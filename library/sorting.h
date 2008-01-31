@@ -3,6 +3,7 @@
 
 #include "../FreeFileSync.h"
 #include "resources.h"
+#include "globalFunctions.h"
 
 
 enum SideToSort
@@ -10,34 +11,6 @@ enum SideToSort
     SORT_ON_LEFT,
     SORT_ON_RIGHT,
 };
-
-
-template <bool sortAscending>
-inline
-bool cmpString(const wxString& a, const wxString& b)
-{
-    if (a.IsEmpty())
-        return false;   //if a and b are empty: false, if a empty, b not empty: also false, since empty rows should appear at the end
-    else if (b.IsEmpty())
-        return true;    //empty rows after filled rows: return true
-
-    //if a and b not empty:
-    if (sortAscending)
-        return (a < b);
-    else
-        return (a > b);
-}
-
-
-template <bool sortAscending>
-inline
-bool cmpLargeInt(const wxULongLong& a, const wxULongLong& b)
-{
-    if (sortAscending)
-        return (a < b);
-    else
-        return (a > b);
-}
 
 
 template <SideToSort side>
@@ -54,49 +27,68 @@ void getDescrLine(const FileCompareLine& a, const FileCompareLine& b, const File
         descrLineA = &a.fileDescrRight;
         descrLineB = &b.fileDescrRight;
     }
-    else assert(false);
+    else
+        assert(false);
 }
 
 
+template <bool sortAscending>
 inline
-wxChar formatChar(const wxChar& c)
+bool stringSmallerThan(const wxChar* stringA, const wxChar* stringB)
 {
-    return c;
-    //return wxTolower(c); <- this is slow as hell! sorting slower by factor 10
+#ifdef FFS_WIN //case-insensitive comparison!
+    return sortAscending ?
+           FreeFileSync::compareStringsWin32(stringA, stringB) < 0 : //way faster than wxString::CmpNoCase() in windows build!!!
+           FreeFileSync::compareStringsWin32(stringA, stringB) > 0;
+#else
+    while (*stringA == *stringB)
+    {
+        if (*stringA == wxChar(0)) //strings are equal
+            return false;
+
+        ++stringA;
+        ++stringB;
+    }
+    return sortAscending ? *stringA < *stringB : *stringA > *stringB; //wxChar(0) is handled correctly
+#endif
 }
 
 
 inline
 int compareString(const wxChar* stringA, const wxChar* stringB, const int lengthA, const int lengthB)
 {
+#ifdef FFS_WIN //case-insensitive comparison!
+    return FreeFileSync::compareStringsWin32(stringA, stringB, lengthA, lengthB); //way faster than wxString::CmpNoCase() in the windows build!!!
+#else
     int i = 0;
     if (lengthA == lengthB)
     {
         for (i = 0; i < lengthA; ++i)
         {
-            if (formatChar(stringA[i]) != formatChar(stringB[i]))
+            if (stringA[i] != stringB[i])
                 break;
         }
-        return i == lengthA ? 0 : formatChar(stringA[i]) < formatChar(stringB[i]) ? -1 : 1;
+        return i == lengthA ? 0 : stringA[i] < stringB[i] ? -1 : 1;
     }
     else if (lengthA < lengthB)
     {
         for (i = 0; i < lengthA; ++i)
         {
-            if (formatChar(stringA[i]) != formatChar(stringB[i]))
+            if (stringA[i] != stringB[i])
                 break;
         }
-        return i == lengthA ? -1 : formatChar(stringA[i]) < formatChar(stringB[i]) ? -1 : 1;
+        return i == lengthA ? -1 : stringA[i] < stringB[i] ? -1 : 1;
     }
     else
     {
         for (i = 0; i < lengthB; ++i)
         {
-            if (formatChar(stringA[i]) != formatChar(stringB[i]))
+            if (stringA[i] != stringB[i])
                 break;
         }
-        return i == lengthB ? 1 : formatChar(stringA[i]) < formatChar(stringB[i]) ? -1 : 1;
+        return i == lengthB ? 1 : stringA[i] < stringB[i] ? -1 : 1;
     }
+#endif
 }
 
 
@@ -119,43 +111,23 @@ bool sortByFileName(const FileCompareLine& a, const FileCompareLine& b)
         return true;
     else
     {
-        const wxChar* stringA  = NULL;
-        const wxChar* stringB  = NULL;
-        int lenghtA  = 0;
-        int lenghtB  = 0;
+        const wxChar* stringA = descrLineA->relativeName.c_str();
+        const wxChar* stringB = descrLineB->relativeName.c_str();
 
-        int pos = descrLineA->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
-        if (pos == wxNOT_FOUND)
-        {
-            stringA = descrLineA->relativeName.c_str();
-            lenghtA = descrLineA->relativeName.Len();
-        }
-        else
-        {
-            stringA = descrLineA->relativeName.c_str() + pos + 1;
-            lenghtA = descrLineA->relativeName.Len() - (pos + 1);
-        }
+        size_t pos = descrLineA->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
+        if (pos != string::npos)
+            stringA += pos + 1;
 
         pos = descrLineB->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
-        if (pos == wxNOT_FOUND)
-        {
-            stringB = descrLineB->relativeName.c_str();
-            lenghtB = descrLineB->relativeName.Len();
-        }
-        else
-        {
-            stringB = descrLineB->relativeName.c_str() + pos + 1;
-            lenghtB = descrLineB->relativeName.Len() - (pos + 1);
-        }
+        if (pos != string::npos)
+            stringB += pos + 1;
 
-        int rv = compareString(stringA, stringB, lenghtA, lenghtB);
-        return sortAscending ? (rv == -1) : (rv == 1);
+        return stringSmallerThan<sortAscending>(stringA, stringB);
     }
 }
 
 
 template <bool sortAscending, SideToSort side>
-inline
 bool sortByRelativeName(const FileCompareLine& a, const FileCompareLine& b)
 {
     const FileDescrLine* descrLineA = NULL;
@@ -163,67 +135,59 @@ bool sortByRelativeName(const FileCompareLine& a, const FileCompareLine& b)
     getDescrLine<side>(a, b, descrLineA, descrLineB);
 
     //extract relative name and filename
-    const wxChar* relStringA  = NULL;
-    const wxChar* fileStringA = NULL;
-    int relLenghtA  = 0;
+    const wxChar* relStringA  = descrLineA->relativeName.c_str(); //mustn't be NULL for CompareString() API to work correctly
+    const wxChar* fileStringA = relStringA;
+    int relLengthA  = 0;
     int fileLengthA = 0;
+
     if (descrLineA->objType == FileDescrLine::TYPE_DIRECTORY)
-    {
-        relStringA  = descrLineA->relativeName.c_str();
-        relLenghtA  = descrLineA->relativeName.Len();
-    }
+        relLengthA  = descrLineA->relativeName.length();
     else if (descrLineA->objType == FileDescrLine::TYPE_FILE)
     {
-        relLenghtA = descrLineA->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
-        if (relLenghtA == wxNOT_FOUND)
+        relLengthA = descrLineA->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
+        if (relLengthA == wxNOT_FOUND)
         {
-            relLenghtA  = 0;
-            fileStringA = descrLineA->relativeName.c_str();
-            fileLengthA = descrLineA->relativeName.Len();
+            relLengthA  = 0;
+            fileLengthA = descrLineA->relativeName.length();
         }
         else
         {
-            relStringA  = descrLineA->relativeName.c_str();
-            fileStringA = descrLineA->relativeName.c_str() + relLenghtA + 1;
-            fileLengthA = descrLineA->relativeName.Len() - (relLenghtA + 1);
+            fileStringA += relLengthA + 1;
+            fileLengthA = descrLineA->relativeName.length() - (relLengthA + 1);
         }
     }
     else
         return false; //empty rows should be on end of list
 
 
-    const wxChar* relStringB  = NULL;
-    const wxChar* fileStringB = NULL;
-    int relLenghtB  = 0;
+    const wxChar* relStringB  = descrLineB->relativeName.c_str(); //mustn't be NULL for CompareString() API to work correctly
+    const wxChar* fileStringB = relStringB;
+    int relLengthB  = 0;
     int fileLengthB = 0;
+
     if (descrLineB->objType == FileDescrLine::TYPE_DIRECTORY)
-    {
-        relStringB  = descrLineB->relativeName.c_str();
-        relLenghtB  = descrLineB->relativeName.Len();
-    }
+        relLengthB  = descrLineB->relativeName.length();
     else if (descrLineB->objType == FileDescrLine::TYPE_FILE)
     {
-        relLenghtB = descrLineB->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
-        if (relLenghtB == wxNOT_FOUND)
+        relLengthB = descrLineB->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
+        if (relLengthB == wxNOT_FOUND)
         {
-            relLenghtB  = 0;
-            fileStringB = descrLineB->relativeName.c_str();
-            fileLengthB = descrLineB->relativeName.Len();
+            relLengthB  = 0;
+            fileLengthB = descrLineB->relativeName.length();
         }
         else
         {
-            relStringB  = descrLineB->relativeName.c_str();
-            fileStringB = descrLineB->relativeName.c_str() + relLenghtB + 1;
-            fileLengthB = descrLineB->relativeName.Len() - (relLenghtB + 1);
+            fileStringB += relLengthB + 1;
+            fileLengthB = descrLineB->relativeName.length() - (relLengthB + 1);
         }
     }
     else
         return true; //empty rows should be on end of list
 
     //compare relative names without filenames first
-    int rv = compareString(relStringA, relStringB, relLenghtA, relLenghtB);
+    int rv = compareString(relStringA, relStringB, relLengthA, relLengthB);
     if (rv != 0)
-        return sortAscending ? (rv == -1) : (rv == 1);
+        return sortAscending ? (rv < 0) : (rv > 0);
     else //compare the filenames
     {
         if (descrLineB->objType == FileDescrLine::TYPE_DIRECTORY)  //directories shall appear before files
@@ -231,8 +195,9 @@ bool sortByRelativeName(const FileCompareLine& a, const FileCompareLine& b)
         else if (descrLineA->objType == FileDescrLine::TYPE_DIRECTORY)
             return true;
 
-        rv = compareString(fileStringA, fileStringB, fileLengthA, fileLengthB);
-        return sortAscending ? (rv == -1) : (rv == 1);
+        return sortAscending ?
+               compareString(fileStringA, fileStringB, fileLengthA, fileLengthB) < 0 :
+               compareString(fileStringA, fileStringB, fileLengthA, fileLengthB) > 0;
     }
 }
 
@@ -254,8 +219,10 @@ bool sortByFileSize(const FileCompareLine& a, const FileCompareLine& b)
         return false;
     else if (descrLineB->objType == FileDescrLine::TYPE_DIRECTORY)
         return true;
-    else       //use unformatted filesizes and sort by size
-        return  cmpLargeInt<sortAscending>(descrLineA->fileSize, descrLineB->fileSize);
+    else
+        return sortAscending ?
+               descrLineA->fileSize < descrLineB->fileSize :
+               descrLineA->fileSize > descrLineB->fileSize;
 }
 
 
@@ -267,7 +234,19 @@ bool sortByDate(const FileCompareLine& a, const FileCompareLine& b)
     const FileDescrLine* descrLineB = NULL;
     getDescrLine<side>(a, b, descrLineA, descrLineB);
 
-    return cmpString<sortAscending>(descrLineA->lastWriteTime, descrLineB->lastWriteTime);
+    //presort types: first files, then directories then empty rows
+    if (descrLineA->objType == FileDescrLine::TYPE_NOTHING)
+        return false;  //empty rows always last
+    else if (descrLineB->objType == FileDescrLine::TYPE_NOTHING)
+        return true;  //empty rows always last
+    else if (descrLineA->objType == FileDescrLine::TYPE_DIRECTORY)
+        return false;
+    else if (descrLineB->objType == FileDescrLine::TYPE_DIRECTORY)
+        return true;
+    else
+        return sortAscending ?
+               descrLineA->lastWriteTimeRaw < descrLineB->lastWriteTimeRaw :
+               descrLineA->lastWriteTimeRaw > descrLineB->lastWriteTimeRaw;
 }
 
 

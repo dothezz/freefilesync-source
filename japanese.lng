@@ -10,34 +10,18 @@
  PB
  TB
  TB
- You may try to synchronize remaining items again (WITHOUT having to re-compare)!
- 残っているファイルは、再び同期することができます (再比較とは別の動作)!
- already exists. Overwrite?
- すでに存在します.. 上書きしますか?
- directories
- ディレクトリ
- directory
- ディレクトリ
- file, 
- つのファイル, 
- files, 
- つのファイル, 
- item(s):\n\n
- つのアイテム(複):\n\n
  kB
  kB
- of 
-  /  
- overwriting 
- 上書き中 
- row in view
-　列を表示
- rows in view
-　列を表示
- to 
- から 
 !=	files are different\n
 !=	ファイルは異なっています\n
+%x directories
+%x ディレクトリ
+%x files,
+%x 個のファイル:
+%x of %y rows in view
+%x / %y 行を表示
+%x of 1 row in view
+%x / 1 行を表示
 &Abort
 情報(&A)
 &About...
@@ -108,12 +92,14 @@
 - 右側の方が新しい
 - same date (different size)
 - 日付は同一(サイズに差異あり)
----------\n
------------\n
 -Open-Source file synchronization-
 -Open-Source ファイル同期ツール-
 .
 ,
+1 directory
+1 ディレクトリ
+1 file,
+1 ファイル
 1. &Compare
 1. 比較(&C)
 1. Enter full file or directory names separated by ';' or a new line.
@@ -152,8 +138,8 @@ Action
 操作
 Add folder pair
 フォルダのペアを追加
-Add to exclude filter: 
-除外フィルターを追加 
+Add to exclude filter:
+除外フィルターを追加
 Adjust file times
 ファイル時間の調整
 Adjust modification times of all files contained in the specified folder and its subfolders. This manual adaption might become necessary if you are synchronizing against a FAT32 drive and the daylight saving time is switched. For an overview about the issue see this article:
@@ -166,8 +152,6 @@ An exception occured!
 例外が発生しました!
 Apply
 適用
-As a result 6 different status can be returned to categorize all files:
-すべてのファイルのカテゴリ別に、6 つの異なるステータスを結果に返す事が出来ます。
 As a result the files are separated into the following categories:
 ファイルは以下のカテゴリに分類されます:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
@@ -178,8 +162,8 @@ Batch file created successfully!
 バッチファイルが作成されました!
 Big thanks for localizing FreeFileSync goes out to:
 FreeFileSync のローカライズへの協力に感謝します:
-Build: 
-ビルド: 
+Build:
+ビルド:
 Choose to hide filtered files/directories from list
 リストから除外したいファイル/ディレクトリを選択
 Comma separated list
@@ -194,8 +178,8 @@ Compare by...
 比較対象...
 Comparing content
 内容の比較中
-Comparing content of files 
-ファイルの内容を比較中 
+Comparing content of files \"%x\"
+ファイル \"%x\" の内容を比較中
 Comparing...
 比較中...
 Completed
@@ -220,6 +204,8 @@ Consider this when setting up synchronization rules: You might want to avoid wri
 同期規則を設定する時の備考: ディレクトリの書き込みアクセスを回避することで、これら両方の同期処理が干渉しないようにすることが考えられます。
 Continue
 続行
+Conversion error:
+変換エラー:
 Copy from left to right
 左から右にコピー
 Copy from left to right overwriting
@@ -232,28 +218,20 @@ Copy new or updated files to right folder.
 新しい(更新)ファイルを右フォルダにコピー
 Copy to clipboard\tCTRL+C
 クリップボードにコピー\tCTRL+C
-Copying file 
-ファイルをコピー中 
-Could not open configuration file 
-構成ファイルを開けませんでした 
-Could not open file: 
-ファイルを開けません: 
-Could not read language file 
-言語ファイルを読み込めません 
-Could not retrieve file info for: 
-ファイル情報を取得できません: 
-Could not set working directory to directory containing executable file!
-実行ファイルが含まれるディレクトリは、作業ディレクトリとして利用できません!
-Could not write configuration file 
-構成ファイルに書き込めませんでした 
-Could not write to 
-書き込みに失敗 
+Copying file \"%x\" overwriting \"%y\"
+ファイル \"%x\" をコピー、\"%y\" に上書き中
+Copying file \"%x\" to \"%y\"
+ファイル \"%x\" を \"%y\" にコピー中
+Could not retrieve file info for:
+ファイル情報を取得できません:
+Could not set working directory:
+作業ディレクトリが設定できません:
 Create a batch job
 一括ジョブを作成
 Create:
 作成:
-Creating folder 
-作成するフォルダ 
+Creating folder \"%x\"
+フォルダ \"%x\" を作成中
 Current operation:
 現在の操作:
 Custom
@@ -266,8 +244,6 @@ Data:
 データ:
 Date
 データ
-Date: 
-日付: 
 Daylight saving time change detected for FAT/FAT32 drive.
 FAT/FAT32 ドライブで検出された夏時間の変更
 Delete files/folders existing on left side only
@@ -278,14 +254,14 @@ Delete files\tDEL
 ファイルを削除\tDEL
 Delete:
 削除:
-Deleting file 
-ファイルを削除中 
-Deleting folder 
-フォルダを削除中 
-Directories are dependent: 
-ディレクトリの依存関係: 
-Directory does not exist: 
-ディレクトリが存在しません: 
+Deleting file \"%x\"
+ファイル \"%x\" を削除中
+Deleting folder \"%x\"
+フォルダ \"%x\" を削除中
+Directories are dependent:
+ディレクトリの依存関係:
+Directory does not exist:
+ディレクトリが存在しません:
 Do not show graphical status and error messages but write to a logfile instead
 進捗状況、及びエラーを表示しないで、代わりにログファイルに書き込む
 Do not show this warning again
@@ -306,38 +282,28 @@ Email:
 E-メール:
 Error
 エラー
-Error adapting modification time of file 
-ファイルの更新時間の適合エラー 
-Error changing modification time: 
-更新時間の変更に失敗しました: 
-Error converting FILETIME to SYSTEMTIME
-FILETIME から SYSTEMTIME への変換エラー
-Error converting FILETIME to local FILETIME
-FILETIME から local FILETIME への変換エラー
-Error copying file 
-ファイルのコピーに失敗 
-Error creating directory 
-ディレクトリの作成に失敗 
-Error deleting directory: 
-ディレクトリの削除エラー: 
-Error deleting file: 
-ファイルの削除エラー: 
-Error moving to recycle bin: 
-ゴミ箱への移動に失敗しました: 
-Error parsing configuration file 
-構成ファイルの構文に誤りがあります 
-Error reading file: 
-ファイル読み込みエラー: 
-Error traversing directory 
-ディレクトリの移動エラー 
-Error when converting int to wxString
-wxString の変換エラー
-Error when converting wxString to double
-wxString の変換エラー(double)
-Error when converting wxString to long
-wxString の変換エラー(long)
-Error: Source directory does not exist anymore: 
-エラー: ソースディレクトリが存在しません: 
+Error changing modification time:
+時間の修正中のエラー:
+Error copying file:
+ファイルのコピーに失敗:
+Error creating directory:
+ディレクトリ作成エラー:
+Error deleting directory:
+ディレクトリの削除エラー:
+Error deleting file:
+ファイルの削除エラー:
+Error moving to recycle bin:
+ゴミ箱への移動に失敗しました:
+Error parsing configuration file:
+構成ファイルの構文に誤りがあります:
+Error reading file:
+ファイル読み込みエラー:
+Error traversing directory:
+ディレクトリの移動エラー:
+Error writing file:
+ファイル書き込みエラー:
+Error: Source directory does not exist anymore:
+エラー: ソースディレクトリが存在しません:
 Example
 例
 Exclude
@@ -346,6 +312,8 @@ Exclude temporarily
 一時フォルダを除外
 Feedback and suggestions are welcome at:
 フィードバック、提案など:
+File already exists. Overwrite?
+ファイルは存在します、上書きしますか?
 File content
 ファイルの内容
 File list exported!
@@ -426,10 +394,10 @@ Ignore errors
 エラーを無視
 Ignore next errors
 次のエラーを無視
-Ignore this error, retry or abort comparison?
-このエラーを無視して再試行、或いは比較を中止しますか?
 Ignore this error, retry or abort synchronization?
 このエラーを無視して再試行、或いは同期を中止しますか?
+Ignore this error, retry or abort?
+このエラーを無視して再試行/中断しますか?
 Include
 含める
 Include temporarily
@@ -442,14 +410,14 @@ Information
 インフォメーション
 Information: If you ignore the error or abort a re-compare will be necessary!
 インフォメーション: このエラーを無視して中断した場合は、再比較が必要です!
-Initialization of Recycle Bin failed! It cannot be used!
-ゴミ箱の初期化に失敗しました! 使用できない状態です!
+Initialization of Recycle Bin failed!
+ゴミ箱の初期化に失敗しました!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 ゴミ箱を初期化することが出来ませんでした!\n\n使用している OS が、Windows 以外の OS です。\nこの機能を使用したい場合は、作者までご連絡ください :)
 Left folder:
 左側フォルダ:
-Legend\n
-履歴\n
+Legend
+履歴
 Load configuration via...\n     - this list (press DEL to delete items)\n     - drag & drop to this window\n     - startup parameter
 構成ファイルの読み込み...\n    - リスト (DEL-でアイテムを削除)\n    - ウィンドウにドラッグ & ドロップ\n    - 起動時のパラメータ
 Load from file...
@@ -460,12 +428,10 @@ Mirror ->>
 ミラー >>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 左側フォルダをミラーリングバックアップ: 同期完了後は、左側フォルダに合わせて右側フォルダは上書きされます。
-No valid configuration file specified: 
-有効な構成ファイルが選択されていません: 
 Not all items were synchronized! Have a look at the list.
 すべてのアイテムは同期されていません! 詳細はリストをご覧ください。
-Nothing to synchronize. Both directories adhere to the sync-configuration!
-同期対象がありません。両方のディレクトリに対する同期設定を確認してください!
+Nothing to synchronize according to configuration!
+構成設定に対応する同期がみつかりません!
 Number of files and directories that will be created
 作成されたファイルとディレクトリ数
 Number of files and directories that will be deleted
@@ -506,18 +472,16 @@ Right folder:
 右側フォルダ:
 S&ave configuration
 構成設定を保存(&A)
+Save aborted!
+保存を中断!
 Save current configuration to file
 現在の設定をファイルに保存
-Saved aborted!
-保存の中断!
-Scanning 
-スキャン 
 Scanning...
 スキャン中...
+Scanning:
+スキャン:
 Select a folder
 フォルダを選択
-Select folder
-フォルダ選択
 Select variant:
 変数を選択:
 Set filter for synchronization
@@ -548,8 +512,6 @@ Stop
 停止
 Swap sides
 パネルを入れ替え
-SyncJob.ffs_batch
-SyncJob.ffs_batch
 Synchronization aborted!
 同期処理を中断!
 Synchronization completed successfully.
@@ -568,10 +530,10 @@ Synchronizing...
 同期処理中...
 System out of memory!
 メモリが不足しています!
-The selected file does not contain a valid configuration!
-選択されたファイルには有効な構成が含まれていません!
-The selected file does not exist: 
-選択されたファイルは存在しません: 
+The file does not contain a valid configuration:
+このファイルには有効な構成が含まれていません:
+The selected file does not exist:
+選択されたファイルは存在しません:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
 この変数では、ふたつの同名ファイルが存在した場合、 それぞれのファイルサイズと最終更新日付/時間を比較します。\nファイル時間の差異が 2 秒以内の場合は検出されないということに注意してください。 (これは、FAT32システムで正確に同期を行うことができる最小値です)
 Time elapsed:
@@ -580,12 +542,12 @@ Time shift in seconds
 タイムシフト(秒)
 Time shift:
 タイムシフト:
-Time: 
-時間: 
+Time:
+時間:
 Total amount of data that will be transferred
 転送されたデータの総量
-Total time: 
-合計時間: 
+Total time:
+合計時間:
 Two way <->
 両方向 <->
 Unable to create logfile!
@@ -604,12 +566,14 @@ Use Recycle Bin when deleting or overwriting files during synchronization
 同期処理の間、ファイルの上書き/削除をする時にゴミ箱を使用
 Warning
 警告
-Warning: Synchronization failed for 
-警告: 同期処理に失敗 
+Warning: Synchronization failed for %x item(s):
+警告: %x アイテムの同期に失敗しました:
 When \"Compare\" is triggered with this option set the following decision tree is processed:
 この設定で \"比較\" トリガが実行された場合は、以下のツリーに従って処理されていきます。
 You can adjust the file times accordingly to resolve the issue:
 この問題を解決するために、ファイルの時間を調整できます:
+You may try to synchronize remaining items again (WITHOUT having to re-compare)!
+残っているファイルは、再び同期することができます (再比較とは別の動作)!
 different
 差異あり
 file exists on both sides

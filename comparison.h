@@ -2,6 +2,7 @@
 #define COMPARISON_H_INCLUDED
 
 #include "FreeFileSync.h"
+#include "library/statusHandler.h"
 
 
 namespace FreeFileSync
@@ -26,6 +27,8 @@ namespace FreeFileSync
 
         StatusHandler* statusUpdater;
         wxString optionalLineBreak; //optional line break for status messages (used by GUI mode only)
+
+        const Zstring txtComparingContentOfFiles;
     };
 }
 

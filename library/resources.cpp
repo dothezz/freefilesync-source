@@ -3,6 +3,7 @@
 #include <wx/zipstrm.h>
 #include <wx/image.h>
 #include <wx/icon.h>
+#include <wx/mstream.h>
 #include "globalFunctions.h"
 
 #ifdef FFS_WIN
@@ -111,6 +112,24 @@ GlobalResources::~GlobalResources()
 }
 
 
+void loadAnimFromZip(wxZipInputStream& zipInput, wxAnimation* animation)
+{
+    //Workaround for wxWidgets:
+    //construct seekable input stream (zip-input stream is non-seekable) for wxAnimation::Load()
+    //luckily this method call is very fast: below measurement precision!
+    vector<unsigned char> data;
+    data.reserve(10000);
+
+    int newValue = 0;
+    while ((newValue = zipInput.GetC()) != wxEOF)
+        data.push_back(newValue);
+
+    wxMemoryInputStream seekAbleStream(&data.front(), data.size()); //stream does not take ownership of data
+
+    animation->Load(seekAbleStream, wxANIMATION_TYPE_GIF);
+}
+
+
 void GlobalResources::load()
 {
     wxFileInputStream input(wxT("Resources.dat"));
@@ -121,20 +140,21 @@ void GlobalResources::load()
 
         wxZipInputStream resourceFile(input);
 
-        wxZipEntry* entry;
+        wxZipEntry* entry = NULL;
         map<wxString, wxBitmap*>::iterator bmp;
         while ((entry = resourceFile.GetNextEntry()))
         {
             wxString name = entry->GetName();
 
-            //just to be sure: search if entry is available in map
+            //search if entry is available in map
             if ((bmp = bitmapResource.find(name)) != bitmapResource.end())
                 *(bmp->second) = wxBitmap(wxImage(resourceFile, wxBITMAP_TYPE_PNG));
+            else if (name == wxT("money.gif"))
+                loadAnimFromZip(resourceFile, animationMoney);
+            else if (name == wxT("working.gif"))
+                loadAnimFromZip(resourceFile, animationSync);
         }
     }
-
-    animationMoney->LoadFile(wxT("Resources.a01"));
-    animationSync->LoadFile(wxT("Resources.a02"));
 
 #ifdef FFS_WIN
     programIcon = new wxIcon(wxT("ffsIcon1"));

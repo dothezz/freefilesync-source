@@ -2,6 +2,7 @@
 #include "globalFunctions.h"
 #include "resources.h"
 #include <wx/dc.h>
+#include "../algorithm.h"
 
 const unsigned int MinimumRows = 15;
 
@@ -18,6 +19,7 @@ public:
             gridData(0),
             lastNrRows(MinimumRows) {}
 
+
     ~CustomGridTableBase() {}
 
 
@@ -26,6 +28,7 @@ public:
         this->gridRefUI = gridRefUI;
         this->gridData  = gridData;
     }
+
 
     void SetGridIdentifier(int id)
     {
@@ -43,13 +46,13 @@ public:
             return MinimumRows; //grid is initialized with this number of rows
     }
 
+
     virtual bool IsEmptyCell( int row, int col )
     {
         return (GetValue(row, col) == wxEmptyString);
     }
 
 
-    inline
     wxString evaluateCmpResult(const CompareFilesResult result, const bool selectedForSynchronization)
     {
         if (selectedForSynchronization)
@@ -106,7 +109,7 @@ public:
                             case 2: //file size
                                 return _("<Directory>");
                             case 3: //date
-                                return gridLine.fileDescrLeft.lastWriteTime;
+                                return wxEmptyString;
                             }
                         }
                         else if (gridLine.fileDescrLeft.objType == FileDescrLine::TYPE_FILE)
@@ -120,10 +123,13 @@ public:
                             case 2: //file size
                                 return globalFunctions::includeNumberSeparator(fileSize = gridLine.fileDescrLeft.fileSize.ToString());
                             case 3: //date
-                                return gridLine.fileDescrLeft.lastWriteTime;
+                                return FreeFileSync::utcTimeToLocalString(gridLine.fileDescrLeft.lastWriteTimeRaw);
                             }
                         }
                     }
+                    else
+                        assert (false);
+
                     break;
 
                 case 2:
@@ -140,7 +146,7 @@ public:
                             case 2: //file size
                                 return _("<Directory>");
                             case 3: //date
-                                return gridLine.fileDescrRight.lastWriteTime;
+                                return wxEmptyString;
                             }
                         }
                         else if (gridLine.fileDescrRight.objType == FileDescrLine::TYPE_FILE)
@@ -154,20 +160,24 @@ public:
                             case 2: //file size
                                 return globalFunctions::includeNumberSeparator(fileSize = gridLine.fileDescrRight.fileSize.ToString());
                             case 3: //date
-                                return gridLine.fileDescrRight.lastWriteTime;
+                                return FreeFileSync::utcTimeToLocalString(gridLine.fileDescrRight.lastWriteTimeRaw);
                             }
                         }
                     }
+                    else
+                        assert (false);
+
                     break;
 
                 case 3:
                     if (col < 1)
-                    {
-                        return evaluateCmpResult(gridLine.cmpResult, gridLine.selectedForSynchronization);;
-                    }
+                        return evaluateCmpResult(gridLine.cmpResult, gridLine.selectedForSynchronization);
+                    else
+                        assert (false);
                     break;
 
                 default:
+                    assert (false);
                     break;
                 }
             }
@@ -175,6 +185,7 @@ public:
         //if data is not found:
         return wxEmptyString;
     }
+
 
     virtual void SetValue( int row, int col, const wxString& value )
     {
@@ -319,11 +330,10 @@ CustomGrid::CustomGrid(wxWindow *parent,
                        const wxString& name) :
         wxGrid(parent, id, pos, size, style, name),
         scrollbarsEnabled(true),
-        m_gridLeft(0), m_gridRight(0), m_gridMiddle(0),
-        gridDataTable(0),
+        m_gridLeft(NULL), m_gridRight(NULL), m_gridMiddle(NULL),
+        gridDataTable(NULL),
         currentSortColumn(-1),
-        sortMarker(0)
-{}
+        sortMarker(NULL) {}
 
 
 CustomGrid::~CustomGrid() {}
@@ -335,7 +345,7 @@ bool CustomGrid::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionMod
     //This is done in CreateGrid instead of SetTable method since source code is generated and wxFormbuilder invokes CreatedGrid by default.
 
     gridDataTable = new CustomGridTableBase(numRows, numCols);
-    SetTable(gridDataTable, true, selmode);  //give ownership to CustomGrid: gridDataTable is deleted automatically in CustomGrid destructor
+    SetTable(gridDataTable, true, selmode);  //give ownership to wxGrid: gridDataTable is deleted automatically in wxGrid destructor
     return true;
 }
 
@@ -356,7 +366,7 @@ void CustomGrid::SetScrollbar(int orientation, int position, int thumbSize, int 
 }
 
 
-//ensure that all grids are properly aligned: add some extra window space to grids that have no horizontal scrollbar
+//workaround: ensure that all grids are properly aligned: add some extra window space to grids that have no horizontal scrollbar
 void CustomGrid::adjustGridHeights() //m_gridLeft, m_gridRight, m_gridMiddle are not NULL in this context
 {
     int y1 = 0;
@@ -372,17 +382,17 @@ void CustomGrid::adjustGridHeights() //m_gridLeft, m_gridRight, m_gridMiddle are
     {
         int yMax = max(y1, max(y2, y3));
 
-        if (leadingPanel == 1)  //do not handle case (y1 == yMax) here!!! Avoid back coupling!
+        if (::leadGrid == m_gridLeft)  //do not handle case (y1 == yMax) here!!! Avoid back coupling!
             m_gridLeft->SetMargins(0, 0);
         else if (y1 < yMax)
             m_gridLeft->SetMargins(0, 50);
 
-        if (leadingPanel == 2)
+        if (::leadGrid == m_gridRight)
             m_gridRight->SetMargins(0, 0);
         else if (y2 < yMax)
             m_gridRight->SetMargins(0, 50);
 
-        if (leadingPanel == 3)
+        if (::leadGrid == m_gridMiddle)
             m_gridMiddle->SetMargins(0, 0);
         else if (y3 < yMax)
             m_gridMiddle->SetMargins(0, 50);
@@ -400,26 +410,29 @@ void CustomGrid::DoPrepareDC(wxDC& dc)
     wxScrollHelper::DoPrepareDC(dc);
 
     int x, y = 0;
-    if (leadingPanel == 1 && this == m_gridLeft)   //avoid back coupling
+    if (this == ::leadGrid)  //avoid back coupling
     {
-        GetViewStart(&x, &y);
-        m_gridRight->Scroll(x, y);
-        m_gridMiddle->Scroll(-1, y); //scroll in y-direction only
-        adjustGridHeights(); //keep here to ensure m_gridLeft, m_gridRight, m_gridMiddle != NULL
-    }
-    else if (leadingPanel == 2 && this == m_gridRight)   //avoid back coupling
-    {
-        GetViewStart(&x, &y);
-        m_gridLeft->Scroll(x, y);
-        m_gridMiddle->Scroll(-1, y);
-        adjustGridHeights(); //keep here to ensure m_gridLeft, m_gridRight, m_gridMiddle != NULL
-    }
-    else if (leadingPanel == 3 && this == m_gridMiddle)   //avoid back coupling
-    {
-        GetViewStart(&x, &y);
-        m_gridLeft->Scroll(-1, y);
-        m_gridRight->Scroll(-1, y);
-        adjustGridHeights(); //keep here to ensure m_gridLeft, m_gridRight, m_gridMiddle != NULL
+        if (this == m_gridLeft)
+        {
+            GetViewStart(&x, &y);
+            m_gridRight->Scroll(x, y);
+            m_gridMiddle->Scroll(-1, y); //scroll in y-direction only
+            adjustGridHeights(); //keep here to ensure m_gridLeft, m_gridRight, m_gridMiddle != NULL
+        }
+        else if (this == m_gridRight)
+        {
+            GetViewStart(&x, &y);
+            m_gridLeft->Scroll(x, y);
+            m_gridMiddle->Scroll(-1, y);
+            adjustGridHeights(); //keep here to ensure m_gridLeft, m_gridRight, m_gridMiddle != NULL
+        }
+        else if (this == m_gridMiddle)
+        {
+            GetViewStart(&x, &y);
+            m_gridLeft->Scroll(-1, y);
+            m_gridRight->Scroll(-1, y);
+            adjustGridHeights(); //keep here to ensure m_gridLeft, m_gridRight, m_gridMiddle != NULL
+        }
     }
 }
 
@@ -427,12 +440,10 @@ void CustomGrid::DoPrepareDC(wxDC& dc)
 //these classes will scroll together, hence the name ;)
 void CustomGrid::setScrollFriends(CustomGrid* gridLeft, CustomGrid* gridRight, CustomGrid* gridMiddle)
 {
-    assert(gridLeft);
-    assert(gridRight);
-    assert(gridMiddle);
+    assert(gridLeft && gridRight && gridMiddle);
 
-    m_gridLeft = gridLeft;
-    m_gridRight = gridRight;
+    m_gridLeft   = gridLeft;
+    m_gridRight  = gridRight;
     m_gridMiddle = gridMiddle;
 
     assert(gridDataTable);
@@ -479,3 +490,4 @@ void CustomGrid::DrawColLabel(wxDC& dc, int col)
         dc.DrawBitmap(*sortMarker, GetColRight(col) - 16 - 2, 2, true); //respect 2-pixel border
     }
 }
+

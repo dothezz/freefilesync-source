@@ -3,7 +3,6 @@
 
 #include "../FreeFileSync.h"
 #include "tinyxml/tinyxml.h"
-#include <wx/intl.h>
 
 using namespace FreeFileSync;
 
@@ -42,13 +41,14 @@ namespace xmlAccess
         bool silent;
     };
 
+    int retrieveSystemLanguage();
 
     struct XmlGlobalSettings
     {
         struct _Global
         {
             _Global() :
-                    programLanguage(wxLocale::GetSystemLanguage()),
+                    programLanguage(retrieveSystemLanguage()),
 #ifdef FFS_WIN
                     dstCheckActive(true),
 #endif
@@ -77,6 +77,8 @@ namespace xmlAccess
             bool isMaximized;
             vector<int> columnWidthLeft;
             vector<int> columnWidthRight;
+            vector<int> columnPositionsLeft;
+            vector<int> columnPositionsRight;
         } gui;
 
         //struct _Batch

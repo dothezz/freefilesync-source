@@ -36,6 +36,9 @@ obj/fileHandling.o: library/fileHandling.cpp
 obj/multithreading.o: library/multithreading.cpp
 	g++ $(CPPFLAGS) library/multithreading.cpp -o obj/multithreading.o
 
+obj/statusHandler.o: library/statusHandler.cpp
+	g++ $(CPPFLAGS) library/statusHandler.cpp -o obj/statusHandler.o
+
 obj/resources.o: library/resources.cpp
 	g++ $(CPPFLAGS) library/resources.cpp -o obj/resources.o
 
@@ -60,9 +63,11 @@ obj/tinyxmlparser.o: library/tinyxml/tinyxmlparser.cpp
 obj/processXml.o: library/processXml.cpp
 	g++ $(CPPFLAGS) library/processXml.cpp -o obj/processXml.o
 	
-FreeFileSync: obj/application.o obj/algorithm.o obj/comparison.o obj/synchronization.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/fileHandling.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o
-	g++ $(ENDFLAGS) -o FreeFileSync obj/application.o obj/algorithm.o obj/comparison.o obj/synchronization.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/fileHandling.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o
+obj/zstring.o: library/zstring.cpp
+	g++ $(CPPFLAGS) library/zstring.cpp -o obj/zstring.o
 
+	FreeFileSync: obj/application.o obj/algorithm.o obj/comparison.o obj/synchronization.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/fileHandling.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/statusHandler.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o obj/zstring.o
+	g++ $(ENDFLAGS) -o FreeFileSync obj/application.o obj/algorithm.o obj/comparison.o obj/synchronization.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/fileHandling.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/statusHandler.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o obj/zstring.o
 
 clean:
 	find obj -type f -exec rm {} \;

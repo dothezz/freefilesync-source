@@ -15,7 +15,7 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
     m_bitmap13->SetBitmap(*globalResource.bitmapGPL);
 
     //build information
-    wxString build = wxString(wxT("(")) + _("Build: ") + __TDATE__;
+    wxString build = wxString(wxT("(")) + _("Build:") + wxT(" ") + __TDATE__;
 #if wxUSE_UNICODE
     build+= wxT(" - Unicode");
 #else
@@ -199,7 +199,7 @@ void DeleteDialog::OnClose(wxCloseEvent& event)
 //########################################################################################
 
 
-ErrorDlg::ErrorDlg(wxWindow* parentWindow, const wxString messageText, bool& ignoreNextErrors, int dummy) :
+ErrorDlg::ErrorDlg(wxWindow* parentWindow, const wxString messageText, bool& ignoreNextErrors) :
         ErrorDlgGenerated(parentWindow),
         ignoreErrors(ignoreNextErrors)
 {
@@ -334,11 +334,11 @@ public:
         if (ignoreErrors)
         {
             unsolvedErrors = true;
-            return ErrorHandler::CONTINUE_NEXT;
+            return ErrorHandler::IGNORE_ERROR;
         }
 
         bool ignoreNextErrors = false;
-        ErrorDlg* errorDlg = new ErrorDlg(parent, text, ignoreNextErrors, 90);
+        ErrorDlg* errorDlg = new ErrorDlg(parent, text, ignoreNextErrors);
         int rv = errorDlg->ShowModal();
 
         switch (rv)
@@ -346,7 +346,7 @@ public:
         case ErrorDlg::BUTTON_IGNORE:
             ignoreErrors = ignoreNextErrors;
             unsolvedErrors = true;
-            return ErrorHandler::CONTINUE_NEXT;
+            return ErrorHandler::IGNORE_ERROR;
         case ErrorDlg::BUTTON_RETRY:
             return ErrorHandler::RETRY;
         case ErrorDlg::BUTTON_ABORT:
@@ -356,9 +356,8 @@ public:
         }
         default:
             assert (false);
+            return ErrorHandler::IGNORE_ERROR; //dummy return value
         }
-
-        return ErrorHandler::CONTINUE_NEXT; //dummy return value
     }
 
 private:
@@ -375,13 +374,15 @@ void ModifyFilesDlg::OnApply(wxCommandEvent& event)
 
     if (!wxDirExists(parentDir))
     {
-        wxMessageBox(wxString(_("Directory does not exist: ")) + wxT("\"") + parentDir + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(wxString(_("Directory does not exist:")) + wxT(" \"") + parentDir + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
         return;
     }
 
     bool unsolvedErrorOccured = false; //if an error is skipped a re-compare will be necessary!
     try
     {
+        wxBusyCursor dummy; //show hourglass cursor
+
         ModifyErrorHandler errorHandler(this, unsolvedErrorOccured);
         FreeFileSync::adjustModificationTimes(parentDir, timeToShift, &errorHandler);
     }
@@ -394,6 +395,7 @@ void ModifyFilesDlg::OnApply(wxCommandEvent& event)
         wxMessageBox(_("Unresolved errors occured during operation!"), _("Information"), wxOK);
     else
         wxMessageBox(_("All file times have been adjusted successfully!"), _("Information"), wxOK);
+
     EndModal(BUTTON_APPLY);
 }
 

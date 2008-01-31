@@ -11,7 +11,6 @@
 #define FREEFILESYNCAPP_H
 
 #include <wx/app.h>
-#include <wx/cmdline.h>
 #include "ui/smallDialogs.h"
 #include "library/misc.h"
 #include "library/processXml.h"

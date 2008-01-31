@@ -2,7 +2,7 @@
 #define STATUSHANDLER_H_INCLUDED
 
 #include <wx/string.h>
-#include <wx/thread.h>
+
 
 const int UI_UPDATE_INTERVAL = 100; //perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
 
@@ -21,7 +21,7 @@ public:
 
     enum Response
     {
-        CONTINUE_NEXT = 10,
+        IGNORE_ERROR = 10,
         RETRY
     };
     virtual Response reportError(const wxString& text) = 0;

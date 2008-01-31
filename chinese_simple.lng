@@ -1,0 +1,520 @@
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+ Byte
+ Byte
+ GB
+ GB
+ MB
+ MB
+ PB
+ PB
+ TB
+ TB
+ kB
+ kB
+!=	files are different\n
+!=	文件不同\n
+&Abort
+取消(&A)
+&About...
+关于(&A)...
+&Adjust file times
+调整文件时间(&A)
+&Advanced
+高级(&A)
+&Back
+返回(&B)
+&Cancel
+撒消(&C)
+&Compare
+比较(&C)
+&Create
+创建(&C)
+&Create batch job
+创建批处理作业(&C)
+&Default
+默认(&D)
+&Export file list
+导出文件列表(&E)
+&File
+文件(&F)
+&Help
+帮助(&H)
+&Ignore
+忽略(&I)
+&Language
+切换语言(&L)
+&Load configuration
+加载配置(&L)
+&OK
+确定(&O)
+&Pause
+暂停(&P)
+&Quit
+退出(&Q)
+&Resolve
+解决(&R)
+&Retry
+重试(&R)
+&Start
+开始(&S)
+&Synchronize
+同步(&S)
+(-)	filtered out from sync-process\n
+(-)	从同步進程中过滤出\n
+,
+.
+- different
+- 不同
+- different (same date, different size)
+- 不同 (日期相同,大小不同)
+- equal
+- 相同
+- exists left only
+- 仅左侧存在的
+- exists right only
+- 仅右侧存在的
+- left
+- 左侧
+- left newer
+- 左侧较新
+- right
+- 右侧
+- right newer
+- 右侧较新
+- same date (different size)
+- 日期相同 (大小不同)
+-Open-Source file synchronization-
+-开源文件同步器-
+.
+,
+1. &Compare
+1. 比较(&C)
+2. &Synchronize...
+2. 同步(&S)...
+2. Use wildcard characters '*' and '?'.
+2. 使用通配符"*"和"?".
+3. Exclude files directly on main grid via context menu.
+3. 直接通过上下文菜单的主要网格排除文件.
+4. Keep the number of entries small for best performance.
+4. 保持小型项目的数量以获得最佳的性能.
+<<	left file is newer\n
+<<	左侧文件较新\n
+<Directory>
+<目录>
+<multiple selection>
+<多选>
+<|	file on left side only\n
+<|	仅左侧文件\n
+==	files are equal\n\n
+==	文件相同\n\n
+>>	right file is newer\n
+>>	右侧文件较新\n
+Abort
+取消
+Abort requested: Waiting for current operation to finish...
+取消请求: 正在等待当前操作完成...
+Aborted
+已取消
+About
+关于
+Action
+动作
+Add folder pair
+添加成对文件夹
+Add to exclude filter:
+添加到排除过滤:
+Adjust file times
+调整文件时间
+Adjust modification times of all files contained in the specified folder and its subfolders. This manual adaption might become necessary if you are synchronizing against a FAT32 drive and the daylight saving time is switched. For an overview about the issue see this article:
+调整修改时，所有的文件载于指定的文件夹及其子文件夹。\n这本手册适应可能需要如果您是同步对FAT32驱动器和夏令时的情况。\n概述的问题参阅此文章:
+All file times have been adjusted successfully!
+所有文件时间已经调整成功!
+All items have been synchronized!
+所有项目已经同步完成!
+An exception occured!
+发生异常!
+Apply
+应用
+As a result the files are separated into the following categories:
+由该文件分为以下几类:
+As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
+顾名思义,这两个文件共享相同的名称被标记为相同当且仅当它们具有相同的内容。\n此选项是有用的一致性检查，而不是备份行动.因此,文件时间没有被考虑到. \n\n通过此选项使决策树较小:
+Assemble a batch file with the following settings. To start synchronization in batch mode simply execute this file or schedule it in your operating system's task planner.
+装配一个批处理文件使用以下设置:\n开始同步批处理模式只是执行此文件或将它计划在您的操作系统的任务规划.
+Batch file created successfully!
+批处理文件创建成功!
+Big thanks for localizing FreeFileSync goes out to:
+非常感谢做本地化FreeFileSync工作的以下人员:
+Build:
+开发:
+Choose to hide filtered files/directories from list
+从列表中选择隐藏过滤文件/文件夹
+Comma separated list
+逗号分隔的列表
+Compare both sides
+两侧比较
+Compare by \"File content\"
+通过文件内容比较
+Compare by \"File size and date\"
+通过文件大小和日期比较
+Compare by...
+比较选项...
+Comparing content
+正在比较内容
+Comparing...
+比较中...
+Completed
+完成
+Configuration
+配置
+Configuration loaded!
+配置已加载!
+Configuration overview:
+配置概览:
+Configuration saved!
+配置已保存!
+Configure filter
+配置过滤
+Configure filter...
+设置过滤...
+Configure your own synchronization rules.
+配置自己的同步规则.
+Confirm
+确认
+Consider this when setting up synchronization rules: You might want to avoid write access to these directories so that synchronization of both does not interfere.
+设置同步规则时审核：您可能要避免写入权限能存取到这些目录，以便同步时两个不干预
+Continue
+继续
+Copy from left to right
+从左侧复制到右侧
+Copy from left to right overwriting
+从左侧复制到右侧(覆盖模式)
+Copy from right to left
+从右侧复制到左侧
+Copy from right to left overwriting
+从右侧复制到左侧(覆盖模式)
+Copy new or updated files to right folder.
+复制新的或修改过的文件到右侧文件夹
+Copy to clipboard\tCTRL+C
+复制到剪贴板\t使用CTRL+C键
+Could not retrieve file info for:
+无法检索下列文件信息:
+Create a batch job
+创建一个批工作
+Create:
+创建:
+Current operation:
+当前操作:
+Custom
+自定义
+DECISION TREE
+决策树
+Data remaining:
+剩余数据:
+Data:
+数据:
+Date
+日期
+Daylight saving time change detected for FAT/FAT32 drive.
+改变时间(FAT/FAT32驱动器)
+Delete files/folders existing on left side only
+仅从左侧中删除文件/方件夹
+Delete files/folders existing on right side only
+仅从左侧中删除文件/方件夹
+Delete files\tDEL
+删除文件\t使用DEL键
+Delete:
+删除:
+Directories are dependent:
+目录已经存在:
+Directory does not exist:
+目录不存在:
+Do not show graphical status and error messages but write to a logfile instead
+不显示图示状态和消息但写入日志
+Do not show this warning again
+不再显示警告信息
+Do nothing
+保持不动
+Do you really want to delete the following objects(s)?
+你确定要删除下列项目吗?
+Do you really want to move the following objects(s) to the recycle bin?
+你确定要移到下列项目到回收站吗?
+Donate with PayPal
+通过PayPal捐赠
+Drag && drop
+拖拽
+Email:
+电子邮件:
+Error
+错误
+Error copying file:
+复制文件出错:
+Error deleting directory:
+删除目录出错:
+Error deleting file:
+删除文件出错:
+Error moving to recycle bin:
+移到回收站出错:
+Error parsing configuration file:
+分析配置文件出错:
+Error reading file:
+读取文件出错:
+Error traversing directory:
+遍历目录出错:
+Error: Source directory does not exist anymore:
+错误:源目录根本不存在:
+Example
+例如
+Exclude
+例外
+Exclude temporarily
+暂时例外
+Feedback and suggestions are welcome at:
+欢迎在下面提出反馈意见和建议:
+File content
+文件内容
+File list exported!
+文件清单已经列出!
+File size and date
+文件大小和日期
+Filename
+文件名
+Files are found equal if\n     - file content\nis the same.
+如果文件内容相同则认为两者相同
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
+如果文件大小和最后修改时间和日期相同则认为两者相同.
+Files remaining:
+其余档案:
+Files that exist on both sides and have different content
+两侧都有但内容不同的文件
+Files that exist on both sides, have same date but different filesizes
+两侧都有且日期相同但文件大小不同的文件
+Files that exist on both sides, left one is newer
+两侧都有但左侧较新的文件
+Files that exist on both sides, right one is newer
+两侧都有但右侧较新的文件
+Files/folders remaining:
+档案/文件夹剩余:
+Files/folders scanned:
+档案/文件夹已扫描:
+Files/folders that exist on left side only
+仅在左侧存在的档案/文件夹
+Files/folders that exist on right side only
+仅在左侧存在的档案/文件夹
+Filter
+过滤
+Filter view
+过滤查看
+Folder pair
+文件夹对
+FreeFileSync - Folder Comparison and Synchronization
+FreeFileSync - 文件夹比较与同步
+FreeFileSync Batch Job
+FreeFileSync 批处理作业
+FreeFileSync at Sourceforge
+FreeFileSync at Sourceforge
+FreeFileSync batch file
+FreeFileSync 批处理文件
+FreeFileSync configuration
+FreeFileSync 配置
+Help
+帮助
+Hide files that are different
+隐藏不同的档案
+Hide files that are equal
+隐藏相同的档案
+Hide files that are newer on left
+隐藏左侧较新的档案
+Hide files that are newer on right
+隐藏右侧较新的档案
+Hide files that exist on left side only
+仅隐藏在左侧的档案
+Hide files that exist on right side only
+仅隐藏在右侧的档案
+Hide filtered items
+隐藏已过滤的项目
+Hide further error messages during the current process
+在当前進程中隐藏下一步的错误信息
+Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
+隐藏同步时的错误信息：在结束进程时收集和显示的清单
+Hints:
+提示:
+Homepage:
+网站主页:
+If you like FFS:
+个人捐助:
+Ignore errors
+忽略错误
+Ignore next errors
+忽略下一个错误
+Ignore this error, retry or abort synchronization?
+忽略这个错误,重试或取消同步?
+Include
+包括
+Include temporarily
+暂时包括
+Include: *.doc;*.zip;*.exe\nExclude: *\\temp\\*
+包括:*.doc;*.zip;*.exe 除外:*\\temp\\*
+Info
+信息
+Information
+信息
+Information: If you ignore the error or abort a re-compare will be necessary!
+信息:如果你忽略或取消这个错误则有必要作再次比较!
+It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
+初始化回收站是不大可能了!估计你使用的不是Windows系统.如果你想未来在此系统上应用请联系作者. :)
+Left folder:
+左侧方件夹:
+Legend
+联想
+Load configuration via...\n     - this list (press DEL to delete items)\n     - drag & drop to this window\n     - startup parameter
+加载配置(通过)...\n     - 这个列表(用DEL键删除项目)\n     - 拖拽到这个窗口\n     - 启动参数
+Load from file...
+从文件加载...
+Mirror ->>
+镜像 ->>
+Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
+左侧文件夹镜像备份: 同步后右侧文件夹将被覆盖(完全匹配左边的文件夹).
+Not all items were synchronized! Have a look at the list.
+不是所有项目被同步!看一下列表
+Number of files and directories that will be created
+一些文件和目录将被创建
+Number of files and directories that will be deleted
+一些文件和目录将被删除
+Number of files that will be overwritten
+一些文件和目录将被覆盖
+Open synchronization dialog
+打开同步对话框
+Open with Explorer\tD-Click
+随资源管理器打开\t使用双击D-Click
+Operation aborted!
+操作已取消!
+Operation:
+操作:
+Pause
+暂停
+Please fill all empty directory fields.
+请填满所有空的目录区域.
+Please restart synchronization!
+请重新开始同步!
+Press button to activate filter
+请按键以激活过滤
+Preview
+视图
+Published under the GNU General Public License:
+在GNU通用公共许可下发布:
+Quit
+退出
+Relative path
+相对路径
+Remove folder pair
+删除文件夹对
+Result
+结果
+Right folder:
+右侧文件夹:
+S&ave configuration
+保存配置(&A)
+Save current configuration to file
+保存当前配置到文件
+Scanning...
+正扫描...
+Scanning:
+扫描中:
+Select a folder
+选择一个文件夹
+Select variant:
+选择变化的:
+Set filter for synchronization
+为同步设置过滤
+Show files that are different
+显示不同的文件
+Show files that are equal
+显示相同的文件
+Show files that are newer on left
+显示左侧较新的文件
+Show files that are newer on right
+显示右侧较新的文件
+Show files that exist on left side only
+显示仅存在左侧的文件
+Show files that exist on right side only
+显示仅存在右侧的文件
+Silent mode
+静默模式
+Size
+大小
+Source code written completely in C++ utilizing:
+使用C++编写的源代码已完全写好:
+Start
+开始
+Start synchronization
+开始同步
+Stop
+停止
+Swap sides
+换边
+Synchronization aborted!
+同步已放弃!
+Synchronization completed successfully.
+同步成功完成.
+Synchronization completed with errors!
+同步已完成但有错误.
+Synchronization settings
+同步设置
+Synchronization status
+同步状态
+Synchronize all .doc, .zip and .exe files except everything from folder \"temp\".
+同步所有的 .doc, .zip und .exe的文件( 文件夹 \"temp\"下的所有文件除外).
+Synchronize both sides simultaneously: Copy new or updated files in both directions.
+同时同步两侧:  复制新的或更新的文件在两个方向.
+Synchronizing...
+同步中...
+System out of memory!
+系统内在溢出!
+The selected file does not exist:
+选定的文件不存在:
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
+这两个同样变异评估命名文件时,在同等条件下,\n他们有同样的文件大小相同的最后收件日期和时间.\n请注意，该文件的时间允许偏差的2秒钟.\n这可确保同步较低文件系统FAT32的精密正常工作.
+Time elapsed:
+已用时间:
+Time shift in seconds
+几秒内的时间偏移
+Time:
+时间:
+Total amount of data that will be transferred
+将被转移的总数据
+Total time:
+总共时间:
+Two way <->
+两侧 <->
+Unable to create logfile!
+无法创建日志!
+Unable to initialize Recycle Bin!
+无法初始化回收站!
+Unresolved errors occured during operation!
+操作中出现异常错误!
+Update ->
+升级 ->
+Update:
+升级:
+Use Recycle Bin
+使用回收站
+Use Recycle Bin when deleting or overwriting files during synchronization
+当同步时使用回收站删除或覆盖档案
+Warning
+警告
+When \"Compare\" is triggered with this option set the following decision tree is processed:
+当"比较" 被触发则按照决定树这个办法规定了做以下处理:
+You can adjust the file times accordingly to resolve the issue:
+您可以调整相应的文件时间来解决这个问题:
+You may try to synchronize remaining items again (WITHOUT having to re-compare)!
+您可能会尝试再次同步,其余的项目(而不必再比较)!
+different
+不同
+file exists on both sides
+两侧文件已存在
+on one side only
+仅在一侧
+|>	file on right side only\n
+|>	仅在可侧的文件\n

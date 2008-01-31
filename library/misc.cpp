@@ -75,6 +75,9 @@ void CustomLocale::setLanguage(const int language)
     case wxLANGUAGE_DUTCH:
         languageFile = "dutch.lng";
         break;
+    case wxLANGUAGE_CHINESE_SIMPLIFIED:
+        languageFile = "chinese_simple.lng";
+        break;
     default:
         languageFile.clear();
         currentLanguage = wxLANGUAGE_ENGLISH;
@@ -123,7 +126,7 @@ void CustomLocale::setLanguage(const int language)
             langFile.close();
         }
         else
-            wxMessageBox(wxString(_("Could not read language file ")) + wxT("\"") + wxString(languageFile.c_str(), wxConvUTF8) + wxT("\""), _("An exception occured!"), wxOK | wxICON_ERROR);
+            wxMessageBox(wxString(_("Error reading file:")) + wxT(" \"") + wxString(languageFile.c_str(), wxConvUTF8) + wxT("\""), _("An exception occured!"), wxOK | wxICON_ERROR);
     }
     else
         ;   //if languageFile is empty texts will be english per default

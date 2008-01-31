@@ -1,4 +1,4 @@
-FreeFileSync v1.13
+FreeFileSync v1.14
 ------------------
 
 Usage
@@ -18,11 +18,12 @@ Key Features
 7. Progress indicators are updated only every 100ms for optimal performance!
 8. Subfolders are also synchronized, including empty folders.
 9. Support for multiple folder pairs
-10. Focus on usability:
+10. Create Batch Jobs for automated synchronization via GUI.
+11. Focus on usability:
 	- Only necessary functionality on UI: no overloaded menus or icon jungle.
 	- Select folders via drag & drop.
 	- Last configuration and screen settings are saved automatically.
-	- Maintain and load different configurations by drag&drop, load-button or commandline.
+	- Maintain and load different configurations by drag&drop, load-button or while startup.
 	- Double-click to show file in explorer. (Windows only)
 	- Copy & paste support to export file-lists.
 	- Delete superfluous/temporary files directly on main grid.
@@ -30,11 +31,10 @@ Key Features
 	- Status information and error reporting
 	- Sort file-lists by name, size or date.
 	- Display statistical data: total filesizes, amount of bytes that will be transfered with the current settings.
-11. Easy configurable commandline mode for automated synchronization.
 12. Support for filesizes > 4 GB.
 13. Option to move files to Recycle Bin instead of deleting/overwriting them.
 14. Automatically ignore directories "\RECYCLER" and "\System Volume Information" when comparing and sync'ing. (Windows only)
-15. Localized English, German, French, Dutch and Japanese versions available.
+15. Localized English, German, French, Dutch, Japanese  and Chinese versions available.
 16. Delete before copy: Avoid disc space shortages with large sync-operations.
 17. Based on wxWidgets framework => Portable to many operating systems.
 18. Filter functionality to include/exclude files from synchronization (without re-compare!).

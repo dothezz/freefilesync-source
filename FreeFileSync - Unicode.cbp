@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
+					<Add option="-pg" />
 					<Add option="-g" />
 					<Add option="-D__WXDEBUG__" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib\mswud" />
@@ -21,6 +22,7 @@
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib\mswud" />
 				</ResourceCompiler>
 				<Linker>
+					<Add option="-pg -lgmon" />
 					<Add library="libwxmsw28ud_adv.a" />
 					<Add library="libwxmsw28ud_core.a" />
 					<Add library="libwxbase28ud.a" />
@@ -35,7 +37,7 @@
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
-					<Add option="-O2" />
+					<Add option="-O3" />
 					<Add option="-DNDEBUG" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib\mswu" />
 				</Compiler>
@@ -82,8 +84,8 @@
 			<Add option="-D__GNUWIN32__" />
 			<Add option="-D__WXMSW__" />
 			<Add option="-DFFS_WIN" />
-			<Add option="-DwxUSE_UNICODE" />
 			<Add option="-DTIXML_USE_STL" />
+			<Add option="-DwxUSE_UNICODE" />
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
 			<Add directory="C:\Programme\C++\wxWidgets\contrib\include" />
 		</Compiler>
@@ -199,6 +201,7 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="library\statusHandler.cpp" />
 		<Unit filename="library\statusHandler.h">
 			<Option target="Debug" />
 			<Option target="Release" />
@@ -207,6 +210,8 @@
 		<Unit filename="library\tinyxml\tinyxml.cpp" />
 		<Unit filename="library\tinyxml\tinyxmlerror.cpp" />
 		<Unit filename="library\tinyxml\tinyxmlparser.cpp" />
+		<Unit filename="library\zstring.cpp" />
+		<Unit filename="library\zstring.h" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 			<Option target="Debug" />

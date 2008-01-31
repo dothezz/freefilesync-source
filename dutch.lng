@@ -10,34 +10,18 @@
  PB
  TB
  TB
- You may try to synchronize remaining items again (WITHOUT having to re-compare)!
- U kunt proberen om de resterende bestanden opnieuw te synchroniseren (ZONDER opnieuw te hoeven vergelijken)!
- already exists. Overwrite?
- bestaat al. Overschrijven?
- directories
- paden
- directory
- pad
- file, 
- Bestand, 
- files, 
- Bestanden, 
- item(s):\n\n
- item(s):\n\n
  kB
  kB
- of 
- van 
- overwriting 
- en overschrijven 
- row in view
- rij in zicht
- rows in view
- rijen in zicht
- to 
- naar 
 !=	files are different\n
 !=	Bestanden zijn verschillend\n
+%x directories
+%x paden
+%x files,
+%x bestanden,
+%x of %y rows in view
+%x van de %y rijen in zicht
+%x of 1 row in view
+%x van 1 rij in zicht
 &Abort
 &Afbreken
 &About...
@@ -108,12 +92,14 @@
 - rechts is nieuwer
 - same date (different size)
 - zelfde datum (verschillende grootte)
----------\n
------------\n
 -Open-Source file synchronization-
 -Open-Source bestandssynchronisatie-
 .
 ,
+1 directory
+1 pad
+1 file,
+1 bestand,
 1. &Compare
 1. &Vergelijk
 1. Enter full file or directory names separated by ';' or a new line.
@@ -152,8 +138,8 @@ Action
 Actie
 Add folder pair
 Voeg 1 paar gekoppelde mappen toe
-Add to exclude filter: 
-Voeg toe om filter uit te sluiten: 
+Add to exclude filter:
+Voeg toe om filter uit te sluiten:
 Adjust file times
 Pas bestandstijden aan
 Adjust modification times of all files contained in the specified folder and its subfolders. This manual adaption might become necessary if you are synchronizing against a FAT32 drive and the daylight saving time is switched. For an overview about the issue see this article:
@@ -166,8 +152,6 @@ An exception occured!
 Er heeft een uitzondering plaatsgevonden!
 Apply
 Toepassen
-As a result 6 different status can be returned to categorize all files:
-Hierdoor kunt u 6 verschillende opties gebruiken om de bestanden te categoriseren:
 As a result the files are separated into the following categories:
 Hierdoor worden de bestanden gescheiden in de volgende categorieën:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
@@ -178,8 +162,8 @@ Batch file created successfully!
 Batchbestand is succesvol aangemaakt!
 Big thanks for localizing FreeFileSync goes out to:
 Extra dank voor het vertalen van FreeFileSync gaat naar:
-Build: 
-Gebouwd: 
+Build:
+Gebouwd:
 Choose to hide filtered files/directories from list
 Gefilterde bestanden niet/wel weergeven
 Comma separated list
@@ -194,8 +178,8 @@ Compare by...
 Vergelelijk met...
 Comparing content
 Vergelijken van inhoud
-Comparing content of files 
-Vergelijken van bestandsinhoud 
+Comparing content of files \"%x\"
+De inhoud van \"%x\" bestanden wordt vergeleken
 Comparing...
 Vergelijken...
 Completed
@@ -220,6 +204,8 @@ Consider this when setting up synchronization rules: You might want to avoid wri
 Neem het volgende in overweging: U wilt misschien schrijfrechten op deze paden vermijden, zodat synchronisatie van bijde elkaar niet hindert.
 Continue
 Doorgaan
+Conversion error:
+Fout bij het converteren:
 Copy from left to right
 Kopieer van links naar rechts
 Copy from left to right overwriting
@@ -232,28 +218,20 @@ Copy new or updated files to right folder.
 Kopieer nieuwe of geupdate bestanden naar de rechter map.
 Copy to clipboard\tCTRL+C
 Kopieer naar het klembord\tCTRL+C
-Copying file 
-Bestand wordt gekopieerd 
-Could not open configuration file 
-Fout bij openen van configuratiebestand 
-Could not open file: 
-Fout bij het openen van bestand: 
-Could not read language file 
-Fout bij het lezen van taalbestand 
-Could not retrieve file info for: 
-Fout bij het verkrijgen van bestandsinformatie van: 
-Could not set working directory to directory containing executable file!
-Fout bij het instellen van de huidige map naar een map met een toepassing erin!
-Could not write configuration file 
-Fout bij het schrijven naar het configuratiebestand 
-Could not write to 
-Fout bij het schrijven naar 
+Copying file \"%x\" overwriting \"%y\"
+Bestand \"%y\" wordt overschreven door een kopie van \"%x\"
+Copying file \"%x\" to \"%y\"
+Bestand \"%x\" wordt gekopieerd naar \"%y\"
+Could not retrieve file info for:
+Fout bij het verkrijgen van bestandsinformatie van:
+Could not set working directory:
+Kan het pad in gebruik niet instellen:
 Create a batch job
 Creëer batchjob
 Create:
 Aanmaken:
-Creating folder 
-Folder aanmaken 
+Creating folder \"%x\"
+Map \"%x\" wordt aangemaakt
 Current operation:
 Huidige operatie:
 Custom
@@ -266,8 +244,6 @@ Data:
 Data:
 Date
 Datum
-Date: 
-Datum: 
 Daylight saving time change detected for FAT/FAT32 drive.
 Zomertijdverandering gedetecteerd voor een FAT/FAT32 schijf.
 Delete files/folders existing on left side only
@@ -278,13 +254,13 @@ Delete files\tDEL
 Verwijder bestanden\tDEL
 Delete:
 Verwijderen:
-Deleting file 
-Bestand wordt verwijderd 
-Deleting folder 
-Folder wordt verwijderd 
-Directories are dependent: 
-De volgende paden zijn afhankelijk van elkaar: 
-Directory does not exist: 
+Deleting file \"%x\"
+Bestand \"%x\" wordt verwijderd
+Deleting folder \"%x\"
+Map \"%x\" wordt verwijderd
+Directories are dependent:
+De volgende paden zijn afhankelijk van elkaar:
+Directory does not exist:
 Map bestaat niet:
 Do not show graphical status and error messages but write to a logfile instead
 Geef geen grafische status en foutmeldingen weer, maar sla het op in een logbestand
@@ -306,38 +282,28 @@ Email:
 Email:
 Error
 Fout
-Error adapting modification time of file 
-Er is een fout opgetreden bij het wijzigen van de modificatietijd van het bestand 
-Error changing modification time: 
-Er is een fout opgetreden bij het wijzigen van de bestandstijden 
-Error converting FILETIME to SYSTEMTIME
-Er is een fout opgetreden bij het converteren van FILETIME naar SYSTEMTIME
-Error converting FILETIME to local FILETIME
-Er is een fout opgetreden bij het converteren van FILETIME naar (lokale) FILETIME
-Error copying file 
-Er is een fout opgetreden bij het kopiëren van een bestand 
-Error creating directory 
-Er is een fout opgetreden bij het aanmaken van een pad 
-Error deleting directory: 
-Er is een fout opgetreden bij het verwijderen van een pad 
-Error deleting file: 
-Er is een fout opgetreden bij het verwijderen van een bestand 
-Error moving to recycle bin: 
-Er is een fout opgetreden bij verwijderen naar de prullenbak 
-Error parsing configuration file 
-Er is een fout opgetreden bij het aanmaken van een configuratiebestand 
-Error reading file: 
-Er is een fout opgetreden bij het lezen van het bestand: 
-Error traversing directory 
-Er is een fout opgetreden bij het doorzoeken van een map 
-Error when converting int to wxString
-Er is een fout opgetreden bij het converteren van int naar wxString
-Error when converting wxString to double
-Er is een fout opgetreden bij het converteren van wxString naar double
-Error when converting wxString to long
-Er is een fout opgetreden bij het converteren van wxString naar long
-Error: Source directory does not exist anymore: 
-Er is een fout opgetreden. De oorspronkelijke map bestaat niet meer: 
+Error changing modification time:
+Er is een fout opgetreden bij het aanpassen van de bestandstijd:
+Error copying file:
+Er is een fout opgetreden bij het kopiëren van bestand:
+Error creating directory:
+Er is een fout opgetreden bij het aanmaken van pad:
+Error deleting directory:
+Er is een fout opgetreden bij het verwijderen van pad:
+Error deleting file:
+Er is een fout opgetreden bij het verwijderen van bestand:
+Error moving to recycle bin:
+Er is een fout opgetreden bij verwijderen naar de prullenbak:
+Error parsing configuration file:
+Er is een fout opgetreden bij het aanmaken van configuratiebestand:
+Error reading file:
+Er is een fout opgetreden bij het lezen van het bestand:
+Error traversing directory:
+Er is een fout opgetreden bij het doorzoeken van map:
+Error writing file:
+Er is een fout opgetreden bij het schrijven naar bestand:
+Error: Source directory does not exist anymore:
+Er is een fout opgetreden. De oorspronkelijke map bestaat niet meer:
 Example
 Voorbeeld
 Exclude
@@ -346,6 +312,8 @@ Exclude temporarily
 Tijdelijk uitsluiten
 Feedback and suggestions are welcome at:
 Tips en suggesties zijn welkom op:
+File already exists. Overwrite?
+Het bestand bestaat al. Overschrijven?
 File content
 Bestandsinhoud
 File list exported!
@@ -426,10 +394,10 @@ Ignore errors
 Negeer foutmeldingen
 Ignore next errors
 Negeer volgende foutmeldingen
-Ignore this error, retry or abort comparison?
-Negeer deze fout, opnieuw proberen of afbreken van deze vergelijking?
 Ignore this error, retry or abort synchronization?
 Negeer deze fout, opnieuw proberen of afbreken van deze synchronisatie?
+Ignore this error, retry or abort?
+Negeer deze fout, opnieuw proberen of de handeling afbreken?
 Include
 Gebruiken
 Include temporarily
@@ -442,14 +410,14 @@ Information
 Informatie
 Information: If you ignore the error or abort a re-compare will be necessary!
 Informatie: als u de fout negeert of de handeling afbreekt is opnieuw vergelijken noodzakelijk!
-Initialization of Recycle Bin failed! It cannot be used!
-Initialiseren van de prullenbak is mislukt. Het kan niet worden gebruikt!
+Initialization of Recycle Bin failed!
+Initialiseren van de prullenbak is mislukt.
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Het was niet mogelijk de prullenbak te initialiseren!\n\nHet is waarschijnlijk dat u niet Windows gebruikt.\nAls u deze optie wel wilt, neem dan alstublieft contact op met de auteur. :)
 Left folder:
 Linker map:
-Legend\n
-Legenda\n
+Legend
+Legenda
 Load configuration via...\n     - this list (press DEL to delete items)\n     - drag & drop to this window\n     - startup parameter
 Laad configuratie via...\n     - deze lijst (druk op DEL om items te verwijderen)\n     - drag en drop in dit venster\n     - opstartparameter
 Load from file...
@@ -460,12 +428,10 @@ Mirror ->>
 Spiegelen ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Spiegel backup van de linkerkant: de rechterkant wordt overschreven en komt na synchronisatie exact overeen met de linkerkant.
-No valid configuration file specified: 
-Er is geen geldig configuratiebestand gespecificeerd: 
 Not all items were synchronized! Have a look at the list.
 Niet alle bestanden zijn gesynchroniseerd! Bekijk de lijst.
-Nothing to synchronize. Both directories adhere to the sync-configuration!
-Er is niks om te synchroniseren. Beide mappen komen overeen met de synchronisatie instellingen!
+Nothing to synchronize according to configuration!
+Volgens de gebruikte configuratie hoeft er niks gesynchroniseerd te worden!
 Number of files and directories that will be created
 Aantal mappen en bestanden die zullen worden aangemaakt
 Number of files and directories that will be deleted
@@ -506,18 +472,16 @@ Right folder:
 Rechter map:
 S&ave configuration
 S&la de instellingen op
+Save aborted!
+Sla de afgebroken bestanden op!
 Save current configuration to file
 Sla de huidige instellingen op in een bestand
-Saved aborted!
-Opslaan afgebroken!
-Scanning 
-Scannen 
 Scanning...
 Data wordt doorlopen...
+Scanning:
+Scannen:
 Select a folder
 Selecteer een map
-Select folder
-Selecteer een folder
 Select variant:
 Selecteer een variant:
 Set filter for synchronization
@@ -548,8 +512,6 @@ Stop
 Stop
 Swap sides
 Verwissel van kant
-SyncJob.ffs_batch
-SyncJob.ffs_batch
 Synchronization aborted!
 Synchronisatie afgebroken!
 Synchronization completed successfully.
@@ -568,10 +530,10 @@ Synchronizing...
 Aan het synchroniseren...
 System out of memory!
 Systeem heeft te weinig geheugen
-The selected file does not contain a valid configuration!
-Het geselecteerde bestand bevat geen geldige configuratie!
-The selected file does not exist: 
-Het volgende geselecteerde bestand bestaat niet: 
+The file does not contain a valid configuration:
+Het bestand bevat geen geldige configuratie:
+The selected file does not exist:
+Het volgende geselecteerde bestand bestaat niet:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
 Deze variant ziet twee gelijknamige bestanden als gelijk wanneer ze dezelfde bestandsgrootte EN tijdstempel hebben. Merk op dat tijdstempel 2 seconden mag verschillen. Dit zorgt ervoor dat het minder nauwkeurige FAT-32 ook kan worden gesynchroniseerd.
 Time elapsed:
@@ -580,12 +542,12 @@ Time shift in seconds
 Timeshift in seconden
 Time shift:
 Timeshift:
-Time: 
-Tijd: 
+Time:
+Tijd:
 Total amount of data that will be transferred
 Hoeveelheid data die verplaatst word
-Total time: 
-Totale tijd: 
+Total time:
+Totale tijd:
 Two way <->
 Beide zijden <->
 Unable to create logfile!
@@ -604,12 +566,14 @@ Use Recycle Bin when deleting or overwriting files during synchronization
 Gebruik de prullenbak wanneer bestanden worden verwijderd of overschreven tijdens het synchroniseren
 Warning
 Attentie
-Warning: Synchronization failed for 
-Attentie: synchronisatie mislukt voor 
+Warning: Synchronization failed for %x item(s):
+Let op: %x item(s) konden niet worden gesynchroniseerd: 
 When \"Compare\" is triggered with this option set the following decision tree is processed:
 Wanneer \"Compare\" met deze instelling aan wordt gebruikt zal de volgende beslissingsboom gebruikt worden:
 You can adjust the file times accordingly to resolve the issue:
 U kunt de bestandstijden aanpassen om het probleem op te lossen:
+You may try to synchronize remaining items again (WITHOUT having to re-compare)!
+U kunt proberen om de resterende bestanden opnieuw te synchroniseren (ZONDER opnieuw te hoeven vergelijken)!
 different
 verschillend
 file exists on both sides

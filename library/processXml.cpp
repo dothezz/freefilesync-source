@@ -115,10 +115,10 @@ XmlGuiConfig xmlAccess::readGuiConfig(const wxString& filename)
     XmlGuiConfig outputCfg;
 
     if (!inputFile.loadedSuccessfully())
-        throw FileError(wxString(_("Could not open configuration file ")) + wxT("\"") + filename + wxT("\""));
+        throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + filename + wxT("\""));
 
     if (!inputFile.readXmlGuiConfig(outputCfg)) //read GUI layout configuration
-        throw FileError(wxString(_("Error parsing configuration file ")) + wxT("\"") + filename + wxT("\""));
+        throw FileError(wxString(_("Error parsing configuration file:")) + wxT(" \"") + filename + wxT("\""));
 
     return outputCfg;
 }
@@ -132,10 +132,10 @@ XmlBatchConfig xmlAccess::readBatchConfig(const wxString& filename)
     XmlBatchConfig outputCfg;
 
     if (!inputFile.loadedSuccessfully())
-        throw FileError(wxString(_("Could not open configuration file ")) + wxT("\"") + filename + wxT("\""));
+        throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + filename + wxT("\""));
 
     if (!inputFile.readXmlBatchConfig(outputCfg))
-        throw FileError(wxString(_("Error parsing configuration file ")) + wxT("\"") + filename + wxT("\""));
+        throw FileError(wxString(_("Error parsing configuration file:")) + wxT(" \"") + filename + wxT("\""));
 
     return outputCfg;
 }
@@ -149,10 +149,10 @@ XmlGlobalSettings xmlAccess::readGlobalSettings()
     XmlGlobalSettings outputCfg;
 
     if (!inputFile.loadedSuccessfully())
-        throw FileError(wxString(_("Could not open configuration file ")) + wxT("\"") + FreeFileSync::GLOBAL_CONFIG_FILE + wxT("\""));
+        throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + FreeFileSync::GLOBAL_CONFIG_FILE + wxT("\""));
 
     if (!inputFile.readXmlGlobalSettings(outputCfg))
-        throw FileError(wxString(_("Error parsing configuration file ")) + wxT("\"") + FreeFileSync::GLOBAL_CONFIG_FILE + wxT("\""));
+        throw FileError(wxString(_("Error parsing configuration file:")) + wxT(" \"") + FreeFileSync::GLOBAL_CONFIG_FILE + wxT("\""));
 
     return outputCfg;
 }
@@ -165,7 +165,7 @@ void xmlAccess::writeGuiConfig(const wxString& filename, const XmlGuiConfig& inp
     //populate and write XML tree
     if (    !outputFile.writeXmlGuiConfig(inputCfg) || //add GUI layout configuration settings
             !outputFile.writeToFile()) //save XML
-        throw FileError(wxString(_("Could not write configuration file ")) + wxT("\"") + filename + wxT("\""));
+        throw FileError(wxString(_("Error writing file:")) + wxT(" \"") + filename + wxT("\""));
     return;
 }
 
@@ -177,7 +177,7 @@ void xmlAccess::writeBatchConfig(const wxString& filename, const XmlBatchConfig&
     //populate and write XML tree
     if (    !outputFile.writeXmlBatchConfig(inputCfg) || //add GUI layout configuration settings
             !outputFile.writeToFile()) //save XML
-        throw FileError(wxString(_("Could not write configuration file ")) + wxT("\"") + filename + wxT("\""));
+        throw FileError(wxString(_("Error writing file:")) + wxT(" \"") + filename + wxT("\""));
     return;
 }
 
@@ -189,7 +189,7 @@ void xmlAccess::writeGlobalSettings(const XmlGlobalSettings& inputCfg)
     //populate and write XML tree
     if (    !outputFile.writeXmlGlobalSettings(inputCfg) || //add GUI layout configuration settings
             !outputFile.writeToFile()) //save XML
-        throw FileError(wxString(_("Could not write configuration file ")) + wxT("\"") + FreeFileSync::GLOBAL_CONFIG_FILE + wxT("\""));
+        throw FileError(wxString(_("Error writing file:")) + wxT(" \"") + FreeFileSync::GLOBAL_CONFIG_FILE + wxT("\""));
     return;
 }
 
@@ -338,10 +338,10 @@ bool XmlConfigInput::readXmlMainConfig(MainConfiguration& mainCfg, vector<Folder
         FolderPair newPair;
 
         if (!readXmlElementValue(tempString, folderPair, "Left")) return false;
-        newPair.leftDirectory = wxString::FromUTF8(tempString.c_str());
+        newPair.leftDirectory = wxString::FromUTF8(tempString.c_str()).c_str();
 
         if (!readXmlElementValue(tempString, folderPair, "Right")) return false;
-        newPair.rightDirectory = wxString::FromUTF8(tempString.c_str());
+        newPair.rightDirectory = wxString::FromUTF8(tempString.c_str()).c_str();
 
         directoryPairs.push_back(newPair);
         folderPair = folderPair->NextSiblingElement();
@@ -462,7 +462,6 @@ bool XmlConfigInput::readXmlGlobalSettings(XmlGlobalSettings& outputCfg)
                 outputCfg.gui.columnWidthLeft.push_back(stringToInt(width));
             else
                 break;
-
             leftColumn = leftColumn->NextSiblingElement();
         }
 
@@ -474,8 +473,30 @@ bool XmlConfigInput::readXmlGlobalSettings(XmlGlobalSettings& outputCfg)
                 outputCfg.gui.columnWidthRight.push_back(stringToInt(width));
             else
                 break;
-
             rightColumn = rightColumn->NextSiblingElement();
+        }
+
+        //read column positions
+        TiXmlElement* leftColumnPos = TiXmlHandle(mainWindow).FirstChild("LeftColumnPositions").FirstChild("Position").ToElement();
+        while (leftColumnPos)
+        {
+            const char* width = leftColumnPos->GetText();
+            if (width) //may be NULL!!
+                outputCfg.gui.columnPositionsLeft.push_back(stringToInt(width));
+            else
+                break;
+            leftColumnPos = leftColumnPos->NextSiblingElement();
+        }
+
+        TiXmlElement* rightColumnPos = TiXmlHandle(mainWindow).FirstChild("RightColumnPositions").FirstChild("Position").ToElement();
+        while (rightColumnPos)
+        {
+            const char* width = rightColumnPos->GetText();
+            if (width) //may be NULL!!
+                outputCfg.gui.columnPositionsRight.push_back(stringToInt(width));
+            else
+                break;
+            rightColumnPos = rightColumnPos->NextSiblingElement();
         }
     }
 
@@ -589,8 +610,8 @@ bool XmlConfigOutput::writeXmlMainConfig(const MainConfiguration& mainCfg, const
         TiXmlElement* folderPair = new TiXmlElement("Pair");
         folders->LinkEndChild(folderPair);
 
-        addXmlElement(folderPair, "Left", string((i->leftDirectory).ToUTF8()));
-        addXmlElement(folderPair, "Right", string((i->rightDirectory).ToUTF8()));
+        addXmlElement(folderPair, "Left", string(wxString(i->leftDirectory.c_str()).ToUTF8()));
+        addXmlElement(folderPair, "Right", string(wxString(i->rightDirectory.c_str()).ToUTF8()));
     }
 
 //###########################################################
@@ -726,6 +747,18 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const XmlGlobalSettings& inputCfg)
     for (unsigned int i = 0; i < inputCfg.gui.columnWidthRight.size(); ++i)
         addXmlElement(rightColumn, "Width", inputCfg.gui.columnWidthRight[i]);
 
+    //write column positions
+    TiXmlElement* leftColumnPos = new TiXmlElement("LeftColumnPositions");
+    mainWindow->LinkEndChild(leftColumnPos);
+
+    for (unsigned int i = 0; i < inputCfg.gui.columnPositionsLeft.size(); ++i)
+        addXmlElement(leftColumnPos, "Position", inputCfg.gui.columnPositionsLeft[i]);
+
+    TiXmlElement* rightColumnPos = new TiXmlElement("RightColumnPositions");
+    mainWindow->LinkEndChild(rightColumnPos);
+
+    for (unsigned int i = 0; i < inputCfg.gui.columnPositionsRight.size(); ++i)
+        addXmlElement(rightColumnPos, "Position", inputCfg.gui.columnPositionsRight[i]);
 
     //###################################################################
     //write batch settings
@@ -734,4 +767,43 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const XmlGlobalSettings& inputCfg)
     root->LinkEndChild(batch);
 
     return true;
+}
+
+
+int xmlAccess::retrieveSystemLanguage() //map language dialects
+{
+    const int lang = wxLocale::GetSystemLanguage();
+
+    switch (lang)
+    {
+    case wxLANGUAGE_GERMAN_AUSTRIAN:
+    case wxLANGUAGE_GERMAN_BELGIUM:
+    case wxLANGUAGE_GERMAN_LIECHTENSTEIN:
+    case wxLANGUAGE_GERMAN_LUXEMBOURG:
+    case wxLANGUAGE_GERMAN_SWISS:
+        return wxLANGUAGE_GERMAN;
+
+    case wxLANGUAGE_FRENCH_BELGIAN:
+    case wxLANGUAGE_FRENCH_CANADIAN:
+    case wxLANGUAGE_FRENCH_LUXEMBOURG:
+    case wxLANGUAGE_FRENCH_MONACO:
+    case wxLANGUAGE_FRENCH_SWISS:
+        return wxLANGUAGE_FRENCH;
+
+        //case wxLANGUAGE_JAPANESE:
+
+    case wxLANGUAGE_DUTCH_BELGIAN:
+        return wxLANGUAGE_DUTCH;
+
+    case wxLANGUAGE_CHINESE:
+    case wxLANGUAGE_CHINESE_TRADITIONAL:
+    case wxLANGUAGE_CHINESE_HONGKONG:
+    case wxLANGUAGE_CHINESE_MACAU:
+    case wxLANGUAGE_CHINESE_SINGAPORE:
+    case wxLANGUAGE_CHINESE_TAIWAN:
+        return wxLANGUAGE_CHINESE_SIMPLIFIED;
+
+    default:
+        return lang;
+    }
 }

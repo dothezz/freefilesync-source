@@ -45,9 +45,10 @@ bool Application::OnInit()
     //do not call wxApp::OnInit() to avoid using default commandline parser
 
     //set working directory to current executable directory
-    if (!wxSetWorkingDirectory(wxFileName(wxStandardPaths::Get().GetExecutablePath()).GetPath()))
+    const wxString workingDir = wxFileName(wxStandardPaths::Get().GetExecutablePath()).GetPath();
+    if (!wxSetWorkingDirectory(workingDir))
     {   //show messagebox and quit program immediately
-        wxMessageBox(_("Could not set working directory to directory containing executable file!"), _("An exception occured!"), wxOK | wxICON_ERROR);
+        wxMessageBox(wxString(_("Could not set working directory:")) + wxT(" ") + workingDir, _("An exception occured!"), wxOK | wxICON_ERROR);
         return false;
     }
 
@@ -65,7 +66,7 @@ bool Application::OnInit()
         //else: globalSettings already has default values
     }
 
-    //set program language: needs to happen aber working directory has been set!
+    //set program language: needs to happen after working directory has been set!
     SetExitOnFrameDelete(false); //prevent error messagebox from becoming top-level window
     programLanguage.setLanguage(globalSettings.global.programLanguage);
     SetExitOnFrameDelete(true);
@@ -95,11 +96,11 @@ void Application::initialize()
 
             if (applicationRunsInBatchWithoutWindows)
                 ExitMainLoop(); //exit programm on next main loop iteration
-            return;             //program will exit automatically if a main window is present and closed
+            return;             //program will exit automatically if a main window is present and is closed
         }
         else
         {
-            wxMessageBox(wxString(_("No valid configuration file specified: ")) + argv[1], _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(wxString(_("The file does not contain a valid configuration:")) + wxT(" \"") + argv[1] + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
             return;
         }
     }
@@ -170,7 +171,7 @@ public:
         readyToWrite = logFile.IsOpened();
         if (readyToWrite)
         {
-            wxString headerLine = wxString(wxT("FreeFileSync (")) + _("Date: ") + wxDateTime::Now().FormatDate() + wxT(" ") + _("Time: ") +  wxDateTime::Now().FormatTime() + wxT(")");
+            wxString headerLine = wxString(wxT("FreeFileSync (")) + _("Date") + wxT(": ") + wxDateTime::Now().FormatDate() + wxT(" ") + _("Time:") + wxT(" ") +  wxDateTime::Now().FormatTime() + wxT(")");
             logFile.Write(headerLine + wxChar('\n'));
             logFile.Write(wxString().Pad(headerLine.Len(), wxChar('-')) + wxChar('\n') + wxChar('\n'));
 
@@ -211,7 +212,7 @@ public:
             logFile.Write(wxChar('\n'));
 
             long time = totalTime.Time(); //retrieve total time
-            write(finalText + wxT(" (") + _("Total time: ") + (wxTimeSpan::Milliseconds(time)).Format() + wxT(")"), _("Stop"));
+            write(finalText + wxT(" (") + _("Total time:") + wxT(" ") + (wxTimeSpan::Milliseconds(time)).Format() + wxT(")"), _("Stop"));
 
             //logFile.close(); <- not needed
         }
@@ -409,7 +410,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
                                            batchCfg.mainCfg.syncConfiguration);
         if (objectsToCreate + objectsToOverwrite + objectsToDelete == 0)
         {
-            statusUpdater.setFinalStatus(_("Nothing to synchronize. Both directories adhere to the sync-configuration!"), SyncStatus::FINISHED_WITH_SUCCESS); //inform about this special case
+            statusUpdater.setFinalStatus(_("Nothing to synchronize according to configuration!"), SyncStatus::FINISHED_WITH_SUCCESS); //inform about this special case
             returnValue = 0;
             return;
         }
@@ -464,7 +465,9 @@ BatchStatusUpdater::~BatchStatusUpdater()
         wxString finalMessage;
         if (failedItems)
         {
-            finalMessage = wxString(_("Warning: Synchronization failed for ")) + globalFunctions::numberToWxString(failedItems) + _(" item(s):\n\n");
+            finalMessage = wxString(_("Warning: Synchronization failed for %x item(s):")) + wxT("\n\n");
+            finalMessage.Replace(wxT("%x"), globalFunctions::numberToWxString(failedItems), false);
+
             for (unsigned int j = 0; j < failedItems; ++j)
                 finalMessage+= unhandledErrors[j] + wxT("\n");
             finalMessage+= wxT("\n");
@@ -561,7 +564,7 @@ ErrorHandler::Response BatchStatusUpdater::reportError(const wxString& text)
         m_log->write(text, _("Error"));
 
         if (ignoreErrors) // /|\ before return, the logfile is written!!!
-            return ErrorHandler::CONTINUE_NEXT;
+            return ErrorHandler::IGNORE_ERROR;
         else
         {
             abortRequested = true;
@@ -573,14 +576,14 @@ ErrorHandler::Response BatchStatusUpdater::reportError(const wxString& text)
         if (ignoreErrors) //this option can be set from commandline or by the user in the error dialog on UI
         {
             unhandledErrors.Add(text);
-            return ErrorHandler::CONTINUE_NEXT;
+            return ErrorHandler::IGNORE_ERROR;
         }
 
         syncStatusFrame->updateStatusDialogNow();
 
         bool ignoreNextErrors = false;
-        wxString errorMessage = text + wxT("\n\n") + _("Ignore this error, retry or abort synchronization?");
-        ErrorDlg* errorDlg = new ErrorDlg(syncStatusFrame, errorMessage, ignoreNextErrors, 90);
+        wxString errorMessage = text + wxT("\n\n") + _("Ignore this error, retry or abort?");
+        ErrorDlg* errorDlg = new ErrorDlg(syncStatusFrame, errorMessage, ignoreNextErrors);
 
         int rv = errorDlg->ShowModal();
         switch (rv)
@@ -588,7 +591,7 @@ ErrorHandler::Response BatchStatusUpdater::reportError(const wxString& text)
         case ErrorDlg::BUTTON_IGNORE:
             ignoreErrors = ignoreNextErrors;
             unhandledErrors.Add(text);
-            return ErrorHandler::CONTINUE_NEXT;
+            return ErrorHandler::IGNORE_ERROR;
         case ErrorDlg::BUTTON_RETRY:
             return ErrorHandler::RETRY;
         case ErrorDlg::BUTTON_ABORT:
@@ -599,7 +602,7 @@ ErrorHandler::Response BatchStatusUpdater::reportError(const wxString& text)
         }
         default:
             assert (false);
-            return ErrorHandler::CONTINUE_NEXT;
+            return ErrorHandler::IGNORE_ERROR;
         }
     }
 }

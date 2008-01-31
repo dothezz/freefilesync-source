@@ -10,34 +10,18 @@
  PB
  TB
  TB
- You may try to synchronize remaining items again (WITHOUT having to re-compare)!
- Verbliebene Elemente können nochmals synchronisiert werden (OHNE dass ein erneuter Vergleich notwendig ist)!
- already exists. Overwrite?
- existiert bereits. Überschreiben?
- directories
- Verzeichnisse
- directory
- Verzeichnis
- file, 
- Datei, 
- files, 
- Dateien, 
- item(s):\n\n
- Element(e):\n\n
  kB
  kB
- of 
- von 
- overwriting 
- und überschreibe 
- row in view
- Zeile zur Ansicht
- rows in view
- Zeilen zur Ansicht
- to 
- nach 
 !=	files are different\n
 !=	Dateien sind verschieden\n
+%x directories
+%x Verzeichnisse
+%x files,
+%x Dateien,
+%x of %y rows in view
+%x von %y Zeilen zur Ansicht
+%x of 1 row in view
+%x von 1 Zeile zur Ansicht
 &Abort
 &Abbruch
 &About...
@@ -108,12 +92,14 @@ E&xportiere Dateiliste
 - rechts neuer
 - same date (different size)
 - gleiches Datum (unterschiedliche Größe)
----------\n
------------\n
 -Open-Source file synchronization-
 -Open-Source Datei-Synchronisation-
 .
 ,
+1 directory
+1 Verzeichnis
+1 file,
+1 Datei,
 1. &Compare
 1. &Vergleichen
 1. Enter full file or directory names separated by ';' or a new line.
@@ -152,8 +138,8 @@ Action
 Aktion
 Add folder pair
 Verzeichnispaar hinzufügen
-Add to exclude filter: 
-Über Filter ausschließen: 
+Add to exclude filter:
+Über Filter ausschließen:
 Adjust file times
 Dateizeiten ändern
 Adjust modification times of all files contained in the specified folder and its subfolders. This manual adaption might become necessary if you are synchronizing against a FAT32 drive and the daylight saving time is switched. For an overview about the issue see this article:
@@ -166,8 +152,6 @@ An exception occured!
 Eine Ausnahme ist aufgetreten!
 Apply
 Anwenden
-As a result 6 different status can be returned to categorize all files:
-Als Ergebnis werden 6 verschiedene Status zurückgegeben, um Dateien zu kategorisieren:
 As a result the files are separated into the following categories:
 Das Ergebnis ist eine Aufteilung in folgende Kategorien:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
@@ -178,8 +162,8 @@ Batch file created successfully!
 Batch-Datei wurde erfolgreich erstellt!
 Big thanks for localizing FreeFileSync goes out to:
 Vielen Dank für die Lokalisation von FreeFileSync an:
-Build: 
-Build: 
+Build:
+Build:
 Choose to hide filtered files/directories from list
 Gefilterte Dateien ein-/ausblenden
 Comma separated list
@@ -194,8 +178,8 @@ Compare by...
 Vergleichen nach...
 Comparing content
 Vergleiche Dateiinhalt
-Comparing content of files 
-Vergleiche Inhalt der Dateien 
+Comparing content of files \"%x\"
+Vergleiche Inhalt der Dateien \"%x\"
 Comparing...
 Vergleiche...
 Completed
@@ -220,6 +204,8 @@ Consider this when setting up synchronization rules: You might want to avoid wri
 Achtung beim Festlegen der Synchronisationseinstellungen: Ein Schreibzugriff auf diese Verzeichnisse sollte vermieden werden, so dass sich die Synchronization von beiden nicht gegenseitig beeinflusst.
 Continue
 Fortfahren
+Conversion error:
+Fehler bei Konvertierung:
 Copy from left to right
 Von links nach rechts kopieren
 Copy from left to right overwriting
@@ -232,28 +218,20 @@ Copy new or updated files to right folder.
 Kopiere neue oder aktualisierte Dateien in den rechten Ordner.
 Copy to clipboard\tCTRL+C
 Kopiere in Zwischenablage\tCTRL+C
-Copying file 
-Kopiere Datei 
-Could not open configuration file 
-Fehler beim Öffnen der Datei 
-Could not open file: 
-Fehler beim Öffnen der Datei: 
-Could not read language file 
-Fehler beim Lesen der Sprachdatei 
-Could not retrieve file info for: 
-Fehler beim Lesen der Dateiattribute von: 
-Could not set working directory to directory containing executable file!
-Arbeitsverzeichnisses konnte nicht auf Pfad der .exe-Datei gelegt werden!
-Could not write configuration file 
-Fehler beim Schreiben der Konfigurationsdatei 
-Could not write to 
-Fehler beim Schreiben von 
+Copying file \"%x\" overwriting \"%y\"
+Kopiere Datei \"%x\" und überschreibe \"%y\"
+Copying file \"%x\" to \"%y\"
+Kopiere Datei \"%x\" nach \"%y\"
+Could not retrieve file info for:
+Fehler beim Lesen der Dateiattribute von:
+Could not set working directory:
+Fehler beim Setzen des Arbeitsverzeichnisses:
 Create a batch job
 Erstelle Batch-Job
 Create:
 Erstellen:
-Creating folder 
-Erstelle Verzeichnis 
+Creating folder \"%x\"
+Erstelle Verzeichnis \"%x\"
 Current operation:
 Aktuelle Operation:
 Custom
@@ -266,8 +244,6 @@ Data:
 Daten:
 Date
 Datum
-Date: 
-Datum: 
 Daylight saving time change detected for FAT/FAT32 drive.
 Sommer-/Winterzeitumstellung wurde für ein FAT/FAT32 Laufwerk erkannt.
 Delete files/folders existing on left side only
@@ -278,14 +254,14 @@ Delete files\tDEL
 Lösche Dateien\tDEL
 Delete:
 Löschen:
-Deleting file 
-Lösche Datei 
-Deleting folder 
-Lösche Verzeichnis 
-Directories are dependent: 
-Die Verzeichnisse sind voneinander abhängig: 
-Directory does not exist: 
-Das Verzeichnis existiert nicht: 
+Deleting file \"%x\"
+Lösche Datei \"%x\"
+Deleting folder \"%x\"
+Lösche Verzeichnis \"%x\"
+Directories are dependent:
+Die Verzeichnisse sind voneinander abhängig:
+Directory does not exist:
+Das Verzeichnis existiert nicht:
 Do not show graphical status and error messages but write to a logfile instead
 Keine graphischen Status- und Fehlermeldungen anzeigen, sondern eine Logdatei erstellen
 Do not show this warning again
@@ -306,38 +282,28 @@ Email:
 Email:
 Error
 Fehler
-Error adapting modification time of file 
-Fehler beim Anpassen des Datums der letzten Änderung der Datei 
-Error changing modification time: 
-Fehler beim Setzen der Änderungszeit: 
-Error converting FILETIME to SYSTEMTIME
-Fehler beim Konvertieren der FILETIME nach SYSTEMTIME
-Error converting FILETIME to local FILETIME
-Fehler beim Konvertieren der FILETIME nach (lokale) FILETIME
-Error copying file 
-Fehler beim Kopieren der Datei 
-Error creating directory 
-Fehler beim Erstellen des Verzeichnisses 
-Error deleting directory: 
-Fehler beim Löschen des Verzeichnisses: 
-Error deleting file: 
-Fehler beim Löschen der Datei: 
-Error moving to recycle bin: 
-Fehler beim Verschieben in den Papierkorb: 
-Error parsing configuration file 
-Fehler beim Auswerten der Konfigurationsdatei 
-Error reading file: 
-Fehler beim Lesen der Datei: 
-Error traversing directory 
-Fehler beim Durchsuchen des Verzeichnisses 
-Error when converting int to wxString
-Fehler bei Konvertierung (int nach wxString)
-Error when converting wxString to double
-Fehler bei Konvertierung (wxString nach double)
-Error when converting wxString to long
-Fehler bei Konvertierung (wxString nach long)
-Error: Source directory does not exist anymore: 
-Fehler: Quellverzeichnis existiert nicht mehr: 
+Error changing modification time:
+Fehler beim Setzen der Dateiänderungszeit:
+Error copying file:
+Fehler beim Kopieren der Datei:
+Error creating directory:
+Fehler beim Erstellen des Verzeichnisses:
+Error deleting directory:
+Fehler beim Löschen des Verzeichnisses:
+Error deleting file:
+Fehler beim Löschen der Datei:
+Error moving to recycle bin:
+Fehler beim Verschieben in den Papierkorb:
+Error parsing configuration file:
+Fehler beim Auswerten der Konfigurationsdatei:
+Error reading file:
+Fehler beim Lesen der Datei:
+Error traversing directory:
+Fehler beim Durchsuchen des Verzeichnisses:
+Error writing file:
+Fehler beim Schreiben der Datei:
+Error: Source directory does not exist anymore:
+Fehler: Quellverzeichnis existiert nicht mehr:
 Example
 Beispiel
 Exclude
@@ -346,6 +312,8 @@ Exclude temporarily
 Temporär ausschließen
 Feedback and suggestions are welcome at:
 Feedback und Vorschläge sind willkommen unter:
+File already exists. Overwrite?
+Die Datei existiert bereits. Überschreiben?
 File content
 Dateiinhalt
 File list exported!
@@ -426,10 +394,10 @@ Ignore errors
 Fehler ignorieren
 Ignore next errors
 Weitere Fehler ignorieren
-Ignore this error, retry or abort comparison?
-Fehler ignorieren, wiederholen oder Vergleich abbrechen?
 Ignore this error, retry or abort synchronization?
 Fehler ignorieren, wiederholen oder Synchronisation abbrechen?
+Ignore this error, retry or abort?
+Fehler ignorieren, wiederholen oder abbrechen?
 Include
 Einschließen
 Include temporarily
@@ -442,14 +410,14 @@ Information
 Information
 Information: If you ignore the error or abort a re-compare will be necessary!
 Information: Wenn der Fehler nicht behoben wird, muss der Vergleich erneut gestartet werden!
-Initialization of Recycle Bin failed! It cannot be used!
-Die Initialisierung des Papierkorbs ist fehlgeschlagen! Er kann nicht verwendet werden!
+Initialization of Recycle Bin failed!
+Die Initialisierung des Papierkorbs ist fehlgeschlagen!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Die Papierkorbfunktion steht nicht zur Verfügung!\n\nWahrscheinlich ist das aktuelle Betriebssystem nicht Windows.\nWenn Sie diese Funktion wirklich benötigen, kontaktieren Sie bitte den Autor. :)
 Left folder:
 Linker Ordner:
-Legend\n
-Legende\n
+Legend
+Legende
 Load configuration via...\n     - this list (press DEL to delete items)\n     - drag & drop to this window\n     - startup parameter
 Lade Konfiguration über...\n     - diese Liste (DEL-Taste löscht Einträge)\n     - Drag & Drop auf dieses Fenster\n     - Startupparameter
 Load from file...
@@ -460,12 +428,10 @@ Mirror ->>
 Spiegel ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Spiegel-Backup des linken Ordners erstellen: Der rechte Ordner wird dabei überschrieben und nach der Synchronisation dem linken exakt gleichen.
-No valid configuration file specified: 
-Keine gültige Konfigurationsdatei angegeben: 
 Not all items were synchronized! Have a look at the list.
 Nicht alle Objekte wurden synchronisiert! Siehe die verbliebenen Elemente im Hauptfenster.
-Nothing to synchronize. Both directories adhere to the sync-configuration!
-Nichts zu synchronisieren. Beide Verzeichnisse entsprechen den Synchronisationseinstellungen!
+Nothing to synchronize according to configuration!
+Es gibt nichts zu synchronisieren gemäß aktueller Einstellungen!
 Number of files and directories that will be created
 Anzahl der Dateien und Verzeichnisse, die erstellt werden
 Number of files and directories that will be deleted
@@ -506,18 +472,16 @@ Right folder:
 Rechter Ordner:
 S&ave configuration
 S&peichere Konfiguration
+Save aborted!
+Speicherung abgebrochen!
 Save current configuration to file
 Aktuelle Konfiguration in Datei sichern
-Saved aborted!
-Speichern abgebrochen!
-Scanning 
-Lese Datei 
 Scanning...
 Suche Dateien...
+Scanning:
+Lese Datei:
 Select a folder
 Verzeichnis wählen
-Select folder
-Verzeichnis auswählen
 Select variant:
 Variante auswählen:
 Set filter for synchronization
@@ -548,8 +512,6 @@ Stop
 Stop
 Swap sides
 Vertausche Seiten
-SyncJob.ffs_batch
-SyncJob.ffs_batch
 Synchronization aborted!
 Synchronisation abgebrochen!
 Synchronization completed successfully.
@@ -568,10 +530,10 @@ Synchronizing...
 Synchronisiere...
 System out of memory!
 Zu wenig freier Arbeitsspeicher!
-The selected file does not contain a valid configuration!
-Die ausgewählte Datei enthält keine gültige Konfiguration!
-The selected file does not exist: 
-Die ausgewählte Datei existiert nicht: 
+The file does not contain a valid configuration:
+Die Datei enthält keine gültige Konfiguration:
+The selected file does not exist:
+Die ausgewählte Datei existiert nicht:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
 Diese Variante identifiziert zwei gleichnamige Dateien als gleich, wenn sie die gleiche Dateigröße haben UND der Zeitpunkt der letzten Änderung derselbe ist. Dabei wird eine Abweichung von bis zu zwei Sekunden toleriert. So ist sichergestellt, dass eine Synchronisation gegen ein FAT32 Dateisystem korrekt funktioniert.
 Time elapsed:
@@ -580,12 +542,12 @@ Time shift in seconds
 Zeitverschiebung in Sekunden
 Time shift:
 Zeitverschiebung:
-Time: 
-Zeit: 
+Time:
+Zeit:
 Total amount of data that will be transferred
 Gesamtmenge der Daten, die übertragen werden
-Total time: 
-Gesamtzeit: 
+Total time:
+Gesamtzeit:
 Two way <->
 Beidseitig <->
 Unable to create logfile!
@@ -604,12 +566,14 @@ Use Recycle Bin when deleting or overwriting files during synchronization
 Papierkorb für zu löschende oder überschreibende Dateien nutzen
 Warning
 Warnung
-Warning: Synchronization failed for 
-Warnung: Synchronisation fehlgeschlagen für 
+Warning: Synchronization failed for %x item(s):
+Warnung: Synchronisation fehlgeschlagen für %x Element(e):
 When \"Compare\" is triggered with this option set the following decision tree is processed:
 Nachdem \"Compare\" mit dieser Einstellung gestartet wurde, wird der folgende Entscheidungsbaum abgearbeitet:
 You can adjust the file times accordingly to resolve the issue:
 Die Dateizeiten können entsprechend angepasst werden, um den Fehler zu beheben:
+You may try to synchronize remaining items again (WITHOUT having to re-compare)!
+Verbliebene Elemente können nochmals synchronisiert werden (OHNE dass ein erneuter Vergleich notwendig ist)!
 different
 verschieden
 file exists on both sides

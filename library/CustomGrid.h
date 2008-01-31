@@ -12,7 +12,7 @@ class CustomGridTableBase;
 
 //##################################################################################
 
-extern int leadingPanel;
+extern const wxGrid* leadGrid; //this global variable is not very nice...
 
 class CustomGrid : public wxGrid
 {
@@ -26,26 +26,19 @@ public:
 
     ~CustomGrid();
 
-    bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
+    virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
+    //overwrite virtual method to finally get rid of the scrollbars
+    virtual void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh = true);
+    //this method is called when grid view changes: useful for parallel updating of multiple grids
+    virtual void DoPrepareDC(wxDC& dc);
+    virtual void DrawColLabel(wxDC& dc, int col);
 
     void deactivateScrollbars();
-
-    //overwrite virtual method to finally get rid of the scrollbars
-    void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh = true);
-
-    //this method is called when grid view changes: useful for parallel updating of multiple grids
-    void DoPrepareDC(wxDC& dc);
-
     void setScrollFriends(CustomGrid* gridLeft, CustomGrid* gridRight, CustomGrid* gridMiddle);
-
     void setGridDataTable(GridView* gridRefUI, FileCompareResult* gridData);
-
     void updateGridSizes();
-
     //set sort direction indicator on UI
     void setSortMarker(const int sortColumn, const wxBitmap* bitmap = &wxNullBitmap);
-
-    void DrawColLabel(wxDC& dc, int col);
 
 private:
     void adjustGridHeights();

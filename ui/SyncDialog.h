@@ -18,9 +18,9 @@ public:
     ~SyncDialog();
 
     enum
-     {
-         BUTTON_START = 15
-     };
+    {
+        BUTTON_START = 15
+    };
 
     static void updateConfigIcons(wxBitmapButton* button1,
                                   wxBitmapButton* button2,

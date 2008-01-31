@@ -9,132 +9,17 @@
 #include "algorithm.h"
 
 #ifdef FFS_WIN
-#include <windows.h>
+#include <wx/msw/wrapwin.h> //includes "windows.h"
 #endif  //FFS_WIN
 
 using namespace FreeFileSync;
 
 CompareProcess::CompareProcess(bool lineBreakOnMessages, StatusHandler* handler) :
-        statusUpdater(handler)
+        statusUpdater(handler),
+        txtComparingContentOfFiles(_("Comparing content of files \"%x\""))
 {
     if (lineBreakOnMessages)
         optionalLineBreak = wxT("\n");
-}
-
-
-struct FileInfo
-{
-    wxULongLong fileSize; //unit: bytes!
-    wxString lastWriteTime;
-    wxULongLong lastWriteTimeRaw; //unit: seconds!
-};
-
-
-class GetAllFilesFull : public wxDirTraverser
-{
-public:
-    GetAllFilesFull(DirectoryDescrType& output, wxString dirThatIsSearched, const wxString& optionalLineBreak, StatusHandler* updateClass = 0);
-
-    wxDirTraverseResult OnFile(const wxString& filename);
-
-    wxDirTraverseResult OnDir(const wxString& dirname);
-
-    wxDirTraverseResult OnOpenError(const wxString& openerrorname);
-
-private:
-    DirectoryDescrType& m_output;
-    wxString directory;
-    int prefixLength;
-    FileInfo currentFileInfo;
-    FileDescrLine fileDescr;
-    const wxString m_optionalLineBreak;
-    StatusHandler* statusUpdater;
-};
-
-
-inline
-wxString formatTime(unsigned int number)
-{
-    assert (number < 100);
-
-    if (number <= 9)
-    {
-        wxChar result[3];
-
-        *result = '0';
-        result[1] = '0' + number;
-        result[2] = 0;
-
-        return result;
-    }
-    else
-    {
-        wxString result;
-        if (result.Printf(wxT("%d"), number) < 0)
-            throw RuntimeException(_("Error when converting int to wxString"));
-        return result;
-    }
-}
-
-
-void getFileInformation(FileInfo& output, const wxString& filename)
-{
-#ifdef FFS_WIN
-    WIN32_FIND_DATA winFileInfo;
-    FILETIME localFileTime;
-    SYSTEMTIME time;
-    HANDLE fileHandle;
-
-    if ((fileHandle = FindFirstFile(filename.c_str(), &winFileInfo)) == INVALID_HANDLE_VALUE)
-        throw FileError(wxString(_("Could not retrieve file info for: ")) + wxT("\"") + filename + wxT("\""));
-
-    FindClose(fileHandle);
-
-    if (FileTimeToLocalFileTime(
-                &winFileInfo.ftLastWriteTime, //pointer to UTC file time to convert
-                &localFileTime 	              //pointer to converted file time
-            ) == 0)
-        throw RuntimeException(_("Error converting FILETIME to local FILETIME"));
-
-    if (FileTimeToSystemTime(
-                &localFileTime, //pointer to file time to convert
-                &time 	        //pointer to structure to receive system time
-            ) == 0)
-        throw RuntimeException(_("Error converting FILETIME to SYSTEMTIME"));
-
-    output.lastWriteTime = globalFunctions::numberToWxString(time.wYear) + wxT("-") +
-                           formatTime(time.wMonth)      + wxT("-") +
-                           formatTime(time.wDay)        + wxT("  ") +
-                           formatTime(time.wHour)       + wxT(":") +
-                           formatTime(time.wMinute)     + wxT(":") +
-                           formatTime(time.wSecond);
-
-    //local time
-    output.lastWriteTimeRaw = wxULongLong(localFileTime.dwHighDateTime, localFileTime.dwLowDateTime);
-
-    //reduce precision to 1 second (FILETIME has unit 10^-7 s)
-    output.lastWriteTimeRaw/= 10000000; // <- time is used for comparison only: unit switched to seconds
-
-    output.fileSize = wxULongLong(winFileInfo.nFileSizeHigh, winFileInfo.nFileSizeLow);
-
-#else
-    struct stat fileInfo;
-    if (stat(filename.c_str(), &fileInfo) != 0)
-        throw FileError(wxString(_("Could not retrieve file info for: ")) + wxT("\"") + filename + wxT("\""));
-
-    tm* timeinfo;
-    timeinfo = localtime(&fileInfo.st_mtime);
-    char buffer [50];
-    strftime(buffer,50,"%Y-%m-%d  %H:%M:%S",timeinfo);
-
-    //local time
-    output.lastWriteTime = buffer;
-
-    //UTC time; unit: 1 second
-    output.lastWriteTimeRaw = fileInfo.st_mtime;
-
-    output.fileSize = fileInfo.st_size;
-#endif
 }
 
 
@@ -164,19 +49,19 @@ bool filesHaveSameContent(const wxString& filename1, const wxString& filename2)
 
     wxFFile file1(filename1.c_str(), wxT("rb"));
     if (!file1.IsOpened())
-        throw FileError(wxString(_("Could not open file: ")) + wxT("\"") + filename1 + wxT("\""));
+        throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + filename1 + wxT("\""));
 
     wxFFile file2(filename2.c_str(), wxT("rb"));
-    if (!file2.IsOpened()) //NO cleanup necessary for wxFFile
-        throw FileError(wxString(_("Could not open file: ")) + wxT("\"") + filename2 + wxT("\""));
+    if (!file2.IsOpened()) //NO cleanup necessary for (wxFFile) file1
+        throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + filename2 + wxT("\""));
 
     do
     {
         size_t length1 = file1.Read(memory.buffer1, memory.bufferSize);
-        if (file1.Error()) throw FileError(wxString(_("Error reading file: ")) + wxT("\"") + filename1 + wxT("\""));
+        if (file1.Error()) throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + filename1 + wxT("\""));
 
         size_t length2 = file2.Read(memory.buffer2, memory.bufferSize);
-        if (file2.Error()) throw FileError(wxString(_("Error reading file: ")) + wxT("\"") + filename2 + wxT("\""));
+        if (file2.Error()) throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + filename2 + wxT("\""));
 
         if (length1 != length2 || memcmp(memory.buffer1, memory.buffer2, length1) != 0)
             return false;
@@ -256,72 +141,154 @@ void calcTotalDataForCompare(int& objectsTotal, double& dataTotal, const FileCom
 }
 
 
+inline
+void writeText(const wxChar* text, const int length, wxChar*& currentPos)
+{
+    memcpy(currentPos, text, length * sizeof(wxChar));
+    currentPos+=length;
+}
+
+
+class GetAllFilesFull : public FullDetailFileTraverser
+{
+public:
+    GetAllFilesFull(DirectoryDescrType& output, Zstring dirThatIsSearched, const Zstring& optionalLineBreak, StatusHandler* updateClass) :
+            m_output(output),
+            directory(dirThatIsSearched),
+            m_optionalLineBreak(optionalLineBreak),
+            statusUpdater(updateClass)
+    {
+        assert(updateClass);
+        prefixLength = directory.length();
+        textScanning = _("Scanning:"); //performance optimization
+    }
+
+
+    virtual wxDirTraverseResult GetAllFilesFull::OnFile(const Zstring& fullFileName, const FileInfo& details)
+    {
+        FileDescrLine fileDescr;
+        fileDescr.fullName         = fullFileName;
+        fileDescr.directory        = directory;
+        fileDescr.relativeName     = fullFileName.substr(prefixLength);
+        fileDescr.lastWriteTimeRaw = details.lastWriteTimeRaw;
+        fileDescr.fileSize         = details.fileSize;
+        fileDescr.objType          = FileDescrLine::TYPE_FILE;
+        m_output.push_back(fileDescr);
+
+        //assemble status message (performance optimized)  = textScanning + wxT(" ") + m_optionalLineBreak + wxT("\"") + fullFileName + wxT("\"")
+        const unsigned int statusTextMaxLen = 2000;
+        wxChar statusText[statusTextMaxLen];
+        wxChar* position = statusText;
+        if (textScanning.length() + m_optionalLineBreak.length() + fullFileName.length() + 3 < statusTextMaxLen) //leave room for 0 terminating char!
+        {
+            writeText(textScanning.c_str(), textScanning.length(), position);
+            writeText(wxT(" "), 1, position);
+            writeText(m_optionalLineBreak.c_str(), m_optionalLineBreak.length(), position);
+            writeText(wxT("\""), 1, position);
+            writeText(fullFileName.c_str(), fullFileName.length(), position);
+            writeText(wxT("\""), 1, position);
+        }
+        *position = 0;
+
+        //update UI/commandline status information
+        statusUpdater->updateStatusText(statusText);
+        //add 1 element to the progress indicator
+        statusUpdater->updateProcessedData(1, 0); //NO performance issue at all
+        //trigger display refresh
+        statusUpdater->requestUiRefresh();
+
+        return wxDIR_CONTINUE;
+    }
+
+
+    virtual wxDirTraverseResult GetAllFilesFull::OnDir(const Zstring& fullDirName)
+    {
+#ifdef FFS_WIN
+        if (    fullDirName.EndsWith(wxT("\\RECYCLER")) ||
+                fullDirName.EndsWith(wxT("\\System Volume Information")))
+            return wxDIR_IGNORE;
+#endif  // FFS_WIN
+
+        FileDescrLine fileDescr;
+        fileDescr.fullName         = fullDirName;
+        fileDescr.directory        = directory;
+        fileDescr.relativeName     = fullDirName.substr(prefixLength);
+        fileDescr.lastWriteTimeRaw = 0;  //irrelevant for directories
+        fileDescr.fileSize         = wxULongLong(0);  //currently used by getBytesToTransfer
+        fileDescr.objType          = FileDescrLine::TYPE_DIRECTORY;
+        m_output.push_back(fileDescr);
+
+        //assemble status message (performance optimized)  = textScanning + wxT(" ") + m_optionalLineBreak + wxT("\"") + fullDirName + wxT("\"")
+        const unsigned int statusTextMaxLen = 2000;
+        wxChar statusText[statusTextMaxLen];
+        wxChar* position = statusText;
+        if (textScanning.length() + m_optionalLineBreak.length() + fullDirName.length() + 3 < statusTextMaxLen) //leave room for 0 terminating char!
+        {
+            writeText(textScanning.c_str(), textScanning.length(), position);
+            writeText(wxT(" "), 1, position);
+            writeText(m_optionalLineBreak.c_str(), m_optionalLineBreak.length(), position);
+            writeText(wxT("\""), 1, position);
+            writeText(fullDirName.c_str(), fullDirName.length(), position);
+            writeText(wxT("\""), 1, position);
+        }
+        *position = 0;
+
+        //update UI/commandline status information
+        statusUpdater->updateStatusText(statusText);
+        //add 1 element to the progress indicator
+        statusUpdater->updateProcessedData(1, 0);     //NO performance issue at all
+        //trigger display refresh
+        statusUpdater->requestUiRefresh();
+
+        return wxDIR_CONTINUE;
+    }
+
+
+    virtual wxDirTraverseResult GetAllFilesFull::OnError(const Zstring& errorText)
+    {
+        wxMessageBox(errorText, _("Error"));
+        return wxDIR_CONTINUE;
+    }
+
+private:
+    DirectoryDescrType& m_output;
+    Zstring directory;
+    int prefixLength;
+    const Zstring m_optionalLineBreak;
+    wxString textScanning;
+    StatusHandler* statusUpdater;
+};
+
+
 void generateFileAndFolderDescriptions(DirectoryDescrType& output, const wxString& directory, const wxString& optionalLineBreak, StatusHandler* updateClass)
 {
     assert (updateClass);
 
-    while (true)
-    {
-        output.clear();
+    output.clear();
 
-        //get all files and folders from directory (and subdirectories) + information
-        GetAllFilesFull traverser(output, FreeFileSync::getFormattedDirectoryName(directory), optionalLineBreak, updateClass);
-        wxDir dir(directory);
+    //get all files and folders from directory (and subdirectories) + information
+    const wxString directoryFormatted = FreeFileSync::getFormattedDirectoryName(directory);
 
-        if (dir.Traverse(traverser) != (size_t)-1)
-            break;  //traversed successfully
-        else
-        {
-            ErrorHandler::Response rv = updateClass->reportError(wxString(_("Error traversing directory ")) + wxT("\"") + directory + wxT("\""));
-            if (rv == ErrorHandler::CONTINUE_NEXT)
-                break;
-            else if (rv == ErrorHandler::RETRY)
-                ;   //continue with loop
-            else
-                assert (false);
-        }
-    }
+    //GetAllFilesFull traverser(output, directoryFormatted.c_str(), optionalLineBreak.c_str(), updateClass);
+    GetAllFilesFull traverser(output, directoryFormatted, optionalLineBreak, updateClass);
+    //traverseInDetail(directoryFormatted.c_str(), &traverser);
+    traverseInDetail(directoryFormatted, &traverser);
 }
 
 
 struct DescrBufferLine
 {
-    wxString directoryName;
+    Zstring directoryName;
     DirectoryDescrType* directoryDesc;
 
-#ifdef FFS_WIN
-    //Windows does NOT distinguish between upper/lower-case
-    bool operator>(const DescrBufferLine& b ) const
+    bool operator < (const DescrBufferLine& b) const
     {
-        return (directoryName.CmpNoCase(b.directoryName) > 0);
-    }
-    bool operator<(const DescrBufferLine& b) const
-    {
+#ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
         return (directoryName.CmpNoCase(b.directoryName) < 0);
-    }
-    bool operator==(const DescrBufferLine& b) const
-    {
-        return (directoryName.CmpNoCase(b.directoryName) == 0);
-    }
-
-#elif defined FFS_LINUX
-    //Linux DOES distinguish between upper/lower-case
-    bool operator>(const DescrBufferLine& b ) const
-    {
-        return (directoryName.Cmp(b.directoryName) > 0);
-    }
-    bool operator<(const DescrBufferLine& b) const
-    {
+#elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
         return (directoryName.Cmp(b.directoryName) < 0);
-    }
-    bool operator==(const DescrBufferLine& b) const
-    {
-        return (directoryName.Cmp(b.directoryName) == 0);
-    }
-#else
-    adapt this
 #endif
-
+    }
 };
 
 
@@ -335,7 +302,7 @@ public:
             delete i->directoryDesc;
     }
 
-    const DirectoryDescrType* getDirectoryDescription(const wxString& directory, const wxString& optionalLineBreak, StatusHandler* statusUpdater)
+    DirectoryDescrType* getDirectoryDescription(const Zstring& directory, const Zstring& optionalLineBreak, StatusHandler* statusUpdater)
     {
         DescrBufferLine bufferEntry;
         bufferEntry.directoryName = directory;
@@ -351,6 +318,8 @@ public:
             //entry not found; create new one
             bufferEntry.directoryDesc = new DirectoryDescrType;
             buffer.insert(bufferEntry); //exception safety: insert into buffer right after creation!
+
+            bufferEntry.directoryDesc->reserve(400000); //reserve space for up to 400000 files to avoid vector reallocations
 
             generateFileAndFolderDescriptions(*bufferEntry.directoryDesc, directory, optionalLineBreak, statusUpdater); //exceptions may be thrown!
             return bufferEntry.directoryDesc;
@@ -370,19 +339,14 @@ void CompareProcess::startCompareProcess(const vector<FolderPair>& directoryPair
     wxLogNull noWxLogs; //hide wxWidgets log messages in release build
 #endif
     assert (statusUpdater);
-
-//################################################################################################################################################
-
     FileCompareResult output_tmp; //write to output not before END of process!
 
     try
-    {
-        //inform about the total amount of data that will be processed from now on
+    {   //inform about the total amount of data that will be processed from now on
         statusUpdater->initNewProcess(-1, 0, StatusHandler::PROCESS_SCANNING); //it's not known how many files will be scanned => -1 objects
 
         //do basis scan: only result lines of type FILE_UNDEFINED need to be determined
-        performBaseComparison(directoryPairsFormatted,
-                              output_tmp);
+        performBaseComparison(directoryPairsFormatted, output_tmp);
 
         if (cmpVar == CMP_BY_TIME_SIZE)
         {
@@ -439,7 +403,9 @@ void CompareProcess::startCompareProcess(const vector<FolderPair>& directoryPair
             {
                 FileCompareLine& gridline = output_tmp[*i];
 
-                statusUpdater->updateStatusText(wxString(_("Comparing content of files ")) + optionalLineBreak + wxT("\"") + gridline.fileDescrLeft.relativeName + wxT("\""));
+                wxString statusText = txtComparingContentOfFiles;
+                statusText.Replace(wxT("%x"), gridline.fileDescrLeft.relativeName, false);
+                statusUpdater->updateStatusText(statusText);
 
                 //check files that exist in left and right model but have different content
                 while (true)
@@ -460,7 +426,7 @@ void CompareProcess::startCompareProcess(const vector<FolderPair>& directoryPair
                     catch (FileError& error)
                     {
                         ErrorHandler::Response rv = statusUpdater->reportError(error.show());
-                        if (rv == ErrorHandler::CONTINUE_NEXT)
+                        if (rv == ErrorHandler::IGNORE_ERROR)
                         {
                             rowsToDelete.insert(*i);
                             break;
@@ -478,9 +444,6 @@ void CompareProcess::startCompareProcess(const vector<FolderPair>& directoryPair
                 removeRowsFromVector(output_tmp, rowsToDelete);
         }
         else assert(false);
-
-
-        statusUpdater->requestUiRefresh();
     }
     catch (const RuntimeException& theException)
     {
@@ -498,8 +461,7 @@ void CompareProcess::startCompareProcess(const vector<FolderPair>& directoryPair
 }
 
 
-void CompareProcess::performBaseComparison(const vector<FolderPair>& directoryPairsFormatted,
-        FileCompareResult& output)
+void CompareProcess::performBaseComparison(const vector<FolderPair>& directoryPairsFormatted, FileCompareResult& output)
 {
     //buffer accesses to the same directories; useful when multiple folder pairs are used
     DirectoryDescrBuffer descriptionBuffer;
@@ -507,16 +469,25 @@ void CompareProcess::performBaseComparison(const vector<FolderPair>& directoryPa
     //process one folder pair after each other
     for (vector<FolderPair>::const_iterator pair = directoryPairsFormatted.begin(); pair != directoryPairsFormatted.end(); ++pair)
     {
+        //PERF_START;
         //retrieve sets of files (with description data)
-        const DirectoryDescrType* directoryLeft  = descriptionBuffer.getDirectoryDescription(pair->leftDirectory, optionalLineBreak, statusUpdater);
-        const DirectoryDescrType* directoryRight = descriptionBuffer.getDirectoryDescription(pair->rightDirectory, optionalLineBreak, statusUpdater);
+        DirectoryDescrType* directoryLeft  = descriptionBuffer.getDirectoryDescription(pair->leftDirectory, optionalLineBreak, statusUpdater);
+        DirectoryDescrType* directoryRight = descriptionBuffer.getDirectoryDescription(pair->rightDirectory, optionalLineBreak, statusUpdater);
 
         statusUpdater->forceUiRefresh();
+        //PERF_STOP;
+        //we use binary search when comparing the directory structures: so sort() first
+        sort(directoryLeft->begin(), directoryLeft->end());
+        sort(directoryRight->begin(), directoryRight->end());
+        //PERF_STOP;
         FileCompareLine newline;
+
+        //reserve some space to avoid vector reallocations
+        output.reserve(int(max(directoryLeft->size(), directoryRight->size()) * 1.2));
 
         //find files/folders that exist in left file model but not in right model
         for (DirectoryDescrType::iterator i = directoryLeft->begin(); i != directoryLeft->end(); ++i)
-            if (directoryRight->find(*i) == directoryRight->end())
+            if (custom_binary_search(directoryRight->begin(), directoryRight->end(), *i) == directoryRight->end())
             {
                 newline.fileDescrLeft            = *i;
                 newline.fileDescrRight           = FileDescrLine();
@@ -530,7 +501,7 @@ void CompareProcess::performBaseComparison(const vector<FolderPair>& directoryPa
             DirectoryDescrType::iterator i;
 
             //find files/folders that exist in right file model but not in left model
-            if ((i = directoryLeft->find(*j)) == directoryLeft->end())
+            if ((i = custom_binary_search(directoryLeft->begin(), directoryLeft->end(), *j)) == directoryLeft->end())
             {
                 newline.fileDescrLeft           = FileDescrLine();
                 newline.fileDescrLeft.directory = pair->leftDirectory;  //directory info is needed when creating new directories
@@ -574,96 +545,8 @@ void CompareProcess::performBaseComparison(const vector<FolderPair>& directoryPa
                 else assert (false);
             }
         }
+        //PERF_STOP;
     }
-    statusUpdater->requestUiRefresh();
-}
-
-
-GetAllFilesFull::GetAllFilesFull(DirectoryDescrType& output, wxString dirThatIsSearched, const wxString& optionalLineBreak, StatusHandler* updateClass) :
-        m_output(output),
-        directory(dirThatIsSearched),
-        m_optionalLineBreak(optionalLineBreak),
-        statusUpdater(updateClass)
-{
-    assert(updateClass);
-    prefixLength = directory.Len();
-}
-
-
-wxDirTraverseResult GetAllFilesFull::OnFile(const wxString& filename)
-{
-    fileDescr.fullName     = filename;
-    fileDescr.directory    = directory;
-    fileDescr.relativeName = filename.Mid(prefixLength);
-    while (true)
-    {
-        try
-        {
-            getFileInformation(currentFileInfo, filename);
-            break;
-        }
-        catch (FileError& error)
-        {
-            //if (updateClass) -> is mandatory
-            ErrorHandler::Response rv = statusUpdater->reportError(error.show());
-            if ( rv == ErrorHandler::CONTINUE_NEXT)
-                return wxDIR_CONTINUE;
-            else if (rv == ErrorHandler::RETRY)
-                ;   //continue with loop
-            else
-                assert (false);
-        }
-    }
-
-    fileDescr.lastWriteTime    = currentFileInfo.lastWriteTime;
-    fileDescr.lastWriteTimeRaw = currentFileInfo.lastWriteTimeRaw;
-    fileDescr.fileSize         = currentFileInfo.fileSize;
-    fileDescr.objType          = FileDescrLine::TYPE_FILE;
-    m_output.insert(fileDescr);
-
-    //update UI/commandline status information
-    statusUpdater->updateStatusText(wxString(_("Scanning ")) + m_optionalLineBreak + wxT("\"") + filename + wxT("\"")); //NO performance issue at all
-    //add 1 element to the progress indicator
-    statusUpdater->updateProcessedData(1, 0); //NO performance issue at all
-    //trigger display refresh
-    statusUpdater->requestUiRefresh();
-
-    return wxDIR_CONTINUE;
-}
-
-
-wxDirTraverseResult GetAllFilesFull::OnDir(const wxString& dirname)
-{
-#ifdef FFS_WIN
-    if (    dirname.EndsWith(wxT("\\RECYCLER")) ||
-            dirname.EndsWith(wxT("\\System Volume Information")))
-        return wxDIR_IGNORE;
-#endif  // FFS_WIN
-
-    fileDescr.fullName     = dirname;
-    fileDescr.directory    = directory;
-    fileDescr.relativeName = dirname.Mid(prefixLength);
-    fileDescr.lastWriteTime    = wxEmptyString;   //irrelevant for directories
-    fileDescr.lastWriteTimeRaw = wxULongLong(0);  //irrelevant for directories
-    fileDescr.fileSize         = wxULongLong(0);  //currently used by getBytesToTransfer
-    fileDescr.objType          = FileDescrLine::TYPE_DIRECTORY;
-    m_output.insert(fileDescr);
-
-    //update UI/commandline status information
-    statusUpdater->updateStatusText(wxString(_("Scanning ")) + m_optionalLineBreak + wxT("\"") + dirname + wxT("\"")); //NO performance issue at all
-    //add 1 element to the progress indicator
-    statusUpdater->updateProcessedData(1, 0);     //NO performance issue at all
-    //trigger display refresh
-    statusUpdater->requestUiRefresh();
-
-    return wxDIR_CONTINUE;
-}
-
-
-wxDirTraverseResult GetAllFilesFull::OnOpenError(const wxString& openerrorname)
-{
-    wxMessageBox(openerrorname, _("Error"));
-    return wxDIR_IGNORE;
 }
 
 
@@ -686,12 +569,12 @@ bool FreeFileSync::foldersAreValidForComparison(const vector<FolderPair>& folder
         //check if folder exists
         if (!wxDirExists(leftFolderName))
         {
-            errorMessage = wxString(_("Directory does not exist: ")) + wxT("\"") + leftFolderName + wxT("\"");
+            errorMessage = wxString(_("Directory does not exist:")) + wxT(" \"") + leftFolderName + wxT("\"");
             return false;
         }
         if (!wxDirExists(rightFolderName))
         {
-            errorMessage = wxString(_("Directory does not exist: ")) + wxT("\"") + rightFolderName + wxT("\"");
+            errorMessage = wxString(_("Directory does not exist:")) + wxT(" \"") + rightFolderName + wxT("\"");
             return false;
         }
     }
@@ -706,8 +589,8 @@ bool dependencyExists(const vector<wxString>& folders, const wxString& newFolder
     for (vector<wxString>::const_iterator i = folders.begin(); i != folders.end(); ++i)
         if (newFolder.StartsWith(*i) || i->StartsWith(newFolder))
         {
-            warningMessage = wxString(_("Directories are dependent: ")) +
-                             wxT("\"") + *i + wxT("\"") + wxT(", ") + wxT("\"") + newFolder + wxT("\"");
+            warningMessage = wxString(_("Directories are dependent:")) +
+                             wxT(" \"") + *i + wxT("\"") + wxT(", ") + wxT("\"") + newFolder + wxT("\"");
             return true;
         }
 

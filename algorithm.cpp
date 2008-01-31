@@ -6,7 +6,7 @@
 #include "library/resources.h"
 
 #ifdef FFS_WIN
-#include <windows.h>
+#include <wx/msw/wrapwin.h> //includes "windows.h"
 #endif  //FFS_WIN
 
 using namespace FreeFileSync;
@@ -95,22 +95,23 @@ wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
 }
 
 
-wxString FreeFileSync::getFormattedDirectoryName(const wxString& dirname)
+Zstring FreeFileSync::getFormattedDirectoryName(const Zstring& dirname)
 {   //Formatting is needed since functions in FreeFileSync.cpp expect the directory to end with '\' to be able to split the relative names.
     //Also improves usability.
 
-    wxString dirnameTmp = dirname;
+    wxString dirnameTmp = dirname.c_str();
     dirnameTmp.Trim(true);  //remove whitespace characters from right
     dirnameTmp.Trim(false); //remove whitespace characters from left
 
     if (dirnameTmp.IsEmpty()) //an empty string is interpreted as "\"; this is not desired
-        return wxEmptyString;
+        return Zstring();
 
     //let wxWidgets do the directory formatting, e.g. replace '/' with '\' for Windows
     wxFileName directory = wxFileName::DirName(dirnameTmp);
     wxString result = directory.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
 
-    return result;
+    //return Zstring(result.c_str());
+    return Zstring(result);
 }
 
 
@@ -138,7 +139,7 @@ void FreeFileSync::swapGrids(FileCompareResult& grid)
 }
 
 
-void FreeFileSync::adjustModificationTimes(const wxString& parentDirectory, const int timeInSeconds, ErrorHandler* errorHandler) throw(AbortThisProcess)
+void FreeFileSync::adjustModificationTimes(const Zstring& parentDirectory, const int timeInSeconds, ErrorHandler* errorHandler) throw(AbortThisProcess)
 {
 #ifndef __WXDEBUG__
     wxLogNull noWxLogs; //prevent wxWidgets logging
@@ -147,8 +148,8 @@ void FreeFileSync::adjustModificationTimes(const wxString& parentDirectory, cons
     if (timeInSeconds == 0)
         return;
 
-    wxArrayString fileList;
-    wxArrayString dirList;
+    vector<Zstring> fileList;
+    vector<Zstring> dirList;
 
     while (true)  //should be executed in own scope so that directory access does not disturb deletion
     {
@@ -160,7 +161,7 @@ void FreeFileSync::adjustModificationTimes(const wxString& parentDirectory, cons
         catch (const FileError& e)
         {
             ErrorHandler::Response rv = errorHandler->reportError(e.show());
-            if (rv == ErrorHandler::CONTINUE_NEXT)
+            if (rv == ErrorHandler::IGNORE_ERROR)
                 break;
             else if (rv == ErrorHandler::RETRY)
                 ;   //continue with loop
@@ -171,27 +172,27 @@ void FreeFileSync::adjustModificationTimes(const wxString& parentDirectory, cons
 
     //this part is only a bit slower than direct Windows API-access!
     wxDateTime modTime;
-    for (unsigned int j = 0; j < fileList.GetCount(); ++j)
+    for (unsigned int j = 0; j < fileList.size(); ++j)
     {
         while (true)  //own scope for directory access to not disturb file access!
         {
             try
             {
-                wxFileName file(fileList[j]);
+                wxFileName file(fileList[j].c_str());
                 if (!file.GetTimes(NULL, &modTime, NULL)) //get modification time
-                    throw FileError(wxString(_("Error changing modification time: ")) + wxT("\"") + fileList[j] + wxT("\""));
+                    throw FileError(wxString(_("Error changing modification time:")) + wxT(" \"") + fileList[j].c_str() + wxT("\""));
 
                 modTime.Add(wxTimeSpan(0, 0, timeInSeconds, 0));
 
                 if (!file.SetTimes(NULL, &modTime, NULL)) //get modification time
-                    throw FileError(wxString(_("Error changing modification time: ")) + wxT("\"") + fileList[j] + wxT("\""));
+                    throw FileError(wxString(_("Error changing modification time:")) + wxT(" \"") + fileList[j].c_str() + wxT("\""));
 
                 break;
             }
             catch (const FileError& error)
             {
                 ErrorHandler::Response rv = errorHandler->reportError(error.show());
-                if (rv == ErrorHandler::CONTINUE_NEXT)
+                if (rv == ErrorHandler::IGNORE_ERROR)
                     break;
                 else if (rv == ErrorHandler::RETRY)
                     ;   //continue with loop
@@ -203,18 +204,18 @@ void FreeFileSync::adjustModificationTimes(const wxString& parentDirectory, cons
 }
 
 
-void compoundStringToTable(const wxString& compoundInput, const wxChar* delimiter, vector<wxString>& output)
+void compoundStringToTable(const Zstring& compoundInput, const defaultChar* delimiter, vector<Zstring>& output)
 {
     output.clear();
-    wxString input(compoundInput);
+    Zstring input(compoundInput);
 
     //make sure input ends with delimiter - no problem with empty strings here
     if (!input.EndsWith(delimiter))
-        input+= delimiter;
+        input += delimiter;
 
     unsigned int indexStart = 0;
     unsigned int indexEnd   = 0;
-    while ((indexEnd = input.find(delimiter, indexStart )) != string::npos)
+    while ((indexEnd = input.find(delimiter, indexStart)) != Zstring::npos)
     {
         if (indexStart != indexEnd) //do not add empty strings
         {
@@ -232,7 +233,33 @@ void compoundStringToTable(const wxString& compoundInput, const wxChar* delimite
 
 
 inline
-void formatFilterString(wxString& filter)
+void mergeVectors(vector<Zstring>& changing, const vector<Zstring>& input)
+{
+    for (vector<Zstring>::const_iterator i = input.begin(); i != input.end(); ++i)
+        changing.push_back(*i);
+}
+
+
+vector<Zstring> compoundStringToFilter(const Zstring& filterString)
+{
+    //delimiters may be ';' or '\n'
+    vector<Zstring> filterList;
+    vector<Zstring> filterPreProcessing;
+    compoundStringToTable(filterString, wxT(";"), filterPreProcessing);
+
+    for (vector<Zstring>::const_iterator i = filterPreProcessing.begin(); i != filterPreProcessing.end(); ++i)
+    {
+        vector<Zstring> newEntries;
+        compoundStringToTable(*i, wxT("\n"), newEntries);
+        mergeVectors(filterList, newEntries);
+    }
+
+    return filterList;
+}
+
+
+inline
+void formatFilterString(Zstring& filter)
 {
 #ifdef FFS_WIN
     //Windows does NOT distinguish between upper/lower-case
@@ -246,60 +273,19 @@ void formatFilterString(wxString& filter)
 }
 
 
-inline
-void formatFilenameString(wxString& filename)
-{
-#ifdef FFS_WIN
-    //Windows does NOT distinguish between upper/lower-case
-    filename.MakeLower();
-#elif defined FFS_LINUX
-    //Linux DOES distinguish between upper/lower-case
-//nothing to do here
-#else
-    adapt;
-#endif
-}
-
-
-inline
-void mergeVectors(vector<wxString>& changing, const vector<wxString>& input)
-{
-    for (vector<wxString>::const_iterator i = input.begin(); i != input.end(); ++i)
-        changing.push_back(*i);
-}
-
-
-vector<wxString> FreeFileSync::compoundStringToFilter(const wxString& filterString)
-{
-    //delimiters may be ';' or '\n'
-    vector<wxString> filterList;
-    vector<wxString> filterPreProcessing;
-    compoundStringToTable(filterString, wxT(";"), filterPreProcessing);
-
-    for (vector<wxString>::const_iterator i = filterPreProcessing.begin(); i != filterPreProcessing.end(); ++i)
-    {
-        vector<wxString> newEntries;
-        compoundStringToTable(*i, wxT("\n"), newEntries);
-        mergeVectors(filterList, newEntries);
-    }
-
-    return filterList;
-}
-
-
 void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, const wxString& includeFilter, const wxString& excludeFilter)
 {
     //no need for regular expressions! In tests wxRegex was by factor of 10 slower than wxString::Matches()!!
 
     //load filter into vectors of strings
     //delimiters may be ';' or '\n'
-    vector<wxString> includeList = FreeFileSync::compoundStringToFilter(includeFilter);
-    vector<wxString> excludeList = FreeFileSync::compoundStringToFilter(excludeFilter);
+    vector<Zstring> includeList = compoundStringToFilter(includeFilter);
+    vector<Zstring> excludeList = compoundStringToFilter(excludeFilter);
 
     //format entries
-    for (vector<wxString>::iterator i = includeList.begin(); i != includeList.end(); ++i)
+    for (vector<Zstring>::iterator i = includeList.begin(); i != includeList.end(); ++i)
         formatFilterString(*i);
-    for (vector<wxString>::iterator i = excludeList.begin(); i != excludeList.end(); ++i)
+    for (vector<Zstring>::iterator i = excludeList.begin(); i != excludeList.end(); ++i)
         formatFilterString(*i);
 
 //##############################################################
@@ -307,17 +293,17 @@ void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, con
     //filter currentGridData
     for (FileCompareResult::iterator i = currentGridData.begin(); i != currentGridData.end(); ++i)
     {
-        wxString filenameLeft  = i->fileDescrLeft.fullName;
-        wxString filenameRight = i->fileDescrRight.fullName;
+        Zstring filenameLeft  = i->fileDescrLeft.fullName;
+        Zstring filenameRight = i->fileDescrRight.fullName;
 
-        formatFilenameString(filenameLeft);
-        formatFilenameString(filenameRight);
+        formatFilterString(filenameLeft);
+        formatFilterString(filenameRight);
 
         //process include filters
         if (i->fileDescrLeft.objType != FileDescrLine::TYPE_NOTHING)
         {
             bool includedLeft = false;
-            for (vector<wxString>::const_iterator j = includeList.begin(); j != includeList.end(); ++j)
+            for (vector<Zstring>::const_iterator j = includeList.begin(); j != includeList.end(); ++j)
                 if (filenameLeft.Matches(*j))
                 {
                     includedLeft = true;
@@ -334,7 +320,7 @@ void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, con
         if (i->fileDescrRight.objType != FileDescrLine::TYPE_NOTHING)
         {
             bool includedRight = false;
-            for (vector<wxString>::const_iterator j = includeList.begin(); j != includeList.end(); ++j)
+            for (vector<Zstring>::const_iterator j = includeList.begin(); j != includeList.end(); ++j)
                 if (filenameRight.Matches(*j))
                 {
                     includedRight = true;
@@ -352,7 +338,7 @@ void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, con
         if (i->fileDescrLeft.objType != FileDescrLine::TYPE_NOTHING)
         {
             bool excluded = false;
-            for (vector<wxString>::const_iterator j = excludeList.begin(); j != excludeList.end(); ++j)
+            for (vector<Zstring>::const_iterator j = excludeList.begin(); j != excludeList.end(); ++j)
                 if (filenameLeft.Matches(*j))
                 {
                     excluded = true;
@@ -369,7 +355,7 @@ void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, con
         if (i->fileDescrRight.objType != FileDescrLine::TYPE_NOTHING)
         {
             bool excluded = false;
-            for (vector<wxString>::const_iterator j = excludeList.begin(); j != excludeList.end(); ++j)
+            for (vector<Zstring>::const_iterator j = excludeList.begin(); j != excludeList.end(); ++j)
                 if (filenameRight.Matches(*j))
                 {
                     excluded = true;
@@ -399,7 +385,7 @@ void FreeFileSync::removeFilterOnCurrentGridData(FileCompareResult& currentGridD
 //add(!) all files and subfolder gridlines that are dependent from the directory
 void FreeFileSync::addSubElements(set<int>& subElements, const FileCompareResult& grid, const FileCompareLine& relevantRow)
 {
-    wxString relevantDirectory;
+    Zstring relevantDirectory;
 
     if (relevantRow.fileDescrLeft.objType == FileDescrLine::TYPE_DIRECTORY)
         relevantDirectory = relevantRow.fileDescrLeft.relativeName + GlobalResources::FILE_NAME_SEPARATOR; //FILE_NAME_SEPARATOR needed to exclude subfile/dirs only
@@ -480,7 +466,7 @@ void FreeFileSync::deleteOnGridAndHD(FileCompareResult& grid, const set<int>& ro
                 //if (updateClass) -> is mandatory
                 ErrorHandler::Response rv = errorHandler->reportError(error.show());
 
-                if (rv == ErrorHandler::CONTINUE_NEXT)
+                if (rv == ErrorHandler::IGNORE_ERROR)
                     break;
 
                 else if (rv == ErrorHandler::RETRY)
@@ -493,13 +479,101 @@ void FreeFileSync::deleteOnGridAndHD(FileCompareResult& grid, const set<int>& ro
 }
 
 
-bool FreeFileSync::sameFileTime(const wxULongLong& a, const wxULongLong& b)
+bool FreeFileSync::sameFileTime(const time_t a, const time_t b)
 {
     if (a < b)
         return b - a <= FILE_TIME_PRECISION;
     else
         return a - b <= FILE_TIME_PRECISION;
 }
+
+
+inline
+void writeTwoDigitNumber(unsigned int number, wxChar*& position)
+{
+    assert (number < 100);
+
+    *position = '0' + number / 10;
+    position[1] = '0' + number % 10;
+
+    position += 2;
+}
+
+
+inline
+void writeFourDigitNumber(unsigned int number, wxChar*& position)
+{
+    assert (number < 10000);
+
+    *position = '0' + number / 1000;
+    number %= 1000;
+    position[1] = '0' + number / 100;
+    number %= 100;
+    position[2] = '0' + number / 10;
+    number %= 10;
+    position[3] = '0' + number;
+
+    position += 4;
+}
+
+
+wxString FreeFileSync::utcTimeToLocalString(const time_t utcTime)
+{
+#ifdef FFS_WIN
+
+    //convert ansi C time to FILETIME
+    wxULongLong fileTimeLong(utcTime);
+    fileTimeLong += wxULongLong(2, 3054539008UL); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
+    fileTimeLong *= 10000000;
+
+    FILETIME lastWriteTimeUtc;
+    lastWriteTimeUtc.dwLowDateTime  = fileTimeLong.GetLo();
+    lastWriteTimeUtc.dwHighDateTime = fileTimeLong.GetHi();
+
+    FILETIME localFileTime;
+    if (FileTimeToLocalFileTime(   //convert to local time
+                &lastWriteTimeUtc, //pointer to UTC file time to convert
+                &localFileTime 	   //pointer to converted file time
+            ) == 0)
+        throw RuntimeException(wxString(_("Conversion error:")) + wxT(" FILETIME -> local FILETIME"));
+
+    SYSTEMTIME time;
+    if (FileTimeToSystemTime(
+                &localFileTime, //pointer to file time to convert
+                &time 	        //pointer to structure to receive system time
+            ) == 0)
+        throw RuntimeException(wxString(_("Conversion error:")) + wxT(" FILETIME -> SYSTEMTIME"));
+
+    //assemble time string (performance optimized)
+    wxChar formattedTime[21];
+    wxChar* p = formattedTime;
+
+    writeFourDigitNumber(time.wYear, p);
+    *(p++) = wxChar('-');
+    writeTwoDigitNumber(time.wMonth, p);
+    *(p++) = wxChar('-');
+    writeTwoDigitNumber(time.wDay, p);
+    *(p++) = wxChar(' ');
+    *(p++) = wxChar(' ');
+    writeTwoDigitNumber(time.wHour, p);
+    *(p++) = wxChar(':');
+    writeTwoDigitNumber(time.wMinute, p);
+    *(p++) = wxChar(':');
+    writeTwoDigitNumber(time.wSecond, p);
+    *p = 0;
+
+    return wxString(formattedTime);
+
+#elif defined FFS_LINUX
+    tm* timeinfo;
+    timeinfo = localtime(&utcTime); //convert to local time
+    char buffer[50];
+    strftime(buffer, 50, "%Y-%m-%d  %H:%M:%S", timeinfo);
+
+    return wxString(buffer);
+#endif
+}
+
 
 inline
 wxString getDriveName(const wxString& directoryName)
@@ -612,17 +686,8 @@ void FreeFileSync::checkForDSTChange(const FileCompareResult& gridData,
 
                 if (    leftFile.objType == FileDescrLine::TYPE_FILE && rightFile.objType == FileDescrLine::TYPE_FILE &&
                         leftFile.fileSize == rightFile.fileSize &&
-
-#ifdef FFS_WIN
-                        //Windows does NOT distinguish between upper/lower-case
-                        leftFile.directory.CmpNoCase(i->leftDirectory) == 0 &&
-                        rightFile.directory.CmpNoCase(i->rightDirectory) == 0
-#elif defined FFS_LINUX
-                        //Linux DOES distinguish between upper/lower-case
-                        leftFile.directory.Cmp(i->leftDirectory) == 0 &&
-                        rightFile.directory.Cmp(i->rightDirectory) == 0
-#endif
-                   )
+                        leftFile.directory.CmpNoCase(i->leftDirectory.c_str()) == 0 && //Windows does NOT distinguish between upper/lower-case
+                        rightFile.directory.CmpNoCase(i->rightDirectory.c_str()) == 0) //
                 {
                     ++filesTotal;
 

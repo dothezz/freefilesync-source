@@ -2,6 +2,7 @@
 #define SYNCHRONIZATION_H_INCLUDED
 
 #include "FreeFileSync.h"
+#include "library/statusHandler.h"
 
 
 namespace FreeFileSync
@@ -28,6 +29,13 @@ namespace FreeFileSync
         const bool useRecycleBin;
         StatusHandler* statusUpdater;
         wxString optionalLineBreak; //optional line break for status messages (used by GUI mode only)
+
+        //preload status texts
+        const Zstring txtCopyingFile;
+        const Zstring txtOverwritingFile;
+        const Zstring txtCreatingFolder;
+        const Zstring txtDeletingFile;
+        const Zstring txtDeletingFolder;
     };
 }
 

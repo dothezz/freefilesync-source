@@ -564,7 +564,7 @@ void BatchDialog::OnCreateBatchJob(wxCommandEvent& event)
         fileName = filePicker->GetPath();
         if (wxFileExists(fileName))
         {
-            wxMessageDialog* messageDlg = new wxMessageDialog(this, wxString(wxT("\"")) + fileName + wxT("\"") + _(" already exists. Overwrite?"), _("Warning") , wxOK | wxCANCEL);
+            wxMessageDialog* messageDlg = new wxMessageDialog(this, wxString(_("File already exists. Overwrite?")) + wxT(" \"") + fileName + wxT("\""), _("Warning") , wxOK | wxCANCEL);
 
             if (messageDlg->ShowModal() != wxID_OK)
                 return;
@@ -599,8 +599,8 @@ bool BatchDialog::createBatchFile(const wxString& filename)
     for (unsigned int i = 0; i < localFolderPairs.size(); ++i)
     {
         FolderPair newPair;
-        newPair.leftDirectory  = localFolderPairs[i]->m_directoryLeft->GetValue();
-        newPair.rightDirectory = localFolderPairs[i]->m_directoryRight->GetValue();
+        newPair.leftDirectory  = localFolderPairs[i]->m_directoryLeft->GetValue().c_str();
+        newPair.rightDirectory = localFolderPairs[i]->m_directoryRight->GetValue().c_str();
 
         batchCfg.directoryPairs.push_back(newPair);
     }
@@ -624,7 +624,7 @@ bool BatchDialog::createBatchFile(const wxString& filename)
 
 /*
 #ifdef FFS_WIN
-#include <windows.h>
+#include <wx/msw/wrapwin.h> //includes "windows.h"
 #include <shlobj.h>
 #endif  // FFS_WIN
 

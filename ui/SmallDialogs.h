@@ -2,6 +2,7 @@
 #define SMALLDIALOGS_H_INCLUDED
 
 #include "../FreeFileSync.h"
+#include "../library/statusHandler.h"
 #include "guiGenerated.h"
 #include <wx/stopwatch.h>
 
@@ -74,7 +75,7 @@ private:
 class ErrorDlg : public ErrorDlgGenerated
 {
 public:
-    ErrorDlg(wxWindow* parentWindow, const wxString messageText, bool& ignoreNextErrors, int dummy);
+    ErrorDlg(wxWindow* parentWindow, const wxString messageText, bool& ignoreNextErrors);
     ~ErrorDlg();
 
     enum

@@ -30,16 +30,17 @@ enum ContextItem
     CONTEXT_EXCLUDE_OBJ,
     CONTEXT_CLIPBOARD,
     CONTEXT_EXPLORER,
-    CONTEXT_DELETE_FILES
+    CONTEXT_DELETE_FILES,
+    CONTEXT_HIDE_COLUMN,
+    CONTEXT_SHOW_ALL_COLUMNS
 };
 
-extern int leadingPanel; //better keep this an int! event.GetEventObject() does NOT always return m_grid1, m_grid2, m_grid3!
+extern const wxGrid* leadGrid; //point to grid that is in focus
 
 class CompareStatusHandler;
 class FileDropEvent;
-class TiXmlElement;
 
-class MainDialog : public GuiGenerated
+class MainDialog : public MainDialogGenerated
 {
     friend class CompareStatusHandler;
     friend class FileDropEvent;
@@ -71,10 +72,10 @@ private:
     void updateStatusInformation(const GridView& output);
 
     //context menu functions
-    set<int> getSelectedRows();
+    set<int> getSelectedRows(const wxGrid* grid);
     void filterRangeTemp(const set<int>& rowsToFilterOnUI_View);
-    void copySelectionToClipboard(const set<int>& selectedRows, int selectedGrid);
-    void openWithFileBrowser(int rowNumber, int gridNr);
+    void copySelectionToClipboard(const wxGrid* selectedGrid);
+    void openWithFileBrowser(int rowNumber, const wxGrid* grid);
     void deleteFilesOnGrid(const set<int>& rowsToDeleteOnUI);
 
     //work to be done in idle time
@@ -85,14 +86,16 @@ private:
     void clearStatusBar();
 
     //events
-    void onGrid1access(wxEvent& event);
-    void onGrid2access(wxEvent& event);
-    void onGrid3access(wxEvent& event);
+    void onGridLeftAccess(  wxEvent& event);
+    void onGridRightAccess( wxEvent& event);
+    void onGridMiddleAccess(wxEvent& event);
 
-    void onGrid1ButtonEvent(wxKeyEvent& event);
-    void onGrid2ButtonEvent(wxKeyEvent& event);
-    void onGrid3ButtonEvent(wxKeyEvent& event);
+    void onGridLeftButtonEvent(wxKeyEvent& event);
+    void onGridRightButtonEvent(wxKeyEvent& event);
+    void onGridMiddleButtonEvent(wxKeyEvent& event);
     void OnOpenContextMenu(wxGridEvent& event);
+    void OnColumnMenuLeft(wxGridEvent& event);
+    void OnColumnMenuRight(wxGridEvent& event);
 
     void OnWriteDirManually(wxCommandEvent& event);
     void OnDirSelected(wxFileDirPickerEvent& event);
@@ -151,6 +154,7 @@ private:
     void OnMenuLangFrench(      wxCommandEvent& event);
     void OnMenuLangJapanese(    wxCommandEvent& event);
     void OnMenuLangDutch(       wxCommandEvent& event);
+    void OnMenuLangChineseSimp( wxCommandEvent& event);
 
     void enableSynchronization(bool value);
 

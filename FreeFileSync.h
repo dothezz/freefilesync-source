@@ -4,9 +4,8 @@
 #include <wx/string.h>
 #include <set>
 #include <vector>
-#include "library/statusHandler.h"
 #include "library/fileHandling.h"
-
+#include "library/zstring.h"
 
 namespace FreeFileSync
 {
@@ -80,52 +79,31 @@ namespace FreeFileSync
             TYPE_FILE
         };
 
-        wxString fullName;  // == directory + relativeName
-        wxString directory; //directory to be synced + separator
-        wxString relativeName; //fullName without directory that is being synchronized
+        Zstring fullName;  // == directory + relativeName
+        Zstring directory; //directory to be synced + separator
+        Zstring relativeName; //fullName without directory that is being synchronized
         //Note on performance: Keep redundant information "directory" and "relativeName"!
         //Extracting info from "fullName" instead would result in noticeable performance loss, with only limited memory reduction (note ref. counting strings)!
-        wxString lastWriteTime;
-        wxULongLong lastWriteTimeRaw;
+        time_t lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
         wxULongLong fileSize;
         ObjectType objType; //is it a file or directory or initial?
 
         //the following operators are needed by template class "set"
         //DO NOT CHANGE THESE RELATIONS!!!
-#ifdef FFS_WIN
-        //Windows does NOT distinguish between upper/lower-case
-        bool operator>(const FileDescrLine& b ) const
-        {
-            return (relativeName.CmpNoCase(b.relativeName) > 0);
-        }
-        bool operator<(const FileDescrLine& b) const
-        {
-            return (relativeName.CmpNoCase(b.relativeName) < 0);
-        }
-        bool operator==(const FileDescrLine& b) const
-        {
-            return (relativeName.CmpNoCase(b.relativeName) == 0);
-        }
-
-#elif defined FFS_LINUX
-        //Linux DOES distinguish between upper/lower-case
-        bool operator>(const FileDescrLine& b ) const
-        {
-            return (relativeName.Cmp(b.relativeName) > 0);
-        }
-        bool operator<(const FileDescrLine& b) const
-        {
-            return (relativeName.Cmp(b.relativeName) < 0);
-        }
-        bool operator==(const FileDescrLine& b) const
-        {
-            return (relativeName.Cmp(b.relativeName) == 0);
-        }
-#else
-        adapt this
+        bool operator < (const FileDescrLine& b) const
+        {   //quick check based on string length: we are not interested in a lexicographical order!
+            const size_t aLength = relativeName.length();
+            const size_t bLength = b.relativeName.length();
+            if (aLength != bLength)
+                return aLength < bLength;
+#ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
+            return relativeName.CmpNoCase(b.relativeName) < 0;
+#elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
+            return relativeName.Cmp(b.relativeName) < 0;
 #endif
+        }
     };
-    typedef set<FileDescrLine> DirectoryDescrType;
+    typedef vector<FileDescrLine> DirectoryDescrType;
 
 
     enum CompareFilesResult
@@ -160,8 +138,8 @@ namespace FreeFileSync
 
     struct FolderPair
     {
-        wxString leftDirectory;
-        wxString rightDirectory;
+        Zstring leftDirectory;
+        Zstring rightDirectory;
     };
 
 

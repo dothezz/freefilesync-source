@@ -1,6 +1,23 @@
 FreeFileSync
 ------------
 
+Changelog v1.14
+---------------
+Massive performance improvements:
+- comprehensive analysis and optimization of comparison functionality
+- new, fast directory traversing algorithm
+- improved folder hierarchy compare algorithm
+- lazy evaluation of formatted date strings
+- new high-performance string class
+=> reduction of CPU time by more than 90%!
+Folder attributes are copied during synchronization
+Sorting now case-insensitive (Windows-only)
+Allow column positioning on main grid
+Many small fixes
+Added Chinese translation
+Updated translation files
+
+
 Changelog v1.13
 ---------------
 Automatically detect daylight saving time (DST) change for FAT/FAT32 drives

@@ -49,9 +49,9 @@ class CustomGrid;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class GuiGenerated
+/// Class MainDialogGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class GuiGenerated : public wxFrame 
+class MainDialogGenerated : public wxFrame 
 {
 	private:
 	
@@ -67,6 +67,7 @@ class GuiGenerated : public wxFrame
 		wxMenuItem* m_menuItemFrench;
 		wxMenuItem* m_menuItemDutch;
 		wxMenuItem* m_menuItemJapanese;
+		wxMenuItem* m_menuItemChineseSimple;
 		wxMenuItem* m_menuItem7;
 		wxMenuItem* m_menuItemAdjustTimes;
 		wxMenu* m_menu2;
@@ -150,6 +151,7 @@ class GuiGenerated : public wxFrame
 		virtual void OnMenuLangFrench( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuLangDutch( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuLangJapanese( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnMenuLangChineseSimp( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuBatchJob( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuAdjustFileTimes( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuExportFileList( wxCommandEvent& event ){ event.Skip(); }
@@ -169,8 +171,10 @@ class GuiGenerated : public wxFrame
 		virtual void OnLeftGridDoubleClick( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnOpenContextMenu( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnSortLeftGrid( wxGridEvent& event ){ event.Skip(); }
+		virtual void OnColumnMenuLeft( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnRightGridDoubleClick( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnSortRightGrid( wxGridEvent& event ){ event.Skip(); }
+		virtual void OnColumnMenuRight( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnSaveConfig( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnChoiceKeyEvent( wxKeyEvent& event ){ event.Skip(); }
 		virtual void OnLoadConfig( wxCommandEvent& event ){ event.Skip(); }
@@ -184,8 +188,8 @@ class GuiGenerated : public wxFrame
 		
 	
 	public:
-		GuiGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("FreeFileSync - Folder Comparison and Synchronization"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 933,612 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
-		~GuiGenerated();
+		MainDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("FreeFileSync - Folder Comparison and Synchronization"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 933,612 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		~MainDialogGenerated();
 	
 };
 
@@ -267,8 +271,8 @@ class BatchDlgGenerated : public wxDialog
 		wxStaticBitmap* m_bitmap17;
 		wxBitmapButton* m_bpButton9;
 		wxStaticLine* m_staticline9;
-		wxButton* m_button6;
 		wxButton* m_buttonCreate;
+		wxButton* m_button6;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ){ event.Skip(); }
@@ -280,8 +284,8 @@ class BatchDlgGenerated : public wxDialog
 		virtual void OnLeftNewer( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnRightNewer( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnDifferent( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnCancel( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnCreateBatchJob( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ){ event.Skip(); }
 		
 	
 	public:
@@ -546,6 +550,8 @@ class AboutDlgGenerated : public wxDialog
 		wxStaticText* m_staticText71;
 		wxStaticText* m_staticText711;
 		wxStaticText* m_staticText712;
+		wxStaticText* m_staticText91;
+		wxStaticText* m_staticText92;
 		wxStaticLine* m_staticline3;
 		wxStaticText* m_staticText131;
 		wxStaticBitmap* m_bitmap9;
@@ -622,16 +628,16 @@ class WarningDlgGenerated : public wxDialog
 		
 		wxButton* m_buttonIgnore;
 		wxButton* m_buttonResolve;
-		wxButton* m_buttonAbort;
 		wxButton* m_buttonOK;
+		wxButton* m_buttonAbort;
 		
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ){ event.Skip(); }
 		virtual void OnIgnore( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnResolve( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnAbort( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnOkay( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnAbort( wxCommandEvent& event ){ event.Skip(); }
 		
 	
 	public:
@@ -706,15 +712,15 @@ class FilterDlgGenerated : public wxDialog
 		
 		wxButton* m_button9;
 		
-		wxButton* m_button17;
 		wxButton* m_button10;
+		wxButton* m_button17;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ){ event.Skip(); }
 		virtual void OnHelp( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnDefault( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnCancel( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnOK( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ){ event.Skip(); }
 		
 	
 	public:
@@ -744,15 +750,15 @@ class ModifyFilesDlgGenerated : public wxDialog
 		wxTextCtrl* m_textCtrlDirectory;
 		wxDirPickerCtrl* m_dirPicker;
 		wxSpinCtrl* m_spinCtrlTimeShift;
-		wxButton* m_button21;
 		wxButton* m_buttonApply;
+		wxButton* m_button21;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ){ event.Skip(); }
 		virtual void OnWriteDirManually( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnDirSelected( wxFileDirPickerEvent& event ){ event.Skip(); }
-		virtual void OnCancel( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnApply( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ){ event.Skip(); }
 		
 	
 	public:

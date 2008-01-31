@@ -44,9 +44,6 @@ namespace globalFunctions
 
     int readInt(wxInputStream& stream);  //read int from file stream
     void writeInt(wxOutputStream& stream, const int number);  //write int to filestream
-
-    void startPerformance(); //helper method for quick performance measurement
-    void stopPerformance();
 }
 
 

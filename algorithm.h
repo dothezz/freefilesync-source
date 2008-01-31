@@ -2,26 +2,39 @@
 #define ALGORITHM_H_INCLUDED
 
 #include "FreeFileSync.h"
+#include "library/statusHandler.h"
 
 
 namespace FreeFileSync
 {
     wxString formatFilesizeToShortString(const wxULongLong& filesize);
     wxString formatFilesizeToShortString(const double filesize);
-    wxString getFormattedDirectoryName(const wxString& dirname);
+    Zstring getFormattedDirectoryName(const Zstring& dirname);
 
     void swapGrids(FileCompareResult& grid);
 
-    void adjustModificationTimes(const wxString& parentDirectory, const int timeInSeconds, ErrorHandler* errorHandler) throw(AbortThisProcess);
+    void adjustModificationTimes(const Zstring& parentDirectory, const int timeInSeconds, ErrorHandler* errorHandler) throw(AbortThisProcess);
 
     void deleteOnGridAndHD(FileCompareResult& grid, const set<int>& rowsToDelete, ErrorHandler* errorHandler, const bool useRecycleBin) throw(AbortThisProcess);
     void addSubElements(set<int>& subElements, const FileCompareResult& grid, const FileCompareLine& relevantRow);
 
     void filterCurrentGridData(FileCompareResult& currentGridData, const wxString& includeFilter, const wxString& excludeFilter);
     void removeFilterOnCurrentGridData(FileCompareResult& currentGridData);
-    vector<wxString> compoundStringToFilter(const wxString& filterString); //convert compound string, separated by ';' or '\n' into formatted vector of wxStrings
 
-    bool sameFileTime(const wxULongLong& a, const wxULongLong& b);
+    bool sameFileTime(const time_t a, const time_t b);
+
+    wxString utcTimeToLocalString(const time_t utcTime);
+
+    //enhanced binary search template: returns an iterator
+    template <class ForwardIterator, class T>
+    ForwardIterator custom_binary_search (ForwardIterator first, ForwardIterator last, const T& value)
+    {
+        first = lower_bound(first, last, value);
+        if (first!=last && !(value<*first))
+            return first;
+        else
+            return last;
+    }
 
 #ifdef FFS_WIN
 //detect if FAT/FAT32 drive needs a +-1h time shift after daylight saving time (DST) switch due to known windows bug:
