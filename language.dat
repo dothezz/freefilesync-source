@@ -1,25 +1,31 @@
   Time: 
-  Zeit: 
+  Uhrzeit: 
  does not exist. Aborting!
  existiert nicht. Abbruch!
  item(s) remaining
  Element(e) übrig
- items on left (
- Elemente links (
- items on right (
- Elemente rechts (
- rows in view (
- Zeilen zur Ansicht (
+ items on left, 
+ Elemente links, 
+ items on right, 
+ Elemente rechts, 
+ of 
+ von 
+ row in view
+ Zeile zur Ansicht
+ rows in view
+ Zeilen zur Ansicht
  to 
  nach 
  to recycle bin!
-in den Papierkorb!
+ in den Papierkorb!
  total)
  gesamt)
 !=	files are different\n
 !=	Dateien sind verschieden\n
-(-)	exclude from sync-process\n
+(-)	filtered out from sync-process\n
 (-)	nicht synchronisieren\n
+(Build: 
+(Build: 
 ,
 .
 -------------------------------------------------
@@ -27,18 +33,18 @@ in den Papierkorb!
 ---------\n
 -----------\n
 -Open-Source file synchronization-
--Open-Source Datei-Synchronisation
+-Open-Source Datei-Synchronisation-
 .
 ,
-1 item on left (
-1 Element links 
-1 item on right (
-1 element rechts 
+1 item on left, 
+1 Element links, 
+1 item on right, 
+1 Element rechts, 
 1 row in view (
 1 Zeile zur Ansicht (
 <<	left file is newer\n
 <<	linke Datei ist neuer\n
-<directory>
+<Directory>
 <Verzeichnis>
 <left directory>
 <linkes Verzeichnis>
@@ -50,6 +56,8 @@ in den Papierkorb!
 ==	Dateien sind gleich\n\n
 >>	right file is newer\n
 >>	rechte Datei ist neuer\n
+Abort
+Abbruch
 About
 Info
 Action
@@ -66,18 +74,24 @@ Begin Synchronization
 Starte Synchronisation
 Benchmark: 
 Benchmark: 
-Both sides <->
-Beidseitig <->
+Choose to hide filtered files/directories from list
+Gefilterte Dateien ein-/ausblenden
 Compare both sides
 Beide Seiten vergleichen
 Compare by
 Vergleichen nach
-Compare by \"File size and date\"\n----------------------------------------\nThis compare variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. For the latter the system's UTC time (coordinated word time) is used internally (although the local file time is displayed on the result list). So there are no problems concerning different time zones or daylight saving time.\n\nWhen \"Compare\" is triggered with this option set the following decision tree is processed:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n          _________|_____________\n         |                  |                         |\n  left newer  right newer  different (but same date)\n\nAs a result 6 different status can be returned to categorize all files:\n\n- exists left only\n- exists right only\n- left newer\n- right newer\n- different (but same date)\n- equal\n\n\nCompare by \"File content\"\n----------------------------------------\nAs the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n\nAs a result the files are separated into the following categories:\n\n- exists left only\n- exists right only\n- different\n- equal
-Vergleichen nach \"Dateigröße und -datum\"\n---------------------------------------------------\nDiese Variante identifiziert zwei gleichnamige Dateien als gleich, wenn sie die gleiche Dateigröße haben UND der Zeitpunkt des letzten Zugriffs derselbe ist. Für Letzteres wird intern die UTC-Zeit (Koordinierte Weltzeit) verwendet (auch wenn die lokale Zeit in der Ergebnisliste angezeigt wird). Dadurch werden Probleme vermieden, die durch verschiedene Zeitzonen oder Sommer-/Winterzeit entstehen.\n\nNachdem \"Compare\" mit dieser Einstellung gestartet wurde, wird der folgende Entscheidungsbaum abgearbeitet:\n\n                         -------------------------\n                         |Entscheidungsbaum|\n                         -------------------------\n                     __________|___________\n                     |                                         |\n Datei ex. auf beiden Seiten      nur auf einer Seite\n     ________|____                             __|___\n     |                        |                           |          |\n  gleich           verschieden               links    rechts\n          __________|___________\n          |                   |                     |\n  links neuer  rechts neuer  verschieden (bei gleichem Datum)\n\nAls Ergebnis werden 6 verschiedene Status zurückgegeben, um Dateien zu kategorisieren:\n\n- existiert nur links\n- existiert nur rechts\n- links neuer\n- rechts neuer\n- verschieden (bei gleichem Datum)\n- gleich\n\n\nVergleichen nach \"Dateiinhalt\"\n------------------------------------\nWie der Name bereits sagt, werden zwei Dateien mit gleichem Namen genau dann als gleich angesehen, wenn sie den gleichen Dateiinhalt haben. Diese Einstellung ist eher für Konsistenzprüfungen geeignet als für Backup-Operationen. Aus diesem Grund wird der Zeitpunkt der letzten Änderung der Dateien nicht berücksichtigt.\n\nDer Entscheidungsbaum ist in diesem Fall kleiner:\n\n                         -------------------------\n                         |Entscheidungsbaum|\n                         -------------------------\n                     __________|___________\n                     |                                         |\n Datei ex. auf beiden Seiten      nur auf einer Seite\n     ________|____                             __|___\n     |                        |                           |          |\n  gleich           verschieden               links    rechts\n\nDas Ergebnis ist eine Aufteilung in folgende Kategorien:\n\n- existiert nur links\n- existiert nur rechts\n- verschieden\n- gleich
+Compare by \"File size and date\"\n----------------------------------------\nThis compare variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. For the latter the system's UTC time (coordinated word time) is used internally, although the local file time is displayed on the result list. So there are no problems concerning different time zones or daylight saving time.\n\nWhen \"Compare\" is triggered with this option set the following decision tree is processed:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n          _________|_____________\n         |                  |                         |\n  left newer  right newer  different (but same date)\n\nAs a result 6 different status can be returned to categorize all files:\n\n- exists left only\n- exists right only\n- left newer\n- right newer\n- different (but same date)\n- equal\n\n\nCompare by \"File content\"\n----------------------------------------\nAs the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n\nAs a result the files are separated into the following categories:\n\n- exists left only\n- exists right only\n- different\n- equal
+Vergleichen nach \"Dateigröße und -datum\"\n---------------------------------------------------\nDiese Variante identifiziert zwei gleichnamige Dateien als gleich, wenn sie die gleiche Dateigröße haben UND der Zeitpunkt des letzten Zugriffs derselbe ist. Für Letzteres wird intern die UTC-Zeit (koordinierte Weltzeit) verwendet, auch wenn die lokale Zeit in der Ergebnisliste angezeigt wird. Dadurch werden Probleme vermieden, die durch verschiedene Zeitzonen oder Sommer-/Winterzeit entstehen.\n\nNachdem \"Compare\" mit dieser Einstellung gestartet wurde, wird der folgende Entscheidungsbaum abgearbeitet:\n\n                         -------------------------\n                         |Entscheidungsbaum|\n                         -------------------------\n                     __________|___________\n                     |                                         |\n Datei ex. auf beiden Seiten      nur auf einer Seite\n     ________|____                             __|___\n     |                        |                           |          |\n  gleich           verschieden               links    rechts\n          __________|___________\n          |                   |                     |\n  links neuer  rechts neuer  verschieden (bei gleichem Datum)\n\nAls Ergebnis werden 6 verschiedene Status zurückgegeben, um Dateien zu kategorisieren:\n\n- existiert nur links\n- existiert nur rechts\n- links neuer\n- rechts neuer\n- verschieden (bei gleichem Datum)\n- gleich\n\n\nVergleichen nach \"Dateiinhalt\"\n------------------------------------\nWie der Name bereits sagt, werden zwei Dateien mit gleichem Namen genau dann als gleich angesehen, wenn sie den gleichen Dateiinhalt haben. Diese Einstellung ist eher für Konsistenzprüfungen geeignet als für Backup-Operationen. Aus diesem Grund wird der Zeitpunkt der letzten Änderung der Dateien nicht berücksichtigt.\n\nDer Entscheidungsbaum ist in diesem Fall kleiner:\n\n                         -------------------------\n                         |Entscheidungsbaum|\n                         -------------------------\n                     __________|___________\n                     |                                         |\n Datei ex. auf beiden Seiten      nur auf einer Seite\n     ________|____                             __|___\n     |                        |                           |          |\n  gleich           verschieden               links    rechts\n\nDas Ergebnis ist eine Aufteilung in folgende Kategorien:\n\n- existiert nur links\n- existiert nur rechts\n- verschieden\n- gleich
 Configuration
 Konfiguration
+Configure Filter...
+Konfiguriere Filter...
+Configure filter settings
+Konfiguriere Filter
 Configure your own synchronization rules.
 Eigene Synchronisationsregeln definieren.
+Continue
+Fortfahren
 Copy from left to right
 Von links nach rechts kopieren
 Copy from left to right overwriting
@@ -102,18 +116,20 @@ Data to be transferred:
 Zu übertragende Daten:
 Date
 Datum
+Default
+Standard
 Delete files existing on left side only
 Lösche Dateien, die nur links existieren
 Delete files existing on right side only
 Lösche Dateien, die nur rechts existieren
 Directory 
 Verzeichnis 
-Directory on the left does not exist anymore. Please select a new one!
-Verzeichnis auf der linken Seite existiert nicht mehr. Bitte ein anderes auswählen!
-Directory on the right does not exist anymore. Please select a new one!
-Verzeichnis auf der rechten Seite existiert nicht mehr. Bitte ein anderes auswählen!
-Do not show UI messages but write to a logfile instead.\n\nExample:\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR c:\\source c:\\target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2\n\n1: Creates a mirror backup of the left directory.\n2: Synchronizes both directories simultaneously.\n\n
-Keine UI-Meldungen anzeigen, sondern eine Logdatei schreiben.\n\nBeispiel:\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR c:\\source c:\\target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2\n\n1: Erzeugt ein Backup des linken Verzeichnisses.\n2: Synchronisiert beide Verzeichnisse wechselseitig.\n\n
+Directory on the left does not exist. Please select a new one!
+Verzeichnis auf der linken Seite existiert nicht. Bitte ein anderes auswählen!
+Directory on the right does not exist. Please select a new one!
+Verzeichnis auf der rechten Seite existiert nicht. Bitte ein anderes auswählen!
+Displays help on the command line parameters\n
+Hilfe zu den Kommandozeilenparametern\n
 Do nothing
 Nichts tun
 Donate with Paypal
@@ -146,6 +162,8 @@ Error overwriting file
 Fehler beim Überschreiben der Datei 
 Error when modifying GUI grid
 Fehler beim Modifizieren des UI Grids
+Exclude
+Ausschließen
 Feedback and suggestions are welcome at:
 Feedback und Vorschläge sind willkommen unter:
 File content
@@ -166,18 +184,22 @@ Files that are newer on left
 Dateien, die auf beiden Seiten existieren; linke Datei ist neuer
 Files that are newer on right
 Dateien, die auf beiden Seiten existieren; rechte Datei ist neuer
+Files that exist on both sides and are different
+Dateien, die auf beiden Seiten existieren und verschieden sind
+Files that exist on both sides, left one is newer
+Dateien, die auf beiden Seiten existieren; linke Datei ist neuer
+Files that exist on both sides, right one is newer
+Dateien, die auf beiden Seiten existieren; rechte Datei ist neuer
 Files that exist on left view only
 Dateien, die nur links existieren
 Files that exist on right view only
 Dateien, die nur rechts existieren
-Filter
-Filter
-Folders/files that exist on both sides and are different
-Ordner/Dateien, die auf beiden Seiten existieren und verschieden sind
-Folders/files that exist on both sides, left one is newer
-Ordner/Dateien, die auf beiden Seiten existieren; linke Datei ist neuer
-Folders/files that exist on both sides, right one is newer
-Ordner/Dateien, die auf beiden Seiten existieren; rechte Datei ist neuer
+Filter active: Press again to deactivate
+Filter aktiv: Zum Deaktivieren erneut auswählen
+Filter files
+Dateien filtern
+Filter view
+Ansicht filtern
 Folders/files that exist on left side only
 Ordner/Dateien, die nur links existieren
 Folders/files that exist on right side only
@@ -188,18 +210,20 @@ FreeFileSync - Folder Synchronization
 FreeFileSync - Dateisynchronisation
 FreeFileSync at Sourceforge
 FreeFileSync bei Sourceforge
-FreeFileSync v1.0
-FreeFileSync v1.0
 Help
 Hilfe
+Hide filtered items
+Gefilterte Elemente ausblenden
+Hide further error messages
+Weitere Fehlermeldungen unterdrücken
 Homepage:
 Homepage:
 If you like FFS:
 FFS unterstützen:
+Include
+Einschließen
 Information
 Information
-Left to right ->
-Nach rechts ->
 Legend\n
 Legende\n
 Log-message:
@@ -210,28 +234,40 @@ Nothing to synchronize. Both directories seem to contain the same data!
 Nichts zu synchronisieren. Beide Verzeichnisse scheinen dieselben Daten zu beinhalten!
 OK
 OK
+One way ->
+Nach rechts ->
+Only files/directories that pass filtering will be relevant for synchronization.\n\n1. Enter full file or directory names separated by ';'.\n2. Wildcard characters '*' and '?' are supported.\n3. Case sensitive expressions!\n\nExample: *.tmp;C:\\data\\dummy.log;*filename*;*directory*
+Nur Dateien/Ordner, die zu den Filtereinstellungen passen, werden bei der\nSynchronisation berücksichtigt.\n\n1. Komplette Datei- oder Verzeichnisnamen getrennt durch ';' eingeben.\n2. Die Platzhalter '*' und '?' werden unterstützt.\n3. Groß-/Kleinschreibung wird unterschieden!\n\nBeispiel: *.tmp;C:\\data\\dummy.log;*filename*;*directory*
 Open synchronization dialog
 Zeige Synchronisationseinstellungen
 Please select directories for both sides!
 Bitte für beide Seiten ein Verzeichnis wählen!
+Press button to activate filter
+Auswählen, um Filter zu aktivieren
 Quit
 Beenden
 Relative path
 Relativer Pfad
 Result
-Ergebnis
+Typ
 Select a folder
 Verzeichnis wählen
 Select variant:
 Variante auswählen:
+Set filter for synchronization
+Filter für Synchronisation einstellen
 Size
 Größe
 Source code written completely in C++ utilizing:\n\nMinGW \t\t- Windows port of GNU Compiler Collection\nwxWidgets \t- Open-Source GUI framework\nwxFormBuilder\t- wxWidgets GUI-builder\nGMP \t\t- arithmetic calculations\nCodeBlocks \t- Open-Source IDE\n\n   by ZenJu - August 2008
 Sourcecode komplett in C++ geschrieben unter Verwendung von:\n\nMinGW \t\t- Windows-Port der GNU Compiler Collection\nwxWidgets \t- Open-Source GUI-Framework\nwxFormBuilder\t- wxWidgets GUI-Builder\nGMP \t\t- Arithmetische Berechnungen\nCodeBlocks \t- Open-Source IDE\n\n      ZenJu - August 2008
-Specify algorithm to test if files are equal:\n\n\tSIZEDATE: check filesize and date\n\tCONTENT: check file content\n
-Methode angeben, um gleiche Dateien zu erkennen:\n\n\tSIZEDATE: Prüfung auf Dateigröße und -datum\n\tCONTENT: Prüfung auf Dateiinhalt\n
-Specify the sync-direction used for each type of file by a string of five chars:\n\n\tChar 1: Folders/files that exist on left side only\n\tChar 2: Folders/files that exist on right side only\n\tChar 3: Folders/files that exist on both sides, left one is newer\n\tChar 4: Folders/files that exist on both sides, right one is newer\n\tChar 5: Folders/files that exist on both sides and are different\n\n\tSync-direction: L: left, R: right, N: do nothing\n
-Synchronisationseinstellungen durch 5 Zeichen langen String spezifizieren:\n\n\t1. Zeichen: Ordner/Dateien, die nur links existieren\n\t2. Zeichen: Ordner/Dateien, die nur rechts existieren\n\t3. Zeichen: Ordner/Dateien, die auf beiden Seiten existieren; linke Datei ist neuer\n\t4. Zeichen: Ordner/Dateien, die auf beiden Seiten existieren; rechte Datei ist neuer\n\t5. Zeichen: Ordner/Dateien, die auf beiden Seiten existieren und verschieden sind\n\n\tSynchronisationsrichtung: L: links, R: rechts, N: nichts tun\n
+Specify algorithm to test if files are equal:\n\n\t\tSIZEDATE: check filesize and date\n\t\tCONTENT: check file content\n
+Methode angeben, um gleiche Dateien zu erkennen:\n\n\t\tSIZEDATE: Prüfung auf Dateigröße und -datum\n\t\tCONTENT: Prüfung auf Dateiinhalt\n
+Specify names to be excluded separated by ';'. Wildcards '*' and '?' are supported. Default: \"\"\n
+Auszuschließende Namen, getrennt durch ';', angeben. Platzhalter '*' und '?' werden unterstützt. Standard: \"\"\n
+Specify names to be included separated by ';'. Wildcards '*' and '?' are supported. Default: \"*\"\n
+Einzuschließende Namen, getrennt durch ';', angeben. Platzhalter '*' und '?' werden unterstützt. Standard: \"*\"\n
+Specify the sync-direction used for each type of file by a string of five chars:\n\n\t\tChar 1: Folders/files that exist on left side only\n\t\tChar 2: Folders/files that exist on right side only\n\t\tChar 3: Files that exist on both sides, left one is newer\n\t\tChar 4: Files that exist on both sides, right one is newer\n\t\tChar 5: Files that exist on both sides and are different\n\n\t\tSync-direction: L: left, R: right, N: none\n
+Synchronisationseinstellungen durch Zeichenkette der Länge 5 spezifizieren:\n\n\t\t1. Zeichen: Ordner/Dateien, die nur links existieren\n\t\t2. Zeichen: Ordner/Dateien, die nur rechts existieren\n\t\t3. Zeichen: Dateien, die auf beiden Seiten existieren; linke Datei ist neuer\n\t\t4. Zeichen: Dateien, die auf beiden Seiten existieren; rechte Datei ist neuer\n\t\t5. Zeichen: Dateien, die auf beiden Seiten existieren und verschieden sind\n\n\t\tSynchronisationsrichtung: L: links, R: rechts, N: nichts tun\n
 Start synchronizing files
 Beginne Synchronisation der Daten
 Swap sides
@@ -240,19 +276,21 @@ Synchronization completed successfully!
 Synchronisation erfolgreich!
 Synchronization settings
 Synchronisationseinstellungen
-Synchronize both sides simultaneously: Copy newer files or files that exist only in one folder to the other.
-Beide Seiten wechselseitig synchronisieren: Kopiere Dateien, die nur auf einer Seite existieren auf die andere.
+Synchronize both sides simultaneously: Copy new or updated files in both directions.
+Beide Seiten gleichzeitig synchronisieren: Kopiere neue oder aktualisierte Dateien auf die jeweils andere Seite.
+Two way <->
+Beidseitig <->
 Unable to create logfile!
 Fehler beim Erstellen der Logdatei!
 Unable to load Resources.dat!
 Fehler beim Laden von Resources.dat!
 Warning
 Warnung
-displays help on the command line parameters
-Hilfe zu den Kommandozeilenparametern
-http://sourceforge.net/projects/freefilesync/
-http://sourceforge.net/projects/freefilesync/
-zhnmju123@gmx.de
-zhnmju123@gmx.de
+\n\nSkip this directory and continue synchronization?
+\n\nDieses Verzeichnis überspringen und mit Synchronisation fortfahren?
+\n\nSkip this file and continue synchronization?
+\n\nDiese Datei überspringen und mit Synchronisation fortfahren?
+\tDo not show UI messages but write to a logfile instead\n\nExamples:\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n1: Creates a mirror backup of the left directory\n2: Synchronizes all *.doc files from both directories simultaneously\n\n
+\tKeine UI-Meldungen anzeigen, sondern eine Logdatei schreiben\n\nBeispiele:\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n1: Erzeugt ein Backup des linken Verzeichnisses\n2: Synchronisiert alle *.doc Dateien aus beiden Verzeichnissen\n\n
 |>	file on right side only\n
 |>	Datei existiert nur rechts\n

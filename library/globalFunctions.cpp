@@ -52,21 +52,56 @@ string GlobalFunctions::numberToString(const float number)
     return string(result);
 }
 
+wxString GlobalFunctions::numberToWxString(const unsigned int number)
+{
+    return wxString::Format(wxT("%u"), number);
+}
+
+wxString GlobalFunctions::numberToWxString(const int number)
+{
+    return wxString::Format(wxT("%i"), number);
+}
+
+wxString GlobalFunctions::numberToWxString(const float number)
+{
+    return wxString::Format(wxT("%f"), number);
+}
+
 inline
-int GlobalFunctions::StringToInt(const string& number)
+int GlobalFunctions::stringToInt(const string& number)
 {
     return atoi(number.c_str());
 }
 
 inline
-double GlobalFunctions::StringToDouble(const string& number)
+double GlobalFunctions::stringToDouble(const string& number)
 {
     return atof(number.c_str());
 }
 
-string& GlobalFunctions::includeNumberSeparator(string& number)
+inline
+int GlobalFunctions::wxStringToInt(const wxString& number)
 {
-    const char* NumberSeparator = _(",");
+    long result = 0;
+    if (number.ToLong(&result))
+        return result;
+    else
+        throw std::runtime_error("Error when converting number to long");
+}
+
+inline
+double GlobalFunctions::wxStringToDouble(const wxString& number)
+{
+    double result = 0;
+    if (number.ToDouble(&result))
+        return result;
+    else
+        throw std::runtime_error("Error when converting number to double");
+}
+
+wxString& GlobalFunctions::includeNumberSeparator(wxString& number)
+{
+    const wxChar* NumberSeparator = _(",");
 
     for (int i = number.size() - 3; i > 0; i-= 3)
         number.insert(i, NumberSeparator);

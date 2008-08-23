@@ -1,9 +1,7 @@
 #ifndef SYNCDIALOG_H_INCLUDED
 #define SYNCDIALOG_H_INCLUDED
 
-#include "GUI_Generated.h"
 #include "MainDialog.h"
-#include "..\FreeFileSync.h"
 
 class MainDialog;
 
@@ -14,6 +12,9 @@ public:
     ~SyncDialog();
 
 private:
+    //temporal copy of maindialog->syncConfiguration
+    SyncConfiguration localSyncConfiguration;
+
     void updateConfigIcons();
 
     void OnSyncLeftToRight( wxCommandEvent& event );

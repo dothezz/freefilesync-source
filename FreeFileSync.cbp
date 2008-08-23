@@ -13,7 +13,6 @@
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
-					<Add option="-pg" />
 					<Add option="-g" />
 					<Add option="-D__WXDEBUG__" />
 					<Add directory="C:\Programme\CodeBlocks\wxWidgets\lib\gcc_lib\mswd" />
@@ -22,7 +21,6 @@
 					<Add directory="C:\Programme\CodeBlocks\wxWidgets\lib\gcc_lib\mswd" />
 				</ResourceCompiler>
 				<Linker>
-					<Add option="-pg -lgmon" />
 					<Add library="libwxmsw28d_adv.a" />
 					<Add library="libwxmsw28d_core.a" />
 					<Add library="libwxbase28d.a" />
@@ -39,6 +37,7 @@
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add option="-DNDEBUG" />
 					<Add directory="C:\Programme\CodeBlocks\wxWidgets\lib\gcc_lib\msw" />
 				</Compiler>
 				<ResourceCompiler>
@@ -103,9 +102,14 @@
 		<Unit filename="UI\SyncDialog.cpp" />
 		<Unit filename="UI\SyncDialog.h" />
 		<Unit filename="WxWizFrame.fbp" />
+		<Unit filename="library\CustomGrid.cpp" />
+		<Unit filename="library\CustomGrid.h" />
+		<Unit filename="library\wxWidgets.h" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
+		<Unit filename="ui\SmallDialogs.cpp" />
+		<Unit filename="ui\SmallDialogs.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

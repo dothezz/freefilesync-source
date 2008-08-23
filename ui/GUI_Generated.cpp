@@ -15,7 +15,7 @@
 #include <wx/wx.h>
 #endif //WX_PRECOMP
 
-#include "MainDialog.h"
+#include "..\library\CustomGrid.h"
 
 #include "GUI_Generated.h"
 
@@ -62,6 +62,34 @@ GUI_Generated::GUI_Generated( wxWindow* parent, wxWindowID id, const wxString& t
 	
 	bSizer6->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	wxStaticBoxSizer* sbSizer9;
+	sbSizer9 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Filter files") ), wxHORIZONTAL );
+	
+	m_bpButtonFilter = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
+	sbSizer9->Add( m_bpButtonFilter, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 5 );
+	
+	wxBoxSizer* bSizer23;
+	bSizer23 = new wxBoxSizer( wxVERTICAL );
+	
+	m_hyperlink6 = new wxHyperlinkCtrl( this, wxID_ANY, _("Configure Filter..."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	
+	m_hyperlink6->SetNormalColour( wxColour( 0, 0, 255 ) );
+	m_hyperlink6->SetVisitedColour( wxColour( 0, 0, 255 ) );
+	m_hyperlink6->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
+	
+	bSizer23->Add( m_hyperlink6, 0, wxALL, 5 );
+	
+	m_checkBox2 = new wxCheckBox( this, wxID_ANY, _("Hide filtered items"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBox2->SetValue(true);
+	
+	m_checkBox2->SetToolTip( _("Choose to hide filtered files/directories from list") );
+	
+	bSizer23->Add( m_checkBox2, 0, 0, 5 );
+	
+	sbSizer9->Add( bSizer23, 1, wxEXPAND, 5 );
+	
+	bSizer6->Add( sbSizer9, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	
 	m_bpButton111 = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 190,37 ), wxBU_AUTODRAW );
 	m_bpButton111->SetToolTip( _("Open synchronization dialog") );
 	
@@ -84,9 +112,7 @@ GUI_Generated::GUI_Generated( wxWindow* parent, wxWindowID id, const wxString& t
 	wxStaticBoxSizer* sbSizer2;
 	sbSizer2 = new wxStaticBoxSizer( new wxStaticBox( m_panel1, wxID_ANY, _("Drag && drop") ), wxHORIZONTAL );
 	
-	m_directoryPanel1 = new wxTextCtrl( m_panel1, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
-	m_directoryPanel1->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
-	
+	m_directoryPanel1 = new wxTextCtrl( m_panel1, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer2->Add( m_directoryPanel1, 1, wxALIGN_BOTTOM, 5 );
 	
 	m_dirPicker1 = new wxDirPickerCtrl( m_panel1, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DIR_MUST_EXIST );
@@ -137,7 +163,7 @@ GUI_Generated::GUI_Generated( wxWindow* parent, wxWindowID id, const wxString& t
 	wxBoxSizer* bSizer18;
 	bSizer18 = new wxBoxSizer( wxVERTICAL );
 	
-	m_bpButton13 = new wxBitmapButton( m_panel3, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
+	m_bpButton13 = new wxBitmapButton( m_panel3, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 42,42 ), wxBU_AUTODRAW );
 	m_bpButton13->SetToolTip( _("Swap sides") );
 	
 	m_bpButton13->SetToolTip( _("Swap sides") );
@@ -171,7 +197,7 @@ GUI_Generated::GUI_Generated( wxWindow* parent, wxWindowID id, const wxString& t
 	// Cell Defaults
 	m_grid3->SetDefaultCellFont( wxFont( 12, 74, 90, 92, false, wxT("Arial") ) );
 	m_grid3->SetDefaultCellAlignment( wxALIGN_CENTRE, wxALIGN_CENTRE );
-	bSizer18->Add( m_grid3, 1, wxBOTTOM|wxTOP, 5 );
+	bSizer18->Add( m_grid3, 1, wxBOTTOM|wxTOP|wxALIGN_CENTER_HORIZONTAL, 3 );
 	
 	m_panel3->SetSizer( bSizer18 );
 	m_panel3->Layout();
@@ -185,9 +211,7 @@ GUI_Generated::GUI_Generated( wxWindow* parent, wxWindowID id, const wxString& t
 	wxStaticBoxSizer* sbSizer3;
 	sbSizer3 = new wxStaticBoxSizer( new wxStaticBox( m_panel2, wxID_ANY, _("Drag && drop") ), wxHORIZONTAL );
 	
-	m_directoryPanel2 = new wxTextCtrl( m_panel2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
-	m_directoryPanel2->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
-	
+	m_directoryPanel2 = new wxTextCtrl( m_panel2, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer3->Add( m_directoryPanel2, 1, wxALIGN_BOTTOM, 5 );
 	
 	m_dirPicker2 = new wxDirPickerCtrl( m_panel2, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, wxDIRP_DIR_MUST_EXIST );
@@ -251,7 +275,7 @@ GUI_Generated::GUI_Generated( wxWindow* parent, wxWindowID id, const wxString& t
 	bSizer3->Add( 0, 0, 1, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer31;
-	sbSizer31 = new wxStaticBoxSizer( new wxStaticBox( m_panel4, wxID_ANY, _("Filter") ), wxHORIZONTAL );
+	sbSizer31 = new wxStaticBoxSizer( new wxStaticBox( m_panel4, wxID_ANY, _("Filter view") ), wxHORIZONTAL );
 	
 	m_bpButton20 = new wxBitmapButton( m_panel4, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
 	m_bpButton20->SetToolTip( _("Files that exist on left view only") );
@@ -322,12 +346,17 @@ GUI_Generated::GUI_Generated( wxWindow* parent, wxWindowID id, const wxString& t
 	m_radioBtn4->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUI_Generated::OnChangeCompareVariant ), NULL, this );
 	m_radioBtn5->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUI_Generated::OnChangeCompareVariant ), NULL, this );
 	m_bpButton14->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnShowHelpDialog ), NULL, this );
+	m_bpButtonFilter->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnFilterButton ), NULL, this );
+	m_hyperlink6->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( GUI_Generated::OnConfigureFilter ), NULL, this );
+	m_checkBox2->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUI_Generated::OnHideFilteredButton ), NULL, this );
 	m_bpButton111->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnSync ), NULL, this );
+	m_directoryPanel1->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUI_Generated::OnEnterLeftDir ), NULL, this );
 	m_dirPicker1->Connect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( GUI_Generated::OnDirChangedPanel1 ), NULL, this );
 	m_grid1->Connect( wxEVT_GRID_CELL_LEFT_DCLICK, wxGridEventHandler( GUI_Generated::OnLeftGridDoubleClick ), NULL, this );
 	m_grid1->Connect( wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler( GUI_Generated::OnSortLeftGrid ), NULL, this );
 	m_bpButton13->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnSwapDirs ), NULL, this );
 	m_grid3->Connect( wxEVT_GRID_CELL_LEFT_CLICK, wxGridEventHandler( GUI_Generated::OnDeselectRow ), NULL, this );
+	m_directoryPanel2->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUI_Generated::OnEnterRightDir ), NULL, this );
 	m_dirPicker2->Connect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( GUI_Generated::OnDirChangedPanel2 ), NULL, this );
 	m_grid2->Connect( wxEVT_GRID_CELL_LEFT_DCLICK, wxGridEventHandler( GUI_Generated::OnRightGridDoubleClick ), NULL, this );
 	m_grid2->Connect( wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler( GUI_Generated::OnSortRightGrid ), NULL, this );
@@ -349,12 +378,17 @@ GUI_Generated::~GUI_Generated()
 	m_radioBtn4->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUI_Generated::OnChangeCompareVariant ), NULL, this );
 	m_radioBtn5->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUI_Generated::OnChangeCompareVariant ), NULL, this );
 	m_bpButton14->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnShowHelpDialog ), NULL, this );
+	m_bpButtonFilter->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnFilterButton ), NULL, this );
+	m_hyperlink6->Disconnect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( GUI_Generated::OnConfigureFilter ), NULL, this );
+	m_checkBox2->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUI_Generated::OnHideFilteredButton ), NULL, this );
 	m_bpButton111->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnSync ), NULL, this );
+	m_directoryPanel1->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUI_Generated::OnEnterLeftDir ), NULL, this );
 	m_dirPicker1->Disconnect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( GUI_Generated::OnDirChangedPanel1 ), NULL, this );
 	m_grid1->Disconnect( wxEVT_GRID_CELL_LEFT_DCLICK, wxGridEventHandler( GUI_Generated::OnLeftGridDoubleClick ), NULL, this );
 	m_grid1->Disconnect( wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler( GUI_Generated::OnSortLeftGrid ), NULL, this );
 	m_bpButton13->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnSwapDirs ), NULL, this );
 	m_grid3->Disconnect( wxEVT_GRID_CELL_LEFT_CLICK, wxGridEventHandler( GUI_Generated::OnDeselectRow ), NULL, this );
+	m_directoryPanel2->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUI_Generated::OnEnterRightDir ), NULL, this );
 	m_dirPicker2->Disconnect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( GUI_Generated::OnDirChangedPanel2 ), NULL, this );
 	m_grid2->Disconnect( wxEVT_GRID_CELL_LEFT_DCLICK, wxGridEventHandler( GUI_Generated::OnRightGridDoubleClick ), NULL, this );
 	m_grid2->Disconnect( wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler( GUI_Generated::OnSortRightGrid ), NULL, this );
@@ -441,7 +475,7 @@ SyncDialogGenerated::SyncDialogGenerated( wxWindow* parent, wxWindowID id, const
 	
 	fgSizer1->Add( m_radioBtn1, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_button5 = new wxButton( this, wxID_ANY, _("Left to right ->"), wxDefaultPosition, wxSize( 130,-1 ), 0 );
+	m_button5 = new wxButton( this, wxID_ANY, _("One way ->"), wxDefaultPosition, wxSize( 130,-1 ), 0 );
 	m_button5->SetFont( wxFont( 11, 74, 90, 92, false, wxT("Tahoma") ) );
 	
 	fgSizer1->Add( m_button5, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
@@ -455,12 +489,12 @@ SyncDialogGenerated::SyncDialogGenerated( wxWindow* parent, wxWindowID id, const
 	
 	fgSizer1->Add( m_radioBtn2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_button61 = new wxButton( this, wxID_ANY, _("Both sides <->"), wxDefaultPosition, wxSize( 130,-1 ), 0 );
+	m_button61 = new wxButton( this, wxID_ANY, _("Two way <->"), wxDefaultPosition, wxSize( 130,-1 ), 0 );
 	m_button61->SetFont( wxFont( 11, 74, 90, 92, false, wxT("Tahoma") ) );
 	
 	fgSizer1->Add( m_button61, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
 	
-	m_staticText10 = new wxStaticText( this, wxID_ANY, _("Synchronize both sides simultaneously: Copy newer files or files that exist only in one folder to the other."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText10 = new wxStaticText( this, wxID_ANY, _("Synchronize both sides simultaneously: Copy new or updated files in both directions."), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText10->Wrap( 200 );
 	fgSizer1->Add( m_staticText10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -544,17 +578,17 @@ SyncDialogGenerated::SyncDialogGenerated( wxWindow* parent, wxWindowID id, const
 	bSizer20->Add( m_bitmap14, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_bitmap15 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 48,48 ), 0 );
-	m_bitmap15->SetToolTip( _("Folders/files that exist on both sides, left one is newer") );
+	m_bitmap15->SetToolTip( _("Files that exist on both sides, left one is newer") );
 	
 	bSizer20->Add( m_bitmap15, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_bitmap16 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 48,48 ), 0 );
-	m_bitmap16->SetToolTip( _("Folders/files that exist on both sides, right one is newer") );
+	m_bitmap16->SetToolTip( _("Files that exist on both sides, right one is newer") );
 	
 	bSizer20->Add( m_bitmap16, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_bitmap17 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 48,48 ), 0 );
-	m_bitmap17->SetToolTip( _("Folders/files that exist on both sides and are different") );
+	m_bitmap17->SetToolTip( _("Files that exist on both sides and are different") );
 	
 	bSizer20->Add( m_bitmap17, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
@@ -667,7 +701,7 @@ HelpDlgGenerated::HelpDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	
 	bSizer20->Add( 0, 5, 0, wxEXPAND, 5 );
 	
-	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, _("Compare by \"File size and date\"\n----------------------------------------\nThis compare variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. For the latter the system's UTC time (coordinated word time) is used internally (although the local file time is displayed on the result list). So there are no problems concerning different time zones or daylight saving time.\n\nWhen \"Compare\" is triggered with this option set the following decision tree is processed:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n          _________|_____________\n         |                  |                         |\n  left newer  right newer  different (but same date)\n\nAs a result 6 different status can be returned to categorize all files:\n\n- exists left only\n- exists right only\n- left newer\n- right newer\n- different (but same date)\n- equal\n\n\nCompare by \"File content\"\n----------------------------------------\nAs the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n\nAs a result the files are separated into the following categories:\n\n- exists left only\n- exists right only\n- different\n- equal"), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
+	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, _("Compare by \"File size and date\"\n----------------------------------------\nThis compare variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. For the latter the system's UTC time (coordinated word time) is used internally, although the local file time is displayed on the result list. So there are no problems concerning different time zones or daylight saving time.\n\nWhen \"Compare\" is triggered with this option set the following decision tree is processed:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n          _________|_____________\n         |                  |                         |\n  left newer  right newer  different (but same date)\n\nAs a result 6 different status can be returned to categorize all files:\n\n- exists left only\n- exists right only\n- left newer\n- right newer\n- different (but same date)\n- equal\n\n\nCompare by \"File content\"\n----------------------------------------\nAs the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n\nAs a result the files are separated into the following categories:\n\n- exists left only\n- exists right only\n- different\n- equal"), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
 	m_textCtrl8->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
 	
 	bSizer20->Add( m_textCtrl8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
@@ -700,7 +734,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	
 	bSizer31->Add( 0, 10, 0, wxEXPAND, 5 );
 	
-	m_staticText14 = new wxStaticText( this, wxID_ANY, _("FreeFileSync v1.0"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText14 = new wxStaticText( this, wxID_ANY, _("FreeFileSync v1.1"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText14->Wrap( -1 );
 	m_staticText14->SetFont( wxFont( 16, 74, 90, 92, false, wxT("Tahoma") ) );
 	
@@ -711,6 +745,10 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	m_staticText15->SetFont( wxFont( 8, 74, 93, 90, false, wxT("Tahoma") ) );
 	
 	bSizer31->Add( m_staticText15, 0, wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	
+	m_build = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_build->Wrap( -1 );
+	bSizer31->Add( m_build, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
 	
 	bSizer31->Add( 0, 10, 0, wxEXPAND, 5 );
@@ -795,4 +833,169 @@ AboutDlgGenerated::~AboutDlgGenerated()
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( AboutDlgGenerated::OnClose ) );
 	m_button8->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AboutDlgGenerated::OnOK ), NULL, this );
+}
+
+FilterDlgGenerated::FilterDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer21;
+	bSizer21 = new wxBoxSizer( wxVERTICAL );
+	
+	m_staticText17 = new wxStaticText( this, wxID_ANY, _("Set filter for synchronization"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText17->Wrap( -1 );
+	m_staticText17->SetFont( wxFont( 14, 74, 90, 92, false, wxT("Arial Black") ) );
+	
+	bSizer21->Add( m_staticText17, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 10 );
+	
+	
+	bSizer21->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_staticText18 = new wxStaticText( this, wxID_ANY, _("Only files/directories that pass filtering will be relevant for synchronization.\n\n1. Enter full file or directory names separated by ';'.\n2. Wildcard characters '*' and '?' are supported.\n3. Case sensitive expressions!\n\nExample: *.tmp;C:\\data\\dummy.log;*filename*;*directory*"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText18->Wrap( -1 );
+	bSizer21->Add( m_staticText18, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	wxStaticBoxSizer* sbSizer8;
+	sbSizer8 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxEmptyString ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer3;
+	fgSizer3 = new wxFlexGridSizer( 2, 2, 0, 0 );
+	fgSizer3->SetFlexibleDirection( wxBOTH );
+	fgSizer3->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	
+	fgSizer3->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_staticText15 = new wxStaticText( this, wxID_ANY, _("Include"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText15->Wrap( -1 );
+	m_staticText15->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
+	
+	fgSizer3->Add( m_staticText15, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	m_bitmap8 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 30,30 ), 0 );
+	fgSizer3->Add( m_bitmap8, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
+	
+	m_textCtrlInclude = new wxTextCtrl( this, wxID_ANY, _("*"), wxDefaultPosition, wxSize( 400,-1 ), 0 );
+	fgSizer3->Add( m_textCtrlInclude, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	sbSizer8->Add( fgSizer3, 0, 0, 5 );
+	
+	wxFlexGridSizer* fgSizer4;
+	fgSizer4 = new wxFlexGridSizer( 2, 2, 0, 0 );
+	fgSizer4->SetFlexibleDirection( wxBOTH );
+	fgSizer4->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	
+	fgSizer4->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_staticText16 = new wxStaticText( this, wxID_ANY, _("Exclude"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText16->Wrap( -1 );
+	m_staticText16->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
+	
+	fgSizer4->Add( m_staticText16, 0, wxTOP|wxRIGHT|wxLEFT, 5 );
+	
+	m_bitmap9 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 30,30 ), 0 );
+	fgSizer4->Add( m_bitmap9, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
+	
+	m_textCtrlExclude = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 400,-1 ), 0 );
+	fgSizer4->Add( m_textCtrlExclude, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	sbSizer8->Add( fgSizer4, 0, 0, 5 );
+	
+	bSizer21->Add( sbSizer8, 0, wxRIGHT|wxLEFT, 5 );
+	
+	
+	bSizer21->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer22;
+	bSizer22 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_button9 = new wxButton( this, wxID_ANY, _("Default"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	bSizer22->Add( m_button9, 0, wxALL, 5 );
+	
+	
+	bSizer22->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_button10 = new wxButton( this, wxID_ANY, _("OK"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_button10->SetDefault(); 
+	bSizer22->Add( m_button10, 0, wxALL, 5 );
+	
+	bSizer21->Add( bSizer22, 0, wxEXPAND|wxTOP, 5 );
+	
+	this->SetSizer( bSizer21 );
+	this->Layout();
+	
+	// Connect Events
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( FilterDlgGenerated::OnClose ) );
+	m_button9->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlgGenerated::OnDefault ), NULL, this );
+	m_button10->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlgGenerated::OnOK ), NULL, this );
+}
+
+FilterDlgGenerated::~FilterDlgGenerated()
+{
+	// Disconnect Events
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( FilterDlgGenerated::OnClose ) );
+	m_button9->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlgGenerated::OnDefault ), NULL, this );
+	m_button10->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlgGenerated::OnOK ), NULL, this );
+}
+
+SyncErrorDlgGenerated::SyncErrorDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer24;
+	bSizer24 = new wxBoxSizer( wxVERTICAL );
+	
+	
+	bSizer24->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer26;
+	bSizer26 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_bitmap10 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 48,48 ), 0 );
+	bSizer26->Add( m_bitmap10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 320,140 ), wxTE_MULTILINE|wxTE_READONLY );
+	m_textCtrl8->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
+	
+	bSizer26->Add( m_textCtrl8, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
+	bSizer24->Add( bSizer26, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	bSizer24->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_checkBoxSuppress = new wxCheckBox( this, wxID_ANY, _("Hide further error messages"), wxDefaultPosition, wxDefaultSize, 0 );
+	
+	bSizer24->Add( m_checkBoxSuppress, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	bSizer24->Add( 0, 10, 0, wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer25;
+	bSizer25 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_buttonContinue = new wxButton( this, wxID_ANY, _("Continue"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer25->Add( m_buttonContinue, 0, wxALL, 5 );
+	
+	m_buttonAbort = new wxButton( this, wxID_ANY, _("Abort"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer25->Add( m_buttonAbort, 0, wxALL, 5 );
+	
+	bSizer24->Add( bSizer25, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	this->SetSizer( bSizer24 );
+	this->Layout();
+	
+	// Connect Events
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SyncErrorDlgGenerated::OnClose ) );
+	m_buttonContinue->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncErrorDlgGenerated::OnContinue ), NULL, this );
+	m_buttonAbort->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncErrorDlgGenerated::OnAbort ), NULL, this );
+}
+
+SyncErrorDlgGenerated::~SyncErrorDlgGenerated()
+{
+	// Disconnect Events
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SyncErrorDlgGenerated::OnClose ) );
+	m_buttonContinue->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncErrorDlgGenerated::OnContinue ), NULL, this );
+	m_buttonAbort->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncErrorDlgGenerated::OnAbort ), NULL, this );
 }

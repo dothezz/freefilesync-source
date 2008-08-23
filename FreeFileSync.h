@@ -12,9 +12,9 @@ using namespace std;
 
 enum SyncDirection
 {
-    syncDirLeft,
-    syncDirRight,
-    syncDirNone
+    SyncDirLeft,
+    SyncDirRight,
+    SyncDirNone
 };
 
 struct SyncConfiguration
@@ -28,21 +28,21 @@ struct SyncConfiguration
 
 typedef struct
 {
-    string fileSize;
-    string lastWriteTime;
+    wxString fileSize;
+    wxString lastWriteTime;
     FILETIME lastWriteTimeUTC;
 } FileInfo;
 
 enum ObjectType
 {
-    isNothing,
-    isDirectory,
-    isFile
+    IsNothing,
+    IsDirectory,
+    IsFile
 };
 
 struct FileDescrLine
 {
-    FileDescrLine() : objType(isNothing) {};
+    FileDescrLine() : objType(IsNothing) {};
 
     wxString filename;  // == directory + relFilename
     wxString directory; //directory to be synced
@@ -55,16 +55,16 @@ struct FileDescrLine
     //the following operators are needed by template class "set"
     //DO NOT CHANGE THESE RELATIONS!!!
     bool operator>(const FileDescrLine& b ) const
-    {   //make lowercase! Windows does NOT distinguish upper/lower-case
-        return (wxString(relFilename).MakeLower() > wxString(b.relFilename).MakeLower());
+    {   //Windows does NOT distinguish upper/lower-case
+        return (relFilename.CmpNoCase(b.relFilename) > 0);
     }
     bool operator<(const FileDescrLine& b) const
-    {   //make lowercase! Windows does NOT distinguish upper/lower-case
-        return (wxString(relFilename).MakeLower() < wxString(b.relFilename).MakeLower());
+    {   //Windows does NOT distinguish upper/lower-case
+        return (relFilename.CmpNoCase(b.relFilename) < 0);
     }
     bool operator==(const FileDescrLine& b) const
-    {   //make lowercase! Windows does NOT distinguish upper/lower-case
-        return (wxString(relFilename).MakeLower() == wxString(b.relFilename).MakeLower());
+    {   //Windows does NOT distinguish upper/lower-case
+        return (relFilename.CmpNoCase(b.relFilename) == 0);
     }
 };
 typedef set<FileDescrLine> DirectoryDescrType;
@@ -72,12 +72,12 @@ typedef set<FileDescrLine> DirectoryDescrType;
 
 enum CompareFilesResult
 {
-    fileOnLeftSideOnly,
-    fileOnRightSideOnly,
-    rightFileNewer,
-    leftFileNewer,
-    filesDifferent,
-    filesEqual
+    FileOnLeftSideOnly,
+    FileOnRightSideOnly,
+    RightFileNewer,
+    LeftFileNewer,
+    FilesDifferent,
+    FilesEqual
 };
 
 struct FileCompareLine
@@ -95,8 +95,8 @@ typedef vector<FileCompareLine> FileCompareResult;
 
 enum CompareVariant
 {
-    compareByMD5,
-    compareByTimeAndSize
+    CompareByMD5,
+    CompareByTimeAndSize
 };
 
 
@@ -138,7 +138,12 @@ public:
     static void copyCreatingDirs(const char* source, const char* target);
     static void createDirectoriesRecursively(const wxString& directory, int level = 0); //level is used internally only
 
+    static void filterCurrentGridData(FileCompareResult& currentGridData, const wxString& includeFilter, const wxString& excludeFilter);
+    static void removeFilterOnCurrentGridData(FileCompareResult& currentGridData);
+
     static wxString formatFilesizeToShortString(const mpz_class& filesize);
+    static wxString getFormattedDirectoryName(const wxString& dirname);
+
     static void getBytesToTransfer(mpz_t& result, const FileCompareLine& fileCmpLine, const SyncConfiguration& config);
     static mpz_class calcTotalBytesToTransfer(const FileCompareResult& fileCmpResult, const SyncConfiguration& config);
 

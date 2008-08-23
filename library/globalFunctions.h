@@ -3,6 +3,8 @@
 
 #include <string>
 #include <algorithm>
+#include <wx/string.h>
+#include <stdexcept> //for std::runtime_error
 
 using namespace std;
 
@@ -19,9 +21,16 @@ namespace GlobalFunctions
     string numberToString(const int number);          //Convert number to string
     string numberToString(const float number);        //Convert number to string
 
-    int    StringToInt(   const string& number); //Convert String to number
-    double StringToDouble(const string& number); //Convert String to number
+    wxString numberToWxString(const unsigned int number); //Convert number to wxString
+    wxString numberToWxString(const int number);          //Convert number to wxString
+    wxString numberToWxString(const float number);        //Convert number to wxString
 
-    string& includeNumberSeparator(string& number);
+    int    stringToInt(   const string& number); //Convert String to number
+    double stringToDouble(const string& number); //Convert String to number
+
+    int    wxStringToInt(   const wxString& number); //Convert wxString to number
+    double wxStringToDouble(const wxString& number); //Convert wxString to number
+
+    wxString& includeNumberSeparator(wxString& number);
 }
 #endif // GLOBALFUNCTIONS_H_INCLUDED

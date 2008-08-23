@@ -10,29 +10,27 @@
 #ifndef MAINDIALOG_H
 #define MAINDIALOG_H
 
-#ifdef WX_PRECOMP
-// For compilers that support precompilation, includes "wx.h".
-#include <wx/wxprec.h>
-#endif
-
-#ifdef __BORLANDC__
-#pragma hdrstop
-#endif //__BORLANDC__
-
-#ifndef WX_PRECOMP
-// Include your minimal set of headers here, or wx.h
-#include <wx/wx.h>
-#endif
-
-//#########################################################################################
-
-#include "SyncDialog.h"
+#include "..\library\wxWidgets.h"
 #include "GUI_Generated.h"
 #include "..\FreeFileSync.h"
 
+#include "SyncDialog.h"
+#include "SmallDialogs.h"
+#include <map>
+
 using namespace std;
 
+//synchronization dialog
 const int StartSynchronizationProcess = 15;
+
+//configure filter dialog
+const int OkayButtonPressed           = 25;
+
+//sync error dialog
+const int ContinueButtonPressed       = 35;
+const int AbortButtonPressed          = 45;
+
+const wxString ConstFilteredOut = "(-)";
 
 struct UI_GridLine
 {
@@ -52,10 +50,11 @@ struct UI_GridLine
 };
 typedef vector<UI_GridLine> UI_Grid;
 
+
 extern int leadingPanel;
 
 
-class MainDialog: public GUI_Generated
+class MainDialog : public GUI_Generated
 {
 public:
     MainDialog(wxFrame* frame);
@@ -63,7 +62,9 @@ public:
 
 private:
     friend class SyncDialog;
+    friend class FilterDlg;
     friend class AboutDlg;
+    friend class SyncErrorDlg;
 
     void readConfigurationFromHD();
     void writeConfigurationToHD();
@@ -78,17 +79,20 @@ private:
     void onGrid1ButtonEvent(wxKeyEvent& event);
     void onGrid2ButtonEvent(wxKeyEvent& event);
 
+    void OnEnterLeftDir(wxCommandEvent& event);
+    void OnEnterRightDir(wxCommandEvent& event);
     void OnDirChangedPanel1(wxFileDirPickerEvent& event);
     void OnDirChangedPanel2(wxFileDirPickerEvent& event);
     void onFilesDroppedPanel1(wxDropFilesEvent& event);
     void onFilesDroppedPanel2(wxDropFilesEvent& event);
 
     void mapFileModelToUI(UI_Grid& output, const FileCompareResult& fileCmpResult);
-    void updateFilterButtons();
+    void updateViewFilterButtons();
+    void updateFilterButton();
 
     void synchronizeFolders(FileCompareResult& grid, const SyncConfiguration config);
 
-static wxString evaluateCmpResult(const CompareFilesResult result, const bool selectedForSynchronization);
+    static wxString evaluateCmpResult(const CompareFilesResult result, const bool selectedForSynchronization);
     void writeGrid(const FileCompareResult& gridData, bool useUI_GridCache =  false);
 
     void OnMarkRangeOnGrid3(    wxEvent&     event);
@@ -105,6 +109,9 @@ static wxString evaluateCmpResult(const CompareFilesResult result, const bool se
     void OnRightOnlyFiles(      wxCommandEvent& event);
     void OnEqualFiles(          wxCommandEvent& event);
 
+    void OnFilterButton(        wxCommandEvent& event);
+    void OnHideFilteredButton(  wxCommandEvent& event);
+    void OnConfigureFilter(     wxHyperlinkEvent& event);
     void OnShowHelpDialog(      wxCommandEvent& event);
     void OnSwapDirs(            wxCommandEvent& event);
     void OnChangeCompareVariant(wxCommandEvent& event);
@@ -121,10 +128,18 @@ static wxString evaluateCmpResult(const CompareFilesResult result, const bool se
     FileCompareResult currentGridData;
 
     //UI view of currentGridData
-    UI_Grid currentUI_View;
+    UI_Grid currentUI_View;    //necessary if user double-clicks on a row when filters are activated
 
+    //Synchronisation settings
     SyncConfiguration syncConfiguration;
 
+    //Filter setting
+    wxString includeFilter;
+    wxString excludeFilter;
+    bool hideFiltered;
+    bool filterIsActive;
+
+    //UI View Filter settings
     bool leftOnlyFilesActive;
     bool leftNewerFilesActive;
     bool differentFilesActive;
@@ -135,9 +150,10 @@ static wxString evaluateCmpResult(const CompareFilesResult result, const bool se
 //***********************************************
 
     wxFrame* parent;
-    wxColour* lightBlue;
 
     //resources
+    map<wxString, wxBitmap*> bitmapResource;
+
     wxBitmap* bitmapLeftArrow;
     wxBitmap* bitmapStartSync;
     wxBitmap* bitmapRightArrow;
@@ -163,116 +179,16 @@ static wxString evaluateCmpResult(const CompareFilesResult result, const bool se
     wxBitmap* bitmapRightOnlyDeact;
     wxBitmap* bitmapEqual;
     wxBitmap* bitmapEqualDeact;
+    wxBitmap* bitmapInclude;
+    wxBitmap* bitmapExclude;
+    wxBitmap* bitmapFilterOn;
+    wxBitmap* bitmapFilterOff;
+    wxBitmap* bitmapWarning;
+    wxBitmap* bitmapSmallUp;
+    wxBitmap* bitmapSmallDown;
+
     wxAnimation* animationMoney;
 };
 
-class CustomGrid : public wxGrid
-{
-public:
-    CustomGrid( wxWindow *parent,
-                wxWindowID id,
-                const wxPoint& pos   = wxDefaultPosition,
-                const wxSize& size   = wxDefaultSize,
-                long style           = wxWANTS_CHARS,
-                const wxString& name = wxGridNameStr )
-            : wxGrid(parent, id, pos, size, style, name), scrollbarsEnabled(true), m_grid1(0), m_grid2(0), m_grid3(0) {}
-
-    ~CustomGrid() {};
-
-    void deactivateScrollbars()
-    {
-        scrollbarsEnabled = false;
-    }
-
-    //overwrite virtual method to finally get rid of the scrollbars
-    void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh = true)
-    {
-        if (scrollbarsEnabled)
-            wxWindow::SetScrollbar(orientation, position, thumbSize, range, refresh);
-        else
-            wxWindow::SetScrollbar(orientation, 0, 0, 0, refresh);
-    }
-
-    //this method is called when grid view changes: useful for parallel updating of multiple grids
-    void DoPrepareDC(wxDC& dc)
-    {
-        wxScrollHelper::DoPrepareDC(dc);
-
-        int x, y = 0;
-        if (leadingPanel == 1 && this == m_grid1)   //avoid back coupling
-        {
-            GetViewStart(&x, &y);
-            m_grid2->Scroll(x, y);
-            m_grid3->Scroll(-1, y); //scroll in y-direction only
-        }
-        else if (leadingPanel == 2 && this == m_grid2)   //avoid back coupling
-        {
-            GetViewStart(&x, &y);
-            m_grid1->Scroll(x, y);
-            m_grid3->Scroll(-1, y);
-        }
-    }
-
-    void setScrollFriends(CustomGrid* grid1, CustomGrid* grid2, CustomGrid* grid3)
-    {
-        m_grid1 = grid1;
-        m_grid2 = grid2;
-        m_grid3 = grid3;
-    }
-
-private:
-    bool scrollbarsEnabled;
-
-    CustomGrid* m_grid1;
-    CustomGrid* m_grid2;
-    CustomGrid* m_grid3;
-};
-
-
-//######################################################################################################
-
-class AboutDlg: public AboutDlgGenerated
-{
-public:
-    AboutDlg(MainDialog* window) : AboutDlgGenerated(window), mainDialog(window)
-    {
-        m_bitmap9->SetBitmap(*mainDialog->bitmapWebsite);
-        m_bitmap10->SetBitmap(*mainDialog->bitmapEmail);
-
-        m_animationControl1->SetAnimation(*mainDialog->animationMoney);
-        m_animationControl1->Play();
-    }
-    ~AboutDlg() {}
-
-private:
-    void OnClose(wxCloseEvent& event)
-    {
-        Destroy();
-    }
-    void OnOK(wxCommandEvent& event)
-    {
-        Destroy();
-    }
-    MainDialog* mainDialog;
-};
-
-//######################################################################################################
-
-class HelpDlg: public HelpDlgGenerated
-{
-public:
-    HelpDlg(MainDialog* window) : HelpDlgGenerated(window) {}
-    ~HelpDlg() {}
-
-private:
-    void OnClose(wxCloseEvent& event)
-    {
-        Destroy();
-    }
-    void OnOK(wxCommandEvent& event)
-    {
-        Destroy();
-    }
-};
 
 #endif // MAINDIALOG_H

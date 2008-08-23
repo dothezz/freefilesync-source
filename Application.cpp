@@ -24,7 +24,7 @@ bool Application::OnInit()
             throw runtime_error(_("Could not set working directory to directory containing executable file!"));
 
         //set program language
-            programLanguage = new CustomLocale();
+        programLanguage = new CustomLocale();
 //        switch (wxLocale::GetSystemLanguage())
 //        {
 //        case wxLANGUAGE_GERMAN:
@@ -75,17 +75,19 @@ SyncDirection convertCmdlineCfg(const wxString& cfg, const int i)
     switch (cfg[i])
     {
     case 'L':
-        return syncDirLeft;
+        return SyncDirLeft;
         break;
     case 'R':
-        return syncDirRight;
+        return SyncDirRight;
         break;
     case 'N':
-        return syncDirNone;
+        return SyncDirNone;
         break;
     default:
         assert(false);
     }
+    //dummy return value to suppress compiler warning
+    return SyncDirNone;
 }
 
 void writeLog(const wxString& logText, const wxString& problemType, bool silentMode)
@@ -121,7 +123,7 @@ bool Application::parsedCommandline()
         { wxCMD_LINE_SWITCH,
             wxT("h"),
             wxT("help"),
-            wxT(_("displays help on the command line parameters")),
+            wxT(_("Displays help on the command line parameters\n")),
             wxCMD_LINE_VAL_NONE,
             wxCMD_LINE_OPTION_HELP
         },
@@ -130,7 +132,7 @@ bool Application::parsedCommandline()
             wxCMD_LINE_OPTION,
             "cmp",
             NULL,
-            _("Specify algorithm to test if files are equal:\n\n\tSIZEDATE: check filesize and date\n\tCONTENT: check file content\n"),
+            _("Specify algorithm to test if files are equal:\n\n\t\tSIZEDATE: check filesize and date\n\t\tCONTENT: check file content\n"),
             wxCMD_LINE_VAL_STRING,
             wxCMD_LINE_OPTION_MANDATORY
         },
@@ -139,7 +141,7 @@ bool Application::parsedCommandline()
             wxCMD_LINE_OPTION,
             "cfg",
             NULL,
-            _("Specify the sync-direction used for each type of file by a string of five chars:\n\n\tChar 1: Folders/files that exist on left side only\n\tChar 2: Folders/files that exist on right side only\n\tChar 3: Folders/files that exist on both sides, left one is newer\n\tChar 4: Folders/files that exist on both sides, right one is newer\n\tChar 5: Folders/files that exist on both sides and are different\n\n\tSync-direction: L: left, R: right, N: do nothing\n"),
+            _("Specify the sync-direction used for each type of file by a string of five chars:\n\n\t\tChar 1: Folders/files that exist on left side only\n\t\tChar 2: Folders/files that exist on right side only\n\t\tChar 3: Files that exist on both sides, left one is newer\n\t\tChar 4: Files that exist on both sides, right one is newer\n\t\tChar 5: Files that exist on both sides and are different\n\n\t\tSync-direction: L: left, R: right, N: none\n"),
             wxCMD_LINE_VAL_STRING,
             wxCMD_LINE_OPTION_MANDATORY
         },
@@ -161,10 +163,26 @@ bool Application::parsedCommandline()
         },
 
         {
+            wxCMD_LINE_OPTION,
+            "incl",
+            NULL,
+            _("Specify names to be included separated by ';'. Wildcards '*' and '?' are supported. Default: \"*\"\n"),
+            wxCMD_LINE_VAL_STRING,
+        },
+
+        {
+            wxCMD_LINE_OPTION,
+            "excl",
+            NULL,
+            _("Specify names to be excluded separated by ';'. Wildcards '*' and '?' are supported. Default: \"\"\n"),
+            wxCMD_LINE_VAL_STRING,
+        },
+
+        {
             wxCMD_LINE_SWITCH,
             "silent",
             NULL,
-            _("Do not show UI messages but write to a logfile instead.\n\nExample:\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR c:\\source c:\\target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2\n\n1: Creates a mirror backup of the left directory.\n2: Synchronizes both directories simultaneously.\n\n")
+            _("\tDo not show UI messages but write to a logfile instead\n\nExamples:\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n1: Creates a mirror backup of the left directory\n2: Synchronizes all *.doc files from both directories simultaneously\n\n")
         },
 
         {
@@ -188,6 +206,8 @@ bool Application::parsedCommandline()
     wxString cfg;
     wxString leftDir;
     wxString rightDir;
+    wxString included;
+    wxString excluded;
 
 //check existence of all commandline parameters
     if (!parser.Found("cmp", &cmp) ||
@@ -203,7 +223,21 @@ bool Application::parsedCommandline()
     leftDir = parser.GetParam(0);
     rightDir = parser.GetParam(1);
 
-//until here all options and parameters had been set
+//evaluate filter settings
+    bool filteringEnabled = false;
+    if (parser.Found("incl", &included))
+        filteringEnabled = true;
+    else
+        included = "*";
+
+    if (parser.Found("excl", &excluded))
+        filteringEnabled = true;
+    else
+        excluded = "";
+
+//until here all options and parameters have been set
+//--------------------------------------------------------------------
+
 
 //check consistency of all commandline parameters
     if ((cmp != "SIZEDATE" && cmp != "CONTENT") ||
@@ -234,14 +268,16 @@ bool Application::parsedCommandline()
 
 //until here all options and parameters are consistent
 
-    CompareVariant cmpVar;
+    CompareVariant cmpVar = CompareByMD5;   //dummy value to suppress compiler warning
     SyncConfiguration syncConfiguration;
     FileCompareResult currentGridData;
 
     if (cmp == "SIZEDATE")
-        cmpVar = compareByTimeAndSize;
+        cmpVar = CompareByTimeAndSize;
     else if (cmp == "CONTENT")
-        cmpVar = compareByMD5;
+        cmpVar = CompareByMD5;
+    else
+        assert (false);
 
     syncConfiguration.exLeftSideOnly  = convertCmdlineCfg(cfg, 0);
     syncConfiguration.exRightSideOnly = convertCmdlineCfg(cfg, 1);
@@ -252,12 +288,15 @@ bool Application::parsedCommandline()
     try
     {
 //COMPARE DIRECTORIES
-        FreeFileSync::getModelDiff(currentGridData, leftDir, rightDir, cmpVar);
+        FreeFileSync::getModelDiff(currentGridData,
+                                   FreeFileSync::getFormattedDirectoryName(leftDir),
+                                   FreeFileSync::getFormattedDirectoryName(rightDir),
+                                   cmpVar);
 
         //check if folders are already in sync
         bool nothingToSync = true;
         for (FileCompareResult::const_iterator i = currentGridData.begin(); i != currentGridData.end(); ++i)
-            if (i->cmpResult != filesEqual)
+            if (i->cmpResult != FilesEqual)
             {
                 nothingToSync = false;
                 break;
@@ -269,17 +308,21 @@ bool Application::parsedCommandline()
             return true;
         }
 
+//APPLY FILTERS
+        if (filteringEnabled)
+            FreeFileSync::filterCurrentGridData(currentGridData, included, excluded);
+
 //SYNCHRONIZE DIRECTORIES
         FreeFileSync fileSyncObject;    //currently only needed for use of recycle bin
 
         //synchronize folders:
         for (FileCompareResult::const_iterator i = currentGridData.begin(); i != currentGridData.end(); ++i)
-            if (i->fileDescrLeft.objType == isDirectory || i->fileDescrRight.objType == isDirectory)
+            if (i->fileDescrLeft.objType == IsDirectory || i->fileDescrRight.objType == IsDirectory)
                 fileSyncObject.synchronizeFolder(*i, syncConfiguration);
 
         //synchronize files:
         for (FileCompareResult::const_iterator i = currentGridData.begin(); i !=currentGridData.end(); ++i)
-            if (i->fileDescrLeft.objType == isFile || i->fileDescrRight.objType == isFile)
+            if (i->fileDescrLeft.objType == IsFile || i->fileDescrRight.objType == IsFile)
                 fileSyncObject.synchronizeFile(*i, syncConfiguration);
     }
     catch (std::runtime_error& theException)
@@ -300,8 +343,8 @@ wxString exchangeEscapeChars(char* temp)
     output.Replace("\\\\", "\\");
     output.Replace("\\n", "\n");
     output.Replace("\\t", "\t");
-    output.Replace("\\\"", "\"");
     output.Replace("\"\"", """");
+    output.Replace("\\\"", "\"");
     return output;
 }
 
@@ -314,7 +357,7 @@ CustomLocale::CustomLocale(int language, int flags)
 //    switch (language)
 //    {
 //    case wxLANGUAGE_GERMAN:
-      wxString languageFile = "language.dat";
+    wxString languageFile = "language.dat";
 //        break;
 //    default: ;
 //    }
