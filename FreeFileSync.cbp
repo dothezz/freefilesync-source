@@ -68,6 +68,7 @@
 			<Add directory="C:\Programme\CodeBlocks\wxWidgets\include" />
 		</ResourceCompiler>
 		<Linker>
+			<Add option="-mthreads" />
 			<Add library="libkernel32.a" />
 			<Add library="libuser32.a" />
 			<Add library="libgdi32.a" />
@@ -108,6 +109,8 @@
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
+		<Unit filename="ui\Resources.cpp" />
+		<Unit filename="ui\Resources.h" />
 		<Unit filename="ui\SmallDialogs.cpp" />
 		<Unit filename="ui\SmallDialogs.h" />
 		<Extensions>

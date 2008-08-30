@@ -11,6 +11,8 @@ public:
     SyncDialog(MainDialog* window);
     ~SyncDialog();
 
+    static const int StartSynchronizationProcess = 15;
+
 private:
     //temporal copy of maindialog->syncConfiguration
     SyncConfiguration localSyncConfiguration;
@@ -19,7 +21,6 @@ private:
 
     void OnSyncLeftToRight( wxCommandEvent& event );
     void OnSyncBothSides( wxCommandEvent& event );
-    void OnSyncCostum( wxCommandEvent& event );
 
     void OnExLeftSideOnly( wxCommandEvent& event );
     void OnExRightSideOnly( wxCommandEvent& event );
@@ -30,6 +31,8 @@ private:
     void OnStartSync(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);
     void OnBack(wxCommandEvent& event);
+
+    void OnSelectRecycleBin(wxCommandEvent& event);
 
     MainDialog* mainDialog;
 };

@@ -1,4 +1,4 @@
-FreeFileSync v1.1 
+FreeFileSync v1.2
 ----------------- 
 
 Usage
@@ -21,11 +21,12 @@ Features
 	- Your last configuration and screen settings are loaded on startup and saved on exit.
 	- Double-click to show file in explorer.
 	- copy & paste support to export file-lists.
+	- Progress indicators, status information and error reporting
 	- Sort file-lists by name, size or date.
 	- Display statistical data: total filesizes, amount of bytes that will be transfered with the current settings.
 8. Easy commandline mode for automated synchronization (can be scheduled or used in Batch jobs).
 9. Support for filesizes > 4 GB.
-10. Files are not deleted but moved to the Recycle Bin.
+10. Option to move files to Recycle Bin instead of deleting/overwriting them.
 11. UTC (coordinated world time) is used when comparing file times avoiding problems with time zones or daylight saving time.
 12. Automatically ignore directories "\RECYCLER" and "System Volume Information" when comparing and syncing.
 13. Localized German version available.
@@ -34,7 +35,7 @@ Features
 16. Include/exclude specific files from synchronization manually.
 
 
-Links:
+Links
 ------
 FreeFileSync on SourceForge:
 

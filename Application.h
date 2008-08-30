@@ -11,10 +11,11 @@
 #define FREEFILESYNCAPP_H
 
 #include <wx/app.h>
-#include "UI\MainDialog.h"
 #include <wx/cmdline.h>
 #include <set>
 #include <fstream>
+#include "FreeFileSync.h"
+#include "ui\SmallDialogs.h"
 
 struct TranslationLine
 {
@@ -52,14 +53,60 @@ private:
     Translation translationDB;
 };
 
+
 class Application : public wxApp
 {
 public:
     bool OnInit();
-    int OnExit();
+    int  OnRun();
+    int  OnExit();
+
+    void initialize();
+    bool ProcessIdle(); //virtual method
+
+    friend class CommandLineStatusUpdate;
+
+    //methods for writing logs
+    void initLog();
+    void writeLog(const wxString& logText, const wxString& problemType = wxEmptyString);
+    void closeLog();
+
+private:
     bool parsedCommandline();
 
+    bool applicationRunsOnCommandLineWithoutWindows;
+
+    ofstream logFile;
     CustomLocale* programLanguage;
+
+    int returnValue;
 };
+
+
+class CommandLineStatusUpdater : public StatusUpdater
+{
+public:
+    CommandLineStatusUpdater(Application* application, bool skipErr, bool silent);
+    ~CommandLineStatusUpdater();
+
+    void updateStatus(const wxString& text);
+    void updateProgressIndicator(double number);
+    int reportError(const wxString& text);
+
+    void triggerUI_Refresh();
+
+    void switchToSyncProcess(double number);
+    void updateFinalStatus(const wxString& text);
+
+private:
+    Application* app;
+    SyncStatus* syncStatusFrame;
+    bool skipErrors;
+    bool silentMode;
+
+    bool switchedToSynchronisation;
+    wxArrayString unhandledErrors;   //list of non-resolved errors
+};
+
 
 #endif // FREEFILESYNCAPP_H

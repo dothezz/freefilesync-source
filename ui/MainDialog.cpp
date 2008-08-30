@@ -11,8 +11,6 @@
 #include <wx/filename.h>
 #include <stdexcept> //for std::runtime_error
 #include "..\library\globalfunctions.h"
-#include <wx/wfstream.h>
-#include <wx/zipstrm.h>
 #include <fstream>
 #include <wx/clipbrd.h>
 #include "..\library\CustomGrid.h"
@@ -23,28 +21,33 @@ using namespace GlobalFunctions;
 
 int leadingPanel = 0;
 
-MainDialog::MainDialog(wxFrame* frame)
-        : GUI_Generated(frame), parent(frame)
+MainDialog::MainDialog(wxFrame* frame) :
+        GUI_Generated(frame),
+        parent(frame),
+        selectedRangeBegin(0),
+        selectedRangeEnd(0),
+        selectionLead(0),
+        filteringPending(false),
+        cmpStatusUpdaterTmp(0)
 {
     //initialize sync configuration
-    readConfigurationFromHD();
+    readConfigurationFromHD("config.dat");
 
-    loadResourceFiles();
     //set icons for this dialog
-    m_bpButton11->SetBitmapLabel(*bitmapAbout);
-    m_bpButton10->SetBitmapLabel(*bitmapExit);
-    m_bpButton12->SetBitmapLabel(*bitmapCompare);
-    m_bpButton111->SetBitmapLabel(*bitmapSync);
-    m_bpButton111->SetBitmapDisabled(*bitmapSyncDisabled);
-    m_bpButton13->SetBitmapLabel(*bitmapSwap);
-    m_bpButton14->SetBitmapLabel(*bitmapHelp);
+    m_bpButton11->SetBitmapLabel(*GlobalResources::bitmapAbout);
+    m_bpButton10->SetBitmapLabel(*GlobalResources::bitmapExit);
+    m_bpButtonCompare->SetBitmapLabel(*GlobalResources::bitmapCompare);
+    m_bpButtonSync->SetBitmapLabel(*GlobalResources::bitmapSync);
+    m_bpButtonSync->SetBitmapDisabled(*GlobalResources::bitmapSyncDisabled);
+    m_bpButtonSwap->SetBitmapLabel(*GlobalResources::bitmapSwap);
+    m_bpButton14->SetBitmapLabel(*GlobalResources::bitmapHelp);
 
     m_panel1->DragAcceptFiles(true);
     m_panel2->DragAcceptFiles(true);
     m_panel1->Connect(wxEVT_DROP_FILES, wxDropFilesEventHandler(MainDialog::onFilesDroppedPanel1), NULL, this);
     m_panel2->Connect(wxEVT_DROP_FILES, wxDropFilesEventHandler(MainDialog::onFilesDroppedPanel2), NULL, this);
 
-    //support for CTRL+C
+    //support for CTRL + C
     m_grid1->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onGrid1ButtonEvent), NULL, this);
     m_grid2->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onGrid2ButtonEvent), NULL, this);
 
@@ -58,6 +61,7 @@ MainDialog::MainDialog(wxFrame* frame)
     m_grid1->Connect(wxEVT_SCROLLWIN_PAGEDOWN,     wxEventHandler(MainDialog::onGrid1access), NULL, this);
     m_grid1->Connect(wxEVT_SCROLLWIN_THUMBTRACK,   wxEventHandler(MainDialog::onGrid1access), NULL, this);
     m_grid1->Connect(wxEVT_SCROLLWIN_THUMBRELEASE, wxEventHandler(MainDialog::onGrid1access), NULL, this);
+    m_grid1->Connect(wxEVT_GRID_LABEL_LEFT_CLICK,  wxEventHandler(MainDialog::onGrid1access), NULL, this);
     m_grid1->GetGridWindow()->Connect(wxEVT_LEFT_DOWN, wxEventHandler(MainDialog::onGrid1access), NULL, this);
 
     m_grid2->Connect(wxEVT_KEY_DOWN,               wxEventHandler(MainDialog::onGrid2access), NULL, this);
@@ -69,6 +73,7 @@ MainDialog::MainDialog(wxFrame* frame)
     m_grid2->Connect(wxEVT_SCROLLWIN_PAGEDOWN,     wxEventHandler(MainDialog::onGrid2access), NULL, this);
     m_grid2->Connect(wxEVT_SCROLLWIN_THUMBTRACK,   wxEventHandler(MainDialog::onGrid2access), NULL, this);
     m_grid2->Connect(wxEVT_SCROLLWIN_THUMBRELEASE, wxEventHandler(MainDialog::onGrid2access), NULL, this);
+    m_grid2->Connect(wxEVT_GRID_LABEL_LEFT_CLICK,  wxEventHandler(MainDialog::onGrid2access), NULL, this);
     m_grid2->GetGridWindow()->Connect(wxEVT_LEFT_DOWN, wxEventHandler(MainDialog::onGrid2access), NULL, this);
 
     m_grid3->Connect(wxEVT_KEY_DOWN,               wxEventHandler(MainDialog::onGrid3access), NULL, this);
@@ -76,8 +81,8 @@ MainDialog::MainDialog(wxFrame* frame)
     m_grid3->Connect(wxEVT_SCROLLWIN_LINEDOWN,     wxEventHandler(MainDialog::onGrid3access), NULL, this);
     m_grid3->GetGridWindow()->Connect(wxEVT_LEFT_DOWN, wxEventHandler(MainDialog::onGrid3access), NULL, this);
 
-    m_grid3->GetGridWindow()->Connect(wxEVT_LEFT_UP, wxEventHandler(MainDialog::OnMarkRangeOnGrid3), NULL, this);
-
+    m_grid3->GetGridWindow()->Connect(wxEVT_IDLE, wxEventHandler(MainDialog::OnIdleToFilterManually), NULL, this);
+    m_grid3->GetGridWindow()->Connect(wxEVT_LEFT_UP, wxEventHandler(MainDialog::OnGrid3LeftMouseUp), NULL, this);
 
     wxString toolTip = wxString(_("Legend\n")) +
                        _("---------\n") +
@@ -103,7 +108,7 @@ MainDialog::MainDialog(wxFrame* frame)
     updateViewFilterButtons();
 
     //disable sync button as long as "compare" hasn't been triggered.
-    m_bpButton111->Enable(false);
+    m_bpButtonSync->Enable(false);
 
     //make filesize right justified on grids
     wxGridCellAttr* cellAttributes = m_grid1->GetOrCreateCellAttr(0, 2);
@@ -120,7 +125,7 @@ MainDialog::MainDialog(wxFrame* frame)
     //set status of filter button
     updateFilterButton();
     //set status of "hide filtered items" checkbox
-    m_checkBox2->SetValue(hideFiltered);
+    m_checkBoxHideFilt->SetValue(hideFiltered);
 
     //mainly to update row label sizes...
     writeGrid(currentGridData);
@@ -135,7 +140,6 @@ MainDialog::~MainDialog()
 
     m_grid1->setSortMarker(-1);
     m_grid2->setSortMarker(-1);
-
 
     m_grid1->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onGrid1ButtonEvent), NULL, this);
     m_grid2->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onGrid2ButtonEvent), NULL, this);
@@ -152,6 +156,8 @@ MainDialog::~MainDialog()
     m_grid1->Disconnect(wxEVT_SCROLLWIN_PAGEDOWN,     wxEventHandler(MainDialog::onGrid1access), NULL, this);
     m_grid1->Disconnect(wxEVT_SCROLLWIN_THUMBTRACK,   wxEventHandler(MainDialog::onGrid1access), NULL, this);
     m_grid1->Disconnect(wxEVT_SCROLLWIN_THUMBRELEASE, wxEventHandler(MainDialog::onGrid1access), NULL, this);
+    m_grid1->Disconnect(wxEVT_GRID_LABEL_LEFT_CLICK,  wxEventHandler(MainDialog::onGrid1access), NULL, this);
+    m_grid1->GetGridWindow()->Disconnect(wxEVT_LEFT_DOWN, wxEventHandler(MainDialog::onGrid1access), NULL, this);
 
     m_grid2->Disconnect(wxEVT_KEY_DOWN,               wxEventHandler(MainDialog::onGrid2access), NULL, this);
     m_grid2->Disconnect(wxEVT_SCROLLWIN_TOP,          wxEventHandler(MainDialog::onGrid2access), NULL, this);
@@ -162,18 +168,20 @@ MainDialog::~MainDialog()
     m_grid2->Disconnect(wxEVT_SCROLLWIN_PAGEDOWN,     wxEventHandler(MainDialog::onGrid2access), NULL, this);
     m_grid2->Disconnect(wxEVT_SCROLLWIN_THUMBTRACK,   wxEventHandler(MainDialog::onGrid2access), NULL, this);
     m_grid2->Disconnect(wxEVT_SCROLLWIN_THUMBRELEASE, wxEventHandler(MainDialog::onGrid2access), NULL, this);
+    m_grid2->Disconnect(wxEVT_GRID_LABEL_LEFT_CLICK,  wxEventHandler(MainDialog::onGrid2access), NULL, this);
+    m_grid2->GetGridWindow()->Disconnect(wxEVT_LEFT_DOWN, wxEventHandler(MainDialog::onGrid2access), NULL, this);
 
     m_grid3->Disconnect(wxEVT_KEY_DOWN,               wxEventHandler(MainDialog::onGrid3access), NULL, this);
     m_grid3->Disconnect(wxEVT_SCROLLWIN_LINEUP,       wxEventHandler(MainDialog::onGrid3access), NULL, this);
     m_grid3->Disconnect(wxEVT_SCROLLWIN_LINEDOWN,     wxEventHandler(MainDialog::onGrid3access), NULL, this);
+    m_grid3->GetGridWindow()->Disconnect(wxEVT_LEFT_DOWN, wxEventHandler(MainDialog::onGrid3access), NULL, this);
 
-    m_grid3->GetGridWindow()->Disconnect(wxEVT_LEFT_UP, wxEventHandler(MainDialog::OnMarkRangeOnGrid3), NULL, this);
+    m_grid3->GetGridWindow()->Disconnect(wxEVT_IDLE, wxEventHandler(MainDialog::OnIdleToFilterManually), NULL, this);
+    m_grid3->GetGridWindow()->Disconnect(wxEVT_LEFT_UP, wxEventHandler(MainDialog::OnGrid3LeftMouseUp), NULL, this);
 
     try
     {
-        unloadResourceFiles();
-
-        writeConfigurationToHD();
+        writeConfigurationToHD("config.dat");   //don't trow exceptions in destructors
     }
     catch (std::runtime_error& theException)
     {
@@ -184,45 +192,71 @@ MainDialog::~MainDialog()
 
 void MainDialog::onGrid1access(wxEvent& event)
 {
-    leadingPanel = 1;
+    if (leadingPanel != 1)
+    {
+        leadingPanel = 1;
+        m_grid1->SetFocus();
+
+        m_grid2->ClearSelection(); //clear selection on grid2
+    }
     event.Skip();
 }
+
 
 void MainDialog::onGrid2access(wxEvent& event)
 {
-    leadingPanel = 2;
+    if (leadingPanel != 2)
+    {
+        leadingPanel = 2;
+        m_grid2->SetFocus();
+
+        m_grid1->ClearSelection(); //clear selection on grid1
+    }
     event.Skip();
 }
+
 
 void MainDialog::onGrid3access(wxEvent& event)
 {
-    leadingPanel = 3;
-    event.Skip();
-}
-
-
-//disable marking ranges on grid3: when user releases left mouse, the selection is cleared
-void MainDialog::OnMarkRangeOnGrid3( wxEvent& event )
-{
-    m_grid3->ClearSelection();
-    m_grid3->ForceRefresh();
-    event.Skip();
-}
-
-
-void MainDialog::OnDeselectRow(wxGridEvent& event)
-{
-    int rowSelected = event.GetRow();
-    if (unsigned(rowSelected)  < currentUI_View.size())
+    if (leadingPanel != 3)
     {
-        bool& currentSelection = currentGridData[currentUI_View[rowSelected].linkToCurrentGridData].selectedForSynchronization;
-        CompareFilesResult currentCmpResult = currentGridData[currentUI_View[rowSelected].linkToCurrentGridData].cmpResult;
+        leadingPanel = 3;
+        m_grid1->ClearSelection(); //clear selection on grid1
+        m_grid2->ClearSelection(); //clear selection on grid1
+    }
+    event.Skip();
+}
 
-        //toggle selection of current row
-        currentSelection = !currentSelection;
 
-        //update currentUI_View, in case of sorting without refresh (mapping of griddata to ui model
-        currentUI_View[rowSelected].cmpResult = evaluateCmpResult(currentCmpResult, currentSelection);
+void MainDialog::filterRangeManual(int begin, int end, int leadingRow)
+{
+    int currentUI_Size = currentUI_View.size();
+
+    int topRow = max(begin, 0);
+    int bottomRow = min(end, currentUI_Size - 1);
+
+    if (topRow <= bottomRow) // bottomRow might be -1 ?
+    {
+        bool newSelection = false;   //default: deselect range
+
+        //lastSelected Row should be set in OnDeselectRow()
+        if (leadingRow < currentUI_Size)
+            newSelection = !currentGridData[currentUI_View[leadingRow].linkToCurrentGridData].selectedForSynchronization;
+
+        if (hideFiltered)
+            assert (!newSelection); //if hidefiltered is active, there should be no filtered elements on screen => current element was filtered out
+
+        for (int i = topRow; i <= bottomRow; ++ i)
+        {
+            bool& currentSelection = currentGridData[currentUI_View[i].linkToCurrentGridData].selectedForSynchronization;
+            CompareFilesResult currentCmpResult = currentGridData[currentUI_View[i].linkToCurrentGridData].cmpResult;
+
+            //toggle selection of current row
+            currentSelection = newSelection;
+
+            //update currentUI_View, in case of sorting without refresh (mapping of griddata to ui model)
+            currentUI_View[i].cmpResult = evaluateCmpResult(currentCmpResult, currentSelection);
+        }
 
         //signal UI that grids need to be refreshed on next Update()
         m_grid1->ForceRefresh();
@@ -231,17 +265,70 @@ void MainDialog::OnDeselectRow(wxGridEvent& event)
 
         if (hideFiltered)
         {
-            assert (!currentSelection); //if hidefiltered is active, there should be no filtered elements on screen => current element was filtered out
-
-            //some delay to show user the row he has filtered out before it is removed
+            //some delay to show user the rows he has filtered out before they are removed
             Update();   //show changes resulting from ForceRefresh()
             wxMilliSleep(400);
 
-            //delete row, that is filtered out:
-            currentUI_View.erase(currentUI_View.begin() + rowSelected);
+            //delete rows, that are filtered out:
+            currentUI_View.erase(currentUI_View.begin() + topRow, currentUI_View.begin() + bottomRow + 1);
+
             //redraw grid neccessary to update new dimensions
-            writeGrid(currentGridData, true);   //use UI buffer, no mapping from currentGridData to UI model again, just a re-dimensioning of grids
+            writeGrid(currentGridData, true);        //use UI buffer, no mapping from currentGridData to UI model again, just a re-dimensioning of grids
+            updateStatusInformation(currentUI_View); //status information has to be recalculated!
         }
+    }
+    //clear selection on grid
+    m_grid3->ClearSelection();
+}
+
+/*grid event choreography:
+1. UI-Mouse-Down => OnGrid3SelectCell
+2. UI-Mouse-Up   => OnGrid3SelectRange (if at least two rows are marked)
+
+=> the decision if a range or a single cell is selected can be made only after Mouse-UP. But OnGrid3SelectRange unfortunately is not always
+executed (e.g. if single cell selected)
+
+=> new choreography:
+
+1. UI-Mouse-Down => OnGrid3SelectCell
+2. UI-Mouse-Up   => OnGrid3LeftMouseUp (notify that filtering shall be started on next idle event
+3. UI-Mouse-Up   => OnGrid3SelectRange, possibly
+4. Idle event    => OnIdleToFilterManually
+
+    It's !crazy! but it works!
+*/
+
+void MainDialog::OnGrid3SelectCell(wxGridEvent& event)
+{
+    selectionLead = selectedRangeBegin = selectedRangeEnd = event.GetRow();
+    event.Skip();
+}
+
+
+void MainDialog::OnGrid3LeftMouseUp(wxEvent& event)
+{
+    filteringPending = true;
+    event.Skip();
+}
+
+
+void MainDialog::OnGrid3SelectRange(wxGridRangeSelectEvent& event)
+{
+    if (event.Selecting())
+    {
+        selectedRangeBegin = event.GetTopRow();
+        selectedRangeEnd   = event.GetBottomRow();
+    }
+    event.Skip();
+}
+
+
+void MainDialog::OnIdleToFilterManually(wxEvent& event)
+{
+    if (filteringPending)
+    {
+        filteringPending = false;
+        filterRangeManual(selectedRangeBegin, selectedRangeEnd, selectionLead);
     }
     event.Skip();
 }
@@ -373,7 +460,7 @@ void MainDialog::OnDirChangedPanel1(wxFileDirPickerEvent& event)
     m_directoryPanel1->SetValue(newPath);
 
     //disable the sync button
-    m_bpButton111->Enable(false);
+    m_bpButtonSync->Enable(false);
 
     //clear grids
     currentGridData.clear();
@@ -389,7 +476,7 @@ void MainDialog::OnDirChangedPanel2(wxFileDirPickerEvent& event)
     m_directoryPanel2->SetValue(newPath);
 
     //disable the sync button
-    m_bpButton111->Enable(false);
+    m_bpButtonSync->Enable(false);
     //clear grids
     currentGridData.clear();
     writeGrid(currentGridData);
@@ -423,7 +510,7 @@ void MainDialog::onFilesDroppedPanel1(wxDropFilesEvent& event)
         onFilesDropped(event.GetFiles()[0], m_directoryPanel1, m_dirPicker1);
 
         //disable the sync button
-        m_bpButton111->Enable(false);
+        m_bpButtonSync->Enable(false);
         //clear grids
         currentGridData.clear();
         writeGrid(currentGridData);
@@ -438,7 +525,7 @@ void MainDialog::onFilesDroppedPanel2(wxDropFilesEvent& event)
         onFilesDropped(event.GetFiles()[0], m_directoryPanel2, m_dirPicker2);
 
         //disable the sync button
-        m_bpButton111->Enable(false);
+        m_bpButtonSync->Enable(false);
         //clear grids
         currentGridData.clear();
         writeGrid(currentGridData);
@@ -446,19 +533,22 @@ void MainDialog::onFilesDroppedPanel2(wxDropFilesEvent& event)
     event.Skip();
 }
 
+
 void MainDialog::OnChangeCompareVariant(wxCommandEvent& event)
 {
     //disable the sync button
-    m_bpButton111->Enable(false);
+    m_bpButtonSync->Enable(false);
     //clear grids
     currentGridData.clear();
     writeGrid(currentGridData);
 }
 
+
 void MainDialog::OnClose(wxCloseEvent &event)
 {
     Destroy();
 }
+
 
 void MainDialog::OnQuit(wxCommandEvent &event)
 {
@@ -466,76 +556,7 @@ void MainDialog::OnQuit(wxCommandEvent &event)
 }
 
 
-void MainDialog::loadResourceFiles()
-{
-    //map, allocate and initialize pictures
-    bitmapResource["left arrow.png"]        = (bitmapLeftArrow       = new wxBitmap(wxNullBitmap));
-    bitmapResource["start sync.png"]        = (bitmapStartSync       = new wxBitmap(wxNullBitmap));
-    bitmapResource["right arrow.png"]       = (bitmapRightArrow      = new wxBitmap(wxNullBitmap));
-    bitmapResource["delete.png"]            = (bitmapDelete          = new wxBitmap(wxNullBitmap));
-    bitmapResource["email.png"]             = (bitmapEmail           = new wxBitmap(wxNullBitmap));
-    bitmapResource["about.png"]             = (bitmapAbout           = new wxBitmap(wxNullBitmap));
-    bitmapResource["website.png"]           = (bitmapWebsite         = new wxBitmap(wxNullBitmap));
-    bitmapResource["exit.png"]              = (bitmapExit            = new wxBitmap(wxNullBitmap));
-    bitmapResource["sync.png"]              = (bitmapSync            = new wxBitmap(wxNullBitmap));
-    bitmapResource["compare.png"]           = (bitmapCompare         = new wxBitmap(wxNullBitmap));
-    bitmapResource["sync disabled.png"]     = (bitmapSyncDisabled    = new wxBitmap(wxNullBitmap));
-    bitmapResource["swap.png"]              = (bitmapSwap            = new wxBitmap(wxNullBitmap));
-    bitmapResource["help.png"]              = (bitmapHelp            = new wxBitmap(wxNullBitmap));
-    bitmapResource["leftOnly.png"]          = (bitmapLeftOnly        = new wxBitmap(wxNullBitmap));
-    bitmapResource["leftNewer.png"]         = (bitmapLeftNewer       = new wxBitmap(wxNullBitmap));
-    bitmapResource["different.png"]         = (bitmapDifferent       = new wxBitmap(wxNullBitmap));
-    bitmapResource["rightNewer.png"]        = (bitmapRightNewer      = new wxBitmap(wxNullBitmap));
-    bitmapResource["rightOnly.png"]         = (bitmapRightOnly       = new wxBitmap(wxNullBitmap));
-    bitmapResource["leftOnlyDeact.png"]     = (bitmapLeftOnlyDeact   = new wxBitmap(wxNullBitmap));
-    bitmapResource["leftNewerDeact.png"]    = (bitmapLeftNewerDeact  = new wxBitmap(wxNullBitmap));
-    bitmapResource["differentDeact.png"]    = (bitmapDifferentDeact  = new wxBitmap(wxNullBitmap));
-    bitmapResource["rightNewerDeact.png"]   = (bitmapRightNewerDeact = new wxBitmap(wxNullBitmap));
-    bitmapResource["rightOnlyDeact.png"]    = (bitmapRightOnlyDeact  = new wxBitmap(wxNullBitmap));
-    bitmapResource["equal.png"]             = (bitmapEqual           = new wxBitmap(wxNullBitmap));
-    bitmapResource["equalDeact.png"]        = (bitmapEqualDeact      = new wxBitmap(wxNullBitmap));
-    bitmapResource["include.png"]           = (bitmapInclude         = new wxBitmap(wxNullBitmap));
-    bitmapResource["exclude.png"]           = (bitmapExclude         = new wxBitmap(wxNullBitmap));
-    bitmapResource["filter active.png"]     = (bitmapFilterOn        = new wxBitmap(wxNullBitmap));
-    bitmapResource["filter not active.png"] = (bitmapFilterOff       = new wxBitmap(wxNullBitmap));
-    bitmapResource["Warning.png"]           = (bitmapWarning         = new wxBitmap(wxNullBitmap));
-    bitmapResource["small arrow up.png"]    = (bitmapSmallUp         = new wxBitmap(wxNullBitmap));
-    bitmapResource["small arrow down.png"]  = (bitmapSmallDown       = new wxBitmap(wxNullBitmap));
-
-    animationMoney = new wxAnimation(wxNullAnimation);
-
-
-    wxFileInputStream input("Resources.dat");
-    if (!input.IsOk()) throw runtime_error(_("Unable to load Resources.dat!"));
-
-    wxZipInputStream resourceFile(input);
-
-    wxZipEntry* entry;
-    map<wxString, wxBitmap*>::iterator bmp;
-    while (entry = resourceFile.GetNextEntry())
-    {
-        wxString name = entry->GetName();
-
-        //just to be sure: search if entry is available in map
-        if ((bmp = bitmapResource.find(name)) != bitmapResource.end())
-            *(bmp->second) = wxBitmap(wxImage(resourceFile, wxBITMAP_TYPE_PNG));
-    }
-
-    animationMoney->LoadFile("Resources.a01");
-}
-
-
-void MainDialog::unloadResourceFiles()
-{
-    //free bitmap resources
-    for (map<wxString, wxBitmap*>::iterator i = bitmapResource.begin(); i != bitmapResource.end(); ++i)
-        delete i->second;
-
-    //free other resources
-    delete animationMoney;
-}
-
-void MainDialog::readConfigurationFromHD()
+void MainDialog::readConfigurationFromHD(const wxString& filename)
 {
     //default values
     syncConfiguration.exLeftSideOnly  = SyncDirRight;
@@ -551,14 +572,15 @@ void MainDialog::readConfigurationFromHD()
     rightOnlyFilesActive  = true;  //it's more convenient to have them defaulted for each execution
     equalFilesActive      = false;
 
-    includeFilter = "*";  //include all files/folders
-    excludeFilter = "";   //exlude nothing
-    hideFiltered  = false; //show filtered items
+    includeFilter = "*";    //include all files/folders
+    excludeFilter = "";     //exlude nothing
+    hideFiltered  = false;  //show filtered items
     filterIsActive = false; //do not filter by default
 
+    useRecycleBin = false;  //do not use: in case OS doesn't support this, user will have to activate first and then get the error message
 //#####################################################
 
-    ifstream config("config.dat");
+    ifstream config(filename.c_str());
     if (!config)
         return;
 
@@ -573,10 +595,10 @@ void MainDialog::readConfigurationFromHD()
     switch (int(config.get()))
     {
     case CompareByTimeAndSize:
-        m_radioBtn4->SetValue(true);
+        m_radioBtnSizeDate->SetValue(true);
         break;
     case CompareByMD5:
-        m_radioBtn5->SetValue(true);
+        m_radioBtnContent->SetValue(true);
         break;
     default:
         assert (false);
@@ -628,31 +650,32 @@ void MainDialog::readConfigurationFromHD()
     config.getline(bigBuffer, 10000, char(0));
     includeFilter = bigBuffer;
 
-    //exlude
+    //exclude
     config.getline(bigBuffer, 10000, char(0));
     excludeFilter = bigBuffer;
+
+    useRecycleBin =  bool(config.get());
 
     config.close();
 }
 
-void MainDialog::writeConfigurationToHD()
+void MainDialog::writeConfigurationToHD(const wxString& filename)
 {
-    char* configFile = "config.dat";
     DWORD dwFileAttributes;
 
     //make config file visible: needed for ofstream
-    if (wxFileExists(configFile))
+    if (wxFileExists(filename))
     {
         dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
         if (!SetFileAttributes(
-                    configFile,	// address of filename
+                    filename.c_str(),	// address of filename
                     dwFileAttributes 	// address of attributes to set
-                )) throw runtime_error(_("Could not change attributes of ""config.dat""!"));
+                )) throw runtime_error(string(_("Could not change attributes of ")) + filename.c_str());
     }
 
-    ofstream config(configFile);
+    ofstream config(filename.c_str());
     if (!config)
-        throw runtime_error(_("Could not open ""config.dat"" for write access!"));
+        throw runtime_error(string(_("Could not open ")) + filename.c_str());
 
     //write sync configuration
     config<<char(syncConfiguration.exLeftSideOnly)
@@ -662,9 +685,9 @@ void MainDialog::writeConfigurationToHD()
     <<char(syncConfiguration.different);
 
     //write find method
-    if (m_radioBtn4->GetValue())
+    if (m_radioBtnSizeDate->GetValue())
         config<<char(CompareByTimeAndSize);
-    else if (m_radioBtn5->GetValue())
+    else if (m_radioBtnContent->GetValue())
         config<<char(CompareByMD5);
     else assert (false);
 
@@ -701,14 +724,16 @@ void MainDialog::writeConfigurationToHD()
     config<<includeFilter.c_str()<<char(0)
     <<excludeFilter.c_str()<<char(0);
 
+    config<<char(useRecycleBin);
+
     config.close();
 
     //hide config file
     dwFileAttributes = FILE_ATTRIBUTE_HIDDEN;
     if (!SetFileAttributes(
-                configFile,	// address of filename
+                filename.c_str(),	// address of filename
                 dwFileAttributes 	// address of attributes to set
-            )) throw runtime_error(_("Could not change attributes of ""config.dat""!"));
+            )) throw runtime_error(string(_("Could not change attributes of ")) + filename.c_str());
 }
 
 void MainDialog::OnAbout(wxCommandEvent &event)
@@ -745,8 +770,8 @@ void MainDialog::OnHideFilteredButton(wxCommandEvent &event)
 
     writeGrid(currentGridData);
 
-    //make sure, checkbox and "hideFiltered" are in sync.
-    m_checkBox2->SetValue(hideFiltered);
+    //make sure, checkbox and "hideFiltered" are in sync
+    m_checkBoxHideFilt->SetValue(hideFiltered);
 }
 
 
@@ -810,34 +835,34 @@ void MainDialog::OnEqualFiles(wxCommandEvent& event)
 void MainDialog::updateViewFilterButtons()
 {
     if (leftOnlyFilesActive)
-        m_bpButton20->SetBitmapLabel(*bitmapLeftOnly);
+        m_bpButton20->SetBitmapLabel(*GlobalResources::bitmapLeftOnly);
     else
-        m_bpButton20->SetBitmapLabel(*bitmapLeftOnlyDeact);
+        m_bpButton20->SetBitmapLabel(*GlobalResources::bitmapLeftOnlyDeact);
 
     if (leftNewerFilesActive)
-        m_bpButton21->SetBitmapLabel(*bitmapLeftNewer);
+        m_bpButton21->SetBitmapLabel(*GlobalResources::bitmapLeftNewer);
     else
-        m_bpButton21->SetBitmapLabel(*bitmapLeftNewerDeact);
+        m_bpButton21->SetBitmapLabel(*GlobalResources::bitmapLeftNewerDeact);
 
     if (differentFilesActive)
-        m_bpButton22->SetBitmapLabel(*bitmapDifferent);
+        m_bpButton22->SetBitmapLabel(*GlobalResources::bitmapDifferent);
     else
-        m_bpButton22->SetBitmapLabel(*bitmapDifferentDeact);
+        m_bpButton22->SetBitmapLabel(*GlobalResources::bitmapDifferentDeact);
 
     if (rightNewerFilesActive)
-        m_bpButton23->SetBitmapLabel(*bitmapRightNewer);
+        m_bpButton23->SetBitmapLabel(*GlobalResources::bitmapRightNewer);
     else
-        m_bpButton23->SetBitmapLabel(*bitmapRightNewerDeact);
+        m_bpButton23->SetBitmapLabel(*GlobalResources::bitmapRightNewerDeact);
 
     if (rightOnlyFilesActive)
-        m_bpButton24->SetBitmapLabel(*bitmapRightOnly);
+        m_bpButton24->SetBitmapLabel(*GlobalResources::bitmapRightOnly);
     else
-        m_bpButton24->SetBitmapLabel(*bitmapRightOnlyDeact);
+        m_bpButton24->SetBitmapLabel(*GlobalResources::bitmapRightOnlyDeact);
 
     if (equalFilesActive)
-        m_bpButton25->SetBitmapLabel(*bitmapEqual);
+        m_bpButton25->SetBitmapLabel(*GlobalResources::bitmapEqual);
     else
-        m_bpButton25->SetBitmapLabel(*bitmapEqualDeact);
+        m_bpButton25->SetBitmapLabel(*GlobalResources::bitmapEqualDeact);
 }
 
 
@@ -845,12 +870,12 @@ void MainDialog::updateFilterButton()
 {
     if (filterIsActive)
     {
-        m_bpButtonFilter->SetBitmapLabel(*bitmapFilterOn);
+        m_bpButtonFilter->SetBitmapLabel(*GlobalResources::bitmapFilterOn);
         m_bpButtonFilter->SetToolTip(_("Filter active: Press again to deactivate"));
     }
     else
     {
-        m_bpButtonFilter->SetBitmapLabel(*bitmapFilterOff);
+        m_bpButtonFilter->SetBitmapLabel(*GlobalResources::bitmapFilterOff);
         m_bpButtonFilter->SetToolTip(_("Press button to activate filter"));
     }
 }
@@ -880,47 +905,55 @@ void MainDialog::OnCompare(wxCommandEvent &event)
         wxMessageBox(_("Directory on the right does not exist. Please select a new one!"), _("Warning"), wxICON_WARNING);
         return;
     }
+
     wxBeginBusyCursor();
 
-    //unsigned int startTime = GetTickCount();
-
     CompareVariant cmpVar = CompareByTimeAndSize;   //assign a value to suppress compiler warning
-    if (m_radioBtn4->GetValue())
-        cmpVar  = CompareByTimeAndSize;
-    else if (m_radioBtn5->GetValue())
-        cmpVar  = CompareByMD5;
+    if (m_radioBtnSizeDate->GetValue())
+        cmpVar = CompareByTimeAndSize;
+    else if (m_radioBtnContent->GetValue())
+        cmpVar = CompareByMD5;
     else assert (false);
 
     try
-    {
+    {   //class handling status display and error messages
+        CompareStatusUpdater statusUpdater(this, m_statusBar1);
+        cmpStatusUpdaterTmp = &statusUpdater;
+
         //unsigned int startTime3 = GetTickCount();
         FreeFileSync::getModelDiff(currentGridData,
                                    FreeFileSync::getFormattedDirectoryName(m_directoryPanel1->GetValue()),
                                    FreeFileSync::getFormattedDirectoryName(m_directoryPanel2->GetValue()),
-                                   cmpVar);
+                                   cmpVar,
+                                   &statusUpdater);
         //wxMessageBox(numberToWxString(unsigned(GetTickCount()) - startTime3));
+
 
         //filter currentGridData if option is set
         if (filterIsActive)
             FreeFileSync::filterCurrentGridData(currentGridData, includeFilter, excludeFilter);
 
-        //unsigned int startTime4 = GetTickCount();
         writeGrid(currentGridData);
-        //wxMessageBox(numberToWxString(unsigned(GetTickCount()) - startTime4));
 
         //once compare is finished enable the sync button
-        m_bpButton111->Enable(true);
+        m_bpButtonSync->Enable(true);
 
-        //m_statusBar1->SetStatusText(wxString(_("Benchmark: ")) + numberToWxString(unsigned(GetTickCount()) - startTime) + " ms", 2);
+        cmpStatusUpdaterTmp = 0;
     }
-    catch (std::runtime_error& theException)
+    catch (AbortThisProcess& theException)
     {
-        wxMessageBox(_(theException.what()), _("An exception occured!"), wxOK | wxICON_ERROR);
         //disable the sync button
-        m_bpButton111->Enable(false);
+        m_bpButtonSync->Enable(false);
     }
 
     wxEndBusyCursor();
+}
+
+
+void MainDialog::OnAbortCompare(wxCommandEvent& event)
+{
+    if (cmpStatusUpdaterTmp)
+        cmpStatusUpdaterTmp->requestAbortion();
 }
 
 
@@ -960,7 +993,10 @@ void MainDialog::writeGrid(const FileCompareResult& gridData, bool useUI_GridCac
     //unsigned int startTime = GetTickCount();
 
     if (!useUI_GridCache)
-        mapFileModelToUI(currentUI_View, gridData);
+    {
+        mapFileModelToUI(currentUI_View, gridData); //update currentUI_View
+        updateStatusInformation(currentUI_View);    //write status information for currentUI_View
+    }
 
     m_grid1->BeginBatch();
     m_grid2->BeginBatch();
@@ -1012,7 +1048,7 @@ void MainDialog::OnSync( wxCommandEvent& event )
     }
 
     SyncDialog* syncDlg = new SyncDialog(this);
-    if (syncDlg->ShowModal() == StartSynchronizationProcess)
+    if (syncDlg->ShowModal() == SyncDialog::StartSynchronizationProcess)
     {
         wxBeginBusyCursor();
 
@@ -1023,14 +1059,8 @@ void MainDialog::OnSync( wxCommandEvent& event )
         m_statusBar1->SetStatusText("", 4);
 
         //unsigned int startTime = GetTickCount();
-
         synchronizeFolders(currentGridData, syncConfiguration);
-
-        wxString gridSizeFormatted = numberToWxString(currentGridData.size());
-        GlobalFunctions::includeNumberSeparator(gridSizeFormatted);
-        m_statusBar1->SetStatusText(gridSizeFormatted + _(" item(s) remaining"), 2);
-
-        //  m_statusBar1->SetStatusText(wxString("Benchmark: ") + numberToWxString(unsigned(GetTickCount()) - startTime) + " ms", 2);
+        //wxMessageBox(numberToWxString(unsigned(GetTickCount()) - startTime));
 
         wxEndBusyCursor();
     }
@@ -1194,9 +1224,9 @@ void MainDialog::OnSortLeftGrid(wxGridEvent& event)
         writeGrid(currentGridData, true);   //use UI buffer, no mapping from currentGridData to UI model again
         //set sort direction indicator on UI
         if (sortAscending)
-            m_grid1->setSortMarker(currentSortColumn, bitmapSmallUp);
+            m_grid1->setSortMarker(currentSortColumn, GlobalResources::bitmapSmallUp);
         else
-            m_grid1->setSortMarker(currentSortColumn, bitmapSmallDown);
+            m_grid1->setSortMarker(currentSortColumn, GlobalResources::bitmapSmallDown);
         m_grid2->setSortMarker(-1);
     }
     event.Skip();
@@ -1217,9 +1247,9 @@ void MainDialog::OnSortRightGrid(wxGridEvent& event)
         //set sort direction indicator on UI
         m_grid1->setSortMarker(-1);
         if (sortAscending)
-            m_grid2->setSortMarker(currentSortColumn, bitmapSmallUp);
+            m_grid2->setSortMarker(currentSortColumn, GlobalResources::bitmapSmallUp);
         else
-            m_grid2->setSortMarker(currentSortColumn, bitmapSmallDown);
+            m_grid2->setSortMarker(currentSortColumn, GlobalResources::bitmapSmallDown);
     }
     event.Skip();
 }
@@ -1240,122 +1270,25 @@ void MainDialog::OnSwapDirs( wxCommandEvent& event )
 
 void MainDialog::synchronizeFolders(FileCompareResult& grid, const SyncConfiguration config)
 {
-    FreeFileSync fileSyncObject;    //currently only needed for use of recycle bin
-    mpz_t largeTmpInt;
-    mpz_init(largeTmpInt);
-
-    FileCompareResult resultsGrid;
-
-    //prepare progress indicator:
-    wxGauge* m_gauge1 = 0;
-    m_gauge1 = new wxGauge( this, wxID_ANY, 100, wxDefaultPosition, wxSize( -1,15 ), wxGA_HORIZONTAL );
-    bSizer1->Add( m_gauge1, 0, wxALL|wxEXPAND, 5 );
-    Layout();
-
-    bool suppressErrormessages = false;
-
     try
-    {
-        double totalElements   = 0;  // each element represents one byte for proper progress indicator scaling
-        double currentElements = 0;
-        double scalingFactor   = 0;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
+    {   //class handling status updates and error messages
+        SyncStatusUpdater statusUpdater(this, FreeFileSync::calcTotalBytesToTransfer(grid, config).get_d());
 
-        //read total nr. of bytes that will be transferred into totalElements
-        totalElements = FreeFileSync::calcTotalBytesToTransfer(grid, config).get_d();
+        //start synchronization and return elements that were errorneous in "grid"
 
-        if (totalElements != 0)
-            scalingFactor = 50000 / totalElements; //let's normalize to 50000
-        m_gauge1->SetRange(50000);
-        m_gauge1->SetValue(0);
+        //unsigned int startTime3 = GetTickCount();
+        FreeFileSync::startSynchronizationProcess(grid, config, &statusUpdater, useRecycleBin);
+        //wxMessageBox(numberToWxString(unsigned(GetTickCount()) - startTime3));
 
-//wxMessageBox(numberToWxString(float(totalElements)));
-
-        // it should never happen, that a directory on left side has same name as file on right side. GetModelDiff should take care of this
-        // and split into two "exists on one side only" cases
-        // Note: this case is not handled by this tool as this is considered to be a bug and must be solved by the user
-
-        //synchronize folders:
-        for (FileCompareResult::const_iterator i = grid.begin(); i != grid.end(); ++i)
-        {
-            try
-            {
-                if (i->fileDescrLeft.objType == IsDirectory || i->fileDescrRight.objType == IsDirectory)
-                {
-                    if (!fileSyncObject.synchronizeFolder(*i, config))
-                        resultsGrid.push_back(*i); //append folders that have not been synced according to configuration
-                }
-            }
-            catch (fileError& error)
-            {
-                if (!suppressErrormessages)
-                {
-                    wxString errorMessage = error.show() + _("\n\nSkip this directory and continue synchronization?");
-
-                    SyncErrorDlg* errorDlg = new SyncErrorDlg(this, errorMessage, suppressErrormessages);
-
-                    if (errorDlg->ShowModal() == AbortButtonPressed)
-                        throw error;
-                    //else if ContinueButtonPressed: right now there are only two return values from errorDlg
-                }
-            }
-        }
-
-        //synchronize files:
-        for (FileCompareResult::const_iterator i = grid.begin(); i != grid.end(); ++i)
-        {
-            try
-            {
-                if (i->fileDescrLeft.objType == IsFile || i->fileDescrRight.objType == IsFile)
-                {
-                    if (!fileSyncObject.synchronizeFile(*i, config))
-                    {
-                        resultsGrid.push_back(*i); //append files that have not been synced according to configuration
-                    }
-                    else
-                    {   //progress indicator update
-                        FreeFileSync::getBytesToTransfer(largeTmpInt, *i, config);
-                        currentElements+= mpz_get_d(largeTmpInt);
-                        m_gauge1->SetValue(int(currentElements * scalingFactor));
-                        Update();
-                    }
-                }
-            }
-            catch (fileError& error)
-            {
-                if (!suppressErrormessages)
-                {
-                    wxString errorMessage = error.show() + _("\n\nSkip this file and continue synchronization?");
-
-                    SyncErrorDlg* errorDlg = new SyncErrorDlg(this, errorMessage, suppressErrormessages);
-
-                    if (errorDlg->ShowModal() == AbortButtonPressed)
-                        throw error;
-                    //else if ContinueButtonPressed: right now there are only two return values from errorDlg
-                }
-            }
-        }
 
         //display files that couldn't be processed
-        currentGridData = resultsGrid;
-        writeGrid(currentGridData);
+        writeGrid(grid);
     }
-    catch (fileError& error)
+    catch (AbortThisProcess& theException)
     {
-        //don't show error message, this was already done before
-
         //disable the sync button
-        m_bpButton111->Enable(false);
-
-        //no return here to clean up data in the next lines of code
+        m_bpButtonSync->Enable(false);
     }
-    //clean up
-    //remove progress indicator from window
-    m_gauge1->Destroy();
-    Layout();
-
-    mpz_clear(largeTmpInt);
-
-    //do not include other lines of code here than clean up
 }
 
 //this sorting method is currently NOT used
@@ -1399,9 +1332,8 @@ bool cmpGridSmallerThan(const UI_GridLine& a, const UI_GridLine& b)
 }
 
 
-void MainDialog::mapFileModelToUI(UI_Grid& output, const FileCompareResult& fileCmpResult)
+void MainDialog::updateStatusInformation(const UI_Grid& visibleGrid)
 {
-    output.clear();
     unsigned int objectsOnLeftView = 0;
     unsigned int objectsOnRightView = 0;
     mpz_t filesizeLeftView, filesizeRightView, tmpInt;
@@ -1410,6 +1342,69 @@ void MainDialog::mapFileModelToUI(UI_Grid& output, const FileCompareResult& file
     mpz_init(tmpInt);
 
     int returnValue = 0;
+
+    for (UI_Grid::const_iterator i = visibleGrid.begin(); i != visibleGrid.end(); i++)
+    {
+        const FileCompareLine& refLine = currentGridData[i->linkToCurrentGridData];
+
+        //calculate total number of bytes for each sied
+        if (refLine.fileDescrLeft.objType != IsNothing)
+        {
+            mpz_set_ui(tmpInt, 0);
+            returnValue = mpz_set_str(tmpInt, refLine.fileDescrLeft.fileSize.c_str(), 10);
+            mpz_add(filesizeLeftView, filesizeLeftView, tmpInt);
+            assert (returnValue == 0);
+
+            objectsOnLeftView++;
+        }
+
+        if (refLine.fileDescrRight.objType != IsNothing)
+        {
+            mpz_set_ui(tmpInt, 0);
+            returnValue = mpz_set_str(tmpInt, refLine.fileDescrRight.fileSize.c_str(), 10);
+            mpz_add(filesizeRightView, filesizeRightView, tmpInt);
+            assert (returnValue == 0);
+
+            objectsOnRightView++;
+        }
+    }
+
+    //show status information on "root" level. This cannot be accomplished in writeGrid since filesizes are already formatted for display there
+    wxString objectsViewLeft = numberToWxString(objectsOnLeftView);
+    GlobalFunctions::includeNumberSeparator(objectsViewLeft);
+    if (objectsOnLeftView == 1)
+        m_statusBar1->SetStatusText(wxString(_("1 item on left, ")) + FreeFileSync::formatFilesizeToShortString(mpz_class(filesizeLeftView)), 0);
+    else
+        m_statusBar1->SetStatusText(objectsViewLeft + _(" items on left, ") + FreeFileSync::formatFilesizeToShortString(mpz_class(filesizeLeftView)), 0);
+
+
+    wxString objectsTotal = numberToWxString(currentGridData.size());
+    GlobalFunctions::includeNumberSeparator(objectsTotal);
+    wxString objectsView = numberToWxString(visibleGrid.size());
+    GlobalFunctions::includeNumberSeparator(objectsView);
+    if (currentGridData.size() == 1)
+        m_statusBar1->SetStatusText(objectsView + _(" of ") + objectsTotal + _(" row in view"), 2);
+    else
+        m_statusBar1->SetStatusText(objectsView + _(" of ") + objectsTotal + _(" rows in view"), 2);
+
+
+    wxString objectsViewRight = numberToWxString(objectsOnRightView);
+    GlobalFunctions::includeNumberSeparator(objectsViewRight);
+    if (objectsOnRightView == 1)
+        m_statusBar1->SetStatusText(wxString(_("1 item on right, ")) + FreeFileSync::formatFilesizeToShortString(mpz_class(filesizeRightView)), 4);
+    else
+        m_statusBar1->SetStatusText(objectsViewRight + _(" items on right, ") + FreeFileSync::formatFilesizeToShortString(mpz_class(filesizeRightView)), 4);
+
+    //-----------------------------------------------------
+    mpz_clear(filesizeLeftView);
+    mpz_clear(filesizeRightView);
+    mpz_clear(tmpInt);
+}
+
+
+void MainDialog::mapFileModelToUI(UI_Grid& output, const FileCompareResult& fileCmpResult)
+{
+    output.clear();
 
     UI_GridLine gridline;
     unsigned int currentRow = 0;
@@ -1445,82 +1440,280 @@ void MainDialog::mapFileModelToUI(UI_Grid& output, const FileCompareResult& file
         if (hideFiltered && !i->selectedForSynchronization)
             continue;
 
-        gridline.leftFilename      = i->fileDescrLeft.relFilename.AfterLast('\\');
-        gridline.leftRelativePath  = i->fileDescrLeft.relFilename.BeforeLast('\\');
         if (i->fileDescrLeft.objType == IsDirectory)
+        {
+            gridline.leftFilename      = wxEmptyString;
+            gridline.leftRelativePath  = i->fileDescrLeft.relFilename;
             gridline.leftSize = _("<Directory>");
+        }
         else
+        {
+            gridline.leftFilename      = i->fileDescrLeft.relFilename.AfterLast('\\');
+            gridline.leftRelativePath  = i->fileDescrLeft.relFilename.BeforeLast('\\');
             gridline.leftSize      = GlobalFunctions::includeNumberSeparator(fileSize = i->fileDescrLeft.fileSize);
+        }
         gridline.leftDate          = i->fileDescrLeft.lastWriteTime;
 
         gridline.cmpResult         = evaluateCmpResult(i->cmpResult, i->selectedForSynchronization);
         gridline.linkToCurrentGridData = currentRow;
 
-        gridline.rightFilename     = i->fileDescrRight.relFilename.AfterLast('\\');
-        gridline.rightRelativePath = i->fileDescrRight.relFilename.BeforeLast('\\');
         if (i->fileDescrRight.objType == IsDirectory)
+        {
+            gridline.rightFilename     = wxEmptyString;
+            gridline.rightRelativePath = i->fileDescrRight.relFilename;
             gridline.rightSize = _("<Directory>");
+        }
         else
+        {
+            gridline.rightFilename     = i->fileDescrRight.relFilename.AfterLast('\\');
+            gridline.rightRelativePath = i->fileDescrRight.relFilename.BeforeLast('\\');
             gridline.rightSize      = GlobalFunctions::includeNumberSeparator(fileSize = i->fileDescrRight.fileSize);
+        }
         gridline.rightDate         = i->fileDescrRight.lastWriteTime;
 
         output.push_back(gridline);
-
-        //prepare status information
-        if (i->fileDescrLeft.objType != IsNothing)
-        {
-            mpz_set_ui(tmpInt, 0);
-            returnValue = mpz_set_str(tmpInt, i->fileDescrLeft.fileSize.c_str(), 10);
-            mpz_add(filesizeLeftView, filesizeLeftView, tmpInt);
-            assert (returnValue == 0);
-
-            objectsOnLeftView++;
-        }
-
-        if (i->fileDescrRight.objType != IsNothing)
-        {
-            mpz_set_ui(tmpInt, 0);
-            returnValue = mpz_set_str(tmpInt, i->fileDescrRight.fileSize.c_str(), 10);
-            mpz_add(filesizeRightView, filesizeRightView, tmpInt);
-            assert (returnValue == 0);
-
-            objectsOnRightView++;
-        }
     }
 
     //sorting is expensive: ca. 50% bigger runtime for large grids; unsorted doesn't look too bad, so it's disabled
     // sort(output.begin(), output.end(), cmpGridSmallerThan);
-
-
-    //show status information on "root" level. This cannot be accomplished in writeGrid since filesizes are already formatted for display there
-    wxString objectsViewLeft = numberToWxString(objectsOnLeftView);
-    GlobalFunctions::includeNumberSeparator(objectsViewLeft);
-    if (objectsOnLeftView != 1)
-        m_statusBar1->SetStatusText(objectsViewLeft + _(" items on left, ") + FreeFileSync::formatFilesizeToShortString(mpz_class(filesizeLeftView)), 0);
-    else
-        m_statusBar1->SetStatusText(wxString(_("1 item on left, ")) + FreeFileSync::formatFilesizeToShortString(mpz_class(filesizeLeftView)), 0);
-
-
-    wxString objectsTotal = numberToWxString(fileCmpResult.size());
-    GlobalFunctions::includeNumberSeparator(objectsTotal);
-    wxString objectsView = numberToWxString(output.size());
-    GlobalFunctions::includeNumberSeparator(objectsView);
-    if (fileCmpResult.size() != 1)
-        m_statusBar1->SetStatusText(objectsView + _(" of ") + objectsTotal + _(" rows in view"), 2);
-    else
-        m_statusBar1->SetStatusText(objectsView + _(" of ") + objectsTotal + _(" row in view"), 2);
-
-
-    wxString objectsViewRight = numberToWxString(objectsOnRightView);
-    GlobalFunctions::includeNumberSeparator(objectsViewRight);
-    if (objectsOnRightView != 1)
-        m_statusBar1->SetStatusText(objectsViewRight + _(" items on right, ") + FreeFileSync::formatFilesizeToShortString(mpz_class(filesizeRightView)), 4);
-    else
-        m_statusBar1->SetStatusText(wxString(_("1 item on right, ")) + FreeFileSync::formatFilesizeToShortString(mpz_class(filesizeRightView)), 4);
-
-    //-----------------------------------------------------
-    mpz_clear(filesizeLeftView);
-    mpz_clear(filesizeRightView);
-    mpz_clear(tmpInt);
 }
+//########################################################################################################
+
+
+void updateUI_Now()
+{
+    //process UI events and prevent application from "not responding"   -> NO performance issue!
+    while (wxTheApp->Pending())
+        wxTheApp->Dispatch();
+}
+
+
+bool updateUI_IsAllowed()
+{
+    static wxLongLong lastExec = 0;
+
+    wxLongLong newExec = wxGetLocalTimeMillis();
+
+    if (newExec - lastExec > 100)  //perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
+    {
+        lastExec = newExec;
+        return true;
+    }
+    return false;
+}
+
+//########################################################################################################
+
+
+CompareStatusUpdater::CompareStatusUpdater(MainDialog* dlg, wxStatusBar* mainWindowBar) :
+        mainDialog(dlg),
+        statusBar(mainWindowBar),
+        suppressUI_Errormessages(false),
+        numberOfScannedObjects(0)
+{
+    //prevent user input during "compare", do not disable maindialog since abort-button would also be disabled
+    //it's not nice, but works - even has the advantage that certain actions are still possible: exit, about..
+    mainDialog->m_radioBtnSizeDate->Disable();
+    mainDialog->m_radioBtnContent->Disable();
+    mainDialog->m_bpButtonFilter->Disable();
+    mainDialog->m_hyperlinkCfgFilter->Disable();
+    mainDialog->m_checkBoxHideFilt->Disable();
+    mainDialog->m_bpButtonSync->Disable();
+    mainDialog->m_dirPicker1->Disable();
+    mainDialog->m_dirPicker2->Disable();
+    mainDialog->m_bpButtonSwap->Disable();
+    mainDialog->m_bpButton20->Disable();
+    mainDialog->m_bpButton21->Disable();
+    mainDialog->m_bpButton22->Disable();
+    mainDialog->m_bpButton23->Disable();
+    mainDialog->m_bpButton24->Disable();
+    mainDialog->m_bpButton25->Disable();
+    mainDialog->m_panel1->Disable();
+    mainDialog->m_panel2->Disable();
+    mainDialog->m_panel3->Disable();
+
+    //show abort button
+    mainDialog->m_buttonAbort->Show(true);
+    mainDialog->m_bpButtonCompare->Show(false);
+    mainDialog->Layout();
+    mainDialog->Refresh();
+}
+
+CompareStatusUpdater::~CompareStatusUpdater()
+{
+    //reenable complete main dialog
+    mainDialog->m_radioBtnSizeDate->Enable();
+    mainDialog->m_radioBtnContent->Enable();
+    mainDialog->m_bpButtonFilter->Enable();
+    mainDialog->m_hyperlinkCfgFilter->Enable();
+    mainDialog->m_checkBoxHideFilt->Enable();
+    //mainDialog->m_bpButtonSync->Enable();  don't enable this one, this is up to OnCompare to handle its status
+    mainDialog->m_dirPicker1->Enable();
+    mainDialog->m_dirPicker2->Enable();
+    mainDialog->m_bpButtonSwap->Enable();
+    mainDialog->m_bpButton20->Enable();
+    mainDialog->m_bpButton21->Enable();
+    mainDialog->m_bpButton22->Enable();
+    mainDialog->m_bpButton23->Enable();
+    mainDialog->m_bpButton24->Enable();
+    mainDialog->m_bpButton25->Enable();
+    mainDialog->m_panel1->Enable();
+    mainDialog->m_panel2->Enable();
+    mainDialog->m_panel3->Enable();
+
+    if (abortionRequested)
+        mainDialog->m_statusBar1->SetStatusText(mainDialog->m_statusBar1->GetStatusText(2) + " - " + _("Aborted!"), 2);
+
+    mainDialog->m_buttonAbort->Show(false);
+    mainDialog->m_bpButtonCompare->Show(true);
+    mainDialog->Layout();
+    mainDialog->Refresh();
+}
+
+void CompareStatusUpdater::updateStatus(const wxString& text)
+{
+    //not relevant for "compare"; it's sufficient to display the number of scanned files/folders
+}
+
+inline
+void CompareStatusUpdater::updateProgressIndicator(double number)
+{
+    numberOfScannedObjects+= int(number);   //conversion is harmless, since number == 1 in case of "compare"
+}
+
+int CompareStatusUpdater::reportError(const wxString& text)
+{
+    if (suppressUI_Errormessages)
+        return StatusUpdater::Continue;
+
+    wxString errorMessage = text + _("\n\nContinue with next object, retry or abort comparison?");
+
+    ErrorDlg* errorDlg = new ErrorDlg(errorMessage, suppressUI_Errormessages);
+
+    int rv = errorDlg->ShowModal();
+    errorDlg->Destroy();
+
+    switch (rv)
+    {
+    case ErrorDlg::ContinueButtonPressed:
+        return StatusUpdater::Continue;
+    case ErrorDlg::RetryButtonPressed:
+        return StatusUpdater::Retry;
+    case ErrorDlg::AbortButtonPressed:
+    {
+        abortionRequested = true;
+        throw AbortThisProcess();
+    }
+    default:
+        assert (false);
+    }
+
+    return StatusUpdater::Continue; //dummy return value
+}
+
+
+inline
+void CompareStatusUpdater::triggerUI_Refresh()
+{
+    if (abortionRequested) throw AbortThisProcess();    //abort can be triggered by syncStatusFrame
+
+    if (updateUI_IsAllowed()) //test if specific time span between ui updates is over
+    {
+        statusBar->SetStatusText(wxString(_("Scanning files/folders: ")) + numberToWxString(numberOfScannedObjects), 2);
+        updateUI_Now();
+    }
+}
+//########################################################################################################
+
+
+SyncStatusUpdater::SyncStatusUpdater(wxWindow* dlg, double gaugeTotalElements) :
+        suppressUI_Errormessages(false)
+{
+    syncStatusFrame = new SyncStatus(this, gaugeTotalElements, dlg);
+    syncStatusFrame->Show();
+    updateUI_Now();
+}
+
+SyncStatusUpdater::~SyncStatusUpdater()
+{
+    if (abortionRequested)
+        syncStatusFrame->processHasFinished(_("Aborted!"));  //enable okay and close events
+    else
+        syncStatusFrame->processHasFinished(_("Completed"));
+
+    //print the results list
+    unsigned int failedItems = unhandledErrors.GetCount();
+    wxString result;
+    if (failedItems)
+    {
+        result = wxString(_("Warning: Synchronization failed for ")) + numberToWxString(failedItems) + _(" item(s):\n\n");
+        for (unsigned int j = 0; j < failedItems; ++j)
+            result+= unhandledErrors[j] + "\n";
+    }
+    syncStatusFrame->setStatusText_NoUpdate(result);
+    syncStatusFrame->updateStatusDialogNow();
+}
+
+
+inline
+void SyncStatusUpdater::updateStatus(const wxString& text)
+{
+    syncStatusFrame->setStatusText_NoUpdate(text);
+}
+
+
+inline
+void SyncStatusUpdater::updateProgressIndicator(double number)
+{
+    syncStatusFrame->incProgressIndicator_NoUpdate(number);
+}
+
+
+int SyncStatusUpdater::reportError(const wxString& text)
+{
+    if (suppressUI_Errormessages)
+    {
+        unhandledErrors.Add(text);
+        return StatusUpdater::Continue;
+    }
+
+    wxString errorMessage = text + _("\n\nContinue with next object, retry or abort synchronization?");
+
+    ErrorDlg* errorDlg = new ErrorDlg(errorMessage, suppressUI_Errormessages);
+
+    int rv = errorDlg->ShowModal();
+    errorDlg->Destroy();
+
+    switch (rv)
+    {
+    case ErrorDlg::ContinueButtonPressed:
+        unhandledErrors.Add(text);
+        return StatusUpdater::Continue;
+    case ErrorDlg::RetryButtonPressed:
+        return StatusUpdater::Retry;
+    case ErrorDlg::AbortButtonPressed:
+    {
+        unhandledErrors.Add(text);
+        abortionRequested = true;
+        throw AbortThisProcess();
+    }
+    default:
+        assert (false);
+    }
+
+    return StatusUpdater::Continue; //dummy return value
+}
+
+
+void SyncStatusUpdater::triggerUI_Refresh()
+{
+    if (abortionRequested)
+        throw AbortThisProcess();    //abort can be triggered by syncStatusFrame
+
+    if (updateUI_IsAllowed()) //test if specific time span between ui updates is over
+    {
+        syncStatusFrame->updateStatusDialogNow();
+    }
+}
+
 
