@@ -15,13 +15,13 @@
 #include <wx/wx.h>
 #endif //WX_PRECOMP
 
-#include "..\library\CustomGrid.h"
+#include "..\library\customGrid.h"
 
-#include "GUI_Generated.h"
+#include "guiGenerated.h"
 
 ///////////////////////////////////////////////////////////////////////////
 
-GUI_Generated::GUI_Generated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
+GuiGenerated::GuiGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
@@ -36,7 +36,8 @@ GUI_Generated::GUI_Generated( wxWindow* parent, wxWindowID id, const wxString& t
 	wxBoxSizer* bSizer30;
 	bSizer30 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_bpButtonCompare = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 190,37 ), wxBU_AUTODRAW|wxFULL_REPAINT_ON_RESIZE );
+	m_bpButtonCompare = new wxBitmapButton( this, wxID_OK, wxNullBitmap, wxDefaultPosition, wxSize( 190,37 ), wxBU_AUTODRAW|wxFULL_REPAINT_ON_RESIZE );
+	m_bpButtonCompare->SetDefault(); 
 	m_bpButtonCompare->SetToolTip( _("Compare both sides") );
 	
 	m_bpButtonCompare->SetToolTip( _("Compare both sides") );
@@ -284,6 +285,24 @@ GUI_Generated::GUI_Generated( wxWindow* parent, wxWindowID id, const wxString& t
 	
 	bSizer3->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	m_bpButton201 = new wxBitmapButton( m_panel4, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
+	m_bpButton201->SetToolTip( _("Save current configuration to file") );
+	
+	m_bpButton201->SetToolTip( _("Save current configuration to file") );
+	
+	bSizer3->Add( m_bpButton201, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxString m_choiceLoadChoices[] = { _("Load configuration...") };
+	int m_choiceLoadNChoices = sizeof( m_choiceLoadChoices ) / sizeof( wxString );
+	m_choiceLoad = new wxChoice( m_panel4, wxID_ANY, wxDefaultPosition, wxSize( 140,-1 ), m_choiceLoadNChoices, m_choiceLoadChoices, 0 );
+	m_choiceLoad->SetSelection( 0 );
+	m_choiceLoad->SetToolTip( _("Load configuration from file:\n     - use this choice box\n     - drag & drop config file to this window\n     - specify config file as first commandline parameter") );
+	
+	bSizer3->Add( m_choiceLoad, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	bSizer3->Add( 0, 0, 1, wxEXPAND, 5 );
+	
 	wxStaticBoxSizer* sbSizer31;
 	sbSizer31 = new wxStaticBoxSizer( new wxStaticBox( m_panel4, wxID_ANY, _("Filter view") ), wxHORIZONTAL );
 	
@@ -334,6 +353,12 @@ GUI_Generated::GUI_Generated( wxWindow* parent, wxWindowID id, const wxString& t
 	
 	bSizer3->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	
+	bSizer3->Add( 190, 0, 0, wxEXPAND, 5 );
+	
+	
+	bSizer3->Add( 0, 0, 1, wxEXPAND, 5 );
+	
 	m_bpButton10 = new wxBitmapButton( m_panel4, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 50,50 ), wxBU_AUTODRAW );
 	m_bpButton10->SetToolTip( _("Quit") );
 	
@@ -348,72 +373,82 @@ GUI_Generated::GUI_Generated( wxWindow* parent, wxWindowID id, const wxString& t
 	
 	this->SetSizer( bSizer1 );
 	this->Layout();
-	m_statusBar1 = this->CreateStatusBar( 5, wxST_SIZEGRIP, wxID_ANY );
+	m_statusBar1 = this->CreateStatusBar( 3, wxST_SIZEGRIP, wxID_ANY );
 	
 	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUI_Generated::OnClose ) );
-	m_bpButtonCompare->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnCompare ), NULL, this );
-	m_buttonAbort->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnAbortCompare ), NULL, this );
-	m_radioBtnSizeDate->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUI_Generated::OnChangeCompareVariant ), NULL, this );
-	m_radioBtnContent->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUI_Generated::OnChangeCompareVariant ), NULL, this );
-	m_bpButton14->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnShowHelpDialog ), NULL, this );
-	m_bpButtonFilter->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnFilterButton ), NULL, this );
-	m_hyperlinkCfgFilter->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( GUI_Generated::OnConfigureFilter ), NULL, this );
-	m_checkBoxHideFilt->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUI_Generated::OnHideFilteredButton ), NULL, this );
-	m_bpButtonSync->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnSync ), NULL, this );
-	m_directoryPanel1->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUI_Generated::OnEnterLeftDir ), NULL, this );
-	m_dirPicker1->Connect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( GUI_Generated::OnDirChangedPanel1 ), NULL, this );
-	m_grid1->Connect( wxEVT_GRID_CELL_LEFT_DCLICK, wxGridEventHandler( GUI_Generated::OnLeftGridDoubleClick ), NULL, this );
-	m_grid1->Connect( wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler( GUI_Generated::OnSortLeftGrid ), NULL, this );
-	m_bpButtonSwap->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnSwapDirs ), NULL, this );
-	m_grid3->Connect( wxEVT_GRID_RANGE_SELECT, wxGridRangeSelectEventHandler( GUI_Generated::OnGrid3SelectRange ), NULL, this );
-	m_grid3->Connect( wxEVT_GRID_SELECT_CELL, wxGridEventHandler( GUI_Generated::OnGrid3SelectCell ), NULL, this );
-	m_directoryPanel2->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUI_Generated::OnEnterRightDir ), NULL, this );
-	m_dirPicker2->Connect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( GUI_Generated::OnDirChangedPanel2 ), NULL, this );
-	m_grid2->Connect( wxEVT_GRID_CELL_LEFT_DCLICK, wxGridEventHandler( GUI_Generated::OnRightGridDoubleClick ), NULL, this );
-	m_grid2->Connect( wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler( GUI_Generated::OnSortRightGrid ), NULL, this );
-	m_bpButton11->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnAbout ), NULL, this );
-	m_bpButton20->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnLeftOnlyFiles ), NULL, this );
-	m_bpButton21->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnLeftNewerFiles ), NULL, this );
-	m_bpButton25->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnEqualFiles ), NULL, this );
-	m_bpButton22->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnDifferentFiles ), NULL, this );
-	m_bpButton23->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnRightNewerFiles ), NULL, this );
-	m_bpButton24->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnRightOnlyFiles ), NULL, this );
-	m_bpButton10->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnQuit ), NULL, this );
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GuiGenerated::OnClose ) );
+	m_bpButtonCompare->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnCompare ), NULL, this );
+	m_buttonAbort->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnAbortCompare ), NULL, this );
+	m_radioBtnSizeDate->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GuiGenerated::OnChangeCompareVariant ), NULL, this );
+	m_radioBtnContent->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GuiGenerated::OnChangeCompareVariant ), NULL, this );
+	m_bpButton14->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnShowHelpDialog ), NULL, this );
+	m_bpButtonFilter->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnFilterButton ), NULL, this );
+	m_hyperlinkCfgFilter->Connect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( GuiGenerated::OnConfigureFilter ), NULL, this );
+	m_checkBoxHideFilt->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GuiGenerated::OnHideFilteredButton ), NULL, this );
+	m_bpButtonSync->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnSync ), NULL, this );
+	m_directoryPanel1->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GuiGenerated::OnEnterLeftDir ), NULL, this );
+	m_dirPicker1->Connect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( GuiGenerated::OnDirChangedPanel1 ), NULL, this );
+	m_grid1->Connect( wxEVT_GRID_CELL_LEFT_DCLICK, wxGridEventHandler( GuiGenerated::OnLeftGridDoubleClick ), NULL, this );
+	m_grid1->Connect( wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler( GuiGenerated::OnSortLeftGrid ), NULL, this );
+	m_grid1->Connect( wxEVT_GRID_SELECT_CELL, wxGridEventHandler( GuiGenerated::OnGridSelectCell ), NULL, this );
+	m_bpButtonSwap->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnSwapDirs ), NULL, this );
+	m_grid3->Connect( wxEVT_GRID_RANGE_SELECT, wxGridRangeSelectEventHandler( GuiGenerated::OnGrid3SelectRange ), NULL, this );
+	m_grid3->Connect( wxEVT_GRID_SELECT_CELL, wxGridEventHandler( GuiGenerated::OnGridSelectCell ), NULL, this );
+	m_directoryPanel2->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GuiGenerated::OnEnterRightDir ), NULL, this );
+	m_dirPicker2->Connect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( GuiGenerated::OnDirChangedPanel2 ), NULL, this );
+	m_grid2->Connect( wxEVT_GRID_CELL_LEFT_DCLICK, wxGridEventHandler( GuiGenerated::OnRightGridDoubleClick ), NULL, this );
+	m_grid2->Connect( wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler( GuiGenerated::OnSortRightGrid ), NULL, this );
+	m_grid2->Connect( wxEVT_GRID_SELECT_CELL, wxGridEventHandler( GuiGenerated::OnGridSelectCell ), NULL, this );
+	m_bpButton11->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnAbout ), NULL, this );
+	m_bpButton201->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnSaveConfig ), NULL, this );
+	m_choiceLoad->Connect( wxEVT_CHAR, wxKeyEventHandler( GuiGenerated::OnChoiceKeyEvent ), NULL, this );
+	m_choiceLoad->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GuiGenerated::OnLoadConfiguration ), NULL, this );
+	m_bpButton20->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnLeftOnlyFiles ), NULL, this );
+	m_bpButton21->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnLeftNewerFiles ), NULL, this );
+	m_bpButton25->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnEqualFiles ), NULL, this );
+	m_bpButton22->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnDifferentFiles ), NULL, this );
+	m_bpButton23->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnRightNewerFiles ), NULL, this );
+	m_bpButton24->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnRightOnlyFiles ), NULL, this );
+	m_bpButton10->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnQuit ), NULL, this );
 }
 
-GUI_Generated::~GUI_Generated()
+GuiGenerated::~GuiGenerated()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GUI_Generated::OnClose ) );
-	m_bpButtonCompare->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnCompare ), NULL, this );
-	m_buttonAbort->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnAbortCompare ), NULL, this );
-	m_radioBtnSizeDate->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUI_Generated::OnChangeCompareVariant ), NULL, this );
-	m_radioBtnContent->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GUI_Generated::OnChangeCompareVariant ), NULL, this );
-	m_bpButton14->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnShowHelpDialog ), NULL, this );
-	m_bpButtonFilter->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnFilterButton ), NULL, this );
-	m_hyperlinkCfgFilter->Disconnect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( GUI_Generated::OnConfigureFilter ), NULL, this );
-	m_checkBoxHideFilt->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GUI_Generated::OnHideFilteredButton ), NULL, this );
-	m_bpButtonSync->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnSync ), NULL, this );
-	m_directoryPanel1->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUI_Generated::OnEnterLeftDir ), NULL, this );
-	m_dirPicker1->Disconnect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( GUI_Generated::OnDirChangedPanel1 ), NULL, this );
-	m_grid1->Disconnect( wxEVT_GRID_CELL_LEFT_DCLICK, wxGridEventHandler( GUI_Generated::OnLeftGridDoubleClick ), NULL, this );
-	m_grid1->Disconnect( wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler( GUI_Generated::OnSortLeftGrid ), NULL, this );
-	m_bpButtonSwap->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnSwapDirs ), NULL, this );
-	m_grid3->Disconnect( wxEVT_GRID_RANGE_SELECT, wxGridRangeSelectEventHandler( GUI_Generated::OnGrid3SelectRange ), NULL, this );
-	m_grid3->Disconnect( wxEVT_GRID_SELECT_CELL, wxGridEventHandler( GUI_Generated::OnGrid3SelectCell ), NULL, this );
-	m_directoryPanel2->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GUI_Generated::OnEnterRightDir ), NULL, this );
-	m_dirPicker2->Disconnect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( GUI_Generated::OnDirChangedPanel2 ), NULL, this );
-	m_grid2->Disconnect( wxEVT_GRID_CELL_LEFT_DCLICK, wxGridEventHandler( GUI_Generated::OnRightGridDoubleClick ), NULL, this );
-	m_grid2->Disconnect( wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler( GUI_Generated::OnSortRightGrid ), NULL, this );
-	m_bpButton11->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnAbout ), NULL, this );
-	m_bpButton20->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnLeftOnlyFiles ), NULL, this );
-	m_bpButton21->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnLeftNewerFiles ), NULL, this );
-	m_bpButton25->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnEqualFiles ), NULL, this );
-	m_bpButton22->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnDifferentFiles ), NULL, this );
-	m_bpButton23->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnRightNewerFiles ), NULL, this );
-	m_bpButton24->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnRightOnlyFiles ), NULL, this );
-	m_bpButton10->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GUI_Generated::OnQuit ), NULL, this );
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( GuiGenerated::OnClose ) );
+	m_bpButtonCompare->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnCompare ), NULL, this );
+	m_buttonAbort->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnAbortCompare ), NULL, this );
+	m_radioBtnSizeDate->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GuiGenerated::OnChangeCompareVariant ), NULL, this );
+	m_radioBtnContent->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( GuiGenerated::OnChangeCompareVariant ), NULL, this );
+	m_bpButton14->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnShowHelpDialog ), NULL, this );
+	m_bpButtonFilter->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnFilterButton ), NULL, this );
+	m_hyperlinkCfgFilter->Disconnect( wxEVT_COMMAND_HYPERLINK, wxHyperlinkEventHandler( GuiGenerated::OnConfigureFilter ), NULL, this );
+	m_checkBoxHideFilt->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( GuiGenerated::OnHideFilteredButton ), NULL, this );
+	m_bpButtonSync->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnSync ), NULL, this );
+	m_directoryPanel1->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GuiGenerated::OnEnterLeftDir ), NULL, this );
+	m_dirPicker1->Disconnect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( GuiGenerated::OnDirChangedPanel1 ), NULL, this );
+	m_grid1->Disconnect( wxEVT_GRID_CELL_LEFT_DCLICK, wxGridEventHandler( GuiGenerated::OnLeftGridDoubleClick ), NULL, this );
+	m_grid1->Disconnect( wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler( GuiGenerated::OnSortLeftGrid ), NULL, this );
+	m_grid1->Disconnect( wxEVT_GRID_SELECT_CELL, wxGridEventHandler( GuiGenerated::OnGridSelectCell ), NULL, this );
+	m_bpButtonSwap->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnSwapDirs ), NULL, this );
+	m_grid3->Disconnect( wxEVT_GRID_RANGE_SELECT, wxGridRangeSelectEventHandler( GuiGenerated::OnGrid3SelectRange ), NULL, this );
+	m_grid3->Disconnect( wxEVT_GRID_SELECT_CELL, wxGridEventHandler( GuiGenerated::OnGridSelectCell ), NULL, this );
+	m_directoryPanel2->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( GuiGenerated::OnEnterRightDir ), NULL, this );
+	m_dirPicker2->Disconnect( wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler( GuiGenerated::OnDirChangedPanel2 ), NULL, this );
+	m_grid2->Disconnect( wxEVT_GRID_CELL_LEFT_DCLICK, wxGridEventHandler( GuiGenerated::OnRightGridDoubleClick ), NULL, this );
+	m_grid2->Disconnect( wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler( GuiGenerated::OnSortRightGrid ), NULL, this );
+	m_grid2->Disconnect( wxEVT_GRID_SELECT_CELL, wxGridEventHandler( GuiGenerated::OnGridSelectCell ), NULL, this );
+	m_bpButton11->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnAbout ), NULL, this );
+	m_bpButton201->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnSaveConfig ), NULL, this );
+	m_choiceLoad->Disconnect( wxEVT_CHAR, wxKeyEventHandler( GuiGenerated::OnChoiceKeyEvent ), NULL, this );
+	m_choiceLoad->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GuiGenerated::OnLoadConfiguration ), NULL, this );
+	m_bpButton20->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnLeftOnlyFiles ), NULL, this );
+	m_bpButton21->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnLeftNewerFiles ), NULL, this );
+	m_bpButton25->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnEqualFiles ), NULL, this );
+	m_bpButton22->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnDifferentFiles ), NULL, this );
+	m_bpButton23->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnRightNewerFiles ), NULL, this );
+	m_bpButton24->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnRightOnlyFiles ), NULL, this );
+	m_bpButton10->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnQuit ), NULL, this );
 }
 
 SyncDialogGenerated::SyncDialogGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -438,7 +473,8 @@ SyncDialogGenerated::SyncDialogGenerated( wxWindow* parent, wxWindowID id, const
 	wxBoxSizer* bSizer201;
 	bSizer201 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_bpButton18 = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 140,58 ), wxBU_AUTODRAW );
+	m_bpButton18 = new wxBitmapButton( this, wxID_OK, wxNullBitmap, wxDefaultPosition, wxSize( 140,58 ), wxBU_AUTODRAW );
+	m_bpButton18->SetDefault(); 
 	m_bpButton18->SetToolTip( _("Start synchronizing files") );
 	
 	m_bpButton18->SetToolTip( _("Start synchronizing files") );
@@ -542,10 +578,13 @@ SyncDialogGenerated::SyncDialogGenerated( wxWindow* parent, wxWindowID id, const
 	wxBoxSizer* bSizer291;
 	bSizer291 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_button6 = new wxButton( this, wxID_ANY, _("Back"), wxDefaultPosition, wxSize( 100,32 ), 0 );
+	m_button6 = new wxButton( this, wxID_ANY, _("&Back"), wxDefaultPosition, wxSize( 100,32 ), 0 );
 	m_button6->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
 	
-	bSizer291->Add( m_button6, 0, wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer291->Add( m_button6, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxLEFT, 5 );
+	
+	m_button16 = new wxButton( this, wxID_CANCEL, _("dummyButton"), wxDefaultPosition, wxSize( 0,-1 ), 0 );
+	bSizer291->Add( m_button16, 0, wxALL, 5 );
 	
 	
 	bSizer291->Add( 82, 0, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
@@ -686,6 +725,7 @@ SyncDialogGenerated::SyncDialogGenerated( wxWindow* parent, wxWindowID id, const
 	m_buttonTwoWay->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncDialogGenerated::OnSyncBothSides ), NULL, this );
 	m_radioBtn3->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( SyncDialogGenerated::OnSyncCostum ), NULL, this );
 	m_button6->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncDialogGenerated::OnBack ), NULL, this );
+	m_button16->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncDialogGenerated::OnCancel ), NULL, this );
 	m_checkBoxUseRecycler->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SyncDialogGenerated::OnSelectRecycleBin ), NULL, this );
 	m_bpButton5->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncDialogGenerated::OnExLeftSideOnly ), NULL, this );
 	m_bpButton6->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncDialogGenerated::OnExRightSideOnly ), NULL, this );
@@ -705,6 +745,7 @@ SyncDialogGenerated::~SyncDialogGenerated()
 	m_buttonTwoWay->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncDialogGenerated::OnSyncBothSides ), NULL, this );
 	m_radioBtn3->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( SyncDialogGenerated::OnSyncCostum ), NULL, this );
 	m_button6->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncDialogGenerated::OnBack ), NULL, this );
+	m_button16->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncDialogGenerated::OnCancel ), NULL, this );
 	m_checkBoxUseRecycler->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SyncDialogGenerated::OnSelectRecycleBin ), NULL, this );
 	m_bpButton5->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncDialogGenerated::OnExLeftSideOnly ), NULL, this );
 	m_bpButton6->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncDialogGenerated::OnExRightSideOnly ), NULL, this );
@@ -737,7 +778,8 @@ HelpDlgGenerated::HelpDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	
 	bSizer20->Add( m_textCtrl8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
-	m_button8 = new wxButton( this, wxID_ANY, _("OK"), wxDefaultPosition, wxSize( 100,32 ), 0 );
+	m_button8 = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( 100,32 ), 0 );
+	m_button8->SetDefault(); 
 	m_button8->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
 	
 	bSizer20->Add( m_button8, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
@@ -767,7 +809,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	
 	bSizer31->Add( 0, 10, 0, wxEXPAND, 5 );
 	
-	m_staticText14 = new wxStaticText( this, wxID_ANY, _("FreeFileSync v1.2"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText14 = new wxStaticText( this, wxID_ANY, _("FreeFileSync v1.3"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText14->Wrap( -1 );
 	m_staticText14->SetFont( wxFont( 16, 74, 90, 92, false, wxT("Tahoma") ) );
 	
@@ -850,7 +892,8 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	
 	bSizer31->Add( fgSizer2, 0, wxEXPAND|wxLEFT, 10 );
 	
-	m_button8 = new wxButton( this, wxID_ANY, _("OK"), wxDefaultPosition, wxSize( 100,32 ), 0 );
+	m_button8 = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( 100,32 ), 0 );
+	m_button8->SetDefault(); 
 	m_button8->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
 	
 	bSizer31->Add( m_button8, 0, wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
@@ -868,6 +911,133 @@ AboutDlgGenerated::~AboutDlgGenerated()
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( AboutDlgGenerated::OnClose ) );
 	m_button8->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AboutDlgGenerated::OnOK ), NULL, this );
+}
+
+ErrorDlgGenerated::ErrorDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer24;
+	bSizer24 = new wxBoxSizer( wxVERTICAL );
+	
+	
+	bSizer24->Add( 0, 10, 0, wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer26;
+	bSizer26 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_bitmap10 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 48,48 ), 0 );
+	bSizer26->Add( m_bitmap10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY );
+	m_textCtrl8->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
+	
+	bSizer26->Add( m_textCtrl8, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	
+	bSizer24->Add( bSizer26, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	
+	
+	bSizer24->Add( 0, 10, 0, wxEXPAND, 5 );
+	
+	m_checkBoxSuppress = new wxCheckBox( this, wxID_ANY, _("Hide further messages during current process"), wxDefaultPosition, wxDefaultSize, 0 );
+	
+	bSizer24->Add( m_checkBoxSuppress, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	bSizer24->Add( 0, 10, 0, wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer25;
+	bSizer25 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_buttonContinue = new wxButton( this, wxID_OK, _("&Continue"), wxDefaultPosition, wxSize( 80,30 ), 0 );
+	m_buttonContinue->SetDefault(); 
+	m_buttonContinue->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
+	
+	bSizer25->Add( m_buttonContinue, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
+	
+	m_buttonRetry = new wxButton( this, wxID_ANY, _("&Retry"), wxDefaultPosition, wxSize( 80,30 ), 0 );
+	m_buttonRetry->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
+	
+	bSizer25->Add( m_buttonRetry, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
+	
+	m_buttonAbort = new wxButton( this, wxID_CANCEL, _("&Abort"), wxDefaultPosition, wxSize( 80,30 ), 0 );
+	m_buttonAbort->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
+	
+	bSizer25->Add( m_buttonAbort, 0, wxALL, 5 );
+	
+	bSizer24->Add( bSizer25, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	this->SetSizer( bSizer24 );
+	this->Layout();
+	
+	// Connect Events
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( ErrorDlgGenerated::OnClose ) );
+	m_buttonContinue->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnContinue ), NULL, this );
+	m_buttonRetry->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnRetry ), NULL, this );
+	m_buttonAbort->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnAbort ), NULL, this );
+}
+
+ErrorDlgGenerated::~ErrorDlgGenerated()
+{
+	// Disconnect Events
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( ErrorDlgGenerated::OnClose ) );
+	m_buttonContinue->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnContinue ), NULL, this );
+	m_buttonRetry->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnRetry ), NULL, this );
+	m_buttonAbort->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnAbort ), NULL, this );
+}
+
+DeleteDialogGenerated::DeleteDialogGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer24;
+	bSizer24 = new wxBoxSizer( wxVERTICAL );
+	
+	
+	bSizer24->Add( 0, 10, 0, wxEXPAND, 5 );
+	
+	m_staticTextHeader = new wxStaticText( this, wxID_ANY, _("Dummy text"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextHeader->Wrap( -1 );
+	m_staticTextHeader->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
+	
+	bSizer24->Add( m_staticTextHeader, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_textCtrlMessage = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY );
+	m_textCtrlMessage->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
+	
+	bSizer24->Add( m_textCtrlMessage, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
+	wxBoxSizer* bSizer25;
+	bSizer25 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_buttonOK = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( 80,30 ), 0 );
+	m_buttonOK->SetDefault(); 
+	m_buttonOK->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
+	
+	bSizer25->Add( m_buttonOK, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
+	
+	m_buttonCancel = new wxButton( this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxSize( 80,30 ), 0 );
+	m_buttonCancel->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
+	
+	bSizer25->Add( m_buttonCancel, 0, wxALL, 5 );
+	
+	bSizer24->Add( bSizer25, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	this->SetSizer( bSizer24 );
+	this->Layout();
+	
+	// Connect Events
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( DeleteDialogGenerated::OnClose ) );
+	m_buttonOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DeleteDialogGenerated::OnOK ), NULL, this );
+	m_buttonCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DeleteDialogGenerated::OnCancel ), NULL, this );
+}
+
+DeleteDialogGenerated::~DeleteDialogGenerated()
+{
+	// Disconnect Events
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( DeleteDialogGenerated::OnClose ) );
+	m_buttonOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DeleteDialogGenerated::OnOK ), NULL, this );
+	m_buttonCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DeleteDialogGenerated::OnCancel ), NULL, this );
 }
 
 FilterDlgGenerated::FilterDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -945,7 +1115,7 @@ FilterDlgGenerated::FilterDlgGenerated( wxWindow* parent, wxWindowID id, const w
 	wxBoxSizer* bSizer22;
 	bSizer22 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_button9 = new wxButton( this, wxID_ANY, _("Default"), wxDefaultPosition, wxSize( 80,30 ), 0 );
+	m_button9 = new wxButton( this, wxID_ANY, _("&Default"), wxDefaultPosition, wxSize( 80,30 ), 0 );
 	m_button9->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
 	
 	bSizer22->Add( m_button9, 0, wxALL, 5 );
@@ -953,7 +1123,10 @@ FilterDlgGenerated::FilterDlgGenerated( wxWindow* parent, wxWindowID id, const w
 	
 	bSizer22->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_button10 = new wxButton( this, wxID_ANY, _("OK"), wxDefaultPosition, wxSize( 80,30 ), 0 );
+	m_button17 = new wxButton( this, wxID_CANCEL, _("dummyButton"), wxDefaultPosition, wxSize( 0,-1 ), 0 );
+	bSizer22->Add( m_button17, 0, wxALL, 5 );
+	
+	m_button10 = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( 80,30 ), 0 );
 	m_button10->SetDefault(); 
 	m_button10->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
 	
@@ -967,6 +1140,7 @@ FilterDlgGenerated::FilterDlgGenerated( wxWindow* parent, wxWindowID id, const w
 	// Connect Events
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( FilterDlgGenerated::OnClose ) );
 	m_button9->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlgGenerated::OnDefault ), NULL, this );
+	m_button17->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlgGenerated::OnCancel ), NULL, this );
 	m_button10->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlgGenerated::OnOK ), NULL, this );
 }
 
@@ -975,79 +1149,8 @@ FilterDlgGenerated::~FilterDlgGenerated()
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( FilterDlgGenerated::OnClose ) );
 	m_button9->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlgGenerated::OnDefault ), NULL, this );
+	m_button17->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlgGenerated::OnCancel ), NULL, this );
 	m_button10->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlgGenerated::OnOK ), NULL, this );
-}
-
-ErrorDlgGenerated::ErrorDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
-{
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	
-	wxBoxSizer* bSizer24;
-	bSizer24 = new wxBoxSizer( wxVERTICAL );
-	
-	
-	bSizer24->Add( 0, 0, 1, wxEXPAND, 5 );
-	
-	wxBoxSizer* bSizer26;
-	bSizer26 = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_bitmap10 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 48,48 ), 0 );
-	bSizer26->Add( m_bitmap10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 320,140 ), wxTE_MULTILINE|wxTE_READONLY );
-	m_textCtrl8->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
-	
-	bSizer26->Add( m_textCtrl8, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
-	
-	bSizer24->Add( bSizer26, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	
-	bSizer24->Add( 0, 0, 1, wxEXPAND, 5 );
-	
-	m_checkBoxSuppress = new wxCheckBox( this, wxID_ANY, _("Hide further messages during current process"), wxDefaultPosition, wxDefaultSize, 0 );
-	
-	bSizer24->Add( m_checkBoxSuppress, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	
-	bSizer24->Add( 0, 10, 0, wxEXPAND, 5 );
-	
-	wxBoxSizer* bSizer25;
-	bSizer25 = new wxBoxSizer( wxHORIZONTAL );
-	
-	m_buttonContinue = new wxButton( this, wxID_ANY, _("Continue"), wxDefaultPosition, wxSize( 80,30 ), 0 );
-	m_buttonContinue->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
-	
-	bSizer25->Add( m_buttonContinue, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
-	
-	m_buttonRetry = new wxButton( this, wxID_ANY, _("Retry"), wxDefaultPosition, wxSize( 80,30 ), 0 );
-	m_buttonRetry->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
-	
-	bSizer25->Add( m_buttonRetry, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
-	
-	m_buttonAbort = new wxButton( this, wxID_ANY, _("Abort"), wxDefaultPosition, wxSize( 80,30 ), 0 );
-	m_buttonAbort->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
-	
-	bSizer25->Add( m_buttonAbort, 0, wxALL, 5 );
-	
-	bSizer24->Add( bSizer25, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	this->SetSizer( bSizer24 );
-	this->Layout();
-	
-	// Connect Events
-	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( ErrorDlgGenerated::OnClose ) );
-	m_buttonContinue->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnContinue ), NULL, this );
-	m_buttonRetry->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnRetry ), NULL, this );
-	m_buttonAbort->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnAbort ), NULL, this );
-}
-
-ErrorDlgGenerated::~ErrorDlgGenerated()
-{
-	// Disconnect Events
-	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( ErrorDlgGenerated::OnClose ) );
-	m_buttonContinue->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnContinue ), NULL, this );
-	m_buttonRetry->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnRetry ), NULL, this );
-	m_buttonAbort->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnAbort ), NULL, this );
 }
 
 SyncStatusGenerated::SyncStatusGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -1118,36 +1221,25 @@ SyncStatusGenerated::SyncStatusGenerated( wxWindow* parent, wxWindowID id, const
 	
 	bSizer32->Add( m_staticText26, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
 	
-	m_staticTextBytesCurrent = new wxStaticText( this, wxID_ANY, _("10,0 MB"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextBytesCurrent->Wrap( -1 );
-	m_staticTextBytesCurrent->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
+	m_staticTextBytesCopied = new wxStaticText( this, wxID_ANY, _("--,- MB"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextBytesCopied->Wrap( -1 );
+	m_staticTextBytesCopied->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
 	
-	bSizer32->Add( m_staticTextBytesCurrent, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
-	
-	m_staticText30 = new wxStaticText( this, wxID_ANY, _("/"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText30->Wrap( -1 );
-	m_staticText30->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
-	
-	bSizer32->Add( m_staticText30, 0, wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_staticTextBytesTotal = new wxStaticText( this, wxID_ANY, _("10,0 MB"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextBytesTotal->Wrap( -1 );
-	m_staticTextBytesTotal->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
-	
-	bSizer32->Add( m_staticTextBytesTotal, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxRIGHT, 5 );
+	bSizer32->Add( m_staticTextBytesCopied, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
 	
 	bSizer28->Add( bSizer32, 1, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
 	bSizer28->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_buttonOK = new wxButton( this, wxID_ANY, _("OK"), wxDefaultPosition, wxSize( 100,32 ), 0 );
+	m_buttonOK = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( 100,32 ), 0 );
 	m_buttonOK->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
 	m_buttonOK->Hide();
 	
 	bSizer28->Add( m_buttonOK, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_buttonAbort = new wxButton( this, wxID_ANY, _("Abort"), wxDefaultPosition, wxSize( 100,32 ), 0 );
+	m_buttonAbort = new wxButton( this, wxID_CANCEL, _("Abort"), wxDefaultPosition, wxSize( 100,32 ), 0 );
+	m_buttonAbort->SetDefault(); 
 	m_buttonAbort->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
 	
 	bSizer28->Add( m_buttonAbort, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );

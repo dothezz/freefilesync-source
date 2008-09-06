@@ -7,13 +7,13 @@
  * License:
  **************************************************************/
 
-#include "MainDialog.h"
+#include "mainDialog.h"
 #include <wx/filename.h>
 #include <stdexcept> //for std::runtime_error
-#include "..\library\globalfunctions.h"
+#include "../library/globalFunctions.h"
 #include <fstream>
 #include <wx/clipbrd.h>
-#include "..\library\CustomGrid.h"
+#include "../library/customGrid.h"
 #include <cmath>
 #include <wx/msgdlg.h>
 
@@ -21,17 +21,19 @@ using namespace GlobalFunctions;
 
 int leadingPanel = 0;
 
-MainDialog::MainDialog(wxFrame* frame) :
-        GUI_Generated(frame),
+MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName) :
+        GuiGenerated(frame),
         parent(frame),
-        selectedRangeBegin(0),
-        selectedRangeEnd(0),
+        stackObjects(0),
+        selectedRange3Begin(0),
+        selectedRange3End(0),
         selectionLead(0),
+        filteringInitialized(false),
         filteringPending(false),
         cmpStatusUpdaterTmp(0)
 {
     //initialize sync configuration
-    readConfigurationFromHD("config.dat");
+    readConfigurationFromHD(cfgFileName, true);
 
     //set icons for this dialog
     m_bpButton11->SetBitmapLabel(*GlobalResources::bitmapAbout);
@@ -41,15 +43,16 @@ MainDialog::MainDialog(wxFrame* frame) :
     m_bpButtonSync->SetBitmapDisabled(*GlobalResources::bitmapSyncDisabled);
     m_bpButtonSwap->SetBitmapLabel(*GlobalResources::bitmapSwap);
     m_bpButton14->SetBitmapLabel(*GlobalResources::bitmapHelp);
+    m_bpButton201->SetBitmapLabel(*GlobalResources::bitmapSave);
 
-    m_panel1->DragAcceptFiles(true);
-    m_panel2->DragAcceptFiles(true);
-    m_panel1->Connect(wxEVT_DROP_FILES, wxDropFilesEventHandler(MainDialog::onFilesDroppedPanel1), NULL, this);
-    m_panel2->Connect(wxEVT_DROP_FILES, wxDropFilesEventHandler(MainDialog::onFilesDroppedPanel2), NULL, this);
+    //prepare drag & drop
+    m_panel1->SetDropTarget(new FileDropEvent(this, 1));
+    m_panel2->SetDropTarget(new FileDropEvent(this, 2));
 
-    //support for CTRL + C
+    //support for CTRL + C and DEL
     m_grid1->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onGrid1ButtonEvent), NULL, this);
     m_grid2->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onGrid2ButtonEvent), NULL, this);
+    m_grid3->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onGrid3ButtonEvent), NULL, this);
 
     //identify leading grid by keyboard input or scroll action
     m_grid1->Connect(wxEVT_KEY_DOWN,               wxEventHandler(MainDialog::onGrid1access), NULL, this);
@@ -81,8 +84,12 @@ MainDialog::MainDialog(wxFrame* frame) :
     m_grid3->Connect(wxEVT_SCROLLWIN_LINEDOWN,     wxEventHandler(MainDialog::onGrid3access), NULL, this);
     m_grid3->GetGridWindow()->Connect(wxEVT_LEFT_DOWN, wxEventHandler(MainDialog::onGrid3access), NULL, this);
 
-    m_grid3->GetGridWindow()->Connect(wxEVT_IDLE, wxEventHandler(MainDialog::OnIdleToFilterManually), NULL, this);
+    m_grid3->GetGridWindow()->Connect(wxEVT_IDLE, wxEventHandler(MainDialog::OnIdleEvent), NULL, this);
     m_grid3->GetGridWindow()->Connect(wxEVT_LEFT_UP, wxEventHandler(MainDialog::OnGrid3LeftMouseUp), NULL, this);
+    m_grid3->GetGridWindow()->Connect(wxEVT_LEFT_DOWN, wxEventHandler(MainDialog::OnGrid3LeftMouseDown), NULL, this);
+
+    Connect(wxEVT_SIZE, wxEventHandler(MainDialog::onResizeMainWindow), NULL, this);
+    Connect(wxEVT_MOVE, wxEventHandler(MainDialog::onResizeMainWindow), NULL, this);
 
     wxString toolTip = wxString(_("Legend\n")) +
                        _("---------\n") +
@@ -108,7 +115,7 @@ MainDialog::MainDialog(wxFrame* frame) :
     updateViewFilterButtons();
 
     //disable sync button as long as "compare" hasn't been triggered.
-    m_bpButtonSync->Enable(false);
+    m_bpButtonSync->Disable();
 
     //make filesize right justified on grids
     wxGridCellAttr* cellAttributes = m_grid1->GetOrCreateCellAttr(0, 2);
@@ -129,6 +136,18 @@ MainDialog::MainDialog(wxFrame* frame) :
 
     //mainly to update row label sizes...
     writeGrid(currentGridData);
+
+    //load list of last used configuration files
+    cfgFileHistory = new wxConfig("FreeFileSync");
+    for (int i = CfgHistroyLength - 1; i >= 0; --i) //put files in reverse order to history
+    {
+        const wxString key = "Selection" + numberToWxString(i);
+
+        wxString value;
+        if (cfgFileHistory->Read(key, &value))
+            addCfgFileToHistory(value);
+    }
+    m_choiceLoad->SetSelection(0);
 }
 
 
@@ -143,9 +162,7 @@ MainDialog::~MainDialog()
 
     m_grid1->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onGrid1ButtonEvent), NULL, this);
     m_grid2->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onGrid2ButtonEvent), NULL, this);
-
-    m_panel1->Disconnect(wxEVT_DROP_FILES, wxDropFilesEventHandler(MainDialog::onFilesDroppedPanel1), NULL, this);
-    m_panel2->Disconnect(wxEVT_DROP_FILES, wxDropFilesEventHandler(MainDialog::onFilesDroppedPanel2), NULL, this);
+    m_grid3->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onGrid3ButtonEvent), NULL, this);
 
     m_grid1->Disconnect(wxEVT_KEY_DOWN,               wxEventHandler(MainDialog::onGrid1access), NULL, this);
     m_grid1->Disconnect(wxEVT_SCROLLWIN_TOP,          wxEventHandler(MainDialog::onGrid1access), NULL, this);
@@ -176,12 +193,32 @@ MainDialog::~MainDialog()
     m_grid3->Disconnect(wxEVT_SCROLLWIN_LINEDOWN,     wxEventHandler(MainDialog::onGrid3access), NULL, this);
     m_grid3->GetGridWindow()->Disconnect(wxEVT_LEFT_DOWN, wxEventHandler(MainDialog::onGrid3access), NULL, this);
 
-    m_grid3->GetGridWindow()->Disconnect(wxEVT_IDLE, wxEventHandler(MainDialog::OnIdleToFilterManually), NULL, this);
+    m_grid3->GetGridWindow()->Disconnect(wxEVT_IDLE, wxEventHandler(MainDialog::OnIdleEvent), NULL, this);
     m_grid3->GetGridWindow()->Disconnect(wxEVT_LEFT_UP, wxEventHandler(MainDialog::OnGrid3LeftMouseUp), NULL, this);
+    m_grid3->GetGridWindow()->Disconnect(wxEVT_LEFT_DOWN, wxEventHandler(MainDialog::OnGrid3LeftMouseDown), NULL, this);
+
+    Disconnect(wxEVT_SIZE, wxEventHandler(MainDialog::onResizeMainWindow), NULL, this);
+    Disconnect(wxEVT_MOVE, wxEventHandler(MainDialog::onResizeMainWindow), NULL, this);
+
+    //write list of last used configuration files
+    int vectorSize = cfgFileNames.size();
+    for (int i = 0; i < CfgHistroyLength; ++i)
+    {
+        const wxString key = "Selection" + numberToWxString(i);
+
+        if (i < vectorSize)
+            cfgFileHistory->Write(key, cfgFileNames[i]);
+        else
+        {
+            if (cfgFileHistory->Exists(key))
+                cfgFileHistory->DeleteEntry(key);
+        }
+    }
+    delete cfgFileHistory;
 
     try
     {
-        writeConfigurationToHD("config.dat");   //don't trow exceptions in destructors
+        writeConfigurationToHD(FreeFileSync::FFS_LastConfigFile);   //don't trow exceptions in destructors
     }
     catch (std::runtime_error& theException)
     {
@@ -237,26 +274,46 @@ void MainDialog::filterRangeManual(int begin, int end, int leadingRow)
 
     if (topRow <= bottomRow) // bottomRow might be -1 ?
     {
+
         bool newSelection = false;   //default: deselect range
 
-        //lastSelected Row should be set in OnDeselectRow()
-        if (leadingRow < currentUI_Size)
+        //leadingRow should be set in OnGridSelectCell()
+        if (0 <= leadingRow && leadingRow < currentUI_Size)
             newSelection = !currentGridData[currentUI_View[leadingRow].linkToCurrentGridData].selectedForSynchronization;
 
         if (hideFiltered)
             assert (!newSelection); //if hidefiltered is active, there should be no filtered elements on screen => current element was filtered out
 
-        for (int i = topRow; i <= bottomRow; ++ i)
+
+        //get all lines that need to be filtered (e.g. if a folder is marked, then its subelements should be marked as well)
+        set<int> rowsToFilterOnGridData;    //rows to filter in backend
+        for (int i = topRow; i <= bottomRow; ++i)
         {
-            bool& currentSelection = currentGridData[currentUI_View[i].linkToCurrentGridData].selectedForSynchronization;
-            CompareFilesResult currentCmpResult = currentGridData[currentUI_View[i].linkToCurrentGridData].cmpResult;
+            unsigned int gridDataLine = currentUI_View[i].linkToCurrentGridData;
 
-            //toggle selection of current row
-            currentSelection = newSelection;
-
-            //update currentUI_View, in case of sorting without refresh (mapping of griddata to ui model)
-            currentUI_View[i].cmpResult = evaluateCmpResult(currentCmpResult, currentSelection);
+            rowsToFilterOnGridData.insert(gridDataLine);
+            FreeFileSync::addSubElements(rowsToFilterOnGridData, currentGridData, currentGridData[gridDataLine]);
         }
+
+
+        //toggle selection of filtered rows
+        for (set<int>::iterator i = rowsToFilterOnGridData.begin(); i != rowsToFilterOnGridData.end(); ++i)
+            currentGridData[*i].selectedForSynchronization = newSelection;
+
+
+        set<int> filteredOutRowsOnUI; //determine rows that are currently filtered out on current UI view
+
+        //update currentUI_View
+        for (UI_Grid::iterator i = currentUI_View.begin(); i != currentUI_View.end(); ++i)
+        {
+            const FileCompareLine& gridLine = currentGridData[i->linkToCurrentGridData];
+
+            i->cmpResult = evaluateCmpResult(gridLine.cmpResult, gridLine.selectedForSynchronization);
+
+            if (!gridLine.selectedForSynchronization)
+                filteredOutRowsOnUI.insert(i - currentUI_View.begin());
+        }
+
 
         //signal UI that grids need to be refreshed on next Update()
         m_grid1->ForceRefresh();
@@ -270,9 +327,39 @@ void MainDialog::filterRangeManual(int begin, int end, int leadingRow)
             wxMilliSleep(400);
 
             //delete rows, that are filtered out:
-            currentUI_View.erase(currentUI_View.begin() + topRow, currentUI_View.begin() + bottomRow + 1);
 
-            //redraw grid neccessary to update new dimensions
+            //for (set<int>::reverse_iterator i = filteredOutRowsOnUI.rbegin(); i != filteredOutRowsOnUI.rend(); ++i)
+            //  currentUI_View.erase(currentUI_View.begin() + *i);
+
+            //Note: the following lines are a performance optimization for deleting elements from a vector. It is incredibly faster to create a new
+            //vector and leave specific elements out than to delete row by row and force recopying of most elements for each single deletion (linear vs quadratic runtime)
+
+            //Note: This is the most time consuming part in this whole method!
+
+            UI_Grid temp;
+            int rowNr = 0;
+            int rowToSkip = -1;
+
+            set<int>::iterator rowToSkipIndex = filteredOutRowsOnUI.begin();
+
+            if (rowToSkipIndex != filteredOutRowsOnUI.end())
+                rowToSkip = *rowToSkipIndex;
+
+            for (UI_Grid::iterator i = currentUI_View.begin(); i != currentUI_View.end(); ++i, ++rowNr)
+            {
+                if (rowNr != rowToSkip)
+                    temp.push_back(*i);
+                else
+                {
+                    rowToSkipIndex++;
+                    if (rowToSkipIndex != filteredOutRowsOnUI.end())
+                        rowToSkip = *rowToSkipIndex;
+                }
+            }
+            currentUI_View.swap(temp);
+
+
+            //redraw grid necessary to update new dimensions
             writeGrid(currentGridData, true);        //use UI buffer, no mapping from currentGridData to UI model again, just a re-dimensioning of grids
             updateStatusInformation(currentUI_View); //status information has to be recalculated!
         }
@@ -282,7 +369,7 @@ void MainDialog::filterRangeManual(int begin, int end, int leadingRow)
 }
 
 /*grid event choreography:
-1. UI-Mouse-Down => OnGrid3SelectCell
+1. UI-Mouse-Down => OnGridSelectCell
 2. UI-Mouse-Up   => OnGrid3SelectRange (if at least two rows are marked)
 
 => the decision if a range or a single cell is selected can be made only after Mouse-UP. But OnGrid3SelectRange unfortunately is not always
@@ -290,17 +377,25 @@ executed (e.g. if single cell selected)
 
 => new choreography:
 
-1. UI-Mouse-Down => OnGrid3SelectCell
+1. UI-Mouse-Down => OnGridSelectCell    -> set leading row
 2. UI-Mouse-Up   => OnGrid3LeftMouseUp (notify that filtering shall be started on next idle event
 3. UI-Mouse-Up   => OnGrid3SelectRange, possibly
-4. Idle event    => OnIdleToFilterManually
+4. Idle event    => OnIdleEvent
 
     It's !crazy! but it works!
 */
 
-void MainDialog::OnGrid3SelectCell(wxGridEvent& event)
+void MainDialog::OnGridSelectCell(wxGridEvent& event)
 {
-    selectionLead = selectedRangeBegin = selectedRangeEnd = event.GetRow();
+    selectionLead = selectedRange3Begin = selectedRange3End = event.GetRow();
+    event.Skip();
+}
+
+
+void MainDialog::OnGrid3LeftMouseDown(wxEvent& event)
+{
+
+    filteringInitialized = true;
     event.Skip();
 }
 
@@ -314,22 +409,45 @@ void MainDialog::OnGrid3LeftMouseUp(wxEvent& event)
 
 void MainDialog::OnGrid3SelectRange(wxGridRangeSelectEvent& event)
 {
-    if (event.Selecting())
+    if (event.Selecting())  //this range event should only be processed on release left mouse button
     {
-        selectedRangeBegin = event.GetTopRow();
-        selectedRangeEnd   = event.GetBottomRow();
+        selectedRange3Begin = event.GetTopRow();
+        selectedRange3End   = event.GetBottomRow();
     }
     event.Skip();
 }
 
 
-void MainDialog::OnIdleToFilterManually(wxEvent& event)
+void MainDialog::OnIdleEvent(wxEvent& event)
 {
+    //process manually filtered rows
     if (filteringPending)
     {
         filteringPending = false;
-        filterRangeManual(selectedRangeBegin, selectedRangeEnd, selectionLead);
+
+        if (filteringInitialized) //filteringInitialized is being reset after each selection, since strangely it might happen, that the grid receives
+        {                         //a mouse up event, but no mouse down! (e.g. when window is maximized and cursor is on grid3)
+            filteringInitialized = false;
+
+            filterRangeManual(selectedRange3Begin, selectedRange3End, selectionLead);
+        }
     }
+
+    //------------------------------------------------------------------------------
+
+    //small routine to restore status information after some time
+    if (stackObjects > 0 )  //check if there is some work to do
+    {
+        wxLongLong currentTime = wxGetLocalTimeMillis();
+        if (currentTime - lastStatusChange > 3000) //restore stackObject after three seconds
+        {
+            lastStatusChange = currentTime;
+
+            stackObjects--;
+            m_statusBar1->PopStatusText(1);
+        }
+    }
+
     event.Skip();
 }
 
@@ -416,12 +534,229 @@ void copySelectionToClipboard(wxGrid* grid)
 }
 
 
+set<int> getSelectedRows(wxGrid* grid)
+{
+    set<int> output;
+    int rowTop, rowBottom; //coords of selection
+
+    wxArrayInt selectedRows = grid->GetSelectedRows();
+    if (!selectedRows.IsEmpty())
+    {
+        for (unsigned int i = 0; i < selectedRows.GetCount(); ++i)
+            output.insert(selectedRows[i]);
+    }
+
+    if (!grid->GetSelectedCols().IsEmpty())    //if a column is selected this is means all rows are marked for deletion
+    {
+        for (int k = 0; k < grid->GetNumberRows(); ++k)
+            output.insert(k);
+    }
+
+    wxGridCellCoordsArray singlySelected = grid->GetSelectedCells();
+    if (!singlySelected.IsEmpty())
+    {
+        for (unsigned int k = 0; k < singlySelected.GetCount(); ++k)
+            output.insert(singlySelected[k].GetRow());
+    }
+
+    wxGridCellCoordsArray tmpArrayTop = grid->GetSelectionBlockTopLeft();
+    if (!tmpArrayTop.IsEmpty())
+    {
+        wxGridCellCoordsArray tmpArrayBottom = grid->GetSelectionBlockBottomRight();
+
+        unsigned int arrayCount = tmpArrayTop.GetCount();
+
+        if (arrayCount == tmpArrayBottom.GetCount())
+        {
+            for (unsigned int i = 0; i < arrayCount; ++i)
+            {
+                rowTop    = tmpArrayTop[i].GetRow();
+                rowBottom = tmpArrayBottom[i].GetRow();
+
+                for (int k = rowTop; k <= rowBottom; ++k)
+                    output.insert(k);
+            }
+        }
+    }
+
+    return output;
+}
+
+
+void removeInvalidRows(set<int>& rows, const int currentUI_Size)
+{
+    set<int> validRows; //temporal table IS needed here
+    for (set<int>::iterator i = rows.begin(); i != rows.end(); ++i)
+        if (0 <= *i)
+        {
+            if (*i >= currentUI_Size)   //set is sorted, so no need to continue here
+                break;
+            validRows.insert(*i);
+        }
+    rows = validRows;
+}
+
+
+class DeleteStatusUpdater : public StatusUpdater
+{
+public:
+    DeleteStatusUpdater(bool& unsolvedErrorOccured) : suppressUI_Errormessages(false), unsolvedErrors(unsolvedErrorOccured) {}
+    ~DeleteStatusUpdater() {}
+
+    int reportError(const wxString& text)
+    {
+        if (suppressUI_Errormessages)
+        {
+            unsolvedErrors = true;
+            return StatusUpdater::Continue;
+        }
+
+        wxString errorMessage = text + _("\n\nInformation: If you skip the error and continue or abort a re-compare will be necessary!");
+
+        ErrorDlg* errorDlg = new ErrorDlg(errorMessage, suppressUI_Errormessages);
+
+        int rv = errorDlg->ShowModal();
+        errorDlg->Destroy();
+
+        switch (rv)
+        {
+        case ErrorDlg::ContinueButtonPressed:
+            unsolvedErrors = true;
+            return StatusUpdater::Continue;
+        case ErrorDlg::RetryButtonPressed:
+            return StatusUpdater::Retry;
+        case ErrorDlg::AbortButtonPressed:
+        {
+            unsolvedErrors = true;
+            throw AbortThisProcess();
+        }
+        default:
+            assert (false);
+        }
+
+        return StatusUpdater::Continue; //dummy return value
+    }
+    void updateStatus(const wxString& text) {}
+    void updateProgressIndicator(double number) {}
+
+
+private:
+    bool suppressUI_Errormessages;
+    bool& unsolvedErrors;
+};
+
+
+void MainDialog::deleteFilesOnGrid(wxGrid* grid)
+{
+    set<int> rowsToDeleteOnUI = getSelectedRows(grid);
+
+    if (0 <= selectionLead && unsigned(selectionLead) < currentUI_View.size())
+        rowsToDeleteOnUI.insert(selectionLead); //add row of the currently selected cell
+
+    removeInvalidRows(rowsToDeleteOnUI, currentUI_View.size());
+
+
+    if (rowsToDeleteOnUI.size())
+    {
+        //map grid lines from UI to grid lines in backend
+        set<int> rowsToDeleteOnGrid;
+        for (set<int>::iterator i = rowsToDeleteOnUI.begin(); i != rowsToDeleteOnUI.end(); ++i)
+            rowsToDeleteOnGrid.insert(currentUI_View[*i].linkToCurrentGridData);
+
+        wxString headerText;
+        wxString filesToDelete;
+
+        if (useRecycleBin)
+            headerText = _("Do you really want to move the following objects(s) to the recycle bin?");
+        else
+            headerText = _("Do you really want to delete the following objects(s)?");
+
+        for (set<int>::iterator i = rowsToDeleteOnGrid.begin(); i != rowsToDeleteOnGrid.end(); ++i)
+        {
+            const FileCompareLine& currentCmpLine = currentGridData[*i];
+
+            if (currentCmpLine.fileDescrLeft.objType != IsNothing)
+                filesToDelete+= currentCmpLine.fileDescrLeft.filename + "\n";
+
+            if (currentCmpLine.fileDescrRight.objType != IsNothing)
+                filesToDelete+= currentCmpLine.fileDescrRight.filename + "\n";
+
+            filesToDelete+= "\n";
+        }
+
+        DeleteDialog* confirmDeletion = new DeleteDialog(headerText, filesToDelete, this);    //no destruction needed; attached to main window
+
+        switch (confirmDeletion->ShowModal())
+        {
+        case DeleteDialog::OkayButtonPressed:
+        {
+            bool unsolvedErrorOccured = false; //if an error is skipped a re-compare will be necessary!
+
+            try
+            {   //class errors when deleting files/folders
+                DeleteStatusUpdater deleteStatusUpdater(unsolvedErrorOccured);
+
+                FreeFileSync::deleteOnGridAndHD(currentGridData, rowsToDeleteOnGrid, &deleteStatusUpdater, useRecycleBin);
+            }
+            catch (AbortThisProcess& theException)
+                {}
+
+
+            //disable the sync button if errors occured during deletion
+            if (unsolvedErrorOccured)
+                m_bpButtonSync->Disable();
+
+
+            //redraw grid neccessary to update new dimensions and for UI-Backend data linkage
+            writeGrid(currentGridData);     //do NOT use UI buffer here
+        }
+        break;
+
+        case DeleteDialog::CancelButtonPressed:
+        default:
+            break;
+
+        }
+    }
+}
+
+
+void MainDialog::pushStatusInformation(const wxString& text)
+{
+    lastStatusChange = wxGetLocalTimeMillis();
+    stackObjects++;
+    m_statusBar1->PushStatusText(text, 1);
+}
+
+
+void MainDialog::writeStatusInformation(const wxString& text)
+{
+    stackObjects = 0;
+    m_statusBar1->SetStatusText(text, 1);
+}
+
+
+void MainDialog::onResizeMainWindow(wxEvent& event)
+{
+    if (!IsMaximized())
+    {
+        GetSize(&widthNotMaximized, &heightNotMaximized);
+        GetPosition(&posXNotMaximized, &posYNotMaximized);
+    }
+    event.Skip();
+}
+
+
 void MainDialog::onGrid1ButtonEvent(wxKeyEvent& event)
 {
     //CTRL + C || CTRL + INS
     if (event.ControlDown() && event.GetKeyCode() == 67 ||
             event.ControlDown() && event.GetKeyCode() == WXK_INSERT)
         copySelectionToClipboard(m_grid1);
+
+    else if (event.GetKeyCode() == WXK_DELETE)
+        deleteFilesOnGrid(m_grid1);
+
     event.Skip();
 }
 
@@ -431,6 +766,22 @@ void MainDialog::onGrid2ButtonEvent(wxKeyEvent& event)
     if (event.ControlDown() && event.GetKeyCode() == 67 ||
             event.ControlDown() && event.GetKeyCode() == WXK_INSERT)
         copySelectionToClipboard(m_grid2);
+    else if (event.GetKeyCode() == WXK_DELETE)
+        deleteFilesOnGrid(m_grid2);
+
+    event.Skip();
+}
+
+
+void MainDialog::onGrid3ButtonEvent(wxKeyEvent& event)
+{
+    //CTRL + C || CTRL + INS
+    if (event.ControlDown() && event.GetKeyCode() == 67 ||
+            event.ControlDown() && event.GetKeyCode() == WXK_INSERT)
+        copySelectionToClipboard(m_grid3);
+    else if (event.GetKeyCode() == WXK_DELETE)
+        deleteFilesOnGrid(m_grid3);
+
     event.Skip();
 }
 
@@ -469,6 +820,7 @@ void MainDialog::OnDirChangedPanel1(wxFileDirPickerEvent& event)
     event.Skip();
 }
 
+
 void MainDialog::OnDirChangedPanel2(wxFileDirPickerEvent& event)
 {
     wxString newPath = m_dirPicker2->GetPath();
@@ -484,51 +836,230 @@ void MainDialog::OnDirChangedPanel2(wxFileDirPickerEvent& event)
     event.Skip();
 }
 
-void onFilesDropped(wxString elementName, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker)
+
+void onFilesDropped(const wxString& elementName, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker)
 {
-    if (wxDirExists(elementName))
+    wxString fileName = elementName;
+
+    if (wxDirExists(fileName))
     {
-        txtCtrl->SetValue(elementName);
-        dirPicker->SetPath(elementName);
+        txtCtrl->SetValue(fileName);
+        dirPicker->SetPath(fileName);
     }
     else
     {
-        elementName = wxFileName(elementName).GetPath();
-        if (wxDirExists(elementName))
+        fileName = wxFileName(fileName).GetPath();
+        if (wxDirExists(fileName))
         {
-            txtCtrl->SetValue(elementName);
-            dirPicker->SetPath(elementName);
+            txtCtrl->SetValue(fileName);
+            dirPicker->SetPath(fileName);
         }
     }
 }
 
 
-void MainDialog::onFilesDroppedPanel1(wxDropFilesEvent& event)
+void MainDialog::clearStatusBar()
 {
-    if (event.m_noFiles >= 1)
-    {
-        onFilesDropped(event.GetFiles()[0], m_directoryPanel1, m_dirPicker1);
+    stackObjects = 0;   //prevent old stack objects from popping up
 
+    m_statusBar1->SetStatusText("");
+    m_statusBar1->SetStatusText("", 1);
+    m_statusBar1->SetStatusText("", 2);
+}
+
+
+wxString getFormattedHistoryElement(const wxString& filename)
+{
+    wxString output = wxFileName(filename).GetFullName();
+    if (output.EndsWith(".FFS"))
+        output = output.BeforeLast('.');
+    return output;
+}
+
+
+//tests if the same filenames are specified, even if they are relative to the current working directory
+bool sameFileSpecified(const wxString& file1, const wxString& file2)
+{
+    wxString file1Full = file1;
+    wxString file2Full = file2;
+
+    if (wxFileName(file1).GetPath() == wxEmptyString)
+        file1Full = wxFileName::GetCwd() + FileNameSeparator + file1;
+
+    if (wxFileName(file2).GetPath() == wxEmptyString)
+        file2Full = wxFileName::GetCwd() + FileNameSeparator + file2;
+
+    return (file1Full == file2Full);
+}
+
+
+void MainDialog::addCfgFileToHistory(const wxString& filename)
+{
+    //the default configFile should not be in the history
+    if (sameFileSpecified(FreeFileSync::FFS_LastConfigFile, filename))
+        return;
+
+
+    bool duplicateEntry = false;
+    unsigned int duplicatePos = 0;
+    for (unsigned int i = 0; i < cfgFileNames.size(); ++i)
+        if (sameFileSpecified(cfgFileNames[i], filename))
+        {
+            duplicateEntry = true;
+            duplicatePos   = i;
+            break;
+        }
+
+
+    if (duplicateEntry)    //if entry is in the list, then jump to element
+    {
+        m_choiceLoad->SetSelection(duplicatePos + 1);
+    }
+    else
+    {
+        cfgFileNames.insert(cfgFileNames.begin(), filename);
+        m_choiceLoad->Insert(getFormattedHistoryElement(filename), 1);  //insert after "Load configuration..."
+        m_choiceLoad->SetSelection(1);
+    }
+
+    //keep maximal size of history list
+    if (cfgFileNames.size() > unsigned(CfgHistroyLength))
+    {
+        //delete last rows
+        cfgFileNames.erase(cfgFileNames.end() - 1);
+        m_choiceLoad->Delete(CfgHistroyLength);  //don't forget: m_choiceLoad has (cfgHistroyLength + 1) elements
+    }
+}
+
+
+bool FileDropEvent::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
+{
+    if (filenames.IsEmpty())
+        return false;
+    else
+    {
         //disable the sync button
-        m_bpButtonSync->Enable(false);
+        mainDlg->m_bpButtonSync->Disable();
+
         //clear grids
-        currentGridData.clear();
-        writeGrid(currentGridData);
+        mainDlg->currentGridData.clear();
+        mainDlg->writeGrid(mainDlg->currentGridData);
+
+        mainDlg->clearStatusBar();
+
+        const wxString droppedFileName = filenames[0];
+
+        //test if ffs config file has been dropped
+        if (wxFileExists(droppedFileName) && FreeFileSync::isFFS_ConfigFile(droppedFileName))
+        {
+            mainDlg->readConfigurationFromHD(droppedFileName);
+
+            mainDlg->pushStatusInformation(_("Configuration loaded!"));
+        }
+
+        else if (targetGrid == 1)
+            onFilesDropped(droppedFileName, mainDlg->m_directoryPanel1, mainDlg->m_dirPicker1);
+
+        else if (targetGrid == 2)
+            onFilesDropped(droppedFileName, mainDlg->m_directoryPanel2, mainDlg->m_dirPicker2);
+    }
+    return false;
+}
+
+
+void MainDialog::OnSaveConfig(wxCommandEvent& event)
+{
+    wxString defaultFileName = "SyncSettings.FFS";
+
+    //try to use last selected configuration file as default
+    int selectedItem;
+    if ((selectedItem = m_choiceLoad->GetSelection()) != wxNOT_FOUND)
+        if (1 <= selectedItem && unsigned(selectedItem) < m_choiceLoad->GetCount())
+            if (unsigned(selectedItem - 1) < cfgFileNames.size())
+                defaultFileName = cfgFileNames[selectedItem - 1];
+
+
+    clearStatusBar();
+
+    wxFileDialog* filePicker = new wxFileDialog(this, "", "", defaultFileName, "*.*", wxFD_SAVE);
+
+    if (filePicker->ShowModal() == wxID_OK)
+    {
+        wxString newFileName = filePicker->GetFilename();
+
+        if (wxFileExists(newFileName))
+        {
+            wxMessageDialog* messageDlg = new wxMessageDialog(this, wxString("\"") + newFileName + "\"" + _(" already exists. Overwrite?"), _("Warning") , wxOK | wxCANCEL);
+
+            if (messageDlg->ShowModal() != wxID_OK)
+            {
+                pushStatusInformation(_("Saved aborted!"));
+                return;
+            }
+        }
+        writeConfigurationToHD(newFileName);
+
+        pushStatusInformation(_("Configuration saved!"));
+    }
+}
+
+
+void MainDialog::OnLoadConfiguration(wxCommandEvent& event)
+{
+    int selectedItem;
+    if ((selectedItem = m_choiceLoad->GetSelection()) != wxNOT_FOUND)
+    {
+        wxString newCfgFile;
+
+        clearStatusBar();
+
+        switch (selectedItem)
+        {
+        case 0: //load config from file
+            wxFileDialog* filePicker = new wxFileDialog(this, "", "", "", "*.*", wxFD_OPEN);
+
+            if (filePicker->ShowModal() == wxID_OK)
+                newCfgFile = filePicker->GetFilename();
+
+            break;
+        default:
+            if (1 <= selectedItem && unsigned(selectedItem) < m_choiceLoad->GetCount())
+            {
+                if (unsigned(selectedItem - 1) < cfgFileNames.size())
+                    newCfgFile = cfgFileNames[selectedItem - 1];
+            }
+            break;
+        }
+
+        if (!newCfgFile.IsEmpty())
+        {
+            if (wxFileExists(newCfgFile) && FreeFileSync::isFFS_ConfigFile(newCfgFile))
+            {
+                readConfigurationFromHD(newCfgFile);
+
+                pushStatusInformation(_("Configuration loaded!"));
+            }
+            else
+                wxMessageBox(_("The selected file does not contain a valid configuration!"), _("Warning"), wxOK);
+        }
     }
     event.Skip();
 }
 
-void MainDialog::onFilesDroppedPanel2(wxDropFilesEvent& event)
-{
-    if (event.m_noFiles >= 1)
-    {
-        onFilesDropped(event.GetFiles()[0], m_directoryPanel2, m_dirPicker2);
 
-        //disable the sync button
-        m_bpButtonSync->Enable(false);
-        //clear grids
-        currentGridData.clear();
-        writeGrid(currentGridData);
+void MainDialog::OnChoiceKeyEvent(wxKeyEvent& event)
+{
+    if (event.GetKeyCode() == WXK_DELETE)
+    {   //try to delete the currently selected config history item
+        int selectedItem;
+        if ((selectedItem = m_choiceLoad->GetSelection()) != wxNOT_FOUND)
+            if (1 <= selectedItem && unsigned(selectedItem) < m_choiceLoad->GetCount())
+                if (unsigned(selectedItem - 1) < cfgFileNames.size())
+                {
+                    //delete selected row
+                    cfgFileNames.erase(cfgFileNames.begin() + selectedItem - 1);
+                    m_choiceLoad->Delete(selectedItem);
+                }
     }
     event.Skip();
 }
@@ -556,7 +1087,7 @@ void MainDialog::OnQuit(wxCommandEvent &event)
 }
 
 
-void MainDialog::readConfigurationFromHD(const wxString& filename)
+void MainDialog::readConfigurationFromHD(const wxString& filename, bool programStartup)
 {
     //default values
     syncConfiguration.exLeftSideOnly  = SyncDirRight;
@@ -578,11 +1109,25 @@ void MainDialog::readConfigurationFromHD(const wxString& filename)
     filterIsActive = false; //do not filter by default
 
     useRecycleBin = false;  //do not use: in case OS doesn't support this, user will have to activate first and then get the error message
+
+    widthNotMaximized  = wxDefaultCoord;
+    heightNotMaximized = wxDefaultCoord;
+    posXNotMaximized   = wxDefaultCoord;
+    posYNotMaximized   = wxDefaultCoord;
 //#####################################################
 
     ifstream config(filename.c_str());
     if (!config)
         return;
+
+    //put filename on list of last used config files
+    addCfgFileToHistory(filename);
+
+    char bigBuffer[10000];
+
+
+    //read FFS identifier
+    config.get(bigBuffer, FreeFileSync::FFS_ConfigFileID.Len() + 1);
 
     //read sync configuration
     syncConfiguration.exLeftSideOnly  = SyncDirection(config.get());
@@ -604,8 +1149,6 @@ void MainDialog::readConfigurationFromHD(const wxString& filename)
         assert (false);
     }
 
-    char bigBuffer[10000];
-
     //read column sizes
     for (int i = 0; i < m_grid1->GetNumberCols(); ++i)
     {
@@ -619,17 +1162,30 @@ void MainDialog::readConfigurationFromHD(const wxString& filename)
     }
 
     //read application window size and position
-    Maximize(bool(config.get()));
+    bool startWindowMaximized = bool(config.get());
 
     config.getline(bigBuffer, 100, char(0));
-    int width = atoi(bigBuffer);
+    int widthTmp = atoi(bigBuffer);
     config.getline(bigBuffer, 100, char(0));
-    int height = atoi(bigBuffer);
+    int heighthTmp = atoi(bigBuffer);
+
     config.getline(bigBuffer, 100, char(0));
-    int posX = atoi(bigBuffer);
+    int posX_Tmp = atoi(bigBuffer);
     config.getline(bigBuffer, 100, char(0));
-    int posY = atoi(bigBuffer);
-    SetSize(posX, posY, width, height);
+    int posY_Tmp = atoi(bigBuffer);
+
+    //apply window size and position at program startup ONLY
+    if (programStartup)
+    {
+        widthNotMaximized  = widthTmp;
+        heightNotMaximized = heighthTmp;
+        posXNotMaximized   = posX_Tmp;
+        posYNotMaximized   = posY_Tmp;
+
+        //apply window size and position
+        SetSize(posXNotMaximized, posYNotMaximized, widthNotMaximized, heightNotMaximized);
+        Maximize(startWindowMaximized);
+    }
 
     //read last directory selection
     config.getline(bigBuffer, 10000, char(0));
@@ -661,21 +1217,15 @@ void MainDialog::readConfigurationFromHD(const wxString& filename)
 
 void MainDialog::writeConfigurationToHD(const wxString& filename)
 {
-    DWORD dwFileAttributes;
-
-    //make config file visible: needed for ofstream
-    if (wxFileExists(filename))
-    {
-        dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
-        if (!SetFileAttributes(
-                    filename.c_str(),	// address of filename
-                    dwFileAttributes 	// address of attributes to set
-                )) throw runtime_error(string(_("Could not change attributes of ")) + filename.c_str());
-    }
-
     ofstream config(filename.c_str());
     if (!config)
-        throw runtime_error(string(_("Could not open ")) + filename.c_str());
+        throw runtime_error(string(_("Could not write to ")) + filename.c_str());
+
+    //put filename on list of last used config files
+    addCfgFileToHistory(filename);
+
+    //write FFS identifier
+    config<<FreeFileSync::FFS_ConfigFileID.c_str();
 
     //write sync configuration
     config<<char(syncConfiguration.exLeftSideOnly)
@@ -698,20 +1248,16 @@ void MainDialog::writeConfigurationToHD(const wxString& filename)
     for (int i = 0; i < m_grid2->GetNumberCols(); ++i)
         config<<m_grid2->GetColSize(i)<<char(0);
 
-    //write application window size
+    //write application window size and position
     config<<char(IsMaximized());
+
     //window size
-    int width = 0;
-    int height = 0;
-    GetSize(&width, &height);
-    config<<width<<char(0);
-    config<<height<<char(0);
+    config<<widthNotMaximized<<char(0);
+    config<<heightNotMaximized<<char(0);
+
     //window position
-    int posX = 0;
-    int posY = 0;
-    GetPosition(&posX, &posY);
-    config<<posX<<char(0);
-    config<<posY<<char(0);
+    config<<posXNotMaximized<<char(0);
+    config<<posYNotMaximized<<char(0);
 
     //write last directory selection
     config<<m_directoryPanel1->GetValue().c_str()<<char(0)
@@ -727,13 +1273,6 @@ void MainDialog::writeConfigurationToHD(const wxString& filename)
     config<<char(useRecycleBin);
 
     config.close();
-
-    //hide config file
-    dwFileAttributes = FILE_ATTRIBUTE_HIDDEN;
-    if (!SetFileAttributes(
-                filename.c_str(),	// address of filename
-                dwFileAttributes 	// address of attributes to set
-            )) throw runtime_error(string(_("Could not change attributes of ")) + filename.c_str());
 }
 
 void MainDialog::OnAbout(wxCommandEvent &event)
@@ -778,7 +1317,7 @@ void MainDialog::OnHideFilteredButton(wxCommandEvent &event)
 void MainDialog::OnConfigureFilter(wxHyperlinkEvent &event)
 {
     FilterDlg* filterDlg = new FilterDlg(this);
-    if (filterDlg->ShowModal() == OkayButtonPressed)
+    if (filterDlg->ShowModal() == FilterDlg::OkayButtonPressed)
     {
         if (filterIsActive)
         {
@@ -888,11 +1427,8 @@ void MainDialog::OnCompare(wxCommandEvent &event)
         wxMessageBox(_("Please select directories for both sides!"), _("Information"));
         return;
     }
-    m_statusBar1->SetStatusText("");
-    m_statusBar1->SetStatusText("", 1);
-    m_statusBar1->SetStatusText("", 2);
-    m_statusBar1->SetStatusText("", 3);
-    m_statusBar1->SetStatusText("", 4);
+
+    clearStatusBar();
 
     //check if directories exist if loaded by config file
     if (!wxDirExists(m_directoryPanel1->GetValue()))
@@ -919,6 +1455,7 @@ void MainDialog::OnCompare(wxCommandEvent &event)
     {   //class handling status display and error messages
         CompareStatusUpdater statusUpdater(this, m_statusBar1);
         cmpStatusUpdaterTmp = &statusUpdater;
+        stackObjects = 0;
 
         //unsigned int startTime3 = GetTickCount();
         FreeFileSync::getModelDiff(currentGridData,
@@ -937,13 +1474,14 @@ void MainDialog::OnCompare(wxCommandEvent &event)
 
         //once compare is finished enable the sync button
         m_bpButtonSync->Enable(true);
+        m_bpButtonSync->SetFocus();
 
         cmpStatusUpdaterTmp = 0;
     }
     catch (AbortThisProcess& theException)
     {
         //disable the sync button
-        m_bpButtonSync->Enable(false);
+        m_bpButtonSync->Disable();
     }
 
     wxEndBusyCursor();
@@ -1052,11 +1590,7 @@ void MainDialog::OnSync( wxCommandEvent& event )
     {
         wxBeginBusyCursor();
 
-        m_statusBar1->SetStatusText("");
-        m_statusBar1->SetStatusText("", 1);
-        m_statusBar1->SetStatusText("", 2);
-        m_statusBar1->SetStatusText("", 3);
-        m_statusBar1->SetStatusText("", 4);
+        clearStatusBar();
 
         //unsigned int startTime = GetTickCount();
         synchronizeFolders(currentGridData, syncConfiguration);
@@ -1334,6 +1868,7 @@ bool cmpGridSmallerThan(const UI_GridLine& a, const UI_GridLine& b)
 
 void MainDialog::updateStatusInformation(const UI_Grid& visibleGrid)
 {
+    stackObjects = 0;
     unsigned int objectsOnLeftView = 0;
     unsigned int objectsOnRightView = 0;
     mpz_t filesizeLeftView, filesizeRightView, tmpInt;
@@ -1383,17 +1918,17 @@ void MainDialog::updateStatusInformation(const UI_Grid& visibleGrid)
     wxString objectsView = numberToWxString(visibleGrid.size());
     GlobalFunctions::includeNumberSeparator(objectsView);
     if (currentGridData.size() == 1)
-        m_statusBar1->SetStatusText(objectsView + _(" of ") + objectsTotal + _(" row in view"), 2);
+        m_statusBar1->SetStatusText(objectsView + _(" of ") + objectsTotal + _(" row in view"), 1);
     else
-        m_statusBar1->SetStatusText(objectsView + _(" of ") + objectsTotal + _(" rows in view"), 2);
+        m_statusBar1->SetStatusText(objectsView + _(" of ") + objectsTotal + _(" rows in view"), 1);
 
 
     wxString objectsViewRight = numberToWxString(objectsOnRightView);
     GlobalFunctions::includeNumberSeparator(objectsViewRight);
     if (objectsOnRightView == 1)
-        m_statusBar1->SetStatusText(wxString(_("1 item on right, ")) + FreeFileSync::formatFilesizeToShortString(mpz_class(filesizeRightView)), 4);
+        m_statusBar1->SetStatusText(wxString(_("1 item on right, ")) + FreeFileSync::formatFilesizeToShortString(mpz_class(filesizeRightView)), 2);
     else
-        m_statusBar1->SetStatusText(objectsViewRight + _(" items on right, ") + FreeFileSync::formatFilesizeToShortString(mpz_class(filesizeRightView)), 4);
+        m_statusBar1->SetStatusText(objectsViewRight + _(" items on right, ") + FreeFileSync::formatFilesizeToShortString(mpz_class(filesizeRightView)), 2);
 
     //-----------------------------------------------------
     mpz_clear(filesizeLeftView);
@@ -1448,8 +1983,8 @@ void MainDialog::mapFileModelToUI(UI_Grid& output, const FileCompareResult& file
         }
         else
         {
-            gridline.leftFilename      = i->fileDescrLeft.relFilename.AfterLast('\\');
-            gridline.leftRelativePath  = i->fileDescrLeft.relFilename.BeforeLast('\\');
+            gridline.leftFilename      = i->fileDescrLeft.relFilename.AfterLast(FileNameSeparator);
+            gridline.leftRelativePath  = i->fileDescrLeft.relFilename.BeforeLast(FileNameSeparator);
             gridline.leftSize      = GlobalFunctions::includeNumberSeparator(fileSize = i->fileDescrLeft.fileSize);
         }
         gridline.leftDate          = i->fileDescrLeft.lastWriteTime;
@@ -1465,8 +2000,8 @@ void MainDialog::mapFileModelToUI(UI_Grid& output, const FileCompareResult& file
         }
         else
         {
-            gridline.rightFilename     = i->fileDescrRight.relFilename.AfterLast('\\');
-            gridline.rightRelativePath = i->fileDescrRight.relFilename.BeforeLast('\\');
+            gridline.rightFilename     = i->fileDescrRight.relFilename.AfterLast(FileNameSeparator);
+            gridline.rightRelativePath = i->fileDescrRight.relFilename.BeforeLast(FileNameSeparator);
             gridline.rightSize      = GlobalFunctions::includeNumberSeparator(fileSize = i->fileDescrRight.fileSize);
         }
         gridline.rightDate         = i->fileDescrRight.lastWriteTime;
@@ -1483,8 +2018,11 @@ void MainDialog::mapFileModelToUI(UI_Grid& output, const FileCompareResult& file
 void updateUI_Now()
 {
     //process UI events and prevent application from "not responding"   -> NO performance issue!
-    while (wxTheApp->Pending())
-        wxTheApp->Dispatch();
+    wxTheApp->Yield();
+
+
+//    while (wxTheApp->Pending())
+//        wxTheApp->Dispatch();
 }
 
 
@@ -1494,7 +2032,7 @@ bool updateUI_IsAllowed()
 
     wxLongLong newExec = wxGetLocalTimeMillis();
 
-    if (newExec - lastExec > 100)  //perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
+    if (newExec - lastExec >= 100)  //perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
     {
         lastExec = newExec;
         return true;
@@ -1531,12 +2069,15 @@ CompareStatusUpdater::CompareStatusUpdater(MainDialog* dlg, wxStatusBar* mainWin
     mainDialog->m_panel1->Disable();
     mainDialog->m_panel2->Disable();
     mainDialog->m_panel3->Disable();
+    mainDialog->m_bpButton201->Disable();
+    mainDialog->m_choiceLoad->Disable();
 
     //show abort button
-    mainDialog->m_buttonAbort->Show(true);
-    mainDialog->m_bpButtonCompare->Show(false);
+    mainDialog->m_buttonAbort->Show();
+    mainDialog->m_bpButtonCompare->Hide();
     mainDialog->Layout();
     mainDialog->Refresh();
+    mainDialog->m_buttonAbort->SetFocus();
 }
 
 CompareStatusUpdater::~CompareStatusUpdater()
@@ -1560,12 +2101,14 @@ CompareStatusUpdater::~CompareStatusUpdater()
     mainDialog->m_panel1->Enable();
     mainDialog->m_panel2->Enable();
     mainDialog->m_panel3->Enable();
+    mainDialog->m_bpButton201->Enable();
+    mainDialog->m_choiceLoad->Enable();
 
     if (abortionRequested)
-        mainDialog->m_statusBar1->SetStatusText(mainDialog->m_statusBar1->GetStatusText(2) + " - " + _("Aborted!"), 2);
+        mainDialog->pushStatusInformation(_("Operation aborted!"));
 
-    mainDialog->m_buttonAbort->Show(false);
-    mainDialog->m_bpButtonCompare->Show(true);
+    mainDialog->m_buttonAbort->Hide();
+    mainDialog->m_bpButtonCompare->Show();
     mainDialog->Layout();
     mainDialog->Refresh();
 }
@@ -1619,7 +2162,7 @@ void CompareStatusUpdater::triggerUI_Refresh()
 
     if (updateUI_IsAllowed()) //test if specific time span between ui updates is over
     {
-        statusBar->SetStatusText(wxString(_("Scanning files/folders: ")) + numberToWxString(numberOfScannedObjects), 2);
+        statusBar->SetStatusText(wxString(_("Scanning files/folders: ")) + numberToWxString(numberOfScannedObjects), 1);
         updateUI_Now();
     }
 }

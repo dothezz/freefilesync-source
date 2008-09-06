@@ -7,14 +7,14 @@
  * License:
  **************************************************************/
 
-#include "Application.h"
-#include "UI\MainDialog.h"
+#include "application.h"
+#include "ui/mainDialog.h"
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
 #include <stdexcept> //for std::runtime_error
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
-#include "library\globalFunctions.h"
+#include "library/globalFunctions.h"
 
 IMPLEMENT_APP(Application);
 
@@ -31,12 +31,12 @@ bool Application::ProcessIdle()
 }
 
 //Note: initialization is done in the FIRST idle event instead in OnInit. Reason: Commandline mode requires the wxApp eventhandler to be established
-//for UI update events. This is not given in OnInit.
+//for UI update events. This is not the case in OnInit.
 
 bool Application::OnInit()
 {
     returnValue = 0;
-    //do not call wxApp::OnInit() to avoid parsing commandline now but use own parser later
+    //do not call wxApp::OnInit() to avoid parsing commandline now, instead use own parser later
     return true;
 }
 
@@ -56,17 +56,30 @@ void Application::initialize()
     //load icon and animation resources (also needed for commandline: status dialog, error dialog
     GlobalResources::loadResourceFiles();
 
-    if (parsedCommandline())   //Note: "return false" is a must here for commandline usage with "-silent" since program crashes if "return true" and no windows have been created
+    //test if ffs is to be started on UI with config file passed as commandline parameter
+    wxString configFileUI = FreeFileSync::FFS_LastConfigFile;
+    if (argc >= 2 && wxFileExists(argv[1]) && FreeFileSync::isFFS_ConfigFile(argv[1]))
+        configFileUI = argv[1];
+
+    //should it start in commandline mode?
+    else if (argc > 1)
+    {
+        parseCommandline();
+
         if (applicationRunsOnCommandLineWithoutWindows)
         {
-            ExitMainLoop();   //exit programm on next main loop iteration
+            ExitMainLoop(); //exit programm on next main loop iteration
             return;
         }
         else
-            return;    //wait for the user to close the status window
+            return;         //wait for the user to close the status window
+    }
+    else
+        ;    //no parameters passed, continue with UI
+
 
     //show UI dialog
-    MainDialog* frame = new MainDialog(0L);
+    MainDialog* frame = new MainDialog(0L, configFileUI);
     frame->SetIcon(wxICON(aaaa)); // To Set App Icon
 
     frame->Show();
@@ -151,7 +164,7 @@ void Application::closeLog()
 }
 
 
-bool Application::parsedCommandline()
+void Application::parseCommandline()
 {
     //commandline-descriptor must be initialized here AFTER the program language is set
     const wxCmdLineEntryDesc cmdLineDesc [] =
@@ -233,15 +246,11 @@ bool Application::parsedCommandline()
         }
     };
 
-
-    if (argc <= 1)
-        return false;    //no parameters passed, continue with UI
-
     //now set the parser with all MANDATORY options and parameters
     wxCmdLineParser parser(cmdLineDesc, argc, argv);
     parser.SetSwitchChars(wxT("-"));
     if (parser.Parse() != 0)  //if commandline is used incorrectly display help dialog and exit program
-        return true;
+        return;
 
     //commandline parameters
     wxString cmp;
@@ -262,7 +271,7 @@ bool Application::parsedCommandline()
             parser.GetParamCount() != 2)
     {
         parser.Usage();
-        return true;
+        return;
     }
 
     cmp.UpperCase();
@@ -295,7 +304,7 @@ bool Application::parsedCommandline()
             (cfg[4] != 'L' && cfg[4] != 'R' && cfg[4] != 'N'))
     {
         parser.Usage();
-        return true;
+        return;
     }
 
 //init logfile
@@ -312,7 +321,7 @@ bool Application::parsedCommandline()
         else wxMessageBox(errorMessage, _("Warning"), wxICON_WARNING);
 
         returnValue = -2;
-        return true;
+        return;
     }
     else if (!wxDirExists(rightDir))
     {
@@ -322,7 +331,7 @@ bool Application::parsedCommandline()
         else wxMessageBox(errorMessage, _("Warning"), wxICON_WARNING);
 
         returnValue = -2;
-        return true;
+        return;
     }
 
 //until here all options and parameters are consistent
@@ -378,7 +387,7 @@ bool Application::parsedCommandline()
             else statusUpdater.updateFinalStatus(errorMessage);
 
             returnValue = -3;
-            return true;
+            return;
         }
 
 //APPLY FILTERS
@@ -408,10 +417,10 @@ bool Application::parsedCommandline()
         if (silent) closeLog();
 
         returnValue = -4;
-        return true;
+        return;
     }
 
-    return true;   //exit program and skip UI dialogs
+    return;   //exit program and skip UI dialogs
 }
 //######################################################################################################
 
@@ -457,7 +466,12 @@ void CommandLineStatusUpdater::updateStatus(const wxString& text)
 {
 
     if (!silentMode)
-        syncStatusFrame->setStatusText_NoUpdate(text);
+    {
+        if (switchedToSynchronisation)
+            syncStatusFrame->setStatusText_NoUpdate(text);
+        else
+            syncStatusFrame->setStatusText_NoUpdate(_("Scanning... ") + text);
+    }
 }
 
 

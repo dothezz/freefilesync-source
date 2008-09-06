@@ -1,7 +1,7 @@
 #ifndef SMALLDIALOGS_H_INCLUDED
 #define SMALLDIALOGS_H_INCLUDED
 
-#include "MainDialog.h"
+#include "mainDialog.h"
 
 class MainDialog;
 
@@ -13,7 +13,7 @@ public:
 
 private:
     void OnClose(wxCloseEvent& event);
-    void AboutDlg::OnOK(wxCommandEvent& event);
+    void OnOK(wxCommandEvent& event);
 };
 
 
@@ -35,12 +35,31 @@ public:
     FilterDlg(MainDialog* window);
     ~FilterDlg();
 
+    static const int OkayButtonPressed = 25;
+
 private:
     void OnDefault(wxCommandEvent& event);
     void OnOK(wxCommandEvent& event);
+    void OnCancel(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);
 
     MainDialog* mainDialog;
+};
+
+
+class DeleteDialog : public DeleteDialogGenerated
+{
+public:
+    DeleteDialog(const wxString& headerText, const wxString& messageText, wxWindow* main);
+    ~DeleteDialog();
+
+    static const int OkayButtonPressed   = 35;
+    static const int CancelButtonPressed = 45;
+
+private:
+    void OnOK(wxCommandEvent& event);
+    void OnCancel(wxCommandEvent& event);
+    void OnClose(wxCloseEvent& event);
 };
 
 
@@ -50,9 +69,9 @@ public:
     ErrorDlg(const wxString messageText, bool& suppressErrormessages);
     ~ErrorDlg();
 
-    static const int ContinueButtonPressed       = 35;
-    static const int RetryButtonPressed          = 45;
-    static const int AbortButtonPressed          = 55;
+    static const int ContinueButtonPressed = 35;
+    static const int RetryButtonPressed    = 45;
+    static const int AbortButtonPressed    = 55;
 
 private:
     void OnClose(wxCloseEvent& event);
@@ -87,7 +106,7 @@ private:
     bool currentProcessIsRunning;
 
     //gauge variables
-    double totalElements;   //each element represents one byte for proper progress indicator scaling
+    double totalElements;     //each element represents one byte for proper progress indicator scaling
     double currentElements;
     double scalingFactor;   //nr of elements has to be normalized to smaller nr. because of range of int limitation
 

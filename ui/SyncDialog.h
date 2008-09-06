@@ -1,7 +1,7 @@
 #ifndef SYNCDIALOG_H_INCLUDED
 #define SYNCDIALOG_H_INCLUDED
 
-#include "MainDialog.h"
+#include "mainDialog.h"
 
 class MainDialog;
 
@@ -31,6 +31,7 @@ private:
     void OnStartSync(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);
     void OnBack(wxCommandEvent& event);
+    void OnCancel(wxCommandEvent& event);
 
     void OnSelectRecycleBin(wxCommandEvent& event);
 

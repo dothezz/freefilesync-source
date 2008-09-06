@@ -1,5 +1,5 @@
-#include "SyncDialog.h"
-#include "..\library\globalfunctions.h"
+#include "syncDialog.h"
+#include "../library/globalFunctions.h"
 
 SyncDialog::SyncDialog(MainDialog* window)
         : SyncDialogGenerated(window), mainDialog(window)
@@ -135,6 +135,13 @@ void SyncDialog::OnClose(wxCloseEvent& event)
 {
     EndModal(0);
 }
+
+
+void SyncDialog::OnCancel(wxCommandEvent& event)
+{
+    EndModal(0);
+}
+
 
 void SyncDialog::OnBack(wxCommandEvent& event)
 {

@@ -1,6 +1,18 @@
 #include "globalFunctions.h"
 #include <wx/intl.h>
 
+#ifdef FFS_WIN
+const wxChar FileNameSeparator = '\\';
+#endif  // FFS_WIN
+
+#ifdef FFS_LINUX
+const wxChar FileNameSeparator = '/';
+#endif  // FFS_LINUX
+
+const wxChar* FloatingPointSeparator = _(".");
+const wxChar* NumberSeparator = _(",");
+
+
 inline
 int GlobalFunctions::round(const double d)
 {
@@ -101,8 +113,6 @@ double GlobalFunctions::wxStringToDouble(const wxString& number)
 
 wxString& GlobalFunctions::includeNumberSeparator(wxString& number)
 {
-    const wxChar* NumberSeparator = _(",");
-
     for (int i = number.size() - 3; i > 0; i-= 3)
         number.insert(i, NumberSeparator);
     return number;

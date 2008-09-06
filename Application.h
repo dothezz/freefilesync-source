@@ -15,7 +15,7 @@
 #include <set>
 #include <fstream>
 #include "FreeFileSync.h"
-#include "ui\SmallDialogs.h"
+#include "ui/smallDialogs.h"
 
 struct TranslationLine
 {
@@ -72,7 +72,7 @@ public:
     void closeLog();
 
 private:
-    bool parsedCommandline();
+    void parseCommandline();
 
     bool applicationRunsOnCommandLineWithoutWindows;
 

@@ -71,7 +71,7 @@
 Abort
 Abbruch
 Aborted!
-Abgebrochen!
+Abbruch!
 About
 Info
 Action
@@ -295,7 +295,7 @@ Ergebnis
 Retry
 Wiederholen
 Running...
-Gestarted...
+Synchronisiere...
 Scanning files/folders: 
 Scanne Dateien/Ordner: 
 Select a folder
@@ -311,9 +311,9 @@ Sourcecode komplett in C++ geschrieben unter Verwendung von:\n\nMinGW \t\t- Wind
 Specify algorithm to test if files are equal:\n\n\t\tSIZEDATE: check filesize and date\n\t\tCONTENT: check file content\n
 Methode angeben, um gleiche Dateien zu erkennen:\n\n\t\tSIZEDATE: Prüfung auf Dateigröße und -datum\n\t\tCONTENT: Prüfung auf Dateiinhalt\n
 Specify names to be excluded separated by ';'. Wildcards '*' and '?' are supported. Default: \"\"\n
-Auszuschließende Namen, getrennt durch ';', angeben. Platzhalter '*' und '?' werden unterstützt. Standard: \"\"\n
+Auszuschließende Namen, getrennt durch ';' angeben. Platzhalter '*' und '?' werden unterstützt. Standard: \"\"\n
 Specify names to be included separated by ';'. Wildcards '*' and '?' are supported. Default: \"*\"\n
-Einzuschließende Namen, getrennt durch ';', angeben. Platzhalter '*' und '?' werden unterstützt. Standard: \"*\"\n
+Einzuschließende Namen, getrennt durch ';' angeben. Platzhalter '*' und '?' werden unterstützt. Standard: \"*\"\n
 Specify the sync-direction used for each type of file by a string of five chars:\n\n\t\tChar 1: Folders/files that exist on left side only\n\t\tChar 2: Folders/files that exist on right side only\n\t\tChar 3: Files that exist on both sides, left one is newer\n\t\tChar 4: Files that exist on both sides, right one is newer\n\t\tChar 5: Files that exist on both sides and are different\n\n\t\tSync-direction: L: left, R: right, N: none\n
 Synchronisationseinstellungen durch Zeichenkette der Länge 5 spezifizieren:\n\n\t\t1. Zeichen: Ordner/Dateien, die nur links existieren\n\t\t2. Zeichen: Ordner/Dateien, die nur rechts existieren\n\t\t3. Zeichen: Dateien, die auf beiden Seiten existieren; linke Datei ist neuer\n\t\t4. Zeichen: Dateien, die auf beiden Seiten existieren; rechte Datei ist neuer\n\t\t5. Zeichen: Dateien, die auf beiden Seiten existieren und verschieden sind\n\n\t\tSynchronisationsrichtung: L: links, R: rechts, N: nichts tun\n
 Start synchronizing files
@@ -327,7 +327,7 @@ Synchronisationseinstellungen
 Synchronization status
 Synchronisation: Status
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
-Beide Seiten gleichzeitig synchronisieren: Kopiere neue oder aktualisierte Dateien auf die jeweils andere Seite.
+Beide Seiten gleichzeitig synchronisieren: Neue oder aktualisierte Dateien auf die jeweils andere Seite kopieren.
 Two way <->
 Beidseitig <->
 Unable to create logfile!

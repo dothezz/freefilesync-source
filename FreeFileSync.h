@@ -6,7 +6,8 @@
 #include <vector>
 #include <wx/dir.h>
 #include <windows.h>
-#include "library\GMP\include\gmpxx.h"
+#include "library/gmp/include/gmpxx.h"
+#include <wx/log.h>
 
 using namespace std;
 
@@ -54,18 +55,38 @@ struct FileDescrLine
 
     //the following operators are needed by template class "set"
     //DO NOT CHANGE THESE RELATIONS!!!
+
+#ifdef FFS_WIN
+    //Windows does NOT distinguish between upper/lower-case
     bool operator>(const FileDescrLine& b ) const
-    {   //Windows does NOT distinguish upper/lower-case
+    {
         return (relFilename.CmpNoCase(b.relFilename) > 0);
     }
     bool operator<(const FileDescrLine& b) const
-    {   //Windows does NOT distinguish upper/lower-case
+    {
         return (relFilename.CmpNoCase(b.relFilename) < 0);
     }
     bool operator==(const FileDescrLine& b) const
-    {   //Windows does NOT distinguish upper/lower-case
+    {
         return (relFilename.CmpNoCase(b.relFilename) == 0);
     }
+#endif  // FFS_WIN
+
+#ifdef FFS_LINUX
+    //Linux DOES distinguish between upper/lower-case
+    bool operator>(const FileDescrLine& b ) const
+    {
+        return (relFilename.Cmp(b.relFilename) > 0);
+    }
+    bool operator<(const FileDescrLine& b) const
+    {
+        return (relFilename.Cmp(b.relFilename) < 0);
+    }
+    bool operator==(const FileDescrLine& b) const
+    {
+        return (relFilename.Cmp(b.relFilename) == 0);
+    }
+#endif  // FFS_LINUX
 };
 typedef set<FileDescrLine> DirectoryDescrType;
 
@@ -156,6 +177,7 @@ public:
     FreeFileSync();
     ~FreeFileSync();
 
+    friend class MainDialog;
     friend class GetAllFilesFull;
     friend class CopyThread;
 
@@ -165,8 +187,11 @@ public:
     //main function for synchronization
     static void startSynchronizationProcess(FileCompareResult& grid, const SyncConfiguration& config, StatusUpdater* statusUpdater, bool useRecycleBin);
 
-    static bool recycleBinExists();          //test existence of Recycle Bin API
+    static bool recycleBinExists();         //test existence of Recycle Bin API
     bool setRecycleBinUsage(bool activate); //enables/disables Recycle Bin usage (but only if usage is possible at all): RV: Setting was successful or not
+
+    static void deleteOnGridAndHD(FileCompareResult& grid, const set<int>& rowsToDelete, StatusUpdater* statusUpdater, bool useRecycleBin);
+static void addSubElements(set<int>& subElements, const FileCompareResult& grid, const FileCompareLine& relevantRow);
 
     static void filterCurrentGridData(FileCompareResult& currentGridData, const wxString& includeFilter, const wxString& excludeFilter);
     static void removeFilterOnCurrentGridData(FileCompareResult& currentGridData);
@@ -177,19 +202,24 @@ public:
     static mpz_class calcTotalBytesToTransfer(const FileCompareResult& fileCmpResult, const SyncConfiguration& config);
     static void swapGrids(FileCompareResult& grid);
 
-private:
-    void synchronizeFile(const FileCompareLine& filename, const SyncConfiguration& config, StatusUpdater* statusUpdater);   // true if successful
-    void synchronizeFolder(const FileCompareLine& filename, const SyncConfiguration& config, StatusUpdater* statusUpdater); // true if successful
+    static bool isFFS_ConfigFile(const wxString& filename);
 
-    //windows file copy functionality
-    void removeDirectory(const char* directory);
-    void removeFile(const char* filename);
-    static void copyOverwriting(const char* source, const char* target);
-    static void copyfile(const char* source, const char* target);
-    static void copyCreatingDirs(const wxString& source, const wxString& target);
-    static void createDirectory(const wxString& directory, int level = 0); //level is used internally only
+    static const wxString FFS_ConfigFileID;
+    static const wxString FFS_LastConfigFile;
+
+private:
+    bool synchronizeFile(const FileCompareLine& filename, const SyncConfiguration& config, StatusUpdater* statusUpdater);   // false if nothing was to be done
+    bool synchronizeFolder(const FileCompareLine& filename, const SyncConfiguration& config, StatusUpdater* statusUpdater); // false if nothing was to be done
+
+    //file copy functionality -> keep instance-bound to to be able to prevent wxWidgets-logging
+    void removeDirectory(const wxString& directory);
+    void removeFile(const wxString& filename);
+    void copyOverwriting(const wxString& source, const wxString& target);
+    void copyfile(const wxString& source, const wxString& target);
+    void copyCreatingDirs(const wxString& source, const wxString& target);
+    void createDirectory(const wxString& directory, int level = 0); //level is used internally only
     //some special file functions
-    void moveToRecycleBin(const char* filename);
+    void moveToRecycleBin(const wxString& filename);
     void copyfileMultithreaded(const wxString& source, const wxString& target, StatusUpdater* updateClass);
 
 
@@ -202,6 +232,7 @@ private:
     static wxString calculateMD5Hash(const wxString& filename);
 
     bool recycleBinAvailable;
+    wxLogNull* noWxLogs;
     HINSTANCE hinstShell;
     DLLFUNC fileOperation;
 };
@@ -210,15 +241,15 @@ private:
 class FileError //Exception class used to notify file/directory copy/delete errors
 {
 public:
-    FileError(string txt) : errorMessage(txt) {}
+    FileError(const wxString& txt) : errorMessage(txt) {}
 
-    string show()
+    wxString show()
     {
         return errorMessage;
     }
 
 private:
-    string errorMessage;
+    wxString errorMessage;
 };
 
 
@@ -228,27 +259,5 @@ public:
     AbortThisProcess() {}
     ~AbortThisProcess() {}
 };
-
-
-class CopyThread : public wxThread
-{
-public:
-    CopyThread(const wxString& sourceFile, const wxString& targetFile);
-    ~CopyThread() {}
-
-    ExitCode Entry();
-
-    static wxCriticalSection copyFileCritSec;
-
-    //shared thread data    -> protect with critical section!
-    static bool threadIsFinished;
-    static bool threadWasSuccessful;
-    //
-
-private:
-    const wxString& source;
-    const wxString& target;
-};
-
 
 #endif // FREEFILESYNC_H_INCLUDED

@@ -1,7 +1,7 @@
 #ifndef CUSTOMGRID_H_INCLUDED
 #define CUSTOMGRID_H_INCLUDED
 
-#include "../ui/MainDialog.h"
+#include "../ui/mainDialog.h"
 #include <vector>
 #include <wx/grid.h>
 

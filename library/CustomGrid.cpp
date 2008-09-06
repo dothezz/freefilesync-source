@@ -1,4 +1,4 @@
-#include "CustomGrid.h"
+#include "customGrid.h"
 
 const unsigned int MinimumRows = 15;
 

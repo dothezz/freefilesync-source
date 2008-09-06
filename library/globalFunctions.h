@@ -8,6 +8,10 @@
 
 using namespace std;
 
+extern const wxChar FileNameSeparator;
+extern const wxChar* FloatingPointSeparator;
+extern const wxChar* NumberSeparator;
+
 namespace GlobalFunctions
 {
     int round(double d); //little rounding function

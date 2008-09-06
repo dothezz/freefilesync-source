@@ -47,6 +47,7 @@ public:
     static wxBitmap* bitmapWarning;
     static wxBitmap* bitmapSmallUp;
     static wxBitmap* bitmapSmallDown;
+    static wxBitmap* bitmapSave;
 
     static wxAnimation* animationMoney;
 

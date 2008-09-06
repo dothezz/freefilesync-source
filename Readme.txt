@@ -1,4 +1,4 @@
-FreeFileSync v1.2
+FreeFileSync v1.3
 ----------------- 
 
 Usage
@@ -19,6 +19,7 @@ Features
 	- Only necessary functionality on UI: no overloaded menus or icon jungle.
 	- Select folders via drag & drop.
 	- Your last configuration and screen settings are loaded on startup and saved on exit.
+	- Maintain and load different configurations by drag&drop, load-button or commandline
 	- Double-click to show file in explorer.
 	- copy & paste support to export file-lists.
 	- Progress indicators, status information and error reporting

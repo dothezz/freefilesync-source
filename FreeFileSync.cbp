@@ -61,6 +61,7 @@
 			<Add option='[[if (PLATFORM == PLATFORM_MSW &amp;&amp; (GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
 			<Add option="-D__GNUWIN32__" />
 			<Add option="-D__WXMSW__" />
+			<Add option="-DFFS_WIN" />
 			<Add directory="C:\Programme\CodeBlocks\wxWidgets\include" />
 			<Add directory="C:\Programme\CodeBlocks\wxWidgets\contrib\include" />
 		</Compiler>
@@ -82,37 +83,37 @@
 			<Add library="libcomctl32.a" />
 			<Add library="libwsock32.a" />
 			<Add library="libodbc32.a" />
-			<Add library="Library\GMP\lib\libgmpxx.a" />
-			<Add library="Library\GMP\lib\libgmp.a" />
+			<Add library="library\gmp\lib\libgmpxx.a" />
+			<Add library="library\gmp\lib\libgmp.a" />
 		</Linker>
-		<Unit filename="Application.cpp" />
-		<Unit filename="Application.h" />
 		<Unit filename="FreeFileSync.cpp" />
 		<Unit filename="FreeFileSync.h" />
-		<Unit filename="Library\GMP\include\gmp.h" />
-		<Unit filename="Library\globalFunctions.cpp" />
-		<Unit filename="Library\globalFunctions.h" />
-		<Unit filename="Library\md5.c">
+		<Unit filename="WxWizFrame.fbp" />
+		<Unit filename="application.cpp" />
+		<Unit filename="application.h" />
+		<Unit filename="library\customGrid.cpp" />
+		<Unit filename="library\customGrid.h" />
+		<Unit filename="library\globalFunctions.cpp" />
+		<Unit filename="library\globalFunctions.h" />
+		<Unit filename="library\gmp\include\gmp.h" />
+		<Unit filename="library\md5.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="Library\md5.h" />
-		<Unit filename="UI\GUI_Generated.cpp" />
-		<Unit filename="UI\GUI_Generated.h" />
-		<Unit filename="UI\MainDialog.cpp" />
-		<Unit filename="UI\MainDialog.h" />
-		<Unit filename="UI\SyncDialog.cpp" />
-		<Unit filename="UI\SyncDialog.h" />
-		<Unit filename="WxWizFrame.fbp" />
-		<Unit filename="library\CustomGrid.cpp" />
-		<Unit filename="library\CustomGrid.h" />
+		<Unit filename="library\md5.h" />
 		<Unit filename="library\wxWidgets.h" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
-		<Unit filename="ui\Resources.cpp" />
-		<Unit filename="ui\Resources.h" />
-		<Unit filename="ui\SmallDialogs.cpp" />
-		<Unit filename="ui\SmallDialogs.h" />
+		<Unit filename="ui\guiGenerated.cpp" />
+		<Unit filename="ui\guiGenerated.h" />
+		<Unit filename="ui\mainDialog.cpp" />
+		<Unit filename="ui\mainDialog.h" />
+		<Unit filename="ui\resources.cpp" />
+		<Unit filename="ui\resources.h" />
+		<Unit filename="ui\smallDialogs.cpp" />
+		<Unit filename="ui\smallDialogs.h" />
+		<Unit filename="ui\syncDialog.cpp" />
+		<Unit filename="ui\syncDialog.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

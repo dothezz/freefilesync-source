@@ -4,11 +4,15 @@
 #include "FreeFileSync.h"
 #include "library\md5.h"
 #include <stdexcept> //for std::runtime_error
-#include "library\globalfunctions.h"
-#include "library\GMP\include\gmp.h"
+#include "library/globalFunctions.h"
+#include "library/gmp/include\gmp.h"
 #include <wx/filename.h>
+#include <fstream>
 
 using namespace GlobalFunctions;
+
+const wxString FreeFileSync::FFS_ConfigFileID = "FFS_CONFIG";
+const wxString FreeFileSync::FFS_LastConfigFile = "LastRun.FFS";
 
 inline
 wxString formatTime(unsigned int number)
@@ -35,7 +39,7 @@ wxString formatTime(unsigned int number)
 }
 
 
-bool filetimeCmpSmallerThan(const FILETIME a,const FILETIME b)
+bool filetimeCmpSmallerThan(const FILETIME a, const FILETIME b)
 {
     if (a.dwHighDateTime != b.dwHighDateTime)
         return (a.dwHighDateTime < b.dwHighDateTime);
@@ -59,7 +63,7 @@ void FreeFileSync::getFileInformation(FileInfo& output, const wxString& filename
     HANDLE fileHandle;
 
     if ((fileHandle = FindFirstFile(filename.c_str(), &winFileInfo)) == INVALID_HANDLE_VALUE)
-        throw FileError((wxString(_("Could not retrieve file info for: ")) + "\"" + filename.c_str() + "\"").c_str());
+        throw FileError(wxString(_("Could not retrieve file info for: ")) + "\"" + filename + "\"");
 
     FindClose(fileHandle);
 
@@ -115,6 +119,7 @@ void FreeFileSync::getFileInformation(FileInfo& output, const wxString& filename
     mpz_clear(largeInt);
 }
 
+
 wxString FreeFileSync::calculateMD5Hash(const wxString& filename)
 {
     const unsigned int bufferSize = 4096;
@@ -127,7 +132,7 @@ wxString FreeFileSync::calculateMD5Hash(const wxString& filename)
     md5_init(&state);
     FILE* inputFile = fopen( filename.c_str(), "rb");
     if (!inputFile)
-        throw FileError((wxString(_("Could not open file: ")) + "\"" + filename + "\"").c_str());
+        throw FileError(wxString(_("Could not open file: ")) + "\"" + filename + "\"");
     do
     {
         unsigned int length = fread(buffer, 1, bufferSize, inputFile);
@@ -460,18 +465,16 @@ private:
 };
 
 
-void FreeFileSync::moveToRecycleBin(const char* filename)
+void FreeFileSync::moveToRecycleBin(const wxString& filename)
 {
-    BOOL aborted = false;
+    bool aborted = false;
     SHFILEOPSTRUCT fileOp;
 
-    char filenameDoubleNull[MAX_PATH + 1];
-    strcpy (filenameDoubleNull, filename);
-    filenameDoubleNull[strlen(filenameDoubleNull) + 1] = 0;
+    wxString filenameDoubleNull = filename + char(0);
 
     fileOp.hwnd   = NULL;
     fileOp.wFunc  = FO_DELETE;
-    fileOp.pFrom  = filenameDoubleNull;
+    fileOp.pFrom  = filenameDoubleNull.c_str();
     fileOp.pTo    = NULL;
     fileOp.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_SILENT;
     fileOp.fAnyOperationsAborted = aborted;
@@ -479,14 +482,14 @@ void FreeFileSync::moveToRecycleBin(const char* filename)
     fileOp.lpszProgressTitle     = NULL;
 
     if (fileOperation(&fileOp   //Pointer to an SHFILEOPSTRUCT structure that contains information the function needs to carry out.
-                     ) != 0 || aborted) throw FileError(string(_("Error moving file ")) + filename + _(" to recycle bin!"));
+                     ) != 0 || aborted) throw FileError(wxString(_("Error moving file ")) + "\"" + filename + "\"" + _(" to recycle bin!"));
 }
 
 
 inline
-void FreeFileSync::removeFile(const char* filename)
+void FreeFileSync::removeFile(const wxString& filename)
 {
-    if (!wxFileExists(filename)) return;
+    if (!wxFileExists(filename)) return; //this is NOT an error situation: the manual deletion relies on it!
 
     if (recycleBinAvailable)
     {
@@ -495,17 +498,19 @@ void FreeFileSync::removeFile(const char* filename)
     }
 
     if (!SetFileAttributes(
-                filename, // address of filename
+                filename.c_str(), // address of filename
                 FILE_ATTRIBUTE_NORMAL	 	// address of attributes to set
-            )) throw FileError(string(_("Error deleting file ")) + filename);
+            )) throw FileError(wxString(_("Error deleting file ")) + "\"" + filename + "\"");
 
-    if (!DeleteFile(filename)) throw FileError(string(_("Error deleting file ")) + filename);
+
+    if (!wxRemoveFile(filename))
+        throw FileError(wxString(_("Error deleting file ")) + "\"" + filename + "\"");
 }
 
 
-void FreeFileSync::removeDirectory(const char* directory)
+void FreeFileSync::removeDirectory(const wxString& directory)
 {
-    if (!wxDirExists(directory)) return;
+    if (!wxDirExists(directory)) return; //this is NOT an error situation: the manual deletion relies on it!
 
     if (recycleBinAvailable)
     {
@@ -513,38 +518,47 @@ void FreeFileSync::removeDirectory(const char* directory)
         return;
     }
 
-    wxDir dir(directory);
-
-    //get all files and directories from current directory (and subdirectories)
     wxArrayString fileList;
     wxArrayString dirList;
-    GetAllFilesSimple traverser(fileList, dirList);
-    dir.Traverse(traverser);
+
+    {   //own scope for directory access to not disturb deletion!
+        wxDir dir(directory);
+
+        //get all files and directories from current directory (and subdirectories)
+        GetAllFilesSimple traverser(fileList, dirList);
+        dir.Traverse(traverser);
+    }
 
     for (unsigned int j = 0; j < fileList.GetCount(); ++j)
-        removeFile(fileList[j].c_str());
+        removeFile(fileList[j]);
 
     dirList.Insert(directory, 0);   //this directory will be deleted last
 
     for (int j = int(dirList.GetCount()) - 1; j >= 0 ; --j)
-        if (!RemoveDirectory(dirList[j].c_str() // address of directory to remove
-                            ))  throw FileError(string(_("Error deleting directory ")) + dirList[j].c_str());
+
+        if (!wxRmdir(dirList[j]))
+            throw FileError(wxString(_("Error deleting directory ")) + "\"" + dirList[j] + "\"");
 }
 
 
 inline
-void FreeFileSync::copyOverwriting(const char* source, const char* target)
+void FreeFileSync::copyfile(const wxString& source, const wxString& target)
+{
+    if (!wxCopyFile(source, target, false)) //return false if file exists
+        throw FileError(wxString(_("Error copying file ")) + "\"" + source + "\"" + _(" to ") + "\"" + target + "\"");
+}
+
+
+inline
+void FreeFileSync::copyOverwriting(const wxString& source, const wxString& target)
 {
     if (!SetFileAttributes(
-                target, // address of filename
+                target.c_str(), // address of filename
                 FILE_ATTRIBUTE_NORMAL	 	// address of attributes to set
-            )) throw FileError(string(_("Error overwriting file ")) + target);
+            )) throw FileError(wxString(_("Error overwriting file ")) + "\"" + target + "\"");
 
-    if (!CopyFile(
-                source,	// pointer to name of an existing file
-                target,	// pointer to filename to copy to
-                FALSE 	// overwrite if file exists
-            ))  throw FileError(string(_("Error copying file ")) + source + _(" to ") + target);
+    if (!wxCopyFile(source, target, true)) //if file exists it will be overwritten
+        throw FileError(wxString(_("Error copying file ")) + "\"" + source + "\"" + _(" to ") + "\"" + target + "\"");
 }
 
 
@@ -556,39 +570,23 @@ void FreeFileSync::createDirectory(const wxString& directory, int level)
     if (level == 50)    //catch endless loop
         return;
 
-//try to create directory
-    if (CreateDirectory(
-                directory.c_str(),	// pointer to a directory path string
-                NULL // pointer to a security descriptor
-            )) return;
+    //try to create directory
+    if (wxMkdir(directory))
+        return;
 
     //if not successfull try to create containing folders first
-    wxString createFirstDir = wxDir(directory).GetName().BeforeLast('\\');
+    wxString createFirstDir = wxDir(directory).GetName().BeforeLast(FileNameSeparator);
 
     //call function recursively
     if (createFirstDir.IsEmpty()) return;
-
     createDirectory(createFirstDir, level + 1);
 
     //now creation should be possible
-    if (!CreateDirectory(
-                directory.c_str(),	// pointer to a directory path string
-                NULL // pointer to a security descriptor
-            ))
+    if (!wxMkdir(directory))
     {
         if (level == 0)
-            throw FileError(string(_("Error creating directory ")) + directory.c_str());
+            throw FileError(wxString(_("Error creating directory ")) + "\"" + directory + "\"");
     }
-}
-
-
-void FreeFileSync::copyfile(const char* source, const char* target)
-{
-    if (!CopyFile(
-                source,	// pointer to name of an existing file
-                target,	// pointer to filename to copy to
-                TRUE 	// break if file exists
-            )) throw FileError(string(_("Error copying file ")) + source + _(" to ") + target);
 }
 
 
@@ -597,43 +595,57 @@ void FreeFileSync::copyCreatingDirs(const wxString& source, const wxString& targ
     wxString targetPath = wxFileName(target).GetPath();
     createDirectory(targetPath);
 
-    if (!CopyFile(
-                source.c_str(),	// pointer to name of an existing file
-                target.c_str(),	// pointer to filename to copy to
-                TRUE 	// break if file exists
-            )) throw FileError(string(_("Error copying file ")) + source.c_str() + _(" to ") + target.c_str());
+    if (!wxCopyFile(source, target, false)) //error if file exists
+        throw FileError(wxString(_("Error copying file ")) + "\"" + source + "\"" + _(" to ") + "\"" + target + "\"");
 }
 
 //###########################################################################################
 
+class CopyThread : public wxThread
+{
+public:
+    CopyThread(const wxString& sourceFile, const wxString& targetFile) :
+            source(sourceFile),
+            target(targetFile)
+    {}
+
+    ~CopyThread() {}
+
+    ExitCode Entry()
+    {
+        bool success = (CopyFile(
+                            source.c_str(),	// pointer to name of an existing file
+                            target.c_str(),	// pointer to filename to copy to
+                            TRUE 	// break if file exists
+                        ));
+
+        copyFileCritSec.Enter();
+
+        //report status to main thread
+        threadIsFinished    = true;
+        threadWasSuccessful = success;
+
+        copyFileCritSec.Leave();
+
+        return 0;
+    }
+
+    static wxCriticalSection copyFileCritSec;
+
+    //shared thread data    -> protect with critical section!
+    static bool threadIsFinished;
+    static bool threadWasSuccessful;
+    //
+
+private:
+    const wxString& source;
+    const wxString& target;
+};
+
 wxCriticalSection CopyThread::copyFileCritSec;
-bool CopyThread::threadIsFinished = true;
+bool CopyThread::threadIsFinished    = true;
 bool CopyThread::threadWasSuccessful = true;
 
-CopyThread::CopyThread(const wxString& sourceFile, const wxString& targetFile) :
-        source(sourceFile),
-        target(targetFile)
-{}
-
-
-wxThread::ExitCode CopyThread::Entry()
-{
-    bool success = (CopyFile(
-                        source.c_str(),	// pointer to name of an existing file
-                        target.c_str(),	// pointer to filename to copy to
-                        TRUE 	// break if file exists
-                    ));
-
-    copyFileCritSec.Enter();
-
-    //report status to main thread
-    threadIsFinished    = true;
-    threadWasSuccessful = success;
-
-    copyFileCritSec.Leave();
-
-    return 0;
-}
 
 
 void FreeFileSync::copyfileMultithreaded(const wxString& source, const wxString& target, StatusUpdater* updateClass)
@@ -659,7 +671,7 @@ void FreeFileSync::copyfileMultithreaded(const wxString& source, const wxString&
         {
             if (!CopyThread::threadWasSuccessful)
             {
-                throw FileError(string(_("Error copying file ")) + source.c_str() + _(" to ") + target.c_str());
+                throw FileError(wxString(_("Error copying file ")) + "\"" + source + "\"" + _(" to ") + "\"" + target + "\"");
             }
             else return;
         }
@@ -687,6 +699,9 @@ FreeFileSync::FreeFileSync()
         else
             recycleBinAvailable = true;
     }
+
+    //prevent logging of wxWidgets
+    noWxLogs = new wxLogNull;
 }
 
 
@@ -694,6 +709,8 @@ FreeFileSync::~FreeFileSync()
 {
     if (recycleBinAvailable)
         FreeLibrary(hinstShell);
+
+    delete noWxLogs;
 }
 
 
@@ -817,11 +834,11 @@ mpz_class FreeFileSync::calcTotalBytesToTransfer(const FileCompareResult& fileCm
 }
 
 
-void FreeFileSync::synchronizeFile(const FileCompareLine& filename, const SyncConfiguration& config, StatusUpdater* statusUpdater)
+bool FreeFileSync::synchronizeFile(const FileCompareLine& filename, const SyncConfiguration& config, StatusUpdater* statusUpdater)
 {
     assert (statusUpdater);
 
-    if (!filename.selectedForSynchronization) return;
+    if (!filename.selectedForSynchronization) return false;
 
     wxString target;
 
@@ -833,7 +850,7 @@ void FreeFileSync::synchronizeFile(const FileCompareLine& filename, const SyncCo
         {
         case SyncDirLeft:   //delete files on left
             statusUpdater->updateStatus(wxString(_("Deleting file ") + filename.fileDescrLeft.filename));
-            removeFile(filename.fileDescrLeft.filename.c_str());
+            removeFile(filename.fileDescrLeft.filename);
             break;
         case SyncDirRight:  //copy files to right
             target = filename.fileDescrRight.directory + filename.fileDescrLeft.relFilename.c_str();
@@ -843,6 +860,7 @@ void FreeFileSync::synchronizeFile(const FileCompareLine& filename, const SyncCo
             copyfileMultithreaded(filename.fileDescrLeft.filename, target, statusUpdater);
             break;
         case SyncDirNone:
+            return false;
             break;
         default:
             assert (false);
@@ -861,9 +879,10 @@ void FreeFileSync::synchronizeFile(const FileCompareLine& filename, const SyncCo
             break;
         case SyncDirRight:  //delete files on right
             statusUpdater->updateStatus(wxString(_("Deleting file ") + filename.fileDescrRight.filename));
-            removeFile(filename.fileDescrRight.filename.c_str());
+            removeFile(filename.fileDescrRight.filename);
             break;
         case SyncDirNone:
+            return false;
             break;
         default:
             assert (false);
@@ -879,17 +898,18 @@ void FreeFileSync::synchronizeFile(const FileCompareLine& filename, const SyncCo
             statusUpdater->updateStatus(wxString(_("Copying file ")) + filename.fileDescrRight.filename +
                                         _(" overwriting ") + filename.fileDescrLeft.filename);
 
-            removeFile(filename.fileDescrLeft.filename.c_str());  //only used if switch activated by user, else file is simply deleted
+            removeFile(filename.fileDescrLeft.filename);  //only used if switch activated by user, else file is simply deleted
             copyfileMultithreaded(filename.fileDescrRight.filename, filename.fileDescrLeft.filename, statusUpdater);
             break;
         case SyncDirRight:  //copy from left to right
             statusUpdater->updateStatus(wxString(_("Copying file ")) + filename.fileDescrLeft.filename +
                                         _(" overwriting ") + filename.fileDescrRight.filename);
 
-            removeFile(filename.fileDescrRight.filename.c_str());  //only used if switch activated by user, else file is simply deleted
+            removeFile(filename.fileDescrRight.filename);  //only used if switch activated by user, else file is simply deleted
             copyfileMultithreaded(filename.fileDescrLeft.filename, filename.fileDescrRight.filename, statusUpdater);
             break;
         case SyncDirNone:
+            return false;
             break;
         default:
             assert (false);
@@ -897,20 +917,21 @@ void FreeFileSync::synchronizeFile(const FileCompareLine& filename, const SyncCo
         break;
 
     case FilesEqual:
+        return false;
         break;
 
     default:
         assert (false);
     }
-    return;
+    return true;
 }
 
 
-void FreeFileSync::synchronizeFolder(const FileCompareLine& filename, const SyncConfiguration& config, StatusUpdater* statusUpdater)
+bool FreeFileSync::synchronizeFolder(const FileCompareLine& filename, const SyncConfiguration& config, StatusUpdater* statusUpdater)
 {
     assert (statusUpdater);
 
-    if (!filename.selectedForSynchronization) return;
+    if (!filename.selectedForSynchronization) return false;
 
     wxString target;
 
@@ -922,7 +943,7 @@ void FreeFileSync::synchronizeFolder(const FileCompareLine& filename, const Sync
         {
         case SyncDirLeft:   //delete folders on left
             statusUpdater->updateStatus(wxString(_("Deleting folder ") + filename.fileDescrLeft.filename));
-            removeDirectory(filename.fileDescrLeft.filename.c_str());
+            removeDirectory(filename.fileDescrLeft.filename);
             break;
         case SyncDirRight:  //create folders on right
             target = filename.fileDescrRight.directory + filename.fileDescrLeft.relFilename;
@@ -930,10 +951,11 @@ void FreeFileSync::synchronizeFolder(const FileCompareLine& filename, const Sync
 
             //some check to catch the error that directory on source has been deleted externally after the "compare"...
             if (!wxDirExists(filename.fileDescrLeft.filename))
-                throw FileError(string(_("Error: Source directory does not exist anymore: ")) + filename.fileDescrLeft.filename.c_str());
+                throw FileError(wxString(_("Error: Source directory does not exist anymore: ")) + "\"" + filename.fileDescrLeft.filename + "\"");
             createDirectory(target);
             break;
         case SyncDirNone:
+            return false;
             break;
         default:
             assert (false);
@@ -949,14 +971,15 @@ void FreeFileSync::synchronizeFolder(const FileCompareLine& filename, const Sync
 
             //some check to catch the error that directory on source has been deleted externally after the "compare"...
             if (!wxDirExists(filename.fileDescrRight.filename))
-                throw FileError(string(_("Error: Source directory does not exist anymore: ")) + filename.fileDescrRight.filename.c_str());
+                throw FileError(wxString(_("Error: Source directory does not exist anymore: ")) + filename.fileDescrRight.filename);
             createDirectory(target);
             break;
         case SyncDirRight:  //delete folders on right
             statusUpdater->updateStatus(wxString(_("Deleting folder ") + filename.fileDescrRight.filename));
-            removeDirectory(filename.fileDescrRight.filename.c_str());
+            removeDirectory(filename.fileDescrRight.filename);
             break;
         case SyncDirNone:
+            return false;
             break;
         default:
             assert (false);
@@ -964,6 +987,7 @@ void FreeFileSync::synchronizeFolder(const FileCompareLine& filename, const Sync
         break;
 
     case FilesEqual:
+        return false;
         break;
     case RightFileNewer:
     case LeftFileNewer:
@@ -971,14 +995,12 @@ void FreeFileSync::synchronizeFolder(const FileCompareLine& filename, const Sync
     default:
         assert (false);
     }
-    return;
+    return true;
 }
 
 
 wxString FreeFileSync::formatFilesizeToShortString(const mpz_class& filesize)
 {
-    const char* DigitsSeparator = _(".");
-
     mpf_class nrOfBytes = filesize;
 
     wxString unit = " Byte";
@@ -1010,16 +1032,16 @@ wxString FreeFileSync::formatFilesizeToShortString(const mpz_class& filesize)
 
     mp_exp_t exponent = 0;
 
-    string temp;
+    wxString temp;
     if (unit == " Byte")        //no decimal places in case of bytes
     {
         temp = nrOfBytes.get_str(exponent, 10, 3);
-        if (!temp.length()) //if nrOfBytes is zero GMP returns an empty string
+        if (!temp.Len()) //if nrOfBytes is zero GMP returns an empty string
             temp = "0";
     }
     else
     {
-        temp = string(nrOfBytes.get_str(exponent, 10, 3) + "000").substr(0, 3); //returns mantisse of length 3 in all cases
+        temp = wxString(nrOfBytes.get_str(exponent, 10, 3) + "000").substr(0, 3); //returns mantisse of length 3 in all cases
 
         if (exponent < 0 || exponent > 3)
             temp = _("Error");
@@ -1027,18 +1049,18 @@ wxString FreeFileSync::formatFilesizeToShortString(const mpz_class& filesize)
             switch (exponent)
             {
             case 0:
-                temp = string("0") + DigitsSeparator + temp.substr(0, 2); //shorten mantisse as a 0 will be inserted
+                temp = wxString("0") + FloatingPointSeparator + temp.substr(0, 2); //shorten mantisse as a 0 will be inserted
                 break;
             case 1:
             case 2:
-                temp.insert(exponent, DigitsSeparator);
+                temp.insert(exponent, FloatingPointSeparator);
                 break;
             case 3:
                 break;
             }
     }
     temp+= unit;
-    return temp.c_str();
+    return temp;
 }
 
 
@@ -1147,10 +1169,10 @@ wxString FreeFileSync::getFormattedDirectoryName(const wxString& dirname)
 {  //this formatting is needed since functions in FreeFileSync.cpp expect the directory to end with '\' to be able to split the relative names
     //Actually all it needs, is the length of the directory
 
-    //let wxWidgets do the directory formatting, e.g. replace '/' with '\'
+    //let wxWidgets do the directory formatting, e.g. replace '/' with '\' for Windows
     wxString result = wxDir(dirname).GetName();
 
-    result.Append('\\');
+    result.Append(FileNameSeparator);
     return result;
 }
 
@@ -1192,7 +1214,10 @@ void FreeFileSync::startSynchronizationProcess(FileCompareResult& grid, const Sy
 
                     try
                     {
-                        fileSyncObject.synchronizeFolder(*i, config, statusUpdater);
+                        if (fileSyncObject.synchronizeFolder(*i, config, statusUpdater))
+                            //progress indicator update
+                            //indicator is updated only if directory is synched correctly  (and if some sync was done)!
+                            statusUpdater->updateProgressIndicator(0);  //each call represents one processed file/directory
                         break;
                     }
                     catch (FileError& error)
@@ -1211,9 +1236,6 @@ void FreeFileSync::startSynchronizationProcess(FileCompareResult& grid, const Sy
                             assert (false);
                     }
                 }
-                //progress indicator update
-                //indicator is updated no matter if errors occured or not!
-                statusUpdater->updateProgressIndicator(0);  //each call represents one processed file/directory
             }
         }
 
@@ -1235,7 +1257,16 @@ void FreeFileSync::startSynchronizationProcess(FileCompareResult& grid, const Sy
 
                             try
                             {
-                                fileSyncObject.synchronizeFile(*i, config, statusUpdater);
+                                if (fileSyncObject.synchronizeFile(*i, config, statusUpdater))
+                                {
+                                    //progress indicator update
+                                    //indicator is updated only if file is synched correctly (and if some sync was done)!
+                                    mpz_t largeTmpInt;
+                                    mpz_init(largeTmpInt);
+                                    FreeFileSync::getBytesToTransfer(largeTmpInt, *i, config);
+                                    statusUpdater->updateProgressIndicator(mpz_get_d(largeTmpInt));
+                                    mpz_clear(largeTmpInt);
+                                }
                                 break;
                             }
                             catch (FileError& error)
@@ -1254,13 +1285,6 @@ void FreeFileSync::startSynchronizationProcess(FileCompareResult& grid, const Sy
                                     assert (false);
                             }
                         }
-                        //progress indicator update
-                        //indicator is updated no matter if errors occured or not!
-                        mpz_t largeTmpInt;
-                        mpz_init(largeTmpInt);
-                        FreeFileSync::getBytesToTransfer(largeTmpInt, *i, config);
-                        statusUpdater->updateProgressIndicator(mpz_get_d(largeTmpInt));
-                        mpz_clear(largeTmpInt);
                     }
                 }
             }
@@ -1275,4 +1299,129 @@ void FreeFileSync::startSynchronizationProcess(FileCompareResult& grid, const Sy
         return;
     }
 }
+
+
+bool FreeFileSync::isFFS_ConfigFile(const wxString& filename)
+{
+    ifstream config(filename.c_str());
+    if (!config)
+        return false;
+
+    char bigBuffer[10000];
+
+    //read FFS identifier
+    config.get(bigBuffer, FreeFileSync::FFS_ConfigFileID.Len() + 1);
+
+    return (FFS_ConfigFileID == wxString(bigBuffer));
+}
+
+
+//add(!) all files and subfolder gridlines that are dependent from the directory
+void FreeFileSync::addSubElements(set<int>& subElements, const FileCompareResult& grid, const FileCompareLine& relevantRow)
+{
+    wxString relevantDirectory;
+
+    if (relevantRow.fileDescrLeft.objType == IsDirectory)
+        relevantDirectory = relevantRow.fileDescrLeft.relFilename;
+
+    else if (relevantRow.fileDescrRight.objType == IsDirectory)
+        relevantDirectory = relevantRow.fileDescrRight.relFilename;
+
+    else
+        return;
+
+    for (FileCompareResult::const_iterator i = grid.begin(); i != grid.end(); ++i)
+        if (i->fileDescrLeft.relFilename.StartsWith(relevantDirectory) ||
+                i->fileDescrRight.relFilename.StartsWith(relevantDirectory))
+            subElements.insert(i - grid.begin());
+}
+
+
+void FreeFileSync::deleteOnGridAndHD(FileCompareResult& grid, const set<int>& rowsToDelete, StatusUpdater* statusUpdater, bool useRecycleBin)
+{
+    FreeFileSync fileSyncObject;    //currently only needed for recycle bin
+    fileSyncObject.setRecycleBinUsage(useRecycleBin);
+
+    set<int> rowsToDeleteInGrid;
+
+    //remove from hd
+    for (set<int>::iterator i = rowsToDelete.begin(); i != rowsToDelete.end(); ++i)
+    {
+        const FileCompareLine& currentCmpLine = grid[*i];
+
+        while (true)
+        {
+            try
+            {
+                if (currentCmpLine.fileDescrLeft.objType == IsFile)
+                    fileSyncObject.removeFile(currentCmpLine.fileDescrLeft.filename);
+                else if (currentCmpLine.fileDescrLeft.objType == IsDirectory)
+                    fileSyncObject.removeDirectory(currentCmpLine.fileDescrLeft.filename);
+
+                if (currentCmpLine.fileDescrRight.objType == IsFile)
+                    fileSyncObject.removeFile(currentCmpLine.fileDescrRight.filename);
+                else if (currentCmpLine.fileDescrRight.objType == IsDirectory)
+                    fileSyncObject.removeDirectory(currentCmpLine.fileDescrRight.filename);
+
+                rowsToDeleteInGrid.insert(*i);
+
+                break;
+            }
+            catch (FileError& error)
+            {
+
+                //if (updateClass) -> is mandatory
+                int rv = statusUpdater->reportError(error.show());
+
+                if (rv == StatusUpdater::Continue)
+                    break;
+
+                else if (rv == StatusUpdater::Retry)
+                    ;   //continue with loop
+                else
+                    assert (false);
+            }
+        }
+    }
+
+    //retrieve all files and subfolder gridlines that are dependent from deleted directories and add them to the list
+    set<int> additionalRowsToDelete;
+    for (set<int>::iterator i = rowsToDeleteInGrid.begin(); i != rowsToDeleteInGrid.end(); ++i)
+        addSubElements(additionalRowsToDelete, grid, grid[*i]);
+
+    for (set<int>::iterator i = additionalRowsToDelete.begin(); i != additionalRowsToDelete.end(); ++i)
+        rowsToDeleteInGrid.insert(*i);
+
+
+    //remove deleted rows from grid
+
+    //for (set<int>::reverse_iterator i = rowsToDeleteInGrid.rbegin(); i != rowsToDeleteInGrid.rend(); ++i)
+    //    grid.erase(grid.begin() + *i);
+
+    //Note: the following lines are a performance optimization for deleting elements from a vector. It is incredibly faster to create a new
+    //vector and leave specific elements out than to delete row by row and force recopying of most elements for each single deletion (linear vs quadratic runtime)
+
+    FileCompareResult temp;
+    int rowNr = 0;
+    int rowToSkip = -1;
+
+    set<int>::iterator rowToSkipIndex = rowsToDeleteInGrid.begin();
+
+    if (rowToSkipIndex != rowsToDeleteInGrid.end())
+        rowToSkip = *rowToSkipIndex;
+
+    for (FileCompareResult::iterator i = grid.begin(); i != grid.end(); ++i, ++rowNr)
+    {
+        if (rowNr != rowToSkip)
+            temp.push_back(*i);
+        else
+        {
+            rowToSkipIndex++;
+            if (rowToSkipIndex != rowsToDeleteInGrid.end())
+                rowToSkip = *rowToSkipIndex;
+        }
+    }
+    grid.swap(temp);
+}
+
 

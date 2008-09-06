@@ -1,5 +1,5 @@
-#include "SmallDialogs.h"
-#include "..\library\globalFunctions.h"
+#include "smallDialogs.h"
+#include "../library/globalFunctions.h"
 
 AboutDlg::AboutDlg(MainDialog* window) : AboutDlgGenerated(window)
 {
@@ -12,6 +12,8 @@ AboutDlg::AboutDlg(MainDialog* window) : AboutDlgGenerated(window)
     //build
     wxString build = wxString(_("(Build: ")) + __TDATE__ + ")";
     m_build->SetLabel(build);
+
+    m_button8->SetFocus();
 }
 
 AboutDlg::~AboutDlg() {}
@@ -28,7 +30,10 @@ void AboutDlg::OnOK(wxCommandEvent& event)
 //########################################################################################
 
 
-HelpDlg::HelpDlg(MainDialog* window) : HelpDlgGenerated(window) {}
+HelpDlg::HelpDlg(MainDialog* window) : HelpDlgGenerated(window)
+{
+    m_button8->SetFocus();
+}
 
 HelpDlg::~HelpDlg() {}
 
@@ -46,7 +51,9 @@ void HelpDlg::OnOK(wxCommandEvent& event)
 //########################################################################################
 
 
-FilterDlg::FilterDlg(MainDialog* window) : FilterDlgGenerated(window), mainDialog(window)
+FilterDlg::FilterDlg(MainDialog* window) :
+        FilterDlgGenerated(window),
+        mainDialog(window)
 {
 
     m_bitmap8->SetBitmap(*GlobalResources::bitmapInclude);
@@ -58,10 +65,12 @@ FilterDlg::FilterDlg(MainDialog* window) : FilterDlgGenerated(window), mainDialo
 
 FilterDlg::~FilterDlg() {}
 
+
 void FilterDlg::OnClose(wxCloseEvent& event)
 {
     EndModal(0);
 }
+
 
 void FilterDlg::OnOK(wxCommandEvent& event)
 {
@@ -71,6 +80,12 @@ void FilterDlg::OnOK(wxCommandEvent& event)
 
     //when leaving dialog: filter and redraw grid, if filter is active
     EndModal(OkayButtonPressed);
+}
+
+
+void FilterDlg::OnCancel(wxCommandEvent& event)
+{
+    EndModal(0);
 }
 
 
@@ -84,6 +99,34 @@ void FilterDlg::OnDefault(wxCommandEvent& event)
 }
 //########################################################################################
 
+DeleteDialog::DeleteDialog(const wxString& headerText, const wxString& messageText, wxWindow* main) :
+        DeleteDialogGenerated(main)
+{
+    m_staticTextHeader->SetLabel(headerText);
+    m_textCtrlMessage->SetValue(messageText);
+
+    m_buttonOK->SetFocus();
+}
+
+DeleteDialog::~DeleteDialog() {}
+
+
+void DeleteDialog::OnOK(wxCommandEvent& event)
+{
+    EndModal(OkayButtonPressed);
+}
+
+void DeleteDialog::OnCancel(wxCommandEvent& event)
+{
+    EndModal(CancelButtonPressed);
+}
+
+void DeleteDialog::OnClose(wxCloseEvent& event)
+{
+    EndModal(CancelButtonPressed);
+}
+//########################################################################################
+
 
 ErrorDlg::ErrorDlg(const wxString messageText, bool& suppressErrormessages) :
         ErrorDlgGenerated(0),
@@ -91,6 +134,8 @@ ErrorDlg::ErrorDlg(const wxString messageText, bool& suppressErrormessages) :
 {
     m_bitmap10->SetBitmap(*GlobalResources::bitmapWarning);
     m_textCtrl8->SetValue(messageText);
+
+    m_buttonContinue->SetFocus();
 }
 
 ErrorDlg::~ErrorDlg() {}
@@ -134,6 +179,8 @@ SyncStatus::SyncStatus(StatusUpdater* updater, double gaugeTotalElements, wxWind
 
     resetGauge(gaugeTotalElements);
 
+    m_buttonAbort->SetFocus();
+
     if (windowToDis)    //disable (main) window while this status dialog is shown
         windowToDis->Enable(false);
 }
@@ -142,7 +189,10 @@ SyncStatus::SyncStatus(StatusUpdater* updater, double gaugeTotalElements, wxWind
 SyncStatus::~SyncStatus()
 {
     if (windowToDis)
+    {
         windowToDis->Enable(true);
+        windowToDis->Raise();
+    }
 }
 
 
@@ -183,14 +233,10 @@ void SyncStatus::updateStatusDialogNow()
     m_staticTextProcessedObj->SetLabel(GlobalFunctions::numberToWxString(numberOfProcessedObjects));
 
     //remaining bytes left for copy
-    m_staticTextBytesCurrent->SetLabel(FreeFileSync::formatFilesizeToShortString(mpz_class(currentElements)));
-
-    static double totalElementsLast = -1;
-    if (totalElementsLast != totalElements)
-    {
-        totalElementsLast = totalElements;
-        m_staticTextBytesTotal->SetLabel(FreeFileSync::formatFilesizeToShortString(mpz_class(totalElements)));
-    }
+    const wxString remainingBytes =
+        FreeFileSync::formatFilesizeToShortString(mpz_class(currentElements)) + "/" +
+        FreeFileSync::formatFilesizeToShortString(mpz_class(totalElements));
+    m_staticTextBytesCopied->SetLabel(remainingBytes);
 
     //do the ui update
     updateUI_Now();
@@ -204,6 +250,7 @@ void SyncStatus::processHasFinished(const wxString& finalStatusText) //essential
     m_staticTextStatus->SetLabel(finalStatusText);
     m_buttonAbort->Hide();
     m_buttonOK->Show();
+    m_buttonOK->SetFocus();
 
     updateStatusDialogNow(); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
     Layout();                //

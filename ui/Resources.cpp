@@ -1,4 +1,4 @@
-#include "Resources.h"
+#include "resources.h"
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
 #include <wx/image.h>
@@ -38,6 +38,7 @@ wxBitmap* GlobalResources::bitmapFilterOff       = 0;
 wxBitmap* GlobalResources::bitmapWarning         = 0;
 wxBitmap* GlobalResources::bitmapSmallUp         = 0;
 wxBitmap* GlobalResources::bitmapSmallDown       = 0;
+wxBitmap* GlobalResources::bitmapSave       = 0;
 
 wxAnimation* GlobalResources::animationMoney     = 0;
 
@@ -77,6 +78,7 @@ void GlobalResources::loadResourceFiles()
     bitmapResource["Warning.png"]           = (bitmapWarning         = new wxBitmap(wxNullBitmap));
     bitmapResource["small arrow up.png"]    = (bitmapSmallUp         = new wxBitmap(wxNullBitmap));
     bitmapResource["small arrow down.png"]  = (bitmapSmallDown       = new wxBitmap(wxNullBitmap));
+    bitmapResource["save.png"]              = (bitmapSave            = new wxBitmap(wxNullBitmap));
 
     animationMoney = new wxAnimation(wxNullAnimation);
 

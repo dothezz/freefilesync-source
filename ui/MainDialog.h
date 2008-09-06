@@ -10,18 +10,17 @@
 #ifndef MAINDIALOG_H
 #define MAINDIALOG_H
 
-#include "..\library\wxWidgets.h"
-#include "GUI_Generated.h"
-#include "..\FreeFileSync.h"
+#include "../library/wxWidgets.h"
+#include "guiGenerated.h"
+#include "../FreeFileSync.h"
 
-#include "SyncDialog.h"
-#include "SmallDialogs.h"
-#include "Resources.h"
+#include "syncDialog.h"
+#include "smallDialogs.h"
+#include "resources.h"
+#include <wx/dnd.h>
+#include <wx/config.h>
 
 using namespace std;
-
-//configure filter dialog
-const int OkayButtonPressed           = 25;
 
 const wxString ConstFilteredOut = "(-)";
 
@@ -50,11 +49,12 @@ void updateUI_Now();        //do the updating
 extern int leadingPanel;
 
 class CompareStatusUpdater;
+class FileDropEvent;
 
-class MainDialog : public GUI_Generated
+class MainDialog : public GuiGenerated
 {
 public:
-    MainDialog(wxFrame* frame);
+    MainDialog(wxFrame* frame, const wxString& cfgFileName);
     ~MainDialog();
 
 private:
@@ -62,8 +62,9 @@ private:
     friend class FilterDlg;
     friend class CompareStatusUpdater;
     friend class SyncStatusUpdater;
+    friend class FileDropEvent;
 
-    void readConfigurationFromHD(const wxString& filename);
+    void readConfigurationFromHD(const wxString& filename, bool programStartup = false);
     void writeConfigurationToHD(const wxString& filename);
 
     void loadResourceFiles();
@@ -72,37 +73,47 @@ private:
     void updateViewFilterButtons();
     void updateFilterButton();
 
+    void addCfgFileToHistory(const wxString& filename);
+
     void synchronizeFolders(FileCompareResult& grid, const SyncConfiguration config);
 
     static wxString evaluateCmpResult(const CompareFilesResult result, const bool selectedForSynchronization);
 
     //main method for putting gridData on UI: maps data respecting current view settings
     void writeGrid(const FileCompareResult& gridData, bool useUI_GridCache =  false);
-
     void mapFileModelToUI(UI_Grid& output, const FileCompareResult& fileCmpResult);
     void updateStatusInformation(const UI_Grid& output);
 
     void filterRangeManual(int begin, int end, int leadingRow);
+    void deleteFilesOnGrid(wxGrid* grid);
 
-    //Events
+    //work to be done in idle time
+    void OnIdleEvent(wxEvent& event);
+
+    //delayed status information restore
+    void pushStatusInformation(const wxString& text);
+    void writeStatusInformation(const wxString& text);
+    void clearStatusBar();
+
+    //events
     void onGrid1access(wxEvent& event);
     void onGrid2access(wxEvent& event);
     void onGrid3access(wxEvent& event);
 
     void onGrid1ButtonEvent(wxKeyEvent& event);
     void onGrid2ButtonEvent(wxKeyEvent& event);
+    void onGrid3ButtonEvent(wxKeyEvent& event);
 
     void OnEnterLeftDir(wxCommandEvent& event);
     void OnEnterRightDir(wxCommandEvent& event);
     void OnDirChangedPanel1(wxFileDirPickerEvent& event);
     void OnDirChangedPanel2(wxFileDirPickerEvent& event);
-    void onFilesDroppedPanel1(wxDropFilesEvent& event);
-    void onFilesDroppedPanel2(wxDropFilesEvent& event);
 
-    void OnGrid3SelectCell(wxGridEvent& event);
+    //manual filtering of rows:
+    void OnGridSelectCell(wxGridEvent& event);
     void OnGrid3SelectRange(wxGridRangeSelectEvent& event);
     void OnGrid3LeftMouseUp(wxEvent& event);
-    void OnIdleToFilterManually(wxEvent& event);
+    void OnGrid3LeftMouseDown(wxEvent& event);
 
     void OnLeftGridDoubleClick( wxGridEvent& event);
     void OnRightGridDoubleClick(wxGridEvent& event);
@@ -116,6 +127,11 @@ private:
     void OnRightOnlyFiles(      wxCommandEvent& event);
     void OnEqualFiles(          wxCommandEvent& event);
 
+    void OnSaveConfig(          wxCommandEvent& event);
+    void OnLoadConfiguration(   wxCommandEvent& event);
+    void OnChoiceKeyEvent(      wxKeyEvent& event );
+
+void onResizeMainWindow(wxEvent& event);
     void OnAbortCompare(        wxCommandEvent& event);
     void OnFilterButton(        wxCommandEvent& event);
     void OnHideFilteredButton(  wxCommandEvent& event);
@@ -155,6 +171,12 @@ private:
     bool rightNewerFilesActive;
     bool rightOnlyFilesActive;
 
+    //ui settings
+    int widthNotMaximized;
+    int heightNotMaximized;
+    int posXNotMaximized;
+    int posYNotMaximized;
+
     //other options
     bool useRecycleBin; //use Recycle bin when deleting or overwriting files while synchronizing
 
@@ -162,13 +184,46 @@ private:
 
     wxFrame* parent;
 
+    //status information
+    wxLongLong lastStatusChange;
+    int        stackObjects;
+
+    //save the last used config filenames
+    wxConfig* cfgFileHistory;
+    vector<wxString> cfgFileNames;
+    static const int CfgHistroyLength = 10;
+
     //variables for manual filtering of m_grid3
-    int selectedRangeBegin;
-    int selectedRangeEnd;
-    int selectionLead;
+    int selectedRange3Begin;  //only used for grid 3
+    int selectedRange3End;    //only used for grid 3
+    int selectionLead;  //used on all three grids
+    bool filteringInitialized;
     bool filteringPending;
 
     CompareStatusUpdater* cmpStatusUpdaterTmp;  //used only by the abort button when comparing
+};
+
+//######################################################################################
+
+
+class FileDropEvent : public wxFileDropTarget
+{
+public:
+    FileDropEvent(MainDialog* dlg, int grid) :
+            mainDlg(dlg),
+            targetGrid(grid)
+    {
+        assert(grid == 1 || grid == 2);
+    }
+
+    ~FileDropEvent() {}
+
+    //overwritten virtual method
+    bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames);
+
+private:
+    MainDialog* mainDlg;
+    int targetGrid;
 };
 
 //######################################################################################
