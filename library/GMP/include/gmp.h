@@ -421,7 +421,7 @@ typedef __mpq_struct *mpq_ptr;
    GCC 4.3 and above with -std=c99 or -std=gnu99 implements ISO C99
    inline semantics, unless -fgnu89-inline is used.  */
 #ifdef __GNUC__
-#ifdef __GNUC_STDC_INLINE__
+#if (defined __GNUC_STDC_INLINE__) || (__GNUC__ == 4 && __GNUC_MINOR__ == 2)
 #define __GMP_EXTERN_INLINE extern __inline__ __attribute__ ((__gnu_inline__))
 #else
 #define __GMP_EXTERN_INLINE      extern __inline__
@@ -518,6 +518,7 @@ typedef __mpq_struct *mpq_ptr;
 #if defined (__cplusplus)
 extern "C"
 {
+#include <cstdio>
 #ifdef _GMP_H_HAVE_FILE
     using std::FILE;
 #endif
@@ -2173,10 +2174,14 @@ enum
     GMP_ERROR_INVALID_ARGUMENT = 8
 };
 
+/* Define CC and CFLAGS which were used to build this version of GMP */
+#define __GMP_CC "gcc"
+#define __GMP_CFLAGS "-m32 -O2 -fomit-frame-pointer -mtune=k8 -march=k8 -mno-cygwin"
+
 /* Major version number is the value of __GNU_MP__ too, above and in mp.h. */
 #define __GNU_MP_VERSION 4
 #define __GNU_MP_VERSION_MINOR 2
-#define __GNU_MP_VERSION_PATCHLEVEL 2
+#define __GNU_MP_VERSION_PATCHLEVEL 3
 
 #define __GMP_H__
 #endif /* __GMP_H__ */

@@ -1,0 +1,63 @@
+FreeFileSync
+------------
+
+Changelog v1.4
+--------------
+Implemented generic multithreading class to keep "compare by content" and "file synchronisation" responsive
+Added status bar when comparing files (with additional status information for "compare by content")
+Some further speed optimizations 
+Added option to skip error messages and have them listed after synchronization
+Restructured loading of configuration files
+The result grid after synchronization now always consists of items that have not been synchronized (even if abort was pressed)
+Added "remaining files" as sync-progress information
+Updated German translation
+
+Changelog v1.3
+--------------
+Maintain and load different configurations by drag&drop, load-button or commandline
+New function to delete files (or move them to recycle bin) manually on the UI (without having to re-compare):
+	Deleting folders results in deletion of all dependent files, subfolders on UI grid (also no re-compare needed)
+	while catching arrow situations and allowing to resolve them
+Improved manual filtering of rows: If folders are marked all dependent subfolders and files are marked as well 
+(keeping sort sequence when "hide filtered elements" is marked)
+Comprehensive performance optimization of the two features above (manual filtering, deletion) for large grids (> 200.000 rows)
+Improved usability: resizable borders, keyboard shortcuts, default buttons, dialog standard focus
+Main window will remember restored position even if maximized
+Updated sources to become more Linux and Unicode friendly
+Updated German translation
+
+Changelog v1.2
+--------------
+New progress indicator and status information when synchronizing:
+	->available for commandline mode and UI mode: Status update and final error report
+New progress information when comparing directories
+Multithreading for copying of files to keep program responsive
+Optimized all status dialogs and progress indicators for high performance: practically NO performance loss
+Possibility to abort all performance critical operations (comparison, synchronization) at any time
+New options in case of an error: "Continue, retry, abort" for UI and commandline
+New commandline option "-skiperrors" to continue synchronization despite errors
+Enhanced logfile (-silent mode) to include all errors during compare and synchronization
+Do not synchronize folders that have been deleted externally (but show an error message)
+Manually filter out ranges from synchronization instead of just single rows
+Some UI improvements
+New option to use Recycle Bin when deleting or overwriting files
+New synchronization sequence: first delete files, then copy files to avoid disc space shortages
+Added different return values when used in commandline mode to report success or failure
+Updated German translation
+
+Changelog v1.1
+--------------
+Some further speed optimizations (sorting)
+Written custom wxGrid class to avoid mapping of data to UI: huge performance increase (especially with formatted grids > 100000 items)
+Filter files to include/exclude them from synchronization
+Minor UI and text adaptions
+Allow direct keyboard input for directory names
+Updated German translation
+Added possibility to continue on error
+Added indicator for sort direction
+Simplified code concerning loading of UI resources
+Prepared code to support unicode in some future version
+
+Changelog v1.0
+--------------
+Initial release

@@ -1,16 +1,22 @@
 set widgets=C:\Programme\CodeBlocks\wxWidgets
 set sources=C:\Programme\CodeBlocks\Projects\FreeFileSync
 
-mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\Application.cpp -o obj\Release\Application.o
+md obj
+md obj\Release
+md obj\Release\library
+md obj\Release\ui
+
+mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\application.cpp -o obj\Release\Application.o
 mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\FreeFileSync.cpp -o obj\Release\FreeFileSync.o
-mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\Library\globalFunctions.cpp -o obj\Release\Library\globalFunctions.o
-mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\UI\GUI_Generated.cpp -o obj\Release\UI\GUI_Generated.o
-mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\UI\MainDialog.cpp -o obj\Release\UI\MainDialog.o
-mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\UI\SyncDialog.cpp -o obj\Release\UI\SyncDialog.o
-mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\library\CustomGrid.cpp -o obj\Release\library\CustomGrid.o
-mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\ui\Resources.cpp -o obj\Release\ui\Resources.o
-mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\ui\SmallDialogs.cpp -o obj\Release\ui\SmallDialogs.o
-mingw32-gcc.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\wxWidgets\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\Library\md5.c -o obj\Release\Library\md5.o
+mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\library\globalFunctions.cpp -o obj\Release\library\globalFunctions.o
+mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\library\multithreading.cpp -o obj\Release\library\multithreading.cpp.o
+mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\ui\guiGenerated.cpp -o obj\Release\UI\GUI_Generated.o
+mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\ui\mainDialog.cpp -o obj\Release\ui\MainDialog.o
+mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\ui\syncDialog.cpp -o obj\Release\ui\SyncDialog.o
+mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\library\customGrid.cpp -o obj\Release\library\CustomGrid.o
+mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\ui\resources.cpp -o obj\Release\ui\Resources.o
+mingw32-g++.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\ui\smallDialogs.cpp -o obj\Release\ui\SmallDialogs.o
+mingw32-gcc.exe -Wall -pipe -mthreads -D__GNUWIN32__ -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -I%widgets%\wxWidgets\include -I%widgets%\contrib\include -I%widgets%\lib\gcc_lib\msw -c %sources%\library\md5.c -o obj\Release\library\md5.o
 windres.exe -i %sources%\resource.rc -J rc -o obj\Release\resource.res -O coff -I%widgets%\include -I%widgets%\lib\gcc_lib\msw
-mingw32-g++.exe -L%widgets%\lib\gcc_lib -o FreeFileSync.exe obj\Release\Application.o obj\Release\FreeFileSync.o obj\Release\Library\globalFunctions.o obj\Release\Library\md5.o obj\Release\UI\GUI_Generated.o obj\Release\UI\MainDialog.o obj\Release\UI\SyncDialog.o obj\Release\library\CustomGrid.o obj\Release\ui\Resources.o obj\Release\ui\SmallDialogs.o obj\Release\resource.res -s -mthreads -lwxmsw28_adv -lwxmsw28_core -lwxbase28 -lwxpng -lwxzlib -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -luuid -lcomctl32 -lwsock32 -lodbc32 Library\GMP\lib\libgmpxx.a Library\GMP\lib\libgmp.a -mwindows
+mingw32-g++.exe -L%widgets%\lib\gcc_lib -o FreeFileSync.exe obj\Release\Application.o obj\Release\FreeFileSync.o obj\Release\library\globalFunctions.o obj\Release\library\multithreading.cpp.o obj\Release\library\md5.o obj\Release\ui\GUI_Generated.o obj\Release\ui\MainDialog.o obj\Release\ui\SyncDialog.o obj\Release\library\CustomGrid.o obj\Release\ui\Resources.o obj\Release\ui\SmallDialogs.o obj\Release\resource.res -s -mthreads -lwxmsw28_adv -lwxmsw28_core -lwxbase28 -lwxpng -lwxzlib -lkernel32 -luser32 -lgdi32 -lwinspool -lcomdlg32 -ladvapi32 -lshell32 -lole32 -loleaut32 -luuid -lcomctl32 -lwsock32 -lodbc32 library\gmp\lib\libgmpxx.a library\gmp\lib\libgmp.a -mwindows
 pause

@@ -8,6 +8,7 @@ SyncDialog::SyncDialog(MainDialog* window)
     localSyncConfiguration = mainDialog->syncConfiguration;
 
     m_checkBoxUseRecycler->SetValue(mainDialog->useRecycleBin);
+    m_checkBoxHideErrors->SetValue(mainDialog->hideErrorMessages);
 
     //set icons for this dialog
     m_bpButton18->SetBitmapLabel(*GlobalResources::bitmapStartSync);
@@ -21,18 +22,18 @@ SyncDialog::SyncDialog(MainDialog* window)
     updateConfigIcons();
 
     //set radiobutton
-    if (localSyncConfiguration.exLeftSideOnly  == SyncDirRight &&
-            localSyncConfiguration.exRightSideOnly == SyncDirRight &&
-            localSyncConfiguration.leftNewer       == SyncDirRight &&
-            localSyncConfiguration.rightNewer      == SyncDirRight &&
-            localSyncConfiguration.different       == SyncDirRight)
+    if (localSyncConfiguration.exLeftSideOnly  == syncDirRight &&
+            localSyncConfiguration.exRightSideOnly == syncDirRight &&
+            localSyncConfiguration.leftNewer       == syncDirRight &&
+            localSyncConfiguration.rightNewer      == syncDirRight &&
+            localSyncConfiguration.different       == syncDirRight)
         m_radioBtn1->SetValue(true);    //one way ->
 
-    else if (localSyncConfiguration.exLeftSideOnly  == SyncDirRight &&
-             localSyncConfiguration.exRightSideOnly == SyncDirLeft &&
-             localSyncConfiguration.leftNewer       == SyncDirRight &&
-             localSyncConfiguration.rightNewer      == SyncDirLeft &&
-             localSyncConfiguration.different       == SyncDirNone)
+    else if (localSyncConfiguration.exLeftSideOnly  == syncDirRight &&
+             localSyncConfiguration.exRightSideOnly == syncDirLeft &&
+             localSyncConfiguration.leftNewer       == syncDirRight &&
+             localSyncConfiguration.rightNewer      == syncDirLeft &&
+             localSyncConfiguration.different       == syncDirNone)
         m_radioBtn2->SetValue(true);    //two way <->
 
     else
@@ -46,88 +47,97 @@ SyncDialog::~SyncDialog() {}
 
 void SyncDialog::updateConfigIcons()
 {
-    if (localSyncConfiguration.exLeftSideOnly == SyncDirRight)
+    if (localSyncConfiguration.exLeftSideOnly == syncDirRight)
     {
         m_bpButton5->SetBitmapLabel(*GlobalResources::bitmapRightArrow);
         m_bpButton5->SetToolTip(_("Copy from left to right"));
     }
-    else if (localSyncConfiguration.exLeftSideOnly == SyncDirLeft)
+    else if (localSyncConfiguration.exLeftSideOnly == syncDirLeft)
     {
         m_bpButton5->SetBitmapLabel(*GlobalResources::bitmapDelete);
         m_bpButton5->SetToolTip(_("Delete files existing on left side only"));
     }
-    else if (localSyncConfiguration.exLeftSideOnly == SyncDirNone)
+    else if (localSyncConfiguration.exLeftSideOnly == syncDirNone)
     {
         m_bpButton5->SetBitmapLabel(wxNullBitmap);
         m_bpButton5->SetToolTip(_("Do nothing"));
     }
 
-    if (localSyncConfiguration.exRightSideOnly == SyncDirRight)
+    if (localSyncConfiguration.exRightSideOnly == syncDirRight)
     {
         m_bpButton6->SetBitmapLabel(*GlobalResources::bitmapDelete);
         m_bpButton6->SetToolTip(_("Delete files existing on right side only"));
     }
-    else if (localSyncConfiguration.exRightSideOnly == SyncDirLeft)
+    else if (localSyncConfiguration.exRightSideOnly == syncDirLeft)
     {
         m_bpButton6->SetBitmapLabel(*GlobalResources::bitmapLeftArrow);
         m_bpButton6->SetToolTip(_("Copy from right to left"));
     }
-    else if (localSyncConfiguration.exRightSideOnly == SyncDirNone)
+    else if (localSyncConfiguration.exRightSideOnly == syncDirNone)
     {
         m_bpButton6->SetBitmapLabel(wxNullBitmap);
         m_bpButton6->SetToolTip(_("Do nothing"));
     }
 
-    if (localSyncConfiguration.leftNewer == SyncDirRight)
+    if (localSyncConfiguration.leftNewer == syncDirRight)
     {
         m_bpButton7->SetBitmapLabel(*GlobalResources::bitmapRightArrow);
         m_bpButton7->SetToolTip(_("Copy from left to right overwriting"));
     }
-    else if (localSyncConfiguration.leftNewer == SyncDirLeft)
+    else if (localSyncConfiguration.leftNewer == syncDirLeft)
     {
         m_bpButton7->SetBitmapLabel(*GlobalResources::bitmapLeftArrow);
         m_bpButton7->SetToolTip(_("Copy from right to left overwriting"));
     }
-    else if (localSyncConfiguration.leftNewer == SyncDirNone)
+    else if (localSyncConfiguration.leftNewer == syncDirNone)
     {
         m_bpButton7->SetBitmapLabel(wxNullBitmap);
         m_bpButton7->SetToolTip(_("Do nothing"));
     }
 
-    if (localSyncConfiguration.rightNewer == SyncDirRight)
+    if (localSyncConfiguration.rightNewer == syncDirRight)
     {
         m_bpButton8->SetBitmapLabel(*GlobalResources::bitmapRightArrow);
         m_bpButton8->SetToolTip(_("Copy from left to right overwriting"));
     }
-    else if (localSyncConfiguration.rightNewer == SyncDirLeft)
+    else if (localSyncConfiguration.rightNewer == syncDirLeft)
     {
         m_bpButton8->SetBitmapLabel(*GlobalResources::bitmapLeftArrow);
         m_bpButton8->SetToolTip(_("Copy from right to left overwriting"));
     }
-    else if (localSyncConfiguration.rightNewer == SyncDirNone)
+    else if (localSyncConfiguration.rightNewer == syncDirNone)
     {
         m_bpButton8->SetBitmapLabel(wxNullBitmap);
         m_bpButton8->SetToolTip(_("Do nothing"));
     }
 
-    if (localSyncConfiguration.different == SyncDirRight)
+    if (localSyncConfiguration.different == syncDirRight)
     {
         m_bpButton9->SetBitmapLabel(*GlobalResources::bitmapRightArrow);
         m_bpButton9->SetToolTip(_("Copy from left to right overwriting"));
     }
-    else if (localSyncConfiguration.different == SyncDirLeft)
+    else if (localSyncConfiguration.different == syncDirLeft)
     {
         m_bpButton9->SetBitmapLabel(*GlobalResources::bitmapLeftArrow);
         m_bpButton9->SetToolTip(_("Copy from right to left overwriting"));
     }
-    else if (localSyncConfiguration.different == SyncDirNone)
+    else if (localSyncConfiguration.different == syncDirNone)
     {
         m_bpButton9->SetBitmapLabel(wxNullBitmap);
         m_bpButton9->SetToolTip(_("Do nothing"));
     }
 
     //update preview of bytes to be transferred:
-    m_textCtrl5->SetValue(FreeFileSync::formatFilesizeToShortString(FreeFileSync::calcTotalBytesToTransfer(mainDialog->currentGridData, localSyncConfiguration)));
+    int objectsTotal = 0;
+    double dataTotal = 0;
+    FreeFileSync::calcTotalBytesToSync(objectsTotal, dataTotal, mainDialog->currentGridData, localSyncConfiguration);
+
+    wxString objects = globalFunctions::numberToWxString(objectsTotal);
+    globalFunctions::includeNumberSeparator(objects);
+    wxString data  = FreeFileSync::formatFilesizeToShortString(dataTotal);
+
+    m_textCtrl12->SetValue(objects);
+    m_textCtrl5->SetValue(data);
 }
 
 
@@ -148,6 +158,7 @@ void SyncDialog::OnBack(wxCommandEvent& event)
     //write configuration to main dialog
     mainDialog->syncConfiguration = localSyncConfiguration;
     mainDialog->useRecycleBin     = m_checkBoxUseRecycler->GetValue();
+    mainDialog->hideErrorMessages = m_checkBoxHideErrors->GetValue();
 
     EndModal(0);
 }
@@ -157,6 +168,7 @@ void SyncDialog::OnStartSync(wxCommandEvent& event)
     //write configuration to main dialog
     mainDialog->syncConfiguration = localSyncConfiguration;
     mainDialog->useRecycleBin     = m_checkBoxUseRecycler->GetValue();
+    mainDialog->hideErrorMessages = m_checkBoxHideErrors->GetValue();
 
     EndModal(StartSynchronizationProcess);
 }
@@ -177,11 +189,11 @@ void SyncDialog::OnSelectRecycleBin(wxCommandEvent& event)
 
 void SyncDialog::OnSyncLeftToRight( wxCommandEvent& event )
 {
-    localSyncConfiguration.exLeftSideOnly  = SyncDirRight;
-    localSyncConfiguration.exRightSideOnly = SyncDirRight;
-    localSyncConfiguration.leftNewer       = SyncDirRight;
-    localSyncConfiguration.rightNewer      = SyncDirRight;
-    localSyncConfiguration.different       = SyncDirRight;
+    localSyncConfiguration.exLeftSideOnly  = syncDirRight;
+    localSyncConfiguration.exRightSideOnly = syncDirRight;
+    localSyncConfiguration.leftNewer       = syncDirRight;
+    localSyncConfiguration.rightNewer      = syncDirRight;
+    localSyncConfiguration.different       = syncDirRight;
 
     updateConfigIcons();
 
@@ -192,11 +204,11 @@ void SyncDialog::OnSyncLeftToRight( wxCommandEvent& event )
 
 void SyncDialog::OnSyncBothSides( wxCommandEvent& event )
 {
-    localSyncConfiguration.exLeftSideOnly  = SyncDirRight;
-    localSyncConfiguration.exRightSideOnly = SyncDirLeft;
-    localSyncConfiguration.leftNewer       = SyncDirRight;
-    localSyncConfiguration.rightNewer      = SyncDirLeft;
-    localSyncConfiguration.different       = SyncDirNone;
+    localSyncConfiguration.exLeftSideOnly  = syncDirRight;
+    localSyncConfiguration.exRightSideOnly = syncDirLeft;
+    localSyncConfiguration.leftNewer       = syncDirRight;
+    localSyncConfiguration.rightNewer      = syncDirLeft;
+    localSyncConfiguration.different       = syncDirNone;
 
     updateConfigIcons();
     //if event is triggered by button
@@ -206,12 +218,12 @@ void SyncDialog::OnSyncBothSides( wxCommandEvent& event )
 
 void toggleSyncDirection(SyncDirection& current)
 {
-    if (current == SyncDirRight)
-        current = SyncDirLeft;
-    else if (current == SyncDirLeft)
-        current = SyncDirNone;
-    else if (current== SyncDirNone)
-        current = SyncDirRight;
+    if (current == syncDirRight)
+        current = syncDirLeft;
+    else if (current == syncDirLeft)
+        current = syncDirNone;
+    else if (current== syncDirNone)
+        current = syncDirRight;
     else
         assert (false);
 }

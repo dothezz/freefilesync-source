@@ -11,10 +11,15 @@ using namespace std;
 class GlobalResources
 {
 public:
-
     static void loadResourceFiles();
     static void unloadResourceFiles();
 
+    //language dependent global variables: need to be initialized by CustomLocale on program startup
+    static wxChar fileNameSeparator;
+    static const wxChar* floatingPointSeparator;
+    static const wxChar* numberSeparator;
+
+    //image resource objects
     static wxBitmap* bitmapLeftArrow;
     static wxBitmap* bitmapStartSync;
     static wxBitmap* bitmapRightArrow;
@@ -48,8 +53,11 @@ public:
     static wxBitmap* bitmapSmallUp;
     static wxBitmap* bitmapSmallDown;
     static wxBitmap* bitmapSave;
+    static wxBitmap* bitmapFFS;
+    static wxBitmap* bitmapDeleteFile;
 
     static wxAnimation* animationMoney;
+    static wxAnimation* animationSync;
 
 private:
     //resource mapping

@@ -4,6 +4,18 @@
 #include <wx/image.h>
 #include <stdexcept> //for std::runtime_error
 
+#ifdef FFS_WIN
+wxChar GlobalResources::fileNameSeparator = '\\';
+#endif  // FFS_WIN
+
+#ifdef FFS_LINUX
+wxChar GlobalResources::fileNameSeparator = '/';
+#endif  // FFS_LINUX
+
+const wxChar* GlobalResources::floatingPointSeparator = "";
+const wxChar* GlobalResources::numberSeparator = "";
+
+
 map<wxString, wxBitmap*> GlobalResources::bitmapResource;
 
 wxBitmap* GlobalResources::bitmapLeftArrow       = 0;
@@ -38,13 +50,21 @@ wxBitmap* GlobalResources::bitmapFilterOff       = 0;
 wxBitmap* GlobalResources::bitmapWarning         = 0;
 wxBitmap* GlobalResources::bitmapSmallUp         = 0;
 wxBitmap* GlobalResources::bitmapSmallDown       = 0;
-wxBitmap* GlobalResources::bitmapSave       = 0;
+wxBitmap* GlobalResources::bitmapSave            = 0;
+wxBitmap* GlobalResources::bitmapFFS             = 0;
+wxBitmap* GlobalResources::bitmapDeleteFile      = 0;
 
 wxAnimation* GlobalResources::animationMoney     = 0;
+wxAnimation* GlobalResources::animationSync      = 0;
 
 
 void GlobalResources::loadResourceFiles()
 {
+
+    floatingPointSeparator = _(".");
+    numberSeparator = _(",");
+
+
     //map, allocate and initialize pictures
     bitmapResource["left arrow.png"]        = (bitmapLeftArrow       = new wxBitmap(wxNullBitmap));
     bitmapResource["start sync.png"]        = (bitmapStartSync       = new wxBitmap(wxNullBitmap));
@@ -79,8 +99,11 @@ void GlobalResources::loadResourceFiles()
     bitmapResource["small arrow up.png"]    = (bitmapSmallUp         = new wxBitmap(wxNullBitmap));
     bitmapResource["small arrow down.png"]  = (bitmapSmallDown       = new wxBitmap(wxNullBitmap));
     bitmapResource["save.png"]              = (bitmapSave            = new wxBitmap(wxNullBitmap));
+    bitmapResource["FFS.png"]               = (bitmapFFS             = new wxBitmap(wxNullBitmap));
+    bitmapResource["deleteFile.png"]        = (bitmapDeleteFile      = new wxBitmap(wxNullBitmap));
 
     animationMoney = new wxAnimation(wxNullAnimation);
+    animationSync  = new wxAnimation(wxNullAnimation);
 
     wxFileInputStream input("Resources.dat");
     if (!input.IsOk()) throw runtime_error(_("Unable to load Resources.dat!"));
@@ -99,6 +122,7 @@ void GlobalResources::loadResourceFiles()
     }
 
     animationMoney->LoadFile("Resources.a01");
+    animationSync->LoadFile("Resources.a02");
 }
 
 
@@ -110,4 +134,5 @@ void GlobalResources::unloadResourceFiles()
 
     //free other resources
     delete animationMoney;
+    delete animationSync;
 }

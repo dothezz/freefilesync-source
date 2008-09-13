@@ -111,7 +111,7 @@ GuiGenerated::GuiGenerated( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	bSizer6->Add( 40, 0, 0, wxEXPAND, 5 );
 	
-	bSizer1->Add( bSizer6, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizer1->Add( bSizer6, 0, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer2;
 	bSizer2 = new wxBoxSizer( wxHORIZONTAL );
@@ -354,7 +354,7 @@ GuiGenerated::GuiGenerated( wxWindow* parent, wxWindowID id, const wxString& tit
 	bSizer3->Add( 0, 0, 1, wxEXPAND, 5 );
 	
 	
-	bSizer3->Add( 190, 0, 0, wxEXPAND, 5 );
+	bSizer3->Add( 190, 0, 0, wxALL, 5 );
 	
 	
 	bSizer3->Add( 0, 0, 1, wxEXPAND, 5 );
@@ -451,6 +451,101 @@ GuiGenerated::~GuiGenerated()
 	m_bpButton10->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnQuit ), NULL, this );
 }
 
+CompareStatusGenerated::CompareStatusGenerated( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	wxBoxSizer* bSizer40;
+	bSizer40 = new wxBoxSizer( wxVERTICAL );
+	
+	wxBoxSizer* bSizer42;
+	bSizer42 = new wxBoxSizer( wxHORIZONTAL );
+	
+	wxStaticBoxSizer* sbSizer10;
+	sbSizer10 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxEmptyString ), wxHORIZONTAL );
+	
+	m_staticText321 = new wxStaticText( this, wxID_ANY, _("Files scanned:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText321->Wrap( -1 );
+	m_staticText321->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
+	
+	sbSizer10->Add( m_staticText321, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxRIGHT, 5 );
+	
+	m_staticTextScanned = new wxStaticText( this, wxID_ANY, _("123456"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextScanned->Wrap( -1 );
+	m_staticTextScanned->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
+	
+	sbSizer10->Add( m_staticTextScanned, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	bSizer42->Add( sbSizer10, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	bSizer42->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer13;
+	sbSizer13 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxEmptyString ), wxHORIZONTAL );
+	
+	m_staticText46 = new wxStaticText( this, wxID_ANY, _("Files to compare:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText46->Wrap( -1 );
+	m_staticText46->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
+	
+	sbSizer13->Add( m_staticText46, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+	
+	m_staticTextFilesToCompare = new wxStaticText( this, wxID_ANY, _("123456"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextFilesToCompare->Wrap( -1 );
+	m_staticTextFilesToCompare->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
+	
+	sbSizer13->Add( m_staticTextFilesToCompare, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	bSizer42->Add( sbSizer13, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	bSizer42->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer11;
+	sbSizer11 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxEmptyString ), wxHORIZONTAL );
+	
+	m_staticText32 = new wxStaticText( this, wxID_ANY, _("Data to compare:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText32->Wrap( -1 );
+	m_staticText32->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
+	
+	sbSizer11->Add( m_staticText32, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxRIGHT, 5 );
+	
+	m_staticTextDataToCompare = new wxStaticText( this, wxID_ANY, _("123456"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextDataToCompare->Wrap( -1 );
+	m_staticTextDataToCompare->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
+	
+	sbSizer11->Add( m_staticTextDataToCompare, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	bSizer42->Add( sbSizer11, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	bSizer40->Add( bSizer42, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxALL, 5 );
+	
+	wxBoxSizer* bSizer48;
+	bSizer48 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_staticText30 = new wxStaticText( this, wxID_ANY, _("Operation:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText30->Wrap( -1 );
+	m_staticText30->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
+	
+	bSizer48->Add( m_staticText30, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrlFilename = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+	m_textCtrlFilename->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
+	
+	bSizer48->Add( m_textCtrlFilename, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	bSizer40->Add( bSizer48, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	
+	m_gauge2 = new wxGauge( this, wxID_ANY, 100, wxDefaultPosition, wxSize( -1,20 ), wxGA_HORIZONTAL );
+	bSizer40->Add( m_gauge2, 0, wxALL|wxEXPAND, 5 );
+	
+	this->SetSizer( bSizer40 );
+	this->Layout();
+	bSizer40->Fit( this );
+}
+
+CompareStatusGenerated::~CompareStatusGenerated()
+{
+}
+
 SyncDialogGenerated::SyncDialogGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
@@ -475,27 +570,42 @@ SyncDialogGenerated::SyncDialogGenerated( wxWindow* parent, wxWindowID id, const
 	
 	m_bpButton18 = new wxBitmapButton( this, wxID_OK, wxNullBitmap, wxDefaultPosition, wxSize( 140,58 ), wxBU_AUTODRAW );
 	m_bpButton18->SetDefault(); 
-	m_bpButton18->SetToolTip( _("Start synchronizing files") );
+	m_bpButton18->SetToolTip( _("Start synchronization") );
 	
-	m_bpButton18->SetToolTip( _("Start synchronizing files") );
+	m_bpButton18->SetToolTip( _("Start synchronization") );
 	
-	bSizer201->Add( m_bpButton18, 0, wxRIGHT, 5 );
+	bSizer201->Add( m_bpButton18, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	wxBoxSizer* bSizer211;
-	bSizer211 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_staticText14 = new wxStaticText( this, wxID_ANY, _("Data to be transferred:"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer201->Add( 10, 0, 0, wxEXPAND, 5 );
+	
+	wxGridSizer* gSizer1;
+	gSizer1 = new wxGridSizer( 2, 2, 0, 0 );
+	
+	m_staticText37 = new wxStaticText( this, wxID_ANY, _("Objects to process:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText37->Wrap( -1 );
+	m_staticText37->SetFont( wxFont( 10, 74, 93, 90, false, wxT("Tahoma") ) );
+	
+	gSizer1->Add( m_staticText37, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_textCtrl12 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_textCtrl12->SetFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxEmptyString ) );
+	m_textCtrl12->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
+	
+	gSizer1->Add( m_textCtrl12, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticText14 = new wxStaticText( this, wxID_ANY, _("Data to transfer:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText14->Wrap( -1 );
 	m_staticText14->SetFont( wxFont( 10, 74, 93, 90, false, wxT("Tahoma") ) );
 	
-	bSizer211->Add( m_staticText14, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	gSizer1->Add( m_staticText14, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
 	m_textCtrl5 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 55,-1 ), wxTE_READONLY );
 	m_textCtrl5->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
 	
-	bSizer211->Add( m_textCtrl5, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+	gSizer1->Add( m_textCtrl5, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	bSizer201->Add( bSizer211, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
+	bSizer201->Add( gSizer1, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	bSizer29->Add( bSizer201, 0, wxEXPAND, 5 );
 	
@@ -583,19 +693,30 @@ SyncDialogGenerated::SyncDialogGenerated( wxWindow* parent, wxWindowID id, const
 	
 	bSizer291->Add( m_button6, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM|wxLEFT, 5 );
 	
-	m_button16 = new wxButton( this, wxID_CANCEL, _("dummyButton"), wxDefaultPosition, wxSize( 0,-1 ), 0 );
-	bSizer291->Add( m_button16, 0, wxALL, 5 );
+	m_button16 = new wxButton( this, wxID_CANCEL, _("dummy"), wxDefaultPosition, wxSize( 0,-1 ), 0 );
+	bSizer291->Add( m_button16, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
 	bSizer291->Add( 82, 0, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	wxBoxSizer* bSizer38;
+	bSizer38 = new wxBoxSizer( wxVERTICAL );
 	
 	m_checkBoxUseRecycler = new wxCheckBox( this, wxID_ANY, _("Use Recycle Bin"), wxDefaultPosition, wxDefaultSize, 0 );
 	
 	m_checkBoxUseRecycler->SetToolTip( _("Use Recycle Bin when deleting or overwriting files during synchronization") );
 	
-	bSizer291->Add( m_checkBoxUseRecycler, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer38->Add( m_checkBoxUseRecycler, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	bSizer29->Add( bSizer291, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+	m_checkBoxHideErrors = new wxCheckBox( this, wxID_ANY, _("Hide error messages"), wxDefaultPosition, wxDefaultSize, 0 );
+	
+	m_checkBoxHideErrors->SetToolTip( _("Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process") );
+	
+	bSizer38->Add( m_checkBoxHideErrors, 0, wxALL, 5 );
+	
+	bSizer291->Add( bSizer38, 0, wxALIGN_BOTTOM, 5 );
+	
+	bSizer29->Add( bSizer291, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
 	bSizer181->Add( bSizer29, 1, wxEXPAND, 5 );
 	
@@ -809,11 +930,22 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	
 	bSizer31->Add( 0, 10, 0, wxEXPAND, 5 );
 	
-	m_staticText14 = new wxStaticText( this, wxID_ANY, _("FreeFileSync v1.3"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxBoxSizer* bSizer36;
+	bSizer36 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_bitmap11 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), 0 );
+	bSizer36->Add( m_bitmap11, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	m_staticText14 = new wxStaticText( this, wxID_ANY, _("FreeFileSync v1.4"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText14->Wrap( -1 );
 	m_staticText14->SetFont( wxFont( 16, 74, 90, 92, false, wxT("Tahoma") ) );
 	
-	bSizer31->Add( m_staticText14, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizer36->Add( m_staticText14, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 5 );
+	
+	
+	bSizer36->Add( 40, 0, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	bSizer31->Add( bSizer36, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_staticText15 = new wxStaticText( this, wxID_ANY, _("-Open-Source file synchronization-"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText15->Wrap( -1 );
@@ -996,11 +1128,25 @@ DeleteDialogGenerated::DeleteDialogGenerated( wxWindow* parent, wxWindowID id, c
 	
 	bSizer24->Add( 0, 10, 0, wxEXPAND, 5 );
 	
+	wxBoxSizer* bSizer41;
+	bSizer41 = new wxBoxSizer( wxHORIZONTAL );
+	
+	
+	bSizer41->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_bitmap12 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), 0 );
+	bSizer41->Add( m_bitmap12, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
 	m_staticTextHeader = new wxStaticText( this, wxID_ANY, _("Dummy text"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextHeader->Wrap( -1 );
 	m_staticTextHeader->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
 	
-	bSizer24->Add( m_staticTextHeader, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizer41->Add( m_staticTextHeader, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	bSizer41->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	bSizer24->Add( bSizer41, 0, wxEXPAND, 5 );
 	
 	m_textCtrlMessage = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY );
 	m_textCtrlMessage->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
@@ -1123,7 +1269,7 @@ FilterDlgGenerated::FilterDlgGenerated( wxWindow* parent, wxWindowID id, const w
 	
 	bSizer22->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_button17 = new wxButton( this, wxID_CANCEL, _("dummyButton"), wxDefaultPosition, wxSize( 0,-1 ), 0 );
+	m_button17 = new wxButton( this, wxID_CANCEL, _("dummy"), wxDefaultPosition, wxSize( 0,-1 ), 0 );
 	bSizer22->Add( m_button17, 0, wxALL, 5 );
 	
 	m_button10 = new wxButton( this, wxID_OK, _("OK"), wxDefaultPosition, wxSize( 80,30 ), 0 );
@@ -1163,13 +1309,21 @@ SyncStatusGenerated::SyncStatusGenerated( wxWindow* parent, wxWindowID id, const
 	
 	bSizer27->Add( 0, 15, 0, wxEXPAND, 5 );
 	
+	wxBoxSizer* bSizer37;
+	bSizer37 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_animationControl1 = new wxAnimationCtrl(this, wxID_ANY, wxNullAnimation, wxDefaultPosition, wxSize( 45,45 ));
+	bSizer37->Add( m_animationControl1, 0, wxALL, 5 );
+	
 	m_staticText20 = new wxStaticText( this, wxID_ANY, _("Synchronization status"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText20->Wrap( -1 );
 	m_staticText20->SetFont( wxFont( 16, 74, 90, 92, false, wxT("Tahoma") ) );
 	
-	bSizer27->Add( m_staticText20, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	bSizer37->Add( m_staticText20, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextStatus = new wxStaticText( this, wxID_ANY, _("Running..."), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer27->Add( bSizer37, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	m_staticTextStatus = new wxStaticText( this, wxID_ANY, _("Synchronizing..."), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextStatus->Wrap( -1 );
 	m_staticTextStatus->SetFont( wxFont( 14, 74, 93, 90, false, wxT("Tahoma") ) );
 	
@@ -1187,18 +1341,6 @@ SyncStatusGenerated::SyncStatusGenerated( wxWindow* parent, wxWindowID id, const
 	
 	bSizer31->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	m_staticText25 = new wxStaticText( this, wxID_ANY, _("Items completed:"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText25->Wrap( -1 );
-	m_staticText25->SetFont( wxFont( 10, 74, 93, 90, false, wxT("Tahoma") ) );
-	
-	bSizer31->Add( m_staticText25, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
-	
-	m_staticTextProcessedObj = new wxStaticText( this, wxID_ANY, _("1000000"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
-	m_staticTextProcessedObj->Wrap( -1 );
-	m_staticTextProcessedObj->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
-	
-	bSizer31->Add( m_staticTextProcessedObj, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-	
 	bSizer27->Add( bSizer31, 0, wxEXPAND, 5 );
 	
 	m_textCtrlInfo = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
@@ -1215,19 +1357,19 @@ SyncStatusGenerated::SyncStatusGenerated( wxWindow* parent, wxWindowID id, const
 	wxBoxSizer* bSizer32;
 	bSizer32 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_staticText26 = new wxStaticText( this, wxID_ANY, _("Data copied:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText26 = new wxStaticText( this, wxID_ANY, _("Data remaining:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText26->Wrap( -1 );
 	m_staticText26->SetFont( wxFont( 10, 74, 93, 90, false, wxT("Tahoma") ) );
 	
 	bSizer32->Add( m_staticText26, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
 	
-	m_staticTextBytesCopied = new wxStaticText( this, wxID_ANY, _("--,- MB"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticTextBytesCopied->Wrap( -1 );
-	m_staticTextBytesCopied->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
+	m_staticTextDataRemaining = new wxStaticText( this, wxID_ANY, _("--,- MB"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextDataRemaining->Wrap( -1 );
+	m_staticTextDataRemaining->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
 	
-	bSizer32->Add( m_staticTextBytesCopied, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
+	bSizer32->Add( m_staticTextDataRemaining, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
-	bSizer28->Add( bSizer32, 1, wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer28->Add( bSizer32, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
 	bSizer28->Add( 0, 0, 1, wxEXPAND, 5 );
@@ -1248,15 +1390,21 @@ SyncStatusGenerated::SyncStatusGenerated( wxWindow* parent, wxWindowID id, const
 	bSizer28->Add( 0, 0, 1, wxEXPAND, 5 );
 	
 	wxBoxSizer* bSizer33;
-	bSizer33 = new wxBoxSizer( wxVERTICAL );
+	bSizer33 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_staticText32 = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText32->Wrap( -1 );
-	m_staticText32->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
+	m_staticText25 = new wxStaticText( this, wxID_ANY, _("Files remaining:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText25->Wrap( -1 );
+	m_staticText25->SetFont( wxFont( 10, 74, 93, 90, false, wxT("Tahoma") ) );
 	
-	bSizer33->Add( m_staticText32, 0, wxALL, 5 );
+	bSizer33->Add( m_staticText25, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	bSizer28->Add( bSizer33, 1, wxEXPAND, 5 );
+	m_staticTextRemainingObj = new wxStaticText( this, wxID_ANY, _("1000000"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_staticTextRemainingObj->Wrap( -1 );
+	m_staticTextRemainingObj->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
+	
+	bSizer33->Add( m_staticTextRemainingObj, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	bSizer28->Add( bSizer33, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	bSizer27->Add( bSizer28, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	

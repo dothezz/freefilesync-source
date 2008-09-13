@@ -35,7 +35,7 @@ public:
     FilterDlg(MainDialog* window);
     ~FilterDlg();
 
-    static const int OkayButtonPressed = 25;
+    static const int okayButtonPressed = 25;
 
 private:
     void OnDefault(wxCommandEvent& event);
@@ -53,8 +53,8 @@ public:
     DeleteDialog(const wxString& headerText, const wxString& messageText, wxWindow* main);
     ~DeleteDialog();
 
-    static const int OkayButtonPressed   = 35;
-    static const int CancelButtonPressed = 45;
+    static const int okayButtonPressed   = 35;
+    static const int cancelButtonPressed = 45;
 
 private:
     void OnOK(wxCommandEvent& event);
@@ -69,9 +69,9 @@ public:
     ErrorDlg(const wxString messageText, bool& suppressErrormessages);
     ~ErrorDlg();
 
-    static const int ContinueButtonPressed = 35;
-    static const int RetryButtonPressed    = 45;
-    static const int AbortButtonPressed    = 55;
+    static const int continueButtonPressed = 35;
+    static const int retryButtonPressed    = 45;
+    static const int abortButtonPressed    = 55;
 
 private:
     void OnClose(wxCloseEvent& event);
@@ -86,11 +86,11 @@ private:
 class SyncStatus : public SyncStatusGenerated
 {
 public:
-    SyncStatus(StatusUpdater* updater, double gaugeTotalElements, wxWindow* parentWindow = 0);
+    SyncStatus(StatusUpdater* updater, wxWindow* parentWindow = 0);
     ~SyncStatus();
 
-    void resetGauge(double totalNrOfElements);
-    void incProgressIndicator_NoUpdate(double number);
+    void resetGauge(int totalObjectsToProcess, double totalDataToProcess);
+    void incProgressIndicator_NoUpdate(int objectsProcessed, double dataProcessed);
     void setStatusText_NoUpdate(const wxString& text);
     void updateStatusDialogNow();
 
@@ -106,12 +106,39 @@ private:
     bool currentProcessIsRunning;
 
     //gauge variables
-    double totalElements;     //each element represents one byte for proper progress indicator scaling
-    double currentElements;
-    double scalingFactor;   //nr of elements has to be normalized to smaller nr. because of range of int limitation
+    double totalData;     //each data element represents one byte for proper progress indicator scaling
+    double currentData;
+    double scalingFactor;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
+    int currentObjects;    //each object represents a file or directory processed
+    int totalObjects;
 
     wxString currentStatusText;
-    unsigned int numberOfProcessedObjects;
+};
+
+
+class CompareStatus : public CompareStatusGenerated
+{
+public:
+    CompareStatus(wxWindow* parentWindow);
+    ~CompareStatus();
+
+    void resetMD5Gauge(int totalMD5ObjectsToProcess, double totalMD5DataToProcess);
+    void incScannedFiles_NoUpdate(int number);
+    void incProcessedMD5Data_NoUpdate(int objectsProcessed, double dataProcessed);
+    void setStatusText_NoUpdate(const wxString& text);
+    void updateStatusPanelNow();
+
+private:
+    //status variables
+    unsigned int scannedFiles;
+    wxString currentStatusText;
+
+    //gauge variables
+    double totalMD5Data;     //each data element represents one byte for proper progress indicator scaling
+    double currentMD5Data;
+    double scalingFactorMD5;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
+    int currentMD5Objects;    //each object represents a file or directory processed
+    int totalMD5Objects;
 };
 
 

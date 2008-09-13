@@ -22,7 +22,7 @@
 
 using namespace std;
 
-const wxString ConstFilteredOut = "(-)";
+const wxString constFilteredOut = "(-)";
 
 struct UI_GridLine
 {
@@ -42,9 +42,8 @@ struct UI_GridLine
 };
 typedef vector<UI_GridLine> UI_Grid;
 
-bool updateUI_IsAllowed();  //test if a specific amount of time is over
-void updateUI_Now();        //do the updating
-
+bool updateUI_IsAllowed();        //test if a specific amount of time is over
+void updateUI_Now();              //do the updating
 
 extern int leadingPanel;
 
@@ -66,16 +65,12 @@ private:
 
     void readConfigurationFromHD(const wxString& filename, bool programStartup = false);
     void writeConfigurationToHD(const wxString& filename);
-
-    void loadResourceFiles();
-    void unloadResourceFiles();
+    void loadDefaultConfiguration();
 
     void updateViewFilterButtons();
     void updateFilterButton();
 
     void addCfgFileToHistory(const wxString& filename);
-
-    void synchronizeFolders(FileCompareResult& grid, const SyncConfiguration config);
 
     static wxString evaluateCmpResult(const CompareFilesResult result, const bool selectedForSynchronization);
 
@@ -84,7 +79,8 @@ private:
     void mapFileModelToUI(UI_Grid& output, const FileCompareResult& fileCmpResult);
     void updateStatusInformation(const UI_Grid& output);
 
-    void filterRangeManual(int begin, int end, int leadingRow);
+    void filterRangeManual(const set<int>& rowsToFilterOnUI_View, int leadingRow);
+
     void deleteFilesOnGrid(wxGrid* grid);
 
     //work to be done in idle time
@@ -131,7 +127,7 @@ private:
     void OnLoadConfiguration(   wxCommandEvent& event);
     void OnChoiceKeyEvent(      wxKeyEvent& event );
 
-void onResizeMainWindow(wxEvent& event);
+    void onResizeMainWindow(wxEvent& event);
     void OnAbortCompare(        wxCommandEvent& event);
     void OnFilterButton(        wxCommandEvent& event);
     void OnHideFilteredButton(  wxCommandEvent& event);
@@ -178,7 +174,8 @@ void onResizeMainWindow(wxEvent& event);
     int posYNotMaximized;
 
     //other options
-    bool useRecycleBin; //use Recycle bin when deleting or overwriting files while synchronizing
+    bool useRecycleBin;     //use Recycle bin when deleting or overwriting files while synchronizing
+    bool hideErrorMessages; //hides error messages during synchronization
 
 //***********************************************
 
@@ -229,37 +226,39 @@ private:
 //######################################################################################
 
 //classes handling sync and compare error as well as status information
+class CompareStatus;
+class SyncStatus;
 
 class CompareStatusUpdater : public StatusUpdater
 {
 public:
-    CompareStatusUpdater(MainDialog* dlg, wxStatusBar* mainWindowBar);
+    CompareStatusUpdater(MainDialog* dlg);
     ~CompareStatusUpdater();
 
-    void updateStatus(const wxString& text);
-    void updateProgressIndicator(double number);
+    void updateStatusText(const wxString& text);
+    void initNewProcess(int objectsTotal, double dataTotal, int processID);
+    void updateProcessedData(int objectsProcessed, double dataProcessed);
     int reportError(const wxString& text);
 
     void triggerUI_Refresh();
 
 private:
     MainDialog* mainDialog;
-    wxStatusBar* statusBar;
     bool suppressUI_Errormessages;
-
-    unsigned int numberOfScannedObjects;
+    CompareStatus* statusPanel;
+    int currentProcess;
 };
 
-class SyncStatus;
 
 class SyncStatusUpdater : public StatusUpdater
 {
 public:
-    SyncStatusUpdater(wxWindow* dlg, double gaugeTotalElements);
+    SyncStatusUpdater(wxWindow* dlg, bool hideErrorMessages);
     ~SyncStatusUpdater();
 
-    void updateStatus(const wxString& text);
-    void updateProgressIndicator(double number);
+    void updateStatusText(const wxString& text);
+    void initNewProcess(int objectsTotal, double dataTotal, int processID);
+    void updateProcessedData(int objectsProcessed, double dataProcessed);
     int reportError(const wxString& text);
 
     void triggerUI_Refresh();

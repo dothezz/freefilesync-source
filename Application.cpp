@@ -30,8 +30,8 @@ bool Application::ProcessIdle()
     return wxApp::ProcessIdle();
 }
 
-//Note: initialization is done in the FIRST idle event instead in OnInit. Reason: Commandline mode requires the wxApp eventhandler to be established
-//for UI update events. This is not the case in OnInit.
+//Note: initialization is done in the FIRST idle event instead of OnInit. Reason: Commandline mode requires the wxApp eventhandler to be established
+//for UI update events. This is not the case at the time of OnInit.
 
 bool Application::OnInit()
 {
@@ -103,8 +103,8 @@ int Application::OnRun()
 
 int Application::OnExit()
 {
-    delete programLanguage;
     GlobalResources::unloadResourceFiles();
+    delete programLanguage;
     return 0;
 }
 
@@ -117,19 +117,19 @@ SyncDirection convertCmdlineCfg(const wxString& cfg, const int i)
     switch (cfg[i])
     {
     case 'L':
-        return SyncDirLeft;
+        return syncDirLeft;
         break;
     case 'R':
-        return SyncDirRight;
+        return syncDirRight;
         break;
     case 'N':
-        return SyncDirNone;
+        return syncDirNone;
         break;
     default:
         assert(false);
     }
     //dummy return value to suppress compiler warning
-    return SyncDirNone;
+    return syncDirNone;
 }
 
 
@@ -337,14 +337,14 @@ void Application::parseCommandline()
 //until here all options and parameters are consistent
 //--------------------------------------------------------------------
 
-    CompareVariant cmpVar = CompareByMD5;   //dummy value to suppress compiler warning
+    CompareVariant cmpVar = compareByMD5;   //dummy value to suppress compiler warning
     SyncConfiguration syncConfiguration;
     FileCompareResult currentGridData;
 
     if (cmp == "SIZEDATE")
-        cmpVar = CompareByTimeAndSize;
+        cmpVar = compareByTimeAndSize;
     else if (cmp == "CONTENT")
-        cmpVar = CompareByMD5;
+        cmpVar = compareByMD5;
     else
         assert (false);
 
@@ -362,17 +362,17 @@ void Application::parseCommandline()
     {
 //COMPARE DIRECTORIES
         //unsigned int startTime = GetTickCount();
-        FreeFileSync::getModelDiff(currentGridData,
-                                   FreeFileSync::getFormattedDirectoryName(leftDir),
-                                   FreeFileSync::getFormattedDirectoryName(rightDir),
-                                   cmpVar,
-                                   &statusUpdater);
+        FreeFileSync::startCompareProcess(currentGridData,
+                                          FreeFileSync::getFormattedDirectoryName(leftDir),
+                                          FreeFileSync::getFormattedDirectoryName(rightDir),
+                                          cmpVar,
+                                          &statusUpdater);
         //wxMessageBox(wxString::Format(wxT("%i"), unsigned(GetTickCount()) - startTime));
 
         //check if folders are already in sync
         bool nothingToSync = true;
         for (FileCompareResult::const_iterator i = currentGridData.begin(); i != currentGridData.end(); ++i)
-            if (i->cmpResult != FilesEqual)
+            if (i->cmpResult != filesEqual)
             {
                 nothingToSync = false;
                 break;
@@ -395,9 +395,6 @@ void Application::parseCommandline()
             FreeFileSync::filterCurrentGridData(currentGridData, included, excluded);
 
 //START SYNCHRONIZATION
-        //adjust progress indicator
-        statusUpdater.switchToSyncProcess(FreeFileSync::calcTotalBytesToTransfer(currentGridData, syncConfiguration).get_d());
-
         //unsigned int startTime = GetTickCount();
         FreeFileSync::startSynchronizationProcess(currentGridData, syncConfiguration, &statusUpdater, false); //default: do not use recycle bin since it's not sure if its possible
         //wxMessageBox(wxString::Format(wxT("%i"), unsigned(GetTickCount()) - startTime));
@@ -429,7 +426,7 @@ CommandLineStatusUpdater::CommandLineStatusUpdater(Application* application, boo
         app(application),
         skipErrors(skipErr),
         silentMode(silent),
-        switchedToSynchronisation(false)  //used for changing mode of gauge
+        currentProcess(-1)
 {
     if (!silentMode)
     {
@@ -449,41 +446,64 @@ CommandLineStatusUpdater::~CommandLineStatusUpdater()
 
         //print the results list
         unsigned int failedItems = unhandledErrors.GetCount();
-        wxString result;
+        wxString errorMessages;
         if (failedItems)
         {
-            result = wxString(_("Warning: Synchronization failed for ")) + GlobalFunctions::numberToWxString(failedItems) + _(" item(s):\n\n");
+            errorMessages = wxString(_("Warning: Synchronization failed for ")) + globalFunctions::numberToWxString(failedItems) + _(" item(s):\n\n");
             for (unsigned int j = 0; j < failedItems; ++j)
-                result+= unhandledErrors[j] + "\n";
+                errorMessages+= unhandledErrors[j] + "\n";
+
+            syncStatusFrame->setStatusText_NoUpdate(errorMessages);
         }
-        syncStatusFrame->setStatusText_NoUpdate(result);
         syncStatusFrame->updateStatusDialogNow();
     }
 }
 
 inline
-void CommandLineStatusUpdater::updateStatus(const wxString& text)
+void CommandLineStatusUpdater::updateStatusText(const wxString& text)
 {
+    if (!silentMode)
+        syncStatusFrame->setStatusText_NoUpdate(text);
+}
+
+
+void CommandLineStatusUpdater::initNewProcess(int objectsTotal, double dataTotal, int processID)
+{
+    currentProcess = processID;
 
     if (!silentMode)
     {
-        if (switchedToSynchronisation)
-            syncStatusFrame->setStatusText_NoUpdate(text);
-        else
-            syncStatusFrame->setStatusText_NoUpdate(_("Scanning... ") + text);
+        if (currentProcess == FreeFileSync::scanningFilesProcess)
+            syncStatusFrame->m_staticTextStatus->SetLabel(_("Scanning..."));
+
+        else if (currentProcess == FreeFileSync::calcMD5Process)
+        {
+            syncStatusFrame->resetGauge(objectsTotal, dataTotal);
+            syncStatusFrame->m_staticTextStatus->SetLabel(_("Comparing..."));
+        }
+
+        else if (currentProcess == FreeFileSync::synchronizeFilesProcess)
+        {
+            syncStatusFrame->resetGauge(objectsTotal, dataTotal);
+            syncStatusFrame->m_staticTextStatus->SetLabel(_("Synchronizing..."));
+        }
+        else assert(false);
     }
 }
 
 
 inline
-void CommandLineStatusUpdater::updateProgressIndicator(double number)
+void CommandLineStatusUpdater::updateProcessedData(int objectsProcessed, double dataProcessed)
 {
     if (!silentMode)
     {
-        if (switchedToSynchronisation)
-            syncStatusFrame->incProgressIndicator_NoUpdate(number);
-        else
+        if (currentProcess == FreeFileSync::scanningFilesProcess)
             syncStatusFrame->m_gauge1->Pulse();
+        else if (currentProcess == FreeFileSync::calcMD5Process)
+            syncStatusFrame->incProgressIndicator_NoUpdate(objectsProcessed, dataProcessed);
+        else if (currentProcess == FreeFileSync::synchronizeFilesProcess)
+            syncStatusFrame->incProgressIndicator_NoUpdate(objectsProcessed, dataProcessed);
+        else assert(false);
     }
 }
 
@@ -495,7 +515,7 @@ int CommandLineStatusUpdater::reportError(const wxString& text)
         app->writeLog(text, _("Error"));
 
         if (skipErrors)                 //  <- /|\ before return, the logfile is written!!!
-            return StatusUpdater::Continue;
+            return StatusUpdater::continueNext;
         else
         {
             abortionRequested = true;
@@ -508,7 +528,7 @@ int CommandLineStatusUpdater::reportError(const wxString& text)
         if (skipErrors)        //this option can be set from commandline or by the user in the error dialog on UI
         {
             unhandledErrors.Add(text);
-            return StatusUpdater::Continue;
+            return StatusUpdater::continueNext;
         }
 
         wxString errorMessage = text + _("\n\nContinue with next object, retry or abort synchronization?");
@@ -520,12 +540,12 @@ int CommandLineStatusUpdater::reportError(const wxString& text)
 
         switch (rv)
         {
-        case ErrorDlg::ContinueButtonPressed:
+        case ErrorDlg::continueButtonPressed:
             unhandledErrors.Add(text);
-            return StatusUpdater::Continue;
-        case ErrorDlg::RetryButtonPressed:
-            return StatusUpdater::Retry;
-        case ErrorDlg::AbortButtonPressed:
+            return StatusUpdater::continueNext;
+        case ErrorDlg::retryButtonPressed:
+            return StatusUpdater::retry;
+        case ErrorDlg::abortButtonPressed:
         {
             unhandledErrors.Add(text);
             abortionRequested = true;
@@ -536,7 +556,7 @@ int CommandLineStatusUpdater::reportError(const wxString& text)
         }
     }
 
-    return StatusUpdater::Continue;  //dummy return value
+    return StatusUpdater::continueNext;  //dummy return value
 }
 
 
@@ -555,20 +575,9 @@ inline
 void CommandLineStatusUpdater::updateFinalStatus(const wxString& text)  //set by parsedCommandline() to communicate e.g. the final "success message"
 {
     if (!silentMode)
-        syncStatusFrame->m_textCtrlInfo->SetValue(text);
+        syncStatusFrame->setStatusText_NoUpdate(text);
 }
 
-
-inline
-void CommandLineStatusUpdater::switchToSyncProcess(double number)
-{
-    if (!silentMode)
-    {
-        syncStatusFrame->resetGauge(number);   //usually this number is set in SyncStatus constructor, but in case of commandline
-        //the total number is known only ofter "compare" so it has to be set later
-        switchedToSynchronisation = true;
-    }
-}
 
 //######################################################################################################
 

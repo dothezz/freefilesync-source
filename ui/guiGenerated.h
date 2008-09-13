@@ -35,11 +35,11 @@ class CustomGrid;
 #include <wx/statusbr.h>
 #include <wx/frame.h>
 #include <wx/stattext.h>
+#include <wx/gauge.h>
 #include <wx/statline.h>
 #include <wx/statbmp.h>
 #include <wx/dialog.h>
 #include <wx/animate.h>
-#include <wx/gauge.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -129,8 +129,34 @@ class GuiGenerated : public wxFrame
 		
 	
 	public:
-		GuiGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("FreeFileSync - Folder Synchronization"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 930,603 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		GuiGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("FreeFileSync - Folder Synchronization"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 933,612 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		~GuiGenerated();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class CompareStatusGenerated
+///////////////////////////////////////////////////////////////////////////////
+class CompareStatusGenerated : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxStaticText* m_staticText321;
+		wxStaticText* m_staticTextScanned;
+		
+		wxStaticText* m_staticText46;
+		wxStaticText* m_staticTextFilesToCompare;
+		
+		wxStaticText* m_staticText32;
+		wxStaticText* m_staticTextDataToCompare;
+		wxStaticText* m_staticText30;
+		wxTextCtrl* m_textCtrlFilename;
+		wxGauge* m_gauge2;
+	
+	public:
+		CompareStatusGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
+		~CompareStatusGenerated();
 	
 };
 
@@ -145,6 +171,9 @@ class SyncDialogGenerated : public wxDialog
 		
 		
 		wxBitmapButton* m_bpButton18;
+		
+		wxStaticText* m_staticText37;
+		wxTextCtrl* m_textCtrl12;
 		wxStaticText* m_staticText14;
 		wxTextCtrl* m_textCtrl5;
 		
@@ -164,6 +193,7 @@ class SyncDialogGenerated : public wxDialog
 		wxButton* m_button16;
 		
 		wxCheckBox* m_checkBoxUseRecycler;
+		wxCheckBox* m_checkBoxHideErrors;
 		
 		wxStaticText* m_staticText2;
 		
@@ -204,7 +234,7 @@ class SyncDialogGenerated : public wxDialog
 		
 	
 	public:
-		SyncDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Synchronization settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 533,349 ), long style = wxDEFAULT_DIALOG_STYLE );
+		SyncDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Synchronization settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 525,356 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~SyncDialogGenerated();
 	
 };
@@ -243,7 +273,9 @@ class AboutDlgGenerated : public wxDialog
 	
 	protected:
 		
+		wxStaticBitmap* m_bitmap11;
 		wxStaticText* m_staticText14;
+		
 		wxStaticText* m_staticText15;
 		wxStaticText* m_build;
 		
@@ -312,7 +344,10 @@ class DeleteDialogGenerated : public wxDialog
 	
 	protected:
 		
+		
+		wxStaticBitmap* m_bitmap12;
 		wxStaticText* m_staticTextHeader;
+		
 		wxTextCtrl* m_textCtrlMessage;
 		wxButton* m_buttonOK;
 		wxButton* m_buttonCancel;
@@ -376,16 +411,16 @@ class SyncStatusGenerated : public wxDialog
 	
 	protected:
 		
+		wxAnimationCtrl* m_animationControl1;
 		wxStaticText* m_staticText20;
 		wxStaticText* m_staticText21;
 		
-		wxStaticText* m_staticText25;
-		wxStaticText* m_staticTextProcessedObj;
 		wxStaticText* m_staticText26;
-		wxStaticText* m_staticTextBytesCopied;
+		wxStaticText* m_staticTextDataRemaining;
 		
 		
-		wxStaticText* m_staticText32;
+		wxStaticText* m_staticText25;
+		wxStaticText* m_staticTextRemainingObj;
 		
 		
 		// Virtual event handlers, overide them in your derived class

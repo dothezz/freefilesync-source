@@ -89,13 +89,12 @@ public:
     CommandLineStatusUpdater(Application* application, bool skipErr, bool silent);
     ~CommandLineStatusUpdater();
 
-    void updateStatus(const wxString& text);
-    void updateProgressIndicator(double number);
+    void updateStatusText(const wxString& text);
+    void initNewProcess(int objectsTotal, double dataTotal, int processID);
+    void updateProcessedData(int objectsProcessed, double dataProcessed);
     int reportError(const wxString& text);
-
     void triggerUI_Refresh();
 
-    void switchToSyncProcess(double number);
     void updateFinalStatus(const wxString& text);
 
 private:
@@ -104,8 +103,8 @@ private:
     bool skipErrors;
     bool silentMode;
 
-    bool switchedToSynchronisation;
     wxArrayString unhandledErrors;   //list of non-resolved errors
+    int currentProcess;
 };
 
 

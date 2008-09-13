@@ -8,14 +8,15 @@
 #include <windows.h>
 #include "library/gmp/include/gmpxx.h"
 #include <wx/log.h>
+#include "library/multithreading.h"
 
 using namespace std;
 
 enum SyncDirection
 {
-    SyncDirLeft,
-    SyncDirRight,
-    SyncDirNone
+    syncDirLeft,
+    syncDirRight,
+    syncDirNone
 };
 
 struct SyncConfiguration
@@ -27,30 +28,31 @@ struct SyncConfiguration
     SyncDirection different;
 };
 
-typedef struct
+
+struct FileInfo
 {
-    wxString fileSize;
+    wxULongLong fileSize;
     wxString lastWriteTime;
-    FILETIME lastWriteTimeUTC;
-} FileInfo;
+    wxULongLong lastWriteTimeUTC;
+};
 
 enum ObjectType
 {
-    IsNothing,
-    IsDirectory,
-    IsFile
+    isNothing,
+    isDirectory,
+    isFile
 };
 
 struct FileDescrLine
 {
-    FileDescrLine() : objType(IsNothing) {};
+    FileDescrLine() : objType(isNothing) {};
 
     wxString filename;  // == directory + relFilename
     wxString directory; //directory to be synced
     wxString relFilename; //filename without directory that is being synchronized
     wxString lastWriteTime;
-    FILETIME lastWriteTimeUTC;
-    wxString fileSize;
+    wxULongLong lastWriteTimeUTC;
+    wxULongLong fileSize;
     ObjectType objType; //is it a file or directory or initial?
 
     //the following operators are needed by template class "set"
@@ -93,12 +95,12 @@ typedef set<FileDescrLine> DirectoryDescrType;
 
 enum CompareFilesResult
 {
-    FileOnLeftSideOnly,
-    FileOnRightSideOnly,
-    RightFileNewer,
-    LeftFileNewer,
-    FilesDifferent,
-    FilesEqual
+    fileOnLeftSideOnly,
+    fileOnRightSideOnly,
+    rightFileNewer,
+    leftFileNewer,
+    filesDifferent,
+    filesEqual
 };
 
 struct FileCompareLine
@@ -116,35 +118,8 @@ typedef vector<FileCompareLine> FileCompareResult;
 
 enum CompareVariant
 {
-    CompareByMD5,
-    CompareByTimeAndSize
-};
-
-//interface for status updates (can be implemented by UI or commandline)
-//overwrite virtual methods for respective functionality
-class StatusUpdater
-{
-public:
-    StatusUpdater() : abortionRequested(false) {}
-    virtual ~StatusUpdater() {}
-
-    //these three methods have to be implemented in the derived classes to handle error and status information
-    virtual void updateStatus(const wxString& text) = 0;
-    virtual void updateProgressIndicator(double number) = 0;
-    virtual int  reportError(const wxString& text) = 0;
-
-    //this method is triggered repeatedly and can be used to refresh the ui by dispatching pending events
-    virtual void triggerUI_Refresh() {}
-
-    void requestAbortion() //opportunity to abort must be implemented in the three virtual status and error methods (for example in triggerUI_Refresh())
-    {                      //currently used by the UI status information screen, when button "Abort is pressed"
-        abortionRequested = true;
-    }
-    static const int Continue = -1;
-    static const int Retry = -2;
-
-protected:
-    bool abortionRequested;
+    compareByMD5,
+    compareByTimeAndSize
 };
 
 
@@ -168,8 +143,36 @@ private:
     StatusUpdater* statusUpdater;
 };
 
-typedef WINSHELLAPI int (*DLLFUNC)(LPSHFILEOPSTRUCT lpFileOp);
 
+//Note: the following lines are a performance optimization for deleting elements from a vector. It is incredibly faster to create a new
+//vector and leave specific elements out than to delete row by row and force recopying of most elements for each single deletion (linear vs quadratic runtime)
+template <class T>
+void removeRowsFromVector(vector<T>& grid, const set<int>& rowsToRemove)
+{
+    vector<T> temp;
+    int rowToSkip = -1; //keep it an INT!
+
+    set<int>::iterator rowToSkipIndex = rowsToRemove.begin();
+
+    if (rowToSkipIndex != rowsToRemove.end())
+        rowToSkip = *rowToSkipIndex;
+
+    for (int i = 0; i < int(grid.size()); ++i)
+    {
+        if (i != rowToSkip)
+            temp.push_back(grid[i]);
+        else
+        {
+            rowToSkipIndex++;
+            if (rowToSkipIndex != rowsToRemove.end())
+                rowToSkip = *rowToSkipIndex;
+        }
+    }
+    grid.swap(temp);
+}
+
+
+typedef WINSHELLAPI int (*DLLFUNC)(LPSHFILEOPSTRUCT lpFileOp);
 
 class FreeFileSync
 {
@@ -181,8 +184,13 @@ public:
     friend class GetAllFilesFull;
     friend class CopyThread;
 
+    //identifiers of different processed
+    static const int scanningFilesProcess    = 1;
+    static const int calcMD5Process          = 2;
+    static const int synchronizeFilesProcess = 3;
+
     //main function for compare
-    static void getModelDiff(FileCompareResult& output, const wxString& dirLeft, const wxString& dirRight, CompareVariant cmpVar, StatusUpdater* updateClass);
+    static void startCompareProcess(FileCompareResult& output, const wxString& dirLeft, const wxString& dirRight, CompareVariant cmpVar, StatusUpdater* statusUpdater);
 
     //main function for synchronization
     static void startSynchronizationProcess(FileCompareResult& grid, const SyncConfiguration& config, StatusUpdater* statusUpdater, bool useRecycleBin);
@@ -191,7 +199,7 @@ public:
     bool setRecycleBinUsage(bool activate); //enables/disables Recycle Bin usage (but only if usage is possible at all): RV: Setting was successful or not
 
     static void deleteOnGridAndHD(FileCompareResult& grid, const set<int>& rowsToDelete, StatusUpdater* statusUpdater, bool useRecycleBin);
-static void addSubElements(set<int>& subElements, const FileCompareResult& grid, const FileCompareLine& relevantRow);
+    static void addSubElements(set<int>& subElements, const FileCompareResult& grid, const FileCompareLine& relevantRow);
 
     static void filterCurrentGridData(FileCompareResult& currentGridData, const wxString& includeFilter, const wxString& excludeFilter);
     static void removeFilterOnCurrentGridData(FileCompareResult& currentGridData);
@@ -199,8 +207,14 @@ static void addSubElements(set<int>& subElements, const FileCompareResult& grid,
     static wxString formatFilesizeToShortString(const mpz_class& filesize);
     static wxString getFormattedDirectoryName(const wxString& dirname);
 
-    static mpz_class calcTotalBytesToTransfer(const FileCompareResult& fileCmpResult, const SyncConfiguration& config);
+    static void calcTotalBytesToSync(int& objectsTotal, double& dataTotal, const FileCompareResult& fileCmpResult, const SyncConfiguration& config);
+
     static void swapGrids(FileCompareResult& grid);
+
+    static void wxULongLongToMpz(mpz_t& output, const wxULongLong& input);
+
+    static string calculateMD5Hash(const wxString& filename);
+    static string calculateMD5HashMultithreaded(const wxString& filename, StatusUpdater* updateClass);
 
     static bool isFFS_ConfigFile(const wxString& filename);
 
@@ -220,16 +234,11 @@ private:
     void createDirectory(const wxString& directory, int level = 0); //level is used internally only
     //some special file functions
     void moveToRecycleBin(const wxString& filename);
-    void copyfileMultithreaded(const wxString& source, const wxString& target, StatusUpdater* updateClass);
-
-
-    static void getBytesToTransfer(mpz_t& result, const FileCompareLine& fileCmpLine, const SyncConfiguration& config);
+    static void copyfileMultithreaded(const wxString& source, const wxString& target, StatusUpdater* updateClass);
 
     static void generateFileAndFolderDescriptions(DirectoryDescrType& output, const wxString& directory, StatusUpdater* updateClass = 0);
 
     static void getFileInformation(FileInfo& output, const wxString& filename);
-
-    static wxString calculateMD5Hash(const wxString& filename);
 
     bool recycleBinAvailable;
     wxLogNull* noWxLogs;

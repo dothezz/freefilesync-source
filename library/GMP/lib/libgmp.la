@@ -19,7 +19,7 @@ dependency_libs=''
 # Version information for libgmp.
 current=7
 age=4
-revision=2
+revision=3
 
 # Is this an already installed library?
 installed=yes
