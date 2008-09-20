@@ -34,12 +34,24 @@
 &Abbruch
 &Back
 &Zurück
+&Cancel
+&Abbruch
+&Compare
+&Vergleichen
 &Continue
 &Fortfahren
 &Default
 &Standard
+&Filter
+&Filter
+&OK
+&OK
 &Retry
 &Wiederholen
+&Start
+&Start
+&Synchronize
+&Synchronisieren
 (-)	filtered out from sync-process\n
 (-)	nicht synchronisieren\n
 (Build: 
@@ -52,6 +64,8 @@
 -----------------------------------------------------
 ---------\n
 -----------\n
+--.--
+--.--
 -Open-Source file synchronization-
 -Open-Source Datei-Synchronisation-
 .
@@ -80,6 +94,8 @@
 >>	rechte Datei ist neuer\n
 Abort
 Abbruch
+Aborted
+Abgebrochen
 Aborted!
 Abbruch!
 About
@@ -110,6 +126,8 @@ Compare by
 Vergleichen nach
 Compare by \"File size and date\"\n----------------------------------------\nThis compare variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. For the latter the system's UTC time (coordinated word time) is used internally, although the local file time is displayed on the result list. So there are no problems concerning different time zones or daylight saving time.\n\nWhen \"Compare\" is triggered with this option set the following decision tree is processed:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n          _________|_____________\n         |                  |                         |\n  left newer  right newer  different (but same date)\n\nAs a result 6 different status can be returned to categorize all files:\n\n- exists left only\n- exists right only\n- left newer\n- right newer\n- different (but same date)\n- equal\n\n\nCompare by \"File content\"\n----------------------------------------\nAs the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n\nAs a result the files are separated into the following categories:\n\n- exists left only\n- exists right only\n- different\n- equal
 Vergleichen nach \"Dateigröße und -datum\"\n---------------------------------------------------\nDiese Variante identifiziert zwei gleichnamige Dateien als gleich, wenn sie die gleiche Dateigröße haben UND der Zeitpunkt der letzten Änderung derselbe ist. Für Letzteres wird intern die UTC-Zeit (koordinierte Weltzeit) verwendet, auch wenn die lokale Zeit in der Ergebnisliste angezeigt wird. Dadurch werden Probleme vermieden, die durch verschiedene Zeitzonen oder Sommer-/Winterzeit entstehen.\n\nNachdem \"Compare\" mit dieser Einstellung gestartet wurde, wird der folgende Entscheidungsbaum abgearbeitet:\n\n                         -------------------------\n                         |Entscheidungsbaum|\n                         -------------------------\n                     __________|___________\n                     |                                         |\n Datei ex. auf beiden Seiten      nur auf einer Seite\n     ________|____                             __|___\n     |                        |                           |          |\n  gleich           verschieden               links    rechts\n          __________|___________\n          |                   |                     |\n  links neuer  rechts neuer  verschieden (bei gleichem Datum)\n\nAls Ergebnis werden 6 verschiedene Status zurückgegeben, um Dateien zu kategorisieren:\n\n- existiert nur links\n- existiert nur rechts\n- links neuer\n- rechts neuer\n- verschieden (bei gleichem Datum)\n- gleich\n\n\nVergleichen nach \"Dateiinhalt\"\n------------------------------------\nWie der Name bereits sagt, werden zwei Dateien mit gleichem Namen genau dann als gleich angesehen, wenn sie den gleichen Dateiinhalt haben. Diese Einstellung ist eher für Konsistenzprüfungen geeignet als für Backup-Operationen. Aus diesem Grund wird der Zeitpunkt der letzten Änderung der Dateien nicht berücksichtigt.\n\nDer Entscheidungsbaum ist in diesem Fall kleiner:\n\n                         -------------------------\n                         |Entscheidungsbaum|\n                         -------------------------\n                     __________|___________\n                     |                                         |\n Datei ex. auf beiden Seiten      nur auf einer Seite\n     ________|____                             __|___\n     |                        |                           |          |\n  gleich           verschieden               links    rechts\n\nDas Ergebnis ist eine Aufteilung in folgende Kategorien:\n\n- existiert nur links\n- existiert nur rechts\n- verschieden\n- gleich
+Comparing content of files 
+Vergleiche Inhalt der Dateien 
 Comparing...
 Vergleiche...
 Completed
@@ -138,6 +156,8 @@ Copy from right to left
 Von rechts nach links kopieren
 Copy from right to left overwriting
 Von rechts nach links kopieren und überschreiben
+Copy to clipboard\tCTRL+C
+Kopiere in Zwischenablage\tCTRL+C
 Copying file 
 Kopiere Datei 
 Could not change attributes of 
@@ -180,6 +200,8 @@ Delete files existing on left side only
 Lösche Dateien, die nur links existieren
 Delete files existing on right side only
 Lösche Dateien, die nur rechts existieren
+Delete files\tDEL
+Lösche Dateien\tDEL
 Deleting file 
 Lösche Datei 
 Deleting folder 
@@ -228,6 +250,8 @@ Error opening file
 Fehler beim Öffnen der Datei
 Error overwriting file 
 Fehler beim Überschreiben der Datei 
+Error reading file: 
+Fehler beim Lesen der Datei: 
 Error when modifying GUI grid
 Fehler beim Modifizieren des UI Grids
 Error: Source directory does not exist anymore: 
@@ -276,6 +300,8 @@ Filter active: Press again to deactivate
 Filter aktiv: Zum Deaktivieren erneut auswählen
 Filter files
 Dateien filtern
+Filter manually
+Manuell filtern
 Filter view
 Ansicht filtern
 Folders/files that exist on left side only
@@ -284,10 +310,12 @@ Folders/files that exist on right side only
 Ordner/Dateien, die nur rechts existieren
 FreeFileSync   (Date: 
 FreeFileSync   (Datum: 
-FreeFileSync - Folder Synchronization
-FreeFileSync - Dateisynchronisation
+FreeFileSync - Folder Comparison and Synchronization
+FreeFileSync - Dateivergleich und -synchronisation
 FreeFileSync at Sourceforge
 FreeFileSync bei Sourceforge
+FreeFileSync configuration
+FreeFileSync Konfiguration
 Help
 Hilfe
 Hide error messages
@@ -311,7 +339,7 @@ Einschließen
 Information
 Information
 It was not possible to gain access to Recycle Bin!\n\nIt's likely that you are not using Windows XP. (Probably Vista)\nIf you want this feature included, please contact the author. :)
-Die Papierkorbfunktion steht nicht zur Verfügung!\n\nWahrscheinlich ist das aktuelle Betriebssystem nicht Windows XP. (Möglicherweise Vista)\nWenn Sie diese Funktion benötigen kontaktieren Sie bitte den Autor. :)
+Die Papierkorbfunktion steht nicht zur Verfügung!\n\nWahrscheinlich ist das aktuelle Betriebssystem nicht Windows XP. (Möglicherweise Vista)\nWenn Sie diese Funktion wirklich benötigen kontaktieren Sie bitte den Autor. :)
 Items completed:
 Elemente komplett:
 Legend\n
@@ -330,6 +358,8 @@ Not all items were synchronized! Have a look at the list.
 Nicht alle Objekte wurden synchronisiert! Siehe die verbliebenen Elemente im Hauptfenster.
 Nothing to synchronize. Both directories seem to contain the same data!
 Nichts zu synchronisieren. Beide Verzeichnisse scheinen dieselben Daten zu enthalten!
+Number of files and directories that will be copied or deleted
+Anzahl der Dateien und Verzeichnisse, die kopiert oder gelöscht werden
 OK
 OK
 Objects to process:
@@ -337,23 +367,31 @@ Zu übertragende Elemente:
 One way ->
 Nach rechts ->
 Only files/directories that pass filtering will be relevant for synchronization.\n\n1. Enter full file or directory names separated by ';'.\n2. Wildcard characters '*' and '?' are supported.\n3. Case sensitive expressions!\n\nExample: *.tmp;C:\\data\\dummy.log;*filename*;*directory*
-Nur Dateien/Ordner, die zu den Filtereinstellungen passen, werden bei der\nSynchronisation berücksichtigt.\n\n1. Komplette Datei- oder Verzeichnisnamen getrennt durch ';' eingeben.\n2. Die Platzhalter '*' und '?' werden unterstützt.\n3. Groß-/Kleinschreibung wird unterschieden!\n\nBeispiel: *.tmp;C:\\data\\dummy.log;*filename*;*directory*
+Bei der Synchronisation werden nur die Dateien/Ordner berücksichtigt, die zu den\nFiltereinstellungen passen.\n\n1. Komplette Datei- oder Verzeichnisnamen getrennt durch ';' eingeben.\n2. Die Platzhalter '*' und '?' werden unterstützt.\n3. Groß-/Kleinschreibung wird unterschieden!\n\nBeispiel: *.tmp;C:\\data\\dummy.log;*filename*;*directory*
 Open synchronization dialog
 Zeige Synchronisationseinstellungen
+Open with Explorer\tD-Click
+Im Explorer öffnen\tD-Click
 Operation aborted!
 Aktion abgebrochen!
 Operation:
 Vorgang:
+Pause
+Pause
 Please select directories for both sides!
 Bitte für beide Seiten ein Verzeichnis wählen!
 Press button to activate filter
 Auswählen, um Filter zu aktivieren
+Published under the GNU General Public License:
+Veröffentlicht unter der GNU General Public License:
 Quit
 Beenden
 Reading content of 
 Lese Inhalt von 
 Relative path
 Relativer Pfad
+Remaining time:
+Verbliebene Zeit:
 Result
 Ergebnis
 Retry
@@ -380,8 +418,8 @@ Set filter for synchronization
 Filter einstellen
 Size
 Größe
-Source code written completely in C++ utilizing:\n\nMinGW \t\t- Windows port of GNU Compiler Collection\nwxWidgets \t- Open-Source GUI framework\nwxFormBuilder\t- wxWidgets GUI-builder\nGMP \t\t- arithmetic calculations\nCodeBlocks \t- Open-Source IDE\n\n   by ZenJu
-Sourcecode komplett in C++ geschrieben unter Verwendung von:\n\nMinGW \t\t- Windows-Port der GNU Compiler Collection\nwxWidgets \t- Open-Source GUI-Framework\nwxFormBuilder\t- wxWidgets GUI-Builder\nGMP \t\t- Arithmetische Berechnungen\nCodeBlocks \t- Open-Source IDE\n\n      ZenJu
+Source code written completely in C++ utilizing:\n\n  MinGW \t\t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE\n\n     by ZenJu
+Sourcecode komplett in C++ geschrieben unter Verwendung von:\n\n  MinGW \t\t- Windows-Port der GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI-Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE\n\n        ZenJu
 Specify algorithm to test if files are equal:\n\n\t\tSIZEDATE: check filesize and date\n\t\tCONTENT: check file content\n
 Methode angeben, um gleiche Dateien zu erkennen:\n\n\t\tSIZEDATE: Prüfung auf Dateigröße und -datum\n\t\tCONTENT: Prüfung auf Dateiinhalt\n
 Specify names to be excluded separated by ';'. Wildcards '*' and '?' are supported. Default: \"\"\n
@@ -412,6 +450,8 @@ The selected file does not contain a valid configuration!
 Die ausgewählte Datei enthält keine gültige Konfiguration!
 The selected file does not exist anymore!
 Die gewählte Datei existiert nicht mehr!
+Total amount of data that will be copied
+Menge der Daten, die kopiert werden
 Two way <->
 Beidseitig <->
 Unable to create logfile!

@@ -107,10 +107,9 @@ class GuiGenerated : public wxFrame
 		virtual void OnEnterLeftDir( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnDirChangedPanel1( wxFileDirPickerEvent& event ){ event.Skip(); }
 		virtual void OnLeftGridDoubleClick( wxGridEvent& event ){ event.Skip(); }
+		virtual void OnOpenContextMenu( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnSortLeftGrid( wxGridEvent& event ){ event.Skip(); }
-		virtual void OnGridSelectCell( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnSwapDirs( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnGrid3SelectRange( wxGridRangeSelectEvent& event ){ event.Skip(); }
 		virtual void OnEnterRightDir( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnDirChangedPanel2( wxFileDirPickerEvent& event ){ event.Skip(); }
 		virtual void OnRightGridDoubleClick( wxGridEvent& event ){ event.Skip(); }
@@ -129,7 +128,7 @@ class GuiGenerated : public wxFrame
 		
 	
 	public:
-		GuiGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("FreeFileSync - Folder Synchronization"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 933,612 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		GuiGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("FreeFileSync - Folder Comparison and Synchronization"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 933,612 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		~GuiGenerated();
 	
 };
@@ -150,6 +149,9 @@ class CompareStatusGenerated : public wxPanel
 		
 		wxStaticText* m_staticText32;
 		wxStaticText* m_staticTextDataToCompare;
+		
+		wxStaticText* m_staticText37;
+		wxStaticText* m_staticTextRemainingTime;
 		wxStaticText* m_staticText30;
 		wxTextCtrl* m_textCtrlFilename;
 		wxGauge* m_gauge2;
@@ -234,7 +236,7 @@ class SyncDialogGenerated : public wxDialog
 		
 	
 	public:
-		SyncDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Synchronization settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 525,356 ), long style = wxDEFAULT_DIALOG_STYLE );
+		SyncDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Synchronization settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 523,356 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~SyncDialogGenerated();
 	
 };
@@ -273,15 +275,17 @@ class AboutDlgGenerated : public wxDialog
 	
 	protected:
 		
+		wxPanel* m_panel5;
 		wxStaticBitmap* m_bitmap11;
-		wxStaticText* m_staticText14;
+		
+		wxStaticText* m_staticText39;
 		
 		wxStaticText* m_staticText15;
 		wxStaticText* m_build;
 		
 		wxTextCtrl* m_textCtrl3;
-		
 		wxStaticText* m_staticText131;
+		wxStaticLine* m_staticline3;
 		wxStaticBitmap* m_bitmap9;
 		wxStaticText* m_staticText11;
 		wxHyperlinkCtrl* m_hyperlink1;
@@ -291,6 +295,11 @@ class AboutDlgGenerated : public wxDialog
 		wxAnimationCtrl* m_animationControl1;
 		wxStaticText* m_staticText151;
 		wxHyperlinkCtrl* m_hyperlink3;
+		wxStaticLine* m_staticline2;
+		
+		wxStaticBitmap* m_bitmap13;
+		wxHyperlinkCtrl* m_hyperlink5;
+		
 		wxButton* m_button8;
 		
 		// Virtual event handlers, overide them in your derived class
@@ -299,7 +308,7 @@ class AboutDlgGenerated : public wxDialog
 		
 	
 	public:
-		AboutDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 439,510 ), long style = wxDEFAULT_DIALOG_STYLE );
+		AboutDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 422,603 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~AboutDlgGenerated();
 	
 };
@@ -397,7 +406,7 @@ class FilterDlgGenerated : public wxDialog
 		
 	
 	public:
-		FilterDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configure filter settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 484,350 ), long style = wxDEFAULT_DIALOG_STYLE );
+		FilterDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configure filter settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 472,367 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~FilterDlgGenerated();
 	
 };
@@ -413,8 +422,13 @@ class SyncStatusGenerated : public wxDialog
 		
 		wxAnimationCtrl* m_animationControl1;
 		wxStaticText* m_staticText20;
+		
+		wxStaticBitmap* m_bitmapStatus;
+		wxStaticText* m_staticTextStatus;
+		
 		wxStaticText* m_staticText21;
 		
+		wxTextCtrl* m_textCtrlInfo;
 		wxStaticText* m_staticText26;
 		wxStaticText* m_staticTextDataRemaining;
 		
@@ -430,8 +444,6 @@ class SyncStatusGenerated : public wxDialog
 		
 	
 	public:
-		wxStaticText* m_staticTextStatus;
-		wxTextCtrl* m_textCtrlInfo;
 		wxGauge* m_gauge1;
 		wxButton* m_buttonOK;
 		wxButton* m_buttonAbort;

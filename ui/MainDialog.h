@@ -45,6 +45,15 @@ typedef vector<UI_GridLine> UI_Grid;
 bool updateUI_IsAllowed();        //test if a specific amount of time is over
 void updateUI_Now();              //do the updating
 
+//IDs for context menu items
+enum ContextItem
+{
+    contextManualFilter = 10,
+    contextCopyClipboard,
+    contextOpenExplorer,
+    contextDeleteFiles
+};
+
 extern int leadingPanel;
 
 class CompareStatusUpdater;
@@ -79,9 +88,12 @@ private:
     void mapFileModelToUI(UI_Grid& output, const FileCompareResult& fileCmpResult);
     void updateStatusInformation(const UI_Grid& output);
 
-    void filterRangeManual(const set<int>& rowsToFilterOnUI_View, int leadingRow);
-
-    void deleteFilesOnGrid(wxGrid* grid);
+    //context menu functions
+    set<int> getSelectedRows();
+    void filterRangeManual(const set<int>& rowsToFilterOnUI_View);
+    void copySelectionToClipboard(const set<int>& selectedRows, int selectedGrid);
+    void openWithFileBrowser(int rowNumber, int gridNr);
+    void deleteFilesOnGrid(const set<int>& rowsToDeleteOnUI);
 
     //work to be done in idle time
     void OnIdleEvent(wxEvent& event);
@@ -99,6 +111,7 @@ private:
     void onGrid1ButtonEvent(wxKeyEvent& event);
     void onGrid2ButtonEvent(wxKeyEvent& event);
     void onGrid3ButtonEvent(wxKeyEvent& event);
+    void OnOpenContextMenu(wxGridEvent& event);
 
     void OnEnterLeftDir(wxCommandEvent& event);
     void OnEnterRightDir(wxCommandEvent& event);
@@ -107,9 +120,10 @@ private:
 
     //manual filtering of rows:
     void OnGridSelectCell(wxGridEvent& event);
-    void OnGrid3SelectRange(wxGridRangeSelectEvent& event);
     void OnGrid3LeftMouseUp(wxEvent& event);
     void OnGrid3LeftMouseDown(wxEvent& event);
+
+    void onContextMenuSelection(wxCommandEvent& event);
 
     void OnLeftGridDoubleClick( wxGridEvent& event);
     void OnRightGridDoubleClick(wxGridEvent& event);
@@ -181,6 +195,8 @@ private:
 
     wxFrame* parent;
 
+    wxMenu* contextMenu;
+
     //status information
     wxLongLong lastStatusChange;
     int        stackObjects;
@@ -191,9 +207,6 @@ private:
     static const int CfgHistroyLength = 10;
 
     //variables for manual filtering of m_grid3
-    int selectedRange3Begin;  //only used for grid 3
-    int selectedRange3End;    //only used for grid 3
-    int selectionLead;  //used on all three grids
     bool filteringInitialized;
     bool filteringPending;
 

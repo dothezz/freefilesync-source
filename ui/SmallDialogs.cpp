@@ -1,13 +1,15 @@
 #include "smallDialogs.h"
 #include "../library/globalFunctions.h"
+#include <fstream>
 
 using namespace globalFunctions;
 
-AboutDlg::AboutDlg(MainDialog* window) : AboutDlgGenerated(window)
+AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
 {
     m_bitmap9->SetBitmap(*GlobalResources::bitmapWebsite);
     m_bitmap10->SetBitmap(*GlobalResources::bitmapEmail);
-    m_bitmap11->SetBitmap(*GlobalResources::bitmapFFS);
+    m_bitmap11->SetBitmap(*GlobalResources::bitmapLogo);
+    m_bitmap13->SetBitmap(*GlobalResources::bitmapGPL);
 
     m_animationControl1->SetAnimation(*GlobalResources::animationMoney);
     m_animationControl1->Play();
@@ -33,7 +35,7 @@ void AboutDlg::OnOK(wxCommandEvent& event)
 //########################################################################################
 
 
-HelpDlg::HelpDlg(MainDialog* window) : HelpDlgGenerated(window)
+HelpDlg::HelpDlg(wxWindow* window) : HelpDlgGenerated(window)
 {
     m_button8->SetFocus();
 }
@@ -54,16 +56,17 @@ void HelpDlg::OnOK(wxCommandEvent& event)
 //########################################################################################
 
 
-FilterDlg::FilterDlg(MainDialog* window) :
+FilterDlg::FilterDlg(wxWindow* window, wxString& filterIncl, wxString& filterExcl) :
         FilterDlgGenerated(window),
-        mainDialog(window)
+        includeFilter(filterIncl),
+        excludeFilter(filterExcl)
 {
 
     m_bitmap8->SetBitmap(*GlobalResources::bitmapInclude);
     m_bitmap9->SetBitmap(*GlobalResources::bitmapExclude);
 
-    m_textCtrlInclude->SetValue(mainDialog->includeFilter);
-    m_textCtrlExclude->SetValue(mainDialog->excludeFilter);
+    m_textCtrlInclude->SetValue(includeFilter);
+    m_textCtrlExclude->SetValue(excludeFilter);
 }
 
 FilterDlg::~FilterDlg() {}
@@ -78,8 +81,8 @@ void FilterDlg::OnClose(wxCloseEvent& event)
 void FilterDlg::OnOK(wxCommandEvent& event)
 {
     //only if user presses ApplyFilter, he wants the changes to be committed
-    mainDialog->includeFilter = m_textCtrlInclude->GetValue();
-    mainDialog->excludeFilter = m_textCtrlExclude->GetValue();
+    includeFilter = m_textCtrlInclude->GetValue();
+    excludeFilter = m_textCtrlExclude->GetValue();
 
     //when leaving dialog: filter and redraw grid, if filter is active
     EndModal(okayButtonPressed);
@@ -173,6 +176,98 @@ void ErrorDlg::OnAbort(wxCommandEvent& event)
 }
 //########################################################################################
 
+/*
+class for calculation of remaining time:
+----------------------------------------
+"filesize |-> time" is an affine linear function f(x) = z_1 + z_2 x
+
+For given n measurements, sizes x_0, ..., x_n and times f_0, ..., f_n, the function f (as a polynom of degree 1) can be lineary approximated by
+
+z_1 = (r - s * q / p) / ((n + 1) - s * s / p)
+z_2 = (q - s * z_1) / p = (r - (n + 1) z_1) / s
+
+with
+p := x_0^2 + ... + x_n^2
+q := f_0 x_0 + ... + f_n x_n
+r := f_0 + ... + f_n
+s := x_0 + ... + x_n
+
+=> the time to process N files with amount of data D is:    N * z_1 + D * z_2
+
+Problem:
+--------
+Times f_0, ..., f_n can be very small so that precision of the PC clock is poor.
+=> Times have to be accumulated to enhance precision:
+Copying of m files with sizes x_i and times f_i (i = 1, ..., m) takes sum_i f(x_i) := m * z_1 + z_2 * sum x_i = sum f_i
+With X defined as the accumulated sizes and F the accumulated times this gives: (in theory...)
+m * z_1 + z_2 * X = F   <=>
+z_1 + z_2 * X / m = F / m
+
+=> we optain a new (artificial) measurement with size X / m and time F / m to be used in the linear approximation above
+
+
+RemainingTime::RemainingTime() : n(0), m(0), X(0), F(0), p(0), q(0), r(0), s(0), z_1(0), z_2(0), lastExec(0) {}
+
+RemainingTime::~RemainingTime()
+{
+    ofstream output("test.txt");
+    for (unsigned i = 0; i < x.size(); ++i)
+    {
+        output<<x[i]<<" "<<f[i]<<endl;
+    }
+    output<<endl<<z_1<<" "<<z_2<<endl;
+    output.close();
+}
+
+
+wxLongLong RemainingTime::getRemainingTime(double processedDataSinceLastCall, int remainingFiles, double remainingData) //returns the remaining time in seconds
+{
+    wxLongLong newExec = wxGetLocalTimeMillis();
+
+    if (lastExec != 0)
+    {
+        X+= processedDataSinceLastCall;
+        F = (newExec - lastExec).ToDouble();
+        ++m;
+
+        if (F > 1000)  //add new measurement only if F is accumulated to a certain degree
+        {
+            lastExec = newExec;
+            ++n;
+
+            double x_i = X / m;
+            double f_i = F / m;
+            X = 0;
+            F = 0;
+            m = 0;
+
+            x.push_back(x_i);
+            f.push_back(f_i);
+
+            p+= x_i * x_i;
+            q+= f_i * x_i;
+            r+= f_i;
+            s+= x_i;
+
+            if (p != 0)
+            {
+                double tmp = (n - s * s / p);
+                if (tmp != 0 && s != 0)
+                {   //recalculate coefficients for affine-linear function
+                    z_1 = (r - s * q / p) / tmp;
+                    z_2 = (r - n * z_1) / s;    //not (n + 1) here, since n already is the number of measurements
+                }
+            }
+        }
+
+        return int(remainingFiles * z_1 + remainingData * z_2);
+    }
+    //else
+    lastExec = newExec;
+    return 0;
+}*/
+
+//########################################################################################
 
 SyncStatus::SyncStatus(StatusUpdater* updater, wxWindow* parentWindow) :
         SyncStatusGenerated(parentWindow),
@@ -186,6 +281,7 @@ SyncStatus::SyncStatus(StatusUpdater* updater, wxWindow* parentWindow) :
         totalObjects(0)
 {
     m_animationControl1->SetAnimation(*GlobalResources::animationSync);
+    m_animationControl1->SetInactiveBitmap(*GlobalResources::bitmapFinished);
     m_animationControl1->Play();
 
     //initialize gauge
@@ -205,6 +301,7 @@ SyncStatus::~SyncStatus()
     {
         windowToDis->Enable();
         windowToDis->Raise();
+        windowToDis->SetFocus();
     }
 }
 
@@ -248,8 +345,9 @@ void SyncStatus::updateStatusDialogNow()
     //remaining objects
     m_staticTextRemainingObj->SetLabel(numberToWxString(totalObjects - currentObjects));
 
+
     //remaining bytes left for copy
-    const wxString remainingBytes = FreeFileSync::formatFilesizeToShortString(mpz_class(totalData - currentData));
+    const wxString remainingBytes = FreeFileSync::formatFilesizeToShortString(totalData - currentData);
     m_staticTextDataRemaining->SetLabel(remainingBytes);
 
     //do the ui update
@@ -257,11 +355,54 @@ void SyncStatus::updateStatusDialogNow()
 }
 
 
-void SyncStatus::processHasFinished(const wxString& finalStatusText) //essential to call this in StatusUpdater derived class destructor
-{                                                                    //at the LATEST(!) to prevent access to currentStatusUpdater
+void SyncStatus::setCurrentStatus(SyncStatusID id)
+{
+    switch (id)
+    {
+    case statusAborted:
+        m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusError);
+        m_staticTextStatus->SetLabel(_("Aborted"));
+        break;
+
+    case statusCompletedWithSuccess:
+        m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusSuccess);
+        m_staticTextStatus->SetLabel(_("Completed"));
+        break;
+
+    case statusCompletedWithErrors:
+        m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusWarning);
+        m_staticTextStatus->SetLabel(_("Completed"));
+        break;
+
+    case statusPause:
+        m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusPause);
+        m_staticTextStatus->SetLabel(_("Pause"));
+        break;
+
+    case statusScanning:
+        m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusComparing);
+        m_staticTextStatus->SetLabel(_("Scanning..."));
+        break;
+
+    case statusComparing:
+        m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusComparing);
+        m_staticTextStatus->SetLabel(_("Comparing..."));
+        break;
+
+    case statusSynchronizing:
+        m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusSyncing);
+        m_staticTextStatus->SetLabel(_("Synchronizing..."));
+        break;
+    }
+}
+
+
+void SyncStatus::processHasFinished(SyncStatusID id) //essential to call this in StatusUpdater derived class destructor
+{                                                    //at the LATEST(!) to prevent access to currentStatusUpdater
     currentProcessIsRunning = false;   //enable okay and close events
 
-    m_staticTextStatus->SetLabel(finalStatusText);
+    setCurrentStatus(id);
+
     m_buttonAbort->Hide();
     m_buttonOK->Show();
     m_buttonOK->SetFocus();
@@ -297,13 +438,15 @@ void SyncStatus::OnClose(wxCloseEvent& event)
 CompareStatus::CompareStatus(wxWindow* parentWindow) :
         CompareStatusGenerated(parentWindow),
         scannedFiles(0),
-        totalMD5Data(0),
-        currentMD5Data(0),
-        scalingFactorMD5(0),
-        currentMD5Objects(0),
-        totalMD5Objects(0)
-{
-    //initialize gauge
+        totalCmpData(0),
+        processedCmpData(0),
+        scalingFactorCmp(0),
+        processedCmpObjects(0),
+        totalCmpObjects(0)
+        /*timeRemaining(0),
+        timeRemainingTimeStamp(0)*/
+
+{   //initialize gauge
     m_gauge2->SetRange(50000);
     m_gauge2->SetValue(0);
 }
@@ -312,18 +455,18 @@ CompareStatus::CompareStatus(wxWindow* parentWindow) :
 CompareStatus::~CompareStatus() {}
 
 
-void CompareStatus::resetMD5Gauge(int totalMD5ObjectsToProcess, double totalMD5DataToProcess)
+void CompareStatus::resetCmpGauge(int totalCmpObjectsToProcess, double totalCmpDataToProcess)
 {
-    currentMD5Data = 0;
-    totalMD5Data = totalMD5DataToProcess;
+    processedCmpData = 0;
+    totalCmpData = totalCmpDataToProcess;
 
-    currentMD5Objects = 0;
-    totalMD5Objects   = totalMD5ObjectsToProcess;
+    processedCmpObjects = 0;
+    totalCmpObjects   = totalCmpObjectsToProcess;
 
-    if (totalMD5Data != 0)
-        scalingFactorMD5 = 50000 / totalMD5Data; //let's normalize to 50000
+    if (totalCmpData != 0)
+        scalingFactorCmp = 50000 / totalCmpData; //let's normalize to 50000
     else
-        scalingFactorMD5 = 0;
+        scalingFactorCmp = 0;
 }
 
 
@@ -333,10 +476,13 @@ void CompareStatus::incScannedFiles_NoUpdate(int number)
 }
 
 
-void CompareStatus::incProcessedMD5Data_NoUpdate(int objectsProcessed, double dataProcessed)
+void CompareStatus::incProcessedCmpData_NoUpdate(int objectsProcessed, double dataProcessed)
 {
-    currentMD5Data+=    dataProcessed;
-    currentMD5Objects+= objectsProcessed;
+    processedCmpData+=    dataProcessed;
+    processedCmpObjects+= objectsProcessed;
+
+/*    timeRemaining = calcTimeLeft.getRemainingTime(dataProcessed, totalCmpObjects - processedCmpObjects, totalCmpData - processedCmpData);
+    timeRemainingTimeStamp = wxGetLocalTimeMillis();*/
 }
 
 
@@ -353,16 +499,23 @@ void CompareStatus::updateStatusPanelNow()
 
     m_staticTextScanned->SetLabel(numberToWxString(scannedFiles));
 
-    //progress indicator for MD5
-    m_gauge2->SetValue(int(currentMD5Data * scalingFactorMD5));
+    //progress indicator for "compare file content"
+    m_gauge2->SetValue(int(processedCmpData * scalingFactorCmp));
 
-    //remaining MD5 objects
-    m_staticTextFilesToCompare->SetLabel(numberToWxString(totalMD5Objects - currentMD5Objects));
+    //remaining file to compare
+    m_staticTextFilesToCompare->SetLabel(numberToWxString(totalCmpObjects - processedCmpObjects));
 
-    //remaining bytes left for MD5 calculation
-    const wxString remainingBytes = FreeFileSync::formatFilesizeToShortString(mpz_class(totalMD5Data - currentMD5Data));
+    //remaining bytes left for file comparison
+    const wxString remainingBytes = FreeFileSync::formatFilesizeToShortString(totalCmpData - processedCmpData);
     m_staticTextDataToCompare->SetLabel(remainingBytes);
-
+/*
+    //remaining time in seconds
+    if (timeRemaining != 0)
+    {
+        int time = ((timeRemaining - (wxGetLocalTimeMillis() - timeRemainingTimeStamp)) / 1000).GetLo();
+        m_staticTextRemainingTime->SetLabel(numberToWxString(time) + " s");
+    }
+*/
     //do the ui update
     updateUI_Now();
 }

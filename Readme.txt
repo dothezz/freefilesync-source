@@ -1,4 +1,4 @@
-FreeFileSync v1.4
+FreeFileSync v1.5
 ----------------- 
 
 Usage
@@ -22,6 +22,8 @@ Features
 	- Maintain and load different configurations by drag&drop, load-button or commandline
 	- Double-click to show file in explorer.
 	- copy & paste support to export file-lists.
+	- right-click context menu
+	- delete superfluous/temporary files directly on main grid
 	- Progress indicators, status information and error reporting
 	- Sort file-lists by name, size or date.
 	- Display statistical data: total filesizes, amount of bytes that will be transfered with the current settings.

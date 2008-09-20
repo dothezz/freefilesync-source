@@ -1,6 +1,17 @@
 FreeFileSync
 ------------
 
+Changelog v1.5
+--------------
+Improved speed of comparison by file content
+Simplified and optimized calculation of accumulated filesizes
+Added right-click context menu to main dialog
+New installer for Windows
+Improved usability of filtering and selecting rows
+Solved possible issue with different file time precisions in multi-OS environments
+Updated German translation
+
+
 Changelog v1.4
 --------------
 Implemented generic multithreading class to keep "compare by content" and "file synchronisation" responsive
@@ -11,6 +22,7 @@ Restructured loading of configuration files
 The result grid after synchronization now always consists of items that have not been synchronized (even if abort was pressed)
 Added "remaining files" as sync-progress information
 Updated German translation
+
 
 Changelog v1.3
 --------------
@@ -25,6 +37,7 @@ Improved usability: resizable borders, keyboard shortcuts, default buttons, dial
 Main window will remember restored position even if maximized
 Updated sources to become more Linux and Unicode friendly
 Updated German translation
+
 
 Changelog v1.2
 --------------
@@ -45,6 +58,7 @@ New synchronization sequence: first delete files, then copy files to avoid disc 
 Added different return values when used in commandline mode to report success or failure
 Updated German translation
 
+
 Changelog v1.1
 --------------
 Some further speed optimizations (sorting)
@@ -57,6 +71,7 @@ Added possibility to continue on error
 Added indicator for sort direction
 Simplified code concerning loading of UI resources
 Prepared code to support unicode in some future version
+
 
 Changelog v1.0
 --------------

@@ -17,7 +17,7 @@
 -------------------------------
         wait until thread is ready
 
-3. Call execAndUpdate
+3. Call execute
 -------------------------------
         send signal to start
                                                 start processing
@@ -135,7 +135,7 @@ void UpdateWhileExecuting::waitUntilReady()
 }
 //          /|\  \|/   must be called directly after each other
 
-void UpdateWhileExecuting::execAndUpdate(StatusUpdater* statusUpdater)
+void UpdateWhileExecuting::execute(StatusUpdater* statusUpdater)
 {
     readyToReceiveResult.Lock();
 

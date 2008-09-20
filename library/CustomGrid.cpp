@@ -164,7 +164,7 @@ public:
     {
         if (currentUI_ViewPtr)
         {
-            if (currentUI_ViewPtr->size() > unsigned(row))
+            if (unsigned(row) < currentUI_ViewPtr->size())
             {
                 if ((*currentUI_ViewPtr)[row].cmpResult == constFilteredOut)
                     return true;

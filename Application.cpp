@@ -11,9 +11,6 @@
 #include "ui/mainDialog.h"
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
-#include <stdexcept> //for std::runtime_error
-#include <wx/wfstream.h>
-#include <wx/zipstrm.h>
 #include "library/globalFunctions.h"
 
 IMPLEMENT_APP(Application);
@@ -337,14 +334,14 @@ void Application::parseCommandline()
 //until here all options and parameters are consistent
 //--------------------------------------------------------------------
 
-    CompareVariant cmpVar = compareByMD5;   //dummy value to suppress compiler warning
+    CompareVariant cmpVar = compareByContent;   //dummy value to suppress compiler warning
     SyncConfiguration syncConfiguration;
     FileCompareResult currentGridData;
 
     if (cmp == "SIZEDATE")
         cmpVar = compareByTimeAndSize;
     else if (cmp == "CONTENT")
-        cmpVar = compareByMD5;
+        cmpVar = compareByContent;
     else
         assert (false);
 
@@ -439,11 +436,6 @@ CommandLineStatusUpdater::~CommandLineStatusUpdater()
 {
     if (!silentMode)
     {
-        if (abortionRequested)
-            syncStatusFrame->processHasFinished(_("Aborted!"));  //enable okay and close events
-        else
-            syncStatusFrame->processHasFinished(_("Completed"));
-
         //print the results list
         unsigned int failedItems = unhandledErrors.GetCount();
         wxString errorMessages;
@@ -455,7 +447,14 @@ CommandLineStatusUpdater::~CommandLineStatusUpdater()
 
             syncStatusFrame->setStatusText_NoUpdate(errorMessages);
         }
-        syncStatusFrame->updateStatusDialogNow();
+
+        //notify to syncStatusFrame that current process has ended
+        if (abortionRequested)
+            syncStatusFrame->processHasFinished(statusAborted);  //enable okay and close events
+        else if (failedItems)
+            syncStatusFrame->processHasFinished(statusCompletedWithErrors);
+        else
+            syncStatusFrame->processHasFinished(statusCompletedWithSuccess);
     }
 }
 
@@ -474,18 +473,18 @@ void CommandLineStatusUpdater::initNewProcess(int objectsTotal, double dataTotal
     if (!silentMode)
     {
         if (currentProcess == FreeFileSync::scanningFilesProcess)
-            syncStatusFrame->m_staticTextStatus->SetLabel(_("Scanning..."));
+            syncStatusFrame->setCurrentStatus(statusScanning);
 
-        else if (currentProcess == FreeFileSync::calcMD5Process)
+        else if (currentProcess == FreeFileSync::compareFileContentProcess)
         {
             syncStatusFrame->resetGauge(objectsTotal, dataTotal);
-            syncStatusFrame->m_staticTextStatus->SetLabel(_("Comparing..."));
+            syncStatusFrame->setCurrentStatus(statusComparing);
         }
 
         else if (currentProcess == FreeFileSync::synchronizeFilesProcess)
         {
             syncStatusFrame->resetGauge(objectsTotal, dataTotal);
-            syncStatusFrame->m_staticTextStatus->SetLabel(_("Synchronizing..."));
+            syncStatusFrame->setCurrentStatus(statusSynchronizing);
         }
         else assert(false);
     }
@@ -499,7 +498,7 @@ void CommandLineStatusUpdater::updateProcessedData(int objectsProcessed, double 
     {
         if (currentProcess == FreeFileSync::scanningFilesProcess)
             syncStatusFrame->m_gauge1->Pulse();
-        else if (currentProcess == FreeFileSync::calcMD5Process)
+        else if (currentProcess == FreeFileSync::compareFileContentProcess)
             syncStatusFrame->incProgressIndicator_NoUpdate(objectsProcessed, dataProcessed);
         else if (currentProcess == FreeFileSync::synchronizeFilesProcess)
             syncStatusFrame->incProgressIndicator_NoUpdate(objectsProcessed, dataProcessed);
@@ -530,6 +529,8 @@ int CommandLineStatusUpdater::reportError(const wxString& text)
             unhandledErrors.Add(text);
             return StatusUpdater::continueNext;
         }
+
+        syncStatusFrame->updateStatusDialogNow();
 
         wxString errorMessage = text + _("\n\nContinue with next object, retry or abort synchronization?");
 
@@ -624,7 +625,7 @@ CustomLocale::CustomLocale(int language, int flags)
                     currentLine.translation = exchangeEscapeChars(temp);
                     translationDB.insert(currentLine);
                 }
-                rowNumber++;
+                ++rowNumber;
             }
             langFile.close();
         }

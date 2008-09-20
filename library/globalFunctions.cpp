@@ -7,29 +7,6 @@ int globalFunctions::round(const double d)
     return static_cast<int>(d<0?d-.5:d+.5);
 }
 
-inline
-int globalFunctions::abs(const int d)
-{
-    return(d<0?-d:d);
-}
-
-inline
-unsigned int globalFunctions::abs(const unsigned int d)
-{
-    return(d<0?-d:d);
-}
-
-inline
-float globalFunctions::abs(const float d)
-{
-    return(d<0?-d:d);
-};
-
-inline
-double globalFunctions::abs(const double d)
-{
-    return(d<0?-d:d);
-}
 
 string globalFunctions::numberToString(const unsigned int number)
 {
@@ -38,12 +15,14 @@ string globalFunctions::numberToString(const unsigned int number)
     return string(result);
 }
 
+
 string globalFunctions::numberToString(const int number)
 {
     char result[100];
     sprintf( result, "%d", number);
     return string(result);
 }
+
 
 string globalFunctions::numberToString(const float number)
 {
@@ -52,20 +31,24 @@ string globalFunctions::numberToString(const float number)
     return string(result);
 }
 
+
 wxString globalFunctions::numberToWxString(const unsigned int number)
 {
     return wxString::Format(wxT("%u"), number);
 }
+
 
 wxString globalFunctions::numberToWxString(const int number)
 {
     return wxString::Format(wxT("%i"), number);
 }
 
+
 wxString globalFunctions::numberToWxString(const float number)
 {
     return wxString::Format(wxT("%f"), number);
 }
+
 
 inline
 int globalFunctions::stringToInt(const string& number)
@@ -73,11 +56,13 @@ int globalFunctions::stringToInt(const string& number)
     return atoi(number.c_str());
 }
 
+
 inline
 double globalFunctions::stringToDouble(const string& number)
 {
     return atof(number.c_str());
 }
+
 
 inline
 int globalFunctions::wxStringToInt(const wxString& number)
@@ -89,6 +74,7 @@ int globalFunctions::wxStringToInt(const wxString& number)
         throw std::runtime_error("Error when converting number to long");
 }
 
+
 inline
 double globalFunctions::wxStringToDouble(const wxString& number)
 {
@@ -98,6 +84,7 @@ double globalFunctions::wxStringToDouble(const wxString& number)
     else
         throw std::runtime_error("Error when converting number to double");
 }
+
 
 wxString& globalFunctions::includeNumberSeparator(wxString& number)
 {

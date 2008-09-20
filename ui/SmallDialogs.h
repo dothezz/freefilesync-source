@@ -8,7 +8,7 @@ class MainDialog;
 class AboutDlg : public AboutDlgGenerated
 {
 public:
-    AboutDlg(MainDialog* window);
+    AboutDlg(wxWindow* window);
     ~AboutDlg();
 
 private:
@@ -20,7 +20,7 @@ private:
 class HelpDlg : public HelpDlgGenerated
 {
 public:
-    HelpDlg(MainDialog* window);
+    HelpDlg(wxWindow* window);
     ~HelpDlg();
 
 private:
@@ -32,7 +32,7 @@ private:
 class FilterDlg : public FilterDlgGenerated
 {
 public:
-    FilterDlg(MainDialog* window);
+    FilterDlg(wxWindow* window, wxString& filterIncl, wxString& filterExcl);
     ~FilterDlg();
 
     static const int okayButtonPressed = 25;
@@ -43,7 +43,8 @@ private:
     void OnCancel(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);
 
-    MainDialog* mainDialog;
+    wxString& includeFilter;
+    wxString& excludeFilter;
 };
 
 
@@ -83,6 +84,18 @@ private:
 };
 
 
+enum SyncStatusID
+{
+    statusAborted,
+    statusCompletedWithSuccess,
+    statusCompletedWithErrors,
+    statusPause,
+    statusScanning,
+    statusComparing,
+    statusSynchronizing
+};
+
+
 class SyncStatus : public SyncStatusGenerated
 {
 public:
@@ -94,7 +107,8 @@ public:
     void setStatusText_NoUpdate(const wxString& text);
     void updateStatusDialogNow();
 
-    void processHasFinished(const wxString& finalStatusText);  //essential to call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater
+    void setCurrentStatus(SyncStatusID id);
+    void processHasFinished(SyncStatusID id);  //essential to call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater
 
 private:
     void OnOkay(wxCommandEvent& event);
@@ -115,6 +129,31 @@ private:
     wxString currentStatusText;
 };
 
+/*
+class RemainingTime
+{
+public:
+    RemainingTime();
+    ~RemainingTime();
+    wxLongLong getRemainingTime(double processedDataSinceLastCall, int remainingFiles, double remainingData); //returns the remaining time in milliseconds
+
+private:
+    double n;
+    double m;
+    double X;
+    double F;
+    double p;
+    double q;
+    double r;
+    double s;
+    double z_1;
+    double z_2;
+    wxLongLong lastExec;
+
+    vector<double> x; //dummy: DELETE asap!
+    vector<double> f;
+};
+*/
 
 class CompareStatus : public CompareStatusGenerated
 {
@@ -122,9 +161,9 @@ public:
     CompareStatus(wxWindow* parentWindow);
     ~CompareStatus();
 
-    void resetMD5Gauge(int totalMD5ObjectsToProcess, double totalMD5DataToProcess);
+    void resetCmpGauge(int totalCmpObjectsToProcess, double totalCmpDataToProcess);
     void incScannedFiles_NoUpdate(int number);
-    void incProcessedMD5Data_NoUpdate(int objectsProcessed, double dataProcessed);
+    void incProcessedCmpData_NoUpdate(int objectsProcessed, double dataProcessed);
     void setStatusText_NoUpdate(const wxString& text);
     void updateStatusPanelNow();
 
@@ -134,11 +173,17 @@ private:
     wxString currentStatusText;
 
     //gauge variables
-    double totalMD5Data;     //each data element represents one byte for proper progress indicator scaling
-    double currentMD5Data;
-    double scalingFactorMD5;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
-    int currentMD5Objects;    //each object represents a file or directory processed
-    int totalMD5Objects;
+    double totalCmpData;     //each data element represents one byte for proper progress indicator scaling
+    double processedCmpData;
+    double scalingFactorCmp;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
+    int processedCmpObjects;    //each object represents a file or directory processed
+    int totalCmpObjects;
+/*
+    //remaining time
+    RemainingTime calcTimeLeft;
+    wxLongLong timeRemaining;          //time in milliseconds
+    wxLongLong timeRemainingTimeStamp; //time in milliseconds
+*/
 };
 
 

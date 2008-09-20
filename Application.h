@@ -35,7 +35,6 @@ struct TranslationLine
         return (original == b.original);
     }
 };
-
 typedef set<TranslationLine> Translation;
 
 

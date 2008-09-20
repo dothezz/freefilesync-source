@@ -53,6 +53,16 @@ wxBitmap* GlobalResources::bitmapSmallDown       = 0;
 wxBitmap* GlobalResources::bitmapSave            = 0;
 wxBitmap* GlobalResources::bitmapFFS             = 0;
 wxBitmap* GlobalResources::bitmapDeleteFile      = 0;
+wxBitmap* GlobalResources::bitmapGPL             = 0;
+wxBitmap* GlobalResources::bitmapStatusPause     = 0;
+wxBitmap* GlobalResources::bitmapStatusError     = 0;
+wxBitmap* GlobalResources::bitmapStatusSuccess   = 0;
+wxBitmap* GlobalResources::bitmapStatusWarning   = 0;
+wxBitmap* GlobalResources::bitmapStatusScanning  = 0;
+wxBitmap* GlobalResources::bitmapStatusComparing = 0;
+wxBitmap* GlobalResources::bitmapStatusSyncing   = 0;
+wxBitmap* GlobalResources::bitmapLogo            = 0;
+wxBitmap* GlobalResources::bitmapFinished        = 0;
 
 wxAnimation* GlobalResources::animationMoney     = 0;
 wxAnimation* GlobalResources::animationSync      = 0;
@@ -60,7 +70,6 @@ wxAnimation* GlobalResources::animationSync      = 0;
 
 void GlobalResources::loadResourceFiles()
 {
-
     floatingPointSeparator = _(".");
     numberSeparator = _(",");
 
@@ -95,12 +104,22 @@ void GlobalResources::loadResourceFiles()
     bitmapResource["exclude.png"]           = (bitmapExclude         = new wxBitmap(wxNullBitmap));
     bitmapResource["filter active.png"]     = (bitmapFilterOn        = new wxBitmap(wxNullBitmap));
     bitmapResource["filter not active.png"] = (bitmapFilterOff       = new wxBitmap(wxNullBitmap));
-    bitmapResource["Warning.png"]           = (bitmapWarning         = new wxBitmap(wxNullBitmap));
+    bitmapResource["warning.png"]           = (bitmapWarning         = new wxBitmap(wxNullBitmap));
     bitmapResource["small arrow up.png"]    = (bitmapSmallUp         = new wxBitmap(wxNullBitmap));
     bitmapResource["small arrow down.png"]  = (bitmapSmallDown       = new wxBitmap(wxNullBitmap));
     bitmapResource["save.png"]              = (bitmapSave            = new wxBitmap(wxNullBitmap));
     bitmapResource["FFS.png"]               = (bitmapFFS             = new wxBitmap(wxNullBitmap));
     bitmapResource["deleteFile.png"]        = (bitmapDeleteFile      = new wxBitmap(wxNullBitmap));
+    bitmapResource["gpl.png"]               = (bitmapGPL             = new wxBitmap(wxNullBitmap));
+    bitmapResource["statusPause.png"]       = (bitmapStatusPause     = new wxBitmap(wxNullBitmap));
+    bitmapResource["statusError.png"]       = (bitmapStatusError     = new wxBitmap(wxNullBitmap));
+    bitmapResource["statusSuccess.png"]     = (bitmapStatusSuccess   = new wxBitmap(wxNullBitmap));
+    bitmapResource["statusWarning.png"]     = (bitmapStatusWarning   = new wxBitmap(wxNullBitmap));
+    bitmapResource["statusScanning.png"]    = (bitmapStatusScanning  = new wxBitmap(wxNullBitmap));
+    bitmapResource["statusComparing.png"]   = (bitmapStatusComparing = new wxBitmap(wxNullBitmap));
+    bitmapResource["statusSyncing.png"]     = (bitmapStatusSyncing   = new wxBitmap(wxNullBitmap));
+    bitmapResource["logo.png"]              = (bitmapLogo            = new wxBitmap(wxNullBitmap));
+    bitmapResource["finished.png"]          = (bitmapFinished        = new wxBitmap(wxNullBitmap));
 
     animationMoney = new wxAnimation(wxNullAnimation);
     animationSync  = new wxAnimation(wxNullAnimation);

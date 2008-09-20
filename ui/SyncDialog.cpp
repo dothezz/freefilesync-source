@@ -38,6 +38,8 @@ SyncDialog::SyncDialog(MainDialog* window)
 
     else
         m_radioBtn3->SetValue(true);    //other
+
+    m_bpButton18->SetLabel(_("&Start"));
 }
 
 //#################################################################################################################

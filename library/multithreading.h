@@ -9,22 +9,24 @@
 class StatusUpdater
 {
 public:
-    StatusUpdater() : abortionRequested(false) {}
+    StatusUpdater() :
+            abortionRequested(false) {}
     virtual ~StatusUpdater() {}
 
     //these four methods have to be implemented in the derived classes to handle error and status information
     virtual void updateStatusText(const wxString& text) = 0;
     virtual void initNewProcess(int objectsTotal, double dataTotal, int processID) = 0; //informs about the total amount of data that will be processed from now on
-    virtual void updateProcessedData(int objectsProcessed, double dataProcessed) = 0; //called periodically after data was processed
+    virtual void updateProcessedData(int objectsProcessed, double dataProcessed) = 0;   //called periodically after data was processed
     virtual int  reportError(const wxString& text) = 0;
 
     //this method is triggered repeatedly and can be used to refresh the ui by dispatching pending events
-    virtual void triggerUI_Refresh() {}
+    virtual void triggerUI_Refresh() = 0;
 
-    void requestAbortion() //opportunity to abort must be implemented in the three virtual status and error methods (for example in triggerUI_Refresh())
+    void requestAbortion() //opportunity to abort must be implemented in a frequently executed method like triggerUI_Refresh()
     {                      //currently used by the UI status information screen, when button "Abort is pressed"
         abortionRequested = true;
     }
+
     static const int continueNext = -1;
     static const int retry        = -2;
 
@@ -48,11 +50,11 @@ public:
     virtual ~UpdateWhileExecuting();
 
     void waitUntilReady();
-    void execAndUpdate(StatusUpdater* statusUpdater);
+    void execute(StatusUpdater* statusUpdater);
 
 
 private:
-    //implement a longrunning method without dependencies (e.g. copy file function) returning "true" on success
+    //implement a longrunning method without dependencies (e.g. copy file function); share input/output parameters as instance variables
     virtual void longRunner() = 0;
 
     WorkerThread* theWorkerThread;

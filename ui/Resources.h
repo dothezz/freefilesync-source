@@ -55,6 +55,16 @@ public:
     static wxBitmap* bitmapSave;
     static wxBitmap* bitmapFFS;
     static wxBitmap* bitmapDeleteFile;
+    static wxBitmap* bitmapGPL;
+    static wxBitmap* bitmapStatusPause;
+    static wxBitmap* bitmapStatusError;
+    static wxBitmap* bitmapStatusSuccess;
+    static wxBitmap* bitmapStatusWarning;
+    static wxBitmap* bitmapStatusScanning;
+    static wxBitmap* bitmapStatusComparing;
+    static wxBitmap* bitmapStatusSyncing;
+    static wxBitmap* bitmapLogo;
+    static wxBitmap* bitmapFinished;
 
     static wxAnimation* animationMoney;
     static wxAnimation* animationSync;

@@ -83,8 +83,6 @@
 			<Add library="libcomctl32.a" />
 			<Add library="libwsock32.a" />
 			<Add library="libodbc32.a" />
-			<Add library="library\gmp\lib\libgmpxx.a" />
-			<Add library="library\gmp\lib\libgmp.a" />
 		</Linker>
 		<Unit filename="FreeFileSync.cpp" />
 		<Unit filename="FreeFileSync.h" />
@@ -95,11 +93,6 @@
 		<Unit filename="library\customGrid.h" />
 		<Unit filename="library\globalFunctions.cpp" />
 		<Unit filename="library\globalFunctions.h" />
-		<Unit filename="library\gmp\include\gmp.h" />
-		<Unit filename="library\md5.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="library\md5.h" />
 		<Unit filename="library\multithreading.cpp" />
 		<Unit filename="library\multithreading.h" />
 		<Unit filename="library\wxWidgets.h" />

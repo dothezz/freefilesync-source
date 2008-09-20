@@ -12,10 +12,11 @@ namespace globalFunctions
 {
     int round(double d); //little rounding function
 
-    int          abs(const int d);          //absolute value
-    unsigned int abs(const unsigned int d); //absolute value
-    float        abs(const float d);        //absolute value
-    double       abs(const double d);       //absolute value
+    template <class T>
+    T abs(const T& d)    //absolute value
+    {
+        return(d<0?-d:d);
+    }
 
     string numberToString(const unsigned int number); //Convert number to string
     string numberToString(const int number);          //Convert number to string
