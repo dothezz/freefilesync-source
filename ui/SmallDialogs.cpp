@@ -1,8 +1,10 @@
 #include "smallDialogs.h"
 #include "../library/globalFunctions.h"
-#include <fstream>
+//#include <fstream>
+#include "../library/resources.h"
 
 using namespace globalFunctions;
+
 
 AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
 {
@@ -11,22 +13,26 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
     m_bitmap11->SetBitmap(*GlobalResources::bitmapLogo);
     m_bitmap13->SetBitmap(*GlobalResources::bitmapGPL);
 
-    m_animationControl1->SetAnimation(*GlobalResources::animationMoney);
-    m_animationControl1->Play();
-
     //build
     wxString build = wxString(_("(Build: ")) + __TDATE__ + ")";
     m_build->SetLabel(build);
 
+    m_animationControl1->SetAnimation(*GlobalResources::animationMoney);
+    m_animationControl1->Play(); //Note: The animation is created hidden(!) to not disturb constraint based window creation;
+    m_animationControl1->Show(); //an empty animation consumes a lot of space that later is NOT removed anymore.
+
     m_button8->SetFocus();
 }
 
+
 AboutDlg::~AboutDlg() {}
+
 
 void AboutDlg::OnClose(wxCloseEvent& event)
 {
     Destroy();
 }
+
 
 void AboutDlg::OnOK(wxCommandEvent& event)
 {
@@ -106,7 +112,7 @@ void FilterDlg::OnDefault(wxCommandEvent& event)
 //########################################################################################
 
 DeleteDialog::DeleteDialog(const wxString& headerText, const wxString& messageText, wxWindow* main) :
-        DeleteDialogGenerated(main)
+        DeleteDlgGenerated(main)
 {
     m_staticTextHeader->SetLabel(headerText);
     m_textCtrlMessage->SetValue(messageText);
@@ -135,9 +141,9 @@ void DeleteDialog::OnClose(wxCloseEvent& event)
 //########################################################################################
 
 
-ErrorDlg::ErrorDlg(const wxString messageText, bool& suppressErrormessages) :
+ErrorDlg::ErrorDlg(const wxString messageText, bool& continueError) :
         ErrorDlgGenerated(0),
-        suppressErrors(suppressErrormessages)
+        continueOnError(continueError)
 {
     m_bitmap10->SetBitmap(*GlobalResources::bitmapWarning);
     m_textCtrl8->SetValue(messageText);
@@ -150,28 +156,28 @@ ErrorDlg::~ErrorDlg() {}
 
 void ErrorDlg::OnClose(wxCloseEvent& event)
 {
-    //suppressErrors = m_checkBoxSuppress->GetValue(); -> not needed here
+    //continueOnError = m_checkBoxContinueError->GetValue(); -> not needed here
     EndModal(abortButtonPressed);
 }
 
 
 void ErrorDlg::OnContinue(wxCommandEvent& event)
 {
-    suppressErrors = m_checkBoxSuppress->GetValue();
+    continueOnError = m_checkBoxContinueError->GetValue();
     EndModal(continueButtonPressed);
 }
 
 
 void ErrorDlg::OnRetry(wxCommandEvent& event)
 {
-    //suppressErrors = m_checkBoxSuppress->GetValue(); -> not needed here
+    //continueOnError = m_checkBoxContinueError->GetValue(); -> not needed here
     EndModal(retryButtonPressed);
 }
 
 
 void ErrorDlg::OnAbort(wxCommandEvent& event)
 {
-    //suppressErrors = m_checkBoxSuppress->GetValue(); -> not needed here
+    //continueOnError = m_checkBoxContinueError->GetValue(); -> not needed here
     EndModal(abortButtonPressed);
 }
 //########################################################################################
@@ -270,7 +276,7 @@ wxLongLong RemainingTime::getRemainingTime(double processedDataSinceLastCall, in
 //########################################################################################
 
 SyncStatus::SyncStatus(StatusUpdater* updater, wxWindow* parentWindow) :
-        SyncStatusGenerated(parentWindow),
+        SyncStatusDlgGenerated(parentWindow),
         currentStatusUpdater(updater),
         windowToDis(parentWindow),
         currentProcessIsRunning(true),
@@ -278,10 +284,10 @@ SyncStatus::SyncStatus(StatusUpdater* updater, wxWindow* parentWindow) :
         currentData(0),
         scalingFactor(0),
         currentObjects(0),
-        totalObjects(0)
+        totalObjects(0),
+        processPaused(false)
 {
     m_animationControl1->SetAnimation(*GlobalResources::animationSync);
-    m_animationControl1->SetInactiveBitmap(*GlobalResources::bitmapFinished);
     m_animationControl1->Play();
 
     //initialize gauge
@@ -351,7 +357,15 @@ void SyncStatus::updateStatusDialogNow()
     m_staticTextDataRemaining->SetLabel(remainingBytes);
 
     //do the ui update
+    bSizer28->Layout();
     updateUI_Now();
+
+    //support for pause button
+    while (processPaused && currentProcessIsRunning)
+    {
+        wxMilliSleep(uiUpdateInterval);
+        updateUI_Now();
+    }
 }
 
 
@@ -399,15 +413,21 @@ void SyncStatus::setCurrentStatus(SyncStatusID id)
 
 void SyncStatus::processHasFinished(SyncStatusID id) //essential to call this in StatusUpdater derived class destructor
 {                                                    //at the LATEST(!) to prevent access to currentStatusUpdater
-    currentProcessIsRunning = false;   //enable okay and close events
+    currentProcessIsRunning = false; //enable okay and close events; may be set ONLY in this method
 
     setCurrentStatus(id);
 
+    m_buttonAbort->Disable();
     m_buttonAbort->Hide();
+    m_buttonPause->Disable();
+    m_buttonPause->Hide();
     m_buttonOK->Show();
     m_buttonOK->SetFocus();
 
     m_animationControl1->Stop();
+
+    //m_animationControl1->SetInactiveBitmap(*GlobalResources::bitmapFinished);
+    m_animationControl1->Hide();
 
     updateStatusDialogNow(); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
     Layout();                //
@@ -420,14 +440,34 @@ void SyncStatus::OnOkay(wxCommandEvent& event)
 }
 
 
+void SyncStatus::OnPause(wxCommandEvent& event)
+{
+    if (processPaused)
+    {
+        processPaused = false;
+        m_buttonPause->SetLabel(_("Pause"));
+        m_animationControl1->Play();
+
+    }
+    else
+    {
+        processPaused = true;
+        m_buttonPause->SetLabel(_("Continue"));
+        m_animationControl1->Stop();
+    }
+}
+
+
 void SyncStatus::OnAbort(wxCommandEvent& event)
 {
+    processPaused = false;
     if (currentProcessIsRunning) currentStatusUpdater->requestAbortion();
 }
 
 
 void SyncStatus::OnClose(wxCloseEvent& event)
 {
+    processPaused = false;
     if (currentProcessIsRunning) currentStatusUpdater->requestAbortion();
     else
         Destroy();
@@ -449,6 +489,11 @@ CompareStatus::CompareStatus(wxWindow* parentWindow) :
 {   //initialize gauge
     m_gauge2->SetRange(50000);
     m_gauge2->SetValue(0);
+
+    //initially hide status that's relevant for comparing bytewise only
+    bSizer42->Hide(sbSizer13);
+    bSizer42->Hide(sbSizer11);
+    bSizer42->Layout();
 }
 
 
@@ -467,6 +512,11 @@ void CompareStatus::resetCmpGauge(int totalCmpObjectsToProcess, double totalCmpD
         scalingFactorCmp = 50000 / totalCmpData; //let's normalize to 50000
     else
         scalingFactorCmp = 0;
+
+    //show status for comparing bytewise
+    bSizer42->Show(sbSizer13);
+    bSizer42->Show(sbSizer11);
+    bSizer42->Layout();
 }
 
 
@@ -481,8 +531,8 @@ void CompareStatus::incProcessedCmpData_NoUpdate(int objectsProcessed, double da
     processedCmpData+=    dataProcessed;
     processedCmpObjects+= objectsProcessed;
 
-/*    timeRemaining = calcTimeLeft.getRemainingTime(dataProcessed, totalCmpObjects - processedCmpObjects, totalCmpData - processedCmpData);
-    timeRemainingTimeStamp = wxGetLocalTimeMillis();*/
+    /*    timeRemaining = calcTimeLeft.getRemainingTime(dataProcessed, totalCmpObjects - processedCmpObjects, totalCmpData - processedCmpData);
+        timeRemainingTimeStamp = wxGetLocalTimeMillis();*/
 }
 
 
@@ -508,14 +558,15 @@ void CompareStatus::updateStatusPanelNow()
     //remaining bytes left for file comparison
     const wxString remainingBytes = FreeFileSync::formatFilesizeToShortString(totalCmpData - processedCmpData);
     m_staticTextDataToCompare->SetLabel(remainingBytes);
-/*
-    //remaining time in seconds
-    if (timeRemaining != 0)
-    {
-        int time = ((timeRemaining - (wxGetLocalTimeMillis() - timeRemainingTimeStamp)) / 1000).GetLo();
-        m_staticTextRemainingTime->SetLabel(numberToWxString(time) + " s");
-    }
-*/
+    /*
+        //remaining time in seconds
+        if (timeRemaining != 0)
+        {
+            int time = ((timeRemaining - (wxGetLocalTimeMillis() - timeRemainingTimeStamp)) / 1000).GetLo();
+            m_staticTextRemainingTime->SetLabel(numberToWxString(time) + " s");
+        }
+    */
     //do the ui update
+    bSizer42->Layout();
     updateUI_Now();
 }

@@ -12,46 +12,10 @@
 
 #include <wx/app.h>
 #include <wx/cmdline.h>
-#include <set>
 #include <fstream>
 #include "FreeFileSync.h"
 #include "ui/smallDialogs.h"
-
-struct TranslationLine
-{
-    wxString original;
-    wxString translation;
-
-    bool operator>(const TranslationLine& b ) const
-    {
-        return (original > b.original);
-    }
-    bool operator<(const TranslationLine& b) const
-    {
-        return (original < b.original);
-    }
-    bool operator==(const TranslationLine& b) const
-    {
-        return (original == b.original);
-    }
-};
-typedef set<TranslationLine> Translation;
-
-
-class CustomLocale : public wxLocale
-{
-public:
-    CustomLocale(int language = wxLANGUAGE_ENGLISH,
-                 int flags = wxLOCALE_LOAD_DEFAULT | wxLOCALE_CONV_ENCODING);
-
-    ~CustomLocale() {}
-
-    const wxChar* GetString(const wxChar* szOrigString, const wxChar* szDomain = NULL) const;
-
-private:
-    Translation translationDB;
-};
-
+#include "library/misc.h"
 
 class Application : public wxApp
 {
@@ -63,12 +27,10 @@ public:
     void initialize();
     bool ProcessIdle(); //virtual method
 
-    friend class CommandLineStatusUpdate;
-
     //methods for writing logs
-    void initLog();
-    void writeLog(const wxString& logText, const wxString& problemType = wxEmptyString);
-    void closeLog();
+    void logInit();
+    void logWrite(const wxString& logText, const wxString& problemType = wxEmptyString);
+    void logClose(const wxString& finalText);
 
 private:
     void parseCommandline();
@@ -76,7 +38,7 @@ private:
     bool applicationRunsOnCommandLineWithoutWindows;
 
     ofstream logFile;
-    CustomLocale* programLanguage;
+    CustomLocale programLanguage;
 
     int returnValue;
 };
@@ -85,7 +47,7 @@ private:
 class CommandLineStatusUpdater : public StatusUpdater
 {
 public:
-    CommandLineStatusUpdater(Application* application, bool skipErr, bool silent);
+    CommandLineStatusUpdater(Application* application, bool continueOnError, bool silent);
     ~CommandLineStatusUpdater();
 
     void updateStatusText(const wxString& text);
@@ -99,7 +61,7 @@ public:
 private:
     Application* app;
     SyncStatus* syncStatusFrame;
-    bool skipErrors;
+    bool continueErrors;
     bool silentMode;
 
     wxArrayString unhandledErrors;   //list of non-resolved errors

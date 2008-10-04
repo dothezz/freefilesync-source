@@ -14,15 +14,30 @@ public:
     static void loadResourceFiles();
     static void unloadResourceFiles();
 
-    //language dependent global variables: need to be initialized by CustomLocale on program startup
     static wxChar fileNameSeparator;
-    static const wxChar* floatingPointSeparator;
-    static const wxChar* numberSeparator;
+
+    //language dependent global variables: need to be initialized by CustomLocale on program startup and language switch
+    static const wxChar* decimalPoint;
+    static const wxChar* thousandsSeparator;
+
+    //command line parameters
+    static const wxChar* paramCompare;
+    static const wxChar* paramCfg;
+    static const wxChar* paramInclude;
+    static const wxChar* paramExclude;
+    static const wxChar* paramContinueError;
+    static const wxChar* paramRecycler;
+    static const wxChar* paramSilent;
+
+    static const wxChar* valueSizeDate;
+    static const wxChar* valueContent;
 
     //image resource objects
     static wxBitmap* bitmapLeftArrow;
-    static wxBitmap* bitmapStartSync;
     static wxBitmap* bitmapRightArrow;
+    static wxBitmap* bitmapNoArrow;
+    static wxBitmap* bitmapStartSync;
+    static wxBitmap* bitmapStartSyncDis;
     static wxBitmap* bitmapDelete;
     static wxBitmap* bitmapEmail;
     static wxBitmap* bitmapAbout;
@@ -65,9 +80,12 @@ public:
     static wxBitmap* bitmapStatusSyncing;
     static wxBitmap* bitmapLogo;
     static wxBitmap* bitmapFinished;
+    static wxBitmap* bitmapStatusEdge;
 
     static wxAnimation* animationMoney;
     static wxAnimation* animationSync;
+
+    static wxIcon* programIcon;
 
 private:
     //resource mapping

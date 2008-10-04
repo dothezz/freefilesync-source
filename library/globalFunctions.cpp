@@ -1,5 +1,5 @@
 #include "globalFunctions.h"
-#include "../ui/resources.h"
+#include "resources.h"
 
 inline
 int globalFunctions::round(const double d)
@@ -89,6 +89,6 @@ double globalFunctions::wxStringToDouble(const wxString& number)
 wxString& globalFunctions::includeNumberSeparator(wxString& number)
 {
     for (int i = number.size() - 3; i > 0; i-= 3)
-        number.insert(i, GlobalResources::numberSeparator);
+        number.insert(i, GlobalResources::thousandsSeparator);
     return number;
 }

@@ -47,6 +47,7 @@ class UpdateWhileExecuting
 
 public:
     UpdateWhileExecuting();
+
     virtual ~UpdateWhileExecuting();
 
     void waitUntilReady();

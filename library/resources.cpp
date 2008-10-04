@@ -2,25 +2,42 @@
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
 #include <wx/image.h>
+#include <wx/icon.h>
 #include <stdexcept> //for std::runtime_error
 
 #ifdef FFS_WIN
 wxChar GlobalResources::fileNameSeparator = '\\';
-#endif  // FFS_WIN
-
-#ifdef FFS_LINUX
+#elif defined FFS_LINUX
 wxChar GlobalResources::fileNameSeparator = '/';
-#endif  // FFS_LINUX
+#else
+assert(false);
+#endif
 
-const wxChar* GlobalResources::floatingPointSeparator = "";
-const wxChar* GlobalResources::numberSeparator = "";
+//these two global variables are language-dependent => cannot be set statically! See CustomLocale
+const wxChar* GlobalResources::decimalPoint = "";
+const wxChar* GlobalResources::thousandsSeparator = "";
+
+
+//command line parameters
+const wxChar* GlobalResources::paramCompare       = "cmp";
+const wxChar* GlobalResources::paramCfg           = "cfg";
+const wxChar* GlobalResources::paramInclude       = "incl";
+const wxChar* GlobalResources::paramExclude       = "excl";
+const wxChar* GlobalResources::paramContinueError = "continue";
+const wxChar* GlobalResources::paramRecycler      = "recycler";
+const wxChar* GlobalResources::paramSilent        = "silent";
+
+const wxChar* GlobalResources::valueSizeDate      = "SIZEDATE";
+const wxChar* GlobalResources::valueContent       = "CONTENT";
 
 
 map<wxString, wxBitmap*> GlobalResources::bitmapResource;
 
 wxBitmap* GlobalResources::bitmapLeftArrow       = 0;
-wxBitmap* GlobalResources::bitmapStartSync       = 0;
 wxBitmap* GlobalResources::bitmapRightArrow      = 0;
+wxBitmap* GlobalResources::bitmapNoArrow         = 0;
+wxBitmap* GlobalResources::bitmapStartSync       = 0;
+wxBitmap* GlobalResources::bitmapStartSyncDis    = 0;
 wxBitmap* GlobalResources::bitmapDelete          = 0;
 wxBitmap* GlobalResources::bitmapEmail           = 0;
 wxBitmap* GlobalResources::bitmapAbout           = 0;
@@ -63,21 +80,21 @@ wxBitmap* GlobalResources::bitmapStatusComparing = 0;
 wxBitmap* GlobalResources::bitmapStatusSyncing   = 0;
 wxBitmap* GlobalResources::bitmapLogo            = 0;
 wxBitmap* GlobalResources::bitmapFinished        = 0;
+wxBitmap* GlobalResources::bitmapStatusEdge      = 0;
 
 wxAnimation* GlobalResources::animationMoney     = 0;
 wxAnimation* GlobalResources::animationSync      = 0;
+wxIcon*      GlobalResources::programIcon        = 0;
 
 
 void GlobalResources::loadResourceFiles()
 {
-    floatingPointSeparator = _(".");
-    numberSeparator = _(",");
-
-
     //map, allocate and initialize pictures
     bitmapResource["left arrow.png"]        = (bitmapLeftArrow       = new wxBitmap(wxNullBitmap));
-    bitmapResource["start sync.png"]        = (bitmapStartSync       = new wxBitmap(wxNullBitmap));
     bitmapResource["right arrow.png"]       = (bitmapRightArrow      = new wxBitmap(wxNullBitmap));
+    bitmapResource["no arrow.png"]          = (bitmapNoArrow         = new wxBitmap(wxNullBitmap));
+    bitmapResource["start sync.png"]        = (bitmapStartSync       = new wxBitmap(wxNullBitmap));
+    bitmapResource["start sync dis.png"]    = (bitmapStartSyncDis    = new wxBitmap(wxNullBitmap));
     bitmapResource["delete.png"]            = (bitmapDelete          = new wxBitmap(wxNullBitmap));
     bitmapResource["email.png"]             = (bitmapEmail           = new wxBitmap(wxNullBitmap));
     bitmapResource["about.png"]             = (bitmapAbout           = new wxBitmap(wxNullBitmap));
@@ -120,9 +137,7 @@ void GlobalResources::loadResourceFiles()
     bitmapResource["statusSyncing.png"]     = (bitmapStatusSyncing   = new wxBitmap(wxNullBitmap));
     bitmapResource["logo.png"]              = (bitmapLogo            = new wxBitmap(wxNullBitmap));
     bitmapResource["finished.png"]          = (bitmapFinished        = new wxBitmap(wxNullBitmap));
-
-    animationMoney = new wxAnimation(wxNullAnimation);
-    animationSync  = new wxAnimation(wxNullAnimation);
+    bitmapResource["statusEdge.png"]        = (bitmapStatusEdge      = new wxBitmap(wxNullBitmap));
 
     wxFileInputStream input("Resources.dat");
     if (!input.IsOk()) throw runtime_error(_("Unable to load Resources.dat!"));
@@ -131,7 +146,7 @@ void GlobalResources::loadResourceFiles()
 
     wxZipEntry* entry;
     map<wxString, wxBitmap*>::iterator bmp;
-    while (entry = resourceFile.GetNextEntry())
+    while ((entry = resourceFile.GetNextEntry()))
     {
         wxString name = entry->GetName();
 
@@ -140,8 +155,19 @@ void GlobalResources::loadResourceFiles()
             *(bmp->second) = wxBitmap(wxImage(resourceFile, wxBITMAP_TYPE_PNG));
     }
 
+    //load all the other resource files
+    animationMoney = new wxAnimation(wxNullAnimation);
+    animationSync  = new wxAnimation(wxNullAnimation);
+
     animationMoney->LoadFile("Resources.a01");
     animationSync->LoadFile("Resources.a02");
+
+#ifdef FFS_WIN
+    programIcon = new wxIcon("winIcon");
+#else
+#include "FreeFileSync.xpm"
+    programIcon = new wxIcon(FreeFileSync_xpm);
+#endif
 }
 
 
@@ -154,4 +180,5 @@ void GlobalResources::unloadResourceFiles()
     //free other resources
     delete animationMoney;
     delete animationSync;
+    delete programIcon;
 }

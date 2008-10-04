@@ -13,37 +13,15 @@
 #include "../library/wxWidgets.h"
 #include "guiGenerated.h"
 #include "../FreeFileSync.h"
-
 #include "syncDialog.h"
 #include "smallDialogs.h"
-#include "resources.h"
+#include "../library/resources.h"
+#include "../library/misc.h"
 #include <wx/dnd.h>
 #include <wx/config.h>
+#include <stack>
 
 using namespace std;
-
-const wxString constFilteredOut = "(-)";
-
-struct UI_GridLine
-{
-    wxString leftFilename;
-    wxString leftRelativePath;
-    wxString leftSize;
-    wxString leftDate;
-
-    wxString cmpResult;
-
-    wxString rightFilename;
-    wxString rightRelativePath;
-    wxString rightSize;
-    wxString rightDate;
-
-    unsigned int linkToCurrentGridData; //rownumber of corresponding row in currentGridData
-};
-typedef vector<UI_GridLine> UI_Grid;
-
-bool updateUI_IsAllowed();        //test if a specific amount of time is over
-void updateUI_Now();              //do the updating
 
 //IDs for context menu items
 enum ContextItem
@@ -61,32 +39,28 @@ class FileDropEvent;
 
 class MainDialog : public GuiGenerated
 {
+    friend class CompareStatusUpdater;
+    friend class FileDropEvent;
+
 public:
-    MainDialog(wxFrame* frame, const wxString& cfgFileName);
+    MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale* language);
     ~MainDialog();
 
 private:
-    friend class SyncDialog;
-    friend class FilterDlg;
-    friend class CompareStatusUpdater;
-    friend class SyncStatusUpdater;
-    friend class FileDropEvent;
-
     void readConfigurationFromHD(const wxString& filename, bool programStartup = false);
     void writeConfigurationToHD(const wxString& filename);
     void loadDefaultConfiguration();
 
     void updateViewFilterButtons();
-    void updateFilterButton();
+    void updateFilterButton(wxBitmapButton* filterButton, bool isActive);
+    void updateCompareButtons();
 
     void addCfgFileToHistory(const wxString& filename);
 
-    static wxString evaluateCmpResult(const CompareFilesResult result, const bool selectedForSynchronization);
-
     //main method for putting gridData on UI: maps data respecting current view settings
     void writeGrid(const FileCompareResult& gridData, bool useUI_GridCache =  false);
-    void mapFileModelToUI(UI_Grid& output, const FileCompareResult& fileCmpResult);
-    void updateStatusInformation(const UI_Grid& output);
+    void mapGridDataToUI(GridView& output, const FileCompareResult& fileCmpResult);
+    void updateStatusInformation(const GridView& output);
 
     //context menu functions
     set<int> getSelectedRows();
@@ -100,7 +74,6 @@ private:
 
     //delayed status information restore
     void pushStatusInformation(const wxString& text);
-    void writeStatusInformation(const wxString& text);
     void clearStatusBar();
 
     //events
@@ -137,23 +110,35 @@ private:
     void OnRightOnlyFiles(      wxCommandEvent& event);
     void OnEqualFiles(          wxCommandEvent& event);
 
+    void OnBatchJob(            wxCommandEvent& event);
     void OnSaveConfig(          wxCommandEvent& event);
     void OnLoadConfiguration(   wxCommandEvent& event);
     void OnChoiceKeyEvent(      wxKeyEvent& event );
 
-    void onResizeMainWindow(wxEvent& event);
+    void onResizeMainWindow(    wxEvent& event);
     void OnAbortCompare(        wxCommandEvent& event);
     void OnFilterButton(        wxCommandEvent& event);
     void OnHideFilteredButton(  wxCommandEvent& event);
     void OnConfigureFilter(     wxHyperlinkEvent& event);
     void OnShowHelpDialog(      wxCommandEvent& event);
     void OnSwapDirs(            wxCommandEvent& event);
-    void OnChangeCompareVariant(wxCommandEvent& event);
+    void OnCompareByTimeSize(   wxCommandEvent& event);
+    void OnCompareByContent(    wxCommandEvent& event);
     void OnCompare(             wxCommandEvent& event);
     void OnSync(                wxCommandEvent& event);
     void OnClose(               wxCloseEvent&   event);
     void OnQuit(                wxCommandEvent& event);
     void OnAbout(               wxCommandEvent& event);
+
+    //menu events
+    void OnMenuExportFileList(  wxCommandEvent& event);
+    void OnMenuBatchJob(        wxCommandEvent& event);
+    void OnMenuAbout(           wxCommandEvent& event);
+    void OnMenuQuit(            wxCommandEvent& event);
+    void OnMenuLangEnglish(     wxCommandEvent& event);
+    void OnMenuLangGerman(      wxCommandEvent& event);
+
+    void enableSynchronization(bool value);
 
 //***********************************************
     //global application variables are stored here:
@@ -162,16 +147,9 @@ private:
     FileCompareResult currentGridData;
 
     //UI view of currentGridData
-    UI_Grid currentUI_View;
+    GridView gridRefUI;
 
-    //Synchronisation settings
-    SyncConfiguration syncConfiguration;
-
-    //Filter setting
-    wxString includeFilter;
-    wxString excludeFilter;
-    bool hideFiltered;
-    bool filterIsActive;
+    Configuration cfg;
 
     //UI View Filter settings
     bool leftOnlyFilesActive;
@@ -187,19 +165,14 @@ private:
     int posXNotMaximized;
     int posYNotMaximized;
 
-    //other options
-    bool useRecycleBin;     //use Recycle bin when deleting or overwriting files while synchronizing
-    bool hideErrorMessages; //hides error messages during synchronization
-
 //***********************************************
-
-    wxFrame* parent;
-
     wxMenu* contextMenu;
+
+    CustomLocale* programLanguage;
 
     //status information
     wxLongLong lastStatusChange;
-    int        stackObjects;
+    stack<wxString> stackObjects;
 
     //save the last used config filenames
     wxConfig* cfgFileHistory;
@@ -209,6 +182,10 @@ private:
     //variables for manual filtering of m_grid3
     bool filteringInitialized;
     bool filteringPending;
+
+    bool synchronizationEnabled; //determines whether synchronization should be allowed
+
+    bool restartOnExit; //restart dialog on exit (currently used, when language is changed)
 
     CompareStatusUpdater* cmpStatusUpdaterTmp;  //used only by the abort button when comparing
 };
@@ -239,8 +216,6 @@ private:
 //######################################################################################
 
 //classes handling sync and compare error as well as status information
-class CompareStatus;
-class SyncStatus;
 
 class CompareStatusUpdater : public StatusUpdater
 {
@@ -257,8 +232,8 @@ public:
 
 private:
     MainDialog* mainDialog;
-    bool suppressUI_Errormessages;
     CompareStatus* statusPanel;
+    bool continueOnError;
     int currentProcess;
 };
 
@@ -266,7 +241,7 @@ private:
 class SyncStatusUpdater : public StatusUpdater
 {
 public:
-    SyncStatusUpdater(wxWindow* dlg, bool hideErrorMessages);
+    SyncStatusUpdater(wxWindow* dlg, bool continueOnError);
     ~SyncStatusUpdater();
 
     void updateStatusText(const wxString& text);
@@ -279,7 +254,7 @@ public:
 private:
     SyncStatus* syncStatusFrame;
 
-    bool suppressUI_Errormessages;
+    bool continueError;
     wxArrayString unhandledErrors;   //list of non-resolved errors
 };
 

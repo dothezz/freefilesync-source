@@ -1,6 +1,21 @@
 FreeFileSync
 ------------
 
+Changelog v1.6
+--------------
+Significantly improved speed of filtering files and view (< 10 ms for > 200.000 rows(!))
+Fixed minor grid mis-alignment under some special conditions
+Enhanced status bar with centered texts
+Flexible filter options depending on compare variant
+Improved synchronization statistics
+Fixed issue when trying to delete system folders
+Usability improvements
+Recycle Bin usage as commandline parameter
+New menu bar
+Program language selectable from menu
+UI-option to create sync jobs (batch files) for automated synchronization
+
+
 Changelog v1.5
 --------------
 Improved speed of comparison by file content

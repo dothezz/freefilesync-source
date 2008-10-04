@@ -1,41 +1,85 @@
 #ifndef SYNCDIALOG_H_INCLUDED
 #define SYNCDIALOG_H_INCLUDED
 
-#include "mainDialog.h"
+#include "../FreeFileSync.h"
+#include "guiGenerated.h"
 
-class MainDialog;
-
-class SyncDialog: public SyncDialogGenerated
+class SyncDialog: public SyncDlgGenerated
 {
 public:
-    SyncDialog(MainDialog* window);
+    SyncDialog(wxWindow* window,
+               const FileCompareResult& gridDataRef,
+               Configuration& config,
+               bool synchronizationEnabled);
+
     ~SyncDialog();
 
     static const int StartSynchronizationProcess = 15;
 
+    static void updateConfigIcons(wxBitmapButton* button1,
+                                  wxBitmapButton* button2,
+                                  wxBitmapButton* button3,
+                                  wxBitmapButton* button4,
+                                  wxBitmapButton* button5,
+                                  const SyncConfiguration& syncConfig);
+
 private:
-    //temporal copy of maindialog->syncConfiguration
-    SyncConfiguration localSyncConfiguration;
+    void calculatePreview();
 
-    void updateConfigIcons();
+    void OnSyncLeftToRight( wxCommandEvent& event);
+    void OnSyncBothSides(   wxCommandEvent& event);
 
-    void OnSyncLeftToRight( wxCommandEvent& event );
-    void OnSyncBothSides( wxCommandEvent& event );
+    void OnExLeftSideOnly(  wxCommandEvent& event);
+    void OnExRightSideOnly( wxCommandEvent& event);
+    void OnLeftNewer(       wxCommandEvent& event);
+    void OnRightNewer(      wxCommandEvent& event);
+    void OnDifferent(       wxCommandEvent& event);
 
-    void OnExLeftSideOnly( wxCommandEvent& event );
-    void OnExRightSideOnly( wxCommandEvent& event );
-    void OnLeftNewer( wxCommandEvent& event );
-    void OnRightNewer( wxCommandEvent& event );
-    void OnDifferent( wxCommandEvent& event );
-
-    void OnStartSync(wxCommandEvent& event);
-    void OnClose(wxCloseEvent& event);
-    void OnBack(wxCommandEvent& event);
-    void OnCancel(wxCommandEvent& event);
+    void OnStartSync(       wxCommandEvent& event);
+    void OnClose(           wxCloseEvent&   event);
+    void OnBack(            wxCommandEvent& event);
+    void OnCancel(          wxCommandEvent& event);
 
     void OnSelectRecycleBin(wxCommandEvent& event);
 
-    MainDialog* mainDialog;
+    //temporal copy of maindialog.cfg.syncConfiguration
+    SyncConfiguration localSyncConfiguration;
+    const FileCompareResult& gridData;
+    Configuration& cfg;
+};
+
+
+class BatchDialog: public BatchDlgGenerated
+{
+public:
+    BatchDialog(wxWindow* window,
+                const Configuration& config,
+                const wxString& leftDir,
+                const wxString& rightDir);
+
+    ~BatchDialog();
+
+    static const int batchFileCreated = 15;
+
+private:
+    void OnExLeftSideOnly(  wxCommandEvent& event);
+    void OnExRightSideOnly( wxCommandEvent& event);
+    void OnLeftNewer(       wxCommandEvent& event);
+    void OnRightNewer(      wxCommandEvent& event);
+    void OnDifferent(       wxCommandEvent& event);
+
+    void OnFilterButton(    wxCommandEvent& event);
+    void OnSelectRecycleBin(wxCommandEvent& event);
+
+    void OnClose(           wxCloseEvent&   event);
+    void OnCancel(          wxCommandEvent& event);
+    void OnCreateJob(       wxCommandEvent& event);
+
+    void updateFilterButton();
+    wxString parseConfiguration();
+
+    SyncConfiguration localSyncConfiguration;
+    bool filterIsActive;
 };
 
 #endif // SYNCDIALOG_H_INCLUDED

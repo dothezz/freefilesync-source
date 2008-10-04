@@ -2,6 +2,8 @@
   Uhrzeit: 
  already exists. Overwrite?
  existiert bereits. Überschreiben?
+ does not exist.
+ existiert nicht.
  does not exist. Aborting!
  existiert nicht. Abbruch!
  does not exist. \n\nSynchronization aborted!
@@ -12,10 +14,16 @@
  Element(e):\n\n
  items on left, 
  Elemente links, 
+Synchronization started.
+Synchronisation gestartet.
  items on right, 
  Elemente rechts, 
  of 
  von 
+Start
+Start
+Stop
+Stop
  overwriting 
  und überschreibe 
  row in view
@@ -32,6 +40,10 @@
 !=	Dateien sind verschieden\n
 &Abort
 &Abbruch
+&About...
+&Über...
+&Advanced
+&Erweitert
 &Back
 &Zurück
 &Cancel
@@ -40,12 +52,28 @@
 &Vergleichen
 &Continue
 &Fortfahren
+&Create
+&Erzeugen
+&Create batch job
+&Erstelle Batch-Job
 &Default
 &Standard
+&Export file list
+&Exportiere Dateiliste
+&File
+&Datei
 &Filter
 &Filter
+&Help
+&Hilfe
+&Language
+&Sprache
 &OK
 &OK
+&Pause
+&Pause
+&Quit
+&Beenden
 &Retry
 &Wiederholen
 &Start
@@ -70,6 +98,8 @@
 -Open-Source Datei-Synchronisation-
 .
 ,
+.\n\nExamples:\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n1: Creates a mirror backup of the left directory\n2: Synchronizes all *.doc files from both directories simultaneously\n\n
+.\n\nBeispiele:\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n1: Erzeugt ein Spiegel-Backup des linken Verzeichnisses\n2: Synchronisiert alle *.doc Dateien aus beiden Verzeichnissen\n\n
 /
 /
 1 item on left, 
@@ -78,6 +108,12 @@
 1 Element rechts, 
 1 row in view (
 1 Zeile zur Ansicht (
+1. Enter full file or directory names separated by ';'.\n2. Wildcard characters '*' and '?' are supported.\n3. Case sensitive expressions!\n\nExample: *.tmp;*\\filename.dat;*\\directory\\*
+1. Komplette Datei- oder Verzeichnisnamen getrennt durch ';' eingeben.\n2. Die Platzhalter '*' und '?' werden unterstützt.\n3. Groß-/Kleinschreibung wird unterschieden!\n\nBeispiel: *.tmp;*\\filename.dat;*\\directory\\*
+: check file content\n
+: Prüfung auf Dateiinhalt\n
+: check filesize and date\n\t\t
+: Prüfung auf Dateigröße und -datum\n\t\t
 <<	left file is newer\n
 <<	linke Datei ist neuer\n
 <Directory>
@@ -99,7 +135,7 @@ Abgebrochen
 Aborted!
 Abbruch!
 About
-Info
+Über
 Action
 Aktion
 All items have been synchronized!
@@ -110,8 +146,12 @@ An exception occured
 Eine Exception wurde geworfen
 An exception occured!
 Eine Exception wurde geworfen!
+Assemble a batch file with the following settings. To start synchronization in batch mode simply execute this file or schedule it in your operating system's task planner.
+Erzeuge eine Batch-Datei mit den folgenden Parametern. Um im Batch-Modus zu synchronisieren, kann diese einfach gestartet oder in den Task-Planer des Betriebssystems eingetragen werden.
 Back
 Zurück
+Batch file created successfully!
+Batch-Datei wurde erfolgreich erstellt!
 Begin Synchronization
 Starte Synchronisation
 Benchmark: 
@@ -120,12 +160,16 @@ Cancel
 Abbruch
 Choose to hide filtered files/directories from list
 Gefilterte Dateien ein-/ausblenden
+Comma separated list
+Kommagetrennte Liste
+Command file
+Command Datei
 Compare both sides
 Beide Seiten vergleichen
-Compare by
-Vergleichen nach
 Compare by \"File size and date\"\n----------------------------------------\nThis compare variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. For the latter the system's UTC time (coordinated word time) is used internally, although the local file time is displayed on the result list. So there are no problems concerning different time zones or daylight saving time.\n\nWhen \"Compare\" is triggered with this option set the following decision tree is processed:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n          _________|_____________\n         |                  |                         |\n  left newer  right newer  different (but same date)\n\nAs a result 6 different status can be returned to categorize all files:\n\n- exists left only\n- exists right only\n- left newer\n- right newer\n- different (but same date)\n- equal\n\n\nCompare by \"File content\"\n----------------------------------------\nAs the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n\nAs a result the files are separated into the following categories:\n\n- exists left only\n- exists right only\n- different\n- equal
 Vergleichen nach \"Dateigröße und -datum\"\n---------------------------------------------------\nDiese Variante identifiziert zwei gleichnamige Dateien als gleich, wenn sie die gleiche Dateigröße haben UND der Zeitpunkt der letzten Änderung derselbe ist. Für Letzteres wird intern die UTC-Zeit (koordinierte Weltzeit) verwendet, auch wenn die lokale Zeit in der Ergebnisliste angezeigt wird. Dadurch werden Probleme vermieden, die durch verschiedene Zeitzonen oder Sommer-/Winterzeit entstehen.\n\nNachdem \"Compare\" mit dieser Einstellung gestartet wurde, wird der folgende Entscheidungsbaum abgearbeitet:\n\n                         -------------------------\n                         |Entscheidungsbaum|\n                         -------------------------\n                     __________|___________\n                     |                                         |\n Datei ex. auf beiden Seiten      nur auf einer Seite\n     ________|____                             __|___\n     |                        |                           |          |\n  gleich           verschieden               links    rechts\n          __________|___________\n          |                   |                     |\n  links neuer  rechts neuer  verschieden (bei gleichem Datum)\n\nAls Ergebnis werden 6 verschiedene Status zurückgegeben, um Dateien zu kategorisieren:\n\n- existiert nur links\n- existiert nur rechts\n- links neuer\n- rechts neuer\n- verschieden (bei gleichem Datum)\n- gleich\n\n\nVergleichen nach \"Dateiinhalt\"\n------------------------------------\nWie der Name bereits sagt, werden zwei Dateien mit gleichem Namen genau dann als gleich angesehen, wenn sie den gleichen Dateiinhalt haben. Diese Einstellung ist eher für Konsistenzprüfungen geeignet als für Backup-Operationen. Aus diesem Grund wird der Zeitpunkt der letzten Änderung der Dateien nicht berücksichtigt.\n\nDer Entscheidungsbaum ist in diesem Fall kleiner:\n\n                         -------------------------\n                         |Entscheidungsbaum|\n                         -------------------------\n                     __________|___________\n                     |                                         |\n Datei ex. auf beiden Seiten      nur auf einer Seite\n     ________|____                             __|___\n     |                        |                           |          |\n  gleich           verschieden               links    rechts\n\nDas Ergebnis ist eine Aufteilung in folgende Kategorien:\n\n- existiert nur links\n- existiert nur rechts\n- verschieden\n- gleich
+Compare by...
+Vergleichen nach...
 Comparing content of files 
 Vergleiche Inhalt der Dateien 
 Comparing...
@@ -136,18 +180,28 @@ Configuration
 Konfiguration
 Configuration loaded!
 Konfiguration geladen!
+Configuration overview:
+Übersicht der Parameter:
 Configuration saved!
 Konfiguration gespeichert!
 Configure Filter...
 Konfiguriere Filter...
+Configure filter
+Konfiguriere Filter
 Configure filter settings
 Konfiguriere Filter
+Configure filter...
+Konfiguriere Filter...
 Configure your own synchronization rules.
 Eigene Synchronisationsregeln definieren.
 Confirm
 Bestätigen
 Continue
 Fortfahren
+Continue on error
+Fortfahren bei Fehler
+Continue on next errors
+Fortfahren bei nächsten Fehlern
 Copy from left to right
 Von links nach rechts kopieren
 Copy from left to right overwriting
@@ -170,12 +224,20 @@ Could not open file:
 Fehler beim Öffnen der Datei: 
 Could not read configuration file 
 Fehler beim Lesen der Konfigurationsdatei 
+Could not read language file 
+Fehler beim Lesen der Sprachdatei 
 Could not retrieve file info for: 
 Fehler beim Lesen der Dateiattribute von:
 Could not set working directory to directory containing executable file!
 Arbeitsverzeichnisses konnte nicht auf Pfad der .exe-Datei gelegt werden!
 Could not write to 
 Fehler beim Schreiben von 
+Create a batch job
+Erstelle Batch-Job
+Create a batch job for automated synchronization
+Erzeuge Batch-Job für die automatische Synchronisation
+Create:
+Erstellen:
 Creating folder 
 Erstelle Verzeichnis 
 Current operation:
@@ -192,6 +254,8 @@ Data to compare:
 Zu vergleichende Daten:
 Data to transfer:
 Zu übertragende Daten:
+Data:
+Daten:
 Date
 Datum
 Default
@@ -200,12 +264,20 @@ Delete files existing on left side only
 Lösche Dateien, die nur links existieren
 Delete files existing on right side only
 Lösche Dateien, die nur rechts existieren
+Delete files/folders existing on left side only
+Lösche Dateien/Ordner, die nur links existieren
+Delete files/folders existing on right side only
+Lösche Dateien/Ordner, die nur rechts existieren
 Delete files\tDEL
 Lösche Dateien\tDEL
+Delete:
+Löschen:
 Deleting file 
 Lösche Datei 
 Deleting folder 
 Lösche Verzeichnis 
+Deutsch
+Deutsch
 Directory 
 Verzeichnis 
 Directory on the left does not exist. Please select a new one!
@@ -214,6 +286,10 @@ Directory on the right does not exist. Please select a new one!
 Verzeichnis auf der rechten Seite existiert nicht. Bitte ein anderes auswählen!
 Displays help on the command line parameters\n
 Hilfe zu den Kommandozeilenparametern\n
+Do not show UI messages but write to a logfile instead\n\nExamples:\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n1: Creates a mirror backup of the left directory\n2: Synchronizes all *.doc files from both directories simultaneously\n\n
+Keine UI-Meldungen anzeigen, sondern eine Logdatei schreiben\n\nBeispiele:\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n1: Erzeugt ein Backup des linken Verzeichnisses\n2: Synchronisiert alle *.doc Dateien aus beiden Verzeichnissen\n\n
+Do not show graphical status and error messages but write to a logfile instead
+Keine graphischen Status- und Fehlermeldungen anzeigen, sondern eine Logdatei erstellen
 Do nothing
 Nichts tun
 Do you really want to delete the following objects(s)?
@@ -228,10 +304,14 @@ Dummy text
 Dummy text
 Email:
 Email:
+English
+English
 Equality condition
 Vergleich nach:
 Error
 Fehler
+Error adapting modification time of file 
+Fehler beim Anpassen des Datums der letzten Änderung der Datei 
 Error converting FILETIME to SYSTEMTIME
 Fehler beim Konvertieren der FILETIME nach SYSTEMTIME
 Error converting FILETIME to local FILETIME
@@ -262,6 +342,8 @@ Feedback and suggestions are welcome at:
 Feedback und Vorschläge sind willkommen unter:
 File content
 Dateiinhalt
+File list exported!
+Dateiliste exportiert!
 File size and date
 Dateigröße und -datum
 Filename
@@ -294,6 +376,10 @@ Files that exist on right view only
 Dateien, die nur rechts existieren
 Files to compare:
 Zu vergleichende Dateien:
+Files/folders that exist on left side only
+Dateien/Ordner, die nur links existieren
+Files/folders that exist on right side only
+Dateien/Ordner, die nur rechts existieren
 Filter
 Filter
 Filter active: Press again to deactivate
@@ -304,6 +390,8 @@ Filter manually
 Manuell filtern
 Filter view
 Ansicht filtern
+Final status
+Finaler status
 Folders/files that exist on left side only
 Ordner/Dateien, die nur links existieren
 Folders/files that exist on right side only
@@ -324,14 +412,18 @@ Hide filtered items
 Gefilterte Elemente ausblenden
 Hide further error messages
 Weitere Fehlermeldungen unterdrücken
+Hide further error messages during the current process and continue
+Unterdrücke alle nachfolgenden Fehlermeldungen für den aktuellen Prozess und fahre fort
 Hide further messages during current process
 Weitere Meldungen während dieser Operation ausblenden
 Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
 Verhindert das Anzeigen von Fehlermeldungen während der Synchronisation:\nSie werden jedoch gesammelt und nach dem Vorgang als Liste angezeigt
+Hints:
+Tipps:
 Homepage:
 Homepage:
-If errors occur during folder comparison or synchronization they are ignored and the process continues.\n
-Wenn Fehler während des Vergleichs oder der Synchronisation auftreten, werden diese ignoriert und der Vorgang fortgesetzt.\n
+If errors occur during folder comparison or synchronization they are ignored and the process continues\n
+Wenn Fehler während des Vergleichs oder der Synchronisation auftreten, werden diese ignoriert und der Vorgang fortgesetzt\n
 If you like FFS:
 FFS unterstützen:
 Include
@@ -342,6 +434,8 @@ It was not possible to gain access to Recycle Bin!\n\nIt's likely that you are n
 Die Papierkorbfunktion steht nicht zur Verfügung!\n\nWahrscheinlich ist das aktuelle Betriebssystem nicht Windows XP. (Möglicherweise Vista)\nWenn Sie diese Funktion wirklich benötigen kontaktieren Sie bitte den Autor. :)
 Items completed:
 Elemente komplett:
+Left folder:
+Linker Ordner:
 Legend\n
 Legende\n
 Load configuration from file:\n     - use this choice box\n     - drag & drop config file to this window\n     - specify config file as first commandline parameter
@@ -351,15 +445,21 @@ Konfiguration laden...
 Log-messages:
 Lognachrichten:
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Backup des linken Ordners erstellen: Der rechte Ordner wird dabei überschrieben und nach der Synchronisation dem linken exakt gleichen.
+Spiegel-Backup des linken Ordners erstellen: Der rechte Ordner wird dabei überschrieben und nach der Synchronisation dem linken exakt gleichen.
+Move files to Recycle Bin instead of deleting or overwriting them directly.\n
+Verschiebe die Dateien in den Papierkorb anstatt sie zu löschen oder zu überschreiben.\n
 Not all items have been synchronized! You may try to synchronize the remaining items again (WITHOUT having to re-compare)!
 Nicht alle Objekte wurden synchronisiert! Die Synchronisation kann erneut gestartet werden (OHNE dass ein erneuter Vergleich notwendig ist)!
 Not all items were synchronized! Have a look at the list.
 Nicht alle Objekte wurden synchronisiert! Siehe die verbliebenen Elemente im Hauptfenster.
 Nothing to synchronize. Both directories seem to contain the same data!
 Nichts zu synchronisieren. Beide Verzeichnisse scheinen dieselben Daten zu enthalten!
-Number of files and directories that will be copied or deleted
-Anzahl der Dateien und Verzeichnisse, die kopiert oder gelöscht werden
+Number of files or directories that will be created
+Anzahl der Dateien oder Verzeichnisse, die erstellt werden
+Number of files or directories that will be deleted
+Anzahl der Dateien oder Verzeichnisse, die gelöscht werden
+Number of files that will be overwritten
+Anzahl der Dateien, die überschrieben werden
 OK
 OK
 Objects to process:
@@ -368,6 +468,8 @@ One way ->
 Nach rechts ->
 Only files/directories that pass filtering will be relevant for synchronization.\n\n1. Enter full file or directory names separated by ';'.\n2. Wildcard characters '*' and '?' are supported.\n3. Case sensitive expressions!\n\nExample: *.tmp;C:\\data\\dummy.log;*filename*;*directory*
 Bei der Synchronisation werden nur die Dateien/Ordner berücksichtigt, die zu den\nFiltereinstellungen passen.\n\n1. Komplette Datei- oder Verzeichnisnamen getrennt durch ';' eingeben.\n2. Die Platzhalter '*' und '?' werden unterstützt.\n3. Groß-/Kleinschreibung wird unterschieden!\n\nBeispiel: *.tmp;C:\\data\\dummy.log;*filename*;*directory*
+Only files/directories that pass filtering will be selected for synchronization.
+Bei der Synchronisation werden nur die Dateien/Ordner berücksichtigt, die zu\nden Filtereinstellungen passen.
 Open synchronization dialog
 Zeige Synchronisationseinstellungen
 Open with Explorer\tD-Click
@@ -382,6 +484,8 @@ Please select directories for both sides!
 Bitte für beide Seiten ein Verzeichnis wählen!
 Press button to activate filter
 Auswählen, um Filter zu aktivieren
+Preview
+Vorschau
 Published under the GNU General Public License:
 Veröffentlicht unter der GNU General Public License:
 Quit
@@ -396,6 +500,8 @@ Result
 Ergebnis
 Retry
 Wiederholen
+Right folder:
+Rechter Ordner:
 Running...
 Aktiv...
 Save current configuration to file
@@ -416,10 +522,16 @@ Select variant:
 Variante auswählen:
 Set filter for synchronization
 Filter einstellen
+Shell script
+Shell Skript
+Silent mode
+Stiller Modus
 Size
 Größe
 Source code written completely in C++ utilizing:\n\n  MinGW \t\t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE\n\n     by ZenJu
 Sourcecode komplett in C++ geschrieben unter Verwendung von:\n\n  MinGW \t\t- Windows-Port der GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI-Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE\n\n        ZenJu
+Specify algorithm to test if files are equal:\n\n\t\t
+Algorithmus wählen, um gleiche Dateien zu erkennen:\n\n\t\t
 Specify algorithm to test if files are equal:\n\n\t\tSIZEDATE: check filesize and date\n\t\tCONTENT: check file content\n
 Methode angeben, um gleiche Dateien zu erkennen:\n\n\t\tSIZEDATE: Prüfung auf Dateigröße und -datum\n\t\tCONTENT: Prüfung auf Dateiinhalt\n
 Specify names to be excluded separated by ';'. Wildcards '*' and '?' are supported. Default: \"\"\n
@@ -434,16 +546,18 @@ Start synchronizing files
 Beginne Synchronisation der Daten
 Swap sides
 Vertausche Seiten
+Synchronization aborted!
+Synchronisation abgebrochen!
 Synchronization aborted: You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Synchronisation abgebrochen: Die Synchronisation kann erneut gestartet werden (OHNE dass ein erneuter Vergleich notwendig ist)!
-Synchronization completed!
-Synchronisation abgeschlossen!
+Synchronization completed.
+Synchronisation abgeschlossen.
 Synchronization settings
 Synchronisationseinstellungen
 Synchronization status
 Synchronisation: Status
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
-Beide Seiten gleichzeitig synchronisieren: Neue oder aktualisierte Dateien auf die jeweils andere Seite kopieren.
+Beide Seiten gleichzeitig synchronisieren: Neue oder aktualisierte Dateien werden auf die jeweils andere Seite kopiert.
 Synchronizing...
 Synchronisiere...
 The selected file does not contain a valid configuration!
@@ -452,12 +566,18 @@ The selected file does not exist anymore!
 Die gewählte Datei existiert nicht mehr!
 Total amount of data that will be copied
 Menge der Daten, die kopiert werden
+Total amount of data that will be transferred
+Gesamtmenge der Daten, die übertragen werden
 Two way <->
 Beidseitig <->
 Unable to create logfile!
 Fehler beim Erstellen der Logdatei!
+Unable to initialize Recycle Bin!
+Der Papierkorb konnte nicht initialisiert werden!
 Unable to load Resources.dat!
 Fehler beim Laden von Resources.dat!
+Update:
+Überschreiben:
 Use Recycle Bin
 Papierkorb verwenden
 Use Recycle Bin when deleting or overwriting files during synchronization
@@ -467,7 +587,7 @@ Warnung
 Warning: Synchronization failed for 
 Warnung: Synchronisation fehlgeschlagen für 
 \n\nContinue with next object, retry or abort comparison?
-\n\nMit nächstem Objekt fortsetzen, wiederholen oder abbrechen?
+\n\nMit nächstem Objekt fortfahren, wiederholen oder abbrechen?
 \n\nContinue with next object, retry or abort synchronization?
 \n\nMit nächstem Objekt fortsetzen, wiederholen oder abbrechen?
 \n\nInformation: If you skip the error and continue or abort a re-compare will be necessary!
@@ -476,7 +596,7 @@ Warnung: Synchronisation fehlgeschlagen für
 \n\nDieses Verzeichnis überspringen und mit Synchronisation fortfahren?
 \n\nSkip this file and continue synchronization?
 \n\nDiese Datei überspringen und mit Synchronisation fortfahren?
-\tDo not show UI messages but write to a logfile instead\n\nExamples:\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n1: Creates a mirror backup of the left directory\n2: Synchronizes all *.doc files from both directories simultaneously\n\n
-\tKeine UI-Meldungen anzeigen, sondern eine Logdatei schreiben\n\nBeispiele:\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n1: Erzeugt ein Backup des linken Verzeichnisses\n2: Synchronisiert alle *.doc Dateien aus beiden Verzeichnissen\n\n
+dummy
+dummy
 |>	file on right side only\n
 |>	Datei existiert nur rechts\n

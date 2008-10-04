@@ -1,6 +1,7 @@
 #ifndef FREEFILESYNC_H_INCLUDED
 #define FREEFILESYNC_H_INCLUDED
 
+#include "library/wxWidgets.h"
 #include <wx/string.h>
 #include <set>
 #include <vector>
@@ -17,6 +18,12 @@ enum SyncDirection
     syncDirNone
 };
 
+enum CompareVariant
+{
+    compareByContent,
+    compareByTimeAndSize
+};
+
 struct SyncConfiguration
 {
     SyncDirection exLeftSideOnly;
@@ -26,6 +33,23 @@ struct SyncConfiguration
     SyncDirection different;
 };
 
+struct Configuration
+{   //Compare setting
+    CompareVariant compareVar;
+
+    //Synchronisation settings
+    SyncConfiguration syncConfiguration;
+
+    //Filter setting
+    wxString includeFilter;
+    wxString excludeFilter;
+    bool hideFiltered;
+    bool filterIsActive;
+
+    //other options
+    bool useRecycleBin;     //use Recycle bin when deleting or overwriting files while synchronizing
+    bool continueOnError; //hides error messages during synchronization
+};
 
 struct FileInfo
 {
@@ -43,7 +67,7 @@ enum ObjectType
 
 struct FileDescrLine
 {
-    FileDescrLine() : objType(isNothing) {};
+    FileDescrLine() : objType(isNothing) {}
 
     wxString filename;  // == directory + relFilename
     wxString directory; //directory to be synced
@@ -55,7 +79,6 @@ struct FileDescrLine
 
     //the following operators are needed by template class "set"
     //DO NOT CHANGE THESE RELATIONS!!!
-
 #ifdef FFS_WIN
     //Windows does NOT distinguish between upper/lower-case
     bool operator>(const FileDescrLine& b ) const
@@ -70,9 +93,8 @@ struct FileDescrLine
     {
         return (relFilename.CmpNoCase(b.relFilename) == 0);
     }
-#endif  // FFS_WIN
 
-#ifdef FFS_LINUX
+#elif defined FFS_LINUX
     //Linux DOES distinguish between upper/lower-case
     bool operator>(const FileDescrLine& b ) const
     {
@@ -86,7 +108,9 @@ struct FileDescrLine
     {
         return (relFilename.Cmp(b.relFilename) == 0);
     }
-#endif  // FFS_LINUX
+#else
+    assert(false);
+#endif
 };
 typedef set<FileDescrLine> DirectoryDescrType;
 
@@ -101,6 +125,7 @@ enum CompareFilesResult
     filesEqual
 };
 
+
 struct FileCompareLine
 {
     FileCompareLine() : selectedForSynchronization(true) {}
@@ -114,11 +139,8 @@ struct FileCompareLine
 typedef vector<FileCompareLine> FileCompareResult;
 
 
-enum CompareVariant
-{
-    compareByContent,
-    compareByTimeAndSize
-};
+typedef int GridViewLine;
+typedef vector<int> GridView;  //vector of references to lines in FileCompareResult
 
 
 class GetAllFilesFull : public wxDirTraverser
@@ -140,6 +162,9 @@ private:
     FileDescrLine fileDescr;
     StatusUpdater* statusUpdater;
 };
+
+bool updateUI_IsAllowed(); //test if a specific amount of time is over
+void updateUI_Now();       //do the updating
 
 
 //Note: the following lines are a performance optimization for deleting elements from a vector. It is incredibly faster to create a new
@@ -178,11 +203,7 @@ public:
     FreeFileSync(bool useRecycleBin);
     ~FreeFileSync();
 
-    friend class MainDialog;
-    friend class GetAllFilesFull;
-    friend class CopyThread;
-
-    //identifiers of different processed
+    //identifiers of different processes
     static const int scanningFilesProcess      = 1;
     static const int compareFileContentProcess = 2;
     static const int synchronizeFilesProcess   = 3;
@@ -205,7 +226,12 @@ public:
     static wxString formatFilesizeToShortString(const double filesize);
     static wxString getFormattedDirectoryName(const wxString& dirname);
 
-    static void calcTotalBytesToSync(int& objectsTotal, double& dataTotal, const FileCompareResult& fileCmpResult, const SyncConfiguration& config);
+    static void calcTotalBytesToSync(int& objectsToCreate,
+                                     int& objectsToOverwrite,
+                                     int& objectsToDelete,
+                                     double& dataToProcess,
+                                     const FileCompareResult& fileCmpResult,
+                                     const SyncConfiguration& config);
 
     static void swapGrids(FileCompareResult& grid);
 
@@ -213,6 +239,8 @@ public:
 
     static const wxString FFS_ConfigFileID;
     static const wxString FFS_LastConfigFile;
+
+    static void getFileInformation(FileInfo& output, const wxString& filename);
 
 private:
     bool synchronizeFile(const FileCompareLine& filename, const SyncConfiguration& config, StatusUpdater* statusUpdater);   // false if nothing had to be done
@@ -226,7 +254,6 @@ private:
 
     //some special file functions
     static void generateFileAndFolderDescriptions(DirectoryDescrType& output, const wxString& directory, StatusUpdater* updateClass = 0);
-    static void getFileInformation(FileInfo& output, const wxString& filename);
 
     bool recycleBinShouldBeUsed;
     static RecycleBin recycler;

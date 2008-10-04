@@ -45,7 +45,7 @@ void Application::initialize()
         throw runtime_error(_("Could not set working directory to directory containing executable file!"));
 
     //set program language
-    programLanguage = new CustomLocale;
+    programLanguage.loadLanguageFromCfg();
 
     //activate support for .png files
     wxImage::AddHandler(new wxPNGHandler);
@@ -54,9 +54,9 @@ void Application::initialize()
     GlobalResources::loadResourceFiles();
 
     //test if ffs is to be started on UI with config file passed as commandline parameter
-    wxString configFileUI = FreeFileSync::FFS_LastConfigFile;
-    if (argc >= 2 && wxFileExists(argv[1]) && FreeFileSync::isFFS_ConfigFile(argv[1]))
-        configFileUI = argv[1];
+    wxString configFileForUI = FreeFileSync::FFS_LastConfigFile;
+    if (argc > 1 && wxFileExists(argv[1]) && FreeFileSync::isFFS_ConfigFile(argv[1]))
+        configFileForUI = argv[1];
 
     //should it start in commandline mode?
     else if (argc > 1)
@@ -71,15 +71,13 @@ void Application::initialize()
         else
             return;         //wait for the user to close the status window
     }
-    else
-        ;    //no parameters passed, continue with UI
-
-
-    //show UI dialog
-    MainDialog* frame = new MainDialog(0L, configFileUI);
-    frame->SetIcon(wxICON(aaaa)); // To Set App Icon
-
-    frame->Show();
+    else  //no parameters passed: continue with UI
+    {
+        //show UI dialog
+        MainDialog* frame = new MainDialog(0L, configFileForUI, &programLanguage);
+        frame->SetIcon(*GlobalResources::programIcon); //set application icon
+        frame->Show();
+    }
 }
 
 
@@ -101,7 +99,6 @@ int Application::OnRun()
 int Application::OnExit()
 {
     GlobalResources::unloadResourceFiles();
-    delete programLanguage;
     return 0;
 }
 
@@ -115,22 +112,18 @@ SyncDirection convertCmdlineCfg(const wxString& cfg, const int i)
     {
     case 'L':
         return syncDirLeft;
-        break;
     case 'R':
         return syncDirRight;
-        break;
     case 'N':
         return syncDirNone;
-        break;
     default:
         assert(false);
+        return syncDirNone;
     }
-    //dummy return value to suppress compiler warning
-    return syncDirNone;
 }
 
 
-void Application::initLog()
+void Application::logInit()
 {
     wxString tmp = wxDateTime::Now().FormatISOTime();
     tmp.Replace(":", "");
@@ -144,19 +137,24 @@ void Application::initLog()
     logFile<<endl;
     logFile<<_("Log-messages:")<<endl;
     logFile<<endl;
+    logWrite(_("Start"));
 }
 
 
-void Application::writeLog(const wxString& logText, const wxString& problemType)
+void Application::logWrite(const wxString& logText, const wxString& problemType)
 {
+    logFile<<"["<<wxDateTime::Now().FormatTime()<<"] ";
+
     if (problemType != wxEmptyString)
         logFile<<problemType<<": ";
+
     logFile<<logText<<endl;
 }
 
 
-void Application::closeLog()
+void Application::logClose(const wxString& finalText)
 {
+    logWrite(finalText, _("Stop"));
     logFile.close();
 }
 
@@ -176,16 +174,16 @@ void Application::parseCommandline()
 
         {
             wxCMD_LINE_OPTION,
-            "cmp",
+            GlobalResources::paramCompare,
             NULL,
-            _("Specify algorithm to test if files are equal:\n\n\t\tSIZEDATE: check filesize and date\n\t\tCONTENT: check file content\n"),
+            wxString(_("Specify algorithm to test if files are equal:\n\n\t\t")) + GlobalResources::valueSizeDate + _(": check filesize and date\n\t\t") + GlobalResources::valueContent + _(": check file content\n"),
             wxCMD_LINE_VAL_STRING,
             wxCMD_LINE_OPTION_MANDATORY
         },
 
         {
             wxCMD_LINE_OPTION,
-            "cfg",
+            GlobalResources::paramCfg,
             NULL,
             _("Specify the sync-direction used for each type of file by a string of five chars:\n\n\t\tChar 1: Folders/files that exist on left side only\n\t\tChar 2: Folders/files that exist on right side only\n\t\tChar 3: Files that exist on both sides, left one is newer\n\t\tChar 4: Files that exist on both sides, right one is newer\n\t\tChar 5: Files that exist on both sides and are different\n\n\t\tSync-direction: L: left, R: right, N: none\n"),
             wxCMD_LINE_VAL_STRING,
@@ -210,7 +208,7 @@ void Application::parseCommandline()
 
         {
             wxCMD_LINE_OPTION,
-            "incl",
+            GlobalResources::paramInclude,
             NULL,
             _("Specify names to be included separated by ';'. Wildcards '*' and '?' are supported. Default: \"*\"\n"),
             wxCMD_LINE_VAL_STRING,
@@ -218,7 +216,7 @@ void Application::parseCommandline()
 
         {
             wxCMD_LINE_OPTION,
-            "excl",
+            GlobalResources::paramExclude,
             NULL,
             _("Specify names to be excluded separated by ';'. Wildcards '*' and '?' are supported. Default: \"\"\n"),
             wxCMD_LINE_VAL_STRING,
@@ -226,16 +224,23 @@ void Application::parseCommandline()
 
         {
             wxCMD_LINE_SWITCH,
-            "skiperrors",
+            GlobalResources::paramContinueError,
             NULL,
-            _("If errors occur during folder comparison or synchronization they are ignored and the process continues.\n")
+            _("If errors occur during folder comparison or synchronization they are ignored and the process continues\n")
         },
 
         {
             wxCMD_LINE_SWITCH,
-            "silent",
+            GlobalResources::paramRecycler,
             NULL,
-            _("\tDo not show UI messages but write to a logfile instead\n\nExamples:\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n1: Creates a mirror backup of the left directory\n2: Synchronizes all *.doc files from both directories simultaneously\n\n")
+            _("Move files to Recycle Bin instead of deleting or overwriting them directly.\n")
+        },
+
+        {
+            wxCMD_LINE_SWITCH,
+            GlobalResources::paramSilent,
+            NULL,
+            wxString(_("Do not show graphical status and error messages but write to a logfile instead")) + _(".\n\nExamples:\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n1: Creates a mirror backup of the left directory\n2: Synchronizes all *.doc files from both directories simultaneously\n\n")
         },
 
         {
@@ -256,15 +261,16 @@ void Application::parseCommandline()
     wxString rightDir;
     wxString included;
     wxString excluded;
-    bool skipErrors = parser.Found("skiperrors");
-    bool silent     = parser.Found("silent");
+    bool continueOnError = parser.Found(GlobalResources::paramContinueError);
+    bool useRecycler     = parser.Found(GlobalResources::paramRecycler);
+    bool silent          = parser.Found(GlobalResources::paramSilent);
 
     applicationRunsOnCommandLineWithoutWindows = silent;  //this value is needed for the application to decide whether to wait for windows to close or not
 
 
 //check existence of all commandline parameters
-    if (!parser.Found("cmp", &cmp) ||
-            !parser.Found("cfg", &cfg) ||
+    if (!parser.Found(GlobalResources::paramCompare, &cmp) ||
+            !parser.Found(GlobalResources::paramCfg, &cfg) ||
             parser.GetParamCount() != 2)
     {
         parser.Usage();
@@ -278,12 +284,12 @@ void Application::parseCommandline()
 
 //evaluate filter settings
     bool filteringEnabled = false;
-    if (parser.Found("incl", &included))
+    if (parser.Found(GlobalResources::paramInclude, &included))
         filteringEnabled = true;
     else
         included = "*";
 
-    if (parser.Found("excl", &excluded))
+    if (parser.Found(GlobalResources::paramExclude, &excluded))
         filteringEnabled = true;
     else
         excluded = "";
@@ -292,7 +298,7 @@ void Application::parseCommandline()
 //--------------------------------------------------------------------
 
 //check consistency of all commandline parameters
-    if ((cmp != "SIZEDATE" && cmp != "CONTENT") ||
+    if ((cmp != GlobalResources::valueSizeDate && cmp != GlobalResources::valueContent) ||
             cfg.Len() != 5 ||
             (cfg[0] != 'L' && cfg[0] != 'R' && cfg[0] != 'N') ||
             (cfg[1] != 'L' && cfg[1] != 'R' && cfg[1] != 'N') ||
@@ -305,30 +311,57 @@ void Application::parseCommandline()
     }
 
 //init logfile
-    if (silent) initLog();
+    if (silent) logInit();
 
     wxString logText;
 
     //check if directories exist
     if (!wxDirExists(leftDir))
     {
-        wxString errorMessage = wxString(_("Directory ")) + leftDir + _(" does not exist. \n\nSynchronization aborted!");
-        if (silent) writeLog(errorMessage, _("Warning"));
-        if (silent) closeLog();
-        else wxMessageBox(errorMessage, _("Warning"), wxICON_WARNING);
+        wxString errorMessage = wxString(_("Directory ")) + leftDir + _(" does not exist.");
+        wxString statusMessage = wxString(_("Synchronization aborted!"));
+        if (silent)
+        {
+            logWrite(errorMessage, _("Warning"));
+            logClose(statusMessage);
+        }
+        else wxMessageBox(errorMessage + "\n\n" + statusMessage, _("Warning"), wxICON_WARNING);
 
         returnValue = -2;
         return;
     }
     else if (!wxDirExists(rightDir))
     {
-        wxString errorMessage = wxString(_("Directory ")) + rightDir + _(" does not exist. \n\nSynchronization aborted!");
-        if (silent) writeLog(errorMessage, _("Warning"));
-        if (silent) closeLog();
-        else wxMessageBox(errorMessage, _("Warning"), wxICON_WARNING);
+        wxString errorMessage = wxString(_("Directory ")) + rightDir + _(" does not exist.");
+        wxString statusMessage = wxString(_("Synchronization aborted!"));
+        if (silent)
+        {
+            logWrite(errorMessage, _("Warning"));
+            logClose(statusMessage);
+        }
+        else wxMessageBox(errorMessage + "\n\n" + statusMessage, _("Warning"), wxICON_WARNING);
 
         returnValue = -2;
         return;
+    }
+
+    //test existence of Recycle Bin
+    if (useRecycler)
+    {
+        if (!FreeFileSync::recycleBinExists())
+        {
+            wxString errorMessage = wxString(_("Unable to initialize Recycle Bin!"));
+            wxString statusMessage = wxString(_("Synchronization aborted!"));
+            if (silent)
+            {
+                logWrite(errorMessage, _("Error"));
+                logClose(statusMessage);
+            }
+            else wxMessageBox(errorMessage + "\n\n" + statusMessage, _("Error"), wxICON_WARNING);
+
+            returnValue = -2;
+            return;
+        }
     }
 
 //until here all options and parameters are consistent
@@ -338,9 +371,9 @@ void Application::parseCommandline()
     SyncConfiguration syncConfiguration;
     FileCompareResult currentGridData;
 
-    if (cmp == "SIZEDATE")
+    if (cmp == GlobalResources::valueSizeDate)
         cmpVar = compareByTimeAndSize;
-    else if (cmp == "CONTENT")
+    else if (cmp == GlobalResources::valueContent)
         cmpVar = compareByContent;
     else
         assert (false);
@@ -352,7 +385,7 @@ void Application::parseCommandline()
     syncConfiguration.different       = convertCmdlineCfg(cfg, 4);
 
     //class handling status updates and error messages
-    CommandLineStatusUpdater statusUpdater(this, skipErrors, silent);
+    CommandLineStatusUpdater statusUpdater(this, continueOnError, silent);
 
     //begin of synchronization process (all in one try-catch block)
     try
@@ -378,10 +411,10 @@ void Application::parseCommandline()
         if (nothingToSync)
         {
             wxString errorMessage = _("Nothing to synchronize. Both directories seem to contain the same data!");
-            if (silent) writeLog("\n");
-            if (silent) writeLog(errorMessage);
-            if (silent) closeLog();
-            else statusUpdater.updateFinalStatus(errorMessage);
+            if (silent)
+                logClose(errorMessage);
+            else
+                statusUpdater.updateFinalStatus(errorMessage);
 
             returnValue = -3;
             return;
@@ -393,35 +426,33 @@ void Application::parseCommandline()
 
 //START SYNCHRONIZATION
         //unsigned int startTime = GetTickCount();
-        FreeFileSync::startSynchronizationProcess(currentGridData, syncConfiguration, &statusUpdater, false); //default: do not use recycle bin since it's not sure if its possible
+        FreeFileSync::startSynchronizationProcess(currentGridData, syncConfiguration, &statusUpdater, useRecycler); //default: do not use recycle bin since it's not sure if its possible
         //wxMessageBox(wxString::Format(wxT("%i"), unsigned(GetTickCount()) - startTime));
 
 //show success message
-        wxString successMessage = _("Synchronization completed!");
-        if (silent) writeLog("\n");
-        if (silent) writeLog(successMessage);
-        if (silent) closeLog();
+        wxString successMessage = _("Synchronization completed.");
+        if (silent)
+            logClose(successMessage);
         else
             statusUpdater.updateFinalStatus(successMessage);
-
     }
     catch (AbortThisProcess& theException)  //exit used by statusUpdater
     {
-        if (silent) writeLog("\n\nSynchronization aborted!");
-        if (silent) closeLog();
+        if (silent)
+            logClose(_("Synchronization aborted!"));
 
         returnValue = -4;
         return;
     }
 
-    return;   //exit program and skip UI dialogs
+    return; //exit program and skip UI dialogs
 }
 //######################################################################################################
 
 
-CommandLineStatusUpdater::CommandLineStatusUpdater(Application* application, bool skipErr, bool silent) :
+CommandLineStatusUpdater::CommandLineStatusUpdater(Application* application, bool continueOnError, bool silent) :
         app(application),
-        skipErrors(skipErr),
+        continueErrors(continueOnError),
         silentMode(silent),
         currentProcess(-1)
 {
@@ -450,11 +481,11 @@ CommandLineStatusUpdater::~CommandLineStatusUpdater()
 
         //notify to syncStatusFrame that current process has ended
         if (abortionRequested)
-            syncStatusFrame->processHasFinished(statusAborted);  //enable okay and close events
+            syncStatusFrame->processHasFinished(SyncStatus::statusAborted);  //enable okay and close events
         else if (failedItems)
-            syncStatusFrame->processHasFinished(statusCompletedWithErrors);
+            syncStatusFrame->processHasFinished(SyncStatus::statusCompletedWithErrors);
         else
-            syncStatusFrame->processHasFinished(statusCompletedWithSuccess);
+            syncStatusFrame->processHasFinished(SyncStatus::statusCompletedWithSuccess);
     }
 }
 
@@ -473,18 +504,18 @@ void CommandLineStatusUpdater::initNewProcess(int objectsTotal, double dataTotal
     if (!silentMode)
     {
         if (currentProcess == FreeFileSync::scanningFilesProcess)
-            syncStatusFrame->setCurrentStatus(statusScanning);
+            syncStatusFrame->setCurrentStatus(SyncStatus::statusScanning);
 
         else if (currentProcess == FreeFileSync::compareFileContentProcess)
         {
             syncStatusFrame->resetGauge(objectsTotal, dataTotal);
-            syncStatusFrame->setCurrentStatus(statusComparing);
+            syncStatusFrame->setCurrentStatus(SyncStatus::statusComparing);
         }
 
         else if (currentProcess == FreeFileSync::synchronizeFilesProcess)
         {
             syncStatusFrame->resetGauge(objectsTotal, dataTotal);
-            syncStatusFrame->setCurrentStatus(statusSynchronizing);
+            syncStatusFrame->setCurrentStatus(SyncStatus::statusSynchronizing);
         }
         else assert(false);
     }
@@ -509,22 +540,21 @@ void CommandLineStatusUpdater::updateProcessedData(int objectsProcessed, double 
 
 int CommandLineStatusUpdater::reportError(const wxString& text)
 {
-    if (silentMode) //write error message log and abort the complete session
+    if (silentMode) //write error message log and abort the complete session if necessary
     {
-        app->writeLog(text, _("Error"));
+        app->logWrite(text, _("Error"));
 
-        if (skipErrors)                 //  <- /|\ before return, the logfile is written!!!
+        if (continueErrors)                 //  <- /|\ before return, the logfile is written!!!
             return StatusUpdater::continueNext;
         else
         {
             abortionRequested = true;
             throw AbortThisProcess();
         }
-
     }
     else    //show dialog to user who can decide how to continue
     {
-        if (skipErrors)        //this option can be set from commandline or by the user in the error dialog on UI
+        if (continueErrors) //this option can be set from commandline or by the user in the error dialog on UI
         {
             unhandledErrors.Add(text);
             return StatusUpdater::continueNext;
@@ -534,7 +564,7 @@ int CommandLineStatusUpdater::reportError(const wxString& text)
 
         wxString errorMessage = text + _("\n\nContinue with next object, retry or abort synchronization?");
 
-        ErrorDlg* errorDlg = new ErrorDlg(errorMessage, skipErrors);
+        ErrorDlg* errorDlg = new ErrorDlg(errorMessage, continueErrors);
 
         int rv = errorDlg->ShowModal();
         errorDlg->Destroy();
@@ -578,71 +608,3 @@ void CommandLineStatusUpdater::updateFinalStatus(const wxString& text)  //set by
     if (!silentMode)
         syncStatusFrame->setStatusText_NoUpdate(text);
 }
-
-
-//######################################################################################################
-
-
-wxString exchangeEscapeChars(char* temp)
-{
-    wxString output(temp);
-    output.Replace("\\\\", "\\");
-    output.Replace("\\n", "\n");
-    output.Replace("\\t", "\t");
-    output.Replace("\"\"", """");
-    output.Replace("\\\"", "\"");
-    return output;
-}
-
-
-CustomLocale::CustomLocale(int language, int flags)
-        :wxLocale(language, flags)
-{
-    char temp[100000];
-//    wxString languageFile;
-//    switch (language)
-//    {
-//    case wxLANGUAGE_GERMAN:
-    wxString languageFile = "language.dat";
-//        break;
-//    default: ;
-//    }
-
-    //load language file into buffer
-    if (languageFile.size() != 0)
-    {
-        ifstream langFile(languageFile.c_str());
-        if (langFile)
-        {
-            int rowNumber = 0;
-            TranslationLine currentLine;
-            while (langFile.getline(temp, 100000))
-            {
-                if (rowNumber%2 == 0)
-                    currentLine.original = exchangeEscapeChars(temp);
-                else
-                {
-                    currentLine.translation = exchangeEscapeChars(temp);
-                    translationDB.insert(currentLine);
-                }
-                ++rowNumber;
-            }
-            langFile.close();
-        }
-    }
-}
-
-
-const wxChar* CustomLocale::GetString(const wxChar* szOrigString, const wxChar* szDomain) const
-{
-    TranslationLine currentLine;
-    currentLine.original = szOrigString;
-
-    //look for translation in buffer table
-    Translation::iterator i;
-    if ((i = translationDB.find(currentLine)) != translationDB.end())
-        return (i->translation.c_str());
-    //fallback
-    return (szOrigString);
-}
-

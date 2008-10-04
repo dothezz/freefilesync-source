@@ -1,9 +1,8 @@
 #ifndef SMALLDIALOGS_H_INCLUDED
 #define SMALLDIALOGS_H_INCLUDED
 
-#include "mainDialog.h"
-
-class MainDialog;
+#include "../FreeFileSync.h"
+#include "guiGenerated.h"
 
 class AboutDlg : public AboutDlgGenerated
 {
@@ -48,7 +47,7 @@ private:
 };
 
 
-class DeleteDialog : public DeleteDialogGenerated
+class DeleteDialog : public DeleteDlgGenerated
 {
 public:
     DeleteDialog(const wxString& headerText, const wxString& messageText, wxWindow* main);
@@ -67,7 +66,7 @@ private:
 class ErrorDlg : public ErrorDlgGenerated
 {
 public:
-    ErrorDlg(const wxString messageText, bool& suppressErrormessages);
+    ErrorDlg(const wxString messageText, bool& continueError);
     ~ErrorDlg();
 
     static const int continueButtonPressed = 35;
@@ -80,27 +79,26 @@ private:
     void OnRetry(wxCommandEvent& event);
     void OnAbort(wxCommandEvent& event);
 
-    bool& suppressErrors;
+    bool& continueOnError;
 };
 
 
-enum SyncStatusID
-{
-    statusAborted,
-    statusCompletedWithSuccess,
-    statusCompletedWithErrors,
-    statusPause,
-    statusScanning,
-    statusComparing,
-    statusSynchronizing
-};
-
-
-class SyncStatus : public SyncStatusGenerated
+class SyncStatus : public SyncStatusDlgGenerated
 {
 public:
     SyncStatus(StatusUpdater* updater, wxWindow* parentWindow = 0);
     ~SyncStatus();
+
+    enum SyncStatusID
+    {
+        statusAborted,
+        statusCompletedWithSuccess,
+        statusCompletedWithErrors,
+        statusPause,
+        statusScanning,
+        statusComparing,
+        statusSynchronizing
+    };
 
     void resetGauge(int totalObjectsToProcess, double totalDataToProcess);
     void incProgressIndicator_NoUpdate(int objectsProcessed, double dataProcessed);
@@ -112,6 +110,7 @@ public:
 
 private:
     void OnOkay(wxCommandEvent& event);
+    void OnPause(wxCommandEvent& event);
     void OnAbort(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);
 
@@ -127,6 +126,7 @@ private:
     int totalObjects;
 
     wxString currentStatusText;
+    bool processPaused;
 };
 
 /*
@@ -178,12 +178,12 @@ private:
     double scalingFactorCmp;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
     int processedCmpObjects;    //each object represents a file or directory processed
     int totalCmpObjects;
-/*
-    //remaining time
-    RemainingTime calcTimeLeft;
-    wxLongLong timeRemaining;          //time in milliseconds
-    wxLongLong timeRemainingTimeStamp; //time in milliseconds
-*/
+    /*
+        //remaining time
+        RemainingTime calcTimeLeft;
+        wxLongLong timeRemaining;          //time in milliseconds
+        wxLongLong timeRemainingTimeStamp; //time in milliseconds
+    */
 };
 
 

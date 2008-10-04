@@ -93,8 +93,12 @@
 		<Unit filename="library\customGrid.h" />
 		<Unit filename="library\globalFunctions.cpp" />
 		<Unit filename="library\globalFunctions.h" />
+		<Unit filename="library\misc.cpp" />
+		<Unit filename="library\misc.h" />
 		<Unit filename="library\multithreading.cpp" />
 		<Unit filename="library\multithreading.h" />
+		<Unit filename="library\resources.cpp" />
+		<Unit filename="library\resources.h" />
 		<Unit filename="library\wxWidgets.h" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
@@ -103,8 +107,6 @@
 		<Unit filename="ui\guiGenerated.h" />
 		<Unit filename="ui\mainDialog.cpp" />
 		<Unit filename="ui\mainDialog.h" />
-		<Unit filename="ui\resources.cpp" />
-		<Unit filename="ui\resources.h" />
 		<Unit filename="ui\smallDialogs.cpp" />
 		<Unit filename="ui\smallDialogs.h" />
 		<Unit filename="ui\syncDialog.cpp" />
@@ -113,6 +115,9 @@
 			<code_completion />
 			<envvars />
 			<debugger />
+			<wxsmith version="1">
+				<gui name="wxWidgets" src="" main="" init_handlers="necessary" language="CPP" />
+			</wxsmith>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

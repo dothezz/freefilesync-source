@@ -1,27 +1,27 @@
 #ifndef CUSTOMGRID_H_INCLUDED
 #define CUSTOMGRID_H_INCLUDED
 
-#include "../ui/mainDialog.h"
 #include <vector>
 #include <wx/grid.h>
+#include "../FreeFileSync.h"
 
 using namespace std;
-
-extern int leadingPanel;
 
 class CustomGridTableBase;
 
 //##################################################################################
 
+extern int leadingPanel;
+
 class CustomGrid : public wxGrid
 {
 public:
-    CustomGrid( wxWindow *parent,
-                wxWindowID id,
-                const wxPoint& pos   = wxDefaultPosition,
-                const wxSize& size   = wxDefaultSize,
-                long style           = wxWANTS_CHARS,
-                const wxString& name = wxGridNameStr );
+    CustomGrid(wxWindow *parent,
+               wxWindowID id,
+               const wxPoint& pos   = wxDefaultPosition,
+               const wxSize& size   = wxDefaultSize,
+               long style           = wxWANTS_CHARS,
+               const wxString& name = wxGridNameStr);
 
     ~CustomGrid();
 
@@ -37,7 +37,7 @@ public:
 
     void setScrollFriends(CustomGrid* grid1, CustomGrid* grid2, CustomGrid* grid3);
 
-    void setGridDataTable(UI_Grid* currentUI_ViewPtr);
+    void setGridDataTable(GridView* gridRefUI, FileCompareResult* gridData);
 
     void updateGridSizes();
 
@@ -47,6 +47,8 @@ public:
     void DrawColLabel( wxDC& dc, int col );
 
 private:
+    void adjustGridHeights();
+
     bool scrollbarsEnabled;
 
     CustomGrid* m_grid1;

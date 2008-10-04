@@ -1,4 +1,7 @@
 #include "customGrid.h"
+#include "globalFunctions.h"
+#include "resources.h"
+#include <wx/dc.h>
 
 const unsigned int MinimumRows = 15;
 
@@ -6,20 +9,21 @@ const unsigned int MinimumRows = 15;
 class CustomGridTableBase : public wxGridStringTable
 {
 public:
-    CustomGridTableBase(int numRows, int numCols) : wxGridStringTable(numRows, numCols), gridIdentifier(0), currentUI_ViewPtr(0), lastNrRows(MinimumRows)
-    {
-        lightBlue = new wxColour(80, 110, 255);
-    }
+    CustomGridTableBase(int numRows, int numCols) :
+            wxGridStringTable(numRows, numCols),
+            lightBlue(80, 110, 255),
+            gridIdentifier(0),
+            gridRefUI(0),
+            gridData(0),
+            lastNrRows(MinimumRows) {}
 
-    ~CustomGridTableBase()
-    {
-        delete lightBlue;
-    }
+    ~CustomGridTableBase() {}
 
 
-    void setGridDataTable(UI_Grid* currentUI_ViewPtr)
+    void setGridDataTable(GridView* gridRefUI, FileCompareResult* gridData)
     {
-        this->currentUI_ViewPtr = currentUI_ViewPtr;
+        this->gridRefUI = gridRefUI;
+        this->gridData  = gridData;
     }
 
     void SetGridIdentifier(int id)
@@ -28,12 +32,12 @@ public:
     }
 
 //###########################################################################
-//grid standard input output methods, redirected directly to UIGrid to improve performance
+//grid standard input output methods, redirected directly to gridData to improve performance
 
     virtual int GetNumberRows()
     {
-        if (currentUI_ViewPtr)
-            return max(currentUI_ViewPtr->size(), MinimumRows);
+        if (gridRefUI)
+            return max(gridRefUI->size(), MinimumRows);
         return MinimumRows; //grid is initialized with this number of rows
     }
 
@@ -42,52 +46,122 @@ public:
         return (GetValue(row, col) == wxEmptyString);
     }
 
-    virtual wxString GetValue( int row, int col )
+
+    inline
+    wxString evaluateCmpResult(const CompareFilesResult result, const bool selectedForSynchronization)
     {
-        if (currentUI_ViewPtr)
-        {
-            if (currentUI_ViewPtr->size() > unsigned(row))
+        if (selectedForSynchronization)
+            switch (result)
             {
+            case fileOnLeftSideOnly:
+                return "<|";
+                break;
+            case fileOnRightSideOnly:
+                return "|>";
+                break;
+            case rightFileNewer:
+                return ">>";
+                break;
+            case leftFileNewer:
+                return "<<";
+                break;
+            case filesDifferent:
+                return "!=";
+                break;
+            case filesEqual:
+                return "==";
+                break;
+            default:
+                assert (false);
+                return wxEmptyString;
+            }
+        else return "(-)";
+    }
+
+
+    virtual wxString GetValue(int row, int col)
+    {
+        if (gridRefUI)
+        {
+            if (unsigned(row) < gridRefUI->size())
+            {
+                const FileCompareLine& gridLine = (*gridData)[(*gridRefUI)[row]];
+                wxString fileSize; //tmp string
+
                 switch (gridIdentifier)
                 {
                 case 1:
-                    if (4 > col)
+                    if (col < 4)
                     {
-                        switch (col)
+                        if (gridLine.fileDescrLeft.objType == isDirectory)
                         {
-                        case 0:
-                            return (*currentUI_ViewPtr)[row].leftFilename;
-                        case 1:
-                            return (*currentUI_ViewPtr)[row].leftRelativePath;
-                        case 2:
-                            return (*currentUI_ViewPtr)[row].leftSize;
-                        case 3:
-                            return (*currentUI_ViewPtr)[row].leftDate;
+                            switch (col)
+                            {
+                            case 0: //filename
+                                return wxEmptyString;
+                            case 1: //relative path
+                                return gridLine.fileDescrLeft.relFilename;
+                            case 2: //file size
+                                return _("<Directory>");
+                            case 3: //date
+                                return gridLine.fileDescrLeft.lastWriteTime;
+                            }
+                        }
+                        else if (gridLine.fileDescrLeft.objType == isFile)
+                        {
+                            switch (col)
+                            {
+                            case 0: //filename
+                                return gridLine.fileDescrLeft.relFilename.AfterLast(GlobalResources::fileNameSeparator);
+                            case 1: //relative path
+                                return gridLine.fileDescrLeft.relFilename.BeforeLast(GlobalResources::fileNameSeparator);
+                            case 2: //file size
+                                return globalFunctions::includeNumberSeparator(fileSize = gridLine.fileDescrLeft.fileSize.ToString());
+                            case 3: //date
+                                return gridLine.fileDescrLeft.lastWriteTime;
+                            }
                         }
                     }
                     break;
 
                 case 2:
-                    if (4 > col)
+                    if (col < 4)
                     {
-                        switch (col)
+                        if (gridLine.fileDescrRight.objType == isDirectory)
                         {
-                        case 0:
-                            return (*currentUI_ViewPtr)[row].rightFilename;
-                        case 1:
-                            return (*currentUI_ViewPtr)[row].rightRelativePath;
-                        case 2:
-                            return (*currentUI_ViewPtr)[row].rightSize;
-                        case 3:
-                            return (*currentUI_ViewPtr)[row].rightDate;
+                            switch (col)
+                            {
+                            case 0: //filename
+                                return wxEmptyString;
+                            case 1: //relative path
+                                return gridLine.fileDescrRight.relFilename;
+                            case 2: //file size
+                                return _("<Directory>");
+                            case 3: //date
+                                return gridLine.fileDescrRight.lastWriteTime;
+                            }
+                        }
+                        else if (gridLine.fileDescrRight.objType == isFile)
+                        {
+                            switch (col)
+                            {
+                            case 0: //filename
+                                return gridLine.fileDescrRight.relFilename.AfterLast(GlobalResources::fileNameSeparator);
+                            case 1: //relative path
+                                return gridLine.fileDescrRight.relFilename.BeforeLast(GlobalResources::fileNameSeparator);
+                            case 2: //file size
+                                return globalFunctions::includeNumberSeparator(fileSize = gridLine.fileDescrRight.fileSize.ToString());
+                            case 3: //date
+                                return gridLine.fileDescrRight.lastWriteTime;
+                            }
                         }
                     }
                     break;
 
                 case 3:
-                    if (1 > col)
+                    if (col < 1)
                     {
-                        return (*currentUI_ViewPtr)[row].cmpResult;
+                        return evaluateCmpResult(gridLine.cmpResult, gridLine.selectedForSynchronization);;
                     }
                     break;
 
@@ -96,44 +170,44 @@ public:
                 }
             }
         }
-        //if data not found in UIgrid table:
+        //if data is not found:
         return wxEmptyString;
     }
 
     virtual void SetValue( int row, int col, const wxString& value )
     {
-        assert (false); //should not be used, since values are retrieved directly from currentUI_ViewPtr
+        assert (false); //should not be used, since values are retrieved directly from gridRefUI
     }
     virtual void Clear()
     {
-        assert (false); // we don't want to use this, since the visible grid is directly connected to currentUI_ViewPtr}
+        assert (false); // we don't want to use this, since the visible grid is directly connected to gridRefUI}
     }
     virtual bool InsertRows( size_t pos = 0, size_t numRows = 1 )
     {
-        assert (false); // we don't want to use this, since the visible grid is directly connected to currentUI_ViewPtr}
+        assert (false); // we don't want to use this, since the visible grid is directly connected to gridRefUI}
         return true;
     }
     virtual bool AppendRows( size_t numRows = 1 )
     {
-        assert (false); // we don't want to use this, since the visible grid is directly connected to currentUI_ViewPtr}
+        assert (false); // we don't want to use this, since the visible grid is directly connected to gridRefUI}
         return true;
     }
     virtual bool DeleteRows( size_t pos = 0, size_t numRows = 1 )
     {
-        assert (false); // we don't want to use this, since the visible grid is directly connected to currentUI_ViewPtr}
+        assert (false); // we don't want to use this, since the visible grid is directly connected to gridRefUI}
         return true;
     }
 
     //update dimensions of grid: no need for InsertRows, AppendRows, DeleteRows anymore!!!
     void updateGridSizes()
     {
-        if (currentUI_ViewPtr)
+        if (gridRefUI)
         {
             int currentNrRows = GetNumberRows();
 
             if (lastNrRows < currentNrRows)
             {
-                if ( GetView() )
+                if (GetView())
                 {
                     wxGridTableMessage msg(this,
                                            wxGRIDTABLE_NOTIFY_ROWS_APPENDED,
@@ -144,7 +218,7 @@ public:
             }
             else if (lastNrRows > currentNrRows)
             {
-                if ( GetView() )
+                if (GetView())
                 {
                     wxGridTableMessage msg(this,
                                            wxGRIDTABLE_NOTIFY_ROWS_DELETED,
@@ -160,18 +234,19 @@ public:
 //###########################################################################
 
 
-    bool markThisRow(int row)
+    bool markThisRow(int row) //rows that are filtered out are shown in different color
     {
-        if (currentUI_ViewPtr)
+        if (gridRefUI)
         {
-            if (unsigned(row) < currentUI_ViewPtr->size())
+            if (unsigned(row) < gridRefUI->size())
             {
-                if ((*currentUI_ViewPtr)[row].cmpResult == constFilteredOut)
+                if (!(*gridData)[(*gridRefUI)[row]].selectedForSynchronization)
                     return true;
             }
         }
         return false;
     }
+
 
     wxGridCellAttr* GetAttr(int row, int col, wxGridCellAttr::wxAttrKind  kind)
     {
@@ -188,7 +263,7 @@ public:
             }
 
             if (markThisRow(row))
-                result->SetBackgroundColour(*lightBlue);
+                result->SetBackgroundColour(lightBlue);
             else
                 result->SetBackgroundColour(*wxWHITE);
         }
@@ -196,16 +271,17 @@ public:
         {
             result = new wxGridCellAttr;
             if (markThisRow(row))
-                result->SetBackgroundColour(*lightBlue);
+                result->SetBackgroundColour(lightBlue);
         }
 
         return result;
     }
 
 private:
-    wxColour* lightBlue;
+    wxColour  lightBlue;
     int       gridIdentifier;
-    UI_Grid*  currentUI_ViewPtr; //(fast) access to underlying grid data :)
+    GridView* gridRefUI; //(very fast) access to underlying grid data :)
+    FileCompareResult* gridData;
     int       lastNrRows;
 };
 
@@ -213,20 +289,23 @@ private:
 
 //########################################################################################################
 
-CustomGrid::CustomGrid( wxWindow *parent,
-                        wxWindowID id,
-                        const wxPoint& pos,
-                        const wxSize& size,
-                        long style,
-                        const wxString& name)
-        : wxGrid(parent, id, pos, size, style, name),
+CustomGrid::CustomGrid(wxWindow *parent,
+                       wxWindowID id,
+                       const wxPoint& pos,
+                       const wxSize& size,
+                       long style,
+                       const wxString& name) :
+        wxGrid(parent, id, pos, size, style, name),
         scrollbarsEnabled(true),
         m_grid1(0), m_grid2(0), m_grid3(0),
         gridDataTable(0),
         currentSortColumn(-1),
-        sortMarker(0) {}
+        sortMarker(0)
+{}
+
 
 CustomGrid::~CustomGrid() {}
+
 
 bool CustomGrid::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
 {
@@ -255,6 +334,44 @@ void CustomGrid::SetScrollbar(int orientation, int position, int thumbSize, int 
 }
 
 
+//ensure that all grids are properly aligned: add some extra window space to grids that have no horizontal scrollbar
+void CustomGrid::adjustGridHeights() //m_grid1, m_grid2, m_grid3 are not NULL in this context
+{
+    int y1 = 0;
+    int y2 = 0;
+    int y3 = 0;
+    int dummy = 0;
+
+    m_grid1->GetViewStart(&dummy, &y1);
+    m_grid2->GetViewStart(&dummy, &y2);
+    m_grid3->GetViewStart(&dummy, &y3);
+
+    if (y1 != y2 || y2 != y3)
+    {
+        int yMax = max(y1, max(y2, y3));
+
+        if (leadingPanel == 1)  //do not handle case (y1 == yMax) here!!! Avoid back coupling!
+            m_grid1->SetMargins(0, 0);
+        else if (y1 < yMax)
+            m_grid1->SetMargins(0, 50);
+
+        if (leadingPanel == 2)
+            m_grid2->SetMargins(0, 0);
+        else if (y2 < yMax)
+            m_grid2->SetMargins(0, 50);
+
+        if (leadingPanel == 3)
+            m_grid3->SetMargins(0, 0);
+        else if (y3 < yMax)
+            m_grid3->SetMargins(0, 50);
+
+        m_grid1->ForceRefresh();
+        m_grid2->ForceRefresh();
+        m_grid3->ForceRefresh();
+    }
+}
+
+
 //this method is called when grid view changes: useful for parallel updating of multiple grids
 void CustomGrid::DoPrepareDC(wxDC& dc)
 {
@@ -266,24 +383,32 @@ void CustomGrid::DoPrepareDC(wxDC& dc)
         GetViewStart(&x, &y);
         m_grid2->Scroll(x, y);
         m_grid3->Scroll(-1, y); //scroll in y-direction only
+        adjustGridHeights(); //keep here to ensure m_grid1, m_grid2, m_grid3 != NULL
     }
     else if (leadingPanel == 2 && this == m_grid2)   //avoid back coupling
     {
         GetViewStart(&x, &y);
         m_grid1->Scroll(x, y);
         m_grid3->Scroll(-1, y);
+        adjustGridHeights(); //keep here to ensure m_grid1, m_grid2, m_grid3 != NULL
     }
     else if (leadingPanel == 3 && this == m_grid3)   //avoid back coupling
     {
         GetViewStart(&x, &y);
         m_grid1->Scroll(-1, y);
         m_grid2->Scroll(-1, y);
+        adjustGridHeights(); //keep here to ensure m_grid1, m_grid2, m_grid3 != NULL
     }
 }
+
 
 //these classes will scroll together, hence the name ;)
 void CustomGrid::setScrollFriends(CustomGrid* grid1, CustomGrid* grid2, CustomGrid* grid3)
 {
+    assert(grid1);
+    assert(grid2);
+    assert(grid3);
+
     m_grid1 = grid1;
     m_grid2 = grid2;
     m_grid3 = grid3;
@@ -300,11 +425,11 @@ void CustomGrid::setScrollFriends(CustomGrid* grid1, CustomGrid* grid2, CustomGr
 }
 
 
-void CustomGrid::setGridDataTable(UI_Grid* currentUI_ViewPtr)
+void CustomGrid::setGridDataTable(GridView* gridRefUI, FileCompareResult* gridData)
 {
     //set underlying grid data
     assert(gridDataTable);
-    gridDataTable->setGridDataTable(currentUI_ViewPtr);
+    gridDataTable->setGridDataTable(gridRefUI, gridData);
 }
 
 
@@ -322,7 +447,7 @@ void CustomGrid::setSortMarker(const int sortColumn, const wxBitmap* bitmap)
 }
 
 
-void CustomGrid::DrawColLabel( wxDC& dc, int col )
+void CustomGrid::DrawColLabel(wxDC& dc, int col)
 {
     assert(0 <= col && col < 4);
 

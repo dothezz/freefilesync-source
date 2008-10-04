@@ -34,6 +34,8 @@
 */
 class WorkerThread : public wxThread
 {
+    friend class UpdateWhileExecuting;
+
 public:
     WorkerThread(UpdateWhileExecuting* handler) :
             readyToBeginProcessing(),
@@ -43,7 +45,9 @@ public:
             threadHandler(handler)
     { }
 
+
     ~WorkerThread() {}
+
 
     ExitCode Entry()
     {
@@ -71,7 +75,7 @@ public:
         return 0;
     }
 
-
+private:
     wxMutex     readyToBeginProcessing;
     wxCondition beginProcessing;
 
@@ -80,8 +84,6 @@ public:
     bool threadIsInitialized;
     bool threadExitIsRequested;
 
-
-private:
     UpdateWhileExecuting* threadHandler;
 };
 

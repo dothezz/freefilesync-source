@@ -5,17 +5,22 @@
 #include "library/globalFunctions.h"
 #include <wx/filename.h>
 #include <fstream>
-#include "ui/resources.h"
+#include "library/resources.h"
 #include <sys/stat.h>
 
 #ifdef FFS_WIN
 #include <windows.h>
 #endif  // FFS_WIN
 
+#ifdef FFS_LINUX
+#include <utime.h>
+#endif  // FFS_LINUX
+
+
 using namespace globalFunctions;
 
-const wxString FreeFileSync::FFS_ConfigFileID = "FFS_CONFIG";
-const wxString FreeFileSync::FFS_LastConfigFile = "LastRun.FFS";
+const wxString FreeFileSync::FFS_ConfigFileID   = "FFS_CONFIG";
+const wxString FreeFileSync::FFS_LastConfigFile = "LastRun.ffs";
 
 inline
 wxString formatTime(unsigned int number)
@@ -85,13 +90,13 @@ void FreeFileSync::getFileInformation(FileInfo& output, const wxString& filename
 
 #else
     struct stat fileInfo;
-    if (stat (filename.c_str(), &fileInfo) != 0)
+    if (stat(filename.c_str(), &fileInfo) != 0)
         throw FileError(wxString(_("Could not retrieve file info for: ")) + "\"" + filename + "\"");
 
-    struct tm * timeinfo;
+    tm* timeinfo;
     timeinfo = localtime(&fileInfo.st_mtime);
     char buffer [50];
-    strftime (buffer,50,"%Y-%m-%d  %H:%M:%S",timeinfo);
+    strftime(buffer,50,"%Y-%m-%d  %H:%M:%S",timeinfo);
 
     //local time
     output.lastWriteTime = buffer;
@@ -664,7 +669,7 @@ public:
         fileOp.hNameMappings         = NULL;
         fileOp.lpszProgressTitle     = NULL;
 
-        if (fileOperation(&fileOp   //Pointer to an SHFILEOPSTRUCT structure that contains information the function needs to carry out.
+        if (fileOperation(&fileOp   //pointer to an SHFILEOPSTRUCT structure that contains information the function needs to carry out
                          ) != 0 || fileOp.fAnyOperationsAborted) throw FileError(wxString(_("Error moving file ")) + "\"" + filename + "\"" + _(" to recycle bin!"));
 #endif  // FFS_WIN
     }
@@ -695,8 +700,8 @@ void FreeFileSync::removeFile(const wxString& filename)
 
 #ifdef FFS_WIN
     if (!SetFileAttributes(
-                filename.c_str(), // address of filename
-                FILE_ATTRIBUTE_NORMAL	 	// address of attributes to set
+                filename.c_str(),     // address of filename
+                FILE_ATTRIBUTE_NORMAL // attributes to set
             )) throw FileError(wxString(_("Error deleting file ")) + "\"" + filename + "\"");
 #endif  // FFS_WIN
 
@@ -732,9 +737,17 @@ void FreeFileSync::removeDirectory(const wxString& directory)
     dirList.Insert(directory, 0);   //this directory will be deleted last
 
     for (int j = int(dirList.GetCount()) - 1; j >= 0 ; --j)
+    {
+#ifdef FFS_WIN
+        if (!SetFileAttributes(
+                    dirList[j].c_str(),   // address of directory name
+                    FILE_ATTRIBUTE_NORMAL // attributes to set
+                )) throw FileError(wxString(_("Error deleting directory ")) + "\"" + dirList[j] + "\"");
+#endif  // FFS_WIN
 
         if (!wxRmdir(dirList[j]))
             throw FileError(wxString(_("Error deleting directory ")) + "\"" + dirList[j] + "\"");
+    }
 }
 
 
@@ -793,11 +806,40 @@ public:
     wxString source;
     wxString target;
     bool success;
+    wxString errorMessage;
 
 private:
     void longRunner() //virtual method implementation
     {
-        success = wxCopyFile(source, target, false); //abort if file exists
+        if (!wxCopyFile(source, target, false)) //abort if file exists
+        {
+            success = false;
+            errorMessage = wxString(_("Error copying file ")) + "\"" + source + "\"" + _(" to ") + "\"" + target + "\"";
+            return;
+        }
+
+#ifdef FFS_LINUX //copying files with Linux does not preserve the modification time => adapt after copying
+        struct stat fileInfo;
+        if (stat(source.c_str(), &fileInfo) != 0) //read modification time from source file
+        {
+            success = false;
+            errorMessage = wxString(_("Could not retrieve file info for: ")) + "\"" + source + "\"";
+            return;
+        }
+
+        utimbuf newTimes;
+        newTimes.actime  = fileInfo.st_mtime;
+        newTimes.modtime = fileInfo.st_mtime;
+
+        if (utime(target.c_str(), &newTimes) != 0)
+        {
+            success = false;
+            errorMessage = wxString(_("Error adapting modification time of file ")) + "\"" + target + "\"";
+            return;
+        }
+#endif  // FFS_LINUX
+
+        success = true;
     }
 
     wxLogNull* noWxLogs;
@@ -818,7 +860,7 @@ void FreeFileSync::copyfileMultithreaded(const wxString& source, const wxString&
 
     //no mutex needed here since longRunner is finished
     if (!copyAndUpdate.success)
-        throw FileError(wxString(_("Error copying file ")) + "\"" + source + "\"" + _(" to ") + "\"" + target + "\"");
+        throw FileError(copyAndUpdate.errorMessage);
 }
 
 
@@ -874,30 +916,73 @@ SyncDirection getSyncDirection(const CompareFilesResult cmpResult, const SyncCon
 }
 
 
-bool getBytesToTransfer(double& result, const FileCompareLine& fileCmpLine, const SyncConfiguration& config)
+bool getBytesToTransfer(int& objectsToCreate,
+                        int& objectsToOverwrite,
+                        int& objectsToDelete,
+                        double& dataToProcess,
+                        const FileCompareLine& fileCmpLine,
+                        const SyncConfiguration& config)
 {   //false if nothing has to be done
 
-    result = 0;  //always initialize variables
+    objectsToCreate    = 0;  //always initialize variables
+    objectsToOverwrite = 0;
+    objectsToDelete    = 0;
+    dataToProcess      = 0;
 
     //do not add filtered entries
     if (!fileCmpLine.selectedForSynchronization)
         return false;
 
+
     switch (fileCmpLine.cmpResult)
     {
     case fileOnLeftSideOnly:
+        //get data to process
+        switch (getSyncDirection(fileCmpLine.cmpResult, config))
+        {
+        case syncDirLeft:   //delete file on left
+            dataToProcess   = 0;
+            objectsToDelete = 1;
+            break;
+        case syncDirRight:  //copy from left to right
+            dataToProcess = fileCmpLine.fileDescrLeft.fileSize.ToDouble();
+            objectsToCreate = 1;
+            break;
+        case syncDirNone:
+            return false;
+        }
+        break;
+
     case fileOnRightSideOnly:
-    case leftFileNewer:
-    case rightFileNewer:
-    case filesDifferent:
         switch (getSyncDirection(fileCmpLine.cmpResult, config))
         {
         case syncDirLeft:   //copy from right to left
-            result = fileCmpLine.fileDescrRight.fileSize.ToDouble();
-            return true;
+            dataToProcess   = fileCmpLine.fileDescrRight.fileSize.ToDouble();;
+            objectsToCreate = 1;
+            break;
+        case syncDirRight:  //delete file on right
+            dataToProcess   = 0;
+            objectsToDelete = 1;
+            break;
+        case syncDirNone:
+            return false;
+        }
+        break;
+
+    case leftFileNewer:
+    case rightFileNewer:
+    case filesDifferent:
+        //get data to process
+        switch (getSyncDirection(fileCmpLine.cmpResult, config))
+        {
+        case syncDirLeft:   //copy from right to left
+            dataToProcess = fileCmpLine.fileDescrRight.fileSize.ToDouble();
+            objectsToOverwrite = 1;
+            break;
         case syncDirRight:  //copy from left to right
-            result = fileCmpLine.fileDescrLeft.fileSize.ToDouble();
-            return true;
+            dataToProcess = fileCmpLine.fileDescrLeft.fileSize.ToDouble();
+            objectsToOverwrite = 1;
+            break;
         case syncDirNone:
             return false;
         }
@@ -911,19 +996,31 @@ bool getBytesToTransfer(double& result, const FileCompareLine& fileCmpLine, cons
 }
 
 
-void FreeFileSync::calcTotalBytesToSync(int& objectsTotal, double& dataTotal, const FileCompareResult& fileCmpResult, const SyncConfiguration& config)
+void FreeFileSync::calcTotalBytesToSync(int& objectsToCreate,
+                                        int& objectsToOverwrite,
+                                        int& objectsToDelete,
+                                        double& dataToProcess,
+                                        const FileCompareResult& fileCmpResult,
+                                        const SyncConfiguration& config)
 {
-    objectsTotal = 0;
-    dataTotal    = 0;
+    objectsToCreate    = 0;
+    objectsToOverwrite = 0;
+    objectsToDelete    = 0;
+    dataToProcess      = 0;
 
-    double tmp = 0;
+    int toCreate    = 0;
+    int toOverwrite = 0;
+    int toDelete    = 0;
+    double data     = 0;
 
     for (FileCompareResult::const_iterator i = fileCmpResult.begin(); i != fileCmpResult.end(); ++i)
     {   //only sum up sizes of files AND directories
-        if (getBytesToTransfer(tmp, *i, config))
+        if (getBytesToTransfer(toCreate, toOverwrite, toDelete, data, *i, config))
         {
-            dataTotal+= tmp;
-            ++objectsTotal;
+            objectsToCreate+=    toCreate;
+            objectsToOverwrite+= toOverwrite;
+            objectsToDelete+=    toDelete;
+            dataToProcess+=      data;
         }
     }
 }
@@ -1149,17 +1246,17 @@ wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
             temp = "Error";
             break;
         case 1:
-            temp = wxString("0") + GlobalResources::floatingPointSeparator + "0" + temp;
+            temp = wxString("0") + GlobalResources::decimalPoint + "0" + temp;
             break; //0,01
         case 2:
-            temp = wxString("0") + GlobalResources::floatingPointSeparator + temp;
+            temp = wxString("0") + GlobalResources::decimalPoint + temp;
             break; //0,11
         case 3:
-            temp.insert(1, GlobalResources::floatingPointSeparator);
+            temp.insert(1, GlobalResources::decimalPoint);
             break; //1,11
         case 4:
             temp = temp.substr(0, 3);
-            temp.insert(2, GlobalResources::floatingPointSeparator);
+            temp.insert(2, GlobalResources::decimalPoint);
             break; //11,1
         case 5:
             temp = temp.substr(0, 3);
@@ -1296,7 +1393,7 @@ bool deletionImminent(const FileCompareLine& line, const SyncConfiguration& conf
 }
 
 
-class AlwaysWriteResult //this class ensures, that the result of the method below is ALWAYS written on exit, even if exceptions were thrown!
+class AlwaysWriteResult //this class ensures, that the result of the method below is ALWAYS written on exit, even if exceptions are thrown!
 {
 public:
     AlwaysWriteResult(FileCompareResult& grid) :
@@ -1327,10 +1424,18 @@ void FreeFileSync::startSynchronizationProcess(FileCompareResult& grid, const Sy
     AlwaysWriteResult writeOutput(grid);  //ensure that grid is always written to, even if method is exitted via exceptions
 
     //inform about the total amount of data that will be processed from now on
-    int objectsTotal = 0;
-    double dataTotal = 0;
-    FreeFileSync::calcTotalBytesToSync(objectsTotal, dataTotal, grid, config);
-    statusUpdater->initNewProcess(objectsTotal, dataTotal, FreeFileSync::synchronizeFilesProcess);
+    int objectsToCreate    = 0;
+    int objectsToOverwrite = 0;
+    int objectsToDelete    = 0;
+    double dataToProcess   = 0;
+    calcTotalBytesToSync(objectsToCreate,
+                         objectsToOverwrite,
+                         objectsToDelete,
+                         dataToProcess,
+                         grid,
+                         config);
+
+    statusUpdater->initNewProcess(objectsToCreate + objectsToOverwrite + objectsToDelete, dataToProcess, FreeFileSync::synchronizeFilesProcess);
 
     try
     {
@@ -1396,10 +1501,19 @@ void FreeFileSync::startSynchronizationProcess(FileCompareResult& grid, const Sy
                                 if (fileSyncObject.synchronizeFile(*i, config, statusUpdater))
                                 {
                                     //progress indicator update
-                                    //indicator is updated only if file is synched correctly (and if some sync was done)!
-                                    double processedData = 0;
-                                    if (getBytesToTransfer(processedData, *i, config))  //update status if some work was done (answer is always "yes" in this context)
-                                        statusUpdater->updateProcessedData(1, processedData);
+                                    //indicator is updated only if file is sync'ed correctly (and if some sync was done)!
+                                    int objectsToCreate    = 0;
+                                    int objectsToOverwrite = 0;
+                                    int objectsToDelete    = 0;
+                                    double dataToProcess   = 0;
+
+                                    if (getBytesToTransfer(objectsToCreate,
+                                                           objectsToOverwrite,
+                                                           objectsToDelete,
+                                                           dataToProcess,
+                                                           *i,
+                                                           config))  //update status if some work was done (answer is always "yes" in this context)
+                                        statusUpdater->updateProcessedData(objectsToCreate + objectsToOverwrite + objectsToDelete, dataToProcess);
                                 }
 
                                 writeOutput.rowProcessedSuccessfully(i - grid.begin());
@@ -1493,12 +1607,10 @@ void FreeFileSync::deleteOnGridAndHD(FileCompareResult& grid, const set<int>& ro
                     fileSyncObject.removeDirectory(currentCmpLine.fileDescrRight.filename);
 
                 rowsToDeleteInGrid.insert(*i);
-
                 break;
             }
             catch (FileError& error)
             {
-
                 //if (updateClass) -> is mandatory
                 int rv = statusUpdater->reportError(error.show());
 
@@ -1521,8 +1633,31 @@ void FreeFileSync::deleteOnGridAndHD(FileCompareResult& grid, const set<int>& ro
     for (set<int>::iterator i = additionalRowsToDelete.begin(); i != additionalRowsToDelete.end(); ++i)
         rowsToDeleteInGrid.insert(*i);
 
-
     //remove deleted rows from grid
     removeRowsFromVector(grid, rowsToDeleteInGrid);
 }
 
+
+void updateUI_Now()
+{
+    //process UI events and prevent application from "not responding"   -> NO performance issue!
+    wxTheApp->Yield();
+
+    //    while (wxTheApp->Pending())
+    //        wxTheApp->Dispatch();
+}
+
+
+bool updateUI_IsAllowed()
+{
+    static wxLongLong lastExec = 0;
+
+    wxLongLong newExec = wxGetLocalTimeMillis();
+
+    if (newExec - lastExec >= uiUpdateInterval)  //perform ui updates not more often than necessary
+    {
+        lastExec = newExec;
+        return true;
+    }
+    return false;
+}

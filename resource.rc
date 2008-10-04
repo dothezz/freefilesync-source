@@ -1,2 +1,2 @@
 #include "wx/msw/wx.rc"
-aaaa ICON DISCARDABLE "FreeFileSync.ico"
+winIcon ICON DISCARDABLE "library/FreeFileSync.ico"
