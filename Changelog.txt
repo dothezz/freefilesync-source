@@ -1,6 +1,16 @@
 FreeFileSync
 ------------
 
+Changelog v1.7
+--------------
+Display only those view filter buttons that are actually needed
+Compare by size and date: last write time may differ by up to 2 seconds (NTFS vs FAT32)
+Fixed minor issue with trailing path separator when creating batch jobs
+Fixed minor issue with window sizes not being remembered in some special situation
+Further improved Unicode compliance
+Updated German translation
+
+
 Changelog v1.6
 --------------
 Significantly improved speed of filtering files and view (< 10 ms for > 200.000 rows(!))
@@ -14,6 +24,7 @@ Recycle Bin usage as commandline parameter
 New menu bar
 Program language selectable from menu
 UI-option to create sync jobs (batch files) for automated synchronization
+Updated German translation
 
 
 Changelog v1.5

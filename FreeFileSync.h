@@ -13,15 +13,15 @@ using namespace std;
 
 enum SyncDirection
 {
-    syncDirLeft,
-    syncDirRight,
-    syncDirNone
+    SYNC_DIR_LEFT,
+    SYNC_DIR_RIGHT,
+    SYNC_DIR_NONE
 };
 
 enum CompareVariant
 {
-    compareByContent,
-    compareByTimeAndSize
+    CMP_BY_CONTENT,
+    CMP_BY_TIME_SIZE
 };
 
 struct SyncConfiguration
@@ -47,27 +47,27 @@ struct Configuration
     bool filterIsActive;
 
     //other options
-    bool useRecycleBin;     //use Recycle bin when deleting or overwriting files while synchronizing
+    bool useRecycleBin;    //use Recycle bin when deleting or overwriting files while synchronizing
     bool continueOnError; //hides error messages during synchronization
 };
 
 struct FileInfo
 {
-    wxULongLong fileSize;
+    wxULongLong fileSize; //unit: bytes!
     wxString lastWriteTime;
-    wxULongLong lastWriteTimeRaw;
+    wxULongLong lastWriteTimeRaw; //unit: seconds!
 };
 
 enum ObjectType
 {
-    isNothing,
-    isDirectory,
-    isFile
+    TYPE_NOTHING,
+    TYPE_DIRECTORY,
+    TYPE_FILE
 };
 
 struct FileDescrLine
 {
-    FileDescrLine() : objType(isNothing) {}
+    FileDescrLine() : objType(TYPE_NOTHING) {}
 
     wxString filename;  // == directory + relFilename
     wxString directory; //directory to be synced
@@ -117,12 +117,12 @@ typedef set<FileDescrLine> DirectoryDescrType;
 
 enum CompareFilesResult
 {
-    fileOnLeftSideOnly,
-    fileOnRightSideOnly,
-    rightFileNewer,
-    leftFileNewer,
-    filesDifferent,
-    filesEqual
+    FILE_LEFT_SIDE_ONLY,
+    FILE_RIGHT_SIDE_ONLY,
+    FILE_RIGHT_NEWER,
+    FILE_LEFT_NEWER,
+    FILE_DIFFERENT,
+    FILE_EQUAL
 };
 
 
@@ -237,8 +237,8 @@ public:
 
     static bool isFFS_ConfigFile(const wxString& filename);
 
-    static const wxString FFS_ConfigFileID;
-    static const wxString FFS_LastConfigFile;
+    static const string   FfsConfigFileID;
+    static const wxString FfsLastConfigFile;
 
     static void getFileInformation(FileInfo& output, const wxString& filename);
 
@@ -266,7 +266,7 @@ class FileError //Exception class used to notify file/directory copy/delete erro
 public:
     FileError(const wxString& txt) : errorMessage(txt) {}
 
-    wxString show()
+    wxString show() const
     {
         return errorMessage;
     }

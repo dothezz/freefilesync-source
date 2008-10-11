@@ -1,4 +1,4 @@
-FreeFileSync v1.6
+FreeFileSync v1.7
 ----------------- 
 
 Usage
@@ -30,14 +30,13 @@ Features
 8. Easy configurable commandline mode for automated synchronization.
 9. Support for filesizes > 4 GB.
 10. Option to move files to Recycle Bin instead of deleting/overwriting them.
-11. UTC (coordinated world time) is used when comparing file times avoiding problems with time zones or daylight saving time.
-12. Automatically ignore directories "\RECYCLER" and "System Volume Information" when comparing and syncing.
-13. Localized German version available.
-14. Delete before copy: Avoid disc space shortages with large sync-operations.
-15. Based on wxWidgets framework => Portable to many operating systems.
-16. Filter functionality to include/exclude files from synchronization (without re-compare!).
-17. Include/exclude specific files from synchronization manually.
-18. Create sync jobs via GUI to synchronize automatically (can be scheduled or executed directly).
+11. Automatically ignore directories "\RECYCLER" and "System Volume Information" when comparing and syncing.
+12. Localized German version available.
+13. Delete before copy: Avoid disc space shortages with large sync-operations.
+14. Based on wxWidgets framework => Portable to many operating systems.
+15. Filter functionality to include/exclude files from synchronization (without re-compare!).
+16. Include/exclude specific files from synchronization manually.
+17. Create sync jobs via GUI to synchronize automatically (can be scheduled or executed directly).
 
 
 Links

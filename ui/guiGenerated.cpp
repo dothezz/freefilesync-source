@@ -72,7 +72,7 @@ GuiGenerated::GuiGenerated( wxWindow* parent, wxWindowID id, const wxString& tit
 	bSizer6 = new wxBoxSizer( wxHORIZONTAL );
 	
 	
-	bSizer6->Add( 40, 0, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer6->Add( 15, 0, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxBoxSizer* bSizer30;
 	bSizer30 = new wxBoxSizer( wxHORIZONTAL );
@@ -145,7 +145,7 @@ GuiGenerated::GuiGenerated( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	m_hyperlinkCfgFilter->SetNormalColour( wxColour( 0, 0, 255 ) );
 	m_hyperlinkCfgFilter->SetVisitedColour( wxColour( 0, 0, 255 ) );
-	m_hyperlinkCfgFilter->SetBackgroundColour( wxColour( 128, 128, 150 ) );
+	m_hyperlinkCfgFilter->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
 	
 	bSizer23->Add( m_hyperlinkCfgFilter, 0, wxALL, 5 );
 	
@@ -172,7 +172,7 @@ GuiGenerated::GuiGenerated( wxWindow* parent, wxWindowID id, const wxString& tit
 	bSizer6->Add( m_bpButtonSync, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
 	
-	bSizer6->Add( 40, 0, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer6->Add( 15, 0, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_panel71->SetSizer( bSizer6 );
 	m_panel71->Layout();
@@ -340,16 +340,6 @@ GuiGenerated::GuiGenerated( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_panel4 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	bSizer3 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_bpButton11 = new wxBitmapButton( m_panel4, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 50,50 ), wxBU_AUTODRAW );
-	m_bpButton11->SetToolTip( _("About") );
-	
-	m_bpButton11->SetToolTip( _("About") );
-	
-	bSizer3->Add( m_bpButton11, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-	
-	
-	bSizer3->Add( 0, 0, 1, wxEXPAND, 5 );
-	
 	wxBoxSizer* bSizer58;
 	bSizer58 = new wxBoxSizer( wxVERTICAL );
 	
@@ -371,85 +361,87 @@ GuiGenerated::GuiGenerated( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	sbSizer16->Add( m_choiceLoad, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	bSizer58->Add( sbSizer16, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer58->Add( sbSizer16, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
 	
 	bSizer58->Add( 0, 4, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	bSizer3->Add( bSizer58, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer3->Add( bSizer58, 1, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	
-	bSizer3->Add( 0, 0, 1, wxEXPAND, 5 );
-	
-	bSizer59 = new wxBoxSizer( wxVERTICAL );
+	m_panel12 = new wxPanel( m_panel4, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxBoxSizer* bSizer64;
+	bSizer64 = new wxBoxSizer( wxVERTICAL );
 	
 	wxStaticBoxSizer* sbSizer31;
-	sbSizer31 = new wxStaticBoxSizer( new wxStaticBox( m_panel4, wxID_ANY, _("Filter view") ), wxHORIZONTAL );
+	sbSizer31 = new wxStaticBoxSizer( new wxStaticBox( m_panel12, wxID_ANY, _("Filter view") ), wxHORIZONTAL );
 	
-	m_bpButton20 = new wxBitmapButton( m_panel4, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
-	m_bpButton20->SetToolTip( _("Files that exist on left view only") );
+	sbSizer31->SetMinSize( wxSize( 100,-1 ) ); 
 	
-	m_bpButton20->SetToolTip( _("Files that exist on left view only") );
+	sbSizer31->Add( 0, 0, 1, wxEXPAND, 5 );
 	
-	sbSizer31->Add( m_bpButton20, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	m_bpButtonLeftOnly = new wxBitmapButton( m_panel12, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
+	m_bpButtonLeftOnly->SetToolTip( _("Show files that exist on left side only") );
 	
-	m_bpButton21 = new wxBitmapButton( m_panel4, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
-	m_bpButton21->SetToolTip( _("Files that are newer on left") );
+	m_bpButtonLeftOnly->SetToolTip( _("Show files that exist on left side only") );
 	
-	m_bpButton21->SetToolTip( _("Files that are newer on left") );
+	sbSizer31->Add( m_bpButtonLeftOnly, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	sbSizer31->Add( m_bpButton21, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	m_bpButtonLeftNewer = new wxBitmapButton( m_panel12, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
+	m_bpButtonLeftNewer->SetToolTip( _("Show files that are newer on left") );
 	
-	m_bpButton25 = new wxBitmapButton( m_panel4, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
-	m_bpButton25->SetToolTip( _("Files that are equal") );
+	m_bpButtonLeftNewer->SetToolTip( _("Show files that are newer on left") );
 	
-	m_bpButton25->SetToolTip( _("Files that are equal") );
+	sbSizer31->Add( m_bpButtonLeftNewer, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	sbSizer31->Add( m_bpButton25, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	m_bpButtonEqual = new wxBitmapButton( m_panel12, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
+	m_bpButtonEqual->SetToolTip( _("Show files that are equal") );
 	
-	m_bpButton22 = new wxBitmapButton( m_panel4, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
-	m_bpButton22->SetToolTip( _("Files that are different") );
+	m_bpButtonEqual->SetToolTip( _("Show files that are equal") );
 	
-	m_bpButton22->SetToolTip( _("Files that are different") );
+	sbSizer31->Add( m_bpButtonEqual, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	sbSizer31->Add( m_bpButton22, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	m_bpButtonDifferent = new wxBitmapButton( m_panel12, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
+	m_bpButtonDifferent->SetToolTip( _("Show files that are different") );
 	
-	m_bpButton23 = new wxBitmapButton( m_panel4, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
-	m_bpButton23->SetToolTip( _("Files that are newer on right") );
+	m_bpButtonDifferent->SetToolTip( _("Show files that are different") );
 	
-	m_bpButton23->SetToolTip( _("Files that are newer on right") );
+	sbSizer31->Add( m_bpButtonDifferent, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	sbSizer31->Add( m_bpButton23, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	m_bpButtonRightNewer = new wxBitmapButton( m_panel12, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
+	m_bpButtonRightNewer->SetToolTip( _("Show files that are newer on right") );
 	
-	m_bpButton24 = new wxBitmapButton( m_panel4, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
-	m_bpButton24->SetToolTip( _("Files that exist on right view only") );
+	m_bpButtonRightNewer->SetToolTip( _("Show files that are newer on right") );
 	
-	m_bpButton24->SetToolTip( _("Files that exist on right view only") );
+	sbSizer31->Add( m_bpButtonRightNewer, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	sbSizer31->Add( m_bpButton24, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	m_bpButtonRightOnly = new wxBitmapButton( m_panel12, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
+	m_bpButtonRightOnly->SetToolTip( _("Show files that exist on right side only") );
 	
-	bSizer59->Add( sbSizer31, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	m_bpButtonRightOnly->SetToolTip( _("Show files that exist on right side only") );
 	
-	
-	bSizer59->Add( 0, 4, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	bSizer3->Add( bSizer59, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizer31->Add( m_bpButtonRightOnly, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
-	bSizer3->Add( 0, 0, 1, wxEXPAND, 5 );
+	sbSizer31->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	bSizer64->Add( sbSizer31, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	bSizer3->Add( 185, 0, 0, wxALL, 5 );
+	m_panel12->SetSizer( bSizer64 );
+	m_panel12->Layout();
+	bSizer64->Fit( m_panel12 );
+	bSizer3->Add( m_panel12, 0, wxALIGN_CENTER_VERTICAL|wxBOTTOM, 4 );
 	
-	
-	bSizer3->Add( 0, 0, 1, wxEXPAND, 5 );
+	wxBoxSizer* bSizer66;
+	bSizer66 = new wxBoxSizer( wxVERTICAL );
 	
 	m_bpButton10 = new wxBitmapButton( m_panel4, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 50,50 ), wxBU_AUTODRAW );
 	m_bpButton10->SetToolTip( _("Quit") );
 	
 	m_bpButton10->SetToolTip( _("Quit") );
 	
-	bSizer3->Add( m_bpButton10, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	bSizer66->Add( m_bpButton10, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_RIGHT|wxALL, 5 );
+	
+	bSizer3->Add( bSizer66, 1, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_panel4->SetSizer( bSizer3 );
 	m_panel4->Layout();
@@ -552,16 +544,15 @@ GuiGenerated::GuiGenerated( wxWindow* parent, wxWindowID id, const wxString& tit
 	m_grid2->Connect( wxEVT_GRID_CELL_LEFT_DCLICK, wxGridEventHandler( GuiGenerated::OnRightGridDoubleClick ), NULL, this );
 	m_grid2->Connect( wxEVT_GRID_CELL_RIGHT_CLICK, wxGridEventHandler( GuiGenerated::OnOpenContextMenu ), NULL, this );
 	m_grid2->Connect( wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler( GuiGenerated::OnSortRightGrid ), NULL, this );
-	m_bpButton11->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnAbout ), NULL, this );
 	m_bpButton201->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnSaveConfig ), NULL, this );
 	m_choiceLoad->Connect( wxEVT_CHAR, wxKeyEventHandler( GuiGenerated::OnChoiceKeyEvent ), NULL, this );
 	m_choiceLoad->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GuiGenerated::OnLoadConfiguration ), NULL, this );
-	m_bpButton20->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnLeftOnlyFiles ), NULL, this );
-	m_bpButton21->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnLeftNewerFiles ), NULL, this );
-	m_bpButton25->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnEqualFiles ), NULL, this );
-	m_bpButton22->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnDifferentFiles ), NULL, this );
-	m_bpButton23->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnRightNewerFiles ), NULL, this );
-	m_bpButton24->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnRightOnlyFiles ), NULL, this );
+	m_bpButtonLeftOnly->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnLeftOnlyFiles ), NULL, this );
+	m_bpButtonLeftNewer->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnLeftNewerFiles ), NULL, this );
+	m_bpButtonEqual->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnEqualFiles ), NULL, this );
+	m_bpButtonDifferent->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnDifferentFiles ), NULL, this );
+	m_bpButtonRightNewer->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnRightNewerFiles ), NULL, this );
+	m_bpButtonRightOnly->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnRightOnlyFiles ), NULL, this );
 	m_bpButton10->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnQuit ), NULL, this );
 }
 
@@ -596,16 +587,15 @@ GuiGenerated::~GuiGenerated()
 	m_grid2->Disconnect( wxEVT_GRID_CELL_LEFT_DCLICK, wxGridEventHandler( GuiGenerated::OnRightGridDoubleClick ), NULL, this );
 	m_grid2->Disconnect( wxEVT_GRID_CELL_RIGHT_CLICK, wxGridEventHandler( GuiGenerated::OnOpenContextMenu ), NULL, this );
 	m_grid2->Disconnect( wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler( GuiGenerated::OnSortRightGrid ), NULL, this );
-	m_bpButton11->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnAbout ), NULL, this );
 	m_bpButton201->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnSaveConfig ), NULL, this );
 	m_choiceLoad->Disconnect( wxEVT_CHAR, wxKeyEventHandler( GuiGenerated::OnChoiceKeyEvent ), NULL, this );
 	m_choiceLoad->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( GuiGenerated::OnLoadConfiguration ), NULL, this );
-	m_bpButton20->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnLeftOnlyFiles ), NULL, this );
-	m_bpButton21->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnLeftNewerFiles ), NULL, this );
-	m_bpButton25->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnEqualFiles ), NULL, this );
-	m_bpButton22->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnDifferentFiles ), NULL, this );
-	m_bpButton23->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnRightNewerFiles ), NULL, this );
-	m_bpButton24->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnRightOnlyFiles ), NULL, this );
+	m_bpButtonLeftOnly->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnLeftOnlyFiles ), NULL, this );
+	m_bpButtonLeftNewer->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnLeftNewerFiles ), NULL, this );
+	m_bpButtonEqual->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnEqualFiles ), NULL, this );
+	m_bpButtonDifferent->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnDifferentFiles ), NULL, this );
+	m_bpButtonRightNewer->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnRightNewerFiles ), NULL, this );
+	m_bpButtonRightOnly->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnRightOnlyFiles ), NULL, this );
 	m_bpButton10->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnQuit ), NULL, this );
 }
 
@@ -1245,7 +1235,7 @@ HelpDlgGenerated::HelpDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	
 	bSizer20->Add( 0, 5, 0, wxEXPAND, 5 );
 	
-	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, _("Compare by \"File size and date\"\n----------------------------------------\nThis compare variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. For the latter the system's UTC time (coordinated word time) is used internally, although the local file time is displayed on the result list. So there are no problems concerning different time zones or daylight saving time.\n\nWhen \"Compare\" is triggered with this option set the following decision tree is processed:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n          _________|_____________\n         |                  |                         |\n  left newer  right newer  different (but same date)\n\nAs a result 6 different status can be returned to categorize all files:\n\n- exists left only\n- exists right only\n- left newer\n- right newer\n- different (but same date)\n- equal\n\n\nCompare by \"File content\"\n----------------------------------------\nAs the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n\nAs a result the files are separated into the following categories:\n\n- exists left only\n- exists right only\n- different\n- equal"), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
+	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, _("Compare by \"File size and date\"\n----------------------------------------\nThis variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.  (Notice that the file time may deviate up to 2 seconds.)\n\nWhen \"Compare\" is triggered with this option set the following decision tree is processed:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n          _________|_____________\n         |                  |                         |\n  left newer  right newer  different (but same date)\n\nAs a result 6 different status can be returned to categorize all files:\n\n- exists left only\n- exists right only\n- left newer\n- right newer\n- different (but same date)\n- equal\n\n\nCompare by \"File content\"\n----------------------------------------\nAs the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n\nAs a result the files are separated into the following categories:\n\n- exists left only\n- exists right only\n- different\n- equal"), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
 	m_textCtrl8->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
 	
 	bSizer20->Add( m_textCtrl8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );

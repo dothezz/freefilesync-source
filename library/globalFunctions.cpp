@@ -71,7 +71,7 @@ int globalFunctions::wxStringToInt(const wxString& number)
     if (number.ToLong(&result))
         return result;
     else
-        throw std::runtime_error("Error when converting number to long");
+        throw RuntimeException(_("Error when converting wxString to long"));
 }
 
 
@@ -82,7 +82,7 @@ double globalFunctions::wxStringToDouble(const wxString& number)
     if (number.ToDouble(&result))
         return result;
     else
-        throw std::runtime_error("Error when converting number to double");
+        throw RuntimeException(_("Error when converting wxString to double"));
 }
 
 

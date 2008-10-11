@@ -12,7 +12,7 @@
 
 #include <wx/app.h>
 #include <wx/cmdline.h>
-#include <fstream>
+#include <wx/ffile.h>
 #include "FreeFileSync.h"
 #include "ui/smallDialogs.h"
 #include "library/misc.h"
@@ -36,8 +36,7 @@ private:
     void parseCommandline();
 
     bool applicationRunsOnCommandLineWithoutWindows;
-
-    ofstream logFile;
+    wxFFile logFile;
     CustomLocale programLanguage;
 
     int returnValue;
@@ -56,7 +55,7 @@ public:
     int reportError(const wxString& text);
     void triggerUI_Refresh();
 
-    void updateFinalStatus(const wxString& text);
+    void noSynchronizationNeeded();
 
 private:
     Application* app;
@@ -66,6 +65,7 @@ private:
 
     wxArrayString unhandledErrors;   //list of non-resolved errors
     int currentProcess;
+    bool synchronizationNeeded;
 };
 
 

@@ -86,18 +86,18 @@ private:
 class SyncStatus : public SyncStatusDlgGenerated
 {
 public:
-    SyncStatus(StatusUpdater* updater, wxWindow* parentWindow = 0);
+    SyncStatus(StatusUpdater* updater, wxWindow* parentWindow = NULL);
     ~SyncStatus();
 
     enum SyncStatusID
     {
-        statusAborted,
-        statusCompletedWithSuccess,
-        statusCompletedWithErrors,
-        statusPause,
-        statusScanning,
-        statusComparing,
-        statusSynchronizing
+        ABORTED,
+        FINISHED_WITH_SUCCESS,
+        FINISHED_WITH_ERROR,
+        PAUSE,
+        SCANNING,
+        COMPARING,
+        SYNCHRONIZING
     };
 
     void resetGauge(int totalObjectsToProcess, double totalDataToProcess);

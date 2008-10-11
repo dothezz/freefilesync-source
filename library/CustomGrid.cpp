@@ -53,29 +53,29 @@ public:
         if (selectedForSynchronization)
             switch (result)
             {
-            case fileOnLeftSideOnly:
-                return "<|";
+            case FILE_LEFT_SIDE_ONLY:
+                return wxT("<|");
                 break;
-            case fileOnRightSideOnly:
-                return "|>";
+            case FILE_RIGHT_SIDE_ONLY:
+                return wxT("|>");
                 break;
-            case rightFileNewer:
-                return ">>";
+            case FILE_RIGHT_NEWER:
+                return wxT(">>");
                 break;
-            case leftFileNewer:
-                return "<<";
+            case FILE_LEFT_NEWER:
+                return wxT("<<");
                 break;
-            case filesDifferent:
-                return "!=";
+            case FILE_DIFFERENT:
+                return wxT("!=");
                 break;
-            case filesEqual:
-                return "==";
+            case FILE_EQUAL:
+                return wxT("==");
                 break;
             default:
                 assert (false);
                 return wxEmptyString;
             }
-        else return "(-)";
+        else return wxT("(-)");
     }
 
 
@@ -93,7 +93,7 @@ public:
                 case 1:
                     if (col < 4)
                     {
-                        if (gridLine.fileDescrLeft.objType == isDirectory)
+                        if (gridLine.fileDescrLeft.objType == TYPE_DIRECTORY)
                         {
                             switch (col)
                             {
@@ -107,7 +107,7 @@ public:
                                 return gridLine.fileDescrLeft.lastWriteTime;
                             }
                         }
-                        else if (gridLine.fileDescrLeft.objType == isFile)
+                        else if (gridLine.fileDescrLeft.objType == TYPE_FILE)
                         {
                             switch (col)
                             {
@@ -127,7 +127,7 @@ public:
                 case 2:
                     if (col < 4)
                     {
-                        if (gridLine.fileDescrRight.objType == isDirectory)
+                        if (gridLine.fileDescrRight.objType == TYPE_DIRECTORY)
                         {
                             switch (col)
                             {
@@ -141,7 +141,7 @@ public:
                                 return gridLine.fileDescrRight.lastWriteTime;
                             }
                         }
-                        else if (gridLine.fileDescrRight.objType == isFile)
+                        else if (gridLine.fileDescrRight.objType == TYPE_FILE)
                         {
                             switch (col)
                             {
@@ -426,8 +426,7 @@ void CustomGrid::setScrollFriends(CustomGrid* grid1, CustomGrid* grid2, CustomGr
 
 
 void CustomGrid::setGridDataTable(GridView* gridRefUI, FileCompareResult* gridData)
-{
-    //set underlying grid data
+{   //set underlying grid data
     assert(gridDataTable);
     gridDataTable->setGridDataTable(gridRefUI, gridData);
 }

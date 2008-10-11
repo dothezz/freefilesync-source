@@ -9,8 +9,11 @@
 #endif //__BORLANDC__
 
 #ifndef WX_PRECOMP
-// Include your minimal set of headers here, or wx.h
 #include <wx/wx.h>
 #endif
+
+#ifdef WX_PRECOMP
+// put here all your rarely-changing header files
+#endif // WX_PRECOMP
 
 #endif // WXWIDGETS_H_INCLUDED

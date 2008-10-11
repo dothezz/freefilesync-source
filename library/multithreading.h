@@ -35,7 +35,7 @@ protected:
 };
 
 
-const int uiUpdateInterval = 100; //perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
+const int UI_UPDATE_INTERVAL = 100; //perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
 
 class WorkerThread;
 

@@ -3,15 +3,13 @@
 #include <wx/msgdlg.h>
 #include "resources.h"
 
-wxString exchangeEscapeChars(char* temp)
+void exchangeEscapeChars(wxString& data)
 {
-    wxString output(temp);
-    output.Replace("\\\\", "\\");
-    output.Replace("\\n", "\n");
-    output.Replace("\\t", "\t");
-    output.Replace("\"\"", """");
-    output.Replace("\\\"", "\"");
-    return output;
+    data.Replace(wxT("\\\\"), wxT("\\"));
+    data.Replace(wxT("\\n"), wxT("\n"));
+    data.Replace(wxT("\\t"), wxT("\t"));
+    data.Replace(wxT("\"\""), wxT(""""));
+    data.Replace(wxT("\\\""), wxT("\""));
 }
 
 
@@ -25,13 +23,13 @@ CustomLocale::~CustomLocale()
 {
     //write language to file
     ofstream output("lang.dat");
-    if (!output)
+    if (output)
     {
-        wxMessageBox(wxString(_("Could not write to ")) + "\"" + "lang.dat" + "\"", _("An exception occured!"), wxOK | wxICON_ERROR);
-        return;
+        output<<currentLanguage<<char(0);
+        output.close();
     }
-    output<<currentLanguage<<char(0);
-    output.close();
+    else
+        wxMessageBox(wxString(_("Could not write to ")) + wxT("\"") + wxT("lang.dat") + wxT("\""), _("An exception occured!"), wxOK | wxICON_ERROR);
 }
 
 
@@ -61,7 +59,7 @@ void CustomLocale::loadLanguageFile(int language)
 {
     currentLanguage = language;
 
-    wxString languageFile;
+    string languageFile;
     switch (language)
     {
     case wxLANGUAGE_GERMAN:
@@ -69,16 +67,17 @@ void CustomLocale::loadLanguageFile(int language)
         break;
 
     default:
-        languageFile = "";
+        languageFile = string();
         currentLanguage = wxLANGUAGE_ENGLISH;
     }
 
     //load language file into buffer
     translationDB.clear();
-    char temp[100000];
-    if (!languageFile.IsEmpty())
+    const int bufferSize = 100000;
+    char temp[bufferSize];
+    if (!languageFile.empty())
     {
-        ifstream langFile(languageFile.c_str());
+        ifstream langFile(languageFile.c_str(), ios::binary);
         if (langFile)
         {
             int rowNumber = 0;
@@ -89,22 +88,20 @@ void CustomLocale::loadLanguageFile(int language)
             //Linux: 0xa
             //Mac:   0xd
             //Win:   0xd 0xa
-#ifdef FFS_WIN
-            while (langFile.getline(temp, 100000))
+            while (langFile.getline(temp, bufferSize, 0xd)) //specify delimiter explicitely
             {
-#elif defined FFS_LINUX
-            while (langFile.getline(temp, 100000, 0xd)) //specify delimiter explicitely
-            {
-                //strangely this approach does NOT work under windows :(
-                langFile.get(); //delimiter 0xd is completely ignored (and also not extracted)
-#else
-            assert (false);
-#endif
+                langFile.get(); //discard the 0xa character
+
+                //wxString formattedString(temp, *wxConvUTF8, bufferSize); //convert UTF8 input to Unicode
+                wxString formattedString(temp);
+
+                exchangeEscapeChars(formattedString);
+
                 if (rowNumber%2 == 0)
-                    currentLine.original = exchangeEscapeChars(temp);
+                    currentLine.original = formattedString;
                 else
                 {
-                    currentLine.translation = exchangeEscapeChars(temp);
+                    currentLine.translation = formattedString;
                     translationDB.insert(currentLine);
                 }
                 ++rowNumber;
@@ -112,7 +109,7 @@ void CustomLocale::loadLanguageFile(int language)
             langFile.close();
         }
         else
-            wxMessageBox(wxString(_("Could not read language file ")) + "\"" + languageFile + "\"", _("An exception occured!"), wxOK | wxICON_ERROR);
+            wxMessageBox(wxString(_("Could not read language file ")) + wxT("\"") + wxString(languageFile.c_str(), wxConvUTF8) + wxT("\""), _("An exception occured!"), wxOK | wxICON_ERROR);
     }
     else
         ;   //if languageFile is empty language is defaulted to english

@@ -2,8 +2,10 @@
 #include "../library/globalFunctions.h"
 #include "../library/resources.h"
 #include <wx/msgdlg.h>
-#include <wx/file.h>
 #include <wx/stdpaths.h>
+#include <fstream>
+
+using namespace std;
 
 SyncDialog::SyncDialog(wxWindow* window,
                        const FileCompareResult& gridDataRef,
@@ -41,18 +43,18 @@ SyncDialog::SyncDialog(wxWindow* window,
     }
 
     //set radiobutton
-    if (localSyncConfiguration.exLeftSideOnly  == syncDirRight &&
-            localSyncConfiguration.exRightSideOnly == syncDirRight &&
-            localSyncConfiguration.leftNewer       == syncDirRight &&
-            localSyncConfiguration.rightNewer      == syncDirRight &&
-            localSyncConfiguration.different       == syncDirRight)
+    if (localSyncConfiguration.exLeftSideOnly  == SYNC_DIR_RIGHT &&
+            localSyncConfiguration.exRightSideOnly == SYNC_DIR_RIGHT &&
+            localSyncConfiguration.leftNewer       == SYNC_DIR_RIGHT &&
+            localSyncConfiguration.rightNewer      == SYNC_DIR_RIGHT &&
+            localSyncConfiguration.different       == SYNC_DIR_RIGHT)
         m_radioBtn1->SetValue(true);    //one way ->
 
-    else if (localSyncConfiguration.exLeftSideOnly  == syncDirRight &&
-             localSyncConfiguration.exRightSideOnly == syncDirLeft &&
-             localSyncConfiguration.leftNewer       == syncDirRight &&
-             localSyncConfiguration.rightNewer      == syncDirLeft &&
-             localSyncConfiguration.different       == syncDirNone)
+    else if (localSyncConfiguration.exLeftSideOnly  == SYNC_DIR_RIGHT &&
+             localSyncConfiguration.exRightSideOnly == SYNC_DIR_LEFT &&
+             localSyncConfiguration.leftNewer       == SYNC_DIR_RIGHT &&
+             localSyncConfiguration.rightNewer      == SYNC_DIR_LEFT &&
+             localSyncConfiguration.different       == SYNC_DIR_NONE)
         m_radioBtn2->SetValue(true);    //two way <->
 
     else
@@ -73,81 +75,81 @@ void SyncDialog::updateConfigIcons(wxBitmapButton* button1,
                                    wxBitmapButton* button5,
                                    const SyncConfiguration& syncConfig)
 {
-    if (syncConfig.exLeftSideOnly == syncDirRight)
+    if (syncConfig.exLeftSideOnly == SYNC_DIR_RIGHT)
     {
         button1->SetBitmapLabel(*GlobalResources::bitmapRightArrow);
         button1->SetToolTip(_("Copy from left to right"));
     }
-    else if (syncConfig.exLeftSideOnly == syncDirLeft)
+    else if (syncConfig.exLeftSideOnly == SYNC_DIR_LEFT)
     {
         button1->SetBitmapLabel(*GlobalResources::bitmapDelete);
         button1->SetToolTip(_("Delete files/folders existing on left side only"));
     }
-    else if (syncConfig.exLeftSideOnly == syncDirNone)
+    else if (syncConfig.exLeftSideOnly == SYNC_DIR_NONE)
     {
         button1->SetBitmapLabel(*GlobalResources::bitmapNoArrow);
         button1->SetToolTip(_("Do nothing"));
     }
 
-    if (syncConfig.exRightSideOnly == syncDirRight)
+    if (syncConfig.exRightSideOnly == SYNC_DIR_RIGHT)
     {
         button2->SetBitmapLabel(*GlobalResources::bitmapDelete);
         button2->SetToolTip(_("Delete files/folders existing on right side only"));
     }
-    else if (syncConfig.exRightSideOnly == syncDirLeft)
+    else if (syncConfig.exRightSideOnly == SYNC_DIR_LEFT)
     {
         button2->SetBitmapLabel(*GlobalResources::bitmapLeftArrow);
         button2->SetToolTip(_("Copy from right to left"));
     }
-    else if (syncConfig.exRightSideOnly == syncDirNone)
+    else if (syncConfig.exRightSideOnly == SYNC_DIR_NONE)
     {
         button2->SetBitmapLabel(*GlobalResources::bitmapNoArrow);
         button2->SetToolTip(_("Do nothing"));
     }
 
-    if (syncConfig.leftNewer == syncDirRight)
+    if (syncConfig.leftNewer == SYNC_DIR_RIGHT)
     {
         button3->SetBitmapLabel(*GlobalResources::bitmapRightArrow);
         button3->SetToolTip(_("Copy from left to right overwriting"));
     }
-    else if (syncConfig.leftNewer == syncDirLeft)
+    else if (syncConfig.leftNewer == SYNC_DIR_LEFT)
     {
         button3->SetBitmapLabel(*GlobalResources::bitmapLeftArrow);
         button3->SetToolTip(_("Copy from right to left overwriting"));
     }
-    else if (syncConfig.leftNewer == syncDirNone)
+    else if (syncConfig.leftNewer == SYNC_DIR_NONE)
     {
         button3->SetBitmapLabel(*GlobalResources::bitmapNoArrow);
         button3->SetToolTip(_("Do nothing"));
     }
 
-    if (syncConfig.rightNewer == syncDirRight)
+    if (syncConfig.rightNewer == SYNC_DIR_RIGHT)
     {
         button4->SetBitmapLabel(*GlobalResources::bitmapRightArrow);
         button4->SetToolTip(_("Copy from left to right overwriting"));
     }
-    else if (syncConfig.rightNewer == syncDirLeft)
+    else if (syncConfig.rightNewer == SYNC_DIR_LEFT)
     {
         button4->SetBitmapLabel(*GlobalResources::bitmapLeftArrow);
         button4->SetToolTip(_("Copy from right to left overwriting"));
     }
-    else if (syncConfig.rightNewer == syncDirNone)
+    else if (syncConfig.rightNewer == SYNC_DIR_NONE)
     {
         button4->SetBitmapLabel(*GlobalResources::bitmapNoArrow);
         button4->SetToolTip(_("Do nothing"));
     }
 
-    if (syncConfig.different == syncDirRight)
+    if (syncConfig.different == SYNC_DIR_RIGHT)
     {
         button5->SetBitmapLabel(*GlobalResources::bitmapRightArrow);
         button5->SetToolTip(_("Copy from left to right overwriting"));
     }
-    else if (syncConfig.different == syncDirLeft)
+    else if (syncConfig.different == SYNC_DIR_LEFT)
     {
         button5->SetBitmapLabel(*GlobalResources::bitmapLeftArrow);
         button5->SetToolTip(_("Copy from right to left overwriting"));
     }
-    else if (syncConfig.different == syncDirNone)
+    else if (syncConfig.different == SYNC_DIR_NONE)
     {
         button5->SetBitmapLabel(*GlobalResources::bitmapNoArrow);
         button5->SetToolTip(_("Do nothing"));
@@ -233,11 +235,11 @@ void SyncDialog::OnSelectRecycleBin(wxCommandEvent& event)
 
 void SyncDialog::OnSyncLeftToRight(wxCommandEvent& event)
 {
-    localSyncConfiguration.exLeftSideOnly  = syncDirRight;
-    localSyncConfiguration.exRightSideOnly = syncDirRight;
-    localSyncConfiguration.leftNewer       = syncDirRight;
-    localSyncConfiguration.rightNewer      = syncDirRight;
-    localSyncConfiguration.different       = syncDirRight;
+    localSyncConfiguration.exLeftSideOnly  = SYNC_DIR_RIGHT;
+    localSyncConfiguration.exRightSideOnly = SYNC_DIR_RIGHT;
+    localSyncConfiguration.leftNewer       = SYNC_DIR_RIGHT;
+    localSyncConfiguration.rightNewer      = SYNC_DIR_RIGHT;
+    localSyncConfiguration.different       = SYNC_DIR_RIGHT;
 
     updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
     calculatePreview();
@@ -249,11 +251,11 @@ void SyncDialog::OnSyncLeftToRight(wxCommandEvent& event)
 
 void SyncDialog::OnSyncBothSides(wxCommandEvent& event)
 {
-    localSyncConfiguration.exLeftSideOnly  = syncDirRight;
-    localSyncConfiguration.exRightSideOnly = syncDirLeft;
-    localSyncConfiguration.leftNewer       = syncDirRight;
-    localSyncConfiguration.rightNewer      = syncDirLeft;
-    localSyncConfiguration.different       = syncDirNone;
+    localSyncConfiguration.exLeftSideOnly  = SYNC_DIR_RIGHT;
+    localSyncConfiguration.exRightSideOnly = SYNC_DIR_LEFT;
+    localSyncConfiguration.leftNewer       = SYNC_DIR_RIGHT;
+    localSyncConfiguration.rightNewer      = SYNC_DIR_LEFT;
+    localSyncConfiguration.different       = SYNC_DIR_NONE;
 
     updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
     calculatePreview();
@@ -265,12 +267,12 @@ void SyncDialog::OnSyncBothSides(wxCommandEvent& event)
 
 void toggleSyncDirection(SyncDirection& current)
 {
-    if (current == syncDirRight)
-        current = syncDirLeft;
-    else if (current == syncDirLeft)
-        current = syncDirNone;
-    else if (current== syncDirNone)
-        current = syncDirRight;
+    if (current == SYNC_DIR_RIGHT)
+        current = SYNC_DIR_LEFT;
+    else if (current == SYNC_DIR_LEFT)
+        current = SYNC_DIR_NONE;
+    else if (current== SYNC_DIR_NONE)
+        current = SYNC_DIR_RIGHT;
     else
         assert (false);
 }
@@ -338,10 +340,10 @@ BatchDialog::BatchDialog(wxWindow* window,
 
     switch (config.compareVar)
     {
-    case compareByTimeAndSize:
+    case CMP_BY_TIME_SIZE:
         m_radioBtnSizeDate->SetValue(true);
         break;
-    case compareByContent:
+    case CMP_BY_CONTENT:
         m_radioBtnContent->SetValue(true);
         break;
     default:
@@ -459,13 +461,32 @@ void BatchDialog::OnCancel(wxCommandEvent& event)
 
 void BatchDialog::OnCreateJob(wxCommandEvent& event)
 {
+    if (m_directoryPanel1->GetValue().IsEmpty() || m_directoryPanel2->GetValue().IsEmpty())
+    {
+        wxMessageBox(_("Please select both left and right directories!"), _("Information"));
+        return;
+    }
+
+    //check if directories exist if loaded by config file
+    if (!wxDirExists(m_directoryPanel1->GetValue()))
+    {
+        wxMessageBox(_("Left directory does not exist. Please select a new one!"), _("Warning"), wxICON_WARNING);
+        return;
+    }
+    else if (!wxDirExists(m_directoryPanel2->GetValue()))
+    {
+        wxMessageBox(_("Right directory does not exist. Please select a new one!"), _("Warning"), wxICON_WARNING);
+        return;
+    }
+
+
     //get a filename
 #ifdef FFS_WIN
-    wxString fileName = "SyncJob.cmd"; //proposal
-    wxFileDialog* filePicker = new wxFileDialog(this, "", "", fileName, wxString(_("Command file")) + " (*.cmd)|*.cmd", wxFD_SAVE);
+    wxString fileName = wxT("SyncJob.cmd"); //proposal
+    wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, fileName, wxString(_("Command file")) + wxT(" (*.cmd)|*.cmd"), wxFD_SAVE);
 #elif defined FFS_LINUX
-    wxString fileName = "SyncJob.sh";  //proposal
-    wxFileDialog* filePicker = new wxFileDialog(this, "", "", fileName, wxString(_("Shell script")) + " (*.sh)|*.sh", wxFD_SAVE);
+    wxString fileName = wxT("SyncJob.sh");  //proposal
+    wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, fileName, wxString(_("Shell script")) + wxT(" (*.sh)|*.sh"), wxFD_SAVE);
 #else
     assert(false);
 #endif
@@ -475,7 +496,7 @@ void BatchDialog::OnCreateJob(wxCommandEvent& event)
         fileName = filePicker->GetPath();
         if (wxFileExists(fileName))
         {
-            wxMessageDialog* messageDlg = new wxMessageDialog(this, wxString("\"") + fileName + "\"" + _(" already exists. Overwrite?"), _("Warning") , wxOK | wxCANCEL);
+            wxMessageDialog* messageDlg = new wxMessageDialog(this, wxString(wxT("\"")) + fileName + wxT("\"") + _(" already exists. Overwrite?"), _("Warning") , wxOK | wxCANCEL);
 
             if (messageDlg->ShowModal() != wxID_OK)
             {
@@ -488,19 +509,19 @@ void BatchDialog::OnCreateJob(wxCommandEvent& event)
         wxString outputString = parseConfiguration();
 
         //write export file
-        wxFile output(fileName, wxFile::write);
-        if (output.IsOpened())
+        ofstream output(fileName.c_str());
+        if (output)
         {
-            output.Write(outputString);
+            output<<outputString.c_str();
             EndModal(batchFileCreated);
         }
         else
-            wxMessageBox(wxString(_("Could not write to ")) + "\"" + fileName + "\"", _("An exception occured!"), wxOK | wxICON_ERROR);
+            wxMessageBox(wxString(_("Could not write to ")) + wxT("\"") + fileName + wxT("\""), _("An exception occured!"), wxOK | wxICON_ERROR);
     }
 
 #ifdef FFS_LINUX
     //for linux the batch file needs the executable flag
-    wxExecute(wxString("chmod +x ") + fileName);
+    wxExecute(wxString(wxT("chmod +x ")) + fileName);
 #endif  // FFS_LINUX
 
     event.Skip();
@@ -509,11 +530,11 @@ void BatchDialog::OnCreateJob(wxCommandEvent& event)
 
 wxString getFormattedSyncDirection(const SyncDirection direction)
 {
-    if (direction == syncDirRight)
+    if (direction == SYNC_DIR_RIGHT)
         return 'R';
-    else if (direction == syncDirLeft)
+    else if (direction == SYNC_DIR_LEFT)
         return 'L';
-    else if (direction == syncDirNone)
+    else if (direction == SYNC_DIR_NONE)
         return 'N';
     else
     {
@@ -526,15 +547,14 @@ wxString getFormattedSyncDirection(const SyncDirection direction)
 wxString BatchDialog::parseConfiguration()
 {
     wxString output;
-
 #ifdef FFS_LINUX
     //shell script identifier
-    output+= "#!/bin/bash\n";
+    output+= wxT("#!/bin/bash\n");
 #endif
 
-    output+= "\"" + wxStandardPaths::Get().GetExecutablePath() + "\"";
+    output+= wxString(wxT("\"")) + wxStandardPaths::Get().GetExecutablePath() + wxT("\"");
 
-    output+= wxString(" -") + GlobalResources::paramCompare + " ";
+    output+= wxString(wxT(" -")) + GlobalResources::paramCompare + wxT(" ");
     if (m_radioBtnSizeDate->GetValue())
         output+= GlobalResources::valueSizeDate;
     else if (m_radioBtnContent->GetValue())
@@ -542,7 +562,7 @@ wxString BatchDialog::parseConfiguration()
     else
         assert(false);
 
-    output+= wxString(" -") + GlobalResources::paramCfg + " " +
+    output+= wxString(wxT(" -")) + GlobalResources::paramCfg + wxT(" ") +
              getFormattedSyncDirection(localSyncConfiguration.exLeftSideOnly) +
              getFormattedSyncDirection(localSyncConfiguration.exRightSideOnly) +
              getFormattedSyncDirection(localSyncConfiguration.leftNewer) +
@@ -551,26 +571,26 @@ wxString BatchDialog::parseConfiguration()
 
     if (filterIsActive)
     {
-        output+= wxString(" -") + GlobalResources::paramInclude + " " +
-                 "\"" + m_textCtrlInclude->GetValue() + "\"";
+        output+= wxString(wxT(" -")) + GlobalResources::paramInclude + wxT(" ") +
+                 wxT("\"") + m_textCtrlInclude->GetValue() + wxT("\"");
 
-        output+= wxString(" -") + GlobalResources::paramExclude + " " +
-                 "\"" + m_textCtrlExclude->GetValue() + "\"";
+        output+= wxString(wxT(" -")) + GlobalResources::paramExclude + wxT(" ") +
+                 wxT("\"") + m_textCtrlExclude->GetValue() + wxT("\"");
     }
 
     if (m_checkBoxUseRecycler->GetValue())
-        output+= wxString(" -") + GlobalResources::paramRecycler;
+        output+= wxString(wxT(" -")) + GlobalResources::paramRecycler;
 
     if (m_checkBoxContinueError->GetValue())
-        output+= wxString(" -") + GlobalResources::paramContinueError;
+        output+= wxString(wxT(" -")) + GlobalResources::paramContinueError;
 
     if (m_checkBoxSilent->GetValue())
-        output+= wxString(" -") + GlobalResources::paramSilent;
+        output+= wxString(wxT(" -")) + GlobalResources::paramSilent;
 
-    output+= wxString(" ") + "\"" + m_directoryPanel1->GetValue() + "\"";
-    output+= wxString(" ") + "\"" + m_directoryPanel2->GetValue() + "\"";
+    output+= wxString(wxT(" ")) + wxT("\"") + wxDir(m_directoryPanel1->GetValue()).GetName() + wxT("\""); //directory WITHOUT trailing path separator
+    output+= wxString(wxT(" ")) + wxT("\"") + wxDir(m_directoryPanel2->GetValue()).GetName() + wxT("\""); //needed since e.g. "C:\" isn't parsed correctly by commandline
 
-    output+= "\n";
+    output+= wxT("\n");
 
     return output;
 }

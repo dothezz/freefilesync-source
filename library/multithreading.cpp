@@ -144,7 +144,7 @@ void UpdateWhileExecuting::execute(StatusUpdater* statusUpdater)
     theWorkerThread->beginProcessing.Signal();
     theWorkerThread->readyToBeginProcessing.Unlock();
 
-    while (receivingResult.WaitTimeout(uiUpdateInterval) == wxCOND_TIMEOUT)
+    while (receivingResult.WaitTimeout(UI_UPDATE_INTERVAL) == wxCOND_TIMEOUT)
         statusUpdater->triggerUI_Refresh(); //ATTENTION: Exception "AbortThisProcess" may be thrown here!!!
 }
 

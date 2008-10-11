@@ -89,22 +89,17 @@ class GuiGenerated : public wxFrame
 		CustomGrid* m_grid2;
 		wxPanel* m_panel4;
 		wxBoxSizer* bSizer3;
-		wxBitmapButton* m_bpButton11;
-		
 		wxBitmapButton* m_bpButton201;
 		wxChoice* m_choiceLoad;
 		
+		wxPanel* m_panel12;
 		
-		wxBoxSizer* bSizer59;
-		wxBitmapButton* m_bpButton20;
-		wxBitmapButton* m_bpButton21;
-		wxBitmapButton* m_bpButton25;
-		wxBitmapButton* m_bpButton22;
-		wxBitmapButton* m_bpButton23;
-		wxBitmapButton* m_bpButton24;
-		
-		
-		
+		wxBitmapButton* m_bpButtonLeftOnly;
+		wxBitmapButton* m_bpButtonLeftNewer;
+		wxBitmapButton* m_bpButtonEqual;
+		wxBitmapButton* m_bpButtonDifferent;
+		wxBitmapButton* m_bpButtonRightNewer;
+		wxBitmapButton* m_bpButtonRightOnly;
 		
 		wxBitmapButton* m_bpButton10;
 		wxPanel* m_panel7;
@@ -148,7 +143,6 @@ class GuiGenerated : public wxFrame
 		virtual void OnDirChangedPanel2( wxFileDirPickerEvent& event ){ event.Skip(); }
 		virtual void OnRightGridDoubleClick( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnSortRightGrid( wxGridEvent& event ){ event.Skip(); }
-		virtual void OnAbout( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSaveConfig( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnChoiceKeyEvent( wxKeyEvent& event ){ event.Skip(); }
 		virtual void OnLoadConfiguration( wxCommandEvent& event ){ event.Skip(); }

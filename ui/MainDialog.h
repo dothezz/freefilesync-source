@@ -26,10 +26,10 @@ using namespace std;
 //IDs for context menu items
 enum ContextItem
 {
-    contextManualFilter = 10,
-    contextCopyClipboard,
-    contextOpenExplorer,
-    contextDeleteFiles
+    CONTEXT_MANUAL_FILTER = 10,
+    CONTEXT_CLIPBOARD,
+    CONTEXT_EXPLORER,
+    CONTEXT_DELETE_FILES
 };
 
 extern int leadingPanel;
@@ -128,7 +128,6 @@ private:
     void OnSync(                wxCommandEvent& event);
     void OnClose(               wxCloseEvent&   event);
     void OnQuit(                wxCommandEvent& event);
-    void OnAbout(               wxCommandEvent& event);
 
     //menu events
     void OnMenuExportFileList(  wxCommandEvent& event);

@@ -13,8 +13,14 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
     m_bitmap11->SetBitmap(*GlobalResources::bitmapLogo);
     m_bitmap13->SetBitmap(*GlobalResources::bitmapGPL);
 
-    //build
-    wxString build = wxString(_("(Build: ")) + __TDATE__ + ")";
+    //build information
+    wxString build = wxString(_("(Build: ")) + __TDATE__;
+#if wxUSE_UNICODE
+    build+= wxT(" - Unicode");
+#else
+    build+= wxT(" - ANSI");
+#endif //wxUSE_UNICODE
+    build+= + wxT(")");
     m_build->SetLabel(build);
 
     m_animationControl1->SetAnimation(*GlobalResources::animationMoney);
@@ -219,9 +225,9 @@ RemainingTime::~RemainingTime()
     ofstream output("test.txt");
     for (unsigned i = 0; i < x.size(); ++i)
     {
-        output<<x[i]<<" "<<f[i]<<endl;
+        output<<x[i]<<" "<<f[i]<<'\n';
     }
-    output<<endl<<z_1<<" "<<z_2<<endl;
+    output<<'\n'<<z_1<<" "<<z_2<<'\n';
     output.close();
 }
 
@@ -363,7 +369,7 @@ void SyncStatus::updateStatusDialogNow()
     //support for pause button
     while (processPaused && currentProcessIsRunning)
     {
-        wxMilliSleep(uiUpdateInterval);
+        wxMilliSleep(UI_UPDATE_INTERVAL);
         updateUI_Now();
     }
 }
@@ -373,37 +379,37 @@ void SyncStatus::setCurrentStatus(SyncStatusID id)
 {
     switch (id)
     {
-    case statusAborted:
+    case ABORTED:
         m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusError);
         m_staticTextStatus->SetLabel(_("Aborted"));
         break;
 
-    case statusCompletedWithSuccess:
+    case FINISHED_WITH_SUCCESS:
         m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusSuccess);
         m_staticTextStatus->SetLabel(_("Completed"));
         break;
 
-    case statusCompletedWithErrors:
+    case FINISHED_WITH_ERROR:
         m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusWarning);
         m_staticTextStatus->SetLabel(_("Completed"));
         break;
 
-    case statusPause:
+    case PAUSE:
         m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusPause);
         m_staticTextStatus->SetLabel(_("Pause"));
         break;
 
-    case statusScanning:
+    case SCANNING:
         m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusComparing);
         m_staticTextStatus->SetLabel(_("Scanning..."));
         break;
 
-    case statusComparing:
+    case COMPARING:
         m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusComparing);
         m_staticTextStatus->SetLabel(_("Comparing..."));
         break;
 
-    case statusSynchronizing:
+    case SYNCHRONIZING:
         m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusSyncing);
         m_staticTextStatus->SetLabel(_("Synchronizing..."));
         break;

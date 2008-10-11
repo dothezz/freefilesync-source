@@ -4,7 +4,6 @@
 #include <string>
 #include <algorithm>
 #include <wx/string.h>
-#include <stdexcept> //for std::runtime_error
 
 using namespace std;
 
@@ -34,4 +33,20 @@ namespace globalFunctions
 
     wxString& includeNumberSeparator(wxString& number);
 }
+
+
+class RuntimeException //Exception class used to notify of general runtime exceptions
+{
+public:
+    RuntimeException(const wxString& txt) : errorMessage(txt) {}
+
+    wxString show() const
+    {
+        return errorMessage;
+    }
+
+private:
+    wxString errorMessage;
+};
+
 #endif // GLOBALFUNCTIONS_H_INCLUDED
