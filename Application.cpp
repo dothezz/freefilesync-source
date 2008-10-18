@@ -45,7 +45,9 @@ void Application::initialize()
         throw RuntimeException(_("Could not set working directory to directory containing executable file!"));
 
     //set program language
+    SetExitOnFrameDelete(false);    //prevent messagebox from becoming top-level window
     programLanguage.loadLanguageFromCfg();
+    SetExitOnFrameDelete(true);
 
     //activate support for .png files
     wxImage::AddHandler(new wxPNGHandler);
@@ -127,18 +129,20 @@ void Application::logInit()
 {
     wxString tmp = wxDateTime::Now().FormatISOTime();
     tmp.Replace(wxT(":"), wxEmptyString);
-    wxString logfileName = wxString(wxT("FFS_")) + wxDateTime::Now().FormatISODate() + '_' + tmp + wxT(".log");
+    wxString logfileName = wxString(wxT("FFS_")) + wxDateTime::Now().FormatISODate() + wxChar('_') + tmp + wxT(".log");
 
-    logFile.Open(logfileName.c_str(), wxT("wb"));
+    logFile.Open(logfileName.c_str(), wxT("w"));
     if (!logFile.IsOpened())
         throw RuntimeException(_("Unable to create logfile!"));
     logFile.Write(wxString(_("FreeFileSync   (Date: ")) + wxDateTime::Now().FormatDate() + _("  Time: ") +  wxDateTime::Now().FormatTime() + wxT(")") + wxChar('\n'));
-    logFile.Write(wxString(_("-------------------------------------------------")) + '\n');
+    logFile.Write(wxString(_("-------------------------------------------------")) + wxChar('\n'));
     logFile.Write(wxChar('\n'));
     logFile.Write(_("Log-messages:\n-------------"));
     logFile.Write(wxChar('\n'));
     logWrite(_("Start"));
     logFile.Write(wxChar('\n'));
+
+totalTime.Start(); //measure total time
 }
 
 
@@ -156,7 +160,10 @@ void Application::logWrite(const wxString& logText, const wxString& problemType)
 void Application::logClose(const wxString& finalText)
 {
     logFile.Write(wxChar('\n'));
-    logWrite(finalText, _("Stop"));
+
+    long time = totalTime.Time(); //retrieve total time
+    logWrite(finalText + wxT(" (") + _("Total time: ") + (wxTimeSpan::Milliseconds(time)).Format() + wxT(")"), _("Stop"));
+
     //logFile.close(); <- not needed
 }
 
@@ -617,9 +624,9 @@ int CommandLineStatusUpdater::reportError(const wxString& text)
 
 
 inline
-void CommandLineStatusUpdater::triggerUI_Refresh()
+void CommandLineStatusUpdater::triggerUI_Refresh(bool asyncProcessActive)
 {
-    if (abortionRequested)
+    if (abortionRequested && !asyncProcessActive)
         throw AbortThisProcess();  //may be triggered by the SyncStatusDialog
 
     if (!silentMode)

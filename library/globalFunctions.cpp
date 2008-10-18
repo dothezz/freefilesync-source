@@ -92,3 +92,35 @@ wxString& globalFunctions::includeNumberSeparator(wxString& number)
         number.insert(i, GlobalResources::thousandsSeparator);
     return number;
 }
+
+
+int globalFunctions::readInt(ifstream& stream)
+{
+    int result = 0;
+    char* buffer = reinterpret_cast<char*>(&result);
+    stream.read(buffer, sizeof(int));
+    return result;
+}
+
+
+void globalFunctions::writeInt(ofstream& stream, const int number)
+{
+    const char* buffer = reinterpret_cast<const char*>(&number);
+    stream.write(buffer, sizeof(int));
+}
+
+
+int globalFunctions::readInt(wxInputStream& stream)
+{
+    int result = 0;
+    char* buffer = reinterpret_cast<char*>(&result);
+    stream.Read(buffer, sizeof(int));
+    return result;
+}
+
+
+void globalFunctions::writeInt(wxOutputStream& stream, const int number)
+{
+    const char* buffer = reinterpret_cast<const char*>(&number);
+    stream.Write(buffer, sizeof(int));
+}

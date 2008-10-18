@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Apr 16 2008)
+// C++ code generated with wxFormBuilder (version Oct 18 2008)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -44,6 +44,9 @@ GuiGenerated::GuiGenerated( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	m_menuItemGerman = new wxMenuItem( m_menu31, wxID_ANY, wxString( _("Deutsch") ) , wxEmptyString, wxITEM_RADIO );
 	m_menu31->Append( m_menuItemGerman );
+	
+	m_menuItemFrench = new wxMenuItem( m_menu31, wxID_ANY, wxString( _("Français") ) , wxEmptyString, wxITEM_RADIO );
+	m_menu31->Append( m_menuItemFrench );
 	
 	m_menu3->Append( -1, _("&Language"), m_menu31 );
 	
@@ -459,7 +462,7 @@ GuiGenerated::GuiGenerated( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	bSizer53->Add( 0, 0, 1, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextStatusLeft = new wxStaticText( m_panel7, wxID_ANY, _("Dummy text"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextStatusLeft = new wxStaticText( m_panel7, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextStatusLeft->Wrap( -1 );
 	bSizer53->Add( m_staticTextStatusLeft, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
@@ -474,7 +477,7 @@ GuiGenerated::GuiGenerated( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	bSizer451->Add( 26, 0, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextStatusMiddle = new wxStaticText( m_panel7, wxID_ANY, _("Dummy text"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextStatusMiddle = new wxStaticText( m_panel7, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextStatusMiddle->Wrap( -1 );
 	bSizer451->Add( m_staticTextStatusMiddle, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
@@ -490,7 +493,7 @@ GuiGenerated::GuiGenerated( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	bSizer52->Add( 0, 0, 1, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextStatusRight = new wxStaticText( m_panel7, wxID_ANY, _("Dummy text"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextStatusRight = new wxStaticText( m_panel7, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextStatusRight->Wrap( -1 );
 	bSizer52->Add( m_staticTextStatusRight, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -521,6 +524,7 @@ GuiGenerated::GuiGenerated( wxWindow* parent, wxWindowID id, const wxString& tit
 	this->Connect( m_menuItem5->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GuiGenerated::OnMenuExportFileList ) );
 	this->Connect( m_menuItemEnglish->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GuiGenerated::OnMenuLangEnglish ) );
 	this->Connect( m_menuItemGerman->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GuiGenerated::OnMenuLangGerman ) );
+	this->Connect( m_menuItemFrench->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GuiGenerated::OnMenuLangFrench ) );
 	this->Connect( m_menuItem7->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GuiGenerated::OnMenuBatchJob ) );
 	this->Connect( m_menuItem3->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GuiGenerated::OnMenuAbout ) );
 	m_bpButtonCompare->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnCompare ), NULL, this );
@@ -564,6 +568,7 @@ GuiGenerated::~GuiGenerated()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GuiGenerated::OnMenuExportFileList ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GuiGenerated::OnMenuLangEnglish ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GuiGenerated::OnMenuLangGerman ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GuiGenerated::OnMenuLangFrench ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GuiGenerated::OnMenuBatchJob ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( GuiGenerated::OnMenuAbout ) );
 	m_bpButtonCompare->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GuiGenerated::OnCompare ), NULL, this );
@@ -609,13 +614,13 @@ CompareStatusGenerated::CompareStatusGenerated( wxWindow* parent, wxWindowID id,
 	wxStaticBoxSizer* sbSizer10;
 	sbSizer10 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxEmptyString ), wxHORIZONTAL );
 	
-	m_staticText321 = new wxStaticText( this, wxID_ANY, _("Files scanned:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText321 = new wxStaticText( this, wxID_ANY, _("Files/folders scanned:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText321->Wrap( -1 );
 	m_staticText321->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
 	
 	sbSizer10->Add( m_staticText321, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxRIGHT, 5 );
 	
-	m_staticTextScanned = new wxStaticText( this, wxID_ANY, _("123456"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextScanned = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextScanned->Wrap( -1 );
 	m_staticTextScanned->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
 	
@@ -634,7 +639,7 @@ CompareStatusGenerated::CompareStatusGenerated( wxWindow* parent, wxWindowID id,
 	
 	sbSizer13->Add( m_staticText46, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 	
-	m_staticTextFilesToCompare = new wxStaticText( this, wxID_ANY, _("123456"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextFilesToCompare = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextFilesToCompare->Wrap( -1 );
 	m_staticTextFilesToCompare->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
 	
@@ -653,7 +658,7 @@ CompareStatusGenerated::CompareStatusGenerated( wxWindow* parent, wxWindowID id,
 	
 	sbSizer11->Add( m_staticText32, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxRIGHT, 5 );
 	
-	m_staticTextDataToCompare = new wxStaticText( this, wxID_ANY, _("123456"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextDataToCompare = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextDataToCompare->Wrap( -1 );
 	m_staticTextDataToCompare->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
 	
@@ -852,7 +857,7 @@ SyncDlgGenerated::SyncDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	m_staticText37 = new wxStaticText( this, wxID_ANY, _("Create:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText37->Wrap( -1 );
 	m_staticText37->SetFont( wxFont( 10, 74, 93, 90, false, wxT("Tahoma") ) );
-	m_staticText37->SetToolTip( _("Number of files or directories that will be created") );
+	m_staticText37->SetToolTip( _("Number of files and directories that will be created") );
 	
 	fgSizer5->Add( m_staticText37, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -866,7 +871,7 @@ SyncDlgGenerated::SyncDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	m_staticText14 = new wxStaticText( this, wxID_ANY, _("Delete:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText14->Wrap( -1 );
 	m_staticText14->SetFont( wxFont( 10, 74, 93, 90, false, wxT("Tahoma") ) );
-	m_staticText14->SetToolTip( _("Number of files or directories that will be deleted") );
+	m_staticText14->SetToolTip( _("Number of files and directories that will be deleted") );
 	
 	fgSizer5->Add( m_staticText14, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -982,7 +987,7 @@ SyncDlgGenerated::SyncDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	gSizer1->Add( m_bpButton8, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_bitmap17 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 48,48 ), 0 );
-	m_bitmap17->SetToolTip( _("Files that exist on both sides and are different") );
+	m_bitmap17->SetToolTip( _("dummy") );
 	
 	gSizer1->Add( m_bitmap17, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -1094,7 +1099,6 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 	
 	bSizer27->Add( bSizer42, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	wxBoxSizer* bSizer31;
 	bSizer31 = new wxBoxSizer( wxHORIZONTAL );
 	
 	m_staticText21 = new wxStaticText( this, wxID_ANY, _("Current operation:"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -1105,6 +1109,18 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 	
 	
 	bSizer31->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_staticText55 = new wxStaticText( this, wxID_ANY, _("Time elapsed:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText55->Wrap( -1 );
+	m_staticText55->SetFont( wxFont( 10, 74, 93, 90, false, wxT("Tahoma") ) );
+	
+	bSizer31->Add( m_staticText55, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM, 5 );
+	
+	m_staticTextTimeElapsed = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextTimeElapsed->Wrap( -1 );
+	m_staticTextTimeElapsed->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
+	
+	bSizer31->Add( m_staticTextTimeElapsed, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	bSizer27->Add( bSizer31, 0, wxEXPAND, 5 );
 	
@@ -1127,7 +1143,7 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 	
 	bSizer32->Add( m_staticText26, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
 	
-	m_staticTextDataRemaining = new wxStaticText( this, wxID_ANY, _("--,- MB"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextDataRemaining = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextDataRemaining->Wrap( -1 );
 	m_staticTextDataRemaining->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
 	
@@ -1161,13 +1177,13 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 	wxBoxSizer* bSizer33;
 	bSizer33 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_staticText25 = new wxStaticText( this, wxID_ANY, _("Files remaining:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText25 = new wxStaticText( this, wxID_ANY, _("Files/folders remaining:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText25->Wrap( -1 );
 	m_staticText25->SetFont( wxFont( 10, 74, 93, 90, false, wxT("Tahoma") ) );
 	
-	bSizer33->Add( m_staticText25, 0, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer33->Add( m_staticText25, 0, wxALIGN_CENTER_VERTICAL|wxTOP|wxBOTTOM|wxLEFT, 5 );
 	
-	m_staticTextRemainingObj = new wxStaticText( this, wxID_ANY, _("0000000"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_staticTextRemainingObj = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
 	m_staticTextRemainingObj->Wrap( -1 );
 	m_staticTextRemainingObj->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Tahoma") ) );
 	
@@ -1235,7 +1251,7 @@ HelpDlgGenerated::HelpDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	
 	bSizer20->Add( 0, 5, 0, wxEXPAND, 5 );
 	
-	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, _("Compare by \"File size and date\"\n----------------------------------------\nThis variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.  (Notice that the file time may deviate up to 2 seconds.)\n\nWhen \"Compare\" is triggered with this option set the following decision tree is processed:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n          _________|_____________\n         |                  |                         |\n  left newer  right newer  different (but same date)\n\nAs a result 6 different status can be returned to categorize all files:\n\n- exists left only\n- exists right only\n- left newer\n- right newer\n- different (but same date)\n- equal\n\n\nCompare by \"File content\"\n----------------------------------------\nAs the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n\nAs a result the files are separated into the following categories:\n\n- exists left only\n- exists right only\n- different\n- equal"), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
+	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, _("Compare by \"File size and date\"\n----------------------------------------\nThis variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.\n\nWhen \"Compare\" is triggered with this option set the following decision tree is processed:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n          _________|__________\n         |                  |                   |\n  left newer  right newer   same date\n\nAs a result 6 different status can be returned to categorize all files:\n\n- exists left only\n- exists right only\n- left newer\n- right newer\n- different filesize (but same date)\n- equal\n\n\nCompare by \"File content\"\n----------------------------------------\nAs the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n\nAs a result the files are separated into the following categories:\n\n- exists left only\n- exists right only\n- different\n- equal"), wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
 	m_textCtrl8->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
 	
 	bSizer20->Add( m_textCtrl8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
@@ -1291,7 +1307,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	
 	bSizer31->Add( m_staticText15, 0, wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
-	m_build = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_build = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_build->Wrap( -1 );
 	m_build->SetFont( wxFont( 8, 74, 90, 90, false, wxT("Tahoma") ) );
 	
@@ -1307,12 +1323,18 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	m_textCtrl3 = new wxTextCtrl( this, wxID_ANY, _("Source code written completely in C++ utilizing:\n\n  MinGW \t\t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE\n\n     by ZenJu"), wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY|wxDOUBLE_BORDER );
 	m_textCtrl3->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
 	
-	bSizer53->Add( m_textCtrl3, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+	bSizer53->Add( m_textCtrl3, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxBOTTOM, 5 );
 	
-	bSizer31->Add( bSizer53, 0, wxRIGHT|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 30 );
+	m_staticText54 = new wxStaticText( this, wxID_ANY, _("Thanks to Jean-François Hartmann for doing the French translation!"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText54->Wrap( -1 );
+	m_staticText54->SetFont( wxFont( 8, 74, 90, 90, false, wxT("Tahoma") ) );
 	
+	bSizer53->Add( m_staticText54, 0, wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	bSizer31->Add( 0, 7, 0, 0, 5 );
+	bSizer31->Add( bSizer53, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxRIGHT|wxLEFT, 30 );
+	
+	m_staticline3 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+	bSizer31->Add( m_staticline3, 0, wxEXPAND|wxTOP|wxBOTTOM, 5 );
 	
 	wxStaticBoxSizer* sbSizer7;
 	sbSizer7 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxEmptyString ), wxVERTICAL );
@@ -1323,10 +1345,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	
 	sbSizer7->Add( m_staticText131, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
-	bSizer31->Add( sbSizer7, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP|wxBOTTOM, 5 );
-	
-	m_staticline3 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-	bSizer31->Add( m_staticline3, 0, wxEXPAND|wxTOP|wxBOTTOM, 5 );
+	bSizer31->Add( sbSizer7, 0, wxALIGN_CENTER_HORIZONTAL|wxBOTTOM, 5 );
 	
 	wxFlexGridSizer* fgSizer2;
 	fgSizer2 = new wxFlexGridSizer( 3, 3, 0, 0 );
@@ -1513,7 +1532,7 @@ DeleteDlgGenerated::DeleteDlgGenerated( wxWindow* parent, wxWindowID id, const w
 	m_bitmap12 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), 0 );
 	bSizer41->Add( m_bitmap12, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticTextHeader = new wxStaticText( this, wxID_ANY, _("Dummy text"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextHeader = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextHeader->Wrap( -1 );
 	m_staticTextHeader->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
 	
@@ -1966,7 +1985,7 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	gSizer1->Add( m_bpButton8, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_bitmap17 = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 48,48 ), 0 );
-	m_bitmap17->SetToolTip( _("Files that exist on both sides and are different") );
+	m_bitmap17->SetToolTip( _("dummy") );
 	
 	gSizer1->Add( m_bitmap17, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -2010,6 +2029,8 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( BatchDlgGenerated::OnClose ) );
 	m_directoryPanel1->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( BatchDlgGenerated::OnEnterLeftDir ), NULL, this );
 	m_directoryPanel2->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( BatchDlgGenerated::OnEnterRightDir ), NULL, this );
+	m_radioBtnSizeDate->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BatchDlgGenerated::OnChangeCompareVar ), NULL, this );
+	m_radioBtnContent->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BatchDlgGenerated::OnChangeCompareVar ), NULL, this );
 	m_checkBoxUseRecycler->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnSelectRecycleBin ), NULL, this );
 	m_bpButtonFilter->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnFilterButton ), NULL, this );
 	m_bpButton5->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnExLeftSideOnly ), NULL, this );
@@ -2027,6 +2048,8 @@ BatchDlgGenerated::~BatchDlgGenerated()
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( BatchDlgGenerated::OnClose ) );
 	m_directoryPanel1->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( BatchDlgGenerated::OnEnterLeftDir ), NULL, this );
 	m_directoryPanel2->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( BatchDlgGenerated::OnEnterRightDir ), NULL, this );
+	m_radioBtnSizeDate->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BatchDlgGenerated::OnChangeCompareVar ), NULL, this );
+	m_radioBtnContent->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BatchDlgGenerated::OnChangeCompareVar ), NULL, this );
 	m_checkBoxUseRecycler->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnSelectRecycleBin ), NULL, this );
 	m_bpButtonFilter->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnFilterButton ), NULL, this );
 	m_bpButton5->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnExLeftSideOnly ), NULL, this );

@@ -90,7 +90,7 @@ void FreeFileSync::getFileInformation(FileInfo& output, const wxString& filename
 #else
     struct stat fileInfo;
     if (stat(filename.c_str(), &fileInfo) != 0)
-        throw FileError(wxString(_("Could not retrieve file info for: ")) + "\"" + filename + "\"");
+        throw FileError(wxString(_("Could not retrieve file info for: ")) + wxT("\"") + filename + wxT("\""));
 
     tm* timeinfo;
     timeinfo = localtime(&fileInfo.st_mtime);
@@ -534,9 +534,11 @@ wxDirTraverseResult GetAllFilesFull::OnFile(const wxString& filename)
 
 wxDirTraverseResult GetAllFilesFull::OnDir(const wxString& dirname)
 {
+#ifdef FFS_WIN
     if (dirname.EndsWith(wxT("\\RECYCLER")) ||
             dirname.EndsWith(wxT("\\System Volume Information")))
         return wxDIR_IGNORE;
+#endif  // FFS_WIN
 
     fileDescr.filename    = dirname;
     fileDescr.directory   = directory;
@@ -579,7 +581,7 @@ wxDirTraverseResult GetAllFilesFull::OnDir(const wxString& dirname)
 
 wxDirTraverseResult GetAllFilesFull::OnOpenError(const wxString& openerrorname)
 {
-    wxMessageBox(openerrorname, _("Error opening file"));
+    wxMessageBox(openerrorname, _("Error"));
     return wxDIR_IGNORE;
 }
 
@@ -609,7 +611,7 @@ public:
 
     wxDirTraverseResult OnOpenError(const wxString& openerrorname)
     {
-        wxMessageBox(openerrorname, _("Error opening file"));
+        wxMessageBox(openerrorname, _("Error"));
         return wxDIR_IGNORE;
     }
 
@@ -1205,27 +1207,27 @@ wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
 {
     double nrOfBytes = filesize;
 
-    wxString unit = wxT(" Byte");
+    wxString unit = _(" Byte");
     if (nrOfBytes > 999)
     {
         nrOfBytes/= 1024;
-        unit = wxT(" kB");
+        unit = _(" kB");
         if (nrOfBytes > 999)
         {
             nrOfBytes/= 1024;
-            unit = wxT(" MB");
+            unit = _(" MB");
             if (nrOfBytes > 999)
             {
                 nrOfBytes/= 1024;
-                unit = wxT(" GB");
+                unit = _(" GB");
                 if (nrOfBytes > 999)
                 {
                     nrOfBytes/= 1024;
-                    unit = wxT(" TB");
+                    unit = _(" TB");
                     if (nrOfBytes > 999)
                     {
                         nrOfBytes/= 1024;
-                        unit = wxT(" PB");
+                        unit = _(" PB");
                     }
                 }
             }
@@ -1233,7 +1235,7 @@ wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
     }
 
     wxString temp;
-    if (unit == wxT(" Byte")) //no decimal places in case of bytes
+    if (unit == _(" Byte")) //no decimal places in case of bytes
     {
         double integer = 0;
         modf(nrOfBytes, &integer); //get integer part of nrOfBytes
@@ -1252,7 +1254,7 @@ wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
         switch (length)
         {
         case 0:
-            temp = wxT("Error");
+            temp = _("Error");
             break;
         case 1:
             temp = wxString(wxT("0")) + GlobalResources::decimalPoint + wxT("0") + temp;
@@ -1271,7 +1273,7 @@ wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
             temp = temp.substr(0, 3);
             break; //111
         default:
-            return wxT("Error");
+            return _("Error");
         }
     }
     return (temp + unit);

@@ -3,6 +3,7 @@
 
 #include "../FreeFileSync.h"
 #include "guiGenerated.h"
+#include <wx/stopwatch.h>
 
 class AboutDlg : public AboutDlgGenerated
 {
@@ -114,6 +115,8 @@ private:
     void OnAbort(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);
 
+    wxStopWatch timeElapsed;
+
     StatusUpdater* currentStatusUpdater;
     wxWindow* windowToDis;
     bool currentProcessIsRunning;
@@ -162,14 +165,14 @@ public:
     ~CompareStatus();
 
     void resetCmpGauge(int totalCmpObjectsToProcess, double totalCmpDataToProcess);
-    void incScannedFiles_NoUpdate(int number);
+    void incScannedObjects_NoUpdate(int number);
     void incProcessedCmpData_NoUpdate(int objectsProcessed, double dataProcessed);
     void setStatusText_NoUpdate(const wxString& text);
     void updateStatusPanelNow();
 
 private:
     //status variables
-    unsigned int scannedFiles;
+    unsigned int scannedObjects;
     wxString currentStatusText;
 
     //gauge variables

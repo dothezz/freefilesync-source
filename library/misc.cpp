@@ -2,6 +2,7 @@
 #include <fstream>
 #include <wx/msgdlg.h>
 #include "resources.h"
+#include "globalFunctions.h"
 
 void exchangeEscapeChars(wxString& data)
 {
@@ -25,7 +26,7 @@ CustomLocale::~CustomLocale()
     ofstream output("lang.dat");
     if (output)
     {
-        output<<currentLanguage<<char(0);
+        globalFunctions::writeInt(output, currentLanguage);
         output.close();
     }
     else
@@ -41,9 +42,7 @@ void CustomLocale::loadLanguageFromCfg()  //retrieve language from config file: 
     ifstream input("lang.dat");
     if (input)
     {
-        char buffer[20];
-        input.getline(buffer, 20, char(0));
-        language = atoi(buffer);
+        language = globalFunctions::readInt(input);
         input.close();
     }
     else
@@ -65,7 +64,9 @@ void CustomLocale::loadLanguageFile(int language)
     case wxLANGUAGE_GERMAN:
         languageFile = "german.lng";
         break;
-
+    case wxLANGUAGE_FRENCH:
+        languageFile = "french.lng";
+        break;
     default:
         languageFile = string();
         currentLanguage = wxLANGUAGE_ENGLISH;
@@ -87,13 +88,13 @@ void CustomLocale::loadLanguageFile(int language)
             //----------
             //Linux: 0xa
             //Mac:   0xd
-            //Win:   0xd 0xa
+            //Win:   0xd 0xa    <- language files are in Windows format
             while (langFile.getline(temp, bufferSize, 0xd)) //specify delimiter explicitely
             {
                 langFile.get(); //discard the 0xa character
 
-                //wxString formattedString(temp, *wxConvUTF8, bufferSize); //convert UTF8 input to Unicode
-                wxString formattedString(temp);
+                //wxString formattedString = wxString::FromUTF8(temp);
+                wxString formattedString = wxString::From8BitData(temp);
 
                 exchangeEscapeChars(formattedString);
 

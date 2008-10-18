@@ -136,6 +136,7 @@ private:
     void OnMenuQuit(            wxCommandEvent& event);
     void OnMenuLangEnglish(     wxCommandEvent& event);
     void OnMenuLangGerman(      wxCommandEvent& event);
+    void OnMenuLangFrench(      wxCommandEvent& event);
 
     void enableSynchronization(bool value);
 
@@ -227,7 +228,7 @@ public:
     void updateProcessedData(int objectsProcessed, double dataProcessed);
     int reportError(const wxString& text);
 
-    void triggerUI_Refresh();
+    void triggerUI_Refresh(bool asyncProcessActive);
 
 private:
     MainDialog* mainDialog;
@@ -248,7 +249,7 @@ public:
     void updateProcessedData(int objectsProcessed, double dataProcessed);
     int reportError(const wxString& text);
 
-    void triggerUI_Refresh();
+    void triggerUI_Refresh(bool asyncProcessActive);
 
 private:
     SyncStatus* syncStatusFrame;

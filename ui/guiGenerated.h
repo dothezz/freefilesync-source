@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Apr 16 2008)
+// C++ code generated with wxFormBuilder (version Oct 18 2008)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -58,6 +58,7 @@ class GuiGenerated : public wxFrame
 		wxMenu* m_menu31;
 		wxMenuItem* m_menuItemEnglish;
 		wxMenuItem* m_menuItemGerman;
+		wxMenuItem* m_menuItemFrench;
 		wxMenu* m_menu2;
 		wxBoxSizer* bSizer1;
 		wxPanel* m_panel71;
@@ -122,6 +123,7 @@ class GuiGenerated : public wxFrame
 		virtual void OnMenuExportFileList( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuLangEnglish( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuLangGerman( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnMenuLangFrench( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuBatchJob( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuAbout( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnCompare( wxCommandEvent& event ){ event.Skip(); }
@@ -281,8 +283,11 @@ class SyncStatusDlgGenerated : public wxDialog
 		wxStaticBitmap* m_bitmapStatus;
 		wxStaticText* m_staticTextStatus;
 		
+		wxBoxSizer* bSizer31;
 		wxStaticText* m_staticText21;
 		
+		wxStaticText* m_staticText55;
+		wxStaticText* m_staticTextTimeElapsed;
 		wxTextCtrl* m_textCtrlInfo;
 		wxBoxSizer* bSizer28;
 		wxStaticText* m_staticText26;
@@ -352,9 +357,9 @@ class AboutDlgGenerated : public wxDialog
 		wxStaticText* m_staticText15;
 		wxStaticText* m_build;
 		
-		
-		wxStaticText* m_staticText131;
+		wxStaticText* m_staticText54;
 		wxStaticLine* m_staticline3;
+		wxStaticText* m_staticText131;
 		wxStaticBitmap* m_bitmap9;
 		wxStaticText* m_staticText11;
 		wxHyperlinkCtrl* m_hyperlink1;
@@ -540,6 +545,7 @@ class BatchDlgGenerated : public wxDialog
 		virtual void OnClose( wxCloseEvent& event ){ event.Skip(); }
 		virtual void OnEnterLeftDir( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnEnterRightDir( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnChangeCompareVar( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSelectRecycleBin( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnFilterButton( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnExLeftSideOnly( wxCommandEvent& event ){ event.Skip(); }

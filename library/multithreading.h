@@ -20,7 +20,7 @@ public:
     virtual int  reportError(const wxString& text) = 0;
 
     //this method is triggered repeatedly and can be used to refresh the ui by dispatching pending events
-    virtual void triggerUI_Refresh() = 0;
+    virtual void triggerUI_Refresh(bool asyncProcessActive = false) = 0;
 
     void requestAbortion() //opportunity to abort must be implemented in a frequently executed method like triggerUI_Refresh()
     {                      //currently used by the UI status information screen, when button "Abort is pressed"

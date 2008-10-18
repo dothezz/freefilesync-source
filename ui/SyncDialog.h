@@ -23,6 +23,8 @@ public:
                                   wxBitmapButton* button5,
                                   const SyncConfiguration& syncConfig);
 
+    static void adjustToolTips(wxStaticBitmap* bitmap, const CompareVariant var);
+
 private:
     void calculatePreview();
 
@@ -70,6 +72,7 @@ private:
 
     void OnFilterButton(    wxCommandEvent& event);
     void OnSelectRecycleBin(wxCommandEvent& event);
+    void OnChangeCompareVar(wxCommandEvent& event);
 
     void OnClose(           wxCloseEvent&   event);
     void OnCancel(          wxCommandEvent& event);

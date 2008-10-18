@@ -1,6 +1,17 @@
 FreeFileSync
 ------------
 
+Changelog v1.8
+--------------
+Enhanced statusbar information
+Enhanced logfile information
+Enhanced progress information
+Added Unicode support
+Program now waits until work is completed when abort is triggered during synchronization
+Added French translation
+Updated German translation
+
+
 Changelog v1.7
 --------------
 Display only those view filter buttons that are actually needed
@@ -55,7 +66,7 @@ Changelog v1.3
 Maintain and load different configurations by drag&drop, load-button or commandline
 New function to delete files (or move them to recycle bin) manually on the UI (without having to re-compare):
 	Deleting folders results in deletion of all dependent files, subfolders on UI grid (also no re-compare needed)
-	while catching arrow situations and allowing to resolve them
+	while catching error situations and allowing to resolve them
 Improved manual filtering of rows: If folders are marked all dependent subfolders and files are marked as well 
 (keeping sort sequence when "hide filtered elements" is marked)
 Comprehensive performance optimization of the two features above (manual filtering, deletion) for large grids (> 200.000 rows)

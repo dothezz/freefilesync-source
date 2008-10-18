@@ -3,7 +3,7 @@
 #include "../library/resources.h"
 #include <wx/msgdlg.h>
 #include <wx/stdpaths.h>
-#include <fstream>
+#include <wx/ffile.h>
 
 using namespace std;
 
@@ -61,6 +61,9 @@ SyncDialog::SyncDialog(wxWindow* window,
         m_radioBtn3->SetValue(true);    //other
 
     m_bpButton18->SetLabel(_("&Start"));
+
+    //set tooltip for ambivalent category "different"
+    adjustToolTips(m_bitmap17, config.compareVar);
 }
 
 //#################################################################################################################
@@ -154,6 +157,22 @@ void SyncDialog::updateConfigIcons(wxBitmapButton* button1,
         button5->SetBitmapLabel(*GlobalResources::bitmapNoArrow);
         button5->SetToolTip(_("Do nothing"));
     }
+}
+
+
+void SyncDialog::adjustToolTips(wxStaticBitmap* bitmap, const CompareVariant var)
+{
+    //set tooltip for ambivalent category "different"
+    if (var == CMP_BY_TIME_SIZE)
+    {
+        bitmap->SetToolTip(_("Files that exist on both sides, have same date but different filesizes"));
+    }
+    else if (var == CMP_BY_CONTENT)
+    {
+        bitmap->SetToolTip(_("Files that exist on both sides and have different content"));
+    }
+    else
+        assert(false);
 }
 
 
@@ -349,6 +368,8 @@ BatchDialog::BatchDialog(wxWindow* window,
     default:
         assert (false);
     }
+    //adjust toolTip
+    SyncDialog::adjustToolTips(m_bitmap17, config.compareVar);
 
     filterIsActive = config.filterIsActive;
     updateFilterButton();
@@ -447,6 +468,24 @@ void BatchDialog::OnSelectRecycleBin(wxCommandEvent& event)
 }
 
 
+void BatchDialog::OnChangeCompareVar(wxCommandEvent& event)
+{
+    CompareVariant var;
+    if (m_radioBtnSizeDate->GetValue())
+        var = CMP_BY_TIME_SIZE;
+    else if (m_radioBtnContent->GetValue())
+        var = CMP_BY_CONTENT;
+    else
+    {
+        assert(false);
+        var = CMP_BY_TIME_SIZE;
+    }
+
+    //set tooltip for ambivalent category "different"
+    SyncDialog::adjustToolTips(m_bitmap17, var);
+}
+
+
 void BatchDialog::OnClose(wxCloseEvent&   event)
 {
     EndModal(0);
@@ -479,7 +518,6 @@ void BatchDialog::OnCreateJob(wxCommandEvent& event)
         return;
     }
 
-
     //get a filename
 #ifdef FFS_WIN
     wxString fileName = wxT("SyncJob.cmd"); //proposal
@@ -499,43 +537,49 @@ void BatchDialog::OnCreateJob(wxCommandEvent& event)
             wxMessageDialog* messageDlg = new wxMessageDialog(this, wxString(wxT("\"")) + fileName + wxT("\"") + _(" already exists. Overwrite?"), _("Warning") , wxOK | wxCANCEL);
 
             if (messageDlg->ShowModal() != wxID_OK)
-            {
-                event.Skip();
                 return;
-            }
         }
 
         //assemble command line parameters
-        wxString outputString = parseConfiguration();
+        wxString outputString;
+        try
+        {
+            outputString+= parseConfiguration();
+        }
+        catch (const FileError& error)
+        {
+            wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
+            return;
+        }
 
         //write export file
-        ofstream output(fileName.c_str());
-        if (output)
+        wxFFile output(fileName, wxT("w"));
+        if (output.IsOpened())
         {
-            output<<outputString.c_str();
+            output.Write(outputString);
+
+#ifdef FFS_LINUX
+            //for linux the batch file needs the executable flag
+            output.Close();
+            wxExecute(wxString(wxT("chmod +x ")) + fileName);
+#endif  // FFS_LINUX
+
             EndModal(batchFileCreated);
         }
         else
-            wxMessageBox(wxString(_("Could not write to ")) + wxT("\"") + fileName + wxT("\""), _("An exception occured!"), wxOK | wxICON_ERROR);
+            wxMessageBox(wxString(_("Could not write to ")) + wxT("\"") + fileName + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
     }
-
-#ifdef FFS_LINUX
-    //for linux the batch file needs the executable flag
-    wxExecute(wxString(wxT("chmod +x ")) + fileName);
-#endif  // FFS_LINUX
-
-    event.Skip();
 }
 
 
 wxString getFormattedSyncDirection(const SyncDirection direction)
 {
     if (direction == SYNC_DIR_RIGHT)
-        return 'R';
+        return wxChar('R');
     else if (direction == SYNC_DIR_LEFT)
-        return 'L';
+        return wxChar('L');
     else if (direction == SYNC_DIR_NONE)
-        return 'N';
+        return wxChar('N');
     else
     {
         assert (false);
@@ -587,8 +631,28 @@ wxString BatchDialog::parseConfiguration()
     if (m_checkBoxSilent->GetValue())
         output+= wxString(wxT(" -")) + GlobalResources::paramSilent;
 
+#ifdef FFS_WIN
+    //retrieve 8.3 directory names to handle unicode names in batch file correctly
+    wxChar buffer[MAX_PATH];
+    if (GetShortPathName(
+                (m_directoryPanel1->GetValue()).c_str(),	// points to a null-terminated path string
+                buffer,	    // points to a buffer to receive the null-terminated short form of the path
+                MAX_PATH	// specifies the size of the buffer pointed to by lpszShortPath
+            ) == 0)
+        throw FileError(wxString(_("Could not retrieve the 8.3 directory name of ")) + wxT("\"") + m_directoryPanel1->GetValue() + wxT("\""));
+    output+= wxString(wxT(" ")) + buffer;
+
+    if (GetShortPathName(
+                (m_directoryPanel2->GetValue()).c_str(),	// points to a null-terminated path string
+                buffer,	    // points to a buffer to receive the null-terminated short form of the path
+                MAX_PATH	// specifies the size of the buffer pointed to by lpszShortPath
+            ) == 0)
+        throw FileError(wxString(_("Could not retrieve the 8.3 directory name of ")) + wxT("\"") + m_directoryPanel2->GetValue() + wxT("\""));
+    output+= wxString(wxT(" ")) + buffer;
+#else
     output+= wxString(wxT(" ")) + wxT("\"") + wxDir(m_directoryPanel1->GetValue()).GetName() + wxT("\""); //directory WITHOUT trailing path separator
     output+= wxString(wxT(" ")) + wxT("\"") + wxDir(m_directoryPanel2->GetValue()).GetName() + wxT("\""); //needed since e.g. "C:\" isn't parsed correctly by commandline
+#endif  // FFS_WIN
 
     output+= wxT("\n");
 

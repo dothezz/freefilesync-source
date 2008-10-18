@@ -16,6 +16,7 @@
 #include "FreeFileSync.h"
 #include "ui/smallDialogs.h"
 #include "library/misc.h"
+#include <wx/stopwatch.h>
 
 class Application : public wxApp
 {
@@ -37,6 +38,7 @@ private:
 
     bool applicationRunsOnCommandLineWithoutWindows;
     wxFFile logFile;
+    wxStopWatch totalTime;
     CustomLocale programLanguage;
 
     int returnValue;
@@ -53,7 +55,7 @@ public:
     void initNewProcess(int objectsTotal, double dataTotal, int processID);
     void updateProcessedData(int objectsProcessed, double dataProcessed);
     int reportError(const wxString& text);
-    void triggerUI_Refresh();
+    void triggerUI_Refresh(bool asyncProcessActive);
 
     void noSynchronizationNeeded();
 

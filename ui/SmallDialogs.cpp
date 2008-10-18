@@ -14,7 +14,7 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
     m_bitmap13->SetBitmap(*GlobalResources::bitmapGPL);
 
     //build information
-    wxString build = wxString(_("(Build: ")) + __TDATE__;
+    wxString build = wxString(wxT("(")) + _("Build: ") + __TDATE__;
 #if wxUSE_UNICODE
     build+= wxT(" - Unicode");
 #else
@@ -109,8 +109,8 @@ void FilterDlg::OnCancel(wxCommandEvent& event)
 
 void FilterDlg::OnDefault(wxCommandEvent& event)
 {
-    m_textCtrlInclude->SetValue("*");
-    m_textCtrlExclude->SetValue("");
+    m_textCtrlInclude->SetValue(wxT("*"));
+    m_textCtrlExclude->SetValue(wxEmptyString);
 
     //changes to mainDialog are only committed when the OK button is pressed
     event.Skip();
@@ -304,6 +304,8 @@ SyncStatus::SyncStatus(StatusUpdater* updater, wxWindow* parentWindow) :
 
     if (windowToDis)    //disable (main) window while this status dialog is shown
         windowToDis->Disable();
+
+    timeElapsed.Start(); //measure total time
 }
 
 
@@ -362,8 +364,12 @@ void SyncStatus::updateStatusDialogNow()
     const wxString remainingBytes = FreeFileSync::formatFilesizeToShortString(totalData - currentData);
     m_staticTextDataRemaining->SetLabel(remainingBytes);
 
+    //time elapsed
+    m_staticTextTimeElapsed->SetLabel((wxTimeSpan::Milliseconds(timeElapsed.Time())).Format());
+
     //do the ui update
     bSizer28->Layout();
+    bSizer31->Layout();
     updateUI_Now();
 
     //support for pause button
@@ -431,7 +437,6 @@ void SyncStatus::processHasFinished(SyncStatusID id) //essential to call this in
     m_buttonOK->SetFocus();
 
     m_animationControl1->Stop();
-
     //m_animationControl1->SetInactiveBitmap(*GlobalResources::bitmapFinished);
     m_animationControl1->Hide();
 
@@ -453,13 +458,14 @@ void SyncStatus::OnPause(wxCommandEvent& event)
         processPaused = false;
         m_buttonPause->SetLabel(_("Pause"));
         m_animationControl1->Play();
-
+        timeElapsed.Resume();
     }
     else
     {
         processPaused = true;
         m_buttonPause->SetLabel(_("Continue"));
         m_animationControl1->Stop();
+        timeElapsed.Pause();
     }
 }
 
@@ -467,7 +473,18 @@ void SyncStatus::OnPause(wxCommandEvent& event)
 void SyncStatus::OnAbort(wxCommandEvent& event)
 {
     processPaused = false;
-    if (currentProcessIsRunning) currentStatusUpdater->requestAbortion();
+    if (currentProcessIsRunning)
+    {
+        m_buttonAbort->Disable();
+        m_buttonAbort->Hide();
+        m_buttonPause->Disable();
+        m_buttonPause->Hide();
+
+        setStatusText_NoUpdate(_("Abort requested: Waiting for current operation to finish..."));
+        //no Layout() or UI-update here to avoid cascaded Yield()-call
+
+        currentStatusUpdater->requestAbortion();
+    }
 }
 
 
@@ -483,7 +500,7 @@ void SyncStatus::OnClose(wxCloseEvent& event)
 
 CompareStatus::CompareStatus(wxWindow* parentWindow) :
         CompareStatusGenerated(parentWindow),
-        scannedFiles(0),
+        scannedObjects(0),
         totalCmpData(0),
         processedCmpData(0),
         scalingFactorCmp(0),
@@ -526,9 +543,9 @@ void CompareStatus::resetCmpGauge(int totalCmpObjectsToProcess, double totalCmpD
 }
 
 
-void CompareStatus::incScannedFiles_NoUpdate(int number)
+void CompareStatus::incScannedObjects_NoUpdate(int number)
 {
-    scannedFiles+= number;
+    scannedObjects+= number;
 }
 
 
@@ -553,7 +570,7 @@ void CompareStatus::updateStatusPanelNow()
     //status texts
     m_textCtrlFilename->SetValue(currentStatusText);
 
-    m_staticTextScanned->SetLabel(numberToWxString(scannedFiles));
+    m_staticTextScanned->SetLabel(numberToWxString(scannedObjects));
 
     //progress indicator for "compare file content"
     m_gauge2->SetValue(int(processedCmpData * scalingFactorCmp));

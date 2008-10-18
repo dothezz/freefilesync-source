@@ -10,7 +10,7 @@
 #include "mainDialog.h"
 #include <wx/filename.h>
 #include "../library/globalFunctions.h"
-#include <fstream>
+#include <wx/wfstream.h>
 #include <wx/clipbrd.h>
 #include <wx/file.h>
 #include "../library/customGrid.h"
@@ -182,7 +182,9 @@ MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale
     case wxLANGUAGE_GERMAN:
         m_menuItemGerman->Check();
         break;
-
+    case wxLANGUAGE_FRENCH:
+        m_menuItemFrench->Check();
+        break;
     default:
         m_menuItemEnglish->Check();
     }
@@ -260,7 +262,7 @@ MainDialog::~MainDialog()
 
     writeConfigurationToHD(FreeFileSync::FfsLastConfigFile);   //don't trow exceptions in destructors
 
-    if (restartOnExit)
+    if (restartOnExit)  //needed so that restart is scheduled AFTER configuration was written!
     {   //create new dialog
         MainDialog* frame = new MainDialog(0L, FreeFileSync::FfsLastConfigFile, programLanguage);
         frame->SetIcon(*GlobalResources::programIcon); //set application icon
@@ -635,7 +637,7 @@ public:
     void updateStatusText(const wxString& text) {}
     void initNewProcess(int objectsTotal, double dataTotal, int processID) {}
     void updateProcessedData(int objectsProcessed, double dataProcessed) {}
-    void triggerUI_Refresh() {}
+    void triggerUI_Refresh(bool asyncProcessActive) {}
 
 private:
     bool continueOnError;
@@ -1236,119 +1238,116 @@ void MainDialog::readConfigurationFromHD(const wxString& filename, bool programS
 {
     char bigBuffer[10000];
 
-    ifstream config(filename.c_str());
-    if (!config)
+    if (wxFileExists(filename))
     {
-        if (programStartup)
-            loadDefaultConfiguration();
-        else
-            wxMessageBox(wxString(_("Could not read configuration file ")) + wxT("\"") + filename + wxT("\""), _("An exception occured!"), wxOK | wxICON_ERROR);
+        wxFFileInputStream config(filename);
+        if (config.IsOk())
+        {
 
-        return;
+            //read FFS identifier
+            config.Read(bigBuffer, FreeFileSync::FfsConfigFileID.size());
+            bigBuffer[FreeFileSync::FfsConfigFileID.size()] = 0;
+
+            if (string(bigBuffer) != FreeFileSync::FfsConfigFileID)
+            {
+                wxMessageBox(_("The selected file does not contain a valid configuration!"), _("Warning"), wxOK);
+                return;
+            }
+
+            //put filename on list of last used config files
+            addCfgFileToHistory(filename);
+
+            //read sync configuration
+            cfg.syncConfiguration.exLeftSideOnly  = SyncDirection(config.GetC());
+            cfg.syncConfiguration.exRightSideOnly = SyncDirection(config.GetC());
+            cfg.syncConfiguration.leftNewer       = SyncDirection(config.GetC());
+            cfg.syncConfiguration.rightNewer      = SyncDirection(config.GetC());
+            cfg.syncConfiguration.different       = SyncDirection(config.GetC());
+
+            //read compare algorithm
+            cfg.compareVar = CompareVariant(config.GetC());
+            updateCompareButtons();
+
+            //read column sizes
+            for (int i = 0; i < m_grid1->GetNumberCols(); ++i)
+                m_grid1->SetColSize(i, globalFunctions::readInt(config));
+
+            for (int i = 0; i < m_grid2->GetNumberCols(); ++i)
+                m_grid2->SetColSize(i, globalFunctions::readInt(config));
+
+            //read application window size and position
+            bool startWindowMaximized = bool(config.GetC());
+
+            int widthTmp   = globalFunctions::readInt(config);
+            int heighthTmp = globalFunctions::readInt(config);
+            int posX_Tmp   = globalFunctions::readInt(config);
+            int posY_Tmp   = globalFunctions::readInt(config);
+
+            //apply window size and position at program startup ONLY
+            if (programStartup)
+            {
+                widthNotMaximized  = widthTmp;
+                heightNotMaximized = heighthTmp;
+                posXNotMaximized   = posX_Tmp;
+                posYNotMaximized   = posY_Tmp;
+
+                //apply window size and position
+                SetSize(posXNotMaximized, posYNotMaximized, widthNotMaximized, heightNotMaximized);
+                Maximize(startWindowMaximized);
+            }
+
+            //read last directory selection
+            int byteCount = globalFunctions::readInt(config);
+            config.Read(bigBuffer, byteCount);
+            wxString leftDir = wxString::FromUTF8(bigBuffer, byteCount);
+            m_directoryPanel1->SetValue(leftDir);
+            if (wxDirExists(leftDir))
+                m_dirPicker1->SetPath(leftDir);
+
+            byteCount = globalFunctions::readInt(config);
+            config.Read(bigBuffer, byteCount);
+            wxString rightDir = wxString::FromUTF8(bigBuffer, byteCount);
+            m_directoryPanel2->SetValue(rightDir);
+            if (wxDirExists(rightDir))
+                m_dirPicker2->SetPath(rightDir);
+
+            //read filter settings:
+            cfg.hideFiltered = bool(config.GetC());
+            m_checkBoxHideFilt->SetValue(cfg.hideFiltered);
+
+            cfg.filterIsActive = bool(config.GetC());
+            updateFilterButton(m_bpButtonFilter, cfg.filterIsActive);
+
+            //include
+            byteCount = globalFunctions::readInt(config);
+            config.Read(bigBuffer, byteCount);
+            cfg.includeFilter = wxString::FromUTF8(bigBuffer, byteCount);
+
+            //exclude
+            byteCount = globalFunctions::readInt(config);
+            config.Read(bigBuffer, byteCount);
+            cfg.excludeFilter = wxString::FromUTF8(bigBuffer, byteCount);
+
+            cfg.useRecycleBin   =  bool(config.GetC());
+
+            cfg.continueOnError =  bool(config.GetC());
+
+            return;
+        }
     }
 
-    //read FFS identifier
-    config.get(bigBuffer, FreeFileSync::FfsConfigFileID.size() + 1);
-
-    if (string(bigBuffer) != FreeFileSync::FfsConfigFileID)
-    {
-        wxMessageBox(_("The selected file does not contain a valid configuration!"), _("Warning"), wxOK);
-        config.close();
-        return;
-    }
-
-
-    //put filename on list of last used config files
-    addCfgFileToHistory(filename);
-
-
-    //read sync configuration
-    cfg.syncConfiguration.exLeftSideOnly  = SyncDirection(config.get());
-    cfg.syncConfiguration.exRightSideOnly = SyncDirection(config.get());
-    cfg.syncConfiguration.leftNewer       = SyncDirection(config.get());
-    cfg.syncConfiguration.rightNewer      = SyncDirection(config.get());
-    cfg.syncConfiguration.different       = SyncDirection(config.get());
-
-    //read compare algorithm
-    cfg.compareVar = CompareVariant(config.get());
-    updateCompareButtons();
-
-    //read column sizes
-    for (int i = 0; i < m_grid1->GetNumberCols(); ++i)
-    {
-        config.getline(bigBuffer, 100, char(0));
-        m_grid1->SetColSize(i, atoi(bigBuffer));
-    }
-    for (int i = 0; i < m_grid2->GetNumberCols(); ++i)
-    {
-        config.getline(bigBuffer, 100, char(0));
-        m_grid2->SetColSize(i, atoi(bigBuffer));
-    }
-
-    //read application window size and position
-    bool startWindowMaximized = bool(config.get());
-
-    config.getline(bigBuffer, 100, char(0));
-    int widthTmp = atoi(bigBuffer);
-    config.getline(bigBuffer, 100, char(0));
-    int heighthTmp = atoi(bigBuffer);
-
-    config.getline(bigBuffer, 100, char(0));
-    int posX_Tmp = atoi(bigBuffer);
-    config.getline(bigBuffer, 100, char(0));
-    int posY_Tmp = atoi(bigBuffer);
-
-    //apply window size and position at program startup ONLY
+    //handle error situation:
     if (programStartup)
-    {
-        widthNotMaximized  = widthTmp;
-        heightNotMaximized = heighthTmp;
-        posXNotMaximized   = posX_Tmp;
-        posYNotMaximized   = posY_Tmp;
-
-        //apply window size and position
-        SetSize(posXNotMaximized, posYNotMaximized, widthNotMaximized, heightNotMaximized);
-        Maximize(startWindowMaximized);
-    }
-
-    //read last directory selection
-    config.getline(bigBuffer, 10000, char(0));
-    m_directoryPanel1->SetValue(bigBuffer);
-    if (wxDirExists(bigBuffer))
-        m_dirPicker1->SetPath(bigBuffer);
-
-    config.getline(bigBuffer, 10000, char(0));
-    m_directoryPanel2->SetValue(bigBuffer);
-    if (wxDirExists(bigBuffer))
-        m_dirPicker2->SetPath(bigBuffer);
-
-    //read filter settings:
-    cfg.hideFiltered = bool(config.get());
-    m_checkBoxHideFilt->SetValue(cfg.hideFiltered);
-
-    cfg.filterIsActive = bool(config.get());
-    updateFilterButton(m_bpButtonFilter, cfg.filterIsActive);
-
-    //include
-    config.getline(bigBuffer, 10000, char(0));
-    cfg.includeFilter = bigBuffer;
-
-    //exclude
-    config.getline(bigBuffer, 10000, char(0));
-    cfg.excludeFilter = bigBuffer;
-
-    cfg.useRecycleBin   =  bool(config.get());
-
-    cfg.continueOnError =  bool(config.get());
-
-    config.close();
+        loadDefaultConfiguration();
+    else
+        wxMessageBox(wxString(_("Could not read configuration file ")) + wxT("\"") + filename + wxT("\""), _("An exception occured!"), wxOK | wxICON_ERROR);
 }
 
 
 void MainDialog::writeConfigurationToHD(const wxString& filename)
 {
-    ofstream config(filename.c_str());
-    if (!config)
+    wxFFileOutputStream config(filename);
+    if (!config.IsOk())
     {
         wxMessageBox(wxString(_("Could not write to ")) + wxT("\"") + filename + wxT("\""), _("An exception occured!"), wxOK | wxICON_ERROR);
         return;
@@ -1358,51 +1357,64 @@ void MainDialog::writeConfigurationToHD(const wxString& filename)
     addCfgFileToHistory(filename);
 
     //write FFS identifier
-    config<<FreeFileSync::FfsConfigFileID.c_str();
+    config.Write(FreeFileSync::FfsConfigFileID.c_str(), FreeFileSync::FfsConfigFileID.size());
 
     //write sync configuration
-    config<<char(cfg.syncConfiguration.exLeftSideOnly)
-    <<char(cfg.syncConfiguration.exRightSideOnly)
-    <<char(cfg.syncConfiguration.leftNewer)
-    <<char(cfg.syncConfiguration.rightNewer)
-    <<char(cfg.syncConfiguration.different);
+    config.PutC(char(cfg.syncConfiguration.exLeftSideOnly));
+    config.PutC(char(cfg.syncConfiguration.exRightSideOnly));
+    config.PutC(char(cfg.syncConfiguration.leftNewer));
+    config.PutC(char(cfg.syncConfiguration.rightNewer));
+    config.PutC(char(cfg.syncConfiguration.different));
 
     //write compare algorithm
-    config<<char(cfg.compareVar);
+    config.PutC(char(cfg.compareVar));
 
     //write column sizes
     for (int i = 0; i < m_grid1->GetNumberCols(); ++i)
-        config<<m_grid1->GetColSize(i)<<char(0);
+        globalFunctions::writeInt(config, m_grid1->GetColSize(i));
+
     for (int i = 0; i < m_grid2->GetNumberCols(); ++i)
-        config<<m_grid2->GetColSize(i)<<char(0);
+        globalFunctions::writeInt(config, m_grid2->GetColSize(i));
 
     //write application window size and position
-    config<<char(IsMaximized());
+    config.PutC(char(IsMaximized()));
 
     //window size
-    config<<widthNotMaximized<<char(0);
-    config<<heightNotMaximized<<char(0);
+    globalFunctions::writeInt(config, widthNotMaximized);
+    globalFunctions::writeInt(config, heightNotMaximized);
 
     //window position
-    config<<posXNotMaximized<<char(0);
-    config<<posYNotMaximized<<char(0);
+    globalFunctions::writeInt(config, posXNotMaximized);
+    globalFunctions::writeInt(config, posYNotMaximized);
 
     //write last directory selection
-    config<<m_directoryPanel1->GetValue().c_str()<<char(0)
-    <<m_directoryPanel2->GetValue().c_str()<<char(0);
+    wxCharBuffer buffer = (m_directoryPanel1->GetValue()).ToUTF8();
+    int byteCount = strlen(buffer);
+    globalFunctions::writeInt(config, byteCount);
+    config.Write(buffer, byteCount);
+
+    buffer = (m_directoryPanel2->GetValue()).ToUTF8();
+    byteCount = strlen(buffer);
+    globalFunctions::writeInt(config, byteCount);
+    config.Write(buffer, byteCount);
 
     //write filter settings
-    config<<char(cfg.hideFiltered);
-    config<<char(cfg.filterIsActive);
+    config.PutC(char(cfg.hideFiltered));
+    config.PutC(char(cfg.filterIsActive));
 
-    config<<cfg.includeFilter.c_str()<<char(0)
-    <<cfg.excludeFilter.c_str()<<char(0);
+    buffer = (cfg.includeFilter).ToUTF8();
+    byteCount = strlen(buffer);
+    globalFunctions::writeInt(config, byteCount);
+    config.Write(buffer, byteCount);
 
-    config<<char(cfg.useRecycleBin);
+    buffer = (cfg.excludeFilter).ToUTF8();
+    byteCount = strlen(buffer);
+    globalFunctions::writeInt(config, byteCount);
+    config.Write(buffer, byteCount);
 
-    config<<char(cfg.continueOnError);
+    config.PutC(char(cfg.useRecycleBin));
 
-    config.close();
+    config.PutC(char(cfg.continueOnError));
 }
 
 
@@ -2009,8 +2021,10 @@ void MainDialog::updateStatusInformation(const GridView& visibleGrid)
     while (stackObjects.size() > 0)
         stackObjects.pop();
 
-    unsigned int objectsOnLeftView = 0;
-    unsigned int objectsOnRightView = 0;
+    unsigned int filesOnLeftView    = 0;
+    unsigned int foldersOnLeftView  = 0;
+    unsigned int filesOnRightView   = 0;
+    unsigned int foldersOnRightView = 0;
     wxULongLong filesizeLeftView;
     wxULongLong filesizeRightView;
 
@@ -2022,27 +2036,55 @@ void MainDialog::updateStatusInformation(const GridView& visibleGrid)
     {
         const FileCompareLine& refLine = currentGridData[*i];
 
-        //calculate total number of bytes for each sied
-        if (refLine.fileDescrLeft.objType != TYPE_NOTHING)
+        //calculate total number of bytes for each side
+        if (refLine.fileDescrLeft.objType == TYPE_FILE)
         {
             filesizeLeftView+= refLine.fileDescrLeft.fileSize;
-            ++objectsOnLeftView;
+            ++filesOnLeftView;
         }
+        else if (refLine.fileDescrLeft.objType == TYPE_DIRECTORY)
+            ++foldersOnLeftView;
 
-        if (refLine.fileDescrRight.objType != TYPE_NOTHING)
+        if (refLine.fileDescrRight.objType == TYPE_FILE)
         {
             filesizeRightView+= refLine.fileDescrRight.fileSize;
-            ++objectsOnRightView;
+            ++filesOnRightView;
         }
+        else if (refLine.fileDescrRight.objType == TYPE_DIRECTORY)
+            ++foldersOnRightView;
+    }
+//#################################################
+// format numbers to text
+
+//show status information on "root" level. This cannot be accomplished in writeGrid since filesizes are already formatted for display there
+    if (foldersOnLeftView)
+    {
+        wxString folderCount = numberToWxString(foldersOnLeftView);
+        globalFunctions::includeNumberSeparator(folderCount);
+
+        statusLeftNew+= folderCount;
+        if (foldersOnLeftView == 1)
+            statusLeftNew+= _(" directory");
+        else
+            statusLeftNew+= _(" directories");
+
+        if (filesOnLeftView)
+            statusLeftNew+= wxT(", ");
     }
 
-    //show status information on "root" level. This cannot be accomplished in writeGrid since filesizes are already formatted for display there
-    wxString objectsViewLeft = numberToWxString(objectsOnLeftView);
-    globalFunctions::includeNumberSeparator(objectsViewLeft);
-    if (objectsOnLeftView == 1)
-        statusLeftNew = wxString(_("1 item on left, ")) + FreeFileSync::formatFilesizeToShortString(filesizeLeftView);
-    else
-        statusLeftNew = objectsViewLeft + _(" items on left, ") + FreeFileSync::formatFilesizeToShortString(filesizeLeftView);
+    if (filesOnLeftView)
+    {
+        wxString fileCount = numberToWxString(filesOnLeftView);
+        globalFunctions::includeNumberSeparator(fileCount);
+
+        statusLeftNew+= fileCount;
+        if (filesOnLeftView == 1)
+            statusLeftNew+= _(" file, ");
+        else
+            statusLeftNew+= _(" files, ");
+
+        statusLeftNew+= FreeFileSync::formatFilesizeToShortString(filesizeLeftView);
+    }
 
     wxString objectsTotal = numberToWxString(currentGridData.size());
     globalFunctions::includeNumberSeparator(objectsTotal);
@@ -2054,12 +2096,35 @@ void MainDialog::updateStatusInformation(const GridView& visibleGrid)
         statusMiddleNew = objectsView + _(" of ") + objectsTotal + _(" rows in view");
 
 
-    wxString objectsViewRight = numberToWxString(objectsOnRightView);
-    globalFunctions::includeNumberSeparator(objectsViewRight);
-    if (objectsOnRightView == 1)
-        statusRightNew = wxString(_("1 item on right, ")) + FreeFileSync::formatFilesizeToShortString(filesizeRightView);
-    else
-        statusRightNew = objectsViewRight + _(" items on right, ") + FreeFileSync::formatFilesizeToShortString(filesizeRightView);
+    if (foldersOnRightView)
+    {
+        wxString folderCount = numberToWxString(foldersOnRightView);
+        globalFunctions::includeNumberSeparator(folderCount);
+
+        statusRightNew+= folderCount;
+        if (foldersOnRightView == 1)
+            statusRightNew+= _(" directory");
+        else
+            statusRightNew+= _(" directories");
+
+        if (filesOnRightView)
+            statusRightNew+= wxT(", ");
+    }
+
+    if (filesOnRightView)
+    {
+        wxString fileCount = numberToWxString(filesOnRightView);
+        globalFunctions::includeNumberSeparator(fileCount);
+
+        statusRightNew+= fileCount;
+        if (filesOnRightView == 1)
+            statusRightNew+= _(" file, ");
+        else
+            statusRightNew+= _(" files, ");
+
+        statusRightNew+= FreeFileSync::formatFilesizeToShortString(filesizeRightView);
+    }
+
 
     //avoid screen flicker
     if (m_staticTextStatusLeft->GetLabel() != statusLeftNew)
@@ -2288,7 +2353,7 @@ inline
 void CompareStatusUpdater::updateProcessedData(int objectsProcessed, double dataProcessed)
 {
     if (currentProcess == FreeFileSync::scanningFilesProcess)
-        statusPanel->incScannedFiles_NoUpdate(objectsProcessed);
+        statusPanel->incScannedObjects_NoUpdate(objectsProcessed);
     else if (currentProcess == FreeFileSync::compareFileContentProcess)
         statusPanel->incProcessedCmpData_NoUpdate(objectsProcessed, dataProcessed);
     else assert(false);
@@ -2329,9 +2394,10 @@ int CompareStatusUpdater::reportError(const wxString& text)
 
 
 inline
-void CompareStatusUpdater::triggerUI_Refresh()
+void CompareStatusUpdater::triggerUI_Refresh(bool asyncProcessActive)
 {
-    if (abortionRequested) throw AbortThisProcess();    //abort can be triggered by syncStatusFrame
+    if (abortionRequested && !asyncProcessActive)
+        throw AbortThisProcess();    //abort can be triggered by syncStatusFrame
 
     if (updateUI_IsAllowed()) //test if specific time span between ui updates is over
         statusPanel->updateStatusPanelNow();
@@ -2441,9 +2507,9 @@ int SyncStatusUpdater::reportError(const wxString& text)
 }
 
 
-void SyncStatusUpdater::triggerUI_Refresh()
+void SyncStatusUpdater::triggerUI_Refresh(bool asyncProcessActive)
 {
-    if (abortionRequested)
+    if (abortionRequested && !asyncProcessActive)
         throw AbortThisProcess();  //abort can be triggered by syncStatusFrame
 
     if (updateUI_IsAllowed())  //test if specific time span between ui updates is over
@@ -2555,6 +2621,15 @@ void MainDialog::OnMenuLangEnglish(wxCommandEvent& event)
 void MainDialog::OnMenuLangGerman(wxCommandEvent& event)
 {
     programLanguage->loadLanguageFile(wxLANGUAGE_GERMAN); //language is a global attribute
+    restartOnExit = true;
+    Destroy();
+    event.Skip();
+}
+
+
+void MainDialog::OnMenuLangFrench(wxCommandEvent& event)
+{
+    programLanguage->loadLanguageFile(wxLANGUAGE_FRENCH); //language is a global attribute
     restartOnExit = true;
     Destroy();
     event.Skip();

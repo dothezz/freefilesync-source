@@ -4,6 +4,8 @@
 #include <string>
 #include <algorithm>
 #include <wx/string.h>
+#include <fstream>
+#include <wx/stream.h>
 
 using namespace std;
 
@@ -32,6 +34,12 @@ namespace globalFunctions
     double wxStringToDouble(const wxString& number); //Convert wxString to number
 
     wxString& includeNumberSeparator(wxString& number);
+
+    int readInt(ifstream& stream);  //read int from file stream
+    void writeInt(ofstream& stream, const int number);  //write int to filestream
+
+    int readInt(wxInputStream& stream);  //read int from file stream
+    void writeInt(wxOutputStream& stream, const int number);  //write int to filestream
 }
 
 
