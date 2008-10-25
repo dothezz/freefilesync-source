@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Oct 18 2008)
+// C++ code generated with wxFormBuilder (version Apr 16 2008)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -356,11 +356,11 @@ GuiGenerated::GuiGenerated( wxWindow* parent, wxWindowID id, const wxString& tit
 	
 	sbSizer16->Add( m_bpButton201, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 	
-	wxString m_choiceLoadChoices[] = { _("Load configuration...") };
+	wxString m_choiceLoadChoices[] = { _("Load from file...") };
 	int m_choiceLoadNChoices = sizeof( m_choiceLoadChoices ) / sizeof( wxString );
 	m_choiceLoad = new wxChoice( m_panel4, wxID_ANY, wxDefaultPosition, wxSize( 140,-1 ), m_choiceLoadNChoices, m_choiceLoadChoices, 0 );
 	m_choiceLoad->SetSelection( 0 );
-	m_choiceLoad->SetToolTip( _("Load configuration from file:\n     - use this choice box\n     - drag & drop config file to this window\n     - specify config file as first commandline parameter") );
+	m_choiceLoad->SetToolTip( _("Load configuration via...\n     - this list (press DEL to delete items)\n     - drag & drop to this window\n     - startup parameter") );
 	
 	sbSizer16->Add( m_choiceLoad, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -787,27 +787,27 @@ SyncDlgGenerated::SyncDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	
 	fgSizer1->Add( m_radioBtn1, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_buttonOneWay = new wxButton( this, wxID_ANY, _("One way ->"), wxDefaultPosition, wxSize( 130,-1 ), 0 );
+	m_buttonOneWay = new wxButton( this, wxID_ANY, _("One way ->"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
 	m_buttonOneWay->SetFont( wxFont( 11, 74, 90, 92, false, wxT("Tahoma") ) );
 	
-	fgSizer1->Add( m_buttonOneWay, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	fgSizer1->Add( m_buttonOneWay, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
 	m_staticText8 = new wxStaticText( this, wxID_ANY, _("Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText8->Wrap( 260 );
-	fgSizer1->Add( m_staticText8, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
+	m_staticText8->Wrap( 300 );
+	fgSizer1->Add( m_staticText8, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_radioBtn2 = new wxRadioButton( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_radioBtn2->SetFont( wxFont( 11, 74, 90, 92, false, wxT("Tahoma") ) );
 	
 	fgSizer1->Add( m_radioBtn2, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_buttonTwoWay = new wxButton( this, wxID_ANY, _("Two way <->"), wxDefaultPosition, wxSize( 130,-1 ), 0 );
+	m_buttonTwoWay = new wxButton( this, wxID_ANY, _("Two way <->"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
 	m_buttonTwoWay->SetFont( wxFont( 11, 74, 90, 92, false, wxT("Tahoma") ) );
 	
-	fgSizer1->Add( m_buttonTwoWay, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	fgSizer1->Add( m_buttonTwoWay, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_staticText10 = new wxStaticText( this, wxID_ANY, _("Synchronize both sides simultaneously: Copy new or updated files in both directions."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText10->Wrap( 250 );
+	m_staticText10->Wrap( 300 );
 	fgSizer1->Add( m_staticText10, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
 	m_radioBtn3 = new wxRadioButton( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
@@ -815,14 +815,25 @@ SyncDlgGenerated::SyncDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	
 	fgSizer1->Add( m_radioBtn3, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	m_staticText23 = new wxStaticText( this, wxID_ANY, _("Custom"), wxDefaultPosition, wxSize( 130,-1 ), wxALIGN_CENTRE|wxSTATIC_BORDER );
+	wxBoxSizer* bSizer65;
+	bSizer65 = new wxBoxSizer( wxVERTICAL );
+	
+	
+	bSizer65->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_staticText23 = new wxStaticText( this, wxID_ANY, _("Custom"), wxDefaultPosition, wxSize( -1,-1 ), wxALIGN_CENTRE|wxSTATIC_BORDER );
 	m_staticText23->Wrap( -1 );
 	m_staticText23->SetFont( wxFont( 11, 74, 90, 92, false, wxT("Tahoma") ) );
 	
-	fgSizer1->Add( m_staticText23, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer65->Add( m_staticText23, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+	
+	
+	bSizer65->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	fgSizer1->Add( bSizer65, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
 	m_staticText9 = new wxStaticText( this, wxID_ANY, _("Configure your own synchronization rules."), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText9->Wrap( 250 );
+	m_staticText9->Wrap( 300 );
 	fgSizer1->Add( m_staticText9, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
 	sbSizer7->Add( fgSizer1, 0, 0, 5 );

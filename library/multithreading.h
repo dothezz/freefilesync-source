@@ -62,6 +62,7 @@ private:
 
     wxMutex     readyToReceiveResult;
     wxCondition receivingResult;
+    bool workDone; //workaround for a bug in wxWidgets v2.8.9 class wxCondition: signals might get lost
 };
 
 #endif // MULTITHREADING_H_INCLUDED

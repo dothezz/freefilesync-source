@@ -11,13 +11,13 @@
  TB
  To
  You may try to synchronize remaining items again (WITHOUT having to re-compare)!
- Vous pouvez essayer de synchroniser à nouveau les éléments restants (SANS avoir à les re-comparer) !
+ Vous pouvez essayer de synchroniser Ã  nouveau les Ã©lÃ©ments restants (SANS avoir Ã  les re-comparer) !
  already exists. Overwrite?
- existe déjà. Voulez-vous le remplacer ?
+ existe dÃ©jÃ . Voulez-vous le remplacer ?
  directories
- répertoires
+ rÃ©pertoires
  directory
- répertoire
+ rÃ©pertoire
  does not exist.
  n'existe pas.
  file, 
@@ -25,7 +25,7 @@
  files, 
  fichiers, 
  item(s):\n\n
- Elément(s):\n\n
+ ElÃ©ment(s):\n\n
  kB
  ko
  of 
@@ -39,15 +39,15 @@
  to 
  vers 
  to recycle bin!
- à la corbeille !
+ Ã  la corbeille !
 !=	files are different\n
-!=	les fichiers sont différents\n
+!=	les fichiers sont diffÃ©rents\n
 &Abort
 &Abandon
 &About...
 &A propos de...
 &Advanced
-&Avancé
+&AvancÃ©
 &Back
 &Retour
 &Cancel
@@ -57,11 +57,11 @@
 &Continue
 &Continuer
 &Create
-&Créer
+&CrÃ©er
 &Create batch job
-&Créer un fichier de commandes
+&CrÃ©er un fichier de commandes
 &Default
-&Défaut
+&DÃ©faut
 &Export file list
 &Exportation de la liste des fichiers
 &File
@@ -77,13 +77,13 @@
 &Quit
 &Quitter
 &Retry
-&Réessayer
+&RÃ©essayer
 &Start
-&Démarrage
+&DÃ©marrage
 &Synchronize
 &Synchronisation
 (-)	filtered out from sync-process\n
-(-)	non synchronisés\n
+(-)	non synchronisÃ©s\n
 ,
 .
 -------------------------------------------------
@@ -96,60 +96,58 @@
 -Synchronisation de fichiers Open-Source-
 .
 ,
-.\n\nExamples:\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n1: Creates a mirror backup of the left directory\n2: Synchronizes all *.doc files from both directories simultaneously\n\n
-.\n\nExemples :\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n1: Crée une sauvegarde miroir du répertoire de gauche\n2: Synchronise tous les fichiers *.doc sur les deux répertoires\n\n
 1. Enter full file or directory names separated by ';'.\n2. Wildcard characters '*' and '?' are supported.\n3. Case sensitive expressions!\n\nExample: *.tmp;*\\filename.dat;*\\directory\\*
-1. Entrer les noms complets des fichiers ou répertoires séparés par des ';'.\n2. Les caractères génériques '*' et '?' sont supportés.\n3. La distinction est faite entre majuscules et minuscules!\n\nExemple: *.tmp;*\\fichier.dat;*\\repert\\*
+1. Entrer les noms complets des fichiers ou rÃ©pertoires sÃ©parÃ©s par des ';'.\n2. Les caractÃ¨res gÃ©nÃ©riques '*' et '?' sont supportÃ©s.\n3. La distinction est faite entre majuscules et minuscules!\n\nExemple: *.tmp;*\\fichier.dat;*\\repert\\*
 : check file content\n
-: Contrôle le contenu du fichier\n
+: ContrÃ´le le contenu du fichier\n
 : check filesize and date\n\t\t
-: Contrôle la taille et la date\n\t\t
+: ContrÃ´le la taille et la date\n\t\t
 <<	left file is newer\n
-<<	le fichier de gauche est plus récent\n
+<<	le fichier de gauche est plus rÃ©cent\n
 <Directory>
-<Répertoire>
+<RÃ©pertoire>
 <left directory>
-<répertoire de gauche>
+<rÃ©pertoire de gauche>
 <right directory>
-<répertoire de droite>
+<rÃ©pertoire de droite>
 <|	file on left side only\n
-<|	Le fichier existe seulement à gauche\n
+<|	Le fichier existe seulement Ã  gauche\n
 ==	files are equal\n\n
 ==	Les fichiers sont identiques\n\n
 >>	right file is newer\n
->>	le fichier de droite est plus récent\n
+>>	le fichier de droite est plus rÃ©cent\n
 Abort
 Abandon
 Abort requested: Waiting for current operation to finish...
-Abandon demandé: En attente de la fin de l'opération en cours...
+Abandon demandÃ©: En attente de la fin de l'opÃ©ration en cours...
 Aborted
-Abandonné
+AbandonnÃ©
 About
 A propos de
 Action
 Action
 All items have been synchronized!
-Tous les éléments ont été synchronisés!
+Tous les Ã©lÃ©ments ont Ã©tÃ© synchronisÃ©s!
 An error occured
 Une erreur s'est produite
 An exception occured!
 Une violation s'est produite!
 Assemble a batch file with the following settings. To start synchronization in batch mode simply execute this file or schedule it in your operating system's task planner.
-Créer un fichier de commandes avec les paramètres suivants. Pour lancer la synchronisation en mode batch, exécutez ce fichier ou paramétrez-le dans le planificateur de tâches.
+CrÃ©er un fichier de commandes avec les paramÃ¨tres suivants. Pour lancer la synchronisation en mode batch, exÃ©cutez ce fichier ou paramÃ©trez-le dans le planificateur de tÃ¢ches.
 Batch file created successfully!
-Fichier de commandes créé avec succès!
+Fichier de commandes crÃ©Ã© avec succÃ¨s!
 Build: 
-Créé: 
+CrÃ©Ã©: 
 Choose to hide filtered files/directories from list
-Masquer les fichiers/répertoires filtrés
+Masquer les fichiers/rÃ©pertoires filtrÃ©s
 Comma separated list
-Liste d'éléments séparés par une virgule
+Liste d'Ã©lÃ©ments sÃ©parÃ©s par une virgule
 Command file
 Fichier de commandes
 Compare both sides
 Comparer les deux listes
 Compare by \"File size and date\"\n----------------------------------------\nThis variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.\n\nWhen \"Compare\" is triggered with this option set the following decision tree is processed:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n          _________|__________\n         |                  |                   |\n  left newer  right newer   same date\n\nAs a result 6 different status can be returned to categorize all files:\n\n- exists left only\n- exists right only\n- left newer\n- right newer\n- different filesize (but same date)\n- equal\n\n\nCompare by \"File content\"\n----------------------------------------\nAs the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:\n\n                    -----------------\n                    |Decision tree|\n                    -----------------\n               ________|___________\n               |                                      |\n file exists on both sides     on one side only\n     _____|______                      __|___\n     |                     |                     |          |\nequal             different            left      right\n\nAs a result the files are separated into the following categories:\n\n- exists left only\n- exists right only\n- different\n- equal
-Comparaison par \"taille et date\"\n---------------------------------------------------\nCette variante identifie deux fichiers identiques lorsqu'ils ont la même taille ET la même date de création. (Note : l'heure est calculée à plus ou moins 2 secondes.)\n\nLorsque \"Compare\" est lancé avec cette option, l'arbre de décision est évalué comme suit :\n\n                                                      -------------------------\n                                                      | Arbre de décision |\n                                                      -------------------------\n                           _______________________|___________________\n                           |                                                                                   |\n         le fichier existe des 2 cotés                                             Sur un seul côté\n        __________|_____________                                                 ____|___\n        |                                              |                                               |              |\n  identique                                 différent                                   gauche      droite\n                    __________________|__________________\n                    |                                  |                                    |\n  plus récent à gauche     plus récent à droite     différents (mais même date)\n\nRésultat : 6 états permettent de différencier tous les fichiers:\n\n- existe seulement à gauche\n- existe seulement à droite\n- plus récent à gauche\n- plus récent à droite\n- différents (mais même date)\n- identiques\n\n\nComparaison du \"contenu\"\n------------------------------------\nComme indiqué, deux fichiers de même nom sont considérés comme identiques si, et seulement si, leur contenu est identique. Cette option sert plus aux contrôles de cohérence qu'aux opérations de sauvegarde. Pour cette raison, la date de la dernière modification des fichiers n'est pas pris en compte.\n\nAvec cette option, l'arbre de décision est plus simple:\n\n                         -------------------------\n                         | Arbre de décision |\n                         -------------------------\n                     __________|_____________\n                     |                                             |\n le fichier existe des deux côtés      seulement d'un côté\n         ______|______                             __|___\n         |                        |                           |          |\n   identiques        différents           à gauche    à droite\n\nRésultat : une répartition dans les catégories suivantes:\n\n- existe à gauche seulement\n- existe à droite seulement\n- différents\n- identiques
+Comparaison par \"taille et date\"\n---------------------------------------------------\nCette variante identifie deux fichiers identiques lorsqu'ils ont la mÃªme taille ET la mÃªme date de crÃ©ation. (Note : l'heure est calculÃ©e Ã  plus ou moins 2 secondes.)\n\nLorsque \"Compare\" est lancÃ© avec cette option, l'arbre de dÃ©cision est Ã©valuÃ© comme suit :\n\n                                                      -------------------------\n                                                      | Arbre de dÃ©cision |\n                                                      -------------------------\n                           _______________________|___________________\n                           |                                                                                   |\n         le fichier existe des 2 cotÃ©s                                             Sur un seul cÃ´tÃ©\n        __________|_____________                                                 ____|___\n        |                                              |                                               |              |\n  identique                                 diffÃ©rent                                   gauche      droite\n                    __________________|__________________\n                    |                                  |                                    |\n  plus rÃ©cent Ã  gauche     plus rÃ©cent Ã  droite     diffÃ©rents (mais mÃªme date)\n\nRÃ©sultat : 6 Ã©tats permettent de diffÃ©rencier tous les fichiers:\n\n- existe seulement Ã  gauche\n- existe seulement Ã  droite\n- plus rÃ©cent Ã  gauche\n- plus rÃ©cent Ã  droite\n- diffÃ©rents (mais mÃªme date)\n- identiques\n\n\nComparaison du \"contenu\"\n------------------------------------\nComme indiquÃ©, deux fichiers de mÃªme nom sont considÃ©rÃ©s comme identiques si, et seulement si, leur contenu est identique. Cette option sert plus aux contrÃ´les de cohÃ©rence qu'aux opÃ©rations de sauvegarde. Pour cette raison, la date de la derniÃ¨re modification des fichiers n'est pas pris en compte.\n\nAvec cette option, l'arbre de dÃ©cision est plus simple:\n\n                         -------------------------\n                         | Arbre de dÃ©cision |\n                         -------------------------\n                     __________|_____________\n                     |                                             |\n le fichier existe des deux cÃ´tÃ©s      seulement d'un cÃ´tÃ©\n         ______|______                             __|___\n         |                        |                           |          |\n   identiques        diffÃ©rents           Ã  gauche    Ã  droite\n\nRÃ©sultat : une rÃ©partition dans les catÃ©gories suivantes:\n\n- existe Ã  gauche seulement\n- existe Ã  droite seulement\n- diffÃ©rents\n- identiques
 Compare by...
 Comparaison par...
 Comparing content of files 
@@ -157,21 +155,21 @@ Comparaison du contenu des fichiers en cours
 Comparing...
 Comparaison en cours...
 Completed
-Terminé
+TerminÃ©
 Configuration
 Configuration
 Configuration loaded!
-Configuration chargée!
+Configuration chargÃ©e!
 Configuration overview:
-Contrôle des paramètres:
+ContrÃ´le des paramÃ¨tres:
 Configuration saved!
-Configuration enregistrée!
+Configuration enregistrÃ©e!
 Configure filter
 Configuration des filtres
 Configure filter...
 Configuration des filtres...
 Configure your own synchronization rules.
-Paramétrage de vos règles de synchronisation.
+ParamÃ©trage de vos rÃ¨gles de synchronisation.
 Confirm
 Confirmation
 Continue
@@ -181,13 +179,13 @@ Continuer en cas d'erreur
 Continue on next errors
 Continuer sur les erreurs suivantes
 Copy from left to right
-Copie de gauche à droite
+Copie de gauche Ã  droite
 Copy from left to right overwriting
-Copie de gauche à droite avec remplacement
+Copie de gauche Ã  droite avec remplacement
 Copy from right to left
-Copie de droite à gauche
+Copie de droite Ã  gauche
 Copy from right to left overwriting
-Copie de droite à gauche avec remplacement
+Copie de droite Ã  gauche avec remplacement
 Copy to clipboard\tCTRL+C
 Copier dans le presse-papiers\tCTRL+C
 Copying file 
@@ -201,31 +199,31 @@ Impossible de lire le fichier de langue
 Could not retrieve file info for: 
 Erreur lors de la lecture des attributs de fichier de :
 Could not set working directory to directory containing executable file!
-Impossible de définir le répertoire de travail à partir du répertoire contenant le fichier exécutable!
+Impossible de dÃ©finir le rÃ©pertoire de travail Ã  partir du rÃ©pertoire contenant le fichier exÃ©cutable!
 Could not write to 
-Erreur en écriture sur
+Erreur en Ã©criture sur
 Create a batch job
-Création du fichier de commandes
+CrÃ©ation du fichier de commandes
 Create:
-Créations:
+CrÃ©ations:
 Creating folder 
-Création d'un répertoire 
+CrÃ©ation d'un rÃ©pertoire 
 Current operation:
-Opération en cours:
+OpÃ©ration en cours:
 Custom
 Personnaliser
 Data remaining:
-Données restantes:
+DonnÃ©es restantes:
 Data to compare:
-Données à comparer:
+DonnÃ©es Ã  comparer:
 Data:
-Données:
+DonnÃ©es:
 Date
 Date
 Delete files/folders existing on left side only
-Suppression des fichiers/répertoires n'existant que sur le côté gauche
+Suppression des fichiers/rÃ©pertoires n'existant que sur le cÃ´tÃ© gauche
 Delete files/folders existing on right side only
-Suppression des fichiers/répertoires n'existant que sur le côté droit
+Suppression des fichiers/rÃ©pertoires n'existant que sur le cÃ´tÃ© droit
 Delete files\tDEL
 Suppression des fichiers\tDEL
 Delete:
@@ -233,19 +231,21 @@ Suppressions:
 Deleting file 
 Suppression du fichier 
 Deleting folder 
-Suppression du répertoire 
+Suppression du rÃ©pertoire 
 Deutsch
 Deutsch
 Directory 
-Répertoire 
+RÃ©pertoire 
 Directory on the left does not exist. Please select a new one!
-Le répertoire de gauche n'existe pas. Veuillez en choisir un autre!
+Le rÃ©pertoire de gauche n'existe pas. Veuillez en choisir un autre!
 Directory on the right does not exist. Please select a new one!
-Le répertoire de droite n'existe pas. Veuillez en choisir un autre
+Le rÃ©pertoire de droite n'existe pas. Veuillez en choisir un autre
 Displays help on the command line parameters\n
-Aide sur les paramètres de la ligne de commandes\n
+Aide sur les paramÃ¨tres de la ligne de commandes\n
 Do not show graphical status and error messages but write to a logfile instead
-Ne pas afficher l'état graphique ni les messages mais les écrire sur un fichier log
+Ne pas afficher l'Ã©tat graphique ni les messages mais les Ã©crire sur un fichier log
+Do not show graphical status and error messages but write to a logfile instead.\n\n
+Ne pas afficher l'Ã©tat graphique ni les messages mais les Ã©crire sur un fichier log.\n\n
 Do nothing
 Ne rien faire
 Do you really want to delete the following objects(s)?
@@ -255,7 +255,7 @@ Voulez-vous vraiment envoyer les objets suivants dans la corbeille ?
 Donate with Paypal
 Don avec Paypal
 Drag && drop
-Glisser && Déposer
+Glisser && DÃ©poser
 Email:
 Email:
 English
@@ -271,17 +271,17 @@ Erreur lors de la conversion de FILETIME en FILETIME local
 Error copying file 
 Erreur lors de la copie du fichier
 Error creating directory 
-Erreur lors de la création du répertoire
+Erreur lors de la crÃ©ation du rÃ©pertoire
 Error deleting directory 
-Erreur lors de la suppression du répertoire
+Erreur lors de la suppression du rÃ©pertoire
 Error deleting file 
 Erreur lors de la suppression du fichier
 Error moving file 
-Erreur lors du déplacement du fichier 
+Erreur lors du dÃ©placement du fichier 
 Error reading file: 
 Erreur lors de la lecture du fichier: 
 Error traversing directory 
-Erreur lors du parcours du répertoire
+Erreur lors du parcours du rÃ©pertoire
 Error when converting int to wxString
 Erreur de conversion (int en wxString)
 Error when converting wxString to double
@@ -289,57 +289,55 @@ Erreur de conversion (wxString en double)
 Error when converting wxString to long
 Erreur de conversion (wxString en long)
 Error: Source directory does not exist anymore: 
-Erreur: le répertoire source n'existe plus: 
+Erreur: le rÃ©pertoire source n'existe plus: 
 Exclude
 Exclure
 Feedback and suggestions are welcome at:
-Commentaires et suggestions sont les bienvenus à:
+Commentaires et suggestions sont les bienvenus Ã :
 File content
 Contenu du fichier
 File list exported!
-Liste des fichiers exportée!
+Liste des fichiers exportÃ©e!
 File size and date
 Taille et date du fichier
 Filename
 Nom du fichier
 Files are found equal if\n     - file content\nis the same.
-Les fichiers sont considérés comme identiques, si\n     - leur contenu est identique.
+Les fichiers sont considÃ©rÃ©s comme identiques, si\n     - leur contenu est identique.
 Files are found equal if\n     - filesize\n     - last write time (UTC) and date\nare the same.
-Les fichiers sont considérés comme identiques, si\n     - leur taille\n     - leur date et heure(UTC) sont identiques.
+Les fichiers sont considÃ©rÃ©s comme identiques, si\n     - leur taille\n     - leur date et heure(UTC) sont identiques.
 Files that exist on both sides and have different content
-Les fichiers existent des deux côtés et ont des contenus différents
+Les fichiers existent des deux cÃ´tÃ©s et ont des contenus diffÃ©rents
 Files that exist on both sides, have same date but different filesizes
-Les fichiers existent des deux côtés, ont la même date mais des tailles différentes
+Les fichiers existent des deux cÃ´tÃ©s, ont la mÃªme date mais des tailles diffÃ©rentes
 Files that exist on both sides, left one is newer
-Fichiers existants des deux côtés, celui de gauche est plus récent
+Fichiers existants des deux cÃ´tÃ©s, celui de gauche est plus rÃ©cent
 Files that exist on both sides, right one is newer
-Fichiers existants des deux côtés, celui de droite est plus récent
+Fichiers existants des deux cÃ´tÃ©s, celui de droite est plus rÃ©cent
 Files to compare:
-Fichiers à comparer:
-Files/folders scanned:
-Fichiers/dossiers analysés
+Fichiers Ã  comparer:
 Files/folders remaining:
 Fichiers/dossiers restants:
+Files/folders scanned:
+Fichiers/dossiers analysÃ©s
 Files/folders that exist on left side only
-Fichiers/répertoires existants seulement à gauche
+Fichiers/rÃ©pertoires existants seulement Ã  gauche
 Files/folders that exist on right side only
-Fichiers/répertoires existants seulement à droite
+Fichiers/rÃ©pertoires existants seulement Ã  droite
 Filter
 Filtrage
 Filter active: Press again to deactivate
-Filtrage actif: Cliquez de nouveau pour le désactiver 
+Filtrage actif: Cliquez de nouveau pour le dÃ©sactiver 
 Filter files
 Filtrage des fichiers
 Filter manually
 Filtrage manuel
 Filter view
 Filtrage de la vue
-Français
-Français
 FreeFileSync   (Date: 
 FreeFileSync   (Date: 
 FreeFileSync - Folder Comparison and Synchronization
-FreeFileSync - Comparaison et synchronisation de répertoires
+FreeFileSync - Comparaison et synchronisation de rÃ©pertoires
 FreeFileSync at Sourceforge
 FreeFileSync par Sourceforge
 FreeFileSync configuration
@@ -347,17 +345,17 @@ FreeFileSync configuration
 Help
 Aide
 Hide filtered items
-Masquer les éléments filtrés
+Masquer les Ã©lÃ©ments filtrÃ©s
 Hide further error messages during the current process and continue
-Masquer les messages d'erreur suivants de l'opération en cours et continuer
+Masquer les messages d'erreur suivants de l'opÃ©ration en cours et continuer
 Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
-Masquer les messages d'erreur pendant la synchronisation:\nIls sont collationnés et listés à la fin de l'opération
+Masquer les messages d'erreur pendant la synchronisation:\nIls sont collationnÃ©s et listÃ©s Ã  la fin de l'opÃ©ration
 Hints:
 Conseils:
 Homepage:
 Page d'accueil:
-If errors occur during folder comparison or synchronization they are ignored and the process continues\n
-Si des erreurs se produisent pendant la comparaison ou la synchronisation des répertoires, elles seront ignorées et l'opération se poursuivra\n
+If errors occur during folder comparison or synchronization they are ignored and the process continues.\n
+Si des erreurs se produisent pendant la comparaison ou la synchronisation des rÃ©pertoires, elles seront ignorÃ©es et l'opÃ©ration se poursuivra.\n
 If you like FFS:
 Si vous aimez FFS:
 Include
@@ -367,59 +365,59 @@ Info
 Information
 Information
 Initialization of Recycle Bin failed! It cannot be used!
-Erreur lors de l'initialisation de la corbeille ! La corbeille ne peut être utilisée!
+Erreur lors de l'initialisation de la corbeille ! La corbeille ne peut Ãªtre utilisÃ©e!
 It was not possible to gain access to Recycle Bin!\n\nIt's likely that you are not using Windows XP. (Probably Vista)\nIf you want this feature included, please contact the author. :)
-Impossible d'accéder à la corbeille!\n\nIl est probable que vous n'utilisez pas Windows XP. (Peut-être Vista?)\nSi vous désirez utilisee cette fonctionnalité, veuillez contacter l'auteur. :)
+Impossible d'accÃ©der Ã  la corbeille!\n\nIl est probable que vous n'utilisez pas Windows XP. (Peut-Ãªtre Vista?)\nSi vous dÃ©sirez utilisee cette fonctionnalitÃ©, veuillez contacter l'auteur. :)
 Left directory does not exist. Please select a new one!
-Le répertoire de gauche n'existe pas. Veuillez en choisir un autre!
+Le rÃ©pertoire de gauche n'existe pas. Veuillez en choisir un autre!
 Left folder:
-Répertoire de gauche:
+RÃ©pertoire de gauche:
 Legend\n
 Legende\n
-Load configuration from file:\n     - use this choice box\n     - drag & drop config file to this window\n     - specify config file as first commandline parameter
-Chargement de la configuration à partir du fichier:\n     - utiliser cette liste de choix\n     - Déplacer et déposer le fichier de configuration dans cette fenêtre\n     - Définir le nom du fichier de commandes comme premier paramètre de la ligne de commande
-Load configuration...
-Charger la configuration...
+Load configuration via...\n     - this list (press DEL to delete items)\n     - drag & drop to this window\n     - startup parameter
+
+Load from file...
+
 Log-messages:\n-------------
 Messages log:\n---------------
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Sauvegarde miroir du répertoire de gauche : Le répertoire de droite sera écrasé et exactement identique au répertoire de gauche après la synchronisation.
+Sauvegarde miroir du rÃ©pertoire de gauche : Le rÃ©pertoire de droite sera Ã©crasÃ© et exactement identique au rÃ©pertoire de gauche aprÃ¨s la synchronisation.
 Move files to Recycle Bin instead of deleting or overwriting them directly.\n
-Déplacer les fichiers dans la corbeille au lieu de les supprimer ou de remplacer.\n
+DÃ©placer les fichiers dans la corbeille au lieu de les supprimer ou de remplacer.\n
 Not all items were synchronized! Have a look at the list.
-Tous les éléments n'ont pas été synchronisés!  Veuillez vérifier la liste.
+Tous les Ã©lÃ©ments n'ont pas Ã©tÃ© synchronisÃ©s!  Veuillez vÃ©rifier la liste.
 Nothing to synchronize. Both directories adhere to the sync-configuration!
-Rien à synchroniser. Les deux répertoires sont conformes aux paramètres de synchronisation!
+Rien Ã  synchroniser. Les deux rÃ©pertoires sont conformes aux paramÃ¨tres de synchronisation!
 Number of files and directories that will be created
-Nombre de fichiers et de répertoires qui seront créés
+Nombre de fichiers et de rÃ©pertoires qui seront crÃ©Ã©s
 Number of files and directories that will be deleted
-Nombre de fichiers et de répertoires qui seront supprimés
+Nombre de fichiers et de rÃ©pertoires qui seront supprimÃ©s
 Number of files that will be overwritten
-Nombre de fichiers qui seront remplacés
+Nombre de fichiers qui seront remplacÃ©s
 One way ->
 Vers la droite ->
 Only files/directories that pass filtering will be selected for synchronization.
-Seuls les fichiers/répertoires correspondant au filtrage sont retenus pour la synchronisation.
+Seuls les fichiers/rÃ©pertoires correspondant au filtrage sont retenus pour la synchronisation.
 Open synchronization dialog
-Ouvrir la boîte de dialogue de la synchronisation
+Ouvrir la boÃ®te de dialogue de la synchronisation
 Open with Explorer\tD-Click
 Ouvrir dans l'explorateur\tD-Click
 Operation aborted!
-Opération abandonnée!
+OpÃ©ration abandonnÃ©e!
 Operation:
-Opération:
+OpÃ©ration:
 Pause
 Pause
 Please select both left and right directories!
-Veuillez, s'il vous plaît, choisir les répertoires de droite et de gauche!
+Veuillez, s'il vous plaÃ®t, choisir les rÃ©pertoires de droite et de gauche!
 Please select directories for both sides!
-Veuillez, s'il vous plaît, choisir les répertoires de droite et de gauche!
+Veuillez, s'il vous plaÃ®t, choisir les rÃ©pertoires de droite et de gauche!
 Press button to activate filter
 Cliquez pour activer le filtrage
 Preview
-Prévoir
+PrÃ©voir
 Published under the GNU General Public License:
-Publié sous la licence GNU General Public:
+PubliÃ© sous la licence GNU General Public:
 Quit
 Quitter
 Relative path
@@ -427,97 +425,97 @@ Chemin
 Remaining time:
 Temps restant:
 Result
-Résultat
+RÃ©sultat
 Right directory does not exist. Please select a new one!
-Le répertoire de droite n'existe pas. Veuillez en choisir un autre!
+Le rÃ©pertoire de droite n'existe pas. Veuillez en choisir un autre!
 Right folder:
-Répertoire de droite:
+RÃ©pertoire de droite:
 Save current configuration to file
 Enregistrer la configuration courante
 Saved aborted!
-Enregistrement annulé!
+Enregistrement annulÃ©!
 Scanning 
 Lecture en cours
 Scanning...
 Lecture en cours...
 Select a folder
-Choisissez un répertoire
+Choisissez un rÃ©pertoire
 Select variant:
 Choisissez une variante:
 Set filter for synchronization
-Définir le filtrage
+DÃ©finir le filtrage
 Shell script
 Shell Script
 Show files that are different
-Afficher les fichiers différents
+Afficher les fichiers diffÃ©rents
 Show files that are equal
 Afficher les fichiers identiques
 Show files that are newer on left
-Afficher les fichiers de gauche plus récents que ceux de droite
+Afficher les fichiers de gauche plus rÃ©cents que ceux de droite
 Show files that are newer on right
-Afficher les fichiers de droite plus récents que ceux de gauche
+Afficher les fichiers de droite plus rÃ©cents que ceux de gauche
 Show files that exist on left side only
-Afficher les fichiers existants seulement à gauche
+Afficher les fichiers existants seulement Ã  gauche
 Show files that exist on right side only
-Afficher les fichiers existants seulement à droite
+Afficher les fichiers existants seulement Ã  droite
 Silent mode
 Mode silence
 Size
 Taille
 Source code written completely in C++ utilizing:\n\n  MinGW \t\t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE\n\n     by ZenJu
-Code source entièrement écrit en C++ utilisant:\n\n  MinGW \t\t- Windows-Port de GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI-Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE\n\n        ZenJu
+Code source entiÃ¨rement Ã©crit en C++ utilisant:\n\n  MinGW \t\t- Windows-Port de GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI-Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE\n\n        ZenJu
 Specify algorithm to test if files are equal:\n\n\t\t
-Spécification de l'algorithme de contrôle de l'identité de deux fichiers:\n\n\t\t
+SpÃ©cification de l'algorithme de contrÃ´le de l'identitÃ© de deux fichiers:\n\n\t\t
 Specify names to be excluded separated by ';'. Wildcards '*' and '?' are supported. Default: \"\"\n
-Noms à exclure, séparés par des ';'. Les caractères génériques '*' et '?' sont supportés. Par défaut: \"\"\n
+Noms Ã  exclure, sÃ©parÃ©s par des ';'. Les caractÃ¨res gÃ©nÃ©riques '*' et '?' sont supportÃ©s. Par dÃ©faut: \"\"\n
 Specify names to be included separated by ';'. Wildcards '*' and '?' are supported. Default: \"*\"\n
-Noms à inclure, séparés par des ';'.Les caractères génériques '*' et '?' sont supportés. Par défaut: \"*\"\n
-Specify the sync-direction used for each type of file by a string of five chars:\n\n\t\tChar 1: Folders/files that exist on left side only\n\t\tChar 2: Folders/files that exist on right side only\n\t\tChar 3: Files that exist on both sides, left one is newer\n\t\tChar 4: Files that exist on both sides, right one is newer\n\t\tChar 5: Files that exist on both sides and are different\n\n\t\tSync-direction: L: left, R: right, N: none\n
-Paramétrage de la synchronisation avec une chaîne de 5 caractères:\n\n\t\tCar 1: Dossiers/fichiers n'existant que dans le répertoire de gauche\n\t\tCar 2: Dossiers/fichiers n'existant que dans le répertoire de droite\n\t\tCar 3: Fichiers de gauche plus récents\n\t\tCar 4: Fichiers de droite plus récents\n\t\tCar 5: Fichiers existants des deux côtés et différents\n\n\t\tDirection de la synchronisation: L: vers la gauche, R: vers la droite, N: ne rien faire\n
+Noms Ã  inclure, sÃ©parÃ©s par des ';'.Les caractÃ¨res gÃ©nÃ©riques '*' et '?' sont supportÃ©s. Par dÃ©faut: \"*\"\n
+Specify the sync-direction used for each type of file by a string of five chars:\n\n
+ParamÃ©trage de la synchronisation avec une chaÃ®ne de 5 caractÃ¨res:\n\n
 Start
-Démarrer
+DÃ©marrer
 Start synchronization
-Démarrer la synchronisation
+DÃ©marrer la synchronisation
 Stop
 Stop
 Swap sides
-Permuter les côtés
+Permuter les cÃ´tÃ©s
 Synchronization aborted!
-Synchronisation abandonnée!
+Synchronisation abandonnÃ©e!
 Synchronization completed successfully.
-Synchronisation terminée avec succès.
+Synchronisation terminÃ©e avec succÃ¨s.
 Synchronization completed with errors!
-Synchronisation terminée avec des erreurs!
+Synchronisation terminÃ©e avec des erreurs!
 Synchronization settings
-Paramétrage de la synchronisation
+ParamÃ©trage de la synchronisation
 Synchronization status
 Etat de la synchronisation
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
-Synchronisation simultanée des deux côtés. Copie des fichiers nouveaux ou mis à jour.
+Synchronisation simultanÃ©e des deux cÃ´tÃ©s. Copie des fichiers nouveaux ou mis Ã  jour.
 Synchronizing...
 Synchronisation en cours...
-Thanks to Jean-François Hartmann for doing the French translation!
-Merci à Jean-François Hartmann pour la traduction en Français!
+Thanks to Jean-FranÃ§ois Hartmann for doing the French translation!
+Merci Ã  Jean-FranÃ§ois Hartmann pour la traduction en FranÃ§ais!
 The selected file does not contain a valid configuration!
-Le fichier sélectionné ne contient pas de configuration valide!
+Le fichier sÃ©lectionnÃ© ne contient pas de configuration valide!
 The selected file does not exist anymore!
-Le fichier sélectionné n'existe plus!
+Le fichier sÃ©lectionnÃ© n'existe plus!
 Time elapsed:
-Temps écoulé:
+Temps Ã©coulÃ©:
 Total amount of data that will be transferred
-Volume de données à transférer
+Volume de donnÃ©es Ã  transfÃ©rer
 Total time: 
 Temps total:
 Two way <->
-Des 2 côtés <->
+Des 2 cÃ´tÃ©s <->
 Unable to create logfile!
-Impossible de créer un fichier log!
+Impossible de crÃ©er un fichier log!
 Unable to initialize Recycle Bin!
 Impossible d'initialiser la corbeille!
 Unable to load Resources.dat!
 Impossible de charger Resources.dat!
 Update:
-Mises à jour:
+Mises Ã  jour:
 Use Recycle Bin
 Utilisation de la corbeille
 Use Recycle Bin when deleting or overwriting files during synchronization
@@ -525,12 +523,30 @@ Utilisation de la corbeille lors de la suppression ou du remplacement des fichie
 Warning
 Attention
 Warning: Synchronization failed for 
-Attention : la synchronisation a échoué à cause de  
+Attention : la synchronisation a Ã©chouÃ© Ã  cause de  
 \n\nContinue with next object, retry or abort comparison?
-\n\nVoulez-vous continuer avec l'objet suivant, réessayer ou annuler la comparaison?
+\n\nVoulez-vous continuer avec l'objet suivant, rÃ©essayer ou annuler la comparaison?
 \n\nContinue with next object, retry or abort synchronization?
-\n\nVoulez-vous continuer avec l'objet suivant, réessayer ou annuler la synchronisation?
+\n\nVoulez-vous continuer avec l'objet suivant, rÃ©essayer ou annuler la synchronisation?
 \n\nInformation: If you skip the error and continue or abort a re-compare will be necessary!
-\n\nInformation: Si vous sautez cette erreur et continuer ou si vous annulez, il sera nécessaire d'effectuer une re-comparaison!
+\n\nInformation: Si vous sautez cette erreur et continuer ou si vous annulez, il sera nÃ©cessaire d'effectuer une re-comparaison!
+\n\t\tSync-direction: L: left, R: right, N: none\n
+\n\t\tDirection de la synchronisation: L: vers la gauche, R: vers la droite, N: ne rien faire\n
+\t1: Creates a mirror backup of the left directory\n\t2: Synchronizes all *.doc files from both directories simultaneously\n\n
+\t1: CrÃ©e une sauvegarde miroir du rÃ©pertoire de gauche\n\t2: Synchronise tous les fichiers *.doc sur les deux rÃ©pertoires\n\n
+\tExamples:\n\n\t1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n\t2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n
+\tExemples :\n\n\t1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n\t2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n
+\tHint: You can easily generate a batch file by chosing \"Create batch job\" from the GUI menubar.\n
+
+\t\tChar 1: Folders/files that exist on left side only\n
+\t\tCar 1: Dossiers/fichiers n'existant que dans le rÃ©pertoire de gauche\n
+\t\tChar 2: Folders/files that exist on right side only\n
+\t\tCar 2: Dossiers/fichiers n'existant que dans le rÃ©pertoire de droite\n
+\t\tChar 3: Files that exist on both sides, left one is newer\n
+\t\tCar 3: Fichiers de gauche plus rÃ©cents\n
+\t\tChar 4: Files that exist on both sides, right one is newer\n
+\t\tCar 4: Fichiers de droite plus rÃ©cents\n
+\t\tChar 5: Files that exist on both sides and are different\n
+\t\tCar 5: Fichiers existants des deux cÃ´tÃ©s et diffÃ©rents\n
 |>	file on right side only\n
-|>	Le fichier existe seulement à droite\n
+|>	Le fichier existe seulement Ã  droite\n

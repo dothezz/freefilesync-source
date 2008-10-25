@@ -14,6 +14,7 @@
 #include <wx/clipbrd.h>
 #include <wx/file.h>
 #include "../library/customGrid.h"
+#include <algorithm>
 
 using namespace globalFunctions;
 
@@ -262,9 +263,9 @@ MainDialog::~MainDialog()
 
     writeConfigurationToHD(FreeFileSync::FfsLastConfigFile);   //don't trow exceptions in destructors
 
-    if (restartOnExit)  //needed so that restart is scheduled AFTER configuration was written!
+    if (restartOnExit)  //this is needed so that restart happens AFTER configuration was written!
     {   //create new dialog
-        MainDialog* frame = new MainDialog(0L, FreeFileSync::FfsLastConfigFile, programLanguage);
+        MainDialog* frame = new MainDialog(NULL, FreeFileSync::FfsLastConfigFile, programLanguage);
         frame->SetIcon(*GlobalResources::programIcon); //set application icon
         frame->Show();
     }
@@ -987,6 +988,9 @@ void MainDialog::addCfgFileToHistory(const wxString& filename)
     if (sameFileSpecified(FreeFileSync::FfsLastConfigFile, filename))
         return;
 
+    //only still existing files should be included in the list
+    if (!wxFileExists(filename))
+        return;
 
     bool duplicateEntry = false;
     unsigned int duplicatePos = 0;
@@ -998,8 +1002,7 @@ void MainDialog::addCfgFileToHistory(const wxString& filename)
             break;
         }
 
-
-    if (duplicateEntry)    //if entry is in the list, then jump to element
+    if (duplicateEntry) //if entry is in the list, then jump to element
     {
         m_choiceLoad->SetSelection(duplicatePos + 1);
     }
@@ -1057,10 +1060,9 @@ bool FileDropEvent::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filen
         const wxString droppedFileName = filenames[0];
 
         //test if ffs config file has been dropped
-        if (wxFileExists(droppedFileName) && FreeFileSync::isFFS_ConfigFile(droppedFileName))
+        if (FreeFileSync::isFFS_ConfigFile(droppedFileName))
         {
             mainDlg->readConfigurationFromHD(droppedFileName);
-
             mainDlg->pushStatusInformation(_("Configuration loaded!"));
         }
 
@@ -1148,7 +1150,6 @@ void MainDialog::OnLoadConfiguration(wxCommandEvent& event)
             else
             {
                 readConfigurationFromHD(newCfgFile);
-
                 pushStatusInformation(_("Configuration loaded!"));
             }
         }
@@ -1162,11 +1163,10 @@ void MainDialog::OnChoiceKeyEvent(wxKeyEvent& event)
     if (event.GetKeyCode() == WXK_DELETE)
     {   //try to delete the currently selected config history item
         int selectedItem;
-        if ((selectedItem = m_choiceLoad->GetSelection()) != wxNOT_FOUND)
+        if ((selectedItem = m_choiceLoad->GetCurrentSelection()) != wxNOT_FOUND)
             if (1 <= selectedItem && unsigned(selectedItem) < m_choiceLoad->GetCount())
                 if (unsigned(selectedItem - 1) < cfgFileNames.size())
-                {
-                    //delete selected row
+                {   //delete selected row
                     cfgFileNames.erase(cfgFileNames.begin() + selectedItem - 1);
                     m_choiceLoad->Delete(selectedItem);
                 }
@@ -2268,7 +2268,7 @@ CompareStatusUpdater::CompareStatusUpdater(MainDialog* dlg) :
 
     //display status panel during compare
     statusPanel = new CompareStatus(mainDialog);
-    mainDialog->bSizer1->Insert(1, statusPanel, 0, wxEXPAND | wxALL, 5 );
+    mainDialog->bSizer1->Insert(1, statusPanel, 0, wxEXPAND | wxBOTTOM, 5 );
 
 
     //show abort button

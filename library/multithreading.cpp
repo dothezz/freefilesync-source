@@ -68,7 +68,8 @@ public:
             threadHandler->longRunner();
 
             threadHandler->readyToReceiveResult.Lock();
-            threadHandler->receivingResult.Signal();
+            threadHandler->receivingResult.Signal(); // kind of a double notice that work is completed
+            threadHandler->workDone = true;          // workaround for wxCondition bug (wxWidgets v2.8.9, signal might geht lost)
             threadHandler->readyToReceiveResult.Unlock();
         }
 
@@ -90,7 +91,8 @@ private:
 
 UpdateWhileExecuting::UpdateWhileExecuting() :
         readyToReceiveResult(),
-        receivingResult(readyToReceiveResult)
+        receivingResult(readyToReceiveResult),
+        workDone(false)
 {
     //mutex needs to be initially locked for condition receivingResult to work properly
     readyToReceiveResult.Lock();
@@ -124,7 +126,6 @@ UpdateWhileExecuting::~UpdateWhileExecuting()
     theWorkerThread->beginProcessing.Signal();
 
     theWorkerThread->readyToBeginProcessing.Unlock();
-
     //theWorkerThread deletes itself!
 }
 
@@ -134,6 +135,8 @@ void UpdateWhileExecuting::waitUntilReady()
     readyToReceiveResult.Unlock(); //avoid possible deadlock, when thread might be waiting to send the signal (if abort was pressed)
 
     theWorkerThread->readyToBeginProcessing.Lock();
+
+    workDone = false; //no mutex needed here (worker thread that changes this variable is in waiting state)
 }
 //          /|\  \|/   must be called directly after each other
 
@@ -145,6 +148,11 @@ void UpdateWhileExecuting::execute(StatusUpdater* statusUpdater)
     theWorkerThread->readyToBeginProcessing.Unlock();
 
     while (receivingResult.WaitTimeout(UI_UPDATE_INTERVAL) == wxCOND_TIMEOUT)
+    {
         statusUpdater->triggerUI_Refresh(true); //ATTENTION: Exception "AbortThisProcess" may be thrown here!!!
+
+        if (workDone == true) //workaround for a bug in wxWidgets v2.8.9 class wxCondition: signals might get lost
+            break;            //no mutex for workDone needed here: it is changed only when maintread is in WaitTimeout()
+    }
 }
 

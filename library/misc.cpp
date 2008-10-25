@@ -4,6 +4,8 @@
 #include "resources.h"
 #include "globalFunctions.h"
 
+const string CustomLocale::FfsLanguageDat = "language.dat";
+
 void exchangeEscapeChars(wxString& data)
 {
     data.Replace(wxT("\\\\"), wxT("\\"));
@@ -23,14 +25,14 @@ CustomLocale::CustomLocale() :
 CustomLocale::~CustomLocale()
 {
     //write language to file
-    ofstream output("lang.dat");
+    ofstream output(FfsLanguageDat.c_str());
     if (output)
     {
         globalFunctions::writeInt(output, currentLanguage);
         output.close();
     }
     else
-        wxMessageBox(wxString(_("Could not write to ")) + wxT("\"") + wxT("lang.dat") + wxT("\""), _("An exception occured!"), wxOK | wxICON_ERROR);
+        wxMessageBox(wxString(_("Could not write to ")) + wxT("\"") + wxString::From8BitData(FfsLanguageDat.c_str()) + wxT("\""), _("An exception occured!"), wxOK | wxICON_ERROR);
 }
 
 
@@ -39,7 +41,7 @@ void CustomLocale::loadLanguageFromCfg()  //retrieve language from config file: 
     int language = wxLANGUAGE_ENGLISH;
 
     //try to load language setting from file
-    ifstream input("lang.dat");
+    ifstream input(FfsLanguageDat.c_str());
     if (input)
     {
         language = globalFunctions::readInt(input);
@@ -86,15 +88,15 @@ void CustomLocale::loadLanguageFile(int language)
 
             //Delimiter:
             //----------
-            //Linux: 0xa
-            //Mac:   0xd
-            //Win:   0xd 0xa    <- language files are in Windows format
+            //Linux: 0xa        \n
+            //Mac:   0xd        \r
+            //Win:   0xd 0xa    \r\n    <- language files are in Windows format
             while (langFile.getline(temp, bufferSize, 0xd)) //specify delimiter explicitely
             {
                 langFile.get(); //discard the 0xa character
 
-                //wxString formattedString = wxString::FromUTF8(temp);
-                wxString formattedString = wxString::From8BitData(temp);
+                wxString formattedString = wxString::FromUTF8(temp);
+                //wxString formattedString = wxString::From8BitData(temp);
 
                 exchangeEscapeChars(formattedString);
 

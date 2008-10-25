@@ -36,13 +36,17 @@ public:
     ~CustomLocale();
 
     void loadLanguageFromCfg();
+
     void loadLanguageFile(int language);
+
     int getLanguage()
     {
         return currentLanguage;
     }
 
     const wxChar* GetString(const wxChar* szOrigString, const wxChar* szDomain = NULL) const;
+
+    static const string FfsLanguageDat;
 
 private:
     Translation translationDB;

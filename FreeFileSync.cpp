@@ -621,11 +621,6 @@ private:
 };
 
 
-#ifdef FFS_WIN
-typedef WINSHELLAPI int (*DllFileOP)(LPSHFILEOPSTRUCT lpFileOp);
-#endif  // FFS_WIN
-
-
 class RecycleBin
 {
 public:
@@ -633,29 +628,11 @@ public:
             recycleBinAvailable(false)
     {
 #ifdef FFS_WIN
-        // Get a handle to the DLL module containing Recycle Bin functionality
-        hinstShell = LoadLibrary(wxT("shell32.dll"));
-        if (hinstShell != NULL)
-        {
-            fileOperation  = (DllFileOP)GetProcAddress(hinstShell, "SHFileOperation");
-            if (fileOperation == NULL )
-            {
-                FreeLibrary(hinstShell);
-                recycleBinAvailable = false;
-            }
-            else
                 recycleBinAvailable = true;
-        }
 #endif  // FFS_WIN
     }
 
-    ~RecycleBin()
-    {
-#ifdef FFS_WIN
-        if (recycleBinAvailable)
-            FreeLibrary(hinstShell);
-#endif  // FFS_WIN
-    }
+    ~RecycleBin() {}
 
     bool recycleBinExists()
     {
@@ -668,10 +645,9 @@ public:
             throw RuntimeException(_("Initialization of Recycle Bin failed! It cannot be used!"));
 
 #ifdef FFS_WIN
-        SHFILEOPSTRUCT fileOp;
-
         wxString filenameDoubleNull = filename + wxChar(0);
 
+        SHFILEOPSTRUCT fileOp;
         fileOp.hwnd   = NULL;
         fileOp.wFunc  = FO_DELETE;
         fileOp.pFrom  = filenameDoubleNull.c_str();
@@ -681,18 +657,13 @@ public:
         fileOp.hNameMappings         = NULL;
         fileOp.lpszProgressTitle     = NULL;
 
-        if (fileOperation(&fileOp   //pointer to an SHFILEOPSTRUCT structure that contains information the function needs to carry out
+        if (SHFileOperation(&fileOp   //pointer to an SHFILEOPSTRUCT structure that contains information the function needs to carry out
                          ) != 0 || fileOp.fAnyOperationsAborted) throw FileError(wxString(_("Error moving file ")) + wxT("\"") + filename + wxT("\"") + _(" to recycle bin!"));
 #endif  // FFS_WIN
     }
 
 private:
     bool recycleBinAvailable;
-
-#ifdef FFS_WIN
-    HINSTANCE hinstShell;
-    DllFileOP fileOperation;
-#endif  // FFS_WIN
 };
 
 
@@ -1559,19 +1530,22 @@ void FreeFileSync::startSynchronizationProcess(FileCompareResult& grid, const Sy
 
 bool FreeFileSync::isFFS_ConfigFile(const wxString& filename)
 {
-    wxFFile configFile(filename.c_str(), wxT("rb"));
+    if (!wxFileExists(filename))
+        return false;
+
+    wxFFile configFile(filename, wxT("rb"));
     if (!configFile.IsOpened())
         return false;
 
-    char bigBuffer[10000];
+    char buffer[FreeFileSync::FfsConfigFileID.size() + 1];
 
     //read FFS identifier
-    size_t bytesRead = configFile.Read(bigBuffer, FreeFileSync::FfsConfigFileID.size());
+    size_t bytesRead = configFile.Read(buffer, FreeFileSync::FfsConfigFileID.size());
 
-    if (!configFile.Error() && bytesRead < 10000)
+    if (!configFile.Error() && bytesRead < 1000)
     {
-        bigBuffer[bytesRead] = 0;
-        return (FfsConfigFileID == string(bigBuffer));
+        buffer[bytesRead] = 0;
+        return (FfsConfigFileID == string(buffer));
     }
     else
         return false;

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Oct 18 2008)
+// C++ code generated with wxFormBuilder (version Apr 16 2008)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -216,7 +216,9 @@ class SyncDlgGenerated : public wxDialog
 		wxButton* m_buttonTwoWay;
 		wxStaticText* m_staticText10;
 		wxRadioButton* m_radioBtn3;
+		
 		wxStaticText* m_staticText23;
+		
 		wxStaticText* m_staticText9;
 		
 		wxButton* m_button6;

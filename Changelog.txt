@@ -1,6 +1,17 @@
 FreeFileSync
 ------------
 
+Changelog v1.9
+--------------
+Fixed wxWidgets multithreading issue that could cause synchronization to hang occasionally
+Fixed issue with %1 parameter
+Fixed issue with recycle bin usage in unicode mode
+Added uninstaller
+New installer option to associate *.ffs files with FreeFileSync
+Transformed language files to Unicode (UTF-8)
+Delete elements in configuration history list via DELETE key
+
+
 Changelog v1.8
 --------------
 Enhanced statusbar information

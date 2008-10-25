@@ -15,10 +15,10 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-D__WXDEBUG__" />
-					<Add directory="C:\Programme\CodeBlocks\wxWidgets\lib\gcc_lib\mswd" />
+					<Add directory="C:\Programme\CodeBlocks\wxWidgets\lib\gcc_lib\mswud" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="C:\Programme\CodeBlocks\wxWidgets\lib\gcc_lib\mswd" />
+					<Add directory="C:\Programme\CodeBlocks\wxWidgets\lib\gcc_lib\mswud" />
 				</ResourceCompiler>
 				<Linker>
 					<Add library="libwxmsw28ud_adv.a" />

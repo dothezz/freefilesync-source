@@ -57,29 +57,28 @@ void Application::initialize()
 
     //test if ffs is to be started on UI with config file passed as commandline parameter
     wxString configFileForUI = FreeFileSync::FfsLastConfigFile;
-    if (argc > 1 && wxFileExists(argv[1]) && FreeFileSync::isFFS_ConfigFile(argv[1]))
-        configFileForUI = argv[1];
-
-    //should it start in commandline mode?
-    else if (argc > 1)
+    if (argc > 1)
     {
-        parseCommandline();
-
-        if (applicationRunsOnCommandLineWithoutWindows)
+        if (FreeFileSync::isFFS_ConfigFile(argv[1]))
+            configFileForUI = argv[1];
+        else //start in commandline mode?
         {
-            ExitMainLoop(); //exit programm on next main loop iteration
-            return;
+            parseCommandline();
+
+            if (applicationRunsOnCommandLineWithoutWindows)
+            {
+                ExitMainLoop(); //exit programm on next main loop iteration
+                return;
+            }
+            else
+                return;         //wait for the user to close the status window
         }
-        else
-            return;         //wait for the user to close the status window
     }
-    else  //no parameters passed: continue with UI
-    {
-        //show UI dialog
-        MainDialog* frame = new MainDialog(NULL, configFileForUI, &programLanguage);
-        frame->SetIcon(*GlobalResources::programIcon); //set application icon
-        frame->Show();
-    }
+
+    //start om GUI mode
+    MainDialog* frame = new MainDialog(NULL, configFileForUI, &programLanguage);
+    frame->SetIcon(*GlobalResources::programIcon); //set application icon
+    frame->Show();
 }
 
 
@@ -142,7 +141,7 @@ void Application::logInit()
     logWrite(_("Start"));
     logFile.Write(wxChar('\n'));
 
-totalTime.Start(); //measure total time
+    totalTime.Start(); //measure total time
 }
 
 
@@ -194,7 +193,13 @@ void Application::parseCommandline()
             wxCMD_LINE_OPTION,
             GlobalResources::paramCfg,
             NULL,
-            _("Specify the sync-direction used for each type of file by a string of five chars:\n\n\t\tChar 1: Folders/files that exist on left side only\n\t\tChar 2: Folders/files that exist on right side only\n\t\tChar 3: Files that exist on both sides, left one is newer\n\t\tChar 4: Files that exist on both sides, right one is newer\n\t\tChar 5: Files that exist on both sides and are different\n\n\t\tSync-direction: L: left, R: right, N: none\n"),
+            wxString(_("Specify the sync-direction used for each type of file by a string of five chars:\n\n")) +
+            _("\t\tChar 1: Folders/files that exist on left side only\n") +
+            _("\t\tChar 2: Folders/files that exist on right side only\n") +
+            _("\t\tChar 3: Files that exist on both sides, left one is newer\n") +
+            _("\t\tChar 4: Files that exist on both sides, right one is newer\n") +
+            _("\t\tChar 5: Files that exist on both sides and are different\n") +
+            _("\n\t\tSync-direction: L: left, R: right, N: none\n"),
             wxCMD_LINE_VAL_STRING,
             wxCMD_LINE_OPTION_MANDATORY
         },
@@ -235,7 +240,7 @@ void Application::parseCommandline()
             wxCMD_LINE_SWITCH,
             GlobalResources::paramContinueError,
             NULL,
-            _("If errors occur during folder comparison or synchronization they are ignored and the process continues\n")
+            _("If errors occur during folder comparison or synchronization they are ignored and the process continues.\n")
         },
 
         {
@@ -249,7 +254,10 @@ void Application::parseCommandline()
             wxCMD_LINE_SWITCH,
             GlobalResources::paramSilent,
             NULL,
-            wxString(_("Do not show graphical status and error messages but write to a logfile instead")) + _(".\n\nExamples:\n\n1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n1: Creates a mirror backup of the left directory\n2: Synchronizes all *.doc files from both directories simultaneously\n\n")
+            wxString(_("Do not show graphical status and error messages but write to a logfile instead.\n\n")) +
+            _("\tExamples:\n\n\t1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n\t2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n") +
+            _("\t1: Creates a mirror backup of the left directory\n\t2: Synchronizes all *.doc files from both directories simultaneously\n\n") +
+            _("\tHint: You can easily generate a batch file by chosing \"Create batch job\" from the GUI menubar.\n")
         },
 
         {
