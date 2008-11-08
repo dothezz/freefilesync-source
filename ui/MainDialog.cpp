@@ -15,6 +15,8 @@
 #include <wx/file.h>
 #include "../library/customGrid.h"
 #include <algorithm>
+#include "../library/tinyxml/tinyxml.h"
+#include <wx/msgdlg.h>
 
 using namespace globalFunctions;
 
@@ -32,8 +34,21 @@ MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale
     m_bpButtonCompare->SetLabel(_("&Compare"));
     m_bpButtonSync->SetLabel(_("&Synchronize"));
 
-    //initialize sync configuration
-    readConfigurationFromHD(cfgFileName, true);
+    //load list of last used configuration files
+    cfgFileHistory = new wxConfig(wxT("FreeFileSync"));
+    for (int i = CfgHistroyLength - 1; i >= 0; --i) //put files in reverse order to history
+    {
+        const wxString key = wxString(wxT("Selection")) + numberToWxString(i);
+
+        wxString value;
+        if (cfgFileHistory->Read(key, &value))
+            addCfgFileToHistory(value);
+    }
+    m_choiceLoad->SetSelection(0);
+
+    //initialize and load configuration
+    readConfigurationFromXml(cfgFileName, true);
+    //readConfigurationFromHD(cfgFileName, true);
 
     leftOnlyFilesActive   = true;
     leftNewerFilesActive  = true;
@@ -149,18 +164,6 @@ MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale
     //mainly to update row label sizes...
     writeGrid(currentGridData);
 
-    //load list of last used configuration files
-    cfgFileHistory = new wxConfig(wxT("FreeFileSync"));
-    for (int i = CfgHistroyLength - 1; i >= 0; --i) //put files in reverse order to history
-    {
-        const wxString key = wxString(wxT("Selection")) + numberToWxString(i);
-
-        wxString value;
-        if (cfgFileHistory->Read(key, &value))
-            addCfgFileToHistory(value);
-    }
-    m_choiceLoad->SetSelection(0);
-
     //select rows only
     m_grid1->SetSelectionMode(wxGrid::wxGridSelectRows);
     m_grid2->SetSelectionMode(wxGrid::wxGridSelectRows);
@@ -186,9 +189,23 @@ MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale
     case wxLANGUAGE_FRENCH:
         m_menuItemFrench->Check();
         break;
+    case wxLANGUAGE_JAPANESE:
+        m_menuItemJapanese->Check();
+        break;
     default:
         m_menuItemEnglish->Check();
     }
+
+    //create the compare status panel
+    compareStatus = new CompareStatus(this);
+    bSizer1->Insert(1, compareStatus, 0, wxEXPAND | wxBOTTOM, 5 );
+    Layout();   //avoid screen flicker when panel is shown
+    compareStatus->Hide();
+
+    //correct height of middle grid
+    wxSize dirPickersize = sbSizer2->GetSize();
+    wxSize swapButtonsize = bSizer69->GetSize();
+    bSizer18->Insert(1, 0, dirPickersize.GetY() - swapButtonsize.GetY(), 0);
 }
 
 
@@ -256,12 +273,14 @@ MainDialog::~MainDialog()
         else
         {
             if (cfgFileHistory->Exists(key))
-                cfgFileHistory->DeleteEntry(key);
+                cfgFileHistory->DeleteEntry(key, false);
         }
     }
     delete cfgFileHistory;
 
-    writeConfigurationToHD(FreeFileSync::FfsLastConfigFile);   //don't trow exceptions in destructors
+    //save configuration
+    writeConfigurationToXml(FreeFileSync::FfsLastConfigFile);   //don't trow exceptions in destructors
+    //writeConfigurationToHD(FreeFileSync::FfsLastConfigFile);
 
     if (restartOnExit)  //this is needed so that restart happens AFTER configuration was written!
     {   //create new dialog
@@ -638,9 +657,10 @@ public:
     void updateStatusText(const wxString& text) {}
     void initNewProcess(int objectsTotal, double dataTotal, int processID) {}
     void updateProcessedData(int objectsProcessed, double dataProcessed) {}
-    void triggerUI_Refresh(bool asyncProcessActive) {}
-
+    void forceUiRefresh() {}
 private:
+    void abortThisProcess() {}
+
     bool continueOnError;
     bool& unsolvedErrors;
 };
@@ -907,8 +927,9 @@ void MainDialog::onContextMenuSelection(wxCommandEvent& event)
 
 void MainDialog::OnEnterLeftDir( wxCommandEvent& event )
 {
-    wxString newDir = m_directoryPanel1->GetValue();
-    m_dirPicker1->SetPath(newDir);
+    wxString newDir = FreeFileSync::getFormattedDirectoryName(m_directoryPanel1->GetValue());
+    if (wxDirExists(newDir))
+        m_dirPicker1->SetPath(newDir);
 
     event.Skip();
 }
@@ -916,8 +937,9 @@ void MainDialog::OnEnterLeftDir( wxCommandEvent& event )
 
 void MainDialog::OnEnterRightDir( wxCommandEvent& event )
 {
-    wxString newDir = m_directoryPanel2->GetValue();
-    m_dirPicker2->SetPath(newDir);
+    wxString newDir = FreeFileSync::getFormattedDirectoryName(m_directoryPanel2->GetValue());
+    if (wxDirExists(newDir))
+        m_dirPicker2->SetPath(newDir);
 
     event.Skip();
 }
@@ -1060,12 +1082,11 @@ bool FileDropEvent::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filen
         const wxString droppedFileName = filenames[0];
 
         //test if ffs config file has been dropped
-        if (FreeFileSync::isFFS_ConfigFile(droppedFileName))
+        if (FreeFileSync::isFfsConfigFile(droppedFileName))
         {
-            mainDlg->readConfigurationFromHD(droppedFileName);
+            mainDlg->readConfigurationFromXml(droppedFileName);
             mainDlg->pushStatusInformation(_("Configuration loaded!"));
         }
-
         else if (targetGrid == 1)
             onFilesDropped(droppedFileName, mainDlg->m_directoryPanel1, mainDlg->m_dirPicker1);
 
@@ -1104,7 +1125,7 @@ void MainDialog::OnSaveConfig(wxCommandEvent& event)
                 return;
             }
         }
-        writeConfigurationToHD(newFileName);
+        writeConfigurationToXml(newFileName);
 
         pushStatusInformation(_("Configuration saved!"));
     }
@@ -1145,11 +1166,11 @@ void MainDialog::OnLoadConfiguration(wxCommandEvent& event)
         {
             if (!wxFileExists(newCfgFile))
                 wxMessageBox(_("The selected file does not exist anymore!"), _("Warning"), wxOK);
-            else if (!FreeFileSync::isFFS_ConfigFile(newCfgFile))
+            else if (!FreeFileSync::isFfsConfigFile(newCfgFile))
                 wxMessageBox(_("The selected file does not contain a valid configuration!"), _("Warning"), wxOK);
             else
             {
-                readConfigurationFromHD(newCfgFile);
+                readConfigurationFromXml(newCfgFile);
                 pushStatusInformation(_("Configuration loaded!"));
             }
         }
@@ -1169,6 +1190,7 @@ void MainDialog::OnChoiceKeyEvent(wxKeyEvent& event)
                 {   //delete selected row
                     cfgFileNames.erase(cfgFileNames.begin() + selectedItem - 1);
                     m_choiceLoad->Delete(selectedItem);
+                    m_choiceLoad->SetSelection(0);
                 }
     }
     event.Skip();
@@ -1213,8 +1235,8 @@ void MainDialog::loadDefaultConfiguration()
     cfg.compareVar = CMP_BY_TIME_SIZE; //compare algorithm
     updateCompareButtons();
 
-    cfg.includeFilter = wxT("*");    //include all files/folders
-    cfg.excludeFilter = wxEmptyString;     //exlude nothing
+    cfg.includeFilter = wxT("*");      //include all files/folders
+    cfg.excludeFilter = wxEmptyString; //exclude nothing
 
     //set status of filter button
     cfg.filterIsActive = false; //do not filter by default
@@ -1224,7 +1246,7 @@ void MainDialog::loadDefaultConfiguration()
     cfg.hideFiltered  = false;  //show filtered items
     m_checkBoxHideFilt->SetValue(cfg.hideFiltered);
 
-    cfg.useRecycleBin   = false;  //do not use: in case OS doesn't support this, user will have to activate first and then get the error message
+    cfg.useRecycleBin   = FreeFileSync::recycleBinExists(); //set if OS supports it; else user will have to activate first and then get the error message
     cfg.continueOnError = false;
 
     widthNotMaximized  = wxDefaultCoord;
@@ -1234,8 +1256,378 @@ void MainDialog::loadDefaultConfiguration()
 }
 
 
+inline
+bool readXmlElementValue(string& output, const TiXmlElement* parent, const string& name)
+{
+    if (parent)
+    {
+        const TiXmlElement* child = parent->FirstChildElement(name);
+        if (child)
+        {
+            const char* text = child->GetText();
+            if (text) //may be NULL!!
+                output = text;
+            else
+                output.clear();
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+inline
+bool readXmlElementValue(int& output, const TiXmlElement* parent, const string& name)
+{
+    string temp;
+    if (readXmlElementValue(temp, parent, name))
+    {
+        output = stringToInt(temp);
+        return true;
+    }
+    else
+        return false;
+}
+
+
+inline
+bool readXmlElementValue(CompareVariant& output, const TiXmlElement* parent, const string& name)
+{
+    int dummy = 0;
+    if (readXmlElementValue(dummy, parent, name))
+    {
+        output = CompareVariant(dummy);
+        return true;
+    }
+    else
+        return false;
+}
+
+
+inline
+bool readXmlElementValue(SyncDirection& output, const TiXmlElement* parent, const string& name)
+{
+    int dummy = 0;
+    if (readXmlElementValue(dummy, parent, name))
+    {
+        output = SyncDirection(dummy);
+        return true;
+    }
+    else
+        return false;
+}
+
+
+inline
+bool readXmlElementValue(bool& output, const TiXmlElement* parent, const string& name)
+{
+    int dummy = 0;
+    if (readXmlElementValue(dummy, parent, name))
+    {
+        output = bool(dummy);
+        return true;
+    }
+    else
+        return false;
+}
+
+
+bool MainDialog::parseXmlData(TiXmlElement* root, bool programStartup)
+{
+    if (root && (root->ValueStr() == string("FreeFileSync"))) //check for FFS configuration xml
+    {
+        TiXmlHandle hRoot(root);
+
+        TiXmlElement* cmpSettings  = hRoot.FirstChild("settings").FirstChild("comparison").ToElement();
+        TiXmlElement* syncConfig   = hRoot.FirstChild("settings").FirstChild("synchronization").FirstChild("directions").ToElement();
+        TiXmlElement* miscSettings = hRoot.FirstChild("settings").FirstChild("miscellaneous").ToElement();
+        TiXmlElement* filter       = TiXmlHandle(miscSettings).FirstChild("filter").ToElement();
+
+        if (cmpSettings && syncConfig && miscSettings && filter)
+        {
+            string tempString;
+//###########################################################
+            //read compare variant
+            if (!readXmlElementValue(cfg.compareVar, cmpSettings, "variant")) return false;
+            updateCompareButtons();
+
+            //read folder pair(s) - currently only one folderpair supported
+            TiXmlElement* folderPair = TiXmlHandle(cmpSettings).FirstChild("folders").FirstChild("pair").ToElement();
+            if (!folderPair) return false;
+
+            //read directories for comparison
+            if (!readXmlElementValue(tempString, folderPair, "left")) return false;
+            wxString leftDir = wxString::FromUTF8(tempString.c_str());
+            m_directoryPanel1->SetValue(leftDir);
+            wxString leftDirFormatted = FreeFileSync::getFormattedDirectoryName(leftDir);
+            if (wxDirExists(leftDirFormatted))
+                m_dirPicker1->SetPath(leftDirFormatted);
+
+            if (!readXmlElementValue(tempString, folderPair, "right")) return false;
+            wxString rightDir = wxString::FromUTF8(tempString.c_str());
+            m_directoryPanel2->SetValue(rightDir);
+            wxString rightDirFormatted = FreeFileSync::getFormattedDirectoryName(rightDir);
+            if (wxDirExists(rightDirFormatted))
+                m_dirPicker2->SetPath(rightDirFormatted);
+//###########################################################
+            //read sync configuration
+            if (!readXmlElementValue(cfg.syncConfiguration.exLeftSideOnly, syncConfig, "leftonly"))   return false;
+            if (!readXmlElementValue(cfg.syncConfiguration.exRightSideOnly, syncConfig, "rightonly")) return false;
+            if (!readXmlElementValue(cfg.syncConfiguration.leftNewer, syncConfig, "leftnewer"))       return false;
+            if (!readXmlElementValue(cfg.syncConfiguration.rightNewer, syncConfig, "rightnewer"))     return false;
+            if (!readXmlElementValue(cfg.syncConfiguration.different, syncConfig, "different"))       return false;
+//###########################################################
+            //read filter settings
+            if (!readXmlElementValue(cfg.filterIsActive, filter, "active")) return false;
+            updateFilterButton(m_bpButtonFilter, cfg.filterIsActive);
+
+            if (!readXmlElementValue(cfg.hideFiltered, filter, "hidefiltered")) return false;
+            m_checkBoxHideFilt->SetValue(cfg.hideFiltered);
+
+            if (!readXmlElementValue(tempString, filter, "include"))  return false;
+            cfg.includeFilter = wxString::FromUTF8(tempString.c_str());
+
+            if (!readXmlElementValue(tempString, filter, "exclude"))  return false;
+            cfg.excludeFilter = wxString::FromUTF8(tempString.c_str());
+//###########################################################
+            //other
+            if (!readXmlElementValue(cfg.useRecycleBin, miscSettings, "recycler"))   return false;
+            if (!readXmlElementValue(cfg.continueOnError, miscSettings, "continue")) return false;
+
+//###########################################################
+            //read GUI layout (optional!)
+            //apply window size and position at program startup ONLY
+            if (programStartup)
+            {
+                TiXmlElement* mainWindow = hRoot.FirstChild("layout").FirstChild("windows").FirstChild("main").ToElement();
+                if (mainWindow)
+                {
+                    //read application window size and position
+                    int widthTmp   = 0; //
+                    int heighthTmp = 0; //
+                    int posxTmp    = 0; // read all parameters "at once"
+                    int posyTmp    = 0; //
+                    bool maximizedTmp = false;
+
+                    if (    readXmlElementValue(widthTmp, mainWindow, "width")    &&
+                            readXmlElementValue(heighthTmp, mainWindow, "height") &&
+                            readXmlElementValue(posxTmp, mainWindow, "posx")      &&
+                            readXmlElementValue(posyTmp, mainWindow, "posy")      &&
+                            readXmlElementValue(maximizedTmp, mainWindow, "maximized"))
+                    {
+                        widthNotMaximized  = widthTmp;
+                        heightNotMaximized = heighthTmp;
+                        posXNotMaximized   = posxTmp;
+                        posYNotMaximized   = posyTmp;
+
+                        //apply window size and position
+                        SetSize(posXNotMaximized, posYNotMaximized, widthNotMaximized, heightNotMaximized);
+                        Maximize(maximizedTmp);
+                    }
+//###########################################################
+                    //read column widths
+                    TiXmlElement* leftColumn = TiXmlHandle(mainWindow).FirstChild("leftcolumns").FirstChild("width").ToElement();
+                    for (int i = 0; i < m_grid1->GetNumberCols(); ++i)
+                    {
+                        if (leftColumn)
+                        {
+                            const char* width = leftColumn->GetText();
+                            if (width) //may be NULL!!
+                                m_grid1->SetColSize(i, stringToInt(width));
+                            leftColumn = leftColumn->NextSiblingElement();
+                        }
+                        else break;
+                    }
+
+                    TiXmlElement* rightColumn = TiXmlHandle(mainWindow).FirstChild("rightcolumns").FirstChild("width").ToElement();
+                    for (int i = 0; i < m_grid2->GetNumberCols(); ++i)
+                    {
+                        if (rightColumn)
+                        {
+                            const char* width = rightColumn->GetText();
+                            if (width) //may be NULL!!
+                                m_grid2->SetColSize(i, stringToInt(width));
+
+                            rightColumn = rightColumn->NextSiblingElement();
+                        }
+                        else break;
+                    }
+                }
+            }
+            return true;
+//###########################################################
+        }
+    }
+    return false;
+}
+
+
+void MainDialog::readConfigurationFromXml(const wxString& filename, bool programStartup)
+{
+    if (wxFileExists(filename))
+    {   //workaround to get a FILE* from a unicode filename
+        wxFFile dummyFile(filename, wxT("rb"));
+        if (dummyFile.IsOpened())
+        {
+            FILE* inputFile = dummyFile.fp();
+
+            TiXmlBase::SetCondenseWhiteSpace(false); //do not condense whitespace characters
+            TiXmlDocument doc;
+            if (    doc.LoadFile(inputFile) &&  //fails if inputFile is no proper XML
+                    parseXmlData(doc.RootElement(), programStartup))
+                addCfgFileToHistory(filename); //put filename on list of last used config files
+            else
+            {   //handle error: parsing
+                wxMessageBox(wxString(_("Error parsing configuration file ")) + wxT("\"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+                if (programStartup)
+                    loadDefaultConfiguration();
+            }
+            return;
+        }
+    }
+
+    //handle error: file load
+    if (programStartup)
+        loadDefaultConfiguration();
+    else
+        wxMessageBox(wxString(_("Could not open configuration file ")) + wxT("\"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+}
+
+
+void addXmlElement(TiXmlElement* parent, const string& name, const string& value)
+{
+    if (parent)
+    {
+        TiXmlElement* subElement = new TiXmlElement(name);
+        parent->LinkEndChild(subElement);
+        subElement->LinkEndChild(new TiXmlText(value));
+    }
+}
+
+
+void addXmlElement(TiXmlElement* parent, const string& name, const int value)
+{
+    addXmlElement(parent, name, numberToString(value));
+}
+
+
+void MainDialog::writeConfigurationToXml(const wxString& filename)
+{
+    //workaround to get a FILE* from a unicode filename
+    wxFFile dummyFile(filename, wxT("wb"));
+    if (!dummyFile.IsOpened())
+    {
+        wxMessageBox(wxString(_("Could not write configuration file ")) + wxT("\"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+        return;
+    }
+    FILE* outputFile = dummyFile.fp();
+
+    TiXmlBase::SetCondenseWhiteSpace(false); //do not condense whitespace characters
+    TiXmlDocument xmlDoc;
+    TiXmlDeclaration* decl = new TiXmlDeclaration("1.0", "UTF-8", ""); //delete won't be necessary later; ownership passed to TiXmlDocument!
+    xmlDoc.LinkEndChild(decl);
+
+    TiXmlElement* root = new TiXmlElement("FreeFileSync");
+    xmlDoc.LinkEndChild(root);
+
+    TiXmlElement* settings = new TiXmlElement("settings");
+    root->LinkEndChild(settings);
+
+//###########################################################
+    TiXmlElement* cmpSettings = new TiXmlElement("comparison");
+    settings->LinkEndChild(cmpSettings);
+
+    //write compare algorithm
+    addXmlElement(cmpSettings, "variant", cfg.compareVar);
+
+    //write folder pair(s)
+    TiXmlElement* folders = new TiXmlElement("folders");
+    cmpSettings->LinkEndChild(folders);
+
+    TiXmlElement* folderPair = new TiXmlElement("pair");
+    folders->LinkEndChild(folderPair);
+
+    addXmlElement(folderPair, "left", string((m_directoryPanel1->GetValue()).ToUTF8()));
+    addXmlElement(folderPair, "right", string((m_directoryPanel2->GetValue()).ToUTF8()));
+
+//###########################################################
+    TiXmlElement* syncSettings = new TiXmlElement("synchronization");
+    settings->LinkEndChild(syncSettings);
+
+    //write sync configuration
+    TiXmlElement* syncConfig = new TiXmlElement("directions");
+    syncSettings->LinkEndChild(syncConfig);
+
+    addXmlElement(syncConfig, "leftonly",   cfg.syncConfiguration.exLeftSideOnly);
+    addXmlElement(syncConfig, "rightonly",  cfg.syncConfiguration.exRightSideOnly);
+    addXmlElement(syncConfig, "leftnewer",  cfg.syncConfiguration.leftNewer);
+    addXmlElement(syncConfig, "rightnewer", cfg.syncConfiguration.rightNewer);
+    addXmlElement(syncConfig, "different",  cfg.syncConfiguration.different);
+
+//###########################################################
+    TiXmlElement* miscSettings = new TiXmlElement("miscellaneous");
+    settings->LinkEndChild(miscSettings);
+
+    //write filter settings
+    TiXmlElement* filter = new TiXmlElement("filter");
+    miscSettings->LinkEndChild(filter);
+
+    addXmlElement(filter, "active", cfg.filterIsActive);
+    addXmlElement(filter, "hidefiltered", cfg.hideFiltered);
+    addXmlElement(filter, "include", string((cfg.includeFilter).ToUTF8()));
+    addXmlElement(filter, "exclude", string((cfg.excludeFilter).ToUTF8()));
+
+    //other
+    addXmlElement(miscSettings, "recycler", cfg.useRecycleBin);
+    addXmlElement(miscSettings, "continue", cfg.continueOnError);
+//###########################################################
+    TiXmlElement* guiLayout = new TiXmlElement("layout");
+    root->LinkEndChild(guiLayout);
+
+    TiXmlElement* windows = new TiXmlElement("windows");
+    guiLayout->LinkEndChild(windows);
+
+    TiXmlElement* mainWindow = new TiXmlElement("main");
+    windows->LinkEndChild(mainWindow);
+
+    //window size
+    addXmlElement(mainWindow, "width", widthNotMaximized);
+    addXmlElement(mainWindow, "height", heightNotMaximized);
+
+    //window position
+    addXmlElement(mainWindow, "posx", posXNotMaximized);
+    addXmlElement(mainWindow, "posy", posYNotMaximized);
+    addXmlElement(mainWindow, "maximized", IsMaximized());
+
+    //write column sizes
+    TiXmlElement* leftColumn = new TiXmlElement("leftcolumns");
+    mainWindow->LinkEndChild(leftColumn);
+
+    for (int i = 0; i < m_grid1->GetNumberCols(); ++i)
+        addXmlElement(leftColumn, "width", m_grid1->GetColSize(i));
+
+    TiXmlElement* rightColumn = new TiXmlElement("rightcolumns");
+    mainWindow->LinkEndChild(rightColumn);
+
+    for (int i = 0; i < m_grid2->GetNumberCols(); ++i)
+        addXmlElement(rightColumn, "width", m_grid2->GetColSize(i));
+
+    if (!xmlDoc.SaveFile(outputFile))
+    {
+        wxMessageBox(wxString(_("Could not write configuration file ")) + wxT("\"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+        return;
+    }
+
+    //put filename on list of last used config files
+    addCfgFileToHistory(filename);
+}
+
+
 void MainDialog::readConfigurationFromHD(const wxString& filename, bool programStartup)
 {
+    assert(false); //deprecated
+
     char bigBuffer[10000];
 
     if (wxFileExists(filename))
@@ -1243,7 +1635,6 @@ void MainDialog::readConfigurationFromHD(const wxString& filename, bool programS
         wxFFileInputStream config(filename);
         if (config.IsOk())
         {
-
             //read FFS identifier
             config.Read(bigBuffer, FreeFileSync::FfsConfigFileID.size());
             bigBuffer[FreeFileSync::FfsConfigFileID.size()] = 0;
@@ -1340,12 +1731,14 @@ void MainDialog::readConfigurationFromHD(const wxString& filename, bool programS
     if (programStartup)
         loadDefaultConfiguration();
     else
-        wxMessageBox(wxString(_("Could not read configuration file ")) + wxT("\"") + filename + wxT("\""), _("An exception occured!"), wxOK | wxICON_ERROR);
+        wxMessageBox(wxString(_("Could not read configuration file ")) + wxT("\"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
 }
 
 
 void MainDialog::writeConfigurationToHD(const wxString& filename)
 {
+    assert(false); //deprecated
+
     wxFFileOutputStream config(filename);
     if (!config.IsOk())
     {
@@ -1609,19 +2002,19 @@ void MainDialog::OnCompare(wxCommandEvent &event)
 {
     if (m_directoryPanel1->GetValue().IsEmpty() || m_directoryPanel2->GetValue().IsEmpty())
     {
-        wxMessageBox(_("Please select directories for both sides!"), _("Information"));
+        wxMessageBox(_("Please select both left and right directories!"), _("Information"));
         return;
     }
 
     clearStatusBar();
 
-    //check if directories exist if loaded by config file
-    if (!wxDirExists(m_directoryPanel1->GetValue()))
+    //check if directories exist (if loaded by config file)
+    if (!wxDirExists(FreeFileSync::getFormattedDirectoryName(m_directoryPanel1->GetValue())))
     {
         wxMessageBox(_("Directory on the left does not exist. Please select a new one!"), _("Warning"), wxICON_WARNING);
         return;
     }
-    else if (!wxDirExists(m_directoryPanel2->GetValue()))
+    else if (!wxDirExists(FreeFileSync::getFormattedDirectoryName(m_directoryPanel2->GetValue())))
     {
         wxMessageBox(_("Directory on the right does not exist. Please select a new one!"), _("Warning"), wxICON_WARNING);
         return;
@@ -2267,9 +2660,8 @@ CompareStatusUpdater::CompareStatusUpdater(MainDialog* dlg) :
     mainDialog->m_menubar1->EnableTop(2, false);
 
     //display status panel during compare
-    statusPanel = new CompareStatus(mainDialog);
-    mainDialog->bSizer1->Insert(1, statusPanel, 0, wxEXPAND | wxBOTTOM, 5 );
-
+    mainDialog->compareStatus->init(); //clear old values
+    mainDialog->compareStatus->Show();
 
     //show abort button
     mainDialog->m_buttonAbort->Enable();
@@ -2278,7 +2670,7 @@ CompareStatusUpdater::CompareStatusUpdater(MainDialog* dlg) :
     mainDialog->m_bpButtonCompare->Hide();
     mainDialog->m_buttonAbort->SetFocus();
 
-    //updateUI_Now();
+    //updateUiNow();
     mainDialog->bSizer1->Layout();  //both sizers need to recalculate!
     mainDialog->bSizer6->Layout();
 }
@@ -2321,10 +2713,9 @@ CompareStatusUpdater::~CompareStatusUpdater()
     mainDialog->m_bpButtonCompare->Enable();
     mainDialog->m_bpButtonCompare->Show();
 
-    //remove status panel from main window
-    mainDialog->bSizer1->Detach(statusPanel);
-    statusPanel->Destroy();
-    updateUI_Now();
+    //hide status panel from main window
+    mainDialog->compareStatus->Hide();
+    updateUiNow();
     mainDialog->Layout();
     mainDialog->Refresh();
 }
@@ -2333,7 +2724,7 @@ CompareStatusUpdater::~CompareStatusUpdater()
 inline
 void CompareStatusUpdater::updateStatusText(const wxString& text)
 {
-    statusPanel->setStatusText_NoUpdate(text);
+    mainDialog->compareStatus->setStatusText_NoUpdate(text);
 }
 
 
@@ -2344,7 +2735,11 @@ void CompareStatusUpdater::initNewProcess(int objectsTotal, double dataTotal, in
     if (currentProcess == FreeFileSync::scanningFilesProcess)
         ;
     else if (currentProcess == FreeFileSync::compareFileContentProcess)
-        statusPanel->resetCmpGauge(objectsTotal, dataTotal);
+    {
+        mainDialog->compareStatus->switchToCompareBytewise(objectsTotal, dataTotal);
+        mainDialog->Layout();
+    }
+
     else assert(false);
 }
 
@@ -2353,9 +2748,9 @@ inline
 void CompareStatusUpdater::updateProcessedData(int objectsProcessed, double dataProcessed)
 {
     if (currentProcess == FreeFileSync::scanningFilesProcess)
-        statusPanel->incScannedObjects_NoUpdate(objectsProcessed);
+        mainDialog->compareStatus->incScannedObjects_NoUpdate(objectsProcessed);
     else if (currentProcess == FreeFileSync::compareFileContentProcess)
-        statusPanel->incProcessedCmpData_NoUpdate(objectsProcessed, dataProcessed);
+        mainDialog->compareStatus->incProcessedCmpData_NoUpdate(objectsProcessed, dataProcessed);
     else assert(false);
 }
 
@@ -2365,7 +2760,7 @@ int CompareStatusUpdater::reportError(const wxString& text)
     if (continueOnError)
         return StatusUpdater::continueNext;
 
-    statusPanel->updateStatusPanelNow();
+    mainDialog->compareStatus->updateStatusPanelNow();
 
     wxString errorMessage = text + _("\n\nContinue with next object, retry or abort comparison?");
 
@@ -2394,13 +2789,15 @@ int CompareStatusUpdater::reportError(const wxString& text)
 
 
 inline
-void CompareStatusUpdater::triggerUI_Refresh(bool asyncProcessActive)
+void CompareStatusUpdater::forceUiRefresh()
 {
-    if (abortionRequested && !asyncProcessActive)
-        throw AbortThisProcess();    //abort can be triggered by syncStatusFrame
+    mainDialog->compareStatus->updateStatusPanelNow();
+}
 
-    if (updateUI_IsAllowed()) //test if specific time span between ui updates is over
-        statusPanel->updateStatusPanelNow();
+
+void CompareStatusUpdater::abortThisProcess()
+{
+    throw AbortThisProcess();  //abort can be triggered by syncStatusFrame
 }
 //########################################################################################################
 
@@ -2410,7 +2807,7 @@ SyncStatusUpdater::SyncStatusUpdater(wxWindow* dlg, bool continueOnError) :
 {
     syncStatusFrame = new SyncStatus(this, dlg);
     syncStatusFrame->Show();
-    updateUI_Now();
+    updateUiNow();
 }
 
 
@@ -2507,15 +2904,16 @@ int SyncStatusUpdater::reportError(const wxString& text)
 }
 
 
-void SyncStatusUpdater::triggerUI_Refresh(bool asyncProcessActive)
+void SyncStatusUpdater::forceUiRefresh()
 {
-    if (abortionRequested && !asyncProcessActive)
-        throw AbortThisProcess();  //abort can be triggered by syncStatusFrame
-
-    if (updateUI_IsAllowed())  //test if specific time span between ui updates is over
-        syncStatusFrame->updateStatusDialogNow();
+    syncStatusFrame->updateStatusDialogNow();
 }
 
+
+void SyncStatusUpdater::abortThisProcess()
+{
+    throw AbortThisProcess();  //abort can be triggered by syncStatusFrame
+}
 //########################################################################################################
 
 
@@ -2635,3 +3033,11 @@ void MainDialog::OnMenuLangFrench(wxCommandEvent& event)
     event.Skip();
 }
 
+
+void MainDialog::OnMenuLangJapanese(wxCommandEvent& event)
+{
+    programLanguage->loadLanguageFile(wxLANGUAGE_JAPANESE); //language is a global attribute
+    restartOnExit = true;
+    Destroy();
+    event.Skip();
+}

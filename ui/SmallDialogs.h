@@ -38,6 +38,7 @@ public:
     static const int okayButtonPressed = 25;
 
 private:
+    void OnHelp(wxCommandEvent& event);
     void OnDefault(wxCommandEvent& event);
     void OnOK(wxCommandEvent& event);
     void OnCancel(wxCommandEvent& event);
@@ -164,7 +165,9 @@ public:
     CompareStatus(wxWindow* parentWindow);
     ~CompareStatus();
 
-    void resetCmpGauge(int totalCmpObjectsToProcess, double totalCmpDataToProcess);
+    void init(); //initialize all status values
+
+    void switchToCompareBytewise(int totalCmpObjectsToProcess, double totalCmpDataToProcess);
     void incScannedObjects_NoUpdate(int number);
     void incProcessedCmpData_NoUpdate(int objectsProcessed, double dataProcessed);
     void setStatusText_NoUpdate(const wxString& text);
@@ -175,12 +178,14 @@ private:
     unsigned int scannedObjects;
     wxString currentStatusText;
 
+    wxStopWatch timeElapsed;
+
     //gauge variables
+    double scalingFactorCmp;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
     double totalCmpData;     //each data element represents one byte for proper progress indicator scaling
     double processedCmpData;
-    double scalingFactorCmp;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
-    int processedCmpObjects;    //each object represents a file or directory processed
     int totalCmpObjects;
+    int processedCmpObjects;    //each object represents a file or directory processed
     /*
         //remaining time
         RemainingTime calcTimeLeft;

@@ -10,7 +10,6 @@
 #ifndef MAINDIALOG_H
 #define MAINDIALOG_H
 
-#include "../library/wxWidgets.h"
 #include "guiGenerated.h"
 #include "../FreeFileSync.h"
 #include "syncDialog.h"
@@ -36,6 +35,7 @@ extern int leadingPanel;
 
 class CompareStatusUpdater;
 class FileDropEvent;
+class TiXmlElement;
 
 class MainDialog : public GuiGenerated
 {
@@ -47,9 +47,16 @@ public:
     ~MainDialog();
 
 private:
+    void loadDefaultConfiguration();
+
+    void readConfigurationFromXml(const wxString& filename, bool programStartup = false);
+    bool parseXmlData(TiXmlElement* root, bool programStartup);
+    void writeConfigurationToXml(const wxString& filename);
+
+    //deprecated
     void readConfigurationFromHD(const wxString& filename, bool programStartup = false);
     void writeConfigurationToHD(const wxString& filename);
-    void loadDefaultConfiguration();
+    //
 
     void updateViewFilterButtons();
     void updateFilterButton(wxBitmapButton* filterButton, bool isActive);
@@ -137,6 +144,7 @@ private:
     void OnMenuLangEnglish(     wxCommandEvent& event);
     void OnMenuLangGerman(      wxCommandEvent& event);
     void OnMenuLangFrench(      wxCommandEvent& event);
+    void OnMenuLangJapanese(    wxCommandEvent& event);
 
     void enableSynchronization(bool value);
 
@@ -173,6 +181,9 @@ private:
     //status information
     wxLongLong lastStatusChange;
     stack<wxString> stackObjects;
+
+    //compare status panel (hidden on start, shown when comparing)
+    CompareStatus* compareStatus;
 
     //save the last used config filenames
     wxConfig* cfgFileHistory;
@@ -228,11 +239,12 @@ public:
     void updateProcessedData(int objectsProcessed, double dataProcessed);
     int reportError(const wxString& text);
 
-    void triggerUI_Refresh(bool asyncProcessActive);
+    void forceUiRefresh();
 
 private:
+    void abortThisProcess();
+
     MainDialog* mainDialog;
-    CompareStatus* statusPanel;
     bool continueOnError;
     int currentProcess;
 };
@@ -249,11 +261,12 @@ public:
     void updateProcessedData(int objectsProcessed, double dataProcessed);
     int reportError(const wxString& text);
 
-    void triggerUI_Refresh(bool asyncProcessActive);
+    void forceUiRefresh();
 
 private:
-    SyncStatus* syncStatusFrame;
+    void abortThisProcess();
 
+    SyncStatus* syncStatusFrame;
     bool continueError;
     wxArrayString unhandledErrors;   //list of non-resolved errors
 };

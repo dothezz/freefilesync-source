@@ -12,6 +12,7 @@ public:
     CustomGridTableBase(int numRows, int numCols) :
             wxGridStringTable(numRows, numCols),
             lightBlue(80, 110, 255),
+            lightGrey(212, 208, 200),
             gridIdentifier(0),
             gridRefUI(0),
             gridData(0),
@@ -233,18 +234,30 @@ public:
     }
 //###########################################################################
 
+    enum RowColor {BLUE, GREY, NONE};
 
-    bool markThisRow(int row) //rows that are filtered out are shown in different color
+    inline  //redundant command
+    RowColor getRowColor(int row) //rows that are filtered out are shown in different color
     {
         if (gridRefUI)
         {
             if (unsigned(row) < gridRefUI->size())
             {
-                if (!(*gridData)[(*gridRefUI)[row]].selectedForSynchronization)
-                    return true;
+                const FileCompareLine cmpLine = (*gridData)[(*gridRefUI)[row]];
+
+                //mark filtered rows
+                if (!cmpLine.selectedForSynchronization)
+                    return BLUE;
+                //mark directories
+                else if (gridIdentifier == 1 && cmpLine.fileDescrLeft.objType == TYPE_DIRECTORY)
+                    return GREY;
+                else if (gridIdentifier == 2 && cmpLine.fileDescrRight.objType == TYPE_DIRECTORY)
+                    return GREY;
+                else
+                    return NONE;
             }
         }
-        return false;
+        return NONE;
     }
 
 
@@ -262,16 +275,23 @@ public:
                 result = attr;
             }
 
-            if (markThisRow(row))
+            RowColor color = getRowColor(row);
+            if (color == BLUE)
                 result->SetBackgroundColour(lightBlue);
+            else if (color == GREY)
+                result->SetBackgroundColour(lightGrey);
             else
                 result->SetBackgroundColour(*wxWHITE);
         }
         else
         {
             result = new wxGridCellAttr;
-            if (markThisRow(row))
+
+            RowColor color = getRowColor(row);
+            if (color == BLUE)
                 result->SetBackgroundColour(lightBlue);
+            else if (color == GREY)
+                result->SetBackgroundColour(lightGrey);
         }
 
         return result;
@@ -279,6 +299,7 @@ public:
 
 private:
     wxColour  lightBlue;
+    wxColour  lightGrey;
     int       gridIdentifier;
     GridView* gridRefUI; //(very fast) access to underlying grid data :)
     FileCompareResult* gridData;

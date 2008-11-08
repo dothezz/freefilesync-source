@@ -25,9 +25,10 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
 
     m_animationControl1->SetAnimation(*GlobalResources::animationMoney);
     m_animationControl1->Play(); //Note: The animation is created hidden(!) to not disturb constraint based window creation;
-    m_animationControl1->Show(); //an empty animation consumes a lot of space that later is NOT removed anymore.
+    m_animationControl1->Show(); //
 
     m_button8->SetFocus();
+    Fit();
 }
 
 
@@ -49,8 +50,39 @@ void AboutDlg::OnOK(wxCommandEvent& event)
 
 HelpDlg::HelpDlg(wxWindow* window) : HelpDlgGenerated(window)
 {
-    m_button8->SetFocus();
+    m_notebook1->SetFocus();
+
+    //populate decision trees: "compare by date"
+    wxTreeItemId treeRoot      = m_treeCtrl1->AddRoot(_("DECISION TREE"));
+    wxTreeItemId treeBothSides = m_treeCtrl1->AppendItem(treeRoot, _("file exists on both sides"));
+    wxTreeItemId treeOneSide   = m_treeCtrl1->AppendItem(treeRoot, _("on one side only"));
+
+    m_treeCtrl1->AppendItem(treeOneSide, _("- left"));
+    m_treeCtrl1->AppendItem(treeOneSide, _("- right"));
+
+    m_treeCtrl1->AppendItem(treeBothSides, _("- equal"));
+    wxTreeItemId treeDifferent = m_treeCtrl1->AppendItem(treeBothSides, _("different"));
+
+    m_treeCtrl1->AppendItem(treeDifferent, _("- left newer"));
+    m_treeCtrl1->AppendItem(treeDifferent, _("- right newer"));
+    m_treeCtrl1->AppendItem(treeDifferent, _("- same date (different size)"));
+
+    m_treeCtrl1->ExpandAll();
+
+    //populate decision trees: "compare by content"
+    wxTreeItemId tree2Root      = m_treeCtrl2->AddRoot(_("DECISION TREE"));
+    wxTreeItemId tree2BothSides = m_treeCtrl2->AppendItem(tree2Root, _("file exists on both sides"));
+    wxTreeItemId tree2OneSide   = m_treeCtrl2->AppendItem(tree2Root, _("on one side only"));
+
+    m_treeCtrl2->AppendItem(tree2OneSide, _("- left"));
+    m_treeCtrl2->AppendItem(tree2OneSide, _("- right"));
+
+    m_treeCtrl2->AppendItem(tree2BothSides, _("- equal"));
+    m_treeCtrl2->AppendItem(tree2BothSides, _("- different"));
+
+    m_treeCtrl2->ExpandAll();
 }
+
 
 HelpDlg::~HelpDlg() {}
 
@@ -76,17 +108,35 @@ FilterDlg::FilterDlg(wxWindow* window, wxString& filterIncl, wxString& filterExc
 
     m_bitmap8->SetBitmap(*GlobalResources::bitmapInclude);
     m_bitmap9->SetBitmap(*GlobalResources::bitmapExclude);
+    m_bpButtonHelp->SetBitmapLabel(*GlobalResources::bitmapHelp);
 
     m_textCtrlInclude->SetValue(includeFilter);
     m_textCtrlExclude->SetValue(excludeFilter);
+
+    m_panel13->Hide();
+    Fit();
 }
 
 FilterDlg::~FilterDlg() {}
 
 
-void FilterDlg::OnClose(wxCloseEvent& event)
+void FilterDlg::OnHelp(wxCommandEvent& event)
 {
-    EndModal(0);
+    m_bpButtonHelp->Hide();
+    m_panel13->Show();
+    Fit();
+
+    event.Skip();
+}
+
+
+void FilterDlg::OnDefault(wxCommandEvent& event)
+{
+    m_textCtrlInclude->SetValue(wxT("*"));
+    m_textCtrlExclude->SetValue(wxEmptyString);
+
+    //changes to mainDialog are only committed when the OK button is pressed
+    event.Skip();
 }
 
 
@@ -107,13 +157,9 @@ void FilterDlg::OnCancel(wxCommandEvent& event)
 }
 
 
-void FilterDlg::OnDefault(wxCommandEvent& event)
+void FilterDlg::OnClose(wxCloseEvent& event)
 {
-    m_textCtrlInclude->SetValue(wxT("*"));
-    m_textCtrlExclude->SetValue(wxEmptyString);
-
-    //changes to mainDialog are only committed when the OK button is pressed
-    event.Skip();
+    EndModal(0);
 }
 //########################################################################################
 
@@ -370,13 +416,13 @@ void SyncStatus::updateStatusDialogNow()
     //do the ui update
     bSizer28->Layout();
     bSizer31->Layout();
-    updateUI_Now();
+    updateUiNow();
 
     //support for pause button
     while (processPaused && currentProcessIsRunning)
     {
         wxMilliSleep(UI_UPDATE_INTERVAL);
-        updateUI_Now();
+        updateUiNow();
     }
 }
 
@@ -501,29 +547,47 @@ void SyncStatus::OnClose(wxCloseEvent& event)
 CompareStatus::CompareStatus(wxWindow* parentWindow) :
         CompareStatusGenerated(parentWindow),
         scannedObjects(0),
+        scalingFactorCmp(0),
         totalCmpData(0),
         processedCmpData(0),
-        scalingFactorCmp(0),
-        processedCmpObjects(0),
-        totalCmpObjects(0)
+        totalCmpObjects(0),
+        processedCmpObjects(0)
         /*timeRemaining(0),
         timeRemainingTimeStamp(0)*/
-
-{   //initialize gauge
-    m_gauge2->SetRange(50000);
-    m_gauge2->SetValue(0);
-
-    //initially hide status that's relevant for comparing bytewise only
-    bSizer42->Hide(sbSizer13);
-    bSizer42->Hide(sbSizer11);
-    bSizer42->Layout();
+{
+    init();
 }
 
 
 CompareStatus::~CompareStatus() {}
 
 
-void CompareStatus::resetCmpGauge(int totalCmpObjectsToProcess, double totalCmpDataToProcess)
+void CompareStatus::init()
+{
+    //initialize gauge
+    m_gauge2->SetRange(50000);
+    m_gauge2->SetValue(0);
+
+    //initially hide status that's relevant for comparing bytewise only
+    bSizer42->Hide(sbSizer13);
+    m_gauge2->Hide();
+    bSizer42->Layout();
+
+    scannedObjects      = 0;
+    scalingFactorCmp    = 0;
+
+    totalCmpData        = 0;
+    processedCmpData    = 0;
+    totalCmpObjects     = 0;
+    processedCmpObjects = 0;
+
+    timeElapsed.Start(); //measure total time
+
+    updateStatusPanelNow();
+}
+
+
+void CompareStatus::switchToCompareBytewise(int totalCmpObjectsToProcess, double totalCmpDataToProcess)
 {
     processedCmpData = 0;
     totalCmpData = totalCmpDataToProcess;
@@ -538,7 +602,7 @@ void CompareStatus::resetCmpGauge(int totalCmpObjectsToProcess, double totalCmpD
 
     //show status for comparing bytewise
     bSizer42->Show(sbSizer13);
-    bSizer42->Show(sbSizer11);
+    m_gauge2->Show();
     bSizer42->Layout();
 }
 
@@ -581,6 +645,7 @@ void CompareStatus::updateStatusPanelNow()
     //remaining bytes left for file comparison
     const wxString remainingBytes = FreeFileSync::formatFilesizeToShortString(totalCmpData - processedCmpData);
     m_staticTextDataToCompare->SetLabel(remainingBytes);
+
     /*
         //remaining time in seconds
         if (timeRemaining != 0)
@@ -589,7 +654,11 @@ void CompareStatus::updateStatusPanelNow()
             m_staticTextRemainingTime->SetLabel(numberToWxString(time) + " s");
         }
     */
+
+    //time elapsed
+    m_staticTextTimeElapsed->SetLabel((wxTimeSpan::Milliseconds(timeElapsed.Time())).Format());
+
     //do the ui update
     bSizer42->Layout();
-    updateUI_Now();
+    updateUiNow();
 }

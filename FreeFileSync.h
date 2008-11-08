@@ -1,7 +1,6 @@
 #ifndef FREEFILESYNC_H_INCLUDED
 #define FREEFILESYNC_H_INCLUDED
 
-#include "library/wxWidgets.h"
 #include <wx/string.h>
 #include <set>
 #include <vector>
@@ -41,12 +40,12 @@ struct Configuration
     SyncConfiguration syncConfiguration;
 
     //Filter setting
+    bool filterIsActive;
+    bool hideFiltered;
     wxString includeFilter;
     wxString excludeFilter;
-    bool hideFiltered;
-    bool filterIsActive;
 
-    //other options
+    //misc options
     bool useRecycleBin;    //use Recycle bin when deleting or overwriting files while synchronizing
     bool continueOnError; //hides error messages during synchronization
 };
@@ -109,7 +108,7 @@ struct FileDescrLine
         return (relFilename.Cmp(b.relFilename) == 0);
     }
 #else
-    assert(false);
+    adapt this
 #endif
 };
 typedef set<FileDescrLine> DirectoryDescrType;
@@ -162,10 +161,6 @@ private:
     FileDescrLine fileDescr;
     StatusUpdater* statusUpdater;
 };
-
-bool updateUI_IsAllowed(); //test if a specific amount of time is over
-void updateUI_Now();       //do the updating
-
 
 //Note: the following lines are a performance optimization for deleting elements from a vector. It is incredibly faster to create a new
 //vector and leave specific elements out than to delete row by row and force recopying of most elements for each single deletion (linear vs quadratic runtime)
@@ -235,7 +230,7 @@ public:
 
     static void swapGrids(FileCompareResult& grid);
 
-    static bool isFFS_ConfigFile(const wxString& filename);
+    static bool isFfsConfigFile(const wxString& filename);
 
     static const string   FfsConfigFileID;
     static const wxString FfsLastConfigFile;
@@ -257,7 +252,10 @@ private:
 
     bool recycleBinShouldBeUsed;
     static RecycleBin recycler;
-    wxLogNull* noWxLogs;
+#ifndef __WXDEBUG__
+    //prevent wxWidgets logging
+    wxLogNull noWxLogs;
+#endif
 };
 
 

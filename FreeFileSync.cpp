@@ -7,6 +7,7 @@
 #include "library/resources.h"
 #include <sys/stat.h>
 #include <wx/ffile.h>
+#include "library/tinyxml/tinyxml.h"
 
 #ifdef FFS_WIN
 #include <windows.h>
@@ -61,14 +62,14 @@ void FreeFileSync::getFileInformation(FileInfo& output, const wxString& filename
     FindClose(fileHandle);
 
     if (FileTimeToLocalFileTime(
-                &winFileInfo.ftLastWriteTime, // pointer to UTC file time to convert
-                &localFileTime 	              // pointer to converted file time
+                &winFileInfo.ftLastWriteTime, //pointer to UTC file time to convert
+                &localFileTime 	              //pointer to converted file time
             ) == 0)
         throw RuntimeException(_("Error converting FILETIME to local FILETIME"));
 
     if (FileTimeToSystemTime(
-                &localFileTime, // pointer to file time to convert
-                &time 	        // pointer to structure to receive system time
+                &localFileTime, //pointer to file time to convert
+                &time 	        //pointer to structure to receive system time
             ) == 0)
         throw RuntimeException(_("Error converting FILETIME to SYSTEMTIME"));
 
@@ -79,8 +80,8 @@ void FreeFileSync::getFileInformation(FileInfo& output, const wxString& filename
                            formatTime(time.wMinute)     + wxT(":") +
                            formatTime(time.wSecond);
 
-    //UTC time
-    output.lastWriteTimeRaw = wxULongLong(winFileInfo.ftLastWriteTime.dwHighDateTime, winFileInfo.ftLastWriteTime.dwLowDateTime);
+    //local time
+    output.lastWriteTimeRaw = wxULongLong(localFileTime.dwHighDateTime, localFileTime.dwLowDateTime);
 
     //reduce precision to 1 second (FILETIME has unit 10^-7 s)
     output.lastWriteTimeRaw/= 10000000; // <- time is used for comparison only: unit switched to seconds
@@ -99,7 +100,8 @@ void FreeFileSync::getFileInformation(FileInfo& output, const wxString& filename
 
     //local time
     output.lastWriteTime = buffer;
-    //unit: 1 second
+
+    //UTC time; unit: 1 second
     output.lastWriteTimeRaw = fileInfo.st_mtime;
 
     output.fileSize = fileInfo.st_size;
@@ -121,7 +123,7 @@ struct MemoryAllocator
         delete [] buffer2;
     }
 
-    static const unsigned int bufferSize = 1024 * 256; //256 kb seems to be the perfect buffer size
+    static const unsigned int bufferSize = 1024 * 512; //512 kb seems to be the perfect buffer size
     unsigned char* buffer1;
     unsigned char* buffer2;
 };
@@ -255,7 +257,9 @@ void calcTotalDataForCompare(int& objectsTotal, double& dataTotal, const FileCom
 
 void FreeFileSync::startCompareProcess(FileCompareResult& output, const wxString& dirLeft, const wxString& dirRight, CompareVariant cmpVar, StatusUpdater* statusUpdater)
 {
-    wxLogNull dummy; //hide wxWidgets log messages
+#ifndef __WXDEBUG__
+    wxLogNull dummy; //hide wxWidgets log messages in release build
+#endif
 
     assert (statusUpdater);
 
@@ -267,8 +271,7 @@ void FreeFileSync::startCompareProcess(FileCompareResult& output, const wxString
     FileCompareResult output_tmp;   //write to output not before END of process!
 
     try
-    {
-        //retrieve sets of files (with description data)
+    {   //retrieve sets of files (with description data)
         DirectoryDescrType directoryLeft;
         DirectoryDescrType directoryRight;
 
@@ -276,6 +279,7 @@ void FreeFileSync::startCompareProcess(FileCompareResult& output, const wxString
         generateFileAndFolderDescriptions(directoryLeft, dirLeft, statusUpdater);
         generateFileAndFolderDescriptions(directoryRight, dirRight, statusUpdater);
         //wxMessageBox(numberToWxString(unsigned(GetTickCount()) - startTime));
+        statusUpdater->forceUiRefresh();
 
         FileCompareLine newline;
 
@@ -334,7 +338,7 @@ void FreeFileSync::startCompareProcess(FileCompareResult& output, const wxString
                 else if (cmpVar == CMP_BY_TIME_SIZE)
                 {  //check files that exist in left and right model but have different properties
 
-                    //last write time may differ up to 2 seconds (NTFS vs FAT32)
+                    //last write time may differ by up to 2 seconds (NTFS vs FAT32)
                     bool sameWriteTime;
                     if (i->lastWriteTimeRaw < j->lastWriteTimeRaw)
                         sameWriteTime = (j->lastWriteTimeRaw - i->lastWriteTimeRaw <= 2);
@@ -410,7 +414,7 @@ void FreeFileSync::startCompareProcess(FileCompareResult& output, const wxString
                 while (true)
                 {
                     //trigger display refresh
-                    statusUpdater->triggerUI_Refresh();
+                    statusUpdater->requestUiRefresh();
 
                     try
                     {
@@ -445,7 +449,7 @@ void FreeFileSync::startCompareProcess(FileCompareResult& output, const wxString
         }
         //wxMessageBox(numberToWxString(unsigned(GetTickCount()) - startTime3));
 
-        statusUpdater->triggerUI_Refresh();
+        statusUpdater->requestUiRefresh();
     }
     catch (const RuntimeException& theException)
     {
@@ -526,7 +530,7 @@ wxDirTraverseResult GetAllFilesFull::OnFile(const wxString& filename)
     //add 1 element to the progress indicator
     statusUpdater->updateProcessedData(1, 0);     // NO performance issue at all
     //trigger display refresh
-    statusUpdater->triggerUI_Refresh();
+    statusUpdater->requestUiRefresh();
 
     return wxDIR_CONTINUE;
 }
@@ -573,7 +577,7 @@ wxDirTraverseResult GetAllFilesFull::OnDir(const wxString& dirname)
     //add 1 element to the progress indicator
     statusUpdater->updateProcessedData(1, 0);     // NO performance issue at all
     //trigger display refresh
-    statusUpdater->triggerUI_Refresh();
+    statusUpdater->requestUiRefresh();
 
     return wxDIR_CONTINUE;
 }
@@ -628,7 +632,7 @@ public:
             recycleBinAvailable(false)
     {
 #ifdef FFS_WIN
-                recycleBinAvailable = true;
+        recycleBinAvailable = true;
 #endif  // FFS_WIN
     }
 
@@ -658,7 +662,7 @@ public:
         fileOp.lpszProgressTitle     = NULL;
 
         if (SHFileOperation(&fileOp   //pointer to an SHFILEOPSTRUCT structure that contains information the function needs to carry out
-                         ) != 0 || fileOp.fAnyOperationsAborted) throw FileError(wxString(_("Error moving file ")) + wxT("\"") + filename + wxT("\"") + _(" to recycle bin!"));
+                           ) != 0 || fileOp.fAnyOperationsAborted) throw FileError(wxString(_("Error moving file ")) + wxT("\"") + filename + wxT("\"") + _(" to recycle bin!"));
 #endif  // FFS_WIN
     }
 
@@ -683,10 +687,10 @@ void FreeFileSync::removeFile(const wxString& filename)
 
 #ifdef FFS_WIN
     if (!SetFileAttributes(
-                filename.c_str(),     // address of filename
-                FILE_ATTRIBUTE_NORMAL // attributes to set
+                filename.c_str(),     //address of filename
+                FILE_ATTRIBUTE_NORMAL //attributes to set
             )) throw FileError(wxString(_("Error deleting file ")) + wxT("\"") + filename + wxT("\""));
-#endif  // FFS_WIN
+#endif  //FFS_WIN
 
     if (!wxRemoveFile(filename))
         throw FileError(wxString(_("Error deleting file ")) + wxT("\"") + filename + wxT("\""));
@@ -779,14 +783,9 @@ void FreeFileSync::copyCreatingDirs(const wxString& source, const wxString& targ
 class UpdateWhileCopying : public UpdateWhileExecuting
 {
 public:
-    UpdateWhileCopying()
-    {   //prevent wxWidgets logging
-        noWxLogs = new wxLogNull;
-    }
-    ~UpdateWhileCopying()
-    {
-        delete noWxLogs;
-    }
+    UpdateWhileCopying() {}
+    ~UpdateWhileCopying() {}
+
     wxString source;
     wxString target;
     bool success;
@@ -826,7 +825,10 @@ private:
         success = true;
     }
 
-    wxLogNull* noWxLogs;
+#ifndef __WXDEBUG__
+    //prevent wxWidgets logging
+    wxLogNull noWxLogs;
+#endif
 };
 
 
@@ -849,17 +851,9 @@ void FreeFileSync::copyfileMultithreaded(const wxString& source, const wxString&
 
 
 FreeFileSync::FreeFileSync(bool useRecycleBin) :
-        recycleBinShouldBeUsed(useRecycleBin)
-{
-    //prevent wxWidgets logging
-    noWxLogs = new wxLogNull;
-}
+        recycleBinShouldBeUsed(useRecycleBin) {}
 
-
-FreeFileSync::~FreeFileSync()
-{
-    delete noWxLogs;
-}
+FreeFileSync::~FreeFileSync() {}
 
 
 bool FreeFileSync::recycleBinExists()
@@ -1251,6 +1245,39 @@ wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
 }
 
 
+inline
+void formatFilterString(wxString& filter)
+{
+    filter.Trim(true);  //remove whitespace characters from right
+    filter.Trim(false); //remove whitespace characters from left
+
+#ifdef FFS_WIN
+    //Windows does NOT distinguish between upper/lower-case
+    filter.MakeLower();
+#elif defined FFS_LINUX
+    //Linux DOES distinguish between upper/lower-case
+//nothing to do here
+#else
+    assert(false);
+#endif
+}
+
+
+inline
+void formatFilenameString(wxString& filename)
+{
+#ifdef FFS_WIN
+    //Windows does NOT distinguish between upper/lower-case
+    filename.MakeLower();
+#elif defined FFS_LINUX
+    //Linux DOES distinguish between upper/lower-case
+//nothing to do here
+#else
+    assert(false);
+#endif
+}
+
+
 void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, const wxString& includeFilter, const wxString& excludeFilter)
 {
     wxString includeFilterTmp(includeFilter);
@@ -1271,16 +1298,24 @@ void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, con
     while ((indexEnd = includeFilterTmp.find(';', indexStart )) != string::npos)
     {
         if (indexStart != indexEnd) //do not add empty strings
-            includeList.push_back( includeFilterTmp.substr(indexStart, indexEnd - indexStart) );
+        {
+            wxString newEntry = includeFilterTmp.substr(indexStart, indexEnd - indexStart);
+            formatFilterString(newEntry);
+            includeList.push_back(newEntry);
+        }
         indexStart = indexEnd + 1;
     }
 
     indexStart = 0;
-    indexEnd = 0;
+    indexEnd   = 0;
     while ((indexEnd = excludeFilterTmp.find(';', indexStart )) != string::npos)
     {
         if (indexStart != indexEnd) //do not add empty strings
-            excludeList.push_back( excludeFilterTmp.substr(indexStart, indexEnd - indexStart) );
+        {
+            wxString newEntry = excludeFilterTmp.substr(indexStart, indexEnd - indexStart);
+            formatFilterString(newEntry);
+            excludeList.push_back(newEntry);
+        }
         indexStart = indexEnd + 1;
     }
 
@@ -1289,12 +1324,18 @@ void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, con
     //filter currentGridData
     for (FileCompareResult::iterator i = currentGridData.begin(); i != currentGridData.end(); ++i)
     {
+        wxString filenameLeft  = i->fileDescrLeft.filename;
+        wxString filenameRight = i->fileDescrRight.filename;
+
+        formatFilenameString(filenameLeft);
+        formatFilenameString(filenameRight);
+
         //process include filters
         if (i->fileDescrLeft.objType != TYPE_NOTHING)
         {
             bool includedLeft = false;
             for (vector<wxString>::const_iterator j = includeList.begin(); j != includeList.end(); ++j)
-                if (i->fileDescrLeft.filename.Matches(*j))
+                if (filenameLeft.Matches(*j))
                 {
                     includedLeft = true;
                     break;
@@ -1311,7 +1352,7 @@ void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, con
         {
             bool includedRight = false;
             for (vector<wxString>::const_iterator j = includeList.begin(); j != includeList.end(); ++j)
-                if (i->fileDescrRight.filename.Matches(*j))
+                if (filenameRight.Matches(*j))
                 {
                     includedRight = true;
                     break;
@@ -1327,8 +1368,7 @@ void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, con
         //process exclude filters
         bool excluded = false;
         for (vector<wxString>::const_iterator j = excludeList.begin(); j != excludeList.end(); ++j)
-            if (i->fileDescrLeft.filename.Matches(*j) ||
-                    i->fileDescrRight.filename.Matches(*j))
+            if (filenameLeft.Matches(*j) || filenameRight.Matches(*j))
             {
                 excluded = true;
                 break;
@@ -1344,6 +1384,7 @@ void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, con
     }
 }
 
+
 void FreeFileSync::removeFilterOnCurrentGridData(FileCompareResult& currentGridData)
 {
     //remove all filters on currentGridData
@@ -1353,11 +1394,15 @@ void FreeFileSync::removeFilterOnCurrentGridData(FileCompareResult& currentGridD
 
 
 wxString FreeFileSync::getFormattedDirectoryName(const wxString& dirname)
-{  //this formatting is needed since functions in FreeFileSync.cpp expect the directory to end with '\' to be able to split the relative names
-    //Actually all it needs, is the length of the directory
+{  //formatting is needed since functions in FreeFileSync.cpp expect the directory to end with '\' to be able to split the relative names
+   //actually all it needs, is the length of the directory
+
+    wxString dirnameTmp = dirname;
+    dirnameTmp.Trim(true);  //remove whitespace characters from right
+    dirnameTmp.Trim(false); //remove whitespace characters from left
 
     //let wxWidgets do the directory formatting, e.g. replace '/' with '\' for Windows
-    wxString result = wxDir(dirname).GetName();
+    wxString result = wxDir(dirnameTmp).GetName();
 
     result.Append(GlobalResources::fileNameSeparator);
     return result;
@@ -1434,7 +1479,7 @@ void FreeFileSync::startSynchronizationProcess(FileCompareResult& grid, const Sy
             {
                 while (true)
                 {   //trigger display refresh
-                    statusUpdater->triggerUI_Refresh();
+                    statusUpdater->requestUiRefresh();
 
                     try
                     {
@@ -1477,7 +1522,7 @@ void FreeFileSync::startSynchronizationProcess(FileCompareResult& grid, const Sy
                     {
                         while (true)
                         {    //trigger display refresh
-                            statusUpdater->triggerUI_Refresh();
+                            statusUpdater->requestUiRefresh();
 
                             try
                             {
@@ -1528,25 +1573,26 @@ void FreeFileSync::startSynchronizationProcess(FileCompareResult& grid, const Sy
 }
 
 
-bool FreeFileSync::isFFS_ConfigFile(const wxString& filename)
+bool FreeFileSync::isFfsConfigFile(const wxString& filename)
 {
     if (!wxFileExists(filename))
         return false;
 
+    //workaround to get a FILE* from a unicode filename
     wxFFile configFile(filename, wxT("rb"));
     if (!configFile.IsOpened())
         return false;
 
-    char buffer[FreeFileSync::FfsConfigFileID.size() + 1];
+    FILE* inputFile = configFile.fp();
 
-    //read FFS identifier
-    size_t bytesRead = configFile.Read(buffer, FreeFileSync::FfsConfigFileID.size());
+    TiXmlDocument doc;
+    if (!doc.LoadFile(inputFile)) //fails if inputFile is no proper XML
+        return false;
 
-    if (!configFile.Error() && bytesRead < 1000)
-    {
-        buffer[bytesRead] = 0;
-        return (FfsConfigFileID == string(buffer));
-    }
+    TiXmlElement* root = doc.RootElement();
+
+    if (root && (root->ValueStr() == string("FreeFileSync"))) //check for FFS configuration xml
+        return true;
     else
         return false;
 }
@@ -1567,7 +1613,7 @@ void FreeFileSync::addSubElements(set<int>& subElements, const FileCompareResult
         return;
 
     for (FileCompareResult::const_iterator i = grid.begin(); i != grid.end(); ++i)
-        if (i->fileDescrLeft.relFilename.StartsWith(relevantDirectory) ||
+        if (    i->fileDescrLeft.relFilename.StartsWith(relevantDirectory) ||
                 i->fileDescrRight.relFilename.StartsWith(relevantDirectory))
             subElements.insert(i - grid.begin());
 }
@@ -1627,29 +1673,4 @@ void FreeFileSync::deleteOnGridAndHD(FileCompareResult& grid, const set<int>& ro
 
     //remove deleted rows from grid
     removeRowsFromVector(grid, rowsToDeleteInGrid);
-}
-
-
-void updateUI_Now()
-{
-    //process UI events and prevent application from "not responding"   -> NO performance issue!
-    wxTheApp->Yield();
-
-    //    while (wxTheApp->Pending())
-    //        wxTheApp->Dispatch();
-}
-
-
-bool updateUI_IsAllowed()
-{
-    static wxLongLong lastExec = 0;
-
-    wxLongLong newExec = wxGetLocalTimeMillis();
-
-    if (newExec - lastExec >= UI_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
-    {
-        lastExec = newExec;
-        return true;
-    }
-    return false;
 }

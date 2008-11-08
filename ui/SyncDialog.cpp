@@ -4,6 +4,10 @@
 #include <wx/msgdlg.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
+#ifdef FFS_WIN
+#include <windows.h>
+#include <shlobj.h>
+#endif  // FFS_WIN
 
 using namespace std;
 
@@ -80,81 +84,81 @@ void SyncDialog::updateConfigIcons(wxBitmapButton* button1,
 {
     if (syncConfig.exLeftSideOnly == SYNC_DIR_RIGHT)
     {
-        button1->SetBitmapLabel(*GlobalResources::bitmapRightArrow);
+        button1->SetBitmapLabel(*GlobalResources::bitmapArrowRightCr);
         button1->SetToolTip(_("Copy from left to right"));
     }
     else if (syncConfig.exLeftSideOnly == SYNC_DIR_LEFT)
     {
-        button1->SetBitmapLabel(*GlobalResources::bitmapDelete);
+        button1->SetBitmapLabel(*GlobalResources::bitmapDeleteLeft);
         button1->SetToolTip(_("Delete files/folders existing on left side only"));
     }
     else if (syncConfig.exLeftSideOnly == SYNC_DIR_NONE)
     {
-        button1->SetBitmapLabel(*GlobalResources::bitmapNoArrow);
+        button1->SetBitmapLabel(*GlobalResources::bitmapArrowNone);
         button1->SetToolTip(_("Do nothing"));
     }
 
     if (syncConfig.exRightSideOnly == SYNC_DIR_RIGHT)
     {
-        button2->SetBitmapLabel(*GlobalResources::bitmapDelete);
+        button2->SetBitmapLabel(*GlobalResources::bitmapDeleteRight);
         button2->SetToolTip(_("Delete files/folders existing on right side only"));
     }
     else if (syncConfig.exRightSideOnly == SYNC_DIR_LEFT)
     {
-        button2->SetBitmapLabel(*GlobalResources::bitmapLeftArrow);
+        button2->SetBitmapLabel(*GlobalResources::bitmapArrowLeftCr);
         button2->SetToolTip(_("Copy from right to left"));
     }
     else if (syncConfig.exRightSideOnly == SYNC_DIR_NONE)
     {
-        button2->SetBitmapLabel(*GlobalResources::bitmapNoArrow);
+        button2->SetBitmapLabel(*GlobalResources::bitmapArrowNone);
         button2->SetToolTip(_("Do nothing"));
     }
 
     if (syncConfig.leftNewer == SYNC_DIR_RIGHT)
     {
-        button3->SetBitmapLabel(*GlobalResources::bitmapRightArrow);
+        button3->SetBitmapLabel(*GlobalResources::bitmapArrowRight);
         button3->SetToolTip(_("Copy from left to right overwriting"));
     }
     else if (syncConfig.leftNewer == SYNC_DIR_LEFT)
     {
-        button3->SetBitmapLabel(*GlobalResources::bitmapLeftArrow);
+        button3->SetBitmapLabel(*GlobalResources::bitmapArrowLeft);
         button3->SetToolTip(_("Copy from right to left overwriting"));
     }
     else if (syncConfig.leftNewer == SYNC_DIR_NONE)
     {
-        button3->SetBitmapLabel(*GlobalResources::bitmapNoArrow);
+        button3->SetBitmapLabel(*GlobalResources::bitmapArrowNone);
         button3->SetToolTip(_("Do nothing"));
     }
 
     if (syncConfig.rightNewer == SYNC_DIR_RIGHT)
     {
-        button4->SetBitmapLabel(*GlobalResources::bitmapRightArrow);
+        button4->SetBitmapLabel(*GlobalResources::bitmapArrowRight);
         button4->SetToolTip(_("Copy from left to right overwriting"));
     }
     else if (syncConfig.rightNewer == SYNC_DIR_LEFT)
     {
-        button4->SetBitmapLabel(*GlobalResources::bitmapLeftArrow);
+        button4->SetBitmapLabel(*GlobalResources::bitmapArrowLeft);
         button4->SetToolTip(_("Copy from right to left overwriting"));
     }
     else if (syncConfig.rightNewer == SYNC_DIR_NONE)
     {
-        button4->SetBitmapLabel(*GlobalResources::bitmapNoArrow);
+        button4->SetBitmapLabel(*GlobalResources::bitmapArrowNone);
         button4->SetToolTip(_("Do nothing"));
     }
 
     if (syncConfig.different == SYNC_DIR_RIGHT)
     {
-        button5->SetBitmapLabel(*GlobalResources::bitmapRightArrow);
+        button5->SetBitmapLabel(*GlobalResources::bitmapArrowRight);
         button5->SetToolTip(_("Copy from left to right overwriting"));
     }
     else if (syncConfig.different == SYNC_DIR_LEFT)
     {
-        button5->SetBitmapLabel(*GlobalResources::bitmapLeftArrow);
+        button5->SetBitmapLabel(*GlobalResources::bitmapArrowLeft);
         button5->SetToolTip(_("Copy from right to left overwriting"));
     }
     else if (syncConfig.different == SYNC_DIR_NONE)
     {
-        button5->SetBitmapLabel(*GlobalResources::bitmapNoArrow);
+        button5->SetBitmapLabel(*GlobalResources::bitmapArrowNone);
         button5->SetToolTip(_("Do nothing"));
     }
 }
@@ -245,7 +249,7 @@ void SyncDialog::OnSelectRecycleBin(wxCommandEvent& event)
     {
         if (!FreeFileSync::recycleBinExists())
         {
-            wxMessageBox(_("It was not possible to gain access to Recycle Bin!\n\nIt's likely that you are not using Windows XP. (Probably Vista)\nIf you want this feature included, please contact the author. :)"), _("Error") , wxOK | wxICON_ERROR);
+            wxMessageBox(_("It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)"), _("Error") , wxOK | wxICON_ERROR);
             m_checkBoxUseRecycler->SetValue(false);
         }
     }
@@ -461,7 +465,7 @@ void BatchDialog::OnSelectRecycleBin(wxCommandEvent& event)
     {
         if (!FreeFileSync::recycleBinExists())
         {
-            wxMessageBox(_("It was not possible to gain access to Recycle Bin!\n\nIt's likely that you are not using Windows XP. (Probably Vista)\nIf you want this feature included, please contact the author. :)"), _("Error") , wxOK | wxICON_ERROR);
+            wxMessageBox(_("It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)"), _("Error") , wxOK | wxICON_ERROR);
             m_checkBoxUseRecycler->SetValue(false);
         }
     }
@@ -498,7 +502,7 @@ void BatchDialog::OnCancel(wxCommandEvent& event)
 }
 
 
-void BatchDialog::OnCreateJob(wxCommandEvent& event)
+void BatchDialog::OnCreateBatchJob(wxCommandEvent& event)
 {
     if (m_directoryPanel1->GetValue().IsEmpty() || m_directoryPanel2->GetValue().IsEmpty())
     {
@@ -507,12 +511,12 @@ void BatchDialog::OnCreateJob(wxCommandEvent& event)
     }
 
     //check if directories exist if loaded by config file
-    if (!wxDirExists(m_directoryPanel1->GetValue()))
+    if (!wxDirExists(FreeFileSync::getFormattedDirectoryName(m_directoryPanel1->GetValue())))
     {
         wxMessageBox(_("Left directory does not exist. Please select a new one!"), _("Warning"), wxICON_WARNING);
         return;
     }
-    else if (!wxDirExists(m_directoryPanel2->GetValue()))
+    else if (!wxDirExists(FreeFileSync::getFormattedDirectoryName(m_directoryPanel2->GetValue())))
     {
         wxMessageBox(_("Right directory does not exist. Please select a new one!"), _("Warning"), wxICON_WARNING);
         return;
@@ -520,10 +524,10 @@ void BatchDialog::OnCreateJob(wxCommandEvent& event)
 
     //get a filename
 #ifdef FFS_WIN
-    wxString fileName = wxT("SyncJob.cmd"); //proposal
-    wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, fileName, wxString(_("Command file")) + wxT(" (*.cmd)|*.cmd"), wxFD_SAVE);
+    wxString fileName = _("SyncJob.lnk"); //proposal
+    wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, fileName, wxString(_("Shell link")) + wxT(" (*.lnk)|*.lnk"), wxFD_SAVE);
 #elif defined FFS_LINUX
-    wxString fileName = wxT("SyncJob.sh");  //proposal
+    wxString fileName = _("SyncJob.sh");  //proposal
     wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, fileName, wxString(_("Shell script")) + wxT(" (*.sh)|*.sh"), wxFD_SAVE);
 #else
     assert(false);
@@ -540,34 +544,11 @@ void BatchDialog::OnCreateJob(wxCommandEvent& event)
                 return;
         }
 
-        //assemble command line parameters
-        wxString outputString;
-        try
-        {
-            outputString+= parseConfiguration();
-        }
-        catch (const FileError& error)
-        {
-            wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
-            return;
-        }
-
-        //write export file
-        wxFFile output(fileName, wxT("w"));
-        if (output.IsOpened())
-        {
-            output.Write(outputString);
-
-#ifdef FFS_LINUX
-            //for linux the batch file needs the executable flag
-            output.Close();
-            wxExecute(wxString(wxT("chmod +x ")) + fileName);
-#endif  // FFS_LINUX
-
+        //create batch file
+        if (createBatchFile(fileName))
             EndModal(batchFileCreated);
-        }
         else
-            wxMessageBox(wxString(_("Could not write to ")) + wxT("\"") + fileName + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(wxString(_("Could not create file ")) + wxT("\"") + fileName + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
     }
 }
 
@@ -588,17 +569,11 @@ wxString getFormattedSyncDirection(const SyncDirection direction)
 }
 
 
-wxString BatchDialog::parseConfiguration()
+wxString BatchDialog::getCommandlineArguments()
 {
     wxString output;
-#ifdef FFS_LINUX
-    //shell script identifier
-    output+= wxT("#!/bin/bash\n");
-#endif
 
-    output+= wxString(wxT("\"")) + wxStandardPaths::Get().GetExecutablePath() + wxT("\"");
-
-    output+= wxString(wxT(" -")) + GlobalResources::paramCompare + wxT(" ");
+    output+= wxString(wxT("-")) + GlobalResources::paramCompare + wxT(" ");
     if (m_radioBtnSizeDate->GetValue())
         output+= GlobalResources::valueSizeDate;
     else if (m_radioBtnContent->GetValue())
@@ -606,7 +581,7 @@ wxString BatchDialog::parseConfiguration()
     else
         assert(false);
 
-    output+= wxString(wxT(" -")) + GlobalResources::paramCfg + wxT(" ") +
+    output+= wxString(wxT(" -")) + GlobalResources::paramSync + wxT(" ") +
              getFormattedSyncDirection(localSyncConfiguration.exLeftSideOnly) +
              getFormattedSyncDirection(localSyncConfiguration.exRightSideOnly) +
              getFormattedSyncDirection(localSyncConfiguration.leftNewer) +
@@ -631,31 +606,100 @@ wxString BatchDialog::parseConfiguration()
     if (m_checkBoxSilent->GetValue())
         output+= wxString(wxT(" -")) + GlobalResources::paramSilent;
 
-#ifdef FFS_WIN
-    //retrieve 8.3 directory names to handle unicode names in batch file correctly
-    wxChar buffer[MAX_PATH];
-    if (GetShortPathName(
-                (m_directoryPanel1->GetValue()).c_str(),	// points to a null-terminated path string
-                buffer,	    // points to a buffer to receive the null-terminated short form of the path
-                MAX_PATH	// specifies the size of the buffer pointed to by lpszShortPath
-            ) == 0)
-        throw FileError(wxString(_("Could not retrieve the 8.3 directory name of ")) + wxT("\"") + m_directoryPanel1->GetValue() + wxT("\""));
-    output+= wxString(wxT(" ")) + buffer;
+    wxString leftDir  = FreeFileSync::getFormattedDirectoryName(m_directoryPanel1->GetValue());
+    wxString rightDir = FreeFileSync::getFormattedDirectoryName(m_directoryPanel2->GetValue());
 
-    if (GetShortPathName(
-                (m_directoryPanel2->GetValue()).c_str(),	// points to a null-terminated path string
-                buffer,	    // points to a buffer to receive the null-terminated short form of the path
-                MAX_PATH	// specifies the size of the buffer pointed to by lpszShortPath
-            ) == 0)
-        throw FileError(wxString(_("Could not retrieve the 8.3 directory name of ")) + wxT("\"") + m_directoryPanel2->GetValue() + wxT("\""));
-    output+= wxString(wxT(" ")) + buffer;
-#else
-    output+= wxString(wxT(" ")) + wxT("\"") + wxDir(m_directoryPanel1->GetValue()).GetName() + wxT("\""); //directory WITHOUT trailing path separator
-    output+= wxString(wxT(" ")) + wxT("\"") + wxDir(m_directoryPanel2->GetValue()).GetName() + wxT("\""); //needed since e.g. "C:\" isn't parsed correctly by commandline
-#endif  // FFS_WIN
-
-    output+= wxT("\n");
+    output+= wxString(wxT(" \"")) + wxDir(leftDir).GetName() + wxT("\""); //directory WITHOUT trailing path separator
+    output+= wxString(wxT(" \"")) + wxDir(rightDir).GetName() + wxT("\""); //needed since e.g. "C:\" isn't parsed correctly by commandline
 
     return output;
 }
 
+
+template <typename T>
+struct CleanUp
+{
+    CleanUp(T* element) : m_element(element) {}
+
+    ~CleanUp()
+    {
+        m_element->Release();
+    }
+
+    T* m_element;
+};
+
+
+bool BatchDialog::createBatchFile(const wxString& filename)
+{
+#ifdef FFS_WIN
+    //create shell link (instead of batch file) for full Unicode support
+    HRESULT hResult = E_FAIL;
+    IShellLink* pShellLink = NULL;
+
+    if (FAILED(CoCreateInstance(CLSID_ShellLink,       //class identifier
+                                NULL,                  //object isn't part of an aggregate
+                                CLSCTX_INPROC_SERVER,  //context for running executable code
+                                IID_IShellLink,        //interface identifier
+                                (void**)&pShellLink))) //pointer to storage of interface pointer
+        return false;
+    CleanUp<IShellLink> cleanOnExit(pShellLink);
+
+    wxString freeFileSyncExe = wxStandardPaths::Get().GetExecutablePath();
+    if (FAILED(pShellLink->SetPath(freeFileSyncExe.c_str())))
+        return false;
+
+    if (FAILED(pShellLink->SetArguments(getCommandlineArguments().c_str())))
+        return false;
+
+    if (FAILED(pShellLink->SetIconLocation(freeFileSyncExe.c_str(), 1))) //second icon from executable file is used
+        return false;
+
+    if (FAILED(pShellLink->SetDescription(_("FreeFileSync Batch Job"))))
+        return false;
+
+    IPersistFile*  pPersistFile = NULL;
+    if (FAILED(pShellLink->QueryInterface(IID_IPersistFile, (void**)&pPersistFile)))
+        return false;
+    CleanUp<IPersistFile> cleanOnExit2(pPersistFile);
+
+    //pPersistFile->Save accepts unicode input only
+#ifdef _UNICODE
+    hResult = pPersistFile->Save(filename.c_str(), TRUE);
+#else
+    WCHAR wszTemp [MAX_PATH];
+    if (MultiByteToWideChar(CP_ACP, 0, filename.c_str(), -1, wszTemp, MAX_PATH) == 0)
+        return false;
+
+    hResult = pPersistFile->Save(wszTemp, TRUE);
+#endif
+    if (FAILED(hResult))
+        return false;
+
+    return true;
+
+//############################################################################
+#elif defined FFS_LINUX
+    //create shell script
+    wxFFile output(filename, wxT("w"));
+    if (output.IsOpened())
+    {
+        wxString outputString;
+        outputString+= wxT("#!/bin/bash\n"); //shell script identifier
+        outputString+= wxString(wxT("\"")) + wxStandardPaths::Get().GetExecutablePath() + wxT("\" ");
+        outputString+= getCommandlineArguments() + wxT("\n");
+
+        if (!output.Write(outputString))
+            return false;
+
+        //for linux the batch file needs the executable flag
+        output.Close();
+        wxExecute(wxString(wxT("chmod +x ")) + filename);
+        return true;
+    }
+    else
+        return false;
+#else
+    adapt this!
+#endif  // FFS_LINUX
+}

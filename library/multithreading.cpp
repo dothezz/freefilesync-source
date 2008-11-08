@@ -1,7 +1,35 @@
 #include "multithreading.h"
 #include <wx/utils.h>
+#include <wx/app.h>
+#include <wx/timer.h>
+
 //#include "windows.h"
 //MessageBox(0, "hi", "", 0);
+
+void updateUiNow()
+{
+    //process UI events and prevent application from "not responding"   -> NO performance issue!
+    wxTheApp->Yield();
+
+    //    while (wxTheApp->Pending())
+    //        wxTheApp->Dispatch();
+}
+
+
+bool updateUiIsAllowed()
+{
+    static wxLongLong lastExec = 0;
+
+    wxLongLong newExec = wxGetLocalTimeMillis();
+
+    if (newExec - lastExec >= UI_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
+    {
+        lastExec = newExec;
+        return true;
+    }
+    return false;
+}
+
 
 /*choreography:
 
@@ -149,10 +177,10 @@ void UpdateWhileExecuting::execute(StatusUpdater* statusUpdater)
 
     while (receivingResult.WaitTimeout(UI_UPDATE_INTERVAL) == wxCOND_TIMEOUT)
     {
-        statusUpdater->triggerUI_Refresh(true); //ATTENTION: Exception "AbortThisProcess" may be thrown here!!!
+        statusUpdater->requestUiRefresh(true); //ATTENTION: Exception "AbortThisProcess" may be thrown here!!!
 
         if (workDone == true) //workaround for a bug in wxWidgets v2.8.9 class wxCondition: signals might get lost
-            break;            //no mutex for workDone needed here: it is changed only when maintread is in WaitTimeout()
+            break;            //no mutex for workDone needed here: it is changed only when mainthread is in WaitTimeout()
     }
 }
 

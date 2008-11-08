@@ -11,7 +11,7 @@ int globalFunctions::round(const double d)
 string globalFunctions::numberToString(const unsigned int number)
 {
     char result[100];
-    sprintf( result, "%u", number);
+    sprintf(result, "%u", number);
     return string(result);
 }
 
@@ -19,7 +19,7 @@ string globalFunctions::numberToString(const unsigned int number)
 string globalFunctions::numberToString(const int number)
 {
     char result[100];
-    sprintf( result, "%d", number);
+    sprintf(result, "%d", number);
     return string(result);
 }
 
@@ -27,7 +27,7 @@ string globalFunctions::numberToString(const int number)
 string globalFunctions::numberToString(const float number)
 {
     char result[100];
-    sprintf( result, "%f", number);
+    sprintf(result, "%f", number);
     return string(result);
 }
 
@@ -50,7 +50,6 @@ wxString globalFunctions::numberToWxString(const float number)
 }
 
 
-inline
 int globalFunctions::stringToInt(const string& number)
 {
     return atoi(number.c_str());

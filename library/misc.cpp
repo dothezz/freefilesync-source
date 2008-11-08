@@ -4,15 +4,52 @@
 #include "resources.h"
 #include "globalFunctions.h"
 
+
 const string CustomLocale::FfsLanguageDat = "language.dat";
+
 
 void exchangeEscapeChars(wxString& data)
 {
-    data.Replace(wxT("\\\\"), wxT("\\"));
-    data.Replace(wxT("\\n"), wxT("\n"));
-    data.Replace(wxT("\\t"), wxT("\t"));
-    data.Replace(wxT("\"\""), wxT(""""));
-    data.Replace(wxT("\\\""), wxT("\""));
+    wxString output;
+
+    const wxChar* input = data.c_str();
+
+    wxChar value;
+    while ((value = *input) != wxChar(0))
+    {
+        //read backslash
+        if (value == wxChar('\\'))
+        {
+            //read next character
+            ++input;
+            value = *input;
+            if (value == wxChar(0))
+                break;
+
+            switch (value)
+            {
+            case wxChar('\\'):
+                output+= wxChar('\\');
+                break;
+            case wxChar('n'):
+                output+= wxChar('\n');
+                break;
+            case wxChar('t'):
+                output+= wxChar('\t');
+                break;
+            case wxChar('\"'):
+                output+= wxChar('\"');
+                break;
+            default:
+                output+= value;
+            }
+        }
+        else
+            output+= value;
+
+        ++input;
+    }
+    data = output;
 }
 
 
@@ -69,8 +106,11 @@ void CustomLocale::loadLanguageFile(int language)
     case wxLANGUAGE_FRENCH:
         languageFile = "french.lng";
         break;
+    case wxLANGUAGE_JAPANESE:
+        languageFile = "japanese.lng";
+        break;
     default:
-        languageFile = string();
+        languageFile.clear();
         currentLanguage = wxLANGUAGE_ENGLISH;
     }
 
@@ -91,7 +131,7 @@ void CustomLocale::loadLanguageFile(int language)
             //Linux: 0xa        \n
             //Mac:   0xd        \r
             //Win:   0xd 0xa    \r\n    <- language files are in Windows format
-            while (langFile.getline(temp, bufferSize, 0xd)) //specify delimiter explicitely
+            while (langFile.getline(temp, bufferSize, 0xd)) //specify delimiter explicitly
             {
                 langFile.get(); //discard the 0xa character
 

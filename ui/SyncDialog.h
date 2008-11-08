@@ -76,10 +76,11 @@ private:
 
     void OnClose(           wxCloseEvent&   event);
     void OnCancel(          wxCommandEvent& event);
-    void OnCreateJob(       wxCommandEvent& event);
+    void OnCreateBatchJob(  wxCommandEvent& event);
 
     void updateFilterButton();
-    wxString parseConfiguration();
+    wxString getCommandlineArguments();
+    bool createBatchFile(const wxString& filename);
 
     SyncConfiguration localSyncConfiguration;
     bool filterIsActive;

@@ -1,4 +1,4 @@
-CPPFLAGS=-Wall -pipe -DNDEBUG `wx-config --cppflags` -DFFS_LINUX -O3 -pthread -c
+CPPFLAGS=-Wall -pipe -DNDEBUG `wx-config --cppflags` -DFFS_LINUX -DTIXML_USE_STL -O3 -pthread -c
 ENDFLAGS=`wx-config --libs` -lwx_gtk2_aui-2.8 -O3 -pthread
 
 all: FreeFileSync
@@ -36,8 +36,21 @@ obj/smallDialogs.o: ui/smallDialogs.cpp
 obj/misc.o: library/misc.cpp
 	g++ $(CPPFLAGS) library/misc.cpp -o obj/misc.o
 
-FreeFileSync: obj/FreeFileSync.o obj/application.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/misc.o
-	g++ $(ENDFLAGS) -o FreeFileSync obj/application.o obj/FreeFileSync.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/misc.o
+obj/tinyxml.o: library/tinyxml/tinyxml.cpp
+	g++ $(CPPFLAGS) library/tinyxml/tinyxml.cpp -o obj/tinyxml.o
+
+obj/tinystr.o: library/tinyxml/tinystr.cpp
+	g++ $(CPPFLAGS) library/tinyxml/tinystr.cpp -o obj/tinystr.o
+
+obj/tinyxmlerror.o: library/tinyxml/tinyxmlerror.cpp
+	g++ $(CPPFLAGS) library/tinyxml/tinyxmlerror.cpp -o obj/tinyxmlerror.o
+
+obj/tinyxmlparser.o: library/tinyxml/tinyxmlparser.cpp
+	g++ $(CPPFLAGS) library/tinyxml/tinyxmlparser.cpp -o obj/tinyxmlparser.o
+
+	
+FreeFileSync: obj/FreeFileSync.o obj/application.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o
+	g++ $(ENDFLAGS) -o FreeFileSync obj/application.o obj/FreeFileSync.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o
 
 
 clean:

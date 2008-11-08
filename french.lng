@@ -96,8 +96,8 @@
 -Synchronisation de fichiers Open-Source-
 .
 ,
-1. Enter full file or directory names separated by ';'.\n2. Wildcard characters '*' and '?' are supported.\n3. Case sensitive expressions!\n\nExample: *.tmp;*\\filename.dat;*\\directory\\*
-1. Entrer les noms complets des fichiers ou répertoires séparés par des ';'.\n2. Les caractères génériques '*' et '?' sont supportés.\n3. La distinction est faite entre majuscules et minuscules!\n\nExemple: *.tmp;*\\fichier.dat;*\\repert\\*
+1. Enter full file or directory names separated by ';'.\n2. Wildcard characters '*' and '?' are supported.\n3. Case sensitive expressions!
+1. Entrer les noms complets des fichiers ou répertoires séparés par des ';'.\n2. Les caractères génériques '*' et '?' sont supportés.\n3. La distinction est faite entre majuscules et minuscules!
 : check file content\n
 : Contrôle le contenu du fichier\n
 : check filesize and date\n\t\t
@@ -366,8 +366,8 @@ Information
 Information
 Initialization of Recycle Bin failed! It cannot be used!
 Erreur lors de l'initialisation de la corbeille ! La corbeille ne peut être utilisée!
-It was not possible to gain access to Recycle Bin!\n\nIt's likely that you are not using Windows XP. (Probably Vista)\nIf you want this feature included, please contact the author. :)
-Impossible d'accéder à la corbeille!\n\nIl est probable que vous n'utilisez pas Windows XP. (Peut-être Vista?)\nSi vous désirez utilisee cette fonctionnalité, veuillez contacter l'auteur. :)
+It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
+Impossible d'accéder à la corbeille!\n\nIl est probable que vous n'utilisez pas Windows.\nSi vous désirez utilisee cette fonctionnalité, veuillez contacter l'auteur. :)
 Left directory does not exist. Please select a new one!
 Le répertoire de gauche n'existe pas. Veuillez en choisir un autre!
 Left folder:
@@ -534,8 +534,8 @@ Attention : la synchronisation a échoué à cause de
 \n\t\tDirection de la synchronisation: L: vers la gauche, R: vers la droite, N: ne rien faire\n
 \t1: Creates a mirror backup of the left directory\n\t2: Synchronizes all *.doc files from both directories simultaneously\n\n
 \t1: Crée une sauvegarde miroir du répertoire de gauche\n\t2: Synchronise tous les fichiers *.doc sur les deux répertoires\n\n
-\tExamples:\n\n\t1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n\t2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n
-\tExemples :\n\n\t1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n\t2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n
+\tExamples:\n\n\t1.) FreeFileSync -cmp SIZEDATE -sync RRRRR C:\\Source C:\\Target\n\t2.) FreeFileSync -cmp sizedate -sync rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n
+\tExemples :\n\n\t1.) FreeFileSync -cmp SIZEDATE -sync RRRRR C:\\Source C:\\Target\n\t2.) FreeFileSync -cmp sizedate -sync rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n
 \tHint: You can easily generate a batch file by chosing \"Create batch job\" from the GUI menubar.\n
 
 \t\tChar 1: Folders/files that exist on left side only\n

@@ -55,11 +55,13 @@ public:
     void initNewProcess(int objectsTotal, double dataTotal, int processID);
     void updateProcessedData(int objectsProcessed, double dataProcessed);
     int reportError(const wxString& text);
-    void triggerUI_Refresh(bool asyncProcessActive);
+    void forceUiRefresh();
 
     void noSynchronizationNeeded();
 
 private:
+    void abortThisProcess();
+
     Application* app;
     SyncStatus* syncStatusFrame;
     bool continueErrors;

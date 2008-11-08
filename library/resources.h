@@ -22,7 +22,7 @@ public:
 
     //command line parameters
     static const wxChar* paramCompare;
-    static const wxChar* paramCfg;
+    static const wxChar* paramSync;
     static const wxChar* paramInclude;
     static const wxChar* paramExclude;
     static const wxChar* paramContinueError;
@@ -33,12 +33,15 @@ public:
     static const wxChar* valueContent;
 
     //image resource objects
-    static wxBitmap* bitmapLeftArrow;
-    static wxBitmap* bitmapRightArrow;
-    static wxBitmap* bitmapNoArrow;
+    static wxBitmap* bitmapArrowLeft;
+    static wxBitmap* bitmapArrowRight;
+    static wxBitmap* bitmapArrowLeftCr;
+    static wxBitmap* bitmapArrowRightCr;
+    static wxBitmap* bitmapArrowNone;
     static wxBitmap* bitmapStartSync;
     static wxBitmap* bitmapStartSyncDis;
-    static wxBitmap* bitmapDelete;
+    static wxBitmap* bitmapDeleteLeft;
+    static wxBitmap* bitmapDeleteRight;
     static wxBitmap* bitmapEmail;
     static wxBitmap* bitmapAbout;
     static wxBitmap* bitmapWebsite;

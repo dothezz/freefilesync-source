@@ -19,8 +19,8 @@ const wxChar* GlobalResources::thousandsSeparator = wxEmptyString;
 
 
 //command line parameters
-const wxChar* GlobalResources::paramCompare       = wxT("cmp");
-const wxChar* GlobalResources::paramCfg           = wxT("cfg");
+const wxChar* GlobalResources::paramCompare       = wxT("comp");
+const wxChar* GlobalResources::paramSync          = wxT("sync");
 const wxChar* GlobalResources::paramInclude       = wxT("incl");
 const wxChar* GlobalResources::paramExclude       = wxT("excl");
 const wxChar* GlobalResources::paramContinueError = wxT("continue");
@@ -33,12 +33,15 @@ const wxChar* GlobalResources::valueContent       = wxT("CONTENT");
 
 map<wxString, wxBitmap*> GlobalResources::bitmapResource;
 
-wxBitmap* GlobalResources::bitmapLeftArrow       = 0;
-wxBitmap* GlobalResources::bitmapRightArrow      = 0;
-wxBitmap* GlobalResources::bitmapNoArrow         = 0;
+wxBitmap* GlobalResources::bitmapArrowLeft       = 0;
+wxBitmap* GlobalResources::bitmapArrowRight      = 0;
+wxBitmap* GlobalResources::bitmapArrowLeftCr     = 0;
+wxBitmap* GlobalResources::bitmapArrowRightCr    = 0;
+wxBitmap* GlobalResources::bitmapArrowNone       = 0;
 wxBitmap* GlobalResources::bitmapStartSync       = 0;
 wxBitmap* GlobalResources::bitmapStartSyncDis    = 0;
-wxBitmap* GlobalResources::bitmapDelete          = 0;
+wxBitmap* GlobalResources::bitmapDeleteLeft      = 0;
+wxBitmap* GlobalResources::bitmapDeleteRight     = 0;
 wxBitmap* GlobalResources::bitmapEmail           = 0;
 wxBitmap* GlobalResources::bitmapAbout           = 0;
 wxBitmap* GlobalResources::bitmapWebsite         = 0;
@@ -90,12 +93,15 @@ wxIcon*      GlobalResources::programIcon        = 0;
 void GlobalResources::loadResourceFiles()
 {
     //map, allocate and initialize pictures
-    bitmapResource[wxT("left arrow.png")]        = (bitmapLeftArrow       = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("right arrow.png")]       = (bitmapRightArrow      = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("no arrow.png")]          = (bitmapNoArrow         = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("left arrow.png")]        = (bitmapArrowLeft       = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("right arrow.png")]       = (bitmapArrowRight      = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("left arrow create.png")] = (bitmapArrowLeftCr     = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("right arrow create.png")]= (bitmapArrowRightCr    = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("no arrow.png")]          = (bitmapArrowNone       = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("start sync.png")]        = (bitmapStartSync       = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("start sync dis.png")]    = (bitmapStartSyncDis    = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("delete.png")]            = (bitmapDelete          = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("left delete.png")]       = (bitmapDeleteLeft      = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("right delete.png")]      = (bitmapDeleteRight     = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("email.png")]             = (bitmapEmail           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("about.png")]             = (bitmapAbout           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("website.png")]           = (bitmapWebsite         = new wxBitmap(wxNullBitmap));
@@ -163,7 +169,7 @@ void GlobalResources::loadResourceFiles()
     animationSync->LoadFile(wxT("Resources.a02"));
 
 #ifdef FFS_WIN
-    programIcon = new wxIcon(wxT("winIcon"));
+    programIcon = new wxIcon(wxT("ffsIcon1"));
 #else
 #include "FreeFileSync.xpm"
     programIcon = new wxIcon(FreeFileSync_xpm);

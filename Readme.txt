@@ -1,4 +1,4 @@
-FreeFileSync v1.9
+FreeFileSync v1.10
 ----------------- 
 
 Usage
@@ -33,7 +33,7 @@ Key Features
 11. Support for filesizes > 4 GB.
 12. Option to move files to Recycle Bin instead of deleting/overwriting them.
 13. Automatically ignore directories "\RECYCLER" and "\System Volume Information" when comparing and sync'ing. (Windows only)
-14. Localized English, French and German versions available.
+14. Localized English, German, French and Japanese versions available.
 15. Delete before copy: Avoid disc space shortages with large sync-operations.
 16. Based on wxWidgets framework => Portable to many operating systems.
 17. Filter functionality to include/exclude files from synchronization (without re-compare!).

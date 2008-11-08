@@ -1,2 +1,5 @@
 #include "wx/msw/wx.rc"
-winIcon ICON DISCARDABLE "library/FreeFileSync.ico"
+
+//naming convention to set icon sequence in executable file
+ffsIcon1 ICON DISCARDABLE "library/FreeFileSync.ico"
+ffsIcon2 ICON DISCARDABLE "library/Batch.ico"

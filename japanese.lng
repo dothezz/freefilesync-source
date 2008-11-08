@@ -1,0 +1,606 @@
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+  Time: 
+  時間: 
+ Byte
+ バイト
+ GB
+ GB
+ MB
+ MB
+ PB
+ PB
+ TB
+ TB
+ You may try to synchronize remaining items again (WITHOUT having to re-compare)!
+ 残っているファイルは、再び同期することができます (再比較とは別の動作)!
+ already exists. Overwrite?
+ すでに存在します.. 上書きしますか?
+ directories
+ ディレクトリ
+ directory
+ ディレクトリ
+ does not exist.
+ 存在しません
+ file, 
+ つのファイル, 
+ files, 
+ つのファイル, 
+ item(s):\n\n
+ つのアイテム(複):\n\n
+ kB
+ kB
+ of 
+  /  
+ overwriting 
+ 上書き中
+ row in view
+　列を表示
+ rows in view
+　列を表示
+ to 
+ から
+ to recycle bin!
+ ゴミ箱に移動!
+!=	files are different\n
+!=	ファイルは異なっています\n
+&Abort
+情報(&A)
+&About...
+情報(&A)...
+&Advanced
+拡張(&A)
+&Back
+戻る(&B)
+&Cancel
+キャンセル(&C)
+&Compare
+比較(&C)
+&Continue
+続行(&C)
+&Create
+作成(&C)
+&Create batch job
+一括ジョブを作成(&C)
+&Default
+デフォルト(&D)
+&Export file list
+ファイル一覧をエクスポート(&E)
+&File
+ファイル(&F)
+&Help
+ヘルプ(&H)
+&Language
+使用言語(&L)
+&OK
+&OK
+&Pause
+一時停止(&P)
+&Quit
+終了(&Q)
+&Retry
+再試行(&R)
+&Start
+開始(&S)
+&Synchronize
+同期(&S)
+(-)	filtered out from sync-process\n
+(-)	同期処理対象から除外\n
+,
+.
+- different
+- 差異あり
+- different (same date, different size)
+- 差異あり(日付は同一、サイズが異なります)
+- equal
+- 同一
+- exists left only
+- 左側にのみ存在
+- exists right only
+- 右側にのみ存在
+- left
+- 左側
+- left newer
+- 左側の方が新しい
+- right
+- 右側
+- right newer
+- 右側の方が新しい
+- same date (different size)
+- 日付は同一(サイズに差異あり)
+-------------------------------------------------
+-----------------------------------------------------
+---------\n
+-----------\n
+-Open-Source file synchronization-
+-Open-Source ファイル同期ツール-
+.
+,
+1. Enter full file or directory names separated by ';'.\n2. Wildcard characters '*' and '?' are supported.
+1. ファイル/ディレクトリ名を ' ; ' で区切って入力してください\n2. ワイルドカード ' * ' と ' ? ' に対応しています。
+: check file content\n
+: ファイル内容を確認\n
+: check filesize and date\n\t\t
+: ファイルサイズと日付を確認\n\t\t
+<<	left file is newer\n
+<<	左側の方が新しい\n
+<Directory>
+<ディレクトリ>
+<left directory>
+<左のディレクトリ>
+<right directory>
+<右のディレクトリ>
+<|	file on left side only\n
+<|	左側のみに存在するファイル\n
+==	files are equal\n\n
+==	同じ内容のファイル\n\n
+>>	right file is newer\n
+>>	右側の方が新しい\n
+Abort
+中断
+Abort requested: Waiting for current operation to finish...
+ユーザによる中断: 現在の処理を終了しています.. お待ちください...
+Aborted
+中断
+About
+情報
+Action
+操作
+All items have been synchronized!
+すべてのアイテムは同期されました!
+An error occured
+エラーが発生
+An exception occured!
+例外が発生しました!
+As a result 6 different status can be returned to categorize all files:
+すべてのファイルのカテゴリ別に、6 つの異なるステータスを結果に返す事が出来ます。
+As a result the files are separated into the following categories:
+ファイルは以下のカテゴリに分類されます:
+As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
+このオプションでは、同じ名前を共有するファイルで内容が同じ場合は、同一として扱われます。 バックアップ操作より、むしろ整合性のチェックを行う時に役立つオプションです。 従ってファイルの日時については全く考慮されていません。\n\n設定が有効な時は、ツリー表示が小さくなります。
+Assemble a batch file with the following settings. To start synchronization in batch mode simply execute this file or schedule it in your operating system's task planner.
+以下の設定で一括処理(バッチ)ファイルを作成します。使用方法は、そのままファイルを実行するか、OS のタスクスケジューラを利用して実行することもできます。
+Batch file created successfully!
+バッチファイルが作成されました!
+Big thanks for localizing FreeFileSync goes out to:
+FreeFileSync のローカライズへの協力に感謝します:
+Build: 
+ビルド: 
+Choose to hide filtered files/directories from list
+リストから除外したいファイル/ディレクトリを選択
+Comma separated list
+カンマ区切り
+Compare both sides
+両方を比較
+Compare by \"File content\"
+\"ファイルの内容\" を比較
+Compare by \"File size and date\"
+\"ファイルサイズと日付\" を比較
+Compare by...
+比較対象...
+Comparing content
+内容の比較中
+Comparing content of files 
+ファイルの内容を比較中 
+Comparing...
+比較中...
+Completed
+完了しました
+Configuration
+構成設定
+Configuration loaded!
+構成設定を読み込み中!
+Configuration overview:
+構成設定の概要:
+Configuration saved!
+構成設定は保存されました!
+Configure filter
+フィルター設定
+Configure filter...
+フィルター設定...
+Configure your own synchronization rules.
+あなたの設定した同期規則
+Confirm
+確認
+Continue
+続行
+Continue on error
+エラーでも続行
+Continue on next errors
+次のエラーまで続行
+Copy from left to right
+左から右にコピー
+Copy from left to right overwriting
+左から右に上書きコピー
+Copy from right to left
+右から左にコピー
+Copy from right to left overwriting
+右から左に上書きコピー
+Copy to clipboard\tCTRL+C
+クリップボードにコピー\tCTRL+C
+Copying file 
+ファイルをコピー中
+Could not create file 
+ファイルを作成できません
+Could not open configuration file 
+構成ファイルを開けませんでした。
+Could not open file: 
+ファイルを開けません: 
+Could not read configuration file 
+構成ファイルを読み込めません 
+Could not read language file 
+言語ファイルを読み込めません
+Could not retrieve file info for: 
+ファイル情報を取得できません:
+Could not set working directory to directory containing executable file!
+実行ファイルが含まれるディレクトリは、作業ディレクトリとして利用できません!
+Could not write configuration file 
+構成ファイルに書き込めませんでした。
+Could not write to 
+書き込みに失敗
+Create a batch job
+一括ジョブを作成
+Create:
+作成:
+Creating folder 
+作成するフォルダ 
+Current operation:
+現在の操作:
+Custom
+カスタム
+DECISION TREE
+[判定ツリー]
+Data remaining:
+残りのデータ:
+Data:
+データ:
+Date
+データ
+Delete files/folders existing on left side only
+左側のみに存在するファイル/フォルダを削除
+Delete files/folders existing on right side only
+右側のみに存在するファイル/フォルダを削除
+Delete files\tDEL
+ファイルを削除\tDEL
+Delete:
+削除:
+Deleting file 
+ファイルを削除中 
+Deleting folder 
+フォルダを削除中 
+Directory 
+ディレクトリ 
+Directory on the left does not exist. Please select a new one!
+左側のディレクトリには存在しません、新たに選択してください!
+Directory on the right does not exist. Please select a new one!
+右側のディレクトリには存在しません、新たに選択してください!
+Displays help on the command line parameters\n
+コマンドラインパラメータを表示\n
+Do not show graphical status and error messages but write to a logfile instead
+進捗状況、及びエラーを表示しないで、代わりにログファイルに書き込む
+Do not show graphical status and error messages but write to a logfile instead.\n\n
+進捗状況、及びエラーを表示しないで、代わりにログファイルに書き込む.\n\n
+Do nothing
+何もしない
+Do you really want to delete the following objects(s)?
+本当に以下のオブジェクトを削除しますか?
+Do you really want to move the following objects(s) to the recycle bin?
+本当に以下のオブジェクトをゴミ箱に移動しますか?
+Donate with PayPal
+PayPal から寄付する
+Drag && drop
+ドラッグ && ドロップ
+Email:
+E-メール:
+Error
+エラー
+Error adapting modification time of file 
+ファイルの更新時間の適合エラー
+Error converting FILETIME to SYSTEMTIME
+FILETIME から SYSTEMTIME への変換エラー
+Error converting FILETIME to local FILETIME
+FILETIME から local FILETIME への変換エラー
+Error copying file 
+ファイルのコピーに失敗 
+Error creating directory 
+ディレクトリの作成に失敗 
+Error deleting directory 
+ディレクトリの削除に失敗
+Error deleting file 
+ファイルの削除に失敗
+Error moving file 
+ファイルの移動に失敗
+Error parsing configuration file 
+構成ファイルの構文に誤りがあります
+Error reading file: 
+ファイル読み込みエラー: 
+Error traversing directory 
+ディレクトリの移動エラー
+Error when converting int to wxString
+wxString の変換エラー
+Error when converting wxString to double
+wxString の変換エラー(double)
+Error when converting wxString to long
+wxString の変換エラー(long)
+Error: Source directory does not exist anymore: 
+エラー: ソースディレクトリが存在しません: 
+Example
+例
+Exclude
+除外
+Feedback and suggestions are welcome at:
+フィードバック、提案など:
+File content
+ファイルの内容
+File list exported!
+ファイル一覧のエクスポートが完了!
+File size and date
+ファイルサイズと日付
+Filename
+ファイル名
+Files are found equal if\n     - file content\nis the same.
+ファイルが同様だった場合\n     - ファイル内容\nで判断する
+Files are found equal if\n     - filesize\n     - last write time (UTC) and date\nare the same.
+ファイルが同様だった場合\n   - ファイルサイズ\n   - 最終書き込み時間(UTC)と日付\nで判断する
+Files remaining:
+残りのファイル:
+Files that exist on both sides and have different content
+両側に存在するが、内容が異なるファイル
+Files that exist on both sides, have same date but different filesizes
+両側に存在して、日付は同じだが、ファイルサイズが異なるファイル
+Files that exist on both sides, left one is newer
+両側に存在するが、左側の方がより新しい
+Files that exist on both sides, right one is newer
+両側に存在するが、右側の方がより新しい
+Files/folders remaining:
+ファイル/フォルダのリネーム:
+Files/folders scanned:
+ファイル/フォルダのスキャン:
+Files/folders that exist on left side only
+左側のみに存在するファイル/フォルダ
+Files/folders that exist on right side only
+右側のみに存在するファイル/フォルダ
+Filter
+フィルター
+Filter active: Press again to deactivate
+フィルター有効化: 再度押すと無効化
+Filter files
+ファイルフィルター
+Filter manually
+手動フィルター
+Filter view
+表示フィルター
+FreeFileSync   (Date: 
+FreeFileSync   (日付: 
+FreeFileSync - Folder Comparison and Synchronization
+FreeFileSync - Folder Comparison and Synchronization
+FreeFileSync Batch Job
+FreeFileSync 一括ジョブ
+FreeFileSync at Sourceforge
+FreeFileSync at Sourceforge
+FreeFileSync configuration
+FreeFileSync 構成設定
+Help
+ヘルプ
+Hide filtered items
+適合するアイテムを非表示にする
+Hide further error messages during the current process and continue
+現在の処理を続行する間は、以降のエラーメッセージを表示しない
+Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
+同期処理中のエラーメッセージを非表示にする:\n非表示にしたメッセージは、処理の終了後に一覧表示されます。
+Hints:
+ヒント:
+Homepage:
+ホームページ:
+If errors occur during folder comparison or synchronization they are ignored and the process continues.\n
+フォルダの比較、または同期処理中のエラーは無視して処理を続行する\n
+If you like FFS:
+FFS が気に入った場合:
+Include
+含める
+Include: *.doc;*.zip;*.exe\nExclude: *\\tempfolder\\*
+含める: *.doc;*.zip;*.exe\n除外: *\\一時フォルダ\\*
+Info
+情報
+Information
+インフォメーション
+Initialization of Recycle Bin failed! It cannot be used!
+ゴミ箱の初期化に失敗しました! 使用できない状態です!
+It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
+ゴミ箱を初期化することが出来ませんでした!\n\n使用している OS が、Windows 以外の OS です。\nこの機能を使用したい場合は、作者までご連絡ください :)
+Left directory does not exist. Please select a new one!
+左のディレクトリは存在しません、再選択してください!
+Left folder:
+左側フォルダ:
+Legend\n
+履歴\n
+Load configuration via...\n     - this list (press DEL to delete items)\n     - drag & drop to this window\n     - startup parameter
+構成ファイルの読み込み...\n    - リスト (DEL-でアイテムを削除)\n    - ウィンドウにドラッグ & ドロップ\n    - 起動時のパラメータ
+Load from file...
+ファイルから読み込み...
+Log-messages:\n-------------
+ログメッセージ:\n---------------
+Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
+左側フォルダをミラーリングバックアップ: 同期完了後は、左側フォルダに合わせて右側フォルダは上書きされます。
+Move files to Recycle Bin instead of deleting or overwriting them directly.\n
+直接上書きするか、または上書きする代わりにファイルをゴミ箱に移動する\n
+Not all items were synchronized! Have a look at the list.
+すべてのアイテムは同期されていません! 詳細はリストをご覧ください。
+Nothing to synchronize. Both directories adhere to the sync-configuration!
+同期対象がありません。両方のディレクトリに対する同期設定を確認してください!
+Number of files and directories that will be created
+作成されたファイルとディレクトリ数
+Number of files and directories that will be deleted
+削除されたファイルとディレクトリ数
+Number of files that will be overwritten
+上書きされたファイル数
+One way ->
+一方通行 ->
+Only files/directories that pass filtering will be selected for synchronization.\nThe filter will be applied to the full name including path prefix.
+選択されたファイル/ディレクトリを同期処理する時だけフィルタリングされます。\nこのフィルターは、接頭語を含むパスと完全な名前にのみ適用されます。
+Open synchronization dialog
+同期ダイアログを開く
+Open with Explorer\tD-Click
+エクスプローラで開く\tD-Click
+Operation aborted!
+操作の中断!
+Operation:
+操作:
+Pause
+一時停止
+Please select both left and right directories!
+左と右両方のディレクトリを選択してください!
+Press button to activate filter
+ボタンをクリックで有効化
+Preview
+プレビュー
+Published under the GNU General Public License:
+Published under the GNU General Public License:
+Quit
+終了
+Relative path
+相対パス
+Result
+結果
+Right directory does not exist. Please select a new one!
+右側のディレクトリが存在しません。再選択してください!
+Right folder:
+右側フォルダ:
+Save current configuration to file
+現在の設定をファイルに保存
+Saved aborted!
+保存の中断!
+Scanning 
+スキャン 
+Scanning...
+スキャン中...
+Select a folder
+フォルダを選択
+Select variant:
+変数を選択:
+Set filter for synchronization
+同期フィルターを設定
+Shell link
+Shell リンク
+Shell script
+Shell スクリプト
+Show files that are different
+差異のあるファイルを表示
+Show files that are equal
+同じ内容のファイルを表示
+Show files that are newer on left
+左側の新しいファイルを表示
+Show files that are newer on right
+右側の新しいファイルを表示
+Show files that exist on left side only
+左側のみに存在するファイルを表示
+Show files that exist on right side only
+右側のみに存在するファイルを表示
+Silent mode
+サイレントモード
+Size
+サイズ
+Source code written completely in C++ utilizing:
+ソースコードは C++ で書かれ、コンパイルされています:
+Specify algorithm to test if files are equal:\n\n\t\t
+指定したアルゴリズムで同等のファイルをテスト:\n\n\t\t
+Specify names to be excluded separated by ';'. Wildcards '*' and '?' are supported. Default: \"\"\n
+名前を指定する時は、 ' ; ' で区切ってください。また、デフォルトでワイルドカード ' * ' と ' ? ' に対応しています: \"\"\n
+Specify names to be included separated by ';'. Wildcards '*' and '?' are supported. Default: \"*\"\n
+Einzuschließende Namen, getrennt durch ';' angeben. Platzhalter '*' und '?' werden unterstützt. Standard: \"*\"\n
+Specify the sync-direction used for each type of file by a string of five chars:\n\n
+同期方向を指定する場合は、各ファイル形式に5 つの文字列を使用してください:\n\n
+Start
+開始
+Start synchronization
+同期の開始
+Stop
+停止
+Swap sides
+パネルを入れ替え
+SyncJob.lnk
+SyncJob.lnk
+SyncJob.sh
+SyncJob.sh
+Synchronization aborted!
+同期処理を中断!
+Synchronization completed successfully.
+同期処理はすべて正常に完了しました。
+Synchronization completed with errors!
+同期処理は、エラーで終了しています!
+Synchronization settings
+同期処理設定
+Synchronization status
+同期処理: ステータス
+Synchronize all .doc, .zip and .exe files except everything from folder \"tempfolder\".
+.doc, .zip と .exe ファイルを除いて、\"一時フォルダ\" からすべてのファイルを同期
+Synchronize both sides simultaneously: Copy new or updated files in both directions.
+両側を同時に処理: 両方のディレクトリのより新しいファイルをコピー
+Synchronizing...
+同期処理中...
+The selected file does not contain a valid configuration!
+選択されたファイルには有効な構成が含まれていません!
+The selected file does not exist anymore!
+選択されたファイルはそれ以上存在しません!
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
+この変数では、ふたつの同名ファイルが存在した場合、 それぞれのファイルサイズと最終更新日付/時間を比較します。\nファイル時間の差異が 2 秒以内の場合は検出されないということに注意してください。 (これは、FAT32システムで正確に同期を行うことができる最小値です)
+Time elapsed:
+経過時間:
+Total amount of data that will be transferred
+転送されたデータの総量
+Total time: 
+合計時間: 
+Two way <->
+両方向 <->
+Unable to create logfile!
+ログファイルを作成出来ません!
+Unable to initialize Recycle Bin!
+ゴミ箱の初期化が出来ません!
+Unable to load Resources.dat!
+Resources.dat を読み込むことが出来ません!
+Update:
+アップデート:
+Use Recycle Bin
+ゴミ箱を使用
+Use Recycle Bin when deleting or overwriting files during synchronization
+同期処理の間、ファイルの上書き/削除をする時にゴミ箱を使用
+Warning
+警告
+Warning: Synchronization failed for 
+警告: 同期処理に失敗
+When \"Compare\" is triggered with this option set the following decision tree is processed:
+この設定で \"比較\" トリガが実行された場合は、以下のツリーに従って処理されていきます。
+\n\nContinue with next object, retry or abort comparison?
+\n\n次のオブジェクトの比較を続行しますか? 中断しますか?
+\n\nContinue with next object, retry or abort synchronization?
+\n\n次のオブジェクトの同期を続行しますか? 中断しますか?
+\n\nInformation: If you skip the error and continue or abort a re-compare will be necessary!
+\n\nインフォメーション: エラーをスキップして続行/中断した場合、再比較を行う必要があります!
+\n\t\tSync-direction: L: left, R: right, N: none\n
+\n\t\t同期方向: L: 左側, R: 右側, N: なし\n
+\t1: Creates a mirror backup of the left directory\n\t2: Synchronizes all *.doc files from both directories simultaneously\n\n
+\t1: 左側ディレクトリのミラーバックアップを作成\n\t2: 両側ディレクトリのすべての*.doc ファイルの同期を実行\n\n
+\tExamples:\n\n\t1.) FreeFileSync -comp SIZEDATE -sync RRRRR C:\\Source C:\\Target\n\t2.) FreeFileSync -comp sizedate -sync rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n
+\t例:\n\n\t1.) FreeFileSync -comp SIZEDATE -sync RRRRR C:\\Source C:\\Target\n\t2.) FreeFileSync -comp sizedate -sync rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n
+\tHint: You can easily generate a batch file by chosing \"Create batch job\" from the GUI menubar.\n
+\tヒント: メニューバーの\"一括ジョブを作成\" を選択することで、簡単にバッチファイルを作成することができます。\n
+\t\tChar 1: Folders/files that exist on left side only\n
+\t\t1. 文字: 左側のみ存在するファイル/フォルダ\n
+\t\tChar 2: Folders/files that exist on right side only\n
+\t\t2. 文字: 右側のみ存在するファイル/フォルダ\n
+\t\tChar 3: Files that exist on both sides, left one is newer\n
+\t\t3. 文字: 両側にファイルが存在して、左側に、より新しいファイル\n
+\t\tChar 4: Files that exist on both sides, right one is newer\n
+\t\t4. 文字: 両側にファイルが存在して、右側に、より新しいファイル\n
+\t\tChar 5: Files that exist on both sides and are different\n
+\t\t5. 文字: 両側にファイルが存在して、異なるファイル\n\n
+by ZenJu
+by ZenJu
+different
+差異あり
+file exists on both sides
+両側に存在するファイル
+on one side only
+片側のみ
+|>	file on right side only\n
+|>	右側のみに存在するファイル\n

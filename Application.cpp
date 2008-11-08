@@ -1,4 +1,4 @@
-/***************************************************************
+/*******#include <wx/msgdlg.h>********************************************************
  * Name:      FreeFileSyncApp.cpp
  * Purpose:   Code for Application Class
  * Author:    ZenJu (zhnmju123@gmx.de)
@@ -12,6 +12,7 @@
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
 #include "library/globalFunctions.h"
+#include <wx/msgdlg.h>
 
 IMPLEMENT_APP(Application);
 
@@ -59,7 +60,7 @@ void Application::initialize()
     wxString configFileForUI = FreeFileSync::FfsLastConfigFile;
     if (argc > 1)
     {
-        if (FreeFileSync::isFFS_ConfigFile(argv[1]))
+        if (FreeFileSync::isFfsConfigFile(argv[1]))
             configFileForUI = argv[1];
         else //start in commandline mode?
         {
@@ -191,7 +192,7 @@ void Application::parseCommandline()
 
         {
             wxCMD_LINE_OPTION,
-            GlobalResources::paramCfg,
+            GlobalResources::paramSync,
             NULL,
             wxString(_("Specify the sync-direction used for each type of file by a string of five chars:\n\n")) +
             _("\t\tChar 1: Folders/files that exist on left side only\n") +
@@ -255,7 +256,7 @@ void Application::parseCommandline()
             GlobalResources::paramSilent,
             NULL,
             wxString(_("Do not show graphical status and error messages but write to a logfile instead.\n\n")) +
-            _("\tExamples:\n\n\t1.) FreeFileSync -cmp SIZEDATE -cfg RRRRR C:\\Source C:\\Target\n\t2.) FreeFileSync -cmp sizedate -cfg rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n") +
+            _("\tExamples:\n\n\t1.) FreeFileSync -comp SIZEDATE -sync RRRRR C:\\Source C:\\Target\n\t2.) FreeFileSync -comp sizedate -sync rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n") +
             _("\t1: Creates a mirror backup of the left directory\n\t2: Synchronizes all *.doc files from both directories simultaneously\n\n") +
             _("\tHint: You can easily generate a batch file by chosing \"Create batch job\" from the GUI menubar.\n")
         },
@@ -268,12 +269,12 @@ void Application::parseCommandline()
     //now set the parser with all MANDATORY options and parameters
     wxCmdLineParser parser(cmdLineDesc, argc, argv);
     parser.SetSwitchChars(wxT("-"));
-    if (parser.Parse() != 0)  //if commandline is used incorrectly display help dialog and exit program
+    if (parser.Parse() != 0)  //if commandline is used incorrectly: display help dialog and exit program
         return;
 
     //commandline parameters
     wxString cmp;
-    wxString cfg;
+    wxString syncCfg;
     wxString leftDir;
     wxString rightDir;
     wxString included;
@@ -286,8 +287,8 @@ void Application::parseCommandline()
 
 
 //check existence of all commandline parameters
-    if (!parser.Found(GlobalResources::paramCompare, &cmp) ||
-            !parser.Found(GlobalResources::paramCfg, &cfg) ||
+    if (    !parser.Found(GlobalResources::paramCompare, &cmp) ||
+            !parser.Found(GlobalResources::paramSync, &syncCfg) ||
             parser.GetParamCount() != 2)
     {
         parser.Usage();
@@ -295,7 +296,7 @@ void Application::parseCommandline()
     }
 
     cmp.UpperCase();
-    cfg.UpperCase();
+    syncCfg.UpperCase();
     leftDir  = parser.GetParam(0);
     rightDir = parser.GetParam(1);
 
@@ -316,12 +317,12 @@ void Application::parseCommandline()
 
 //check consistency of all commandline parameters
     if ((cmp != GlobalResources::valueSizeDate && cmp != GlobalResources::valueContent) ||
-            cfg.Len() != 5 ||
-            (cfg[0] != 'L' && cfg[0] != 'R' && cfg[0] != 'N') ||
-            (cfg[1] != 'L' && cfg[1] != 'R' && cfg[1] != 'N') ||
-            (cfg[2] != 'L' && cfg[2] != 'R' && cfg[2] != 'N') ||
-            (cfg[3] != 'L' && cfg[3] != 'R' && cfg[3] != 'N') ||
-            (cfg[4] != 'L' && cfg[4] != 'R' && cfg[4] != 'N'))
+            syncCfg.Len() != 5 ||
+            (syncCfg[0] != 'L' && syncCfg[0] != 'R' && syncCfg[0] != 'N') ||
+            (syncCfg[1] != 'L' && syncCfg[1] != 'R' && syncCfg[1] != 'N') ||
+            (syncCfg[2] != 'L' && syncCfg[2] != 'R' && syncCfg[2] != 'N') ||
+            (syncCfg[3] != 'L' && syncCfg[3] != 'R' && syncCfg[3] != 'N') ||
+            (syncCfg[4] != 'L' && syncCfg[4] != 'R' && syncCfg[4] != 'N'))
     {
         parser.Usage();
         return;
@@ -333,7 +334,7 @@ void Application::parseCommandline()
     wxString logText;
 
     //check if directories exist
-    if (!wxDirExists(leftDir))
+    if (!wxDirExists(FreeFileSync::getFormattedDirectoryName(leftDir)))
     {
         wxString errorMessage = wxString(_("Directory ")) + wxT("\"") + leftDir + wxT("\"") + _(" does not exist.");
         wxString statusMessage = wxString(_("Synchronization aborted!"));
@@ -347,7 +348,7 @@ void Application::parseCommandline()
         returnValue = -2;
         return;
     }
-    else if (!wxDirExists(rightDir))
+    else if (!wxDirExists(FreeFileSync::getFormattedDirectoryName(rightDir)))
     {
         wxString errorMessage = wxString(_("Directory ")) + wxT("\"") + rightDir + wxT("\"") + _(" does not exist.");
         wxString statusMessage = wxString(_("Synchronization aborted!"));
@@ -395,11 +396,11 @@ void Application::parseCommandline()
     else
         assert (false);
 
-    syncConfiguration.exLeftSideOnly  = convertCmdlineCfg(cfg, 0);
-    syncConfiguration.exRightSideOnly = convertCmdlineCfg(cfg, 1);
-    syncConfiguration.leftNewer       = convertCmdlineCfg(cfg, 2);
-    syncConfiguration.rightNewer      = convertCmdlineCfg(cfg, 3);
-    syncConfiguration.different       = convertCmdlineCfg(cfg, 4);
+    syncConfiguration.exLeftSideOnly  = convertCmdlineCfg(syncCfg, 0);
+    syncConfiguration.exRightSideOnly = convertCmdlineCfg(syncCfg, 1);
+    syncConfiguration.leftNewer       = convertCmdlineCfg(syncCfg, 2);
+    syncConfiguration.rightNewer      = convertCmdlineCfg(syncCfg, 3);
+    syncConfiguration.different       = convertCmdlineCfg(syncCfg, 4);
 
     //begin of synchronization process (all in one try-catch block)
     try
@@ -632,14 +633,16 @@ int CommandLineStatusUpdater::reportError(const wxString& text)
 
 
 inline
-void CommandLineStatusUpdater::triggerUI_Refresh(bool asyncProcessActive)
+void CommandLineStatusUpdater::forceUiRefresh()
 {
-    if (abortionRequested && !asyncProcessActive)
-        throw AbortThisProcess();  //may be triggered by the SyncStatusDialog
-
     if (!silentMode)
-        if (updateUI_IsAllowed()) //test if specific time span between ui updates is over
-            syncStatusFrame->updateStatusDialogNow();
+        syncStatusFrame->updateStatusDialogNow();
+}
+
+
+void CommandLineStatusUpdater::abortThisProcess()
+{
+    throw AbortThisProcess();  //abort can be triggered by syncStatusFrame
 }
 
 

@@ -62,6 +62,7 @@
 			<Add option="-D__GNUWIN32__" />
 			<Add option="-D__WXMSW__" />
 			<Add option="-DFFS_WIN" />
+			<Add option="-DTIXML_USE_STL" />
 			<Add directory="C:\Programme\CodeBlocks\wxWidgets\include" />
 			<Add directory="C:\Programme\CodeBlocks\wxWidgets\contrib\include" />
 		</Compiler>
@@ -97,9 +98,15 @@
 		<Unit filename="library\misc.h" />
 		<Unit filename="library\multithreading.cpp" />
 		<Unit filename="library\multithreading.h" />
+		<Unit filename="library\pch.h">
+			<Option weight="0" />
+		</Unit>
 		<Unit filename="library\resources.cpp" />
 		<Unit filename="library\resources.h" />
-		<Unit filename="library\wxWidgets.h" />
+		<Unit filename="library\tinyxml\tinystr.cpp" />
+		<Unit filename="library\tinyxml\tinyxml.cpp" />
+		<Unit filename="library\tinyxml\tinyxmlerror.cpp" />
+		<Unit filename="library\tinyxml\tinyxmlparser.cpp" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
