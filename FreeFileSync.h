@@ -32,7 +32,7 @@ struct SyncConfiguration
     SyncDirection different;
 };
 
-struct Configuration
+struct MainConfiguration
 {   //Compare setting
     CompareVariant compareVar;
 
@@ -41,12 +41,11 @@ struct Configuration
 
     //Filter setting
     bool filterIsActive;
-    bool hideFiltered;
     wxString includeFilter;
     wxString excludeFilter;
 
     //misc options
-    bool useRecycleBin;    //use Recycle bin when deleting or overwriting files while synchronizing
+    bool useRecycleBin;   //use Recycle bin when deleting or overwriting files while synchronizing
     bool continueOnError; //hides error messages during synchronization
 };
 
@@ -121,7 +120,9 @@ enum CompareFilesResult
     FILE_RIGHT_NEWER,
     FILE_LEFT_NEWER,
     FILE_DIFFERENT,
-    FILE_EQUAL
+    FILE_EQUAL,
+
+    FILE_INVALID //error situation
 };
 
 
@@ -139,8 +140,13 @@ typedef vector<FileCompareLine> FileCompareResult;
 
 
 typedef int GridViewLine;
-typedef vector<int> GridView;  //vector of references to lines in FileCompareResult
+typedef vector<GridViewLine> GridView;  //vector of references to lines in FileCompareResult
 
+struct FolderPair
+{
+    wxString leftDirectory;
+    wxString rightDirectory;
+};
 
 class GetAllFilesFull : public wxDirTraverser
 {
@@ -190,10 +196,13 @@ void removeRowsFromVector(vector<T>& grid, const set<int>& rowsToRemove)
 }
 
 class RecycleBin;
+class DirectoryDescrBuffer;
 
 
 class FreeFileSync
 {
+    friend class DirectoryDescrBuffer;
+
 public:
     FreeFileSync(bool useRecycleBin);
     ~FreeFileSync();
@@ -204,12 +213,15 @@ public:
     static const int synchronizeFilesProcess   = 3;
 
     //main function for compare
-    static void startCompareProcess(FileCompareResult& output, const wxString& dirLeft, const wxString& dirRight, CompareVariant cmpVar, StatusUpdater* statusUpdater);
+    static void startCompareProcess(FileCompareResult& output, const vector<FolderPair>& directoryPairsFormatted, const CompareVariant cmpVar, StatusUpdater* statusUpdater);
 
     //main function for synchronization
     static void startSynchronizationProcess(FileCompareResult& grid, const SyncConfiguration& config, StatusUpdater* statusUpdater, bool useRecycleBin);
 
+    static bool foldersAreValidForComparison(const vector<FolderPair>& folderPairs, wxString& errorMessage);
     static bool recycleBinExists(); //test existence of Recycle Bin API on current system
+
+    static vector<wxString> compoundStringToTable(const wxString& compoundInput, const wxChar* delimiter); //convert ';'-separated list into table of strings
 
     static void deleteOnGridAndHD(FileCompareResult& grid, const set<int>& rowsToDelete, StatusUpdater* statusUpdater, bool useRecycleBin);
     static void addSubElements(set<int>& subElements, const FileCompareResult& grid, const FileCompareLine& relevantRow);
@@ -230,9 +242,6 @@ public:
 
     static void swapGrids(FileCompareResult& grid);
 
-    static bool isFfsConfigFile(const wxString& filename);
-
-    static const string   FfsConfigFileID;
     static const wxString FfsLastConfigFile;
 
     static void getFileInformation(FileInfo& output, const wxString& filename);

@@ -20,8 +20,6 @@
  ディレクトリ
  directory
  ディレクトリ
- does not exist.
- 存在しません
  file, 
  つのファイル, 
  files, 
@@ -40,8 +38,6 @@
 　列を表示
  to 
  から
- to recycle bin!
- ゴミ箱に移動!
 !=	files are different\n
 !=	ファイルは異なっています\n
 &Abort
@@ -109,27 +105,19 @@
 - same date (different size)
 - 日付は同一(サイズに差異あり)
 -------------------------------------------------
------------------------------------------------------
+------------------------------------------------
 ---------\n
 -----------\n
 -Open-Source file synchronization-
 -Open-Source ファイル同期ツール-
 .
 ,
-1. Enter full file or directory names separated by ';'.\n2. Wildcard characters '*' and '?' are supported.
-1. ファイル/ディレクトリ名を ' ; ' で区切って入力してください\n2. ワイルドカード ' * ' と ' ? ' に対応しています。
-: check file content\n
-: ファイル内容を確認\n
-: check filesize and date\n\t\t
-: ファイルサイズと日付を確認\n\t\t
+1. Enter full file or directory names separated by ';' or a new line.\n2. Use wildcard characters '*' and '?'.
+完全なファイル/ディレクトリ名を ' ; ' で区切って入力してください。\n2.ワイルドカードに ' * ' と ' ? ' を使用出来ます。
 <<	left file is newer\n
 <<	左側の方が新しい\n
 <Directory>
 <ディレクトリ>
-<left directory>
-<左のディレクトリ>
-<right directory>
-<右のディレクトリ>
 <|	file on left side only\n
 <|	左側のみに存在するファイル\n
 ==	files are equal\n\n
@@ -146,6 +134,10 @@ About
 情報
 Action
 操作
+Add folder pair
+フォルダのペアを追加
+Add to exclude filter: 
+除外フィルターを追加
 All items have been synchronized!
 すべてのアイテムは同期されました!
 An error occured
@@ -226,8 +218,6 @@ Could not open configuration file
 構成ファイルを開けませんでした。
 Could not open file: 
 ファイルを開けません: 
-Could not read configuration file 
-構成ファイルを読み込めません 
 Could not read language file 
 言語ファイルを読み込めません
 Could not retrieve file info for: 
@@ -268,18 +258,10 @@ Deleting file
 ファイルを削除中 
 Deleting folder 
 フォルダを削除中 
-Directory 
-ディレクトリ 
-Directory on the left does not exist. Please select a new one!
-左側のディレクトリには存在しません、新たに選択してください!
-Directory on the right does not exist. Please select a new one!
-右側のディレクトリには存在しません、新たに選択してください!
-Displays help on the command line parameters\n
-コマンドラインパラメータを表示\n
+Directory does not exist. Please select a new one: 
+ディレクトリが見つかりません。 再度選択してください: 
 Do not show graphical status and error messages but write to a logfile instead
 進捗状況、及びエラーを表示しないで、代わりにログファイルに書き込む
-Do not show graphical status and error messages but write to a logfile instead.\n\n
-進捗状況、及びエラーを表示しないで、代わりにログファイルに書き込む.\n\n
 Do nothing
 何もしない
 Do you really want to delete the following objects(s)?
@@ -308,8 +290,8 @@ Error deleting directory
 ディレクトリの削除に失敗
 Error deleting file 
 ファイルの削除に失敗
-Error moving file 
-ファイルの移動に失敗
+Error moving file to recycle bin: 
+ファイルをゴミ箱に移動できません: 
 Error parsing configuration file 
 構成ファイルの構文に誤りがあります
 Error reading file: 
@@ -328,6 +310,8 @@ Example
 例
 Exclude
 除外
+Exclude temporarily
+一時フォルダを除外
 Feedback and suggestions are welcome at:
 フィードバック、提案など:
 File content
@@ -366,10 +350,10 @@ Filter active: Press again to deactivate
 フィルター有効化: 再度押すと無効化
 Filter files
 ファイルフィルター
-Filter manually
-手動フィルター
 Filter view
 表示フィルター
+Folder pair
+フォルダペア
 FreeFileSync   (Date: 
 FreeFileSync   (日付: 
 FreeFileSync - Folder Comparison and Synchronization
@@ -378,6 +362,8 @@ FreeFileSync Batch Job
 FreeFileSync 一括ジョブ
 FreeFileSync at Sourceforge
 FreeFileSync at Sourceforge
+FreeFileSync batch file
+FreeFileSync バッチファイル
 FreeFileSync configuration
 FreeFileSync 構成設定
 Help
@@ -392,14 +378,14 @@ Hints:
 ヒント:
 Homepage:
 ホームページ:
-If errors occur during folder comparison or synchronization they are ignored and the process continues.\n
-フォルダの比較、または同期処理中のエラーは無視して処理を続行する\n
 If you like FFS:
 FFS が気に入った場合:
 Include
 含める
-Include: *.doc;*.zip;*.exe\nExclude: *\\tempfolder\\*
-含める: *.doc;*.zip;*.exe\n除外: *\\一時フォルダ\\*
+Include temporarily
+一時フォルダを含める
+Include: *.doc;*.zip;*.exe\nExclude: *\\temp\\*
+含める: *.doc;*.zip;*.exe\n除外: *\\temp\\*
 Info
 情報
 Information
@@ -408,8 +394,6 @@ Initialization of Recycle Bin failed! It cannot be used!
 ゴミ箱の初期化に失敗しました! 使用できない状態です!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 ゴミ箱を初期化することが出来ませんでした!\n\n使用している OS が、Windows 以外の OS です。\nこの機能を使用したい場合は、作者までご連絡ください :)
-Left directory does not exist. Please select a new one!
-左のディレクトリは存在しません、再選択してください!
 Left folder:
 左側フォルダ:
 Legend\n
@@ -419,11 +403,11 @@ Load configuration via...\n     - this list (press DEL to delete items)\n     - 
 Load from file...
 ファイルから読み込み...
 Log-messages:\n-------------
-ログメッセージ:\n---------------
+ログメッセージ:\n-----------
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 左側フォルダをミラーリングバックアップ: 同期完了後は、左側フォルダに合わせて右側フォルダは上書きされます。
-Move files to Recycle Bin instead of deleting or overwriting them directly.\n
-直接上書きするか、または上書きする代わりにファイルをゴミ箱に移動する\n
+No valid configuration file specified: 
+有効な構成ファイルが選択されていません: 
 Not all items were synchronized! Have a look at the list.
 すべてのアイテムは同期されていません! 詳細はリストをご覧ください。
 Nothing to synchronize. Both directories adhere to the sync-configuration!
@@ -448,8 +432,8 @@ Operation:
 操作:
 Pause
 一時停止
-Please select both left and right directories!
-左と右両方のディレクトリを選択してください!
+Please fill all empty directory fields.
+すべてのフィールドに入力してください。
 Press button to activate filter
 ボタンをクリックで有効化
 Preview
@@ -460,10 +444,10 @@ Quit
 終了
 Relative path
 相対パス
+Remove folder pair
+フォルダペアを除去
 Result
 結果
-Right directory does not exist. Please select a new one!
-右側のディレクトリが存在しません。再選択してください!
 Right folder:
 右側フォルダ:
 Save current configuration to file
@@ -480,10 +464,6 @@ Select variant:
 変数を選択:
 Set filter for synchronization
 同期フィルターを設定
-Shell link
-Shell リンク
-Shell script
-Shell スクリプト
 Show files that are different
 差異のあるファイルを表示
 Show files that are equal
@@ -502,14 +482,6 @@ Size
 サイズ
 Source code written completely in C++ utilizing:
 ソースコードは C++ で書かれ、コンパイルされています:
-Specify algorithm to test if files are equal:\n\n\t\t
-指定したアルゴリズムで同等のファイルをテスト:\n\n\t\t
-Specify names to be excluded separated by ';'. Wildcards '*' and '?' are supported. Default: \"\"\n
-名前を指定する時は、 ' ; ' で区切ってください。また、デフォルトでワイルドカード ' * ' と ' ? ' に対応しています: \"\"\n
-Specify names to be included separated by ';'. Wildcards '*' and '?' are supported. Default: \"*\"\n
-Einzuschließende Namen, getrennt durch ';' angeben. Platzhalter '*' und '?' werden unterstützt. Standard: \"*\"\n
-Specify the sync-direction used for each type of file by a string of five chars:\n\n
-同期方向を指定する場合は、各ファイル形式に5 つの文字列を使用してください:\n\n
 Start
 開始
 Start synchronization
@@ -518,10 +490,8 @@ Stop
 停止
 Swap sides
 パネルを入れ替え
-SyncJob.lnk
-SyncJob.lnk
-SyncJob.sh
-SyncJob.sh
+SyncJob.ffs_batch
+SyncJob.ffs_batch
 Synchronization aborted!
 同期処理を中断!
 Synchronization completed successfully.
@@ -532,8 +502,8 @@ Synchronization settings
 同期処理設定
 Synchronization status
 同期処理: ステータス
-Synchronize all .doc, .zip and .exe files except everything from folder \"tempfolder\".
-.doc, .zip と .exe ファイルを除いて、\"一時フォルダ\" からすべてのファイルを同期
+Synchronize all .doc, .zip and .exe files except everything from folder \"temp\".
+.doc, .zip and .exe ファイル以外を \"temp\" フォルダからすべて同期
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 両側を同時に処理: 両方のディレクトリのより新しいファイルをコピー
 Synchronizing...
@@ -556,8 +526,6 @@ Unable to create logfile!
 ログファイルを作成出来ません!
 Unable to initialize Recycle Bin!
 ゴミ箱の初期化が出来ません!
-Unable to load Resources.dat!
-Resources.dat を読み込むことが出来ません!
 Update:
 アップデート:
 Use Recycle Bin
@@ -576,26 +544,6 @@ When \"Compare\" is triggered with this option set the following decision tree i
 \n\n次のオブジェクトの同期を続行しますか? 中断しますか?
 \n\nInformation: If you skip the error and continue or abort a re-compare will be necessary!
 \n\nインフォメーション: エラーをスキップして続行/中断した場合、再比較を行う必要があります!
-\n\t\tSync-direction: L: left, R: right, N: none\n
-\n\t\t同期方向: L: 左側, R: 右側, N: なし\n
-\t1: Creates a mirror backup of the left directory\n\t2: Synchronizes all *.doc files from both directories simultaneously\n\n
-\t1: 左側ディレクトリのミラーバックアップを作成\n\t2: 両側ディレクトリのすべての*.doc ファイルの同期を実行\n\n
-\tExamples:\n\n\t1.) FreeFileSync -comp SIZEDATE -sync RRRRR C:\\Source C:\\Target\n\t2.) FreeFileSync -comp sizedate -sync rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n
-\t例:\n\n\t1.) FreeFileSync -comp SIZEDATE -sync RRRRR C:\\Source C:\\Target\n\t2.) FreeFileSync -comp sizedate -sync rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n
-\tHint: You can easily generate a batch file by chosing \"Create batch job\" from the GUI menubar.\n
-\tヒント: メニューバーの\"一括ジョブを作成\" を選択することで、簡単にバッチファイルを作成することができます。\n
-\t\tChar 1: Folders/files that exist on left side only\n
-\t\t1. 文字: 左側のみ存在するファイル/フォルダ\n
-\t\tChar 2: Folders/files that exist on right side only\n
-\t\t2. 文字: 右側のみ存在するファイル/フォルダ\n
-\t\tChar 3: Files that exist on both sides, left one is newer\n
-\t\t3. 文字: 両側にファイルが存在して、左側に、より新しいファイル\n
-\t\tChar 4: Files that exist on both sides, right one is newer\n
-\t\t4. 文字: 両側にファイルが存在して、右側に、より新しいファイル\n
-\t\tChar 5: Files that exist on both sides and are different\n
-\t\t5. 文字: 両側にファイルが存在して、異なるファイル\n\n
-by ZenJu
-by ZenJu
 different
 差異あり
 file exists on both sides

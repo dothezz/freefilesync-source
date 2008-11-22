@@ -1,14 +1,24 @@
 FreeFileSync
 ------------
 
+Changelog v1.11
+---------------
+Support for multiple folder pairs
+Optimized performance of multiple pairs to scan each folder just once
+Enhanced batch file format
+New context menu option to add files, file types or directories to exclude filter
+Reworked file filter dialog
+Updated translation files
+
+
 Changelog v1.10
---------------
+---------------
 Transformed configuration file format to XML
 Exchanged batch files with shell links for full Unicode support (Windows-only)
-Improved Filter usage: ignore leading/trailing whitespace, upper/lower-case (Windows-only) chars
+Improved filter usage: ignore leading/trailing whitespace, upper/lower-case (Windows-only) chars
 Removed screen-flicker when clicking on compare:
 Added elapsed time to compare status
-Calculate height of middle grid independently from OS window layout
+Calculate height of middle grid independently of OS window layout
 Multiple GUI improvements
 Added Japanese translation
 Updated translation files

@@ -25,13 +25,16 @@ using namespace std;
 //IDs for context menu items
 enum ContextItem
 {
-    CONTEXT_MANUAL_FILTER = 10,
+    CONTEXT_FILTER_TEMP = 10,
+    CONTEXT_EXCLUDE_EXT,
+    CONTEXT_EXCLUDE_FILE,
+    CONTEXT_EXCLUDE_DIR,
     CONTEXT_CLIPBOARD,
     CONTEXT_EXPLORER,
     CONTEXT_DELETE_FILES
 };
 
-extern int leadingPanel;
+extern int leadingPanel; //better keep this an int! event.GetEventObject() does NOT always return m_grid1, m_grid2, m_grid3!
 
 class CompareStatusUpdater;
 class FileDropEvent;
@@ -47,22 +50,19 @@ public:
     ~MainDialog();
 
 private:
+    //configuration load/save
     void loadDefaultConfiguration();
-
-    void readConfigurationFromXml(const wxString& filename, bool programStartup = false);
-    bool parseXmlData(TiXmlElement* root, bool programStartup);
-    void writeConfigurationToXml(const wxString& filename);
-
-    //deprecated
-    void readConfigurationFromHD(const wxString& filename, bool programStartup = false);
-    void writeConfigurationToHD(const wxString& filename);
-    //
+    bool readConfigurationFromXml(const wxString& filename, bool programStartup = false);
+    bool writeConfigurationToXml(const wxString& filename);
 
     void updateViewFilterButtons();
     void updateFilterButton(wxBitmapButton* filterButton, bool isActive);
     void updateCompareButtons();
 
     void addCfgFileToHistory(const wxString& filename);
+
+    void addFolderPair(const wxString& leftDir, const wxString& rightDir);
+    void removeFolderPair(bool removeAll = false);
 
     //main method for putting gridData on UI: maps data respecting current view settings
     void writeGrid(const FileCompareResult& gridData, bool useUI_GridCache =  false);
@@ -71,7 +71,7 @@ private:
 
     //context menu functions
     set<int> getSelectedRows();
-    void filterRangeManual(const set<int>& rowsToFilterOnUI_View);
+    void filterRangeTemp(const set<int>& rowsToFilterOnUI_View);
     void copySelectionToClipboard(const set<int>& selectedRows, int selectedGrid);
     void openWithFileBrowser(int rowNumber, int gridNr);
     void deleteFilesOnGrid(const set<int>& rowsToDeleteOnUI);
@@ -93,10 +93,8 @@ private:
     void onGrid3ButtonEvent(wxKeyEvent& event);
     void OnOpenContextMenu(wxGridEvent& event);
 
-    void OnEnterLeftDir(wxCommandEvent& event);
-    void OnEnterRightDir(wxCommandEvent& event);
-    void OnDirChangedPanel1(wxFileDirPickerEvent& event);
-    void OnDirChangedPanel2(wxFileDirPickerEvent& event);
+    void OnWriteDirManually(wxCommandEvent& event);
+    void OnDirSelected(wxFileDirPickerEvent& event);
 
     //manual filtering of rows:
     void OnGridSelectCell(wxGridEvent& event);
@@ -117,7 +115,6 @@ private:
     void OnRightOnlyFiles(      wxCommandEvent& event);
     void OnEqualFiles(          wxCommandEvent& event);
 
-    void OnBatchJob(            wxCommandEvent& event);
     void OnSaveConfig(          wxCommandEvent& event);
     void OnLoadConfiguration(   wxCommandEvent& event);
     void OnChoiceKeyEvent(      wxKeyEvent& event );
@@ -135,6 +132,9 @@ private:
     void OnSync(                wxCommandEvent& event);
     void OnClose(               wxCloseEvent&   event);
     void OnQuit(                wxCommandEvent& event);
+
+    void OnAddFolderPair(       wxCommandEvent& event);
+    void OnRemoveFolderPair(    wxCommandEvent& event);
 
     //menu events
     void OnMenuExportFileList(  wxCommandEvent& event);
@@ -157,7 +157,24 @@ private:
     //UI view of currentGridData
     GridView gridRefUI;
 
-    Configuration cfg;
+//-------------------------------------
+    //functional configuration
+    MainConfiguration cfg;
+
+    //folder pairs:
+    //m_directoryLeft, m_directoryRight
+    vector<FolderPairGenerated*> additionalFolderPairs; //additional pairs to the standard pair
+
+    //gui settings
+    int widthNotMaximized;
+    int heightNotMaximized;
+    int posXNotMaximized;
+    int posYNotMaximized;
+    bool hideFilteredElements;
+//-------------------------------------
+
+    //convenience method to get all folder pairs (unformatted)
+    void GetFolderPairs(vector<FolderPair>& output,  bool formatted = false);
 
     //UI View Filter settings
     bool leftOnlyFilesActive;
@@ -166,12 +183,6 @@ private:
     bool equalFilesActive;
     bool rightNewerFilesActive;
     bool rightOnlyFilesActive;
-
-    //ui settings
-    int widthNotMaximized;
-    int heightNotMaximized;
-    int posXNotMaximized;
-    int posYNotMaximized;
 
 //***********************************************
     wxMenu* contextMenu;
@@ -190,9 +201,13 @@ private:
     vector<wxString> cfgFileNames;
     static const int CfgHistroyLength = 10;
 
-    //variables for manual filtering of m_grid3
+    //variables for filtering of m_grid3
     bool filteringInitialized;
     bool filteringPending;
+
+    wxString exFilterCandidateExtension;
+    wxString exFilterCandidateFilename;
+    wxString exFilterCandidateDirname;
 
     bool synchronizationEnabled; //determines whether synchronization should be allowed
 
@@ -207,12 +222,10 @@ private:
 class FileDropEvent : public wxFileDropTarget
 {
 public:
-    FileDropEvent(MainDialog* dlg, int grid) :
+    FileDropEvent(MainDialog* dlg, const wxPanel* obj) :
             mainDlg(dlg),
-            targetGrid(grid)
-    {
-        assert(grid == 1 || grid == 2);
-    }
+            dropTarget(obj)
+    {}
 
     ~FileDropEvent() {}
 
@@ -221,7 +234,7 @@ public:
 
 private:
     MainDialog* mainDlg;
-    int targetGrid;
+    const wxPanel* dropTarget;
 };
 
 //######################################################################################

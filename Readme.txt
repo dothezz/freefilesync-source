@@ -1,5 +1,5 @@
-FreeFileSync v1.10
------------------ 
+FreeFileSync v1.11
+------------------
 
 Usage
 -----
@@ -17,7 +17,8 @@ Key Features
 6. Algorithms coded in C++ completely.
 7. Progress indicators are updated only every 100ms for optimal performance!
 8. Subfolders are also synchronized, including empty folders.
-9. Focus on usability:
+9. Support for multiple folder pairs
+10. Focus on usability:
 	- Only necessary functionality on UI: no overloaded menus or icon jungle.
 	- Select folders via drag & drop.
 	- Last configuration and screen settings are saved automatically.
@@ -29,16 +30,16 @@ Key Features
 	- Status information and error reporting
 	- Sort file-lists by name, size or date.
 	- Display statistical data: total filesizes, amount of bytes that will be transfered with the current settings.
-10. Easy configurable commandline mode for automated synchronization.
-11. Support for filesizes > 4 GB.
-12. Option to move files to Recycle Bin instead of deleting/overwriting them.
-13. Automatically ignore directories "\RECYCLER" and "\System Volume Information" when comparing and sync'ing. (Windows only)
-14. Localized English, German, French and Japanese versions available.
-15. Delete before copy: Avoid disc space shortages with large sync-operations.
-16. Based on wxWidgets framework => Portable to many operating systems.
-17. Filter functionality to include/exclude files from synchronization (without re-compare!).
-18. Include/exclude specific files from synchronization manually.
-19. Create sync jobs via GUI to synchronize automatically (can be scheduled or executed directly).
+11. Easy configurable commandline mode for automated synchronization.
+12. Support for filesizes > 4 GB.
+13. Option to move files to Recycle Bin instead of deleting/overwriting them.
+14. Automatically ignore directories "\RECYCLER" and "\System Volume Information" when comparing and sync'ing. (Windows only)
+15. Localized English, German, French and Japanese versions available.
+16. Delete before copy: Avoid disc space shortages with large sync-operations.
+17. Based on wxWidgets framework => Portable to many operating systems.
+18. Filter functionality to include/exclude files from synchronization (without re-compare!).
+19. Include/exclude specific files from synchronization manually.
+20. Create sync jobs via GUI to synchronize automatically (can be scheduled or executed directly).
 
 
 Links

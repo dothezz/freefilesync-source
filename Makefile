@@ -48,9 +48,11 @@ obj/tinyxmlerror.o: library/tinyxml/tinyxmlerror.cpp
 obj/tinyxmlparser.o: library/tinyxml/tinyxmlparser.cpp
 	g++ $(CPPFLAGS) library/tinyxml/tinyxmlparser.cpp -o obj/tinyxmlparser.o
 
+obj/processXml.o: library/processXml.cpp
+	g++ $(CPPFLAGS) library/processXml.cpp -o obj/processXml.o
 	
-FreeFileSync: obj/FreeFileSync.o obj/application.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o
-	g++ $(ENDFLAGS) -o FreeFileSync obj/application.o obj/FreeFileSync.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o
+FreeFileSync: obj/FreeFileSync.o obj/application.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o
+	g++ $(ENDFLAGS) -o FreeFileSync obj/application.o obj/FreeFileSync.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o
 
 
 clean:

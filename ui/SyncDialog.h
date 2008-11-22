@@ -9,7 +9,7 @@ class SyncDialog: public SyncDlgGenerated
 public:
     SyncDialog(wxWindow* window,
                const FileCompareResult& gridDataRef,
-               Configuration& config,
+               MainConfiguration& config,
                bool synchronizationEnabled);
 
     ~SyncDialog();
@@ -47,7 +47,7 @@ private:
     //temporal copy of maindialog.cfg.syncConfiguration
     SyncConfiguration localSyncConfiguration;
     const FileCompareResult& gridData;
-    Configuration& cfg;
+    MainConfiguration& cfg;
 };
 
 
@@ -55,9 +55,8 @@ class BatchDialog: public BatchDlgGenerated
 {
 public:
     BatchDialog(wxWindow* window,
-                const Configuration& config,
-                const wxString& leftDir,
-                const wxString& rightDir);
+                const MainConfiguration& config,
+                const vector<FolderPair>& folderPairs);
 
     ~BatchDialog();
 
@@ -79,10 +78,12 @@ private:
     void OnCreateBatchJob(  wxCommandEvent& event);
 
     void updateFilterButton();
-    wxString getCommandlineArguments();
+
     bool createBatchFile(const wxString& filename);
 
     SyncConfiguration localSyncConfiguration;
+    vector<BatchFolderPairGenerated*> localFolderPairs;
+
     bool filterIsActive;
 };
 

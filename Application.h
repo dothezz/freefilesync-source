@@ -12,11 +12,9 @@
 
 #include <wx/app.h>
 #include <wx/cmdline.h>
-#include <wx/ffile.h>
 #include "FreeFileSync.h"
 #include "ui/smallDialogs.h"
 #include "library/misc.h"
-#include <wx/stopwatch.h>
 
 class Application : public wxApp
 {
@@ -26,30 +24,24 @@ public:
     int  OnExit();
 
     void initialize();
-    bool ProcessIdle(); //virtual method
-
-    //methods for writing logs
-    void logInit();
-    void logWrite(const wxString& logText, const wxString& problemType = wxEmptyString);
-    void logClose(const wxString& finalText);
+    bool ProcessIdle(); //virtual method!
 
 private:
-    void parseCommandline();
+    void runBatchMode(const wxString& filename);
 
-    bool applicationRunsOnCommandLineWithoutWindows;
-    wxFFile logFile;
-    wxStopWatch totalTime;
+    bool applicationRunsInBatchWithoutWindows;
     CustomLocale programLanguage;
 
     int returnValue;
 };
 
+class LogFile;
 
-class CommandLineStatusUpdater : public StatusUpdater
+class BatchStatusUpdater : public StatusUpdater
 {
 public:
-    CommandLineStatusUpdater(Application* application, bool continueOnError, bool silent);
-    ~CommandLineStatusUpdater();
+    BatchStatusUpdater(bool continueOnError, bool silent, LogFile* log);
+    ~BatchStatusUpdater();
 
     void updateStatusText(const wxString& text);
     void initNewProcess(int objectsTotal, double dataTotal, int processID);
@@ -62,12 +54,12 @@ public:
 private:
     void abortThisProcess();
 
-    Application* app;
+    LogFile* m_log;
     SyncStatus* syncStatusFrame;
     bool continueErrors;
     bool silentMode;
 
-    wxArrayString unhandledErrors;   //list of non-resolved errors
+    wxArrayString unhandledErrors; //list of non-resolved errors
     int currentProcess;
     bool synchronizationNeeded;
 };

@@ -1,19 +1,18 @@
 #include "syncDialog.h"
 #include "../library/globalFunctions.h"
 #include "../library/resources.h"
+#include "../library/processXml.h"
 #include <wx/msgdlg.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
-#ifdef FFS_WIN
-#include <windows.h>
-#include <shlobj.h>
-#endif  // FFS_WIN
 
 using namespace std;
+using namespace xmlAccess;
+
 
 SyncDialog::SyncDialog(wxWindow* window,
                        const FileCompareResult& gridDataRef,
-                       Configuration& config,
+                       MainConfiguration& config,
                        bool synchronizationEnabled) :
         SyncDlgGenerated(window),
         gridData(gridDataRef),
@@ -30,13 +29,13 @@ SyncDialog::SyncDialog(wxWindow* window,
     calculatePreview();
 
     //set icons for this dialog
-    m_bpButton18->SetBitmapLabel(*GlobalResources::bitmapStartSync);
-    m_bpButton18->SetBitmapDisabled(*GlobalResources::bitmapStartSyncDis);
-    m_bitmap13->SetBitmap(*GlobalResources::bitmapLeftOnlyDeact);
-    m_bitmap14->SetBitmap(*GlobalResources::bitmapRightOnlyDeact);
-    m_bitmap15->SetBitmap(*GlobalResources::bitmapLeftNewerDeact);
-    m_bitmap16->SetBitmap(*GlobalResources::bitmapRightNewerDeact);
-    m_bitmap17->SetBitmap(*GlobalResources::bitmapDifferentDeact);
+    m_bpButton18->SetBitmapLabel(*globalResource.bitmapStartSync);
+    m_bpButton18->SetBitmapDisabled(*globalResource.bitmapStartSyncDis);
+    m_bitmap13->SetBitmap(*globalResource.bitmapLeftOnlyDeact);
+    m_bitmap14->SetBitmap(*globalResource.bitmapRightOnlyDeact);
+    m_bitmap15->SetBitmap(*globalResource.bitmapLeftNewerDeact);
+    m_bitmap16->SetBitmap(*globalResource.bitmapRightNewerDeact);
+    m_bitmap17->SetBitmap(*globalResource.bitmapDifferentDeact);
 
     if (synchronizationEnabled)
         m_bpButton18->Enable();
@@ -84,81 +83,81 @@ void SyncDialog::updateConfigIcons(wxBitmapButton* button1,
 {
     if (syncConfig.exLeftSideOnly == SYNC_DIR_RIGHT)
     {
-        button1->SetBitmapLabel(*GlobalResources::bitmapArrowRightCr);
+        button1->SetBitmapLabel(*globalResource.bitmapArrowRightCr);
         button1->SetToolTip(_("Copy from left to right"));
     }
     else if (syncConfig.exLeftSideOnly == SYNC_DIR_LEFT)
     {
-        button1->SetBitmapLabel(*GlobalResources::bitmapDeleteLeft);
+        button1->SetBitmapLabel(*globalResource.bitmapDeleteLeft);
         button1->SetToolTip(_("Delete files/folders existing on left side only"));
     }
     else if (syncConfig.exLeftSideOnly == SYNC_DIR_NONE)
     {
-        button1->SetBitmapLabel(*GlobalResources::bitmapArrowNone);
+        button1->SetBitmapLabel(*globalResource.bitmapArrowNone);
         button1->SetToolTip(_("Do nothing"));
     }
 
     if (syncConfig.exRightSideOnly == SYNC_DIR_RIGHT)
     {
-        button2->SetBitmapLabel(*GlobalResources::bitmapDeleteRight);
+        button2->SetBitmapLabel(*globalResource.bitmapDeleteRight);
         button2->SetToolTip(_("Delete files/folders existing on right side only"));
     }
     else if (syncConfig.exRightSideOnly == SYNC_DIR_LEFT)
     {
-        button2->SetBitmapLabel(*GlobalResources::bitmapArrowLeftCr);
+        button2->SetBitmapLabel(*globalResource.bitmapArrowLeftCr);
         button2->SetToolTip(_("Copy from right to left"));
     }
     else if (syncConfig.exRightSideOnly == SYNC_DIR_NONE)
     {
-        button2->SetBitmapLabel(*GlobalResources::bitmapArrowNone);
+        button2->SetBitmapLabel(*globalResource.bitmapArrowNone);
         button2->SetToolTip(_("Do nothing"));
     }
 
     if (syncConfig.leftNewer == SYNC_DIR_RIGHT)
     {
-        button3->SetBitmapLabel(*GlobalResources::bitmapArrowRight);
+        button3->SetBitmapLabel(*globalResource.bitmapArrowRight);
         button3->SetToolTip(_("Copy from left to right overwriting"));
     }
     else if (syncConfig.leftNewer == SYNC_DIR_LEFT)
     {
-        button3->SetBitmapLabel(*GlobalResources::bitmapArrowLeft);
+        button3->SetBitmapLabel(*globalResource.bitmapArrowLeft);
         button3->SetToolTip(_("Copy from right to left overwriting"));
     }
     else if (syncConfig.leftNewer == SYNC_DIR_NONE)
     {
-        button3->SetBitmapLabel(*GlobalResources::bitmapArrowNone);
+        button3->SetBitmapLabel(*globalResource.bitmapArrowNone);
         button3->SetToolTip(_("Do nothing"));
     }
 
     if (syncConfig.rightNewer == SYNC_DIR_RIGHT)
     {
-        button4->SetBitmapLabel(*GlobalResources::bitmapArrowRight);
+        button4->SetBitmapLabel(*globalResource.bitmapArrowRight);
         button4->SetToolTip(_("Copy from left to right overwriting"));
     }
     else if (syncConfig.rightNewer == SYNC_DIR_LEFT)
     {
-        button4->SetBitmapLabel(*GlobalResources::bitmapArrowLeft);
+        button4->SetBitmapLabel(*globalResource.bitmapArrowLeft);
         button4->SetToolTip(_("Copy from right to left overwriting"));
     }
     else if (syncConfig.rightNewer == SYNC_DIR_NONE)
     {
-        button4->SetBitmapLabel(*GlobalResources::bitmapArrowNone);
+        button4->SetBitmapLabel(*globalResource.bitmapArrowNone);
         button4->SetToolTip(_("Do nothing"));
     }
 
     if (syncConfig.different == SYNC_DIR_RIGHT)
     {
-        button5->SetBitmapLabel(*GlobalResources::bitmapArrowRight);
+        button5->SetBitmapLabel(*globalResource.bitmapArrowRight);
         button5->SetToolTip(_("Copy from left to right overwriting"));
     }
     else if (syncConfig.different == SYNC_DIR_LEFT)
     {
-        button5->SetBitmapLabel(*GlobalResources::bitmapArrowLeft);
+        button5->SetBitmapLabel(*globalResource.bitmapArrowLeft);
         button5->SetToolTip(_("Copy from right to left overwriting"));
     }
     else if (syncConfig.different == SYNC_DIR_NONE)
     {
-        button5->SetBitmapLabel(*GlobalResources::bitmapArrowNone);
+        button5->SetBitmapLabel(*globalResource.bitmapArrowNone);
         button5->SetToolTip(_("Do nothing"));
     }
 }
@@ -349,9 +348,8 @@ void SyncDialog::OnDifferent( wxCommandEvent& event )
 
 
 BatchDialog::BatchDialog(wxWindow* window,
-                         const Configuration& config,
-                         const wxString& leftDir,
-                         const wxString& rightDir) :
+                         const MainConfiguration& config,
+                         const vector<FolderPair>& folderPairs) :
         BatchDlgGenerated(window)
 {
     //make working copy of mainDialog.cfg.syncConfiguration and recycler setting
@@ -381,18 +379,40 @@ BatchDialog::BatchDialog(wxWindow* window,
     m_textCtrlInclude->SetValue(config.includeFilter);
     m_textCtrlExclude->SetValue(config.excludeFilter);
 
-    m_directoryPanel1->SetValue(leftDir);
-    m_directoryPanel2->SetValue(rightDir);
+
+    //add folder pairs
+    int scrWindowHeight = 0;
+    for (vector<FolderPair>::const_iterator i = folderPairs.begin(); i != folderPairs.end(); ++i)
+    {
+        BatchFolderPairGenerated* newPair = new BatchFolderPairGenerated(m_scrolledWindow6);
+        newPair->m_directoryLeft->SetValue(i->leftDirectory);
+        newPair->m_directoryRight->SetValue(i->rightDirectory);
+
+        bSizerFolderPairs->Insert(0, newPair, 0, wxEXPAND, 5);
+        localFolderPairs.push_back(newPair);
+
+        if (i == folderPairs.begin())
+            scrWindowHeight = newPair->GetSize().GetHeight();
+    }
+    //set size of scrolled window
+    int pairCount = min(localFolderPairs.size(), size_t(3)); //up to 3 additional pairs shall be shown
+    m_scrolledWindow6->SetMinSize(wxSize( -1, scrWindowHeight * pairCount));
+
+    m_scrolledWindow6->Fit();
+    m_scrolledWindow6->Layout();
+
 
     //set icons for this dialog
-    m_bitmap13->SetBitmap(*GlobalResources::bitmapLeftOnlyDeact);
-    m_bitmap14->SetBitmap(*GlobalResources::bitmapRightOnlyDeact);
-    m_bitmap15->SetBitmap(*GlobalResources::bitmapLeftNewerDeact);
-    m_bitmap16->SetBitmap(*GlobalResources::bitmapRightNewerDeact);
-    m_bitmap17->SetBitmap(*GlobalResources::bitmapDifferentDeact);
-    m_bitmap8->SetBitmap(*GlobalResources::bitmapInclude);
-    m_bitmap9->SetBitmap(*GlobalResources::bitmapExclude);
+    m_bitmap13->SetBitmap(*globalResource.bitmapLeftOnlyDeact);
+    m_bitmap14->SetBitmap(*globalResource.bitmapRightOnlyDeact);
+    m_bitmap15->SetBitmap(*globalResource.bitmapLeftNewerDeact);
+    m_bitmap16->SetBitmap(*globalResource.bitmapRightNewerDeact);
+    m_bitmap17->SetBitmap(*globalResource.bitmapDifferentDeact);
+    m_bitmap8->SetBitmap(*globalResource.bitmapInclude);
+    m_bitmap9->SetBitmap(*globalResource.bitmapExclude);
 
+    Fit();
+    Centre();
     m_buttonCreate->SetFocus();
 }
 
@@ -404,7 +424,7 @@ void BatchDialog::updateFilterButton()
 {
     if (filterIsActive)
     {
-        m_bpButtonFilter->SetBitmapLabel(*GlobalResources::bitmapFilterOn);
+        m_bpButtonFilter->SetBitmapLabel(*globalResource.bitmapFilterOn);
         m_bpButtonFilter->SetToolTip(_("Filter active: Press again to deactivate"));
 
         m_textCtrlInclude->Enable();
@@ -412,7 +432,7 @@ void BatchDialog::updateFilterButton()
     }
     else
     {
-        m_bpButtonFilter->SetBitmapLabel(*GlobalResources::bitmapFilterOff);
+        m_bpButtonFilter->SetBitmapLabel(*globalResource.bitmapFilterOff);
         m_bpButtonFilter->SetToolTip(_("Press button to activate filter"));
 
         m_textCtrlInclude->Disable();
@@ -504,34 +524,9 @@ void BatchDialog::OnCancel(wxCommandEvent& event)
 
 void BatchDialog::OnCreateBatchJob(wxCommandEvent& event)
 {
-    if (m_directoryPanel1->GetValue().IsEmpty() || m_directoryPanel2->GetValue().IsEmpty())
-    {
-        wxMessageBox(_("Please select both left and right directories!"), _("Information"));
-        return;
-    }
-
-    //check if directories exist if loaded by config file
-    if (!wxDirExists(FreeFileSync::getFormattedDirectoryName(m_directoryPanel1->GetValue())))
-    {
-        wxMessageBox(_("Left directory does not exist. Please select a new one!"), _("Warning"), wxICON_WARNING);
-        return;
-    }
-    else if (!wxDirExists(FreeFileSync::getFormattedDirectoryName(m_directoryPanel2->GetValue())))
-    {
-        wxMessageBox(_("Right directory does not exist. Please select a new one!"), _("Warning"), wxICON_WARNING);
-        return;
-    }
-
     //get a filename
-#ifdef FFS_WIN
-    wxString fileName = _("SyncJob.lnk"); //proposal
-    wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, fileName, wxString(_("Shell link")) + wxT(" (*.lnk)|*.lnk"), wxFD_SAVE);
-#elif defined FFS_LINUX
-    wxString fileName = _("SyncJob.sh");  //proposal
-    wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, fileName, wxString(_("Shell script")) + wxT(" (*.sh)|*.sh"), wxFD_SAVE);
-#else
-    assert(false);
-#endif
+    wxString fileName = _("SyncJob.ffs_batch"); //proposal
+    wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, fileName, wxString(_("FreeFileSync batch file")) + wxT(" (*.ffs_batch)|*.ffs_batch"), wxFD_SAVE);
 
     if (filePicker->ShowModal() == wxID_OK)
     {
@@ -553,68 +548,54 @@ void BatchDialog::OnCreateBatchJob(wxCommandEvent& event)
 }
 
 
-wxString getFormattedSyncDirection(const SyncDirection direction)
+bool BatchDialog::createBatchFile(const wxString& filename)
 {
-    if (direction == SYNC_DIR_RIGHT)
-        return wxChar('R');
-    else if (direction == SYNC_DIR_LEFT)
-        return wxChar('L');
-    else if (direction == SYNC_DIR_NONE)
-        return wxChar('N');
-    else
-    {
-        assert (false);
-        return wxEmptyString;
-    }
-}
+    XmlOutput outputFile(filename, XML_BATCH_CONFIG);
 
-
-wxString BatchDialog::getCommandlineArguments()
-{
-    wxString output;
-
-    output+= wxString(wxT("-")) + GlobalResources::paramCompare + wxT(" ");
+    //load structure with basic settings "mainCfg"
+    XmlMainConfig mainCfg;
     if (m_radioBtnSizeDate->GetValue())
-        output+= GlobalResources::valueSizeDate;
+        mainCfg.cfg.compareVar = CMP_BY_TIME_SIZE;
     else if (m_radioBtnContent->GetValue())
-        output+= GlobalResources::valueContent;
+        mainCfg.cfg.compareVar = CMP_BY_CONTENT;
     else
-        assert(false);
+        return false;
 
-    output+= wxString(wxT(" -")) + GlobalResources::paramSync + wxT(" ") +
-             getFormattedSyncDirection(localSyncConfiguration.exLeftSideOnly) +
-             getFormattedSyncDirection(localSyncConfiguration.exRightSideOnly) +
-             getFormattedSyncDirection(localSyncConfiguration.leftNewer) +
-             getFormattedSyncDirection(localSyncConfiguration.rightNewer) +
-             getFormattedSyncDirection(localSyncConfiguration.different);
+    mainCfg.cfg.syncConfiguration = localSyncConfiguration;
+    mainCfg.cfg.filterIsActive    = filterIsActive;
+    mainCfg.cfg.includeFilter     = m_textCtrlInclude->GetValue();
+    mainCfg.cfg.excludeFilter     = m_textCtrlExclude->GetValue();
+    mainCfg.cfg.useRecycleBin     = m_checkBoxUseRecycler->GetValue();
+    mainCfg.cfg.continueOnError   = m_checkBoxContinueError->GetValue();
 
-    if (filterIsActive)
+    for (unsigned int i = 0; i < localFolderPairs.size(); ++i)
     {
-        output+= wxString(wxT(" -")) + GlobalResources::paramInclude + wxT(" ") +
-                 wxT("\"") + m_textCtrlInclude->GetValue() + wxT("\"");
+        FolderPair newPair;
+        newPair.leftDirectory  = localFolderPairs[i]->m_directoryLeft->GetValue();
+        newPair.rightDirectory = localFolderPairs[i]->m_directoryRight->GetValue();
 
-        output+= wxString(wxT(" -")) + GlobalResources::paramExclude + wxT(" ") +
-                 wxT("\"") + m_textCtrlExclude->GetValue() + wxT("\"");
+        mainCfg.directoryPairs.push_back(newPair);
     }
 
-    if (m_checkBoxUseRecycler->GetValue())
-        output+= wxString(wxT(" -")) + GlobalResources::paramRecycler;
+    //load structure with batch settings "batchCfg"
+    XmlBatchConfig batchCfg;
+    batchCfg.silent = m_checkBoxSilent->GetValue();
 
-    if (m_checkBoxContinueError->GetValue())
-        output+= wxString(wxT(" -")) + GlobalResources::paramContinueError;
-
-    if (m_checkBoxSilent->GetValue())
-        output+= wxString(wxT(" -")) + GlobalResources::paramSilent;
-
-    wxString leftDir  = FreeFileSync::getFormattedDirectoryName(m_directoryPanel1->GetValue());
-    wxString rightDir = FreeFileSync::getFormattedDirectoryName(m_directoryPanel2->GetValue());
-
-    output+= wxString(wxT(" \"")) + wxDir(leftDir).GetName() + wxT("\""); //directory WITHOUT trailing path separator
-    output+= wxString(wxT(" \"")) + wxDir(rightDir).GetName() + wxT("\""); //needed since e.g. "C:\" isn't parsed correctly by commandline
-
-    return output;
+    //populate and write XML tree
+    if (    !outputFile.writeXmlMainConfig(mainCfg)   || //add basic configuration settings
+            !outputFile.writeXmlBatchConfig(batchCfg) || //add batch configuration settings
+            !outputFile.writeToFile()) //save XML
+        return false;
+    else
+        return true;
 }
 
+
+/*
+#ifdef FFS_WIN
+#include <windows.h>
+#include <shlobj.h>
+#endif  // FFS_WIN
 
 template <typename T>
 struct CleanUp
@@ -677,29 +658,5 @@ bool BatchDialog::createBatchFile(const wxString& filename)
         return false;
 
     return true;
-
-//############################################################################
-#elif defined FFS_LINUX
-    //create shell script
-    wxFFile output(filename, wxT("w"));
-    if (output.IsOpened())
-    {
-        wxString outputString;
-        outputString+= wxT("#!/bin/bash\n"); //shell script identifier
-        outputString+= wxString(wxT("\"")) + wxStandardPaths::Get().GetExecutablePath() + wxT("\" ");
-        outputString+= getCommandlineArguments() + wxT("\n");
-
-        if (!output.Write(outputString))
-            return false;
-
-        //for linux the batch file needs the executable flag
-        output.Close();
-        wxExecute(wxString(wxT("chmod +x ")) + filename);
-        return true;
-    }
-    else
-        return false;
-#else
-    adapt this!
-#endif  // FFS_LINUX
 }
+*/

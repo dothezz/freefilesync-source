@@ -20,8 +20,6 @@
  Verzeichnisse
  directory
  Verzeichnis
- does not exist.
- existiert nicht.
  file, 
  Datei, 
  files, 
@@ -40,8 +38,6 @@
  Zeilen zur Ansicht
  to 
  nach 
- to recycle bin!
- in den Papierkorb!
 !=	files are different\n
 !=	Dateien sind verschieden\n
 &Abort
@@ -116,20 +112,12 @@
 -Open-Source Datei-Synchronisation-
 .
 ,
-1. Enter full file or directory names separated by ';'.\n2. Wildcard characters '*' and '?' are supported.
-1. Komplette Datei- oder Verzeichnisnamen getrennt durch ';' eingeben.\n2. Die Platzhalter '*' und '?' werden unterstützt.
-: check file content\n
-: Prüfung auf Dateiinhalt\n
-: check filesize and date\n\t\t
-: Prüfung auf Dateigröße und -datum\n\t\t
+1. Enter full file or directory names separated by ';' or a new line.\n2. Use wildcard characters '*' and '?'.
+1. Komplette Datei- und Verzeichnisnamen getrennt durch ';' oder eine Neuzeile eingeben.\n2. Die Platzhalter '*' und '?' werden unterstützt.
 <<	left file is newer\n
 <<	linke Datei ist neuer\n
 <Directory>
 <Verzeichnis>
-<left directory>
-<linkes Verzeichnis>
-<right directory>
-<rechtes Verzeichnis>
 <|	file on left side only\n
 <|	Datei existiert nur links\n
 ==	files are equal\n\n
@@ -146,6 +134,10 @@ About
 Über
 Action
 Aktion
+Add folder pair
+Verzeichnispaar hinzufügen
+Add to exclude filter: 
+Über Filter ausschließen: 
 All items have been synchronized!
 Alle Elemente wurden synchronisiert!
 An error occured
@@ -226,8 +218,6 @@ Could not open configuration file
 Fehler beim Öffnen der Datei 
 Could not open file: 
 Fehler beim Öffnen der Datei: 
-Could not read configuration file 
-Fehler beim Lesen der Konfigurationsdatei 
 Could not read language file 
 Fehler beim Lesen der Sprachdatei 
 Could not retrieve file info for: 
@@ -268,20 +258,10 @@ Deleting file
 Lösche Datei 
 Deleting folder 
 Lösche Verzeichnis 
-Deutsch
-Deutsch
-Directory 
-Verzeichnis 
-Directory on the left does not exist. Please select a new one!
-Verzeichnis auf der linken Seite existiert nicht. Bitte ein anderes auswählen!
-Directory on the right does not exist. Please select a new one!
-Verzeichnis auf der rechten Seite existiert nicht. Bitte ein anderes auswählen!
-Displays help on the command line parameters\n
-Hilfe zu den Kommandozeilenparametern\n
+Directory does not exist. Please select a new one: 
+Das Verzeichnis existiert nicht. Bitte ein anderes auswählen: 
 Do not show graphical status and error messages but write to a logfile instead
 Keine graphischen Status- und Fehlermeldungen anzeigen, sondern eine Logdatei erstellen
-Do not show graphical status and error messages but write to a logfile instead.\n\n
-Keine graphischen Status- und Fehlermeldungen anzeigen, sondern eine Logdatei erstellen.\n\n
 Do nothing
 Nichts tun
 Do you really want to delete the following objects(s)?
@@ -294,8 +274,6 @@ Drag && drop
 Drag && Drop
 Email:
 Email:
-English
-English
 Error
 Fehler
 Error adapting modification time of file 
@@ -312,8 +290,8 @@ Error deleting directory
 Fehler beim Löschen des Verzeichnisses 
 Error deleting file 
 Fehler beim Löschen der Datei 
-Error moving file 
-Fehler beim Verschieben der Datei 
+Error moving file to recycle bin: 
+Fehler beim Verschieben der Datei in den Papierkorb: 
 Error parsing configuration file 
 Fehler beim Auswerten der Konfigurationsdatei 
 Error reading file: 
@@ -332,6 +310,8 @@ Example
 Beispiel
 Exclude
 Ausschließen
+Exclude temporarily
+Temporär ausschließen
 Feedback and suggestions are welcome at:
 Feedback und Vorschläge sind willkommen unter:
 File content
@@ -370,10 +350,10 @@ Filter active: Press again to deactivate
 Filter aktiv: Zum Deaktivieren erneut auswählen
 Filter files
 Dateien filtern
-Filter manually
-Manuell filtern
 Filter view
 Ansicht filtern
+Folder pair
+Verzeichnispaar
 FreeFileSync   (Date: 
 FreeFileSync   (Datum: 
 FreeFileSync - Folder Comparison and Synchronization
@@ -382,6 +362,8 @@ FreeFileSync Batch Job
 FreeFileSync Batchdatei
 FreeFileSync at Sourceforge
 FreeFileSync auf Sourceforge
+FreeFileSync batch file
+FreeFileSync Batchdatei
 FreeFileSync configuration
 FreeFileSync Konfiguration
 Help
@@ -396,14 +378,14 @@ Hints:
 Tipps:
 Homepage:
 Homepage:
-If errors occur during folder comparison or synchronization they are ignored and the process continues.\n
-Wenn Fehler während des Vergleichs oder der Synchronisation auftreten, werden diese ignoriert und der Vorgang fortgesetzt.\n
 If you like FFS:
 FFS unterstützen:
 Include
 Einschließen
-Include: *.doc;*.zip;*.exe\nExclude: *\\tempfolder\\*
-Einschließen: *.doc;*.zip;*.exe\nAusschließen: *\\TempOrdner\\*
+Include temporarily
+Temporär einschließen
+Include: *.doc;*.zip;*.exe\nExclude: *\\temp\\*
+Einschließen: *.doc;*.zip;*.exe\nAusschließen: *\\temp\\*
 Info
 Info
 Information
@@ -412,8 +394,6 @@ Initialization of Recycle Bin failed! It cannot be used!
 Die Initialisierung des Papierkorbs ist fehlgeschlagen! Er kann nicht verwendet werden!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Die Papierkorbfunktion steht nicht zur Verfügung!\n\nWahrscheinlich ist das aktuelle Betriebssystem nicht Windows.\nWenn Sie diese Funktion wirklich benötigen, kontaktieren Sie bitte den Autor. :)
-Left directory does not exist. Please select a new one!
-Verzeichnis auf der linken Seite existiert nicht. Bitte ein anderes auswählen!
 Left folder:
 Linker Ordner:
 Legend\n
@@ -426,8 +406,8 @@ Log-messages:\n-------------
 Lognachrichten:\n---------------
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Spiegel-Backup des linken Ordners erstellen: Der rechte Ordner wird dabei überschrieben und nach der Synchronisation dem linken exakt gleichen.
-Move files to Recycle Bin instead of deleting or overwriting them directly.\n
-Verschiebe die Dateien in den Papierkorb anstatt sie zu löschen oder zu überschreiben.\n
+No valid configuration file specified: 
+Keine gültige Konfigurationsdatei angegeben: 
 Not all items were synchronized! Have a look at the list.
 Nicht alle Objekte wurden synchronisiert! Siehe die verbliebenen Elemente im Hauptfenster.
 Nothing to synchronize. Both directories adhere to the sync-configuration!
@@ -452,8 +432,8 @@ Operation:
 Vorgang:
 Pause
 Pause
-Please select both left and right directories!
-Bitte für beide Seiten ein Verzeichnis wählen!
+Please fill all empty directory fields.
+Bitte alle leeren Verzeichnisfelder füllen.
 Press button to activate filter
 Auswählen, um Filter zu aktivieren
 Preview
@@ -464,10 +444,10 @@ Quit
 Beenden
 Relative path
 Relativer Pfad
+Remove folder pair
+Verzeichnispaar entfernen
 Result
 Ergebnis
-Right directory does not exist. Please select a new one!
-Verzeichnis auf der rechten Seite existiert nicht. Bitte ein anderes auswählen!
 Right folder:
 Rechter Ordner:
 Save current configuration to file
@@ -484,10 +464,6 @@ Select variant:
 Variante auswählen:
 Set filter for synchronization
 Filter einstellen
-Shell link
-Shell Link
-Shell script
-Shell Skript
 Show files that are different
 Zeige unterschiedliche Dateien
 Show files that are equal
@@ -506,14 +482,6 @@ Size
 Größe
 Source code written completely in C++ utilizing:
 Sourcecode komplett in C++ geschrieben mit Hilfe von:
-Specify algorithm to test if files are equal:\n\n\t\t
-Algorithmus wählen, um gleiche Dateien zu erkennen:\n\n\t\t
-Specify names to be excluded separated by ';'. Wildcards '*' and '?' are supported. Default: \"\"\n
-Auszuschließende Namen, getrennt durch ';' angeben. Platzhalter '*' und '?' werden unterstützt. Standard: \"\"\n
-Specify names to be included separated by ';'. Wildcards '*' and '?' are supported. Default: \"*\"\n
-Einzuschließende Namen, getrennt durch ';' angeben. Platzhalter '*' und '?' werden unterstützt. Standard: \"*\"\n
-Specify the sync-direction used for each type of file by a string of five chars:\n\n
-Synchronisationseinstellungen durch Zeichenkette der Länge 5 spezifizieren:\n\n
 Start
 Start
 Start synchronization
@@ -522,10 +490,8 @@ Stop
 Stop
 Swap sides
 Vertausche Seiten
-SyncJob.lnk
-SyncJob.lnk
-SyncJob.sh
-SyncJob.sh
+SyncJob.ffs_batch
+SyncJob.ffs_batch
 Synchronization aborted!
 Synchronisation abgebrochen!
 Synchronization completed successfully.
@@ -536,8 +502,8 @@ Synchronization settings
 Synchronisationseinstellungen
 Synchronization status
 Synchronisation: Status
-Synchronize all .doc, .zip and .exe files except everything from folder \"tempfolder\".
-Synchronisiere alle .doc, .zip und .exe Dateien mit Ausnahme des Ordners \"TempOrdner\".
+Synchronize all .doc, .zip and .exe files except everything from folder \"temp\".
+Synchronisiere alle .doc, .zip und .exe Dateien mit Ausnahme des Ordners \"temp\".
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Beide Seiten gleichzeitig synchronisieren: Neue oder aktualisierte Dateien werden auf die jeweils andere Seite kopiert.
 Synchronizing...
@@ -560,8 +526,6 @@ Unable to create logfile!
 Fehler beim Erstellen der Logdatei!
 Unable to initialize Recycle Bin!
 Der Papierkorb konnte nicht initialisiert werden!
-Unable to load Resources.dat!
-Fehler beim Laden von Resources.dat!
 Update:
 Überschreiben:
 Use Recycle Bin
@@ -580,26 +544,6 @@ Nachdem \"Compare\" mit dieser Einstellung gestartet wurde, wird der folgende En
 \n\nMit nächstem Objekt fortsetzen, wiederholen oder abbrechen?
 \n\nInformation: If you skip the error and continue or abort a re-compare will be necessary!
 \n\nInformation: Wenn der Fehler nicht behoben wird, muss der Vergleich erneut gestartet werden!
-\n\t\tSync-direction: L: left, R: right, N: none\n
-\n\t\tSynchronisationsrichtung: L: links, R: rechts, N: nichts tun\n
-\t1: Creates a mirror backup of the left directory\n\t2: Synchronizes all *.doc files from both directories simultaneously\n\n
-\t1: Erzeugt ein Spiegel-Backup des linken Verzeichnisses\n\t2: Synchronisiert alle *.doc Dateien aus beiden Verzeichnissen\n\n
-\tExamples:\n\n\t1.) FreeFileSync -comp SIZEDATE -sync RRRRR C:\\Source C:\\Target\n\t2.) FreeFileSync -comp sizedate -sync rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n
-\tBeispiele:\n\n\t1.) FreeFileSync -comp SIZEDATE -sync RRRRR C:\\Quelle C:\\Ziel\n\t2.) FreeFileSync -comp sizedate -sync rlrln c:\\dir1 c:\\dir2 -incl *.doc\n\n
-\tHint: You can easily generate a batch file by chosing \"Create batch job\" from the GUI menubar.\n
-\tTipp: Eine Batchdatei kann auch über das Menü der graphischen Benutzeroberfläche unter \"Erstelle Batch-Job\" generiert werden.\n
-\t\tChar 1: Folders/files that exist on left side only\n
-\t\t1. Zeichen: Ordner/Dateien, die nur links existieren\n
-\t\tChar 2: Folders/files that exist on right side only\n
-\t\t2. Zeichen: Ordner/Dateien, die nur rechts existieren\n
-\t\tChar 3: Files that exist on both sides, left one is newer\n
-\t\t3. Zeichen: Dateien, die auf beiden Seiten existieren; linke Datei ist neuer\n
-\t\tChar 4: Files that exist on both sides, right one is newer\n
-\t\t4. Zeichen: Dateien, die auf beiden Seiten existieren; rechte Datei ist neuer\n
-\t\tChar 5: Files that exist on both sides and are different\n
-\t\t5. Zeichen: Dateien, die auf beiden Seiten existieren und verschieden sind\n
-by ZenJu
-von ZenJu
 different
 verschieden
 file exists on both sides

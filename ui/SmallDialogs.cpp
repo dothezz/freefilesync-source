@@ -8,10 +8,10 @@ using namespace globalFunctions;
 
 AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
 {
-    m_bitmap9->SetBitmap(*GlobalResources::bitmapWebsite);
-    m_bitmap10->SetBitmap(*GlobalResources::bitmapEmail);
-    m_bitmap11->SetBitmap(*GlobalResources::bitmapLogo);
-    m_bitmap13->SetBitmap(*GlobalResources::bitmapGPL);
+    m_bitmap9->SetBitmap(*globalResource.bitmapWebsite);
+    m_bitmap10->SetBitmap(*globalResource.bitmapEmail);
+    m_bitmap11->SetBitmap(*globalResource.bitmapLogo);
+    m_bitmap13->SetBitmap(*globalResource.bitmapGPL);
 
     //build information
     wxString build = wxString(wxT("(")) + _("Build: ") + __TDATE__;
@@ -23,7 +23,7 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
     build+= + wxT(")");
     m_build->SetLabel(build);
 
-    m_animationControl1->SetAnimation(*GlobalResources::animationMoney);
+    m_animationControl1->SetAnimation(*globalResource.animationMoney);
     m_animationControl1->Play(); //Note: The animation is created hidden(!) to not disturb constraint based window creation;
     m_animationControl1->Show(); //
 
@@ -106,14 +106,16 @@ FilterDlg::FilterDlg(wxWindow* window, wxString& filterIncl, wxString& filterExc
         excludeFilter(filterExcl)
 {
 
-    m_bitmap8->SetBitmap(*GlobalResources::bitmapInclude);
-    m_bitmap9->SetBitmap(*GlobalResources::bitmapExclude);
-    m_bpButtonHelp->SetBitmapLabel(*GlobalResources::bitmapHelp);
+    m_bitmap8->SetBitmap(*globalResource.bitmapInclude);
+    m_bitmap9->SetBitmap(*globalResource.bitmapExclude);
+    m_bpButtonHelp->SetBitmapLabel(*globalResource.bitmapHelp);
 
     m_textCtrlInclude->SetValue(includeFilter);
     m_textCtrlExclude->SetValue(excludeFilter);
 
     m_panel13->Hide();
+    m_button10->SetFocus();
+
     Fit();
 }
 
@@ -125,6 +127,7 @@ void FilterDlg::OnHelp(wxCommandEvent& event)
     m_bpButtonHelp->Hide();
     m_panel13->Show();
     Fit();
+    Refresh();
 
     event.Skip();
 }
@@ -168,7 +171,7 @@ DeleteDialog::DeleteDialog(const wxString& headerText, const wxString& messageTe
 {
     m_staticTextHeader->SetLabel(headerText);
     m_textCtrlMessage->SetValue(messageText);
-    m_bitmap12->SetBitmap(*GlobalResources::bitmapDeleteFile);
+    m_bitmap12->SetBitmap(*globalResource.bitmapDeleteFile);
 
     m_buttonOK->SetFocus();
 }
@@ -197,7 +200,7 @@ ErrorDlg::ErrorDlg(const wxString messageText, bool& continueError) :
         ErrorDlgGenerated(0),
         continueOnError(continueError)
 {
-    m_bitmap10->SetBitmap(*GlobalResources::bitmapWarning);
+    m_bitmap10->SetBitmap(*globalResource.bitmapWarning);
     m_textCtrl8->SetValue(messageText);
 
     m_buttonContinue->SetFocus();
@@ -339,7 +342,7 @@ SyncStatus::SyncStatus(StatusUpdater* updater, wxWindow* parentWindow) :
         totalObjects(0),
         processPaused(false)
 {
-    m_animationControl1->SetAnimation(*GlobalResources::animationSync);
+    m_animationControl1->SetAnimation(*globalResource.animationSync);
     m_animationControl1->Play();
 
     //initialize gauge
@@ -432,37 +435,37 @@ void SyncStatus::setCurrentStatus(SyncStatusID id)
     switch (id)
     {
     case ABORTED:
-        m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusError);
+        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusError);
         m_staticTextStatus->SetLabel(_("Aborted"));
         break;
 
     case FINISHED_WITH_SUCCESS:
-        m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusSuccess);
+        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusSuccess);
         m_staticTextStatus->SetLabel(_("Completed"));
         break;
 
     case FINISHED_WITH_ERROR:
-        m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusWarning);
+        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusWarning);
         m_staticTextStatus->SetLabel(_("Completed"));
         break;
 
     case PAUSE:
-        m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusPause);
+        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusPause);
         m_staticTextStatus->SetLabel(_("Pause"));
         break;
 
     case SCANNING:
-        m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusComparing);
+        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusComparing);
         m_staticTextStatus->SetLabel(_("Scanning..."));
         break;
 
     case COMPARING:
-        m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusComparing);
+        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusComparing);
         m_staticTextStatus->SetLabel(_("Comparing..."));
         break;
 
     case SYNCHRONIZING:
-        m_bitmapStatus->SetBitmap(*GlobalResources::bitmapStatusSyncing);
+        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusSyncing);
         m_staticTextStatus->SetLabel(_("Synchronizing..."));
         break;
     }
@@ -483,7 +486,7 @@ void SyncStatus::processHasFinished(SyncStatusID id) //essential to call this in
     m_buttonOK->SetFocus();
 
     m_animationControl1->Stop();
-    //m_animationControl1->SetInactiveBitmap(*GlobalResources::bitmapFinished);
+    //m_animationControl1->SetInactiveBitmap(*globalResource.bitmapFinished);
     m_animationControl1->Hide();
 
     updateStatusDialogNow(); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed

@@ -11,89 +11,85 @@ using namespace std;
 class GlobalResources
 {
 public:
-    static void loadResourceFiles();
-    static void unloadResourceFiles();
+    GlobalResources();
+    ~GlobalResources();
 
-    static wxChar fileNameSeparator;
+    void load();
+
+    static const wxChar fileNameSeparator;
 
     //language dependent global variables: need to be initialized by CustomLocale on program startup and language switch
     static const wxChar* decimalPoint;
     static const wxChar* thousandsSeparator;
 
-    //command line parameters
-    static const wxChar* paramCompare;
-    static const wxChar* paramSync;
-    static const wxChar* paramInclude;
-    static const wxChar* paramExclude;
-    static const wxChar* paramContinueError;
-    static const wxChar* paramRecycler;
-    static const wxChar* paramSilent;
-
-    static const wxChar* valueSizeDate;
-    static const wxChar* valueContent;
-
     //image resource objects
-    static wxBitmap* bitmapArrowLeft;
-    static wxBitmap* bitmapArrowRight;
-    static wxBitmap* bitmapArrowLeftCr;
-    static wxBitmap* bitmapArrowRightCr;
-    static wxBitmap* bitmapArrowNone;
-    static wxBitmap* bitmapStartSync;
-    static wxBitmap* bitmapStartSyncDis;
-    static wxBitmap* bitmapDeleteLeft;
-    static wxBitmap* bitmapDeleteRight;
-    static wxBitmap* bitmapEmail;
-    static wxBitmap* bitmapAbout;
-    static wxBitmap* bitmapWebsite;
-    static wxBitmap* bitmapExit;
-    static wxBitmap* bitmapSync;
-    static wxBitmap* bitmapCompare;
-    static wxBitmap* bitmapSyncDisabled;
-    static wxBitmap* bitmapSwap;
-    static wxBitmap* bitmapHelp;
-    static wxBitmap* bitmapLeftOnly;
-    static wxBitmap* bitmapLeftNewer;
-    static wxBitmap* bitmapDifferent;
-    static wxBitmap* bitmapRightNewer;
-    static wxBitmap* bitmapRightOnly;
-    static wxBitmap* bitmapLeftOnlyDeact;
-    static wxBitmap* bitmapLeftNewerDeact;
-    static wxBitmap* bitmapDifferentDeact;
-    static wxBitmap* bitmapRightNewerDeact;
-    static wxBitmap* bitmapRightOnlyDeact;
-    static wxBitmap* bitmapEqual;
-    static wxBitmap* bitmapEqualDeact;
-    static wxBitmap* bitmapInclude;
-    static wxBitmap* bitmapExclude;
-    static wxBitmap* bitmapFilterOn;
-    static wxBitmap* bitmapFilterOff;
-    static wxBitmap* bitmapWarning;
-    static wxBitmap* bitmapSmallUp;
-    static wxBitmap* bitmapSmallDown;
-    static wxBitmap* bitmapSave;
-    static wxBitmap* bitmapFFS;
-    static wxBitmap* bitmapDeleteFile;
-    static wxBitmap* bitmapGPL;
-    static wxBitmap* bitmapStatusPause;
-    static wxBitmap* bitmapStatusError;
-    static wxBitmap* bitmapStatusSuccess;
-    static wxBitmap* bitmapStatusWarning;
-    static wxBitmap* bitmapStatusScanning;
-    static wxBitmap* bitmapStatusComparing;
-    static wxBitmap* bitmapStatusSyncing;
-    static wxBitmap* bitmapLogo;
-    static wxBitmap* bitmapFinished;
-    static wxBitmap* bitmapStatusEdge;
+    wxBitmap* bitmapArrowLeft;
+    wxBitmap* bitmapArrowRight;
+    wxBitmap* bitmapArrowLeftCr;
+    wxBitmap* bitmapArrowRightCr;
+    wxBitmap* bitmapArrowNone;
+    wxBitmap* bitmapStartSync;
+    wxBitmap* bitmapStartSyncDis;
+    wxBitmap* bitmapDeleteLeft;
+    wxBitmap* bitmapDeleteRight;
+    wxBitmap* bitmapEmail;
+    wxBitmap* bitmapAbout;
+    wxBitmap* bitmapWebsite;
+    wxBitmap* bitmapExit;
+    wxBitmap* bitmapSync;
+    wxBitmap* bitmapCompare;
+    wxBitmap* bitmapSyncDisabled;
+    wxBitmap* bitmapSwap;
+    wxBitmap* bitmapHelp;
+    wxBitmap* bitmapLeftOnly;
+    wxBitmap* bitmapLeftNewer;
+    wxBitmap* bitmapDifferent;
+    wxBitmap* bitmapRightNewer;
+    wxBitmap* bitmapRightOnly;
+    wxBitmap* bitmapLeftOnlyDeact;
+    wxBitmap* bitmapLeftNewerDeact;
+    wxBitmap* bitmapDifferentDeact;
+    wxBitmap* bitmapRightNewerDeact;
+    wxBitmap* bitmapRightOnlyDeact;
+    wxBitmap* bitmapEqual;
+    wxBitmap* bitmapEqualDeact;
+    wxBitmap* bitmapInclude;
+    wxBitmap* bitmapExclude;
+    wxBitmap* bitmapFilterOn;
+    wxBitmap* bitmapFilterOff;
+    wxBitmap* bitmapWarning;
+    wxBitmap* bitmapSmallUp;
+    wxBitmap* bitmapSmallDown;
+    wxBitmap* bitmapSave;
+    wxBitmap* bitmapFFS;
+    wxBitmap* bitmapDeleteFile;
+    wxBitmap* bitmapGPL;
+    wxBitmap* bitmapStatusPause;
+    wxBitmap* bitmapStatusError;
+    wxBitmap* bitmapStatusSuccess;
+    wxBitmap* bitmapStatusWarning;
+    wxBitmap* bitmapStatusScanning;
+    wxBitmap* bitmapStatusComparing;
+    wxBitmap* bitmapStatusSyncing;
+    wxBitmap* bitmapLogo;
+    wxBitmap* bitmapFinished;
+    wxBitmap* bitmapStatusEdge;
+    wxBitmap* bitmapAddFolderPair;
+    wxBitmap* bitmapRemoveFolderPair;
+    wxBitmap* bitmapRemoveFolderPairD;
+    wxBitmap* bitmapLink;
 
-    static wxAnimation* animationMoney;
-    static wxAnimation* animationSync;
+    wxAnimation* animationMoney;
+    wxAnimation* animationSync;
 
-    static wxIcon* programIcon;
+    wxIcon* programIcon;
 
 private:
     //resource mapping
-    static map<wxString, wxBitmap*> bitmapResource;
+    map<wxString, wxBitmap*> bitmapResource;
 };
 
+
+extern GlobalResources globalResource;  //loads bitmap resources on program startup
 
 #endif // RESOURCES_H_INCLUDED
