@@ -44,6 +44,8 @@
 &Abandon
 &About...
 &A propos de...
+&Adjust file times
+&Ajuster les dates de fichiers
 &Advanced
 &Avancé
 &Back
@@ -99,7 +101,7 @@
 - left newer
 - fichier de gauche plus récent
 - right
--  à droite
+- à droite
 - right newer
 - fichier de droite plus récent
 - same date (different size)
@@ -112,12 +114,20 @@
 -Synchronisation de fichiers Open-Source-
 .
 ,
-1. Enter full file or directory names separated by ';' or a new line.\n2. Use wildcard characters '*' and '?'.
-1. Entrez le nom complet des fichiers ou des dossier séparés par un ';' ou par un 'retour charit'.\n2. Les caractères génériques '*' et '?' sont acceptés.
+1. Enter full file or directory names separated by ';' or a new line.
+1. Entrez le nom complet des fichiers ou des dossier séparés par un ';' ou par un 'retour charit'.
+2. Use wildcard characters '*' and '?'.
+2. Les caractères génériques '*' et '?' sont acceptés.
+3. Exclude files directly on main grid via context menu.
+3. Excluez les fichiers directement sur le tableau principal à l'aide du menu contextuel.
+4. Keep the number of entries small for best performance.
+4. Réduisez le nombre d'entrées pour améliorer les performances.
 <<	left file is newer\n
 <<	le fichier de gauche est plus récent\n
 <Directory>
 <Répertoire>
+<multiple selection>
+<sélection multiple>
 <|	file on left side only\n
 <|	Le fichier existe seulement à gauche\n
 ==	files are equal\n\n
@@ -137,13 +147,21 @@ Action
 Add folder pair
 Ajout d'un couple de dossiers
 Add to exclude filter: 
-Ajout au filtre exclure:
+Ajout au filtre exclure: 
+Adjust file times
+Ajuster les dates de fichiers
+Adjust modification times of all files contained in the specified folder and its subfolders. This manual adaption might become necessary if you are synchronizing against a FAT32 drive and the daylight saving time is switched. For an overview about the issue see this article:
+Ajuster les dates de modification de tous les fichiers contenus dans le dossier spécifié et ses sous-dossiers. Ce règlage manuel pourrait s'avérer nécessaire si vous synchroniser de nouveau un lecteur en FAT32 avec l'option heure d'été sectionnée. Pour plus d'informations, lire cet article :
+All file times have been adjusted successfully!
+Toutes les dates de fichiers ont été ajustées avec succès!
 All items have been synchronized!
 Tous les éléments ont été synchronisés!
 An error occured
 Une erreur s'est produite
 An exception occured!
 Une violation s'est produite!
+Apply
+Apliquer
 As a result 6 different status can be returned to categorize all files:
 En conclusion, 6 états différents caractérisent tous les fichiers:
 As a result the files are separated into the following categories:
@@ -173,7 +191,7 @@ Comparaison par...
 Comparing content
 Comparaison du contenu
 Comparing content of files 
-Comparaison du contenu des fichiers en cours
+Comparaison du contenu des fichiers en cours 
 Comparing...
 Comparaison en cours...
 Completed
@@ -212,22 +230,20 @@ Copy to clipboard\tCTRL+C
 Copier dans le presse-papiers\tCTRL+C
 Copying file 
 Copie du fichier en cours 
-Could not create file 
-Impossible de créer le fichier
 Could not open configuration file 
-Ipossible d'ouvrir le fichier de configuration
+Ipossible d'ouvrir le fichier de configuration 
 Could not open file: 
 Erreur lors de l'ouverture de : 
 Could not read language file 
 Impossible de lire le fichier de langue 
 Could not retrieve file info for: 
-Erreur lors de la lecture des attributs de fichier de :
+Erreur lors de la lecture des attributs de fichier de : 
 Could not set working directory to directory containing executable file!
 Impossible de définir le répertoire de travail à partir du répertoire contenant le fichier exécutable!
 Could not write configuration file 
 Impossible d'écrire le fichier de configuration 
 Could not write to 
-Erreur en écriture sur
+Erreur en écriture sur 
 Create a batch job
 Création du fichier de commandes
 Create:
@@ -258,8 +274,8 @@ Deleting file
 Suppression du fichier 
 Deleting folder 
 Suppression du répertoire 
-Directory does not exist. Please select a new one: 
-Le répertoire n'existe pas. Veuillez en choisir un autre:
+Directory does not exist: 
+Le répertoire n'existe pas: 
 Do not show graphical status and error messages but write to a logfile instead
 Ne pas afficher l'état graphique ni les messages mais les écrire sur un fichier log
 Do nothing
@@ -277,27 +293,31 @@ Email:
 Error
 Erreur
 Error adapting modification time of file 
-Erreur lors de la modification de la date du fichier
+Erreur lors de la modification de la date du fichier 
+Error changing modification time: 
+Erreur lors du changement de la date de modification: 
 Error converting FILETIME to SYSTEMTIME
 Erreur lors de la conversion de FILETIME en SYSTEMTIME
 Error converting FILETIME to local FILETIME
 Erreur lors de la conversion de FILETIME en FILETIME local
 Error copying file 
-Erreur lors de la copie du fichier
+Erreur lors de la copie du fichier 
 Error creating directory 
-Erreur lors de la création du répertoire
+Erreur lors de la création du répertoire 
 Error deleting directory 
-Erreur lors de la suppression du répertoire
+Erreur lors de la suppression du répertoire 
 Error deleting file 
-Erreur lors de la suppression du fichier
-Error moving file to recycle bin: 
-Erreur lors du déplacement du fichier vers la corbeille:
+Erreur lors de la suppression du fichier 
+Error moving to recycle bin: 
+Erreur lors du déplacement vers la corbeille: 
 Error parsing configuration file 
-Erreur lors de l'analyse du fichier de configuration
+Erreur lors de l'analyse du fichier de configuration 
 Error reading file: 
 Erreur lors de la lecture du fichier: 
+Error scanning directory: 
+Erreur lors du parcours du répertoire:
 Error traversing directory 
-Erreur lors du parcours du répertoire
+Erreur lors du parcours du répertoire 
 Error when converting int to wxString
 Erreur de conversion (int en wxString)
 Error when converting wxString to double
@@ -324,8 +344,8 @@ Filename
 Nom du fichier
 Files are found equal if\n     - file content\nis the same.
 Les fichiers sont considérés comme identiques, si\n     - leur contenu est identique.
-Files are found equal if\n     - filesize\n     - last write time (UTC) and date\nare the same.
-Les fichiers sont considérés comme identiques, si\n     - leur taille\n     - leur date et heure(UTC) sont identiques.
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
+Les fichiers sont considérés comme identiques, si\n     - leur taille\n     - leur date et heure sont identiques.
 Files remaining:
 Fichiers restants:
 Files that exist on both sides and have different content
@@ -347,7 +367,7 @@ Fichiers/répertoires existants seulement à droite
 Filter
 Filtrage
 Filter active: Press again to deactivate
-Filtrage actif: Cliquez de nouveau pour le désactiver 
+Filtrage actif: Cliquez de nouveau pour le désactiver
 Filter files
 Filtrage des fichiers
 Filter view
@@ -368,6 +388,18 @@ FreeFileSync configuration
 FreeFileSync configuration
 Help
 Aide
+Hide files that are different
+Masquer les fichiers différents
+Hide files that are equal
+Masquer les fichiers identiques
+Hide files that are newer on left
+Masquer les fichiers plus récents à gauche
+Hide files that are newer on right
+Masquer les fichiers plus récents à droite
+Hide files that exist on left side only
+Masquer les fichiers existant des deux côtés
+Hide files that exist on right side only
+Masquer les fichiers n'existant qu'à droite
 Hide filtered items
 Masquer les éléments filtrés
 Hide further error messages during the current process and continue
@@ -407,7 +439,7 @@ Messages log:\n---------------
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Sauvegarde miroir du répertoire de gauche : Le répertoire de droite sera écrasé et exactement identique au répertoire de gauche après la synchronisation.
 No valid configuration file specified: 
-Auncun fichier de configuration valide spécifié:
+Auncun fichier de configuration valide spécifié: 
 Not all items were synchronized! Have a look at the list.
 Tous les éléments n'ont pas été synchronisés!  Veuillez vérifier la liste.
 Nothing to synchronize. Both directories adhere to the sync-configuration!
@@ -455,10 +487,12 @@ Enregistrer la configuration courante
 Saved aborted!
 Enregistrement annulé!
 Scanning 
-Lecture en cours
+Lecture en cours 
 Scanning...
 Lecture en cours...
 Select a folder
+Choisissez un répertoire
+Select folder
 Choisissez un répertoire
 Select variant:
 Choisissez une variante:
@@ -508,6 +542,8 @@ Synchronize both sides simultaneously: Copy new or updated files in both directi
 Synchronisation simultanée des deux côtés. Copie des fichiers nouveaux ou mis à jour.
 Synchronizing...
 Synchronisation en cours...
+System out of memory!
+Erreur mémoire système!
 The selected file does not contain a valid configuration!
 Le fichier sélectionné ne contient pas de configuration valide!
 The selected file does not exist anymore!
@@ -516,10 +552,12 @@ This variant evaluates two equally named files as being equal when they have the
 Cette variante définit comme identiques deux fichiers de même nom lorsqu'ils ont la même taille et le même date et heure de modification. Attention : la précision de l'heure est mesurée à 2 secondes près. Cela permet d'assurer la synchronisation avec la précision du systéme de fichiers FAT32.
 Time elapsed:
 Temps écoulé:
+Time shift in seconds
+Décalage horaire en secondes
 Total amount of data that will be transferred
 Volume de données à transférer
 Total time: 
-Temps total:
+Temps total: 
 Two way <->
 Des 2 côtés <->
 Unable to create logfile!
@@ -535,7 +573,7 @@ Utilisation de la corbeille lors de la suppression ou du remplacement des fichie
 Warning
 Attention
 Warning: Synchronization failed for 
-Attention : la synchronisation a échoué à cause de  
+Attention : la synchronisation a échoué à cause de 
 When \"Compare\" is triggered with this option set the following decision tree is processed:
 Quand \"Compare\" est lancé avec cette option, l'arbre de décision suivant est éxécuté:
 \n\nContinue with next object, retry or abort comparison?

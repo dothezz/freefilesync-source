@@ -39,7 +39,8 @@ public:
     {
         if (gridRefUI)
             return max(gridRefUI->size(), MinimumRows);
-        return MinimumRows; //grid is initialized with this number of rows
+        else
+            return MinimumRows; //grid is initialized with this number of rows
     }
 
     virtual bool IsEmptyCell( int row, int col )
@@ -94,28 +95,28 @@ public:
                 case 1:
                     if (col < 4)
                     {
-                        if (gridLine.fileDescrLeft.objType == TYPE_DIRECTORY)
+                        if (gridLine.fileDescrLeft.objType == FileDescrLine::TYPE_DIRECTORY)
                         {
                             switch (col)
                             {
                             case 0: //filename
                                 return wxEmptyString;
                             case 1: //relative path
-                                return gridLine.fileDescrLeft.relFilename;
+                                return gridLine.fileDescrLeft.relativeName;
                             case 2: //file size
                                 return _("<Directory>");
                             case 3: //date
                                 return gridLine.fileDescrLeft.lastWriteTime;
                             }
                         }
-                        else if (gridLine.fileDescrLeft.objType == TYPE_FILE)
+                        else if (gridLine.fileDescrLeft.objType == FileDescrLine::TYPE_FILE)
                         {
                             switch (col)
                             {
                             case 0: //filename
-                                return gridLine.fileDescrLeft.relFilename.AfterLast(GlobalResources::fileNameSeparator);
+                                return gridLine.fileDescrLeft.relativeName.AfterLast(GlobalResources::fileNameSeparator);
                             case 1: //relative path
-                                return gridLine.fileDescrLeft.relFilename.BeforeLast(GlobalResources::fileNameSeparator);
+                                return gridLine.fileDescrLeft.relativeName.BeforeLast(GlobalResources::fileNameSeparator);
                             case 2: //file size
                                 return globalFunctions::includeNumberSeparator(fileSize = gridLine.fileDescrLeft.fileSize.ToString());
                             case 3: //date
@@ -128,28 +129,28 @@ public:
                 case 2:
                     if (col < 4)
                     {
-                        if (gridLine.fileDescrRight.objType == TYPE_DIRECTORY)
+                        if (gridLine.fileDescrRight.objType == FileDescrLine::TYPE_DIRECTORY)
                         {
                             switch (col)
                             {
                             case 0: //filename
                                 return wxEmptyString;
                             case 1: //relative path
-                                return gridLine.fileDescrRight.relFilename;
+                                return gridLine.fileDescrRight.relativeName;
                             case 2: //file size
                                 return _("<Directory>");
                             case 3: //date
                                 return gridLine.fileDescrRight.lastWriteTime;
                             }
                         }
-                        else if (gridLine.fileDescrRight.objType == TYPE_FILE)
+                        else if (gridLine.fileDescrRight.objType == FileDescrLine::TYPE_FILE)
                         {
                             switch (col)
                             {
                             case 0: //filename
-                                return gridLine.fileDescrRight.relFilename.AfterLast(GlobalResources::fileNameSeparator);
+                                return gridLine.fileDescrRight.relativeName.AfterLast(GlobalResources::fileNameSeparator);
                             case 1: //relative path
-                                return gridLine.fileDescrRight.relFilename.BeforeLast(GlobalResources::fileNameSeparator);
+                                return gridLine.fileDescrRight.relativeName.BeforeLast(GlobalResources::fileNameSeparator);
                             case 2: //file size
                                 return globalFunctions::includeNumberSeparator(fileSize = gridLine.fileDescrRight.fileSize.ToString());
                             case 3: //date
@@ -249,9 +250,9 @@ public:
                 if (!cmpLine.selectedForSynchronization)
                     return BLUE;
                 //mark directories
-                else if (gridIdentifier == 1 && cmpLine.fileDescrLeft.objType == TYPE_DIRECTORY)
+                else if (gridIdentifier == 1 && cmpLine.fileDescrLeft.objType == FileDescrLine::TYPE_DIRECTORY)
                     return GREY;
-                else if (gridIdentifier == 2 && cmpLine.fileDescrRight.objType == TYPE_DIRECTORY)
+                else if (gridIdentifier == 2 && cmpLine.fileDescrRight.objType == FileDescrLine::TYPE_DIRECTORY)
                     return GREY;
                 else
                     return NONE;

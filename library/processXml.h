@@ -3,6 +3,8 @@
 
 #include "../FreeFileSync.h"
 #include "tinyxml/tinyxml.h"
+#include <wx/intl.h>
+
 
 namespace xmlAccess
 {
@@ -10,34 +12,21 @@ namespace xmlAccess
     {
         XML_GUI_CONFIG,
         XML_BATCH_CONFIG,
+        XML_GLOBAL_SETTINGS,
         XML_OTHER
     };
 
-
-    struct XmlMainConfig
-    {
-        MainConfiguration cfg;
-        vector<FolderPair> directoryPairs;
-    };
+    XmlType getXmlType(const wxString& filename);
 
 
     struct XmlGuiConfig
     {
-        XmlGuiConfig() :
-                hideFilteredElements(false), //initialize values
-                widthNotMaximized(-1),
-                heightNotMaximized(-1),
-                posXNotMaximized(-1),
-                posYNotMaximized(-1),
-                isMaximized(false) {}
+        XmlGuiConfig() : hideFilteredElements(false) {} //initialize values
+
+        MainConfiguration mainCfg;
+        vector<FolderPair> directoryPairs;
+
         bool hideFilteredElements;
-        int widthNotMaximized;
-        int heightNotMaximized;
-        int posXNotMaximized;
-        int posYNotMaximized;
-        bool isMaximized;
-        vector<int> columnWidthLeft;
-        vector<int> columnWidthRight;
     };
 
 
@@ -45,68 +34,50 @@ namespace xmlAccess
     {
         XmlBatchConfig() :  silent(false) {}
 
+        MainConfiguration mainCfg;
+        vector<FolderPair> directoryPairs;
+
         bool silent;
     };
 
 
-    XmlType getXmlType(const wxString& filename);
-
-    class XmlInput
+    struct XmlGlobalSettings
     {
-    public:
-        XmlInput(const wxString& fileName, const XmlType type);
-        ~XmlInput() {}
-
-        bool loadedSuccessfully()
+        struct _Global
         {
-            return loadSuccess;
-        }
+            _Global() : programLanguage(wxLocale::GetSystemLanguage()) {}
+            int programLanguage;
+        } global;
 
-        //read basic FreefileSync settings (used by commandline and GUI), return true if ALL values have been retrieved successfully
-        bool readXmlMainConfig(XmlMainConfig& outputCfg);
-        //read additional gui settings, all values retrieved are optional, so check for initial values! (== -1)
-        bool readXmlGuiConfig(XmlGuiConfig& outputCfg);
-        //read additional batch settings, all values retrieved are optional
-        bool readXmlBatchConfig(XmlBatchConfig& outputCfg);
+        struct _Gui
+        {
+            _Gui() :
+                    widthNotMaximized(wxDefaultCoord),
+                    heightNotMaximized(wxDefaultCoord),
+                    posXNotMaximized(wxDefaultCoord),
+                    posYNotMaximized(wxDefaultCoord),
+                    isMaximized(false) {}
 
-    private:
-//read
-        bool readXmlElementValue(string& output, const TiXmlElement* parent, const string& name);
-        bool readXmlElementValue(int& output, const TiXmlElement* parent, const string& name);
-        bool readXmlElementValue(CompareVariant& output, const TiXmlElement* parent, const string& name);
-        bool readXmlElementValue(SyncDirection& output, const TiXmlElement* parent, const string& name);
-        bool readXmlElementValue(bool& output, const TiXmlElement* parent, const string& name);
+            int widthNotMaximized;
+            int heightNotMaximized;
+            int posXNotMaximized;
+            int posYNotMaximized;
+            bool isMaximized;
+            vector<int> columnWidthLeft;
+            vector<int> columnWidthRight;
+        } gui;
 
-        TiXmlDocument doc;
-        bool loadSuccess;
+        //struct _Batch
     };
 
 
-    class XmlOutput
-    {
-    public:
-        XmlOutput(const wxString& fileName, const XmlType type);
-        ~XmlOutput() {}
+    XmlGuiConfig readGuiConfig(const wxString& filename);
+    XmlBatchConfig readBatchConfig(const wxString& filename);
+    XmlGlobalSettings readGlobalSettings();   //used for both GUI and batch mode, independent from configuration instance
 
-        bool writeToFile();
-
-        //write basic FreefileSync settings (used by commandline and GUI), return true if everything was written successfully
-        bool writeXmlMainConfig(const XmlMainConfig& inputCfg);
-        //write additional gui settings
-        bool writeXmlGuiConfig(const XmlGuiConfig& inputCfg);
-        //write additional batch settings
-        bool writeXmlBatchConfig(const XmlBatchConfig& inputCfg);
-
-    private:
-//write
-        void addXmlElement(TiXmlElement* parent, const string& name, const string& value);
-        void addXmlElement(TiXmlElement* parent, const string& name, const int value);
-        void addXmlElement(TiXmlElement* parent, const string& name, const SyncDirection value);
-        void addXmlElement(TiXmlElement* parent, const string& name, const bool value);
-
-        TiXmlDocument doc;
-        const wxString& m_fileName;
-    };
+    void writeGuiConfig(const wxString& filename, const XmlGuiConfig& inputCfg);
+    void writeBatchConfig(const wxString& filename, const XmlBatchConfig& inputCfg);
+    void writeGlobalSettings(const XmlGlobalSettings& inputCfg);
 
 }
 

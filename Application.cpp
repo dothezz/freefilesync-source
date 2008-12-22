@@ -24,49 +24,71 @@ IMPLEMENT_APP(Application);
 
 bool Application::ProcessIdle()
 {
-    static bool firstExecution = true;
-    if (firstExecution)
+    static bool initialized = false;
+    if (!initialized)
     {
-        firstExecution = false;
+        initialized = true;
         initialize();   //here the program initialization takes place
     }
     return wxApp::ProcessIdle();
 }
 
 //Note: initialization is done in the FIRST idle event instead of OnInit. Reason: Commandline mode requires the wxApp eventhandler to be established
-//for UI update events. This is not the case at the time of OnInit.
+//for UI update events. This is not the case at the time of OnInit().
 
 bool Application::OnInit()
 {
     returnValue = 0;
-    //do not call wxApp::OnInit() to avoid parsing commandline now, instead use own parser later
+    //do not call wxApp::OnInit() to avoid using default commandline parser
+
+    //set working directory to current executable directory
+    if (!wxSetWorkingDirectory(wxFileName(wxStandardPaths::Get().GetExecutablePath()).GetPath()))
+    {   //show messagebox and quit program immediately
+        wxMessageBox(_("Could not set working directory to directory containing executable file!"), _("An exception occured!"), wxOK | wxICON_ERROR);
+        return false;
+    }
+
+    try //load global settings from XML: must be called AFTER working dir was set
+    {
+        globalSettings = xmlAccess::readGlobalSettings();
+    }
+    catch (const FileError& error)
+    {
+        if (wxFileExists(FreeFileSync::FfsGlobalSettingsFile))
+        {   //show messagebox and quit program immediately
+            wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
+            return false;
+        }
+        //else: globalSettings already has default values
+    }
+
+    //set program language: needs to happen aber working directory has been set!
+    SetExitOnFrameDelete(false); //prevent error messagebox from becoming top-level window
+    programLanguage.setLanguage(globalSettings.global.programLanguage);
+    SetExitOnFrameDelete(true);
+
+    //load image resources from file: must be called after working directory has been set
+    globalResource.load();
+
     return true;
 }
 
 
 void Application::initialize()
 {
-    //set working directory to current executable directory
-    if (!wxSetWorkingDirectory(wxFileName(wxStandardPaths::Get().GetExecutablePath()).GetPath()))
-        throw RuntimeException(_("Could not set working directory to directory containing executable file!"));
-
-    globalResource.load(); //load image resources from file: must be called after working directory has been set
-
-    //set program language
-    SetExitOnFrameDelete(false);    //prevent messagebox from becoming top-level window
-    programLanguage.loadLanguageFromCfg();
-    SetExitOnFrameDelete(true);
-
-    //test if ffs is to be started on UI with config file passed as commandline parameter
-    wxString configFileForUI = FreeFileSync::FfsLastConfigFile;
+    //test if FFS is to be started on UI with config file passed as commandline parameter
     if (argc > 1)
     {
         XmlType xmlConfigType = xmlAccess::getXmlType(argv[1]);
-        if (xmlConfigType == XML_GUI_CONFIG)
-            configFileForUI = argv[1];
+        if (xmlConfigType == XML_GUI_CONFIG) //start in GUI mode (configuration file specified)
+        {
+            MainDialog* frame = new MainDialog(NULL, argv[1], &programLanguage, globalSettings);
+            frame->SetIcon(*globalResource.programIcon); //set application icon
+            frame->Show();
+        }
         else if (xmlConfigType == XML_BATCH_CONFIG) //start in commandline mode
         {
-            runBatchMode(argv[1]);
+            runBatchMode(argv[1], globalSettings);
 
             if (applicationRunsInBatchWithoutWindows)
                 ExitMainLoop(); //exit programm on next main loop iteration
@@ -78,11 +100,18 @@ void Application::initialize()
             return;
         }
     }
+    else //start in GUI mode (standard)
+    {
+        MainDialog* frame = new MainDialog(NULL, FreeFileSync::FfsLastConfigFile, &programLanguage, globalSettings);
+        frame->SetIcon(*globalResource.programIcon); //set application icon
+        frame->Show();
+    }
+}
 
-    //start in GUI mode
-    MainDialog* frame = new MainDialog(NULL, configFileForUI, &programLanguage);
-    frame->SetIcon(*globalResource.programIcon); //set application icon
-    frame->Show();
+
+bool Application::OnExceptionInMainLoop()
+{
+    throw; //just pass exceptions and avoid display of additional exception messagebox: they will be caught in OnRun()
 }
 
 
@@ -92,17 +121,35 @@ int Application::OnRun()
     {
         wxApp::OnRun();
     }
-    catch (const RuntimeException& theException)    //catch runtime errors during main event loop
+    catch (const RuntimeException& theException) //catch runtime errors during main event loop; wxApp::OnUnhandledException could be used alternatively
     {
         wxMessageBox(theException.show(), _("An exception occured!"), wxOK | wxICON_ERROR);
         return -1;
     }
+    catch (std::exception& e) //catch all STL exceptions
+    {
+        wxMessageBox(wxString::From8BitData(e.what()), _("An exception occured!"), wxOK | wxICON_ERROR);
+        return -1;
+    }
+
     return returnValue;
 }
 
 
 int Application::OnExit()
 {
+    //get program language
+    globalSettings.global.programLanguage = programLanguage.getLanguage();
+
+    try //save global settings to XML
+    {
+        xmlAccess::writeGlobalSettings(globalSettings);
+    }
+    catch (const FileError& error)
+    {
+        wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
+    }
+
     return 0;
 }
 
@@ -186,136 +233,122 @@ private:
 };
 
 
-void Application::runBatchMode(const wxString& filename)
+void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSettings& globalSettings)
 {
     applicationRunsInBatchWithoutWindows = false; //default value
 
     //load XML settings
-    XmlInput inputFile(filename, XML_BATCH_CONFIG);
-
-    if (!inputFile.loadedSuccessfully())
-    { //handle error: file load
-        wxMessageBox(wxString(_("Could not open configuration file ")) + wxT("\"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+    XmlBatchConfig batchCfg;  //structure to receive gui settings
+    try
+    {
+        batchCfg = xmlAccess::readBatchConfig(filename);
+    }
+    catch (const FileError& error)
+    {
+        wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
         return;
     }
 
-    XmlMainConfig  mainCfg;  //structure to receive main settings
-    XmlBatchConfig batchCfg; //structure to receive batch settings
-    if (    inputFile.readXmlMainConfig(mainCfg) && //read main configuration settings
-            inputFile.readXmlBatchConfig(batchCfg)) //read GUI layout configuration
+    //all settings have been read successfully...
+    applicationRunsInBatchWithoutWindows = batchCfg.silent;  //this value is needed for the application to decide whether to wait for windows to close or not
+
+    //format directory names
+    for (vector<FolderPair>::iterator i = batchCfg.directoryPairs.begin(); i != batchCfg.directoryPairs.end(); ++i)
     {
-        //all settings have been read successfully...
+        i->leftDirectory  = FreeFileSync::getFormattedDirectoryName(i->leftDirectory);
+        i->rightDirectory = FreeFileSync::getFormattedDirectoryName(i->rightDirectory);
+    }
 
-        applicationRunsInBatchWithoutWindows = batchCfg.silent;  //this value is needed for the application to decide whether to wait for windows to close or not
+    //init logfile
+    LogFile* log = NULL;
+    if (batchCfg.silent)
+        log = new LogFile;
+    DeleteOnExit dummy(log); //delete log object on exit (if not NULL)
 
-        //format directory names
-        for (vector<FolderPair>::iterator i = mainCfg.directoryPairs.begin(); i != mainCfg.directoryPairs.end(); ++i)
-        {
-            i->leftDirectory  = FreeFileSync::getFormattedDirectoryName(i->leftDirectory);
-            i->rightDirectory = FreeFileSync::getFormattedDirectoryName(i->rightDirectory);
-        }
+    if (log && !log->isOkay())
+    { //handle error: file load
+        wxMessageBox(_("Unable to create logfile!"), _("Error"), wxOK | wxICON_ERROR);
+        return;
+    }
 
-        //init logfile
-        LogFile* log = NULL;
+
+    //check if directories exist
+    wxString errorMessage;
+    if (!FreeFileSync::foldersAreValidForComparison(batchCfg.directoryPairs, errorMessage))
+    {
         if (batchCfg.silent)
-            log = new LogFile;
-        DeleteOnExit dummy(log); //delete log object on exit (if not NULL)
-
-        if (log && !log->isOkay())
-        { //handle error: file load
-            wxMessageBox(_("Unable to create logfile!"), _("Error"), wxOK | wxICON_ERROR);
-            return;
-        }
-
-
-        //check if directories exist
-        wxString errorMessage;
-        if (!FreeFileSync::foldersAreValidForComparison(mainCfg.directoryPairs, errorMessage))
         {
+            log->write(errorMessage, _("Warning"));
+            log->close(_("Synchronization aborted!"));
+        }
+        else wxMessageBox(errorMessage + wxT("\n\n") + _("Synchronization aborted!"), _("Warning"), wxICON_WARNING);
+
+        returnValue = -2;
+        return;
+    }
+
+
+    //test existence of Recycle Bin
+    if (batchCfg.mainCfg.useRecycleBin)
+    {
+        if (!FreeFileSync::recycleBinExists())
+        {
+            wxString errorMessage  = wxString(_("Unable to initialize Recycle Bin!"));
+            wxString statusMessage = wxString(_("Synchronization aborted!"));
             if (batchCfg.silent)
             {
-                log->write(errorMessage, _("Warning"));
-                log->close(_("Synchronization aborted!"));
+                log->write(errorMessage, _("Error"));
+                log->close(statusMessage);
             }
-            else wxMessageBox(errorMessage + wxT("\n\n") + _("Synchronization aborted!"), _("Warning"), wxICON_WARNING);
+            else wxMessageBox(errorMessage + wxT("\n\n") + statusMessage, _("Error"), wxICON_WARNING);
 
             returnValue = -2;
             return;
         }
+    }
 
+    //begin of synchronization process (all in one try-catch block)
+    try
+    {
+        FileCompareResult currentGridData;
+        //class handling status updates and error messages
+        BatchStatusUpdater statusUpdater(batchCfg.mainCfg.continueOnError, batchCfg.silent, log);
 
-        //test existence of Recycle Bin
-        if (mainCfg.cfg.useRecycleBin)
+        //COMPARE DIRECTORIES
+        FreeFileSync::startCompareProcess(batchCfg.directoryPairs,
+                                          batchCfg.mainCfg.compareVar,
+                                          currentGridData,
+                                          &statusUpdater);
+
+        //APPLY FILTERS
+        if (batchCfg.mainCfg.filterIsActive)
+            FreeFileSync::filterCurrentGridData(currentGridData, batchCfg.mainCfg.includeFilter, batchCfg.mainCfg.excludeFilter);
+
+        //check if there are files/folders to be sync'ed at all
+        int objectsToCreate    = 0;
+        int objectsToOverwrite = 0;
+        int objectsToDelete    = 0;
+        double dataToProcess   = 0;
+        FreeFileSync::calcTotalBytesToSync(objectsToCreate,
+                                           objectsToOverwrite,
+                                           objectsToDelete,
+                                           dataToProcess,
+                                           currentGridData,
+                                           batchCfg.mainCfg.syncConfiguration);
+        if (objectsToCreate + objectsToOverwrite + objectsToDelete == 0)
         {
-            if (!FreeFileSync::recycleBinExists())
-            {
-                wxString errorMessage  = wxString(_("Unable to initialize Recycle Bin!"));
-                wxString statusMessage = wxString(_("Synchronization aborted!"));
-                if (batchCfg.silent)
-                {
-                    log->write(errorMessage, _("Error"));
-                    log->close(statusMessage);
-                }
-                else wxMessageBox(errorMessage + wxT("\n\n") + statusMessage, _("Error"), wxICON_WARNING);
+            statusUpdater.noSynchronizationNeeded(); //inform about this special case
 
-                returnValue = -2;
-                return;
-            }
-        }
-
-        //begin of synchronization process (all in one try-catch block)
-        try
-        {
-            FileCompareResult currentGridData;
-            //class handling status updates and error messages
-            BatchStatusUpdater statusUpdater(mainCfg.cfg.continueOnError, batchCfg.silent, log);
-
-//COMPARE DIRECTORIES
-            //unsigned int startTime = GetTickCount();
-            FreeFileSync::startCompareProcess(currentGridData,
-                                              mainCfg.directoryPairs,
-                                              mainCfg.cfg.compareVar,
-                                              &statusUpdater);
-            //wxMessageBox(wxString::Format(wxT("%i"), unsigned(GetTickCount()) - startTime));
-
-//APPLY FILTERS
-            if (mainCfg.cfg.filterIsActive)
-                FreeFileSync::filterCurrentGridData(currentGridData, mainCfg.cfg.includeFilter, mainCfg.cfg.excludeFilter);
-
-//check if there are files/folders to be sync'ed at all
-            int objectsToCreate    = 0;
-            int objectsToOverwrite = 0;
-            int objectsToDelete    = 0;
-            double dataToProcess   = 0;
-            FreeFileSync::calcTotalBytesToSync(objectsToCreate,
-                                               objectsToOverwrite,
-                                               objectsToDelete,
-                                               dataToProcess,
-                                               currentGridData,
-                                               mainCfg.cfg.syncConfiguration);
-            if (objectsToCreate + objectsToOverwrite + objectsToDelete == 0)
-            {
-                statusUpdater.noSynchronizationNeeded(); //inform about this special case
-
-                returnValue = -3;
-                return;
-            }
-
-//START SYNCHRONIZATION
-            //unsigned int startTime = GetTickCount();
-            FreeFileSync::startSynchronizationProcess(currentGridData, mainCfg.cfg.syncConfiguration, &statusUpdater, mainCfg.cfg.useRecycleBin);
-            //wxMessageBox(wxString::Format(wxT("%i"), unsigned(GetTickCount()) - startTime));
-        }
-        catch (AbortThisProcess& theException)  //exit used by statusUpdater
-        {
-            returnValue = -4;
+            returnValue = -3;
             return;
         }
 
+        //START SYNCHRONIZATION
+        FreeFileSync::startSynchronizationProcess(currentGridData, batchCfg.mainCfg.syncConfiguration, &statusUpdater, batchCfg.mainCfg.useRecycleBin);
     }
-    else
-    {   //handle error: parsing
-        wxMessageBox(wxString(_("Error parsing configuration file ")) + wxT("\"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+    catch (AbortThisProcess& theException)  //exit used by statusUpdater
+    {
+        returnValue = -4;
         return;
     }
 
@@ -328,7 +361,7 @@ BatchStatusUpdater::BatchStatusUpdater(bool continueOnError, bool silent, LogFil
         m_log(log),
         continueErrors(continueOnError),
         silentMode(silent),
-        currentProcess(-1),
+        currentProcess(StatusHandler::PROCESS_NONE),
         synchronizationNeeded(true)
 {
     if (!silentMode)
@@ -400,7 +433,7 @@ void BatchStatusUpdater::updateStatusText(const wxString& text)
 {
     if (silentMode)
     {
-        if (currentProcess == FreeFileSync::synchronizeFilesProcess)
+        if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING)
             m_log->write(text, _("Info"));
     }
     else
@@ -408,22 +441,22 @@ void BatchStatusUpdater::updateStatusText(const wxString& text)
 }
 
 
-void BatchStatusUpdater::initNewProcess(int objectsTotal, double dataTotal, int processID)
+void BatchStatusUpdater::initNewProcess(int objectsTotal, double dataTotal, StatusHandler::Process processID)
 {
     currentProcess = processID;
 
     if (!silentMode)
     {
-        if (currentProcess == FreeFileSync::scanningFilesProcess)
+        if (currentProcess == StatusHandler::PROCESS_SCANNING)
             syncStatusFrame->setCurrentStatus(SyncStatus::SCANNING);
 
-        else if (currentProcess == FreeFileSync::compareFileContentProcess)
+        else if (currentProcess == StatusHandler::PROCESS_COMPARING_CONTENT)
         {
             syncStatusFrame->resetGauge(objectsTotal, dataTotal);
             syncStatusFrame->setCurrentStatus(SyncStatus::COMPARING);
         }
 
-        else if (currentProcess == FreeFileSync::synchronizeFilesProcess)
+        else if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING)
         {
             syncStatusFrame->resetGauge(objectsTotal, dataTotal);
             syncStatusFrame->setCurrentStatus(SyncStatus::SYNCHRONIZING);
@@ -438,38 +471,38 @@ void BatchStatusUpdater::updateProcessedData(int objectsProcessed, double dataPr
 {
     if (!silentMode)
     {
-        if (currentProcess == FreeFileSync::scanningFilesProcess)
+        if (currentProcess == StatusHandler::PROCESS_SCANNING)
             syncStatusFrame->m_gauge1->Pulse();
-        else if (currentProcess == FreeFileSync::compareFileContentProcess)
+        else if (currentProcess == StatusHandler::PROCESS_COMPARING_CONTENT)
             syncStatusFrame->incProgressIndicator_NoUpdate(objectsProcessed, dataProcessed);
-        else if (currentProcess == FreeFileSync::synchronizeFilesProcess)
+        else if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING)
             syncStatusFrame->incProgressIndicator_NoUpdate(objectsProcessed, dataProcessed);
         else assert(false);
     }
 }
 
 
-int BatchStatusUpdater::reportError(const wxString& text)
+ErrorHandler::Response BatchStatusUpdater::reportError(const wxString& text)
 {
     if (silentMode) //write error message log and abort the complete session if necessary
     {
         unhandledErrors.Add(text);
         m_log->write(text, _("Error"));
 
-        if (continueErrors)                 //  <- /|\ before return, the logfile is written!!!
-            return StatusUpdater::continueNext;
+        if (continueErrors) // /|\ before return, the logfile is written!!!
+            return ErrorHandler::CONTINUE_NEXT;
         else
         {
             abortionRequested = true;
             throw AbortThisProcess();
         }
     }
-    else    //show dialog to user who can decide how to continue
+    else //show dialog to user who can decide how to continue
     {
         if (continueErrors) //this option can be set from commandline or by the user in the error dialog on UI
         {
             unhandledErrors.Add(text);
-            return StatusUpdater::continueNext;
+            return ErrorHandler::CONTINUE_NEXT;
         }
 
         wxString errorMessage = text + _("\n\nContinue with next object, retry or abort synchronization?");
@@ -481,12 +514,12 @@ int BatchStatusUpdater::reportError(const wxString& text)
 
         switch (rv)
         {
-        case ErrorDlg::continueButtonPressed:
+        case ErrorDlg::BUTTON_CONTINUE:
             unhandledErrors.Add(text);
-            return StatusUpdater::continueNext;
-        case ErrorDlg::retryButtonPressed:
-            return StatusUpdater::retry;
-        case ErrorDlg::abortButtonPressed:
+            return ErrorHandler::CONTINUE_NEXT;
+        case ErrorDlg::BUTTON_RETRY:
+            return ErrorHandler::RETRY;
+        case ErrorDlg::BUTTON_ABORT:
         {
             unhandledErrors.Add(text);
             abortionRequested = true;
@@ -494,7 +527,7 @@ int BatchStatusUpdater::reportError(const wxString& text)
         }
         default:
             assert (false);
-            return StatusUpdater::continueNext;
+            return ErrorHandler::CONTINUE_NEXT;
         }
     }
 }

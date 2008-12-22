@@ -1,13 +1,10 @@
 #include "misc.h"
-#include <fstream>
 #include <wx/msgdlg.h>
 #include "resources.h"
 #include "globalFunctions.h"
 
 
-const string CustomLocale::FfsLanguageDat = "language.dat";
-
-
+inline
 void exchangeEscapeChars(wxString& data)
 {
     wxString output;
@@ -59,41 +56,7 @@ CustomLocale::CustomLocale() :
 {}
 
 
-CustomLocale::~CustomLocale()
-{
-    //write language to file
-    ofstream output(FfsLanguageDat.c_str());
-    if (output)
-    {
-        globalFunctions::writeInt(output, currentLanguage);
-        output.close();
-    }
-    else
-        wxMessageBox(wxString(_("Could not write to ")) + wxT("\"") + wxString::From8BitData(FfsLanguageDat.c_str()) + wxT("\""), _("An exception occured!"), wxOK | wxICON_ERROR);
-}
-
-
-void CustomLocale::loadLanguageFromCfg()  //retrieve language from config file: do NOT put into constructor since working directory has not been set!
-{
-    int language = wxLANGUAGE_ENGLISH;
-
-    //try to load language setting from file
-    ifstream input(FfsLanguageDat.c_str());
-    if (input)
-    {
-        language = globalFunctions::readInt(input);
-        input.close();
-    }
-    else
-        language = wxLocale::GetSystemLanguage();
-
-    wxLocale::Init(language, wxLOCALE_LOAD_DEFAULT | wxLOCALE_CONV_ENCODING);
-
-    loadLanguageFile(language);
-}
-
-
-void CustomLocale::loadLanguageFile(int language)
+void CustomLocale::setLanguage(const int language)
 {
     currentLanguage = language;
 
@@ -109,9 +72,19 @@ void CustomLocale::loadLanguageFile(int language)
     case wxLANGUAGE_JAPANESE:
         languageFile = "japanese.lng";
         break;
+    case wxLANGUAGE_DUTCH:
+        languageFile = "dutch.lng";
+        break;
     default:
         languageFile.clear();
         currentLanguage = wxLANGUAGE_ENGLISH;
+    }
+
+    static bool initialized = false; //wxLocale is a "static" too!
+    if (!initialized)
+    {
+        initialized = true;
+        wxLocale::Init(currentLanguage, wxLOCALE_LOAD_DEFAULT | wxLOCALE_CONV_ENCODING);
     }
 
     //load language file into buffer
@@ -123,7 +96,6 @@ void CustomLocale::loadLanguageFile(int language)
         ifstream langFile(languageFile.c_str(), ios::binary);
         if (langFile)
         {
-            int rowNumber = 0;
             TranslationLine currentLine;
 
             //Delimiter:
@@ -131,7 +103,7 @@ void CustomLocale::loadLanguageFile(int language)
             //Linux: 0xa        \n
             //Mac:   0xd        \r
             //Win:   0xd 0xa    \r\n    <- language files are in Windows format
-            while (langFile.getline(temp, bufferSize, 0xd)) //specify delimiter explicitly
+            for (int rowNumber = 0; langFile.getline(temp, bufferSize, 0xd); ++rowNumber) //specify delimiter explicitly
             {
                 langFile.get(); //discard the 0xa character
 
@@ -147,7 +119,6 @@ void CustomLocale::loadLanguageFile(int language)
                     currentLine.translation = formattedString;
                     translationDB.insert(currentLine);
                 }
-                ++rowNumber;
             }
             langFile.close();
         }
@@ -155,7 +126,7 @@ void CustomLocale::loadLanguageFile(int language)
             wxMessageBox(wxString(_("Could not read language file ")) + wxT("\"") + wxString(languageFile.c_str(), wxConvUTF8) + wxT("\""), _("An exception occured!"), wxOK | wxICON_ERROR);
     }
     else
-        ;   //if languageFile is empty language is defaulted to english
+        ;   //if languageFile is empty texts will be english per default
 
     //these global variables need to be redetermined on language selection
     GlobalResources::decimalPoint = _(".");
@@ -175,4 +146,3 @@ const wxChar* CustomLocale::GetString(const wxChar* szOrigString, const wxChar* 
     //fallback
     return (szOrigString);
 }
-

@@ -168,7 +168,7 @@ void UpdateWhileExecuting::waitUntilReady()
 }
 //          /|\  \|/   must be called directly after each other
 
-void UpdateWhileExecuting::execute(StatusUpdater* statusUpdater)
+void UpdateWhileExecuting::execute(StatusHandler* statusUpdater)
 {
     readyToReceiveResult.Lock();
 
@@ -179,8 +179,8 @@ void UpdateWhileExecuting::execute(StatusUpdater* statusUpdater)
     {
         statusUpdater->requestUiRefresh(true); //ATTENTION: Exception "AbortThisProcess" may be thrown here!!!
 
-        if (workDone == true) //workaround for a bug in wxWidgets v2.8.9 class wxCondition: signals might get lost
-            break;            //no mutex for workDone needed here: it is changed only when mainthread is in WaitTimeout()
+        if (workDone) //workaround for a bug in wxWidgets v2.8.9 class wxCondition: signals might get lost
+            break;    //no mutex for workDone needed here: it is changed only when mainthread is in WaitTimeout()
     }
 }
 

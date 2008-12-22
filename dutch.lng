@@ -1,0 +1,596 @@
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+  Time: 
+  Tijd: 
+ Byte
+ Byte
+ GB
+ GB
+ MB
+ MB
+ PB
+ PB
+ TB
+ TB
+ You may try to synchronize remaining items again (WITHOUT having to re-compare)!
+ U kunt proberen om de resterende bestanden opnieuw te synchroniseren (ZONDER opnieuw te hoeven vergelijken)!
+ already exists. Overwrite?
+ bestaat al. Overschrijven?
+ directories
+ paden
+ directory
+ pad
+ file, 
+ Bestand, 
+ files, 
+ Bestanden, 
+ item(s):\n\n
+ item(s):\n\n
+ kB
+ kB
+ of 
+ van 
+ overwriting 
+ en overschrijven 
+ row in view
+ rij in zicht
+ rows in view
+ rijen in zicht
+ to 
+ naar 
+!=	files are different\n
+!=	Bestanden zijn verschillend\n
+&Abort
+&Afbreken
+&About...
+&Informatie...
+&Adjust file times
+&Pas bestandstijden aan
+&Advanced
+&Geavanceerd
+&Back
+&Terug
+&Cancel
+&Annuleren
+&Compare
+&Vergelijken
+&Continue
+&Doorgaan
+&Create
+&Creëer
+&Create batch job
+&Creëer batchjob
+&Default
+&Standaard
+&Export file list
+&Exporteer bestandslijst
+&File
+&Bestand
+&Help
+&Help
+&Language
+&Taal
+&OK
+&OK
+&Pause
+&Pause
+&Quit
+&Afsluiten
+&Retry
+&Opnieuw proberen
+&Start
+&Start
+&Synchronize
+&Synchroniseer
+(-)	filtered out from sync-process\n
+(-)	wordt niet gesynchroniseerd\n
+,
+.
+- different
+- verschillend
+- different (same date, different size)
+- verschillend (zelfde datum, verschillende grootte)
+- equal
+- gelijk
+- exists left only
+- bestaat alleen links
+- exists right only
+- bestaat alleen rechts
+- left
+- links
+- left newer
+- links is nieuwer
+- right
+- rechts
+- right newer
+- rechts is nieuwer
+- same date (different size)
+- zelfde datum (verschillende grootte)
+-------------------------------------------------
+-----------------------------------------------------
+---------\n
+-----------\n
+-Open-Source file synchronization-
+-Open-Source bestandssynchronisatie-
+.
+,
+1. &Compare
+1. &Vergelijk
+1. Enter full file or directory names separated by ';' or a new line.
+1. Geef de volledige naam van het bestand of pad gescheiden bij ';' of een nieuwe regel.
+2. &Synchronize...
+2. &Synchroniseer...
+2. Use wildcard characters '*' and '?'.
+2. U kunt gebruik maken van wildcard karakters zoals '*' en '?'.
+3. Exclude files directly on main grid via context menu.
+3. Sluit bestanden direct uit in het hoofscherm via een contextmenu
+4. Keep the number of entries small for best performance.
+4. Houd het aantal klein voor de beste prestaties
+<<	left file is newer\n
+<<	linker bestand is nieuwer\n
+<Directory>
+<Pad>
+<multiple selection>
+<veelvoudige selectie>
+<|	file on left side only\n
+<|	bestand bestaat alleen links\n
+==	files are equal\n\n
+==	bestanden zijn gelijk\n\n
+>>	right file is newer\n
+>>	rechter bestand is nieuwer\n
+Abort
+Afbreken
+Abort requested: Waiting for current operation to finish...
+Bezig met afbreken: wachten op beëindigen huidige handeling...
+Aborted
+Afgebroken
+About
+Informatie
+Action
+Actie
+Add folder pair
+Voeg 1 paar gekoppelde mappen toe
+Add to exclude filter: 
+Voeg toe om filter uit te sluiten: 
+Adjust file times
+Pas bestandstijden aan
+Adjust modification times of all files contained in the specified folder and its subfolders. This manual adaption might become necessary if you are synchronizing against a FAT32 drive and the daylight saving time is switched. For an overview about the issue see this article:
+Past de bewerkingstijden aan van alle bestanden in de gespecificeerde map en onderliggende mappen. Deze handeling is misschien nodig als u synchroniseerd naar een FAT32-schijf en de zomertijd is ingeschakeld. Voor meer informatie hierover kunt u terecht bij het volgende artikel:
+All file times have been adjusted successfully!
+Alle bestandstijden zijn succesvol aangepast!
+All items have been synchronized!
+Alle bestanden zijn gesynchroniseerd!
+An error occured
+Er is een fout opgetreden
+An exception occured!
+Er heeft een uitzondering plaatsgevonden!
+Apply
+Toepassen
+As a result 6 different status can be returned to categorize all files:
+Hierdoor kunt u 6 verschillende opties gebruiken om de bestanden te categoriseren:
+As a result the files are separated into the following categories:
+Hierdoor worden de bestanden gescheiden in de volgende categorieën:
+As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
+Zoals de naam suggereert, worden twee bestanden met dezelfde naam alleen gemarkeerd als gelijk, als ze precies dezelfde inhoud hebben. Deze optie is handig voor een consistentiecontrole in plaats van back-up handelingen. Daarom worden de tijdstempels niet bekeken.\n\n Met deze optie aan is de beslissingsboom korter:
+Assemble a batch file with the following settings. To start synchronization in batch mode simply execute this file or schedule it in your operating system's task planner.
+Creëer een batchbestand met de volgende instellingen. Om synchronisatie\nin batchmodus uit te voeren kunt u dit bestand uitvoeren of opnemen in de taakplanner van het systeem.
+Batch file created successfully!
+Batchbestand is succesvol aangemaakt!
+Big thanks for localizing FreeFileSync goes out to:
+Extra dank voor het vertalen van FreeFileSync gaat naar:
+Build: 
+Gebouwd: 
+Choose to hide filtered files/directories from list
+Gefilterde bestanden niet/wel weergeven
+Comma separated list
+Komma gescheiden lijst
+Compare both sides
+Beide zijden vergelijken
+Compare by \"File content\"
+Vergelijk met \"bestandsinhoud\"
+Compare by \"File size and date\"
+Vergelijk met \"bestandsgrootte en -datum\"
+Compare by...
+Vergelelijk met...
+Comparing content
+Vergelijken van inhoud
+Comparing content of files 
+Vergelijken van bestandsinhoud 
+Comparing...
+Vergelijken...
+Completed
+Volbracht
+Configuration
+Configuratie
+Configuration loaded!
+Configuratie geladen!
+Configuration overview:
+Configuratie overzicht:
+Configuration saved!
+Configuratie opgeslagen!
+Configure filter
+Configuratie filter
+Configure filter...
+Configuratie filter...
+Configure your own synchronization rules.
+Configureer uw eigen synchronisatieregels.
+Confirm
+Bevestig
+Continue
+Doorgaan
+Continue on error
+Doorgaan bij fout
+Continue on next errors
+Doorgaan bij volgende fouten
+Copy from left to right
+Kopieer van links naar rechts
+Copy from left to right overwriting
+Kopieer en overschrijf van links naar rechts
+Copy from right to left
+Kopieer van rechts naar links
+Copy from right to left overwriting
+Kopieer en overschrijf van rechts naar links
+Copy to clipboard\tCTRL+C
+Kopieer naar het klembord\tCTRL+C
+Copying file 
+Bestand wordt gekopieerd 
+Could not open configuration file 
+Fout bij openen van configuratiebestand 
+Could not open file: 
+Fout bij het openen van bestand: 
+Could not read language file 
+Fout bij het lezen van taalbestand 
+Could not retrieve file info for: 
+Fout bij het verkrijgen van bestandsinformatie van: 
+Could not set working directory to directory containing executable file!
+Fout bij het instellen van de huidige map naar een map met een toepassing erin!
+Could not write configuration file 
+Fout bij het schrijven naar het configuratiebestand 
+Could not write to 
+Fout bij het schrijven naar 
+Create a batch job
+Creëer batchjob
+Create:
+Aanmaken:
+Creating folder 
+Folder aanmaken 
+Current operation:
+Huidige operatie:
+Custom
+Gebruik
+DECISION TREE
+BESLISSINGSBOOM
+Data remaining:
+Resterende data:
+Data:
+Data:
+Date
+Datum
+Delete files/folders existing on left side only
+Verwijder bestanden/folders die alleen links bestaan
+Delete files/folders existing on right side only
+Verwijder bestanden/folders die alleen rechts bestaan
+Delete files\tDEL
+Verwijder bestanden\tDEL
+Delete:
+Verwijderen:
+Deleting file 
+Bestand wordt verwijderd 
+Deleting folder 
+Folder wordt verwijderd 
+Directory does not exist: 
+Map bestaat niet:
+Do not show graphical status and error messages but write to a logfile instead
+Geef geen grafische status en foutmeldingen weer, maar sla het op in een logbestand
+Do nothing
+Geen actie ondernemen
+Do you really want to delete the following objects(s)?
+Weet u zeker dat u de volgende bestanden wilt verwijderen?
+Do you really want to move the following objects(s) to the recycle bin?
+Weet u zeker dat u de volgende bestanden naar de prullenbak wilt verplaatsen?
+Donate with PayPal
+Doneer met PayPal
+Drag && drop
+Drag en drop
+Email:
+Email:
+Error
+Fout
+Error adapting modification time of file 
+Er is een fout opgetreden bij het wijzigen van de modificatietijd van het bestand 
+Error changing modification time: 
+Er is een fout opgetreden bij het wijzigen van de bestandstijden
+Error converting FILETIME to SYSTEMTIME
+Er is een fout opgetreden bij het converteren van FILETIME naar SYSTEMTIME
+Error converting FILETIME to local FILETIME
+Er is een fout opgetreden bij het converteren van FILETIME naar (lokale) FILETIME
+Error copying file 
+Er is een fout opgetreden bij het kopiëren van een bestand 
+Error creating directory 
+Er is een fout opgetreden bij het aanmaken van een map 
+Error deleting directory 
+Er is een fout opgetreden bij het verwijderen van een map 
+Error deleting file 
+Er is een fout opgetreden bij het verwijderen van een bestand 
+Error moving to recycle bin: 
+Er is een fout opgetreden bij verwijderen naar de prullenbak
+Error parsing configuration file 
+Er is een fout opgetreden bij het aanmaken van een configuratiebestand 
+Error reading file: 
+Er is een fout opgetreden bij het lezen van het bestand: 
+Error traversing directory 
+Er is een fout opgetreden bij het doorzoeken van een map 
+Error when converting int to wxString
+Er is een fout opgetreden bij het converteren van int naar wxString
+Error when converting wxString to double
+Er is een fout opgetreden bij het converteren van wxString naar double
+Error when converting wxString to long
+Er is een fout opgetreden bij het converteren van wxString naar long
+Error: Source directory does not exist anymore: 
+Er is een fout opgetreden. De oorspronkelijke map bestaat niet meer: 
+Example
+Voorbeeld
+Exclude
+Uitsluiten
+Exclude temporarily
+Tijdelijk uitsluiten
+Feedback and suggestions are welcome at:
+Tips en suggesties zijn welkom op:
+File content
+Bestandsinhoud
+File list exported!
+Bestandslijst geëxporteerd!
+File size and date
+Bestandsgrootte en -datum
+Filename
+Bestandsnaam
+Files are found equal if\n     - file content\nis the same.
+Bestanden worden gelijk beschouwd als,\n     - de inhoud\novereenkomt.
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
+Bestanden worden gelijk beschouwd als,\n     - de grootte\n     - datum en tijdstip van de laatste wijziging\novereenkomt.
+Files remaining:
+Resterende bestanden:
+Files that exist on both sides and have different content
+Bestanden die aan beide kanten bestaan maar een verschillende inhoud hebben
+Files that exist on both sides, have same date but different filesizes
+Bestanden die aan beide kanten bestaan, dezelfde datum hebben maar verschillende bestandgroottes
+Files that exist on both sides, left one is newer
+Bestanden die aan beide kanten bestaan, maar waarvan de linkerkant nieuwer is
+Files that exist on both sides, right one is newer
+Bestanden die aan beide kanten bestaan, maar waarvan de rechterkant nieuwer is
+Files/folders remaining:
+Resterende bestanden/mappen:
+Files/folders scanned:
+Aantal bestanden/mappen gescand:
+Files/folders that exist on left side only
+Bestanden/mappen die alleen aan de linkerkant bestaan
+Files/folders that exist on right side only
+Bestanden/mappen die alleen aan de rechterkant bestaan
+Filter
+Filter
+Filter active: Press again to deactivate
+Filter actief: nogmaals klikken om uit te zetten
+Filter files
+Filter bestanden
+Filter view
+Bekijk het filter
+Folder pair
+Gekoppelde mappen
+FreeFileSync   (Date: 
+FreeFileSync   (Datum: 
+FreeFileSync - Folder Comparison and Synchronization
+FreeFileSync - Mappen vergelijken en synchroniseren
+FreeFileSync Batch Job
+FreeFileSync batchjob
+FreeFileSync at Sourceforge
+FreeFileSync op Sourceforge
+FreeFileSync batch file
+FreeFileSync batchbestand
+FreeFileSync configuration
+FreeFileSync configuratie
+Help
+Help
+Hide files that are different
+Verberg bestanden die verschillend zijn
+Hide files that are equal
+Verberg bestanden die gelijk zijn
+Hide files that are newer on left
+Verberg bestanden die aan de linkerkant nieuwer zijn
+Hide files that are newer on right
+Verberg bestanden die aan de rechterkant nieuwer zijn
+Hide files that exist on left side only
+Verberg bestanden die alleen aan de linkerkant bestaan
+Hide files that exist on right side only
+Verberg bestanden die alleen aan de rechterkant bestaan
+Hide filtered items
+Verberg gefilterde items
+Hide further error messages during the current process and continue
+Ga door en geef volgende foutmeldingen tijdens dit proces niet meer weer
+Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
+Verbergt foutmeldingen tijdens het synchroniseren:\nze worden verzameld en op het eind in een lijst getoond
+Hints:
+Tips:
+Homepage:
+Homepage:
+If you like FFS:
+Als het programma u bevalt:
+Include
+Gebruiken
+Include temporarily
+Gebruik tijdelijk
+Include: *.doc;*.zip;*.exe\nExclude: *\\temp\\*
+Gebruiken: *.doc;*.zip;*.exe\nUitsluiten: *\\temp\\*
+Info
+Info
+Information
+Informatie
+Initialization of Recycle Bin failed! It cannot be used!
+Initialiseren van de prullenbak is mislukt. Het kan niet worden gebruikt!
+It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
+Het was niet mogelijk de prullenbak te initialiseren!\n\nHet is waarschijnlijk dat u niet Windows gebruikt.\nAls u deze optie wel wilt, neem dan alstublieft contact op met de auteur. :)
+Left folder:
+Linker map:
+Legend\n
+Legenda\n
+Load configuration via...\n     - this list (press DEL to delete items)\n     - drag & drop to this window\n     - startup parameter
+Laad configuratie via...\n     - deze lijst (druk op DEL om items te verwijderen)\n     - drag en drop in dit venster\n     - opstartparameter
+Load from file...
+Laad met behulp van...
+Log-messages:\n-------------
+Logberichten:\n---------------
+Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
+Spiegel backup van de linkerkant: de rechterkant wordt overschreven en komt na synchronisatie exact overeen met de linkerkant.
+No valid configuration file specified: 
+Er is geen geldig configuratiebestand gespecificeerd: 
+Not all items were synchronized! Have a look at the list.
+Niet alle bestanden zijn gesynchroniseerd! Bekijk de lijst.
+Nothing to synchronize. Both directories adhere to the sync-configuration!
+Er is niks om te synchroniseren. Beide mappen komen overeen met de synchronisatie instellingen!
+Number of files and directories that will be created
+Aantal mappen en bestanden die zullen worden aangemaakt
+Number of files and directories that will be deleted
+Aantal mappen en bestanden die zullen worden verwijderd
+Number of files that will be overwritten
+Aantal bestanden dat zal worden overschreven
+One way ->
+Naar rechts ->
+Only files/directories that pass filtering will be selected for synchronization.\nThe filter will be applied to the full name including path prefix.
+Alleen de niet gefilterde bestanden worden geselecteerd voor synchronisatie.\nHet filter wordt toegepast op de volledige naam inclusief pad-voorvoegsel.
+Open synchronization dialog
+Open de synchronisatie-instellingen
+Open with Explorer\tD-Click
+Open met Verkenner\tD-Click
+Operation aborted!
+Operatie afgebroken!
+Operation:
+Voortgang:
+Pause
+Pause
+Please fill all empty directory fields.
+Vul alstublieft aan beide kanten een pad in.
+Press button to activate filter
+Druk op de knop om het filter te activeren.
+Preview
+Voorbeeld
+Published under the GNU General Public License:
+Gepubliceerd onder de GNU General Public License:
+Quit
+Afsluiten
+Relative path
+Relatieve pad
+Remove folder pair
+Verwijder 1 paar gekoppelde mappen
+Result
+Resultaat
+Right folder:
+Rechter map:
+Save current configuration to file
+Sla de huidige instellingen op in een bestand
+Saved aborted!
+Opslaan afgebroken!
+Scanning 
+Scannen 
+Scanning...
+Data wordt doorlopen...
+Select a folder
+Selecteer een map
+Select folder
+Selecteer een folder
+Select variant:
+Selecteer een variant:
+Set filter for synchronization
+Filter instellen
+Show files that are different
+Geef bestanden die verschillend zijn weer
+Show files that are equal
+Geef bestanden die gelijk zijn weer
+Show files that are newer on left
+Geef bestanden weer die nieuwer zijn aan de linkerkant
+Show files that are newer on right
+Geef bestanden weer die nieuwer zijn aan de rechterkant
+Show files that exist on left side only
+Geef bestanden weer die alleen bestaan aan de linkerkant
+Show files that exist on right side only
+Geef bestanden weer die alleen bestaan aan de rechterkant
+Silent mode
+Stille modus
+Size
+Grootte
+Source code written completely in C++ utilizing:
+Broncode compleet geschreven in C++ met behulp van:
+Start
+Start
+Start synchronization
+Start synchroniseren
+Stop
+Stop
+Swap sides
+Verwissel van kant
+SyncJob.ffs_batch
+SyncJob.ffs_batch
+Synchronization aborted!
+Synchronisatie afgebroken!
+Synchronization completed successfully.
+Synchronisatie succesvol afgerond.
+Synchronization completed with errors!
+Synchronisatie afgerond. Er zijn fouten opgetreden.
+Synchronization settings
+Synchronisatie instellingen
+Synchronization status
+Synchronisatie: status
+Synchronize all .doc, .zip and .exe files except everything from folder \"temp\".
+Synchroniseer alle .doc, .zip en .exe bestanden behalve alles uit de map \"temp\".
+Synchronize both sides simultaneously: Copy new or updated files in both directions.
+Synchroniseer beide zijde tegelijkertijd: kopieer nieuwe of geüpdatete bestanden in beide richtingen.
+Synchronizing...
+Aan het synchroniseren...
+System out of memory!
+Systeem heeft te weinig geheugen
+The selected file does not contain a valid configuration!
+Het geselecteerde bestand bevat geen geldige configuratie!
+The selected file does not exist anymore!
+Het geselecteerde bestand bestaat niet meer!
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
+Deze variant ziet twee gelijknamige bestanden als gelijk wanneer ze dezelfde bestandsgrootte EN tijdstempel hebben. Merk op dat tijdstempel 2 seconden mag verschillen. Dit zorgt ervoor dat het minder nauwkeurige FAT-32 ook kan worden gesynchroniseerd.
+Time elapsed:
+Verstreken tijd:
+Time shift in seconds
+Timeshift in seconden
+Total amount of data that will be transferred
+Hoeveelheid data die verplaatst word
+Total time: 
+Totale tijd: 
+Two way <->
+Beide zijden <->
+Unable to create logfile!
+Niet mogelijk om een logbestand aan te maken!
+Unable to initialize Recycle Bin!
+De prullenbak kon niet worden geïnitialiseerd!
+Unresolved errors occured during operation!
+Er is een onbekende fout opgetreden tijdens de handeling!
+Update:
+Overschrijven:
+Use Recycle Bin
+Gebruik de prullenbak
+Use Recycle Bin when deleting or overwriting files during synchronization
+Gebruik de prullenbak wanneer bestanden worden verwijderd of overschreven tijdens het synchroniseren
+Warning
+Attentie
+Warning: Synchronization failed for 
+Attentie: synchronisatie mislukt voor 
+When \"Compare\" is triggered with this option set the following decision tree is processed:
+Wanneer \"Compare\" met deze instelling aan wordt gebruikt zal de volgende beslissingsboom gebruikt worden:
+\n\nContinue with next object, retry or abort comparison?
+\n\nDoorgaan met volgende object, opnieuw proberen of het vergelijken afbreken?
+\n\nContinue with next object, retry or abort synchronization?
+\n\nDoorgaan met volgende object, opnieuw proberen of de synchronisatie afbreken?
+\n\nInformation: If you skip the error and continue or abort a re-compare will be necessary!
+\n\nInformatie: Als u de fout negeert en doorgaat of afbreekt zult u opnieuw moeten vergelijken!
+different
+verschillend
+file exists on both sides
+Bestand bestaat aan beide zijde
+on one side only
+alleen aan één kant
+|>	file on right side only\n
+|>	Bestand bestaat alleen aan de rechter kant\n

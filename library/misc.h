@@ -4,6 +4,7 @@
 #include <wx/string.h>
 #include <set>
 #include <wx/intl.h>
+#include <wx/panel.h>
 
 using namespace std;
 
@@ -32,12 +33,9 @@ class CustomLocale : public wxLocale
 {
 public:
     CustomLocale();
+    ~CustomLocale() {}
 
-    ~CustomLocale();
-
-    void loadLanguageFromCfg();
-
-    void loadLanguageFile(int language);
+    void setLanguage(const int language);
 
     int getLanguage()
     {
@@ -52,5 +50,6 @@ private:
     Translation translationDB;
     int currentLanguage;
 };
+
 
 #endif // MISC_H_INCLUDED

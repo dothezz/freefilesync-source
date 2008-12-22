@@ -44,6 +44,8 @@
 &Abbruch
 &About...
 &Über...
+&Adjust file times
+&Dateizeiten ändern
 &Advanced
 &Erweitert
 &Back
@@ -112,12 +114,20 @@
 -Open-Source Datei-Synchronisation-
 .
 ,
-1. Enter full file or directory names separated by ';' or a new line.\n2. Use wildcard characters '*' and '?'.
-1. Komplette Datei- und Verzeichnisnamen getrennt durch ';' oder eine Neuzeile eingeben.\n2. Die Platzhalter '*' und '?' werden unterstützt.
+1. Enter full file or directory names separated by ';' or a new line.
+1. Komplette Datei- und Verzeichnisnamen getrennt durch ';' oder eine Neuzeile eingeben.
+2. Use wildcard characters '*' and '?'.
+2. Die Platzhalter '*' und '?' werden unterstützt.
+3. Exclude files directly on main grid via context menu.
+3. Dateien können direkt über das Kontextmenü im Hauptfenster ausgeschlossen werden.
+4. Keep the number of entries small for best performance.
+4. Für beste Performance möglichst wenige Einträge filtern.
 <<	left file is newer\n
 <<	linke Datei ist neuer\n
 <Directory>
 <Verzeichnis>
+<multiple selection>
+<Mehrfachauswahl>
 <|	file on left side only\n
 <|	Datei existiert nur links\n
 ==	files are equal\n\n
@@ -138,12 +148,20 @@ Add folder pair
 Verzeichnispaar hinzufügen
 Add to exclude filter: 
 Über Filter ausschließen: 
+Adjust file times
+Dateizeiten ändern
+Adjust modification times of all files contained in the specified folder and its subfolders. This manual adaption might become necessary if you are synchronizing against a FAT32 drive and the daylight saving time is switched. For an overview about the issue see this article:
+Passt die Änderungszeiten aller Datein im angegebenen Ordner einschließlich Unterordner an. Diese manuelle Änderung kann nötig sein, wenn gegen ein FAT32-Laufwerk synchronisiert und zwischen Sommer- und Winterzeit umgestellt wurde. Für eine Übersicht der Problematik siehe:
+All file times have been adjusted successfully!
+Alle Dateien wurden erfolgreich angepasst!
 All items have been synchronized!
 Alle Elemente wurden synchronisiert!
 An error occured
 Fehler
 An exception occured!
 Eine Exception wurde geworfen!
+Apply
+Anwenden
 As a result 6 different status can be returned to categorize all files:
 Als Ergebnis werden 6 verschiedene Status zurückgegeben, um Dateien zu kategorisieren:
 As a result the files are separated into the following categories:
@@ -212,8 +230,6 @@ Copy to clipboard\tCTRL+C
 Kopiere in Zwischenablage\tCTRL+C
 Copying file 
 Kopiere Datei 
-Could not create file 
-Fehler beim Erstellen der Datei 
 Could not open configuration file 
 Fehler beim Öffnen der Datei 
 Could not open file: 
@@ -258,8 +274,8 @@ Deleting file
 Lösche Datei 
 Deleting folder 
 Lösche Verzeichnis 
-Directory does not exist. Please select a new one: 
-Das Verzeichnis existiert nicht. Bitte ein anderes auswählen: 
+Directory does not exist: 
+Das Verzeichnis existiert nicht: 
 Do not show graphical status and error messages but write to a logfile instead
 Keine graphischen Status- und Fehlermeldungen anzeigen, sondern eine Logdatei erstellen
 Do nothing
@@ -278,6 +294,8 @@ Error
 Fehler
 Error adapting modification time of file 
 Fehler beim Anpassen des Datums der letzten Änderung der Datei 
+Error changing modification time: 
+Fehler beim Setzen der Änderungszeit: 
 Error converting FILETIME to SYSTEMTIME
 Fehler beim Konvertieren der FILETIME nach SYSTEMTIME
 Error converting FILETIME to local FILETIME
@@ -290,12 +308,14 @@ Error deleting directory
 Fehler beim Löschen des Verzeichnisses 
 Error deleting file 
 Fehler beim Löschen der Datei 
-Error moving file to recycle bin: 
-Fehler beim Verschieben der Datei in den Papierkorb: 
+Error moving to recycle bin: 
+Fehler beim Verschieben in den Papierkorb: 
 Error parsing configuration file 
 Fehler beim Auswerten der Konfigurationsdatei 
 Error reading file: 
 Fehler beim Lesen der Datei: 
+Error scanning directory: 
+Fehler beim Lesen des Verzeichnisses: 
 Error traversing directory 
 Fehler beim Durchsuchen des Verzeichnisses 
 Error when converting int to wxString
@@ -324,8 +344,8 @@ Filename
 Dateiname
 Files are found equal if\n     - file content\nis the same.
 Dateien gelten als gleich, wenn\n     - der Inhalt\ngleich ist.
-Files are found equal if\n     - filesize\n     - last write time (UTC) and date\nare the same.
-Dateien gelten als gleich, wenn\n     - die Größe\n     - Datum und Uhrzeit(UTC) der letzten Änderung\ngleich sind.
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
+Dateien gelten als gleich, wenn\n     - die Größe\n     - Datum und Uhrzeit der letzten Änderung\ngleich sind.
 Files remaining:
 Verbliebene Dateien:
 Files that exist on both sides and have different content
@@ -368,6 +388,18 @@ FreeFileSync configuration
 FreeFileSync Konfiguration
 Help
 Hilfe
+Hide files that are different
+Blende unterschiedliche Dateien aus
+Hide files that are equal
+Blende gleiche Dateien aus
+Hide files that are newer on left
+Blende Dateien aus, die auf beiden Seiten existieren; linke Datei ist neuer
+Hide files that are newer on right
+Blende Dateien aus, die auf beiden Seiten existieren; rechte Datei ist neuer
+Hide files that exist on left side only
+Blende Dateien aus, die nur links existieren
+Hide files that exist on right side only
+Blende Dateien aus, die nur rechts existieren
 Hide filtered items
 Gefilterte Elemente ausblenden
 Hide further error messages during the current process and continue
@@ -460,6 +492,8 @@ Scanning...
 Suche Dateien...
 Select a folder
 Verzeichnis wählen
+Select folder
+Verzeichnis auswählen
 Select variant:
 Variante auswählen:
 Set filter for synchronization
@@ -508,6 +542,8 @@ Synchronize both sides simultaneously: Copy new or updated files in both directi
 Beide Seiten gleichzeitig synchronisieren: Neue oder aktualisierte Dateien werden auf die jeweils andere Seite kopiert.
 Synchronizing...
 Synchronisiere...
+System out of memory!
+Zu wenig freier Arbeitsspeicher!
 The selected file does not contain a valid configuration!
 Die ausgewählte Datei enthält keine gültige Konfiguration!
 The selected file does not exist anymore!
@@ -516,6 +552,8 @@ This variant evaluates two equally named files as being equal when they have the
 Diese Variante identifiziert zwei gleichnamige Dateien als gleich, wenn sie die gleiche Dateigröße haben UND der Zeitpunkt der letzten Änderung derselbe ist. Dabei wird eine Abweichung von bis zu zwei Sekunden toleriert. So ist sichergestellt, dass eine Synchronisation gegen ein FAT32 Dateisystem korrekt funktioniert.
 Time elapsed:
 Vergangene Zeit:
+Time shift in seconds
+Zeitverschiebung in Sekunden
 Total amount of data that will be transferred
 Gesamtmenge der Daten, die übertragen werden
 Total time: 

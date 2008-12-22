@@ -3,11 +3,14 @@
 
 #include <string>
 #include <algorithm>
+#include <vector>
 #include <wx/string.h>
 #include <fstream>
 #include <wx/stream.h>
+#include <wx/stopwatch.h>
 
 using namespace std;
+
 
 namespace globalFunctions
 {
@@ -40,9 +43,54 @@ namespace globalFunctions
 
     int readInt(wxInputStream& stream);  //read int from file stream
     void writeInt(wxOutputStream& stream, const int number);  //write int to filestream
+
+    void startPerformance(); //helper method for quick performance measurement
+    void stopPerformance();
 }
 
 
+//############################################################################
+class Performance
+{
+public:
+    wxDEPRECATED(Performance()); //generates compiler warnings as a reminder to remove code after measurements
+    ~Performance();
+    void showResult();
+
+private:
+    bool resultWasShown;
+    wxStopWatch timer;
+};
+
+//two macros for quick performance measurements
+#define PERF_START Performance a;
+#define PERF_STOP  a.showResult();
+
+
+//############################################################################
+class wxFile;
+class DebugLog
+{
+public:
+    wxDEPRECATED(DebugLog());
+    ~DebugLog();
+    void write(const wxString& logText);
+
+private:
+    wxString assembleFileName();
+    wxString logfileName;
+    int lineCount;
+    wxFile* logFile; //logFile.close(); <- not needed
+};
+extern DebugLog logDebugInfo;
+wxString getCodeLocation(const wxString file, const int line);
+
+//small macro for writing debug information into a logfile
+#define WRITE_DEBUG_LOG(x) logDebugInfo.write(getCodeLocation(__TFILE__, __LINE__) + x);
+//speed alternative: wxLogDebug(wxT("text")) + DebugView
+
+
+//############################################################################
 class RuntimeException //Exception class used to notify of general runtime exceptions
 {
 public:
@@ -50,6 +98,7 @@ public:
 
     wxString show() const
     {
+
         return errorMessage;
     }
 

@@ -44,7 +44,7 @@ public:
     //set sort direction indicator on UI
     void setSortMarker(const int sortColumn, const wxBitmap* bitmap = &wxNullBitmap);
 
-    void DrawColLabel( wxDC& dc, int col );
+    void DrawColLabel(wxDC& dc, int col);
 
 private:
     void adjustGridHeights();

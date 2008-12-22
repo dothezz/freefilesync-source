@@ -10,12 +10,6 @@
 
 using namespace std;
 
-enum SyncDirection
-{
-    SYNC_DIR_LEFT,
-    SYNC_DIR_RIGHT,
-    SYNC_DIR_NONE
-};
 
 enum CompareVariant
 {
@@ -25,15 +19,33 @@ enum CompareVariant
 
 struct SyncConfiguration
 {
-    SyncDirection exLeftSideOnly;
-    SyncDirection exRightSideOnly;
-    SyncDirection leftNewer;
-    SyncDirection rightNewer;
-    SyncDirection different;
+    SyncConfiguration() :
+            exLeftSideOnly(SYNC_DIR_RIGHT),
+            exRightSideOnly(SYNC_DIR_RIGHT),
+            leftNewer(SYNC_DIR_RIGHT),
+            rightNewer(SYNC_DIR_RIGHT),
+            different(SYNC_DIR_RIGHT) {}
+
+    enum Direction
+    {
+        SYNC_DIR_LEFT,
+        SYNC_DIR_RIGHT,
+        SYNC_DIR_NONE
+    };
+
+    Direction exLeftSideOnly;
+    Direction exRightSideOnly;
+    Direction leftNewer;
+    Direction rightNewer;
+    Direction different;
 };
 
+
 struct MainConfiguration
-{   //Compare setting
+{
+    MainConfiguration();
+
+    //Compare setting
     CompareVariant compareVar;
 
     //Synchronisation settings
@@ -44,32 +56,28 @@ struct MainConfiguration
     wxString includeFilter;
     wxString excludeFilter;
 
+
     //misc options
     bool useRecycleBin;   //use Recycle bin when deleting or overwriting files while synchronizing
     bool continueOnError; //hides error messages during synchronization
 };
 
-struct FileInfo
-{
-    wxULongLong fileSize; //unit: bytes!
-    wxString lastWriteTime;
-    wxULongLong lastWriteTimeRaw; //unit: seconds!
-};
-
-enum ObjectType
-{
-    TYPE_NOTHING,
-    TYPE_DIRECTORY,
-    TYPE_FILE
-};
 
 struct FileDescrLine
 {
     FileDescrLine() : objType(TYPE_NOTHING) {}
 
-    wxString filename;  // == directory + relFilename
+    enum ObjectType
+    {
+        TYPE_NOTHING,
+        TYPE_DIRECTORY,
+        TYPE_FILE
+    };
+
+    wxString fullName;  // == directory + relativeName
     wxString directory; //directory to be synced
-    wxString relFilename; //filename without directory that is being synchronized
+    wxString relativeName; //fullName without directory that is being synchronized
+    //Note on performance: Keep redundant information "directory" and "relativeName"! Extracting info from "fullName" results in noticeable performance loss!
     wxString lastWriteTime;
     wxULongLong lastWriteTimeRaw;
     wxULongLong fileSize;
@@ -81,30 +89,30 @@ struct FileDescrLine
     //Windows does NOT distinguish between upper/lower-case
     bool operator>(const FileDescrLine& b ) const
     {
-        return (relFilename.CmpNoCase(b.relFilename) > 0);
+        return (relativeName.CmpNoCase(b.relativeName) > 0);
     }
     bool operator<(const FileDescrLine& b) const
     {
-        return (relFilename.CmpNoCase(b.relFilename) < 0);
+        return (relativeName.CmpNoCase(b.relativeName) < 0);
     }
     bool operator==(const FileDescrLine& b) const
     {
-        return (relFilename.CmpNoCase(b.relFilename) == 0);
+        return (relativeName.CmpNoCase(b.relativeName) == 0);
     }
 
 #elif defined FFS_LINUX
     //Linux DOES distinguish between upper/lower-case
     bool operator>(const FileDescrLine& b ) const
     {
-        return (relFilename.Cmp(b.relFilename) > 0);
+        return (relativeName.Cmp(b.relativeName) > 0);
     }
     bool operator<(const FileDescrLine& b) const
     {
-        return (relFilename.Cmp(b.relFilename) < 0);
+        return (relativeName.Cmp(b.relativeName) < 0);
     }
     bool operator==(const FileDescrLine& b) const
     {
-        return (relFilename.Cmp(b.relFilename) == 0);
+        return (relativeName.Cmp(b.relativeName) == 0);
     }
 #else
     adapt this
@@ -122,7 +130,7 @@ enum CompareFilesResult
     FILE_DIFFERENT,
     FILE_EQUAL,
 
-    FILE_INVALID //error situation
+    FILE_UNDEFINED
 };
 
 
@@ -142,130 +150,72 @@ typedef vector<FileCompareLine> FileCompareResult;
 typedef int GridViewLine;
 typedef vector<GridViewLine> GridView;  //vector of references to lines in FileCompareResult
 
+
 struct FolderPair
 {
     wxString leftDirectory;
     wxString rightDirectory;
 };
 
-class GetAllFilesFull : public wxDirTraverser
-{
-public:
-    GetAllFilesFull(DirectoryDescrType& output, wxString dirThatIsSearched, StatusUpdater* updateClass = 0);
-
-    wxDirTraverseResult OnFile(const wxString& filename);
-
-    wxDirTraverseResult OnDir(const wxString& dirname);
-
-    wxDirTraverseResult OnOpenError(const wxString& openerrorname);
-
-private:
-    DirectoryDescrType& m_output;
-    wxString directory;
-    int prefixLength;
-    FileInfo currentFileInfo;
-    FileDescrLine fileDescr;
-    StatusUpdater* statusUpdater;
-};
-
-//Note: the following lines are a performance optimization for deleting elements from a vector. It is incredibly faster to create a new
-//vector and leave specific elements out than to delete row by row and force recopying of most elements for each single deletion (linear vs quadratic runtime)
-template <class T>
-void removeRowsFromVector(vector<T>& grid, const set<int>& rowsToRemove)
-{
-    vector<T> temp;
-    int rowToSkip = -1; //keep it an INT!
-
-    set<int>::iterator rowToSkipIndex = rowsToRemove.begin();
-
-    if (rowToSkipIndex != rowsToRemove.end())
-        rowToSkip = *rowToSkipIndex;
-
-    for (int i = 0; i < int(grid.size()); ++i)
-    {
-        if (i != rowToSkip)
-            temp.push_back(grid[i]);
-        else
-        {
-            ++rowToSkipIndex;
-            if (rowToSkipIndex != rowsToRemove.end())
-                rowToSkip = *rowToSkipIndex;
-        }
-    }
-    grid.swap(temp);
-}
 
 class RecycleBin;
-class DirectoryDescrBuffer;
 
-
-class FreeFileSync
+namespace FreeFileSync
 {
-    friend class DirectoryDescrBuffer;
-
-public:
-    FreeFileSync(bool useRecycleBin);
-    ~FreeFileSync();
-
-    //identifiers of different processes
-    static const int scanningFilesProcess      = 1;
-    static const int compareFileContentProcess = 2;
-    static const int synchronizeFilesProcess   = 3;
-
-    //main function for compare
-    static void startCompareProcess(FileCompareResult& output, const vector<FolderPair>& directoryPairsFormatted, const CompareVariant cmpVar, StatusUpdater* statusUpdater);
+    //main functions for compare
+    bool foldersAreValidForComparison(const vector<FolderPair>& folderPairs, wxString& errorMessage);
+    void startCompareProcess(const vector<FolderPair>& directoryPairsFormatted, const CompareVariant cmpVar, FileCompareResult& output, StatusHandler* statusUpdater);
 
     //main function for synchronization
-    static void startSynchronizationProcess(FileCompareResult& grid, const SyncConfiguration& config, StatusUpdater* statusUpdater, bool useRecycleBin);
+    void startSynchronizationProcess(FileCompareResult& grid, const SyncConfiguration& config, StatusHandler* statusUpdater, const bool useRecycleBin);
 
-    static bool foldersAreValidForComparison(const vector<FolderPair>& folderPairs, wxString& errorMessage);
-    static bool recycleBinExists(); //test existence of Recycle Bin API on current system
+    bool recycleBinExists(); //test existence of Recycle Bin API on current system
 
-    static vector<wxString> compoundStringToTable(const wxString& compoundInput, const wxChar* delimiter); //convert ';'-separated list into table of strings
+    void deleteOnGridAndHD(FileCompareResult& grid, const set<int>& rowsToDelete, ErrorHandler* errorHandler, const bool useRecycleBin);
+    void addSubElements(set<int>& subElements, const FileCompareResult& grid, const FileCompareLine& relevantRow);
 
-    static void deleteOnGridAndHD(FileCompareResult& grid, const set<int>& rowsToDelete, StatusUpdater* statusUpdater, bool useRecycleBin);
-    static void addSubElements(set<int>& subElements, const FileCompareResult& grid, const FileCompareLine& relevantRow);
+    void filterCurrentGridData(FileCompareResult& currentGridData, const wxString& includeFilter, const wxString& excludeFilter);
+    void removeFilterOnCurrentGridData(FileCompareResult& currentGridData);
 
-    static void filterCurrentGridData(FileCompareResult& currentGridData, const wxString& includeFilter, const wxString& excludeFilter);
-    static void removeFilterOnCurrentGridData(FileCompareResult& currentGridData);
+    wxString formatFilesizeToShortString(const wxULongLong& filesize);
+    wxString formatFilesizeToShortString(const double filesize);
+    wxString getFormattedDirectoryName(const wxString& dirname);
 
-    static wxString formatFilesizeToShortString(const wxULongLong& filesize);
-    static wxString formatFilesizeToShortString(const double filesize);
-    static wxString getFormattedDirectoryName(const wxString& dirname);
+    void calcTotalBytesToSync(int& objectsToCreate,
+                              int& objectsToOverwrite,
+                              int& objectsToDelete,
+                              double& dataToProcess,
+                              const FileCompareResult& fileCmpResult,
+                              const SyncConfiguration& config);
 
-    static void calcTotalBytesToSync(int& objectsToCreate,
-                                     int& objectsToOverwrite,
-                                     int& objectsToDelete,
-                                     double& dataToProcess,
-                                     const FileCompareResult& fileCmpResult,
-                                     const SyncConfiguration& config);
+    void swapGrids(FileCompareResult& grid);
 
-    static void swapGrids(FileCompareResult& grid);
+    void adjustModificationTimes(const wxString& parentDirectory, const int timeInSeconds, ErrorHandler* errorHandler);
 
-    static const wxString FfsLastConfigFile;
+    const wxString FfsLastConfigFile = wxT("LastRun.ffs_gui");
+    const wxString FfsGlobalSettingsFile = wxT("GlobalSettings.xml");
 
-    static void getFileInformation(FileInfo& output, const wxString& filename);
 
-private:
-    bool synchronizeFile(const FileCompareLine& filename, const SyncConfiguration& config, StatusUpdater* statusUpdater);   // false if nothing had to be done
-    bool synchronizeFolder(const FileCompareLine& filename, const SyncConfiguration& config, StatusUpdater* statusUpdater); // false if nothing had to be done
+//+++++++++++++++++++SUBROUTINES++++++++++++++++++++++++++
+    //create comparison result table and fill relation except for files existing on both sides
+    void performBaseComparison(const vector<FolderPair>& directoryPairsFormatted,
+                               FileCompareResult& output,
+                               StatusHandler* statusUpdater);
 
-    //file copy functionality -> keep instance-bound to to be able to prevent wxWidgets-logging
-    void removeDirectory(const wxString& directory);
-    void removeFile(const wxString& filename);
-    void copyfileMultithreaded(const wxString& source, const wxString& target, StatusUpdater* updateClass);
+    bool synchronizeFile(const FileCompareLine& cmpLine, const SyncConfiguration& config, const bool useRecycleBin, StatusHandler* statusUpdater);   // false if nothing had to be done
+    bool synchronizeFolder(const FileCompareLine& cmpLine, const SyncConfiguration& config, const bool useRecycleBin, StatusHandler* statusUpdater); // false if nothing had to be done
+
+    //file functionality
+    void removeDirectory(const wxString& directory, const bool useRecycleBin);
+    void removeFile(const wxString& filename, const bool useRecycleBin);
+    void copyfileMultithreaded(const wxString& source, const wxString& target, StatusHandler* updateClass);
     void createDirectory(const wxString& directory, int level = 0); //level is used internally only
 
-    //some special file functions
-    static void generateFileAndFolderDescriptions(DirectoryDescrType& output, const wxString& directory, StatusUpdater* updateClass = 0);
+    //misc
+    vector<wxString> compoundStringToFilter(const wxString& filterString); //convert compound string, separated by ';' or '\n' into formatted vector of wxStrings
 
-    bool recycleBinShouldBeUsed;
-    static RecycleBin recycler;
-#ifndef __WXDEBUG__
-    //prevent wxWidgets logging
-    wxLogNull noWxLogs;
-#endif
-};
+    extern RecycleBin recycler;
+}
 
 
 class FileError //Exception class used to notify file/directory copy/delete errors

@@ -1,4 +1,4 @@
-FreeFileSync v1.11
+FreeFileSync v1.12
 ------------------
 
 Usage

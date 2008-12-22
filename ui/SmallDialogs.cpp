@@ -1,7 +1,7 @@
 #include "smallDialogs.h"
 #include "../library/globalFunctions.h"
-//#include <fstream>
 #include "../library/resources.h"
+#include <wx/msgdlg.h>
 
 using namespace globalFunctions;
 
@@ -150,7 +150,7 @@ void FilterDlg::OnOK(wxCommandEvent& event)
     excludeFilter = m_textCtrlExclude->GetValue();
 
     //when leaving dialog: filter and redraw grid, if filter is active
-    EndModal(okayButtonPressed);
+    EndModal(BUTTON_OKAY);
 }
 
 
@@ -181,29 +181,29 @@ DeleteDialog::~DeleteDialog() {}
 
 void DeleteDialog::OnOK(wxCommandEvent& event)
 {
-    EndModal(okayButtonPressed);
+    EndModal(BUTTON_OKAY);
 }
 
 void DeleteDialog::OnCancel(wxCommandEvent& event)
 {
-    EndModal(cancelButtonPressed);
+    EndModal(BUTTON_CANCEL);
 }
 
 void DeleteDialog::OnClose(wxCloseEvent& event)
 {
-    EndModal(cancelButtonPressed);
+    EndModal(BUTTON_CANCEL);
 }
 //########################################################################################
 
 
 ErrorDlg::ErrorDlg(const wxString messageText, bool& continueError) :
-        ErrorDlgGenerated(0),
+        ErrorDlgGenerated(NULL),
         continueOnError(continueError)
 {
     m_bitmap10->SetBitmap(*globalResource.bitmapWarning);
     m_textCtrl8->SetValue(messageText);
 
-    m_buttonContinue->SetFocus();
+    m_buttonRetry->SetFocus();
 }
 
 ErrorDlg::~ErrorDlg() {}
@@ -212,31 +212,156 @@ ErrorDlg::~ErrorDlg() {}
 void ErrorDlg::OnClose(wxCloseEvent& event)
 {
     //continueOnError = m_checkBoxContinueError->GetValue(); -> not needed here
-    EndModal(abortButtonPressed);
+    EndModal(BUTTON_ABORT);
 }
 
 
 void ErrorDlg::OnContinue(wxCommandEvent& event)
 {
     continueOnError = m_checkBoxContinueError->GetValue();
-    EndModal(continueButtonPressed);
+    EndModal(BUTTON_CONTINUE);
 }
 
 
 void ErrorDlg::OnRetry(wxCommandEvent& event)
 {
     //continueOnError = m_checkBoxContinueError->GetValue(); -> not needed here
-    EndModal(retryButtonPressed);
+    EndModal(BUTTON_RETRY);
 }
 
 
 void ErrorDlg::OnAbort(wxCommandEvent& event)
 {
     //continueOnError = m_checkBoxContinueError->GetValue(); -> not needed here
-    EndModal(abortButtonPressed);
+    EndModal(BUTTON_ABORT);
 }
-//########################################################################################
 
+
+//########################################################################################
+ModifyFilesDlg::ModifyFilesDlg(wxWindow* window, const wxString& parentDirectory, const int timeShift) :
+        ModifyFilesDlgGenerated(window)
+{
+    m_dirPicker->SetPath(parentDirectory);
+    m_textCtrlDirectory->SetValue(parentDirectory);
+    m_spinCtrlTimeShift->SetValue(timeShift);
+
+    m_buttonApply->SetFocus();
+}
+
+
+ModifyFilesDlg::~ModifyFilesDlg() {}
+
+
+class ModifyErrorHandler : public ErrorHandler
+{
+public:
+    ModifyErrorHandler(bool& unsolvedErrorOccured) :
+            continueOnError(false),
+            unsolvedErrors(unsolvedErrorOccured) {}
+
+    ~ModifyErrorHandler() {}
+
+    Response reportError(const wxString& text)
+    {
+        if (continueOnError)
+        {
+            unsolvedErrors = true;
+            return ErrorHandler::CONTINUE_NEXT;
+        }
+
+        ErrorDlg* errorDlg = new ErrorDlg(text, continueOnError);
+
+        int rv = errorDlg->ShowModal();
+        errorDlg->Destroy();
+
+        switch (rv)
+        {
+        case ErrorDlg::BUTTON_CONTINUE:
+            unsolvedErrors = true;
+            return ErrorHandler::CONTINUE_NEXT;
+        case ErrorDlg::BUTTON_RETRY:
+            return ErrorHandler::RETRY;
+        case ErrorDlg::BUTTON_ABORT:
+        {
+            unsolvedErrors = true;
+            throw AbortThisProcess();
+        }
+        default:
+            assert (false);
+        }
+
+        return ErrorHandler::CONTINUE_NEXT; //dummy return value
+    }
+private:
+
+    bool continueOnError;
+    bool& unsolvedErrors;
+};
+
+
+void ModifyFilesDlg::OnApply(wxCommandEvent& event)
+{
+    const int      timeToShift = m_spinCtrlTimeShift->GetValue();
+    const wxString parentDir   = m_textCtrlDirectory->GetValue();
+
+    if (!wxDirExists(parentDir))
+    {
+        wxMessageBox(wxString(_("Directory does not exist: ")) + wxT("\"") + parentDir + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+        return;
+    }
+
+    bool unsolvedErrorOccured = false; //if an error is skipped a re-compare will be necessary!
+    try
+    {
+        ModifyErrorHandler errorHandler(unsolvedErrorOccured);
+        FreeFileSync::adjustModificationTimes(parentDir, timeToShift, &errorHandler);
+    }
+    catch (const AbortThisProcess& theException)
+    {
+        EndModal(0);
+    }
+
+    if (unsolvedErrorOccured)
+        wxMessageBox(_("Unresolved errors occured during operation!"), _("Info"), wxOK);
+    else
+        wxMessageBox(_("All file times have been adjusted successfully!"), _("Info"), wxOK);
+    EndModal(0);
+}
+
+
+void ModifyFilesDlg::OnCancel(wxCommandEvent& event)
+{
+    EndModal(0);
+}
+
+
+void ModifyFilesDlg::OnClose(wxCloseEvent& event)
+{
+    EndModal(0);
+}
+
+
+void ModifyFilesDlg::OnWriteDirManually(wxCommandEvent& event)
+{
+    wxString newDir = FreeFileSync::getFormattedDirectoryName(event.GetString());
+    if (wxDirExists(newDir))
+        m_dirPicker->SetPath(newDir);
+
+    event.Skip();
+}
+
+
+void ModifyFilesDlg::OnDirSelected(wxFileDirPickerEvent& event)
+{
+    const wxString newPath = event.GetPath();
+    m_textCtrlDirectory->SetValue(newPath);
+
+    event.Skip();
+}
+
+
+
+//########################################################################################
 /*
 class for calculation of remaining time:
 ----------------------------------------
@@ -330,9 +455,9 @@ wxLongLong RemainingTime::getRemainingTime(double processedDataSinceLastCall, in
 
 //########################################################################################
 
-SyncStatus::SyncStatus(StatusUpdater* updater, wxWindow* parentWindow) :
+SyncStatus::SyncStatus(StatusHandler* updater, wxWindow* parentWindow) :
         SyncStatusDlgGenerated(parentWindow),
-        currentStatusUpdater(updater),
+        currentStatusHandler(updater),
         windowToDis(parentWindow),
         currentProcessIsRunning(true),
         totalData(0),
@@ -403,18 +528,23 @@ void SyncStatus::updateStatusDialogNow()
     m_gauge1->SetValue(int(currentData * scalingFactor));
 
     //status text
-    m_textCtrlInfo->SetValue(currentStatusText);
+    if (m_textCtrlInfo->GetValue() != currentStatusText) //avoid screen flicker
+        m_textCtrlInfo->SetValue(currentStatusText);
 
     //remaining objects
-    m_staticTextRemainingObj->SetLabel(numberToWxString(totalObjects - currentObjects));
-
+    const wxString remainingObjTmp = numberToWxString(totalObjects - currentObjects);
+    if (m_staticTextRemainingObj->GetLabel() != remainingObjTmp) //avoid screen flicker
+        m_staticTextRemainingObj->SetLabel(remainingObjTmp);
 
     //remaining bytes left for copy
-    const wxString remainingBytes = FreeFileSync::formatFilesizeToShortString(totalData - currentData);
-    m_staticTextDataRemaining->SetLabel(remainingBytes);
+    const wxString remainingBytesTmp = FreeFileSync::formatFilesizeToShortString(totalData - currentData);
+    if (m_staticTextDataRemaining->GetLabel() != remainingBytesTmp) //avoid screen flicker
+        m_staticTextDataRemaining->SetLabel(remainingBytesTmp);
 
     //time elapsed
-    m_staticTextTimeElapsed->SetLabel((wxTimeSpan::Milliseconds(timeElapsed.Time())).Format());
+    const wxString timeElapsedTmp = (wxTimeSpan::Milliseconds(timeElapsed.Time())).Format();
+    if (m_staticTextTimeElapsed->GetLabel() != timeElapsedTmp) //avoid screen flicker
+        m_staticTextTimeElapsed->SetLabel(timeElapsedTmp);
 
     //do the ui update
     bSizer28->Layout();
@@ -472,8 +602,8 @@ void SyncStatus::setCurrentStatus(SyncStatusID id)
 }
 
 
-void SyncStatus::processHasFinished(SyncStatusID id) //essential to call this in StatusUpdater derived class destructor
-{                                                    //at the LATEST(!) to prevent access to currentStatusUpdater
+void SyncStatus::processHasFinished(SyncStatusID id) //essential to call this in StatusHandler derived class destructor
+{                                                    //at the LATEST(!) to prevent access to currentStatusHandler
     currentProcessIsRunning = false; //enable okay and close events; may be set ONLY in this method
 
     setCurrentStatus(id);
@@ -532,7 +662,7 @@ void SyncStatus::OnAbort(wxCommandEvent& event)
         setStatusText_NoUpdate(_("Abort requested: Waiting for current operation to finish..."));
         //no Layout() or UI-update here to avoid cascaded Yield()-call
 
-        currentStatusUpdater->requestAbortion();
+        currentStatusHandler->requestAbortion();
     }
 }
 
@@ -540,7 +670,8 @@ void SyncStatus::OnAbort(wxCommandEvent& event)
 void SyncStatus::OnClose(wxCloseEvent& event)
 {
     processPaused = false;
-    if (currentProcessIsRunning) currentStatusUpdater->requestAbortion();
+    if (currentProcessIsRunning)
+        currentStatusHandler->requestAbortion();
     else
         Destroy();
 }
@@ -635,19 +766,26 @@ void CompareStatus::setStatusText_NoUpdate(const wxString& text)
 void CompareStatus::updateStatusPanelNow()
 {
     //status texts
-    m_textCtrlFilename->SetValue(currentStatusText);
+    if (m_textCtrlFilename->GetValue() != currentStatusText) //avoid screen flicker
+        m_textCtrlFilename->SetValue(currentStatusText);
 
-    m_staticTextScanned->SetLabel(numberToWxString(scannedObjects));
+    //nr of scanned objects
+    const wxString scannedObjTmp = numberToWxString(scannedObjects);
+    if (m_staticTextScanned->GetLabel() != scannedObjTmp) //avoid screen flicker
+        m_staticTextScanned->SetLabel(scannedObjTmp);
 
     //progress indicator for "compare file content"
     m_gauge2->SetValue(int(processedCmpData * scalingFactorCmp));
 
-    //remaining file to compare
-    m_staticTextFilesToCompare->SetLabel(numberToWxString(totalCmpObjects - processedCmpObjects));
+    //remaining files left for file comparison
+    const wxString filesToCompareTmp = numberToWxString(totalCmpObjects - processedCmpObjects);
+    if (m_staticTextFilesToCompare->GetLabel() != filesToCompareTmp) //avoid screen flicker
+        m_staticTextFilesToCompare->SetLabel(filesToCompareTmp);
 
     //remaining bytes left for file comparison
-    const wxString remainingBytes = FreeFileSync::formatFilesizeToShortString(totalCmpData - processedCmpData);
-    m_staticTextDataToCompare->SetLabel(remainingBytes);
+    const wxString remainingBytesTmp = FreeFileSync::formatFilesizeToShortString(totalCmpData - processedCmpData);
+    if (m_staticTextDataToCompare->GetLabel() != remainingBytesTmp) //avoid screen flicker
+        m_staticTextDataToCompare->SetLabel(remainingBytesTmp);
 
     /*
         //remaining time in seconds
@@ -659,7 +797,9 @@ void CompareStatus::updateStatusPanelNow()
     */
 
     //time elapsed
-    m_staticTextTimeElapsed->SetLabel((wxTimeSpan::Milliseconds(timeElapsed.Time())).Format());
+    const wxString timeElapsedTmp = (wxTimeSpan::Milliseconds(timeElapsed.Time())).Format();
+    if (m_staticTextTimeElapsed->GetLabel() != timeElapsedTmp) //avoid screen flicker
+        m_staticTextTimeElapsed->SetLabel(timeElapsedTmp);
 
     //do the ui update
     bSizer42->Layout();

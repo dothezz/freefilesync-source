@@ -15,10 +15,10 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-D__WXDEBUG__" />
-					<Add directory="C:\Programme\CodeBlocks\wxWidgets\lib\gcc_lib\mswud" />
+					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib\mswud" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="C:\Programme\CodeBlocks\wxWidgets\lib\gcc_lib\mswud" />
+					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib\mswud" />
 				</ResourceCompiler>
 				<Linker>
 					<Add library="libwxmsw28ud_adv.a" />
@@ -26,7 +26,6 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
-					<Add directory="C:\Programme\CodeBlocks\wxWidgets\lib\gcc_lib" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -38,10 +37,10 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-DNDEBUG" />
-					<Add directory="C:\Programme\CodeBlocks\wxWidgets\lib\gcc_lib\mswu" />
+					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib\mswu" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="C:\Programme\CodeBlocks\wxWidgets\lib\gcc_lib\mswu" />
+					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib\mswu" />
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-s" />
@@ -50,7 +49,6 @@
 					<Add library="libwxbase28u.a" />
 					<Add library="libwxpng.a" />
 					<Add library="libwxzlib.a" />
-					<Add directory="C:\Programme\CodeBlocks\wxWidgets\lib\gcc_lib" />
 				</Linker>
 			</Target>
 			<Target title="Unit Test">
@@ -65,7 +63,7 @@
 					<Add option="-D__WXDEBUG__" />
 					<Add directory="library\gtest" />
 					<Add directory="library\gtest\include" />
-					<Add directory="C:\Programme\CodeBlocks\wxWidgets\lib\gcc_lib\mswud" />
+					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib\mswud" />
 				</Compiler>
 				<Linker>
 					<Add library="libwxmsw28ud_adv.a" />
@@ -73,7 +71,6 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
-					<Add directory="C:\Programme\CodeBlocks\wxWidgets\lib\gcc_lib" />
 				</Linker>
 			</Target>
 		</Build>
@@ -87,11 +84,11 @@
 			<Add option="-DFFS_WIN" />
 			<Add option="-DwxUSE_UNICODE" />
 			<Add option="-DTIXML_USE_STL" />
-			<Add directory="C:\Programme\CodeBlocks\wxWidgets\include" />
-			<Add directory="C:\Programme\CodeBlocks\wxWidgets\contrib\include" />
+			<Add directory="C:\Programme\C++\wxWidgets\include" />
+			<Add directory="C:\Programme\C++\wxWidgets\contrib\include" />
 		</Compiler>
 		<ResourceCompiler>
-			<Add directory="C:\Programme\CodeBlocks\wxWidgets\include" />
+			<Add directory="C:\Programme\C++\wxWidgets\include" />
 		</ResourceCompiler>
 		<Linker>
 			<Add option="-mthreads" />
@@ -108,6 +105,7 @@
 			<Add library="libcomctl32.a" />
 			<Add library="libwsock32.a" />
 			<Add library="libodbc32.a" />
+			<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 		</Linker>
 		<Unit filename="FreeFileSync.cpp" />
 		<Unit filename="FreeFileSync.h">
@@ -139,6 +137,9 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="library\gtest\main.cpp">
+			<Option target="Unit Test" />
+		</Unit>
 		<Unit filename="library\gtest\src\gtest-death-test.cc">
 			<Option target="Unit Test" />
 		</Unit>
@@ -154,27 +155,25 @@
 		<Unit filename="library\gtest\src\gtest.cc">
 			<Option target="Unit Test" />
 		</Unit>
-		<Unit filename="library\gtest\src\gtest_main.cc">
+		<Unit filename="library\gtest\unittest.h">
 			<Option target="Unit Test" />
 		</Unit>
 		<Unit filename="library\gtest\unittest1.cpp">
 			<Option target="Unit Test" />
 		</Unit>
-		<Unit filename="library\misc.cpp">
-			<Option target="Debug" />
-			<Option target="Release" />
+		<Unit filename="library\gtest\unittest2.cpp">
+			<Option target="Unit Test" />
 		</Unit>
+		<Unit filename="library\gtest\unittest3.cpp">
+			<Option target="Unit Test" />
+		</Unit>
+		<Unit filename="library\misc.cpp" />
 		<Unit filename="library\misc.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="library\multithreading.cpp" />
 		<Unit filename="library\multithreading.h">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="library\pch.h">
-			<Option weight="0" />
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
@@ -185,6 +184,14 @@
 		</Unit>
 		<Unit filename="library\resources.cpp" />
 		<Unit filename="library\resources.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="library\sorting.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="library\statusHandler.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>

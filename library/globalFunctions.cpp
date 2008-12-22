@@ -1,5 +1,8 @@
 #include "globalFunctions.h"
 #include "resources.h"
+#include <wx/msgdlg.h>
+#include <wx/file.h>
+
 
 inline
 int globalFunctions::round(const double d)
@@ -122,4 +125,77 @@ void globalFunctions::writeInt(wxOutputStream& stream, const int number)
 {
     const char* buffer = reinterpret_cast<const char*>(&number);
     stream.Write(buffer, sizeof(int));
+}
+
+
+//############################################################################
+Performance::Performance() :
+        resultWasShown(false)
+{
+    timer.Start();
+}
+
+
+Performance::~Performance()
+{
+    if (!resultWasShown)
+        showResult();
+}
+
+
+void Performance::showResult()
+{
+    resultWasShown = true;
+    wxMessageBox(globalFunctions::numberToWxString(unsigned(timer.Time())) + wxT(" ms"));
+    timer.Start(); //reset timer
+}
+
+
+//############################################################################
+DebugLog::DebugLog() :
+        lineCount(0),
+        logFile(NULL)
+{
+    logFile = new wxFile;
+    logfileName = assembleFileName();
+    logFile->Open(logfileName.c_str(), wxFile::write);
+}
+
+
+DebugLog::~DebugLog()
+{
+    delete logFile; //automatically closes file handle
+}
+
+
+wxString DebugLog::assembleFileName()
+{
+    wxString tmp = wxDateTime::Now().FormatISOTime();
+    tmp.Replace(wxT(":"), wxEmptyString);
+    return wxString(wxT("DEBUG_")) + wxDateTime::Now().FormatISODate() + wxChar('_') + tmp + wxT(".log");
+}
+
+
+void DebugLog::write(const wxString& logText)
+{
+    ++lineCount;
+    if (lineCount % 10000 == 0) //prevent logfile from becoming too big
+    {
+        logFile->Close();
+        wxRemoveFile(logfileName);
+
+        logfileName = assembleFileName();
+        logFile->Open(logfileName.c_str(), wxFile::write);
+    }
+
+    logFile->Write(wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] "));
+    logFile->Write(logText + wxChar('\n'));
+}
+
+//DebugLog logDebugInfo;
+
+
+wxString getCodeLocation(const wxString file, const int line)
+{
+    return wxString(file).AfterLast(GlobalResources::fileNameSeparator) + wxT(", LINE ") + globalFunctions::numberToWxString(line) + wxT(" | ");
 }

@@ -31,19 +31,21 @@
  of 
   /  
  overwriting 
- 上書き中
+ 上書き中 
  row in view
 　列を表示
  rows in view
 　列を表示
  to 
- から
+ から 
 !=	files are different\n
 !=	ファイルは異なっています\n
 &Abort
 情報(&A)
 &About...
 情報(&A)...
+&Adjust file times
+ファイル時間の調整(&A)
 &Advanced
 拡張(&A)
 &Back
@@ -112,12 +114,20 @@
 -Open-Source ファイル同期ツール-
 .
 ,
-1. Enter full file or directory names separated by ';' or a new line.\n2. Use wildcard characters '*' and '?'.
-完全なファイル/ディレクトリ名を ' ; ' で区切って入力してください。\n2.ワイルドカードに ' * ' と ' ? ' を使用出来ます。
+1. Enter full file or directory names separated by ';' or a new line.
+1.完全なファイル/ディレクトリ名を ' ; ' で区切って入力してください。
+2. Use wildcard characters '*' and '?'.
+2.ワイルドカードに ' * ' と ' ? ' を使用出来ます。
+3. Exclude files directly on main grid via context menu.
+3. コンテキストメニューから直接ファイルを除外出来ます。
+4. Keep the number of entries small for best performance.
+4. 保持エントリ数を小さくすることで、最適な性能を発揮します。
 <<	left file is newer\n
 <<	左側の方が新しい\n
 <Directory>
 <ディレクトリ>
+<multiple selection>
+<複数選択>
 <|	file on left side only\n
 <|	左側のみに存在するファイル\n
 ==	files are equal\n\n
@@ -137,13 +147,21 @@ Action
 Add folder pair
 フォルダのペアを追加
 Add to exclude filter: 
-除外フィルターを追加
+除外フィルターを追加 
+Adjust file times
+ファイル時間の調整
+Adjust modification times of all files contained in the specified folder and its subfolders. This manual adaption might become necessary if you are synchronizing against a FAT32 drive and the daylight saving time is switched. For an overview about the issue see this article:
+指定したフォルダとそのサブフォルダに存在する、すべてのファイルの更新時間を調整します。\nFAT32ドライブを同期に使用している場合は、\nここで最適化しておく必要があるかもしれません(夏時間は切り替えられます)\n\n　この機能に関する詳細については、こちらをご覧ください:
+All file times have been adjusted successfully!
+ファイルの時間調整が完了しました!
 All items have been synchronized!
 すべてのアイテムは同期されました!
 An error occured
 エラーが発生
 An exception occured!
 例外が発生しました!
+Apply
+適用
 As a result 6 different status can be returned to categorize all files:
 すべてのファイルのカテゴリ別に、6 つの異なるステータスを結果に返す事が出来ます。
 As a result the files are separated into the following categories:
@@ -211,23 +229,21 @@ Copy from right to left overwriting
 Copy to clipboard\tCTRL+C
 クリップボードにコピー\tCTRL+C
 Copying file 
-ファイルをコピー中
-Could not create file 
-ファイルを作成できません
+ファイルをコピー中 
 Could not open configuration file 
-構成ファイルを開けませんでした。
+構成ファイルを開けませんでした 
 Could not open file: 
 ファイルを開けません: 
 Could not read language file 
-言語ファイルを読み込めません
+言語ファイルを読み込めません 
 Could not retrieve file info for: 
-ファイル情報を取得できません:
+ファイル情報を取得できません: 
 Could not set working directory to directory containing executable file!
 実行ファイルが含まれるディレクトリは、作業ディレクトリとして利用できません!
 Could not write configuration file 
-構成ファイルに書き込めませんでした。
+構成ファイルに書き込めませんでした 
 Could not write to 
-書き込みに失敗
+書き込みに失敗 
 Create a batch job
 一括ジョブを作成
 Create:
@@ -258,8 +274,8 @@ Deleting file
 ファイルを削除中 
 Deleting folder 
 フォルダを削除中 
-Directory does not exist. Please select a new one: 
-ディレクトリが見つかりません。 再度選択してください: 
+Directory does not exist: 
+ディレクトリが存在しません: 
 Do not show graphical status and error messages but write to a logfile instead
 進捗状況、及びエラーを表示しないで、代わりにログファイルに書き込む
 Do nothing
@@ -277,7 +293,9 @@ E-メール:
 Error
 エラー
 Error adapting modification time of file 
-ファイルの更新時間の適合エラー
+ファイルの更新時間の適合エラー 
+Error changing modification time: 
+更新時間の変更に失敗しました: 
 Error converting FILETIME to SYSTEMTIME
 FILETIME から SYSTEMTIME への変換エラー
 Error converting FILETIME to local FILETIME
@@ -287,17 +305,19 @@ Error copying file
 Error creating directory 
 ディレクトリの作成に失敗 
 Error deleting directory 
-ディレクトリの削除に失敗
+ディレクトリの削除に失敗 
 Error deleting file 
-ファイルの削除に失敗
-Error moving file to recycle bin: 
-ファイルをゴミ箱に移動できません: 
+ファイルの削除に失敗 
+Error moving to recycle bin: 
+ゴミ箱への移動に失敗しました: 
 Error parsing configuration file 
-構成ファイルの構文に誤りがあります
+構成ファイルの構文に誤りがあります 
 Error reading file: 
 ファイル読み込みエラー: 
+Error scanning directory: 
+ディレクトリの読み込みエラー: 
 Error traversing directory 
-ディレクトリの移動エラー
+ディレクトリの移動エラー 
 Error when converting int to wxString
 wxString の変換エラー
 Error when converting wxString to double
@@ -324,8 +344,8 @@ Filename
 ファイル名
 Files are found equal if\n     - file content\nis the same.
 ファイルが同様だった場合\n     - ファイル内容\nで判断する
-Files are found equal if\n     - filesize\n     - last write time (UTC) and date\nare the same.
-ファイルが同様だった場合\n   - ファイルサイズ\n   - 最終書き込み時間(UTC)と日付\nで判断する
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
+ファイルが同様だった場合\n   - ファイルサイズ\n   - 最終書き込み時間と日付\nで判断する
 Files remaining:
 残りのファイル:
 Files that exist on both sides and have different content
@@ -368,6 +388,18 @@ FreeFileSync configuration
 FreeFileSync 構成設定
 Help
 ヘルプ
+Hide files that are different
+異なるファイルを非表示
+Hide files that are equal
+同様のファイルを非表示
+Hide files that are newer on left
+左側の新しいファイルを非表示
+Hide files that are newer on right
+右側の新しいファイルを非表示
+Hide files that exist on left side only
+左側のみに存在するファイルを非表示
+Hide files that exist on right side only
+右側のみに存在するファイルを非表示
 Hide filtered items
 適合するアイテムを非表示にする
 Hide further error messages during the current process and continue
@@ -460,6 +492,8 @@ Scanning...
 スキャン中...
 Select a folder
 フォルダを選択
+Select folder
+フォルダ選択
 Select variant:
 変数を選択:
 Set filter for synchronization
@@ -508,6 +542,8 @@ Synchronize both sides simultaneously: Copy new or updated files in both directi
 両側を同時に処理: 両方のディレクトリのより新しいファイルをコピー
 Synchronizing...
 同期処理中...
+System out of memory!
+メモリが不足しています!
 The selected file does not contain a valid configuration!
 選択されたファイルには有効な構成が含まれていません!
 The selected file does not exist anymore!
@@ -516,6 +552,8 @@ This variant evaluates two equally named files as being equal when they have the
 この変数では、ふたつの同名ファイルが存在した場合、 それぞれのファイルサイズと最終更新日付/時間を比較します。\nファイル時間の差異が 2 秒以内の場合は検出されないということに注意してください。 (これは、FAT32システムで正確に同期を行うことができる最小値です)
 Time elapsed:
 経過時間:
+Time shift in seconds
+タイムシフト(秒)
 Total amount of data that will be transferred
 転送されたデータの総量
 Total time: 
@@ -535,7 +573,7 @@ Use Recycle Bin when deleting or overwriting files during synchronization
 Warning
 警告
 Warning: Synchronization failed for 
-警告: 同期処理に失敗
+警告: 同期処理に失敗 
 When \"Compare\" is triggered with this option set the following decision tree is processed:
 この設定で \"比較\" トリガが実行された場合は、以下のツリーに従って処理されていきます。
 \n\nContinue with next object, retry or abort comparison?

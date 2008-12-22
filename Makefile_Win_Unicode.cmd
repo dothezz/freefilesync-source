@@ -1,8 +1,8 @@
 ::set these variables to the appropriate directories
-set widgets=C:\Programme\CodeBlocks\wxWidgets
-set widgetslib=C:\Programme\CodeBlocks\wxWidgets\lib\gcc_lib\mswu
+set widgets=C:\Programme\C++\wxWidgets
+set widgetslib=C:\Programme\C++\wxWidgets\lib\gcc_lib\mswu
 set sources=.
-set mingw=C:\Programme\CodeBlocks\MinGW\bin
+set mingw=C:\Programme\C++\MinGW\bin
 
 set parameters=-Wall -pipe -mthreads -D__GNUWIN32__ -DwxUSE_UNICODE -D__WXMSW__ -DFFS_WIN -O2 -DNDEBUG -DTIXML_USE_STL
 path=%path%;%mingw%

@@ -35,7 +35,10 @@ public:
     FilterDlg(wxWindow* window, wxString& filterIncl, wxString& filterExcl);
     ~FilterDlg();
 
-    static const int okayButtonPressed = 25;
+    enum
+    {
+        BUTTON_OKAY
+    };
 
 private:
     void OnHelp(wxCommandEvent& event);
@@ -55,8 +58,11 @@ public:
     DeleteDialog(const wxString& headerText, const wxString& messageText, wxWindow* main);
     ~DeleteDialog();
 
-    static const int okayButtonPressed   = 35;
-    static const int cancelButtonPressed = 45;
+    enum
+    {
+        BUTTON_OKAY,
+        BUTTON_CANCEL
+    };
 
 private:
     void OnOK(wxCommandEvent& event);
@@ -71,9 +77,12 @@ public:
     ErrorDlg(const wxString messageText, bool& continueError);
     ~ErrorDlg();
 
-    static const int continueButtonPressed = 35;
-    static const int retryButtonPressed    = 45;
-    static const int abortButtonPressed    = 55;
+    enum
+    {
+        BUTTON_CONTINUE,
+        BUTTON_RETRY,
+        BUTTON_ABORT
+    };
 
 private:
     void OnClose(wxCloseEvent& event);
@@ -85,10 +94,26 @@ private:
 };
 
 
+class ModifyFilesDlg : public ModifyFilesDlgGenerated
+{
+public:
+    ModifyFilesDlg(wxWindow* window, const wxString& parentDirectory, const int timeShift);
+    ~ModifyFilesDlg();
+
+private:
+    void OnApply(wxCommandEvent& event);
+    void OnCancel(wxCommandEvent& event);
+    void OnClose(wxCloseEvent& event);
+
+    void OnWriteDirManually(wxCommandEvent& event);
+    void OnDirSelected(wxFileDirPickerEvent& event);
+};
+
+
 class SyncStatus : public SyncStatusDlgGenerated
 {
 public:
-    SyncStatus(StatusUpdater* updater, wxWindow* parentWindow = NULL);
+    SyncStatus(StatusHandler* updater, wxWindow* parentWindow = NULL);
     ~SyncStatus();
 
     enum SyncStatusID
@@ -118,7 +143,7 @@ private:
 
     wxStopWatch timeElapsed;
 
-    StatusUpdater* currentStatusUpdater;
+    StatusHandler* currentStatusHandler;
     wxWindow* windowToDis;
     bool currentProcessIsRunning;
 

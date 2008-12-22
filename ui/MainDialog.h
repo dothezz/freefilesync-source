@@ -19,6 +19,7 @@
 #include <wx/dnd.h>
 #include <wx/config.h>
 #include <stack>
+#include "../library/processXml.h"
 
 using namespace std;
 
@@ -27,8 +28,7 @@ enum ContextItem
 {
     CONTEXT_FILTER_TEMP = 10,
     CONTEXT_EXCLUDE_EXT,
-    CONTEXT_EXCLUDE_FILE,
-    CONTEXT_EXCLUDE_DIR,
+    CONTEXT_EXCLUDE_OBJ,
     CONTEXT_CLIPBOARD,
     CONTEXT_EXPLORER,
     CONTEXT_DELETE_FILES
@@ -46,14 +46,16 @@ class MainDialog : public GuiGenerated
     friend class FileDropEvent;
 
 public:
-    MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale* language);
+    MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale* language, xmlAccess::XmlGlobalSettings& settings);
     ~MainDialog();
 
 private:
     //configuration load/save
-    void loadDefaultConfiguration();
     bool readConfigurationFromXml(const wxString& filename, bool programStartup = false);
     bool writeConfigurationToXml(const wxString& filename);
+
+    void readGlobalSettings();
+    void writeGlobalSettings();
 
     void updateViewFilterButtons();
     void updateFilterButton(wxBitmapButton* filterButton, bool isActive);
@@ -65,7 +67,7 @@ private:
     void removeFolderPair(bool removeAll = false);
 
     //main method for putting gridData on UI: maps data respecting current view settings
-    void writeGrid(const FileCompareResult& gridData, bool useUI_GridCache =  false);
+    void writeGrid(const FileCompareResult& gridData);
     void mapGridDataToUI(GridView& output, const FileCompareResult& fileCmpResult);
     void updateStatusInformation(const GridView& output);
 
@@ -138,6 +140,7 @@ private:
 
     //menu events
     void OnMenuExportFileList(  wxCommandEvent& event);
+    void OnMenuAdjustFileTimes( wxCommandEvent& event);
     void OnMenuBatchJob(        wxCommandEvent& event);
     void OnMenuAbout(           wxCommandEvent& event);
     void OnMenuQuit(            wxCommandEvent& event);
@@ -145,11 +148,15 @@ private:
     void OnMenuLangGerman(      wxCommandEvent& event);
     void OnMenuLangFrench(      wxCommandEvent& event);
     void OnMenuLangJapanese(    wxCommandEvent& event);
+    void OnMenuLangDutch(       wxCommandEvent& event);
 
     void enableSynchronization(bool value);
 
 //***********************************************
-    //global application variables are stored here:
+    //application variables are stored here:
+
+    //global settings used by GUI and batch mode
+    xmlAccess::XmlGlobalSettings& globalSettings;
 
     //technical representation of grid-data
     FileCompareResult currentGridData;
@@ -205,9 +212,14 @@ private:
     bool filteringInitialized;
     bool filteringPending;
 
+    //temporal variables used by exclude via context menu
     wxString exFilterCandidateExtension;
-    wxString exFilterCandidateFilename;
-    wxString exFilterCandidateDirname;
+    struct FilterObject
+    {
+        wxString relativeName;
+        FileDescrLine::ObjectType type;
+    };
+    vector<FilterObject> exFilterCandidateObj;
 
     bool synchronizationEnabled; //determines whether synchronization should be allowed
 
@@ -241,16 +253,16 @@ private:
 
 //classes handling sync and compare error as well as status information
 
-class CompareStatusUpdater : public StatusUpdater
+class CompareStatusUpdater : public StatusHandler
 {
 public:
     CompareStatusUpdater(MainDialog* dlg);
     ~CompareStatusUpdater();
 
     void updateStatusText(const wxString& text);
-    void initNewProcess(int objectsTotal, double dataTotal, int processID);
+    void initNewProcess(int objectsTotal, double dataTotal, Process processID);
     void updateProcessedData(int objectsProcessed, double dataProcessed);
-    int reportError(const wxString& text);
+    ErrorHandler::Response reportError(const wxString& text);
 
     void forceUiRefresh();
 
@@ -259,20 +271,20 @@ private:
 
     MainDialog* mainDialog;
     bool continueOnError;
-    int currentProcess;
+    Process currentProcess;
 };
 
 
-class SyncStatusUpdater : public StatusUpdater
+class SyncStatusUpdater : public StatusHandler
 {
 public:
     SyncStatusUpdater(wxWindow* dlg, bool continueOnError);
     ~SyncStatusUpdater();
 
     void updateStatusText(const wxString& text);
-    void initNewProcess(int objectsTotal, double dataTotal, int processID);
+    void initNewProcess(int objectsTotal, double dataTotal, Process processID);
     void updateProcessedData(int objectsProcessed, double dataProcessed);
-    int reportError(const wxString& text);
+    ErrorHandler::Response reportError(const wxString& text);
 
     void forceUiRefresh();
 

@@ -1,10 +1,74 @@
 #include "processXml.h"
 #include <wx/filefn.h>
 #include <wx/ffile.h>
+#include <wx/intl.h>
 #include "globalFunctions.h"
 
 using namespace globalFunctions;
 using namespace xmlAccess;
+
+//small helper functions
+bool readXmlElementValue(string& output, const TiXmlElement* parent, const string& name);
+bool readXmlElementValue(int& output, const TiXmlElement* parent, const string& name);
+bool readXmlElementValue(CompareVariant& output, const TiXmlElement* parent, const string& name);
+bool readXmlElementValue(SyncConfiguration::Direction& output, const TiXmlElement* parent, const string& name);
+bool readXmlElementValue(bool& output, const TiXmlElement* parent, const string& name);
+
+void addXmlElement(TiXmlElement* parent, const string& name, const string& value);
+void addXmlElement(TiXmlElement* parent, const string& name, const int value);
+void addXmlElement(TiXmlElement* parent, const string& name, const SyncConfiguration::Direction value);
+void addXmlElement(TiXmlElement* parent, const string& name, const bool value);
+
+
+class XmlConfigInput
+{
+public:
+    XmlConfigInput(const wxString& fileName, const XmlType type);
+    ~XmlConfigInput() {}
+
+    bool loadedSuccessfully()
+    {
+        return loadSuccess;
+    }
+
+    //read gui settings, all values retrieved are optional, so check for initial values! (== -1)
+    bool readXmlGuiConfig(XmlGuiConfig& outputCfg);
+    //read batch settings, all values retrieved are optional
+    bool readXmlBatchConfig(XmlBatchConfig& outputCfg);
+    //read global settings, valid for both GUI and batch mode, independent from configuration
+    bool readXmlGlobalSettings(XmlGlobalSettings& outputCfg);
+
+private:
+    //read basic FreefileSync settings (used by commandline and GUI), return true if ALL values have been retrieved successfully
+    bool readXmlMainConfig(MainConfiguration& mainCfg, vector<FolderPair>& directoryPairs);
+
+    TiXmlDocument doc;
+    bool loadSuccess;
+};
+
+
+class XmlConfigOutput
+{
+public:
+    XmlConfigOutput(const wxString& fileName, const XmlType type);
+    ~XmlConfigOutput() {}
+
+    bool writeToFile();
+
+    //write gui settings
+    bool writeXmlGuiConfig(const XmlGuiConfig& inputCfg);
+    //write batch settings
+    bool writeXmlBatchConfig(const XmlBatchConfig& inputCfg);
+    //write global settings
+    bool writeXmlGlobalSettings(const XmlGlobalSettings& inputCfg);
+
+private:
+    //write basic FreefileSync settings (used by commandline and GUI), return true if everything was written successfully
+    bool writeXmlMainConfig(const MainConfiguration& mainCfg, const vector<FolderPair>& directoryPairs);
+
+    TiXmlDocument doc;
+    const wxString& m_fileName;
+};
 
 
 XmlType xmlAccess::getXmlType(const wxString& filename)
@@ -36,12 +100,101 @@ XmlType xmlAccess::getXmlType(const wxString& filename)
         return XML_BATCH_CONFIG;
     else if (string(cfgType) == "GUI")
         return XML_GUI_CONFIG;
+    else if (string(cfgType) == "GLOBAL")
+        return XML_GLOBAL_SETTINGS;
     else
         return XML_OTHER;
 }
 
 
-XmlInput::XmlInput(const wxString& fileName, const XmlType type) :
+XmlGuiConfig xmlAccess::readGuiConfig(const wxString& filename)
+{
+    //load XML
+    XmlConfigInput inputFile(filename, XML_GUI_CONFIG);
+
+    XmlGuiConfig outputCfg;
+
+    if (!inputFile.loadedSuccessfully())
+        throw FileError(wxString(_("Could not open configuration file ")) + wxT("\"") + filename + wxT("\""));
+
+    if (!inputFile.readXmlGuiConfig(outputCfg)) //read GUI layout configuration
+        throw FileError(wxString(_("Error parsing configuration file ")) + wxT("\"") + filename + wxT("\""));
+
+    return outputCfg;
+}
+
+
+XmlBatchConfig xmlAccess::readBatchConfig(const wxString& filename)
+{
+    //load XML
+    XmlConfigInput inputFile(filename, XML_BATCH_CONFIG);
+
+    XmlBatchConfig outputCfg;
+
+    if (!inputFile.loadedSuccessfully())
+        throw FileError(wxString(_("Could not open configuration file ")) + wxT("\"") + filename + wxT("\""));
+
+    if (!inputFile.readXmlBatchConfig(outputCfg))
+        throw FileError(wxString(_("Error parsing configuration file ")) + wxT("\"") + filename + wxT("\""));
+
+    return outputCfg;
+}
+
+
+XmlGlobalSettings xmlAccess::readGlobalSettings()
+{
+    //load XML
+    XmlConfigInput inputFile(FreeFileSync::FfsGlobalSettingsFile, XML_GLOBAL_SETTINGS);
+
+    XmlGlobalSettings outputCfg;
+
+    if (!inputFile.loadedSuccessfully())
+        throw FileError(wxString(_("Could not open configuration file ")) + wxT("\"") + FreeFileSync::FfsGlobalSettingsFile + wxT("\""));
+
+    if (!inputFile.readXmlGlobalSettings(outputCfg))
+        throw FileError(wxString(_("Error parsing configuration file ")) + wxT("\"") + FreeFileSync::FfsGlobalSettingsFile + wxT("\""));
+
+    return outputCfg;
+}
+
+
+void xmlAccess::writeGuiConfig(const wxString& filename, const XmlGuiConfig& inputCfg)
+{
+    XmlConfigOutput outputFile(filename, XML_GUI_CONFIG);
+
+    //populate and write XML tree
+    if (    !outputFile.writeXmlGuiConfig(inputCfg) || //add GUI layout configuration settings
+            !outputFile.writeToFile()) //save XML
+        throw FileError(wxString(_("Could not write configuration file ")) + wxT("\"") + filename + wxT("\""));
+    return;
+}
+
+
+void xmlAccess::writeBatchConfig(const wxString& filename, const XmlBatchConfig& inputCfg)
+{
+    XmlConfigOutput outputFile(filename, XML_BATCH_CONFIG);
+
+    //populate and write XML tree
+    if (    !outputFile.writeXmlBatchConfig(inputCfg) || //add GUI layout configuration settings
+            !outputFile.writeToFile()) //save XML
+        throw FileError(wxString(_("Could not write configuration file ")) + wxT("\"") + filename + wxT("\""));
+    return;
+}
+
+
+void xmlAccess::writeGlobalSettings(const XmlGlobalSettings& inputCfg)
+{
+    XmlConfigOutput outputFile(FreeFileSync::FfsGlobalSettingsFile, XML_GLOBAL_SETTINGS);
+
+    //populate and write XML tree
+    if (    !outputFile.writeXmlGlobalSettings(inputCfg) || //add GUI layout configuration settings
+            !outputFile.writeToFile()) //save XML
+        throw FileError(wxString(_("Could not write configuration file ")) + wxT("\"") + FreeFileSync::FfsGlobalSettingsFile + wxT("\""));
+    return;
+}
+
+
+XmlConfigInput::XmlConfigInput(const wxString& fileName, const XmlType type) :
         loadSuccess(false)
 {
     if (!wxFileExists(fileName)) //avoid wxWidgets error message when wxFFile receives not existing file
@@ -68,6 +221,8 @@ XmlInput::XmlInput(const wxString& fileName, const XmlType type) :
                         loadSuccess = string(cfgType) == "GUI";
                     else if (type == XML_BATCH_CONFIG)
                         loadSuccess = string(cfgType) == "BATCH";
+                    else if (type == XML_GLOBAL_SETTINGS)
+                        loadSuccess = string(cfgType) == "GLOBAL";
                 }
             }
         }
@@ -75,7 +230,7 @@ XmlInput::XmlInput(const wxString& fileName, const XmlType type) :
 }
 
 
-bool XmlInput::readXmlElementValue(string& output, const TiXmlElement* parent, const string& name)
+bool readXmlElementValue(string& output, const TiXmlElement* parent, const string& name)
 {
     if (parent)
     {
@@ -95,7 +250,7 @@ bool XmlInput::readXmlElementValue(string& output, const TiXmlElement* parent, c
 }
 
 
-bool XmlInput::readXmlElementValue(int& output, const TiXmlElement* parent, const string& name)
+bool readXmlElementValue(int& output, const TiXmlElement* parent, const string& name)
 {
     string temp;
     if (readXmlElementValue(temp, parent, name))
@@ -108,7 +263,7 @@ bool XmlInput::readXmlElementValue(int& output, const TiXmlElement* parent, cons
 }
 
 
-bool XmlInput::readXmlElementValue(CompareVariant& output, const TiXmlElement* parent, const string& name)
+bool readXmlElementValue(CompareVariant& output, const TiXmlElement* parent, const string& name)
 {
     int dummy = 0;
     if (readXmlElementValue(dummy, parent, name))
@@ -121,17 +276,17 @@ bool XmlInput::readXmlElementValue(CompareVariant& output, const TiXmlElement* p
 }
 
 
-bool XmlInput::readXmlElementValue(SyncDirection& output, const TiXmlElement* parent, const string& name)
+bool readXmlElementValue(SyncConfiguration::Direction& output, const TiXmlElement* parent, const string& name)
 {
     string dummy;
     if (readXmlElementValue(dummy, parent, name))
     {
         if (dummy == "left")
-            output = SYNC_DIR_LEFT;
+            output = SyncConfiguration::SYNC_DIR_LEFT;
         else if (dummy == "right")
-            output = SYNC_DIR_RIGHT;
+            output = SyncConfiguration::SYNC_DIR_RIGHT;
         else //treat all other input as "none"
-            output = SYNC_DIR_NONE;
+            output = SyncConfiguration::SYNC_DIR_NONE;
 
         return true;
     }
@@ -140,7 +295,7 @@ bool XmlInput::readXmlElementValue(SyncDirection& output, const TiXmlElement* pa
 }
 
 
-bool XmlInput::readXmlElementValue(bool& output, const TiXmlElement* parent, const string& name)
+bool readXmlElementValue(bool& output, const TiXmlElement* parent, const string& name)
 {
     string dummy;
     if (readXmlElementValue(dummy, parent, name))
@@ -153,7 +308,7 @@ bool XmlInput::readXmlElementValue(bool& output, const TiXmlElement* parent, con
 }
 
 
-bool XmlInput::readXmlMainConfig(XmlMainConfig& outputCfg)
+bool XmlConfigInput::readXmlMainConfig(MainConfiguration& mainCfg, vector<FolderPair>& directoryPairs)
 {
     TiXmlElement* root = doc.RootElement();
     if (!root) return false;
@@ -171,12 +326,13 @@ bool XmlInput::readXmlMainConfig(XmlMainConfig& outputCfg)
     string tempString;
 //###########################################################
     //read compare variant
-    if (!readXmlElementValue(outputCfg.cfg.compareVar, cmpSettings, "Variant")) return false;
+    if (!readXmlElementValue(mainCfg.compareVar, cmpSettings, "Variant")) return false;
 
     //read folder pair(s)
     TiXmlElement* folderPair = TiXmlHandle(cmpSettings).FirstChild("Folders").FirstChild("Pair").ToElement();
 
     //read folder pairs
+    directoryPairs.clear();
     while (folderPair)
     {
         FolderPair newPair;
@@ -187,37 +343,42 @@ bool XmlInput::readXmlMainConfig(XmlMainConfig& outputCfg)
         if (!readXmlElementValue(tempString, folderPair, "Right")) return false;
         newPair.rightDirectory = wxString::FromUTF8(tempString.c_str());
 
-        outputCfg.directoryPairs.push_back(newPair);
+        directoryPairs.push_back(newPair);
         folderPair = folderPair->NextSiblingElement();
     }
 
 //###########################################################
     //read sync configuration
-    if (!readXmlElementValue(outputCfg.cfg.syncConfiguration.exLeftSideOnly, syncConfig, "LeftOnly"))   return false;
-    if (!readXmlElementValue(outputCfg.cfg.syncConfiguration.exRightSideOnly, syncConfig, "RightOnly")) return false;
-    if (!readXmlElementValue(outputCfg.cfg.syncConfiguration.leftNewer, syncConfig, "LeftNewer"))       return false;
-    if (!readXmlElementValue(outputCfg.cfg.syncConfiguration.rightNewer, syncConfig, "RightNewer"))     return false;
-    if (!readXmlElementValue(outputCfg.cfg.syncConfiguration.different, syncConfig, "Different"))       return false;
+    if (!readXmlElementValue(mainCfg.syncConfiguration.exLeftSideOnly, syncConfig, "LeftOnly"))   return false;
+    if (!readXmlElementValue(mainCfg.syncConfiguration.exRightSideOnly, syncConfig, "RightOnly")) return false;
+    if (!readXmlElementValue(mainCfg.syncConfiguration.leftNewer, syncConfig, "LeftNewer"))       return false;
+    if (!readXmlElementValue(mainCfg.syncConfiguration.rightNewer, syncConfig, "RightNewer"))     return false;
+    if (!readXmlElementValue(mainCfg.syncConfiguration.different, syncConfig, "Different"))       return false;
 //###########################################################
     //read filter settings
-    if (!readXmlElementValue(outputCfg.cfg.filterIsActive, filter, "Active")) return false;
+    if (!readXmlElementValue(mainCfg.filterIsActive, filter, "Active")) return false;
 
     if (!readXmlElementValue(tempString, filter, "Include"))  return false;
-    outputCfg.cfg.includeFilter = wxString::FromUTF8(tempString.c_str());
+    mainCfg.includeFilter = wxString::FromUTF8(tempString.c_str());
 
     if (!readXmlElementValue(tempString, filter, "Exclude"))  return false;
-    outputCfg.cfg.excludeFilter = wxString::FromUTF8(tempString.c_str());
+    mainCfg.excludeFilter = wxString::FromUTF8(tempString.c_str());
 //###########################################################
     //other
-    if (!readXmlElementValue(outputCfg.cfg.useRecycleBin, miscSettings, "Recycler"))   return false;
-    if (!readXmlElementValue(outputCfg.cfg.continueOnError, miscSettings, "Continue")) return false;
+    if (!readXmlElementValue(mainCfg.useRecycleBin, miscSettings, "Recycler"))   return false;
+    if (!readXmlElementValue(mainCfg.continueOnError, miscSettings, "Continue")) return false;
 
     return true;
 }
 
 
-bool XmlInput::readXmlGuiConfig(XmlGuiConfig& outputCfg)
+bool XmlConfigInput::readXmlGuiConfig(XmlGuiConfig& outputCfg)
 {
+    //read main config
+    if (!readXmlMainConfig(outputCfg.mainCfg, outputCfg.directoryPairs))
+        return false;
+
+    //read GUI specific config data
     TiXmlElement* root = doc.RootElement();
     if (!root) return false;
 
@@ -229,52 +390,19 @@ bool XmlInput::readXmlGuiConfig(XmlGuiConfig& outputCfg)
     {
         if (!readXmlElementValue(outputCfg.hideFilteredElements, mainWindow, "HideFiltered"))
             outputCfg.hideFilteredElements = false;
-
-        //read application window size and position
-        if (!readXmlElementValue(outputCfg.widthNotMaximized, mainWindow, "Width"))
-            outputCfg.widthNotMaximized = -1;
-        if (!readXmlElementValue(outputCfg.heightNotMaximized, mainWindow, "Height"))
-            outputCfg.heightNotMaximized = -1;
-        if (!readXmlElementValue(outputCfg.posXNotMaximized, mainWindow, "PosX"))
-            outputCfg.posXNotMaximized = -1;
-        if (!readXmlElementValue(outputCfg.posYNotMaximized, mainWindow, "PosY"))
-            outputCfg.posYNotMaximized = -1;
-        if (!readXmlElementValue(outputCfg.isMaximized, mainWindow, "Maximized"))
-            outputCfg.isMaximized = false;
-
-//###########################################################
-        //read column widths
-        TiXmlElement* leftColumn = TiXmlHandle(mainWindow).FirstChild("LeftColumns").FirstChild("Width").ToElement();
-        while (leftColumn)
-        {
-            const char* width = leftColumn->GetText();
-            if (width) //may be NULL!!
-                outputCfg.columnWidthLeft.push_back(stringToInt(width));
-            else
-                break;
-
-            leftColumn = leftColumn->NextSiblingElement();
-        }
-
-        TiXmlElement* rightColumn = TiXmlHandle(mainWindow).FirstChild("RightColumns").FirstChild("Width").ToElement();
-        while (rightColumn)
-        {
-            const char* width = rightColumn->GetText();
-            if (width) //may be NULL!!
-                outputCfg.columnWidthRight.push_back(stringToInt(width));
-            else
-                break;
-
-            rightColumn = rightColumn->NextSiblingElement();
-        }
     }
 
     return true;
 }
 
 
-bool XmlInput::readXmlBatchConfig(XmlBatchConfig& outputCfg)
+bool XmlConfigInput::readXmlBatchConfig(XmlBatchConfig& outputCfg)
 {
+    //read main config
+    if (!readXmlMainConfig(outputCfg.mainCfg, outputCfg.directoryPairs))
+        return false;
+
+    //read batch specific config
     TiXmlElement* root = doc.RootElement();
     if (!root) return false;
 
@@ -293,7 +421,71 @@ bool XmlInput::readXmlBatchConfig(XmlBatchConfig& outputCfg)
 }
 
 
-XmlOutput::XmlOutput(const wxString& fileName, const XmlType type) :
+bool XmlConfigInput::readXmlGlobalSettings(XmlGlobalSettings& outputCfg)
+{
+    TiXmlElement* root = doc.RootElement();
+    if (!root) return false;
+
+    TiXmlHandle hRoot(root);
+
+    //read global settings
+    TiXmlElement* global = hRoot.FirstChild("Global").ToElement();
+    if (!global) return false;
+
+    //program language
+    readXmlElementValue(outputCfg.global.programLanguage, global, "Language");
+
+    //gui specific global settings (optional)
+    TiXmlElement* mainWindow = hRoot.FirstChild("Gui").FirstChild("Windows").FirstChild("Main").ToElement();
+    if (mainWindow)
+    {
+        //read application window size and position
+        readXmlElementValue(outputCfg.gui.widthNotMaximized, mainWindow, "Width");
+        readXmlElementValue(outputCfg.gui.heightNotMaximized, mainWindow, "Height");
+        readXmlElementValue(outputCfg.gui.posXNotMaximized, mainWindow, "PosX");
+        readXmlElementValue(outputCfg.gui.posYNotMaximized, mainWindow, "PosY");
+        readXmlElementValue(outputCfg.gui.isMaximized, mainWindow, "Maximized");
+
+//###########################################################
+        //read column widths
+        TiXmlElement* leftColumn = TiXmlHandle(mainWindow).FirstChild("LeftColumns").FirstChild("Width").ToElement();
+        while (leftColumn)
+        {
+            const char* width = leftColumn->GetText();
+            if (width) //may be NULL!!
+                outputCfg.gui.columnWidthLeft.push_back(stringToInt(width));
+            else
+                break;
+
+            leftColumn = leftColumn->NextSiblingElement();
+        }
+
+        TiXmlElement* rightColumn = TiXmlHandle(mainWindow).FirstChild("RightColumns").FirstChild("Width").ToElement();
+        while (rightColumn)
+        {
+            const char* width = rightColumn->GetText();
+            if (width) //may be NULL!!
+                outputCfg.gui.columnWidthRight.push_back(stringToInt(width));
+            else
+                break;
+
+            rightColumn = rightColumn->NextSiblingElement();
+        }
+    }
+
+
+//batch specific global settings
+    TiXmlElement* batch = hRoot.FirstChild("Batch").ToElement();
+    if (!batch) return false;
+
+
+//    if (!readXmlElementValue(outputCfg.dummy, global, "Language")) return false;
+
+    return true;
+}
+
+
+XmlConfigOutput::XmlConfigOutput(const wxString& fileName, const XmlType type) :
         m_fileName(fileName)
 {
     TiXmlBase::SetCondenseWhiteSpace(false); //do not condense whitespace characters
@@ -306,13 +498,15 @@ XmlOutput::XmlOutput(const wxString& fileName, const XmlType type) :
         root->SetAttribute("XmlType", "GUI"); //xml configuration type
     else if (type == XML_BATCH_CONFIG)
         root->SetAttribute("XmlType", "BATCH");
+    else if (type == XML_GLOBAL_SETTINGS)
+        root->SetAttribute("XmlType", "GLOBAL");
     else
         assert(false);
     doc.LinkEndChild(root);
 }
 
 
-bool XmlOutput::writeToFile()
+bool XmlConfigOutput::writeToFile()
 {
     //workaround to get a FILE* from a unicode filename
     wxFFile dummyFile(m_fileName, wxT("wb"));
@@ -325,7 +519,7 @@ bool XmlOutput::writeToFile()
 }
 
 
-void XmlOutput::addXmlElement(TiXmlElement* parent, const string& name, const string& value)
+void addXmlElement(TiXmlElement* parent, const string& name, const string& value)
 {
     if (parent)
     {
@@ -336,26 +530,26 @@ void XmlOutput::addXmlElement(TiXmlElement* parent, const string& name, const st
 }
 
 
-void XmlOutput::addXmlElement(TiXmlElement* parent, const string& name, const int value)
+void addXmlElement(TiXmlElement* parent, const string& name, const int value)
 {
     addXmlElement(parent, name, numberToString(value));
 }
 
 
-void XmlOutput::addXmlElement(TiXmlElement* parent, const string& name, const SyncDirection value)
+void addXmlElement(TiXmlElement* parent, const string& name, const SyncConfiguration::Direction value)
 {
-    if (value == SYNC_DIR_LEFT)
+    if (value == SyncConfiguration::SYNC_DIR_LEFT)
         addXmlElement(parent, name, string("left"));
-    else if (value == SYNC_DIR_RIGHT)
+    else if (value == SyncConfiguration::SYNC_DIR_RIGHT)
         addXmlElement(parent, name, string("right"));
-    else if (value == SYNC_DIR_NONE)
+    else if (value == SyncConfiguration::SYNC_DIR_NONE)
         addXmlElement(parent, name, string("none"));
     else
         assert(false);
 }
 
 
-void XmlOutput::addXmlElement(TiXmlElement* parent, const string& name, const bool value)
+void addXmlElement(TiXmlElement* parent, const string& name, const bool value)
 {
     if (value)
         addXmlElement(parent, name, string("true"));
@@ -364,7 +558,7 @@ void XmlOutput::addXmlElement(TiXmlElement* parent, const string& name, const bo
 }
 
 
-bool XmlOutput::writeXmlMainConfig(const XmlMainConfig& inputCfg)
+bool XmlConfigOutput::writeXmlMainConfig(const MainConfiguration& mainCfg, const vector<FolderPair>& directoryPairs)
 {
     TiXmlElement* root = doc.RootElement();
     if (!root) return false;
@@ -377,14 +571,14 @@ bool XmlOutput::writeXmlMainConfig(const XmlMainConfig& inputCfg)
     settings->LinkEndChild(cmpSettings);
 
     //write compare algorithm
-    addXmlElement(cmpSettings, "Variant", inputCfg.cfg.compareVar);
+    addXmlElement(cmpSettings, "Variant", mainCfg.compareVar);
 
     //write folder pair(s)
     TiXmlElement* folders = new TiXmlElement("Folders");
     cmpSettings->LinkEndChild(folders);
 
     //write folder pairs
-    for (vector<FolderPair>::const_iterator i = inputCfg.directoryPairs.begin(); i != inputCfg.directoryPairs.end(); ++i)
+    for (vector<FolderPair>::const_iterator i = directoryPairs.begin(); i != directoryPairs.end(); ++i)
     {
         TiXmlElement* folderPair = new TiXmlElement("Pair");
         folders->LinkEndChild(folderPair);
@@ -401,11 +595,11 @@ bool XmlOutput::writeXmlMainConfig(const XmlMainConfig& inputCfg)
     TiXmlElement* syncConfig = new TiXmlElement("Directions");
     syncSettings->LinkEndChild(syncConfig);
 
-    addXmlElement(syncConfig, "LeftOnly",   inputCfg.cfg.syncConfiguration.exLeftSideOnly);
-    addXmlElement(syncConfig, "RightOnly",  inputCfg.cfg.syncConfiguration.exRightSideOnly);
-    addXmlElement(syncConfig, "LeftNewer",  inputCfg.cfg.syncConfiguration.leftNewer);
-    addXmlElement(syncConfig, "RightNewer", inputCfg.cfg.syncConfiguration.rightNewer);
-    addXmlElement(syncConfig, "Different",  inputCfg.cfg.syncConfiguration.different);
+    addXmlElement(syncConfig, "LeftOnly",   mainCfg.syncConfiguration.exLeftSideOnly);
+    addXmlElement(syncConfig, "RightOnly",  mainCfg.syncConfiguration.exRightSideOnly);
+    addXmlElement(syncConfig, "LeftNewer",  mainCfg.syncConfiguration.leftNewer);
+    addXmlElement(syncConfig, "RightNewer", mainCfg.syncConfiguration.rightNewer);
+    addXmlElement(syncConfig, "Different",  mainCfg.syncConfiguration.different);
 
 //###########################################################
     TiXmlElement* miscSettings = new TiXmlElement("Miscellaneous");
@@ -415,21 +609,26 @@ bool XmlOutput::writeXmlMainConfig(const XmlMainConfig& inputCfg)
     TiXmlElement* filter = new TiXmlElement("Filter");
     miscSettings->LinkEndChild(filter);
 
-    addXmlElement(filter, "Active", inputCfg.cfg.filterIsActive);
-    addXmlElement(filter, "Include", string((inputCfg.cfg.includeFilter).ToUTF8()));
-    addXmlElement(filter, "Exclude", string((inputCfg.cfg.excludeFilter).ToUTF8()));
+    addXmlElement(filter, "Active", mainCfg.filterIsActive);
+    addXmlElement(filter, "Include", string((mainCfg.includeFilter).ToUTF8()));
+    addXmlElement(filter, "Exclude", string((mainCfg.excludeFilter).ToUTF8()));
 
     //other
-    addXmlElement(miscSettings, "Recycler", inputCfg.cfg.useRecycleBin);
-    addXmlElement(miscSettings, "Continue", inputCfg.cfg.continueOnError);
+    addXmlElement(miscSettings, "Recycler", mainCfg.useRecycleBin);
+    addXmlElement(miscSettings, "Continue", mainCfg.continueOnError);
 //###########################################################
 
     return true;
 }
 
 
-bool XmlOutput::writeXmlGuiConfig(const XmlGuiConfig& inputCfg)
+bool XmlConfigOutput::writeXmlGuiConfig(const XmlGuiConfig& inputCfg)
 {
+    //write main config
+    if (!writeXmlMainConfig(inputCfg.mainCfg, inputCfg.directoryPairs))
+        return false;
+
+    //write GUI specific config
     TiXmlElement* root = doc.RootElement();
     if (!root) return false;
 
@@ -444,34 +643,17 @@ bool XmlOutput::writeXmlGuiConfig(const XmlGuiConfig& inputCfg)
 
     addXmlElement(mainWindow, "HideFiltered", inputCfg.hideFilteredElements);
 
-    //window size
-    addXmlElement(mainWindow, "Width", inputCfg.widthNotMaximized);
-    addXmlElement(mainWindow, "Height", inputCfg.heightNotMaximized);
-
-    //window position
-    addXmlElement(mainWindow, "PosX", inputCfg.posXNotMaximized);
-    addXmlElement(mainWindow, "PosY", inputCfg.posYNotMaximized);
-    addXmlElement(mainWindow, "Maximized", inputCfg.isMaximized);
-
-    //write column sizes
-    TiXmlElement* leftColumn = new TiXmlElement("LeftColumns");
-    mainWindow->LinkEndChild(leftColumn);
-
-    for (unsigned int i = 0; i < inputCfg.columnWidthLeft.size(); ++i)
-        addXmlElement(leftColumn, "Width", inputCfg.columnWidthLeft[i]);
-
-    TiXmlElement* rightColumn = new TiXmlElement("RightColumns");
-    mainWindow->LinkEndChild(rightColumn);
-
-    for (unsigned int i = 0; i < inputCfg.columnWidthRight.size(); ++i)
-        addXmlElement(rightColumn, "Width", inputCfg.columnWidthRight[i]);
-
     return true;
 }
 
 
-bool XmlOutput::writeXmlBatchConfig(const XmlBatchConfig& inputCfg)
+bool XmlConfigOutput::writeXmlBatchConfig(const XmlBatchConfig& inputCfg)
 {
+    //write main config
+    if (!writeXmlMainConfig(inputCfg.mainCfg, inputCfg.directoryPairs))
+        return false;
+
+    //write GUI specific config
     TiXmlElement* root = doc.RootElement();
     if (!root) return false;
 
@@ -479,6 +661,63 @@ bool XmlOutput::writeXmlBatchConfig(const XmlBatchConfig& inputCfg)
     root->LinkEndChild(batchConfig);
 
     addXmlElement(batchConfig, "Silent", inputCfg.silent);
+
+    return true;
+}
+
+
+bool XmlConfigOutput::writeXmlGlobalSettings(const XmlGlobalSettings& inputCfg)
+{
+    TiXmlElement* root = doc.RootElement();
+    if (!root) return false;
+
+    //###################################################################
+    //write global settings
+    TiXmlElement* global = new TiXmlElement("Global");
+    root->LinkEndChild(global);
+
+    //program language
+    addXmlElement(global, "Language", inputCfg.global.programLanguage);
+
+    //###################################################################
+    //write gui settings
+    TiXmlElement* guiLayout = new TiXmlElement("Gui");
+    root->LinkEndChild(guiLayout);
+
+    TiXmlElement* windows = new TiXmlElement("Windows");
+    guiLayout->LinkEndChild(windows);
+
+    TiXmlElement* mainWindow = new TiXmlElement("Main");
+    windows->LinkEndChild(mainWindow);
+
+    //window size
+    addXmlElement(mainWindow, "Width", inputCfg.gui.widthNotMaximized);
+    addXmlElement(mainWindow, "Height", inputCfg.gui.heightNotMaximized);
+
+    //window position
+    addXmlElement(mainWindow, "PosX", inputCfg.gui.posXNotMaximized);
+    addXmlElement(mainWindow, "PosY", inputCfg.gui.posYNotMaximized);
+    addXmlElement(mainWindow, "Maximized", inputCfg.gui.isMaximized);
+
+    //write column sizes
+    TiXmlElement* leftColumn = new TiXmlElement("LeftColumns");
+    mainWindow->LinkEndChild(leftColumn);
+
+    for (unsigned int i = 0; i < inputCfg.gui.columnWidthLeft.size(); ++i)
+        addXmlElement(leftColumn, "Width", inputCfg.gui.columnWidthLeft[i]);
+
+    TiXmlElement* rightColumn = new TiXmlElement("RightColumns");
+    mainWindow->LinkEndChild(rightColumn);
+
+    for (unsigned int i = 0; i < inputCfg.gui.columnWidthRight.size(); ++i)
+        addXmlElement(rightColumn, "Width", inputCfg.gui.columnWidthRight[i]);
+
+
+    //###################################################################
+    //write batch settings
+
+    TiXmlElement* batch = new TiXmlElement("Batch");
+    root->LinkEndChild(batch);
 
     return true;
 }

@@ -40,18 +40,24 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("sync disabled.png")]      = (bitmapSyncDisabled      = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("swap.png")]               = (bitmapSwap              = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("help.png")]               = (bitmapHelp              = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("leftOnly.png")]           = (bitmapLeftOnly          = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("leftNewer.png")]          = (bitmapLeftNewer         = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("different.png")]          = (bitmapDifferent         = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("rightNewer.png")]         = (bitmapRightNewer        = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("rightOnly.png")]          = (bitmapRightOnly         = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("leftOnlyDeact.png")]      = (bitmapLeftOnlyDeact     = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("leftNewerDeact.png")]     = (bitmapLeftNewerDeact    = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("differentDeact.png")]     = (bitmapDifferentDeact    = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("rightNewerDeact.png")]    = (bitmapRightNewerDeact   = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("rightOnlyDeact.png")]     = (bitmapRightOnlyDeact    = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("equal.png")]              = (bitmapEqual             = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("equalAct.png")]           = (bitmapEqualAct          = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("equalDeact.png")]         = (bitmapEqualDeact        = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("leftOnly.png")]           = (bitmapLeftOnly          = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("leftOnlyAct.png")]        = (bitmapLeftOnlyAct       = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("leftOnlyDeact.png")]      = (bitmapLeftOnlyDeact     = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("leftNewer.png")]          = (bitmapLeftNewer         = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("leftNewerAct.png")]       = (bitmapLeftNewerAct      = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("leftNewerDeact.png")]     = (bitmapLeftNewerDeact    = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("different.png")]          = (bitmapDifferent         = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("differentAct.png")]       = (bitmapDifferentAct      = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("differentDeact.png")]     = (bitmapDifferentDeact    = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("rightNewer.png")]         = (bitmapRightNewer        = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("rightNewerAct.png")]      = (bitmapRightNewerAct     = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("rightNewerDeact.png")]    = (bitmapRightNewerDeact   = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("rightOnly.png")]          = (bitmapRightOnly         = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("rightOnlyAct.png")]       = (bitmapRightOnlyAct      = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("rightOnlyDeact.png")]     = (bitmapRightOnlyDeact    = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("include.png")]            = (bitmapInclude           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("exclude.png")]            = (bitmapExclude           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("filter active.png")]      = (bitmapFilterOn          = new wxBitmap(wxNullBitmap));
@@ -77,6 +83,7 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("remove pair.png")]        = (bitmapRemoveFolderPair  = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("remove pair disabl.png")] = (bitmapRemoveFolderPairD = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("link.png")]               = (bitmapLink              = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("background.png")]         = (bitmapBackground        = new wxBitmap(wxNullBitmap));
 
     //init all the other resource files
     animationMoney = new wxAnimation(wxNullAnimation);
@@ -103,7 +110,7 @@ void GlobalResources::load()
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files
-        wxImage::AddHandler(new wxPNGHandler);
+        wxImage::AddHandler(new wxPNGHandler); //ownership passed
 
         wxZipInputStream resourceFile(input);
 

@@ -43,6 +43,7 @@ class CustomGrid;
 #include <wx/animate.h>
 #include <wx/treectrl.h>
 #include <wx/notebook.h>
+#include <wx/spinctrl.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -59,9 +60,10 @@ protected:
     wxMenu* m_menu1;
     wxMenu* m_menu3;
     wxMenu* m_menu31;
-    wxMenuItem* m_menuItemEnglish;
     wxMenuItem* m_menuItemGerman;
+    wxMenuItem* m_menuItemEnglish;
     wxMenuItem* m_menuItemFrench;
+    wxMenuItem* m_menuItemDutch;
     wxMenuItem* m_menuItemJapanese;
     wxMenu* m_menu2;
     wxBoxSizer* bSizer1;
@@ -134,15 +136,15 @@ protected:
     {
         event.Skip();
     }
+    virtual void OnCompare( wxCommandEvent& event )
+    {
+        event.Skip();
+    }
+    virtual void OnSync( wxCommandEvent& event )
+    {
+        event.Skip();
+    }
     virtual void OnMenuQuit( wxCommandEvent& event )
-    {
-        event.Skip();
-    }
-    virtual void OnMenuExportFileList( wxCommandEvent& event )
-    {
-        event.Skip();
-    }
-    virtual void OnMenuLangEnglish( wxCommandEvent& event )
     {
         event.Skip();
     }
@@ -150,7 +152,15 @@ protected:
     {
         event.Skip();
     }
+    virtual void OnMenuLangEnglish( wxCommandEvent& event )
+    {
+        event.Skip();
+    }
     virtual void OnMenuLangFrench( wxCommandEvent& event )
+    {
+        event.Skip();
+    }
+    virtual void OnMenuLangDutch( wxCommandEvent& event )
     {
         event.Skip();
     }
@@ -158,15 +168,19 @@ protected:
     {
         event.Skip();
     }
+    virtual void OnMenuAdjustFileTimes( wxCommandEvent& event )
+    {
+        event.Skip();
+    }
     virtual void OnMenuBatchJob( wxCommandEvent& event )
     {
         event.Skip();
     }
-    virtual void OnMenuAbout( wxCommandEvent& event )
+    virtual void OnMenuExportFileList( wxCommandEvent& event )
     {
         event.Skip();
     }
-    virtual void OnCompare( wxCommandEvent& event )
+    virtual void OnMenuAbout( wxCommandEvent& event )
     {
         event.Skip();
     }
@@ -195,10 +209,6 @@ protected:
         event.Skip();
     }
     virtual void OnHideFilteredButton( wxCommandEvent& event )
-    {
-        event.Skip();
-    }
-    virtual void OnSync( wxCommandEvent& event )
     {
         event.Skip();
     }
@@ -730,6 +740,8 @@ protected:
     wxStaticText* m_staticText69;
     wxStaticText* m_staticText70;
     wxStaticText* m_staticText71;
+    wxStaticText* m_staticText711;
+    wxStaticText* m_staticText712;
     wxStaticLine* m_staticline3;
     wxStaticText* m_staticText131;
     wxStaticBitmap* m_bitmap9;
@@ -862,7 +874,10 @@ protected:
     wxPanel* m_panel13;
     wxStaticLine* m_staticline10;
     wxStaticText* m_staticText45;
-    wxStaticText* m_staticText18;
+    wxStaticText* m_staticText83;
+    wxStaticText* m_staticText84;
+    wxStaticText* m_staticText85;
+    wxStaticText* m_staticText86;
     wxStaticText* m_staticText181;
     wxStaticText* m_staticText1811;
 
@@ -905,6 +920,59 @@ protected:
 public:
     FilterDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configure filter"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
     ~FilterDlgGenerated();
+
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class ModifyFilesDlgGenerated
+///////////////////////////////////////////////////////////////////////////////
+class ModifyFilesDlgGenerated : public wxDialog
+{
+private:
+
+protected:
+    wxPanel* m_panel8;
+
+    wxStaticText* m_staticText56;
+
+
+
+    wxStaticText* m_staticTextHeader;
+
+    wxHyperlinkCtrl* m_hyperlink6;
+
+    wxTextCtrl* m_textCtrlDirectory;
+    wxDirPickerCtrl* m_dirPicker;
+    wxSpinCtrl* m_spinCtrlTimeShift;
+    wxButton* m_button21;
+    wxButton* m_buttonApply;
+
+    // Virtual event handlers, overide them in your derived class
+    virtual void OnClose( wxCloseEvent& event )
+    {
+        event.Skip();
+    }
+    virtual void OnWriteDirManually( wxCommandEvent& event )
+    {
+        event.Skip();
+    }
+    virtual void OnDirSelected( wxFileDirPickerEvent& event )
+    {
+        event.Skip();
+    }
+    virtual void OnCancel( wxCommandEvent& event )
+    {
+        event.Skip();
+    }
+    virtual void OnApply( wxCommandEvent& event )
+    {
+        event.Skip();
+    }
+
+
+public:
+    ModifyFilesDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+    ~ModifyFilesDlgGenerated();
 
 };
 

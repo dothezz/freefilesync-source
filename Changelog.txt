@@ -1,6 +1,22 @@
 FreeFileSync
 ------------
 
+Changelog v1.12
+---------------
+Significantly improved speed of all sorting algorithms
+Keep sorting sequence when adding or removing rows
+'Sort by relative path' secondarily sorts by filename and respects folders
+Allow adding multiple files/folders to exclude filter via context menu
+Exclude full relative path instead of short filenames via context menu
+Fixed possible memory leak when cancelling compare
+New option to manually adjust file modification times (To be used e.g. for FAT32 volumes on DST switch)
+Handling of different types of configuration (GUI, batch, global)
+Enhanced exception handling
+Multiple GUI improvements
+Added Dutch translation
+Updated translation files
+
+
 Changelog v1.11
 ---------------
 Support for multiple folder pairs
