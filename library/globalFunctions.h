@@ -4,6 +4,7 @@
 #include <string>
 #include <algorithm>
 #include <vector>
+#include <set>
 #include <wx/string.h>
 #include <fstream>
 #include <wx/stream.h>
@@ -105,5 +106,34 @@ public:
 private:
     wxString errorMessage;
 };
+
+
+//Note: the following lines are a performance optimization for deleting elements from a vector. It is incredibly faster to create a new
+//vector and leave specific elements out than to delete row by row and force recopying of most elements for each single deletion (linear vs quadratic runtime)
+template <class T>
+void removeRowsFromVector(vector<T>& grid, const set<int>& rowsToRemove)
+{
+    vector<T> temp;
+    int rowToSkip = -1; //keep it an INT!
+
+    set<int>::iterator rowToSkipIndex = rowsToRemove.begin();
+
+    if (rowToSkipIndex != rowsToRemove.end())
+        rowToSkip = *rowToSkipIndex;
+
+    for (int i = 0; i < int(grid.size()); ++i)
+    {
+        if (i != rowToSkip)
+            temp.push_back(grid[i]);
+        else
+        {
+            ++rowToSkipIndex;
+            if (rowToSkipIndex != rowsToRemove.end())
+                rowToSkip = *rowToSkipIndex;
+        }
+    }
+    grid.swap(temp);
+}
+
 
 #endif // GLOBALFUNCTIONS_H_INCLUDED

@@ -12,7 +12,6 @@
 
 #include <wx/app.h>
 #include <wx/cmdline.h>
-#include "FreeFileSync.h"
 #include "ui/smallDialogs.h"
 #include "library/misc.h"
 #include "library/processXml.h"
@@ -43,28 +42,31 @@ class LogFile;
 class BatchStatusUpdater : public StatusHandler
 {
 public:
-    BatchStatusUpdater(bool continueOnError, bool silent, LogFile* log);
+    BatchStatusUpdater(bool ignoreAllErrors, bool silent, LogFile* log);
     ~BatchStatusUpdater();
 
-    void updateStatusText(const wxString& text);
-    void initNewProcess(int objectsTotal, double dataTotal, Process processID);
-    void updateProcessedData(int objectsProcessed, double dataProcessed);
-    ErrorHandler::Response reportError(const wxString& text);
-    void forceUiRefresh();
+    virtual void updateStatusText(const wxString& text);
+    virtual void initNewProcess(int objectsTotal, double dataTotal, Process processID);
+    virtual void updateProcessedData(int objectsProcessed, double dataProcessed);
+    virtual ErrorHandler::Response reportError(const wxString& text);
+    virtual void forceUiRefresh();
 
-    void noSynchronizationNeeded();
+    wxWindow* getWindow();
+    void setFinalStatus(const wxString& message, SyncStatus::SyncStatusID id); //overwrite final status message text
 
 private:
-    void abortThisProcess();
+    virtual void abortThisProcess();
 
     LogFile* m_log;
     SyncStatus* syncStatusFrame;
-    bool continueErrors;
+    bool ignoreErrors;
     bool silentMode;
 
     wxArrayString unhandledErrors; //list of non-resolved errors
     Process currentProcess;
-    bool synchronizationNeeded;
+
+    wxString customStatusMessage; //final status message written by service consumer
+    SyncStatus::SyncStatusID customStatusId;
 };
 
 

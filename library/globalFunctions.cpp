@@ -91,7 +91,7 @@ double globalFunctions::wxStringToDouble(const wxString& number)
 wxString& globalFunctions::includeNumberSeparator(wxString& number)
 {
     for (int i = number.size() - 3; i > 0; i-= 3)
-        number.insert(i, GlobalResources::thousandsSeparator);
+        number.insert(i, GlobalResources::THOUSANDS_SEPARATOR);
     return number;
 }
 
@@ -197,5 +197,5 @@ void DebugLog::write(const wxString& logText)
 
 wxString getCodeLocation(const wxString file, const int line)
 {
-    return wxString(file).AfterLast(GlobalResources::fileNameSeparator) + wxT(", LINE ") + globalFunctions::numberToWxString(line) + wxT(" | ");
+    return wxString(file).AfterLast(GlobalResources::FILE_NAME_SEPARATOR) + wxT(", LINE ") + globalFunctions::numberToWxString(line) + wxT(" | ");
 }

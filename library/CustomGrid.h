@@ -5,7 +5,8 @@
 #include <wx/grid.h>
 #include "../FreeFileSync.h"
 
-using namespace std;
+using namespace FreeFileSync;
+
 
 class CustomGridTableBase;
 
@@ -35,7 +36,7 @@ public:
     //this method is called when grid view changes: useful for parallel updating of multiple grids
     void DoPrepareDC(wxDC& dc);
 
-    void setScrollFriends(CustomGrid* grid1, CustomGrid* grid2, CustomGrid* grid3);
+    void setScrollFriends(CustomGrid* gridLeft, CustomGrid* gridRight, CustomGrid* gridMiddle);
 
     void setGridDataTable(GridView* gridRefUI, FileCompareResult* gridData);
 
@@ -51,9 +52,9 @@ private:
 
     bool scrollbarsEnabled;
 
-    CustomGrid* m_grid1;
-    CustomGrid* m_grid2;
-    CustomGrid* m_grid3;
+    CustomGrid* m_gridLeft;
+    CustomGrid* m_gridRight;
+    CustomGrid* m_gridMiddle;
 
     CustomGridTableBase* gridDataTable;
 

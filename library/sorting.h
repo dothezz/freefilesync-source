@@ -104,8 +104,8 @@ template <bool sortAscending, SideToSort side>
 inline
 bool sortByFileName(const FileCompareLine& a, const FileCompareLine& b)
 {
-    const FileDescrLine* descrLineA;
-    const FileDescrLine* descrLineB;
+    const FileDescrLine* descrLineA = NULL;
+    const FileDescrLine* descrLineB = NULL;
     getDescrLine<side>(a, b, descrLineA, descrLineB);
 
     //presort types: first files, then directories then empty rows
@@ -124,7 +124,7 @@ bool sortByFileName(const FileCompareLine& a, const FileCompareLine& b)
         int lenghtA  = 0;
         int lenghtB  = 0;
 
-        int pos = descrLineA->relativeName.Find(GlobalResources::fileNameSeparator, true); //start search beginning from end
+        int pos = descrLineA->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
         if (pos == wxNOT_FOUND)
         {
             stringA = descrLineA->relativeName.c_str();
@@ -136,7 +136,7 @@ bool sortByFileName(const FileCompareLine& a, const FileCompareLine& b)
             lenghtA = descrLineA->relativeName.Len() - (pos + 1);
         }
 
-        pos = descrLineB->relativeName.Find(GlobalResources::fileNameSeparator, true); //start search beginning from end
+        pos = descrLineB->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
         if (pos == wxNOT_FOUND)
         {
             stringB = descrLineB->relativeName.c_str();
@@ -149,7 +149,7 @@ bool sortByFileName(const FileCompareLine& a, const FileCompareLine& b)
         }
 
         int rv = compareString(stringA, stringB, lenghtA, lenghtB);
-        return sortAscending ? (rv == -1) : (rv != -1);
+        return sortAscending ? (rv == -1) : (rv == 1);
     }
 }
 
@@ -158,8 +158,8 @@ template <bool sortAscending, SideToSort side>
 inline
 bool sortByRelativeName(const FileCompareLine& a, const FileCompareLine& b)
 {
-    const FileDescrLine* descrLineA;
-    const FileDescrLine* descrLineB;
+    const FileDescrLine* descrLineA = NULL;
+    const FileDescrLine* descrLineB = NULL;
     getDescrLine<side>(a, b, descrLineA, descrLineB);
 
     //extract relative name and filename
@@ -174,7 +174,7 @@ bool sortByRelativeName(const FileCompareLine& a, const FileCompareLine& b)
     }
     else if (descrLineA->objType == FileDescrLine::TYPE_FILE)
     {
-        relLenghtA = descrLineA->relativeName.Find(GlobalResources::fileNameSeparator, true); //start search beginning from end
+        relLenghtA = descrLineA->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
         if (relLenghtA == wxNOT_FOUND)
         {
             relLenghtA  = 0;
@@ -203,7 +203,7 @@ bool sortByRelativeName(const FileCompareLine& a, const FileCompareLine& b)
     }
     else if (descrLineB->objType == FileDescrLine::TYPE_FILE)
     {
-        relLenghtB = descrLineB->relativeName.Find(GlobalResources::fileNameSeparator, true); //start search beginning from end
+        relLenghtB = descrLineB->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
         if (relLenghtB == wxNOT_FOUND)
         {
             relLenghtB  = 0;
@@ -223,7 +223,7 @@ bool sortByRelativeName(const FileCompareLine& a, const FileCompareLine& b)
     //compare relative names without filenames first
     int rv = compareString(relStringA, relStringB, relLenghtA, relLenghtB);
     if (rv != 0)
-        return sortAscending ? (rv == -1) : (rv != -1);
+        return sortAscending ? (rv == -1) : (rv == 1);
     else //compare the filenames
     {
         if (descrLineB->objType == FileDescrLine::TYPE_DIRECTORY)  //directories shall appear before files
@@ -232,7 +232,7 @@ bool sortByRelativeName(const FileCompareLine& a, const FileCompareLine& b)
             return true;
 
         rv = compareString(fileStringA, fileStringB, fileLengthA, fileLengthB);
-        return sortAscending ? (rv == -1) : (rv != -1);
+        return sortAscending ? (rv == -1) : (rv == 1);
     }
 }
 
@@ -241,8 +241,8 @@ template <bool sortAscending, SideToSort side>
 inline
 bool sortByFileSize(const FileCompareLine& a, const FileCompareLine& b)
 {
-    const FileDescrLine* descrLineA;
-    const FileDescrLine* descrLineB;
+    const FileDescrLine* descrLineA = NULL;
+    const FileDescrLine* descrLineB = NULL;
     getDescrLine<side>(a, b, descrLineA, descrLineB);
 
     //presort types: first files, then directories then empty rows
@@ -263,8 +263,8 @@ template <bool sortAscending, SideToSort side>
 inline
 bool sortByDate(const FileCompareLine& a, const FileCompareLine& b)
 {
-    const FileDescrLine* descrLineA;
-    const FileDescrLine* descrLineB;
+    const FileDescrLine* descrLineA = NULL;
+    const FileDescrLine* descrLineB = NULL;
     getDescrLine<side>(a, b, descrLineA, descrLineB);
 
     return cmpString<sortAscending>(descrLineA->lastWriteTime, descrLineB->lastWriteTime);

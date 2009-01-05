@@ -1,7 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
-  Time: 
-  Uhrzeit: 
  Byte
  Byte
  GB
@@ -54,8 +52,6 @@
 &Abbruch
 &Compare
 &Vergleichen
-&Continue
-&Fortfahren
 &Create
 &Erzeugen
 &Create batch job
@@ -63,19 +59,25 @@
 &Default
 &Standard
 &Export file list
-&Exportiere Dateiliste
+E&xportiere Dateiliste
 &File
 &Datei
 &Help
 &Hilfe
+&Ignore
+&Ignorieren
 &Language
 &Sprache
+&Load configuration
+&Lade Konfiguration
 &OK
 &OK
 &Pause
 &Pause
 &Quit
 &Beenden
+&Resolve
+&Beheben
 &Retry
 &Wiederholen
 &Start
@@ -106,16 +108,18 @@
 - rechts neuer
 - same date (different size)
 - gleiches Datum (unterschiedliche Größe)
--------------------------------------------------
------------------------------------------------------
 ---------\n
 -----------\n
 -Open-Source file synchronization-
 -Open-Source Datei-Synchronisation-
 .
 ,
+1. &Compare
+1. &Vergleichen
 1. Enter full file or directory names separated by ';' or a new line.
 1. Komplette Datei- und Verzeichnisnamen getrennt durch ';' oder eine Neuzeile eingeben.
+2. &Synchronize...
+2. &Synchronisieren...
 2. Use wildcard characters '*' and '?'.
 2. Die Platzhalter '*' und '?' werden unterstützt.
 3. Exclude files directly on main grid via context menu.
@@ -134,6 +138,8 @@
 ==	Dateien sind gleich\n\n
 >>	right file is newer\n
 >>	rechte Datei ist neuer\n
+A file time shift due to a daylight saving time change was detected for a FAT/FAT32 drive.
+Eine Verschiebung der Dateiänderungszeiten aufgrund der Sommer-/Winterzeitumstellung wurde auf einem FAT/FAT32 Laufwerk erkannt.
 Abort
 Abbruch
 Abort requested: Waiting for current operation to finish...
@@ -151,15 +157,13 @@ Add to exclude filter:
 Adjust file times
 Dateizeiten ändern
 Adjust modification times of all files contained in the specified folder and its subfolders. This manual adaption might become necessary if you are synchronizing against a FAT32 drive and the daylight saving time is switched. For an overview about the issue see this article:
-Passt die Änderungszeiten aller Datein im angegebenen Ordner einschließlich Unterordner an. Diese manuelle Änderung kann nötig sein, wenn gegen ein FAT32-Laufwerk synchronisiert und zwischen Sommer- und Winterzeit umgestellt wurde. Für eine Übersicht der Problematik siehe:
+Passt die Änderungszeiten aller Dateien im angegebenen Ordner einschließlich Unterordner an. Diese manuelle Änderung kann nötig sein, wenn gegen ein FAT32-Laufwerk synchronisiert und zwischen Sommer- und Winterzeit umgestellt wurde. Für eine Übersicht der Problematik siehe:
 All file times have been adjusted successfully!
 Alle Dateien wurden erfolgreich angepasst!
 All items have been synchronized!
 Alle Elemente wurden synchronisiert!
-An error occured
-Fehler
 An exception occured!
-Eine Exception wurde geworfen!
+Eine Ausnahme ist aufgetreten!
 Apply
 Anwenden
 As a result 6 different status can be returned to categorize all files:
@@ -212,12 +216,10 @@ Configure your own synchronization rules.
 Eigene Synchronisationsregeln definieren.
 Confirm
 Bestätigen
+Consider this when setting up synchronization rules: You might want to avoid write access to these directories so that synchronization of both does not interfere.
+Achtung beim Festlegen der Synchronisationseinstellungen: Ein Schreibzugriff auf diese Verzeichnisse sollte vermieden werden, so dass sich die Synchronization von beiden nicht gegenseitig beeinflusst.
 Continue
 Fortfahren
-Continue on error
-Fortfahren bei Fehler
-Continue on next errors
-Fortfahren bei nächsten Fehlern
 Copy from left to right
 Von links nach rechts kopieren
 Copy from left to right overwriting
@@ -226,6 +228,8 @@ Copy from right to left
 Von rechts nach links kopieren
 Copy from right to left overwriting
 Von rechts nach links kopieren und überschreiben
+Copy new or updated files to right folder.
+Kopiere neue oder aktualisierte Dateien in den rechten Ordner.
 Copy to clipboard\tCTRL+C
 Kopiere in Zwischenablage\tCTRL+C
 Copying file 
@@ -237,7 +241,7 @@ Fehler beim Öffnen der Datei:
 Could not read language file 
 Fehler beim Lesen der Sprachdatei 
 Could not retrieve file info for: 
-Fehler beim Lesen der Dateiattribute von:
+Fehler beim Lesen der Dateiattribute von: 
 Could not set working directory to directory containing executable file!
 Arbeitsverzeichnisses konnte nicht auf Pfad der .exe-Datei gelegt werden!
 Could not write configuration file 
@@ -262,6 +266,10 @@ Data:
 Daten:
 Date
 Datum
+Date: 
+Datum: 
+Daylight saving time change detected for FAT/FAT32 drive.
+Sommer-/Winterzeitumstellung wurde für ein FAT/FAT32 Laufwerk erkannt.
 Delete files/folders existing on left side only
 Lösche Dateien/Ordner, die nur links existieren
 Delete files/folders existing on right side only
@@ -274,10 +282,14 @@ Deleting file
 Lösche Datei 
 Deleting folder 
 Lösche Verzeichnis 
+Directories are dependent: 
+Die Verzeichnisse sind voneinander abhängig: 
 Directory does not exist: 
 Das Verzeichnis existiert nicht: 
 Do not show graphical status and error messages but write to a logfile instead
 Keine graphischen Status- und Fehlermeldungen anzeigen, sondern eine Logdatei erstellen
+Do not show this warning again
+Diese Warnung nicht mehr anzeigen
 Do nothing
 Nichts tun
 Do you really want to delete the following objects(s)?
@@ -288,6 +300,8 @@ Donate with PayPal
 Spenden mit PayPal
 Drag && drop
 Drag && Drop
+Drive:
+Laufwerk:
 Email:
 Email:
 Error
@@ -304,18 +318,16 @@ Error copying file
 Fehler beim Kopieren der Datei 
 Error creating directory 
 Fehler beim Erstellen des Verzeichnisses 
-Error deleting directory 
-Fehler beim Löschen des Verzeichnisses 
-Error deleting file 
-Fehler beim Löschen der Datei 
+Error deleting directory: 
+Fehler beim Löschen des Verzeichnisses: 
+Error deleting file: 
+Fehler beim Löschen der Datei: 
 Error moving to recycle bin: 
 Fehler beim Verschieben in den Papierkorb: 
 Error parsing configuration file 
 Fehler beim Auswerten der Konfigurationsdatei 
 Error reading file: 
 Fehler beim Lesen der Datei: 
-Error scanning directory: 
-Fehler beim Lesen des Verzeichnisses: 
 Error traversing directory 
 Fehler beim Durchsuchen des Verzeichnisses 
 Error when converting int to wxString
@@ -374,8 +386,6 @@ Filter view
 Ansicht filtern
 Folder pair
 Verzeichnispaar
-FreeFileSync   (Date: 
-FreeFileSync   (Datum: 
 FreeFileSync - Folder Comparison and Synchronization
 FreeFileSync - Verzeichnisvergleich und -synchronisation
 FreeFileSync Batch Job
@@ -402,8 +412,8 @@ Hide files that exist on right side only
 Blende Dateien aus, die nur rechts existieren
 Hide filtered items
 Gefilterte Elemente ausblenden
-Hide further error messages during the current process and continue
-Unterdrücke alle nachfolgenden Fehlermeldungen für den aktuellen Prozess und fahre fort
+Hide further error messages during the current process
+Weitere Fehlermeldungen während des aktuellen Prozesses ausblenden
 Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
 Verhindert das Anzeigen von Fehlermeldungen während der Synchronisation:\nSie werden jedoch gesammelt und nach dem Vorgang als Liste angezeigt
 Hints:
@@ -412,6 +422,14 @@ Homepage:
 Homepage:
 If you like FFS:
 FFS unterstützen:
+Ignore errors
+Fehler ignorieren
+Ignore next errors
+Weitere Fehler ignorieren
+Ignore this error, retry or abort comparison?
+Fehler ignorieren, wiederholen oder Vergleich abbrechen?
+Ignore this error, retry or abort synchronization?
+Fehler ignorieren, wiederholen oder Synchronisation abbrechen?
 Include
 Einschließen
 Include temporarily
@@ -422,6 +440,8 @@ Info
 Info
 Information
 Information
+Information: If you ignore the error or abort a re-compare will be necessary!
+Information: Wenn der Fehler nicht behoben wird, muss der Vergleich erneut gestartet werden!
 Initialization of Recycle Bin failed! It cannot be used!
 Die Initialisierung des Papierkorbs ist fehlgeschlagen! Er kann nicht verwendet werden!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -434,8 +454,10 @@ Load configuration via...\n     - this list (press DEL to delete items)\n     - 
 Lade Konfiguration über...\n     - diese Liste (DEL-Taste löscht Einträge)\n     - Drag & Drop auf dieses Fenster\n     - Startupparameter
 Load from file...
 Lade aus Datei...
-Log-messages:\n-------------
-Lognachrichten:\n---------------
+Log-messages:
+Lognachrichten:
+Mirror ->>
+Spiegel ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Spiegel-Backup des linken Ordners erstellen: Der rechte Ordner wird dabei überschrieben und nach der Synchronisation dem linken exakt gleichen.
 No valid configuration file specified: 
@@ -450,10 +472,8 @@ Number of files and directories that will be deleted
 Anzahl der Dateien und Verzeichnisse, die gelöscht werden
 Number of files that will be overwritten
 Anzahl der Dateien, die überschrieben werden
-One way ->
-Nach rechts ->
-Only files/directories that pass filtering will be selected for synchronization.\nThe filter will be applied to the full name including path prefix.
-Bei der Synchronisation werden nur die Dateien/Ordner berücksichtigt, die zu den Filtereinstellungen passen.\nDer Filter wird dabei auf den kompletten Dateinamen einschließlich Pfadprefix angewandt.
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the full name including path prefix.
+Bei der Synchronisation werden nur die Dateien/Ordner berücksichtigt, die zu den Filtereinstellungen passen. Der Filter wird dabei auf den kompletten Dateinamen einschließlich Pfadprefix angewandt.
 Open synchronization dialog
 Zeige Synchronisationseinstellungen
 Open with Explorer\tD-Click
@@ -466,6 +486,8 @@ Pause
 Pause
 Please fill all empty directory fields.
 Bitte alle leeren Verzeichnisfelder füllen.
+Please restart synchronization!
+Synchronisation bitte erneut ausführen!
 Press button to activate filter
 Auswählen, um Filter zu aktivieren
 Preview
@@ -482,6 +504,8 @@ Result
 Ergebnis
 Right folder:
 Rechter Ordner:
+S&ave configuration
+S&peichere Konfiguration
 Save current configuration to file
 Aktuelle Konfiguration in Datei sichern
 Saved aborted!
@@ -546,14 +570,18 @@ System out of memory!
 Zu wenig freier Arbeitsspeicher!
 The selected file does not contain a valid configuration!
 Die ausgewählte Datei enthält keine gültige Konfiguration!
-The selected file does not exist anymore!
-Die gewählte Datei existiert nicht mehr!
+The selected file does not exist: 
+Die ausgewählte Datei existiert nicht: 
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
 Diese Variante identifiziert zwei gleichnamige Dateien als gleich, wenn sie die gleiche Dateigröße haben UND der Zeitpunkt der letzten Änderung derselbe ist. Dabei wird eine Abweichung von bis zu zwei Sekunden toleriert. So ist sichergestellt, dass eine Synchronisation gegen ein FAT32 Dateisystem korrekt funktioniert.
 Time elapsed:
 Vergangene Zeit:
 Time shift in seconds
 Zeitverschiebung in Sekunden
+Time shift:
+Zeitverschiebung:
+Time: 
+Zeit: 
 Total amount of data that will be transferred
 Gesamtmenge der Daten, die übertragen werden
 Total time: 
@@ -564,6 +592,10 @@ Unable to create logfile!
 Fehler beim Erstellen der Logdatei!
 Unable to initialize Recycle Bin!
 Der Papierkorb konnte nicht initialisiert werden!
+Unresolved errors occured during operation!
+Es sind nichtbehobene Fehler aufgetreten!
+Update ->
+Update ->
 Update:
 Überschreiben:
 Use Recycle Bin
@@ -576,12 +608,8 @@ Warning: Synchronization failed for
 Warnung: Synchronisation fehlgeschlagen für 
 When \"Compare\" is triggered with this option set the following decision tree is processed:
 Nachdem \"Compare\" mit dieser Einstellung gestartet wurde, wird der folgende Entscheidungsbaum abgearbeitet:
-\n\nContinue with next object, retry or abort comparison?
-\n\nMit nächstem Objekt fortfahren, wiederholen oder abbrechen?
-\n\nContinue with next object, retry or abort synchronization?
-\n\nMit nächstem Objekt fortsetzen, wiederholen oder abbrechen?
-\n\nInformation: If you skip the error and continue or abort a re-compare will be necessary!
-\n\nInformation: Wenn der Fehler nicht behoben wird, muss der Vergleich erneut gestartet werden!
+You can adjust the file times accordingly to resolve the issue:
+Die Dateizeiten können entsprechend angepasst werden, um den Fehler zu beheben:
 different
 verschieden
 file exists on both sides

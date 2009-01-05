@@ -5,6 +5,8 @@
 #include "tinyxml/tinyxml.h"
 #include <wx/intl.h>
 
+using namespace FreeFileSync;
+
 
 namespace xmlAccess
 {
@@ -45,8 +47,18 @@ namespace xmlAccess
     {
         struct _Global
         {
-            _Global() : programLanguage(wxLocale::GetSystemLanguage()) {}
+            _Global() :
+                    programLanguage(wxLocale::GetSystemLanguage()),
+#ifdef FFS_WIN
+                    dstCheckActive(true),
+#endif
+                    folderDependCheckActive(true) {}
+
             int programLanguage;
+#ifdef FFS_WIN
+            bool dstCheckActive;
+#endif
+            bool folderDependCheckActive;
         } global;
 
         struct _Gui

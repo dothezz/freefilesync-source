@@ -129,8 +129,8 @@ void CustomLocale::setLanguage(const int language)
         ;   //if languageFile is empty texts will be english per default
 
     //these global variables need to be redetermined on language selection
-    GlobalResources::decimalPoint = _(".");
-    GlobalResources::thousandsSeparator = _(",");
+    GlobalResources::DECIMAL_POINT = _(".");
+    GlobalResources::THOUSANDS_SEPARATOR = _(",");
 }
 
 

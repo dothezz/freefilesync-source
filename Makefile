@@ -3,8 +3,14 @@ ENDFLAGS=`wx-config --libs` -lwx_gtk2_aui-2.8 -O3 -pthread
 
 all: FreeFileSync
 
-obj/FreeFileSync.o: FreeFileSync.cpp
-	g++ $(CPPFLAGS) FreeFileSync.cpp -o obj/FreeFileSync.o
+obj/algorithm.o: algorithm.cpp
+	g++ $(CPPFLAGS) algorithm.cpp -o obj/algorithm.o
+
+obj/comparison.o: comparison.cpp
+	g++ $(CPPFLAGS) comparison.cpp -o obj/comparison.o
+
+obj/synchronization.o: synchronization.cpp
+	g++ $(CPPFLAGS) synchronization.cpp -o obj/synchronization.o
 
 obj/application.o: application.cpp
 	g++ $(CPPFLAGS) application.cpp -o obj/application.o
@@ -23,6 +29,9 @@ obj/syncDialog.o: ui/syncDialog.cpp
 
 obj/customGrid.o: library/customGrid.cpp
 	g++ $(CPPFLAGS) library/customGrid.cpp -o obj/customGrid.o
+
+obj/fileHandling.o: library/fileHandling.cpp
+	g++ $(CPPFLAGS) library/fileHandling.cpp -o obj/fileHandling.o
 
 obj/multithreading.o: library/multithreading.cpp
 	g++ $(CPPFLAGS) library/multithreading.cpp -o obj/multithreading.o
@@ -51,8 +60,8 @@ obj/tinyxmlparser.o: library/tinyxml/tinyxmlparser.cpp
 obj/processXml.o: library/processXml.cpp
 	g++ $(CPPFLAGS) library/processXml.cpp -o obj/processXml.o
 	
-FreeFileSync: obj/FreeFileSync.o obj/application.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o
-	g++ $(ENDFLAGS) -o FreeFileSync obj/application.o obj/FreeFileSync.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o
+FreeFileSync: obj/application.o obj/algorithm.o obj/comparison.o obj/synchronization.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/fileHandling.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o
+	g++ $(ENDFLAGS) -o FreeFileSync obj/application.o obj/algorithm.o obj/comparison.o obj/synchronization.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/fileHandling.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o
 
 
 clean:

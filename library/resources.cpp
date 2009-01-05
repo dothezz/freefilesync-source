@@ -6,16 +6,16 @@
 #include "globalFunctions.h"
 
 #ifdef FFS_WIN
-const wxChar GlobalResources::fileNameSeparator = '\\';
+const wxChar GlobalResources::FILE_NAME_SEPARATOR = '\\';
 #elif defined FFS_LINUX
-const wxChar GlobalResources::fileNameSeparator = '/';
+const wxChar GlobalResources::FILE_NAME_SEPARATOR = '/';
 #else
 assert(false);
 #endif
 
 //these two global variables are language-dependent => cannot be set statically! See CustomLocale
-const wxChar* GlobalResources::decimalPoint       = wxEmptyString;
-const wxChar* GlobalResources::thousandsSeparator = wxEmptyString;
+const wxChar* GlobalResources::DECIMAL_POINT       = wxEmptyString;
+const wxChar* GlobalResources::THOUSANDS_SEPARATOR = wxEmptyString;
 
 GlobalResources globalResource;  //init resources on program startup
 
@@ -84,6 +84,13 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("remove pair disabl.png")] = (bitmapRemoveFolderPairD = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("link.png")]               = (bitmapLink              = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("background.png")]         = (bitmapBackground        = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("compare_small.png")]      = (bitmapCompareSmall      = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("sync_small.png")]         = (bitmapSyncSmall         = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("clock_small.png")]        = (bitmapClockSmall        = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("clock.png")]              = (bitmapClock             = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("filter.png")]             = (bitmapFilter            = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("batch.png")]              = (bitmapBatch             = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("batch_small.png")]        = (bitmapBatchSmall        = new wxBitmap(wxNullBitmap));
 
     //init all the other resource files
     animationMoney = new wxAnimation(wxNullAnimation);

@@ -1,9 +1,10 @@
 #include "smallDialogs.h"
 #include "../library/globalFunctions.h"
 #include "../library/resources.h"
+#include "../algorithm.h"
 #include <wx/msgdlg.h>
 
-using namespace globalFunctions;
+using namespace FreeFileSync;
 
 
 AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
@@ -51,6 +52,8 @@ void AboutDlg::OnOK(wxCommandEvent& event)
 HelpDlg::HelpDlg(wxWindow* window) : HelpDlgGenerated(window)
 {
     m_notebook1->SetFocus();
+
+    m_bitmap25->SetBitmap(*globalResource.bitmapHelp);
 
     //populate decision trees: "compare by date"
     wxTreeItemId treeRoot      = m_treeCtrl1->AddRoot(_("DECISION TREE"));
@@ -105,9 +108,9 @@ FilterDlg::FilterDlg(wxWindow* window, wxString& filterIncl, wxString& filterExc
         includeFilter(filterIncl),
         excludeFilter(filterExcl)
 {
-
     m_bitmap8->SetBitmap(*globalResource.bitmapInclude);
     m_bitmap9->SetBitmap(*globalResource.bitmapExclude);
+    m_bitmap26->SetBitmap(*globalResource.bitmapFilter);
     m_bpButtonHelp->SetBitmapLabel(*globalResource.bitmapHelp);
 
     m_textCtrlInclude->SetValue(includeFilter);
@@ -196,9 +199,9 @@ void DeleteDialog::OnClose(wxCloseEvent& event)
 //########################################################################################
 
 
-ErrorDlg::ErrorDlg(const wxString messageText, bool& continueError) :
-        ErrorDlgGenerated(NULL),
-        continueOnError(continueError)
+ErrorDlg::ErrorDlg(wxWindow* parentWindow, const wxString messageText, bool& ignoreNextErrors, int dummy) :
+        ErrorDlgGenerated(parentWindow),
+        ignoreErrors(ignoreNextErrors)
 {
     m_bitmap10->SetBitmap(*globalResource.bitmapWarning);
     m_textCtrl8->SetValue(messageText);
@@ -211,40 +214,104 @@ ErrorDlg::~ErrorDlg() {}
 
 void ErrorDlg::OnClose(wxCloseEvent& event)
 {
-    //continueOnError = m_checkBoxContinueError->GetValue(); -> not needed here
+    ignoreErrors = m_checkBoxIgnoreErrors->GetValue();
     EndModal(BUTTON_ABORT);
 }
 
 
-void ErrorDlg::OnContinue(wxCommandEvent& event)
+void ErrorDlg::OnIgnore(wxCommandEvent& event)
 {
-    continueOnError = m_checkBoxContinueError->GetValue();
-    EndModal(BUTTON_CONTINUE);
+    ignoreErrors = m_checkBoxIgnoreErrors->GetValue();
+    EndModal(BUTTON_IGNORE);
 }
 
 
 void ErrorDlg::OnRetry(wxCommandEvent& event)
 {
-    //continueOnError = m_checkBoxContinueError->GetValue(); -> not needed here
+    ignoreErrors = m_checkBoxIgnoreErrors->GetValue();
     EndModal(BUTTON_RETRY);
 }
 
 
 void ErrorDlg::OnAbort(wxCommandEvent& event)
 {
-    //continueOnError = m_checkBoxContinueError->GetValue(); -> not needed here
+    ignoreErrors = m_checkBoxIgnoreErrors->GetValue();
+    EndModal(BUTTON_ABORT);
+}
+//########################################################################################
+
+
+WarningDlg::WarningDlg(wxWindow* parentWindow,  int activeButtons, const wxString messageText, bool& dontShowDlgAgain) :
+        WarningDlgGenerated(parentWindow),
+        dontShowAgain(dontShowDlgAgain)
+{
+    m_bitmap10->SetBitmap(*globalResource.bitmapWarning);
+    m_textCtrl8->SetValue(messageText);
+
+    if (~activeButtons & BUTTON_IGNORE)
+        m_buttonIgnore->Hide();
+
+    if (activeButtons & BUTTON_RESOLVE)
+        m_buttonResolve->SetFocus();
+    else
+        m_buttonResolve->Hide();
+
+    if (~activeButtons & BUTTON_ABORT)
+        m_buttonAbort->Hide();
+
+    if (activeButtons & BUTTON_OKAY)
+        m_buttonOK->SetFocus();
+    else
+        m_buttonOK->Hide();
+}
+
+WarningDlg::~WarningDlg() {}
+
+
+void WarningDlg::OnClose(wxCloseEvent& event)
+{
+    dontShowAgain = m_checkBoxDontShowAgain->GetValue();
     EndModal(BUTTON_ABORT);
 }
 
 
+void WarningDlg::OnIgnore(wxCommandEvent& event)
+{
+    dontShowAgain = m_checkBoxDontShowAgain->GetValue();
+    EndModal(BUTTON_IGNORE);
+}
+
+
+void WarningDlg::OnResolve(wxCommandEvent& event)
+{
+    dontShowAgain = m_checkBoxDontShowAgain->GetValue();
+    EndModal(BUTTON_RESOLVE);
+}
+
+
+void WarningDlg::OnAbort(wxCommandEvent& event)
+{
+    dontShowAgain = m_checkBoxDontShowAgain->GetValue();
+    EndModal(BUTTON_ABORT);
+}
+
+void WarningDlg::OnOkay(wxCommandEvent& event)
+{
+    dontShowAgain = m_checkBoxDontShowAgain->GetValue();
+    EndModal(BUTTON_OKAY);
+}
 //########################################################################################
+
+
 ModifyFilesDlg::ModifyFilesDlg(wxWindow* window, const wxString& parentDirectory, const int timeShift) :
         ModifyFilesDlgGenerated(window)
 {
-    m_dirPicker->SetPath(parentDirectory);
+    if (wxDirExists(parentDirectory))
+        m_dirPicker->SetPath(parentDirectory);
     m_textCtrlDirectory->SetValue(parentDirectory);
     m_spinCtrlTimeShift->SetValue(timeShift);
 
+    m_bitmap24->SetBitmap(*globalResource.bitmapClock);
     m_buttonApply->SetFocus();
 }
 
@@ -255,28 +322,29 @@ ModifyFilesDlg::~ModifyFilesDlg() {}
 class ModifyErrorHandler : public ErrorHandler
 {
 public:
-    ModifyErrorHandler(bool& unsolvedErrorOccured) :
-            continueOnError(false),
+    ModifyErrorHandler(wxWindow* parentWindow, bool& unsolvedErrorOccured) :
+            parent(parentWindow),
+            ignoreErrors(false),
             unsolvedErrors(unsolvedErrorOccured) {}
 
     ~ModifyErrorHandler() {}
 
     Response reportError(const wxString& text)
     {
-        if (continueOnError)
+        if (ignoreErrors)
         {
             unsolvedErrors = true;
             return ErrorHandler::CONTINUE_NEXT;
         }
 
-        ErrorDlg* errorDlg = new ErrorDlg(text, continueOnError);
-
+        bool ignoreNextErrors = false;
+        ErrorDlg* errorDlg = new ErrorDlg(parent, text, ignoreNextErrors, 90);
         int rv = errorDlg->ShowModal();
-        errorDlg->Destroy();
 
         switch (rv)
         {
-        case ErrorDlg::BUTTON_CONTINUE:
+        case ErrorDlg::BUTTON_IGNORE:
+            ignoreErrors = ignoreNextErrors;
             unsolvedErrors = true;
             return ErrorHandler::CONTINUE_NEXT;
         case ErrorDlg::BUTTON_RETRY:
@@ -292,9 +360,10 @@ public:
 
         return ErrorHandler::CONTINUE_NEXT; //dummy return value
     }
-private:
 
-    bool continueOnError;
+private:
+    wxWindow* parent;
+    bool ignoreErrors;
     bool& unsolvedErrors;
 };
 
@@ -313,19 +382,19 @@ void ModifyFilesDlg::OnApply(wxCommandEvent& event)
     bool unsolvedErrorOccured = false; //if an error is skipped a re-compare will be necessary!
     try
     {
-        ModifyErrorHandler errorHandler(unsolvedErrorOccured);
+        ModifyErrorHandler errorHandler(this, unsolvedErrorOccured);
         FreeFileSync::adjustModificationTimes(parentDir, timeToShift, &errorHandler);
     }
     catch (const AbortThisProcess& theException)
     {
-        EndModal(0);
+        EndModal(BUTTON_APPLY);
     }
 
     if (unsolvedErrorOccured)
-        wxMessageBox(_("Unresolved errors occured during operation!"), _("Info"), wxOK);
+        wxMessageBox(_("Unresolved errors occured during operation!"), _("Information"), wxOK);
     else
-        wxMessageBox(_("All file times have been adjusted successfully!"), _("Info"), wxOK);
-    EndModal(0);
+        wxMessageBox(_("All file times have been adjusted successfully!"), _("Information"), wxOK);
+    EndModal(BUTTON_APPLY);
 }
 
 
@@ -524,31 +593,36 @@ void SyncStatus::setStatusText_NoUpdate(const wxString& text)
 
 void SyncStatus::updateStatusDialogNow()
 {
+    bool screenChanged = false; //avoid screen flicker by calling layout() only if necessary
+
     //progress indicator
     m_gauge1->SetValue(int(currentData * scalingFactor));
 
     //status text
-    if (m_textCtrlInfo->GetValue() != currentStatusText) //avoid screen flicker
+    if (m_textCtrlInfo->GetValue() != currentStatusText && (screenChanged = true)) //avoid screen flicker
         m_textCtrlInfo->SetValue(currentStatusText);
 
     //remaining objects
-    const wxString remainingObjTmp = numberToWxString(totalObjects - currentObjects);
-    if (m_staticTextRemainingObj->GetLabel() != remainingObjTmp) //avoid screen flicker
+    const wxString remainingObjTmp = globalFunctions::numberToWxString(totalObjects - currentObjects);
+    if (m_staticTextRemainingObj->GetLabel() != remainingObjTmp && (screenChanged = true)) //avoid screen flicker
         m_staticTextRemainingObj->SetLabel(remainingObjTmp);
 
     //remaining bytes left for copy
     const wxString remainingBytesTmp = FreeFileSync::formatFilesizeToShortString(totalData - currentData);
-    if (m_staticTextDataRemaining->GetLabel() != remainingBytesTmp) //avoid screen flicker
+    if (m_staticTextDataRemaining->GetLabel() != remainingBytesTmp && (screenChanged = true)) //avoid screen flicker
         m_staticTextDataRemaining->SetLabel(remainingBytesTmp);
 
     //time elapsed
     const wxString timeElapsedTmp = (wxTimeSpan::Milliseconds(timeElapsed.Time())).Format();
-    if (m_staticTextTimeElapsed->GetLabel() != timeElapsedTmp) //avoid screen flicker
+    if (m_staticTextTimeElapsed->GetLabel() != timeElapsedTmp && (screenChanged = true)) //avoid screen flicker
         m_staticTextTimeElapsed->SetLabel(timeElapsedTmp);
 
     //do the ui update
-    bSizer28->Layout();
-    bSizer31->Layout();
+    if (screenChanged)
+    {
+        bSizer28->Layout();
+        bSizer31->Layout();
+    }
     updateUiNow();
 
     //support for pause button
@@ -765,26 +839,28 @@ void CompareStatus::setStatusText_NoUpdate(const wxString& text)
 
 void CompareStatus::updateStatusPanelNow()
 {
+    bool screenChanged = false; //avoid screen flicker by calling layout() only if necessary
+
     //status texts
-    if (m_textCtrlFilename->GetValue() != currentStatusText) //avoid screen flicker
+    if (m_textCtrlFilename->GetValue() != currentStatusText && (screenChanged = true)) //avoid screen flicker
         m_textCtrlFilename->SetValue(currentStatusText);
 
     //nr of scanned objects
-    const wxString scannedObjTmp = numberToWxString(scannedObjects);
-    if (m_staticTextScanned->GetLabel() != scannedObjTmp) //avoid screen flicker
+    const wxString scannedObjTmp = globalFunctions::numberToWxString(scannedObjects);
+    if (m_staticTextScanned->GetLabel() != scannedObjTmp && (screenChanged = true)) //avoid screen flicker
         m_staticTextScanned->SetLabel(scannedObjTmp);
 
     //progress indicator for "compare file content"
     m_gauge2->SetValue(int(processedCmpData * scalingFactorCmp));
 
     //remaining files left for file comparison
-    const wxString filesToCompareTmp = numberToWxString(totalCmpObjects - processedCmpObjects);
-    if (m_staticTextFilesToCompare->GetLabel() != filesToCompareTmp) //avoid screen flicker
+    const wxString filesToCompareTmp = globalFunctions::numberToWxString(totalCmpObjects - processedCmpObjects);
+    if (m_staticTextFilesToCompare->GetLabel() != filesToCompareTmp && (screenChanged = true)) //avoid screen flicker
         m_staticTextFilesToCompare->SetLabel(filesToCompareTmp);
 
     //remaining bytes left for file comparison
     const wxString remainingBytesTmp = FreeFileSync::formatFilesizeToShortString(totalCmpData - processedCmpData);
-    if (m_staticTextDataToCompare->GetLabel() != remainingBytesTmp) //avoid screen flicker
+    if (m_staticTextDataToCompare->GetLabel() != remainingBytesTmp && (screenChanged = true)) //avoid screen flicker
         m_staticTextDataToCompare->SetLabel(remainingBytesTmp);
 
     /*
@@ -798,10 +874,12 @@ void CompareStatus::updateStatusPanelNow()
 
     //time elapsed
     const wxString timeElapsedTmp = (wxTimeSpan::Milliseconds(timeElapsed.Time())).Format();
-    if (m_staticTextTimeElapsed->GetLabel() != timeElapsedTmp) //avoid screen flicker
+    if (m_staticTextTimeElapsed->GetLabel() != timeElapsedTmp && (screenChanged = true)) //avoid screen flicker
         m_staticTextTimeElapsed->SetLabel(timeElapsedTmp);
 
     //do the ui update
-    bSizer42->Layout();
+    if (screenChanged)
+        bSizer42->Layout();
+
     updateUiNow();
 }

@@ -74,23 +74,48 @@ private:
 class ErrorDlg : public ErrorDlgGenerated
 {
 public:
-    ErrorDlg(const wxString messageText, bool& continueError);
+    ErrorDlg(wxWindow* parentWindow, const wxString messageText, bool& ignoreNextErrors, int dummy);
     ~ErrorDlg();
 
     enum
     {
-        BUTTON_CONTINUE,
+        BUTTON_IGNORE,
         BUTTON_RETRY,
         BUTTON_ABORT
     };
 
 private:
     void OnClose(wxCloseEvent& event);
-    void OnContinue(wxCommandEvent& event);
+    void OnIgnore(wxCommandEvent& event);
     void OnRetry(wxCommandEvent& event);
     void OnAbort(wxCommandEvent& event);
 
-    bool& continueOnError;
+    bool& ignoreErrors;
+};
+
+
+class WarningDlg : public WarningDlgGenerated
+{
+public:
+    WarningDlg(wxWindow* parentWindow,  int activeButtons, const wxString messageText, bool& dontShowAgain);
+    ~WarningDlg();
+
+    enum
+    {
+        BUTTON_IGNORE  = 1,
+        BUTTON_RESOLVE = 2,
+        BUTTON_ABORT   = 4,
+        BUTTON_OKAY    = 8
+    };
+
+private:
+    void OnClose(wxCloseEvent& event);
+    void OnIgnore(wxCommandEvent& event);
+    void OnResolve(wxCommandEvent& event);
+    void OnAbort(wxCommandEvent& event);
+    void OnOkay(wxCommandEvent& event);
+
+    bool& dontShowAgain;
 };
 
 
@@ -99,6 +124,11 @@ class ModifyFilesDlg : public ModifyFilesDlgGenerated
 public:
     ModifyFilesDlg(wxWindow* window, const wxString& parentDirectory, const int timeShift);
     ~ModifyFilesDlg();
+
+    enum
+    {
+        BUTTON_APPLY = 10
+    };
 
 private:
     void OnApply(wxCommandEvent& event);

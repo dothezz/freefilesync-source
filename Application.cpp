@@ -16,6 +16,9 @@
 #include <wx/msgdlg.h>
 #include "library/processXml.h"
 #include <wx/stopwatch.h>
+#include "comparison.h"
+#include "synchronization.h"
+#include "algorithm.h"
 
 using namespace xmlAccess;
 
@@ -54,7 +57,7 @@ bool Application::OnInit()
     }
     catch (const FileError& error)
     {
-        if (wxFileExists(FreeFileSync::FfsGlobalSettingsFile))
+        if (wxFileExists(FreeFileSync::GLOBAL_CONFIG_FILE))
         {   //show messagebox and quit program immediately
             wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
             return false;
@@ -102,7 +105,7 @@ void Application::initialize()
     }
     else //start in GUI mode (standard)
     {
-        MainDialog* frame = new MainDialog(NULL, FreeFileSync::FfsLastConfigFile, &programLanguage, globalSettings);
+        MainDialog* frame = new MainDialog(NULL, FreeFileSync::LAST_CONFIG_FILE, &programLanguage, globalSettings);
         frame->SetIcon(*globalResource.programIcon); //set application icon
         frame->Show();
     }
@@ -167,13 +170,15 @@ public:
         readyToWrite = logFile.IsOpened();
         if (readyToWrite)
         {
-            logFile.Write(wxString(_("FreeFileSync   (Date: ")) + wxDateTime::Now().FormatDate() + _("  Time: ") +  wxDateTime::Now().FormatTime() + wxT(")") + wxChar('\n'));
-            logFile.Write(wxString(_("-------------------------------------------------")) + wxChar('\n'));
-            logFile.Write(wxChar('\n'));
-            logFile.Write(_("Log-messages:\n-------------"));
-            logFile.Write(wxChar('\n'));
-            write(_("Start"));
-            logFile.Write(wxChar('\n'));
+            wxString headerLine = wxString(wxT("FreeFileSync (")) + _("Date: ") + wxDateTime::Now().FormatDate() + wxT(" ") + _("Time: ") +  wxDateTime::Now().FormatTime() + wxT(")");
+            logFile.Write(headerLine + wxChar('\n'));
+            logFile.Write(wxString().Pad(headerLine.Len(), wxChar('-')) + wxChar('\n') + wxChar('\n'));
+
+            wxString caption = _("Log-messages:");
+            logFile.Write(caption + wxChar('\n'));
+            logFile.Write(wxString().Pad(caption.Len(), wxChar('-')) + wxChar('\n'));
+
+            write(wxString(_("Start")) + wxChar('\n'));
 
             totalTime.Start(); //measure total time
         }
@@ -250,7 +255,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
     }
 
     //all settings have been read successfully...
-    applicationRunsInBatchWithoutWindows = batchCfg.silent;  //this value is needed for the application to decide whether to wait for windows to close or not
+    applicationRunsInBatchWithoutWindows = batchCfg.silent; //this value is needed for the application to decide whether to wait for all windows to close or not
 
     //format directory names
     for (vector<FolderPair>::iterator i = batchCfg.directoryPairs.begin(); i != batchCfg.directoryPairs.end(); ++i)
@@ -272,53 +277,120 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
     }
 
 
-    //check if directories exist
-    wxString errorMessage;
-    if (!FreeFileSync::foldersAreValidForComparison(batchCfg.directoryPairs, errorMessage))
-    {
-        if (batchCfg.silent)
-        {
-            log->write(errorMessage, _("Warning"));
-            log->close(_("Synchronization aborted!"));
-        }
-        else wxMessageBox(errorMessage + wxT("\n\n") + _("Synchronization aborted!"), _("Warning"), wxICON_WARNING);
-
-        returnValue = -2;
-        return;
-    }
-
-
-    //test existence of Recycle Bin
-    if (batchCfg.mainCfg.useRecycleBin)
-    {
-        if (!FreeFileSync::recycleBinExists())
-        {
-            wxString errorMessage  = wxString(_("Unable to initialize Recycle Bin!"));
-            wxString statusMessage = wxString(_("Synchronization aborted!"));
-            if (batchCfg.silent)
-            {
-                log->write(errorMessage, _("Error"));
-                log->close(statusMessage);
-            }
-            else wxMessageBox(errorMessage + wxT("\n\n") + statusMessage, _("Error"), wxICON_WARNING);
-
-            returnValue = -2;
-            return;
-        }
-    }
-
     //begin of synchronization process (all in one try-catch block)
     try
     {
         FileCompareResult currentGridData;
         //class handling status updates and error messages
-        BatchStatusUpdater statusUpdater(batchCfg.mainCfg.continueOnError, batchCfg.silent, log);
+        BatchStatusUpdater statusUpdater(batchCfg.mainCfg.ignoreErrors, batchCfg.silent, log);
+
+        //test existence of Recycle Bin
+        if (batchCfg.mainCfg.useRecycleBin)
+        {
+            if (!FreeFileSync::recycleBinExists())
+            {
+                statusUpdater.setFinalStatus(_("Unable to initialize Recycle Bin!"), SyncStatus::ABORTED);
+                returnValue = -2;
+                return;
+            }
+        }
+
+        //check if directories are valid
+        wxString errorMessage;
+        if (!FreeFileSync::foldersAreValidForComparison(batchCfg.directoryPairs, errorMessage))
+        {
+            statusUpdater.setFinalStatus(errorMessage, SyncStatus::ABORTED);
+            returnValue = -2;
+            return;
+        }
+
+
+        //check if folders have dependencies
+        if (globalSettings.global.folderDependCheckActive)
+        {
+            wxString warningMessage;
+            if (FreeFileSync::foldersHaveDependencies(batchCfg.directoryPairs, warningMessage))
+            {
+                //abort if in silent mode
+                if (batchCfg.silent)
+                {
+                    statusUpdater.setFinalStatus(warningMessage, SyncStatus::ABORTED);
+                    returnValue = -2;
+                    return;
+                }
+
+                //non silent mode: offer possibility to ignore issue
+                bool hideThisDialog = false;
+                wxString messageText = warningMessage + wxT("\n\n") +
+                                       _("Consider this when setting up synchronization rules: You might want to avoid write access to these directories so that synchronization of both does not interfere.");
+
+                //show popup and ask user how to handle warning
+                WarningDlg* warningDlg = new WarningDlg(statusUpdater.getWindow(), WarningDlg::BUTTON_IGNORE | WarningDlg::BUTTON_ABORT, messageText, hideThisDialog);
+                if (warningDlg->ShowModal() == WarningDlg::BUTTON_ABORT)
+                {
+                    statusUpdater.setFinalStatus(warningMessage, SyncStatus::ABORTED);
+                    returnValue = -2;
+                    return;
+                }
+                else
+                    globalSettings.global.folderDependCheckActive = !hideThisDialog;
+            }
+        }
+
 
         //COMPARE DIRECTORIES
-        FreeFileSync::startCompareProcess(batchCfg.directoryPairs,
-                                          batchCfg.mainCfg.compareVar,
-                                          currentGridData,
-                                          &statusUpdater);
+        bool lineBreakOnMessages = !batchCfg.silent;
+        FreeFileSync::CompareProcess comparison(lineBreakOnMessages, &statusUpdater);
+        comparison.startCompareProcess(batchCfg.directoryPairs,
+                                       batchCfg.mainCfg.compareVar,
+                                       currentGridData);
+
+#ifdef FFS_WIN
+        //check if DST time correction needs to be applied
+        if (globalSettings.global.dstCheckActive)
+        {
+            int timeShift = 0;
+            wxString driveName;
+            FreeFileSync::checkForDSTChange(currentGridData, batchCfg.directoryPairs, timeShift, driveName);
+            if (timeShift)
+            {
+                //abort if in silent mode
+                if (batchCfg.silent)
+                {
+                    statusUpdater.setFinalStatus(_("Daylight saving time change detected for FAT/FAT32 drive."), SyncStatus::ABORTED);
+                    returnValue = -2;
+                    return;
+                }
+
+                //non silent mode: offer possibility to resolve issue
+                bool hideThisDialog = false;
+                wxString errorMessage = wxString(_("A file time shift due to a daylight saving time change was detected for a FAT/FAT32 drive.")) + wxT("\n")
+                                        + _("You can adjust the file times accordingly to resolve the issue:");
+                errorMessage+= wxString(wxT("\n\n")) + _("Drive:") + wxT(" ") + driveName + wxT("\n")
+                               + _("Time shift:") + wxT(" ") + globalFunctions::numberToWxString(timeShift);
+
+                //show popup and ask user how to handle the DST change
+                WarningDlg* warningDlg = new WarningDlg(statusUpdater.getWindow(), WarningDlg::BUTTON_RESOLVE | WarningDlg::BUTTON_IGNORE, errorMessage, hideThisDialog);
+                warningDlg->m_bitmap10->SetBitmap(*globalResource.bitmapClock);
+
+                if (warningDlg->ShowModal() == WarningDlg::BUTTON_RESOLVE)
+                {
+                    ModifyFilesDlg* modifyDlg = new ModifyFilesDlg(NULL, driveName, timeShift);
+                    modifyDlg->ShowModal();
+                    delete modifyDlg;
+
+                    //exit batch processing
+                    statusUpdater.setFinalStatus(wxString(_("Daylight saving time change detected for FAT/FAT32 drive.")) + wxT("\n\n")
+                                                 + _("Please restart synchronization!"), SyncStatus::ABORTED);
+                    returnValue = -2;
+                    return;
+                }
+                else
+                    globalSettings.global.dstCheckActive = !hideThisDialog;
+            }
+        }
+#endif  //FFS_WIN
+
 
         //APPLY FILTERS
         if (batchCfg.mainCfg.filterIsActive)
@@ -337,14 +409,14 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
                                            batchCfg.mainCfg.syncConfiguration);
         if (objectsToCreate + objectsToOverwrite + objectsToDelete == 0)
         {
-            statusUpdater.noSynchronizationNeeded(); //inform about this special case
-
-            returnValue = -3;
+            statusUpdater.setFinalStatus(_("Nothing to synchronize. Both directories adhere to the sync-configuration!"), SyncStatus::FINISHED_WITH_SUCCESS); //inform about this special case
+            returnValue = 0;
             return;
         }
 
         //START SYNCHRONIZATION
-        FreeFileSync::startSynchronizationProcess(currentGridData, batchCfg.mainCfg.syncConfiguration, &statusUpdater, batchCfg.mainCfg.useRecycleBin);
+        FreeFileSync::SyncProcess synchronization(batchCfg.mainCfg.useRecycleBin, lineBreakOnMessages, &statusUpdater);
+        synchronization.startSynchronizationProcess(currentGridData, batchCfg.mainCfg.syncConfiguration);
     }
     catch (AbortThisProcess& theException)  //exit used by statusUpdater
     {
@@ -357,12 +429,11 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 //######################################################################################################
 
 
-BatchStatusUpdater::BatchStatusUpdater(bool continueOnError, bool silent, LogFile* log) :
+BatchStatusUpdater::BatchStatusUpdater(bool ignoreAllErrors, bool silent, LogFile* log) :
         m_log(log),
-        continueErrors(continueOnError),
+        ignoreErrors(ignoreAllErrors),
         silentMode(silent),
-        currentProcess(StatusHandler::PROCESS_NONE),
-        synchronizationNeeded(true)
+        currentProcess(StatusHandler::PROCESS_NONE)
 {
     if (!silentMode)
     {
@@ -379,16 +450,14 @@ BatchStatusUpdater::~BatchStatusUpdater()
     //output the result
     if (silentMode)
     {
-        if (abortionRequested)
+        if (!customStatusMessage.IsEmpty())
+            m_log->close(customStatusMessage);
+        else if (abortRequested)
             m_log->close(_("Synchronization aborted!"));
         else if (failedItems)
             m_log->close(_("Synchronization completed with errors!"));
         else
-        {
-            if (!synchronizationNeeded)
-                m_log->write(_("Nothing to synchronize. Both directories adhere to the sync-configuration!"), _("Info"));
             m_log->close(_("Synchronization completed successfully."));
-        }
     }
     else
     {
@@ -402,7 +471,13 @@ BatchStatusUpdater::~BatchStatusUpdater()
         }
 
         //notify to syncStatusFrame that current process has ended
-        if (abortionRequested)
+        if (!customStatusMessage.IsEmpty()) //custom status message written by service consumer
+        {
+            finalMessage+= customStatusMessage;
+            syncStatusFrame->setStatusText_NoUpdate(finalMessage);
+            syncStatusFrame->processHasFinished(customStatusId);
+        }
+        else if (abortRequested)
         {
             finalMessage+= _("Synchronization aborted!");
             syncStatusFrame->setStatusText_NoUpdate(finalMessage);
@@ -416,11 +491,7 @@ BatchStatusUpdater::~BatchStatusUpdater()
         }
         else
         {
-            if (synchronizationNeeded)
-                finalMessage+= _("Synchronization completed successfully.");
-            else
-                finalMessage+= _("Nothing to synchronize. Both directories adhere to the sync-configuration!");
-
+            finalMessage+= _("Synchronization completed successfully.");
             syncStatusFrame->setStatusText_NoUpdate(finalMessage);
             syncStatusFrame->processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS);
         }
@@ -489,32 +560,33 @@ ErrorHandler::Response BatchStatusUpdater::reportError(const wxString& text)
         unhandledErrors.Add(text);
         m_log->write(text, _("Error"));
 
-        if (continueErrors) // /|\ before return, the logfile is written!!!
+        if (ignoreErrors) // /|\ before return, the logfile is written!!!
             return ErrorHandler::CONTINUE_NEXT;
         else
         {
-            abortionRequested = true;
+            abortRequested = true;
             throw AbortThisProcess();
         }
     }
     else //show dialog to user who can decide how to continue
     {
-        if (continueErrors) //this option can be set from commandline or by the user in the error dialog on UI
+        if (ignoreErrors) //this option can be set from commandline or by the user in the error dialog on UI
         {
             unhandledErrors.Add(text);
             return ErrorHandler::CONTINUE_NEXT;
         }
 
-        wxString errorMessage = text + _("\n\nContinue with next object, retry or abort synchronization?");
-        ErrorDlg* errorDlg = new ErrorDlg(errorMessage, continueErrors);
-
         syncStatusFrame->updateStatusDialogNow();
-        int rv = errorDlg->ShowModal();
-        errorDlg->Destroy();
 
+        bool ignoreNextErrors = false;
+        wxString errorMessage = text + wxT("\n\n") + _("Ignore this error, retry or abort synchronization?");
+        ErrorDlg* errorDlg = new ErrorDlg(syncStatusFrame, errorMessage, ignoreNextErrors, 90);
+
+        int rv = errorDlg->ShowModal();
         switch (rv)
         {
-        case ErrorDlg::BUTTON_CONTINUE:
+        case ErrorDlg::BUTTON_IGNORE:
+            ignoreErrors = ignoreNextErrors;
             unhandledErrors.Add(text);
             return ErrorHandler::CONTINUE_NEXT;
         case ErrorDlg::BUTTON_RETRY:
@@ -522,7 +594,7 @@ ErrorHandler::Response BatchStatusUpdater::reportError(const wxString& text)
         case ErrorDlg::BUTTON_ABORT:
         {
             unhandledErrors.Add(text);
-            abortionRequested = true;
+            abortRequested = true;
             throw AbortThisProcess();
         }
         default:
@@ -547,7 +619,18 @@ void BatchStatusUpdater::abortThisProcess()
 }
 
 
-void BatchStatusUpdater::noSynchronizationNeeded()
+void BatchStatusUpdater::setFinalStatus(const wxString& message, SyncStatus::SyncStatusID id)
 {
-    synchronizationNeeded = false;;
+    customStatusMessage = message;
+    customStatusId = id;
+}
+
+
+wxWindow* BatchStatusUpdater::getWindow()
+{
+    assert(!silentMode);
+    if (!silentMode)
+        return syncStatusFrame;
+    else
+        return NULL;
 }

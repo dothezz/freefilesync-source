@@ -1,6 +1,17 @@
 FreeFileSync
 ------------
 
+Changelog v1.13
+---------------
+Automatically detect daylight saving time (DST) change for FAT/FAT32 drives
+Added directory dependency check when synchronizing multiple folder pairs
+New synchronization option: "update"
+Reduced status screen flicker when comparing and synchronizing
+Fixed bug when sorting by filename
+Further GUI improvements
+Updated translation files
+
+
 Changelog v1.12
 ---------------
 Significantly improved speed of all sorting algorithms

@@ -107,7 +107,6 @@
 			<Add library="libodbc32.a" />
 			<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 		</Linker>
-		<Unit filename="FreeFileSync.cpp" />
 		<Unit filename="FreeFileSync.h">
 			<Option target="Debug" />
 			<Option target="Release" />
@@ -116,11 +115,18 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="algorithm.cpp" />
+		<Unit filename="algorithm.h" />
 		<Unit filename="application.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="application.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="comparison.cpp" />
+		<Unit filename="comparison.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
@@ -132,6 +138,8 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="library\fileHandling.cpp" />
+		<Unit filename="library\fileHandling.h" />
 		<Unit filename="library\globalFunctions.cpp" />
 		<Unit filename="library\globalFunctions.h">
 			<Option target="Debug" />
@@ -201,6 +209,11 @@
 		<Unit filename="library\tinyxml\tinyxmlparser.cpp" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="synchronization.cpp" />
+		<Unit filename="synchronization.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>

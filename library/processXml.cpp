@@ -144,15 +144,15 @@ XmlBatchConfig xmlAccess::readBatchConfig(const wxString& filename)
 XmlGlobalSettings xmlAccess::readGlobalSettings()
 {
     //load XML
-    XmlConfigInput inputFile(FreeFileSync::FfsGlobalSettingsFile, XML_GLOBAL_SETTINGS);
+    XmlConfigInput inputFile(FreeFileSync::GLOBAL_CONFIG_FILE, XML_GLOBAL_SETTINGS);
 
     XmlGlobalSettings outputCfg;
 
     if (!inputFile.loadedSuccessfully())
-        throw FileError(wxString(_("Could not open configuration file ")) + wxT("\"") + FreeFileSync::FfsGlobalSettingsFile + wxT("\""));
+        throw FileError(wxString(_("Could not open configuration file ")) + wxT("\"") + FreeFileSync::GLOBAL_CONFIG_FILE + wxT("\""));
 
     if (!inputFile.readXmlGlobalSettings(outputCfg))
-        throw FileError(wxString(_("Error parsing configuration file ")) + wxT("\"") + FreeFileSync::FfsGlobalSettingsFile + wxT("\""));
+        throw FileError(wxString(_("Error parsing configuration file ")) + wxT("\"") + FreeFileSync::GLOBAL_CONFIG_FILE + wxT("\""));
 
     return outputCfg;
 }
@@ -184,12 +184,12 @@ void xmlAccess::writeBatchConfig(const wxString& filename, const XmlBatchConfig&
 
 void xmlAccess::writeGlobalSettings(const XmlGlobalSettings& inputCfg)
 {
-    XmlConfigOutput outputFile(FreeFileSync::FfsGlobalSettingsFile, XML_GLOBAL_SETTINGS);
+    XmlConfigOutput outputFile(FreeFileSync::GLOBAL_CONFIG_FILE, XML_GLOBAL_SETTINGS);
 
     //populate and write XML tree
     if (    !outputFile.writeXmlGlobalSettings(inputCfg) || //add GUI layout configuration settings
             !outputFile.writeToFile()) //save XML
-        throw FileError(wxString(_("Could not write configuration file ")) + wxT("\"") + FreeFileSync::FfsGlobalSettingsFile + wxT("\""));
+        throw FileError(wxString(_("Could not write configuration file ")) + wxT("\"") + FreeFileSync::GLOBAL_CONFIG_FILE + wxT("\""));
     return;
 }
 
@@ -365,8 +365,8 @@ bool XmlConfigInput::readXmlMainConfig(MainConfiguration& mainCfg, vector<Folder
     mainCfg.excludeFilter = wxString::FromUTF8(tempString.c_str());
 //###########################################################
     //other
-    if (!readXmlElementValue(mainCfg.useRecycleBin, miscSettings, "Recycler"))   return false;
-    if (!readXmlElementValue(mainCfg.continueOnError, miscSettings, "Continue")) return false;
+    readXmlElementValue(mainCfg.useRecycleBin, miscSettings, "UseRecycler");
+    readXmlElementValue(mainCfg.ignoreErrors, miscSettings, "IgnoreErrors");
 
     return true;
 }
@@ -388,8 +388,7 @@ bool XmlConfigInput::readXmlGuiConfig(XmlGuiConfig& outputCfg)
     TiXmlElement* mainWindow = hRoot.FirstChild("GuiConfig").FirstChild("Windows").FirstChild("Main").ToElement();
     if (mainWindow)
     {
-        if (!readXmlElementValue(outputCfg.hideFilteredElements, mainWindow, "HideFiltered"))
-            outputCfg.hideFilteredElements = false;
+        readXmlElementValue(outputCfg.hideFilteredElements, mainWindow, "HideFiltered");
     }
 
     return true;
@@ -413,8 +412,7 @@ bool XmlConfigInput::readXmlBatchConfig(XmlBatchConfig& outputCfg)
     if (batchConfig)
     {
         //read application window size and position
-        if (!readXmlElementValue(outputCfg.silent, batchConfig, "Silent"))
-            outputCfg.silent = false;
+        readXmlElementValue(outputCfg.silent, batchConfig, "Silent");
     }
 
     return true;
@@ -434,6 +432,14 @@ bool XmlConfigInput::readXmlGlobalSettings(XmlGlobalSettings& outputCfg)
 
     //program language
     readXmlElementValue(outputCfg.global.programLanguage, global, "Language");
+
+#ifdef FFS_WIN
+    //daylight saving time check
+    readXmlElementValue(outputCfg.global.dstCheckActive, global, "DaylightSavingTimeCheckActive");
+#endif
+
+    //folder dependency check
+    readXmlElementValue(outputCfg.global.folderDependCheckActive, global, "FolderDependencyCheckActive");
 
     //gui specific global settings (optional)
     TiXmlElement* mainWindow = hRoot.FirstChild("Gui").FirstChild("Windows").FirstChild("Main").ToElement();
@@ -614,8 +620,8 @@ bool XmlConfigOutput::writeXmlMainConfig(const MainConfiguration& mainCfg, const
     addXmlElement(filter, "Exclude", string((mainCfg.excludeFilter).ToUTF8()));
 
     //other
-    addXmlElement(miscSettings, "Recycler", mainCfg.useRecycleBin);
-    addXmlElement(miscSettings, "Continue", mainCfg.continueOnError);
+    addXmlElement(miscSettings, "UseRecycler", mainCfg.useRecycleBin);
+    addXmlElement(miscSettings, "IgnoreErrors", mainCfg.ignoreErrors);
 //###########################################################
 
     return true;
@@ -678,6 +684,14 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const XmlGlobalSettings& inputCfg)
 
     //program language
     addXmlElement(global, "Language", inputCfg.global.programLanguage);
+
+#ifdef FFS_WIN
+    //daylight saving time check
+    addXmlElement(global, "DaylightSavingTimeCheckActive", inputCfg.global.dstCheckActive);
+#endif
+
+    //folder dependency check
+    addXmlElement(global, "FolderDependencyCheckActive", inputCfg.global.folderDependCheckActive);
 
     //###################################################################
     //write gui settings

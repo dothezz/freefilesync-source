@@ -4,6 +4,9 @@
 #include "../FreeFileSync.h"
 #include "guiGenerated.h"
 
+using namespace FreeFileSync;
+
+
 class SyncDialog: public SyncDlgGenerated
 {
 public:
@@ -14,7 +17,10 @@ public:
 
     ~SyncDialog();
 
-    static const int StartSynchronizationProcess = 15;
+    enum
+     {
+         BUTTON_START = 15
+     };
 
     static void updateConfigIcons(wxBitmapButton* button1,
                                   wxBitmapButton* button2,
@@ -29,6 +35,7 @@ private:
     void calculatePreview();
 
     void OnSyncLeftToRight( wxCommandEvent& event);
+    void OnSyncUpdate(      wxCommandEvent& event);
     void OnSyncBothSides(   wxCommandEvent& event);
 
     void OnExLeftSideOnly(  wxCommandEvent& event);

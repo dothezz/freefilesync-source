@@ -11,7 +11,6 @@
 #define MAINDIALOG_H
 
 #include "guiGenerated.h"
-#include "../FreeFileSync.h"
 #include "syncDialog.h"
 #include "smallDialogs.h"
 #include "../library/resources.h"
@@ -36,13 +35,13 @@ enum ContextItem
 
 extern int leadingPanel; //better keep this an int! event.GetEventObject() does NOT always return m_grid1, m_grid2, m_grid3!
 
-class CompareStatusUpdater;
+class CompareStatusHandler;
 class FileDropEvent;
 class TiXmlElement;
 
 class MainDialog : public GuiGenerated
 {
-    friend class CompareStatusUpdater;
+    friend class CompareStatusHandler;
     friend class FileDropEvent;
 
 public:
@@ -118,7 +117,8 @@ private:
     void OnEqualFiles(          wxCommandEvent& event);
 
     void OnSaveConfig(          wxCommandEvent& event);
-    void OnLoadConfiguration(   wxCommandEvent& event);
+    void OnLoadConfig(          wxCommandEvent& event);
+    void loadConfiguration(const wxString& filename);
     void OnChoiceKeyEvent(      wxKeyEvent& event );
 
     void onResizeMainWindow(    wxEvent& event);
@@ -139,6 +139,8 @@ private:
     void OnRemoveFolderPair(    wxCommandEvent& event);
 
     //menu events
+    void OnMenuSaveConfig(      wxCommandEvent& event);
+    void OnMenuLoadConfig(      wxCommandEvent& event);
     void OnMenuExportFileList(  wxCommandEvent& event);
     void OnMenuAdjustFileTimes( wxCommandEvent& event);
     void OnMenuBatchJob(        wxCommandEvent& event);
@@ -181,7 +183,7 @@ private:
 //-------------------------------------
 
     //convenience method to get all folder pairs (unformatted)
-    void GetFolderPairs(vector<FolderPair>& output,  bool formatted = false);
+    void getFolderPairs(vector<FolderPair>& output,  bool formatted = false);
 
     //UI View Filter settings
     bool leftOnlyFilesActive;
@@ -225,7 +227,7 @@ private:
 
     bool restartOnExit; //restart dialog on exit (currently used, when language is changed)
 
-    CompareStatusUpdater* cmpStatusUpdaterTmp;  //used only by the abort button when comparing
+    CompareStatusHandler* cmpStatusHandlerTmp;  //used only by the abort button when comparing
 };
 
 //######################################################################################
@@ -253,11 +255,11 @@ private:
 
 //classes handling sync and compare error as well as status information
 
-class CompareStatusUpdater : public StatusHandler
+class CompareStatusHandler : public StatusHandler
 {
 public:
-    CompareStatusUpdater(MainDialog* dlg);
-    ~CompareStatusUpdater();
+    CompareStatusHandler(MainDialog* dlg);
+    ~CompareStatusHandler();
 
     void updateStatusText(const wxString& text);
     void initNewProcess(int objectsTotal, double dataTotal, Process processID);
@@ -270,16 +272,16 @@ private:
     void abortThisProcess();
 
     MainDialog* mainDialog;
-    bool continueOnError;
+    bool ignoreErrors;
     Process currentProcess;
 };
 
 
-class SyncStatusUpdater : public StatusHandler
+class SyncStatusHandler : public StatusHandler
 {
 public:
-    SyncStatusUpdater(wxWindow* dlg, bool continueOnError);
-    ~SyncStatusUpdater();
+    SyncStatusHandler(wxWindow* dlg, bool ignoreAllErrors);
+    ~SyncStatusHandler();
 
     void updateStatusText(const wxString& text);
     void initNewProcess(int objectsTotal, double dataTotal, Process processID);
@@ -292,7 +294,7 @@ private:
     void abortThisProcess();
 
     SyncStatus* syncStatusFrame;
-    bool continueError;
+    bool ignoreErrors;
     wxArrayString unhandledErrors;   //list of non-resolved errors
 };
 

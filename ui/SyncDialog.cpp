@@ -5,6 +5,8 @@
 #include <wx/msgdlg.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
+#include "../synchronization.h"
+#include "../algorithm.h"
 
 using namespace std;
 using namespace xmlAccess;
@@ -21,7 +23,7 @@ SyncDialog::SyncDialog(wxWindow* window,
     //make working copy of mainDialog.cfg.syncConfiguration and recycler setting
     localSyncConfiguration = config.syncConfiguration;
     m_checkBoxUseRecycler->SetValue(cfg.useRecycleBin);
-    m_checkBoxContinueError->SetValue(cfg.continueOnError);
+    m_checkBoxIgnoreErrors->SetValue(cfg.ignoreErrors);
 
     //set sync config icons
     updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
@@ -54,9 +56,16 @@ SyncDialog::SyncDialog(wxWindow* window,
         m_radioBtn1->SetValue(true);    //one way ->
 
     else if (localSyncConfiguration.exLeftSideOnly  == SyncConfiguration::SYNC_DIR_RIGHT &&
-             localSyncConfiguration.exRightSideOnly == SyncConfiguration::SYNC_DIR_LEFT &&
+             localSyncConfiguration.exRightSideOnly == SyncConfiguration::SYNC_DIR_NONE  &&
              localSyncConfiguration.leftNewer       == SyncConfiguration::SYNC_DIR_RIGHT &&
-             localSyncConfiguration.rightNewer      == SyncConfiguration::SYNC_DIR_LEFT &&
+             localSyncConfiguration.rightNewer      == SyncConfiguration::SYNC_DIR_NONE  &&
+             localSyncConfiguration.different       == SyncConfiguration::SYNC_DIR_NONE)
+        m_radioBtnUpdate->SetValue(true);    //Update ->
+
+    else if (localSyncConfiguration.exLeftSideOnly  == SyncConfiguration::SYNC_DIR_RIGHT &&
+             localSyncConfiguration.exRightSideOnly == SyncConfiguration::SYNC_DIR_LEFT  &&
+             localSyncConfiguration.leftNewer       == SyncConfiguration::SYNC_DIR_RIGHT &&
+             localSyncConfiguration.rightNewer      == SyncConfiguration::SYNC_DIR_LEFT  &&
              localSyncConfiguration.different       == SyncConfiguration::SYNC_DIR_NONE)
         m_radioBtn2->SetValue(true);    //two way <->
 
@@ -226,7 +235,7 @@ void SyncDialog::OnBack(wxCommandEvent& event)
     //write configuration to main dialog
     cfg.syncConfiguration = localSyncConfiguration;
     cfg.useRecycleBin     = m_checkBoxUseRecycler->GetValue();
-    cfg.continueOnError   = m_checkBoxContinueError->GetValue();
+    cfg.ignoreErrors      = m_checkBoxIgnoreErrors->GetValue();
 
     EndModal(0);
 }
@@ -236,9 +245,9 @@ void SyncDialog::OnStartSync(wxCommandEvent& event)
     //write configuration to main dialog
     cfg.syncConfiguration = localSyncConfiguration;
     cfg.useRecycleBin     = m_checkBoxUseRecycler->GetValue();
-    cfg.continueOnError   = m_checkBoxContinueError->GetValue();
+    cfg.ignoreErrors      = m_checkBoxIgnoreErrors->GetValue();
 
-    EndModal(StartSynchronizationProcess);
+    EndModal(BUTTON_START);
 }
 
 
@@ -271,6 +280,22 @@ void SyncDialog::OnSyncLeftToRight(wxCommandEvent& event)
 }
 
 
+void SyncDialog::OnSyncUpdate(wxCommandEvent& event)
+{
+    localSyncConfiguration.exLeftSideOnly  = SyncConfiguration::SYNC_DIR_RIGHT;
+    localSyncConfiguration.exRightSideOnly = SyncConfiguration::SYNC_DIR_NONE;
+    localSyncConfiguration.leftNewer       = SyncConfiguration::SYNC_DIR_RIGHT;
+    localSyncConfiguration.rightNewer      = SyncConfiguration::SYNC_DIR_NONE;
+    localSyncConfiguration.different       = SyncConfiguration::SYNC_DIR_NONE;
+
+    updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
+    calculatePreview();
+
+    //if event is triggered by button
+    m_radioBtnUpdate->SetValue(true);
+}
+
+
 void SyncDialog::OnSyncBothSides(wxCommandEvent& event)
 {
     localSyncConfiguration.exLeftSideOnly  = SyncConfiguration::SYNC_DIR_RIGHT;
@@ -299,6 +324,7 @@ void toggleSyncDirection(SyncConfiguration::Direction& current)
         assert (false);
 }
 
+
 void SyncDialog::OnExLeftSideOnly( wxCommandEvent& event )
 {
     toggleSyncDirection(localSyncConfiguration.exLeftSideOnly);
@@ -307,6 +333,7 @@ void SyncDialog::OnExLeftSideOnly( wxCommandEvent& event )
     //set custom config button
     m_radioBtn3->SetValue(true);
 }
+
 
 void SyncDialog::OnExRightSideOnly( wxCommandEvent& event )
 {
@@ -317,6 +344,7 @@ void SyncDialog::OnExRightSideOnly( wxCommandEvent& event )
     m_radioBtn3->SetValue(true);
 }
 
+
 void SyncDialog::OnLeftNewer( wxCommandEvent& event )
 {
     toggleSyncDirection(localSyncConfiguration.leftNewer);
@@ -325,6 +353,7 @@ void SyncDialog::OnLeftNewer( wxCommandEvent& event )
     //set custom config button
     m_radioBtn3->SetValue(true);
 }
+
 
 void SyncDialog::OnRightNewer( wxCommandEvent& event )
 {
@@ -335,6 +364,7 @@ void SyncDialog::OnRightNewer( wxCommandEvent& event )
     m_radioBtn3->SetValue(true);
 }
 
+
 void SyncDialog::OnDifferent( wxCommandEvent& event )
 {
     toggleSyncDirection(localSyncConfiguration.different);
@@ -343,7 +373,6 @@ void SyncDialog::OnDifferent( wxCommandEvent& event )
     //set custom config button
     m_radioBtn3->SetValue(true);
 }
-
 //###################################################################################################################################
 
 
@@ -357,7 +386,7 @@ BatchDialog::BatchDialog(wxWindow* window,
     SyncDialog::updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
 
     m_checkBoxUseRecycler->SetValue(config.useRecycleBin);
-    m_checkBoxContinueError->SetValue(config.continueOnError);
+    m_checkBoxIgnoreErrors->SetValue(config.ignoreErrors);
 
     switch (config.compareVar)
     {
@@ -388,7 +417,7 @@ BatchDialog::BatchDialog(wxWindow* window,
         newPair->m_directoryLeft->SetValue(i->leftDirectory);
         newPair->m_directoryRight->SetValue(i->rightDirectory);
 
-        bSizerFolderPairs->Insert(0, newPair, 0, wxEXPAND, 5);
+        bSizerFolderPairs->Add( newPair, 0, wxEXPAND, 5);
         localFolderPairs.push_back(newPair);
 
         if (i == folderPairs.begin())
@@ -410,11 +439,13 @@ BatchDialog::BatchDialog(wxWindow* window,
     m_bitmap17->SetBitmap(*globalResource.bitmapDifferent);
     m_bitmap8->SetBitmap(*globalResource.bitmapInclude);
     m_bitmap9->SetBitmap(*globalResource.bitmapExclude);
+    m_bitmap27->SetBitmap(*globalResource.bitmapBatch);
 
     Fit();
     Centre();
     m_buttonCreate->SetFocus();
 }
+
 
 BatchDialog::~BatchDialog()
 {}
@@ -563,7 +594,7 @@ bool BatchDialog::createBatchFile(const wxString& filename)
     batchCfg.mainCfg.includeFilter     = m_textCtrlInclude->GetValue();
     batchCfg.mainCfg.excludeFilter     = m_textCtrlExclude->GetValue();
     batchCfg.mainCfg.useRecycleBin     = m_checkBoxUseRecycler->GetValue();
-    batchCfg.mainCfg.continueOnError   = m_checkBoxContinueError->GetValue();
+    batchCfg.mainCfg.ignoreErrors      = m_checkBoxIgnoreErrors->GetValue();
 
     for (unsigned int i = 0; i < localFolderPairs.size(); ++i)
     {

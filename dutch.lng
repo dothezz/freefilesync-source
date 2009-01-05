@@ -1,7 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
-  Time: 
-  Tijd: 
  Byte
  Byte
  GB
@@ -54,8 +52,6 @@
 &Annuleren
 &Compare
 &Vergelijken
-&Continue
-&Doorgaan
 &Create
 &Creëer
 &Create batch job
@@ -68,14 +64,20 @@
 &Bestand
 &Help
 &Help
+&Ignore
+&Negeren
 &Language
 &Taal
+&Load configuration
+&Laad de configuratie
 &OK
 &OK
 &Pause
 &Pause
 &Quit
 &Afsluiten
+&Resolve
+&Oplossen
 &Retry
 &Opnieuw proberen
 &Start
@@ -106,8 +108,6 @@
 - rechts is nieuwer
 - same date (different size)
 - zelfde datum (verschillende grootte)
--------------------------------------------------
------------------------------------------------------
 ---------\n
 -----------\n
 -Open-Source file synchronization-
@@ -138,6 +138,8 @@
 ==	bestanden zijn gelijk\n\n
 >>	right file is newer\n
 >>	rechter bestand is nieuwer\n
+A file time shift due to a daylight saving time change was detected for a FAT/FAT32 drive.
+Een time shift, van een bestand, door zomertijd is gedetecteerd op een FAT/FAT32 schijf.
 Abort
 Afbreken
 Abort requested: Waiting for current operation to finish...
@@ -160,8 +162,6 @@ All file times have been adjusted successfully!
 Alle bestandstijden zijn succesvol aangepast!
 All items have been synchronized!
 Alle bestanden zijn gesynchroniseerd!
-An error occured
-Er is een fout opgetreden
 An exception occured!
 Er heeft een uitzondering plaatsgevonden!
 Apply
@@ -216,12 +216,10 @@ Configure your own synchronization rules.
 Configureer uw eigen synchronisatieregels.
 Confirm
 Bevestig
+Consider this when setting up synchronization rules: You might want to avoid write access to these directories so that synchronization of both does not interfere.
+Neem het volgende in overweging: U wilt misschien schrijfrechten op deze paden vermijden, zodat synchronisatie van bijde elkaar niet hindert.
 Continue
 Doorgaan
-Continue on error
-Doorgaan bij fout
-Continue on next errors
-Doorgaan bij volgende fouten
 Copy from left to right
 Kopieer van links naar rechts
 Copy from left to right overwriting
@@ -230,6 +228,8 @@ Copy from right to left
 Kopieer van rechts naar links
 Copy from right to left overwriting
 Kopieer en overschrijf van rechts naar links
+Copy new or updated files to right folder.
+Kopieer nieuwe of geupdate bestanden naar de rechter map.
 Copy to clipboard\tCTRL+C
 Kopieer naar het klembord\tCTRL+C
 Copying file 
@@ -266,6 +266,10 @@ Data:
 Data:
 Date
 Datum
+Date: 
+Datum: 
+Daylight saving time change detected for FAT/FAT32 drive.
+Zomertijdverandering gedetecteerd voor een FAT/FAT32 schijf.
 Delete files/folders existing on left side only
 Verwijder bestanden/folders die alleen links bestaan
 Delete files/folders existing on right side only
@@ -278,10 +282,14 @@ Deleting file
 Bestand wordt verwijderd 
 Deleting folder 
 Folder wordt verwijderd 
+Directories are dependent: 
+De volgende paden zijn afhankelijk van elkaar: 
 Directory does not exist: 
 Map bestaat niet:
 Do not show graphical status and error messages but write to a logfile instead
 Geef geen grafische status en foutmeldingen weer, maar sla het op in een logbestand
+Do not show this warning again
+Deze waarschuwing niet meer tonen
 Do nothing
 Geen actie ondernemen
 Do you really want to delete the following objects(s)?
@@ -292,6 +300,8 @@ Donate with PayPal
 Doneer met PayPal
 Drag && drop
 Drag en drop
+Drive:
+Schijf:
 Email:
 Email:
 Error
@@ -299,7 +309,7 @@ Fout
 Error adapting modification time of file 
 Er is een fout opgetreden bij het wijzigen van de modificatietijd van het bestand 
 Error changing modification time: 
-Er is een fout opgetreden bij het wijzigen van de bestandstijden
+Er is een fout opgetreden bij het wijzigen van de bestandstijden 
 Error converting FILETIME to SYSTEMTIME
 Er is een fout opgetreden bij het converteren van FILETIME naar SYSTEMTIME
 Error converting FILETIME to local FILETIME
@@ -307,13 +317,13 @@ Er is een fout opgetreden bij het converteren van FILETIME naar (lokale) FILETIM
 Error copying file 
 Er is een fout opgetreden bij het kopiëren van een bestand 
 Error creating directory 
-Er is een fout opgetreden bij het aanmaken van een map 
-Error deleting directory 
-Er is een fout opgetreden bij het verwijderen van een map 
-Error deleting file 
+Er is een fout opgetreden bij het aanmaken van een pad 
+Error deleting directory: 
+Er is een fout opgetreden bij het verwijderen van een pad 
+Error deleting file: 
 Er is een fout opgetreden bij het verwijderen van een bestand 
 Error moving to recycle bin: 
-Er is een fout opgetreden bij verwijderen naar de prullenbak
+Er is een fout opgetreden bij verwijderen naar de prullenbak 
 Error parsing configuration file 
 Er is een fout opgetreden bij het aanmaken van een configuratiebestand 
 Error reading file: 
@@ -376,8 +386,6 @@ Filter view
 Bekijk het filter
 Folder pair
 Gekoppelde mappen
-FreeFileSync   (Date: 
-FreeFileSync   (Datum: 
 FreeFileSync - Folder Comparison and Synchronization
 FreeFileSync - Mappen vergelijken en synchroniseren
 FreeFileSync Batch Job
@@ -404,8 +412,8 @@ Hide files that exist on right side only
 Verberg bestanden die alleen aan de rechterkant bestaan
 Hide filtered items
 Verberg gefilterde items
-Hide further error messages during the current process and continue
-Ga door en geef volgende foutmeldingen tijdens dit proces niet meer weer
+Hide further error messages during the current process
+Volgende foutmeldingen niet meer weergeven tijdens de huidige handeling
 Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
 Verbergt foutmeldingen tijdens het synchroniseren:\nze worden verzameld en op het eind in een lijst getoond
 Hints:
@@ -414,6 +422,14 @@ Homepage:
 Homepage:
 If you like FFS:
 Als het programma u bevalt:
+Ignore errors
+Negeer foutmeldingen
+Ignore next errors
+Negeer volgende foutmeldingen
+Ignore this error, retry or abort comparison?
+Negeer deze fout, opnieuw proberen of afbreken van deze vergelijking?
+Ignore this error, retry or abort synchronization?
+Negeer deze fout, opnieuw proberen of afbreken van deze synchronisatie?
 Include
 Gebruiken
 Include temporarily
@@ -424,6 +440,8 @@ Info
 Info
 Information
 Informatie
+Information: If you ignore the error or abort a re-compare will be necessary!
+Informatie: als u de fout negeert of de handeling afbreekt is opnieuw vergelijken noodzakelijk!
 Initialization of Recycle Bin failed! It cannot be used!
 Initialiseren van de prullenbak is mislukt. Het kan niet worden gebruikt!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -436,8 +454,10 @@ Load configuration via...\n     - this list (press DEL to delete items)\n     - 
 Laad configuratie via...\n     - deze lijst (druk op DEL om items te verwijderen)\n     - drag en drop in dit venster\n     - opstartparameter
 Load from file...
 Laad met behulp van...
-Log-messages:\n-------------
-Logberichten:\n---------------
+Log-messages:
+Logberichten:
+Mirror ->>
+Spiegelen ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Spiegel backup van de linkerkant: de rechterkant wordt overschreven en komt na synchronisatie exact overeen met de linkerkant.
 No valid configuration file specified: 
@@ -452,10 +472,8 @@ Number of files and directories that will be deleted
 Aantal mappen en bestanden die zullen worden verwijderd
 Number of files that will be overwritten
 Aantal bestanden dat zal worden overschreven
-One way ->
-Naar rechts ->
-Only files/directories that pass filtering will be selected for synchronization.\nThe filter will be applied to the full name including path prefix.
-Alleen de niet gefilterde bestanden worden geselecteerd voor synchronisatie.\nHet filter wordt toegepast op de volledige naam inclusief pad-voorvoegsel.
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the full name including path prefix.
+Alleen de niet gefilterde bestanden worden geselecteerd voor synchronisatie. Het filter wordt toegepast op de volledige naam inclusief pad-voorvoegsel.
 Open synchronization dialog
 Open de synchronisatie-instellingen
 Open with Explorer\tD-Click
@@ -468,6 +486,8 @@ Pause
 Pause
 Please fill all empty directory fields.
 Vul alstublieft aan beide kanten een pad in.
+Please restart synchronization!
+Herstart het synchroniseren alstublieft!
 Press button to activate filter
 Druk op de knop om het filter te activeren.
 Preview
@@ -484,6 +504,8 @@ Result
 Resultaat
 Right folder:
 Rechter map:
+S&ave configuration
+S&la de instellingen op
 Save current configuration to file
 Sla de huidige instellingen op in een bestand
 Saved aborted!
@@ -548,14 +570,18 @@ System out of memory!
 Systeem heeft te weinig geheugen
 The selected file does not contain a valid configuration!
 Het geselecteerde bestand bevat geen geldige configuratie!
-The selected file does not exist anymore!
-Het geselecteerde bestand bestaat niet meer!
+The selected file does not exist: 
+Het volgende geselecteerde bestand bestaat niet: 
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
 Deze variant ziet twee gelijknamige bestanden als gelijk wanneer ze dezelfde bestandsgrootte EN tijdstempel hebben. Merk op dat tijdstempel 2 seconden mag verschillen. Dit zorgt ervoor dat het minder nauwkeurige FAT-32 ook kan worden gesynchroniseerd.
 Time elapsed:
 Verstreken tijd:
 Time shift in seconds
 Timeshift in seconden
+Time shift:
+Timeshift:
+Time: 
+Tijd: 
 Total amount of data that will be transferred
 Hoeveelheid data die verplaatst word
 Total time: 
@@ -567,7 +593,9 @@ Niet mogelijk om een logbestand aan te maken!
 Unable to initialize Recycle Bin!
 De prullenbak kon niet worden geïnitialiseerd!
 Unresolved errors occured during operation!
-Er is een onbekende fout opgetreden tijdens de handeling!
+Er zijn niet oplosbare fouten opgetreden tijdens de handeling!
+Update ->
+Overschrijven ->
 Update:
 Overschrijven:
 Use Recycle Bin
@@ -580,12 +608,8 @@ Warning: Synchronization failed for
 Attentie: synchronisatie mislukt voor 
 When \"Compare\" is triggered with this option set the following decision tree is processed:
 Wanneer \"Compare\" met deze instelling aan wordt gebruikt zal de volgende beslissingsboom gebruikt worden:
-\n\nContinue with next object, retry or abort comparison?
-\n\nDoorgaan met volgende object, opnieuw proberen of het vergelijken afbreken?
-\n\nContinue with next object, retry or abort synchronization?
-\n\nDoorgaan met volgende object, opnieuw proberen of de synchronisatie afbreken?
-\n\nInformation: If you skip the error and continue or abort a re-compare will be necessary!
-\n\nInformatie: Als u de fout negeert en doorgaat of afbreekt zult u opnieuw moeten vergelijken!
+You can adjust the file times accordingly to resolve the issue:
+U kunt de bestandstijden aanpassen om het probleem op te lossen:
 different
 verschillend
 file exists on both sides

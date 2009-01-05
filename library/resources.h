@@ -16,11 +16,11 @@ public:
 
     void load();
 
-    static const wxChar fileNameSeparator;
+    static const wxChar FILE_NAME_SEPARATOR;
 
     //language dependent global variables: need to be initialized by CustomLocale on program startup and language switch
-    static const wxChar* decimalPoint;
-    static const wxChar* thousandsSeparator;
+    static const wxChar* DECIMAL_POINT;
+    static const wxChar* THOUSANDS_SEPARATOR;
 
     //image resource objects
     wxBitmap* bitmapArrowLeft;
@@ -85,6 +85,13 @@ public:
     wxBitmap* bitmapRemoveFolderPairD;
     wxBitmap* bitmapLink;
     wxBitmap* bitmapBackground;
+    wxBitmap* bitmapCompareSmall;
+    wxBitmap* bitmapSyncSmall;
+    wxBitmap* bitmapClockSmall;
+    wxBitmap* bitmapClock;
+    wxBitmap* bitmapFilter;
+    wxBitmap* bitmapBatch;
+    wxBitmap* bitmapBatchSmall;
 
     wxAnimation* animationMoney;
     wxAnimation* animationSync;

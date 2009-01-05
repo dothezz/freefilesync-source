@@ -1,7 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
-  Time: 
-  時間: 
  Byte
  バイト
  GB
@@ -54,8 +52,6 @@
 キャンセル(&C)
 &Compare
 比較(&C)
-&Continue
-続行(&C)
 &Create
 作成(&C)
 &Create batch job
@@ -68,14 +64,20 @@
 ファイル(&F)
 &Help
 ヘルプ(&H)
+&Ignore
+無視(&I)
 &Language
 使用言語(&L)
+&Load configuration
+構成設定の読み込み(&L)
 &OK
 &OK
 &Pause
 一時停止(&P)
 &Quit
 終了(&Q)
+&Resolve
+決定(&R)
 &Retry
 再試行(&R)
 &Start
@@ -106,18 +108,20 @@
 - 右側の方が新しい
 - same date (different size)
 - 日付は同一(サイズに差異あり)
--------------------------------------------------
-------------------------------------------------
 ---------\n
 -----------\n
 -Open-Source file synchronization-
 -Open-Source ファイル同期ツール-
 .
 ,
+1. &Compare
+1. 比較(&C)
 1. Enter full file or directory names separated by ';' or a new line.
-1.完全なファイル/ディレクトリ名を ' ; ' で区切って入力してください。
+1. 完全なファイル/ディレクトリ名を ' ; ' で区切って入力してください。
+2. &Synchronize...
+2. 同期処理(&S)...
 2. Use wildcard characters '*' and '?'.
-2.ワイルドカードに ' * ' と ' ? ' を使用出来ます。
+2. ワイルドカードに ' * ' と ' ? ' を使用出来ます。
 3. Exclude files directly on main grid via context menu.
 3. コンテキストメニューから直接ファイルを除外出来ます。
 4. Keep the number of entries small for best performance.
@@ -134,6 +138,8 @@
 ==	同じ内容のファイル\n\n
 >>	right file is newer\n
 >>	右側の方が新しい\n
+A file time shift due to a daylight saving time change was detected for a FAT/FAT32 drive.
+FAT/FAT32 ドライブにおいて、夏時間の変更に伴う時間のシフトが検出されました。
 Abort
 中断
 Abort requested: Waiting for current operation to finish...
@@ -156,8 +162,6 @@ All file times have been adjusted successfully!
 ファイルの時間調整が完了しました!
 All items have been synchronized!
 すべてのアイテムは同期されました!
-An error occured
-エラーが発生
 An exception occured!
 例外が発生しました!
 Apply
@@ -212,12 +216,10 @@ Configure your own synchronization rules.
 あなたの設定した同期規則
 Confirm
 確認
+Consider this when setting up synchronization rules: You might want to avoid write access to these directories so that synchronization of both does not interfere.
+同期規則を設定する時の備考: ディレクトリの書き込みアクセスを回避することで、これら両方の同期処理が干渉しないようにすることが考えられます。
 Continue
 続行
-Continue on error
-エラーでも続行
-Continue on next errors
-次のエラーまで続行
 Copy from left to right
 左から右にコピー
 Copy from left to right overwriting
@@ -226,6 +228,8 @@ Copy from right to left
 右から左にコピー
 Copy from right to left overwriting
 右から左に上書きコピー
+Copy new or updated files to right folder.
+新しい(更新)ファイルを右フォルダにコピー
 Copy to clipboard\tCTRL+C
 クリップボードにコピー\tCTRL+C
 Copying file 
@@ -262,6 +266,10 @@ Data:
 データ:
 Date
 データ
+Date: 
+日付: 
+Daylight saving time change detected for FAT/FAT32 drive.
+FAT/FAT32 ドライブで検出された夏時間の変更
 Delete files/folders existing on left side only
 左側のみに存在するファイル/フォルダを削除
 Delete files/folders existing on right side only
@@ -274,10 +282,14 @@ Deleting file
 ファイルを削除中 
 Deleting folder 
 フォルダを削除中 
+Directories are dependent: 
+ディレクトリの依存関係: 
 Directory does not exist: 
 ディレクトリが存在しません: 
 Do not show graphical status and error messages but write to a logfile instead
 進捗状況、及びエラーを表示しないで、代わりにログファイルに書き込む
+Do not show this warning again
+次回からこの警告を表示しない
 Do nothing
 何もしない
 Do you really want to delete the following objects(s)?
@@ -288,6 +300,8 @@ Donate with PayPal
 PayPal から寄付する
 Drag && drop
 ドラッグ && ドロップ
+Drive:
+ドライブ:
 Email:
 E-メール:
 Error
@@ -304,18 +318,16 @@ Error copying file
 ファイルのコピーに失敗 
 Error creating directory 
 ディレクトリの作成に失敗 
-Error deleting directory 
-ディレクトリの削除に失敗 
-Error deleting file 
-ファイルの削除に失敗 
+Error deleting directory: 
+ディレクトリの削除エラー: 
+Error deleting file: 
+ファイルの削除エラー: 
 Error moving to recycle bin: 
 ゴミ箱への移動に失敗しました: 
 Error parsing configuration file 
 構成ファイルの構文に誤りがあります 
 Error reading file: 
 ファイル読み込みエラー: 
-Error scanning directory: 
-ディレクトリの読み込みエラー: 
 Error traversing directory 
 ディレクトリの移動エラー 
 Error when converting int to wxString
@@ -365,7 +377,7 @@ Files/folders that exist on left side only
 Files/folders that exist on right side only
 右側のみに存在するファイル/フォルダ
 Filter
-フィルター
+フィルタ
 Filter active: Press again to deactivate
 フィルター有効化: 再度押すと無効化
 Filter files
@@ -374,8 +386,6 @@ Filter view
 表示フィルター
 Folder pair
 フォルダペア
-FreeFileSync   (Date: 
-FreeFileSync   (日付: 
 FreeFileSync - Folder Comparison and Synchronization
 FreeFileSync - Folder Comparison and Synchronization
 FreeFileSync Batch Job
@@ -402,8 +412,8 @@ Hide files that exist on right side only
 右側のみに存在するファイルを非表示
 Hide filtered items
 適合するアイテムを非表示にする
-Hide further error messages during the current process and continue
-現在の処理を続行する間は、以降のエラーメッセージを表示しない
+Hide further error messages during the current process
+現在の処理中は以降のエラーメッセージを表示しない
 Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
 同期処理中のエラーメッセージを非表示にする:\n非表示にしたメッセージは、処理の終了後に一覧表示されます。
 Hints:
@@ -412,6 +422,14 @@ Homepage:
 ホームページ:
 If you like FFS:
 FFS が気に入った場合:
+Ignore errors
+エラーを無視
+Ignore next errors
+次のエラーを無視
+Ignore this error, retry or abort comparison?
+このエラーを無視して再試行、或いは比較を中止しますか?
+Ignore this error, retry or abort synchronization?
+このエラーを無視して再試行、或いは同期を中止しますか?
 Include
 含める
 Include temporarily
@@ -422,6 +440,8 @@ Info
 情報
 Information
 インフォメーション
+Information: If you ignore the error or abort a re-compare will be necessary!
+インフォメーション: このエラーを無視して中断した場合は、再比較が必要です!
 Initialization of Recycle Bin failed! It cannot be used!
 ゴミ箱の初期化に失敗しました! 使用できない状態です!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -434,8 +454,10 @@ Load configuration via...\n     - this list (press DEL to delete items)\n     - 
 構成ファイルの読み込み...\n    - リスト (DEL-でアイテムを削除)\n    - ウィンドウにドラッグ & ドロップ\n    - 起動時のパラメータ
 Load from file...
 ファイルから読み込み...
-Log-messages:\n-------------
-ログメッセージ:\n-----------
+Log-messages:
+ログメッセージ:
+Mirror ->>
+ミラー >>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 左側フォルダをミラーリングバックアップ: 同期完了後は、左側フォルダに合わせて右側フォルダは上書きされます。
 No valid configuration file specified: 
@@ -450,9 +472,7 @@ Number of files and directories that will be deleted
 削除されたファイルとディレクトリ数
 Number of files that will be overwritten
 上書きされたファイル数
-One way ->
-一方通行 ->
-Only files/directories that pass filtering will be selected for synchronization.\nThe filter will be applied to the full name including path prefix.
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the full name including path prefix.
 選択されたファイル/ディレクトリを同期処理する時だけフィルタリングされます。\nこのフィルターは、接頭語を含むパスと完全な名前にのみ適用されます。
 Open synchronization dialog
 同期ダイアログを開く
@@ -465,7 +485,9 @@ Operation:
 Pause
 一時停止
 Please fill all empty directory fields.
-すべてのフィールドに入力してください。
+アイテムが選択されていません!
+Please restart synchronization!
+同期処理を再スタートしてください!
 Press button to activate filter
 ボタンをクリックで有効化
 Preview
@@ -482,6 +504,8 @@ Result
 結果
 Right folder:
 右側フォルダ:
+S&ave configuration
+構成設定を保存(&A)
 Save current configuration to file
 現在の設定をファイルに保存
 Saved aborted!
@@ -546,14 +570,18 @@ System out of memory!
 メモリが不足しています!
 The selected file does not contain a valid configuration!
 選択されたファイルには有効な構成が含まれていません!
-The selected file does not exist anymore!
-選択されたファイルはそれ以上存在しません!
+The selected file does not exist: 
+選択されたファイルは存在しません: 
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
 この変数では、ふたつの同名ファイルが存在した場合、 それぞれのファイルサイズと最終更新日付/時間を比較します。\nファイル時間の差異が 2 秒以内の場合は検出されないということに注意してください。 (これは、FAT32システムで正確に同期を行うことができる最小値です)
 Time elapsed:
 経過時間:
 Time shift in seconds
 タイムシフト(秒)
+Time shift:
+タイムシフト:
+Time: 
+時間: 
 Total amount of data that will be transferred
 転送されたデータの総量
 Total time: 
@@ -564,6 +592,10 @@ Unable to create logfile!
 ログファイルを作成出来ません!
 Unable to initialize Recycle Bin!
 ゴミ箱の初期化が出来ません!
+Unresolved errors occured during operation!
+例外エラーが発生しました!
+Update ->
+更新 ->
 Update:
 アップデート:
 Use Recycle Bin
@@ -576,12 +608,8 @@ Warning: Synchronization failed for
 警告: 同期処理に失敗 
 When \"Compare\" is triggered with this option set the following decision tree is processed:
 この設定で \"比較\" トリガが実行された場合は、以下のツリーに従って処理されていきます。
-\n\nContinue with next object, retry or abort comparison?
-\n\n次のオブジェクトの比較を続行しますか? 中断しますか?
-\n\nContinue with next object, retry or abort synchronization?
-\n\n次のオブジェクトの同期を続行しますか? 中断しますか?
-\n\nInformation: If you skip the error and continue or abort a re-compare will be necessary!
-\n\nインフォメーション: エラーをスキップして続行/中断した場合、再比較を行う必要があります!
+You can adjust the file times accordingly to resolve the issue:
+この問題を解決するために、ファイルの時間を調整できます:
 different
 差異あり
 file exists on both sides

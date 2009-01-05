@@ -114,9 +114,9 @@ public:
                             switch (col)
                             {
                             case 0: //filename
-                                return gridLine.fileDescrLeft.relativeName.AfterLast(GlobalResources::fileNameSeparator);
+                                return gridLine.fileDescrLeft.relativeName.AfterLast(GlobalResources::FILE_NAME_SEPARATOR);
                             case 1: //relative path
-                                return gridLine.fileDescrLeft.relativeName.BeforeLast(GlobalResources::fileNameSeparator);
+                                return gridLine.fileDescrLeft.relativeName.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
                             case 2: //file size
                                 return globalFunctions::includeNumberSeparator(fileSize = gridLine.fileDescrLeft.fileSize.ToString());
                             case 3: //date
@@ -148,9 +148,9 @@ public:
                             switch (col)
                             {
                             case 0: //filename
-                                return gridLine.fileDescrRight.relativeName.AfterLast(GlobalResources::fileNameSeparator);
+                                return gridLine.fileDescrRight.relativeName.AfterLast(GlobalResources::FILE_NAME_SEPARATOR);
                             case 1: //relative path
-                                return gridLine.fileDescrRight.relativeName.BeforeLast(GlobalResources::fileNameSeparator);
+                                return gridLine.fileDescrRight.relativeName.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
                             case 2: //file size
                                 return globalFunctions::includeNumberSeparator(fileSize = gridLine.fileDescrRight.fileSize.ToString());
                             case 3: //date
@@ -319,7 +319,7 @@ CustomGrid::CustomGrid(wxWindow *parent,
                        const wxString& name) :
         wxGrid(parent, id, pos, size, style, name),
         scrollbarsEnabled(true),
-        m_grid1(0), m_grid2(0), m_grid3(0),
+        m_gridLeft(0), m_gridRight(0), m_gridMiddle(0),
         gridDataTable(0),
         currentSortColumn(-1),
         sortMarker(0)
@@ -357,39 +357,39 @@ void CustomGrid::SetScrollbar(int orientation, int position, int thumbSize, int 
 
 
 //ensure that all grids are properly aligned: add some extra window space to grids that have no horizontal scrollbar
-void CustomGrid::adjustGridHeights() //m_grid1, m_grid2, m_grid3 are not NULL in this context
+void CustomGrid::adjustGridHeights() //m_gridLeft, m_gridRight, m_gridMiddle are not NULL in this context
 {
     int y1 = 0;
     int y2 = 0;
     int y3 = 0;
     int dummy = 0;
 
-    m_grid1->GetViewStart(&dummy, &y1);
-    m_grid2->GetViewStart(&dummy, &y2);
-    m_grid3->GetViewStart(&dummy, &y3);
+    m_gridLeft->GetViewStart(&dummy, &y1);
+    m_gridRight->GetViewStart(&dummy, &y2);
+    m_gridMiddle->GetViewStart(&dummy, &y3);
 
     if (y1 != y2 || y2 != y3)
     {
         int yMax = max(y1, max(y2, y3));
 
         if (leadingPanel == 1)  //do not handle case (y1 == yMax) here!!! Avoid back coupling!
-            m_grid1->SetMargins(0, 0);
+            m_gridLeft->SetMargins(0, 0);
         else if (y1 < yMax)
-            m_grid1->SetMargins(0, 50);
+            m_gridLeft->SetMargins(0, 50);
 
         if (leadingPanel == 2)
-            m_grid2->SetMargins(0, 0);
+            m_gridRight->SetMargins(0, 0);
         else if (y2 < yMax)
-            m_grid2->SetMargins(0, 50);
+            m_gridRight->SetMargins(0, 50);
 
         if (leadingPanel == 3)
-            m_grid3->SetMargins(0, 0);
+            m_gridMiddle->SetMargins(0, 0);
         else if (y3 < yMax)
-            m_grid3->SetMargins(0, 50);
+            m_gridMiddle->SetMargins(0, 50);
 
-        m_grid1->ForceRefresh();
-        m_grid2->ForceRefresh();
-        m_grid3->ForceRefresh();
+        m_gridLeft->ForceRefresh();
+        m_gridRight->ForceRefresh();
+        m_gridMiddle->ForceRefresh();
     }
 }
 
@@ -400,47 +400,47 @@ void CustomGrid::DoPrepareDC(wxDC& dc)
     wxScrollHelper::DoPrepareDC(dc);
 
     int x, y = 0;
-    if (leadingPanel == 1 && this == m_grid1)   //avoid back coupling
+    if (leadingPanel == 1 && this == m_gridLeft)   //avoid back coupling
     {
         GetViewStart(&x, &y);
-        m_grid2->Scroll(x, y);
-        m_grid3->Scroll(-1, y); //scroll in y-direction only
-        adjustGridHeights(); //keep here to ensure m_grid1, m_grid2, m_grid3 != NULL
+        m_gridRight->Scroll(x, y);
+        m_gridMiddle->Scroll(-1, y); //scroll in y-direction only
+        adjustGridHeights(); //keep here to ensure m_gridLeft, m_gridRight, m_gridMiddle != NULL
     }
-    else if (leadingPanel == 2 && this == m_grid2)   //avoid back coupling
+    else if (leadingPanel == 2 && this == m_gridRight)   //avoid back coupling
     {
         GetViewStart(&x, &y);
-        m_grid1->Scroll(x, y);
-        m_grid3->Scroll(-1, y);
-        adjustGridHeights(); //keep here to ensure m_grid1, m_grid2, m_grid3 != NULL
+        m_gridLeft->Scroll(x, y);
+        m_gridMiddle->Scroll(-1, y);
+        adjustGridHeights(); //keep here to ensure m_gridLeft, m_gridRight, m_gridMiddle != NULL
     }
-    else if (leadingPanel == 3 && this == m_grid3)   //avoid back coupling
+    else if (leadingPanel == 3 && this == m_gridMiddle)   //avoid back coupling
     {
         GetViewStart(&x, &y);
-        m_grid1->Scroll(-1, y);
-        m_grid2->Scroll(-1, y);
-        adjustGridHeights(); //keep here to ensure m_grid1, m_grid2, m_grid3 != NULL
+        m_gridLeft->Scroll(-1, y);
+        m_gridRight->Scroll(-1, y);
+        adjustGridHeights(); //keep here to ensure m_gridLeft, m_gridRight, m_gridMiddle != NULL
     }
 }
 
 
 //these classes will scroll together, hence the name ;)
-void CustomGrid::setScrollFriends(CustomGrid* grid1, CustomGrid* grid2, CustomGrid* grid3)
+void CustomGrid::setScrollFriends(CustomGrid* gridLeft, CustomGrid* gridRight, CustomGrid* gridMiddle)
 {
-    assert(grid1);
-    assert(grid2);
-    assert(grid3);
+    assert(gridLeft);
+    assert(gridRight);
+    assert(gridMiddle);
 
-    m_grid1 = grid1;
-    m_grid2 = grid2;
-    m_grid3 = grid3;
+    m_gridLeft = gridLeft;
+    m_gridRight = gridRight;
+    m_gridMiddle = gridMiddle;
 
     assert(gridDataTable);
-    if (this == m_grid1)
+    if (this == m_gridLeft)
         gridDataTable->SetGridIdentifier(1);
-    else if (this == m_grid2)
+    else if (this == m_gridRight)
         gridDataTable->SetGridIdentifier(2);
-    else if (this == m_grid3)
+    else if (this == m_gridMiddle)
         gridDataTable->SetGridIdentifier(3);
     else
         assert (false);
