@@ -7,12 +7,14 @@
 
 namespace FreeFileSync
 {
-    void calcTotalBytesToSync(int& objectsToCreate,
+    void calcTotalBytesToSync(const FileCompareResult& fileCmpResult,
+                              const SyncConfiguration& config,
+                              int& objectsToCreate,
                               int& objectsToOverwrite,
                               int& objectsToDelete,
-                              double& dataToProcess,
-                              const FileCompareResult& fileCmpResult,
-                              const SyncConfiguration& config);
+                              double& dataToProcess);
+
+    bool synchronizationNeeded(const FileCompareResult& fileCmpResult, const SyncConfiguration& config);
 
     //class handling synchronization process
     class SyncProcess
@@ -28,14 +30,13 @@ namespace FreeFileSync
 
         const bool useRecycleBin;
         StatusHandler* statusUpdater;
-        wxString optionalLineBreak; //optional line break for status messages (used by GUI mode only)
 
         //preload status texts
-        const Zstring txtCopyingFile;
-        const Zstring txtOverwritingFile;
-        const Zstring txtCreatingFolder;
-        const Zstring txtDeletingFile;
-        const Zstring txtDeletingFolder;
+        Zstring txtCopyingFile;
+        Zstring txtOverwritingFile;
+        Zstring txtCreatingFolder;
+        Zstring txtDeletingFile;
+        Zstring txtDeletingFolder;
     };
 }
 

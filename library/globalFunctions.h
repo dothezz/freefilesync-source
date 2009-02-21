@@ -10,8 +10,6 @@
 #include <wx/stream.h>
 #include <wx/stopwatch.h>
 
-using namespace std;
-
 
 namespace globalFunctions
 {
@@ -23,24 +21,24 @@ namespace globalFunctions
         return(d<0?-d:d);
     }
 
-    string numberToString(const unsigned int number); //convert number to string
-    string numberToString(const int number);          //convert number to string
-    string numberToString(const float number);        //convert number to string
+    std::string numberToString(const unsigned int number); //convert number to string
+    std::string numberToString(const int number);          //convert number to string
+    std::string numberToString(const float number);        //convert number to string
 
     wxString numberToWxString(const unsigned int number); //convert number to wxString
     wxString numberToWxString(const int number);          //convert number to wxString
     wxString numberToWxString(const float number);        //convert number to wxString
 
-    int    stringToInt(   const string& number); //convert String to number
-    double stringToDouble(const string& number); //convert String to number
+    int    stringToInt(   const std::string& number); //convert String to number
+    double stringToDouble(const std::string& number); //convert String to number
 
     int    wxStringToInt(   const wxString& number); //convert wxString to number
     double wxStringToDouble(const wxString& number); //convert wxString to number
 
     wxString& includeNumberSeparator(wxString& number);
 
-    int readInt(ifstream& stream);  //read int from file stream
-    void writeInt(ofstream& stream, const int number);  //write int to filestream
+    int readInt(std::ifstream& stream);  //read int from file stream
+    void writeInt(std::ofstream& stream, const int number);  //write int to filestream
 
     int readInt(wxInputStream& stream);  //read int from file stream
     void writeInt(wxOutputStream& stream, const int number);  //write int to filestream
@@ -108,12 +106,12 @@ private:
 //Note: the following lines are a performance optimization for deleting elements from a vector. It is incredibly faster to create a new
 //vector and leave specific elements out than to delete row by row and force recopying of most elements for each single deletion (linear vs quadratic runtime)
 template <class T>
-void removeRowsFromVector(vector<T>& grid, const set<int>& rowsToRemove)
+void removeRowsFromVector(std::vector<T>& grid, const std::set<int>& rowsToRemove)
 {
-    vector<T> temp;
+    std::vector<T> temp;
     int rowToSkip = -1; //keep it an INT!
 
-    set<int>::iterator rowToSkipIndex = rowsToRemove.begin();
+    std::set<int>::iterator rowToSkipIndex = rowsToRemove.begin();
 
     if (rowToSkipIndex != rowsToRemove.end())
         rowToSkip = *rowToSkipIndex;

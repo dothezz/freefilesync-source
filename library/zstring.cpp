@@ -44,14 +44,14 @@ int FreeFileSync::compareStringsWin32(const wchar_t* a, const wchar_t* b, const 
                  bCount); 	          //size, in bytes or characters, of second string
 
     if (rv == 0)
-        throw RuntimeException(wxString(_("Error comparing strings!")));
+        throw RuntimeException(wxString(wxT("Error comparing strings!")));
     else
         return rv - 2;
 }
 #endif
 
 
-size_t Zstring::Replace(const defaultChar* old, const defaultChar* replacement, bool replaceAll)
+size_t Zstring::Replace(const DefaultChar* old, const DefaultChar* replacement, bool replaceAll)
 {
     const size_t oldLen         = defaultLength(old);
     const size_t replacementLen = defaultLength(replacement);
@@ -77,29 +77,29 @@ size_t Zstring::Replace(const defaultChar* old, const defaultChar* replacement, 
 }
 
 
-bool matchesHelper(const defaultChar* string, const defaultChar* mask)
+bool matchesHelper(const DefaultChar* string, const DefaultChar* mask)
 {
-    for (defaultChar ch; (ch = *mask) != 0; ++mask)
+    for (DefaultChar ch; (ch = *mask) != 0; ++mask)
     {
         switch (ch)
         {
-        case defaultChar('?'):
+        case DefaultChar('?'):
             if (*string == 0)
                 return false;
             else
                 ++string;
             break;
 
-        case defaultChar('*'):
+        case DefaultChar('*'):
             //advance to next non-*/? char
             do
             {
                 ++mask;
                 ch = *mask;
             }
-            while (ch == defaultChar('*') || ch == defaultChar('?'));
+            while (ch == DefaultChar('*') || ch == DefaultChar('?'));
             //if match ends with '*':
-            if (ch == defaultChar(0))
+            if (ch == DefaultChar(0))
                 return true;
 
             ++mask;
@@ -123,7 +123,7 @@ bool matchesHelper(const defaultChar* string, const defaultChar* mask)
 }
 
 
-bool Zstring::Matches(const defaultChar* mask) const
+bool Zstring::Matches(const DefaultChar* mask) const
 {
     return matchesHelper(c_str(), mask);
 }
@@ -137,7 +137,7 @@ Zstring& Zstring::Trim(bool fromRight)
 
     if (fromRight)
     {
-        const defaultChar* cursor = data + thisLen - 1;
+        const DefaultChar* cursor = data + thisLen - 1;
         while (cursor != data - 1 && defaultIsWhiteSpace(*cursor)) //break when pointing one char further than last skipped element
             --cursor;
         ++cursor;
@@ -153,8 +153,8 @@ Zstring& Zstring::Trim(bool fromRight)
     }
     else
     {
-        defaultChar* cursor = data;
-        defaultChar ch;
+        DefaultChar* cursor = data;
+        DefaultChar ch;
         while ((ch = *cursor) != 0 && defaultIsWhiteSpace(ch))
             ++cursor;
 
@@ -185,7 +185,7 @@ Zstring& Zstring::MakeLower()
     if (descr->refCount > 1) //allocate new string
     {
         StringDescriptor* newDescr;
-        defaultChar*      newData;
+        DefaultChar*      newData;
         const size_t newCapacity = getCapacityToAllocate(thisLen);
         allocate(1, thisLen, newCapacity, newDescr, newData);
 
@@ -224,7 +224,7 @@ Zstring Zstring::substr(size_t pos, size_t len) const
 }
 
 
-size_t Zstring::rfind(const defaultChar ch, size_t pos) const
+size_t Zstring::rfind(const DefaultChar ch, size_t pos) const
 {
     const size_t thisLen = length();
     if (thisLen == 0)
@@ -245,7 +245,7 @@ size_t Zstring::rfind(const defaultChar ch, size_t pos) const
 }
 
 
-Zstring& Zstring::replace(size_t pos1, size_t n1, const defaultChar* str, size_t n2)
+Zstring& Zstring::replace(size_t pos1, size_t n1, const DefaultChar* str, size_t n2)
 {
     assert(str < c_str() || c_str() + length() < str); //str mustn't point to data in this string
     assert(n1 <= length() - pos1);
@@ -265,15 +265,15 @@ Zstring& Zstring::replace(size_t pos1, size_t n1, const defaultChar* str, size_t
             const size_t newCapacity = getCapacityToAllocate(newLen);
 
             StringDescriptor* newDescr;
-            defaultChar* newData;
+            DefaultChar* newData;
             allocate(1, newLen, newCapacity, newDescr, newData);
             //StringDescriptor* newDescr = new StringDescriptor(1, newLen, newCapacity);
-            //defaultChar* newData = new defaultChar[newCapacity + 1];
+            //DefaultChar* newData = new DefaultChar[newCapacity + 1];
 
             //assemble new string with replacement
-            memcpy(newData, data, pos1 * sizeof(defaultChar));
-            memcpy(newData + pos1, str, n2 * sizeof(defaultChar));
-            memcpy(newData + pos1 + n2, data + pos1 + n1, (oldLen - pos1 - n1) * sizeof(defaultChar));
+            memcpy(newData, data, pos1 * sizeof(DefaultChar));
+            memcpy(newData + pos1, str, n2 * sizeof(DefaultChar));
+            memcpy(newData + pos1 + n2, data + pos1 + n1, (oldLen - pos1 - n1) * sizeof(DefaultChar));
             newData[newLen] = 0;
 
             decRef();
@@ -282,10 +282,10 @@ Zstring& Zstring::replace(size_t pos1, size_t n1, const defaultChar* str, size_t
         }
         else
         {   //overwrite current string
-            memcpy(data + pos1, str, n2 * sizeof(defaultChar));
+            memcpy(data + pos1, str, n2 * sizeof(DefaultChar));
             if (n1 > n2)
             {
-                memmove(data + pos1 + n2, data + pos1 + n1, (oldLen - pos1 - n1) * sizeof(defaultChar));
+                memmove(data + pos1 + n2, data + pos1 + n1, (oldLen - pos1 - n1) * sizeof(DefaultChar));
                 data[newLen] = 0;
                 descr->length = newLen;
             }
@@ -295,7 +295,7 @@ Zstring& Zstring::replace(size_t pos1, size_t n1, const defaultChar* str, size_t
 }
 
 
-Zstring& Zstring::operator=(const defaultChar* source)
+Zstring& Zstring::operator=(const DefaultChar* source)
 {
     const size_t sourceLen = defaultLength(source);
     if (sourceLen == 0)
@@ -305,7 +305,7 @@ Zstring& Zstring::operator=(const defaultChar* source)
         *this = Zstring(source, sourceLen);
     else
     {   //overwrite this string
-        memcpy(data, source, sourceLen * sizeof(defaultChar));
+        memcpy(data, source, sourceLen * sizeof(DefaultChar));
         data[sourceLen] = 0;
         descr->length = sourceLen;
     }
@@ -322,7 +322,7 @@ Zstring& Zstring::operator+=(const Zstring& other)
         const size_t newLen = thisLen + otherLen;
         copyBeforeWrite(newLen);
 
-        memcpy(data + thisLen, other.c_str(), otherLen * sizeof(defaultChar));
+        memcpy(data + thisLen, other.c_str(), otherLen * sizeof(DefaultChar));
         data[newLen] = 0;
         descr->length = newLen;
     }
@@ -330,7 +330,7 @@ Zstring& Zstring::operator+=(const Zstring& other)
 }
 
 
-Zstring& Zstring::operator+=(const defaultChar* other)
+Zstring& Zstring::operator+=(const DefaultChar* other)
 {
     const size_t otherLen = defaultLength(other);
     if (otherLen != 0)
@@ -339,7 +339,7 @@ Zstring& Zstring::operator+=(const defaultChar* other)
         const size_t newLen = thisLen + otherLen;
         copyBeforeWrite(newLen);
 
-        memcpy(data + thisLen, other, otherLen * sizeof(defaultChar));
+        memcpy(data + thisLen, other, otherLen * sizeof(DefaultChar));
         data[newLen] = 0;
         descr->length = newLen;
     }
@@ -347,7 +347,7 @@ Zstring& Zstring::operator+=(const defaultChar* other)
 }
 
 
-Zstring& Zstring::operator+=(defaultChar ch)
+Zstring& Zstring::operator+=(DefaultChar ch)
 {
     const size_t oldLen = length();
     copyBeforeWrite(oldLen + 1);
@@ -368,15 +368,13 @@ void Zstring::copyBeforeWrite(const size_t capacityNeeded)
         const size_t newCapacity = getCapacityToAllocate(capacityNeeded);
 
         StringDescriptor* newDescr;
-        defaultChar* newData;
+        DefaultChar* newData;
         allocate(1, oldLength, newCapacity, newDescr, newData);
-        //StringDescriptor* newDescr = new StringDescriptor(1, oldLength, newCapacity);
-        //defaultChar* newData = new defaultChar[newCapacity + 1];
 
         if (oldLength)
         {
             assert(oldLength <= newCapacity);
-            memcpy(newData, data, oldLength * sizeof(defaultChar));
+            memcpy(newData, data, oldLength * sizeof(DefaultChar));
             newData[oldLength] = 0;
         }
         decRef();
@@ -387,10 +385,10 @@ void Zstring::copyBeforeWrite(const size_t capacityNeeded)
     {   //try to resize the current string (allocate anew if necessary)
         const size_t newCapacity = getCapacityToAllocate(capacityNeeded);
 
-        descr = (StringDescriptor*) realloc(descr, sizeof(StringDescriptor) + (newCapacity + 1) * sizeof(defaultChar));
+        descr = (StringDescriptor*) realloc(descr, sizeof(StringDescriptor) + (newCapacity + 1) * sizeof(DefaultChar));
         if (descr == NULL)
-            throw; //std::bad_alloc& e
-        data = (defaultChar*)(descr + 1);
+            throw std::bad_alloc();
+        data = (DefaultChar*)(descr + 1);
         descr->capacity = newCapacity;
     }
 }

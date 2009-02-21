@@ -19,8 +19,7 @@ void exchangeEscapeChars(wxString& data)
         {
             //read next character
             ++input;
-            value = *input;
-            if (value == wxChar(0))
+            if ((value = *input) == wxChar(0))
                 break;
 
             switch (value)
@@ -60,23 +59,32 @@ void CustomLocale::setLanguage(const int language)
 {
     currentLanguage = language;
 
-    string languageFile;
+    std::string languageFile;
     switch (language)
     {
-    case wxLANGUAGE_GERMAN:
-        languageFile = "german.lng";
-        break;
-    case wxLANGUAGE_FRENCH:
-        languageFile = "french.lng";
-        break;
-    case wxLANGUAGE_JAPANESE:
-        languageFile = "japanese.lng";
+    case wxLANGUAGE_CHINESE_SIMPLIFIED:
+        languageFile = "Languages/chinese_simple.lng";
         break;
     case wxLANGUAGE_DUTCH:
-        languageFile = "dutch.lng";
+        languageFile = "Languages/dutch.lng";
         break;
-    case wxLANGUAGE_CHINESE_SIMPLIFIED:
-        languageFile = "chinese_simple.lng";
+    case wxLANGUAGE_FRENCH:
+        languageFile = "Languages/french.lng";
+        break;
+    case wxLANGUAGE_GERMAN:
+        languageFile = "Languages/german.lng";
+        break;
+    case wxLANGUAGE_ITALIAN:
+        languageFile = "Languages/italian.lng";
+        break;
+    case wxLANGUAGE_JAPANESE:
+        languageFile = "Languages/japanese.lng";
+        break;
+    case wxLANGUAGE_POLISH:
+        languageFile = "Languages/polish.lng";
+        break;
+    case wxLANGUAGE_PORTUGUESE:
+        languageFile = "Languages/portuguese.lng";
         break;
     default:
         languageFile.clear();
@@ -96,7 +104,7 @@ void CustomLocale::setLanguage(const int language)
     char temp[bufferSize];
     if (!languageFile.empty())
     {
-        ifstream langFile(languageFile.c_str(), ios::binary);
+        std::ifstream langFile(languageFile.c_str(), std::ios::binary);
         if (langFile)
         {
             TranslationLine currentLine;

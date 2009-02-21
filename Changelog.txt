@@ -1,6 +1,29 @@
 FreeFileSync
 ------------
 
+Changelog v1.15
+---------------
+Fixed performance bottleneck in batch mode (non-silent)
+Improved performance of comparison by another 10%
+Configure column settings by right-click context menu
+Remember column positions on main grid
+Hide/Show individual columns
+Added "sort by comparison result"
+Sort file list by relative name after comparison (GUI mode only)
+Removed Windows registry usage for portable version
+Restored linebreaks in status texts for better readability
+Revised German translation. Thanks to «Latino»!
+Created custom button control to finally translate "compare" and "synchronize"
+Allow manual setup of file manager integration (Windows and Linux)
+Added Step-By-Step guide for manual compilation (Windows and Linux)
+Added checkboxes to manually select/deselect rows
+New option: Treat files with time deviation of less-equal 1 hour as equal (FAT/FAT32 drives only) 
+Added Polish translation
+Added Portuguese translation
+Added Italian translation
+Updated translation files
+
+
 Changelog v1.14
 ---------------
 Massive performance improvements:

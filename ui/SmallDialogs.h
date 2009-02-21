@@ -3,6 +3,7 @@
 
 #include "../FreeFileSync.h"
 #include "../library/statusHandler.h"
+#include "../library/processXml.h"
 #include "guiGenerated.h"
 #include <wx/stopwatch.h>
 
@@ -120,24 +121,48 @@ private:
 };
 
 
-class ModifyFilesDlg : public ModifyFilesDlgGenerated
+class CustomizeColsDlg : public CustomizeColsDlgGenerated
 {
 public:
-    ModifyFilesDlg(wxWindow* window, const wxString& parentDirectory, const int timeShift);
-    ~ModifyFilesDlg();
+    CustomizeColsDlg(wxWindow* window, xmlAccess::XmlGlobalSettings::ColumnAttributes& attr);
+    ~CustomizeColsDlg() {}
 
     enum
     {
-        BUTTON_APPLY = 10
+        BUTTON_OKAY = 10
     };
 
 private:
-    void OnApply(wxCommandEvent& event);
+    void OnOkay(wxCommandEvent& event);
+    void OnDefault(wxCommandEvent& event);
     void OnCancel(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);
 
-    void OnWriteDirManually(wxCommandEvent& event);
-    void OnDirSelected(wxFileDirPickerEvent& event);
+    void OnMoveUp(wxCommandEvent& event);
+    void OnMoveDown(wxCommandEvent& event);
+
+    xmlAccess::XmlGlobalSettings::ColumnAttributes& output;
+};
+
+
+class GlobalSettingsDlg : public GlobalSettingsDlgGenerated
+{
+public:
+    GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSettings& globalSettings);
+    ~GlobalSettingsDlg() {}
+
+    enum
+    {
+        BUTTON_OKAY = 10
+    };
+
+private:
+    void OnOkay(wxCommandEvent& event);
+    void OnDefault(wxCommandEvent& event);
+    void OnCancel(wxCommandEvent& event);
+    void OnClose(wxCloseEvent& event);
+
+    xmlAccess::XmlGlobalSettings& settings;
 };
 
 
@@ -160,7 +185,7 @@ public:
 
     void resetGauge(int totalObjectsToProcess, double totalDataToProcess);
     void incProgressIndicator_NoUpdate(int objectsProcessed, double dataProcessed);
-    void setStatusText_NoUpdate(const wxString& text);
+    void setStatusText_NoUpdate(const Zstring& text);
     void updateStatusDialogNow();
 
     void setCurrentStatus(SyncStatusID id);
@@ -185,7 +210,7 @@ private:
     int currentObjects;    //each object represents a file or directory processed
     int totalObjects;
 
-    wxString currentStatusText;
+    Zstring currentStatusText;
     bool processPaused;
 };
 
@@ -226,13 +251,13 @@ public:
     void switchToCompareBytewise(int totalCmpObjectsToProcess, double totalCmpDataToProcess);
     void incScannedObjects_NoUpdate(int number);
     void incProcessedCmpData_NoUpdate(int objectsProcessed, double dataProcessed);
-    void setStatusText_NoUpdate(const wxString& text);
+    void setStatusText_NoUpdate(const Zstring& text);
     void updateStatusPanelNow();
 
 private:
     //status variables
     unsigned int scannedObjects;
-    wxString currentStatusText;
+    Zstring currentStatusText;
 
     wxStopWatch timeElapsed;
 

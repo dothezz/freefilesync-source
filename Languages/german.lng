@@ -19,33 +19,31 @@
 %x files,
 %x Dateien,
 %x of %y rows in view
-%x von %y Zeilen zur Ansicht
+%x von %y Zeilen in Ansicht
 %x of 1 row in view
-%x von 1 Zeile zur Ansicht
+%x von 1 Zeile in Ansicht
 &Abort
-&Abbruch
+&Abbrechen
 &About...
 &Über...
-&Adjust file times
-&Dateizeiten ändern
 &Advanced
 &Erweitert
 &Back
 &Zurück
 &Cancel
-&Abbruch
+&Abbrechen
 &Compare
 &Vergleichen
-&Create
-&Erzeugen
 &Create batch job
-&Erstelle Batch-Job
+&Batch-Job erstellen
 &Default
 &Standard
 &Export file list
-E&xportiere Dateiliste
+Dateiliste e&xportieren
 &File
 &Datei
+&Global settings
+&Globale Einstellungen
 &Help
 &Hilfe
 &Ignore
@@ -53,7 +51,7 @@ E&xportiere Dateiliste
 &Language
 &Sprache
 &Load configuration
-&Lade Konfiguration
+Konfiguration &laden
 &OK
 &OK
 &Pause
@@ -64,12 +62,12 @@ E&xportiere Dateiliste
 &Beheben
 &Retry
 &Wiederholen
+&Save
+&Speichern
 &Start
 &Start
-&Synchronize
+&Synchronize...
 &Synchronisieren
-(-)	filtered out from sync-process\n
-(-)	nicht synchronisieren\n
 ,
 .
 - different
@@ -103,7 +101,7 @@ E&xportiere Dateiliste
 1. &Compare
 1. &Vergleichen
 1. Enter full file or directory names separated by ';' or a new line.
-1. Komplette Datei- und Verzeichnisnamen getrennt durch ';' oder eine Neuzeile eingeben.
+1. Ganze Datei- und Verzeichnisnamen getrennt durch ';' oder eine Neuzeile eingeben.
 2. &Synchronize...
 2. &Synchronisieren...
 2. Use wildcard characters '*' and '?'.
@@ -113,7 +111,7 @@ E&xportiere Dateiliste
 4. Keep the number of entries small for best performance.
 4. Für beste Performance möglichst wenige Einträge filtern.
 <<	left file is newer\n
-<<	linke Datei ist neuer\n
+<<	Linke Datei ist neuer\n
 <Directory>
 <Verzeichnis>
 <multiple selection>
@@ -123,11 +121,9 @@ E&xportiere Dateiliste
 ==	files are equal\n\n
 ==	Dateien sind gleich\n\n
 >>	right file is newer\n
->>	rechte Datei ist neuer\n
-A file time shift due to a daylight saving time change was detected for a FAT/FAT32 drive.
-Eine Verschiebung der Dateiänderungszeiten aufgrund der Sommer-/Winterzeitumstellung wurde auf einem FAT/FAT32 Laufwerk erkannt.
+>>	Rechte Datei ist neuer\n
 Abort
-Abbruch
+Abbrechen
 Abort requested: Waiting for current operation to finish...
 Abbruch initiiert: Warte, bis aktuelle Operation beendet ist...
 Aborted
@@ -136,36 +132,32 @@ About
 Über
 Action
 Aktion
+Active for FAT/FAT32 drives only: When comparing filetimes treat files that differ by less or equal than 1 hour as equal. This ensures daylight saving time switches are handled properly.
+Nur für FAT/FAT32-Laufwerke aktiv: Dateien mit einem Zeitunterschied von kleiner oder gleich einer Stunde werden als gleich angesehen. Dadurch ist sichergestellt, dass die Sommer-/Winterzeitumstellung korrekt behandelt wird.
 Add folder pair
 Verzeichnispaar hinzufügen
-Add to exclude filter:
-Über Filter ausschließen:
-Adjust file times
-Dateizeiten ändern
-Adjust modification times of all files contained in the specified folder and its subfolders. This manual adaption might become necessary if you are synchronizing against a FAT32 drive and the daylight saving time is switched. For an overview about the issue see this article:
-Passt die Änderungszeiten aller Dateien im angegebenen Ordner einschließlich Unterordner an. Diese manuelle Änderung kann nötig sein, wenn gegen ein FAT32-Laufwerk synchronisiert und zwischen Sommer- und Winterzeit umgestellt wurde. Für eine Übersicht der Problematik siehe:
-All file times have been adjusted successfully!
-Alle Dateien wurden erfolgreich angepasst!
 All items have been synchronized!
 Alle Elemente wurden synchronisiert!
 An exception occured!
 Eine Ausnahme ist aufgetreten!
-Apply
-Anwenden
 As a result the files are separated into the following categories:
 Das Ergebnis ist eine Aufteilung in folgende Kategorien:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
-Wie der Name bereits sagt, werden zwei Dateien mit gleichem Namen genau dann als gleich angesehen, wenn sie den gleichen Dateiinhalt haben. Diese Einstellung ist eher für Konsistenzprüfungen geeignet als für Backup-Operationen. Aus diesem Grund wird der Zeitpunkt der letzten Änderung der Dateien nicht berücksichtigt.\n\nDer Entscheidungsbaum ist in diesem Fall kleiner:
+Wie der Name andeutet, werden zwei Dateien mit gleichem Namen genau dann als gleich angesehen, wenn sie den gleichen Dateiinhalt haben. Diese Einstellung ist eher für Konsistenzprüfungen geeignet als für Backup-Operationen. Aus diesem Grund wird der Zeitpunkt der letzten Änderung der Dateien nicht berücksichtigt.\n\nDer Entscheidungsbaum ist in diesem Fall kleiner:
 Assemble a batch file with the following settings. To start synchronization in batch mode simply execute this file or schedule it in your operating system's task planner.
-Erzeuge eine Batch-Datei mit den folgenden Parametern. Um im Batch-Modus zu synchronisieren, kann diese einfach gestartet oder in den Task-Planer des Betriebssystems eingetragen werden.
+Erzeuge eine Batchdatei mit den folgenden Parametern. Um im Batch-Modus zu synchronisieren, kann diese einfach gestartet oder in den Task-Planer des Betriebssystems eingetragen werden.
 Batch file created successfully!
-Batch-Datei wurde erfolgreich erstellt!
+Batchdatei wurde erfolgreich erstellt!
+Batch job
+Batch-Job
 Big thanks for localizing FreeFileSync goes out to:
 Vielen Dank für die Lokalisation von FreeFileSync an:
 Build:
 Build:
+Cancel
+Abbrechen
 Choose to hide filtered files/directories from list
-Gefilterte Dateien ein-/ausblenden
+Gefilterte Dateien bzw. Verzeichnisse ein-/ausblenden
 Comma separated list
 Kommagetrennte Liste
 Compare both sides
@@ -178,8 +170,8 @@ Compare by...
 Vergleichen nach...
 Comparing content
 Vergleiche Dateiinhalt
-Comparing content of files \"%x\"
-Vergleiche Inhalt der Dateien \"%x\"
+Comparing content of files %x
+Vergleiche Inhalt der Dateien %x
 Comparing...
 Vergleiche...
 Completed
@@ -189,7 +181,7 @@ Konfiguration
 Configuration loaded!
 Konfiguration geladen!
 Configuration overview:
-Übersicht der Parameter:
+Konfigurationsübersicht:
 Configuration saved!
 Konfiguration gespeichert!
 Configure filter
@@ -215,27 +207,29 @@ Von rechts nach links kopieren
 Copy from right to left overwriting
 Von rechts nach links kopieren und überschreiben
 Copy new or updated files to right folder.
-Kopiere neue oder aktualisierte Dateien in den rechten Ordner.
+Neue oder aktualisierte Dateien vom linken in das rechte Verzeichnis kopieren.
 Copy to clipboard\tCTRL+C
-Kopiere in Zwischenablage\tCTRL+C
-Copying file \"%x\" overwriting \"%y\"
-Kopiere Datei \"%x\" und überschreibe \"%y\"
-Copying file \"%x\" to \"%y\"
-Kopiere Datei \"%x\" nach \"%y\"
+In die Zwischenablage kopieren\tCTRL+C
+Copying file %x overwriting %y
+Kopiere Datei %x und überschreibe %y
+Copying file %x to %y
+Kopiere Datei %x nach %y
 Could not retrieve file info for:
-Fehler beim Lesen der Dateiattribute von:
+Dateiattribute konnten nicht gelesen werden:
 Could not set working directory:
-Fehler beim Setzen des Arbeitsverzeichnisses:
+Das Arbeitsverzeichnis konnte nicht gesetzt werden:
 Create a batch job
-Erstelle Batch-Job
+Batch-Job erstellen
 Create:
 Erstellen:
-Creating folder \"%x\"
-Erstelle Verzeichnis \"%x\"
+Creating folder %x
+Erstelle Verzeichnis %x
 Current operation:
 Aktuelle Operation:
 Custom
 Eigene
+Customize columns
+Spalten anpassen
 DECISION TREE
 ENTSCHEIDUNGSBAUM
 Data remaining:
@@ -244,40 +238,36 @@ Data:
 Daten:
 Date
 Datum
-Daylight saving time change detected for FAT/FAT32 drive.
-Sommer-/Winterzeitumstellung wurde für ein FAT/FAT32 Laufwerk erkannt.
 Delete files/folders existing on left side only
-Lösche Dateien/Ordner, die nur links existieren
+Nur links existierende Dateien/Verzeichnisse löschen
 Delete files/folders existing on right side only
-Lösche Dateien/Ordner, die nur rechts existieren
+Nur rechts existierende Dateien/Verzeichnisse löschen
 Delete files\tDEL
-Lösche Dateien\tDEL
+Dateien löschen\tDEL
 Delete:
 Löschen:
-Deleting file \"%x\"
-Lösche Datei \"%x\"
-Deleting folder \"%x\"
-Lösche Verzeichnis \"%x\"
+Deleting file %x
+Lösche Datei %x
+Deleting folder %x
+Lösche Verzeichnis %x
 Directories are dependent:
 Die Verzeichnisse sind voneinander abhängig:
 Directory does not exist:
 Das Verzeichnis existiert nicht:
 Do not show graphical status and error messages but write to a logfile instead
-Keine graphischen Status- und Fehlermeldungen anzeigen, sondern eine Logdatei erstellen
+Keine graphischen Status- und Fehlermeldungen anzeigen, sondern eine Protokolldatei erstellen
 Do not show this warning again
 Diese Warnung nicht mehr anzeigen
 Do nothing
 Nichts tun
 Do you really want to delete the following objects(s)?
-Sollen die folgenden Elemente wirklich gelöscht werden?
+Sollen folgende Elemente wirklich gelöscht werden?
 Do you really want to move the following objects(s) to the recycle bin?
-Sollen die folgenden Elemente wirklich in den Papierkorb verschoben werden?
+Sollen folgende Elemente wirklich in den Papierkorb verschoben werden?
 Donate with PayPal
-Spenden mit PayPal
+Mit PayPal spenden
 Drag && drop
 Drag && Drop
-Drive:
-Laufwerk:
 Email:
 Email:
 Error
@@ -295,13 +285,17 @@ Fehler beim Löschen der Datei:
 Error moving to recycle bin:
 Fehler beim Verschieben in den Papierkorb:
 Error parsing configuration file:
-Fehler beim Auswerten der Konfigurationsdatei:
+Fehler beim Lesen der Konfigurationsdatei:
 Error reading file:
 Fehler beim Lesen der Datei:
+Error reading folder attributes:
+Fehler beim Lesen der Verzeichnisattribute:
 Error traversing directory:
 Fehler beim Durchsuchen des Verzeichnisses:
 Error writing file:
 Fehler beim Schreiben der Datei:
+Error writing folder attributes:
+Fehler beim Schreiben der Verzeichnisattribute:
 Error: Source directory does not exist anymore:
 Fehler: Quellverzeichnis existiert nicht mehr:
 Example
@@ -310,8 +304,14 @@ Exclude
 Ausschließen
 Exclude temporarily
 Temporär ausschließen
+Exclude via filter:
+Über Filter ausschließen:
+FAT32: Handle Daylight Saving Time
+FAT32: Sommer-/Winterzeitumstellung berücksichtigen
 Feedback and suggestions are welcome at:
 Feedback und Vorschläge sind willkommen unter:
+File Manager integration:
+Einbinden des Dateimanagers:
 File already exists. Overwrite?
 Die Datei existiert bereits. Überschreiben?
 File content
@@ -329,25 +329,25 @@ Dateien gelten als gleich, wenn\n     - die Größe\n     - Datum und Uhrzeit de
 Files remaining:
 Verbliebene Dateien:
 Files that exist on both sides and have different content
-Dateien, die auf beiden Seiten existieren und unterschiedlichen Inhalt haben
+Auf beiden Seiten existierende Dateien mit unterschiedlichem Inhalt
 Files that exist on both sides, have same date but different filesizes
-Dateien, die auf beiden Seiten existieren; gleiches Datum aber unterschiedliche Dateigrößen
+Auf beiden Seiten existierende Dateien mit gleichem Datum aber verschiedenen Dateigrößen
 Files that exist on both sides, left one is newer
-Dateien, die auf beiden Seiten existieren; linke Datei ist neuer
+Auf beiden Seiten existierende Dateien; linke Datei ist neuer
 Files that exist on both sides, right one is newer
-Dateien, die auf beiden Seiten existieren; rechte Datei ist neuer
+Auf beiden Seiten existierende Dateien; rechte Datei ist neuer
 Files/folders remaining:
 Verbliebene Dateien/Ordner:
 Files/folders scanned:
 Eingelesene Dateien/Ordner:
 Files/folders that exist on left side only
-Dateien/Ordner, die nur links existieren
+Nur links exisitierende Dateien/Verzeichnisse
 Files/folders that exist on right side only
-Dateien/Ordner, die nur rechts existieren
+Nur rechts exisitierende Dateien/Verzeichnisse
 Filter
 Filter
 Filter active: Press again to deactivate
-Filter aktiv: Zum Deaktivieren erneut auswählen
+Filter aktiviert: Zum Deaktivieren erneut anwählen
 Filter files
 Dateien filtern
 Filter view
@@ -357,33 +357,37 @@ Verzeichnispaar
 FreeFileSync - Folder Comparison and Synchronization
 FreeFileSync - Verzeichnisvergleich und -synchronisation
 FreeFileSync Batch Job
-FreeFileSync Batchdatei
+FreeFileSync Batch-Job
 FreeFileSync at Sourceforge
 FreeFileSync auf Sourceforge
 FreeFileSync batch file
 FreeFileSync Batchdatei
 FreeFileSync configuration
 FreeFileSync Konfiguration
+Generating file list...
+Erzeuge Dateiliste...
+Global settings
+Globale Einstellungen
 Help
 Hilfe
 Hide files that are different
-Blende unterschiedliche Dateien aus
+Ungleiche Dateien ausblenden
 Hide files that are equal
-Blende gleiche Dateien aus
+Gleiche Dateien ausblenden
 Hide files that are newer on left
-Blende Dateien aus, die auf beiden Seiten existieren; linke Datei ist neuer
+Auf beiden Seiten existierende Dateien ausblenden; linke Datei ist neuer
 Hide files that are newer on right
-Blende Dateien aus, die auf beiden Seiten existieren; rechte Datei ist neuer
+Auf beiden Seiten existierende Dateien ausblenden; rechte Datei ist neuer
 Hide files that exist on left side only
-Blende Dateien aus, die nur links existieren
+Nur links existierende Dateien ausblenden
 Hide files that exist on right side only
-Blende Dateien aus, die nur rechts existieren
+Nur rechts existierende Dateien ausblenden
 Hide filtered items
 Gefilterte Elemente ausblenden
 Hide further error messages during the current process
-Weitere Fehlermeldungen während des aktuellen Prozesses ausblenden
+Weitere Fehlermeldungen während des laufenden Prozesses ausblenden
 Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
-Verhindert das Anzeigen von Fehlermeldungen während der Synchronisation:\nSie werden jedoch gesammelt und nach dem Vorgang als Liste angezeigt
+Verhindert das Anzeigen von Fehlermeldungen während der Synchronisation:\nSie werden jedoch gesammelt und nach Vorgangsende als Liste angezeigt
 Hints:
 Tipps:
 Homepage:
@@ -409,53 +413,57 @@ Info
 Information
 Information
 Information: If you ignore the error or abort a re-compare will be necessary!
-Information: Wenn der Fehler nicht behoben wird, muss der Vergleich erneut gestartet werden!
+Information: Wenn der Fehler ignoriert oder der Vorgang abgebrochen wird, ist ein neuer Vergleich erforderlich!
 Initialization of Recycle Bin failed!
 Die Initialisierung des Papierkorbs ist fehlgeschlagen!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
-Die Papierkorbfunktion steht nicht zur Verfügung!\n\nWahrscheinlich ist das aktuelle Betriebssystem nicht Windows.\nWenn Sie diese Funktion wirklich benötigen, kontaktieren Sie bitte den Autor. :)
+Die Papierkorbfunktion steht nicht zur Verfügung!\n\nWahrscheinlich benutzen Sie nicht Microsoft Windows.\nWenn Sie diese Funktion wirklich benötigen, kontaktieren Sie bitte den Autor. :)
 Left folder:
-Linker Ordner:
+Linkes Verzeichnis:
 Legend
 Legende
 Load configuration via...\n     - this list (press DEL to delete items)\n     - drag & drop to this window\n     - startup parameter
-Lade Konfiguration über...\n     - diese Liste (DEL-Taste löscht Einträge)\n     - Drag & Drop auf dieses Fenster\n     - Startupparameter
+Konfiguration laden über...\n     - diese Liste (DEL-Taste löscht Einträge)\n     - Drag & Drop auf dieses Fenster\n     - Startupparameter
 Load from file...
-Lade aus Datei...
+Von Datei laden...
 Log-messages:
-Lognachrichten:
+Protokollmitteilungen:
 Mirror ->>
-Spiegel ->>
+Spiegeln ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Spiegel-Backup des linken Ordners erstellen: Der rechte Ordner wird dabei überschrieben und nach der Synchronisation dem linken exakt gleichen.
+Spiegelkopie des linken Verzeichnisses erstellen: Das rechte Verzeichnis wird dabei überschrieben und nach der Synchronisation dem linken exakt entsprechen.
+Move column down
+Spalte nach unten verschieben
+Move column up
+Spalte nach oben verschieben
 Not all items were synchronized! Have a look at the list.
-Nicht alle Objekte wurden synchronisiert! Siehe die verbliebenen Elemente im Hauptfenster.
+Nicht alle Elemente wurden synchronisiert! Siehe verbliebene Elemente im Hauptfenster.
 Nothing to synchronize according to configuration!
-Es gibt nichts zu synchronisieren gemäß aktueller Einstellungen!
+Nichts zu synchronisieren gemäß den aktuellen Einstellungen!
 Number of files and directories that will be created
-Anzahl der Dateien und Verzeichnisse, die erstellt werden
+Anzahl der zu erstellenden Dateien und Verzeichnisse
 Number of files and directories that will be deleted
-Anzahl der Dateien und Verzeichnisse, die gelöscht werden
+Anzahl der zu löschenden Dateien und Verzeichnisse
 Number of files that will be overwritten
-Anzahl der Dateien, die überschrieben werden
+Anzahl der zu überschreibenden Dateien
+OK
+OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the full name including path prefix.
-Bei der Synchronisation werden nur die Dateien/Ordner berücksichtigt, die zu den Filtereinstellungen passen. Der Filter wird dabei auf den kompletten Dateinamen einschließlich Pfadprefix angewandt.
+Für die Synchronisation werden nur die Dateien/Verzeichnisse berücksichtigt, die den Filtereinstellungen entsprechen. Der Filter wird dabei auf den kompletten Dateinamen einschließlich Pfadprefix angewandt.
 Open synchronization dialog
 Zeige Synchronisationseinstellungen
-Open with Explorer\tD-Click
-Im Explorer öffnen\tD-Click
+Open with File Manager\tD-Click
+Mit Dateimanager öffnen\tD-Click
 Operation aborted!
-Aktion abgebrochen!
+Vorgang abgebrochen!
 Operation:
 Vorgang:
 Pause
 Pause
 Please fill all empty directory fields.
 Bitte alle leeren Verzeichnisfelder füllen.
-Please restart synchronization!
-Synchronisation bitte erneut ausführen!
 Press button to activate filter
-Auswählen, um Filter zu aktivieren
+Taste drücken, um Filter zu aktivieren
 Preview
 Vorschau
 Published under the GNU General Public License:
@@ -469,63 +477,65 @@ Verzeichnispaar entfernen
 Result
 Ergebnis
 Right folder:
-Rechter Ordner:
+Rechtes Verzeichnis:
 S&ave configuration
-S&peichere Konfiguration
+Konfiguration s&peichern 
 Save aborted!
 Speicherung abgebrochen!
 Save current configuration to file
-Aktuelle Konfiguration in Datei sichern
+Aktuelle Konfiguration in Datei speichern
 Scanning...
-Suche Dateien...
+Suchvorgang...
 Scanning:
-Lese Datei:
+Suchvorgang:
 Select a folder
-Verzeichnis wählen
+Verzeichnis auswählen
 Select variant:
 Variante auswählen:
-Set filter for synchronization
-Filter einstellen
 Show files that are different
-Zeige unterschiedliche Dateien
+Ungleiche Dateien anzeigen
 Show files that are equal
-Zeige gleiche Dateien
+Gleiche Dateien anzeigen
 Show files that are newer on left
-Zeige Dateien, die auf beiden Seiten existieren; linke Datei ist neuer
+Auf beiden Seiten existierende Dateien anzeigen; linke Datei ist neuer
 Show files that are newer on right
-Zeige Dateien, die auf beiden Seiten existieren; rechte Datei ist neuer
+Auf beiden Seiten existierende Dateien anzeigen; rechte Datei ist neuer
 Show files that exist on left side only
-Zeige Dateien, die nur links existieren
+Nur links existierende Dateien anzeigen
 Show files that exist on right side only
-Zeige Dateien, die nur rechts existieren
+Nur rechts existierende Dateien anzeigen
 Silent mode
 Stiller Modus
 Size
 Größe
+Sorting file list...
+Sortiere Dateiliste...
 Source code written completely in C++ utilizing:
 Sourcecode komplett in C++ geschrieben mit Hilfe von:
 Start
 Start
 Start synchronization
-Starte die Synchronisation
+Synchronisation starten
 Stop
 Stop
 Swap sides
-Vertausche Seiten
+Seiten vertauschen
 Synchronization aborted!
 Synchronisation abgebrochen!
-Synchronization completed successfully.
-Synchronisation erfolgreich abgeschlossen.
+Synchronization completed successfully!
+Synchronisation erfolgreich abgeschlossen!
 Synchronization completed with errors!
-Synchronisation abgeschlossen. Es sind Fehler aufgetreten.
+Synchronisation mit Fehlern abgeschlossen!
+Synchronization filter
+Filter für Synchronisation
 Synchronization settings
 Synchronisationseinstellungen
 Synchronization status
-Synchronisation: Status
+Synchronisationsstatus
 Synchronize all .doc, .zip and .exe files except everything from folder \"temp\".
-Synchronisiere alle .doc, .zip und .exe Dateien mit Ausnahme des Ordners \"temp\".
+Alle .doc, .zip und .exe Dateien mit Ausnahme des Verzeichnisses \"temp\" werden synchronisiert.
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
-Beide Seiten gleichzeitig synchronisieren: Neue oder aktualisierte Dateien werden auf die jeweils andere Seite kopiert.
+Beide Seiten gleichzeitig synchronisieren: Neue oder aktualisierte Dateien werden in beide Richtungen kopiert.
 Synchronizing...
 Synchronisiere...
 System out of memory!
@@ -534,50 +544,44 @@ The file does not contain a valid configuration:
 Die Datei enthält keine gültige Konfiguration:
 The selected file does not exist:
 Die ausgewählte Datei existiert nicht:
+This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
+Diese Befehlszeile wird ausgeführt, wenn ein Doppelklick auf einen Dateinamen erfolgt. %x ist hierbei der Platzhalter für die ausgewählte Datei.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
 Diese Variante identifiziert zwei gleichnamige Dateien als gleich, wenn sie die gleiche Dateigröße haben UND der Zeitpunkt der letzten Änderung derselbe ist. Dabei wird eine Abweichung von bis zu zwei Sekunden toleriert. So ist sichergestellt, dass eine Synchronisation gegen ein FAT32 Dateisystem korrekt funktioniert.
 Time elapsed:
 Vergangene Zeit:
-Time shift in seconds
-Zeitverschiebung in Sekunden
-Time shift:
-Zeitverschiebung:
 Time:
 Zeit:
 Total amount of data that will be transferred
-Gesamtmenge der Daten, die übertragen werden
+Gesamtmenge der zu übertragenden Daten
 Total time:
 Gesamtzeit:
 Two way <->
 Beidseitig <->
 Unable to create logfile!
-Fehler beim Erstellen der Logdatei!
+Die Protokolldatei konnte nicht erstellt werden!
 Unable to initialize Recycle Bin!
 Der Papierkorb konnte nicht initialisiert werden!
-Unresolved errors occured during operation!
-Es sind nichtbehobene Fehler aufgetreten!
 Update ->
-Update ->
+Aktualisieren ->
 Update:
-Überschreiben:
+Aktualisieren:
 Use Recycle Bin
 Papierkorb verwenden
 Use Recycle Bin when deleting or overwriting files during synchronization
-Papierkorb für zu löschende oder überschreibende Dateien nutzen
+Papierkorb für zu löschende oder zu überschreibende Dateien nutzen
 Warning
 Warnung
 Warning: Synchronization failed for %x item(s):
 Warnung: Synchronisation fehlgeschlagen für %x Element(e):
 When \"Compare\" is triggered with this option set the following decision tree is processed:
-Nachdem \"Compare\" mit dieser Einstellung gestartet wurde, wird der folgende Entscheidungsbaum abgearbeitet:
-You can adjust the file times accordingly to resolve the issue:
-Die Dateizeiten können entsprechend angepasst werden, um den Fehler zu beheben:
+Wenn \"Compare\" mit dieser Option eingestellt wurde, wird folgender Entscheidungsbaum abgearbeitet:
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Verbliebene Elemente können nochmals synchronisiert werden (OHNE dass ein erneuter Vergleich notwendig ist)!
 different
 verschieden
 file exists on both sides
-Datei ex. auf beiden Seiten
+Datei existiert auf beiden Seiten
 on one side only
 nur auf einer Seite
 |>	file on right side only\n

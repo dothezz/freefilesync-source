@@ -7,6 +7,7 @@
 #include <wx/log.h>
 #include "library/multithreading.h"
 #include "algorithm.h"
+#include <wx/thread.h>
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -14,12 +15,16 @@
 
 using namespace FreeFileSync;
 
-CompareProcess::CompareProcess(bool lineBreakOnMessages, StatusHandler* handler) :
+CompareProcess::CompareProcess(bool lineBreakOnMessages, bool handleDstOnFat32Drives, StatusHandler* handler) :
+        includeLineBreak(lineBreakOnMessages),
+        handleDstOnFat32(handleDstOnFat32Drives),
         statusUpdater(handler),
-        txtComparingContentOfFiles(_("Comparing content of files \"%x\""))
+        txtComparingContentOfFiles(_("Comparing content of files %x"))
 {
-    if (lineBreakOnMessages)
-        optionalLineBreak = wxT("\n");
+    if (includeLineBreak)
+        txtComparingContentOfFiles.Replace(wxT("%x"), wxT("\n\"%x\""), false);
+    else
+        txtComparingContentOfFiles.Replace(wxT("%x"), wxT("\"%x\""), false);
 }
 
 
@@ -43,25 +48,25 @@ struct MemoryAllocator
 };
 
 
-bool filesHaveSameContent(const wxString& filename1, const wxString& filename2)
+bool filesHaveSameContent(const Zstring& filename1, const Zstring& filename2)
 {
     static MemoryAllocator memory;
 
     wxFFile file1(filename1.c_str(), wxT("rb"));
     if (!file1.IsOpened())
-        throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + filename1 + wxT("\""));
+        throw FileError(Zstring(_("Error reading file:")) + wxT(" \"") + filename1 + wxT("\""));
 
     wxFFile file2(filename2.c_str(), wxT("rb"));
     if (!file2.IsOpened()) //NO cleanup necessary for (wxFFile) file1
-        throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + filename2 + wxT("\""));
+        throw FileError(Zstring(_("Error reading file:")) + wxT(" \"") + filename2 + wxT("\""));
 
     do
     {
         size_t length1 = file1.Read(memory.buffer1, memory.bufferSize);
-        if (file1.Error()) throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + filename1 + wxT("\""));
+        if (file1.Error()) throw FileError(Zstring(_("Error reading file:")) + wxT(" \"") + filename1 + wxT("\""));
 
         size_t length2 = file2.Read(memory.buffer2, memory.bufferSize);
-        if (file2.Error()) throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + filename2 + wxT("\""));
+        if (file2.Error()) throw FileError(Zstring(_("Error reading file:")) + wxT(" \"") + filename2 + wxT("\""));
 
         if (length1 != length2 || memcmp(memory.buffer1, memory.buffer2, length1) != 0)
             return false;
@@ -82,10 +87,10 @@ public:
     UpdateWhileComparing() {}
     ~UpdateWhileComparing() {}
 
-    wxString file1;
-    wxString file2;
+    Zstring file1;
+    Zstring file2;
     bool success;
-    wxString errorMessage;
+    Zstring errorMessage;
     bool result;
 
 private:
@@ -105,7 +110,7 @@ private:
 };
 
 
-bool filesHaveSameContentMultithreaded(const wxString& filename1, const wxString& filename2, StatusHandler* updateClass)
+bool filesHaveSameContentMultithreaded(const Zstring& filename1, const Zstring& filename2, StatusHandler* updateClass)
 {
     static UpdateWhileComparing cmpAndUpdate; //single instantiation: thread enters wait phase after each execution
 
@@ -125,11 +130,11 @@ bool filesHaveSameContentMultithreaded(const wxString& filename1, const wxString
 }
 
 
-void calcTotalDataForCompare(int& objectsTotal, double& dataTotal, const FileCompareResult& grid, const set<int>& rowsToCompare)
+void calcTotalDataForCompare(int& objectsTotal, double& dataTotal, const FileCompareResult& grid, const std::set<int>& rowsToCompare)
 {
     dataTotal = 0;
 
-    for (set<int>::iterator i = rowsToCompare.begin(); i != rowsToCompare.end(); ++i)
+    for (std::set<int>::iterator i = rowsToCompare.begin(); i != rowsToCompare.end(); ++i)
     {
         const FileCompareLine& gridline = grid[*i];
 
@@ -152,19 +157,22 @@ void writeText(const wxChar* text, const int length, wxChar*& currentPos)
 class GetAllFilesFull : public FullDetailFileTraverser
 {
 public:
-    GetAllFilesFull(DirectoryDescrType& output, Zstring dirThatIsSearched, const Zstring& optionalLineBreak, StatusHandler* updateClass) :
+    GetAllFilesFull(DirectoryDescrType& output, Zstring dirThatIsSearched, const bool includeLineBreak, StatusHandler* updateClass) :
             m_output(output),
             directory(dirThatIsSearched),
-            m_optionalLineBreak(optionalLineBreak),
             statusUpdater(updateClass)
     {
         assert(updateClass);
         prefixLength = directory.length();
-        textScanning = _("Scanning:"); //performance optimization
+
+        if (includeLineBreak)
+            textScanning = Zstring(_("Scanning:")) + wxT("\n"); //performance optimization
+        else
+            textScanning = Zstring(_("Scanning:")) + wxT(" "); //performance optimization
     }
 
 
-    virtual wxDirTraverseResult GetAllFilesFull::OnFile(const Zstring& fullFileName, const FileInfo& details)
+    wxDirTraverseResult GetAllFilesFull::OnFile(const Zstring& fullFileName, const FileInfo& details) //virtual impl.
     {
         FileDescrLine fileDescr;
         fileDescr.fullName         = fullFileName;
@@ -175,15 +183,13 @@ public:
         fileDescr.objType          = FileDescrLine::TYPE_FILE;
         m_output.push_back(fileDescr);
 
-        //assemble status message (performance optimized)  = textScanning + wxT(" ") + m_optionalLineBreak + wxT("\"") + fullFileName + wxT("\"")
+        //assemble status message (performance optimized)  = textScanning + wxT("\"") + fullFileName + wxT("\"")
         const unsigned int statusTextMaxLen = 2000;
         wxChar statusText[statusTextMaxLen];
         wxChar* position = statusText;
-        if (textScanning.length() + m_optionalLineBreak.length() + fullFileName.length() + 3 < statusTextMaxLen) //leave room for 0 terminating char!
+        if (textScanning.length() + fullFileName.length() + 2 < statusTextMaxLen) //leave room for 0 terminating char!
         {
             writeText(textScanning.c_str(), textScanning.length(), position);
-            writeText(wxT(" "), 1, position);
-            writeText(m_optionalLineBreak.c_str(), m_optionalLineBreak.length(), position);
             writeText(wxT("\""), 1, position);
             writeText(fullFileName.c_str(), fullFileName.length(), position);
             writeText(wxT("\""), 1, position);
@@ -201,7 +207,7 @@ public:
     }
 
 
-    virtual wxDirTraverseResult GetAllFilesFull::OnDir(const Zstring& fullDirName)
+    wxDirTraverseResult GetAllFilesFull::OnDir(const Zstring& fullDirName) //virtual impl.
     {
 #ifdef FFS_WIN
         if (    fullDirName.EndsWith(wxT("\\RECYCLER")) ||
@@ -218,15 +224,13 @@ public:
         fileDescr.objType          = FileDescrLine::TYPE_DIRECTORY;
         m_output.push_back(fileDescr);
 
-        //assemble status message (performance optimized)  = textScanning + wxT(" ") + m_optionalLineBreak + wxT("\"") + fullDirName + wxT("\"")
+        //assemble status message (performance optimized)  = textScanning + wxT("\"") + fullDirName + wxT("\"")
         const unsigned int statusTextMaxLen = 2000;
         wxChar statusText[statusTextMaxLen];
         wxChar* position = statusText;
-        if (textScanning.length() + m_optionalLineBreak.length() + fullDirName.length() + 3 < statusTextMaxLen) //leave room for 0 terminating char!
+        if (textScanning.length() + fullDirName.length() + 2 < statusTextMaxLen) //leave room for 0 terminating char!
         {
             writeText(textScanning.c_str(), textScanning.length(), position);
-            writeText(wxT(" "), 1, position);
-            writeText(m_optionalLineBreak.c_str(), m_optionalLineBreak.length(), position);
             writeText(wxT("\""), 1, position);
             writeText(fullDirName.c_str(), fullDirName.length(), position);
             writeText(wxT("\""), 1, position);
@@ -244,9 +248,9 @@ public:
     }
 
 
-    virtual wxDirTraverseResult GetAllFilesFull::OnError(const Zstring& errorText)
+    wxDirTraverseResult GetAllFilesFull::OnError(const Zstring& errorText) //virtual impl.
     {
-        wxMessageBox(errorText, _("Error"));
+        wxMessageBox(errorText.c_str(), _("Error"));
         return wxDIR_CONTINUE;
     }
 
@@ -254,24 +258,22 @@ private:
     DirectoryDescrType& m_output;
     Zstring directory;
     int prefixLength;
-    const Zstring m_optionalLineBreak;
-    wxString textScanning;
+    Zstring textScanning;
     StatusHandler* statusUpdater;
 };
 
 
-void generateFileAndFolderDescriptions(DirectoryDescrType& output, const wxString& directory, const wxString& optionalLineBreak, StatusHandler* updateClass)
+void generateFileAndFolderDescriptions(DirectoryDescrType& output, const Zstring& directory, const bool includeLineBreak, StatusHandler* updateClass)
 {
     assert (updateClass);
 
     output.clear();
 
     //get all files and folders from directory (and subdirectories) + information
-    const wxString directoryFormatted = FreeFileSync::getFormattedDirectoryName(directory);
+    const Zstring directoryFormatted = FreeFileSync::getFormattedDirectoryName(directory);
 
-    //GetAllFilesFull traverser(output, directoryFormatted.c_str(), optionalLineBreak.c_str(), updateClass);
-    GetAllFilesFull traverser(output, directoryFormatted, optionalLineBreak, updateClass);
-    //traverseInDetail(directoryFormatted.c_str(), &traverser);
+    GetAllFilesFull traverser(output, directoryFormatted, includeLineBreak, updateClass);
+
     traverseInDetail(directoryFormatted, &traverser);
 }
 
@@ -298,16 +300,16 @@ public:
     ~DirectoryDescrBuffer()
     {
         //clean up
-        for (set<DescrBufferLine>::iterator i = buffer.begin(); i != buffer.end(); ++i)
+        for (std::set<DescrBufferLine>::iterator i = buffer.begin(); i != buffer.end(); ++i)
             delete i->directoryDesc;
     }
 
-    DirectoryDescrType* getDirectoryDescription(const Zstring& directory, const Zstring& optionalLineBreak, StatusHandler* statusUpdater)
+    DirectoryDescrType* getDirectoryDescription(const Zstring& directory, const bool includeLineBreak, StatusHandler* statusUpdater)
     {
         DescrBufferLine bufferEntry;
         bufferEntry.directoryName = directory;
 
-        set<DescrBufferLine>::iterator entryFound;
+        std::set<DescrBufferLine>::iterator entryFound;
         if ((entryFound = buffer.find(bufferEntry)) != buffer.end())
         {
             //entry found in buffer; return
@@ -321,17 +323,27 @@ public:
 
             bufferEntry.directoryDesc->reserve(400000); //reserve space for up to 400000 files to avoid vector reallocations
 
-            generateFileAndFolderDescriptions(*bufferEntry.directoryDesc, directory, optionalLineBreak, statusUpdater); //exceptions may be thrown!
+            generateFileAndFolderDescriptions(*bufferEntry.directoryDesc, directory, includeLineBreak, statusUpdater); //exceptions may be thrown!
             return bufferEntry.directoryDesc;
         }
     }
 
 private:
-    set<DescrBufferLine> buffer;
+    std::set<DescrBufferLine> buffer;
 };
 
 
-void CompareProcess::startCompareProcess(const vector<FolderPair>& directoryPairsFormatted,
+inline
+bool sameFileTime(const time_t a, const time_t b, const time_t tolerance)
+{
+    if (a < b)
+        return b - a <= tolerance;
+    else
+        return a - b <= tolerance;
+}
+
+
+void CompareProcess::startCompareProcess(const std::vector<FolderPair>& directoryPairsFormatted,
         const CompareVariant cmpVar,
         FileCompareResult& output) throw(AbortThisProcess)
 {
@@ -342,117 +354,23 @@ void CompareProcess::startCompareProcess(const vector<FolderPair>& directoryPair
     FileCompareResult output_tmp; //write to output not before END of process!
 
     try
-    {   //inform about the total amount of data that will be processed from now on
-        statusUpdater->initNewProcess(-1, 0, StatusHandler::PROCESS_SCANNING); //it's not known how many files will be scanned => -1 objects
-
-        //do basis scan: only result lines of type FILE_UNDEFINED need to be determined
-        performBaseComparison(directoryPairsFormatted, output_tmp);
-
+    {
         if (cmpVar == CMP_BY_TIME_SIZE)
-        {
-            for (FileCompareResult::iterator i = output_tmp.begin(); i != output_tmp.end(); ++i)
-            {
-                if (i->cmpResult == FILE_UNDEFINED)
-                {
-                    //last write time may differ by up to 2 seconds (NTFS vs FAT32)
-                    if (sameFileTime(i->fileDescrLeft.lastWriteTimeRaw, i->fileDescrRight.lastWriteTimeRaw))
-                    {
-                        if (i->fileDescrLeft.fileSize == i->fileDescrRight.fileSize)
-                            i->cmpResult = FILE_EQUAL;
-                        else
-                            i->cmpResult = FILE_DIFFERENT;
-                    }
-                    else
-                    {
-                        if (i->fileDescrLeft.lastWriteTimeRaw < i->fileDescrRight.lastWriteTimeRaw)
-                            i->cmpResult = FILE_RIGHT_NEWER;
-                        else
-                            i->cmpResult = FILE_LEFT_NEWER;
-                    }
-                }
-            }
-        }
-//################################################################################################################################################
+            compareByTimeSize(directoryPairsFormatted, output_tmp);
         else if (cmpVar == CMP_BY_CONTENT)
-        {
-            set<int> rowsToCompareBytewise; //compare of file content happens AFTER finding corresponding files
-            //in order to separate into two processes (scanning and comparing)
-
-            //pre-check: files have different content if they have a different filesize
-            for (FileCompareResult::iterator i = output_tmp.begin(); i != output_tmp.end(); ++i)
-            {
-                if (i->cmpResult == FILE_UNDEFINED)
-                {
-                    if (i->fileDescrLeft.fileSize != i->fileDescrRight.fileSize)
-                        i->cmpResult = FILE_DIFFERENT;
-                    else
-                        rowsToCompareBytewise.insert(i - output_tmp.begin());
-                }
-            }
-
-            int objectsTotal = 0;
-            double dataTotal = 0;
-            calcTotalDataForCompare(objectsTotal, dataTotal, output_tmp, rowsToCompareBytewise);
-
-            statusUpdater->initNewProcess(objectsTotal, dataTotal, StatusHandler::PROCESS_COMPARING_CONTENT);
-
-            set<int> rowsToDelete;  //if errors occur during file access and user skips, these rows need to be deleted from result
-
-            //compare files (that have same size) bytewise...
-            for (set<int>::iterator i = rowsToCompareBytewise.begin(); i != rowsToCompareBytewise.end(); ++i)
-            {
-                FileCompareLine& gridline = output_tmp[*i];
-
-                wxString statusText = txtComparingContentOfFiles;
-                statusText.Replace(wxT("%x"), gridline.fileDescrLeft.relativeName, false);
-                statusUpdater->updateStatusText(statusText);
-
-                //check files that exist in left and right model but have different content
-                while (true)
-                {
-                    //trigger display refresh
-                    statusUpdater->requestUiRefresh();
-
-                    try
-                    {
-                        if (filesHaveSameContentMultithreaded(gridline.fileDescrLeft.fullName, gridline.fileDescrRight.fullName, statusUpdater))
-                            gridline.cmpResult = FILE_EQUAL;
-                        else
-                            gridline.cmpResult = FILE_DIFFERENT;
-
-                        statusUpdater->updateProcessedData(2, (gridline.fileDescrLeft.fileSize * 2).ToDouble());
-                        break;
-                    }
-                    catch (FileError& error)
-                    {
-                        ErrorHandler::Response rv = statusUpdater->reportError(error.show());
-                        if (rv == ErrorHandler::IGNORE_ERROR)
-                        {
-                            rowsToDelete.insert(*i);
-                            break;
-                        }
-                        else if (rv == ErrorHandler::RETRY)
-                            ;   //continue with loop
-                        else
-                            assert (false);
-                    }
-                }
-            }
-
-            //delete invalid rows that have no valid cmpResult
-            if (rowsToDelete.size() > 0)
-                removeRowsFromVector(output_tmp, rowsToDelete);
-        }
+            compareByContent(directoryPairsFormatted, output_tmp);
         else assert(false);
     }
     catch (const RuntimeException& theException)
     {
         wxMessageBox(theException.show(), _("An exception occured!"), wxOK | wxICON_ERROR);
+        statusUpdater->requestAbortion();
         return;
     }
     catch (std::bad_alloc& e)
     {
         wxMessageBox(wxString(_("System out of memory!")) + wxT(" ") + wxString::From8BitData(e.what()), _("An exception occured!"), wxOK | wxICON_ERROR);
+        statusUpdater->requestAbortion();
         return;
     }
 
@@ -461,106 +379,293 @@ void CompareProcess::startCompareProcess(const vector<FolderPair>& directoryPair
 }
 
 
-void CompareProcess::performBaseComparison(const vector<FolderPair>& directoryPairsFormatted, FileCompareResult& output)
+void CompareProcess::compareByTimeSize(const std::vector<FolderPair>& directoryPairsFormatted, FileCompareResult& output)
 {
+    //inform about the total amount of data that will be processed from now on
+    statusUpdater->initNewProcess(-1, 0, StatusHandler::PROCESS_SCANNING); //it's not known how many files will be scanned => -1 objects
+
     //buffer accesses to the same directories; useful when multiple folder pairs are used
     DirectoryDescrBuffer descriptionBuffer;
 
     //process one folder pair after each other
-    for (vector<FolderPair>::const_iterator pair = directoryPairsFormatted.begin(); pair != directoryPairsFormatted.end(); ++pair)
+    unsigned tableSizeOld = 0;
+    for (std::vector<FolderPair>::const_iterator pair = directoryPairsFormatted.begin(); pair != directoryPairsFormatted.end(); ++pair)
     {
-        //PERF_START;
-        //retrieve sets of files (with description data)
-        DirectoryDescrType* directoryLeft  = descriptionBuffer.getDirectoryDescription(pair->leftDirectory, optionalLineBreak, statusUpdater);
-        DirectoryDescrType* directoryRight = descriptionBuffer.getDirectoryDescription(pair->rightDirectory, optionalLineBreak, statusUpdater);
+        //do basis scan: only result lines of type FILE_UNDEFINED (files that exist on both sides) need to be determined after this call
+        this->performBaseComparison(*pair, descriptionBuffer, output);
 
-        statusUpdater->forceUiRefresh();
-        //PERF_STOP;
-        //we use binary search when comparing the directory structures: so sort() first
-        sort(directoryLeft->begin(), directoryLeft->end());
-        sort(directoryRight->begin(), directoryRight->end());
-        //PERF_STOP;
-        FileCompareLine newline;
-
-        //reserve some space to avoid vector reallocations
-        output.reserve(int(max(directoryLeft->size(), directoryRight->size()) * 1.2));
-
-        //find files/folders that exist in left file model but not in right model
-        for (DirectoryDescrType::iterator i = directoryLeft->begin(); i != directoryLeft->end(); ++i)
-            if (custom_binary_search(directoryRight->begin(), directoryRight->end(), *i) == directoryRight->end())
-            {
-                newline.fileDescrLeft            = *i;
-                newline.fileDescrRight           = FileDescrLine();
-                newline.fileDescrRight.directory = pair->rightDirectory;
-                newline.cmpResult                = FILE_LEFT_SIDE_ONLY;
-                output.push_back(newline);
-            }
-
-        for (DirectoryDescrType::iterator j = directoryRight->begin(); j != directoryRight->end(); ++j)
+        //add some tolerance if one of the folders is FAT/FAT32
+        time_t tolerance = 0;
+#ifdef FFS_WIN
+        if (handleDstOnFat32 && (isFatDrive(pair->leftDirectory) || isFatDrive(pair->leftDirectory)))
+            tolerance = FILE_TIME_PRECISION + 3600; //tolerate filetime diff <= 1 h to handle daylight saving time issues
+        else
+            tolerance = FILE_TIME_PRECISION;
+#elif defined FFS_LINUX
+        tolerance = FILE_TIME_PRECISION;
+#endif
+        //categorize files that exist on both sides
+        for (FileCompareResult::iterator i = output.begin() + tableSizeOld; i != output.end(); ++i)
         {
-            DirectoryDescrType::iterator i;
-
-            //find files/folders that exist in right file model but not in left model
-            if ((i = custom_binary_search(directoryLeft->begin(), directoryLeft->end(), *j)) == directoryLeft->end())
+            if (i->cmpResult == FILE_UNDEFINED)
             {
-                newline.fileDescrLeft           = FileDescrLine();
-                newline.fileDescrLeft.directory = pair->leftDirectory;  //directory info is needed when creating new directories
-                newline.fileDescrRight          = *j;
-                newline.cmpResult               = FILE_RIGHT_SIDE_ONLY;
-                output.push_back(newline);
-            }
-            //find files/folders that exist in left and right file model
-            else
-            {   //files...
-                if (i->objType == FileDescrLine::TYPE_FILE && j->objType == FileDescrLine::TYPE_FILE)
+                //last write time may differ by up to 2 seconds (NTFS vs FAT32)
+                if (sameFileTime(i->fileDescrLeft.lastWriteTimeRaw, i->fileDescrRight.lastWriteTimeRaw, tolerance))
                 {
-                    newline.fileDescrLeft  = *i;
-                    newline.fileDescrRight = *j;
-                    newline.cmpResult      = FILE_UNDEFINED; //not yet determined!
-                    output.push_back(newline);
+                    if (i->fileDescrLeft.fileSize == i->fileDescrRight.fileSize)
+                        i->cmpResult = FILE_EQUAL;
+                    else
+                        i->cmpResult = FILE_DIFFERENT;
                 }
-                //directories...
-                else if (i->objType == FileDescrLine::TYPE_DIRECTORY && j->objType == FileDescrLine::TYPE_DIRECTORY)
+                else
                 {
-                    newline.fileDescrLeft  = *i;
-                    newline.fileDescrRight = *j;
-                    newline.cmpResult      = FILE_EQUAL;
-                    output.push_back(newline);
+                    if (i->fileDescrLeft.lastWriteTimeRaw < i->fileDescrRight.lastWriteTimeRaw)
+                        i->cmpResult = FILE_RIGHT_NEWER;
+                    else
+                        i->cmpResult = FILE_LEFT_NEWER;
                 }
-                //if we have a nameclash between a file and a directory: split into two separate rows
-                else if (i->objType != j->objType)
-                {
-                    newline.fileDescrLeft            = *i;
-                    newline.fileDescrRight           = FileDescrLine();
-                    newline.fileDescrRight.directory = pair->rightDirectory;
-                    newline.cmpResult                = FILE_LEFT_SIDE_ONLY;
-                    output.push_back(newline);
-
-                    newline.fileDescrLeft           = FileDescrLine();
-                    newline.fileDescrLeft.directory = pair->leftDirectory;
-                    newline.fileDescrRight          = *j;
-                    newline.cmpResult               = FILE_RIGHT_SIDE_ONLY;
-                    output.push_back(newline);
-                }
-                else assert (false);
             }
         }
-        //PERF_STOP;
+
+        tableSizeOld = output.size();
     }
 }
 
 
-bool FreeFileSync::foldersAreValidForComparison(const vector<FolderPair>& folderPairs, wxString& errorMessage)
+void CompareProcess::compareByContent(const std::vector<FolderPair>& directoryPairsFormatted, FileCompareResult& output)
+{
+    //inform about the total amount of data that will be processed from now on
+    statusUpdater->initNewProcess(-1, 0, StatusHandler::PROCESS_SCANNING); //it's not known how many files will be scanned => -1 objects
+
+    //buffer accesses to the same directories; useful when multiple folder pairs are used
+    DirectoryDescrBuffer descriptionBuffer;
+
+    //process one folder pair after each other
+    for (std::vector<FolderPair>::const_iterator pair = directoryPairsFormatted.begin(); pair != directoryPairsFormatted.end(); ++pair)
+    {
+        //do basis scan: only result lines of type FILE_UNDEFINED (files that exist on both sides) need to be determined after this call
+        this->performBaseComparison(*pair, descriptionBuffer, output);
+    }
+
+
+    std::set<int> rowsToCompareBytewise; //content comparison of file content happens AFTER finding corresponding files
+    //in order to separate into two processes (scanning and comparing)
+
+    //pre-check: files have different content if they have a different filesize
+    for (FileCompareResult::iterator i = output.begin(); i != output.end(); ++i)
+    {
+        if (i->cmpResult == FILE_UNDEFINED)
+        {
+            if (i->fileDescrLeft.fileSize != i->fileDescrRight.fileSize)
+                i->cmpResult = FILE_DIFFERENT;
+            else
+                rowsToCompareBytewise.insert(i - output.begin());
+        }
+    }
+
+    int objectsTotal = 0;
+    double dataTotal = 0;
+    calcTotalDataForCompare(objectsTotal, dataTotal, output, rowsToCompareBytewise);
+
+    statusUpdater->initNewProcess(objectsTotal, dataTotal, StatusHandler::PROCESS_COMPARING_CONTENT);
+
+    std::set<int> rowsToDelete;  //if errors occur during file access and user skips, these rows need to be deleted from result
+
+    //compare files (that have same size) bytewise...
+    for (std::set<int>::iterator i = rowsToCompareBytewise.begin(); i != rowsToCompareBytewise.end(); ++i)
+    {
+        FileCompareLine& gridline = output[*i];
+
+        Zstring statusText = txtComparingContentOfFiles;
+        statusText.Replace(wxT("%x"), gridline.fileDescrLeft.relativeName, false);
+        statusUpdater->updateStatusText(statusText);
+
+        //check files that exist in left and right model but have different content
+        while (true)
+        {
+            //trigger display refresh
+            statusUpdater->requestUiRefresh();
+
+            try
+            {
+                if (filesHaveSameContentMultithreaded(gridline.fileDescrLeft.fullName, gridline.fileDescrRight.fullName, statusUpdater))
+                    gridline.cmpResult = FILE_EQUAL;
+                else
+                    gridline.cmpResult = FILE_DIFFERENT;
+
+                statusUpdater->updateProcessedData(2, (gridline.fileDescrLeft.fileSize * 2).ToDouble());
+                break;
+            }
+            catch (FileError& error)
+            {
+                ErrorHandler::Response rv = statusUpdater->reportError(error.show());
+                if (rv == ErrorHandler::IGNORE_ERROR)
+                {
+                    rowsToDelete.insert(*i);
+                    break;
+                }
+                else if (rv == ErrorHandler::RETRY)
+                    ;   //continue with loop
+                else
+                    assert (false);
+            }
+        }
+    }
+
+    //delete invalid rows that have no valid cmpResult
+    if (rowsToDelete.size() > 0)
+        removeRowsFromVector(output, rowsToDelete);
+}
+
+
+class ThreadSorting : public wxThread
+{
+public:
+    ThreadSorting(DirectoryDescrType* directory) :
+            wxThread(wxTHREAD_JOINABLE),
+            m_directory(directory)
+    {
+        if (Create() != wxTHREAD_NO_ERROR)
+            throw RuntimeException(wxString(wxT("Error starting thread for sorting!")));
+    }
+
+    ~ThreadSorting() {}
+
+
+    ExitCode Entry()
+    {
+        std::sort(m_directory->begin(), m_directory->end());
+        return 0;
+    }
+
+private:
+    DirectoryDescrType* m_directory;
+};
+
+
+void CompareProcess::performBaseComparison(const FolderPair& pair, DirectoryDescrBuffer& descriptionBuffer, FileCompareResult& output)
+{
+    //PERF_START;
+    //retrieve sets of files (with description data)
+    DirectoryDescrType* directoryLeft  = descriptionBuffer.getDirectoryDescription(pair.leftDirectory, includeLineBreak, statusUpdater);
+    DirectoryDescrType* directoryRight = descriptionBuffer.getDirectoryDescription(pair.rightDirectory, includeLineBreak, statusUpdater);
+
+    statusUpdater->updateStatusText(_("Generating file list..."));
+    statusUpdater->forceUiRefresh(); //keep total number of scanned files up to date
+    //PERF_STOP;
+
+    //we use binary search when comparing the directory structures: so sort() first
+    if (wxThread::GetCPUCount() >= 2) //do it the multithreaded way:
+    {
+        //no synchronization (multithreading) needed here: directoryLeft and directoryRight are disjunct
+        //reference counting Zstring also shouldn't be an issue, as no strings are deleted during std::sort()
+        ThreadSorting sortLeft(directoryLeft);
+        ThreadSorting sortRight(directoryRight);
+
+        sortLeft.Run();
+        if (directoryLeft != directoryRight) //attention: might point to the same vector because of buffer!
+        {
+            sortRight.Run();
+            sortRight.Wait();
+        }
+        sortLeft.Wait();
+    }
+    else //single threaded
+    {
+        std::sort(directoryLeft->begin(), directoryLeft->end());
+
+        if (directoryLeft != directoryRight) //attention: might point to the same vector because of buffer!
+            std::sort(directoryRight->begin(), directoryRight->end());
+    }
+    //PERF_STOP;
+
+    //reserve some space to avoid vector reallocations
+    output.reserve(output.size() + unsigned(std::max(directoryLeft->size(), directoryRight->size()) * 1.2));
+
+    //begin base comparison
+    FileCompareLine newline;
+    DirectoryDescrType::iterator j;
+    for (DirectoryDescrType::iterator i = directoryLeft->begin(); i != directoryLeft->end(); ++i)
+    {    //find files/folders that exist in left file model but not in right model
+        if ((j = custom_binary_search(directoryRight->begin(), directoryRight->end(), *i)) == directoryRight->end())
+        {
+            newline.fileDescrLeft            = *i;
+            newline.fileDescrRight           = FileDescrLine();
+            newline.fileDescrRight.directory = pair.rightDirectory;
+            newline.cmpResult                = FILE_LEFT_SIDE_ONLY;
+            output.push_back(newline);
+        }
+        //find files/folders that exist in left and right file model
+        else
+        {
+            const FileDescrLine::ObjectType typeLeft  = i->objType;
+            const FileDescrLine::ObjectType typeRight = j->objType;
+
+            //files...
+            if (typeLeft == FileDescrLine::TYPE_FILE && typeRight == FileDescrLine::TYPE_FILE)
+            {
+                newline.fileDescrLeft  = *i;
+                newline.fileDescrRight = *j;
+                newline.cmpResult      = FILE_UNDEFINED; //not yet determined!
+                output.push_back(newline);
+            }
+            //directories...
+            else if (typeLeft == FileDescrLine::TYPE_DIRECTORY && typeRight == FileDescrLine::TYPE_DIRECTORY)
+            {
+                newline.fileDescrLeft  = *i;
+                newline.fileDescrRight = *j;
+                newline.cmpResult      = FILE_EQUAL;
+                output.push_back(newline);
+            }
+            //if we have a nameclash between a file and a directory: split into two separate rows
+            else
+            {
+                assert (typeLeft != typeRight);
+
+                newline.fileDescrLeft            = *i;
+                newline.fileDescrRight           = FileDescrLine();
+                newline.fileDescrRight.directory = pair.rightDirectory;
+                newline.cmpResult                = FILE_LEFT_SIDE_ONLY;
+                output.push_back(newline);
+
+                newline.fileDescrLeft           = FileDescrLine();
+                newline.fileDescrLeft.directory = pair.leftDirectory;
+                newline.fileDescrRight          = *j;
+                newline.cmpResult               = FILE_RIGHT_SIDE_ONLY;
+                output.push_back(newline);
+            }
+        }
+    }
+
+
+    for (DirectoryDescrType::iterator j = directoryRight->begin(); j != directoryRight->end(); ++j)
+    {
+        //find files/folders that exist in right file model but not in left model
+        if (custom_binary_search(directoryLeft->begin(), directoryLeft->end(), *j) == directoryLeft->end())
+        {
+            newline.fileDescrLeft           = FileDescrLine();
+            newline.fileDescrLeft.directory = pair.leftDirectory;  //directory info is needed when creating new directories
+            newline.fileDescrRight          = *j;
+            newline.cmpResult               = FILE_RIGHT_SIDE_ONLY;
+            output.push_back(newline);
+        }
+    }
+
+    //PERF_STOP
+}
+
+
+bool FreeFileSync::foldersAreValidForComparison(const std::vector<FolderPair>& folderPairs, wxString& errorMessage)
 {
     errorMessage.Clear();
 
-    for (vector<FolderPair>::const_iterator i = folderPairs.begin(); i != folderPairs.end(); ++i)
+    for (std::vector<FolderPair>::const_iterator i = folderPairs.begin(); i != folderPairs.end(); ++i)
     {
-        const wxString leftFolderName  = getFormattedDirectoryName(i->leftDirectory);
-        const wxString rightFolderName = getFormattedDirectoryName(i->rightDirectory);
+        const Zstring leftFolderName  = getFormattedDirectoryName(i->leftDirectory);
+        const Zstring rightFolderName = getFormattedDirectoryName(i->rightDirectory);
 
         //check if folder name is empty
-        if (leftFolderName.IsEmpty() || rightFolderName.IsEmpty())
+        if (leftFolderName.empty() || rightFolderName.empty())
         {
             errorMessage = _("Please fill all empty directory fields.");
             return false;
@@ -582,15 +687,15 @@ bool FreeFileSync::foldersAreValidForComparison(const vector<FolderPair>& folder
 }
 
 
-bool dependencyExists(const vector<wxString>& folders, const wxString& newFolder, wxString& warningMessage)
+bool dependencyExists(const std::vector<Zstring>& folders, const Zstring& newFolder, wxString& warningMessage)
 {
     warningMessage.Clear();
 
-    for (vector<wxString>::const_iterator i = folders.begin(); i != folders.end(); ++i)
+    for (std::vector<Zstring>::const_iterator i = folders.begin(); i != folders.end(); ++i)
         if (newFolder.StartsWith(*i) || i->StartsWith(newFolder))
         {
             warningMessage = wxString(_("Directories are dependent:")) +
-                             wxT(" \"") + *i + wxT("\"") + wxT(", ") + wxT("\"") + newFolder + wxT("\"");
+                             wxT(" \n\"") + *i + wxT("\"") + wxT(", \n") + wxT("\"") + newFolder + wxT("\"");
             return true;
         }
 
@@ -598,15 +703,15 @@ bool dependencyExists(const vector<wxString>& folders, const wxString& newFolder
 }
 
 
-bool FreeFileSync::foldersHaveDependencies(const vector<FolderPair>& folderPairs, wxString& warningMessage)
+bool FreeFileSync::foldersHaveDependencies(const std::vector<FolderPair>& folderPairs, wxString& warningMessage)
 {
     warningMessage.Clear();
 
-    vector<wxString> folders;
-    for (vector<FolderPair>::const_iterator i = folderPairs.begin(); i != folderPairs.end(); ++i)
+    std::vector<Zstring> folders;
+    for (std::vector<FolderPair>::const_iterator i = folderPairs.begin(); i != folderPairs.end(); ++i)
     {
-        const wxString leftFolderName  = getFormattedDirectoryName(i->leftDirectory);
-        const wxString rightFolderName = getFormattedDirectoryName(i->rightDirectory);
+        const Zstring leftFolderName  = getFormattedDirectoryName(i->leftDirectory);
+        const Zstring rightFolderName = getFormattedDirectoryName(i->rightDirectory);
 
         if (dependencyExists(folders, leftFolderName, warningMessage))
             return true;

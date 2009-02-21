@@ -1,4 +1,4 @@
-FreeFileSync v1.14
+FreeFileSync v1.15
 ------------------
 
 Usage
@@ -34,13 +34,13 @@ Key Features
 12. Support for filesizes > 4 GB.
 13. Option to move files to Recycle Bin instead of deleting/overwriting them.
 14. Automatically ignore directories "\RECYCLER" and "\System Volume Information" when comparing and sync'ing. (Windows only)
-15. Localized English, German, French, Dutch, Japanese  and Chinese versions available.
+15. Localized versions for many languages are available.
 16. Delete before copy: Avoid disc space shortages with large sync-operations.
 17. Based on wxWidgets framework => Portable to many operating systems.
 18. Filter functionality to include/exclude files from synchronization (without re-compare!).
 19. Include/exclude specific files from synchronization manually.
 20. Create sync jobs via GUI to synchronize automatically (can be scheduled or executed directly).
-21. Handle daylight saving time changes on FAT/FAT32 volumes correctly and automatically: No need für a "ignore +/-1h" option
+21. Handle daylight saving time changes on FAT/FAT32 volumes correctly
 
 
 Links

@@ -13,7 +13,6 @@
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
-					<Add option="-pg" />
 					<Add option="-g" />
 					<Add option="-D__WXDEBUG__" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib\mswud" />
@@ -22,7 +21,6 @@
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib\mswud" />
 				</ResourceCompiler>
 				<Linker>
-					<Add option="-pg -lgmon" />
 					<Add library="libwxmsw28ud_adv.a" />
 					<Add library="libwxmsw28ud_core.a" />
 					<Add library="libwxbase28ud.a" />
@@ -96,17 +94,12 @@
 			<Add option="-mthreads" />
 			<Add library="libkernel32.a" />
 			<Add library="libuser32.a" />
-			<Add library="libgdi32.a" />
-			<Add library="libwinspool.a" />
-			<Add library="libcomdlg32.a" />
-			<Add library="libadvapi32.a" />
-			<Add library="libshell32.a" />
-			<Add library="libole32.a" />
-			<Add library="liboleaut32.a" />
 			<Add library="libuuid.a" />
 			<Add library="libcomctl32.a" />
-			<Add library="libwsock32.a" />
-			<Add library="libodbc32.a" />
+			<Add library="libole32.a" />
+			<Add library="liboleaut32.a" />
+			<Add library="libgdi32.a" />
+			<Add library="libcomdlg32.a" />
 			<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 		</Linker>
 		<Unit filename="FreeFileSync.h">
@@ -129,6 +122,14 @@
 		</Unit>
 		<Unit filename="comparison.cpp" />
 		<Unit filename="comparison.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="library\customButton.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="library\customButton.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>

@@ -8,9 +8,9 @@
 #endif  // FFS_WIN
 
 inline
-bool endsWithPathSeparator(const wxChar* name)
+bool endsWithPathSeparator(const Zstring& name)
 {
-    size_t len = wxStrlen(name);
+    const size_t len = name.length();
     return len && (name[len - 1] == GlobalResources::FILE_NAME_SEPARATOR);
 }
 
@@ -84,12 +84,12 @@ bool moveToRecycleBin(const Zstring& filename) throw(RuntimeException)
 inline
 void FreeFileSync::removeFile(const Zstring& filename, const bool useRecycleBin)
 {
-    if (!wxFileExists(filename)) return; //this is NOT an error situation: the manual deletion relies on it!
+    if (!wxFileExists(filename.c_str())) return; //this is NOT an error situation: the manual deletion relies on it!
 
     if (useRecycleBin)
     {
         if (!moveToRecycleBin(filename))
-            throw FileError(wxString(_("Error moving to recycle bin:")) + wxT(" \"") + filename.c_str() + wxT("\""));
+            throw FileError(Zstring(_("Error moving to recycle bin:")) + wxT(" \"") + filename + wxT("\""));
         return;
     }
 
@@ -97,11 +97,11 @@ void FreeFileSync::removeFile(const Zstring& filename, const bool useRecycleBin)
     if (!SetFileAttributes(
                 filename.c_str(),     //address of filename
                 FILE_ATTRIBUTE_NORMAL //attributes to set
-            )) throw FileError(wxString(_("Error deleting file:")) + wxT(" \"") + filename.c_str() + wxT("\""));
+            )) throw FileError(Zstring(_("Error deleting file:")) + wxT(" \"") + filename + wxT("\""));
 #endif  //FFS_WIN
 
-    if (!wxRemoveFile(filename))
-        throw FileError(wxString(_("Error deleting file:")) + wxT(" \"") + filename.c_str() + wxT("\""));
+    if (!wxRemoveFile(filename.c_str()))
+        throw FileError(Zstring(_("Error deleting file:")) + wxT(" \"") + filename + wxT("\""));
 }
 
 
@@ -112,12 +112,12 @@ void FreeFileSync::removeDirectory(const Zstring& directory, const bool useRecyc
     if (useRecycleBin)
     {
         if (!moveToRecycleBin(directory))
-            throw FileError(wxString(_("Error moving to recycle bin:")) + wxT(" \"") + directory.c_str() + wxT("\""));
+            throw FileError(Zstring(_("Error moving to recycle bin:")) + wxT(" \"") + directory + wxT("\""));
         return;
     }
 
-    vector<Zstring> fileList;
-    vector<Zstring> dirList;
+    std::vector<Zstring> fileList;
+    std::vector<Zstring> dirList;
 
     try
     {   //should be executed in own scope so that directory access does not disturb deletion!
@@ -125,7 +125,7 @@ void FreeFileSync::removeDirectory(const Zstring& directory, const bool useRecyc
     }
     catch (const FileError& e)
     {
-        throw FileError(wxString(_("Error deleting directory:")) + wxT(" \"") + directory.c_str() + wxT("\""));
+        throw FileError(Zstring(_("Error deleting directory:")) + wxT(" \"") + directory + wxT("\""));
     }
 
     for (unsigned int j = 0; j < fileList.size(); ++j)
@@ -139,11 +139,11 @@ void FreeFileSync::removeDirectory(const Zstring& directory, const bool useRecyc
         if (!SetFileAttributes(
                     dirList[j].c_str(),     // address of directory name
                     FILE_ATTRIBUTE_NORMAL)) // attributes to set
-            throw FileError(wxString(_("Error deleting directory:")) + wxT(" \"") + dirList[j].c_str() + wxT("\""));
+            throw FileError(Zstring(_("Error deleting directory:")) + wxT(" \"") + dirList[j] + wxT("\""));
 #endif  // FFS_WIN
 
-        if (!wxRmdir(dirList[j]))
-            throw FileError(wxString(_("Error deleting directory:")) + wxT(" \"") + dirList[j].c_str() + wxT("\""));
+        if (!wxRmdir(dirList[j].c_str()))
+            throw FileError(Zstring(_("Error deleting directory:")) + wxT(" \"") + dirList[j] + wxT("\""));
     }
 }
 
@@ -157,12 +157,12 @@ void FreeFileSync::createDirectory(const Zstring& directory, const int level)
         return;
 
     //try to create directory
-    if (wxMkdir(directory))
+    if (wxMkdir(directory.c_str()))
         return;
 
     //if not successfull try to create parent folders first
     Zstring parentDir;
-    if (endsWithPathSeparator(directory.c_str())) //may be valid on first level of recursion at most! Usually never true!
+    if (endsWithPathSeparator(directory)) //may be valid on first level of recursion at most! Usually never true!
     {
         parentDir = directory.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
         parentDir = parentDir.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
@@ -176,10 +176,10 @@ void FreeFileSync::createDirectory(const Zstring& directory, const int level)
     createDirectory(parentDir, level + 1);
 
     //now creation should be possible
-    if (!wxMkdir(directory))
+    if (!wxMkdir(directory.c_str()))
     {
         if (level == 0)
-            throw FileError(wxString(_("Error creating directory:")) + wxT(" \"") + directory.c_str() + wxT("\""));
+            throw FileError(Zstring(_("Error creating directory:")) + wxT(" \"") + directory + wxT("\""));
     }
 }
 
@@ -189,12 +189,12 @@ void FreeFileSync::copyFolderAttributes(const Zstring& source, const Zstring& ta
 #ifdef FFS_WIN
     DWORD attr = GetFileAttributes(source.c_str()); // address of the name of a file or directory
     if (attr ==  0xFFFFFFFF)
-        throw FileError(wxString(_("Error reading file attributes:")) + wxT(" \"") + source.c_str() + wxT("\""));
+        throw FileError(Zstring(_("Error reading folder attributes:")) + wxT(" \"") + source + wxT("\""));
 
     if (!SetFileAttributes(
                 target.c_str(), // address of filename
                 attr))          // address of attributes to set
-        throw FileError(wxString(_("Error writing file attributes:")) + wxT(" \"") + target.c_str() + wxT("\""));
+        throw FileError(Zstring(_("Error writing folder attributes:")) + wxT(" \"") + target + wxT("\""));
 #elif defined FFS_LINUX
 //Linux doesn't use attributes for files or folders
 #endif
@@ -204,19 +204,19 @@ void FreeFileSync::copyFolderAttributes(const Zstring& source, const Zstring& ta
 class GetAllFilesSimple : public wxDirTraverser
 {
 public:
-    GetAllFilesSimple(vector<Zstring>& files, vector<Zstring>& subDirectories) :
+    GetAllFilesSimple(std::vector<Zstring>& files, std::vector<Zstring>& subDirectories) :
             m_files(files),
             m_dirs(subDirectories) {}
 
     wxDirTraverseResult OnDir(const wxString& dirname)
     {
-        m_dirs.push_back(dirname);
+        m_dirs.push_back(dirname.c_str());
         return wxDIR_CONTINUE;
     }
 
     wxDirTraverseResult OnFile(const wxString& filename)
     {
-        m_files.push_back(filename);
+        m_files.push_back(filename.c_str());
         return wxDIR_CONTINUE;
     }
 
@@ -227,22 +227,22 @@ public:
     }
 
 private:
-    vector<Zstring>& m_files;
-    vector<Zstring>& m_dirs;
+    std::vector<Zstring>& m_files;
+    std::vector<Zstring>& m_dirs;
 };
 
 
-void FreeFileSync::getAllFilesAndDirs(const Zstring& sourceDir, vector<Zstring>& files, vector<Zstring>& directories) throw(FileError)
+void FreeFileSync::getAllFilesAndDirs(const Zstring& sourceDir, std::vector<Zstring>& files, std::vector<Zstring>& directories) throw(FileError)
 {
     files.clear();
     directories.clear();
 
     //get all files and directories from current directory (and subdirectories)
-    wxDir dir(sourceDir);
+    wxDir dir(sourceDir.c_str());
     GetAllFilesSimple traverser(files, directories);
 
     if (dir.Traverse(traverser) == (size_t)-1)
-        throw FileError(wxString(_("Error traversing directory:")) + wxT(" \"") + sourceDir.c_str() + wxT("\""));
+        throw FileError(Zstring(_("Error traversing directory:")) + wxT(" \"") + sourceDir + wxT("\""));
 }
 
 
@@ -267,10 +267,10 @@ void getWin32FileInformation(const WIN32_FIND_DATA& input, FreeFileSync::FileInf
 {
     //convert UTC FILETIME to ANSI C format (number of seconds since Jan. 1st 1970 UTC)
     wxULongLong writeTimeLong(input.ftLastWriteTime.dwHighDateTime, input.ftLastWriteTime.dwLowDateTime);
-    writeTimeLong /= 10000000;    //reduce precision to 1 second (FILETIME has unit 10^-7 s)
-    writeTimeLong -= wxULongLong(2, 3054539008UL);   //timeshift between ansi C time and FILETIME in seconds == 11644473600s
-    output.lastWriteTimeRaw = writeTimeLong.GetLo(); //it should fit into a 32bit variable now
-    assert(writeTimeLong.GetHi() == 0);
+    writeTimeLong /= 10000000;                     //reduce precision to 1 second (FILETIME has unit 10^-7 s)
+    writeTimeLong -= wxULongLong(2, 3054539008UL); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
+    assert(writeTimeLong.GetHi() == 0);            //it should fit into a 32bit variable now
+    output.lastWriteTimeRaw = writeTimeLong.GetLo();
 
     output.fileSize = wxULongLong(input.nFileSizeHigh, input.nFileSizeLow);
 }
@@ -281,7 +281,7 @@ class EnhancedFileTraverser : public wxDirTraverser
 public:
     EnhancedFileTraverser(FreeFileSync::FullDetailFileTraverser* sink) : m_sink(sink) {}
 
-    virtual wxDirTraverseResult OnFile(const wxString& filename)
+    wxDirTraverseResult OnFile(const wxString& filename) //virtual impl.
     {
         struct stat fileInfo;
         if (stat(filename.c_str(), &fileInfo) != 0)
@@ -291,17 +291,17 @@ public:
         details.lastWriteTimeRaw = fileInfo.st_mtime; //UTC time(ANSI C format); unit: 1 second
         details.fileSize         = fileInfo.st_size;
 
-        return m_sink->OnFile(filename, details);
+        return m_sink->OnFile(filename.c_str(), details);
     }
 
-    virtual wxDirTraverseResult OnDir(const wxString& dirname)
+    wxDirTraverseResult OnDir(const wxString& dirname) //virtual impl.
     {
-        return m_sink->OnDir(dirname);
+        return m_sink->OnDir(dirname.c_str());
     }
 
-    virtual wxDirTraverseResult OnOpenError(const wxString& errorText)
+    wxDirTraverseResult OnOpenError(const wxString& errorText) //virtual impl.
     {
-        return m_sink->OnError(errorText);
+        return m_sink->OnError(errorText.c_str());
     }
 
 private:
@@ -322,7 +322,7 @@ bool FreeFileSync::traverseInDetail(const Zstring& directory, FullDetailFileTrav
     }
 
     Zstring directoryFormatted = directory;
-    if (!endsWithPathSeparator(directoryFormatted.c_str()))
+    if (!endsWithPathSeparator(directoryFormatted))
         directoryFormatted += GlobalResources::FILE_NAME_SEPARATOR;
 
     const Zstring filespec = directoryFormatted + wxT("*.*");
@@ -403,10 +403,10 @@ bool FreeFileSync::traverseInDetail(const Zstring& directory, FullDetailFileTrav
 #elif defined FFS_LINUX
 
     //use standard file traverser and enrich output with additional file information
-    //could be improved with own traversing algorithm for optimized performance
+    //could be improved with custom traversing algorithm for optimized performance
     EnhancedFileTraverser traverser(sink);
 
-    wxDir dir(directory);
+    wxDir dir(directory.c_str());
     if (dir.IsOpened())
         dir.Traverse(traverser);
 

@@ -99,19 +99,17 @@ Zstring FreeFileSync::getFormattedDirectoryName(const Zstring& dirname)
 {   //Formatting is needed since functions in FreeFileSync.cpp expect the directory to end with '\' to be able to split the relative names.
     //Also improves usability.
 
-    wxString dirnameTmp = dirname.c_str();
+    Zstring dirnameTmp = dirname;
     dirnameTmp.Trim(true);  //remove whitespace characters from right
     dirnameTmp.Trim(false); //remove whitespace characters from left
 
-    if (dirnameTmp.IsEmpty()) //an empty string is interpreted as "\"; this is not desired
+    if (dirnameTmp.empty()) //an empty string is interpreted as "\"; this is not desired
         return Zstring();
 
     //let wxWidgets do the directory formatting, e.g. replace '/' with '\' for Windows
-    wxFileName directory = wxFileName::DirName(dirnameTmp);
-    wxString result = directory.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR);
+    wxFileName directory = wxFileName::DirName(dirnameTmp.c_str());
 
-    //return Zstring(result.c_str());
-    return Zstring(result);
+    return Zstring(directory.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR));
 }
 
 
@@ -148,8 +146,8 @@ void FreeFileSync::adjustModificationTimes(const Zstring& parentDirectory, const
     if (timeInSeconds == 0)
         return;
 
-    vector<Zstring> fileList;
-    vector<Zstring> dirList;
+    std::vector<Zstring> fileList;
+    std::vector<Zstring> dirList;
 
     while (true)  //should be executed in own scope so that directory access does not disturb deletion
     {
@@ -180,12 +178,12 @@ void FreeFileSync::adjustModificationTimes(const Zstring& parentDirectory, const
             {
                 wxFileName file(fileList[j].c_str());
                 if (!file.GetTimes(NULL, &modTime, NULL)) //get modification time
-                    throw FileError(wxString(_("Error changing modification time:")) + wxT(" \"") + fileList[j].c_str() + wxT("\""));
+                    throw FileError(Zstring(_("Error changing modification time:")) + wxT(" \"") + fileList[j] + wxT("\""));
 
                 modTime.Add(wxTimeSpan(0, 0, timeInSeconds, 0));
 
                 if (!file.SetTimes(NULL, &modTime, NULL)) //get modification time
-                    throw FileError(wxString(_("Error changing modification time:")) + wxT(" \"") + fileList[j].c_str() + wxT("\""));
+                    throw FileError(Zstring(_("Error changing modification time:")) + wxT(" \"") + fileList[j] + wxT("\""));
 
                 break;
             }
@@ -204,7 +202,7 @@ void FreeFileSync::adjustModificationTimes(const Zstring& parentDirectory, const
 }
 
 
-void compoundStringToTable(const Zstring& compoundInput, const defaultChar* delimiter, vector<Zstring>& output)
+void compoundStringToTable(const Zstring& compoundInput, const DefaultChar* delimiter, std::vector<Zstring>& output)
 {
     output.clear();
     Zstring input(compoundInput);
@@ -219,12 +217,12 @@ void compoundStringToTable(const Zstring& compoundInput, const defaultChar* deli
     {
         if (indexStart != indexEnd) //do not add empty strings
         {
-            wxString newEntry = input.substr(indexStart, indexEnd - indexStart);
+            Zstring newEntry = input.substr(indexStart, indexEnd - indexStart);
 
             newEntry.Trim(true);  //remove whitespace characters from right
             newEntry.Trim(false); //remove whitespace characters from left
 
-            if (!newEntry.IsEmpty())
+            if (!newEntry.empty())
                 output.push_back(newEntry);
         }
         indexStart = indexEnd + 1;
@@ -233,23 +231,23 @@ void compoundStringToTable(const Zstring& compoundInput, const defaultChar* deli
 
 
 inline
-void mergeVectors(vector<Zstring>& changing, const vector<Zstring>& input)
+void mergeVectors(std::vector<Zstring>& changing, const std::vector<Zstring>& input)
 {
-    for (vector<Zstring>::const_iterator i = input.begin(); i != input.end(); ++i)
+    for (std::vector<Zstring>::const_iterator i = input.begin(); i != input.end(); ++i)
         changing.push_back(*i);
 }
 
 
-vector<Zstring> compoundStringToFilter(const Zstring& filterString)
+std::vector<Zstring> compoundStringToFilter(const Zstring& filterString)
 {
     //delimiters may be ';' or '\n'
-    vector<Zstring> filterList;
-    vector<Zstring> filterPreProcessing;
+    std::vector<Zstring> filterList;
+    std::vector<Zstring> filterPreProcessing;
     compoundStringToTable(filterString, wxT(";"), filterPreProcessing);
 
-    for (vector<Zstring>::const_iterator i = filterPreProcessing.begin(); i != filterPreProcessing.end(); ++i)
+    for (std::vector<Zstring>::const_iterator i = filterPreProcessing.begin(); i != filterPreProcessing.end(); ++i)
     {
-        vector<Zstring> newEntries;
+        std::vector<Zstring> newEntries;
         compoundStringToTable(*i, wxT("\n"), newEntries);
         mergeVectors(filterList, newEntries);
     }
@@ -279,13 +277,13 @@ void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, con
 
     //load filter into vectors of strings
     //delimiters may be ';' or '\n'
-    vector<Zstring> includeList = compoundStringToFilter(includeFilter);
-    vector<Zstring> excludeList = compoundStringToFilter(excludeFilter);
+    std::vector<Zstring> includeList = compoundStringToFilter(includeFilter.c_str());
+    std::vector<Zstring> excludeList = compoundStringToFilter(excludeFilter.c_str());
 
     //format entries
-    for (vector<Zstring>::iterator i = includeList.begin(); i != includeList.end(); ++i)
+    for (std::vector<Zstring>::iterator i = includeList.begin(); i != includeList.end(); ++i)
         formatFilterString(*i);
-    for (vector<Zstring>::iterator i = excludeList.begin(); i != excludeList.end(); ++i)
+    for (std::vector<Zstring>::iterator i = excludeList.begin(); i != excludeList.end(); ++i)
         formatFilterString(*i);
 
 //##############################################################
@@ -303,7 +301,7 @@ void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, con
         if (i->fileDescrLeft.objType != FileDescrLine::TYPE_NOTHING)
         {
             bool includedLeft = false;
-            for (vector<Zstring>::const_iterator j = includeList.begin(); j != includeList.end(); ++j)
+            for (std::vector<Zstring>::const_iterator j = includeList.begin(); j != includeList.end(); ++j)
                 if (filenameLeft.Matches(*j))
                 {
                     includedLeft = true;
@@ -320,7 +318,7 @@ void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, con
         if (i->fileDescrRight.objType != FileDescrLine::TYPE_NOTHING)
         {
             bool includedRight = false;
-            for (vector<Zstring>::const_iterator j = includeList.begin(); j != includeList.end(); ++j)
+            for (std::vector<Zstring>::const_iterator j = includeList.begin(); j != includeList.end(); ++j)
                 if (filenameRight.Matches(*j))
                 {
                     includedRight = true;
@@ -338,7 +336,7 @@ void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, con
         if (i->fileDescrLeft.objType != FileDescrLine::TYPE_NOTHING)
         {
             bool excluded = false;
-            for (vector<Zstring>::const_iterator j = excludeList.begin(); j != excludeList.end(); ++j)
+            for (std::vector<Zstring>::const_iterator j = excludeList.begin(); j != excludeList.end(); ++j)
                 if (filenameLeft.Matches(*j))
                 {
                     excluded = true;
@@ -355,7 +353,7 @@ void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, con
         if (i->fileDescrRight.objType != FileDescrLine::TYPE_NOTHING)
         {
             bool excluded = false;
-            for (vector<Zstring>::const_iterator j = excludeList.begin(); j != excludeList.end(); ++j)
+            for (std::vector<Zstring>::const_iterator j = excludeList.begin(); j != excludeList.end(); ++j)
                 if (filenameRight.Matches(*j))
                 {
                     excluded = true;
@@ -383,7 +381,7 @@ void FreeFileSync::removeFilterOnCurrentGridData(FileCompareResult& currentGridD
 
 
 //add(!) all files and subfolder gridlines that are dependent from the directory
-void FreeFileSync::addSubElements(set<int>& subElements, const FileCompareResult& grid, const FileCompareLine& relevantRow)
+void FreeFileSync::addSubElements(std::set<int>& subElements, const FileCompareResult& grid, const FileCompareLine& relevantRow)
 {
     Zstring relevantDirectory;
 
@@ -420,17 +418,17 @@ public:
 
 private:
     FileCompareResult& gridToWrite;
-    set<int> rowsProcessed;
+    std::set<int> rowsProcessed;
 };
 
 
-void FreeFileSync::deleteOnGridAndHD(FileCompareResult& grid, const set<int>& rowsToDelete, ErrorHandler* errorHandler, const bool useRecycleBin) throw(AbortThisProcess)
+void FreeFileSync::deleteOnGridAndHD(FileCompareResult& grid, const std::set<int>& rowsToDelete, ErrorHandler* errorHandler, const bool useRecycleBin) throw(AbortThisProcess)
 {
     //remove deleted rows from grid
     AlwaysWriteToGrid writeOutput(grid);  //ensure that grid is always written to, even if method is exitted via exceptions
 
     //remove from hd
-    for (set<int>::iterator i = rowsToDelete.begin(); i != rowsToDelete.end(); ++i)
+    for (std::set<int>::iterator i = rowsToDelete.begin(); i != rowsToDelete.end(); ++i)
     {
         const FileCompareLine& currentCmpLine = grid[*i];
 
@@ -452,11 +450,11 @@ void FreeFileSync::deleteOnGridAndHD(FileCompareResult& grid, const set<int>& ro
                 writeOutput.rowProcessedSuccessfully(*i);
 
                 //retrieve all files and subfolder gridlines that are dependent from this deleted entry
-                set<int> additionalRowsToDelete;
+                std::set<int> additionalRowsToDelete;
                 addSubElements(additionalRowsToDelete, grid, grid[*i]);
 
                 //...and remove them also
-                for (set<int>::iterator j = additionalRowsToDelete.begin(); j != additionalRowsToDelete.end(); ++j)
+                for (std::set<int>::iterator j = additionalRowsToDelete.begin(); j != additionalRowsToDelete.end(); ++j)
                     writeOutput.rowProcessedSuccessfully(*j);
 
                 break;
@@ -476,15 +474,6 @@ void FreeFileSync::deleteOnGridAndHD(FileCompareResult& grid, const set<int>& ro
             }
         }
     }
-}
-
-
-bool FreeFileSync::sameFileTime(const time_t a, const time_t b)
-{
-    if (a < b)
-        return b - a <= FILE_TIME_PRECISION;
-    else
-        return a - b <= FILE_TIME_PRECISION;
 }
 
 
@@ -575,30 +564,42 @@ wxString FreeFileSync::utcTimeToLocalString(const time_t utcTime)
 }
 
 
+#ifdef FFS_WIN
 inline
-wxString getDriveName(const wxString& directoryName)
+Zstring getDriveName(const Zstring& directoryName) //GetVolume() doesn't work under Linux!
 {
-    const wxString volumeName = wxFileName(directoryName).GetVolume();
-    if (volumeName.IsEmpty())
-        return wxEmptyString;
+    const Zstring volumeName = wxFileName(directoryName.c_str()).GetVolume().c_str();
+    if (volumeName.empty())
+        return Zstring();
 
-    return volumeName + wxFileName::GetVolumeSeparator() + GlobalResources::FILE_NAME_SEPARATOR;
+    return volumeName + wxFileName::GetVolumeSeparator().c_str() + GlobalResources::FILE_NAME_SEPARATOR;
 }
+#endif  //FFS_WIN
 
 
 #ifdef FFS_WIN
-inline
-bool isFatDrive(const wxString& directoryName)
+bool FreeFileSync::isFatDrive(const Zstring& directoryName)
 {
-    const wxString driveName = getDriveName(directoryName);
-    if (driveName.IsEmpty())
+    const Zstring driveName = getDriveName(directoryName);
+    if (driveName.empty())
         return false;
 
-    wxChar fileSystem[32] = wxT("");
+    wxChar fileSystem[32];
     if (!GetVolumeInformation(driveName.c_str(), NULL, 0, NULL, NULL, NULL, fileSystem, 32))
         return false;
 
-    return wxString(fileSystem).StartsWith(wxT("FAT"));
+    return Zstring(fileSystem).StartsWith(wxT("FAT"));
+}
+#endif
+
+
+inline
+bool sameFileTime(const time_t a, const time_t b)
+{
+    if (a < b)
+        return b - a <= FILE_TIME_PRECISION;
+    else
+        return a - b <= FILE_TIME_PRECISION;
 }
 
 
@@ -643,6 +644,7 @@ N(M) =
 
 */
 
+#ifdef FFS_WIN
 unsigned int getThreshold(const unsigned filesWithSameSizeTotal)
 {
     if (filesWithSameSizeTotal <= 500)
@@ -657,7 +659,7 @@ unsigned int getThreshold(const unsigned filesWithSameSizeTotal)
 
 
 void FreeFileSync::checkForDSTChange(const FileCompareResult& gridData,
-                                     const vector<FolderPair>& directoryPairsFormatted,
+                                     const std::vector<FolderPair>& directoryPairsFormatted,
                                      int& timeShift, wxString& driveName)
 {
     driveName.Clear();
@@ -668,7 +670,7 @@ void FreeFileSync::checkForDSTChange(const FileCompareResult& gridData,
     if (rv == TIME_ZONE_ID_UNKNOWN) return;
     bool dstActive = rv == TIME_ZONE_ID_DAYLIGHT;
 
-    for (vector<FolderPair>::const_iterator i = directoryPairsFormatted.begin(); i != directoryPairsFormatted.end(); ++i)
+    for (std::vector<FolderPair>::const_iterator i = directoryPairsFormatted.begin(); i != directoryPairsFormatted.end(); ++i)
     {
         bool leftDirIsFat = isFatDrive(i->leftDirectory);
         bool rightDirIsFat = isFatDrive(i->rightDirectory);

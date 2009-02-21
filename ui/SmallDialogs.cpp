@@ -3,6 +3,7 @@
 #include "../library/resources.h"
 #include "../algorithm.h"
 #include <wx/msgdlg.h>
+#include "../library/customGrid.h"
 
 using namespace FreeFileSync;
 
@@ -300,136 +301,156 @@ void WarningDlg::OnOkay(wxCommandEvent& event)
     dontShowAgain = m_checkBoxDontShowAgain->GetValue();
     EndModal(BUTTON_OKAY);
 }
+
+
 //########################################################################################
-
-
-ModifyFilesDlg::ModifyFilesDlg(wxWindow* window, const wxString& parentDirectory, const int timeShift) :
-        ModifyFilesDlgGenerated(window)
+CustomizeColsDlg::CustomizeColsDlg(wxWindow* window, xmlAccess::XmlGlobalSettings::ColumnAttributes& attr) :
+        CustomizeColsDlgGenerated(window),
+        output(attr)
 {
-    if (wxDirExists(parentDirectory))
-        m_dirPicker->SetPath(parentDirectory);
-    m_textCtrlDirectory->SetValue(parentDirectory);
-    m_spinCtrlTimeShift->SetValue(timeShift);
+    m_bpButton29->SetBitmapLabel(*globalResource.bitmapMoveUp);
+    m_bpButton30->SetBitmapLabel(*globalResource.bitmapMoveDown);
 
-    m_bitmap24->SetBitmap(*globalResource.bitmapClock);
-    m_buttonApply->SetFocus();
+    xmlAccess::XmlGlobalSettings::ColumnAttributes columnSettings = attr;
+
+    sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByPositionOnly);
+
+    for (xmlAccess::XmlGlobalSettings::ColumnAttributes::const_iterator i = columnSettings.begin(); i != columnSettings.end(); ++i) //love these iterators!
+    {
+        m_checkListColumns->Append(CustomGrid::getTypeName(i->type));
+        m_checkListColumns->Check(i - columnSettings.begin(), i->visible);
+    }
+
+    m_checkListColumns->SetSelection(0);
 }
 
 
-ModifyFilesDlg::~ModifyFilesDlg() {}
-
-
-class ModifyErrorHandler : public ErrorHandler
+void CustomizeColsDlg::OnOkay(wxCommandEvent& event)
 {
-public:
-    ModifyErrorHandler(wxWindow* parentWindow, bool& unsolvedErrorOccured) :
-            parent(parentWindow),
-            ignoreErrors(false),
-            unsolvedErrors(unsolvedErrorOccured) {}
-
-    ~ModifyErrorHandler() {}
-
-    Response reportError(const wxString& text)
+    for (int i = 0; i < int(m_checkListColumns->GetCount()); ++i)
     {
-        if (ignoreErrors)
+        const wxString label = m_checkListColumns->GetString(i);
+        for (xmlAccess::XmlGlobalSettings::ColumnAttributes::iterator j = output.begin(); j != output.end(); ++j)
         {
-            unsolvedErrors = true;
-            return ErrorHandler::IGNORE_ERROR;
-        }
-
-        bool ignoreNextErrors = false;
-        ErrorDlg* errorDlg = new ErrorDlg(parent, text, ignoreNextErrors);
-        int rv = errorDlg->ShowModal();
-
-        switch (rv)
-        {
-        case ErrorDlg::BUTTON_IGNORE:
-            ignoreErrors = ignoreNextErrors;
-            unsolvedErrors = true;
-            return ErrorHandler::IGNORE_ERROR;
-        case ErrorDlg::BUTTON_RETRY:
-            return ErrorHandler::RETRY;
-        case ErrorDlg::BUTTON_ABORT:
-        {
-            unsolvedErrors = true;
-            throw AbortThisProcess();
-        }
-        default:
-            assert (false);
-            return ErrorHandler::IGNORE_ERROR; //dummy return value
+            if (CustomGrid::getTypeName(j->type) == label) //not nice but short and no performance issue
+            {
+                j->position = i;
+                j->visible  = m_checkListColumns->IsChecked(i);;
+                break;
+            }
         }
     }
 
-private:
-    wxWindow* parent;
-    bool ignoreErrors;
-    bool& unsolvedErrors;
-};
-
-
-void ModifyFilesDlg::OnApply(wxCommandEvent& event)
-{
-    const int      timeToShift = m_spinCtrlTimeShift->GetValue();
-    const wxString parentDir   = m_textCtrlDirectory->GetValue();
-
-    if (!wxDirExists(parentDir))
-    {
-        wxMessageBox(wxString(_("Directory does not exist:")) + wxT(" \"") + parentDir + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
-        return;
-    }
-
-    bool unsolvedErrorOccured = false; //if an error is skipped a re-compare will be necessary!
-    try
-    {
-        wxBusyCursor dummy; //show hourglass cursor
-
-        ModifyErrorHandler errorHandler(this, unsolvedErrorOccured);
-        FreeFileSync::adjustModificationTimes(parentDir, timeToShift, &errorHandler);
-    }
-    catch (const AbortThisProcess& theException)
-    {
-        EndModal(BUTTON_APPLY);
-    }
-
-    if (unsolvedErrorOccured)
-        wxMessageBox(_("Unresolved errors occured during operation!"), _("Information"), wxOK);
-    else
-        wxMessageBox(_("All file times have been adjusted successfully!"), _("Information"), wxOK);
-
-    EndModal(BUTTON_APPLY);
+    EndModal(BUTTON_OKAY);
 }
 
 
-void ModifyFilesDlg::OnCancel(wxCommandEvent& event)
+void CustomizeColsDlg::OnDefault(wxCommandEvent& event)
+{
+    for (unsigned i = 0; i < m_checkListColumns->GetCount(); ++i)
+    {
+        m_checkListColumns->SetString(i, CustomGrid::getTypeName(xmlAccess::XmlGlobalSettings::ColumnTypes(i)));
+        m_checkListColumns->Check(i, true);
+    }
+}
+
+
+void CustomizeColsDlg::OnCancel(wxCommandEvent& event)
 {
     EndModal(0);
 }
 
 
-void ModifyFilesDlg::OnClose(wxCloseEvent& event)
+void CustomizeColsDlg::OnClose(wxCloseEvent& event)
 {
     EndModal(0);
 }
 
 
-void ModifyFilesDlg::OnWriteDirManually(wxCommandEvent& event)
+void CustomizeColsDlg::OnMoveUp(wxCommandEvent& event)
 {
-    wxString newDir = FreeFileSync::getFormattedDirectoryName(event.GetString());
-    if (wxDirExists(newDir))
-        m_dirPicker->SetPath(newDir);
+    const int pos = m_checkListColumns->GetSelection();
+    if (1 <= pos && pos < int(m_checkListColumns->GetCount()))
+    {
+        const bool checked    = m_checkListColumns->IsChecked(pos);
+        const wxString label  = m_checkListColumns->GetString(pos);
 
+        m_checkListColumns->SetString(pos, m_checkListColumns->GetString(pos - 1));
+        m_checkListColumns->Check(pos, m_checkListColumns->IsChecked(pos - 1));
+        m_checkListColumns->SetString(pos - 1, label);
+        m_checkListColumns->Check(pos - 1, checked);
+        m_checkListColumns->Select(pos - 1);
+    }
     event.Skip();
 }
 
 
-void ModifyFilesDlg::OnDirSelected(wxFileDirPickerEvent& event)
+void CustomizeColsDlg::OnMoveDown(wxCommandEvent& event)
 {
-    const wxString newPath = event.GetPath();
-    m_textCtrlDirectory->SetValue(newPath);
+    const int pos = m_checkListColumns->GetSelection();
+    if (0 <= pos && pos < int(m_checkListColumns->GetCount()) - 1)
+    {
+        const bool checked    = m_checkListColumns->IsChecked(pos);
+        const wxString label  = m_checkListColumns->GetString(pos);
 
+        m_checkListColumns->SetString(pos, m_checkListColumns->GetString(pos + 1));
+        m_checkListColumns->Check(pos, m_checkListColumns->IsChecked(pos + 1));
+        m_checkListColumns->SetString(pos + 1, label);
+        m_checkListColumns->Check(pos + 1, checked);
+        m_checkListColumns->Select(pos + 1);
+    }
     event.Skip();
 }
 
+//########################################################################################
+GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSettings& globalSettings) :
+        GlobalSettingsDlgGenerated(window),
+        settings(globalSettings)
+{
+    m_bitmapSettings->SetBitmap(*globalResource.bitmapSettings);
+
+#ifdef FFS_WIN
+    m_checkBoxHandleDstFat->SetValue(globalSettings.global.handleDstOnFat32);
+#else
+    m_checkBoxHandleDstFat->Hide();
+#endif
+    m_textCtrlFileManager->SetValue(globalSettings.gui.commandLineFileManager);
+}
+
+
+void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
+{
+    //write global settings only when okay-button is pressed!
+#ifdef FFS_WIN
+    settings.global.handleDstOnFat32    = m_checkBoxHandleDstFat->GetValue();
+#endif
+    settings.gui.commandLineFileManager = m_textCtrlFileManager->GetValue();
+
+    EndModal(BUTTON_OKAY);
+}
+
+
+void GlobalSettingsDlg::OnDefault(wxCommandEvent& event)
+{
+    m_checkBoxHandleDstFat->SetValue(true);
+#ifdef FFS_WIN
+    m_textCtrlFileManager->SetValue(wxT("explorer /select, %x"));
+#elif defined FFS_LINUX
+    m_textCtrlFileManager->SetValue(wxT("konqueror \"%path\""));
+#endif
+}
+
+
+void GlobalSettingsDlg::OnCancel(wxCommandEvent& event)
+{
+    EndModal(0);
+}
+
+
+void GlobalSettingsDlg::OnClose(wxCloseEvent& event)
+{
+    EndModal(0);
+}
 
 
 //########################################################################################
@@ -587,7 +608,7 @@ void SyncStatus::incProgressIndicator_NoUpdate(int objectsProcessed, double data
 }
 
 
-void SyncStatus::setStatusText_NoUpdate(const wxString& text)
+void SyncStatus::setStatusText_NoUpdate(const Zstring& text)
 {
     currentStatusText = text;
 }
@@ -601,8 +622,8 @@ void SyncStatus::updateStatusDialogNow()
     m_gauge1->SetValue(int(currentData * scalingFactor));
 
     //status text
-    if (m_textCtrlInfo->GetValue() != currentStatusText && (screenChanged = true)) //avoid screen flicker
-        m_textCtrlInfo->SetValue(currentStatusText);
+    if (m_textCtrlInfo->GetValue() != wxString(currentStatusText.c_str()) && (screenChanged = true)) //avoid screen flicker
+        m_textCtrlInfo->SetValue(currentStatusText.c_str());
 
     //remaining objects
     const wxString remainingObjTmp = globalFunctions::numberToWxString(totalObjects - currentObjects);
@@ -833,7 +854,7 @@ void CompareStatus::incProcessedCmpData_NoUpdate(int objectsProcessed, double da
 }
 
 
-void CompareStatus::setStatusText_NoUpdate(const wxString& text)
+void CompareStatus::setStatusText_NoUpdate(const Zstring& text)
 {
     currentStatusText = text;
 }
@@ -844,8 +865,8 @@ void CompareStatus::updateStatusPanelNow()
     bool screenChanged = false; //avoid screen flicker by calling layout() only if necessary
 
     //status texts
-    if (m_textCtrlFilename->GetValue() != currentStatusText && (screenChanged = true)) //avoid screen flicker
-        m_textCtrlFilename->SetValue(currentStatusText);
+    if (m_textCtrlFilename->GetValue() != wxString(currentStatusText.c_str()) && (screenChanged = true)) //avoid screen flicker
+        m_textCtrlFilename->SetValue(currentStatusText.c_str());
 
     //nr of scanned objects
     const wxString scannedObjTmp = globalFunctions::numberToWxString(scannedObjects);

@@ -8,21 +8,21 @@
 class FileError //Exception class used to notify file/directory copy/delete errors
 {
 public:
-    FileError(const wxString& txt) : errorMessage(txt) {}
+    FileError(const Zstring& txt) : errorMessage(txt) {}
 
-    wxString show() const
+    Zstring show() const
     {
         return errorMessage;
     }
 
 private:
-    wxString errorMessage;
+    Zstring errorMessage;
 };
 
 
 namespace FreeFileSync
 {
-    void getAllFilesAndDirs(const Zstring& sourceDir, vector<Zstring>& files, vector<Zstring>& directories) throw(FileError);
+    void getAllFilesAndDirs(const Zstring& sourceDir, std::vector<Zstring>& files, std::vector<Zstring>& directories) throw(FileError);
 
     //recycler
     bool recycleBinExists(); //test existence of Recycle Bin API on current system

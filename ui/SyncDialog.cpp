@@ -5,10 +5,11 @@
 #include <wx/msgdlg.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
+#include "../library/customButton.h"
 #include "../synchronization.h"
 #include "../algorithm.h"
 
-using namespace std;
+
 using namespace xmlAccess;
 
 
@@ -31,8 +32,6 @@ SyncDialog::SyncDialog(wxWindow* window,
     calculatePreview();
 
     //set icons for this dialog
-    m_bpButton18->SetBitmapLabel(*globalResource.bitmapStartSync);
-    m_bpButton18->SetBitmapDisabled(*globalResource.bitmapStartSyncDis);
     m_bitmap13->SetBitmap(*globalResource.bitmapLeftOnly);
     m_bitmap14->SetBitmap(*globalResource.bitmapRightOnly);
     m_bitmap15->SetBitmap(*globalResource.bitmapLeftNewer);
@@ -40,12 +39,21 @@ SyncDialog::SyncDialog(wxWindow* window,
     m_bitmap17->SetBitmap(*globalResource.bitmapDifferent);
 
     if (synchronizationEnabled)
-        m_bpButton18->Enable();
+    {
+        m_button18->SetForegroundColour(*wxBLACK);
+        m_button18->setBitmapFront(*globalResource.bitmapStartSync);
+        m_button18->Enable();
+    }
     else
     {
-        m_bpButton18->Disable();
+        m_button18->SetForegroundColour(wxColor(94, 94, 94)); //grey
+        m_button18->setBitmapFront(*globalResource.bitmapStartSyncDis);
+        m_button18->Disable();
         m_button6->SetFocus();
     }
+
+    bSizer201->Layout(); //wxButtonWithImage size might have changed
+
 
     //set radiobutton
     if (    localSyncConfiguration.exLeftSideOnly  == SyncConfiguration::SYNC_DIR_RIGHT &&
@@ -71,8 +79,6 @@ SyncDialog::SyncDialog(wxWindow* window,
 
     else
         m_radioBtn3->SetValue(true);    //other
-
-    m_bpButton18->SetLabel(_("&Start"));
 
     //set tooltip for ambivalent category "different"
     adjustToolTips(m_bitmap17, config.compareVar);
@@ -195,12 +201,12 @@ void SyncDialog::calculatePreview()
     int objectsToOverwrite = 0;
     int objectsToDelete    = 0;
     double dataToProcess   = 0;
-    FreeFileSync::calcTotalBytesToSync(objectsToCreate,
+    FreeFileSync::calcTotalBytesToSync(gridData,
+                                       localSyncConfiguration,
+                                       objectsToCreate,
                                        objectsToOverwrite,
                                        objectsToDelete,
-                                       dataToProcess,
-                                       gridData,
-                                       localSyncConfiguration);
+                                       dataToProcess);
 
     wxString toCreate = globalFunctions::numberToWxString(objectsToCreate);
     wxString toUpdate = globalFunctions::numberToWxString(objectsToOverwrite);
@@ -378,7 +384,7 @@ void SyncDialog::OnDifferent( wxCommandEvent& event )
 
 BatchDialog::BatchDialog(wxWindow* window,
                          const MainConfiguration& config,
-                         const vector<FolderPair>& folderPairs) :
+                         const std::vector<FolderPair>& folderPairs) :
         BatchDlgGenerated(window)
 {
     //make working copy of mainDialog.cfg.syncConfiguration and recycler setting
@@ -411,11 +417,11 @@ BatchDialog::BatchDialog(wxWindow* window,
 
     //add folder pairs
     int scrWindowHeight = 0;
-    for (vector<FolderPair>::const_iterator i = folderPairs.begin(); i != folderPairs.end(); ++i)
+    for (std::vector<FolderPair>::const_iterator i = folderPairs.begin(); i != folderPairs.end(); ++i)
     {
         BatchFolderPairGenerated* newPair = new BatchFolderPairGenerated(m_scrolledWindow6);
-        newPair->m_directoryLeft->SetValue(i->leftDirectory);
-        newPair->m_directoryRight->SetValue(i->rightDirectory);
+        newPair->m_directoryLeft->SetValue(i->leftDirectory.c_str());
+        newPair->m_directoryRight->SetValue(i->rightDirectory.c_str());
 
         bSizerFolderPairs->Add( newPair, 0, wxEXPAND, 5);
         localFolderPairs.push_back(newPair);
@@ -424,7 +430,7 @@ BatchDialog::BatchDialog(wxWindow* window,
             scrWindowHeight = newPair->GetSize().GetHeight();
     }
     //set size of scrolled window
-    int pairCount = min(localFolderPairs.size(), size_t(3)); //up to 3 additional pairs shall be shown
+    int pairCount = std::min(localFolderPairs.size(), size_t(3)); //up to 3 additional pairs shall be shown
     m_scrolledWindow6->SetMinSize(wxSize( -1, scrWindowHeight * pairCount));
 
     m_scrolledWindow6->Fit();
@@ -553,7 +559,7 @@ void BatchDialog::OnCancel(wxCommandEvent& event)
 }
 
 
-void BatchDialog::OnCreateBatchJob(wxCommandEvent& event)
+void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
 {
     //get a filename
     wxString fileName = _("SyncJob.ffs_batch"); //proposal
@@ -571,13 +577,13 @@ void BatchDialog::OnCreateBatchJob(wxCommandEvent& event)
         }
 
         //create batch file
-        if (createBatchFile(fileName))
+        if (saveBatchFile(fileName))
             EndModal(batchFileCreated);
     }
 }
 
 
-bool BatchDialog::createBatchFile(const wxString& filename)
+bool BatchDialog::saveBatchFile(const wxString& filename)
 {
     XmlBatchConfig batchCfg;
 
@@ -615,7 +621,7 @@ bool BatchDialog::createBatchFile(const wxString& filename)
     }
     catch (const FileError& error)
     {
-        wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(error.show().c_str(), _("Error"), wxOK | wxICON_ERROR);
         return false;
     }
     return true;
@@ -644,7 +650,6 @@ struct CleanUp
 
 bool BatchDialog::createBatchFile(const wxString& filename)
 {
-#ifdef FFS_WIN
     //create shell link (instead of batch file) for full Unicode support
     HRESULT hResult = E_FAIL;
     IShellLink* pShellLink = NULL;

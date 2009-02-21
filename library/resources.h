@@ -6,7 +6,6 @@
 #include <wx/string.h>
 #include <map>
 
-using namespace std;
 
 class GlobalResources
 {
@@ -92,6 +91,12 @@ public:
     wxBitmap* bitmapFilter;
     wxBitmap* bitmapBatch;
     wxBitmap* bitmapBatchSmall;
+    wxBitmap* bitmapMoveUp;
+    wxBitmap* bitmapMoveDown;
+    wxBitmap* bitmapCheckBoxTrue;
+    wxBitmap* bitmapCheckBoxFalse;
+    wxBitmap* bitmapSettings;
+    wxBitmap* bitmapSettingsSmall;
 
     wxAnimation* animationMoney;
     wxAnimation* animationSync;
@@ -100,7 +105,7 @@ public:
 
 private:
     //resource mapping
-    map<wxString, wxBitmap*> bitmapResource;
+    std::map<wxString, wxBitmap*> bitmapResource;
 };
 
 

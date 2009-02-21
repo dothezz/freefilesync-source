@@ -26,8 +26,6 @@
 &Afbreken
 &About...
 &Informatie...
-&Adjust file times
-&Pas bestandstijden aan
 &Advanced
 &Geavanceerd
 &Back
@@ -36,8 +34,6 @@
 &Annuleren
 &Compare
 &Vergelijken
-&Create
-&Creëer
 &Create batch job
 &Creëer batchjob
 &Default
@@ -66,10 +62,6 @@
 &Opnieuw proberen
 &Start
 &Start
-&Synchronize
-&Synchroniseer
-(-)	filtered out from sync-process\n
-(-)	wordt niet gesynchroniseerd\n
 ,
 .
 - different
@@ -124,8 +116,6 @@
 ==	bestanden zijn gelijk\n\n
 >>	right file is newer\n
 >>	rechter bestand is nieuwer\n
-A file time shift due to a daylight saving time change was detected for a FAT/FAT32 drive.
-Een time shift, van een bestand, door zomertijd is gedetecteerd op een FAT/FAT32 schijf.
 Abort
 Afbreken
 Abort requested: Waiting for current operation to finish...
@@ -138,20 +128,10 @@ Action
 Actie
 Add folder pair
 Voeg 1 paar gekoppelde mappen toe
-Add to exclude filter:
-Voeg toe om filter uit te sluiten:
-Adjust file times
-Pas bestandstijden aan
-Adjust modification times of all files contained in the specified folder and its subfolders. This manual adaption might become necessary if you are synchronizing against a FAT32 drive and the daylight saving time is switched. For an overview about the issue see this article:
-Past de bewerkingstijden aan van alle bestanden in de gespecificeerde map en onderliggende mappen. Deze handeling is misschien nodig als u synchroniseerd naar een FAT32-schijf en de zomertijd is ingeschakeld. Voor meer informatie hierover kunt u terecht bij het volgende artikel:
-All file times have been adjusted successfully!
-Alle bestandstijden zijn succesvol aangepast!
 All items have been synchronized!
 Alle bestanden zijn gesynchroniseerd!
 An exception occured!
 Er heeft een uitzondering plaatsgevonden!
-Apply
-Toepassen
 As a result the files are separated into the following categories:
 Hierdoor worden de bestanden gescheiden in de volgende categorieën:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
@@ -178,8 +158,8 @@ Compare by...
 Vergelelijk met...
 Comparing content
 Vergelijken van inhoud
-Comparing content of files \"%x\"
-De inhoud van \"%x\" bestanden wordt vergeleken
+Comparing content of files %x
+De inhoud van %x bestanden wordt vergeleken
 Comparing...
 Vergelijken...
 Completed
@@ -218,10 +198,10 @@ Copy new or updated files to right folder.
 Kopieer nieuwe of geupdate bestanden naar de rechter map.
 Copy to clipboard\tCTRL+C
 Kopieer naar het klembord\tCTRL+C
-Copying file \"%x\" overwriting \"%y\"
-Bestand \"%y\" wordt overschreven door een kopie van \"%x\"
-Copying file \"%x\" to \"%y\"
-Bestand \"%x\" wordt gekopieerd naar \"%y\"
+Copying file %x overwriting %y
+Bestand %y wordt overschreven door een kopie van %x
+Copying file %x to %y
+Bestand %x wordt gekopieerd naar %y
 Could not retrieve file info for:
 Fout bij het verkrijgen van bestandsinformatie van:
 Could not set working directory:
@@ -230,8 +210,8 @@ Create a batch job
 Creëer batchjob
 Create:
 Aanmaken:
-Creating folder \"%x\"
-Map \"%x\" wordt aangemaakt
+Creating folder %x
+Map %x wordt aangemaakt
 Current operation:
 Huidige operatie:
 Custom
@@ -244,8 +224,6 @@ Data:
 Data:
 Date
 Datum
-Daylight saving time change detected for FAT/FAT32 drive.
-Zomertijdverandering gedetecteerd voor een FAT/FAT32 schijf.
 Delete files/folders existing on left side only
 Verwijder bestanden/folders die alleen links bestaan
 Delete files/folders existing on right side only
@@ -254,10 +232,10 @@ Delete files\tDEL
 Verwijder bestanden\tDEL
 Delete:
 Verwijderen:
-Deleting file \"%x\"
-Bestand \"%x\" wordt verwijderd
-Deleting folder \"%x\"
-Map \"%x\" wordt verwijderd
+Deleting file %x
+Bestand %x wordt verwijderd
+Deleting folder %x
+Map %x wordt verwijderd
 Directories are dependent:
 De volgende paden zijn afhankelijk van elkaar:
 Directory does not exist:
@@ -276,8 +254,6 @@ Donate with PayPal
 Doneer met PayPal
 Drag && drop
 Drag en drop
-Drive:
-Schijf:
 Email:
 Email:
 Error
@@ -308,8 +284,6 @@ Example
 Voorbeeld
 Exclude
 Uitsluiten
-Exclude temporarily
-Tijdelijk uitsluiten
 Feedback and suggestions are welcome at:
 Tips en suggesties zijn welkom op:
 File already exists. Overwrite?
@@ -400,8 +374,6 @@ Ignore this error, retry or abort?
 Negeer deze fout, opnieuw proberen of de handeling afbreken?
 Include
 Gebruiken
-Include temporarily
-Gebruik tijdelijk
 Include: *.doc;*.zip;*.exe\nExclude: *\\temp\\*
 Gebruiken: *.doc;*.zip;*.exe\nUitsluiten: *\\temp\\*
 Info
@@ -442,8 +414,6 @@ Only files/directories that pass filtering will be selected for synchronization.
 Alleen de niet gefilterde bestanden worden geselecteerd voor synchronisatie. Het filter wordt toegepast op de volledige naam inclusief pad-voorvoegsel.
 Open synchronization dialog
 Open de synchronisatie-instellingen
-Open with Explorer\tD-Click
-Open met Verkenner\tD-Click
 Operation aborted!
 Operatie afgebroken!
 Operation:
@@ -452,8 +422,6 @@ Pause
 Pause
 Please fill all empty directory fields.
 Vul alstublieft aan beide kanten een pad in.
-Please restart synchronization!
-Herstart het synchroniseren alstublieft!
 Press button to activate filter
 Druk op de knop om het filter te activeren.
 Preview
@@ -484,8 +452,6 @@ Select a folder
 Selecteer een map
 Select variant:
 Selecteer een variant:
-Set filter for synchronization
-Filter instellen
 Show files that are different
 Geef bestanden die verschillend zijn weer
 Show files that are equal
@@ -514,8 +480,8 @@ Swap sides
 Verwissel van kant
 Synchronization aborted!
 Synchronisatie afgebroken!
-Synchronization completed successfully.
-Synchronisatie succesvol afgerond.
+Synchronization completed successfully!
+Synchronisatie succesvol afgerond!
 Synchronization completed with errors!
 Synchronisatie afgerond. Er zijn fouten opgetreden.
 Synchronization settings
@@ -538,10 +504,6 @@ This variant evaluates two equally named files as being equal when they have the
 Deze variant ziet twee gelijknamige bestanden als gelijk wanneer ze dezelfde bestandsgrootte EN tijdstempel hebben. Merk op dat tijdstempel 2 seconden mag verschillen. Dit zorgt ervoor dat het minder nauwkeurige FAT-32 ook kan worden gesynchroniseerd.
 Time elapsed:
 Verstreken tijd:
-Time shift in seconds
-Timeshift in seconden
-Time shift:
-Timeshift:
 Time:
 Tijd:
 Total amount of data that will be transferred
@@ -554,8 +516,6 @@ Unable to create logfile!
 Niet mogelijk om een logbestand aan te maken!
 Unable to initialize Recycle Bin!
 De prullenbak kon niet worden geïnitialiseerd!
-Unresolved errors occured during operation!
-Er zijn niet oplosbare fouten opgetreden tijdens de handeling!
 Update ->
 Overschrijven ->
 Update:
@@ -570,8 +530,6 @@ Warning: Synchronization failed for %x item(s):
 Let op: %x item(s) konden niet worden gesynchroniseerd: 
 When \"Compare\" is triggered with this option set the following decision tree is processed:
 Wanneer \"Compare\" met deze instelling aan wordt gebruikt zal de volgende beslissingsboom gebruikt worden:
-You can adjust the file times accordingly to resolve the issue:
-U kunt de bestandstijden aanpassen om het probleem op te lossen:
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 U kunt proberen om de resterende bestanden opnieuw te synchroniseren (ZONDER opnieuw te hoeven vergelijken)!
 different

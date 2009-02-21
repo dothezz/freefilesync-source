@@ -14,14 +14,32 @@ using namespace FreeFileSync;
 SyncProcess::SyncProcess(bool useRecycler, bool lineBreakOnMessages, StatusHandler* handler) :
         useRecycleBin(useRecycler),
         statusUpdater(handler),
-        txtCopyingFile(_("Copying file \"%x\" to \"%y\"")),
-        txtOverwritingFile(_("Copying file \"%x\" overwriting \"%y\"")),
-        txtCreatingFolder(_("Creating folder \"%x\"")),
-        txtDeletingFile(_("Deleting file \"%x\"")),
-        txtDeletingFolder(_("Deleting folder \"%x\""))
+        txtCopyingFile(_("Copying file %x to %y")),
+        txtOverwritingFile(_("Copying file %x overwriting %y")),
+        txtCreatingFolder(_("Creating folder %x")),
+        txtDeletingFile(_("Deleting file %x")),
+        txtDeletingFolder(_("Deleting folder %x"))
 {
     if (lineBreakOnMessages)
-        optionalLineBreak = wxT("\n");
+    {
+        txtCopyingFile.Replace(    wxT("%x"), wxT("\n\"%x\""), false);
+        txtCopyingFile.Replace(    wxT("%y"), wxT("\n\"%y\""), false);
+        txtOverwritingFile.Replace(wxT("%x"), wxT("\n\"%x\""), false);
+        txtOverwritingFile.Replace(wxT("%y"), wxT("\n\"%y\""), false);
+        txtCreatingFolder.Replace( wxT("%x"), wxT("\n\"%x\""), false);
+        txtDeletingFile.Replace(   wxT("%x"), wxT("\n\"%x\""), false);
+        txtDeletingFolder.Replace( wxT("%x"), wxT("\n\"%x\""), false);
+    }
+    else
+    {
+        txtCopyingFile.Replace(    wxT("%x"), wxT("\"%x\""), false);
+        txtCopyingFile.Replace(    wxT("%y"), wxT("\"%y\""), false);
+        txtOverwritingFile.Replace(wxT("%x"), wxT("\"%x\""), false);
+        txtOverwritingFile.Replace(wxT("%y"), wxT("\"%y\""), false);
+        txtCreatingFolder.Replace( wxT("%x"), wxT("\"%x\""), false);
+        txtDeletingFile.Replace(   wxT("%x"), wxT("\"%x\""), false);
+        txtDeletingFolder.Replace( wxT("%x"), wxT("\"%x\""), false);
+    }
 }
 
 
@@ -139,7 +157,7 @@ bool getBytesToTransfer(int& objectsToCreate,
     return true;
 }
 
-void copyfileMultithreaded(const wxString& source, const wxString& target, StatusHandler* updateClass);
+void copyfileMultithreaded(const Zstring& source, const Zstring& target, StatusHandler* updateClass);
 
 
 bool SyncProcess::synchronizeFile(const FileCompareLine& cmpLine, const SyncConfiguration& config)
@@ -168,7 +186,7 @@ bool SyncProcess::synchronizeFile(const FileCompareLine& cmpLine, const SyncConf
 
             statusText = txtCopyingFile;
             statusText.Replace(wxT("%x"), cmpLine.fileDescrLeft.fullName, false);
-            statusText.Replace(wxT("%y"), target, false);
+            statusText.Replace(wxT("%y"), cmpLine.fileDescrRight.directory, false);
             statusUpdater->updateStatusText(statusText);
 
             copyfileMultithreaded(cmpLine.fileDescrLeft.fullName, target, statusUpdater);
@@ -188,7 +206,7 @@ bool SyncProcess::synchronizeFile(const FileCompareLine& cmpLine, const SyncConf
 
             statusText = txtCopyingFile;
             statusText.Replace(wxT("%x"), cmpLine.fileDescrRight.fullName, false);
-            statusText.Replace(wxT("%y"), target, false);
+            statusText.Replace(wxT("%y"), cmpLine.fileDescrLeft.directory, false);
             statusUpdater->updateStatusText(statusText);
 
             copyfileMultithreaded(cmpLine.fileDescrRight.fullName, target, statusUpdater);
@@ -278,7 +296,7 @@ bool SyncProcess::synchronizeFolder(const FileCompareLine& cmpLine, const SyncCo
 
             //some check to catch the error that directory on source has been deleted externally after "compare"...
             if (!wxDirExists(cmpLine.fileDescrLeft.fullName))
-                throw FileError(wxString(_("Error: Source directory does not exist anymore:")) + wxT(" \"") + cmpLine.fileDescrLeft.fullName.c_str() + wxT("\""));
+                throw FileError(Zstring(_("Error: Source directory does not exist anymore:")) + wxT(" \"") + cmpLine.fileDescrLeft.fullName + wxT("\""));
             createDirectory(target);
             copyFolderAttributes(cmpLine.fileDescrLeft.fullName, target);
             break;
@@ -301,7 +319,7 @@ bool SyncProcess::synchronizeFolder(const FileCompareLine& cmpLine, const SyncCo
 
             //some check to catch the error that directory on source has been deleted externally after "compare"...
             if (!wxDirExists(cmpLine.fileDescrRight.fullName))
-                throw FileError(wxString(_("Error: Source directory does not exist anymore:")) + wxT(" \"") + cmpLine.fileDescrRight.fullName.c_str() + wxT("\""));
+                throw FileError(Zstring(_("Error: Source directory does not exist anymore:")) + wxT(" \"") + cmpLine.fileDescrRight.fullName + wxT("\""));
             createDirectory(target);
             copyFolderAttributes(cmpLine.fileDescrRight.fullName, target);
             break;
@@ -361,7 +379,7 @@ public:
 
 private:
     FileCompareResult& gridToWrite;
-    set<int> rowsProcessed;
+    std::set<int> rowsProcessed;
 };
 
 
@@ -381,12 +399,12 @@ void SyncProcess::startSynchronizationProcess(FileCompareResult& grid, const Syn
     int objectsToOverwrite = 0;
     int objectsToDelete    = 0;
     double dataToProcess   = 0;
-    calcTotalBytesToSync(objectsToCreate,
+    calcTotalBytesToSync(grid,
+                         config,
+                         objectsToCreate,
                          objectsToOverwrite,
                          objectsToDelete,
-                         dataToProcess,
-                         grid,
-                         config);
+                         dataToProcess);
 
     statusUpdater->initNewProcess(objectsToCreate + objectsToOverwrite + objectsToDelete, dataToProcess, StatusHandler::PROCESS_SYNCHRONIZING);
 
@@ -495,6 +513,7 @@ void SyncProcess::startSynchronizationProcess(FileCompareResult& grid, const Syn
     catch (const RuntimeException& theException)
     {
         wxMessageBox(theException.show(), _("An exception occured!"), wxOK | wxICON_ERROR);
+        statusUpdater->requestAbortion();
         return;
     }
 }
@@ -510,18 +529,18 @@ public:
     UpdateWhileCopying() {}
     ~UpdateWhileCopying() {}
 
-    wxString source;
-    wxString target;
+    Zstring source;
+    Zstring target;
     bool success;
-    wxString errorMessage;
+    Zstring errorMessage;
 
 private:
-    virtual void longRunner() //virtual method implementation
+    void longRunner()  //virtual impl.
     {
-        if (!wxCopyFile(source, target, false)) //abort if file exists
+        if (!wxCopyFile(source.c_str(), target.c_str(), false)) //abort if file exists
         {
             success = false;
-            errorMessage = wxString(_("Error copying file:")) + wxT(" \"") + source +  wxT("\" -> \"") + target + wxT("\"");
+            errorMessage = Zstring(_("Error copying file:")) + wxT(" \"") + source +  wxT("\" -> \"") + target + wxT("\"");
             return;
         }
 
@@ -530,7 +549,7 @@ private:
         if (stat(source.c_str(), &fileInfo) != 0) //read modification time from source file
         {
             success = false;
-            errorMessage = wxString(_("Could not retrieve file info for:")) + wxT(" \"") + source + wxT("\"");
+            errorMessage = Zstring(_("Could not retrieve file info for:")) + wxT(" \"") + source + wxT("\"");
             return;
         }
 
@@ -541,7 +560,7 @@ private:
         if (utime(target.c_str(), &newTimes) != 0)
         {
             success = false;
-            errorMessage = wxString(_("Error changing modification time:")) + wxT(" \"") + target + wxT("\"");
+            errorMessage = Zstring(_("Error changing modification time:")) + wxT(" \"") + target + wxT("\"");
             return;
         }
 #endif  // FFS_LINUX
@@ -551,7 +570,7 @@ private:
 };
 
 
-void copyfileMultithreaded(const wxString& source, const wxString& target, StatusHandler* updateClass)
+void copyfileMultithreaded(const Zstring& source, const Zstring& target, StatusHandler* updateClass)
 {
     static UpdateWhileCopying copyAndUpdate; //single instantiation: after each execution thread enters wait phase
 
@@ -569,12 +588,12 @@ void copyfileMultithreaded(const wxString& source, const wxString& target, Statu
 }
 
 
-void FreeFileSync::calcTotalBytesToSync(int& objectsToCreate,
+void FreeFileSync::calcTotalBytesToSync(const FileCompareResult& fileCmpResult,
+                                        const SyncConfiguration& config,
+                                        int& objectsToCreate,
                                         int& objectsToOverwrite,
                                         int& objectsToDelete,
-                                        double& dataToProcess,
-                                        const FileCompareResult& fileCmpResult,
-                                        const SyncConfiguration& config)
+                                        double& dataToProcess)
 {
     objectsToCreate    = 0;
     objectsToOverwrite = 0;
@@ -590,10 +609,26 @@ void FreeFileSync::calcTotalBytesToSync(int& objectsToCreate,
     {   //only sum up sizes of files AND directories
         if (getBytesToTransfer(toCreate, toOverwrite, toDelete, data, *i, config))
         {
-            objectsToCreate+=    toCreate;
-            objectsToOverwrite+= toOverwrite;
-            objectsToDelete+=    toDelete;
-            dataToProcess+=      data;
+            objectsToCreate    += toCreate;
+            objectsToOverwrite += toOverwrite;
+            objectsToDelete    += toDelete;
+            dataToProcess      += data;
         }
     }
+}
+
+
+bool FreeFileSync::synchronizationNeeded(const FileCompareResult& fileCmpResult, const SyncConfiguration& config)
+{
+    int objectsToCreate    = 0;
+    int objectsToOverwrite = 0;
+    int objectsToDelete    = 0;
+    double dataToProcess   = 0;
+    FreeFileSync::calcTotalBytesToSync(fileCmpResult,
+                                       config,
+                                       objectsToCreate,
+                                       objectsToOverwrite,
+                                       objectsToDelete,
+                                       dataToProcess);
+    return objectsToCreate + objectsToOverwrite + objectsToDelete != 0;
 }

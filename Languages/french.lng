@@ -26,8 +26,6 @@
 &Abandon
 &About...
 &A propos de...
-&Adjust file times
-&Ajuster les dates de fichiers
 &Advanced
 &Avancé
 &Back
@@ -36,8 +34,6 @@
 &Annuler
 &Compare
 &Comparer
-&Create
-&Créer
 &Create batch job
 &Créer un fichier de commandes
 &Default
@@ -46,6 +42,8 @@
 &Exportation de la liste des fichiers
 &File
 &Fichier
+&Global settings
+&Paramètres généraux
 &Help
 &Aide
 &Ignore
@@ -64,12 +62,12 @@
 &Résoudre
 &Retry
 &Réessayer
+&Save
+&Sauvegarder
 &Start
-&Démarrage
-&Synchronize
-&Synchronisation
-(-)	filtered out from sync-process\n
-(-)	non synchronisés\n
+&Démarrer 
+&Synchronize...
+&Synchroniser...
 ,
  
 - different
@@ -124,8 +122,6 @@
 ==	Les fichiers sont identiques\n\n
 >>	right file is newer\n
 >>	le fichier de droite est plus récent\n
-A file time shift due to a daylight saving time change was detected for a FAT/FAT32 drive.
-Un décalage horaire du fichier du à l'heure d'été a été détecté sur un lecteur FAT/FAT32.
 Abort
 Abandon
 Abort requested: Waiting for current operation to finish...
@@ -136,22 +132,14 @@ About
 A propos de
 Action
 Action
+Active for FAT/FAT32 drives only: When comparing filetimes treat files that differ by less or equal than 1 hour as equal. This ensures daylight saving time switches are handled properly.
+Valable seulement pour les disques FAT/FAT32: Les fichiers de même nom et dont l'heure de création diffèrent de moins d'une heure sont considérés comme identiques. Cela garantit que l'heure d'été est traitée correctement.
 Add folder pair
 Ajout d'un couple de dossiers
-Add to exclude filter:
-Ajout au filtre exclure:
-Adjust file times
-Ajuster les dates de fichiers
-Adjust modification times of all files contained in the specified folder and its subfolders. This manual adaption might become necessary if you are synchronizing against a FAT32 drive and the daylight saving time is switched. For an overview about the issue see this article:
-Ajuster les dates de modification de tous les fichiers contenus dans le dossier spécifié et ses sous-dossiers. Ce règlage manuel pourrait s'avérer nécessaire si vous synchroniser de nouveau un lecteur en FAT32 avec l'option heure d'été sectionnée. Pour plus d'informations, lire cet article :
-All file times have been adjusted successfully!
-Toutes les dates de fichiers ont été ajustées avec succès!
 All items have been synchronized!
 Tous les éléments ont été synchronisés!
 An exception occured!
 Une violation s'est produite!
-Apply
-Apliquer
 As a result the files are separated into the following categories:
 En conclusion, les fichiers sont répartis dans les catégories suivantes:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
@@ -160,10 +148,14 @@ Assemble a batch file with the following settings. To start synchronization in b
 Créer un fichier de commandes avec les paramètres suivants. Pour lancer la synchronisation en mode batch, exécutez ce fichier ou paramétrez-le dans le planificateur de tâches.
 Batch file created successfully!
 Fichier de commandes créé avec succès!
+Batch job
+Fichier de commandes
 Big thanks for localizing FreeFileSync goes out to:
 Pour les traductions de FreeFileSync, un grand merci à:
 Build:
 Créé:
+Cancel
+Annuler
 Choose to hide filtered files/directories from list
 Masquer les fichiers/répertoires filtrés
 Comma separated list
@@ -178,8 +170,8 @@ Compare by...
 Comparaison par...
 Comparing content
 Comparaison du contenu
-Comparing content of files \"%x\"
-comparaison du contenu des fichiers \"%x\"
+Comparing content of files %x
+comparaison du contenu des fichiers %x
 Comparing...
 Comparaison en cours...
 Completed
@@ -218,10 +210,10 @@ Copy new or updated files to right folder.
 Copie de fichiers nouveaux ou modifiés dans le dossier de droite.
 Copy to clipboard\tCTRL+C
 Copier dans le presse-papiers\tCTRL+C
-Copying file \"%x\" overwriting \"%y\"
-Copie fichier \"%x\" écrasant \"%y\"
-Copying file \"%x\" to \"%y\"
-Copie fichier \"%x\" vers \"%y\"
+Copying file %x overwriting %y
+Copie fichier %x écrasant %y
+Copying file %x to %y
+Copie fichier %x vers %y
 Could not retrieve file info for:
 Erreur lors de la lecture des attributs de fichier de :
 Could not set working directory:
@@ -230,12 +222,14 @@ Create a batch job
 Création du fichier de commandes
 Create:
 Créations:
-Creating folder \"%x\"
-Création du dossier \"%x\"
+Creating folder %x
+Création du dossier %x
 Current operation:
 Opération en cours:
 Custom
 Personnaliser
+Customize columns
+Personnaliser les colonnes
 DECISION TREE
 ARBRE DE DECISION
 Data remaining:
@@ -244,8 +238,6 @@ Data:
 Données:
 Date
 Date
-Daylight saving time change detected for FAT/FAT32 drive.
-Changement Heure d'été détecté sur un lecteur FAT/FAT32.
 Delete files/folders existing on left side only
 Suppression des fichiers/répertoires n'existant que sur le côté gauche
 Delete files/folders existing on right side only
@@ -254,10 +246,10 @@ Delete files\tDEL
 Suppression des fichiers\tDEL
 Delete:
 Suppressions:
-Deleting file \"%x\"
-Suppression du fichier \"%x\"
-Deleting folder \"%x\"
-Suppression du dossier \"%x\"
+Deleting file %x
+Suppression du fichier %x
+Deleting folder %x
+Suppression du dossier %x
 Directories are dependent:
 Les dossiers sont liés:
 Directory does not exist:
@@ -276,8 +268,6 @@ Donate with PayPal
 Faites un don avec PayPal
 Drag && drop
 Glisser && Déposer
-Drive:
-Lecteur:
 Email:
 Email:
 Error
@@ -310,8 +300,14 @@ Exclude
 Exclure
 Exclude temporarily
 Exclure temporairement
+Exclude via filter:
+Exclure à l'aide du filtre:
+FAT32: Handle Daylight Saving Time
+FAT32: Traitement de l'heure d'été
 Feedback and suggestions are welcome at:
 Commentaires et suggestions sont les bienvenus à:
+File Manager integration:
+Choix du Gestionnaire de Fichiers:
 File already exists. Overwrite?
 Le fichier existe déjà. Voulez-vous le remplacer?
 File content
@@ -364,6 +360,10 @@ FreeFileSync batch file
 FreeFileSync fichier de commandes
 FreeFileSync configuration
 FreeFileSync configuration
+Generating file list...
+Génération de la liste des fichiers...
+Global settings
+Paramètres généraux
 Help
 Aide
 Hide files that are different
@@ -428,6 +428,10 @@ Mirror ->>
 Mirroir ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Sauvegarde miroir du répertoire de gauche : Le répertoire de droite sera écrasé et exactement identique au répertoire de gauche après la synchronisation.
+Move column down
+Déplacer la colonne vers le bas
+Move column up
+Déplacer la colonne vers le haut
 Not all items were synchronized! Have a look at the list.
 Tous les éléments n'ont pas été synchronisés!  Veuillez vérifier la liste.
 Nothing to synchronize according to configuration!
@@ -438,12 +442,14 @@ Number of files and directories that will be deleted
 Nombre de fichiers et de répertoires qui seront supprimés
 Number of files that will be overwritten
 Nombre de fichiers qui seront remplacés
+OK
+OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the full name including path prefix.
-Seuls les fichiers/dossiers filtrés seront sélectionnés pour la synchronisation. Le filtre s'appliquera au nom complet incluant le chemin.
+Seuls les fichiers/dossiers filtrés seront sélectionnés pour la synchronisation.\nLe filtre s'appliquera au nom complet incluant le chemin.
 Open synchronization dialog
 Ouvrir la boîte de dialogue de la synchronisation
-Open with Explorer\tD-Click
-Ouvrir dans l'explorateur\tD-Click
+Open with File Manager\tD-Click
+Ouvrir avec le Gestionnaire de Fichiers\tClick droit
 Operation aborted!
 Opération abandonnée!
 Operation:
@@ -452,8 +458,6 @@ Pause
 Pause
 Please fill all empty directory fields.
 Veuillez remplir tous les champs vides du répertoire.
-Please restart synchronization!
-Veuillez, s'il vous plaît, relancer la synchronisation!
 Press button to activate filter
 Cliquez pour activer le filtrage
 Preview
@@ -484,8 +488,6 @@ Select a folder
 Choisissez un répertoire
 Select variant:
 Choisissez une variante:
-Set filter for synchronization
-Définir le filtrage
 Show files that are different
 Afficher les fichiers différents
 Show files that are equal
@@ -499,9 +501,11 @@ Afficher les fichiers existants seulement à gauche
 Show files that exist on right side only
 Afficher les fichiers existants seulement à droite
 Silent mode
-Mode silence
+Mode silencieux
 Size
 Taille
+Sorting file list...
+Tri de la liste des fichiers...
 Source code written completely in C++ utilizing:
 Code source écrit totalement en C++ et utilisant:
 Start
@@ -514,10 +518,12 @@ Swap sides
 Permuter les côtés
 Synchronization aborted!
 Synchronisation abandonnée!
-Synchronization completed successfully.
-Synchronisation terminée avec succès.
+Synchronization completed successfully!
+Synchronisation terminée avec succès!
 Synchronization completed with errors!
 Synchronisation terminée avec des erreurs!
+Synchronization filter
+Filtre de synchronisation
 Synchronization settings
 Paramétrage de la synchronisation
 Synchronization status
@@ -534,14 +540,12 @@ The file does not contain a valid configuration:
 Le fichier ne contient pas de configuration valide
 The selected file does not exist:
 Le fichier sélectionné n'existe pas:
+This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
+Cette commande sera exécutée à chaque fois que vous double-cliquez sur un nom de fichier. %x est un espace réservé pour le fichier sélectionné.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
 Cette variante définit comme identiques deux fichiers de même nom lorsqu'ils ont la même taille et le même date et heure de modification. Attention : la précision de l'heure est mesurée à 2 secondes près. Cela permet d'assurer la synchronisation avec la précision du systéme de fichiers FAT32.
 Time elapsed:
 Temps écoulé:
-Time shift in seconds
-Décalage horaire en secondes
-Time shift:
-Décalage horaire:
 Time:
 Heure:
 Total amount of data that will be transferred
@@ -554,8 +558,6 @@ Unable to create logfile!
 Impossible de créer un fichier log!
 Unable to initialize Recycle Bin!
 Impossible d'initialiser la corbeille!
-Unresolved errors occured during operation!
-Des erreurs inattendues se sont produites pendant le traitement!
 Update ->
 Mise à Jour ->
 Update:
@@ -570,8 +572,6 @@ Warning: Synchronization failed for %x item(s):
 Attention: La synchronisation a échouée pour %x élément(s):
 When \"Compare\" is triggered with this option set the following decision tree is processed:
 Quand \"Compare\" est lancé avec cette option, l'arbre de décision suivant est éxécuté:
-You can adjust the file times accordingly to resolve the issue:
-Vous pouvez modifier l'heure des fichiers pour résoudre le problème:
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Vous pouvez essayer de synchroniser à nouveau les éléments restants (SANS avoir à les re-comparer) !
 different

@@ -11,27 +11,27 @@ int globalFunctions::round(const double d)
 }
 
 
-string globalFunctions::numberToString(const unsigned int number)
+std::string globalFunctions::numberToString(const unsigned int number)
 {
     char result[100];
     sprintf(result, "%u", number);
-    return string(result);
+    return std::string(result);
 }
 
 
-string globalFunctions::numberToString(const int number)
+std::string globalFunctions::numberToString(const int number)
 {
     char result[100];
     sprintf(result, "%d", number);
-    return string(result);
+    return std::string(result);
 }
 
 
-string globalFunctions::numberToString(const float number)
+std::string globalFunctions::numberToString(const float number)
 {
     char result[100];
     sprintf(result, "%f", number);
-    return string(result);
+    return std::string(result);
 }
 
 
@@ -53,14 +53,14 @@ wxString globalFunctions::numberToWxString(const float number)
 }
 
 
-int globalFunctions::stringToInt(const string& number)
+int globalFunctions::stringToInt(const std::string& number)
 {
     return atoi(number.c_str());
 }
 
 
 inline
-double globalFunctions::stringToDouble(const string& number)
+double globalFunctions::stringToDouble(const std::string& number)
 {
     return atof(number.c_str());
 }
@@ -96,7 +96,7 @@ wxString& globalFunctions::includeNumberSeparator(wxString& number)
 }
 
 
-int globalFunctions::readInt(ifstream& stream)
+int globalFunctions::readInt(std::ifstream& stream)
 {
     int result = 0;
     char* buffer = reinterpret_cast<char*>(&result);
@@ -105,7 +105,7 @@ int globalFunctions::readInt(ifstream& stream)
 }
 
 
-void globalFunctions::writeInt(ofstream& stream, const int number)
+void globalFunctions::writeInt(std::ofstream& stream, const int number)
 {
     const char* buffer = reinterpret_cast<const char*>(&number);
     stream.write(buffer, sizeof(int));

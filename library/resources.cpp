@@ -92,6 +92,12 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("filter.png")]             = (bitmapFilter            = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("batch.png")]              = (bitmapBatch             = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("batch_small.png")]        = (bitmapBatchSmall        = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("move up.png")]            = (bitmapMoveUp            = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("move down.png")]          = (bitmapMoveDown          = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("checkbox true.png")]      = (bitmapCheckBoxTrue      = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("checkbox false.png")]     = (bitmapCheckBoxFalse     = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("settings.png")]           = (bitmapSettings          = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("settings_small.png")]     = (bitmapSettingsSmall     = new wxBitmap(wxNullBitmap));
 
     //init all the other resource files
     animationMoney = new wxAnimation(wxNullAnimation);
@@ -102,7 +108,7 @@ GlobalResources::GlobalResources()
 GlobalResources::~GlobalResources()
 {
     //free bitmap resources
-    for (map<wxString, wxBitmap*>::iterator i = bitmapResource.begin(); i != bitmapResource.end(); ++i)
+    for (std::map<wxString, wxBitmap*>::iterator i = bitmapResource.begin(); i != bitmapResource.end(); ++i)
         delete i->second;
 
     //free other resources
@@ -117,7 +123,7 @@ void loadAnimFromZip(wxZipInputStream& zipInput, wxAnimation* animation)
     //Workaround for wxWidgets:
     //construct seekable input stream (zip-input stream is non-seekable) for wxAnimation::Load()
     //luckily this method call is very fast: below measurement precision!
-    vector<unsigned char> data;
+    std::vector<unsigned char> data;
     data.reserve(10000);
 
     int newValue = 0;
@@ -141,7 +147,7 @@ void GlobalResources::load()
         wxZipInputStream resourceFile(input);
 
         wxZipEntry* entry = NULL;
-        map<wxString, wxBitmap*>::iterator bmp;
+        std::map<wxString, wxBitmap*>::iterator bmp;
         while ((entry = resourceFile.GetNextEntry()))
         {
             wxString name = entry->GetName();

@@ -97,13 +97,13 @@ namespace FreeFileSync
             if (aLength != bLength)
                 return aLength < bLength;
 #ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
-            return relativeName.CmpNoCase(b.relativeName) < 0;
+            return relativeName.CmpNoCase(b.relativeName) < 0; //implementing a (reverse) comparison manually is a lot slower!
 #elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
             return relativeName.Cmp(b.relativeName) < 0;
 #endif
         }
     };
-    typedef vector<FileDescrLine> DirectoryDescrType;
+    typedef std::vector<FileDescrLine> DirectoryDescrType;
 
 
     enum CompareFilesResult
@@ -129,11 +129,11 @@ namespace FreeFileSync
         CompareFilesResult cmpResult;
         bool selectedForSynchronization;
     };
-    typedef vector<FileCompareLine> FileCompareResult;
+    typedef std::vector<FileCompareLine> FileCompareResult;
 
 
     typedef int GridViewLine;
-    typedef vector<GridViewLine> GridView;  //vector of references to lines in FileCompareResult
+    typedef std::vector<GridViewLine> GridView;  //vector of references to lines in FileCompareResult
 
 
     struct FolderPair
@@ -150,7 +150,7 @@ namespace FreeFileSync
         ~AbortThisProcess() {}
     };
 
-    const int FILE_TIME_PRECISION = 2; //file times have precision of 2 seconds due to FAT/FAT32 file systems
+    const time_t FILE_TIME_PRECISION = 2; //file times have precision of 2 seconds due to FAT/FAT32 file systems
     const wxString LAST_CONFIG_FILE = wxT("LastRun.ffs_gui");
     const wxString GLOBAL_CONFIG_FILE = wxT("GlobalSettings.xml");
 }

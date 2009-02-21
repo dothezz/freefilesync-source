@@ -6,7 +6,6 @@
 #include <wx/intl.h>
 #include <wx/panel.h>
 
-using namespace std;
 
 struct TranslationLine
 {
@@ -26,7 +25,7 @@ struct TranslationLine
         return (original == b.original);
     }
 };
-typedef set<TranslationLine> Translation;
+typedef std::set<TranslationLine> Translation;
 
 
 class CustomLocale : public wxLocale
@@ -44,7 +43,7 @@ public:
 
     const wxChar* GetString(const wxChar* szOrigString, const wxChar* szDomain = NULL) const;
 
-    static const string FfsLanguageDat;
+    static const std::string FfsLanguageDat;
 
 private:
     Translation translationDB;

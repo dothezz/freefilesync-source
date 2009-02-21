@@ -16,11 +16,9 @@
 #include "../library/resources.h"
 #include "../library/misc.h"
 #include <wx/dnd.h>
-#include <wx/config.h>
 #include <stack>
 #include "../library/processXml.h"
 
-using namespace std;
 
 //IDs for context menu items
 enum ContextItem
@@ -31,8 +29,8 @@ enum ContextItem
     CONTEXT_CLIPBOARD,
     CONTEXT_EXPLORER,
     CONTEXT_DELETE_FILES,
-    CONTEXT_HIDE_COLUMN,
-    CONTEXT_SHOW_ALL_COLUMNS
+    CONTEXT_CUSTOMIZE_COLUMN_LEFT,
+    CONTEXT_CUSTOMIZE_COLUMN_RIGHT
 };
 
 extern const wxGrid* leadGrid; //point to grid that is in focus
@@ -72,11 +70,11 @@ private:
     void updateStatusInformation(const GridView& output);
 
     //context menu functions
-    set<int> getSelectedRows(const wxGrid* grid);
-    void filterRangeTemp(const set<int>& rowsToFilterOnUI_View);
+    std::set<int> getSelectedRows(const wxGrid* grid);
+    void filterRangeManually(const std::set<int>& rowsToFilterOnUiTable);
     void copySelectionToClipboard(const wxGrid* selectedGrid);
-    void openWithFileBrowser(int rowNumber, const wxGrid* grid);
-    void deleteFilesOnGrid(const set<int>& rowsToDeleteOnUI);
+    void openWithFileManager(int rowNumber, const wxGrid* grid);
+    void deleteFilesOnGrid(const std::set<int>& rowsToDeleteOnUI);
 
     //work to be done in idle time
     void OnIdleEvent(wxEvent& event);
@@ -111,6 +109,7 @@ private:
     void OnRightGridDoubleClick(wxGridEvent& event);
     void OnSortLeftGrid(        wxGridEvent& event);
     void OnSortRightGrid(       wxGridEvent& event);
+    void OnSortMiddleGrid(      wxGridEvent& event);
 
     void OnLeftOnlyFiles(       wxCommandEvent& event);
     void OnLeftNewerFiles(      wxCommandEvent& event);
@@ -144,18 +143,22 @@ private:
     //menu events
     void OnMenuSaveConfig(      wxCommandEvent& event);
     void OnMenuLoadConfig(      wxCommandEvent& event);
+    void OnMenuGlobalSettings(  wxCommandEvent& event);
     void OnMenuExportFileList(  wxCommandEvent& event);
-    void OnMenuAdjustFileTimes( wxCommandEvent& event);
     void OnMenuBatchJob(        wxCommandEvent& event);
     void OnMenuAbout(           wxCommandEvent& event);
     void OnMenuQuit(            wxCommandEvent& event);
-    void OnMenuLangEnglish(     wxCommandEvent& event);
-    void OnMenuLangGerman(      wxCommandEvent& event);
-    void OnMenuLangFrench(      wxCommandEvent& event);
-    void OnMenuLangJapanese(    wxCommandEvent& event);
-    void OnMenuLangDutch(       wxCommandEvent& event);
     void OnMenuLangChineseSimp( wxCommandEvent& event);
+    void OnMenuLangDutch(       wxCommandEvent& event);
+    void OnMenuLangEnglish(     wxCommandEvent& event);
+    void OnMenuLangFrench(      wxCommandEvent& event);
+    void OnMenuLangGerman(      wxCommandEvent& event);
+    void OnMenuLangItalian(     wxCommandEvent& event);
+    void OnMenuLangJapanese(    wxCommandEvent& event);
+    void OnMenuLangPolish(      wxCommandEvent& event);
+    void OnMenuLangPortuguese(  wxCommandEvent& event);
 
+    void changeProgramLanguage(const int langID);
     void enableSynchronization(bool value);
 
 //***********************************************
@@ -176,7 +179,7 @@ private:
 
     //folder pairs:
     //m_directoryLeft, m_directoryRight
-    vector<FolderPairGenerated*> additionalFolderPairs; //additional pairs to the standard pair
+    std::vector<FolderPairGenerated*> additionalFolderPairs; //additional pairs to the standard pair
 
     //gui settings
     int widthNotMaximized;
@@ -187,7 +190,7 @@ private:
 //-------------------------------------
 
     //convenience method to get all folder pairs (unformatted)
-    void getFolderPairs(vector<FolderPair>& output,  bool formatted = false);
+    void getFolderPairs(std::vector<FolderPair>& output,  bool formatted = false);
 
     //UI View Filter settings
     bool leftOnlyFilesActive;
@@ -204,15 +207,14 @@ private:
 
     //status information
     wxLongLong lastStatusChange;
-    stack<wxString> stackObjects;
+    std::stack<wxString> stackObjects;
 
     //compare status panel (hidden on start, shown when comparing)
     CompareStatus* compareStatus;
 
     //save the last used config filenames
-    wxConfig* cfgFileHistory;
-    vector<wxString> cfgFileNames;
-    static const int CfgHistroyLength = 10;
+    std::vector<wxString> cfgFileNames;
+    static const unsigned int CFG_HISTORY_LENGTH = 10;
 
     //variables for filtering of m_grid3
     bool filteringInitialized;
@@ -225,7 +227,7 @@ private:
         wxString relativeName;
         FileDescrLine::ObjectType type;
     };
-    vector<FilterObject> exFilterCandidateObj;
+    std::vector<FilterObject> exFilterCandidateObj;
 
     bool synchronizationEnabled; //determines whether synchronization should be allowed
 
@@ -265,10 +267,10 @@ public:
     CompareStatusHandler(MainDialog* dlg);
     ~CompareStatusHandler();
 
-    void updateStatusText(const wxString& text);
+    void updateStatusText(const Zstring& text);
     void initNewProcess(int objectsTotal, double dataTotal, Process processID);
     void updateProcessedData(int objectsProcessed, double dataProcessed);
-    ErrorHandler::Response reportError(const wxString& text);
+    ErrorHandler::Response reportError(const Zstring& text);
 
     void forceUiRefresh();
 
@@ -287,10 +289,10 @@ public:
     SyncStatusHandler(wxWindow* dlg, bool ignoreAllErrors);
     ~SyncStatusHandler();
 
-    void updateStatusText(const wxString& text);
+    void updateStatusText(const Zstring& text);
     void initNewProcess(int objectsTotal, double dataTotal, Process processID);
     void updateProcessedData(int objectsProcessed, double dataProcessed);
-    ErrorHandler::Response reportError(const wxString& text);
+    ErrorHandler::Response reportError(const Zstring& text);
 
     void forceUiRefresh();
 

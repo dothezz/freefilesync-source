@@ -63,7 +63,7 @@ class BatchDialog: public BatchDlgGenerated
 public:
     BatchDialog(wxWindow* window,
                 const MainConfiguration& config,
-                const vector<FolderPair>& folderPairs);
+                const std::vector<FolderPair>& folderPairs);
 
     ~BatchDialog();
 
@@ -82,14 +82,14 @@ private:
 
     void OnClose(           wxCloseEvent&   event);
     void OnCancel(          wxCommandEvent& event);
-    void OnCreateBatchJob(  wxCommandEvent& event);
+    void OnSaveBatchJob(    wxCommandEvent& event);
 
     void updateFilterButton();
 
-    bool createBatchFile(const wxString& filename);
+    bool saveBatchFile(const wxString& filename);
 
     SyncConfiguration localSyncConfiguration;
-    vector<BatchFolderPairGenerated*> localFolderPairs;
+    std::vector<BatchFolderPairGenerated*> localFolderPairs;
 
     bool filterIsActive;
 };

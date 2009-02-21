@@ -3,6 +3,9 @@ ENDFLAGS=`wx-config --libs` -lwx_gtk2_aui-2.8 -O3 -pthread
 
 all: FreeFileSync
 
+init:
+	mkdir obj
+	
 obj/algorithm.o: algorithm.cpp
 	g++ $(CPPFLAGS) algorithm.cpp -o obj/algorithm.o
 
@@ -65,9 +68,12 @@ obj/processXml.o: library/processXml.cpp
 	
 obj/zstring.o: library/zstring.cpp
 	g++ $(CPPFLAGS) library/zstring.cpp -o obj/zstring.o
+	
+obj/customButton.o: library/customButton.cpp
+	g++ $(CPPFLAGS) library/customButton.cpp -o obj/customButton.o
 
-	FreeFileSync: obj/application.o obj/algorithm.o obj/comparison.o obj/synchronization.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/fileHandling.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/statusHandler.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o obj/zstring.o
-	g++ $(ENDFLAGS) -o FreeFileSync obj/application.o obj/algorithm.o obj/comparison.o obj/synchronization.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/fileHandling.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/statusHandler.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o obj/zstring.o
+FreeFileSync: init obj/application.o obj/algorithm.o obj/comparison.o obj/customButton.o obj/synchronization.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/fileHandling.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/statusHandler.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o obj/zstring.o
+	g++ $(ENDFLAGS) -o FreeFileSync obj/application.o obj/algorithm.o obj/comparison.o obj/customButton.o obj/synchronization.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/fileHandling.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/statusHandler.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o obj/zstring.o
 
 clean:
 	find obj -type f -exec rm {} \;

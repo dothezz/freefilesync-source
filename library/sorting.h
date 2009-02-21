@@ -5,6 +5,7 @@
 #include "resources.h"
 #include "globalFunctions.h"
 
+using namespace FreeFileSync;
 
 enum SideToSort
 {
@@ -115,11 +116,11 @@ bool sortByFileName(const FileCompareLine& a, const FileCompareLine& b)
         const wxChar* stringB = descrLineB->relativeName.c_str();
 
         size_t pos = descrLineA->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
-        if (pos != string::npos)
+        if (pos != std::string::npos)
             stringA += pos + 1;
 
         pos = descrLineB->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
-        if (pos != string::npos)
+        if (pos != std::string::npos)
             stringB += pos + 1;
 
         return stringSmallerThan<sortAscending>(stringA, stringB);
@@ -247,6 +248,22 @@ bool sortByDate(const FileCompareLine& a, const FileCompareLine& b)
         return sortAscending ?
                descrLineA->lastWriteTimeRaw < descrLineB->lastWriteTimeRaw :
                descrLineA->lastWriteTimeRaw > descrLineB->lastWriteTimeRaw;
+}
+
+
+template <bool sortAscending>
+inline
+bool sortByCmpResult(const FileCompareLine& a, const FileCompareLine& b)
+{
+    //presort result: equal shall appear at end of list
+    if (a.cmpResult == FILE_EQUAL)
+        return false;
+    if (b.cmpResult == FILE_EQUAL)
+        return true;
+
+    return sortAscending ?
+           a.cmpResult < b.cmpResult :
+           a.cmpResult > b.cmpResult;
 }
 
 

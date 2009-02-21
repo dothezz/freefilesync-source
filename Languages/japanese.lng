@@ -26,8 +26,6 @@
 情報(&A)
 &About...
 情報(&A)...
-&Adjust file times
-ファイル時間の調整(&A)
 &Advanced
 拡張(&A)
 &Back
@@ -36,8 +34,6 @@
 キャンセル(&C)
 &Compare
 比較(&C)
-&Create
-作成(&C)
 &Create batch job
 一括ジョブを作成(&C)
 &Default
@@ -46,6 +42,8 @@
 ファイル一覧をエクスポート(&E)
 &File
 ファイル(&F)
+&Global settings
+全般的な設定(&G)
 &Help
 ヘルプ(&H)
 &Ignore
@@ -64,12 +62,12 @@
 決定(&R)
 &Retry
 再試行(&R)
+&Save
+保存(&S)
 &Start
 開始(&S)
-&Synchronize
-同期(&S)
-(-)	filtered out from sync-process\n
-(-)	同期処理対象から除外\n
+&Synchronize...
+同期(&S)...
 ,
 .
 - different
@@ -119,13 +117,11 @@
 <multiple selection>
 <複数選択>
 <|	file on left side only\n
-<|	左側のみに存在するファイル\n
+<|	左側のみに存在\n
 ==	files are equal\n\n
 ==	同じ内容のファイル\n\n
 >>	right file is newer\n
 >>	右側の方が新しい\n
-A file time shift due to a daylight saving time change was detected for a FAT/FAT32 drive.
-FAT/FAT32 ドライブにおいて、夏時間の変更に伴う時間のシフトが検出されました。
 Abort
 中断
 Abort requested: Waiting for current operation to finish...
@@ -136,22 +132,14 @@ About
 情報
 Action
 操作
+Active for FAT/FAT32 drives only: When comparing filetimes treat files that differ by less or equal than 1 hour as equal. This ensures daylight saving time switches are handled properly.
+FAT/FAT32 ドライブのみ有効: ファイルの時間を比較するとき、差異が 1 時間未満より少ないか同等かで判断します。これにより、夏時間の切り替えが適切に行われるようになります。
 Add folder pair
 フォルダのペアを追加
-Add to exclude filter:
-除外フィルターを追加
-Adjust file times
-ファイル時間の調整
-Adjust modification times of all files contained in the specified folder and its subfolders. This manual adaption might become necessary if you are synchronizing against a FAT32 drive and the daylight saving time is switched. For an overview about the issue see this article:
-指定したフォルダとそのサブフォルダに存在する、すべてのファイルの更新時間を調整します。\nFAT32ドライブを同期に使用している場合は、\nここで最適化しておく必要があるかもしれません(夏時間は切り替えられます)\n\n　この機能に関する詳細については、こちらをご覧ください:
-All file times have been adjusted successfully!
-ファイルの時間調整が完了しました!
 All items have been synchronized!
 すべてのアイテムは同期されました!
 An exception occured!
 例外が発生しました!
-Apply
-適用
 As a result the files are separated into the following categories:
 ファイルは以下のカテゴリに分類されます:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
@@ -160,10 +148,14 @@ Assemble a batch file with the following settings. To start synchronization in b
 以下の設定で一括処理(バッチ)ファイルを作成します。使用方法は、そのままファイルを実行するか、OS のタスクスケジューラを利用して実行することもできます。
 Batch file created successfully!
 バッチファイルが作成されました!
+Batch job
+一括処理
 Big thanks for localizing FreeFileSync goes out to:
 FreeFileSync のローカライズへの協力に感謝します:
 Build:
 ビルド:
+Cancel
+中止
 Choose to hide filtered files/directories from list
 リストから除外したいファイル/ディレクトリを選択
 Comma separated list
@@ -178,8 +170,8 @@ Compare by...
 比較対象...
 Comparing content
 内容の比較中
-Comparing content of files \"%x\"
-ファイル \"%x\" の内容を比較中
+Comparing content of files %x
+ファイル %x の内容を比較中
 Comparing...
 比較中...
 Completed
@@ -218,10 +210,10 @@ Copy new or updated files to right folder.
 新しい(更新)ファイルを右フォルダにコピー
 Copy to clipboard\tCTRL+C
 クリップボードにコピー\tCTRL+C
-Copying file \"%x\" overwriting \"%y\"
-ファイル \"%x\" をコピー、\"%y\" に上書き中
-Copying file \"%x\" to \"%y\"
-ファイル \"%x\" を \"%y\" にコピー中
+Copying file %x overwriting %y
+ファイル %x をコピー、%y に上書き中
+Copying file %x to %y
+ファイル %x を %y にコピー中
 Could not retrieve file info for:
 ファイル情報を取得できません:
 Could not set working directory:
@@ -230,12 +222,14 @@ Create a batch job
 一括ジョブを作成
 Create:
 作成:
-Creating folder \"%x\"
-フォルダ \"%x\" を作成中
+Creating folder %x
+フォルダ %x を作成中
 Current operation:
 現在の操作:
 Custom
 カスタム
+Customize columns
+列の調整
 DECISION TREE
 [判定ツリー]
 Data remaining:
@@ -244,8 +238,6 @@ Data:
 データ:
 Date
 データ
-Daylight saving time change detected for FAT/FAT32 drive.
-FAT/FAT32 ドライブで検出された夏時間の変更
 Delete files/folders existing on left side only
 左側のみに存在するファイル/フォルダを削除
 Delete files/folders existing on right side only
@@ -254,10 +246,10 @@ Delete files\tDEL
 ファイルを削除\tDEL
 Delete:
 削除:
-Deleting file \"%x\"
-ファイル \"%x\" を削除中
-Deleting folder \"%x\"
-フォルダ \"%x\" を削除中
+Deleting file %x
+ファイル %x を削除中
+Deleting folder %x
+フォルダ %x を削除中
 Directories are dependent:
 ディレクトリの依存関係:
 Directory does not exist:
@@ -276,8 +268,6 @@ Donate with PayPal
 PayPal から寄付する
 Drag && drop
 ドラッグ && ドロップ
-Drive:
-ドライブ:
 Email:
 E-メール:
 Error
@@ -310,8 +300,14 @@ Exclude
 除外
 Exclude temporarily
 一時フォルダを除外
+Exclude via filter:
+フィルターを通して除外
+FAT32: Handle Daylight Saving Time
+FAT32: 夏時間の取り扱いを有効
 Feedback and suggestions are welcome at:
 フィードバック、提案など:
+File Manager integration:
+ファイラとの統合:
 File already exists. Overwrite?
 ファイルは存在します、上書きしますか?
 File content
@@ -364,6 +360,10 @@ FreeFileSync batch file
 FreeFileSync バッチファイル
 FreeFileSync configuration
 FreeFileSync 構成設定
+Generating file list...
+ファイル一覧を作成中...
+Global settings
+全般的な設定
 Help
 ヘルプ
 Hide files that are different
@@ -428,6 +428,10 @@ Mirror ->>
 ミラー >>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 左側フォルダをミラーリングバックアップ: 同期完了後は、左側フォルダに合わせて右側フォルダは上書きされます。
+Move column down
+列を下に移動
+Move column up
+列を上に移動
 Not all items were synchronized! Have a look at the list.
 すべてのアイテムは同期されていません! 詳細はリストをご覧ください。
 Nothing to synchronize according to configuration!
@@ -438,12 +442,14 @@ Number of files and directories that will be deleted
 削除されたファイルとディレクトリ数
 Number of files that will be overwritten
 上書きされたファイル数
+OK
+OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the full name including path prefix.
 選択されたファイル/ディレクトリを同期処理する時だけフィルタリングされます。\nこのフィルターは、接頭語を含むパスと完全な名前にのみ適用されます。
 Open synchronization dialog
 同期ダイアログを開く
-Open with Explorer\tD-Click
-エクスプローラで開く\tD-Click
+Open with File Manager\tD-Click
+ファイラーから開く\tD-クリック
 Operation aborted!
 操作の中断!
 Operation:
@@ -452,8 +458,6 @@ Pause
 一時停止
 Please fill all empty directory fields.
 アイテムが選択されていません!
-Please restart synchronization!
-同期処理を再スタートしてください!
 Press button to activate filter
 ボタンをクリックで有効化
 Preview
@@ -484,8 +488,6 @@ Select a folder
 フォルダを選択
 Select variant:
 変数を選択:
-Set filter for synchronization
-同期フィルターを設定
 Show files that are different
 差異のあるファイルを表示
 Show files that are equal
@@ -502,6 +504,8 @@ Silent mode
 サイレントモード
 Size
 サイズ
+Sorting file list...
+一覧のソート中...
 Source code written completely in C++ utilizing:
 ソースコードは C++ で書かれ、コンパイルされています:
 Start
@@ -514,10 +518,12 @@ Swap sides
 パネルを入れ替え
 Synchronization aborted!
 同期処理を中断!
-Synchronization completed successfully.
-同期処理はすべて正常に完了しました。
+Synchronization completed successfully!
+同期処理はすべて正常に完了しました!
 Synchronization completed with errors!
 同期処理は、エラーで終了しています!
+Synchronization filter
+同期フィルター
 Synchronization settings
 同期処理設定
 Synchronization status
@@ -534,14 +540,12 @@ The file does not contain a valid configuration:
 このファイルには有効な構成が含まれていません:
 The selected file does not exist:
 選択されたファイルは存在しません:
+This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
+ファイル名をダブルクリックする度に、このコマンドが実行されます。%x は選択ファイルのプレースフォルダとして機能します。
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
 この変数では、ふたつの同名ファイルが存在した場合、 それぞれのファイルサイズと最終更新日付/時間を比較します。\nファイル時間の差異が 2 秒以内の場合は検出されないということに注意してください。 (これは、FAT32システムで正確に同期を行うことができる最小値です)
 Time elapsed:
 経過時間:
-Time shift in seconds
-タイムシフト(秒)
-Time shift:
-タイムシフト:
 Time:
 時間:
 Total amount of data that will be transferred
@@ -554,8 +558,6 @@ Unable to create logfile!
 ログファイルを作成出来ません!
 Unable to initialize Recycle Bin!
 ゴミ箱の初期化が出来ません!
-Unresolved errors occured during operation!
-例外エラーが発生しました!
 Update ->
 更新 ->
 Update:
@@ -570,8 +572,6 @@ Warning: Synchronization failed for %x item(s):
 警告: %x アイテムの同期に失敗しました:
 When \"Compare\" is triggered with this option set the following decision tree is processed:
 この設定で \"比較\" トリガが実行された場合は、以下のツリーに従って処理されていきます。
-You can adjust the file times accordingly to resolve the issue:
-この問題を解決するために、ファイルの時間を調整できます:
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 残っているファイルは、再び同期することができます (再比較とは別の動作)!
 different
@@ -581,4 +581,4 @@ file exists on both sides
 on one side only
 片側のみ
 |>	file on right side only\n
-|>	右側のみに存在するファイル\n
+|>	右側のみに存在\n

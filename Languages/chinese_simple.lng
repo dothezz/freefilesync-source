@@ -14,12 +14,18 @@
  kB
 !=	files are different\n
 !=	文件不同\n
+%x directories
+%x 目录
+%x files,
+%x 文件,
+%x of %y rows in view
+%x of %y 横向视图
+%x of 1 row in view
+%x of 1 行视图
 &Abort
 取消(&A)
 &About...
 关于(&A)...
-&Adjust file times
-调整文件时间(&A)
 &Advanced
 高级(&A)
 &Back
@@ -28,8 +34,6 @@
 撒消(&C)
 &Compare
 比较(&C)
-&Create
-创建(&C)
 &Create batch job
 创建批处理作业(&C)
 &Default
@@ -58,10 +62,8 @@
 重试(&R)
 &Start
 开始(&S)
-&Synchronize
-同步(&S)
-(-)	filtered out from sync-process\n
-(-)	从同步進程中过滤出\n
+&Synchronize...
+同步(&S)...
 ,
 .
 - different
@@ -88,8 +90,14 @@
 -开源文件同步器-
 .
 ,
+1 directory
+1 目录
+1 file,
+1 文件,
 1. &Compare
 1. 比较(&C)
+1. Enter full file or directory names separated by ';' or a new line.
+1. 输入完整的文件名或目录名(用";"号或一个新行)
 2. &Synchronize...
 2. 同步(&S)...
 2. Use wildcard characters '*' and '?'.
@@ -122,20 +130,10 @@ Action
 动作
 Add folder pair
 添加成对文件夹
-Add to exclude filter:
-添加到排除过滤:
-Adjust file times
-调整文件时间
-Adjust modification times of all files contained in the specified folder and its subfolders. This manual adaption might become necessary if you are synchronizing against a FAT32 drive and the daylight saving time is switched. For an overview about the issue see this article:
-调整修改时，所有的文件载于指定的文件夹及其子文件夹。\n这本手册适应可能需要如果您是同步对FAT32驱动器和夏令时的情况。\n概述的问题参阅此文章:
-All file times have been adjusted successfully!
-所有文件时间已经调整成功!
 All items have been synchronized!
 所有项目已经同步完成!
 An exception occured!
 发生异常!
-Apply
-应用
 As a result the files are separated into the following categories:
 由该文件分为以下几类:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
@@ -162,6 +160,8 @@ Compare by...
 比较选项...
 Comparing content
 正在比较内容
+Comparing content of files %x
+正在比较档案内容的百分比 %x
 Comparing...
 比较中...
 Completed
@@ -186,6 +186,8 @@ Consider this when setting up synchronization rules: You might want to avoid wri
 设置同步规则时审核：您可能要避免写入权限能存取到这些目录，以便同步时两个不干预
 Continue
 继续
+Conversion error:
+转换错误:
 Copy from left to right
 从左侧复制到右侧
 Copy from left to right overwriting
@@ -198,12 +200,20 @@ Copy new or updated files to right folder.
 复制新的或修改过的文件到右侧文件夹
 Copy to clipboard\tCTRL+C
 复制到剪贴板\t使用CTRL+C键
+Copying file %x overwriting %y
+正复制文件 %x 正覆盖 %y
+Copying file %x to %y
+正复制文件 %x 到 %y
 Could not retrieve file info for:
 无法检索下列文件信息:
+Could not set working directory:
+无法设置工作目录:
 Create a batch job
 创建一个批工作
 Create:
 创建:
+Creating folder %x
+正创建文件夹 %x
 Current operation:
 当前操作:
 Custom
@@ -216,8 +226,6 @@ Data:
 数据:
 Date
 日期
-Daylight saving time change detected for FAT/FAT32 drive.
-改变时间(FAT/FAT32驱动器)
 Delete files/folders existing on left side only
 仅从左侧中删除文件/方件夹
 Delete files/folders existing on right side only
@@ -226,6 +234,10 @@ Delete files\tDEL
 删除文件\t使用DEL键
 Delete:
 删除:
+Deleting file %x
+正删除文件 %x
+Deleting folder %x
+正删除文件夹 %x
 Directories are dependent:
 目录已经存在:
 Directory does not exist:
@@ -248,8 +260,12 @@ Email:
 电子邮件:
 Error
 错误
+Error changing modification time:
+修改时间出错:
 Error copying file:
 复制文件出错:
+Error creating directory:
+创建目录出错:
 Error deleting directory:
 删除目录出错:
 Error deleting file:
@@ -262,16 +278,18 @@ Error reading file:
 读取文件出错:
 Error traversing directory:
 遍历目录出错:
+Error writing file:
+写入文件出错:
 Error: Source directory does not exist anymore:
 错误:源目录根本不存在:
 Example
 例如
 Exclude
 例外
-Exclude temporarily
-暂时例外
 Feedback and suggestions are welcome at:
 欢迎在下面提出反馈意见和建议:
+File already exists. Overwrite?
+文件已经存在.覆盖?
 File content
 文件内容
 File list exported!
@@ -304,6 +322,10 @@ Files/folders that exist on right side only
 仅在左侧存在的档案/文件夹
 Filter
 过滤
+Filter active: Press again to deactivate
+过滤激活: 请按键以关闭激活
+Filter files
+过滤文件
 Filter view
 过滤查看
 Folder pair
@@ -350,10 +372,10 @@ Ignore next errors
 忽略下一个错误
 Ignore this error, retry or abort synchronization?
 忽略这个错误,重试或取消同步?
+Ignore this error, retry or abort?
+忽略这个错误,重试或取消?
 Include
 包括
-Include temporarily
-暂时包括
 Include: *.doc;*.zip;*.exe\nExclude: *\\temp\\*
 包括:*.doc;*.zip;*.exe 除外:*\\temp\\*
 Info
@@ -362,6 +384,8 @@ Information
 信息
 Information: If you ignore the error or abort a re-compare will be necessary!
 信息:如果你忽略或取消这个错误则有必要作再次比较!
+Initialization of Recycle Bin failed!
+初始化回收站失败!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 初始化回收站是不大可能了!估计你使用的不是Windows系统.如果你想未来在此系统上应用请联系作者. :)
 Left folder:
@@ -372,22 +396,26 @@ Load configuration via...\n     - this list (press DEL to delete items)\n     - 
 加载配置(通过)...\n     - 这个列表(用DEL键删除项目)\n     - 拖拽到这个窗口\n     - 启动参数
 Load from file...
 从文件加载...
+Log-messages:
+日志信息:
 Mirror ->>
 镜像 ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 左侧文件夹镜像备份: 同步后右侧文件夹将被覆盖(完全匹配左边的文件夹).
 Not all items were synchronized! Have a look at the list.
 不是所有项目被同步!看一下列表
+Nothing to synchronize according to configuration!
+根据配置没有任何同步!
 Number of files and directories that will be created
 一些文件和目录将被创建
 Number of files and directories that will be deleted
 一些文件和目录将被删除
 Number of files that will be overwritten
 一些文件和目录将被覆盖
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the full name including path prefix.
+只有过滤的文件/目录将选定做同步.该过滤器将被应用到全称包括路径前缀.
 Open synchronization dialog
 打开同步对话框
-Open with Explorer\tD-Click
-随资源管理器打开\t使用双击D-Click
 Operation aborted!
 操作已取消!
 Operation:
@@ -396,8 +424,6 @@ Pause
 暂停
 Please fill all empty directory fields.
 请填满所有空的目录区域.
-Please restart synchronization!
-请重新开始同步!
 Press button to activate filter
 请按键以激活过滤
 Preview
@@ -416,6 +442,8 @@ Right folder:
 右侧文件夹:
 S&ave configuration
 保存配置(&A)
+Save aborted!
+保存失败!
 Save current configuration to file
 保存当前配置到文件
 Scanning...
@@ -426,8 +454,6 @@ Select a folder
 选择一个文件夹
 Select variant:
 选择变化的:
-Set filter for synchronization
-为同步设置过滤
 Show files that are different
 显示不同的文件
 Show files that are equal
@@ -456,8 +482,8 @@ Swap sides
 换边
 Synchronization aborted!
 同步已放弃!
-Synchronization completed successfully.
-同步成功完成.
+Synchronization completed successfully!
+同步成功完成!
 Synchronization completed with errors!
 同步已完成但有错误.
 Synchronization settings
@@ -472,14 +498,14 @@ Synchronizing...
 同步中...
 System out of memory!
 系统内在溢出!
+The file does not contain a valid configuration:
+该文件不包含有效的配置:
 The selected file does not exist:
 选定的文件不存在:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
 这两个同样变异评估命名文件时,在同等条件下,\n他们有同样的文件大小相同的最后收件日期和时间.\n请注意，该文件的时间允许偏差的2秒钟.\n这可确保同步较低文件系统FAT32的精密正常工作.
 Time elapsed:
 已用时间:
-Time shift in seconds
-几秒内的时间偏移
 Time:
 时间:
 Total amount of data that will be transferred
@@ -492,8 +518,6 @@ Unable to create logfile!
 无法创建日志!
 Unable to initialize Recycle Bin!
 无法初始化回收站!
-Unresolved errors occured during operation!
-操作中出现异常错误!
 Update ->
 升级 ->
 Update:
@@ -504,10 +528,10 @@ Use Recycle Bin when deleting or overwriting files during synchronization
 当同步时使用回收站删除或覆盖档案
 Warning
 警告
+Warning: Synchronization failed for %x item(s):
+警告:同步失败 %x (某些)项目:
 When \"Compare\" is triggered with this option set the following decision tree is processed:
 当"比较" 被触发则按照决定树这个办法规定了做以下处理:
-You can adjust the file times accordingly to resolve the issue:
-您可以调整相应的文件时间来解决这个问题:
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 您可能会尝试再次同步,其余的项目(而不必再比较)!
 different

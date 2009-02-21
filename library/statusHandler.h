@@ -1,7 +1,7 @@
 #ifndef STATUSHANDLER_H_INCLUDED
 #define STATUSHANDLER_H_INCLUDED
 
-#include <wx/string.h>
+#include "zstring.h"
 
 
 const int UI_UPDATE_INTERVAL = 100; //perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
@@ -24,7 +24,7 @@ public:
         IGNORE_ERROR = 10,
         RETRY
     };
-    virtual Response reportError(const wxString& text) = 0;
+    virtual Response reportError(const Zstring& text) = 0;
 };
 
 
@@ -45,10 +45,10 @@ public:
     };
 
     //these methods have to be implemented in the derived classes to handle error and status information
-    virtual void updateStatusText(const wxString& text) = 0;
+    virtual void updateStatusText(const Zstring& text) = 0;
     virtual void initNewProcess(int objectsTotal, double dataTotal, Process processID) = 0; //informs about the total amount of data that will be processed from now on
     virtual void updateProcessedData(int objectsProcessed, double dataProcessed) = 0;  //called periodically after data was processed
-    virtual ErrorHandler::Response reportError(const wxString& text) = 0;
+    virtual ErrorHandler::Response reportError(const Zstring& text) = 0;
 
     //this method is triggered repeatedly by requestUiRefresh() and can be used to refresh the ui by dispatching pending events
     virtual void forceUiRefresh() = 0;

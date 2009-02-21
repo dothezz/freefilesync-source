@@ -4,12 +4,13 @@
 #include <vector>
 #include <wx/grid.h>
 #include "../FreeFileSync.h"
+#include "processXml.h"
 
 using namespace FreeFileSync;
 
 
-class CustomGridTableBase;
-
+class CustomGridTable;
+class CustomGridTableMiddle;
 //##################################################################################
 
 extern const wxGrid* leadGrid; //this global variable is not very nice...
@@ -24,35 +25,128 @@ public:
                long style           = wxWANTS_CHARS,
                const wxString& name = wxGridNameStr);
 
-    ~CustomGrid();
+    virtual ~CustomGrid() {}
 
-    virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
     //overwrite virtual method to finally get rid of the scrollbars
     virtual void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh = true);
-    //this method is called when grid view changes: useful for parallel updating of multiple grids
-    virtual void DoPrepareDC(wxDC& dc);
+
     virtual void DrawColLabel(wxDC& dc, int col);
 
-    void deactivateScrollbars();
-    void setScrollFriends(CustomGrid* gridLeft, CustomGrid* gridRight, CustomGrid* gridMiddle);
-    void setGridDataTable(GridView* gridRefUI, FileCompareResult* gridData);
+    void initSettings(bool enableScrollbars,
+                      CustomGrid* gridLeft,
+                      CustomGrid* gridRight,
+                      CustomGrid* gridMiddle,
+                      GridView* gridRefUI,
+                      FileCompareResult* gridData);
+
+    //notify wxGrid that underlying table size has changed
     void updateGridSizes();
+
     //set sort direction indicator on UI
     void setSortMarker(const int sortColumn, const wxBitmap* bitmap = &wxNullBitmap);
 
-private:
+    //set visibility, position and width of columns
+    void setColumnAttributes(const xmlAccess::XmlGlobalSettings::ColumnAttributes& attr);
+    xmlAccess::XmlGlobalSettings::ColumnAttributes getColumnAttributes();
+
+    xmlAccess::XmlGlobalSettings::ColumnTypes getTypeAtPos(unsigned pos) const;
+
+    static wxString getTypeName(xmlAccess::XmlGlobalSettings::ColumnTypes colType);
+
+    static const unsigned COLUMN_TYPE_COUNT = 4;
+
+protected:
+    //set visibility, position and width of columns
+    xmlAccess::XmlGlobalSettings::ColumnAttributes columnSettings;
+
+
     void adjustGridHeights();
 
     bool scrollbarsEnabled;
-
     CustomGrid* m_gridLeft;
     CustomGrid* m_gridRight;
     CustomGrid* m_gridMiddle;
 
-    CustomGridTableBase* gridDataTable;
+    CustomGridTable* gridDataTable;
 
     int currentSortColumn;
     const wxBitmap* sortMarker;
+};
+
+
+class CustomGridLeft : public CustomGrid
+{
+public:
+    CustomGridLeft(wxWindow *parent,
+                   wxWindowID id,
+                   const wxPoint& pos   = wxDefaultPosition,
+                   const wxSize& size   = wxDefaultSize,
+                   long style           = wxWANTS_CHARS,
+                   const wxString& name = wxGridNameStr);
+
+    ~CustomGridLeft() {}
+
+    //this method is called when grid view changes: useful for parallel updating of multiple grids
+    virtual void DoPrepareDC(wxDC& dc);
+
+    virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
+};
+
+
+class CustomGridMiddle : public CustomGrid
+{
+public:
+    CustomGridMiddle(wxWindow *parent,
+                     wxWindowID id,
+                     const wxPoint& pos   = wxDefaultPosition,
+                     const wxSize& size   = wxDefaultSize,
+                     long style           = wxWANTS_CHARS,
+                     const wxString& name = wxGridNameStr);
+
+    ~CustomGridMiddle() {}
+
+    //this method is called when grid view changes: useful for parallel updating of multiple grids
+    virtual void DoPrepareDC(wxDC& dc);
+
+    virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
+
+private:
+
+    class GridCellRendererAddCheckbox : public wxGridCellStringRenderer
+    {
+    public:
+        GridCellRendererAddCheckbox(CustomGridTableMiddle* gridDataTable) : m_gridDataTable(gridDataTable) {};
+
+
+        virtual void Draw(wxGrid& grid,
+                          wxGridCellAttr& attr,
+                          wxDC& dc,
+                          const wxRect& rect,
+                          int row, int col,
+                          bool isSelected);
+
+    private:
+        CustomGridTableMiddle* m_gridDataTable;
+    };
+};
+
+
+class CustomGridRight : public CustomGrid
+{
+public:
+    CustomGridRight(wxWindow *parent,
+                    wxWindowID id,
+                    const wxPoint& pos   = wxDefaultPosition,
+                    const wxSize& size   = wxDefaultSize,
+                    long style           = wxWANTS_CHARS,
+                    const wxString& name = wxGridNameStr);
+
+    ~CustomGridRight() {}
+
+    //this method is called when grid view changes: useful for parallel updating of multiple grids
+    virtual void DoPrepareDC(wxDC& dc);
+
+    virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
 };
 
 #endif // CUSTOMGRID_H_INCLUDED

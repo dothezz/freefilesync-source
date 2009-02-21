@@ -39,6 +39,7 @@ class WorkerThread : public wxThread
 
 public:
     WorkerThread(UpdateWhileExecuting* handler) :
+            wxThread(wxTHREAD_DETACHED),
             readyToBeginProcessing(),
             beginProcessing(readyToBeginProcessing),
             threadIsInitialized(false),
