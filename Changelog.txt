@@ -1,6 +1,36 @@
 FreeFileSync
 ------------
 
+Changelog v1.16
+---------------
+Support for \\?\ path prefix for unrestricted path length (directory names > 255 characters) (windows only)
+Copy files even if target folder does not exist
+Fixed occasional error when switching languages
+Added sys-tray icon for silent batch mode (pause, abort, about)
+Support for numeric del-key
+Avoid endless loops with Vista symbolic links (don't traverse into symbolic links - configurable)
+New functionality for loading batch files (load button or drag & drop to main/batch window)
+New options for batch file error handling: "popup, ignore errors, exit with returncode < 0"
+New option to reset all warning messages
+Allow marking both sides of the main grid via CTRL + mouse-click
+Allow manual deletion of files on both or one side only (respecting selections on both sides)
+Special recylcer option for manual deletion
+New optional grid column: Full name
+Fixed locale related issue when comparing. Big thanks to Persson Henric for providing support!
+New check if more than 50% of files will be overwritten/deleted
+Save memory by clearing old results before re-comparing
+Usability improvements:
+	- name of config file in window title
+	- refresh view filters on configuration load
+	- default to ascending sort when changing column
+	- maximum length of config file history customizable through xml
+	- new "load configuration" button
+	- check/uncheck option for middle grid
+	- support for CTRL + A (select all)
+	- enhanced error messages (windows only)
+Updated translation files
+
+
 Changelog v1.15
 ---------------
 Fixed performance bottleneck in batch mode (non-silent)

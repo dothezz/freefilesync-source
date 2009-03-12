@@ -9,6 +9,13 @@ using namespace FreeFileSync;
 
 namespace xmlAccess
 {
+    enum OnError
+    {
+        ON_ERROR_POPUP,
+        ON_ERROR_IGNORE,
+        ON_ERROR_EXIT
+    };
+
     enum XmlType
     {
         XML_GUI_CONFIG,
@@ -17,28 +24,49 @@ namespace xmlAccess
         XML_OTHER
     };
 
-    XmlType getXmlType(const wxString& filename);
+    enum ColumnTypes
+    {
+        FILENAME = 0,
+        REL_PATH,
+        SIZE,
+        DATE,
+        FULL_NAME
+    };
+    const unsigned COLUMN_TYPE_COUNT = 5;
 
+    struct ColumnAttrib
+    {
+        ColumnTypes type;
+        bool        visible;
+        unsigned    position;
+        int         width;
+    };
+    typedef std::vector<ColumnAttrib> ColumnAttributes;
+
+    XmlType getXmlType(const wxString& filename);
+//---------------------------------------------------------------------
 
     struct XmlGuiConfig
     {
-        XmlGuiConfig() : hideFilteredElements(false) {} //initialize values
+        XmlGuiConfig() : hideFilteredElements(false), ignoreErrors(false) {} //initialize values
 
         MainConfiguration mainCfg;
         std::vector<FolderPair> directoryPairs;
 
         bool hideFilteredElements;
+        bool ignoreErrors; //reaction on error situation during synchronization
     };
 
 
     struct XmlBatchConfig
     {
-        XmlBatchConfig() :  silent(false) {}
+        XmlBatchConfig() : silent(false), handleError(ON_ERROR_POPUP) {}
 
         MainConfiguration mainCfg;
         std::vector<FolderPair> directoryPairs;
 
         bool silent;
+        OnError handleError; //reaction on error situation during synchronization
     };
 
     int retrieveSystemLanguage();
@@ -47,40 +75,30 @@ namespace xmlAccess
     struct XmlGlobalSettings
     {
 //---------------------------------------------------------------------
-//internal structures:
-        enum ColumnTypes
+        struct _Shared
         {
-            FILENAME = 0,
-            REL_PATH,
-            SIZE,
-            DATE
-        };
-
-        struct ColumnAttrib
-        {
-            ColumnTypes type;
-            bool        visible;
-            unsigned    position;
-            int         width;
-        };
-        typedef std::vector<ColumnAttrib> ColumnAttributes;
-
-//---------------------------------------------------------------------
-        struct _Global
-        {
-            _Global() :
+            _Shared() :
                     programLanguage(retrieveSystemLanguage()),
 #ifdef FFS_WIN
                     handleDstOnFat32(true),
 #endif
-                    folderDependCheckActive(true) {}
+                    traverseSymbolicLinks(false)
+            {
+                resetWarnings();
+            }
 
             int programLanguage;
 #ifdef FFS_WIN
             bool handleDstOnFat32;
 #endif
-            bool folderDependCheckActive;
-        } global;
+            bool traverseSymbolicLinks;
+
+            //warnings
+            void resetWarnings();
+
+            bool warningDependentFolders;
+            bool warningSignificantDifference;
+        } shared;
 
 //---------------------------------------------------------------------
         struct _Gui
@@ -92,10 +110,13 @@ namespace xmlAccess
                     posYNotMaximized(wxDefaultCoord),
                     isMaximized(false),
 #ifdef FFS_WIN
-                    commandLineFileManager(wxT("explorer /select, %x"))
+                    commandLineFileManager(wxT("explorer /select, %name")),
 #elif defined FFS_LINUX
-                    commandLineFileManager(wxT("konqueror \"%path\""))
+                    commandLineFileManager(wxT("konqueror \"%path\"")),
 #endif
+                    cfgHistoryMaxItems(10),
+                    deleteOnBothSides(false),
+                    useRecyclerForManualDeletion(FreeFileSync::recycleBinExists()) //enable if OS supports it; else user will have to activate first and then get an error message
             {}
 
             int widthNotMaximized;
@@ -106,8 +127,11 @@ namespace xmlAccess
 
             ColumnAttributes columnAttribLeft;
             ColumnAttributes columnAttribRight;
-            std::vector<wxString> cfgFileHistory;
             wxString commandLineFileManager;
+            std::vector<wxString> cfgFileHistory;
+            unsigned cfgHistoryMaxItems;
+            bool deleteOnBothSides;
+            bool useRecyclerForManualDeletion;
         } gui;
 
 //---------------------------------------------------------------------
@@ -116,21 +140,21 @@ namespace xmlAccess
 
 
     inline
-    bool sortByType(const XmlGlobalSettings::ColumnAttrib& a, const XmlGlobalSettings::ColumnAttrib& b)
+    bool sortByType(const ColumnAttrib& a, const ColumnAttrib& b)
     {
         return a.type < b.type;
     }
 
 
     inline
-    bool sortByPositionOnly(const XmlGlobalSettings::ColumnAttrib& a, const XmlGlobalSettings::ColumnAttrib& b)
+    bool sortByPositionOnly(const ColumnAttrib& a, const ColumnAttrib& b)
     {
         return a.position < b.position;
     }
 
 
     inline
-    bool sortByPositionAndVisibility(const XmlGlobalSettings::ColumnAttrib& a, const XmlGlobalSettings::ColumnAttrib& b)
+    bool sortByPositionAndVisibility(const ColumnAttrib& a, const ColumnAttrib& b)
     {
         if (a.visible == false) //hidden elements shall appear at end of vector
             return false;

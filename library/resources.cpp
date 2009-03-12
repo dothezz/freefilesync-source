@@ -64,10 +64,14 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("filter active.png")]      = (bitmapFilterOn          = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("filter not active.png")]  = (bitmapFilterOff         = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("warning.png")]            = (bitmapWarning           = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("warningSmall.png")]       = (bitmapWarningSmall      = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("error.png")]              = (bitmapError             = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("small arrow up.png"])     = (bitmapSmallUp           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("small arrow down.png")]   = (bitmapSmallDown         = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("save.png")]               = (bitmapSave              = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("load.png")]               = (bitmapLoad              = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("FFS.png")]                = (bitmapFFS               = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("FFS paused.png")]         = (bitmapFFSPaused         = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("deleteFile.png")]         = (bitmapDeleteFile        = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("gpl.png")]                = (bitmapGPL               = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("statusPause.png")]        = (bitmapStatusPause       = new wxBitmap(wxNullBitmap));
@@ -102,6 +106,8 @@ GlobalResources::GlobalResources()
     //init all the other resource files
     animationMoney = new wxAnimation(wxNullAnimation);
     animationSync  = new wxAnimation(wxNullAnimation);
+
+    programIcon = &wxNullIcon;
 }
 
 

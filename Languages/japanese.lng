@@ -28,8 +28,8 @@
 情報(&A)...
 &Advanced
 拡張(&A)
-&Back
-戻る(&B)
+&Apply
+適用(&A)
 &Cancel
 キャンセル(&C)
 &Compare
@@ -50,6 +50,8 @@
 無視(&I)
 &Language
 使用言語(&L)
+&Load
+読み込み(&L)
 &Load configuration
 構成設定の読み込み(&L)
 &OK
@@ -58,8 +60,6 @@
 一時停止(&P)
 &Quit
 終了(&Q)
-&Resolve
-決定(&R)
 &Retry
 再試行(&R)
 &Save
@@ -114,6 +114,8 @@
 <<	左側の方が新しい\n
 <Directory>
 <ディレクトリ>
+<Last session>
+<最後のセッション>
 <multiple selection>
 <複数選択>
 <|	file on left side only\n
@@ -144,8 +146,10 @@ As a result the files are separated into the following categories:
 ファイルは以下のカテゴリに分類されます:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
 このオプションでは、同じ名前を共有するファイルで内容が同じ場合は、同一として扱われます。 バックアップ操作より、むしろ整合性のチェックを行う時に役立つオプションです。 従ってファイルの日時については全く考慮されていません。\n\n設定が有効な時は、ツリー表示が小さくなります。
-Assemble a batch file with the following settings. To start synchronization in batch mode simply execute this file or schedule it in your operating system's task planner.
-以下の設定で一括処理(バッチ)ファイルを作成します。使用方法は、そのままファイルを実行するか、OS のタスクスケジューラを利用して実行することもできます。
+Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
+一括で同期処理を行うためのバッチファイルを作成します。一括モードを開始するときは、ファイルのパス名を実行ファイル\n< FreeFileSync.exe> \nにバッチファイルで渡すだけです。また、この操作はOSのタスクスケジューラから実行することができます。
+Batch execution
+一括処理を実行
 Batch file created successfully!
 バッチファイルが作成されました!
 Batch job
@@ -156,6 +160,8 @@ Build:
 ビルド:
 Cancel
 中止
+Check all
+すべて選択
 Choose to hide filtered files/directories from list
 リストから除外したいファイル/ディレクトリを選択
 Comma separated list
@@ -192,8 +198,6 @@ Configure your own synchronization rules.
 あなたの設定した同期規則
 Confirm
 確認
-Consider this when setting up synchronization rules: You might want to avoid write access to these directories so that synchronization of both does not interfere.
-同期規則を設定する時の備考: ディレクトリの書き込みアクセスを回避することで、これら両方の同期処理が干渉しないようにすることが考えられます。
 Continue
 続行
 Conversion error:
@@ -244,14 +248,18 @@ Delete files/folders existing on right side only
 右側のみに存在するファイル/フォルダを削除
 Delete files\tDEL
 ファイルを削除\tDEL
+Delete on both sides
+両方を削除
+Delete on both sides even if the file is selected on one side only
+片側のペインのみ選択されている場合でも両方を削除する
 Delete:
 削除:
 Deleting file %x
 ファイル %x を削除中
 Deleting folder %x
 フォルダ %x を削除中
-Directories are dependent:
-ディレクトリの依存関係:
+Directories are dependent! Be careful when setting up synchronization rules:
+ディレクトリが依存関係にあります! 同期規則の設定時には注意してください:
 Directory does not exist:
 ディレクトリが存在しません:
 Do not show graphical status and error messages but write to a logfile instead
@@ -262,8 +270,8 @@ Do nothing
 何もしない
 Do you really want to delete the following objects(s)?
 本当に以下のオブジェクトを削除しますか?
-Do you really want to move the following objects(s) to the recycle bin?
-本当に以下のオブジェクトをゴミ箱に移動しますか?
+Do you really want to move the following objects(s) to the Recycle Bin?
+本当に以下のオブジェクト(複)をゴミ箱に移動しますか?
 Donate with PayPal
 PayPal から寄付する
 Drag && drop
@@ -282,16 +290,22 @@ Error deleting directory:
 ディレクトリの削除エラー:
 Error deleting file:
 ファイルの削除エラー:
-Error moving to recycle bin:
-ゴミ箱への移動に失敗しました:
+Error handling
+ハンドリングのエラー
+Error moving to Recycle Bin:
+ゴミ箱への移動に失敗:
 Error parsing configuration file:
 構成ファイルの構文に誤りがあります:
 Error reading file:
 ファイル読み込みエラー:
+Error reading folder attributes:
+フォルダ属性の読み取りエラー:
 Error traversing directory:
 ディレクトリの移動エラー:
 Error writing file:
 ファイル書き込みエラー:
+Error writing folder attributes:
+フォルダ属性の書き込みエラー:
 Error: Source directory does not exist anymore:
 エラー: ソースディレクトリが存在しません:
 Example
@@ -302,6 +316,10 @@ Exclude temporarily
 一時フォルダを除外
 Exclude via filter:
 フィルターを通して除外
+Exit immediately and set returncode < 0
+すぐに終了する場合の戻り値設定 < 0
+Exit with RC < 0
+RC で終了 < 0
 FAT32: Handle Daylight Saving Time
 FAT32: 夏時間の取り扱いを有効
 Feedback and suggestions are welcome at:
@@ -340,14 +358,14 @@ Files/folders that exist on left side only
 左側のみに存在するファイル/フォルダ
 Files/folders that exist on right side only
 右側のみに存在するファイル/フォルダ
-Filter
-フィルタ
 Filter active: Press again to deactivate
 フィルター有効化: 再度押すと無効化
 Filter files
 ファイルフィルター
 Filter view
 表示フィルター
+Folder Comparison and Synchronization
+フォルダの比較と同期
 Folder pair
 フォルダペア
 FreeFileSync - Folder Comparison and Synchronization
@@ -360,12 +378,16 @@ FreeFileSync batch file
 FreeFileSync バッチファイル
 FreeFileSync configuration
 FreeFileSync 構成設定
+Full name
+完全な名前
 Generating file list...
 ファイル一覧を作成中...
 Global settings
 全般的な設定
 Help
 ヘルプ
+Hide all error and warning messages
+すべてのエラーと警告メッセージを非表示
 Hide files that are different
 異なるファイルを非表示
 Hide files that are equal
@@ -392,8 +414,8 @@ If you like FFS:
 FFS が気に入った場合:
 Ignore errors
 エラーを無視
-Ignore next errors
-次のエラーを無視
+Ignore subsequent errors
+以降のエラーを無視
 Ignore this error, retry or abort synchronization?
 このエラーを無視して再試行、或いは同期を中止しますか?
 Ignore this error, retry or abort?
@@ -408,8 +430,6 @@ Info
 情報
 Information
 インフォメーション
-Information: If you ignore the error or abort a re-compare will be necessary!
-インフォメーション: このエラーを無視して中断した場合は、再比較が必要です!
 Initialization of Recycle Bin failed!
 ゴミ箱の初期化に失敗しました!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -418,10 +438,10 @@ Left folder:
 左側フォルダ:
 Legend
 履歴
-Load configuration via...\n     - this list (press DEL to delete items)\n     - drag & drop to this window\n     - startup parameter
-構成ファイルの読み込み...\n    - リスト (DEL-でアイテムを削除)\n    - ウィンドウにドラッグ & ドロップ\n    - 起動時のパラメータ
-Load from file...
-ファイルから読み込み...
+Load configuration from file
+外部ファイルから構成設定を読み込みます
+Load configuration history (press DEL to delete items)
+構成設定履歴の読み込み(DELキーでアイテムを削除)
 Log-messages:
 ログメッセージ:
 Mirror ->>
@@ -470,6 +490,12 @@ Relative path
 相対パス
 Remove folder pair
 フォルダペアを除去
+Reset
+リセット
+Reset all warning messages?
+すべての警告をリセットしますか?
+Resets all warning messages
+すべての警告をリセット
 Result
 結果
 Right folder:
@@ -500,6 +526,12 @@ Show files that exist on left side only
 左側のみに存在するファイルを表示
 Show files that exist on right side only
 右側のみに存在するファイルを表示
+Show popup
+ポップアップ表示
+Show popup on errors or warnings
+エラー/警告をポップアップ表示
+Significant difference detected: More than 50% of files will be overwritten/deleted!
+大幅な差異の検出: 50%以上のファイルが上書き、または削除されています!
 Silent mode
 サイレントモード
 Size
@@ -538,16 +570,18 @@ System out of memory!
 メモリが不足しています!
 The file does not contain a valid configuration:
 このファイルには有効な構成が含まれていません:
-The selected file does not exist:
-選択されたファイルは存在しません:
+The file does not exist:
+ファイルが存在しません:
+This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
+ファイル名をダブルクリックする度に、このコマンドが実行されます。%name は選択ファイルのプレースフォルダとして機能します。
 This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
 ファイル名をダブルクリックする度に、このコマンドが実行されます。%x は選択ファイルのプレースフォルダとして機能します。
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
 この変数では、ふたつの同名ファイルが存在した場合、 それぞれのファイルサイズと最終更新日付/時間を比較します。\nファイル時間の差異が 2 秒以内の場合は検出されないということに注意してください。 (これは、FAT32システムで正確に同期を行うことができる最小値です)
+Time
+時間
 Time elapsed:
 経過時間:
-Time:
-時間:
 Total amount of data that will be transferred
 転送されたデータの総量
 Total time:
@@ -558,6 +592,8 @@ Unable to create logfile!
 ログファイルを作成出来ません!
 Unable to initialize Recycle Bin!
 ゴミ箱の初期化が出来ません!
+Uncheck all
+すべて解除
 Update ->
 更新 ->
 Update:

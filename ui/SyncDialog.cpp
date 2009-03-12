@@ -1,30 +1,29 @@
 #include "syncDialog.h"
 #include "../library/globalFunctions.h"
 #include "../library/resources.h"
-#include "../library/processXml.h"
 #include <wx/msgdlg.h>
 #include <wx/stdpaths.h>
 #include <wx/ffile.h>
 #include "../library/customButton.h"
 #include "../synchronization.h"
 #include "../algorithm.h"
-
-
-using namespace xmlAccess;
+#include <wx/dnd.h>
 
 
 SyncDialog::SyncDialog(wxWindow* window,
                        const FileCompareResult& gridDataRef,
                        MainConfiguration& config,
+                       bool& ignoreErrors,
                        bool synchronizationEnabled) :
         SyncDlgGenerated(window),
         gridData(gridDataRef),
-        cfg(config)
+        cfg(config),
+        m_ignoreErrors(ignoreErrors)
 {
     //make working copy of mainDialog.cfg.syncConfiguration and recycler setting
     localSyncConfiguration = config.syncConfiguration;
     m_checkBoxUseRecycler->SetValue(cfg.useRecycleBin);
-    m_checkBoxIgnoreErrors->SetValue(cfg.ignoreErrors);
+    m_checkBoxIgnoreErrors->SetValue(m_ignoreErrors);
 
     //set sync config icons
     updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
@@ -241,7 +240,7 @@ void SyncDialog::OnBack(wxCommandEvent& event)
     //write configuration to main dialog
     cfg.syncConfiguration = localSyncConfiguration;
     cfg.useRecycleBin     = m_checkBoxUseRecycler->GetValue();
-    cfg.ignoreErrors      = m_checkBoxIgnoreErrors->GetValue();
+    m_ignoreErrors        = m_checkBoxIgnoreErrors->GetValue();
 
     EndModal(0);
 }
@@ -251,7 +250,7 @@ void SyncDialog::OnStartSync(wxCommandEvent& event)
     //write configuration to main dialog
     cfg.syncConfiguration = localSyncConfiguration;
     cfg.useRecycleBin     = m_checkBoxUseRecycler->GetValue();
-    cfg.ignoreErrors      = m_checkBoxIgnoreErrors->GetValue();
+    m_ignoreErrors        = m_checkBoxIgnoreErrors->GetValue();
 
     EndModal(BUTTON_START);
 }
@@ -382,60 +381,52 @@ void SyncDialog::OnDifferent( wxCommandEvent& event )
 //###################################################################################################################################
 
 
-BatchDialog::BatchDialog(wxWindow* window,
-                         const MainConfiguration& config,
-                         const std::vector<FolderPair>& folderPairs) :
+class BatchFileDropEvent : public wxFileDropTarget
+{
+public:
+    BatchFileDropEvent(BatchDialog* dlg) :
+            batchDlg(dlg) {}
+
+    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
+    {
+        if (!filenames.IsEmpty())
+        {
+            const wxString droppedFileName = filenames[0];
+
+            xmlAccess::XmlType fileType = xmlAccess::getXmlType(droppedFileName);
+
+            //test if ffs batch file has been dropped
+            if (fileType == xmlAccess::XML_BATCH_CONFIG)
+                batchDlg->loadBatchFile(droppedFileName);
+        }
+        return false;
+    }
+
+private:
+    BatchDialog* batchDlg;
+};
+
+
+BatchDialog::BatchDialog(wxWindow* window, const xmlAccess::XmlBatchConfig& batchCfg) :
         BatchDlgGenerated(window)
 {
-    //make working copy of mainDialog.cfg.syncConfiguration and recycler setting
-    localSyncConfiguration = config.syncConfiguration;
-    SyncDialog::updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
-
-    m_checkBoxUseRecycler->SetValue(config.useRecycleBin);
-    m_checkBoxIgnoreErrors->SetValue(config.ignoreErrors);
-
-    switch (config.compareVar)
-    {
-    case CMP_BY_TIME_SIZE:
-        m_radioBtnSizeDate->SetValue(true);
-        break;
-    case CMP_BY_CONTENT:
-        m_radioBtnContent->SetValue(true);
-        break;
-    default:
-        assert (false);
-    }
-    //adjust toolTip
-    SyncDialog::adjustToolTips(m_bitmap17, config.compareVar);
-
-    filterIsActive = config.filterIsActive;
-    updateFilterButton();
-
-    m_textCtrlInclude->SetValue(config.includeFilter);
-    m_textCtrlExclude->SetValue(config.excludeFilter);
+    init();
+    loadBatchCfg(batchCfg);
+}
 
 
-    //add folder pairs
-    int scrWindowHeight = 0;
-    for (std::vector<FolderPair>::const_iterator i = folderPairs.begin(); i != folderPairs.end(); ++i)
-    {
-        BatchFolderPairGenerated* newPair = new BatchFolderPairGenerated(m_scrolledWindow6);
-        newPair->m_directoryLeft->SetValue(i->leftDirectory.c_str());
-        newPair->m_directoryRight->SetValue(i->rightDirectory.c_str());
+BatchDialog::BatchDialog(wxWindow* window, const wxString& filename) :
+        BatchDlgGenerated(window)
+{
+    init();
+    loadBatchFile(filename);
+}
 
-        bSizerFolderPairs->Add( newPair, 0, wxEXPAND, 5);
-        localFolderPairs.push_back(newPair);
 
-        if (i == folderPairs.begin())
-            scrWindowHeight = newPair->GetSize().GetHeight();
-    }
-    //set size of scrolled window
-    int pairCount = std::min(localFolderPairs.size(), size_t(3)); //up to 3 additional pairs shall be shown
-    m_scrolledWindow6->SetMinSize(wxSize( -1, scrWindowHeight * pairCount));
-
-    m_scrolledWindow6->Fit();
-    m_scrolledWindow6->Layout();
-
+void BatchDialog::init()
+{
+    //prepare drag & drop
+    SetDropTarget(new BatchFileDropEvent(this));
 
     //set icons for this dialog
     m_bitmap13->SetBitmap(*globalResource.bitmapLeftOnly);
@@ -446,15 +437,7 @@ BatchDialog::BatchDialog(wxWindow* window,
     m_bitmap8->SetBitmap(*globalResource.bitmapInclude);
     m_bitmap9->SetBitmap(*globalResource.bitmapExclude);
     m_bitmap27->SetBitmap(*globalResource.bitmapBatch);
-
-    Fit();
-    Centre();
-    m_buttonCreate->SetFocus();
 }
-
-
-BatchDialog::~BatchDialog()
-{}
 
 
 void BatchDialog::updateFilterButton()
@@ -478,11 +461,82 @@ void BatchDialog::updateFilterButton()
 }
 
 
+xmlAccess::OnError BatchDialog::getSelectionHandleError()
+{
+    switch (m_choiceHandleError->GetSelection())
+    {
+    case 0:
+        return xmlAccess::ON_ERROR_POPUP;
+    case 1:
+        return xmlAccess::ON_ERROR_IGNORE;
+    case 2:
+        return xmlAccess::ON_ERROR_EXIT;
+    default:
+        assert(false);
+        return xmlAccess::ON_ERROR_POPUP;
+    }
+}
+
+
+void updateToolTip(wxChoice* choiceHandleError, const xmlAccess::OnError value)
+{
+    switch (value)
+    {
+    case xmlAccess::ON_ERROR_POPUP:
+        choiceHandleError->SetToolTip(_("Show popup on errors or warnings"));
+        break;
+    case xmlAccess::ON_ERROR_IGNORE:
+        choiceHandleError->SetToolTip(_("Hide all error and warning messages"));
+        break;
+    case xmlAccess::ON_ERROR_EXIT:
+        choiceHandleError->SetToolTip(_("Exit immediately and set returncode < 0"));
+        break;
+    default:
+        assert(false);
+        choiceHandleError->SetToolTip(wxEmptyString);
+    }
+}
+
+
+void BatchDialog::setSelectionHandleError(const xmlAccess::OnError value)
+{
+    m_choiceHandleError->Clear();
+    m_choiceHandleError->Append(_("Show popup"));
+    m_choiceHandleError->Append(_("Ignore errors"));
+    m_choiceHandleError->Append(_("Exit with RC < 0"));
+
+    switch (value)
+    {
+    case xmlAccess::ON_ERROR_POPUP:
+        m_choiceHandleError->SetSelection(0);
+        break;
+    case xmlAccess::ON_ERROR_IGNORE:
+        m_choiceHandleError->SetSelection(1);
+        break;
+    case xmlAccess::ON_ERROR_EXIT:
+        m_choiceHandleError->SetSelection(2);
+        break;
+    default:
+        assert(false);
+        m_choiceHandleError->SetSelection(0);
+    }
+
+    updateToolTip(m_choiceHandleError, getSelectionHandleError());
+}
+
+
+void BatchDialog::OnChangeErrorHandling(wxCommandEvent& event)
+{
+    updateToolTip(m_choiceHandleError, getSelectionHandleError());
+}
+
+
 void BatchDialog::OnExLeftSideOnly(wxCommandEvent& event)
 {
     toggleSyncDirection(localSyncConfiguration.exLeftSideOnly);
     SyncDialog::updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
 }
+
 
 void BatchDialog::OnExRightSideOnly(wxCommandEvent& event)
 {
@@ -490,17 +544,20 @@ void BatchDialog::OnExRightSideOnly(wxCommandEvent& event)
     SyncDialog::updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
 }
 
+
 void BatchDialog::OnLeftNewer(wxCommandEvent& event)
 {
     toggleSyncDirection(localSyncConfiguration.leftNewer);
     SyncDialog::updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
 }
 
+
 void BatchDialog::OnRightNewer(wxCommandEvent& event)
 {
     toggleSyncDirection(localSyncConfiguration.rightNewer);
     SyncDialog::updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
 }
+
 
 void BatchDialog::OnDifferent(wxCommandEvent& event)
 {
@@ -518,7 +575,7 @@ void BatchDialog::OnFilterButton(wxCommandEvent& event)
 
 void BatchDialog::OnSelectRecycleBin(wxCommandEvent& event)
 {
-    if (event.IsChecked())
+    if (m_checkBoxUseRecycler->GetValue())
     {
         if (!FreeFileSync::recycleBinExists())
         {
@@ -562,7 +619,11 @@ void BatchDialog::OnCancel(wxCommandEvent& event)
 void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
 {
     //get a filename
-    wxString fileName = _("SyncJob.ffs_batch"); //proposal
+    wxString fileName = wxT("SyncJob.ffs_batch"); //proposal
+
+    if (!proposedBatchFileName.empty())
+        fileName = proposedBatchFileName;
+
     wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, fileName, wxString(_("FreeFileSync batch file")) + wxT(" (*.ffs_batch)|*.ffs_batch"), wxFD_SAVE);
 
     if (filePicker->ShowModal() == wxID_OK)
@@ -578,14 +639,22 @@ void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
 
         //create batch file
         if (saveBatchFile(fileName))
-            EndModal(batchFileCreated);
+            EndModal(BATCH_FILE_SAVED);
     }
+}
+
+
+void BatchDialog::OnLoadBatchJob(wxCommandEvent& event)
+{
+    wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, wxEmptyString, wxString(_("FreeFileSync batch file")) + wxT(" (*.ffs_batch)|*.ffs_batch"), wxFD_OPEN);;
+    if (filePicker->ShowModal() == wxID_OK)
+        loadBatchFile(filePicker->GetPath());
 }
 
 
 bool BatchDialog::saveBatchFile(const wxString& filename)
 {
-    XmlBatchConfig batchCfg;
+    xmlAccess::XmlBatchConfig batchCfg;
 
     //load structure with basic settings "mainCfg"
     if (m_radioBtnSizeDate->GetValue())
@@ -600,7 +669,7 @@ bool BatchDialog::saveBatchFile(const wxString& filename)
     batchCfg.mainCfg.includeFilter     = m_textCtrlInclude->GetValue();
     batchCfg.mainCfg.excludeFilter     = m_textCtrlExclude->GetValue();
     batchCfg.mainCfg.useRecycleBin     = m_checkBoxUseRecycler->GetValue();
-    batchCfg.mainCfg.ignoreErrors      = m_checkBoxIgnoreErrors->GetValue();
+    batchCfg.handleError               = getSelectionHandleError();
 
     for (unsigned int i = 0; i < localFolderPairs.size(); ++i)
     {
@@ -624,7 +693,94 @@ bool BatchDialog::saveBatchFile(const wxString& filename)
         wxMessageBox(error.show().c_str(), _("Error"), wxOK | wxICON_ERROR);
         return false;
     }
+
+    SetTitle(wxString(_("Create a batch job")) + wxT(" - ") + filename);
+    proposedBatchFileName = filename; //may be used on next save
+
     return true;
+}
+
+
+void BatchDialog::loadBatchFile(const wxString& filename)
+{
+    //load XML settings
+    xmlAccess::XmlBatchConfig batchCfg;  //structure to receive gui settings
+    try
+    {
+        batchCfg = xmlAccess::readBatchConfig(filename);
+    }
+    catch (const FileError& error)
+    {
+        wxMessageBox(error.show().c_str(), _("Error"), wxOK | wxICON_ERROR);
+        return;
+    }
+
+    SetTitle(wxString(_("Create a batch job")) + wxT(" - ") + filename);
+    proposedBatchFileName = filename; //may be used on next save
+
+    this->loadBatchCfg(batchCfg);
+}
+
+
+void BatchDialog::loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg)
+{
+    //make working copy of mainDialog.cfg.syncConfiguration and recycler setting
+    localSyncConfiguration = batchCfg.mainCfg.syncConfiguration;
+    SyncDialog::updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
+
+    m_checkBoxUseRecycler->SetValue(batchCfg.mainCfg.useRecycleBin);
+    setSelectionHandleError(batchCfg.handleError);
+
+    switch (batchCfg.mainCfg.compareVar)
+    {
+    case CMP_BY_TIME_SIZE:
+        m_radioBtnSizeDate->SetValue(true);
+        break;
+    case CMP_BY_CONTENT:
+        m_radioBtnContent->SetValue(true);
+        break;
+    default:
+        assert (false);
+    }
+    //adjust toolTip
+    SyncDialog::adjustToolTips(m_bitmap17, batchCfg.mainCfg.compareVar);
+
+    filterIsActive = batchCfg.mainCfg.filterIsActive;
+    updateFilterButton();
+
+    m_textCtrlInclude->SetValue(batchCfg.mainCfg.includeFilter);
+    m_textCtrlExclude->SetValue(batchCfg.mainCfg.excludeFilter);
+
+    m_checkBoxSilent->SetValue(batchCfg.silent);
+
+    //remove existing folder pairs
+    localFolderPairs.clear();
+    bSizerFolderPairs->Clear(true);
+
+    //add folder pairs
+    int scrWindowHeight = 0;
+    for (std::vector<FolderPair>::const_iterator i = batchCfg.directoryPairs.begin(); i != batchCfg.directoryPairs.end(); ++i)
+    {
+        BatchFolderPairGenerated* newPair = new BatchFolderPairGenerated(m_scrolledWindow6);
+        newPair->m_directoryLeft->SetValue(i->leftDirectory.c_str());
+        newPair->m_directoryRight->SetValue(i->rightDirectory.c_str());
+
+        bSizerFolderPairs->Add( newPair, 0, wxEXPAND, 5);
+        localFolderPairs.push_back(newPair);
+
+        if (i == batchCfg.directoryPairs.begin())
+            scrWindowHeight = newPair->GetSize().GetHeight();
+    }
+    //set size of scrolled window
+    int pairCount = std::min(localFolderPairs.size(), size_t(3)); //up to 3 additional pairs shall be shown
+    m_scrolledWindow6->SetMinSize(wxSize( -1, scrWindowHeight * pairCount));
+
+    m_scrolledWindow6->Layout();
+    //m_scrolledWindow6->Fit();
+
+    Fit();
+    Centre();
+    m_buttonSave->SetFocus();
 }
 
 

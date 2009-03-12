@@ -106,24 +106,34 @@ bool sortByFileName(const FileCompareLine& a, const FileCompareLine& b)
         return false;  //empty rows always last
     else if (descrLineB->objType == FileDescrLine::TYPE_NOTHING)
         return true;  //empty rows always last
-    else if (descrLineA->objType == FileDescrLine::TYPE_DIRECTORY)
-        return false;
-    else if (descrLineB->objType == FileDescrLine::TYPE_DIRECTORY)
-        return true;
+
+
+    if (descrLineA->objType == FileDescrLine::TYPE_DIRECTORY) //sort directories by relative name
+    {
+        if (descrLineB->objType == FileDescrLine::TYPE_DIRECTORY)
+            return stringSmallerThan<sortAscending>(descrLineA->relativeName.c_str(), descrLineB->relativeName.c_str());
+        else
+            return false;
+    }
     else
     {
-        const wxChar* stringA = descrLineA->relativeName.c_str();
-        const wxChar* stringB = descrLineB->relativeName.c_str();
+        if (descrLineB->objType == FileDescrLine::TYPE_DIRECTORY)
+            return true;
+        else
+        {
+            const wxChar* stringA = descrLineA->relativeName.c_str();
+            const wxChar* stringB = descrLineB->relativeName.c_str();
 
-        size_t pos = descrLineA->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
-        if (pos != std::string::npos)
-            stringA += pos + 1;
+            size_t pos = descrLineA->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
+            if (pos != std::string::npos)
+                stringA += pos + 1;
 
-        pos = descrLineB->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
-        if (pos != std::string::npos)
-            stringB += pos + 1;
+            pos = descrLineB->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
+            if (pos != std::string::npos)
+                stringB += pos + 1;
 
-        return stringSmallerThan<sortAscending>(stringA, stringB);
+            return stringSmallerThan<sortAscending>(stringA, stringB);
+        }
     }
 }
 
@@ -205,6 +215,32 @@ bool sortByRelativeName(const FileCompareLine& a, const FileCompareLine& b)
 
 template <bool sortAscending, SideToSort side>
 inline
+bool sortByFullName(const FileCompareLine& a, const FileCompareLine& b)
+{
+    const FileDescrLine* descrLineA = NULL;
+    const FileDescrLine* descrLineB = NULL;
+    getDescrLine<side>(a, b, descrLineA, descrLineB);
+
+    //presort types: first files, then directories then empty rows
+    if (descrLineA->objType == FileDescrLine::TYPE_NOTHING)
+        return false;  //empty rows always last
+    else if (descrLineB->objType == FileDescrLine::TYPE_NOTHING)
+        return true;  //empty rows always last
+    else
+#ifdef FFS_WIN //case-insensitive comparison!
+        return sortAscending ?
+               FreeFileSync::compareStringsWin32(descrLineA->fullName.c_str(), descrLineB->fullName.c_str()) < 0 : //way faster than wxString::CmpNoCase() in windows build!!!
+               FreeFileSync::compareStringsWin32(descrLineA->fullName.c_str(), descrLineB->fullName.c_str()) > 0;
+#else
+        return sortAscending ?
+               descrLineA->fullName.Cmp(descrLineB->fullName) < 0 :
+               descrLineA->fullName.Cmp(descrLineB->fullName) > 0;
+#endif
+}
+
+
+template <bool sortAscending, SideToSort side>
+inline
 bool sortByFileSize(const FileCompareLine& a, const FileCompareLine& b)
 {
     const FileDescrLine* descrLineA = NULL;
@@ -216,14 +252,24 @@ bool sortByFileSize(const FileCompareLine& a, const FileCompareLine& b)
         return false;  //empty rows always last
     else if (descrLineB->objType == FileDescrLine::TYPE_NOTHING)
         return true;  //empty rows always last
-    else if (descrLineA->objType == FileDescrLine::TYPE_DIRECTORY)
-        return false;
-    else if (descrLineB->objType == FileDescrLine::TYPE_DIRECTORY)
-        return true;
+
+
+    if (descrLineA->objType == FileDescrLine::TYPE_DIRECTORY) //sort directories by relative name
+    {
+        if (descrLineB->objType == FileDescrLine::TYPE_DIRECTORY)
+            return stringSmallerThan<sortAscending>(descrLineA->relativeName.c_str(), descrLineB->relativeName.c_str());
+        else
+            return false;
+    }
     else
-        return sortAscending ?
-               descrLineA->fileSize < descrLineB->fileSize :
-               descrLineA->fileSize > descrLineB->fileSize;
+    {
+        if (descrLineB->objType == FileDescrLine::TYPE_DIRECTORY)
+            return true;
+        else
+            return sortAscending ?
+                   descrLineA->fileSize > descrLineB->fileSize : //sortAscending == true shall result in list beginning with largest files first
+                   descrLineA->fileSize < descrLineB->fileSize;
+    }
 }
 
 
@@ -240,14 +286,23 @@ bool sortByDate(const FileCompareLine& a, const FileCompareLine& b)
         return false;  //empty rows always last
     else if (descrLineB->objType == FileDescrLine::TYPE_NOTHING)
         return true;  //empty rows always last
-    else if (descrLineA->objType == FileDescrLine::TYPE_DIRECTORY)
-        return false;
-    else if (descrLineB->objType == FileDescrLine::TYPE_DIRECTORY)
-        return true;
+
+    if (descrLineA->objType == FileDescrLine::TYPE_DIRECTORY) //sort directories by relative name
+    {
+        if (descrLineB->objType == FileDescrLine::TYPE_DIRECTORY)
+            return stringSmallerThan<sortAscending>(descrLineA->relativeName.c_str(), descrLineB->relativeName.c_str());
+        else
+            return false;
+    }
     else
-        return sortAscending ?
-               descrLineA->lastWriteTimeRaw < descrLineB->lastWriteTimeRaw :
-               descrLineA->lastWriteTimeRaw > descrLineB->lastWriteTimeRaw;
+    {
+        if (descrLineB->objType == FileDescrLine::TYPE_DIRECTORY)
+            return true;
+        else
+            return sortAscending ?
+                   descrLineA->lastWriteTimeRaw < descrLineB->lastWriteTimeRaw :
+                   descrLineA->lastWriteTimeRaw > descrLineB->lastWriteTimeRaw;
+    }
 }
 
 

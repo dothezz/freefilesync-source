@@ -1,4 +1,4 @@
-  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+﻿  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
  Byte
  Bajt
@@ -28,8 +28,8 @@
 &O Programie...
 &Advanced
 &Zaawansowane
-&Back
-&Cofnij
+&Apply
+&Zastosuj
 &Cancel
 &Anuluj
 &Compare
@@ -50,6 +50,8 @@
 &Ignoruj
 &Language
 &Język
+&Load
+&Wczytaj
 &Load configuration
 &Ładuj konfigurację
 &OK
@@ -57,9 +59,7 @@
 &Pause
 &Pauza
 &Quit
-&Zamnkij
-&Resolve
-&Rozwiąż
+&Zamknij
 &Retry
 &Powtórz
 &Save
@@ -114,6 +114,8 @@
 <<	lewy plik jest nowszy\n
 <Directory>
 <Katalog>
+<Last session>
+<Ostatnia sesja>
 <multiple selection>
 <zaznaczone elementy>
 <|	file on left side only\n
@@ -125,7 +127,7 @@
 Abort
 Przerwij
 Abort requested: Waiting for current operation to finish...
-Rządanie przerwania: Czekaj na koniec aktualnie wykonywanego zadania...
+Żądanie przerwania: Czekaj na koniec aktualnie wykonywanego zadania...
 Aborted
 Przerwana
 About
@@ -144,8 +146,8 @@ As a result the files are separated into the following categories:
 W rezultacie pliki zostały podzielone na następujące kategorie:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
 Jak wskazuje nazwa, dwa pliki o tej samej nazwie są równe tylko i wyłącznie jeżeli ich zawartość jest jednakowa. Czas modyfikacji nie jest brany pod uwagę. Ta opcja jest raczej użyteczna do sprawdzania spójności plików niż zadań kopii zapasowej.\n\nDrzewko decyzyjne dla tej opcji jest mniejsze:
-Assemble a batch file with the following settings. To start synchronization in batch mode simply execute this file or schedule it in your operating system's task planner.
-Utwórz zadanie batch z tymi ustawieniami. Aby rozpocząć synchronizację w tym trybie zwyczajnie uruchom plik lub dodaj go do zadań zaplanowanych Twojego systemu.
+Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
+Twórz zadanie batch dla automatyzacji procesu. By rozpocząć prace w tym trybie zwyczajnie uruchom plik z zadaniem batch lub dodaj go do zadań zaplanowanych Twojego systemu. Plik batch może być również przekazywany jako parametr do programu w postaci: FreeFileSync.exe <batchfile>.
 Batch file created successfully!
 Plik Batch utworzony pomyślnie!
 Batch job
@@ -156,6 +158,8 @@ Build:
 Buduj:
 Cancel
 Anuluj
+Check all
+Sprawdź wszystko
 Choose to hide filtered files/directories from list
 Zaznacz aby ukryć przefiltrowane pliki/katalogi z listy
 Comma separated list
@@ -192,8 +196,6 @@ Configure your own synchronization rules.
 Skonfiguruj swoje własne zasady synchronizacji.
 Confirm
 Potwierdź
-Consider this when setting up synchronization rules: You might want to avoid write access to these directories so that synchronization of both does not interfere.
-Pamiętaj: Możesz zastrzec prawo do zapisu dla tych katalogów aby uniknąć ewentualej kolizji podczas synchronizacji.
 Continue
 Kontynuuj
 Conversion error:
@@ -205,7 +207,7 @@ Kopiuj z lewej do prawej nadpisując
 Copy from right to left
 Kopiuj z prawej do lewej
 Copy from right to left overwriting
-Kopij z prawej do lewej nadpisując
+Kopiuj z prawej do lewej nadpisując
 Copy new or updated files to right folder.
 Kopiuj nowe lub aktualniejsze pliki na prawą stronę.
 Copy to clipboard\tCTRL+C
@@ -244,14 +246,18 @@ Delete files/folders existing on right side only
 Usuń pliki/foldery istniejące tylko po prawej stronie
 Delete files\tDEL
 Usuń\tDEL
+Delete on both sides
+Usuń po obu stronach
+Delete on both sides even if the file is selected on one side only
+Usuń po obu stronach nawet jeżeli plik zaznaczony jest tylko po jednej stronie
 Delete:
 Usuń:
 Deleting file %x
 Usuwanie pliku %x
 Deleting folder %x
 Usuwanie folderu %x
-Directories are dependent:
-Katalogi są zależne:
+Directories are dependent! Be careful when setting up synchronization rules:
+Katalogi są zależne! Pamiętaj o tym podczas ustawiania zasad synchronizacji:
 Directory does not exist:
 Katalog nie istnieje:
 Do not show graphical status and error messages but write to a logfile instead
@@ -262,8 +268,8 @@ Do nothing
 Nic nie rób
 Do you really want to delete the following objects(s)?
 Czy na pewno chcesz usunąć wybrane obiekty?
-Do you really want to move the following objects(s) to the recycle bin?
-Czy na pewno chesz przenieść wybrane obiekty do kosza?
+Do you really want to move the following objects(s) to the Recycle Bin?
+Czy na pewno chcesz przenieść wybrane pliki do kosza?
 Donate with PayPal
 Wesprzyj z PayPal
 Drag && drop
@@ -282,16 +288,22 @@ Error deleting directory:
 Błąd podczas usuwania katalogu:
 Error deleting file:
 Błąd podczas usuwania pliku:
-Error moving to recycle bin:
+Error handling
+Obsługa błędów
+Error moving to Recycle Bin:
 Błąd podczas przenoszenia do kosza:
 Error parsing configuration file:
 Błąd podczas parsowania pliku konfiguracyjnego:
 Error reading file:
 Błąd podczas odczytu pliku:
+Error reading folder attributes:
+Błąd odczytu atrybutów folderu:
 Error traversing directory:
 Błąd podczas odczytywania katalogu:
 Error writing file:
 Błąd podczas zapisu do pliku:
+Error writing folder attributes:
+Błąd zapisu atrybutów folderu:
 Error: Source directory does not exist anymore:
 Błąd: Katalog źródłowy nie istnieje:
 Example
@@ -302,6 +314,10 @@ Exclude temporarily
 Wyklucz tymczasowo
 Exclude via filter:
 Dodaj filtr:
+Exit immediately and set returncode < 0
+Zakończ natychmiastowo i zwróć wartość < 0
+Exit with RC < 0
+Zakończ z RC < 0
 FAT32: Handle Daylight Saving Time
 FAT32: Uwzględnij przesunięcie czasu
 Feedback and suggestions are welcome at:
@@ -340,14 +356,14 @@ Files/folders that exist on left side only
 Pliki/katalogi istniejące tylko po lewej stronie
 Files/folders that exist on right side only
 Pliki/katalogi istniejące tylko po prawej stronie
-Filter
-Filtr
 Filter active: Press again to deactivate
 Filtr aktywny: Kliknij ponownie aby wyłączyć
 Filter files
 Filtruj pliki
 Filter view
 Filtr podglądu
+Folder Comparison and Synchronization
+Porównywanie i Synchronizacja folderów
 Folder pair
 Para folderów
 FreeFileSync - Folder Comparison and Synchronization
@@ -360,12 +376,16 @@ FreeFileSync batch file
 FreeFileSync plik batch
 FreeFileSync configuration
 Konfiguracja FreeFileSync
+Full name
+Pełna nazwa
 Generating file list...
 Generowanie listy plików...
 Global settings
 Ustawienia globalne
 Help
 Pomoc
+Hide all error and warning messages
+Ukryj wszystkie informacje błędach i ostrzeżeniach
 Hide files that are different
 Ukryj pliki, które są różne
 Hide files that are equal
@@ -392,12 +412,12 @@ If you like FFS:
 Jeżeli Ci się podoba:
 Ignore errors
 Ignoruj błędy
-Ignore next errors
+Ignore subsequent errors
 Ignoruj kolejne błędy
 Ignore this error, retry or abort synchronization?
 Ignoruj, powtórz albo przerwij synchronizacje.
 Ignore this error, retry or abort?
-Ignorować błąd, powtórzć albo zakończyć?
+Ignorować błąd, powtórzyć albo zakończyć?
 Include
 Dołącz
 Include temporarily
@@ -408,8 +428,6 @@ Info
 Info
 Information
 Informacja
-Information: If you ignore the error or abort a re-compare will be necessary!
-Informacja: Jeśli zignorujesz błąd albo zakończysz konieczne będzie ponowne porównanie!
 Initialization of Recycle Bin failed!
 Niepowodzenie inicjalizacji Kosza!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -418,10 +436,10 @@ Left folder:
 Lewy folder:
 Legend
 Legenda
-Load configuration via...\n     - this list (press DEL to delete items)\n     - drag & drop to this window\n     - startup parameter
-Ładuj konfigurację przez...\n     - ta lista (DEL aby usunąć element)\n     - przeciągnij i upuść na to okno\n     - parametry startowe
-Load from file...
-Ładuj z pliku...
+Load configuration from file
+Wczytaj konfigurację z pliku
+Load configuration history (press DEL to delete items)
+Wczytaj historie konfiguracji (naciśnij Del aby usunąć element)
 Log-messages:
 Logi:
 Mirror ->>
@@ -433,7 +451,7 @@ Przesuń kolumnę w dół
 Move column up
 Przesuń kolumnę do góry
 Not all items were synchronized! Have a look at the list.
-Nie wszysktkie elementy zostały zsynchronizowane! Lista pominiętych plików.
+Nie wszystkie elementy zostały zsynchronizowane! Lista pominiętych plików.
 Nothing to synchronize according to configuration!
 Brak elementów do synchronizacji!
 Number of files and directories that will be created
@@ -470,6 +488,12 @@ Relative path
 Relatywna ścieżka
 Remove folder pair
 Usuń parę folderów
+Reset
+Resetuj
+Reset all warning messages?
+Zresetować wszystkie ostrzeżenia?
+Resets all warning messages
+Zresetuj wszystkie ostrzeżenia
 Result
 Rezultat
 Right folder:
@@ -491,7 +515,7 @@ Wybierz wariant:
 Show files that are different
 Pokaż pliki, które się różnią
 Show files that are equal
-Pokaż pliki, ktore są równe
+Pokaż pliki, które są równe
 Show files that are newer on left
 Pokaż pliki nowsze po lewej stronie
 Show files that are newer on right
@@ -500,6 +524,12 @@ Show files that exist on left side only
 Pokaż pliki istniejące tylko po lewej stronie
 Show files that exist on right side only
 Pokaż pliki istniejące tylko po prawej stronie
+Show popup
+Pokaż okno popup
+Show popup on errors or warnings
+Pokaż okno popup dla błędów i ostrzeżeń
+Significant difference detected: More than 50% of files will be overwritten/deleted!
+Wykryto znaczące zmiany: Ponad 50% plików zostanie nadpisane/usunięte!
 Silent mode
 Tryb Cichy
 Size
@@ -533,20 +563,22 @@ Synchronizuj wszystkie pliki .doc, .zip i .exe z wyjątkiem folderu \"temp\".
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Synchronizuj obie strony jednocześnie: Kopiuj nowe albo uaktualniaj w obu folderach.
 Synchronizing...
-Synchronizuje...
+Synchronizuję...
 System out of memory!
 Brak pamięci!
 The file does not contain a valid configuration:
 Nieprawidłowy format pliku:
-The selected file does not exist:
-Zaznaczony plik nie istnieje:
+The file does not exist:
+Plik nie istnieje:
+This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
+Ta komenda będzie wykonywana za każdym razem jak klikniesz dwa razy na dany plik. %name jest wskaźnikiem na katalog zaznaczonego pliku.
 This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
-Ta linia będzie wykonywana za każdym razem jak będziesz eksplorował plik. %x jest wskaźnikiem na katalog zaznaczonego pliku.
+Ta komenda będzie wykonywana za każdym razem jak klikniesz dwa razy na dany plik. %x jest wskaźnikiem na katalog zaznaczonego pliku.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
-Ten wariant traktuje dwa pliki jako równe w przypadku gdy mają jednakowy rozmiar oraz tą samą datę i czas ostatniej modyfikacji. Miej na uwadzę, że czas pliku może odbiegać od rzeczywistego o 2 sekundy. Jest to konieczne podczas synchronizacji dla plików w systemie FAT32.
+Ten wariant traktuje dwa pliki jako równe w przypadku gdy mają jednakowy rozmiar oraz tą samą datę i czas ostatniej modyfikacji. Miej na uwadze, że czas pliku może odbiegać od rzeczywistego o 2 sekundy. Jest to konieczne podczas synchronizacji dla plików w systemie FAT32.
+Time
+Czas
 Time elapsed:
-Czas:
-Time:
 Czas:
 Total amount of data that will be transferred
 Liczba danych do przekopiowania
@@ -558,6 +590,8 @@ Unable to create logfile!
 Nie można utworzyć pliku z logami!
 Unable to initialize Recycle Bin!
 Nie można zainicjalizować Kosz!
+Uncheck all
+Odznacz wszystko
 Update ->
 Uaktualnij ->
 Update:

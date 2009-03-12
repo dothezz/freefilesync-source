@@ -28,8 +28,8 @@
 &Über...
 &Advanced
 &Erweitert
-&Back
-&Zurück
+&Apply
+&Übernehmen
 &Cancel
 &Abbrechen
 &Compare
@@ -50,6 +50,8 @@ Dateiliste e&xportieren
 &Ignorieren
 &Language
 &Sprache
+&Load
+&Laden
 &Load configuration
 Konfiguration &laden
 &OK
@@ -58,8 +60,6 @@ Konfiguration &laden
 &Pause
 &Quit
 &Beenden
-&Resolve
-&Beheben
 &Retry
 &Wiederholen
 &Save
@@ -114,6 +114,8 @@ Konfiguration &laden
 <<	Linke Datei ist neuer\n
 <Directory>
 <Verzeichnis>
+<Last session>
+<Letzte Sitzung>
 <multiple selection>
 <Mehrfachauswahl>
 <|	file on left side only\n
@@ -144,8 +146,10 @@ As a result the files are separated into the following categories:
 Das Ergebnis ist eine Aufteilung in folgende Kategorien:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
 Wie der Name andeutet, werden zwei Dateien mit gleichem Namen genau dann als gleich angesehen, wenn sie den gleichen Dateiinhalt haben. Diese Einstellung ist eher für Konsistenzprüfungen geeignet als für Backup-Operationen. Aus diesem Grund wird der Zeitpunkt der letzten Änderung der Dateien nicht berücksichtigt.\n\nDer Entscheidungsbaum ist in diesem Fall kleiner:
-Assemble a batch file with the following settings. To start synchronization in batch mode simply execute this file or schedule it in your operating system's task planner.
-Erzeuge eine Batchdatei mit den folgenden Parametern. Um im Batch-Modus zu synchronisieren, kann diese einfach gestartet oder in den Task-Planer des Betriebssystems eingetragen werden.
+Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
+Erzeuge eine Batchdatei für die automatisierte Synchronisation. Um den Batch-Modus zu starten, muss nur der Dateiname an die Programmdatei übergeben werden: FreeFileSync.exe <Batchdatei>. Dies kann auch in den Taskplaner des Betriebssystems eingetragen werden.
+Batch execution
+Batchlauf
 Batch file created successfully!
 Batchdatei wurde erfolgreich erstellt!
 Batch job
@@ -156,6 +160,8 @@ Build:
 Build:
 Cancel
 Abbrechen
+Check all
+Alles auswählen
 Choose to hide filtered files/directories from list
 Gefilterte Dateien bzw. Verzeichnisse ein-/ausblenden
 Comma separated list
@@ -192,8 +198,6 @@ Configure your own synchronization rules.
 Eigene Synchronisationsregeln definieren.
 Confirm
 Bestätigen
-Consider this when setting up synchronization rules: You might want to avoid write access to these directories so that synchronization of both does not interfere.
-Achtung beim Festlegen der Synchronisationseinstellungen: Ein Schreibzugriff auf diese Verzeichnisse sollte vermieden werden, so dass sich die Synchronization von beiden nicht gegenseitig beeinflusst.
 Continue
 Fortfahren
 Conversion error:
@@ -244,14 +248,18 @@ Delete files/folders existing on right side only
 Nur rechts existierende Dateien/Verzeichnisse löschen
 Delete files\tDEL
 Dateien löschen\tDEL
+Delete on both sides
+Auf beiden Seiten löschen
+Delete on both sides even if the file is selected on one side only
+Lösche auf beiden Seiten, auch wenn die Datei nur auf einer Seite markiert ist
 Delete:
 Löschen:
 Deleting file %x
 Lösche Datei %x
 Deleting folder %x
 Lösche Verzeichnis %x
-Directories are dependent:
-Die Verzeichnisse sind voneinander abhängig:
+Directories are dependent! Be careful when setting up synchronization rules:
+Die Verzeichnisse sind voneinander abhängig! Achtung beim Festlegen der Synchronisationseinstellungen:
 Directory does not exist:
 Das Verzeichnis existiert nicht:
 Do not show graphical status and error messages but write to a logfile instead
@@ -262,7 +270,7 @@ Do nothing
 Nichts tun
 Do you really want to delete the following objects(s)?
 Sollen folgende Elemente wirklich gelöscht werden?
-Do you really want to move the following objects(s) to the recycle bin?
+Do you really want to move the following objects(s) to the Recycle Bin?
 Sollen folgende Elemente wirklich in den Papierkorb verschoben werden?
 Donate with PayPal
 Mit PayPal spenden
@@ -282,7 +290,9 @@ Error deleting directory:
 Fehler beim Löschen des Verzeichnisses:
 Error deleting file:
 Fehler beim Löschen der Datei:
-Error moving to recycle bin:
+Error handling
+Fehlerbehandlung
+Error moving to Recycle Bin:
 Fehler beim Verschieben in den Papierkorb:
 Error parsing configuration file:
 Fehler beim Lesen der Konfigurationsdatei:
@@ -306,6 +316,10 @@ Exclude temporarily
 Temporär ausschließen
 Exclude via filter:
 Über Filter ausschließen:
+Exit immediately and set returncode < 0
+Sofort beenden und Returncode < 0 setzen
+Exit with RC < 0
+Beenden mit RC < 0
 FAT32: Handle Daylight Saving Time
 FAT32: Sommer-/Winterzeitumstellung berücksichtigen
 Feedback and suggestions are welcome at:
@@ -344,14 +358,14 @@ Files/folders that exist on left side only
 Nur links exisitierende Dateien/Verzeichnisse
 Files/folders that exist on right side only
 Nur rechts exisitierende Dateien/Verzeichnisse
-Filter
-Filter
 Filter active: Press again to deactivate
 Filter aktiviert: Zum Deaktivieren erneut anwählen
 Filter files
 Dateien filtern
 Filter view
 Ansicht filtern
+Folder Comparison and Synchronization
+Verzeichnisvergleich und Synchronisation
 Folder pair
 Verzeichnispaar
 FreeFileSync - Folder Comparison and Synchronization
@@ -364,12 +378,16 @@ FreeFileSync batch file
 FreeFileSync Batchdatei
 FreeFileSync configuration
 FreeFileSync Konfiguration
+Full name
+Absoluter Name
 Generating file list...
 Erzeuge Dateiliste...
 Global settings
 Globale Einstellungen
 Help
 Hilfe
+Hide all error and warning messages
+Alle Fehler- und Warnmeldungen werden unterdrückt
 Hide files that are different
 Ungleiche Dateien ausblenden
 Hide files that are equal
@@ -387,7 +405,7 @@ Gefilterte Elemente ausblenden
 Hide further error messages during the current process
 Weitere Fehlermeldungen während des laufenden Prozesses ausblenden
 Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
-Verhindert das Anzeigen von Fehlermeldungen während der Synchronisation:\nSie werden jedoch gesammelt und nach Vorgangsende als Liste angezeigt
+Verhindert das Anzeigen von Fehlermeldungen während der Synchronisation:\nSie werden jedoch gesammelt und am Ende als Liste angezeigt
 Hints:
 Tipps:
 Homepage:
@@ -396,8 +414,8 @@ If you like FFS:
 FFS unterstützen:
 Ignore errors
 Fehler ignorieren
-Ignore next errors
-Weitere Fehler ignorieren
+Ignore subsequent errors
+Nachfolgende Fehler ignorieren
 Ignore this error, retry or abort synchronization?
 Fehler ignorieren, wiederholen oder Synchronisation abbrechen?
 Ignore this error, retry or abort?
@@ -412,8 +430,6 @@ Info
 Info
 Information
 Information
-Information: If you ignore the error or abort a re-compare will be necessary!
-Information: Wenn der Fehler ignoriert oder der Vorgang abgebrochen wird, ist ein neuer Vergleich erforderlich!
 Initialization of Recycle Bin failed!
 Die Initialisierung des Papierkorbs ist fehlgeschlagen!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -422,12 +438,12 @@ Left folder:
 Linkes Verzeichnis:
 Legend
 Legende
-Load configuration via...\n     - this list (press DEL to delete items)\n     - drag & drop to this window\n     - startup parameter
-Konfiguration laden über...\n     - diese Liste (DEL-Taste löscht Einträge)\n     - Drag & Drop auf dieses Fenster\n     - Startupparameter
-Load from file...
-Von Datei laden...
+Load configuration from file
+Konfiguration aus Datei laden
+Load configuration history (press DEL to delete items)
+Lade Konfigurationshistorie (DEL-Taste löscht Einträge)
 Log-messages:
-Protokollmitteilungen:
+Protokollmeldungen:
 Mirror ->>
 Spiegeln ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -451,7 +467,7 @@ OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the full name including path prefix.
 Für die Synchronisation werden nur die Dateien/Verzeichnisse berücksichtigt, die den Filtereinstellungen entsprechen. Der Filter wird dabei auf den kompletten Dateinamen einschließlich Pfadprefix angewandt.
 Open synchronization dialog
-Zeige Synchronisationseinstellungen
+Synchronisationseinstellungen zeigen
 Open with File Manager\tD-Click
 Mit Dateimanager öffnen\tD-Click
 Operation aborted!
@@ -474,6 +490,12 @@ Relative path
 Relativer Pfad
 Remove folder pair
 Verzeichnispaar entfernen
+Reset
+Zurücksetzen
+Reset all warning messages?
+Sollen alle Warnmeldungen zurückgesetzt werden?
+Resets all warning messages
+Setzt alle Warnmeldungen zurück
 Result
 Ergebnis
 Right folder:
@@ -504,6 +526,12 @@ Show files that exist on left side only
 Nur links existierende Dateien anzeigen
 Show files that exist on right side only
 Nur rechts existierende Dateien anzeigen
+Show popup
+Popup zeigen
+Show popup on errors or warnings
+Zeigt ein Auswahlfenster bei Fehlern oder Warnungen an
+Significant difference detected: More than 50% of files will be overwritten/deleted!
+Ein erheblicher Unterschied wurde festgestellt: Mehr als 50% der Dateien werden überschrieben/gelöscht!
 Silent mode
 Stiller Modus
 Size
@@ -542,16 +570,18 @@ System out of memory!
 Zu wenig freier Arbeitsspeicher!
 The file does not contain a valid configuration:
 Die Datei enthält keine gültige Konfiguration:
-The selected file does not exist:
-Die ausgewählte Datei existiert nicht:
+The file does not exist:
+Die Datei existiert nicht:
+This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
+Diese Kommandozeile wird bei jedem Doppelklick auf einen Dateinamen ausgeführt. %name dient dabei als Platzhalter für die ausgewählte Datei.
 This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
 Diese Befehlszeile wird ausgeführt, wenn ein Doppelklick auf einen Dateinamen erfolgt. %x ist hierbei der Platzhalter für die ausgewählte Datei.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
 Diese Variante identifiziert zwei gleichnamige Dateien als gleich, wenn sie die gleiche Dateigröße haben UND der Zeitpunkt der letzten Änderung derselbe ist. Dabei wird eine Abweichung von bis zu zwei Sekunden toleriert. So ist sichergestellt, dass eine Synchronisation gegen ein FAT32 Dateisystem korrekt funktioniert.
+Time
+Uhrzeit
 Time elapsed:
 Vergangene Zeit:
-Time:
-Zeit:
 Total amount of data that will be transferred
 Gesamtmenge der zu übertragenden Daten
 Total time:
@@ -562,6 +592,8 @@ Unable to create logfile!
 Die Protokolldatei konnte nicht erstellt werden!
 Unable to initialize Recycle Bin!
 Der Papierkorb konnte nicht initialisiert werden!
+Uncheck all
+Nichts auswählen
 Update ->
 Aktualisieren ->
 Update:

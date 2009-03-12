@@ -24,29 +24,23 @@ void testZstringForMemoryLeak()
 
 
 #ifdef FFS_WIN
-int FreeFileSync::compareStringsWin32(const wchar_t* a, const wchar_t* b)
-{
-    return lstrcmpi(
-               a,    //address of first string
-               b);   //address of second string
-}
-
-
-//equivalent implementation, but slightly(!!!) slower:
 int FreeFileSync::compareStringsWin32(const wchar_t* a, const wchar_t* b, const int aCount, const int bCount)
 {
-    int rv = CompareString(
-                 LOCALE_USER_DEFAULT, //locale identifier
-                 NORM_IGNORECASE,	  //comparison-style options
-                 a,  	              //pointer to first string
-                 aCount,	          //size, in bytes or characters, of first string
-                 b,	                  //pointer to second string
-                 bCount); 	          //size, in bytes or characters, of second string
+    //DON'T use lstrcmpi() here! It uses word sort, which unfortunately is NOT always a strict weak sorting function for some locales (e.g. swedish)
+    //Use CompareString() with "SORT_STRINGSORT" instead!!!
+
+    const int rv = CompareString(
+                       LOCALE_USER_DEFAULT, //locale identifier
+                       NORM_IGNORECASE | SORT_STRINGSORT,	  //comparison-style options
+                       a,  	                //pointer to first string
+                       aCount,	            //size, in bytes or characters, of first string
+                       b,	                //pointer to second string
+                       bCount); 	        //size, in bytes or characters, of second string
 
     if (rv == 0)
         throw RuntimeException(wxString(wxT("Error comparing strings!")));
     else
-        return rv - 2;
+        return rv - 2; //convert to C-style string compare result
 }
 #endif
 

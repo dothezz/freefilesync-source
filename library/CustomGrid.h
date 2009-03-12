@@ -13,8 +13,6 @@ class CustomGridTable;
 class CustomGridTableMiddle;
 //##################################################################################
 
-extern const wxGrid* leadGrid; //this global variable is not very nice...
-
 class CustomGrid : public wxGrid
 {
 public:
@@ -46,22 +44,23 @@ public:
     void setSortMarker(const int sortColumn, const wxBitmap* bitmap = &wxNullBitmap);
 
     //set visibility, position and width of columns
-    void setColumnAttributes(const xmlAccess::XmlGlobalSettings::ColumnAttributes& attr);
-    xmlAccess::XmlGlobalSettings::ColumnAttributes getColumnAttributes();
+    static xmlAccess::ColumnAttributes getDefaultColumnAttributes();
+    xmlAccess::ColumnAttributes getColumnAttributes();
+    void setColumnAttributes(const xmlAccess::ColumnAttributes& attr);
 
-    xmlAccess::XmlGlobalSettings::ColumnTypes getTypeAtPos(unsigned pos) const;
+    xmlAccess::ColumnTypes getTypeAtPos(unsigned pos) const;
 
-    static wxString getTypeName(xmlAccess::XmlGlobalSettings::ColumnTypes colType);
+    static wxString getTypeName(xmlAccess::ColumnTypes colType);
 
-    static const unsigned COLUMN_TYPE_COUNT = 4;
+    void setLeadGrid(const wxGrid* newLead);
 
 protected:
     //set visibility, position and width of columns
-    xmlAccess::XmlGlobalSettings::ColumnAttributes columnSettings;
-
+    xmlAccess::ColumnAttributes columnSettings;
 
     void adjustGridHeights();
 
+    const wxGrid* leadGrid; //grid that has user focus
     bool scrollbarsEnabled;
     CustomGrid* m_gridLeft;
     CustomGrid* m_gridRight;

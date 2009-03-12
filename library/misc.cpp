@@ -25,23 +25,23 @@ void exchangeEscapeChars(wxString& data)
             switch (value)
             {
             case wxChar('\\'):
-                output+= wxChar('\\');
+                output += wxChar('\\');
                 break;
             case wxChar('n'):
-                output+= wxChar('\n');
+                output += wxChar('\n');
                 break;
             case wxChar('t'):
-                output+= wxChar('\t');
+                output += wxChar('\t');
                 break;
             case wxChar('\"'):
-                output+= wxChar('\"');
+                output += wxChar('\"');
                 break;
             default:
-                output+= value;
+                output += value;
             }
         }
         else
-            output+= value;
+            output += value;
 
         ++input;
     }

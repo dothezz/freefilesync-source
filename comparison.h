@@ -4,20 +4,22 @@
 #include "FreeFileSync.h"
 #include "library/statusHandler.h"
 
-class DirectoryDescrBuffer;
-
 namespace FreeFileSync
 {
-    bool foldersAreValidForComparison(const std::vector<FolderPair>& folderPairs, wxString& errorMessage);
-    bool foldersHaveDependencies(     const std::vector<FolderPair>& folderPairs, wxString& warningMessage);
+    class DirectoryDescrBuffer;
 
     //class handling comparison process
     class CompareProcess
     {
     public:
-        CompareProcess(bool lineBreakOnMessages, bool handleDstOnFat32Drives, StatusHandler* handler);
+        CompareProcess(const bool traverseSymLinks,
+                       const bool handleDstOnFat32Drives,
+                       bool& warningDependentFolders,
+                       StatusHandler* handler);
 
-        void startCompareProcess(const std::vector<FolderPair>& directoryPairsFormatted,
+        ~CompareProcess();
+
+        void startCompareProcess(const std::vector<FolderPair>& directoryPairs,
                                  const CompareVariant cmpVar,
                                  FileCompareResult& output) throw(AbortThisProcess);
 
@@ -27,12 +29,15 @@ namespace FreeFileSync
         void compareByContent(const std::vector<FolderPair>& directoryPairsFormatted, FileCompareResult& output);
 
         //create comparison result table and fill relation except for files existing on both sides
-        void performBaseComparison(const FolderPair& pair,
-                                   DirectoryDescrBuffer& descriptionBuffer,
-                                   FileCompareResult& output);
+        void performBaseComparison(const FolderPair& pair, FileCompareResult& output);
 
-        const bool includeLineBreak; //optional line break for status messages (used by GUI mode only)
+        //buffer accesses to the same directories; useful when multiple folder pairs are used
+        DirectoryDescrBuffer* descriptionBuffer;
+
+        const bool traverseSymbolicLinks;
         const bool handleDstOnFat32;
+        bool& m_warningDependentFolders;
+
         StatusHandler* statusUpdater;
         Zstring txtComparingContentOfFiles;
     };

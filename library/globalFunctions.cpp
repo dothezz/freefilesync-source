@@ -179,7 +179,7 @@ wxString DebugLog::assembleFileName()
 void DebugLog::write(const wxString& logText)
 {
     ++lineCount;
-    if (lineCount % 10000 == 0) //prevent logfile from becoming too big
+    if (lineCount % 50000 == 0) //prevent logfile from becoming too big
     {
         logFile->Close();
         wxRemoveFile(logfileName);

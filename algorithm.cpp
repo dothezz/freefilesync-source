@@ -1,7 +1,6 @@
 #include "algorithm.h"
 #include <wx/intl.h>
 #include <cmath>
-#include <wx/filename.h>
 #include <wx/log.h>
 #include "library/resources.h"
 
@@ -96,7 +95,7 @@ wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
 
 
 Zstring FreeFileSync::getFormattedDirectoryName(const Zstring& dirname)
-{   //Formatting is needed since functions in FreeFileSync.cpp expect the directory to end with '\' to be able to split the relative names.
+{   //Formatting is needed since functions expect the directory to end with '\' to be able to split the relative names.
     //Also improves usability.
 
     Zstring dirnameTmp = dirname;
@@ -106,17 +105,16 @@ Zstring FreeFileSync::getFormattedDirectoryName(const Zstring& dirname)
     if (dirnameTmp.empty()) //an empty string is interpreted as "\"; this is not desired
         return Zstring();
 
-    //let wxWidgets do the directory formatting, e.g. replace '/' with '\' for Windows
-    wxFileName directory = wxFileName::DirName(dirnameTmp.c_str());
+    if (!endsWithPathSeparator(dirnameTmp))
+        dirnameTmp += GlobalResources::FILE_NAME_SEPARATOR;
 
-    return Zstring(directory.GetPath(wxPATH_GET_VOLUME | wxPATH_GET_SEPARATOR));
+    //don't do directory formatting with wxFileName, as it doesn't respect //?/ - prefix
+    return dirnameTmp;
 }
 
 
 void FreeFileSync::swapGrids(FileCompareResult& grid)
 {
-    FileDescrLine tmp;
-
     for (FileCompareResult::iterator i = grid.begin(); i != grid.end(); ++i)
     {
         //swap compare result
@@ -130,13 +128,11 @@ void FreeFileSync::swapGrids(FileCompareResult& grid)
             i->cmpResult = FILE_RIGHT_NEWER;
 
         //swap file descriptors
-        tmp = i->fileDescrLeft;
-        i->fileDescrLeft = i->fileDescrRight;
-        i->fileDescrRight = tmp;
+        std::swap(i->fileDescrLeft, i->fileDescrRight);
     }
 }
 
-
+/*
 void FreeFileSync::adjustModificationTimes(const Zstring& parentDirectory, const int timeInSeconds, ErrorHandler* errorHandler) throw(AbortThisProcess)
 {
 #ifndef __WXDEBUG__
@@ -200,7 +196,7 @@ void FreeFileSync::adjustModificationTimes(const Zstring& parentDirectory, const
         }
     }
 }
-
+*/
 
 void compoundStringToTable(const Zstring& compoundInput, const DefaultChar* delimiter, std::vector<Zstring>& output)
 {
@@ -271,7 +267,7 @@ void formatFilterString(Zstring& filter)
 }
 
 
-void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, const wxString& includeFilter, const wxString& excludeFilter)
+void FreeFileSync::filterGridData(FileCompareResult& currentGridData, const wxString& includeFilter, const wxString& excludeFilter)
 {
     //no need for regular expressions! In tests wxRegex was by factor of 10 slower than wxString::Matches()!!
 
@@ -372,7 +368,7 @@ void FreeFileSync::filterCurrentGridData(FileCompareResult& currentGridData, con
 }
 
 
-void FreeFileSync::removeFilterOnCurrentGridData(FileCompareResult& currentGridData)
+void FreeFileSync::includeAllRowsOnGrid(FileCompareResult& currentGridData)
 {
     //remove all filters on currentGridData
     for (FileCompareResult::iterator i = currentGridData.begin(); i != currentGridData.end(); ++i)
@@ -380,38 +376,147 @@ void FreeFileSync::removeFilterOnCurrentGridData(FileCompareResult& currentGridD
 }
 
 
+void FreeFileSync::excludeAllRowsOnGrid(FileCompareResult& currentGridData)
+{
+    //exclude all rows on currentGridData
+    for (FileCompareResult::iterator i = currentGridData.begin(); i != currentGridData.end(); ++i)
+        i->selectedForSynchronization = false;
+}
+
+
 //add(!) all files and subfolder gridlines that are dependent from the directory
-void FreeFileSync::addSubElements(std::set<int>& subElements, const FileCompareResult& grid, const FileCompareLine& relevantRow)
+template <bool searchLeftSide>
+void addSubElementsOneSide(const FileCompareResult& grid, const FileCompareLine& relevantRow, std::set<int>& subElements)
 {
     Zstring relevantDirectory;
 
-    if (relevantRow.fileDescrLeft.objType == FileDescrLine::TYPE_DIRECTORY)
-        relevantDirectory = relevantRow.fileDescrLeft.relativeName + GlobalResources::FILE_NAME_SEPARATOR; //FILE_NAME_SEPARATOR needed to exclude subfile/dirs only
-    else if (relevantRow.fileDescrRight.objType == FileDescrLine::TYPE_DIRECTORY)
-        relevantDirectory = relevantRow.fileDescrRight.relativeName + GlobalResources::FILE_NAME_SEPARATOR;
+    const FileDescrLine* fileDescr = NULL; //get descriptor for file to be deleted; evaluated at compile time
+    if (searchLeftSide)
+        fileDescr = &relevantRow.fileDescrLeft;
+    else
+        fileDescr = &relevantRow.fileDescrRight;
+
+    if (fileDescr->objType == FileDescrLine::TYPE_DIRECTORY)
+        relevantDirectory = fileDescr->relativeName + GlobalResources::FILE_NAME_SEPARATOR; //FILE_NAME_SEPARATOR needed to exclude subfile/dirs only
     else
         return;
 
     for (FileCompareResult::const_iterator i = grid.begin(); i != grid.end(); ++i)
-        if (    i->fileDescrLeft.relativeName.StartsWith(relevantDirectory) ||
-                i->fileDescrRight.relativeName.StartsWith(relevantDirectory))
-            subElements.insert(i - grid.begin());
+    {
+        if (searchLeftSide) //evaluated at compile time
+        {
+            if (i->fileDescrLeft.relativeName.StartsWith(relevantDirectory))
+                subElements.insert(i - grid.begin());
+        }
+        else
+        {
+            if (i->fileDescrRight.relativeName.StartsWith(relevantDirectory))
+                subElements.insert(i - grid.begin());
+        }
+    }
 }
 
 
-class AlwaysWriteToGrid //this class ensures, that the result of the method below is ALWAYS written on exit, even if exceptions are thrown!
+//add(!) all files and subfolder gridlines that are dependent from the directory
+void FreeFileSync::addSubElements(const FileCompareResult& grid, const FileCompareLine& relevantRow, std::set<int>& subElements)
+{
+    addSubElementsOneSide<true>(grid, relevantRow, subElements);
+    addSubElementsOneSide<false>(grid, relevantRow, subElements);
+}
+
+
+//############################################################################################################
+struct SortedFileName
+{
+    unsigned position;
+    Zstring name;
+
+    bool operator < (const SortedFileName& b) const
+    {
+        return position < b.position;
+    }
+};
+
+
+//assemble message containing all files to be deleted
+wxString FreeFileSync::deleteFromGridAndHDPreview(const FileCompareResult& grid,
+        const std::set<int>& rowsToDeleteOnLeft,
+        const std::set<int>& rowsToDeleteOnRight,
+        const bool deleteOnBothSides)
+{
+    if (deleteOnBothSides)
+    {
+        //mix selected rows from left and right
+        std::set<int> rowsToDelete = rowsToDeleteOnLeft;
+        for (std::set<int>::const_iterator i = rowsToDeleteOnRight.begin(); i != rowsToDeleteOnRight.end(); ++i)
+            rowsToDelete.insert(*i);
+
+        wxString filesToDelete;
+        for (std::set<int>::const_iterator i = rowsToDelete.begin(); i != rowsToDelete.end(); ++i)
+        {
+            const FileCompareLine& currentCmpLine = grid[*i];
+
+            if (currentCmpLine.fileDescrLeft.objType != FileDescrLine::TYPE_NOTHING)
+                filesToDelete += (currentCmpLine.fileDescrLeft.fullName + wxT("\n")).c_str();
+
+            if (currentCmpLine.fileDescrRight.objType != FileDescrLine::TYPE_NOTHING)
+                filesToDelete += (currentCmpLine.fileDescrRight.fullName + wxT("\n")).c_str();
+
+            filesToDelete+= wxT("\n");
+        }
+
+        return filesToDelete;
+    }
+    else //delete selected files only
+    {
+        std::set<SortedFileName> outputTable; //sort selected files from left and right ascending by row number
+
+        SortedFileName newEntry;
+        for (std::set<int>::const_iterator i = rowsToDeleteOnLeft.begin(); i != rowsToDeleteOnLeft.end(); ++i)
+        {
+            const FileCompareLine& currentCmpLine = grid[*i];
+
+            if (currentCmpLine.fileDescrLeft.objType != FileDescrLine::TYPE_NOTHING)
+            {
+                newEntry.position = *i * 10;
+                newEntry.name = currentCmpLine.fileDescrLeft.fullName;
+                outputTable.insert(newEntry);
+            }
+        }
+
+        for (std::set<int>::const_iterator i = rowsToDeleteOnRight.begin(); i != rowsToDeleteOnRight.end(); ++i)
+        {
+            const FileCompareLine& currentCmpLine = grid[*i];
+
+            if (currentCmpLine.fileDescrRight.objType != FileDescrLine::TYPE_NOTHING)
+            {
+                newEntry.position = *i * 10 + 1; //ensure files on left are before files on right for the same row number
+                newEntry.name = currentCmpLine.fileDescrRight.fullName;
+                outputTable.insert(newEntry);
+            }
+        }
+
+        wxString filesToDelete;
+        for (std::set<SortedFileName>::iterator i = outputTable.begin(); i != outputTable.end(); ++i)
+            filesToDelete += (i->name + wxT("\n")).c_str();
+
+        return filesToDelete;
+    }
+}
+
+
+class RemoveAtExit //this class ensures, that the result of the method below is ALWAYS written on exit, even if exceptions are thrown!
 {
 public:
-    AlwaysWriteToGrid(FileCompareResult& grid) :
-            gridToWrite(grid)
-    {}
+    RemoveAtExit(FileCompareResult& grid) :
+            gridToWrite(grid) {}
 
-    ~AlwaysWriteToGrid()
+    ~RemoveAtExit()
     {
         removeRowsFromVector(gridToWrite, rowsProcessed);
     }
 
-    void rowProcessedSuccessfully(int nr)
+    void removeRow(int nr)
     {
         rowsProcessed.insert(nr);
     }
@@ -422,40 +527,84 @@ private:
 };
 
 
-void FreeFileSync::deleteOnGridAndHD(FileCompareResult& grid, const std::set<int>& rowsToDelete, ErrorHandler* errorHandler, const bool useRecycleBin) throw(AbortThisProcess)
+template <bool leftSide> //update compareGrid row information after deletion from leftSide (or !leftSide)
+inline
+void updateCmpLineAfterDeletion(FileCompareLine& relevantRow, const int rowNr, RemoveAtExit& markForRemoval)
 {
-    //remove deleted rows from grid
-    AlwaysWriteToGrid writeOutput(grid);  //ensure that grid is always written to, even if method is exitted via exceptions
-
-    //remove from hd
-    for (std::set<int>::iterator i = rowsToDelete.begin(); i != rowsToDelete.end(); ++i)
+    FileDescrLine* fileDescr        = NULL; //get descriptor for file to be deleted; evaluated at compile time
+    FileDescrLine* fileDescrPartner = NULL; //file descriptor for "other side"
+    if (leftSide)
     {
-        const FileCompareLine& currentCmpLine = grid[*i];
+        fileDescr        = &relevantRow.fileDescrLeft;
+        fileDescrPartner = &relevantRow.fileDescrRight;
+    }
+    else
+    {
+        fileDescr        = &relevantRow.fileDescrRight;
+        fileDescrPartner = &relevantRow.fileDescrLeft;
+    }
+
+
+    //remove deleted entries from grid
+    if (fileDescrPartner->objType == FileDescrLine::TYPE_NOTHING)
+        markForRemoval.removeRow(rowNr);
+    else
+    {
+        //initialize fileDescr for deleted file/folder
+        const Zstring saveDir = fileDescr->directory;
+        *fileDescr = FileDescrLine();
+        fileDescr->directory = saveDir;
+
+        //adapt the compare result
+        if (leftSide) //again evaluated at compile time
+            relevantRow.cmpResult = FILE_RIGHT_SIDE_ONLY;
+        else
+            relevantRow.cmpResult = FILE_LEFT_SIDE_ONLY;
+    }
+}
+
+
+template <bool leftSide>
+void deleteFromGridAndHDOneSide(FileCompareResult& grid,
+                                const std::set<int>& rowsToDeleteOneSide,
+                                const bool useRecycleBin,
+                                RemoveAtExit& markForRemoval,
+                                ErrorHandler* errorHandler)
+{
+    for (std::set<int>::iterator i = rowsToDeleteOneSide.begin(); i != rowsToDeleteOneSide.end(); ++i)
+    {
+        FileCompareLine& currentCmpLine = grid[*i];
+
+        FileDescrLine* fileDescr = NULL; //get descriptor for file to be deleted; evaluated at compile time
+        if (leftSide)
+            fileDescr = &currentCmpLine.fileDescrLeft;
+        else
+            fileDescr = &currentCmpLine.fileDescrRight;
 
         while (true)
         {
             try
             {
-                if (currentCmpLine.fileDescrLeft.objType == FileDescrLine::TYPE_FILE)
-                    FreeFileSync::removeFile(currentCmpLine.fileDescrLeft.fullName, useRecycleBin);
-                else if (currentCmpLine.fileDescrLeft.objType == FileDescrLine::TYPE_DIRECTORY)
-                    FreeFileSync::removeDirectory(currentCmpLine.fileDescrLeft.fullName, useRecycleBin);
-
-                if (currentCmpLine.fileDescrRight.objType == FileDescrLine::TYPE_FILE)
-                    FreeFileSync::removeFile(currentCmpLine.fileDescrRight.fullName, useRecycleBin);
-                else if (currentCmpLine.fileDescrRight.objType == FileDescrLine::TYPE_DIRECTORY)
-                    FreeFileSync::removeDirectory(currentCmpLine.fileDescrRight.fullName, useRecycleBin);
-
-                //remove deleted row from grid
-                writeOutput.rowProcessedSuccessfully(*i);
+                if (fileDescr->objType == FileDescrLine::TYPE_FILE)
+                    FreeFileSync::removeFile(fileDescr->fullName, useRecycleBin);
+                else if (fileDescr->objType == FileDescrLine::TYPE_DIRECTORY)
+                    FreeFileSync::removeDirectory(fileDescr->fullName, useRecycleBin);
+                else if (fileDescr->objType == FileDescrLine::TYPE_NOTHING)
+                    break; //nothing to do
+                else
+                {
+                    assert(false);
+                    break;
+                }
 
                 //retrieve all files and subfolder gridlines that are dependent from this deleted entry
-                std::set<int> additionalRowsToDelete;
-                addSubElements(additionalRowsToDelete, grid, grid[*i]);
+                std::set<int> rowsToDelete;
+                rowsToDelete.insert(*i);
+                addSubElementsOneSide<leftSide>(grid, grid[*i], rowsToDelete);
 
-                //...and remove them also
-                for (std::set<int>::iterator j = additionalRowsToDelete.begin(); j != additionalRowsToDelete.end(); ++j)
-                    writeOutput.rowProcessedSuccessfully(*j);
+                //remove deleted entries from grid (or adapt it if deleted from one side only)
+                for (std::set<int>::iterator j = rowsToDelete.begin(); j != rowsToDelete.end(); ++j)
+                    updateCmpLineAfterDeletion<leftSide>(grid[*j], *j, markForRemoval);
 
                 break;
             }
@@ -475,6 +624,53 @@ void FreeFileSync::deleteOnGridAndHD(FileCompareResult& grid, const std::set<int
         }
     }
 }
+
+
+void FreeFileSync::deleteFromGridAndHD(FileCompareResult& grid,
+                                       const std::set<int>& rowsToDeleteOnLeft,
+                                       const std::set<int>& rowsToDeleteOnRight,
+                                       const bool deleteOnBothSides,
+                                       const bool useRecycleBin,
+                                       ErrorHandler* errorHandler)
+{
+    //remove deleted rows from grid (AFTER all rows to be deleted are known: consider row references!
+    RemoveAtExit markForRemoval(grid); //ensure that grid is always written to, even if method is exitted via exceptions
+
+    if (deleteOnBothSides)
+    {
+        //mix selected rows from left and right
+        std::set<int> rowsToDeleteBothSides = rowsToDeleteOnLeft;
+        for (std::set<int>::const_iterator i = rowsToDeleteOnRight.begin(); i != rowsToDeleteOnRight.end(); ++i)
+            rowsToDeleteBothSides.insert(*i);
+
+        deleteFromGridAndHDOneSide<true>(grid,
+                                         rowsToDeleteBothSides,
+                                         useRecycleBin,
+                                         markForRemoval,
+                                         errorHandler);
+
+        deleteFromGridAndHDOneSide<false>(grid,
+                                          rowsToDeleteBothSides,
+                                          useRecycleBin,
+                                          markForRemoval,
+                                          errorHandler);
+    }
+    else
+    {
+        deleteFromGridAndHDOneSide<true>(grid,
+                                         rowsToDeleteOnLeft,
+                                         useRecycleBin,
+                                         markForRemoval,
+                                         errorHandler);
+
+        deleteFromGridAndHDOneSide<false>(grid,
+                                          rowsToDeleteOnRight,
+                                          useRecycleBin,
+                                          markForRemoval,
+                                          errorHandler);
+    }
+}
+//############################################################################################################
 
 
 inline
@@ -565,42 +761,22 @@ wxString FreeFileSync::utcTimeToLocalString(const time_t utcTime)
 
 
 #ifdef FFS_WIN
-inline
-Zstring getDriveName(const Zstring& directoryName) //GetVolume() doesn't work under Linux!
+Zstring FreeFileSync::getLastErrorFormatted(const unsigned long lastError) //try to get additional windows error information
 {
-    const Zstring volumeName = wxFileName(directoryName.c_str()).GetVolume().c_str();
-    if (volumeName.empty())
-        return Zstring();
+    unsigned long lastErrorCode = lastError;
+    //determine error code if none was specified
+    if (lastErrorCode == 0)
+        lastErrorCode = GetLastError();
 
-    return volumeName + wxFileName::GetVolumeSeparator().c_str() + GlobalResources::FILE_NAME_SEPARATOR;
-}
-#endif  //FFS_WIN
+    Zstring output = Zstring(wxT("Windows Error Code ")) + wxString::Format(wxT("%u"), lastErrorCode).c_str();
 
-
-#ifdef FFS_WIN
-bool FreeFileSync::isFatDrive(const Zstring& directoryName)
-{
-    const Zstring driveName = getDriveName(directoryName);
-    if (driveName.empty())
-        return false;
-
-    wxChar fileSystem[32];
-    if (!GetVolumeInformation(driveName.c_str(), NULL, 0, NULL, NULL, NULL, fileSystem, 32))
-        return false;
-
-    return Zstring(fileSystem).StartsWith(wxT("FAT"));
+    WCHAR buffer[1001];
+    if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 0, lastErrorCode, 0, buffer, 1001, NULL) != 0)
+        output += Zstring(wxT(": ")) + buffer;
+    return output;
 }
 #endif
 
-
-inline
-bool sameFileTime(const time_t a, const time_t b)
-{
-    if (a < b)
-        return b - a <= FILE_TIME_PRECISION;
-    else
-        return a - b <= FILE_TIME_PRECISION;
-}
 
 
 /*Statistical theory: detect daylight saving time (DST) switch by comparing files that exist on both sides (and have same filesizes). If there are "enough"
@@ -642,7 +818,16 @@ N(M) =
 77/1000000 * M + 10 for  50000 <  M <= 400000
 60/1000000 * M + 35 for 400000 <  M
 
-*/
+
+inline
+bool sameFileTime(const time_t a, const time_t b)
+{
+    if (a < b)
+        return b - a <= FILE_TIME_PRECISION;
+    else
+        return a - b <= FILE_TIME_PRECISION;
+}
+
 
 #ifdef FFS_WIN
 unsigned int getThreshold(const unsigned filesWithSameSizeTotal)
@@ -745,5 +930,4 @@ void FreeFileSync::checkForDSTChange(const FileCompareResult& gridData,
     }
 }
 #endif  //FFS_WIN
-
-
+*/

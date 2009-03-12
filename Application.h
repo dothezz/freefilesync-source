@@ -54,51 +54,60 @@ public:
 
 
 class LogFile;
+class FfsTrayIcon;
+
 class BatchStatusHandlerSilent : public BatchStatusHandler
 {
 public:
-    BatchStatusHandlerSilent(bool ignoreAllErrors, LogFile* log, int& returnVal);
+    BatchStatusHandlerSilent(const xmlAccess::OnError handleError, int& returnVal);
     ~BatchStatusHandlerSilent();
 
 
-    void updateStatusText(const Zstring& text); //virtual impl.
-    void initNewProcess(int objectsTotal, double dataTotal, Process processID); //virtual impl.
-    void updateProcessedData(int objectsProcessed, double dataProcessed) {} //virtual impl.
-    ErrorHandler::Response reportError(const Zstring& text); //virtual impl.
-    void forceUiRefresh() {} //virtual impl.
+    virtual void updateStatusText(const Zstring& text);
+    virtual void initNewProcess(int objectsTotal, double dataTotal, Process processID);
+    virtual void updateProcessedData(int objectsProcessed, double dataProcessed) {}
+    virtual void forceUiRefresh();
 
-    void exitAndSetStatus(const wxString& message, ExitCode code); //abort externally //virtual impl.
+    virtual ErrorHandler::Response reportError(const Zstring& errorMessage);
+    virtual void reportFatalError(const Zstring& errorMessage);
+    virtual void reportWarning(const Zstring& warningMessage, bool& dontShowAgain);
+
+    virtual void exitAndSetStatus(const wxString& message, ExitCode code); //abort externally
 
 private:
-    void abortThisProcess(); //virtual impl.
+    virtual void abortThisProcess();
 
-    bool ignoreErrors;
+    xmlAccess::OnError m_handleError;
     wxArrayString unhandledErrors; //list of non-resolved errors
     Process currentProcess;
     int& returnValue;
+    std::auto_ptr<FfsTrayIcon> trayIcon;
 
-    LogFile* m_log;
+    std::auto_ptr<LogFile> m_log;
 };
 
 
 class BatchStatusHandlerGui : public BatchStatusHandler
 {
 public:
-    BatchStatusHandlerGui(bool ignoreAllErrors, int& returnVal);
+    BatchStatusHandlerGui(const xmlAccess::OnError handleError, int& returnVal);
     ~BatchStatusHandlerGui();
 
-    void updateStatusText(const Zstring& text); //virtual impl.
-    void initNewProcess(int objectsTotal, double dataTotal, Process processID); //virtual impl.
-    void updateProcessedData(int objectsProcessed, double dataProcessed); //virtual impl.
-    ErrorHandler::Response reportError(const Zstring& text); //virtual impl.
-    void forceUiRefresh(); //virtual impl.
+    virtual void updateStatusText(const Zstring& text);
+    virtual void initNewProcess(int objectsTotal, double dataTotal, Process processID);
+    virtual void updateProcessedData(int objectsProcessed, double dataProcessed);
+    virtual void forceUiRefresh();
 
-    void exitAndSetStatus(const wxString& message, ExitCode code); //abort externally //virtual impl.
+    virtual ErrorHandler::Response reportError(const Zstring& errorMessage);
+    virtual void reportFatalError(const Zstring& errorMessage);
+    virtual void reportWarning(const Zstring& warningMessage, bool& dontShowAgain);
+
+    virtual void exitAndSetStatus(const wxString& message, ExitCode code); //abort externally
 
 private:
-    void abortThisProcess(); //virtual impl.
+    virtual void abortThisProcess();
 
-    bool ignoreErrors;
+    xmlAccess::OnError m_handleError;
     wxArrayString unhandledErrors; //list of non-resolved errors
     Process currentProcess;
     int& returnValue;

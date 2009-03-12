@@ -14,8 +14,7 @@ namespace FreeFileSync
 {
 #ifdef FFS_WIN
     //super fast case-insensitive string comparison: way faster than wxString::CmpNoCase()!!!
-    int compareStringsWin32(const wchar_t* a, const wchar_t* b);
-    int compareStringsWin32(const wchar_t* a, const wchar_t* b, const int aCount, const int bCount);
+    int compareStringsWin32(const wchar_t* a, const wchar_t* b, const int aCount = -1, const int bCount = -1);
 #endif  //FFS_WIN
 }
 
@@ -322,11 +321,11 @@ void Zstring::incRef() const
 inline
 void Zstring::decRef()
 {
-    assert(descr && descr->refCount >= 1);
+    assert(descr && descr->refCount >= 1); //descr points to the begin of the allocated memory block
     if (--descr->refCount == 0)
     {
-        assert(descr); //descr points to the begin of the allocated memory block
         free(descr);   //this must NEVER be changed!! E.g. Trim() relies on descr being start of allocated memory block
+        descr = 0;
 #ifdef __WXDEBUG__
         --allocCount; //test Zstring for memory leaks
 #endif
@@ -345,7 +344,7 @@ int Zstring::CmpNoCase(const DefaultChar* other) const
 inline
 int Zstring::CmpNoCase(const Zstring& other) const
 {
-    return FreeFileSync::compareStringsWin32(c_str(), other.c_str()); //way faster than wxString::CmpNoCase()!!
+    return FreeFileSync::compareStringsWin32(c_str(), other.c_str(), length(), other.length()); //way faster than wxString::CmpNoCase()!!
 }
 #endif
 

@@ -4,7 +4,7 @@ ENDFLAGS=`wx-config --libs` -lwx_gtk2_aui-2.8 -O3 -pthread
 all: FreeFileSync
 
 init:
-	mkdir obj
+	if [ ! -d obj ]; then mkdir obj; fi
 	
 obj/algorithm.o: algorithm.cpp
 	g++ $(CPPFLAGS) algorithm.cpp -o obj/algorithm.o

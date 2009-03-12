@@ -57,8 +57,14 @@ private:
 class DeleteDialog : public DeleteDlgGenerated
 {
 public:
-    DeleteDialog(const wxString& headerText, const wxString& messageText, wxWindow* main);
-    ~DeleteDialog();
+    DeleteDialog(wxWindow* main,
+                 const FileCompareResult& grid,
+                 const std::set<int>& rowsOnLeft,
+                 const std::set<int>& rowsOnRight,
+                 bool& deleteOnBothSides,
+                 bool& useRecycleBin);
+
+    ~DeleteDialog() {}
 
     enum
     {
@@ -70,20 +76,30 @@ private:
     void OnOK(wxCommandEvent& event);
     void OnCancel(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);
+    void OnDelOnBothSides(wxCommandEvent& event);
+    void OnUseRecycler(wxCommandEvent& event);
+
+    void updateTexts();
+
+    const FileCompareResult& mainGrid;
+    const std::set<int>& rowsToDeleteOnLeft;
+    const std::set<int>& rowsToDeleteOnRight;
+    bool& m_deleteOnBothSides;
+    bool& m_useRecycleBin;
 };
 
 
 class ErrorDlg : public ErrorDlgGenerated
 {
 public:
-    ErrorDlg(wxWindow* parentWindow, const wxString messageText, bool& ignoreNextErrors);
+    ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxString messageText, bool& ignoreNextErrors);
     ~ErrorDlg();
 
     enum
     {
-        BUTTON_IGNORE,
-        BUTTON_RETRY,
-        BUTTON_ABORT
+        BUTTON_IGNORE = 1,
+        BUTTON_RETRY  = 2,
+        BUTTON_ABORT  = 4
     };
 
 private:
@@ -99,15 +115,13 @@ private:
 class WarningDlg : public WarningDlgGenerated
 {
 public:
-    WarningDlg(wxWindow* parentWindow,  int activeButtons, const wxString messageText, bool& dontShowAgain);
+    WarningDlg(wxWindow* parentWindow, int activeButtons, const wxString messageText, bool& dontShowAgain);
     ~WarningDlg();
 
     enum
     {
         BUTTON_IGNORE  = 1,
-        BUTTON_RESOLVE = 2,
-        BUTTON_ABORT   = 4,
-        BUTTON_OKAY    = 8
+        BUTTON_ABORT   = 2
     };
 
 private:
@@ -124,7 +138,7 @@ private:
 class CustomizeColsDlg : public CustomizeColsDlgGenerated
 {
 public:
-    CustomizeColsDlg(wxWindow* window, xmlAccess::XmlGlobalSettings::ColumnAttributes& attr);
+    CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes& attr);
     ~CustomizeColsDlg() {}
 
     enum
@@ -141,7 +155,7 @@ private:
     void OnMoveUp(wxCommandEvent& event);
     void OnMoveDown(wxCommandEvent& event);
 
-    xmlAccess::XmlGlobalSettings::ColumnAttributes& output;
+    xmlAccess::ColumnAttributes& output;
 };
 
 
@@ -158,6 +172,7 @@ public:
 
 private:
     void OnOkay(wxCommandEvent& event);
+    void OnResetWarnings(wxCommandEvent& event);
     void OnDefault(wxCommandEvent& event);
     void OnCancel(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);

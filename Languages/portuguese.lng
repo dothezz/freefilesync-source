@@ -1,4 +1,4 @@
-  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+﻿  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
  Byte
  Byte
@@ -28,8 +28,8 @@
 &Sobre...
 &Advanced
 &Avançado
-&Back
-&Atrás
+&Apply
+&Aplicar
 &Cancel
 &Cancelar
 &Compare
@@ -50,6 +50,8 @@
 &Ignorar
 &Language
 &Língua
+&Load
+&Carregar
 &Load configuration
 &Carregar configuração
 &OK
@@ -58,8 +60,6 @@
 &Pausa
 &Quit
 &Sair
-&Resolve
-&Resolve
 &Retry
 &Tentar de Novo
 &Save
@@ -114,6 +114,8 @@
 <<	ficheiro à esquerda mais recente\n
 <Directory>
 <Directório>
+<Last session>
+<Última Sessão>
 <multiple selection>
 <Selecção Múltipla>
 <|	file on left side only\n
@@ -144,8 +146,10 @@ As a result the files are separated into the following categories:
 Como resultado, os ficheiros foram separados nas seguintes categorias:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
 Como o nome sugere, dois ficheiros com o mesmo nome são assinalados iguais se e só se o seu conteúdo for idêntico. Esta opção é útil para controles de consistência mais do que para efeitos de backup. Portanto, a data dos ficheiros não é tomada em conta.\n\nCom esta opção, a arvoré de decisão é menor:
-Assemble a batch file with the following settings. To start synchronization in batch mode simply execute this file or schedule it in your operating system's task planner.
-Criar um ficheiro batch com as seguintes opções. Para iniciar a sincronização no modo batch, execute o ficheiro ou junte-o ao programador de tarefas do sistema operativo.
+Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
+Criar um batch para sincronização automática. Para iniciar o modo batch, passar o nome do ficheiro para o executável do FreeFileSync: FreeFileSync.exe <ficheiro batch>. Também pode ser calendarizado no programador de tarefas.
+Batch execution
+Execução do batch
 Batch file created successfully!
 Ficheiro batch criado com sucesso!
 Batch job
@@ -156,6 +160,8 @@ Build:
 Criado:
 Cancel
 Cancelar
+Check all
+Verificar tudo
 Choose to hide filtered files/directories from list
 Ocultar itens filtrados da lista
 Comma separated list
@@ -192,8 +198,6 @@ Configure your own synchronization rules.
 Configure as suas regras de sincronização.
 Confirm
 Confirmar
-Consider this when setting up synchronization rules: You might want to avoid write access to these directories so that synchronization of both does not interfere.
-A considerar ao escolher as regras de sincronização: Pode querer evitar escrever sobre estas pastas para que a sincronização ocorra sem problemas.
 Continue
 Continuar
 Conversion error:
@@ -244,14 +248,18 @@ Delete files/folders existing on right side only
 Eliminar itens existentes apenas no lado direito
 Delete files\tDEL
 Eliminar ficheiros\tDEL
+Delete on both sides
+Eliminar em ambos os lados
+Delete on both sides even if the file is selected on one side only
+Eliminar em ambos os lados mesmo se o ficheiro só está seleccionado num lado
 Delete:
 Eliminar:
 Deleting file %x
 Apagar ficheiro %x
 Deleting folder %x
 Apagar pasta %x
-Directories are dependent:
-As pastas são dependentes:
+Directories are dependent! Be careful when setting up synchronization rules:
+Directórios são dependentes! Cuidado ao definir as regras de sincronização:
 Directory does not exist:
 A pasta não existe:
 Do not show graphical status and error messages but write to a logfile instead
@@ -262,8 +270,8 @@ Do nothing
 Não fazer nada
 Do you really want to delete the following objects(s)?
 Quer mesmo eliminar o(s) seguinte(s) item(s) ?
-Do you really want to move the following objects(s) to the recycle bin?
-Quer mesmo enviar o(s) seguinte(s) item(s) para a Reciclagem?
+Do you really want to move the following objects(s) to the Recycle Bin?
+Quer mesmo mover o(s) seguinte(s) objecto(s) para a Reciclagem?
 Donate with PayPal
 Doar usando PayPal
 Drag && drop
@@ -282,8 +290,10 @@ Error deleting directory:
 Erro ao eliminar a pasta:
 Error deleting file:
 Erro ao eliminar o ficheiro:
-Error moving to recycle bin:
-Erro ao mover para a Reciclagem:
+Error handling
+Controlador de erros
+Error moving to Recycle Bin:
+Erro ao mover para Reciclagem:
 Error parsing configuration file:
 Erro de leitura do ficheiro de configuração:
 Error reading file:
@@ -306,6 +316,10 @@ Exclude temporarily
 Excluir temporariamente
 Exclude via filter:
 Excluir por filtro:
+Exit immediately and set returncode < 0
+Sair imediatamente e enviar o código < 0
+Exit with RC < 0
+Sair com RC < 0
 FAT32: Handle Daylight Saving Time
 FAT32: Tratar Hora de Verão
 Feedback and suggestions are welcome at:
@@ -344,14 +358,14 @@ Files/folders that exist on left side only
 Ficheiros/pastas existentes somente à esquerda
 Files/folders that exist on right side only
 Ficheiros/pastas existentes somente à direita
-Filter
-Filtro
 Filter active: Press again to deactivate
 Filtro activo: Clique aqui para desactivar
 Filter files
 Filtrar ficheiros
 Filter view
 Filtrar vista
+Folder Comparison and Synchronization
+Comparação e Sincronização de pastas
 Folder pair
 Par de pastas
 FreeFileSync - Folder Comparison and Synchronization
@@ -364,12 +378,16 @@ FreeFileSync batch file
 FreeFileSync Ficheiro batch
 FreeFileSync configuration
 FreeFileSync configuração
+Full name
+Nome completo
 Generating file list...
 A gerar lista ficheiros...
 Global settings
 Opções
 Help
 Ajuda
+Hide all error and warning messages
+Ocultar todas as mensagens de erro ou aviso
 Hide files that are different
 Ocultar ficheiros diferentes
 Hide files that are equal
@@ -396,8 +414,8 @@ If you like FFS:
 SE gosta de FFS:
 Ignore errors
 Ignorar erros
-Ignore next errors
-Ignorar erros seguintes
+Ignore subsequent errors
+Ignorar erros subsequentes
 Ignore this error, retry or abort synchronization?
 Ignorar erro, tentar de novo ou abortar a sincronização?
 Ignore this error, retry or abort?
@@ -412,8 +430,6 @@ Info
 Info
 Information
 Informação
-Information: If you ignore the error or abort a re-compare will be necessary!
-Informação: Se ignorar o erro ou abortar, será necessário voltar a comparar!
 Initialization of Recycle Bin failed!
 Início da Reciclagem falhou!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -422,10 +438,10 @@ Left folder:
 Pasta esquerda:
 Legend
 Legenda
-Load configuration via...\n     - this list (press DEL to delete items)\n     - drag & drop to this window\n     - startup parameter
-Carregar configuração via...\n     - esta lista (pressione DEL para apagar itens),\n     - pegar & largar para esta janela,\n     - parâmetros de arranque.
-Load from file...
-Carregar a partir de ficheiro...
+Load configuration from file
+Carregar configuração do ficheiro
+Load configuration history (press DEL to delete items)
+Carregar histórico de configuração (pressione DEL para apagar itens)
 Log-messages:
 Log de mensagens:
 Mirror ->>
@@ -474,6 +490,12 @@ Relative path
 Caminho
 Remove folder pair
 Remover o par de pastas
+Reset
+Reiniciar
+Reset all warning messages?
+Reiniciar mensagens de aviso?
+Resets all warning messages
+Reinicia mensagens de aviso
 Result
 Resultado
 Right folder:
@@ -504,6 +526,12 @@ Show files that exist on left side only
 Mostrar ficheiros existentes somente à esquerda
 Show files that exist on right side only
 Mostrar ficheiros existentes somente à direita
+Show popup
+Mostrar popups
+Show popup on errors or warnings
+Mostrar popup c/ erros ou avisos
+Significant difference detected: More than 50% of files will be overwritten/deleted!
+Diferença significativa detectada: Mais de 50% dos ficheiros serão substituídos/apagados!
 Silent mode
 Modo silencioso
 Size
@@ -542,16 +570,18 @@ System out of memory!
 Sistema sem memória!
 The file does not contain a valid configuration:
 O ficheiro não contém uma configuração válida:
-The selected file does not exist:
-O ficheiro seleccionado não existe:
+The file does not exist:
+O ficheiro não existe:
+This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
+Esta linha de comandos será executada cada vez que fizer duplo click num ficheiro. %name serve para reservar o lugar do ficheiro seleccionado.
 This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
 Esta linha de comandos será executada cada vez que fizer duplo click num ficheiro. %x serve para reservar o lugar do ficheiro seleccionado.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
 Esta variante avalia dois ficheiros de nome igual como iguais quando têm o mesmo tamanho e a mesma data e hora de modificação. Atenção: É permitido um desvio de 2 segundos na hora, de maneira a assegurar a sincronização com sistema de ficheiros de baixa precisão FAT32.
+Time
+Hora
 Time elapsed:
 Tempo passado:
-Time:
-Hora:
 Total amount of data that will be transferred
 Volume de dados a ser transferido
 Total time:
@@ -562,6 +592,8 @@ Unable to create logfile!
 Não é possível criar ficheiro log!
 Unable to initialize Recycle Bin!
 Não é possível iniciar a Reciclagem!
+Uncheck all
+Deseleccionar todos
 Update ->
 Actualizar ->
 Update:

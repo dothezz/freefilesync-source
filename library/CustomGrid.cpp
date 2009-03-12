@@ -5,8 +5,6 @@
 #include "../algorithm.h"
 #include "resources.h"
 
-using namespace xmlAccess;
-
 
 const unsigned int MIN_ROW_COUNT = 15;
 
@@ -16,8 +14,11 @@ class CustomGridTable : public wxGridTableBase
 public:
     CustomGridTable() :
             wxGridTableBase(),
-            lightBlue(80, 110, 255),
-            lightGrey(212, 208, 200),
+            blue(80, 110, 255),
+            grey(212, 208, 200),
+            lightRed(235, 57, 61),
+            lightBlue(63, 206, 233),
+            lightGreen(54, 218, 2),
             gridRefUI(NULL),
             gridData(NULL),
             lastNrRows(0),
@@ -186,29 +187,32 @@ public:
     }
 
 
-    void setupColumns(const std::vector<xmlAccess::XmlGlobalSettings::ColumnTypes>& positions)
+    void setupColumns(const std::vector<xmlAccess::ColumnTypes>& positions)
     {
         columnPositions = positions;
         updateGridSizes(); //add or remove columns
     }
 
 
-    XmlGlobalSettings::ColumnTypes getTypeAtPos(unsigned pos) const
+    xmlAccess::ColumnTypes getTypeAtPos(unsigned pos) const
     {
         if (pos < columnPositions.size())
             return columnPositions[pos];
         else
-            return XmlGlobalSettings::ColumnTypes(1000);
+            return xmlAccess::ColumnTypes(1000);
     }
 
 
 protected:
     virtual const wxColour& getRowColor(int row) = 0; //rows that are filtered out are shown in different color
 
-    std::vector<xmlAccess::XmlGlobalSettings::ColumnTypes> columnPositions;
+    std::vector<xmlAccess::ColumnTypes> columnPositions;
 
+    wxColour  blue;
+    wxColour  grey;
+    wxColour  lightRed;
     wxColour  lightBlue;
-    wxColour  lightGrey;
+    wxColour  lightGreen;
     GridView* gridRefUI; //(very fast) access to underlying grid data :)
     FileCompareResult* gridData;
     int       lastNrRows;
@@ -230,10 +234,10 @@ public:
 
             //mark filtered rows
             if (!cmpLine.selectedForSynchronization)
-                return lightBlue;
+                return blue;
             //mark directories
             else if (cmpLine.fileDescrLeft.objType == FileDescrLine::TYPE_DIRECTORY)
-                return lightGrey;
+                return grey;
             else
                 return *wxWHITE;
         }
@@ -254,13 +258,15 @@ public:
                 {
                     switch (getTypeAtPos(col))
                     {
-                    case XmlGlobalSettings::FILENAME: //filename
+                    case xmlAccess::FULL_NAME:
+                        return gridLine.fileDescrLeft.fullName.c_str();
+                    case xmlAccess::FILENAME: //filename
                         return wxEmptyString;
-                    case XmlGlobalSettings::REL_PATH: //relative path
+                    case xmlAccess::REL_PATH: //relative path
                         return gridLine.fileDescrLeft.relativeName.c_str();
-                    case XmlGlobalSettings::SIZE: //file size
+                    case xmlAccess::SIZE: //file size
                         return _("<Directory>");
-                    case XmlGlobalSettings::DATE: //date
+                    case xmlAccess::DATE: //date
                         return wxEmptyString;
                     }
                 }
@@ -268,16 +274,18 @@ public:
                 {
                     switch (getTypeAtPos(col))
                     {
-                    case XmlGlobalSettings::FILENAME: //filename
+                    case xmlAccess::FULL_NAME:
+                        return gridLine.fileDescrLeft.fullName.c_str();
+                    case xmlAccess::FILENAME: //filename
                         return gridLine.fileDescrLeft.relativeName.AfterLast(GlobalResources::FILE_NAME_SEPARATOR).c_str();
-                    case XmlGlobalSettings::REL_PATH: //relative path
+                    case xmlAccess::REL_PATH: //relative path
                         return gridLine.fileDescrLeft.relativeName.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR).c_str();
-                    case XmlGlobalSettings::SIZE: //file size
+                    case xmlAccess::SIZE: //file size
                     {
                         wxString fileSize = gridLine.fileDescrLeft.fileSize.ToString(); //tmp string
                         return globalFunctions::includeNumberSeparator(fileSize);
                     }
-                    case XmlGlobalSettings::DATE: //date
+                    case xmlAccess::DATE: //date
                         return FreeFileSync::utcTimeToLocalString(gridLine.fileDescrLeft.lastWriteTimeRaw);
                     }
                 }
@@ -320,8 +328,7 @@ public:
     }
 
 
-    //virtual impl.
-    const wxColour& getRowColor(int row) //rows that are filtered out are shown in different color
+    virtual const wxColour& getRowColor(int row) //rows that are filtered out are shown in different color
     {
         if (gridRefUI && unsigned(row) < gridRefUI->size())
         {
@@ -329,15 +336,27 @@ public:
 
             //mark filtered rows
             if (!cmpLine.selectedForSynchronization)
-                return lightBlue;
+                return blue;
             else
-                return *wxWHITE;
+                switch (cmpLine.cmpResult)
+                {
+                case FILE_LEFT_SIDE_ONLY:
+                case FILE_RIGHT_SIDE_ONLY:
+                    return lightGreen;
+                case FILE_LEFT_NEWER:
+                case FILE_RIGHT_NEWER:
+                    return lightBlue;
+                case FILE_DIFFERENT:
+                    return lightRed;
+                default:
+                    return *wxWHITE;
+                }
         }
         return *wxWHITE;
     }
 
-    //virtual impl.
-    wxString GetValue(int row, int col)
+
+    virtual wxString GetValue(int row, int col)
     {
         if (gridRefUI)
         {
@@ -377,8 +396,7 @@ public:
     CustomGridTableRight() : CustomGridTable() {}
     ~CustomGridTableRight() {}
 
-    //virtual impl.
-    const wxColour& getRowColor(int row) //rows that are filtered out are shown in different color
+    virtual const wxColour& getRowColor(int row) //rows that are filtered out are shown in different color
     {
         if (gridRefUI && unsigned(row) < gridRefUI->size())
         {
@@ -386,10 +404,10 @@ public:
 
             //mark filtered rows
             if (!cmpLine.selectedForSynchronization)
-                return lightBlue;
+                return blue;
             //mark directories
             else if (cmpLine.fileDescrRight.objType == FileDescrLine::TYPE_DIRECTORY)
-                return lightGrey;
+                return grey;
             else
                 return *wxWHITE;
         }
@@ -409,13 +427,15 @@ public:
                 {
                     switch (getTypeAtPos(col))
                     {
-                    case XmlGlobalSettings::FILENAME: //filename
+                    case xmlAccess::FULL_NAME:
+                        return gridLine.fileDescrRight.fullName.c_str();
+                    case xmlAccess::FILENAME: //filename
                         return wxEmptyString;
-                    case XmlGlobalSettings::REL_PATH: //relative path
+                    case xmlAccess::REL_PATH: //relative path
                         return gridLine.fileDescrRight.relativeName.c_str();
-                    case XmlGlobalSettings::SIZE: //file size
+                    case xmlAccess::SIZE: //file size
                         return _("<Directory>");
-                    case XmlGlobalSettings::DATE: //date
+                    case xmlAccess::DATE: //date
                         return wxEmptyString;
                     }
                 }
@@ -423,16 +443,18 @@ public:
                 {
                     switch (getTypeAtPos(col))
                     {
-                    case XmlGlobalSettings::FILENAME: //filename
+                    case xmlAccess::FULL_NAME:
+                        return gridLine.fileDescrRight.fullName.c_str();
+                    case xmlAccess::FILENAME: //filename
                         return gridLine.fileDescrRight.relativeName.AfterLast(GlobalResources::FILE_NAME_SEPARATOR).c_str();
-                    case XmlGlobalSettings::REL_PATH: //relative path
+                    case xmlAccess::REL_PATH: //relative path
                         return gridLine.fileDescrRight.relativeName.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR).c_str();
-                    case XmlGlobalSettings::SIZE: //file size
+                    case xmlAccess::SIZE: //file size
                     {
                         wxString fileSize = gridLine.fileDescrRight.fileSize.ToString(); //tmp string
                         return globalFunctions::includeNumberSeparator(fileSize);
                     }
-                    case XmlGlobalSettings::DATE: //date
+                    case xmlAccess::DATE: //date
                         return FreeFileSync::utcTimeToLocalString(gridLine.fileDescrRight.lastWriteTimeRaw);
                     }
                 }
@@ -454,6 +476,7 @@ CustomGrid::CustomGrid(wxWindow *parent,
                        long style,
                        const wxString& name) :
         wxGrid(parent, id, pos, size, style, name),
+        leadGrid(NULL),
         scrollbarsEnabled(true),
         m_gridLeft(NULL), m_gridRight(NULL), m_gridMiddle(NULL),
         gridDataTable(NULL),
@@ -514,17 +537,17 @@ void CustomGrid::adjustGridHeights() //m_gridLeft, m_gridRight, m_gridMiddle are
     {
         int yMax = std::max(y1, std::max(y2, y3));
 
-        if (::leadGrid == m_gridLeft)  //do not handle case (y1 == yMax) here!!! Avoid back coupling!
+        if (leadGrid == m_gridLeft)  //do not handle case (y1 == yMax) here!!! Avoid back coupling!
             m_gridLeft->SetMargins(0, 0);
         else if (y1 < yMax)
             m_gridLeft->SetMargins(0, 50);
 
-        if (::leadGrid == m_gridRight)
+        if (leadGrid == m_gridRight)
             m_gridRight->SetMargins(0, 0);
         else if (y2 < yMax)
             m_gridRight->SetMargins(0, 50);
 
-        if (::leadGrid == m_gridMiddle)
+        if (leadGrid == m_gridMiddle)
             m_gridMiddle->SetMargins(0, 0);
         else if (y3 < yMax)
             m_gridMiddle->SetMargins(0, 50);
@@ -533,6 +556,12 @@ void CustomGrid::adjustGridHeights() //m_gridLeft, m_gridRight, m_gridMiddle are
         m_gridRight->ForceRefresh();
         m_gridMiddle->ForceRefresh();
     }
+}
+
+
+void CustomGrid::setLeadGrid(const wxGrid* newLead)
+{
+    leadGrid = newLead;
 }
 
 
@@ -559,11 +588,66 @@ void CustomGrid::DrawColLabel(wxDC& dc, int col)
 }
 
 
-void CustomGrid::setColumnAttributes(const xmlAccess::XmlGlobalSettings::ColumnAttributes& attr)
+xmlAccess::ColumnAttributes CustomGrid::getDefaultColumnAttributes()
+{
+    xmlAccess::ColumnAttributes defaultColumnSettings;
+
+    xmlAccess::ColumnAttrib newEntry;
+
+    newEntry.type     = xmlAccess::FULL_NAME;
+    newEntry.visible  = false;
+    newEntry.position = 0;
+    newEntry.width    = 150;
+    defaultColumnSettings.push_back(newEntry);
+
+    newEntry.type     = xmlAccess::FILENAME;
+    newEntry.visible  = true;
+    newEntry.position = 1;
+    newEntry.width    = 138;
+    defaultColumnSettings.push_back(newEntry);
+
+    newEntry.type     = xmlAccess::REL_PATH;
+    newEntry.position = 2;
+    newEntry.width    = 118;
+    defaultColumnSettings.push_back(newEntry);
+
+    newEntry.type     = xmlAccess::SIZE;
+    newEntry.position = 3;
+    newEntry.width    = 67;
+    defaultColumnSettings.push_back(newEntry);
+
+    newEntry.type     = xmlAccess::DATE;
+    newEntry.position = 4;
+    newEntry.width    = 113;
+    defaultColumnSettings.push_back(newEntry);
+
+    return defaultColumnSettings;
+}
+
+
+xmlAccess::ColumnAttributes CustomGrid::getColumnAttributes()
+{
+    std::sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByPositionAndVisibility);
+
+    xmlAccess::ColumnAttributes output;
+    xmlAccess::ColumnAttrib newEntry;
+    for (unsigned int i = 0; i < columnSettings.size(); ++i)
+    {
+        newEntry = columnSettings[i];
+        if (newEntry.visible)
+            newEntry.width = GetColSize(i); //hidden columns are sorted to the end of vector!
+        output.push_back(newEntry);
+    }
+
+    return output;
+}
+
+
+void CustomGrid::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
 {
     //remove special alignment for column "size"
     for (int i = 0; i < GetNumberCols(); ++i)
-        if (getTypeAtPos(i) == XmlGlobalSettings::SIZE)
+        if (getTypeAtPos(i) == xmlAccess::SIZE)
         {
             wxGridCellAttr* cellAttributes = GetOrCreateCellAttr(0, i);
             cellAttributes->SetAlignment(wxALIGN_LEFT,wxALIGN_CENTRE);
@@ -571,44 +655,23 @@ void CustomGrid::setColumnAttributes(const xmlAccess::XmlGlobalSettings::ColumnA
             break;
         }
 //----------------------------------------------------------------------------------
-    setSortMarker(-1); //clear sorting marker
 
     columnSettings.clear();
     if (attr.size() == 0)
     {   //default settings:
-        xmlAccess::XmlGlobalSettings::ColumnAttrib newEntry;
-        newEntry.type     = xmlAccess::XmlGlobalSettings::FILENAME;
-        newEntry.visible  = true;
-        newEntry.position = 0;
-        newEntry.width    = 138;
-        columnSettings.push_back(newEntry);
-
-        newEntry.type     = xmlAccess::XmlGlobalSettings::REL_PATH;
-        newEntry.position = 1;
-        newEntry.width    = 118;
-        columnSettings.push_back(newEntry);
-
-        newEntry.type     = xmlAccess::XmlGlobalSettings::SIZE;
-        newEntry.position = 2;
-        newEntry.width    = 67;
-        columnSettings.push_back(newEntry);
-
-        newEntry.type     = xmlAccess::XmlGlobalSettings::DATE;
-        newEntry.position = 3;
-        newEntry.width    = 113;
-        columnSettings.push_back(newEntry);
+        columnSettings = getDefaultColumnAttributes();
     }
     else
     {
-        for (unsigned int i = 0; i < COLUMN_TYPE_COUNT; ++i)
+        for (unsigned int i = 0; i < xmlAccess::COLUMN_TYPE_COUNT; ++i)
         {
-            XmlGlobalSettings::ColumnAttrib newEntry;
+            xmlAccess::ColumnAttrib newEntry;
 
             if (i < attr.size())
                 newEntry = attr[i];
             else
             {
-                newEntry.type     = xmlAccess::XmlGlobalSettings::FILENAME;
+                newEntry.type     = xmlAccess::FILENAME;
                 newEntry.visible  = true;
                 newEntry.position = i;
                 newEntry.width    = 100;
@@ -616,18 +679,17 @@ void CustomGrid::setColumnAttributes(const xmlAccess::XmlGlobalSettings::ColumnA
             columnSettings.push_back(newEntry);
         }
 
-        sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByType);
-        for (unsigned int i = 0; i < COLUMN_TYPE_COUNT; ++i) //just be sure that each type exists only once
-            columnSettings[i].type = XmlGlobalSettings::ColumnTypes(i);
+        std::sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByType);
+        for (unsigned int i = 0; i < xmlAccess::COLUMN_TYPE_COUNT; ++i) //just be sure that each type exists only once
+            columnSettings[i].type = xmlAccess::ColumnTypes(i);
 
-        sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByPositionOnly);
-        for (unsigned int i = 0; i < COLUMN_TYPE_COUNT; ++i) //just be sure that positions are numbered correctly
+        std::sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByPositionOnly);
+        for (unsigned int i = 0; i < xmlAccess::COLUMN_TYPE_COUNT; ++i) //just be sure that positions are numbered correctly
             columnSettings[i].position = i;
-
-        sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByPositionAndVisibility);
     }
 
-    std::vector<XmlGlobalSettings::ColumnTypes> newPositions;
+    std::sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByPositionAndVisibility);
+    std::vector<xmlAccess::ColumnTypes> newPositions;
     for (unsigned int i = 0; i < columnSettings.size() && columnSettings[i].visible; ++i)  //hidden columns are sorted to the end of vector!
         newPositions.push_back(columnSettings[i].type);
 
@@ -642,7 +704,7 @@ void CustomGrid::setColumnAttributes(const xmlAccess::XmlGlobalSettings::ColumnA
 //--------------------------------------------------------------------------------------------------------
     //set special alignment for column "size"
     for (int i = 0; i < GetNumberCols(); ++i)
-        if (getTypeAtPos(i) == XmlGlobalSettings::SIZE)
+        if (getTypeAtPos(i) == xmlAccess::SIZE)
         {
             wxGridCellAttr* cellAttributes = GetOrCreateCellAttr(0, i);
             cellAttributes->SetAlignment(wxALIGN_RIGHT,wxALIGN_CENTRE);
@@ -655,42 +717,26 @@ void CustomGrid::setColumnAttributes(const xmlAccess::XmlGlobalSettings::ColumnA
 }
 
 
-xmlAccess::XmlGlobalSettings::ColumnAttributes CustomGrid::getColumnAttributes()
-{
-    sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByPositionAndVisibility);
-
-    xmlAccess::XmlGlobalSettings::ColumnAttributes output;
-    xmlAccess::XmlGlobalSettings::ColumnAttrib newEntry;
-    for (unsigned int i = 0; i < columnSettings.size(); ++i)
-    {
-        newEntry = columnSettings[i];
-        if (newEntry.visible)  //hidden columns are sorted to the end of vector!
-            newEntry.width = GetColSize(i);
-        output.push_back(newEntry);
-    }
-
-    return output;
-}
-
-
-XmlGlobalSettings::ColumnTypes CustomGrid::getTypeAtPos(unsigned pos) const
+xmlAccess::ColumnTypes CustomGrid::getTypeAtPos(unsigned pos) const
 {
     assert(gridDataTable);
     return gridDataTable->getTypeAtPos(pos);
 }
 
 
-wxString CustomGrid::getTypeName(XmlGlobalSettings::ColumnTypes colType)
+wxString CustomGrid::getTypeName(xmlAccess::ColumnTypes colType)
 {
     switch (colType)
     {
-    case XmlGlobalSettings::FILENAME:
+    case xmlAccess::FULL_NAME:
+        return _("Full name");
+    case xmlAccess::FILENAME:
         return _("Filename");
-    case XmlGlobalSettings::REL_PATH:
+    case xmlAccess::REL_PATH:
         return _("Relative path");
-    case XmlGlobalSettings::SIZE:
+    case xmlAccess::SIZE:
         return _("Size");
-    case XmlGlobalSettings::DATE:
+    case xmlAccess::DATE:
         return _("Date");
     default:
         return wxEmptyString;
@@ -725,7 +771,7 @@ void CustomGridLeft::DoPrepareDC(wxDC& dc)
     wxScrollHelper::DoPrepareDC(dc);
 
     int x, y = 0;
-    if (this == ::leadGrid)  //avoid back coupling
+    if (this == leadGrid)  //avoid back coupling
     {
         GetViewStart(&x, &y);
         m_gridMiddle->Scroll(-1, y); //scroll in y-direction only
@@ -764,7 +810,7 @@ void CustomGridMiddle::DoPrepareDC(wxDC& dc)
     wxScrollHelper::DoPrepareDC(dc);
 
     int x, y = 0;
-    if (this == ::leadGrid)  //avoid back coupling
+    if (this == leadGrid)  //avoid back coupling
     {
         GetViewStart(&x, &y);
         m_gridLeft->Scroll(-1, y);
@@ -836,7 +882,7 @@ void CustomGridRight::DoPrepareDC(wxDC& dc)
     wxScrollHelper::DoPrepareDC(dc);
 
     int x, y = 0;
-    if (this == ::leadGrid)  //avoid back coupling
+    if (this == leadGrid)  //avoid back coupling
     {
         GetViewStart(&x, &y);
         m_gridLeft->Scroll(x, y);

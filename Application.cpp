@@ -1,10 +1,8 @@
 /*******#include <wx/msgdlg.h>********************************************************
- * Name:      FreeFileSyncApp.cpp
  * Purpose:   Code for Application Class
  * Author:    ZenJu (zhnmju123@gmx.de)
  * Created:   2008-07-16
  * Copyright: ZenJu ()
- * License:
  **************************************************************/
 
 #include "application.h"
@@ -19,8 +17,8 @@
 #include "comparison.h"
 #include "synchronization.h"
 #include "algorithm.h"
-
-using namespace xmlAccess;
+#include <wx/taskbar.h>
+#include "ui/smallDialogs.h"
 
 
 IMPLEMENT_APP(Application);
@@ -68,7 +66,7 @@ bool Application::OnInit()
 
     //set program language: needs to happen after working directory has been set!
     SetExitOnFrameDelete(false); //prevent error messagebox from becoming top-level window
-    programLanguage.setLanguage(globalSettings.global.programLanguage);
+    programLanguage.setLanguage(globalSettings.shared.programLanguage);
     SetExitOnFrameDelete(true);
 
     //load image resources from file: must be called after working directory has been set
@@ -83,16 +81,30 @@ void Application::initialize()
     //test if FFS is to be started on UI with config file passed as commandline parameter
     if (argc > 1)
     {
-        XmlType xmlConfigType = xmlAccess::getXmlType(argv[1]);
-        if (xmlConfigType == XML_GUI_CONFIG) //start in GUI mode (configuration file specified)
+        //load file specified by %1 parameter:
+        wxString filename;
+        if (wxFileExists(argv[1]))
+            filename = argv[1];
+        else if (wxFileExists(wxString(argv[1]) + wxT(".ffs_batch")))
+            filename = wxString(argv[1]) + wxT(".ffs_batch");
+        else if (wxFileExists(wxString(argv[1]) + wxT(".ffs_gui")))
+            filename = wxString(argv[1]) + wxT(".ffs_gui");
+        else
         {
-            MainDialog* frame = new MainDialog(NULL, argv[1], &programLanguage, globalSettings);
+            wxMessageBox(wxString(_("The file does not exist:")) + wxT(" \"") + argv[1] + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+            return;
+        }
+
+        xmlAccess::XmlType xmlConfigType = xmlAccess::getXmlType(filename);
+        if (xmlConfigType == xmlAccess::XML_GUI_CONFIG) //start in GUI mode (configuration file specified)
+        {
+            MainDialog* frame = new MainDialog(NULL, filename, &programLanguage, globalSettings);
             frame->SetIcon(*globalResource.programIcon); //set application icon
             frame->Show();
         }
-        else if (xmlConfigType == XML_BATCH_CONFIG) //start in commandline mode
+        else if (xmlConfigType == xmlAccess::XML_BATCH_CONFIG) //start in commandline mode
         {
-            runBatchMode(argv[1], globalSettings);
+            runBatchMode(filename, globalSettings);
 
             if (wxApp::GetTopWindow() == NULL) //if no windows are shown program won't exit automatically
                 ExitMainLoop();
@@ -100,7 +112,7 @@ void Application::initialize()
         }
         else
         {
-            wxMessageBox(wxString(_("The file does not contain a valid configuration:")) + wxT(" \"") + argv[1] + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(wxString(_("The file does not contain a valid configuration:")) + wxT(" \"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
             return;
         }
     }
@@ -143,7 +155,7 @@ int Application::OnRun()
 int Application::OnExit()
 {
     //get program language
-    globalSettings.global.programLanguage = programLanguage.getLanguage();
+    globalSettings.shared.programLanguage = programLanguage.getLanguage();
 
     try //save global settings to XML
     {
@@ -174,8 +186,11 @@ public:
         logFile.Open(logfileName.c_str(), wxT("w"));
         readyToWrite = logFile.IsOpened();
         if (readyToWrite)
-        {                                                           //"Date" is used at other places too
-            wxString headerLine = wxString(wxT("FreeFileSync (")) + _("Date") + wxT(": ") + wxDateTime::Now().FormatDate() + wxT(" ") + _("Time:") + wxT(" ") +  wxDateTime::Now().FormatTime() + wxT(")");
+        {
+            wxString headerLine = wxString(wxT("FreeFileSync - "))  +
+                                  _("Batch execution") + wxT(" (") +
+                                  _("Date") + wxT(": ") + wxDateTime::Now().FormatDate() + wxT(" ") + //"Date" is used at other places too
+                                  _("Time") + wxT(":") + wxT(" ") +  wxDateTime::Now().FormatTime() + wxT(")");
             logFile.Write(headerLine + wxChar('\n'));
             logFile.Write(wxString().Pad(headerLine.Len(), wxChar('-')) + wxChar('\n') + wxChar('\n'));
 
@@ -207,7 +222,13 @@ public:
         if (problemType != wxEmptyString)
             logFile.Write(problemType + wxT(": "));
 
-        logFile.Write(logText + wxChar('\n'));
+        //remove linebreaks
+        wxString formattedText = logText;
+        for (wxString::iterator i = formattedText.begin(); i != formattedText.end(); ++i)
+            if (*i == wxChar('\n'))
+                *i = wxChar(' ');
+
+        logFile.Write(formattedText + wxChar('\n'));
     }
 
 private:
@@ -233,7 +254,7 @@ private:
 void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSettings& globalSettings)
 {
     //load XML settings
-    XmlBatchConfig batchCfg;  //structure to receive gui settings
+    xmlAccess::XmlBatchConfig batchCfg;  //structure to receive gui settings
     try
     {
         batchCfg = xmlAccess::readBatchConfig(filename);
@@ -245,98 +266,46 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
     }
     //all settings have been read successfully...
 
-    //format directory names
-    for (std::vector<FolderPair>::iterator i = batchCfg.directoryPairs.begin(); i != batchCfg.directoryPairs.end(); ++i)
-    {
-        i->leftDirectory  = FreeFileSync::getFormattedDirectoryName(i->leftDirectory);
-        i->rightDirectory = FreeFileSync::getFormattedDirectoryName(i->rightDirectory);
-    }
-
-    //init logfile
-    std::auto_ptr<LogFile> log; //delete log object on exit (if not NULL)
-    if (batchCfg.silent)
-    {
-        log = std::auto_ptr<LogFile>(new LogFile);
-        if (!log->isOkay())
-        { //handle error: file load
-            wxMessageBox(_("Unable to create logfile!"), _("Error"), wxOK | wxICON_ERROR);
-            return;
-        }
-    }
-
-    //begin of synchronization process (all in one try-catch block)
-    try
+    try //begin of synchronization process (all in one try-catch block)
     {
         //class handling status updates and error messages
         std::auto_ptr<BatchStatusHandler> statusHandler;  //delete object automatically
         if (batchCfg.silent)
-            statusHandler = std::auto_ptr<BatchStatusHandler>(new BatchStatusHandlerSilent(batchCfg.mainCfg.ignoreErrors, log.get(), returnValue));
+            statusHandler = std::auto_ptr<BatchStatusHandler>(new BatchStatusHandlerSilent(batchCfg.handleError, returnValue));
         else
-            statusHandler = std::auto_ptr<BatchStatusHandler>(new BatchStatusHandlerGui(batchCfg.mainCfg.ignoreErrors, returnValue));
-
-        //test existence of Recycle Bin
-        if (batchCfg.mainCfg.useRecycleBin)
-        {
-            if (!FreeFileSync::recycleBinExists())
-                statusHandler->exitAndSetStatus(_("Unable to initialize Recycle Bin!"), BatchStatusHandler::ABORTED);
-        }
-
-        //check if directories are valid
-        wxString errorMessage;
-        if (!FreeFileSync::foldersAreValidForComparison(batchCfg.directoryPairs, errorMessage))
-            statusHandler->exitAndSetStatus(errorMessage, BatchStatusHandler::ABORTED);
-
-
-        //check if folders have dependencies
-        if (globalSettings.global.folderDependCheckActive)
-        {
-            wxString warningMessage;
-            if (FreeFileSync::foldersHaveDependencies(batchCfg.directoryPairs, warningMessage))
-            {
-                //abort if in silent mode
-                if (batchCfg.silent)
-                    statusHandler->exitAndSetStatus(warningMessage, BatchStatusHandler::ABORTED);
-
-                //non silent mode: offer possibility to ignore issue
-                bool hideThisDialog = false;
-                wxString messageText = warningMessage + wxT("\n\n") +
-                                       _("Consider this when setting up synchronization rules: You might want to avoid write access to these directories so that synchronization of both does not interfere.");
-
-                //show popup and ask user how to handle warning
-                WarningDlg* warningDlg = new WarningDlg(NULL, WarningDlg::BUTTON_IGNORE | WarningDlg::BUTTON_ABORT, messageText, hideThisDialog);
-                const int rv = warningDlg->ShowModal();
-                warningDlg->Destroy();
-                if (rv == WarningDlg::BUTTON_ABORT)
-                    statusHandler->exitAndSetStatus(warningMessage, BatchStatusHandler::ABORTED);
-                else
-                    globalSettings.global.folderDependCheckActive = !hideThisDialog;
-            }
-        }
-
+            statusHandler = std::auto_ptr<BatchStatusHandler>(new BatchStatusHandlerGui(batchCfg.handleError, returnValue));
 
         //COMPARE DIRECTORIES
         FileCompareResult currentGridData;
-        bool lineBreakOnMessages = !batchCfg.silent;
-
-        #ifdef FFS_WIN
-        FreeFileSync::CompareProcess comparison(lineBreakOnMessages, globalSettings.global.handleDstOnFat32, statusHandler.get());
-        #elif defined FFS_LINUX
-        FreeFileSync::CompareProcess comparison(lineBreakOnMessages, false, statusHandler.get());
-        #endif
+#ifdef FFS_WIN
+        FreeFileSync::CompareProcess comparison(globalSettings.shared.traverseSymbolicLinks,
+                                                globalSettings.shared.handleDstOnFat32,
+                                                globalSettings.shared.warningDependentFolders,
+                                                statusHandler.get());
+#elif defined FFS_LINUX
+        FreeFileSync::CompareProcess comparison(globalSettings.shared.traverseSymbolicLinks,
+                                                false,
+                                                globalSettings.shared.warningDependentFolders,
+                                                statusHandler.get());
+#endif
         comparison.startCompareProcess(batchCfg.directoryPairs,
                                        batchCfg.mainCfg.compareVar,
                                        currentGridData);
 
         //APPLY FILTERS
         if (batchCfg.mainCfg.filterIsActive)
-            FreeFileSync::filterCurrentGridData(currentGridData, batchCfg.mainCfg.includeFilter, batchCfg.mainCfg.excludeFilter);
+            FreeFileSync::filterGridData(currentGridData, batchCfg.mainCfg.includeFilter, batchCfg.mainCfg.excludeFilter);
 
         //check if there are files/folders to be sync'ed at all
         if (!synchronizationNeeded(currentGridData, batchCfg.mainCfg.syncConfiguration))
             statusHandler->exitAndSetStatus(_("Nothing to synchronize according to configuration!"), BatchStatusHandler::FINISHED); //inform about this special case
 
         //START SYNCHRONIZATION
-        FreeFileSync::SyncProcess synchronization(batchCfg.mainCfg.useRecycleBin, lineBreakOnMessages, statusHandler.get());
+        FreeFileSync::SyncProcess synchronization(
+            batchCfg.mainCfg.useRecycleBin,
+            globalSettings.shared.warningSignificantDifference,
+            statusHandler.get());
+
         synchronization.startSynchronizationProcess(currentGridData, batchCfg.mainCfg.syncConfiguration);
     }
     catch (AbortThisProcess&)  //exit used by statusHandler
@@ -349,24 +318,120 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
 
 //######################################################################################################
-BatchStatusHandlerSilent::BatchStatusHandlerSilent(bool ignoreAllErrors, LogFile* log, int& returnVal) :
-        ignoreErrors(ignoreAllErrors),
+
+class FfsTrayIcon : public wxTaskBarIcon
+{
+public:
+    FfsTrayIcon(StatusHandler* statusHandler) :
+            m_statusHandler(statusHandler),
+            processPaused(false)
+    {
+        running.reset(new wxIcon(*globalResource.programIcon));
+        paused.reset(new wxIcon);
+        paused->CopyFromBitmap(*globalResource.bitmapFFSPaused);
+
+        wxTaskBarIcon::SetIcon(*running);
+    }
+
+    ~FfsTrayIcon() {}
+
+    enum
+    {
+        CONTEXT_PAUSE,
+        CONTEXT_ABORT,
+        CONTEXT_ABOUT
+    };
+
+    virtual wxMenu* CreatePopupMenu()
+    {
+        wxMenu* contextMenu = new wxMenu;
+        contextMenu->Append(CONTEXT_PAUSE, _("&Pause"), wxEmptyString, wxITEM_CHECK);
+        contextMenu->Check(CONTEXT_PAUSE, processPaused);
+        contextMenu->Append(CONTEXT_ABORT, _("&Abort"));
+        contextMenu->AppendSeparator();
+        contextMenu->Append(CONTEXT_ABOUT, _("&About..."));
+        //event handling
+        contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FfsTrayIcon::onContextMenuSelection), NULL, this);
+
+        return contextMenu; //ownership transferred to library
+    }
+
+    void onContextMenuSelection(wxCommandEvent& event)
+    {
+        int eventId = event.GetId();
+        if (eventId == CONTEXT_PAUSE)
+        {
+            processPaused = !processPaused;
+            if (processPaused)
+                wxTaskBarIcon::SetIcon(*paused);
+            else
+                wxTaskBarIcon::SetIcon(*running);
+        }
+        else if (eventId == CONTEXT_ABORT)
+        {
+            processPaused = false;
+            wxTaskBarIcon::SetIcon(*running);
+            m_statusHandler->requestAbortion();
+        }
+        else if (eventId == CONTEXT_ABOUT)
+        {
+            AboutDlg* aboutDlg = new AboutDlg(NULL);
+            aboutDlg->ShowModal();
+            aboutDlg->Destroy();
+        }
+    }
+
+    void updateSysTray()
+    {
+        updateUiNow();
+
+        //support for pause button
+        while (processPaused)
+        {
+            wxMilliSleep(UI_UPDATE_INTERVAL);
+            updateUiNow();
+        }
+    }
+
+private:
+    StatusHandler* m_statusHandler;
+    bool processPaused;
+    std::auto_ptr<wxIcon> running;
+    std::auto_ptr<wxIcon> paused;
+};
+
+
+BatchStatusHandlerSilent::BatchStatusHandlerSilent(const xmlAccess::OnError handleError, int& returnVal) :
+        m_handleError(handleError),
         currentProcess(StatusHandler::PROCESS_NONE),
         returnValue(returnVal),
-        m_log(log) {}
+        trayIcon(new FfsTrayIcon(this)),
+        m_log(new LogFile)
+{
+    //test if log was instantiated successfully
+    if (!m_log->isOkay())
+    {  //handle error: file load
+        wxMessageBox(_("Unable to create logfile!"), _("Error"), wxOK | wxICON_ERROR);
+        throw AbortThisProcess();
+    }
+}
 
 
 BatchStatusHandlerSilent::~BatchStatusHandlerSilent()
 {
     unsigned int failedItems = unhandledErrors.GetCount();
-    if (failedItems)
-        returnValue = -5;
 
     //write result
     if (abortRequested)
+    {
+        returnValue = -4;
         m_log->write(_("Synchronization aborted!"), _("Error"));
+    }
     else if (failedItems)
-        m_log->write(_("Synchronization completed with errors!"), _("Error"));
+    {
+        returnValue = -5;
+        m_log->write(_("Synchronization completed with errors!"), _("Info"));
+    }
     else
         m_log->write(_("Synchronization completed successfully!"), _("Info"));
 }
@@ -387,25 +452,132 @@ void BatchStatusHandlerSilent::initNewProcess(int objectsTotal, double dataTotal
 }
 
 
-ErrorHandler::Response BatchStatusHandlerSilent::reportError(const Zstring& text)
+ErrorHandler::Response BatchStatusHandlerSilent::reportError(const Zstring& errorMessage)
 {
-    if (ignoreErrors)
+    switch (m_handleError)
     {
-        unhandledErrors.Add(text.c_str());
-        m_log->write(text.c_str(), _("Error"));
+    case xmlAccess::ON_ERROR_POPUP:
+    {
+        bool ignoreNextErrors = false;
+        ErrorDlg* errorDlg = new ErrorDlg(NULL,
+                                          ErrorDlg::BUTTON_IGNORE |  ErrorDlg::BUTTON_RETRY | ErrorDlg::BUTTON_ABORT,
+                                          wxString(errorMessage) + wxT("\n\n") + _("Ignore this error, retry or abort?"),
+                                          ignoreNextErrors);
+        const int rv = errorDlg->ShowModal();
+        errorDlg->Destroy();
+        switch (rv)
+        {
+        case ErrorDlg::BUTTON_IGNORE:
+            if (ignoreNextErrors) //falsify only
+                m_handleError = xmlAccess::ON_ERROR_IGNORE;
+            unhandledErrors.Add(errorMessage.c_str());
+            m_log->write(errorMessage.c_str(), _("Error"));
+            return ErrorHandler::IGNORE_ERROR;
+
+        case ErrorDlg::BUTTON_RETRY:
+            return ErrorHandler::RETRY;
+
+        case ErrorDlg::BUTTON_ABORT:
+            unhandledErrors.Add(errorMessage.c_str());
+            m_log->write(errorMessage.c_str(), _("Error"));
+            abortThisProcess();
+        }
+    }
+    break; //used if last switch didn't find a match
+
+    case xmlAccess::ON_ERROR_EXIT: //abort
+        unhandledErrors.Add(errorMessage.c_str());
+        m_log->write(errorMessage.c_str(), _("Error"));
+        abortThisProcess();
+
+    case xmlAccess::ON_ERROR_IGNORE:
+        unhandledErrors.Add(errorMessage.c_str());
+        m_log->write(errorMessage.c_str(), _("Error"));
         return ErrorHandler::IGNORE_ERROR;
     }
-    else
-    {
-        unhandledErrors.Add(text.c_str());
-        m_log->write(text.c_str(), _("Error"));
-        abortRequested = true;
-        throw AbortThisProcess();
-    }
+
+    assert(false);
+    return ErrorHandler::IGNORE_ERROR; //dummy value
 }
 
 
-void BatchStatusHandlerSilent::abortThisProcess() //not used in this context!
+void BatchStatusHandlerSilent::reportFatalError(const Zstring& errorMessage)
+{
+    switch (m_handleError)
+    {
+    case xmlAccess::ON_ERROR_POPUP:
+    {
+        bool dummy = false;
+        ErrorDlg* errorDlg = new ErrorDlg(NULL,
+                                          ErrorDlg::BUTTON_ABORT,
+                                          errorMessage.c_str(), dummy);
+        errorDlg->ShowModal();
+        errorDlg->Destroy();
+    }
+    break;
+
+    case xmlAccess::ON_ERROR_EXIT:
+        break;
+
+    case xmlAccess::ON_ERROR_IGNORE:
+        break;
+    }
+
+    unhandledErrors.Add(errorMessage.c_str());
+    m_log->write(errorMessage.c_str(), _("Error"));
+    abortThisProcess();
+}
+
+
+void BatchStatusHandlerSilent::reportWarning(const Zstring& warningMessage, bool& dontShowAgain)
+{
+    switch (m_handleError)
+    {
+    case xmlAccess::ON_ERROR_POPUP:
+    {
+        //show popup and ask user how to handle warning
+        bool dontWarnAgain = false;
+        WarningDlg* warningDlg = new WarningDlg(NULL,
+                                                WarningDlg::BUTTON_IGNORE | WarningDlg::BUTTON_ABORT,
+                                                warningMessage.c_str(),
+                                                dontWarnAgain);
+        const int rv = warningDlg->ShowModal();
+        warningDlg->Destroy();
+        switch (rv)
+        {
+        case WarningDlg::BUTTON_ABORT:
+            unhandledErrors.Add(warningMessage.c_str());
+            m_log->write(warningMessage.c_str(), _("Warning"));
+            abortThisProcess();
+        case WarningDlg::BUTTON_IGNORE: //no unhandled error situation!
+            dontShowAgain = dontWarnAgain;
+            m_log->write(warningMessage.c_str(), _("Warning"));
+            return;
+        }
+    }
+    break; //keep it! last switch might not find match
+
+    case xmlAccess::ON_ERROR_EXIT: //abort
+        unhandledErrors.Add(warningMessage.c_str());
+        m_log->write(warningMessage.c_str(), _("Warning"));
+        abortThisProcess();
+
+    case xmlAccess::ON_ERROR_IGNORE: //no unhandled error situation!
+        m_log->write(warningMessage.c_str(), _("Warning"));
+        return;
+    }
+
+    assert(false);
+}
+
+
+void BatchStatusHandlerSilent::forceUiRefresh()
+{
+    trayIcon->updateSysTray(); //needed by sys-tray icon only
+}
+
+
+void BatchStatusHandlerSilent::abortThisProcess() //used by sys-tray menu
 {
     abortRequested = true;
     throw AbortThisProcess();
@@ -421,12 +593,10 @@ void BatchStatusHandlerSilent::exitAndSetStatus(const wxString& message, ExitCod
         m_log->write(message, _("Error"));
         abortRequested = true;
         throw AbortThisProcess();
-        break;
 
     case BatchStatusHandler::FINISHED:
         m_log->write(message, _("Info"));
         throw AbortThisProcess();
-        break;
     default:
         assert(false);
     }
@@ -434,8 +604,8 @@ void BatchStatusHandlerSilent::exitAndSetStatus(const wxString& message, ExitCod
 
 
 //######################################################################################################
-BatchStatusHandlerGui::BatchStatusHandlerGui(bool ignoreAllErrors, int& returnVal) :
-        ignoreErrors(ignoreAllErrors),
+BatchStatusHandlerGui::BatchStatusHandlerGui(const xmlAccess::OnError handleError, int& returnVal) :
+        m_handleError(handleError),
         currentProcess(StatusHandler::PROCESS_NONE),
         returnValue(returnVal)
 {
@@ -452,14 +622,19 @@ BatchStatusHandlerGui::~BatchStatusHandlerGui()
     unsigned int failedItems = unhandledErrors.GetCount();
     if (failedItems)
     {
-        returnValue = -5;
-
         finalMessage = wxString(_("Warning: Synchronization failed for %x item(s):")) + wxT("\n\n");
         finalMessage.Replace(wxT("%x"), globalFunctions::numberToWxString(failedItems), false);
 
         for (unsigned int j = 0; j < failedItems; ++j)
-            finalMessage+= unhandledErrors[j] + wxT("\n");
-        finalMessage+= wxT("\n");
+        {   //remove linebreaks
+            wxString errorMessage = unhandledErrors[j];
+            for (wxString::iterator i = errorMessage.begin(); i != errorMessage.end(); ++i)
+                if (*i == wxChar('\n'))
+                    *i = wxChar(' ');
+
+            finalMessage += errorMessage + wxT("\n");
+        }
+        finalMessage += wxT("\n");
     }
 
     if (!additionalStatusInfo.IsEmpty())
@@ -468,19 +643,21 @@ BatchStatusHandlerGui::~BatchStatusHandlerGui()
     //notify to syncStatusFrame that current process has ended
     if (abortRequested)
     {
-        finalMessage+= _("Synchronization aborted!");
+        returnValue = -4;
+        finalMessage += _("Synchronization aborted!");
         syncStatusFrame->setStatusText_NoUpdate(finalMessage.c_str());
         syncStatusFrame->processHasFinished(SyncStatus::ABORTED);  //enable okay and close events
     }
     else if (failedItems)
     {
-        finalMessage+= _("Synchronization completed with errors!");
+        returnValue = -5;
+        finalMessage += _("Synchronization completed with errors!");
         syncStatusFrame->setStatusText_NoUpdate(finalMessage.c_str());
         syncStatusFrame->processHasFinished(SyncStatus::FINISHED_WITH_ERROR);
     }
     else
     {
-        finalMessage+= _("Synchronization completed successfully!");
+        finalMessage += _("Synchronization completed successfully!");
         syncStatusFrame->setStatusText_NoUpdate(finalMessage.c_str());
         syncStatusFrame->processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS);
     }
@@ -529,40 +706,95 @@ void BatchStatusHandlerGui::updateProcessedData(int objectsProcessed, double dat
 }
 
 
-ErrorHandler::Response BatchStatusHandlerGui::reportError(const Zstring& text)
+ErrorHandler::Response BatchStatusHandlerGui::reportError(const Zstring& errorMessage)
 {
-    if (ignoreErrors) //this option can be set from commandline or by the user in the error dialog on UI
+    //add current time before error message
+    wxString errorWithTime = wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + errorMessage.c_str();
+
+    switch (m_handleError)
     {
-        unhandledErrors.Add(text.c_str());
-        return ErrorHandler::IGNORE_ERROR;
-    }
-    else
+    case xmlAccess::ON_ERROR_POPUP:
     {
         syncStatusFrame->updateStatusDialogNow();
 
         bool ignoreNextErrors = false;
-        wxString errorMessage = wxString(text) + wxT("\n\n") + _("Ignore this error, retry or abort?");
-        ErrorDlg* errorDlg = new ErrorDlg(syncStatusFrame, errorMessage, ignoreNextErrors);
-
+        ErrorDlg* errorDlg = new ErrorDlg(syncStatusFrame,
+                                          ErrorDlg::BUTTON_IGNORE |  ErrorDlg::BUTTON_RETRY | ErrorDlg::BUTTON_ABORT,
+                                          wxString(errorMessage) + wxT("\n\n") + _("Ignore this error, retry or abort?"),
+                                          ignoreNextErrors);
         switch (errorDlg->ShowModal())
         {
         case ErrorDlg::BUTTON_IGNORE:
-            ignoreErrors = ignoreNextErrors;
-            unhandledErrors.Add(text.c_str());
+            if (ignoreNextErrors) //falsify only
+                m_handleError = xmlAccess::ON_ERROR_IGNORE;
+            unhandledErrors.Add(errorWithTime);
             return ErrorHandler::IGNORE_ERROR;
         case ErrorDlg::BUTTON_RETRY:
             return ErrorHandler::RETRY;
         case ErrorDlg::BUTTON_ABORT:
-        {
-            unhandledErrors.Add(text.c_str());
-            abortRequested = true;
-            throw AbortThisProcess();
-        }
-        default:
-            assert (false);
-            return ErrorHandler::IGNORE_ERROR;
+            unhandledErrors.Add(errorWithTime);
+            abortThisProcess();
         }
     }
+    break; //used IF last switch didn't find a match
+
+    case xmlAccess::ON_ERROR_EXIT: //abort
+        unhandledErrors.Add(errorWithTime);
+        abortThisProcess();
+
+    case xmlAccess::ON_ERROR_IGNORE:
+        unhandledErrors.Add(errorWithTime);
+        return ErrorHandler::IGNORE_ERROR;
+    }
+
+    assert(false);
+    return ErrorHandler::IGNORE_ERROR; //dummy value
+}
+
+
+void BatchStatusHandlerGui::reportFatalError(const Zstring& errorMessage)
+{   //add current time before error message
+    wxString errorWithTime = wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + errorMessage.c_str();
+
+    unhandledErrors.Add(errorWithTime);
+    abortThisProcess();
+}
+
+
+void BatchStatusHandlerGui::reportWarning(const Zstring& warningMessage, bool& dontShowAgain)
+{   //add current time before warning message
+    wxString warningWithTime = wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + warningMessage.c_str();
+
+    switch (m_handleError)
+    {
+    case xmlAccess::ON_ERROR_POPUP:
+    case xmlAccess::ON_ERROR_EXIT: //show popup in this case also
+    {
+        //show popup and ask user how to handle warning
+        bool dontWarnAgain = false;
+        WarningDlg* warningDlg = new WarningDlg(NULL,
+                                                WarningDlg::BUTTON_IGNORE | WarningDlg::BUTTON_ABORT,
+                                                warningMessage.c_str(),
+                                                dontWarnAgain);
+        const int rv = warningDlg->ShowModal();
+        warningDlg->Destroy();
+        switch (rv)
+        {
+        case WarningDlg::BUTTON_IGNORE: //no unhandled error situation!
+            dontShowAgain = dontWarnAgain;
+            return;
+        case WarningDlg::BUTTON_ABORT:
+            unhandledErrors.Add(warningWithTime);
+            abortThisProcess();
+        }
+    }
+    break; //keep it! last switch might not find match
+
+    case xmlAccess::ON_ERROR_IGNORE: //no unhandled error situation!
+        return;
+    }
+
+    assert(false);
 }
 
 

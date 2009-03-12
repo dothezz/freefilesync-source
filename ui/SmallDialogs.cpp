@@ -4,6 +4,7 @@
 #include "../algorithm.h"
 #include <wx/msgdlg.h>
 #include "../library/customGrid.h"
+#include "../library/customButton.h"
 
 using namespace FreeFileSync;
 
@@ -39,13 +40,13 @@ AboutDlg::~AboutDlg() {}
 
 void AboutDlg::OnClose(wxCloseEvent& event)
 {
-    Destroy();
+    EndModal(0);
 }
 
 
 void AboutDlg::OnOK(wxCommandEvent& event)
 {
-    Destroy();
+    EndModal(0);
 }
 //########################################################################################
 
@@ -168,19 +169,48 @@ void FilterDlg::OnClose(wxCloseEvent& event)
 {
     EndModal(0);
 }
+
+
 //########################################################################################
-
-DeleteDialog::DeleteDialog(const wxString& headerText, const wxString& messageText, wxWindow* main) :
-        DeleteDlgGenerated(main)
+DeleteDialog::DeleteDialog(wxWindow* main,
+                           const FileCompareResult& grid,
+                           const std::set<int>& rowsOnLeft,
+                           const std::set<int>& rowsOnRight,
+                           bool& deleteOnBothSides,
+                           bool& useRecycleBin) :
+        DeleteDlgGenerated(main),
+        mainGrid(grid),
+        rowsToDeleteOnLeft(rowsOnLeft),
+        rowsToDeleteOnRight(rowsOnRight),
+        m_deleteOnBothSides(deleteOnBothSides),
+        m_useRecycleBin(useRecycleBin)
 {
-    m_staticTextHeader->SetLabel(headerText);
-    m_textCtrlMessage->SetValue(messageText);
-    m_bitmap12->SetBitmap(*globalResource.bitmapDeleteFile);
+    m_checkBoxDeleteBothSides->SetValue(deleteOnBothSides);
+    m_checkBoxUseRecycler->SetValue(useRecycleBin);
+    updateTexts();
 
+    m_bitmap12->SetBitmap(*globalResource.bitmapDeleteFile);
     m_buttonOK->SetFocus();
 }
 
-DeleteDialog::~DeleteDialog() {}
+
+void DeleteDialog::updateTexts()
+{
+    wxString headerText;
+    if (m_checkBoxUseRecycler->GetValue())
+        headerText = _("Do you really want to move the following objects(s) to the Recycle Bin?");
+    else
+        headerText = _("Do you really want to delete the following objects(s)?");
+    m_staticTextHeader->SetLabel(headerText);
+
+    wxString filesToDelete = FreeFileSync::deleteFromGridAndHDPreview(mainGrid,
+                             rowsToDeleteOnLeft,
+                             rowsToDeleteOnRight,
+                             m_checkBoxDeleteBothSides->GetValue());
+    m_textCtrlMessage->SetValue(filesToDelete);
+
+    Layout();
+}
 
 
 void DeleteDialog::OnOK(wxCommandEvent& event)
@@ -197,17 +227,50 @@ void DeleteDialog::OnClose(wxCloseEvent& event)
 {
     EndModal(BUTTON_CANCEL);
 }
+
+void DeleteDialog::OnDelOnBothSides(wxCommandEvent& event)
+{
+    m_deleteOnBothSides = m_checkBoxDeleteBothSides->GetValue();
+    updateTexts();
+}
+
+void DeleteDialog::OnUseRecycler(wxCommandEvent& event)
+{
+    if (m_checkBoxUseRecycler->GetValue())
+    {
+        if (!FreeFileSync::recycleBinExists())
+        {
+            wxMessageBox(_("It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)"), _("Error") , wxOK | wxICON_ERROR);
+            m_checkBoxUseRecycler->SetValue(false);
+        }
+    }
+
+    m_useRecycleBin = m_checkBoxUseRecycler->GetValue();
+    updateTexts();
+}
 //########################################################################################
 
 
-ErrorDlg::ErrorDlg(wxWindow* parentWindow, const wxString messageText, bool& ignoreNextErrors) :
+ErrorDlg::ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxString messageText, bool& ignoreNextErrors) :
         ErrorDlgGenerated(parentWindow),
         ignoreErrors(ignoreNextErrors)
 {
-    m_bitmap10->SetBitmap(*globalResource.bitmapWarning);
+    m_bitmap10->SetBitmap(*globalResource.bitmapError);
     m_textCtrl8->SetValue(messageText);
 
-    m_buttonRetry->SetFocus();
+    if (~activeButtons & BUTTON_IGNORE)
+    {
+        m_buttonIgnore->Hide();
+        m_checkBoxIgnoreErrors->Hide();
+    }
+
+    if (activeButtons & BUTTON_RETRY)
+        m_buttonRetry->SetFocus();
+    else
+        m_buttonRetry->Hide();
+
+    if (~activeButtons & BUTTON_ABORT)
+        m_buttonAbort->Hide();
 }
 
 ErrorDlg::~ErrorDlg() {}
@@ -250,20 +313,13 @@ WarningDlg::WarningDlg(wxWindow* parentWindow,  int activeButtons, const wxStrin
     m_textCtrl8->SetValue(messageText);
 
     if (~activeButtons & BUTTON_IGNORE)
+    {
         m_buttonIgnore->Hide();
-
-    if (activeButtons & BUTTON_RESOLVE)
-        m_buttonResolve->SetFocus();
-    else
-        m_buttonResolve->Hide();
+        m_checkBoxDontShowAgain->Hide();
+    }
 
     if (~activeButtons & BUTTON_ABORT)
         m_buttonAbort->Hide();
-
-    if (activeButtons & BUTTON_OKAY)
-        m_buttonOK->SetFocus();
-    else
-        m_buttonOK->Hide();
 }
 
 WarningDlg::~WarningDlg() {}
@@ -283,45 +339,32 @@ void WarningDlg::OnIgnore(wxCommandEvent& event)
 }
 
 
-void WarningDlg::OnResolve(wxCommandEvent& event)
-{
-    dontShowAgain = m_checkBoxDontShowAgain->GetValue();
-    EndModal(BUTTON_RESOLVE);
-}
-
-
 void WarningDlg::OnAbort(wxCommandEvent& event)
 {
     dontShowAgain = m_checkBoxDontShowAgain->GetValue();
     EndModal(BUTTON_ABORT);
 }
 
-void WarningDlg::OnOkay(wxCommandEvent& event)
-{
-    dontShowAgain = m_checkBoxDontShowAgain->GetValue();
-    EndModal(BUTTON_OKAY);
-}
-
-
 //########################################################################################
-CustomizeColsDlg::CustomizeColsDlg(wxWindow* window, xmlAccess::XmlGlobalSettings::ColumnAttributes& attr) :
+CustomizeColsDlg::CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes& attr) :
         CustomizeColsDlgGenerated(window),
         output(attr)
 {
     m_bpButton29->SetBitmapLabel(*globalResource.bitmapMoveUp);
     m_bpButton30->SetBitmapLabel(*globalResource.bitmapMoveDown);
 
-    xmlAccess::XmlGlobalSettings::ColumnAttributes columnSettings = attr;
+    xmlAccess::ColumnAttributes columnSettings = attr;
 
     sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByPositionOnly);
 
-    for (xmlAccess::XmlGlobalSettings::ColumnAttributes::const_iterator i = columnSettings.begin(); i != columnSettings.end(); ++i) //love these iterators!
+    for (xmlAccess::ColumnAttributes::const_iterator i = columnSettings.begin(); i != columnSettings.end(); ++i) //love these iterators!
     {
         m_checkListColumns->Append(CustomGrid::getTypeName(i->type));
         m_checkListColumns->Check(i - columnSettings.begin(), i->visible);
     }
 
     m_checkListColumns->SetSelection(0);
+    Fit();
 }
 
 
@@ -330,7 +373,7 @@ void CustomizeColsDlg::OnOkay(wxCommandEvent& event)
     for (int i = 0; i < int(m_checkListColumns->GetCount()); ++i)
     {
         const wxString label = m_checkListColumns->GetString(i);
-        for (xmlAccess::XmlGlobalSettings::ColumnAttributes::iterator j = output.begin(); j != output.end(); ++j)
+        for (xmlAccess::ColumnAttributes::iterator j = output.begin(); j != output.end(); ++j)
         {
             if (CustomGrid::getTypeName(j->type) == label) //not nice but short and no performance issue
             {
@@ -347,10 +390,13 @@ void CustomizeColsDlg::OnOkay(wxCommandEvent& event)
 
 void CustomizeColsDlg::OnDefault(wxCommandEvent& event)
 {
-    for (unsigned i = 0; i < m_checkListColumns->GetCount(); ++i)
+    xmlAccess::ColumnAttributes defaultColumnAttr = CustomGrid::getDefaultColumnAttributes();
+
+    m_checkListColumns->Clear();
+    for (xmlAccess::ColumnAttributes::const_iterator i = defaultColumnAttr.begin(); i != defaultColumnAttr.end(); ++i)
     {
-        m_checkListColumns->SetString(i, CustomGrid::getTypeName(xmlAccess::XmlGlobalSettings::ColumnTypes(i)));
-        m_checkListColumns->Check(i, true);
+        m_checkListColumns->Append(CustomGrid::getTypeName(i->type));
+        m_checkListColumns->Check(i - defaultColumnAttr.begin(), i->visible);
     }
 }
 
@@ -381,7 +427,6 @@ void CustomizeColsDlg::OnMoveUp(wxCommandEvent& event)
         m_checkListColumns->Check(pos - 1, checked);
         m_checkListColumns->Select(pos - 1);
     }
-    event.Skip();
 }
 
 
@@ -399,7 +444,6 @@ void CustomizeColsDlg::OnMoveDown(wxCommandEvent& event)
         m_checkListColumns->Check(pos + 1, checked);
         m_checkListColumns->Select(pos + 1);
     }
-    event.Skip();
 }
 
 //########################################################################################
@@ -408,13 +452,16 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSetti
         settings(globalSettings)
 {
     m_bitmapSettings->SetBitmap(*globalResource.bitmapSettings);
+    m_buttonResetWarnings->setBitmapFront(*globalResource.bitmapWarningSmall, 5);
 
 #ifdef FFS_WIN
-    m_checkBoxHandleDstFat->SetValue(globalSettings.global.handleDstOnFat32);
+    m_checkBoxHandleDstFat->SetValue(globalSettings.shared.handleDstOnFat32);
 #else
     m_checkBoxHandleDstFat->Hide();
 #endif
     m_textCtrlFileManager->SetValue(globalSettings.gui.commandLineFileManager);
+
+    Fit();
 }
 
 
@@ -422,7 +469,7 @@ void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 {
     //write global settings only when okay-button is pressed!
 #ifdef FFS_WIN
-    settings.global.handleDstOnFat32    = m_checkBoxHandleDstFat->GetValue();
+    settings.shared.handleDstOnFat32    = m_checkBoxHandleDstFat->GetValue();
 #endif
     settings.gui.commandLineFileManager = m_textCtrlFileManager->GetValue();
 
@@ -430,11 +477,19 @@ void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 }
 
 
+void GlobalSettingsDlg::OnResetWarnings(wxCommandEvent& event)
+{
+    wxMessageDialog* messageDlg = new wxMessageDialog(this, _("Reset all warning messages?"), _("Warning") , wxOK | wxCANCEL);
+    if (messageDlg->ShowModal() == wxID_OK)
+        settings.shared.resetWarnings();
+}
+
+
 void GlobalSettingsDlg::OnDefault(wxCommandEvent& event)
 {
     m_checkBoxHandleDstFat->SetValue(true);
 #ifdef FFS_WIN
-    m_textCtrlFileManager->SetValue(wxT("explorer /select, %x"));
+    m_textCtrlFileManager->SetValue(wxT("explorer /select, %name"));
 #elif defined FFS_LINUX
     m_textCtrlFileManager->SetValue(wxT("konqueror \"%path\""));
 #endif

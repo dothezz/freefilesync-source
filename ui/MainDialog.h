@@ -1,10 +1,8 @@
 /***************************************************************
- * Name:      FreeFileSyncMain.h
+ * Name:      mainDialog.h
  * Purpose:   Defines Application Frame
  * Author:    ZenJu (zhnmju123@gmx.de)
  * Created:   2008-07-16
- * Copyright: ZenJu ()
- * License:
  **************************************************************/
 
 #ifndef MAINDIALOG_H
@@ -18,10 +16,11 @@
 #include <wx/dnd.h>
 #include <stack>
 #include "../library/processXml.h"
+#include <wx/event.h>
 
 
 //IDs for context menu items
-enum ContextItem
+enum //context menu for left and right grids
 {
     CONTEXT_FILTER_TEMP = 10,
     CONTEXT_EXCLUDE_EXT,
@@ -29,14 +28,23 @@ enum ContextItem
     CONTEXT_CLIPBOARD,
     CONTEXT_EXPLORER,
     CONTEXT_DELETE_FILES,
+};
+
+enum //context menu for middle grid
+{
+    CONTEXT_CHECK_ALL,
+    CONTEXT_UNCHECK_ALL
+};
+
+enum //context menu for column settings
+{
     CONTEXT_CUSTOMIZE_COLUMN_LEFT,
     CONTEXT_CUSTOMIZE_COLUMN_RIGHT
 };
 
-extern const wxGrid* leadGrid; //point to grid that is in focus
-
 class CompareStatusHandler;
 class FileDropEvent;
+class FfsFileDropEvent;
 
 class MainDialog : public MainDialogGenerated
 {
@@ -48,6 +56,8 @@ public:
     ~MainDialog();
 
 private:
+    void cleanUp();
+
     //configuration load/save
     bool readConfigurationFromXml(const wxString& filename, bool programStartup = false);
     bool writeConfigurationToXml(const wxString& filename);
@@ -74,7 +84,7 @@ private:
     void filterRangeManually(const std::set<int>& rowsToFilterOnUiTable);
     void copySelectionToClipboard(const wxGrid* selectedGrid);
     void openWithFileManager(int rowNumber, const wxGrid* grid);
-    void deleteFilesOnGrid(const std::set<int>& rowsToDeleteOnUI);
+    void deleteFilesOnGrid(const std::set<int>& selectedRowsLeft, const std::set<int>& selectedRowsRight);
 
     //work to be done in idle time
     void OnIdleEvent(wxEvent& event);
@@ -91,9 +101,13 @@ private:
     void onGridLeftButtonEvent(wxKeyEvent& event);
     void onGridRightButtonEvent(wxKeyEvent& event);
     void onGridMiddleButtonEvent(wxKeyEvent& event);
-    void OnOpenContextMenu(wxGridEvent& event);
-    void OnColumnMenuLeft(wxGridEvent& event);
-    void OnColumnMenuRight(wxGridEvent& event);
+    void OnContextMenu(wxGridEvent& event);
+    void OnContextMenuSelection(wxCommandEvent& event);
+    void OnContextMenuMiddle(wxGridEvent& event);
+    void OnContextMenuMiddleSelection(wxCommandEvent& event);
+    void OnContextColumnLeft(wxGridEvent& event);
+    void OnContextColumnRight(wxGridEvent& event);
+    void OnContextColumnSelection(wxCommandEvent& event);
 
     void OnWriteDirManually(wxCommandEvent& event);
     void OnDirSelected(wxFileDirPickerEvent& event);
@@ -102,8 +116,6 @@ private:
     void OnGridSelectCell(wxGridEvent& event);
     void OnGrid3LeftMouseUp(wxEvent& event);
     void OnGrid3LeftMouseDown(wxEvent& event);
-
-    void onContextMenuSelection(wxCommandEvent& event);
 
     void OnLeftGridDoubleClick( wxGridEvent& event);
     void OnRightGridDoubleClick(wxGridEvent& event);
@@ -120,9 +132,11 @@ private:
 
     void OnSaveConfig(          wxCommandEvent& event);
     void OnLoadConfig(          wxCommandEvent& event);
+    void OnLoadFromHistory(     wxCommandEvent& event);
     void loadConfiguration(const wxString& filename);
     void OnChoiceKeyEvent(      wxKeyEvent& event );
 
+    void OnFilesDropped(        FfsFileDropEvent& event);
     void onResizeMainWindow(    wxEvent& event);
     void OnAbortCompare(        wxCommandEvent& event);
     void OnFilterButton(        wxCommandEvent& event);
@@ -158,7 +172,7 @@ private:
     void OnMenuLangPolish(      wxCommandEvent& event);
     void OnMenuLangPortuguese(  wxCommandEvent& event);
 
-    void changeProgramLanguage(const int langID);
+    void switchProgramLanguage(const int langID);
     void enableSynchronization(bool value);
 
 //***********************************************
@@ -187,10 +201,11 @@ private:
     int posXNotMaximized;
     int posYNotMaximized;
     bool hideFilteredElements;
+    bool ignoreErrors;
 //-------------------------------------
 
     //convenience method to get all folder pairs (unformatted)
-    void getFolderPairs(std::vector<FolderPair>& output,  bool formatted = false);
+    std::vector<FolderPair> getFolderPairs();
 
     //UI View Filter settings
     bool leftOnlyFilesActive;
@@ -201,7 +216,7 @@ private:
     bool rightOnlyFilesActive;
 
 //***********************************************
-    wxMenu* contextMenu;
+    std::auto_ptr<wxMenu> contextMenu;
 
     CustomLocale* programLanguage;
 
@@ -212,9 +227,11 @@ private:
     //compare status panel (hidden on start, shown when comparing)
     CompareStatus* compareStatus;
 
-    //save the last used config filenames
+    //save the last used config filename history
     std::vector<wxString> cfgFileNames;
-    static const unsigned int CFG_HISTORY_LENGTH = 10;
+
+    //used when saving configuration
+    wxString proposedConfigFileName;
 
     //variables for filtering of m_grid3
     bool filteringInitialized;
@@ -231,26 +248,51 @@ private:
 
     bool synchronizationEnabled; //determines whether synchronization should be allowed
 
-    bool restartOnExit; //restart dialog on exit (currently used, when language is changed)
-
     CompareStatusHandler* cmpStatusHandlerTmp;  //used only by the abort button when comparing
+
+    bool cleanedUp; //determines if destructor code was already executed
+
+    //remember last sort executed (for determination of sort order)
+    int lastSortColumn;
+    const wxGrid* lastSortGrid;
+
+    const wxGrid* leadGrid; //point to grid that is in focus
 };
 
 //######################################################################################
 
+//define new event type
+const wxEventType FFS_DROP_FILE_EVENT = wxNewEventType();
+typedef void (wxEvtHandler::*FffsFileDropEventFunction)(FfsFileDropEvent&);
+#define FfsFileDropEventHandler(func) \
+    (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(FffsFileDropEventFunction, &func)
 
-class FileDropEvent : public wxFileDropTarget
+class FfsFileDropEvent : public wxCommandEvent
 {
 public:
-    FileDropEvent(MainDialog* dlg, const wxPanel* obj) :
+    FfsFileDropEvent(const wxString& nameDropped, const wxPanel* dropTarget) :
+            wxCommandEvent(FFS_DROP_FILE_EVENT),
+            m_nameDropped(nameDropped),
+            m_dropTarget(dropTarget) {}
+
+    virtual wxEvent* Clone() const
+    {
+        return new FfsFileDropEvent(m_nameDropped, m_dropTarget);
+    }
+
+    const wxString m_nameDropped;
+    const wxPanel* m_dropTarget;
+};
+
+
+class MainWindowDropTarget : public wxFileDropTarget
+{
+public:
+    MainWindowDropTarget(MainDialog* dlg, const wxPanel* obj) :
             mainDlg(dlg),
-            dropTarget(obj)
-    {}
+            dropTarget(obj) {}
 
-    ~FileDropEvent() {}
-
-    //overwritten virtual method
-    bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames);
+    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames);
 
 private:
     MainDialog* mainDlg;
@@ -270,9 +312,11 @@ public:
     void updateStatusText(const Zstring& text);
     void initNewProcess(int objectsTotal, double dataTotal, Process processID);
     void updateProcessedData(int objectsProcessed, double dataProcessed);
-    ErrorHandler::Response reportError(const Zstring& text);
-
     void forceUiRefresh();
+
+    ErrorHandler::Response reportError(const Zstring& text);
+    void reportFatalError(const Zstring& errorMessage);
+    void reportWarning(const Zstring& warningMessage, bool& dontShowAgain);
 
 private:
     void abortThisProcess();
@@ -292,9 +336,11 @@ public:
     void updateStatusText(const Zstring& text);
     void initNewProcess(int objectsTotal, double dataTotal, Process processID);
     void updateProcessedData(int objectsProcessed, double dataProcessed);
-    ErrorHandler::Response reportError(const Zstring& text);
-
     void forceUiRefresh();
+
+    ErrorHandler::Response reportError(const Zstring& text);
+    void reportFatalError(const Zstring& errorMessage);
+    void reportWarning(const Zstring& warningMessage, bool& dontShowAgain);
 
 private:
     void abortThisProcess();

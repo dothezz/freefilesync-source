@@ -28,8 +28,8 @@
 &Informatie...
 &Advanced
 &Geavanceerd
-&Back
-&Terug
+&Apply
+&Toepassen
 &Cancel
 &Annuleren
 &Compare
@@ -42,12 +42,16 @@
 &Exporteer bestandslijst
 &File
 &Bestand
+&Global settings
+&Algemene instellingen
 &Help
 &Help
 &Ignore
 &Negeren
 &Language
 &Taal
+&Load
+&Laden
 &Load configuration
 &Laad de configuratie
 &OK
@@ -56,12 +60,14 @@
 &Pause
 &Quit
 &Afsluiten
-&Resolve
-&Oplossen
 &Retry
 &Opnieuw proberen
+&Save
+&Opslaan
 &Start
 &Start
+&Synchronize...
+&Synchroniseer...
 ,
 .
 - different
@@ -108,6 +114,8 @@
 <<	linker bestand is nieuwer\n
 <Directory>
 <Pad>
+<Last session>
+<Laatste sessie>
 <multiple selection>
 <veelvoudige selectie>
 <|	file on left side only\n
@@ -126,6 +134,8 @@ About
 Informatie
 Action
 Actie
+Active for FAT/FAT32 drives only: When comparing filetimes treat files that differ by less or equal than 1 hour as equal. This ensures daylight saving time switches are handled properly.
+Aleen van toepassing voor FAT/FAT32-schijven: wanneer bestandstijden worden vergeleken, de bestanden die verschillen met 1 of minder dan 1 uur als gelijk behandelen. Dit zorgt ervoor dat zomertijd veranderingen juist worden afgehandeld.
 Add folder pair
 Voeg 1 paar gekoppelde mappen toe
 All items have been synchronized!
@@ -136,14 +146,22 @@ As a result the files are separated into the following categories:
 Hierdoor worden de bestanden gescheiden in de volgende categorieën:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
 Zoals de naam suggereert, worden twee bestanden met dezelfde naam alleen gemarkeerd als gelijk, als ze precies dezelfde inhoud hebben. Deze optie is handig voor een consistentiecontrole in plaats van back-up handelingen. Daarom worden de tijdstempels niet bekeken.\n\n Met deze optie aan is de beslissingsboom korter:
-Assemble a batch file with the following settings. To start synchronization in batch mode simply execute this file or schedule it in your operating system's task planner.
-Creëer een batchbestand met de volgende instellingen. Om synchronisatie\nin batchmodus uit te voeren kunt u dit bestand uitvoeren of opnemen in de taakplanner van het systeem.
+Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
+Assembleer een batchbestand voor automatische synchronisatie. Om te starten in batchmodus is het voldoende om de bestandsnaam achter de FreeFileSync toepassing te zetten: FreeFileSync.exe <batchbestand>. Het is mogelijk dit in te plannen in de systeemplanner.
+Batch execution
+Batch taak uitvoeren
 Batch file created successfully!
 Batchbestand is succesvol aangemaakt!
+Batch job
+Batch taak
 Big thanks for localizing FreeFileSync goes out to:
 Extra dank voor het vertalen van FreeFileSync gaat naar:
 Build:
 Gebouwd:
+Cancel
+Annuleren
+Check all
+Alles controleren
 Choose to hide filtered files/directories from list
 Gefilterde bestanden niet/wel weergeven
 Comma separated list
@@ -180,8 +198,6 @@ Configure your own synchronization rules.
 Configureer uw eigen synchronisatieregels.
 Confirm
 Bevestig
-Consider this when setting up synchronization rules: You might want to avoid write access to these directories so that synchronization of both does not interfere.
-Neem het volgende in overweging: U wilt misschien schrijfrechten op deze paden vermijden, zodat synchronisatie van bijde elkaar niet hindert.
 Continue
 Doorgaan
 Conversion error:
@@ -216,6 +232,8 @@ Current operation:
 Huidige operatie:
 Custom
 Gebruik
+Customize columns
+Aanpassen kolommen
 DECISION TREE
 BESLISSINGSBOOM
 Data remaining:
@@ -230,14 +248,18 @@ Delete files/folders existing on right side only
 Verwijder bestanden/folders die alleen rechts bestaan
 Delete files\tDEL
 Verwijder bestanden\tDEL
+Delete on both sides
+Verwijder aan beide kanten
+Delete on both sides even if the file is selected on one side only
+Verwijder aan beide kanten ookal is het bestand maar aan één kant geselecteerd
 Delete:
 Verwijderen:
 Deleting file %x
 Bestand %x wordt verwijderd
 Deleting folder %x
 Map %x wordt verwijderd
-Directories are dependent:
-De volgende paden zijn afhankelijk van elkaar:
+Directories are dependent! Be careful when setting up synchronization rules:
+Mappen zijn afhankelijk van elkaar! Wees voorzichtig met het maken van synchronisatieregels:
 Directory does not exist:
 Map bestaat niet:
 Do not show graphical status and error messages but write to a logfile instead
@@ -248,8 +270,8 @@ Do nothing
 Geen actie ondernemen
 Do you really want to delete the following objects(s)?
 Weet u zeker dat u de volgende bestanden wilt verwijderen?
-Do you really want to move the following objects(s) to the recycle bin?
-Weet u zeker dat u de volgende bestanden naar de prullenbak wilt verplaatsen?
+Do you really want to move the following objects(s) to the Recycle Bin?
+Weet u zeker dat u de/het volgende bestand(en) wilt verplaatsen naar de prullenbak?
 Donate with PayPal
 Doneer met PayPal
 Drag && drop
@@ -268,24 +290,42 @@ Error deleting directory:
 Er is een fout opgetreden bij het verwijderen van pad:
 Error deleting file:
 Er is een fout opgetreden bij het verwijderen van bestand:
-Error moving to recycle bin:
-Er is een fout opgetreden bij verwijderen naar de prullenbak:
+Error handling
+Fout afhandeling
+Error moving to Recycle Bin:
+Er is een fout opgetreden bij het verplaatsen naar de prullenbak:
 Error parsing configuration file:
 Er is een fout opgetreden bij het aanmaken van configuratiebestand:
 Error reading file:
 Er is een fout opgetreden bij het lezen van het bestand:
+Error reading folder attributes:
+Er is een fout opgetreden bij het lezen van de map-eigenschappen:
 Error traversing directory:
 Er is een fout opgetreden bij het doorzoeken van map:
 Error writing file:
 Er is een fout opgetreden bij het schrijven naar bestand:
+Error writing folder attributes:
+Er is een fout opgetreden bij het schrijven van de map-eigenschappen:
 Error: Source directory does not exist anymore:
 Er is een fout opgetreden. De oorspronkelijke map bestaat niet meer:
 Example
 Voorbeeld
 Exclude
 Uitsluiten
+Exclude temporarily
+Tijdelijk uitsluiten
+Exclude via filter:
+Uitsluiten door filter:
+Exit immediately and set returncode < 0
+Onmiddelijk afsluiten en zet de returncode < 0
+Exit with RC < 0
+Afsluiten met RC < 0
+FAT32: Handle Daylight Saving Time
+FAT32: Gebruik zomertijd
 Feedback and suggestions are welcome at:
 Tips en suggesties zijn welkom op:
+File Manager integration:
+Integratie bestandsbeheer:
 File already exists. Overwrite?
 Het bestand bestaat al. Overschrijven?
 File content
@@ -318,14 +358,14 @@ Files/folders that exist on left side only
 Bestanden/mappen die alleen aan de linkerkant bestaan
 Files/folders that exist on right side only
 Bestanden/mappen die alleen aan de rechterkant bestaan
-Filter
-Filter
 Filter active: Press again to deactivate
 Filter actief: nogmaals klikken om uit te zetten
 Filter files
 Filter bestanden
 Filter view
 Bekijk het filter
+Folder Comparison and Synchronization
+Mappen vergelijken en synchroniseren
 Folder pair
 Gekoppelde mappen
 FreeFileSync - Folder Comparison and Synchronization
@@ -338,8 +378,16 @@ FreeFileSync batch file
 FreeFileSync batchbestand
 FreeFileSync configuration
 FreeFileSync configuratie
+Full name
+Volledige naam
+Generating file list...
+Bestandslijst genereren...
+Global settings
+Algemene instellingen
 Help
 Help
+Hide all error and warning messages
+Verberg alle foutmeldingen en waarschuwingen
 Hide files that are different
 Verberg bestanden die verschillend zijn
 Hide files that are equal
@@ -366,22 +414,22 @@ If you like FFS:
 Als het programma u bevalt:
 Ignore errors
 Negeer foutmeldingen
-Ignore next errors
-Negeer volgende foutmeldingen
+Ignore subsequent errors
+Negeer verdere foutmeldingen
 Ignore this error, retry or abort synchronization?
 Negeer deze fout, opnieuw proberen of afbreken van deze synchronisatie?
 Ignore this error, retry or abort?
 Negeer deze fout, opnieuw proberen of de handeling afbreken?
 Include
 Gebruiken
+Include temporarily
+Tijdelijk bijsluiten
 Include: *.doc;*.zip;*.exe\nExclude: *\\temp\\*
 Gebruiken: *.doc;*.zip;*.exe\nUitsluiten: *\\temp\\*
 Info
 Info
 Information
 Informatie
-Information: If you ignore the error or abort a re-compare will be necessary!
-Informatie: als u de fout negeert of de handeling afbreekt is opnieuw vergelijken noodzakelijk!
 Initialization of Recycle Bin failed!
 Initialiseren van de prullenbak is mislukt.
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -390,16 +438,20 @@ Left folder:
 Linker map:
 Legend
 Legenda
-Load configuration via...\n     - this list (press DEL to delete items)\n     - drag & drop to this window\n     - startup parameter
-Laad configuratie via...\n     - deze lijst (druk op DEL om items te verwijderen)\n     - drag en drop in dit venster\n     - opstartparameter
-Load from file...
-Laad met behulp van...
+Load configuration from file
+Laad configuratie uit bestand
+Load configuration history (press DEL to delete items)
+Laad configuratiegeschiedenis (druk op DEL om items te verwijderen)
 Log-messages:
 Logberichten:
 Mirror ->>
 Spiegelen ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Spiegel backup van de linkerkant: de rechterkant wordt overschreven en komt na synchronisatie exact overeen met de linkerkant.
+Move column down
+Verplaats kolom naar beneden
+Move column up
+Verplaats kolom naar boven
 Not all items were synchronized! Have a look at the list.
 Niet alle bestanden zijn gesynchroniseerd! Bekijk de lijst.
 Nothing to synchronize according to configuration!
@@ -410,10 +462,14 @@ Number of files and directories that will be deleted
 Aantal mappen en bestanden die zullen worden verwijderd
 Number of files that will be overwritten
 Aantal bestanden dat zal worden overschreven
+OK
+OKE
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the full name including path prefix.
 Alleen de niet gefilterde bestanden worden geselecteerd voor synchronisatie. Het filter wordt toegepast op de volledige naam inclusief pad-voorvoegsel.
 Open synchronization dialog
 Open de synchronisatie-instellingen
+Open with File Manager\tD-Click
+Openen met bestandsbeheerder\tD-klik
 Operation aborted!
 Operatie afgebroken!
 Operation:
@@ -434,6 +490,12 @@ Relative path
 Relatieve pad
 Remove folder pair
 Verwijder 1 paar gekoppelde mappen
+Reset
+Reset
+Reset all warning messages?
+Reset alle waarschuwingen?
+Resets all warning messages
+Reset alle waarschuwingen
 Result
 Resultaat
 Right folder:
@@ -464,10 +526,18 @@ Show files that exist on left side only
 Geef bestanden weer die alleen bestaan aan de linkerkant
 Show files that exist on right side only
 Geef bestanden weer die alleen bestaan aan de rechterkant
+Show popup
+Pop-up weergeven
+Show popup on errors or warnings
+Pop-up weergeven bij foutmeldingen of waarschuwingen
+Significant difference detected: More than 50% of files will be overwritten/deleted!
+Significant verschil gedetecteerd: meer dan 50% van de bestanden zal worden overschreven/verwijderd!
 Silent mode
 Stille modus
 Size
 Grootte
+Sorting file list...
+Bestandslijst sorteren...
 Source code written completely in C++ utilizing:
 Broncode compleet geschreven in C++ met behulp van:
 Start
@@ -484,6 +554,8 @@ Synchronization completed successfully!
 Synchronisatie succesvol afgerond!
 Synchronization completed with errors!
 Synchronisatie afgerond. Er zijn fouten opgetreden.
+Synchronization filter
+Synchronisatie filter
 Synchronization settings
 Synchronisatie instellingen
 Synchronization status
@@ -498,14 +570,18 @@ System out of memory!
 Systeem heeft te weinig geheugen
 The file does not contain a valid configuration:
 Het bestand bevat geen geldige configuratie:
-The selected file does not exist:
-Het volgende geselecteerde bestand bestaat niet:
+The file does not exist:
+Het bestand bestaat niet:
+This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
+Deze opdrachtregel wordt bij elke dubbelklik op een bestandsnaam uitgevoerd. %name doet dienst als plaatshouder voor het betreffende bestand.
+This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
+Deze opdrachtregel zal elke keer dat u dubbelklikt op een bestandsnaam, worden uitgevoerd. %x doet dienst als opslagplaats voor het geselecteerde bestand.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
 Deze variant ziet twee gelijknamige bestanden als gelijk wanneer ze dezelfde bestandsgrootte EN tijdstempel hebben. Merk op dat tijdstempel 2 seconden mag verschillen. Dit zorgt ervoor dat het minder nauwkeurige FAT-32 ook kan worden gesynchroniseerd.
+Time
+Tijd
 Time elapsed:
 Verstreken tijd:
-Time:
-Tijd:
 Total amount of data that will be transferred
 Hoeveelheid data die verplaatst word
 Total time:
@@ -516,6 +592,8 @@ Unable to create logfile!
 Niet mogelijk om een logbestand aan te maken!
 Unable to initialize Recycle Bin!
 De prullenbak kon niet worden geïnitialiseerd!
+Uncheck all
+Alles uitvinken
 Update ->
 Overschrijven ->
 Update:

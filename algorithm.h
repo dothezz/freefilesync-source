@@ -3,6 +3,7 @@
 
 #include "FreeFileSync.h"
 #include "library/statusHandler.h"
+#include "library/resources.h"
 
 
 namespace FreeFileSync
@@ -11,15 +12,28 @@ namespace FreeFileSync
     wxString formatFilesizeToShortString(const double filesize);
     Zstring getFormattedDirectoryName(const Zstring& dirname);
 
+    bool endsWithPathSeparator(const Zstring& name);
+
     void swapGrids(FileCompareResult& grid);
 
-    void adjustModificationTimes(const Zstring& parentDirectory, const int timeInSeconds, ErrorHandler* errorHandler) throw(AbortThisProcess);
+    void addSubElements(const FileCompareResult& grid, const FileCompareLine& relevantRow, std::set<int>& subElements);
 
-    void deleteOnGridAndHD(FileCompareResult& grid, const std::set<int>& rowsToDelete, ErrorHandler* errorHandler, const bool useRecycleBin) throw(AbortThisProcess);
-    void addSubElements(std::set<int>& subElements, const FileCompareResult& grid, const FileCompareLine& relevantRow);
+    //manual deletion of files on main grid
+    wxString deleteFromGridAndHDPreview(const FileCompareResult& grid,
+                                        const std::set<int>& rowsToDeleteOnLeft,
+                                        const std::set<int>& rowsToDeleteOnRight,
+                                        const bool deleteOnBothSides);
 
-    void filterCurrentGridData(FileCompareResult& currentGridData, const wxString& includeFilter, const wxString& excludeFilter);
-    void removeFilterOnCurrentGridData(FileCompareResult& currentGridData);
+    void deleteFromGridAndHD(FileCompareResult& grid,
+                             const std::set<int>& rowsToDeleteOnLeft,
+                             const std::set<int>& rowsToDeleteOnRight,
+                             const bool deleteOnBothSides,
+                             const bool useRecycleBin,
+                             ErrorHandler* errorHandler);
+
+    void filterGridData(FileCompareResult& currentGridData, const wxString& includeFilter, const wxString& excludeFilter);
+    void includeAllRowsOnGrid(FileCompareResult& currentGridData);
+    void excludeAllRowsOnGrid(FileCompareResult& currentGridData);
 
     wxString utcTimeToLocalString(const time_t utcTime);
 
@@ -28,14 +42,14 @@ namespace FreeFileSync
     ForwardIterator custom_binary_search (ForwardIterator first, ForwardIterator last, const T& value)
     {
         first = lower_bound(first, last, value);
-        if (first!=last && !(value<*first))
+        if (first != last && !(value < *first))
             return first;
         else
             return last;
     }
 
 #ifdef FFS_WIN
-    bool isFatDrive(const Zstring& directoryName);
+    Zstring getLastErrorFormatted(const unsigned long lastError = 0); //try to get additional windows error information
 
 //detect if FAT/FAT32 drive needs a +-1h time shift after daylight saving time (DST) switch due to known windows bug:
 //http://www.codeproject.com/KB/datetime/dstbugs.aspx
@@ -45,6 +59,15 @@ namespace FreeFileSync
 #endif  //FFS_WIN
 
 }
+
+
+inline
+bool FreeFileSync::endsWithPathSeparator(const Zstring& name)
+{
+    const size_t len = name.length();
+    return len && (name[len - 1] == GlobalResources::FILE_NAME_SEPARATOR);
+}
+
 
 
 #endif // ALGORITHM_H_INCLUDED

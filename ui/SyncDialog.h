@@ -3,6 +3,7 @@
 
 #include "../FreeFileSync.h"
 #include "guiGenerated.h"
+#include "../library/processXml.h"
 
 using namespace FreeFileSync;
 
@@ -13,6 +14,7 @@ public:
     SyncDialog(wxWindow* window,
                const FileCompareResult& gridDataRef,
                MainConfiguration& config,
+               bool& ignoreErrors,
                bool synchronizationEnabled);
 
     ~SyncDialog();
@@ -55,21 +57,32 @@ private:
     SyncConfiguration localSyncConfiguration;
     const FileCompareResult& gridData;
     MainConfiguration& cfg;
+    bool& m_ignoreErrors;
 };
+
+
+class BatchFileDropEvent;
 
 
 class BatchDialog: public BatchDlgGenerated
 {
+    friend class BatchFileDropEvent;
+
 public:
-    BatchDialog(wxWindow* window,
-                const MainConfiguration& config,
-                const std::vector<FolderPair>& folderPairs);
+    BatchDialog(wxWindow* window, const xmlAccess::XmlBatchConfig& batchCfg);
+    BatchDialog(wxWindow* window, const wxString& filename);
+    ~BatchDialog() {};
 
-    ~BatchDialog();
-
-    static const int batchFileCreated = 15;
+    enum
+    {
+        BATCH_FILE_SAVED = 15
+    };
 
 private:
+    void init();
+
+    void OnChangeErrorHandling(wxCommandEvent& event);
+
     void OnExLeftSideOnly(  wxCommandEvent& event);
     void OnExRightSideOnly( wxCommandEvent& event);
     void OnLeftNewer(       wxCommandEvent& event);
@@ -83,15 +96,23 @@ private:
     void OnClose(           wxCloseEvent&   event);
     void OnCancel(          wxCommandEvent& event);
     void OnSaveBatchJob(    wxCommandEvent& event);
+    void OnLoadBatchJob(    wxCommandEvent& event);
 
     void updateFilterButton();
+    xmlAccess::OnError getSelectionHandleError();
+    void setSelectionHandleError(const xmlAccess::OnError value);
 
     bool saveBatchFile(const wxString& filename);
+    void loadBatchFile(const wxString& filename);
+    void loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg);
 
     SyncConfiguration localSyncConfiguration;
     std::vector<BatchFolderPairGenerated*> localFolderPairs;
 
     bool filterIsActive;
+
+    //used when saving batch file
+    wxString proposedBatchFileName;
 };
 
 #endif // SYNCDIALOG_H_INCLUDED

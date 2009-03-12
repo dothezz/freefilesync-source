@@ -20,7 +20,9 @@ namespace FreeFileSync
     class SyncProcess
     {
     public:
-        SyncProcess(bool useRecycler, bool lineBreakOnMessages, StatusHandler* handler);
+        SyncProcess(const bool useRecycler,
+                    bool& warningSignificantDifference,
+                    StatusHandler* handler);
 
         void startSynchronizationProcess(FileCompareResult& grid, const SyncConfiguration& config)  throw(AbortThisProcess);
 
@@ -29,6 +31,7 @@ namespace FreeFileSync
         bool synchronizeFolder(const FileCompareLine& cmpLine, const SyncConfiguration& config); //false if nothing had to be done
 
         const bool useRecycleBin;
+        bool& m_warningSignificantDifference;
         StatusHandler* statusUpdater;
 
         //preload status texts

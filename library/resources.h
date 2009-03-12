@@ -63,10 +63,14 @@ public:
     wxBitmap* bitmapFilterOn;
     wxBitmap* bitmapFilterOff;
     wxBitmap* bitmapWarning;
+    wxBitmap* bitmapWarningSmall;
+    wxBitmap* bitmapError;
     wxBitmap* bitmapSmallUp;
     wxBitmap* bitmapSmallDown;
     wxBitmap* bitmapSave;
+    wxBitmap* bitmapLoad;
     wxBitmap* bitmapFFS;
+    wxBitmap* bitmapFFSPaused;
     wxBitmap* bitmapDeleteFile;
     wxBitmap* bitmapGPL;
     wxBitmap* bitmapStatusPause;

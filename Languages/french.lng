@@ -28,8 +28,8 @@
 &A propos de...
 &Advanced
 &Avancé
-&Back
-&Quitter
+&Apply
+&Appliquer
 &Cancel
 &Annuler
 &Compare
@@ -50,6 +50,8 @@
 &Ignorer
 &Language
 &Langue
+&Load
+&Charger
 &Load configuration
 &Charger la configuration
 &OK
@@ -58,8 +60,6 @@
 &Pause
 &Quit
 &Quitter
-&Resolve
-&Résoudre
 &Retry
 &Réessayer
 &Save
@@ -114,6 +114,8 @@
 <<	le fichier de gauche est plus récent\n
 <Directory>
 <Répertoire>
+<Last session>
+<Dernière session>
 <multiple selection>
 <sélection multiple>
 <|	file on left side only\n
@@ -144,8 +146,10 @@ As a result the files are separated into the following categories:
 En conclusion, les fichiers sont répartis dans les catégories suivantes:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
 Comme le nom le suggère, deux fichiers qui ont le même nom sont considérés comme identiques si, et seulement si, leur contenu est identique. Cette option est utile pour les contrôles de cohérence plutôt que pour les opérations de sauvegarde. Toutefois, les dates et heures ne sont pas du tout prises en compte.\n\nAvec cette option, l'arbre de décision est plus simple:
-Assemble a batch file with the following settings. To start synchronization in batch mode simply execute this file or schedule it in your operating system's task planner.
-Créer un fichier de commandes avec les paramètres suivants. Pour lancer la synchronisation en mode batch, exécutez ce fichier ou paramétrez-le dans le planificateur de tâches.
+Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
+Créer un fichier de commandespour une synchronisation automatique. Pour démarrer en mode batch, indiquer le nom du fichier à l'exécutable FreeFileSync: freefilesync.exe <fichier de commandes>. Ceci peut aussi être programmé dans le plannificateur de tâches.
+Batch execution
+Exécution du fichier de commandes
 Batch file created successfully!
 Fichier de commandes créé avec succès!
 Batch job
@@ -156,6 +160,8 @@ Build:
 Créé:
 Cancel
 Annuler
+Check all
+Cocher tout
 Choose to hide filtered files/directories from list
 Masquer les fichiers/répertoires filtrés
 Comma separated list
@@ -192,8 +198,6 @@ Configure your own synchronization rules.
 Paramétrage de vos règles de synchronisation.
 Confirm
 Confirmation
-Consider this when setting up synchronization rules: You might want to avoid write access to these directories so that synchronization of both does not interfere.
-Lisez ceci lors de la mise à jour des règles de synchronisation : Vous voudrez peut-être éviter l'accès en écriture à ces répertoires pour que la synchronisation n'interfère pas.
 Continue
 Continuer
 Conversion error:
@@ -244,14 +248,18 @@ Delete files/folders existing on right side only
 Suppression des fichiers/répertoires n'existant que sur le côté droit
 Delete files\tDEL
 Suppression des fichiers\tDEL
+Delete on both sides
+Suppression des deux côtés
+Delete on both sides even if the file is selected on one side only
+Suppression des deux côtés même si le fichier est sélectionné d'un seul côté
 Delete:
 Suppressions:
 Deleting file %x
 Suppression du fichier %x
 Deleting folder %x
 Suppression du dossier %x
-Directories are dependent:
-Les dossiers sont liés:
+Directories are dependent! Be careful when setting up synchronization rules:
+Les dossiers sont imbriqués! Attention à la mise à jour des règles de synchronisation:
 Directory does not exist:
 Le répertoire n'existe pas:
 Do not show graphical status and error messages but write to a logfile instead
@@ -262,8 +270,8 @@ Do nothing
 Ne rien faire
 Do you really want to delete the following objects(s)?
 Voulez-vous vraiment supprimer les objets suivants ?
-Do you really want to move the following objects(s) to the recycle bin?
-Voulez-vous vraiment envoyer les objets suivants dans la corbeille ?
+Do you really want to move the following objects(s) to the Recycle Bin?
+Voulez-vous vraiment déplacer les objets suivants dans la corbeille?
 Donate with PayPal
 Faites un don avec PayPal
 Drag && drop
@@ -282,16 +290,22 @@ Error deleting directory:
 Erreur lors de la suppression d'un répertoire:
 Error deleting file:
 Erreur lors de la suppression d'un fichier:
-Error moving to recycle bin:
-Erreur lors du déplacement vers la corbeille:
+Error handling
+Erreur de gestion de fichiers
+Error moving to Recycle Bin:
+Erreur lors du déplacement dans la corbeille
 Error parsing configuration file:
 Erreur lors de l'analyse du fichier de configuration:
 Error reading file:
 Erreur lors de la lecture du fichier:
+Error reading folder attributes:
+Erreur lors de la lecture des attributs du dossier
 Error traversing directory:
 Erreur lors du parcours du répertoire:
 Error writing file:
 Erreur lors de l'écriture du fichier:
+Error writing folder attributes:
+Erreur lors de l'écriture des attributs du dossier
 Error: Source directory does not exist anymore:
 Erreur: le répertoire source n'existe plus:
 Example
@@ -302,6 +316,10 @@ Exclude temporarily
 Exclure temporairement
 Exclude via filter:
 Exclure à l'aide du filtre:
+Exit immediately and set returncode < 0
+Sortie immédiate avec le returncode < 0
+Exit with RC < 0
+Sortie avec RC < 0
 FAT32: Handle Daylight Saving Time
 FAT32: Traitement de l'heure d'été
 Feedback and suggestions are welcome at:
@@ -340,14 +358,14 @@ Files/folders that exist on left side only
 Fichiers/répertoires existants seulement à gauche
 Files/folders that exist on right side only
 Fichiers/répertoires existants seulement à droite
-Filter
-Filtrage
 Filter active: Press again to deactivate
 Filtrage actif: Cliquez de nouveau pour le désactiver
 Filter files
 Filtrage des fichiers
 Filter view
 Filtrage de la vue
+Folder Comparison and Synchronization
+Comparaison de Dossiers et Synchronisation
 Folder pair
 Couple de dossiers
 FreeFileSync - Folder Comparison and Synchronization
@@ -360,12 +378,16 @@ FreeFileSync batch file
 FreeFileSync fichier de commandes
 FreeFileSync configuration
 FreeFileSync configuration
+Full name
+Nom complet
 Generating file list...
 Génération de la liste des fichiers...
 Global settings
 Paramètres généraux
 Help
 Aide
+Hide all error and warning messages
+Masquer tous les messages d'erreurs et les avertissements
 Hide files that are different
 Masquer les fichiers différents
 Hide files that are equal
@@ -392,8 +414,8 @@ If you like FFS:
 Si vous aimez FFS:
 Ignore errors
 Ignorer les erreurs
-Ignore next errors
-Ignorer les erreurs suivantes
+Ignore subsequent errors
+Ignorer les erreurs ultérieures
 Ignore this error, retry or abort synchronization?
 Ignorer l'erreur, réessayer ou abandonner la synchronisation ?
 Ignore this error, retry or abort?
@@ -408,8 +430,6 @@ Info
 Info
 Information
 Information
-Information: If you ignore the error or abort a re-compare will be necessary!
-Information: Si vous ignorez l'erreur ou abandonnez, il sera nécessaire de relancer la comparaison!
 Initialization of Recycle Bin failed!
 Erreur lors de l'initialisation de la corbeille !
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -418,10 +438,10 @@ Left folder:
 Répertoire de gauche:
 Legend
 Legende
-Load configuration via...\n     - this list (press DEL to delete items)\n     - drag & drop to this window\n     - startup parameter
-Charger la configuration via...\n     - cette liste (Appuyez sur Suppr pour supprimer des éléments),\n     - un glisser-déposer vers cette fenêtre,\n     - les paramètres de démarrage.
-Load from file...
-Chargement à partir du fichier...
+Load configuration from file
+Charger la configuration à partir du fichier
+Load configuration history (press DEL to delete items)
+Charger l'historique des configuration (appuyez sur Suppr pour supprimer des éléments)
 Log-messages:
 Messages log:
 Mirror ->>
@@ -470,6 +490,12 @@ Relative path
 Chemin
 Remove folder pair
 Supprimer le couple de dossiers
+Reset
+Réinitialiser
+Reset all warning messages?
+Réinitialiser tous les avertissements?
+Resets all warning messages
+Réinitialise tous les avertissements
 Result
 Situation
 Right folder:
@@ -500,6 +526,12 @@ Show files that exist on left side only
 Afficher les fichiers existants seulement à gauche
 Show files that exist on right side only
 Afficher les fichiers existants seulement à droite
+Show popup
+Affich
+Show popup on errors or warnings
+Affiche une boîte de dialogue pour chaque erreur ou avertissement
+Significant difference detected: More than 50% of files will be overwritten/deleted!
+Différence significative détectée: Plus de 50% des fichiers seront écrasés ou détruits!
 Silent mode
 Mode silencieux
 Size
@@ -538,16 +570,18 @@ System out of memory!
 Erreur mémoire système!
 The file does not contain a valid configuration:
 Le fichier ne contient pas de configuration valide
-The selected file does not exist:
-Le fichier sélectionné n'existe pas:
+The file does not exist:
+Le fichier n'existe pas:
+This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
+Cette ligne de commandes sera exécutée chaque fois que vous double-cliquerez sur un fichier. %name sert d'emplacement pour le fichier sélectionné.
 This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
 Cette commande sera exécutée à chaque fois que vous double-cliquez sur un nom de fichier. %x est un espace réservé pour le fichier sélectionné.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
 Cette variante définit comme identiques deux fichiers de même nom lorsqu'ils ont la même taille et le même date et heure de modification. Attention : la précision de l'heure est mesurée à 2 secondes près. Cela permet d'assurer la synchronisation avec la précision du systéme de fichiers FAT32.
+Time
+Heure
 Time elapsed:
 Temps écoulé:
-Time:
-Heure:
 Total amount of data that will be transferred
 Volume de données à transférer
 Total time:
@@ -558,6 +592,8 @@ Unable to create logfile!
 Impossible de créer un fichier log!
 Unable to initialize Recycle Bin!
 Impossible d'initialiser la corbeille!
+Uncheck all
+Décocher tout
 Update ->
 Mise à Jour ->
 Update:

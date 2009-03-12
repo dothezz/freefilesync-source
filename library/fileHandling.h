@@ -8,7 +8,8 @@
 class FileError //Exception class used to notify file/directory copy/delete errors
 {
 public:
-    FileError(const Zstring& txt) : errorMessage(txt) {}
+    FileError(const Zstring& message) :
+            errorMessage(message) {}
 
     Zstring show() const
     {
@@ -22,20 +23,6 @@ private:
 
 namespace FreeFileSync
 {
-    void getAllFilesAndDirs(const Zstring& sourceDir, std::vector<Zstring>& files, std::vector<Zstring>& directories) throw(FileError);
-
-    //recycler
-    bool recycleBinExists(); //test existence of Recycle Bin API on current system
-
-    //file handling
-    void removeDirectory(const Zstring& directory, const bool useRecycleBin);
-    void removeFile(const Zstring& filename, const bool useRecycleBin);
-    void createDirectory(const Zstring& directory, const int level = 0); //level is used internally only
-    void copyFolderAttributes(const Zstring& source, const Zstring& target);
-
-//################################
-    //custom traverser with detail information about files
-
     struct FileInfo
     {
         wxULongLong fileSize;    //unit: bytes!
@@ -52,8 +39,22 @@ namespace FreeFileSync
         virtual wxDirTraverseResult OnError(const Zstring& errorText) = 0;
     };
 
-    bool traverseInDetail(const Zstring& directory, FullDetailFileTraverser* sink, const int level = 0); //return value and level are used internally only
-//################################
+    //custom traverser with detail information about files
+    void traverseInDetail(const Zstring& directory, const bool traverseSymbolicLinks, FullDetailFileTraverser* sink);
+    void getAllFilesAndDirs(const Zstring& sourceDir, std::vector<Zstring>& files, std::vector<Zstring>& directories) throw(FileError);
+
+    //recycler
+    bool recycleBinExists(); //test existence of Recycle Bin API on current system
+
+    //file handling
+    void removeDirectory(const Zstring& directory, const bool useRecycleBin);
+    void removeFile(const Zstring& filename, const bool useRecycleBin);
+    void createDirectory(const Zstring& directory, const int level = 0); //level is used internally only
+    void copyFolderAttributes(const Zstring& source, const Zstring& target);
+
+#ifdef FFS_WIN
+    bool isFatDrive(const Zstring& directoryName);
+#endif  //FFS_WIN
 }
 
 

@@ -47,8 +47,7 @@ namespace FreeFileSync
                 filterIsActive(false),        //do not filter by default
                 includeFilter(wxT("*")),      //include all files/folders
                 excludeFilter(wxEmptyString), //exclude nothing
-                useRecycleBin(FreeFileSync::recycleBinExists()), //enable if OS supports it; else user will have to activate first and then get an error message
-                ignoreErrors(false) {}
+                useRecycleBin(FreeFileSync::recycleBinExists()) {} //enable if OS supports it; else user will have to activate first and then get an error message
 
         //Compare setting
         CompareVariant compareVar;
@@ -61,10 +60,8 @@ namespace FreeFileSync
         wxString includeFilter;
         wxString excludeFilter;
 
-
         //misc options
         bool useRecycleBin; //use Recycle bin when deleting or overwriting files while synchronizing
-        bool ignoreErrors;  //hides error messages during synchronization
     };
 
 
@@ -97,7 +94,7 @@ namespace FreeFileSync
             if (aLength != bLength)
                 return aLength < bLength;
 #ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
-            return relativeName.CmpNoCase(b.relativeName) < 0; //implementing a (reverse) comparison manually is a lot slower!
+            return FreeFileSync::compareStringsWin32(relativeName.c_str(), b.relativeName.c_str()) < 0;  //implementing a (reverse) comparison manually is a lot slower!
 #elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
             return relativeName.Cmp(b.relativeName) < 0;
 #endif
