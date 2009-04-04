@@ -104,7 +104,6 @@ bool matchesHelper(const DefaultChar* string, const DefaultChar* mask)
                 ++string;
             }
             return false;
-            break;
 
         default:
             if (*string != ch)
@@ -141,8 +140,11 @@ Zstring& Zstring::Trim(bool fromRight)
         {
             if (descr->refCount > 1) //allocate new string
                 *this = Zstring(data, newLength);
-            else //overwrite this string
-                descr->length = newLength;
+            else //overwrite this strin
+            {
+                descr->length   = newLength;
+                data[newLength] = DefaultChar(0);
+            }
         }
     }
     else
@@ -180,8 +182,7 @@ Zstring& Zstring::MakeLower()
     {
         StringDescriptor* newDescr;
         DefaultChar*      newData;
-        const size_t newCapacity = getCapacityToAllocate(thisLen);
-        allocate(1, thisLen, newCapacity, newDescr, newData);
+        allocate(thisLen, newDescr, newData);
 
         for (unsigned int i = 0; i < thisLen; ++i)
             newData[i] = defaultToLower(data[i]);
@@ -244,47 +245,41 @@ Zstring& Zstring::replace(size_t pos1, size_t n1, const DefaultChar* str, size_t
     assert(str < c_str() || c_str() + length() < str); //str mustn't point to data in this string
     assert(n1 <= length() - pos1);
 
-    if (n2 != 0)
+    const size_t oldLen = length();
+    if (oldLen == 0)
     {
-        const size_t oldLen = length();
-        if (oldLen == 0)
+        assert(pos1 == 0 && n1 == 0);
+        return *this = Zstring(str, n2);
+    }
+
+    const size_t newLen = oldLen - n1 + n2;
+    if (n1 < n2 || descr->refCount > 1)
+    {   //allocate a new string
+        StringDescriptor* newDescr;
+        DefaultChar* newData;
+        allocate(newLen, newDescr, newData);
+
+        //assemble new string with replacement
+        memcpy(newData, data, pos1 * sizeof(DefaultChar));
+        memcpy(newData + pos1, str, n2 * sizeof(DefaultChar));
+        memcpy(newData + pos1 + n2, data + pos1 + n1, (oldLen - pos1 - n1) * sizeof(DefaultChar));
+        newData[newLen] = 0;
+
+        decRef();
+        data  = newData;
+        descr = newDescr;
+    }
+    else  //overwrite current string: case "n2 == 0" is handled implicitly
+    {
+        memcpy(data + pos1, str, n2 * sizeof(DefaultChar));
+        if (n1 > n2)
         {
-            assert(n1 == 0);
-            return *this = Zstring(str, n2);
-        }
-
-        const size_t newLen = oldLen - n1 + n2;
-        if (n1 < n2 || descr->refCount > 1)
-        {   //allocate a new string
-            const size_t newCapacity = getCapacityToAllocate(newLen);
-
-            StringDescriptor* newDescr;
-            DefaultChar* newData;
-            allocate(1, newLen, newCapacity, newDescr, newData);
-            //StringDescriptor* newDescr = new StringDescriptor(1, newLen, newCapacity);
-            //DefaultChar* newData = new DefaultChar[newCapacity + 1];
-
-            //assemble new string with replacement
-            memcpy(newData, data, pos1 * sizeof(DefaultChar));
-            memcpy(newData + pos1, str, n2 * sizeof(DefaultChar));
-            memcpy(newData + pos1 + n2, data + pos1 + n1, (oldLen - pos1 - n1) * sizeof(DefaultChar));
-            newData[newLen] = 0;
-
-            decRef();
-            data = newData;
-            descr = newDescr;
-        }
-        else
-        {   //overwrite current string
-            memcpy(data + pos1, str, n2 * sizeof(DefaultChar));
-            if (n1 > n2)
-            {
-                memmove(data + pos1 + n2, data + pos1 + n1, (oldLen - pos1 - n1) * sizeof(DefaultChar));
-                data[newLen] = 0;
-                descr->length = newLen;
-            }
+            memmove(data + pos1 + n2, data + pos1 + n1, (oldLen - pos1 - n1) * sizeof(DefaultChar));
+            data[newLen]  = 0;
+            descr->length = newLen;
         }
     }
+
     return *this;
 }
 
@@ -358,16 +353,16 @@ void Zstring::copyBeforeWrite(const size_t capacityNeeded)
 
     if (descr->refCount > 1)
     {   //allocate a new string
-        const size_t oldLength   = length();
-        const size_t newCapacity = getCapacityToAllocate(capacityNeeded);
+        const size_t oldLength = length();
+        assert(oldLength <= getCapacityToAllocate(capacityNeeded));
 
         StringDescriptor* newDescr;
-        DefaultChar* newData;
-        allocate(1, oldLength, newCapacity, newDescr, newData);
+        DefaultChar*      newData;
+        allocate(capacityNeeded, newDescr, newData);
+        newDescr->length = oldLength;
 
         if (oldLength)
         {
-            assert(oldLength <= newCapacity);
             memcpy(newData, data, oldLength * sizeof(DefaultChar));
             newData[oldLength] = 0;
         }

@@ -134,8 +134,6 @@ About
 Informatie
 Action
 Actie
-Active for FAT/FAT32 drives only: When comparing filetimes treat files that differ by less or equal than 1 hour as equal. This ensures daylight saving time switches are handled properly.
-Aleen van toepassing voor FAT/FAT32-schijven: wanneer bestandstijden worden vergeleken, de bestanden die verschillen met 1 of minder dan 1 uur als gelijk behandelen. Dit zorgt ervoor dat zomertijd veranderingen juist worden afgehandeld.
 Add folder pair
 Voeg 1 paar gekoppelde mappen toe
 All items have been synchronized!
@@ -218,8 +216,6 @@ Copying file %x overwriting %y
 Bestand %y wordt overschreven door een kopie van %x
 Copying file %x to %y
 Bestand %x wordt gekopieerd naar %y
-Could not retrieve file info for:
-Fout bij het verkrijgen van bestandsinformatie van:
 Could not set working directory:
 Kan het pad in gebruik niet instellen:
 Create a batch job
@@ -292,20 +288,26 @@ Error deleting file:
 Er is een fout opgetreden bij het verwijderen van bestand:
 Error handling
 Fout afhandeling
+Error loading library function:
+Er is een fout opgetreden bij het laden van de 'library function':
 Error moving to Recycle Bin:
 Er is een fout opgetreden bij het verplaatsen naar de prullenbak:
+Error opening file:
+Er is een fout opgetreden bij het openen van het bestand:
 Error parsing configuration file:
 Er is een fout opgetreden bij het aanmaken van configuratiebestand:
+Error reading file attributes:
+Er is een fout opgetreden bij het lezen van de bestands-eigenschappen
 Error reading file:
 Er is een fout opgetreden bij het lezen van het bestand:
-Error reading folder attributes:
-Er is een fout opgetreden bij het lezen van de map-eigenschappen:
+Error resolving symbolic link:
+Er is een fout opgetreden bij het ophalen van een symbolische koppeling:
 Error traversing directory:
 Er is een fout opgetreden bij het doorzoeken van map:
+Error writing file attributes:
+Er is een fout opgetreden bij het schrijven van de bestands-eigenschappen:
 Error writing file:
 Er is een fout opgetreden bij het schrijven naar bestand:
-Error writing folder attributes:
-Er is een fout opgetreden bij het schrijven van de map-eigenschappen:
 Error: Source directory does not exist anymore:
 Er is een fout opgetreden. De oorspronkelijke map bestaat niet meer:
 Example
@@ -320,12 +322,12 @@ Exit immediately and set returncode < 0
 Onmiddelijk afsluiten en zet de returncode < 0
 Exit with RC < 0
 Afsluiten met RC < 0
-FAT32: Handle Daylight Saving Time
-FAT32: Gebruik zomertijd
 Feedback and suggestions are welcome at:
 Tips en suggesties zijn welkom op:
 File Manager integration:
 Integratie bestandsbeheer:
+File Time Tolerance:
+Bestandstijd-tolerantie
 File already exists. Overwrite?
 Het bestand bestaat al. Overschrijven?
 File content
@@ -334,6 +336,8 @@ File list exported!
 Bestandslijst geëxporteerd!
 File size and date
 Bestandsgrootte en -datum
+File times that differ by up to the specified number of seconds are still handled as having same time.
+Bestandstijden die verschillen met maximaal de gespecificeerde tijd worden nog steeds behandeld alsof ze dezelfde tijd hebben.
 Filename
 Bestandsnaam
 Files are found equal if\n     - file content\nis the same.
@@ -410,8 +414,8 @@ Hints:
 Tips:
 Homepage:
 Homepage:
-If you like FFS:
-Als het programma u bevalt:
+If you like FFS
+Als het programma u bevalt
 Ignore errors
 Negeer foutmeldingen
 Ignore subsequent errors
@@ -568,16 +572,18 @@ Synchronizing...
 Aan het synchroniseren...
 System out of memory!
 Systeem heeft te weinig geheugen
+Target file already existing!
+Doelbestand bestaat al!
 The file does not contain a valid configuration:
 Het bestand bevat geen geldige configuratie:
-The file does not exist:
+File does not exist:
 Het bestand bestaat niet:
 This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
 Deze opdrachtregel wordt bij elke dubbelklik op een bestandsnaam uitgevoerd. %name doet dienst als plaatshouder voor het betreffende bestand.
 This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
 Deze opdrachtregel zal elke keer dat u dubbelklikt op een bestandsnaam, worden uitgevoerd. %x doet dienst als opslagplaats voor het geselecteerde bestand.
-This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
-Deze variant ziet twee gelijknamige bestanden als gelijk wanneer ze dezelfde bestandsgrootte EN tijdstempel hebben. Merk op dat tijdstempel 2 seconden mag verschillen. Dit zorgt ervoor dat het minder nauwkeurige FAT-32 ook kan worden gesynchroniseerd.
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
+Deze variant ziet twee gelijknamige bestanden als gelijk wanneer ze dezelfde bestandsgrootte EN tijdstempel hebben.
 Time
 Tijd
 Time elapsed:
@@ -606,8 +612,10 @@ Warning
 Attentie
 Warning: Synchronization failed for %x item(s):
 Let op: %x item(s) konden niet worden gesynchroniseerd: 
-When \"Compare\" is triggered with this option set the following decision tree is processed:
-Wanneer \"Compare\" met deze instelling aan wordt gebruikt zal de volgende beslissingsboom gebruikt worden:
+Warnings:
+Waarschuwingen:
+When the comparison is started with this option set the following decision tree is processed:
+Wanneer met deze optie aan de vergelijking wordt gestart zal de volgende vergelijkingsboom worden gebruikt:
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 U kunt proberen om de resterende bestanden opnieuw te synchroniseren (ZONDER opnieuw te hoeven vergelijken)!
 different

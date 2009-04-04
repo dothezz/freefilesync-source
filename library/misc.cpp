@@ -74,6 +74,9 @@ void CustomLocale::setLanguage(const int language)
     case wxLANGUAGE_GERMAN:
         languageFile = "Languages/german.lng";
         break;
+    case wxLANGUAGE_HUNGARIAN:
+        languageFile = "Languages/hungarian.lng";
+        break;
     case wxLANGUAGE_ITALIAN:
         languageFile = "Languages/italian.lng";
         break;
@@ -85,6 +88,12 @@ void CustomLocale::setLanguage(const int language)
         break;
     case wxLANGUAGE_PORTUGUESE:
         languageFile = "Languages/portuguese.lng";
+        break;
+    case wxLANGUAGE_SLOVENIAN:
+        languageFile = "Languages/slovenian.lng";
+        break;
+    case wxLANGUAGE_SPANISH:
+        languageFile = "Languages/spanish.lng";
         break;
     default:
         languageFile.clear();
@@ -153,7 +162,8 @@ const wxChar* CustomLocale::GetString(const wxChar* szOrigString, const wxChar* 
     //look for translation in buffer table
     Translation::iterator i;
     if ((i = translationDB.find(currentLine)) != translationDB.end())
-        return (i->translation.c_str());
+        return i->translation.c_str();
+
     //fallback
-    return (szOrigString);
+    return szOrigString;
 }

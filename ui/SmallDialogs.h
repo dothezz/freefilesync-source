@@ -227,6 +227,7 @@ private:
 
     Zstring currentStatusText;
     bool processPaused;
+    SyncStatusID currentStatus;
 };
 
 /*

@@ -134,8 +134,6 @@ About
 情報
 Action
 操作
-Active for FAT/FAT32 drives only: When comparing filetimes treat files that differ by less or equal than 1 hour as equal. This ensures daylight saving time switches are handled properly.
-FAT/FAT32 ドライブのみ有効: ファイルの時間を比較するとき、差異が 1 時間未満より少ないか同等かで判断します。これにより、夏時間の切り替えが適切に行われるようになります。
 Add folder pair
 フォルダのペアを追加
 All items have been synchronized!
@@ -218,8 +216,6 @@ Copying file %x overwriting %y
 ファイル %x をコピー、%y に上書き中
 Copying file %x to %y
 ファイル %x を %y にコピー中
-Could not retrieve file info for:
-ファイル情報を取得できません:
 Could not set working directory:
 作業ディレクトリが設定できません:
 Create a batch job
@@ -292,20 +288,26 @@ Error deleting file:
 ファイルの削除エラー:
 Error handling
 ハンドリングのエラー
+Error loading library function:
+ライブラリ読み込みエラー:
 Error moving to Recycle Bin:
 ゴミ箱への移動に失敗:
+Error opening file:
+ファイルのオープンに失敗:
 Error parsing configuration file:
 構成ファイルの構文に誤りがあります:
+Error reading file attributes:
+ファイル属性の取得に失敗:
 Error reading file:
 ファイル読み込みエラー:
-Error reading folder attributes:
-フォルダ属性の読み取りエラー:
+Error resolving symbolic link:
+シンボリックリンクの解決に失敗:
 Error traversing directory:
 ディレクトリの移動エラー:
+Error writing file attributes:
+ファイル属性の書き込みエラー:
 Error writing file:
 ファイル書き込みエラー:
-Error writing folder attributes:
-フォルダ属性の書き込みエラー:
 Error: Source directory does not exist anymore:
 エラー: ソースディレクトリが存在しません:
 Example
@@ -320,12 +322,12 @@ Exit immediately and set returncode < 0
 すぐに終了する場合の戻り値設定 < 0
 Exit with RC < 0
 RC で終了 < 0
-FAT32: Handle Daylight Saving Time
-FAT32: 夏時間の取り扱いを有効
 Feedback and suggestions are welcome at:
 フィードバック、提案など:
 File Manager integration:
 ファイラとの統合:
+File Time Tolerance:
+ファイル時刻の許容範囲:
 File already exists. Overwrite?
 ファイルは存在します、上書きしますか?
 File content
@@ -334,6 +336,8 @@ File list exported!
 ファイル一覧のエクスポートが完了!
 File size and date
 ファイルサイズと日付
+File times that differ by up to the specified number of seconds are still handled as having same time.
+ファイル時刻の指定された秒以内の誤差は、同じものとして取り扱われます。
 Filename
 ファイル名
 Files are found equal if\n     - file content\nis the same.
@@ -410,8 +414,8 @@ Hints:
 ヒント:
 Homepage:
 ホームページ:
-If you like FFS:
-FFS が気に入った場合:
+If you like FFS
+FFS が気に入った場合
 Ignore errors
 エラーを無視
 Ignore subsequent errors
@@ -568,16 +572,18 @@ Synchronizing...
 同期処理中...
 System out of memory!
 メモリが不足しています!
+Target file already existing!
+対象ファイルは既に存在します!
 The file does not contain a valid configuration:
 このファイルには有効な構成が含まれていません:
-The file does not exist:
+File does not exist:
 ファイルが存在しません:
 This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
 ファイル名をダブルクリックする度に、このコマンドが実行されます。%name は選択ファイルのプレースフォルダとして機能します。
 This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
 ファイル名をダブルクリックする度に、このコマンドが実行されます。%x は選択ファイルのプレースフォルダとして機能します。
-This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
-この変数では、ふたつの同名ファイルが存在した場合、 それぞれのファイルサイズと最終更新日付/時間を比較します。\nファイル時間の差異が 2 秒以内の場合は検出されないということに注意してください。 (これは、FAT32システムで正確に同期を行うことができる最小値です)
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
+この変数では、ふたつの同名ファイルが存在した場合、 それぞれのファイルサイズと最終更新日付/時間を比較します。
 Time
 時間
 Time elapsed:
@@ -606,8 +612,10 @@ Warning
 警告
 Warning: Synchronization failed for %x item(s):
 警告: %x アイテムの同期に失敗しました:
-When \"Compare\" is triggered with this option set the following decision tree is processed:
-この設定で \"比較\" トリガが実行された場合は、以下のツリーに従って処理されていきます。
+Warnings:
+警告:
+When the comparison is started with this option set the following decision tree is processed:
+このオプションで比較を開始した場合は、以下のツリーに従って処理が行われます:
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 残っているファイルは、再び同期することができます (再比較とは別の動作)!
 different

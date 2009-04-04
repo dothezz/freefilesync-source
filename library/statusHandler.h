@@ -50,19 +50,11 @@ public:
 
     //this method is triggered repeatedly by requestUiRefresh() and can be used to refresh the ui by dispatching pending events
     virtual void forceUiRefresh() = 0;
-    void requestUiRefresh(bool asyncProcessActive = false)
-    {
-        if (updateUiIsAllowed())  //test if specific time span between ui updates is over
-            forceUiRefresh();
 
-        if (abortRequested && !asyncProcessActive)
-            abortThisProcess();  //abort can be triggered by requestAbortion()
-    }
+    void requestUiRefresh(bool allowAbort = true); //opportunity to abort must be implemented in a frequently executed method like requestUiRefresh()
+    void requestAbortion();  //does NOT call abortThisProcess immediately, but when appropriate (e.g. async. processes finished)
+    bool abortIsRequested();
 
-    void requestAbortion() //opportunity to abort must be implemented in a frequently executed method like requestUiRefresh()
-    {                      //currently used by the UI status information screen, when button "Abort is pressed"
-        abortRequested = true;
-    }
 
     //error handling:
     virtual ErrorHandler::Response reportError(const Zstring& errorMessage) = 0; //recoverable error situation
@@ -74,6 +66,33 @@ protected:
 
     bool abortRequested;
 };
+
+
+
+//##############################################################################
+inline
+void StatusHandler::requestUiRefresh(bool allowAbort)
+{
+    if (updateUiIsAllowed())  //test if specific time span between ui updates is over
+        forceUiRefresh();
+
+    if (abortRequested && allowAbort)
+        abortThisProcess();  //abort can be triggered by requestAbortion()
+}
+
+
+inline
+void StatusHandler::requestAbortion()
+{
+    abortRequested = true;
+}
+
+
+inline
+bool StatusHandler::abortIsRequested()
+{
+    return abortRequested;
+}
 
 
 #endif // STATUSHANDLER_H_INCLUDED

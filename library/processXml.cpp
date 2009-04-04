@@ -4,6 +4,9 @@
 #include <wx/intl.h>
 #include "globalFunctions.h"
 
+#ifdef FFS_WIN
+#include <wx/msw/wrapwin.h> //includes "windows.h"
+#endif
 
 //small helper functions
 bool readXmlElementValue(std::string& output,                  const TiXmlElement* parent, const std::string& name);
@@ -109,7 +112,7 @@ xmlAccess::XmlGuiConfig xmlAccess::readGuiConfig(const wxString& filename)
 {
     //load XML
     if (!wxFileExists(filename))
-        throw FileError(Zstring(_("The file does not exist:")) + wxT(" \"") + filename.c_str() + wxT("\""));
+        throw FileError(Zstring(_("File does not exist:")) + wxT(" \"") + filename.c_str() + wxT("\""));
 
     XmlConfigInput inputFile(filename, XML_GUI_CONFIG);
 
@@ -129,7 +132,7 @@ xmlAccess::XmlBatchConfig xmlAccess::readBatchConfig(const wxString& filename)
 {
     //load XML
     if (!wxFileExists(filename))
-        throw FileError(Zstring(_("The file does not exist:")) + wxT(" \"") + filename.c_str() + wxT("\""));
+        throw FileError(Zstring(_("File does not exist:")) + wxT(" \"") + filename.c_str() + wxT("\""));
 
     XmlConfigInput inputFile(filename, XML_BATCH_CONFIG);
 
@@ -149,7 +152,7 @@ xmlAccess::XmlGlobalSettings xmlAccess::readGlobalSettings()
 {
     //load XML
     if (!wxFileExists(FreeFileSync::GLOBAL_CONFIG_FILE))
-        throw FileError(Zstring(_("The file does not exist:")) + wxT(" \"") + FreeFileSync::GLOBAL_CONFIG_FILE.c_str() + wxT("\""));
+        throw FileError(Zstring(_("File does not exist:")) + wxT(" \"") + FreeFileSync::GLOBAL_CONFIG_FILE.c_str() + wxT("\""));
 
     XmlConfigInput inputFile(FreeFileSync::GLOBAL_CONFIG_FILE, XML_GLOBAL_SETTINGS);
 
@@ -334,6 +337,29 @@ bool readXmlElementValue(xmlAccess::OnError& output, const TiXmlElement* parent,
 }
 
 
+void readXmlElementTable(std::vector<wxString>& output, const TiXmlElement* parent, const std::string& name)
+{
+    output.clear();
+
+    if (parent)
+    {
+        //load elements
+        const TiXmlElement* element = parent->FirstChildElement(name);
+        while (element)
+        {
+            const char* text = element->GetText();
+            if (text) //may be NULL!!
+                output.push_back(wxString::FromUTF8(text));
+            else
+                break;
+            element = element->NextSiblingElement();
+        }
+    }
+}
+
+//################################################################################################################
+
+
 bool XmlConfigInput::readXmlMainConfig(MainConfiguration& mainCfg, std::vector<FolderPair>& directoryPairs)
 {
     TiXmlElement* root = doc.RootElement();
@@ -444,6 +470,11 @@ bool XmlConfigInput::readXmlBatchConfig(xmlAccess::XmlBatchConfig& outputCfg)
     if (batchConfig)
     {
         readXmlElementValue(outputCfg.silent, batchConfig, "Silent");
+
+        std::string tempString;
+        if (readXmlElementValue(tempString, batchConfig, "LogfileDirectory"))
+            outputCfg.logFileDirectory = wxString::FromUTF8(tempString.c_str());
+
         readXmlElementValue(outputCfg.handleError, batchConfig, "HandleError");
     }
 
@@ -465,13 +496,16 @@ bool XmlConfigInput::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputC
         //program language
         readXmlElementValue(outputCfg.shared.programLanguage, global, "Language");
 
-        //traverse into symbolic links (to folders)
-        readXmlElementValue(outputCfg.shared.traverseSymbolicLinks, global, "TraverseSymbolicLinks");
+        //max. allowed file time deviation
+        int dummy = 0;
+        if (readXmlElementValue(dummy, global, "FileTimeTolerance"))
+            outputCfg.shared.fileTimeTolerance = dummy;
 
-#ifdef FFS_WIN
-        //daylight saving time check
-        readXmlElementValue(outputCfg.shared.handleDstOnFat32, global, "HandleDaylightSavingTimeOnFAT");
-#endif
+        //traverse into symbolic links (to folders)
+        readXmlElementValue(outputCfg.shared.traverseDirectorySymlinks, global, "TraverseDirectorySymlinks");
+
+        //copy symbolic links to files
+        readXmlElementValue(outputCfg.shared.copyFileSymlinks, global, "CopyFileSymlinks");
     }
 
     TiXmlElement* warnings = hRoot.FirstChild("Shared").FirstChild("Warnings").ToElement();
@@ -497,6 +531,7 @@ bool XmlConfigInput::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputC
 
         readXmlElementValue(outputCfg.gui.deleteOnBothSides, mainWindow, "ManualDeletionOnBothSides");
         readXmlElementValue(outputCfg.gui.useRecyclerForManualDeletion, mainWindow, "ManualDeletionUseRecycler");
+        readXmlElementValue(outputCfg.gui.showFileIcons, mainWindow, "ShowFileIcons");
 
 //###########################################################
         //read column attributes
@@ -547,19 +582,26 @@ bool XmlConfigInput::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputC
             rightColumn = rightColumn->NextSiblingElement();
             ++colType;
         }
+
+        //load folder history elements
+        const TiXmlElement* historyLeft = TiXmlHandle(mainWindow).FirstChild("FolderHistoryLeft").ToElement();
+        const TiXmlElement* historyRight = TiXmlHandle(mainWindow).FirstChild("FolderHistoryRight").ToElement();
+
+        readXmlElementTable(outputCfg.gui.folderHistoryLeft, historyLeft, "Folder");
+        readXmlElementTable(outputCfg.gui.folderHistoryRight, historyRight, "Folder");
     }
 
     TiXmlElement* gui = hRoot.FirstChild("Gui").ToElement();
     if (gui)
     {
         //commandline for file manager integration
-        std::string  tempString;
+        std::string tempString;
         if (readXmlElementValue(tempString, gui, "FileManager"))
             outputCfg.gui.commandLineFileManager = wxString::FromUTF8(tempString.c_str());
     }
 
     //load config file history
-    TiXmlElement* cfgHistory = hRoot.FirstChild("Gui").FirstChild("History").ToElement();
+    TiXmlElement* cfgHistory = hRoot.FirstChild("Gui").FirstChild("ConfigHistory").ToElement();
     if (cfgHistory)
     {
         //load max. history size
@@ -567,17 +609,8 @@ bool XmlConfigInput::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputC
         if (histSizeMax) //may be NULL!
             outputCfg.gui.cfgHistoryMaxItems = globalFunctions::stringToInt(histSizeMax);
 
-        //load history elements
-        TiXmlElement* cfgFile = TiXmlHandle(cfgHistory).FirstChild("File").ToElement();
-        while (cfgFile)
-        {
-            const char* fileName = cfgFile->GetText();
-            if (fileName) //may be NULL!!
-                outputCfg.gui.cfgFileHistory.push_back(wxString::FromUTF8(fileName));
-            else
-                break;
-            cfgFile = cfgFile->NextSiblingElement();
-        }
+        //load config history elements
+        readXmlElementTable(outputCfg.gui.cfgFileHistory, cfgHistory, "File");
     }
 
 
@@ -616,7 +649,7 @@ XmlConfigOutput::XmlConfigOutput(const wxString& fileName, const xmlAccess::XmlT
 bool XmlConfigOutput::writeToFile()
 {
     //workaround to get a FILE* from a unicode filename
-    wxFFile dummyFile(m_fileName, wxT("wb"));
+    wxFFile dummyFile(m_fileName, wxT("wb")); //save in binary mode for Linux portability of config files
     if (!dummyFile.IsOpened())
         return false;
 
@@ -675,6 +708,13 @@ void addXmlElement(TiXmlElement* parent, const std::string& name, const xmlAcces
         addXmlElement(parent, name, std::string("Popup"));
     else
         assert(false);
+}
+
+
+void addXmlElementTable(TiXmlElement* parent, const std::string& name, const std::vector<wxString>& input)
+{
+    for (std::vector<wxString>::const_iterator i = input.begin(); i != input.end(); ++i)
+        addXmlElement(parent, name, std::string(i->ToUTF8()));
 }
 
 
@@ -741,10 +781,10 @@ bool XmlConfigOutput::writeXmlMainConfig(const MainConfiguration& mainCfg, const
 }
 
 
-bool XmlConfigOutput::writeXmlGuiConfig(const xmlAccess::XmlGuiConfig& outputCfg)
+bool XmlConfigOutput::writeXmlGuiConfig(const xmlAccess::XmlGuiConfig& inputCfg)
 {
     //write main config
-    if (!writeXmlMainConfig(outputCfg.mainCfg, outputCfg.directoryPairs))
+    if (!writeXmlMainConfig(inputCfg.mainCfg, inputCfg.directoryPairs))
         return false;
 
     //write GUI specific config
@@ -760,18 +800,18 @@ bool XmlConfigOutput::writeXmlGuiConfig(const xmlAccess::XmlGuiConfig& outputCfg
     TiXmlElement* mainWindow = new TiXmlElement("Main");
     windows->LinkEndChild(mainWindow);
 
-    addXmlElement(mainWindow, "HideFiltered", outputCfg.hideFilteredElements);
+    addXmlElement(mainWindow, "HideFiltered", inputCfg.hideFilteredElements);
 
-    addXmlElement(guiConfig, "IgnoreErrors", outputCfg.ignoreErrors);
+    addXmlElement(guiConfig, "IgnoreErrors", inputCfg.ignoreErrors);
 
     return true;
 }
 
 
-bool XmlConfigOutput::writeXmlBatchConfig(const xmlAccess::XmlBatchConfig& outputCfg)
+bool XmlConfigOutput::writeXmlBatchConfig(const xmlAccess::XmlBatchConfig& inputCfg)
 {
     //write main config
-    if (!writeXmlMainConfig(outputCfg.mainCfg, outputCfg.directoryPairs))
+    if (!writeXmlMainConfig(inputCfg.mainCfg, inputCfg.directoryPairs))
         return false;
 
     //write GUI specific config
@@ -781,14 +821,15 @@ bool XmlConfigOutput::writeXmlBatchConfig(const xmlAccess::XmlBatchConfig& outpu
     TiXmlElement* batchConfig = new TiXmlElement("BatchConfig");
     root->LinkEndChild(batchConfig);
 
-    addXmlElement(batchConfig, "Silent", outputCfg.silent);
-    addXmlElement(batchConfig, "HandleError", outputCfg.handleError);
+    addXmlElement(batchConfig, "Silent", inputCfg.silent);
+    addXmlElement(batchConfig, "LogfileDirectory", std::string(inputCfg.logFileDirectory.ToUTF8()));
+    addXmlElement(batchConfig, "HandleError", inputCfg.handleError);
 
     return true;
 }
 
 
-bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& outputCfg)
+bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg)
 {
     TiXmlElement* root = doc.RootElement();
     if (!root) return false;
@@ -799,25 +840,26 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings&
     root->LinkEndChild(global);
 
     //program language
-    addXmlElement(global, "Language", outputCfg.shared.programLanguage);
+    addXmlElement(global, "Language", inputCfg.shared.programLanguage);
 
-#ifdef FFS_WIN
-    //daylight saving time check
-    addXmlElement(global, "HandleDaylightSavingTimeOnFAT", outputCfg.shared.handleDstOnFat32);
-#endif
+    //max. allowed file time deviation
+    addXmlElement(global, "FileTimeTolerance", int(inputCfg.shared.fileTimeTolerance));
 
     //traverse into symbolic links (to folders)
-    addXmlElement(global, "TraverseSymbolicLinks", outputCfg.shared.traverseSymbolicLinks);
+    addXmlElement(global, "TraverseDirectorySymlinks", inputCfg.shared.traverseDirectorySymlinks);
+
+    //copy symbolic links to files
+    addXmlElement(global, "CopyFileSymlinks", inputCfg.shared.copyFileSymlinks);
 
     //warnings
     TiXmlElement* warnings = new TiXmlElement("Warnings");
     global->LinkEndChild(warnings);
 
     //warning: dependent folders
-    addXmlElement(warnings, "CheckForDependentFolders", outputCfg.shared.warningDependentFolders);
+    addXmlElement(warnings, "CheckForDependentFolders", inputCfg.shared.warningDependentFolders);
 
     //significant difference check
-    addXmlElement(warnings, "CheckForSignificantDifference", outputCfg.shared.warningSignificantDifference);
+    addXmlElement(warnings, "CheckForSignificantDifference", inputCfg.shared.warningSignificantDifference);
 
 
     //###################################################################
@@ -832,21 +874,22 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings&
     windows->LinkEndChild(mainWindow);
 
     //window size
-    addXmlElement(mainWindow, "Width", outputCfg.gui.widthNotMaximized);
-    addXmlElement(mainWindow, "Height", outputCfg.gui.heightNotMaximized);
+    addXmlElement(mainWindow, "Width", inputCfg.gui.widthNotMaximized);
+    addXmlElement(mainWindow, "Height", inputCfg.gui.heightNotMaximized);
 
     //window position
-    addXmlElement(mainWindow, "PosX", outputCfg.gui.posXNotMaximized);
-    addXmlElement(mainWindow, "PosY", outputCfg.gui.posYNotMaximized);
-    addXmlElement(mainWindow, "Maximized", outputCfg.gui.isMaximized);
+    addXmlElement(mainWindow, "PosX", inputCfg.gui.posXNotMaximized);
+    addXmlElement(mainWindow, "PosY", inputCfg.gui.posYNotMaximized);
+    addXmlElement(mainWindow, "Maximized", inputCfg.gui.isMaximized);
 
-    addXmlElement(mainWindow, "ManualDeletionOnBothSides", outputCfg.gui.deleteOnBothSides);
-    addXmlElement(mainWindow, "ManualDeletionUseRecycler", outputCfg.gui.useRecyclerForManualDeletion);
+    addXmlElement(mainWindow, "ManualDeletionOnBothSides", inputCfg.gui.deleteOnBothSides);
+    addXmlElement(mainWindow, "ManualDeletionUseRecycler", inputCfg.gui.useRecyclerForManualDeletion);
+    addXmlElement(mainWindow, "ShowFileIcons", inputCfg.gui.showFileIcons);
 
     //write column attributes
     TiXmlElement* leftColumn = new TiXmlElement("LeftColumns");
     mainWindow->LinkEndChild(leftColumn);
-    xmlAccess::ColumnAttributes columnAtrribLeftCopy = outputCfg.gui.columnAttribLeft; //can't change const vector
+    xmlAccess::ColumnAttributes columnAtrribLeftCopy = inputCfg.gui.columnAttribLeft; //can't change const vector
     sort(columnAtrribLeftCopy.begin(), columnAtrribLeftCopy.end(), xmlAccess::sortByType);
     for (unsigned int i = 0; i < columnAtrribLeftCopy.size(); ++i)
     {
@@ -862,7 +905,7 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings&
 
     TiXmlElement* rightColumn = new TiXmlElement("RightColumns");
     mainWindow->LinkEndChild(rightColumn);
-    xmlAccess::ColumnAttributes columnAtrribRightCopy = outputCfg.gui.columnAttribRight;
+    xmlAccess::ColumnAttributes columnAtrribRightCopy = inputCfg.gui.columnAttribRight;
     sort(columnAtrribRightCopy.begin(), columnAtrribRightCopy.end(), xmlAccess::sortByType);
     for (unsigned int i = 0; i < columnAtrribRightCopy.size(); ++i)
     {
@@ -876,17 +919,25 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings&
         subElement->SetAttribute("Width", colAttrib.width);
     }
 
+    //write folder history elements
+    TiXmlElement* historyLeft = new TiXmlElement("FolderHistoryLeft");
+    mainWindow->LinkEndChild(historyLeft);
+    TiXmlElement* historyRight = new TiXmlElement("FolderHistoryRight");
+    mainWindow->LinkEndChild(historyRight);
+
+    addXmlElementTable(historyLeft, "Folder", inputCfg.gui.folderHistoryLeft);
+    addXmlElementTable(historyRight, "Folder", inputCfg.gui.folderHistoryRight);
+
+
     //commandline for file manager integration
-    addXmlElement(gui, "FileManager", std::string((outputCfg.gui.commandLineFileManager).ToUTF8()));
+    addXmlElement(gui, "FileManager", std::string((inputCfg.gui.commandLineFileManager).ToUTF8()));
 
     //write config file history
-    TiXmlElement* cfgHistory = new TiXmlElement("History");
+    TiXmlElement* cfgHistory = new TiXmlElement("ConfigHistory");
     gui->LinkEndChild(cfgHistory);
 
-    cfgHistory->SetAttribute("MaximumSize", globalFunctions::numberToString(outputCfg.gui.cfgHistoryMaxItems));
-
-    for (unsigned int i = 0; i < outputCfg.gui.cfgFileHistory.size(); ++i)
-        addXmlElement(cfgHistory, "File", std::string(outputCfg.gui.cfgFileHistory[i].ToUTF8()));
+    cfgHistory->SetAttribute("MaximumSize", globalFunctions::numberToString(inputCfg.gui.cfgHistoryMaxItems));
+    addXmlElementTable(cfgHistory, "File", inputCfg.gui.cfgFileHistory);
 
     //###################################################################
     //write global batch settings
@@ -941,12 +992,55 @@ int xmlAccess::retrieveSystemLanguage()
     case wxLANGUAGE_PORTUGUESE_BRAZILIAN:
         return wxLANGUAGE_PORTUGUESE;
 
+        //variants of wxLANGUAGE_SPANISH
+    case wxLANGUAGE_SPANISH_ARGENTINA:
+    case wxLANGUAGE_SPANISH_BOLIVIA:
+    case wxLANGUAGE_SPANISH_CHILE:
+    case wxLANGUAGE_SPANISH_COLOMBIA:
+    case wxLANGUAGE_SPANISH_COSTA_RICA:
+    case wxLANGUAGE_SPANISH_DOMINICAN_REPUBLIC:
+    case wxLANGUAGE_SPANISH_ECUADOR:
+    case wxLANGUAGE_SPANISH_EL_SALVADOR:
+    case wxLANGUAGE_SPANISH_GUATEMALA:
+    case wxLANGUAGE_SPANISH_HONDURAS:
+    case wxLANGUAGE_SPANISH_MEXICAN:
+    case wxLANGUAGE_SPANISH_MODERN:
+    case wxLANGUAGE_SPANISH_NICARAGUA:
+    case wxLANGUAGE_SPANISH_PANAMA:
+    case wxLANGUAGE_SPANISH_PARAGUAY:
+    case wxLANGUAGE_SPANISH_PERU:
+    case wxLANGUAGE_SPANISH_PUERTO_RICO:
+    case wxLANGUAGE_SPANISH_URUGUAY:
+    case wxLANGUAGE_SPANISH_US:
+    case wxLANGUAGE_SPANISH_VENEZUELA:
+        return wxLANGUAGE_SPANISH;
+
         //case wxLANGUAGE_JAPANESE:
         //case wxLANGUAGE_POLISH:
+        //case wxLANGUAGE_SLOVENIAN:
+        //case wxLANGUAGE_HUNGARIAN:
 
     default:
         return lang;
     }
+}
+
+
+bool xmlAccess::supportForSymbolicLinks()
+{
+#ifdef FFS_WIN
+    OSVERSIONINFO osvi;
+    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+    //symbolic links are supported starting with Vista
+    if (GetVersionEx(&osvi))
+        return osvi.dwMajorVersion > 5; //XP has majorVersion == 5, minorVersion == 1, Vista majorVersion == 6
+
+    return false;
+#elif defined FFS_LINUX
+    return true;
+#endif
 }
 
 

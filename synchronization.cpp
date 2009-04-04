@@ -8,9 +8,7 @@
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
-#elif defined FFS_LINUX
-#include <utime.h>
-#endif  // FFS_LINUX
+#endif
 
 using namespace FreeFileSync;
 
@@ -197,8 +195,14 @@ bool significantDifferenceDetected(const FileCompareResult& fileCmpResult, const
 }
 
 
-SyncProcess::SyncProcess(const bool useRecycler, bool& warningSignificantDifference, StatusHandler* handler) :
-        useRecycleBin(useRecycler),
+SyncProcess::SyncProcess(const bool useRecycler,
+                         const bool copyFileSymLinks,
+                         const bool traverseDirSymLinks,
+                         bool& warningSignificantDifference,
+                         StatusHandler* handler) :
+        m_useRecycleBin(useRecycler),
+        m_copyFileSymLinks(copyFileSymLinks),
+        m_traverseDirSymLinks(traverseDirSymLinks),
         m_warningSignificantDifference(warningSignificantDifference),
         statusUpdater(handler),
         txtCopyingFile(_("Copying file %x to %y")),
@@ -215,9 +219,6 @@ SyncProcess::SyncProcess(const bool useRecycler, bool& warningSignificantDiffere
     txtDeletingFile.Replace(   wxT("%x"), wxT("\n\"%x\""), false);
     txtDeletingFolder.Replace( wxT("%x"), wxT("\n\"%x\""), false);
 }
-
-
-void copyfileMultithreaded(const Zstring& source, const Zstring& target, StatusHandler* updateClass);
 
 
 inline
@@ -240,17 +241,17 @@ bool SyncProcess::synchronizeFile(const FileCompareLine& cmpLine, const SyncConf
             statusText.Replace(wxT("%x"), cmpLine.fileDescrLeft.fullName, false);
             statusUpdater->updateStatusText(statusText);
 
-            removeFile(cmpLine.fileDescrLeft.fullName, useRecycleBin);
+            removeFile(cmpLine.fileDescrLeft.fullName, m_useRecycleBin);
             break;
         case SyncConfiguration::SYNC_DIR_RIGHT:  //copy files to right
-            target = cmpLine.fileDescrRight.directory + cmpLine.fileDescrLeft.relativeName;
+            target = cmpLine.fileDescrRight.directory + cmpLine.fileDescrLeft.relativeName.c_str();
 
             statusText = txtCopyingFile;
             statusText.Replace(wxT("%x"), cmpLine.fileDescrLeft.fullName, false);
             statusText.Replace(wxT("%y"), target, false);
             statusUpdater->updateStatusText(statusText);
 
-            copyfileMultithreaded(cmpLine.fileDescrLeft.fullName, target, statusUpdater);
+            copyFileUpdating(cmpLine.fileDescrLeft.fullName, target, cmpLine.fileDescrLeft.fileSize);
             break;
         case SyncConfiguration::SYNC_DIR_NONE:
             return false;
@@ -263,21 +264,21 @@ bool SyncProcess::synchronizeFile(const FileCompareLine& cmpLine, const SyncConf
         switch (config.exRightSideOnly)
         {
         case SyncConfiguration::SYNC_DIR_LEFT:   //copy files to left
-            target = cmpLine.fileDescrLeft.directory + cmpLine.fileDescrRight.relativeName;
+            target = cmpLine.fileDescrLeft.directory + cmpLine.fileDescrRight.relativeName.c_str();
 
             statusText = txtCopyingFile;
             statusText.Replace(wxT("%x"), cmpLine.fileDescrRight.fullName, false);
             statusText.Replace(wxT("%y"), target, false);
             statusUpdater->updateStatusText(statusText);
 
-            copyfileMultithreaded(cmpLine.fileDescrRight.fullName, target, statusUpdater);
+            copyFileUpdating(cmpLine.fileDescrRight.fullName, target, cmpLine.fileDescrRight.fileSize);
             break;
         case SyncConfiguration::SYNC_DIR_RIGHT:  //delete files on right
             statusText = txtDeletingFile;
             statusText.Replace(wxT("%x"), cmpLine.fileDescrRight.fullName, false);
             statusUpdater->updateStatusText(statusText);
 
-            removeFile(cmpLine.fileDescrRight.fullName, useRecycleBin);
+            removeFile(cmpLine.fileDescrRight.fullName, m_useRecycleBin);
             break;
         case SyncConfiguration::SYNC_DIR_NONE:
             return false;
@@ -297,8 +298,8 @@ bool SyncProcess::synchronizeFile(const FileCompareLine& cmpLine, const SyncConf
             statusText.Replace(wxT("%y"), cmpLine.fileDescrLeft.fullName, false);
             statusUpdater->updateStatusText(statusText);
 
-            removeFile(cmpLine.fileDescrLeft.fullName, useRecycleBin);  //only used if switch activated by user, else file is simply deleted
-            copyfileMultithreaded(cmpLine.fileDescrRight.fullName, cmpLine.fileDescrLeft.fullName, statusUpdater);
+            removeFile(cmpLine.fileDescrLeft.fullName, m_useRecycleBin);  //only used if switch activated by user, else file is simply deleted
+            copyFileUpdating(cmpLine.fileDescrRight.fullName, cmpLine.fileDescrLeft.fullName, cmpLine.fileDescrRight.fileSize);
             break;
         case SyncConfiguration::SYNC_DIR_RIGHT:  //copy from left to right
             statusText = txtOverwritingFile;
@@ -306,8 +307,8 @@ bool SyncProcess::synchronizeFile(const FileCompareLine& cmpLine, const SyncConf
             statusText.Replace(wxT("%y"), cmpLine.fileDescrRight.fullName, false);
             statusUpdater->updateStatusText(statusText);
 
-            removeFile(cmpLine.fileDescrRight.fullName, useRecycleBin);  //only used if switch activated by user, else file is simply deleted
-            copyfileMultithreaded(cmpLine.fileDescrLeft.fullName, cmpLine.fileDescrRight.fullName, statusUpdater);
+            removeFile(cmpLine.fileDescrRight.fullName, m_useRecycleBin);  //only used if switch activated by user, else file is simply deleted
+            copyFileUpdating(cmpLine.fileDescrLeft.fullName, cmpLine.fileDescrRight.fullName, cmpLine.fileDescrLeft.fileSize);
             break;
         case SyncConfiguration::SYNC_DIR_NONE:
             return false;
@@ -347,10 +348,10 @@ bool SyncProcess::synchronizeFolder(const FileCompareLine& cmpLine, const SyncCo
             statusText.Replace(wxT("%x"), cmpLine.fileDescrLeft.fullName, false);
             statusUpdater->updateStatusText(statusText);
 
-            removeDirectory(cmpLine.fileDescrLeft.fullName, useRecycleBin);
+            removeDirectory(cmpLine.fileDescrLeft.fullName, m_useRecycleBin);
             break;
         case SyncConfiguration::SYNC_DIR_RIGHT:  //create folders on right
-            target = cmpLine.fileDescrRight.directory + cmpLine.fileDescrLeft.relativeName;
+            target = cmpLine.fileDescrRight.directory + cmpLine.fileDescrLeft.relativeName.c_str();
 
             statusText = txtCreatingFolder;
             statusText.Replace(wxT("%x"), target, false);
@@ -359,8 +360,7 @@ bool SyncProcess::synchronizeFolder(const FileCompareLine& cmpLine, const SyncCo
             //some check to catch the error that directory on source has been deleted externally after "compare"...
             if (!wxDirExists(cmpLine.fileDescrLeft.fullName))
                 throw FileError(Zstring(_("Error: Source directory does not exist anymore:")) + wxT("\n\"") + cmpLine.fileDescrLeft.fullName + wxT("\""));
-            createDirectory(target);
-            copyFolderAttributes(cmpLine.fileDescrLeft.fullName, target);
+            createDirectory(target, cmpLine.fileDescrLeft.fullName, !m_traverseDirSymLinks); //traverse symlinks <=> !copy symlinks
             break;
         case SyncConfiguration::SYNC_DIR_NONE:
             return false;
@@ -373,7 +373,7 @@ bool SyncProcess::synchronizeFolder(const FileCompareLine& cmpLine, const SyncCo
         switch (config.exRightSideOnly)
         {
         case SyncConfiguration::SYNC_DIR_LEFT:   //create folders on left
-            target = cmpLine.fileDescrLeft.directory + cmpLine.fileDescrRight.relativeName;
+            target = cmpLine.fileDescrLeft.directory + cmpLine.fileDescrRight.relativeName.c_str();
 
             statusText = txtCreatingFolder;
             statusText.Replace(wxT("%x"), target, false);
@@ -382,15 +382,14 @@ bool SyncProcess::synchronizeFolder(const FileCompareLine& cmpLine, const SyncCo
             //some check to catch the error that directory on source has been deleted externally after "compare"...
             if (!wxDirExists(cmpLine.fileDescrRight.fullName))
                 throw FileError(Zstring(_("Error: Source directory does not exist anymore:")) + wxT("\n\"") + cmpLine.fileDescrRight.fullName + wxT("\""));
-            createDirectory(target);
-            copyFolderAttributes(cmpLine.fileDescrRight.fullName, target);
+            createDirectory(target, cmpLine.fileDescrRight.fullName, !m_traverseDirSymLinks); //traverse symlinks <=> !copy symlinks
             break;
         case SyncConfiguration::SYNC_DIR_RIGHT:  //delete folders on right
             statusText = txtDeletingFolder;
             statusText.Replace(wxT("%x"), cmpLine.fileDescrRight.fullName, false);
             statusUpdater->updateStatusText(statusText);
 
-            removeDirectory(cmpLine.fileDescrRight.fullName, useRecycleBin);
+            removeDirectory(cmpLine.fileDescrRight.fullName, m_useRecycleBin);
             break;
         case SyncConfiguration::SYNC_DIR_NONE:
             return false;
@@ -414,8 +413,8 @@ bool SyncProcess::synchronizeFolder(const FileCompareLine& cmpLine, const SyncCo
 inline
 bool deletionImminent(const FileCompareLine& line, const SyncConfiguration& config)
 {   //test if current sync-line will result in deletion of files    -> used to avoid disc space bottlenecks
-    if (    line.cmpResult == FILE_LEFT_SIDE_ONLY && config.exLeftSideOnly == SyncConfiguration::SYNC_DIR_LEFT ||
-            line.cmpResult == FILE_RIGHT_SIDE_ONLY && config.exRightSideOnly == SyncConfiguration::SYNC_DIR_RIGHT)
+    if (    (line.cmpResult == FILE_LEFT_SIDE_ONLY && config.exLeftSideOnly == SyncConfiguration::SYNC_DIR_LEFT) ||
+            (line.cmpResult == FILE_RIGHT_SIDE_ONLY && config.exRightSideOnly == SyncConfiguration::SYNC_DIR_RIGHT))
         return true;
     else
         return false;
@@ -447,15 +446,13 @@ private:
 //synchronizes while processing rows in grid and returns all rows that have not been synced
 void SyncProcess::startSynchronizationProcess(FileCompareResult& grid, const SyncConfiguration& config) throw(AbortThisProcess)
 {
-    assert (statusUpdater);
-
 #ifndef __WXDEBUG__
     wxLogNull noWxLogs; //prevent wxWidgets logging
 #endif
 
     //some basic checks:
     //test existence of Recycle Bin
-    if (useRecycleBin && !FreeFileSync::recycleBinExists())
+    if (m_useRecycleBin && !FreeFileSync::recycleBinExists())
     {
         statusUpdater->reportFatalError(_("Unable to initialize Recycle Bin!"));
         return; //should be obsolete!
@@ -502,7 +499,6 @@ void SyncProcess::startSynchronizationProcess(FileCompareResult& grid, const Syn
             if (    i->fileDescrLeft.objType == FileDescrLine::TYPE_DIRECTORY ||
                     i->fileDescrRight.objType == FileDescrLine::TYPE_DIRECTORY)
             {
-
                 while (true)
                 {   //trigger display refresh
                     statusUpdater->requestUiRefresh();
@@ -545,8 +541,8 @@ void SyncProcess::startSynchronizationProcess(FileCompareResult& grid, const Syn
                 if (    i->fileDescrLeft.objType == FileDescrLine::TYPE_FILE ||
                         i->fileDescrRight.objType == FileDescrLine::TYPE_FILE)
                 {
-                    if (    deleteLoop && deletionImminent(*i, config) ||
-                            !deleteLoop && !deletionImminent(*i, config))
+                    if (    (deleteLoop && deletionImminent(*i, config)) ||
+                            (!deleteLoop && !deletionImminent(*i, config)))
                     {
                         while (true)
                         {    //trigger display refresh
@@ -569,7 +565,7 @@ void SyncProcess::startSynchronizationProcess(FileCompareResult& grid, const Syn
                                                            dataToProcess,
                                                            *i,
                                                            config))  //update status if some work was done (answer is always "yes" in this context)
-                                        statusUpdater->updateProcessedData(objectsToCreate + objectsToOverwrite + objectsToDelete, dataToProcess);
+                                        statusUpdater->updateProcessedData(objectsToCreate + objectsToOverwrite + objectsToDelete, 0); //processed data is communicated in subfunctions!
                                 }
 
                                 markForRemoval.removeRow(i - grid.begin());
@@ -601,8 +597,143 @@ void SyncProcess::startSynchronizationProcess(FileCompareResult& grid, const Syn
 
 
 //###########################################################################################
+//callback functionality for smooth progress indicators
+
+struct CallBackData
+{
+    StatusHandler* handler;
+    wxULongLong bytesTransferredLast;
+};
+
+#ifdef FFS_WIN
+const DWORD COPY_FILE_COPY_SYMLINK = 0x00000800;
+
+DWORD CALLBACK copyProcessCallback(
+    LARGE_INTEGER totalFileSize,
+    LARGE_INTEGER totalBytesTransferred,
+    LARGE_INTEGER streamSize,
+    LARGE_INTEGER streamBytesTransferred,
+    DWORD dwStreamNumber,
+    DWORD dwCallbackReason,
+    HANDLE hSourceFile,
+    HANDLE hDestinationFile,
+    LPVOID lpData)
+{
+    //small performance optimization: it seems this callback function is called for every 64 kB (depending on cluster size).
+    static unsigned callNr = 0;
+    if (++callNr % 50 == 0) //reduce by factor of 50 =^ 10-20 calls/sec
+    {
+        CallBackData* sharedData = static_cast<CallBackData*>(lpData);
+
+        //inform about the (differential) processed amount of data
+        const wxULongLong currentBytesTransferred = wxULongLong(totalBytesTransferred.HighPart, totalBytesTransferred.LowPart);
+        sharedData->handler->updateProcessedData(0, (currentBytesTransferred - sharedData->bytesTransferredLast).ToDouble());
+        sharedData->bytesTransferredLast = currentBytesTransferred;
+
+        sharedData->handler->requestUiRefresh(false); //don't allow throwing exception within this call
+
+        if (sharedData->handler->abortIsRequested())
+            return PROGRESS_CANCEL;
+        else
+            return PROGRESS_CONTINUE;
+    }
+    else
+        return PROGRESS_CONTINUE;
+}
+
+#elif defined FFS_LINUX
+void copyProcessCallback(const wxULongLong& totalBytesTransferred, void* data)
+{   //called every 512 kB
+
+    CallBackData* sharedData = static_cast<CallBackData*>(data);
+
+    //inform about the (differential) processed amount of data
+    sharedData->handler->updateProcessedData(0, (totalBytesTransferred - sharedData->bytesTransferredLast).ToDouble());
+    sharedData->bytesTransferredLast = totalBytesTransferred;
+
+    sharedData->handler->requestUiRefresh(); //exceptions may be thrown here!
+}
+#endif
 
 
+//copy file while executing statusUpdater->requestUiRefresh() calls
+void SyncProcess::copyFileUpdating(const Zstring& source, const Zstring& target, const wxULongLong& totalBytesToCpy)
+{
+    //create folders first (see http://sourceforge.net/tracker/index.php?func=detail&aid=2628943&group_id=234430&atid=1093080)
+    const Zstring targetDir = target.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+    if (!wxDirExists(targetDir.c_str()))
+    {
+        const Zstring templateDir = source.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+        FreeFileSync::createDirectory(targetDir, templateDir, !m_traverseDirSymLinks); //might throw FileError() exception
+    }
+
+    //start of (possibly) long-running copy process: ensure status updates are performed regularly
+#ifdef FFS_WIN //update via call-back function
+
+    CallBackData sharedData;
+    sharedData.handler = statusUpdater;
+//data.bytesTransferredLast =
+
+
+    DWORD copyFlags = COPY_FILE_FAIL_IF_EXISTS;
+
+    if (m_copyFileSymLinks) //copy symbolic links instead of the files pointed at
+        copyFlags |= COPY_FILE_COPY_SYMLINK;
+
+    if (!CopyFileEx( //same performance as CopyFile()
+                source.c_str(),
+                target.c_str(),
+                copyProcessCallback,
+                &sharedData,
+                NULL,
+                copyFlags))
+    {
+        //error situation: undo communication of processed amount of data
+        statusUpdater->updateProcessedData(0, sharedData.bytesTransferredLast.ToDouble() * -1 );
+
+        statusUpdater->requestUiRefresh(); //abort if requested, don't show error message if cancelled by user!
+
+        Zstring errorMessage = Zstring(_("Error copying file:")) + wxT("\n\"") + source +  wxT("\" -> \"") + target + wxT("\"");
+        errorMessage += Zstring(wxT("\n\n"));
+        errorMessage += FreeFileSync::getLastErrorFormatted(); //some additional windows error information
+        throw FileError(errorMessage);
+    }
+
+    //inform about the (remaining) processed amount of data
+    statusUpdater->updateProcessedData(0, (totalBytesToCpy - sharedData.bytesTransferredLast).ToDouble());
+
+
+#elif defined FFS_LINUX //update via call-back function
+
+    CallBackData sharedData;
+    sharedData.handler = statusUpdater;
+//data.bytesTransferredLast =
+
+    try
+    {
+        FreeFileSync::copyFile(source,
+                               target,
+                               m_copyFileSymLinks,
+                               copyProcessCallback,
+                               &sharedData);
+    }
+    catch (...)
+    {
+        //error situation: undo communication of processed amount of data
+        statusUpdater->updateProcessedData(0, sharedData.bytesTransferredLast.ToDouble() * -1 );
+
+        throw;
+    }
+
+    //inform about the (remaining) processed amount of data
+    statusUpdater->updateProcessedData(0, (totalBytesToCpy - sharedData.bytesTransferredLast).ToDouble());
+#endif
+}
+
+/*
+//##### OLD IMPLEMENTATION WITHOUT SMOOTH PROGRESS INDICATOR ################
+
+#ifdef FFS_LINUX
 //handle execution of a method while updating the UI
 class UpdateWhileCopying : public UpdateWhileExecuting
 {
@@ -618,76 +749,32 @@ public:
 private:
     virtual void longRunner()
     {
-        //create folders first (see http://sourceforge.net/tracker/index.php?func=detail&aid=2628943&group_id=234430&atid=1093080)
         try
         {
-            const Zstring targetDir = target.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
-            if (!wxDirExists(targetDir.c_str()))
-            {
-                FreeFileSync::createDirectory(targetDir);
-            }
+            FreeFileSync::copyFile(source, target);
         }
-        catch (FileError& e)
+        catch (const FileError& e)
         {
             success = false;
             errorMessage = e.show();
             return;
         }
 
-
-#ifdef FFS_WIN
-//const DWORD COPY_FILE_COPY_SYMLINK = 0x00000800;
-
-        if (!CopyFileEx( //same performance as CopyFile()
-                    source.c_str(),
-                    target.c_str(),
-                    NULL,
-                    NULL,
-                    NULL,
-                    COPY_FILE_FAIL_IF_EXISTS))
-        {
-            success = false;
-            errorMessage = Zstring(_("Error copying file:")) + wxT("\n\"") + source +  wxT("\" -> \"") + target + wxT("\"");
-            errorMessage += Zstring(wxT("\n\n"));
-            errorMessage += FreeFileSync::getLastErrorFormatted(); //some additional windows error information
-            return;
-        }
-
-#elif defined FFS_LINUX //copying files with Linux does not preserve the modification time => adapt after copying
-        if (!wxCopyFile(source.c_str(), target.c_str(), false)) //abort if file exists
-        {
-            success = false;
-            errorMessage = Zstring(_("Error copying file:")) + wxT("\n\"") + source +  wxT("\" -> \"") + target + wxT("\"");
-            return;
-        }
-
-        struct stat fileInfo;
-        if (stat(source.c_str(), &fileInfo) != 0) //read modification time from source file
-        {
-            success = false;
-            errorMessage = Zstring(_("Could not retrieve file info for:")) + wxT("\n\"") + source + wxT("\"");
-            return;
-        }
-
-        utimbuf newTimes;
-        newTimes.actime  = fileInfo.st_mtime;
-        newTimes.modtime = fileInfo.st_mtime;
-
-        if (utime(target.c_str(), &newTimes) != 0)
-        {
-            success = false;
-            errorMessage = Zstring(_("Error changing modification time:")) + wxT("\n\"") + target + wxT("\"");
-            return;
-        }
-#endif  // FFS_LINUX
-
         success = true;
     }
 };
 
-
-void copyfileMultithreaded(const Zstring& source, const Zstring& target, StatusHandler* updateClass)
+void copyFileUpdating(const Zstring& source, const Zstring& target, const wxULongLong& totalBytesToCpy, StatusHandler* updateClass)
 {
+    //create folders first (see http://sourceforge.net/tracker/index.php?func=detail&aid=2628943&group_id=234430&atid=1093080)
+    const Zstring targetDir = target.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+    if (!wxDirExists(targetDir.c_str()))
+    {
+        const Zstring templateDir = source.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+        FreeFileSync::createDirectory(targetDir, templateDir); //might throw FileError() exception
+    }
+
+//update while copying via additional worker thread
     static UpdateWhileCopying copyAndUpdate; //single instantiation: thread enters wait phase after each execution
 
     copyAndUpdate.waitUntilReady();
@@ -701,4 +788,9 @@ void copyfileMultithreaded(const Zstring& source, const Zstring& target, StatusH
     //no mutex needed here since longRunner is finished
     if (!copyAndUpdate.success)
         throw FileError(copyAndUpdate.errorMessage);
+
+    //inform about the processed amount of data
+    updateClass->updateProcessedData(0, totalBytesToCpy.ToDouble());
+#endif
 }
+*/

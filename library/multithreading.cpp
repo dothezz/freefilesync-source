@@ -151,7 +151,7 @@ void UpdateWhileExecuting::execute(StatusHandler* statusUpdater)
 
     while (receivingResult.WaitTimeout(UI_UPDATE_INTERVAL) == wxCOND_TIMEOUT)
     {
-        statusUpdater->requestUiRefresh(true); //ATTENTION: Exception "AbortThisProcess" may be thrown here!!!
+        statusUpdater->requestUiRefresh(false); //don't allow throwing exception within this call
 
         if (workDone) //workaround for a bug in wxWidgets v2.8.9 class wxCondition: signals might get lost
             break;    //no mutex for workDone needed here: it is changed only when mainthread is in WaitTimeout()

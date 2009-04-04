@@ -17,6 +17,7 @@
 #include <stack>
 #include "../library/processXml.h"
 #include <wx/event.h>
+#include <memory>
 
 
 //IDs for context menu items
@@ -69,10 +70,14 @@ private:
     void updateFilterButton(wxBitmapButton* filterButton, bool isActive);
     void updateCompareButtons();
 
-    void addCfgFileToHistory(const wxString& filename);
+    void addFileToCfgHistory(const wxString& filename);
+    void addLeftFolderToHistory(const wxString& leftFolder);
+    void addRightFolderToHistory(const wxString& rightFolder);
 
-    void addFolderPair(const wxString& leftDir, const wxString& rightDir);
-    void removeFolderPair(bool removeAll = false);
+    void addFolderPair(const Zstring& leftDir, const Zstring& rightDir);
+    void addFolderPair(const std::vector<FolderPair>& newPairs);
+    void removeFolderPair(const int pos, bool refreshLayout = true); //keep it an int, allow negative values!
+    void clearFolderPairs();
 
     //main method for putting gridData on UI: maps data respecting current view settings
     void writeGrid(const FileCompareResult& gridData);
@@ -94,10 +99,6 @@ private:
     void clearStatusBar();
 
     //events
-    void onGridLeftAccess(  wxEvent& event);
-    void onGridRightAccess( wxEvent& event);
-    void onGridMiddleAccess(wxEvent& event);
-
     void onGridLeftButtonEvent(wxKeyEvent& event);
     void onGridRightButtonEvent(wxKeyEvent& event);
     void onGridMiddleButtonEvent(wxKeyEvent& event);
@@ -134,7 +135,8 @@ private:
     void OnLoadConfig(          wxCommandEvent& event);
     void OnLoadFromHistory(     wxCommandEvent& event);
     void loadConfiguration(const wxString& filename);
-    void OnChoiceKeyEvent(      wxKeyEvent& event );
+    void OnCfgHistoryKeyEvent(  wxKeyEvent& event);
+    void OnFolderHistoryKeyEvent(wxKeyEvent& event);
 
     void OnFilesDropped(        FfsFileDropEvent& event);
     void onResizeMainWindow(    wxEvent& event);
@@ -160,6 +162,7 @@ private:
     void OnMenuGlobalSettings(  wxCommandEvent& event);
     void OnMenuExportFileList(  wxCommandEvent& event);
     void OnMenuBatchJob(        wxCommandEvent& event);
+    void OnMenuCheckVersion(    wxCommandEvent& event);
     void OnMenuAbout(           wxCommandEvent& event);
     void OnMenuQuit(            wxCommandEvent& event);
     void OnMenuLangChineseSimp( wxCommandEvent& event);
@@ -167,10 +170,13 @@ private:
     void OnMenuLangEnglish(     wxCommandEvent& event);
     void OnMenuLangFrench(      wxCommandEvent& event);
     void OnMenuLangGerman(      wxCommandEvent& event);
+    void OnMenuLangHungarian(   wxCommandEvent& event);
     void OnMenuLangItalian(     wxCommandEvent& event);
     void OnMenuLangJapanese(    wxCommandEvent& event);
     void OnMenuLangPolish(      wxCommandEvent& event);
     void OnMenuLangPortuguese(  wxCommandEvent& event);
+    void OnMenuLangSlovenian(   wxCommandEvent& event);
+    void OnMenuLangSpanish(     wxCommandEvent& event);
 
     void switchProgramLanguage(const int langID);
     void enableSynchronization(bool value);
@@ -255,8 +261,6 @@ private:
     //remember last sort executed (for determination of sort order)
     int lastSortColumn;
     const wxGrid* lastSortGrid;
-
-    const wxGrid* leadGrid; //point to grid that is in focus
 };
 
 //######################################################################################
@@ -309,17 +313,17 @@ public:
     CompareStatusHandler(MainDialog* dlg);
     ~CompareStatusHandler();
 
-    void updateStatusText(const Zstring& text);
-    void initNewProcess(int objectsTotal, double dataTotal, Process processID);
-    void updateProcessedData(int objectsProcessed, double dataProcessed);
-    void forceUiRefresh();
+    virtual void updateStatusText(const Zstring& text);
+    virtual void initNewProcess(int objectsTotal, double dataTotal, Process processID);
+    virtual void updateProcessedData(int objectsProcessed, double dataProcessed);
+    virtual void forceUiRefresh();
 
-    ErrorHandler::Response reportError(const Zstring& text);
-    void reportFatalError(const Zstring& errorMessage);
-    void reportWarning(const Zstring& warningMessage, bool& dontShowAgain);
+    virtual ErrorHandler::Response reportError(const Zstring& text);
+    virtual void reportFatalError(const Zstring& errorMessage);
+    virtual void reportWarning(const Zstring& warningMessage, bool& dontShowAgain);
 
 private:
-    void abortThisProcess();
+    virtual void abortThisProcess();
 
     MainDialog* mainDialog;
     bool ignoreErrors;
@@ -333,17 +337,17 @@ public:
     SyncStatusHandler(wxWindow* dlg, bool ignoreAllErrors);
     ~SyncStatusHandler();
 
-    void updateStatusText(const Zstring& text);
-    void initNewProcess(int objectsTotal, double dataTotal, Process processID);
-    void updateProcessedData(int objectsProcessed, double dataProcessed);
-    void forceUiRefresh();
+    virtual void updateStatusText(const Zstring& text);
+    virtual void initNewProcess(int objectsTotal, double dataTotal, Process processID);
+    virtual void updateProcessedData(int objectsProcessed, double dataProcessed);
+    virtual void forceUiRefresh();
 
-    ErrorHandler::Response reportError(const Zstring& text);
-    void reportFatalError(const Zstring& errorMessage);
-    void reportWarning(const Zstring& warningMessage, bool& dontShowAgain);
+    virtual ErrorHandler::Response reportError(const Zstring& text);
+    virtual void reportFatalError(const Zstring& errorMessage);
+    virtual void reportWarning(const Zstring& warningMessage, bool& dontShowAgain);
 
 private:
-    void abortThisProcess();
+    virtual void abortThisProcess();
 
     SyncStatus* syncStatusFrame;
     bool ignoreErrors;

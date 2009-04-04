@@ -1,6 +1,37 @@
 FreeFileSync
 ------------
 
+Changelog v1.17
+---------------
+Full support for Windows/Linux symbolic links:
+	- traverse, copy, delete symbolic links
+	- handle broken symbolic links
+	- new options in GlobalSettings.xml: TraverseDirectorySymlinks, CopyFileSymlinks
+New menu option: "Check for new version"
+Copy folder attributes and security settings when implicitly creating folders
+Maximum file time difference now fully configurable
+New history of last selected folders
+Fixed "Year-2038-Problem" for time_t
+Upgraded to wxWidgets 2.8.10
+Individual folder pairs can be selected for removal
+Performance: Reduced CPU time by 9%, memory consumption by 36%
+Support for cancellation when copying and comparing large files
+Smooth progress indicators when copying and comparing large files
+Support for Shift-PageUp/PageDown
+Support for Home/End and Shift-Home/End
+Alternative logfile directory configurable via *.ffs_batch Xml
+Show explorer file icons in grid (windows only)
+Fixed compilation issues for Linux build
+Fixed grid alignment issue in Linux build
+Enhanced error messages for Linux build
+Optimized traversing algorithm for Linux build
+Fixed graphical misalignment with multiple folder pairs
+Added Slovenian translation
+Added Hungarian translation
+Added Spanish translation
+Updated translation files
+
+
 Changelog v1.16
 ---------------
 Support for \\?\ path prefix for unrestricted path length (directory names > 255 characters) (windows only)

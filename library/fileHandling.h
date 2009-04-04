@@ -26,7 +26,7 @@ namespace FreeFileSync
     struct FileInfo
     {
         wxULongLong fileSize;    //unit: bytes!
-        time_t lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
+        wxLongLong lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
     };
 
     //traverser interface
@@ -40,8 +40,9 @@ namespace FreeFileSync
     };
 
     //custom traverser with detail information about files
-    void traverseInDetail(const Zstring& directory, const bool traverseSymbolicLinks, FullDetailFileTraverser* sink);
-    void getAllFilesAndDirs(const Zstring& sourceDir, std::vector<Zstring>& files, std::vector<Zstring>& directories) throw(FileError);
+    void traverseInDetail(const Zstring& directory, const bool traverseDirectorySymlinks, FullDetailFileTraverser* sink);
+
+    bool fileExists(const Zstring& filename); //replaces wxFileExists()!
 
     //recycler
     bool recycleBinExists(); //test existence of Recycle Bin API on current system
@@ -49,12 +50,17 @@ namespace FreeFileSync
     //file handling
     void removeDirectory(const Zstring& directory, const bool useRecycleBin);
     void removeFile(const Zstring& filename, const bool useRecycleBin);
-    void createDirectory(const Zstring& directory, const int level = 0); //level is used internally only
-    void copyFolderAttributes(const Zstring& source, const Zstring& target);
+    void createDirectory(const Zstring& directory, const Zstring& templateDir, const bool copyDirectorySymLinks);
+#ifdef FFS_LINUX
+    //callback function for status updates whily copying
+    typedef void (*CopyFileCallback)(const wxULongLong& totalBytesTransferred, void* data);
 
-#ifdef FFS_WIN
-    bool isFatDrive(const Zstring& directoryName);
-#endif  //FFS_WIN
+    void copyFile(const Zstring& sourceFile,
+                  const Zstring& targetFile,
+                  const bool copyFileSymLinks,
+                  CopyFileCallback callback = NULL,
+                  void* data = NULL);
+#endif
 }
 
 

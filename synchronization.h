@@ -21,6 +21,8 @@ namespace FreeFileSync
     {
     public:
         SyncProcess(const bool useRecycler,
+                    const bool copyFileSymLinks,
+                    const bool traverseDirSymLinks,
                     bool& warningSignificantDifference,
                     StatusHandler* handler);
 
@@ -30,7 +32,11 @@ namespace FreeFileSync
         bool synchronizeFile(const FileCompareLine& cmpLine, const SyncConfiguration& config);   //false if nothing had to be done
         bool synchronizeFolder(const FileCompareLine& cmpLine, const SyncConfiguration& config); //false if nothing had to be done
 
-        const bool useRecycleBin;
+        void copyFileUpdating(const Zstring& source, const Zstring& target, const wxULongLong& sourceFileSize);
+
+        const bool m_useRecycleBin;
+        const bool m_copyFileSymLinks;
+        const bool m_traverseDirSymLinks;
         bool& m_warningSignificantDifference;
         StatusHandler* statusUpdater;
 

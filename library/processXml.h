@@ -66,10 +66,12 @@ namespace xmlAccess
         std::vector<FolderPair> directoryPairs;
 
         bool silent;
-        OnError handleError; //reaction on error situation during synchronization
+        OnError handleError;       //reaction on error situation during synchronization
+        wxString logFileDirectory; //
     };
 
     int retrieveSystemLanguage();
+    bool supportForSymbolicLinks();
 
 
     struct XmlGlobalSettings
@@ -79,19 +81,17 @@ namespace xmlAccess
         {
             _Shared() :
                     programLanguage(retrieveSystemLanguage()),
-#ifdef FFS_WIN
-                    handleDstOnFat32(true),
-#endif
-                    traverseSymbolicLinks(false)
+                    fileTimeTolerance(2),  //default 2s: FAT vs NTFS
+                    traverseDirectorySymlinks(false),
+                    copyFileSymlinks(supportForSymbolicLinks())
             {
                 resetWarnings();
             }
 
             int programLanguage;
-#ifdef FFS_WIN
-            bool handleDstOnFat32;
-#endif
-            bool traverseSymbolicLinks;
+            unsigned fileTimeTolerance; //max. allowed file time deviation
+            bool traverseDirectorySymlinks;
+            bool copyFileSymlinks; //copy symbolic link instead of target file
 
             //warnings
             void resetWarnings();
@@ -116,8 +116,8 @@ namespace xmlAccess
 #endif
                     cfgHistoryMaxItems(10),
                     deleteOnBothSides(false),
-                    useRecyclerForManualDeletion(FreeFileSync::recycleBinExists()) //enable if OS supports it; else user will have to activate first and then get an error message
-            {}
+                    useRecyclerForManualDeletion(FreeFileSync::recycleBinExists()), //enable if OS supports it; else user will have to activate first and then get an error message
+                    showFileIcons(true) {}
 
             int widthNotMaximized;
             int heightNotMaximized;
@@ -130,8 +130,11 @@ namespace xmlAccess
             wxString commandLineFileManager;
             std::vector<wxString> cfgFileHistory;
             unsigned cfgHistoryMaxItems;
+            std::vector<wxString> folderHistoryLeft;
+            std::vector<wxString> folderHistoryRight;
             bool deleteOnBothSides;
             bool useRecyclerForManualDeletion;
+            bool showFileIcons;
         } gui;
 
 //---------------------------------------------------------------------

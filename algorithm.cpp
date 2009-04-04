@@ -6,7 +6,11 @@
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
-#endif  //FFS_WIN
+
+#elif defined FFS_LINUX
+#include <string.h>
+#include <errno.h>
+#endif
 
 using namespace FreeFileSync;
 
@@ -68,8 +72,7 @@ wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
         switch (length)
         {
         case 0:
-            temp = _("Error");
-            break;
+            return _("Error");
         case 1:
             temp = wxString(wxT("0")) + GlobalResources::DECIMAL_POINT + wxT("0") + temp;
             break; //0,01
@@ -388,8 +391,6 @@ void FreeFileSync::excludeAllRowsOnGrid(FileCompareResult& currentGridData)
 template <bool searchLeftSide>
 void addSubElementsOneSide(const FileCompareResult& grid, const FileCompareLine& relevantRow, std::set<int>& subElements)
 {
-    Zstring relevantDirectory;
-
     const FileDescrLine* fileDescr = NULL; //get descriptor for file to be deleted; evaluated at compile time
     if (searchLeftSide)
         fileDescr = &relevantRow.fileDescrLeft;
@@ -397,21 +398,22 @@ void addSubElementsOneSide(const FileCompareResult& grid, const FileCompareLine&
         fileDescr = &relevantRow.fileDescrRight;
 
     if (fileDescr->objType == FileDescrLine::TYPE_DIRECTORY)
-        relevantDirectory = fileDescr->relativeName + GlobalResources::FILE_NAME_SEPARATOR; //FILE_NAME_SEPARATOR needed to exclude subfile/dirs only
-    else
-        return;
-
-    for (FileCompareResult::const_iterator i = grid.begin(); i != grid.end(); ++i)
     {
-        if (searchLeftSide) //evaluated at compile time
+        Zstring relevantDirectory(fileDescr->relativeName.c_str(), fileDescr->relativeName.length());
+        relevantDirectory += GlobalResources::FILE_NAME_SEPARATOR; //FILE_NAME_SEPARATOR needed to exclude subfile/dirs only
+
+        for (FileCompareResult::const_iterator i = grid.begin(); i != grid.end(); ++i)
         {
-            if (i->fileDescrLeft.relativeName.StartsWith(relevantDirectory))
-                subElements.insert(i - grid.begin());
-        }
-        else
-        {
-            if (i->fileDescrRight.relativeName.StartsWith(relevantDirectory))
-                subElements.insert(i - grid.begin());
+            if (searchLeftSide) //evaluated at compile time
+            {
+                if (i->fileDescrLeft.relativeName.StartsWith(relevantDirectory))
+                    subElements.insert(i - grid.begin());
+            }
+            else
+            {
+                if (i->fileDescrRight.relativeName.StartsWith(relevantDirectory))
+                    subElements.insert(i - grid.begin());
+            }
         }
     }
 }
@@ -702,18 +704,17 @@ void writeFourDigitNumber(unsigned int number, wxChar*& position)
 }
 
 
-wxString FreeFileSync::utcTimeToLocalString(const time_t utcTime)
+wxString FreeFileSync::utcTimeToLocalString(const wxLongLong& utcTime)
 {
 #ifdef FFS_WIN
-
     //convert ansi C time to FILETIME
-    wxULongLong fileTimeLong(utcTime);
-    fileTimeLong += wxULongLong(2, 3054539008UL); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
+    wxLongLong fileTimeLong(utcTime);
+    fileTimeLong += wxLongLong(2, 3054539008UL); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
     fileTimeLong *= 10000000;
 
     FILETIME lastWriteTimeUtc;
-    lastWriteTimeUtc.dwLowDateTime  = fileTimeLong.GetLo();
-    lastWriteTimeUtc.dwHighDateTime = fileTimeLong.GetHi();
+    lastWriteTimeUtc.dwLowDateTime  = fileTimeLong.GetLo();             //GetLo() returns unsigned
+    lastWriteTimeUtc.dwHighDateTime = unsigned(fileTimeLong.GetHi());   //GetHi() returns signed
 
     FILETIME localFileTime;
     if (FileTimeToLocalFileTime(   //convert to local time
@@ -751,7 +752,8 @@ wxString FreeFileSync::utcTimeToLocalString(const time_t utcTime)
 
 #elif defined FFS_LINUX
     tm* timeinfo;
-    timeinfo = localtime(&utcTime); //convert to local time
+    const time_t fileTime = utcTime.ToLong();
+    timeinfo = localtime(&fileTime); //convert to local time
     char buffer[50];
     strftime(buffer, 50, "%Y-%m-%d  %H:%M:%S", timeinfo);
 
@@ -761,7 +763,7 @@ wxString FreeFileSync::utcTimeToLocalString(const time_t utcTime)
 
 
 #ifdef FFS_WIN
-Zstring FreeFileSync::getLastErrorFormatted(const unsigned long lastError) //try to get additional windows error information
+Zstring FreeFileSync::getLastErrorFormatted(const unsigned long lastError) //try to get additional Windows error information
 {
     unsigned long lastErrorCode = lastError;
     //determine error code if none was specified
@@ -775,9 +777,20 @@ Zstring FreeFileSync::getLastErrorFormatted(const unsigned long lastError) //try
         output += Zstring(wxT(": ")) + buffer;
     return output;
 }
+
+#elif defined FFS_LINUX
+Zstring FreeFileSync::getLastErrorFormatted(const int lastError) //try to get additional Linux error information
+{
+    int lastErrorCode = lastError;
+    //determine error code if none was specified
+    if (lastErrorCode == 0)
+        lastErrorCode = errno;
+
+    Zstring output = Zstring(wxT("Linux Error Code ")) + wxString::Format(wxT("%i"), lastErrorCode).c_str();
+    output += Zstring(wxT(": ")) + strerror(lastErrorCode);
+    return output;
+}
 #endif
-
-
 
 /*Statistical theory: detect daylight saving time (DST) switch by comparing files that exist on both sides (and have same filesizes). If there are "enough"
 that have a shift by +-1h then assert that DST switch occured.

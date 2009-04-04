@@ -78,17 +78,18 @@ namespace FreeFileSync
 
         Zstring fullName;  // == directory + relativeName
         Zstring directory; //directory to be synced + separator
-        Zstring relativeName; //fullName without directory that is being synchronized
+        Zsubstr relativeName; //fullName without directory that is being synchronized
         //Note on performance: Keep redundant information "directory" and "relativeName"!
         //Extracting info from "fullName" instead would result in noticeable performance loss, with only limited memory reduction (note ref. counting strings)!
-        time_t lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
+        wxLongLong lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
         wxULongLong fileSize;
         ObjectType objType; //is it a file or directory or initial?
 
         //the following operators are needed by template class "set"
         //DO NOT CHANGE THESE RELATIONS!!!
         bool operator < (const FileDescrLine& b) const
-        {   //quick check based on string length: we are not interested in a lexicographical order!
+        {
+            //quick check based on string length: we are not interested in a lexicographical order!
             const size_t aLength = relativeName.length();
             const size_t bLength = b.relativeName.length();
             if (aLength != bLength)
@@ -96,7 +97,7 @@ namespace FreeFileSync
 #ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
             return FreeFileSync::compareStringsWin32(relativeName.c_str(), b.relativeName.c_str()) < 0;  //implementing a (reverse) comparison manually is a lot slower!
 #elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
-            return relativeName.Cmp(b.relativeName) < 0;
+            return defaultCompare(relativeName.c_str(), b.relativeName.c_str()) < 0;
 #endif
         }
     };
@@ -147,7 +148,6 @@ namespace FreeFileSync
         ~AbortThisProcess() {}
     };
 
-    const time_t FILE_TIME_PRECISION = 2; //file times have precision of 2 seconds due to FAT/FAT32 file systems
     const wxString LAST_CONFIG_FILE = wxT("LastRun.ffs_gui");
     const wxString GLOBAL_CONFIG_FILE = wxT("GlobalSettings.xml");
 }

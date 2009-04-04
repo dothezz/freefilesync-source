@@ -15,7 +15,7 @@
 !=	files are different\n
 !=	i file sono diversi\n
 %x directories
-%x directories
+%x cartelle
 %x files,
 %x files,
 %x of %y rows in view
@@ -134,8 +134,6 @@ About
 A proposito di
 Action
 Azioni
-Active for FAT/FAT32 drives only: When comparing filetimes treat files that differ by less or equal than 1 hour as equal. This ensures daylight saving time switches are handled properly.
-Attivo solo per drive FAT/FAT32: File con lo stesso nome e con ora di modifica differente per 1 ora o meno sono considerati identici. Cio' garantisce la corretta gestione dell'ora di modifica.
 Add folder pair
 Aggiungi una coppia di cartelle
 All items have been synchronized!
@@ -218,8 +216,6 @@ Copying file %x overwriting %y
 Copia di %x file sovrascrivendone %y
 Copying file %x to %y
 Copia di file da %x a %y
-Could not retrieve file info for:
-Errore durante la lettura degli attributi file per:
 Could not set working directory:
 Impossibile definire la directory di lavoro:
 Create a batch job
@@ -292,20 +288,26 @@ Error deleting file:
 Errore durante l'eliminazione del file:
 Error handling
 Errore nella gestione
+Error loading library function:
+Errore nel caricamento della funzione libreria:
 Error moving to Recycle Bin:
 Errore durante lo spostamento nel Cestino:
+Error opening file:
+Errore in apertura file:
 Error parsing configuration file:
-Errore durante l'analisi del file di configurazione:
+Errore nell'analisi del file di configurazione:
+Error reading file attributes:
+Errore di lettura degli attributi file:
 Error reading file:
 Errore durante la lettura del file:
-Error reading folder attributes:
-Errore durante la lettura attributi della cartella:
+Error resolving symbolic link:
+Errore nella risoluzione di collegamento simbolico:
 Error traversing directory:
 Errore nel percorso della directory:
+Error writing file attributes:
+Errore nella scrittura degli attributi file:
 Error writing file:
 Errore durante la scrittura del file:
-Error writing folder attributes:
-Errore in scrittura attributi della cartella:
 Error: Source directory does not exist anymore:
 Errore: la directory sorgente non è più esistente:
 Example
@@ -320,12 +322,12 @@ Exit immediately and set returncode < 0
 Esci immediatamente ed imposta returncode < 0
 Exit with RC < 0
 Esci con RC < 0
-FAT32: Handle Daylight Saving Time
-FAT32: Gestisci Ora di Modifica
 Feedback and suggestions are welcome at:
 Commenti e suggerimenti sono i benvenuti:
 File Manager integration:
 Integrazione File Manager:
+File Time Tolerance:
+Tolleranza di File Time:
 File already exists. Overwrite?
 Il file esiste già. Lo vuoi sovrascrivere?
 File content
@@ -334,6 +336,8 @@ File list exported!
 Lista dei file esportata!
 File size and date
 Dimensione e data del file
+File times that differ by up to the specified number of seconds are still handled as having same time.
+File time che differiscono per meno dello specificato numero di secondi sono considerati come aventi lo stesso File time.
 Filename
 Nome del file
 Files are found equal if\n     - file content\nis the same.
@@ -410,8 +414,8 @@ Hints:
 Consigli:
 Homepage:
 Homepage:
-If you like FFS:
-Se ti piace FFS:
+If you like FFS
+Se ti piace FFS
 Ignore errors
 Ignora gli errori
 Ignore subsequent errors
@@ -568,16 +572,18 @@ Synchronizing...
 Sincronizzazione in corso...
 System out of memory!
 Memoria di sistema esaurita!
+Target file already existing!
+File destinazione già esistente!
 The file does not contain a valid configuration:
 Il file non contiene una configurazione valida
-The file does not exist:
+File does not exist:
 Il file non esiste:
 This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
 Questa riga di comando verrà eseguita ad ogni doppio click sul nome di un file. %name é lo spazio riservato per il file selezionato.
 This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
 Questa riga di comando verrà eseguita ad ogni doppio click sul nome di un file. %x é lo spazio riservato per il file selezionato.
-This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
-Questa variante definisce identici due file con lo stesso nome quando hanno la stessa dimensione E la stessa data e ora. Attenzione: la precisione dell'ora è di circa 2 secondi. Ciò assicura il corretto funzionamneto della sincronizzazione con la precisione del file system FAT32.
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
+Questa variante definisce identici due file con lo stesso nome quando hanno la stessa dimensione E la stessa data e ora.
 Time
 Ora
 Time elapsed:
@@ -606,15 +612,17 @@ Warning
 Attenzione
 Warning: Synchronization failed for %x item(s):
 Attenzione: Sincronizzazione fallita per %x elementi:
-When \"Compare\" is triggered with this option set the following decision tree is processed:
-Quando \"Compara\" è usato con questa opzione, viene eseguito il seguente albero delle decisioni:
+Warnings:
+Attenzione:
+When the comparison is started with this option set the following decision tree is processed:
+Quando questo set di opzioni viene selezionato per la comparazione viene processato il seguente albero di decisioni:
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Puoi provare a sincronizzare di nuovo gli elementi restanti (SENZA doverli ri-comparare) !
 different
 file differenti
 file exists on both sides
-il file esiste su entrambi i lati
+file esistente su entrambi i lati
 on one side only
-il file esiste su un solo lato
+file esistente su un solo lato
 |>	file on right side only\n
 |>	Il file esiste solo sul lato destro\n

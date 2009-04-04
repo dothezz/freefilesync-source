@@ -14,6 +14,7 @@
 #include "ui/smallDialogs.h"
 #include "library/misc.h"
 #include "library/processXml.h"
+#include <memory>
 
 class Application : public wxApp
 {
@@ -22,10 +23,7 @@ public:
     int  OnRun();
     int  OnExit();
     bool OnExceptionInMainLoop();
-
-    void initialize();
-
-    bool ProcessIdle();  //virtual impl.
+    void OnStartApplication(wxIdleEvent& event);
 
 private:
     void runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSettings& globalSettings);
@@ -59,7 +57,7 @@ class FfsTrayIcon;
 class BatchStatusHandlerSilent : public BatchStatusHandler
 {
 public:
-    BatchStatusHandlerSilent(const xmlAccess::OnError handleError, int& returnVal);
+    BatchStatusHandlerSilent(const xmlAccess::OnError handleError, const wxString& logfileDirectory, int& returnVal);
     ~BatchStatusHandlerSilent();
 
 

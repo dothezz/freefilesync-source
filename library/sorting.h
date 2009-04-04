@@ -124,11 +124,11 @@ bool sortByFileName(const FileCompareLine& a, const FileCompareLine& b)
             const wxChar* stringA = descrLineA->relativeName.c_str();
             const wxChar* stringB = descrLineB->relativeName.c_str();
 
-            size_t pos = descrLineA->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
+            size_t pos = descrLineA->relativeName.findFromEnd(GlobalResources::FILE_NAME_SEPARATOR); //start search beginning from end
             if (pos != std::string::npos)
                 stringA += pos + 1;
 
-            pos = descrLineB->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
+            pos = descrLineB->relativeName.findFromEnd(GlobalResources::FILE_NAME_SEPARATOR); //start search beginning from end
             if (pos != std::string::npos)
                 stringB += pos + 1;
 
@@ -155,7 +155,7 @@ bool sortByRelativeName(const FileCompareLine& a, const FileCompareLine& b)
         relLengthA  = descrLineA->relativeName.length();
     else if (descrLineA->objType == FileDescrLine::TYPE_FILE)
     {
-        relLengthA = descrLineA->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
+        relLengthA = descrLineA->relativeName.findFromEnd(GlobalResources::FILE_NAME_SEPARATOR); //start search beginning from end
         if (relLengthA == wxNOT_FOUND)
         {
             relLengthA  = 0;
@@ -180,7 +180,7 @@ bool sortByRelativeName(const FileCompareLine& a, const FileCompareLine& b)
         relLengthB  = descrLineB->relativeName.length();
     else if (descrLineB->objType == FileDescrLine::TYPE_FILE)
     {
-        relLengthB = descrLineB->relativeName.Find(GlobalResources::FILE_NAME_SEPARATOR, true); //start search beginning from end
+        relLengthB = descrLineB->relativeName.findFromEnd(GlobalResources::FILE_NAME_SEPARATOR); //start search beginning from end
         if (relLengthB == wxNOT_FOUND)
         {
             relLengthB  = 0;

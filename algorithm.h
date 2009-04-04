@@ -35,7 +35,7 @@ namespace FreeFileSync
     void includeAllRowsOnGrid(FileCompareResult& currentGridData);
     void excludeAllRowsOnGrid(FileCompareResult& currentGridData);
 
-    wxString utcTimeToLocalString(const time_t utcTime);
+    wxString utcTimeToLocalString(const wxLongLong& utcTime);
 
     //enhanced binary search template: returns an iterator
     template <class ForwardIterator, class T>
@@ -49,15 +49,10 @@ namespace FreeFileSync
     }
 
 #ifdef FFS_WIN
-    Zstring getLastErrorFormatted(const unsigned long lastError = 0); //try to get additional windows error information
-
-//detect if FAT/FAT32 drive needs a +-1h time shift after daylight saving time (DST) switch due to known windows bug:
-//http://www.codeproject.com/KB/datetime/dstbugs.aspx
-
-//NO performance issue: debug build: 50 ms for 200000 files processed in for-loop
-    void checkForDSTChange(const FileCompareResult& gridData, const std::vector<FolderPair>& directoryPairsFormatted, int& timeShift, wxString& driveName);
-#endif  //FFS_WIN
-
+    Zstring getLastErrorFormatted(const unsigned long lastError = 0); //try to get additional Windows error information
+#elif defined FFS_LINUX
+    Zstring getLastErrorFormatted(const int lastError = 0); //try to get additional Linux error information
+#endif
 }
 
 

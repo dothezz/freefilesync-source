@@ -1,8 +1,7 @@
-/*******#include <wx/msgdlg.h>********************************************************
+/***************************************************************
  * Purpose:   Code for Application Class
  * Author:    ZenJu (zhnmju123@gmx.de)
  * Created:   2008-07-16
- * Copyright: ZenJu ()
  **************************************************************/
 
 #include "application.h"
@@ -19,35 +18,63 @@
 #include "algorithm.h"
 #include <wx/taskbar.h>
 #include "ui/smallDialogs.h"
+#include <memory>
 
 
 IMPLEMENT_APP(Application);
 
-bool Application::ProcessIdle()
-{
-    static bool initialized = false;
-    if (!initialized)
-    {
-        initialized = true;
-        initialize();   //here the program initialization takes place
-    }
-    return wxApp::ProcessIdle();
-}
-
-//Note: initialization is done in the FIRST idle event instead of OnInit. Reason: Commandline mode requires the wxApp eventhandler to be established
-//for UI update events. This is not the case at the time of OnInit().
 
 bool Application::OnInit()
 {
     returnValue = 0;
     //do not call wxApp::OnInit() to avoid using default commandline parser
 
-    //set working directory to current executable directory
+//Note: initialization is done in the FIRST idle event instead of OnInit. Reason: Commandline mode requires the wxApp eventhandler to be established
+//for UI update events. This is not the case at the time of OnInit().
+    Connect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), NULL, this);
+
+    return true;
+}
+
+
+void Application::OnStartApplication(wxIdleEvent& event)
+{
+    Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), NULL, this);
+
+    //test if FFS is to be started on UI with config file passed as commandline parameter
+    //this needs to happen BEFORE the working directory is set!
+    wxString cfgFilename;
+    if (argc > 1)
+    {
+        //resolve relative names to avoid problems after working directory is changed
+        wxFileName filename(argv[1]);
+        if (!filename.Normalize())
+        {
+            wxMessageBox(wxString(_("Error retrieving full path:")) + wxT("\n\"") + argv[1] + wxT("\""));
+            return;
+        }
+        const wxString fullFilename = filename.GetFullPath();
+
+        if (wxFileExists(fullFilename))  //load file specified by %1 parameter:
+            cfgFilename = fullFilename;
+        else if (wxFileExists(fullFilename + wxT(".ffs_batch")))
+            cfgFilename = fullFilename + wxT(".ffs_batch");
+        else if (wxFileExists(fullFilename + wxT(".ffs_gui")))
+            cfgFilename = fullFilename + wxT(".ffs_gui");
+        else
+        {
+            wxMessageBox(wxString(_("File does not exist:")) + wxT(" \"") + fullFilename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+            return;
+        }
+    }
+
+
+//set working directory to current executable directory
     const wxString workingDir = wxFileName(wxStandardPaths::Get().GetExecutablePath()).GetPath();
     if (!wxSetWorkingDirectory(workingDir))
     {   //show messagebox and quit program immediately
         wxMessageBox(wxString(_("Could not set working directory:")) + wxT(" ") + workingDir, _("An exception occured!"), wxOK | wxICON_ERROR);
-        return false;
+        return;
     }
 
     try //load global settings from XML: must be called AFTER working dir was set
@@ -59,52 +86,33 @@ bool Application::OnInit()
         if (wxFileExists(FreeFileSync::GLOBAL_CONFIG_FILE))
         {   //show messagebox and quit program immediately
             wxMessageBox(error.show().c_str(), _("Error"), wxOK | wxICON_ERROR);
-            return false;
+            return;
         }
         //else: globalSettings already has default values
     }
 
-    //set program language: needs to happen after working directory has been set!
+//set program language: needs to happen after working directory has been set!
     SetExitOnFrameDelete(false); //prevent error messagebox from becoming top-level window
     programLanguage.setLanguage(globalSettings.shared.programLanguage);
     SetExitOnFrameDelete(true);
 
-    //load image resources from file: must be called after working directory has been set
+//load image resources from file: must be called after working directory has been set
     globalResource.load();
 
-    return true;
-}
 
-
-void Application::initialize()
-{
-    //test if FFS is to be started on UI with config file passed as commandline parameter
-    if (argc > 1)
+    if (!cfgFilename.empty())
     {
         //load file specified by %1 parameter:
-        wxString filename;
-        if (wxFileExists(argv[1]))
-            filename = argv[1];
-        else if (wxFileExists(wxString(argv[1]) + wxT(".ffs_batch")))
-            filename = wxString(argv[1]) + wxT(".ffs_batch");
-        else if (wxFileExists(wxString(argv[1]) + wxT(".ffs_gui")))
-            filename = wxString(argv[1]) + wxT(".ffs_gui");
-        else
-        {
-            wxMessageBox(wxString(_("The file does not exist:")) + wxT(" \"") + argv[1] + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
-            return;
-        }
-
-        xmlAccess::XmlType xmlConfigType = xmlAccess::getXmlType(filename);
+        xmlAccess::XmlType xmlConfigType = xmlAccess::getXmlType(cfgFilename);
         if (xmlConfigType == xmlAccess::XML_GUI_CONFIG) //start in GUI mode (configuration file specified)
         {
-            MainDialog* frame = new MainDialog(NULL, filename, &programLanguage, globalSettings);
+            MainDialog* frame = new MainDialog(NULL, cfgFilename, &programLanguage, globalSettings);
             frame->SetIcon(*globalResource.programIcon); //set application icon
             frame->Show();
         }
         else if (xmlConfigType == xmlAccess::XML_BATCH_CONFIG) //start in commandline mode
         {
-            runBatchMode(filename, globalSettings);
+            runBatchMode(cfgFilename, globalSettings);
 
             if (wxApp::GetTopWindow() == NULL) //if no windows are shown program won't exit automatically
                 ExitMainLoop();
@@ -112,7 +120,7 @@ void Application::initialize()
         }
         else
         {
-            wxMessageBox(wxString(_("The file does not contain a valid configuration:")) + wxT(" \"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(wxString(_("The file does not contain a valid configuration:")) + wxT(" \"") + cfgFilename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
             return;
         }
     }
@@ -173,15 +181,38 @@ int Application::OnExit()
 class LogFile
 {
 public:
-    LogFile()
+    LogFile(const wxString& logfileDirectory)
     {
-        wxString tmp = wxDateTime::Now().FormatISOTime();
-        tmp.Replace(wxT(":"), wxEmptyString);
+        wxString timeNow = wxDateTime::Now().FormatISOTime();
+        timeNow.Replace(wxT(":"), wxEmptyString);
 
-        //create subfolder "log" to hold logfiles
-        if (!wxDirExists(wxT("Logs")))
-            wxMkdir(wxT("Logs"));
-        wxString logfileName = wxString(wxT("Logs")) + GlobalResources::FILE_NAME_SEPARATOR + wxT("FFS_") + wxDateTime::Now().FormatISODate() + wxChar('_') + tmp + wxT(".log");
+        wxString logfileName;
+        if (logfileDirectory.empty())
+        {   //create subfolder "log" to hold logfiles
+            if (!wxDirExists(wxT("Logs")))
+                wxMkdir(wxT("Logs"));
+            logfileName = wxString(wxT("Logs")) + GlobalResources::FILE_NAME_SEPARATOR + wxT("FFS_") + wxDateTime::Now().FormatISODate() + wxChar('_') + timeNow + wxT(".log");
+        }
+        else
+        {   //use alternate logfile directory
+            if (!wxDirExists(logfileDirectory))
+                try
+                {
+                    FreeFileSync::createDirectory(logfileDirectory.c_str(), Zstring(), false);
+                }
+                catch (FileError&)
+                {
+                    readyToWrite = false;
+                    return;
+                }
+
+            logfileName = logfileDirectory;
+            if (!endsWithPathSeparator(logfileName.c_str()))
+                logfileName += GlobalResources::FILE_NAME_SEPARATOR;
+
+            logfileName += wxT("FFS_") + wxDateTime::Now().FormatISODate() + wxChar('_') + timeNow + wxT(".log");
+        }
+
 
         logFile.Open(logfileName.c_str(), wxT("w"));
         readyToWrite = logFile.IsOpened();
@@ -271,23 +302,17 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         //class handling status updates and error messages
         std::auto_ptr<BatchStatusHandler> statusHandler;  //delete object automatically
         if (batchCfg.silent)
-            statusHandler = std::auto_ptr<BatchStatusHandler>(new BatchStatusHandlerSilent(batchCfg.handleError, returnValue));
+            statusHandler = std::auto_ptr<BatchStatusHandler>(new BatchStatusHandlerSilent(batchCfg.handleError, batchCfg.logFileDirectory, returnValue));
         else
             statusHandler = std::auto_ptr<BatchStatusHandler>(new BatchStatusHandlerGui(batchCfg.handleError, returnValue));
 
         //COMPARE DIRECTORIES
         FileCompareResult currentGridData;
-#ifdef FFS_WIN
-        FreeFileSync::CompareProcess comparison(globalSettings.shared.traverseSymbolicLinks,
-                                                globalSettings.shared.handleDstOnFat32,
+        FreeFileSync::CompareProcess comparison(globalSettings.shared.traverseDirectorySymlinks,
+                                                globalSettings.shared.fileTimeTolerance,
                                                 globalSettings.shared.warningDependentFolders,
                                                 statusHandler.get());
-#elif defined FFS_LINUX
-        FreeFileSync::CompareProcess comparison(globalSettings.shared.traverseSymbolicLinks,
-                                                false,
-                                                globalSettings.shared.warningDependentFolders,
-                                                statusHandler.get());
-#endif
+
         comparison.startCompareProcess(batchCfg.directoryPairs,
                                        batchCfg.mainCfg.compareVar,
                                        currentGridData);
@@ -303,6 +328,8 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         //START SYNCHRONIZATION
         FreeFileSync::SyncProcess synchronization(
             batchCfg.mainCfg.useRecycleBin,
+            globalSettings.shared.copyFileSymlinks,
+            globalSettings.shared.traverseDirectorySymlinks,
             globalSettings.shared.warningSignificantDifference,
             statusHandler.get());
 
@@ -401,12 +428,12 @@ private:
 };
 
 
-BatchStatusHandlerSilent::BatchStatusHandlerSilent(const xmlAccess::OnError handleError, int& returnVal) :
+BatchStatusHandlerSilent::BatchStatusHandlerSilent(const xmlAccess::OnError handleError, const wxString& logfileDirectory, int& returnVal) :
         m_handleError(handleError),
         currentProcess(StatusHandler::PROCESS_NONE),
         returnValue(returnVal),
         trayIcon(new FfsTrayIcon(this)),
-        m_log(new LogFile)
+        m_log(new LogFile(logfileDirectory))
 {
     //test if log was instantiated successfully
     if (!m_log->isOkay())

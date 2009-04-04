@@ -33,6 +33,7 @@ public:
     wxBitmap* bitmapDeleteRight;
     wxBitmap* bitmapEmail;
     wxBitmap* bitmapAbout;
+    wxBitmap* bitmapAboutSmall;
     wxBitmap* bitmapWebsite;
     wxBitmap* bitmapExit;
     wxBitmap* bitmapSync;
@@ -101,6 +102,8 @@ public:
     wxBitmap* bitmapCheckBoxFalse;
     wxBitmap* bitmapSettings;
     wxBitmap* bitmapSettingsSmall;
+    wxBitmap* bitmapRecycler;
+    wxBitmap* bitmapShift;
 
     wxAnimation* animationMoney;
     wxAnimation* animationSync;

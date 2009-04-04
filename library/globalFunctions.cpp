@@ -4,13 +4,6 @@
 #include <wx/file.h>
 
 
-inline
-int globalFunctions::round(const double d)
-{
-    return static_cast<int>(d<0?d-.5:d+.5);
-}
-
-
 std::string globalFunctions::numberToString(const unsigned int number)
 {
     char result[100];
@@ -88,11 +81,12 @@ double globalFunctions::wxStringToDouble(const wxString& number)
 }
 
 
-wxString& globalFunctions::includeNumberSeparator(wxString& number)
+wxString globalFunctions::includeNumberSeparator(const wxString& number)
 {
-    for (int i = number.size() - 3; i > 0; i-= 3)
-        number.insert(i, GlobalResources::THOUSANDS_SEPARATOR);
-    return number;
+    wxString output(number);
+    for (int i = output.size() - 3; i > 0; i -= 3)
+        output.insert(i, GlobalResources::THOUSANDS_SEPARATOR);
+    return output;
 }
 
 

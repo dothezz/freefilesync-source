@@ -2,7 +2,6 @@
  * Purpose:   Code for main dialog
  * Author:    ZenJu (zhnmju123@gmx.de)
  * Created:   2008-07-16
- * Copyright: ZenJu ()
  **************************************************************/
 
 #include "mainDialog.h"
@@ -19,6 +18,7 @@
 #include "../comparison.h"
 #include "../synchronization.h"
 #include "../algorithm.h"
+#include "checkVersion.h"
 
 
 MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale* language, xmlAccess::XmlGlobalSettings& settings) :
@@ -32,8 +32,7 @@ MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale
         cmpStatusHandlerTmp(0),
         cleanedUp(false),
         lastSortColumn(-1),
-        lastSortGrid(NULL),
-        leadGrid(NULL)
+        lastSortGrid(NULL)
 {
     //initialize and load configuration
     readGlobalSettings();
@@ -48,9 +47,8 @@ MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale
     m_bpButtonSave->SetBitmapLabel(*globalResource.bitmapSave);
     m_bpButtonLoad->SetBitmapLabel(*globalResource.bitmapLoad);
     m_bpButtonAddPair->SetBitmapLabel(*globalResource.bitmapAddFolderPair);
-    m_bpButtonRemovePair->SetBitmapLabel(*globalResource.bitmapRemoveFolderPair);
-    m_bpButtonRemovePair->SetBitmapDisabled(*globalResource.bitmapRemoveFolderPairD);
     m_bitmap15->SetBitmap(*globalResource.bitmapStatusEdge);
+    m_bitmapShift->SetBitmap(*globalResource.bitmapShift);
 
     bSizer6->Layout(); //wxButtonWithImage size might have changed
 
@@ -59,16 +57,20 @@ MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale
     m_menuItem11->SetBitmap(*globalResource.bitmapSyncSmall);
     m_menuItem7->SetBitmap(*globalResource.bitmapBatchSmall);
     m_menuItemGlobSett->SetBitmap(*globalResource.bitmapSettingsSmall);
+    m_menuItemAbout->SetBitmap(*globalResource.bitmapAboutSmall);
 
-    //Workaround for wxWidgets: small hack to update menu items: actually this is a wxWidgets bug (affects Windows- and Linux-build)
+    //workaround for wxWidgets: small hack to update menu items: actually this is a wxWidgets bug (affects Windows- and Linux-build)
     m_menu1->Remove(m_menuItem10);
     m_menu1->Remove(m_menuItem11);
     m_menu1->Insert(0, m_menuItem10);
     m_menu1->Insert(1, m_menuItem11);
-    m_menu3->Remove(m_menuItem7);
     m_menu3->Remove(m_menuItemGlobSett);
-    m_menu3->Insert(2, m_menuItem7);
-    m_menu3->Insert(3, m_menuItemGlobSett);
+    m_menu3->Remove(m_menuItem7);
+    m_menu3->Insert(2, m_menuItemGlobSett);
+    m_menu3->Insert(3, m_menuItem7);
+
+    m_menu33->Remove(m_menuItemAbout);
+    m_menu33->Insert(2, m_menuItemAbout);
 
     //prepare drag & drop
     m_panel1->SetDropTarget(new MainWindowDropTarget(this, m_panel1));
@@ -85,36 +87,6 @@ MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale
     m_gridRight->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onGridRightButtonEvent), NULL, this);
     m_gridMiddle->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onGridMiddleButtonEvent), NULL, this);
 
-    //identify leading grid by keyboard input or scroll action
-    m_gridLeft->Connect(wxEVT_KEY_DOWN,               wxEventHandler(MainDialog::onGridLeftAccess), NULL, this);
-    m_gridLeft->Connect(wxEVT_SCROLLWIN_TOP,          wxEventHandler(MainDialog::onGridLeftAccess), NULL, this);
-    m_gridLeft->Connect(wxEVT_SCROLLWIN_BOTTOM,       wxEventHandler(MainDialog::onGridLeftAccess), NULL, this);
-    m_gridLeft->Connect(wxEVT_SCROLLWIN_LINEUP,       wxEventHandler(MainDialog::onGridLeftAccess), NULL, this);
-    m_gridLeft->Connect(wxEVT_SCROLLWIN_LINEDOWN,     wxEventHandler(MainDialog::onGridLeftAccess), NULL, this);
-    m_gridLeft->Connect(wxEVT_SCROLLWIN_PAGEUP,       wxEventHandler(MainDialog::onGridLeftAccess), NULL, this);
-    m_gridLeft->Connect(wxEVT_SCROLLWIN_PAGEDOWN,     wxEventHandler(MainDialog::onGridLeftAccess), NULL, this);
-    m_gridLeft->Connect(wxEVT_SCROLLWIN_THUMBTRACK,   wxEventHandler(MainDialog::onGridLeftAccess), NULL, this);
-    m_gridLeft->Connect(wxEVT_SCROLLWIN_THUMBRELEASE, wxEventHandler(MainDialog::onGridLeftAccess), NULL, this);
-    m_gridLeft->Connect(wxEVT_GRID_LABEL_LEFT_CLICK,  wxEventHandler(MainDialog::onGridLeftAccess), NULL, this);
-    m_gridLeft->GetGridWindow()->Connect(wxEVT_LEFT_DOWN, wxEventHandler(MainDialog::onGridLeftAccess), NULL, this);
-
-    m_gridRight->Connect(wxEVT_KEY_DOWN,               wxEventHandler(MainDialog::onGridRightAccess), NULL, this);
-    m_gridRight->Connect(wxEVT_SCROLLWIN_TOP,          wxEventHandler(MainDialog::onGridRightAccess), NULL, this);
-    m_gridRight->Connect(wxEVT_SCROLLWIN_BOTTOM,       wxEventHandler(MainDialog::onGridRightAccess), NULL, this);
-    m_gridRight->Connect(wxEVT_SCROLLWIN_LINEUP,       wxEventHandler(MainDialog::onGridRightAccess), NULL, this);
-    m_gridRight->Connect(wxEVT_SCROLLWIN_LINEDOWN,     wxEventHandler(MainDialog::onGridRightAccess), NULL, this);
-    m_gridRight->Connect(wxEVT_SCROLLWIN_PAGEUP,       wxEventHandler(MainDialog::onGridRightAccess), NULL, this);
-    m_gridRight->Connect(wxEVT_SCROLLWIN_PAGEDOWN,     wxEventHandler(MainDialog::onGridRightAccess), NULL, this);
-    m_gridRight->Connect(wxEVT_SCROLLWIN_THUMBTRACK,   wxEventHandler(MainDialog::onGridRightAccess), NULL, this);
-    m_gridRight->Connect(wxEVT_SCROLLWIN_THUMBRELEASE, wxEventHandler(MainDialog::onGridRightAccess), NULL, this);
-    m_gridRight->Connect(wxEVT_GRID_LABEL_LEFT_CLICK,  wxEventHandler(MainDialog::onGridRightAccess), NULL, this);
-    m_gridRight->GetGridWindow()->Connect(wxEVT_LEFT_DOWN, wxEventHandler(MainDialog::onGridRightAccess), NULL, this);
-
-    m_gridMiddle->Connect(wxEVT_KEY_DOWN,               wxEventHandler(MainDialog::onGridMiddleAccess), NULL, this);
-    m_gridMiddle->Connect(wxEVT_SCROLLWIN_LINEUP,       wxEventHandler(MainDialog::onGridMiddleAccess), NULL, this);
-    m_gridMiddle->Connect(wxEVT_SCROLLWIN_LINEDOWN,     wxEventHandler(MainDialog::onGridMiddleAccess), NULL, this);
-    m_gridMiddle->GetGridWindow()->Connect(wxEVT_LEFT_DOWN, wxEventHandler(MainDialog::onGridMiddleAccess), NULL, this);
-
     Connect(wxEVT_IDLE, wxEventHandler(MainDialog::OnIdleEvent), NULL, this);
     m_gridMiddle->GetGridWindow()->Connect(wxEVT_LEFT_UP, wxEventHandler(MainDialog::OnGrid3LeftMouseUp), NULL, this);
     m_gridMiddle->GetGridWindow()->Connect(wxEVT_LEFT_DOWN, wxEventHandler(MainDialog::OnGrid3LeftMouseDown), NULL, this);
@@ -122,21 +94,10 @@ MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale
     Connect(wxEVT_SIZE, wxEventHandler(MainDialog::onResizeMainWindow), NULL, this);
     Connect(wxEVT_MOVE, wxEventHandler(MainDialog::onResizeMainWindow), NULL, this);
 
-    const wxString header = _("Legend");
-    wxString toolTip = header + wxT("\n") +
-                       wxString().Pad(header.Len(), wxChar('-')) + wxT("\n") +
-                       _("<|	file on left side only\n") +
-                       _("|>	file on right side only\n") +
-                       _("<<	left file is newer\n") +
-                       _(">>	right file is newer\n") +
-                       _("!=	files are different\n") +
-                       _("==	files are equal\n\n");
-    m_gridMiddle->GetGridWindow()->SetToolTip(toolTip);
-
     //init grid settings
-    m_gridLeft->initSettings(  true,  m_gridLeft, m_gridRight, m_gridMiddle, &gridRefUI, &currentGridData);
-    m_gridMiddle->initSettings(false, m_gridLeft, m_gridRight, m_gridMiddle, &gridRefUI, &currentGridData);
-    m_gridRight->initSettings( true,  m_gridLeft, m_gridRight, m_gridMiddle, &gridRefUI, &currentGridData);
+    m_gridLeft->initSettings(  true, globalSettings.gui.showFileIcons, m_gridLeft, m_gridRight, m_gridMiddle, &gridRefUI, &currentGridData);
+    m_gridMiddle->initSettings(false, false, m_gridLeft, m_gridRight, m_gridMiddle, &gridRefUI, &currentGridData);
+    m_gridRight->initSettings( true, globalSettings.gui.showFileIcons, m_gridLeft, m_gridRight, m_gridMiddle, &gridRefUI, &currentGridData);
 
     //disable sync button as long as "compare" hasn't been triggered.
     enableSynchronization(false);
@@ -161,6 +122,9 @@ MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale
     case wxLANGUAGE_GERMAN:
         m_menuItemGerman->Check();
         break;
+    case wxLANGUAGE_HUNGARIAN:
+        m_menuItemHungarian->Check();
+        break;
     case wxLANGUAGE_ITALIAN:
         m_menuItemItalian->Check();
         break;
@@ -172,6 +136,12 @@ MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale
         break;
     case wxLANGUAGE_PORTUGUESE:
         m_menuItemPortuguese->Check();
+        break;
+    case wxLANGUAGE_SLOVENIAN:
+        m_menuItemSlovenian->Check();
+        break;
+    case wxLANGUAGE_SPANISH:
+        m_menuItemSpanish->Check();
         break;
     default:
         m_menuItemEnglish->Check();
@@ -204,7 +174,7 @@ void MainDialog::cleanUp()
     {
         cleanedUp = true;
 
-        //no need for event disconnect here; done automatically
+        //no need for event Disconnect() here; done automatically
 
         //save configuration
         writeConfigurationToXml(FreeFileSync::LAST_CONFIG_FILE);   //don't trow exceptions in destructors
@@ -238,9 +208,17 @@ void MainDialog::readGlobalSettings()
     for (std::vector<wxString>::reverse_iterator i = globalSettings.gui.cfgFileHistory.rbegin();
             i != globalSettings.gui.cfgFileHistory.rend();
             ++i)
-        addCfgFileToHistory(*i);
-    m_choiceHistory->SetSelection(0);
+        addFileToCfgHistory(*i);
 
+    //load list of last used folders
+    for (std::vector<wxString>::reverse_iterator i = globalSettings.gui.folderHistoryLeft.rbegin();
+            i != globalSettings.gui.folderHistoryLeft.rend();
+            ++i)
+        addLeftFolderToHistory(*i);
+    for (std::vector<wxString>::reverse_iterator i = globalSettings.gui.folderHistoryRight.rbegin();
+            i != globalSettings.gui.folderHistoryRight.rend();
+            ++i)
+        addRightFolderToHistory(*i);
 }
 
 
@@ -259,121 +237,17 @@ void MainDialog::writeGlobalSettings()
 
     //write list of last used configuration files
     globalSettings.gui.cfgFileHistory = cfgFileNames;
-}
 
+    //write list of last used folders
+    globalSettings.gui.folderHistoryLeft.clear();
+    const wxArrayString leftFolderHistory = m_comboBoxDirLeft->GetStrings();
+    for (unsigned i = 0; i < leftFolderHistory.GetCount(); ++i)
+        globalSettings.gui.folderHistoryLeft.push_back(leftFolderHistory[i]);
 
-inline
-bool gridShouldBeCleared(const wxEvent& event)
-{
-    try //test if CTRL was pressed during a mouse event
-    {
-        const wxMouseEvent& mouseEvent = dynamic_cast<const wxMouseEvent&> (event);
-        if (mouseEvent.ButtonDown(wxMOUSE_BTN_LEFT) && !mouseEvent.ControlDown() && !mouseEvent.ShiftDown())
-            return true;
-        else
-            return false;
-    }
-    catch (std::bad_cast&) {}
-
-    try //test if CTRL was pressed during a key event
-    {
-        const wxKeyEvent& keyEvent = dynamic_cast<const wxKeyEvent&> (event);
-
-        if (keyEvent.ShiftDown())
-            return false;
-
-        switch (keyEvent.GetKeyCode())
-        {
-        case WXK_SPACE:
-        case WXK_TAB:
-        case WXK_RETURN:
-        case WXK_ESCAPE:
-        case WXK_NUMPAD_ENTER:
-        case WXK_LEFT:
-        case WXK_UP:
-        case WXK_RIGHT:
-        case WXK_DOWN:
-            return true;
-
-        default:
-            return false;
-        }
-    }
-    catch (std::bad_cast&) {}
-
-    return false;
-}
-
-
-void MainDialog::onGridLeftAccess(wxEvent& event)
-{
-    if (leadGrid != m_gridLeft)
-    {
-        leadGrid = m_gridLeft;
-
-        //notify grids of new user focus
-        m_gridLeft->setLeadGrid(leadGrid);
-        m_gridMiddle->setLeadGrid(leadGrid);
-        m_gridRight->setLeadGrid(leadGrid);
-
-        m_gridLeft->SetFocus();
-    }
-
-    if (gridShouldBeCleared(event))
-    {
-        m_gridLeft->ClearSelection();
-        m_gridRight->ClearSelection();
-    }
-
-    event.Skip();
-}
-
-
-void MainDialog::onGridRightAccess(wxEvent& event)
-{
-    if (leadGrid != m_gridRight)
-    {
-        leadGrid = m_gridRight;
-
-        //notify grids of new user focus
-        m_gridLeft->setLeadGrid(leadGrid);
-        m_gridMiddle->setLeadGrid(leadGrid);
-        m_gridRight->setLeadGrid(leadGrid);
-
-        m_gridRight->SetFocus();
-    }
-
-    if (gridShouldBeCleared(event))
-    {
-        m_gridLeft->ClearSelection();
-        m_gridRight->ClearSelection();
-    }
-
-    event.Skip();
-}
-
-
-void MainDialog::onGridMiddleAccess(wxEvent& event)
-{
-    if (leadGrid != m_gridMiddle)
-    {
-        leadGrid = m_gridMiddle;
-
-        //notify grids of new user focus
-        m_gridLeft->setLeadGrid(leadGrid);
-        m_gridMiddle->setLeadGrid(leadGrid);
-        m_gridRight->setLeadGrid(leadGrid);
-
-        m_gridMiddle->SetFocus();
-    }
-
-    if (gridShouldBeCleared(event))
-    {
-        m_gridLeft->ClearSelection();
-        m_gridRight->ClearSelection();
-    }
-
-    event.Skip();
+    globalSettings.gui.folderHistoryRight.clear();
+    const wxArrayString rightFolderHistory = m_comboBoxDirRight->GetStrings();
+    for (unsigned i = 0; i < rightFolderHistory.GetCount(); ++i)
+        globalSettings.gui.folderHistoryRight.push_back(rightFolderHistory[i]);
 }
 
 
@@ -608,7 +482,7 @@ std::set<int> MainDialog::getSelectedRows(const wxGrid* grid)
     }
 
     //some exception: also add current cursor row to selection if there are no others... hopefully improving usability
-    if (output.empty() && grid == leadGrid)
+    if (output.empty() && grid == m_gridLeft->getLeadGrid())
         output.insert(const_cast<wxGrid*>(grid)->GetCursorRow()); //messy wxGrid implementation...
 
     removeInvalidRows(output, gridRefUI.size());
@@ -677,6 +551,12 @@ void MainDialog::deleteFilesOnGrid(const std::set<int>& selectedRowsLeft, const 
                 globalSettings.gui.useRecyclerForManualDeletion);
         if (confirmDeletion->ShowModal() == DeleteDialog::BUTTON_OKAY)
         {
+            if (globalSettings.gui.useRecyclerForManualDeletion && !FreeFileSync::recycleBinExists())
+            {
+                wxMessageBox(_("Unable to initialize Recycle Bin!"));
+                return;
+            }
+
             //Attention! Modifying the grid is highly critical! There MUST NOT BE any accesses to gridRefUI until this reference table is updated
             //by writeGrid()!! This is easily missed, e.g. when ClearSelection() or ShowModal() or possibly any other wxWidgets function is called
             //that might want to redraw the UI (which implicitly uses the information in gridRefUI and currentGridData (see CustomGrid)
@@ -714,7 +594,7 @@ void MainDialog::openWithFileManager(int rowNumber, const wxGrid* grid)
         if (0 <= rowNumber && rowNumber < int(gridRefUI.size()))
             fileDescr = &currentGridData[gridRefUI[rowNumber]].fileDescrLeft;
 #ifdef FFS_WIN
-        command = wxString(wxT("explorer ")) + FreeFileSync::getFormattedDirectoryName(m_directoryLeft->GetValue().c_str()).c_str(); //default
+        command = wxString(wxT("explorer ")) + FreeFileSync::getFormattedDirectoryName(m_comboBoxDirLeft->GetValue().c_str()).c_str(); //default
 #endif  // FFS_WIN
     }
     else if (grid == m_gridRight)
@@ -722,7 +602,7 @@ void MainDialog::openWithFileManager(int rowNumber, const wxGrid* grid)
         if (0 <= rowNumber && rowNumber < int(gridRefUI.size()))
             fileDescr = &currentGridData[gridRefUI[rowNumber]].fileDescrRight;
 #ifdef FFS_WIN
-        command = wxString(wxT("explorer ")) + FreeFileSync::getFormattedDirectoryName(m_directoryRight->GetValue().c_str()).c_str(); //default
+        command = wxString(wxT("explorer ")) + FreeFileSync::getFormattedDirectoryName(m_comboBoxDirRight->GetValue().c_str()).c_str(); //default
 #endif  // FFS_WIN
     }
     else
@@ -737,13 +617,13 @@ void MainDialog::openWithFileManager(int rowNumber, const wxGrid* grid)
         {
             command = globalSettings.gui.commandLineFileManager;
             command.Replace(wxT("%name"), fileDescr->fullName.c_str());
-            command.Replace(wxT("%path"), fileDescr->relativeName.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR).c_str());
+            command.Replace(wxT("%path"), wxString(fileDescr->fullName.c_str()).BeforeLast(GlobalResources::FILE_NAME_SEPARATOR));
         }
         else if (fileDescr->objType == FileDescrLine::TYPE_DIRECTORY)
         {
             command = globalSettings.gui.commandLineFileManager;
             command.Replace(wxT("%name"), fileDescr->fullName.c_str());
-            command.Replace(wxT("%path"), fileDescr->relativeName.c_str());
+            command.Replace(wxT("%path"), fileDescr->fullName.c_str());
         }
     }
 
@@ -927,7 +807,8 @@ void MainDialog::OnContextMenu(wxGridEvent& event)
     //CONTEXT_CLIPBOARD
     contextMenu->Append(CONTEXT_CLIPBOARD, _("Copy to clipboard\tCTRL+C"));
 
-    if (leadGrid == m_gridLeft && selectionLeft.size() || leadGrid == m_gridRight && selectionRight.size())
+    if (    (m_gridLeft->isLeadGrid()  && selectionLeft.size()) ||
+            (m_gridRight->isLeadGrid() && selectionRight.size()))
         contextMenu->Enable(CONTEXT_CLIPBOARD, true);
     else
         contextMenu->Enable(CONTEXT_CLIPBOARD, false);
@@ -936,7 +817,8 @@ void MainDialog::OnContextMenu(wxGridEvent& event)
     //CONTEXT_EXPLORER
     contextMenu->Append(CONTEXT_EXPLORER, _("Open with File Manager\tD-Click"));
 
-    if (leadGrid == m_gridLeft && selectionLeft.size() <= 1 || leadGrid == m_gridRight && selectionRight.size() <= 1)
+    if (    (m_gridLeft->isLeadGrid()  && selectionLeft.size() <= 1) ||
+            (m_gridRight->isLeadGrid() && selectionRight.size() <= 1))
         contextMenu->Enable(CONTEXT_EXPLORER, true);
     else
         contextMenu->Enable(CONTEXT_EXPLORER, false);
@@ -1037,14 +919,18 @@ void MainDialog::OnContextMenuSelection(wxCommandEvent& event)
 
     else if (eventId == CONTEXT_CLIPBOARD)
     {
-        if (leadGrid == m_gridLeft || leadGrid == m_gridRight)
-            copySelectionToClipboard(leadGrid);
+        if (m_gridLeft->isLeadGrid())
+            copySelectionToClipboard(m_gridLeft);
+        else if (m_gridRight->isLeadGrid())
+            copySelectionToClipboard(m_gridRight);
     }
 
     else if (eventId == CONTEXT_EXPLORER)
     {
-        if (leadGrid == m_gridLeft || leadGrid == m_gridRight)
+        if (m_gridLeft->isLeadGrid() || m_gridRight->isLeadGrid())
         {
+            const wxGrid* const leadGrid = m_gridLeft->getLeadGrid();
+
             std::set<int> selection = getSelectedRows(leadGrid);
 
             if (selection.size() == 1)
@@ -1157,9 +1043,9 @@ void MainDialog::OnWriteDirManually(wxCommandEvent& event)
         wxObject* eventObj = event.GetEventObject();
 
         //first check if event comes from main folder pair
-        if (eventObj == (wxObject*)m_directoryLeft)
+        if (eventObj == (wxObject*)m_comboBoxDirLeft)
             m_dirPickerLeft->SetPath(newDir);
-        else if (eventObj == (wxObject*)m_directoryRight)
+        else if (eventObj == (wxObject*)m_comboBoxDirRight)
             m_dirPickerRight->SetPath(newDir);
         else
         {
@@ -1191,9 +1077,15 @@ void MainDialog::OnDirSelected(wxFileDirPickerEvent& event)
 
     //first check if event comes from main folder pair
     if (eventObj == (wxObject*)m_dirPickerLeft)
-        m_directoryLeft->SetValue(newPath);
+    {
+        m_comboBoxDirLeft->SetSelection(wxNOT_FOUND);
+        m_comboBoxDirLeft->SetValue(newPath);
+    }
     else if (eventObj == (wxObject*)m_dirPickerRight)
-        m_directoryRight->SetValue(newPath);
+    {
+        m_comboBoxDirRight->SetSelection(wxNOT_FOUND);
+        m_comboBoxDirRight->SetValue(newPath);
+    }
     else //check if event comes from additional pairs
     {
         for (std::vector<FolderPairGenerated*>::const_iterator i = additionalFolderPairs.begin(); i != additionalFolderPairs.end(); ++i)
@@ -1245,7 +1137,11 @@ bool sameFileSpecified(const wxString& file1, const wxString& file2)
     if (wxFileName(file2).GetPath() == wxEmptyString)
         file2Full = wxFileName::GetCwd() + GlobalResources::FILE_NAME_SEPARATOR + file2;
 
-    return (file1Full == file2Full);
+#ifdef FFS_WIN //don't respect case in windows build
+    return FreeFileSync::compareStringsWin32(file1Full.c_str(), file2Full.c_str()) == 0;
+#elif defined FFS_LINUX
+    return file1Full == file2Full;
+#endif
 }
 
 
@@ -1264,7 +1160,7 @@ private:
 };
 
 
-void MainDialog::addCfgFileToHistory(const wxString& filename)
+void MainDialog::addFileToCfgHistory(const wxString& filename)
 {
     //only (still) existing files should be included in the list
     if (!wxFileExists(filename))
@@ -1281,7 +1177,7 @@ void MainDialog::addCfgFileToHistory(const wxString& filename)
 
         //the default config file should receive another name on GUI
         if (sameFileSpecified(FreeFileSync::LAST_CONFIG_FILE, filename))
-            m_choiceHistory->Insert(getFormattedHistoryElement(_("<Last session>")), 0);  //insert at beginning of list
+            m_choiceHistory->Insert(_("<Last session>"), 0);  //insert at beginning of list
         else
             m_choiceHistory->Insert(getFormattedHistoryElement(filename), 0);  //insert at beginning of list
 
@@ -1312,7 +1208,8 @@ bool MainWindowDropTarget::OnDropFiles(wxCoord x, wxCoord y, const wxArrayString
 }
 
 
-void setDirectoryFromDrop(const wxString& elementName, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker)
+template <class Ctrl>
+void setDirectoryFromDrop(const wxString& elementName, Ctrl* txtCtrl, wxDirPickerCtrl* dirPicker)
 {
     wxString fileName = elementName;
 
@@ -1362,10 +1259,16 @@ void MainDialog::OnFilesDropped(FfsFileDropEvent& event)
     }
     //test if main folder pair is drop target
     else if (dropTarget == m_panel1)
-        setDirectoryFromDrop(droppedFileName, m_directoryLeft, m_dirPickerLeft);
+    {
+        m_comboBoxDirLeft->SetSelection(wxNOT_FOUND);
+        setDirectoryFromDrop<wxComboBox>(droppedFileName, m_comboBoxDirLeft, m_dirPickerLeft);
+    }
 
     else if (dropTarget == m_panel2)
-        setDirectoryFromDrop(droppedFileName, m_directoryRight, m_dirPickerRight);
+    {
+        m_comboBoxDirRight->SetSelection(wxNOT_FOUND);
+        setDirectoryFromDrop<wxComboBox>(droppedFileName, m_comboBoxDirRight, m_dirPickerRight);
+    }
 
     else //test if additional folder pairs are drop targets
     {
@@ -1374,16 +1277,62 @@ void MainDialog::OnFilesDropped(FfsFileDropEvent& event)
             FolderPairGenerated* dirPair = *i;
             if (dropTarget == (dirPair->m_panelLeft))
             {
-                setDirectoryFromDrop(droppedFileName, dirPair->m_directoryLeft, dirPair->m_dirPickerLeft);
+                setDirectoryFromDrop<wxTextCtrl>(droppedFileName, dirPair->m_directoryLeft, dirPair->m_dirPickerLeft);
                 break;
             }
             else if (dropTarget == (dirPair->m_panelRight))
             {
-                setDirectoryFromDrop(droppedFileName, dirPair->m_directoryRight, dirPair->m_dirPickerRight);
+                setDirectoryFromDrop<wxTextCtrl>(droppedFileName, dirPair->m_directoryRight, dirPair->m_dirPickerRight);
                 break;
             }
         }
     }
+}
+
+
+int findTextPos(const wxArrayString& array, const wxString& text)
+{
+    for (unsigned int i = 0; i < array.GetCount(); ++i)
+#ifdef FFS_WIN //don't respect case in windows build
+        if (FreeFileSync::compareStringsWin32(array[i].c_str(), text.c_str()) == 0)
+#elif defined FFS_LINUX
+        if (array[i] == text)
+#endif
+            return i;
+
+    return -1;
+}
+
+
+void addPairToFolderHistory(wxComboBox* comboBox, const wxString& newFolder)
+{
+    const wxString oldVal = comboBox->GetValue();
+
+    const int pos = findTextPos(comboBox->GetStrings(), newFolder);
+    if (pos >= 0)
+        comboBox->Delete(pos);
+
+    comboBox->Insert(newFolder, 0);
+
+    //keep maximal size of history list
+    const unsigned MAX_FOLDER_HIST_COUNT = 12;
+    if (comboBox->GetCount() > MAX_FOLDER_HIST_COUNT)
+        comboBox->Delete(MAX_FOLDER_HIST_COUNT);
+
+    comboBox->SetSelection(wxNOT_FOUND);  //don't select anything
+    comboBox->SetValue(oldVal);           //but preserve main text!
+}
+
+
+void MainDialog::addLeftFolderToHistory(const wxString& leftFolder)
+{
+    addPairToFolderHistory(m_comboBoxDirLeft, leftFolder);
+}
+
+
+void MainDialog::addRightFolderToHistory(const wxString& rightFolder)
+{
+    addPairToFolderHistory(m_comboBoxDirRight, rightFolder);
 }
 
 
@@ -1399,7 +1348,7 @@ void MainDialog::OnSaveConfig(wxCommandEvent& event)
     {
         wxString newFileName = filePicker->GetPath();
 
-        if (wxFileExists(newFileName))
+        if (FreeFileSync::fileExists(newFileName.c_str()))
         {
             wxMessageDialog* messageDlg = new wxMessageDialog(this, wxString(_("File already exists. Overwrite?")) + wxT(" \"") + newFileName + wxT("\""), _("Warning") , wxOK | wxCANCEL);
 
@@ -1456,21 +1405,58 @@ void MainDialog::loadConfiguration(const wxString& filename)
 }
 
 
-void MainDialog::OnChoiceKeyEvent(wxKeyEvent& event)
+void MainDialog::OnCfgHistoryKeyEvent(wxKeyEvent& event)
 {
     const int keyCode = event.GetKeyCode();
     if (keyCode == WXK_DELETE || keyCode == WXK_NUMPAD_DELETE)
     {   //try to delete the currently selected config history item
         const int selectedItem = m_choiceHistory->GetCurrentSelection();
         if (    0 <= selectedItem &&
-                unsigned(selectedItem) < m_choiceHistory->GetCount() &&
-                unsigned(selectedItem) < cfgFileNames.size())
+                selectedItem < int(m_choiceHistory->GetCount()) &&
+                selectedItem < int(cfgFileNames.size()))
         {   //delete selected row
             cfgFileNames.erase(cfgFileNames.begin() + selectedItem);
             m_choiceHistory->Delete(selectedItem);
-            m_choiceHistory->SetSelection(0);
         }
     }
+    event.Skip();
+}
+
+
+void removeSelectedElement(wxComboBox* control, wxEvent& event)
+{
+    const int selectedItem = control->GetCurrentSelection();
+    if (0 <= selectedItem && selectedItem < int(control->GetCount()))
+    {
+        const wxString oldVal = control->GetValue();
+        control->Delete(selectedItem);
+        control->SetSelection(wxNOT_FOUND);
+        control->SetValue(oldVal);
+    }
+    else
+        event.Skip();
+}
+
+
+void MainDialog::OnFolderHistoryKeyEvent(wxKeyEvent& event)
+{
+
+    /*
+        const int keyCode = event.GetKeyCode();
+        if (keyCode == WXK_DELETE || keyCode == WXK_NUMPAD_DELETE)
+        {
+            wxObject* eventObj = event.GetEventObject();
+            if (eventObj == (wxObject*)m_comboBoxDirLeft)
+            {
+                removeSelectedElement(m_comboBoxDirLeft, event);
+                return; //no event.Skip() here!
+            }
+            else if (eventObj == (wxObject*)m_comboBoxDirRight)
+            {
+                removeSelectedElement(m_comboBoxDirRight, event);
+                return;
+            }
+        }*/
     event.Skip();
 }
 
@@ -1543,37 +1529,37 @@ bool MainDialog::readConfigurationFromXml(const wxString& filename, bool program
 
     //read folder pairs:
     //clear existing pairs first
-    m_directoryLeft->SetValue(wxEmptyString);
+    m_comboBoxDirLeft->SetSelection(wxNOT_FOUND);
+    m_comboBoxDirLeft->SetValue(wxEmptyString);
     m_dirPickerLeft->SetPath(wxEmptyString);
-    m_directoryRight->SetValue(wxEmptyString);
+    m_comboBoxDirRight->SetSelection(wxNOT_FOUND);
+    m_comboBoxDirRight->SetValue(wxEmptyString);
     m_dirPickerRight->SetPath(wxEmptyString);
 
-    removeFolderPair(true);
+    clearFolderPairs();
 
-    //set main folder pair
-    const unsigned int folderPairCount = guiCfg.directoryPairs.size();
-    if (folderPairCount > 0)
+    if (guiCfg.directoryPairs.size() > 0)
     {
-        std::vector<FolderPair>::const_iterator i = guiCfg.directoryPairs.begin();
+        //set main folder pair
+        std::vector<FolderPair>::const_iterator main = guiCfg.directoryPairs.begin();
 
-        m_directoryLeft->SetValue(i->leftDirectory.c_str());
-        wxString leftDirFormatted = FreeFileSync::getFormattedDirectoryName(i->leftDirectory).c_str();
+        m_comboBoxDirLeft->SetValue(main->leftDirectory.c_str());
+        const wxString leftDirFormatted = FreeFileSync::getFormattedDirectoryName(main->leftDirectory).c_str();
         if (wxDirExists(leftDirFormatted))
             m_dirPickerLeft->SetPath(leftDirFormatted);
+        addLeftFolderToHistory(main->leftDirectory.c_str()); //another hack: wxCombobox::Insert() asynchronously sends message overwriting a later wxCombobox::SetValue()!!! :(
 
-        m_directoryRight->SetValue(i->rightDirectory.c_str());
-        wxString rightDirFormatted = FreeFileSync::getFormattedDirectoryName(i->rightDirectory).c_str();
+        m_comboBoxDirRight->SetValue(main->rightDirectory.c_str());
+        const wxString rightDirFormatted = FreeFileSync::getFormattedDirectoryName(main->rightDirectory).c_str();
         if (wxDirExists(rightDirFormatted))
             m_dirPickerRight->SetPath(rightDirFormatted);
+        addRightFolderToHistory(main->rightDirectory.c_str()); //another hack...
 
         //set additional pairs
+        std::vector<FolderPair> additionalPairs; //don't modify guiCfg.directoryPairs!
         for (std::vector<FolderPair>::const_iterator i = guiCfg.directoryPairs.begin() + 1; i != guiCfg.directoryPairs.end(); ++i)
-            addFolderPair(i->leftDirectory.c_str(), i->rightDirectory.c_str());
-
-        //adjust folder pair buttons
-        const int additionalFolderCount = folderPairCount - 1;
-        if (additionalFolderCount <= 0)
-            m_bpButtonRemovePair->Disable();
+            additionalPairs.push_back(*i);
+        addFolderPair(additionalPairs);
     }
 
     //read GUI layout
@@ -1583,7 +1569,7 @@ bool MainDialog::readConfigurationFromXml(const wxString& filename, bool program
     ignoreErrors = guiCfg.ignoreErrors;
 
     //###########################################################
-    addCfgFileToHistory(filename); //put filename on list of last used config files
+    addFileToCfgHistory(filename); //put filename on list of last used config files
 
     if (filename == FreeFileSync::LAST_CONFIG_FILE) //set title
     {
@@ -1625,7 +1611,7 @@ bool MainDialog::writeConfigurationToXml(const wxString& filename)
     }
 
     //put filename on list of last used config files
-    addCfgFileToHistory(filename);
+    addFileToCfgHistory(filename);
 
     if (filename == FreeFileSync::LAST_CONFIG_FILE) //set title
     {
@@ -1867,8 +1853,8 @@ std::vector<FolderPair> MainDialog::getFolderPairs()
 
     //add main pair
     FolderPair newPair;
-    newPair.leftDirectory  = m_directoryLeft->GetValue().c_str();
-    newPair.rightDirectory = m_directoryRight->GetValue().c_str();
+    newPair.leftDirectory  = m_comboBoxDirLeft->GetValue().c_str();
+    newPair.rightDirectory = m_comboBoxDirRight->GetValue().c_str();
     output.push_back(newPair);
 
     //add additional pairs
@@ -1886,6 +1872,8 @@ std::vector<FolderPair> MainDialog::getFolderPairs()
 
 void MainDialog::OnCompare(wxCommandEvent &event)
 {
+    //PERF_START;
+
     clearStatusBar();
 
     wxBusyCursor dummy; //show hourglass cursor
@@ -1900,17 +1888,11 @@ void MainDialog::OnCompare(wxCommandEvent &event)
         CompareStatusHandler statusHandler(this);
         cmpStatusHandlerTmp = &statusHandler;
 
-#ifdef FFS_WIN
-        FreeFileSync::CompareProcess comparison(globalSettings.shared.traverseSymbolicLinks,
-                                                globalSettings.shared.handleDstOnFat32,
+        FreeFileSync::CompareProcess comparison(globalSettings.shared.traverseDirectorySymlinks,
+                                                globalSettings.shared.fileTimeTolerance,
                                                 globalSettings.shared.warningDependentFolders,
                                                 &statusHandler);
-#elif defined FFS_LINUX
-        FreeFileSync::CompareProcess comparison(globalSettings.shared.traverseSymbolicLinks,
-                                                false,
-                                                globalSettings.shared.warningDependentFolders,
-                                                &statusHandler);
-#endif
+
         comparison.startCompareProcess(getFolderPairs(),
                                        cfg.compareVar,
                                        currentGridData);
@@ -1952,6 +1934,10 @@ void MainDialog::OnCompare(wxCommandEvent &event)
         m_gridLeft->ClearSelection();
         m_gridMiddle->ClearSelection();
         m_gridRight->ClearSelection();
+
+        //add to folder history after successful comparison only
+        addLeftFolderToHistory(m_comboBoxDirLeft->GetValue());
+        addRightFolderToHistory(m_comboBoxDirRight->GetValue());
     }
 
     //refresh grid in ANY case! (also on abort)
@@ -2020,6 +2006,8 @@ void MainDialog::OnSync(wxCommandEvent& event)
             //start synchronization and return elements that were not sync'ed in currentGridData
             FreeFileSync::SyncProcess synchronization(
                 cfg.useRecycleBin,
+                globalSettings.shared.copyFileSymlinks,
+                globalSettings.shared.traverseDirectorySymlinks,
                 globalSettings.shared.warningSignificantDifference,
                 &statusHandler);
 
@@ -2211,11 +2199,16 @@ void MainDialog::OnSortMiddleGrid(wxGridEvent& event)
 void MainDialog::OnSwapDirs( wxCommandEvent& event )
 {
     //swap directory names : main pair
-    wxString tmp = m_directoryLeft->GetValue();
-    m_directoryLeft->SetValue(m_directoryRight->GetValue());
-    m_directoryRight->SetValue(tmp);
+    const wxString leftDir  = m_comboBoxDirLeft->GetValue();
+    const wxString rightDir = m_comboBoxDirRight->GetValue();
+    m_comboBoxDirLeft->SetSelection(wxNOT_FOUND);
+    m_comboBoxDirRight->SetSelection(wxNOT_FOUND);
+
+    m_comboBoxDirLeft->SetValue(rightDir);
+    m_comboBoxDirRight->SetValue(leftDir);
 
     //additional pairs
+    wxString tmp;
     for (std::vector<FolderPairGenerated*>::const_iterator i = additionalFolderPairs.begin(); i != additionalFolderPairs.end(); ++i)
     {
         FolderPairGenerated* dirPair = *i;
@@ -2283,8 +2276,7 @@ void MainDialog::updateStatusInformation(const GridView& visibleGrid)
             statusLeftNew+= _("1 directory");
         else
         {
-            wxString folderCount = globalFunctions::numberToWxString(foldersOnLeftView);
-            globalFunctions::includeNumberSeparator(folderCount);
+            wxString folderCount = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(foldersOnLeftView));
 
             wxString outputString = _("%x directories");
             outputString.Replace(wxT("%x"), folderCount, false);
@@ -2301,8 +2293,7 @@ void MainDialog::updateStatusInformation(const GridView& visibleGrid)
             statusLeftNew+= _("1 file,");
         else
         {
-            wxString fileCount = globalFunctions::numberToWxString(filesOnLeftView);
-            globalFunctions::includeNumberSeparator(fileCount);
+            wxString fileCount = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(filesOnLeftView));
 
             wxString outputString = _("%x files,");
             outputString.Replace(wxT("%x"), fileCount, false);
@@ -2312,8 +2303,7 @@ void MainDialog::updateStatusInformation(const GridView& visibleGrid)
         statusLeftNew+= FreeFileSync::formatFilesizeToShortString(filesizeLeftView);
     }
 
-    wxString objectsView = globalFunctions::numberToWxString(visibleGrid.size());
-    globalFunctions::includeNumberSeparator(objectsView);
+    wxString objectsView = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(visibleGrid.size()));
     if (currentGridData.size() == 1)
     {
         wxString outputString = _("%x of 1 row in view");
@@ -2322,8 +2312,7 @@ void MainDialog::updateStatusInformation(const GridView& visibleGrid)
     }
     else
     {
-        wxString objectsTotal = globalFunctions::numberToWxString(currentGridData.size());
-        globalFunctions::includeNumberSeparator(objectsTotal);
+        wxString objectsTotal = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(currentGridData.size()));
 
         wxString outputString = _("%x of %y rows in view");
         outputString.Replace(wxT("%x"), objectsView, false);
@@ -2337,8 +2326,7 @@ void MainDialog::updateStatusInformation(const GridView& visibleGrid)
             statusRightNew+= _("1 directory");
         else
         {
-            wxString folderCount = globalFunctions::numberToWxString(foldersOnRightView);
-            globalFunctions::includeNumberSeparator(folderCount);
+            wxString folderCount = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(foldersOnRightView));
 
             wxString outputString = _("%x directories");
             outputString.Replace(wxT("%x"), folderCount, false);
@@ -2355,8 +2343,7 @@ void MainDialog::updateStatusInformation(const GridView& visibleGrid)
             statusRightNew+= _("1 file,");
         else
         {
-            wxString fileCount = globalFunctions::numberToWxString(filesOnRightView);
-            globalFunctions::includeNumberSeparator(fileCount);
+            wxString fileCount = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(filesOnRightView));
 
             wxString outputString = _("%x files,");
             outputString.Replace(wxT("%x"), fileCount, false);
@@ -2474,81 +2461,130 @@ void MainDialog::mapGridDataToUI(GridView& output, const FileCompareResult& file
 void MainDialog::OnAddFolderPair(wxCommandEvent& event)
 {
     addFolderPair(wxEmptyString, wxEmptyString);
-    event.Skip();
+
+    //disable the sync button
+    enableSynchronization(false);
+
+    //clear grids
+    currentGridData.clear();
+    writeGrid(currentGridData);
 }
 
 
 void MainDialog::OnRemoveFolderPair(wxCommandEvent& event)
 {
-    removeFolderPair();
-    event.Skip();
+    //find folder pair originating the event
+    const wxObject* const eventObj = event.GetEventObject();
+    for (std::vector<FolderPairGenerated*>::const_iterator i = additionalFolderPairs.begin(); i != additionalFolderPairs.end(); ++i)
+    {
+        if (eventObj == static_cast<wxObject*>((*i)->m_bpButtonRemovePair))
+        {
+            removeFolderPair(i - additionalFolderPairs.begin());
+
+            //disable the sync button
+            enableSynchronization(false);
+
+            //clear grids
+            currentGridData.clear();
+            writeGrid(currentGridData);
+            return;
+        }
+    }
 }
 
 
-void MainDialog::addFolderPair(const wxString& leftDir, const wxString& rightDir)
+void MainDialog::addFolderPair(const Zstring& leftDir, const Zstring& rightDir)
 {
-    //add new folder pair
-    FolderPairGenerated* newPair = new FolderPairGenerated(m_scrolledWindowFolderPairs);
-    newPair->m_bitmap23->SetBitmap(*globalResource.bitmapLink);
+    std::vector<FolderPair> newPairs;
+    FolderPair pair;
+    pair.leftDirectory = leftDir;
+    pair.rightDirectory = rightDir;
+    newPairs.push_back(pair);
 
-    bSizerFolderPairs->Add(newPair, 0, wxEXPAND, 5);
-    additionalFolderPairs.push_back(newPair);
+    MainDialog::addFolderPair(newPairs);
+}
 
-    //set size of scrolled window
-    wxSize pairSize = newPair->GetSize();
-    const int additionalRows = additionalFolderPairs.size();
-    if (additionalRows <= 3) //up to 3 additional pairs shall be shown
-        m_scrolledWindowFolderPairs->SetMinSize(wxSize( -1, pairSize.GetHeight() * additionalRows));
-    else //adjust scrollbars
-        m_scrolledWindowFolderPairs->Fit();
 
-    //adjust remove button
-    if (additionalRows > 0)
-        m_bpButtonRemovePair->Enable();
+void MainDialog::addFolderPair(const std::vector<FolderPair>& newPairs)
+{
+    if (newPairs.size() == 0)
+        return;
+
+    for (std::vector<FolderPair>::const_iterator i = newPairs.begin(); i != newPairs.end(); ++i)
+    {
+        //add new folder pair
+        FolderPairGenerated* newPair = new FolderPairGenerated(m_scrolledWindowFolderPairs);
+        newPair->m_bitmap23->SetBitmap(*globalResource.bitmapLink);
+        newPair->m_bpButtonRemovePair->SetBitmapLabel(*globalResource.bitmapRemoveFolderPair);
+
+        bSizerFolderPairs->Add(newPair, 0, wxEXPAND, 5);
+        additionalFolderPairs.push_back(newPair);
+
+        //set size of scrolled window
+        wxSize pairSize = newPair->GetSize();
+
+        const int additionalRows = additionalFolderPairs.size();
+        if (additionalRows <= 3) //up to 3 additional pairs shall be shown
+            m_scrolledWindowFolderPairs->SetMinSize(wxSize( -1, pairSize.GetHeight() * additionalRows));
+        else //adjust scrollbars
+            m_scrolledWindowFolderPairs->Fit();
+
+        //register events
+        newPair->m_dirPickerLeft->Connect(wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler(MainDialog::OnDirSelected), NULL, this);
+        newPair->m_dirPickerRight->Connect(wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler(MainDialog::OnDirSelected), NULL, this);
+
+        newPair->m_directoryLeft->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainDialog::OnWriteDirManually), NULL, this );
+        newPair->m_directoryRight->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainDialog::OnWriteDirManually), NULL, this );
+
+        newPair->m_bpButtonRemovePair->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainDialog::OnRemoveFolderPair), NULL, this );
+
+        //prepare drag & drop
+        newPair->m_panelLeft->SetDropTarget(new MainWindowDropTarget(this, newPair->m_panelLeft)); //ownership passed
+        newPair->m_panelRight->SetDropTarget(new MainWindowDropTarget(this, newPair->m_panelRight));
+
+        //insert directory names if provided
+        newPair->m_directoryLeft->SetValue(i->leftDirectory.c_str());
+        const wxString leftDirFormatted = FreeFileSync::getFormattedDirectoryName(i->leftDirectory).c_str();
+        if (wxDirExists(leftDirFormatted))
+            newPair->m_dirPickerLeft->SetPath(leftDirFormatted);
+
+        newPair->m_directoryRight->SetValue(i->rightDirectory.c_str());
+        const wxString rightDirFormatted = FreeFileSync::getFormattedDirectoryName(i->rightDirectory).c_str();
+        if (wxDirExists(rightDirFormatted))
+            newPair->m_dirPickerRight->SetPath(rightDirFormatted);
+    }
+
+    //adapt left-shift display distortion caused by scrollbars
+    if (additionalFolderPairs.size() > 3 && !m_bitmapShift->IsShown())
+    {
+        //m_scrolledWindowFolderPairs and bSizerFolderPairs need to be up to date
+        m_scrolledWindowFolderPairs->Layout();
+        bSizer1->Layout();
+
+        //calculate scrollbar width
+        const int shiftToRight = m_scrolledWindowFolderPairs->GetSize().GetWidth() - bSizerFolderPairs->GetSize().GetWidth();
+        m_bitmapShift->SetMinSize(wxSize(shiftToRight, -1));
+        m_bitmapShift->Show();
+    }
 
     m_scrolledWindowFolderPairs->Layout();
     bSizer1->Layout();
     m_bpButtonSwap->Refresh();
-
-    //register events
-    newPair->m_dirPickerLeft->Connect(wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler(MainDialog::OnDirSelected), NULL, this);
-    newPair->m_dirPickerRight->Connect(wxEVT_COMMAND_DIRPICKER_CHANGED, wxFileDirPickerEventHandler(MainDialog::OnDirSelected), NULL, this);
-
-    newPair->m_directoryLeft->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainDialog::OnWriteDirManually), NULL, this );
-    newPair->m_directoryRight->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainDialog::OnWriteDirManually), NULL, this );
-
-    //prepare drag & drop
-    newPair->m_panelLeft->SetDropTarget(new MainWindowDropTarget(this, newPair->m_panelLeft)); //ownership passed
-    newPair->m_panelRight->SetDropTarget(new MainWindowDropTarget(this, newPair->m_panelRight));
-
-    //insert directory names if provided
-    newPair->m_directoryLeft->SetValue(leftDir);
-    wxString leftDirFormatted = FreeFileSync::getFormattedDirectoryName(leftDir.c_str()).c_str();
-    if (wxDirExists(leftDirFormatted))
-        newPair->m_dirPickerLeft->SetPath(leftDirFormatted);
-
-    newPair->m_directoryRight->SetValue(rightDir);
-    wxString rightDirFormatted = FreeFileSync::getFormattedDirectoryName(rightDir.c_str()).c_str();
-    if (wxDirExists(rightDirFormatted))
-        newPair->m_dirPickerRight->SetPath(rightDirFormatted);
 }
 
 
-void MainDialog::removeFolderPair(bool removeAll)
+void MainDialog::removeFolderPair(const int pos, bool refreshLayout)
 {
-    if (additionalFolderPairs.size() > 0)
+    if (0 <= pos && pos < int(additionalFolderPairs.size()))
     {
         wxSize pairSize;
-        do
-        {   //remove folder pairs from window
-            FolderPairGenerated* pairToDelete = additionalFolderPairs.back();
-            pairSize = pairToDelete->GetSize();
+        //remove folder pairs from window
+        FolderPairGenerated* pairToDelete = additionalFolderPairs[pos];
+        pairSize = pairToDelete->GetSize();
 
-            bSizerFolderPairs->Detach(pairToDelete); //Remove() does not work on Window*, so do it manually
-            pairToDelete->Destroy();                 //
-            additionalFolderPairs.pop_back(); //remove last element in vector
-        }
-        while (removeAll && additionalFolderPairs.size() > 0);
+        bSizerFolderPairs->Detach(pairToDelete); //Remove() does not work on Window*, so do it manually
+        pairToDelete->Destroy();                 //
+        additionalFolderPairs.erase(additionalFolderPairs.begin() + pos); //remove last element in vector
 
         //set size of scrolled window
         const int additionalRows = additionalFolderPairs.size();
@@ -2557,17 +2593,32 @@ void MainDialog::removeFolderPair(bool removeAll)
         //adjust scrollbars (do not put in else clause)
         m_scrolledWindowFolderPairs->Fit();
 
-        //adjust remove button
-        if (additionalRows <= 0)
-            m_bpButtonRemovePair->Disable();
+        if (refreshLayout)
+        {
+            //adapt left-shift display distortion caused by scrollbars
+            if (additionalFolderPairs.size() <= 3)
+                m_bitmapShift->Hide();
 
-        m_scrolledWindowFolderPairs->Layout();
-        bSizer1->Layout();
+            m_scrolledWindowFolderPairs->Layout();
+            bSizer1->Layout();
+        }
+    }
+}
+
+
+void MainDialog::clearFolderPairs()
+{
+    if (additionalFolderPairs.size() > 0)
+    {
+        for (int i = int(additionalFolderPairs.size()) - 1; i > 0; --i)
+            MainDialog::removeFolderPair(i, false);
+
+        //refresh layout just once for improved performance!
+        MainDialog::removeFolderPair(0, true);
     }
 }
 
 //########################################################################################################
-
 
 CompareStatusHandler::CompareStatusHandler(MainDialog* dlg) :
         mainDialog(dlg),
@@ -2607,10 +2658,6 @@ CompareStatusHandler::CompareStatusHandler(MainDialog* dlg) :
     mainDialog->m_menubar1->EnableTop(1, false);
     mainDialog->m_menubar1->EnableTop(2, false);
 
-    //display status panel during compare
-    mainDialog->compareStatus->init(); //clear old values
-    mainDialog->compareStatus->Show();
-
     //show abort button
     mainDialog->m_buttonAbort->Enable();
     mainDialog->m_buttonAbort->Show();
@@ -2618,9 +2665,13 @@ CompareStatusHandler::CompareStatusHandler(MainDialog* dlg) :
     mainDialog->m_buttonCompare->Hide();
     mainDialog->m_buttonAbort->SetFocus();
 
+    //display status panel during compare
+    mainDialog->compareStatus->init(); //clear old values
+    mainDialog->compareStatus->Show();
+
     //updateUiNow();
-    mainDialog->bSizer1->Layout();  //both sizers need to recalculate!
-    mainDialog->bSizer6->Layout();
+    mainDialog->bSizer1->Layout(); //both sizers need to recalculate!
+    mainDialog->bSizer6->Layout(); //adapt layout for wxBitmapWithImage
     mainDialog->Refresh();
 }
 
@@ -2666,12 +2717,13 @@ CompareStatusHandler::~CompareStatusHandler()
 
     mainDialog->m_buttonAbort->Disable();
     mainDialog->m_buttonAbort->Hide();
-
     mainDialog->m_buttonCompare->Enable(); //enable compare button
     mainDialog->m_buttonCompare->Show();
 
     //hide status panel from main window
     mainDialog->compareStatus->Hide();
+
+    mainDialog->bSizer6->Layout(); //adapt layout for wxBitmapWithImage
 
     mainDialog->Layout();
     mainDialog->Refresh();
@@ -2973,7 +3025,7 @@ void MainDialog::OnMenuGlobalSettings(wxCommandEvent& event)
     wxDialog* settingsDlg = new GlobalSettingsDlg(this, globalSettings);
     settingsDlg->ShowModal();
 
-    event.Skip();
+    //event.Skip();
 }
 
 
@@ -2986,7 +3038,7 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
     if (filePicker->ShowModal() == wxID_OK)
     {
         fileName = filePicker->GetPath();
-        if (wxFileExists(fileName))
+        if (FreeFileSync::fileExists(fileName.c_str()))
         {
             wxMessageDialog* messageDlg = new wxMessageDialog(this, wxString(_("File already exists. Overwrite?")) + wxT(" \"") + fileName + wxT("\""), _("Warning") , wxOK | wxCANCEL);
 
@@ -3056,18 +3108,22 @@ void MainDialog::OnMenuBatchJob(wxCommandEvent& event)
 }
 
 
+void MainDialog::OnMenuCheckVersion(wxCommandEvent& event)
+{
+    FreeFileSync::checkForNewVersion();
+}
+
+
 void MainDialog::OnMenuAbout(wxCommandEvent& event)
 {
     AboutDlg* aboutDlg = new AboutDlg(this);
     aboutDlg->ShowModal();
-    event.Skip();
 }
 
 
 void MainDialog::OnMenuQuit(wxCommandEvent& event)
 {
     Destroy();
-    event.Skip();
 }
 
 
@@ -3120,6 +3176,12 @@ void MainDialog::OnMenuLangGerman(wxCommandEvent& event)
 }
 
 
+void MainDialog::OnMenuLangHungarian(wxCommandEvent& event)
+{
+    switchProgramLanguage(wxLANGUAGE_HUNGARIAN);
+}
+
+
 void MainDialog::OnMenuLangItalian(wxCommandEvent& event)
 {
     switchProgramLanguage(wxLANGUAGE_ITALIAN);
@@ -3141,5 +3203,17 @@ void MainDialog::OnMenuLangPolish(wxCommandEvent& event)
 void MainDialog::OnMenuLangPortuguese(wxCommandEvent& event)
 {
     switchProgramLanguage(wxLANGUAGE_PORTUGUESE);
+}
+
+
+void MainDialog::OnMenuLangSlovenian(wxCommandEvent& event)
+{
+    switchProgramLanguage(wxLANGUAGE_SLOVENIAN);
+}
+
+
+void MainDialog::OnMenuLangSpanish(wxCommandEvent& event)
+{
+    switchProgramLanguage(wxLANGUAGE_SPANISH);
 }
 

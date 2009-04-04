@@ -13,12 +13,17 @@
 
 namespace globalFunctions
 {
-    int round(double d); //little rounding function
+    inline
+    int round(double d) //little rounding function
+    {
+        return static_cast<int>(d < 0 ? d - .5 : d + .5);
+    }
 
     template <class T>
-    T abs(const T& d)    //absolute value
+    inline
+    T abs(const T& d) //absolute value
     {
-        return(d<0?-d:d);
+        return(d < 0 ? -d : d);
     }
 
     std::string numberToString(const unsigned int number); //convert number to string
@@ -35,7 +40,7 @@ namespace globalFunctions
     int    wxStringToInt(   const wxString& number); //convert wxString to number
     double wxStringToDouble(const wxString& number); //convert wxString to number
 
-    wxString& includeNumberSeparator(wxString& number);
+    wxString includeNumberSeparator(const wxString& number);
 
     int readInt(std::ifstream& stream);  //read int from file stream
     void writeInt(std::ofstream& stream, const int number);  //write int to filestream

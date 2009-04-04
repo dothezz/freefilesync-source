@@ -207,14 +207,10 @@ void SyncDialog::calculatePreview()
                                        objectsToDelete,
                                        dataToProcess);
 
-    wxString toCreate = globalFunctions::numberToWxString(objectsToCreate);
-    wxString toUpdate = globalFunctions::numberToWxString(objectsToOverwrite);
-    wxString toDelete = globalFunctions::numberToWxString(objectsToDelete);
+    wxString toCreate = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(objectsToCreate));
+    wxString toUpdate = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(objectsToOverwrite));
+    wxString toDelete = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(objectsToDelete));
     wxString data     = FreeFileSync::formatFilesizeToShortString(dataToProcess);
-
-    globalFunctions::includeNumberSeparator(toCreate);
-    globalFunctions::includeNumberSeparator(toUpdate);
-    globalFunctions::includeNumberSeparator(toDelete);
 
     m_textCtrlCreate->SetValue(toCreate);
     m_textCtrlUpdate->SetValue(toUpdate);
@@ -629,7 +625,7 @@ void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
     if (filePicker->ShowModal() == wxID_OK)
     {
         fileName = filePicker->GetPath();
-        if (wxFileExists(fileName))
+        if (FreeFileSync::fileExists(fileName.c_str()))
         {
             wxMessageDialog* messageDlg = new wxMessageDialog(this, wxString(_("File already exists. Overwrite?")) + wxT(" \"") + fileName + wxT("\""), _("Warning") , wxOK | wxCANCEL);
 

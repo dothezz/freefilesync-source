@@ -189,7 +189,6 @@ DeleteDialog::DeleteDialog(wxWindow* main,
     m_checkBoxUseRecycler->SetValue(useRecycleBin);
     updateTexts();
 
-    m_bitmap12->SetBitmap(*globalResource.bitmapDeleteFile);
     m_buttonOK->SetFocus();
 }
 
@@ -198,9 +197,15 @@ void DeleteDialog::updateTexts()
 {
     wxString headerText;
     if (m_checkBoxUseRecycler->GetValue())
+    {
         headerText = _("Do you really want to move the following objects(s) to the Recycle Bin?");
+        m_bitmap12->SetBitmap(*globalResource.bitmapRecycler);
+    }
     else
+    {
         headerText = _("Do you really want to delete the following objects(s)?");
+        m_bitmap12->SetBitmap(*globalResource.bitmapDeleteFile);
+    }
     m_staticTextHeader->SetLabel(headerText);
 
     wxString filesToDelete = FreeFileSync::deleteFromGridAndHDPreview(mainGrid,
@@ -264,13 +269,19 @@ ErrorDlg::ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxStri
         m_checkBoxIgnoreErrors->Hide();
     }
 
-    if (activeButtons & BUTTON_RETRY)
-        m_buttonRetry->SetFocus();
-    else
+    if (~activeButtons & BUTTON_RETRY)
         m_buttonRetry->Hide();
 
     if (~activeButtons & BUTTON_ABORT)
         m_buttonAbort->Hide();
+
+    //set button focus precedence
+    if (activeButtons & BUTTON_RETRY)
+        m_buttonRetry->SetFocus();
+    else if (activeButtons & BUTTON_IGNORE)
+        m_buttonIgnore->SetFocus();
+    else if (activeButtons & BUTTON_ABORT)
+        m_buttonAbort->SetFocus();
 }
 
 ErrorDlg::~ErrorDlg() {}
@@ -320,6 +331,12 @@ WarningDlg::WarningDlg(wxWindow* parentWindow,  int activeButtons, const wxStrin
 
     if (~activeButtons & BUTTON_ABORT)
         m_buttonAbort->Hide();
+
+    //set button focus precedence
+    else if (activeButtons & BUTTON_IGNORE)
+        m_buttonIgnore->SetFocus();
+    else if (activeButtons & BUTTON_ABORT)
+        m_buttonAbort->SetFocus();
 }
 
 WarningDlg::~WarningDlg() {}
@@ -454,11 +471,7 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSetti
     m_bitmapSettings->SetBitmap(*globalResource.bitmapSettings);
     m_buttonResetWarnings->setBitmapFront(*globalResource.bitmapWarningSmall, 5);
 
-#ifdef FFS_WIN
-    m_checkBoxHandleDstFat->SetValue(globalSettings.shared.handleDstOnFat32);
-#else
-    m_checkBoxHandleDstFat->Hide();
-#endif
+    m_spinCtrlFileTimeTolerance->SetValue(globalSettings.shared.fileTimeTolerance);
     m_textCtrlFileManager->SetValue(globalSettings.gui.commandLineFileManager);
 
     Fit();
@@ -468,9 +481,8 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSetti
 void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 {
     //write global settings only when okay-button is pressed!
-#ifdef FFS_WIN
-    settings.shared.handleDstOnFat32    = m_checkBoxHandleDstFat->GetValue();
-#endif
+
+    settings.shared.fileTimeTolerance = m_spinCtrlFileTimeTolerance->GetValue();
     settings.gui.commandLineFileManager = m_textCtrlFileManager->GetValue();
 
     EndModal(BUTTON_OKAY);
@@ -487,7 +499,7 @@ void GlobalSettingsDlg::OnResetWarnings(wxCommandEvent& event)
 
 void GlobalSettingsDlg::OnDefault(wxCommandEvent& event)
 {
-    m_checkBoxHandleDstFat->SetValue(true);
+    m_spinCtrlFileTimeTolerance->SetValue(2);
 #ifdef FFS_WIN
     m_textCtrlFileManager->SetValue(wxT("explorer /select, %name"));
 #elif defined FFS_LINUX
@@ -612,7 +624,8 @@ SyncStatus::SyncStatus(StatusHandler* updater, wxWindow* parentWindow) :
         scalingFactor(0),
         currentObjects(0),
         totalObjects(0),
-        processPaused(false)
+        processPaused(false),
+        currentStatus(SyncStatus::ABORTED)
 {
     m_animationControl1->SetAnimation(*globalResource.animationSync);
     m_animationControl1->Play();
@@ -674,7 +687,7 @@ void SyncStatus::updateStatusDialogNow()
     bool screenChanged = false; //avoid screen flicker by calling layout() only if necessary
 
     //progress indicator
-    m_gauge1->SetValue(int(currentData * scalingFactor));
+    m_gauge1->SetValue(globalFunctions::round(currentData * scalingFactor));
 
     //status text
     if (m_textCtrlInfo->GetValue() != wxString(currentStatusText.c_str()) && (screenChanged = true)) //avoid screen flicker
@@ -751,6 +764,9 @@ void SyncStatus::setCurrentStatus(SyncStatusID id)
         m_staticTextStatus->SetLabel(_("Synchronizing..."));
         break;
     }
+
+    currentStatus = id;
+    Layout();
 }
 
 
@@ -784,8 +800,11 @@ void SyncStatus::OnOkay(wxCommandEvent& event)
 
 void SyncStatus::OnPause(wxCommandEvent& event)
 {
+    static SyncStatusID previousStatus = SyncStatus::ABORTED;
+
     if (processPaused)
     {
+        setCurrentStatus(previousStatus);
         processPaused = false;
         m_buttonPause->SetLabel(_("Pause"));
         m_animationControl1->Play();
@@ -793,6 +812,9 @@ void SyncStatus::OnPause(wxCommandEvent& event)
     }
     else
     {
+        previousStatus = currentStatus; //save current status
+
+        setCurrentStatus(SyncStatus::PAUSE);
         processPaused = true;
         m_buttonPause->SetLabel(_("Continue"));
         m_animationControl1->Stop();
@@ -919,9 +941,15 @@ void CompareStatus::updateStatusPanelNow()
 {
     bool screenChanged = false; //avoid screen flicker by calling layout() only if necessary
 
+    //remove linebreaks from currentStatusText
+    wxString formattedStatusText = currentStatusText.c_str();
+    for (wxString::iterator i = formattedStatusText.begin(); i != formattedStatusText.end(); ++i)
+        if (*i == wxChar('\n'))
+            *i = wxChar(' ');
+
     //status texts
-    if (m_textCtrlFilename->GetValue() != wxString(currentStatusText.c_str()) && (screenChanged = true)) //avoid screen flicker
-        m_textCtrlFilename->SetValue(currentStatusText.c_str());
+    if (m_textCtrlFilename->GetValue() != formattedStatusText && (screenChanged = true)) //avoid screen flicker
+        m_textCtrlFilename->SetValue(formattedStatusText);
 
     //nr of scanned objects
     const wxString scannedObjTmp = globalFunctions::numberToWxString(scannedObjects);

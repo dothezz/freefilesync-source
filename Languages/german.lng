@@ -1,5 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
-  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE
  Byte
  Byte
  GB
@@ -32,6 +32,8 @@
 &Übernehmen
 &Cancel
 &Abbrechen
+&Check for new version
+&Auf neuere Version prüfen
 &Compare
 &Vergleichen
 &Create batch job
@@ -124,6 +126,8 @@ Konfiguration &laden
 ==	Dateien sind gleich\n\n
 >>	right file is newer\n
 >>	Rechte Datei ist neuer\n
+A newer version is available:
+Eine neuere Version steht zum Download bereit:
 Abort
 Abbrechen
 Abort requested: Waiting for current operation to finish...
@@ -134,8 +138,6 @@ About
 Über
 Action
 Aktion
-Active for FAT/FAT32 drives only: When comparing filetimes treat files that differ by less or equal than 1 hour as equal. This ensures daylight saving time switches are handled properly.
-Nur für FAT/FAT32-Laufwerke aktiv: Dateien mit einem Zeitunterschied von kleiner oder gleich einer Stunde werden als gleich angesehen. Dadurch ist sichergestellt, dass die Sommer-/Winterzeitumstellung korrekt behandelt wird.
 Add folder pair
 Verzeichnispaar hinzufügen
 All items have been synchronized!
@@ -218,8 +220,6 @@ Copying file %x overwriting %y
 Kopiere Datei %x und überschreibe %y
 Copying file %x to %y
 Kopiere Datei %x nach %y
-Could not retrieve file info for:
-Dateiattribute konnten nicht gelesen werden:
 Could not set working directory:
 Das Arbeitsverzeichnis konnte nicht gesetzt werden:
 Create a batch job
@@ -274,10 +274,12 @@ Do you really want to move the following objects(s) to the Recycle Bin?
 Sollen folgende Elemente wirklich in den Papierkorb verschoben werden?
 Donate with PayPal
 Mit PayPal spenden
+Download now?
+Jetzt herunterladen?
 Drag && drop
 Drag && Drop
-Email:
-Email:
+Email
+Email
 Error
 Fehler
 Error changing modification time:
@@ -292,20 +294,28 @@ Error deleting file:
 Fehler beim Löschen der Datei:
 Error handling
 Fehlerbehandlung
+Error loading library function:
+Fehler beim Laden der Bibliotheksfunktion:
 Error moving to Recycle Bin:
 Fehler beim Verschieben in den Papierkorb:
+Error opening file:
+Fehler beim Öffnen der Datei:
 Error parsing configuration file:
 Fehler beim Lesen der Konfigurationsdatei:
+Error reading file attributes:
+Fehler beim Lesen der Dateiattribute:
 Error reading file:
 Fehler beim Lesen der Datei:
-Error reading folder attributes:
-Fehler beim Lesen der Verzeichnisattribute:
+Error resolving symbolic link:
+Fehler beim Auflösen des Symbolischen Links:
+Error retrieving full path:
+Fehler beim Ermitteln des kompletten Pfades:
 Error traversing directory:
 Fehler beim Durchsuchen des Verzeichnisses:
+Error writing file attributes:
+Fehler beim Schreiben der Dateiattribute:
 Error writing file:
 Fehler beim Schreiben der Datei:
-Error writing folder attributes:
-Fehler beim Schreiben der Verzeichnisattribute:
 Error: Source directory does not exist anymore:
 Fehler: Quellverzeichnis existiert nicht mehr:
 Example
@@ -320,20 +330,24 @@ Exit immediately and set returncode < 0
 Sofort beenden und Returncode < 0 setzen
 Exit with RC < 0
 Beenden mit RC < 0
-FAT32: Handle Daylight Saving Time
-FAT32: Sommer-/Winterzeitumstellung berücksichtigen
 Feedback and suggestions are welcome at:
 Feedback und Vorschläge sind willkommen unter:
 File Manager integration:
 Einbinden des Dateimanagers:
+File Time Tolerance:
+Abweichung der Dateizeit:
 File already exists. Overwrite?
 Die Datei existiert bereits. Überschreiben?
 File content
 Dateiinhalt
+File does not exist:
+Die Datei existiert nicht:
 File list exported!
 Dateiliste exportiert!
 File size and date
 Dateigröße und -datum
+File times that differ by up to the specified number of seconds are still handled as having same time.
+Dateiänderungszeiten, die um bis zu der angegebenen Anzahl an Sekunden abweichen, werden trotzdem als gleich angesehen.
 Filename
 Dateiname
 Files are found equal if\n     - file content\nis the same.
@@ -378,6 +392,8 @@ FreeFileSync batch file
 FreeFileSync Batchdatei
 FreeFileSync configuration
 FreeFileSync Konfiguration
+FreeFileSync is up to date!
+FreeFileSync ist auf dem neuesten Stand!
 Full name
 Absoluter Name
 Generating file list...
@@ -408,10 +424,10 @@ Hides error messages during synchronization:\nThey are collected and shown as a 
 Verhindert das Anzeigen von Fehlermeldungen während der Synchronisation:\nSie werden jedoch gesammelt und am Ende als Liste angezeigt
 Hints:
 Tipps:
-Homepage:
-Homepage:
-If you like FFS:
-FFS unterstützen:
+Homepage
+Homepage
+If you like FFS
+FFS unterstützen
 Ignore errors
 Fehler ignorieren
 Ignore subsequent errors
@@ -507,9 +523,9 @@ Speicherung abgebrochen!
 Save current configuration to file
 Aktuelle Konfiguration in Datei speichern
 Scanning...
-Suchvorgang...
+Suche Dateien...
 Scanning:
-Suchvorgang:
+Suche Dateien:
 Select a folder
 Verzeichnis auswählen
 Select variant:
@@ -568,16 +584,14 @@ Synchronizing...
 Synchronisiere...
 System out of memory!
 Zu wenig freier Arbeitsspeicher!
+Target file already existing!
+Die Zieldatei existiert bereits!
 The file does not contain a valid configuration:
 Die Datei enthält keine gültige Konfiguration:
-The file does not exist:
-Die Datei existiert nicht:
 This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
 Diese Kommandozeile wird bei jedem Doppelklick auf einen Dateinamen ausgeführt. %name dient dabei als Platzhalter für die ausgewählte Datei.
-This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
-Diese Befehlszeile wird ausgeführt, wenn ein Doppelklick auf einen Dateinamen erfolgt. %x ist hierbei der Platzhalter für die ausgewählte Datei.
-This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
-Diese Variante identifiziert zwei gleichnamige Dateien als gleich, wenn sie die gleiche Dateigröße haben UND der Zeitpunkt der letzten Änderung derselbe ist. Dabei wird eine Abweichung von bis zu zwei Sekunden toleriert. So ist sichergestellt, dass eine Synchronisation gegen ein FAT32 Dateisystem korrekt funktioniert.
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
+Diese Variante identifiziert zwei gleichnamige Dateien als gleich, wenn sie die gleiche Dateigröße haben UND der Zeitpunkt der letzten Änderung derselbe ist.
 Time
 Uhrzeit
 Time elapsed:
@@ -588,6 +602,8 @@ Total time:
 Gesamtzeit:
 Two way <->
 Beidseitig <->
+Unable to connect to sourceforge.net!
+Es konnte keine Verbindung zu sourceforge.net aufgebaut werden!
 Unable to create logfile!
 Die Protokolldatei konnte nicht erstellt werden!
 Unable to initialize Recycle Bin!
@@ -606,8 +622,10 @@ Warning
 Warnung
 Warning: Synchronization failed for %x item(s):
 Warnung: Synchronisation fehlgeschlagen für %x Element(e):
-When \"Compare\" is triggered with this option set the following decision tree is processed:
-Wenn \"Compare\" mit dieser Option eingestellt wurde, wird folgender Entscheidungsbaum abgearbeitet:
+Warnings:
+Warnungen:
+When the comparison is started with this option set the following decision tree is processed:
+Wenn der Vergleich mit dieser Option gestarted wurde, wird folgender Entscheidungsbaum abgearbeitet:
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Verbliebene Elemente können nochmals synchronisiert werden (OHNE dass ein erneuter Vergleich notwendig ist)!
 different

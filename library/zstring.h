@@ -7,7 +7,11 @@
 #ifndef ZSTRING_H_INCLUDED
 #define ZSTRING_H_INCLUDED
 
-#include <string>
+#include <cstring>
+#include <cctype>
+#include <assert.h>
+#include <new>
+#include <cstdlib>
 
 
 namespace FreeFileSync
@@ -33,6 +37,7 @@ typedef char DefaultChar;
 typedef wchar_t DefaultChar;
 #endif
 
+class Zsubstr;
 
 class Zstring
 {
@@ -67,7 +72,8 @@ public:
     //std::string functions
     size_t length() const;
     const DefaultChar* c_str() const;
-    Zstring substr(size_t pos = 0, size_t len = npos) const;
+    Zstring substr(size_t pos = 0, size_t len = npos) const; //allocate new string
+    Zsubstr zsubstr(size_t pos = 0) const;                   //use ref-counting!
     bool empty() const;
     int compare(const DefaultChar* other) const;
     int compare(const Zstring& other) const;
@@ -106,15 +112,32 @@ private:
 
     struct StringDescriptor
     {
-        StringDescriptor(const unsigned int refC, const size_t len, const size_t cap) : refCount(refC), length(len), capacity(cap) {}
         mutable unsigned int refCount;
-        size_t       length;
-        size_t       capacity; //allocated length without null-termination
+        size_t               length;
+        size_t               capacity; //allocated length without null-termination
     };
-    static void allocate(const unsigned int newRefCount, const size_t newLength, const size_t newCapacity, Zstring::StringDescriptor*& newDescr, DefaultChar*& newData);
+    static void allocate(const size_t newLength, Zstring::StringDescriptor*& newDescr, DefaultChar*& newData);
 
     StringDescriptor* descr;
     DefaultChar*      data;
+};
+
+
+class Zsubstr //ref-counted substring of a Zstring
+{
+public:
+    Zsubstr();
+    Zsubstr(const Zstring& ref, const size_t pos);
+
+    const DefaultChar* c_str() const;
+    size_t length() const;
+    bool StartsWith(const Zstring& begin) const;
+    size_t findFromEnd(const DefaultChar ch) const;
+
+private:
+    Zstring m_ref;
+    const DefaultChar* m_data;
+    size_t m_length;
 };
 
 
@@ -218,28 +241,26 @@ void testZstringForMemoryLeak();
 
 
 inline
-void Zstring::allocate(const unsigned int newRefCount,
-                       const size_t       newLength,
-                       const size_t       newCapacity,
+size_t getCapacityToAllocate(const size_t length)
+{
+    return (length + (19 - length % 16)); //allocate some additional length to speed up concatenation
+}
+
+
+inline
+void Zstring::allocate(const size_t       newLength,
                        StringDescriptor*& newDescr,
                        DefaultChar*&      newData)
 {   //allocate and set data for new string
-    if (newCapacity)
-    {
-        newDescr = (StringDescriptor*) malloc( sizeof(StringDescriptor) + (newCapacity + 1) * sizeof(DefaultChar));
-        if (newDescr == NULL)
-            throw std::bad_alloc();
-        newData = (DefaultChar*)(newDescr + 1);
-    }
-    else
-    {
-        newDescr = (StringDescriptor*) malloc( sizeof(StringDescriptor));
-        if (newDescr == NULL)
-            throw std::bad_alloc();
-        newData = NULL;
-    }
+    const size_t newCapacity = getCapacityToAllocate(newLength);
+    assert(newCapacity);
 
-    newDescr->refCount = newRefCount;
+    newDescr = (StringDescriptor*) malloc( sizeof(StringDescriptor) + (newCapacity + 1) * sizeof(DefaultChar));
+    if (newDescr == NULL)
+        throw std::bad_alloc();
+    newData = (DefaultChar*)(newDescr + 1);
+
+    newDescr->refCount = 1;
     newDescr->length   = newLength;
     newDescr->capacity = newCapacity;
 
@@ -259,7 +280,16 @@ void Zstring::allocate(const unsigned int newRefCount,
 inline
 Zstring::Zstring()
 {
-    allocate(1, 0, 0, descr, data);
+    //static (dummy) empty Zstring
+#ifdef ZSTRING_CHAR
+    static Zstring emptyString("");
+#elif defined ZSTRING_WIDE_CHAR
+    static Zstring emptyString(L"");
+#endif
+
+    emptyString.incRef(); //implicitly handle case "this == &source" and avoid this check
+    descr = emptyString.descr;
+    data  = emptyString.data;
 }
 
 
@@ -281,7 +311,7 @@ inline
 Zstring::Zstring(const Zstring& source)
 {
     descr = source.descr;
-    data = source.data;
+    data  = source.data;
     incRef(); //reference counting!
 }
 
@@ -294,17 +324,9 @@ Zstring::~Zstring()
 
 
 inline
-size_t getCapacityToAllocate(const size_t length)
-{
-    return (length + (19 - length % 16)); //allocate some additional length to speed up concatenation
-}
-
-
-inline
 void Zstring::initAndCopy(const DefaultChar* source, size_t length)
 {
-    const size_t newCapacity = getCapacityToAllocate(length);
-    allocate(1, length, newCapacity, descr, data);
+    allocate(length, descr, data);
     memcpy(data, source, length * sizeof(DefaultChar));
     data[length] = 0;
 }
@@ -548,21 +570,14 @@ size_t Zstring::size() const
 inline
 const DefaultChar* Zstring::c_str() const
 {
-    if (length())
-        return data;
-    else
-#ifdef ZSTRING_CHAR
-        return "";
-#elif defined ZSTRING_WIDE_CHAR
-        return L"";
-#endif
+    return data;
 }
 
 
 inline
 bool Zstring::empty() const
 {
-    return length() == 0;
+    return descr->length == 0;
 }
 
 
@@ -593,6 +608,72 @@ Zstring Zstring::operator+(const DefaultChar ch) const
 {
     return Zstring(*this)+=ch;
 }
+
+//##################### Zsubstr #############################
+inline
+Zsubstr Zstring::zsubstr(size_t pos) const
+{
+    assert(pos <= length());
+    return Zsubstr(*this, pos); //return reference counted string
+}
+
+
+inline
+Zsubstr::Zsubstr()
+{
+    m_data   = m_ref.c_str();
+    m_length = 0;
+}
+
+
+inline
+Zsubstr::Zsubstr(const Zstring& ref, const size_t pos) :
+        m_ref(ref),
+        m_data(ref.c_str() + pos),
+        m_length(ref.length() - pos) {}
+
+
+inline
+const DefaultChar* Zsubstr::c_str() const
+{
+    return m_data;
+}
+
+
+inline
+size_t Zsubstr::length() const
+{
+    return m_length;
+}
+
+
+inline
+bool Zsubstr::StartsWith(const Zstring& begin) const
+{
+    const size_t beginLength = begin.length();
+    if (length() < beginLength)
+        return false;
+
+    return defaultCompare(m_data, begin.c_str(), beginLength) == 0;
+}
+
+
+inline
+size_t Zsubstr::findFromEnd(const DefaultChar ch) const
+{
+    if (length() == 0)
+        return Zstring::npos;
+
+    size_t pos = length() - 1;
+    do //pos points to last char of the string
+    {
+        if (m_data[pos] == ch)
+            return pos;
+    }
+    while (--pos != static_cast<size_t>(-1));
+    return Zstring::npos;
+}
+
 
 
 #endif // ZSTRING_H_INCLUDED

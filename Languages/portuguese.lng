@@ -1,4 +1,4 @@
-﻿  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
  Byte
  Byte
@@ -134,8 +134,6 @@ About
 Sobre
 Action
 Acção
-Active for FAT/FAT32 drives only: When comparing filetimes treat files that differ by less or equal than 1 hour as equal. This ensures daylight saving time switches are handled properly.
-Activo apenas para drives FAT/FAT32: ao comparar as datas de ficheiros, tratar como iguais ficheiros com diferença de 1 hora ou menos. Esta opção assegura que as mudanças de Hora de Verão são tratadas correctamente.
 Add folder pair
 Adicionar um par de pastas
 All items have been synchronized!
@@ -218,8 +216,6 @@ Copying file %x overwriting %y
 Copiar ficheiro %x substituindo %y
 Copying file %x to %y
 Copiar ficheiro %x para %y
-Could not retrieve file info for:
-Não pode obter informação do ficheiro:
 Could not set working directory:
 Não pode definir pasta de trabalho:
 Create a batch job
@@ -292,20 +288,26 @@ Error deleting file:
 Erro ao eliminar o ficheiro:
 Error handling
 Controlador de erros
+Error loading library function:
+Erro ao carregar a livraria:
 Error moving to Recycle Bin:
 Erro ao mover para Reciclagem:
+Error opening file:
+Erro ao abrir ficheiro:
 Error parsing configuration file:
 Erro de leitura do ficheiro de configuração:
+Error reading file attributes:
+Erro ao ler atributos do ficheiro:
 Error reading file:
 Erro de leitura de ficheiro:
-Error reading folder attributes:
-Erro de leitura de atributos de pasta:
+Error resolving symbolic link:
+Erro na resolução do link simbólico:
 Error traversing directory:
 Erro ao percorrer a pasta:
+Error writing file attributes:
+Erro na escrita dos atributos do ficheiro:
 Error writing file:
 Erro de escrita no ficheiro:
-Error writing folder attributes:
-Erro de escrita de atributos de pasta:
 Error: Source directory does not exist anymore:
 Erro: A pasta de origem já não existe:
 Example
@@ -320,12 +322,12 @@ Exit immediately and set returncode < 0
 Sair imediatamente e enviar o código < 0
 Exit with RC < 0
 Sair com RC < 0
-FAT32: Handle Daylight Saving Time
-FAT32: Tratar Hora de Verão
 Feedback and suggestions are welcome at:
 Comentários e sugestões são benvindos em:
 File Manager integration:
 Integração c/ Gestor de Ficheiros:
+File Time Tolerance:
+Tolerância de tempo do ficheiro:
 File already exists. Overwrite?
 O ficheiro já existe. Deseja substituir?
 File content
@@ -334,6 +336,8 @@ File list exported!
 Lista dos ficheiros exportada!
 File size and date
 Data e tamanho do ficheiro
+File times that differ by up to the specified number of seconds are still handled as having same time.
+Ficheiro com diferença de tempo até ao número especificado de segundos são tratados como tendo o mesmo tempo.
 Filename
 Nome do ficheiro
 Files are found equal if\n     - file content\nis the same.
@@ -410,8 +414,8 @@ Hints:
 Dicas:
 Homepage:
 Homepage:
-If you like FFS:
-SE gosta de FFS:
+If you like FFS
+SE gosta de FFS
 Ignore errors
 Ignorar erros
 Ignore subsequent errors
@@ -568,16 +572,18 @@ Synchronizing...
 A sincronizar...
 System out of memory!
 Sistema sem memória!
+Target file already existing!
+Ficheiro destino já existe!
 The file does not contain a valid configuration:
 O ficheiro não contém uma configuração válida:
-The file does not exist:
+File does not exist:
 O ficheiro não existe:
 This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
 Esta linha de comandos será executada cada vez que fizer duplo click num ficheiro. %name serve para reservar o lugar do ficheiro seleccionado.
 This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
 Esta linha de comandos será executada cada vez que fizer duplo click num ficheiro. %x serve para reservar o lugar do ficheiro seleccionado.
-This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
-Esta variante avalia dois ficheiros de nome igual como iguais quando têm o mesmo tamanho e a mesma data e hora de modificação. Atenção: É permitido um desvio de 2 segundos na hora, de maneira a assegurar a sincronização com sistema de ficheiros de baixa precisão FAT32.
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
+Esta variante avalia dois ficheiros de nome igual como iguais quando têm o mesmo tamanho e a mesma data e hora de modificação.
 Time
 Hora
 Time elapsed:
@@ -606,8 +612,10 @@ Warning
 Atenção
 Warning: Synchronization failed for %x item(s):
 Atenção: A sincronização falhou para %x item(s):
-When \"Compare\" is triggered with this option set the following decision tree is processed:
-Quando \"Compare\" é iniciado com esta opção, é executada a seguinte árvore de decisão:
+Warnings:
+Avisos:
+When the comparison is started with this option set the following decision tree is processed:
+Usar a seguinte árvore de decisão quando inicia com estas opções de comparação:
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Pode tentar sincronizar os restantes elementos outra vez (SEM TER QUE comparar de novo) !
 different

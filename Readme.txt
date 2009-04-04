@@ -1,4 +1,4 @@
-FreeFileSync v1.16
+FreeFileSync v1.17
 ------------------
 
 Usage
@@ -13,13 +13,14 @@ Key Features
 2. No limitations: An arbitrary number of files can be synchronized.
 3. Unicode support.
 4. Network support.
-5. Lean & easily accessible UI: Highly optimized for speed and huge sets of data.
-6. Algorithms coded in C++ completely.
-7. Progress indicators are updated only every 100ms for optimal performance!
-8. Subfolders are also synchronized, including empty folders.
-9. Support for multiple folder pairs
-10. Create Batch Jobs for automated synchronization with or without GUI.
-11. Focus on usability:
+5. Full support for Windows/Linux symbolic links.
+6. Lean & easily accessible UI: Highly optimized for speed and huge sets of data.
+7. Algorithms coded in C++ completely.
+8. Progress indicators are updated only every 100ms for optimal performance!
+9. Subfolders are also synchronized, including empty folders.
+10. Support for multiple folder pairs
+11. Create Batch Jobs for automated synchronization with or without GUI.
+12. Focus on usability:
 	- Only necessary functionality on UI: no overloaded menus or icon jungle.
 	- Select folders via drag & drop.
 	- Last configuration and screen settings are saved automatically.
@@ -31,19 +32,20 @@ Key Features
 	- Status information and error reporting
 	- Sort file-lists by name, size or date.
 	- Display statistical data: total filesizes, amount of bytes that will be transfered with the current settings.
-12. Support for filesizes larger than 4 GB.
-13. Option to move files to Recycle Bin instead of deleting/overwriting them.
-14. Automatically ignore directories "\RECYCLER" and "\System Volume Information" when comparing and sync'ing. (Windows only)
-15. Localized versions for many languages are available.
-16. Delete before copy: Avoid disc space shortages with large sync-operations.
-17. Based on wxWidgets framework => Portable to many operating systems.
-18. Filter functionality to include/exclude files from synchronization (without re-compare!).
-19. Include/exclude specific files from synchronization manually.
-20. Create sync jobs via GUI to synchronize automatically (can be scheduled or executed directly).
-21. Handle daylight saving time changes on FAT/FAT32 volumes correctly
-22. Portable version (.zip) available
-23. No Windows registry entries for portable version
-24. Support for \\?\ path prefix for unrestricted path length (windows only)
+13. Support for filesizes larger than 4 GB.
+14. Option to move files to Recycle Bin instead of deleting/overwriting them.
+15. Automatically ignore directories "\RECYCLER" and "\System Volume Information" when comparing and sync'ing. (Windows only)
+16. Localized versions for many languages are available.
+17. Delete before copy: Avoid disc space shortages with large sync-operations.
+18. Based on wxWidgets framework => Portable to many operating systems.
+19. Filter functionality to include/exclude files from synchronization (without re-compare!).
+20. Include/exclude specific files from synchronization manually.
+21. Create sync jobs via GUI to synchronize automatically (can be scheduled or executed directly).
+22. Handle daylight saving time changes on FAT/FAT32 volumes correctly.
+23. Portable version (.zip) available.
+24. No Windows registry entries for portable version.
+25. Support for \\?\ path prefix for unrestricted path length. (windows only)
+26. Check for updates from within FreeFileSync.
 
 
 Advanced topics

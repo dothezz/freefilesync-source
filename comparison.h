@@ -13,7 +13,7 @@ namespace FreeFileSync
     {
     public:
         CompareProcess(const bool traverseSymLinks,
-                       const bool handleDstOnFat32Drives,
+                       const unsigned fileTimeTol,
                        bool& warningDependentFolders,
                        StatusHandler* handler);
 
@@ -34,8 +34,8 @@ namespace FreeFileSync
         //buffer accesses to the same directories; useful when multiple folder pairs are used
         DirectoryDescrBuffer* descriptionBuffer;
 
-        const bool traverseSymbolicLinks;
-        const bool handleDstOnFat32;
+        const bool traverseDirectorySymlinks;
+        const unsigned fileTimeTolerance; //max allowed file time deviation
         bool& m_warningDependentFolders;
 
         StatusHandler* statusUpdater;

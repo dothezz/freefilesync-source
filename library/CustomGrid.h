@@ -10,7 +10,6 @@ using namespace FreeFileSync;
 
 
 class CustomGridTable;
-class CustomGridTableMiddle;
 //##################################################################################
 
 class CustomGrid : public wxGrid
@@ -30,12 +29,15 @@ public:
 
     virtual void DrawColLabel(wxDC& dc, int col);
 
-    void initSettings(bool enableScrollbars,
+    void initSettings(const bool enableScrollbars,
+                      const bool showFileIcons,
                       CustomGrid* gridLeft,
                       CustomGrid* gridRight,
                       CustomGrid* gridMiddle,
                       GridView* gridRefUI,
                       FileCompareResult* gridData);
+
+    virtual void initGridRenderer(const bool showFileIcons) = 0;
 
     //notify wxGrid that underlying table size has changed
     void updateGridSizes();
@@ -52,19 +54,20 @@ public:
 
     static wxString getTypeName(xmlAccess::ColumnTypes colType);
 
-    void setLeadGrid(const wxGrid* newLead);
+    const wxGrid* getLeadGrid();
+    bool isLeadGrid();
 
 protected:
-    //set visibility, position and width of columns
-    xmlAccess::ColumnAttributes columnSettings;
+    void onGridAccess(wxEvent& event);
+    void adjustGridHeights(wxEvent& event);
 
-    void adjustGridHeights();
+    xmlAccess::ColumnAttributes columnSettings; //set visibility, position and width of columns
 
     const wxGrid* leadGrid; //grid that has user focus
     bool scrollbarsEnabled;
     CustomGrid* m_gridLeft;
-    CustomGrid* m_gridRight;
     CustomGrid* m_gridMiddle;
+    CustomGrid* m_gridRight;
 
     CustomGridTable* gridDataTable;
 
@@ -72,6 +75,7 @@ protected:
     const wxBitmap* sortMarker;
 };
 
+//############## SPECIALIZATIONS ###################
 
 class CustomGridLeft : public CustomGrid
 {
@@ -89,6 +93,8 @@ public:
     virtual void DoPrepareDC(wxDC& dc);
 
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
+
+    virtual void initGridRenderer(const bool showFileIcons);
 };
 
 
@@ -109,24 +115,7 @@ public:
 
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
 
-private:
-
-    class GridCellRendererAddCheckbox : public wxGridCellStringRenderer
-    {
-    public:
-        GridCellRendererAddCheckbox(CustomGridTableMiddle* gridDataTable) : m_gridDataTable(gridDataTable) {};
-
-
-        virtual void Draw(wxGrid& grid,
-                          wxGridCellAttr& attr,
-                          wxDC& dc,
-                          const wxRect& rect,
-                          int row, int col,
-                          bool isSelected);
-
-    private:
-        CustomGridTableMiddle* m_gridDataTable;
-    };
+    virtual void initGridRenderer(const bool showFileIcons) {}
 };
 
 
@@ -146,6 +135,8 @@ public:
     virtual void DoPrepareDC(wxDC& dc);
 
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
+
+    virtual void initGridRenderer(const bool showFileIcons);
 };
 
 #endif // CUSTOMGRID_H_INCLUDED

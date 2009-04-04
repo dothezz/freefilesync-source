@@ -134,8 +134,6 @@ About
 O Programie
 Action
 Akcja
-Active for FAT/FAT32 drives only: When comparing filetimes treat files that differ by less or equal than 1 hour as equal. This ensures daylight saving time switches are handled properly.
-Aktywne dla dysków FAT/FAT32: pliki, których czasy modyfikacji różnią się nie więcej niż godzinę, zostaną potraktowane jako równe. Zapewnia to poprawną synchronizację po zmianie czasu letniego.
 Add folder pair
 Dodaj foldery do porównania
 All items have been synchronized!
@@ -148,6 +146,8 @@ As the name suggests, two files which share the same name are marked as equal if
 Jak wskazuje nazwa, dwa pliki o tej samej nazwie są równe tylko i wyłącznie jeżeli ich zawartość jest jednakowa. Czas modyfikacji nie jest brany pod uwagę. Ta opcja jest raczej użyteczna do sprawdzania spójności plików niż zadań kopii zapasowej.\n\nDrzewko decyzyjne dla tej opcji jest mniejsze:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Twórz zadanie batch dla automatyzacji procesu. By rozpocząć prace w tym trybie zwyczajnie uruchom plik z zadaniem batch lub dodaj go do zadań zaplanowanych Twojego systemu. Plik batch może być również przekazywany jako parametr do programu w postaci: FreeFileSync.exe <batchfile>.
+Batch execution
+Zadanie Batch
 Batch file created successfully!
 Plik Batch utworzony pomyślnie!
 Batch job
@@ -216,8 +216,6 @@ Copying file %x overwriting %y
 Kopiowanie pliku %x nadpisywanie %y
 Copying file %x to %y
 Kopiowanie pliku %x do %y
-Could not retrieve file info for:
-Nie można uzyskać informacji o pliku dla:
 Could not set working directory:
 Nie można ustawić poprawnego folderu:
 Create a batch job
@@ -290,20 +288,26 @@ Error deleting file:
 Błąd podczas usuwania pliku:
 Error handling
 Obsługa błędów
+Error loading library function:
+Błąd wczytywania funkcji:
 Error moving to Recycle Bin:
 Błąd podczas przenoszenia do kosza:
+Error opening file:
+Błąd odczytu pliku:
 Error parsing configuration file:
 Błąd podczas parsowania pliku konfiguracyjnego:
+Error reading file attributes:
+Błąd odczytu atrybutów pliku:
 Error reading file:
-Błąd podczas odczytu pliku:
-Error reading folder attributes:
-Błąd odczytu atrybutów folderu:
+Błąd odczytu pliku:
+Error resolving symbolic link:
+Błąd odczytu dowiązania symbolicznego:
 Error traversing directory:
 Błąd podczas odczytywania katalogu:
+Error writing file attributes:
+Błąd zapisu atrybutów pliku:
 Error writing file:
-Błąd podczas zapisu do pliku:
-Error writing folder attributes:
-Błąd zapisu atrybutów folderu:
+Błąd zapisu pliku:
 Error: Source directory does not exist anymore:
 Błąd: Katalog źródłowy nie istnieje:
 Example
@@ -318,12 +322,12 @@ Exit immediately and set returncode < 0
 Zakończ natychmiastowo i zwróć wartość < 0
 Exit with RC < 0
 Zakończ z RC < 0
-FAT32: Handle Daylight Saving Time
-FAT32: Uwzględnij przesunięcie czasu
 Feedback and suggestions are welcome at:
 Komentarze i sugestie mile widziane na:
 File Manager integration:
 Menadżer plików:
+File Time Tolerance:
+Tolerancja czasu:
 File already exists. Overwrite?
 Nadpisać istniejący już plik?
 File content
@@ -332,6 +336,8 @@ File list exported!
 Lista plików wyeksportowana!
 File size and date
 Rozmiar i data pliku
+File times that differ by up to the specified number of seconds are still handled as having same time.
+Plik różniące się określoną liczbą sekund traktowane są jako równe.
 Filename
 Nazwa pliku
 Files are found equal if\n     - file content\nis the same.
@@ -408,8 +414,8 @@ Hints:
 Wskazówki:
 Homepage:
 Strona domowa:
-If you like FFS:
-Jeżeli Ci się podoba:
+If you like FFS
+Jeżeli Ci się podoba
 Ignore errors
 Ignoruj błędy
 Ignore subsequent errors
@@ -566,16 +572,18 @@ Synchronizing...
 Synchronizuję...
 System out of memory!
 Brak pamięci!
+Target file already existing!
+Plik docelowy już istnieje!
 The file does not contain a valid configuration:
 Nieprawidłowy format pliku:
-The file does not exist:
+File does not exist:
 Plik nie istnieje:
 This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
 Ta komenda będzie wykonywana za każdym razem jak klikniesz dwa razy na dany plik. %name jest wskaźnikiem na katalog zaznaczonego pliku.
 This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
 Ta komenda będzie wykonywana za każdym razem jak klikniesz dwa razy na dany plik. %x jest wskaźnikiem na katalog zaznaczonego pliku.
-This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
-Ten wariant traktuje dwa pliki jako równe w przypadku gdy mają jednakowy rozmiar oraz tą samą datę i czas ostatniej modyfikacji. Miej na uwadze, że czas pliku może odbiegać od rzeczywistego o 2 sekundy. Jest to konieczne podczas synchronizacji dla plików w systemie FAT32.
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
+Ten wariant traktuje dwa pliki jako równe w przypadku gdy mają jednakowy rozmiar oraz tą samą datę i czas ostatniej modyfikacji.
 Time
 Czas
 Time elapsed:
@@ -604,8 +612,10 @@ Warning
 Uwaga
 Warning: Synchronization failed for %x item(s):
 Uwaga: Błąd synchronizacji dla \"%x\" elementów:
-When \"Compare\" is triggered with this option set the following decision tree is processed:
-Gdy \"Porównywanie\" z zaznaczoną opcją jest w toku, podejmowane są następujące dezycje:
+Warnings:
+Ostrzeżenia:
+When the comparison is started with this option set the following decision tree is processed:
+Gdy porównywanie z zaznaczoną opcją jest w toku, podejmowane są następujące dezyje:
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Możesz spróbować synchronizować pozostałe elementy ponownie (bez konieczności ponownego porównywania)!
 different

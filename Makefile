@@ -1,5 +1,5 @@
 CPPFLAGS=-Wall -pipe -DNDEBUG `wx-config --cppflags` -DFFS_LINUX -DTIXML_USE_STL -O3 -pthread -c
-ENDFLAGS=`wx-config --libs` -lwx_gtk2_aui-2.8 -O3 -pthread
+ENDFLAGS=`wx-config --libs` -O3 -pthread
 
 all: FreeFileSync
 
@@ -29,6 +29,9 @@ obj/mainDialog.o: ui/mainDialog.cpp
 
 obj/syncDialog.o: ui/syncDialog.cpp
 	g++ $(CPPFLAGS) ui/syncDialog.cpp -o obj/syncDialog.o
+
+obj/checkVersion.o: ui/checkVersion.cpp
+	g++ $(CPPFLAGS) ui/checkVersion.cpp -o obj/checkVersion.o
 
 obj/customGrid.o: library/customGrid.cpp
 	g++ $(CPPFLAGS) library/customGrid.cpp -o obj/customGrid.o
@@ -72,8 +75,8 @@ obj/zstring.o: library/zstring.cpp
 obj/customButton.o: library/customButton.cpp
 	g++ $(CPPFLAGS) library/customButton.cpp -o obj/customButton.o
 
-FreeFileSync: init obj/application.o obj/algorithm.o obj/comparison.o obj/customButton.o obj/synchronization.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/fileHandling.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/statusHandler.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o obj/zstring.o
-	g++ $(ENDFLAGS) -o FreeFileSync obj/application.o obj/algorithm.o obj/comparison.o obj/customButton.o obj/synchronization.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/fileHandling.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/statusHandler.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o obj/zstring.o
+FreeFileSync: init obj/application.o obj/algorithm.o obj/comparison.o obj/customButton.o obj/checkVersion.o obj/synchronization.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/fileHandling.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/statusHandler.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o obj/zstring.o
+	g++ $(ENDFLAGS) -o FreeFileSync obj/application.o obj/algorithm.o obj/comparison.o obj/customButton.o obj/checkVersion.o obj/synchronization.o obj/globalFunctions.o obj/guiGenerated.o obj/mainDialog.o obj/syncDialog.o obj/customGrid.o obj/fileHandling.o obj/resources.o obj/smallDialogs.o obj/multithreading.o obj/statusHandler.o obj/misc.o obj/tinyxml.o obj/tinystr.o obj/tinyxmlerror.o obj/tinyxmlparser.o obj/processXml.o obj/zstring.o
 
 clean:
 	find obj -type f -exec rm {} \;

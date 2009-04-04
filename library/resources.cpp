@@ -34,6 +34,7 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("right delete.png")]       = (bitmapDeleteRight       = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("email.png")]              = (bitmapEmail             = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("about.png")]              = (bitmapAbout             = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("about_small.png")]        = (bitmapAboutSmall        = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("website.png")]            = (bitmapWebsite           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("exit.png")]               = (bitmapExit              = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("sync.png")]               = (bitmapSync              = new wxBitmap(wxNullBitmap));
@@ -102,6 +103,8 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("checkbox false.png")]     = (bitmapCheckBoxFalse     = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("settings.png")]           = (bitmapSettings          = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("settings_small.png")]     = (bitmapSettingsSmall     = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("recycler.png")]           = (bitmapRecycler          = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("shift.png")]              = (bitmapShift             = new wxBitmap(wxNullBitmap));
 
     //init all the other resource files
     animationMoney = new wxAnimation(wxNullAnimation);

@@ -1,0 +1,628 @@
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+  MinGW \t- A GNU fordítócsomag Windows portja\n  wxWidgets \t- Nyílt forráskódú GUI keretrendszer\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Nyílt forráskódú IDE
+ Byte
+ Bájt
+ GB
+ GB
+ MB
+ MB
+ PB
+ PB
+ TB
+ TB
+ kB
+ kB
+!=	files are different\n
+!=	a fájlok különböznek\n
+%x directories
+%x könyvtár
+%x files,
+%x fájl,
+%x of %y rows in view
+%x sor látható a(z) %y sorból
+%x of 1 row in view
+%x sor látható az 1 sorból
+&Abort
+&Megszakítás
+&About...
+&A programról...
+&Advanced
+&Haladó
+&Apply
+&Alkalmaz
+&Cancel
+&Mégsem
+&Compare
+&Összehasonlít
+&Create batch job
+&Kötegelt feladat létrehozása
+&Default
+&Alapértelmezett
+&Export file list
+&Fájllista exportálása
+&File
+&Fájl
+&Global settings
+&Globális beállítások
+&Help
+&Súgó
+&Ignore
+&Kihagy
+&Language
+&Nyelv
+&Load
+&Betöltés
+&Load configuration
+&Beállítások betöltése
+&OK
+&OK
+&Pause
+&Szünet
+&Quit
+&Kilépés
+&Retry
+&Ismét
+&Save
+&Mestés
+&Start
+&Indítás
+&Synchronize...
+&Szinkronizálás
+,
+.
+- different
+- különböző
+- different (same date, different size)
+- különböző (ugyanaz a dátum, eltérő méret)
+- equal
+- egyforma
+- exists left only
+- csak a bal oldalon létezik
+- exists right only
+- csak a jobb oldalon létezik
+- left
+- bal oldali
+- left newer
+- a bal oldali újabb
+- right
+- jobb oldali
+- right newer
+- a jobb oldali újabb
+- same date (different size)
+- ugyanaz a dátum (eltérő méret)
+-Open-Source file synchronization-
+-Nyílt forráskódú fájlszinkronizálás-
+.
+,
+1 directory
+1 könyvtár
+1 file,
+1 fájl,
+1. &Compare
+1. &Összehasonlítás
+1. Enter full file or directory names separated by ';' or a new line.
+1. Teljes fájl- vagy könyvtárnév megadása pontosvesszővel vagy új sorral elválasztva.
+2. &Synchronize...
+2. &Szinkronizálás
+2. Use wildcard characters '*' and '?'.
+2. A csillag ('*') és a kérdőjel ('?') helyettesítő karakterek megengedettek.
+3. Exclude files directly on main grid via context menu.
+3. Fájlok közvetlen kizárása a fő listából helyi menü segítségével.
+4. Keep the number of entries small for best performance.
+4. A bejegyzések számának minimalizálása a jobb teljesítmény érdekében.
+<<	left file is newer\n
+<<	a bal oldali fájl újabb\n
+<Directory>
+<Könyvtár>
+<Last session>
+<Utolsó munkamenet>
+<multiple selection>
+<többszörös kijelölés>
+<|	file on left side only\n
+<|	csak a bal oldalon lévő fájl\n
+==	files are equal\n\n
+==	a fájlok egyformák\n\n
+>>	right file is newer\n
+>>	a jobb oldali fájl újabb\n
+Abort
+Megszakítás
+Abort requested: Waiting for current operation to finish...
+Megszakítási kérelem: Várakozás a folyamatban lévő művelet befejezésére...
+Aborted
+Megszakítva
+About
+A programról
+Action
+Művelet
+Add folder pair
+Könyvtár pár megadása
+All items have been synchronized!
+Minden elem szinkronizálva lett!
+An exception occured!
+Kivétel keletkezett!
+As a result the files are separated into the following categories:
+Eredményképpen a fájlok a következő kategóriákra bomlanak:
+As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
+Ahogy a neve is mutatja, két fájl, melyeknek ugyanaz a nevük, akkor és csakis akkor lesz egyezőként jelölve, ha a tartalmuk megegyezik. Ez az opció leginkább a konzisztencia-viszgálatokhoz jó, mintsem a biztonsági mentésekhez. Így a fájlok dátuma nem számít semmit.\n\nEnnek az opciónak az engedélyezésével a döntési fa kisebb lesz:
+Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
+Egy kötegelt feladat fájl létrehozása az automatizált szinkronizációhoz. Kötegelt feladat módban való indításhoz egyszerűen meg kell adni a fájl nevét a FreeFileSync.exe-nek: FreeFileSync.exe <kötegelt feladat fájl>. Ezt ütemezni is lehet az operációs rendszer feladatkezelőjével.
+Batch execution
+Kötegelt végrehajtás
+Batch file created successfully!
+A kötegelt feladat fájl létrehozása sikerült!
+Batch job
+Kötegelt feladat
+Big thanks for localizing FreeFileSync goes out to:
+Nagy köszönet a FreeFileSync lokalizációjáért\na következő személyeknek:
+Build:
+Build:
+Cancel
+Mégsem
+Check all
+Mindent kijelöl
+Choose to hide filtered files/directories from list
+Szűrt fájlok/könyvtárak elrejése a listában
+Comma separated list
+Comma separated values
+Compare both sides
+Mindkét oldal összehasonlítása
+Compare by \"File content\"
+Összehasonlítás \"fájltartalom\" alapján
+Compare by \"File size and date\"
+Összehasonlítás \"fájlméret és dátum alapján\"
+Compare by...
+Összehasonlítás
+Comparing content
+Tartalom összehasonlítása
+Comparing content of files %x
+%x fájlok tartalmának összehasonlítása
+Comparing...
+Összehasonlítás...
+Completed
+Befejezve
+Configuration
+Beállítás
+Configuration loaded!
+Beállítások betöltve!
+Configuration overview:
+Beállítások áttekintése:
+Configuration saved!
+Beállítások elmentve!
+Configure filter
+Szűrő beállítása
+Configure filter...
+Szűrő beállítása
+Configure your own synchronization rules.
+Saját szinkronizálási szabályok beállítása.
+Confirm
+Megerősítés
+Continue
+Folytatás
+Conversion error:
+Konverziós hiba:
+Copy from left to right
+Másolás a bal oldalról a jobb oldalra
+Copy from left to right overwriting
+Másolás a bal oldalról a jobb oldalra felülírással
+Copy from right to left
+Másolás a jobb oldalról a bal oldalra
+Copy from right to left overwriting
+Másolás a jobb oldalról a bal oldalra felülírással
+Copy new or updated files to right folder.
+Új vagy frissített fájlok másolása a jobb oldali könyvtárba.
+Copy to clipboard\tCTRL+C
+Másolás a vágólapra\tCTRL+C
+Copying file %x overwriting %y
+%x fájl másolása felülírva a(z) %y fájlt
+Copying file %x to %y
+%x fájl másolása a(z) %y fájlba
+Could not set working directory:
+Munkakönyvtár beállítása sikertelen:
+Create a batch job
+Kötegelt feladat létrehozása
+Create:
+Létrehozás:
+Creating folder %x
+Könyvtár létrehozása %x
+Current operation:
+Aktuális művelet:
+Custom
+Egyedi
+Customize columns
+Oszlopok testreszabása
+DECISION TREE
+DÖNTÉSI FA
+Data remaining:
+Hátralévő adat:
+Data:
+Adat:
+Date
+Dátum
+Delete files/folders existing on left side only
+Csak a bal oldalon létező fájlok/könyvtárak törlése
+Delete files/folders existing on right side only
+Csak a jobb oldalon létező fájlok/könyvtárak törlése
+Delete files\tDEL
+Fájlok törlése\tDEL
+Delete on both sides
+Törlés mindkét oldalon
+Delete on both sides even if the file is selected on one side only
+Törlés mindkét oldalon, még akkor is, ha csak egyik oldalon lett kijelölve
+Delete:
+Törlés:
+Deleting file %x
+Fájl törlése %x
+Deleting folder %x
+Könyvtár törlése %x
+Directories are dependent! Be careful when setting up synchronization rules:
+A könyvtárak függenek egymástól! Legyen óvatos, amikor megadja a szinkronizálási szabályokat:
+Directory does not exist:
+A könyvtár nem létezik:
+Do not show graphical status and error messages but write to a logfile instead
+Grafikusan ne jelenítse meg az állapotot és hibaüzeneteket, helyette írja a naplófájlba
+Do not show this warning again
+Ennek a figyelmeztetésnek az elrejtése legközelebb
+Do nothing
+Nincs mit csinálni
+Do you really want to delete the following objects(s)?
+Valóban törölni akarja a az alábbi objektumo(ka)t?
+Do you really want to move the following objects(s) to the Recycle Bin?
+Valóban a Lomtárba (Recycle Bin) akarja mozgatni az alábbi objektumo(ka)t?
+Donate with PayPal
+Támogasd a PayPal segítségével
+Drag && drop
+Húzd && Ejtsd
+Email:
+E-mail:
+Error
+Hiba
+Error changing modification time:
+Az utolsó változtatás dátumának módosítása sikertelen:
+Error copying file:
+A fájl másolása sikertelen:
+Error creating directory:
+A könyvtár létrehozása sikertelen:
+Error deleting directory:
+A könyvtár törlése sikertelen:
+Error deleting file:
+A fájl törlése sikertelen:
+Error handling
+Hibakezelés
+Error loading library function:
+A könyvtári funkció betöltése sikertelen:
+Error moving to Recycle Bin:
+A Lomtárba (Recycle Bin) mozgatás sikertelen:
+Error opening file:
+A fájl megnyitása sikertelen:
+Error parsing configuration file:
+A beállításokat tartalmazó fájl feldolgozása sikertelen:
+Error reading file attributes:
+A fájl attribútumainak olvasása sikertelen:
+Error reading file:
+A fájl olvasása sikertelen:
+Error resolving symbolic link:
+A szimbolikus link feloldása sikertelen:
+Error traversing directory:
+Könyvtár átnézése sikertelen:
+Error writing file attributes:
+A fájl attribútumainak írása sikertelen:
+Error writing file:
+A fájl írása sikertelen:
+Error: Source directory does not exist anymore:
+Hiba: A forráskönyvtár többé nem létezik:
+Example
+Példa
+Exclude
+Kizárás
+Exclude temporarily
+Ideiglenes kizárás
+Exclude via filter:
+Kizárás szűrő segítségével:
+Exit immediately and set returncode < 0
+Azonnali kilépés és a visszatérési érték < 0
+Exit with RC < 0
+Kilépés (visszatérési érték < 0)
+Feedback and suggestions are welcome at:
+A visszajelzéseket és javaslatokat ide várjuk:
+File Manager integration:
+Beépülés a Fájlkezelőbe:
+File Time Tolerance:
+Fájl dátumának toleranciája:
+File already exists. Overwrite?
+A fájl már létezik. Felülírjuk?
+File content
+fájl tartalma alapján
+File list exported!
+A fájllista exportálása befejeződött!
+File size and date
+fájlméret és dátum alapján
+File times that differ by up to the specified number of seconds are still handled as having same time.
+Két fájl, melyeknek dátuma legfeljebb az itt megadott másodperccel tér el egymástól, úgy lesz kezelve, mintha egyforma lenne a dátumuk.
+Filename
+Fájlnév
+Files are found equal if\n     - file content\nis the same.
+A fájlok megegyeznek ha\n  - a fájlok tartalma\nmegegyezik.
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
+A fájlok megegyeznek ha\n  - a fájlméret\n  - az utolsó módosítás dátuma\nmegegyezik.
+Files remaining:
+Hátralévő fájlok:
+Files that exist on both sides and have different content
+Mindkét oldalon létező fájlok különböző tartalommal
+Files that exist on both sides, have same date but different filesizes
+Mindkét oldalon létező fájlok ugyanazzal a dátummal, de különböző mérettel
+Files that exist on both sides, left one is newer
+Mindkét oldalon létező fájlok, de a bal oldali újabb
+Files that exist on both sides, right one is newer
+Mindkét oldalon létező fájlok, de a jobb oldali újabb
+Files/folders remaining:
+Hátralévő fájlok/könyvtárak:
+Files/folders scanned:
+Vizsgált fájlok/könyvtárak:
+Files/folders that exist on left side only
+Csak a bal oldalon létező fájlok/könyvtárak
+Files/folders that exist on right side only
+Csak a jobb oldalon létező fájlok/könyvtárak
+Filter active: Press again to deactivate
+Szűrő aktív: Nyomja meg újra a deaktiváláshoz
+Filter files
+Fájlok szűrése
+Filter view
+Szűrő nézet
+Folder Comparison and Synchronization
+Könyvtár összehasonlítás és szinkronizáció
+Folder pair
+Könyvtár pár
+FreeFileSync - Folder Comparison and Synchronization
+FreeFileSync - Könyvtár összehasonlítás és szinkronizáció
+FreeFileSync Batch Job
+FreeFileSync kötegelt feladat
+FreeFileSync at Sourceforge
+FreeFileSync a Sourceforge-on
+FreeFileSync batch file
+FreeFileSync kötegelt fájl
+FreeFileSync configuration
+FreeFileSync beállítások
+Full name
+Teljes név
+Generating file list...
+Fájllista generálása...
+Global settings
+Globális beállítások
+Help
+Súgó
+Hide all error and warning messages
+Összes hibaüzenet és figyelmeztetés elrejtése
+Hide files that are different
+A nem egyező fájlok elrejtése
+Hide files that are equal
+Az egyező fájlok elrejtése
+Hide files that are newer on left
+A bal oldalon lévő újabb fájlok elrejtése
+Hide files that are newer on right
+A jobb oldalon lévő újabb fájlok elrejtése
+Hide files that exist on left side only
+Csak a bal oldalon létező fájlok elrejtése
+Hide files that exist on right side only
+Csak a jobb oldalon létező fájlok elrejtése
+Hide filtered items
+A szűrt elemek elrejtése
+Hide further error messages during the current process
+A további hibaüzenetek elrejtése az aktuális folyamat során
+Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
+Hibaüzenetek elrejtése szinkronizálás közben:\nÖssze lesznek gyűjtve és a folyamat végén meg lesznek jelenítve egy listában
+Hints:
+Tippek:
+Homepage:
+Honlap:
+If you like FFS
+Ha szereted az FFS-t
+Ignore errors
+Hibák figyelmen kívül hagyása
+Ignore subsequent errors
+Későbbi hibák figyelmen kívül hagyása
+Ignore this error, retry or abort synchronization?
+Figyelmen kívül hagyja ezt a hibát, újra megpróbálja vagy megszakítja a szinkronizálást?
+Ignore this error, retry or abort?
+Figyelmen kívül hagyja ezt a hibát, újra megpróbálja vagy megszakítja?
+Include
+Tartalmaz
+Include temporarily
+Ideiglenesen tartalmaz
+Include: *.doc;*.zip;*.exe\nExclude: *\\temp\\*
+Tartalmaz: *.doc;*.zip;*.exe\nKizárás: *\\temp\\*
+Info
+Információ
+Information
+Információ
+Initialization of Recycle Bin failed!
+A Lomtár (Recycle Bin) inicializálása sikertelen!
+It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
+Lehetetlen a Lomtár (Recycle Bin) inicializálása!\n\nValószínűleg azért, mert nem Windost használ.\nHa szeretné ezt a funkciót használni, kérjük, lépjen kapcsolatba a szerzővel. :)
+Left folder:
+Bal oldali könyvtár:
+Legend
+Előzmény
+Load configuration from file
+Beállítások betöltése fájlból
+Load configuration history (press DEL to delete items)
+Beállítások előzményeinek a betöltése (Nyomja meg a DEL gombot a törléshez)
+Log-messages:
+Naplóbejegyzések:
+Mirror ->>
+Tükrözés ->>
+Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
+A bal oldali könyvtár tükrözött másolata: A jobb oldali könyvtár felülíródik és pontosan megegyezik majd a bal oldalival a szinkronizálás után.
+Move column down
+Oszlop mozgatása lefelé
+Move column up
+Oszlop mozgatása felfelé
+Not all items were synchronized! Have a look at the list.
+Nem minden elemet sikerült szinkronizálni. Vessen egy pillantást a listára.
+Nothing to synchronize according to configuration!
+A beállításoknak megfelelően nincs mit szinkronizálni!
+Number of files and directories that will be created
+A létrehozandó fájlok és könyvtárak száma
+Number of files and directories that will be deleted
+A törlendő fájlok és könyvtárak száma
+Number of files that will be overwritten
+A felülírandó fájlok száma
+OK
+OK
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the full name including path prefix.
+Csak a szűrőnek megfelelő fájlok/könyvtárak lesznek kijelölve szinkronizáláshoz.\nA szűrő a teljes névre érvényes, amelybe beletartozik az útvonal is.
+Open synchronization dialog
+Szinkronizációs ablak megnyitása
+Open with File Manager\tD-Click
+Megnyitás a Fájlkezelőben\tD-Click
+Operation aborted!
+Művelet megszakítva!
+Operation:
+Művelet:
+Pause
+Szünet
+Please fill all empty directory fields.
+Kérjük, töltse ki az összes üres könyvtár mezőt.
+Press button to activate filter
+Nyomja meg a gombot a szűrő aktiválásához
+Preview
+Előnézet
+Published under the GNU General Public License:
+Kiadva a GNU General Public License alatt:
+Quit
+Kilépés
+Relative path
+Relatív útvonal
+Remove folder pair
+Könyvtár párok eltávolítása
+Reset
+Helyreállítás
+Reset all warning messages?
+Helyreállítja az összes figyelmeztető üzenetet?
+Resets all warning messages
+Az összes figyelmeztető üzenet helyreállítása
+Result
+Eredmény
+Right folder:
+Jobb oldali könyvtár:
+S&ave configuration
+Beállítások mentés&e
+Save aborted!
+Mentés megszakítva!
+Save current configuration to file
+Aktuális beállítások mentése fájlba
+Scanning...
+Vizsgálat folyamatban...
+Scanning:
+Vizsgálat:
+Select a folder
+Könyvtár kiválasztása
+Select variant:
+Változat kiválasztása:
+Show files that are different
+Eltérő fájlok mutatása
+Show files that are equal
+Egyező fájlok mutatása
+Show files that are newer on left
+A bal oldali újabb fájlok mutatása
+Show files that are newer on right
+A jobb oldali újabb fájlok mutatása
+Show files that exist on left side only
+Csak a bal oldalon létező fájlok mutatása
+Show files that exist on right side only
+Csak a jobb oldalon létező fájlok mutatása
+Show popup
+Felbukkanó ablak mutatása
+Show popup on errors or warnings
+Értesítés felbukkanó ablakban a hibákról és figyelmeztetésekről
+Significant difference detected: More than 50% of files will be overwritten/deleted!
+Nagymennyiségű változások felismerve: Több mint 50%-a a fájloknak felülírva/törölve!
+Silent mode
+Csendes mód
+Size
+Méret
+Sorting file list...
+Fájllista rendezése...
+Source code written completely in C++ utilizing:
+A forráskód teljes egészében C++-ban íródott\na következők felhasználásával:
+Start
+Indítás
+Start synchronization
+Szinkronizáció indítása
+Stop
+Megállítás
+Swap sides
+Oldalak felcserélése
+Synchronization aborted!
+A szinkronizáció megszakítva!
+Synchronization completed successfully!
+A szinkronizáció sikeresen befejeződött!
+Synchronization completed with errors!
+A szinkronizáció befejeződött, de akadtak hibák!
+Synchronization filter
+Szinkronizáció szűrője
+Synchronization settings
+Szinkronizáció beállításai
+Synchronization status
+Szinkronizáció állapota
+Synchronize all .doc, .zip and .exe files except everything from folder \"temp\".
+Minden .doc, .zip és .exe fájl szinkronizálása a \"temp\" könyvtárban levők kivételével.
+Synchronize both sides simultaneously: Copy new or updated files in both directions.
+Mindkét oldal szinkronizálása egyszerre: Új és frissített fájlok másolása mindkét irányban.
+Synchronizing...
+Szinkronizálás folyamatban...
+System out of memory!
+Nincs elég rendszermemória!
+Target file already existing!
+A célként megadott fájl már létezik!
+The file does not contain a valid configuration:
+A következő fájl nem tartalmaz érvényes beállításokat:
+File does not exist:
+A következő fájl nem létezik:
+This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
+Ez a parancssor lesz végrehajtva minden fájlnéven történő dupla kattintás esetében. %name helyettesíti a kiválasztott fájlt.
+This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
+Ez a parancssor lesz végrehajtva minden fájlnéven történő dupla kattintás esetében. %x helyettesíti a kiválasztott fájlt.
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
+Ez a változat akkor tekint egyformának két azonos nevű fájlt, ha azok mérete ÉS az utolsó módosításuk ideje azonos.
+Time
+Idő
+Time elapsed:
+Eltelt idő:
+Total amount of data that will be transferred
+A mozgatandó adatok összmérete
+Total time:
+Becsült idő:
+Two way <->
+Kétirányú <->
+Unable to create logfile!
+Nem lehet létrehozni a naplófájlt!
+Unable to initialize Recycle Bin!
+Nem lehet inicializálni a Lomtárat (Recycle Bin)!
+Uncheck all
+Összes kijelölést megszűntet
+Update ->
+Frissítés ->
+Update:
+Frissítés:
+Use Recycle Bin
+Lomtár (Recycle Bin) használata
+Use Recycle Bin when deleting or overwriting files during synchronization
+A Lomtár (Recycle Bin) használata fájlok szinkronizálása közbeni törlésnél vagy felülírásnál
+Warning
+Figyelem
+Warning: Synchronization failed for %x item(s):
+Figyelem: A következő %x elem szinkronizálása sikertelen:
+Warnings:
+Figyelem:
+When the comparison is started with this option set the following decision tree is processed:
+Ha az összehasonlítás ezekkel a beállításokkal lesz elindítva, akkor a következő döntési fa érvényesül:
+You may try to synchronize remaining items again (WITHOUT having to re-compare)!
+Meg lehet próbálni újra a megmaradt elemek szinkronizálását (az összehasonlítás újbóli elvégzése NÉLKÜL)!
+different
+különböző
+file exists on both sides
+mindkét oldalon létező fájlok
+on one side only
+csak az egy oldalon létező fájlok
+|>	file on right side only\n
+|>	csak a jobb oldali fájl\n

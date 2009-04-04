@@ -26,6 +26,7 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
+					<Add library="libwxbase28ud_net.a" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -49,6 +50,7 @@
 					<Add library="libwxbase28u.a" />
 					<Add library="libwxpng.a" />
 					<Add library="libwxzlib.a" />
+					<Add library="libwxbase28u_net.a" />
 				</Linker>
 			</Target>
 			<Target title="Unit Test">
@@ -100,6 +102,7 @@
 			<Add library="liboleaut32.a" />
 			<Add library="libgdi32.a" />
 			<Add library="libcomdlg32.a" />
+			<Add library="libws2_32.a" />
 			<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 		</Linker>
 		<Unit filename="FreeFileSync.h">
@@ -252,6 +255,14 @@
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="ui\syncDialog.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="ui\checkVersion.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="ui\checkVersion.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
