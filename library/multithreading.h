@@ -1,9 +1,9 @@
 #ifndef MULTITHREADING_H_INCLUDED
 #define MULTITHREADING_H_INCLUDED
 
-#include "statusHandler.h"
 #include <wx/thread.h>
 
+class StatusHandler;
 class WorkerThread;
 
 

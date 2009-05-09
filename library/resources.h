@@ -82,7 +82,6 @@ public:
     wxBitmap* bitmapStatusComparing;
     wxBitmap* bitmapStatusSyncing;
     wxBitmap* bitmapLogo;
-    wxBitmap* bitmapFinished;
     wxBitmap* bitmapStatusEdge;
     wxBitmap* bitmapAddFolderPair;
     wxBitmap* bitmapRemoveFolderPair;
@@ -104,6 +103,20 @@ public:
     wxBitmap* bitmapSettingsSmall;
     wxBitmap* bitmapRecycler;
     wxBitmap* bitmapShift;
+    wxBitmap* bitmapQuestion;
+    wxBitmap* bitmapChina;
+    wxBitmap* bitmapHolland;
+    wxBitmap* bitmapEngland;
+    wxBitmap* bitmapFrance;
+    wxBitmap* bitmapGermany;
+    wxBitmap* bitmapHungary;
+    wxBitmap* bitmapItaly;
+    wxBitmap* bitmapJapan;
+    wxBitmap* bitmapPoland;
+    wxBitmap* bitmapPortugal;
+    wxBitmap* bitmapBrazil;
+    wxBitmap* bitmapSlovakia;
+    wxBitmap* bitmapSpain;
 
     wxAnimation* animationMoney;
     wxAnimation* animationSync;

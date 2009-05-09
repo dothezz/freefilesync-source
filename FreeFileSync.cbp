@@ -105,7 +105,8 @@
 			<Add library="libws2_32.a" />
 			<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 		</Linker>
-		<Unit filename="FreeFileSync.h">
+		<Unit filename="structures.cpp" />
+		<Unit filename="structures.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
@@ -146,6 +147,8 @@
 		</Unit>
 		<Unit filename="library\fileHandling.cpp" />
 		<Unit filename="library\fileHandling.h" />
+		<Unit filename="library\filter.cpp" />
+		<Unit filename="library\filter.h" />
 		<Unit filename="library\globalFunctions.cpp" />
 		<Unit filename="library\globalFunctions.h">
 			<Option target="Debug" />
@@ -181,8 +184,8 @@
 		<Unit filename="library\gtest\unittest3.cpp">
 			<Option target="Unit Test" />
 		</Unit>
-		<Unit filename="library\misc.cpp" />
-		<Unit filename="library\misc.h">
+		<Unit filename="library\localization.cpp" />
+		<Unit filename="library\localization.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
@@ -201,7 +204,11 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="library\sorting.h">
+		<Unit filename="library\statistics.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="library\statistics.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
@@ -226,11 +233,51 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="ui\batchStatusHandler.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="ui\batchStatusHandler.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="ui\checkVersion.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="ui\checkVersion.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="ui\dragAndDrop.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="ui\dragAndDrop.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="ui\gridView.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="ui\gridView.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="ui\guiGenerated.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="ui\guiGenerated.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="ui\guiStatusHandler.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="ui\guiStatusHandler.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
@@ -250,19 +297,15 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="ui\sorting.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="ui\syncDialog.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="ui\syncDialog.h">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="ui\checkVersion.cpp">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="ui\checkVersion.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>

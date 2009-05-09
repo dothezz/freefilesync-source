@@ -2,6 +2,7 @@
 #include "resources.h"
 #include <wx/msgdlg.h>
 #include <wx/file.h>
+#include <fstream>
 
 
 std::string globalFunctions::numberToString(const unsigned int number)
@@ -16,6 +17,14 @@ std::string globalFunctions::numberToString(const int number)
 {
     char result[100];
     sprintf(result, "%d", number);
+    return std::string(result);
+}
+
+
+std::string globalFunctions::numberToString(const long number)
+{
+    char result[100];
+    sprintf(result, "%ld", number);
     return std::string(result);
 }
 
@@ -52,14 +61,18 @@ int globalFunctions::stringToInt(const std::string& number)
 }
 
 
-inline
+long globalFunctions::stringToLong(const std::string& number)
+{
+    return atol(number.c_str());
+}
+
+
 double globalFunctions::stringToDouble(const std::string& number)
 {
     return atof(number.c_str());
 }
 
 
-inline
 int globalFunctions::wxStringToInt(const wxString& number)
 {
     long result = 0;
@@ -70,7 +83,6 @@ int globalFunctions::wxStringToInt(const wxString& number)
 }
 
 
-inline
 double globalFunctions::wxStringToDouble(const wxString& number)
 {
     double result = 0;

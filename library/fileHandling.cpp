@@ -3,6 +3,7 @@
 #include <wx/msgdlg.h>
 #include "../algorithm.h"
 #include <wx/filename.h>
+#include "globalFunctions.h"
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -67,20 +68,25 @@ private:
     bool recycleBinAvailable;
 };
 
-//global instance of recycle bin
-RecycleBin recyclerInstance;
+
+inline
+RecycleBin& getRecycleBin()
+{
+    static RecycleBin instance; //lazy creation of RecycleBin
+    return instance;
+}
 
 
 bool FreeFileSync::recycleBinExists()
 {
-    return recyclerInstance.recycleBinExists();
+    return getRecycleBin().recycleBinExists();
 }
 
 
 inline
 bool moveToRecycleBin(const Zstring& filename) throw(RuntimeException)
 {
-    return recyclerInstance.moveToRecycleBin(filename);
+    return getRecycleBin().moveToRecycleBin(filename);
 }
 
 
@@ -266,16 +272,17 @@ void FreeFileSync::removeDirectory(const Zstring& directory, const bool useRecyc
 class CloseHandleOnExit
 {
 public:
-    CloseHandleOnExit(HANDLE searchHandle) : m_searchHandle(searchHandle) {}
+    CloseHandleOnExit(HANDLE fileHandle) : fileHandle_(fileHandle) {}
 
     ~CloseHandleOnExit()
     {
-        FindClose(m_searchHandle);
+        CloseHandle(fileHandle_);
     }
 
 private:
-    HANDLE m_searchHandle;
+    HANDLE fileHandle_;
 };
+
 
 
 typedef DWORD WINAPI (*GetFinalPath)(
@@ -295,7 +302,7 @@ public:
         //get a handle to the DLL module containing required functionality
         hKernel = ::LoadLibrary(wxT("kernel32.dll"));
         if (hKernel)
-            getFinalPathNameByHandle = (GetFinalPath)(::GetProcAddress(hKernel, "GetFinalPathNameByHandleW")); //load unicode version!
+            getFinalPathNameByHandle = reinterpret_cast<GetFinalPath>(::GetProcAddress(hKernel, "GetFinalPathNameByHandleW")); //load unicode version!
     }
 
     ~DllHandler()
@@ -309,8 +316,13 @@ private:
     HINSTANCE hKernel;
 };
 
-//global instance
-DllHandler dynamicWinApi;
+
+inline
+DllHandler& getDllHandler() //lazy creation of DllHandler
+{
+    static DllHandler instance;
+    return instance;
+}
 
 
 Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target path of symbolic link to a directory
@@ -328,13 +340,13 @@ Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target pa
 
     CloseHandleOnExit dummy(hDir);
 
-    if (dynamicWinApi.getFinalPathNameByHandle == NULL )
+    if (getDllHandler().getFinalPathNameByHandle == NULL )
         throw FileError(Zstring(_("Error loading library function:")) + wxT("\n\"") + wxT("GetFinalPathNameByHandleW") + wxT("\""));
 
     const unsigned BUFFER_SIZE = 10000;
     TCHAR targetPath[BUFFER_SIZE];
 
-    const DWORD rv = dynamicWinApi.getFinalPathNameByHandle(
+    const DWORD rv = getDllHandler().getFinalPathNameByHandle(
                          hDir,
                          targetPath,
                          BUFFER_SIZE,
@@ -638,6 +650,21 @@ void FreeFileSync::copyFile(const Zstring& sourceFile,
 
 
 #ifdef FFS_WIN
+class CloseFindHandleOnExit
+{
+public:
+    CloseFindHandleOnExit(HANDLE searchHandle) : searchHandle_(searchHandle) {}
+
+    ~CloseFindHandleOnExit()
+    {
+        FindClose(searchHandle_);
+    }
+
+private:
+    HANDLE searchHandle_;
+};
+
+
 inline
 void setWin32FileInformation(const FILETIME& lastWriteTime, const DWORD fileSizeHigh, const DWORD fileSizeLow, FreeFileSync::FileInfo& output)
 {
@@ -649,6 +676,7 @@ void setWin32FileInformation(const FILETIME& lastWriteTime, const DWORD fileSize
 
     output.fileSize = wxULongLong(fileSizeHigh, fileSizeLow);
 }
+
 
 inline
 bool setWin32FileInformationFromSymlink(const Zstring linkName, FreeFileSync::FileInfo& output)
@@ -678,6 +706,7 @@ bool setWin32FileInformationFromSymlink(const Zstring linkName, FreeFileSync::Fi
 
     return true;
 }
+
 
 #elif defined FFS_LINUX
 class CloseDirOnExit
@@ -713,14 +742,13 @@ public:
         }
 
 #ifdef FFS_WIN
-        Zstring directoryFormatted = directory;
-        if (!FreeFileSync::endsWithPathSeparator(directoryFormatted))
-            directoryFormatted += GlobalResources::FILE_NAME_SEPARATOR;
-
-        const Zstring filespec = directoryFormatted + DefaultChar('*');
+        //ensure directoryFormatted ends with backslash
+        const Zstring directoryFormatted = FreeFileSync::endsWithPathSeparator(directory) ?
+                                           directory :
+                                           directory + GlobalResources::FILE_NAME_SEPARATOR;
 
         WIN32_FIND_DATA fileMetaData;
-        HANDLE searchHandle = FindFirstFile(filespec.c_str(), //pointer to name of file to search for
+        HANDLE searchHandle = FindFirstFile((directoryFormatted + DefaultChar('*')).c_str(), //pointer to name of file to search for
                                             &fileMetaData);   //pointer to returned information
 
         if (searchHandle == INVALID_HANDLE_VALUE)
@@ -736,11 +764,11 @@ public:
             else
                 return true;
         }
-        CloseHandleOnExit dummy(searchHandle);
+        CloseFindHandleOnExit dummy(searchHandle);
 
         do
         {   //don't return "." and ".."
-            const wxChar* name = fileMetaData.cFileName;
+            const wxChar* const name = fileMetaData.cFileName;
             if (    name[0] == wxChar('.') &&
                     ((name[1] == wxChar('.') && name[2] == wxChar('\0')) ||
                      name[1] == wxChar('\0')))
@@ -800,14 +828,10 @@ public:
             return true;
 
 #elif defined FFS_LINUX
-        Zstring directoryFormatted = directory;
-        if (FreeFileSync::endsWithPathSeparator(directoryFormatted))
-            directoryFormatted = directoryFormatted.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
-
-        DIR* dirObj = opendir(directoryFormatted.c_str());
+        DIR* dirObj = opendir(directory.c_str());
         if (dirObj == NULL)
         {
-            Zstring errorMessage = Zstring(_("Error traversing directory:")) + wxT("\n\"") + directoryFormatted + wxT("\"") ;
+            Zstring errorMessage = Zstring(_("Error traversing directory:")) + wxT("\n\"") + directory+ wxT("\"") ;
             if (m_sink->OnError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted()) == wxDIR_STOP)
                 return false;
             else
@@ -819,13 +843,15 @@ public:
         while (!(errno = 0) && (dirEntry = readdir(dirObj)) != NULL) //set errno to 0 as unfortunately this isn't done when readdir() returns NULL when it is finished
         {
             //don't return "." and ".."
-            const wxChar* name = dirEntry->d_name;
+            const wxChar* const name = dirEntry->d_name;
             if (      name[0] == wxChar('.') &&
                       ((name[1] == wxChar('.') && name[2] == wxChar('\0')) ||
                        name[1] == wxChar('\0')))
                 continue;
 
-            const Zstring fullName = directoryFormatted + GlobalResources::FILE_NAME_SEPARATOR + name;
+            const Zstring fullName = FreeFileSync::endsWithPathSeparator(directory) ? //e.g. "/"
+                                     directory + name :
+                                     directory + GlobalResources::FILE_NAME_SEPARATOR + name;
 
             struct stat fileInfo;
             if (lstat(fullName.c_str(), &fileInfo) != 0) //lstat() does not resolve symlinks
@@ -887,7 +913,7 @@ public:
             return true; //everything okay
 
         //else: we have a problem... report it:
-        const Zstring errorMessage = Zstring(_("Error traversing directory:")) + wxT("\n\"") + directoryFormatted + wxT("\"") ;
+        const Zstring errorMessage = Zstring(_("Error traversing directory:")) + wxT("\n\"") + directory + wxT("\"") ;
         if (m_sink->OnError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted()) == wxDIR_STOP)
             return false;
         else
@@ -904,15 +930,21 @@ void FreeFileSync::traverseInDetail(const Zstring& directory,
                                     const bool traverseDirectorySymlinks,
                                     FullDetailFileTraverser* sink)
 {
+    Zstring directoryFormatted = directory;
+#ifdef FFS_LINUX //remove trailing slash
+    if (directoryFormatted.size() > 1 && FreeFileSync::endsWithPathSeparator(directoryFormatted))
+        directoryFormatted = directoryFormatted.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+#endif
+
     if (traverseDirectorySymlinks)
     {
         TraverseRecursively<true> filewalker(sink);
-        filewalker.traverse(directory, 0);
+        filewalker.traverse(directoryFormatted, 0);
     }
     else
     {
         TraverseRecursively<false> filewalker(sink);
-        filewalker.traverse(directory, 0);
+        filewalker.traverse(directoryFormatted, 0);
     }
 }
 

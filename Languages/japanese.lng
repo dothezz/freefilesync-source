@@ -10,14 +10,24 @@
  PB
  TB
  TB
+ day(s)
+ 日(間)
+ hour(s)
+ 時(間)
  kB
  kB
+ min
+ 分
+ sec
+ 秒
 !=	files are different\n
-!=	ファイルは異なっています\n
+!=	ファイルに差異あり\n
 %x directories
 %x ディレクトリ
 %x files,
 %x 個のファイル:
+%x is not a valid FreeFileSync batch file!
+%x は有効なバッチファイルではありません!
 %x of %y rows in view
 %x / %y 行を表示
 %x of 1 row in view
@@ -32,6 +42,8 @@
 適用(&A)
 &Cancel
 キャンセル(&C)
+&Check for new version
+バージョン更新の確認(&C)
 &Compare
 比較(&C)
 &Create batch job
@@ -94,6 +106,8 @@
 -Open-Source ファイル同期ツール-
 .
 ,
+/sec
+/秒
 1 directory
 1 ディレクトリ
 1 file,
@@ -108,8 +122,8 @@
 2. ワイルドカードに ' * ' と ' ? ' を使用出来ます。
 3. Exclude files directly on main grid via context menu.
 3. コンテキストメニューから直接ファイルを除外出来ます。
-4. Keep the number of entries small for best performance.
-4. 保持エントリ数を小さくすることで、最適な性能を発揮します。
+4. Keep the number of (different) entries small for best performance.
+4. 保持エントリ数を小さい値にすることで、より最適な性能を発揮します。
 <<	left file is newer\n
 <<	左側の方が新しい\n
 <Directory>
@@ -124,8 +138,8 @@
 ==	同じ内容のファイル\n\n
 >>	right file is newer\n
 >>	右側の方が新しい\n
-Abort
-中断
+A newer version of FreeFileSync is available:
+FreeFileSync の新しいバージョンが利用可能です:
 Abort requested: Waiting for current operation to finish...
 ユーザによる中断: 現在の処理を終了しています.. お待ちください...
 Aborted
@@ -212,10 +226,10 @@ Copy new or updated files to right folder.
 新しい(更新)ファイルを右フォルダにコピー
 Copy to clipboard\tCTRL+C
 クリップボードにコピー\tCTRL+C
-Copying file %x overwriting %y
-ファイル %x をコピー、%y に上書き中
 Copying file %x to %y
 ファイル %x を %y にコピー中
+Copying file %x to %y overwriting target
+ファイル %x をコピー、%y に上書き中
 Could not set working directory:
 作業ディレクトリが設定できません:
 Create a batch job
@@ -256,10 +270,12 @@ Deleting folder %x
 フォルダ %x を削除中
 Directories are dependent! Be careful when setting up synchronization rules:
 ディレクトリが依存関係にあります! 同期規則の設定時には注意してください:
+Directory
+ディレクトリ
 Directory does not exist:
 ディレクトリが存在しません:
-Do not show graphical status and error messages but write to a logfile instead
-進捗状況、及びエラーを表示しないで、代わりにログファイルに書き込む
+Do not display visual status information but write to a logfile instead
+進捗状況などのメッセージを表示しないで、ログファイルの書き込みは実施する。
 Do not show this warning again
 次回からこの警告を表示しない
 Do nothing
@@ -268,12 +284,18 @@ Do you really want to delete the following objects(s)?
 本当に以下のオブジェクトを削除しますか?
 Do you really want to move the following objects(s) to the Recycle Bin?
 本当に以下のオブジェクト(複)をゴミ箱に移動しますか?
+Do you want FreeFileSync to automatically check for updates every week?
+FreeFileSync のアップデートの有無の確認を自動的に毎週行いますか>
 Donate with PayPal
 PayPal から寄付する
+Download now?
+ダウンロードしますか?
 Drag && drop
 ドラッグ && ドロップ
-Email:
-E-メール:
+Email
+E-メール
+Enable filter to exclude files from synchronization
+同期処理の際、除外ファイルフィルターを有効にする。
 Error
 エラー
 Error changing modification time:
@@ -302,6 +324,8 @@ Error reading file:
 ファイル読み込みエラー:
 Error resolving symbolic link:
 シンボリックリンクの解決に失敗:
+Error retrieving full path:
+フルパスの取得に失敗:
 Error traversing directory:
 ディレクトリの移動エラー:
 Error writing file attributes:
@@ -326,12 +350,14 @@ Feedback and suggestions are welcome at:
 フィードバック、提案など:
 File Manager integration:
 ファイラとの統合:
-File Time Tolerance:
-ファイル時刻の許容範囲:
+File Time tolerance (seconds):
+ファイル時間の許容範囲 (秒):
 File already exists. Overwrite?
 ファイルは存在します、上書きしますか?
 File content
 ファイルの内容
+File does not exist:
+ファイルが存在しません:
 File list exported!
 ファイル一覧のエクスポートが完了!
 File size and date
@@ -362,6 +388,8 @@ Files/folders that exist on left side only
 左側のみに存在するファイル/フォルダ
 Files/folders that exist on right side only
 右側のみに存在するファイル/フォルダ
+Filter
+フィルター
 Filter active: Press again to deactivate
 フィルター有効化: 再度押すと無効化
 Filter files
@@ -382,6 +410,8 @@ FreeFileSync batch file
 FreeFileSync バッチファイル
 FreeFileSync configuration
 FreeFileSync 構成設定
+FreeFileSync is up to date!
+FreeFileSync は最新です!
 Full name
 完全な名前
 Generating file list...
@@ -412,8 +442,8 @@ Hides error messages during synchronization:\nThey are collected and shown as a 
 同期処理中のエラーメッセージを非表示にする:\n非表示にしたメッセージは、処理の終了後に一覧表示されます。
 Hints:
 ヒント:
-Homepage:
-ホームページ:
+Homepage
+ホームページ
 If you like FFS
 FFS が気に入った場合
 Ignore errors
@@ -438,8 +468,8 @@ Initialization of Recycle Bin failed!
 ゴミ箱の初期化に失敗しました!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 ゴミ箱を初期化することが出来ませんでした!\n\n使用している OS が、Windows 以外の OS です。\nこの機能を使用したい場合は、作者までご連絡ください :)
-Left folder:
-左側フォルダ:
+Left:
+左側:
 Legend
 履歴
 Load configuration from file
@@ -448,16 +478,22 @@ Load configuration history (press DEL to delete items)
 構成設定履歴の読み込み(DELキーでアイテムを削除)
 Log-messages:
 ログメッセージ:
+Logging
+ログ
 Mirror ->>
 ミラー >>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 左側フォルダをミラーリングバックアップ: 同期完了後は、左側フォルダに合わせて右側フォルダは上書きされます。
+More than 50% of the total number of files will be copied or deleted!
+ファイル合計総数の 50% 以上が削除、またはコピーされます
 Move column down
 列を下に移動
 Move column up
 列を上に移動
 Not all items were synchronized! Have a look at the list.
 すべてのアイテムは同期されていません! 詳細はリストをご覧ください。
+Not enough free disk space available in:
+利用可能なディスク空き容量が足りません:
 Nothing to synchronize according to configuration!
 構成設定に対応する同期がみつかりません!
 Number of files and directories that will be created
@@ -478,8 +514,12 @@ Operation aborted!
 操作の中断!
 Operation:
 操作:
+Overview
+概要
 Pause
 一時停止
+Paused
+一時停止中
 Please fill all empty directory fields.
 アイテムが選択されていません!
 Press button to activate filter
@@ -502,8 +542,8 @@ Resets all warning messages
 すべての警告をリセット
 Result
 結果
-Right folder:
-右側フォルダ:
+Right:
+右側:
 S&ave configuration
 構成設定を保存(&A)
 Save aborted!
@@ -516,6 +556,8 @@ Scanning:
 スキャン:
 Select a folder
 フォルダを選択
+Select logfile directory:
+ログファイルの保存先を選択:
 Select variant:
 変数を選択:
 Show files that are different
@@ -534,8 +576,8 @@ Show popup
 ポップアップ表示
 Show popup on errors or warnings
 エラー/警告をポップアップ表示
-Significant difference detected: More than 50% of files will be overwritten/deleted!
-大幅な差異の検出: 50%以上のファイルが上書き、または削除されています!
+Significant difference detected:
+重大な差異が検出されました:
 Silent mode
 サイレントモード
 Size
@@ -544,6 +586,8 @@ Sorting file list...
 一覧のソート中...
 Source code written completely in C++ utilizing:
 ソースコードは C++ で書かれ、コンパイルされています:
+Speed:
+速度:
 Start
 開始
 Start synchronization
@@ -576,24 +620,26 @@ Target file already existing!
 対象ファイルは既に存在します!
 The file does not contain a valid configuration:
 このファイルには有効な構成が含まれていません:
-File does not exist:
-ファイルが存在しません:
 This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
 ファイル名をダブルクリックする度に、このコマンドが実行されます。%name は選択ファイルのプレースフォルダとして機能します。
-This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
-ファイル名をダブルクリックする度に、このコマンドが実行されます。%x は選択ファイルのプレースフォルダとして機能します。
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 この変数では、ふたつの同名ファイルが存在した場合、 それぞれのファイルサイズと最終更新日付/時間を比較します。
 Time
 時間
 Time elapsed:
 経過時間:
+Time remaining:
+残り時間:
 Total amount of data that will be transferred
 転送されたデータの総量
+Total required free disk space:
+必要な合計ディスク空き容量:
 Total time:
 合計時間:
 Two way <->
 両方向 <->
+Unable to connect to sourceforge.net!
+Sourceforge.net に接続できません!
 Unable to create logfile!
 ログファイルを作成出来ません!
 Unable to initialize Recycle Bin!

@@ -1,7 +1,39 @@
-#include "misc.h"
+#include "localization.h"
 #include <wx/msgdlg.h>
 #include "resources.h"
 #include "globalFunctions.h"
+#include <fstream>
+#include <set>
+
+//_("Browse") <- dummy string for wxDirPickerCtrl to be recognized by automatic text extraction!
+
+
+struct TranslationLine
+{
+    wxString original;
+    wxString translation;
+
+    bool operator<(const TranslationLine& b) const
+    {
+        return (original < b.original);
+    }
+};
+
+class Translation : public std::set<TranslationLine> {};
+
+
+CustomLocale::CustomLocale() :
+        wxLocale(),
+        currentLanguage(wxLANGUAGE_ENGLISH)
+{
+    translationDB = new Translation;
+}
+
+
+CustomLocale::~CustomLocale()
+{
+    delete translationDB;
+}
 
 
 inline
@@ -49,12 +81,6 @@ void exchangeEscapeChars(wxString& data)
 }
 
 
-CustomLocale::CustomLocale() :
-        wxLocale(),
-        currentLanguage(wxLANGUAGE_ENGLISH)
-{}
-
-
 void CustomLocale::setLanguage(const int language)
 {
     currentLanguage = language;
@@ -89,6 +115,9 @@ void CustomLocale::setLanguage(const int language)
     case wxLANGUAGE_PORTUGUESE:
         languageFile = "Languages/portuguese.lng";
         break;
+    case wxLANGUAGE_PORTUGUESE_BRAZILIAN:
+        languageFile = "Languages/portuguese_br.lng";
+        break;
     case wxLANGUAGE_SLOVENIAN:
         languageFile = "Languages/slovenian.lng";
         break;
@@ -100,7 +129,7 @@ void CustomLocale::setLanguage(const int language)
         currentLanguage = wxLANGUAGE_ENGLISH;
     }
 
-    static bool initialized = false; //wxLocale is a "static" too!
+    static bool initialized = false; //wxLocale is a global too!
     if (!initialized)
     {
         initialized = true;
@@ -108,7 +137,7 @@ void CustomLocale::setLanguage(const int language)
     }
 
     //load language file into buffer
-    translationDB.clear();
+    translationDB->clear();
     const int bufferSize = 100000;
     char temp[bufferSize];
     if (!languageFile.empty())
@@ -137,7 +166,7 @@ void CustomLocale::setLanguage(const int language)
                 else
                 {
                     currentLine.translation = formattedString;
-                    translationDB.insert(currentLine);
+                    translationDB->insert(currentLine);
                 }
             }
             langFile.close();
@@ -160,8 +189,8 @@ const wxChar* CustomLocale::GetString(const wxChar* szOrigString, const wxChar* 
     currentLine.original = szOrigString;
 
     //look for translation in buffer table
-    Translation::iterator i;
-    if ((i = translationDB.find(currentLine)) != translationDB.end())
+    const Translation::iterator i = translationDB->find(currentLine);
+    if (i != translationDB->end())
         return i->translation.c_str();
 
     //fallback

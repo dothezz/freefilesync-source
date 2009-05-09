@@ -5,39 +5,58 @@
 #include "../algorithm.h"
 #include "resources.h"
 #include <typeinfo>
+#include "../ui/gridView.h"
 
 #ifdef FFS_WIN
 #include <wx/icon.h>
 #include <wx/msw/wrapwin.h> //includes "windows.h"
-#endif  // FFS_WIN
+
+#elif defined FFS_LINUX
+#include <gtk/gtk.h>
+#endif
+
+
+using namespace FreeFileSync;
 
 
 const unsigned int MIN_ROW_COUNT = 15;
 
 //class containing pure grid data: basically the same as wxGridStringTable, but adds cell formatting
+
+/*
+class hierarchy:
+                              CustomGridTable
+                                    /|\
+                     ________________|________________
+                    |                                |
+           CustomGridTableRim                        |
+                   /|\                               |
+          __________|__________                      |
+         |                    |                      |
+CustomGridTableLeft  CustomGridTableRight  CustomGridTableMiddle
+*/
+
 class CustomGridTable : public wxGridTableBase
 {
 public:
-    CustomGridTable() :
+    CustomGridTable(int initialRows = 0, int initialCols = 0) : //note: initialRows/initialCols MUST match with GetNumberRows()/GetNumberCols() at initialization!!!
             wxGridTableBase(),
-            blue(80, 110, 255),
-            grey(212, 208, 200),
-            lightRed(235, 57, 61),
-            lightBlue(63, 206, 233),
-            lightGreen(54, 218, 2),
-            gridRefUI(NULL),
-            gridData(NULL),
-            lastNrRows(0),
-            lastNrCols(0) {}
+            COLOR_BLUE(       80,  110, 255),
+            COLOR_GREY(       212, 208, 200),
+            COLOR_LIGHT_RED(  235, 57,  61),
+            COLOR_LIGHT_BLUE( 63,  206, 233),
+            COLOR_LIGHT_GREEN(54,  218, 2),
+            gridDataView(NULL),
+            lastNrRows(initialRows),
+            lastNrCols(initialCols) {}
 
 
     virtual ~CustomGridTable() {}
 
 
-    void setGridDataTable(GridView* gridRefUI, FileCompareResult* gridData)
+    void setGridDataTable(GridView* gridDataView)
     {
-        this->gridRefUI = gridRefUI;
-        this->gridData  = gridData;
+        this->gridDataView = gridDataView;
     }
 
 
@@ -46,57 +65,27 @@ public:
 
     virtual int GetNumberRows()
     {
-        if (gridRefUI)
-            return std::max(gridRefUI->size(), MIN_ROW_COUNT);
+        if (gridDataView)
+            return std::max(gridDataView->elementsOnView(), MIN_ROW_COUNT);
         else
             return 0; //grid is initialized with zero number of rows
     }
 
 
-    virtual int GetNumberCols() //virtual used by middle grid!
-    {
-        return columnPositions.size();
-    }
-
-
     virtual bool IsEmptyCell( int row, int col )
     {
-        return (GetValue(row, col) == wxEmptyString);
+        return false; //avoid overlapping cells
+
+        //return (GetValue(row, col) == wxEmptyString);
     }
-
-
-    virtual wxString GetValue(int row, int col) = 0;
 
 
     virtual void SetValue(int row, int col, const wxString& value)
     {
-        assert (false); //should not be used, since values are retrieved directly from gridRefUI
+        assert (false); //should not be used, since values are retrieved directly from gridDataView
     }
 
-    virtual void Clear()
-    {
-        assert (false); // we don't want to use this, since the visible grid is directly connected to gridRefUI}
-    }
-
-    virtual bool InsertRows(size_t pos = 0, size_t numRows = 1)
-    {
-        assert (false); // we don't want to use this, since the visible grid is directly connected to gridRefUI}
-        return true;
-    }
-
-    virtual bool AppendRows(size_t numRows = 1)
-    {
-        assert (false); // we don't want to use this, since the visible grid is directly connected to gridRefUI}
-        return true;
-    }
-
-    virtual bool DeleteRows(size_t pos = 0, size_t numRows = 1)
-    {
-        assert (false); // we don't want to use this, since the visible grid is directly connected to gridRefUI}
-        return true;
-    }
-
-    //update dimensions of grid: no need for InsertRows, AppendRows, DeleteRows anymore!!!
+    //update dimensions of grid: no need for InsertRows(), AppendRows(), DeleteRows() anymore!!!
     void updateGridSizes()
     {
         const int currentNrRows = GetNumberRows();
@@ -156,12 +145,6 @@ public:
 //###########################################################################
 
 
-    virtual wxString GetColLabelValue( int col )
-    {
-        return CustomGrid::getTypeName(getTypeAtPos(col));
-    }
-
-
     virtual wxGridCellAttr* GetAttr(int row, int col, wxGridCellAttr::wxAttrKind  kind)
     {
         const wxColour& color = getRowColor(row);
@@ -190,6 +173,46 @@ public:
     }
 
 
+    const FileCompareLine* getRawData(const unsigned int row) const
+    {
+        if (gridDataView && row < gridDataView->elementsOnView())
+        {
+            return &(*gridDataView)[row];
+        }
+        return NULL;
+    }
+
+protected:
+    const wxColour COLOR_BLUE;
+    const wxColour COLOR_GREY;
+    const wxColour COLOR_LIGHT_RED;
+    const wxColour COLOR_LIGHT_BLUE;
+    const wxColour COLOR_LIGHT_GREEN;
+
+    const GridView* gridDataView; //(very fast) access to underlying grid data :)
+
+private:
+    virtual const wxColour& getRowColor(int row) = 0; //rows that are filtered out are shown in different color
+
+    int       lastNrRows;
+    int       lastNrCols;
+};
+
+
+class CustomGridTableRim : public CustomGridTable
+{
+public:
+    virtual int GetNumberCols()
+    {
+        return columnPositions.size();
+    }
+
+    virtual wxString GetColLabelValue( int col )
+    {
+        return CustomGridRim::getTypeName(getTypeAtPos(col));
+    }
+
+
     void setupColumns(const std::vector<xmlAccess::ColumnTypes>& positions)
     {
         columnPositions = positions;
@@ -206,107 +229,145 @@ public:
     }
 
 
-    const FileCompareLine* getRawData(const unsigned int row)
-    {
-        if (gridRefUI && row < gridRefUI->size())
-        {
-            const FileCompareLine& cmpLine = (*gridData)[(*gridRefUI)[row]];
-            return &cmpLine;
-        }
-        return NULL;
-    }
-
-
-protected:
-    virtual const wxColour& getRowColor(int row) = 0; //rows that are filtered out are shown in different color
-
+private:
     std::vector<xmlAccess::ColumnTypes> columnPositions;
-
-    wxColour  blue;
-    wxColour  grey;
-    wxColour  lightRed;
-    wxColour  lightBlue;
-    wxColour  lightGreen;
-    GridView* gridRefUI; //(very fast) access to underlying grid data :)
-    FileCompareResult* gridData;
-    int       lastNrRows;
-    int       lastNrCols;
 };
 
 
-class CustomGridTableLeft : public CustomGridTable
+class CustomGridTableLeft : public CustomGridTableRim
 {
 public:
-    CustomGridTableLeft() : CustomGridTable() {}
-    ~CustomGridTableLeft() {}
-
-    virtual const wxColour& getRowColor(int row) //rows that are filtered out are shown in different color
+    virtual wxString GetValue(int row, int col)
     {
-        if (gridRefUI && unsigned(row) < gridRefUI->size())
+        const FileCompareLine* gridLine = getRawData(row);
+        if (gridLine)
         {
-            const FileCompareLine cmpLine = (*gridData)[(*gridRefUI)[row]];
-
-            //mark filtered rows
-            if (!cmpLine.selectedForSynchronization)
-                return blue;
-            //mark directories
-            else if (cmpLine.fileDescrLeft.objType == FileDescrLine::TYPE_DIRECTORY)
-                return grey;
-            else
-                return *wxWHITE;
-        }
-        return *wxWHITE;
-    }
-
-
-    //virtual impl.
-    wxString GetValue(int row, int col)
-    {
-        if (gridRefUI)
-        {
-            if (unsigned(row) < gridRefUI->size())
+            if (gridLine->fileDescrLeft.objType == FileDescrLine::TYPE_DIRECTORY)
             {
-                const FileCompareLine& gridLine = (*gridData)[(*gridRefUI)[row]];
-
-                if (gridLine.fileDescrLeft.objType == FileDescrLine::TYPE_DIRECTORY)
+                switch (getTypeAtPos(col))
                 {
-                    switch (getTypeAtPos(col))
-                    {
-                    case xmlAccess::FULL_NAME:
-                        return gridLine.fileDescrLeft.fullName.c_str();
-                    case xmlAccess::FILENAME: //filename
-                        return wxEmptyString;
-                    case xmlAccess::REL_PATH: //relative path
-                        return gridLine.fileDescrLeft.relativeName.c_str();
-                    case xmlAccess::SIZE: //file size
-                        return _("<Directory>");
-                    case xmlAccess::DATE: //date
-                        return wxEmptyString;
-                    }
+                case xmlAccess::FULL_NAME:
+                    return gridLine->fileDescrLeft.fullName.c_str();
+                case xmlAccess::FILENAME:
+                    return wxEmptyString;
+                case xmlAccess::REL_PATH:
+                    return gridLine->fileDescrLeft.relativeName.c_str();
+                case xmlAccess::DIRECTORY:
+                    return gridDataView->getFolderPair(row).leftDirectory.c_str();
+                case xmlAccess::SIZE: //file size
+                    return _("<Directory>");
+                case xmlAccess::DATE: //date
+                    return wxEmptyString;
                 }
-                else if (gridLine.fileDescrLeft.objType == FileDescrLine::TYPE_FILE)
+            }
+            else if (gridLine->fileDescrLeft.objType == FileDescrLine::TYPE_FILE)
+            {
+                switch (getTypeAtPos(col))
                 {
-                    switch (getTypeAtPos(col))
-                    {
-                    case xmlAccess::FULL_NAME:
-                        return gridLine.fileDescrLeft.fullName.c_str();
-                    case xmlAccess::FILENAME: //filename
-                        return wxString(gridLine.fileDescrLeft.relativeName.c_str()).AfterLast(GlobalResources::FILE_NAME_SEPARATOR);
-                    case xmlAccess::REL_PATH: //relative path
-                        return wxString(gridLine.fileDescrLeft.relativeName.c_str()).BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
-                    case xmlAccess::SIZE: //file size
-                    {
-                        wxString fileSize = gridLine.fileDescrLeft.fileSize.ToString(); //tmp string
-                        return globalFunctions::includeNumberSeparator(fileSize);
-                    }
-                    case xmlAccess::DATE: //date
-                        return FreeFileSync::utcTimeToLocalString(gridLine.fileDescrLeft.lastWriteTimeRaw);
-                    }
+                case xmlAccess::FULL_NAME:
+                    return gridLine->fileDescrLeft.fullName.c_str();
+                case xmlAccess::FILENAME: //filename
+                    return wxString(gridLine->fileDescrLeft.relativeName.c_str()).AfterLast(GlobalResources::FILE_NAME_SEPARATOR);
+                case xmlAccess::REL_PATH: //relative path
+                    return wxString(gridLine->fileDescrLeft.relativeName.c_str()).BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+                case xmlAccess::DIRECTORY:
+                    return gridDataView->getFolderPair(row).leftDirectory.c_str();
+                case xmlAccess::SIZE: //file size
+                    return globalFunctions::includeNumberSeparator(gridLine->fileDescrLeft.fileSize.ToString());
+                case xmlAccess::DATE: //date
+                    return FreeFileSync::utcTimeToLocalString(gridLine->fileDescrLeft.lastWriteTimeRaw);
                 }
             }
         }
         //if data is not found:
         return wxEmptyString;
+    }
+
+private:
+    virtual const wxColour& getRowColor(int row) //rows that are filtered out are shown in different color
+    {
+        const FileCompareLine* gridLine = getRawData(row);
+        if (gridLine)
+        {
+            //mark filtered rows
+            if (!gridLine->selectedForSynchronization)
+                return COLOR_BLUE;
+            //mark directories
+            else if (gridLine->fileDescrLeft.objType == FileDescrLine::TYPE_DIRECTORY)
+                return COLOR_GREY;
+            else
+                return *wxWHITE;
+        }
+        return *wxWHITE;
+    }
+};
+
+
+class CustomGridTableRight : public CustomGridTableRim
+{
+public:
+    virtual wxString GetValue(int row, int col)
+    {
+        const FileCompareLine* gridLine = getRawData(row);
+        if (gridLine)
+        {
+            if (gridLine->fileDescrRight.objType == FileDescrLine::TYPE_DIRECTORY)
+            {
+                switch (getTypeAtPos(col))
+                {
+                case xmlAccess::FULL_NAME:
+                    return gridLine->fileDescrRight.fullName.c_str();
+                case xmlAccess::FILENAME: //filename
+                    return wxEmptyString;
+                case xmlAccess::REL_PATH: //relative path
+                    return gridLine->fileDescrRight.relativeName.c_str();
+                case xmlAccess::DIRECTORY:
+                    return gridDataView->getFolderPair(row).rightDirectory.c_str();
+                case xmlAccess::SIZE: //file size
+                    return _("<Directory>");
+                case xmlAccess::DATE: //date
+                    return wxEmptyString;
+                }
+            }
+            else if (gridLine->fileDescrRight.objType == FileDescrLine::TYPE_FILE)
+            {
+                switch (getTypeAtPos(col))
+                {
+                case xmlAccess::FULL_NAME:
+                    return gridLine->fileDescrRight.fullName.c_str();
+                case xmlAccess::FILENAME: //filename
+                    return wxString(gridLine->fileDescrRight.relativeName.c_str()).AfterLast(GlobalResources::FILE_NAME_SEPARATOR);
+                case xmlAccess::REL_PATH: //relative path
+                    return wxString(gridLine->fileDescrRight.relativeName.c_str()).BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+                case xmlAccess::DIRECTORY:
+                    return gridDataView->getFolderPair(row).rightDirectory.c_str();
+                case xmlAccess::SIZE: //file size
+                    return globalFunctions::includeNumberSeparator(gridLine->fileDescrRight.fileSize.ToString());
+                case xmlAccess::DATE: //date
+                    return FreeFileSync::utcTimeToLocalString(gridLine->fileDescrRight.lastWriteTimeRaw);
+                }
+            }
+        }
+        //if data is not found:
+        return wxEmptyString;
+    }
+
+private:
+    virtual const wxColour& getRowColor(int row) //rows that are filtered out are shown in different color
+    {
+        const FileCompareLine* gridLine = getRawData(row);
+        if (gridLine)
+        {
+            //mark filtered rows
+            if (!gridLine->selectedForSynchronization)
+                return COLOR_BLUE;
+            //mark directories
+            else if (gridLine->fileDescrRight.objType == FileDescrLine::TYPE_DIRECTORY)
+                return COLOR_GREY;
+            else
+                return *wxWHITE;
+        }
+        return *wxWHITE;
     }
 };
 
@@ -314,160 +375,78 @@ public:
 class CustomGridTableMiddle : public CustomGridTable
 {
 public:
-    CustomGridTableMiddle() : CustomGridTable()
-    {
-        lastNrCols = 1; //ensure CustomGridTable::updateGridSizes() is working correctly
-    }
+//middle grid is created (first wxWidgets internal call to GetNumberCols()) with one column
+    CustomGridTableMiddle() : CustomGridTable(0, GetNumberCols()) {} //attention: static binding to virtual GetNumberCols() in a Constructor!
 
-    ~CustomGridTableMiddle() {}
-
-    //virtual impl.
-    int GetNumberCols()
+    virtual int GetNumberCols()
     {
         return 1;
     }
 
+    virtual wxString GetColLabelValue( int col )
+    {
+        return wxEmptyString;
+    }
 
+
+    virtual wxString GetValue(int row, int col)
+    {
+        const FileCompareLine* gridLine = getRawData(row);
+        if (gridLine)
+        {
+            switch (gridLine->cmpResult)
+            {
+            case FILE_LEFT_SIDE_ONLY:
+                return wxT("<|");
+            case FILE_RIGHT_SIDE_ONLY:
+                return wxT("|>");
+            case FILE_RIGHT_NEWER:
+                return wxT(">>");
+            case FILE_LEFT_NEWER:
+                return wxT("<<");
+            case FILE_DIFFERENT:
+                return wxT("!=");
+            case FILE_EQUAL:
+                return wxT("==");
+            default:
+                assert (false);
+                return wxEmptyString;
+            }
+        }
+        //if data is not found:
+        return wxEmptyString;
+    }
+
+private:
     virtual const wxColour& getRowColor(int row) //rows that are filtered out are shown in different color
     {
-        if (gridRefUI && unsigned(row) < gridRefUI->size())
+        const FileCompareLine* gridLine = getRawData(row);
+        if (gridLine)
         {
-            const FileCompareLine cmpLine = (*gridData)[(*gridRefUI)[row]];
-
             //mark filtered rows
-            if (!cmpLine.selectedForSynchronization)
-                return blue;
+            if (!gridLine->selectedForSynchronization)
+                return COLOR_BLUE;
             else
-                switch (cmpLine.cmpResult)
+                switch (gridLine->cmpResult)
                 {
                 case FILE_LEFT_SIDE_ONLY:
                 case FILE_RIGHT_SIDE_ONLY:
-                    return lightGreen;
+                    return COLOR_LIGHT_GREEN;
                 case FILE_LEFT_NEWER:
                 case FILE_RIGHT_NEWER:
-                    return lightBlue;
+                    return COLOR_LIGHT_BLUE;
                 case FILE_DIFFERENT:
-                    return lightRed;
+                    return COLOR_LIGHT_RED;
                 default:
                     return *wxWHITE;
                 }
         }
         return *wxWHITE;
     }
-
-
-    virtual wxString GetValue(int row, int col)
-    {
-        if (gridRefUI)
-        {
-            if (unsigned(row) < gridRefUI->size())
-            {
-                const FileCompareLine& gridLine = (*gridData)[(*gridRefUI)[row]];
-
-                switch (gridLine.cmpResult)
-                {
-                case FILE_LEFT_SIDE_ONLY:
-                    return wxT("<|");
-                case FILE_RIGHT_SIDE_ONLY:
-                    return wxT("|>");
-                case FILE_RIGHT_NEWER:
-                    return wxT(">>");
-                case FILE_LEFT_NEWER:
-                    return wxT("<<");
-                case FILE_DIFFERENT:
-                    return wxT("!=");
-                case FILE_EQUAL:
-                    return wxT("==");
-                default:
-                    assert (false);
-                    return wxEmptyString;
-                }
-            }
-        }
-        //if data is not found:
-        return wxEmptyString;
-    }
 };
-
-
-class CustomGridTableRight : public CustomGridTable
-{
-public:
-    CustomGridTableRight() : CustomGridTable() {}
-    ~CustomGridTableRight() {}
-
-    virtual const wxColour& getRowColor(int row) //rows that are filtered out are shown in different color
-    {
-        if (gridRefUI && unsigned(row) < gridRefUI->size())
-        {
-            const FileCompareLine cmpLine = (*gridData)[(*gridRefUI)[row]];
-
-            //mark filtered rows
-            if (!cmpLine.selectedForSynchronization)
-                return blue;
-            //mark directories
-            else if (cmpLine.fileDescrRight.objType == FileDescrLine::TYPE_DIRECTORY)
-                return grey;
-            else
-                return *wxWHITE;
-        }
-        return *wxWHITE;
-    }
-
-    //virtual impl.
-    wxString GetValue(int row, int col)
-    {
-        if (gridRefUI)
-        {
-            if (unsigned(row) < gridRefUI->size())
-            {
-                const FileCompareLine& gridLine = (*gridData)[(*gridRefUI)[row]];
-
-                if (gridLine.fileDescrRight.objType == FileDescrLine::TYPE_DIRECTORY)
-                {
-                    switch (getTypeAtPos(col))
-                    {
-                    case xmlAccess::FULL_NAME:
-                        return gridLine.fileDescrRight.fullName.c_str();
-                    case xmlAccess::FILENAME: //filename
-                        return wxEmptyString;
-                    case xmlAccess::REL_PATH: //relative path
-                        return gridLine.fileDescrRight.relativeName.c_str();
-                    case xmlAccess::SIZE: //file size
-                        return _("<Directory>");
-                    case xmlAccess::DATE: //date
-                        return wxEmptyString;
-                    }
-                }
-                else if (gridLine.fileDescrRight.objType == FileDescrLine::TYPE_FILE)
-                {
-                    switch (getTypeAtPos(col))
-                    {
-                    case xmlAccess::FULL_NAME:
-                        return gridLine.fileDescrRight.fullName.c_str();
-                    case xmlAccess::FILENAME: //filename
-                        return wxString(gridLine.fileDescrRight.relativeName.c_str()).AfterLast(GlobalResources::FILE_NAME_SEPARATOR);
-                    case xmlAccess::REL_PATH: //relative path
-                        return wxString(gridLine.fileDescrRight.relativeName.c_str()).BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
-                    case xmlAccess::SIZE: //file size
-                    {
-                        wxString fileSize = gridLine.fileDescrRight.fileSize.ToString(); //tmp string
-                        return globalFunctions::includeNumberSeparator(fileSize);
-                    }
-                    case xmlAccess::DATE: //date
-                        return FreeFileSync::utcTimeToLocalString(gridLine.fileDescrRight.lastWriteTimeRaw);
-                    }
-                }
-            }
-        }
-        //if data is not found:
-        return wxEmptyString;
-    }
-};
-
-
 
 //########################################################################################################
+
 
 CustomGrid::CustomGrid(wxWindow *parent,
                        wxWindowID id,
@@ -476,10 +455,10 @@ CustomGrid::CustomGrid(wxWindow *parent,
                        long style,
                        const wxString& name) :
         wxGrid(parent, id, pos, size, style, name),
-        leadGrid(NULL),
-        scrollbarsEnabled(true),
-        m_gridLeft(NULL), m_gridMiddle(NULL), m_gridRight(NULL),
-        gridDataTable(NULL),
+        m_gridLeft(NULL),
+        m_gridMiddle(NULL),
+        m_gridRight(NULL),
+        isLeading(false),
         currentSortColumn(-1),
         sortMarker(NULL)
 {
@@ -500,32 +479,14 @@ CustomGrid::CustomGrid(wxWindow *parent,
     Connect(wxEVT_SCROLLWIN_THUMBRELEASE, wxEventHandler(CustomGrid::onGridAccess), NULL, this);
     Connect(wxEVT_GRID_LABEL_LEFT_CLICK,  wxEventHandler(CustomGrid::onGridAccess), NULL, this);
     GetGridWindow()->Connect(wxEVT_LEFT_DOWN, wxEventHandler(CustomGrid::onGridAccess), NULL, this);
+
+    GetGridWindow()->Connect(wxEVT_ENTER_WINDOW, wxEventHandler(CustomGrid::adjustGridHeights), NULL, this);
 }
 
 
-void CustomGrid::initSettings(const bool enableScrollbars,
-                              const bool showFileIcons,
-                              CustomGrid* gridLeft,
-                              CustomGrid* gridRight,
-                              CustomGrid* gridMiddle,
-                              GridView* gridRefUI,
-                              FileCompareResult* gridData)
+bool CustomGrid::isLeadGrid() const
 {
-    scrollbarsEnabled = enableScrollbars;
-
-    //these grids will scroll together
-    assert(gridLeft && gridRight && gridMiddle);
-    m_gridLeft   = gridLeft;
-    m_gridRight  = gridRight;
-    m_gridMiddle = gridMiddle;
-
-    //set underlying grid data
-    assert(gridDataTable);
-    gridDataTable->setGridDataTable(gridRefUI, gridData);
-
-    this->initGridRenderer(showFileIcons);
-
-    GetGridWindow()->Connect(wxEVT_ENTER_WINDOW, wxEventHandler(CustomGrid::adjustGridHeights), NULL, this);
+    return isLeading;
 }
 
 
@@ -705,14 +666,17 @@ void additionalGridCommands(wxEvent& event, wxGrid* grid)
 
 void CustomGrid::onGridAccess(wxEvent& event)
 {
-    if (leadGrid != this)
+    if (!isLeading)
     {
-        leadGrid = this;
+        isLeading = true;
 
-        //notify grids of new user focus
-        m_gridLeft->leadGrid   = this;
-        m_gridMiddle->leadGrid = this;
-        m_gridRight->leadGrid  = this;
+        //notify other grids of new user focus
+        if (m_gridLeft != this)
+            m_gridLeft->isLeading = false;
+        if (m_gridMiddle != this)
+            m_gridMiddle->isLeading = false;
+        if (m_gridRight != this)
+            m_gridRight->isLeading = false;
 
         wxGrid::SetFocus();
     }
@@ -728,70 +692,44 @@ void CustomGrid::onGridAccess(wxEvent& event)
 }
 
 
-const wxGrid* CustomGrid::getLeadGrid()
-{
-    return leadGrid;
-}
-
-
-bool CustomGrid::isLeadGrid()
-{
-    return leadGrid == static_cast<const wxGrid*>(this);
-}
-
-
-//overwrite virtual method to finally get rid of the scrollbars
-void CustomGrid::SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh)
-{
-    if (scrollbarsEnabled)
-        wxWindow::SetScrollbar(orientation, position, thumbSize, range, refresh);
-    else
-        wxWindow::SetScrollbar(orientation, 0, 0, 0, refresh);
-}
-
-
 //workaround: ensure that all grids are properly aligned: add some extra window space to grids that have no horizontal scrollbar
-void CustomGrid::adjustGridHeights(wxEvent& event) //m_gridLeft, m_gridRight, m_gridMiddle are not NULL in this context
+void CustomGrid::adjustGridHeights(wxEvent& event)
 {
-    int y1 = 0;
-    int y2 = 0;
-    int y3 = 0;
-    int dummy = 0;
-
-    m_gridLeft->GetViewStart(&dummy, &y1);
-    m_gridRight->GetViewStart(&dummy, &y2);
-    m_gridMiddle->GetViewStart(&dummy, &y3);
-
-    if (y1 != y2 || y2 != y3)
+    if (m_gridLeft && m_gridRight && m_gridMiddle)
     {
-        int yMax = std::max(y1, std::max(y2, y3));
+        int y1 = 0;
+        int y2 = 0;
+        int y3 = 0;
+        int dummy = 0;
 
-        if (leadGrid == m_gridLeft)  //do not handle case (y1 == yMax) here!!! Avoid back coupling!
-            m_gridLeft->SetMargins(0, 0);
-        else if (y1 < yMax)
-            m_gridLeft->SetMargins(0, 30);
+        m_gridLeft->GetViewStart(&dummy, &y1);
+        m_gridRight->GetViewStart(&dummy, &y2);
+        m_gridMiddle->GetViewStart(&dummy, &y3);
 
-        if (leadGrid == m_gridRight)
-            m_gridRight->SetMargins(0, 0);
-        else if (y2 < yMax)
-            m_gridRight->SetMargins(0, 30);
+        if (y1 != y2 || y2 != y3)
+        {
+            int yMax = std::max(y1, std::max(y2, y3));
 
-        if (leadGrid == m_gridMiddle)
-            m_gridMiddle->SetMargins(0, 0);
-        else if (y3 < yMax)
-            m_gridMiddle->SetMargins(0, 30);
+            if (m_gridLeft->isLeadGrid())  //do not handle case (y1 == yMax) here!!! Avoid back coupling!
+                m_gridLeft->SetMargins(0, 0);
+            else if (y1 < yMax)
+                m_gridLeft->SetMargins(0, 30);
 
-        m_gridLeft->ForceRefresh();
-        m_gridRight->ForceRefresh();
-        m_gridMiddle->ForceRefresh();
+            if (m_gridRight->isLeadGrid())
+                m_gridRight->SetMargins(0, 0);
+            else if (y2 < yMax)
+                m_gridRight->SetMargins(0, 30);
+
+            if (m_gridMiddle->isLeadGrid())
+                m_gridMiddle->SetMargins(0, 0);
+            else if (y3 < yMax)
+                m_gridMiddle->SetMargins(0, 30);
+
+            m_gridLeft->ForceRefresh();
+            m_gridRight->ForceRefresh();
+            m_gridMiddle->ForceRefresh();
+        }
     }
-}
-
-
-void CustomGrid::updateGridSizes()
-{
-    assert(gridDataTable);
-    gridDataTable->updateGridSizes();
 }
 
 
@@ -810,37 +748,138 @@ void CustomGrid::DrawColLabel(wxDC& dc, int col)
         dc.DrawBitmap(*sortMarker, GetColRight(col) - 16 - 2, 2, true); //respect 2-pixel border
 }
 
+//############################################################################################
+//CustomGrid specializations
 
-xmlAccess::ColumnAttributes CustomGrid::getDefaultColumnAttributes()
+template <bool leftSide, bool showFileIcons>
+class GridCellRenderer : public wxGridCellStringRenderer
+{
+public:
+    GridCellRenderer(CustomGridTableRim* gridDataTable) : m_gridDataTable(gridDataTable) {};
+
+
+    virtual void Draw(wxGrid& grid,
+                      wxGridCellAttr& attr,
+                      wxDC& dc,
+                      const wxRect& rect,
+                      int row, int col,
+                      bool isSelected)
+    {
+#ifdef FFS_WIN
+        //############## show windows explorer file icons ######################
+
+        if (showFileIcons) //evaluate at compile time
+        {
+            const int ICON_SIZE = 16; //size in pixel
+
+            if (    m_gridDataTable->getTypeAtPos(col) == xmlAccess::FILENAME &&
+                    rect.GetWidth() >= ICON_SIZE)
+            {
+                //retrieve grid data
+                const FileCompareLine* rowData = m_gridDataTable->getRawData(row);
+                if (rowData) //valid row
+                {
+                    const DefaultChar* filename;
+                    if (leftSide) //evaluate at compile time
+                        filename = rowData->fileDescrLeft.fullName.c_str();
+                    else
+                        filename = rowData->fileDescrRight.fullName.c_str();
+
+                    if (*filename != DefaultChar(0)) //test if filename is empty
+                    {
+                        // Get the file icon.
+                        SHFILEINFO fileInfo;
+                        fileInfo.hIcon = 0; //initialize hIcon
+
+                        if (SHGetFileInfo(filename, //NOTE: CoInitializeEx()/CoUninitialize() implicitly called by wxWidgets on program startup!
+                                          0,
+                                          &fileInfo,
+                                          sizeof(fileInfo),
+                                          SHGFI_ICON | SHGFI_SMALLICON))
+                        {
+                            //clear area where icon will be placed
+                            wxRect rectShrinked(rect);
+                            rectShrinked.SetWidth(ICON_SIZE + 2); //add 2 pixel border
+                            wxGridCellRenderer::Draw(grid, attr, dc, rectShrinked, row, col, isSelected);
+
+                            //draw icon
+                            if (fileInfo.hIcon != 0) //fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
+                            {                        //bug report: https://sourceforge.net/tracker/?func=detail&aid=2768004&group_id=234430&atid=1093080
+                                wxIcon icon;
+                                icon.SetHICON(static_cast<WXHICON>(fileInfo.hIcon));
+                                icon.SetSize(ICON_SIZE, ICON_SIZE);
+
+                                dc.DrawIcon(icon, rectShrinked.GetX() + 2, rectShrinked.GetY());
+
+                                if (!DestroyIcon(fileInfo.hIcon))
+                                    throw RuntimeException(wxString(wxT("Error deallocating Icon handle!\n\n")) + FreeFileSync::getLastErrorFormatted());
+                            }
+
+                            //draw rest
+                            rectShrinked.SetWidth(rect.GetWidth() - ICON_SIZE - 2);
+                            rectShrinked.SetX(rect.GetX() + ICON_SIZE + 2);
+                            wxGridCellStringRenderer::Draw(grid, attr, dc, rectShrinked, row, col, isSelected);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        //default
+        wxGridCellStringRenderer::Draw(grid, attr, dc, rect, row, col, isSelected);
+
+#elif defined FFS_LINUX
+        wxGridCellStringRenderer::Draw(grid, attr, dc, rect, row, col, isSelected);
+#endif
+    }
+
+private:
+    const CustomGridTableRim* const m_gridDataTable;
+};
+
+
+
+void CustomGridRim::updateGridSizes()
+{
+    assert(gridDataTable);
+    gridDataTable->updateGridSizes();
+}
+
+
+xmlAccess::ColumnAttributes CustomGridRim::getDefaultColumnAttributes()
 {
     xmlAccess::ColumnAttributes defaultColumnSettings;
 
     xmlAccess::ColumnAttrib newEntry;
-
     newEntry.type     = xmlAccess::FULL_NAME;
     newEntry.visible  = false;
     newEntry.position = 0;
     newEntry.width    = 150;
     defaultColumnSettings.push_back(newEntry);
 
-    newEntry.type     = xmlAccess::FILENAME;
-    newEntry.visible  = true;
+    newEntry.type     = xmlAccess::DIRECTORY;
     newEntry.position = 1;
-    newEntry.width    = 138;
+    newEntry.width    = 140;
     defaultColumnSettings.push_back(newEntry);
 
     newEntry.type     = xmlAccess::REL_PATH;
+    newEntry.visible  = true;
     newEntry.position = 2;
     newEntry.width    = 118;
     defaultColumnSettings.push_back(newEntry);
 
-    newEntry.type     = xmlAccess::SIZE;
+    newEntry.type     = xmlAccess::FILENAME;
     newEntry.position = 3;
-    newEntry.width    = 67;
+    newEntry.width    = 138;
+    defaultColumnSettings.push_back(newEntry);
+
+    newEntry.type     = xmlAccess::SIZE;
+    newEntry.position = 4;
+    newEntry.width    = 70;
     defaultColumnSettings.push_back(newEntry);
 
     newEntry.type     = xmlAccess::DATE;
-    newEntry.position = 4;
+    newEntry.position = 5;
     newEntry.width    = 113;
     defaultColumnSettings.push_back(newEntry);
 
@@ -848,7 +887,7 @@ xmlAccess::ColumnAttributes CustomGrid::getDefaultColumnAttributes()
 }
 
 
-xmlAccess::ColumnAttributes CustomGrid::getColumnAttributes()
+xmlAccess::ColumnAttributes CustomGridRim::getColumnAttributes()
 {
     std::sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByPositionAndVisibility);
 
@@ -866,7 +905,7 @@ xmlAccess::ColumnAttributes CustomGrid::getColumnAttributes()
 }
 
 
-void CustomGrid::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
+void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
 {
     //remove special alignment for column "size"
     for (int i = 0; i < GetNumberCols(); ++i)
@@ -940,14 +979,14 @@ void CustomGrid::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
 }
 
 
-xmlAccess::ColumnTypes CustomGrid::getTypeAtPos(unsigned pos) const
+xmlAccess::ColumnTypes CustomGridRim::getTypeAtPos(unsigned pos) const
 {
     assert(gridDataTable);
     return gridDataTable->getTypeAtPos(pos);
 }
 
 
-wxString CustomGrid::getTypeName(xmlAccess::ColumnTypes colType)
+wxString CustomGridRim::getTypeName(xmlAccess::ColumnTypes colType)
 {
     switch (colType)
     {
@@ -957,6 +996,8 @@ wxString CustomGrid::getTypeName(xmlAccess::ColumnTypes colType)
         return _("Filename");
     case xmlAccess::REL_PATH:
         return _("Relative path");
+    case xmlAccess::DIRECTORY:
+        return _("Directory");
     case xmlAccess::SIZE:
         return _("Size");
     case xmlAccess::DATE:
@@ -966,112 +1007,47 @@ wxString CustomGrid::getTypeName(xmlAccess::ColumnTypes colType)
     }
 }
 
-//############################################################################################
-//CustomGrid specializations
 
+//----------------------------------------------------------------------------------------
 CustomGridLeft::CustomGridLeft(wxWindow *parent,
                                wxWindowID id,
                                const wxPoint& pos,
                                const wxSize& size,
                                long style,
                                const wxString& name) :
-        CustomGrid(parent, id, pos, size, style, name) {}
-
-
-template <bool leftSide, bool showFileIcons>
-class GridCellRenderer : public wxGridCellStringRenderer
-{
-public:
-    GridCellRenderer(CustomGridTable* gridDataTable) : m_gridDataTable(gridDataTable) {};
-
-
-    virtual void Draw(wxGrid& grid,
-                      wxGridCellAttr& attr,
-                      wxDC& dc,
-                      const wxRect& rect,
-                      int row, int col,
-                      bool isSelected)
-    {
-#ifdef FFS_WIN
-        //############## show windows explorer file icons ######################
-
-        if (showFileIcons) //evaluate at compile time
-        {
-            const int ICON_SIZE = 16; //size in pixel
-
-            if (    m_gridDataTable->getTypeAtPos(col) == xmlAccess::FILENAME &&
-                    rect.GetWidth() >= ICON_SIZE)
-            {
-                //retrieve grid data
-                const FileCompareLine* rowData = m_gridDataTable->getRawData(row);
-                if (rowData) //valid row
-                {
-                    const DefaultChar* filename;
-                    if (leftSide) //evaluate at compile time
-                        filename = rowData->fileDescrLeft.fullName.c_str();
-                    else
-                        filename = rowData->fileDescrRight.fullName.c_str();
-
-                    if (*filename != 0) //test if filename is empty
-                    {
-                        // Get the file icon.
-                        SHFILEINFO fileInfo;
-                        if (SHGetFileInfo(filename,
-                                          0,
-                                          &fileInfo,
-                                          sizeof(fileInfo),
-                                          SHGFI_ICON | SHGFI_SMALLICON))
-                        {
-                            wxIcon icon;
-                            icon.SetHICON((WXHICON)fileInfo.hIcon);
-                            icon.SetSize(ICON_SIZE, ICON_SIZE);
-
-                            //clear area where icon will be placed
-                            wxRect rectShrinked(rect);
-                            rectShrinked.SetWidth(ICON_SIZE + 2); //add 2 pixel border
-
-                            dc.SetPen(*wxWHITE_PEN);
-                            dc.SetBrush(*wxWHITE_BRUSH);
-                            dc.DrawRectangle(rectShrinked);
-
-                            //draw icon
-                            dc.DrawIcon(icon, rectShrinked.GetX() + 2, rectShrinked.GetY());
-
-                            rectShrinked.SetWidth(rect.GetWidth() - ICON_SIZE - 2);
-                            rectShrinked.SetX(rect.GetX() + ICON_SIZE + 2);
-                            wxGridCellStringRenderer::Draw(grid, attr, dc, rectShrinked, row, col, isSelected);
-
-                            if (!DestroyIcon(fileInfo.hIcon))
-                                throw RuntimeException(wxString(wxT("Error deallocating Icon handle!\n\n")) + FreeFileSync::getLastErrorFormatted());
-
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-        //default
-        wxGridCellStringRenderer::Draw(grid, attr, dc, rect, row, col, isSelected);
-
-#elif defined FFS_LINUX
-        wxGridCellStringRenderer::Draw(grid, attr, dc, rect, row, col, isSelected);
-#endif
-    }
-
-private:
-    CustomGridTable* m_gridDataTable;
-};
-
+        CustomGridRim(parent, id, pos, size, style, name) {}
 
 
 bool CustomGridLeft::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
 {
     //use custom wxGridTableBase class for management of large sets of formatted data.
     //This is done in CreateGrid instead of SetTable method since source code is generated and wxFormbuilder invokes CreatedGrid by default.
-    gridDataTable = new CustomGridTableLeft();
+    gridDataTable = new CustomGridTableLeft;
     SetTable(gridDataTable, true, wxGrid::wxGridSelectRows);  //give ownership to wxGrid: gridDataTable is deleted automatically in wxGrid destructor
 
     return true;
+}
+
+
+void CustomGridLeft::initSettings(const bool showFileIcons,
+                                  CustomGrid* gridLeft,
+                                  CustomGrid* gridRight,
+                                  CustomGrid* gridMiddle,
+                                  GridView* gridDataView)
+{
+    //these grids will scroll together
+    m_gridLeft   = gridLeft;
+    m_gridRight  = gridRight;
+    m_gridMiddle = gridMiddle;
+
+    //set underlying grid data
+    assert(gridDataTable);
+    gridDataTable->setGridDataTable(gridDataView);
+
+    if (showFileIcons)
+        SetDefaultRenderer(new GridCellRenderer<true, true>(gridDataTable)); //SetDefaultRenderer takes ownership!
+    else
+        SetDefaultRenderer(new GridCellRenderer<true, false>(gridDataTable));
 }
 
 
@@ -1081,7 +1057,7 @@ void CustomGridLeft::DoPrepareDC(wxDC& dc)
     wxScrollHelper::DoPrepareDC(dc);
 
     int x, y = 0;
-    if (this == leadGrid)  //avoid back coupling
+    if (isLeadGrid())  //avoid back coupling
     {
         GetViewStart(&x, &y);
         m_gridMiddle->Scroll(-1, y); //scroll in y-direction only
@@ -1090,12 +1066,59 @@ void CustomGridLeft::DoPrepareDC(wxDC& dc)
 }
 
 
-void CustomGridLeft::initGridRenderer(const bool showFileIcons)
+//----------------------------------------------------------------------------------------
+CustomGridRight::CustomGridRight(wxWindow *parent,
+                                 wxWindowID id,
+                                 const wxPoint& pos,
+                                 const wxSize& size,
+                                 long style,
+                                 const wxString& name) :
+        CustomGridRim(parent, id, pos, size, style, name) {}
+
+
+bool CustomGridRight::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
 {
+    gridDataTable = new CustomGridTableRight;
+    SetTable(gridDataTable, true, wxGrid::wxGridSelectRows);  //give ownership to wxGrid: gridDataTable is deleted automatically in wxGrid destructor
+
+    return true;
+}
+
+
+void CustomGridRight::initSettings(const bool showFileIcons,
+                                   CustomGrid* gridLeft,
+                                   CustomGrid* gridRight,
+                                   CustomGrid* gridMiddle,
+                                   GridView* gridDataView)
+{
+    //these grids will scroll together
+    m_gridLeft   = gridLeft;
+    m_gridRight  = gridRight;
+    m_gridMiddle = gridMiddle;
+
+    //set underlying grid data
+    assert(gridDataTable);
+    gridDataTable->setGridDataTable(gridDataView);
+
     if (showFileIcons)
-        SetDefaultRenderer(new GridCellRenderer<true, true>(gridDataTable)); //SetDefaultRenderer takes ownership!
+        SetDefaultRenderer(new GridCellRenderer<false, true>(gridDataTable)); //SetDefaultRenderer takes ownership!
     else
-        SetDefaultRenderer(new GridCellRenderer<true, false>(gridDataTable));
+        SetDefaultRenderer(new GridCellRenderer<false, false>(gridDataTable));
+}
+
+
+//this method is called when grid view changes: useful for parallel updating of multiple grids
+void CustomGridRight::DoPrepareDC(wxDC& dc)
+{
+    wxScrollHelper::DoPrepareDC(dc);
+
+    int x, y = 0;
+    if (isLeadGrid())  //avoid back coupling
+    {
+        GetViewStart(&x, &y);
+        m_gridLeft->Scroll(x, y);
+        m_gridMiddle->Scroll(-1, y);
+    }
 }
 
 
@@ -1106,7 +1129,8 @@ CustomGridMiddle::CustomGridMiddle(wxWindow *parent,
                                    const wxSize& size,
                                    long style,
                                    const wxString& name) :
-        CustomGrid(parent, id, pos, size, style, name)
+        CustomGrid(parent, id, pos, size, style, name),
+        gridDataTable(NULL)
 {
     const wxString header = _("Legend");
     wxString toolTip = header + wxT("\n") +
@@ -1118,6 +1142,42 @@ CustomGridMiddle::CustomGridMiddle(wxWindow *parent,
                        _("!=	files are different\n") +
                        _("==	files are equal\n\n");
     GetGridWindow()->SetToolTip(toolTip);
+}
+
+
+void CustomGridMiddle::initSettings(CustomGrid* gridLeft,
+                                    CustomGrid* gridRight,
+                                    CustomGrid* gridMiddle,
+                                    FreeFileSync::GridView* gridDataView)
+{
+    //these grids will scroll together
+    m_gridLeft   = gridLeft;
+    m_gridRight  = gridRight;
+    m_gridMiddle = gridMiddle;
+
+    //set underlying grid data
+    assert(gridDataTable);
+    gridDataTable->setGridDataTable(gridDataView);
+
+#ifdef FFS_LINUX //get rid of scrollbars; Linux: change policy for GtkScrolledWindow
+    GtkWidget* gridWidget = wxWindow::m_widget;
+    GtkScrolledWindow* scrolledWindow = GTK_SCROLLED_WINDOW(gridWidget);
+    gtk_scrolled_window_set_policy(scrolledWindow, GTK_POLICY_NEVER, GTK_POLICY_NEVER);
+#endif
+}
+
+
+#ifdef FFS_WIN //get rid of scrollbars; Windows: overwrite virtual method
+void CustomGridMiddle::SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh)
+{
+    wxWindow::SetScrollbar(orientation, 0, 0, 0, refresh);
+}
+#endif
+
+void CustomGridMiddle::updateGridSizes()
+{
+    assert(gridDataTable);
+    gridDataTable->updateGridSizes();
 }
 
 
@@ -1148,12 +1208,10 @@ public:
 
         //clean first block of rect that will receive image of checkbox
         rectShrinked.SetWidth(shift);
-        dc.SetPen(*wxWHITE_PEN);
-        dc.SetBrush(*wxWHITE_BRUSH);
-        dc.DrawRectangle(rectShrinked);
+        wxGridCellRenderer::Draw(grid, attr, dc, rectShrinked, row, col, isSelected);
 
         //print image into first block
-        rectShrinked.SetX(1);
+        rectShrinked.SetX(rect.GetX() + 1);
         if (rowData->selectedForSynchronization)
             dc.DrawLabel(wxEmptyString, *globalResource.bitmapCheckBoxTrue, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
         else
@@ -1161,18 +1219,18 @@ public:
 
         //print second block (default): display compare result
         rectShrinked.SetWidth(rect.GetWidth() - shift);
-        rectShrinked.SetX(shift);
+        rectShrinked.SetX(rect.GetX() + shift);
         wxGridCellStringRenderer::Draw(grid, attr, dc, rectShrinked, row, col, isSelected);
     }
 
 private:
-    CustomGridTable* m_gridDataTable;
+    const CustomGridTable* const m_gridDataTable;
 };
 
 
 bool CustomGridMiddle::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
 {
-    gridDataTable = new CustomGridTableMiddle();
+    gridDataTable = new CustomGridTableMiddle;
     SetTable(gridDataTable, true, wxGrid::wxGridSelectRows);  //give ownership to wxGrid: gridDataTable is deleted automatically in wxGrid destructor
 
     //display checkboxes (representing bool values) if row is enabled for synchronization
@@ -1188,7 +1246,7 @@ void CustomGridMiddle::DoPrepareDC(wxDC& dc)
     wxScrollHelper::DoPrepareDC(dc);
 
     int x, y = 0;
-    if (this == leadGrid)  //avoid back coupling
+    if (isLeadGrid())  //avoid back coupling
     {
         GetViewStart(&x, &y);
         m_gridLeft->Scroll(-1, y);
@@ -1196,45 +1254,3 @@ void CustomGridMiddle::DoPrepareDC(wxDC& dc)
     }
 }
 
-
-//----------------------------------------------------------------------------------------
-CustomGridRight::CustomGridRight(wxWindow *parent,
-                                 wxWindowID id,
-                                 const wxPoint& pos,
-                                 const wxSize& size,
-                                 long style,
-                                 const wxString& name) :
-        CustomGrid(parent, id, pos, size, style, name) {}
-
-
-bool CustomGridRight::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
-{
-    gridDataTable = new CustomGridTableRight();
-    SetTable(gridDataTable, true, wxGrid::wxGridSelectRows);  //give ownership to wxGrid: gridDataTable is deleted automatically in wxGrid destructor
-
-    return true;
-}
-
-
-//this method is called when grid view changes: useful for parallel updating of multiple grids
-void CustomGridRight::DoPrepareDC(wxDC& dc)
-{
-    wxScrollHelper::DoPrepareDC(dc);
-
-    int x, y = 0;
-    if (this == leadGrid)  //avoid back coupling
-    {
-        GetViewStart(&x, &y);
-        m_gridLeft->Scroll(x, y);
-        m_gridMiddle->Scroll(-1, y);
-    }
-}
-
-
-void CustomGridRight::initGridRenderer(const bool showFileIcons)
-{
-    if (showFileIcons)
-        SetDefaultRenderer(new GridCellRenderer<false, true>(gridDataTable)); //SetDefaultRenderer takes ownership!
-    else
-        SetDefaultRenderer(new GridCellRenderer<false, false>(gridDataTable));
-}

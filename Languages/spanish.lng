@@ -110,8 +110,6 @@
 2. Usar '*' y '?' como caracteres comodín.
 3. Exclude files directly on main grid via context menu.
 3. Excluir directamente ficheros sobre la rejilla a través del menu de contexto.
-4. Keep the number of entries small for best performance.
-4. Mantener pequeño el número de entradas para conseguir un mejor funcionamiento.
 <<	left file is newer\n
 <<	el fichero de la izquierda es el más nuevo\n
 <Directory>
@@ -126,10 +124,6 @@
 ==	los ficheros son iguales\n\n
 >>	right file is newer\n
 >>	el fichero de la derecha es el más nuevo\n
-A newer version is available:
-Hay una nueva versión disponible:
-Abort
-Abortar
 Abort requested: Waiting for current operation to finish...
 Abortar pedido: Esperar a que la actual operación finalice...
 Aborted
@@ -216,8 +210,6 @@ Copy new or updated files to right folder.
 Copiar ficheros nuevos o actualizados a la carpeta de la derecha.
 Copy to clipboard\tCTRL+C
 Copiar al Portapapeles\tCTRL+C
-Copying file %x overwriting %y
-Copiar fichero %x sustituyendo %y
 Copying file %x to %y
 Copiar fichero %x a %y
 Could not set working directory:
@@ -262,8 +254,6 @@ Directories are dependent! Be careful when setting up synchronization rules:
 ¡Los directorios son dependientes! Cuidado al establecer las reglas de sincronización:
 Directory does not exist:
 El directorio no existe:
-Do not show graphical status and error messages but write to a logfile instead
-No mostrar estado ni errores en formato gráfico sino escribir un fichero "log" en su lugar.
 Do not show this warning again
 No mostrar este aviso otra vez
 Do nothing
@@ -308,8 +298,6 @@ Error reading file:
 Error al leer el fichero:
 Error resolving symbolic link:
 Error al resolver enlace simbólico:
-Error retrieving full name:
-Error al recuperar el nombre completo:
 Error traversing directory:
 Error al trasladar directorio:
 Error writing file attributes:
@@ -334,12 +322,12 @@ Feedback and suggestions are welcome at:
 Los comentarios y sugerencias será bienvenidos en:
 File Manager integration:
 Integración con el Explorador:
-File Time Tolerance:
-Tolerancia de Hora del Fichero:
 File already exists. Overwrite?
 El fichero ya existe. ¿Sustituir?
 File content
 Contenido del fichero
+File does not exist:
+El fichero no existe:
 File list exported!
 Lista de ficheros exportada!
 File size and date
@@ -448,8 +436,6 @@ Initialization of Recycle Bin failed!
 ¡El inicio de la Papelera falló!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 ¡No fue posible iniciar la Papelera!\n\nEs probable que no esté usando Windows.\nSi quiere que este hecho sea considerado, por favor, contactate con el autor :)
-Left folder:
-Carpeta de la izquierda:
 Legend
 Leyenda
 Load configuration from file
@@ -512,8 +498,6 @@ Resets all warning messages
 Reinicia todos los mensajes de aviso
 Result
 Resultado
-Right folder:
-Carpeta de la derecha:
 S&ave configuration
 G&uardar configuración
 Save aborted!
@@ -544,8 +528,6 @@ Show popup
 Mostrar "popups"
 Show popup on errors or warnings
 Mostrar "popup" de errores o avisos
-Significant difference detected: More than 50% of files will be overwritten/deleted!
-¡Detectada diferencia significativa!: Más del 50% de los ficheros serán sustituídos/borrados!
 Silent mode
 Modo silencioso
 Size
@@ -586,12 +568,8 @@ Target file already existing!
 ¡El fichero objetivo existe ya!
 The file does not contain a valid configuration:
 El fichero no contiene una configuración válida:
-File does not exist:
-El fichero no existe:
 This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
 Esta línea de comandos será ejecutada cada vez que haga doble click sobre un nombre de fichero. %name es el espacio reservado del fichero seleccionado.
-This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
-Esta línea de comandos será ejecutada cada vez que haga doble click sobre un nombre de fichero. %x es el espacio reservado para el fichero seleccionado.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Esta variante evalúa dos ficheros con el mismo nombre como iguales cuando tienen el mismo tamaño Y la misma fecha de modificación.
 Time
@@ -637,4 +615,4 @@ el fichero existe en ambos lados
 on one side only
 fichero sólo en un lado
 |>	file on right side only\n
-|>	ficheiro en lado derecho sólo\n
+|>	fichero en lado derecho sólo\n

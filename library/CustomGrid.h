@@ -3,14 +3,32 @@
 
 #include <vector>
 #include <wx/grid.h>
-#include "../FreeFileSync.h"
+#include "../structures.h"
 #include "processXml.h"
-
-using namespace FreeFileSync;
 
 
 class CustomGridTable;
+class CustomGridTableRim;
+class CustomGridTableMiddle;
+
+namespace FreeFileSync
+{
+    class GridView;
+}
 //##################################################################################
+
+/*
+class hierarchy:
+                        CustomGrid
+                            /|\
+                 ____________|____________
+                |                        |
+          CustomGridRim                  |
+               /|\                       |
+        ________|_______                 |
+       |                |                |
+CustomGridLeft  CustomGridRight  CustomGridMiddle
+*/
 
 class CustomGrid : public wxGrid
 {
@@ -24,26 +42,45 @@ public:
 
     virtual ~CustomGrid() {}
 
-    //overwrite virtual method to finally get rid of the scrollbars
-    virtual void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh = true);
-
     virtual void DrawColLabel(wxDC& dc, int col);
-
-    void initSettings(const bool enableScrollbars,
-                      const bool showFileIcons,
-                      CustomGrid* gridLeft,
-                      CustomGrid* gridRight,
-                      CustomGrid* gridMiddle,
-                      GridView* gridRefUI,
-                      FileCompareResult* gridData);
-
-    virtual void initGridRenderer(const bool showFileIcons) = 0;
-
-    //notify wxGrid that underlying table size has changed
-    void updateGridSizes();
 
     //set sort direction indicator on UI
     void setSortMarker(const int sortColumn, const wxBitmap* bitmap = &wxNullBitmap);
+
+    bool isLeadGrid() const;
+
+protected:
+    CustomGrid* m_gridLeft;
+    CustomGrid* m_gridMiddle;
+    CustomGrid* m_gridRight;
+
+private:
+    void onGridAccess(wxEvent& event);
+    void adjustGridHeights(wxEvent& event);
+
+    bool isLeading; //identify grid that has user focus
+    int currentSortColumn;
+    const wxBitmap* sortMarker;
+};
+
+
+//############## SPECIALIZATIONS ###################
+class CustomGridRim : public CustomGrid
+{
+public:
+    CustomGridRim(wxWindow *parent,
+                  wxWindowID id,
+                  const wxPoint& pos,
+                  const wxSize& size,
+                  long style,
+                  const wxString& name) :
+            CustomGrid(parent, id, pos, size, style, name),
+            gridDataTable(NULL) {}
+
+    ~CustomGridRim() {}
+
+    //notify wxGrid that underlying table size has changed
+    void updateGridSizes();
 
     //set visibility, position and width of columns
     static xmlAccess::ColumnAttributes getDefaultColumnAttributes();
@@ -54,30 +91,15 @@ public:
 
     static wxString getTypeName(xmlAccess::ColumnTypes colType);
 
-    const wxGrid* getLeadGrid();
-    bool isLeadGrid();
-
 protected:
-    void onGridAccess(wxEvent& event);
-    void adjustGridHeights(wxEvent& event);
+    CustomGridTableRim* gridDataTable;
 
+private:
     xmlAccess::ColumnAttributes columnSettings; //set visibility, position and width of columns
-
-    const wxGrid* leadGrid; //grid that has user focus
-    bool scrollbarsEnabled;
-    CustomGrid* m_gridLeft;
-    CustomGrid* m_gridMiddle;
-    CustomGrid* m_gridRight;
-
-    CustomGridTable* gridDataTable;
-
-    int currentSortColumn;
-    const wxBitmap* sortMarker;
 };
 
-//############## SPECIALIZATIONS ###################
 
-class CustomGridLeft : public CustomGrid
+class CustomGridLeft : public CustomGridRim
 {
 public:
     CustomGridLeft(wxWindow *parent,
@@ -89,12 +111,41 @@ public:
 
     ~CustomGridLeft() {}
 
+    virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
+
+    void initSettings(const bool showFileIcons,  //workaround: though this coding better belongs into a constructor
+                      CustomGrid* gridLeft,      //this is not possible due to source code generation (information not available at time of construction)
+                      CustomGrid* gridRight,
+                      CustomGrid* gridMiddle,
+                      FreeFileSync::GridView* gridDataView);
+
     //this method is called when grid view changes: useful for parallel updating of multiple grids
     virtual void DoPrepareDC(wxDC& dc);
+};
+
+
+class CustomGridRight : public CustomGridRim
+{
+public:
+    CustomGridRight(wxWindow *parent,
+                    wxWindowID id,
+                    const wxPoint& pos   = wxDefaultPosition,
+                    const wxSize& size   = wxDefaultSize,
+                    long style           = wxWANTS_CHARS,
+                    const wxString& name = wxGridNameStr);
+
+    ~CustomGridRight() {}
 
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
 
-    virtual void initGridRenderer(const bool showFileIcons);
+    void initSettings(const bool showFileIcons,  //workaround: though this coding better belongs into a constructor
+                      CustomGrid* gridLeft,      //this is not possible due to source code generation (information not available at time of construction)
+                      CustomGrid* gridRight,
+                      CustomGrid* gridMiddle,
+                      FreeFileSync::GridView* gridDataView);
+
+    //this method is called when grid view changes: useful for parallel updating of multiple grids
+    virtual void DoPrepareDC(wxDC& dc);
 };
 
 
@@ -110,33 +161,25 @@ public:
 
     ~CustomGridMiddle() {}
 
-    //this method is called when grid view changes: useful for parallel updating of multiple grids
-    virtual void DoPrepareDC(wxDC& dc);
-
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
 
-    virtual void initGridRenderer(const bool showFileIcons) {}
-};
+    void initSettings(CustomGrid* gridLeft,  //workaround: though this coding better belongs into a constructor
+                      CustomGrid* gridRight, //this is not possible due to source code generation (information not available at time of construction)
+                      CustomGrid* gridMiddle,
+                      FreeFileSync::GridView* gridDataView);
 
+    //notify wxGrid that underlying table size has changed
+    void updateGridSizes();
 
-class CustomGridRight : public CustomGrid
-{
-public:
-    CustomGridRight(wxWindow *parent,
-                    wxWindowID id,
-                    const wxPoint& pos   = wxDefaultPosition,
-                    const wxSize& size   = wxDefaultSize,
-                    long style           = wxWANTS_CHARS,
-                    const wxString& name = wxGridNameStr);
-
-    ~CustomGridRight() {}
+#ifdef FFS_WIN //get rid of scrollbars; Windows: overwrite virtual method
+    virtual void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh = true);
+#endif
 
     //this method is called when grid view changes: useful for parallel updating of multiple grids
     virtual void DoPrepareDC(wxDC& dc);
 
-    virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
-
-    virtual void initGridRenderer(const bool showFileIcons);
+private:
+    CustomGridTableMiddle* gridDataTable;
 };
 
 #endif // CUSTOMGRID_H_INCLUDED

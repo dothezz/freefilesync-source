@@ -1,17 +1,21 @@
 #ifndef SMALLDIALOGS_H_INCLUDED
 #define SMALLDIALOGS_H_INCLUDED
 
-#include "../FreeFileSync.h"
+#include "../structures.h"
 #include "../library/statusHandler.h"
 #include "../library/processXml.h"
 #include "guiGenerated.h"
 #include <wx/stopwatch.h>
+#include <memory>
+
+class Statistics;
+
 
 class AboutDlg : public AboutDlgGenerated
 {
 public:
     AboutDlg(wxWindow* window);
-    ~AboutDlg();
+    ~AboutDlg() {}
 
 private:
     void OnClose(wxCloseEvent& event);
@@ -35,7 +39,7 @@ class FilterDlg : public FilterDlgGenerated
 {
 public:
     FilterDlg(wxWindow* window, wxString& filterIncl, wxString& filterExcl);
-    ~FilterDlg();
+    ~FilterDlg() {}
 
     enum
     {
@@ -58,9 +62,9 @@ class DeleteDialog : public DeleteDlgGenerated
 {
 public:
     DeleteDialog(wxWindow* main,
-                 const FileCompareResult& grid,
-                 const std::set<int>& rowsOnLeft,
-                 const std::set<int>& rowsOnRight,
+                 const FreeFileSync::FolderComparison& folderCmp,
+                 const FreeFileSync::FolderCompRef& rowsOnLeft,
+                 const FreeFileSync::FolderCompRef& rowsOnRight,
                  bool& deleteOnBothSides,
                  bool& useRecycleBin);
 
@@ -81,9 +85,9 @@ private:
 
     void updateTexts();
 
-    const FileCompareResult& mainGrid;
-    const std::set<int>& rowsToDeleteOnLeft;
-    const std::set<int>& rowsToDeleteOnRight;
+    const FreeFileSync::FolderComparison& m_folderCmp;
+    const FreeFileSync::FolderCompRef& rowsToDeleteOnLeft;
+    const FreeFileSync::FolderCompRef& rowsToDeleteOnRight;
     bool& m_deleteOnBothSides;
     bool& m_useRecycleBin;
 };
@@ -135,6 +139,29 @@ private:
 };
 
 
+class QuestionDlg : public QuestionDlgGenerated
+{
+public:
+    QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxString messageText, bool& dontShowAgain);
+    ~QuestionDlg();
+
+    enum
+    {
+        BUTTON_YES    = 1,
+        BUTTON_NO     = 2,
+        BUTTON_CANCEL = 4
+    };
+
+private:
+    void OnClose(wxCloseEvent& event);
+    void OnCancel(wxCommandEvent& event);
+    void OnYes(wxCommandEvent& event);
+    void OnNo(wxCommandEvent& event);
+
+    bool& dontShowAgain;
+};
+
+
 class CustomizeColsDlg : public CustomizeColsDlgGenerated
 {
 public:
@@ -181,10 +208,44 @@ private:
 };
 
 
+class CompareStatus : public CompareStatusGenerated
+{
+public:
+    CompareStatus(wxWindow* parentWindow);
+
+    void init(); //initialize all status values
+
+    void switchToCompareBytewise(int totalObjectsToProcess, wxLongLong totalDataToProcess);
+    void incScannedObjects_NoUpdate(int number);
+    void incProcessedCmpData_NoUpdate(int objectsProcessed, wxLongLong dataProcessed);
+    void setStatusText_NoUpdate(const Zstring& text);
+    void updateStatusPanelNow();
+
+private:
+    //status variables
+    unsigned int scannedObjects;
+    Zstring currentStatusText;
+
+    wxStopWatch timeElapsed;
+
+    //gauge variables
+    int        totalObjects;
+    wxLongLong totalData;      //each data element represents one byte for proper progress indicator scaling
+    int        currentObjects; //each object represents a file or directory processed
+    wxLongLong currentData;
+    double     scalingFactor;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
+
+    //remaining time
+    std::auto_ptr<Statistics> statistics;
+    long lastStatCallSpeed;   //used for calculating intervals between statistics update
+    long lastStatCallRemTime; //
+};
+
+
 class SyncStatus : public SyncStatusDlgGenerated
 {
 public:
-    SyncStatus(StatusHandler* updater, wxWindow* parentWindow = NULL);
+    SyncStatus(StatusHandler* updater, wxWindow* parentWindow);
     ~SyncStatus();
 
     enum SyncStatusID
@@ -198,8 +259,8 @@ public:
         SYNCHRONIZING
     };
 
-    void resetGauge(int totalObjectsToProcess, double totalDataToProcess);
-    void incProgressIndicator_NoUpdate(int objectsProcessed, double dataProcessed);
+    void resetGauge(int totalObjectsToProcess, wxLongLong totalDataToProcess);
+    void incProgressIndicator_NoUpdate(int objectsProcessed, wxLongLong dataProcessed);
     void setStatusText_NoUpdate(const Zstring& text);
     void updateStatusDialogNow();
 
@@ -219,77 +280,20 @@ private:
     bool currentProcessIsRunning;
 
     //gauge variables
-    double totalData;     //each data element represents one byte for proper progress indicator scaling
-    double currentData;
-    double scalingFactor;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
-    int currentObjects;    //each object represents a file or directory processed
-    int totalObjects;
+    int        totalObjects;
+    wxLongLong totalData;
+    int        currentObjects; //each object represents a file or directory processed
+    wxLongLong currentData;    //each data element represents one byte for proper progress indicator scaling
+    double     scalingFactor;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
 
     Zstring currentStatusText;
     bool processPaused;
     SyncStatusID currentStatus;
+
+    //remaining time
+    std::auto_ptr<Statistics> statistics;
+    long lastStatCallSpeed;   //used for calculating intervals between statistics update
+    long lastStatCallRemTime; //
 };
-
-/*
-class RemainingTime
-{
-public:
-    RemainingTime();
-    ~RemainingTime();
-    wxLongLong getRemainingTime(double processedDataSinceLastCall, int remainingFiles, double remainingData); //returns the remaining time in milliseconds
-
-private:
-    double n;
-    double m;
-    double X;
-    double F;
-    double p;
-    double q;
-    double r;
-    double s;
-    double z_1;
-    double z_2;
-    wxLongLong lastExec;
-
-    vector<double> x; //dummy: DELETE asap!
-    vector<double> f;
-};
-*/
-
-class CompareStatus : public CompareStatusGenerated
-{
-public:
-    CompareStatus(wxWindow* parentWindow);
-    ~CompareStatus();
-
-    void init(); //initialize all status values
-
-    void switchToCompareBytewise(int totalCmpObjectsToProcess, double totalCmpDataToProcess);
-    void incScannedObjects_NoUpdate(int number);
-    void incProcessedCmpData_NoUpdate(int objectsProcessed, double dataProcessed);
-    void setStatusText_NoUpdate(const Zstring& text);
-    void updateStatusPanelNow();
-
-private:
-    //status variables
-    unsigned int scannedObjects;
-    Zstring currentStatusText;
-
-    wxStopWatch timeElapsed;
-
-    //gauge variables
-    double scalingFactorCmp;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
-    double totalCmpData;     //each data element represents one byte for proper progress indicator scaling
-    double processedCmpData;
-    int totalCmpObjects;
-    int processedCmpObjects;    //each object represents a file or directory processed
-    /*
-        //remaining time
-        RemainingTime calcTimeLeft;
-        wxLongLong timeRemaining;          //time in milliseconds
-        wxLongLong timeRemainingTimeStamp; //time in milliseconds
-    */
-};
-
 
 #endif // SMALLDIALOGS_H_INCLUDED

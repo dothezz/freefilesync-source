@@ -1,13 +1,14 @@
 #ifndef COMPARISON_H_INCLUDED
 #define COMPARISON_H_INCLUDED
 
-#include "FreeFileSync.h"
-#include "library/statusHandler.h"
+#include "structures.h"
+
+class StatusHandler;
+class DirectoryDescrBuffer;
+
 
 namespace FreeFileSync
 {
-    class DirectoryDescrBuffer;
-
     //class handling comparison process
     class CompareProcess
     {
@@ -21,15 +22,15 @@ namespace FreeFileSync
 
         void startCompareProcess(const std::vector<FolderPair>& directoryPairs,
                                  const CompareVariant cmpVar,
-                                 FileCompareResult& output) throw(AbortThisProcess);
+                                 FolderComparison& output);
 
     private:
-        void compareByTimeSize(const std::vector<FolderPair>& directoryPairsFormatted, FileCompareResult& output);
+        void compareByTimeSize(const std::vector<FolderPair>& directoryPairsFormatted, FolderComparison& output);
 
-        void compareByContent(const std::vector<FolderPair>& directoryPairsFormatted, FileCompareResult& output);
+        void compareByContent(const std::vector<FolderPair>& directoryPairsFormatted, FolderComparison& output);
 
         //create comparison result table and fill relation except for files existing on both sides
-        void performBaseComparison(const FolderPair& pair, FileCompareResult& output);
+        void performBaseComparison(const FolderPair& pair, FileComparison& output);
 
         //buffer accesses to the same directories; useful when multiple folder pairs are used
         DirectoryDescrBuffer* descriptionBuffer;
@@ -39,7 +40,7 @@ namespace FreeFileSync
         bool& m_warningDependentFolders;
 
         StatusHandler* statusUpdater;
-        Zstring txtComparingContentOfFiles;
+        const Zstring txtComparingContentOfFiles;
     };
 }
 

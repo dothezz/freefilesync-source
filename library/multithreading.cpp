@@ -1,4 +1,5 @@
 #include "multithreading.h"
+#include "statusHandler.h"
 #include <wx/utils.h>
 
 //#include <wx/msw/wrapwin.h> //includes "windows.h"

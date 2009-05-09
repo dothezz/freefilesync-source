@@ -33,7 +33,7 @@
 &Cancel
 &Mégsem
 &Compare
-&Összehasonlít
+Öss&zehasonlítás
 &Create batch job
 &Kötegelt feladat létrehozása
 &Default
@@ -108,8 +108,6 @@
 2. A csillag ('*') és a kérdőjel ('?') helyettesítő karakterek megengedettek.
 3. Exclude files directly on main grid via context menu.
 3. Fájlok közvetlen kizárása a fő listából helyi menü segítségével.
-4. Keep the number of entries small for best performance.
-4. A bejegyzések számának minimalizálása a jobb teljesítmény érdekében.
 <<	left file is newer\n
 <<	a bal oldali fájl újabb\n
 <Directory>
@@ -124,8 +122,6 @@
 ==	a fájlok egyformák\n\n
 >>	right file is newer\n
 >>	a jobb oldali fájl újabb\n
-Abort
-Megszakítás
 Abort requested: Waiting for current operation to finish...
 Megszakítási kérelem: Várakozás a folyamatban lévő művelet befejezésére...
 Aborted
@@ -212,8 +208,6 @@ Copy new or updated files to right folder.
 Új vagy frissített fájlok másolása a jobb oldali könyvtárba.
 Copy to clipboard\tCTRL+C
 Másolás a vágólapra\tCTRL+C
-Copying file %x overwriting %y
-%x fájl másolása felülírva a(z) %y fájlt
 Copying file %x to %y
 %x fájl másolása a(z) %y fájlba
 Could not set working directory:
@@ -258,8 +252,6 @@ Directories are dependent! Be careful when setting up synchronization rules:
 A könyvtárak függenek egymástól! Legyen óvatos, amikor megadja a szinkronizálási szabályokat:
 Directory does not exist:
 A könyvtár nem létezik:
-Do not show graphical status and error messages but write to a logfile instead
-Grafikusan ne jelenítse meg az állapotot és hibaüzeneteket, helyette írja a naplófájlba
 Do not show this warning again
 Ennek a figyelmeztetésnek az elrejtése legközelebb
 Do nothing
@@ -269,11 +261,9 @@ Valóban törölni akarja a az alábbi objektumo(ka)t?
 Do you really want to move the following objects(s) to the Recycle Bin?
 Valóban a Lomtárba (Recycle Bin) akarja mozgatni az alábbi objektumo(ka)t?
 Donate with PayPal
-Támogasd a PayPal segítségével
+Ha szereted a FreeFileSync-et, támogasd a PayPal segítségével.
 Drag && drop
 Húzd && Ejtsd
-Email:
-E-mail:
 Error
 Hiba
 Error changing modification time:
@@ -326,12 +316,12 @@ Feedback and suggestions are welcome at:
 A visszajelzéseket és javaslatokat ide várjuk:
 File Manager integration:
 Beépülés a Fájlkezelőbe:
-File Time Tolerance:
-Fájl dátumának toleranciája:
 File already exists. Overwrite?
 A fájl már létezik. Felülírjuk?
 File content
 fájl tartalma alapján
+File does not exist:
+A következő fájl nem létezik:
 File list exported!
 A fájllista exportálása befejeződött!
 File size and date
@@ -412,10 +402,8 @@ Hides error messages during synchronization:\nThey are collected and shown as a 
 Hibaüzenetek elrejtése szinkronizálás közben:\nÖssze lesznek gyűjtve és a folyamat végén meg lesznek jelenítve egy listában
 Hints:
 Tippek:
-Homepage:
-Honlap:
 If you like FFS
-Ha szereted az FFS-t
+FFS támogatása
 Ignore errors
 Hibák figyelmen kívül hagyása
 Ignore subsequent errors
@@ -438,8 +426,6 @@ Initialization of Recycle Bin failed!
 A Lomtár (Recycle Bin) inicializálása sikertelen!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Lehetetlen a Lomtár (Recycle Bin) inicializálása!\n\nValószínűleg azért, mert nem Windost használ.\nHa szeretné ezt a funkciót használni, kérjük, lépjen kapcsolatba a szerzővel. :)
-Left folder:
-Bal oldali könyvtár:
 Legend
 Előzmény
 Load configuration from file
@@ -502,8 +488,6 @@ Resets all warning messages
 Az összes figyelmeztető üzenet helyreállítása
 Result
 Eredmény
-Right folder:
-Jobb oldali könyvtár:
 S&ave configuration
 Beállítások mentés&e
 Save aborted!
@@ -534,8 +518,6 @@ Show popup
 Felbukkanó ablak mutatása
 Show popup on errors or warnings
 Értesítés felbukkanó ablakban a hibákról és figyelmeztetésekről
-Significant difference detected: More than 50% of files will be overwritten/deleted!
-Nagymennyiségű változások felismerve: Több mint 50%-a a fájloknak felülírva/törölve!
 Silent mode
 Csendes mód
 Size
@@ -576,12 +558,8 @@ Target file already existing!
 A célként megadott fájl már létezik!
 The file does not contain a valid configuration:
 A következő fájl nem tartalmaz érvényes beállításokat:
-File does not exist:
-A következő fájl nem létezik:
 This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
 Ez a parancssor lesz végrehajtva minden fájlnéven történő dupla kattintás esetében. %name helyettesíti a kiválasztott fájlt.
-This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
-Ez a parancssor lesz végrehajtva minden fájlnéven történő dupla kattintás esetében. %x helyettesíti a kiválasztott fájlt.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Ez a változat akkor tekint egyformának két azonos nevű fájlt, ha azok mérete ÉS az utolsó módosításuk ideje azonos.
 Time

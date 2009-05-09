@@ -1,19 +1,26 @@
 #ifndef SYNCDIALOG_H_INCLUDED
 #define SYNCDIALOG_H_INCLUDED
 
-#include "../FreeFileSync.h"
+#include "../structures.h"
 #include "guiGenerated.h"
 #include "../library/processXml.h"
+#include <memory>
 
-using namespace FreeFileSync;
+class BatchFileDropEvent;
+class BatchFolderPairPanel;
+
+namespace FreeFileSync
+{
+    class DragDropOnDlg;
+}
 
 
 class SyncDialog: public SyncDlgGenerated
 {
 public:
     SyncDialog(wxWindow* window,
-               const FileCompareResult& gridDataRef,
-               MainConfiguration& config,
+               const FreeFileSync::FolderComparison& folderCmpRef,
+               FreeFileSync::MainConfiguration& config,
                bool& ignoreErrors,
                bool synchronizationEnabled);
 
@@ -29,9 +36,9 @@ public:
                                   wxBitmapButton* button3,
                                   wxBitmapButton* button4,
                                   wxBitmapButton* button5,
-                                  const SyncConfiguration& syncConfig);
+                                  const FreeFileSync::SyncConfiguration& syncConfig);
 
-    static void adjustToolTips(wxStaticBitmap* bitmap, const CompareVariant var);
+    static void adjustToolTips(wxStaticBitmap* bitmap, const FreeFileSync::CompareVariant var);
 
 private:
     void calculatePreview();
@@ -54,14 +61,11 @@ private:
     void OnSelectRecycleBin(wxCommandEvent& event);
 
     //temporal copy of maindialog.cfg.syncConfiguration
-    SyncConfiguration localSyncConfiguration;
-    const FileCompareResult& gridData;
-    MainConfiguration& cfg;
+    FreeFileSync::SyncConfiguration localSyncConfiguration;
+    const FreeFileSync::FolderComparison& folderCmp;
+    FreeFileSync::MainConfiguration& cfg;
     bool& m_ignoreErrors;
 };
-
-
-class BatchFileDropEvent;
 
 
 class BatchDialog: public BatchDlgGenerated
@@ -89,16 +93,19 @@ private:
     void OnRightNewer(      wxCommandEvent& event);
     void OnDifferent(       wxCommandEvent& event);
 
-    void OnFilterButton(    wxCommandEvent& event);
+    void OnCheckFilter(     wxCommandEvent& event);
+    void OnCheckLogging(    wxCommandEvent& event);
     void OnSelectRecycleBin(wxCommandEvent& event);
     void OnChangeCompareVar(wxCommandEvent& event);
+
+    void updateVisibleTabs();
+    void showNotebookpage(wxWindow* page, const wxString& pageName, bool show);
 
     void OnClose(           wxCloseEvent&   event);
     void OnCancel(          wxCommandEvent& event);
     void OnSaveBatchJob(    wxCommandEvent& event);
     void OnLoadBatchJob(    wxCommandEvent& event);
 
-    void updateFilterButton();
     xmlAccess::OnError getSelectionHandleError();
     void setSelectionHandleError(const xmlAccess::OnError value);
 
@@ -106,13 +113,14 @@ private:
     void loadBatchFile(const wxString& filename);
     void loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg);
 
-    SyncConfiguration localSyncConfiguration;
-    std::vector<BatchFolderPairGenerated*> localFolderPairs;
-
-    bool filterIsActive;
+    FreeFileSync::SyncConfiguration localSyncConfiguration;
+    std::vector<BatchFolderPairPanel*> localFolderPairs;
 
     //used when saving batch file
     wxString proposedBatchFileName;
+
+    //add drag & drop support when selecting logfile directory
+    std::auto_ptr<FreeFileSync::DragDropOnDlg> dragDropOnLogfileDir;
 };
 
 #endif // SYNCDIALOG_H_INCLUDED

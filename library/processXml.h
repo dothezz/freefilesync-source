@@ -1,14 +1,14 @@
 #ifndef PROCESSXML_H_INCLUDED
 #define PROCESSXML_H_INCLUDED
 
-#include "../FreeFileSync.h"
-#include "tinyxml/tinyxml.h"
-
-using namespace FreeFileSync;
-
+#include "../structures.h"
+#include "fileHandling.h"
 
 namespace xmlAccess
 {
+    extern const wxString LAST_CONFIG_FILE;
+    extern const wxString GLOBAL_CONFIG_FILE;
+
     enum OnError
     {
         ON_ERROR_POPUP,
@@ -30,9 +30,10 @@ namespace xmlAccess
         REL_PATH,
         SIZE,
         DATE,
-        FULL_NAME
+        FULL_NAME,
+        DIRECTORY
     };
-    const unsigned COLUMN_TYPE_COUNT = 5;
+    const unsigned COLUMN_TYPE_COUNT = 6;
 
     struct ColumnAttrib
     {
@@ -48,13 +49,28 @@ namespace xmlAccess
 
     struct XmlGuiConfig
     {
-        XmlGuiConfig() : hideFilteredElements(false), ignoreErrors(false) {} //initialize values
+        XmlGuiConfig() :
+                hideFilteredElements(false),
+                ignoreErrors(false) {} //initialize values
 
-        MainConfiguration mainCfg;
-        std::vector<FolderPair> directoryPairs;
+        FreeFileSync::MainConfiguration mainCfg;
+        std::vector<FreeFileSync::FolderPair> directoryPairs;
 
         bool hideFilteredElements;
         bool ignoreErrors; //reaction on error situation during synchronization
+
+        bool operator==(const XmlGuiConfig& other) const
+        {
+            return mainCfg              == other.mainCfg &&
+                   directoryPairs       == other.directoryPairs &&
+                   hideFilteredElements == other.hideFilteredElements &&
+                   ignoreErrors         == other.ignoreErrors;
+        }
+
+        bool operator!=(const XmlGuiConfig& other) const
+        {
+            return !(*this == other);
+        }
     };
 
 
@@ -62,8 +78,8 @@ namespace xmlAccess
     {
         XmlBatchConfig() : silent(false), handleError(ON_ERROR_POPUP) {}
 
-        MainConfiguration mainCfg;
-        std::vector<FolderPair> directoryPairs;
+        FreeFileSync::MainConfiguration mainCfg;
+        std::vector<FreeFileSync::FolderPair> directoryPairs;
 
         bool silent;
         OnError handleError;       //reaction on error situation during synchronization
@@ -83,7 +99,8 @@ namespace xmlAccess
                     programLanguage(retrieveSystemLanguage()),
                     fileTimeTolerance(2),  //default 2s: FAT vs NTFS
                     traverseDirectorySymlinks(false),
-                    copyFileSymlinks(supportForSymbolicLinks())
+                    copyFileSymlinks(supportForSymbolicLinks()),
+                    lastUpdateCheck(0)
             {
                 resetWarnings();
             }
@@ -92,12 +109,14 @@ namespace xmlAccess
             unsigned fileTimeTolerance; //max. allowed file time deviation
             bool traverseDirectorySymlinks;
             bool copyFileSymlinks; //copy symbolic link instead of target file
+            long lastUpdateCheck; //time of last update check
 
             //warnings
             void resetWarnings();
 
             bool warningDependentFolders;
             bool warningSignificantDifference;
+            bool warningNotEnoughDiskSpace;
         } shared;
 
 //---------------------------------------------------------------------
@@ -114,10 +133,13 @@ namespace xmlAccess
 #elif defined FFS_LINUX
                     commandLineFileManager(wxT("konqueror \"%path\"")),
 #endif
-                    cfgHistoryMaxItems(10),
+                    cfgHistoryMax(10),
+                    folderHistLeftMax(12),
+                    folderHistRightMax(12),
                     deleteOnBothSides(false),
                     useRecyclerForManualDeletion(FreeFileSync::recycleBinExists()), //enable if OS supports it; else user will have to activate first and then get an error message
-                    showFileIcons(true) {}
+                    showFileIcons(true),
+                    popupOnConfigChange(true) {}
 
             int widthNotMaximized;
             int heightNotMaximized;
@@ -127,14 +149,22 @@ namespace xmlAccess
 
             ColumnAttributes columnAttribLeft;
             ColumnAttributes columnAttribRight;
+
             wxString commandLineFileManager;
+
             std::vector<wxString> cfgFileHistory;
-            unsigned cfgHistoryMaxItems;
+            unsigned int cfgHistoryMax;
+
             std::vector<wxString> folderHistoryLeft;
+            unsigned int folderHistLeftMax;
+
             std::vector<wxString> folderHistoryRight;
+            unsigned int folderHistRightMax;
+
             bool deleteOnBothSides;
             bool useRecyclerForManualDeletion;
             bool showFileIcons;
+            bool popupOnConfigChange;
         } gui;
 
 //---------------------------------------------------------------------

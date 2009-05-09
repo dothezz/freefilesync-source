@@ -1,6 +1,31 @@
 FreeFileSync
 ------------
 
+Changelog v1.18
+---------------
+Linux build officially released: all major problems solved!
+New statistic: remaining time
+New statistic: bytes per second
+Automatically check for program updates every week
+Finally got rid of scrollbar in middle grid for Linux build
+Fixed issue with file icon display
+Fixed overlapping grid cells
+Alternate logfile directory configurable via GUI
+Added drag & drop support for batch job assembly
+Simplyfied filter usage: - <dirname> matches "<dirname>\*" as well as "<dirname>\"
+						 - only distinct filter entries are considered
+Platform dependent linebreaks in configuration *.xml files
+"Significant difference check" runs at folder pair level
+Sorting runs at folder pair level
+New check for sufficient free disk space (considering recycle bin usage)
+New optional grid column: directory
+New sort by directory name
+Reduced memory consumption by 10%
+A lot of smaller improvements
+Added Brazilian Portuguese translation
+Updated translation files
+
+
 Changelog v1.17
 ---------------
 Full support for Windows/Linux symbolic links:

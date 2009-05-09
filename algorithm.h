@@ -1,44 +1,45 @@
 #ifndef ALGORITHM_H_INCLUDED
 #define ALGORITHM_H_INCLUDED
 
-#include "FreeFileSync.h"
-#include "library/statusHandler.h"
+#include "structures.h"
 #include "library/resources.h"
+
+class ErrorHandler;
 
 
 namespace FreeFileSync
 {
+    wxString formatFilesizeToShortString(const wxLongLong& filesize);
     wxString formatFilesizeToShortString(const wxULongLong& filesize);
     wxString formatFilesizeToShortString(const double filesize);
+
     Zstring getFormattedDirectoryName(const Zstring& dirname);
 
     bool endsWithPathSeparator(const Zstring& name);
 
-    void swapGrids(FileCompareResult& grid);
+    void swapGrids(FolderComparison& folderCmp);
 
-    void addSubElements(const FileCompareResult& grid, const FileCompareLine& relevantRow, std::set<int>& subElements);
+    void addSubElements(const FileComparison& fileCmp, const FileCompareLine& relevantRow, std::set<int>& subElements);
 
-    //manual deletion of files on main grid
-    wxString deleteFromGridAndHDPreview(const FileCompareResult& grid,
+    //manual deletion of files on main grid: runs at individual directory pair level
+    wxString deleteFromGridAndHDPreview(const FileComparison& fileCmp,
                                         const std::set<int>& rowsToDeleteOnLeft,
                                         const std::set<int>& rowsToDeleteOnRight,
                                         const bool deleteOnBothSides);
 
-    void deleteFromGridAndHD(FileCompareResult& grid,
+    void deleteFromGridAndHD(FileComparison& fileCmp,
                              const std::set<int>& rowsToDeleteOnLeft,
                              const std::set<int>& rowsToDeleteOnRight,
                              const bool deleteOnBothSides,
                              const bool useRecycleBin,
                              ErrorHandler* errorHandler);
 
-    void filterGridData(FileCompareResult& currentGridData, const wxString& includeFilter, const wxString& excludeFilter);
-    void includeAllRowsOnGrid(FileCompareResult& currentGridData);
-    void excludeAllRowsOnGrid(FileCompareResult& currentGridData);
 
     wxString utcTimeToLocalString(const wxLongLong& utcTime);
 
     //enhanced binary search template: returns an iterator
     template <class ForwardIterator, class T>
+    inline
     ForwardIterator custom_binary_search (ForwardIterator first, ForwardIterator last, const T& value)
     {
         first = lower_bound(first, last, value);

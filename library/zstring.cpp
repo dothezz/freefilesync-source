@@ -2,23 +2,28 @@
 #include <wx/intl.h>
 #include "globalFunctions.h"
 
-
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #endif  //FFS_WIN
 
 
-#ifdef __WXDEBUG__
-int allocCount = 0; //test Zstring for memory leaks
 
-void testZstringForMemoryLeak()
+#ifdef __WXDEBUG__
+AllocationCount::~AllocationCount()
 {
-    if (allocCount != 0)
+    if (count != 0)
 #ifdef FFS_WIN
-        MessageBox(NULL, wxT("Fatal Error! Allocation problem with Zstring! (No problem if it occures while Unit testing only!)"), wxString::Format(wxT("%i"), allocCount), 0);
+        MessageBox(NULL, wxT("Fatal Error! Allocation problem with Zstring! (No problem if it occurs while Unit testing only!)"), wxString::Format(wxT("%i"), count), 0);
 #else
-        throw;
-#endif  //FFS_WIN
+        std::abort();
+#endif
+}
+
+
+AllocationCount& AllocationCount::getGlobal()
+{
+    static AllocationCount global;
+    return global;
 }
 #endif
 
@@ -45,11 +50,10 @@ int FreeFileSync::compareStringsWin32(const wchar_t* a, const wchar_t* b, const 
 #endif
 
 
-size_t Zstring::Replace(const DefaultChar* old, const DefaultChar* replacement, bool replaceAll)
+Zstring& Zstring::Replace(const DefaultChar* old, const DefaultChar* replacement, bool replaceAll)
 {
     const size_t oldLen         = defaultLength(old);
     const size_t replacementLen = defaultLength(replacement);
-    size_t uiCount = 0; //count of replacements made
 
     size_t pos = 0;
     while (true)
@@ -61,13 +65,11 @@ size_t Zstring::Replace(const DefaultChar* old, const DefaultChar* replacement, 
         replace(pos, oldLen, replacement, replacementLen);
         pos += replacementLen; //move past the string that was replaced
 
-        ++uiCount; //increase replace count
-
         // stop now?
         if (!replaceAll)
             break;
     }
-    return uiCount;
+    return *this;
 }
 
 

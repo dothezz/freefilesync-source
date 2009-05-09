@@ -8,15 +8,18 @@
 #include "../synchronization.h"
 #include "../algorithm.h"
 #include <wx/dnd.h>
+#include "dragAndDrop.h"
+
+using namespace FreeFileSync;
 
 
 SyncDialog::SyncDialog(wxWindow* window,
-                       const FileCompareResult& gridDataRef,
+                       const FolderComparison& folderCmpRef,
                        MainConfiguration& config,
                        bool& ignoreErrors,
                        bool synchronizationEnabled) :
         SyncDlgGenerated(window),
-        gridData(gridDataRef),
+        folderCmp(folderCmpRef),
         cfg(config),
         m_ignoreErrors(ignoreErrors)
 {
@@ -180,16 +183,15 @@ void SyncDialog::updateConfigIcons(wxBitmapButton* button1,
 void SyncDialog::adjustToolTips(wxStaticBitmap* bitmap, const CompareVariant var)
 {
     //set tooltip for ambivalent category "different"
-    if (var == CMP_BY_TIME_SIZE)
+    switch (var)
     {
+    case CMP_BY_TIME_SIZE:
         bitmap->SetToolTip(_("Files that exist on both sides, have same date but different filesizes"));
-    }
-    else if (var == CMP_BY_CONTENT)
-    {
+        break;
+    case CMP_BY_CONTENT:
         bitmap->SetToolTip(_("Files that exist on both sides and have different content"));
+        break;
     }
-    else
-        assert(false);
 }
 
 
@@ -199,18 +201,18 @@ void SyncDialog::calculatePreview()
     int objectsToCreate    = 0;
     int objectsToOverwrite = 0;
     int objectsToDelete    = 0;
-    double dataToProcess   = 0;
-    FreeFileSync::calcTotalBytesToSync(gridData,
+    wxULongLong dataToProcess;
+    FreeFileSync::calcTotalBytesToSync(folderCmp,
                                        localSyncConfiguration,
                                        objectsToCreate,
                                        objectsToOverwrite,
                                        objectsToDelete,
                                        dataToProcess);
 
-    wxString toCreate = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(objectsToCreate));
-    wxString toUpdate = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(objectsToOverwrite));
-    wxString toDelete = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(objectsToDelete));
-    wxString data     = FreeFileSync::formatFilesizeToShortString(dataToProcess);
+    const wxString toCreate = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(objectsToCreate));
+    const wxString toUpdate = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(objectsToOverwrite));
+    const wxString toDelete = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(objectsToDelete));
+    const wxString data     = FreeFileSync::formatFilesizeToShortString(dataToProcess);
 
     m_textCtrlCreate->SetValue(toCreate);
     m_textCtrlUpdate->SetValue(toUpdate);
@@ -377,6 +379,23 @@ void SyncDialog::OnDifferent( wxCommandEvent& event )
 //###################################################################################################################################
 
 
+class BatchFolderPairPanel : public BatchFolderPairGenerated
+{
+public:
+    BatchFolderPairPanel(wxWindow* parent) :
+            BatchFolderPairGenerated(parent),
+            dragDropOnLeft(m_panelLeft, m_dirPickerLeft, m_directoryLeft),
+            dragDropOnRight(m_panelRight, m_dirPickerRight, m_directoryRight) {}
+
+private:
+    //support for drag and drop
+    DragDropOnDlg dragDropOnLeft;
+    DragDropOnDlg dragDropOnRight;
+};
+
+//###################################################################################################################################
+
+
 class BatchFileDropEvent : public wxFileDropTarget
 {
 public:
@@ -394,6 +413,12 @@ public:
             //test if ffs batch file has been dropped
             if (fileType == xmlAccess::XML_BATCH_CONFIG)
                 batchDlg->loadBatchFile(droppedFileName);
+            else
+            {
+                wxString errorMessage = _("%x is not a valid FreeFileSync batch file!");
+                errorMessage.Replace(wxT("%x"), wxString(wxT("\"")) + droppedFileName + wxT("\""), false);
+                wxMessageBox(errorMessage, _("Error"), wxOK | wxICON_ERROR);
+            }
         }
         return false;
     }
@@ -421,8 +446,10 @@ BatchDialog::BatchDialog(wxWindow* window, const wxString& filename) :
 
 void BatchDialog::init()
 {
-    //prepare drag & drop
+    //prepare drag & drop for loading of *.ffs_batch files
     SetDropTarget(new BatchFileDropEvent(this));
+
+    dragDropOnLogfileDir.reset(new DragDropOnDlg(m_panelLogging, m_dirPickerLogfileDir, m_textCtrlLogfileDir));
 
     //set icons for this dialog
     m_bitmap13->SetBitmap(*globalResource.bitmapLeftOnly);
@@ -433,27 +460,6 @@ void BatchDialog::init()
     m_bitmap8->SetBitmap(*globalResource.bitmapInclude);
     m_bitmap9->SetBitmap(*globalResource.bitmapExclude);
     m_bitmap27->SetBitmap(*globalResource.bitmapBatch);
-}
-
-
-void BatchDialog::updateFilterButton()
-{
-    if (filterIsActive)
-    {
-        m_bpButtonFilter->SetBitmapLabel(*globalResource.bitmapFilterOn);
-        m_bpButtonFilter->SetToolTip(_("Filter active: Press again to deactivate"));
-
-        m_textCtrlInclude->Enable();
-        m_textCtrlExclude->Enable();
-    }
-    else
-    {
-        m_bpButtonFilter->SetBitmapLabel(*globalResource.bitmapFilterOff);
-        m_bpButtonFilter->SetToolTip(_("Press button to activate filter"));
-
-        m_textCtrlInclude->Disable();
-        m_textCtrlExclude->Disable();
-    }
 }
 
 
@@ -562,10 +568,52 @@ void BatchDialog::OnDifferent(wxCommandEvent& event)
 }
 
 
-void BatchDialog::OnFilterButton(wxCommandEvent& event)
+void BatchDialog::OnCheckFilter(wxCommandEvent& event)
 {
-    filterIsActive = !filterIsActive;
-    updateFilterButton();
+    updateVisibleTabs();
+}
+
+
+void BatchDialog::OnCheckLogging(wxCommandEvent& event)
+{
+    updateVisibleTabs();
+}
+
+
+void BatchDialog::updateVisibleTabs()
+{
+    showNotebookpage(m_panelFilter, _("Filter"), m_checkBoxFilter->GetValue());
+    showNotebookpage(m_panelLogging, _("Logging"), m_checkBoxSilent->GetValue());
+}
+
+
+void BatchDialog::showNotebookpage(wxWindow* page, const wxString& pageName, bool show)
+{
+    int windowPosition = -1;
+    for (size_t i = 0; i < m_notebookSettings->GetPageCount(); ++i)
+        if (    static_cast<wxWindow*>(m_notebookSettings->GetPage(i)) ==
+                static_cast<wxWindow*>(page))
+        {
+            windowPosition = i;
+            break;
+        }
+
+    if (show)
+    {
+        if (windowPosition == -1)
+            m_notebookSettings->AddPage(page, pageName, false);
+    }
+    else
+    {
+        if (windowPosition != -1)
+        {
+            //do not delete currently selected tab!!
+            if (m_notebookSettings->GetCurrentPage() == m_notebookSettings->GetPage(windowPosition))
+                m_notebookSettings->ChangeSelection(0);
+
+            m_notebookSettings->RemovePage(windowPosition);
+        }
+    }
 }
 
 
@@ -615,26 +663,25 @@ void BatchDialog::OnCancel(wxCommandEvent& event)
 void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
 {
     //get a filename
-    wxString fileName = wxT("SyncJob.ffs_batch"); //proposal
+    const wxString defaultFileName = proposedBatchFileName.empty() ? wxT("SyncJob.ffs_batch") : proposedBatchFileName;
 
-    if (!proposedBatchFileName.empty())
-        fileName = proposedBatchFileName;
-
-    wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, fileName, wxString(_("FreeFileSync batch file")) + wxT(" (*.ffs_batch)|*.ffs_batch"), wxFD_SAVE);
-
+    wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, defaultFileName, wxString(_("FreeFileSync batch file")) + wxT(" (*.ffs_batch)|*.ffs_batch"), wxFD_SAVE);
     if (filePicker->ShowModal() == wxID_OK)
     {
-        fileName = filePicker->GetPath();
-        if (FreeFileSync::fileExists(fileName.c_str()))
+        const wxString newFileName = filePicker->GetPath();
+        if (FreeFileSync::fileExists(newFileName.c_str()))
         {
-            wxMessageDialog* messageDlg = new wxMessageDialog(this, wxString(_("File already exists. Overwrite?")) + wxT(" \"") + fileName + wxT("\""), _("Warning") , wxOK | wxCANCEL);
+            wxMessageDialog* messageDlg = new wxMessageDialog(this, wxString(_("File already exists. Overwrite?")) + wxT(" \"") + newFileName + wxT("\""), _("Warning") , wxOK | wxCANCEL);
 
             if (messageDlg->ShowModal() != wxID_OK)
+            {
+                OnSaveBatchJob(event); //retry
                 return;
+            }
         }
 
         //create batch file
-        if (saveBatchFile(fileName))
+        if (saveBatchFile(newFileName))
             EndModal(BATCH_FILE_SAVED);
     }
 }
@@ -661,7 +708,7 @@ bool BatchDialog::saveBatchFile(const wxString& filename)
         return false;
 
     batchCfg.mainCfg.syncConfiguration = localSyncConfiguration;
-    batchCfg.mainCfg.filterIsActive    = filterIsActive;
+    batchCfg.mainCfg.filterIsActive    = m_checkBoxFilter->GetValue();
     batchCfg.mainCfg.includeFilter     = m_textCtrlInclude->GetValue();
     batchCfg.mainCfg.excludeFilter     = m_textCtrlExclude->GetValue();
     batchCfg.mainCfg.useRecycleBin     = m_checkBoxUseRecycler->GetValue();
@@ -678,6 +725,7 @@ bool BatchDialog::saveBatchFile(const wxString& filename)
 
     //load structure with batch settings "batchCfg"
     batchCfg.silent = m_checkBoxSilent->GetValue();
+    batchCfg.logFileDirectory = m_textCtrlLogfileDir->GetValue();
 
     //write config to XML
     try
@@ -741,13 +789,12 @@ void BatchDialog::loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg)
     //adjust toolTip
     SyncDialog::adjustToolTips(m_bitmap17, batchCfg.mainCfg.compareVar);
 
-    filterIsActive = batchCfg.mainCfg.filterIsActive;
-    updateFilterButton();
-
+    m_checkBoxFilter->SetValue(batchCfg.mainCfg.filterIsActive);
     m_textCtrlInclude->SetValue(batchCfg.mainCfg.includeFilter);
     m_textCtrlExclude->SetValue(batchCfg.mainCfg.excludeFilter);
 
     m_checkBoxSilent->SetValue(batchCfg.silent);
+    m_textCtrlLogfileDir->SetValue(batchCfg.logFileDirectory);
 
     //remove existing folder pairs
     localFolderPairs.clear();
@@ -757,7 +804,7 @@ void BatchDialog::loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg)
     int scrWindowHeight = 0;
     for (std::vector<FolderPair>::const_iterator i = batchCfg.directoryPairs.begin(); i != batchCfg.directoryPairs.end(); ++i)
     {
-        BatchFolderPairGenerated* newPair = new BatchFolderPairGenerated(m_scrolledWindow6);
+        BatchFolderPairPanel* newPair = new BatchFolderPairPanel(m_scrolledWindow6);
         newPair->m_directoryLeft->SetValue(i->leftDirectory.c_str());
         newPair->m_directoryRight->SetValue(i->rightDirectory.c_str());
 
@@ -771,10 +818,12 @@ void BatchDialog::loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg)
     int pairCount = std::min(localFolderPairs.size(), size_t(3)); //up to 3 additional pairs shall be shown
     m_scrolledWindow6->SetMinSize(wxSize( -1, scrWindowHeight * pairCount));
 
-    m_scrolledWindow6->Layout();
-    //m_scrolledWindow6->Fit();
+    updateVisibleTabs();
 
-    Fit();
+    m_scrolledWindow6->Layout(); //needed
+    m_panelOverview->Layout(); //needed
+
+    Fit(); //needed
     Centre();
     m_buttonSave->SetFocus();
 }

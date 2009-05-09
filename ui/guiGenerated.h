@@ -42,11 +42,11 @@ class wxButtonWithImage;
 #include <wx/statline.h>
 #include <wx/frame.h>
 #include <wx/textctrl.h>
+#include <wx/notebook.h>
 #include <wx/dialog.h>
 #include <wx/gauge.h>
 #include <wx/animate.h>
 #include <wx/treectrl.h>
-#include <wx/notebook.h>
 #include <wx/checklst.h>
 #include <wx/spinctrl.h>
 
@@ -62,26 +62,27 @@ class MainDialogGenerated : public wxFrame
 	
 	protected:
 		wxMenuBar* m_menubar1;
-		wxMenu* m_menu1;
+		wxMenu* m_menuFile;
 		wxMenuItem* m_menuItem10;
 		wxMenuItem* m_menuItem11;
-		wxMenu* m_menu3;
-		wxMenu* m_menu31;
+		wxMenu* m_menuAdvanced;
+		wxMenu* m_menuLanguages;
 		wxMenuItem* m_menuItemGerman;
 		wxMenuItem* m_menuItemEnglish;
 		wxMenuItem* m_menuItemSpanish;
 		wxMenuItem* m_menuItemFrench;
-		wxMenuItem* m_menuItemHungarian;
 		wxMenuItem* m_menuItemItalian;
-		wxMenuItem* m_menuItemPolish;
+		wxMenuItem* m_menuItemHungarian;
 		wxMenuItem* m_menuItemDutch;
+		wxMenuItem* m_menuItemPolish;
 		wxMenuItem* m_menuItemPortuguese;
+		wxMenuItem* m_menuItemPortugueseBrazil;
 		wxMenuItem* m_menuItemSlovenian;
 		wxMenuItem* m_menuItemJapanese;
 		wxMenuItem* m_menuItemChineseSimple;
 		wxMenuItem* m_menuItemGlobSett;
 		wxMenuItem* m_menuItem7;
-		wxMenu* m_menu33;
+		wxMenu* m_menuHelp;
 		wxMenuItem* m_menuItemAbout;
 		wxBoxSizer* bSizer1;
 		wxPanel* m_panel71;
@@ -100,29 +101,29 @@ class MainDialogGenerated : public wxFrame
 		
 		wxButtonWithImage* m_buttonSync;
 		
-		wxPanel* m_panel11;
+		wxPanel* m_panelTopLeft;
 		wxStaticBoxSizer* sbSizer2;
-		wxComboBox* m_comboBoxDirLeft;
+		wxComboBox* m_directoryLeft;
 		wxDirPickerCtrl* m_dirPickerLeft;
-		wxPanel* m_panel13;
+		wxPanel* m_panelTopMiddle;
 		
 		wxBoxSizer* bSizerMiddle;
 		wxBitmapButton* m_bpButtonSwap;
 		
-		wxPanel* m_panel12;
+		wxPanel* m_panelTopRight;
 		
 		wxBitmapButton* m_bpButtonAddPair;
-		wxComboBox* m_comboBoxDirRight;
+		wxComboBox* m_directoryRight;
 		wxDirPickerCtrl* m_dirPickerRight;
 		wxBoxSizer* bSizer106;
 		wxStaticBitmap* m_bitmapShift;
 		wxScrolledWindow* m_scrolledWindowFolderPairs;
 		wxBoxSizer* bSizerFolderPairs;
-		wxPanel* m_panel1;
+		wxPanel* m_panelLeft;
 		CustomGridLeft* m_gridLeft;
-		wxPanel* m_panel3;
+		wxPanel* m_panelMiddle;
 		CustomGridMiddle* m_gridMiddle;
-		wxPanel* m_panel2;
+		wxPanel* m_panelRight;
 		CustomGridRight* m_gridRight;
 		wxBoxSizer* bSizer3;
 		wxBoxSizer* bSizer58;
@@ -165,11 +166,12 @@ class MainDialogGenerated : public wxFrame
 		virtual void OnMenuLangEnglish( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuLangSpanish( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuLangFrench( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnMenuLangHungarian( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuLangItalian( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnMenuLangPolish( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnMenuLangHungarian( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuLangDutch( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnMenuLangPolish( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuLangPortuguese( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnMenuLangPortugueseBrazil( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuLangSlovenian( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuLangJapanese( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuLangChineseSimp( wxCommandEvent& event ){ event.Skip(); }
@@ -186,7 +188,6 @@ class MainDialogGenerated : public wxFrame
 		virtual void OnConfigureFilter( wxHyperlinkEvent& event ){ event.Skip(); }
 		virtual void OnHideFilteredButton( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnFolderHistoryKeyEvent( wxKeyEvent& event ){ event.Skip(); }
-		virtual void OnWriteDirManually( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnDirSelected( wxFileDirPickerEvent& event ){ event.Skip(); }
 		virtual void OnSwapDirs( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnAddFolderPair( wxCommandEvent& event ){ event.Skip(); }
@@ -229,10 +230,6 @@ class FolderPairGenerated : public wxPanel
 		wxPanel* m_panel20;
 		wxPanel* m_panel21;
 		
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnRemoveFolderPair( wxCommandEvent& event ){ event.Skip(); }
-		
 	
 	public:
 		wxPanel* m_panelLeft;
@@ -245,6 +242,29 @@ class FolderPairGenerated : public wxPanel
 		wxDirPickerCtrl* m_dirPickerRight;
 		FolderPairGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
 		~FolderPairGenerated();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class BatchFolderPairGenerated
+///////////////////////////////////////////////////////////////////////////////
+class BatchFolderPairGenerated : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxStaticText* m_staticText53;
+		wxPanel* m_panelLeft;
+		wxStaticText* m_staticText541;
+		wxPanel* m_panelRight;
+	
+	public:
+		wxTextCtrl* m_directoryLeft;
+		wxDirPickerCtrl* m_dirPickerLeft;
+		wxTextCtrl* m_directoryRight;
+		wxDirPickerCtrl* m_dirPickerRight;
+		BatchFolderPairGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
+		~BatchFolderPairGenerated();
 	
 };
 
@@ -266,6 +286,8 @@ class BatchDlgGenerated : public wxDialog
 		
 		wxStaticLine* m_staticline10;
 		wxStaticText* m_staticText531;
+		wxNotebook* m_notebookSettings;
+		wxPanel* m_panelOverview;
 		wxScrolledWindow* m_scrolledWindow6;
 		wxBoxSizer* bSizerFolderPairs;
 		
@@ -274,15 +296,13 @@ class BatchDlgGenerated : public wxDialog
 		
 		wxChoice* m_choiceHandleError;
 		
+		
 		wxCheckBox* m_checkBoxUseRecycler;
+		wxCheckBox* m_checkBoxFilter;
 		wxCheckBox* m_checkBoxSilent;
 		
-		wxBitmapButton* m_bpButtonFilter;
-		wxStaticBitmap* m_bitmap8;
-		wxTextCtrl* m_textCtrlInclude;
 		
-		wxStaticBitmap* m_bitmap9;
-		wxTextCtrl* m_textCtrlExclude;
+		
 		
 		wxStaticText* m_staticText211;
 		wxStaticText* m_staticText311;
@@ -297,7 +317,19 @@ class BatchDlgGenerated : public wxDialog
 		wxBitmapButton* m_bpButton8;
 		wxStaticBitmap* m_bitmap17;
 		wxBitmapButton* m_bpButton9;
-		wxStaticLine* m_staticline9;
+		wxPanel* m_panelFilter;
+		
+		wxStaticText* m_staticText15;
+		wxStaticBitmap* m_bitmap8;
+		wxTextCtrl* m_textCtrlInclude;
+		
+		wxStaticText* m_staticText16;
+		wxStaticBitmap* m_bitmap9;
+		wxTextCtrl* m_textCtrlExclude;
+		wxPanel* m_panelLogging;
+		wxStaticText* m_staticText120;
+		wxTextCtrl* m_textCtrlLogfileDir;
+		wxDirPickerCtrl* m_dirPickerLogfileDir;
 		wxButton* m_buttonSave;
 		wxButton* m_buttonLoad;
 		wxButton* m_button6;
@@ -307,7 +339,8 @@ class BatchDlgGenerated : public wxDialog
 		virtual void OnChangeCompareVar( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnChangeErrorHandling( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSelectRecycleBin( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnFilterButton( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnCheckFilter( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnCheckLogging( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnExLeftSideOnly( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnExRightSideOnly( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnLeftNewer( wxCommandEvent& event ){ event.Skip(); }
@@ -319,32 +352,8 @@ class BatchDlgGenerated : public wxDialog
 		
 	
 	public:
-		BatchDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Create a batch job"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
+		BatchDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Create a batch job"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~BatchDlgGenerated();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class BatchFolderPairGenerated
-///////////////////////////////////////////////////////////////////////////////
-class BatchFolderPairGenerated : public wxPanel 
-{
-	private:
-	
-	protected:
-		wxStaticText* m_staticText53;
-		wxStaticText* m_staticText541;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnEnterLeftDir( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnEnterRightDir( wxCommandEvent& event ){ event.Skip(); }
-		
-	
-	public:
-		wxTextCtrl* m_directoryLeft;
-		wxTextCtrl* m_directoryRight;
-		BatchFolderPairGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
-		~BatchFolderPairGenerated();
 	
 };
 
@@ -362,9 +371,13 @@ class CompareStatusGenerated : public wxPanel
 		
 		wxStaticBoxSizer* sbSizer13;
 		wxStaticText* m_staticText46;
-		wxStaticText* m_staticTextFilesToCompare;
+		wxStaticText* m_staticTextFilesRemaining;
 		wxStaticText* m_staticText32;
-		wxStaticText* m_staticTextDataToCompare;
+		wxStaticText* m_staticTextDataRemaining;
+		wxStaticText* m_staticText104;
+		wxStaticText* m_staticTextSpeed;
+		wxStaticText* m_staticText103;
+		wxStaticText* m_staticTextTimeRemaining;
 		
 		wxStaticText* m_staticText37;
 		wxStaticText* m_staticTextTimeElapsed;
@@ -482,6 +495,9 @@ class SyncStatusDlgGenerated : public wxDialog
 		wxBoxSizer* bSizer28;
 		wxStaticText* m_staticText25;
 		wxStaticText* m_staticTextRemainingObj;
+		wxBoxSizer* bSizerSpeed;
+		wxStaticText* m_staticText108;
+		wxStaticText* m_staticTextSpeed;
 		
 		wxButton* m_buttonOK;
 		wxButton* m_buttonPause;
@@ -489,6 +505,9 @@ class SyncStatusDlgGenerated : public wxDialog
 		
 		wxStaticText* m_staticText26;
 		wxStaticText* m_staticTextDataRemaining;
+		wxBoxSizer* bSizerRemTime;
+		wxStaticText* m_staticText106;
+		wxStaticText* m_staticTextTimeRemaining;
 		
 		
 		// Virtual event handlers, overide them in your derived class
@@ -500,7 +519,7 @@ class SyncStatusDlgGenerated : public wxDialog
 	
 	public:
 		wxGauge* m_gauge1;
-		SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 614,371 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 638,376 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~SyncStatusDlgGenerated();
 	
 };
@@ -576,26 +595,39 @@ class AboutDlgGenerated : public wxDialog
 		wxScrolledWindow* m_scrolledWindow3;
 		wxStaticText* m_staticText54;
 		
+		wxStaticBitmap* m_bitmapFrench;
 		wxStaticText* m_staticText68;
 		wxStaticText* m_staticText69;
+		wxStaticBitmap* m_bitmapJapanese;
 		wxStaticText* m_staticText70;
 		wxStaticText* m_staticText71;
+		wxStaticBitmap* m_bitmapDutch;
 		wxStaticText* m_staticText711;
 		wxStaticText* m_staticText712;
+		wxStaticBitmap* m_bitmapChineseSimple;
 		wxStaticText* m_staticText91;
 		wxStaticText* m_staticText92;
+		wxStaticBitmap* m_bitmapPolish;
 		wxStaticText* m_staticText911;
 		wxStaticText* m_staticText921;
+		wxStaticBitmap* m_bitmapPortuguese;
 		wxStaticText* m_staticText9211;
 		wxStaticText* m_staticText9212;
+		wxStaticBitmap* m_bitmapItalian;
 		wxStaticText* m_staticText92121;
 		wxStaticText* m_staticText92122;
+		wxStaticBitmap* m_bitmapSlovenian;
 		wxStaticText* m_staticText921221;
 		wxStaticText* m_staticText921222;
+		wxStaticBitmap* m_bitmapHungarian;
 		wxStaticText* m_staticText682;
 		wxStaticText* m_staticText681;
+		wxStaticBitmap* m_bitmapSpanish;
 		wxStaticText* m_staticText683;
 		wxStaticText* m_staticText691;
+		wxStaticBitmap* m_bitmapPortugueseBrazil;
+		wxStaticText* m_staticText684;
+		wxStaticText* m_staticText685;
 		wxStaticLine* m_staticline3;
 		wxPanel* m_panel22;
 		wxStaticText* m_staticText131;
@@ -687,6 +719,37 @@ class WarningDlgGenerated : public wxDialog
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// Class QuestionDlgGenerated
+///////////////////////////////////////////////////////////////////////////////
+class QuestionDlgGenerated : public wxDialog 
+{
+	private:
+	
+	protected:
+		
+		wxStaticBitmap* m_bitmap10;
+		wxTextCtrl* m_textCtrl8;
+		wxCheckBox* m_checkBoxDontAskAgain;
+		
+		wxButton* m_buttonYes;
+		wxButton* m_buttonNo;
+		wxButton* m_buttonCancel;
+		
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ){ event.Skip(); }
+		virtual void OnYes( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnNo( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ){ event.Skip(); }
+		
+	
+	public:
+		QuestionDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Question"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 391,237 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		~QuestionDlgGenerated();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// Class DeleteDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
 class DeleteDlgGenerated : public wxDialog 
@@ -732,7 +795,6 @@ class FilterDlgGenerated : public wxDialog
 		wxPanel* m_panel8;
 		wxStaticText* m_staticText56;
 		
-		
 		wxStaticText* m_staticText44;
 		wxBitmapButton* m_bpButtonHelp;
 		
@@ -768,7 +830,7 @@ class FilterDlgGenerated : public wxDialog
 		
 	
 	public:
-		FilterDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configure filter"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
+		FilterDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configure filter"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~FilterDlgGenerated();
 	
 };

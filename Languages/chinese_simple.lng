@@ -1,5 +1,3 @@
-  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
-  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
  Byte
  Byte
  GB
@@ -28,8 +26,8 @@
 关于(&A)...
 &Advanced
 高级(&A)
-&Back
-返回(&B)
+&Apply
+应用(&Y)
 &Cancel
 撒消(&C)
 &Compare
@@ -42,12 +40,16 @@
 导出文件列表(&E)
 &File
 文件(&F)
+&Global settings
+全局设置(&G)
 &Help
 帮助(&H)
 &Ignore
 忽略(&I)
 &Language
 切换语言(&L)
+&Load
+加载(&L)
 &Load configuration
 加载配置(&L)
 &OK
@@ -56,10 +58,10 @@
 暂停(&P)
 &Quit
 退出(&Q)
-&Resolve
-解决(&R)
 &Retry
 重试(&R)
+&Save
+保存(&S)
 &Start
 开始(&S)
 &Synchronize...
@@ -104,12 +106,12 @@
 2. 使用通配符"*"和"?".
 3. Exclude files directly on main grid via context menu.
 3. 直接通过上下文菜单的主要网格排除文件.
-4. Keep the number of entries small for best performance.
-4. 保持小型项目的数量以获得最佳的性能.
 <<	left file is newer\n
 <<	左侧文件较新\n
 <Directory>
 <目录>
+<Last session>
+<最后会话>
 <multiple selection>
 <多选>
 <|	file on left side only\n
@@ -118,8 +120,6 @@
 ==	文件相同\n\n
 >>	right file is newer\n
 >>	右侧文件较新\n
-Abort
-取消
 Abort requested: Waiting for current operation to finish...
 取消请求: 正在等待当前操作完成...
 Aborted
@@ -138,14 +138,22 @@ As a result the files are separated into the following categories:
 由该文件分为以下几类:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
 顾名思义,这两个文件共享相同的名称被标记为相同当且仅当它们具有相同的内容。\n此选项是有用的一致性检查，而不是备份行动.因此,文件时间没有被考虑到. \n\n通过此选项使决策树较小:
-Assemble a batch file with the following settings. To start synchronization in batch mode simply execute this file or schedule it in your operating system's task planner.
-装配一个批处理文件使用以下设置:\n开始同步批处理模式只是执行此文件或将它计划在您的操作系统的任务规划.
+Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
+装配一个批处理文件自动同步.开始只是通过批处理模式的文件的名称为FreeFileSync可执行:FreeFileSync.exe <batchfile> .这也可以安排在您的操作系统的工作规划.
+Batch execution
+批处理执行
 Batch file created successfully!
 批处理文件创建成功!
+Batch job
+批处理作业
 Big thanks for localizing FreeFileSync goes out to:
 非常感谢做本地化FreeFileSync工作的以下人员:
 Build:
 开发:
+Cancel
+放弃
+Check all
+检查所有
 Choose to hide filtered files/directories from list
 从列表中选择隐藏过滤文件/文件夹
 Comma separated list
@@ -182,8 +190,6 @@ Configure your own synchronization rules.
 配置自己的同步规则.
 Confirm
 确认
-Consider this when setting up synchronization rules: You might want to avoid write access to these directories so that synchronization of both does not interfere.
-设置同步规则时审核：您可能要避免写入权限能存取到这些目录，以便同步时两个不干预
 Continue
 继续
 Conversion error:
@@ -200,12 +206,8 @@ Copy new or updated files to right folder.
 复制新的或修改过的文件到右侧文件夹
 Copy to clipboard\tCTRL+C
 复制到剪贴板\t使用CTRL+C键
-Copying file %x overwriting %y
-正复制文件 %x 正覆盖 %y
 Copying file %x to %y
 正复制文件 %x 到 %y
-Could not retrieve file info for:
-无法检索下列文件信息:
 Could not set working directory:
 无法设置工作目录:
 Create a batch job
@@ -218,6 +220,8 @@ Current operation:
 当前操作:
 Custom
 自定义
+Customize columns
+自定义行
 DECISION TREE
 决策树
 Data remaining:
@@ -232,32 +236,32 @@ Delete files/folders existing on right side only
 仅从左侧中删除文件/方件夹
 Delete files\tDEL
 删除文件\t使用DEL键
+Delete on both sides
+删除两侧
+Delete on both sides even if the file is selected on one side only
+删除两侧(仅对在一侧已选择文件)
 Delete:
 删除:
 Deleting file %x
 正删除文件 %x
 Deleting folder %x
 正删除文件夹 %x
-Directories are dependent:
-目录已经存在:
+Directories are dependent! Be careful when setting up synchronization rules:
+目录有依赖性！注意设立同步的规则:
 Directory does not exist:
 目录不存在:
-Do not show graphical status and error messages but write to a logfile instead
-不显示图示状态和消息但写入日志
 Do not show this warning again
 不再显示警告信息
 Do nothing
 保持不动
 Do you really want to delete the following objects(s)?
 你确定要删除下列项目吗?
-Do you really want to move the following objects(s) to the recycle bin?
-你确定要移到下列项目到回收站吗?
+Do you really want to move the following objects(s) to the Recycle Bin?
+你确定要移动下列项目到回收站吗?
 Donate with PayPal
 通过PayPal捐赠
 Drag && drop
 拖拽
-Email:
-电子邮件:
 Error
 错误
 Error changing modification time:
@@ -270,14 +274,26 @@ Error deleting directory:
 删除目录出错:
 Error deleting file:
 删除文件出错:
-Error moving to recycle bin:
-移到回收站出错:
+Error handling
+错误处理
+Error loading library function:
+加载库函数出错:
+Error moving to Recycle Bin:
+移到到回收站出错:
+Error opening file:
+打开文件出错:
 Error parsing configuration file:
 分析配置文件出错:
+Error reading file attributes:
+读文件属性出错:
 Error reading file:
 读取文件出错:
+Error resolving symbolic link:
+解决字符链接出错:
 Error traversing directory:
 遍历目录出错:
+Error writing file attributes:
+写文件属性出错:
 Error writing file:
 写入文件出错:
 Error: Source directory does not exist anymore:
@@ -286,8 +302,18 @@ Example
 例如
 Exclude
 例外
+Exclude temporarily
+暂时除外
+Exclude via filter:
+通过过滤器排除:
+Exit immediately and set returncode < 0
+立即退出，并传回
+Exit with RC < 0
+带参数退出
 Feedback and suggestions are welcome at:
 欢迎在下面提出反馈意见和建议:
+File Manager integration:
+文件管理集成器:
 File already exists. Overwrite?
 文件已经存在.覆盖?
 File content
@@ -296,6 +322,8 @@ File list exported!
 文件清单已经列出!
 File size and date
 文件大小和日期
+File times that differ by up to the specified number of seconds are still handled as having same time.
+文件相差最多指定秒数但仍然具有相同的处理时间.
 Filename
 文件名
 Files are found equal if\n     - file content\nis the same.
@@ -320,14 +348,14 @@ Files/folders that exist on left side only
 仅在左侧存在的档案/文件夹
 Files/folders that exist on right side only
 仅在左侧存在的档案/文件夹
-Filter
-过滤
 Filter active: Press again to deactivate
 过滤激活: 请按键以关闭激活
 Filter files
 过滤文件
 Filter view
 过滤查看
+Folder Comparison and Synchronization
+文件夹比较与同步
 Folder pair
 文件夹对
 FreeFileSync - Folder Comparison and Synchronization
@@ -340,8 +368,16 @@ FreeFileSync batch file
 FreeFileSync 批处理文件
 FreeFileSync configuration
 FreeFileSync 配置
+Full name
+全称
+Generating file list...
+生成文件列表...
+Global settings
+全局设置
 Help
 帮助
+Hide all error and warning messages
+隐藏所有错误与警告信息
 Hide files that are different
 隐藏不同的档案
 Hide files that are equal
@@ -362,46 +398,44 @@ Hides error messages during synchronization:\nThey are collected and shown as a 
 隐藏同步时的错误信息：在结束进程时收集和显示的清单
 Hints:
 提示:
-Homepage:
-网站主页:
-If you like FFS
-个人捐助
 Ignore errors
 忽略错误
-Ignore next errors
-忽略下一个错误
+Ignore subsequent errors
+忽略随后的错误
 Ignore this error, retry or abort synchronization?
 忽略这个错误,重试或取消同步?
 Ignore this error, retry or abort?
 忽略这个错误,重试或取消?
 Include
 包括
+Include temporarily
+包括暂时的
 Include: *.doc;*.zip;*.exe\nExclude: *\\temp\\*
 包括:*.doc;*.zip;*.exe 除外:*\\temp\\*
 Info
 信息
 Information
 信息
-Information: If you ignore the error or abort a re-compare will be necessary!
-信息:如果你忽略或取消这个错误则有必要作再次比较!
 Initialization of Recycle Bin failed!
 初始化回收站失败!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 初始化回收站是不大可能了!估计你使用的不是Windows系统.如果你想未来在此系统上应用请联系作者. :)
-Left folder:
-左侧方件夹:
 Legend
 联想
-Load configuration via...\n     - this list (press DEL to delete items)\n     - drag & drop to this window\n     - startup parameter
-加载配置(通过)...\n     - 这个列表(用DEL键删除项目)\n     - 拖拽到这个窗口\n     - 启动参数
-Load from file...
-从文件加载...
+Load configuration from file
+从文件加载配置
+Load configuration history (press DEL to delete items)
+加载配置历史记录(按DEL键删除项目)
 Log-messages:
 日志信息:
 Mirror ->>
 镜像 ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 左侧文件夹镜像备份: 同步后右侧文件夹将被覆盖(完全匹配左边的文件夹).
+Move column down
+移动下一行
+Move column up
+移动上一行
 Not all items were synchronized! Have a look at the list.
 不是所有项目被同步!看一下列表
 Nothing to synchronize according to configuration!
@@ -412,10 +446,14 @@ Number of files and directories that will be deleted
 一些文件和目录将被删除
 Number of files that will be overwritten
 一些文件和目录将被覆盖
+OK
+确定
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the full name including path prefix.
 只有过滤的文件/目录将选定做同步.该过滤器将被应用到全称包括路径前缀.
 Open synchronization dialog
 打开同步对话框
+Open with File Manager\tD-Click
+打开文件管理
 Operation aborted!
 操作已取消!
 Operation:
@@ -436,10 +474,14 @@ Relative path
 相对路径
 Remove folder pair
 删除文件夹对
+Reset
+重置
+Reset all warning messages?
+重置所有警告信息?
+Resets all warning messages
+重置所有警告信息
 Result
 结果
-Right folder:
-右侧文件夹:
 S&ave configuration
 保存配置(&A)
 Save aborted!
@@ -466,10 +508,16 @@ Show files that exist on left side only
 显示仅存在左侧的文件
 Show files that exist on right side only
 显示仅存在右侧的文件
+Show popup
+查看弹出
+Show popup on errors or warnings
+查看弹出的错误或警告
 Silent mode
 静默模式
 Size
 大小
+Sorting file list...
+排序文件列表...
 Source code written completely in C++ utilizing:
 使用C++编写的源代码已完全写好:
 Start
@@ -486,6 +534,8 @@ Synchronization completed successfully!
 同步成功完成!
 Synchronization completed with errors!
 同步已完成但有错误.
+Synchronization filter
+同步过滤
 Synchronization settings
 同步设置
 Synchronization status
@@ -498,16 +548,18 @@ Synchronizing...
 同步中...
 System out of memory!
 系统内在溢出!
+Target file already existing!
+目标文件已经存在!
 The file does not contain a valid configuration:
 该文件不包含有效的配置:
-The selected file does not exist:
-选定的文件不存在:
-This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time. Notice that the file time is allowed to deviate by up to 2 seconds. This ensures synchronization with the lower-precision file system FAT32 works correctly.
-这两个同样变异评估命名文件时,在同等条件下,\n他们有同样的文件大小相同的最后收件日期和时间.\n请注意，该文件的时间允许偏差的2秒钟.\n这可确保同步较低文件系统FAT32的精密正常工作.
+This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
+这一指令将被执行，每次你双击一个文件名。 %name作为预留位置选定的文件。
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
+这两个同样变异评估命名文件时,在同等条件下,\n他们有同样的文件大小相同的最后收件日期和时间.
+Time
+时间
 Time elapsed:
 已用时间:
-Time:
-时间:
 Total amount of data that will be transferred
 将被转移的总数据
 Total time:
@@ -518,6 +570,8 @@ Unable to create logfile!
 无法创建日志!
 Unable to initialize Recycle Bin!
 无法初始化回收站!
+Uncheck all
+全部取消选中
 Update ->
 升级 ->
 Update:
@@ -530,8 +584,10 @@ Warning
 警告
 Warning: Synchronization failed for %x item(s):
 警告:同步失败 %x (某些)项目:
-When \"Compare\" is triggered with this option set the following decision tree is processed:
-当"比较" 被触发则按照决定树这个办法规定了做以下处理:
+Warnings:
+警告:
+When the comparison is started with this option set the following decision tree is processed:
+当比较是开始使用此选项设置以下处理决定树:
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 您可能会尝试再次同步,其余的项目(而不必再比较)!
 different

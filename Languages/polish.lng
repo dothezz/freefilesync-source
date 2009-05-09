@@ -1,4 +1,4 @@
-﻿  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
  Byte
  Bajt
@@ -10,14 +10,24 @@
  PB
  TB
  TB
+ day(s)
+ dni
+ hour(s)
+ godziny
  kB
  kB
+ min
+ minuty
+ sec
+ sekundy
 !=	files are different\n
 !=	pliki są różne\n
 %x directories
 %x katalogi
 %x files,
 %x pliki,
+%x is not a valid FreeFileSync batch file!
+%x nie jest poprawnym plikiem batch programu FreeFileSync!
 %x of %y rows in view
 %x z %y wierszy w widoku
 %x of 1 row in view
@@ -32,6 +42,8 @@
 &Zastosuj
 &Cancel
 &Anuluj
+&Check for new version
+&Sprawdź aktualizacje
 &Compare
 &Porównaj
 &Create batch job
@@ -43,7 +55,7 @@
 &File
 &Plik
 &Global settings
-&Ustawienia globalne
+&Ustawienia programu
 &Help
 &Pomoc
 &Ignore
@@ -94,6 +106,8 @@
 -synchronizacja plików Open-Source-
 .
 ,
+/sec
+/sekundę
 1 directory
 1 katalog
 1 file,
@@ -107,9 +121,9 @@
 2. Use wildcard characters '*' and '?'.
 2. Użyj wieloznacznika (wildcard) '*' i '?'.
 3. Exclude files directly on main grid via context menu.
-3. Wyklucz pliki i foldery urzywając prawego przycisku myszki.
-4. Keep the number of entries small for best performance.
-4. Przechowuj małą listę wpisów dla lepszej wydajności.
+3. Wyklucz pliki i foldery używając prawego przycisku myszki.
+4. Keep the number of (different) entries small for best performance.
+4. Przechowuj małą liczbę wpisów (różnych) dla lepszej wydajności.
 <<	left file is newer\n
 <<	lewy plik jest nowszy\n
 <Directory>
@@ -124,8 +138,8 @@
 ==	pliki są równe\n\n
 >>	right file is newer\n
 >>	prawy plik jest nowszy\n
-Abort
-Przerwij
+A newer version of FreeFileSync is available:
+Dostępna jest nowa wersja FreeFileSync:
 Abort requested: Waiting for current operation to finish...
 Żądanie przerwania: Czekaj na koniec aktualnie wykonywanego zadania...
 Aborted
@@ -153,7 +167,7 @@ Plik Batch utworzony pomyślnie!
 Batch job
 Zadanie batch
 Big thanks for localizing FreeFileSync goes out to:
-Podziękowania za tłumaczenia FreeFileSync:
+Podziękowania za tłumaczenie FreeFileSync:
 Build:
 Buduj:
 Cancel
@@ -212,10 +226,10 @@ Copy new or updated files to right folder.
 Kopiuj nowe lub aktualniejsze pliki na prawą stronę.
 Copy to clipboard\tCTRL+C
 Kopiuj do pamięci\tCTRL+C
-Copying file %x overwriting %y
-Kopiowanie pliku %x nadpisywanie %y
 Copying file %x to %y
 Kopiowanie pliku %x do %y
+Copying file %x to %y overwriting target
+Nadpisywanie pliku %y plikiem %x
 Could not set working directory:
 Nie można ustawić poprawnego folderu:
 Create a batch job
@@ -223,7 +237,7 @@ Twórz zadanie Batch
 Create:
 Utwórz:
 Creating folder %x
-Tworzenie foldery %x
+Tworzenie folderu %x
 Current operation:
 Aktualna operacja:
 Custom
@@ -256,10 +270,12 @@ Deleting folder %x
 Usuwanie folderu %x
 Directories are dependent! Be careful when setting up synchronization rules:
 Katalogi są zależne! Pamiętaj o tym podczas ustawiania zasad synchronizacji:
+Directory
+Katalog
 Directory does not exist:
 Katalog nie istnieje:
-Do not show graphical status and error messages but write to a logfile instead
-Nie pokazuj statusu graficznego oraz informacji o błędach ale zapisz je w logach
+Do not display visual status information but write to a logfile instead
+Nie wyświetla informacji o statusie, ale tworzy plik z logami
 Do not show this warning again
 Nie pokazuj tego ostrzeżenia ponownie
 Do nothing
@@ -268,12 +284,18 @@ Do you really want to delete the following objects(s)?
 Czy na pewno chcesz usunąć wybrane obiekty?
 Do you really want to move the following objects(s) to the Recycle Bin?
 Czy na pewno chcesz przenieść wybrane pliki do kosza?
+Do you want FreeFileSync to automatically check for updates every week?
+Czy chcesz aby FreeFileSync sprawdzał uaktualnienia co tydzień?
 Donate with PayPal
 Wesprzyj z PayPal
+Download now?
+Pobrać teraz?
 Drag && drop
 Drag && Drop
-Email:
-Email:
+Email
+Poczta
+Enable filter to exclude files from synchronization
+Włącz filtr aby wykluczyć pliki z procesu synchronizacji
 Error
 Błąd
 Error changing modification time:
@@ -302,6 +324,8 @@ Error reading file:
 Błąd odczytu pliku:
 Error resolving symbolic link:
 Błąd odczytu dowiązania symbolicznego:
+Error retrieving full path:
+Błąd odzyskiwania pełnej ścieżki:
 Error traversing directory:
 Błąd podczas odczytywania katalogu:
 Error writing file attributes:
@@ -326,12 +350,14 @@ Feedback and suggestions are welcome at:
 Komentarze i sugestie mile widziane na:
 File Manager integration:
 Menadżer plików:
-File Time Tolerance:
-Tolerancja czasu:
+File Time tolerance (seconds):
+Tolerancja czasu plików (sekundy):
 File already exists. Overwrite?
 Nadpisać istniejący już plik?
 File content
 Zawartość pliku
+File does not exist:
+Plik nie istnieje:
 File list exported!
 Lista plików wyeksportowana!
 File size and date
@@ -362,6 +388,8 @@ Files/folders that exist on left side only
 Pliki/katalogi istniejące tylko po lewej stronie
 Files/folders that exist on right side only
 Pliki/katalogi istniejące tylko po prawej stronie
+Filter
+Filtr
 Filter active: Press again to deactivate
 Filtr aktywny: Kliknij ponownie aby wyłączyć
 Filter files
@@ -382,12 +410,14 @@ FreeFileSync batch file
 FreeFileSync plik batch
 FreeFileSync configuration
 Konfiguracja FreeFileSync
+FreeFileSync is up to date!
+FreeFileSync jest już uaktualniony!
 Full name
 Pełna nazwa
 Generating file list...
 Generowanie listy plików...
 Global settings
-Ustawienia globalne
+Ustawienia programu
 Help
 Pomoc
 Hide all error and warning messages
@@ -412,8 +442,8 @@ Hides error messages during synchronization:\nThey are collected and shown as a 
 Ukryj informacje o błędach podczas synchronizacji:\nZostaną wyświetlone pod koniec procesu
 Hints:
 Wskazówki:
-Homepage:
-Strona domowa:
+Homepage
+Strona domowa
 If you like FFS
 Jeżeli Ci się podoba
 Ignore errors
@@ -438,8 +468,8 @@ Initialization of Recycle Bin failed!
 Niepowodzenie inicjalizacji Kosza!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Inicjalizacja Kosza nie była możliwa!\n\nPrawdopodobnie nie używasz Windowsa.\nJeżeli chcesz dołączyć tą cechę, skontaktuj się z autorem. :)
-Left folder:
-Lewy folder:
+Left:
+Lewy:
 Legend
 Legenda
 Load configuration from file
@@ -448,16 +478,22 @@ Load configuration history (press DEL to delete items)
 Wczytaj historie konfiguracji (naciśnij Del aby usunąć element)
 Log-messages:
 Logi:
+Logging
+Tworzenie logów
 Mirror ->>
 Lustrzana ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Kopia lustrzana lewego folderu: Prawy folder będzie nadpisany zawartością lewego folderu.
+More than 50% of the total number of files will be copied or deleted!
+Ponad 50% plików zostanie skopiowanych lub usuniętych!
 Move column down
 Przesuń kolumnę w dół
 Move column up
 Przesuń kolumnę do góry
 Not all items were synchronized! Have a look at the list.
 Nie wszystkie elementy zostały zsynchronizowane! Lista pominiętych plików.
+Not enough free disk space available in:
+Brak wystarczającej przestrzeni dyskowej na:
 Nothing to synchronize according to configuration!
 Brak elementów do synchronizacji!
 Number of files and directories that will be created
@@ -478,7 +514,11 @@ Operation aborted!
 Operacja przerwana!
 Operation:
 Operacja:
+Overview
+Przegląd
 Pause
+Pauza
+Paused
 Pauza
 Please fill all empty directory fields.
 Podaj foldery do synchronizacji.
@@ -502,8 +542,8 @@ Resets all warning messages
 Zresetuj wszystkie ostrzeżenia
 Result
 Rezultat
-Right folder:
-Prawy folder:
+Right:
+Prawy:
 S&ave configuration
 Z&apisz konfigurację
 Save aborted!
@@ -516,6 +556,8 @@ Scanning:
 Skanowanie:
 Select a folder
 Wybierz folder
+Select logfile directory:
+Wybierz katalog z logami:
 Select variant:
 Wybierz wariant:
 Show files that are different
@@ -534,8 +576,8 @@ Show popup
 Pokaż okno popup
 Show popup on errors or warnings
 Pokaż okno popup dla błędów i ostrzeżeń
-Significant difference detected: More than 50% of files will be overwritten/deleted!
-Wykryto znaczące zmiany: Ponad 50% plików zostanie nadpisane/usunięte!
+Significant difference detected:
+Wykryto znaczące zmiany:
 Silent mode
 Tryb Cichy
 Size
@@ -544,6 +586,8 @@ Sorting file list...
 Sortowanie listy plików...
 Source code written completely in C++ utilizing:
 Kod źródłowy napisany całkowicie w C++ z wykorzystaniem:
+Speed:
+Prędkość:
 Start
 Rozpocznij
 Start synchronization
@@ -576,24 +620,26 @@ Target file already existing!
 Plik docelowy już istnieje!
 The file does not contain a valid configuration:
 Nieprawidłowy format pliku:
-File does not exist:
-Plik nie istnieje:
 This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
 Ta komenda będzie wykonywana za każdym razem jak klikniesz dwa razy na dany plik. %name jest wskaźnikiem na katalog zaznaczonego pliku.
-This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
-Ta komenda będzie wykonywana za każdym razem jak klikniesz dwa razy na dany plik. %x jest wskaźnikiem na katalog zaznaczonego pliku.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Ten wariant traktuje dwa pliki jako równe w przypadku gdy mają jednakowy rozmiar oraz tą samą datę i czas ostatniej modyfikacji.
 Time
 Czas
 Time elapsed:
 Czas:
+Time remaining:
+Pozostały czas:
 Total amount of data that will be transferred
 Liczba danych do przekopiowania
+Total required free disk space:
+Całkowita wymagana przestrzeń dyskowa:
 Total time:
 Całkowity czas:
 Two way <->
 Obustronna <->
+Unable to connect to sourceforge.net!
+Nie można się połączyć z sourceforge.net!
 Unable to create logfile!
 Nie można utworzyć pliku z logami!
 Unable to initialize Recycle Bin!

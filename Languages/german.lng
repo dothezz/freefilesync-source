@@ -1,6 +1,8 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE
- Byte
+Browse
+Suchen
+  Byte
  Byte
  GB
  GB
@@ -10,14 +12,24 @@
  PB
  TB
  TB
+ day(s)
+ Tag(e)
+ hour(s)
+ Stunde(n)
  kB
  kB
+ min
+ Min.
+ sec
+ Sek.
 !=	files are different\n
 !=	Dateien sind verschieden\n
 %x directories
 %x Verzeichnisse
 %x files,
 %x Dateien,
+%x is not a valid FreeFileSync batch file!
+%x ist keine gültige FreeFileSync-Batchdatei!
 %x of %y rows in view
 %x von %y Zeilen in Ansicht
 %x of 1 row in view
@@ -96,6 +108,8 @@ Konfiguration &laden
 -Open-Source Datei-Synchronisation-
 .
 ,
+/sec
+/s
 1 directory
 1 Verzeichnis
 1 file,
@@ -110,8 +124,8 @@ Konfiguration &laden
 2. Die Platzhalter '*' und '?' werden unterstützt.
 3. Exclude files directly on main grid via context menu.
 3. Dateien können direkt über das Kontextmenü im Hauptfenster ausgeschlossen werden.
-4. Keep the number of entries small for best performance.
-4. Für beste Performance möglichst wenige Einträge filtern.
+4. Keep the number of (different) entries small for best performance.
+4. Für beste Performance möglichst wenige (verschiedene) Einträge filtern.
 <<	left file is newer\n
 <<	Linke Datei ist neuer\n
 <Directory>
@@ -126,10 +140,8 @@ Konfiguration &laden
 ==	Dateien sind gleich\n\n
 >>	right file is newer\n
 >>	Rechte Datei ist neuer\n
-A newer version is available:
-Eine neuere Version steht zum Download bereit:
-Abort
-Abbrechen
+A newer version of FreeFileSync is available:
+Eine neuere Version von FreeFileSync ist verfügbar:
 Abort requested: Waiting for current operation to finish...
 Abbruch initiiert: Warte, bis aktuelle Operation beendet ist...
 Aborted
@@ -216,10 +228,10 @@ Copy new or updated files to right folder.
 Neue oder aktualisierte Dateien vom linken in das rechte Verzeichnis kopieren.
 Copy to clipboard\tCTRL+C
 In die Zwischenablage kopieren\tCTRL+C
-Copying file %x overwriting %y
-Kopiere Datei %x und überschreibe %y
 Copying file %x to %y
 Kopiere Datei %x nach %y
+Copying file %x to %y overwriting target
+Kopiere Datei %x nach %y und überschreibe Ziel
 Could not set working directory:
 Das Arbeitsverzeichnis konnte nicht gesetzt werden:
 Create a batch job
@@ -260,10 +272,12 @@ Deleting folder %x
 Lösche Verzeichnis %x
 Directories are dependent! Be careful when setting up synchronization rules:
 Die Verzeichnisse sind voneinander abhängig! Achtung beim Festlegen der Synchronisationseinstellungen:
+Directory
+Verzeichnis
 Directory does not exist:
 Das Verzeichnis existiert nicht:
-Do not show graphical status and error messages but write to a logfile instead
-Keine graphischen Status- und Fehlermeldungen anzeigen, sondern eine Protokolldatei erstellen
+Do not display visual status information but write to a logfile instead
+Keine graphischen Statusinformationen anzeigen, sondern eine Logdatei schreiben
 Do not show this warning again
 Diese Warnung nicht mehr anzeigen
 Do nothing
@@ -272,6 +286,8 @@ Do you really want to delete the following objects(s)?
 Sollen folgende Elemente wirklich gelöscht werden?
 Do you really want to move the following objects(s) to the Recycle Bin?
 Sollen folgende Elemente wirklich in den Papierkorb verschoben werden?
+Do you want FreeFileSync to automatically check for updates every week?
+Soll FreeFileSync automatisch jede Woche nach Aktualisierungen suchen?
 Donate with PayPal
 Mit PayPal spenden
 Download now?
@@ -280,6 +296,8 @@ Drag && drop
 Drag && Drop
 Email
 Email
+Enable filter to exclude files from synchronization
+Aktiviere Filter, um Dateien von der Synchronisation auszuschließen
 Error
 Fehler
 Error changing modification time:
@@ -334,8 +352,8 @@ Feedback and suggestions are welcome at:
 Feedback und Vorschläge sind willkommen unter:
 File Manager integration:
 Einbinden des Dateimanagers:
-File Time Tolerance:
-Abweichung der Dateizeit:
+File Time tolerance (seconds):
+Abweichung der Dateizeit (Sekunden):
 File already exists. Overwrite?
 Die Datei existiert bereits. Überschreiben?
 File content
@@ -372,6 +390,8 @@ Files/folders that exist on left side only
 Nur links exisitierende Dateien/Verzeichnisse
 Files/folders that exist on right side only
 Nur rechts exisitierende Dateien/Verzeichnisse
+Filter
+Filter
 Filter active: Press again to deactivate
 Filter aktiviert: Zum Deaktivieren erneut anwählen
 Filter files
@@ -450,8 +470,8 @@ Initialization of Recycle Bin failed!
 Die Initialisierung des Papierkorbs ist fehlgeschlagen!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Die Papierkorbfunktion steht nicht zur Verfügung!\n\nWahrscheinlich benutzen Sie nicht Microsoft Windows.\nWenn Sie diese Funktion wirklich benötigen, kontaktieren Sie bitte den Autor. :)
-Left folder:
-Linkes Verzeichnis:
+Left:
+Links:
 Legend
 Legende
 Load configuration from file
@@ -460,16 +480,22 @@ Load configuration history (press DEL to delete items)
 Lade Konfigurationshistorie (DEL-Taste löscht Einträge)
 Log-messages:
 Protokollmeldungen:
+Logging
+Protokoll
 Mirror ->>
 Spiegeln ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Spiegelkopie des linken Verzeichnisses erstellen: Das rechte Verzeichnis wird dabei überschrieben und nach der Synchronisation dem linken exakt entsprechen.
+More than 50% of the total number of files will be copied or deleted!
+Mehr als 50% aller Dateien werden kopiert oder gelöscht!
 Move column down
 Spalte nach unten verschieben
 Move column up
 Spalte nach oben verschieben
 Not all items were synchronized! Have a look at the list.
 Nicht alle Elemente wurden synchronisiert! Siehe verbliebene Elemente im Hauptfenster.
+Not enough free disk space available in:
+Nicht genügend freier Speicher verfügbar unter:
 Nothing to synchronize according to configuration!
 Nichts zu synchronisieren gemäß den aktuellen Einstellungen!
 Number of files and directories that will be created
@@ -490,10 +516,14 @@ Operation aborted!
 Vorgang abgebrochen!
 Operation:
 Vorgang:
+Overview
+Übersicht
 Pause
 Pause
+Paused
+Angehalten
 Please fill all empty directory fields.
-Bitte alle leeren Verzeichnisfelder füllen.
+Bitte die leeren Verzeichnisfelder füllen.
 Press button to activate filter
 Taste drücken, um Filter zu aktivieren
 Preview
@@ -514,8 +544,8 @@ Resets all warning messages
 Setzt alle Warnmeldungen zurück
 Result
 Ergebnis
-Right folder:
-Rechtes Verzeichnis:
+Right:
+Rechts:
 S&ave configuration
 Konfiguration s&peichern 
 Save aborted!
@@ -528,6 +558,8 @@ Scanning:
 Suche Dateien:
 Select a folder
 Verzeichnis auswählen
+Select logfile directory:
+Verzeichnis für Logdatei wählen:
 Select variant:
 Variante auswählen:
 Show files that are different
@@ -546,8 +578,8 @@ Show popup
 Popup zeigen
 Show popup on errors or warnings
 Zeigt ein Auswahlfenster bei Fehlern oder Warnungen an
-Significant difference detected: More than 50% of files will be overwritten/deleted!
-Ein erheblicher Unterschied wurde festgestellt: Mehr als 50% der Dateien werden überschrieben/gelöscht!
+Significant difference detected:
+Ein erheblicher Unterschied wurde festgestellt:
 Silent mode
 Stiller Modus
 Size
@@ -556,6 +588,8 @@ Sorting file list...
 Sortiere Dateiliste...
 Source code written completely in C++ utilizing:
 Sourcecode komplett in C++ geschrieben mit Hilfe von:
+Speed:
+Geschwindigkeit:
 Start
 Start
 Start synchronization
@@ -596,8 +630,12 @@ Time
 Uhrzeit
 Time elapsed:
 Vergangene Zeit:
+Time remaining:
+Verbliebene Zeit:
 Total amount of data that will be transferred
 Gesamtmenge der zu übertragenden Daten
+Total required free disk space:
+Insgesamt benötigter freier Speicherplatz:
 Total time:
 Gesamtzeit:
 Two way <->

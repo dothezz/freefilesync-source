@@ -1,5 +1,5 @@
 /* XPM */
-static char * FreeFileSync_xpm[] = {
+static const char * FreeFileSync_xpm[] = {
 "32 32 390 2",
 "  	c None",
 ". 	c #005927",

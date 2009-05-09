@@ -61,7 +61,7 @@ public:
 #endif
     int Cmp(const DefaultChar* other) const;
     int Cmp(const Zstring& other) const;
-    size_t Replace(const DefaultChar* old, const DefaultChar* replacement, bool replaceAll = true);
+    Zstring& Replace(const DefaultChar* old, const DefaultChar* replacement, bool replaceAll = true);
     Zstring AfterLast(DefaultChar ch) const;
     Zstring BeforeLast(DefaultChar ch) const;
     size_t Find(DefaultChar ch, bool fromEnd) const;
@@ -87,10 +87,12 @@ public:
     Zstring& operator=(const Zstring& source);
     Zstring& operator=(const DefaultChar* source);
 
-    bool operator==(const Zstring& other) const;
-    bool operator==(const DefaultChar* other) const;
-    bool operator!=(const Zstring& other) const;
-    bool operator!=(const DefaultChar* other) const;
+    bool operator == (const Zstring& other) const;
+    bool operator == (const DefaultChar* other) const;
+    bool operator < (const Zstring& other) const;
+    bool operator < (const DefaultChar* other) const;
+    bool operator != (const Zstring& other) const;
+    bool operator != (const DefaultChar* other) const;
 
     DefaultChar operator[](const size_t pos) const;
 
@@ -98,9 +100,9 @@ public:
     Zstring& operator+=(const DefaultChar* other);
     Zstring& operator+=(DefaultChar ch);
 
-    Zstring operator+(const Zstring& string2) const;
-    Zstring operator+(const DefaultChar* string2) const;
-    Zstring operator+(const DefaultChar ch) const;
+    const Zstring operator+(const Zstring& string2) const;
+    const Zstring operator+(const DefaultChar* string2) const;
+    const Zstring operator+(const DefaultChar ch) const;
 
     static const size_t	npos = static_cast<size_t>(-1);
 
@@ -235,8 +237,27 @@ wchar_t defaultToLower(const wchar_t ch)
 
 
 #ifdef __WXDEBUG__
-extern int allocCount; //test Zstring for memory leaks
-void testZstringForMemoryLeak();
+class AllocationCount //small test for memory leaks in Zstring
+{
+public:
+    void inc()
+    {
+        ++count;
+    }
+
+    void dec()
+    {
+        --count;
+    }
+
+    static AllocationCount& getGlobal();
+
+private:
+    AllocationCount() : count(0) {}
+    ~AllocationCount();
+
+    int count;
+};
 #endif
 
 
@@ -265,14 +286,7 @@ void Zstring::allocate(const size_t       newLength,
     newDescr->capacity = newCapacity;
 
 #ifdef __WXDEBUG__
-    ++allocCount; //test Zstring for memory leaks
-
-    static bool isRegistered = false;
-    if (!isRegistered)
-    {
-        isRegistered = true;
-        atexit(testZstringForMemoryLeak);
-    }
+    AllocationCount::getGlobal().inc(); //test Zstring for memory leaks
 #endif
 }
 
@@ -287,7 +301,7 @@ Zstring::Zstring()
     static Zstring emptyString(L"");
 #endif
 
-    emptyString.incRef(); //implicitly handle case "this == &source" and avoid this check
+    emptyString.incRef();
     descr = emptyString.descr;
     data  = emptyString.data;
 }
@@ -347,9 +361,9 @@ void Zstring::decRef()
     if (--descr->refCount == 0)
     {
         free(descr);   //this must NEVER be changed!! E.g. Trim() relies on descr being start of allocated memory block
-        descr = 0;
+        descr = NULL;
 #ifdef __WXDEBUG__
-        --allocCount; //test Zstring for memory leaks
+        AllocationCount::getGlobal().dec(); //test Zstring for memory leaks
 #endif
     }
 }
@@ -504,28 +518,42 @@ int Zstring::Cmp(const Zstring& other) const
 
 
 inline
-bool Zstring::operator==(const Zstring& other) const
+bool Zstring::operator == (const Zstring& other) const
 {
     return length() != other.length() ? false : defaultCompare(c_str(), other.c_str()) == 0;
 }
 
 
 inline
-bool Zstring::operator==(const DefaultChar* other) const
+bool Zstring::operator == (const DefaultChar* other) const
 {
     return defaultCompare(c_str(), other) == 0; //overload using strcmp(char*, char*) should be fastest!
 }
 
 
 inline
-bool Zstring::operator!=(const Zstring& other) const
+bool Zstring::operator < (const Zstring& other) const
+{
+    return defaultCompare(c_str(), other.c_str()) < 0;
+}
+
+
+inline
+bool Zstring::operator < (const DefaultChar* other) const
+{
+    return defaultCompare(c_str(), other) < 0; //overload using strcmp(char*, char*) should be fastest!
+}
+
+
+inline
+bool Zstring::operator != (const Zstring& other) const
 {
     return length() != other.length() ? true: defaultCompare(c_str(), other.c_str()) != 0;
 }
 
 
 inline
-bool Zstring::operator!=(const DefaultChar* other) const
+bool Zstring::operator != (const DefaultChar* other) const
 {
     return defaultCompare(c_str(), other) != 0; //overload using strcmp(char*, char*) should be fastest!
 }
@@ -590,21 +618,21 @@ DefaultChar Zstring::operator[](const size_t pos) const
 
 
 inline
-Zstring Zstring::operator+(const Zstring& string2) const
+const Zstring Zstring::operator+(const Zstring& string2) const
 {
     return Zstring(*this)+=string2;
 }
 
 
 inline
-Zstring Zstring::operator+(const DefaultChar* string2) const
+const Zstring Zstring::operator+(const DefaultChar* string2) const
 {
     return Zstring(*this)+=string2;
 }
 
 
 inline
-Zstring Zstring::operator+(const DefaultChar ch) const
+const Zstring Zstring::operator+(const DefaultChar ch) const
 {
     return Zstring(*this)+=ch;
 }

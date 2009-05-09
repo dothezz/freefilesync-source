@@ -4,8 +4,9 @@
 #include <wx/string.h>
 #include <set>
 #include <vector>
-#include "library/fileHandling.h"
 #include "library/zstring.h"
+#include <wx/longlong.h>
+
 
 namespace FreeFileSync
 {
@@ -37,17 +38,21 @@ namespace FreeFileSync
         Direction leftNewer;
         Direction rightNewer;
         Direction different;
+
+        bool operator==(const SyncConfiguration& other) const
+        {
+            return exLeftSideOnly  == other.exLeftSideOnly &&
+                   exRightSideOnly == other.exRightSideOnly &&
+                   leftNewer       == other.leftNewer &&
+                   rightNewer      == other.rightNewer &&
+                   different       == other.different;
+        }
     };
 
 
     struct MainConfiguration
     {
-        MainConfiguration() :
-                compareVar(CMP_BY_TIME_SIZE),
-                filterIsActive(false),        //do not filter by default
-                includeFilter(wxT("*")),      //include all files/folders
-                excludeFilter(wxEmptyString), //exclude nothing
-                useRecycleBin(FreeFileSync::recycleBinExists()) {} //enable if OS supports it; else user will have to activate first and then get an error message
+        MainConfiguration();
 
         //Compare setting
         CompareVariant compareVar;
@@ -62,6 +67,34 @@ namespace FreeFileSync
 
         //misc options
         bool useRecycleBin; //use Recycle bin when deleting or overwriting files while synchronizing
+
+        bool operator==(const MainConfiguration& other) const
+        {
+            return compareVar        == other.compareVar &&
+                   syncConfiguration == other.syncConfiguration &&
+                   filterIsActive    == other.filterIsActive &&
+                   includeFilter     == other.includeFilter &&
+                   excludeFilter     == other.excludeFilter;
+        }
+    };
+
+
+    struct FolderPair
+    {
+        FolderPair() {}
+
+        FolderPair(const Zstring& leftDir, const Zstring& rightDir) :
+                leftDirectory(leftDir),
+                rightDirectory(rightDir) {}
+
+        Zstring leftDirectory;
+        Zstring rightDirectory;
+
+        bool operator==(const FolderPair& other) const
+        {
+            return leftDirectory  == other.leftDirectory &&
+                   rightDirectory == other.rightDirectory;
+        }
     };
 
 
@@ -77,17 +110,14 @@ namespace FreeFileSync
         };
 
         Zstring fullName;  // == directory + relativeName
-        Zstring directory; //directory to be synced + separator
         Zsubstr relativeName; //fullName without directory that is being synchronized
-        //Note on performance: Keep redundant information "directory" and "relativeName"!
+        //Note on performance: Keep redundant information "relativeName"!
         //Extracting info from "fullName" instead would result in noticeable performance loss, with only limited memory reduction (note ref. counting strings)!
         wxLongLong lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
         wxULongLong fileSize;
         ObjectType objType; //is it a file or directory or initial?
 
-        //the following operators are needed by template class "set"
-        //DO NOT CHANGE THESE RELATIONS!!!
-        bool operator < (const FileDescrLine& b) const
+        bool operator < (const FileDescrLine& b) const //used by template class "set"
         {
             //quick check based on string length: we are not interested in a lexicographical order!
             const size_t aLength = relativeName.length();
@@ -123,22 +153,22 @@ namespace FreeFileSync
 
         FileDescrLine fileDescrLeft;
         FileDescrLine fileDescrRight;
-
         CompareFilesResult cmpResult;
+
         bool selectedForSynchronization;
     };
-    typedef std::vector<FileCompareLine> FileCompareResult;
+    typedef std::vector<FileCompareLine> FileComparison;
 
 
-    typedef int GridViewLine;
-    typedef std::vector<GridViewLine> GridView;  //vector of references to lines in FileCompareResult
-
-
-    struct FolderPair
+    struct FolderCompareLine //support for multiple folder pairs
     {
-        Zstring leftDirectory;
-        Zstring rightDirectory;
+        FolderPair syncPair;  //directories to be synced (ending with separator)
+        FileComparison fileCmp;
     };
+    typedef std::vector<FolderCompareLine> FolderComparison;
+
+    //References to single lines(in FileComparison) inside FolderComparison
+    typedef std::vector<std::set<int> > FolderCompRef;
 
 
     class AbortThisProcess  //Exception class used to abort the "compare" and "sync" process
@@ -147,9 +177,6 @@ namespace FreeFileSync
         AbortThisProcess() {}
         ~AbortThisProcess() {}
     };
-
-    const wxString LAST_CONFIG_FILE = wxT("LastRun.ffs_gui");
-    const wxString GLOBAL_CONFIG_FILE = wxT("GlobalSettings.xml");
 }
 
 #endif // FREEFILESYNC_H_INCLUDED

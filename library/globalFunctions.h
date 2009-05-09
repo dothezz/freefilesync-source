@@ -6,10 +6,9 @@
 #include <vector>
 #include <set>
 #include <wx/string.h>
-#include <fstream>
 #include <wx/stream.h>
 #include <wx/stopwatch.h>
-
+#include <wx/longlong.h>
 
 namespace globalFunctions
 {
@@ -28,6 +27,7 @@ namespace globalFunctions
 
     std::string numberToString(const unsigned int number); //convert number to string
     std::string numberToString(const int number);          //convert number to string
+    std::string numberToString(const long number);         //convert number to string
     std::string numberToString(const float number);        //convert number to string
 
     wxString numberToWxString(const unsigned int number); //convert number to wxString
@@ -35,6 +35,7 @@ namespace globalFunctions
     wxString numberToWxString(const float number);        //convert number to wxString
 
     int    stringToInt(   const std::string& number); //convert String to number
+    long   stringToLong(  const std::string& number); //convert String to number
     double stringToDouble(const std::string& number); //convert String to number
 
     int    wxStringToInt(   const wxString& number); //convert wxString to number
@@ -47,6 +48,12 @@ namespace globalFunctions
 
     int readInt(wxInputStream& stream);  //read int from file stream
     void writeInt(wxOutputStream& stream, const int number);  //write int to filestream
+
+    inline
+    wxLongLong convertToSigned(const wxULongLong number)
+    {
+        return wxLongLong(number.GetHi(), number.GetLo());
+    }
 }
 
 
@@ -54,7 +61,7 @@ namespace globalFunctions
 class Performance
 {
 public:
-    wxDEPRECATED(Performance()); //generates compiler warnings as a reminder to remove code after measurements
+    wxDEPRECATED(Performance()); //generate compiler warnings as a reminder to remove code after measurements
     ~Performance();
     void showResult();
 
@@ -113,26 +120,26 @@ private:
 template <class T>
 void removeRowsFromVector(std::vector<T>& grid, const std::set<int>& rowsToRemove)
 {
-    std::vector<T> temp;
-    int rowToSkip = -1; //keep it an INT!
-
-    std::set<int>::iterator rowToSkipIndex = rowsToRemove.begin();
-
-    if (rowToSkipIndex != rowsToRemove.end())
-        rowToSkip = *rowToSkipIndex;
-
-    for (int i = 0; i < int(grid.size()); ++i)
+    if (rowsToRemove.size() > 0)
     {
-        if (i != rowToSkip)
-            temp.push_back(grid[i]);
-        else
+        std::vector<T> temp;
+
+        std::set<int>::iterator rowToSkipIndex = rowsToRemove.begin();
+        int rowToSkip = *rowToSkipIndex;
+
+        for (int i = 0; i < int(grid.size()); ++i)
         {
-            ++rowToSkipIndex;
-            if (rowToSkipIndex != rowsToRemove.end())
-                rowToSkip = *rowToSkipIndex;
+            if (i != rowToSkip)
+                temp.push_back(grid[i]);
+            else
+            {
+                ++rowToSkipIndex;
+                if (rowToSkipIndex != rowsToRemove.end())
+                    rowToSkip = *rowToSkipIndex;
+            }
         }
+        grid.swap(temp);
     }
-    grid.swap(temp);
 }
 
 

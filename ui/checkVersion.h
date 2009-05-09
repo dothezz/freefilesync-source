@@ -4,7 +4,9 @@
 
 namespace FreeFileSync
 {
-    void checkForNewVersion();
+    void checkForUpdateNow();
+
+    void checkForUpdatePeriodically(long& lastUpdateCheck);
 }
 
 #endif // UPDATEVERSION_H_INCLUDED

@@ -10,14 +10,24 @@
  PB
  TB
  TB
+ day(s)
+ dag(en)
+ hour(s)
+ u(u)r(en)
  kB
  kB
+ min
+ min
+ sec
+ sec
 !=	files are different\n
 !=	Bestanden zijn verschillend\n
 %x directories
 %x paden
 %x files,
 %x bestanden,
+%x is not a valid FreeFileSync batch file!
+%x is geen geldig FreeFileSync batch-bestand!
 %x of %y rows in view
 %x van de %y rijen in zicht
 %x of 1 row in view
@@ -32,6 +42,8 @@
 &Toepassen
 &Cancel
 &Annuleren
+&Check for new version
+&Controleer op nieuwe versie
 &Compare
 &Vergelijken
 &Create batch job
@@ -94,6 +106,8 @@
 -Open-Source bestandssynchronisatie-
 .
 ,
+/sec
+/sec
 1 directory
 1 pad
 1 file,
@@ -108,8 +122,8 @@
 2. U kunt gebruik maken van wildcard karakters zoals '*' en '?'.
 3. Exclude files directly on main grid via context menu.
 3. Sluit bestanden direct uit in het hoofscherm via een contextmenu
-4. Keep the number of entries small for best performance.
-4. Houd het aantal klein voor de beste prestaties
+4. Keep the number of (different) entries small for best performance.
+4. Hou het aantal (verschillende) posten klein voor de beste prestaties.
 <<	left file is newer\n
 <<	linker bestand is nieuwer\n
 <Directory>
@@ -124,8 +138,8 @@
 ==	bestanden zijn gelijk\n\n
 >>	right file is newer\n
 >>	rechter bestand is nieuwer\n
-Abort
-Afbreken
+A newer version of FreeFileSync is available:
+Een nieuwe versie van FreeFileSync is beschikbaar:
 Abort requested: Waiting for current operation to finish...
 Bezig met afbreken: wachten op beëindigen huidige handeling...
 Aborted
@@ -212,10 +226,10 @@ Copy new or updated files to right folder.
 Kopieer nieuwe of geupdate bestanden naar de rechter map.
 Copy to clipboard\tCTRL+C
 Kopieer naar het klembord\tCTRL+C
-Copying file %x overwriting %y
-Bestand %y wordt overschreven door een kopie van %x
 Copying file %x to %y
 Bestand %x wordt gekopieerd naar %y
+Copying file %x to %y overwriting target
+Aan het overschrijven van bestand %x naar %y
 Could not set working directory:
 Kan het pad in gebruik niet instellen:
 Create a batch job
@@ -256,10 +270,12 @@ Deleting folder %x
 Map %x wordt verwijderd
 Directories are dependent! Be careful when setting up synchronization rules:
 Mappen zijn afhankelijk van elkaar! Wees voorzichtig met het maken van synchronisatieregels:
+Directory
+Map
 Directory does not exist:
 Map bestaat niet:
-Do not show graphical status and error messages but write to a logfile instead
-Geef geen grafische status en foutmeldingen weer, maar sla het op in een logbestand
+Do not display visual status information but write to a logfile instead
+In plaats van visuele statusinformatie weergeven, alles naar een logbestand schrijven
 Do not show this warning again
 Deze waarschuwing niet meer tonen
 Do nothing
@@ -268,12 +284,18 @@ Do you really want to delete the following objects(s)?
 Weet u zeker dat u de volgende bestanden wilt verwijderen?
 Do you really want to move the following objects(s) to the Recycle Bin?
 Weet u zeker dat u de/het volgende bestand(en) wilt verplaatsen naar de prullenbak?
+Do you want FreeFileSync to automatically check for updates every week?
+Wilt u FreeFileSync automatisch elke week laten controleren of er een nieuwe versie is?
 Donate with PayPal
 Doneer met PayPal
+Download now?
+Nu downloaden?
 Drag && drop
 Drag en drop
-Email:
-Email:
+Email
+E-mail
+Enable filter to exclude files from synchronization
+Filter gebruiken om bestanden uit te sluiten van synchronisatie
 Error
 Fout
 Error changing modification time:
@@ -302,6 +324,8 @@ Error reading file:
 Er is een fout opgetreden bij het lezen van het bestand:
 Error resolving symbolic link:
 Er is een fout opgetreden bij het ophalen van een symbolische koppeling:
+Error retrieving full path:
+Er is een fout opgetreden bij het achterhalen van de volledige bestandslocatie:
 Error traversing directory:
 Er is een fout opgetreden bij het doorzoeken van map:
 Error writing file attributes:
@@ -326,12 +350,14 @@ Feedback and suggestions are welcome at:
 Tips en suggesties zijn welkom op:
 File Manager integration:
 Integratie bestandsbeheer:
-File Time Tolerance:
-Bestandstijd-tolerantie
+File Time tolerance (seconds):
+Bestandtijd tolerantie (seconden):
 File already exists. Overwrite?
 Het bestand bestaat al. Overschrijven?
 File content
 Bestandsinhoud
+File does not exist:
+Het bestand bestaat niet:
 File list exported!
 Bestandslijst geëxporteerd!
 File size and date
@@ -362,6 +388,8 @@ Files/folders that exist on left side only
 Bestanden/mappen die alleen aan de linkerkant bestaan
 Files/folders that exist on right side only
 Bestanden/mappen die alleen aan de rechterkant bestaan
+Filter
+Filter
 Filter active: Press again to deactivate
 Filter actief: nogmaals klikken om uit te zetten
 Filter files
@@ -382,6 +410,8 @@ FreeFileSync batch file
 FreeFileSync batchbestand
 FreeFileSync configuration
 FreeFileSync configuratie
+FreeFileSync is up to date!
+U gebruikt de nieuwste versie van FreeFileSync!
 Full name
 Volledige naam
 Generating file list...
@@ -412,8 +442,8 @@ Hides error messages during synchronization:\nThey are collected and shown as a 
 Verbergt foutmeldingen tijdens het synchroniseren:\nze worden verzameld en op het eind in een lijst getoond
 Hints:
 Tips:
-Homepage:
-Homepage:
+Homepage
+Homepage
 If you like FFS
 Als het programma u bevalt
 Ignore errors
@@ -438,8 +468,8 @@ Initialization of Recycle Bin failed!
 Initialiseren van de prullenbak is mislukt.
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Het was niet mogelijk de prullenbak te initialiseren!\n\nHet is waarschijnlijk dat u niet Windows gebruikt.\nAls u deze optie wel wilt, neem dan alstublieft contact op met de auteur. :)
-Left folder:
-Linker map:
+Left:
+Links:
 Legend
 Legenda
 Load configuration from file
@@ -448,16 +478,22 @@ Load configuration history (press DEL to delete items)
 Laad configuratiegeschiedenis (druk op DEL om items te verwijderen)
 Log-messages:
 Logberichten:
+Logging
+Loggen
 Mirror ->>
 Spiegelen ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Spiegel backup van de linkerkant: de rechterkant wordt overschreven en komt na synchronisatie exact overeen met de linkerkant.
+More than 50% of the total number of files will be copied or deleted!
+Meer dan 50% van alle bestanden zal worden gekopieerd of verwijderd!
 Move column down
 Verplaats kolom naar beneden
 Move column up
 Verplaats kolom naar boven
 Not all items were synchronized! Have a look at the list.
 Niet alle bestanden zijn gesynchroniseerd! Bekijk de lijst.
+Not enough free disk space available in:
+Niet genoeg schijfruimte beschikbaar op:
 Nothing to synchronize according to configuration!
 Volgens de gebruikte configuratie hoeft er niks gesynchroniseerd te worden!
 Number of files and directories that will be created
@@ -478,8 +514,12 @@ Operation aborted!
 Operatie afgebroken!
 Operation:
 Voortgang:
+Overview
+Overzicht
 Pause
 Pause
+Paused
+Gepauseerd
 Please fill all empty directory fields.
 Vul alstublieft aan beide kanten een pad in.
 Press button to activate filter
@@ -502,8 +542,8 @@ Resets all warning messages
 Reset alle waarschuwingen
 Result
 Resultaat
-Right folder:
-Rechter map:
+Right:
+Rechts:
 S&ave configuration
 S&la de instellingen op
 Save aborted!
@@ -516,6 +556,8 @@ Scanning:
 Scannen:
 Select a folder
 Selecteer een map
+Select logfile directory:
+Selecteer een map voor het logbestand:
 Select variant:
 Selecteer een variant:
 Show files that are different
@@ -534,8 +576,8 @@ Show popup
 Pop-up weergeven
 Show popup on errors or warnings
 Pop-up weergeven bij foutmeldingen of waarschuwingen
-Significant difference detected: More than 50% of files will be overwritten/deleted!
-Significant verschil gedetecteerd: meer dan 50% van de bestanden zal worden overschreven/verwijderd!
+Significant difference detected:
+Significant verschil gedetecteerd:
 Silent mode
 Stille modus
 Size
@@ -544,6 +586,8 @@ Sorting file list...
 Bestandslijst sorteren...
 Source code written completely in C++ utilizing:
 Broncode compleet geschreven in C++ met behulp van:
+Speed:
+Snelheid:
 Start
 Start
 Start synchronization
@@ -576,24 +620,26 @@ Target file already existing!
 Doelbestand bestaat al!
 The file does not contain a valid configuration:
 Het bestand bevat geen geldige configuratie:
-File does not exist:
-Het bestand bestaat niet:
 This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
 Deze opdrachtregel wordt bij elke dubbelklik op een bestandsnaam uitgevoerd. %name doet dienst als plaatshouder voor het betreffende bestand.
-This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
-Deze opdrachtregel zal elke keer dat u dubbelklikt op een bestandsnaam, worden uitgevoerd. %x doet dienst als opslagplaats voor het geselecteerde bestand.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Deze variant ziet twee gelijknamige bestanden als gelijk wanneer ze dezelfde bestandsgrootte EN tijdstempel hebben.
 Time
 Tijd
 Time elapsed:
 Verstreken tijd:
+Time remaining:
+Benodigde tijd:
 Total amount of data that will be transferred
 Hoeveelheid data die verplaatst word
+Total required free disk space:
+Benodigde hoeveelheid vrije schijfruimte:
 Total time:
 Totale tijd:
 Two way <->
 Beide zijden <->
+Unable to connect to sourceforge.net!
+Niet in staat verbinding te maken met sourceforge.net!
 Unable to create logfile!
 Niet mogelijk om een logbestand aan te maken!
 Unable to initialize Recycle Bin!

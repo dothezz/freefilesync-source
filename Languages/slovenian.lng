@@ -10,14 +10,24 @@
  PB
  TB
  TB
+ day(s)
+ dni
+ hour(s)
+ ur
  kB
  kB
+ min
+ min
+ sec
+ sek
 !=	files are different\n
-!=	datoteke so različne\n
+!=	datoteki sta različni\n
 %x directories
 %x imeniki
 %x files,
 %x datoteke,
+%x is not a valid FreeFileSync batch file!
+%x ni veljavna FreeFileSync batch datoteka!
 %x of %y rows in view
 %x od %y vrstic prikazanih
 %x of 1 row in view
@@ -32,6 +42,8 @@
 &Uveljavi
 &Cancel
 &Prekliči
+&Check for new version
+&Preveri za novo različico
 &Compare
 &Primerjaj
 &Create batch job
@@ -83,21 +95,23 @@ Na&loži konfiguracijo
 - left
 - levo
 - left newer
-- na levi novejša
+- leva novejša
 - right
 - desno
 - right newer
-- na desni novejša
+- desna novejša
 - same date (different size)
 - enak datum (različna velikost)
 -Open-Source file synchronization-
 -Odprto-kodna sinhronizacija datotek-
 .
 ,
+/sec
+/sek
 1 directory
 1 imenik
 1 file,
-1 datoeka,
+1 datoteka,
 1. &Compare
 1. &Primerjaj
 1. Enter full file or directory names separated by ';' or a new line.
@@ -108,8 +122,8 @@ Na&loži konfiguracijo
 2. Uporabite lahko tudi znake '*' in '?'.
 3. Exclude files directly on main grid via context menu.
 3. Izključite datoteke neposredno na glavni mreži s kontekstnim menujem.
-4. Keep the number of entries small for best performance.
-4. Za boljše delovanje vzdržujte majhno število vnosov.
+4. Keep the number of (different) entries small for best performance.
+4. Za boljšo učinkovitost ohranjajte število (različnih) vnosov majhno.
 <<	left file is newer\n
 <<	leva datoteka je novejša\n
 <Directory>
@@ -121,11 +135,11 @@ Na&loži konfiguracijo
 <|	file on left side only\n
 <|	datoteka obstaja samo na levi\n
 ==	files are equal\n\n
-==	datoteke so enake\n\n
+==	datoteki sta enaki\n\n
 >>	right file is newer\n
 >>	desna datoteka je novejša\n
-Abort
-Prekini
+A newer version of FreeFileSync is available:
+Na voljo je nova različica FreeFileSync:
 Abort requested: Waiting for current operation to finish...
 Zahtevana je bila prekinitev: čakam, da se zaključi trenutna operacija...
 Aborted
@@ -195,7 +209,7 @@ Konfiguriraj filter...
 Configure your own synchronization rules.
 Konfiguriraj vaša lastna sinhronizacijska pravila.
 Confirm
-Potrdite
+Potrdi
 Continue
 Nadaljuj
 Conversion error:
@@ -212,14 +226,14 @@ Copy new or updated files to right folder.
 Kopiraj nove ali posodobljene datoteke v desno mapo.
 Copy to clipboard\tCTRL+C
 Kopiraj v odložišče\tCTRL+C
-Copying file %x overwriting %y
-Kopiram datoteko %x s prepisovanjem %y
 Copying file %x to %y
 Kopiram datoteko %x v %y
+Copying file %x to %y overwriting target
+Kopiram datoteko %x v %y s prepisovanjem cilja
 Could not set working directory:
 Ne morem nastaviti delovnega imenika:
 Create a batch job
-Ustvarite batch opravilo
+Ustvari batch opravilo
 Create:
 Ustvari:
 Creating folder %x
@@ -256,10 +270,12 @@ Deleting folder %x
 Brisanje mape %x
 Directories are dependent! Be careful when setting up synchronization rules:
 Imeniki so v odvisnosti! Bodite pozorni, ko nastavljate sinhronizacijska pravila:
+Directory
+Imenik
 Directory does not exist:
 Imenik ne obstaja:
-Do not show graphical status and error messages but write to a logfile instead
-Ne prikazuj grafičnega statusa in obvestil o napakah, ampak zabeleži samo v dnevniško datoteko
+Do not display visual status information but write to a logfile instead
+Ne prikazuj vidnih statusnih informacij, ampak piši v dnevniško datoteko
 Do not show this warning again
 Ne prikazuj več tega obvestila
 Do nothing
@@ -268,12 +284,18 @@ Do you really want to delete the following objects(s)?
 Ali resnično želite izbrisati naslednje objekte?
 Do you really want to move the following objects(s) to the Recycle Bin?
 Ali resnično želite premakniti naslednje objekte v Koš?
+Do you want FreeFileSync to automatically check for updates every week?
+Ali želite, da FreeFileSync samodejno preverja za posodobitve vsak teden?
 Donate with PayPal
 Doniraj s PayPal
+Download now?
+Prenesem sedaj?
 Drag && drop
 Povleci && spusti
-Email:
-Email:
+Email
+Email
+Enable filter to exclude files from synchronization
+Omogoči filter, da se datoteke izključi iz sinhronizacije
 Error
 Napaka
 Error changing modification time:
@@ -302,6 +324,8 @@ Error reading file:
 Napaka pri branju datoteke:
 Error resolving symbolic link:
 Napaka pri razreševanju simbolične povezave:
+Error retrieving full path:
+Napaka pri pridobivanju polne poti:
 Error traversing directory:
 Napaka pri prehajanju imenika:
 Error writing file attributes:
@@ -326,12 +350,14 @@ Feedback and suggestions are welcome at:
 Povratne informacije in predlogi so dobrodošli na:
 File Manager integration:
 Integracija z urejevalnikom datotek:
-File Time Tolerance:
-Toleranca časa spremembe datoteke:
+File Time tolerance (seconds):
+Toleranca v času zadnje spremembe datoteke (sekunde):
 File already exists. Overwrite?
 Datoteka že obstaja. Prepišem?
 File content
 Vsebini datoteke
+File does not exist:
+Datoteka ne obstaja:
 File list exported!
 Seznam datotek je bil izvožen!
 File size and date
@@ -362,6 +388,8 @@ Files/folders that exist on left side only
 Datoteke/mape, ki obstajajo samo na levi strani
 Files/folders that exist on right side only
 Datoteke/mape, ki obstajajo samo na desni strani
+Filter
+Filter
 Filter active: Press again to deactivate
 Filter aktiven: Ponovno kliknite za deaktivacijo
 Filter files
@@ -382,6 +410,8 @@ FreeFileSync batch file
 FreeFileSync batch datoteka
 FreeFileSync configuration
 FreeFileSync konfiguracija
+FreeFileSync is up to date!
+FreeFileSync je posodobljen!
 Full name
 Polno ime
 Generating file list...
@@ -412,8 +442,8 @@ Hides error messages during synchronization:\nThey are collected and shown as a 
 Skrij obvestila o napakah med sinhronizacijo:\nObvestila se zbirajo in se prikažejo kot seznam na koncu procesa
 Hints:
 Namigi:
-Homepage:
-Domača stran:
+Homepage
+Domača stran
 If you like FFS
 Če vam je FFS všeč
 Ignore errors
@@ -438,8 +468,8 @@ Initialization of Recycle Bin failed!
 Inicializacija Koša ni uspela!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Ni bilo mogoče inicializirati Koša!\n\nZgleda, da ne uporabljate Windowsov.\nČe želite imeti vključeno to lastnost, prosimo kontaktirajte avtorja. :)
-Left folder:
-Leva mapa:
+Left:
+Levo:
 Legend
 Legenda
 Load configuration from file
@@ -448,16 +478,22 @@ Load configuration history (press DEL to delete items)
 Naloži zgodovino konfiguracije (pritisnite DEL za brisanje predmetov)
 Log-messages:
 Sporočila beleženja:
+Logging
+Beležim
 Mirror ->>
 Zrcalno ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Zrcalna kopija leve mape: Desna mapa bo prepisana in se bo natančno ujemala z levo mapo po sinhronizaciji.
+More than 50% of the total number of files will be copied or deleted!
+Več kot 50% od celotnega števila datotek bo kopiranih ali izbrisanih!
 Move column down
 Premakni stolpec dol
 Move column up
 Premakni stolpec gor
 Not all items were synchronized! Have a look at the list.
 Vsi predmeti niso bili sinhronizirani! Poglejte seznam.
+Not enough free disk space available in:
+Na voljo ni dovolj prostega prostora na disku v:
 Nothing to synchronize according to configuration!
 Nič ni za sinhronizirati po trenutni konfiguraciji!
 Number of files and directories that will be created
@@ -478,8 +514,12 @@ Operation aborted!
 Operacija prekinjena!
 Operation:
 Operacija:
+Overview
+Pregled
 Pause
 Pavza
+Paused
+Na pavzi
 Please fill all empty directory fields.
 Prosim izpolnite vse imenike s praznimi polji.
 Press button to activate filter
@@ -502,8 +542,8 @@ Resets all warning messages
 Ponastavi vsa obvestila z opozorili
 Result
 Rezultat
-Right folder:
-Desna mapa:
+Right:
+Desno:
 S&ave configuration
 Shr&ani konfiguracijo
 Save aborted!
@@ -516,6 +556,8 @@ Scanning:
 Pregledujem:
 Select a folder
 Izberite mapo
+Select logfile directory:
+Izberite imenik datoteke za beleženje:
 Select variant:
 Izberite varianto:
 Show files that are different
@@ -534,8 +576,8 @@ Show popup
 Prikaži pojavno okno
 Show popup on errors or warnings
 Prikaži pojavno okno pri napakah in opozorilih
-Significant difference detected: More than 50% of files will be overwritten/deleted!
-Pomembna razlika zaznana: Več kot 50% datotek bo prepisanih/izbrisanih!
+Significant difference detected:
+Zaznana je važna razlika:
 Silent mode
 Tihi način
 Size
@@ -544,6 +586,8 @@ Sorting file list...
 Sortiram seznam datotek...
 Source code written completely in C++ utilizing:
 Izvorna koda napisana celotno v C++ z uporabo:
+Speed:
+Hitrost:
 Start
 Začni
 Start synchronization
@@ -573,27 +617,29 @@ Sinhroniziram...
 System out of memory!
 Sistemu je zmanjkalo pomnilnika!
 Target file already existing!
-Tarčna datoteka že obstaja!
+Ciljna datoteka že obstaja!
 The file does not contain a valid configuration:
 Datoteka ne vsebuje veljavne konfiguracije:
-File does not exist:
-Datoteka ne obstaja:
 This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
 Ta ukaz bo izveden vsakič, ko boste dvokliknili na ime datoteke. %name služi kot rezerviran prostor za izbrano datoteko.
-This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
-Ta ukaz bo izveden vsakič, ko boste dvokliknili na ime datoteke. %x služi kot rezerviran prostor za izbrano datoteko.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Ta varianta oceni dve datoteki z enakim imenom kot enaki, ko imata enako velikost IN enak datum ter čas zadnjega spreminjanja.
 Time
 Čas
 Time elapsed:
 Pretečen čas:
+Time remaining:
+Preostali čas:
 Total amount of data that will be transferred
 Količina podatkov, ki bo prenešena
+Total required free disk space:
+Skupno zahtevani prosti prostor na disku:
 Total time:
 Celoten čas:
 Two way <->
 Obojesmerno <->
+Unable to connect to sourceforge.net!
+Ne morem se povezati na sourceforge.net!
 Unable to create logfile!
 Ne morem ustvariti datoteko za beleženje!
 Unable to initialize Recycle Bin!
@@ -611,7 +657,7 @@ Uporabi Koš ko se briše ali prepisuje datoteke med sinhronizacijo
 Warning
 Pozor
 Warning: Synchronization failed for %x item(s):
-Pozore: Sinhronizacija ni uspela za %x predmetov:
+Pozor: Sinhronizacija ni uspela za %x predmetov:
 Warnings:
 Opozorila:
 When the comparison is started with this option set the following decision tree is processed:
@@ -623,6 +669,6 @@ različni
 file exists on both sides
 datoteka obstaja na obeh straneh
 on one side only
-datoteka obstaja samo na eni strani
+samo na eni strani
 |>	file on right side only\n
 |>	datoteka obstaja samo na desni\n

@@ -108,8 +108,6 @@
 2. Sono ammessi i caratteri generici '*' e '?'.
 3. Exclude files directly on main grid via context menu.
 3. Escludi i file direttamente sul main grid tramite il menu contestuale.
-4. Keep the number of entries small for best performance.
-4. Riduci il numero di ingressi per migliorare le performances.
 <<	left file is newer\n
 <<	il file di sinistra è più recente\n
 <Directory>
@@ -124,8 +122,6 @@
 ==	i file sono identici\n\n
 >>	right file is newer\n
 >>	il file di destra è più recente\n
-Abort
-Abbandona
 Abort requested: Waiting for current operation to finish...
 Abbandono richiesto: in attesa della fine dell'operazione in corso...
 Aborted
@@ -212,8 +208,6 @@ Copy new or updated files to right folder.
 Copia file nuovi o aggiornati nella cartella di destra.
 Copy to clipboard\tCTRL+C
 Copia nella clipboard\tCTRL+C
-Copying file %x overwriting %y
-Copia di %x file sovrascrivendone %y
 Copying file %x to %y
 Copia di file da %x a %y
 Could not set working directory:
@@ -258,8 +252,6 @@ Directories are dependent! Be careful when setting up synchronization rules:
 Le directory sono dipendenti! Fai attenzione quando configuri le regole di sincronizzazione:
 Directory does not exist:
 La directory non esiste:
-Do not show graphical status and error messages but write to a logfile instead
-Non mostrare lo stato grafico nè i messaggi d'errore ma scrivi un file log
 Do not show this warning again
 Non mostrare più questo messaggio
 Do nothing
@@ -272,8 +264,6 @@ Donate with PayPal
 Fai una donazione con PayPal
 Drag && drop
 Drag && drop
-Email:
-Email:
 Error
 Errore
 Error changing modification time:
@@ -326,12 +316,12 @@ Feedback and suggestions are welcome at:
 Commenti e suggerimenti sono i benvenuti:
 File Manager integration:
 Integrazione File Manager:
-File Time Tolerance:
-Tolleranza di File Time:
 File already exists. Overwrite?
 Il file esiste già. Lo vuoi sovrascrivere?
 File content
 Contenuto del file
+File does not exist:
+Il file non esiste:
 File list exported!
 Lista dei file esportata!
 File size and date
@@ -412,8 +402,6 @@ Hides error messages during synchronization:\nThey are collected and shown as a 
 Non mostrare i messaggi d'errore durante la sincronizzazione:\nVerranno raccolti e mostrati alla fine del processo
 Hints:
 Consigli:
-Homepage:
-Homepage:
 If you like FFS
 Se ti piace FFS
 Ignore errors
@@ -438,8 +426,6 @@ Initialization of Recycle Bin failed!
 Inizializzazione del Cestino fallita!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Impossibile inizializzare il Cestino!\n\nE'probabile che non si stia utilizzando Windows.\nSe si vuole usare questa funzionalità, contattare l'autore. :)
-Left folder:
-Cartella di sinistra:
 Legend
 Legenda
 Load configuration from file
@@ -502,8 +488,6 @@ Resets all warning messages
 Resetta tutti gli avvisi
 Result
 Risultato
-Right folder:
-Cartella Destra:
 S&ave configuration
 S&alva la configurazione
 Save aborted!
@@ -534,8 +518,6 @@ Show popup
 Mostra popup
 Show popup on errors or warnings
 Mostra popup degli errori o avvisi
-Significant difference detected: More than 50% of files will be overwritten/deleted!
-Riscontrate differenze significative: Più del 50% dei file saranno sovrascritti/cancellati!
 Silent mode
 Modalità Silenziosa
 Size
@@ -576,12 +558,8 @@ Target file already existing!
 File destinazione già esistente!
 The file does not contain a valid configuration:
 Il file non contiene una configurazione valida
-File does not exist:
-Il file non esiste:
 This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
 Questa riga di comando verrà eseguita ad ogni doppio click sul nome di un file. %name é lo spazio riservato per il file selezionato.
-This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
-Questa riga di comando verrà eseguita ad ogni doppio click sul nome di un file. %x é lo spazio riservato per il file selezionato.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Questa variante definisce identici due file con lo stesso nome quando hanno la stessa dimensione E la stessa data e ora.
 Time

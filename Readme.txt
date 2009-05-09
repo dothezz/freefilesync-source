@@ -1,4 +1,4 @@
-FreeFileSync v1.17
+FreeFileSync v1.18
 ------------------
 
 Usage
@@ -45,7 +45,7 @@ Key Features
 23. Portable version (.zip) available.
 24. No Windows registry entries for portable version.
 25. Support for \\?\ path prefix for unrestricted path length. (windows only)
-26. Check for updates from within FreeFileSync.
+26. Check for updates from within FreeFileSync automatically.
 
 
 Advanced topics
@@ -78,7 +78,7 @@ FreeFileSync has a big focus on usability. Therefore drag & drop is supported in
 
 You can: - drag & drop any directory onto the main window to set the directory for comparison
          - drag & drop any file onto the main window to set the directory for comparison
-         - drag & drop *.ffs_gui files onto the main window to load the configuration within
+         - drag & drop *.ffs_gui files onto the main window to load the configuration contained
          - drag & drop *.ffs_batch files onto the main window to display and edit the batch configuration
          - drag & drop *.ffs_batch files onto the batch dialog to display and edit the batch configuration
 

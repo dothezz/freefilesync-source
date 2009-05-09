@@ -1,20 +1,21 @@
 #ifndef SYNCHRONIZATION_H_INCLUDED
 #define SYNCHRONIZATION_H_INCLUDED
 
-#include "FreeFileSync.h"
-#include "library/statusHandler.h"
+#include "structures.h"
+
+class StatusHandler;
 
 
 namespace FreeFileSync
 {
-    void calcTotalBytesToSync(const FileCompareResult& fileCmpResult,
+    void calcTotalBytesToSync(const FolderComparison& folderCmp,
                               const SyncConfiguration& config,
                               int& objectsToCreate,
                               int& objectsToOverwrite,
                               int& objectsToDelete,
-                              double& dataToProcess);
+                              wxULongLong& dataToProcess);
 
-    bool synchronizationNeeded(const FileCompareResult& fileCmpResult, const SyncConfiguration& config);
+    bool synchronizationNeeded(const FolderComparison& folderCmp, const SyncConfiguration& config);
 
     //class handling synchronization process
     class SyncProcess
@@ -24,13 +25,14 @@ namespace FreeFileSync
                     const bool copyFileSymLinks,
                     const bool traverseDirSymLinks,
                     bool& warningSignificantDifference,
+                    bool& warningNotEnoughDiskSpace,
                     StatusHandler* handler);
 
-        void startSynchronizationProcess(FileCompareResult& grid, const SyncConfiguration& config)  throw(AbortThisProcess);
+        void startSynchronizationProcess(FolderComparison& folderCmp, const SyncConfiguration& config);
 
     private:
-        bool synchronizeFile(const FileCompareLine& cmpLine, const SyncConfiguration& config);   //false if nothing had to be done
-        bool synchronizeFolder(const FileCompareLine& cmpLine, const SyncConfiguration& config); //false if nothing had to be done
+        bool synchronizeFile(const FileCompareLine& cmpLine, const SyncConfiguration& config, const FolderPair& folderPair);   //false if nothing was done
+        bool synchronizeFolder(const FileCompareLine& cmpLine, const SyncConfiguration& config, const FolderPair& folderPair); //false if nothing was done
 
         void copyFileUpdating(const Zstring& source, const Zstring& target, const wxULongLong& sourceFileSize);
 
@@ -38,14 +40,15 @@ namespace FreeFileSync
         const bool m_copyFileSymLinks;
         const bool m_traverseDirSymLinks;
         bool& m_warningSignificantDifference;
+        bool& m_warningNotEnoughDiskSpace;
         StatusHandler* statusUpdater;
 
         //preload status texts
-        Zstring txtCopyingFile;
-        Zstring txtOverwritingFile;
-        Zstring txtCreatingFolder;
-        Zstring txtDeletingFile;
-        Zstring txtDeletingFolder;
+        const Zstring txtCopyingFile;
+        const Zstring txtOverwritingFile;
+        const Zstring txtCreatingFolder;
+        const Zstring txtDeletingFile;
+        const Zstring txtDeletingFolder;
     };
 }
 

@@ -1,7 +1,6 @@
 #ifndef RECYCLER_H_INCLUDED
 #define RECYCLER_H_INCLUDED
 
-#include "globalFunctions.h"
 #include <wx/dir.h>
 #include "zstring.h"
 
@@ -11,7 +10,7 @@ public:
     FileError(const Zstring& message) :
             errorMessage(message) {}
 
-    Zstring show() const
+    const Zstring& show() const
     {
         return errorMessage;
     }
@@ -25,7 +24,7 @@ namespace FreeFileSync
 {
     struct FileInfo
     {
-        wxULongLong fileSize;    //unit: bytes!
+        wxULongLong fileSize;        //unit: bytes!
         wxLongLong lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
     };
 

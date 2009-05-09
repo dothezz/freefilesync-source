@@ -83,7 +83,6 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("statusComparing.png")]    = (bitmapStatusComparing   = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("statusSyncing.png")]      = (bitmapStatusSyncing     = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("logo.png")]               = (bitmapLogo              = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("finished.png")]           = (bitmapFinished          = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("statusEdge.png")]         = (bitmapStatusEdge        = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("add pair.png")]           = (bitmapAddFolderPair     = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("remove pair.png")]        = (bitmapRemoveFolderPair  = new wxBitmap(wxNullBitmap));
@@ -105,12 +104,25 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("settings_small.png")]     = (bitmapSettingsSmall     = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("recycler.png")]           = (bitmapRecycler          = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("shift.png")]              = (bitmapShift             = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("question.png")]           = (bitmapQuestion          = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("china.png")]              = (bitmapChina             = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("holland.png")]            = (bitmapHolland           = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("england.png")]            = (bitmapEngland           = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("france.png")]             = (bitmapFrance            = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("germany.png")]            = (bitmapGermany           = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("hungary.png")]            = (bitmapHungary           = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("italy.png")]              = (bitmapItaly             = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("japan.png")]              = (bitmapJapan             = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("poland.png")]             = (bitmapPoland            = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("portugal.png")]           = (bitmapPortugal          = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("brazil.png")]             = (bitmapBrazil            = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("slovakia.png")]           = (bitmapSlovakia          = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("spain.png")]              = (bitmapSpain             = new wxBitmap(wxNullBitmap));
 
     //init all the other resource files
     animationMoney = new wxAnimation(wxNullAnimation);
     animationSync  = new wxAnimation(wxNullAnimation);
-
-    programIcon = &wxNullIcon;
+    programIcon    = new wxIcon(wxNullIcon);
 }
 
 
@@ -159,7 +171,7 @@ void GlobalResources::load()
         std::map<wxString, wxBitmap*>::iterator bmp;
         while ((entry = resourceFile.GetNextEntry()))
         {
-            wxString name = entry->GetName();
+            const wxString name = entry->GetName();
 
             //search if entry is available in map
             if ((bmp = bitmapResource.find(name)) != bitmapResource.end())
@@ -172,9 +184,9 @@ void GlobalResources::load()
     }
 
 #ifdef FFS_WIN
-    programIcon = new wxIcon(wxT("ffsIcon1"));
+    *programIcon = wxIcon(wxT("ffsIcon1"));
 #else
 #include "FreeFileSync.xpm"
-    programIcon = new wxIcon(FreeFileSync_xpm);
+    *programIcon = wxIcon(FreeFileSync_xpm);
 #endif
 }

@@ -10,14 +10,24 @@
  Po
  TB
  To
+ day(s)
+ jour(s)
+ hour(s)
+ heure(s)
  kB
  ko
+ min
+ min
+ sec
+ sec
 !=	files are different\n
 !=	les fichiers sont différents\n
 %x directories
 %x dossiers
 %x files,
 %x fichiers,
+%x is not a valid FreeFileSync batch file!
+%x n'est pas un fichier batch FreeFileSync valide!
 %x of %y rows in view
 %x sur %y lignes affichées
 %x of 1 row in view
@@ -32,6 +42,8 @@
 &Appliquer
 &Cancel
 &Annuler
+&Check for new version
+&Rechercher une nouvelle version
 &Compare
 &Comparer
 &Create batch job
@@ -94,6 +106,8 @@
 -Synchronisation de fichiers Open-Source-
 .
 ,
+/sec
+/sec
 1 directory
 1 dossier
 1 file,
@@ -107,9 +121,9 @@
 2. Use wildcard characters '*' and '?'.
 2. Les caractères génériques '*' et '?' sont acceptés.
 3. Exclude files directly on main grid via context menu.
-3. Excluez les fichiers directement sur le tableau principal à l'aide du menu contextuel.
-4. Keep the number of entries small for best performance.
-4. Réduisez le nombre d'entrées pour améliorer les performances.
+3. Exclure les fichiers directement sur le tableau principal à l'aide du menu contextuel.
+4. Keep the number of (different) entries small for best performance.
+4. Réduire le nombre d'entrées (différentes) pour une meilleure performance
 <<	left file is newer\n
 <<	le fichier de gauche est plus récent\n
 <Directory>
@@ -124,8 +138,8 @@
 ==	Les fichiers sont identiques\n\n
 >>	right file is newer\n
 >>	le fichier de droite est plus récent\n
-Abort
-Abandon
+A newer version of FreeFileSync is available:
+Une version de FreeFileSync plus récente est disponible:
 Abort requested: Waiting for current operation to finish...
 Abandon demandé: En attente de la fin de l'opération en cours...
 Aborted
@@ -212,10 +226,10 @@ Copy new or updated files to right folder.
 Copie de fichiers nouveaux ou modifiés dans le dossier de droite.
 Copy to clipboard\tCTRL+C
 Copier dans le presse-papiers\tCTRL+C
-Copying file %x overwriting %y
-Copie fichier %x écrasant %y
 Copying file %x to %y
-Copie fichier %x vers %y
+Copie le fichier %x vers %y
+Copying file %x to %y overwriting target
+Copie le fichier %x vers %y avec écrasement
 Could not set working directory:
 Impossible de définir le répertoire de travail:
 Create a batch job
@@ -256,10 +270,10 @@ Deleting folder %x
 Suppression du dossier %x
 Directories are dependent! Be careful when setting up synchronization rules:
 Les dossiers sont imbriqués! Attention à la mise à jour des règles de synchronisation:
+Directory
+Répertoire
 Directory does not exist:
 Le répertoire n'existe pas:
-Do not show graphical status and error messages but write to a logfile instead
-Ne pas afficher l'état graphique ni les messages mais les écrire sur un fichier log
 Do not show this warning again
 Ne plus afficher cet avertissement
 Do nothing
@@ -268,12 +282,18 @@ Do you really want to delete the following objects(s)?
 Voulez-vous vraiment supprimer les objets suivants ?
 Do you really want to move the following objects(s) to the Recycle Bin?
 Voulez-vous vraiment déplacer les objets suivants dans la corbeille?
+Do you want FreeFileSync to automatically check for updates every week?
+Voulez-vous que FreeFileSync recherche automatiquement de nouvelles versions chaque semaine ?
 Donate with PayPal
 Faites un don avec PayPal
+Download now?
+Télécharger maintenant ?
 Drag && drop
 Glisser && Déposer
-Email:
-Email:
+Email
+Email
+Enable filter to exclude files from synchronization
+Activer le filtrage pour exclure les fichiers de la synchronisation
 Error
 Erreur
 Error changing modification time:
@@ -302,6 +322,8 @@ Error reading file:
 Erreur lors de la lecture du fichier:
 Error resolving symbolic link:
 Erreur lors de la résolution du lien symbolique:
+Error retrieving full path:
+Erreur lors de la recherche du chemin:
 Error traversing directory:
 Erreur lors du parcours du répertoire:
 Error writing file attributes:
@@ -326,12 +348,14 @@ Feedback and suggestions are welcome at:
 Commentaires et suggestions sont les bienvenus à:
 File Manager integration:
 Choix du Gestionnaire de Fichiers:
-File Time Tolerance:
-Tolérance horaire:
+File Time tolerance (seconds):
+Tolérance sur l'heure de création du fichier (en secondes):
 File already exists. Overwrite?
 Le fichier existe déjà. Voulez-vous le remplacer?
 File content
 Contenu du fichier
+File does not exist:
+Le fichier n'existe pas:
 File list exported!
 Liste des fichiers exportée!
 File size and date
@@ -362,6 +386,8 @@ Files/folders that exist on left side only
 Fichiers/répertoires existants seulement à gauche
 Files/folders that exist on right side only
 Fichiers/répertoires existants seulement à droite
+Filter
+Filtrage
 Filter active: Press again to deactivate
 Filtrage actif: Cliquez de nouveau pour le désactiver
 Filter files
@@ -382,6 +408,8 @@ FreeFileSync batch file
 FreeFileSync fichier de commandes
 FreeFileSync configuration
 FreeFileSync configuration
+FreeFileSync is up to date!
+FreeFileSync a été mis à jour !
 Full name
 Nom complet
 Generating file list...
@@ -412,8 +440,8 @@ Hides error messages during synchronization:\nThey are collected and shown as a 
 Masquer les messages d'erreur pendant la synchronisation:\nIls sont collationnés et listés à la fin de l'opération
 Hints:
 Conseils:
-Homepage:
-Page d'accueil:
+Homepage
+Accueil
 If you like FFS
 Si vous aimez FFS
 Ignore errors
@@ -438,8 +466,8 @@ Initialization of Recycle Bin failed!
 Erreur lors de l'initialisation de la corbeille !
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Impossible d'accéder à la corbeille!\n\nIl est probable que vous n'utilisez pas Windows.\nSi vous désirez utilisee cette fonctionnalité, veuillez contacter l'auteur. :)
-Left folder:
-Répertoire de gauche:
+Left:
+Gauche:
 Legend
 Legende
 Load configuration from file
@@ -448,16 +476,22 @@ Load configuration history (press DEL to delete items)
 Charger l'historique des configuration (appuyez sur Suppr pour supprimer des éléments)
 Log-messages:
 Messages log:
+Logging
+Connexion
 Mirror ->>
 Mirroir ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Sauvegarde miroir du répertoire de gauche : Le répertoire de droite sera écrasé et exactement identique au répertoire de gauche après la synchronisation.
+More than 50% of the total number of files will be copied or deleted!
+Plus de 50% des fichiers seront copiés ou détruits!
 Move column down
 Déplacer la colonne vers le bas
 Move column up
 Déplacer la colonne vers le haut
 Not all items were synchronized! Have a look at the list.
 Tous les éléments n'ont pas été synchronisés!  Veuillez vérifier la liste.
+Not enough free disk space available in:
+Espace disque insuffisant sur :
 Nothing to synchronize according to configuration!
 Rien à synchroniser dans cette configuration!
 Number of files and directories that will be created
@@ -478,8 +512,12 @@ Operation aborted!
 Opération abandonnée!
 Operation:
 Opération:
+Overview
+Présentation
 Pause
 Pause
+Paused
+En pause
 Please fill all empty directory fields.
 Veuillez remplir tous les champs vides du répertoire.
 Press button to activate filter
@@ -502,8 +540,8 @@ Resets all warning messages
 Réinitialise tous les avertissements
 Result
 Situation
-Right folder:
-Répertoire de droite:
+Right:
+Droite :
 S&ave configuration
 S&auvegarder la configuration
 Save aborted!
@@ -516,6 +554,8 @@ Scanning:
 Lecture en cours:
 Select a folder
 Choisissez un répertoire
+Select logfile directory:
+Choisissez un dossier pour le fichier .log
 Select variant:
 Choisissez une variante:
 Show files that are different
@@ -534,8 +574,8 @@ Show popup
 Affich
 Show popup on errors or warnings
 Affiche une boîte de dialogue pour chaque erreur ou avertissement
-Significant difference detected: More than 50% of files will be overwritten/deleted!
-Différence significative détectée: Plus de 50% des fichiers seront écrasés ou détruits!
+Significant difference detected:
+Différence significative détectée :
 Silent mode
 Mode silencieux
 Size
@@ -544,12 +584,14 @@ Sorting file list...
 Tri de la liste des fichiers...
 Source code written completely in C++ utilizing:
 Code source écrit totalement en C++ et utilisant:
+Speed:
+Vitesse :
 Start
 Démarrer
 Start synchronization
 Démarrer la synchronisation
 Stop
-Stop
+Arrêt
 Swap sides
 Permuter les côtés
 Synchronization aborted!
@@ -576,24 +618,26 @@ Target file already existing!
 Le fichier de destination existe déjà!
 The file does not contain a valid configuration:
 Le fichier ne contient pas de configuration valide
-File does not exist:
-Le fichier n'existe pas:
 This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
 Cette ligne de commandes sera exécutée chaque fois que vous double-cliquerez sur un fichier. %name sert d'emplacement pour le fichier sélectionné.
-This commandline will be executed each time you doubleclick on a filename. %x serves as a placeholder for the selected file.
-Cette commande sera exécutée à chaque fois que vous double-cliquez sur un nom de fichier. %x est un espace réservé pour le fichier sélectionné.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Cette variante définit comme identiques deux fichiers de même nom lorsqu'ils ont la même taille et le même date et heure de modification.
 Time
 Heure
 Time elapsed:
 Temps écoulé:
+Time remaining:
+Temps restant :
 Total amount of data that will be transferred
 Volume de données à transférer
+Total required free disk space:
+Espace disque nécessaire :
 Total time:
 Temps total:
 Two way <->
 Des 2 côtés <->
+Unable to connect to sourceforge.net!
+Impossible de se connecter à sourceforge.net!
 Unable to create logfile!
 Impossible de créer un fichier log!
 Unable to initialize Recycle Bin!

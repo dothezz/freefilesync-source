@@ -1,6 +1,6 @@
 /***************************************************************
  * Name:      mainDialog.h
- * Purpose:   Defines Application Frame
+ * Purpose:   Main Application Dialog
  * Author:    ZenJu (zhnmju123@gmx.de)
  * Created:   2008-07-16
  **************************************************************/
@@ -9,48 +9,47 @@
 #define MAINDIALOG_H
 
 #include "guiGenerated.h"
-#include "syncDialog.h"
-#include "smallDialogs.h"
-#include "../library/resources.h"
-#include "../library/misc.h"
-#include <wx/dnd.h>
 #include <stack>
 #include "../library/processXml.h"
-#include <wx/event.h>
+#include "gridView.h"
 #include <memory>
 
-
-//IDs for context menu items
-enum //context menu for left and right grids
-{
-    CONTEXT_FILTER_TEMP = 10,
-    CONTEXT_EXCLUDE_EXT,
-    CONTEXT_EXCLUDE_OBJ,
-    CONTEXT_CLIPBOARD,
-    CONTEXT_EXPLORER,
-    CONTEXT_DELETE_FILES,
-};
-
-enum //context menu for middle grid
-{
-    CONTEXT_CHECK_ALL,
-    CONTEXT_UNCHECK_ALL
-};
-
-enum //context menu for column settings
-{
-    CONTEXT_CUSTOMIZE_COLUMN_LEFT,
-    CONTEXT_CUSTOMIZE_COLUMN_RIGHT
-};
-
 class CompareStatusHandler;
-class FileDropEvent;
-class FfsFileDropEvent;
+class CompareStatus;
+class CustomLocale;
+class MainFolderDragDrop;
+class FolderPairPanel;
+class CustomGrid;
+
 
 class MainDialog : public MainDialogGenerated
 {
     friend class CompareStatusHandler;
-    friend class FileDropEvent;
+    friend class MainFolderDragDrop;
+
+//IDs for context menu items
+    enum //context menu for left and right grids
+    {
+        CONTEXT_FILTER_TEMP = 10,
+        CONTEXT_EXCLUDE_EXT,
+        CONTEXT_EXCLUDE_OBJ,
+        CONTEXT_CLIPBOARD,
+        CONTEXT_EXPLORER,
+        CONTEXT_DELETE_FILES,
+    };
+
+    enum //context menu for middle grid
+    {
+        CONTEXT_CHECK_ALL,
+        CONTEXT_UNCHECK_ALL
+    };
+
+    enum //context menu for column settings
+    {
+        CONTEXT_CUSTOMIZE_COLUMN_LEFT,
+        CONTEXT_CUSTOMIZE_COLUMN_RIGHT
+    };
+
 
 public:
     MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale* language, xmlAccess::XmlGlobalSettings& settings);
@@ -62,6 +61,9 @@ private:
     //configuration load/save
     bool readConfigurationFromXml(const wxString& filename, bool programStartup = false);
     bool writeConfigurationToXml(const wxString& filename);
+    xmlAccess::XmlGuiConfig getCurrentConfiguration() const;
+
+    xmlAccess::XmlGuiConfig lastConfigurationSaved; //support for: "Save changed configuration?" dialog
 
     void readGlobalSettings();
     void writeGlobalSettings();
@@ -75,21 +77,21 @@ private:
     void addRightFolderToHistory(const wxString& rightFolder);
 
     void addFolderPair(const Zstring& leftDir, const Zstring& rightDir);
-    void addFolderPair(const std::vector<FolderPair>& newPairs);
+    void addFolderPair(const std::vector<FreeFileSync::FolderPair>& newPairs);
     void removeFolderPair(const int pos, bool refreshLayout = true); //keep it an int, allow negative values!
     void clearFolderPairs();
 
-    //main method for putting gridData on UI: maps data respecting current view settings
-    void writeGrid(const FileCompareResult& gridData);
-    void mapGridDataToUI(GridView& output, const FileCompareResult& fileCmpResult);
-    void updateStatusInformation(const GridView& output);
+    //main method for putting gridDataView on UI: updates data respecting current view settings
+    void updateGuiGrid();
+
+    void updateGridViewData();
 
     //context menu functions
-    std::set<int> getSelectedRows(const wxGrid* grid);
+    std::set<int> getSelectedRows(const CustomGrid* grid);
     void filterRangeManually(const std::set<int>& rowsToFilterOnUiTable);
-    void copySelectionToClipboard(const wxGrid* selectedGrid);
-    void openWithFileManager(int rowNumber, const wxGrid* grid);
-    void deleteFilesOnGrid(const std::set<int>& selectedRowsLeft, const std::set<int>& selectedRowsRight);
+    void copySelectionToClipboard(const CustomGrid* selectedGrid);
+    void openWithFileManager(const int rowNumber, const bool leftSide);
+    void deleteSelectedFiles();
 
     //work to be done in idle time
     void OnIdleEvent(wxEvent& event);
@@ -110,8 +112,9 @@ private:
     void OnContextColumnRight(wxGridEvent& event);
     void OnContextColumnSelection(wxCommandEvent& event);
 
-    void OnWriteDirManually(wxCommandEvent& event);
     void OnDirSelected(wxFileDirPickerEvent& event);
+
+    void requestShutdown(); //try to exit application
 
     //manual filtering of rows:
     void OnGridSelectCell(wxGridEvent& event);
@@ -121,8 +124,8 @@ private:
     void OnLeftGridDoubleClick( wxGridEvent& event);
     void OnRightGridDoubleClick(wxGridEvent& event);
     void OnSortLeftGrid(        wxGridEvent& event);
-    void OnSortRightGrid(       wxGridEvent& event);
     void OnSortMiddleGrid(      wxGridEvent& event);
+    void OnSortRightGrid(       wxGridEvent& event);
 
     void OnLeftOnlyFiles(       wxCommandEvent& event);
     void OnLeftNewerFiles(      wxCommandEvent& event);
@@ -137,8 +140,8 @@ private:
     void loadConfiguration(const wxString& filename);
     void OnCfgHistoryKeyEvent(  wxKeyEvent& event);
     void OnFolderHistoryKeyEvent(wxKeyEvent& event);
+    void OnRegularUpdateCheck(  wxIdleEvent& event);
 
-    void OnFilesDropped(        FfsFileDropEvent& event);
     void onResizeMainWindow(    wxEvent& event);
     void OnAbortCompare(        wxCommandEvent& event);
     void OnFilterButton(        wxCommandEvent& event);
@@ -175,6 +178,7 @@ private:
     void OnMenuLangJapanese(    wxCommandEvent& event);
     void OnMenuLangPolish(      wxCommandEvent& event);
     void OnMenuLangPortuguese(  wxCommandEvent& event);
+    void OnMenuLangPortugueseBrazil(wxCommandEvent& event);
     void OnMenuLangSlovenian(   wxCommandEvent& event);
     void OnMenuLangSpanish(     wxCommandEvent& event);
 
@@ -188,18 +192,18 @@ private:
     xmlAccess::XmlGlobalSettings& globalSettings;
 
     //technical representation of grid-data
-    FileCompareResult currentGridData;
+    FreeFileSync::FolderComparison currentGridData;
 
     //UI view of currentGridData
-    GridView gridRefUI;
+    FreeFileSync::GridView gridDataView;
 
 //-------------------------------------
     //functional configuration
-    MainConfiguration cfg;
+    FreeFileSync::MainConfiguration cfg;
 
     //folder pairs:
     //m_directoryLeft, m_directoryRight
-    std::vector<FolderPairGenerated*> additionalFolderPairs; //additional pairs to the standard pair
+    std::vector<FolderPairPanel*> additionalFolderPairs; //additional pairs to the standard pair
 
     //gui settings
     int widthNotMaximized;
@@ -211,7 +215,7 @@ private:
 //-------------------------------------
 
     //convenience method to get all folder pairs (unformatted)
-    std::vector<FolderPair> getFolderPairs();
+    std::vector<FreeFileSync::FolderPair> getFolderPairs() const;
 
     //UI View Filter settings
     bool leftOnlyFilesActive;
@@ -248,7 +252,7 @@ private:
     struct FilterObject
     {
         wxString relativeName;
-        FileDescrLine::ObjectType type;
+        FreeFileSync::FileDescrLine::ObjectType type;
     };
     std::vector<FilterObject> exFilterCandidateObj;
 
@@ -261,98 +265,10 @@ private:
     //remember last sort executed (for determination of sort order)
     int lastSortColumn;
     const wxGrid* lastSortGrid;
+
+    //support for drag and drop
+    std::auto_ptr<MainFolderDragDrop> dragDropOnLeft;
+    std::auto_ptr<MainFolderDragDrop> dragDropOnRight;
 };
-
-//######################################################################################
-
-//define new event type
-const wxEventType FFS_DROP_FILE_EVENT = wxNewEventType();
-typedef void (wxEvtHandler::*FffsFileDropEventFunction)(FfsFileDropEvent&);
-#define FfsFileDropEventHandler(func) \
-    (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(FffsFileDropEventFunction, &func)
-
-class FfsFileDropEvent : public wxCommandEvent
-{
-public:
-    FfsFileDropEvent(const wxString& nameDropped, const wxPanel* dropTarget) :
-            wxCommandEvent(FFS_DROP_FILE_EVENT),
-            m_nameDropped(nameDropped),
-            m_dropTarget(dropTarget) {}
-
-    virtual wxEvent* Clone() const
-    {
-        return new FfsFileDropEvent(m_nameDropped, m_dropTarget);
-    }
-
-    const wxString m_nameDropped;
-    const wxPanel* m_dropTarget;
-};
-
-
-class MainWindowDropTarget : public wxFileDropTarget
-{
-public:
-    MainWindowDropTarget(MainDialog* dlg, const wxPanel* obj) :
-            mainDlg(dlg),
-            dropTarget(obj) {}
-
-    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames);
-
-private:
-    MainDialog* mainDlg;
-    const wxPanel* dropTarget;
-};
-
-//######################################################################################
-
-//classes handling sync and compare error as well as status information
-
-class CompareStatusHandler : public StatusHandler
-{
-public:
-    CompareStatusHandler(MainDialog* dlg);
-    ~CompareStatusHandler();
-
-    virtual void updateStatusText(const Zstring& text);
-    virtual void initNewProcess(int objectsTotal, double dataTotal, Process processID);
-    virtual void updateProcessedData(int objectsProcessed, double dataProcessed);
-    virtual void forceUiRefresh();
-
-    virtual ErrorHandler::Response reportError(const Zstring& text);
-    virtual void reportFatalError(const Zstring& errorMessage);
-    virtual void reportWarning(const Zstring& warningMessage, bool& dontShowAgain);
-
-private:
-    virtual void abortThisProcess();
-
-    MainDialog* mainDialog;
-    bool ignoreErrors;
-    Process currentProcess;
-};
-
-
-class SyncStatusHandler : public StatusHandler
-{
-public:
-    SyncStatusHandler(wxWindow* dlg, bool ignoreAllErrors);
-    ~SyncStatusHandler();
-
-    virtual void updateStatusText(const Zstring& text);
-    virtual void initNewProcess(int objectsTotal, double dataTotal, Process processID);
-    virtual void updateProcessedData(int objectsProcessed, double dataProcessed);
-    virtual void forceUiRefresh();
-
-    virtual ErrorHandler::Response reportError(const Zstring& text);
-    virtual void reportFatalError(const Zstring& errorMessage);
-    virtual void reportWarning(const Zstring& warningMessage, bool& dontShowAgain);
-
-private:
-    virtual void abortThisProcess();
-
-    SyncStatus* syncStatusFrame;
-    bool ignoreErrors;
-    wxArrayString unhandledErrors;   //list of non-resolved errors
-};
-
 
 #endif // MAINDIALOG_H
