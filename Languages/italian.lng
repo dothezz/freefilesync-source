@@ -10,14 +10,24 @@
  PB
  TB
  TB
+ day(s)
+ giorno(i)
+ hour(s)
+ ora(e)
  kB
  kB
+ min
+ min
+ sec
+ sec
 !=	files are different\n
 !=	i file sono diversi\n
 %x directories
 %x cartelle
 %x files,
 %x files,
+%x is not a valid FreeFileSync batch file!
+%x non è un batch file valido per FreeFileSync!
 %x of %y rows in view
 %x di %y righe visualizzate
 %x of 1 row in view
@@ -32,8 +42,8 @@
 &Applica
 &Cancel
 &Annulla
-&Compare
-&Compara
+&Check for new version
+&Controlla la presenza di nuove versioni
 &Create batch job
 &Crea un job in batch
 &Default
@@ -54,6 +64,8 @@
 &Carica
 &Load configuration
 &Carica la configurazione
+&No
+&No
 &OK
 &OK
 &Pause
@@ -64,16 +76,18 @@
 &Riprova
 &Save
 &Salva
-&Start
-&Avvia
-&Synchronize...
-&Sincronizzazione...
+&Yes
+&Si
 ,
 , 
+-	do not copy\n
+-	non copiare\n
+- conflict
+- conflitto
+- conflict (same date, different size)
+- conflitto (stessa data, dimensione diversa)
 - different
 - file diversi
-- different (same date, different size)
-- file diversi (stessa data, diversa dimensione)
 - equal
 - file identici
 - exists left only
@@ -88,26 +102,30 @@
 - a destra
 - right newer
 - file di destra più recente
-- same date (different size)
-- stessa data (diversa dimensione)
+->	copy to right side\n
+->	copia sul lato destro\n
 -Open-Source file synchronization-
 -Sincronizzazione Open-Source-
 .
 ,
+/sec
+/sec
 1 directory
 1 directory
 1 file,
 1 file,
 1. &Compare
 1. &Compara
-1. Enter full file or directory names separated by ';' or a new line.
-1. Inserisci il nome completo dei file o delle directory separati da ';' o da un 'a capo'.
+1. Enter relative file or directory names separated by ';' or a new line.
+1. Inserisci i nomi relativi di file o directory separati da ';' o su una nuova riga.
 2. &Synchronize...
 2. &Sincronizza...
 2. Use wildcard characters '*' and '?'.
 2. Sono ammessi i caratteri generici '*' e '?'.
 3. Exclude files directly on main grid via context menu.
-3. Escludi i file direttamente sul main grid tramite il menu contestuale.
+3. Escludi i file direttamente sulla griglia principale tramite il menu contestuale.
+<-	copy to left side\n
+<-	copia sul lato sinistro\n
 <<	left file is newer\n
 <<	il file di sinistra è più recente\n
 <Directory>
@@ -118,10 +136,12 @@
 <selezione multipla>
 <|	file on left side only\n
 <|	il file esiste solo a sinistra\n
-==	files are equal\n\n
-==	i file sono identici\n\n
+==	files are equal\n
+==	i file sono uguali\n
 >>	right file is newer\n
 >>	il file di destra è più recente\n
+A newer version of FreeFileSync is available:
+E' disponibile una nuova versione di FreeFileSync:
 Abort requested: Waiting for current operation to finish...
 Abbandono richiesto: in attesa della fine dell'operazione in corso...
 Aborted
@@ -150,6 +170,8 @@ Batch job
 Batch job
 Big thanks for localizing FreeFileSync goes out to:
 Per la traduzione di FreeFileSync, un grazie va a:
+Browse
+Sfoglia
 Build:
 Build:
 Cancel
@@ -160,6 +182,8 @@ Choose to hide filtered files/directories from list
 Nascondi i files/directories dalla lista
 Comma separated list
 Lista di elementi separati da virgola
+Compare
+Compara
 Compare both sides
 Compara le due liste
 Compare by \"File content\"
@@ -172,8 +196,10 @@ Comparing content
 Comparazione contenuto
 Comparing content of files %x
 Comparazione contenuto del file %x
-Comparing...
-Comparazione in corso...
+Comparing content...
+Comparazione contenuto...
+Comparison Result
+Risultato della comparazione
 Completed
 Completato
 Configuration
@@ -210,12 +236,12 @@ Copy to clipboard\tCTRL+C
 Copia nella clipboard\tCTRL+C
 Copying file %x to %y
 Copia di file da %x a %y
+Copying file %x to %y overwriting target
+Copia file %x su %y sovrascrivendo la destinazione
 Could not set working directory:
 Impossibile definire la directory di lavoro:
 Create a batch job
 Creazione di un job batch
-Create:
-Crea:
 Creating folder %x
 Creazione cartella %x
 Current operation:
@@ -228,8 +254,6 @@ DECISION TREE
 ALBERO DELLE DECISIONI
 Data remaining:
 Dati rimanenti:
-Data:
-Dati:
 Date
 Data
 Delete files/folders existing on left side only
@@ -242,16 +266,18 @@ Delete on both sides
 Cancella su entrambi i lati
 Delete on both sides even if the file is selected on one side only
 Cancella su entrambi i lati anche se il file è selezionato su un solo lato.
-Delete:
-Elimina: 
 Deleting file %x
 Eliminazione file %x
 Deleting folder %x
 Eliminazione cartella %x
 Directories are dependent! Be careful when setting up synchronization rules:
 Le directory sono dipendenti! Fai attenzione quando configuri le regole di sincronizzazione:
+Directory
+Directory
 Directory does not exist:
 La directory non esiste:
+Do not display visual status information but write to a logfile instead
+Non visualizzare le informazioni di stato ma scrivile in un file di log
 Do not show this warning again
 Non mostrare più questo messaggio
 Do nothing
@@ -260,10 +286,20 @@ Do you really want to delete the following objects(s)?
 Vuoi veramente eliminare i seguenti oggetti?
 Do you really want to move the following objects(s) to the Recycle Bin?
 Vuoi veramente spostare i seguenti oggetti nel Cestino?
+Do you want FreeFileSync to automatically check for updates every week?
+Vuoi che FreeFileSync controlli automaticamente gli aggiornamenti ogni settimana?
+Don't ask me again
+Non chiederlo di nuovo
 Donate with PayPal
 Fai una donazione con PayPal
+Download now?
+Scaricare ora?
 Drag && drop
 Drag && drop
+Email
+Email
+Enable filter to exclude files from synchronization
+Abilita il filtro per escludere files dalla sincronizzazione
 Error
 Errore
 Error changing modification time:
@@ -292,6 +328,8 @@ Error reading file:
 Errore durante la lettura del file:
 Error resolving symbolic link:
 Errore nella risoluzione di collegamento simbolico:
+Error retrieving full path:
+Errore nel reperire il percorso completo:
 Error traversing directory:
 Errore nel percorso della directory:
 Error writing file attributes:
@@ -316,6 +354,8 @@ Feedback and suggestions are welcome at:
 Commenti e suggerimenti sono i benvenuti:
 File Manager integration:
 Integrazione File Manager:
+File Time tolerance (seconds):
+Tolleranza di File Time (in secondi):
 File already exists. Overwrite?
 Il file esiste già. Lo vuoi sovrascrivere?
 File content
@@ -338,8 +378,6 @@ Files remaining:
 File rimanenti:
 Files that exist on both sides and have different content
 Files esistenti su entrambi i lati e aventi differente contenuto
-Files that exist on both sides, have same date but different filesizes
-Files esistenti su entrambi i lati e aventi la stessa data ma dimensioni differenti
 Files that exist on both sides, left one is newer
 Files esistenti su entrambi i lati, più recenti a sinistra
 Files that exist on both sides, right one is newer
@@ -352,6 +390,8 @@ Files/folders that exist on left side only
 Files/cartelle esistenti solo a sinistra
 Files/folders that exist on right side only
 Files/cartelle esistenti solo a destra
+Filter
+Filtro
 Filter active: Press again to deactivate
 Filtro attivo: Clicca nuovamente per disattivare
 Filter files
@@ -372,8 +412,10 @@ FreeFileSync batch file
 FreeFileSync batch file
 FreeFileSync configuration
 FreeFileSync configurazione
-Full name
-Nome completo
+FreeFileSync is up to date!
+FreeFileSync è aggiornato!
+Full path
+Percorso completo
 Generating file list...
 Generazione lista dei file...
 Global settings
@@ -382,6 +424,8 @@ Help
 Aiuto
 Hide all error and warning messages
 Nascondi tutti gli errori e i messaggi d'avviso
+Hide conflicts
+Nascondi i conflitti
 Hide files that are different
 Nascondi i file differenti
 Hide files that are equal
@@ -394,6 +438,12 @@ Hide files that exist on left side only
 Nascondi i file esistenti solo a sinistra
 Hide files that exist on right side only
 Nascondi i file esistenti solo a destra
+Hide files that will be copied to the left side
+Nascondi i file da copiare sul lato sinistro
+Hide files that will be copied to the right side
+Nascondi i file da copiare sul lato destro
+Hide files that won't be copied
+Nascondi i file che non saranno copiati
 Hide filtered items
 Nascondi gli elementi filtrati
 Hide further error messages during the current process
@@ -402,8 +452,12 @@ Hides error messages during synchronization:\nThey are collected and shown as a 
 Non mostrare i messaggi d'errore durante la sincronizzazione:\nVerranno raccolti e mostrati alla fine del processo
 Hints:
 Consigli:
+Homepage
+Homepage
 If you like FFS
 Se ti piace FFS
+Ignore 1-hour file time difference
+Ignora la differenza di file time di 1 ora
 Ignore errors
 Ignora gli errori
 Ignore subsequent errors
@@ -416,8 +470,8 @@ Include
 Includi
 Include temporarily
 Includi temporaneamente
-Include: *.doc;*.zip;*.exe\nExclude: *\\temp\\*
-Includi: *.doc;*.zip;*.exe\nEscludi: *\\temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\temp\\*
+Includi: *.doc;*.zip;*.exe\nEscludi: \\temp\\*
 Info
 Info
 Information
@@ -426,24 +480,30 @@ Initialization of Recycle Bin failed!
 Inizializzazione del Cestino fallita!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Impossibile inizializzare il Cestino!\n\nE'probabile che non si stia utilizzando Windows.\nSe si vuole usare questa funzionalità, contattare l'autore. :)
-Legend
-Legenda
+Left:
+Sinistra:
 Load configuration from file
 Carica configurazione da file
 Load configuration history (press DEL to delete items)
 Carica la cronologia delle configurazioni (premi DEL per eliminare elementi)
 Log-messages:
 Log-messages:
+Logging
+Logging
 Mirror ->>
 Mirror ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Mirror backup della cartella di sinistra: La cartella di destra sarà sovrascritta e resa identica alla cartella di sinistra dopo la sincronizzazione.
+More than 50% of the total number of files will be copied or deleted!
+Piu' del 50% del totale dei files saranno copiati o cancellati!
 Move column down
 Sposta colonna giu'
 Move column up
 Sposta colonna su'
-Not all items were synchronized! Have a look at the list.
-Alcuni elementi non sono stati sincronizzati! Controllare la lista.
+Not all items have been synchronized! Have a look at the list.
+Non tutti gli oggetti sono stati sincronizzati! Controlla la lista.
+Not enough free disk space available in:
+Spazio libero su disco non sufficiente in:
 Nothing to synchronize according to configuration!
 Niente da sincronizzare in questa configurazione!
 Number of files and directories that will be created
@@ -454,18 +514,20 @@ Number of files that will be overwritten
 Numero di file che verranno sovrascritti
 OK
 OK
-Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the full name including path prefix.
-Solo i files/cartelle filtrati saranno selezionati per la sincronizzazione. Il filtro verrà applicato al nome completo incluso il percorso.
-Open synchronization dialog
-Apri la finestra di dialogo della sincronizzazione
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the synchronization directories.
+Solo file e/o directory non filtrati saranno selezionati per la sincronizzazione. Il filtro verrà applicato al nome relativo(!) nelle directory di sincronizzazione.
 Open with File Manager\tD-Click
 Apri con File Manager\tD-Click
 Operation aborted!
 Operazione abortita!
 Operation:
 Operazione:
+Overview
+Controllo generale
 Pause
 Pausa
+Paused
+In pausa
 Please fill all empty directory fields.
 Compilare tutti i campi di directory vuoti.
 Press button to activate filter
@@ -474,6 +536,8 @@ Preview
 Anteprima
 Published under the GNU General Public License:
 Pubblicato sotto licenza GNU General Public:
+Question
+Domanda
 Quit
 Esci
 Relative path
@@ -482,16 +546,20 @@ Remove folder pair
 Elimina la coppia di cartelle
 Reset
 Reset
+Reset all warning messages
+Resetta tutti i messaggi d'avviso
 Reset all warning messages?
-Resettare tutti gli avvisi?
-Resets all warning messages
-Resetta tutti gli avvisi
+Resettare tutti i messaggi d'avviso?
 Result
 Risultato
+Right:
+Destra:
 S&ave configuration
 S&alva la configurazione
-Save aborted!
-Salvataggio abortito!
+S&witch view
+C&ommuta vista
+Save changes to current configuration?
+Salvare i cambiamenti alla configurazione corrente?
 Save current configuration to file
 Salva su file la configurazione corrente
 Scanning...
@@ -500,8 +568,14 @@ Scanning:
 Analisi in corso:
 Select a folder
 Selezionare una cartella
+Select logfile directory:
+Seleziona cartella per il file di log:
 Select variant:
 Selezionare una variante:
+Show conflicts
+Mostra conflitti
+Show file icons
+Mostra icone dei file
 Show files that are different
 Mostra file differenti
 Show files that are equal
@@ -514,10 +588,18 @@ Show files that exist on left side only
 Mostra file esistenti solo a sinistra
 Show files that exist on right side only
 Mostra file esistenti solo a destra
+Show files that will be copied to the left side
+Mostra file da copiare sul lato sinistro
+Show files that will be copied to the right side
+Mostra file da copiare sul lato destro
+Show files that won't be copied
+Mostra file che non saranno copiati
 Show popup
 Mostra popup
 Show popup on errors or warnings
 Mostra popup degli errori o avvisi
+Significant difference detected:
+Riscontrate differenze significative:
 Silent mode
 Modalità Silenziosa
 Size
@@ -526,6 +608,8 @@ Sorting file list...
 Ordinamento lista file...
 Source code written completely in C++ utilizing:
 Codice sorgente scritto completamente in C++ \ne utilizzando:
+Speed:
+Velocita':
 Start
 Avvia
 Start synchronization
@@ -534,6 +618,8 @@ Stop
 Stop
 Swap sides
 Inverti i lati
+Synchronization Preview
+Anteprima Sincronizzazione
 Synchronization aborted!
 Sincronizzazione abortita!
 Synchronization completed successfully!
@@ -546,8 +632,8 @@ Synchronization settings
 Parametri di sincronizzazione
 Synchronization status
 Stato della sincronizzazione 
-Synchronize all .doc, .zip and .exe files except everything from folder \"temp\".
-Sincronizza tutti i file .doc, .zip e .exe eccetto la cartella \"temp\".
+Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
+Sincronizza tutti i file .doc, .zip e .exe eccetto tutti quelli nella cartella \"temp\".
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Sincronizza simultaneamente entrambi i lati: Copia file nuovi o aggiornati in entrambe le direzioni.
 Synchronizing...
@@ -566,22 +652,30 @@ Time
 Ora
 Time elapsed:
 Tempo trascorso:
+Time remaining:
+Tempo rimanente:
 Total amount of data that will be transferred
 Volume dei dati che verranno trasferiti
+Total required free disk space:
+Spazio libero su disco richiesto:
 Total time:
 Tempo totale:
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
+Tratta file time che differiscono di esattamente +/- 1 ora come uguali, meno di 1 ora come conflitto per gestire i cambiamenti di Daylight Saving Time.
 Two way <->
 Dai 2 lati <->
+Unable to connect to sourceforge.net!
+Impossibile collegarsi a sourceforge.net!
 Unable to create logfile!
 Impossibile creaer il file di log!
 Unable to initialize Recycle Bin!
 Impossibile inizializzare il Cestino!
 Uncheck all
 Deseleziona tutto
+Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
+Sono presenti conflitti irrisolti! \n\nPuoi ignorare i conflitti e continuare la sincronizzazione.
 Update ->
 Aggiorna ->
-Update:
-Aggiorna:
 Use Recycle Bin
 Usa il Cestino
 Use Recycle Bin when deleting or overwriting files during synchronization
@@ -600,6 +694,8 @@ different
 file differenti
 file exists on both sides
 file esistente su entrambi i lati
+flash	conflict\n
+conflitto flash\n
 on one side only
 file esistente su un solo lato
 |>	file on right side only\n

@@ -1,6 +1,26 @@
 FreeFileSync
 ------------
 
+Changelog v1.19
+---------------
+New synchronization preview
+Sync-direction can be adapted manually
+New category type "conflict"
+New check for unresolved conflicts
+Improved overall GUI layout
+New check for erroneous file modification dates
+Optional popup to notify on changed configuration
+Files with invalid dates (e.g. year 30.000) do not result in a program abort anymore
+Replaced column "full name" by "full path" to be combined with "filename"
+Apply filtering WHILE comparing (if activated) and avoid traversing excluded directories
+New filter paradigm: use relative instead of absolute names
+New option "ignore DST +/- 1-hour" to correctly handle daylight saving changes
+Sync preview statistics now on main dialog
+Show only relevant synchronization options
+File icon display configurable via grid column context menu
+Updated translation files
+
+
 Changelog v1.18
 ---------------
 Linux build officially released: all major problems solved!

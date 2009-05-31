@@ -44,8 +44,6 @@
 キャンセル(&C)
 &Check for new version
 バージョン更新の確認(&C)
-&Compare
-比較(&C)
 &Create batch job
 一括ジョブを作成(&C)
 &Default
@@ -66,6 +64,8 @@
 読み込み(&L)
 &Load configuration
 構成設定の読み込み(&L)
+&No
+いいえ(&N)
 &OK
 &OK
 &Pause
@@ -76,16 +76,18 @@
 再試行(&R)
 &Save
 保存(&S)
-&Start
-開始(&S)
-&Synchronize...
-同期(&S)...
+&Yes
+はい(&Y)
 ,
 .
+-	do not copy\n
+-	コピーしない\n
+- conflict
+- 不一致
+- conflict (same date, different size)
+- 不一致 (同じ日付, 異なるサイズ)
 - different
 - 差異あり
-- different (same date, different size)
-- 差異あり(日付は同一、サイズが異なります)
 - equal
 - 同一
 - exists left only
@@ -100,8 +102,8 @@
 - 右側
 - right newer
 - 右側の方が新しい
-- same date (different size)
-- 日付は同一(サイズに差異あり)
+->	copy to right side\n
+->	右側にコピー\n
 -Open-Source file synchronization-
 -Open-Source ファイル同期ツール-
 .
@@ -114,16 +116,16 @@
 1 ファイル
 1. &Compare
 1. 比較(&C)
-1. Enter full file or directory names separated by ';' or a new line.
-1. 完全なファイル/ディレクトリ名を ' ; ' で区切って入力してください。
+1. Enter relative file or directory names separated by ';' or a new line.
+1. 相対ファイル、またはディレクトリを ';' または 改行で区切って入力
 2. &Synchronize...
 2. 同期処理(&S)...
 2. Use wildcard characters '*' and '?'.
 2. ワイルドカードに ' * ' と ' ? ' を使用出来ます。
 3. Exclude files directly on main grid via context menu.
 3. コンテキストメニューから直接ファイルを除外出来ます。
-4. Keep the number of (different) entries small for best performance.
-4. 保持エントリ数を小さい値にすることで、より最適な性能を発揮します。
+<-	copy to left side\n
+<-	左側にコピー\n
 <<	left file is newer\n
 <<	左側の方が新しい\n
 <Directory>
@@ -134,8 +136,8 @@
 <複数選択>
 <|	file on left side only\n
 <|	左側のみに存在\n
-==	files are equal\n\n
-==	同じ内容のファイル\n\n
+==	files are equal\n
+==	同様のファイル\n
 >>	right file is newer\n
 >>	右側の方が新しい\n
 A newer version of FreeFileSync is available:
@@ -157,9 +159,9 @@ An exception occured!
 As a result the files are separated into the following categories:
 ファイルは以下のカテゴリに分類されます:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
-このオプションでは、同じ名前を共有するファイルで内容が同じ場合は、同一として扱われます。 バックアップ操作より、むしろ整合性のチェックを行う時に役立つオプションです。 従ってファイルの日時については全く考慮されていません。\n\n設定が有効な時は、ツリー表示が小さくなります。
+このオプションでは、同じ名前を共有するファイルで内容が同じ場合は、同一として扱われます。  バックアップ操作より、むしろ整合性のチェックを行う時に役立つオプションです。  従ってファイルの日時については全く考慮されていません。\n\n設定が有効な時は、ツリー表示が小さくなります。
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
-一括で同期処理を行うためのバッチファイルを作成します。一括モードを開始するときは、ファイルのパス名を実行ファイル\n< FreeFileSync.exe> \nにバッチファイルで渡すだけです。また、この操作はOSのタスクスケジューラから実行することができます。
+一括で同期処理を行うためのバッチファイルを作成します。 一括モードを開始するときは、ファイルのパス名を実行ファイル\n< FreeFileSync.exe> \nにバッチファイルで渡すだけです。 また、この操作はOSのタスクスケジューラから実行することができます。
 Batch execution
 一括処理を実行
 Batch file created successfully!
@@ -168,6 +170,8 @@ Batch job
 一括処理
 Big thanks for localizing FreeFileSync goes out to:
 FreeFileSync のローカライズへの協力に感謝します:
+Browse
+参照
 Build:
 ビルド:
 Cancel
@@ -178,6 +182,8 @@ Choose to hide filtered files/directories from list
 リストから除外したいファイル/ディレクトリを選択
 Comma separated list
 カンマ区切り
+Compare
+比較
 Compare both sides
 両方を比較
 Compare by \"File content\"
@@ -190,8 +196,10 @@ Comparing content
 内容の比較中
 Comparing content of files %x
 ファイル %x の内容を比較中
-Comparing...
-比較中...
+Comparing content...
+内容を比較中...
+Comparison Result
+比較結果
 Completed
 完了しました
 Configuration
@@ -234,8 +242,6 @@ Could not set working directory:
 作業ディレクトリが設定できません:
 Create a batch job
 一括ジョブを作成
-Create:
-作成:
 Creating folder %x
 フォルダ %x を作成中
 Current operation:
@@ -248,8 +254,6 @@ DECISION TREE
 [判定ツリー]
 Data remaining:
 残りのデータ:
-Data:
-データ:
 Date
 データ
 Delete files/folders existing on left side only
@@ -262,8 +266,6 @@ Delete on both sides
 両方を削除
 Delete on both sides even if the file is selected on one side only
 片側のペインのみ選択されている場合でも両方を削除する
-Delete:
-削除:
 Deleting file %x
 ファイル %x を削除中
 Deleting folder %x
@@ -286,6 +288,8 @@ Do you really want to move the following objects(s) to the Recycle Bin?
 本当に以下のオブジェクト(複)をゴミ箱に移動しますか?
 Do you want FreeFileSync to automatically check for updates every week?
 FreeFileSync のアップデートの有無の確認を自動的に毎週行いますか>
+Don't ask me again
+次回から確認しない
 Donate with PayPal
 PayPal から寄付する
 Download now?
@@ -374,8 +378,6 @@ Files remaining:
 残りのファイル:
 Files that exist on both sides and have different content
 両側に存在するが、内容が異なるファイル
-Files that exist on both sides, have same date but different filesizes
-両側に存在して、日付は同じだが、ファイルサイズが異なるファイル
 Files that exist on both sides, left one is newer
 両側に存在するが、左側の方がより新しい
 Files that exist on both sides, right one is newer
@@ -412,8 +414,8 @@ FreeFileSync configuration
 FreeFileSync 構成設定
 FreeFileSync is up to date!
 FreeFileSync は最新です!
-Full name
-完全な名前
+Full path
+フルパス
 Generating file list...
 ファイル一覧を作成中...
 Global settings
@@ -422,6 +424,8 @@ Help
 ヘルプ
 Hide all error and warning messages
 すべてのエラーと警告メッセージを非表示
+Hide conflicts
+不一致を隠す
 Hide files that are different
 異なるファイルを非表示
 Hide files that are equal
@@ -434,6 +438,12 @@ Hide files that exist on left side only
 左側のみに存在するファイルを非表示
 Hide files that exist on right side only
 右側のみに存在するファイルを非表示
+Hide files that will be copied to the left side
+左側にコピーしたファイルを非表示にする
+Hide files that will be copied to the right side
+右側にコピーしたファイルを非表示にする
+Hide files that won't be copied
+コピーしなかったファイルを隠す
 Hide filtered items
 適合するアイテムを非表示にする
 Hide further error messages during the current process
@@ -446,6 +456,8 @@ Homepage
 ホームページ
 If you like FFS
 FFS が気に入った場合
+Ignore 1-hour file time difference
+1 時間のファイル時間の差異は無視
 Ignore errors
 エラーを無視
 Ignore subsequent errors
@@ -458,8 +470,8 @@ Include
 含める
 Include temporarily
 一時フォルダを含める
-Include: *.doc;*.zip;*.exe\nExclude: *\\temp\\*
-含める: *.doc;*.zip;*.exe\n除外: *\\temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\temp\\*
+含める: *.doc;*.zip;*.exe\n除外: \\temp\\*
 Info
 情報
 Information
@@ -470,8 +482,6 @@ It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are n
 ゴミ箱を初期化することが出来ませんでした!\n\n使用している OS が、Windows 以外の OS です。\nこの機能を使用したい場合は、作者までご連絡ください :)
 Left:
 左側:
-Legend
-履歴
 Load configuration from file
 外部ファイルから構成設定を読み込みます
 Load configuration history (press DEL to delete items)
@@ -490,8 +500,8 @@ Move column down
 列を下に移動
 Move column up
 列を上に移動
-Not all items were synchronized! Have a look at the list.
-すべてのアイテムは同期されていません! 詳細はリストをご覧ください。
+Not all items have been synchronized! Have a look at the list.
+すべてのアイテムは同期されていません、リストを確認してください
 Not enough free disk space available in:
 利用可能なディスク空き容量が足りません:
 Nothing to synchronize according to configuration!
@@ -504,10 +514,8 @@ Number of files that will be overwritten
 上書きされたファイル数
 OK
 OK
-Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the full name including path prefix.
-選択されたファイル/ディレクトリを同期処理する時だけフィルタリングされます。\nこのフィルターは、接頭語を含むパスと完全な名前にのみ適用されます。
-Open synchronization dialog
-同期ダイアログを開く
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the synchronization directories.
+フィルタリングをパスしたファイル/ディレクトリのみが同期対象に選択されます。 フィルターは同期先ディレクトリの同類の名前(!)に対して適用されます。
 Open with File Manager\tD-Click
 ファイラーから開く\tD-クリック
 Operation aborted!
@@ -528,6 +536,8 @@ Preview
 プレビュー
 Published under the GNU General Public License:
 Published under the GNU General Public License:
+Question
+質問
 Quit
 終了
 Relative path
@@ -536,18 +546,20 @@ Remove folder pair
 フォルダペアを除去
 Reset
 リセット
+Reset all warning messages
+すべての警告をリセット
 Reset all warning messages?
 すべての警告をリセットしますか?
-Resets all warning messages
-すべての警告をリセット
 Result
 結果
 Right:
 右側:
 S&ave configuration
 構成設定を保存(&A)
-Save aborted!
-保存を中断!
+S&witch view
+表示切り替え(&W)
+Save changes to current configuration?
+現在の構成の変更を保存しますか?
 Save current configuration to file
 現在の設定をファイルに保存
 Scanning...
@@ -560,6 +572,10 @@ Select logfile directory:
 ログファイルの保存先を選択:
 Select variant:
 変数を選択:
+Show conflicts
+不一致を表示
+Show file icons
+アイコンを表示
 Show files that are different
 差異のあるファイルを表示
 Show files that are equal
@@ -572,6 +588,12 @@ Show files that exist on left side only
 左側のみに存在するファイルを表示
 Show files that exist on right side only
 右側のみに存在するファイルを表示
+Show files that will be copied to the left side
+左側にコピーされたファイルを表示
+Show files that will be copied to the right side
+右側にコピーされたファイルを表示
+Show files that won't be copied
+コピーされなかったファイルを表示
 Show popup
 ポップアップ表示
 Show popup on errors or warnings
@@ -596,6 +618,8 @@ Stop
 停止
 Swap sides
 パネルを入れ替え
+Synchronization Preview
+同期処理のプレビュー
 Synchronization aborted!
 同期処理を中断!
 Synchronization completed successfully!
@@ -608,8 +632,8 @@ Synchronization settings
 同期処理設定
 Synchronization status
 同期処理: ステータス
-Synchronize all .doc, .zip and .exe files except everything from folder \"temp\".
-.doc, .zip and .exe ファイル以外を \"temp\" フォルダからすべて同期
+Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
+\"temp\" のサブフォルダを除いて、すべての.doc、.zip、および.exeファイルを同期
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 両側を同時に処理: 両方のディレクトリのより新しいファイルをコピー
 Synchronizing...
@@ -621,7 +645,7 @@ Target file already existing!
 The file does not contain a valid configuration:
 このファイルには有効な構成が含まれていません:
 This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
-ファイル名をダブルクリックする度に、このコマンドが実行されます。%name は選択ファイルのプレースフォルダとして機能します。
+ファイル名をダブルクリックする度に、このコマンドが実行されます。 %name は選択ファイルのプレースフォルダとして機能します。
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 この変数では、ふたつの同名ファイルが存在した場合、 それぞれのファイルサイズと最終更新日付/時間を比較します。
 Time
@@ -636,6 +660,8 @@ Total required free disk space:
 必要な合計ディスク空き容量:
 Total time:
 合計時間:
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
+ファイルの時間の +/- を正確に 1 時間以上の差異は不一致、1 時間未満の差異は同様ファイルとして取り扱います(夏時間は変換されます)
 Two way <->
 両方向 <->
 Unable to connect to sourceforge.net!
@@ -646,10 +672,10 @@ Unable to initialize Recycle Bin!
 ゴミ箱の初期化が出来ません!
 Uncheck all
 すべて解除
+Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
+未解決の不一致があります! \n\nこの不一致を無視して同期を続行することが出来ます。
 Update ->
 更新 ->
-Update:
-アップデート:
 Use Recycle Bin
 ゴミ箱を使用
 Use Recycle Bin when deleting or overwriting files during synchronization
@@ -668,6 +694,8 @@ different
 差異あり
 file exists on both sides
 両側に存在するファイル
+flash	conflict\n
+不一致を点滅
 on one side only
 片側のみ
 |>	file on right side only\n

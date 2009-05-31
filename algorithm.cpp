@@ -148,77 +148,17 @@ void FreeFileSync::swapGrids(FolderComparison& folderCmp)
             else if (i->cmpResult == FILE_LEFT_NEWER)
                 i->cmpResult = FILE_RIGHT_NEWER;
 
+            //swap sync direction
+            if (i->direction == SYNC_DIR_LEFT)
+                i->direction = SYNC_DIR_RIGHT;
+            else if (i->direction == SYNC_DIR_RIGHT)
+                i->direction = SYNC_DIR_LEFT;
+
             //swap file descriptors
             std::swap(i->fileDescrLeft, i->fileDescrRight);
         }
     }
 }
-
-/*
-void FreeFileSync::adjustModificationTimes(const Zstring& parentDirectory, const int timeInSeconds, ErrorHandler* errorHandler) throw(AbortThisProcess)
-{
-#ifndef __WXDEBUG__
-    wxLogNull noWxLogs; //prevent wxWidgets logging
-#endif
-
-    if (timeInSeconds == 0)
-        return;
-
-    std::vector<Zstring> fileList;
-    std::vector<Zstring> dirList;
-
-    while (true)  //should be executed in own scope so that directory access does not disturb deletion
-    {
-        try
-        {   //get all files and folders from directory (and subdirectories)
-            FreeFileSync::getAllFilesAndDirs(parentDirectory, fileList, dirList);
-            break;
-        }
-        catch (const FileError& e)
-        {
-            ErrorHandler::Response rv = errorHandler->reportError(e.show());
-            if (rv == ErrorHandler::IGNORE_ERROR)
-                break;
-            else if (rv == ErrorHandler::RETRY)
-                ;   //continue with loop
-            else
-                assert (false);
-        }
-    }
-
-    //this part is only a bit slower than direct Windows API-access!
-    wxDateTime modTime;
-    for (unsigned int j = 0; j < fileList.size(); ++j)
-    {
-        while (true)  //own scope for directory access to not disturb file access!
-        {
-            try
-            {
-                wxFileName file(fileList[j].c_str());
-                if (!file.GetTimes(NULL, &modTime, NULL)) //get modification time
-                    throw FileError(Zstring(_("Error changing modification time:")) + wxT(" \"") + fileList[j] + wxT("\""));
-
-                modTime.Add(wxTimeSpan(0, 0, timeInSeconds, 0));
-
-                if (!file.SetTimes(NULL, &modTime, NULL)) //get modification time
-                    throw FileError(Zstring(_("Error changing modification time:")) + wxT(" \"") + fileList[j] + wxT("\""));
-
-                break;
-            }
-            catch (const FileError& error)
-            {
-                ErrorHandler::Response rv = errorHandler->reportError(error.show());
-                if (rv == ErrorHandler::IGNORE_ERROR)
-                    break;
-                else if (rv == ErrorHandler::RETRY)
-                    ;   //continue with loop
-                else
-                    assert (false);
-            }
-        }
-    }
-}
-*/
 
 
 //add(!) all files and subfolder gridlines that are dependent from the directory
@@ -358,35 +298,44 @@ private:
 
 template <bool leftSide> //update compareGrid row information after deletion from leftSide (or !leftSide)
 inline
-void updateCmpLineAfterDeletion(FileCompareLine& relevantRow, const int rowNr, RemoveAtExit& markForRemoval)
+void updateCmpLineAfterDeletion(const int rowNr, const SyncConfiguration& syncConfig, FileComparison& fileCmp, RemoveAtExit& markForRemoval)
 {
-    FileDescrLine* fileDescr;        //get descriptor for file to be deleted; evaluated at compile time
-    FileDescrLine* fileDescrPartner; //file descriptor for "other side"
-    if (leftSide)
-    {
-        fileDescr        = &relevantRow.fileDescrLeft;
-        fileDescrPartner = &relevantRow.fileDescrRight;
-    }
-    else
-    {
-        fileDescr        = &relevantRow.fileDescrRight;
-        fileDescrPartner = &relevantRow.fileDescrLeft;
-    }
+    //retrieve all files and subfolder gridlines that are dependent from this deleted entry
+    std::set<int> rowsToDelete;
+    rowsToDelete.insert(rowNr);
+    FreeFileSync::addSubElements(fileCmp, fileCmp[rowNr], rowsToDelete);
 
-
-    //remove deleted entries from grid
-    if (fileDescrPartner->objType == FileDescrLine::TYPE_NOTHING)
-        markForRemoval.removeRow(rowNr);
-    else
+    //remove deleted entries from fileCmp (or adapt it if deleted from one side only)
+    for (std::set<int>::iterator j = rowsToDelete.begin(); j != rowsToDelete.end(); ++j)
     {
-        //initialize fileDescr for deleted file/folder
-        *fileDescr = FileDescrLine();
+        FileCompareLine& currentLine = fileCmp[*j];
 
-        //adapt the compare result
-        if (leftSide) //again evaluated at compile time
-            relevantRow.cmpResult = FILE_RIGHT_SIDE_ONLY;
+        //file descriptor for "other side"
+        const FileDescrLine* const fileDescrPartner = leftSide ? &currentLine.fileDescrRight : &currentLine.fileDescrLeft;
+
+        //remove deleted entries from grid
+        if (fileDescrPartner->objType == FileDescrLine::TYPE_NOTHING)
+            markForRemoval.removeRow(*j);
         else
-            relevantRow.cmpResult = FILE_LEFT_SIDE_ONLY;
+        {
+            //get descriptor for file to be deleted; evaluated at compile time
+            FileDescrLine* const fileDescr = leftSide ? &currentLine.fileDescrLeft : &currentLine.fileDescrRight;
+
+            //initialize fileDescr for deleted file/folder
+            *fileDescr = FileDescrLine();
+
+            //adapt the compare result and sync direction
+            if (leftSide) //again evaluated at compile time
+            {
+                currentLine.cmpResult = FILE_RIGHT_SIDE_ONLY;
+                currentLine.direction = syncConfig.exRightSideOnly;
+            }
+            else
+            {
+                currentLine.cmpResult = FILE_LEFT_SIDE_ONLY;
+                currentLine.direction = syncConfig.exLeftSideOnly;
+            }
+        }
     }
 }
 
@@ -396,42 +345,31 @@ void deleteFromGridAndHDOneSide(FileComparison& fileCmp,
                                 const std::set<int>& rowsToDeleteOneSide,
                                 const bool useRecycleBin,
                                 RemoveAtExit& markForRemoval,
+                                const SyncConfiguration& syncConfig,
                                 ErrorHandler* errorHandler)
 {
     for (std::set<int>::iterator i = rowsToDeleteOneSide.begin(); i != rowsToDeleteOneSide.end(); ++i)
     {
-        FileCompareLine& currentCmpLine = fileCmp[*i];
-
-        FileDescrLine* fileDescr = NULL; //get descriptor for file to be deleted; evaluated at compile time
-        if (leftSide)
-            fileDescr = &currentCmpLine.fileDescrLeft;
-        else
-            fileDescr = &currentCmpLine.fileDescrRight;
+        //get descriptor for file to be deleted; evaluated at compile time
+        const FileDescrLine* const fileDescr = leftSide ? &fileCmp[*i].fileDescrLeft : &fileCmp[*i].fileDescrRight;
 
         while (true)
         {
             try
             {
-                if (fileDescr->objType == FileDescrLine::TYPE_FILE)
-                    FreeFileSync::removeFile(fileDescr->fullName, useRecycleBin);
-                else if (fileDescr->objType == FileDescrLine::TYPE_DIRECTORY)
-                    FreeFileSync::removeDirectory(fileDescr->fullName, useRecycleBin);
-                else if (fileDescr->objType == FileDescrLine::TYPE_NOTHING)
-                    break; //nothing to do
-                else
+                switch (fileDescr->objType)
                 {
-                    assert(false);
+                case FileDescrLine::TYPE_FILE:
+                    FreeFileSync::removeFile(fileDescr->fullName, useRecycleBin);
+                    updateCmpLineAfterDeletion<leftSide>(*i, syncConfig, fileCmp, markForRemoval); //remove entries from fileCmp
+                    break;
+                case FileDescrLine::TYPE_DIRECTORY:
+                    FreeFileSync::removeDirectory(fileDescr->fullName, useRecycleBin);
+                    updateCmpLineAfterDeletion<leftSide>(*i, syncConfig, fileCmp, markForRemoval); //remove entries from fileCmp
+                    break;
+                case FileDescrLine::TYPE_NOTHING:
                     break;
                 }
-
-                //retrieve all files and subfolder gridlines that are dependent from this deleted entry
-                std::set<int> rowsToDelete;
-                rowsToDelete.insert(*i);
-                FreeFileSync::addSubElements(fileCmp, currentCmpLine, rowsToDelete);
-
-                //remove deleted entries from fileCmp (or adapt it if deleted from one side only)
-                for (std::set<int>::iterator j = rowsToDelete.begin(); j != rowsToDelete.end(); ++j)
-                    updateCmpLineAfterDeletion<leftSide>(fileCmp[*j], *j, markForRemoval);
 
                 break;
             }
@@ -457,6 +395,7 @@ void FreeFileSync::deleteFromGridAndHD(FileComparison& fileCmp,
                                        const std::set<int>& rowsToDeleteOnRight,
                                        const bool deleteOnBothSides,
                                        const bool useRecycleBin,
+                                       const SyncConfiguration& syncConfig,
                                        ErrorHandler* errorHandler)
 {
     //remove deleted rows from fileCmp (AFTER all rows to be deleted are known: consider row references!
@@ -473,12 +412,14 @@ void FreeFileSync::deleteFromGridAndHD(FileComparison& fileCmp,
                                          rowsToDeleteBothSides,
                                          useRecycleBin,
                                          markForRemoval,
+                                         syncConfig,
                                          errorHandler);
 
         deleteFromGridAndHDOneSide<false>(fileCmp,
                                           rowsToDeleteBothSides,
                                           useRecycleBin,
                                           markForRemoval,
+                                          syncConfig,
                                           errorHandler);
     }
     else
@@ -487,12 +428,14 @@ void FreeFileSync::deleteFromGridAndHD(FileComparison& fileCmp,
                                          rowsToDeleteOnLeft,
                                          useRecycleBin,
                                          markForRemoval,
+                                         syncConfig,
                                          errorHandler);
 
         deleteFromGridAndHDOneSide<false>(fileCmp,
                                           rowsToDeleteOnRight,
                                           useRecycleBin,
                                           markForRemoval,
+                                          syncConfig,
                                           errorHandler);
     }
 }
@@ -528,11 +471,12 @@ void writeFourDigitNumber(unsigned int number, wxChar*& position)
 }
 
 
-wxString FreeFileSync::utcTimeToLocalString(const wxLongLong& utcTime)
+wxString FreeFileSync::utcTimeToLocalString(const wxLongLong& utcTime, const Zstring& filename)
 {
 #ifdef FFS_WIN
     //convert ansi C time to FILETIME
     wxLongLong fileTimeLong(utcTime);
+
     fileTimeLong += wxLongLong(2, 3054539008UL); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
     fileTimeLong *= 10000000;
 
@@ -540,19 +484,29 @@ wxString FreeFileSync::utcTimeToLocalString(const wxLongLong& utcTime)
     lastWriteTimeUtc.dwLowDateTime  = fileTimeLong.GetLo();             //GetLo() returns unsigned
     lastWriteTimeUtc.dwHighDateTime = unsigned(fileTimeLong.GetHi());   //GetHi() returns signed
 
+
     FILETIME localFileTime;
-    if (FileTimeToLocalFileTime(   //convert to local time
+    if (::FileTimeToLocalFileTime(   //convert to local time
                 &lastWriteTimeUtc, //pointer to UTC file time to convert
                 &localFileTime 	   //pointer to converted file time
             ) == 0)
-        throw RuntimeException(wxString(_("Conversion error:")) + wxT(" FILETIME -> local FILETIME"));
+        throw RuntimeException(wxString(_("Conversion error:")) + wxT(" FILETIME -> local FILETIME: ") +
+                               wxT("(") + wxULongLong(lastWriteTimeUtc.dwHighDateTime, lastWriteTimeUtc.dwLowDateTime).ToString() + wxT(") ") +
+                               filename.c_str() + wxT("\n\n") + getLastErrorFormatted().c_str());
+
+    if (localFileTime.dwHighDateTime > 2147483647) //== 256^4 / 2 - 1 == 0x7fffffff
+        return _("Error");  //this actually CAN happen if UTC time is just below this border and ::FileTimeToLocalFileTime() adds 2 hours due to DST or whatever!
+    //Testcase (UTC): dateHigh = 2147483647 -> year 30000
+    //                dateLow  = 4294967295
 
     SYSTEMTIME time;
-    if (FileTimeToSystemTime(
+    if (::FileTimeToSystemTime(
                 &localFileTime, //pointer to file time to convert
                 &time 	        //pointer to structure to receive system time
             ) == 0)
-        throw RuntimeException(wxString(_("Conversion error:")) + wxT(" FILETIME -> SYSTEMTIME"));
+        throw RuntimeException(wxString(_("Conversion error:")) + wxT(" local FILETIME -> SYSTEMTIME: ") +
+                               wxT("(") + wxULongLong(localFileTime.dwHighDateTime, localFileTime.dwLowDateTime).ToString() + wxT(") ") +
+                               filename.c_str()  + wxT("\n\n") + getLastErrorFormatted().c_str());
 
     //assemble time string (performance optimized)
     wxChar formattedTime[21];
@@ -589,10 +543,8 @@ wxString FreeFileSync::utcTimeToLocalString(const wxLongLong& utcTime)
 #ifdef FFS_WIN
 Zstring FreeFileSync::getLastErrorFormatted(const unsigned long lastError) //try to get additional Windows error information
 {
-    unsigned long lastErrorCode = lastError;
-    //determine error code if none was specified
-    if (lastErrorCode == 0)
-        lastErrorCode = GetLastError();
+         //determine error code if none was specified
+    const unsigned long lastErrorCode = lastError == 0 ? GetLastError() : lastError;
 
     Zstring output = Zstring(wxT("Windows Error Code ")) + wxString::Format(wxT("%u"), lastErrorCode).c_str();
 
@@ -605,10 +557,8 @@ Zstring FreeFileSync::getLastErrorFormatted(const unsigned long lastError) //try
 #elif defined FFS_LINUX
 Zstring FreeFileSync::getLastErrorFormatted(const int lastError) //try to get additional Linux error information
 {
-    int lastErrorCode = lastError;
     //determine error code if none was specified
-    if (lastErrorCode == 0)
-        lastErrorCode = errno;
+    const int lastErrorCode = lastError == 0 ? errno : lastError;
 
     Zstring output = Zstring(wxT("Linux Error Code ")) + wxString::Format(wxT("%i"), lastErrorCode).c_str();
     output += Zstring(wxT(": ")) + strerror(lastErrorCode);

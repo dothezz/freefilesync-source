@@ -57,8 +57,7 @@ public:
         //test if ffs config file has been dropped
         if (fileType == xmlAccess::XML_GUI_CONFIG)
         {
-            if (mainDlg_->readConfigurationFromXml(dropName))
-                mainDlg_->pushStatusInformation(_("Configuration loaded!"));
+            mainDlg_->loadConfiguration(dropName);
             return false;
         }
         //...or a ffs batch file
@@ -71,7 +70,7 @@ public:
         }
 
         //disable the sync button
-        mainDlg_->enableSynchronization(false);
+        mainDlg_->syncPreview->enableSynchronization(false);
 
         //clear grids
         mainDlg_->currentGridData.clear();
@@ -133,13 +132,11 @@ MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale
         gridDataView(currentGridData),
         contextMenu(new wxMenu), //initialize right-click context menu; will be dynamically re-created on each R-mouse-click
         programLanguage(language),
-        filteringInitialized(false),
-        filteringPending(false),
-        synchronizationEnabled(false),
         cmpStatusHandlerTmp(0),
         cleanedUp(false),
         lastSortColumn(-1),
-        lastSortGrid(NULL)
+        lastSortGrid(NULL),
+        syncPreview(new SyncPreview(this))
 {
     //initialize and load configuration
     readGlobalSettings();
@@ -148,14 +145,17 @@ MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale
     //set icons for this dialog
     m_bpButton10->SetBitmapLabel(*globalResource.bitmapExit);
     m_buttonCompare->setBitmapFront(*globalResource.bitmapCompare);
-    m_buttonSync->setBitmapFront(*globalResource.bitmapSync);
-    m_bpButtonSwap->SetBitmapLabel(*globalResource.bitmapSwap);
+    m_bpButtonSyncConfig->SetBitmapLabel(*globalResource.bitmapSyncCfg);
     m_bpButton14->SetBitmapLabel(*globalResource.bitmapHelp);
     m_bpButtonSave->SetBitmapLabel(*globalResource.bitmapSave);
     m_bpButtonLoad->SetBitmapLabel(*globalResource.bitmapLoad);
     m_bpButtonAddPair->SetBitmapLabel(*globalResource.bitmapAddFolderPair);
     m_bitmap15->SetBitmap(*globalResource.bitmapStatusEdge);
     m_bitmapShift->SetBitmap(*globalResource.bitmapShift);
+    m_bitmapCreate->SetBitmap(*globalResource.bitmapCreate);
+    m_bitmapUpdate->SetBitmap(*globalResource.bitmapUpdate);
+    m_bitmapDelete->SetBitmap(*globalResource.bitmapDelete);
+    m_bitmapData->SetBitmap(*globalResource.bitmapData);
 
     bSizer6->Layout(); //wxButtonWithImage size might have changed
 
@@ -163,6 +163,7 @@ MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale
     MenuItemUpdater updateMenuFile(m_menuFile);
     updateMenuFile.addForUpdate(m_menuItem10, *globalResource.bitmapCompareSmall);
     updateMenuFile.addForUpdate(m_menuItem11, *globalResource.bitmapSyncSmall);
+    updateMenuFile.addForUpdate(m_menuItemSwitchView, *globalResource.bitmapSwitchViewSmall);
 
     MenuItemUpdater updateMenuAdv(m_menuAdvanced);
     updateMenuAdv.addForUpdate(m_menuItemGlobSett, *globalResource.bitmapSettingsSmall);
@@ -208,11 +209,12 @@ MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale
     m_gridMiddle->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onGridMiddleButtonEvent), NULL, this);
 
     Connect(wxEVT_IDLE, wxEventHandler(MainDialog::OnIdleEvent), NULL, this);
-    m_gridMiddle->GetGridWindow()->Connect(wxEVT_LEFT_UP, wxEventHandler(MainDialog::OnGrid3LeftMouseUp), NULL, this);
-    m_gridMiddle->GetGridWindow()->Connect(wxEVT_LEFT_DOWN, wxEventHandler(MainDialog::OnGrid3LeftMouseDown), NULL, this);
-
     Connect(wxEVT_SIZE, wxEventHandler(MainDialog::onResizeMainWindow), NULL, this);
     Connect(wxEVT_MOVE, wxEventHandler(MainDialog::onResizeMainWindow), NULL, this);
+
+    //event handler for manual (un-)checking of rows and setting of sync direction
+    m_gridMiddle->Connect(FFS_CHECK_ROWS_EVENT, FFSCheckRowsEventHandler(MainDialog::OnCheckRows), NULL, this);
+    m_gridMiddle->Connect(FFS_SYNC_DIRECTION_EVENT, FFSSyncDirectionEventHandler(MainDialog::OnSetSyncDirection), NULL, this);
 
     //init grid settings
     m_gridLeft->initSettings(  globalSettings.gui.showFileIcons,
@@ -233,12 +235,10 @@ MainDialog::MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale
                                &gridDataView);
 
     //disable sync button as long as "compare" hasn't been triggered.
-    enableSynchronization(false);
+    syncPreview->enableSynchronization(false);
 
     //mainly to update row label sizes...
     updateGuiGrid();
-
-    enableSynchronization(false);
 
     //create the compare status panel in hidden state
     compareStatus = new CompareStatus(this);
@@ -347,31 +347,13 @@ void MainDialog::writeGlobalSettings()
 }
 
 
-void MainDialog::enableSynchronization(bool value)
-{
-    if (value)
-    {
-        synchronizationEnabled = true;
-        m_buttonSync->SetForegroundColour(*wxBLACK);
-        m_buttonSync->setBitmapFront(*globalResource.bitmapSync);
-    }
-    else
-    {
-        synchronizationEnabled = false;
-        m_buttonSync->SetForegroundColour(wxColor(94, 94, 94)); //grey
-        m_buttonSync->setBitmapFront(*globalResource.bitmapSyncDisabled);
-    }
-}
-
-
-void MainDialog::filterRangeManually(const std::set<int>& rowsToFilterOnUiTable)
+void MainDialog::filterRangeManually(const std::set<int>& rowsToFilterOnUiTable, const int leadingRow)
 {
     if (rowsToFilterOnUiTable.size() > 0)
     {
         bool newSelection = false; //default: deselect range
 
         //leadingRow determines de-/selection of all other rows
-        const int leadingRow = *rowsToFilterOnUiTable.begin();
         if (0 <= leadingRow && leadingRow < int(gridDataView.elementsOnView()))
             newSelection = !gridDataView[leadingRow].selectedForSynchronization;
 
@@ -414,67 +396,15 @@ void MainDialog::filterRangeManually(const std::set<int>& rowsToFilterOnUiTable)
 
             m_gridLeft->ClearSelection();
             m_gridRight->ClearSelection();
-            m_gridMiddle->ClearSelection();
         }
         else
-        {   //this second call to ForceRefresh() looks strange, but it actually fixes occasional graphical artifacts on bottom right of the grid
-            m_gridLeft->ForceRefresh();
-            m_gridMiddle->ForceRefresh();
-            m_gridRight->ForceRefresh();
-
-            m_gridMiddle->ClearSelection();
-        }
+            updateGuiGrid();
     }
-}
-
-/*grid event choreography:
-1. UI-Mouse-Down => OnGridSelectCell
-2. UI-Mouse-Up   => SelectRangeEvent (if at least two rows are marked)
-
-=> the decision if a range or a single cell is selected can be made only after Mouse-UP. But SelectRangeEvent unfortunately is not always
-executed (e.g. if single cell selected)
-
-=> new choreography:
-1. UI-Mouse-Down => OnGrid3LeftMouseDown (notify that filtering was initialized: this is needed since under some circumstances it might happen that the program
-                    receives a mouse-up without a preceding mouse-down (double-clicks)
-2. UI-Mouse-Up   => OnGrid3LeftMouseUp (notify that filtering shall be started on next idle event
-3. UI-Mouse-Up   => SelectRangeEvent, possibly
-4. Idle event    => OnIdleEvent
-*/
-
-
-void MainDialog::OnGrid3LeftMouseDown(wxEvent& event)
-{
-    filteringInitialized = true;
-    event.Skip();
-}
-
-
-void MainDialog::OnGrid3LeftMouseUp(wxEvent& event)
-{
-    filteringPending = true;
-    event.Skip();
 }
 
 
 void MainDialog::OnIdleEvent(wxEvent& event)
 {
-    //process manually filtered rows
-    if (filteringPending)
-    {
-        filteringPending = false;
-
-        if (filteringInitialized) //filteringInitialized is being reset after each selection, since strangely it might happen, that the grid receives
-        {                         //a mouse up event, but no mouse down! (e.g. when window is maximized and cursor is on grid3)
-            filteringInitialized = false;
-
-            if (m_gridMiddle)
-                filterRangeManually(getSelectedRows(m_gridMiddle));
-        }
-    }
-
-    //------------------------------------------------------------------------------
-
     //small routine to restore status information after some time
     if (stackObjects.size() > 0 )  //check if there is some work to do
     {
@@ -538,54 +468,9 @@ void removeInvalidRows(std::set<int>& rows, const int currentUiTableSize)
 }
 
 
-std::set<int> MainDialog::getSelectedRows(const CustomGrid* grid)
+std::set<int> MainDialog::getSelectedRows(const CustomGrid* grid) const
 {
-    std::set<int> output;
-    int rowTop, rowBottom; //coords of selection
-
-    wxArrayInt selectedRows = grid->GetSelectedRows();
-    if (!selectedRows.IsEmpty())
-    {
-        for (unsigned int i = 0; i < selectedRows.GetCount(); ++i)
-            output.insert(selectedRows[i]);
-    }
-
-    if (!grid->GetSelectedCols().IsEmpty())    //if a column is selected this is means all rows are marked for deletion
-    {
-        for (int k = 0; k < const_cast<CustomGrid*>(grid)->GetNumberRows(); ++k) //messy wxGrid implementation...
-            output.insert(k);
-    }
-
-    wxGridCellCoordsArray singlySelected = grid->GetSelectedCells();
-    if (!singlySelected.IsEmpty())
-    {
-        for (unsigned int k = 0; k < singlySelected.GetCount(); ++k)
-            output.insert(singlySelected[k].GetRow());
-    }
-
-    wxGridCellCoordsArray tmpArrayTop = grid->GetSelectionBlockTopLeft();
-    if (!tmpArrayTop.IsEmpty())
-    {
-        wxGridCellCoordsArray tmpArrayBottom = grid->GetSelectionBlockBottomRight();
-
-        unsigned int arrayCount = tmpArrayTop.GetCount();
-
-        if (arrayCount == tmpArrayBottom.GetCount())
-        {
-            for (unsigned int i = 0; i < arrayCount; ++i)
-            {
-                rowTop    = tmpArrayTop[i].GetRow();
-                rowBottom = tmpArrayBottom[i].GetRow();
-
-                for (int k = rowTop; k <= rowBottom; ++k)
-                    output.insert(k);
-            }
-        }
-    }
-
-    //some exception: also add current cursor row to selection if there are no others... hopefully improving usability
-    if (output.empty() && grid->isLeadGrid())
-        output.insert(const_cast<CustomGrid*>(grid)->GetCursorRow()); //messy wxGrid implementation...
+    std::set<int> output = grid->getAllSelectedRows();
 
     removeInvalidRows(output, gridDataView.elementsOnView());
 
@@ -685,6 +570,7 @@ void MainDialog::deleteSelectedFiles()
                                                       rowsToDeleteOnRight,
                                                       globalSettings.gui.deleteOnBothSides,
                                                       globalSettings.gui.useRecyclerForManualDeletion,
+                                                      cfg.syncConfiguration,
                                                       &errorHandler);
                 }
 
@@ -706,45 +592,75 @@ void MainDialog::openWithFileManager(const int rowNumber, const bool leftSide)
 {
     wxString command;
 
-    wxString defaultFolder;
-    if (0 <= rowNumber && rowNumber < int(gridDataView.elementsOnView()))
-        defaultFolder = leftSide ?
-                        gridDataView.getFolderPair(rowNumber).leftDirectory.c_str() :
-                        gridDataView.getFolderPair(rowNumber).rightDirectory.c_str();
-    else
-        defaultFolder = leftSide ?
-                        FreeFileSync::getFormattedDirectoryName(m_directoryLeft->GetValue().c_str()).c_str() :
-                        FreeFileSync::getFormattedDirectoryName(m_directoryRight->GetValue().c_str()).c_str();
-
-#ifdef FFS_WIN
-    command = wxString(wxT("explorer ")) + defaultFolder; //default
-#elif defined FFS_LINUX
-    command = globalSettings.gui.commandLineFileManager;
-    command.Replace(wxT("%name"), defaultFolder);
-    command.Replace(wxT("%path"), defaultFolder);
-#endif
-
     if (0 <= rowNumber && rowNumber < int(gridDataView.elementsOnView()))
     {
         const FileDescrLine* fileDescr = leftSide ?
                                          &gridDataView[rowNumber].fileDescrLeft :
                                          &gridDataView[rowNumber].fileDescrRight;
 
-        if (fileDescr->objType == FileDescrLine::TYPE_FILE)
+        switch (fileDescr->objType)
         {
+        case FileDescrLine::TYPE_FILE:
             command = globalSettings.gui.commandLineFileManager;
             command.Replace(wxT("%name"), fileDescr->fullName.c_str());
             command.Replace(wxT("%path"), wxString(fileDescr->fullName.c_str()).BeforeLast(GlobalResources::FILE_NAME_SEPARATOR));
-        }
-        else if (fileDescr->objType == FileDescrLine::TYPE_DIRECTORY)
-        {
+            break;
+        case FileDescrLine::TYPE_DIRECTORY:
             command = globalSettings.gui.commandLineFileManager;
             command.Replace(wxT("%name"), fileDescr->fullName.c_str());
             command.Replace(wxT("%path"), fileDescr->fullName.c_str());
-        }
-        else if (fileDescr->objType == FileDescrLine::TYPE_NOTHING)
+            break;
+        case FileDescrLine::TYPE_NOTHING:
         {
+            //use path from other side
+            const FileDescrLine* fileDescrOther = leftSide ?
+                                                  &gridDataView[rowNumber].fileDescrRight :
+                                                  &gridDataView[rowNumber].fileDescrLeft;
+
+            const wxString syncFolder = leftSide ?
+                                        gridDataView.getFolderPair(rowNumber).leftDirectory.c_str() :
+                                        gridDataView.getFolderPair(rowNumber).rightDirectory.c_str();
+
+            wxString alternateFolder;
+            switch (fileDescrOther->objType)
+            {
+            case FileDescrLine::TYPE_FILE:
+                alternateFolder = syncFolder + wxString(fileDescrOther->relativeName.c_str()).BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+                break;
+            case FileDescrLine::TYPE_DIRECTORY:
+                alternateFolder = syncFolder + wxString(fileDescrOther->relativeName.c_str());
+                break;
+            case FileDescrLine::TYPE_NOTHING:
+                assert(false);
+                break;
+            }
+
+            if (!wxDirExists(alternateFolder))
+                alternateFolder = syncFolder;
+
+#ifdef FFS_WIN
+            command = wxString(wxT("explorer ")) + alternateFolder; //default
+#elif defined FFS_LINUX
+            command = globalSettings.gui.commandLineFileManager;
+            command.Replace(wxT("%name"), alternateFolder);
+            command.Replace(wxT("%path"), alternateFolder);
+#endif
         }
+        break;
+        }
+    }
+    else
+    {   //fallback
+        const wxString defaultFolder = leftSide ?
+                                       FreeFileSync::getFormattedDirectoryName(m_directoryLeft->GetValue().c_str()).c_str() :
+                                       FreeFileSync::getFormattedDirectoryName(m_directoryRight->GetValue().c_str()).c_str();
+#ifdef FFS_WIN
+        command = wxString(wxT("explorer ")) + defaultFolder; //default
+#elif defined FFS_LINUX
+        command = globalSettings.gui.commandLineFileManager;
+        command.Replace(wxT("%name"), defaultFolder);
+        command.Replace(wxT("%path"), defaultFolder);
+#endif
     }
 
     if (!command.empty())
@@ -957,7 +873,6 @@ void MainDialog::OnContextMenu(wxGridEvent& event)
 
     //show context menu
     PopupMenu(contextMenu.get());
-    event.Skip();
 }
 
 
@@ -972,7 +887,8 @@ void MainDialog::OnContextMenuSelection(wxCommandEvent& event)
         for (std::set<int>::const_iterator i = additional.begin(); i != additional.end(); ++i)
             selection.insert(*i);
 
-        filterRangeManually(selection);
+        if (selection.size() > 0)
+            filterRangeManually(selection, *selection.begin());
     }
 
     else if (eventId == CONTEXT_EXCLUDE_EXT)
@@ -987,7 +903,8 @@ void MainDialog::OnContextMenuSelection(wxCommandEvent& event)
             cfg.filterIsActive = true;
             updateFilterButton(m_bpButtonFilter, cfg.filterIsActive);
 
-            FreeFileSync::filterGridData(currentGridData, cfg.includeFilter, cfg.excludeFilter);
+            FreeFileSync::FilterProcess filterInstance(cfg.includeFilter, cfg.excludeFilter);
+            filterInstance.filterGridData(currentGridData);
 
             updateGuiGrid();
             if (hideFilteredElements)
@@ -1009,17 +926,17 @@ void MainDialog::OnContextMenuSelection(wxCommandEvent& event)
                     cfg.excludeFilter+= wxT("\n");
 
                 if (i->type == FileDescrLine::TYPE_FILE)
-                    cfg.excludeFilter+= wxString(wxT("*")) + GlobalResources::FILE_NAME_SEPARATOR + i->relativeName;
+                    cfg.excludeFilter+= wxString(GlobalResources::FILE_NAME_SEPARATOR) + i->relativeName;
                 else if (i->type == FileDescrLine::TYPE_DIRECTORY)
-                    cfg.excludeFilter+= wxString(wxT("*")) + GlobalResources::FILE_NAME_SEPARATOR + i->relativeName + GlobalResources::FILE_NAME_SEPARATOR + wxT("*");
-
+                    cfg.excludeFilter+= wxString(GlobalResources::FILE_NAME_SEPARATOR) + i->relativeName + GlobalResources::FILE_NAME_SEPARATOR + wxT("*");
                 else assert(false);
             }
 
             cfg.filterIsActive = true;
             updateFilterButton(m_bpButtonFilter, cfg.filterIsActive);
 
-            FreeFileSync::filterGridData(currentGridData, cfg.includeFilter, cfg.excludeFilter);
+            FreeFileSync::FilterProcess filterInstance(cfg.includeFilter, cfg.excludeFilter);
+            filterInstance.filterGridData(currentGridData);
 
             updateGuiGrid();
             if (hideFilteredElements)
@@ -1068,10 +985,12 @@ void MainDialog::OnContextMenuSelection(wxCommandEvent& event)
 void MainDialog::OnContextMenuMiddle(wxGridEvent& event)
 {
     contextMenu.reset(new wxMenu); //re-create context menu
+    contextMenu->Append(CONTEXT_SWAP_SIDES, _("Swap sides"));
+    contextMenu->AppendSeparator();
     contextMenu->Append(CONTEXT_CHECK_ALL, _("Check all"));
     contextMenu->Append(CONTEXT_UNCHECK_ALL, _("Uncheck all"));
 
-    if (gridDataView.elementsTotal() == 0)
+    if (gridDataView.refGridIsEmpty())
     {
         contextMenu->Enable(CONTEXT_CHECK_ALL, false);
         contextMenu->Enable(CONTEXT_UNCHECK_ALL, false);
@@ -1079,22 +998,25 @@ void MainDialog::OnContextMenuMiddle(wxGridEvent& event)
 
     contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainDialog::OnContextMenuMiddleSelection), NULL, this);
     PopupMenu(contextMenu.get()); //show context menu
-
-    event.Skip();
 }
 
 
 void MainDialog::OnContextMenuMiddleSelection(wxCommandEvent& event)
 {
     int eventId = event.GetId();
-    if (eventId == CONTEXT_CHECK_ALL)
+    if (eventId == CONTEXT_SWAP_SIDES)
     {
-        FreeFileSync::includeAllRowsOnGrid(currentGridData);
+        wxCommandEvent dummy;
+        MainDialog::OnSwapSides(dummy);
+    }
+    else if (eventId == CONTEXT_CHECK_ALL)
+    {
+        FreeFileSync::FilterProcess::includeAllRowsOnGrid(currentGridData);
         updateGuiGrid();
     }
     else if (eventId == CONTEXT_UNCHECK_ALL)
     {
-        FreeFileSync::excludeAllRowsOnGrid(currentGridData);
+        FreeFileSync::FilterProcess::excludeAllRowsOnGrid(currentGridData);
         updateGuiGrid();
     }
 }
@@ -1128,10 +1050,12 @@ void MainDialog::OnContextColumnSelection(wxCommandEvent& event)
     if (eventId == CONTEXT_CUSTOMIZE_COLUMN_LEFT)
     {
         xmlAccess::ColumnAttributes colAttr = m_gridLeft->getColumnAttributes();
-        CustomizeColsDlg* customizeDlg = new CustomizeColsDlg(this, colAttr);
+        CustomizeColsDlg* customizeDlg = new CustomizeColsDlg(this, colAttr, globalSettings.gui.showFileIcons);
         if (customizeDlg->ShowModal() == CustomizeColsDlg::BUTTON_OKAY)
         {
             m_gridLeft->setColumnAttributes(colAttr);
+            m_gridLeft->enableFileIcons(globalSettings.gui.showFileIcons);
+            m_gridRight->enableFileIcons(globalSettings.gui.showFileIcons);
 
             m_gridLeft->setSortMarker(-1); //hide sort direction indicator on GUI grids
             m_gridMiddle->setSortMarker(-1);
@@ -1141,10 +1065,13 @@ void MainDialog::OnContextColumnSelection(wxCommandEvent& event)
     else if (eventId == CONTEXT_CUSTOMIZE_COLUMN_RIGHT)
     {
         xmlAccess::ColumnAttributes colAttr = m_gridRight->getColumnAttributes();
-        CustomizeColsDlg* customizeDlg = new CustomizeColsDlg(this, colAttr);
+        CustomizeColsDlg* customizeDlg = new CustomizeColsDlg(this, colAttr, globalSettings.gui.showFileIcons);
         if (customizeDlg->ShowModal() == CustomizeColsDlg::BUTTON_OKAY)
         {
             m_gridRight->setColumnAttributes(colAttr);
+            m_gridLeft->enableFileIcons(globalSettings.gui.showFileIcons);
+            m_gridRight->enableFileIcons(globalSettings.gui.showFileIcons);
+
             m_gridLeft->setSortMarker(-1); //hide sort direction indicator on GUI grids
             m_gridMiddle->setSortMarker(-1);
             m_gridRight->setSortMarker(-1);
@@ -1158,7 +1085,7 @@ void MainDialog::OnDirSelected(wxFileDirPickerEvent& event)
     //left and right directory text-control and dirpicker are synchronized by MainFolderDragDrop automatically
 
     //disable the sync button
-    enableSynchronization(false);
+    syncPreview->enableSynchronization(false);
 
     //clear grids
     currentGridData.clear();
@@ -1294,7 +1221,13 @@ void MainDialog::addRightFolderToHistory(const wxString& rightFolder)
 
 void MainDialog::OnSaveConfig(wxCommandEvent& event)
 {
-    const wxString defaultFileName = proposedConfigFileName.empty() ? wxT("SyncSettings.ffs_gui") : proposedConfigFileName;
+    trySaveConfig();
+}
+
+
+bool MainDialog::trySaveConfig() //return true if saved successfully
+{
+    const wxString defaultFileName = currentConfigFileName.empty() ? wxT("SyncSettings.ffs_gui") : currentConfigFileName;
 
     wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, defaultFileName, wxString(_("FreeFileSync configuration")) + wxT(" (*.ffs_gui)|*.ffs_gui"), wxFD_SAVE);
     if (filePicker->ShowModal() == wxID_OK)
@@ -1306,14 +1239,17 @@ void MainDialog::OnSaveConfig(wxCommandEvent& event)
             wxMessageDialog* messageDlg = new wxMessageDialog(this, wxString(_("File already exists. Overwrite?")) + wxT(" \"") + newFileName + wxT("\""), _("Warning") , wxOK | wxCANCEL);
 
             if (messageDlg->ShowModal() != wxID_OK)
-            {
-                OnSaveConfig(event); //retry
-                return;
-            }
+                return trySaveConfig(); //retry
         }
+
         if (writeConfigurationToXml(newFileName))
+        {
             pushStatusInformation(_("Configuration saved!"));
+            return true;
+        }
     }
+
+    return false;
 }
 
 
@@ -1347,6 +1283,34 @@ void MainDialog::OnMenuLoadConfig(wxCommandEvent& event)
 
 void MainDialog::loadConfiguration(const wxString& filename)
 {
+    //notify user about changed settings
+    if (globalSettings.gui.popupOnConfigChange && !currentConfigFileName.empty()) //only if check is active and non-default config file loaded
+    {
+        if (lastConfigurationSaved != getCurrentConfiguration())
+        {
+            bool dontShowAgain = !globalSettings.gui.popupOnConfigChange;
+
+            QuestionDlg* notifyChangeDlg = new QuestionDlg(this,
+                    QuestionDlg::BUTTON_YES | QuestionDlg::BUTTON_NO | QuestionDlg::BUTTON_CANCEL,
+                    _("Save changes to current configuration?"),
+                    dontShowAgain);
+
+            switch (notifyChangeDlg->ShowModal())
+            {
+            case QuestionDlg::BUTTON_YES:
+                if (!trySaveConfig())
+                    return;
+                break;
+            case QuestionDlg::BUTTON_NO:
+                globalSettings.gui.popupOnConfigChange = !dontShowAgain;
+                break;
+            case QuestionDlg::BUTTON_CANCEL:
+                return;
+            }
+        }
+    }
+    //------------------------------------------------------------------------------------
+
     if (!filename.IsEmpty())
     {   //clear grids
         currentGridData.clear();
@@ -1442,36 +1406,71 @@ void MainDialog::OnQuit(wxCommandEvent &event)
 
 void MainDialog::requestShutdown()
 {
-    /*
-    if (globalSettings.gui.popupOnConfigChange)
+    //notify user about changed settings
+    if (globalSettings.gui.popupOnConfigChange && !currentConfigFileName.empty()) //only if check is active and non-default config file loaded
     {
         if (lastConfigurationSaved != getCurrentConfiguration())
         {
-            ...
-wxID_OK
-            OnSaveConfig(wxCommandEvent& event)
+            bool dontShowAgain = !globalSettings.gui.popupOnConfigChange;
 
-            ;
-            wxMessageBox(wxT("ji"));
+            QuestionDlg* notifyChangeDlg = new QuestionDlg(this,
+                    QuestionDlg::BUTTON_YES | QuestionDlg::BUTTON_NO | QuestionDlg::BUTTON_CANCEL,
+                    _("Save changes to current configuration?"),
+                    dontShowAgain);
+
+            switch (notifyChangeDlg->ShowModal())
+            {
+            case QuestionDlg::BUTTON_YES:
+                if (!trySaveConfig())
+                    return;
+                break;
+            case QuestionDlg::BUTTON_NO:
+                globalSettings.gui.popupOnConfigChange = !dontShowAgain;
+                break;
+            case QuestionDlg::BUTTON_CANCEL:
+                return;
+            }
         }
     }
-    */
 
     Destroy();
 }
 
 
+void MainDialog::OnCheckRows(FFSCheckRowsEvent& event)
+{
+    const int lowerBound = std::min(event.rowFrom, event.rowTo);
+    const int upperBound = std::max(event.rowFrom, event.rowTo);
+
+    if (0 <= lowerBound)
+    {
+        std::set<int> selectedRowsOnView;
+
+        for (int i = lowerBound; i <= std::min(upperBound, int(gridDataView.elementsOnView()) - 1); ++i)
+            selectedRowsOnView.insert(i);
+
+        filterRangeManually(selectedRowsOnView, event.rowFrom);
+    }
+}
+
+
+void MainDialog::OnSetSyncDirection(FFSSyncDirectionEvent& event)
+{
+    const int lowerBound = std::min(event.rowFrom, event.rowTo);
+    const int upperBound = std::max(event.rowFrom, event.rowTo);
+
+    if (0 <= lowerBound)
+    {
+        for (int i = lowerBound; i <= std::min(upperBound, int(gridDataView.elementsOnView()) - 1); ++i)
+            gridDataView[i].direction = event.direction;
+
+        updateGuiGrid();
+    }
+}
+
+
 bool MainDialog::readConfigurationFromXml(const wxString& filename, bool programStartup)
 {
-    leftOnlyFilesActive   = true;
-    leftNewerFilesActive  = true;
-    differentFilesActive  = true;
-    rightNewerFilesActive = true;  //do not save/load these bool values from harddisk!
-    rightOnlyFilesActive  = true;  //it's more convenient to have them defaulted at startup
-    equalFilesActive      = false;
-    updateViewFilterButtons();
-
-
     //load XML
     xmlAccess::XmlGuiConfig guiCfg;  //structure to receive gui settings, already defaulted!!
     try
@@ -1494,11 +1493,29 @@ bool MainDialog::readConfigurationFromXml(const wxString& filename, bool program
         }
     }
 
+    //(re-)set view filter buttons
+    gridDataView.leftOnlyFilesActive   = true;
+    gridDataView.leftNewerFilesActive  = true;
+    gridDataView.differentFilesActive  = true;
+    gridDataView.rightNewerFilesActive = true;  //do not save/load these bool values from harddisk!
+    gridDataView.rightOnlyFilesActive  = true;  //it's more convenient to have them defaulted at startup
+    gridDataView.equalFilesActive      = false;
+
+    gridDataView.conflictFilesActive   = true;
+
+    gridDataView.syncDirLeftActive     = true;
+    gridDataView.syncDirRightActive    = true;
+    gridDataView.syncDirNoneActive     = true;
+
+    updateViewFilterButtons();
+
+
     //load main configuration into instance
     cfg = guiCfg.mainCfg;
 
     //update visible config on main window
     updateCompareButtons();
+
     updateFilterButton(m_bpButtonFilter, cfg.filterIsActive);
 
     //read folder pairs:
@@ -1542,6 +1559,8 @@ bool MainDialog::readConfigurationFromXml(const wxString& filename, bool program
 
     ignoreErrors = guiCfg.ignoreErrors;
 
+    syncPreview->enablePreview(guiCfg.syncPreviewEnabled);
+
     //###########################################################
     addFileToCfgHistory(filename); //put filename on list of last used config files
 
@@ -1550,12 +1569,12 @@ bool MainDialog::readConfigurationFromXml(const wxString& filename, bool program
     if (filename == xmlAccess::LAST_CONFIG_FILE) //set title
     {
         SetTitle(wxString(wxT("FreeFileSync - ")) + _("Folder Comparison and Synchronization"));
-        proposedConfigFileName.clear();
+        currentConfigFileName.clear();
     }
     else
     {
         SetTitle(wxString(wxT("FreeFileSync - ")) + filename);
-        proposedConfigFileName = filename;
+        currentConfigFileName = filename;
     }
 
     return true;
@@ -1585,12 +1604,12 @@ bool MainDialog::writeConfigurationToXml(const wxString& filename)
     if (filename == xmlAccess::LAST_CONFIG_FILE) //set title
     {
         SetTitle(wxString(wxT("FreeFileSync - ")) + _("Folder Comparison and Synchronization"));
-        proposedConfigFileName.clear();
+        currentConfigFileName.clear();
     }
     else
     {
         SetTitle(wxString(wxT("FreeFileSync - ")) + filename);
-        proposedConfigFileName = filename;
+        currentConfigFileName = filename;
     }
 
     return true;
@@ -1610,6 +1629,8 @@ xmlAccess::XmlGuiConfig MainDialog::getCurrentConfiguration() const
 
     guiCfg.ignoreErrors = ignoreErrors;
 
+    guiCfg.syncPreviewEnabled = syncPreview->previewIsEnabled();
+
     return guiCfg;
 }
 
@@ -1628,9 +1649,12 @@ void MainDialog::OnFilterButton(wxCommandEvent &event)
     updateFilterButton(m_bpButtonFilter, cfg.filterIsActive);
 
     if (cfg.filterIsActive)
-        FreeFileSync::filterGridData(currentGridData, cfg.includeFilter, cfg.excludeFilter);
+    {
+        FreeFileSync::FilterProcess filterInstance(cfg.includeFilter, cfg.excludeFilter);
+        filterInstance.filterGridData(currentGridData);
+    }
     else
-        FreeFileSync::includeAllRowsOnGrid(currentGridData);
+        FreeFileSync::FilterProcess::includeAllRowsOnGrid(currentGridData);
 
     updateGuiGrid();
 }
@@ -1653,24 +1677,26 @@ void MainDialog::OnHideFilteredButton(wxCommandEvent &event)
 
 void MainDialog::OnConfigureFilter(wxHyperlinkEvent &event)
 {
-    wxString beforeImage = cfg.includeFilter + wxChar(1) + cfg.excludeFilter;
+    const wxString beforeImage = cfg.includeFilter + wxChar(1) + cfg.excludeFilter;
 
     FilterDlg* filterDlg = new FilterDlg(this, cfg.includeFilter, cfg.excludeFilter);
     if (filterDlg->ShowModal() == FilterDlg::BUTTON_OKAY)
     {
-        wxString afterImage = cfg.includeFilter + wxChar(1) + cfg.excludeFilter;
+        const wxString afterImage = cfg.includeFilter + wxChar(1) + cfg.excludeFilter;
 
         if (beforeImage != afterImage)  //if filter settings are changed: set filtering to "on"
         {
             if (afterImage == (wxString(wxT("*")) + wxChar(1))) //default
             {
                 cfg.filterIsActive = false;
-                FreeFileSync::includeAllRowsOnGrid(currentGridData);
+                FreeFileSync::FilterProcess::includeAllRowsOnGrid(currentGridData);
             }
             else
             {
                 cfg.filterIsActive = true;
-                FreeFileSync::filterGridData(currentGridData, cfg.includeFilter, cfg.excludeFilter);
+
+                FreeFileSync::FilterProcess filterInstance(cfg.includeFilter, cfg.excludeFilter);
+                filterInstance.filterGridData(currentGridData);
             }
 
             updateFilterButton(m_bpButtonFilter, cfg.filterIsActive);
@@ -1684,42 +1710,75 @@ void MainDialog::OnConfigureFilter(wxHyperlinkEvent &event)
 
 void MainDialog::OnLeftOnlyFiles(wxCommandEvent& event)
 {
-    leftOnlyFilesActive = !leftOnlyFilesActive;
+    gridDataView.leftOnlyFilesActive = !gridDataView.leftOnlyFilesActive;
     updateViewFilterButtons();
     updateGuiGrid();
 };
 
 void MainDialog::OnLeftNewerFiles(wxCommandEvent& event)
 {
-    leftNewerFilesActive = !leftNewerFilesActive;
+    gridDataView.leftNewerFilesActive = !gridDataView.leftNewerFilesActive;
     updateViewFilterButtons();
     updateGuiGrid();
 };
 
 void MainDialog::OnDifferentFiles(wxCommandEvent& event)
 {
-    differentFilesActive = !differentFilesActive;
+    gridDataView.differentFilesActive = !gridDataView.differentFilesActive;
     updateViewFilterButtons();
     updateGuiGrid();
 };
 
 void MainDialog::OnRightNewerFiles(wxCommandEvent& event)
 {
-    rightNewerFilesActive = !rightNewerFilesActive;
+    gridDataView.rightNewerFilesActive = !gridDataView.rightNewerFilesActive;
     updateViewFilterButtons();
     updateGuiGrid();
 };
 
 void MainDialog::OnRightOnlyFiles(wxCommandEvent& event)
 {
-    rightOnlyFilesActive = !rightOnlyFilesActive;
+    gridDataView.rightOnlyFilesActive = !gridDataView.rightOnlyFilesActive;
     updateViewFilterButtons();
     updateGuiGrid();
 };
 
+
 void MainDialog::OnEqualFiles(wxCommandEvent& event)
 {
-    equalFilesActive = !equalFilesActive;
+    gridDataView.equalFilesActive = !gridDataView.equalFilesActive;
+    updateViewFilterButtons();
+    updateGuiGrid();
+};
+
+
+void MainDialog::OnConflictFiles(wxCommandEvent& event)
+{
+    gridDataView.conflictFilesActive = !gridDataView.conflictFilesActive;
+    updateViewFilterButtons();
+    updateGuiGrid();
+};
+
+
+void MainDialog::OnSyncDirLeft(wxCommandEvent& event)
+{
+    gridDataView.syncDirLeftActive = !gridDataView.syncDirLeftActive;
+    updateViewFilterButtons();
+    updateGuiGrid();
+};
+
+
+void MainDialog::OnSyncDirRight(wxCommandEvent& event)
+{
+    gridDataView.syncDirRightActive = !gridDataView.syncDirRightActive;
+    updateViewFilterButtons();
+    updateGuiGrid();
+};
+
+
+void MainDialog::OnSyncDirNone(wxCommandEvent& event)
+{
+    gridDataView.syncDirNoneActive = !gridDataView.syncDirNoneActive;
     updateViewFilterButtons();
     updateGuiGrid();
 };
@@ -1727,7 +1786,8 @@ void MainDialog::OnEqualFiles(wxCommandEvent& event)
 
 void MainDialog::updateViewFilterButtons()
 {
-    if (leftOnlyFilesActive)
+    //compare result buttons
+    if (gridDataView.leftOnlyFilesActive)
     {
         m_bpButtonLeftOnly->SetBitmapLabel(*globalResource.bitmapLeftOnlyAct);
         m_bpButtonLeftOnly->SetToolTip(_("Hide files that exist on left side only"));
@@ -1738,7 +1798,18 @@ void MainDialog::updateViewFilterButtons()
         m_bpButtonLeftOnly->SetToolTip(_("Show files that exist on left side only"));
     }
 
-    if (leftNewerFilesActive)
+    if (gridDataView.rightOnlyFilesActive)
+    {
+        m_bpButtonRightOnly->SetBitmapLabel(*globalResource.bitmapRightOnlyAct);
+        m_bpButtonRightOnly->SetToolTip(_("Hide files that exist on right side only"));
+    }
+    else
+    {
+        m_bpButtonRightOnly->SetBitmapLabel(*globalResource.bitmapRightOnlyDeact);
+        m_bpButtonRightOnly->SetToolTip(_("Show files that exist on right side only"));
+    }
+
+    if (gridDataView.leftNewerFilesActive)
     {
         m_bpButtonLeftNewer->SetBitmapLabel(*globalResource.bitmapLeftNewerAct);
         m_bpButtonLeftNewer->SetToolTip(_("Hide files that are newer on left"));
@@ -1749,29 +1820,7 @@ void MainDialog::updateViewFilterButtons()
         m_bpButtonLeftNewer->SetToolTip(_("Show files that are newer on left"));
     }
 
-    if (equalFilesActive)
-    {
-        m_bpButtonEqual->SetBitmapLabel(*globalResource.bitmapEqualAct);
-        m_bpButtonEqual->SetToolTip(_("Hide files that are equal"));
-    }
-    else
-    {
-        m_bpButtonEqual->SetBitmapLabel(*globalResource.bitmapEqualDeact);
-        m_bpButtonEqual->SetToolTip(_("Show files that are equal"));
-    }
-
-    if (differentFilesActive)
-    {
-        m_bpButtonDifferent->SetBitmapLabel(*globalResource.bitmapDifferentAct);
-        m_bpButtonDifferent->SetToolTip(_("Hide files that are different"));
-    }
-    else
-    {
-        m_bpButtonDifferent->SetBitmapLabel(*globalResource.bitmapDifferentDeact);
-        m_bpButtonDifferent->SetToolTip(_("Show files that are different"));
-    }
-
-    if (rightNewerFilesActive)
+    if (gridDataView.rightNewerFilesActive)
     {
         m_bpButtonRightNewer->SetBitmapLabel(*globalResource.bitmapRightNewerAct);
         m_bpButtonRightNewer->SetToolTip(_("Hide files that are newer on right"));
@@ -1782,15 +1831,71 @@ void MainDialog::updateViewFilterButtons()
         m_bpButtonRightNewer->SetToolTip(_("Show files that are newer on right"));
     }
 
-    if (rightOnlyFilesActive)
+    if (gridDataView.equalFilesActive)
     {
-        m_bpButtonRightOnly->SetBitmapLabel(*globalResource.bitmapRightOnlyAct);
-        m_bpButtonRightOnly->SetToolTip(_("Hide files that exist on right side only"));
+        m_bpButtonEqual->SetBitmapLabel(*globalResource.bitmapEqualAct);
+        m_bpButtonEqual->SetToolTip(_("Hide files that are equal"));
     }
     else
     {
-        m_bpButtonRightOnly->SetBitmapLabel(*globalResource.bitmapRightOnlyDeact);
-        m_bpButtonRightOnly->SetToolTip(_("Show files that exist on right side only"));
+        m_bpButtonEqual->SetBitmapLabel(*globalResource.bitmapEqualDeact);
+        m_bpButtonEqual->SetToolTip(_("Show files that are equal"));
+    }
+
+    if (gridDataView.differentFilesActive)
+    {
+        m_bpButtonDifferent->SetBitmapLabel(*globalResource.bitmapDifferentAct);
+        m_bpButtonDifferent->SetToolTip(_("Hide files that are different"));
+    }
+    else
+    {
+        m_bpButtonDifferent->SetBitmapLabel(*globalResource.bitmapDifferentDeact);
+        m_bpButtonDifferent->SetToolTip(_("Show files that are different"));
+    }
+
+    if (gridDataView.conflictFilesActive)
+    {
+        m_bpButtonConflict->SetBitmapLabel(*globalResource.bitmapConflictAct);
+        m_bpButtonConflict->SetToolTip(_("Hide conflicts"));
+    }
+    else
+    {
+        m_bpButtonConflict->SetBitmapLabel(*globalResource.bitmapConflictDeact);
+        m_bpButtonConflict->SetToolTip(_("Show conflicts"));
+    }
+
+    //sync preview buttons
+    if (gridDataView.syncDirLeftActive)
+    {
+        m_bpButtonSyncDirLeft->SetBitmapLabel(*globalResource.bitmapSyncDirLeftAct);
+        m_bpButtonSyncDirLeft->SetToolTip(_("Hide files that will be copied to the left side"));
+    }
+    else
+    {
+        m_bpButtonSyncDirLeft->SetBitmapLabel(*globalResource.bitmapSyncDirLeftDeact);
+        m_bpButtonSyncDirLeft->SetToolTip(_("Show files that will be copied to the left side"));
+    }
+
+    if (gridDataView.syncDirRightActive)
+    {
+        m_bpButtonSyncDirRight->SetBitmapLabel(*globalResource.bitmapSyncDirRightAct);
+        m_bpButtonSyncDirRight->SetToolTip(_("Hide files that will be copied to the right side"));
+    }
+    else
+    {
+        m_bpButtonSyncDirRight->SetBitmapLabel(*globalResource.bitmapSyncDirRightDeact);
+        m_bpButtonSyncDirRight->SetToolTip(_("Show files that will be copied to the right side"));
+    }
+
+    if (gridDataView.syncDirNoneActive)
+    {
+        m_bpButtonSyncDirNone->SetBitmapLabel(*globalResource.bitmapSyncDirNoneAct);
+        m_bpButtonSyncDirNone->SetToolTip(_("Hide files that won't be copied"));
+    }
+    else
+    {
+        m_bpButtonSyncDirNone->SetBitmapLabel(*globalResource.bitmapSyncDirNoneDeact);
+        m_bpButtonSyncDirNone->SetToolTip(_("Show files that won't be copied"));
     }
 }
 
@@ -1825,7 +1930,7 @@ void MainDialog::updateCompareButtons()
     }
 
     //disable the sync button
-    enableSynchronization(false);
+    syncPreview->enableSynchronization(false);
 
     //clear grids
     currentGridData.clear();
@@ -1867,13 +1972,22 @@ void MainDialog::OnCompare(wxCommandEvent &event)
         CompareStatusHandler statusHandler(this);
         cmpStatusHandlerTmp = &statusHandler;
 
+        //prepare filter
+        std::auto_ptr<FreeFileSync::FilterProcess> filterInstance(NULL);
+        if (cfg.filterIsActive)
+            filterInstance.reset(new FreeFileSync::FilterProcess(cfg.includeFilter, cfg.excludeFilter));
+
+        //begin comparison
         FreeFileSync::CompareProcess comparison(globalSettings.shared.traverseDirectorySymlinks,
                                                 globalSettings.shared.fileTimeTolerance,
+                                                globalSettings.shared.ignoreOneHourDiff,
                                                 globalSettings.shared.warningDependentFolders,
+                                                filterInstance.get(),
                                                 &statusHandler);
 
         comparison.startCompareProcess(getFolderPairs(),
                                        cfg.compareVar,
+                                       cfg.syncConfiguration,
                                        currentGridData);
 
         //if (output.size < 50000)
@@ -1881,26 +1995,22 @@ void MainDialog::OnCompare(wxCommandEvent &event)
         statusHandler.forceUiRefresh(); //keep total number of scanned files up to date
 
         gridDataView.sortView(GridView::SORT_BY_DIRECTORY, true, true);
-
-        //filter currentGridData if option is set
-        if (cfg.filterIsActive)
-            FreeFileSync::filterGridData(currentGridData, cfg.includeFilter, cfg.excludeFilter);
     }
     catch (AbortThisProcess& theException)
     {
         aborted = true;
     }
-    cmpStatusHandlerTmp = 0;
+    cmpStatusHandlerTmp = NULL;
 
     if (aborted)
     {   //disable the sync button
-        enableSynchronization(false);
+        syncPreview->enableSynchronization(false);
         m_buttonCompare->SetFocus();
     }
     else
     {   //once compare is finished enable the sync button
-        enableSynchronization(true);
-        m_buttonSync->SetFocus();
+        syncPreview->enableSynchronization(true);
+        m_buttonStartSync->SetFocus();
 
         //hide sort direction indicator on GUI grids
         m_gridLeft->setSortMarker(-1);
@@ -1961,24 +2071,43 @@ void MainDialog::updateGuiGrid()
         m_gridRight->SetRowLabelSize(nrOfDigits * digitWidth + 4);
     }
 
+    //update sync preview statistics
+    calculatePreview();
+
     m_gridLeft->EndBatch();
     m_gridMiddle->EndBatch();
     m_gridRight->EndBatch();
 }
 
 
-void MainDialog::OnSync(wxCommandEvent& event)
+void MainDialog::OnSwitchView(wxCommandEvent& event)
 {
-    SyncDialog* syncDlg = new SyncDialog(this, currentGridData, cfg, ignoreErrors, synchronizationEnabled);
-    if (syncDlg->ShowModal() == SyncDialog::BUTTON_START)
+    //toggle view
+    syncPreview->enablePreview(!syncPreview->previewIsEnabled());
+}
+
+
+void MainDialog::OnSyncSettings(wxCommandEvent& event)
+{
+    SyncDialog* syncDlg = new SyncDialog(this, currentGridData, cfg, ignoreErrors);
+    if (syncDlg->ShowModal() == SyncDialog::BUTTON_OKAY)
+    {
+        redetermineSyncDirection(cfg.syncConfiguration, currentGridData);
+        updateGuiGrid();
+    }
+}
+
+
+void MainDialog::OnStartSync(wxCommandEvent& event)
+{
+    if (syncPreview->synchronizationIsEnabled())
     {
         //check if there are files/folders to be sync'ed at all
-        if (!synchronizationNeeded(currentGridData, cfg.syncConfiguration))
+        if (!synchronizationNeeded(currentGridData))
         {
             wxMessageBox(_("Nothing to synchronize according to configuration!"), _("Information"), wxICON_WARNING);
             return;
         }
-
 
         wxBusyCursor dummy; //show hourglass cursor
 
@@ -1988,6 +2117,15 @@ void MainDialog::OnSync(wxCommandEvent& event)
             //class handling status updates and error messages
             SyncStatusHandler statusHandler(this, ignoreErrors);
 
+//            //small reminder that synchronization will be starting immediately
+//            if (globalSettings.shared.warningSynchronizationStarting) //test if check should be executed
+//            {
+//                bool dontShowAgain = false;
+//                statusHandler.reportWarning(_(""),
+//                                            dontShowAgain);
+//                globalSettings.shared.warningSynchronizationStarting = !dontShowAgain;
+//            }
+
             //start synchronization and return elements that were not sync'ed in currentGridData
             FreeFileSync::SyncProcess synchronization(
                 cfg.useRecycleBin,
@@ -1995,9 +2133,10 @@ void MainDialog::OnSync(wxCommandEvent& event)
                 globalSettings.shared.traverseDirectorySymlinks,
                 globalSettings.shared.warningSignificantDifference,
                 globalSettings.shared.warningNotEnoughDiskSpace,
+                globalSettings.shared.warningUnresolvedConflicts,
                 &statusHandler);
 
-            synchronization.startSynchronizationProcess(currentGridData, cfg.syncConfiguration);
+            synchronization.startSynchronizationProcess(currentGridData);
         }
         catch (AbortThisProcess& theException)
         {   //do NOT disable the sync button: user might want to try to sync the REMAINING rows
@@ -2012,16 +2151,15 @@ void MainDialog::OnSync(wxCommandEvent& event)
         m_gridMiddle->ClearSelection();
         m_gridRight->ClearSelection();
 
-        if (gridDataView.elementsTotal() > 0)
-            pushStatusInformation(_("Not all items were synchronized! Have a look at the list."));
+        if (!gridDataView.refGridIsEmpty())
+            pushStatusInformation(_("Not all items have been synchronized! Have a look at the list."));
         else
         {
             pushStatusInformation(_("All items have been synchronized!"));
-            enableSynchronization(false);
+            syncPreview->enableSynchronization(false);
         }
     }
 }
-
 
 void MainDialog::OnLeftGridDoubleClick(wxGridEvent& event)
 {
@@ -2056,7 +2194,7 @@ void MainDialog::OnSortLeftGrid(wxGridEvent& event)
         const xmlAccess::ColumnTypes columnType = m_gridLeft->getTypeAtPos(currentSortColumn);
         switch (columnType)
         {
-        case xmlAccess::FULL_NAME:
+        case xmlAccess::FULL_PATH:
             gridDataView.sortView(GridView::SORT_BY_DIRECTORY, true, sortAscending);
             break;
         case xmlAccess::FILENAME:
@@ -2134,7 +2272,7 @@ void MainDialog::OnSortRightGrid(wxGridEvent& event)
         const xmlAccess::ColumnTypes columnType = m_gridRight->getTypeAtPos(currentSortColumn);
         switch (columnType)
         {
-        case xmlAccess::FULL_NAME:
+        case xmlAccess::FULL_PATH:
             gridDataView.sortView(GridView::SORT_BY_DIRECTORY, false, sortAscending);
             break;
         case xmlAccess::FILENAME:
@@ -2167,7 +2305,7 @@ void MainDialog::OnSortRightGrid(wxGridEvent& event)
 }
 
 
-void MainDialog::OnSwapDirs( wxCommandEvent& event )
+void MainDialog::OnSwapSides(wxCommandEvent& event)
 {
     //swap directory names: main pair
     const wxString leftDir  = m_directoryLeft->GetValue();
@@ -2189,8 +2327,10 @@ void MainDialog::OnSwapDirs( wxCommandEvent& event )
     }
 
     //swap view filter
-    std::swap(leftOnlyFilesActive, rightOnlyFilesActive);
-    std::swap(leftNewerFilesActive, rightNewerFilesActive);
+    std::swap(gridDataView.leftOnlyFilesActive, gridDataView.rightOnlyFilesActive);
+    std::swap(gridDataView.leftNewerFilesActive, gridDataView.rightNewerFilesActive);
+    std::swap(gridDataView.syncDirLeftActive, gridDataView.syncDirRightActive);
+
     updateViewFilterButtons();
 
     //swap grid information
@@ -2202,16 +2342,11 @@ void MainDialog::OnSwapDirs( wxCommandEvent& event )
 
 void MainDialog::updateGridViewData()
 {
-    const GridView::StatusInfo result = gridDataView.update(
-                                            leftOnlyFilesActive,
-                                            rightOnlyFilesActive,
-                                            leftNewerFilesActive,
-                                            rightNewerFilesActive,
-                                            differentFilesActive,
-                                            equalFilesActive,
-                                            hideFilteredElements);
+    const GridView::StatusInfo result = gridDataView.update(hideFilteredElements, syncPreview->previewIsEnabled());
 
     //hide or enable view filter buttons
+
+    //comparison result view buttons
     if (result.existsLeftOnly)
         m_bpButtonLeftOnly->Show();
     else
@@ -2242,12 +2377,38 @@ void MainDialog::updateGridViewData()
     else
         m_bpButtonEqual->Hide();
 
-    if (    result.existsLeftOnly   ||
-            result.existsRightOnly  ||
-            result.existsLeftNewer  ||
-            result.existsRightNewer ||
-            result.existsDifferent  ||
-            result.existsEqual)
+    if (result.existsConflict)
+        m_bpButtonConflict->Show();
+    else
+        m_bpButtonConflict->Hide();
+
+    //sync preview buttons
+    if (result.existsSyncDirLeft)
+        m_bpButtonSyncDirLeft->Show();
+    else
+        m_bpButtonSyncDirLeft->Hide();
+
+    if (result.existsSyncDirRight)
+        m_bpButtonSyncDirRight->Show();
+    else
+        m_bpButtonSyncDirRight->Hide();
+
+    if (result.existsSyncDirNone)
+        m_bpButtonSyncDirNone->Show();
+    else
+        m_bpButtonSyncDirNone->Hide();
+
+
+    if (    result.existsLeftOnly     ||
+            result.existsRightOnly    ||
+            result.existsLeftNewer    ||
+            result.existsRightNewer   ||
+            result.existsDifferent    ||
+            result.existsEqual        ||
+            result.existsConflict     ||
+            result.existsSyncDirLeft  ||
+            result.existsSyncDirRight ||
+            result.existsSyncDirNone)
     {
         m_panel112->Show();
         m_panel112->Layout();
@@ -2304,8 +2465,7 @@ void MainDialog::updateGridViewData()
     }
 
     const wxString objectsView = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(gridDataView.elementsOnView()));
-    const unsigned int objCount = gridDataView.elementsTotal();
-    if (objCount == 1)
+    if (result.objectsTotal == 1)
     {
         wxString outputString = _("%x of 1 row in view");
         outputString.Replace(wxT("%x"), objectsView, false);
@@ -2313,7 +2473,7 @@ void MainDialog::updateGridViewData()
     }
     else
     {
-        const wxString objectsTotal = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(objCount));
+        const wxString objectsTotal = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(result.objectsTotal));
 
         wxString outputString = _("%x of %y rows in view");
         outputString.Replace(wxT("%x"), objectsView, false);
@@ -2373,7 +2533,7 @@ void MainDialog::OnAddFolderPair(wxCommandEvent& event)
     addFolderPair(wxEmptyString, wxEmptyString);
 
     //disable the sync button
-    enableSynchronization(false);
+    syncPreview->enableSynchronization(false);
 
     //clear grids
     currentGridData.clear();
@@ -2392,7 +2552,7 @@ void MainDialog::OnRemoveFolderPair(wxCommandEvent& event)
             removeFolderPair(i - additionalFolderPairs.begin());
 
             //disable the sync button
-            enableSynchronization(false);
+            syncPreview->enableSynchronization(false);
 
             //clear grids
             currentGridData.clear();
@@ -2400,6 +2560,33 @@ void MainDialog::OnRemoveFolderPair(wxCommandEvent& event)
             return;
         }
     }
+}
+
+
+void MainDialog::calculatePreview()
+{
+    //update preview of bytes to be transferred:
+    int objectsToCreate    = 0;
+    int objectsToOverwrite = 0;
+    int objectsToDelete    = 0;
+    int conflictsDummy     = 0;
+    wxULongLong dataToProcess;
+    FreeFileSync::calcTotalBytesToSync(currentGridData,
+                                       objectsToCreate,
+                                       objectsToOverwrite,
+                                       objectsToDelete,
+                                       conflictsDummy,
+                                       dataToProcess);
+
+    const wxString toCreate = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(objectsToCreate));
+    const wxString toUpdate = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(objectsToOverwrite));
+    const wxString toDelete = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(objectsToDelete));
+    const wxString data     = FreeFileSync::formatFilesizeToShortString(dataToProcess);
+
+    m_textCtrlCreate->SetValue(toCreate);
+    m_textCtrlUpdate->SetValue(toUpdate);
+    m_textCtrlDelete->SetValue(toDelete);
+    m_textCtrlData->SetValue(data);
 }
 
 
@@ -2469,7 +2656,7 @@ void MainDialog::addFolderPair(const std::vector<FolderPair>& newPairs)
 
     m_scrolledWindowFolderPairs->Layout();
     bSizer1->Layout();
-    m_bpButtonSwap->Refresh();
+    m_bpButtonSwitchView->Refresh();
 }
 
 
@@ -2637,10 +2824,9 @@ void MainDialog::OnMenuQuit(wxCommandEvent& event)
     requestShutdown();
 }
 
-
 //#########################################################################################################
-//language selection
 
+//language selection
 void MainDialog::switchProgramLanguage(const int langID)
 {
     programLanguage->setLanguage(langID); //language is a global attribute
@@ -2734,4 +2920,90 @@ void MainDialog::OnMenuLangSpanish(wxCommandEvent& event)
     switchProgramLanguage(wxLANGUAGE_SPANISH);
 }
 
+//#########################################################################################################
 
+
+SyncPreview::SyncPreview(MainDialog* mainDlg) :
+        mainDlg_(mainDlg),
+        syncPreviewEnabled(false),
+        synchronizationEnabled(false) {}
+
+
+bool SyncPreview::previewIsEnabled()
+{
+    return syncPreviewEnabled;
+}
+
+
+void SyncPreview::enablePreview(bool value)
+{
+    if (value)
+    {
+        syncPreviewEnabled = true;
+
+        mainDlg_->m_bpButtonSwitchView->SetBitmapLabel(*globalResource.bitmapSyncView);
+        mainDlg_->m_bpButtonSwitchView->SetToolTip(_("Synchronization Preview"));
+
+        /*mainDlg_->m_bpButtonSyncConfig->Show();
+        mainDlg_->m_bpButtonSyncConfig->Enable();
+
+        mainDlg_->m_buttonStartSync->Show();
+        mainDlg_->m_buttonStartSync->Enable();*/
+
+        mainDlg_->m_panelSyncPreview->Show();
+
+        mainDlg_->bSizer6->Layout();
+
+        //toggle display of sync preview in middle grid
+        mainDlg_->m_gridMiddle->enableSyncPreview(true);
+
+        mainDlg_->Refresh();
+    }
+    else
+    {
+        syncPreviewEnabled = false;
+
+        mainDlg_->m_bpButtonSwitchView->SetBitmapLabel(*globalResource.bitmapCmpView);
+        mainDlg_->m_bpButtonSwitchView->SetToolTip(_("Comparison Result"));
+
+        /*mainDlg_->m_bpButtonSyncConfig->Disable();
+        mainDlg_->m_bpButtonSyncConfig->Hide();
+
+        mainDlg_->m_buttonStartSync->Disable();
+        mainDlg_->m_buttonStartSync->Hide();*/
+
+        mainDlg_->m_panelSyncPreview->Hide();
+
+        mainDlg_->bSizer6->Layout();
+
+        //toggle display of sync preview in middle grid
+        mainDlg_->m_gridMiddle->enableSyncPreview(false);
+
+        mainDlg_->Refresh();
+    }
+
+    mainDlg_->updateGuiGrid();
+}
+
+
+void SyncPreview::enableSynchronization(bool value)
+{
+    if (value)
+    {
+        synchronizationEnabled = true;
+        mainDlg_->m_buttonStartSync->SetForegroundColour(*wxBLACK);
+        mainDlg_->m_buttonStartSync->setBitmapFront(*globalResource.bitmapSync);
+    }
+    else
+    {
+        synchronizationEnabled = false;
+        mainDlg_->m_buttonStartSync->SetForegroundColour(wxColor(94, 94, 94)); //grey
+        mainDlg_->m_buttonStartSync->setBitmapFront(*globalResource.bitmapSyncDisabled);
+    }
+}
+
+
+bool SyncPreview::synchronizationIsEnabled()
+{
+    return synchronizationEnabled;
+}

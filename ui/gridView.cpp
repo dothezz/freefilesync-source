@@ -4,33 +4,51 @@
 using FreeFileSync::GridView;
 
 
-GridView::StatusInfo GridView::update(
-    const bool includeLeftOnly,
-    const bool includeRightOnly,
-    const bool includeLeftNewer,
-    const bool includeRightNewer,
-    const bool includeDifferent,
-    const bool includeEqual,
-    const bool hideFiltered)
+GridView::GridView(FolderComparison& results) :
+        leftOnlyFilesActive(false),
+        rightOnlyFilesActive(false),
+        leftNewerFilesActive(false),
+        rightNewerFilesActive(false),
+        differentFilesActive(false),
+        equalFilesActive(false),
+        conflictFilesActive(false),
+        syncDirLeftActive(false),
+        syncDirRightActive(false),
+        syncDirNoneActive(false),
+        folderCmp(results) {}
+
+
+GridView::StatusInfo::StatusInfo() :
+        existsLeftOnly(false),
+        existsRightOnly(false),
+        existsLeftNewer(false),
+        existsRightNewer(false),
+        existsDifferent(false),
+        existsEqual(false),
+        existsConflict(false),
+
+        existsSyncDirLeft(false),
+        existsSyncDirRight(false),
+        existsSyncDirNone(false),
+
+        filesOnLeftView(0),
+        foldersOnLeftView(0),
+        filesOnRightView(0),
+        foldersOnRightView(0),
+        objectsTotal(0) {}
+
+template <bool syncPreviewActive>
+GridView::StatusInfo GridView::update_sub(const bool hideFiltered)
 {
     StatusInfo output;
-    output.existsLeftOnly   = false;
-    output.existsRightOnly  = false;
-    output.existsLeftNewer  = false;
-    output.existsRightNewer = false;
-    output.existsDifferent  = false;
-    output.existsEqual      = false;
-
-    output.filesOnLeftView    = 0;
-    output.foldersOnLeftView  = 0;
-    output.filesOnRightView   = 0;
-    output.foldersOnRightView = 0;
 
     refView.clear();
 
     for (FolderComparison::const_iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
     {
         const FileComparison& fileCmp = j->fileCmp;
+
+        output.objectsTotal += j->fileCmp.size();
 
         RefIndex newEntry;
         newEntry.folderIndex = j - folderCmp.begin();
@@ -42,34 +60,68 @@ GridView::StatusInfo GridView::update(
                 continue;
 
             //process UI filter settings
-            switch (i->cmpResult)
+            if (syncPreviewActive) //synchronization preview
             {
-            case FILE_LEFT_SIDE_ONLY:
-                output.existsLeftOnly = true;
-                if (!includeLeftOnly) continue;
-                break;
-            case FILE_RIGHT_SIDE_ONLY:
-                output.existsRightOnly = true;
-                if (!includeRightOnly) continue;
-                break;
-            case FILE_LEFT_NEWER:
-                output.existsLeftNewer = true;
-                if (!includeLeftNewer) continue;
-                break;
-            case FILE_RIGHT_NEWER:
-                output.existsRightNewer = true;
-                if (!includeRightNewer) continue;
-                break;
-            case FILE_DIFFERENT:
-                output.existsDifferent = true;
-                if (!includeDifferent) continue;
-                break;
-            case FILE_EQUAL:
-                output.existsEqual = true;
-                if (!includeEqual) continue;
-                break;
-            default:
-                assert (false);
+                //exclude result "=="
+                if (i->cmpResult == FILE_EQUAL) //note: consider elementsTotal()!
+                {
+                    --output.objectsTotal;
+                    continue;
+                }
+
+                switch (i->direction)
+                {
+                case SYNC_DIR_LEFT:
+                    output.existsSyncDirLeft = true;
+                    if (!syncDirLeftActive) continue;
+                    break;
+                case SYNC_DIR_RIGHT:
+                    output.existsSyncDirRight = true;
+                    if (!syncDirRightActive) continue;
+                    break;
+                case SYNC_DIR_NONE:
+                    output.existsSyncDirNone = true;
+                    if (!syncDirNoneActive) continue;
+                    break;
+                case SYNC_UNRESOLVED_CONFLICT:
+                    output.existsConflict = true;
+                    if (!conflictFilesActive) continue;
+                    break;
+                }
+            }
+            else //comparison results view
+            {
+                switch (i->cmpResult)
+                {
+                case FILE_LEFT_SIDE_ONLY:
+                    output.existsLeftOnly = true;
+                    if (!leftOnlyFilesActive) continue;
+                    break;
+                case FILE_RIGHT_SIDE_ONLY:
+                    output.existsRightOnly = true;
+                    if (!rightOnlyFilesActive) continue;
+                    break;
+                case FILE_LEFT_NEWER:
+                    output.existsLeftNewer = true;
+                    if (!leftNewerFilesActive) continue;
+                    break;
+                case FILE_RIGHT_NEWER:
+                    output.existsRightNewer = true;
+                    if (!rightNewerFilesActive) continue;
+                    break;
+                case FILE_DIFFERENT:
+                    output.existsDifferent = true;
+                    if (!differentFilesActive) continue;
+                    break;
+                case FILE_EQUAL:
+                    output.existsEqual = true;
+                    if (!equalFilesActive) continue;
+                    break;
+                case FILE_CONFLICT:
+                    output.existsConflict = true;
+                    if (!conflictFilesActive) continue;
+                    break;
+                }
             }
 
             //calculate total number of bytes for each side
@@ -89,7 +141,6 @@ GridView::StatusInfo GridView::update(
             else if (i->fileDescrRight.objType == FileDescrLine::TYPE_DIRECTORY)
                 ++output.foldersOnRightView;
 
-
             newEntry.rowIndex = i - fileCmp.begin();
             refView.push_back(newEntry);
         }
@@ -102,6 +153,14 @@ GridView::StatusInfo GridView::update(
     }
 
     return output;
+}
+
+
+GridView::StatusInfo GridView::update(const bool hideFiltered, const bool syncPreviewActive)
+{
+    return syncPreviewActive ?
+           update_sub<true>(hideFiltered) :
+           update_sub<false>(hideFiltered);
 }
 
 
@@ -121,13 +180,12 @@ void GridView::viewRefToFolderRef(const std::set<int>& viewRef, FolderCompRef& o
 }
 
 
-unsigned int GridView::elementsTotal() const
+bool GridView::refGridIsEmpty() const
 {
-    unsigned int total = 0;
     for (FolderComparison::const_iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
-        total += j->fileCmp.size();
+        if (!j->fileCmp.empty()) return false;
 
-    return total;
+    return true;
 }
 
 
@@ -140,9 +198,7 @@ void bubbleSort(FreeFileSync::FolderComparison& folderCmp, CompareFct compare)
         for (int j = 0; j <= i; ++j)
             if (compare(folderCmp[j + 1], folderCmp[j]))
             {
-                std::swap(folderCmp[j + 1].syncPair, folderCmp[j].syncPair);
-                folderCmp[j + 1].fileCmp.swap(folderCmp[j].fileCmp);
-
+                folderCmp[j + 1].swap(folderCmp[j]);
                 swapped = true;
             }
 
@@ -158,8 +214,8 @@ void GridView::sortView(const SortType type, const bool onLeft, const bool ascen
 
     if (type == SORT_BY_DIRECTORY)
     {
-        //specialization: use own sorting function based on vector<FileCompareLine>::swap()
-        //bubble sort is no performance issue since number of folder pairs should be "small"
+        //specialization: use custom sorting function based on FolderComparison::swap()
+        //bubble sort is no performance issue since number of folder pairs should be "very small"
         if      (ascending  &&  onLeft) bubbleSort(folderCmp, sortByDirectory<ASCENDING,  SORT_ON_LEFT>);
         else if (ascending  && !onLeft) bubbleSort(folderCmp, sortByDirectory<ASCENDING,  SORT_ON_RIGHT>);
         else if (!ascending &&  onLeft) bubbleSort(folderCmp, sortByDirectory<DESCENDING, SORT_ON_LEFT>);

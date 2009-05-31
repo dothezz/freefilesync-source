@@ -209,7 +209,7 @@ BatchStatusHandlerSilent::~BatchStatusHandlerSilent()
     unsigned int failedItems = unhandledErrors.GetCount();
 
     //write result
-    if (abortRequested)
+    if (abortIsRequested())
     {
         returnValue = -4;
         m_log->write(_("Synchronization aborted!"), _("Error"));
@@ -227,8 +227,18 @@ BatchStatusHandlerSilent::~BatchStatusHandlerSilent()
 inline
 void BatchStatusHandlerSilent::updateStatusText(const Zstring& text)
 {
-    if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING)
+    switch (currentProcess)
+    {
+    case StatusHandler::PROCESS_SCANNING:
+    case StatusHandler::PROCESS_COMPARING_CONTENT:
+        break;
+    case StatusHandler::PROCESS_SYNCHRONIZING:
         m_log->write(text.c_str(), _("Info"));
+        break;
+    case StatusHandler::PROCESS_NONE:
+        assert(false);
+        break;
+    }
 }
 
 
@@ -360,7 +370,7 @@ void BatchStatusHandlerSilent::reportWarning(const Zstring& warningMessage, bool
 
 void BatchStatusHandlerSilent::addFinalInfo(const Zstring& infoMessage)
 {
-        m_log->write(infoMessage.c_str(), _("Info"));
+    m_log->write(infoMessage.c_str(), _("Info"));
 }
 
 
@@ -372,7 +382,7 @@ void BatchStatusHandlerSilent::forceUiRefresh()
 
 void BatchStatusHandlerSilent::abortThisProcess() //used by sys-tray menu
 {
-    abortRequested = true;
+    requestAbortion();
     throw FreeFileSync::AbortThisProcess();
 }
 
@@ -416,7 +426,7 @@ BatchStatusHandlerGui::~BatchStatusHandlerGui()
         finalMessage += finalInfo + wxT("\n\n");
 
     //notify to syncStatusFrame that current process has ended
-    if (abortRequested)
+    if (abortIsRequested())
     {
         returnValue = -4;
         finalMessage += _("Synchronization aborted!");
@@ -450,41 +460,49 @@ void BatchStatusHandlerGui::initNewProcess(int objectsTotal, wxLongLong dataTota
 {
     currentProcess = processID;
 
-    if (currentProcess == StatusHandler::PROCESS_SCANNING)
+    switch (currentProcess)
+    {
+    case StatusHandler::PROCESS_SCANNING:
+        syncStatusFrame->resetGauge(0, 0); //dummy call to initialize some gui elements (remaining time, speed)
         syncStatusFrame->setCurrentStatus(SyncStatus::SCANNING);
-
-    else if (currentProcess == StatusHandler::PROCESS_COMPARING_CONTENT)
-    {
+        break;
+    case StatusHandler::PROCESS_COMPARING_CONTENT:
         syncStatusFrame->resetGauge(objectsTotal, dataTotal);
-        syncStatusFrame->setCurrentStatus(SyncStatus::COMPARING);
-    }
-
-    else if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING)
-    {
+        syncStatusFrame->setCurrentStatus(SyncStatus::COMPARING_CONTENT);
+        break;
+    case StatusHandler::PROCESS_SYNCHRONIZING:
         syncStatusFrame->resetGauge(objectsTotal, dataTotal);
         syncStatusFrame->setCurrentStatus(SyncStatus::SYNCHRONIZING);
+        break;
+    case StatusHandler::PROCESS_NONE:
+        assert(false);
+        break;
     }
-    else assert(false);
 }
 
 
 inline
 void BatchStatusHandlerGui::updateProcessedData(int objectsProcessed, wxLongLong dataProcessed)
 {
-    if (currentProcess == StatusHandler::PROCESS_SCANNING)
-        ;
-    else if (currentProcess == StatusHandler::PROCESS_COMPARING_CONTENT)
+    switch (currentProcess)
+    {
+    case StatusHandler::PROCESS_SCANNING:
+        break;
+    case StatusHandler::PROCESS_COMPARING_CONTENT:
+    case StatusHandler::PROCESS_SYNCHRONIZING:
         syncStatusFrame->incProgressIndicator_NoUpdate(objectsProcessed, dataProcessed);
-    else if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING)
-        syncStatusFrame->incProgressIndicator_NoUpdate(objectsProcessed, dataProcessed);
-    else assert(false);
+        break;
+    case StatusHandler::PROCESS_NONE:
+        assert(false);
+        break;
+    }
 }
 
 
 ErrorHandler::Response BatchStatusHandlerGui::reportError(const Zstring& errorMessage)
 {
     //add current time before error message
-    wxString errorWithTime = wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + errorMessage.c_str();
+    const wxString errorWithTime = wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + errorMessage.c_str();
 
     switch (m_handleError)
     {
@@ -545,6 +563,8 @@ void BatchStatusHandlerGui::reportWarning(const Zstring& warningMessage, bool& d
     case xmlAccess::ON_ERROR_POPUP:
     case xmlAccess::ON_ERROR_EXIT: //show popup in this case also
     {
+        syncStatusFrame->updateStatusDialogNow();
+
         //show popup and ask user how to handle warning
         bool dontWarnAgain = false;
         WarningDlg* warningDlg = new WarningDlg(NULL,
@@ -585,12 +605,12 @@ void BatchStatusHandlerGui::forceUiRefresh()
 
 void BatchStatusHandlerGui::abortThisProcess()
 {
-    abortRequested = true;
+    requestAbortion();
     throw FreeFileSync::AbortThisProcess();  //abort can be triggered by syncStatusFrame
 }
 
 
 void BatchStatusHandlerGui::addFinalInfo(const Zstring& infoMessage)
 {
-        finalInfo = infoMessage.c_str();
+    finalInfo = infoMessage.c_str();
 }

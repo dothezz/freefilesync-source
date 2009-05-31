@@ -54,7 +54,7 @@ public:
     virtual void forceUiRefresh() = 0;
 
     void requestUiRefresh(bool allowAbort = true); //opportunity to abort must be implemented in a frequently executed method like requestUiRefresh()
-    void requestAbortion();  //does NOT call abortThisProcess immediately, but when appropriate (e.g. async. processes finished)
+    void requestAbortion();  //this does NOT call abortThisProcess immediately, but when appropriate (e.g. async. processes finished)
     bool abortIsRequested();
 
 
@@ -63,7 +63,7 @@ public:
     virtual void reportFatalError(const Zstring& errorMessage) = 0;              //non-recoverable error situation, implement abort!
     virtual void reportWarning(const Zstring& warningMessage, bool& dontShowAgain) = 0;
 
-protected:
+private:
     virtual void abortThisProcess() = 0;
 
     bool abortRequested;

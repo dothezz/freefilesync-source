@@ -50,7 +50,7 @@ public:
 
             //create a custom event on drop window: execute event after file dropping is completed! (e.g. after mouse is released)
             FFSFileDropEvent evt(droppedFileName, dropWindow_);
-            dropWindow_->GetEventHandler()->AddPendingEvent(evt);
+            dropWindow_->AddPendingEvent(evt);
         }
         return false;
     }

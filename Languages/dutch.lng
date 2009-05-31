@@ -44,8 +44,6 @@
 &Annuleren
 &Check for new version
 &Controleer op nieuwe versie
-&Compare
-&Vergelijken
 &Create batch job
 &Creëer batchjob
 &Default
@@ -66,6 +64,8 @@
 &Laden
 &Load configuration
 &Laad de configuratie
+&No
+&Nee
 &OK
 &OK
 &Pause
@@ -76,16 +76,18 @@
 &Opnieuw proberen
 &Save
 &Opslaan
-&Start
-&Start
-&Synchronize...
-&Synchroniseer...
+&Yes
+&Ja
 ,
 .
+-	do not copy\n
+-	niet kopiëren\n
+- conflict
+- conflict
+- conflict (same date, different size)
+- conflict (zelfde datum, verschillende grootte)
 - different
 - verschillend
-- different (same date, different size)
-- verschillend (zelfde datum, verschillende grootte)
 - equal
 - gelijk
 - exists left only
@@ -100,8 +102,8 @@
 - rechts
 - right newer
 - rechts is nieuwer
-- same date (different size)
-- zelfde datum (verschillende grootte)
+->	copy to right side\n
+->	kopieer naar de rechterkant\n
 -Open-Source file synchronization-
 -Open-Source bestandssynchronisatie-
 .
@@ -114,16 +116,16 @@
 1 bestand,
 1. &Compare
 1. &Vergelijk
-1. Enter full file or directory names separated by ';' or a new line.
-1. Geef de volledige naam van het bestand of pad gescheiden bij ';' of een nieuwe regel.
+1. Enter relative file or directory names separated by ';' or a new line.
+1. Vul de relatieve bestandsnaam of map in, gescheiden bij ';' of een nieuwe regel.
 2. &Synchronize...
 2. &Synchroniseer...
 2. Use wildcard characters '*' and '?'.
 2. U kunt gebruik maken van wildcard karakters zoals '*' en '?'.
 3. Exclude files directly on main grid via context menu.
 3. Sluit bestanden direct uit in het hoofscherm via een contextmenu
-4. Keep the number of (different) entries small for best performance.
-4. Hou het aantal (verschillende) posten klein voor de beste prestaties.
+<-	copy to left side\n
+<-	kopieer naar de linkerkant\n
 <<	left file is newer\n
 <<	linker bestand is nieuwer\n
 <Directory>
@@ -134,8 +136,8 @@
 <veelvoudige selectie>
 <|	file on left side only\n
 <|	bestand bestaat alleen links\n
-==	files are equal\n\n
-==	bestanden zijn gelijk\n\n
+==	files are equal\n
+==	bestanden zijn gelijk\n
 >>	right file is newer\n
 >>	rechter bestand is nieuwer\n
 A newer version of FreeFileSync is available:
@@ -168,6 +170,8 @@ Batch job
 Batch taak
 Big thanks for localizing FreeFileSync goes out to:
 Extra dank voor het vertalen van FreeFileSync gaat naar:
+Browse
+Bestand opzoeken
 Build:
 Gebouwd:
 Cancel
@@ -178,6 +182,8 @@ Choose to hide filtered files/directories from list
 Gefilterde bestanden niet/wel weergeven
 Comma separated list
 Komma gescheiden lijst
+Compare
+Vergelijk
 Compare both sides
 Beide zijden vergelijken
 Compare by \"File content\"
@@ -190,8 +196,10 @@ Comparing content
 Vergelijken van inhoud
 Comparing content of files %x
 De inhoud van %x bestanden wordt vergeleken
-Comparing...
-Vergelijken...
+Comparing content...
+Inhoud vergelijken...
+Comparison Result
+Resultaat vergelijken
 Completed
 Volbracht
 Configuration
@@ -234,8 +242,6 @@ Could not set working directory:
 Kan het pad in gebruik niet instellen:
 Create a batch job
 Creëer batchjob
-Create:
-Aanmaken:
 Creating folder %x
 Map %x wordt aangemaakt
 Current operation:
@@ -248,8 +254,6 @@ DECISION TREE
 BESLISSINGSBOOM
 Data remaining:
 Resterende data:
-Data:
-Data:
 Date
 Datum
 Delete files/folders existing on left side only
@@ -262,8 +266,6 @@ Delete on both sides
 Verwijder aan beide kanten
 Delete on both sides even if the file is selected on one side only
 Verwijder aan beide kanten ookal is het bestand maar aan één kant geselecteerd
-Delete:
-Verwijderen:
 Deleting file %x
 Bestand %x wordt verwijderd
 Deleting folder %x
@@ -286,6 +288,8 @@ Do you really want to move the following objects(s) to the Recycle Bin?
 Weet u zeker dat u de/het volgende bestand(en) wilt verplaatsen naar de prullenbak?
 Do you want FreeFileSync to automatically check for updates every week?
 Wilt u FreeFileSync automatisch elke week laten controleren of er een nieuwe versie is?
+Don't ask me again
+Niet meer vragen
 Donate with PayPal
 Doneer met PayPal
 Download now?
@@ -374,8 +378,6 @@ Files remaining:
 Resterende bestanden:
 Files that exist on both sides and have different content
 Bestanden die aan beide kanten bestaan maar een verschillende inhoud hebben
-Files that exist on both sides, have same date but different filesizes
-Bestanden die aan beide kanten bestaan, dezelfde datum hebben maar verschillende bestandgroottes
 Files that exist on both sides, left one is newer
 Bestanden die aan beide kanten bestaan, maar waarvan de linkerkant nieuwer is
 Files that exist on both sides, right one is newer
@@ -412,8 +414,8 @@ FreeFileSync configuration
 FreeFileSync configuratie
 FreeFileSync is up to date!
 U gebruikt de nieuwste versie van FreeFileSync!
-Full name
-Volledige naam
+Full path
+Volledige bestandslocatie
 Generating file list...
 Bestandslijst genereren...
 Global settings
@@ -422,6 +424,8 @@ Help
 Help
 Hide all error and warning messages
 Verberg alle foutmeldingen en waarschuwingen
+Hide conflicts
+Verberg conflicten
 Hide files that are different
 Verberg bestanden die verschillend zijn
 Hide files that are equal
@@ -434,6 +438,12 @@ Hide files that exist on left side only
 Verberg bestanden die alleen aan de linkerkant bestaan
 Hide files that exist on right side only
 Verberg bestanden die alleen aan de rechterkant bestaan
+Hide files that will be copied to the left side
+Verberg bestanden die naar de linkerkant zullen worden gekopieerd
+Hide files that will be copied to the right side
+Verberg bestanden die naar de rechterkant zullen worden gekopieerd
+Hide files that won't be copied
+Verberg bestanden die niet zullen worden gekopieerd
 Hide filtered items
 Verberg gefilterde items
 Hide further error messages during the current process
@@ -446,6 +456,8 @@ Homepage
 Homepage
 If you like FFS
 Als het programma u bevalt
+Ignore 1-hour file time difference
+Negeer 1-uur bestandstijd verschillen
 Ignore errors
 Negeer foutmeldingen
 Ignore subsequent errors
@@ -458,8 +470,8 @@ Include
 Gebruiken
 Include temporarily
 Tijdelijk bijsluiten
-Include: *.doc;*.zip;*.exe\nExclude: *\\temp\\*
-Gebruiken: *.doc;*.zip;*.exe\nUitsluiten: *\\temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\temp\\*
+Bijsluiten: *.doc;*.zip;*.exe\nUitsluiten: \\temp\\*
 Info
 Info
 Information
@@ -470,8 +482,6 @@ It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are n
 Het was niet mogelijk de prullenbak te initialiseren!\n\nHet is waarschijnlijk dat u niet Windows gebruikt.\nAls u deze optie wel wilt, neem dan alstublieft contact op met de auteur. :)
 Left:
 Links:
-Legend
-Legenda
 Load configuration from file
 Laad configuratie uit bestand
 Load configuration history (press DEL to delete items)
@@ -490,7 +500,7 @@ Move column down
 Verplaats kolom naar beneden
 Move column up
 Verplaats kolom naar boven
-Not all items were synchronized! Have a look at the list.
+Not all items have been synchronized! Have a look at the list.
 Niet alle bestanden zijn gesynchroniseerd! Bekijk de lijst.
 Not enough free disk space available in:
 Niet genoeg schijfruimte beschikbaar op:
@@ -504,10 +514,8 @@ Number of files that will be overwritten
 Aantal bestanden dat zal worden overschreven
 OK
 OKE
-Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the full name including path prefix.
-Alleen de niet gefilterde bestanden worden geselecteerd voor synchronisatie. Het filter wordt toegepast op de volledige naam inclusief pad-voorvoegsel.
-Open synchronization dialog
-Open de synchronisatie-instellingen
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the synchronization directories.
+Alleen bestanden/mappen die niet zijn gefilterd worden geselecteerd voor synchronisatie. Het filter wordt toegepast op de naam relatief(!) ten opzichte van de synchronisatiemappen.
 Open with File Manager\tD-Click
 Openen met bestandsbeheerder\tD-klik
 Operation aborted!
@@ -528,6 +536,8 @@ Preview
 Voorbeeld
 Published under the GNU General Public License:
 Gepubliceerd onder de GNU General Public License:
+Question
+Vraag
 Quit
 Afsluiten
 Relative path
@@ -536,18 +546,20 @@ Remove folder pair
 Verwijder 1 paar gekoppelde mappen
 Reset
 Reset
+Reset all warning messages
+Reset alle waarchuwingen
 Reset all warning messages?
 Reset alle waarschuwingen?
-Resets all warning messages
-Reset alle waarschuwingen
 Result
 Resultaat
 Right:
 Rechts:
 S&ave configuration
 S&la de instellingen op
-Save aborted!
-Sla de afgebroken bestanden op!
+S&witch view
+&Wijzig weergave
+Save changes to current configuration?
+Sla veranderingen op in de huidige configuratie?
 Save current configuration to file
 Sla de huidige instellingen op in een bestand
 Scanning...
@@ -560,6 +572,10 @@ Select logfile directory:
 Selecteer een map voor het logbestand:
 Select variant:
 Selecteer een variant:
+Show conflicts
+Geef conflicten weer
+Show file icons
+Geef bestandsiconen weer
 Show files that are different
 Geef bestanden die verschillend zijn weer
 Show files that are equal
@@ -572,6 +588,12 @@ Show files that exist on left side only
 Geef bestanden weer die alleen bestaan aan de linkerkant
 Show files that exist on right side only
 Geef bestanden weer die alleen bestaan aan de rechterkant
+Show files that will be copied to the left side
+Geef bestanden weer die naar de linkerkant worden gekopieerd
+Show files that will be copied to the right side
+Geef bestanden weer die naar de rechterkant worden gekopieerd
+Show files that won't be copied
+Geef bestanden weer die niet zullen worden gekopieerd
 Show popup
 Pop-up weergeven
 Show popup on errors or warnings
@@ -596,6 +618,8 @@ Stop
 Stop
 Swap sides
 Verwissel van kant
+Synchronization Preview
+Synchronisatie voorbeeldweergave
 Synchronization aborted!
 Synchronisatie afgebroken!
 Synchronization completed successfully!
@@ -608,8 +632,8 @@ Synchronization settings
 Synchronisatie instellingen
 Synchronization status
 Synchronisatie: status
-Synchronize all .doc, .zip and .exe files except everything from folder \"temp\".
-Synchroniseer alle .doc, .zip en .exe bestanden behalve alles uit de map \"temp\".
+Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
+Synchroniseer alle .doc, .zip en .exe bestanden uitgezonderd alles in submap \"temp\"
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Synchroniseer beide zijde tegelijkertijd: kopieer nieuwe of geüpdatete bestanden in beide richtingen.
 Synchronizing...
@@ -636,6 +660,8 @@ Total required free disk space:
 Benodigde hoeveelheid vrije schijfruimte:
 Total time:
 Totale tijd:
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
+Behandel bestandstijden die verschillen met precies +/- 1 uur als gelijk en minder als 1 uur als conflict om zomertijd veranderingen te verwerken.
 Two way <->
 Beide zijden <->
 Unable to connect to sourceforge.net!
@@ -646,10 +672,10 @@ Unable to initialize Recycle Bin!
 De prullenbak kon niet worden geïnitialiseerd!
 Uncheck all
 Alles uitvinken
+Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
+Er bestaan onopgeloste conflicten! \n\nU kunt de conflicten negeren en doorgaan met synchroniseren.
 Update ->
 Overschrijven ->
-Update:
-Overschrijven:
 Use Recycle Bin
 Gebruik de prullenbak
 Use Recycle Bin when deleting or overwriting files during synchronization
@@ -668,6 +694,8 @@ different
 verschillend
 file exists on both sides
 Bestand bestaat aan beide zijde
+flash	conflict\n
+knipperen	conflict\n
 on one side only
 alleen aan één kant
 |>	file on right side only\n

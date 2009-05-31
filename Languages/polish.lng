@@ -44,8 +44,6 @@
 &Anuluj
 &Check for new version
 &Sprawdź aktualizacje
-&Compare
-&Porównaj
 &Create batch job
 &Twórz zadanie batch
 &Default
@@ -66,6 +64,8 @@
 &Wczytaj
 &Load configuration
 &Ładuj konfigurację
+&No
+&Nie
 &OK
 &OK
 &Pause
@@ -76,16 +76,18 @@
 &Powtórz
 &Save
 &Zapisz
-&Start
-&Start
-&Synchronize...
-&Synchronizuj...
+&Yes
+&Tak
 ,
 .
+-	do not copy\n
+-	nie kopiuj\n
+- conflict
+- konflikt
+- conflict (same date, different size)
+- konflikt (ta sama data, różny rozmiar)
 - different
 - różny
-- different (same date, different size)
-- różnica (jednakowa data, różny rozmiar)
 - equal
 - równy
 - exists left only
@@ -100,8 +102,8 @@
 - prawy
 - right newer
 - prawy jest nowszy
-- same date (different size)
-- jednakowa data (różny rozmiar)
+->	copy to right side\n
+->	kopiuj na prawą stronę
 -Open-Source file synchronization-
 -synchronizacja plików Open-Source-
 .
@@ -114,16 +116,16 @@
 1 plik,
 1. &Compare
 1. &Porównaj
-1. Enter full file or directory names separated by ';' or a new line.
-1. Wprowadź pełne ścieżki do plików lub katalogów oddzielone ';' albo nową linią.
+1. Enter relative file or directory names separated by ';' or a new line.
+1. Wprowdź relatywne scieżki do plików lub katalogów oddzielone ';' lub nową linią.
 2. &Synchronize...
 2. &Synchronizuj...
 2. Use wildcard characters '*' and '?'.
 2. Użyj wieloznacznika (wildcard) '*' i '?'.
 3. Exclude files directly on main grid via context menu.
 3. Wyklucz pliki i foldery używając prawego przycisku myszki.
-4. Keep the number of (different) entries small for best performance.
-4. Przechowuj małą liczbę wpisów (różnych) dla lepszej wydajności.
+<-	copy to left side\n
+<-	kopiuje na lewą stronę\n
 <<	left file is newer\n
 <<	lewy plik jest nowszy\n
 <Directory>
@@ -134,8 +136,8 @@
 <zaznaczone elementy>
 <|	file on left side only\n
 <|	istnieje tylko po lewej stronie\n
-==	files are equal\n\n
-==	pliki są równe\n\n
+==	files are equal\n
+==	pliki są równe\n
 >>	right file is newer\n
 >>	prawy plik jest nowszy\n
 A newer version of FreeFileSync is available:
@@ -168,6 +170,8 @@ Batch job
 Zadanie batch
 Big thanks for localizing FreeFileSync goes out to:
 Podziękowania za tłumaczenie FreeFileSync:
+Browse
+Przeglądaj
 Build:
 Buduj:
 Cancel
@@ -178,6 +182,8 @@ Choose to hide filtered files/directories from list
 Zaznacz aby ukryć przefiltrowane pliki/katalogi z listy
 Comma separated list
 Lista oddzielona przecinkami
+Compare
+Porównaj
 Compare both sides
 Porównaj foldery
 Compare by \"File content\"
@@ -190,8 +196,10 @@ Comparing content
 Porównuję zawartość
 Comparing content of files %x
 Porównywanie zawartości plików %x
-Comparing...
-Porównuje...
+Comparing content...
+Porównywanie zawartości...
+Comparison Result
+Rezultat porównywania
 Completed
 Zakończono
 Configuration
@@ -234,8 +242,6 @@ Could not set working directory:
 Nie można ustawić poprawnego folderu:
 Create a batch job
 Twórz zadanie Batch
-Create:
-Utwórz:
 Creating folder %x
 Tworzenie folderu %x
 Current operation:
@@ -248,8 +254,6 @@ DECISION TREE
 DRZEWO DECYZYJNE
 Data remaining:
 Pozostałe dane:
-Data:
-Dane:
 Date
 Data
 Delete files/folders existing on left side only
@@ -262,8 +266,6 @@ Delete on both sides
 Usuń po obu stronach
 Delete on both sides even if the file is selected on one side only
 Usuń po obu stronach nawet jeżeli plik zaznaczony jest tylko po jednej stronie
-Delete:
-Usuń:
 Deleting file %x
 Usuwanie pliku %x
 Deleting folder %x
@@ -286,6 +288,8 @@ Do you really want to move the following objects(s) to the Recycle Bin?
 Czy na pewno chcesz przenieść wybrane pliki do kosza?
 Do you want FreeFileSync to automatically check for updates every week?
 Czy chcesz aby FreeFileSync sprawdzał uaktualnienia co tydzień?
+Don't ask me again
+Nie pytaj mnie ponownie
 Donate with PayPal
 Wesprzyj z PayPal
 Download now?
@@ -374,8 +378,6 @@ Files remaining:
 Pozostałe pliki:
 Files that exist on both sides and have different content
 Pliki, które istnieją po obu stronach i różnią się zawartością
-Files that exist on both sides, have same date but different filesizes
-Pliki, które istnieją po obu stronach, mają tą samą datę ale inny rozmiar
 Files that exist on both sides, left one is newer
 Pliki, które istnieją po obu stronach, lewa strona jest nowsza
 Files that exist on both sides, right one is newer
@@ -412,8 +414,8 @@ FreeFileSync configuration
 Konfiguracja FreeFileSync
 FreeFileSync is up to date!
 FreeFileSync jest już uaktualniony!
-Full name
-Pełna nazwa
+Full path
+Pełna scieżka
 Generating file list...
 Generowanie listy plików...
 Global settings
@@ -422,6 +424,8 @@ Help
 Pomoc
 Hide all error and warning messages
 Ukryj wszystkie informacje błędach i ostrzeżeniach
+Hide conflicts
+Ukryj konflikty
 Hide files that are different
 Ukryj pliki, które są różne
 Hide files that are equal
@@ -434,6 +438,12 @@ Hide files that exist on left side only
 Ukryj pliki, które istnieją tylko po lewej stronie
 Hide files that exist on right side only
 Ukryj pliki, które istnieją tylko po prawej stronie
+Hide files that will be copied to the left side
+Ukryj pliki, które będą kopiowane na lewą stronę
+Hide files that will be copied to the right side
+Ukryj pliki, które będą kopiowane na prawą stronę
+Hide files that won't be copied
+Ukryj pliki, które nie będą kopiowane
 Hide filtered items
 Ukryj elementy przefiltrowane
 Hide further error messages during the current process
@@ -446,6 +456,8 @@ Homepage
 Strona domowa
 If you like FFS
 Jeżeli Ci się podoba
+Ignore 1-hour file time difference
+Ignoruj 1-godzinną różnicę między plikami
 Ignore errors
 Ignoruj błędy
 Ignore subsequent errors
@@ -458,8 +470,8 @@ Include
 Dołącz
 Include temporarily
 Dołącz tymczasowo
-Include: *.doc;*.zip;*.exe\nExclude: *\\temp\\*
-Dołącz: *.doc;*.zip;*.exe\nWyklucz: *\\temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\temp\\*
+Dołącz: *.doc;*.zip;*.exe\nWyklucz: \\temp\\*
 Info
 Info
 Information
@@ -470,8 +482,6 @@ It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are n
 Inicjalizacja Kosza nie była możliwa!\n\nPrawdopodobnie nie używasz Windowsa.\nJeżeli chcesz dołączyć tą cechę, skontaktuj się z autorem. :)
 Left:
 Lewy:
-Legend
-Legenda
 Load configuration from file
 Wczytaj konfigurację z pliku
 Load configuration history (press DEL to delete items)
@@ -490,8 +500,8 @@ Move column down
 Przesuń kolumnę w dół
 Move column up
 Przesuń kolumnę do góry
-Not all items were synchronized! Have a look at the list.
-Nie wszystkie elementy zostały zsynchronizowane! Lista pominiętych plików.
+Not all items have been synchronized! Have a look at the list.
+Nie wszystkie elementy zostały zsynchronizowane! Zobacz tą listę.
 Not enough free disk space available in:
 Brak wystarczającej przestrzeni dyskowej na:
 Nothing to synchronize according to configuration!
@@ -504,10 +514,8 @@ Number of files that will be overwritten
 Liczba plików, które zostaną nadpisane
 OK
 OK
-Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the full name including path prefix.
-Tylko pliki/katalogi, które nie zostaną odrzucone przez filtr zostaną zsynchronizowane. Filtr jest stosowany tylko dla pełnej nazwy pliku.
-Open synchronization dialog
-Przejdź do ustawień zaawansowanych synchronizacji
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the synchronization directories.
+Tylko pliki/katalogi, które nie zostaną odrzucone przez filtr zostaną dodane do procesu synchronizacji. Filtr działa tylko dla nazw wprowadzonych relatywnie(!)
 Open with File Manager\tD-Click
 Exploruj
 Operation aborted!
@@ -528,6 +536,8 @@ Preview
 Podgląd
 Published under the GNU General Public License:
 Udostępnione na zasadach licencji GNU General Public License:
+Question
+Pytanie
 Quit
 Zakończ
 Relative path
@@ -536,18 +546,20 @@ Remove folder pair
 Usuń parę folderów
 Reset
 Resetuj
+Reset all warning messages
+Resetuj wszystkie ostrzeżenia
 Reset all warning messages?
 Zresetować wszystkie ostrzeżenia?
-Resets all warning messages
-Zresetuj wszystkie ostrzeżenia
 Result
 Rezultat
 Right:
 Prawy:
 S&ave configuration
 Z&apisz konfigurację
-Save aborted!
-Speicherung abgebrochen!
+S&witch view
+P&rzełącz widok
+Save changes to current configuration?
+Zapisać zmiany obecnej konfiguracji?
 Save current configuration to file
 Zapisz aktualny plik konfiguracyjny
 Scanning...
@@ -560,6 +572,10 @@ Select logfile directory:
 Wybierz katalog z logami:
 Select variant:
 Wybierz wariant:
+Show conflicts
+Pokaż konflikty
+Show file icons
+Ukryj ikony plików
 Show files that are different
 Pokaż pliki, które się różnią
 Show files that are equal
@@ -572,6 +588,12 @@ Show files that exist on left side only
 Pokaż pliki istniejące tylko po lewej stronie
 Show files that exist on right side only
 Pokaż pliki istniejące tylko po prawej stronie
+Show files that will be copied to the left side
+Pokaż pliki, które będą kopiowane na lewą stronę
+Show files that will be copied to the right side
+Pokaż pliki, które będą kopiowane na prawą stronę
+Show files that won't be copied
+Pokaż pliki, które nie będą kopiowane
 Show popup
 Pokaż okno popup
 Show popup on errors or warnings
@@ -596,6 +618,8 @@ Stop
 Zatrzymaj
 Swap sides
 Zamień stronami
+Synchronization Preview
+Podgląd synchronizacji
 Synchronization aborted!
 Synchronizacja przerwana!
 Synchronization completed successfully!
@@ -608,8 +632,8 @@ Synchronization settings
 Ustawienia synchronizacji
 Synchronization status
 Status synchronizacji
-Synchronize all .doc, .zip and .exe files except everything from folder \"temp\".
-Synchronizuj wszystkie pliki .doc, .zip i .exe z wyjątkiem folderu \"temp\".
+Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
+Synchronizuj wszystkie pliki .doc, .zip i exe z wyjątkiem folderu \"temp\"
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Synchronizuj obie strony jednocześnie: Kopiuj nowe albo uaktualniaj w obu folderach.
 Synchronizing...
@@ -636,6 +660,8 @@ Total required free disk space:
 Całkowita wymagana przestrzeń dyskowa:
 Total time:
 Całkowity czas:
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
+Traktuj pliki różniące się dokładnie +/- 1 godzinę jako równe, mniej niż 1 godzinę jako konflikt by uwzględnić zmiane czasu letniego.
 Two way <->
 Obustronna <->
 Unable to connect to sourceforge.net!
@@ -646,10 +672,10 @@ Unable to initialize Recycle Bin!
 Nie można zainicjalizować Kosz!
 Uncheck all
 Odznacz wszystko
+Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
+Istnieją nierozwiązane konflikty! \n\nMożesz je zignorować i kontynułować synchronizację.
 Update ->
 Uaktualnij ->
-Update:
-Uaktualnij:
 Use Recycle Bin
 Użyj kosza
 Use Recycle Bin when deleting or overwriting files during synchronization
@@ -668,6 +694,8 @@ different
 różny
 file exists on both sides
 plik istnieje po obu stronach
+flash	conflict\n
+konflikt\n
 on one side only
 tylko po jednej stronie
 |>	file on right side only\n

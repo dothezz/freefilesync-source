@@ -66,6 +66,7 @@ public:
     Zstring BeforeLast(DefaultChar ch) const;
     size_t Find(DefaultChar ch, bool fromEnd) const;
     bool Matches(const DefaultChar* mask) const;
+    static bool Matches(const DefaultChar* name, const DefaultChar* mask);
     Zstring& Trim(bool fromRight); //from right or left
     Zstring& MakeLower();
 

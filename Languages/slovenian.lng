@@ -44,8 +44,6 @@
 &Prekliči
 &Check for new version
 &Preveri za novo različico
-&Compare
-&Primerjaj
 &Create batch job
 &Ustvari batch opravilo
 &Default
@@ -66,26 +64,30 @@
 &Naloži
 &Load configuration
 Na&loži konfiguracijo
+&No
+&Ne
 &OK
 &V redu
 &Pause
 &Pavza
 &Quit
-&Zapusti
+&Zapri
 &Retry
 &Ponovi
 &Save
 &Shrani
-&Start
-&Začni
-&Synchronize...
-&Sinhroniziraj...
+&Yes
+&Da
 ,
 , 
+-	do not copy\n
+-	ne kopiraj\n
+- conflict
+- spor
+- conflict (same date, different size)
+- spor (isti datum, različna velikost)
 - different
 - različni
-- different (same date, different size)
-- različni (enak datum, različna velikost)
 - equal
 - enaki
 - exists left only
@@ -100,8 +102,8 @@ Na&loži konfiguracijo
 - desno
 - right newer
 - desna novejša
-- same date (different size)
-- enak datum (različna velikost)
+->	copy to right side\n
+->	kopiraj na desno stran\n
 -Open-Source file synchronization-
 -Odprto-kodna sinhronizacija datotek-
 .
@@ -114,16 +116,16 @@ Na&loži konfiguracijo
 1 datoteka,
 1. &Compare
 1. &Primerjaj
-1. Enter full file or directory names separated by ';' or a new line.
-1. Vnesite polno ime datotek ali imenikov ločenih s ';' ali novo vrstico.
+1. Enter relative file or directory names separated by ';' or a new line.
+1. Vnesite relativna imena datotek ali imenikov ločenih z ';' ali novo vrstico.
 2. &Synchronize...
 2. &Sinhroniziraj...
 2. Use wildcard characters '*' and '?'.
 2. Uporabite lahko tudi znake '*' in '?'.
 3. Exclude files directly on main grid via context menu.
 3. Izključite datoteke neposredno na glavni mreži s kontekstnim menujem.
-4. Keep the number of (different) entries small for best performance.
-4. Za boljšo učinkovitost ohranjajte število (različnih) vnosov majhno.
+<-	copy to left side\n
+<-	kopiraj na levo stran\n
 <<	left file is newer\n
 <<	leva datoteka je novejša\n
 <Directory>
@@ -134,8 +136,8 @@ Na&loži konfiguracijo
 <mnogokratna izbira>
 <|	file on left side only\n
 <|	datoteka obstaja samo na levi\n
-==	files are equal\n\n
-==	datoteki sta enaki\n\n
+==	files are equal\n
+==	datoteki sta enaki\n
 >>	right file is newer\n
 >>	desna datoteka je novejša\n
 A newer version of FreeFileSync is available:
@@ -168,6 +170,8 @@ Batch job
 Batch opravilo
 Big thanks for localizing FreeFileSync goes out to:
 Zahvale za prevod FreeFileSync gredo:
+Browse
+Brskaj
 Build:
 Izgradnja:
 Cancel
@@ -178,6 +182,8 @@ Choose to hide filtered files/directories from list
 Skrij filtrirane datoteke/imenike iz seznama
 Comma separated list
 Seznam ločen z vejico
+Compare
+Primerjaj
 Compare both sides
 Primerjaj obe strani
 Compare by \"File content\"
@@ -190,8 +196,10 @@ Comparing content
 Primerjam vsebino
 Comparing content of files %x
 Primerjam vsebino datotek %x
-Comparing...
-Primerjam...
+Comparing content...
+Primerjam vsebino...
+Comparison Result
+Rezultati primerjave
 Completed
 Zaključeno
 Configuration
@@ -234,8 +242,6 @@ Could not set working directory:
 Ne morem nastaviti delovnega imenika:
 Create a batch job
 Ustvari batch opravilo
-Create:
-Ustvari:
 Creating folder %x
 Ustvarjam mapo %x
 Current operation:
@@ -248,8 +254,6 @@ DECISION TREE
 DREVO ODLOČITEV
 Data remaining:
 Preostanek podatkov:
-Data:
-Podatki:
 Date
 Datum
 Delete files/folders existing on left side only
@@ -262,8 +266,6 @@ Delete on both sides
 Izbriši na obeh straneh
 Delete on both sides even if the file is selected on one side only
 Izbriši na obeh straneh, četudi je datoteka izbrana na samo eni strani
-Delete:
-Izbriši: 
 Deleting file %x
 Brisanje datoteke %x
 Deleting folder %x
@@ -286,6 +288,8 @@ Do you really want to move the following objects(s) to the Recycle Bin?
 Ali resnično želite premakniti naslednje objekte v Koš?
 Do you want FreeFileSync to automatically check for updates every week?
 Ali želite, da FreeFileSync samodejno preverja za posodobitve vsak teden?
+Don't ask me again
+Ne sprašuj me več
 Donate with PayPal
 Doniraj s PayPal
 Download now?
@@ -367,15 +371,13 @@ File times that differ by up to the specified number of seconds are still handle
 Filename
 Ime datoteke
 Files are found equal if\n     - file content\nis the same.
-Datoteke so enake če\n     - je vsebina datoteke\nenaka.
+Datoteki sta enaki, če\n     - je vsebina datoteke\nenaka.
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
-Datoteke so enake če\n     - velikost datoteke\n     - zadnji čas pisanja in datum\nso enaki.
+Datoteki sta enaki, če so\n     - velikost datoteke\n     - zadnji čas spremembe in datum\nenaki.
 Files remaining:
 Preostale datoteke:
 Files that exist on both sides and have different content
 Datoteke, ki obstajajo na obeh straneh in imajo različno vesbino
-Files that exist on both sides, have same date but different filesizes
-Datoteke, ki obstajajo na obeh straneh, imajo isti datum, vendar so različnih velikosti
 Files that exist on both sides, left one is newer
 Datoteke, ki obstajajo na obeh straneh, leva je novejša
 Files that exist on both sides, right one is newer
@@ -412,8 +414,8 @@ FreeFileSync configuration
 FreeFileSync konfiguracija
 FreeFileSync is up to date!
 FreeFileSync je posodobljen!
-Full name
-Polno ime
+Full path
+Polna pot
 Generating file list...
 Ustvarjam seznam datotek...
 Global settings
@@ -422,6 +424,8 @@ Help
 Pomoč
 Hide all error and warning messages
 Skrij vsa obvestila o napakah in opozorilih
+Hide conflicts
+Skrij spore
 Hide files that are different
 Skrij datoteke ki so različne
 Hide files that are equal
@@ -434,6 +438,12 @@ Hide files that exist on left side only
 Skrij datoteke, ki obstajajo samo na levi strani
 Hide files that exist on right side only
 Skrij datoteke, ki obstajajo samo na desni strani
+Hide files that will be copied to the left side
+Skrij datoteke, ki bodo kopirane na levo stran
+Hide files that will be copied to the right side
+Skrij datoteke, ki bodo kopirane na desno stran
+Hide files that won't be copied
+Skrij datoteke, ki ne bodo kopirane
 Hide filtered items
 Skrij filtrirane predmete
 Hide further error messages during the current process
@@ -446,6 +456,8 @@ Homepage
 Domača stran
 If you like FFS
 Če vam je FFS všeč
+Ignore 1-hour file time difference
+Ignoriraj 1-urno časovno razliko
 Ignore errors
 Ignoriraj napake
 Ignore subsequent errors
@@ -458,8 +470,8 @@ Include
 Vključi
 Include temporarily
 Trenutno vključi
-Include: *.doc;*.zip;*.exe\nExclude: *\\temp\\*
-Vključi: *.doc;*.zip;*.exe\nIzključi: *\\temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\temp\\*
+Vključi: *.doc;*.zip;*.exe\nIzključi: \\temp\\*
 Info
 Info
 Information
@@ -470,8 +482,6 @@ It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are n
 Ni bilo mogoče inicializirati Koša!\n\nZgleda, da ne uporabljate Windowsov.\nČe želite imeti vključeno to lastnost, prosimo kontaktirajte avtorja. :)
 Left:
 Levo:
-Legend
-Legenda
 Load configuration from file
 Naloži konfiguracijo iz datoteke
 Load configuration history (press DEL to delete items)
@@ -490,8 +500,8 @@ Move column down
 Premakni stolpec dol
 Move column up
 Premakni stolpec gor
-Not all items were synchronized! Have a look at the list.
-Vsi predmeti niso bili sinhronizirani! Poglejte seznam.
+Not all items have been synchronized! Have a look at the list.
+Vse stvari niso bile sinhronizirane! Preglejte seznam.
 Not enough free disk space available in:
 Na voljo ni dovolj prostega prostora na disku v:
 Nothing to synchronize according to configuration!
@@ -504,10 +514,8 @@ Number of files that will be overwritten
 Število datotek, ki bodo prepisane
 OK
 V redu
-Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the full name including path prefix.
-Samo datoteke/imeniki, ki preidejo filtriranje bodo izbrane za sinhronizacijo. Filter bo uveljavljen na polno ime vključujoč predpono.
-Open synchronization dialog
-Odpri sinhronizacijsko pogovorno okno
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the synchronization directories.
+Samo datoteke/imeniki, ki preidejo skozi filtriranje bodo izbrane za sinhronizacijo. Filter bo uveljavljen na ime relativno(!) glede na sinhronizacijske imenike.
 Open with File Manager\tD-Click
 Odpri z urejevalnikom datotek\tD-Click
 Operation aborted!
@@ -528,6 +536,8 @@ Preview
 Predogled
 Published under the GNU General Public License:
 Objavljeno pod licenco GNU General Public:
+Question
+Vprašanje
 Quit
 Zapusti
 Relative path
@@ -536,18 +546,20 @@ Remove folder pair
 Odstrani par imenikov
 Reset
 Ponastavi
+Reset all warning messages
+Ponastavi vsa obvestila z opozorili
 Reset all warning messages?
 Ponastavim vsa obvestila z opozorili?
-Resets all warning messages
-Ponastavi vsa obvestila z opozorili
 Result
 Rezultat
 Right:
 Desno:
 S&ave configuration
 Shr&ani konfiguracijo
-Save aborted!
-Shranjevanje prekinjeno!
+S&witch view
+Sp&remeni pogled
+Save changes to current configuration?
+Shranim spremembe trenutne konfiguracije?
 Save current configuration to file
 Shrani trenutno konfiguracijo v datoteko
 Scanning...
@@ -560,6 +572,10 @@ Select logfile directory:
 Izberite imenik datoteke za beleženje:
 Select variant:
 Izberite varianto:
+Show conflicts
+Prikaži spore
+Show file icons
+Prikaži ikone datotek
 Show files that are different
 Prikaži datoteke, ki so različne
 Show files that are equal
@@ -572,6 +588,12 @@ Show files that exist on left side only
 Prikaži datoteke, ki obstajajo samo na levi
 Show files that exist on right side only
 Prikaži datoteke, ki obstajajo samo na desni
+Show files that will be copied to the left side
+Prikaži datoteke, ki bodo kopirane na levo stran
+Show files that will be copied to the right side
+Prikaži datoteke, ki bodo kopirane na desno stran
+Show files that won't be copied
+Prikaži datoteke, ki ne bodo kopirane
 Show popup
 Prikaži pojavno okno
 Show popup on errors or warnings
@@ -596,6 +618,8 @@ Stop
 Ustavi
 Swap sides
 Zamenjaj strani
+Synchronization Preview
+Predogled sinhronizacije
 Synchronization aborted!
 Sinhronizacija prekinjena!
 Synchronization completed successfully!
@@ -605,11 +629,11 @@ Sinhronizacija se je končala z napakami!
 Synchronization filter
 Filter sinhronizacije
 Synchronization settings
-nastavitve sinhronizacije
+Nastavitve sinhronizacije
 Synchronization status
 Status sinhronizacije
-Synchronize all .doc, .zip and .exe files except everything from folder \"temp\".
-Sinhroniziraj vse .doc, .zip in .exe datoteke, razen kar je v mapi \"temp\".
+Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
+Sinhroniziraj vse .doc, .zip in .exe datoteke, razen iz podmape \"temp\".
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Sinhroniziraj obe strani istočasno: Kopiraj nove ali posodobljene datoteke v obe smeri.
 Synchronizing...
@@ -636,6 +660,8 @@ Total required free disk space:
 Skupno zahtevani prosti prostor na disku:
 Total time:
 Celoten čas:
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
+Obravnavaj čas spremembe datoteke, ki se razlikuje za točno +/- 1 uro kot enak, če pa je manjši kot 1 ura, pa kot spor, da lahko obravnavamo spremembe Poletnega časa.
 Two way <->
 Obojesmerno <->
 Unable to connect to sourceforge.net!
@@ -646,14 +672,14 @@ Unable to initialize Recycle Bin!
 Ne morem inicializirati Koša!
 Uncheck all
 Odznači vse
+Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
+Obstajajo nerešeni spori! \n\nLahko ignorirate spore in nadaljujete s sinhronizacijo.
 Update ->
 Posodobi ->
-Update:
-Posodobi:
 Use Recycle Bin
 Uporabi Koš
 Use Recycle Bin when deleting or overwriting files during synchronization
-Uporabi Koš ko se briše ali prepisuje datoteke med sinhronizacijo
+Uporabi Koš, ko se briše ali prepisuje datoteke med sinhronizacijo
 Warning
 Pozor
 Warning: Synchronization failed for %x item(s):
@@ -668,6 +694,8 @@ different
 različni
 file exists on both sides
 datoteka obstaja na obeh straneh
+flash	conflict\n
+strela	spor\n
 on one side only
 samo na eni strani
 |>	file on right side only\n

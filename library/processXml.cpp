@@ -19,12 +19,12 @@ const wxString xmlAccess::GLOBAL_CONFIG_FILE = wxT("GlobalSettings.xml");
 bool readXmlElementValue(std::string& output,                  const TiXmlElement* parent, const std::string& name);
 bool readXmlElementValue(int& output,                          const TiXmlElement* parent, const std::string& name);
 bool readXmlElementValue(CompareVariant& output,               const TiXmlElement* parent, const std::string& name);
-bool readXmlElementValue(SyncConfiguration::Direction& output, const TiXmlElement* parent, const std::string& name);
+bool readXmlElementValue(SyncDirection& output, const TiXmlElement* parent, const std::string& name);
 bool readXmlElementValue(bool& output,                         const TiXmlElement* parent, const std::string& name);
 
 void addXmlElement(TiXmlElement* parent, const std::string& name, const std::string& value);
 void addXmlElement(TiXmlElement* parent, const std::string& name, const int value);
-void addXmlElement(TiXmlElement* parent, const std::string& name, const SyncConfiguration::Direction value);
+void addXmlElement(TiXmlElement* parent, const std::string& name, const SyncDirection value);
 void addXmlElement(TiXmlElement* parent, const std::string& name, const bool value);
 
 
@@ -306,17 +306,17 @@ bool readXmlElementValue(CompareVariant& output, const TiXmlElement* parent, con
 }
 
 
-bool readXmlElementValue(SyncConfiguration::Direction& output, const TiXmlElement* parent, const std::string& name)
+bool readXmlElementValue(SyncDirection& output, const TiXmlElement* parent, const std::string& name)
 {
     std::string dummy;
     if (readXmlElementValue(dummy, parent, name))
     {
         if (dummy == "left")
-            output = SyncConfiguration::SYNC_DIR_LEFT;
+            output = SYNC_DIR_LEFT;
         else if (dummy == "right")
-            output = SyncConfiguration::SYNC_DIR_RIGHT;
+            output = SYNC_DIR_RIGHT;
         else //treat all other input as "none"
-            output = SyncConfiguration::SYNC_DIR_NONE;
+            output = SYNC_DIR_NONE;
 
         return true;
     }
@@ -460,8 +460,8 @@ bool XmlConfigInput::readXmlGuiConfig(xmlAccess::XmlGuiConfig& outputCfg)
     if (guiConfig)
     {
         readXmlElementValue(outputCfg.hideFilteredElements, guiConfig, "HideFiltered");
-
         readXmlElementValue(outputCfg.ignoreErrors, guiConfig, "IgnoreErrors");
+        readXmlElementValue(outputCfg.syncPreviewEnabled, guiConfig, "SyncPreviewActive");
     }
 
     return true;
@@ -508,13 +508,16 @@ bool XmlConfigInput::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputC
     TiXmlElement* global = hRoot.FirstChild("Shared").ToElement();
     if (global)
     {
-        //program language
+        //try to read program language setting
         readXmlElementValue(outputCfg.shared.programLanguage, global, "Language");
 
         //max. allowed file time deviation
         int dummy = 0;
         if (readXmlElementValue(dummy, global, "FileTimeTolerance"))
             outputCfg.shared.fileTimeTolerance = dummy;
+
+        //ignore +/- 1 hour due to DST change
+        readXmlElementValue(outputCfg.shared.ignoreOneHourDiff, global, "IgnoreOneHourDifference");
 
         //traverse into symbolic links (to folders)
         readXmlElementValue(outputCfg.shared.traverseDirectorySymlinks, global, "TraverseDirectorySymlinks");
@@ -537,6 +540,12 @@ bool XmlConfigInput::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputC
 
         //check free disk space
         readXmlElementValue(outputCfg.shared.warningNotEnoughDiskSpace, warnings, "CheckForFreeDiskSpace");
+
+        //check for unresolved conflicts
+        readXmlElementValue(outputCfg.shared.warningUnresolvedConflicts, warnings, "CheckForUnresolvedConflicts");
+
+        //small reminder that synchronization will be starting immediately
+        readXmlElementValue(outputCfg.shared.warningSynchronizationStarting, warnings, "SynchronizationStarting");
     }
 
     //gui specific global settings (optional)
@@ -558,19 +567,19 @@ bool XmlConfigInput::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputC
 //###########################################################
         //read column attributes
         TiXmlElement* leftColumn = TiXmlHandle(mainWindow).FirstChild("LeftColumns").FirstChild("Column").ToElement();
-        unsigned int colType = 0;
+        unsigned int colPos = 0;
         while (leftColumn)
         {
-            const char* visible  = leftColumn->Attribute("Visible");
-            const char* position = leftColumn->Attribute("Position");
-            const char* width    = leftColumn->Attribute("Width");
+            const char* type    = leftColumn->Attribute("Type");
+            const char* visible = leftColumn->Attribute("Visible");
+            const char* width   = leftColumn->Attribute("Width");
 
-            if (visible && position && width) //may be NULL!!
+            if (type && visible && width) //may be NULL!!
             {
                 xmlAccess::ColumnAttrib newAttrib;
-                newAttrib.type     = xmlAccess::ColumnTypes(colType);
+                newAttrib.type     = xmlAccess::ColumnTypes(globalFunctions::stringToInt(type));
                 newAttrib.visible  = std::string(visible) != std::string("false");
-                newAttrib.position = globalFunctions::stringToInt(position);
+                newAttrib.position = colPos;
                 newAttrib.width    = globalFunctions::stringToInt(width);
                 outputCfg.gui.columnAttribLeft.push_back(newAttrib);
             }
@@ -578,23 +587,23 @@ bool XmlConfigInput::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputC
                 break;
 
             leftColumn = leftColumn->NextSiblingElement();
-            ++colType;
+            ++colPos;
         }
 
         TiXmlElement* rightColumn = TiXmlHandle(mainWindow).FirstChild("RightColumns").FirstChild("Column").ToElement();
-        colType = 0;
+        colPos = 0;
         while (rightColumn)
         {
-            const char* visible  = rightColumn->Attribute("Visible");
-            const char* position = rightColumn->Attribute("Position");
-            const char* width    = rightColumn->Attribute("Width");
+            const char* type    = rightColumn->Attribute("Type");
+            const char* visible = rightColumn->Attribute("Visible");
+            const char* width   = rightColumn->Attribute("Width");
 
-            if (visible && position && width) //may be NULL!!
+            if (type && visible && width) //may be NULL!!
             {
                 xmlAccess::ColumnAttrib newAttrib;
-                newAttrib.type     = xmlAccess::ColumnTypes(colType);
+                newAttrib.type     = xmlAccess::ColumnTypes(globalFunctions::stringToInt(type));
                 newAttrib.visible  = std::string(visible) != std::string("false");
-                newAttrib.position = globalFunctions::stringToInt(position);
+                newAttrib.position = colPos;
                 newAttrib.width    = globalFunctions::stringToInt(width);
                 outputCfg.gui.columnAttribRight.push_back(newAttrib);
             }
@@ -602,7 +611,7 @@ bool XmlConfigInput::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputC
                 break;
 
             rightColumn = rightColumn->NextSiblingElement();
-            ++colType;
+            ++colPos;
         }
 
         //load folder history elements
@@ -722,13 +731,13 @@ void addXmlElement(TiXmlElement* parent, const std::string& name, const long val
 }
 
 
-void addXmlElement(TiXmlElement* parent, const std::string& name, const SyncConfiguration::Direction value)
+void addXmlElement(TiXmlElement* parent, const std::string& name, const SyncDirection value)
 {
-    if (value == SyncConfiguration::SYNC_DIR_LEFT)
+    if (value == SYNC_DIR_LEFT)
         addXmlElement(parent, name, std::string("left"));
-    else if (value == SyncConfiguration::SYNC_DIR_RIGHT)
+    else if (value == SYNC_DIR_RIGHT)
         addXmlElement(parent, name, std::string("right"));
-    else if (value == SyncConfiguration::SYNC_DIR_NONE)
+    else if (value == SYNC_DIR_NONE)
         addXmlElement(parent, name, std::string("none"));
     else
         assert(false);
@@ -841,8 +850,8 @@ bool XmlConfigOutput::writeXmlGuiConfig(const xmlAccess::XmlGuiConfig& inputCfg)
     root->LinkEndChild(guiConfig);
 
     addXmlElement(guiConfig, "HideFiltered", inputCfg.hideFilteredElements);
-
     addXmlElement(guiConfig, "IgnoreErrors", inputCfg.ignoreErrors);
+    addXmlElement(guiConfig, "SyncPreviewActive", inputCfg.syncPreviewEnabled);
 
     return true;
 }
@@ -885,6 +894,9 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings&
     //max. allowed file time deviation
     addXmlElement(global, "FileTimeTolerance", int(inputCfg.shared.fileTimeTolerance));
 
+    //ignore +/- 1 hour due to DST change
+    addXmlElement(global, "IgnoreOneHourDifference", inputCfg.shared.ignoreOneHourDiff);
+
     //traverse into symbolic links (to folders)
     addXmlElement(global, "TraverseDirectorySymlinks", inputCfg.shared.traverseDirectorySymlinks);
 
@@ -906,6 +918,12 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings&
 
     //check free disk space
     addXmlElement(warnings, "CheckForFreeDiskSpace", inputCfg.shared.warningNotEnoughDiskSpace);
+
+    //check for unresolved conflicts
+    addXmlElement(warnings, "CheckForUnresolvedConflicts", inputCfg.shared.warningUnresolvedConflicts);
+
+    //small reminder that synchronization will be starting immediately
+    addXmlElement(warnings, "SynchronizationStarting", inputCfg.shared.warningSynchronizationStarting);
 
 
     //###################################################################
@@ -937,32 +955,32 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings&
     TiXmlElement* leftColumn = new TiXmlElement("LeftColumns");
     mainWindow->LinkEndChild(leftColumn);
     xmlAccess::ColumnAttributes columnAtrribLeftCopy = inputCfg.gui.columnAttribLeft; //can't change const vector
-    sort(columnAtrribLeftCopy.begin(), columnAtrribLeftCopy.end(), xmlAccess::sortByType);
+    sort(columnAtrribLeftCopy.begin(), columnAtrribLeftCopy.end(), xmlAccess::sortByPositionOnly);
     for (unsigned int i = 0; i < columnAtrribLeftCopy.size(); ++i)
     {
         TiXmlElement* subElement = new TiXmlElement("Column");
         leftColumn->LinkEndChild(subElement);
 
         const xmlAccess::ColumnAttrib& colAttrib = columnAtrribLeftCopy[i];
+        subElement->SetAttribute("Type", colAttrib.type);
         if (colAttrib.visible) subElement->SetAttribute("Visible", "true");
         else subElement->SetAttribute("Visible", "false");
-        subElement->SetAttribute("Position", colAttrib.position);
         subElement->SetAttribute("Width", colAttrib.width);
     }
 
     TiXmlElement* rightColumn = new TiXmlElement("RightColumns");
     mainWindow->LinkEndChild(rightColumn);
     xmlAccess::ColumnAttributes columnAtrribRightCopy = inputCfg.gui.columnAttribRight;
-    sort(columnAtrribRightCopy.begin(), columnAtrribRightCopy.end(), xmlAccess::sortByType);
+    sort(columnAtrribRightCopy.begin(), columnAtrribRightCopy.end(), xmlAccess::sortByPositionOnly);
     for (unsigned int i = 0; i < columnAtrribRightCopy.size(); ++i)
     {
         TiXmlElement* subElement = new TiXmlElement("Column");
         rightColumn->LinkEndChild(subElement);
 
         const xmlAccess::ColumnAttrib& colAttrib = columnAtrribRightCopy[i];
+        subElement->SetAttribute("Type", colAttrib.type);
         if (colAttrib.visible) subElement->SetAttribute("Visible", "true");
         else subElement->SetAttribute("Visible", "false");
-        subElement->SetAttribute("Position", colAttrib.position);
         subElement->SetAttribute("Width", colAttrib.width);
     }
 
@@ -1094,7 +1112,9 @@ bool xmlAccess::supportForSymbolicLinks()
 
 void xmlAccess::XmlGlobalSettings::_Shared::resetWarnings()
 {
-    warningDependentFolders      = true;
-    warningSignificantDifference = true;
-    warningNotEnoughDiskSpace    = true;
+    warningDependentFolders        = true;
+    warningSignificantDifference   = true;
+    warningNotEnoughDiskSpace      = true;
+    warningUnresolvedConflicts     = true;
+    warningSynchronizationStarting = true;
 }

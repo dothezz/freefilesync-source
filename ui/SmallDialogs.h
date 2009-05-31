@@ -165,7 +165,7 @@ private:
 class CustomizeColsDlg : public CustomizeColsDlgGenerated
 {
 public:
-    CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes& attr);
+    CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes& attr, bool& showFileIcons);
     ~CustomizeColsDlg() {}
 
     enum
@@ -183,6 +183,7 @@ private:
     void OnMoveDown(wxCommandEvent& event);
 
     xmlAccess::ColumnAttributes& output;
+    bool& m_showFileIcons;
 };
 
 
@@ -255,7 +256,7 @@ public:
         FINISHED_WITH_ERROR,
         PAUSE,
         SCANNING,
-        COMPARING,
+        COMPARING_CONTENT,
         SYNCHRONIZING
     };
 

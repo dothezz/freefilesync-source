@@ -5,6 +5,8 @@
 #include <vector>
 #include "resources.h"
 
+using FreeFileSync::FilterProcess;
+
 
 void compoundStringToTable(const Zstring& compoundInput, const DefaultChar* delimiter, std::vector<Zstring>& output)
 {
@@ -42,21 +44,6 @@ void mergeVectors(std::vector<Zstring>& changing, const std::vector<Zstring>& in
 }
 
 
-inline
-void formatFilterString(Zstring& filter)
-{
-#ifdef FFS_WIN
-    //Windows does NOT distinguish between upper/lower-case
-    filter.MakeLower();
-#elif defined FFS_LINUX
-    //Linux DOES distinguish between upper/lower-case
-//nothing to do here
-#else
-    adapt;
-#endif
-}
-
-
 std::vector<Zstring> compoundStringToFilter(const Zstring& filterString)
 {
     //delimiters may be ';' or '\n'
@@ -78,12 +65,26 @@ std::vector<Zstring> compoundStringToFilter(const Zstring& filterString)
 inline
 void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, std::set<Zstring>& directoryFilter)
 {
-    //Test if filtername ends with GlobalResources::FILE_NAME_SEPARATOR, ignoring '*' and '?'.
-    //If so, treat as filter for directory and add to directoryFilter.
-    if (!filtername.empty())
+    Zstring filterFormatted = filtername;
+
+#ifdef FFS_WIN
+    //Windows does NOT distinguish between upper/lower-case
+    filterFormatted.MakeLower();
+#elif defined FFS_LINUX
+    //Linux DOES distinguish between upper/lower-case
+//nothing to do here
+#endif
+
+    //remove leading separators (keep BEFORE test for Zstring::empty()!)
+    if (filterFormatted.length() > 0 && *filterFormatted.c_str() == GlobalResources::FILE_NAME_SEPARATOR)
+        filterFormatted = Zstring(filterFormatted.c_str() + 1);
+
+    if (!filterFormatted.empty())
     {
-        const DefaultChar* filter = filtername.c_str();
-        int i = filtername.length() - 1;
+        //Test if filterFormatted ends with GlobalResources::FILE_NAME_SEPARATOR, ignoring '*' and '?'.
+        //If so, treat as filter for directory and add to directoryFilter.
+        const DefaultChar* filter = filterFormatted.c_str();
+        int i = filterFormatted.length() - 1;
         while (filter[i] == DefaultChar('*') || filter[i] == DefaultChar('?'))
         {
             --i;
@@ -94,37 +95,46 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
 
         if (i >= 0 && filter[i] == GlobalResources::FILE_NAME_SEPARATOR) //last FILE_NAME_SEPARATOR found
         {
-            if (i != int(filtername.length()) - 1)  // "name\*"
+            if (i != int(filterFormatted.length()) - 1)  // "name\*"
             {
-                fileFilter.insert(filtername);
-                directoryFilter.insert(filtername);
+                fileFilter.insert(filterFormatted);
+                directoryFilter.insert(filterFormatted);
             }
-            //else: "name\" -> not inserted directly
+            //else // "name\"
 
             if (i > 0) // "name\*" or "name\": add "name" to directory filter
-                directoryFilter.insert(Zstring(filtername.c_str(), i));
+                directoryFilter.insert(Zstring(filterFormatted.c_str(), i));
         }
         else
         {
-            fileFilter.insert(filtername);
-            directoryFilter.insert(filtername);
+            fileFilter.insert(filterFormatted);
+            directoryFilter.insert(filterFormatted);
         }
     }
 }
 
 
 inline
-bool matchesFilter(const Zstring& name, const std::set<Zstring>& filter)
+bool matchesFilter(const DefaultChar* name, const std::set<Zstring>& filter)
 {
+#ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
+    Zstring nameFormatted = name;
+    nameFormatted.MakeLower();
+#elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
+    const DefaultChar* const nameFormatted = name; //nothing to do here
+#endif
+
     for (std::set<Zstring>::iterator j = filter.begin(); j != filter.end(); ++j)
-        if (name.Matches(*j))
+        if (Zstring::Matches(nameFormatted, *j))
             return true;
 
     return false;
 }
 
+//##############################################################
 
-void FreeFileSync::filterGridData(FolderComparison& folderCmp, const wxString& includeFilter, const wxString& excludeFilter)
+
+FilterProcess::FilterProcess(const wxString& includeFilter, const wxString& excludeFilter)
 {
     //no need for regular expressions! In tests wxRegex was by factor of 10 slower than wxString::Matches()!!
 
@@ -133,26 +143,37 @@ void FreeFileSync::filterGridData(FolderComparison& folderCmp, const wxString& i
     std::vector<Zstring> includeList = compoundStringToFilter(includeFilter.c_str());
     std::vector<Zstring> excludeList = compoundStringToFilter(excludeFilter.c_str());
 
-//##############################################################
     //setup include/exclude filters for files and directories
-    std::set<Zstring> filterFileIn;
-    std::set<Zstring> filterFolderIn;
     for (std::vector<Zstring>::iterator i = includeList.begin(); i != includeList.end(); ++i)
-    {
-        formatFilterString(*i); //format entry
         addFilterEntry(*i, filterFileIn, filterFolderIn);
-    }
 
-    std::set<Zstring> filterFileEx;
-    std::set<Zstring> filterFolderEx;
     for (std::vector<Zstring>::iterator i = excludeList.begin(); i != excludeList.end(); ++i)
-    {
-        formatFilterString(*i); //format entry
         addFilterEntry(*i, filterFileEx, filterFolderEx);
-    }
+}
 
-//##############################################################
 
+bool FilterProcess::matchesFileFilter(const DefaultChar* relFilename) const
+{
+    if (    matchesFilter(relFilename, filterFileIn) &&  //process include filters
+            !matchesFilter(relFilename, filterFileEx))   //process exclude filters
+        return true;
+    else
+        return false;
+}
+
+
+bool FilterProcess::matchesDirFilter(const DefaultChar* relDirname) const
+{
+    if (    matchesFilter(relDirname, filterFolderIn) &&  //process include filters
+            !matchesFilter(relDirname, filterFolderEx))   //process exclude filters
+        return true;
+    else
+        return false;
+}
+
+
+void FilterProcess::filterGridData(FolderComparison& folderCmp) const
+{
     //execute filtering...
     for (FolderComparison::iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
     {
@@ -160,18 +181,10 @@ void FreeFileSync::filterGridData(FolderComparison& folderCmp, const wxString& i
 
         for (FileComparison::iterator i = fileCmp.begin(); i != fileCmp.end(); ++i)
         {
-            Zstring filenameLeft  = i->fileDescrLeft.fullName;
-            Zstring filenameRight = i->fileDescrRight.fullName;
-
-            formatFilterString(filenameLeft);
-            formatFilterString(filenameRight);
-
-
             //left hand side
             if (i->fileDescrLeft.objType == FileDescrLine::TYPE_FILE)
             {
-                if (    !matchesFilter(filenameLeft, filterFileIn) || //process include filters
-                        matchesFilter(filenameLeft, filterFileEx))   //process exclude filters
+                if (!matchesFileFilter(i->fileDescrLeft.relativeName.c_str()))
                 {
                     i->selectedForSynchronization = false;
                     continue;
@@ -179,19 +192,16 @@ void FreeFileSync::filterGridData(FolderComparison& folderCmp, const wxString& i
             }
             else if (i->fileDescrLeft.objType == FileDescrLine::TYPE_DIRECTORY)
             {
-                if (    !matchesFilter(filenameLeft, filterFolderIn) || //process include filters
-                        matchesFilter(filenameLeft, filterFolderEx))   //process exclude filters
+                if (!matchesDirFilter(i->fileDescrLeft.relativeName.c_str()))
                 {
                     i->selectedForSynchronization = false;
                     continue;
                 }
             }
-
             //right hand side
-            if (i->fileDescrRight.objType == FileDescrLine::TYPE_FILE)
+            else if (i->fileDescrRight.objType == FileDescrLine::TYPE_FILE)
             {
-                if (    !matchesFilter(filenameRight, filterFileIn) || //process include filters
-                        matchesFilter(filenameRight, filterFileEx))   //process exclude filters
+                if (!matchesFileFilter(i->fileDescrRight.relativeName.c_str()))
                 {
                     i->selectedForSynchronization = false;
                     continue;
@@ -199,8 +209,7 @@ void FreeFileSync::filterGridData(FolderComparison& folderCmp, const wxString& i
             }
             else if (i->fileDescrRight.objType == FileDescrLine::TYPE_DIRECTORY)
             {
-                if (    !matchesFilter(filenameRight, filterFolderIn) || //process include filters
-                        matchesFilter(filenameRight, filterFolderEx))   //process exclude filters
+                if (!matchesDirFilter(i->fileDescrRight.relativeName.c_str()))
                 {
                     i->selectedForSynchronization = false;
                     continue;
@@ -227,14 +236,14 @@ void inOrExcludeAllRows(FreeFileSync::FolderComparison& folderCmp)
 }
 
 
-void FreeFileSync::includeAllRowsOnGrid(FolderComparison& folderCmp)
+void FilterProcess::includeAllRowsOnGrid(FolderComparison& folderCmp)
 {
     //remove all filters on currentGridData
     inOrExcludeAllRows<true>(folderCmp);
 }
 
 
-void FreeFileSync::excludeAllRowsOnGrid(FolderComparison& folderCmp)
+void FilterProcess::excludeAllRowsOnGrid(FolderComparison& folderCmp)
 {
     //exclude all rows on currentGridData
     inOrExcludeAllRows<false>(folderCmp);

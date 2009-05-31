@@ -9,13 +9,15 @@ class StatusHandler;
 namespace FreeFileSync
 {
     void calcTotalBytesToSync(const FolderComparison& folderCmp,
-                              const SyncConfiguration& config,
                               int& objectsToCreate,
                               int& objectsToOverwrite,
                               int& objectsToDelete,
+                              int& conflicts,
                               wxULongLong& dataToProcess);
 
-    bool synchronizationNeeded(const FolderComparison& folderCmp, const SyncConfiguration& config);
+    bool synchronizationNeeded(const FolderComparison& folderCmp);
+
+    void redetermineSyncDirection(const SyncConfiguration& config, FolderComparison& folderCmp);
 
     //class handling synchronization process
     class SyncProcess
@@ -26,21 +28,26 @@ namespace FreeFileSync
                     const bool traverseDirSymLinks,
                     bool& warningSignificantDifference,
                     bool& warningNotEnoughDiskSpace,
+                    bool& warningUnresolvedConflict,
                     StatusHandler* handler);
 
-        void startSynchronizationProcess(FolderComparison& folderCmp, const SyncConfiguration& config);
+        void startSynchronizationProcess(FolderComparison& folderCmp);
 
     private:
-        bool synchronizeFile(const FileCompareLine& cmpLine, const SyncConfiguration& config, const FolderPair& folderPair);   //false if nothing was done
-        bool synchronizeFolder(const FileCompareLine& cmpLine, const SyncConfiguration& config, const FolderPair& folderPair); //false if nothing was done
+        bool synchronizeFile(const FileCompareLine& cmpLine, const FolderPair& folderPair);   //false if nothing was done
+        bool synchronizeFolder(const FileCompareLine& cmpLine, const FolderPair& folderPair); //false if nothing was done
 
         void copyFileUpdating(const Zstring& source, const Zstring& target, const wxULongLong& sourceFileSize);
 
         const bool m_useRecycleBin;
         const bool m_copyFileSymLinks;
         const bool m_traverseDirSymLinks;
+
+        //warnings
         bool& m_warningSignificantDifference;
         bool& m_warningNotEnoughDiskSpace;
+        bool& m_warningUnresolvedConflict;
+
         StatusHandler* statusUpdater;
 
         //preload status texts

@@ -291,13 +291,13 @@ namespace FreeFileSync
         const Zstring* const dirNameB = side == SORT_ON_LEFT ? &b.syncPair.leftDirectory : &b.syncPair.rightDirectory;
 
 #ifdef FFS_WIN //case-insensitive comparison!
-            return sortAscending == ASCENDING ?
-                   FreeFileSync::compareStringsWin32(dirNameA->c_str(), dirNameB->c_str()) < 0 : //way faster than wxString::CmpNoCase() in windows build!!!
-                   FreeFileSync::compareStringsWin32(dirNameA->c_str(), dirNameB->c_str()) > 0;
+        return sortAscending == ASCENDING ?
+               FreeFileSync::compareStringsWin32(dirNameA->c_str(), dirNameB->c_str()) < 0 : //way faster than wxString::CmpNoCase() in windows build!!!
+               FreeFileSync::compareStringsWin32(dirNameA->c_str(), dirNameB->c_str()) > 0;
 #elif defined FFS_LINUX
-            return sortAscending == ASCENDING ?
-                   dirNameA->Cmp(*dirNameB) < 0 :
-                   dirNameA->Cmp(*dirNameB) > 0;
+        return sortAscending == ASCENDING ?
+               dirNameA->Cmp(*dirNameB) < 0 :
+               dirNameA->Cmp(*dirNameB) > 0;
 #endif
     }
 }

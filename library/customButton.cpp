@@ -126,6 +126,9 @@ void linearInterpolation(wxImage& img)
 
 wxBitmap wxButtonWithImage::createBitmapFromText(const wxString& text)
 {
+    if (text.empty())
+        return wxBitmap();
+
     wxFont currentFont = wxBitmapButton::GetFont();
     wxColor textColor  = wxBitmapButton::GetForegroundColour();
 

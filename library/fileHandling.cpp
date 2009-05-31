@@ -284,18 +284,25 @@ private:
 };
 
 
-
-typedef DWORD WINAPI (*GetFinalPath)(
-    HANDLE hFile,
-    LPTSTR lpszFilePath,
-    DWORD cchFilePath,
-    DWORD dwFlags);
-
-
-class DllHandler //dynamically load windows API functions
+class KernelDllHandler //dynamically load windows API functions
 {
+    typedef DWORD WINAPI (*GetFinalPath)(
+        HANDLE hFile,
+        LPTSTR lpszFilePath,
+        DWORD cchFilePath,
+        DWORD dwFlags);
+
 public:
-    DllHandler() :
+    static const KernelDllHandler& getInstance() //lazy creation of KernelDllHandler
+    {
+        static KernelDllHandler instance;
+        return instance;
+    }
+
+    GetFinalPath getFinalPathNameByHandle;
+
+private:
+    KernelDllHandler() :
             getFinalPathNameByHandle(NULL),
             hKernel(NULL)
     {
@@ -305,24 +312,13 @@ public:
             getFinalPathNameByHandle = reinterpret_cast<GetFinalPath>(::GetProcAddress(hKernel, "GetFinalPathNameByHandleW")); //load unicode version!
     }
 
-    ~DllHandler()
+    ~KernelDllHandler()
     {
         if (hKernel) ::FreeLibrary(hKernel);
     }
 
-    GetFinalPath getFinalPathNameByHandle;
-
-private:
     HINSTANCE hKernel;
 };
-
-
-inline
-DllHandler& getDllHandler() //lazy creation of DllHandler
-{
-    static DllHandler instance;
-    return instance;
-}
 
 
 Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target path of symbolic link to a directory
@@ -340,13 +336,13 @@ Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target pa
 
     CloseHandleOnExit dummy(hDir);
 
-    if (getDllHandler().getFinalPathNameByHandle == NULL )
+    if (KernelDllHandler::getInstance().getFinalPathNameByHandle == NULL )
         throw FileError(Zstring(_("Error loading library function:")) + wxT("\n\"") + wxT("GetFinalPathNameByHandleW") + wxT("\""));
 
     const unsigned BUFFER_SIZE = 10000;
     TCHAR targetPath[BUFFER_SIZE];
 
-    const DWORD rv = getDllHandler().getFinalPathNameByHandle(
+    const DWORD rv = KernelDllHandler::getInstance().getFinalPathNameByHandle(
                          hDir,
                          targetPath,
                          BUFFER_SIZE,
@@ -669,8 +665,8 @@ inline
 void setWin32FileInformation(const FILETIME& lastWriteTime, const DWORD fileSizeHigh, const DWORD fileSizeLow, FreeFileSync::FileInfo& output)
 {
     //convert UTC FILETIME to ANSI C format (number of seconds since Jan. 1st 1970 UTC)
-    wxLongLong writeTimeLong(lastWriteTime.dwHighDateTime, lastWriteTime.dwLowDateTime);
-    writeTimeLong /= 10000000;                     //reduce precision to 1 second (FILETIME has unit 10^-7 s)
+    wxLongLong writeTimeLong(wxInt32(lastWriteTime.dwHighDateTime), lastWriteTime.dwLowDateTime);
+    writeTimeLong /= 10000000;                    //reduce precision to 1 second (FILETIME has unit 10^-7 s)
     writeTimeLong -= wxLongLong(2, 3054539008UL); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
     output.lastWriteTimeRaw = writeTimeLong;
 

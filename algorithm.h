@@ -32,10 +32,11 @@ namespace FreeFileSync
                              const std::set<int>& rowsToDeleteOnRight,
                              const bool deleteOnBothSides,
                              const bool useRecycleBin,
+                             const SyncConfiguration& syncConfig,
                              ErrorHandler* errorHandler);
 
 
-    wxString utcTimeToLocalString(const wxLongLong& utcTime);
+    wxString utcTimeToLocalString(const wxLongLong& utcTime, const Zstring& filename);
 
     //enhanced binary search template: returns an iterator
     template <class ForwardIterator, class T>

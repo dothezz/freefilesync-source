@@ -1,4 +1,4 @@
-FreeFileSync v1.18
+FreeFileSync v1.19
 ------------------
 
 Usage
@@ -13,7 +13,7 @@ Key Features
 2. No limitations: An arbitrary number of files can be synchronized.
 3. Unicode support.
 4. Network support.
-5. Full support for Windows/Linux symbolic links.
+5. Full support for Windows/Linux Symbolic Links and Windows Junction Points.
 6. Lean & easily accessible UI: Highly optimized for speed and huge sets of data.
 7. Algorithms coded in C++ completely.
 8. Progress indicators are updated only every 100ms for optimal performance!
@@ -81,6 +81,16 @@ You can: - drag & drop any directory onto the main window to set the directory f
          - drag & drop *.ffs_gui files onto the main window to load the configuration contained
          - drag & drop *.ffs_batch files onto the main window to display and edit the batch configuration
          - drag & drop *.ffs_batch files onto the batch dialog to display and edit the batch configuration
+
+		 
+4.) Synchronize two folders but exclude all subfolders from synchronization
+
+Assuming you plan to synchronize two folders "C:\Source" and "D:\Target", you'll want to setup a filter like this:
+
+	Include: *
+	Exclude: *\*
+	
+This will exclude all files and folders within the two directories that contain a "\" character. These are exactly the subfolders and -files you want to exclude.
 
 
 Links

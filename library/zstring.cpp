@@ -1,5 +1,4 @@
 #include "zstring.h"
-#include <wx/intl.h>
 #include "globalFunctions.h"
 
 #ifdef FFS_WIN
@@ -121,6 +120,12 @@ bool matchesHelper(const DefaultChar* string, const DefaultChar* mask)
 bool Zstring::Matches(const DefaultChar* mask) const
 {
     return matchesHelper(c_str(), mask);
+}
+
+
+bool Zstring::Matches(const DefaultChar* name, const DefaultChar* mask)
+{
+    return matchesHelper(name, mask);
 }
 
 

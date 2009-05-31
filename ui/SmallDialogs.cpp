@@ -80,7 +80,7 @@ HelpDlg::HelpDlg(wxWindow* window) : HelpDlgGenerated(window)
 
     m_treeCtrl1->AppendItem(treeDifferent, _("- left newer"));
     m_treeCtrl1->AppendItem(treeDifferent, _("- right newer"));
-    m_treeCtrl1->AppendItem(treeDifferent, _("- same date (different size)"));
+    m_treeCtrl1->AppendItem(treeDifferent, _("- conflict (same date, different size)"));
 
     m_treeCtrl1->ExpandAll();
 
@@ -451,9 +451,10 @@ void QuestionDlg::OnNo(wxCommandEvent& event)
 //########################################################################################
 
 
-CustomizeColsDlg::CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes& attr) :
+CustomizeColsDlg::CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes& attr, bool& showFileIcons) :
         CustomizeColsDlgGenerated(window),
-        output(attr)
+        output(attr),
+        m_showFileIcons(showFileIcons)
 {
     m_bpButton29->SetBitmapLabel(*globalResource.bitmapMoveUp);
     m_bpButton30->SetBitmapLabel(*globalResource.bitmapMoveDown);
@@ -467,6 +468,12 @@ CustomizeColsDlg::CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes
         m_checkListColumns->Append(CustomGridRim::getTypeName(i->type));
         m_checkListColumns->Check(i - columnSettings.begin(), i->visible);
     }
+
+#ifdef FFS_LINUX //file icons currently supported on Windows only
+    m_checkBoxShowFileIcons->Hide();
+#endif
+
+    m_checkBoxShowFileIcons->SetValue(m_showFileIcons);
 
     m_checkListColumns->SetSelection(0);
     Fit();
@@ -489,6 +496,8 @@ void CustomizeColsDlg::OnOkay(wxCommandEvent& event)
         }
     }
 
+    m_showFileIcons = m_checkBoxShowFileIcons->GetValue();
+
     EndModal(BUTTON_OKAY);
 }
 
@@ -503,6 +512,8 @@ void CustomizeColsDlg::OnDefault(wxCommandEvent& event)
         m_checkListColumns->Append(CustomGridRim::getTypeName(i->type));
         m_checkListColumns->Check(i - defaultColumnAttr.begin(), i->visible);
     }
+
+    m_checkBoxShowFileIcons->SetValue(true);
 }
 
 
@@ -560,6 +571,8 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSetti
     m_buttonResetWarnings->setBitmapFront(*globalResource.bitmapWarningSmall, 5);
 
     m_spinCtrlFileTimeTolerance->SetValue(globalSettings.shared.fileTimeTolerance);
+    m_checkBoxIgnoreOneHour->SetValue(globalSettings.shared.ignoreOneHourDiff);
+
     m_textCtrlFileManager->SetValue(globalSettings.gui.commandLineFileManager);
 
     Fit();
@@ -569,8 +582,9 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSetti
 void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 {
     //write global settings only when okay-button is pressed!
-
     settings.shared.fileTimeTolerance = m_spinCtrlFileTimeTolerance->GetValue();
+    settings.shared.ignoreOneHourDiff = m_checkBoxIgnoreOneHour->GetValue();
+
     settings.gui.commandLineFileManager = m_textCtrlFileManager->GetValue();
 
     EndModal(BUTTON_OKAY);
@@ -588,6 +602,7 @@ void GlobalSettingsDlg::OnResetWarnings(wxCommandEvent& event)
 void GlobalSettingsDlg::OnDefault(wxCommandEvent& event)
 {
     m_spinCtrlFileTimeTolerance->SetValue(2);
+    m_checkBoxIgnoreOneHour->SetValue(true);
 #ifdef FFS_WIN
     m_textCtrlFileManager->SetValue(wxT("explorer /select, %name"));
 #elif defined FFS_LINUX
@@ -948,13 +963,13 @@ void SyncStatus::setCurrentStatus(SyncStatusID id)
         break;
 
     case SCANNING:
-        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusComparing);
+        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusScanning);
         m_staticTextStatus->SetLabel(_("Scanning..."));
         break;
 
-    case COMPARING:
-        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusComparing);
-        m_staticTextStatus->SetLabel(_("Comparing..."));
+    case COMPARING_CONTENT:
+        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusBinCompare);
+        m_staticTextStatus->SetLabel(_("Comparing content..."));
         break;
 
     case SYNCHRONIZING:

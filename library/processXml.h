@@ -26,21 +26,21 @@ namespace xmlAccess
 
     enum ColumnTypes
     {
-        FILENAME = 0,
+        DIRECTORY,
+        FULL_PATH,
         REL_PATH,
+        FILENAME,
         SIZE,
-        DATE,
-        FULL_NAME,
-        DIRECTORY
+        DATE
     };
     const unsigned COLUMN_TYPE_COUNT = 6;
 
     struct ColumnAttrib
     {
         ColumnTypes type;
-        bool        visible;
-        unsigned    position;
-        int         width;
+        bool         visible;
+        unsigned int position;
+        int          width;
     };
     typedef std::vector<ColumnAttrib> ColumnAttributes;
 
@@ -51,20 +51,23 @@ namespace xmlAccess
     {
         XmlGuiConfig() :
                 hideFilteredElements(false),
-                ignoreErrors(false) {} //initialize values
+                ignoreErrors(false),
+                syncPreviewEnabled(true) {} //initialize values
 
         FreeFileSync::MainConfiguration mainCfg;
         std::vector<FreeFileSync::FolderPair> directoryPairs;
 
         bool hideFilteredElements;
         bool ignoreErrors; //reaction on error situation during synchronization
+        bool syncPreviewEnabled;
 
         bool operator==(const XmlGuiConfig& other) const
         {
-            return mainCfg              == other.mainCfg &&
-                   directoryPairs       == other.directoryPairs &&
+            return mainCfg              == other.mainCfg              &&
+                   directoryPairs       == other.directoryPairs       &&
                    hideFilteredElements == other.hideFilteredElements &&
-                   ignoreErrors         == other.ignoreErrors;
+                   ignoreErrors         == other.ignoreErrors         &&
+                   syncPreviewEnabled   == other.syncPreviewEnabled;
         }
 
         bool operator!=(const XmlGuiConfig& other) const
@@ -98,6 +101,7 @@ namespace xmlAccess
             _Shared() :
                     programLanguage(retrieveSystemLanguage()),
                     fileTimeTolerance(2),  //default 2s: FAT vs NTFS
+                    ignoreOneHourDiff(true),
                     traverseDirectorySymlinks(false),
                     copyFileSymlinks(supportForSymbolicLinks()),
                     lastUpdateCheck(0)
@@ -106,7 +110,8 @@ namespace xmlAccess
             }
 
             int programLanguage;
-            unsigned fileTimeTolerance; //max. allowed file time deviation
+            unsigned int fileTimeTolerance; //max. allowed file time deviation
+            bool ignoreOneHourDiff; //ignore +/- 1 hour due to DST change
             bool traverseDirectorySymlinks;
             bool copyFileSymlinks; //copy symbolic link instead of target file
             long lastUpdateCheck; //time of last update check
@@ -117,6 +122,8 @@ namespace xmlAccess
             bool warningDependentFolders;
             bool warningSignificantDifference;
             bool warningNotEnoughDiskSpace;
+            bool warningUnresolvedConflicts;
+            bool warningSynchronizationStarting;
         } shared;
 
 //---------------------------------------------------------------------

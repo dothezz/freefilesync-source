@@ -16,8 +16,7 @@ using namespace FreeFileSync;
 SyncDialog::SyncDialog(wxWindow* window,
                        const FolderComparison& folderCmpRef,
                        MainConfiguration& config,
-                       bool& ignoreErrors,
-                       bool synchronizationEnabled) :
+                       bool& ignoreErrors) :
         SyncDlgGenerated(window),
         folderCmp(folderCmpRef),
         cfg(config),
@@ -29,61 +28,43 @@ SyncDialog::SyncDialog(wxWindow* window,
     m_checkBoxIgnoreErrors->SetValue(m_ignoreErrors);
 
     //set sync config icons
-    updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
-    //update preview
-    calculatePreview();
+    updateConfigIcons(cfg.compareVar, localSyncConfiguration);
 
     //set icons for this dialog
-    m_bitmap13->SetBitmap(*globalResource.bitmapLeftOnly);
-    m_bitmap14->SetBitmap(*globalResource.bitmapRightOnly);
-    m_bitmap15->SetBitmap(*globalResource.bitmapLeftNewer);
-    m_bitmap16->SetBitmap(*globalResource.bitmapRightNewer);
-    m_bitmap17->SetBitmap(*globalResource.bitmapDifferent);
-
-    if (synchronizationEnabled)
-    {
-        m_button18->SetForegroundColour(*wxBLACK);
-        m_button18->setBitmapFront(*globalResource.bitmapStartSync);
-        m_button18->Enable();
-    }
-    else
-    {
-        m_button18->SetForegroundColour(wxColor(94, 94, 94)); //grey
-        m_button18->setBitmapFront(*globalResource.bitmapStartSyncDis);
-        m_button18->Disable();
-        m_button6->SetFocus();
-    }
+    m_bitmapLeftOnly->SetBitmap(*globalResource.bitmapLeftOnly);
+    m_bitmapRightOnly->SetBitmap(*globalResource.bitmapRightOnly);
+    m_bitmapLeftNewer->SetBitmap(*globalResource.bitmapLeftNewer);
+    m_bitmapRightNewer->SetBitmap(*globalResource.bitmapRightNewer);
+    m_bitmapDifferent->SetBitmap(*globalResource.bitmapDifferent);
 
     bSizer201->Layout(); //wxButtonWithImage size might have changed
 
-
     //set radiobutton
-    if (    localSyncConfiguration.exLeftSideOnly  == SyncConfiguration::SYNC_DIR_RIGHT &&
-            localSyncConfiguration.exRightSideOnly == SyncConfiguration::SYNC_DIR_RIGHT &&
-            localSyncConfiguration.leftNewer       == SyncConfiguration::SYNC_DIR_RIGHT &&
-            localSyncConfiguration.rightNewer      == SyncConfiguration::SYNC_DIR_RIGHT &&
-            localSyncConfiguration.different       == SyncConfiguration::SYNC_DIR_RIGHT)
+    if (    localSyncConfiguration.exLeftSideOnly  == SYNC_DIR_RIGHT &&
+            localSyncConfiguration.exRightSideOnly == SYNC_DIR_RIGHT &&
+            localSyncConfiguration.leftNewer       == SYNC_DIR_RIGHT &&
+            localSyncConfiguration.rightNewer      == SYNC_DIR_RIGHT &&
+            localSyncConfiguration.different       == SYNC_DIR_RIGHT)
         m_radioBtn1->SetValue(true);    //one way ->
 
-    else if (localSyncConfiguration.exLeftSideOnly  == SyncConfiguration::SYNC_DIR_RIGHT &&
-             localSyncConfiguration.exRightSideOnly == SyncConfiguration::SYNC_DIR_NONE  &&
-             localSyncConfiguration.leftNewer       == SyncConfiguration::SYNC_DIR_RIGHT &&
-             localSyncConfiguration.rightNewer      == SyncConfiguration::SYNC_DIR_NONE  &&
-             localSyncConfiguration.different       == SyncConfiguration::SYNC_DIR_NONE)
+    else if (localSyncConfiguration.exLeftSideOnly  == SYNC_DIR_RIGHT &&
+             localSyncConfiguration.exRightSideOnly == SYNC_DIR_NONE  &&
+             localSyncConfiguration.leftNewer       == SYNC_DIR_RIGHT &&
+             localSyncConfiguration.rightNewer      == SYNC_DIR_NONE  &&
+             localSyncConfiguration.different       == SYNC_DIR_NONE)
         m_radioBtnUpdate->SetValue(true);    //Update ->
 
-    else if (localSyncConfiguration.exLeftSideOnly  == SyncConfiguration::SYNC_DIR_RIGHT &&
-             localSyncConfiguration.exRightSideOnly == SyncConfiguration::SYNC_DIR_LEFT  &&
-             localSyncConfiguration.leftNewer       == SyncConfiguration::SYNC_DIR_RIGHT &&
-             localSyncConfiguration.rightNewer      == SyncConfiguration::SYNC_DIR_LEFT  &&
-             localSyncConfiguration.different       == SyncConfiguration::SYNC_DIR_NONE)
+    else if (localSyncConfiguration.exLeftSideOnly  == SYNC_DIR_RIGHT &&
+             localSyncConfiguration.exRightSideOnly == SYNC_DIR_LEFT  &&
+             localSyncConfiguration.leftNewer       == SYNC_DIR_RIGHT &&
+             localSyncConfiguration.rightNewer      == SYNC_DIR_LEFT  &&
+             localSyncConfiguration.different       == SYNC_DIR_NONE)
         m_radioBtn2->SetValue(true);    //two way <->
 
     else
         m_radioBtn3->SetValue(true);    //other
 
-    //set tooltip for ambivalent category "different"
-    adjustToolTips(m_bitmap17, config.compareVar);
+    Fit();
 }
 
 //#################################################################################################################
@@ -91,133 +72,148 @@ SyncDialog::SyncDialog(wxWindow* window,
 SyncDialog::~SyncDialog() {}
 
 
-void SyncDialog::updateConfigIcons(wxBitmapButton* button1,
-                                   wxBitmapButton* button2,
-                                   wxBitmapButton* button3,
-                                   wxBitmapButton* button4,
-                                   wxBitmapButton* button5,
-                                   const SyncConfiguration& syncConfig)
+void SyncDialog::updateConfigIcons(const FreeFileSync::CompareVariant cmpVar, const FreeFileSync::SyncConfiguration& syncConfig)
 {
-    if (syncConfig.exLeftSideOnly == SyncConfiguration::SYNC_DIR_RIGHT)
-    {
-        button1->SetBitmapLabel(*globalResource.bitmapArrowRightCr);
-        button1->SetToolTip(_("Copy from left to right"));
-    }
-    else if (syncConfig.exLeftSideOnly == SyncConfiguration::SYNC_DIR_LEFT)
-    {
-        button1->SetBitmapLabel(*globalResource.bitmapDeleteLeft);
-        button1->SetToolTip(_("Delete files/folders existing on left side only"));
-    }
-    else if (syncConfig.exLeftSideOnly == SyncConfiguration::SYNC_DIR_NONE)
-    {
-        button1->SetBitmapLabel(*globalResource.bitmapArrowNone);
-        button1->SetToolTip(_("Do nothing"));
-    }
-
-    if (syncConfig.exRightSideOnly == SyncConfiguration::SYNC_DIR_RIGHT)
-    {
-        button2->SetBitmapLabel(*globalResource.bitmapDeleteRight);
-        button2->SetToolTip(_("Delete files/folders existing on right side only"));
-    }
-    else if (syncConfig.exRightSideOnly == SyncConfiguration::SYNC_DIR_LEFT)
-    {
-        button2->SetBitmapLabel(*globalResource.bitmapArrowLeftCr);
-        button2->SetToolTip(_("Copy from right to left"));
-    }
-    else if (syncConfig.exRightSideOnly == SyncConfiguration::SYNC_DIR_NONE)
-    {
-        button2->SetBitmapLabel(*globalResource.bitmapArrowNone);
-        button2->SetToolTip(_("Do nothing"));
-    }
-
-    if (syncConfig.leftNewer == SyncConfiguration::SYNC_DIR_RIGHT)
-    {
-        button3->SetBitmapLabel(*globalResource.bitmapArrowRight);
-        button3->SetToolTip(_("Copy from left to right overwriting"));
-    }
-    else if (syncConfig.leftNewer == SyncConfiguration::SYNC_DIR_LEFT)
-    {
-        button3->SetBitmapLabel(*globalResource.bitmapArrowLeft);
-        button3->SetToolTip(_("Copy from right to left overwriting"));
-    }
-    else if (syncConfig.leftNewer == SyncConfiguration::SYNC_DIR_NONE)
-    {
-        button3->SetBitmapLabel(*globalResource.bitmapArrowNone);
-        button3->SetToolTip(_("Do nothing"));
-    }
-
-    if (syncConfig.rightNewer == SyncConfiguration::SYNC_DIR_RIGHT)
-    {
-        button4->SetBitmapLabel(*globalResource.bitmapArrowRight);
-        button4->SetToolTip(_("Copy from left to right overwriting"));
-    }
-    else if (syncConfig.rightNewer == SyncConfiguration::SYNC_DIR_LEFT)
-    {
-        button4->SetBitmapLabel(*globalResource.bitmapArrowLeft);
-        button4->SetToolTip(_("Copy from right to left overwriting"));
-    }
-    else if (syncConfig.rightNewer == SyncConfiguration::SYNC_DIR_NONE)
-    {
-        button4->SetBitmapLabel(*globalResource.bitmapArrowNone);
-        button4->SetToolTip(_("Do nothing"));
-    }
-
-    if (syncConfig.different == SyncConfiguration::SYNC_DIR_RIGHT)
-    {
-        button5->SetBitmapLabel(*globalResource.bitmapArrowRight);
-        button5->SetToolTip(_("Copy from left to right overwriting"));
-    }
-    else if (syncConfig.different == SyncConfiguration::SYNC_DIR_LEFT)
-    {
-        button5->SetBitmapLabel(*globalResource.bitmapArrowLeft);
-        button5->SetToolTip(_("Copy from right to left overwriting"));
-    }
-    else if (syncConfig.different == SyncConfiguration::SYNC_DIR_NONE)
-    {
-        button5->SetBitmapLabel(*globalResource.bitmapArrowNone);
-        button5->SetToolTip(_("Do nothing"));
-    }
+    updateConfigIcons(cmpVar,
+                      syncConfig,
+                      m_bpButtonLeftOnly,
+                      m_bpButtonRightOnly,
+                      m_bpButtonLeftNewer,
+                      m_bpButtonRightNewer,
+                      m_bpButtonDifferent,
+                      m_bitmapLeftOnly,
+                      m_bitmapRightOnly,
+                      m_bitmapLeftNewer,
+                      m_bitmapRightNewer,
+                      m_bitmapDifferent);
 }
 
 
-void SyncDialog::adjustToolTips(wxStaticBitmap* bitmap, const CompareVariant var)
+void SyncDialog::updateConfigIcons(const CompareVariant compareVar,
+                                   const SyncConfiguration& syncConfig,
+                                   wxBitmapButton* buttonLeftOnly,
+                                   wxBitmapButton* buttonRightOnly,
+                                   wxBitmapButton* buttonLeftNewer,
+                                   wxBitmapButton* buttonRightNewer,
+                                   wxBitmapButton* buttonDifferent,
+                                   wxStaticBitmap* bitmapLeftOnly,
+                                   wxStaticBitmap* bitmapRightOnly,
+                                   wxStaticBitmap* bitmapLeftNewer,
+                                   wxStaticBitmap* bitmapRightNewer,
+                                   wxStaticBitmap* bitmapDifferent)
 {
-    //set tooltip for ambivalent category "different"
-    switch (var)
+    //display only relevant sync options
+    switch (compareVar)
     {
     case CMP_BY_TIME_SIZE:
-        bitmap->SetToolTip(_("Files that exist on both sides, have same date but different filesizes"));
+        buttonLeftOnly->Show();
+        buttonRightOnly->Show();
+        buttonLeftNewer->Show();
+        buttonRightNewer->Show();
+        buttonDifferent->Hide();
+
+        bitmapLeftOnly->Show();
+        bitmapRightOnly->Show();
+        bitmapLeftNewer->Show();
+        bitmapRightNewer->Show();
+        bitmapDifferent->Hide();
         break;
+
     case CMP_BY_CONTENT:
-        bitmap->SetToolTip(_("Files that exist on both sides and have different content"));
+        buttonLeftOnly->Show();
+        buttonRightOnly->Show();
+        buttonLeftNewer->Hide();
+        buttonRightNewer->Hide();
+        buttonDifferent->Show();
+
+        bitmapLeftOnly->Show();
+        bitmapRightOnly->Show();
+        bitmapLeftNewer->Hide();
+        bitmapRightNewer->Hide();
+        bitmapDifferent->Show();
         break;
     }
-}
 
 
-void SyncDialog::calculatePreview()
-{
-    //update preview of bytes to be transferred:
-    int objectsToCreate    = 0;
-    int objectsToOverwrite = 0;
-    int objectsToDelete    = 0;
-    wxULongLong dataToProcess;
-    FreeFileSync::calcTotalBytesToSync(folderCmp,
-                                       localSyncConfiguration,
-                                       objectsToCreate,
-                                       objectsToOverwrite,
-                                       objectsToDelete,
-                                       dataToProcess);
+    if (syncConfig.exLeftSideOnly == SYNC_DIR_RIGHT)
+    {
+        buttonLeftOnly->SetBitmapLabel(*globalResource.bitmapArrowRightCr);
+        buttonLeftOnly->SetToolTip(_("Copy from left to right"));
+    }
+    else if (syncConfig.exLeftSideOnly == SYNC_DIR_LEFT)
+    {
+        buttonLeftOnly->SetBitmapLabel(*globalResource.bitmapDeleteLeft);
+        buttonLeftOnly->SetToolTip(_("Delete files/folders existing on left side only"));
+    }
+    else if (syncConfig.exLeftSideOnly == SYNC_DIR_NONE)
+    {
+        buttonLeftOnly->SetBitmapLabel(*globalResource.bitmapArrowNone);
+        buttonLeftOnly->SetToolTip(_("Do nothing"));
+    }
 
-    const wxString toCreate = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(objectsToCreate));
-    const wxString toUpdate = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(objectsToOverwrite));
-    const wxString toDelete = globalFunctions::includeNumberSeparator(globalFunctions::numberToWxString(objectsToDelete));
-    const wxString data     = FreeFileSync::formatFilesizeToShortString(dataToProcess);
+    if (syncConfig.exRightSideOnly == SYNC_DIR_RIGHT)
+    {
+        buttonRightOnly->SetBitmapLabel(*globalResource.bitmapDeleteRight);
+        buttonRightOnly->SetToolTip(_("Delete files/folders existing on right side only"));
+    }
+    else if (syncConfig.exRightSideOnly == SYNC_DIR_LEFT)
+    {
+        buttonRightOnly->SetBitmapLabel(*globalResource.bitmapArrowLeftCr);
+        buttonRightOnly->SetToolTip(_("Copy from right to left"));
+    }
+    else if (syncConfig.exRightSideOnly == SYNC_DIR_NONE)
+    {
+        buttonRightOnly->SetBitmapLabel(*globalResource.bitmapArrowNone);
+        buttonRightOnly->SetToolTip(_("Do nothing"));
+    }
 
-    m_textCtrlCreate->SetValue(toCreate);
-    m_textCtrlUpdate->SetValue(toUpdate);
-    m_textCtrlDelete->SetValue(toDelete);
-    m_textCtrlData->SetValue(data);
+    if (syncConfig.leftNewer == SYNC_DIR_RIGHT)
+    {
+        buttonLeftNewer->SetBitmapLabel(*globalResource.bitmapArrowRight);
+        buttonLeftNewer->SetToolTip(_("Copy from left to right overwriting"));
+    }
+    else if (syncConfig.leftNewer == SYNC_DIR_LEFT)
+    {
+        buttonLeftNewer->SetBitmapLabel(*globalResource.bitmapArrowLeft);
+        buttonLeftNewer->SetToolTip(_("Copy from right to left overwriting"));
+    }
+    else if (syncConfig.leftNewer == SYNC_DIR_NONE)
+    {
+        buttonLeftNewer->SetBitmapLabel(*globalResource.bitmapArrowNone);
+        buttonLeftNewer->SetToolTip(_("Do nothing"));
+    }
+
+    if (syncConfig.rightNewer == SYNC_DIR_RIGHT)
+    {
+        buttonRightNewer->SetBitmapLabel(*globalResource.bitmapArrowRight);
+        buttonRightNewer->SetToolTip(_("Copy from left to right overwriting"));
+    }
+    else if (syncConfig.rightNewer == SYNC_DIR_LEFT)
+    {
+        buttonRightNewer->SetBitmapLabel(*globalResource.bitmapArrowLeft);
+        buttonRightNewer->SetToolTip(_("Copy from right to left overwriting"));
+    }
+    else if (syncConfig.rightNewer == SYNC_DIR_NONE)
+    {
+        buttonRightNewer->SetBitmapLabel(*globalResource.bitmapArrowNone);
+        buttonRightNewer->SetToolTip(_("Do nothing"));
+    }
+
+    if (syncConfig.different == SYNC_DIR_RIGHT)
+    {
+        buttonDifferent->SetBitmapLabel(*globalResource.bitmapArrowRight);
+        buttonDifferent->SetToolTip(_("Copy from left to right overwriting"));
+    }
+    else if (syncConfig.different == SYNC_DIR_LEFT)
+    {
+        buttonDifferent->SetBitmapLabel(*globalResource.bitmapArrowLeft);
+        buttonDifferent->SetToolTip(_("Copy from right to left overwriting"));
+    }
+    else if (syncConfig.different == SYNC_DIR_NONE)
+    {
+        buttonDifferent->SetBitmapLabel(*globalResource.bitmapArrowNone);
+        buttonDifferent->SetToolTip(_("Do nothing"));
+    }
 }
 
 
@@ -233,24 +229,14 @@ void SyncDialog::OnCancel(wxCommandEvent& event)
 }
 
 
-void SyncDialog::OnBack(wxCommandEvent& event)
+void SyncDialog::OnApply(wxCommandEvent& event)
 {
     //write configuration to main dialog
     cfg.syncConfiguration = localSyncConfiguration;
     cfg.useRecycleBin     = m_checkBoxUseRecycler->GetValue();
     m_ignoreErrors        = m_checkBoxIgnoreErrors->GetValue();
 
-    EndModal(0);
-}
-
-void SyncDialog::OnStartSync(wxCommandEvent& event)
-{
-    //write configuration to main dialog
-    cfg.syncConfiguration = localSyncConfiguration;
-    cfg.useRecycleBin     = m_checkBoxUseRecycler->GetValue();
-    m_ignoreErrors        = m_checkBoxIgnoreErrors->GetValue();
-
-    EndModal(BUTTON_START);
+    EndModal(BUTTON_OKAY);
 }
 
 
@@ -269,14 +255,13 @@ void SyncDialog::OnSelectRecycleBin(wxCommandEvent& event)
 
 void SyncDialog::OnSyncLeftToRight(wxCommandEvent& event)
 {
-    localSyncConfiguration.exLeftSideOnly  = SyncConfiguration::SYNC_DIR_RIGHT;
-    localSyncConfiguration.exRightSideOnly = SyncConfiguration::SYNC_DIR_RIGHT;
-    localSyncConfiguration.leftNewer       = SyncConfiguration::SYNC_DIR_RIGHT;
-    localSyncConfiguration.rightNewer      = SyncConfiguration::SYNC_DIR_RIGHT;
-    localSyncConfiguration.different       = SyncConfiguration::SYNC_DIR_RIGHT;
+    localSyncConfiguration.exLeftSideOnly  = SYNC_DIR_RIGHT;
+    localSyncConfiguration.exRightSideOnly = SYNC_DIR_RIGHT;
+    localSyncConfiguration.leftNewer       = SYNC_DIR_RIGHT;
+    localSyncConfiguration.rightNewer      = SYNC_DIR_RIGHT;
+    localSyncConfiguration.different       = SYNC_DIR_RIGHT;
 
-    updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
-    calculatePreview();
+    updateConfigIcons(cfg.compareVar, localSyncConfiguration);
 
     //if event is triggered by button
     m_radioBtn1->SetValue(true);
@@ -285,14 +270,13 @@ void SyncDialog::OnSyncLeftToRight(wxCommandEvent& event)
 
 void SyncDialog::OnSyncUpdate(wxCommandEvent& event)
 {
-    localSyncConfiguration.exLeftSideOnly  = SyncConfiguration::SYNC_DIR_RIGHT;
-    localSyncConfiguration.exRightSideOnly = SyncConfiguration::SYNC_DIR_NONE;
-    localSyncConfiguration.leftNewer       = SyncConfiguration::SYNC_DIR_RIGHT;
-    localSyncConfiguration.rightNewer      = SyncConfiguration::SYNC_DIR_NONE;
-    localSyncConfiguration.different       = SyncConfiguration::SYNC_DIR_NONE;
+    localSyncConfiguration.exLeftSideOnly  = SYNC_DIR_RIGHT;
+    localSyncConfiguration.exRightSideOnly = SYNC_DIR_NONE;
+    localSyncConfiguration.leftNewer       = SYNC_DIR_RIGHT;
+    localSyncConfiguration.rightNewer      = SYNC_DIR_NONE;
+    localSyncConfiguration.different       = SYNC_DIR_NONE;
 
-    updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
-    calculatePreview();
+    updateConfigIcons(cfg.compareVar, localSyncConfiguration);
 
     //if event is triggered by button
     m_radioBtnUpdate->SetValue(true);
@@ -301,28 +285,27 @@ void SyncDialog::OnSyncUpdate(wxCommandEvent& event)
 
 void SyncDialog::OnSyncBothSides(wxCommandEvent& event)
 {
-    localSyncConfiguration.exLeftSideOnly  = SyncConfiguration::SYNC_DIR_RIGHT;
-    localSyncConfiguration.exRightSideOnly = SyncConfiguration::SYNC_DIR_LEFT;
-    localSyncConfiguration.leftNewer       = SyncConfiguration::SYNC_DIR_RIGHT;
-    localSyncConfiguration.rightNewer      = SyncConfiguration::SYNC_DIR_LEFT;
-    localSyncConfiguration.different       = SyncConfiguration::SYNC_DIR_NONE;
+    localSyncConfiguration.exLeftSideOnly  = SYNC_DIR_RIGHT;
+    localSyncConfiguration.exRightSideOnly = SYNC_DIR_LEFT;
+    localSyncConfiguration.leftNewer       = SYNC_DIR_RIGHT;
+    localSyncConfiguration.rightNewer      = SYNC_DIR_LEFT;
+    localSyncConfiguration.different       = SYNC_DIR_NONE;
 
-    updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
-    calculatePreview();
+    updateConfigIcons(cfg.compareVar, localSyncConfiguration);
 
     //if event is triggered by button
     m_radioBtn2->SetValue(true);
 }
 
 
-void toggleSyncDirection(SyncConfiguration::Direction& current)
+void toggleSyncDirection(SyncDirection& current)
 {
-    if (current == SyncConfiguration::SYNC_DIR_RIGHT)
-        current = SyncConfiguration::SYNC_DIR_LEFT;
-    else if (current == SyncConfiguration::SYNC_DIR_LEFT)
-        current = SyncConfiguration::SYNC_DIR_NONE;
-    else if (current== SyncConfiguration::SYNC_DIR_NONE)
-        current = SyncConfiguration::SYNC_DIR_RIGHT;
+    if (current == SYNC_DIR_RIGHT)
+        current = SYNC_DIR_LEFT;
+    else if (current == SYNC_DIR_LEFT)
+        current = SYNC_DIR_NONE;
+    else if (current== SYNC_DIR_NONE)
+        current = SYNC_DIR_RIGHT;
     else
         assert (false);
 }
@@ -331,8 +314,7 @@ void toggleSyncDirection(SyncConfiguration::Direction& current)
 void SyncDialog::OnExLeftSideOnly( wxCommandEvent& event )
 {
     toggleSyncDirection(localSyncConfiguration.exLeftSideOnly);
-    updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
-    calculatePreview();
+    updateConfigIcons(cfg.compareVar, localSyncConfiguration);
     //set custom config button
     m_radioBtn3->SetValue(true);
 }
@@ -341,8 +323,7 @@ void SyncDialog::OnExLeftSideOnly( wxCommandEvent& event )
 void SyncDialog::OnExRightSideOnly( wxCommandEvent& event )
 {
     toggleSyncDirection(localSyncConfiguration.exRightSideOnly);
-    updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
-    calculatePreview();
+    updateConfigIcons(cfg.compareVar, localSyncConfiguration);
     //set custom config button
     m_radioBtn3->SetValue(true);
 }
@@ -351,8 +332,7 @@ void SyncDialog::OnExRightSideOnly( wxCommandEvent& event )
 void SyncDialog::OnLeftNewer( wxCommandEvent& event )
 {
     toggleSyncDirection(localSyncConfiguration.leftNewer);
-    updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
-    calculatePreview();
+    updateConfigIcons(cfg.compareVar, localSyncConfiguration);
     //set custom config button
     m_radioBtn3->SetValue(true);
 }
@@ -361,8 +341,7 @@ void SyncDialog::OnLeftNewer( wxCommandEvent& event )
 void SyncDialog::OnRightNewer( wxCommandEvent& event )
 {
     toggleSyncDirection(localSyncConfiguration.rightNewer);
-    updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
-    calculatePreview();
+    updateConfigIcons(cfg.compareVar, localSyncConfiguration);
     //set custom config button
     m_radioBtn3->SetValue(true);
 }
@@ -371,8 +350,7 @@ void SyncDialog::OnRightNewer( wxCommandEvent& event )
 void SyncDialog::OnDifferent( wxCommandEvent& event )
 {
     toggleSyncDirection(localSyncConfiguration.different);
-    updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
-    calculatePreview();
+    updateConfigIcons(cfg.compareVar, localSyncConfiguration);
     //set custom config button
     m_radioBtn3->SetValue(true);
 }
@@ -452,11 +430,11 @@ void BatchDialog::init()
     dragDropOnLogfileDir.reset(new DragDropOnDlg(m_panelLogging, m_dirPickerLogfileDir, m_textCtrlLogfileDir));
 
     //set icons for this dialog
-    m_bitmap13->SetBitmap(*globalResource.bitmapLeftOnly);
-    m_bitmap14->SetBitmap(*globalResource.bitmapRightOnly);
-    m_bitmap15->SetBitmap(*globalResource.bitmapLeftNewer);
-    m_bitmap16->SetBitmap(*globalResource.bitmapRightNewer);
-    m_bitmap17->SetBitmap(*globalResource.bitmapDifferent);
+    m_bitmapLeftOnly->SetBitmap(*globalResource.bitmapLeftOnly);
+    m_bitmapRightOnly->SetBitmap(*globalResource.bitmapRightOnly);
+    m_bitmapLeftNewer->SetBitmap(*globalResource.bitmapLeftNewer);
+    m_bitmapRightNewer->SetBitmap(*globalResource.bitmapRightNewer);
+    m_bitmapDifferent->SetBitmap(*globalResource.bitmapDifferent);
     m_bitmap8->SetBitmap(*globalResource.bitmapInclude);
     m_bitmap9->SetBitmap(*globalResource.bitmapExclude);
     m_bitmap27->SetBitmap(*globalResource.bitmapBatch);
@@ -536,35 +514,35 @@ void BatchDialog::OnChangeErrorHandling(wxCommandEvent& event)
 void BatchDialog::OnExLeftSideOnly(wxCommandEvent& event)
 {
     toggleSyncDirection(localSyncConfiguration.exLeftSideOnly);
-    SyncDialog::updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
+    updateConfigIcons(getCurrentCompareVar(), localSyncConfiguration);
 }
 
 
 void BatchDialog::OnExRightSideOnly(wxCommandEvent& event)
 {
     toggleSyncDirection(localSyncConfiguration.exRightSideOnly);
-    SyncDialog::updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
+    updateConfigIcons(getCurrentCompareVar(), localSyncConfiguration);
 }
 
 
 void BatchDialog::OnLeftNewer(wxCommandEvent& event)
 {
     toggleSyncDirection(localSyncConfiguration.leftNewer);
-    SyncDialog::updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
+    updateConfigIcons(getCurrentCompareVar(), localSyncConfiguration);
 }
 
 
 void BatchDialog::OnRightNewer(wxCommandEvent& event)
 {
     toggleSyncDirection(localSyncConfiguration.rightNewer);
-    SyncDialog::updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
+    updateConfigIcons(getCurrentCompareVar(), localSyncConfiguration);
 }
 
 
 void BatchDialog::OnDifferent(wxCommandEvent& event)
 {
     toggleSyncDirection(localSyncConfiguration.different);
-    SyncDialog::updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
+    updateConfigIcons(getCurrentCompareVar(), localSyncConfiguration);
 }
 
 
@@ -630,21 +608,41 @@ void BatchDialog::OnSelectRecycleBin(wxCommandEvent& event)
 }
 
 
-void BatchDialog::OnChangeCompareVar(wxCommandEvent& event)
+CompareVariant BatchDialog::getCurrentCompareVar()
 {
-    CompareVariant var;
     if (m_radioBtnSizeDate->GetValue())
-        var = CMP_BY_TIME_SIZE;
+        return CMP_BY_TIME_SIZE;
     else if (m_radioBtnContent->GetValue())
-        var = CMP_BY_CONTENT;
+        return CMP_BY_CONTENT;
     else
     {
         assert(false);
-        var = CMP_BY_TIME_SIZE;
+        return CMP_BY_TIME_SIZE;
     }
+}
 
-    //set tooltip for ambivalent category "different"
-    SyncDialog::adjustToolTips(m_bitmap17, var);
+
+void BatchDialog::updateConfigIcons(const FreeFileSync::CompareVariant cmpVar, const FreeFileSync::SyncConfiguration& syncConfig)
+{
+    SyncDialog::updateConfigIcons(cmpVar,
+                                  syncConfig,
+                                  m_bpButtonLeftOnly,
+                                  m_bpButtonRightOnly,
+                                  m_bpButtonLeftNewer,
+                                  m_bpButtonRightNewer,
+                                  m_bpButtonDifferent,
+                                  m_bitmapLeftOnly,
+                                  m_bitmapRightOnly,
+                                  m_bitmapLeftNewer,
+                                  m_bitmapRightNewer,
+                                  m_bitmapDifferent);
+}
+
+
+void BatchDialog::OnChangeCompareVar(wxCommandEvent& event)
+{
+    updateConfigIcons(getCurrentCompareVar(), localSyncConfiguration);
+    Fit();
 }
 
 
@@ -700,13 +698,7 @@ bool BatchDialog::saveBatchFile(const wxString& filename)
     xmlAccess::XmlBatchConfig batchCfg;
 
     //load structure with basic settings "mainCfg"
-    if (m_radioBtnSizeDate->GetValue())
-        batchCfg.mainCfg.compareVar = CMP_BY_TIME_SIZE;
-    else if (m_radioBtnContent->GetValue())
-        batchCfg.mainCfg.compareVar = CMP_BY_CONTENT;
-    else
-        return false;
-
+    batchCfg.mainCfg.compareVar        = getCurrentCompareVar();
     batchCfg.mainCfg.syncConfiguration = localSyncConfiguration;
     batchCfg.mainCfg.filterIsActive    = m_checkBoxFilter->GetValue();
     batchCfg.mainCfg.includeFilter     = m_textCtrlInclude->GetValue();
@@ -770,7 +762,6 @@ void BatchDialog::loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg)
 {
     //make working copy of mainDialog.cfg.syncConfiguration and recycler setting
     localSyncConfiguration = batchCfg.mainCfg.syncConfiguration;
-    SyncDialog::updateConfigIcons(m_bpButton5, m_bpButton6, m_bpButton7, m_bpButton8, m_bpButton9, localSyncConfiguration);
 
     m_checkBoxUseRecycler->SetValue(batchCfg.mainCfg.useRecycleBin);
     setSelectionHandleError(batchCfg.handleError);
@@ -783,11 +774,9 @@ void BatchDialog::loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg)
     case CMP_BY_CONTENT:
         m_radioBtnContent->SetValue(true);
         break;
-    default:
-        assert (false);
     }
-    //adjust toolTip
-    SyncDialog::adjustToolTips(m_bitmap17, batchCfg.mainCfg.compareVar);
+
+    updateConfigIcons(batchCfg.mainCfg.compareVar, batchCfg.mainCfg.syncConfiguration);
 
     m_checkBoxFilter->SetValue(batchCfg.mainCfg.filterIsActive);
     m_textCtrlInclude->SetValue(batchCfg.mainCfg.includeFilter);

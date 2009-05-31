@@ -20,12 +20,16 @@ class CustomLocale;
 class MainFolderDragDrop;
 class FolderPairPanel;
 class CustomGrid;
+class FFSCheckRowsEvent;
+class FFSSyncDirectionEvent;
+class SyncPreview;
 
 
 class MainDialog : public MainDialogGenerated
 {
     friend class CompareStatusHandler;
     friend class MainFolderDragDrop;
+    friend class SyncPreview;
 
 //IDs for context menu items
     enum //context menu for left and right grids
@@ -36,6 +40,7 @@ class MainDialog : public MainDialogGenerated
         CONTEXT_CLIPBOARD,
         CONTEXT_EXPLORER,
         CONTEXT_DELETE_FILES,
+        CONTEXT_SWAP_SIDES
     };
 
     enum //context menu for middle grid
@@ -69,7 +74,7 @@ private:
     void writeGlobalSettings();
 
     void updateViewFilterButtons();
-    void updateFilterButton(wxBitmapButton* filterButton, bool isActive);
+    static void updateFilterButton(wxBitmapButton* filterButton, bool isActive);
     void updateCompareButtons();
 
     void addFileToCfgHistory(const wxString& filename);
@@ -87,8 +92,8 @@ private:
     void updateGridViewData();
 
     //context menu functions
-    std::set<int> getSelectedRows(const CustomGrid* grid);
-    void filterRangeManually(const std::set<int>& rowsToFilterOnUiTable);
+    std::set<int> getSelectedRows(const CustomGrid* grid) const;
+    void filterRangeManually(const std::set<int>& rowsToFilterOnUiTable, const int leadingRow);
     void copySelectionToClipboard(const CustomGrid* selectedGrid);
     void openWithFileManager(const int rowNumber, const bool leftSide);
     void deleteSelectedFiles();
@@ -116,10 +121,8 @@ private:
 
     void requestShutdown(); //try to exit application
 
-    //manual filtering of rows:
-    void OnGridSelectCell(wxGridEvent& event);
-    void OnGrid3LeftMouseUp(wxEvent& event);
-    void OnGrid3LeftMouseDown(wxEvent& event);
+    void OnCheckRows(FFSCheckRowsEvent& event);
+    void OnSetSyncDirection(FFSSyncDirectionEvent& event);
 
     void OnLeftGridDoubleClick( wxGridEvent& event);
     void OnRightGridDoubleClick(wxGridEvent& event);
@@ -128,15 +131,22 @@ private:
     void OnSortRightGrid(       wxGridEvent& event);
 
     void OnLeftOnlyFiles(       wxCommandEvent& event);
-    void OnLeftNewerFiles(      wxCommandEvent& event);
-    void OnDifferentFiles(      wxCommandEvent& event);
-    void OnRightNewerFiles(     wxCommandEvent& event);
     void OnRightOnlyFiles(      wxCommandEvent& event);
+    void OnLeftNewerFiles(      wxCommandEvent& event);
+    void OnRightNewerFiles(     wxCommandEvent& event);
     void OnEqualFiles(          wxCommandEvent& event);
+    void OnDifferentFiles(      wxCommandEvent& event);
+    void OnConflictFiles(       wxCommandEvent& event);
+
+    void OnSyncDirLeft(         wxCommandEvent& event);
+    void OnSyncDirRight(        wxCommandEvent& event);
+    void OnSyncDirNone(         wxCommandEvent& event);
 
     void OnSaveConfig(          wxCommandEvent& event);
     void OnLoadConfig(          wxCommandEvent& event);
     void OnLoadFromHistory(     wxCommandEvent& event);
+    bool trySaveConfig(); //return true if saved successfully
+
     void loadConfiguration(const wxString& filename);
     void OnCfgHistoryKeyEvent(  wxKeyEvent& event);
     void OnFolderHistoryKeyEvent(wxKeyEvent& event);
@@ -148,16 +158,20 @@ private:
     void OnHideFilteredButton(  wxCommandEvent& event);
     void OnConfigureFilter(     wxHyperlinkEvent& event);
     void OnShowHelpDialog(      wxCommandEvent& event);
-    void OnSwapDirs(            wxCommandEvent& event);
+    void OnSwapSides(           wxCommandEvent& event);
     void OnCompareByTimeSize(   wxCommandEvent& event);
     void OnCompareByContent(    wxCommandEvent& event);
     void OnCompare(             wxCommandEvent& event);
-    void OnSync(                wxCommandEvent& event);
+    void OnSwitchView(          wxCommandEvent& event);
+    void OnSyncSettings(        wxCommandEvent& event);
+    void OnStartSync(           wxCommandEvent& event);
     void OnClose(               wxCloseEvent&   event);
     void OnQuit(                wxCommandEvent& event);
 
     void OnAddFolderPair(       wxCommandEvent& event);
     void OnRemoveFolderPair(    wxCommandEvent& event);
+
+    void calculatePreview();
 
     //menu events
     void OnMenuSaveConfig(      wxCommandEvent& event);
@@ -183,7 +197,6 @@ private:
     void OnMenuLangSpanish(     wxCommandEvent& event);
 
     void switchProgramLanguage(const int langID);
-    void enableSynchronization(bool value);
 
 //***********************************************
     //application variables are stored here:
@@ -217,13 +230,6 @@ private:
     //convenience method to get all folder pairs (unformatted)
     std::vector<FreeFileSync::FolderPair> getFolderPairs() const;
 
-    //UI View Filter settings
-    bool leftOnlyFilesActive;
-    bool leftNewerFilesActive;
-    bool differentFilesActive;
-    bool equalFilesActive;
-    bool rightNewerFilesActive;
-    bool rightOnlyFilesActive;
 
 //***********************************************
     std::auto_ptr<wxMenu> contextMenu;
@@ -241,11 +247,7 @@ private:
     std::vector<wxString> cfgFileNames;
 
     //used when saving configuration
-    wxString proposedConfigFileName;
-
-    //variables for filtering of m_grid3
-    bool filteringInitialized;
-    bool filteringPending;
+    wxString currentConfigFileName;
 
     //temporal variables used by exclude via context menu
     wxString exFilterCandidateExtension;
@@ -255,8 +257,6 @@ private:
         FreeFileSync::FileDescrLine::ObjectType type;
     };
     std::vector<FilterObject> exFilterCandidateObj;
-
-    bool synchronizationEnabled; //determines whether synchronization should be allowed
 
     CompareStatusHandler* cmpStatusHandlerTmp;  //used only by the abort button when comparing
 
@@ -269,6 +269,29 @@ private:
     //support for drag and drop
     std::auto_ptr<MainFolderDragDrop> dragDropOnLeft;
     std::auto_ptr<MainFolderDragDrop> dragDropOnRight;
+
+    //encapsulation of handling of sync preview
+    std::auto_ptr<SyncPreview> syncPreview;
+};
+
+
+class SyncPreview //encapsulates MainDialog functionality for synchronization preview (friend class)
+{
+    friend class MainDialog;
+
+public:
+    void enablePreview(bool value);
+    bool previewIsEnabled();
+
+    void enableSynchronization(bool value);
+    bool synchronizationIsEnabled();
+
+private:
+    SyncPreview(MainDialog* mainDlg);
+
+    MainDialog* mainDlg_;
+    bool syncPreviewEnabled; //toggle to display configuration preview instead of comparison result
+    bool synchronizationEnabled; //determines whether synchronization should be allowed
 };
 
 #endif // MAINDIALOG_H

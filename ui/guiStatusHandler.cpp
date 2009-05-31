@@ -17,10 +17,11 @@ CompareStatusHandler::CompareStatusHandler(MainDialog* dlg) :
     mainDialog->m_bpButtonFilter->Disable();
     mainDialog->m_hyperlinkCfgFilter->Disable();
     mainDialog->m_checkBoxHideFilt->Disable();
-    mainDialog->m_buttonSync->Disable();
+    mainDialog->m_bpButtonSyncConfig->Disable();
+    mainDialog->m_buttonStartSync->Disable();
     mainDialog->m_dirPickerLeft->Disable();
     mainDialog->m_dirPickerRight->Disable();
-    mainDialog->m_bpButtonSwap->Disable();
+    mainDialog->m_bpButtonSwitchView->Disable();
     mainDialog->m_bpButtonLeftOnly->Disable();
     mainDialog->m_bpButtonLeftNewer->Disable();
     mainDialog->m_bpButtonEqual->Disable();
@@ -70,10 +71,11 @@ CompareStatusHandler::~CompareStatusHandler()
     mainDialog->m_bpButtonFilter->Enable();
     mainDialog->m_hyperlinkCfgFilter->Enable();
     mainDialog->m_checkBoxHideFilt->Enable();
-    mainDialog->m_buttonSync->Enable();
+    mainDialog->m_bpButtonSyncConfig->Enable();
+    mainDialog->m_buttonStartSync->Enable();
     mainDialog->m_dirPickerLeft->Enable();
     mainDialog->m_dirPickerRight->Enable();
-    mainDialog->m_bpButtonSwap->Enable();
+    mainDialog->m_bpButtonSwitchView->Enable();
     mainDialog->m_bpButtonLeftOnly->Enable();
     mainDialog->m_bpButtonLeftNewer->Enable();
     mainDialog->m_bpButtonEqual->Enable();
@@ -96,7 +98,7 @@ CompareStatusHandler::~CompareStatusHandler()
     mainDialog->m_menubar1->EnableTop(1, true);
     mainDialog->m_menubar1->EnableTop(2, true);
 
-    if (abortRequested)
+    if (abortIsRequested())
         mainDialog->pushStatusInformation(_("Operation aborted!"));
 
     mainDialog->m_buttonAbort->Disable();
@@ -125,26 +127,38 @@ void CompareStatusHandler::initNewProcess(int objectsTotal, wxLongLong dataTotal
 {
     currentProcess = processID;
 
-    if (currentProcess == StatusHandler::PROCESS_SCANNING)
-        ;
-    else if (currentProcess == StatusHandler::PROCESS_COMPARING_CONTENT)
+    switch (currentProcess)
     {
+    case StatusHandler::PROCESS_SCANNING:
+        break;
+    case StatusHandler::PROCESS_COMPARING_CONTENT:
         mainDialog->compareStatus->switchToCompareBytewise(objectsTotal, dataTotal);
         mainDialog->Layout();
+        break;
+    case StatusHandler::PROCESS_SYNCHRONIZING:
+    case StatusHandler::PROCESS_NONE:
+        assert(false);
+        break;
     }
-
-    else assert(false);
 }
 
 
 inline
 void CompareStatusHandler::updateProcessedData(int objectsProcessed, wxLongLong dataProcessed)
 {
-    if (currentProcess == StatusHandler::PROCESS_SCANNING)
+    switch (currentProcess)
+    {
+    case StatusHandler::PROCESS_SCANNING:
         mainDialog->compareStatus->incScannedObjects_NoUpdate(objectsProcessed);
-    else if (currentProcess == StatusHandler::PROCESS_COMPARING_CONTENT)
+        break;
+    case StatusHandler::PROCESS_COMPARING_CONTENT:
         mainDialog->compareStatus->incProcessedCmpData_NoUpdate(objectsProcessed, dataProcessed);
-    else assert(false);
+        break;
+    case StatusHandler::PROCESS_SYNCHRONIZING:
+    case StatusHandler::PROCESS_NONE:
+        assert(false);
+        break;
+    }
 }
 
 
@@ -228,7 +242,7 @@ void CompareStatusHandler::forceUiRefresh()
 
 void CompareStatusHandler::abortThisProcess()
 {
-    abortRequested = true;
+    requestAbortion();
     throw FreeFileSync::AbortThisProcess();  //abort can be triggered by syncStatusFrame
 }
 //########################################################################################################
@@ -266,7 +280,7 @@ SyncStatusHandler::~SyncStatusHandler()
     }
 
     //notify to syncStatusFrame that current process has ended
-    if (abortRequested)
+    if (abortIsRequested())
     {
         result+= wxString(_("Synchronization aborted!")) + wxT(" ") + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!");
         syncStatusFrame->setStatusText_NoUpdate(result.c_str());
@@ -296,10 +310,18 @@ void SyncStatusHandler::updateStatusText(const Zstring& text)
 
 void SyncStatusHandler::initNewProcess(int objectsTotal, wxLongLong dataTotal, Process processID)
 {
-    assert (processID == StatusHandler::PROCESS_SYNCHRONIZING);
-
-    syncStatusFrame->resetGauge(objectsTotal, dataTotal);
-    syncStatusFrame->setCurrentStatus(SyncStatus::SYNCHRONIZING);
+    switch (processID)
+    {
+    case StatusHandler::PROCESS_SYNCHRONIZING:
+        syncStatusFrame->resetGauge(objectsTotal, dataTotal);
+        syncStatusFrame->setCurrentStatus(SyncStatus::SYNCHRONIZING);
+        break;
+    case StatusHandler::PROCESS_SCANNING:
+    case StatusHandler::PROCESS_COMPARING_CONTENT:
+    case StatusHandler::PROCESS_NONE:
+        assert(false);
+        break;
+    }
 }
 
 
@@ -397,6 +419,6 @@ void SyncStatusHandler::forceUiRefresh()
 
 void SyncStatusHandler::abortThisProcess()
 {
-    abortRequested = true;
+    requestAbortion();
     throw FreeFileSync::AbortThisProcess();  //abort can be triggered by syncStatusFrame
 }

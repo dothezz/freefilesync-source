@@ -204,23 +204,27 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         else
             statusHandler = std::auto_ptr<BatchStatusHandler>(new BatchStatusHandlerGui(batchCfg.handleError, returnValue));
 
+        //PREPARE FILTER
+        std::auto_ptr<FreeFileSync::FilterProcess> filterInstance(NULL);
+        if (batchCfg.mainCfg.filterIsActive)
+            filterInstance.reset(new FreeFileSync::FilterProcess(batchCfg.mainCfg.includeFilter, batchCfg.mainCfg.excludeFilter));
+
         //COMPARE DIRECTORIES
         FreeFileSync::FolderComparison folderCmp;
         FreeFileSync::CompareProcess comparison(globalSettings.shared.traverseDirectorySymlinks,
                                                 globalSettings.shared.fileTimeTolerance,
+                                                globalSettings.shared.ignoreOneHourDiff,
                                                 globalSettings.shared.warningDependentFolders,
+                                                filterInstance.get(),
                                                 statusHandler.get());
 
         comparison.startCompareProcess(batchCfg.directoryPairs,
                                        batchCfg.mainCfg.compareVar,
+                                       batchCfg.mainCfg.syncConfiguration,
                                        folderCmp);
 
-        //APPLY FILTERS
-        if (batchCfg.mainCfg.filterIsActive)
-            FreeFileSync::filterGridData(folderCmp, batchCfg.mainCfg.includeFilter, batchCfg.mainCfg.excludeFilter);
-
         //check if there are files/folders to be sync'ed at all
-        if (!synchronizationNeeded(folderCmp, batchCfg.mainCfg.syncConfiguration))
+        if (!synchronizationNeeded(folderCmp))
         {
             statusHandler->addFinalInfo(_("Nothing to synchronize according to configuration!")); //inform about this special case
             return;
@@ -233,9 +237,10 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
             globalSettings.shared.traverseDirectorySymlinks,
             globalSettings.shared.warningSignificantDifference,
             globalSettings.shared.warningNotEnoughDiskSpace,
+            globalSettings.shared.warningUnresolvedConflicts,
             statusHandler.get());
 
-        synchronization.startSynchronizationProcess(folderCmp, batchCfg.mainCfg.syncConfiguration);
+        synchronization.startSynchronizationProcess(folderCmp);
     }
     catch (FreeFileSync::AbortThisProcess&)  //exit used by statusHandler
     {

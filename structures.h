@@ -17,34 +17,36 @@ namespace FreeFileSync
     };
 
 
+    enum SyncDirection
+    {
+        SYNC_DIR_LEFT,
+        SYNC_DIR_RIGHT,
+        SYNC_DIR_NONE,
+        SYNC_UNRESOLVED_CONFLICT
+    };
+
+
     struct SyncConfiguration
     {
         SyncConfiguration() :
                 exLeftSideOnly(SYNC_DIR_RIGHT),
-                exRightSideOnly(SYNC_DIR_RIGHT),
+                exRightSideOnly(SYNC_DIR_LEFT),
                 leftNewer(SYNC_DIR_RIGHT),
-                rightNewer(SYNC_DIR_RIGHT),
-                different(SYNC_DIR_RIGHT) {}
+                rightNewer(SYNC_DIR_LEFT),
+                different(SYNC_DIR_NONE) {}
 
-        enum Direction
-        {
-            SYNC_DIR_LEFT,
-            SYNC_DIR_RIGHT,
-            SYNC_DIR_NONE
-        };
-
-        Direction exLeftSideOnly;
-        Direction exRightSideOnly;
-        Direction leftNewer;
-        Direction rightNewer;
-        Direction different;
+        SyncDirection exLeftSideOnly;
+        SyncDirection exRightSideOnly;
+        SyncDirection leftNewer;
+        SyncDirection rightNewer;
+        SyncDirection different;
 
         bool operator==(const SyncConfiguration& other) const
         {
-            return exLeftSideOnly  == other.exLeftSideOnly &&
+            return exLeftSideOnly  == other.exLeftSideOnly  &&
                    exRightSideOnly == other.exRightSideOnly &&
-                   leftNewer       == other.leftNewer &&
-                   rightNewer      == other.rightNewer &&
+                   leftNewer       == other.leftNewer       &&
+                   rightNewer      == other.rightNewer      &&
                    different       == other.different;
         }
     };
@@ -143,18 +145,24 @@ namespace FreeFileSync
         FILE_DIFFERENT,
         FILE_EQUAL,
 
-        FILE_UNDEFINED
+        FILE_CONFLICT,
     };
 
 
     struct FileCompareLine
     {
-        FileCompareLine() : selectedForSynchronization(true) {}
+        FileCompareLine(const CompareFilesResult defaultCmpResult,
+                        const SyncDirection defaultDirection,
+                        const bool selected) :
+                cmpResult(defaultCmpResult),
+                direction(defaultDirection),
+                selectedForSynchronization(selected) {}
 
         FileDescrLine fileDescrLeft;
         FileDescrLine fileDescrRight;
-        CompareFilesResult cmpResult;
 
+        CompareFilesResult cmpResult;
+        SyncDirection      direction;
         bool selectedForSynchronization;
     };
     typedef std::vector<FileCompareLine> FileComparison;
@@ -164,6 +172,12 @@ namespace FreeFileSync
     {
         FolderPair syncPair;  //directories to be synced (ending with separator)
         FileComparison fileCmp;
+
+        void swap(FolderCompareLine& other)
+        {
+            std::swap(syncPair, other.syncPair);
+            fileCmp.swap(other.fileCmp);
+        }
     };
     typedef std::vector<FolderCompareLine> FolderComparison;
 

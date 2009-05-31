@@ -9,19 +9,24 @@ class DirectoryDescrBuffer;
 
 namespace FreeFileSync
 {
+    class FilterProcess;
+
     //class handling comparison process
     class CompareProcess
     {
     public:
         CompareProcess(const bool traverseSymLinks,
                        const unsigned fileTimeTol,
+                       const bool ignoreOneHourDiff,
                        bool& warningDependentFolders,
+                       const FilterProcess* filter, //may be NULL
                        StatusHandler* handler);
 
         ~CompareProcess();
 
         void startCompareProcess(const std::vector<FolderPair>& directoryPairs,
                                  const CompareVariant cmpVar,
+                                 const SyncConfiguration& config,
                                  FolderComparison& output);
 
     private:
@@ -35,8 +40,9 @@ namespace FreeFileSync
         //buffer accesses to the same directories; useful when multiple folder pairs are used
         DirectoryDescrBuffer* descriptionBuffer;
 
-        const bool traverseDirectorySymlinks;
-        const unsigned fileTimeTolerance; //max allowed file time deviation
+        const unsigned int fileTimeTolerance; //max allowed file time deviation
+        const bool ignoreOneHourDifference;
+
         bool& m_warningDependentFolders;
 
         StatusHandler* statusUpdater;

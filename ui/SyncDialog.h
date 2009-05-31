@@ -21,28 +21,31 @@ public:
     SyncDialog(wxWindow* window,
                const FreeFileSync::FolderComparison& folderCmpRef,
                FreeFileSync::MainConfiguration& config,
-               bool& ignoreErrors,
-               bool synchronizationEnabled);
+               bool& ignoreErrors);
 
     ~SyncDialog();
 
     enum
     {
-        BUTTON_START = 15
+        BUTTON_OKAY = 10
     };
 
-    static void updateConfigIcons(wxBitmapButton* button1,
-                                  wxBitmapButton* button2,
-                                  wxBitmapButton* button3,
-                                  wxBitmapButton* button4,
-                                  wxBitmapButton* button5,
-                                  const FreeFileSync::SyncConfiguration& syncConfig);
-
-    static void adjustToolTips(wxStaticBitmap* bitmap, const FreeFileSync::CompareVariant var);
+    static void updateConfigIcons(const FreeFileSync::CompareVariant compareVar,
+                                  const FreeFileSync::SyncConfiguration& syncConfig,
+                                  wxBitmapButton* buttonLeftOnly,
+                                  wxBitmapButton* buttonRightOnly,
+                                  wxBitmapButton* buttonLeftNewer,
+                                  wxBitmapButton* buttonRightNewer,
+                                  wxBitmapButton* buttonDifferent,
+                                  wxStaticBitmap* bitmapLeftOnly,
+                                  wxStaticBitmap* bitmapRightOnly,
+                                  wxStaticBitmap* bitmapLeftNewer,
+                                  wxStaticBitmap* bitmapRightNewer,
+                                  wxStaticBitmap* bitmapDifferent);
+    //some syntax relaxation
+    void updateConfigIcons(const FreeFileSync::CompareVariant cmpVar, const FreeFileSync::SyncConfiguration& syncConfig);
 
 private:
-    void calculatePreview();
-
     void OnSyncLeftToRight( wxCommandEvent& event);
     void OnSyncUpdate(      wxCommandEvent& event);
     void OnSyncBothSides(   wxCommandEvent& event);
@@ -53,10 +56,9 @@ private:
     void OnRightNewer(      wxCommandEvent& event);
     void OnDifferent(       wxCommandEvent& event);
 
-    void OnStartSync(       wxCommandEvent& event);
     void OnClose(           wxCloseEvent&   event);
-    void OnBack(            wxCommandEvent& event);
     void OnCancel(          wxCommandEvent& event);
+    void OnApply(           wxCommandEvent& event);
 
     void OnSelectRecycleBin(wxCommandEvent& event);
 
@@ -97,6 +99,11 @@ private:
     void OnCheckLogging(    wxCommandEvent& event);
     void OnSelectRecycleBin(wxCommandEvent& event);
     void OnChangeCompareVar(wxCommandEvent& event);
+
+    FreeFileSync::CompareVariant getCurrentCompareVar();
+
+    void updateConfigIcons(const FreeFileSync::CompareVariant cmpVar, const FreeFileSync::SyncConfiguration& syncConfig);
+
 
     void updateVisibleTabs();
     void showNotebookpage(wxWindow* page, const wxString& pageName, bool show);

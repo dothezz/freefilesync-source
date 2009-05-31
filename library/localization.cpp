@@ -129,7 +129,7 @@ void CustomLocale::setLanguage(const int language)
         currentLanguage = wxLANGUAGE_ENGLISH;
     }
 
-    static bool initialized = false; //wxLocale is a global too!
+    static bool initialized = false; //wxLocale is a static global too!
     if (!initialized)
     {
         initialized = true;
@@ -152,7 +152,7 @@ void CustomLocale::setLanguage(const int language)
             //Linux: 0xa        \n
             //Mac:   0xd        \r
             //Win:   0xd 0xa    \r\n    <- language files are in Windows format
-            for (int rowNumber = 0; langFile.getline(temp, bufferSize, 0xd); ++rowNumber) //specify delimiter explicitly
+            for (int rowNumber = 0; langFile.getline(temp, bufferSize, 0xD); ++rowNumber) //specify delimiter explicitly
             {
                 langFile.get(); //discard the 0xa character
 
@@ -165,8 +165,11 @@ void CustomLocale::setLanguage(const int language)
                     currentLine.original = formattedString;
                 else
                 {
-                    currentLine.translation = formattedString;
-                    translationDB->insert(currentLine);
+                    if (!formattedString.empty())
+                    {
+                        currentLine.translation = formattedString;
+                        translationDB->insert(currentLine);
+                    }
                 }
             }
             langFile.close();

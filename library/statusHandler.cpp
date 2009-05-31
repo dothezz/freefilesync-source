@@ -16,8 +16,7 @@ void updateUiNow()
 bool updateUiIsAllowed()
 {
     static wxLongLong lastExec = 0;
-
-    wxLongLong newExec = wxGetLocalTimeMillis();
+    const wxLongLong  newExec  = wxGetLocalTimeMillis();
 
     if (newExec - lastExec >= UI_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
     {
