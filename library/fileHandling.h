@@ -3,21 +3,7 @@
 
 #include <wx/dir.h>
 #include "zstring.h"
-
-class FileError //Exception class used to notify file/directory copy/delete errors
-{
-public:
-    FileError(const Zstring& message) :
-            errorMessage(message) {}
-
-    const Zstring& show() const
-    {
-        return errorMessage;
-    }
-
-private:
-    Zstring errorMessage;
-};
+#include "fileError.h"
 
 
 namespace FreeFileSync
@@ -50,15 +36,34 @@ namespace FreeFileSync
     void removeDirectory(const Zstring& directory, const bool useRecycleBin);
     void removeFile(const Zstring& filename, const bool useRecycleBin);
     void createDirectory(const Zstring& directory, const Zstring& templateDir, const bool copyDirectorySymLinks);
-#ifdef FFS_LINUX
-    //callback function for status updates whily copying
-    typedef void (*CopyFileCallback)(const wxULongLong& totalBytesTransferred, void* data);
 
+
+    class CopyFileCallback //callback functionality
+    {
+    public:
+        virtual ~CopyFileCallback() {}
+
+        enum Response
+        {
+            CONTINUE,
+            CANCEL
+        };
+        virtual Response updateCopyStatus(const wxULongLong& totalBytesTransferred) = 0;
+    };
+
+    class ShadowCopy;
+#ifdef FFS_WIN
     void copyFile(const Zstring& sourceFile,
                   const Zstring& targetFile,
                   const bool copyFileSymLinks,
-                  CopyFileCallback callback = NULL,
-                  void* data = NULL);
+                  ShadowCopy* shadowCopyHandler = NULL, //supply handler for making shadow copies
+                  CopyFileCallback* callback = NULL);
+
+#elif defined FFS_LINUX
+    void copyFile(const Zstring& sourceFile,
+                                const Zstring& targetFile,
+                                const bool copyFileSymLinks,
+                                CopyFileCallback* callback);
 #endif
 }
 

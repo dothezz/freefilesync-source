@@ -176,6 +176,8 @@ Build:
 Criado:
 Cancel
 Cancelar
+Change direction
+Mudar direcção
 Check all
 Verificar tudo
 Choose to hide filtered files/directories from list
@@ -218,6 +220,8 @@ Configure your own synchronization rules.
 Configure as suas regras de sincronização.
 Confirm
 Confirmar
+Conflict detected:
+Conflito detectado:
 Continue
 Continuar
 Conversion error:
@@ -238,6 +242,8 @@ Copying file %x to %y
 Copiar ficheiro %x para %y
 Copying file %x to %y overwriting target
 Copiar ficheiro %x para %y substituindo
+Could not determine volume name for file:
+Não é possível determinar o nome do volume para o ficheiro:
 Could not set working directory:
 Não pode definir pasta de trabalho:
 Create a batch job
@@ -278,8 +284,8 @@ Directory does not exist:
 A pasta não existe:
 Do not display visual status information but write to a logfile instead
 Não apresentar informação de estado, mas escrever num ficheiro log
-Do not show this warning again
-Não voltar a mostrar este aviso
+Do not show this dialog again
+Não mostrar novamente
 Do nothing
 Não fazer nada
 Do you really want to delete the following objects(s)?
@@ -306,6 +312,8 @@ Error changing modification time:
 Erro ao mudar a hora de modificação:
 Error copying file:
 Erro ao copiar ficheiro:
+Error copying locked file %x!
+Erro ao copiar ficheiro bloqueado %x!
 Error creating directory:
 Erro ao criar a pasta:
 Error deleting directory:
@@ -330,6 +338,8 @@ Error resolving symbolic link:
 Erro na resolução do link simbólico:
 Error retrieving full path:
 Erro no retorno do caminho:
+Error starting Volume Shadow Copy Service!
+Erro ao iniciar o serviço Volume Shadow Copy!
 Error traversing directory:
 Erro ao percorrer a pasta:
 Error writing file attributes:
@@ -352,6 +362,8 @@ Exit with RC < 0
 Sair com RC < 0
 Feedback and suggestions are welcome at:
 Comentários e sugestões são benvindos em:
+File %x has an invalid date!
+Ficheiro %x tem data inválida!
 File Manager integration:
 Integração c/ Gestor de Ficheiros:
 File Time tolerance (seconds):
@@ -370,6 +382,10 @@ File times that differ by up to the specified number of seconds are still handle
 Ficheiro com diferença de tempo até ao número especificado de segundos são tratados como tendo o mesmo tempo.
 Filename
 Nome do ficheiro
+Files %x have a file time difference of less than 1 hour! It's not safe to decide which one is newer due to Daylight Saving Time issues.
+Os ficheiros %x têm uma diferença de tempo inferior a 1 hora! Não é seguro decidir qual o mais novo devido às mudanças de Hora de Verão.
+Files %x have the same date but a different size!
+Os ficheiros %x têm a mesma data, mas tamanho diferente!
 Files are found equal if\n     - file content\nis the same.
 Os ficheiros são considerados iguais se\n     - o conteúdo é o mesmo.
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
@@ -500,6 +516,8 @@ Move column down
 Mover coluna para baixo
 Move column up
 Mover coluna para cima
+Moving %x to Recycle Bin
+Mover %x para a Reciclagem
 Not all items have been synchronized! Have a look at the list.
 Nem todos os ficheiros foram sincronizados! Verifique a lista.
 Not enough free disk space available in:
@@ -528,12 +546,12 @@ Pause
 Pausa
 Paused
 Em pausa
+Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
+Por favor copie o \"Shadow.dll\" correcto (localizado no arquivo \"Shadow.zip\") para a pasta da instalação do FreeFileSync para activar esta opção.
 Please fill all empty directory fields.
 Por favor, preencha todos os campos vazios.
 Press button to activate filter
 Pressione para activar o filtro
-Preview
-Pré-visualizar
 Published under the GNU General Public License:
 Publicado sobre GNU General Public License:
 Question
@@ -614,6 +632,8 @@ Start
 Iniciar
 Start synchronization
 Iniciar a sincronização
+Statistics
+Estatísticas
 Stop
 Parar
 Swap sides
@@ -626,8 +646,6 @@ Synchronization completed successfully!
 Sincronização completa com sucesso!
 Synchronization completed with errors!
 Sincronização completa com erros!
-Synchronization filter
-Filtro sincronização
 Synchronization settings
 Parâmetros de sincronização
 Synchronization status
@@ -636,6 +654,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 Sincronizar todos os ficheiros .doc, .zip e .exe excepto os da pasta \"temp\".
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Sincronizar ambos os lados simultaneamente: Copiar os ficheiros novos ou mais recentes em ambas as direcções.
+Synchronize...
+Sincronizar...
 Synchronizing...
 A sincronizar...
 System out of memory!
@@ -680,6 +700,10 @@ Use Recycle Bin
 Utilizar Reciclagem
 Use Recycle Bin when deleting or overwriting files during synchronization
 Utilizar a Reciclagem ao eliminar ou substituir ficheiros durante a sincronização
+Variant
+Variável
+Volume name %x not part of filename %y!
+Nome do volume %x não faz parte do ficheiro %y!
 Warning
 Atenção
 Warning: Synchronization failed for %x item(s):

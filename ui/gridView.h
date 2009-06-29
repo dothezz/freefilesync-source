@@ -78,7 +78,8 @@ namespace FreeFileSync
             SORT_BY_FILESIZE,
             SORT_BY_DATE,
             SORT_BY_CMP_RESULT,
-            SORT_BY_DIRECTORY
+            SORT_BY_DIRECTORY,
+            SORT_BY_SYNC_DIRECTION
         };
 
         void sortView(const SortType type, const bool onLeft, const bool ascending);

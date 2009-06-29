@@ -1,40 +1,10 @@
 #include "globalFunctions.h"
-#include "resources.h"
 #include <wx/msgdlg.h>
 #include <wx/file.h>
 #include <fstream>
-
-
-std::string globalFunctions::numberToString(const unsigned int number)
-{
-    char result[100];
-    sprintf(result, "%u", number);
-    return std::string(result);
-}
-
-
-std::string globalFunctions::numberToString(const int number)
-{
-    char result[100];
-    sprintf(result, "%d", number);
-    return std::string(result);
-}
-
-
-std::string globalFunctions::numberToString(const long number)
-{
-    char result[100];
-    sprintf(result, "%ld", number);
-    return std::string(result);
-}
-
-
-std::string globalFunctions::numberToString(const float number)
-{
-    char result[100];
-    sprintf(result, "%f", number);
-    return std::string(result);
-}
+#include "../structures.h"
+#include <wx/stream.h>
+#include <wx/stopwatch.h>
 
 
 wxString globalFunctions::numberToWxString(const unsigned int number)
@@ -97,7 +67,7 @@ wxString globalFunctions::includeNumberSeparator(const wxString& number)
 {
     wxString output(number);
     for (int i = output.size() - 3; i > 0; i -= 3)
-        output.insert(i, GlobalResources::THOUSANDS_SEPARATOR);
+        output.insert(i, FreeFileSync::THOUSANDS_SEPARATOR);
     return output;
 }
 
@@ -136,9 +106,10 @@ void globalFunctions::writeInt(wxOutputStream& stream, const int number)
 
 //############################################################################
 Performance::Performance() :
-        resultWasShown(false)
+        resultWasShown(false),
+        timer(new wxStopWatch)
 {
-    timer.Start();
+    timer->Start();
 }
 
 
@@ -152,8 +123,8 @@ Performance::~Performance()
 void Performance::showResult()
 {
     resultWasShown = true;
-    wxMessageBox(globalFunctions::numberToWxString(unsigned(timer.Time())) + wxT(" ms"));
-    timer.Start(); //reset timer
+    wxMessageBox(globalFunctions::numberToWxString(unsigned(timer->Time())) + wxT(" ms"));
+    timer->Start(); //reset timer
 }
 
 
@@ -203,5 +174,5 @@ void DebugLog::write(const wxString& logText)
 
 wxString getCodeLocation(const wxString file, const int line)
 {
-    return wxString(file).AfterLast(GlobalResources::FILE_NAME_SEPARATOR) + wxT(", LINE ") + globalFunctions::numberToWxString(line) + wxT(" | ");
+    return wxString(file).AfterLast(FreeFileSync::FILE_NAME_SEPARATOR) + wxT(", LINE ") + globalFunctions::numberToWxString(line) + wxT(" | ");
 }

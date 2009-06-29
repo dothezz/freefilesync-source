@@ -6,15 +6,18 @@
 #include "resources.h"
 #include <typeinfo>
 #include "../ui/gridView.h"
+#include "../synchronization.h"
 
 #ifdef FFS_WIN
+#include <wx/timer.h>
 #include <wx/icon.h>
-#include <wx/msw/wrapwin.h> //includes "windows.h"
+#include "iconBuffer.h"
+#include "statusHandler.h"
+#include <cmath>
 
 #elif defined FFS_LINUX
 #include <gtk/gtk.h>
 #endif
-
 
 using namespace FreeFileSync;
 
@@ -234,6 +237,7 @@ public:
             return xmlAccess::ColumnTypes(1000);
     }
 
+    virtual Zstring getFileName(const unsigned int row) const = 0;
 
 private:
     std::vector<xmlAccess::ColumnTypes> columnPositions;
@@ -271,11 +275,11 @@ public:
                 switch (getTypeAtPos(col))
                 {
                 case xmlAccess::FULL_PATH:
-                    return wxString(gridLine->fileDescrLeft.fullName.c_str()).BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+                    return wxString(gridLine->fileDescrLeft.fullName.c_str()).BeforeLast(FreeFileSync::FILE_NAME_SEPARATOR);
                 case xmlAccess::FILENAME: //filename
-                    return wxString(gridLine->fileDescrLeft.relativeName.c_str()).AfterLast(GlobalResources::FILE_NAME_SEPARATOR);
+                    return wxString(gridLine->fileDescrLeft.relativeName.c_str()).AfterLast(FreeFileSync::FILE_NAME_SEPARATOR);
                 case xmlAccess::REL_PATH: //relative path
-                    return wxString(gridLine->fileDescrLeft.relativeName.c_str()).BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+                    return wxString(gridLine->fileDescrLeft.relativeName.c_str()).BeforeLast(FreeFileSync::FILE_NAME_SEPARATOR);
                 case xmlAccess::DIRECTORY:
                     return gridDataView->getFolderPair(row).leftDirectory.c_str();
                 case xmlAccess::SIZE: //file size
@@ -288,6 +292,17 @@ public:
         //if data is not found:
         return wxEmptyString;
     }
+
+
+    virtual Zstring getFileName(const unsigned int row) const
+    {
+        const FileCompareLine* gridLine = getRawData(row);
+        if (gridLine)
+            return Zstring(gridLine->fileDescrLeft.fullName);
+        else
+            return Zstring();
+    }
+
 
 private:
     virtual const wxColour& getRowColor(int row) //rows that are filtered out are shown in different color
@@ -340,11 +355,11 @@ public:
                 switch (getTypeAtPos(col))
                 {
                 case xmlAccess::FULL_PATH:
-                    return wxString(gridLine->fileDescrRight.fullName.c_str()).BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+                    return wxString(gridLine->fileDescrRight.fullName.c_str()).BeforeLast(FreeFileSync::FILE_NAME_SEPARATOR);
                 case xmlAccess::FILENAME: //filename
-                    return wxString(gridLine->fileDescrRight.relativeName.c_str()).AfterLast(GlobalResources::FILE_NAME_SEPARATOR);
+                    return wxString(gridLine->fileDescrRight.relativeName.c_str()).AfterLast(FreeFileSync::FILE_NAME_SEPARATOR);
                 case xmlAccess::REL_PATH: //relative path
-                    return wxString(gridLine->fileDescrRight.relativeName.c_str()).BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+                    return wxString(gridLine->fileDescrRight.relativeName.c_str()).BeforeLast(FreeFileSync::FILE_NAME_SEPARATOR);
                 case xmlAccess::DIRECTORY:
                     return gridDataView->getFolderPair(row).rightDirectory.c_str();
                 case xmlAccess::SIZE: //file size
@@ -357,6 +372,17 @@ public:
         //if data is not found:
         return wxEmptyString;
     }
+
+
+    virtual Zstring getFileName(const unsigned int row) const
+    {
+        const FileCompareLine* gridLine = getRawData(row);
+        if (gridLine)
+            return Zstring(gridLine->fileDescrRight.fullName);
+        else
+            return Zstring();
+    }
+
 
 private:
     virtual const wxColour& getRowColor(int row) //rows that are filtered out are shown in different color
@@ -476,27 +502,43 @@ CustomGrid::CustomGrid(wxWindow *parent,
         m_gridMiddle(NULL),
         m_gridRight(NULL),
         isLeading(false),
-        currentSortColumn(-1),
-        sortMarker(NULL)
+        m_marker(-1, ASCENDING)
 {
     //set color of selections
     wxColour darkBlue(40, 35, 140);
     SetSelectionBackground(darkBlue);
     SetSelectionForeground(*wxWHITE);
+}
+
+
+void CustomGrid::initSettings(CustomGridLeft*   gridLeft,
+                              CustomGridMiddle* gridMiddle,
+                              CustomGridRight*  gridRight,
+                              const GridView*   gridDataView)
+{
+    assert(this == gridLeft || this == gridRight || this == gridMiddle);
+
+    //these grids will scroll together
+    m_gridLeft   = gridLeft;
+    m_gridRight  = gridRight;
+    m_gridMiddle = gridMiddle;
+
+    //set underlying grid data
+    setGridDataTable(gridDataView);
 
     //enhance grid functionality; identify leading grid by keyboard input or scroll action
-    Connect(wxEVT_KEY_DOWN,               wxEventHandler(CustomGrid::onGridAccess), NULL, this);
-    Connect(wxEVT_SCROLLWIN_TOP,          wxEventHandler(CustomGrid::onGridAccess), NULL, this);
-    Connect(wxEVT_SCROLLWIN_BOTTOM,       wxEventHandler(CustomGrid::onGridAccess), NULL, this);
-    Connect(wxEVT_SCROLLWIN_LINEUP,       wxEventHandler(CustomGrid::onGridAccess), NULL, this);
-    Connect(wxEVT_SCROLLWIN_LINEDOWN,     wxEventHandler(CustomGrid::onGridAccess), NULL, this);
-    Connect(wxEVT_SCROLLWIN_PAGEUP,       wxEventHandler(CustomGrid::onGridAccess), NULL, this);
-    Connect(wxEVT_SCROLLWIN_PAGEDOWN,     wxEventHandler(CustomGrid::onGridAccess), NULL, this);
-    Connect(wxEVT_SCROLLWIN_THUMBTRACK,   wxEventHandler(CustomGrid::onGridAccess), NULL, this);
-    Connect(wxEVT_SCROLLWIN_THUMBRELEASE, wxEventHandler(CustomGrid::onGridAccess), NULL, this);
-    Connect(wxEVT_GRID_LABEL_LEFT_CLICK,  wxEventHandler(CustomGrid::onGridAccess), NULL, this);
-    GetGridWindow()->Connect(wxEVT_LEFT_DOWN, wxEventHandler(CustomGrid::onGridAccess), NULL, this);
-
+    Connect(wxEVT_KEY_DOWN,                      wxEventHandler(CustomGrid::onGridAccess), NULL, this);
+    Connect(wxEVT_SCROLLWIN_TOP,                 wxEventHandler(CustomGrid::onGridAccess), NULL, this);
+    Connect(wxEVT_SCROLLWIN_BOTTOM,              wxEventHandler(CustomGrid::onGridAccess), NULL, this);
+    Connect(wxEVT_SCROLLWIN_LINEUP,              wxEventHandler(CustomGrid::onGridAccess), NULL, this);
+    Connect(wxEVT_SCROLLWIN_LINEDOWN,            wxEventHandler(CustomGrid::onGridAccess), NULL, this);
+    Connect(wxEVT_SCROLLWIN_PAGEUP,              wxEventHandler(CustomGrid::onGridAccess), NULL, this);
+    Connect(wxEVT_SCROLLWIN_PAGEDOWN,            wxEventHandler(CustomGrid::onGridAccess), NULL, this);
+    Connect(wxEVT_SCROLLWIN_THUMBTRACK,          wxEventHandler(CustomGrid::onGridAccess), NULL, this);
+    Connect(wxEVT_SCROLLWIN_THUMBRELEASE,        wxEventHandler(CustomGrid::onGridAccess), NULL, this);
+    Connect(wxEVT_GRID_LABEL_LEFT_CLICK,         wxEventHandler(CustomGrid::onGridAccess), NULL, this);
+    GetGridWindow()->Connect(wxEVT_LEFT_DOWN,    wxEventHandler(CustomGrid::onGridAccess), NULL, this);
+    GetGridWindow()->Connect(wxEVT_RIGHT_DOWN,    wxEventHandler(CustomGrid::onGridAccess), NULL, this);
     GetGridWindow()->Connect(wxEVT_ENTER_WINDOW, wxEventHandler(CustomGrid::adjustGridHeights), NULL, this);
 }
 
@@ -507,58 +549,22 @@ bool CustomGrid::isLeadGrid() const
 }
 
 
-inline
-bool gridsShouldBeCleared(const wxEvent& event)
+void CustomGrid::RefreshCell(int row, int col)
 {
-    try
-    {
-        const wxMouseEvent& mouseEvent = dynamic_cast<const wxMouseEvent&> (event);
+    wxRect rectScrolled(CellToRect(row, col));
 
-        if (mouseEvent.ControlDown() || mouseEvent.ShiftDown())
-            return false;
+    CalcScrolledPosition(rectScrolled.x, rectScrolled.y, &rectScrolled.x, &rectScrolled.y);
 
-        if (mouseEvent.ButtonDown(wxMOUSE_BTN_LEFT))
-            return true;
+    GetGridWindow()->RefreshRect(rectScrolled); //note: CellToRect() and YToRow work on m_gridWindow NOT on the whole grid!
+}
 
-        return false;
-    }
-    catch (std::bad_cast&) {}
 
-    try
-    {
-        const wxKeyEvent& keyEvent = dynamic_cast<const wxKeyEvent&> (event);
+void CustomGrid::DoPrepareDC(wxDC& dc)
+{
+    wxScrollHelper::DoPrepareDC(dc);
 
-        if (keyEvent.ControlDown() || keyEvent.ShiftDown())
-            return false;
-
-        switch (keyEvent.GetKeyCode())
-        {
-        case WXK_SPACE:
-        case WXK_TAB:
-        case WXK_RETURN:
-        case WXK_ESCAPE:
-        case WXK_NUMPAD_ENTER:
-        case WXK_LEFT:
-        case WXK_UP:
-        case WXK_RIGHT:
-        case WXK_DOWN:
-        case WXK_PAGEUP:
-        case WXK_PAGEDOWN:
-        case WXK_NUMPAD_PAGEUP:
-        case WXK_NUMPAD_PAGEDOWN:
-        case WXK_HOME:
-        case WXK_END:
-        case WXK_NUMPAD_HOME:
-        case WXK_NUMPAD_END:
-            return true;
-
-        default:
-            return false;
-        }
-    }
-    catch (std::bad_cast&) {}
-
-    return false;
+    if (isLeadGrid())  //avoid back coupling
+        alignOtherGrids(m_gridLeft, m_gridMiddle, m_gridRight); //scroll other grids
 }
 
 
@@ -681,28 +687,83 @@ void additionalGridCommands(wxEvent& event, wxGrid* grid)
 }
 
 
+inline
+bool gridsShouldBeCleared(const wxEvent& event)
+{
+    try
+    {
+        const wxMouseEvent& mouseEvent = dynamic_cast<const wxMouseEvent&> (event);
+
+        if (mouseEvent.ControlDown() || mouseEvent.ShiftDown())
+            return false;
+
+        if (mouseEvent.ButtonDown(wxMOUSE_BTN_LEFT))
+            return true;
+
+        return false;
+    }
+    catch (std::bad_cast&) {}
+
+    try
+    {
+        const wxKeyEvent& keyEvent = dynamic_cast<const wxKeyEvent&> (event);
+
+        if (keyEvent.ControlDown() || keyEvent.ShiftDown())
+            return false;
+
+        switch (keyEvent.GetKeyCode())
+        {
+        case WXK_SPACE:
+        case WXK_TAB:
+        case WXK_RETURN:
+        case WXK_ESCAPE:
+        case WXK_NUMPAD_ENTER:
+        case WXK_LEFT:
+        case WXK_UP:
+        case WXK_RIGHT:
+        case WXK_DOWN:
+        case WXK_PAGEUP:
+        case WXK_PAGEDOWN:
+        case WXK_NUMPAD_PAGEUP:
+        case WXK_NUMPAD_PAGEDOWN:
+        case WXK_HOME:
+        case WXK_END:
+        case WXK_NUMPAD_HOME:
+        case WXK_NUMPAD_END:
+            return true;
+        }
+
+        return false;
+    }
+    catch (std::bad_cast&) {}
+
+    return false;
+}
+
+
 void CustomGrid::onGridAccess(wxEvent& event)
 {
     if (!isLeading)
     {
-        isLeading = true;
-
         //notify other grids of new user focus
-        if (m_gridLeft != this)
-            m_gridLeft->isLeading = false;
-        if (m_gridMiddle != this)
-            m_gridMiddle->isLeading = false;
-        if (m_gridRight != this)
-            m_gridRight->isLeading = false;
+        m_gridLeft->isLeading   = m_gridLeft   == this;
+        m_gridMiddle->isLeading = m_gridMiddle == this;
+        m_gridRight->isLeading  = m_gridRight  == this;
 
         wxGrid::SetFocus();
     }
 
+    //clear grids
     if (gridsShouldBeCleared(event))
     {
         m_gridLeft->ClearSelection();
+        m_gridMiddle->ClearSelection();
         m_gridRight->ClearSelection();
     }
+
+    //update row labels NOW (needed when scrolling if buttons keep being pressed)
+    m_gridLeft->GetGridRowLabelWindow()->Update();
+    m_gridRight->GetGridRowLabelWindow()->Update();
 
     //support for additional short-cuts
     additionalGridCommands(event, this); //event.Skip is handled here!
@@ -712,48 +773,46 @@ void CustomGrid::onGridAccess(wxEvent& event)
 //workaround: ensure that all grids are properly aligned: add some extra window space to grids that have no horizontal scrollbar
 void CustomGrid::adjustGridHeights(wxEvent& event)
 {
-    if (m_gridLeft && m_gridRight && m_gridMiddle)
+    //m_gridLeft, m_gridRight, m_gridMiddle not NULL because called after initSettings()
+
+    int y1 = 0;
+    int y2 = 0;
+    int y3 = 0;
+    int dummy = 0;
+
+    m_gridLeft->GetViewStart(&dummy, &y1);
+    m_gridRight->GetViewStart(&dummy, &y2);
+    m_gridMiddle->GetViewStart(&dummy, &y3);
+
+    if (y1 != y2 || y2 != y3)
     {
-        int y1 = 0;
-        int y2 = 0;
-        int y3 = 0;
-        int dummy = 0;
+        int yMax = std::max(y1, std::max(y2, y3));
 
-        m_gridLeft->GetViewStart(&dummy, &y1);
-        m_gridRight->GetViewStart(&dummy, &y2);
-        m_gridMiddle->GetViewStart(&dummy, &y3);
+        if (m_gridLeft->isLeadGrid())  //do not handle case (y1 == yMax) here!!! Avoid back coupling!
+            m_gridLeft->SetMargins(0, 0);
+        else if (y1 < yMax)
+            m_gridLeft->SetMargins(0, 30);
 
-        if (y1 != y2 || y2 != y3)
-        {
-            int yMax = std::max(y1, std::max(y2, y3));
+        if (m_gridRight->isLeadGrid())
+            m_gridRight->SetMargins(0, 0);
+        else if (y2 < yMax)
+            m_gridRight->SetMargins(0, 30);
 
-            if (m_gridLeft->isLeadGrid())  //do not handle case (y1 == yMax) here!!! Avoid back coupling!
-                m_gridLeft->SetMargins(0, 0);
-            else if (y1 < yMax)
-                m_gridLeft->SetMargins(0, 30);
+        if (m_gridMiddle->isLeadGrid())
+            m_gridMiddle->SetMargins(0, 0);
+        else if (y3 < yMax)
+            m_gridMiddle->SetMargins(0, 30);
 
-            if (m_gridRight->isLeadGrid())
-                m_gridRight->SetMargins(0, 0);
-            else if (y2 < yMax)
-                m_gridRight->SetMargins(0, 30);
-
-            if (m_gridMiddle->isLeadGrid())
-                m_gridMiddle->SetMargins(0, 0);
-            else if (y3 < yMax)
-                m_gridMiddle->SetMargins(0, 30);
-
-            m_gridLeft->ForceRefresh();
-            m_gridRight->ForceRefresh();
-            m_gridMiddle->ForceRefresh();
-        }
+        m_gridLeft->ForceRefresh();
+        m_gridRight->ForceRefresh();
+        m_gridMiddle->ForceRefresh();
     }
 }
 
 
-void CustomGrid::setSortMarker(const int sortColumn, const wxBitmap* bitmap)
+void CustomGrid::setSortMarker(SortMarker marker)
 {
-    currentSortColumn = sortColumn;
-    sortMarker        = bitmap;
+    m_marker = marker;
 }
 
 
@@ -761,8 +820,13 @@ void CustomGrid::DrawColLabel(wxDC& dc, int col)
 {
     wxGrid::DrawColLabel(dc, col);
 
-    if (col == currentSortColumn)
-        dc.DrawBitmap(*sortMarker, GetColRight(col) - 16 - 2, 2, true); //respect 2-pixel border
+    if (col == m_marker.first)
+    {
+        if (m_marker.second == ASCENDING)
+            dc.DrawBitmap(*GlobalResources::getInstance().bitmapSmallUp, GetColRight(col) - 16 - 2, 2, true); //respect 2-pixel border
+        else
+            dc.DrawBitmap(*GlobalResources::getInstance().bitmapSmallDown, GetColRight(col) - 16 - 2, 2, true); //respect 2-pixel border
+    }
 }
 
 
@@ -821,118 +885,119 @@ std::set<int> CustomGrid::getAllSelectedRows() const
 //############################################################################################
 //CustomGrid specializations
 
-template <bool leftSide, bool showFileIcons>
+#ifdef FFS_WIN
+template <bool showFileIcons>
 class GridCellRenderer : public wxGridCellStringRenderer
 {
 public:
-    GridCellRenderer(CustomGridTableRim* gridDataTable) : m_gridDataTable(gridDataTable) {};
+    GridCellRenderer(CustomGridRim::LoadSuccess& loadIconSuccess, const CustomGridTableRim* gridDataTable) :
+            m_loadIconSuccess(loadIconSuccess),
+            m_gridDataTable(gridDataTable) {}
 
 
     virtual void Draw(wxGrid& grid,
                       wxGridCellAttr& attr,
                       wxDC& dc,
-                      const wxRect& rect,
+                      const wxRect& rect, //unscrolled rect
                       int row, int col,
                       bool isSelected)
     {
-#ifdef FFS_WIN
         //############## show windows explorer file icons ######################
 
         if (showFileIcons) //evaluate at compile time
         {
-            const int ICON_SIZE = 16; //size in pixel
-
             if (    m_gridDataTable->getTypeAtPos(col) == xmlAccess::FILENAME &&
-                    rect.GetWidth() >= ICON_SIZE)
+                    rect.GetWidth() >= IconBuffer::ICON_SIZE)
             {
                 //retrieve grid data
-                const FileCompareLine* rowData = m_gridDataTable->getRawData(row);
-                if (rowData) //valid row
+                const Zstring fileName = m_gridDataTable->getFileName(row);
+                if (!fileName.empty())
                 {
-                    const DefaultChar* filename;
-                    if (leftSide) //evaluate at compile time
-                        filename = rowData->fileDescrLeft.fullName.c_str();
-                    else
-                        filename = rowData->fileDescrRight.fullName.c_str();
+                    //  Partitioning:
+                    //   _____________________
+                    //  | 2 pix | icon | rest |
+                    //   ---------------------
 
-                    if (*filename != DefaultChar(0)) //test if filename is empty
+                    //clear area where icon will be placed
+                    wxRect rectShrinked(rect);
+                    rectShrinked.SetWidth(IconBuffer::ICON_SIZE + 2); //add 2 pixel border
+                    wxGridCellRenderer::Draw(grid, attr, dc, rectShrinked, row, col, isSelected);
+
+                    //try to draw icon
+                    wxIcon icon;
+                    const bool iconLoaded = IconBuffer::getInstance().requestIcon(fileName, &icon); //returns false if icon is not in buffer
+                    if (iconLoaded)
+                        dc.DrawIcon(icon, rectShrinked.GetX() + 2, rectShrinked.GetY());
+
+                    //-----------------------------------------------------------------------------------------------
+                    //only mark as successful if icon was drawn fully!
+                    //(attention: when scrolling, rows get partially updated, which can result in the upper half being blank!)
+
+                    //rect where icon was placed
+                    wxRect iconRect(rect); //unscrolled
+                    iconRect.x += 2;
+                    iconRect.SetWidth(IconBuffer::ICON_SIZE);
+
+                    //convert to scrolled coordinates
+                    grid.CalcScrolledPosition(iconRect.x, iconRect.y, &iconRect.x, &iconRect.y);
+
+                    bool iconDrawnFully = false;
+                    wxRegionIterator regionsInv(grid.GetGridWindow()->GetUpdateRegion());
+                    while (regionsInv)
                     {
-                        // Get the file icon.
-                        SHFILEINFO fileInfo;
-                        fileInfo.hIcon = 0; //initialize hIcon
-
-                        if (SHGetFileInfo(filename, //NOTE: CoInitializeEx()/CoUninitialize() implicitly called by wxWidgets on program startup!
-                                          0,
-                                          &fileInfo,
-                                          sizeof(fileInfo),
-                                          SHGFI_ICON | SHGFI_SMALLICON))
+                        if (regionsInv.GetRect().Contains(iconRect))
                         {
-                            //clear area where icon will be placed
-                            wxRect rectShrinked(rect);
-                            rectShrinked.SetWidth(ICON_SIZE + 2); //add 2 pixel border
-                            wxGridCellRenderer::Draw(grid, attr, dc, rectShrinked, row, col, isSelected);
-
-                            //draw icon
-                            if (fileInfo.hIcon != 0) //fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
-                            {                        //bug report: https://sourceforge.net/tracker/?func=detail&aid=2768004&group_id=234430&atid=1093080
-                                wxIcon icon;
-                                icon.SetHICON(static_cast<WXHICON>(fileInfo.hIcon));
-                                icon.SetSize(ICON_SIZE, ICON_SIZE);
-
-                                dc.DrawIcon(icon, rectShrinked.GetX() + 2, rectShrinked.GetY());
-
-                                if (!DestroyIcon(fileInfo.hIcon))
-                                    throw RuntimeException(wxString(wxT("Error deallocating Icon handle!\n\n")) + FreeFileSync::getLastErrorFormatted());
-                            }
-
-                            //draw rest
-                            rectShrinked.SetWidth(rect.GetWidth() - ICON_SIZE - 2);
-                            rectShrinked.SetX(rect.GetX() + ICON_SIZE + 2);
-                            wxGridCellStringRenderer::Draw(grid, attr, dc, rectShrinked, row, col, isSelected);
-                            return;
+                            iconDrawnFully = true;
+                            break;
                         }
+                        ++regionsInv;
                     }
+                    //-----------------------------------------------------------------------------------------------
+
+
+                    //save status of last icon load -> used for async. icon loading
+                    m_loadIconSuccess[row] = iconLoaded && iconDrawnFully;
+
+                    //draw rest
+                    wxRect rest(rect); //unscrolled
+                    rest.x     += IconBuffer::ICON_SIZE + 2;
+                    rest.width -= IconBuffer::ICON_SIZE + 2;
+
+                    wxGridCellStringRenderer::Draw(grid, attr, dc, rest, row, col, isSelected);
+                    return;
                 }
             }
         }
         //default
         wxGridCellStringRenderer::Draw(grid, attr, dc, rect, row, col, isSelected);
-
-#elif defined FFS_LINUX
-        wxGridCellStringRenderer::Draw(grid, attr, dc, rect, row, col, isSelected);
-#endif
     }
 
 private:
+    CustomGridRim::LoadSuccess& m_loadIconSuccess;
     const CustomGridTableRim* const m_gridDataTable;
 };
+#endif
 
 //----------------------------------------------------------------------------------------
 
 
-void CustomGridRim::initSettings(const bool showFileIcons,
-                                 CustomGrid* gridLeft,
-                                 CustomGrid* gridRight,
-                                 CustomGrid* gridMiddle,
-                                 const GridView* gridDataView)
-{
-    //these grids will scroll together
-    m_gridLeft   = gridLeft;
-    m_gridRight  = gridRight;
-    m_gridMiddle = gridMiddle;
-
-    //set underlying grid data
-    assert(gridDataTable);
-    gridDataTable->setGridDataTable(gridDataView);
-
-    enableFileIcons(showFileIcons);
-}
+CustomGridRim::CustomGridRim(wxWindow *parent,
+                             wxWindowID id,
+                             const wxPoint& pos,
+                             const wxSize& size,
+                             long style,
+                             const wxString& name) :
+        CustomGrid(parent, id, pos, size, style, name)
+#ifdef FFS_WIN
+        , fileIconsAreEnabled(false)
+#endif
+{}
 
 
 void CustomGridRim::updateGridSizes()
 {
-    assert(gridDataTable);
-    gridDataTable->updateGridSizes();
+    assert(getGridDataTable());
+    getGridDataTable()->updateGridSizes();
 }
 
 
@@ -1046,8 +1111,8 @@ void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
         newPositions.push_back(columnSettings[i].type);
 
     //set column positions
-    assert(gridDataTable);
-    gridDataTable->setupColumns(newPositions);
+    assert(getGridDataTable());
+    getGridDataTable()->setupColumns(newPositions);
 
     //set column width (set them after setupColumns!)
     for (unsigned int i = 0; i < newPositions.size(); ++i)
@@ -1071,8 +1136,8 @@ void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
 
 xmlAccess::ColumnTypes CustomGridRim::getTypeAtPos(unsigned pos) const
 {
-    assert(gridDataTable);
-    return gridDataTable->getTypeAtPos(pos);
+    assert(getGridDataTable());
+    return getGridDataTable()->getTypeAtPos(pos);
 }
 
 
@@ -1097,6 +1162,132 @@ wxString CustomGridRim::getTypeName(xmlAccess::ColumnTypes colType)
     return wxEmptyString; //dummy
 }
 
+
+CustomGridTableRim* CustomGridRim::getGridDataTable()
+{   //let the non-const call the const version: see Meyers Effective C++
+    return const_cast<CustomGridTableRim*>(static_cast<const CustomGridRim*>(this)->getGridDataTable());
+}
+
+
+#ifdef FFS_WIN
+void CustomGridRim::enableFileIcons(const bool value)
+{
+    fileIconsAreEnabled = value;
+
+    if (value)
+        SetDefaultRenderer(new GridCellRenderer<true>(loadIconSuccess, getGridDataTable())); //SetDefaultRenderer takes ownership!
+    else
+        SetDefaultRenderer(new GridCellRenderer<false>(loadIconSuccess, getGridDataTable()));
+
+    Refresh();
+}
+
+
+CustomGridRim::VisibleRowRange CustomGridRim::getVisibleRows()
+{
+    int dummy  = -1;
+    int height = -1;
+    GetGridWindow()->GetClientSize(&dummy, &height);
+
+    if (height >= 0)
+    {
+        int topRowY = -1;
+        CalcUnscrolledPosition(0, 0, &dummy, &topRowY);
+
+        if (topRowY >= 0)
+        {
+            const int topRow    = YToRow(topRowY);
+            const int rowCount  = static_cast<int>(ceil(height / static_cast<double>(GetDefaultRowSize()))); // = height / rowHeight rounded up
+            const int bottomRow = topRow + rowCount - 1;
+
+            return VisibleRowRange(topRow, bottomRow); //"top" means here top of the screen: => smaller value
+        }
+    }
+
+    return VisibleRowRange(0, 0);
+}
+
+
+void CustomGridRim::getIconsToBeLoaded(std::vector<Zstring>& newLoad) //loads all (not yet) drawn icons
+{
+    newLoad.clear();
+
+    if (fileIconsAreEnabled) //don't check too often! give worker thread some time to fetch data
+    {
+        const CustomGridTableRim* gridDataTable = getGridDataTable();
+        const VisibleRowRange rowsOnScreen = getVisibleRows();
+        const int totalCols = const_cast<CustomGridTableRim*>(gridDataTable)->GetNumberCols();
+        const int totalRows = const_cast<CustomGridTableRim*>(gridDataTable)->GetNumberRows();
+
+        //loop over all visible rows
+        const int firstRow = rowsOnScreen.first;
+        const int lastRow  = std::min(int(rowsOnScreen.second), totalRows - 1);
+        const int rowNo = lastRow - firstRow + 1;
+
+        for (int i = 0; i < rowNo; ++i)
+        {
+            //alternate when adding rows: first, last, first + 1, last - 1 ...
+            const int currentRow = i % 2 == 0 ?
+                                   firstRow + i / 2 :
+                                   lastRow - (i - 1) / 2;
+
+            LoadSuccess::const_iterator j = loadIconSuccess.find(currentRow);
+            if (j != loadIconSuccess.end() && j->second == false) //find failed attempts to load icon
+            {
+                const Zstring fileName = gridDataTable->getFileName(currentRow);
+                if (!fileName.empty())
+                {
+                    //test if they are already loaded in buffer:
+                    if (FreeFileSync::IconBuffer::getInstance().requestIcon(fileName))
+                    {
+                        //exists in buffer: refresh Row
+                        for (int k = 0; k < totalCols; ++k)
+                            if (gridDataTable->getTypeAtPos(k) == xmlAccess::FILENAME)
+                            {
+                                RefreshCell(currentRow, k);
+                                break;
+                            }
+                    }
+                    else //not yet in buffer: mark for async. loading
+                    {
+                        newLoad.push_back(fileName);
+                    }
+                }
+            }
+        }
+    }
+}
+
+//----------------------------------------------------------------------------------------
+
+
+//update file icons periodically: use SINGLE instance to coordinate left and right grid at once
+IconUpdater::IconUpdater(CustomGridLeft* leftGrid, CustomGridRight* rightGrid) :
+        m_leftGrid(leftGrid),
+        m_rightGrid(rightGrid),
+        m_timer(new wxTimer)      //connect timer event for async. icon loading
+{
+    m_timer->Connect(wxEVT_TIMER, wxEventHandler(IconUpdater::loadIconsAsynchronously), NULL, this);
+    m_timer->Start(50); //timer interval
+}
+
+
+void IconUpdater::loadIconsAsynchronously(wxEvent& event) //loads all (not yet) drawn icons
+{
+    std::vector<Zstring> iconsLeft;
+    m_leftGrid->getIconsToBeLoaded(iconsLeft);
+
+    std::vector<Zstring> newLoad;
+    m_rightGrid->getIconsToBeLoaded(newLoad);
+
+    globalFunctions::mergeVectors(iconsLeft, newLoad);
+
+    FreeFileSync::IconBuffer::getInstance().setWorkload(newLoad); //attention: newLoad is invalidated after this call!!!
+
+    //event.Skip();
+}
+#endif
+
 //----------------------------------------------------------------------------------------
 
 
@@ -1106,7 +1297,8 @@ CustomGridLeft::CustomGridLeft(wxWindow *parent,
                                const wxSize& size,
                                long style,
                                const wxString& name) :
-        CustomGridRim(parent, id, pos, size, style, name) {}
+        CustomGridRim(parent, id, pos, size, style, name),
+        gridDataTable(NULL) {}
 
 
 bool CustomGridLeft::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
@@ -1120,29 +1312,28 @@ bool CustomGridLeft::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectio
 }
 
 
-void CustomGridLeft::enableFileIcons(const bool value)
+void CustomGridLeft::setGridDataTable(const GridView* gridDataView)
 {
-    if (value)
-        SetDefaultRenderer(new GridCellRenderer<true, true>(gridDataTable)); //SetDefaultRenderer takes ownership!
-    else
-        SetDefaultRenderer(new GridCellRenderer<true, false>(gridDataTable));
+    //set underlying grid data
+    assert(gridDataTable);
+    gridDataTable->setGridDataTable(gridDataView);
+}
 
-    Refresh();
+
+const CustomGridTableRim* CustomGridLeft::getGridDataTable() const
+{
+    return gridDataTable;
 }
 
 
 //this method is called when grid view changes: useful for parallel updating of multiple grids
-void CustomGridLeft::DoPrepareDC(wxDC& dc)
+void CustomGridLeft::alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight)
 {
-    wxScrollHelper::DoPrepareDC(dc);
-
-    int x, y = 0;
-    if (isLeadGrid())  //avoid back coupling
-    {
-        GetViewStart(&x, &y);
-        m_gridMiddle->Scroll(-1, y); //scroll in y-direction only
-        m_gridRight->Scroll(x, y);
-    }
+    int x = 0;
+    int y = 0;
+    GetViewStart(&x, &y);
+    gridMiddle->Scroll(-1, y); //scroll in y-direction only
+    gridRight->Scroll(x, y);
 }
 
 
@@ -1153,7 +1344,8 @@ CustomGridRight::CustomGridRight(wxWindow *parent,
                                  const wxSize& size,
                                  long style,
                                  const wxString& name) :
-        CustomGridRim(parent, id, pos, size, style, name) {}
+        CustomGridRim(parent, id, pos, size, style, name),
+        gridDataTable(NULL) {}
 
 
 bool CustomGridRight::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
@@ -1165,33 +1357,49 @@ bool CustomGridRight::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelecti
 }
 
 
-void CustomGridRight::enableFileIcons(const bool value)
+void CustomGridRight::setGridDataTable(const GridView* gridDataView)
 {
-    if (value)
-        SetDefaultRenderer(new GridCellRenderer<false, true>(gridDataTable)); //SetDefaultRenderer takes ownership!
-    else
-        SetDefaultRenderer(new GridCellRenderer<false, false>(gridDataTable));
+    //set underlying grid data
+    assert(gridDataTable);
+    gridDataTable->setGridDataTable(gridDataView);
+}
 
-    Refresh();
+
+const CustomGridTableRim* CustomGridRight::getGridDataTable() const
+{
+    return gridDataTable;
 }
 
 
 //this method is called when grid view changes: useful for parallel updating of multiple grids
-void CustomGridRight::DoPrepareDC(wxDC& dc)
+void CustomGridRight::alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight)
 {
-    wxScrollHelper::DoPrepareDC(dc);
-
-    int x, y = 0;
-    if (isLeadGrid())  //avoid back coupling
-    {
-        GetViewStart(&x, &y);
-        m_gridLeft->Scroll(x, y);
-        m_gridMiddle->Scroll(-1, y);
-    }
+    int x = 0;
+    int y = 0;
+    GetViewStart(&x, &y);
+    gridLeft->Scroll(x, y);
+    gridMiddle->Scroll(-1, y);
 }
 
 
 //----------------------------------------------------------------------------------------
+class GridCellRendererMiddle : public wxGridCellStringRenderer
+{
+public:
+    GridCellRendererMiddle(const CustomGridMiddle* middleGrid) : m_gridMiddle(middleGrid) {};
+
+    virtual void Draw(wxGrid& grid,
+                      wxGridCellAttr& attr,
+                      wxDC& dc,
+                      const wxRect& rect,
+                      int row, int col,
+                      bool isSelected);
+
+private:
+    const CustomGridMiddle* const m_gridMiddle;
+};
+
+
 //define new event types
 const wxEventType FFS_CHECK_ROWS_EVENT     = wxNewEventType(); //attention! do NOT place in header to keep (generated) id unique!
 const wxEventType FFS_SYNC_DIRECTION_EVENT = wxNewEventType();
@@ -1220,10 +1428,43 @@ CustomGridMiddle::CustomGridMiddle(wxWindow *parent,
 {
     //connect events for dynamic selection of sync direction
     GetGridWindow()->Connect(wxEVT_MOTION, wxMouseEventHandler(CustomGridMiddle::OnMouseMovement), NULL, this);
-
     GetGridWindow()->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CustomGridMiddle::OnLeaveWindow), NULL, this);
     GetGridWindow()->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CustomGridMiddle::OnLeftMouseUp), NULL, this);
     GetGridWindow()->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CustomGridMiddle::OnLeftMouseDown), NULL, this);
+}
+
+
+bool CustomGridMiddle::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
+{
+    gridDataTable = new CustomGridTableMiddle;
+    SetTable(gridDataTable, true, wxGrid::wxGridSelectRows);  //give ownership to wxGrid: gridDataTable is deleted automatically in wxGrid destructor
+
+    //display checkboxes (representing bool values) if row is enabled for synchronization
+    SetDefaultRenderer(new GridCellRendererMiddle(this)); //SetDefaultRenderer takes ownership!
+
+    return true;
+}
+
+
+#ifdef FFS_WIN //get rid of scrollbars; Windows: overwrite virtual method
+void CustomGridMiddle::SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh)
+{
+    wxWindow::SetScrollbar(orientation, 0, 0, 0, refresh);
+}
+#endif
+
+
+void CustomGridMiddle::setGridDataTable(const GridView* gridDataView) //called once on startup
+{
+    //set underlying grid data
+    assert(gridDataTable);
+    gridDataTable->setGridDataTable(gridDataView);
+
+#ifdef FFS_LINUX //get rid of scrollbars; Linux: change policy for GtkScrolledWindow
+    GtkWidget* gridWidget = wxWindow::m_widget;
+    GtkScrolledWindow* scrolledWindow = GTK_SCROLLED_WINDOW(gridWidget);
+    gtk_scrolled_window_set_policy(scrolledWindow, GTK_POLICY_NEVER, GTK_POLICY_NEVER);
+#endif
 }
 
 
@@ -1234,22 +1475,14 @@ void CustomGridMiddle::OnMouseMovement(wxMouseEvent& event)
     if (selectionRowBegin == -1) //change highlightning only if currently not dragging mouse
     {
         highlightedRow = mousePosToRow(event.GetPosition(), &highlightedPos);
-        if (highlightedRow >= 0) RefreshRow(highlightedRow);
+        if (highlightedRow >= 0)
+            RefreshCell(highlightedRow, 0);
         if (    highlightedRowOld >= 0 &&
                 highlightedRow != highlightedRowOld)
-            RefreshRow(highlightedRowOld);
+            RefreshCell(highlightedRowOld, 0);
     }
 
     event.Skip();
-}
-
-
-void CustomGridMiddle::RefreshRow(int row)
-{
-    wxRect rectScrolled(CellToRect(row, 0));
-    CalcScrolledPosition(rectScrolled.x, rectScrolled.y, &rectScrolled.x, &rectScrolled.y);
-
-    GetGridWindow()->Refresh(false, &rectScrolled); //note: CellToRect() and YToRow work on m_gridWindow NOT on the whole grid!
 }
 
 
@@ -1357,36 +1590,6 @@ int CustomGridMiddle::mousePosToRow(const wxPoint pos, BlockPosition* block)
 }
 
 
-void CustomGridMiddle::initSettings(CustomGrid* gridLeft,
-                                    CustomGrid* gridRight,
-                                    CustomGrid* gridMiddle,
-                                    const FreeFileSync::GridView* gridDataView)
-{
-    //these grids will scroll together
-    m_gridLeft   = gridLeft;
-    m_gridRight  = gridRight;
-    m_gridMiddle = gridMiddle;
-
-    //set underlying grid data
-    assert(gridDataTable);
-    gridDataTable->setGridDataTable(gridDataView);
-
-#ifdef FFS_LINUX //get rid of scrollbars; Linux: change policy for GtkScrolledWindow
-    GtkWidget* gridWidget = wxWindow::m_widget;
-    GtkScrolledWindow* scrolledWindow = GTK_SCROLLED_WINDOW(gridWidget);
-    gtk_scrolled_window_set_policy(scrolledWindow, GTK_POLICY_NEVER, GTK_POLICY_NEVER);
-#endif
-}
-
-
-#ifdef FFS_WIN //get rid of scrollbars; Windows: overwrite virtual method
-void CustomGridMiddle::SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh)
-{
-    wxWindow::SetScrollbar(orientation, 0, 0, 0, refresh);
-}
-#endif
-
-
 void CustomGridMiddle::enableSyncPreview(bool value)
 {
     assert(gridDataTable);
@@ -1427,152 +1630,128 @@ void CustomGridMiddle::updateGridSizes()
 }
 
 
-class GridCellRendererMiddle : public wxGridCellStringRenderer
+void GridCellRendererMiddle::Draw(wxGrid& grid,
+                                  wxGridCellAttr& attr,
+                                  wxDC& dc,
+                                  const wxRect& rect,
+                                  int row, int col,
+                                  bool isSelected)
 {
-public:
-    GridCellRendererMiddle(const CustomGridMiddle* middleGrid) : m_gridMiddle(middleGrid) {};
-
-
-    virtual void Draw(wxGrid& grid,
-                      wxGridCellAttr& attr,
-                      wxDC& dc,
-                      const wxRect& rect,
-                      int row, int col,
-                      bool isSelected)
+    //retrieve grid data
+    const FileCompareLine* const rowData = m_gridMiddle->gridDataTable->getRawData(row);
+    if (rowData != NULL) //if valid row...
     {
-        //retrieve grid data
-        const FileCompareLine* const rowData = m_gridMiddle->gridDataTable->getRawData(row);
-        if (rowData) //no valid row
+        if (rect.GetWidth() > CHECK_BOX_WIDTH)
         {
-            if (rect.GetWidth() > CHECK_BOX_WIDTH)
+            wxRect rectShrinked(rect);
+
+            //clean first block of rect that will receive image of checkbox
+            rectShrinked.SetWidth(CHECK_BOX_WIDTH);
+            wxGridCellRenderer::Draw(grid, attr, dc, rectShrinked, row, col, isSelected);
+
+            //print image into first block
+            rectShrinked.SetX(rect.GetX() + 1);
+            bool selected = rowData->selectedForSynchronization;
+
+            //HIGHLIGHTNING:
+            if (    row == m_gridMiddle->highlightedRow &&
+                    m_gridMiddle->highlightedPos == CustomGridMiddle::BLOCKPOS_CHECK_BOX)
+                selected = !selected;
+
+            if (selected)
+                dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapCheckBoxTrue, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+            else
+                dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapCheckBoxFalse, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+
+            //clean remaining block of rect that will receive image of checkbox/directions
+            rectShrinked.SetWidth(rect.GetWidth() - CHECK_BOX_WIDTH);
+            rectShrinked.SetX(rect.GetX() + CHECK_BOX_WIDTH);
+            wxGridCellRenderer::Draw(grid, attr, dc, rectShrinked, row, col, isSelected);
+
+            //print remaining block
+            if (m_gridMiddle->gridDataTable->syncPreviewIsActive()) //synchronization preview
             {
-                wxRect rectShrinked(rect);
-
-                //clean first block of rect that will receive image of checkbox
-                rectShrinked.SetWidth(CHECK_BOX_WIDTH);
-                wxGridCellRenderer::Draw(grid, attr, dc, rectShrinked, row, col, isSelected);
-
-                //print image into first block
-                rectShrinked.SetX(rect.GetX() + 1);
-                bool selected = rowData->selectedForSynchronization;
+                //print sync direction into second block
 
                 //HIGHLIGHTNING:
-                if (    row == m_gridMiddle->highlightedRow &&
-                        m_gridMiddle->highlightedPos == CustomGridMiddle::BLOCKPOS_CHECK_BOX)
-                    selected = !selected;
-
-                if (selected)
-                    dc.DrawLabel(wxEmptyString, *globalResource.bitmapCheckBoxTrue, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
-                else
-                    dc.DrawLabel(wxEmptyString, *globalResource.bitmapCheckBoxFalse, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
-
-                //clean remaining block of rect that will receive image of checkbox/directions
-                rectShrinked.SetWidth(rect.GetWidth() - CHECK_BOX_WIDTH);
-                rectShrinked.SetX(rect.GetX() + CHECK_BOX_WIDTH);
-                wxGridCellRenderer::Draw(grid, attr, dc, rectShrinked, row, col, isSelected);
-
-                //print remaining block
-                if (m_gridMiddle->gridDataTable->syncPreviewIsActive()) //synchronization preview
-                {
-                    //print sync direction into second block
-
-                    //HIGHLIGHTNING:
-                    if (row == m_gridMiddle->highlightedRow && m_gridMiddle->highlightedPos != CustomGridMiddle::BLOCKPOS_CHECK_BOX)
-                        switch (m_gridMiddle->highlightedPos)
-                        {
-                        case CustomGridMiddle::BLOCKPOS_CHECK_BOX:
-                            break;
-                        case CustomGridMiddle::BLOCKPOS_LEFT:
-                            dc.DrawLabel(wxEmptyString, *globalResource.bitmapSyncDirLeftSmall, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
-                            break;
-                        case CustomGridMiddle::BLOCKPOS_MIDDLE:
-                            dc.DrawLabel(wxEmptyString, *globalResource.bitmapSyncDirNoneSmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
-                            break;
-                        case CustomGridMiddle::BLOCKPOS_RIGHT:
-                            dc.DrawLabel(wxEmptyString, *globalResource.bitmapSyncDirRightSmall, rectShrinked, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
-                            break;
-                        }
-                    else //default
-                        switch (rowData->direction)
-                        {
-                        case SYNC_DIR_LEFT:
-                            dc.DrawLabel(wxEmptyString, *globalResource.bitmapSyncDirLeftSmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
-                            break;
-                        case SYNC_DIR_RIGHT:
-                            dc.DrawLabel(wxEmptyString, *globalResource.bitmapSyncDirRightSmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
-                            break;
-                        case SYNC_DIR_NONE:
-                            dc.DrawLabel(wxEmptyString, *globalResource.bitmapSyncDirNoneSmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
-                            break;
-                        case SYNC_UNRESOLVED_CONFLICT:
-                            dc.DrawLabel(wxEmptyString, *globalResource.bitmapConflictSmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
-                            break;
-                        }
-                }
-                else //comparison results view
-                {
-                    switch (rowData->cmpResult)
+                if (row == m_gridMiddle->highlightedRow && m_gridMiddle->highlightedPos != CustomGridMiddle::BLOCKPOS_CHECK_BOX)
+                    switch (m_gridMiddle->highlightedPos)
                     {
-                    case FILE_LEFT_SIDE_ONLY:
-                        dc.DrawLabel(wxEmptyString, *globalResource.bitmapLeftOnlySmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                    case CustomGridMiddle::BLOCKPOS_CHECK_BOX:
                         break;
-                    case FILE_RIGHT_SIDE_ONLY:
-                        dc.DrawLabel(wxEmptyString, *globalResource.bitmapRightOnlySmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                    case CustomGridMiddle::BLOCKPOS_LEFT:
+                        dc.DrawLabel(wxEmptyString, getSyncOpImage(rowData->cmpResult, true, SYNC_DIR_LEFT), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
                         break;
-                    case FILE_LEFT_NEWER:
-                        dc.DrawLabel(wxEmptyString, *globalResource.bitmapLeftNewerSmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                    case CustomGridMiddle::BLOCKPOS_MIDDLE:
+                        dc.DrawLabel(wxEmptyString, getSyncOpImage(rowData->cmpResult, true, SYNC_DIR_NONE), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
                         break;
-                    case FILE_RIGHT_NEWER:
-                        dc.DrawLabel(wxEmptyString, *globalResource.bitmapRightNewerSmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
-                        break;
-                    case FILE_DIFFERENT:
-                        dc.DrawLabel(wxEmptyString, *globalResource.bitmapDifferentSmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
-                        break;
-                    case FILE_EQUAL:
-                        dc.DrawLabel(wxEmptyString, *globalResource.bitmapEqualSmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
-                        break;
-                    case FILE_CONFLICT:
-                        dc.DrawLabel(wxEmptyString, *globalResource.bitmapConflictSmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                    case CustomGridMiddle::BLOCKPOS_RIGHT:
+                        dc.DrawLabel(wxEmptyString, getSyncOpImage(rowData->cmpResult, true, SYNC_DIR_RIGHT), rectShrinked, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
                         break;
                     }
+                else //default
+                {
+                    const wxBitmap& syncOpIcon = getSyncOpImage(rowData->cmpResult, rowData->selectedForSynchronization, rowData->direction);
+                    dc.DrawLabel(wxEmptyString, syncOpIcon, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
                 }
-
-                return;
             }
-        }
+            else //comparison results view
+            {
+                switch (rowData->cmpResult)
+                {
+                case FILE_LEFT_SIDE_ONLY:
+                    dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapLeftOnlySmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                    break;
+                case FILE_RIGHT_SIDE_ONLY:
+                    dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapRightOnlySmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                    break;
+                case FILE_LEFT_NEWER:
+                    dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapLeftNewerSmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                    break;
+                case FILE_RIGHT_NEWER:
+                    dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapRightNewerSmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                    break;
+                case FILE_DIFFERENT:
+                    dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapDifferentSmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                    break;
+                case FILE_EQUAL:
+                    dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapEqualSmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                    break;
+                case FILE_CONFLICT:
+                    dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapConflictSmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                    break;
+                }
+            }
 
-        //fallback
-        wxGridCellStringRenderer::Draw(grid, attr, dc, rect, row, col, isSelected);
+            return;
+        }
     }
 
-private:
-    const CustomGridMiddle* const m_gridMiddle;
-};
-
-
-bool CustomGridMiddle::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
-{
-    gridDataTable = new CustomGridTableMiddle;
-    SetTable(gridDataTable, true, wxGrid::wxGridSelectRows);  //give ownership to wxGrid: gridDataTable is deleted automatically in wxGrid destructor
-
-    //display checkboxes (representing bool values) if row is enabled for synchronization
-    SetDefaultRenderer(new GridCellRendererMiddle(this)); //SetDefaultRenderer takes ownership!
-
-    return true;
+    //fallback
+    wxGridCellStringRenderer::Draw(grid, attr, dc, rect, row, col, isSelected);
 }
 
 
 //this method is called when grid view changes: useful for parallel updating of multiple grids
-void CustomGridMiddle::DoPrepareDC(wxDC& dc)
+void CustomGridMiddle::alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight)
 {
-    wxScrollHelper::DoPrepareDC(dc);
+    int x = 0;
+    int y = 0;
+    GetViewStart(&x, &y);
+    gridLeft->Scroll(-1, y);
+    gridRight->Scroll(-1, y);
+}
 
-    int x, y = 0;
-    if (isLeadGrid())  //avoid back coupling
-    {
-        GetViewStart(&x, &y);
-        m_gridLeft->Scroll(-1, y);
-        m_gridRight->Scroll(-1, y);
-    }
+
+void CustomGridMiddle::DrawColLabel(wxDC& dc, int col)
+{
+    CustomGrid::DrawColLabel(dc, col);
+
+    const wxRect rect(GetColLeft(col), 0, GetColWidth(col), GetColLabelSize());
+
+    if (gridDataTable->syncPreviewIsActive())
+        dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapSyncViewSmall, rect, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL);
+    else
+        dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapCmpViewSmall, rect, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL);
 }
 

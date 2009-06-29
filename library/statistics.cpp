@@ -5,6 +5,11 @@
 #include "statusHandler.h"
 #include "../algorithm.h"
 #include <limits>
+#include <wx/stopwatch.h>
+
+
+RetrieveStatistics::RetrieveStatistics() :
+        timer(new wxStopWatch) {}
 
 
 RetrieveStatistics::~RetrieveStatistics()
@@ -30,7 +35,7 @@ void RetrieveStatistics::writeEntry(const double value, const int objects)
     statEntry newEntry;
     newEntry.value   = value;
     newEntry.objects = objects;
-    newEntry.time    = timer.Time();
+    newEntry.time    = timer->Time();
     data.push_back(newEntry);
 }
 
@@ -102,8 +107,8 @@ Statistics::Statistics(const int totalObjectCount,
         windowSizeRemTime(windowSizeRemainingTime),
         windowSizeBPS(windowSizeBytesPerSecond),
         windowMax(std::max(windowSizeRemainingTime, windowSizeBytesPerSecond)),
-        remainingTimeLast(256*256*256*100) //something "big"
-{}
+        remainingTimeLast(256*256*256*100), //something "big"
+        timer(new wxStopWatch) {}
 
 
 void Statistics::addMeasurement(const int objectsCurrent, const double dataCurrent)
@@ -111,7 +116,7 @@ void Statistics::addMeasurement(const int objectsCurrent, const double dataCurre
     record newEntry;
     newEntry.objects = objectsCurrent;
     newEntry.data    = dataCurrent;
-    newEntry.time    = timer.Time();
+    newEntry.time    = timer->Time();
 
     //insert new record
     measurements.push_back(newEntry);
@@ -176,13 +181,13 @@ wxString Statistics::getBytesPerSecond() const
 
 void Statistics::pauseTimer()
 {
-    timer.Pause();
+    timer->Pause();
 }
 
 
 void Statistics::resumeTimer()
 {
-    timer.Resume();
+    timer->Resume();
 }
 
 /*

@@ -7,13 +7,16 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="FreeFileSync" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\Debug\" />
+				<Option output="BUILD\FreeFileSync" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="BUILD\" />
+				<Option object_output="OBJ\Debug\" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="-Winvalid-pch" />
+					<Add option='-include &quot;library/pch.h&quot;' />
 					<Add option="-D__WXDEBUG__" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib\mswud" />
 				</Compiler>
@@ -30,8 +33,9 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="FreeFileSync" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\Release\" />
+				<Option output="BUILD\FreeFileSync" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="BUILD\" />
+				<Option object_output="OBJ\Release\" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -54,14 +58,16 @@
 				</Linker>
 			</Target>
 			<Target title="Unit Test">
-				<Option output="obj\Unit Test\Unit Test" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="obj\Unit Test\" />
-				<Option object_output="obj\Unit Test\" />
+				<Option output="OBJ\Unit Test\Unit Test" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="OBJ\Unit Test\" />
+				<Option object_output="OBJ\Unit Test\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="-Winvalid-pch" />
+					<Add option='-include &quot;library/pch.h&quot;' />
 					<Add option="-D__WXDEBUG__" />
 					<Add directory="library\gtest" />
 					<Add directory="library\gtest\include" />
@@ -87,6 +93,7 @@
 			<Add option="-DFFS_WIN" />
 			<Add option="-DTIXML_USE_STL" />
 			<Add option="-DwxUSE_UNICODE" />
+			<Add option="-DZSTRING_WIDE_CHAR" />
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
 			<Add directory="C:\Programme\C++\wxWidgets\contrib\include" />
 		</Compiler>
@@ -107,48 +114,51 @@
 			<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 		</Linker>
 		<Unit filename="WxWizFrame.fbp">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="algorithm.cpp" />
-		<Unit filename="algorithm.h" />
+		<Unit filename="algorithm.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="application.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="application.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="comparison.cpp" />
 		<Unit filename="comparison.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="library\customButton.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="library\customButton.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="library\customGrid.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="library\customGrid.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="library\fileError.h">
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="library\fileHandling.cpp" />
-		<Unit filename="library\fileHandling.h" />
+		<Unit filename="library\fileHandling.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="library\filter.cpp" />
-		<Unit filename="library\filter.h" />
+		<Unit filename="library\filter.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="library\globalFunctions.cpp" />
 		<Unit filename="library\globalFunctions.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="library\gtest\main.cpp">
 			<Option target="Unit Test" />
@@ -169,7 +179,7 @@
 			<Option target="Unit Test" />
 		</Unit>
 		<Unit filename="library\gtest\unittest.h">
-			<Option target="Unit Test" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="library\gtest\unittest1.cpp">
 			<Option target="Unit Test" />
@@ -180,45 +190,58 @@
 		<Unit filename="library\gtest\unittest3.cpp">
 			<Option target="Unit Test" />
 		</Unit>
-		<Unit filename="library\localization.cpp" />
-		<Unit filename="library\localization.h">
+		<Unit filename="library\iconBuffer.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="library\multithreading.cpp" />
-		<Unit filename="library\multithreading.h">
+		<Unit filename="library\iconBuffer.h">
 			<Option target="Debug" />
 			<Option target="Release" />
+		</Unit>
+		<Unit filename="library\localization.cpp" />
+		<Unit filename="library\localization.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="library\multithreading.cpp">
+			<Option target="Unit Test" />
+		</Unit>
+		<Unit filename="library\pch.h">
+			<Option compile="1" />
+			<Option weight="0" />
+			<Option target="Debug" />
+			<Option target="Unit Test" />
 		</Unit>
 		<Unit filename="library\processXml.cpp" />
 		<Unit filename="library\processXml.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="library\resources.cpp" />
 		<Unit filename="library\resources.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="library\shadow.cpp" />
+		<Unit filename="library\shadow.h">
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="library\statistics.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="library\statistics.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="library\statusHandler.cpp" />
 		<Unit filename="library\statusHandler.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="library\tinyxml\tinystr.cpp" />
 		<Unit filename="library\tinyxml\tinyxml.cpp" />
 		<Unit filename="library\tinyxml\tinyxmlerror.cpp" />
 		<Unit filename="library\tinyxml\tinyxmlparser.cpp" />
 		<Unit filename="library\zstring.cpp" />
-		<Unit filename="library\zstring.h" />
+		<Unit filename="library\zstring.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 			<Option target="Debug" />
@@ -226,89 +249,77 @@
 		</Unit>
 		<Unit filename="structures.cpp" />
 		<Unit filename="structures.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="synchronization.cpp" />
 		<Unit filename="synchronization.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="ui\batchStatusHandler.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="ui\batchStatusHandler.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="ui\checkVersion.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="ui\checkVersion.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="ui\dragAndDrop.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="ui\dragAndDrop.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="ui\gridView.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="ui\gridView.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="ui\guiGenerated.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="ui\guiGenerated.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="ui\guiStatusHandler.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="ui\guiStatusHandler.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="ui\mainDialog.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="ui\mainDialog.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="ui\smallDialogs.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="ui\smallDialogs.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="ui\sorting.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="ui\syncDialog.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
 		<Unit filename="ui\syncDialog.h">
-			<Option target="Debug" />
-			<Option target="Release" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Extensions>
 			<code_completion />

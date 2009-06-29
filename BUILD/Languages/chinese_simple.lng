@@ -176,6 +176,8 @@ Build:
 开发:
 Cancel
 取消
+Change direction
+
 Check all
 检查所有
 Choose to hide filtered files/directories from list
@@ -218,6 +220,8 @@ Configure your own synchronization rules.
 配置自己的同步规则.
 Confirm
 确认
+Conflict detected:
+
 Continue
 继续
 Conversion error:
@@ -238,6 +242,8 @@ Copying file %x to %y
 正复制文件 %x 到 %y
 Copying file %x to %y overwriting target
 复制文件 %x 并覆盖到目标 %y
+Could not determine volume name for file:
+
 Could not set working directory:
 无法设置工作目录:
 Create a batch job
@@ -278,8 +284,8 @@ Directory does not exist:
 目录不存在:
 Do not display visual status information but write to a logfile instead
 不显示视觉状态信息,使用写入日志文件代替。
-Do not show this warning again
-不再显示警告信息
+Do not show this dialog again
+
 Do nothing
 保持不动
 Do you really want to delete the following objects(s)?
@@ -306,6 +312,8 @@ Error changing modification time:
 修改时间出错:
 Error copying file:
 复制文件出错:
+Error copying locked file %x!
+
 Error creating directory:
 创建目录出错:
 Error deleting directory:
@@ -330,6 +338,8 @@ Error resolving symbolic link:
 解决字符链接出错:
 Error retrieving full path:
 获取完整路径时出错:
+Error starting Volume Shadow Copy Service!
+
 Error traversing directory:
 遍历目录出错:
 Error writing file attributes:
@@ -352,6 +362,8 @@ Exit with RC < 0
 带参数退出
 Feedback and suggestions are welcome at:
 欢迎在下面提出反馈意见和建议:
+File %x has an invalid date!
+
 File Manager integration:
 文件管理集成器:
 File Time tolerance (seconds):
@@ -370,6 +382,10 @@ File times that differ by up to the specified number of seconds are still handle
 文件相差最多指定秒数但仍然具有相同的处理时间.
 Filename
 文件名
+Files %x have a file time difference of less than 1 hour! It's not safe to decide which one is newer due to Daylight Saving Time issues.
+
+Files %x have the same date but a different size!
+
 Files are found equal if\n     - file content\nis the same.
 如果文件内容相同则认为两者相同
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
@@ -500,6 +516,8 @@ Move column down
 移动下一行
 Move column up
 移动上一行
+Moving %x to Recycle Bin
+
 Not all items have been synchronized! Have a look at the list.
 
 Not enough free disk space available in:
@@ -528,12 +546,12 @@ Pause
 暂停
 Paused
 已暂停
+Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
+
 Please fill all empty directory fields.
 请填满所有空的目录区域.
 Press button to activate filter
 请按键以激活过滤
-Preview
-视图
 Published under the GNU General Public License:
 在GNU通用公共许可下发布:
 Question
@@ -614,10 +632,12 @@ Start
 开始
 Start synchronization
 开始同步
+Statistics
+
 Stop
 停止
 Swap sides
-换边
+
 Synchronization Preview
 
 Synchronization aborted!
@@ -626,8 +646,6 @@ Synchronization completed successfully!
 同步成功完成!
 Synchronization completed with errors!
 同步已完成但有错误.
-Synchronization filter
-同步过滤
 Synchronization settings
 同步设置
 Synchronization status
@@ -636,6 +654,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 同时同步两侧:  复制新的或更新的文件在两个方向.
+Synchronize...
+
 Synchronizing...
 同步中...
 System out of memory!
@@ -680,6 +700,10 @@ Use Recycle Bin
 使用回收站
 Use Recycle Bin when deleting or overwriting files during synchronization
 当同步时使用回收站删除或覆盖档案
+Variant
+
+Volume name %x not part of filename %y!
+
 Warning
 警告
 Warning: Synchronization failed for %x item(s):

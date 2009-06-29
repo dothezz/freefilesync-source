@@ -10,16 +10,7 @@
 class GlobalResources
 {
 public:
-    GlobalResources();
-    ~GlobalResources();
-
-    void load();
-
-    static const wxChar FILE_NAME_SEPARATOR;
-
-    //language dependent global variables: need to be initialized by CustomLocale on program startup and language switch
-    static const wxChar* DECIMAL_POINT;
-    static const wxChar* THOUSANDS_SEPARATOR;
+    static const GlobalResources& getInstance();
 
     //image resource objects
     wxBitmap* bitmapArrowLeft;
@@ -41,6 +32,7 @@ public:
     wxBitmap* bitmapSync;
     wxBitmap* bitmapSyncDisabled;
     wxBitmap* bitmapSwap;
+    wxBitmap* bitmapSwapSmall;
     wxBitmap* bitmapHelp;
     wxBitmap* bitmapLeftOnly;
     wxBitmap* bitmapLeftOnlyAct;
@@ -66,6 +58,7 @@ public:
     wxBitmap* bitmapExclude;
     wxBitmap* bitmapFilterOn;
     wxBitmap* bitmapFilterOff;
+    wxBitmap* bitmapFilterSmall;
     wxBitmap* bitmapWarning;
     wxBitmap* bitmapWarningSmall;
     wxBitmap* bitmapError;
@@ -123,6 +116,7 @@ public:
     wxBitmap* bitmapBrazil;
     wxBitmap* bitmapSlovakia;
     wxBitmap* bitmapSpain;
+    wxBitmap* bitmapRussia;
     wxBitmap* bitmapSyncDirLeftAct;
     wxBitmap* bitmapSyncDirLeftDeact;
     wxBitmap* bitmapSyncDirRightAct;
@@ -132,6 +126,10 @@ public:
     wxBitmap* bitmapSyncDirLeftSmall;
     wxBitmap* bitmapSyncDirRightSmall;
     wxBitmap* bitmapSyncDirNoneSmall;
+    wxBitmap* bitmapCreateLeftSmall;
+    wxBitmap* bitmapCreateRightSmall;
+    wxBitmap* bitmapDeleteLeftSmall;
+    wxBitmap* bitmapDeleteRightSmall;
     wxBitmap* bitmapLeftOnlySmall;
     wxBitmap* bitmapRightOnlySmall;
     wxBitmap* bitmapLeftNewerSmall;
@@ -143,8 +141,8 @@ public:
     wxBitmap* bitmapUpdate;
     wxBitmap* bitmapDelete;
     wxBitmap* bitmapData;
-    wxBitmap* bitmapCmpView;
-    wxBitmap* bitmapSyncView;
+    wxBitmap* bitmapCmpViewSmall;
+    wxBitmap* bitmapSyncViewSmall;
     wxBitmap* bitmapSwitchViewSmall;
 
     wxAnimation* animationMoney;
@@ -152,12 +150,14 @@ public:
 
     wxIcon* programIcon;
 
+    void load() const; //loads bitmap resources on program startup: logical const!
+
 private:
+    GlobalResources();
+    ~GlobalResources();
+
     //resource mapping
-    std::map<wxString, wxBitmap*> bitmapResource;
+    mutable std::map<wxString, wxBitmap*> bitmapResource;
 };
-
-
-extern GlobalResources globalResource;  //loads bitmap resources on program startup
 
 #endif // RESOURCES_H_INCLUDED

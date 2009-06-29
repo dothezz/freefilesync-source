@@ -176,6 +176,8 @@ Build:
 Izgradnja:
 Cancel
 Prekliči
+Change direction
+Spremeni smer
 Check all
 Preveri vse
 Choose to hide filtered files/directories from list
@@ -215,9 +217,11 @@ Konfiguriraj filter
 Configure filter...
 Konfiguriraj filter...
 Configure your own synchronization rules.
-Konfiguriraj vaša lastna sinhronizacijska pravila.
+Konfigurirajte vaša lastna sinhronizacijska pravila.
 Confirm
 Potrdi
+Conflict detected:
+Zaznan spor:
 Continue
 Nadaljuj
 Conversion error:
@@ -238,6 +242,8 @@ Copying file %x to %y
 Kopiram datoteko %x v %y
 Copying file %x to %y overwriting target
 Kopiram datoteko %x v %y s prepisovanjem cilja
+Could not determine volume name for file:
+Ne morem določiti imena volumna za datoteko:
 Could not set working directory:
 Ne morem nastaviti delovnega imenika:
 Create a batch job
@@ -278,8 +284,8 @@ Directory does not exist:
 Imenik ne obstaja:
 Do not display visual status information but write to a logfile instead
 Ne prikazuj vidnih statusnih informacij, ampak piši v dnevniško datoteko
-Do not show this warning again
-Ne prikazuj več tega obvestila
+Do not show this dialog again
+Ne prikaži več tega pogovornega okna
 Do nothing
 Ne naredi ničesar
 Do you really want to delete the following objects(s)?
@@ -306,6 +312,8 @@ Error changing modification time:
 Napaka pri spreminjanju časa modifikacije:
 Error copying file:
 Napaka pri kopiranju datoteke:
+Error copying locked file %x!
+Napaka pri kopiranju zaklenjene datoteke %x!
 Error creating directory:
 Napaka pri ustvarjanju imenika:
 Error deleting directory:
@@ -330,6 +338,8 @@ Error resolving symbolic link:
 Napaka pri razreševanju simbolične povezave:
 Error retrieving full path:
 Napaka pri pridobivanju polne poti:
+Error starting Volume Shadow Copy Service!
+Napaka pri zagonu servisa Volume Shadow Copy!
 Error traversing directory:
 Napaka pri prehajanju imenika:
 Error writing file attributes:
@@ -352,6 +362,8 @@ Exit with RC < 0
 Zapusti z RC < 0
 Feedback and suggestions are welcome at:
 Povratne informacije in predlogi so dobrodošli na:
+File %x has an invalid date!
+Datoteka %x ima neveljaven datum!
 File Manager integration:
 Integracija z urejevalnikom datotek:
 File Time tolerance (seconds):
@@ -370,6 +382,10 @@ File times that differ by up to the specified number of seconds are still handle
 Časi sprememb datotek, ki se razlikujejo do navedenega števila sekund so smatrani kot da imajo isti čas spremembe.
 Filename
 Ime datoteke
+Files %x have a file time difference of less than 1 hour! It's not safe to decide which one is newer due to Daylight Saving Time issues.
+Datoteki %x imata razliko v času spremembe manj kot 1 uro! Ni se varno odločiti katera je novejša zaradi vprašanj v zvezi s Poletnim časom.
+Files %x have the same date but a different size!
+Datoteki %x imata enak datum ampak različno velikost!
 Files are found equal if\n     - file content\nis the same.
 Datoteki sta enaki, če\n     - je vsebina datoteke\nenaka.
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
@@ -500,6 +516,8 @@ Move column down
 Premakni stolpec dol
 Move column up
 Premakni stolpec gor
+Moving %x to Recycle Bin
+Premikam %x v Koš
 Not all items have been synchronized! Have a look at the list.
 Vse stvari niso bile sinhronizirane! Preglejte seznam.
 Not enough free disk space available in:
@@ -528,12 +546,12 @@ Pause
 Pavza
 Paused
 Na pavzi
+Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
+Prosim prekopirajte ustrezno \"Shadow.dll\" (ki se nahaja v \"Shadow.zip\" arhivu) v FreeFileSync namestitveni imenik, da omogočite to lastnost.
 Please fill all empty directory fields.
 Prosim izpolnite vse imenike s praznimi polji.
 Press button to activate filter
 Kliknite za aktivacijo filtra
-Preview
-Predogled
 Published under the GNU General Public License:
 Objavljeno pod licenco GNU General Public:
 Question
@@ -614,6 +632,8 @@ Start
 Začni
 Start synchronization
 Začni sinhronizacijo
+Statistics
+Statistika
 Stop
 Ustavi
 Swap sides
@@ -626,8 +646,6 @@ Synchronization completed successfully!
 Sinhronizacija uspešno zaključena!
 Synchronization completed with errors!
 Sinhronizacija se je končala z napakami!
-Synchronization filter
-Filter sinhronizacije
 Synchronization settings
 Nastavitve sinhronizacije
 Synchronization status
@@ -636,6 +654,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 Sinhroniziraj vse .doc, .zip in .exe datoteke, razen iz podmape \"temp\".
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Sinhroniziraj obe strani istočasno: Kopiraj nove ali posodobljene datoteke v obe smeri.
+Synchronize...
+Sinhroniziraj...
 Synchronizing...
 Sinhroniziram...
 System out of memory!
@@ -680,6 +700,10 @@ Use Recycle Bin
 Uporabi Koš
 Use Recycle Bin when deleting or overwriting files during synchronization
 Uporabi Koš, ko se briše ali prepisuje datoteke med sinhronizacijo
+Variant
+Različica
+Volume name %x not part of filename %y!
+Ime volumna %x ni del imena datoteke %y!
 Warning
 Pozor
 Warning: Synchronization failed for %x item(s):

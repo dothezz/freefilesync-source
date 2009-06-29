@@ -171,11 +171,13 @@ Batch taak
 Big thanks for localizing FreeFileSync goes out to:
 Extra dank voor het vertalen van FreeFileSync gaat naar:
 Browse
-Bestand opzoeken
+Map opzoeken
 Build:
 Gebouwd:
 Cancel
 Annuleren
+Change direction
+Zijdes omwisselen
 Check all
 Alles controleren
 Choose to hide filtered files/directories from list
@@ -218,6 +220,8 @@ Configure your own synchronization rules.
 Configureer uw eigen synchronisatieregels.
 Confirm
 Bevestig
+Conflict detected:
+Conflict gedetecteerd:
 Continue
 Doorgaan
 Conversion error:
@@ -238,6 +242,8 @@ Copying file %x to %y
 Bestand %x wordt gekopieerd naar %y
 Copying file %x to %y overwriting target
 Aan het overschrijven van bestand %x naar %y
+Could not determine volume name for file:
+Kon de schijfnaam niet vaststellen van bestand:
 Could not set working directory:
 Kan het pad in gebruik niet instellen:
 Create a batch job
@@ -247,7 +253,7 @@ Map %x wordt aangemaakt
 Current operation:
 Huidige operatie:
 Custom
-Gebruik
+Eigen regels
 Customize columns
 Aanpassen kolommen
 DECISION TREE
@@ -278,8 +284,8 @@ Directory does not exist:
 Map bestaat niet:
 Do not display visual status information but write to a logfile instead
 In plaats van visuele statusinformatie weergeven, alles naar een logbestand schrijven
-Do not show this warning again
-Deze waarschuwing niet meer tonen
+Do not show this dialog again
+Deze melding niet meer weergeven
 Do nothing
 Geen actie ondernemen
 Do you really want to delete the following objects(s)?
@@ -306,6 +312,8 @@ Error changing modification time:
 Er is een fout opgetreden bij het aanpassen van de bestandstijd:
 Error copying file:
 Er is een fout opgetreden bij het kopiëren van bestand:
+Error copying locked file %x!
+Er is een fout opgetreden bij het kopiëren van %x omdat het bestand in gebruik is!
 Error creating directory:
 Er is een fout opgetreden bij het aanmaken van pad:
 Error deleting directory:
@@ -330,6 +338,8 @@ Error resolving symbolic link:
 Er is een fout opgetreden bij het ophalen van een symbolische koppeling:
 Error retrieving full path:
 Er is een fout opgetreden bij het achterhalen van de volledige bestandslocatie:
+Error starting Volume Shadow Copy Service!
+Er is een fout opgetreden bij het starten van de Volume Schadow Copy Service! 
 Error traversing directory:
 Er is een fout opgetreden bij het doorzoeken van map:
 Error writing file attributes:
@@ -352,6 +362,8 @@ Exit with RC < 0
 Afsluiten met RC < 0
 Feedback and suggestions are welcome at:
 Tips en suggesties zijn welkom op:
+File %x has an invalid date!
+Bestand %x heeft een ongeldige datum!
 File Manager integration:
 Integratie bestandsbeheer:
 File Time tolerance (seconds):
@@ -370,6 +382,10 @@ File times that differ by up to the specified number of seconds are still handle
 Bestandstijden die verschillen met maximaal de gespecificeerde tijd worden nog steeds behandeld alsof ze dezelfde tijd hebben.
 Filename
 Bestandsnaam
+Files %x have a file time difference of less than 1 hour! It's not safe to decide which one is newer due to Daylight Saving Time issues.
+De bestanden %x hebben een bestandstijd verschil van minder dan één uur! Het is niet veilig te bepalen welke nieuwer is vanwege zomertijd instellingen
+Files %x have the same date but a different size!
+De bestanden %x hebben dezelfde data maar een afwijkende grootte!
 Files are found equal if\n     - file content\nis the same.
 Bestanden worden gelijk beschouwd als,\n     - de inhoud\novereenkomt.
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
@@ -500,6 +516,8 @@ Move column down
 Verplaats kolom naar beneden
 Move column up
 Verplaats kolom naar boven
+Moving %x to Recycle Bin
+%x aan het verplaatsen naar de Prullenbak
 Not all items have been synchronized! Have a look at the list.
 Niet alle bestanden zijn gesynchroniseerd! Bekijk de lijst.
 Not enough free disk space available in:
@@ -528,12 +546,12 @@ Pause
 Pause
 Paused
 Gepauseerd
+Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
+Kopiëer alstublieft \"Shadow.dll\" (locatie in \"Shadow.zip\" archief) naar de FreeFileSync installatiemap om het gebruik van deze optie mogelijk te maken
 Please fill all empty directory fields.
 Vul alstublieft aan beide kanten een pad in.
 Press button to activate filter
 Druk op de knop om het filter te activeren.
-Preview
-Voorbeeld
 Published under the GNU General Public License:
 Gepubliceerd onder de GNU General Public License:
 Question
@@ -614,10 +632,12 @@ Start
 Start
 Start synchronization
 Start synchroniseren
+Statistics
+Statistieken
 Stop
 Stop
 Swap sides
-Verwissel van kant
+Wissel zijdes
 Synchronization Preview
 Synchronisatie voorbeeldweergave
 Synchronization aborted!
@@ -626,8 +646,6 @@ Synchronization completed successfully!
 Synchronisatie succesvol afgerond!
 Synchronization completed with errors!
 Synchronisatie afgerond. Er zijn fouten opgetreden.
-Synchronization filter
-Synchronisatie filter
 Synchronization settings
 Synchronisatie instellingen
 Synchronization status
@@ -636,6 +654,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 Synchroniseer alle .doc, .zip en .exe bestanden uitgezonderd alles in submap \"temp\"
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Synchroniseer beide zijde tegelijkertijd: kopieer nieuwe of geüpdatete bestanden in beide richtingen.
+Synchronize...
+Synchroniseer...
 Synchronizing...
 Aan het synchroniseren...
 System out of memory!
@@ -680,6 +700,10 @@ Use Recycle Bin
 Gebruik de prullenbak
 Use Recycle Bin when deleting or overwriting files during synchronization
 Gebruik de prullenbak wanneer bestanden worden verwijderd of overschreven tijdens het synchroniseren
+Variant
+Variant
+Volume name %x not part of filename %y!
+Volume naam %x maakt niet deel uit van bestandsnaam %y!
 Warning
 Attentie
 Warning: Synchronization failed for %x item(s):

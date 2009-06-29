@@ -19,7 +19,7 @@ AllocationCount::~AllocationCount()
 }
 
 
-AllocationCount& AllocationCount::getGlobal()
+AllocationCount& AllocationCount::getInstance()
 {
     static AllocationCount global;
     return global;
@@ -260,7 +260,7 @@ Zstring& Zstring::replace(size_t pos1, size_t n1, const DefaultChar* str, size_t
     }
 
     const size_t newLen = oldLen - n1 + n2;
-    if (n1 < n2 || descr->refCount > 1)
+    if (newLen > oldLen || descr->refCount > 1)
     {   //allocate a new string
         StringDescriptor* newDescr;
         DefaultChar* newData;
@@ -279,7 +279,7 @@ Zstring& Zstring::replace(size_t pos1, size_t n1, const DefaultChar* str, size_t
     else  //overwrite current string: case "n2 == 0" is handled implicitly
     {
         memcpy(data + pos1, str, n2 * sizeof(DefaultChar));
-        if (n1 > n2)
+        if (newLen < oldLen)
         {
             memmove(data + pos1 + n2, data + pos1 + n1, (oldLen - pos1 - n1) * sizeof(DefaultChar));
             data[newLen]  = 0;

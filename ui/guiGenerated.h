@@ -29,8 +29,7 @@ class wxButtonWithImage;
 #include <wx/radiobut.h>
 #include <wx/bmpbuttn.h>
 #include <wx/statbox.h>
-#include <wx/hyperlink.h>
-#include <wx/checkbox.h>
+#include <wx/stattext.h>
 #include <wx/panel.h>
 #include <wx/combobox.h>
 #include <wx/filepicker.h>
@@ -38,11 +37,12 @@ class wxButtonWithImage;
 #include <wx/scrolwin.h>
 #include <wx/grid.h>
 #include <wx/choice.h>
+#include <wx/hyperlink.h>
+#include <wx/checkbox.h>
+#include <wx/notebook.h>
 #include <wx/textctrl.h>
-#include <wx/stattext.h>
 #include <wx/statline.h>
 #include <wx/frame.h>
-#include <wx/notebook.h>
 #include <wx/dialog.h>
 #include <wx/gauge.h>
 #include <wx/animate.h>
@@ -68,19 +68,6 @@ class MainDialogGenerated : public wxFrame
 		wxMenuItem* m_menuItemSwitchView;
 		wxMenu* m_menuAdvanced;
 		wxMenu* m_menuLanguages;
-		wxMenuItem* m_menuItemGerman;
-		wxMenuItem* m_menuItemEnglish;
-		wxMenuItem* m_menuItemSpanish;
-		wxMenuItem* m_menuItemFrench;
-		wxMenuItem* m_menuItemItalian;
-		wxMenuItem* m_menuItemHungarian;
-		wxMenuItem* m_menuItemDutch;
-		wxMenuItem* m_menuItemPolish;
-		wxMenuItem* m_menuItemPortuguese;
-		wxMenuItem* m_menuItemPortugueseBrazil;
-		wxMenuItem* m_menuItemSlovenian;
-		wxMenuItem* m_menuItemJapanese;
-		wxMenuItem* m_menuItemChineseSimple;
 		wxMenuItem* m_menuItemGlobSett;
 		wxMenuItem* m_menuItem7;
 		wxMenu* m_menuHelp;
@@ -96,11 +83,8 @@ class MainDialogGenerated : public wxFrame
 		wxBitmapButton* m_bpButton14;
 		
 		
-		wxBitmapButton* m_bpButtonFilter;
-		wxHyperlinkCtrl* m_hyperlinkCfgFilter;
-		wxCheckBox* m_checkBoxHideFilt;
 		
-		
+		wxStaticText* m_staticTextVariant;
 		wxBitmapButton* m_bpButtonSyncConfig;
 		wxButtonWithImage* m_buttonStartSync;
 		
@@ -111,11 +95,10 @@ class MainDialogGenerated : public wxFrame
 		wxPanel* m_panelTopMiddle;
 		
 		wxBoxSizer* bSizerMiddle;
-		wxBitmapButton* m_bpButtonSwitchView;
-		
+		wxBitmapButton* m_bpButtonSwapSides;
 		wxPanel* m_panelTopRight;
-		
 		wxBitmapButton* m_bpButtonAddPair;
+		wxBitmapButton* m_bpButtonRemoveTopPair;
 		wxComboBox* m_directoryRight;
 		wxDirPickerCtrl* m_dirPickerRight;
 		wxBoxSizer* bSizer106;
@@ -129,9 +112,15 @@ class MainDialogGenerated : public wxFrame
 		wxPanel* m_panelRight;
 		CustomGridRight* m_gridRight;
 		wxBoxSizer* bSizer3;
+		wxNotebook* m_notebookBottomLeft;
+		wxPanel* m_panel30;
 		wxBitmapButton* m_bpButtonSave;
 		wxBitmapButton* m_bpButtonLoad;
 		wxChoice* m_choiceHistory;
+		wxPanel* m_panelFilter;
+		wxBitmapButton* m_bpButtonFilter;
+		wxHyperlinkCtrl* m_hyperlinkCfgFilter;
+		wxCheckBox* m_checkBoxHideFilt;
 		wxPanel* m_panel112;
 		
 		wxBitmapButton* m_bpButtonLeftOnly;
@@ -145,6 +134,7 @@ class MainDialogGenerated : public wxFrame
 		wxBitmapButton* m_bpButtonSyncDirRight;
 		wxBitmapButton* m_bpButtonConflict;
 		
+		wxBoxSizer* bSizerBottomRight;
 		
 		wxPanel* m_panelSyncPreview;
 		wxStaticBitmap* m_bitmapCreate;
@@ -178,19 +168,6 @@ class MainDialogGenerated : public wxFrame
 		virtual void OnMenuSaveConfig( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuLoadConfig( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuQuit( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnMenuLangGerman( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnMenuLangEnglish( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnMenuLangSpanish( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnMenuLangFrench( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnMenuLangItalian( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnMenuLangHungarian( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnMenuLangDutch( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnMenuLangPolish( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnMenuLangPortuguese( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnMenuLangPortugueseBrazil( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnMenuLangSlovenian( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnMenuLangJapanese( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnMenuLangChineseSimp( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuGlobalSettings( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuBatchJob( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuExportFileList( wxCommandEvent& event ){ event.Skip(); }
@@ -200,26 +177,29 @@ class MainDialogGenerated : public wxFrame
 		virtual void OnCompareByTimeSize( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnCompareByContent( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnShowHelpDialog( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnFilterButton( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnConfigureFilter( wxHyperlinkEvent& event ){ event.Skip(); }
-		virtual void OnHideFilteredButton( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSyncSettings( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnFolderHistoryKeyEvent( wxKeyEvent& event ){ event.Skip(); }
 		virtual void OnDirSelected( wxFileDirPickerEvent& event ){ event.Skip(); }
+		virtual void OnSwapSides( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnAddFolderPair( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnRemoveTopFolderPair( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnLeftGridDoubleClick( wxGridEvent& event ){ event.Skip(); }
-		virtual void OnContextMenu( wxGridEvent& event ){ event.Skip(); }
+		virtual void OnContextRim( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnSortLeftGrid( wxGridEvent& event ){ event.Skip(); }
-		virtual void OnContextColumnLeft( wxGridEvent& event ){ event.Skip(); }
-		virtual void OnContextMenuMiddle( wxGridEvent& event ){ event.Skip(); }
+		virtual void OnContextRimLabelLeft( wxGridEvent& event ){ event.Skip(); }
+		virtual void OnContextMiddle( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnSortMiddleGrid( wxGridEvent& event ){ event.Skip(); }
+		virtual void OnContextMiddleLabel( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnRightGridDoubleClick( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnSortRightGrid( wxGridEvent& event ){ event.Skip(); }
-		virtual void OnContextColumnRight( wxGridEvent& event ){ event.Skip(); }
+		virtual void OnContextRimLabelRight( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnSaveConfig( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnLoadConfig( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnCfgHistoryKeyEvent( wxKeyEvent& event ){ event.Skip(); }
 		virtual void OnLoadFromHistory( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnFilterButton( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnConfigureFilter( wxHyperlinkEvent& event ){ event.Skip(); }
+		virtual void OnHideFilteredButton( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnLeftOnlyFiles( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnLeftNewerFiles( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnEqualFiles( wxCommandEvent& event ){ event.Skip(); }
@@ -612,42 +592,11 @@ class AboutDlgGenerated : public wxDialog
 		wxStaticText* m_staticText72;
 		wxStaticText* m_staticText73;
 		wxStaticText* m_staticText74;
-		wxScrolledWindow* m_scrolledWindow3;
+		wxScrolledWindow* m_scrolledWindowTranslators;
+		wxBoxSizer* bSizerTranslators;
 		wxStaticText* m_staticText54;
 		
-		wxStaticBitmap* m_bitmapFrench;
-		wxStaticText* m_staticText68;
-		wxStaticText* m_staticText69;
-		wxStaticBitmap* m_bitmapJapanese;
-		wxStaticText* m_staticText70;
-		wxStaticText* m_staticText71;
-		wxStaticBitmap* m_bitmapDutch;
-		wxStaticText* m_staticText711;
-		wxStaticText* m_staticText712;
-		wxStaticBitmap* m_bitmapChineseSimple;
-		wxStaticText* m_staticText91;
-		wxStaticText* m_staticText92;
-		wxStaticBitmap* m_bitmapPolish;
-		wxStaticText* m_staticText911;
-		wxStaticText* m_staticText921;
-		wxStaticBitmap* m_bitmapPortuguese;
-		wxStaticText* m_staticText9211;
-		wxStaticText* m_staticText9212;
-		wxStaticBitmap* m_bitmapItalian;
-		wxStaticText* m_staticText92121;
-		wxStaticText* m_staticText92122;
-		wxStaticBitmap* m_bitmapSlovenian;
-		wxStaticText* m_staticText921221;
-		wxStaticText* m_staticText921222;
-		wxStaticBitmap* m_bitmapHungarian;
-		wxStaticText* m_staticText682;
-		wxStaticText* m_staticText681;
-		wxStaticBitmap* m_bitmapSpanish;
-		wxStaticText* m_staticText683;
-		wxStaticText* m_staticText691;
-		wxStaticBitmap* m_bitmapPortugueseBrazil;
-		wxStaticText* m_staticText684;
-		wxStaticText* m_staticText685;
+		wxFlexGridSizer* fgSizerTranslators;
 		wxStaticLine* m_staticline3;
 		wxPanel* m_panel22;
 		wxStaticText* m_staticText131;
@@ -926,6 +875,43 @@ class GlobalSettingsDlgGenerated : public wxDialog
 	public:
 		GlobalSettingsDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Global settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
 		~GlobalSettingsDlgGenerated();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class SyncPreviewDlgGenerated
+///////////////////////////////////////////////////////////////////////////////
+class SyncPreviewDlgGenerated : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* m_staticTextVariant;
+		wxButtonWithImage* m_buttonStartSync;
+		wxStaticLine* m_staticline14;
+		
+		wxStaticBitmap* m_bitmapCreate;
+		wxTextCtrl* m_textCtrlCreate;
+		wxStaticBitmap* m_bitmapDelete;
+		wxTextCtrl* m_textCtrlDelete;
+		wxStaticBitmap* m_bitmapUpdate;
+		wxTextCtrl* m_textCtrlUpdate;
+		wxStaticBitmap* m_bitmapData;
+		wxTextCtrl* m_textCtrlData;
+		wxStaticLine* m_staticline12;
+		wxCheckBox* m_checkBoxDontShowAgain;
+		
+		wxButton* m_button16;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ){ event.Skip(); }
+		virtual void OnStartSync( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ){ event.Skip(); }
+		
+	
+	public:
+		SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Synchronization Preview"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		~SyncPreviewDlgGenerated();
 	
 };
 

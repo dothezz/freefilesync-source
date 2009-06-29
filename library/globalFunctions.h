@@ -6,9 +6,14 @@
 #include <vector>
 #include <set>
 #include <wx/string.h>
-#include <wx/stream.h>
-#include <wx/stopwatch.h>
 #include <wx/longlong.h>
+#include <memory>
+#include <sstream>
+
+class wxInputStream;
+class wxOutputStream;
+class wxStopWatch;
+
 
 namespace globalFunctions
 {
@@ -25,10 +30,13 @@ namespace globalFunctions
         return(d < 0 ? -d : d);
     }
 
-    std::string numberToString(const unsigned int number); //convert number to string
-    std::string numberToString(const int number);          //convert number to string
-    std::string numberToString(const long number);         //convert number to string
-    std::string numberToString(const float number);        //convert number to string
+    template <class T>
+    inline std::string numberToString(const T& number) //convert number to string the C++ way
+    {
+        std::stringstream ss;
+        ss << number;
+        return ss.str();
+    }
 
     wxString numberToWxString(const unsigned int number); //convert number to wxString
     wxString numberToWxString(const int number);          //convert number to wxString
@@ -54,6 +62,43 @@ namespace globalFunctions
     {
         return wxLongLong(number.GetHi(), number.GetLo());
     }
+
+
+    //Note: the following lines are a performance optimization for deleting elements from a vector. It is incredibly faster to create a new
+//vector and leave specific elements out than to delete row by row and force recopying of most elements for each single deletion (linear vs quadratic runtime)
+    template <class T>
+    void removeRowsFromVector(const std::set<int>& rowsToRemove, std::vector<T>& grid)
+    {
+        if (rowsToRemove.size() > 0)
+        {
+            std::vector<T> temp;
+
+            std::set<int>::const_iterator rowToSkipIndex = rowsToRemove.begin();
+            int rowToSkip = *rowToSkipIndex;
+
+            for (int i = 0; i < int(grid.size()); ++i)
+            {
+                if (i != rowToSkip)
+                    temp.push_back(grid[i]);
+                else
+                {
+                    ++rowToSkipIndex;
+                    if (rowToSkipIndex != rowsToRemove.end())
+                        rowToSkip = *rowToSkipIndex;
+                }
+            }
+            grid.swap(temp);
+        }
+    }
+
+
+    template <class T>
+    inline
+    void mergeVectors(const std::vector<T>& input, std::vector<T>& changing)
+    {
+        for (typename std::vector<T>::const_iterator i = input.begin(); i != input.end(); ++i) //nested dependent typename: see Meyers effective C++
+            changing.push_back(*i);
+    }
 }
 
 
@@ -67,7 +112,7 @@ public:
 
 private:
     bool resultWasShown;
-    wxStopWatch timer;
+    std::auto_ptr<wxStopWatch> timer;
 };
 
 //two macros for quick performance measurements
@@ -106,41 +151,12 @@ public:
 
     wxString show() const
     {
-
         return errorMessage;
     }
 
 private:
     wxString errorMessage;
 };
-
-
-//Note: the following lines are a performance optimization for deleting elements from a vector. It is incredibly faster to create a new
-//vector and leave specific elements out than to delete row by row and force recopying of most elements for each single deletion (linear vs quadratic runtime)
-template <class T>
-void removeRowsFromVector(std::vector<T>& grid, const std::set<int>& rowsToRemove)
-{
-    if (rowsToRemove.size() > 0)
-    {
-        std::vector<T> temp;
-
-        std::set<int>::iterator rowToSkipIndex = rowsToRemove.begin();
-        int rowToSkip = *rowToSkipIndex;
-
-        for (int i = 0; i < int(grid.size()); ++i)
-        {
-            if (i != rowToSkip)
-                temp.push_back(grid[i]);
-            else
-            {
-                ++rowToSkipIndex;
-                if (rowToSkipIndex != rowsToRemove.end())
-                    rowToSkip = *rowToSkipIndex;
-            }
-        }
-        grid.swap(temp);
-    }
-}
 
 
 #endif // GLOBALFUNCTIONS_H_INCLUDED

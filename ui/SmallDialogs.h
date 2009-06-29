@@ -143,7 +143,6 @@ class QuestionDlg : public QuestionDlgGenerated
 {
 public:
     QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxString messageText, bool& dontShowAgain);
-    ~QuestionDlg();
 
     enum
     {
@@ -166,7 +165,6 @@ class CustomizeColsDlg : public CustomizeColsDlgGenerated
 {
 public:
     CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes& attr, bool& showFileIcons);
-    ~CustomizeColsDlg() {}
 
     enum
     {
@@ -184,6 +182,32 @@ private:
 
     xmlAccess::ColumnAttributes& output;
     bool& m_showFileIcons;
+};
+
+
+class SyncPreviewDlg : public SyncPreviewDlgGenerated
+{
+public:
+    SyncPreviewDlg(wxWindow* parentWindow,
+                   const wxString& variantName,
+                   const wxString& toCreate,
+                   const wxString& toUpdate,
+                   const wxString& toDelete,
+                   const wxString& data,
+                   bool& dontShowAgain);
+
+    enum
+    {
+        BUTTON_START  = 1,
+        BUTTON_CANCEL = 2
+    };
+
+private:
+    void OnClose(wxCloseEvent& event);
+    void OnCancel(wxCommandEvent& event);
+    void OnStartSync(wxCommandEvent& event);
+
+    bool& m_dontShowAgain;
 };
 
 

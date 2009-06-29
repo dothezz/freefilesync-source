@@ -10,6 +10,22 @@
 
 namespace FreeFileSync
 {
+//------------------------------------------------------------------------------
+//global variables
+//------------------------------------------------------------------------------
+    extern const wxChar FILE_NAME_SEPARATOR;
+
+    //language dependent global variables: need to be initialized by CustomLocale on program startup and language switch
+    extern const wxChar* DECIMAL_POINT;
+    extern const wxChar* THOUSANDS_SEPARATOR;
+
+    const wxString& getLastConfigFile();
+    const wxString& getGlobalConfigFile();
+    const wxString& getDefaultLogDirectory();
+    const wxString& getLastErrorTxtFile();
+    const wxString& getInstallationDir(); //FreeFileSync installation directory without path separator
+//------------------------------------------------------------------------------
+
     enum CompareVariant
     {
         CMP_BY_CONTENT,
@@ -22,6 +38,7 @@ namespace FreeFileSync
         SYNC_DIR_LEFT,
         SYNC_DIR_RIGHT,
         SYNC_DIR_NONE,
+
         SYNC_UNRESOLVED_CONFLICT
     };
 
@@ -49,6 +66,18 @@ namespace FreeFileSync
                    rightNewer      == other.rightNewer      &&
                    different       == other.different;
         }
+
+        //get/set default configuration variants
+        enum Variant
+        {
+            MIRROR,
+            UPDATE,
+            TWOWAY,
+            CUSTOM
+        };
+        Variant getVariant();
+        wxString getVariantName();
+        void setVariant(const Variant var);
     };
 
 
@@ -158,6 +187,10 @@ namespace FreeFileSync
                 direction(defaultDirection),
                 selectedForSynchronization(selected) {}
 
+        typedef unsigned int FolderPairNr;
+
+        FolderPairNr folderPairRef;
+
         FileDescrLine fileDescrLeft;
         FileDescrLine fileDescrRight;
 
@@ -166,6 +199,17 @@ namespace FreeFileSync
         bool selectedForSynchronization;
     };
     typedef std::vector<FileCompareLine> FileComparison;
+
+
+    struct FileComparison2
+    {
+
+        std::vector<FolderPair> directoryPairs; //directoryPairs - cmpLines 1:n
+
+        std::vector<FileCompareLine> cmpLines;
+    };
+
+
 
 
     struct FolderCompareLine //support for multiple folder pairs

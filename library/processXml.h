@@ -6,9 +6,6 @@
 
 namespace xmlAccess
 {
-    extern const wxString LAST_CONFIG_FILE;
-    extern const wxString GLOBAL_CONFIG_FILE;
-
     enum OnError
     {
         ON_ERROR_POPUP,
@@ -93,38 +90,45 @@ namespace xmlAccess
     bool supportForSymbolicLinks();
 
 
+    struct WarningMessages
+    {
+        WarningMessages()
+        {
+            resetWarnings();
+        }
+
+        void resetWarnings();
+
+        bool warningDependentFolders;
+        bool warningSignificantDifference;
+        bool warningNotEnoughDiskSpace;
+        bool warningUnresolvedConflicts;
+        bool warningInvalidDate;
+        bool warningSameDateDiffSize;
+        bool warningDSTChangeWithinHour;
+    };
+
+
     struct XmlGlobalSettings
     {
 //---------------------------------------------------------------------
-        struct _Shared
-        {
-            _Shared() :
-                    programLanguage(retrieveSystemLanguage()),
-                    fileTimeTolerance(2),  //default 2s: FAT vs NTFS
-                    ignoreOneHourDiff(true),
-                    traverseDirectorySymlinks(false),
-                    copyFileSymlinks(supportForSymbolicLinks()),
-                    lastUpdateCheck(0)
-            {
-                resetWarnings();
-            }
+        //Shared (GUI/BATCH) settings
+        XmlGlobalSettings() :
+                programLanguage(retrieveSystemLanguage()),
+                fileTimeTolerance(2),  //default 2s: FAT vs NTFS
+                ignoreOneHourDiff(true),
+                traverseDirectorySymlinks(false),
+                copyFileSymlinks(supportForSymbolicLinks()),
+                lastUpdateCheck(0) {}
 
-            int programLanguage;
-            unsigned int fileTimeTolerance; //max. allowed file time deviation
-            bool ignoreOneHourDiff; //ignore +/- 1 hour due to DST change
-            bool traverseDirectorySymlinks;
-            bool copyFileSymlinks; //copy symbolic link instead of target file
-            long lastUpdateCheck; //time of last update check
+        int programLanguage;
+        unsigned int fileTimeTolerance; //max. allowed file time deviation
+        bool ignoreOneHourDiff; //ignore +/- 1 hour due to DST change
+        bool traverseDirectorySymlinks;
+        bool copyFileSymlinks; //copy symbolic link instead of target file
+        long lastUpdateCheck; //time of last update check
 
-            //warnings
-            void resetWarnings();
-
-            bool warningDependentFolders;
-            bool warningSignificantDifference;
-            bool warningNotEnoughDiskSpace;
-            bool warningUnresolvedConflicts;
-            bool warningSynchronizationStarting;
-        } shared;
+        WarningMessages warnings;
 
 //---------------------------------------------------------------------
         struct _Gui
@@ -143,10 +147,13 @@ namespace xmlAccess
                     cfgHistoryMax(10),
                     folderHistLeftMax(12),
                     folderHistRightMax(12),
+                    selectedTabBottomLeft(0),
                     deleteOnBothSides(false),
                     useRecyclerForManualDeletion(FreeFileSync::recycleBinExists()), //enable if OS supports it; else user will have to activate first and then get an error message
-                    showFileIcons(true),
-                    popupOnConfigChange(true) {}
+                    showFileIconsLeft(true),
+                    showFileIconsRight(true),
+                    popupOnConfigChange(true),
+                    showSummaryBeforeSync(true) {}
 
             int widthNotMaximized;
             int heightNotMaximized;
@@ -168,10 +175,14 @@ namespace xmlAccess
             std::vector<wxString> folderHistoryRight;
             unsigned int folderHistRightMax;
 
+            int selectedTabBottomLeft;
+
             bool deleteOnBothSides;
             bool useRecyclerForManualDeletion;
-            bool showFileIcons;
+            bool showFileIconsLeft;
+            bool showFileIconsRight;
             bool popupOnConfigChange;
+            bool showSummaryBeforeSync;
         } gui;
 
 //---------------------------------------------------------------------

@@ -7,6 +7,7 @@
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
+#include "shadow.h"
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
@@ -18,10 +19,26 @@
 #include <errno.h>
 #endif
 
+using FreeFileSync::FileError;
+
 
 class RecycleBin
 {
 public:
+    static const RecycleBin& getInstance()
+    {
+        static RecycleBin instance; //lazy creation of RecycleBin
+        return instance;
+    }
+
+    bool recycleBinExists() const
+    {
+        return recycleBinAvailable;
+    }
+
+    bool moveToRecycleBin(const Zstring& filename) const;
+
+private:
     RecycleBin() :
             recycleBinAvailable(false)
     {
@@ -32,61 +49,46 @@ public:
 
     ~RecycleBin() {}
 
-    bool recycleBinExists()
-    {
-        return recycleBinAvailable;
-    }
-
-    bool moveToRecycleBin(const Zstring& filename)
-    {
-        if (!recycleBinAvailable)   //this method should ONLY be called if recycle bin is available
-            throw RuntimeException(_("Initialization of Recycle Bin failed!"));
-
-#ifdef FFS_WIN
-        Zstring filenameDoubleNull = filename + wxChar(0);
-
-        SHFILEOPSTRUCT fileOp;
-        fileOp.hwnd   = NULL;
-        fileOp.wFunc  = FO_DELETE;
-        fileOp.pFrom  = filenameDoubleNull.c_str();
-        fileOp.pTo    = NULL;
-        fileOp.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_SILENT | FOF_NOERRORUI;
-        fileOp.fAnyOperationsAborted = false;
-        fileOp.hNameMappings         = NULL;
-        fileOp.lpszProgressTitle     = NULL;
-
-        if (SHFileOperation(&fileOp   //pointer to an SHFILEOPSTRUCT structure that contains information the function needs to carry out
-                           ) != 0 || fileOp.fAnyOperationsAborted) return false;
-#else
-        assert(false);
-#endif
-
-        return true;
-    }
-
 private:
     bool recycleBinAvailable;
 };
 
 
-inline
-RecycleBin& getRecycleBin()
+bool RecycleBin::moveToRecycleBin(const Zstring& filename) const
 {
-    static RecycleBin instance; //lazy creation of RecycleBin
-    return instance;
+    if (!recycleBinAvailable)   //this method should ONLY be called if recycle bin is available
+        throw RuntimeException(_("Initialization of Recycle Bin failed!"));
+
+#ifdef FFS_WIN
+    Zstring filenameDoubleNull = filename + wxChar(0);
+
+    SHFILEOPSTRUCT fileOp;
+    fileOp.hwnd   = NULL;
+    fileOp.wFunc  = FO_DELETE;
+    fileOp.pFrom  = filenameDoubleNull.c_str();
+    fileOp.pTo    = NULL;
+    fileOp.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_SILENT | FOF_NOERRORUI;
+    fileOp.fAnyOperationsAborted = false;
+    fileOp.hNameMappings         = NULL;
+    fileOp.lpszProgressTitle     = NULL;
+
+    if (SHFileOperation(&fileOp) != 0 || fileOp.fAnyOperationsAborted) return false;
+#endif
+
+    return true;
 }
 
 
 bool FreeFileSync::recycleBinExists()
 {
-    return getRecycleBin().recycleBinExists();
+    return RecycleBin::getInstance().recycleBinExists();
 }
 
 
 inline
 bool moveToRecycleBin(const Zstring& filename) throw(RuntimeException)
 {
-    return getRecycleBin().moveToRecycleBin(filename);
+    return RecycleBin::getInstance().moveToRecycleBin(filename);
 }
 
 
@@ -286,7 +288,7 @@ private:
 
 class KernelDllHandler //dynamically load windows API functions
 {
-    typedef DWORD WINAPI (*GetFinalPath)(
+    typedef DWORD (WINAPI *GetFinalPath)(
         HANDLE hFile,
         LPTSTR lpszFilePath,
         DWORD cchFilePath,
@@ -365,11 +367,11 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
         return;
 
     //try to create parent folders first
-    const Zstring dirParent = directory.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+    const Zstring dirParent = directory.BeforeLast(FreeFileSync::FILE_NAME_SEPARATOR);
     if (!dirParent.empty() && !wxDirExists(dirParent))
     {
         //call function recursively
-        const Zstring templateParent = templateDir.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+        const Zstring templateParent = templateDir.BeforeLast(FreeFileSync::FILE_NAME_SEPARATOR);
         createDirectoryRecursively(dirParent, templateParent, false, level + 1); //don't create symbolic links in recursion!
     }
 
@@ -488,13 +490,13 @@ void FreeFileSync::createDirectory(const Zstring& directory, const Zstring& temp
     //remove trailing separator
     Zstring dirFormatted;
     if (FreeFileSync::endsWithPathSeparator(directory))
-        dirFormatted = directory.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+        dirFormatted = directory.BeforeLast(FreeFileSync::FILE_NAME_SEPARATOR);
     else
         dirFormatted = directory;
 
     Zstring templateFormatted;
     if (FreeFileSync::endsWithPathSeparator(templateDir))
-        templateFormatted = templateDir.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+        templateFormatted = templateDir.BeforeLast(FreeFileSync::FILE_NAME_SEPARATOR);
     else
         templateFormatted = templateDir;
 
@@ -502,7 +504,95 @@ void FreeFileSync::createDirectory(const Zstring& directory, const Zstring& temp
 }
 
 
-#ifdef FFS_LINUX
+#ifdef FFS_WIN
+
+#ifndef COPY_FILE_COPY_SYMLINK
+const DWORD COPY_FILE_COPY_SYMLINK = 0x00000800;
+#endif
+
+DWORD CALLBACK copyCallbackInternal(
+    LARGE_INTEGER totalFileSize,
+    LARGE_INTEGER totalBytesTransferred,
+    LARGE_INTEGER streamSize,
+    LARGE_INTEGER streamBytesTransferred,
+    DWORD dwStreamNumber,
+    DWORD dwCallbackReason,
+    HANDLE hSourceFile,
+    HANDLE hDestinationFile,
+    LPVOID lpData)
+{
+    using FreeFileSync::CopyFileCallback;
+
+    //small performance optimization: it seems this callback function is called for every 64 kB (depending on cluster size).
+    static unsigned int callNr = 0;
+    if (++callNr % 50 == 0) //reduce by factor of 50 =^ 10-20 calls/sec
+    {
+        if (lpData != NULL)
+        {
+            //some odd check for some possible(?) error condition
+            if (totalBytesTransferred.HighPart < 0) //let's see if someone answers the call...
+                wxMessageBox(wxT("You've just discovered a bug in WIN32 API function \"CopyFileEx\"! \n\n\
+            Please write a mail to the author of FreeFileSync at zhnmju123@gmx.de and simply state that\n\
+            \"totalBytesTransferred.HighPart can be below zero\"!\n\n\
+            This will then be handled in future versions of FreeFileSync.\n\nThanks -ZenJu"), wxT("Warning"));
+
+
+            CopyFileCallback* callback = static_cast<CopyFileCallback*>(lpData);
+
+            switch (callback->updateCopyStatus(wxULongLong(totalBytesTransferred.HighPart, totalBytesTransferred.LowPart)))
+            {
+            case CopyFileCallback::CONTINUE:
+                break;
+            case CopyFileCallback::CANCEL:
+                return PROGRESS_CANCEL;
+            }
+        }
+    }
+
+    return PROGRESS_CONTINUE;
+}
+
+
+void FreeFileSync::copyFile(const Zstring& sourceFile,
+                            const Zstring& targetFile,
+                            const bool copyFileSymLinks,
+                            ShadowCopy* shadowCopyHandler,
+                            CopyFileCallback* callback)
+{
+    DWORD copyFlags = COPY_FILE_FAIL_IF_EXISTS;
+
+    if (copyFileSymLinks) //copy symbolic links instead of the files pointed at
+        copyFlags |= COPY_FILE_COPY_SYMLINK;
+
+    if (!::CopyFileEx( //same performance as CopyFile()
+                sourceFile.c_str(),
+                targetFile.c_str(),
+                copyCallbackInternal,
+                callback,
+                NULL,
+                copyFlags))
+    {
+        const DWORD lastError = ::GetLastError();
+
+        //if file is locked (try to) use Windows Volume Shadow Copy Service
+        if (lastError == ERROR_SHARING_VIOLATION && shadowCopyHandler != NULL)
+        {
+            const Zstring shadowFilename(shadowCopyHandler->makeShadowCopy(sourceFile));
+            FreeFileSync::copyFile(shadowFilename, //transferred bytes is automatically reset when new file is copied
+                                   targetFile,
+                                   copyFileSymLinks,
+                                   shadowCopyHandler,
+                                   callback);
+            return;
+        }
+
+        const Zstring errorMessage = Zstring(_("Error copying file:")) + wxT("\n\"") + sourceFile +  wxT("\" -> \"") + targetFile + wxT("\"");
+        throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted(lastError));
+    }
+}
+
+
+#elif defined FFS_LINUX
 struct MemoryAllocator
 {
     MemoryAllocator()
@@ -523,9 +613,10 @@ struct MemoryAllocator
 void FreeFileSync::copyFile(const Zstring& sourceFile,
                             const Zstring& targetFile,
                             const bool copyFileSymLinks,
-                            CopyFileCallback callback,
-                            void* data)
+                            CopyFileCallback* callback)
 {
+    using FreeFileSync::CopyFileCallback;
+
     try
     {
         if (FreeFileSync::fileExists(targetFile.c_str()))
@@ -609,8 +700,18 @@ void FreeFileSync::copyFile(const Zstring& sourceFile,
             totalBytesTransferred += memory.bufferSize;
 
             //invoke callback method to update progress indicators
-            if (callback)
-                callback(totalBytesTransferred, data);
+            if (callback != NULL)
+            {
+                switch (callback->updateCopyStatus(totalBytesTransferred))
+                {
+                case CopyFileCallback::CONTINUE:
+                    break;
+                case CopyFileCallback::CANCEL:
+                    fileOut.close();
+                    wxRemoveFile(targetFile.c_str()); //don't handle error situations!
+                    return;
+                }
+            }
         }
 
         //close streams before changing attributes
@@ -741,7 +842,7 @@ public:
         //ensure directoryFormatted ends with backslash
         const Zstring directoryFormatted = FreeFileSync::endsWithPathSeparator(directory) ?
                                            directory :
-                                           directory + GlobalResources::FILE_NAME_SEPARATOR;
+                                           directory + FreeFileSync::FILE_NAME_SEPARATOR;
 
         WIN32_FIND_DATA fileMetaData;
         HANDLE searchHandle = FindFirstFile((directoryFormatted + DefaultChar('*')).c_str(), //pointer to name of file to search for
@@ -847,7 +948,7 @@ public:
 
             const Zstring fullName = FreeFileSync::endsWithPathSeparator(directory) ? //e.g. "/"
                                      directory + name :
-                                     directory + GlobalResources::FILE_NAME_SEPARATOR + name;
+                                     directory + FreeFileSync::FILE_NAME_SEPARATOR + name;
 
             struct stat fileInfo;
             if (lstat(fullName.c_str(), &fileInfo) != 0) //lstat() does not resolve symlinks
@@ -929,7 +1030,7 @@ void FreeFileSync::traverseInDetail(const Zstring& directory,
     Zstring directoryFormatted = directory;
 #ifdef FFS_LINUX //remove trailing slash
     if (directoryFormatted.size() > 1 && FreeFileSync::endsWithPathSeparator(directoryFormatted))
-        directoryFormatted = directoryFormatted.BeforeLast(GlobalResources::FILE_NAME_SEPARATOR);
+        directoryFormatted = directoryFormatted.BeforeLast(FreeFileSync::FILE_NAME_SEPARATOR);
 #endif
 
     if (traverseDirectorySymlinks)
@@ -954,7 +1055,7 @@ Zstring getDriveName(const Zstring& directoryName) //GetVolume() doesn't work un
     if (volumeName.empty())
         return Zstring();
 
-    return volumeName + wxFileName::GetVolumeSeparator().c_str() + GlobalResources::FILE_NAME_SEPARATOR;
+    return volumeName + wxFileName::GetVolumeSeparator().c_str() + FreeFileSync::FILE_NAME_SEPARATOR;
 }
 
 

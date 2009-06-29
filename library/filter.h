@@ -11,8 +11,10 @@ namespace FreeFileSync
     public:
         FilterProcess(const wxString& includeFilter, const wxString& excludeFilter);
 
-        bool matchesFileFilter(const DefaultChar* relFilename) const;
-        bool matchesDirFilter(const DefaultChar* relDirname) const;
+        bool matchesFileFilterIncl(const DefaultChar* relFilename) const;
+        bool matchesFileFilterExcl(const DefaultChar* relFilename) const;
+        bool matchesDirFilterIncl(const DefaultChar* relDirname) const;
+        bool matchesDirFilterExcl(const DefaultChar* relDirname) const;
 
         void filterGridData(FolderComparison& folderCmp) const;
 

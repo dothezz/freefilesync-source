@@ -176,6 +176,8 @@ Build:
 Construído:
 Cancel
 Cancelar
+Change direction
+
 Check all
 Verificar todo
 Choose to hide filtered files/directories from list
@@ -218,6 +220,8 @@ Configure your own synchronization rules.
 Configure sus propias reglas de sincronización.
 Confirm
 Confirmar
+Conflict detected:
+
 Continue
 Continuar
 Conversion error:
@@ -237,6 +241,8 @@ Copiar al Portapapeles\tCTRL+C
 Copying file %x to %y
 Copiar fichero %x a %y
 Copying file %x to %y overwriting target
+
+Could not determine volume name for file:
 
 Could not set working directory:
 No se pudo definir el directorio de trabajo:
@@ -278,8 +284,8 @@ Directory does not exist:
 El directorio no existe:
 Do not display visual status information but write to a logfile instead
 
-Do not show this warning again
-No mostrar este aviso otra vez
+Do not show this dialog again
+
 Do nothing
 No hacer nada
 Do you really want to delete the following objects(s)?
@@ -306,6 +312,8 @@ Error changing modification time:
 Error al modificar hora:
 Error copying file:
 Erro al copiar fichero:
+Error copying locked file %x!
+
 Error creating directory:
 Error al crear directorio:
 Error deleting directory:
@@ -330,6 +338,8 @@ Error resolving symbolic link:
 Error al resolver enlace simbólico:
 Error retrieving full path:
 
+Error starting Volume Shadow Copy Service!
+
 Error traversing directory:
 Error al trasladar directorio:
 Error writing file attributes:
@@ -352,6 +362,8 @@ Exit with RC < 0
 Salir com RC < 0
 Feedback and suggestions are welcome at:
 Los comentarios y sugerencias será bienvenidos en:
+File %x has an invalid date!
+
 File Manager integration:
 Integración con el Explorador:
 File Time tolerance (seconds):
@@ -370,6 +382,10 @@ File times that differ by up to the specified number of seconds are still handle
 Las horas de los ficheros que difieren hasta el número de segundos especificados, son consideradas iguales.
 Filename
 Nombre del fichero
+Files %x have a file time difference of less than 1 hour! It's not safe to decide which one is newer due to Daylight Saving Time issues.
+
+Files %x have the same date but a different size!
+
 Files are found equal if\n     - file content\nis the same.
 Los ficheros serán considerados iguales si\n     - el contenido del fichero\nes el mismo.
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
@@ -500,6 +516,8 @@ Move column down
 Mover columna abajo
 Move column up
 Mover columna arriba
+Moving %x to Recycle Bin
+
 Not all items have been synchronized! Have a look at the list.
 
 Not enough free disk space available in:
@@ -528,12 +546,12 @@ Pause
 Pausa
 Paused
 
+Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
+
 Please fill all empty directory fields.
 Por favor, rellene todos los campos del directorio vacíos.
 Press button to activate filter
 Presione el botón para activar el filtro
-Preview
-Previsualizar
 Published under the GNU General Public License:
 Publicado bajo "GNU General Public License":
 Question
@@ -614,10 +632,12 @@ Start
 Iniciar
 Start synchronization
 Iniciar a sincronización
+Statistics
+
 Stop
 Parar
 Swap sides
-Intercambiar lados
+
 Synchronization Preview
 
 Synchronization aborted!
@@ -626,8 +646,6 @@ Synchronization completed successfully!
 ¡Sincronización completada con éxito!
 Synchronization completed with errors!
 ¡Sincronización completada con errores!
-Synchronization filter
-Filtro de sincronización
 Synchronization settings
 Parámetros de sincronización
 Synchronization status
@@ -636,6 +654,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Sincronizar ambos lados simultáneamente: Copiar ficheros nuevos o actualizados en ambas direcciones.
+Synchronize...
+
 Synchronizing...
 Sincronizando...
 System out of memory!
@@ -680,6 +700,10 @@ Use Recycle Bin
 Utilizar la Papelera
 Use Recycle Bin when deleting or overwriting files during synchronization
 Utilizar la papelera en el borrado o sustitución de ficheros durante la sincronización.
+Variant
+
+Volume name %x not part of filename %y!
+
 Warning
 Atención
 Warning: Synchronization failed for %x item(s):

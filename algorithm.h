@@ -17,7 +17,9 @@ namespace FreeFileSync
 
     bool endsWithPathSeparator(const Zstring& name);
 
-    void swapGrids(FolderComparison& folderCmp);
+    void swapGrids(const SyncConfiguration& config, FolderComparison& folderCmp);
+
+    void redetermineSyncDirection(const SyncConfiguration& config, FolderComparison& folderCmp);
 
     void addSubElements(const FileComparison& fileCmp, const FileCompareLine& relevantRow, std::set<int>& subElements);
 
@@ -62,7 +64,7 @@ inline
 bool FreeFileSync::endsWithPathSeparator(const Zstring& name)
 {
     const size_t len = name.length();
-    return len && (name[len - 1] == GlobalResources::FILE_NAME_SEPARATOR);
+    return len && (name[len - 1] == FreeFileSync::FILE_NAME_SEPARATOR);
 }
 
 

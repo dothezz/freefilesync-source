@@ -5,12 +5,19 @@
 #include <wx/grid.h>
 #include "../structures.h"
 #include "processXml.h"
+#include <map>
+#include <memory>
 
-
-class CustomGridTable;
 class CustomGridTableRim;
+class CustomGridTableLeft;
+class CustomGridTableRight;
 class CustomGridTableMiddle;
 class GridCellRendererMiddle;
+class wxTimer;
+class CustomGridRim;
+class CustomGridLeft;
+class CustomGridMiddle;
+class CustomGridRight;
 
 namespace FreeFileSync
 {
@@ -43,50 +50,89 @@ public:
 
     virtual ~CustomGrid() {}
 
-    virtual void DrawColLabel(wxDC& dc, int col);
+    void initSettings(CustomGridLeft*   gridLeft,
+                      CustomGridMiddle* gridMiddle,
+                      CustomGridRight*  gridRight,
+                      const FreeFileSync::GridView* gridDataView);
 
     std::set<int> getAllSelectedRows() const;
 
     //set sort direction indicator on UI
-    void setSortMarker(const int sortColumn, const wxBitmap* bitmap = &wxNullBitmap);
+    typedef int SortColumn;
+
+    enum SortDirection
+    {
+        ASCENDING,
+        DESCENDING,
+    };
+
+    typedef std::pair<SortColumn, SortDirection> SortMarker;
+    void setSortMarker(SortMarker marker);
 
     bool isLeadGrid() const;
 
 protected:
+    void RefreshCell(int row, int col);
+
+    virtual void DrawColLabel(wxDC& dc, int col);
+
+private:
+    virtual void setGridDataTable(const FreeFileSync::GridView* gridDataView) = 0;
+
+//this method is called when grid view changes: useful for parallel updating of multiple grids
+    virtual void DoPrepareDC(wxDC& dc);
+
+    virtual void alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight) = 0;
+
+    void onGridAccess(wxEvent& event);
+    void adjustGridHeights(wxEvent& event);
+
     CustomGrid* m_gridLeft;
     CustomGrid* m_gridMiddle;
     CustomGrid* m_gridRight;
 
-private:
-    void onGridAccess(wxEvent& event);
-    void adjustGridHeights(wxEvent& event);
-
     bool isLeading; //identify grid that has user focus
-    int currentSortColumn;
-    const wxBitmap* sortMarker;
+
+    SortMarker m_marker;
 };
+
+
+template <bool showFileIcons>
+class GridCellRenderer;
+
+
+//-----------------------------------------------------------
+#ifdef FFS_WIN
+class IconUpdater : public wxEvtHandler //update file icons periodically: use SINGLE instance to coordinate left and right grid at once
+{
+public:
+    IconUpdater(CustomGridLeft* leftGrid, CustomGridRight* rightGrid);
+
+private:
+    void loadIconsAsynchronously(wxEvent& event); //loads all (not yet) drawn icons
+
+    CustomGridRim* m_leftGrid;
+    CustomGridRim* m_rightGrid;
+
+    std::auto_ptr<wxTimer> m_timer; //user timer event to periodically update icons: better than idle event because also active when scrolling! :)
+};
+#endif
 
 
 //############## SPECIALIZATIONS ###################
 class CustomGridRim : public CustomGrid
 {
+    friend class IconUpdater;
+	template <bool showFileIcons>
+	friend class GridCellRenderer;
+
 public:
     CustomGridRim(wxWindow *parent,
                   wxWindowID id,
                   const wxPoint& pos,
                   const wxSize& size,
                   long style,
-                  const wxString& name) :
-            CustomGrid(parent, id, pos, size, style, name),
-            gridDataTable(NULL) {}
-
-    ~CustomGridRim() {}
-
-    void initSettings(const bool showFileIcons,  //workaround: though this coding better belongs into a constructor
-                      CustomGrid* gridLeft,      //this is not possible due to source code generation (information not available at time of construction)
-                      CustomGrid* gridRight,
-                      CustomGrid* gridMiddle,
-                      const FreeFileSync::GridView* gridDataView);
+                  const wxString& name);
 
     //notify wxGrid that underlying table size has changed
     void updateGridSizes();
@@ -99,12 +145,32 @@ public:
     xmlAccess::ColumnTypes getTypeAtPos(unsigned pos) const;
     static wxString getTypeName(xmlAccess::ColumnTypes colType);
 
-    virtual void enableFileIcons(const bool value) = 0;
-
-protected:
-    CustomGridTableRim* gridDataTable;
+#ifdef FFS_WIN
+    void enableFileIcons(const bool value);
+#endif
 
 private:
+    CustomGridTableRim* getGridDataTable();
+    virtual const CustomGridTableRim* getGridDataTable() const = 0;
+
+#ifdef FFS_WIN
+    //asynchronous icon loading
+    void getIconsToBeLoaded(std::vector<Zstring>& newLoad); //loads all (not yet) drawn icons
+
+    typedef unsigned int FromRow;
+    typedef unsigned int ToRow;
+    typedef std::pair<FromRow, ToRow> VisibleRowRange;
+    VisibleRowRange getVisibleRows();
+
+
+    typedef unsigned int RowNumber;
+    typedef bool         IconLoaded;
+    typedef std::map<RowNumber, IconLoaded> LoadSuccess;
+    LoadSuccess loadIconSuccess; //save status of last icon load when drawing on GUI
+
+    bool fileIconsAreEnabled;
+#endif
+
     xmlAccess::ColumnAttributes columnSettings; //set visibility, position and width of columns
 };
 
@@ -119,14 +185,16 @@ public:
                    long style           = wxWANTS_CHARS,
                    const wxString& name = wxGridNameStr);
 
-    ~CustomGridLeft() {}
-
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
 
-    virtual void enableFileIcons(const bool value);
+private:
+    virtual void setGridDataTable(const FreeFileSync::GridView* gridDataView);
+    virtual const CustomGridTableRim* getGridDataTable() const;
 
     //this method is called when grid view changes: useful for parallel updating of multiple grids
-    virtual void DoPrepareDC(wxDC& dc);
+    virtual void alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight);
+
+    CustomGridTableLeft* gridDataTable;
 };
 
 
@@ -140,14 +208,16 @@ public:
                     long style           = wxWANTS_CHARS,
                     const wxString& name = wxGridNameStr);
 
-    ~CustomGridRight() {}
-
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
 
-    virtual void enableFileIcons(const bool value);
+private:
+    virtual void setGridDataTable(const FreeFileSync::GridView* gridDataView);
+    virtual const CustomGridTableRim* getGridDataTable() const;
 
     //this method is called when grid view changes: useful for parallel updating of multiple grids
-    virtual void DoPrepareDC(wxDC& dc);
+    virtual void alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight);
+
+    CustomGridTableRight* gridDataTable;
 };
 
 
@@ -163,35 +233,31 @@ public:
                      long style           = wxWANTS_CHARS,
                      const wxString& name = wxGridNameStr);
 
-    ~CustomGridMiddle() {}
-
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
-
-    void initSettings(CustomGrid* gridLeft,  //workaround: though this coding better belongs into a constructor
-                      CustomGrid* gridRight, //this is not possible due to source code generation (information not available at time of construction)
-                      CustomGrid* gridMiddle,
-                      const FreeFileSync::GridView* gridDataView);
 
     void enableSyncPreview(bool value);
 
     //notify wxGrid that underlying table size has changed
     void updateGridSizes();
 
+private:
 #ifdef FFS_WIN //get rid of scrollbars; Windows: overwrite virtual method
     virtual void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh = true);
 #endif
 
-    //this method is called when grid view changes: useful for parallel updating of multiple grids
-    virtual void DoPrepareDC(wxDC& dc);
+    virtual void setGridDataTable(const FreeFileSync::GridView* gridDataView);
 
-private:
+    //this method is called when grid view changes: useful for parallel updating of multiple grids
+    virtual void alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight);
+
+    virtual void DrawColLabel(wxDC& dc, int col);
+
     void OnMouseMovement(wxMouseEvent& event);
     void OnLeaveWindow(wxMouseEvent& event);
     void OnLeftMouseDown(wxMouseEvent& event);
     void OnLeftMouseUp(wxMouseEvent& event);
 
     //small helper methods
-    void RefreshRow(int row);
     enum BlockPosition //each cell can be divided into four blocks concerning mouse selections
     {
         BLOCKPOS_CHECK_BOX,

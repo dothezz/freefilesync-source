@@ -7,7 +7,6 @@
 #include "application.h"
 #include "ui/mainDialog.h"
 #include <wx/stdpaths.h>
-#include <wx/filename.h>
 #include "library/globalFunctions.h"
 #include <wx/msgdlg.h>
 #include "comparison.h"
@@ -17,6 +16,10 @@
 #include "ui/batchStatusHandler.h"
 #include "ui/checkVersion.h"
 #include "library/filter.h"
+#include <wx/file.h>
+#include <wx/filename.h>
+
+using FreeFileSync::FileError;
 
 
 IMPLEMENT_APP(Application);
@@ -38,7 +41,12 @@ void Application::OnStartApplication(wxIdleEvent& event)
 {
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), NULL, this);
 
+    //if appname is not set, the default is the executable's name!
+    SetAppName(wxT("FreeFileSync"));
+
     //test if FFS is to be started on UI with config file passed as commandline parameter
+
+//#warning
     //this needs to happen BEFORE the working directory is set!
     wxString cfgFilename;
     if (argc > 1)
@@ -66,13 +74,15 @@ void Application::OnStartApplication(wxIdleEvent& event)
     }
 
 
-//set working directory to current executable directory
-    const wxString workingDir = wxFileName(wxStandardPaths::Get().GetExecutablePath()).GetPath();
+    //set working directory to current executable directory
+    const wxString workingDir = FreeFileSync::getInstallationDir();
     if (!wxSetWorkingDirectory(workingDir))
     {   //show messagebox and quit program immediately
         wxMessageBox(wxString(_("Could not set working directory:")) + wxT(" ") + workingDir, _("An exception occured!"), wxOK | wxICON_ERROR);
         return;
     }
+
+    GlobalResources::getInstance().load(); //loads bitmap resources on program startup
 
     try //load global settings from XML: must be called AFTER working dir was set
     {
@@ -80,7 +90,7 @@ void Application::OnStartApplication(wxIdleEvent& event)
     }
     catch (const FileError& error)
     {
-        if (wxFileExists(xmlAccess::GLOBAL_CONFIG_FILE))
+        if (wxFileExists(FreeFileSync::getGlobalConfigFile()))
         {   //show messagebox and quit program immediately
             wxMessageBox(error.show().c_str(), _("Error"), wxOK | wxICON_ERROR);
             return;
@@ -90,11 +100,8 @@ void Application::OnStartApplication(wxIdleEvent& event)
 
 //set program language: needs to happen after working directory has been set!
     SetExitOnFrameDelete(false); //prevent error messagebox from becoming top-level window
-    programLanguage.setLanguage(globalSettings.shared.programLanguage);
+    programLanguage.setLanguage(globalSettings.programLanguage);
     SetExitOnFrameDelete(true);
-
-//load image resources from file: must be called after working directory has been set
-    globalResource.load();
 
 
     if (!cfgFilename.empty())
@@ -104,7 +111,7 @@ void Application::OnStartApplication(wxIdleEvent& event)
         if (xmlConfigType == xmlAccess::XML_GUI_CONFIG) //start in GUI mode (configuration file specified)
         {
             MainDialog* frame = new MainDialog(NULL, cfgFilename, &programLanguage, globalSettings);
-            frame->SetIcon(*globalResource.programIcon); //set application icon
+            frame->SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
             frame->Show();
         }
         else if (xmlConfigType == xmlAccess::XML_BATCH_CONFIG) //start in commandline mode
@@ -123,8 +130,8 @@ void Application::OnStartApplication(wxIdleEvent& event)
     }
     else //start in GUI mode (standard)
     {
-        MainDialog* frame = new MainDialog(NULL, xmlAccess::LAST_CONFIG_FILE, &programLanguage, globalSettings);
-        frame->SetIcon(*globalResource.programIcon); //set application icon
+        MainDialog* frame = new MainDialog(NULL, FreeFileSync::getLastConfigFile(), &programLanguage, globalSettings);
+        frame->SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
         frame->Show();
     }
 }
@@ -142,15 +149,23 @@ int Application::OnRun()
     {
         wxApp::OnRun();
     }
-    catch (const RuntimeException& theException) //catch runtime errors during main event loop; wxApp::OnUnhandledException could be used alternatively
+    catch (const RuntimeException& e) //catch runtime errors during main event loop; wxApp::OnUnhandledException could be used alternatively
     {
-        wxMessageBox(theException.show(), _("An exception occured!"), wxOK | wxICON_ERROR);
-        return -1;
+        //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
+        wxFile safeOutput(FreeFileSync::getLastErrorTxtFile(), wxFile::write);
+        safeOutput.Write(e.show());
+
+        wxMessageBox(e.show(), _("An exception occured!"), wxOK | wxICON_ERROR);
+        return -8;
     }
     catch (std::exception& e) //catch all STL exceptions
     {
+        //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
+        wxFile safeOutput(FreeFileSync::getLastErrorTxtFile(), wxFile::write);
+        safeOutput.Write(wxString::From8BitData(e.what()));
+
         wxMessageBox(wxString::From8BitData(e.what()), _("An exception occured!"), wxOK | wxICON_ERROR);
-        return -1;
+        return -9;
     }
 
     return returnValue;
@@ -160,7 +175,7 @@ int Application::OnRun()
 int Application::OnExit()
 {
     //get program language
-    globalSettings.shared.programLanguage = programLanguage.getLanguage();
+    globalSettings.programLanguage = programLanguage.getLanguage();
 
     try //save global settings to XML
     {
@@ -192,7 +207,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
     //regular check for program updates
     if (!batchCfg.silent)
-        FreeFileSync::checkForUpdatePeriodically(globalSettings.shared.lastUpdateCheck);
+        FreeFileSync::checkForUpdatePeriodically(globalSettings.lastUpdateCheck);
 
 
     try //begin of synchronization process (all in one try-catch block)
@@ -211,10 +226,10 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
         //COMPARE DIRECTORIES
         FreeFileSync::FolderComparison folderCmp;
-        FreeFileSync::CompareProcess comparison(globalSettings.shared.traverseDirectorySymlinks,
-                                                globalSettings.shared.fileTimeTolerance,
-                                                globalSettings.shared.ignoreOneHourDiff,
-                                                globalSettings.shared.warningDependentFolders,
+        FreeFileSync::CompareProcess comparison(globalSettings.traverseDirectorySymlinks,
+                                                globalSettings.fileTimeTolerance,
+                                                globalSettings.ignoreOneHourDiff,
+                                                globalSettings.warnings,
                                                 filterInstance.get(),
                                                 statusHandler.get());
 
@@ -233,11 +248,9 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         //START SYNCHRONIZATION
         FreeFileSync::SyncProcess synchronization(
             batchCfg.mainCfg.useRecycleBin,
-            globalSettings.shared.copyFileSymlinks,
-            globalSettings.shared.traverseDirectorySymlinks,
-            globalSettings.shared.warningSignificantDifference,
-            globalSettings.shared.warningNotEnoughDiskSpace,
-            globalSettings.shared.warningUnresolvedConflicts,
+            globalSettings.copyFileSymlinks,
+            globalSettings.traverseDirectorySymlinks,
+            globalSettings.warnings,
             statusHandler.get());
 
         synchronization.startSynchronizationProcess(folderCmp);

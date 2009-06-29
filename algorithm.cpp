@@ -87,17 +87,17 @@ wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
         case 0:
             return _("Error");
         case 1:
-            temp = wxString(wxT("0")) + GlobalResources::DECIMAL_POINT + wxT("0") + temp;
+            temp = wxString(wxT("0")) + FreeFileSync::DECIMAL_POINT + wxT("0") + temp;
             break; //0,01
         case 2:
-            temp = wxString(wxT("0")) + GlobalResources::DECIMAL_POINT + temp;
+            temp = wxString(wxT("0")) + FreeFileSync::DECIMAL_POINT + temp;
             break; //0,11
         case 3:
-            temp.insert(1, GlobalResources::DECIMAL_POINT);
+            temp.insert(1, FreeFileSync::DECIMAL_POINT);
             break; //1,11
         case 4:
             temp = temp.substr(0, 3);
-            temp.insert(2, GlobalResources::DECIMAL_POINT);
+            temp.insert(2, FreeFileSync::DECIMAL_POINT);
             break; //11,1
         case 5:
             temp = temp.substr(0, 3);
@@ -122,14 +122,14 @@ Zstring FreeFileSync::getFormattedDirectoryName(const Zstring& dirname)
         return Zstring();
 
     if (!endsWithPathSeparator(dirnameTmp))
-        dirnameTmp += GlobalResources::FILE_NAME_SEPARATOR;
+        dirnameTmp += FreeFileSync::FILE_NAME_SEPARATOR;
 
     //don't do directory formatting with wxFileName, as it doesn't respect //?/ - prefix
     return dirnameTmp;
 }
 
 
-void FreeFileSync::swapGrids(FolderComparison& folderCmp)
+void FreeFileSync::swapGrids(const SyncConfiguration& config, FolderComparison& folderCmp)
 {
     for (FolderComparison::iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
     {
@@ -148,14 +148,55 @@ void FreeFileSync::swapGrids(FolderComparison& folderCmp)
             else if (i->cmpResult == FILE_LEFT_NEWER)
                 i->cmpResult = FILE_RIGHT_NEWER;
 
-            //swap sync direction
-            if (i->direction == SYNC_DIR_LEFT)
-                i->direction = SYNC_DIR_RIGHT;
-            else if (i->direction == SYNC_DIR_RIGHT)
-                i->direction = SYNC_DIR_LEFT;
-
             //swap file descriptors
             std::swap(i->fileDescrLeft, i->fileDescrRight);
+        }
+    }
+
+    //adjust sync direction
+    redetermineSyncDirection(config, folderCmp);
+}
+
+
+void FreeFileSync::redetermineSyncDirection(const SyncConfiguration& config, FolderComparison& folderCmp)
+{
+    //do not handle i->selectedForSynchronization in this method! handled in synchronizeFile(), synchronizeFolder()!
+
+
+    for (FolderComparison::iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
+    {
+        FileComparison& fileCmp = j->fileCmp;
+        for (FileComparison::iterator i = fileCmp.begin(); i != fileCmp.end(); ++i)
+        {
+            switch (i->cmpResult)
+            {
+            case FILE_LEFT_SIDE_ONLY:
+                i->direction = config.exLeftSideOnly;
+                break;
+
+            case FILE_RIGHT_SIDE_ONLY:
+                i->direction = config.exRightSideOnly;
+                break;
+
+            case FILE_RIGHT_NEWER:
+                i->direction = config.rightNewer;
+                break;
+
+            case FILE_LEFT_NEWER:
+                i->direction = config.leftNewer;
+                break;
+
+            case FILE_DIFFERENT:
+                i->direction = config.different;
+                break;
+
+            case FILE_CONFLICT:
+                i->direction = SYNC_UNRESOLVED_CONFLICT;
+                break;
+
+            case FILE_EQUAL:
+                i->direction = SYNC_DIR_NONE;
+            }
         }
     }
 }
@@ -175,7 +216,7 @@ void FreeFileSync::addSubElements(const FileComparison& fileCmp, const FileCompa
     else
         return;
 
-    relevantDirectory += GlobalResources::FILE_NAME_SEPARATOR; //FILE_NAME_SEPARATOR needed to exclude subfile/dirs only
+    relevantDirectory += FreeFileSync::FILE_NAME_SEPARATOR; //FILE_NAME_SEPARATOR needed to exclude subfile/dirs only
 
     for (FileComparison::const_iterator i = fileCmp.begin(); i != fileCmp.end(); ++i)
     {
@@ -266,7 +307,7 @@ wxString FreeFileSync::deleteFromGridAndHDPreview(const FileComparison& fileCmp,
         }
 
         wxString filesToDelete;
-        for (std::set<SortedFileName>::iterator i = outputTable.begin(); i != outputTable.end(); ++i)
+        for (std::set<SortedFileName>::const_iterator i = outputTable.begin(); i != outputTable.end(); ++i)
             filesToDelete += (i->name + wxT("\n")).c_str();
 
         return filesToDelete;
@@ -282,7 +323,7 @@ public:
 
     ~RemoveAtExit()
     {
-        removeRowsFromVector(gridToWrite, rowsProcessed);
+        globalFunctions::removeRowsFromVector(rowsProcessed, gridToWrite);
     }
 
     void removeRow(int nr)
@@ -348,7 +389,7 @@ void deleteFromGridAndHDOneSide(FileComparison& fileCmp,
                                 const SyncConfiguration& syncConfig,
                                 ErrorHandler* errorHandler)
 {
-    for (std::set<int>::iterator i = rowsToDeleteOneSide.begin(); i != rowsToDeleteOneSide.end(); ++i)
+    for (std::set<int>::const_iterator i = rowsToDeleteOneSide.begin(); i != rowsToDeleteOneSide.end(); ++i)
     {
         //get descriptor for file to be deleted; evaluated at compile time
         const FileDescrLine* const fileDescr = leftSide ? &fileCmp[*i].fileDescrLeft : &fileCmp[*i].fileDescrRight;
@@ -494,9 +535,9 @@ wxString FreeFileSync::utcTimeToLocalString(const wxLongLong& utcTime, const Zst
                                wxT("(") + wxULongLong(lastWriteTimeUtc.dwHighDateTime, lastWriteTimeUtc.dwLowDateTime).ToString() + wxT(") ") +
                                filename.c_str() + wxT("\n\n") + getLastErrorFormatted().c_str());
 
-    if (localFileTime.dwHighDateTime > 2147483647) //== 256^4 / 2 - 1 == 0x7fffffff
+    if (localFileTime.dwHighDateTime > 0x7fffffff)
         return _("Error");  //this actually CAN happen if UTC time is just below this border and ::FileTimeToLocalFileTime() adds 2 hours due to DST or whatever!
-    //Testcase (UTC): dateHigh = 2147483647 -> year 30000
+    //Testcase (UTC): dateHigh = 2147483647 (=0x7fffffff) -> year 30000
     //                dateLow  = 4294967295
 
     SYSTEMTIME time;
@@ -543,7 +584,7 @@ wxString FreeFileSync::utcTimeToLocalString(const wxLongLong& utcTime, const Zst
 #ifdef FFS_WIN
 Zstring FreeFileSync::getLastErrorFormatted(const unsigned long lastError) //try to get additional Windows error information
 {
-         //determine error code if none was specified
+    //determine error code if none was specified
     const unsigned long lastErrorCode = lastError == 0 ? GetLastError() : lastError;
 
     Zstring output = Zstring(wxT("Windows Error Code ")) + wxString::Format(wxT("%u"), lastErrorCode).c_str();

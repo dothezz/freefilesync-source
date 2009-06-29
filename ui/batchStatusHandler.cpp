@@ -14,13 +14,13 @@ public:
     LogFile(const wxString& logfileDirectory)
     {
         //create logfile directory
-        const Zstring logfileDir = logfileDirectory.empty() ? wxT("Logs") : logfileDirectory.c_str();
+        const Zstring logfileDir = logfileDirectory.empty() ? FreeFileSync::getDefaultLogDirectory().c_str() : logfileDirectory.c_str();
         if (!wxDirExists(logfileDir))
             try
             {
                 FreeFileSync::createDirectory(logfileDir, Zstring(), false);
             }
-            catch (FileError&)
+            catch (FreeFileSync::FileError&)
             {
                 readyToWrite = false;
                 return;
@@ -29,10 +29,10 @@ public:
         //assemble logfile name
         wxString logfileName = logfileDir.c_str();
         if (!FreeFileSync::endsWithPathSeparator(logfileName.c_str()))
-            logfileName += GlobalResources::FILE_NAME_SEPARATOR;
+            logfileName += FreeFileSync::FILE_NAME_SEPARATOR;
         wxString timeNow = wxDateTime::Now().FormatISOTime();
-        timeNow.Replace(wxT(":"), wxEmptyString);
-        logfileName += wxT("FFS_") + wxDateTime::Now().FormatISODate() + wxChar('_') + timeNow + wxT(".log");
+        timeNow.Replace(wxT(":"), wxT("-"));
+        logfileName += wxDateTime::Now().FormatISODate() + wxChar(' ') + timeNow + wxT(".log");
 
 
         logFile.Open(logfileName.c_str(), wxT("w"));
@@ -111,9 +111,9 @@ public:
             m_statusHandler(statusHandler),
             processPaused(false)
     {
-        running.reset(new wxIcon(*globalResource.programIcon));
+        running.reset(new wxIcon(*GlobalResources::getInstance().programIcon));
         paused.reset(new wxIcon);
-        paused->CopyFromBitmap(*globalResource.bitmapFFSPaused);
+        paused->CopyFromBitmap(*GlobalResources::getInstance().bitmapFFSPaused);
 
         wxTaskBarIcon::SetIcon(*running);
     }

@@ -1,0 +1,726 @@
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE
+ Byte
+ Байт
+ GB
+ ГБ
+ MB
+ МБ
+ PB
+ ПБ
+ TB
+ ТБ
+ day(s)
+ день(ей)
+ hour(s)
+ час(ов)
+ kB
+ кБ
+ min
+ мин.
+ sec
+ сек.
+!=	files are different\n
+!=	файлы разные\n
+%x directories
+%x папки
+%x files,
+%x файл(ов),
+%x is not a valid FreeFileSync batch file!
+%x не корректная группа FreeFileSync файл!
+%x of %y rows in view
+%x из %y строк(и) показано
+%x of 1 row in view
+%x из 1 строка показана
+&Abort
+&Отмена
+&About...
+&О программе...
+&Advanced
+&Дополнительно
+&Apply
+&Принять
+&Cancel
+&Отмена
+&Check for new version
+&Проверить наличие новой версии
+&Create batch job
+&Создать задание
+&Default
+&По-умолчанию
+&Export file list
+&Экспортировать список файлов
+&File
+&Файл
+&Global settings
+&Глобальные настройки
+&Help
+&Помощь
+&Ignore
+&Игнорировать
+&Language
+&Язык
+&Load
+&Загрузить
+&Load configuration
+&Загрузить конфигурацию
+&No
+&Нет
+&OK
+&OK
+&Pause
+&Пауза
+&Quit
+&Выход
+&Retry
+&Повторить
+&Save
+&Сохранить
+&Yes
+&Да
+,
+.
+-	do not copy\n
+	не копировать\n
+- conflict
+	конфликт
+- conflict (same date, different size)
+конфликт (даты совпадают, размеры разные)
+- different
+разные
+- equal
+одинаковые
+- exists left only
+только левые существуют
+- exists right only
+только правые существуют
+- left
+левые
+- left newer
+левые новее
+- right
+правые
+- right newer
+правые новее
+->	copy to right side\n
+->	скопировать на правую сторону\n
+-Open-Source file synchronization-
+Синхронизатор файлов с открытым исходным кодом
+.
+,
+/sec
+/сек.
+1 directory
+1 папка
+1 file,
+1 файл,
+1. &Compare
+1. &Сравнить
+1. Enter relative file or directory names separated by ';' or a new line.
+1. Введите имена файлов или папок, разделяя знаком ';' или с новой строки.
+2. &Synchronize...
+2. &Синхронизировать
+2. Use wildcard characters '*' and '?'.
+2. Используйте символы '*' и '?' для замены неизвестных.
+3. Exclude files directly on main grid via context menu.
+3. Исключите файлы прямо в главном окне через контекстное меню.
+<-	copy to left side\n
+<-	скопировать на левую сторону\n
+<<	left file is newer\n
+<<	файл слева новее\n
+<Directory>
+<Папка>
+<Last session>
+<Последняя сессия>
+<multiple selection>
+<групповое выделение>
+<|	file on left side only\n
+<|	файлы только слева\n
+==	files are equal\n
+==	файлы одинаковые\n
+>>	right file is newer\n
+>>	файлы справа новее\n
+A newer version of FreeFileSync is available:
+Доступна новая версия FreeFileSync:
+Abort requested: Waiting for current operation to finish...
+Запрос отмены: Ожидайте, пока текущая операция завершится...
+Aborted
+Отменено
+About
+О программе
+Action
+Действие
+Add folder pair
+Добавить папку
+All items have been synchronized!
+Все пункты были синхронизированы!
+An exception occured!
+Исключение произошло!
+As a result the files are separated into the following categories:
+Как результат файлы разделяются на следующие категории:
+As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
+Как написано в названии, два файла с одинаковым именем отмечаются равными, только если они имеют то же самое содержание. Эта опция полезна для проверки согласованности, а не операции резервного копирования. Поэтому даты файлов не учитываются вообще.\n\nС этой опцией алгоритм короче:
+Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
+Создайте файл задания для автоматизированной синхронизации. Чтобы запустить программу в этом режиме просто передайте название файла на выполнение FreeFileSync: FreeFileSync.exe <batchfile>. Это также может быть записано в планировщике задач Вашей операционной системы.
+Batch execution
+Выполнение пакетного задания
+Batch file created successfully!
+Файл задания создан успешно!
+Batch job
+Пакетное задание
+Big thanks for localizing FreeFileSync goes out to:
+Большое спасибо за перевод FreeFileSync:
+Browse
+Обзор
+Build:
+Сборка:
+Cancel
+Отмена
+Change direction
+Поменять направление
+Check all
+Проверить все
+Choose to hide filtered files/directories from list
+Выберите для скрытия отфильтрованных файлов/папок из списка
+Comma separated list
+Список, разделяемый запятыми
+Compare
+Сравнить
+Compare both sides
+Сравнить обе стороны
+Compare by \"File content\"
+Сравнивать по содержимому
+Compare by \"File size and date\"
+Сравнивать по размеру и дате
+Compare by...
+Критерии сравнения
+Comparing content
+Сравнивать содержание
+Comparing content of files %x
+Сравнение содержания файлов %x
+Comparing content...
+Сравнение содержания...
+Comparison Result
+Результаты сравнения
+Completed
+Завершено
+Configuration
+Настройка
+Configuration loaded!
+Настройка загружена!
+Configuration overview:
+Конфигурация:
+Configuration saved!
+Настройка сохранена!
+Configure filter
+Настройка фильтра
+Configure filter...
+Настроить фильтр
+Configure your own synchronization rules.
+Настроить свои собственные правила синхронизации.
+Confirm
+Подтвердить
+Conflict detected:
+Обнаружен конфликт:
+Continue
+Продолжить
+Conversion error:
+Ошибка преобразования:
+Copy from left to right
+Скопировать слева направо
+Copy from left to right overwriting
+Скопировать слева направо с перезаписью
+Copy from right to left
+Скопировать справа налево
+Copy from right to left overwriting
+Скопировать справа налево с перезаписью
+Copy new or updated files to right folder.
+Копировать новые или обновлять файлы на правой стороне.
+Copy to clipboard\tCTRL+C
+Копировать в буфер обмена\tCTRL+C
+Copying file %x to %y
+Копирование файла %x в %y
+Copying file %x to %y overwriting target
+Копирование файла %x в %y с заменой
+Could not determine volume name for file:
+Не удалось определить название тома для файла:
+Could not set working directory:
+Не удалось установить рабочую папку:
+Create a batch job
+Создать пакетное задание
+Creating folder %x
+Создание папки %x
+Current operation:
+Текущая операция:
+Custom
+Выборочно
+Customize columns
+Выбор колонок
+DECISION TREE
+Древо решений
+Data remaining:
+Осталось:
+Date
+Дата
+Delete files/folders existing on left side only
+Удалить файлы/папки, существующие только на левой стороне
+Delete files/folders existing on right side only
+Удалить файлы/папки, существующие только на правой стороне
+Delete files\tDEL
+Удалить файлы\tDEL
+Delete on both sides
+Удалить на обоих сторонах
+Delete on both sides even if the file is selected on one side only
+Удалить на обоих сторонах, если даже файл выделен только на одной стороне
+Deleting file %x
+Удаление файла %x
+Deleting folder %x
+Удаление папки %x
+Directories are dependent! Be careful when setting up synchronization rules:
+Зависимые папки! Будьте внимательны при настройке правил синхронизации:
+Directory
+Папка
+Directory does not exist:
+Папка не существует:
+Do not display visual status information but write to a logfile instead
+Не показывать информацию по статусу, но записывать в лог-файл
+Do not show this dialog again
+Больше не показывать это окно
+Do nothing
+Ничего не делать
+Do you really want to delete the following objects(s)?
+Вы действительно хотите удалить следующие объекты?
+Do you really want to move the following objects(s) to the Recycle Bin?
+Вы действительно хотите отправить следующие объекты в Корзину?
+Do you want FreeFileSync to automatically check for updates every week?
+Вы хотите, чтобы FreeFileSync автоматически проверял наличие обновлений каждую неделю?
+Don't ask me again
+Не спрашивать меня больше
+Donate with PayPal
+Отправить деньги через PayPal
+Download now?
+Загрузить сейчас?
+Drag && drop
+Drag && drop
+Email
+Почта
+Enable filter to exclude files from synchronization
+Применить фильтр, чтобы исключить файлы из задания на синхронизацию
+Error
+Ошибка
+Error changing modification time:
+Ошибка при изменении времени модификации файла:
+Error copying file:
+Ошибка при копировании файла:
+Error copying locked file %x!
+Ошибка при копировании заблокированного файла %x!
+Error creating directory:
+Ошибка при создании папки:
+Error deleting directory:
+Ошибка при удалении папки:
+Error deleting file:
+Ошибка при удалении файла:
+Error handling
+Обработка ошибок
+Error loading library function:
+Ошибка при загрузке функции библиотеки:
+Error moving to Recycle Bin:
+Ошибка при отправке в Корзину:
+Error opening file:
+Ошибка при открытии файла:
+Error parsing configuration file:
+Ошибка при анализе файла конфигурации:
+Error reading file attributes:
+Ошибка при чтении параметров файла:
+Error reading file:
+Ошибка при чтении файла:
+Error resolving symbolic link:
+Ошибка при решении символической ссылки:
+Error retrieving full path:
+Ошибка при получении полного пути:
+Error starting Volume Shadow Copy Service!
+Ошибка при запуске Службы Теневого Копирования Тома!
+Error traversing directory:
+Ошибка при пересечении папок:
+Error writing file attributes:
+Ошибка при записи параметров файла:
+Error writing file:
+Ошибка при записи файла:
+Error: Source directory does not exist anymore:
+Ошибка: Исходная папка больше не существует:
+Example
+Пример
+Exclude
+Исключая
+Exclude temporarily
+Исключить временные
+Exclude via filter:
+Исключить через фильтр:
+Exit immediately and set returncode < 0
+Выйти немедленно и установить код возврата <0
+Exit with RC < 0
+Выход с RC <0
+Feedback and suggestions are welcome at:
+Отзывы и предложения присылайте по адресу:
+File %x has an invalid date!
+Файл %x имеет недействительную дату!
+File Manager integration:
+Интеграция в Проводник:
+File Time tolerance (seconds):
+Допуск по времени файла (секунд):
+File already exists. Overwrite?
+Файл уже существует. Перезаписать?
+File content
+Содержимое файла
+File does not exist:
+Файл не существует:
+File list exported!
+Список файлов экспортирован!
+File size and date
+Размер и дата файла
+File times that differ by up to the specified number of seconds are still handled as having same time.
+Время файлов отличающееся на определенное количество секунд рассматривается как равное.
+Filename
+Имя файла
+Files %x have a file time difference of less than 1 hour! It's not safe to decide which one is newer due to Daylight Saving Time issues.
+Файлы %x имеют время отличающееся менее чем на 1 час! Решать какой новее небезопасно ввиду перехода на летнее время.
+Files %x have the same date but a different size!
+Файлы %x имеют одинаковую дату, но различаются по размеру!
+Files are found equal if\n     - file content\nis the same.
+Файлы считаются равными, если\n - содержание файлов одинаковое
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
+Файлы считаются равными, если одинаковые\n - размер файла\n - дата и время последнего изменения
+Files remaining:
+Файлов осталось:
+Files that exist on both sides and have different content
+Файлы, существующие на обоих сторонах и имеющие разное содержание
+Files that exist on both sides, left one is newer
+Файлы, существующие на обоих сторонах, левый новее
+Files that exist on both sides, right one is newer
+Файлы, существующие на обоих сторонах, правый новее
+Files/folders remaining:
+Файлов/папко осталось:
+Files/folders scanned:
+Файлов/папок просканировано:
+Files/folders that exist on left side only
+Файлы/папки, существующие только на левой стороне
+Files/folders that exist on right side only
+Файлы/папки, существующие только на правой стороне
+Filter
+Фильтр
+Filter active: Press again to deactivate
+Фильтр активен: Нажмите еще раз для отключения
+Filter files
+Фильтр файлов
+Filter view
+Вид фильтра
+Folder Comparison and Synchronization
+Сравнение и синхронизация
+Folder pair
+Дополнительная папка
+FreeFileSync - Folder Comparison and Synchronization
+FreeFileSync - Сравнение и синхронизация
+FreeFileSync Batch Job
+Пакетное задание FreeFileSync
+FreeFileSync at Sourceforge
+FreeFileSync на Sourceforge
+FreeFileSync batch file
+Файл задания FreeFileSync
+FreeFileSync configuration
+FreeFileSync настройка
+FreeFileSync is up to date!
+У Вас самый последний FreeFileSync!
+Full path
+Полный путь
+Generating file list...
+Создание списка файлов...
+Global settings
+Глобальные настройки
+Help
+Помощь
+Hide all error and warning messages
+Скрывать все ошибки и сообщения с предупреждениями
+Hide conflicts
+Скрыть конфликтующие файлы
+Hide files that are different
+Скрыть различающиеся файлы
+Hide files that are equal
+Скрыть одинаковые файлы
+Hide files that are newer on left
+Скрыть файлы, которые новее слева
+Hide files that are newer on right
+Скрыть файлы, которые новее справа
+Hide files that exist on left side only
+Скрыть файлы, существующие только слева
+Hide files that exist on right side only
+Скрыть файлы, существующие только справа
+Hide files that will be copied to the left side
+Скрыть файлы, которые будут скопированы на левую сторону
+Hide files that will be copied to the right side
+Скрыть файлы, которые будут скопированы на правую сторону
+Hide files that won't be copied
+Скрыть файлы, которые не будут скопированы
+Hide filtered items
+Скрыть отфильтрованные
+Hide further error messages during the current process
+Скрыть последующие ошибки во время текущего процесса
+Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
+Скрыть сообщения об ошибках во время синхронизации:\nони накапливаются и показываются как список в конце процесса
+Hints:
+Подсказка:
+Homepage
+Оф.сайт
+If you like FFS
+Если Вам понравился FFS
+Ignore 1-hour file time difference
+Игнорировать 1-часовую разницу во времени
+Ignore errors
+Игнорировать ошибки
+Ignore subsequent errors
+Игнорировать последующие ошибки
+Ignore this error, retry or abort synchronization?
+Игнорировать эту ошибку, повторить или отменить синхронизацию?
+Ignore this error, retry or abort?
+Игнорировать эту ошибку, повторить или отменить?
+Include
+Включая
+Include temporarily
+Включая временные
+Include: *.doc;*.zip;*.exe\nExclude: \\temp\\*
+Включая: *.doc;*.zip;*.exe\nИсключая: \\temp\\*
+Info
+Информация
+Information
+Информация
+Initialization of Recycle Bin failed!
+Инициализация Корзины провалена!
+It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
+Невозможно инициализировать Корзину!\n\nВероятно, что Вы не используете Windows.\nЕсли Вы хотите, чтобы эта функция была, пожалуйста свяжитесь с автором.:)
+Left:
+Слева:
+Load configuration from file
+Загрузить конфигурацию из файла
+Load configuration history (press DEL to delete items)
+Выбрать конфигурацию из списка (нажмите DEL для удаления пунктов)
+Log-messages:
+Лог-сообщения:
+Logging
+Лог-файлы
+Mirror ->>
+Зеркало ->>
+Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
+Резервная копия левой папки: правая папка будет перезаписана и после синхронизации будет точно соответствовать левой папке
+More than 50% of the total number of files will be copied or deleted!
+Более 50% общего количества файлов будет скопировано или удалено!
+Move column down
+Переместить вниз
+Move column up
+Переместить вверх
+Moving %x to Recycle Bin
+Отправка %x в Корзину
+Not all items have been synchronized! Have a look at the list.
+Не все пункты были синхронизированы! Посмотрите список.
+Not enough free disk space available in:
+Не достаточно свободного места в:
+Nothing to synchronize according to configuration!
+Ничего нет для синхронизации в соответствии с конфигурацией!
+Number of files and directories that will be created
+Число файлов и папок, которые будут созданы
+Number of files and directories that will be deleted
+Число файлов и папок, которые будут удалены
+Number of files that will be overwritten
+Число файлов, которые будут перезаписаны
+OK
+OK
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the synchronization directories.
+Только файлы/папки, которые проходят фильтрацию, будут отобраны для синхронизации. Этот фильтр будет применяться к пути папки.
+Open with File Manager\tD-Click
+Открыть файловым менеджером\tD-Click
+Operation aborted!
+Операция отменена!
+Operation:
+Операция:
+Overview
+Главная
+Pause
+Пауза
+Paused
+Пауза
+Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
+Пожалуйста, скопируйте соответствующий \"Shadow.dll\" (находящийся в архиве \"Shadow.zip\") в папку установки FreeFileSync для включения этой функции.
+Please fill all empty directory fields.
+Пожалуйста, заполните все пустые поля папок
+Press button to activate filter
+Включить фильтр
+Published under the GNU General Public License:
+Издается под GNU General Public License:
+Question
+Вопрос
+Quit
+Выход
+Relative path
+Относительный путь
+Remove folder pair
+Удалить папку
+Reset
+Сбросить
+Reset all warning messages
+Сбросить все сообщения с предупреждениями
+Reset all warning messages?
+Сбросить все сообщения с предупреждениями?
+Result
+Описание
+Right:
+Справа:
+S&ave configuration
+Сохранить конфигурацию
+S&witch view
+Переключить вид
+Save changes to current configuration?
+Сохранить изменения в текущей конфигурации?
+Save current configuration to file
+Сохранить текущую конфигурацию в файл
+Scanning...
+Сканирование...
+Scanning:
+Сканирую:
+Select a folder
+Выделить папку
+Select logfile directory:
+Выберите папку для лог-файлов:
+Select variant:
+Выберите вариант:
+Show conflicts
+Показать конфликтующие файлы
+Show file icons
+Показывать иконки файлов
+Show files that are different
+Показать различающиеся файлы
+Show files that are equal
+Показать одинаковые файлы
+Show files that are newer on left
+Показать файлы, которые новее слева
+Show files that are newer on right
+Показать файлы, которые новее справа
+Show files that exist on left side only
+Показать файлы, существующие только слева
+Show files that exist on right side only
+Показать файлы, существующие только справа
+Show files that will be copied to the left side
+Показать файлы, которые будут скопированы на левую сторону
+Show files that will be copied to the right side
+Показать файлы, которые будут скопированы на правую сторону
+Show files that won't be copied
+Показать файлы, которые не будут скопированы
+Show popup
+Показывать всплывающие окна
+Show popup on errors or warnings
+Показывать всплывающие окна при ошибках и замечаниях
+Significant difference detected:
+Обнаружено существенное различие:
+Silent mode
+Скрытый режим
+Size
+Размер
+Sorting file list...
+Формирование списка файлов...
+Source code written completely in C++ utilizing:
+Исходный код написан на С++ с использованием:
+Speed:
+Скорость:
+Start
+Старт
+Start synchronization
+Начать синхронизацию
+Statistics
+Статистика
+Stop
+Стоп
+Swap sides
+
+Synchronization Preview
+Предпросмотр синхронизации
+Synchronization aborted!
+Синхронизация отменена!
+Synchronization completed successfully!
+Синхронизация прошла успешно!
+Synchronization completed with errors!
+Синхронизация закончена с ошибками!
+Synchronization settings
+Настройки синхронизации
+Synchronization status
+Статус синхронизации
+Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
+Синхронизировать все .doc, .zip и .exe файлы, за исключением всех файлов из подпапки \"temp\"
+Synchronize both sides simultaneously: Copy new or updated files in both directions.
+Синхронизировать обе стороны одновременно: копировать новые или обновлять файлы в обоих направлениях.
+Synchronize...
+Синхронизировать
+Synchronizing...
+Синхронизация...
+System out of memory!
+Нехватка памяти!
+Target file already existing!
+Конечный файл уже существует!
+The file does not contain a valid configuration:
+Файл не содержит действительную конфигурацию:
+This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
+Эта командная строка будет выполняться каждый раз, когда Вы дважды кликните на имени файла. %name служит указателем места для выбранного файла.
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
+Этот вариант сравнивает два файла с одинаковыми именами и считает их равными, если они имеют одинаковый размер файла и одинаковую дату и время последнего изменения.
+Time
+Время
+Time elapsed:
+Времени прошло:
+Time remaining:
+Времени осталось:
+Total amount of data that will be transferred
+Общий объем данных, который будет передаваться
+Total required free disk space:
+Общее требуемое свободное дисковое пространство:
+Total time:
+Общее время:
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
+Обрабатывать файлы, которые отличаются по времени на 1 час, как равные, менее чем на 1 час, как конфликтные, чтобы справиться с переходом на летнее время.
+Two way <->
+В обоих направлениях <->
+Unable to connect to sourceforge.net!
+Невозможно соединиться с sourceforge.net!
+Unable to create logfile!
+Невозможно создать лог!
+Unable to initialize Recycle Bin!
+Невозможно инициализировать Корзину!
+Uncheck all
+Снять выделение со всех
+Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
+Существуют нерешенные конфликты \n\nВы можете проигнорировать их и продолжить синхронизацию.
+Update ->
+Обновить ->
+Use Recycle Bin
+Использовать "Корзину"
+Use Recycle Bin when deleting or overwriting files during synchronization
+Использовать "Корзину" при удалении или перезаписи во время синхронизации
+Variant
+Вариант
+Volume name %x not part of filename %y!
+Имя тома %x не является частью имени файла %y!
+Warning
+Внимание
+Warning: Synchronization failed for %x item(s):
+Внимание: Синхронизация провалена для %x 
+Warnings:
+Предупреждения:
+When the comparison is started with this option set the following decision tree is processed:
+Когда сравнение запущено с этими критериями, алгоритм следующий:
+You may try to synchronize remaining items again (WITHOUT having to re-compare)!
+Вы можете попытаться синхронизировать оставшиеся пункты снова (без повторного сравнения)!
+different
+разные
+file exists on both sides
+файлы существуют на обоих сторонах
+flash	conflict\n
+молния	конфликт\n
+on one side only
+файлы существуют только на одной стороне
+|>	file on right side only\n
+|>	файлы только на правой стороне\n

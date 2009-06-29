@@ -2,10 +2,10 @@
 #define COMPARISON_H_INCLUDED
 
 #include "structures.h"
+#include "library/processXml.h"
 
 class StatusHandler;
 class DirectoryDescrBuffer;
-
 
 namespace FreeFileSync
 {
@@ -18,7 +18,7 @@ namespace FreeFileSync
         CompareProcess(const bool traverseSymLinks,
                        const unsigned fileTimeTol,
                        const bool ignoreOneHourDiff,
-                       bool& warningDependentFolders,
+                       xmlAccess::WarningMessages& warnings,
                        const FilterProcess* filter, //may be NULL
                        StatusHandler* handler);
 
@@ -37,13 +37,19 @@ namespace FreeFileSync
         //create comparison result table and fill relation except for files existing on both sides
         void performBaseComparison(const FolderPair& pair, FileComparison& output);
 
+
+        void issueWarningInvalidDate(const Zstring& fileNameFull, const wxLongLong& utcTime);
+        void issueWarningSameDateDiffSize(const FileCompareLine& cmpLine);
+        void issueWarningChangeWithinHour(const FileCompareLine& cmpLine);
+
+
         //buffer accesses to the same directories; useful when multiple folder pairs are used
         DirectoryDescrBuffer* descriptionBuffer;
 
         const unsigned int fileTimeTolerance; //max allowed file time deviation
         const bool ignoreOneHourDifference;
 
-        bool& m_warningDependentFolders;
+        xmlAccess::WarningMessages& m_warnings;
 
         StatusHandler* statusUpdater;
         const Zstring txtComparingContentOfFiles;

@@ -13,16 +13,22 @@
 #include "../library/processXml.h"
 #include "gridView.h"
 #include <memory>
+#include <map>
 
 class CompareStatusHandler;
 class CompareStatus;
-class CustomLocale;
 class MainFolderDragDrop;
 class FolderPairPanel;
 class CustomGrid;
 class FFSCheckRowsEvent;
 class FFSSyncDirectionEvent;
 class SyncPreview;
+class IconUpdater;
+
+namespace FreeFileSync
+{
+    class CustomLocale;
+}
 
 
 class MainDialog : public MainDialogGenerated
@@ -32,7 +38,7 @@ class MainDialog : public MainDialogGenerated
     friend class SyncPreview;
 
 //IDs for context menu items
-    enum //context menu for left and right grids
+    enum ContextIDRim //context menu for left and right grids
     {
         CONTEXT_FILTER_TEMP = 10,
         CONTEXT_EXCLUDE_EXT,
@@ -40,24 +46,36 @@ class MainDialog : public MainDialogGenerated
         CONTEXT_CLIPBOARD,
         CONTEXT_EXPLORER,
         CONTEXT_DELETE_FILES,
-        CONTEXT_SWAP_SIDES
+        CONTEXT_SYNC_DIR_LEFT,
+        CONTEXT_SYNC_DIR_NONE,
+        CONTEXT_SYNC_DIR_RIGHT
     };
 
-    enum //context menu for middle grid
-    {
-        CONTEXT_CHECK_ALL,
-        CONTEXT_UNCHECK_ALL
-    };
-
-    enum //context menu for column settings
+    enum ContextIDRimLabel//context menu for column settings
     {
         CONTEXT_CUSTOMIZE_COLUMN_LEFT,
         CONTEXT_CUSTOMIZE_COLUMN_RIGHT
     };
 
+    enum ContextIDMiddle//context menu for middle grid
+    {
+        CONTEXT_CHECK_ALL = 20,
+        CONTEXT_UNCHECK_ALL
+    };
+
+    enum ContextIDMiddleLabel
+    {
+        CONTEXT_COMPARISON_RESULT = 30,
+        CONTEXT_SYNC_PREVIEW
+    };
+
 
 public:
-    MainDialog(wxFrame* frame, const wxString& cfgFileName, CustomLocale* language, xmlAccess::XmlGlobalSettings& settings);
+    MainDialog(wxFrame* frame,
+               const wxString& cfgFileName,
+               FreeFileSync::CustomLocale* language,
+               xmlAccess::XmlGlobalSettings& settings);
+
     ~MainDialog();
 
 private:
@@ -74,15 +92,15 @@ private:
     void writeGlobalSettings();
 
     void updateViewFilterButtons();
-    static void updateFilterButton(wxBitmapButton* filterButton, bool isActive);
+    void updateFilterButton(wxBitmapButton* filterButton, bool isActive);
     void updateCompareButtons();
 
     void addFileToCfgHistory(const wxString& filename);
     void addLeftFolderToHistory(const wxString& leftFolder);
     void addRightFolderToHistory(const wxString& rightFolder);
 
-    void addFolderPair(const Zstring& leftDir, const Zstring& rightDir);
-    void addFolderPair(const std::vector<FreeFileSync::FolderPair>& newPairs);
+    void addFolderPair(const Zstring& leftDir, const Zstring& rightDir, bool addFront = false);
+    void addFolderPair(const std::vector<FreeFileSync::FolderPair>& newPairs, bool addFront = false);
     void removeFolderPair(const int pos, bool refreshLayout = true); //keep it an int, allow negative values!
     void clearFolderPairs();
 
@@ -93,6 +111,8 @@ private:
 
     //context menu functions
     std::set<int> getSelectedRows(const CustomGrid* grid) const;
+    std::set<int> getSelectedRows() const;
+    void setSyncDirManually(const std::set<int>& rowsToSetOnUiTable, const FreeFileSync::SyncDirection dir);
     void filterRangeManually(const std::set<int>& rowsToFilterOnUiTable, const int leadingRow);
     void copySelectionToClipboard(const CustomGrid* selectedGrid);
     void openWithFileManager(const int rowNumber, const bool leftSide);
@@ -106,16 +126,18 @@ private:
     void clearStatusBar();
 
     //events
-    void onGridLeftButtonEvent(wxKeyEvent& event);
-    void onGridRightButtonEvent(wxKeyEvent& event);
-    void onGridMiddleButtonEvent(wxKeyEvent& event);
-    void OnContextMenu(wxGridEvent& event);
-    void OnContextMenuSelection(wxCommandEvent& event);
-    void OnContextMenuMiddle(wxGridEvent& event);
-    void OnContextMenuMiddleSelection(wxCommandEvent& event);
-    void OnContextColumnLeft(wxGridEvent& event);
-    void OnContextColumnRight(wxGridEvent& event);
-    void OnContextColumnSelection(wxCommandEvent& event);
+    void onGridLeftButtonEvent(        wxKeyEvent& event);
+    void onGridRightButtonEvent(       wxKeyEvent& event);
+    void onGridMiddleButtonEvent(      wxKeyEvent& event);
+    void OnContextRim(                 wxGridEvent& event);
+    void OnContextRimSelection(        wxCommandEvent& event);
+    void OnContextRimLabelLeft(        wxGridEvent& event);
+    void OnContextRimLabelRight(       wxGridEvent& event);
+    void OnContextRimLabelSelection(   wxCommandEvent& event);
+    void OnContextMiddle(              wxGridEvent& event);
+    void OnContextMiddleSelection(     wxCommandEvent& event);
+    void OnContextMiddleLabel(         wxGridEvent& event);
+    void OnContextMiddleLabelSelection(wxCommandEvent& event);
 
     void OnDirSelected(wxFileDirPickerEvent& event);
 
@@ -151,6 +173,9 @@ private:
     void OnCfgHistoryKeyEvent(  wxKeyEvent& event);
     void OnFolderHistoryKeyEvent(wxKeyEvent& event);
     void OnRegularUpdateCheck(  wxIdleEvent& event);
+    void OnLayoutWindowAsync(   wxIdleEvent& event);
+
+    void refreshGridAfterFilterChange(const int delay);
 
     void onResizeMainWindow(    wxEvent& event);
     void OnAbortCompare(        wxCommandEvent& event);
@@ -168,10 +193,11 @@ private:
     void OnClose(               wxCloseEvent&   event);
     void OnQuit(                wxCommandEvent& event);
 
+    void calculatePreview();
+
     void OnAddFolderPair(       wxCommandEvent& event);
     void OnRemoveFolderPair(    wxCommandEvent& event);
-
-    void calculatePreview();
+    void OnRemoveTopFolderPair( wxCommandEvent& event);
 
     //menu events
     void OnMenuSaveConfig(      wxCommandEvent& event);
@@ -182,21 +208,13 @@ private:
     void OnMenuCheckVersion(    wxCommandEvent& event);
     void OnMenuAbout(           wxCommandEvent& event);
     void OnMenuQuit(            wxCommandEvent& event);
-    void OnMenuLangChineseSimp( wxCommandEvent& event);
-    void OnMenuLangDutch(       wxCommandEvent& event);
-    void OnMenuLangEnglish(     wxCommandEvent& event);
-    void OnMenuLangFrench(      wxCommandEvent& event);
-    void OnMenuLangGerman(      wxCommandEvent& event);
-    void OnMenuLangHungarian(   wxCommandEvent& event);
-    void OnMenuLangItalian(     wxCommandEvent& event);
-    void OnMenuLangJapanese(    wxCommandEvent& event);
-    void OnMenuLangPolish(      wxCommandEvent& event);
-    void OnMenuLangPortuguese(  wxCommandEvent& event);
-    void OnMenuLangPortugueseBrazil(wxCommandEvent& event);
-    void OnMenuLangSlovenian(   wxCommandEvent& event);
-    void OnMenuLangSpanish(     wxCommandEvent& event);
+    void OnMenuLanguageSwitch(  wxCommandEvent& event);
 
     void switchProgramLanguage(const int langID);
+
+    typedef int MenuItemID;
+    typedef int LanguageID;
+    std::map<MenuItemID, LanguageID> languageMenuItemMap; //needed to attach menu item events
 
 //***********************************************
     //application variables are stored here:
@@ -234,7 +252,7 @@ private:
 //***********************************************
     std::auto_ptr<wxMenu> contextMenu;
 
-    CustomLocale* programLanguage;
+    FreeFileSync::CustomLocale* programLanguage;
 
     //status information
     wxLongLong lastStatusChange;
@@ -269,6 +287,11 @@ private:
     //support for drag and drop
     std::auto_ptr<MainFolderDragDrop> dragDropOnLeft;
     std::auto_ptr<MainFolderDragDrop> dragDropOnRight;
+
+#ifdef FFS_WIN
+    //update icons periodically: one updater instance for both left and right grids
+    std::auto_ptr<IconUpdater> updateFileIcons;
+#endif
 
     //encapsulation of handling of sync preview
     std::auto_ptr<SyncPreview> syncPreview;

@@ -176,6 +176,8 @@ Build:
 ビルド:
 Cancel
 中止
+Change direction
+方向を変更
 Check all
 すべて選択
 Choose to hide filtered files/directories from list
@@ -218,6 +220,8 @@ Configure your own synchronization rules.
 あなたの設定した同期規則
 Confirm
 確認
+Conflict detected:
+検出された競合:
 Continue
 続行
 Conversion error:
@@ -238,6 +242,8 @@ Copying file %x to %y
 ファイル %x を %y にコピー中
 Copying file %x to %y overwriting target
 ファイル %x をコピー、%y に上書き中
+Could not determine volume name for file:
+ファイルのボリューム名が決定されていません:
 Could not set working directory:
 作業ディレクトリが設定できません:
 Create a batch job
@@ -278,8 +284,8 @@ Directory does not exist:
 ディレクトリが存在しません:
 Do not display visual status information but write to a logfile instead
 進捗状況などのメッセージを表示しないで、ログファイルの書き込みは実施する。
-Do not show this warning again
-次回からこの警告を表示しない
+Do not show this dialog again
+次回から表示しない
 Do nothing
 何もしない
 Do you really want to delete the following objects(s)?
@@ -306,6 +312,8 @@ Error changing modification time:
 時間の修正中のエラー:
 Error copying file:
 ファイルのコピーに失敗:
+Error copying locked file %x!
+コピーに失敗! ファイル%x はロックされています!
 Error creating directory:
 ディレクトリ作成エラー:
 Error deleting directory:
@@ -330,6 +338,8 @@ Error resolving symbolic link:
 シンボリックリンクの解決に失敗:
 Error retrieving full path:
 フルパスの取得に失敗:
+Error starting Volume Shadow Copy Service!
+ボリュームシャドウコピーの開始に失敗!
 Error traversing directory:
 ディレクトリの移動エラー:
 Error writing file attributes:
@@ -352,6 +362,8 @@ Exit with RC < 0
 RC で終了 < 0
 Feedback and suggestions are welcome at:
 フィードバック、提案など:
+File %x has an invalid date!
+ファイル %x の日付は無効なものです!
 File Manager integration:
 ファイラとの統合:
 File Time tolerance (seconds):
@@ -370,6 +382,10 @@ File times that differ by up to the specified number of seconds are still handle
 ファイル時刻の指定された秒以内の誤差は、同じものとして取り扱われます。
 Filename
 ファイル名
+Files %x have a file time difference of less than 1 hour! It's not safe to decide which one is newer due to Daylight Saving Time issues.
+ファイル %x の時間には、一時間未満の誤差があります! 夏時間の問題により、より新しい方を時間で決定するのは安全ではありません。
+Files %x have the same date but a different size!
+ファイル %x は、同じ時間ですがサイズが異なっています!
 Files are found equal if\n     - file content\nis the same.
 ファイルが同様だった場合\n     - ファイル内容\nで判断する
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
@@ -500,6 +516,8 @@ Move column down
 列を下に移動
 Move column up
 列を上に移動
+Moving %x to Recycle Bin
+%x をゴミ箱に移動中
 Not all items have been synchronized! Have a look at the list.
 すべてのアイテムは同期されていません、リストを確認してください
 Not enough free disk space available in:
@@ -528,12 +546,12 @@ Pause
 一時停止
 Paused
 一時停止中
+Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
+ \"Shadow.dll\" (\"Shadow.zip\" アーカイブ内) を、FreeFileSync インストールフォルダにコピーすることで、この機能を利用できるようになります。
 Please fill all empty directory fields.
 アイテムが選択されていません!
 Press button to activate filter
 ボタンをクリックで有効化
-Preview
-プレビュー
 Published under the GNU General Public License:
 Published under the GNU General Public License:
 Question
@@ -614,6 +632,8 @@ Start
 開始
 Start synchronization
 同期の開始
+Statistics
+統計
 Stop
 停止
 Swap sides
@@ -626,8 +646,6 @@ Synchronization completed successfully!
 同期処理はすべて正常に完了しました!
 Synchronization completed with errors!
 同期処理は、エラーで終了しています!
-Synchronization filter
-同期フィルター
 Synchronization settings
 同期処理設定
 Synchronization status
@@ -636,6 +654,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 \"temp\" のサブフォルダを除いて、すべての.doc、.zip、および.exeファイルを同期
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 両側を同時に処理: 両方のディレクトリのより新しいファイルをコピー
+Synchronize...
+同期処理...
 Synchronizing...
 同期処理中...
 System out of memory!
@@ -680,6 +700,10 @@ Use Recycle Bin
 ゴミ箱を使用
 Use Recycle Bin when deleting or overwriting files during synchronization
 同期処理の間、ファイルの上書き/削除をする時にゴミ箱を使用
+Variant
+変化
+Volume name %x not part of filename %y!
+ボリューム名 %x にファイル名 %y はありません!
 Warning
 警告
 Warning: Synchronization failed for %x item(s):

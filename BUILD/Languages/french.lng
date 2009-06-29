@@ -27,7 +27,7 @@
 %x files,
 %x fichiers,
 %x is not a valid FreeFileSync batch file!
-%x n'est pas un fichier batch FreeFileSync valide!
+%x n'est pas un fichier batch FreeFileSync valide !
 %x of %y rows in view
 %x sur %y lignes affichées
 %x of 1 row in view
@@ -141,9 +141,9 @@
 >>	right file is newer\n
 >>	le fichier de droite est plus récent\n
 A newer version of FreeFileSync is available:
-Une version plus récente de FreeFileSync est disponible:
+Une version plus récente de FreeFileSync est disponible :
 Abort requested: Waiting for current operation to finish...
-Abandon demandé: En attente de la fin de l'opération en cours...
+Abandon demandé : En attente de la fin de l'opération en cours...
 Aborted
 Abandonné
 About
@@ -153,29 +153,31 @@ Action
 Add folder pair
 Ajout d'un couple de dossiers
 All items have been synchronized!
-Tous les éléments ont été synchronisés!
+Tous les éléments ont été synchronisés !
 An exception occured!
 Une violation s'est produite !
 As a result the files are separated into the following categories:
-En conclusion, les fichiers sont répartis dans les catégories suivantes:
+En conclusion, les fichiers sont répartis dans les catégories suivantes :
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
-Comme le nom le suggère, deux fichiers qui ont le même nom sont considérés comme identiques si, et seulement si, leur contenu est identique. Cette option est utile pour les contrôles de cohérence plutôt que pour les opérations de sauvegarde. Toutefois, les dates et heures ne sont pas du tout prises en compte.\n\nAvec cette option, l'arbre de décision est plus simple:
+Comme le nom le suggère, deux fichiers qui ont le même nom sont considérés comme identiques si, et seulement si, leur contenu est identique. Cette option est utile pour les contrôles de cohérence plutôt que pour les opérations de sauvegarde. Toutefois, les dates et heures ne sont pas du tout prises en compte.\n\nAvec cette option, l'arbre de décision est plus simple :
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
-Créer un fichier de commandespour une synchronisation automatique. Pour démarrer en mode batch, indiquer le nom du fichier à l'exécutable FreeFileSync: freefilesync.exe <fichier de commandes>. Ceci peut aussi être programmé dans le plannificateur de tâches.
+Créer un fichier de commandespour une synchronisation automatique. Pour démarrer en mode batch, indiquer le nom du fichier à l'exécutable FreeFileSync : freefilesync.exe <fichier de commandes>. Ceci peut aussi être programmé dans le plannificateur de tâches.
 Batch execution
 Exécution du fichier de commandes
 Batch file created successfully!
-Fichier de commandes créé avec succès!
+Fichier de commandes créé avec succès !
 Batch job
 Fichier de commandes
 Big thanks for localizing FreeFileSync goes out to:
-Pour les traductions de FreeFileSync, un grand merci à:
+Pour les traductions de FreeFileSync, un grand merci à :
 Browse
 Parcourir
 Build:
-Créé:
+Créé le :
 Cancel
 Annuler
+Change direction
+Changer la direction
 Check all
 Cocher tout
 Choose to hide filtered files/directories from list
@@ -205,11 +207,11 @@ Terminé
 Configuration
 Configuration
 Configuration loaded!
-Configuration chargée!
+Configuration chargée !
 Configuration overview:
-Contrôle des paramètres:
+Contrôle des paramètres :
 Configuration saved!
-Configuration enregistrée!
+Configuration enregistrée !
 Configure filter
 Configuration des filtres
 Configure filter...
@@ -218,10 +220,12 @@ Configure your own synchronization rules.
 Paramétrage de vos règles de synchronisation.
 Confirm
 Confirmation
+Conflict detected:
+Conflit détecté :
 Continue
 Continuer
 Conversion error:
-Erreur de conversion:
+Erreur de conversion :
 Copy from left to right
 Copie de gauche à droite
 Copy from left to right overwriting
@@ -238,8 +242,10 @@ Copying file %x to %y
 Copie le fichier %x vers %y
 Copying file %x to %y overwriting target
 Copie le fichier %x vers %y avec écrasement
+Could not determine volume name for file:
+Impossible de trouver le nom de volume pour le fichier :
 Could not set working directory:
-Impossible de définir le répertoire de travail:
+Impossible de définir le répertoire de travail :
 Create a batch job
 Création du fichier de commandes
 Creating folder %x
@@ -271,15 +277,15 @@ Suppression du fichier %x
 Deleting folder %x
 Suppression du dossier %x
 Directories are dependent! Be careful when setting up synchronization rules:
-Les dossiers sont imbriqués! Attention à la mise à jour des règles de synchronisation:
+Les dossiers sont imbriqués ! Attention à la mise à jour des règles de synchronisation :
 Directory
 Répertoire
 Directory does not exist:
-Le répertoire n'existe pas:
+Le répertoire n'existe pas :
 Do not display visual status information but write to a logfile instead
 Ne pas afficher les informations d'état à l'écran mais les enregistrer plutôt dans un fichier log
-Do not show this warning again
-Ne plus afficher cet avertissement
+Do not show this dialog again
+Ne pas afficher cette boîte de dialogue
 Do nothing
 Ne rien faire
 Do you really want to delete the following objects(s)?
@@ -303,41 +309,45 @@ Activer le filtrage pour exclure les fichiers de la synchronisation
 Error
 Erreur
 Error changing modification time:
-Erreur lors du changement de la date de modification:
+Erreur lors du changement de la date de modification :
 Error copying file:
-Erreur lors de la copie du fichier:
+Erreur lors de la copie du fichier :
+Error copying locked file %x!
+Erreur lors de la copie du fichier verrouillé %x !
 Error creating directory:
-Erreur lors de la création d'un répertoire:
+Erreur lors de la création d'un répertoire :
 Error deleting directory:
-Erreur lors de la suppression d'un répertoire:
+Erreur lors de la suppression d'un répertoire :
 Error deleting file:
-Erreur lors de la suppression d'un fichier:
+Erreur lors de la suppression d'un fichier :
 Error handling
 Erreur de gestion de fichiers
 Error loading library function:
-Erreur lors du chargement de la bibliothèque de fonctions
+Erreur lors du chargement de la bibliothèque de fonctions :
 Error moving to Recycle Bin:
-Erreur lors du déplacement dans la corbeille
+Erreur lors du déplacement dans la corbeille :
 Error opening file:
-Erreur lors de l'ouverture du fichier:
+Erreur lors de l'ouverture du fichier :
 Error parsing configuration file:
-Erreur lors de l'analyse du fichier de configuration:
+Erreur lors de l'analyse du fichier de configuration :
 Error reading file attributes:
-Erreur lors de la lecture des attributs du fichier:
+Erreur lors de la lecture des attributs du fichier :
 Error reading file:
-Erreur lors de la lecture du fichier:
+Erreur lors de la lecture du fichier :
 Error resolving symbolic link:
-Erreur lors de la résolution du lien symbolique:
+Erreur lors de la résolution du lien symbolique :
 Error retrieving full path:
-Erreur lors de la recherche du chemin:
+Erreur lors de la recherche du chemin :
+Error starting Volume Shadow Copy Service!
+Erreur lors du démarrage du service 'Volume Shadow Copy' !
 Error traversing directory:
-Erreur lors du parcours du répertoire:
+Erreur lors du parcours du répertoire :
 Error writing file attributes:
-Erreur lors de l'écriture des attributs du fichier:
+Erreur lors de l'écriture des attributs du fichier :
 Error writing file:
-Erreur lors de l'écriture du fichier:
+Erreur lors de l'écriture du fichier :
 Error: Source directory does not exist anymore:
-Erreur: le répertoire source n'existe plus:
+Erreur : le répertoire source n'existe plus :
 Example
 Exemple
 Exclude
@@ -345,37 +355,43 @@ Exclure
 Exclude temporarily
 Exclure temporairement
 Exclude via filter:
-Exclure à l'aide du filtre:
+Exclure à l'aide du filtre :
 Exit immediately and set returncode < 0
 Sortie immédiate avec le returncode < 0
 Exit with RC < 0
 Sortie avec RC < 0
 Feedback and suggestions are welcome at:
 Commentaires et suggestions sont les bienvenus à :
+File %x has an invalid date!
+Le fichier %x a une date invalide !
 File Manager integration:
-Choix du Gestionnaire de Fichiers:
+Choix du Gestionnaire de Fichiers :
 File Time tolerance (seconds):
-Tolérance sur l'heure de création du fichier (en secondes):
+Tolérance sur l'heure de création du fichier (en secondes) :
 File already exists. Overwrite?
-Le fichier existe déjà. Voulez-vous le remplacer?
+Le fichier existe déjà. Voulez-vous le remplacer ?
 File content
 Contenu du fichier
 File does not exist:
-Le fichier n'existe pas:
+Le fichier n'existe pas :
 File list exported!
-Liste des fichiers exportée!
+Liste des fichiers exportée !
 File size and date
 Taille et date du fichier
 File times that differ by up to the specified number of seconds are still handled as having same time.
 Les fichiers ayant des heures qui diffèrent d'un nombre de secondes inférieur à celui spécifié sont considérés comme ayant la même heure.
 Filename
 Nom du fichier
+Files %x have a file time difference of less than 1 hour! It's not safe to decide which one is newer due to Daylight Saving Time issues.
+Les fichiers %x ont une différence de date inférieure à 1 heure ! Il n'est pas sain de décider quelle est la plus récente à cause de l'heure d'été.
+Files %x have the same date but a different size!
+Les fichiers %x ont la même data mais une taille différente !
 Files are found equal if\n     - file content\nis the same.
 Les fichiers sont considérés comme identiques, si\n     - leur contenu est identique.
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
 Les fichiers sont considérés comme identiques, si\n     - leur taille\n     - leur date et heure sont identiques.
 Files remaining:
-Fichiers restants:
+Fichiers restants :
 Files that exist on both sides and have different content
 Les fichiers existent des deux côtés et ont des contenus différents
 Files that exist on both sides, left one is newer
@@ -383,9 +399,9 @@ Fichiers existants des deux côtés, celui de gauche est plus récent
 Files that exist on both sides, right one is newer
 Fichiers existants des deux côtés, celui de droite est plus récent
 Files/folders remaining:
-Fichiers/dossiers restants:
+Fichiers/dossiers restants :
 Files/folders scanned:
-Fichiers/dossiers analysés
+Fichiers/dossiers analysés :
 Files/folders that exist on left side only
 Fichiers/répertoires existants seulement à gauche
 Files/folders that exist on right side only
@@ -393,7 +409,7 @@ Fichiers/répertoires existants seulement à droite
 Filter
 Filtrage
 Filter active: Press again to deactivate
-Filtrage actif: Cliquez de nouveau pour le désactiver
+Filtrage actif : Cliquez de nouveau pour le désactiver
 Filter files
 Filtrage des fichiers
 Filter view
@@ -449,9 +465,9 @@ Masquer les éléments filtrés
 Hide further error messages during the current process
 Masquer les messages d'erreur suivants pendant le traitement
 Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
-Masquer les messages d'erreur pendant la synchronisation:\nIls sont collationnés et listés à la fin de l'opération
+Masquer les messages d'erreur pendant la synchronisation :\nIls sont collationnés et listés à la fin de l'opération
 Hints:
-Conseils:
+Conseils :
 Homepage
 Accueil
 If you like FFS
@@ -465,13 +481,13 @@ Ignorer les erreurs ultérieures
 Ignore this error, retry or abort synchronization?
 Ignorer l'erreur, réessayer ou abandonner la synchronisation ?
 Ignore this error, retry or abort?
-Ignorer l'erreur, réessayer ou abandonner?
+Ignorer l'erreur, réessayer ou abandonner ?
 Include
 Inclure
 Include temporarily
 Inclure temporairement
 Include: *.doc;*.zip;*.exe\nExclude: \\temp\\*
-Inclure: *.doc;*.zip;*.exe\nExclure: \\temp\\*
+Inclure : *.doc;*.zip;*.exe\nExclure : \\temp\\*
 Info
 Info
 Information
@@ -479,15 +495,15 @@ Information
 Initialization of Recycle Bin failed!
 Erreur lors de l'initialisation de la corbeille !
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
-Impossible d'accéder à la corbeille!\n\nIl est probable que vous n'utilisez pas Windows.\nSi vous désirez utilisee cette fonctionnalité, veuillez contacter l'auteur. :)
+Impossible d'accéder à la corbeille !\n\nIl est probable que vous n'utilisez pas Windows.\nSi vous désirez utilisee cette fonctionnalité, veuillez contacter l'auteur. :)
 Left:
-Gauche:
+Gauche :
 Load configuration from file
 Charger la configuration à partir du fichier
 Load configuration history (press DEL to delete items)
 Charger l'historique des configuration (appuyez sur Suppr pour supprimer des éléments)
 Log-messages:
-Messages log:
+Messages log :
 Logging
 Connexion
 Mirror ->>
@@ -495,17 +511,19 @@ Mirroir ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Sauvegarde miroir du répertoire de gauche : Le répertoire de droite sera écrasé et exactement identique au répertoire de gauche après la synchronisation.
 More than 50% of the total number of files will be copied or deleted!
-Plus de 50% des fichiers seront copiés ou détruits!
+Plus de 50% des fichiers seront copiés ou détruits !
 Move column down
 Déplacer la colonne vers le bas
 Move column up
 Déplacer la colonne vers le haut
+Moving %x to Recycle Bin
+Déplacement de %x vers la Corbeille
 Not all items have been synchronized! Have a look at the list.
 Tout n'a pas été synchronisé ! Vérifiez la liste.
 Not enough free disk space available in:
 Espace disque insuffisant sur :
 Nothing to synchronize according to configuration!
-Rien à synchroniser dans cette configuration!
+Rien à synchroniser dans cette configuration !
 Number of files and directories that will be created
 Nombre de fichiers et de répertoires qui seront créés
 Number of files and directories that will be deleted
@@ -515,27 +533,27 @@ Nombre de fichiers qui seront remplacés
 OK
 OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the synchronization directories.
-Seuls les fichiers/répertoires filtrés seront sélectionnés pour la synchronisation. Le filtre sera appliqué aux noms relatifs pour la synchronisation.
+Seuls les fichiers/répertoires filtrés seront sélectionnés pour la synchronisation. Le filtre sera appliqué aux noms relatifs(!) pour la synchronisation.
 Open with File Manager\tD-Click
 Ouvrir avec le Gestionnaire de Fichiers\tClick droit
 Operation aborted!
-Opération abandonnée!
+Opération abandonnée !
 Operation:
-Opération:
+Opération :
 Overview
 Présentation
 Pause
 Pause
 Paused
 En pause
+Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
+Veuillez copier le fichier \"Shadow.dll\" (situé dans l'archive \"Shadow.zip\") vers le répertoire d'installation de FreeFileSync pour utiliser cette fonctionnalité.
 Please fill all empty directory fields.
 Veuillez remplir tous les champs vides du répertoire.
 Press button to activate filter
 Cliquez pour activer le filtrage
-Preview
-Prévoir
 Published under the GNU General Public License:
-Publié sous la licence GNU General Public:
+Publié sous la licence GNU General Public :
 Question
 Question
 Quit
@@ -549,7 +567,7 @@ Réinitialiser
 Reset all warning messages
 Réinitialisation de tous les avertissements
 Reset all warning messages?
-Réinitialiser tous les avertissements?
+Réinitialiser tous les avertissements ?
 Result
 Situation
 Right:
@@ -565,13 +583,13 @@ Enregistrer la configuration courante
 Scanning...
 Lecture en cours...
 Scanning:
-Lecture en cours:
+Lecture en cours :
 Select a folder
 Choisissez un répertoire
 Select logfile directory:
-Choisissez un dossier pour le fichier .log
+Choisissez un dossier pour le fichier .log :
 Select variant:
-Choisissez une variante:
+Choisissez une variante :
 Show conflicts
 Afficher les conflits
 Show file icons
@@ -607,13 +625,15 @@ Taille
 Sorting file list...
 Tri de la liste des fichiers...
 Source code written completely in C++ utilizing:
-Code source écrit totalement en C++ et utilisant:
+Code source écrit totalement en C++ et utilisant :
 Speed:
 Vitesse :
 Start
 Démarrer
 Start synchronization
 Démarrer la synchronisation
+Statistics
+Statistiques
 Stop
 Arrêt
 Swap sides
@@ -621,13 +641,11 @@ Permuter les côtés
 Synchronization Preview
 Prévisualisation de la synchronisation
 Synchronization aborted!
-Synchronisation abandonnée!
+Synchronisation abandonnée !
 Synchronization completed successfully!
-Synchronisation terminée avec succès!
+Synchronisation terminée avec succès !
 Synchronization completed with errors!
-Synchronisation terminée avec des erreurs!
-Synchronization filter
-Filtre de synchronisation
+Synchronisation terminée avec des erreurs !
 Synchronization settings
 Paramétrage de la synchronisation
 Synchronization status
@@ -635,15 +653,17 @@ Etat de la synchronisation
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Synchroniser rous les fichiers .doc, .zip et .exe sauf ceux du dossier \"temp\".
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
-Synchronisation simultanée des deux côtés. Copie des fichiers nouveaux ou mis à jour.
+Synchronisation simultanée des deux côtés : Copie des fichiers nouveaux ou mis à jour.
+Synchronize...
+Synchroniser...
 Synchronizing...
 Synchronisation en cours...
 System out of memory!
-Erreur mémoire système!
+Erreur mémoire système !
 Target file already existing!
-Le fichier de destination existe déjà!
+Le fichier de destination existe déjà !
 The file does not contain a valid configuration:
-Le fichier ne contient pas de configuration valide
+Le fichier ne contient pas de configuration valide :
 This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
 Cette ligne de commandes sera exécutée chaque fois que vous double-cliquerez sur un fichier. %name sert d'emplacement pour le fichier sélectionné.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
@@ -651,7 +671,7 @@ Cette variante définit comme identiques deux fichiers de même nom lorsqu'ils o
 Time
 Heure
 Time elapsed:
-Temps écoulé:
+Temps écoulé :
 Time remaining:
 Temps restant :
 Total amount of data that will be transferred
@@ -659,17 +679,17 @@ Volume de données à transférer
 Total required free disk space:
 Espace disque nécessaire :
 Total time:
-Temps total:
+Temps total :
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
 Traiter les heures qui différent exactement de +/- 1 heure comme égales, et celles qui diffèrent de moins d'une heure comme conflit sur la gestion de l'heure d'été.
 Two way <->
 Des 2 côtés <->
 Unable to connect to sourceforge.net!
-Impossible de se connecter à sourceforge.net!
+Impossible de se connecter à sourceforge.net !
 Unable to create logfile!
-Impossible de créer un fichier log!
+Impossible de créer un fichier log !
 Unable to initialize Recycle Bin!
-Impossible d'initialiser la corbeille!
+Impossible d'initialiser la corbeille !
 Uncheck all
 Décocher tout
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
@@ -680,14 +700,18 @@ Use Recycle Bin
 Utilisation de la corbeille
 Use Recycle Bin when deleting or overwriting files during synchronization
 Utilisation de la corbeille lors de la suppression ou du remplacement des fichiers pendant la synchronisation
+Variant
+Variante
+Volume name %x not part of filename %y!
+Le nom de volume %x ne fait pas partie du nom de fichier %y !
 Warning
 Attention
 Warning: Synchronization failed for %x item(s):
-Attention: La synchronisation a échouée pour %x élément(s):
+Attention : La synchronisation a échouée pour %x élément(s) :
 Warnings:
-Avertissements:
+Avertissements :
 When the comparison is started with this option set the following decision tree is processed:
-Lorsque la comparaison démarre avec cette option, l'arbre de décision suivant est exécuté:
+Lorsque la comparaison démarre avec cette option, l'arbre de décision suivant est exécuté :
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Vous pouvez essayer de synchroniser à nouveau les éléments restants (SANS avoir à les re-comparer) !
 different

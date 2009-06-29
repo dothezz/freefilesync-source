@@ -2,5 +2,5 @@
 
 namespace FreeFileSync
 {
-    static const wxString currentVersion = wxT("1.19"); //internal linkage!
+    static const wxString currentVersion = wxT("2.0"); //internal linkage!
 }

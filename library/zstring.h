@@ -11,7 +11,6 @@
 #include <cctype>
 #include <assert.h>
 #include <new>
-#include <cstdlib>
 
 
 namespace FreeFileSync
@@ -23,18 +22,10 @@ namespace FreeFileSync
 }
 
 
-#ifdef FFS_WIN
-#define ZSTRING_WIDE_CHAR //use wide character strings
-
-#elif defined FFS_LINUX
-#define ZSTRING_CHAR //use char strings
-#endif
-
-
 #ifdef ZSTRING_CHAR
-typedef char DefaultChar;
+typedef char DefaultChar; //use char strings
 #elif defined ZSTRING_WIDE_CHAR
-typedef wchar_t DefaultChar;
+typedef wchar_t DefaultChar; //use wide character strings
 #endif
 
 class Zsubstr;
@@ -54,6 +45,7 @@ public:
     bool StartsWith(const DefaultChar* begin) const;
     bool StartsWith(const Zstring& begin) const;
     bool EndsWith(const DefaultChar* end) const;
+    bool EndsWith(const DefaultChar end) const;
     bool EndsWith(const Zstring& end) const;
 #ifdef FFS_WIN
     int CmpNoCase(const DefaultChar* other) const;
@@ -76,6 +68,7 @@ public:
     Zstring substr(size_t pos = 0, size_t len = npos) const; //allocate new string
     Zsubstr zsubstr(size_t pos = 0) const;                   //use ref-counting!
     bool empty() const;
+    void clear();
     int compare(const DefaultChar* other) const;
     int compare(const Zstring& other) const;
     int compare(const size_t pos1, const size_t n1, const DefaultChar* other) const;
@@ -119,7 +112,7 @@ private:
         size_t               length;
         size_t               capacity; //allocated length without null-termination
     };
-    static void allocate(const size_t newLength, Zstring::StringDescriptor*& newDescr, DefaultChar*& newData);
+    static void allocate(const size_t newLength, StringDescriptor*& newDescr, DefaultChar*& newData);
 
     StringDescriptor* descr;
     DefaultChar*      data;
@@ -211,13 +204,13 @@ int defaultCompare(const wchar_t* str1, const wchar_t* str2, const size_t count)
 }
 
 inline
-wchar_t* defaultStrFind(const wchar_t* str1, const wchar_t* str2)
+const wchar_t* defaultStrFind(const wchar_t* str1, const wchar_t* str2)
 {
     return wcsstr(str1, str2);
 }
 
 inline
-wchar_t* defaultStrFind(const wchar_t* str1, int ch)
+const wchar_t* defaultStrFind(const wchar_t* str1, int ch)
 {
     return wcschr(str1, ch);
 }
@@ -251,7 +244,7 @@ public:
         --count;
     }
 
-    static AllocationCount& getGlobal();
+    static AllocationCount& getInstance();
 
 private:
     AllocationCount() : count(0) {}
@@ -277,17 +270,15 @@ void Zstring::allocate(const size_t       newLength,
     const size_t newCapacity = getCapacityToAllocate(newLength);
     assert(newCapacity);
 
-    newDescr = (StringDescriptor*) malloc( sizeof(StringDescriptor) + (newCapacity + 1) * sizeof(DefaultChar));
-    if (newDescr == NULL)
-        throw std::bad_alloc();
-    newData = (DefaultChar*)(newDescr + 1);
+    newDescr = static_cast<StringDescriptor*>(operator new [] (sizeof(StringDescriptor) + (newCapacity + 1) * sizeof(DefaultChar)));
+    newData = reinterpret_cast<DefaultChar*>(newDescr + 1);
 
     newDescr->refCount = 1;
     newDescr->length   = newLength;
     newDescr->capacity = newCapacity;
 
 #ifdef __WXDEBUG__
-    AllocationCount::getGlobal().inc(); //test Zstring for memory leaks
+    AllocationCount::getInstance().inc(); //test Zstring for memory leaks
 #endif
 }
 
@@ -361,10 +352,10 @@ void Zstring::decRef()
     assert(descr && descr->refCount >= 1); //descr points to the begin of the allocated memory block
     if (--descr->refCount == 0)
     {
-        free(descr);   //this must NEVER be changed!! E.g. Trim() relies on descr being start of allocated memory block
+        operator delete [] (descr);   //this must NEVER be changed!! E.g. Trim() relies on descr being start of allocated memory block
         descr = NULL;
 #ifdef __WXDEBUG__
-        AllocationCount::getGlobal().dec(); //test Zstring for memory leaks
+        AllocationCount::getInstance().dec(); //test Zstring for memory leaks
 #endif
     }
 }
@@ -470,6 +461,16 @@ bool Zstring::EndsWith(const DefaultChar* end) const
     if (thisLength < endLength)
         return false;
     return compare(thisLength - endLength, endLength, end) == 0;
+}
+
+
+inline
+bool Zstring::EndsWith(const DefaultChar end) const
+{
+    const size_t thisLength = length();
+    if (thisLength < 1)
+        return false;
+    return  *(c_str() + thisLength - 1) == end;
 }
 
 
@@ -611,6 +612,13 @@ bool Zstring::empty() const
 
 
 inline
+void Zstring::clear()
+{
+    *this = Zstring();
+}
+
+
+inline
 DefaultChar Zstring::operator[](const size_t pos) const
 {
     assert(pos < length());
@@ -690,16 +698,12 @@ bool Zsubstr::StartsWith(const Zstring& begin) const
 inline
 size_t Zsubstr::findFromEnd(const DefaultChar ch) const
 {
-    if (length() == 0)
-        return Zstring::npos;
-
-    size_t pos = length() - 1;
-    do //pos points to last char of the string
+    size_t pos = length();
+    while (--pos != static_cast<size_t>(-1))
     {
         if (m_data[pos] == ch)
             return pos;
     }
-    while (--pos != static_cast<size_t>(-1));
     return Zstring::npos;
 }
 

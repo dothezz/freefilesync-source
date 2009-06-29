@@ -1,4 +1,4 @@
-FreeFileSync v1.19
+FreeFileSync v2.0
 ------------------
 
 Usage
@@ -44,8 +44,10 @@ Key Features
 22. Handle daylight saving time changes on FAT/FAT32 volumes correctly.
 23. Portable version (.zip) available.
 24. No Windows registry entries for portable version.
-25. Support for \\?\ path prefix for unrestricted path length. (windows only)
+25. Support for \\?\ path prefix for unrestricted path length. (Windows only)
 26. Check for updates from within FreeFileSync automatically.
+27. Copy locked files using Windows Volume Shadow Copy. (Windows only)
+28. Load file icons asynchronously for maximum display performance.
 
 
 Advanced topics
@@ -91,6 +93,15 @@ Assuming you plan to synchronize two folders "C:\Source" and "D:\Target", you'll
 	Exclude: *\*
 	
 This will exclude all files and folders within the two directories that contain a "\" character. These are exactly the subfolders and -files you want to exclude.
+
+
+5.) Synchronize with FTP
+
+FreeFileSync does not support FTP directly. But the FTP functionality can be easily activated by mapping the FTP webspace to a drive letter:
+
+Example: Use the free utility NetDrive (http://www.netdrive.net/)
+- Add a "New Site" and specify site name, site URL, drive letter, account and password.
+- Use the newly created drive as if it were a regular hard disk.
 
 
 Links

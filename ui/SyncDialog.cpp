@@ -31,38 +31,30 @@ SyncDialog::SyncDialog(wxWindow* window,
     updateConfigIcons(cfg.compareVar, localSyncConfiguration);
 
     //set icons for this dialog
-    m_bitmapLeftOnly->SetBitmap(*globalResource.bitmapLeftOnly);
-    m_bitmapRightOnly->SetBitmap(*globalResource.bitmapRightOnly);
-    m_bitmapLeftNewer->SetBitmap(*globalResource.bitmapLeftNewer);
-    m_bitmapRightNewer->SetBitmap(*globalResource.bitmapRightNewer);
-    m_bitmapDifferent->SetBitmap(*globalResource.bitmapDifferent);
+    m_bitmapLeftOnly->SetBitmap(*GlobalResources::getInstance().bitmapLeftOnly);
+    m_bitmapRightOnly->SetBitmap(*GlobalResources::getInstance().bitmapRightOnly);
+    m_bitmapLeftNewer->SetBitmap(*GlobalResources::getInstance().bitmapLeftNewer);
+    m_bitmapRightNewer->SetBitmap(*GlobalResources::getInstance().bitmapRightNewer);
+    m_bitmapDifferent->SetBitmap(*GlobalResources::getInstance().bitmapDifferent);
 
     bSizer201->Layout(); //wxButtonWithImage size might have changed
 
     //set radiobutton
-    if (    localSyncConfiguration.exLeftSideOnly  == SYNC_DIR_RIGHT &&
-            localSyncConfiguration.exRightSideOnly == SYNC_DIR_RIGHT &&
-            localSyncConfiguration.leftNewer       == SYNC_DIR_RIGHT &&
-            localSyncConfiguration.rightNewer      == SYNC_DIR_RIGHT &&
-            localSyncConfiguration.different       == SYNC_DIR_RIGHT)
+    switch (localSyncConfiguration.getVariant())
+    {
+    case SyncConfiguration::MIRROR:
         m_radioBtn1->SetValue(true);    //one way ->
-
-    else if (localSyncConfiguration.exLeftSideOnly  == SYNC_DIR_RIGHT &&
-             localSyncConfiguration.exRightSideOnly == SYNC_DIR_NONE  &&
-             localSyncConfiguration.leftNewer       == SYNC_DIR_RIGHT &&
-             localSyncConfiguration.rightNewer      == SYNC_DIR_NONE  &&
-             localSyncConfiguration.different       == SYNC_DIR_NONE)
+        break;
+    case SyncConfiguration::UPDATE:
         m_radioBtnUpdate->SetValue(true);    //Update ->
-
-    else if (localSyncConfiguration.exLeftSideOnly  == SYNC_DIR_RIGHT &&
-             localSyncConfiguration.exRightSideOnly == SYNC_DIR_LEFT  &&
-             localSyncConfiguration.leftNewer       == SYNC_DIR_RIGHT &&
-             localSyncConfiguration.rightNewer      == SYNC_DIR_LEFT  &&
-             localSyncConfiguration.different       == SYNC_DIR_NONE)
+        break;
+    case SyncConfiguration::TWOWAY:
         m_radioBtn2->SetValue(true);    //two way <->
-
-    else
+        break;
+    case SyncConfiguration::CUSTOM:
         m_radioBtn3->SetValue(true);    //other
+        break;
+    }
 
     Fit();
 }
@@ -106,112 +98,112 @@ void SyncDialog::updateConfigIcons(const CompareVariant compareVar,
     switch (compareVar)
     {
     case CMP_BY_TIME_SIZE:
-        buttonLeftOnly->Show();
-        buttonRightOnly->Show();
-        buttonLeftNewer->Show();
+        buttonLeftOnly  ->Show();
+        buttonRightOnly ->Show();
+        buttonLeftNewer ->Show();
         buttonRightNewer->Show();
-        buttonDifferent->Hide();
+        buttonDifferent ->Hide();
 
-        bitmapLeftOnly->Show();
-        bitmapRightOnly->Show();
-        bitmapLeftNewer->Show();
+        bitmapLeftOnly  ->Show();
+        bitmapRightOnly ->Show();
+        bitmapLeftNewer ->Show();
         bitmapRightNewer->Show();
-        bitmapDifferent->Hide();
+        bitmapDifferent ->Hide();
         break;
 
     case CMP_BY_CONTENT:
-        buttonLeftOnly->Show();
-        buttonRightOnly->Show();
-        buttonLeftNewer->Hide();
+        buttonLeftOnly  ->Show();
+        buttonRightOnly ->Show();
+        buttonLeftNewer ->Hide();
         buttonRightNewer->Hide();
-        buttonDifferent->Show();
+        buttonDifferent ->Show();
 
-        bitmapLeftOnly->Show();
-        bitmapRightOnly->Show();
-        bitmapLeftNewer->Hide();
+        bitmapLeftOnly  ->Show();
+        bitmapRightOnly ->Show();
+        bitmapLeftNewer ->Hide();
         bitmapRightNewer->Hide();
-        bitmapDifferent->Show();
+        bitmapDifferent ->Show();
         break;
     }
 
 
     if (syncConfig.exLeftSideOnly == SYNC_DIR_RIGHT)
     {
-        buttonLeftOnly->SetBitmapLabel(*globalResource.bitmapArrowRightCr);
+        buttonLeftOnly->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowRightCr);
         buttonLeftOnly->SetToolTip(_("Copy from left to right"));
     }
     else if (syncConfig.exLeftSideOnly == SYNC_DIR_LEFT)
     {
-        buttonLeftOnly->SetBitmapLabel(*globalResource.bitmapDeleteLeft);
+        buttonLeftOnly->SetBitmapLabel(*GlobalResources::getInstance().bitmapDeleteLeft);
         buttonLeftOnly->SetToolTip(_("Delete files/folders existing on left side only"));
     }
     else if (syncConfig.exLeftSideOnly == SYNC_DIR_NONE)
     {
-        buttonLeftOnly->SetBitmapLabel(*globalResource.bitmapArrowNone);
+        buttonLeftOnly->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowNone);
         buttonLeftOnly->SetToolTip(_("Do nothing"));
     }
 
     if (syncConfig.exRightSideOnly == SYNC_DIR_RIGHT)
     {
-        buttonRightOnly->SetBitmapLabel(*globalResource.bitmapDeleteRight);
+        buttonRightOnly->SetBitmapLabel(*GlobalResources::getInstance().bitmapDeleteRight);
         buttonRightOnly->SetToolTip(_("Delete files/folders existing on right side only"));
     }
     else if (syncConfig.exRightSideOnly == SYNC_DIR_LEFT)
     {
-        buttonRightOnly->SetBitmapLabel(*globalResource.bitmapArrowLeftCr);
+        buttonRightOnly->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowLeftCr);
         buttonRightOnly->SetToolTip(_("Copy from right to left"));
     }
     else if (syncConfig.exRightSideOnly == SYNC_DIR_NONE)
     {
-        buttonRightOnly->SetBitmapLabel(*globalResource.bitmapArrowNone);
+        buttonRightOnly->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowNone);
         buttonRightOnly->SetToolTip(_("Do nothing"));
     }
 
     if (syncConfig.leftNewer == SYNC_DIR_RIGHT)
     {
-        buttonLeftNewer->SetBitmapLabel(*globalResource.bitmapArrowRight);
+        buttonLeftNewer->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowRight);
         buttonLeftNewer->SetToolTip(_("Copy from left to right overwriting"));
     }
     else if (syncConfig.leftNewer == SYNC_DIR_LEFT)
     {
-        buttonLeftNewer->SetBitmapLabel(*globalResource.bitmapArrowLeft);
+        buttonLeftNewer->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowLeft);
         buttonLeftNewer->SetToolTip(_("Copy from right to left overwriting"));
     }
     else if (syncConfig.leftNewer == SYNC_DIR_NONE)
     {
-        buttonLeftNewer->SetBitmapLabel(*globalResource.bitmapArrowNone);
+        buttonLeftNewer->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowNone);
         buttonLeftNewer->SetToolTip(_("Do nothing"));
     }
 
     if (syncConfig.rightNewer == SYNC_DIR_RIGHT)
     {
-        buttonRightNewer->SetBitmapLabel(*globalResource.bitmapArrowRight);
+        buttonRightNewer->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowRight);
         buttonRightNewer->SetToolTip(_("Copy from left to right overwriting"));
     }
     else if (syncConfig.rightNewer == SYNC_DIR_LEFT)
     {
-        buttonRightNewer->SetBitmapLabel(*globalResource.bitmapArrowLeft);
+        buttonRightNewer->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowLeft);
         buttonRightNewer->SetToolTip(_("Copy from right to left overwriting"));
     }
     else if (syncConfig.rightNewer == SYNC_DIR_NONE)
     {
-        buttonRightNewer->SetBitmapLabel(*globalResource.bitmapArrowNone);
+        buttonRightNewer->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowNone);
         buttonRightNewer->SetToolTip(_("Do nothing"));
     }
 
     if (syncConfig.different == SYNC_DIR_RIGHT)
     {
-        buttonDifferent->SetBitmapLabel(*globalResource.bitmapArrowRight);
+        buttonDifferent->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowRight);
         buttonDifferent->SetToolTip(_("Copy from left to right overwriting"));
     }
     else if (syncConfig.different == SYNC_DIR_LEFT)
     {
-        buttonDifferent->SetBitmapLabel(*globalResource.bitmapArrowLeft);
+        buttonDifferent->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowLeft);
         buttonDifferent->SetToolTip(_("Copy from right to left overwriting"));
     }
     else if (syncConfig.different == SYNC_DIR_NONE)
     {
-        buttonDifferent->SetBitmapLabel(*globalResource.bitmapArrowNone);
+        buttonDifferent->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowNone);
         buttonDifferent->SetToolTip(_("Do nothing"));
     }
 }
@@ -255,11 +247,7 @@ void SyncDialog::OnSelectRecycleBin(wxCommandEvent& event)
 
 void SyncDialog::OnSyncLeftToRight(wxCommandEvent& event)
 {
-    localSyncConfiguration.exLeftSideOnly  = SYNC_DIR_RIGHT;
-    localSyncConfiguration.exRightSideOnly = SYNC_DIR_RIGHT;
-    localSyncConfiguration.leftNewer       = SYNC_DIR_RIGHT;
-    localSyncConfiguration.rightNewer      = SYNC_DIR_RIGHT;
-    localSyncConfiguration.different       = SYNC_DIR_RIGHT;
+    localSyncConfiguration.setVariant(SyncConfiguration::MIRROR);
 
     updateConfigIcons(cfg.compareVar, localSyncConfiguration);
 
@@ -270,11 +258,7 @@ void SyncDialog::OnSyncLeftToRight(wxCommandEvent& event)
 
 void SyncDialog::OnSyncUpdate(wxCommandEvent& event)
 {
-    localSyncConfiguration.exLeftSideOnly  = SYNC_DIR_RIGHT;
-    localSyncConfiguration.exRightSideOnly = SYNC_DIR_NONE;
-    localSyncConfiguration.leftNewer       = SYNC_DIR_RIGHT;
-    localSyncConfiguration.rightNewer      = SYNC_DIR_NONE;
-    localSyncConfiguration.different       = SYNC_DIR_NONE;
+    localSyncConfiguration.setVariant(SyncConfiguration::UPDATE);
 
     updateConfigIcons(cfg.compareVar, localSyncConfiguration);
 
@@ -285,11 +269,7 @@ void SyncDialog::OnSyncUpdate(wxCommandEvent& event)
 
 void SyncDialog::OnSyncBothSides(wxCommandEvent& event)
 {
-    localSyncConfiguration.exLeftSideOnly  = SYNC_DIR_RIGHT;
-    localSyncConfiguration.exRightSideOnly = SYNC_DIR_LEFT;
-    localSyncConfiguration.leftNewer       = SYNC_DIR_RIGHT;
-    localSyncConfiguration.rightNewer      = SYNC_DIR_LEFT;
-    localSyncConfiguration.different       = SYNC_DIR_NONE;
+    localSyncConfiguration.setVariant(SyncConfiguration::TWOWAY);
 
     updateConfigIcons(cfg.compareVar, localSyncConfiguration);
 
@@ -430,14 +410,14 @@ void BatchDialog::init()
     dragDropOnLogfileDir.reset(new DragDropOnDlg(m_panelLogging, m_dirPickerLogfileDir, m_textCtrlLogfileDir));
 
     //set icons for this dialog
-    m_bitmapLeftOnly->SetBitmap(*globalResource.bitmapLeftOnly);
-    m_bitmapRightOnly->SetBitmap(*globalResource.bitmapRightOnly);
-    m_bitmapLeftNewer->SetBitmap(*globalResource.bitmapLeftNewer);
-    m_bitmapRightNewer->SetBitmap(*globalResource.bitmapRightNewer);
-    m_bitmapDifferent->SetBitmap(*globalResource.bitmapDifferent);
-    m_bitmap8->SetBitmap(*globalResource.bitmapInclude);
-    m_bitmap9->SetBitmap(*globalResource.bitmapExclude);
-    m_bitmap27->SetBitmap(*globalResource.bitmapBatch);
+    m_bitmapLeftOnly->SetBitmap(*GlobalResources::getInstance().bitmapLeftOnly);
+    m_bitmapRightOnly->SetBitmap(*GlobalResources::getInstance().bitmapRightOnly);
+    m_bitmapLeftNewer->SetBitmap(*GlobalResources::getInstance().bitmapLeftNewer);
+    m_bitmapRightNewer->SetBitmap(*GlobalResources::getInstance().bitmapRightNewer);
+    m_bitmapDifferent->SetBitmap(*GlobalResources::getInstance().bitmapDifferent);
+    m_bitmap8->SetBitmap(*GlobalResources::getInstance().bitmapInclude);
+    m_bitmap9->SetBitmap(*GlobalResources::getInstance().bitmapExclude);
+    m_bitmap27->SetBitmap(*GlobalResources::getInstance().bitmapBatch);
 }
 
 

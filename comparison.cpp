@@ -12,10 +12,7 @@
 #include "library/fileHandling.h"
 #include "synchronization.h"
 #include "library/filter.h"
-
-#ifdef FFS_WIN
-#include <wx/msw/wrapwin.h> //includes "windows.h"
-#endif  //FFS_WIN
+#include "library/processXml.h"
 
 using namespace FreeFileSync;
 
@@ -45,8 +42,13 @@ public:
     wxDirTraverseResult OnFile(const Zstring& fullFileName, const FileInfo& details) //virtual impl.
     {
         //apply filter before processing (use relative name!)
-        if (filterInstance && !filterInstance->matchesFileFilter(fullFileName.c_str() + prefixLength))
-            return wxDIR_CONTINUE;
+        if (filterInstance)
+            if (    !filterInstance->matchesFileFilterIncl(fullFileName.c_str() + prefixLength) ||
+                    filterInstance->matchesFileFilterExcl(fullFileName.c_str() + prefixLength))
+            {
+                statusHandler->requestUiRefresh();
+                return wxDIR_CONTINUE;
+            }
 
         FileDescrLine fileDescr;
         fileDescr.fullName         = fullFileName;
@@ -83,13 +85,26 @@ public:
     wxDirTraverseResult OnDir(const Zstring& fullDirName) //virtual impl.
     {
         //apply filter before processing (use relative name!)
-        if (filterInstance && !filterInstance->matchesDirFilter(fullDirName.c_str() + prefixLength))
-            return wxDIR_IGNORE;
-
+        if (filterInstance)
+        {
+            if (!filterInstance->matchesDirFilterIncl(fullDirName.c_str() + prefixLength))
+            {
+                statusHandler->requestUiRefresh(); //if not included: CONTINUE traversing subdirs
+                return wxDIR_CONTINUE;
+            }
+            else if (filterInstance->matchesDirFilterExcl(fullDirName.c_str() + prefixLength))
+            {
+                statusHandler->requestUiRefresh(); //if excluded: do NOT traverse subdirs
+                return wxDIR_IGNORE;
+            }
+        }
 #ifdef FFS_WIN
         if (    fullDirName.EndsWith(wxT("\\RECYCLER")) ||
                 fullDirName.EndsWith(wxT("\\System Volume Information")))
+        {
+            statusHandler->requestUiRefresh();
             return wxDIR_IGNORE;
+        }
 #endif  // FFS_WIN
 
         FileDescrLine fileDescr;
@@ -292,12 +307,12 @@ bool foldersHaveDependencies(const std::vector<FolderPair>& folderPairs, wxStrin
 CompareProcess::CompareProcess(const bool traverseSymLinks,
                                const unsigned int fileTimeTol,
                                const bool ignoreOneHourDiff,
-                               bool& warningDependentFolders,
+                               xmlAccess::WarningMessages& warnings,
                                const FilterProcess* filter, //may be NULL
                                StatusHandler* handler) :
         fileTimeTolerance(fileTimeTol),
         ignoreOneHourDifference(ignoreOneHourDiff),
-        m_warningDependentFolders(warningDependentFolders),
+        m_warnings(warnings),
         statusUpdater(handler),
         txtComparingContentOfFiles(Zstring(_("Comparing content of files %x")).Replace(wxT("%x"), wxT("\n\"%x\""), false))
 {
@@ -487,7 +502,7 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPair>& director
     //init process: keep at beginning so that all gui elements are initialized properly
     statusUpdater->initNewProcess(-1, 0, StatusHandler::PROCESS_SCANNING); //it's not known how many files will be scanned => -1 objects
 
-    //format directory pairs: ensure they end with GlobalResources::FILE_NAME_SEPARATOR!
+    //format directory pairs: ensure they end with FreeFileSync::FILE_NAME_SEPARATOR!
     std::vector<FolderPair> directoryPairsFormatted;
     for (std::vector<FolderPair>::const_iterator i = directoryPairs.begin(); i != directoryPairs.end(); ++i)
         directoryPairsFormatted.push_back(
@@ -505,7 +520,7 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPair>& director
     }
 
     //check if folders have dependencies
-    if (m_warningDependentFolders) //test if check should be executed
+    if (m_warnings.warningDependentFolders) //test if check should be executed
     {
         wxString warningMessage;
         if (foldersHaveDependencies(directoryPairsFormatted, warningMessage))
@@ -513,7 +528,7 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPair>& director
             bool dontShowAgain = false;
             statusUpdater->reportWarning(warningMessage.c_str(),
                                          dontShowAgain);
-            m_warningDependentFolders = !dontShowAgain;
+            m_warnings.warningDependentFolders = !dontShowAgain;
         }
     }
 
@@ -549,6 +564,59 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPair>& director
     {
         statusUpdater->reportFatalError((wxString(_("System out of memory!")) + wxT(" ") + wxString::From8BitData(e.what())).c_str());
         return; //should be obsolete!
+    }
+}
+
+
+//check for very old dates or dates in the future
+void CompareProcess::issueWarningInvalidDate(const Zstring& fileNameFull, const wxLongLong& utcTime)
+{
+    if (m_warnings.warningInvalidDate)
+    {
+        bool dontShowAgain = false;
+        Zstring msg = Zstring(_("File %x has an invalid date!")).Replace(wxT("%x"), Zstring(wxT("\"")) + fileNameFull + wxT("\""));
+        msg += Zstring(wxT("\n\n")) + _("Date") + wxT(": ") + utcTimeToLocalString(utcTime, fileNameFull).c_str();
+        statusUpdater->reportWarning(Zstring(_("Conflict detected:")) + wxT("\n") + msg,
+                                     dontShowAgain);
+        m_warnings.warningInvalidDate = !dontShowAgain;
+    }
+}
+
+
+//check for changed files with same modification date
+void CompareProcess::issueWarningSameDateDiffSize(const FileCompareLine& cmpLine)
+{
+    if (m_warnings.warningSameDateDiffSize)
+    {
+        bool dontShowAgain = false;
+        Zstring msg = Zstring(_("Files %x have the same date but a different size!")).Replace(wxT("%x"), Zstring(wxT("\"")) + cmpLine.fileDescrLeft.relativeName.c_str() + wxT("\""));
+        msg += wxT("\n\n");
+        msg += Zstring(_("Left:")) + wxT(" \t") + _("Date") + wxT(": ") + utcTimeToLocalString(cmpLine.fileDescrLeft.lastWriteTimeRaw,
+                cmpLine.fileDescrLeft.fullName).c_str() + wxT(" \t") + _("Size") + wxT(": ") + cmpLine.fileDescrLeft.fileSize.ToString().c_str() + wxT("\n");
+        msg += Zstring(_("Right:")) + wxT(" \t") + _("Date") + wxT(": ") + utcTimeToLocalString(cmpLine.fileDescrRight.lastWriteTimeRaw,
+                cmpLine.fileDescrRight.fullName).c_str() + wxT(" \t") + _("Size") + wxT(": ") + cmpLine.fileDescrRight.fileSize.ToString().c_str();
+
+        statusUpdater->reportWarning(Zstring(_("Conflict detected:")) + wxT("\n") + msg,
+                                     dontShowAgain);
+        m_warnings.warningSameDateDiffSize = !dontShowAgain;
+    }
+}
+
+
+//check for files that have a difference in file modification date below 1 hour when DST check is active
+void CompareProcess::issueWarningChangeWithinHour(const FileCompareLine& cmpLine)
+{
+    if (m_warnings.warningDSTChangeWithinHour)
+    {
+        bool dontShowAgain = false;
+        Zstring msg = Zstring(_("Files %x have a file time difference of less than 1 hour! It's not safe to decide which one is newer due to Daylight Saving Time issues.")).Replace(wxT("%x"), Zstring(wxT("\"")) + cmpLine.fileDescrLeft.relativeName.c_str() + wxT("\""));
+        msg += wxT("\n\n");
+        msg += Zstring(_("Left:")) + wxT(" \t") + _("Date") + wxT(": ") + utcTimeToLocalString(cmpLine.fileDescrLeft.lastWriteTimeRaw, cmpLine.fileDescrLeft.fullName).c_str() + wxT("\n");
+        msg += Zstring(_("Right:")) + wxT(" \t") + _("Date") + wxT(": ") + utcTimeToLocalString(cmpLine.fileDescrRight.lastWriteTimeRaw, cmpLine.fileDescrRight.fullName).c_str();
+
+        statusUpdater->reportWarning(Zstring(_("Conflict detected:")) + wxT("\n") + msg,
+                                     dontShowAgain);
+        m_warnings.warningDSTChangeWithinHour = !dontShowAgain;
     }
 }
 
@@ -596,6 +664,10 @@ void CompareProcess::compareByTimeSize(const std::vector<FolderPair>& directoryP
                             i->fileDescrRight.lastWriteTimeRaw > oneYearFromNow)   //dated more than one year in future
                     {
                         i->cmpResult = FILE_CONFLICT;
+                        if (i->fileDescrLeft.lastWriteTimeRaw < 0 || i->fileDescrLeft.lastWriteTimeRaw > oneYearFromNow)
+                            issueWarningInvalidDate(i->fileDescrLeft.fullName, i->fileDescrLeft.lastWriteTimeRaw);
+                        else
+                            issueWarningInvalidDate(i->fileDescrRight.fullName, i->fileDescrRight.lastWriteTimeRaw);
                     }
                     else //from this block on all dates are at least "valid"
                     {
@@ -605,7 +677,10 @@ void CompareProcess::compareByTimeSize(const std::vector<FolderPair>& directoryP
                             if (i->fileDescrLeft.fileSize == i->fileDescrRight.fileSize)
                                 i->cmpResult = FILE_EQUAL;
                             else
+                            {
                                 i->cmpResult = FILE_CONFLICT; //same date, different filesize
+                                issueWarningSameDateDiffSize(*i);
+                            }
                         }
                         else
                         {
@@ -616,13 +691,17 @@ void CompareProcess::compareByTimeSize(const std::vector<FolderPair>& directoryP
                                 if (sameFileTime(i->fileDescrLeft.lastWriteTimeRaw, i->fileDescrRight.lastWriteTimeRaw, 3600 - 2 - 1))
                                 {
                                     i->cmpResult = FILE_CONFLICT;
+                                    issueWarningChangeWithinHour(*i);
                                 }
                                 else //exact +/- 1-hour detected: treat as equal
                                 {
                                     if (i->fileDescrLeft.fileSize == i->fileDescrRight.fileSize)
                                         i->cmpResult = FILE_EQUAL;
                                     else
+                                    {
                                         i->cmpResult = FILE_CONFLICT; //same date, different filesize
+                                        issueWarningSameDateDiffSize(*i);
+                                    }
                                 }
                             }
                             else
@@ -640,7 +719,10 @@ void CompareProcess::compareByTimeSize(const std::vector<FolderPair>& directoryP
                     if (i->fileDescrLeft.fileSize == i->fileDescrRight.fileSize)
                         i->cmpResult = FILE_EQUAL;
                     else
+                    {
                         i->cmpResult = FILE_CONFLICT; //same date, different filesize
+                        issueWarningSameDateDiffSize(*i);
+                    }
                 }
             }
     }
@@ -655,7 +737,7 @@ public:
 
     ~RemoveAtExit()
     {
-        removeRowsFromVector(gridToWrite, rowsToDelete);
+        globalFunctions::removeRowsFromVector(rowsToDelete, gridToWrite);
     }
 
     void markRow(int nr)
@@ -679,7 +761,7 @@ void getBytesToCompare(const FolderComparison& grid, const FolderCompRef& rowsTo
         const FileComparison& fileCmp = j->fileCmp;
 
         const std::set<int>& index = rowsToCompare[j - grid.begin()];
-        for (std::set<int>::iterator i = index.begin(); i != index.end(); ++i)
+        for (std::set<int>::const_iterator i = index.begin(); i != index.end(); ++i)
         {
             const FileCompareLine& line = fileCmp[*i];
             dataTotal += line.fileDescrLeft.fileSize;
@@ -749,7 +831,7 @@ void CompareProcess::compareByContent(const std::vector<FolderPair>& directoryPa
         RemoveAtExit removeRowsAtExit(fileCmp); //note: running at individual folder pair level!
 
         const std::set<int>& index = rowsToCompareBytewise[j - output.begin()];
-        for (std::set<int>::iterator i = index.begin(); i != index.end(); ++i)
+        for (std::set<int>::const_iterator i = index.begin(); i != index.end(); ++i)
         {
             FileCompareLine& gridline = fileCmp[*i];
 

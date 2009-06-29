@@ -2,8 +2,15 @@
 #define SYNCHRONIZATION_H_INCLUDED
 
 #include "structures.h"
+#include "library/processXml.h"
+#include <memory>
+
+#ifdef FFS_WIN
+#include "library/shadow.h"
+#endif
 
 class StatusHandler;
+class wxBitmap;
 
 
 namespace FreeFileSync
@@ -17,7 +24,25 @@ namespace FreeFileSync
 
     bool synchronizationNeeded(const FolderComparison& folderCmp);
 
-    void redetermineSyncDirection(const SyncConfiguration& config, FolderComparison& folderCmp);
+
+    enum SyncOperation
+    {
+        SO_CREATE_NEW_LEFT,
+        SO_CREATE_NEW_RIGHT,
+        SO_DELETE_LEFT,
+        SO_DELETE_RIGHT,
+        SO_OVERWRITE_RIGHT,
+        SO_OVERWRITE_LEFT,
+        SO_DO_NOTHING,
+        SO_UNRESOLVED_CONFLICT
+    };
+    SyncOperation getSyncOperation(const CompareFilesResult cmpResult,
+                                   const bool selectedForSynchronization,
+                                   const SyncDirection syncDir); //evaluate comparison result and sync direction
+
+    const wxBitmap& getSyncOpImage(const CompareFilesResult cmpResult,
+                                   const bool selectedForSynchronization,
+                                   const SyncDirection syncDir);
 
     //class handling synchronization process
     class SyncProcess
@@ -26,9 +51,7 @@ namespace FreeFileSync
         SyncProcess(const bool useRecycler,
                     const bool copyFileSymLinks,
                     const bool traverseDirSymLinks,
-                    bool& warningSignificantDifference,
-                    bool& warningNotEnoughDiskSpace,
-                    bool& warningUnresolvedConflict,
+                    xmlAccess::WarningMessages& warnings,
                     StatusHandler* handler);
 
         void startSynchronizationProcess(FolderComparison& folderCmp);
@@ -44,9 +67,12 @@ namespace FreeFileSync
         const bool m_traverseDirSymLinks;
 
         //warnings
-        bool& m_warningSignificantDifference;
-        bool& m_warningNotEnoughDiskSpace;
-        bool& m_warningUnresolvedConflict;
+        xmlAccess::WarningMessages& m_warnings;
+
+#ifdef FFS_WIN
+        //shadow copy buffer
+        std::auto_ptr<ShadowCopy> shadowCopyHandler;
+#endif
 
         StatusHandler* statusUpdater;
 

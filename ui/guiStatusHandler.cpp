@@ -12,6 +12,7 @@ CompareStatusHandler::CompareStatusHandler(MainDialog* dlg) :
 {
     //prevent user input during "compare", do not disable maindialog since abort-button would also be disabled
     //it's not nice, but works
+    mainDialog->m_notebookBottomLeft->Disable();
     mainDialog->m_radioBtnSizeDate->Disable();
     mainDialog->m_radioBtnContent->Disable();
     mainDialog->m_bpButtonFilter->Disable();
@@ -21,7 +22,7 @@ CompareStatusHandler::CompareStatusHandler(MainDialog* dlg) :
     mainDialog->m_buttonStartSync->Disable();
     mainDialog->m_dirPickerLeft->Disable();
     mainDialog->m_dirPickerRight->Disable();
-    mainDialog->m_bpButtonSwitchView->Disable();
+    mainDialog->m_bpButtonSwapSides->Disable();
     mainDialog->m_bpButtonLeftOnly->Disable();
     mainDialog->m_bpButtonLeftNewer->Disable();
     mainDialog->m_bpButtonEqual->Disable();
@@ -66,6 +67,7 @@ CompareStatusHandler::~CompareStatusHandler()
     updateUiNow(); //ui update before enabling buttons again: prevent strange behaviour of delayed button clicks
 
     //reenable complete main dialog
+    mainDialog->m_notebookBottomLeft->Enable();
     mainDialog->m_radioBtnSizeDate->Enable();
     mainDialog->m_radioBtnContent->Enable();
     mainDialog->m_bpButtonFilter->Enable();
@@ -75,7 +77,7 @@ CompareStatusHandler::~CompareStatusHandler()
     mainDialog->m_buttonStartSync->Enable();
     mainDialog->m_dirPickerLeft->Enable();
     mainDialog->m_dirPickerRight->Enable();
-    mainDialog->m_bpButtonSwitchView->Enable();
+    mainDialog->m_bpButtonSwapSides->Enable();
     mainDialog->m_bpButtonLeftOnly->Enable();
     mainDialog->m_bpButtonLeftNewer->Enable();
     mainDialog->m_bpButtonEqual->Enable();

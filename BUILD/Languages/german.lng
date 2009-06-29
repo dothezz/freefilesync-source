@@ -176,6 +176,8 @@ Build:
 Build:
 Cancel
 Abbrechen
+Change direction
+Richtung ändern
 Check all
 Alles auswählen
 Choose to hide filtered files/directories from list
@@ -218,6 +220,8 @@ Configure your own synchronization rules.
 Eigene Synchronisationsregeln definieren.
 Confirm
 Bestätigen
+Conflict detected:
+Ein Konflikt wurde erkannt:
 Continue
 Fortfahren
 Conversion error:
@@ -238,6 +242,8 @@ Copying file %x to %y
 Kopiere Datei %x nach %y
 Copying file %x to %y overwriting target
 Kopiere Datei %x nach %y und überschreibe Ziel
+Could not determine volume name for file:
+Der Laufwerksname für folgende Datei konnte nicht ermittelt werden:
 Could not set working directory:
 Das Arbeitsverzeichnis konnte nicht gesetzt werden:
 Create a batch job
@@ -278,8 +284,8 @@ Directory does not exist:
 Das Verzeichnis existiert nicht:
 Do not display visual status information but write to a logfile instead
 Keine graphischen Statusinformationen anzeigen, sondern eine Logdatei schreiben
-Do not show this warning again
-Diese Warnung nicht mehr anzeigen
+Do not show this dialog again
+Diesen Dialog nicht mehr anzeigen
 Do nothing
 Nichts tun
 Do you really want to delete the following objects(s)?
@@ -306,6 +312,8 @@ Error changing modification time:
 Fehler beim Setzen der Dateiänderungszeit:
 Error copying file:
 Fehler beim Kopieren der Datei:
+Error copying locked file %x!
+Fehler beim Kopieren der gesperrten Datei %x!
 Error creating directory:
 Fehler beim Erstellen des Verzeichnisses:
 Error deleting directory:
@@ -330,6 +338,8 @@ Error resolving symbolic link:
 Fehler beim Auflösen des Symbolischen Links:
 Error retrieving full path:
 Fehler beim Ermitteln des kompletten Pfades:
+Error starting Volume Shadow Copy Service!
+Fehler beim Starten des Volume Shadow Copy Service!
 Error traversing directory:
 Fehler beim Durchsuchen des Verzeichnisses:
 Error writing file attributes:
@@ -352,6 +362,8 @@ Exit with RC < 0
 Beenden mit RC < 0
 Feedback and suggestions are welcome at:
 Feedback und Vorschläge sind willkommen unter:
+File %x has an invalid date!
+Die Datei %x hat ein ungültiges Datum!
 File Manager integration:
 Einbinden des Dateimanagers:
 File Time tolerance (seconds):
@@ -370,6 +382,10 @@ File times that differ by up to the specified number of seconds are still handle
 Dateiänderungszeiten, die um bis zu der angegebenen Anzahl an Sekunden abweichen, werden trotzdem als gleich angesehen.
 Filename
 Dateiname
+Files %x have a file time difference of less than 1 hour! It's not safe to decide which one is newer due to Daylight Saving Time issues.
+Die Dateien %x haben eine Abweichung der Dateizeit von unter einer Stunde! Aufgrund der Zeitumstellungsproblematik kann nicht zweifelsfrei festgestellt werden, welche die aktuellere ist.
+Files %x have the same date but a different size!
+Die Dateien %x haben dasselbe Datum, aber eine unterschiedliche Größe!
 Files are found equal if\n     - file content\nis the same.
 Dateien gelten als gleich, wenn\n     - der Inhalt\ngleich ist.
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
@@ -500,6 +516,8 @@ Move column down
 Spalte nach unten verschieben
 Move column up
 Spalte nach oben verschieben
+Moving %x to Recycle Bin
+Verschiebe %x in den Papierkorb
 Not all items have been synchronized! Have a look at the list.
 Nicht alle Elemente wurden synchronisiert! Siehe verbliebene Elemente im Hauptfenster.
 Not enough free disk space available in:
@@ -528,12 +546,12 @@ Pause
 Pause
 Paused
 Angehalten
+Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
+Um diese Funktionalität zu aktivieren, bitte die entsprechende Datei \"Shadow.dll\" (siehe Archiv \"Shadow.zip\") in das FreeFileSync Installationsverzeichnis kopieren.
 Please fill all empty directory fields.
 Bitte die leeren Verzeichnisfelder füllen.
 Press button to activate filter
 Taste drücken, um Filter zu aktivieren
-Preview
-Vorschau
 Published under the GNU General Public License:
 Veröffentlicht unter der GNU General Public License:
 Question
@@ -614,6 +632,8 @@ Start
 Start
 Start synchronization
 Synchronisation starten
+Statistics
+Statistiken
 Stop
 Stop
 Swap sides
@@ -626,8 +646,6 @@ Synchronization completed successfully!
 Synchronisation erfolgreich abgeschlossen!
 Synchronization completed with errors!
 Synchronisation mit Fehlern abgeschlossen!
-Synchronization filter
-Filter für Synchronisation
 Synchronization settings
 Synchronisationseinstellungen
 Synchronization status
@@ -636,6 +654,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 Alle .doc, .zip und .exe Dateien mit Ausnahme des Verzeichnisses \"temp\" werden synchronisiert.
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Beide Seiten gleichzeitig synchronisieren: Neue oder aktualisierte Dateien werden in beide Richtungen kopiert.
+Synchronize...
+Synchronisieren
 Synchronizing...
 Synchronisiere...
 System out of memory!
@@ -680,6 +700,10 @@ Use Recycle Bin
 Papierkorb verwenden
 Use Recycle Bin when deleting or overwriting files during synchronization
 Papierkorb für zu löschende oder zu überschreibende Dateien nutzen
+Variant
+Variante
+Volume name %x not part of filename %y!
+Laufwerksname %x ist kein Teil des Dateinamens %y!
 Warning
 Warnung
 Warning: Synchronization failed for %x item(s):
@@ -687,7 +711,7 @@ Warnung: Synchronisation fehlgeschlagen für %x Element(e):
 Warnings:
 Warnungen:
 When the comparison is started with this option set the following decision tree is processed:
-Wenn der Vergleich mit dieser Option gestarted wurde, wird folgender Entscheidungsbaum abgearbeitet:
+Wenn der Vergleich mit dieser Option gestartet wurde, wird folgender Entscheidungsbaum abgearbeitet:
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Verbliebene Elemente können nochmals synchronisiert werden (OHNE dass ein erneuter Vergleich notwendig ist)!
 different

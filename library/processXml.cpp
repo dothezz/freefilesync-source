@@ -11,15 +11,12 @@
 
 using namespace FreeFileSync;
 
-const wxString xmlAccess::LAST_CONFIG_FILE   = wxT("LastRun.ffs_gui");
-const wxString xmlAccess::GLOBAL_CONFIG_FILE = wxT("GlobalSettings.xml");
-
 
 //small helper functions
 bool readXmlElementValue(std::string& output,                  const TiXmlElement* parent, const std::string& name);
 bool readXmlElementValue(int& output,                          const TiXmlElement* parent, const std::string& name);
 bool readXmlElementValue(CompareVariant& output,               const TiXmlElement* parent, const std::string& name);
-bool readXmlElementValue(SyncDirection& output, const TiXmlElement* parent, const std::string& name);
+bool readXmlElementValue(SyncDirection& output,                const TiXmlElement* parent, const std::string& name);
 bool readXmlElementValue(bool& output,                         const TiXmlElement* parent, const std::string& name);
 
 void addXmlElement(TiXmlElement* parent, const std::string& name, const std::string& value);
@@ -158,18 +155,18 @@ xmlAccess::XmlBatchConfig xmlAccess::readBatchConfig(const wxString& filename)
 xmlAccess::XmlGlobalSettings xmlAccess::readGlobalSettings()
 {
     //load XML
-    if (!wxFileExists(xmlAccess::GLOBAL_CONFIG_FILE))
-        throw FileError(Zstring(_("File does not exist:")) + wxT(" \"") + xmlAccess::GLOBAL_CONFIG_FILE.c_str() + wxT("\""));
+    if (!wxFileExists(FreeFileSync::getGlobalConfigFile()))
+        throw FileError(Zstring(_("File does not exist:")) + wxT(" \"") + FreeFileSync::getGlobalConfigFile().c_str() + wxT("\""));
 
-    XmlConfigInput inputFile(xmlAccess::GLOBAL_CONFIG_FILE, XML_GLOBAL_SETTINGS);
+    XmlConfigInput inputFile(FreeFileSync::getGlobalConfigFile(), XML_GLOBAL_SETTINGS);
 
     XmlGlobalSettings outputCfg;
 
     if (!inputFile.loadedSuccessfully())
-        throw FileError(Zstring(_("Error reading file:")) + wxT(" \"") + xmlAccess::GLOBAL_CONFIG_FILE.c_str() + wxT("\""));
+        throw FileError(Zstring(_("Error reading file:")) + wxT(" \"") + FreeFileSync::getGlobalConfigFile().c_str() + wxT("\""));
 
     if (!inputFile.readXmlGlobalSettings(outputCfg))
-        throw FileError(Zstring(_("Error parsing configuration file:")) + wxT(" \"") + xmlAccess::GLOBAL_CONFIG_FILE.c_str() + wxT("\""));
+        throw FileError(Zstring(_("Error parsing configuration file:")) + wxT(" \"") + FreeFileSync::getGlobalConfigFile().c_str() + wxT("\""));
 
     return outputCfg;
 }
@@ -201,12 +198,12 @@ void xmlAccess::writeBatchConfig(const wxString& filename, const XmlBatchConfig&
 
 void xmlAccess::writeGlobalSettings(const XmlGlobalSettings& outputCfg)
 {
-    XmlConfigOutput outputFile(xmlAccess::GLOBAL_CONFIG_FILE, XML_GLOBAL_SETTINGS);
+    XmlConfigOutput outputFile(FreeFileSync::getGlobalConfigFile(), XML_GLOBAL_SETTINGS);
 
     //populate and write XML tree
     if (    !outputFile.writeXmlGlobalSettings(outputCfg) || //add GUI layout configuration settings
             !outputFile.writeToFile()) //save XML
-        throw FileError(Zstring(_("Error writing file:")) + wxT(" \"") + xmlAccess::GLOBAL_CONFIG_FILE.c_str() + wxT("\""));
+        throw FileError(Zstring(_("Error writing file:")) + wxT(" \"") + FreeFileSync::getGlobalConfigFile().c_str() + wxT("\""));
     return;
 }
 
@@ -509,43 +506,49 @@ bool XmlConfigInput::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputC
     if (global)
     {
         //try to read program language setting
-        readXmlElementValue(outputCfg.shared.programLanguage, global, "Language");
+        readXmlElementValue(outputCfg.programLanguage, global, "Language");
 
         //max. allowed file time deviation
         int dummy = 0;
         if (readXmlElementValue(dummy, global, "FileTimeTolerance"))
-            outputCfg.shared.fileTimeTolerance = dummy;
+            outputCfg.fileTimeTolerance = dummy;
 
         //ignore +/- 1 hour due to DST change
-        readXmlElementValue(outputCfg.shared.ignoreOneHourDiff, global, "IgnoreOneHourDifference");
+        readXmlElementValue(outputCfg.ignoreOneHourDiff, global, "IgnoreOneHourDifference");
 
         //traverse into symbolic links (to folders)
-        readXmlElementValue(outputCfg.shared.traverseDirectorySymlinks, global, "TraverseDirectorySymlinks");
+        readXmlElementValue(outputCfg.traverseDirectorySymlinks, global, "TraverseDirectorySymlinks");
 
         //copy symbolic links to files
-        readXmlElementValue(outputCfg.shared.copyFileSymlinks, global, "CopyFileSymlinks");
+        readXmlElementValue(outputCfg.copyFileSymlinks, global, "CopyFileSymlinks");
 
         //last update check
-        readXmlElementValue(outputCfg.shared.lastUpdateCheck, global, "LastCheckForUpdates");
+        readXmlElementValue(outputCfg.lastUpdateCheck, global, "LastCheckForUpdates");
     }
 
     TiXmlElement* warnings = hRoot.FirstChild("Shared").FirstChild("Warnings").ToElement();
     if (warnings)
     {
         //folder dependency check
-        readXmlElementValue(outputCfg.shared.warningDependentFolders, warnings, "CheckForDependentFolders");
+        readXmlElementValue(outputCfg.warnings.warningDependentFolders, warnings, "CheckForDependentFolders");
 
         //significant difference check
-        readXmlElementValue(outputCfg.shared.warningSignificantDifference, warnings, "CheckForSignificantDifference");
+        readXmlElementValue(outputCfg.warnings.warningSignificantDifference, warnings, "CheckForSignificantDifference");
 
         //check free disk space
-        readXmlElementValue(outputCfg.shared.warningNotEnoughDiskSpace, warnings, "CheckForFreeDiskSpace");
+        readXmlElementValue(outputCfg.warnings.warningNotEnoughDiskSpace, warnings, "CheckForFreeDiskSpace");
 
         //check for unresolved conflicts
-        readXmlElementValue(outputCfg.shared.warningUnresolvedConflicts, warnings, "CheckForUnresolvedConflicts");
+        readXmlElementValue(outputCfg.warnings.warningUnresolvedConflicts, warnings, "CheckForUnresolvedConflicts");
 
-        //small reminder that synchronization will be starting immediately
-        readXmlElementValue(outputCfg.shared.warningSynchronizationStarting, warnings, "SynchronizationStarting");
+        //check for very old dates or dates in the future
+        readXmlElementValue(outputCfg.warnings.warningInvalidDate, warnings, "CheckForInvalidFileDate");
+
+        //check for changed files with same modification date
+        readXmlElementValue(outputCfg.warnings.warningSameDateDiffSize, warnings, "SameDateDifferentFileSize");
+
+        //check for files that have a difference in file modification date below 1 hour when DST check is active
+        readXmlElementValue(outputCfg.warnings.warningDSTChangeWithinHour, warnings, "FileChangeWithinHour");
     }
 
     //gui specific global settings (optional)
@@ -553,16 +556,18 @@ bool XmlConfigInput::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputC
     if (mainWindow)
     {
         //read application window size and position
-        readXmlElementValue(outputCfg.gui.widthNotMaximized, mainWindow, "Width");
+        readXmlElementValue(outputCfg.gui.widthNotMaximized,  mainWindow, "Width");
         readXmlElementValue(outputCfg.gui.heightNotMaximized, mainWindow, "Height");
-        readXmlElementValue(outputCfg.gui.posXNotMaximized, mainWindow, "PosX");
-        readXmlElementValue(outputCfg.gui.posYNotMaximized, mainWindow, "PosY");
-        readXmlElementValue(outputCfg.gui.isMaximized, mainWindow, "Maximized");
+        readXmlElementValue(outputCfg.gui.posXNotMaximized,   mainWindow, "PosX");
+        readXmlElementValue(outputCfg.gui.posYNotMaximized,   mainWindow, "PosY");
+        readXmlElementValue(outputCfg.gui.isMaximized,        mainWindow, "Maximized");
 
-        readXmlElementValue(outputCfg.gui.deleteOnBothSides, mainWindow, "ManualDeletionOnBothSides");
+        readXmlElementValue(outputCfg.gui.deleteOnBothSides,            mainWindow, "ManualDeletionOnBothSides");
         readXmlElementValue(outputCfg.gui.useRecyclerForManualDeletion, mainWindow, "ManualDeletionUseRecycler");
-        readXmlElementValue(outputCfg.gui.showFileIcons, mainWindow, "ShowFileIcons");
-        readXmlElementValue(outputCfg.gui.popupOnConfigChange, mainWindow, "PopupOnConfigChange");
+        readXmlElementValue(outputCfg.gui.showFileIconsLeft,            mainWindow, "ShowFileIconsLeft");
+        readXmlElementValue(outputCfg.gui.showFileIconsRight,           mainWindow, "ShowFileIconsRight");
+        readXmlElementValue(outputCfg.gui.popupOnConfigChange,          mainWindow, "PopupOnConfigChange");
+        readXmlElementValue(outputCfg.gui.showSummaryBeforeSync,        mainWindow, "SummaryBeforeSync");
 
 //###########################################################
         //read column attributes
@@ -638,6 +643,8 @@ bool XmlConfigInput::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputC
             //load config history elements
             readXmlElementTable(outputCfg.gui.folderHistoryRight, historyRight, "Folder");
         }
+
+        readXmlElementValue(outputCfg.gui.selectedTabBottomLeft, mainWindow, "SelectedTabBottomLeft");
     }
 
     TiXmlElement* gui = hRoot.FirstChild("Gui").ToElement();
@@ -666,9 +673,6 @@ bool XmlConfigInput::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputC
 //batch specific global settings
     TiXmlElement* batch = hRoot.FirstChild("Batch").ToElement();
     if (!batch) return false;
-
-
-//    if (!readXmlElementValue(outputCfg.dummy, global, "Language")) return false;
 
     return true;
 }
@@ -889,41 +893,47 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings&
     root->LinkEndChild(global);
 
     //program language
-    addXmlElement(global, "Language", inputCfg.shared.programLanguage);
+    addXmlElement(global, "Language", inputCfg.programLanguage);
 
     //max. allowed file time deviation
-    addXmlElement(global, "FileTimeTolerance", int(inputCfg.shared.fileTimeTolerance));
+    addXmlElement(global, "FileTimeTolerance", int(inputCfg.fileTimeTolerance));
 
     //ignore +/- 1 hour due to DST change
-    addXmlElement(global, "IgnoreOneHourDifference", inputCfg.shared.ignoreOneHourDiff);
+    addXmlElement(global, "IgnoreOneHourDifference", inputCfg.ignoreOneHourDiff);
 
     //traverse into symbolic links (to folders)
-    addXmlElement(global, "TraverseDirectorySymlinks", inputCfg.shared.traverseDirectorySymlinks);
+    addXmlElement(global, "TraverseDirectorySymlinks", inputCfg.traverseDirectorySymlinks);
 
     //copy symbolic links to files
-    addXmlElement(global, "CopyFileSymlinks", inputCfg.shared.copyFileSymlinks);
+    addXmlElement(global, "CopyFileSymlinks", inputCfg.copyFileSymlinks);
 
     //last update check
-    addXmlElement(global, "LastCheckForUpdates", inputCfg.shared.lastUpdateCheck);
+    addXmlElement(global, "LastCheckForUpdates", inputCfg.lastUpdateCheck);
 
     //warnings
     TiXmlElement* warnings = new TiXmlElement("Warnings");
     global->LinkEndChild(warnings);
 
     //warning: dependent folders
-    addXmlElement(warnings, "CheckForDependentFolders", inputCfg.shared.warningDependentFolders);
+    addXmlElement(warnings, "CheckForDependentFolders", inputCfg.warnings.warningDependentFolders);
 
     //significant difference check
-    addXmlElement(warnings, "CheckForSignificantDifference", inputCfg.shared.warningSignificantDifference);
+    addXmlElement(warnings, "CheckForSignificantDifference", inputCfg.warnings.warningSignificantDifference);
 
     //check free disk space
-    addXmlElement(warnings, "CheckForFreeDiskSpace", inputCfg.shared.warningNotEnoughDiskSpace);
+    addXmlElement(warnings, "CheckForFreeDiskSpace", inputCfg.warnings.warningNotEnoughDiskSpace);
 
     //check for unresolved conflicts
-    addXmlElement(warnings, "CheckForUnresolvedConflicts", inputCfg.shared.warningUnresolvedConflicts);
+    addXmlElement(warnings, "CheckForUnresolvedConflicts", inputCfg.warnings.warningUnresolvedConflicts);
 
-    //small reminder that synchronization will be starting immediately
-    addXmlElement(warnings, "SynchronizationStarting", inputCfg.shared.warningSynchronizationStarting);
+    //check for very old dates or dates in the future
+    addXmlElement(warnings, "CheckForInvalidFileDate", inputCfg.warnings.warningInvalidDate);
+
+    //check for changed files with same modification date
+    addXmlElement(warnings, "SameDateDifferentFileSize", inputCfg.warnings.warningSameDateDiffSize);
+
+    //check for files that have a difference in file modification date below 1 hour when DST check is active
+    addXmlElement(warnings, "FileChangeWithinHour", inputCfg.warnings.warningDSTChangeWithinHour);
 
 
     //###################################################################
@@ -948,8 +958,10 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings&
 
     addXmlElement(mainWindow, "ManualDeletionOnBothSides", inputCfg.gui.deleteOnBothSides);
     addXmlElement(mainWindow, "ManualDeletionUseRecycler", inputCfg.gui.useRecyclerForManualDeletion);
-    addXmlElement(mainWindow, "ShowFileIcons"            , inputCfg.gui.showFileIcons);
-    addXmlElement(mainWindow, "PopupOnConfigChange"      , inputCfg.gui.popupOnConfigChange);
+    addXmlElement(mainWindow, "ShowFileIconsLeft",         inputCfg.gui.showFileIconsLeft);
+    addXmlElement(mainWindow, "ShowFileIconsRight",        inputCfg.gui.showFileIconsRight);
+    addXmlElement(mainWindow, "PopupOnConfigChange",       inputCfg.gui.popupOnConfigChange);
+    addXmlElement(mainWindow, "SummaryBeforeSync",         inputCfg.gui.showSummaryBeforeSync);
 
     //write column attributes
     TiXmlElement* leftColumn = new TiXmlElement("LeftColumns");
@@ -996,6 +1008,7 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings&
     historyRight->SetAttribute("MaximumSize", globalFunctions::numberToString(inputCfg.gui.folderHistRightMax));
     addXmlElementTable(historyRight, "Folder", inputCfg.gui.folderHistoryRight);
 
+    addXmlElement(mainWindow, "SelectedTabBottomLeft", inputCfg.gui.selectedTabBottomLeft);
 
     //commandline for file manager integration
     addXmlElement(gui, "FileManager", std::string((inputCfg.gui.commandLineFileManager).ToUTF8()));
@@ -1056,6 +1069,10 @@ int xmlAccess::retrieveSystemLanguage()
     case wxLANGUAGE_CHINESE_TAIWAN:
         return wxLANGUAGE_CHINESE_SIMPLIFIED;
 
+        //variants of wxLANGUAGE_RUSSIAN
+    case wxLANGUAGE_RUSSIAN_UKRAINE:
+        return wxLANGUAGE_RUSSIAN;
+
         //variants of wxLANGUAGE_SPANISH
     case wxLANGUAGE_SPANISH_ARGENTINA:
     case wxLANGUAGE_SPANISH_BOLIVIA:
@@ -1110,11 +1127,13 @@ bool xmlAccess::supportForSymbolicLinks()
 }
 
 
-void xmlAccess::XmlGlobalSettings::_Shared::resetWarnings()
+void xmlAccess::WarningMessages::resetWarnings()
 {
     warningDependentFolders        = true;
     warningSignificantDifference   = true;
     warningNotEnoughDiskSpace      = true;
     warningUnresolvedConflicts     = true;
-    warningSynchronizationStarting = true;
+    warningInvalidDate             = true;
+    warningSameDateDiffSize        = true;
+    warningDSTChangeWithinHour     = true;
 }

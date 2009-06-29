@@ -4,7 +4,7 @@
 using FreeFileSync::GridView;
 
 
-GridView::GridView(FolderComparison& results) :
+GridView::GridView(FreeFileSync::FolderComparison& results) :
         leftOnlyFilesActive(false),
         rightOnlyFilesActive(false),
         leftNewerFilesActive(false),
@@ -48,26 +48,24 @@ GridView::StatusInfo GridView::update_sub(const bool hideFiltered)
     {
         const FileComparison& fileCmp = j->fileCmp;
 
-        output.objectsTotal += j->fileCmp.size();
-
         RefIndex newEntry;
         newEntry.folderIndex = j - folderCmp.begin();
 
         for (FileComparison::const_iterator i = fileCmp.begin(); i != fileCmp.end(); ++i)
         {
-            //hide filtered row, if corresponding option is set
-            if (hideFiltered && !i->selectedForSynchronization)
-                continue;
-
             //process UI filter settings
             if (syncPreviewActive) //synchronization preview
             {
                 //exclude result "=="
-                if (i->cmpResult == FILE_EQUAL) //note: consider elementsTotal()!
-                {
-                    --output.objectsTotal;
+                if (i->cmpResult == FILE_EQUAL) //note: consider "objectsTotal"
                     continue;
-                }
+
+                output.objectsTotal++;
+
+                //hide filtered row, if corresponding option is set
+                if (hideFiltered && !i->selectedForSynchronization) //keep AFTER "objectsTotal++"
+                    continue;
+
 
                 switch (i->direction)
                 {
@@ -91,6 +89,12 @@ GridView::StatusInfo GridView::update_sub(const bool hideFiltered)
             }
             else //comparison results view
             {
+                output.objectsTotal++;
+
+                //hide filtered row, if corresponding option is set
+                if (hideFiltered && !i->selectedForSynchronization)
+                    continue;
+
                 switch (i->cmpResult)
                 {
                 case FILE_LEFT_SIDE_ONLY:
@@ -164,13 +168,13 @@ GridView::StatusInfo GridView::update(const bool hideFiltered, const bool syncPr
 }
 
 
-void GridView::viewRefToFolderRef(const std::set<int>& viewRef, FolderCompRef& output)
+void GridView::viewRefToFolderRef(const std::set<int>& viewRef, FreeFileSync::FolderCompRef& output)
 {
     output.clear();
     for (int i = 0; i < int(folderCmp.size()); ++i)
         output.push_back(std::set<int>());      //avoid copy by value for full set<int>
 
-    for (std::set<int>::iterator i = viewRef.begin(); i != viewRef.end(); ++i)
+    for (std::set<int>::const_iterator i = viewRef.begin(); i != viewRef.end(); ++i)
     {
         const unsigned int folder = refView[*i].folderIndex;
         const unsigned int row    = refView[*i].rowIndex;
@@ -260,6 +264,10 @@ void GridView::sortView(const SortType type, const bool onLeft, const bool ascen
         case SORT_BY_CMP_RESULT:
             if      ( ascending) std::sort(fileCmp.begin(), fileCmp.end(), sortByCmpResult<ASCENDING>);
             else if (!ascending) std::sort(fileCmp.begin(), fileCmp.end(), sortByCmpResult<DESCENDING>);
+            break;
+        case SORT_BY_SYNC_DIRECTION:
+            if      ( ascending) std::sort(fileCmp.begin(), fileCmp.end(), sortBySyncDirection<ASCENDING>);
+            else if (!ascending) std::sort(fileCmp.begin(), fileCmp.end(), sortBySyncDirection<DESCENDING>);
             break;
         default:
             assert(false);

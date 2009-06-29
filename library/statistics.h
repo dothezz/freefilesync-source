@@ -2,13 +2,18 @@
 #define STATISTICS_H_INCLUDED
 
 #include <vector>
-#include <wx/stopwatch.h>
 #include <list>
+#include <memory>
+#include <wx/defs.h>
+
+class wxStopWatch;
+class wxString;
+
 
 class RetrieveStatistics
 {
 public:
-    wxDEPRECATED(RetrieveStatistics() {}) //generate compiler warnings as a reminder to remove code after measurements
+    wxDEPRECATED( RetrieveStatistics() ); //generate compiler warnings as a reminder to remove code after measurements
     ~RetrieveStatistics();
 
     void writeEntry(const double value, const int objects);
@@ -22,7 +27,7 @@ private:
     };
 
     std::vector<statEntry> data;
-    wxStopWatch timer;
+    std::auto_ptr<wxStopWatch> timer;
 };
 
 
@@ -61,7 +66,7 @@ private:
     };
 
     std::list<record> measurements;
-    wxStopWatch timer;
+    std::auto_ptr<wxStopWatch> timer;
 };
 
 #endif // STATISTICS_H_INCLUDED

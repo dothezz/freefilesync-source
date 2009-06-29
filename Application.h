@@ -25,7 +25,7 @@ public:
 private:
     void runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSettings& globalSettings);
 
-    CustomLocale programLanguage;
+    FreeFileSync::CustomLocale programLanguage;
 
     int returnValue;
     xmlAccess::XmlGlobalSettings globalSettings; //settings used by GUI, batch mode or both

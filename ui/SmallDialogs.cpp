@@ -6,29 +6,40 @@
 #include "../library/customGrid.h"
 #include "../library/customButton.h"
 #include "../library/statistics.h"
+#include "../library/localization.h"
 
 using namespace FreeFileSync;
 
 
 AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
 {
-    m_bitmap9->SetBitmap(*globalResource.bitmapWebsite);
-    m_bitmap10->SetBitmap(*globalResource.bitmapEmail);
-    m_bitmap11->SetBitmap(*globalResource.bitmapLogo);
-    m_bitmap13->SetBitmap(*globalResource.bitmapGPL);
+    m_bitmap9->SetBitmap(*GlobalResources::getInstance().bitmapWebsite);
+    m_bitmap10->SetBitmap(*GlobalResources::getInstance().bitmapEmail);
+    m_bitmap11->SetBitmap(*GlobalResources::getInstance().bitmapLogo);
+    m_bitmap13->SetBitmap(*GlobalResources::getInstance().bitmapGPL);
 
-    //flag bitmaps
-    m_bitmapFrench          ->SetBitmap(*globalResource.bitmapFrance);
-    m_bitmapJapanese        ->SetBitmap(*globalResource.bitmapJapan);
-    m_bitmapDutch           ->SetBitmap(*globalResource.bitmapHolland);
-    m_bitmapChineseSimple   ->SetBitmap(*globalResource.bitmapChina);
-    m_bitmapPolish          ->SetBitmap(*globalResource.bitmapPoland);
-    m_bitmapPortuguese      ->SetBitmap(*globalResource.bitmapPortugal);
-    m_bitmapItalian         ->SetBitmap(*globalResource.bitmapItaly);
-    m_bitmapSlovenian       ->SetBitmap(*globalResource.bitmapSlovakia);
-    m_bitmapHungarian       ->SetBitmap(*globalResource.bitmapHungary);
-    m_bitmapSpanish         ->SetBitmap(*globalResource.bitmapSpain);
-    m_bitmapPortugueseBrazil->SetBitmap(*globalResource.bitmapBrazil);
+
+    //create language credits
+    for (std::vector<LocInfoLine>::const_iterator i = LocalizationInfo::getMapping().begin(); i != LocalizationInfo::getMapping().end(); ++i)
+    {
+        //flag
+        wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, *i->languageFlag, wxDefaultPosition, wxSize(-1,11), 0 );
+        fgSizerTranslators->Add(staticBitmapFlag, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+
+        //language name
+        wxStaticText* staticTextLanguage = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, i->languageName, wxDefaultPosition, wxDefaultSize, 0 );
+        staticTextLanguage->Wrap( -1 );
+        fgSizerTranslators->Add(staticTextLanguage, 0, wxALIGN_CENTER_VERTICAL, 5);
+
+        //translator name
+        wxStaticText* staticTextTranslator = new wxStaticText(m_scrolledWindowTranslators, wxID_ANY, i->translatorName, wxDefaultPosition, wxDefaultSize, 0 );
+        staticTextTranslator->Wrap( -1 );
+        fgSizerTranslators->Add(staticTextTranslator, 0, wxALIGN_CENTER_VERTICAL, 5);
+    }
+
+    bSizerTranslators->Fit(m_scrolledWindowTranslators);
+
+
 
     //build information
     wxString build = wxString(wxT("(")) + _("Build:") + wxT(" ") + __TDATE__;
@@ -39,7 +50,7 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
 #endif //wxUSE_UNICODE
     m_build->SetLabel(build);
 
-    m_animationControl1->SetAnimation(*globalResource.animationMoney);
+    m_animationControl1->SetAnimation(*GlobalResources::getInstance().animationMoney);
     m_animationControl1->Play(); //Note: The animation is created hidden(!) to not disturb constraint based window creation;
     m_animationControl1->Show(); //
 
@@ -65,7 +76,7 @@ HelpDlg::HelpDlg(wxWindow* window) : HelpDlgGenerated(window)
 {
     m_notebook1->SetFocus();
 
-    m_bitmap25->SetBitmap(*globalResource.bitmapHelp);
+    m_bitmap25->SetBitmap(*GlobalResources::getInstance().bitmapHelp);
 
     //populate decision trees: "compare by date"
     wxTreeItemId treeRoot      = m_treeCtrl1->AddRoot(_("DECISION TREE"));
@@ -120,10 +131,10 @@ FilterDlg::FilterDlg(wxWindow* window, wxString& filterIncl, wxString& filterExc
         includeFilter(filterIncl),
         excludeFilter(filterExcl)
 {
-    m_bitmap8->SetBitmap(*globalResource.bitmapInclude);
-    m_bitmap9->SetBitmap(*globalResource.bitmapExclude);
-    m_bitmap26->SetBitmap(*globalResource.bitmapFilter);
-    m_bpButtonHelp->SetBitmapLabel(*globalResource.bitmapHelp);
+    m_bitmap8->SetBitmap(*GlobalResources::getInstance().bitmapInclude);
+    m_bitmap9->SetBitmap(*GlobalResources::getInstance().bitmapExclude);
+    m_bitmap26->SetBitmap(*GlobalResources::getInstance().bitmapFilter);
+    m_bpButtonHelp->SetBitmapLabel(*GlobalResources::getInstance().bitmapHelp);
 
     m_textCtrlInclude->SetValue(includeFilter);
     m_textCtrlExclude->SetValue(excludeFilter);
@@ -207,12 +218,12 @@ void DeleteDialog::updateTexts()
     if (m_checkBoxUseRecycler->GetValue())
     {
         headerText = _("Do you really want to move the following objects(s) to the Recycle Bin?");
-        m_bitmap12->SetBitmap(*globalResource.bitmapRecycler);
+        m_bitmap12->SetBitmap(*GlobalResources::getInstance().bitmapRecycler);
     }
     else
     {
         headerText = _("Do you really want to delete the following objects(s)?");
-        m_bitmap12->SetBitmap(*globalResource.bitmapDeleteFile);
+        m_bitmap12->SetBitmap(*GlobalResources::getInstance().bitmapDeleteFile);
     }
     m_staticTextHeader->SetLabel(headerText);
 
@@ -282,7 +293,7 @@ ErrorDlg::ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxStri
         ErrorDlgGenerated(parentWindow),
         ignoreErrors(ignoreNextErrors)
 {
-    m_bitmap10->SetBitmap(*globalResource.bitmapError);
+    m_bitmap10->SetBitmap(*GlobalResources::getInstance().bitmapError);
     m_textCtrl8->SetValue(messageText);
     m_checkBoxIgnoreErrors->SetValue(ignoreNextErrors);
 
@@ -343,7 +354,7 @@ WarningDlg::WarningDlg(wxWindow* parentWindow,  int activeButtons, const wxStrin
         WarningDlgGenerated(parentWindow),
         dontShowAgain(dontShowDlgAgain)
 {
-    m_bitmap10->SetBitmap(*globalResource.bitmapWarning);
+    m_bitmap10->SetBitmap(*GlobalResources::getInstance().bitmapWarning);
     m_textCtrl8->SetValue(messageText);
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
 
@@ -393,7 +404,7 @@ QuestionDlg::QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxStri
         QuestionDlgGenerated(parentWindow),
         dontShowAgain(dontShowDlgAgain)
 {
-    m_bitmap10->SetBitmap(*globalResource.bitmapQuestion);
+    m_bitmap10->SetBitmap(*GlobalResources::getInstance().bitmapQuestion);
     m_textCtrl8->SetValue(messageText);
     m_checkBoxDontAskAgain->SetValue(dontShowAgain);
 
@@ -417,9 +428,6 @@ QuestionDlg::QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxStri
     else if (activeButtons & BUTTON_NO)
         m_buttonNo->SetFocus();
 }
-
-
-QuestionDlg::~QuestionDlg() {}
 
 
 void QuestionDlg::OnClose(wxCloseEvent& event)
@@ -456,8 +464,8 @@ CustomizeColsDlg::CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes
         output(attr),
         m_showFileIcons(showFileIcons)
 {
-    m_bpButton29->SetBitmapLabel(*globalResource.bitmapMoveUp);
-    m_bpButton30->SetBitmapLabel(*globalResource.bitmapMoveDown);
+    m_bpButton29->SetBitmapLabel(*GlobalResources::getInstance().bitmapMoveUp);
+    m_bpButton30->SetBitmapLabel(*GlobalResources::getInstance().bitmapMoveDown);
 
     xmlAccess::ColumnAttributes columnSettings = attr;
 
@@ -563,15 +571,68 @@ void CustomizeColsDlg::OnMoveDown(wxCommandEvent& event)
 }
 
 //########################################################################################
+
+
+SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
+                               const wxString& variantName,
+                               const wxString& toCreate,
+                               const wxString& toUpdate,
+                               const wxString& toDelete,
+                               const wxString& data,
+                               bool& dontShowAgain) :
+        SyncPreviewDlgGenerated(parentWindow),
+        m_dontShowAgain(dontShowAgain)
+{
+    //m_bitmapPreview->SetBitmap(*GlobalResources::getInstance().bitmapSync);
+    m_buttonStartSync->setBitmapFront(*GlobalResources::getInstance().bitmapStartSync);
+    m_bitmapCreate->SetBitmap(*GlobalResources::getInstance().bitmapCreate);
+    m_bitmapUpdate->SetBitmap(*GlobalResources::getInstance().bitmapUpdate);
+    m_bitmapDelete->SetBitmap(*GlobalResources::getInstance().bitmapDelete);
+    m_bitmapData->SetBitmap(*GlobalResources::getInstance().bitmapData);
+
+    m_staticTextVariant->SetLabel(variantName);
+    m_textCtrlCreate->SetValue(toCreate);
+    m_textCtrlUpdate->SetValue(toUpdate);
+    m_textCtrlDelete->SetValue(toDelete);
+    m_textCtrlData->SetValue(data);
+
+    m_checkBoxDontShowAgain->SetValue(dontShowAgain);
+
+    m_buttonStartSync->SetFocus();
+    Fit();
+}
+
+
+void SyncPreviewDlg::OnClose(wxCloseEvent& event)
+{
+    EndModal(BUTTON_CANCEL);
+}
+
+
+void SyncPreviewDlg::OnCancel(wxCommandEvent& event)
+{
+    EndModal(BUTTON_CANCEL);
+}
+
+
+void SyncPreviewDlg::OnStartSync(wxCommandEvent& event)
+{
+    m_dontShowAgain = m_checkBoxDontShowAgain->GetValue();
+    EndModal(BUTTON_START);
+}
+
+
+
+//########################################################################################
 GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSettings& globalSettings) :
         GlobalSettingsDlgGenerated(window),
         settings(globalSettings)
 {
-    m_bitmapSettings->SetBitmap(*globalResource.bitmapSettings);
-    m_buttonResetWarnings->setBitmapFront(*globalResource.bitmapWarningSmall, 5);
+    m_bitmapSettings->SetBitmap(*GlobalResources::getInstance().bitmapSettings);
+    m_buttonResetWarnings->setBitmapFront(*GlobalResources::getInstance().bitmapWarningSmall, 5);
 
-    m_spinCtrlFileTimeTolerance->SetValue(globalSettings.shared.fileTimeTolerance);
-    m_checkBoxIgnoreOneHour->SetValue(globalSettings.shared.ignoreOneHourDiff);
+    m_spinCtrlFileTimeTolerance->SetValue(globalSettings.fileTimeTolerance);
+    m_checkBoxIgnoreOneHour->SetValue(globalSettings.ignoreOneHourDiff);
 
     m_textCtrlFileManager->SetValue(globalSettings.gui.commandLineFileManager);
 
@@ -582,8 +643,8 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSetti
 void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 {
     //write global settings only when okay-button is pressed!
-    settings.shared.fileTimeTolerance = m_spinCtrlFileTimeTolerance->GetValue();
-    settings.shared.ignoreOneHourDiff = m_checkBoxIgnoreOneHour->GetValue();
+    settings.fileTimeTolerance = m_spinCtrlFileTimeTolerance->GetValue();
+    settings.ignoreOneHourDiff = m_checkBoxIgnoreOneHour->GetValue();
 
     settings.gui.commandLineFileManager = m_textCtrlFileManager->GetValue();
 
@@ -595,7 +656,7 @@ void GlobalSettingsDlg::OnResetWarnings(wxCommandEvent& event)
 {
     wxMessageDialog* messageDlg = new wxMessageDialog(this, _("Reset all warning messages?"), _("Warning") , wxOK | wxCANCEL);
     if (messageDlg->ShowModal() == wxID_OK)
-        settings.shared.resetWarnings();
+        settings.warnings.resetWarnings();
 }
 
 
@@ -803,7 +864,7 @@ SyncStatus::SyncStatus(StatusHandler* updater, wxWindow* parentWindow) :
         lastStatCallSpeed(-1000000), //some big number
         lastStatCallRemTime(-1000000)
 {
-    m_animationControl1->SetAnimation(*globalResource.animationSync);
+    m_animationControl1->SetAnimation(*GlobalResources::getInstance().animationSync);
     m_animationControl1->Play();
 
     //initialize gauge
@@ -943,37 +1004,37 @@ void SyncStatus::setCurrentStatus(SyncStatusID id)
     switch (id)
     {
     case ABORTED:
-        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusError);
+        m_bitmapStatus->SetBitmap(*GlobalResources::getInstance().bitmapStatusError);
         m_staticTextStatus->SetLabel(_("Aborted"));
         break;
 
     case FINISHED_WITH_SUCCESS:
-        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusSuccess);
+        m_bitmapStatus->SetBitmap(*GlobalResources::getInstance().bitmapStatusSuccess);
         m_staticTextStatus->SetLabel(_("Completed"));
         break;
 
     case FINISHED_WITH_ERROR:
-        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusWarning);
+        m_bitmapStatus->SetBitmap(*GlobalResources::getInstance().bitmapStatusWarning);
         m_staticTextStatus->SetLabel(_("Completed"));
         break;
 
     case PAUSE:
-        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusPause);
+        m_bitmapStatus->SetBitmap(*GlobalResources::getInstance().bitmapStatusPause);
         m_staticTextStatus->SetLabel(_("Paused"));
         break;
 
     case SCANNING:
-        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusScanning);
+        m_bitmapStatus->SetBitmap(*GlobalResources::getInstance().bitmapStatusScanning);
         m_staticTextStatus->SetLabel(_("Scanning..."));
         break;
 
     case COMPARING_CONTENT:
-        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusBinCompare);
+        m_bitmapStatus->SetBitmap(*GlobalResources::getInstance().bitmapStatusBinCompare);
         m_staticTextStatus->SetLabel(_("Comparing content..."));
         break;
 
     case SYNCHRONIZING:
-        m_bitmapStatus->SetBitmap(*globalResource.bitmapStatusSyncing);
+        m_bitmapStatus->SetBitmap(*GlobalResources::getInstance().bitmapStatusSyncing);
         m_staticTextStatus->SetLabel(_("Synchronizing..."));
         break;
     }

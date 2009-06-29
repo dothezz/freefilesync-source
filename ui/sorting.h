@@ -89,11 +89,11 @@ namespace FreeFileSync
                 const wxChar* stringA = descrLineA->relativeName.c_str();
                 const wxChar* stringB = descrLineB->relativeName.c_str();
 
-                size_t pos = descrLineA->relativeName.findFromEnd(GlobalResources::FILE_NAME_SEPARATOR); //start search beginning from end
+                size_t pos = descrLineA->relativeName.findFromEnd(FreeFileSync::FILE_NAME_SEPARATOR); //start search beginning from end
                 if (pos != std::string::npos)
                     stringA += pos + 1;
 
-                pos = descrLineB->relativeName.findFromEnd(GlobalResources::FILE_NAME_SEPARATOR); //start search beginning from end
+                pos = descrLineB->relativeName.findFromEnd(FreeFileSync::FILE_NAME_SEPARATOR); //start search beginning from end
                 if (pos != std::string::npos)
                     stringB += pos + 1;
 
@@ -119,7 +119,7 @@ namespace FreeFileSync
             relLengthA = descrLineA->relativeName.length();
         else if (descrLineA->objType == FileDescrLine::TYPE_FILE)
         {
-            relLengthA = descrLineA->relativeName.findFromEnd(GlobalResources::FILE_NAME_SEPARATOR); //start search beginning from end
+            relLengthA = descrLineA->relativeName.findFromEnd(FreeFileSync::FILE_NAME_SEPARATOR); //start search beginning from end
             if (relLengthA == wxNOT_FOUND)
             {
                 relLengthA  = 0;
@@ -144,7 +144,7 @@ namespace FreeFileSync
             relLengthB = descrLineB->relativeName.length();
         else if (descrLineB->objType == FileDescrLine::TYPE_FILE)
         {
-            relLengthB = descrLineB->relativeName.findFromEnd(GlobalResources::FILE_NAME_SEPARATOR); //start search beginning from end
+            relLengthB = descrLineB->relativeName.findFromEnd(FreeFileSync::FILE_NAME_SEPARATOR); //start search beginning from end
             if (relLengthB == wxNOT_FOUND)
             {
                 relLengthB  = 0;
@@ -280,6 +280,16 @@ namespace FreeFileSync
         return sortAscending == ASCENDING ?
                a.cmpResult < b.cmpResult :
                a.cmpResult > b.cmpResult;
+    }
+
+
+    template <SortDirection sortAscending>
+    inline
+    bool sortBySyncDirection(const FileCompareLine& a, const FileCompareLine& b)
+    {
+        return sortAscending == ASCENDING ?
+               a.direction < b.direction :
+               a.direction > b.direction;
     }
 
 

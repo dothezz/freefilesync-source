@@ -65,7 +65,7 @@
 &Load configuration
 &Carregar configuração 
 &No
-
+&Não
 &OK
 &OK
 &Pause
@@ -77,15 +77,15 @@
 &Save
 &Salvar
 &Yes
-
+&Sim
 ,
 .
 -	do not copy\n
-
+-	não copiar\n
 - conflict
-
+- conflito
 - conflict (same date, different size)
-
+- conflito (mesma data, tamanho diferente)
 - different
 - diferente
 - equal
@@ -103,7 +103,7 @@
 - right newer
 - mais recente à direita
 ->	copy to right side\n
-
+->	copiar para o lado direito\n
 -Open-Source file synchronization-
 -Sincronização de Arquivos Open-Source-
 .
@@ -117,15 +117,15 @@
 1. &Compare
 1. &Comparar
 1. Enter relative file or directory names separated by ';' or a new line.
-
+1. Entre os nomes dos arquivos ou diretórios relativos separados por ';' ou uma nova linha.
 2. &Synchronize...
 2. &Sincronizar...
 2. Use wildcard characters '*' and '?'.
-2. Usar '*' e '?' como caracteres de procura.
+2. Usar '*' e '?' como caracteres coringa.
 3. Exclude files directly on main grid via context menu.
 3. Excluir arquivos diretamente do grid principal através do menu de contexto.
 <-	copy to left side\n
-
+<-	copiar para o lado esquerdo\n
 <<	left file is newer\n
 <<	arquivo à esquerda é mais recente\n
 <Directory>
@@ -137,7 +137,7 @@
 <|	file on left side only\n
 <|	arquivo apenas à esquerda\n
 ==	files are equal\n
-
+==	arquivos são iguais\n
 >>	right file is newer\n
 >>	arquivo à direita é mais recente\n
 A newer version of FreeFileSync is available:
@@ -171,19 +171,21 @@ Arquivo Batch
 Big thanks for localizing FreeFileSync goes out to:
 Pela tradução do FreeFileSync, um agradecimento a:
 Browse
-
+Procurar
 Build:
 Criado:
 Cancel
 Cancelar
+Change direction
+Inverter sentido
 Check all
-Verificar tudo
+Marcar todos
 Choose to hide filtered files/directories from list
 Ocultar arquivos/diretórios filtrados da lista
 Comma separated list
 Lista de itens separada por vírgula
 Compare
-
+Comparar
 Compare both sides
 Comparar os dois lados
 Compare by \"File content\"
@@ -197,9 +199,9 @@ Comparando conteúdo
 Comparing content of files %x
 Comparando conteúdo do arquivo %x
 Comparing content...
-
+Comparando conteúdo...
 Comparison Result
-
+Resultado da Comparação
 Completed
 Finalizado
 Configuration
@@ -218,6 +220,8 @@ Configure your own synchronization rules.
 Configure as suas próprias regras de sincronização.
 Confirm
 Confirmar
+Conflict detected:
+Conflito detectado:
 Continue
 Continuar
 Conversion error:
@@ -238,6 +242,8 @@ Copying file %x to %y
 Copiando arquivo %x para %y
 Copying file %x to %y overwriting target
 Copiando arquivo %x para %y substituindo destino
+Could not determine volume name for file:
+Não foi possível determinar o nome do volume para o arquivo:
 Could not set working directory:
 Não se pode definir pasta de trabalho:
 Create a batch job
@@ -278,8 +284,8 @@ Directory does not exist:
 Diretório não existe:
 Do not display visual status information but write to a logfile instead
 Ao invés de mostrar informação do estado visualmente, escrever para um arquivo log
-Do not show this warning again
-Não mostrar novamente este aviso
+Do not show this dialog again
+Não mostrar esse diálogo novamente
 Do nothing
 Não fazer nada
 Do you really want to delete the following objects(s)?
@@ -289,7 +295,7 @@ Quer mesmo mover o(s) seguinte(s) item(s) para a Lixeira?
 Do you want FreeFileSync to automatically check for updates every week?
 Deseja que o FreeFileSync procure automaticamente novas versões toda semana?
 Don't ask me again
-
+Não perguntar novamente
 Donate with PayPal
 Doar usando PayPal
 Download now?
@@ -306,6 +312,8 @@ Error changing modification time:
 Erro ao mudar a hora de modificação:
 Error copying file:
 Erro ao copiar arquivo:
+Error copying locked file %x!
+Erro ao copiar arquivo bloqueado %x!
 Error creating directory:
 Erro ao criar diretório:
 Error deleting directory:
@@ -330,6 +338,8 @@ Error resolving symbolic link:
 Erro na resolução de link simbólico:
 Error retrieving full path:
 Erro ao obter caminho completo:
+Error starting Volume Shadow Copy Service!
+Erro ao inicializar o Serviço de Cópias de Sombra de Volume!
 Error traversing directory:
 Erro ao percorrer diretório:
 Error writing file attributes:
@@ -352,6 +362,8 @@ Exit with RC < 0
 Sair com RC < 0
 Feedback and suggestions are welcome at:
 Comentários e sugestões são bem-vindos em:
+File %x has an invalid date!
+Arquivo %x tem uma data inválida!
 File Manager integration:
 Integração com Gerenciador de Arquivos:
 File Time tolerance (seconds):
@@ -370,6 +382,10 @@ File times that differ by up to the specified number of seconds are still handle
 Arquivos com diferença de horário até o número especificado de segundos são tratados como tendo o mesmo horário.
 Filename
 Nome do arquivo
+Files %x have a file time difference of less than 1 hour! It's not safe to decide which one is newer due to Daylight Saving Time issues.
+Arquivos %x têm diferença no horário de criação menor do que 1 hora! Não é seguro decidir qual é o mais novo devido a problemas relacionados com o Horário de Verão.
+Files %x have the same date but a different size!
+Arquivos %x têm a mesma data mas tamanhos diferentes!
 Files are found equal if\n     - file content\nis the same.
 Os arquivos são considerados iguais se\n     - o conteúdo do arquivo\né o mesmo.
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
@@ -415,7 +431,7 @@ FreeFileSync configuração
 FreeFileSync is up to date!
 FreeFileSync está atualizado!
 Full path
-
+Caminho completo
 Generating file list...
 Gerando lista de arquivos...
 Global settings
@@ -425,7 +441,7 @@ Ajuda
 Hide all error and warning messages
 Ocultar todas as mensagens de erro ou aviso
 Hide conflicts
-
+Ocultar conflitos
 Hide files that are different
 Ocultar arquivos que são diferentes
 Hide files that are equal
@@ -439,11 +455,11 @@ Ocultar arquivos que existem somente à esquerda
 Hide files that exist on right side only
 Ocultar arquivos que existem somente à direita
 Hide files that will be copied to the left side
-
+Ocultar arquivos que serão copiados para o lado esquerdo
 Hide files that will be copied to the right side
-
+Ocultar arquivos que serão copiados para o lado direito
 Hide files that won't be copied
-
+Ocultar arquivos que não serão copiados
 Hide filtered items
 Ocultar itens filtrados
 Hide further error messages during the current process
@@ -457,7 +473,7 @@ Homepage
 If you like FFS
 Se gosta do FFS
 Ignore 1-hour file time difference
-
+Ignorar diferença de tempo do arquivo de 1 hora
 Ignore errors
 Ignorar erros
 Ignore subsequent errors
@@ -471,7 +487,7 @@ Incluir
 Include temporarily
 Incluir temporariamente
 Include: *.doc;*.zip;*.exe\nExclude: \\temp\\*
-
+Incluir: *.doc;*.zip;*.exe\nExcluir: \\temp\\*
 Info
 Info
 Information
@@ -500,8 +516,10 @@ Move column down
 Mover coluna para baixo
 Move column up
 Mover coluna para cima
+Moving %x to Recycle Bin
+Movendo %x para a Lixeira
 Not all items have been synchronized! Have a look at the list.
-
+Nem todos os itens foram sincronizados! Olhe a lista.
 Not enough free disk space available in:
 Espaço em disco insuficiente em:
 Nothing to synchronize according to configuration!
@@ -515,7 +533,7 @@ Número de arquivos que serão substituídos
 OK
 OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the synchronization directories.
-
+Apenas arquivos/diretórios que passarem a filtragem serão selecionados para sincronização. O filtro será aplicado ao nome em relação(!) aos diretórios de sincronização.
 Open with File Manager\tD-Click
 Abrir com Gerenciador de Arquivos\tD-Click
 Operation aborted!
@@ -528,16 +546,16 @@ Pause
 Pausa
 Paused
 Pausado
+Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
+Por favor, copie o \"Shadow.dll\" apropriado (localizado no arquivo \"Shadow.zip\") no diretório de instalação do FreeFileSync para habilitar essa funcionalidade.
 Please fill all empty directory fields.
 Por favor, preencha todos os campos de diretórios vazios.
 Press button to activate filter
 Pressione para ativar o filtro
-Preview
-Pré-visualização
 Published under the GNU General Public License:
 Publicado sobre a GNU General Public License:
 Question
-
+Questão
 Quit
 Sair
 Relative path
@@ -547,19 +565,19 @@ Remover par de pastas
 Reset
 Reiniciar
 Reset all warning messages
-
+Resetar todas as mensagens de aviso
 Reset all warning messages?
-Reiniciar todas as mensagens de aviso?
+Resetar todas as mensagens de aviso?
 Result
 Resultado
 Right:
-Direita:
+Direita:    
 S&ave configuration
 S&alvar configuração
 S&witch view
-
+A&lterar visualização
 Save changes to current configuration?
-
+Salvar modificações para a configuração atual?
 Save current configuration to file
 Salvar configuração atual para arquivo
 Scanning...
@@ -573,9 +591,9 @@ Escolha um diretório para salvar o arquivo log:
 Select variant:
 Selecione uma variante:
 Show conflicts
-
+Mostrar conflitos
 Show file icons
-
+Mostrar ícones dos arquivos
 Show files that are different
 Mostrar arquivos que são diferentes
 Show files that are equal
@@ -589,11 +607,11 @@ Mostrar arquivos que existem somente à esquerda
 Show files that exist on right side only
 Mostrar arquivos que existem somente à direita
 Show files that will be copied to the left side
-
+Mostrar arquivos que serão copiados para o lado esquerdo
 Show files that will be copied to the right side
-
+Mostrar arquivos que serão copiados para o lado direito
 Show files that won't be copied
-
+Mostrar arquivos que não serão copiados
 Show popup
 Mostrar popup
 Show popup on errors or warnings
@@ -614,28 +632,30 @@ Start
 Iniciar
 Start synchronization
 Iniciar sincronização
+Statistics
+Estatísticas
 Stop
 Parar
 Swap sides
 Inverter lados
 Synchronization Preview
-
+Pré-visualização da Sincronização
 Synchronization aborted!
 Sincronização cancelada!
 Synchronization completed successfully!
 Sincronização finalizada com sucesso!
 Synchronization completed with errors!
 Sincronização finalizada com erros!
-Synchronization filter
-Filtro de sincronização
 Synchronization settings
 Parâmetros de sincronização
 Synchronization status
 Estado da sincronização
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
-
+Sincronizar todos arquivos .doc, .zip e .exe exceto tudo que estiver na subpasta \"temp\".
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
-Sincronizar ambos os lados simultaneamente: Copiar os arquivos novos ou mais recentes em ambas as direções.
+Sincronizar ambos os lados simultaneamente: Copia os arquivos novos ou mais recentes em ambas as direções.
+Synchronize...
+Sincronizar...
 Synchronizing...
 Sincronizando...
 System out of memory!
@@ -661,7 +681,7 @@ Espaço livre total requerido:
 Total time:
 Tempo total:
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
-
+Tratar tempo dos arquivos que diferem exatamente por +/- 1 hora como igual, menor que 1 hora como conflito para lidar com mudanças de Horário de Verão.
 Two way <->
 Dois sentidos <->
 Unable to connect to sourceforge.net!
@@ -671,15 +691,19 @@ Não foi possível criar arquivo log!
 Unable to initialize Recycle Bin!
 Não foi possível inicializar a Lixeira!
 Uncheck all
-Deselecionar todos
+Desmarcar todos
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
-
+Conflitos não resolvidos existentes! \n\nVocê pode ignorar conflitos e continuar a sincronização.
 Update ->
 Atualizar ->
 Use Recycle Bin
 Utilizar Lixeira
 Use Recycle Bin when deleting or overwriting files during synchronization
 Utilizar a Lixeira ao apagar ou substituir arquivos durante a sincronização
+Variant
+Variante
+Volume name %x not part of filename %y!
+Nome do volume %x não é parte do arquivo %y!
 Warning
 Atenção
 Warning: Synchronization failed for %x item(s):
@@ -695,7 +719,7 @@ diferente
 file exists on both sides
 arquivo existe em ambos os lados
 flash	conflict\n
-
+raio	conflito\n
 on one side only
 existente apenas em um lado
 |>	file on right side only\n
