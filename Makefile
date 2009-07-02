@@ -6,9 +6,6 @@ all: FreeFileSync
 init:
 	if [ ! -d OBJ ]; then mkdir OBJ; fi
 
-removeBOM: tools/removeBOM.cpp
-	g++ -o removeBOM tools/removeBOM.cpp
-	
 structures.o: structures.cpp
 	g++ $(CPPFLAGS) structures.cpp -o OBJ/structures.o
 
@@ -66,6 +63,9 @@ smallDialogs.o: ui/smallDialogs.cpp
 dragAndDrop.o: ui/dragAndDrop.cpp
 	g++ $(CPPFLAGS) ui/dragAndDrop.cpp -o OBJ/dragAndDrop.o
 
+removeBOM: tools/removeBOM.cpp
+	g++ -o removeBOM tools/removeBOM.cpp
+	
 localization.o: library/localization.cpp removeBOM
 	./removeBOM library/localization.cpp
 	g++ $(CPPFLAGS) library/localization.cpp -o OBJ/localization.o

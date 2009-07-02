@@ -64,16 +64,34 @@ bool getOnlineVersion(wxString& version)
 
 bool newerVersionExists(const wxString& onlineVersion)
 {
-    const wxString currentMajor = FreeFileSync::currentVersion.BeforeLast(wxT('.'));
-    const wxString onlineMajor  = onlineVersion.BeforeLast(wxT('.'));
+    wxString currentVersionCpy = FreeFileSync::currentVersion;
+    wxString onlineVersionCpy  = onlineVersion;
 
-    if (currentMajor != onlineMajor)
-        return globalFunctions::wxStringToInt(currentMajor) < globalFunctions::wxStringToInt(onlineMajor);
+    const wxChar VERSION_SEP = wxT('.');
 
-    const wxString currentMinor = FreeFileSync::currentVersion.AfterLast(wxT('.'));
-    const wxString onlineMinor  = onlineVersion.AfterLast(wxT('.'));
+    while ( currentVersionCpy.Find(VERSION_SEP) != wxNOT_FOUND &&
+            onlineVersionCpy.Find(VERSION_SEP) != wxNOT_FOUND)
+    {
+        const wxString currentMajor = currentVersionCpy.BeforeFirst(VERSION_SEP);
+        const wxString onlineMajor  = onlineVersionCpy.BeforeFirst(VERSION_SEP);
 
-    return globalFunctions::wxStringToInt(currentMinor) < globalFunctions::wxStringToInt(onlineMinor);
+        if (currentMajor != onlineMajor)
+            return globalFunctions::wxStringToInt(currentMajor) < globalFunctions::wxStringToInt(onlineMajor);
+
+        currentVersionCpy = currentVersionCpy.AfterFirst(VERSION_SEP);
+        onlineVersionCpy  = onlineVersionCpy.AfterFirst(VERSION_SEP);
+    }
+
+    const wxString currentMinor = currentVersionCpy.BeforeFirst(VERSION_SEP); //Returns the whole string if VERSION_SEP is not found.
+    const wxString onlineMinor  = onlineVersionCpy.BeforeFirst(VERSION_SEP);  //Returns the whole string if VERSION_SEP is not found.
+
+    if (currentMinor != onlineMinor)
+        return globalFunctions::wxStringToInt(currentMinor) < globalFunctions::wxStringToInt(onlineMinor);
+
+    currentVersionCpy = currentVersionCpy.AfterFirst(VERSION_SEP); //Returns the empty string if VERSION_SEP is not found.
+    onlineVersionCpy  = onlineVersionCpy.AfterFirst(VERSION_SEP);  //Returns the empty string if VERSION_SEP is not found.
+
+    return globalFunctions::wxStringToInt(currentVersionCpy) < globalFunctions::wxStringToInt(onlineVersionCpy);
 }
 
 

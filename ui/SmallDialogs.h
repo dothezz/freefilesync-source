@@ -287,7 +287,7 @@ public:
     void resetGauge(int totalObjectsToProcess, wxLongLong totalDataToProcess);
     void incProgressIndicator_NoUpdate(int objectsProcessed, wxLongLong dataProcessed);
     void setStatusText_NoUpdate(const Zstring& text);
-    void updateStatusDialogNow();
+    void updateStatusDialogNow(bool flushWindowMessages = true);
 
     void setCurrentStatus(SyncStatusID id);
     void processHasFinished(SyncStatusID id);  //essential to call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater

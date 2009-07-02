@@ -1,6 +1,11 @@
 FreeFileSync
 ------------
 
+Changelog v2.1
+----------------
+Fixed bug that could cause FreeFileSync to crash after synchronization
+
+
 Changelog v2.0
 ---------------
 Copy locked files using Windows Volume Shadow Copy

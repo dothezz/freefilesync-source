@@ -924,7 +924,7 @@ void SyncStatus::setStatusText_NoUpdate(const Zstring& text)
 }
 
 
-void SyncStatus::updateStatusDialogNow()
+void SyncStatus::updateStatusDialogNow(bool flushWindowMessages)
 {
 
     //static RetrieveStatistics statistic;
@@ -988,13 +988,15 @@ void SyncStatus::updateStatusDialogNow()
         bSizer28->Layout();
         bSizer31->Layout();
     }
-    updateUiNow();
+    if (flushWindowMessages)
+        updateUiNow();
 
     //support for pause button
     while (processPaused && currentProcessIsRunning)
     {
         wxMilliSleep(UI_UPDATE_INTERVAL);
-        updateUiNow();
+        if (flushWindowMessages)
+            updateUiNow();
     }
 }
 
@@ -1063,8 +1065,11 @@ void SyncStatus::processHasFinished(SyncStatusID id) //essential to call this in
     bSizerSpeed->Show(false);
     bSizerRemTime->Show(false);
 
-    updateStatusDialogNow(); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
-    Layout();                //
+    //ATTENTION don't call wxAPP->Yield()!  at this point in time there is a mismatch between
+    //gridDataView and currentGridData!! avoid grid repaint at all costs!!
+
+    updateStatusDialogNow(false); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
+    Layout();                     //
 }
 
 

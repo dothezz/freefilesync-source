@@ -13,6 +13,7 @@ del FreeFileSync.suo
 del FreeFileSync.vcproj.*.user
 del FreeFileSync.sln
 del BUILD\FreeFileSync.pdb
+del BUILD\FreeFileSync.ilk
 
 del library\ShadowCopy\ShadowCopy.ncb
 attrib library\ShadowCopy\ShadowCopy.suo -h

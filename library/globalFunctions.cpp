@@ -49,7 +49,8 @@ int globalFunctions::wxStringToInt(const wxString& number)
     if (number.ToLong(&result))
         return result;
     else
-        throw RuntimeException(wxString(_("Conversion error:")) + wxT(" wxString -> long"));
+        return 0; //don't throw exceptions here: wxEmptyString shall be interpreted as 0
+    //throw RuntimeException(wxString(_("Conversion error:")) + wxT(" wxString -> long"));
 }
 
 
@@ -59,7 +60,8 @@ double globalFunctions::wxStringToDouble(const wxString& number)
     if (number.ToDouble(&result))
         return result;
     else
-        throw RuntimeException(wxString(_("Conversion error:")) + wxT(" wxString -> double"));
+        return 0; //don't throw exceptions here: wxEmptyString shall be interpreted as 0
+    //throw RuntimeException(wxString(_("Conversion error:")) + wxT(" wxString -> double"));
 }
 
 

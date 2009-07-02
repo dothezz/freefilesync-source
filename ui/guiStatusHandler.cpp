@@ -64,7 +64,10 @@ CompareStatusHandler::CompareStatusHandler(MainDialog* dlg) :
 
 CompareStatusHandler::~CompareStatusHandler()
 {
-    updateUiNow(); //ui update before enabling buttons again: prevent strange behaviour of delayed button clicks
+    //ATTENTION don't call wxAPP->Yield()!  at this point in time there is a mismatch between
+    //gridDataView and currentGridData!! avoid grid repaint at all costs!!
+
+    //just DON'T: updateUiNow(); //ui update before enabling buttons again: prevent strange behaviour of delayed button clicks
 
     //reenable complete main dialog
     mainDialog->m_notebookBottomLeft->Enable();
