@@ -1,10 +1,10 @@
 #include "filter.h"
-#include "zstring.h"
+#include "../shared/zstring.h"
 #include <wx/string.h>
 #include <set>
 #include <vector>
-#include "resources.h"
-#include "globalFunctions.h"
+#include "../shared/globalFunctions.h"
+#include "../structures.h"
 
 using FreeFileSync::FilterProcess;
 
@@ -49,7 +49,7 @@ std::vector<Zstring> compoundStringToFilter(const Zstring& filterString)
         std::vector<Zstring> newEntries;
         compoundStringToTable(*i, wxT("\n"), newEntries);
 
-        globalFunctions::mergeVectors(newEntries, filterList);
+        filterList.insert(filterList.end(), newEntries.begin(), newEntries.end());
     }
 
     return filterList;
@@ -70,12 +70,12 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
 #endif
 
     //remove leading separators (keep BEFORE test for Zstring::empty()!)
-    if (filterFormatted.length() > 0 && *filterFormatted.c_str() == FreeFileSync::FILE_NAME_SEPARATOR)
+    if (filterFormatted.length() > 0 && *filterFormatted.c_str() == globalFunctions::FILE_NAME_SEPARATOR)
         filterFormatted = Zstring(filterFormatted.c_str() + 1);
 
     if (!filterFormatted.empty())
     {
-        //Test if filterFormatted ends with FreeFileSync::FILE_NAME_SEPARATOR, ignoring '*' and '?'.
+        //Test if filterFormatted ends with globalFunctions::FILE_NAME_SEPARATOR, ignoring '*' and '?'.
         //If so, treat as filter for directory and add to directoryFilter.
         const DefaultChar* filter = filterFormatted.c_str();
         int i = filterFormatted.length() - 1;
@@ -87,7 +87,7 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
                 break;
         }
 
-        if (i >= 0 && filter[i] == FreeFileSync::FILE_NAME_SEPARATOR) //last FILE_NAME_SEPARATOR found
+        if (i >= 0 && filter[i] == globalFunctions::FILE_NAME_SEPARATOR) //last FILE_NAME_SEPARATOR found
         {
             if (i != int(filterFormatted.length()) - 1)  // "name\*"
             {
@@ -119,7 +119,7 @@ bool matchesFilter(const DefaultChar* name, const std::set<Zstring>& filter)
 #endif
 
     for (std::set<Zstring>::const_iterator j = filter.begin(); j != filter.end(); ++j)
-        if (Zstring::Matches(nameFormatted, *j))
+        if (Zstring::Matches(nameFormatted, j->c_str()))
             return true;
 
     return false;

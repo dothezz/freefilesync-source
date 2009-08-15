@@ -37,12 +37,6 @@ namespace FreeFileSync
         //create comparison result table and fill relation except for files existing on both sides
         void performBaseComparison(const FolderPair& pair, FileComparison& output);
 
-
-        void issueWarningInvalidDate(const Zstring& fileNameFull, const wxLongLong& utcTime);
-        void issueWarningSameDateDiffSize(const FileCompareLine& cmpLine);
-        void issueWarningChangeWithinHour(const FileCompareLine& cmpLine);
-
-
         //buffer accesses to the same directories; useful when multiple folder pairs are used
         DirectoryDescrBuffer* descriptionBuffer;
 

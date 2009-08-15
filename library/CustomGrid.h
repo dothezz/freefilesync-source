@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <wx/grid.h>
-#include "../structures.h"
 #include "processXml.h"
 #include <map>
 #include <memory>
@@ -14,6 +13,7 @@ class CustomGridTableRight;
 class CustomGridTableMiddle;
 class GridCellRendererMiddle;
 class wxTimer;
+class CustomTooltip;
 class CustomGridRim;
 class CustomGridLeft;
 class CustomGridMiddle;
@@ -22,6 +22,10 @@ class CustomGridRight;
 namespace FreeFileSync
 {
     class GridView;
+
+    const wxBitmap& getSyncOpImage(const CompareFilesResult cmpResult,
+                                   const bool selectedForSynchronization,
+                                   const SyncDirection syncDir);
 }
 //##################################################################################
 
@@ -103,7 +107,7 @@ class GridCellRenderer;
 
 //-----------------------------------------------------------
 #ifdef FFS_WIN
-class IconUpdater : public wxEvtHandler //update file icons periodically: use SINGLE instance to coordinate left and right grid at once
+class IconUpdater : private wxEvtHandler //update file icons periodically: use SINGLE instance to coordinate left and right grid at once
 {
 public:
     IconUpdater(CustomGridLeft* leftGrid, CustomGridRight* rightGrid);
@@ -123,8 +127,8 @@ private:
 class CustomGridRim : public CustomGrid
 {
     friend class IconUpdater;
-	template <bool showFileIcons>
-	friend class GridCellRenderer;
+    template <bool showFileIcons>
+    friend class GridCellRenderer;
 
 public:
     CustomGridRim(wxWindow *parent,
@@ -257,6 +261,8 @@ private:
     void OnLeftMouseDown(wxMouseEvent& event);
     void OnLeftMouseUp(wxMouseEvent& event);
 
+    void showToolTip(int rowNumber, wxPoint pos);
+
     //small helper methods
     enum BlockPosition //each cell can be divided into four blocks concerning mouse selections
     {
@@ -276,6 +282,8 @@ private:
     BlockPosition highlightedPos;
 
     CustomGridTableMiddle* gridDataTable;
+
+    std::auto_ptr<CustomTooltip> toolTip;
 };
 
 //custom events for middle grid:

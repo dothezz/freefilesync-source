@@ -6,8 +6,7 @@
 
 #include "application.h"
 #include "ui/mainDialog.h"
-#include <wx/stdpaths.h>
-#include "library/globalFunctions.h"
+#include "shared/globalFunctions.h"
 #include <wx/msgdlg.h>
 #include "comparison.h"
 #include "algorithm.h"
@@ -17,9 +16,16 @@
 #include "ui/checkVersion.h"
 #include "library/filter.h"
 #include <wx/file.h>
-#include <wx/filename.h>
+#include "shared/xmlBase.h"
+#include "library/resources.h"
+#include "shared/standardPaths.h"
+#include "shared/localization.h"
 
-using FreeFileSync::FileError;
+#ifdef FFS_LINUX
+#include <gtk/gtk.h>
+#endif
+
+using FreeFileSync::CustomLocale;
 
 
 IMPLEMENT_APP(Application);
@@ -44,96 +50,83 @@ void Application::OnStartApplication(wxIdleEvent& event)
     //if appname is not set, the default is the executable's name!
     SetAppName(wxT("FreeFileSync"));
 
+#ifdef FFS_LINUX
+    ::gtk_rc_parse("styles.rc"); //remove inner border from bitmap buttons
+#endif
+
     //test if FFS is to be started on UI with config file passed as commandline parameter
 
-//#warning
-    //this needs to happen BEFORE the working directory is set!
+    //try to set config/batch-filename set by %1 parameter
     wxString cfgFilename;
     if (argc > 1)
     {
-        //resolve relative names to avoid problems after working directory is changed
-        wxFileName filename(argv[1]);
-        if (!filename.Normalize())
-        {
-            wxMessageBox(wxString(_("Error retrieving full path:")) + wxT("\n\"") + argv[1] + wxT("\""));
-            return;
-        }
-        const wxString fullFilename = filename.GetFullPath();
+        const wxString filename(argv[1]);
 
-        if (wxFileExists(fullFilename))  //load file specified by %1 parameter:
-            cfgFilename = fullFilename;
-        else if (wxFileExists(fullFilename + wxT(".ffs_batch")))
-            cfgFilename = fullFilename + wxT(".ffs_batch");
-        else if (wxFileExists(fullFilename + wxT(".ffs_gui")))
-            cfgFilename = fullFilename + wxT(".ffs_gui");
+        if (wxFileExists(filename))  //load file specified by %1 parameter:
+            cfgFilename = filename;
+        else if (wxFileExists(filename + wxT(".ffs_batch")))
+            cfgFilename = filename + wxT(".ffs_batch");
+        else if (wxFileExists(filename + wxT(".ffs_gui")))
+            cfgFilename = filename + wxT(".ffs_gui");
         else
         {
-            wxMessageBox(wxString(_("File does not exist:")) + wxT(" \"") + fullFilename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(wxString(_("File does not exist:")) + wxT(" \"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
             return;
         }
-    }
-
-
-    //set working directory to current executable directory
-    const wxString workingDir = FreeFileSync::getInstallationDir();
-    if (!wxSetWorkingDirectory(workingDir))
-    {   //show messagebox and quit program immediately
-        wxMessageBox(wxString(_("Could not set working directory:")) + wxT(" ") + workingDir, _("An exception occured!"), wxOK | wxICON_ERROR);
-        return;
     }
 
     GlobalResources::getInstance().load(); //loads bitmap resources on program startup
 
-    try //load global settings from XML: must be called AFTER working dir was set
+    try //load global settings from XML
     {
-        globalSettings = xmlAccess::readGlobalSettings();
+        xmlAccess::readGlobalSettings(globalSettings);
     }
-    catch (const FileError& error)
+    catch (const xmlAccess::XmlError& error)
     {
         if (wxFileExists(FreeFileSync::getGlobalConfigFile()))
-        {   //show messagebox and quit program immediately
-            wxMessageBox(error.show().c_str(), _("Error"), wxOK | wxICON_ERROR);
-            return;
+        {   //show messagebox and continue
+            SetExitOnFrameDelete(false); //prevent error messagebox from becoming top-level window
+            if (error.getSeverity() == xmlAccess::XmlError::WARNING)
+                wxMessageBox(error.show(), _("Warning"), wxOK | wxICON_WARNING);
+            else
+                wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
+            SetExitOnFrameDelete(true);
         }
         //else: globalSettings already has default values
     }
 
-//set program language: needs to happen after working directory has been set!
+    //set program language
     SetExitOnFrameDelete(false); //prevent error messagebox from becoming top-level window
-    programLanguage.setLanguage(globalSettings.programLanguage);
+    CustomLocale::getInstance().setLanguage(globalSettings.programLanguage);
     SetExitOnFrameDelete(true);
 
 
     if (!cfgFilename.empty())
     {
         //load file specified by %1 parameter:
-        xmlAccess::XmlType xmlConfigType = xmlAccess::getXmlType(cfgFilename);
-        if (xmlConfigType == xmlAccess::XML_GUI_CONFIG) //start in GUI mode (configuration file specified)
+        const xmlAccess::XmlType xmlConfigType = xmlAccess::getXmlType(cfgFilename);
+        switch (xmlConfigType)
         {
-            MainDialog* frame = new MainDialog(NULL, cfgFilename, &programLanguage, globalSettings);
-            frame->SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
-            frame->Show();
-        }
-        else if (xmlConfigType == xmlAccess::XML_BATCH_CONFIG) //start in commandline mode
-        {
+        case xmlAccess::XML_GUI_CONFIG: //start in GUI mode (configuration file specified)
+            runGuiMode(cfgFilename, globalSettings);
+            break;
+
+        case xmlAccess::XML_BATCH_CONFIG: //start in commandline mode
             runBatchMode(cfgFilename, globalSettings);
 
-            if (wxApp::GetTopWindow() == NULL) //if no windows are shown program won't exit automatically
+            if (wxApp::GetTopWindow() == NULL) //if no windows are shown, program won't exit automatically
                 ExitMainLoop();
-            return;
-        }
-        else
-        {
+            break;
+
+        case xmlAccess::XML_GLOBAL_SETTINGS:
+        case xmlAccess::XML_REAL_CONFIG:
+        case xmlAccess::XML_OTHER:
             wxMessageBox(wxString(_("The file does not contain a valid configuration:")) + wxT(" \"") + cfgFilename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
-            return;
+            break;
         }
     }
     else //start in GUI mode (standard)
-    {
-        MainDialog* frame = new MainDialog(NULL, FreeFileSync::getLastConfigFile(), &programLanguage, globalSettings);
-        frame->SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
-        frame->Show();
-    }
+        runGuiMode(wxEmptyString, globalSettings);
 }
 
 
@@ -158,7 +151,7 @@ int Application::OnRun()
         wxMessageBox(e.show(), _("An exception occured!"), wxOK | wxICON_ERROR);
         return -8;
     }
-    catch (std::exception& e) //catch all STL exceptions
+    catch (const std::exception& e) //catch all STL exceptions
     {
         //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
         wxFile safeOutput(FreeFileSync::getLastErrorTxtFile(), wxFile::write);
@@ -175,39 +168,47 @@ int Application::OnRun()
 int Application::OnExit()
 {
     //get program language
-    globalSettings.programLanguage = programLanguage.getLanguage();
+    globalSettings.programLanguage = CustomLocale::getInstance().getLanguage();
 
     try //save global settings to XML
     {
         xmlAccess::writeGlobalSettings(globalSettings);
     }
-    catch (const FileError& error)
+    catch (const xmlAccess::XmlError& error)
     {
-        wxMessageBox(error.show().c_str(), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
     }
 
     return 0;
 }
 
 
-void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSettings& globalSettings)
+void Application::runGuiMode(const wxString& cfgFileName, xmlAccess::XmlGlobalSettings& settings)
+{
+    MainDialog* frame = new MainDialog(NULL, cfgFileName, settings);
+    frame->SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
+    frame->Show();
+}
+
+
+void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSettings& globSettings)
 {
     //load XML settings
     xmlAccess::XmlBatchConfig batchCfg;  //structure to receive gui settings
     try
     {
-        batchCfg = xmlAccess::readBatchConfig(filename);
+        xmlAccess::readBatchConfig(filename, batchCfg);
     }
-    catch (const FileError& error)
+    catch (const xmlAccess::XmlError& error)
     {
-        wxMessageBox(error.show().c_str(), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
         return;
     }
     //all settings have been read successfully...
 
     //regular check for program updates
     if (!batchCfg.silent)
-        FreeFileSync::checkForUpdatePeriodically(globalSettings.lastUpdateCheck);
+        FreeFileSync::checkForUpdatePeriodically(globSettings.lastUpdateCheck);
 
 
     try //begin of synchronization process (all in one try-catch block)
@@ -226,10 +227,10 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
         //COMPARE DIRECTORIES
         FreeFileSync::FolderComparison folderCmp;
-        FreeFileSync::CompareProcess comparison(globalSettings.traverseDirectorySymlinks,
-                                                globalSettings.fileTimeTolerance,
-                                                globalSettings.ignoreOneHourDiff,
-                                                globalSettings.warnings,
+        FreeFileSync::CompareProcess comparison(globSettings.traverseDirectorySymlinks,
+                                                globSettings.fileTimeTolerance,
+                                                globSettings.ignoreOneHourDiff,
+                                                globSettings.warnings,
                                                 filterInstance.get(),
                                                 statusHandler.get());
 
@@ -247,16 +248,19 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
         //START SYNCHRONIZATION
         FreeFileSync::SyncProcess synchronization(
-            batchCfg.mainCfg.useRecycleBin,
-            globalSettings.copyFileSymlinks,
-            globalSettings.traverseDirectorySymlinks,
-            globalSettings.warnings,
+            batchCfg.mainCfg.handleDeletion,
+            batchCfg.mainCfg.customDeletionDirectory,
+            globSettings.copyFileSymlinks,
+            globSettings.traverseDirectorySymlinks,
+            globSettings.warnings,
             statusHandler.get());
 
         synchronization.startSynchronizationProcess(folderCmp);
     }
     catch (FreeFileSync::AbortThisProcess&)  //exit used by statusHandler
     {
+        if (returnValue >= 0)
+            returnValue = -12;
         return;
     }
 }

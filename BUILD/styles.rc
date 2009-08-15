@@ -1,0 +1,6 @@
+style "no-inner-border"
+{
+   GtkButton::inner-border = {0, 0, 0, 0}
+}
+
+class "GtkButton" style "no-inner-border"

@@ -1,11 +1,9 @@
 #include "iconBuffer.h"
 #include <wx/thread.h>
-#include "globalFunctions.h"
-#include <wx/utils.h>
+#include "../shared/globalFunctions.h"
 #include <wx/bitmap.h>
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include <wx/msgdlg.h>
-#include "../algorithm.h"
 #include <wx/icon.h>
 #include <map>
 #include <queue>
@@ -13,53 +11,7 @@
 using FreeFileSync::IconBuffer;
 
 
-class BasicString //simple thread safe string class
-{
-public:
-    BasicString()
-    {
-        data = new DefaultChar[1]; //compliance with delete []
-        *data = 0;                 //compliance with c_str()
-    }
-
-    BasicString(const Zstring& other) //make DEEP COPY from Zstring!
-    {
-        data = new DefaultChar[other.length() + 1];
-        memcpy(data, other.c_str(), (other.length() + 1) * sizeof(DefaultChar));
-    }
-
-    BasicString(const BasicString& other)
-    {
-        const size_t otherLen = defaultLength(other.c_str());
-        data = new DefaultChar[otherLen + 1];
-        memcpy(data, other.c_str(), (otherLen + 1) * sizeof(DefaultChar));
-    }
-
-    ~BasicString()
-    {
-        delete [] data;
-    }
-
-    BasicString& operator=(const BasicString& other)
-    {   //exception safety; handle self-assignment implicitly
-        const size_t otherLen = defaultLength(other.c_str());
-        DefaultChar* dataNew = new DefaultChar[otherLen + 1];
-        memcpy(dataNew, other.c_str(), (otherLen + 1) * sizeof(DefaultChar));
-
-        delete data;
-        data = dataNew;
-
-        return *this;
-    }
-
-    const DefaultChar* c_str() const
-    {
-        return data;
-    }
-
-private:
-    DefaultChar* data;
-};
+typedef std::vector<DefaultChar> BasicString; //simple thread safe string class: std::vector is guaranteed to not use reference counting, Effective STL, item 13
 
 
 class WorkerThread : public wxThread
@@ -123,7 +75,7 @@ void WorkerThread::setWorkload(const std::vector<Zstring>& load) //(re-)set new 
 
     workload.clear();
     for (std::vector<Zstring>::const_iterator i = load.begin(); i != load.end(); ++i)
-        workload.push_back(*i); //make DEEP COPY from Zstring!
+        workload.push_back(FileName(i->c_str(), i->c_str() + i->length() + 1)); //make DEEP COPY from Zstring (include null-termination)!
 
     if (!workload.empty())
         continueWork.Signal(); //wake thread IF he is waiting
@@ -132,9 +84,12 @@ void WorkerThread::setWorkload(const std::vector<Zstring>& load) //(re-)set new 
 
 void WorkerThread::quitThread()
 {
-    wxMutexLocker dummy(threadIsListening); //wait until thread is in waiting state
-    threadExitIsRequested = true; //no sharing conflicts in this situation
-    continueWork.Signal(); //exit thread
+    {
+        wxMutexLocker dummy(threadIsListening); //wait until thread is in waiting state
+        threadExitIsRequested = true; //no sharing conflicts in this situation
+        continueWork.Signal(); //exit thread
+    }
+    Wait(); //wait until thread has exitted
 }
 
 
@@ -144,7 +99,7 @@ wxThread::ExitCode WorkerThread::Entry()
     {
         wxMutexLocker dummy(threadIsListening); //this lock needs to be called from WITHIN the thread => calling it from constructor(Main thread) would be useless
         {                                       //this mutex STAYS locked all the time except of continueWork.Wait()!
-            wxCriticalSectionLocker dummy(lockWorkload);
+            wxCriticalSectionLocker dummy2(lockWorkload);
             threadHasMutex = true;
         }
 
@@ -170,7 +125,7 @@ wxThread::ExitCode WorkerThread::Entry()
 
 void WorkerThread::doWork()
 {
-    BasicString fileName; //don't use Zstring: reference-counted objects are NOT THREADSAFE!!! e.g. double deletion might happen
+    FileName fileName; //don't use Zstring: reference-counted objects are NOT THREADSAFE!!! e.g. double deletion might happen
 
     //do work: get the file icon.
     while (true)
@@ -183,38 +138,46 @@ void WorkerThread::doWork()
             workload.pop_back();
         }
 
-        if (iconBuffer->requestIcon(Zstring(fileName.c_str()))) //thread safety: Zstring okay, won't be reference-counted in requestIcon()
+        if (iconBuffer->requestIcon(Zstring(&fileName[0]))) //thread safety: Zstring okay, won't be reference-counted in requestIcon(), fileName is NOT empty
             break; //icon already in buffer: enter waiting state
 
-        //load icon
-        SHFILEINFO fileInfo;
-        fileInfo.hIcon = 0; //initialize hIcon
-
-        if (SHGetFileInfo(fileName.c_str(), //NOTE: CoInitializeEx()/CoUninitialize() implicitly called by wxWidgets on program startup!
-                          0,
-                          &fileInfo,
-                          sizeof(fileInfo),
-                          SHGFI_ICON | SHGFI_SMALLICON) &&
-
-                fileInfo.hIcon != 0) //fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
-        {                        //bug report: https://sourceforge.net/tracker/?func=detail&aid=2768004&group_id=234430&atid=1093080
-
-            wxIcon newIcon; //attention: wxIcon uses reference counting!
-            newIcon.SetHICON(fileInfo.hIcon);
-            newIcon.SetSize(IconBuffer::ICON_SIZE, IconBuffer::ICON_SIZE);
-
-            iconBuffer->insertIntoBuffer(fileName.c_str(), newIcon); //thread safety: icon may be deleted only within insertIntoBuffer()
-
-            //freeing of icon handle seems to happen somewhere beyond wxIcon destructor
-            //if (!DestroyIcon(fileInfo.hIcon))
-            //  throw RuntimeException(wxString(wxT("Error deallocating Icon handle!\n\n")) + FreeFileSync::getLastErrorFormatted());
-
-        }
-        else
+        //despite what docu says about SHGetFileInfo() it can't handle all relative filenames, e.g. "\DirName"
+        const unsigned int BUFFER_SIZE = 10000;
+        DefaultChar fullName[BUFFER_SIZE];
+        const DWORD rv = ::GetFullPathName(
+                             &fileName[0], //__in   LPCTSTR lpFileName,
+                             BUFFER_SIZE,  //__in   DWORD nBufferLength,
+                             fullName,     //__out  LPTSTR lpBuffer,
+                             NULL);        //__out  LPTSTR *lpFilePart
+        if (rv < BUFFER_SIZE && rv != 0)
         {
-            //if loading of icon fails for whatever reason, just save a dummy icon to avoid re-loading
-            iconBuffer->insertIntoBuffer(fileName.c_str(), wxNullIcon);
+            //load icon
+            SHFILEINFO fileInfo;
+            fileInfo.hIcon = 0; //initialize hIcon
+
+            if (::SHGetFileInfo(fullName, //NOTE: CoInitializeEx()/CoUninitialize() implicitly called by wxWidgets on program startup!
+                                0,
+                                &fileInfo,
+                                sizeof(fileInfo),
+                                SHGFI_ICON | SHGFI_SMALLICON) &&
+
+                    fileInfo.hIcon != 0) //fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
+            {                            //bug report: https://sourceforge.net/tracker/?func=detail&aid=2768004&group_id=234430&atid=1093080
+
+                wxIcon newIcon; //attention: wxIcon uses reference counting!
+                newIcon.SetHICON(fileInfo.hIcon);
+                newIcon.SetSize(IconBuffer::ICON_SIZE, IconBuffer::ICON_SIZE);
+
+                iconBuffer->insertIntoBuffer(&fileName[0], newIcon); //thread safety: icon may be deleted only within insertIntoBuffer()
+
+                //freeing of icon handle seems to happen somewhere beyond wxIcon destructor
+                //if (!DestroyIcon(fileInfo.hIcon))
+                //  throw RuntimeException(wxString(wxT("Error deallocating Icon handle!\n\n")) + FreeFileSync::getLastErrorFormatted());
+                continue;
+            }
         }
+        //if loading of icon fails for whatever reason, just save a dummy icon to avoid re-loading
+        iconBuffer->insertIntoBuffer(&fileName[0], wxNullIcon);
     }
 }
 
@@ -245,7 +208,6 @@ IconBuffer::IconBuffer() :
 IconBuffer::~IconBuffer()
 {
     worker->quitThread();
-    worker->Wait(); //wait until thread has exitted
 }
 
 

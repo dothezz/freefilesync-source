@@ -4,7 +4,7 @@
 #include "../library/statusHandler.h"
 #include <memory>
 #include "../library/processXml.h"
-#include <wx/arrstr.h>
+#include "../library/errorLogging.h"
 
 class LogFile;
 class FfsTrayIcon;
@@ -14,10 +14,7 @@ class SyncStatus;
 class BatchStatusHandler : public StatusHandler
 {
 public:
-    BatchStatusHandler() {}
-    virtual ~BatchStatusHandler() {}
-
-    virtual void addFinalInfo(const Zstring& infoMessage) = 0;
+    virtual void addFinalInfo(const wxString& infoMessage) = 0;
 };
 
 
@@ -30,19 +27,19 @@ public:
 
     virtual void updateStatusText(const Zstring& text);
     virtual void initNewProcess(int objectsTotal, wxLongLong dataTotal, Process processID);
-    virtual void updateProcessedData(int objectsProcessed, wxLongLong dataProcessed) {}
+    virtual void updateProcessedData(int objectsProcessed, wxLongLong dataProcessed);
     virtual void forceUiRefresh();
 
-    virtual ErrorHandler::Response reportError(const Zstring& errorMessage);
-    virtual void reportFatalError(const Zstring& errorMessage);
-    virtual void reportWarning(const Zstring& warningMessage, bool& dontShowAgain);
-    virtual void addFinalInfo(const Zstring& infoMessage);
+    virtual ErrorHandler::Response reportError(const wxString& errorMessage);
+    virtual void reportFatalError(const wxString& errorMessage);
+    virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
+    virtual void addFinalInfo(const wxString& infoMessage);
 
 private:
     virtual void abortThisProcess();
 
     xmlAccess::OnError m_handleError;
-    wxArrayString unhandledErrors; //list of non-resolved errors
+
     Process currentProcess;
     int& returnValue;
     std::auto_ptr<FfsTrayIcon> trayIcon;
@@ -62,16 +59,16 @@ public:
     virtual void updateProcessedData(int objectsProcessed, wxLongLong dataProcessed);
     virtual void forceUiRefresh();
 
-    virtual ErrorHandler::Response reportError(const Zstring& errorMessage);
-    virtual void reportFatalError(const Zstring& errorMessage);
-    virtual void reportWarning(const Zstring& warningMessage, bool& dontShowAgain);
-    virtual void addFinalInfo(const Zstring& infoMessage);
+    virtual ErrorHandler::Response reportError(const wxString& errorMessage);
+    virtual void reportFatalError(const wxString& errorMessage);
+    virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
+    virtual void addFinalInfo(const wxString& infoMessage);
 
 private:
     virtual void abortThisProcess();
 
-    xmlAccess::OnError m_handleError;
-    wxArrayString unhandledErrors; //list of non-resolved errors
+    bool showPopups;
+    FreeFileSync::ErrorLogging errorLog; //list of non-resolved errors and warnings
     Process currentProcess;
     int& returnValue;
 

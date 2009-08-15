@@ -20,8 +20,10 @@
  Min.
  sec
  Sek.
-!=	files are different\n
-!=	Dateien sind verschieden\n
+%x / %y objects deleted successfully
+%x von %y Objekten erfolgreich gelöscht
+%x Percent
+%x Prozent
 %x directories
 %x Verzeichnisse
 %x files,
@@ -48,6 +50,8 @@
 &Batch-Job erstellen
 &Default
 &Standard
+&Exit
+&Beenden
 &Export file list
 Dateiliste e&xportieren
 &File
@@ -72,6 +76,8 @@ Konfiguration &laden
 &Pause
 &Quit
 &Beenden
+&Restore
+&Wiederherstellen
 &Retry
 &Wiederholen
 &Save
@@ -80,20 +86,22 @@ Konfiguration &laden
 &Ja
 ,
 .
--	do not copy\n
--	nicht kopieren\n
 - conflict
 - Konflikt
 - conflict (same date, different size)
 - Konflikt (gleiches Datum, unterschiedliche Größe)
 - different
 - verschieden
+- directory part only
+- nur Verzeichnisanteil
 - equal
 - gleich
 - exists left only
 - existiert nur links
 - exists right only
 - existiert nur rechts
+- full file or directory name
+- kompletter Datei oder Verzeichnisname
 - left
 - links
 - left newer
@@ -102,8 +110,10 @@ Konfiguration &laden
 - rechts
 - right newer
 - rechts neuer
-->	copy to right side\n
-->	nach rechts kopieren\n
+- sibling of %dir
+- Gegenstück zu %dir
+- sibling of %name
+- Gegenstück zu %name
 -Open-Source file synchronization-
 -Open-Source Datei-Synchronisation-
 .
@@ -124,22 +134,12 @@ Konfiguration &laden
 2. Die Platzhalter '*' und '?' werden unterstützt.
 3. Exclude files directly on main grid via context menu.
 3. Dateien können direkt über das Kontextmenü im Hauptfenster ausgeschlossen werden.
-<-	copy to left side\n
-->	nach links kopieren\n
-<<	left file is newer\n
-<<	Linke Datei ist neuer\n
 <Directory>
 <Verzeichnis>
 <Last session>
 <Letzte Sitzung>
 <multiple selection>
 <Mehrfachauswahl>
-<|	file on left side only\n
-<|	Datei existiert nur links\n
-==	files are equal\n
-==	Dateien sind gleich\n
->>	right file is newer\n
->>	Rechte Datei ist neuer\n
 A newer version of FreeFileSync is available:
 Eine neuere Version von FreeFileSync ist verfügbar:
 Abort requested: Waiting for current operation to finish...
@@ -150,6 +150,8 @@ About
 Über
 Action
 Aktion
+Add folder
+Verzeichnis hinzufügen
 Add folder pair
 Verzeichnispaar hinzufügen
 All items have been synchronized!
@@ -162,6 +164,8 @@ As the name suggests, two files which share the same name are marked as equal if
 Wie der Name andeutet, werden zwei Dateien mit gleichem Namen genau dann als gleich angesehen, wenn sie den gleichen Dateiinhalt haben. Diese Einstellung ist eher für Konsistenzprüfungen geeignet als für Backup-Operationen. Aus diesem Grund wird der Zeitpunkt der letzten Änderung der Dateien nicht berücksichtigt.\n\nDer Entscheidungsbaum ist in diesem Fall kleiner:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Erzeuge eine Batchdatei für die automatisierte Synchronisation. Um den Batch-Modus zu starten, muss nur der Dateiname an die Programmdatei übergeben werden: FreeFileSync.exe <Batchdatei>. Dies kann auch in den Taskplaner des Betriebssystems eingetragen werden.
+Auto-adjust columns
+Spalten automatisch anpassen
 Batch execution
 Batchlauf
 Batch file created successfully!
@@ -184,6 +188,10 @@ Choose to hide filtered files/directories from list
 Gefilterte Dateien bzw. Verzeichnisse ein-/ausblenden
 Comma separated list
 Kommagetrennte Liste
+Commandline
+Kommandozeile
+Commandline is empty!
+Die Kommandozeile ist leer!
 Compare
 Vergleichen
 Compare both sides
@@ -202,6 +210,8 @@ Comparing content...
 Vergleiche Dateiinhalt...
 Comparison Result
 Ergebnis des Vergleichs
+Comparison settings
+Vergleichseinstellungen
 Completed
 Fertig
 Configuration
@@ -244,8 +254,10 @@ Copying file %x to %y overwriting target
 Kopiere Datei %x nach %y und überschreibe Ziel
 Could not determine volume name for file:
 Der Laufwerksname für folgende Datei konnte nicht ermittelt werden:
-Could not set working directory:
-Das Arbeitsverzeichnis konnte nicht gesetzt werden:
+Could not initialize directory monitoring:
+Die Verzeichnisüberwachung konnte nicht gestartet werden:
+Could not read values for the following XML nodes:
+Die folgenden XML Knoten konnten nicht gelesen werden:
 Create a batch job
 Batch-Job erstellen
 Creating folder %x
@@ -256,12 +268,18 @@ Custom
 Eigene
 Customize columns
 Spalten anpassen
+Customize...
+Anpassen...
 DECISION TREE
 ENTSCHEIDUNGSBAUM
 Data remaining:
 Verbliebene Daten:
 Date
 Datum
+Delay
+Verzögerung
+Delay between two invocations of the commandline
+Verzögerung zwischen zwei Aufrufen der Kommandozeile
 Delete files/folders existing on left side only
 Nur links existierende Dateien/Verzeichnisse löschen
 Delete files/folders existing on right side only
@@ -272,12 +290,20 @@ Delete on both sides
 Auf beiden Seiten löschen
 Delete on both sides even if the file is selected on one side only
 Lösche auf beiden Seiten, auch wenn die Datei nur auf einer Seite markiert ist
+Delete or overwrite files permanently.
+Dateien endgültig löschen oder überschreiben.
+Delete permanently
+Endgültig löschen
 Deleting file %x
 Lösche Datei %x
 Deleting folder %x
 Lösche Verzeichnis %x
+Deletion handling
+Behandlung von Löschungen
 Directories are dependent! Be careful when setting up synchronization rules:
 Die Verzeichnisse sind voneinander abhängig! Achtung beim Festlegen der Synchronisationseinstellungen:
+Directories to watch
+Zu überwachende Verzeichnisse
 Directory
 Verzeichnis
 Directory does not exist:
@@ -306,6 +332,8 @@ Email
 Email
 Enable filter to exclude files from synchronization
 Aktiviere Filter, um Dateien von der Synchronisation auszuschließen
+Endless loop when traversing directory:
+Endlosschleife beim Lesen des Verzeichnisses:
 Error
 Fehler
 Error changing modification time:
@@ -324,24 +352,28 @@ Error handling
 Fehlerbehandlung
 Error loading library function:
 Fehler beim Laden der Bibliotheksfunktion:
+Error moving directory:
+Fehler beim Verschieben des Verzeichnisses:
+Error moving file:
+Fehler beim Verschieben der Datei:
 Error moving to Recycle Bin:
 Fehler beim Verschieben in den Papierkorb:
 Error opening file:
 Fehler beim Öffnen der Datei:
 Error parsing configuration file:
-Fehler beim Lesen der Konfigurationsdatei:
+Fehler beim Auswerten der Konfigurationsdatei:
 Error reading file attributes:
 Fehler beim Lesen der Dateiattribute:
 Error reading file:
 Fehler beim Lesen der Datei:
 Error resolving symbolic link:
 Fehler beim Auflösen des Symbolischen Links:
-Error retrieving full path:
-Fehler beim Ermitteln des kompletten Pfades:
 Error starting Volume Shadow Copy Service!
 Fehler beim Starten des Volume Shadow Copy Service!
 Error traversing directory:
 Fehler beim Durchsuchen des Verzeichnisses:
+Error when monitoring directories.
+Fehler beim Überwachen der Verzeichnisse.
 Error writing file attributes:
 Fehler beim Schreiben der Dateiattribute:
 Error writing file:
@@ -458,14 +490,20 @@ Hide files that will be copied to the left side
 Dateien die nach links kopiert werden ausblenden
 Hide files that will be copied to the right side
 Dateien die nach rechts kopiert werden ausblenden
+Hide files that will be created on the left side
+Dateien die links erstellt werden ausblenden
+Hide files that will be created on the right side
+Dateien die rechts erstellt werden ausblenden
+Hide files that will be deleted on the left side
+Dateien die links gelöscht werden ausblenden
+Hide files that will be deleted on the right side
+Dateien die rechts gelöscht werden ausblenden
 Hide files that won't be copied
 Dateien die nicht kopiert werden ausblenden
 Hide filtered items
 Gefilterte Elemente ausblenden
 Hide further error messages during the current process
 Weitere Fehlermeldungen während des laufenden Prozesses ausblenden
-Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
-Verhindert das Anzeigen von Fehlermeldungen während der Synchronisation:\nSie werden jedoch gesammelt und am Ende als Liste angezeigt
 Hints:
 Tipps:
 Homepage
@@ -486,8 +524,8 @@ Include
 Einschließen
 Include temporarily
 Temporär einschließen
-Include: *.doc;*.zip;*.exe\nExclude: \\temp\\*
-Einschließen: *.doc;*.zip;*.exe\nAusschließen: \\temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: temp\\*
+Einschließen: *.doc;*.zip;*.exe\nAusschließen: temp\\*
 Info
 Info
 Information
@@ -496,8 +534,8 @@ Initialization of Recycle Bin failed!
 Die Initialisierung des Papierkorbs ist fehlgeschlagen!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Die Papierkorbfunktion steht nicht zur Verfügung!\n\nWahrscheinlich benutzen Sie nicht Microsoft Windows.\nWenn Sie diese Funktion wirklich benötigen, kontaktieren Sie bitte den Autor. :)
-Left:
-Links:
+Left
+Links
 Load configuration from file
 Konfiguration aus Datei laden
 Load configuration history (press DEL to delete items)
@@ -516,8 +554,14 @@ Move column down
 Spalte nach unten verschieben
 Move column up
 Spalte nach oben verschieben
+Move files to a custom directory.
+Verschiebe Dateien in ein benutzerdefiniertes Verzeichnis.
+Move to custom directory
+In eigenes Verzeichnis verschieben
 Moving %x to Recycle Bin
 Verschiebe %x in den Papierkorb
+Moving %x to custom directory
+Verschiebe %x in eigenes Verzeichnis
 Not all items have been synchronized! Have a look at the list.
 Nicht alle Elemente wurden synchronisiert! Siehe verbliebene Elemente im Hauptfenster.
 Not enough free disk space available in:
@@ -550,6 +594,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Um diese Funktionalität zu aktivieren, bitte die entsprechende Datei \"Shadow.dll\" (siehe Archiv \"Shadow.zip\") in das FreeFileSync Installationsverzeichnis kopieren.
 Please fill all empty directory fields.
 Bitte die leeren Verzeichnisfelder füllen.
+Please specify alternate directory for deletion!
+Bitte ein alternatives Löschverzeichnis angeben!
 Press button to activate filter
 Taste drücken, um Filter zu aktivieren
 Published under the GNU General Public License:
@@ -558,10 +604,18 @@ Question
 Frage
 Quit
 Beenden
+RealtimeSync - Automated Synchronization
+RealtimeSync - Automatisierte Synchronisation
+RealtimeSync configuration
+RealtimeSync Konfiguration
 Relative path
 Relativer Pfad
+Remove folder
+Verzeichnis entfernen
 Remove folder pair
 Verzeichnispaar entfernen
+Report translation error
+Übersetzungsfehler melden
 Reset
 Zurücksetzen
 Reset all warning messages
@@ -570,8 +624,8 @@ Reset all warning messages?
 Sollen alle Warnmeldungen zurückgesetzt werden?
 Result
 Ergebnis
-Right:
-Rechts:
+Right
+Rechts
 S&ave configuration
 Konfiguration s&peichern 
 S&witch view
@@ -610,6 +664,14 @@ Show files that will be copied to the left side
 Dateien die nach links kopiert werden anzeigen
 Show files that will be copied to the right side
 Dateien die nach rechts kopiert werden anzeigen
+Show files that will be created on the left side
+Dateien die links erstellt werden anzeigen
+Show files that will be created on the right side
+Dateien die rechts erstellt werden anzeigen
+Show files that will be deleted on the left side
+Dateien die links gelöscht werden anzeigen
+Show files that will be deleted on the right side
+Dateien die rechts gelöscht werden anzeigen
 Show files that won't be copied
 Dateien die nicht kopiert werden anzeigen
 Show popup
@@ -660,12 +722,14 @@ Synchronizing...
 Synchronisiere...
 System out of memory!
 Zu wenig freier Arbeitsspeicher!
+Target directory already existing!
+Zielverzeichnis existiert bereits!
 Target file already existing!
 Die Zieldatei existiert bereits!
 The file does not contain a valid configuration:
 Die Datei enthält keine gültige Konfiguration:
-This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
-Diese Kommandozeile wird bei jedem Doppelklick auf einen Dateinamen ausgeführt. %name dient dabei als Platzhalter für die ausgewählte Datei.
+This commandline will be executed on each doubleclick. The following macros are available:
+Diese Befehlszeile wird bei jeden Doppelklick ausgeführt. Dabei stehen die folgenden Makros zur Verfügung:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Diese Variante identifiziert zwei gleichnamige Dateien als gleich, wenn sie die gleiche Dateigröße haben UND der Zeitpunkt der letzten Änderung derselbe ist.
 Time
@@ -696,10 +760,12 @@ Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchro
 Es existieren ungelöste Konflikte! \n\nDie Konflikte können ignoriert und die Synchronisation fortgesetzt werden.
 Update ->
 Aktualisieren ->
+Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
+Verwendung: Die zu überwachenden Verzeichnisse auswählen und eine Kommandozeile angeben. Jedesmal wenn Dateien innerhalb dieser Verzeichnisse (oder Unterverzeichnisse) verändert werden, wird die Kommandozeile ausgeführt.
 Use Recycle Bin
 Papierkorb verwenden
-Use Recycle Bin when deleting or overwriting files during synchronization
-Papierkorb für zu löschende oder zu überschreibende Dateien nutzen
+Use Recycle Bin when deleting or overwriting files.
+Papierkorb für zu löschende oder zu überschreibende Dateien nutzen.
 Variant
 Variante
 Volume name %x not part of filename %y!
@@ -712,15 +778,13 @@ Warnings:
 Warnungen:
 When the comparison is started with this option set the following decision tree is processed:
 Wenn der Vergleich mit dieser Option gestartet wurde, wird folgender Entscheidungsbaum abgearbeitet:
+You can ignore the error to consider not existing directories as empty.
+Dieser Fehler kann ignoriert werden, um nicht existierende Verzeichnisse als leer anzusehen.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Verbliebene Elemente können nochmals synchronisiert werden (OHNE dass ein erneuter Vergleich notwendig ist)!
 different
 verschieden
 file exists on both sides
 Datei existiert auf beiden Seiten
-flash	conflict\n
-Blitz	Konflikt\n
 on one side only
 nur auf einer Seite
-|>	file on right side only\n
-|>	Datei existiert nur rechts\n

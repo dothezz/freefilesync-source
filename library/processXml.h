@@ -2,7 +2,6 @@
 #define PROCESSXML_H_INCLUDED
 
 #include "../structures.h"
-#include "fileHandling.h"
 
 namespace xmlAccess
 {
@@ -11,14 +10,6 @@ namespace xmlAccess
         ON_ERROR_POPUP,
         ON_ERROR_IGNORE,
         ON_ERROR_EXIT
-    };
-
-    enum XmlType
-    {
-        XML_GUI_CONFIG,
-        XML_BATCH_CONFIG,
-        XML_GLOBAL_SETTINGS,
-        XML_OTHER
     };
 
     enum ColumnTypes
@@ -30,7 +21,7 @@ namespace xmlAccess
         SIZE,
         DATE
     };
-    const unsigned COLUMN_TYPE_COUNT = 6;
+    const unsigned int COLUMN_TYPE_COUNT = 6;
 
     struct ColumnAttrib
     {
@@ -41,7 +32,6 @@ namespace xmlAccess
     };
     typedef std::vector<ColumnAttrib> ColumnAttributes;
 
-    XmlType getXmlType(const wxString& filename);
 //---------------------------------------------------------------------
 
     struct XmlGuiConfig
@@ -60,11 +50,11 @@ namespace xmlAccess
 
         bool operator==(const XmlGuiConfig& other) const
         {
-            return mainCfg              == other.mainCfg              &&
-                   directoryPairs       == other.directoryPairs       &&
-                   hideFilteredElements == other.hideFilteredElements &&
-                   ignoreErrors         == other.ignoreErrors         &&
-                   syncPreviewEnabled   == other.syncPreviewEnabled;
+            return mainCfg                == other.mainCfg               &&
+                   directoryPairs         == other.directoryPairs        &&
+                   hideFilteredElements   == other.hideFilteredElements  &&
+                   ignoreErrors           == other.ignoreErrors          &&
+                   syncPreviewEnabled     == other.syncPreviewEnabled;
         }
 
         bool operator!=(const XmlGuiConfig& other) const
@@ -87,7 +77,7 @@ namespace xmlAccess
     };
 
     int retrieveSystemLanguage();
-    bool supportForSymbolicLinks();
+    bool recycleBinAvailable();
 
 
     struct WarningMessages
@@ -103,9 +93,6 @@ namespace xmlAccess
         bool warningSignificantDifference;
         bool warningNotEnoughDiskSpace;
         bool warningUnresolvedConflicts;
-        bool warningInvalidDate;
-        bool warningSameDateDiffSize;
-        bool warningDSTChangeWithinHour;
     };
 
 
@@ -118,7 +105,7 @@ namespace xmlAccess
                 fileTimeTolerance(2),  //default 2s: FAT vs NTFS
                 ignoreOneHourDiff(true),
                 traverseDirectorySymlinks(false),
-                copyFileSymlinks(supportForSymbolicLinks()),
+                copyFileSymlinks(true),
                 lastUpdateCheck(0) {}
 
         int programLanguage;
@@ -126,7 +113,7 @@ namespace xmlAccess
         bool ignoreOneHourDiff; //ignore +/- 1 hour due to DST change
         bool traverseDirectorySymlinks;
         bool copyFileSymlinks; //copy symbolic link instead of target file
-        long lastUpdateCheck; //time of last update check
+        long lastUpdateCheck;  //time of last update check
 
         WarningMessages warnings;
 
@@ -139,17 +126,19 @@ namespace xmlAccess
                     posXNotMaximized(wxDefaultCoord),
                     posYNotMaximized(wxDefaultCoord),
                     isMaximized(false),
+                    autoAdjustColumnsLeft(false),
+                    autoAdjustColumnsRight(false),
 #ifdef FFS_WIN
                     commandLineFileManager(wxT("explorer /select, %name")),
 #elif defined FFS_LINUX
-                    commandLineFileManager(wxT("konqueror \"%path\"")),
+                    commandLineFileManager(wxT("konqueror \"%dir\"")),
 #endif
                     cfgHistoryMax(10),
                     folderHistLeftMax(12),
                     folderHistRightMax(12),
                     selectedTabBottomLeft(0),
                     deleteOnBothSides(false),
-                    useRecyclerForManualDeletion(FreeFileSync::recycleBinExists()), //enable if OS supports it; else user will have to activate first and then get an error message
+                    useRecyclerForManualDeletion(recycleBinAvailable()), //enable if OS supports it; else user will have to activate first and then get an error message
                     showFileIconsLeft(true),
                     showFileIconsRight(true),
                     popupOnConfigChange(true),
@@ -163,6 +152,9 @@ namespace xmlAccess
 
             ColumnAttributes columnAttribLeft;
             ColumnAttributes columnAttribRight;
+
+            bool autoAdjustColumnsLeft;
+            bool autoAdjustColumnsRight;
 
             wxString commandLineFileManager;
 
@@ -214,15 +206,13 @@ namespace xmlAccess
         return a.position < b.position;
     }
 
+    void readGuiConfig(  const wxString& filename, XmlGuiConfig&      config); //throw (xmlAccess::XmlError);
+    void readBatchConfig(const wxString& filename, XmlBatchConfig&    config); //throw (xmlAccess::XmlError);
+    void readGlobalSettings(                       XmlGlobalSettings& config); //throw (xmlAccess::XmlError);
 
-    XmlGuiConfig readGuiConfig(const wxString& filename);
-    XmlBatchConfig readBatchConfig(const wxString& filename);
-    XmlGlobalSettings readGlobalSettings();   //used for both GUI and batch mode, independent from configuration instance
-
-    void writeGuiConfig(const wxString& filename, const XmlGuiConfig& outputCfg);
-    void writeBatchConfig(const wxString& filename, const XmlBatchConfig& outputCfg);
-    void writeGlobalSettings(const XmlGlobalSettings& outputCfg);
-
+    void writeGuiConfig(     const XmlGuiConfig&      outputCfg, const wxString& filename); //throw (xmlAccess::XmlError);
+    void writeBatchConfig(   const XmlBatchConfig&    outputCfg, const wxString& filename); //throw (xmlAccess::XmlError);
+    void writeGlobalSettings(const XmlGlobalSettings& outputCfg);                           //throw (xmlAccess::XmlError);
 }
 
 

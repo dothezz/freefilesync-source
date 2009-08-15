@@ -3,13 +3,14 @@
 	<FileVersion major="1" minor="6" />
 	<Project>
 		<Option title="FreeFileSync" />
+		<Option makefile="makefile" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
 				<Option output="BUILD\FreeFileSync" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="BUILD\" />
-				<Option object_output="OBJ\Debug\" />
+				<Option object_output="OBJ\Debug_FFS_GCC\" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -35,7 +36,7 @@
 			<Target title="Release">
 				<Option output="BUILD\FreeFileSync" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="BUILD\" />
-				<Option object_output="OBJ\Release\" />
+				<Option object_output="OBJ\Release_FFS_GCC\" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -83,7 +84,10 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-Wshadow" />
 			<Add option="-Wredundant-decls" />
+			<Add option="-Wcast-align" />
+			<Add option="-Wswitch-enum" />
 			<Add option="-Wall" />
 			<Add option="-pipe" />
 			<Add option="-mthreads" />
@@ -131,13 +135,6 @@
 		<Unit filename="comparison.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="library\customButton.cpp">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="library\customButton.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
 		<Unit filename="library\customGrid.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
@@ -145,19 +142,16 @@
 		<Unit filename="library\customGrid.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="library\fileError.h">
-			<Option target="&lt;{~None~}&gt;" />
+		<Unit filename="library\errorLogging.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
 		</Unit>
-		<Unit filename="library\fileHandling.cpp" />
-		<Unit filename="library\fileHandling.h">
-			<Option target="&lt;{~None~}&gt;" />
+		<Unit filename="library\errorLogging.h">
+			<Option target="Debug" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="library\filter.cpp" />
 		<Unit filename="library\filter.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="library\globalFunctions.cpp" />
-		<Unit filename="library\globalFunctions.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="library\gtest\main.cpp">
@@ -198,10 +192,6 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="library\localization.cpp" />
-		<Unit filename="library\localization.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
 		<Unit filename="library\multithreading.cpp">
 			<Option target="Unit Test" />
 		</Unit>
@@ -219,10 +209,6 @@
 		<Unit filename="library\resources.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="library\shadow.cpp" />
-		<Unit filename="library\shadow.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
 		<Unit filename="library\statistics.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
@@ -234,19 +220,60 @@
 		<Unit filename="library\statusHandler.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="library\tinyxml\tinystr.cpp" />
-		<Unit filename="library\tinyxml\tinyxml.cpp" />
-		<Unit filename="library\tinyxml\tinyxmlerror.cpp" />
-		<Unit filename="library\tinyxml\tinyxmlparser.cpp" />
-		<Unit filename="library\zstring.cpp" />
-		<Unit filename="library\zstring.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="shared\customButton.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="shared\customButton.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="shared\customTooltip.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="shared\customTooltip.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="shared\dragAndDrop.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="shared\dragAndDrop.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="shared\fileError.h" />
+		<Unit filename="shared\fileHandling.cpp" />
+		<Unit filename="shared\fileHandling.h" />
+		<Unit filename="shared\fileTraverser.cpp" />
+		<Unit filename="shared\fileTraverser.h" />
+		<Unit filename="shared\globalFunctions.cpp" />
+		<Unit filename="shared\globalFunctions.h" />
+		<Unit filename="shared\localization.cpp" />
+		<Unit filename="shared\localization.h" />
+		<Unit filename="shared\shadow.cpp" />
+		<Unit filename="shared\shadow.h" />
+		<Unit filename="shared\shared_ptr.h" />
+		<Unit filename="shared\standardPaths.cpp" />
+		<Unit filename="shared\standardPaths.h" />
+		<Unit filename="shared\staticAssert.h" />
+		<Unit filename="shared\systemFunctions.cpp" />
+		<Unit filename="shared\systemFunctions.h" />
+		<Unit filename="shared\tinyxml\tinystr.cpp" />
+		<Unit filename="shared\tinyxml\tinyxml.cpp" />
+		<Unit filename="shared\tinyxml\tinyxmlerror.cpp" />
+		<Unit filename="shared\tinyxml\tinyxmlparser.cpp" />
+		<Unit filename="shared\xmlBase.cpp" />
+		<Unit filename="shared\xmlBase.h" />
+		<Unit filename="shared\zstring.cpp" />
+		<Unit filename="shared\zstring.h" />
 		<Unit filename="structures.cpp" />
 		<Unit filename="structures.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -269,12 +296,9 @@
 		<Unit filename="ui\checkVersion.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="ui\dragAndDrop.cpp">
+		<Unit filename="ui\dummyPanel.h">
 			<Option target="Debug" />
 			<Option target="Release" />
-		</Unit>
-		<Unit filename="ui\dragAndDrop.h">
-			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="ui\gridView.cpp">
 			<Option target="Debug" />

@@ -20,8 +20,10 @@
  perc
  sec
  másodperc
-!=	files are different\n
-!=	a fájlok különböznek\n
+%x / %y objects deleted successfully
+%X / %Y objektum sikeresen törölve
+%x Percent
+%x százalék
 %x directories
 %x mappa
 %x files,
@@ -33,7 +35,7 @@ A(z) %x nem megfelelő FreeFileSync kötegelt feladat fájl!
 %x of 1 row in view
 %x sor látható az 1 sorból
 &Abort
-&Megszakítás
+&Megszakít
 &About...
 &A programról...
 &Advanced
@@ -48,6 +50,8 @@ A(z) %x nem megfelelő FreeFileSync kötegelt feladat fájl!
 &Kötegelt feladat létrehozása
 &Default
 &Alapértelmezett
+&Exit
+&Kilépés
 &Export file list
 &Fájllista exportálása
 &File
@@ -72,6 +76,8 @@ A(z) %x nem megfelelő FreeFileSync kötegelt feladat fájl!
 &Szünet
 &Quit
 &Kilépés
+&Restore
+&Visszaállítás
 &Retry
 &Ismét
 &Save
@@ -80,20 +86,22 @@ A(z) %x nem megfelelő FreeFileSync kötegelt feladat fájl!
 &Igen
 ,
 .
--	do not copy\n
--	nem másolni\n
 - conflict
 - ütközés
 - conflict (same date, different size)
 - ütközés (ugyanaz a dátum, különböző méret)
 - different
 - különböző
+- directory part only
+- csak a mappa részét
 - equal
 - egyezik
 - exists left only
 - csak a bal oldalon létezik
 - exists right only
 - csak a jobb oldalon létezik
+- full file or directory name
+- teljes fájl- vagy mappanév
 - left
 - bal oldali
 - left newer
@@ -102,8 +110,10 @@ A(z) %x nem megfelelő FreeFileSync kötegelt feladat fájl!
 - jobb oldali
 - right newer
 - a jobb oldali újabb
-->	copy to right side\n
-->	másolni a jobb oldalra\n
+- sibling of %dir
+- a %dir gyermeke
+- sibling of %name
+- a %name gyermeke
 -Open-Source file synchronization-
 -Nyílt forráskódú fájlszinkronizálás-
 .
@@ -124,22 +134,12 @@ A(z) %x nem megfelelő FreeFileSync kötegelt feladat fájl!
 2. A csillag ('*') és a kérdőjel ('?') helyettesítő karakterek megengedettek.
 3. Exclude files directly on main grid via context menu.
 3. Fájlok közvetlen kizárása a fő listából helyi menü segítségével.
-<-	copy to left side\n
-<-	másolni a bal oldalra\n
-<<	left file is newer\n
-<<	a bal oldali fájl újabb\n
 <Directory>
 <Mappa>
 <Last session>
 <Utolsó munkamenet>
 <multiple selection>
 <többszörös kijelölés>
-<|	file on left side only\n
-<|	csak a bal oldalon lévő fájl\n
-==	files are equal\n
-==	egyező fájlok\n
->>	right file is newer\n
->>	a jobb oldali fájl újabb\n
 A newer version of FreeFileSync is available:
 Elérhető a FreeFileSync egy újabb verziója:
 Abort requested: Waiting for current operation to finish...
@@ -150,6 +150,8 @@ About
 A programról
 Action
 Művelet
+Add folder
+Mappa hozzáadása
 Add folder pair
 Mappa pár megadása
 All items have been synchronized!
@@ -162,6 +164,8 @@ As the name suggests, two files which share the same name are marked as equal if
 Ahogy a neve is mutatja, két fájl, melyeknek ugyanaz a nevük, akkor és csakis akkor lesz egyezőként jelölve, ha a tartalmuk megegyezik. Ez az opció leginkább a konzisztencia-viszgálatokhoz jó, mintsem a biztonsági mentésekhez. Így a fájlok dátuma nem számít semmit.\n\nEnnek az opciónak az engedélyezésével a döntési fa kisebb lesz:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Egy kötegelt feladat fájl létrehozása az automatizált szinkronizációhoz. Kötegelt feladat módban való indításhoz egyszerűen meg kell adni a fájl nevét a FreeFileSync.exe-nek: FreeFileSync.exe <kötegelt feladat fájl>. Ezt ütemezni is lehet az operációs rendszer feladatkezelőjével.
+Auto-adjust columns
+Oszlopok automatikus igazítása
 Batch execution
 Kötegelt végrehajtás
 Batch file created successfully!
@@ -184,6 +188,10 @@ Choose to hide filtered files/directories from list
 Szűrt fájlok/mappák elrejtése a listában
 Comma separated list
 Comma separated values
+Commandline
+Parancssor
+Commandline is empty!
+A parancssor üres!
 Compare
 Összehasonlítás
 Compare both sides
@@ -202,6 +210,8 @@ Comparing content...
 Tartalom összehasonlítása...
 Comparison Result
 Az összehasonlítás eredménye
+Comparison settings
+Összehasonlítási beállítások
 Completed
 Befejezve
 Configuration
@@ -244,8 +254,10 @@ Copying file %x to %y overwriting target
 A(z) %x fájl másolása a(z) %y fájlba fölülírva a célt
 Could not determine volume name for file:
 A következő fájlnak nem lehet meghatározni a kötetnevét:
-Could not set working directory:
-Munkamappa beállítása sikertelen:
+Could not initialize directory monitoring:
+A mappafigyelés inicializálása sikertelen:
+Could not read values for the following XML nodes:
+
 Create a batch job
 Kötegelt feladat létrehozása
 Creating folder %x
@@ -256,12 +268,18 @@ Custom
 Egyedi
 Customize columns
 Oszlopok testreszabása
+Customize...
+Testreszabás...
 DECISION TREE
 DÖNTÉSI FA
 Data remaining:
 Hátralévő adat:
 Date
 Dátum
+Delay
+Várakozás
+Delay between two invocations of the commandline
+Két parancssor meghívása közötti várakozás
 Delete files/folders existing on left side only
 Csak a bal oldalon létező fájlok/mappák törlése
 Delete files/folders existing on right side only
@@ -272,12 +290,20 @@ Delete on both sides
 Törlés mindkét oldalon
 Delete on both sides even if the file is selected on one side only
 Törlés mindkét oldalon, még akkor is, ha csak egyik oldalon lett kijelölve
+Delete or overwrite files permanently.
+A fájlok folyamatos törlése vagy felülírása.
+Delete permanently
+Folyamatosan törölni
 Deleting file %x
 Fájl törlése %x
 Deleting folder %x
 Mappa törlése %x
+Deletion handling
+Törlések kezelése
 Directories are dependent! Be careful when setting up synchronization rules:
 A mappák függenek egymástól! Legyen óvatos, amikor megadja a szinkronizálási szabályokat:
+Directories to watch
+Figyelendő mappák
 Directory
 Mappa
 Directory does not exist:
@@ -306,6 +332,8 @@ Email
 E-mail
 Enable filter to exclude files from synchronization
 Szűrő engedélyezése fájlok a szinkronizációból való kizárásához
+Endless loop when traversing directory:
+Végtelen hurok a mappák bejárásakor:
 Error
 Hiba
 Error changing modification time:
@@ -324,6 +352,10 @@ Error handling
 Hibakezelés
 Error loading library function:
 A könyvtári funkció betöltése sikertelen:
+Error moving directory:
+Hiba a mappa mozgatásakor:
+Error moving file:
+Hiba a fájl mozgatásakor:
 Error moving to Recycle Bin:
 A Lomtárba (Recycle Bin) mozgatás sikertelen:
 Error opening file:
@@ -336,12 +368,12 @@ Error reading file:
 A fájl olvasása sikertelen:
 Error resolving symbolic link:
 A szimbolikus link feloldása sikertelen:
-Error retrieving full path:
-A teljes elérési útvonal meghatározása sikertelen:
 Error starting Volume Shadow Copy Service!
 Hiba történt a Volume Shadow Copy szolgáltatás indítása közben!
 Error traversing directory:
 A mappa átnézése sikertelen:
+Error when monitoring directories.
+Hiba történt a mappák figyelése közben.
 Error writing file attributes:
 A fájl attribútumainak írása sikertelen:
 Error writing file:
@@ -458,14 +490,20 @@ Hide files that will be copied to the left side
 A bal oldalra másolandó fájlok elrejtése
 Hide files that will be copied to the right side
 A jobb oldalra másolandó fájlok elrejtése
+Hide files that will be created on the left side
+A bal oldalon létrehozandó fájlok elrejtése.
+Hide files that will be created on the right side
+A jobb oldalon létrehozandó fájlok elrejtése.
+Hide files that will be deleted on the left side
+A bal oldalon törlendő fájlok elrejtése.
+Hide files that will be deleted on the right side
+A jobb oldalon törlendő fájlok elrejtése.
 Hide files that won't be copied
 A nem másolandó fájlok elrejtése
 Hide filtered items
 A szűrt elemek elrejtése
 Hide further error messages during the current process
 A további hibaüzenetek elrejtése az aktuális folyamat során
-Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
-Hibaüzenetek elrejtése szinkronizálás közben:\nÖssze lesznek gyűjtve és a folyamat végén meg lesznek jelenítve egy listában
 Hints:
 Tippek:
 Homepage
@@ -486,8 +524,8 @@ Include
 Csatol
 Include temporarily
 Ideiglenesen tartalmaz
-Include: *.doc;*.zip;*.exe\nExclude: \\temp\\*
-Csatol: *.doc;*.zip;*.exe\nKizár: \\temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: temp\\*
+Csatol: *.doc;*.zip;*.exe\nKizár: temp\\*
 Info
 Információ
 Information
@@ -496,8 +534,8 @@ Initialization of Recycle Bin failed!
 A Lomtár (Recycle Bin) inicializálása sikertelen!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Lehetetlen a Lomtár (Recycle Bin) inicializálása!\n\nValószínűleg azért, mert nem Windost használ.\nHa szeretné ezt a funkciót használni, kérjük, lépjen kapcsolatba a szerzővel. :)
-Left:
-Bal oldal:
+Left
+Bal oldal
 Load configuration from file
 Beállítások betöltése fájlból
 Load configuration history (press DEL to delete items)
@@ -516,8 +554,14 @@ Move column down
 Oszlop mozgatása lefelé
 Move column up
 Oszlop mozgatása felfelé
+Move files to a custom directory.
+Fájlok mozgatása egyedi mappába.
+Move to custom directory
+Mozgatás egyedi mappába
 Moving %x to Recycle Bin
 %x mozgatása a Lomtárba
+Moving %x to custom directory
+%x mozgatása egyedi mappába
 Not all items have been synchronized! Have a look at the list.
 Nem minden elem szinkronizálódott! Tekintsd meg a listát.
 Not enough free disk space available in:
@@ -550,6 +594,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Ennek a funkciónak a használatához, kérjük, másold a megfelelő \"Shadow.dll\" fájlt (megtalálható a \"Shadow.zip\" archívumban) abba a mappába, amelybe a FreeFileSync-et telepítetted.
 Please fill all empty directory fields.
 Kérjük, töltse ki az összes üres mappa mezőt.
+Please specify alternate directory for deletion!
+Kérjük, adjon meg egy alternatív mappát a törléshez!
 Press button to activate filter
 Nyomja meg a gombot a szűrő aktiválásához
 Published under the GNU General Public License:
@@ -558,10 +604,18 @@ Question
 Kérdés
 Quit
 Kilépés
+RealtimeSync - Automated Synchronization
+RealtimeSync - Automatikus szinkronizálás
+RealtimeSync configuration
+RealtimeSync beállítások
 Relative path
 Relatív útvonal
+Remove folder
+Mappa eltávolítása
 Remove folder pair
 Mappa párok eltávolítása
+Report translation error
+Fordítói hiba bejelentése
 Reset
 Helyreállítás
 Reset all warning messages
@@ -570,8 +624,8 @@ Reset all warning messages?
 Helyreállítja az összes figyelmeztető üzenetet?
 Result
 Eredmény
-Right:
-Jobb oldal:
+Right
+Jobb oldal
 S&ave configuration
 Beállítások mentés&e
 S&witch view
@@ -610,6 +664,14 @@ Show files that will be copied to the left side
 A bal oldalra másolandó fájlok mutatása
 Show files that will be copied to the right side
 A jobb oldalra másolandó fájlok mutatása
+Show files that will be created on the left side
+A bal oldalon létrehozandó fájlok mutatása.
+Show files that will be created on the right side
+A jobb oldalon létrehozandó fájlok mutatása.
+Show files that will be deleted on the left side
+A bal oldalon törlendő fájlok mutatása.
+Show files that will be deleted on the right side
+A jobb oldalon törlendő fájlok mutatása.
 Show files that won't be copied
 A nem másolandó fájlok mutatása
 Show popup
@@ -660,12 +722,14 @@ Synchronizing...
 Szinkronizálás folyamatban...
 System out of memory!
 Nincs elég rendszermemória!
+Target directory already existing!
+
 Target file already existing!
 A célként megadott fájl már létezik!
 The file does not contain a valid configuration:
 A következő fájl nem tartalmaz érvényes beállításokat:
-This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
-Ez a parancssor lesz végrehajtva minden fájlnéven történő dupla kattintás esetében. %name helyettesíti a kiválasztott fájlt.
+This commandline will be executed on each doubleclick. The following macros are available:
+Ez a parancssor fog végrehajtódni minden dupla kattintásnál. A következő makrók elérhetőek:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Ez a változat akkor tekint egyezőnek két azonos nevű fájlt, ha azok mérete ÉS az utolsó módosításuk ideje azonos.
 Time
@@ -696,10 +760,12 @@ Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchro
 Feloldatlan ütközések vannak! \n\nFigyelmen kívül hagyhatod az ütközéseket és folytathatod a szinkronizálást.
 Update ->
 Frissítés ->
+Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
+Használat: Válassza ki a figyelendő mappákat és adjon meg egy parancssort. Minden alkalommal, amikor az adott mappákon (vagy almappákon) belül megváltoznak a fájlok, a parancssor végrehajtásra kerül.
 Use Recycle Bin
 Lomtár (Recycle Bin) használata
-Use Recycle Bin when deleting or overwriting files during synchronization
-A Lomtár (Recycle Bin) használata fájlok szinkronizálása közbeni törlésnél vagy felülírásnál
+Use Recycle Bin when deleting or overwriting files.
+A Lomtár használata fájlok törlésénél vagy felülírásánál.
 Variant
 Variáns
 Volume name %x not part of filename %y!
@@ -712,15 +778,13 @@ Warnings:
 Figyelem:
 When the comparison is started with this option set the following decision tree is processed:
 Ha az összehasonlítás ezekkel a beállításokkal lesz elindítva, akkor a következő döntési fa érvényesül:
+You can ignore the error to consider not existing directories as empty.
+Figyelmen kívül hagyhatja a hibákat a nem létező mappákat üresnek tekintve.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Meg lehet próbálni újra a megmaradt elemek szinkronizálását (az összehasonlítás újbóli elvégzése NÉLKÜL)!
 different
 különböző
 file exists on both sides
 mindkét oldalon létező fájlok
-flash	conflict\n
-jelzés	ütközés\n
 on one side only
 csak az egy oldalon létező fájlok
-|>	file on right side only\n
-|>	csak a jobb oldali fájl\n

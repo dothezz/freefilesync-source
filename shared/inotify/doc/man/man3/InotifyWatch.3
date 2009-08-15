@@ -1,0 +1,207 @@
+.TH "InotifyWatch" 3 "18 Apr 2007" "Version 0.7.2" "inotify-cxx" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+InotifyWatch \- inotify watch class  
+
+.PP
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <inotify-cxx.h>\fP
+.PP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBInotifyWatch\fP (const std::string &rPath, int32_t uMask, bool fEnabled=true)"
+.br
+.RI "\fIConstructor. \fP"
+.ti -1c
+.RI "\fB~InotifyWatch\fP ()"
+.br
+.RI "\fIDestructor. \fP"
+.ti -1c
+.RI "int32_t \fBGetDescriptor\fP () const"
+.br
+.RI "\fIReturns the watch descriptor. \fP"
+.ti -1c
+.RI "const std::string & \fBGetPath\fP () const"
+.br
+.RI "\fIReturns the watched file path. \fP"
+.ti -1c
+.RI "uint32_t \fBGetMask\fP () const"
+.br
+.RI "\fIReturns the watch event mask. \fP"
+.ti -1c
+.RI "void \fBSetMask\fP (uint32_t uMask)  throw (InotifyException)"
+.br
+.RI "\fISets the watch event mask. \fP"
+.ti -1c
+.RI "\fBInotify\fP * \fBGetInotify\fP ()"
+.br
+.RI "\fIReturns the appropriate inotify class instance. \fP"
+.ti -1c
+.RI "void \fBSetEnabled\fP (bool fEnabled)  throw (InotifyException)"
+.br
+.RI "\fIEnables/disables the watch. \fP"
+.ti -1c
+.RI "bool \fBIsEnabled\fP () const"
+.br
+.RI "\fIChecks whether the watch is enabled. \fP"
+.ti -1c
+.RI "bool \fBIsRecursive\fP () const"
+.br
+.RI "\fIChecks whether the watch is recursive. \fP"
+.in -1c
+.SS "Friends"
+
+.in +1c
+.ti -1c
+.RI "class \fBInotify\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+inotify watch class 
+
+It holds information about the inotify watch on a particular inode.
+.PP
+If the INOTIFY_THREAD_SAFE is defined this class is thread-safe. 
+.PP
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "InotifyWatch::InotifyWatch (const std::string & rPath, int32_t uMask, bool fEnabled = \fCtrue\fP)\fC [inline]\fP"
+.PP
+Constructor. 
+.PP
+Creates an inotify watch. Because this watch is inactive it has an invalid descriptor (-1).
+.PP
+\fBParameters:\fP
+.RS 4
+\fIrPath\fP watched file path 
+.br
+\fIuMask\fP mask for events 
+.br
+\fIfEnabled\fP events enabled yes/no 
+.RE
+.PP
+
+.SS "InotifyWatch::~InotifyWatch ()\fC [inline]\fP"
+.PP
+Destructor. 
+.PP
+.SH "Member Function Documentation"
+.PP 
+.SS "int32_t InotifyWatch::GetDescriptor () const\fC [inline]\fP"
+.PP
+Returns the watch descriptor. 
+.PP
+\fBReturns:\fP
+.RS 4
+watch descriptor; -1 for inactive watch 
+.RE
+.PP
+
+.SS "const std::string& InotifyWatch::GetPath () const\fC [inline]\fP"
+.PP
+Returns the watched file path. 
+.PP
+\fBReturns:\fP
+.RS 4
+file path 
+.RE
+.PP
+
+.SS "uint32_t InotifyWatch::GetMask () const\fC [inline]\fP"
+.PP
+Returns the watch event mask. 
+.PP
+\fBReturns:\fP
+.RS 4
+event mask 
+.RE
+.PP
+
+.SS "void InotifyWatch::SetMask (uint32_t uMask)  throw (\fBInotifyException\fP)"
+.PP
+Sets the watch event mask. 
+.PP
+If the watch is active (added to an instance of \fBInotify\fP) this method may fail due to unsuccessful re-setting the watch in the kernel.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIuMask\fP event mask
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fI\fBInotifyException\fP\fP thrown if changing fails 
+.RE
+.PP
+
+.SS "\fBInotify\fP* InotifyWatch::GetInotify ()\fC [inline]\fP"
+.PP
+Returns the appropriate inotify class instance. 
+.PP
+\fBReturns:\fP
+.RS 4
+inotify instance 
+.RE
+.PP
+
+.SS "void InotifyWatch::SetEnabled (bool fEnabled)  throw (\fBInotifyException\fP)"
+.PP
+Enables/disables the watch. 
+.PP
+If the watch is active (added to an instance of \fBInotify\fP) this method may fail due to unsuccessful re-setting the watch in the kernel.
+.PP
+Re-setting the current state has no effect.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIfEnabled\fP set enabled yes/no
+.RE
+.PP
+\fBExceptions:\fP
+.RS 4
+\fI\fBInotifyException\fP\fP thrown if enabling/disabling fails 
+.RE
+.PP
+
+.SS "bool InotifyWatch::IsEnabled () const\fC [inline]\fP"
+.PP
+Checks whether the watch is enabled. 
+.PP
+\fBReturns:\fP
+.RS 4
+true = enables, false = disabled 
+.RE
+.PP
+
+.SS "bool InotifyWatch::IsRecursive () const\fC [inline]\fP"
+.PP
+Checks whether the watch is recursive. 
+.PP
+A recursive watch monitors a directory itself and all its subdirectories. This watch is a logical object which may have many underlying kernel watches.
+.PP
+\fBReturns:\fP
+.RS 4
+currently always false (recursive watches not yet supported) 
+.RE
+.PP
+\fBAttention:\fP
+.RS 4
+Recursive watches are currently NOT supported. They are planned for future versions. 
+.RE
+.PP
+
+.SH "Friends And Related Function Documentation"
+.PP 
+.SS "friend class \fBInotify\fP\fC [friend]\fP"
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for inotify-cxx from the source code.

@@ -20,8 +20,10 @@
  min
  sec
  seg
-!=	files are different\n
-!=	ficheiros diferentes\n
+%x / %y objects deleted successfully
+%x / %y objectos eliminados com sucesso
+%x Percent
+%x Por cento
 %x directories
 %x pastas
 %x files,
@@ -48,6 +50,8 @@
 &Criar um ficheiro batch
 &Default
 &Config. Iniciais
+&Exit
+&Sair
 &Export file list
 &Exportar lista de ficheiros
 &File
@@ -72,6 +76,8 @@
 &Pausa
 &Quit
 &Sair
+&Restore
+&Restaurar
 &Retry
 &Tentar de Novo
 &Save
@@ -80,20 +86,22 @@
 &Sim
 ,
  
--	do not copy\n
--	não copiar\n
 - conflict
 - conflito
 - conflict (same date, different size)
 - conflito (mesma data, tamanho diferente)
 - different
 - ficheiros diferentes
+- directory part only
+- apenas parte do directório
 - equal
 - ficheiros iguais
 - exists left only
 - existe apenas à esquerda
 - exists right only
 - existe apenas à direita
+- full file or directory name
+- nome completo do ficheiro ou directório
 - left
 - esquerda
 - left newer
@@ -102,8 +110,10 @@
 - direita
 - right newer
 - mais novo à direita
-->	copy to right side\n
-->	copiar para a direita\n
+- sibling of %dir
+- irmão de %dir
+- sibling of %name
+- irmão de %name
 -Open-Source file synchronization-
 -Sincronização de ficheiros Open-Source-
 .
@@ -124,22 +134,12 @@
 2. Usar '*' e '?' como caracteres de procura.
 3. Exclude files directly on main grid via context menu.
 3. Excluir ficheiros directamente da grelha através do menu de contexto.
-<-	copy to left side\n
-<-	copiar para a esquerda\n
-<<	left file is newer\n
-<<	ficheiro à esquerda mais recente\n
 <Directory>
 <Directório>
 <Last session>
 <Última Sessão>
 <multiple selection>
 <Selecção Múltipla>
-<|	file on left side only\n
-<|	ficheiro apenas à esquerda\n
-==	files are equal\n
-==	ficheiros iguais\n
->>	right file is newer\n
->>	ficheiro à direita mais recente\n
 A newer version of FreeFileSync is available:
 Mais recente versão do FreeFileSync disponível:
 Abort requested: Waiting for current operation to finish...
@@ -150,6 +150,8 @@ About
 Sobre
 Action
 Acção
+Add folder
+Adicionar pasta
 Add folder pair
 Adicionar um par de pastas
 All items have been synchronized!
@@ -162,6 +164,8 @@ As the name suggests, two files which share the same name are marked as equal if
 Como o nome sugere, dois ficheiros com o mesmo nome são assinalados iguais se e só se o seu conteúdo for idêntico. Esta opção é útil para controles de consistência mais do que para efeitos de backup. Portanto, a data dos ficheiros não é tomada em conta.\n\nCom esta opção, a arvoré de decisão é menor:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Criar um batch para sincronização automática. Para iniciar o modo batch, passar o nome do ficheiro para o executável do FreeFileSync: FreeFileSync.exe <ficheiro batch>. Também pode ser calendarizado no programador de tarefas.
+Auto-adjust columns
+Auto ajustar colunas
 Batch execution
 Execução do batch
 Batch file created successfully!
@@ -184,6 +188,10 @@ Choose to hide filtered files/directories from list
 Ocultar itens filtrados da lista
 Comma separated list
 Lista de itens separados por virgula
+Commandline
+Linha de comandos
+Commandline is empty!
+Linha de comandos vazia!
 Compare
 Comparar
 Compare both sides
@@ -201,7 +209,9 @@ A comparar o conteúdo do ficheiro %x
 Comparing content...
 A comparar...
 Comparison Result
-Resultado comparação
+Resultados da Comparação
+Comparison settings
+Opções de Comparação
 Completed
 Terminado
 Configuration
@@ -244,8 +254,10 @@ Copying file %x to %y overwriting target
 Copiar ficheiro %x para %y substituindo
 Could not determine volume name for file:
 Não é possível determinar o nome do volume para o ficheiro:
-Could not set working directory:
-Não pode definir pasta de trabalho:
+Could not initialize directory monitoring:
+Não é possível iniciar monitorização do directório:
+Could not read values for the following XML nodes:
+
 Create a batch job
 Criar ficheiro batch
 Creating folder %x
@@ -256,12 +268,18 @@ Custom
 Personalizado
 Customize columns
 Personalizar colunas
+Customize...
+Personalizar...
 DECISION TREE
 ÁRVORE DE DECISÃO
 Data remaining:
 Dados em falta:
 Date
 Data
+Delay
+Atraso
+Delay between two invocations of the commandline
+Atraso entre duas chamadas da linha de comandos
 Delete files/folders existing on left side only
 Eliminar itens existentes apenas no lado esquerdo
 Delete files/folders existing on right side only
@@ -272,12 +290,20 @@ Delete on both sides
 Eliminar em ambos os lados
 Delete on both sides even if the file is selected on one side only
 Eliminar em ambos os lados mesmo se o ficheiro só está seleccionado num lado
+Delete or overwrite files permanently.
+Apagar ou substituir ficheiros permanentemente.
+Delete permanently
+Apagar permanentemente
 Deleting file %x
 Apagar ficheiro %x
 Deleting folder %x
 Apagar pasta %x
+Deletion handling
+Controlo eliminação
 Directories are dependent! Be careful when setting up synchronization rules:
 Directórios são dependentes! Cuidado ao definir as regras de sincronização:
+Directories to watch
+Directórios a observar
 Directory
 Directório
 Directory does not exist:
@@ -306,6 +332,8 @@ Email
 Email
 Enable filter to exclude files from synchronization
 Ligar filtro para excluir ficheiros da sincronização
+Endless loop when traversing directory:
+Loop infinito ao percorrer directório:
 Error
 Erro
 Error changing modification time:
@@ -324,8 +352,12 @@ Error handling
 Controlador de erros
 Error loading library function:
 Erro ao carregar a livraria:
+Error moving directory:
+Erro ao mover o directório:
+Error moving file:
+Erro ao mover o ficheiro:
 Error moving to Recycle Bin:
-Erro ao mover para Reciclagem:
+Erro ao mover para a Reciclagem:
 Error opening file:
 Erro ao abrir ficheiro:
 Error parsing configuration file:
@@ -336,12 +368,12 @@ Error reading file:
 Erro de leitura de ficheiro:
 Error resolving symbolic link:
 Erro na resolução do link simbólico:
-Error retrieving full path:
-Erro no retorno do caminho:
 Error starting Volume Shadow Copy Service!
 Erro ao iniciar o serviço Volume Shadow Copy!
 Error traversing directory:
 Erro ao percorrer a pasta:
+Error when monitoring directories.
+Erro ao monitorizar os directórios.
 Error writing file attributes:
 Erro na escrita dos atributos do ficheiro:
 Error writing file:
@@ -458,14 +490,20 @@ Hide files that will be copied to the left side
 Ocultar ficheiros a copiar para a esquerda
 Hide files that will be copied to the right side
 Ocultar ficheiros a copiar para a direita
+Hide files that will be created on the left side
+Ocultar ficheiros a ser criados à esquerda
+Hide files that will be created on the right side
+Ocultar ficheiros a ser criados à direita
+Hide files that will be deleted on the left side
+Ocultar ficheiros a ser apagados à esquerda
+Hide files that will be deleted on the right side
+Ocultar ficheiros a ser apagados à direita
 Hide files that won't be copied
 Ocultar ficheiros que não serão copiados
 Hide filtered items
 Ocultar itens filtrados
 Hide further error messages during the current process
 Ocultar próximas mensagens de erro durante este processo
-Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
-Ocultar mensagens de erro durante a sincronização:\nSerão coleccionadas e mostradas numa lista no fim do processo
 Hints:
 Dicas:
 Homepage
@@ -486,8 +524,8 @@ Include
 Incluir
 Include temporarily
 Incluir temporariamente
-Include: *.doc;*.zip;*.exe\nExclude: \\temp\\*
-Incluir: *.doc;*.zip;*.exe\nExcluir: \\temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: temp\\*
+Incluir: *.doc;*.zip;*.exe\nExcluir: temp\\*
 Info
 Info
 Information
@@ -496,8 +534,8 @@ Initialization of Recycle Bin failed!
 Início da Reciclagem falhou!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Não é possível aceder à Reciclagem!\n\nÉ possível que não esteja a utilizar Windows.\nSe desejar esta opção incluída, é favor contactar o autor. :)
-Left:
-Esquerda:
+Left
+Esquerda
 Load configuration from file
 Carregar configuração do ficheiro
 Load configuration history (press DEL to delete items)
@@ -516,8 +554,14 @@ Move column down
 Mover coluna para baixo
 Move column up
 Mover coluna para cima
+Move files to a custom directory.
+Mover ficheiros para uma pasta própria.
+Move to custom directory
+Mover para pasta própria
 Moving %x to Recycle Bin
 Mover %x para a Reciclagem
+Moving %x to custom directory
+Mover %x para pasta própria
 Not all items have been synchronized! Have a look at the list.
 Nem todos os ficheiros foram sincronizados! Verifique a lista.
 Not enough free disk space available in:
@@ -550,6 +594,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Por favor copie o \"Shadow.dll\" correcto (localizado no arquivo \"Shadow.zip\") para a pasta da instalação do FreeFileSync para activar esta opção.
 Please fill all empty directory fields.
 Por favor, preencha todos os campos vazios.
+Please specify alternate directory for deletion!
+Por favor especifique directório alternativo para eliminação!
 Press button to activate filter
 Pressione para activar o filtro
 Published under the GNU General Public License:
@@ -558,10 +604,18 @@ Question
 Questão
 Quit
 Sair
+RealtimeSync - Automated Synchronization
+RealtimeSync - Sincronização Automática
+RealtimeSync configuration
+Configuração do RealtimeSync
 Relative path
 Caminho
+Remove folder
+Remover pasta(s)
 Remove folder pair
 Remover o par de pastas
+Report translation error
+Informar um erro de tradução
 Reset
 Reiniciar
 Reset all warning messages
@@ -570,8 +624,8 @@ Reset all warning messages?
 Reiniciar todas mensagens de aviso?
 Result
 Resultado
-Right:
-Direita:
+Right
+Direita
 S&ave configuration
 G&uardar a configuração
 S&witch view
@@ -610,6 +664,14 @@ Show files that will be copied to the left side
 Mostrar ficheiros a copiar para a esquerda
 Show files that will be copied to the right side
 Mostrar ficheiros a copiar para a direita
+Show files that will be created on the left side
+Mostrar ficheiros a ser criados à esquerda
+Show files that will be created on the right side
+Mostrar ficheiros a ser criados à direita
+Show files that will be deleted on the left side
+Mostrar ficheiros a ser apagados à esquerda
+Show files that will be deleted on the right side
+Mostrar ficheiros a ser apagados à direita
 Show files that won't be copied
 Mostrar ficheiros que não serão copiados
 Show popup
@@ -660,12 +722,14 @@ Synchronizing...
 A sincronizar...
 System out of memory!
 Sistema sem memória!
+Target directory already existing!
+Directório de destino já existe!
 Target file already existing!
-Ficheiro destino já existe!
+Ficheiro de destino já existe!
 The file does not contain a valid configuration:
 O ficheiro não contém uma configuração válida:
-This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
-Esta linha de comandos será executada cada vez que fizer duplo click num ficheiro. %name serve para reservar o lugar do ficheiro seleccionado.
+This commandline will be executed on each doubleclick. The following macros are available:
+Esta linha de comandos será executada a cada duplo clique. As seguintes macros estão disponíveis:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Esta variante avalia dois ficheiros de nome igual como iguais quando têm o mesmo tamanho e a mesma data e hora de modificação.
 Time
@@ -696,10 +760,12 @@ Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchro
 Existem conflitos não resolvidos! \n\nPode ignorá-los e continuar a sincronização.
 Update ->
 Actualizar ->
+Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
+Uso: Selecionar directórios a monitorizar e escrever uma linha de comando. Cada vez que um ficheiro for alterado nestes directórios (ou subdirectórios) a linha de comando será executada.
 Use Recycle Bin
 Utilizar Reciclagem
-Use Recycle Bin when deleting or overwriting files during synchronization
-Utilizar a Reciclagem ao eliminar ou substituir ficheiros durante a sincronização
+Use Recycle Bin when deleting or overwriting files.
+Utilizar Reciclagem ao apagar ou substituir ficheiros.
 Variant
 Variável
 Volume name %x not part of filename %y!
@@ -712,15 +778,13 @@ Warnings:
 Avisos:
 When the comparison is started with this option set the following decision tree is processed:
 Usar a seguinte árvore de decisão quando inicia com estas opções de comparação:
+You can ignore the error to consider not existing directories as empty.
+Pode ignorar o erro para considerar directórios não existentes como vazios.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Pode tentar sincronizar os restantes elementos outra vez (SEM TER QUE comparar de novo) !
 different
 ficheiros diferentes
 file exists on both sides
 ficheiro existente em ambos os lados
-flash	conflict\n
-relâmpago	conflito\n
 on one side only
 ficheiro existente apenas num lado
-|>	file on right side only\n
-|>	ficheiro apenas à direita\n

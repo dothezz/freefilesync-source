@@ -20,8 +20,10 @@
  мин.
  sec
  сек.
-!=	files are different\n
-!=	файлы разные\n
+%x / %y objects deleted successfully
+%x / %y объектов удалено удачно
+%x Percent
+%x %
 %x directories
 %x папки
 %x files,
@@ -45,15 +47,17 @@
 &Check for new version
 &Проверить наличие новой версии
 &Create batch job
-&Создать задание
+&Создать задание...
 &Default
 &По-умолчанию
+&Exit
+&Выход
 &Export file list
-&Экспортировать список файлов
+&Экспортировать список файлов...
 &File
 &Файл
 &Global settings
-&Глобальные настройки
+&Глобальные настройки...
 &Help
 &Помощь
 &Ignore
@@ -63,7 +67,7 @@
 &Load
 &Загрузить
 &Load configuration
-&Загрузить конфигурацию
+&Загрузить конфигурацию...
 &No
 &Нет
 &OK
@@ -72,6 +76,8 @@
 &Пауза
 &Quit
 &Выход
+&Restore
+&Восстановить
 &Retry
 &Повторить
 &Save
@@ -80,30 +86,34 @@
 &Да
 ,
 .
--	do not copy\n
-	не копировать\n
 - conflict
-	конфликт
+- конфликт
 - conflict (same date, different size)
-конфликт (даты совпадают, размеры разные)
+- конфликт (даты совпадают, размеры разные)
 - different
-разные
+- разные
+- directory part only
+- папка
 - equal
-одинаковые
+- одинаковые
 - exists left only
-только левые существуют
+- только левые существуют
 - exists right only
-только правые существуют
+- только правые существуют
+- full file or directory name
+- файл
 - left
-левые
+- левые
 - left newer
-левые новее
+- левые новее
 - right
-правые
+- правые
 - right newer
-правые новее
-->	copy to right side\n
-->	скопировать на правую сторону\n
+- правые новее
+- sibling of %dir
+- аналогичная папка с другой стороны
+- sibling of %name
+- аналогичный файл с другой стороны
 -Open-Source file synchronization-
 Синхронизатор файлов с открытым исходным кодом
 .
@@ -124,22 +134,12 @@
 2. Используйте символы '*' и '?' для замены неизвестных.
 3. Exclude files directly on main grid via context menu.
 3. Исключите файлы прямо в главном окне через контекстное меню.
-<-	copy to left side\n
-<-	скопировать на левую сторону\n
-<<	left file is newer\n
-<<	файл слева новее\n
 <Directory>
 <Папка>
 <Last session>
 <Последняя сессия>
 <multiple selection>
 <групповое выделение>
-<|	file on left side only\n
-<|	файлы только слева\n
-==	files are equal\n
-==	файлы одинаковые\n
->>	right file is newer\n
->>	файлы справа новее\n
 A newer version of FreeFileSync is available:
 Доступна новая версия FreeFileSync:
 Abort requested: Waiting for current operation to finish...
@@ -150,6 +150,8 @@ About
 О программе
 Action
 Действие
+Add folder
+Добавить папку
 Add folder pair
 Добавить папку
 All items have been synchronized!
@@ -162,6 +164,8 @@ As the name suggests, two files which share the same name are marked as equal if
 Как написано в названии, два файла с одинаковым именем отмечаются равными, только если они имеют то же самое содержание. Эта опция полезна для проверки согласованности, а не операции резервного копирования. Поэтому даты файлов не учитываются вообще.\n\nС этой опцией алгоритм короче:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Создайте файл задания для автоматизированной синхронизации. Чтобы запустить программу в этом режиме просто передайте название файла на выполнение FreeFileSync: FreeFileSync.exe <batchfile>. Это также может быть записано в планировщике задач Вашей операционной системы.
+Auto-adjust columns
+Автовыравнивание ширины колонок
 Batch execution
 Выполнение пакетного задания
 Batch file created successfully!
@@ -184,6 +188,10 @@ Choose to hide filtered files/directories from list
 Выберите для скрытия отфильтрованных файлов/папок из списка
 Comma separated list
 Список, разделяемый запятыми
+Commandline
+Командная строка
+Commandline is empty!
+Командная строка пуста!
 Compare
 Сравнить
 Compare both sides
@@ -202,6 +210,8 @@ Comparing content...
 Сравнение содержания...
 Comparison Result
 Результаты сравнения
+Comparison settings
+Настройки сравнения
 Completed
 Завершено
 Configuration
@@ -244,8 +254,10 @@ Copying file %x to %y overwriting target
 Копирование файла %x в %y с заменой
 Could not determine volume name for file:
 Не удалось определить название тома для файла:
-Could not set working directory:
-Не удалось установить рабочую папку:
+Could not initialize directory monitoring:
+Не удалось инициализировать папку для мониторинга:
+Could not read values for the following XML nodes:
+Не удалось прочитать значения для следующих XML записей:
 Create a batch job
 Создать пакетное задание
 Creating folder %x
@@ -256,28 +268,42 @@ Custom
 Выборочно
 Customize columns
 Выбор колонок
+Customize...
+Выбрать колонки...
 DECISION TREE
 Древо решений
 Data remaining:
 Осталось:
 Date
 Дата
+Delay
+Задержка
+Delay between two invocations of the commandline
+Задержка между двумя обращениями к командной строке
 Delete files/folders existing on left side only
-Удалить файлы/папки, существующие только на левой стороне
+Удалять файлы/папки, существующие только на левой стороне
 Delete files/folders existing on right side only
-Удалить файлы/папки, существующие только на правой стороне
+Удалять файлы/папки, существующие только на правой стороне
 Delete files\tDEL
-Удалить файлы\tDEL
+Удалить файл(ы)...\tDEL
 Delete on both sides
-Удалить на обоих сторонах
+Удалить с обеих сторон
 Delete on both sides even if the file is selected on one side only
-Удалить на обоих сторонах, если даже файл выделен только на одной стороне
+Удалить с обеих сторон, если даже файл выделен только на одной стороне
+Delete or overwrite files permanently.
+Удалять или перезаписать файлы, не помещая в Корзину
+Delete permanently
+Удалять, не помещая в "Корзину"
 Deleting file %x
 Удаление файла %x
 Deleting folder %x
 Удаление папки %x
+Deletion handling
+Настройки удаления
 Directories are dependent! Be careful when setting up synchronization rules:
 Зависимые папки! Будьте внимательны при настройке правил синхронизации:
+Directories to watch
+Папки для наблюдения
 Directory
 Папка
 Directory does not exist:
@@ -306,6 +332,8 @@ Email
 Почта
 Enable filter to exclude files from synchronization
 Применить фильтр, чтобы исключить файлы из задания на синхронизацию
+Endless loop when traversing directory:
+Зацикливание при встрече пересекающихся путей:
 Error
 Ошибка
 Error changing modification time:
@@ -324,6 +352,10 @@ Error handling
 Обработка ошибок
 Error loading library function:
 Ошибка при загрузке функции библиотеки:
+Error moving directory:
+Ошибка перемещения папки:
+Error moving file:
+Ошибка перемещения файла:
 Error moving to Recycle Bin:
 Ошибка при отправке в Корзину:
 Error opening file:
@@ -336,12 +368,12 @@ Error reading file:
 Ошибка при чтении файла:
 Error resolving symbolic link:
 Ошибка при решении символической ссылки:
-Error retrieving full path:
-Ошибка при получении полного пути:
 Error starting Volume Shadow Copy Service!
 Ошибка при запуске Службы Теневого Копирования Тома!
 Error traversing directory:
 Ошибка при пересечении папок:
+Error when monitoring directories.
+Ошибка при мониторинге папок.
 Error writing file attributes:
 Ошибка при записи параметров файла:
 Error writing file:
@@ -387,7 +419,7 @@ Files %x have a file time difference of less than 1 hour! It's not safe to decid
 Files %x have the same date but a different size!
 Файлы %x имеют одинаковую дату, но различаются по размеру!
 Files are found equal if\n     - file content\nis the same.
-Файлы считаются равными, если\n - содержание файлов одинаковое
+Файлы считаются равными, если содержание файлов одинаковое
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
 Файлы считаются равными, если одинаковые\n - размер файла\n - дата и время последнего изменения
 Files remaining:
@@ -399,7 +431,7 @@ Files that exist on both sides, left one is newer
 Files that exist on both sides, right one is newer
 Файлы, существующие на обоих сторонах, правый новее
 Files/folders remaining:
-Файлов/папко осталось:
+Файлов/папок осталось:
 Files/folders scanned:
 Файлов/папок просканировано:
 Files/folders that exist on left side only
@@ -427,9 +459,9 @@ FreeFileSync на Sourceforge
 FreeFileSync batch file
 Файл задания FreeFileSync
 FreeFileSync configuration
-FreeFileSync настройка
+Настройка FreeFileSync
 FreeFileSync is up to date!
-У Вас самый последний FreeFileSync!
+У Вас самая последняя версия FreeFileSync!
 Full path
 Полный путь
 Generating file list...
@@ -458,14 +490,20 @@ Hide files that will be copied to the left side
 Скрыть файлы, которые будут скопированы на левую сторону
 Hide files that will be copied to the right side
 Скрыть файлы, которые будут скопированы на правую сторону
+Hide files that will be created on the left side
+Скрыть файлы, которые будут созданы на левой стороне
+Hide files that will be created on the right side
+Скрыть файлы, которые будут созданы на правой стороне
+Hide files that will be deleted on the left side
+Скрыть файлы, которые будут удалены на левой стороне
+Hide files that will be deleted on the right side
+Скрыть файлы, которые будут удалены на правой стороне
 Hide files that won't be copied
 Скрыть файлы, которые не будут скопированы
 Hide filtered items
 Скрыть отфильтрованные
 Hide further error messages during the current process
 Скрыть последующие ошибки во время текущего процесса
-Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
-Скрыть сообщения об ошибках во время синхронизации:\nони накапливаются и показываются как список в конце процесса
 Hints:
 Подсказка:
 Homepage
@@ -486,8 +524,8 @@ Include
 Включая
 Include temporarily
 Включая временные
-Include: *.doc;*.zip;*.exe\nExclude: \\temp\\*
-Включая: *.doc;*.zip;*.exe\nИсключая: \\temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: temp\\*
+Включая: *.doc;*.zip;*.exe\nИсключая: temp\\*
 Info
 Информация
 Information
@@ -496,8 +534,8 @@ Initialization of Recycle Bin failed!
 Инициализация Корзины провалена!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Невозможно инициализировать Корзину!\n\nВероятно, что Вы не используете Windows.\nЕсли Вы хотите, чтобы эта функция была, пожалуйста свяжитесь с автором.:)
-Left:
-Слева:
+Left
+Слева
 Load configuration from file
 Загрузить конфигурацию из файла
 Load configuration history (press DEL to delete items)
@@ -516,8 +554,14 @@ Move column down
 Переместить вниз
 Move column up
 Переместить вверх
+Move files to a custom directory.
+Перемещать файлы в выбранную папку
+Move to custom directory
+Перемещать в выбранную папку
 Moving %x to Recycle Bin
 Отправка %x в Корзину
+Moving %x to custom directory
+Переместить %x в выбранную папку
 Not all items have been synchronized! Have a look at the list.
 Не все пункты были синхронизированы! Посмотрите список.
 Not enough free disk space available in:
@@ -535,7 +579,7 @@ OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the synchronization directories.
 Только файлы/папки, которые проходят фильтрацию, будут отобраны для синхронизации. Этот фильтр будет применяться к пути папки.
 Open with File Manager\tD-Click
-Открыть файловым менеджером\tD-Click
+Открыть в Проводнике...\tD-Click
 Operation aborted!
 Операция отменена!
 Operation:
@@ -550,6 +594,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Пожалуйста, скопируйте соответствующий \"Shadow.dll\" (находящийся в архиве \"Shadow.zip\") в папку установки FreeFileSync для включения этой функции.
 Please fill all empty directory fields.
 Пожалуйста, заполните все пустые поля папок
+Please specify alternate directory for deletion!
+Просьба указать альтернативную папку для удаленых файлов!
 Press button to activate filter
 Включить фильтр
 Published under the GNU General Public License:
@@ -558,10 +604,18 @@ Question
 Вопрос
 Quit
 Выход
+RealtimeSync - Automated Synchronization
+RealtimeSync - Автоматическая синхронизация
+RealtimeSync configuration
+Настройка RealtimeSync
 Relative path
 Относительный путь
+Remove folder
+Удалить папку
 Remove folder pair
 Удалить папку
+Report translation error
+Сообщить об ошибке перевода
 Reset
 Сбросить
 Reset all warning messages
@@ -570,10 +624,10 @@ Reset all warning messages?
 Сбросить все сообщения с предупреждениями?
 Result
 Описание
-Right:
-Справа:
+Right
+Справа
 S&ave configuration
-Сохранить конфигурацию
+Сохранить конфигурацию...
 S&witch view
 Переключить вид
 Save changes to current configuration?
@@ -585,7 +639,7 @@ Scanning...
 Scanning:
 Сканирую:
 Select a folder
-Выделить папку
+Выбрать папку
 Select logfile directory:
 Выберите папку для лог-файлов:
 Select variant:
@@ -610,6 +664,14 @@ Show files that will be copied to the left side
 Показать файлы, которые будут скопированы на левую сторону
 Show files that will be copied to the right side
 Показать файлы, которые будут скопированы на правую сторону
+Show files that will be created on the left side
+Показать файлы, которые будут созданы на левой стороне
+Show files that will be created on the right side
+Показать файлы, которые будут созданы на правой стороне
+Show files that will be deleted on the left side
+Показать файлы, которые будут удалены на левой стороне
+Show files that will be deleted on the right side
+Показать файлы, которые будут удалены на правой стороне
 Show files that won't be copied
 Показать файлы, которые не будут скопированы
 Show popup
@@ -637,7 +699,7 @@ Statistics
 Stop
 Стоп
 Swap sides
-
+Поменять направление
 Synchronization Preview
 Предпросмотр синхронизации
 Synchronization aborted!
@@ -660,12 +722,14 @@ Synchronizing...
 Синхронизация...
 System out of memory!
 Нехватка памяти!
+Target directory already existing!
+Конечная папка уже существует!
 Target file already existing!
 Конечный файл уже существует!
 The file does not contain a valid configuration:
 Файл не содержит действительную конфигурацию:
-This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
-Эта командная строка будет выполняться каждый раз, когда Вы дважды кликните на имени файла. %name служит указателем места для выбранного файла.
+This commandline will be executed on each doubleclick. The following macros are available:
+Эта командная строка будет выполняться при каждом двойном клике. Следующие макросы доступны:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Этот вариант сравнивает два файла с одинаковыми именами и считает их равными, если они имеют одинаковый размер файла и одинаковую дату и время последнего изменения.
 Time
@@ -681,7 +745,7 @@ Total required free disk space:
 Total time:
 Общее время:
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
-Обрабатывать файлы, которые отличаются по времени на 1 час, как равные, менее чем на 1 час, как конфликтные, чтобы справиться с переходом на летнее время.
+Учитывать файлы, которые отличаются по времени на 1 час, как равные, менее чем на 1 час, как конфликтные, чтобы учесть переход на летнее время.
 Two way <->
 В обоих направлениях <->
 Unable to connect to sourceforge.net!
@@ -696,10 +760,12 @@ Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchro
 Существуют нерешенные конфликты \n\nВы можете проигнорировать их и продолжить синхронизацию.
 Update ->
 Обновить ->
+Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
+Выберите папки для мониторинга и введите командную строку. Каждый раз при обновлении этих папок (или их подпапок) командная строка будет выполняться.
 Use Recycle Bin
 Использовать "Корзину"
-Use Recycle Bin when deleting or overwriting files during synchronization
-Использовать "Корзину" при удалении или перезаписи во время синхронизации
+Use Recycle Bin when deleting or overwriting files.
+Использовать "Корзину" при удалении или перезаписи файлов
 Variant
 Вариант
 Volume name %x not part of filename %y!
@@ -712,15 +778,13 @@ Warnings:
 Предупреждения:
 When the comparison is started with this option set the following decision tree is processed:
 Когда сравнение запущено с этими критериями, алгоритм следующий:
+You can ignore the error to consider not existing directories as empty.
+Вы можете проигнорировать ошибку, приняв несуществующие папки за пустые.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Вы можете попытаться синхронизировать оставшиеся пункты снова (без повторного сравнения)!
 different
 разные
 file exists on both sides
 файлы существуют на обоих сторонах
-flash	conflict\n
-молния	конфликт\n
 on one side only
 файлы существуют только на одной стороне
-|>	file on right side only\n
-|>	файлы только на правой стороне\n

@@ -1,13 +1,41 @@
-FreeFileSync
-------------
+--------------
+|FreeFileSync|
+--------------
+
+Changelog v2.2
+---------------
+New user-defined recycle bin directory
+Possibility to create synchronization directories automatically (if not existing)
+Support for relative directory names (e.g. \foo, ..\bar) respecting current working directory
+New tooltip in middle grid showing detailed information (including conflicts)
+Status feedback and new abort button for manual deletion
+Options to add/remove folder pairs in batch dialog
+Added tooltip showing progress for silent batchmode
+New view filter buttons in synchronization preview
+Revisioned handling of symbolic links (Linux/Windows)
+GUI optimizations removing flicker
+Possibility to create new folders via browse folder dialog
+Open files with associated application by special command string
+Improved warning/error handling
+Auto-adjust columns automatically or manually with CTRL + '+'
+New makros for double-click commandline: %name, %dir, %nameCo, %dirCo
+Fixed runtime error when multiple folder pairs are used
+New tool 'RealtimeSync': Watch directories for changes and start synchronization automatically
+Improved XML parsing, fault tolerance and concept revisioned
+More detailed statistics before start of synchronization
+Removed superfluous border for bitmap buttons (Linux only)
+Added Czech translation
+Updated translation files
+
 
 Changelog v2.1
-----------------
+--------------
 Fixed bug that could cause FreeFileSync to crash after synchronization
+Compiled with MS Visual C++ 2008 using static runtime library
 
 
 Changelog v2.0
----------------
+--------------
 Copy locked files using Windows Volume Shadow Copy
 Load file icons asynchronously for maximum display performance
 Handle include filter correctly when comparing

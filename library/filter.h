@@ -1,6 +1,9 @@
 #ifndef FFS_FILTER_H_INCLUDED
 #define FFS_FILTER_H_INCLUDED
 
+#include <wx/string.h>
+#include "../shared/zstring.h"
+#include <set>
 #include "../structures.h"
 
 

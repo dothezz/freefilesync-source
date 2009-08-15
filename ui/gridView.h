@@ -15,8 +15,6 @@ namespace FreeFileSync
         const FileCompareLine& operator[] (unsigned row) const;
         FileCompareLine& operator[] (unsigned row);
 
-        //unsigned getResultsIndex(const unsigned viewIndex); //convert index on GridView to index on FolderComparison
-
         unsigned int elementsOnView() const; //only the currently visible elements
 
         bool refGridIsEmpty() const;
@@ -38,6 +36,10 @@ namespace FreeFileSync
             bool existsEqual;
             bool existsConflict;
 
+            bool existsSyncCreateLeft;
+            bool existsSyncCreateRight;
+            bool existsSyncDeleteLeft;
+            bool existsSyncDeleteRight;
             bool existsSyncDirLeft;
             bool existsSyncDirRight;
             bool existsSyncDirNone;
@@ -55,6 +57,8 @@ namespace FreeFileSync
 
         StatusInfo update(const bool hideFiltered, const bool syncPreviewActive);
 
+        void clearView(); //clear all references on compare results table: needed if there is a mismatch between references and actual data
+
         //UI View Filter settings
         //compare result
         bool leftOnlyFilesActive;
@@ -65,10 +69,15 @@ namespace FreeFileSync
         bool equalFilesActive;
         bool conflictFilesActive;
         //sync preview
+        bool syncCreateLeftActive;
+        bool syncCreateRightActive;
+        bool syncDeleteLeftActive;
+        bool syncDeleteRightActive;
         bool syncDirLeftActive;
         bool syncDirRightActive;
         bool syncDirNoneActive;
 
+        void resetSettings();
 
         //sorting...
         enum SortType

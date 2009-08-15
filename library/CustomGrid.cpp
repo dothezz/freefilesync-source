@@ -1,5 +1,5 @@
 #include "customGrid.h"
-#include "globalFunctions.h"
+#include "../shared/globalFunctions.h"
 #include "resources.h"
 #include <wx/dc.h>
 #include "../algorithm.h"
@@ -7,6 +7,7 @@
 #include <typeinfo>
 #include "../ui/gridView.h"
 #include "../synchronization.h"
+#include "../shared/customTooltip.h"
 
 #ifdef FFS_WIN
 #include <wx/timer.h>
@@ -60,9 +61,9 @@ public:
     virtual ~CustomGridTable() {}
 
 
-    void setGridDataTable(const GridView* gridDataView)
+    void setGridDataTable(const GridView* view)
     {
-        this->gridDataView = gridDataView;
+        this->gridDataView = view;
     }
 
 
@@ -275,15 +276,15 @@ public:
                 switch (getTypeAtPos(col))
                 {
                 case xmlAccess::FULL_PATH:
-                    return wxString(gridLine->fileDescrLeft.fullName.c_str()).BeforeLast(FreeFileSync::FILE_NAME_SEPARATOR);
+                    return wxString(gridLine->fileDescrLeft.fullName.c_str()).BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);
                 case xmlAccess::FILENAME: //filename
-                    return wxString(gridLine->fileDescrLeft.relativeName.c_str()).AfterLast(FreeFileSync::FILE_NAME_SEPARATOR);
+                    return wxString(gridLine->fileDescrLeft.relativeName.c_str()).AfterLast(globalFunctions::FILE_NAME_SEPARATOR);
                 case xmlAccess::REL_PATH: //relative path
-                    return wxString(gridLine->fileDescrLeft.relativeName.c_str()).BeforeLast(FreeFileSync::FILE_NAME_SEPARATOR);
+                    return wxString(gridLine->fileDescrLeft.relativeName.c_str()).BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);
                 case xmlAccess::DIRECTORY:
                     return gridDataView->getFolderPair(row).leftDirectory.c_str();
                 case xmlAccess::SIZE: //file size
-                    return globalFunctions::includeNumberSeparator(gridLine->fileDescrLeft.fileSize.ToString());
+                    return FreeFileSync::includeNumberSeparator(gridLine->fileDescrLeft.fileSize.ToString());
                 case xmlAccess::DATE: //date
                     return FreeFileSync::utcTimeToLocalString(gridLine->fileDescrLeft.lastWriteTimeRaw, gridLine->fileDescrLeft.fullName);
                 }
@@ -355,15 +356,15 @@ public:
                 switch (getTypeAtPos(col))
                 {
                 case xmlAccess::FULL_PATH:
-                    return wxString(gridLine->fileDescrRight.fullName.c_str()).BeforeLast(FreeFileSync::FILE_NAME_SEPARATOR);
+                    return wxString(gridLine->fileDescrRight.fullName.c_str()).BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);
                 case xmlAccess::FILENAME: //filename
-                    return wxString(gridLine->fileDescrRight.relativeName.c_str()).AfterLast(FreeFileSync::FILE_NAME_SEPARATOR);
+                    return wxString(gridLine->fileDescrRight.relativeName.c_str()).AfterLast(globalFunctions::FILE_NAME_SEPARATOR);
                 case xmlAccess::REL_PATH: //relative path
-                    return wxString(gridLine->fileDescrRight.relativeName.c_str()).BeforeLast(FreeFileSync::FILE_NAME_SEPARATOR);
+                    return wxString(gridLine->fileDescrRight.relativeName.c_str()).BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);
                 case xmlAccess::DIRECTORY:
                     return gridDataView->getFolderPair(row).rightDirectory.c_str();
                 case xmlAccess::SIZE: //file size
-                    return globalFunctions::includeNumberSeparator(gridLine->fileDescrRight.fileSize.ToString());
+                    return FreeFileSync::includeNumberSeparator(gridLine->fileDescrRight.fileSize.ToString());
                 case xmlAccess::DATE: //date
                     return FreeFileSync::utcTimeToLocalString(gridLine->fileDescrRight.lastWriteTimeRaw, gridLine->fileDescrRight.fullName);
                 }
@@ -449,7 +450,7 @@ private:
 
             if (syncPreviewActive) //synchronization preview
             {
-                switch (gridLine->direction)
+                switch (gridLine->syncDir)
                 {
                 case SYNC_DIR_LEFT:
                     return COLOR_SYNC_BLUE;
@@ -904,77 +905,98 @@ public:
     {
         //############## show windows explorer file icons ######################
 
-        if (showFileIcons) //evaluate at compile time
+        if (    showFileIcons && //evaluate at compile time
+                m_gridDataTable->getTypeAtPos(col) == xmlAccess::FILENAME)
         {
-            if (    m_gridDataTable->getTypeAtPos(col) == xmlAccess::FILENAME &&
-                    rect.GetWidth() >= IconBuffer::ICON_SIZE)
+            if (rect.GetWidth() >= IconBuffer::ICON_SIZE)
             {
+                //  Partitioning:
+                //   _____________________
+                //  | 2 pix | icon | rest |
+                //   ---------------------
+
+                //clear area where icon will be placed
+                wxRect rectShrinked(rect);
+                rectShrinked.SetWidth(IconBuffer::ICON_SIZE + LEFT_BORDER); //add 2 pixel border
+                wxGridCellRenderer::Draw(grid, attr, dc, rectShrinked, row, col, isSelected);
+
+                //draw rest
+                wxRect rest(rect); //unscrolled
+                rest.x     += IconBuffer::ICON_SIZE + LEFT_BORDER;
+                rest.width -= IconBuffer::ICON_SIZE + LEFT_BORDER;
+                wxGridCellStringRenderer::Draw(grid, attr, dc, rest, row, col, isSelected);
+
+                //try to draw icon
                 //retrieve grid data
                 const Zstring fileName = m_gridDataTable->getFileName(row);
                 if (!fileName.empty())
                 {
-                    //  Partitioning:
-                    //   _____________________
-                    //  | 2 pix | icon | rest |
-                    //   ---------------------
-
-                    //clear area where icon will be placed
-                    wxRect rectShrinked(rect);
-                    rectShrinked.SetWidth(IconBuffer::ICON_SIZE + 2); //add 2 pixel border
-                    wxGridCellRenderer::Draw(grid, attr, dc, rectShrinked, row, col, isSelected);
-
-                    //try to draw icon
                     wxIcon icon;
+                    bool iconDrawnFully = false;
                     const bool iconLoaded = IconBuffer::getInstance().requestIcon(fileName, &icon); //returns false if icon is not in buffer
                     if (iconLoaded)
-                        dc.DrawIcon(icon, rectShrinked.GetX() + 2, rectShrinked.GetY());
-
-                    //-----------------------------------------------------------------------------------------------
-                    //only mark as successful if icon was drawn fully!
-                    //(attention: when scrolling, rows get partially updated, which can result in the upper half being blank!)
-
-                    //rect where icon was placed
-                    wxRect iconRect(rect); //unscrolled
-                    iconRect.x += 2;
-                    iconRect.SetWidth(IconBuffer::ICON_SIZE);
-
-                    //convert to scrolled coordinates
-                    grid.CalcScrolledPosition(iconRect.x, iconRect.y, &iconRect.x, &iconRect.y);
-
-                    bool iconDrawnFully = false;
-                    wxRegionIterator regionsInv(grid.GetGridWindow()->GetUpdateRegion());
-                    while (regionsInv)
                     {
-                        if (regionsInv.GetRect().Contains(iconRect))
+                        dc.DrawIcon(icon, rectShrinked.GetX() + LEFT_BORDER, rectShrinked.GetY());
+
+                        //-----------------------------------------------------------------------------------------------
+                        //only mark as successful if icon was drawn fully!
+                        //(attention: when scrolling, rows get partially updated, which can result in the upper half being blank!)
+
+                        //rect where icon was placed
+                        wxRect iconRect(rect); //unscrolled
+                        iconRect.x += LEFT_BORDER;
+                        iconRect.SetWidth(IconBuffer::ICON_SIZE);
+
+                        //convert to scrolled coordinates
+                        grid.CalcScrolledPosition(iconRect.x, iconRect.y, &iconRect.x, &iconRect.y);
+
+                        wxRegionIterator regionsInv(grid.GetGridWindow()->GetUpdateRegion());
+                        while (regionsInv)
                         {
-                            iconDrawnFully = true;
-                            break;
+                            if (regionsInv.GetRect().Contains(iconRect))
+                            {
+                                iconDrawnFully = true;
+                                break;
+                            }
+                            ++regionsInv;
                         }
-                        ++regionsInv;
                     }
                     //-----------------------------------------------------------------------------------------------
-
-
                     //save status of last icon load -> used for async. icon loading
                     m_loadIconSuccess[row] = iconLoaded && iconDrawnFully;
-
-                    //draw rest
-                    wxRect rest(rect); //unscrolled
-                    rest.x     += IconBuffer::ICON_SIZE + 2;
-                    rest.width -= IconBuffer::ICON_SIZE + 2;
-
-                    wxGridCellStringRenderer::Draw(grid, attr, dc, rest, row, col, isSelected);
-                    return;
                 }
             }
+            return;
         }
+
         //default
         wxGridCellStringRenderer::Draw(grid, attr, dc, rect, row, col, isSelected);
     }
 
+
+    virtual wxSize GetBestSize(wxGrid& grid,       //adapt reported width if file icons are shown
+                               wxGridCellAttr& attr,
+                               wxDC& dc,
+                               int row, int col)
+    {
+        if (    showFileIcons && //evaluate at compile time
+                m_gridDataTable->getTypeAtPos(col) == xmlAccess::FILENAME)
+        {
+            wxSize rv = wxGridCellStringRenderer::GetBestSize(grid, attr, dc, row, col);
+            rv.SetWidth(rv.GetWidth() + LEFT_BORDER + IconBuffer::ICON_SIZE);
+            return rv;
+        }
+
+        //default
+        return wxGridCellStringRenderer::GetBestSize(grid, attr, dc, row, col);
+    }
+
+
 private:
     CustomGridRim::LoadSuccess& m_loadIconSuccess;
     const CustomGridTableRim* const m_gridDataTable;
+
+    static const int LEFT_BORDER = 2;
 };
 #endif
 
@@ -1268,7 +1290,7 @@ IconUpdater::IconUpdater(CustomGridLeft* leftGrid, CustomGridRight* rightGrid) :
         m_timer(new wxTimer)      //connect timer event for async. icon loading
 {
     m_timer->Connect(wxEVT_TIMER, wxEventHandler(IconUpdater::loadIconsAsynchronously), NULL, this);
-    m_timer->Start(50); //timer interval
+    m_timer->Start(50); //timer interval in ms
 }
 
 
@@ -1280,7 +1302,8 @@ void IconUpdater::loadIconsAsynchronously(wxEvent& event) //loads all (not yet) 
     std::vector<Zstring> newLoad;
     m_rightGrid->getIconsToBeLoaded(newLoad);
 
-    globalFunctions::mergeVectors(iconsLeft, newLoad);
+    //merge vectors
+    newLoad.insert(newLoad.end(), iconsLeft.begin(), iconsLeft.end());
 
     FreeFileSync::IconBuffer::getInstance().setWorkload(newLoad); //attention: newLoad is invalidated after this call!!!
 
@@ -1424,7 +1447,8 @@ CustomGridMiddle::CustomGridMiddle(wxWindow *parent,
         selectionPos(BLOCKPOS_CHECK_BOX),
         highlightedRow(-1),
         highlightedPos(BLOCKPOS_CHECK_BOX),
-        gridDataTable(NULL)
+        gridDataTable(NULL),
+        toolTip(new CustomTooltip)
 {
     //connect events for dynamic selection of sync direction
     GetGridWindow()->Connect(wxEVT_MOTION, wxMouseEventHandler(CustomGridMiddle::OnMouseMovement), NULL, this);
@@ -1480,6 +1504,9 @@ void CustomGridMiddle::OnMouseMovement(wxMouseEvent& event)
         if (    highlightedRowOld >= 0 &&
                 highlightedRow != highlightedRowOld)
             RefreshCell(highlightedRowOld, 0);
+
+        //handle tooltip
+        showToolTip(highlightedRow, GetGridWindow()->ClientToScreen(event.GetPosition()));
     }
 
     event.Skip();
@@ -1491,6 +1518,78 @@ void CustomGridMiddle::OnLeaveWindow(wxMouseEvent& event)
     highlightedRow = -1;
     highlightedPos = BLOCKPOS_CHECK_BOX;
     Refresh();
+
+    //handle tooltip
+    toolTip->hide();
+}
+
+
+void CustomGridMiddle::showToolTip(int rowNumber, wxPoint pos)
+{
+    const FileCompareLine* const rowData = gridDataTable->getRawData(rowNumber);
+    if (rowData == NULL) //if invalid row...
+    {
+        toolTip->hide();
+        return;
+    }
+
+    if (gridDataTable->syncPreviewIsActive()) //synchronization preview
+    {
+        switch (getSyncOperation(*rowData))
+        {
+        case SO_CREATE_NEW_LEFT:
+            toolTip->show(_("Copy from right to left"), pos, GlobalResources::getInstance().bitmapSyncCreateLeftAct);
+            break;
+        case SO_CREATE_NEW_RIGHT:
+            toolTip->show(_("Copy from left to right"), pos, GlobalResources::getInstance().bitmapSyncCreateRightAct);
+            break;
+        case SO_DELETE_LEFT:
+            toolTip->show(_("Delete files/folders existing on left side only"), pos, GlobalResources::getInstance().bitmapSyncDeleteLeftAct);
+            break;
+        case SO_DELETE_RIGHT:
+            toolTip->show(_("Delete files/folders existing on right side only"), pos, GlobalResources::getInstance().bitmapSyncDeleteRightAct);
+            break;
+        case SO_OVERWRITE_LEFT:
+            toolTip->show(_("Copy from right to left overwriting"), pos, GlobalResources::getInstance().bitmapSyncDirLeftAct);
+            break;
+        case SO_OVERWRITE_RIGHT:
+            toolTip->show(_("Copy from left to right overwriting"), pos, GlobalResources::getInstance().bitmapSyncDirRightAct);
+            break;
+        case SO_DO_NOTHING:
+            toolTip->show(_("Do nothing"), pos, GlobalResources::getInstance().bitmapSyncDirNoneAct);
+            break;
+        case SO_UNRESOLVED_CONFLICT:
+            toolTip->show(rowData->conflictDescription.get(), pos, GlobalResources::getInstance().bitmapConflictAct);
+            break;
+        };
+    }
+    else
+    {
+        switch (rowData->cmpResult)
+        {
+        case FILE_LEFT_SIDE_ONLY:
+            toolTip->show(_("Files/folders that exist on left side only"), pos, GlobalResources::getInstance().bitmapLeftOnlyAct);
+            break;
+        case FILE_RIGHT_SIDE_ONLY:
+            toolTip->show(_("Files/folders that exist on right side only"), pos, GlobalResources::getInstance().bitmapRightOnlyAct);
+            break;
+        case FILE_LEFT_NEWER:
+            toolTip->show(_("Files that exist on both sides, left one is newer"), pos, GlobalResources::getInstance().bitmapLeftNewerAct);
+            break;
+        case FILE_RIGHT_NEWER:
+            toolTip->show(_("Files that exist on both sides, right one is newer"), pos, GlobalResources::getInstance().bitmapRightNewerAct);
+            break;
+        case FILE_DIFFERENT:
+            toolTip->show(_("Files that exist on both sides and have different content"), pos, GlobalResources::getInstance().bitmapDifferentAct);
+            break;
+        case FILE_EQUAL:
+            toolTip->show(_(""), pos, GlobalResources::getInstance().bitmapEqualAct);
+            break;
+        case FILE_CONFLICT:
+            toolTip->show(rowData->conflictDescription.get(), pos, GlobalResources::getInstance().bitmapConflictAct);
+            break;
+        }
+    }
 }
 
 
@@ -1594,32 +1693,6 @@ void CustomGridMiddle::enableSyncPreview(bool value)
 {
     assert(gridDataTable);
     gridDataTable->enableSyncPreview(value);
-
-    //update legend
-    wxString toolTip;
-
-    if (gridDataTable->syncPreviewIsActive()) //synchronization preview
-    {
-        const wxString header = _("Synchronization Preview");
-        toolTip = header + wxT("\n") + wxString().Pad(header.Len(), wxChar('-')) + wxT("\n");
-        toolTip += wxString(_("<-	copy to left side\n")) +
-                   _("->	copy to right side\n") +
-                   wxT(" ")+ _("-	do not copy\n") +
-                   _("flash	conflict\n");
-    }
-    else //compare results view
-    {
-        const wxString header = _("Comparison Result");
-        toolTip = header + wxT("\n") + wxString().Pad(header.Len(), wxChar('-')) + wxT("\n");
-        toolTip += wxString(_("<|	file on left side only\n")) +
-                   _("|>	file on right side only\n") +
-                   _("<<	left file is newer\n") +
-                   _(">>	right file is newer\n") +
-                   _("!=	files are different\n") +
-                   _("==	files are equal\n") +
-                   _("flash	conflict\n");
-    }
-    GetGridColLabelWindow()->SetToolTip(toolTip);
 }
 
 
@@ -1643,6 +1716,8 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
     {
         if (rect.GetWidth() > CHECK_BOX_WIDTH)
         {
+            const bool rowIsHighlighted = row == m_gridMiddle->highlightedRow;
+
             wxRect rectShrinked(rect);
 
             //clean first block of rect that will receive image of checkbox
@@ -1651,14 +1726,17 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
 
             //print image into first block
             rectShrinked.SetX(rect.GetX() + 1);
-            bool selected = rowData->selectedForSynchronization;
 
             //HIGHLIGHTNING:
-            if (    row == m_gridMiddle->highlightedRow &&
-                    m_gridMiddle->highlightedPos == CustomGridMiddle::BLOCKPOS_CHECK_BOX)
-                selected = !selected;
-
-            if (selected)
+            if (rowIsHighlighted && m_gridMiddle->highlightedPos == CustomGridMiddle::BLOCKPOS_CHECK_BOX)
+            {
+                if (rowData->selectedForSynchronization)
+                    dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapCheckBoxTrueFocus, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+                else
+                    dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapCheckBoxFalseFocus, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+            }
+            //default
+            else if (rowData->selectedForSynchronization)
                 dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapCheckBoxTrue, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
             else
                 dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapCheckBoxFalse, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
@@ -1674,7 +1752,7 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
                 //print sync direction into second block
 
                 //HIGHLIGHTNING:
-                if (row == m_gridMiddle->highlightedRow && m_gridMiddle->highlightedPos != CustomGridMiddle::BLOCKPOS_CHECK_BOX)
+                if (rowIsHighlighted && m_gridMiddle->highlightedPos != CustomGridMiddle::BLOCKPOS_CHECK_BOX)
                     switch (m_gridMiddle->highlightedPos)
                     {
                     case CustomGridMiddle::BLOCKPOS_CHECK_BOX:
@@ -1691,7 +1769,7 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
                     }
                 else //default
                 {
-                    const wxBitmap& syncOpIcon = getSyncOpImage(rowData->cmpResult, rowData->selectedForSynchronization, rowData->direction);
+                    const wxBitmap& syncOpIcon = getSyncOpImage(rowData->cmpResult, rowData->selectedForSynchronization, rowData->syncDir);
                     dc.DrawLabel(wxEmptyString, syncOpIcon, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
                 }
             }
@@ -1755,3 +1833,30 @@ void CustomGridMiddle::DrawColLabel(wxDC& dc, int col)
         dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapCmpViewSmall, rect, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL);
 }
 
+
+const wxBitmap& FreeFileSync::getSyncOpImage(const CompareFilesResult cmpResult,
+        const bool selectedForSynchronization,
+        const SyncDirection syncDir)
+{
+    switch (getSyncOperation(cmpResult, selectedForSynchronization, syncDir)) //evaluate comparison result and sync direction
+    {
+    case SO_CREATE_NEW_LEFT:
+        return *GlobalResources::getInstance().bitmapCreateLeftSmall;
+    case SO_CREATE_NEW_RIGHT:
+        return *GlobalResources::getInstance().bitmapCreateRightSmall;
+    case SO_DELETE_LEFT:
+        return *GlobalResources::getInstance().bitmapDeleteLeftSmall;
+    case SO_DELETE_RIGHT:
+        return *GlobalResources::getInstance().bitmapDeleteRightSmall;
+    case SO_OVERWRITE_RIGHT:
+        return *GlobalResources::getInstance().bitmapSyncDirRightSmall;
+    case SO_OVERWRITE_LEFT:
+        return *GlobalResources::getInstance().bitmapSyncDirLeftSmall;
+    case SO_DO_NOTHING:
+        return *GlobalResources::getInstance().bitmapSyncDirNoneSmall;
+    case SO_UNRESOLVED_CONFLICT:
+        return *GlobalResources::getInstance().bitmapConflictSmall;
+    }
+
+    return wxNullBitmap; //dummy
+}

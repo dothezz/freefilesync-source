@@ -1,20 +1,20 @@
 #include "algorithm.h"
 #include <wx/intl.h>
-#include <cmath>
 #include <wx/log.h>
 #include "library/resources.h"
-#include "library/globalFunctions.h"
-#include "library/statusHandler.h"
-#include "library/fileHandling.h"
+#include "shared/globalFunctions.h"
+#include "shared/systemFunctions.h"
+#include "shared/fileHandling.h"
 #include <wx/msgdlg.h>
+#include <wx/textctrl.h>
+#include <wx/combobox.h>
+#include <wx/filepicker.h>
+#include "shared/localization.h"
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
-
-#elif defined FFS_LINUX
-#include <string.h>
-#include <errno.h>
 #endif
+
 
 using namespace FreeFileSync;
 
@@ -36,96 +36,89 @@ wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
     if (filesize < 0)
         return _("Error");
 
+    if (filesize <= 999)
+        return wxString::Format(wxT("%i"), static_cast<int>(filesize)) + _(" Byte"); //no decimal places in case of bytes
+
     double nrOfBytes = filesize;
 
-    bool unitByte = true;
-    wxString unit = _(" Byte");
+    nrOfBytes /= 1024;
+    wxString unit = _(" kB");
     if (nrOfBytes > 999)
     {
-        unitByte = false;
         nrOfBytes /= 1024;
-        unit = _(" kB");
+        unit = _(" MB");
         if (nrOfBytes > 999)
         {
             nrOfBytes /= 1024;
-            unit = _(" MB");
+            unit = _(" GB");
             if (nrOfBytes > 999)
             {
                 nrOfBytes /= 1024;
-                unit = _(" GB");
+                unit = _(" TB");
                 if (nrOfBytes > 999)
                 {
                     nrOfBytes /= 1024;
-                    unit = _(" TB");
-                    if (nrOfBytes > 999)
-                    {
-                        nrOfBytes /= 1024;
-                        unit = _(" PB");
-                    }
+                    unit = _(" PB");
                 }
             }
         }
     }
 
-    wxString temp;
-    if (unitByte) //no decimal places in case of bytes
-    {
-        double integer = 0;
-        modf(nrOfBytes, &integer); //get integer part of nrOfBytes
-        temp = globalFunctions::numberToWxString(int(integer));
-    }
-    else
-    {
-        nrOfBytes*= 100;    //we want up to two decimal places
-        double integer = 0;
-        modf(nrOfBytes, &integer); //get integer part of nrOfBytes
+    //print just three significant digits: 0,01 | 0,11 | 1,11 | 11,1 | 111
 
-        temp = globalFunctions::numberToWxString(int(integer));
+    const unsigned int leadDigitCount = globalFunctions::getDigitCount(static_cast<unsigned int>(nrOfBytes)); //number of digits before decimal point
+    if (leadDigitCount == 0 || leadDigitCount > 3)
+        return _("Error");
 
-        switch (temp.length())
-        {
-        case 0:
-            return _("Error");
-        case 1:
-            temp = wxString(wxT("0")) + FreeFileSync::DECIMAL_POINT + wxT("0") + temp;
-            break; //0,01
-        case 2:
-            temp = wxString(wxT("0")) + FreeFileSync::DECIMAL_POINT + temp;
-            break; //0,11
-        case 3:
-            temp.insert(1, FreeFileSync::DECIMAL_POINT);
-            break; //1,11
-        case 4:
-            temp = temp.substr(0, 3);
-            temp.insert(2, FreeFileSync::DECIMAL_POINT);
-            break; //11,1
-        case 5:
-            temp = temp.substr(0, 3);
-            break; //111
-        default:
-            return _("Error");
-        }
+    if (leadDigitCount == 3)
+        return wxString::Format(wxT("%i"), static_cast<int>(nrOfBytes)) + unit;
+    else if (leadDigitCount == 2)
+    {
+        wxString output = wxString::Format(wxT("%i"), static_cast<int>(nrOfBytes * 10));
+        output.insert(leadDigitCount, FreeFileSync::DECIMAL_POINT);
+        return output + unit;
     }
-    return (temp + unit);
+    else //leadDigitCount == 1
+    {
+        wxString output = wxString::Format(wxT("%03i"), static_cast<int>(nrOfBytes * 100));
+        output.insert(leadDigitCount, FreeFileSync::DECIMAL_POINT);
+        return output + unit;
+    }
+
+    //return wxString::Format(wxT("%.*f"), 3 - leadDigitCount, nrOfBytes) + unit;
 }
 
 
-Zstring FreeFileSync::getFormattedDirectoryName(const Zstring& dirname)
-{   //Formatting is needed since functions expect the directory to end with '\' to be able to split the relative names.
-    //Also improves usability.
+wxString FreeFileSync::includeNumberSeparator(const wxString& number)
+{
+    wxString output(number);
+    for (int i = output.size() - 3; i > 0; i -= 3)
+        output.insert(i,  FreeFileSync::THOUSANDS_SEPARATOR);
 
-    Zstring dirnameTmp = dirname;
-    dirnameTmp.Trim(true);  //remove whitespace characters from right
-    dirnameTmp.Trim(false); //remove whitespace characters from left
+    return output;
+}
 
-    if (dirnameTmp.empty()) //an empty string is interpreted as "\"; this is not desired
-        return Zstring();
 
-    if (!endsWithPathSeparator(dirnameTmp))
-        dirnameTmp += FreeFileSync::FILE_NAME_SEPARATOR;
+template <class T>
+void setDirectoryNameImpl(const wxString& dirname, T* txtCtrl, wxDirPickerCtrl* dirPicker)
+{
+    txtCtrl->SetValue(dirname);
+    const Zstring leftDirFormatted = FreeFileSync::getFormattedDirectoryName(dirname.c_str());
+    if (wxDirExists(leftDirFormatted.c_str()))
+        dirPicker->SetPath(leftDirFormatted.c_str());
+}
 
-    //don't do directory formatting with wxFileName, as it doesn't respect //?/ - prefix
-    return dirnameTmp;
+
+void FreeFileSync::setDirectoryName(const wxString& dirname, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker)
+{
+    setDirectoryNameImpl(dirname, txtCtrl, dirPicker);
+}
+
+
+void FreeFileSync::setDirectoryName(const wxString& dirname, wxComboBox* txtCtrl, wxDirPickerCtrl* dirPicker)
+{
+    txtCtrl->SetSelection(wxNOT_FOUND);
+    setDirectoryNameImpl(dirname, txtCtrl, dirPicker);
 }
 
 
@@ -162,7 +155,6 @@ void FreeFileSync::redetermineSyncDirection(const SyncConfiguration& config, Fol
 {
     //do not handle i->selectedForSynchronization in this method! handled in synchronizeFile(), synchronizeFolder()!
 
-
     for (FolderComparison::iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
     {
         FileComparison& fileCmp = j->fileCmp;
@@ -171,31 +163,31 @@ void FreeFileSync::redetermineSyncDirection(const SyncConfiguration& config, Fol
             switch (i->cmpResult)
             {
             case FILE_LEFT_SIDE_ONLY:
-                i->direction = config.exLeftSideOnly;
+                i->syncDir = convertToSyncDirection(config.exLeftSideOnly);
                 break;
 
             case FILE_RIGHT_SIDE_ONLY:
-                i->direction = config.exRightSideOnly;
+                i->syncDir = convertToSyncDirection(config.exRightSideOnly);
                 break;
 
             case FILE_RIGHT_NEWER:
-                i->direction = config.rightNewer;
+                i->syncDir = convertToSyncDirection(config.rightNewer);
                 break;
 
             case FILE_LEFT_NEWER:
-                i->direction = config.leftNewer;
+                i->syncDir = convertToSyncDirection(config.leftNewer);
                 break;
 
             case FILE_DIFFERENT:
-                i->direction = config.different;
+                i->syncDir = convertToSyncDirection(config.different);
                 break;
 
             case FILE_CONFLICT:
-                i->direction = SYNC_UNRESOLVED_CONFLICT;
+                i->syncDir = SYNC_UNRESOLVED_CONFLICT;
                 break;
 
             case FILE_EQUAL:
-                i->direction = SYNC_DIR_NONE;
+                i->syncDir = SYNC_DIR_NONE;
             }
         }
     }
@@ -216,7 +208,7 @@ void FreeFileSync::addSubElements(const FileComparison& fileCmp, const FileCompa
     else
         return;
 
-    relevantDirectory += FreeFileSync::FILE_NAME_SEPARATOR; //FILE_NAME_SEPARATOR needed to exclude subfile/dirs only
+    relevantDirectory += globalFunctions::FILE_NAME_SEPARATOR; //FILE_NAME_SEPARATOR needed to exclude subfile/dirs only
 
     for (FileComparison::const_iterator i = fileCmp.begin(); i != fileCmp.end(); ++i)
     {
@@ -249,11 +241,14 @@ struct SortedFileName
 
 
 //assemble message containing all files to be deleted
-wxString FreeFileSync::deleteFromGridAndHDPreview(const FileComparison& fileCmp,
+std::pair<wxString, int> FreeFileSync::deleteFromGridAndHDPreview(const FileComparison& fileCmp,
         const std::set<int>& rowsToDeleteOnLeft,
         const std::set<int>& rowsToDeleteOnRight,
         const bool deleteOnBothSides)
 {
+    wxString filesToDelete;
+    int totalDelCount = 0;
+
     if (deleteOnBothSides)
     {
         //mix selected rows from left and right
@@ -261,21 +256,26 @@ wxString FreeFileSync::deleteFromGridAndHDPreview(const FileComparison& fileCmp,
         for (std::set<int>::const_iterator i = rowsToDeleteOnRight.begin(); i != rowsToDeleteOnRight.end(); ++i)
             rowsToDelete.insert(*i);
 
-        wxString filesToDelete;
         for (std::set<int>::const_iterator i = rowsToDelete.begin(); i != rowsToDelete.end(); ++i)
         {
             const FileCompareLine& currentCmpLine = fileCmp[*i];
 
             if (currentCmpLine.fileDescrLeft.objType != FileDescrLine::TYPE_NOTHING)
+            {
                 filesToDelete += (currentCmpLine.fileDescrLeft.fullName + wxT("\n")).c_str();
+                ++totalDelCount;
+            }
 
             if (currentCmpLine.fileDescrRight.objType != FileDescrLine::TYPE_NOTHING)
+            {
                 filesToDelete += (currentCmpLine.fileDescrRight.fullName + wxT("\n")).c_str();
+                ++totalDelCount;
+            }
 
             filesToDelete+= wxT("\n");
         }
 
-        return filesToDelete;
+        return std::pair<wxString, int>(filesToDelete, totalDelCount);
     }
     else //delete selected files only
     {
@@ -291,6 +291,7 @@ wxString FreeFileSync::deleteFromGridAndHDPreview(const FileComparison& fileCmp,
                 newEntry.position = *i * 10;
                 newEntry.name = currentCmpLine.fileDescrLeft.fullName;
                 outputTable.insert(newEntry);
+                ++totalDelCount;
             }
         }
 
@@ -303,14 +304,14 @@ wxString FreeFileSync::deleteFromGridAndHDPreview(const FileComparison& fileCmp,
                 newEntry.position = *i * 10 + 1; //ensure files on left are before files on right for the same row number
                 newEntry.name = currentCmpLine.fileDescrRight.fullName;
                 outputTable.insert(newEntry);
+                ++totalDelCount;
             }
         }
 
-        wxString filesToDelete;
         for (std::set<SortedFileName>::const_iterator i = outputTable.begin(); i != outputTable.end(); ++i)
             filesToDelete += (i->name + wxT("\n")).c_str();
 
-        return filesToDelete;
+        return std::pair<wxString, int>(filesToDelete, totalDelCount);
     }
 }
 
@@ -318,7 +319,7 @@ wxString FreeFileSync::deleteFromGridAndHDPreview(const FileComparison& fileCmp,
 class RemoveAtExit //this class ensures, that the result of the method below is ALWAYS written on exit, even if exceptions are thrown!
 {
 public:
-    RemoveAtExit(FileComparison& fileCmp) :
+    RemoveAtExit(FreeFileSync::FileComparison& fileCmp) :
             gridToWrite(fileCmp) {}
 
     ~RemoveAtExit()
@@ -332,7 +333,7 @@ public:
     }
 
 private:
-    FileComparison& gridToWrite;
+    FreeFileSync::FileComparison& gridToWrite;
     std::set<int> rowsProcessed;
 };
 
@@ -369,12 +370,12 @@ void updateCmpLineAfterDeletion(const int rowNr, const SyncConfiguration& syncCo
             if (leftSide) //again evaluated at compile time
             {
                 currentLine.cmpResult = FILE_RIGHT_SIDE_ONLY;
-                currentLine.direction = syncConfig.exRightSideOnly;
+                currentLine.syncDir   = convertToSyncDirection(syncConfig.exRightSideOnly);
             }
             else
             {
                 currentLine.cmpResult = FILE_LEFT_SIDE_ONLY;
-                currentLine.direction = syncConfig.exLeftSideOnly;
+                currentLine.syncDir   = convertToSyncDirection(syncConfig.exLeftSideOnly);
             }
         }
     }
@@ -387,7 +388,7 @@ void deleteFromGridAndHDOneSide(FileComparison& fileCmp,
                                 const bool useRecycleBin,
                                 RemoveAtExit& markForRemoval,
                                 const SyncConfiguration& syncConfig,
-                                ErrorHandler* errorHandler)
+                                DeleteFilesHandler* statusHandler)
 {
     for (std::set<int>::const_iterator i = rowsToDeleteOneSide.begin(); i != rowsToDeleteOneSide.end(); ++i)
     {
@@ -403,10 +404,12 @@ void deleteFromGridAndHDOneSide(FileComparison& fileCmp,
                 case FileDescrLine::TYPE_FILE:
                     FreeFileSync::removeFile(fileDescr->fullName, useRecycleBin);
                     updateCmpLineAfterDeletion<leftSide>(*i, syncConfig, fileCmp, markForRemoval); //remove entries from fileCmp
+                    statusHandler->deletionSuccessful(); //notify successful file/folder deletion
                     break;
                 case FileDescrLine::TYPE_DIRECTORY:
                     FreeFileSync::removeDirectory(fileDescr->fullName, useRecycleBin);
                     updateCmpLineAfterDeletion<leftSide>(*i, syncConfig, fileCmp, markForRemoval); //remove entries from fileCmp
+                    statusHandler->deletionSuccessful(); //notify successful file/folder deletion
                     break;
                 case FileDescrLine::TYPE_NOTHING:
                     break;
@@ -416,12 +419,12 @@ void deleteFromGridAndHDOneSide(FileComparison& fileCmp,
             }
             catch (const FileError& error)
             {
-                ErrorHandler::Response rv = errorHandler->reportError(error.show());
+                DeleteFilesHandler::Response rv = statusHandler->reportError(error.show());
 
-                if (rv == ErrorHandler::IGNORE_ERROR)
+                if (rv == DeleteFilesHandler::IGNORE_ERROR)
                     break;
 
-                else if (rv == ErrorHandler::RETRY)
+                else if (rv == DeleteFilesHandler::RETRY)
                     ;   //continue in loop
                 else
                     assert (false);
@@ -437,7 +440,7 @@ void FreeFileSync::deleteFromGridAndHD(FileComparison& fileCmp,
                                        const bool deleteOnBothSides,
                                        const bool useRecycleBin,
                                        const SyncConfiguration& syncConfig,
-                                       ErrorHandler* errorHandler)
+                                       DeleteFilesHandler* statusHandler)
 {
     //remove deleted rows from fileCmp (AFTER all rows to be deleted are known: consider row references!
     RemoveAtExit markForRemoval(fileCmp); //ensure that fileCmp is always written to, even if method is exitted via exceptions
@@ -454,14 +457,14 @@ void FreeFileSync::deleteFromGridAndHD(FileComparison& fileCmp,
                                          useRecycleBin,
                                          markForRemoval,
                                          syncConfig,
-                                         errorHandler);
+                                         statusHandler);
 
         deleteFromGridAndHDOneSide<false>(fileCmp,
                                           rowsToDeleteBothSides,
                                           useRecycleBin,
                                           markForRemoval,
                                           syncConfig,
-                                          errorHandler);
+                                          statusHandler);
     }
     else
     {
@@ -470,14 +473,14 @@ void FreeFileSync::deleteFromGridAndHD(FileComparison& fileCmp,
                                          useRecycleBin,
                                          markForRemoval,
                                          syncConfig,
-                                         errorHandler);
+                                         statusHandler);
 
         deleteFromGridAndHDOneSide<false>(fileCmp,
                                           rowsToDeleteOnRight,
                                           useRecycleBin,
                                           markForRemoval,
                                           syncConfig,
-                                          errorHandler);
+                                          statusHandler);
     }
 }
 //############################################################################################################
@@ -527,7 +530,7 @@ wxString FreeFileSync::utcTimeToLocalString(const wxLongLong& utcTime, const Zst
 
 
     FILETIME localFileTime;
-    if (::FileTimeToLocalFileTime(   //convert to local time
+    if (::FileTimeToLocalFileTime( //convert to local time
                 &lastWriteTimeUtc, //pointer to UTC file time to convert
                 &localFileTime 	   //pointer to converted file time
             ) == 0)
@@ -580,32 +583,6 @@ wxString FreeFileSync::utcTimeToLocalString(const wxLongLong& utcTime, const Zst
 #endif
 }
 
-
-#ifdef FFS_WIN
-Zstring FreeFileSync::getLastErrorFormatted(const unsigned long lastError) //try to get additional Windows error information
-{
-    //determine error code if none was specified
-    const unsigned long lastErrorCode = lastError == 0 ? GetLastError() : lastError;
-
-    Zstring output = Zstring(wxT("Windows Error Code ")) + wxString::Format(wxT("%u"), lastErrorCode).c_str();
-
-    WCHAR buffer[1001];
-    if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 0, lastErrorCode, 0, buffer, 1001, NULL) != 0)
-        output += Zstring(wxT(": ")) + buffer;
-    return output;
-}
-
-#elif defined FFS_LINUX
-Zstring FreeFileSync::getLastErrorFormatted(const int lastError) //try to get additional Linux error information
-{
-    //determine error code if none was specified
-    const int lastErrorCode = lastError == 0 ? errno : lastError;
-
-    Zstring output = Zstring(wxT("Linux Error Code ")) + wxString::Format(wxT("%i"), lastErrorCode).c_str();
-    output += Zstring(wxT(": ")) + strerror(lastErrorCode);
-    return output;
-}
-#endif
 
 /*Statistical theory: detect daylight saving time (DST) switch by comparing files that exist on both sides (and have same filesizes). If there are "enough"
 that have a shift by +-1h then assert that DST switch occured.

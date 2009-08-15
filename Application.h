@@ -9,7 +9,6 @@
 #define FREEFILESYNCAPP_H
 
 #include <wx/app.h>
-#include "library/localization.h"
 #include "library/processXml.h"
 
 
@@ -23,12 +22,12 @@ public:
     void OnStartApplication(wxIdleEvent& event);
 
 private:
-    void runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSettings& globalSettings);
+    void runGuiMode(const wxString& cfgFileName, xmlAccess::XmlGlobalSettings& settings);
+    void runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSettings& globSettings);
 
-    FreeFileSync::CustomLocale programLanguage;
+    xmlAccess::XmlGlobalSettings globalSettings; //settings used by GUI, batch mode or both
 
     int returnValue;
-    xmlAccess::XmlGlobalSettings globalSettings; //settings used by GUI, batch mode or both
 };
 
 #endif // FREEFILESYNCAPP_H

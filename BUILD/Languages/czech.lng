@@ -1,0 +1,790 @@
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+ Byte
+ Byte
+ GB
+ GB
+ MB
+ MB
+ PB
+ PB
+ TB
+ TB
+ day(s)
+ d
+ hour(s)
+ hod
+ kB
+ kB
+ min
+ min
+ sec
+ s
+%x / %y objects deleted successfully
+%x / %y objektů úspěšně smazáno
+%x Percent
+%x procent
+%x directories
+adresářů: %x
+%x files,
+souborů: %x;
+%x is not a valid FreeFileSync batch file!
+%x není platným dávkovým souborem programu FreeFileSync!
+%x of %y rows in view
+%x z %y řádků
+%x of 1 row in view
+%x z 1 řádku
+&Abort
+&Přerušit
+&About...
+&O Programu...
+&Advanced
+&Upřesnit
+&Apply
+&Použít
+&Cancel
+&Zrušit
+&Check for new version
+Zkontrolovat &aktualizace
+&Create batch job
+&Vytvořit dávku
+&Default
+&Předdefinované
+&Exit
+&Konec
+&Export file list
+&Exportovat seznam souborů
+&File
+&Soubor
+&Global settings
+&Nastavení
+&Help
+&Pomoc
+&Ignore
+&Ignorovat
+&Language
+&Jazyk
+&Load
+&Načíst
+&Load configuration
+&Načíst konfiguraci
+&No
+&Ne
+&OK
+&OK
+&Pause
+&Pauza
+&Quit
+U&končit
+&Restore
+&Obnovit
+&Retry
+&Znovu
+&Save
+&Uložit
+&Yes
+&Ano
+,
+ 
+- conflict
+- konflikt
+- conflict (same date, different size)
+- konflikt (stejné datum, jiná velikost)
+- different
+- rozdílné
+- directory part only
+- pouze cesta
+- equal
+- stejné
+- exists left only
+- existuje pouze na levé straně
+- exists right only
+- existuje pouze na pravé straně
+- full file or directory name
+- celá cesta nebo jméno souboru
+- left
+- vlevo
+- left newer
+- vlevo novější
+- right
+- vpravo
+- right newer
+- vpravo novější
+- sibling of %dir
+- pouze cesta z protistrany
+- sibling of %name
+- celá cesta nebo jméno souboru z protistrany
+-Open-Source file synchronization-
+-synchronizace souborů Open-Source-
+.
+,
+/sec
+/s
+1 directory
+adresář: 1
+1 file,
+soubor: 1;
+1. &Compare
+1. &Porovnat
+1. Enter relative file or directory names separated by ';' or a new line.
+1. Můžete použít relativní cesty k souboru nebo adresáři oddělené ';' nebo řádkem.
+2. &Synchronize...
+2. &Synchronizovat...
+2. Use wildcard characters '*' and '?'.
+2. Můžete použít zástupné znaky (wildcard) '*' a '?'.
+3. Exclude files directly on main grid via context menu.
+3. Můžete použít pro vynechávání souborů přímo kontextového menu.
+<Directory>
+<Adresář>
+<Last session>
+<Poslední>
+<multiple selection>
+<vícenásobný výběr>
+A newer version of FreeFileSync is available:
+je dostupná novější verze FreeFileSync:
+Abort requested: Waiting for current operation to finish...
+Požadavek na přerušení: Čekání na ukončení aktuální operace...
+Aborted
+Přerušeno
+About
+O Programu
+Action
+Akce
+Add folder
+Přidat adresář
+Add folder pair
+Přidat adresář pro porovnání
+All items have been synchronized!
+Všechny položky byly aktualizovány!
+An exception occured!
+Vyskytla se chyba!
+As a result the files are separated into the following categories:
+Jako výsledek jsou soubory rozděleny do následujících kategorií:
+As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
+Jak název napovídá, dva soubory mající stejné jméno jsou označeny za shodné jen a pouze pokud mají shodný obsah. Toto nastavení je vhodné spíše pro sledování konzistence než pro zálohování. Proto nejsou data změn souborů brána vůbec v potaz.\n\nPokud vyberete toto nastavení bude schéma rozhodování kratší:
+Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
+Vytvoření dávkového souboru pro automatický provoz. Ke spuštění dávky jednoduše její jméno zadejte jako parametr při spuštění FreeFileSync: FreeFileSync.exe <batchfile>.
+Auto-adjust columns
+Automaticky přizpůsobit šířku
+Batch execution
+Spuštění dávky
+Batch file created successfully!
+Dávka úspěšně vytvořena!
+Batch job
+Dávkový soubor
+Big thanks for localizing FreeFileSync goes out to:
+Poděkování za překlad FreeFileSync:
+Browse
+Procházet
+Build:
+Build:
+Cancel
+Zrušit
+Change direction
+Změnit akci
+Check all
+Označit vše
+Choose to hide filtered files/directories from list
+Vyberte pro skrytí filtrovaných souborů/adresářů ze seznamu
+Comma separated list
+Text oddělený čárkami
+Commandline
+Příkazová řádka
+Commandline is empty!
+Příkazová řádka je prázdná!
+Compare
+Porovnat
+Compare both sides
+Porovnat obě strany
+Compare by \"File content\"
+Porovnat \"podle obsahu souboru\"
+Compare by \"File size and date\"
+Porovnat \"podle velikosti a data souboru\"
+Compare by...
+Porovnat ...
+Comparing content
+Porovnání obsahu
+Comparing content of files %x
+Porovnávání obsahu souborů %x
+Comparing content...
+Porovnávání obsahu...
+Comparison Result
+Výsledek porovnání
+Comparison settings
+Nastavení porovnání
+Completed
+Hotovo
+Configuration
+Konfigurace
+Configuration loaded!
+Konfigurace načtena.
+Configuration overview:
+Přehled konfigurace:
+Configuration saved!
+Konfigurace uložena.
+Configure filter
+Nastavení filtru
+Configure filter...
+Nastavení filtru...
+Configure your own synchronization rules.
+Nastavení vlastních pravidel synchronizace.
+Confirm
+Potvrdit
+Conflict detected:
+Zaznamenán konflikt:
+Continue
+Pokračovat
+Conversion error:
+Chyba konverze:
+Copy from left to right
+Kopírovat z leva do prava
+Copy from left to right overwriting
+Kopírovat z leva do prava přepisem
+Copy from right to left
+Kopírovat z prava do leva
+Copy from right to left overwriting
+Kopírovat z prava do leva přepisem
+Copy new or updated files to right folder.
+Kopírovat nové nebo aktualizované soubory do adresáře vpravo.
+Copy to clipboard\tCTRL+C
+Vložit do schránky\tCTRL+C
+Copying file %x to %y
+Kopírování souboru %x do %y
+Copying file %x to %y overwriting target
+Přepis souboru %y souborem %x
+Could not determine volume name for file:
+Není možné zjistit jméno jednotky souboru:
+Could not initialize directory monitoring:
+Nelze nastavit monitorování adresáře:
+Could not read values for the following XML nodes:
+
+Create a batch job
+Vytvořit dávku
+Creating folder %x
+Vytváření adresáře %x
+Current operation:
+Aktuální operace:
+Custom
+Vlastní
+Customize columns
+Vlastní sloupce
+Customize...
+Vlastní....
+DECISION TREE
+ROZHODOVÁNÍ
+Data remaining:
+Zbývá dat:
+Date
+Datum
+Delay
+Zpoždění
+Delay between two invocations of the commandline
+Zpoždění mezi dvěma příkazovými řádky
+Delete files/folders existing on left side only
+Smazat soubory/adresáře existující pouze na levé straně
+Delete files/folders existing on right side only
+Smazat soubory/adresáře existující pouze na pravé straně
+Delete files\tDEL
+Smazat soubory\tDEL
+Delete on both sides
+Smazat z obou stran
+Delete on both sides even if the file is selected on one side only
+Smazat na obou stranách i když je soubor vybrán pouze na jedné z nich
+Delete or overwrite files permanently.
+Smazat nebo přepsat soubory trvale.
+Delete permanently
+Odstranit trvale
+Deleting file %x
+Mazání souboru %x
+Deleting folder %x
+Mazání adresáře %x
+Deletion handling
+Nastavení mazání
+Directories are dependent! Be careful when setting up synchronization rules:
+Adresáře jsou závislé! Buďte opatrní s definicí synchronizačních pravidel:
+Directories to watch
+Sledované adresáře
+Directory
+Adresář
+Directory does not exist:
+Adresář neexistuje:
+Do not display visual status information but write to a logfile instead
+Nezobrazovat informace o stavu ale zapisovat přímo do souboru záznamů
+Do not show this dialog again
+tento dialog již nezobrazovat
+Do nothing
+Nic nedělat
+Do you really want to delete the following objects(s)?
+Opravdu chcete smazat následující objekty?
+Do you really want to move the following objects(s) to the Recycle Bin?
+Opravdu chcete přesunout následující objekty do koše?
+Do you want FreeFileSync to automatically check for updates every week?
+Chcete aby FreeFileSync automaticky zjišťoval aktualizace každý týden?
+Don't ask me again
+Již se znovu neptat
+Donate with PayPal
+Přispět pomocí PayPal
+Download now?
+Stáhnout nyní?
+Drag && drop
+Drag && Drop
+Email
+Email
+Enable filter to exclude files from synchronization
+Povolit filtr pro vynechání souborů ze synchronizace
+Endless loop when traversing directory:
+Zacyklení při procházení adresáře:
+Error
+Chyba
+Error changing modification time:
+Chyba nastavení času změny:
+Error copying file:
+Chyba kopírování souboru:
+Error copying locked file %x!
+Chyba kopírování zamčeného souboru %x!
+Error creating directory:
+Chyba vytvoření adresáře:
+Error deleting directory:
+Chyba mazání adresáře:
+Error deleting file:
+Chyba mazání souboru:
+Error handling
+Zpracování chyb
+Error loading library function:
+Chyba načtení knihovny funkcí:
+Error moving directory:
+Chyba přesouvání adresáře:
+Error moving file:
+Chyba přesouvání souboru:
+Error moving to Recycle Bin:
+Chyba přesunu do Koše:
+Error opening file:
+Chyba otevření souboru:
+Error parsing configuration file:
+Chyba zpracování konfigurace:
+Error reading file attributes:
+Chyba čtení atributů souboru:
+Error reading file:
+Chyba čtení souboru:
+Error resolving symbolic link:
+Chyba odkazu zástupce:
+Error starting Volume Shadow Copy Service!
+Chyba spuštění služby Volume Shadow Copy Service!
+Error traversing directory:
+Chyba procházení adresáře:
+Error when monitoring directories.
+Chyba při sledování adresářů.
+Error writing file attributes:
+Chyba zápisu atributů souboru:
+Error writing file:
+Chyba zápisu souboru:
+Error: Source directory does not exist anymore:
+Chyba: Zdrojový adresář již neexistuje:
+Example
+Příklad
+Exclude
+Vynechat
+Exclude temporarily
+Vynechat dočasně
+Exclude via filter:
+Vynechat pomocí filtru:
+Exit immediately and set returncode < 0
+Ukočit okamžitě a nastavit návratový kód < 0
+Exit with RC < 0
+Ukočit s RC < 0
+Feedback and suggestions are welcome at:
+Komentáře a náměty zasílejte na:
+File %x has an invalid date!
+Soubor %x má chybné datum!
+File Manager integration:
+Integrace do průzkumníka:
+File Time tolerance (seconds):
+Tolerance času souboru (sekundy):
+File already exists. Overwrite?
+Soubor již existuje. Přepsat?
+File content
+Podle obsahu souboru
+File does not exist:
+Soubor neexistuje:
+File list exported!
+Seznam souborů exportován!
+File size and date
+Podle velikosti a data souboru
+File times that differ by up to the specified number of seconds are still handled as having same time.
+Soubory jejichž čas se neliší o více než zadaný počet sekund jsou brány jako se stejným časem.
+Filename
+Jméno
+Files %x have a file time difference of less than 1 hour! It's not safe to decide which one is newer due to Daylight Saving Time issues.
+Soubory %x se liší o méně než 1 hodinu. není možné bezpečně rozhodnout, který z nich je novější kvůli používání Letního času.
+Files %x have the same date but a different size!
+Soubory %x mají stejné datum a čas ale rozdílnou velikost!
+Files are found equal if\n     - file content\nis the same.
+Soubory jsou shodné jestliže\n     - obsah souboru\nje stejný.
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
+Soubory jsou shodné jestliže\n     - velikost souboru\n     - datum i čas poslední změny\njsou stejné.
+Files remaining:
+Zbývá souborů:
+Files that exist on both sides and have different content
+Soubory, ketré existují na obou stranách a liší se obsahem
+Files that exist on both sides, left one is newer
+Soubory, které existují na obou stranách, z nichž vlevo je novější
+Files that exist on both sides, right one is newer
+Soubory, které existujé na obou stranách, z nichž vpravo je novější
+Files/folders remaining:
+Zbývá souborů/adresářů:
+Files/folders scanned:
+Zpracované soubory/adresáře:
+Files/folders that exist on left side only
+Soubory/adresáře, které existují pouze vlevo
+Files/folders that exist on right side only
+Soubory/adresáře, které existují pouze vpravo
+Filter
+Filtr
+Filter active: Press again to deactivate
+Filtr aktivní: Klikni znovu pro deaktivaci
+Filter files
+Filtrovat soubory
+Filter view
+Filtrovat seznam
+Folder Comparison and Synchronization
+Porovnání a Synchronizace adresářů
+Folder pair
+Dvojice adresářů
+FreeFileSync - Folder Comparison and Synchronization
+FreeFileSync - Porovnání a Synchronizace adresářů
+FreeFileSync Batch Job
+FreeFileSync Dávkové zpracování
+FreeFileSync at Sourceforge
+FreeFileSync na Sourceforge
+FreeFileSync batch file
+FreeFileSync dávkový soubor
+FreeFileSync configuration
+Konfigurace FreeFileSync
+FreeFileSync is up to date!
+FreeFileSync je aktuální!
+Full path
+Plná cesta
+Generating file list...
+Vytváření seznamu souborů...
+Global settings
+Nastavení programu
+Help
+Nápověda
+Hide all error and warning messages
+Skrýt všechny chyby a varování
+Hide conflicts
+Skrýt konflikty
+Hide files that are different
+Skrýt rozdílné soubory
+Hide files that are equal
+Skrýt shodné soubory
+Hide files that are newer on left
+Skrýt novější zleva
+Hide files that are newer on right
+Skrýt novější zprava
+Hide files that exist on left side only
+Skrýt soubory existující pouze vlevo
+Hide files that exist on right side only
+Skrýt soubory existující pouze vpravo
+Hide files that will be copied to the left side
+Skrýt soubory, které budou kopírovány vlevo
+Hide files that will be copied to the right side
+Skrýt soubory, které budou kopírovány vpravo
+Hide files that will be created on the left side
+Skrýt soubory, které budou vlevo vytvořeny
+Hide files that will be created on the right side
+Skrýt soubory, které budou vpravo vytvořeny
+Hide files that will be deleted on the left side
+Skrýt soubory, které budou vlevo smazány
+Hide files that will be deleted on the right side
+Skrýt soubory, které budou vpravo smazány
+Hide files that won't be copied
+Skrýt soubory, které nebudou kopírovány
+Hide filtered items
+Skrýt filtrované soubory
+Hide further error messages during the current process
+Nezobrazovat další chybová hlášení během zpracování
+Hints:
+Nápověda:
+Homepage
+Homepage
+If you like FFS
+Pokud se Vám FSS líbí
+Ignore 1-hour file time difference
+Ignorovat 1 hodinu rozdílu v čase mezi soubory
+Ignore errors
+Ignorovat chyby
+Ignore subsequent errors
+Ignorovat další chyby
+Ignore this error, retry or abort synchronization?
+Ignorovat chybu, opakovat nebo přerušit synchronizaci.
+Ignore this error, retry or abort?
+Ignorovat chybu, opakovat nebo přerušit?
+Include
+Přidat
+Include temporarily
+Přidat dočasně
+Include: *.doc;*.zip;*.exe\nExclude: temp\\*
+Přidat: *.doc;*.zip;*.exe\nVynechat: temp\\*
+Info
+Info
+Information
+Informace
+Initialization of Recycle Bin failed!
+Chyba inicializace Koše!
+It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
+Nebylo možné inicializovat Koš!\n\nPravděpodobně nepoužíváte Windows.\nPokud chcete tuto vlastnost využívat, kontaktujte autora. :)
+Left
+Levý
+Load configuration from file
+Načíst konfiguraci ze souboru
+Load configuration history (press DEL to delete items)
+Načíst historii konfigurace (pomocí DEL můžete položku smazat)
+Log-messages:
+Záznamy:
+Logging
+Zaznamenávání
+Mirror ->>
+Zrcadlení ->>
+Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
+Zrcadlení levého adresáře: Pravý adresář bude přepsán a po synchronizaci bude totožný s levým.
+More than 50% of the total number of files will be copied or deleted!
+Více než 50% souborů bude kopírovaných nebo mazaných!
+Move column down
+Přesunout sloupec dolů
+Move column up
+Přesunout sloupec nahoru
+Move files to a custom directory.
+Přesunout soubory do nastaveného adresáře.
+Move to custom directory
+Přesunout do adresáře
+Moving %x to Recycle Bin
+Přesouvání %x do Koše.
+Moving %x to custom directory
+Přesouvání %x do nastaveného adresáře.
+Not all items have been synchronized! Have a look at the list.
+Ne všechny položky byly sesynchronizovány! Podívejte se na seznam.
+Not enough free disk space available in:
+Nedostatek místa na disku:
+Nothing to synchronize according to configuration!
+Podle dané konfigurace není co synchronizovat!
+Number of files and directories that will be created
+Počet souborů a adresářů k vytvoření
+Number of files and directories that will be deleted
+Počet souborů a adresářů ke smazání
+Number of files that will be overwritten
+Počet souborů a adresářů k přepsání
+OK
+OK
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the synchronization directories.
+Pouze soubory/adresáře odpovídající nastavenému filtru budou vybrány pro synchronizaci. Filtr je aplikován relativně(!) k cestě synchronizovaných adresářů.
+Open with File Manager\tD-Click
+Otevřít\tDvojklikem
+Operation aborted!
+Operace zrušena!
+Operation:
+Operace:
+Overview
+Přehled
+Pause
+Pauza
+Paused
+Pauza
+Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
+Prosím zkopírujte odpovídající \"Shadow.dll\" (umístěný v \"Shadow.zip\") do instalačního adresáře FreeFileSync, aby bylo možné použít tuto funkci.
+Please fill all empty directory fields.
+Zadejte adresáře pro synchronizaci.
+Please specify alternate directory for deletion!
+Zadejte cílový adresář pro mazání! 
+Press button to activate filter
+Kliknutím aktivujete filtr
+Published under the GNU General Public License:
+Vydáno podl GNU General Public License (GPL):
+Question
+Otázky
+Quit
+Konec
+RealtimeSync - Automated Synchronization
+RealtimeSync - Automatická synchronizace
+RealtimeSync configuration
+Konfigurace RealtimeSync
+Relative path
+Relativní cesta
+Remove folder
+Odstranit adresář
+Remove folder pair
+Odtsranit dvojici adresářů
+Report translation error
+Hlásit chyby překladu
+Reset
+Resetovat
+Reset all warning messages
+Resetovat všechna varovná hlášení
+Reset all warning messages?
+Resetovat všechna varovná hlášení?
+Result
+Výsledek
+Right
+Pravý
+S&ave configuration
+&Uložení konfigurace
+S&witch view
+&Změnit zobrazení
+Save changes to current configuration?
+Uložit změny do aktuální konfigurace?
+Save current configuration to file
+Uložit změny do konfiguračního souboru
+Scanning...
+Zpracovávání...
+Scanning:
+Zpracováváno:
+Select a folder
+Vyberte adresář
+Select logfile directory:
+Vyberte adresář pro záznamy:
+Select variant:
+Vyberte variantu:
+Show conflicts
+Zobrazit konflikty
+Show file icons
+Zobrazit ikony souborů
+Show files that are different
+Zobrazit rozdílené soubory
+Show files that are equal
+Zobrazit shodné soubory
+Show files that are newer on left
+Zobrazit soubory novější vlevo
+Show files that are newer on right
+Zobrazit soubory novější vpravo
+Show files that exist on left side only
+Zobrazit soubory existující pouze vlevo
+Show files that exist on right side only
+Zobrazit soubory existující pouze vpravo
+Show files that will be copied to the left side
+Zobrazit soubory pro kopírování doleva
+Show files that will be copied to the right side
+Zobrazit soubory pro kopírování doprava
+Show files that will be created on the left side
+Zobrazit soubory, které budou vlevo vytvořeny
+Show files that will be created on the right side
+Zobrazit soubory, které budou vpravo vytvořeny
+Show files that will be deleted on the left side
+Zobrazit soubory, které budou vlevo smazány
+Show files that will be deleted on the right side
+Zobrazit soubory, které budou vpravo smazány
+Show files that won't be copied
+Zobrazit soubory, které nebudou kopírovány
+Show popup
+Zobrazit okno
+Show popup on errors or warnings
+Zobrazit hlášení při chybě nebo varování
+Significant difference detected:
+Nalezeny významné změny:
+Silent mode
+Tichý mód
+Size
+Velikost
+Sorting file list...
+Setřídění seznamu...
+Source code written completely in C++ utilizing:
+Zdrojový kód byl napsán kompletně v C++ s pomocí:
+Speed:
+Rychlost:
+Start
+Start
+Start synchronization
+Start synchronizace
+Statistics
+Statistika
+Stop
+Stop
+Swap sides
+Změna stran
+Synchronization Preview
+Náhled synchronizace
+Synchronization aborted!
+Synchronizace zrušena!
+Synchronization completed successfully!
+Synchronizace dokončena úspěšně!
+Synchronization completed with errors!
+Synchronizace dokončena s chybami.
+Synchronization settings
+Nastavení synchronizace
+Synchronization status
+Stav synchronizace
+Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
+Synchronizuj všechny soubory .doc, .zip a .exe s výjimkou všeho v podadresáři \"temp\"
+Synchronize both sides simultaneously: Copy new or updated files in both directions.
+Synchronizuj obě strany zároveň: Kopíruj nové nebo aktualizované soubory z obou adresářů.
+Synchronize...
+Synchronizace...
+Synchronizing...
+Synchronizuji...
+System out of memory!
+Nedostatek paměti!
+Target directory already existing!
+
+Target file already existing!
+Cílový soubor již existuje!
+The file does not contain a valid configuration:
+Soubor neobsahuje platnou konfiguraci:
+This commandline will be executed on each doubleclick. The following macros are available:
+Tento příkaz bude spuštěn vždy, když poklikáte na název souboru. K dispozici jsou následující proměnné:
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
+Tato variantra vyhodnotí dva stejně pojmenované soubory jako shodné pokud mají i stejnou velikost A ZÁROVEŇ i datum a čas poslední změny.
+Time
+Čas
+Time elapsed:
+Uplynulý čas:
+Time remaining:
+Zbývající čas:
+Total amount of data that will be transferred
+Celkový objem dat, který bude přenesen
+Total required free disk space:
+Požadované volné místo na disku:
+Total time:
+Celkový čas:
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
+Považovat čas souboru lišící se přesně o +/- 1 hodinu jako shodný, méně než 1 hodinu jako konflikt, kvůli zpracování a přechodům na Letní čas.
+Two way <->
+Obousměrná <->
+Unable to connect to sourceforge.net!
+Není možné se připojit k sourceforge.net!
+Unable to create logfile!
+není možné vytvořit záznamový soubor!
+Unable to initialize Recycle Bin!
+Není možné použít Koš!
+Uncheck all
+Odznačit vše
+Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
+Nevyřešené konflikty! \n\nJe možné konflikt ignorovat a pokračovat v synchronizaci.
+Update ->
+Aktualizuj ->
+Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
+Použití: Vyberte adresáře, které mají být monitorovány a vložte příkaz. Pokaždé, když dojde ke změně v těchto adresářích (nebo podadresářích), bude příkaz spuštěn.
+Use Recycle Bin
+Použít Koš
+Use Recycle Bin when deleting or overwriting files.
+Použít Koš při mazání nebo přepisu souborů.
+Variant
+Varianta
+Volume name %x not part of filename %y!
+Disk %x není součástí jména souboru %y!
+Warning
+Varování
+Warning: Synchronization failed for %x item(s):
+Varování: Synchornizace se nepovedla pro \"%x\" položek:
+Warnings:
+Varování:
+When the comparison is started with this option set the following decision tree is processed:
+Když je zahájeno porovnávání s tímto nastavením, je použito následující schéma rozhodování:
+You can ignore the error to consider not existing directories as empty.
+Chybu považovaní neexistující adresářů jako prázdných můžete ignorovat.
+You may try to synchronize remaining items again (WITHOUT having to re-compare)!
+Můžete se pokusit synchronizovat zbývající položky (BEZ nutnosti znovuporovnávání)!
+different
+rozdílný
+file exists on both sides
+soubor existuje na obou stranách
+on one side only
+pouze na jedné straně

@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="OBJ\$(ConfigurationName)"
-			IntermediateDirectory="OBJ\$(ConfigurationName)"
+			OutputDirectory="OBJ\$(ConfigurationName)_FFS_VCPP"
+			IntermediateDirectory="OBJ\$(ConfigurationName)_FFS_VCPP"
 			ConfigurationType="1"
 			CharacterSet="1"
 			>
@@ -46,11 +46,10 @@
 				PreprocessorDefinitions="wxUSE_UNICODE;__WXMSW__;FFS_WIN;__WXDEBUG__;TIXML_USE_STL;ZSTRING_WIDE_CHAR"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4290"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -101,8 +100,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="OBJ\$(ConfigurationName)"
-			IntermediateDirectory="OBJ\$(ConfigurationName)"
+			OutputDirectory="OBJ\$(ConfigurationName)_FFS_VCPP"
+			IntermediateDirectory="OBJ\$(ConfigurationName)_FFS_VCPP"
 			ConfigurationType="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -129,12 +128,11 @@
 				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="&quot;C:\Programme\C++\wxWidgets\include&quot;;&quot;C:\Programme\C++\wxWidgets\lib\vc_lib\mswu&quot;"
 				PreprocessorDefinitions="wxUSE_UNICODE;__WXMSW__;FFS_WIN;NDEBUG;TIXML_USE_STL;ZSTRING_WIDE_CHAR"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
-				DisableSpecificWarnings="4290"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -212,7 +210,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\library\customButton.cpp"
+				RelativePath=".\shared\customButton.cpp"
 				>
 			</File>
 			<File
@@ -220,11 +218,23 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ui\dragAndDrop.cpp"
+				RelativePath=".\shared\customTooltip.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\library\fileHandling.cpp"
+				RelativePath=".\shared\dragAndDrop.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\library\errorLogging.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\shared\fileHandling.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\shared\fileTraverser.cpp"
 				>
 			</File>
 			<File
@@ -232,7 +242,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\library\globalFunctions.cpp"
+				RelativePath=".\shared\globalFunctions.cpp"
 				>
 			</File>
 			<File
@@ -252,7 +262,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\library\localization.cpp"
+				RelativePath=".\shared\localization.cpp"
 				>
 			</File>
 			<File
@@ -268,11 +278,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\library\shadow.cpp"
+				RelativePath=".\shared\shadow.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\ui\smallDialogs.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\shared\standardPaths.cpp"
 				>
 			</File>
 			<File
@@ -296,157 +310,31 @@
 				>
 			</File>
 			<File
-				RelativePath=".\library\tinyxml\tinystr.cpp"
+				RelativePath=".\shared\systemFunctions.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\library\tinyxml\tinyxml.cpp"
+				RelativePath=".\shared\tinyxml\tinystr.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\library\tinyxml\tinyxmlerror.cpp"
+				RelativePath=".\shared\tinyxml\tinyxml.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\library\tinyxml\tinyxmlparser.cpp"
+				RelativePath=".\shared\tinyxml\tinyxmlerror.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\library\zstring.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Headerdateien"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
-			<File
-				RelativePath=".\algorithm.h"
+				RelativePath=".\shared\tinyxml\tinyxmlparser.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\application.h"
+				RelativePath=".\shared\xmlBase.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\ui\batchStatusHandler.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ui\checkVersion.h"
-				>
-			</File>
-			<File
-				RelativePath=".\comparison.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\customButton.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\customGrid.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ui\dragAndDrop.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\fileError.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\fileHandling.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\filter.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\globalFunctions.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ui\gridView.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ui\guiGenerated.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ui\guiStatusHandler.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\iconBuffer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\localization.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ui\mainDialog.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\pch.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\processXml.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\resources.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\shadow.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ui\smallDialogs.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ui\sorting.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\statistics.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\statusHandler.h"
-				>
-			</File>
-			<File
-				RelativePath=".\structures.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ui\syncDialog.h"
-				>
-			</File>
-			<File
-				RelativePath=".\synchronization.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\tinyxml\tinystr.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\tinyxml\tinyxml.h"
-				>
-			</File>
-			<File
-				RelativePath=".\library\zstring.h"
+				RelativePath=".\shared\zstring.cpp"
 				>
 			</File>
 		</Filter>
@@ -465,6 +353,7 @@
 						Name="VCResourceCompilerTool"
 						PreprocessorDefinitions="_UNICODE;UNICODE;wxUSE_NO_MANIFEST"
 						Culture="1033"
+						ResourceOutputFileName="$(IntDir)/Resource.res"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -473,6 +362,7 @@
 					<Tool
 						Name="VCResourceCompilerTool"
 						PreprocessorDefinitions="_UNICODE;UNICODE;wxUSE_NO_MANIFEST"
+						ResourceOutputFileName="$(IntDir)/Resource.res"
 					/>
 				</FileConfiguration>
 			</File>

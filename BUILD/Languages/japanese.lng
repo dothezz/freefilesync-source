@@ -20,8 +20,10 @@
  分
  sec
  秒
-!=	files are different\n
-!=	ファイルに差異あり\n
+%x / %y objects deleted successfully
+%x / %y のオブジェクトを削除しました
+%x Percent
+%x パーセント
 %x directories
 %x ディレクトリ
 %x files,
@@ -48,6 +50,8 @@
 一括ジョブを作成(&C)
 &Default
 デフォルト(&D)
+&Exit
+終了(&E)
 &Export file list
 ファイル一覧をエクスポート(&E)
 &File
@@ -72,6 +76,8 @@
 一時停止(&P)
 &Quit
 終了(&Q)
+&Restore
+修復(&R)
 &Retry
 再試行(&R)
 &Save
@@ -80,20 +86,22 @@
 はい(&Y)
 ,
 .
--	do not copy\n
--	コピーしない\n
 - conflict
 - 不一致
 - conflict (same date, different size)
 - 不一致 (同じ日付, 異なるサイズ)
 - different
 - 差異あり
+- directory part only
+- ディレクトリ部のみ
 - equal
 - 同一
 - exists left only
 - 左側にのみ存在
 - exists right only
 - 右側にのみ存在
+- full file or directory name
+- 完全なファイル/フォルダ名
 - left
 - 左側
 - left newer
@@ -102,8 +110,10 @@
 - 右側
 - right newer
 - 右側の方が新しい
-->	copy to right side\n
-->	右側にコピー\n
+- sibling of %dir
+- %dir の兄弟
+- sibling of %name
+- %name の兄弟
 -Open-Source file synchronization-
 -Open-Source ファイル同期ツール-
 .
@@ -124,22 +134,12 @@
 2. ワイルドカードに ' * ' と ' ? ' を使用出来ます。
 3. Exclude files directly on main grid via context menu.
 3. コンテキストメニューから直接ファイルを除外出来ます。
-<-	copy to left side\n
-<-	左側にコピー\n
-<<	left file is newer\n
-<<	左側の方が新しい\n
 <Directory>
 <ディレクトリ>
 <Last session>
 <最後のセッション>
 <multiple selection>
 <複数選択>
-<|	file on left side only\n
-<|	左側のみに存在\n
-==	files are equal\n
-==	同様のファイル\n
->>	right file is newer\n
->>	右側の方が新しい\n
 A newer version of FreeFileSync is available:
 FreeFileSync の新しいバージョンが利用可能です:
 Abort requested: Waiting for current operation to finish...
@@ -150,6 +150,8 @@ About
 情報
 Action
 操作
+Add folder
+フォルダを追加
 Add folder pair
 フォルダのペアを追加
 All items have been synchronized!
@@ -162,6 +164,8 @@ As the name suggests, two files which share the same name are marked as equal if
 このオプションでは、同じ名前を共有するファイルで内容が同じ場合は、同一として扱われます。  バックアップ操作より、むしろ整合性のチェックを行う時に役立つオプションです。  従ってファイルの日時については全く考慮されていません。\n\n設定が有効な時は、ツリー表示が小さくなります。
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 一括で同期処理を行うためのバッチファイルを作成します。 一括モードを開始するときは、ファイルのパス名を実行ファイル\n< FreeFileSync.exe> \nにバッチファイルで渡すだけです。 また、この操作はOSのタスクスケジューラから実行することができます。
+Auto-adjust columns
+列の自動調整
 Batch execution
 一括処理を実行
 Batch file created successfully!
@@ -184,6 +188,10 @@ Choose to hide filtered files/directories from list
 リストから除外したいファイル/ディレクトリを選択
 Comma separated list
 カンマ区切り
+Commandline
+コマンドライン
+Commandline is empty!
+コマンドラインが空白です!
 Compare
 比較
 Compare both sides
@@ -202,6 +210,8 @@ Comparing content...
 内容を比較中...
 Comparison Result
 比較結果
+Comparison settings
+比較設定
 Completed
 完了しました
 Configuration
@@ -244,8 +254,10 @@ Copying file %x to %y overwriting target
 ファイル %x をコピー、%y に上書き中
 Could not determine volume name for file:
 ファイルのボリューム名が決定されていません:
-Could not set working directory:
-作業ディレクトリが設定できません:
+Could not initialize directory monitoring:
+監視するディレクトリを初期化できません:
+Could not read values for the following XML nodes:
+
 Create a batch job
 一括ジョブを作成
 Creating folder %x
@@ -256,12 +268,18 @@ Custom
 カスタム
 Customize columns
 列の調整
+Customize...
+カスタマイズ...
 DECISION TREE
 [判定ツリー]
 Data remaining:
 残りのデータ:
 Date
 データ
+Delay
+遅延時間
+Delay between two invocations of the commandline
+2 つのコマンドラインを実行する時の遅延時間
 Delete files/folders existing on left side only
 左側のみに存在するファイル/フォルダを削除
 Delete files/folders existing on right side only
@@ -272,12 +290,20 @@ Delete on both sides
 両方を削除
 Delete on both sides even if the file is selected on one side only
 片側のペインのみ選択されている場合でも両方を削除する
+Delete or overwrite files permanently.
+ファイルを上書き、または完全に削除
+Delete permanently
+完全に削除
 Deleting file %x
 ファイル %x を削除中
 Deleting folder %x
 フォルダ %x を削除中
+Deletion handling
+削除の取り扱い
 Directories are dependent! Be careful when setting up synchronization rules:
 ディレクトリが依存関係にあります! 同期規則の設定時には注意してください:
+Directories to watch
+ディレクトリを監視
 Directory
 ディレクトリ
 Directory does not exist:
@@ -306,6 +332,8 @@ Email
 E-メール
 Enable filter to exclude files from synchronization
 同期処理の際、除外ファイルフィルターを有効にする。
+Endless loop when traversing directory:
+ディレクトリ移動中に無限ループが発生:
 Error
 エラー
 Error changing modification time:
@@ -324,6 +352,10 @@ Error handling
 ハンドリングのエラー
 Error loading library function:
 ライブラリ読み込みエラー:
+Error moving directory:
+ディレクトリ移動に失敗:
+Error moving file:
+ファイルの移動に失敗:
 Error moving to Recycle Bin:
 ゴミ箱への移動に失敗:
 Error opening file:
@@ -336,12 +368,12 @@ Error reading file:
 ファイル読み込みエラー:
 Error resolving symbolic link:
 シンボリックリンクの解決に失敗:
-Error retrieving full path:
-フルパスの取得に失敗:
 Error starting Volume Shadow Copy Service!
 ボリュームシャドウコピーの開始に失敗!
 Error traversing directory:
 ディレクトリの移動エラー:
+Error when monitoring directories.
+ディレクトリの監視エラー
 Error writing file attributes:
 ファイル属性の書き込みエラー:
 Error writing file:
@@ -458,14 +490,20 @@ Hide files that will be copied to the left side
 左側にコピーしたファイルを非表示にする
 Hide files that will be copied to the right side
 右側にコピーしたファイルを非表示にする
+Hide files that will be created on the left side
+左側で作成されたファイルを非表示にする
+Hide files that will be created on the right side
+右側で作成されたファイルを非表示にする
+Hide files that will be deleted on the left side
+左側で削除されたファイルを非表示にする
+Hide files that will be deleted on the right side
+右側で削除されたファイルを非表示にする
 Hide files that won't be copied
 コピーしなかったファイルを隠す
 Hide filtered items
 適合するアイテムを非表示にする
 Hide further error messages during the current process
 現在の処理中は以降のエラーメッセージを表示しない
-Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
-同期処理中のエラーメッセージを非表示にする:\n非表示にしたメッセージは、処理の終了後に一覧表示されます。
 Hints:
 ヒント:
 Homepage
@@ -486,8 +524,8 @@ Include
 含める
 Include temporarily
 一時フォルダを含める
-Include: *.doc;*.zip;*.exe\nExclude: \\temp\\*
-含める: *.doc;*.zip;*.exe\n除外: \\temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: temp\\*
+含める: *.doc;*.zip;*.exe\n除外: temp\\*
 Info
 情報
 Information
@@ -496,8 +534,8 @@ Initialization of Recycle Bin failed!
 ゴミ箱の初期化に失敗しました!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 ゴミ箱を初期化することが出来ませんでした!\n\n使用している OS が、Windows 以外の OS です。\nこの機能を使用したい場合は、作者までご連絡ください :)
-Left:
-左側:
+Left
+左側
 Load configuration from file
 外部ファイルから構成設定を読み込みます
 Load configuration history (press DEL to delete items)
@@ -516,8 +554,14 @@ Move column down
 列を下に移動
 Move column up
 列を上に移動
+Move files to a custom directory.
+ファイルを指定ディレクトリに移動
+Move to custom directory
+指定ディレクトリに移動
 Moving %x to Recycle Bin
 %x をゴミ箱に移動中
+Moving %x to custom directory
+%x を指定ディレクトリに移動中
 Not all items have been synchronized! Have a look at the list.
 すべてのアイテムは同期されていません、リストを確認してください
 Not enough free disk space available in:
@@ -550,6 +594,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
  \"Shadow.dll\" (\"Shadow.zip\" アーカイブ内) を、FreeFileSync インストールフォルダにコピーすることで、この機能を利用できるようになります。
 Please fill all empty directory fields.
 アイテムが選択されていません!
+Please specify alternate directory for deletion!
+削除に使用する代替ディレクトリを指定してください!
 Press button to activate filter
 ボタンをクリックで有効化
 Published under the GNU General Public License:
@@ -558,10 +604,18 @@ Question
 質問
 Quit
 終了
+RealtimeSync - Automated Synchronization
+リアルタイム同期 - 自動同期
+RealtimeSync configuration
+リアルタイム同期の構成設定
 Relative path
 相対パス
+Remove folder
+フォルダ除去
 Remove folder pair
 フォルダペアを除去
+Report translation error
+翻訳エラーの詳細
 Reset
 リセット
 Reset all warning messages
@@ -570,8 +624,8 @@ Reset all warning messages?
 すべての警告をリセットしますか?
 Result
 結果
-Right:
-右側:
+Right
+右側
 S&ave configuration
 構成設定を保存(&A)
 S&witch view
@@ -610,6 +664,14 @@ Show files that will be copied to the left side
 左側にコピーされたファイルを表示
 Show files that will be copied to the right side
 右側にコピーされたファイルを表示
+Show files that will be created on the left side
+左側で作成されたファイルを表示
+Show files that will be created on the right side
+右側で作成されたファイルを表示
+Show files that will be deleted on the left side
+左側で削除されたファイルを表示
+Show files that will be deleted on the right side
+右側で削除されたファイルを表示
 Show files that won't be copied
 コピーされなかったファイルを表示
 Show popup
@@ -660,12 +722,14 @@ Synchronizing...
 同期処理中...
 System out of memory!
 メモリが不足しています!
+Target directory already existing!
+対象ディレクトリはすでに存在します!
 Target file already existing!
 対象ファイルは既に存在します!
 The file does not contain a valid configuration:
 このファイルには有効な構成が含まれていません:
-This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
-ファイル名をダブルクリックする度に、このコマンドが実行されます。 %name は選択ファイルのプレースフォルダとして機能します。
+This commandline will be executed on each doubleclick. The following macros are available:
+このコマンドラインはダブルクリックで実行されます。また、以下のマクロを利用可能です:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 この変数では、ふたつの同名ファイルが存在した場合、 それぞれのファイルサイズと最終更新日付/時間を比較します。
 Time
@@ -696,10 +760,12 @@ Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchro
 未解決の不一致があります! \n\nこの不一致を無視して同期を続行することが出来ます。
 Update ->
 更新 ->
+Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
+使用方法: 監視するディレクトリを選択して、コマンドを入力します。 選択されたディレクトリ(サブディレクトリ)内のファイルが変更される度に、入力したコマンドが実行されます。
 Use Recycle Bin
 ゴミ箱を使用
-Use Recycle Bin when deleting or overwriting files during synchronization
-同期処理の間、ファイルの上書き/削除をする時にゴミ箱を使用
+Use Recycle Bin when deleting or overwriting files.
+ファイルの削除、上書き時にゴミ箱を使用する
 Variant
 変化
 Volume name %x not part of filename %y!
@@ -712,15 +778,13 @@ Warnings:
 警告:
 When the comparison is started with this option set the following decision tree is processed:
 このオプションで比較を開始した場合は、以下のツリーに従って処理が行われます:
+You can ignore the error to consider not existing directories as empty.
+既存のディレクトリが空ではないというエラーは無視できます。
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 残っているファイルは、再び同期することができます (再比較とは別の動作)!
 different
 差異あり
 file exists on both sides
 両側に存在するファイル
-flash	conflict\n
-不一致を点滅
 on one side only
 片側のみ
-|>	file on right side only\n
-|>	右側のみに存在\n

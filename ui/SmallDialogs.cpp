@@ -1,12 +1,16 @@
 #include "smallDialogs.h"
-#include "../library/globalFunctions.h"
+#include "../shared/globalFunctions.h"
 #include "../library/resources.h"
 #include "../algorithm.h"
+#include "../synchronization.h"
 #include <wx/msgdlg.h>
 #include "../library/customGrid.h"
-#include "../library/customButton.h"
+#include "../shared/customButton.h"
 #include "../library/statistics.h"
-#include "../library/localization.h"
+#include "../shared/localization.h"
+#include "../shared/fileHandling.h"
+#include "../library/statusHandler.h"
+#include <wx/wupdlock.h>
 
 using namespace FreeFileSync;
 
@@ -18,12 +22,11 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
     m_bitmap11->SetBitmap(*GlobalResources::getInstance().bitmapLogo);
     m_bitmap13->SetBitmap(*GlobalResources::getInstance().bitmapGPL);
 
-
     //create language credits
     for (std::vector<LocInfoLine>::const_iterator i = LocalizationInfo::getMapping().begin(); i != LocalizationInfo::getMapping().end(); ++i)
     {
         //flag
-        wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, *i->languageFlag, wxDefaultPosition, wxSize(-1,11), 0 );
+        wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, GlobalResources::getInstance().getImageByName(i->languageFlag), wxDefaultPosition, wxSize(-1,11), 0 );
         fgSizerTranslators->Add(staticBitmapFlag, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
         //language name
@@ -40,21 +43,19 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
     bSizerTranslators->Fit(m_scrolledWindowTranslators);
 
 
-
     //build information
     wxString build = wxString(wxT("(")) + _("Build:") + wxT(" ") + __TDATE__;
 #if wxUSE_UNICODE
-    build+= wxT(" - Unicode)");
+    build += wxT(" - Unicode)");
 #else
-    build+= wxT(" - ANSI)");
+    build += wxT(" - ANSI)");
 #endif //wxUSE_UNICODE
     m_build->SetLabel(build);
 
     m_animationControl1->SetAnimation(*GlobalResources::getInstance().animationMoney);
-    m_animationControl1->Play(); //Note: The animation is created hidden(!) to not disturb constraint based window creation;
-    m_animationControl1->Show(); //
+    m_animationControl1->Play();
 
-    m_button8->SetFocus();
+    m_buttonOkay->SetFocus();
     Fit();
 }
 
@@ -196,13 +197,15 @@ DeleteDialog::DeleteDialog(wxWindow* main,
                            const FreeFileSync::FolderCompRef& rowsOnLeft,
                            const FreeFileSync::FolderCompRef& rowsOnRight,
                            bool& deleteOnBothSides,
-                           bool& useRecycleBin) :
+                           bool& useRecycleBin,
+                           int& totalDeleteCount) :
         DeleteDlgGenerated(main),
         m_folderCmp(folderCmp),
         rowsToDeleteOnLeft(rowsOnLeft),
         rowsToDeleteOnRight(rowsOnRight),
         m_deleteOnBothSides(deleteOnBothSides),
-        m_useRecycleBin(useRecycleBin)
+        m_useRecycleBin(useRecycleBin),
+        totalDelCount(totalDeleteCount)
 {
     m_checkBoxDeleteBothSides->SetValue(deleteOnBothSides);
     m_checkBoxUseRecycler->SetValue(useRecycleBin);
@@ -231,6 +234,7 @@ void DeleteDialog::updateTexts()
     assert(m_folderCmp.size() == rowsToDeleteOnRight.size());
 
     wxString filesToDelete;
+    totalDelCount = 0;
     for (FolderComparison::const_iterator j = m_folderCmp.begin(); j != m_folderCmp.end(); ++j)
     {
         const FileComparison& fileCmp = j->fileCmp;
@@ -239,10 +243,13 @@ void DeleteDialog::updateTexts()
         if (    pairIndex < int(rowsToDeleteOnLeft.size()) && //just to be sure
                 pairIndex < int(rowsToDeleteOnRight.size()))
         {
-            filesToDelete += FreeFileSync::deleteFromGridAndHDPreview(fileCmp,
-                             rowsToDeleteOnLeft[pairIndex],
-                             rowsToDeleteOnRight[pairIndex],
-                             m_checkBoxDeleteBothSides->GetValue());
+            const std::pair<wxString, int> delInfo = FreeFileSync::deleteFromGridAndHDPreview(fileCmp,
+                    rowsToDeleteOnLeft[pairIndex],
+                    rowsToDeleteOnRight[pairIndex],
+                    m_checkBoxDeleteBothSides->GetValue());
+
+            filesToDelete += delInfo.first;
+            totalDelCount += delInfo.second;
         }
     }
     m_textCtrlMessage->SetValue(filesToDelete);
@@ -575,14 +582,14 @@ void CustomizeColsDlg::OnMoveDown(wxCommandEvent& event)
 
 SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
                                const wxString& variantName,
-                               const wxString& toCreate,
-                               const wxString& toUpdate,
-                               const wxString& toDelete,
-                               const wxString& data,
+                               const FreeFileSync::SyncStatistics& statistics,
                                bool& dontShowAgain) :
         SyncPreviewDlgGenerated(parentWindow),
         m_dontShowAgain(dontShowAgain)
 {
+    using FreeFileSync::includeNumberSeparator;
+    using globalFunctions::numberToWxString;
+
     //m_bitmapPreview->SetBitmap(*GlobalResources::getInstance().bitmapSync);
     m_buttonStartSync->setBitmapFront(*GlobalResources::getInstance().bitmapStartSync);
     m_bitmapCreate->SetBitmap(*GlobalResources::getInstance().bitmapCreate);
@@ -591,10 +598,15 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
     m_bitmapData->SetBitmap(*GlobalResources::getInstance().bitmapData);
 
     m_staticTextVariant->SetLabel(variantName);
-    m_textCtrlCreate->SetValue(toCreate);
-    m_textCtrlUpdate->SetValue(toUpdate);
-    m_textCtrlDelete->SetValue(toDelete);
-    m_textCtrlData->SetValue(data);
+    m_textCtrlData->SetValue(FreeFileSync::formatFilesizeToShortString(statistics.getDataToProcess()));
+
+    m_textCtrlCreateL->SetValue(includeNumberSeparator(numberToWxString(statistics.getCreate(   true, false))));
+    m_textCtrlUpdateL->SetValue(includeNumberSeparator(numberToWxString(statistics.getOverwrite(true, false))));
+    m_textCtrlDeleteL->SetValue(includeNumberSeparator(numberToWxString(statistics.getDelete(   true, false))));
+
+    m_textCtrlCreateR->SetValue(includeNumberSeparator(numberToWxString(statistics.getCreate(   false, true))));
+    m_textCtrlUpdateR->SetValue(includeNumberSeparator(numberToWxString(statistics.getOverwrite(false, true))));
+    m_textCtrlDeleteR->SetValue(includeNumberSeparator(numberToWxString(statistics.getDelete(   false, true))));
 
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
 
@@ -622,6 +634,60 @@ void SyncPreviewDlg::OnStartSync(wxCommandEvent& event)
 }
 
 
+//########################################################################################
+
+CompareCfgDialog::CompareCfgDialog(wxWindow* parentWindow, CompareVariant& cmpVar) :
+        CmpCfgDlgGenerated(parentWindow),
+        m_cmpVar(cmpVar)
+{
+    m_bpButtonHelp->SetBitmapLabel(*GlobalResources::getInstance().bitmapHelp);
+
+    switch (cmpVar)
+    {
+    case CMP_BY_TIME_SIZE:
+        m_radioBtnSizeDate->SetValue(true);
+        m_buttonContent->SetFocus(); //set focus on the other button
+        break;
+    case CMP_BY_CONTENT:
+        m_radioBtnContent->SetValue(true);
+        m_buttonTimeSize->SetFocus(); //set focus on the other button
+        break;
+    }
+}
+
+
+void CompareCfgDialog::OnClose(wxCloseEvent& event)
+{
+    EndModal(0);
+}
+
+
+void CompareCfgDialog::OnCancel(wxCommandEvent& event)
+{
+    EndModal(0);
+}
+
+
+void CompareCfgDialog::OnTimeSize(wxCommandEvent& event)
+{
+    m_cmpVar = CMP_BY_TIME_SIZE;
+    EndModal(BUTTON_OKAY);
+}
+
+
+void CompareCfgDialog::OnContent(wxCommandEvent& event)
+{
+    m_cmpVar = CMP_BY_CONTENT;
+    EndModal(BUTTON_OKAY);
+}
+
+
+void CompareCfgDialog::OnShowHelp(wxCommandEvent& event)
+{
+    HelpDlg* helpDlg = new HelpDlg(this);
+    helpDlg->ShowModal();
+}
+
 
 //########################################################################################
 GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSettings& globalSettings) :
@@ -634,7 +700,18 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSetti
     m_spinCtrlFileTimeTolerance->SetValue(globalSettings.fileTimeTolerance);
     m_checkBoxIgnoreOneHour->SetValue(globalSettings.ignoreOneHourDiff);
 
-    m_textCtrlFileManager->SetValue(globalSettings.gui.commandLineFileManager);
+    m_textCtrlCommand->SetValue(globalSettings.gui.commandLineFileManager);
+
+    const wxString toolTip = wxString(_("This commandline will be executed on each doubleclick. The following macros are available:")) + wxT("\n\n") +
+                             wxT("%name   \t") + _("- full file or directory name") + wxT("\n") +
+                             wxT("%dir    \t") + _("- directory part only") + wxT("\n") +
+                             wxT("%nameCo \t") + _("- sibling of %name") + wxT("\n") +
+                             wxT("%dirCo  \t") + _("- sibling of %dir");
+
+    m_staticTextCommand->SetToolTip(toolTip);
+    m_textCtrlCommand->SetToolTip(toolTip);
+
+    m_buttonOkay->SetFocus();
 
     Fit();
 }
@@ -646,7 +723,7 @@ void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
     settings.fileTimeTolerance = m_spinCtrlFileTimeTolerance->GetValue();
     settings.ignoreOneHourDiff = m_checkBoxIgnoreOneHour->GetValue();
 
-    settings.gui.commandLineFileManager = m_textCtrlFileManager->GetValue();
+    settings.gui.commandLineFileManager = m_textCtrlCommand->GetValue();
 
     EndModal(BUTTON_OKAY);
 }
@@ -665,9 +742,9 @@ void GlobalSettingsDlg::OnDefault(wxCommandEvent& event)
     m_spinCtrlFileTimeTolerance->SetValue(2);
     m_checkBoxIgnoreOneHour->SetValue(true);
 #ifdef FFS_WIN
-    m_textCtrlFileManager->SetValue(wxT("explorer /select, %name"));
+    m_textCtrlCommand->SetValue(wxT("explorer /select, %name"));
 #elif defined FFS_LINUX
-    m_textCtrlFileManager->SetValue(wxT("konqueror \"%path\""));
+    m_textCtrlCommand->SetValue(wxT("konqueror \"%dir\""));
 #endif
 }
 
@@ -713,7 +790,8 @@ void CompareStatus::init()
     m_gauge2->Hide();
     bSizer42->Layout();
 
-    scannedObjects      = 0;
+    scannedObjects = 0;
+    currentStatusText.clear();
 
     totalObjects   = 0;
     totalData      = 0;
@@ -777,71 +855,73 @@ void CompareStatus::updateStatusPanelNow()
 {
     //static RetrieveStatistics statistic;
     //statistic.writeEntry(currentData, currentObjects);
-
-    bool screenChanged = false; //avoid screen flicker by calling layout() only if necessary
-
-    //remove linebreaks from currentStatusText
-    wxString formattedStatusText = currentStatusText.c_str();
-    for (wxString::iterator i = formattedStatusText.begin(); i != formattedStatusText.end(); ++i)
-        if (*i == wxChar('\n'))
-            *i = wxChar(' ');
-
-    //status texts
-    if (m_textCtrlFilename->GetValue() != formattedStatusText && (screenChanged = true)) //avoid screen flicker
-        m_textCtrlFilename->SetValue(formattedStatusText);
-
-    //nr of scanned objects
-    const wxString scannedObjTmp = globalFunctions::numberToWxString(scannedObjects);
-    if (m_staticTextScanned->GetLabel() != scannedObjTmp && (screenChanged = true)) //avoid screen flicker
-        m_staticTextScanned->SetLabel(scannedObjTmp);
-
-    //progress indicator for "compare file content"
-    m_gauge2->SetValue(int(currentData.ToDouble() * scalingFactor));
-
-    //remaining files left for file comparison
-    const wxString filesToCompareTmp = globalFunctions::numberToWxString(totalObjects - currentObjects);
-    if (m_staticTextFilesRemaining->GetLabel() != filesToCompareTmp && (screenChanged = true)) //avoid screen flicker
-        m_staticTextFilesRemaining->SetLabel(filesToCompareTmp);
-
-    //remaining bytes left for file comparison
-    const wxString remainingBytesTmp = FreeFileSync::formatFilesizeToShortString(totalData - currentData);
-    if (m_staticTextDataRemaining->GetLabel() != remainingBytesTmp && (screenChanged = true)) //avoid screen flicker
-        m_staticTextDataRemaining->SetLabel(remainingBytesTmp);
-
-    if (statistics.get())
     {
-        if (timeElapsed.Time() - lastStatCallSpeed >= 500) //call method every 500 ms
+        wxWindowUpdateLocker dummy(this); //reduce display distortion
+
+        bool screenChanged = false; //avoid screen flicker by calling layout() only if necessary
+
+        //remove linebreaks from currentStatusText
+        wxString formattedStatusText = currentStatusText.c_str();
+        for (wxString::iterator i = formattedStatusText.begin(); i != formattedStatusText.end(); ++i)
+            if (*i == wxChar('\n'))
+                *i = wxChar(' ');
+
+        //status texts
+        if (m_textCtrlStatus->GetValue() != formattedStatusText && (screenChanged = true)) //avoid screen flicker
+            m_textCtrlStatus->SetValue(formattedStatusText);
+
+        //nr of scanned objects
+        const wxString scannedObjTmp = globalFunctions::numberToWxString(scannedObjects);
+        if (m_staticTextScanned->GetLabel() != scannedObjTmp && (screenChanged = true)) //avoid screen flicker
+            m_staticTextScanned->SetLabel(scannedObjTmp);
+
+        //progress indicator for "compare file content"
+        m_gauge2->SetValue(int(currentData.ToDouble() * scalingFactor));
+
+        //remaining files left for file comparison
+        const wxString filesToCompareTmp = globalFunctions::numberToWxString(totalObjects - currentObjects);
+        if (m_staticTextFilesRemaining->GetLabel() != filesToCompareTmp && (screenChanged = true)) //avoid screen flicker
+            m_staticTextFilesRemaining->SetLabel(filesToCompareTmp);
+
+        //remaining bytes left for file comparison
+        const wxString remainingBytesTmp = FreeFileSync::formatFilesizeToShortString(totalData - currentData);
+        if (m_staticTextDataRemaining->GetLabel() != remainingBytesTmp && (screenChanged = true)) //avoid screen flicker
+            m_staticTextDataRemaining->SetLabel(remainingBytesTmp);
+
+        if (statistics.get())
         {
-            lastStatCallSpeed = timeElapsed.Time();
-
-            statistics->addMeasurement(currentObjects, currentData.ToDouble());
-
-            //current speed
-            const wxString speedTmp = statistics->getBytesPerSecond();
-            if (m_staticTextSpeed->GetLabel() != speedTmp && (screenChanged = true)) //avoid screen flicker
-                m_staticTextSpeed->SetLabel(speedTmp);
-
-            if (timeElapsed.Time() - lastStatCallRemTime >= 2000) //call method every two seconds only
+            if (timeElapsed.Time() - lastStatCallSpeed >= 500) //call method every 500 ms
             {
-                lastStatCallRemTime = timeElapsed.Time();
+                lastStatCallSpeed = timeElapsed.Time();
 
-                //remaining time
-                const wxString timeRemainingTmp = statistics->getRemainingTime();
-                if (m_staticTextTimeRemaining->GetLabel() != timeRemainingTmp && (screenChanged = true)) //avoid screen flicker
-                    m_staticTextTimeRemaining->SetLabel(timeRemainingTmp);
+                statistics->addMeasurement(currentObjects, currentData.ToDouble());
+
+                //current speed
+                const wxString speedTmp = statistics->getBytesPerSecond();
+                if (m_staticTextSpeed->GetLabel() != speedTmp && (screenChanged = true)) //avoid screen flicker
+                    m_staticTextSpeed->SetLabel(speedTmp);
+
+                if (timeElapsed.Time() - lastStatCallRemTime >= 2000) //call method every two seconds only
+                {
+                    lastStatCallRemTime = timeElapsed.Time();
+
+                    //remaining time
+                    const wxString timeRemainingTmp = statistics->getRemainingTime();
+                    if (m_staticTextTimeRemaining->GetLabel() != timeRemainingTmp && (screenChanged = true)) //avoid screen flicker
+                        m_staticTextTimeRemaining->SetLabel(timeRemainingTmp);
+                }
             }
         }
+
+        //time elapsed
+        const wxString timeElapsedTmp = (wxTimeSpan::Milliseconds(timeElapsed.Time())).Format();
+        if (m_staticTextTimeElapsed->GetLabel() != timeElapsedTmp && (screenChanged = true)) //avoid screen flicker
+            m_staticTextTimeElapsed->SetLabel(timeElapsedTmp);
+
+        //do the ui update
+        if (screenChanged)
+            bSizer42->Layout();
     }
-
-    //time elapsed
-    const wxString timeElapsedTmp = (wxTimeSpan::Milliseconds(timeElapsed.Time())).Format();
-    if (m_staticTextTimeElapsed->GetLabel() != timeElapsedTmp && (screenChanged = true)) //avoid screen flicker
-        m_staticTextTimeElapsed->SetLabel(timeElapsedTmp);
-
-    //do the ui update
-    if (screenChanged)
-        bSizer42->Layout();
-
     updateUiNow();
 }
 
@@ -924,79 +1004,79 @@ void SyncStatus::setStatusText_NoUpdate(const Zstring& text)
 }
 
 
-void SyncStatus::updateStatusDialogNow(bool flushWindowMessages)
+void SyncStatus::updateStatusDialogNow()
 {
 
     //static RetrieveStatistics statistic;
     //statistic.writeEntry(currentData, currentObjects);
 
-
-
-    bool screenChanged = false; //avoid screen flicker by calling layout() only if necessary
-
-    //progress indicator
-    m_gauge1->SetValue(globalFunctions::round(currentData.ToDouble() * scalingFactor));
-
-    //status text
-    if (m_textCtrlInfo->GetValue() != wxString(currentStatusText.c_str()) && (screenChanged = true)) //avoid screen flicker
-        m_textCtrlInfo->SetValue(currentStatusText.c_str());
-
-    //remaining objects
-    const wxString remainingObjTmp = globalFunctions::numberToWxString(totalObjects - currentObjects);
-    if (m_staticTextRemainingObj->GetLabel() != remainingObjTmp && (screenChanged = true)) //avoid screen flicker
-        m_staticTextRemainingObj->SetLabel(remainingObjTmp);
-
-    //remaining bytes left for copy
-    const wxString remainingBytesTmp = FreeFileSync::formatFilesizeToShortString(totalData - currentData);
-    if (m_staticTextDataRemaining->GetLabel() != remainingBytesTmp && (screenChanged = true)) //avoid screen flicker
-        m_staticTextDataRemaining->SetLabel(remainingBytesTmp);
-
-    if (statistics.get())
     {
-        if (timeElapsed.Time() - lastStatCallSpeed >= 500) //call method every 500 ms
+        wxWindowUpdateLocker dummy(this); //reduce display distortion
+
+        bool screenChanged = false; //avoid screen flicker by calling layout() only if necessary
+
+        //progress indicator
+        m_gauge1->SetValue(globalFunctions::round(currentData.ToDouble() * scalingFactor));
+
+        //status text
+        if (m_textCtrlInfo->GetValue() != wxString(currentStatusText.c_str()) && (screenChanged = true)) //avoid screen flicker
+            m_textCtrlInfo->SetValue(currentStatusText.c_str());
+
+        //remaining objects
+        const wxString remainingObjTmp = globalFunctions::numberToWxString(totalObjects - currentObjects);
+        if (m_staticTextRemainingObj->GetLabel() != remainingObjTmp && (screenChanged = true)) //avoid screen flicker
+            m_staticTextRemainingObj->SetLabel(remainingObjTmp);
+
+        //remaining bytes left for copy
+        const wxString remainingBytesTmp = FreeFileSync::formatFilesizeToShortString(totalData - currentData);
+        if (m_staticTextDataRemaining->GetLabel() != remainingBytesTmp && (screenChanged = true)) //avoid screen flicker
+            m_staticTextDataRemaining->SetLabel(remainingBytesTmp);
+
+        if (statistics.get())
         {
-            lastStatCallSpeed = timeElapsed.Time();
-
-            statistics->addMeasurement(currentObjects, currentData.ToDouble());
-
-            //current speed
-            const wxString speedTmp = statistics->getBytesPerSecond();
-            if (m_staticTextSpeed->GetLabel() != speedTmp && (screenChanged = true)) //avoid screen flicker
-                m_staticTextSpeed->SetLabel(speedTmp);
-
-            if (timeElapsed.Time() - lastStatCallRemTime >= 2000) //call method every two seconds only
+            if (timeElapsed.Time() - lastStatCallSpeed >= 500) //call method every 500 ms
             {
-                lastStatCallRemTime = timeElapsed.Time();
+                lastStatCallSpeed = timeElapsed.Time();
 
-                //remaining time
-                const wxString timeRemainingTmp = statistics->getRemainingTime();
-                if (m_staticTextTimeRemaining->GetLabel() != timeRemainingTmp && (screenChanged = true)) //avoid screen flicker
-                    m_staticTextTimeRemaining->SetLabel(timeRemainingTmp);
+                statistics->addMeasurement(currentObjects, currentData.ToDouble());
+
+                //current speed
+                const wxString speedTmp = statistics->getBytesPerSecond();
+                if (m_staticTextSpeed->GetLabel() != speedTmp && (screenChanged = true)) //avoid screen flicker
+                    m_staticTextSpeed->SetLabel(speedTmp);
+
+                if (timeElapsed.Time() - lastStatCallRemTime >= 2000) //call method every two seconds only
+                {
+                    lastStatCallRemTime = timeElapsed.Time();
+
+                    //remaining time
+                    const wxString timeRemainingTmp = statistics->getRemainingTime();
+                    if (m_staticTextTimeRemaining->GetLabel() != timeRemainingTmp && (screenChanged = true)) //avoid screen flicker
+                        m_staticTextTimeRemaining->SetLabel(timeRemainingTmp);
+                }
             }
         }
+
+        //time elapsed
+        const wxString timeElapsedTmp = (wxTimeSpan::Milliseconds(timeElapsed.Time())).Format();
+        if (m_staticTextTimeElapsed->GetLabel() != timeElapsedTmp && (screenChanged = true)) //avoid screen flicker
+            m_staticTextTimeElapsed->SetLabel(timeElapsedTmp);
+
+
+        //do the ui update
+        if (screenChanged)
+        {
+            bSizer28->Layout();
+            bSizer31->Layout();
+        }
     }
-
-    //time elapsed
-    const wxString timeElapsedTmp = (wxTimeSpan::Milliseconds(timeElapsed.Time())).Format();
-    if (m_staticTextTimeElapsed->GetLabel() != timeElapsedTmp && (screenChanged = true)) //avoid screen flicker
-        m_staticTextTimeElapsed->SetLabel(timeElapsedTmp);
-
-
-    //do the ui update
-    if (screenChanged)
-    {
-        bSizer28->Layout();
-        bSizer31->Layout();
-    }
-    if (flushWindowMessages)
-        updateUiNow();
+    updateUiNow();
 
     //support for pause button
     while (processPaused && currentProcessIsRunning)
     {
         wxMilliSleep(UI_UPDATE_INTERVAL);
-        if (flushWindowMessages)
-            updateUiNow();
+        updateUiNow();
     }
 }
 
@@ -1065,11 +1145,8 @@ void SyncStatus::processHasFinished(SyncStatusID id) //essential to call this in
     bSizerSpeed->Show(false);
     bSizerRemTime->Show(false);
 
-    //ATTENTION don't call wxAPP->Yield()!  at this point in time there is a mismatch between
-    //gridDataView and currentGridData!! avoid grid repaint at all costs!!
-
-    updateStatusDialogNow(false); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
-    Layout();                     //
+    updateStatusDialogNow(); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
+    Layout();                //
 }
 
 

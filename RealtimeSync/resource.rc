@@ -1,0 +1,4 @@
+#include "wx/msw/wx.rc"
+
+//naming convention to set icon sequence in executable file
+A_PROGRAM_ICON ICON DISCARDABLE "RealtimeSync.ico"

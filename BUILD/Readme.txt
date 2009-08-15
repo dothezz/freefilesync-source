@@ -1,14 +1,18 @@
-FreeFileSync v2.1
-------------------
+FreeFileSync v2.2
+-----------------
 
-Usage
------
+---------
+| Usage |
+---------
+
 1. Choose left and right directories and "Compare" them.
-2. Select "Synchronize..." to specify settings and begin synchronization.
+2. Select synchronization settings and press "Synchronize..." to begin synchronization.
 
 
-Key Features
-------------
+----------------
+| Key Features |
+----------------
+
 1. Compare files (bytewise or by date) and synchronize them.
 2. No limitations: An arbitrary number of files can be synchronized.
 3. Unicode support.
@@ -50,8 +54,10 @@ Key Features
 28. Load file icons asynchronously for maximum display performance.
 
 
-Advanced topics
----------------
+-------------------
+| Advanced topics |
+-------------------
+
 1.) Synchronize in Batch Mode and send error notification via email:
 
 - Create a FreeFileSync batch file using "silent mode".
@@ -85,9 +91,9 @@ You can: - drag & drop any directory onto the main window to set the directory f
          - drag & drop *.ffs_batch files onto the batch dialog to display and edit the batch configuration
 
 		 
-4.) Synchronize two folders but exclude all subfolders from synchronization
+4.) Exclude all subfolders from synchronization
 
-Assuming you plan to synchronize two folders "C:\Source" and "D:\Target", you'll want to setup a filter like this:
+Assuming you plan to synchronize two folders "C:\Source" and "D:\Target", simply set up a filter like this:
 
 	Include: *
 	Exclude: *\*
@@ -104,15 +110,38 @@ Example: Use the free utility NetDrive (http://www.netdrive.net/)
 - Use the newly created drive as if it were a regular hard disk.
 
 
-Links
-------
-FreeFileSync on SourceForge:
+6.) Start associated program on double-click
 
+FreeFileSync's default is to show files in the operating system's standard file browser on double-click e.g. by invoking "explorer /select, %name" on Windows.
+If the file shall be started with its associated application instead, all you have to do is the following:
+On main dialog navigate to:  Menu -> Advanced -> Global settings: File Manager integration. Then replace the command string by
+
+	cmd /c start "" "%name"
+
+	
+7. Synchronize USB sticks with variable drive letter
+
+USB sticks often have different volume names assigned to them when plugged into two distinct computers. In order to handle this flexibility FreeFileSync is able to process directory names relative to the current working directory. Thus the following workflow is possible:
+	
+	- Replace the absolute USB directory name (variable) in your configuration by a relative one: E.g. "E:\SyncDir" -> "\SyncDir"
+	- Save and copy synchronization settings to the USB stick: "E:\settings.ffs_gui"
+	- Start FreeFileSync by double-clicking on "E:\settings.ffs_gui"
+
+=> Working directory automatically is set to "E:\" by the operating system so that "\SyncDir" is interpreted as "E:\SyncDir". Now start synchronization as usual.
+
+
+---------
+| Links |
+---------
+
+FreeFileSync on SourceForge: 
 http://sourceforge.net/projects/freefilesync/
 
 
-Contact 
--------
+------------
+| Contact  |
+------------
+
 For feedback, suggestions or bug-reports you can write an email to:
 zhnmju123 [at] gmx [dot] de
 

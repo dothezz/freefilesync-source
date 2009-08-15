@@ -59,9 +59,9 @@ public:
 
 
     //error handling:
-    virtual ErrorHandler::Response reportError(const Zstring& errorMessage) = 0; //recoverable error situation
-    virtual void reportFatalError(const Zstring& errorMessage) = 0;              //non-recoverable error situation, implement abort!
-    virtual void reportWarning(const Zstring& warningMessage, bool& dontShowAgain) = 0;
+    virtual ErrorHandler::Response reportError(const wxString& errorMessage) = 0; //recoverable error situation
+    virtual void reportFatalError(const wxString& errorMessage) = 0;              //non-recoverable error situation, implement abort!
+    virtual void reportWarning(const wxString& warningMessage, bool& warningActive) = 0;
 
 private:
     virtual void abortThisProcess() = 0;

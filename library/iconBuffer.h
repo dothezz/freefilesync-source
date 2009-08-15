@@ -2,11 +2,11 @@
 #define ICONBUFFER_H_INCLUDED
 
 #ifndef FFS_WIN
-#warning //this header should be used in the windows build only!
+header should be used in the windows build only!
 #endif
 
 #include <vector>
-#include "zstring.h"
+#include "../shared/zstring.h"
 #include <memory>
 
 class wxCriticalSection;

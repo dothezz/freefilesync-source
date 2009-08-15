@@ -1,5 +1,6 @@
 #include "gridView.h"
 #include "sorting.h"
+#include "../synchronization.h"
 
 using FreeFileSync::GridView;
 
@@ -12,6 +13,10 @@ GridView::GridView(FreeFileSync::FolderComparison& results) :
         differentFilesActive(false),
         equalFilesActive(false),
         conflictFilesActive(false),
+        syncCreateLeftActive(false),
+        syncCreateRightActive(false),
+        syncDeleteLeftActive(false),
+        syncDeleteRightActive(false),
         syncDirLeftActive(false),
         syncDirRightActive(false),
         syncDirNoneActive(false),
@@ -26,7 +31,10 @@ GridView::StatusInfo::StatusInfo() :
         existsDifferent(false),
         existsEqual(false),
         existsConflict(false),
-
+        existsSyncCreateLeft(false),
+        existsSyncCreateRight(false),
+        existsSyncDeleteLeft(false),
+        existsSyncDeleteRight(false),
         existsSyncDirLeft(false),
         existsSyncDirRight(false),
         existsSyncDirNone(false),
@@ -67,21 +75,37 @@ GridView::StatusInfo GridView::update_sub(const bool hideFiltered)
                     continue;
 
 
-                switch (i->direction)
+                switch (FreeFileSync::getSyncOperation(*i)) //evaluate comparison result and sync direction
                 {
-                case SYNC_DIR_LEFT:
-                    output.existsSyncDirLeft = true;
-                    if (!syncDirLeftActive) continue;
+                case SO_CREATE_NEW_LEFT:
+                    output.existsSyncCreateLeft = true;
+                    if (!syncCreateLeftActive) continue;
                     break;
-                case SYNC_DIR_RIGHT:
+                case SO_CREATE_NEW_RIGHT:
+                    output.existsSyncCreateRight = true;
+                    if (!syncCreateRightActive) continue;
+                    break;
+                case SO_DELETE_LEFT:
+                    output.existsSyncDeleteLeft = true;
+                    if (!syncDeleteLeftActive) continue;
+                    break;
+                case SO_DELETE_RIGHT:
+                    output.existsSyncDeleteRight = true;
+                    if (!syncDeleteRightActive) continue;
+                    break;
+                case SO_OVERWRITE_RIGHT:
                     output.existsSyncDirRight = true;
                     if (!syncDirRightActive) continue;
                     break;
-                case SYNC_DIR_NONE:
+                case SO_OVERWRITE_LEFT:
+                    output.existsSyncDirLeft = true;
+                    if (!syncDirLeftActive) continue;
+                    break;
+                case SO_DO_NOTHING:
                     output.existsSyncDirNone = true;
                     if (!syncDirNoneActive) continue;
                     break;
-                case SYNC_UNRESOLVED_CONFLICT:
+                case SO_UNRESOLVED_CONFLICT:
                     output.existsConflict = true;
                     if (!conflictFilesActive) continue;
                     break;
@@ -168,6 +192,33 @@ GridView::StatusInfo GridView::update(const bool hideFiltered, const bool syncPr
 }
 
 
+void GridView::resetSettings()
+{
+    leftOnlyFilesActive   = true;
+    leftNewerFilesActive  = true;
+    differentFilesActive  = true;
+    rightNewerFilesActive = true;  //do not save/load these bool values from harddisk!
+    rightOnlyFilesActive  = true;  //it's more convenient to have them defaulted at startup
+    equalFilesActive      = false;
+
+    conflictFilesActive   = true;
+
+    syncCreateLeftActive  = true;
+    syncCreateRightActive = true;
+    syncDeleteLeftActive  = true;
+    syncDeleteRightActive = true;
+    syncDirLeftActive     = true;
+    syncDirRightActive    = true;
+    syncDirNoneActive     = true;
+}
+
+
+void GridView::clearView()
+{
+    refView.clear();
+}
+
+
 void GridView::viewRefToFolderRef(const std::set<int>& viewRef, FreeFileSync::FolderCompRef& output)
 {
     output.clear();
@@ -212,24 +263,41 @@ void bubbleSort(FreeFileSync::FolderComparison& folderCmp, CompareFct compare)
 }
 
 
+template <class T>
+struct CompareGreater
+{
+    typedef bool (*CmpLess) (const T& a, const T& b);
+    CompareGreater(CmpLess cmpFct) : m_cmpFct(cmpFct) {}
+
+    bool operator()(const T& a, const T& b) const
+    {
+        return m_cmpFct(b, a);
+    }
+private:
+    CmpLess m_cmpFct;
+};
+
+
 void GridView::sortView(const SortType type, const bool onLeft, const bool ascending)
 {
     using namespace FreeFileSync;
+    typedef CompareGreater<FolderCompareLine> FolderReverse;
 
     if (type == SORT_BY_DIRECTORY)
     {
         //specialization: use custom sorting function based on FolderComparison::swap()
         //bubble sort is no performance issue since number of folder pairs should be "very small"
-        if      (ascending  &&  onLeft) bubbleSort(folderCmp, sortByDirectory<ASCENDING,  SORT_ON_LEFT>);
-        else if (ascending  && !onLeft) bubbleSort(folderCmp, sortByDirectory<ASCENDING,  SORT_ON_RIGHT>);
-        else if (!ascending &&  onLeft) bubbleSort(folderCmp, sortByDirectory<DESCENDING, SORT_ON_LEFT>);
-        else if (!ascending && !onLeft) bubbleSort(folderCmp, sortByDirectory<DESCENDING, SORT_ON_RIGHT>);
+        if      (ascending  &&  onLeft) bubbleSort(folderCmp, sortByDirectory<SORT_ON_LEFT>);
+        else if (ascending  && !onLeft) bubbleSort(folderCmp, sortByDirectory<SORT_ON_RIGHT>);
+        else if (!ascending &&  onLeft) bubbleSort(folderCmp, FolderReverse(sortByDirectory<SORT_ON_LEFT>));
+        else if (!ascending && !onLeft) bubbleSort(folderCmp, FolderReverse(sortByDirectory<SORT_ON_RIGHT>));
 
         //then sort by relative name
         GridView::sortView(SORT_BY_REL_NAME, onLeft, ascending);
         return;
     }
 
+    typedef CompareGreater<FileCompareLine> FileReverse;
 
     for (FolderComparison::iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
     {
@@ -238,38 +306,38 @@ void GridView::sortView(const SortType type, const bool onLeft, const bool ascen
         switch (type)
         {
         case SORT_BY_REL_NAME:
-            if      ( ascending &&  onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByRelativeName<ASCENDING,  SORT_ON_LEFT>);
-            else if ( ascending && !onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByRelativeName<ASCENDING,  SORT_ON_RIGHT>);
-            else if (!ascending &&  onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByRelativeName<DESCENDING, SORT_ON_LEFT>);
-            else if (!ascending && !onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByRelativeName<DESCENDING, SORT_ON_RIGHT>);
+            if      ( ascending &&  onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByRelativeName<SORT_ON_LEFT>);
+            else if ( ascending && !onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByRelativeName<SORT_ON_RIGHT>);
+            else if (!ascending &&  onLeft) std::sort(fileCmp.begin(), fileCmp.end(), FileReverse(sortByRelativeName<SORT_ON_LEFT>));
+            else if (!ascending && !onLeft) std::sort(fileCmp.begin(), fileCmp.end(), FileReverse(sortByRelativeName<SORT_ON_RIGHT>));
             break;
         case SORT_BY_FILENAME:
-            if      ( ascending &&  onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByFileName<ASCENDING,  SORT_ON_LEFT>);
-            else if ( ascending && !onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByFileName<ASCENDING,  SORT_ON_RIGHT>);
-            else if (!ascending &&  onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByFileName<DESCENDING, SORT_ON_LEFT>);
-            else if (!ascending && !onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByFileName<DESCENDING, SORT_ON_RIGHT>);
+            if      ( ascending &&  onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByFileName<SORT_ON_LEFT>);
+            else if ( ascending && !onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByFileName<SORT_ON_RIGHT>);
+            else if (!ascending &&  onLeft) std::sort(fileCmp.begin(), fileCmp.end(), FileReverse(sortByFileName<SORT_ON_LEFT>));
+            else if (!ascending && !onLeft) std::sort(fileCmp.begin(), fileCmp.end(), FileReverse(sortByFileName<SORT_ON_RIGHT>));
             break;
         case SORT_BY_FILESIZE:
-            if      ( ascending &&  onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByFileSize<ASCENDING,  SORT_ON_LEFT>);
-            else if ( ascending && !onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByFileSize<ASCENDING,  SORT_ON_RIGHT>);
-            else if (!ascending &&  onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByFileSize<DESCENDING, SORT_ON_LEFT>);
-            else if (!ascending && !onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByFileSize<DESCENDING, SORT_ON_RIGHT>);
+            if      ( ascending &&  onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByFileSize<SORT_ON_LEFT>);
+            else if ( ascending && !onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByFileSize<SORT_ON_RIGHT>);
+            else if (!ascending &&  onLeft) std::sort(fileCmp.begin(), fileCmp.end(), FileReverse(sortByFileSize<SORT_ON_LEFT>));
+            else if (!ascending && !onLeft) std::sort(fileCmp.begin(), fileCmp.end(), FileReverse(sortByFileSize<SORT_ON_RIGHT>));
             break;
         case SORT_BY_DATE:
-            if      ( ascending &&  onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByDate<ASCENDING,  SORT_ON_LEFT>);
-            else if ( ascending && !onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByDate<ASCENDING,  SORT_ON_RIGHT>);
-            else if (!ascending &&  onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByDate<DESCENDING, SORT_ON_LEFT>);
-            else if (!ascending && !onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByDate<DESCENDING, SORT_ON_RIGHT>);
+            if      ( ascending &&  onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByDate<SORT_ON_LEFT>);
+            else if ( ascending && !onLeft) std::sort(fileCmp.begin(), fileCmp.end(), sortByDate<SORT_ON_RIGHT>);
+            else if (!ascending &&  onLeft) std::sort(fileCmp.begin(), fileCmp.end(), FileReverse(sortByDate<SORT_ON_LEFT>));
+            else if (!ascending && !onLeft) std::sort(fileCmp.begin(), fileCmp.end(), FileReverse(sortByDate<SORT_ON_RIGHT>));
             break;
         case SORT_BY_CMP_RESULT:
-            if      ( ascending) std::sort(fileCmp.begin(), fileCmp.end(), sortByCmpResult<ASCENDING>);
-            else if (!ascending) std::sort(fileCmp.begin(), fileCmp.end(), sortByCmpResult<DESCENDING>);
+            if      ( ascending) std::sort(fileCmp.begin(), fileCmp.end(), sortByCmpResult);
+            else if (!ascending) std::sort(fileCmp.begin(), fileCmp.end(), FileReverse(sortByCmpResult));
             break;
         case SORT_BY_SYNC_DIRECTION:
-            if      ( ascending) std::sort(fileCmp.begin(), fileCmp.end(), sortBySyncDirection<ASCENDING>);
-            else if (!ascending) std::sort(fileCmp.begin(), fileCmp.end(), sortBySyncDirection<DESCENDING>);
+            if      ( ascending) std::sort(fileCmp.begin(), fileCmp.end(), sortBySyncDirection);
+            else if (!ascending) std::sort(fileCmp.begin(), fileCmp.end(), FileReverse(sortBySyncDirection));
             break;
-        default:
+        case SORT_BY_DIRECTORY:
             assert(false);
         }
     }

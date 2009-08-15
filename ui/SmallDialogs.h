@@ -2,13 +2,18 @@
 #define SMALLDIALOGS_H_INCLUDED
 
 #include "../structures.h"
-#include "../library/statusHandler.h"
 #include "../library/processXml.h"
 #include "guiGenerated.h"
 #include <wx/stopwatch.h>
 #include <memory>
 
 class Statistics;
+class StatusHandler;
+
+namespace FreeFileSync
+{
+    class SyncStatistics;
+}
 
 
 class AboutDlg : public AboutDlgGenerated
@@ -66,7 +71,8 @@ public:
                  const FreeFileSync::FolderCompRef& rowsOnLeft,
                  const FreeFileSync::FolderCompRef& rowsOnRight,
                  bool& deleteOnBothSides,
-                 bool& useRecycleBin);
+                 bool& useRecycleBin,
+                 int& totalDeleteCount);
 
     ~DeleteDialog() {}
 
@@ -90,6 +96,7 @@ private:
     const FreeFileSync::FolderCompRef& rowsToDeleteOnRight;
     bool& m_deleteOnBothSides;
     bool& m_useRecycleBin;
+    int&  totalDelCount;
 };
 
 
@@ -99,7 +106,7 @@ public:
     ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxString messageText, bool& ignoreNextErrors);
     ~ErrorDlg();
 
-    enum
+    enum ReturnCodes
     {
         BUTTON_IGNORE = 1,
         BUTTON_RETRY  = 2,
@@ -122,7 +129,7 @@ public:
     WarningDlg(wxWindow* parentWindow, int activeButtons, const wxString messageText, bool& dontShowAgain);
     ~WarningDlg();
 
-    enum
+    enum Response
     {
         BUTTON_IGNORE  = 1,
         BUTTON_ABORT   = 2
@@ -190,10 +197,7 @@ class SyncPreviewDlg : public SyncPreviewDlgGenerated
 public:
     SyncPreviewDlg(wxWindow* parentWindow,
                    const wxString& variantName,
-                   const wxString& toCreate,
-                   const wxString& toUpdate,
-                   const wxString& toDelete,
-                   const wxString& data,
+                   const FreeFileSync::SyncStatistics& statistics,
                    bool& dontShowAgain);
 
     enum
@@ -208,6 +212,27 @@ private:
     void OnStartSync(wxCommandEvent& event);
 
     bool& m_dontShowAgain;
+};
+
+
+class CompareCfgDialog : public CmpCfgDlgGenerated
+{
+public:
+    CompareCfgDialog(wxWindow* parentWindow, FreeFileSync::CompareVariant& cmpVar);
+
+    enum
+    {
+        BUTTON_OKAY = 10
+    };
+
+private:
+    void OnClose(wxCloseEvent& event);
+    void OnCancel(wxCommandEvent& event);
+    void OnTimeSize(wxCommandEvent& event);
+    void OnContent(wxCommandEvent& event);
+    void OnShowHelp(wxCommandEvent& event);
+
+    FreeFileSync::CompareVariant& m_cmpVar;
 };
 
 
@@ -287,7 +312,7 @@ public:
     void resetGauge(int totalObjectsToProcess, wxLongLong totalDataToProcess);
     void incProgressIndicator_NoUpdate(int objectsProcessed, wxLongLong dataProcessed);
     void setStatusText_NoUpdate(const Zstring& text);
-    void updateStatusDialogNow(bool flushWindowMessages = true);
+    void updateStatusDialogNow();
 
     void setCurrentStatus(SyncStatusID id);
     void processHasFinished(SyncStatusID id);  //essential to call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater

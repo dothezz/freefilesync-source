@@ -11,7 +11,6 @@
 #include "guiGenerated.h"
 #include <stack>
 #include "../library/processXml.h"
-#include "gridView.h"
 #include <memory>
 #include <map>
 
@@ -22,20 +21,21 @@ class FolderPairPanel;
 class CustomGrid;
 class FFSCheckRowsEvent;
 class FFSSyncDirectionEvent;
-class SyncPreview;
 class IconUpdater;
+class ManualDeletionHandler;
 
 namespace FreeFileSync
 {
     class CustomLocale;
+    class GridView;
 }
 
 
 class MainDialog : public MainDialogGenerated
 {
     friend class CompareStatusHandler;
+    friend class ManualDeletionHandler;
     friend class MainFolderDragDrop;
-    friend class SyncPreview;
 
 //IDs for context menu items
     enum ContextIDRim //context menu for left and right grids
@@ -54,7 +54,9 @@ class MainDialog : public MainDialogGenerated
     enum ContextIDRimLabel//context menu for column settings
     {
         CONTEXT_CUSTOMIZE_COLUMN_LEFT,
-        CONTEXT_CUSTOMIZE_COLUMN_RIGHT
+        CONTEXT_CUSTOMIZE_COLUMN_RIGHT,
+        CONTEXT_AUTO_ADJUST_COLUMN_LEFT,
+        CONTEXT_AUTO_ADJUST_COLUMN_RIGHT
     };
 
     enum ContextIDMiddle//context menu for middle grid
@@ -73,7 +75,6 @@ class MainDialog : public MainDialogGenerated
 public:
     MainDialog(wxFrame* frame,
                const wxString& cfgFileName,
-               FreeFileSync::CustomLocale* language,
                xmlAccess::XmlGlobalSettings& settings);
 
     ~MainDialog();
@@ -85,6 +86,7 @@ private:
     bool readConfigurationFromXml(const wxString& filename, bool programStartup = false);
     bool writeConfigurationToXml(const wxString& filename);
     xmlAccess::XmlGuiConfig getCurrentConfiguration() const;
+    static const wxString& lastConfigFileName();
 
     xmlAccess::XmlGuiConfig lastConfigurationSaved; //support for: "Save changed configuration?" dialog
 
@@ -93,16 +95,14 @@ private:
 
     void updateViewFilterButtons();
     void updateFilterButton(wxBitmapButton* filterButton, bool isActive);
-    void updateCompareButtons();
 
     void addFileToCfgHistory(const wxString& filename);
     void addLeftFolderToHistory(const wxString& leftFolder);
     void addRightFolderToHistory(const wxString& rightFolder);
 
-    void addFolderPair(const Zstring& leftDir, const Zstring& rightDir, bool addFront = false);
     void addFolderPair(const std::vector<FreeFileSync::FolderPair>& newPairs, bool addFront = false);
-    void removeFolderPair(const int pos, bool refreshLayout = true); //keep it an int, allow negative values!
-    void clearFolderPairs();
+    void removeAddFolderPair(const int pos); //keep it an int, allow negative values!
+    void clearAddFolderPairs();
 
     //main method for putting gridDataView on UI: updates data respecting current view settings
     void updateGuiGrid();
@@ -124,6 +124,9 @@ private:
     //delayed status information restore
     void pushStatusInformation(const wxString& text);
     void clearStatusBar();
+
+    void disableAllElements(); //dis-/enables all elements (except abort button) that might receive user input during long-running processes: comparison, deletion
+    void enableAllElements();  //
 
     //events
     void onGridLeftButtonEvent(        wxKeyEvent& event);
@@ -160,6 +163,10 @@ private:
     void OnDifferentFiles(      wxCommandEvent& event);
     void OnConflictFiles(       wxCommandEvent& event);
 
+    void OnSyncCreateLeft(      wxCommandEvent& event);
+    void OnSyncCreateRight(     wxCommandEvent& event);
+    void OnSyncDeleteLeft(      wxCommandEvent& event);
+    void OnSyncDeleteRight(     wxCommandEvent& event);
     void OnSyncDirLeft(         wxCommandEvent& event);
     void OnSyncDirRight(        wxCommandEvent& event);
     void OnSyncDirNone(         wxCommandEvent& event);
@@ -177,18 +184,16 @@ private:
 
     void refreshGridAfterFilterChange(const int delay);
 
-    void onResizeMainWindow(    wxEvent& event);
-    void OnAbortCompare(        wxCommandEvent& event);
+    void OnResize(              wxSizeEvent& event);
+    void OnResizeFolderPairs(   wxSizeEvent& event);
     void OnFilterButton(        wxCommandEvent& event);
     void OnHideFilteredButton(  wxCommandEvent& event);
     void OnConfigureFilter(     wxHyperlinkEvent& event);
-    void OnShowHelpDialog(      wxCommandEvent& event);
     void OnSwapSides(           wxCommandEvent& event);
-    void OnCompareByTimeSize(   wxCommandEvent& event);
-    void OnCompareByContent(    wxCommandEvent& event);
     void OnCompare(             wxCommandEvent& event);
     void OnSwitchView(          wxCommandEvent& event);
     void OnSyncSettings(        wxCommandEvent& event);
+    void OnCmpSettings(         wxCommandEvent& event);
     void OnStartSync(           wxCommandEvent& event);
     void OnClose(               wxCloseEvent&   event);
     void OnQuit(                wxCommandEvent& event);
@@ -200,8 +205,6 @@ private:
     void OnRemoveTopFolderPair( wxCommandEvent& event);
 
     //menu events
-    void OnMenuSaveConfig(      wxCommandEvent& event);
-    void OnMenuLoadConfig(      wxCommandEvent& event);
     void OnMenuGlobalSettings(  wxCommandEvent& event);
     void OnMenuExportFileList(  wxCommandEvent& event);
     void OnMenuBatchJob(        wxCommandEvent& event);
@@ -226,11 +229,11 @@ private:
     FreeFileSync::FolderComparison currentGridData;
 
     //UI view of currentGridData
-    FreeFileSync::GridView gridDataView;
+    std::auto_ptr<FreeFileSync::GridView> gridDataView;
 
 //-------------------------------------
     //functional configuration
-    FreeFileSync::MainConfiguration cfg;
+    xmlAccess::XmlGuiConfig currentCfg;
 
     //folder pairs:
     //m_directoryLeft, m_directoryRight
@@ -241,8 +244,6 @@ private:
     int heightNotMaximized;
     int posXNotMaximized;
     int posYNotMaximized;
-    bool hideFilteredElements;
-    bool ignoreErrors;
 //-------------------------------------
 
     //convenience method to get all folder pairs (unformatted)
@@ -251,8 +252,6 @@ private:
 
 //***********************************************
     std::auto_ptr<wxMenu> contextMenu;
-
-    FreeFileSync::CustomLocale* programLanguage;
 
     //status information
     wxLongLong lastStatusChange;
@@ -276,8 +275,6 @@ private:
     };
     std::vector<FilterObject> exFilterCandidateObj;
 
-    CompareStatusHandler* cmpStatusHandlerTmp;  //used only by the abort button when comparing
-
     bool cleanedUp; //determines if destructor code was already executed
 
     //remember last sort executed (for determination of sort order)
@@ -294,27 +291,22 @@ private:
 #endif
 
     //encapsulation of handling of sync preview
-    std::auto_ptr<SyncPreview> syncPreview;
-};
+    class SyncPreview //encapsulates MainDialog functionality for synchronization preview (friend class)
+    {
+    public:
+        SyncPreview(MainDialog* mainDlg);
 
+        void enablePreview(bool value);
+        bool previewIsEnabled() const;
 
-class SyncPreview //encapsulates MainDialog functionality for synchronization preview (friend class)
-{
-    friend class MainDialog;
+        void enableSynchronization(bool value);
+        bool synchronizationIsEnabled() const;
 
-public:
-    void enablePreview(bool value);
-    bool previewIsEnabled();
-
-    void enableSynchronization(bool value);
-    bool synchronizationIsEnabled();
-
-private:
-    SyncPreview(MainDialog* mainDlg);
-
-    MainDialog* mainDlg_;
-    bool syncPreviewEnabled; //toggle to display configuration preview instead of comparison result
-    bool synchronizationEnabled; //determines whether synchronization should be allowed
+    private:
+        MainDialog* mainDlg_;
+        bool syncPreviewEnabled; //toggle to display configuration preview instead of comparison result
+        bool synchronizationEnabled; //determines whether synchronization should be allowed
+    } syncPreview;
 };
 
 #endif // MAINDIALOG_H

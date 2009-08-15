@@ -2,14 +2,17 @@
 #define GUISTATUSHANDLER_H_INCLUDED
 
 #include "../library/statusHandler.h"
-#include <wx/arrstr.h>
+#include <wx/event.h>
+#include "../library/errorLogging.h"
 
 class SyncStatus;
 class MainDialog;
 class wxWindow;
+class wxCommandEvent;
+
 
 //classes handling sync and compare error as well as status information
-class CompareStatusHandler : public StatusHandler
+class CompareStatusHandler : private wxEvtHandler, public StatusHandler
 {
 public:
     CompareStatusHandler(MainDialog* dlg);
@@ -20,11 +23,12 @@ public:
     virtual void updateProcessedData(int objectsProcessed, wxLongLong dataProcessed);
     virtual void forceUiRefresh();
 
-    virtual ErrorHandler::Response reportError(const Zstring& text);
-    virtual void reportFatalError(const Zstring& errorMessage);
-    virtual void reportWarning(const Zstring& warningMessage, bool& dontShowAgain);
+    virtual ErrorHandler::Response reportError(const wxString& text);
+    virtual void reportFatalError(const wxString& errorMessage);
+    virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
 
 private:
+    void OnAbortCompare(wxCommandEvent& event); //handle abort button click
     virtual void abortThisProcess();
 
     MainDialog* mainDialog;
@@ -44,16 +48,16 @@ public:
     virtual void updateProcessedData(int objectsProcessed, wxLongLong dataProcessed);
     virtual void forceUiRefresh();
 
-    virtual ErrorHandler::Response reportError(const Zstring& text);
-    virtual void reportFatalError(const Zstring& errorMessage);
-    virtual void reportWarning(const Zstring& warningMessage, bool& dontShowAgain);
+    virtual ErrorHandler::Response reportError(const wxString& text);
+    virtual void reportFatalError(const wxString& errorMessage);
+    virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
 
 private:
     virtual void abortThisProcess();
 
     SyncStatus* syncStatusFrame;
     bool ignoreErrors;
-    wxArrayString unhandledErrors;   //list of non-resolved errors
+    FreeFileSync::ErrorLogging errorLog;
 };
 
 

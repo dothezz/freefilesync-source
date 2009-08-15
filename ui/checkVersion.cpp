@@ -6,7 +6,7 @@
 #include <wx/msgdlg.h>
 #include <wx/utils.h>
 #include <wx/timer.h>
-#include "../library/globalFunctions.h"
+#include "../shared/globalFunctions.h"
 
 
 class CloseConnectionOnExit
@@ -69,27 +69,18 @@ bool newerVersionExists(const wxString& onlineVersion)
 
     const wxChar VERSION_SEP = wxT('.');
 
-    while ( currentVersionCpy.Find(VERSION_SEP) != wxNOT_FOUND &&
+    while ( currentVersionCpy.Find(VERSION_SEP) != wxNOT_FOUND ||
             onlineVersionCpy.Find(VERSION_SEP) != wxNOT_FOUND)
     {
-        const wxString currentMajor = currentVersionCpy.BeforeFirst(VERSION_SEP);
-        const wxString onlineMajor  = onlineVersionCpy.BeforeFirst(VERSION_SEP);
+        const int currentMajor = globalFunctions::wxStringToInt(currentVersionCpy.BeforeFirst(VERSION_SEP));  //Returns the whole string if VERSION_SEP is not found.
+        const int onlineMajor  = globalFunctions::wxStringToInt(onlineVersionCpy.BeforeFirst(VERSION_SEP));   //Returns the whole string if VERSION_SEP is not found.
 
         if (currentMajor != onlineMajor)
-            return globalFunctions::wxStringToInt(currentMajor) < globalFunctions::wxStringToInt(onlineMajor);
+            return currentMajor < onlineMajor;
 
-        currentVersionCpy = currentVersionCpy.AfterFirst(VERSION_SEP);
-        onlineVersionCpy  = onlineVersionCpy.AfterFirst(VERSION_SEP);
+        currentVersionCpy = currentVersionCpy.AfterFirst(VERSION_SEP); //Returns the empty string if VERSION_SEP is not found.
+        onlineVersionCpy  = onlineVersionCpy.AfterFirst(VERSION_SEP);  //Returns the empty string if VERSION_SEP is not found.
     }
-
-    const wxString currentMinor = currentVersionCpy.BeforeFirst(VERSION_SEP); //Returns the whole string if VERSION_SEP is not found.
-    const wxString onlineMinor  = onlineVersionCpy.BeforeFirst(VERSION_SEP);  //Returns the whole string if VERSION_SEP is not found.
-
-    if (currentMinor != onlineMinor)
-        return globalFunctions::wxStringToInt(currentMinor) < globalFunctions::wxStringToInt(onlineMinor);
-
-    currentVersionCpy = currentVersionCpy.AfterFirst(VERSION_SEP); //Returns the empty string if VERSION_SEP is not found.
-    onlineVersionCpy  = onlineVersionCpy.AfterFirst(VERSION_SEP);  //Returns the empty string if VERSION_SEP is not found.
 
     return globalFunctions::wxStringToInt(currentVersionCpy) < globalFunctions::wxStringToInt(onlineVersionCpy);
 }

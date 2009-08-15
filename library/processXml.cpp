@@ -1,9 +1,10 @@
 #include "processXml.h"
+#include "../shared/xmlBase.h"
 #include <wx/filefn.h>
-#include <wx/ffile.h>
 #include <wx/intl.h>
-#include "globalFunctions.h"
-#include "tinyxml/tinyxml.h"
+#include "../shared/globalFunctions.h"
+#include "../shared/fileHandling.h"
+#include "../shared/standardPaths.h"
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -12,308 +13,160 @@
 using namespace FreeFileSync;
 
 
-//small helper functions
-bool readXmlElementValue(std::string& output,                  const TiXmlElement* parent, const std::string& name);
-bool readXmlElementValue(int& output,                          const TiXmlElement* parent, const std::string& name);
-bool readXmlElementValue(CompareVariant& output,               const TiXmlElement* parent, const std::string& name);
-bool readXmlElementValue(SyncDirection& output,                const TiXmlElement* parent, const std::string& name);
-bool readXmlElementValue(bool& output,                         const TiXmlElement* parent, const std::string& name);
-
-void addXmlElement(TiXmlElement* parent, const std::string& name, const std::string& value);
-void addXmlElement(TiXmlElement* parent, const std::string& name, const int value);
-void addXmlElement(TiXmlElement* parent, const std::string& name, const SyncDirection value);
-void addXmlElement(TiXmlElement* parent, const std::string& name, const bool value);
-
-
-class XmlConfigInput
+class FfsXmlParser : public xmlAccess::XmlParser
 {
 public:
-    XmlConfigInput(const wxString& fileName, const xmlAccess::XmlType type);
-    ~XmlConfigInput() {}
-
-    bool loadedSuccessfully()
-    {
-        return loadSuccess;
-    }
+    FfsXmlParser(const TiXmlElement* rootElement) : xmlAccess::XmlParser(rootElement) {}
 
     //read gui settings, all values retrieved are optional, so check for initial values! (== -1)
-    bool readXmlGuiConfig(xmlAccess::XmlGuiConfig& outputCfg);
+    void readXmlGuiConfig(xmlAccess::XmlGuiConfig& outputCfg);
     //read batch settings, all values retrieved are optional
-    bool readXmlBatchConfig(xmlAccess::XmlBatchConfig& outputCfg);
+    void readXmlBatchConfig(xmlAccess::XmlBatchConfig& outputCfg);
     //read global settings, valid for both GUI and batch mode, independent from configuration
-    bool readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg);
+    void readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg);
 
 private:
     //read basic FreefileSync settings (used by commandline and GUI), return true if ALL values have been retrieved successfully
-    bool readXmlMainConfig(MainConfiguration& mainCfg, std::vector<FolderPair>& directoryPairs);
-
-    TiXmlDocument doc;
-    bool loadSuccess;
+    void readXmlMainConfig(MainConfiguration& mainCfg, std::vector<FolderPair>& directoryPairs);
 };
 
 
-class XmlConfigOutput
-{
-public:
-    XmlConfigOutput(const wxString& fileName, const xmlAccess::XmlType type);
-    ~XmlConfigOutput() {}
-
-    bool writeToFile();
-
-    //write gui settings
-    bool writeXmlGuiConfig(const xmlAccess::XmlGuiConfig& outputCfg);
-    //write batch settings
-    bool writeXmlBatchConfig(const xmlAccess::XmlBatchConfig& outputCfg);
-    //write global settings
-    bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& outputCfg);
-
-private:
-    //write basic FreefileSync settings (used by commandline and GUI), return true if everything was written successfully
-    bool writeXmlMainConfig(const MainConfiguration& mainCfg, const std::vector<FolderPair>& directoryPairs);
-
-    TiXmlDocument doc;
-    const wxString& m_fileName;
-};
+//write gui settings
+bool writeXmlGuiConfig(const xmlAccess::XmlGuiConfig& outputCfg, TiXmlDocument& doc);
+//write batch settings
+bool writeXmlBatchConfig(const xmlAccess::XmlBatchConfig& outputCfg, TiXmlDocument& doc);
+//write global settings
+bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& outputCfg, TiXmlDocument& doc);
+//write basic FreefileSync settings (used by commandline and GUI), return true if everything was written successfully
+bool writeXmlMainConfig(const MainConfiguration& mainCfg, const std::vector<FolderPair>& directoryPairs, TiXmlDocument& doc);
 
 
-xmlAccess::XmlType xmlAccess::getXmlType(const wxString& filename)
-{
-    if (!wxFileExists(filename))
-        return XML_OTHER;
-
-    //workaround to get a FILE* from a unicode filename
-    wxFFile configFile(filename, wxT("rb"));
-    if (!configFile.IsOpened())
-        return XML_OTHER;
-
-    FILE* inputFile = configFile.fp();
-
-    TiXmlDocument doc;
-    if (!doc.LoadFile(inputFile)) //fails if inputFile is no proper XML
-        return XML_OTHER;
-
-    TiXmlElement* root = doc.RootElement();
-
-    if (!root || (root->ValueStr() != std::string("FreeFileSync"))) //check for FFS configuration xml
-        return XML_OTHER;
-
-    const char* cfgType = root->Attribute("XmlType");
-    if (!cfgType)
-        return XML_OTHER;
-
-    if (std::string(cfgType) == "BATCH")
-        return XML_BATCH_CONFIG;
-    else if (std::string(cfgType) == "GUI")
-        return XML_GUI_CONFIG;
-    else if (std::string(cfgType) == "GLOBAL")
-        return XML_GLOBAL_SETTINGS;
-    else
-        return XML_OTHER;
-}
-
-
-xmlAccess::XmlGuiConfig xmlAccess::readGuiConfig(const wxString& filename)
+void xmlAccess::readGuiConfig(const wxString& filename, xmlAccess::XmlGuiConfig& config)
 {
     //load XML
     if (!wxFileExists(filename))
-        throw FileError(Zstring(_("File does not exist:")) + wxT(" \"") + filename.c_str() + wxT("\""));
+        throw XmlError(wxString(_("File does not exist:")) + wxT(" \"") + filename + wxT("\""));
 
-    XmlConfigInput inputFile(filename, XML_GUI_CONFIG);
+    TiXmlDocument doc;
+    if (!loadXmlDocument(filename, XML_GUI_CONFIG, doc))
+        throw XmlError(wxString(_("Error reading file:")) + wxT(" \"") + filename + wxT("\""));
 
-    XmlGuiConfig outputCfg;
+    FfsXmlParser parser(doc.RootElement());
+    parser.readXmlGuiConfig(config); //read GUI layout configuration
 
-    if (!inputFile.loadedSuccessfully())
-        throw FileError(Zstring(_("Error reading file:")) + wxT(" \"") + filename.c_str() + wxT("\""));
-
-    if (!inputFile.readXmlGuiConfig(outputCfg)) //read GUI layout configuration
-        throw FileError(Zstring(_("Error parsing configuration file:")) + wxT(" \"") + filename.c_str() + wxT("\""));
-
-    return outputCfg;
+    if (parser.errorsOccured())
+        throw XmlError(wxString(_("Error parsing configuration file:")) + wxT(" \"") + filename + wxT("\"\n\n") +
+                       parser.getErrorMessageFormatted(), XmlError::WARNING);
 }
 
 
-xmlAccess::XmlBatchConfig xmlAccess::readBatchConfig(const wxString& filename)
+void xmlAccess::readBatchConfig(const wxString& filename, xmlAccess::XmlBatchConfig& config)
 {
     //load XML
     if (!wxFileExists(filename))
-        throw FileError(Zstring(_("File does not exist:")) + wxT(" \"") + filename.c_str() + wxT("\""));
+        throw XmlError(wxString(_("File does not exist:")) + wxT(" \"") + filename + wxT("\""));
 
-    XmlConfigInput inputFile(filename, XML_BATCH_CONFIG);
+    TiXmlDocument doc;
+    if (!loadXmlDocument(filename, XML_BATCH_CONFIG, doc))
+        throw XmlError(wxString(_("Error reading file:")) + wxT(" \"") + filename + wxT("\""));
 
-    XmlBatchConfig outputCfg;
+    FfsXmlParser parser(doc.RootElement());
+    parser.readXmlBatchConfig(config); //read GUI layout configuration
 
-    if (!inputFile.loadedSuccessfully())
-        throw FileError(Zstring(_("Error reading file:")) + wxT(" \"") + filename.c_str() + wxT("\""));
-
-    if (!inputFile.readXmlBatchConfig(outputCfg))
-        throw FileError(Zstring(_("Error parsing configuration file:")) + wxT(" \"") + filename.c_str() + wxT("\""));
-
-    return outputCfg;
+    if (parser.errorsOccured())
+        throw XmlError(wxString(_("Error parsing configuration file:")) + wxT(" \"") + filename + wxT("\"\n\n") +
+                       parser.getErrorMessageFormatted(), XmlError::WARNING);
 }
 
 
-xmlAccess::XmlGlobalSettings xmlAccess::readGlobalSettings()
+void xmlAccess::readGlobalSettings(xmlAccess::XmlGlobalSettings& config)
 {
     //load XML
     if (!wxFileExists(FreeFileSync::getGlobalConfigFile()))
-        throw FileError(Zstring(_("File does not exist:")) + wxT(" \"") + FreeFileSync::getGlobalConfigFile().c_str() + wxT("\""));
+        throw XmlError(wxString(_("File does not exist:")) + wxT(" \"") + FreeFileSync::getGlobalConfigFile() + wxT("\""));
 
-    XmlConfigInput inputFile(FreeFileSync::getGlobalConfigFile(), XML_GLOBAL_SETTINGS);
+    TiXmlDocument doc;
+    if (!loadXmlDocument(FreeFileSync::getGlobalConfigFile(), XML_GLOBAL_SETTINGS, doc))
+        throw XmlError(wxString(_("Error reading file:")) + wxT(" \"") + FreeFileSync::getGlobalConfigFile() + wxT("\""));
 
-    XmlGlobalSettings outputCfg;
+    FfsXmlParser parser(doc.RootElement());
+    parser.readXmlGlobalSettings(config); //read GUI layout configuration
 
-    if (!inputFile.loadedSuccessfully())
-        throw FileError(Zstring(_("Error reading file:")) + wxT(" \"") + FreeFileSync::getGlobalConfigFile().c_str() + wxT("\""));
-
-    if (!inputFile.readXmlGlobalSettings(outputCfg))
-        throw FileError(Zstring(_("Error parsing configuration file:")) + wxT(" \"") + FreeFileSync::getGlobalConfigFile().c_str() + wxT("\""));
-
-    return outputCfg;
+    if (parser.errorsOccured())
+        throw XmlError(wxString(_("Error parsing configuration file:")) + wxT(" \"") + FreeFileSync::getGlobalConfigFile() + wxT("\"\n\n") +
+                       parser.getErrorMessageFormatted(), XmlError::WARNING);
 }
 
 
-void xmlAccess::writeGuiConfig(const wxString& filename, const XmlGuiConfig& outputCfg)
+void xmlAccess::writeGuiConfig(const XmlGuiConfig& outputCfg, const wxString& filename)
 {
-    XmlConfigOutput outputFile(filename, XML_GUI_CONFIG);
+    TiXmlDocument doc;
+    getDefaultXmlDocument(XML_GUI_CONFIG, doc);
 
     //populate and write XML tree
-    if (    !outputFile.writeXmlGuiConfig(outputCfg) || //add GUI layout configuration settings
-            !outputFile.writeToFile()) //save XML
-        throw FileError(Zstring(_("Error writing file:")) + wxT(" \"") + filename.c_str() + wxT("\""));
+    if (    !writeXmlGuiConfig(outputCfg, doc) || //add GUI layout configuration settings
+            !saveXmlDocument(filename, doc)) //save XML
+        throw XmlError(wxString(_("Error writing file:")) + wxT(" \"") + filename + wxT("\""));
     return;
 }
 
 
-void xmlAccess::writeBatchConfig(const wxString& filename, const XmlBatchConfig& outputCfg)
+void xmlAccess::writeBatchConfig(const XmlBatchConfig& outputCfg, const wxString& filename)
 {
-    XmlConfigOutput outputFile(filename, XML_BATCH_CONFIG);
+    TiXmlDocument doc;
+    getDefaultXmlDocument(XML_BATCH_CONFIG, doc);
 
     //populate and write XML tree
-    if (    !outputFile.writeXmlBatchConfig(outputCfg) || //add batch configuration settings
-            !outputFile.writeToFile()) //save XML
-        throw FileError(Zstring(_("Error writing file:")) + wxT(" \"") + filename.c_str() + wxT("\""));
+    if (    !writeXmlBatchConfig(outputCfg, doc) || //add batch configuration settings
+            !saveXmlDocument(filename, doc)) //save XML
+        throw XmlError(wxString(_("Error writing file:")) + wxT(" \"") + filename + wxT("\""));
     return;
 }
 
 
 void xmlAccess::writeGlobalSettings(const XmlGlobalSettings& outputCfg)
 {
-    XmlConfigOutput outputFile(FreeFileSync::getGlobalConfigFile(), XML_GLOBAL_SETTINGS);
+    TiXmlDocument doc;
+    getDefaultXmlDocument(XML_GLOBAL_SETTINGS, doc);
 
     //populate and write XML tree
-    if (    !outputFile.writeXmlGlobalSettings(outputCfg) || //add GUI layout configuration settings
-            !outputFile.writeToFile()) //save XML
-        throw FileError(Zstring(_("Error writing file:")) + wxT(" \"") + FreeFileSync::getGlobalConfigFile().c_str() + wxT("\""));
+    if (    !writeXmlGlobalSettings(outputCfg, doc) || //add GUI layout configuration settings
+            !saveXmlDocument(FreeFileSync::getGlobalConfigFile(), doc)) //save XML
+        throw XmlError(wxString(_("Error writing file:")) + wxT(" \"") + FreeFileSync::getGlobalConfigFile() + wxT("\""));
     return;
 }
 
 
-XmlConfigInput::XmlConfigInput(const wxString& fileName, const xmlAccess::XmlType type) :
-        loadSuccess(false)
-{
-    if (!wxFileExists(fileName)) //avoid wxWidgets error message when wxFFile receives not existing file
-        return;
-
-    //workaround to get a FILE* from a unicode filename
-    wxFFile dummyFile(fileName, wxT("rb"));
-    if (dummyFile.IsOpened())
-    {
-        FILE* inputFile = dummyFile.fp();
-
-        TiXmlBase::SetCondenseWhiteSpace(false); //do not condense whitespace characters
-
-        if (doc.LoadFile(inputFile)) //load XML; fails if inputFile is no proper XML
-        {
-            TiXmlElement* root = doc.RootElement();
-
-            if (root && (root->ValueStr() == std::string("FreeFileSync"))) //check for FFS configuration xml
-            {
-                const char* cfgType = root->Attribute("XmlType");
-                if (cfgType)
-                {
-                    if (type == xmlAccess::XML_GUI_CONFIG)
-                        loadSuccess = std::string(cfgType) == "GUI";
-                    else if (type == xmlAccess::XML_BATCH_CONFIG)
-                        loadSuccess = std::string(cfgType) == "BATCH";
-                    else if (type == xmlAccess::XML_GLOBAL_SETTINGS)
-                        loadSuccess = std::string(cfgType) == "GLOBAL";
-                }
-            }
-        }
-    }
-}
-
-
-bool readXmlElementValue(std::string& output, const TiXmlElement* parent, const std::string& name)
-{
-    if (parent)
-    {
-        const TiXmlElement* child = parent->FirstChildElement(name);
-        if (child)
-        {
-            const char* text = child->GetText();
-            if (text) //may be NULL!!
-                output = text;
-            else
-                output.clear();
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-bool readXmlElementValue(int& output, const TiXmlElement* parent, const std::string& name)
-{
-    std::string temp;
-    if (readXmlElementValue(temp, parent, name))
-    {
-        output = globalFunctions::stringToInt(temp);
-        return true;
-    }
-    else
-        return false;
-}
-
-
-bool readXmlElementValue(long& output, const TiXmlElement* parent, const std::string& name)
-{
-    std::string temp;
-    if (readXmlElementValue(temp, parent, name))
-    {
-        output = globalFunctions::stringToLong(temp);
-        return true;
-    }
-    else
-        return false;
-}
-
-
-bool readXmlElementValue(CompareVariant& output, const TiXmlElement* parent, const std::string& name)
-{
-    int dummy = 0;
-    if (readXmlElementValue(dummy, parent, name))
-    {
-        output = CompareVariant(dummy);
-        return true;
-    }
-    else
-        return false;
-}
-
-
-bool readXmlElementValue(SyncDirection& output, const TiXmlElement* parent, const std::string& name)
+bool readXmlElement(const std::string& name, const TiXmlElement* parent, CompareVariant& output)
 {
     std::string dummy;
-    if (readXmlElementValue(dummy, parent, name))
+    if (xmlAccess::readXmlElement(name, parent, dummy))
+    {
+        if (dummy == "ByTimeAndSize")
+            output = FreeFileSync::CMP_BY_TIME_SIZE;
+        else if (dummy == "ByContent")
+            output = FreeFileSync::CMP_BY_CONTENT;
+        else
+            return false;
+
+        return true;
+    }
+    else
+        return false;
+}
+
+
+bool readXmlElement(const std::string& name, const TiXmlElement* parent, SyncDirectionCfg& output)
+{
+    std::string dummy;
+    if (xmlAccess::readXmlElement(name, parent, dummy))
     {
         if (dummy == "left")
-            output = SYNC_DIR_LEFT;
+            output = SYNC_DIR_CFG_LEFT;
         else if (dummy == "right")
-            output = SYNC_DIR_RIGHT;
+            output = SYNC_DIR_CFG_RIGHT;
         else //treat all other input as "none"
-            output = SYNC_DIR_NONE;
+            output = SYNC_DIR_CFG_NONE;
 
         return true;
     }
@@ -322,23 +175,10 @@ bool readXmlElementValue(SyncDirection& output, const TiXmlElement* parent, cons
 }
 
 
-bool readXmlElementValue(bool& output, const TiXmlElement* parent, const std::string& name)
+bool readXmlElement(const std::string& name, const TiXmlElement* parent, xmlAccess::OnError& output)
 {
     std::string dummy;
-    if (readXmlElementValue(dummy, parent, name))
-    {
-        output = (dummy == "true");
-        return true;
-    }
-    else
-        return false;
-}
-
-
-bool readXmlElementValue(xmlAccess::OnError& output, const TiXmlElement* parent, const std::string& name)
-{
-    std::string dummy;
-    if (readXmlElementValue(dummy, parent, name))
+    if (xmlAccess::readXmlElement(name, parent, dummy))
     {
         if (dummy == "Ignore")
             output = xmlAccess::ON_ERROR_IGNORE;
@@ -354,430 +194,319 @@ bool readXmlElementValue(xmlAccess::OnError& output, const TiXmlElement* parent,
 }
 
 
-void readXmlElementTable(std::vector<wxString>& output, const TiXmlElement* parent, const std::string& name)
+bool readXmlElement(const std::string& name, const TiXmlElement* parent , FreeFileSync::DeletionPolicy& output)
 {
-    output.clear();
-
-    if (parent)
+    std::string dummy;
+    if (xmlAccess::readXmlElement(name, parent, dummy))
     {
-        //load elements
-        const TiXmlElement* element = parent->FirstChildElement(name);
-        while (element)
-        {
-            const char* text = element->GetText();
-            if (text) //may be NULL!!
-                output.push_back(wxString::FromUTF8(text));
-            else
-                break;
-            element = element->NextSiblingElement();
-        }
+        if (dummy == "DeletePermanently")
+            output = FreeFileSync::DELETE_PERMANENTLY;
+        else if (dummy == "MoveToRecycleBin")
+            output = FreeFileSync::MOVE_TO_RECYCLE_BIN;
+        else if (dummy == "MoveToCustomDirectory")
+            output = FreeFileSync::MOVE_TO_CUSTOM_DIRECTORY;
+        else
+            return false;
+
+        return true;
     }
+
+    return false;
 }
 
-//################################################################################################################
 
-
-bool XmlConfigInput::readXmlMainConfig(MainConfiguration& mainCfg, std::vector<FolderPair>& directoryPairs)
+bool readXmlAttribute(const std::string& name, const TiXmlElement* node, xmlAccess::ColumnTypes& output)
 {
-    TiXmlElement* root = doc.RootElement();
-    if (!root) return false;
-
-    TiXmlHandle hRoot(root);
-
-    TiXmlElement* cmpSettings  = hRoot.FirstChild("MainConfig").FirstChild("Comparison").ToElement();
-    TiXmlElement* syncConfig   = hRoot.FirstChild("MainConfig").FirstChild("Synchronization").FirstChild("Directions").ToElement();
-    TiXmlElement* miscSettings = hRoot.FirstChild("MainConfig").FirstChild("Miscellaneous").ToElement();
-    TiXmlElement* filter       = TiXmlHandle(miscSettings).FirstChild("Filter").ToElement();
-
-    if (!cmpSettings || !syncConfig || !miscSettings || !filter)
+    int dummy;
+    if (xmlAccess::readXmlAttribute(name, node, dummy))
+    {
+        output = static_cast<xmlAccess::ColumnTypes>(dummy);
+        return true;
+    }
+    else
         return false;
+}
 
-    std::string tempString;
+
+//################################################################################################################
+void FfsXmlParser::readXmlMainConfig(MainConfiguration& mainCfg, std::vector<FolderPair>& directoryPairs)
+{
+    TiXmlHandleConst hRoot(root); //custom const handle: TiXml API seems broken in this regard
+
+    const TiXmlElement* cmpSettings  = hRoot.FirstChild("MainConfig").FirstChild("Comparison").ToElement();
+    const TiXmlElement* syncConfig   = hRoot.FirstChild("MainConfig").FirstChild("Synchronization").FirstChild("Directions").ToElement();
+    const TiXmlElement* miscSettings = hRoot.FirstChild("MainConfig").FirstChild("Miscellaneous").ToElement();
+    const TiXmlElement* filter       = TiXmlHandleConst(miscSettings).FirstChild("Filter").ToElement();
+
 //###########################################################
     //read compare variant
-    if (!readXmlElementValue(mainCfg.compareVar, cmpSettings, "Variant")) return false;
+    readXmlElementLogging("Variant", cmpSettings, mainCfg.compareVar);
 
     //read folder pair(s)
-    TiXmlElement* folderPair = TiXmlHandle(cmpSettings).FirstChild("Folders").FirstChild("Pair").ToElement();
+    const TiXmlElement* folderPair = TiXmlHandleConst(cmpSettings).FirstChild("Folders").FirstChild("Pair").ToElement();
 
     //read folder pairs
     directoryPairs.clear();
     while (folderPair)
     {
-        FolderPair newPair;
-
-        if (!readXmlElementValue(tempString, folderPair, "Left")) return false;
-        newPair.leftDirectory = wxString::FromUTF8(tempString.c_str()).c_str();
-
-        if (!readXmlElementValue(tempString, folderPair, "Right")) return false;
-        newPair.rightDirectory = wxString::FromUTF8(tempString.c_str()).c_str();
-
-        directoryPairs.push_back(newPair);
+        wxString temp;
+        wxString temp2;
+        readXmlElementLogging("Left",  folderPair, temp);
+        readXmlElementLogging("Right", folderPair, temp2);
+        directoryPairs.push_back(FolderPair(temp.c_str(), temp2.c_str()));
 
         folderPair = folderPair->NextSiblingElement();
     }
 
 //###########################################################
     //read sync configuration
-    if (!readXmlElementValue(mainCfg.syncConfiguration.exLeftSideOnly, syncConfig, "LeftOnly"))   return false;
-    if (!readXmlElementValue(mainCfg.syncConfiguration.exRightSideOnly, syncConfig, "RightOnly")) return false;
-    if (!readXmlElementValue(mainCfg.syncConfiguration.leftNewer, syncConfig, "LeftNewer"))       return false;
-    if (!readXmlElementValue(mainCfg.syncConfiguration.rightNewer, syncConfig, "RightNewer"))     return false;
-    if (!readXmlElementValue(mainCfg.syncConfiguration.different, syncConfig, "Different"))       return false;
+    readXmlElementLogging("LeftOnly",   syncConfig, mainCfg.syncConfiguration.exLeftSideOnly);
+    readXmlElementLogging("RightOnly",  syncConfig, mainCfg.syncConfiguration.exRightSideOnly);
+    readXmlElementLogging("LeftNewer",  syncConfig, mainCfg.syncConfiguration.leftNewer);
+    readXmlElementLogging("RightNewer", syncConfig, mainCfg.syncConfiguration.rightNewer);
+    readXmlElementLogging("Different",  syncConfig, mainCfg.syncConfiguration.different);
+
 //###########################################################
     //read filter settings
-    if (!readXmlElementValue(mainCfg.filterIsActive, filter, "Active")) return false;
-
-    if (!readXmlElementValue(tempString, filter, "Include"))  return false;
-    mainCfg.includeFilter = wxString::FromUTF8(tempString.c_str());
-
-    if (!readXmlElementValue(tempString, filter, "Exclude"))  return false;
-    mainCfg.excludeFilter = wxString::FromUTF8(tempString.c_str());
+    readXmlElementLogging("Active",  filter, mainCfg.filterIsActive);
+    readXmlElementLogging("Include", filter, mainCfg.includeFilter);
+    readXmlElementLogging("Exclude", filter, mainCfg.excludeFilter);
 //###########################################################
     //other
-    readXmlElementValue(mainCfg.useRecycleBin, miscSettings, "UseRecycler");
-
-    return true;
+    readXmlElementLogging("DeletionPolicy", miscSettings, mainCfg.handleDeletion);
+    readXmlElementLogging("CustomDeletionFolder", miscSettings, mainCfg.customDeletionDirectory);
 }
 
 
-bool XmlConfigInput::readXmlGuiConfig(xmlAccess::XmlGuiConfig& outputCfg)
+void FfsXmlParser::readXmlGuiConfig(xmlAccess::XmlGuiConfig& outputCfg)
 {
     //read main config
-    if (!readXmlMainConfig(outputCfg.mainCfg, outputCfg.directoryPairs))
-        return false;
+    readXmlMainConfig(outputCfg.mainCfg, outputCfg.directoryPairs);
 
     //read GUI specific config data
-    TiXmlElement* root = doc.RootElement();
-    if (!root) return false;
+    const TiXmlElement* guiConfig = TiXmlHandleConst(root).FirstChild("GuiConfig").ToElement();
 
-    TiXmlHandle hRoot(root);
+    readXmlElementLogging("HideFiltered", guiConfig, outputCfg.hideFilteredElements);
 
-    TiXmlElement* guiConfig = hRoot.FirstChild("GuiConfig").ToElement();
-    if (guiConfig)
-    {
-        readXmlElementValue(outputCfg.hideFilteredElements, guiConfig, "HideFiltered");
-        readXmlElementValue(outputCfg.ignoreErrors, guiConfig, "IgnoreErrors");
-        readXmlElementValue(outputCfg.syncPreviewEnabled, guiConfig, "SyncPreviewActive");
-    }
+    xmlAccess::OnError errorHand;
+    readXmlElementLogging("HandleError", guiConfig, errorHand);
+    outputCfg.ignoreErrors = errorHand == xmlAccess::ON_ERROR_IGNORE;
 
-    return true;
+    readXmlElementLogging("SyncPreviewActive", guiConfig, outputCfg.syncPreviewEnabled);
 }
 
 
-bool XmlConfigInput::readXmlBatchConfig(xmlAccess::XmlBatchConfig& outputCfg)
+void FfsXmlParser::readXmlBatchConfig(xmlAccess::XmlBatchConfig& outputCfg)
 {
     //read main config
-    if (!readXmlMainConfig(outputCfg.mainCfg, outputCfg.directoryPairs))
-        return false;
+    readXmlMainConfig(outputCfg.mainCfg, outputCfg.directoryPairs);
 
     //read batch specific config
-    TiXmlElement* root = doc.RootElement();
-    if (!root) return false;
+    const TiXmlElement* batchConfig = TiXmlHandleConst(root).FirstChild("BatchConfig").ToElement();
 
-    TiXmlHandle hRoot(root);
-
-    //read batch settings
-    TiXmlElement* batchConfig = hRoot.FirstChild("BatchConfig").ToElement();
-    if (batchConfig)
-    {
-        readXmlElementValue(outputCfg.silent, batchConfig, "Silent");
-
-        std::string tempString;
-        if (readXmlElementValue(tempString, batchConfig, "LogfileDirectory"))
-            outputCfg.logFileDirectory = wxString::FromUTF8(tempString.c_str());
-
-        readXmlElementValue(outputCfg.handleError, batchConfig, "HandleError");
-    }
-
-    return true;
+    readXmlElementLogging("Silent", batchConfig, outputCfg.silent);
+    readXmlElementLogging("LogfileDirectory", batchConfig, outputCfg.logFileDirectory);
+    readXmlElementLogging("HandleError", batchConfig, outputCfg.handleError);
 }
 
 
-bool XmlConfigInput::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg)
+void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg)
 {
-    TiXmlElement* root = doc.RootElement();
-    if (!root) return false;
-
-    TiXmlHandle hRoot(root);
-
     //read global settings
-    TiXmlElement* global = hRoot.FirstChild("Shared").ToElement();
-    if (global)
-    {
-        //try to read program language setting
-        readXmlElementValue(outputCfg.programLanguage, global, "Language");
+    const TiXmlElement* global = TiXmlHandleConst(root).FirstChild("Shared").ToElement();
 
-        //max. allowed file time deviation
-        int dummy = 0;
-        if (readXmlElementValue(dummy, global, "FileTimeTolerance"))
-            outputCfg.fileTimeTolerance = dummy;
+    //try to read program language setting
+    readXmlElementLogging("Language", global, outputCfg.programLanguage);
 
-        //ignore +/- 1 hour due to DST change
-        readXmlElementValue(outputCfg.ignoreOneHourDiff, global, "IgnoreOneHourDifference");
+    //max. allowed file time deviation
+    readXmlElementLogging("FileTimeTolerance", global, outputCfg.fileTimeTolerance);
 
-        //traverse into symbolic links (to folders)
-        readXmlElementValue(outputCfg.traverseDirectorySymlinks, global, "TraverseDirectorySymlinks");
+    //ignore +/- 1 hour due to DST change
+    readXmlElementLogging("IgnoreOneHourDifference", global, outputCfg.ignoreOneHourDiff);
 
-        //copy symbolic links to files
-        readXmlElementValue(outputCfg.copyFileSymlinks, global, "CopyFileSymlinks");
+    //traverse into symbolic links (to folders)
+    readXmlElementLogging("TraverseDirectorySymlinks", global, outputCfg.traverseDirectorySymlinks);
 
-        //last update check
-        readXmlElementValue(outputCfg.lastUpdateCheck, global, "LastCheckForUpdates");
-    }
+    //copy symbolic links to files
+    readXmlElementLogging("CopyFileSymlinks", global, outputCfg.copyFileSymlinks);
 
-    TiXmlElement* warnings = hRoot.FirstChild("Shared").FirstChild("Warnings").ToElement();
-    if (warnings)
-    {
-        //folder dependency check
-        readXmlElementValue(outputCfg.warnings.warningDependentFolders, warnings, "CheckForDependentFolders");
+    //last update check
+    readXmlElementLogging("LastCheckForUpdates", global, outputCfg.lastUpdateCheck);
 
-        //significant difference check
-        readXmlElementValue(outputCfg.warnings.warningSignificantDifference, warnings, "CheckForSignificantDifference");
 
-        //check free disk space
-        readXmlElementValue(outputCfg.warnings.warningNotEnoughDiskSpace, warnings, "CheckForFreeDiskSpace");
+    const TiXmlElement* warnings = TiXmlHandleConst(root).FirstChild("Shared").FirstChild("Warnings").ToElement();
 
-        //check for unresolved conflicts
-        readXmlElementValue(outputCfg.warnings.warningUnresolvedConflicts, warnings, "CheckForUnresolvedConflicts");
-
-        //check for very old dates or dates in the future
-        readXmlElementValue(outputCfg.warnings.warningInvalidDate, warnings, "CheckForInvalidFileDate");
-
-        //check for changed files with same modification date
-        readXmlElementValue(outputCfg.warnings.warningSameDateDiffSize, warnings, "SameDateDifferentFileSize");
-
-        //check for files that have a difference in file modification date below 1 hour when DST check is active
-        readXmlElementValue(outputCfg.warnings.warningDSTChangeWithinHour, warnings, "FileChangeWithinHour");
-    }
+    //folder dependency check
+    readXmlElementLogging("CheckForDependentFolders", warnings, outputCfg.warnings.warningDependentFolders);
+    //significant difference check
+    readXmlElementLogging("CheckForSignificantDifference", warnings, outputCfg.warnings.warningSignificantDifference);
+    //check free disk space
+    readXmlElementLogging("CheckForFreeDiskSpace", warnings, outputCfg.warnings.warningNotEnoughDiskSpace);
+    //check for unresolved conflicts
+    readXmlElementLogging("CheckForUnresolvedConflicts", warnings, outputCfg.warnings.warningUnresolvedConflicts);
 
     //gui specific global settings (optional)
-    TiXmlElement* mainWindow = hRoot.FirstChild("Gui").FirstChild("Windows").FirstChild("Main").ToElement();
-    if (mainWindow)
-    {
-        //read application window size and position
-        readXmlElementValue(outputCfg.gui.widthNotMaximized,  mainWindow, "Width");
-        readXmlElementValue(outputCfg.gui.heightNotMaximized, mainWindow, "Height");
-        readXmlElementValue(outputCfg.gui.posXNotMaximized,   mainWindow, "PosX");
-        readXmlElementValue(outputCfg.gui.posYNotMaximized,   mainWindow, "PosY");
-        readXmlElementValue(outputCfg.gui.isMaximized,        mainWindow, "Maximized");
+    const TiXmlElement* mainWindow = TiXmlHandleConst(root).FirstChild("Gui").FirstChild("Windows").FirstChild("Main").ToElement();
 
-        readXmlElementValue(outputCfg.gui.deleteOnBothSides,            mainWindow, "ManualDeletionOnBothSides");
-        readXmlElementValue(outputCfg.gui.useRecyclerForManualDeletion, mainWindow, "ManualDeletionUseRecycler");
-        readXmlElementValue(outputCfg.gui.showFileIconsLeft,            mainWindow, "ShowFileIconsLeft");
-        readXmlElementValue(outputCfg.gui.showFileIconsRight,           mainWindow, "ShowFileIconsRight");
-        readXmlElementValue(outputCfg.gui.popupOnConfigChange,          mainWindow, "PopupOnConfigChange");
-        readXmlElementValue(outputCfg.gui.showSummaryBeforeSync,        mainWindow, "SummaryBeforeSync");
+    //read application window size and position
+    readXmlElementLogging("Width",     mainWindow, outputCfg.gui.widthNotMaximized);
+    readXmlElementLogging("Height",    mainWindow, outputCfg.gui.heightNotMaximized);
+    readXmlElementLogging("PosX",      mainWindow, outputCfg.gui.posXNotMaximized);
+    readXmlElementLogging("PosY",      mainWindow, outputCfg.gui.posYNotMaximized);
+    readXmlElementLogging("Maximized", mainWindow, outputCfg.gui.isMaximized);
+
+    readXmlElementLogging("ManualDeletionOnBothSides", mainWindow, outputCfg.gui.deleteOnBothSides);
+    readXmlElementLogging("ManualDeletionUseRecycler", mainWindow, outputCfg.gui.useRecyclerForManualDeletion);
+    readXmlElementLogging("ShowFileIconsLeft",         mainWindow, outputCfg.gui.showFileIconsLeft);
+    readXmlElementLogging("ShowFileIconsRight",        mainWindow, outputCfg.gui.showFileIconsRight);
+    readXmlElementLogging("PopupOnConfigChange",       mainWindow, outputCfg.gui.popupOnConfigChange);
+    readXmlElementLogging("SummaryBeforeSync",         mainWindow, outputCfg.gui.showSummaryBeforeSync);
 
 //###########################################################
-        //read column attributes
-        TiXmlElement* leftColumn = TiXmlHandle(mainWindow).FirstChild("LeftColumns").FirstChild("Column").ToElement();
-        unsigned int colPos = 0;
-        while (leftColumn)
-        {
-            const char* type    = leftColumn->Attribute("Type");
-            const char* visible = leftColumn->Attribute("Visible");
-            const char* width   = leftColumn->Attribute("Width");
+    //read column attributes
+    readXmlAttributeLogging("AutoAdjust", TiXmlHandleConst(mainWindow).FirstChild("LeftColumns").ToElement(), outputCfg.gui.autoAdjustColumnsLeft);
 
-            if (type && visible && width) //may be NULL!!
-            {
-                xmlAccess::ColumnAttrib newAttrib;
-                newAttrib.type     = xmlAccess::ColumnTypes(globalFunctions::stringToInt(type));
-                newAttrib.visible  = std::string(visible) != std::string("false");
-                newAttrib.position = colPos;
-                newAttrib.width    = globalFunctions::stringToInt(width);
-                outputCfg.gui.columnAttribLeft.push_back(newAttrib);
-            }
-            else
-                break;
-
-            leftColumn = leftColumn->NextSiblingElement();
-            ++colPos;
-        }
-
-        TiXmlElement* rightColumn = TiXmlHandle(mainWindow).FirstChild("RightColumns").FirstChild("Column").ToElement();
-        colPos = 0;
-        while (rightColumn)
-        {
-            const char* type    = rightColumn->Attribute("Type");
-            const char* visible = rightColumn->Attribute("Visible");
-            const char* width   = rightColumn->Attribute("Width");
-
-            if (type && visible && width) //may be NULL!!
-            {
-                xmlAccess::ColumnAttrib newAttrib;
-                newAttrib.type     = xmlAccess::ColumnTypes(globalFunctions::stringToInt(type));
-                newAttrib.visible  = std::string(visible) != std::string("false");
-                newAttrib.position = colPos;
-                newAttrib.width    = globalFunctions::stringToInt(width);
-                outputCfg.gui.columnAttribRight.push_back(newAttrib);
-            }
-            else
-                break;
-
-            rightColumn = rightColumn->NextSiblingElement();
-            ++colPos;
-        }
-
-        //load folder history elements
-        const TiXmlElement* historyLeft = TiXmlHandle(mainWindow).FirstChild("FolderHistoryLeft").ToElement();
-        if (historyLeft)
-        {
-            //load max. history size
-            const char* histSizeMax = historyLeft->Attribute("MaximumSize");
-            if (histSizeMax) //may be NULL!
-                outputCfg.gui.folderHistLeftMax = globalFunctions::stringToInt(histSizeMax);
-
-            //load config history elements
-            readXmlElementTable(outputCfg.gui.folderHistoryLeft, historyLeft, "Folder");
-        }
-
-        const TiXmlElement* historyRight = TiXmlHandle(mainWindow).FirstChild("FolderHistoryRight").ToElement();
-        if (historyRight)
-        {
-            //load max. history size
-            const char* histSizeMax = historyRight->Attribute("MaximumSize");
-            if (histSizeMax) //may be NULL!
-                outputCfg.gui.folderHistRightMax = globalFunctions::stringToInt(histSizeMax);
-
-            //load config history elements
-            readXmlElementTable(outputCfg.gui.folderHistoryRight, historyRight, "Folder");
-        }
-
-        readXmlElementValue(outputCfg.gui.selectedTabBottomLeft, mainWindow, "SelectedTabBottomLeft");
-    }
-
-    TiXmlElement* gui = hRoot.FirstChild("Gui").ToElement();
-    if (gui)
+    const TiXmlElement* leftColumn = TiXmlHandleConst(mainWindow).FirstChild("LeftColumns").FirstChild("Column").ToElement();
+    unsigned int colPos = 0;
+    while (leftColumn)
     {
-        //commandline for file manager integration
-        std::string tempString;
-        if (readXmlElementValue(tempString, gui, "FileManager"))
-            outputCfg.gui.commandLineFileManager = wxString::FromUTF8(tempString.c_str());
+        xmlAccess::ColumnAttrib newAttrib;
+        newAttrib.position = colPos++;
+        readXmlAttributeLogging("Type",    leftColumn, newAttrib.type);
+        readXmlAttributeLogging("Visible", leftColumn, newAttrib.visible);
+        readXmlAttributeLogging("Width",   leftColumn, newAttrib.width);
+        outputCfg.gui.columnAttribLeft.push_back(newAttrib);
+
+        leftColumn = leftColumn->NextSiblingElement();
     }
+
+    readXmlAttributeLogging("AutoAdjust", TiXmlHandleConst(mainWindow).FirstChild("RightColumns").ToElement(), outputCfg.gui.autoAdjustColumnsRight);
+
+    const TiXmlElement* rightColumn = TiXmlHandleConst(mainWindow).FirstChild("RightColumns").FirstChild("Column").ToElement();
+    colPos = 0;
+    while (rightColumn)
+    {
+        xmlAccess::ColumnAttrib newAttrib;
+        newAttrib.position = colPos++;
+        readXmlAttributeLogging("Type",    rightColumn, newAttrib.type);
+        readXmlAttributeLogging("Visible", rightColumn, newAttrib.visible);
+        readXmlAttributeLogging("Width",   rightColumn, newAttrib.width);
+        outputCfg.gui.columnAttribRight.push_back(newAttrib);
+
+        rightColumn = rightColumn->NextSiblingElement();
+    }
+
+    //load folder history elements
+    const TiXmlElement* historyLeft = TiXmlHandleConst(mainWindow).FirstChild("FolderHistoryLeft").ToElement();
+    //load max. history size
+    readXmlAttributeLogging("MaximumSize", historyLeft, outputCfg.gui.folderHistLeftMax);
+    //load config history elements
+    readXmlElementLogging("Folder", historyLeft, outputCfg.gui.folderHistoryLeft);
+
+
+    const TiXmlElement* historyRight = TiXmlHandleConst(mainWindow).FirstChild("FolderHistoryRight").ToElement();
+    //load max. history size
+    readXmlAttributeLogging("MaximumSize", historyRight, outputCfg.gui.folderHistRightMax);
+    //load config history elements
+    readXmlElementLogging("Folder", historyRight, outputCfg.gui.folderHistoryRight);
+
+
+    readXmlElementLogging("SelectedTabBottomLeft", mainWindow, outputCfg.gui.selectedTabBottomLeft);
+
+
+    const TiXmlElement* gui = TiXmlHandleConst(root).FirstChild("Gui").ToElement();
+
+    //commandline for file manager integration
+    readXmlElementLogging("FileManager", gui, outputCfg.gui.commandLineFileManager);
+
 
     //load config file history
-    TiXmlElement* cfgHistory = hRoot.FirstChild("Gui").FirstChild("ConfigHistory").ToElement();
-    if (cfgHistory)
+    const TiXmlElement* cfgHistory = TiXmlHandleConst(root).FirstChild("Gui").FirstChild("ConfigHistory").ToElement();
+
+    //load max. history size
+    readXmlAttributeLogging("MaximumSize", cfgHistory, outputCfg.gui.cfgHistoryMax);
+
+    //load config history elements
+    readXmlElementLogging("File", cfgHistory, outputCfg.gui.cfgFileHistory);
+
+
+    //batch specific global settings
+    //const TiXmlElement* batch = TiXmlHandleConst(root).FirstChild("Batch").ToElement();
+}
+
+
+void addXmlElement(const std::string& name, const CompareVariant variant, TiXmlElement* parent)
+{
+    switch (variant)
     {
-        //load max. history size
-        const char* histSizeMax = cfgHistory->Attribute("MaximumSize");
-        if (histSizeMax) //may be NULL!
-            outputCfg.gui.cfgHistoryMax = globalFunctions::stringToInt(histSizeMax);
-
-        //load config history elements
-        readXmlElementTable(outputCfg.gui.cfgFileHistory, cfgHistory, "File");
-    }
-
-
-//batch specific global settings
-    TiXmlElement* batch = hRoot.FirstChild("Batch").ToElement();
-    if (!batch) return false;
-
-    return true;
-}
-
-
-XmlConfigOutput::XmlConfigOutput(const wxString& fileName, const xmlAccess::XmlType type) :
-        m_fileName(fileName)
-{
-    TiXmlBase::SetCondenseWhiteSpace(false); //do not condense whitespace characters
-
-    TiXmlDeclaration* decl = new TiXmlDeclaration("1.0", "UTF-8", ""); //delete won't be necessary later; ownership passed to TiXmlDocument!
-    doc.LinkEndChild(decl);
-
-    TiXmlElement* root = new TiXmlElement("FreeFileSync");
-    if (type == xmlAccess::XML_GUI_CONFIG)
-        root->SetAttribute("XmlType", "GUI"); //xml configuration type
-    else if (type == xmlAccess::XML_BATCH_CONFIG)
-        root->SetAttribute("XmlType", "BATCH");
-    else if (type == xmlAccess::XML_GLOBAL_SETTINGS)
-        root->SetAttribute("XmlType", "GLOBAL");
-    else
-        assert(false);
-    doc.LinkEndChild(root);
-}
-
-
-bool XmlConfigOutput::writeToFile()
-{
-    //workaround to get a FILE* from a unicode filename
-    wxFFile dummyFile(m_fileName, wxT("w")); //no need for "binary" mode here
-    if (!dummyFile.IsOpened())
-        return false;
-
-    FILE* outputFile = dummyFile.fp();
-
-    return doc.SaveFile(outputFile); //save XML
-}
-
-
-void addXmlElement(TiXmlElement* parent, const std::string& name, const std::string& value)
-{
-    if (parent)
-    {
-        TiXmlElement* subElement = new TiXmlElement(name);
-        parent->LinkEndChild(subElement);
-        subElement->LinkEndChild(new TiXmlText(value));
+    case FreeFileSync::CMP_BY_TIME_SIZE:
+        xmlAccess::addXmlElement(name, std::string("ByTimeAndSize"), parent);
+        break;
+    case FreeFileSync::CMP_BY_CONTENT:
+        xmlAccess::addXmlElement(name, std::string("ByContent"), parent);
+        break;
     }
 }
 
 
-void addXmlElement(TiXmlElement* parent, const std::string& name, const int value)
+void addXmlElement(TiXmlElement* parent, const std::string& name, const SyncDirectionCfg value)
 {
-    addXmlElement(parent, name, globalFunctions::numberToString(value));
+    switch (value)
+    {
+    case SYNC_DIR_CFG_LEFT:
+        xmlAccess::addXmlElement(name, std::string("left"), parent);
+        break;
+    case SYNC_DIR_CFG_RIGHT:
+        xmlAccess::addXmlElement(name, std::string("right"), parent);
+        break;
+    case SYNC_DIR_CFG_NONE:
+        xmlAccess::addXmlElement(name, std::string("none"), parent);
+        break;
+    }
 }
 
 
-void addXmlElement(TiXmlElement* parent, const std::string& name, const long value)
+void addXmlElement(const std::string& name, const xmlAccess::OnError value, TiXmlElement* parent)
 {
-    addXmlElement(parent, name, globalFunctions::numberToString(value));
+    switch (value)
+    {
+    case xmlAccess::ON_ERROR_IGNORE:
+        xmlAccess::addXmlElement(name, std::string("Ignore"), parent);
+        break;
+    case xmlAccess::ON_ERROR_EXIT:
+        xmlAccess::addXmlElement(name, std::string("Exit"), parent);
+        break;
+    case xmlAccess::ON_ERROR_POPUP:
+        xmlAccess::addXmlElement(name, std::string("Popup"), parent);
+        break;
+    }
 }
 
 
-void addXmlElement(TiXmlElement* parent, const std::string& name, const SyncDirection value)
+void addXmlElement(const std::string& name, const FreeFileSync::DeletionPolicy value, TiXmlElement* parent)
 {
-    if (value == SYNC_DIR_LEFT)
-        addXmlElement(parent, name, std::string("left"));
-    else if (value == SYNC_DIR_RIGHT)
-        addXmlElement(parent, name, std::string("right"));
-    else if (value == SYNC_DIR_NONE)
-        addXmlElement(parent, name, std::string("none"));
-    else
-        assert(false);
+    switch (value)
+    {
+    case FreeFileSync::DELETE_PERMANENTLY:
+        xmlAccess::addXmlElement(name, std::string("DeletePermanently"), parent);
+        break;
+    case FreeFileSync::MOVE_TO_RECYCLE_BIN:
+        xmlAccess::addXmlElement(name, std::string("MoveToRecycleBin"), parent);
+        break;
+    case FreeFileSync::MOVE_TO_CUSTOM_DIRECTORY:
+        xmlAccess::addXmlElement(name, std::string("MoveToCustomDirectory"), parent);
+        break;
+    }
 }
 
 
-void addXmlElement(TiXmlElement* parent, const std::string& name, const bool value)
+void addXmlAttribute(const std::string& name, const xmlAccess::ColumnTypes value, TiXmlElement* node)
 {
-    if (value)
-        addXmlElement(parent, name, std::string("true"));
-    else
-        addXmlElement(parent, name, std::string("false"));
+    xmlAccess::addXmlAttribute(name, static_cast<int>(value), node);
 }
 
 
-void addXmlElement(TiXmlElement* parent, const std::string& name, const xmlAccess::OnError value)
-{
-    if (value == xmlAccess::ON_ERROR_IGNORE)
-        addXmlElement(parent, name, std::string("Ignore"));
-    else if (value == xmlAccess::ON_ERROR_EXIT)
-        addXmlElement(parent, name, std::string("Exit"));
-    else if (value == xmlAccess::ON_ERROR_POPUP)
-        addXmlElement(parent, name, std::string("Popup"));
-    else
-        assert(false);
-}
-
-
-void addXmlElementTable(TiXmlElement* parent, const std::string& name, const std::vector<wxString>& input)
-{
-    for (std::vector<wxString>::const_iterator i = input.begin(); i != input.end(); ++i)
-        addXmlElement(parent, name, std::string(i->ToUTF8()));
-}
-
-
-bool XmlConfigOutput::writeXmlMainConfig(const MainConfiguration& mainCfg, const std::vector<FolderPair>& directoryPairs)
+bool writeXmlMainConfig(const MainConfiguration& mainCfg, const std::vector<FolderPair>& directoryPairs, TiXmlDocument& doc)
 {
     TiXmlElement* root = doc.RootElement();
     if (!root) return false;
@@ -790,7 +519,7 @@ bool XmlConfigOutput::writeXmlMainConfig(const MainConfiguration& mainCfg, const
     settings->LinkEndChild(cmpSettings);
 
     //write compare algorithm
-    addXmlElement(cmpSettings, "Variant", mainCfg.compareVar);
+    ::addXmlElement("Variant", mainCfg.compareVar, cmpSettings);
 
     //write folder pair(s)
     TiXmlElement* folders = new TiXmlElement("Folders");
@@ -802,8 +531,8 @@ bool XmlConfigOutput::writeXmlMainConfig(const MainConfiguration& mainCfg, const
         TiXmlElement* folderPair = new TiXmlElement("Pair");
         folders->LinkEndChild(folderPair);
 
-        addXmlElement(folderPair, "Left", std::string(wxString(i->leftDirectory.c_str()).ToUTF8()));
-        addXmlElement(folderPair, "Right", std::string(wxString(i->rightDirectory.c_str()).ToUTF8()));
+        xmlAccess::addXmlElement("Left",  wxString(i->leftDirectory.c_str()),  folderPair);
+        xmlAccess::addXmlElement("Right", wxString(i->rightDirectory.c_str()), folderPair);
     }
 
 //###########################################################
@@ -814,11 +543,11 @@ bool XmlConfigOutput::writeXmlMainConfig(const MainConfiguration& mainCfg, const
     TiXmlElement* syncConfig = new TiXmlElement("Directions");
     syncSettings->LinkEndChild(syncConfig);
 
-    addXmlElement(syncConfig, "LeftOnly",   mainCfg.syncConfiguration.exLeftSideOnly);
-    addXmlElement(syncConfig, "RightOnly",  mainCfg.syncConfiguration.exRightSideOnly);
-    addXmlElement(syncConfig, "LeftNewer",  mainCfg.syncConfiguration.leftNewer);
-    addXmlElement(syncConfig, "RightNewer", mainCfg.syncConfiguration.rightNewer);
-    addXmlElement(syncConfig, "Different",  mainCfg.syncConfiguration.different);
+    ::addXmlElement(syncConfig, "LeftOnly",   mainCfg.syncConfiguration.exLeftSideOnly);
+    ::addXmlElement(syncConfig, "RightOnly",  mainCfg.syncConfiguration.exRightSideOnly);
+    ::addXmlElement(syncConfig, "LeftNewer",  mainCfg.syncConfiguration.leftNewer);
+    ::addXmlElement(syncConfig, "RightNewer", mainCfg.syncConfiguration.rightNewer);
+    ::addXmlElement(syncConfig, "Different",  mainCfg.syncConfiguration.different);
 
 //###########################################################
     TiXmlElement* miscSettings = new TiXmlElement("Miscellaneous");
@@ -828,22 +557,23 @@ bool XmlConfigOutput::writeXmlMainConfig(const MainConfiguration& mainCfg, const
     TiXmlElement* filter = new TiXmlElement("Filter");
     miscSettings->LinkEndChild(filter);
 
-    addXmlElement(filter, "Active", mainCfg.filterIsActive);
-    addXmlElement(filter, "Include", std::string((mainCfg.includeFilter).ToUTF8()));
-    addXmlElement(filter, "Exclude", std::string((mainCfg.excludeFilter).ToUTF8()));
+    xmlAccess::addXmlElement("Active",  mainCfg.filterIsActive, filter);
+    xmlAccess::addXmlElement("Include", mainCfg.includeFilter,  filter);
+    xmlAccess::addXmlElement("Exclude", mainCfg.excludeFilter,  filter);
 
     //other
-    addXmlElement(miscSettings, "UseRecycler", mainCfg.useRecycleBin);
+    addXmlElement("DeletionPolicy", mainCfg.handleDeletion, miscSettings);
+    xmlAccess::addXmlElement("CustomDeletionFolder", mainCfg.customDeletionDirectory, miscSettings);
 //###########################################################
 
     return true;
 }
 
 
-bool XmlConfigOutput::writeXmlGuiConfig(const xmlAccess::XmlGuiConfig& inputCfg)
+bool writeXmlGuiConfig(const xmlAccess::XmlGuiConfig& inputCfg, TiXmlDocument& doc)
 {
     //write main config
-    if (!writeXmlMainConfig(inputCfg.mainCfg, inputCfg.directoryPairs))
+    if (!writeXmlMainConfig(inputCfg.mainCfg, inputCfg.directoryPairs, doc))
         return false;
 
     //write GUI specific config
@@ -853,18 +583,20 @@ bool XmlConfigOutput::writeXmlGuiConfig(const xmlAccess::XmlGuiConfig& inputCfg)
     TiXmlElement* guiConfig = new TiXmlElement("GuiConfig");
     root->LinkEndChild(guiConfig);
 
-    addXmlElement(guiConfig, "HideFiltered", inputCfg.hideFilteredElements);
-    addXmlElement(guiConfig, "IgnoreErrors", inputCfg.ignoreErrors);
-    addXmlElement(guiConfig, "SyncPreviewActive", inputCfg.syncPreviewEnabled);
+    xmlAccess::addXmlElement("HideFiltered",      inputCfg.hideFilteredElements, guiConfig);
+
+    ::addXmlElement("HandleError", inputCfg.ignoreErrors ? xmlAccess::ON_ERROR_IGNORE : xmlAccess::ON_ERROR_POPUP, guiConfig);
+
+    xmlAccess::addXmlElement("SyncPreviewActive", inputCfg.syncPreviewEnabled,   guiConfig);
 
     return true;
 }
 
 
-bool XmlConfigOutput::writeXmlBatchConfig(const xmlAccess::XmlBatchConfig& inputCfg)
+bool writeXmlBatchConfig(const xmlAccess::XmlBatchConfig& inputCfg, TiXmlDocument& doc)
 {
     //write main config
-    if (!writeXmlMainConfig(inputCfg.mainCfg, inputCfg.directoryPairs))
+    if (!writeXmlMainConfig(inputCfg.mainCfg, inputCfg.directoryPairs, doc))
         return false;
 
     //write GUI specific config
@@ -874,15 +606,15 @@ bool XmlConfigOutput::writeXmlBatchConfig(const xmlAccess::XmlBatchConfig& input
     TiXmlElement* batchConfig = new TiXmlElement("BatchConfig");
     root->LinkEndChild(batchConfig);
 
-    addXmlElement(batchConfig, "Silent", inputCfg.silent);
-    addXmlElement(batchConfig, "LogfileDirectory", std::string(inputCfg.logFileDirectory.ToUTF8()));
-    addXmlElement(batchConfig, "HandleError", inputCfg.handleError);
+    xmlAccess::addXmlElement("Silent", inputCfg.silent, batchConfig);
+    xmlAccess::addXmlElement("LogfileDirectory", inputCfg.logFileDirectory, batchConfig);
+    ::addXmlElement("HandleError", inputCfg.handleError, batchConfig);
 
     return true;
 }
 
 
-bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg)
+bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlDocument& doc)
 {
     TiXmlElement* root = doc.RootElement();
     if (!root) return false;
@@ -893,47 +625,38 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings&
     root->LinkEndChild(global);
 
     //program language
-    addXmlElement(global, "Language", inputCfg.programLanguage);
+    xmlAccess::addXmlElement("Language", inputCfg.programLanguage, global);
 
     //max. allowed file time deviation
-    addXmlElement(global, "FileTimeTolerance", int(inputCfg.fileTimeTolerance));
+    xmlAccess::addXmlElement("FileTimeTolerance", inputCfg.fileTimeTolerance, global);
 
     //ignore +/- 1 hour due to DST change
-    addXmlElement(global, "IgnoreOneHourDifference", inputCfg.ignoreOneHourDiff);
+    xmlAccess::addXmlElement("IgnoreOneHourDifference", inputCfg.ignoreOneHourDiff, global);
 
     //traverse into symbolic links (to folders)
-    addXmlElement(global, "TraverseDirectorySymlinks", inputCfg.traverseDirectorySymlinks);
+    xmlAccess::addXmlElement("TraverseDirectorySymlinks", inputCfg.traverseDirectorySymlinks, global);
 
     //copy symbolic links to files
-    addXmlElement(global, "CopyFileSymlinks", inputCfg.copyFileSymlinks);
+    xmlAccess::addXmlElement("CopyFileSymlinks", inputCfg.copyFileSymlinks, global);
 
     //last update check
-    addXmlElement(global, "LastCheckForUpdates", inputCfg.lastUpdateCheck);
+    xmlAccess::addXmlElement("LastCheckForUpdates", inputCfg.lastUpdateCheck, global);
 
     //warnings
     TiXmlElement* warnings = new TiXmlElement("Warnings");
     global->LinkEndChild(warnings);
 
     //warning: dependent folders
-    addXmlElement(warnings, "CheckForDependentFolders", inputCfg.warnings.warningDependentFolders);
+    xmlAccess::addXmlElement("CheckForDependentFolders", inputCfg.warnings.warningDependentFolders, warnings);
 
     //significant difference check
-    addXmlElement(warnings, "CheckForSignificantDifference", inputCfg.warnings.warningSignificantDifference);
+    xmlAccess::addXmlElement("CheckForSignificantDifference", inputCfg.warnings.warningSignificantDifference, warnings);
 
     //check free disk space
-    addXmlElement(warnings, "CheckForFreeDiskSpace", inputCfg.warnings.warningNotEnoughDiskSpace);
+    xmlAccess::addXmlElement("CheckForFreeDiskSpace", inputCfg.warnings.warningNotEnoughDiskSpace, warnings);
 
     //check for unresolved conflicts
-    addXmlElement(warnings, "CheckForUnresolvedConflicts", inputCfg.warnings.warningUnresolvedConflicts);
-
-    //check for very old dates or dates in the future
-    addXmlElement(warnings, "CheckForInvalidFileDate", inputCfg.warnings.warningInvalidDate);
-
-    //check for changed files with same modification date
-    addXmlElement(warnings, "SameDateDifferentFileSize", inputCfg.warnings.warningSameDateDiffSize);
-
-    //check for files that have a difference in file modification date below 1 hour when DST check is active
-    addXmlElement(warnings, "FileChangeWithinHour", inputCfg.warnings.warningDSTChangeWithinHour);
+    xmlAccess::addXmlElement("CheckForUnresolvedConflicts", inputCfg.warnings.warningUnresolvedConflicts, warnings);
 
 
     //###################################################################
@@ -948,24 +671,27 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings&
     windows->LinkEndChild(mainWindow);
 
     //window size
-    addXmlElement(mainWindow, "Width", inputCfg.gui.widthNotMaximized);
-    addXmlElement(mainWindow, "Height", inputCfg.gui.heightNotMaximized);
+    xmlAccess::addXmlElement("Width",  inputCfg.gui.widthNotMaximized,  mainWindow);
+    xmlAccess::addXmlElement("Height", inputCfg.gui.heightNotMaximized, mainWindow);
 
     //window position
-    addXmlElement(mainWindow, "PosX", inputCfg.gui.posXNotMaximized);
-    addXmlElement(mainWindow, "PosY", inputCfg.gui.posYNotMaximized);
-    addXmlElement(mainWindow, "Maximized", inputCfg.gui.isMaximized);
+    xmlAccess::addXmlElement("PosX",      inputCfg.gui.posXNotMaximized, mainWindow);
+    xmlAccess::addXmlElement("PosY",      inputCfg.gui.posYNotMaximized, mainWindow);
+    xmlAccess::addXmlElement("Maximized", inputCfg.gui.isMaximized,      mainWindow);
 
-    addXmlElement(mainWindow, "ManualDeletionOnBothSides", inputCfg.gui.deleteOnBothSides);
-    addXmlElement(mainWindow, "ManualDeletionUseRecycler", inputCfg.gui.useRecyclerForManualDeletion);
-    addXmlElement(mainWindow, "ShowFileIconsLeft",         inputCfg.gui.showFileIconsLeft);
-    addXmlElement(mainWindow, "ShowFileIconsRight",        inputCfg.gui.showFileIconsRight);
-    addXmlElement(mainWindow, "PopupOnConfigChange",       inputCfg.gui.popupOnConfigChange);
-    addXmlElement(mainWindow, "SummaryBeforeSync",         inputCfg.gui.showSummaryBeforeSync);
+    xmlAccess::addXmlElement("ManualDeletionOnBothSides", inputCfg.gui.deleteOnBothSides,            mainWindow);
+    xmlAccess::addXmlElement("ManualDeletionUseRecycler", inputCfg.gui.useRecyclerForManualDeletion, mainWindow);
+    xmlAccess::addXmlElement("ShowFileIconsLeft",         inputCfg.gui.showFileIconsLeft,            mainWindow);
+    xmlAccess::addXmlElement("ShowFileIconsRight",        inputCfg.gui.showFileIconsRight,           mainWindow);
+    xmlAccess::addXmlElement("PopupOnConfigChange",       inputCfg.gui.popupOnConfigChange,          mainWindow);
+    xmlAccess::addXmlElement("SummaryBeforeSync",         inputCfg.gui.showSummaryBeforeSync,        mainWindow);
 
     //write column attributes
     TiXmlElement* leftColumn = new TiXmlElement("LeftColumns");
     mainWindow->LinkEndChild(leftColumn);
+
+    xmlAccess::addXmlAttribute("AutoAdjust", inputCfg.gui.autoAdjustColumnsLeft, leftColumn);
+
     xmlAccess::ColumnAttributes columnAtrribLeftCopy = inputCfg.gui.columnAttribLeft; //can't change const vector
     sort(columnAtrribLeftCopy.begin(), columnAtrribLeftCopy.end(), xmlAccess::sortByPositionOnly);
     for (unsigned int i = 0; i < columnAtrribLeftCopy.size(); ++i)
@@ -974,14 +700,16 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings&
         leftColumn->LinkEndChild(subElement);
 
         const xmlAccess::ColumnAttrib& colAttrib = columnAtrribLeftCopy[i];
-        subElement->SetAttribute("Type", colAttrib.type);
-        if (colAttrib.visible) subElement->SetAttribute("Visible", "true");
-        else subElement->SetAttribute("Visible", "false");
-        subElement->SetAttribute("Width", colAttrib.width);
+        addXmlAttribute("Type",    colAttrib.type,    subElement);
+        xmlAccess::addXmlAttribute("Visible", colAttrib.visible, subElement);
+        xmlAccess::addXmlAttribute("Width",   colAttrib.width,   subElement);
     }
 
     TiXmlElement* rightColumn = new TiXmlElement("RightColumns");
     mainWindow->LinkEndChild(rightColumn);
+
+    xmlAccess::addXmlAttribute("AutoAdjust", inputCfg.gui.autoAdjustColumnsRight, rightColumn);
+
     xmlAccess::ColumnAttributes columnAtrribRightCopy = inputCfg.gui.columnAttribRight;
     sort(columnAtrribRightCopy.begin(), columnAtrribRightCopy.end(), xmlAccess::sortByPositionOnly);
     for (unsigned int i = 0; i < columnAtrribRightCopy.size(); ++i)
@@ -990,10 +718,9 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings&
         rightColumn->LinkEndChild(subElement);
 
         const xmlAccess::ColumnAttrib& colAttrib = columnAtrribRightCopy[i];
-        subElement->SetAttribute("Type", colAttrib.type);
-        if (colAttrib.visible) subElement->SetAttribute("Visible", "true");
-        else subElement->SetAttribute("Visible", "false");
-        subElement->SetAttribute("Width", colAttrib.width);
+        addXmlAttribute("Type",    colAttrib.type,    subElement);
+        xmlAccess::addXmlAttribute("Visible", colAttrib.visible, subElement);
+        xmlAccess::addXmlAttribute("Width",   colAttrib.width,   subElement);
     }
 
     //write folder history elements
@@ -1002,23 +729,23 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings&
     TiXmlElement* historyRight = new TiXmlElement("FolderHistoryRight");
     mainWindow->LinkEndChild(historyRight);
 
-    historyLeft->SetAttribute("MaximumSize", globalFunctions::numberToString(inputCfg.gui.folderHistLeftMax));
-    addXmlElementTable(historyLeft, "Folder", inputCfg.gui.folderHistoryLeft);
+    xmlAccess::addXmlAttribute("MaximumSize", inputCfg.gui.folderHistLeftMax,  historyLeft);
+    xmlAccess::addXmlAttribute("MaximumSize", inputCfg.gui.folderHistRightMax, historyRight);
 
-    historyRight->SetAttribute("MaximumSize", globalFunctions::numberToString(inputCfg.gui.folderHistRightMax));
-    addXmlElementTable(historyRight, "Folder", inputCfg.gui.folderHistoryRight);
+    xmlAccess::addXmlElement("Folder", inputCfg.gui.folderHistoryLeft, historyLeft);
+    xmlAccess::addXmlElement("Folder", inputCfg.gui.folderHistoryRight, historyRight);
 
-    addXmlElement(mainWindow, "SelectedTabBottomLeft", inputCfg.gui.selectedTabBottomLeft);
+    xmlAccess::addXmlElement("SelectedTabBottomLeft", inputCfg.gui.selectedTabBottomLeft, mainWindow);
 
     //commandline for file manager integration
-    addXmlElement(gui, "FileManager", std::string((inputCfg.gui.commandLineFileManager).ToUTF8()));
+    xmlAccess::addXmlElement("FileManager", inputCfg.gui.commandLineFileManager, gui);
 
     //write config file history
     TiXmlElement* cfgHistory = new TiXmlElement("ConfigHistory");
     gui->LinkEndChild(cfgHistory);
 
-    cfgHistory->SetAttribute("MaximumSize", globalFunctions::numberToString(inputCfg.gui.cfgHistoryMax));
-    addXmlElementTable(cfgHistory, "File", inputCfg.gui.cfgFileHistory);
+    xmlAccess::addXmlAttribute("MaximumSize", inputCfg.gui.cfgHistoryMax, cfgHistory);
+    xmlAccess::addXmlElement("File", inputCfg.gui.cfgFileHistory, cfgHistory);
 
     //###################################################################
     //write global batch settings
@@ -1032,98 +759,13 @@ bool XmlConfigOutput::writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings&
 
 int xmlAccess::retrieveSystemLanguage()
 {
-    const int lang = wxLocale::GetSystemLanguage();
-
-    switch (lang) //map language dialects
-    {
-        //variants of wxLANGUAGE_GERMAN
-    case wxLANGUAGE_GERMAN_AUSTRIAN:
-    case wxLANGUAGE_GERMAN_BELGIUM:
-    case wxLANGUAGE_GERMAN_LIECHTENSTEIN:
-    case wxLANGUAGE_GERMAN_LUXEMBOURG:
-    case wxLANGUAGE_GERMAN_SWISS:
-        return wxLANGUAGE_GERMAN;
-
-        //variants of wxLANGUAGE_FRENCH
-    case wxLANGUAGE_FRENCH_BELGIAN:
-    case wxLANGUAGE_FRENCH_CANADIAN:
-    case wxLANGUAGE_FRENCH_LUXEMBOURG:
-    case wxLANGUAGE_FRENCH_MONACO:
-    case wxLANGUAGE_FRENCH_SWISS:
-        return wxLANGUAGE_FRENCH;
-
-        //variants of wxLANGUAGE_DUTCH
-    case wxLANGUAGE_DUTCH_BELGIAN:
-        return wxLANGUAGE_DUTCH;
-
-        //variants of wxLANGUAGE_ITALIAN
-    case wxLANGUAGE_ITALIAN_SWISS:
-        return wxLANGUAGE_ITALIAN;
-
-        //variants of wxLANGUAGE_CHINESE_SIMPLIFIED
-    case wxLANGUAGE_CHINESE:
-    case wxLANGUAGE_CHINESE_TRADITIONAL:
-    case wxLANGUAGE_CHINESE_HONGKONG:
-    case wxLANGUAGE_CHINESE_MACAU:
-    case wxLANGUAGE_CHINESE_SINGAPORE:
-    case wxLANGUAGE_CHINESE_TAIWAN:
-        return wxLANGUAGE_CHINESE_SIMPLIFIED;
-
-        //variants of wxLANGUAGE_RUSSIAN
-    case wxLANGUAGE_RUSSIAN_UKRAINE:
-        return wxLANGUAGE_RUSSIAN;
-
-        //variants of wxLANGUAGE_SPANISH
-    case wxLANGUAGE_SPANISH_ARGENTINA:
-    case wxLANGUAGE_SPANISH_BOLIVIA:
-    case wxLANGUAGE_SPANISH_CHILE:
-    case wxLANGUAGE_SPANISH_COLOMBIA:
-    case wxLANGUAGE_SPANISH_COSTA_RICA:
-    case wxLANGUAGE_SPANISH_DOMINICAN_REPUBLIC:
-    case wxLANGUAGE_SPANISH_ECUADOR:
-    case wxLANGUAGE_SPANISH_EL_SALVADOR:
-    case wxLANGUAGE_SPANISH_GUATEMALA:
-    case wxLANGUAGE_SPANISH_HONDURAS:
-    case wxLANGUAGE_SPANISH_MEXICAN:
-    case wxLANGUAGE_SPANISH_MODERN:
-    case wxLANGUAGE_SPANISH_NICARAGUA:
-    case wxLANGUAGE_SPANISH_PANAMA:
-    case wxLANGUAGE_SPANISH_PARAGUAY:
-    case wxLANGUAGE_SPANISH_PERU:
-    case wxLANGUAGE_SPANISH_PUERTO_RICO:
-    case wxLANGUAGE_SPANISH_URUGUAY:
-    case wxLANGUAGE_SPANISH_US:
-    case wxLANGUAGE_SPANISH_VENEZUELA:
-        return wxLANGUAGE_SPANISH;
-
-        //case wxLANGUAGE_JAPANESE:
-        //case wxLANGUAGE_POLISH:
-        //case wxLANGUAGE_SLOVENIAN:
-        //case wxLANGUAGE_HUNGARIAN:
-        //case wxLANGUAGE_PORTUGUESE:
-        //case wxLANGUAGE_PORTUGUESE_BRAZILIAN:
-
-    default:
-        return lang;
-    }
+    return wxLocale::GetSystemLanguage();
 }
 
 
-bool xmlAccess::supportForSymbolicLinks()
+bool xmlAccess::recycleBinAvailable()
 {
-#ifdef FFS_WIN
-    OSVERSIONINFO osvi;
-    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-
-    //symbolic links are supported starting with Vista
-    if (GetVersionEx(&osvi))
-        return osvi.dwMajorVersion > 5; //XP has majorVersion == 5, minorVersion == 1, Vista majorVersion == 6
-
-    return false;
-#elif defined FFS_LINUX
-    return true;
-#endif
+    return FreeFileSync::recycleBinExists();
 }
 
 
@@ -1133,7 +775,4 @@ void xmlAccess::WarningMessages::resetWarnings()
     warningSignificantDifference   = true;
     warningNotEnoughDiskSpace      = true;
     warningUnresolvedConflicts     = true;
-    warningInvalidDate             = true;
-    warningSameDateDiffSize        = true;
-    warningDSTChangeWithinHour     = true;
 }

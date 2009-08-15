@@ -1,9 +1,10 @@
 #include "statistics.h"
 
 #include <wx/ffile.h>
-#include "globalFunctions.h"
+#include "../shared/globalFunctions.h"
 #include "statusHandler.h"
 #include "../algorithm.h"
+#include <wx/intl.h>
 #include <limits>
 #include <wx/stopwatch.h>
 

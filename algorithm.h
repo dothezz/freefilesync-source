@@ -2,9 +2,11 @@
 #define ALGORITHM_H_INCLUDED
 
 #include "structures.h"
-#include "library/resources.h"
 
 class ErrorHandler;
+class wxComboBox;
+class wxTextCtrl;
+class wxDirPickerCtrl;
 
 
 namespace FreeFileSync
@@ -13,9 +15,10 @@ namespace FreeFileSync
     wxString formatFilesizeToShortString(const wxULongLong& filesize);
     wxString formatFilesizeToShortString(const double filesize);
 
-    Zstring getFormattedDirectoryName(const Zstring& dirname);
+    wxString includeNumberSeparator(const wxString& number);
 
-    bool endsWithPathSeparator(const Zstring& name);
+    void setDirectoryName(const wxString& dirname, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker);
+    void setDirectoryName(const wxString& dirname, wxComboBox* txtCtrl, wxDirPickerCtrl* dirPicker);
 
     void swapGrids(const SyncConfiguration& config, FolderComparison& folderCmp);
 
@@ -24,18 +27,35 @@ namespace FreeFileSync
     void addSubElements(const FileComparison& fileCmp, const FileCompareLine& relevantRow, std::set<int>& subElements);
 
     //manual deletion of files on main grid: runs at individual directory pair level
-    wxString deleteFromGridAndHDPreview(const FileComparison& fileCmp,
-                                        const std::set<int>& rowsToDeleteOnLeft,
-                                        const std::set<int>& rowsToDeleteOnRight,
-                                        const bool deleteOnBothSides);
+    std::pair<wxString, int> deleteFromGridAndHDPreview(const FileComparison& fileCmp, //returns wxString with elements to be deleted and total count
+            const std::set<int>& rowsToDeleteOnLeft,
+            const std::set<int>& rowsToDeleteOnRight,
+            const bool deleteOnBothSides);
 
+    class DeleteFilesHandler
+    {
+    public:
+        DeleteFilesHandler() {}
+        virtual ~DeleteFilesHandler() {}
+
+        enum Response
+        {
+            IGNORE_ERROR = 10,
+            RETRY
+        };
+        virtual Response reportError(const wxString& errorMessage) = 0;
+
+        //virtual void totalFilesToDelete(int objectsTotal) = 0; //informs about the total number of files to be deleted
+        virtual void deletionSuccessful() = 0;  //called for each file/folder that has been deleted
+
+    };
     void deleteFromGridAndHD(FileComparison& fileCmp,
                              const std::set<int>& rowsToDeleteOnLeft,
                              const std::set<int>& rowsToDeleteOnRight,
                              const bool deleteOnBothSides,
                              const bool useRecycleBin,
                              const SyncConfiguration& syncConfig,
-                             ErrorHandler* errorHandler);
+                             DeleteFilesHandler* statusHandler);
 
 
     wxString utcTimeToLocalString(const wxLongLong& utcTime, const Zstring& filename);
@@ -51,22 +71,6 @@ namespace FreeFileSync
         else
             return last;
     }
-
-#ifdef FFS_WIN
-    Zstring getLastErrorFormatted(const unsigned long lastError = 0); //try to get additional Windows error information
-#elif defined FFS_LINUX
-    Zstring getLastErrorFormatted(const int lastError = 0); //try to get additional Linux error information
-#endif
 }
-
-
-inline
-bool FreeFileSync::endsWithPathSeparator(const Zstring& name)
-{
-    const size_t len = name.length();
-    return len && (name[len - 1] == FreeFileSync::FILE_NAME_SEPARATOR);
-}
-
-
 
 #endif // ALGORITHM_H_INCLUDED

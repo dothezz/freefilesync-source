@@ -4,8 +4,9 @@
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/mstream.h>
-#include "globalFunctions.h"
-#include "../structures.h"
+#include "../shared/globalFunctions.h"
+//#include "../shared/systemFunctions.h"
+#include "../shared/standardPaths.h"
 
 
 const GlobalResources& GlobalResources::getInstance()
@@ -98,16 +99,20 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("batch_small.png")]        = (bitmapBatchSmall        = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("move up.png")]            = (bitmapMoveUp            = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("move down.png")]          = (bitmapMoveDown          = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("checkbox true.png")]      = (bitmapCheckBoxTrue      = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("checkbox false.png")]     = (bitmapCheckBoxFalse     = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("checkbox_true.png")]        = (bitmapCheckBoxTrue       = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("checkbox_true_focus.png")]  = (bitmapCheckBoxTrueFocus  = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("checkbox_false.png")]       = (bitmapCheckBoxFalse      = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("checkbox_false_focus.png")] = (bitmapCheckBoxFalseFocus = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("settings.png")]           = (bitmapSettings          = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("settings_small.png")]     = (bitmapSettingsSmall     = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("recycler.png")]           = (bitmapRecycler          = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("shift.png")]              = (bitmapShift             = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("syncConfig.png")]         = (bitmapSyncCfg           = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("cmpConfig.png")]          = (bitmapCmpCfg            = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("syncPreview.png")]        = (bitmapPreview           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("syncPreviewDisabl.png")]  = (bitmapPreviewDisabled   = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("question.png")]           = (bitmapQuestion          = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("czechRep.png")]           = (bitmapCzechRep          = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("china.png")]              = (bitmapChina             = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("holland.png")]            = (bitmapHolland           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("england.png")]            = (bitmapEngland           = new wxBitmap(wxNullBitmap));
@@ -120,8 +125,16 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("portugal.png")]           = (bitmapPortugal          = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("brazil.png")]             = (bitmapBrazil            = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("slovakia.png")]           = (bitmapSlovakia          = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("spain.png")]              = (bitmapSpain             = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("russia.png")]             = (bitmapRussia            = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("spain.png")]                = (bitmapSpain             = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("russia.png")]               = (bitmapRussia            = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("syncCreateLeftAct.png")]    = (bitmapSyncCreateLeftAct    = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("syncCreateLeftDeact.png")]  = (bitmapSyncCreateLeftDeact  = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("syncCreateRightAct.png")]   = (bitmapSyncCreateRightAct   = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("syncCreateRightDeact.png")] = (bitmapSyncCreateRightDeact = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("syncDeleteLeftAct.png")]    = (bitmapSyncDeleteLeftAct    = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("syncDeleteLeftDeact.png")]  = (bitmapSyncDeleteLeftDeact  = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("syncDeleteRightAct.png")]   = (bitmapSyncDeleteRightAct   = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("syncDeleteRightDeact.png")] = (bitmapSyncDeleteRightDeact = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("syncDirLeftAct.png")]     = (bitmapSyncDirLeftAct    = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("syncDirLeftDeact.png")]   = (bitmapSyncDirLeftDeact  = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("syncDirRightAct.png")]    = (bitmapSyncDirRightAct   = new wxBitmap(wxNullBitmap));
@@ -191,7 +204,7 @@ void loadAnimFromZip(wxZipInputStream& zipInput, wxAnimation* animation)
 
 void GlobalResources::load() const
 {
-    wxFileInputStream input(FreeFileSync::getInstallationDir() + FreeFileSync::FILE_NAME_SEPARATOR + wxT("Resources.dat"));
+    wxFFileInputStream input(FreeFileSync::getInstallationDir() + globalFunctions::FILE_NAME_SEPARATOR + wxT("Resources.dat"));
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files
@@ -199,10 +212,13 @@ void GlobalResources::load() const
 
         wxZipInputStream resourceFile(input);
 
-        wxZipEntry* entry = NULL;
         std::map<wxString, wxBitmap*>::iterator bmp;
-        while ((entry = resourceFile.GetNextEntry()))
+        while (true)
         {
+            std::auto_ptr<wxZipEntry> entry(resourceFile.GetNextEntry());
+            if (entry.get() == NULL)
+                break;
+
             const wxString name = entry->GetName();
 
             //search if entry is available in map
@@ -221,4 +237,14 @@ void GlobalResources::load() const
 #include "FreeFileSync.xpm"
     *programIcon = wxIcon(FreeFileSync_xpm);
 #endif
+}
+
+
+const wxBitmap& GlobalResources::getImageByName(const wxString& imageName) const
+{
+    std::map<wxString, wxBitmap*>::const_iterator bmp = bitmapResource.find(imageName);
+    if (bmp != bitmapResource.end())
+        return *bmp->second;
+    else
+        return wxNullBitmap;
 }

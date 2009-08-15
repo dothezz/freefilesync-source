@@ -20,8 +20,10 @@
  minuty
  sec
  sekundy
-!=	files are different\n
-!=	pliki są różne\n
+%x / %y objects deleted successfully
+%x / %y usuniętych obiektów
+%x Percent
+%x Procent
 %x directories
 %x katalogi
 %x files,
@@ -43,11 +45,13 @@
 &Cancel
 &Anuluj
 &Check for new version
-&Sprawdź aktualizacje
+&Aktualizuj
 &Create batch job
-&Twórz zadanie batch
+&Twórz plik wsadowy
 &Default
 &Domyślne
+&Exit
+&Wyjście
 &Export file list
 &Eksportuj listę plików
 &File
@@ -63,7 +67,7 @@
 &Load
 &Wczytaj
 &Load configuration
-&Ładuj konfigurację
+&Wczytaj konfigurację
 &No
 &Nie
 &OK
@@ -72,6 +76,8 @@
 &Pauza
 &Quit
 &Zamknij
+&Restore
+&Przywróć
 &Retry
 &Powtórz
 &Save
@@ -80,20 +86,22 @@
 &Tak
 ,
 .
--	do not copy\n
--	nie kopiuj\n
 - conflict
 - konflikt
 - conflict (same date, different size)
 - konflikt (ta sama data, różny rozmiar)
 - different
 - różny
+- directory part only
+- tylko struktura katalogu
 - equal
 - równy
 - exists left only
 - istnieje tylko po lewej stronie
 - exists right only
 - istnieje tylko po prawej stronie
+- full file or directory name
+- pełna nazwa pliku lub katalogu
 - left
 - lewy
 - left newer
@@ -102,8 +110,10 @@
 - prawy
 - right newer
 - prawy jest nowszy
-->	copy to right side\n
-->	kopiuj na prawą stronę
+- sibling of %dir
+- brat %dir
+- sibling of %name
+- brat %name
 -Open-Source file synchronization-
 -synchronizacja plików Open-Source-
 .
@@ -124,22 +134,12 @@
 2. Użyj wieloznacznika (wildcard) '*' i '?'.
 3. Exclude files directly on main grid via context menu.
 3. Wyklucz pliki i foldery używając prawego przycisku myszki.
-<-	copy to left side\n
-<-	kopiuje na lewą stronę\n
-<<	left file is newer\n
-<<	lewy plik jest nowszy\n
 <Directory>
 <Katalog>
 <Last session>
 <Ostatnia sesja>
 <multiple selection>
 <zaznaczone elementy>
-<|	file on left side only\n
-<|	istnieje tylko po lewej stronie\n
-==	files are equal\n
-==	pliki są równe\n
->>	right file is newer\n
->>	prawy plik jest nowszy\n
 A newer version of FreeFileSync is available:
 Dostępna jest nowa wersja FreeFileSync:
 Abort requested: Waiting for current operation to finish...
@@ -150,6 +150,8 @@ About
 O Programie
 Action
 Akcja
+Add folder
+Dodaj folder
 Add folder pair
 Dodaj foldery do porównania
 All items have been synchronized!
@@ -161,13 +163,15 @@ W rezultacie pliki zostały podzielone na następujące kategorie:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
 Jak wskazuje nazwa, dwa pliki o tej samej nazwie są równe tylko i wyłącznie jeżeli ich zawartość jest jednakowa. Czas modyfikacji nie jest brany pod uwagę. Ta opcja jest raczej użyteczna do sprawdzania spójności plików niż zadań kopii zapasowej.\n\nDrzewko decyzyjne dla tej opcji jest mniejsze:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
-Twórz zadanie batch dla automatyzacji procesu. By rozpocząć prace w tym trybie zwyczajnie uruchom plik z zadaniem batch lub dodaj go do zadań zaplanowanych Twojego systemu. Plik batch może być również przekazywany jako parametr do programu w postaci: FreeFileSync.exe <batchfile>.
+Twórz plik wsadowy dla automatyzacji procesu. By rozpocząć prace w tym trybie zwyczajnie uruchom plik klikając dwa razy lub dodaj go do zadań zaplanowanych Twojego systemu. Plik wsadowy może być również przekazywany jako parametr do programu w postaci: FreeFileSync.exe <plikwsadowy>.
+Auto-adjust columns
+Autodopasowanie kolumn
 Batch execution
-Zadanie Batch
+Uruchomienie pliku wsadowego
 Batch file created successfully!
-Plik Batch utworzony pomyślnie!
+Plik wsadowy utworzony pomyślnie!
 Batch job
-Zadanie batch
+Plik wsadowy
 Big thanks for localizing FreeFileSync goes out to:
 Podziękowania za tłumaczenie FreeFileSync:
 Browse
@@ -184,6 +188,10 @@ Choose to hide filtered files/directories from list
 Zaznacz aby ukryć przefiltrowane pliki/katalogi z listy
 Comma separated list
 Lista oddzielona przecinkami
+Commandline
+Wiersz poleceń
+Commandline is empty!
+Wiersz poleceń jest pusty!
 Compare
 Porównaj
 Compare both sides
@@ -202,12 +210,14 @@ Comparing content...
 Porównywanie zawartości...
 Comparison Result
 Rezultat porównywania
+Comparison settings
+Ustawienia porównywania
 Completed
 Zakończono
 Configuration
 Konfiguracja
 Configuration loaded!
-Konfiguracja załadowana!
+Konfiguracja wczytana!
 Configuration overview:
 Przegląd konfiguracji:
 Configuration saved!
@@ -244,10 +254,12 @@ Copying file %x to %y overwriting target
 Nadpisywanie pliku %y plikiem %x
 Could not determine volume name for file:
 Nie można określić nazwy dysku dla pliku:
-Could not set working directory:
-Nie można ustawić poprawnego folderu:
+Could not initialize directory monitoring:
+Nie można uruchomić monitora katalogów:
+Could not read values for the following XML nodes:
+
 Create a batch job
-Twórz zadanie Batch
+Twórz plik wsadowy
 Creating folder %x
 Tworzenie folderu %x
 Current operation:
@@ -256,12 +268,18 @@ Custom
 Własne
 Customize columns
 Dostosuj kolumny
+Customize...
+Dostosuj...
 DECISION TREE
 DRZEWO DECYZYJNE
 Data remaining:
 Pozostałe dane:
 Date
 Data
+Delay
+Opóźnienie
+Delay between two invocations of the commandline
+Opóźnienie pomiędzy wywołaniem dwóch komend
 Delete files/folders existing on left side only
 Usuń pliki/foldery istniejące tylko po lewej stronie
 Delete files/folders existing on right side only
@@ -272,18 +290,26 @@ Delete on both sides
 Usuń po obu stronach
 Delete on both sides even if the file is selected on one side only
 Usuń po obu stronach nawet jeżeli plik zaznaczony jest tylko po jednej stronie
+Delete or overwrite files permanently.
+Usuń lub nadpisz pliki na stałe.
+Delete permanently
+Usuń na stałe
 Deleting file %x
 Usuwanie pliku %x
 Deleting folder %x
 Usuwanie folderu %x
+Deletion handling
+Obsługa usuwania
 Directories are dependent! Be careful when setting up synchronization rules:
 Katalogi są zależne! Pamiętaj o tym podczas ustawiania zasad synchronizacji:
+Directories to watch
+Katalogi do obserwacji
 Directory
 Katalog
 Directory does not exist:
 Katalog nie istnieje:
 Do not display visual status information but write to a logfile instead
-Nie wyświetla informacji o statusie, ale tworzy plik z logami
+Nie wyświetla graficznej informacji o statusie, ale tworzy plik z logami
 Do not show this dialog again
 Nie pokazuj tego okna ponownie
 Do nothing
@@ -306,6 +332,8 @@ Email
 Poczta
 Enable filter to exclude files from synchronization
 Włącz filtr aby wykluczyć pliki z procesu synchronizacji
+Endless loop when traversing directory:
+Zapętlenie podczas przeglądania katalogu:
 Error
 Błąd
 Error changing modification time:
@@ -324,6 +352,10 @@ Error handling
 Obsługa błędów
 Error loading library function:
 Błąd wczytywania funkcji:
+Error moving directory:
+Błąd podczas przenoszenia katalogu:
+Error moving file:
+Błąd podczas przenoszenia pliku:
 Error moving to Recycle Bin:
 Błąd podczas przenoszenia do kosza:
 Error opening file:
@@ -336,12 +368,12 @@ Error reading file:
 Błąd odczytu pliku:
 Error resolving symbolic link:
 Błąd odczytu dowiązania symbolicznego:
-Error retrieving full path:
-Błąd odzyskiwania pełnej ścieżki:
 Error starting Volume Shadow Copy Service!
 Błąd podczas uruchamianiu usługi Shadow Copy!
 Error traversing directory:
 Błąd podczas odczytywania katalogu:
+Error when monitoring directories.
+Błąd podczas monitorowania katalogów.
 Error writing file attributes:
 Błąd zapisu atrybutów pliku:
 Error writing file:
@@ -421,11 +453,11 @@ Para folderów
 FreeFileSync - Folder Comparison and Synchronization
 FreeFileSync - Porównywanie i Synchronizacja folderów
 FreeFileSync Batch Job
-FreeFileSync Batch
+FreeFileSync plik wsadowy
 FreeFileSync at Sourceforge
 FreeFileSync na Sourceforge
 FreeFileSync batch file
-FreeFileSync plik batch
+FreeFileSync plik wsadowy
 FreeFileSync configuration
 Konfiguracja FreeFileSync
 FreeFileSync is up to date!
@@ -458,14 +490,20 @@ Hide files that will be copied to the left side
 Ukryj pliki, które będą kopiowane na lewą stronę
 Hide files that will be copied to the right side
 Ukryj pliki, które będą kopiowane na prawą stronę
+Hide files that will be created on the left side
+Ukryj pliki, które będą utworzone po lewej stronie
+Hide files that will be created on the right side
+Ukryj pliki, które będą utworzone po prawej stronie
+Hide files that will be deleted on the left side
+Ukryj pliki, które będą usunięte po lewej stronie
+Hide files that will be deleted on the right side
+Ukryj pliki, które będą usunięte po lewej stronie
 Hide files that won't be copied
 Ukryj pliki, które nie będą kopiowane
 Hide filtered items
 Ukryj elementy przefiltrowane
 Hide further error messages during the current process
 Ukryj kolejne informacje o błędach dla tego zadania
-Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
-Ukryj informacje o błędach podczas synchronizacji:\nZostaną wyświetlone pod koniec procesu
 Hints:
 Wskazówki:
 Homepage
@@ -486,8 +524,8 @@ Include
 Dołącz
 Include temporarily
 Dołącz tymczasowo
-Include: *.doc;*.zip;*.exe\nExclude: \\temp\\*
-Dołącz: *.doc;*.zip;*.exe\nWyklucz: \\temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: temp\\*
+Dołącz: *.doc;*.zip;*.exe\nWyklucz: temp\\*
 Info
 Info
 Information
@@ -496,8 +534,8 @@ Initialization of Recycle Bin failed!
 Niepowodzenie inicjalizacji Kosza!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Inicjalizacja Kosza nie była możliwa!\n\nPrawdopodobnie nie używasz Windowsa.\nJeżeli chcesz dołączyć tą cechę, skontaktuj się z autorem. :)
-Left:
-Lewy:
+Left
+Lewy
 Load configuration from file
 Wczytaj konfigurację z pliku
 Load configuration history (press DEL to delete items)
@@ -516,8 +554,14 @@ Move column down
 Przesuń kolumnę w dół
 Move column up
 Przesuń kolumnę do góry
+Move files to a custom directory.
+Przenieś plik do niestandardowego katalogu.
+Move to custom directory
+Przenieś do niestandardowego katalogu
 Moving %x to Recycle Bin
 Przenoszenie %x do kosza.
+Moving %x to custom directory
+Przenoszenie %x to niestandardowego katalogu
 Not all items have been synchronized! Have a look at the list.
 Nie wszystkie elementy zostały zsynchronizowane! Zobacz tą listę.
 Not enough free disk space available in:
@@ -533,7 +577,7 @@ Liczba plików, które zostaną nadpisane
 OK
 OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the synchronization directories.
-Tylko pliki/katalogi, które nie zostaną odrzucone przez filtr zostaną dodane do procesu synchronizacji. Filtr działa tylko dla nazw wprowadzonych relatywnie(!)
+Tylko pliki/katalogi, które nie zostaną odrzucone przez filtr dodane będą do procesu synchronizacji. Filtr działa tylko dla nazw wprowadzonych relatywnie(!)
 Open with File Manager\tD-Click
 Exploruj
 Operation aborted!
@@ -550,6 +594,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Skopiuj odpowiedni plik \"Shadow.dll\" (ulokowany w \"Shadow.zip\") do folderu z instalacją FreeFileSync aby uaktywnić tą opcję.
 Please fill all empty directory fields.
 Podaj foldery do synchronizacji.
+Please specify alternate directory for deletion!
+Proszę określić inny katalog jako kosz!
 Press button to activate filter
 Kliknij aby aktywować filtr
 Published under the GNU General Public License:
@@ -558,10 +604,18 @@ Question
 Pytanie
 Quit
 Zakończ
+RealtimeSync - Automated Synchronization
+RealtimeSync - Automatyczna Synchronizacja
+RealtimeSync configuration
+RealtimeSync konfiguracja
 Relative path
 Relatywna ścieżka
+Remove folder
+Usuń folder
 Remove folder pair
 Usuń parę folderów
+Report translation error
+Zgłoś błąd w tłumaczeniu
 Reset
 Resetuj
 Reset all warning messages
@@ -570,8 +624,8 @@ Reset all warning messages?
 Zresetować wszystkie ostrzeżenia?
 Result
 Rezultat
-Right:
-Prawy:
+Right
+Prawy
 S&ave configuration
 Z&apisz konfigurację
 S&witch view
@@ -610,6 +664,14 @@ Show files that will be copied to the left side
 Pokaż pliki, które będą kopiowane na lewą stronę
 Show files that will be copied to the right side
 Pokaż pliki, które będą kopiowane na prawą stronę
+Show files that will be created on the left side
+Pokaż pliki, które będą utworzone po lewej stronie
+Show files that will be created on the right side
+Pokaż pliki, które będą utworzone po prawej stronie
+Show files that will be deleted on the left side
+Pokaż pliki, które będą usunięte po lewej stronie
+Show files that will be deleted on the right side
+Pokaż pliki, które będą usunięte po prawej stronie
 Show files that won't be copied
 Pokaż pliki, które nie będą kopiowane
 Show popup
@@ -660,12 +722,14 @@ Synchronizing...
 Synchronizuję...
 System out of memory!
 Brak pamięci!
+Target directory already existing!
+Katalog docelowy już istnieje!
 Target file already existing!
 Plik docelowy już istnieje!
 The file does not contain a valid configuration:
 Nieprawidłowy format pliku:
-This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
-Ta komenda będzie wykonywana za każdym razem jak klikniesz dwa razy na dany plik. %name jest wskaźnikiem na katalog zaznaczonego pliku.
+This commandline will be executed on each doubleclick. The following macros are available:
+Ta komenda będzie wykonana przy każdym podwójnym kliknięciu. Dostępne są następujące makra:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Ten wariant traktuje dwa pliki jako równe w przypadku gdy mają jednakowy rozmiar oraz tą samą datę i czas ostatniej modyfikacji.
 Time
@@ -696,10 +760,12 @@ Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchro
 Istnieją nierozwiązane konflikty! \n\nMożesz je zignorować i kontynułować synchronizację.
 Update ->
 Uaktualnij ->
+Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
+Użycie: Wybierz katalogi do monitorowania i wprowadź komendę. Gdy któryś z plików zostanie zmodyfikowany, w obrębie katalogów, zostanie uruchomiona podana komenda.
 Use Recycle Bin
 Użyj kosza
-Use Recycle Bin when deleting or overwriting files during synchronization
-Użyj Kosza podczas usuwania bądź nadpisywania plików w trakcie synchronizacji
+Use Recycle Bin when deleting or overwriting files.
+Używaj Kosza podczas usuwania lub nadpisywania plików.
 Variant
 Wariant
 Volume name %x not part of filename %y!
@@ -712,15 +778,13 @@ Warnings:
 Ostrzeżenia:
 When the comparison is started with this option set the following decision tree is processed:
 Gdy porównywanie z zaznaczoną opcją jest w toku, podejmowane są następujące dezyje:
+You can ignore the error to consider not existing directories as empty.
+Możesz zignorować ten błąd i uznać nieistniejący katalog za pusty.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Możesz spróbować synchronizować pozostałe elementy ponownie (bez konieczności ponownego porównywania)!
 different
 różny
 file exists on both sides
 plik istnieje po obu stronach
-flash	conflict\n
-konflikt\n
 on one side only
 tylko po jednej stronie
-|>	file on right side only\n
-|>	istnieje tylko po prawej stronie\n

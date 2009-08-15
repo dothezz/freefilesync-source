@@ -12,6 +12,8 @@ class GlobalResources
 public:
     static const GlobalResources& getInstance();
 
+    const wxBitmap& getImageByName(const wxString& imageName) const;
+
     //image resource objects
     wxBitmap* bitmapArrowLeft;
     wxBitmap* bitmapArrowRight;
@@ -94,15 +96,19 @@ public:
     wxBitmap* bitmapMoveUp;
     wxBitmap* bitmapMoveDown;
     wxBitmap* bitmapCheckBoxTrue;
+    wxBitmap* bitmapCheckBoxTrueFocus;
     wxBitmap* bitmapCheckBoxFalse;
+    wxBitmap* bitmapCheckBoxFalseFocus;
     wxBitmap* bitmapSettings;
     wxBitmap* bitmapSettingsSmall;
     wxBitmap* bitmapRecycler;
     wxBitmap* bitmapShift;
     wxBitmap* bitmapSyncCfg;
+    wxBitmap* bitmapCmpCfg;
     wxBitmap* bitmapPreview;
     wxBitmap* bitmapPreviewDisabled;
     wxBitmap* bitmapQuestion;
+    wxBitmap* bitmapCzechRep;
     wxBitmap* bitmapChina;
     wxBitmap* bitmapHolland;
     wxBitmap* bitmapEngland;
@@ -117,6 +123,14 @@ public:
     wxBitmap* bitmapSlovakia;
     wxBitmap* bitmapSpain;
     wxBitmap* bitmapRussia;
+    wxBitmap* bitmapSyncCreateLeftAct;
+    wxBitmap* bitmapSyncCreateLeftDeact;
+    wxBitmap* bitmapSyncCreateRightAct;
+    wxBitmap* bitmapSyncCreateRightDeact;
+    wxBitmap* bitmapSyncDeleteLeftAct;
+    wxBitmap* bitmapSyncDeleteLeftDeact;
+    wxBitmap* bitmapSyncDeleteRightAct;
+    wxBitmap* bitmapSyncDeleteRightDeact;
     wxBitmap* bitmapSyncDirLeftAct;
     wxBitmap* bitmapSyncDirLeftDeact;
     wxBitmap* bitmapSyncDirRightAct;

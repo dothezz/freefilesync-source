@@ -20,8 +20,10 @@
  min
  sec
  sek
-!=	files are different\n
-!=	datoteki sta različni\n
+%x / %y objects deleted successfully
+%x / %y objektov uspešno izbrisanih
+%x Percent
+%x Procentov
 %x directories
 %x imeniki
 %x files,
@@ -48,6 +50,8 @@
 &Ustvari batch opravilo
 &Default
 &Privzeto
+&Exit
+&Izhod
 &Export file list
 &Izvozi seznam datotek
 &File
@@ -72,6 +76,8 @@ Na&loži konfiguracijo
 &Pavza
 &Quit
 &Zapri
+&Restore
+&Obnovi
 &Retry
 &Ponovi
 &Save
@@ -80,20 +86,22 @@ Na&loži konfiguracijo
 &Da
 ,
 , 
--	do not copy\n
--	ne kopiraj\n
 - conflict
 - spor
 - conflict (same date, different size)
 - spor (isti datum, različna velikost)
 - different
 - različni
+- directory part only
+- del, ki zajema samo imenike
 - equal
 - enaki
 - exists left only
 - obstaja samo na levi
 - exists right only
 - obstaja samo na desni
+- full file or directory name
+- polno ime datoteke ali imenika
 - left
 - levo
 - left newer
@@ -102,8 +110,10 @@ Na&loži konfiguracijo
 - desno
 - right newer
 - desna novejša
-->	copy to right side\n
-->	kopiraj na desno stran\n
+- sibling of %dir
+- v sorodu z %dir
+- sibling of %name
+- v sorodu z %name
 -Open-Source file synchronization-
 -Odprto-kodna sinhronizacija datotek-
 .
@@ -124,22 +134,12 @@ Na&loži konfiguracijo
 2. Uporabite lahko tudi znake '*' in '?'.
 3. Exclude files directly on main grid via context menu.
 3. Izključite datoteke neposredno na glavni mreži s kontekstnim menujem.
-<-	copy to left side\n
-<-	kopiraj na levo stran\n
-<<	left file is newer\n
-<<	leva datoteka je novejša\n
 <Directory>
 <Imenik>
 <Last session>
 <Zadnja seja>
 <multiple selection>
 <mnogokratna izbira>
-<|	file on left side only\n
-<|	datoteka obstaja samo na levi\n
-==	files are equal\n
-==	datoteki sta enaki\n
->>	right file is newer\n
->>	desna datoteka je novejša\n
 A newer version of FreeFileSync is available:
 Na voljo je nova različica FreeFileSync:
 Abort requested: Waiting for current operation to finish...
@@ -150,6 +150,8 @@ About
 O programu(1)
 Action
 Ukrep
+Add folder
+Dodaj mapo
 Add folder pair
 Dodaj par imenikov
 All items have been synchronized!
@@ -162,6 +164,8 @@ As the name suggests, two files which share the same name are marked as equal if
 Kot že samo ime pove, sta dve datoteki označeni kot enaki samo takrat, ko imata enako vsebino. Ta možnost je bolj uporabna za preverjanje doslednosti kot za operacije varnostnega shranjevanja. Zaradi tega se časi datotek ne upoštevajo.\n\nZ omogočeno to možnostjo je drevo odločanja manjše:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Sestavi batch datoteko za samodejno sinhronizacijo. Da začnete v batch načinu, preprosto podajte ime datoteke k FreeFileSync izvršilni datoteki: FreeFileSync.exe <imedatotekebatch>. To se lahko tudi nastavi v urniku opravil vašega operacijskega sistema.
+Auto-adjust columns
+Samo-prilagodi stolpce
 Batch execution
 Batch izvajanje
 Batch file created successfully!
@@ -184,6 +188,10 @@ Choose to hide filtered files/directories from list
 Skrij filtrirane datoteke/imenike iz seznama
 Comma separated list
 Seznam ločen z vejico
+Commandline
+Ukazna vrstica
+Commandline is empty!
+Ukazna vrstica je prazna!
 Compare
 Primerjaj
 Compare both sides
@@ -202,6 +210,8 @@ Comparing content...
 Primerjam vsebino...
 Comparison Result
 Rezultati primerjave
+Comparison settings
+Nastavitve primerjanja
 Completed
 Zaključeno
 Configuration
@@ -244,8 +254,10 @@ Copying file %x to %y overwriting target
 Kopiram datoteko %x v %y s prepisovanjem cilja
 Could not determine volume name for file:
 Ne morem določiti imena volumna za datoteko:
-Could not set working directory:
-Ne morem nastaviti delovnega imenika:
+Could not initialize directory monitoring:
+Ne morem začeti nadzorovanja imenikov:
+Could not read values for the following XML nodes:
+
 Create a batch job
 Ustvari batch opravilo
 Creating folder %x
@@ -256,12 +268,18 @@ Custom
 Po meri
 Customize columns
 Stolpce prikroji po meri
+Customize...
+Prilagodi...
 DECISION TREE
 DREVO ODLOČITEV
 Data remaining:
 Preostanek podatkov:
 Date
 Datum
+Delay
+Zakasnitev
+Delay between two invocations of the commandline
+Zakasnitev med dvema pozivoma ukazne vrstice
 Delete files/folders existing on left side only
 Izbriši datoteke/mape, ki obstajajo samo na levi strani
 Delete files/folders existing on right side only
@@ -272,12 +290,20 @@ Delete on both sides
 Izbriši na obeh straneh
 Delete on both sides even if the file is selected on one side only
 Izbriši na obeh straneh, četudi je datoteka izbrana na samo eni strani
+Delete or overwrite files permanently.
+Trajno izbriši ali prepiši datoteke.
+Delete permanently
+Trajno izbriši
 Deleting file %x
 Brisanje datoteke %x
 Deleting folder %x
 Brisanje mape %x
+Deletion handling
+Postopanje pri brisanju
 Directories are dependent! Be careful when setting up synchronization rules:
 Imeniki so v odvisnosti! Bodite pozorni, ko nastavljate sinhronizacijska pravila:
+Directories to watch
+Imenika za nadzorovanje
 Directory
 Imenik
 Directory does not exist:
@@ -306,6 +332,8 @@ Email
 Email
 Enable filter to exclude files from synchronization
 Omogoči filter, da se datoteke izključi iz sinhronizacije
+Endless loop when traversing directory:
+Neskončna zanka pri prehodu imenika:
 Error
 Napaka
 Error changing modification time:
@@ -324,6 +352,10 @@ Error handling
 Napaka pri obravnavanju
 Error loading library function:
 Napaka pri nalaganju funkcije iz knjižnice:
+Error moving directory:
+Napaka pri premikanju imenika:
+Error moving file:
+Napaka pri premikanju datoteke:
 Error moving to Recycle Bin:
 Napaka pri premikanju v Koš:
 Error opening file:
@@ -336,12 +368,12 @@ Error reading file:
 Napaka pri branju datoteke:
 Error resolving symbolic link:
 Napaka pri razreševanju simbolične povezave:
-Error retrieving full path:
-Napaka pri pridobivanju polne poti:
 Error starting Volume Shadow Copy Service!
 Napaka pri zagonu servisa Volume Shadow Copy!
 Error traversing directory:
 Napaka pri prehajanju imenika:
+Error when monitoring directories.
+Napaka pri nadzorovanju imenikov.
 Error writing file attributes:
 Napaka pri pisanju atributov datoteke:
 Error writing file:
@@ -458,14 +490,20 @@ Hide files that will be copied to the left side
 Skrij datoteke, ki bodo kopirane na levo stran
 Hide files that will be copied to the right side
 Skrij datoteke, ki bodo kopirane na desno stran
+Hide files that will be created on the left side
+Skrij datoteke, ki bodo ustvarjene na levi strani
+Hide files that will be created on the right side
+Skrij datoteke, ki bodo ustvarjene na desni strani
+Hide files that will be deleted on the left side
+Skrij datoteke, ki bodo izbrisane na levi strani
+Hide files that will be deleted on the right side
+Skrij datoteke, ki bodo izbrisane na desni strani
 Hide files that won't be copied
 Skrij datoteke, ki ne bodo kopirane
 Hide filtered items
 Skrij filtrirane predmete
 Hide further error messages during the current process
 Skrijte nadaljnja obvestila o napakah med trenutnim procesom
-Hides error messages during synchronization:\nThey are collected and shown as a list at the end of the process
-Skrij obvestila o napakah med sinhronizacijo:\nObvestila se zbirajo in se prikažejo kot seznam na koncu procesa
 Hints:
 Namigi:
 Homepage
@@ -486,8 +524,8 @@ Include
 Vključi
 Include temporarily
 Trenutno vključi
-Include: *.doc;*.zip;*.exe\nExclude: \\temp\\*
-Vključi: *.doc;*.zip;*.exe\nIzključi: \\temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: temp\\*
+Vključi: *.doc;*.zip;*.exe\nIzključi: temp\\*
 Info
 Info
 Information
@@ -496,8 +534,8 @@ Initialization of Recycle Bin failed!
 Inicializacija Koša ni uspela!
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Ni bilo mogoče inicializirati Koša!\n\nZgleda, da ne uporabljate Windowsov.\nČe želite imeti vključeno to lastnost, prosimo kontaktirajte avtorja. :)
-Left:
-Levo:
+Left
+Levo
 Load configuration from file
 Naloži konfiguracijo iz datoteke
 Load configuration history (press DEL to delete items)
@@ -516,8 +554,14 @@ Move column down
 Premakni stolpec dol
 Move column up
 Premakni stolpec gor
+Move files to a custom directory.
+Premakni datoteke v imenik po meri.
+Move to custom directory
+Premakni v imenik po meri
 Moving %x to Recycle Bin
 Premikam %x v Koš
+Moving %x to custom directory
+Premikam %x v imenik po meri
 Not all items have been synchronized! Have a look at the list.
 Vse stvari niso bile sinhronizirane! Preglejte seznam.
 Not enough free disk space available in:
@@ -550,6 +594,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Prosim prekopirajte ustrezno \"Shadow.dll\" (ki se nahaja v \"Shadow.zip\" arhivu) v FreeFileSync namestitveni imenik, da omogočite to lastnost.
 Please fill all empty directory fields.
 Prosim izpolnite vse imenike s praznimi polji.
+Please specify alternate directory for deletion!
+Prosim navedite alternativen imenik za brisanje!
 Press button to activate filter
 Kliknite za aktivacijo filtra
 Published under the GNU General Public License:
@@ -558,10 +604,18 @@ Question
 Vprašanje
 Quit
 Zapusti
+RealtimeSync - Automated Synchronization
+RealtimeSync - Avtomatizirana sinhronizacija
+RealtimeSync configuration
+RealtimeSync nastavitve
 Relative path
 Relativna pot
+Remove folder
+Odstrani v mapo
 Remove folder pair
 Odstrani par imenikov
+Report translation error
+Poročaj o napaki prevoda
 Reset
 Ponastavi
 Reset all warning messages
@@ -570,8 +624,8 @@ Reset all warning messages?
 Ponastavim vsa obvestila z opozorili?
 Result
 Rezultat
-Right:
-Desno:
+Right
+Desno
 S&ave configuration
 Shr&ani konfiguracijo
 S&witch view
@@ -610,6 +664,14 @@ Show files that will be copied to the left side
 Prikaži datoteke, ki bodo kopirane na levo stran
 Show files that will be copied to the right side
 Prikaži datoteke, ki bodo kopirane na desno stran
+Show files that will be created on the left side
+Prikaži datoteke, ki bodo ustvarjene na levi strani
+Show files that will be created on the right side
+Prikaži datoteke, ki bodo ustvarjene na desni strani
+Show files that will be deleted on the left side
+Prikaži datoteke, ki bodo izbrisane na levi strani
+Show files that will be deleted on the right side
+Prikaži datoteke, ki bodo izbrisane na desni strani
 Show files that won't be copied
 Prikaži datoteke, ki ne bodo kopirane
 Show popup
@@ -660,12 +722,14 @@ Synchronizing...
 Sinhroniziram...
 System out of memory!
 Sistemu je zmanjkalo pomnilnika!
+Target directory already existing!
+
 Target file already existing!
 Ciljna datoteka že obstaja!
 The file does not contain a valid configuration:
 Datoteka ne vsebuje veljavne konfiguracije:
-This commandline will be executed each time you doubleclick on a filename. %name serves as a placeholder for the selected file.
-Ta ukaz bo izveden vsakič, ko boste dvokliknili na ime datoteke. %name služi kot rezerviran prostor za izbrano datoteko.
+This commandline will be executed on each doubleclick. The following macros are available:
+Ta ukazna vrstica bo izvedena ob vsakem dvokliku. Na voljo so naslednji makri:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Ta varianta oceni dve datoteki z enakim imenom kot enaki, ko imata enako velikost IN enak datum ter čas zadnjega spreminjanja.
 Time
@@ -696,10 +760,12 @@ Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchro
 Obstajajo nerešeni spori! \n\nLahko ignorirate spore in nadaljujete s sinhronizacijo.
 Update ->
 Posodobi ->
+Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
+Uporaba: Izberite imenike za nadzorovanje in vnesite ukazno vrstico. Vsakič ko se spremenijo datoteke znotraj teh imenikov (ali podimenikov) se izvrši ukazna vrstica.
 Use Recycle Bin
 Uporabi Koš
-Use Recycle Bin when deleting or overwriting files during synchronization
-Uporabi Koš, ko se briše ali prepisuje datoteke med sinhronizacijo
+Use Recycle Bin when deleting or overwriting files.
+Uporabi Koš pri brisanju ali prepisovanju datotek.
 Variant
 Različica
 Volume name %x not part of filename %y!
@@ -712,15 +778,13 @@ Warnings:
 Opozorila:
 When the comparison is started with this option set the following decision tree is processed:
 Ko se primerjava zažene s tem setom možnosti, se obdela naslednje drevo odločitev:
+You can ignore the error to consider not existing directories as empty.
+Ignoriraj napako za smatranje neobstoječih imenikv kot praznih.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Naslednje predmete lahko ponovno poskusite sinhronizirati (BREZ ponovne primerjave) !
 different
 različni
 file exists on both sides
 datoteka obstaja na obeh straneh
-flash	conflict\n
-strela	spor\n
 on one side only
 samo na eni strani
-|>	file on right side only\n
-|>	datoteka obstaja samo na desni\n

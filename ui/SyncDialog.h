@@ -1,7 +1,6 @@
 #ifndef SYNCDIALOG_H_INCLUDED
 #define SYNCDIALOG_H_INCLUDED
 
-#include "../structures.h"
 #include "guiGenerated.h"
 #include "../library/processXml.h"
 #include <memory>
@@ -15,15 +14,15 @@ namespace FreeFileSync
 }
 
 
-class SyncDialog: public SyncDlgGenerated
+class SyncCfgDialog : public SyncCfgDlgGenerated
 {
 public:
-    SyncDialog(wxWindow* window,
-               const FreeFileSync::FolderComparison& folderCmpRef,
-               FreeFileSync::MainConfiguration& config,
-               bool& ignoreErrors);
+    SyncCfgDialog(wxWindow* window,
+                  const FreeFileSync::FolderComparison& folderCmpRef,
+                  FreeFileSync::MainConfiguration& config,
+                  bool& ignoreErrors);
 
-    ~SyncDialog();
+    ~SyncCfgDialog();
 
     enum
     {
@@ -60,13 +59,23 @@ private:
     void OnCancel(          wxCommandEvent& event);
     void OnApply(           wxCommandEvent& event);
 
-    void OnSelectRecycleBin(wxCommandEvent& event);
+    //error handling
+    bool getErrorHandling();
+    void setErrorHandling(bool ignoreErrors);
+    void OnChangeErrorHandling(wxCommandEvent& event);
+
+    //deletion handling
+    FreeFileSync::DeletionPolicy getDeletionHandling();
+    void setDeletionHandling(FreeFileSync::DeletionPolicy newValue);
+    void OnChangeDeletionHandling(wxCommandEvent& event);
 
     //temporal copy of maindialog.cfg.syncConfiguration
     FreeFileSync::SyncConfiguration localSyncConfiguration;
     const FreeFileSync::FolderComparison& folderCmp;
     FreeFileSync::MainConfiguration& cfg;
     bool& m_ignoreErrors;
+
+    std::auto_ptr<FreeFileSync::DragDropOnDlg> dragDropCustomDelFolder;
 };
 
 
@@ -87,47 +96,65 @@ public:
 private:
     void init();
 
-    void OnChangeErrorHandling(wxCommandEvent& event);
+    virtual void OnExLeftSideOnly(     wxCommandEvent& event);
+    virtual void OnExRightSideOnly(    wxCommandEvent& event);
+    virtual void OnLeftNewer(          wxCommandEvent& event);
+    virtual void OnRightNewer(         wxCommandEvent& event);
+    virtual void OnDifferent(          wxCommandEvent& event);
 
-    void OnExLeftSideOnly(  wxCommandEvent& event);
-    void OnExRightSideOnly( wxCommandEvent& event);
-    void OnLeftNewer(       wxCommandEvent& event);
-    void OnRightNewer(      wxCommandEvent& event);
-    void OnDifferent(       wxCommandEvent& event);
+    virtual void OnCheckFilter(        wxCommandEvent& event);
+    virtual void OnCheckLogging(       wxCommandEvent& event);
+    virtual void OnChangeCompareVar(   wxCommandEvent& event);
+    virtual void OnClose(              wxCloseEvent&   event);
+    virtual void OnCancel(             wxCommandEvent& event);
+    virtual void OnSaveBatchJob(       wxCommandEvent& event);
+    virtual void OnLoadBatchJob(       wxCommandEvent& event);
+    virtual void OnAddFolderPair(      wxCommandEvent& event);
+    virtual void OnRemoveFolderPair(   wxCommandEvent& event);
+    virtual void OnRemoveTopFolderPair(wxCommandEvent& event);
 
-    void OnCheckFilter(     wxCommandEvent& event);
-    void OnCheckLogging(    wxCommandEvent& event);
-    void OnSelectRecycleBin(wxCommandEvent& event);
-    void OnChangeCompareVar(wxCommandEvent& event);
+    void addFolderPair(const std::vector<FreeFileSync::FolderPair>& newPairs, bool addFront = false);
+    void removeAddFolderPair(const int pos);
+    void clearAddFolderPairs();
+    std::vector<FreeFileSync::FolderPair> getFolderPairs() const;
 
     FreeFileSync::CompareVariant getCurrentCompareVar();
 
     void updateConfigIcons(const FreeFileSync::CompareVariant cmpVar, const FreeFileSync::SyncConfiguration& syncConfig);
 
-
     void updateVisibleTabs();
     void showNotebookpage(wxWindow* page, const wxString& pageName, bool show);
 
-    void OnClose(           wxCloseEvent&   event);
-    void OnCancel(          wxCommandEvent& event);
-    void OnSaveBatchJob(    wxCommandEvent& event);
-    void OnLoadBatchJob(    wxCommandEvent& event);
-
+    //error handling
     xmlAccess::OnError getSelectionHandleError();
     void setSelectionHandleError(const xmlAccess::OnError value);
+    void OnChangeErrorHandling(wxCommandEvent& event);
+
+    //deletion handling
+    FreeFileSync::DeletionPolicy getDeletionHandling();
+    void setDeletionHandling(FreeFileSync::DeletionPolicy newValue);
+    void OnChangeDeletionHandling(wxCommandEvent& event);
+
 
     bool saveBatchFile(const wxString& filename);
     void loadBatchFile(const wxString& filename);
     void loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg);
 
+
     FreeFileSync::SyncConfiguration localSyncConfiguration;
-    std::vector<BatchFolderPairPanel*> localFolderPairs;
+    std::vector<BatchFolderPairPanel*> additionalFolderPairs;
 
     //used when saving batch file
     wxString proposedBatchFileName;
 
     //add drag & drop support when selecting logfile directory
     std::auto_ptr<FreeFileSync::DragDropOnDlg> dragDropOnLogfileDir;
+
+    //support for drag and drop on main pair
+    std::auto_ptr<FreeFileSync::DragDropOnDlg> dragDropOnLeft;
+    std::auto_ptr<FreeFileSync::DragDropOnDlg> dragDropOnRight;
+
+    std::auto_ptr<FreeFileSync::DragDropOnDlg> dragDropCustomDelFolder;
 };
 
 #endif // SYNCDIALOG_H_INCLUDED

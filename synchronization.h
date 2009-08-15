@@ -6,7 +6,7 @@
 #include <memory>
 
 #ifdef FFS_WIN
-#include "library/shadow.h"
+#include "shared/shadow.h"
 #endif
 
 class StatusHandler;
@@ -15,12 +15,28 @@ class wxBitmap;
 
 namespace FreeFileSync
 {
-    void calcTotalBytesToSync(const FolderComparison& folderCmp,
-                              int& objectsToCreate,
-                              int& objectsToOverwrite,
-                              int& objectsToDelete,
-                              int& conflicts,
-                              wxULongLong& dataToProcess);
+    class SyncStatistics
+    {
+    public:
+        SyncStatistics(const FileComparison&   fileCmp);
+        SyncStatistics(const FolderComparison& folderCmp);
+
+        int         getCreate(   bool inclLeft = true, bool inclRight = true) const;
+        int         getOverwrite(bool inclLeft = true, bool inclRight = true) const;
+        int         getDelete(   bool inclLeft = true, bool inclRight = true) const;
+        int         getConflict() const;
+        wxULongLong getDataToProcess() const;
+
+    private:
+        void init();
+        void getNumbers(const FileCompareLine& fileCmpLine);
+
+        int createLeft,    createRight;
+        int overwriteLeft, overwriteRight;
+        int deleteLeft,    deleteRight;
+        int conflict;
+        wxULongLong dataToProcess;
+    };
 
     bool synchronizationNeeded(const FolderComparison& folderCmp);
 
@@ -31,8 +47,8 @@ namespace FreeFileSync
         SO_CREATE_NEW_RIGHT,
         SO_DELETE_LEFT,
         SO_DELETE_RIGHT,
-        SO_OVERWRITE_RIGHT,
         SO_OVERWRITE_LEFT,
+        SO_OVERWRITE_RIGHT,
         SO_DO_NOTHING,
         SO_UNRESOLVED_CONFLICT
     };
@@ -40,15 +56,15 @@ namespace FreeFileSync
                                    const bool selectedForSynchronization,
                                    const SyncDirection syncDir); //evaluate comparison result and sync direction
 
-    const wxBitmap& getSyncOpImage(const CompareFilesResult cmpResult,
-                                   const bool selectedForSynchronization,
-                                   const SyncDirection syncDir);
+    SyncOperation getSyncOperation(const FileCompareLine& line); //convenience function
+
 
     //class handling synchronization process
     class SyncProcess
     {
     public:
-        SyncProcess(const bool useRecycler,
+        SyncProcess(const DeletionPolicy handleDeletion,
+                    const wxString& custDelFolder,
                     const bool copyFileSymLinks,
                     const bool traverseDirSymLinks,
                     xmlAccess::WarningMessages& warnings,
@@ -57,12 +73,17 @@ namespace FreeFileSync
         void startSynchronizationProcess(FolderComparison& folderCmp);
 
     private:
-        bool synchronizeFile(const FileCompareLine& cmpLine, const FolderPair& folderPair);   //false if nothing was done
-        bool synchronizeFolder(const FileCompareLine& cmpLine, const FolderPair& folderPair); //false if nothing was done
+        void synchronizeFile(const FileCompareLine& cmpLine, const FolderPair& folderPair, const Zstring& altDeletionDir);   //false if nothing was done
+        void synchronizeFolder(const FileCompareLine& cmpLine, const FolderPair& folderPair, const Zstring& altDeletionDir); //false if nothing was done
+
+        void removeFile(const FileDescrLine& fildesc, const Zstring& altDeletionDir);
+        void removeFolder(const FileDescrLine& fildesc, const Zstring& altDeletionDir);
 
         void copyFileUpdating(const Zstring& source, const Zstring& target, const wxULongLong& sourceFileSize);
 
-        const bool m_useRecycleBin;
+        const DeletionPolicy m_handleDeletion;
+        const Zstring sessionDeletionDirectory; //ends with path separator
+
         const bool m_copyFileSymLinks;
         const bool m_traverseDirSymLinks;
 

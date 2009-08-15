@@ -5,15 +5,23 @@
 ::clean codeblocks garbage
 del FreeFileSync.layout
 del FreeFileSync.depend
+del RealtimeSync\RealtimeSync.layout
+del RealtimeSync\RealtimeSync.depend
 
 ::clean Visual C++ garbage
 del FreeFileSync.ncb
+del RealtimeSync\RealtimeSync.ncb
 attrib FreeFileSync.suo -h
 del FreeFileSync.suo
+attrib RealtimeSync\RealtimeSync.suo -h
+del RealtimeSync\RealtimeSync.suo
 del FreeFileSync.vcproj.*.user
-del FreeFileSync.sln
+del RealtimeSync\RealtimeSync.vcproj.*.user
+
 del BUILD\FreeFileSync.pdb
 del BUILD\FreeFileSync.ilk
+del BUILD\RealtimeSync.pdb
+del BUILD\RealtimeSync.ilk
 
 del library\ShadowCopy\ShadowCopy.ncb
 attrib library\ShadowCopy\ShadowCopy.suo -h
@@ -27,3 +35,6 @@ del library\ShadowCopy\Shadow.lib
 del library\ShadowCopy\ShadowTest.ilk
 del library\ShadowCopy\ShadowTest.pdb
 
+::remove precompiled headers
+del library\pch.h.gch
+del RealtimeSync\pch.h.gch
