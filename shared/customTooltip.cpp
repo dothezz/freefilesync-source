@@ -37,8 +37,7 @@ PopupFrameGenerated::PopupFrameGenerated(
     bSizer158->Add( m_bitmapLeft, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
     m_staticTextMain = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticTextMain->Wrap( -1 );
-    bSizer158->Add( m_staticTextMain, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer158->Add( m_staticTextMain, 0, wxALL | wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL, 5 );
 
     this->SetSizer( bSizer158 );
     this->Layout();
@@ -67,7 +66,10 @@ void CustomTooltip::show(const wxString& text, wxPoint pos, const wxBitmap* bmp)
     }
 
     if (text != tipWindow->m_staticTextMain->GetLabel())
+    {
         tipWindow->m_staticTextMain->SetLabel(text);
+        tipWindow->m_staticTextMain->Wrap(600);
+    }
 
 #ifdef FFS_LINUX
     tipWindow->Fit(); //Alas Fit() seems to be somewhat broken => this needs to be called EVERY time inside show, not only if text or bmp change.

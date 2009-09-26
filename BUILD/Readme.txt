@@ -1,4 +1,4 @@
-FreeFileSync v2.2
+FreeFileSync v2.3
 -----------------
 
 ---------
@@ -63,7 +63,7 @@ FreeFileSync v2.2
 - Create a FreeFileSync batch file using "silent mode".
 - Set error handling to "Exit with Returncode < 0" or "ignore errors" to avoid having a popup stop the program flow.
   In case errors occur FreeFileSync will abort with a returncode < 0 which can be checked via the ERRORLEVEL command.
-- Create a *.cmd or *.bat file and specify the location of FreeFileSync.exe and pass the name of the FreeFileSync batch file as %1 parameter; e.g.:
+- Create a *.cmd or *.bat file and specify the location of FreeFileSync.exe and pass the name of the FreeFileSync batch file as first argument; e.g.:
 
 	C:\Program Files\FreeFileSync\FreeFileSync.exe C:\SyncJob.ffs_batch
 	IF NOT ERRORLEVEL 0 echo An error occurred! && pause
@@ -93,12 +93,12 @@ You can: - drag & drop any directory onto the main window to set the directory f
 		 
 4.) Exclude all subfolders from synchronization
 
-Assuming you plan to synchronize two folders "C:\Source" and "D:\Target", simply set up a filter like this:
+If you want to synchronize all files from the base synchronization directories only, simply set up a filter like this:
 
 	Include: *
-	Exclude: *\*
+	Exclude: *\
 	
-This will exclude all files and folders within the two directories that contain a "\" character. These are exactly the subfolders and -files you want to exclude.
+This will exclude all objects within the two directories that end with a "\" character, which is interpreted as the end of a directory name,
 
 
 5.) Synchronize with FTP
@@ -108,15 +108,17 @@ FreeFileSync does not support FTP directly. But the FTP functionality can be eas
 Example: Use the free utility NetDrive (http://www.netdrive.net/)
 - Add a "New Site" and specify site name, site URL, drive letter, account and password.
 - Use the newly created drive as if it were a regular hard disk.
+- Note: Most FTP drives set a file's timestamp to current time when synchronizing. As a workaround you can try a "compare by filesize", see below.
 
 
-6.) Start associated program on double-click
+6.) Start external application on double-click
 
-FreeFileSync's default is to show files in the operating system's standard file browser on double-click e.g. by invoking "explorer /select, %name" on Windows.
-If the file shall be started with its associated application instead, all you have to do is the following:
-On main dialog navigate to:  Menu -> Advanced -> Global settings: File Manager integration. Then replace the command string by
+FreeFileSync's default is to show files in the operating system's standard file browser on each double-click e.g. by invoking "explorer /select, %name" on Windows.
+If some other application shall be started instead, just navigate to "Menu -> Advanced -> Global settings: External Applications" and replace the command string:
 
-	cmd /c start "" "%name"
+Examples:	- Start associated application:		cmd /c start "" "%name" 				
+			- Start visual difference tool:		C:\Program Files\WinMerge\WinMergeU.exe "%name" "%nameCo"
+(Don't forget to use quotation marks if file names contain spaces!)
 
 	
 7. Synchronize USB sticks with variable drive letter
@@ -128,6 +130,22 @@ USB sticks often have different volume names assigned to them when plugged into 
 	- Start FreeFileSync by double-clicking on "E:\settings.ffs_gui"
 
 => Working directory automatically is set to "E:\" by the operating system so that "\SyncDir" is interpreted as "E:\SyncDir". Now start synchronization as usual.
+
+
+8. Start RealtimeSync via commandline
+
+RealtimeSync can be used to load a configuration file and start processing immediately without additional user intervention. Just pass the name of a configuration file as 
+first commandline argument.
+
+Example: C:\Program Files\FreeFileSync\RealtimeSync.exe MyConfig.ffs_real
+
+
+9. Compare by filesize
+
+Sometimes you might want to compare both sides by filesize only, ignoring the last modification timestamp. Here is how you can do this: Open your *.ffs_gui configuration file
+and change the XML node <FileTimeTolerance> to some sufficiently large value. Now changed files will be detected as a conflict (same date, different filesize) and a default
+synchronization direction for conflics can be used.
+
 
 
 ---------

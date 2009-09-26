@@ -54,6 +54,8 @@ public:
     wxBitmap* bitmapDifferent;
     wxBitmap* bitmapDifferentAct;
     wxBitmap* bitmapDifferentDeact;
+    wxBitmap* bitmapConflict;
+    wxBitmap* bitmapConflictGrey;
     wxBitmap* bitmapConflictAct;
     wxBitmap* bitmapConflictDeact;
     wxBitmap* bitmapInclude;
@@ -61,6 +63,7 @@ public:
     wxBitmap* bitmapFilterOn;
     wxBitmap* bitmapFilterOff;
     wxBitmap* bitmapFilterSmall;
+    wxBitmap* bitmapFilterSmallGrey;
     wxBitmap* bitmapWarning;
     wxBitmap* bitmapWarningSmall;
     wxBitmap* bitmapError;
@@ -68,6 +71,9 @@ public:
     wxBitmap* bitmapSmallDown;
     wxBitmap* bitmapSave;
     wxBitmap* bitmapLoad;
+    wxBitmap* bitmapSaveSmall;
+    wxBitmap* bitmapLoadSmall;
+    wxBitmap* bitmapNewSmall;
     wxBitmap* bitmapFFS;
     wxBitmap* bitmapFFSPaused;
     wxBitmap* bitmapDeleteFile;
@@ -104,6 +110,8 @@ public:
     wxBitmap* bitmapRecycler;
     wxBitmap* bitmapShift;
     wxBitmap* bitmapSyncCfg;
+    wxBitmap* bitmapSyncCfgSmall;
+    wxBitmap* bitmapSyncCfgSmallGrey;
     wxBitmap* bitmapCmpCfg;
     wxBitmap* bitmapPreview;
     wxBitmap* bitmapPreviewDisabled;
@@ -115,6 +123,7 @@ public:
     wxBitmap* bitmapFrance;
     wxBitmap* bitmapGermany;
     wxBitmap* bitmapHungary;
+    wxBitmap* bitmapTaiwan;
     wxBitmap* bitmapItaly;
     wxBitmap* bitmapJapan;
     wxBitmap* bitmapPoland;

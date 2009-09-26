@@ -1,12 +1,13 @@
 #ifndef ALGORITHM_H_INCLUDED
 #define ALGORITHM_H_INCLUDED
 
-#include "structures.h"
+#include "fileHierarchy.h"
 
 class ErrorHandler;
 class wxComboBox;
 class wxTextCtrl;
 class wxDirPickerCtrl;
+class wxScrolledWindow;
 
 
 namespace FreeFileSync
@@ -19,18 +20,22 @@ namespace FreeFileSync
 
     void setDirectoryName(const wxString& dirname, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker);
     void setDirectoryName(const wxString& dirname, wxComboBox* txtCtrl, wxDirPickerCtrl* dirPicker);
+    void scrollToBottom(wxScrolledWindow* scrWindow);
 
-    void swapGrids(const SyncConfiguration& config, FolderComparison& folderCmp);
+    void swapGrids2(const MainConfiguration& config, FolderComparison& folderCmp);
 
-    void redetermineSyncDirection(const SyncConfiguration& config, FolderComparison& folderCmp);
+    void redetermineSyncDirection(const SyncConfiguration& config, HierarchyObject& baseDirectory);
+    void redetermineSyncDirection(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp);
 
-    void addSubElements(const FileComparison& fileCmp, const FileCompareLine& relevantRow, std::set<int>& subElements);
+    void setSyncDirection(SyncDirection newDirection, FileSystemObject& fsObj); //set new direction (recursively)
 
-    //manual deletion of files on main grid: runs at individual directory pair level
-    std::pair<wxString, int> deleteFromGridAndHDPreview(const FileComparison& fileCmp, //returns wxString with elements to be deleted and total count
-            const std::set<int>& rowsToDeleteOnLeft,
-            const std::set<int>& rowsToDeleteOnRight,
-            const bool deleteOnBothSides);
+    void applyFiltering(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp);
+
+    //manual deletion of files on main grid
+    std::pair<wxString, int> deleteFromGridAndHDPreview(           //returns wxString with elements to be deleted and total count
+        const std::vector<FileSystemObject*>& rowsToDeleteOnLeft,  //all pointers need to be bound!
+        const std::vector<FileSystemObject*>& rowsToDeleteOnRight, //
+        const bool deleteOnBothSides);
 
     class DeleteFilesHandler
     {
@@ -49,28 +54,16 @@ namespace FreeFileSync
         virtual void deletionSuccessful() = 0;  //called for each file/folder that has been deleted
 
     };
-    void deleteFromGridAndHD(FileComparison& fileCmp,
-                             const std::set<int>& rowsToDeleteOnLeft,
-                             const std::set<int>& rowsToDeleteOnRight,
+    void deleteFromGridAndHD(FolderComparison& folderCmp,                        //attention: rows will be physically deleted!
+                             std::vector<FileSystemObject*>& rowsToDeleteOnLeft,  //refresh GUI grid after deletion to remove invalid rows
+                             std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
                              const bool deleteOnBothSides,
                              const bool useRecycleBin,
-                             const SyncConfiguration& syncConfig,
+                             const MainConfiguration& mainConfig,
                              DeleteFilesHandler* statusHandler);
 
 
     wxString utcTimeToLocalString(const wxLongLong& utcTime, const Zstring& filename);
-
-    //enhanced binary search template: returns an iterator
-    template <class ForwardIterator, class T>
-    inline
-    ForwardIterator custom_binary_search (ForwardIterator first, ForwardIterator last, const T& value)
-    {
-        first = lower_bound(first, last, value);
-        if (first != last && !(value < *first))
-            return first;
-        else
-            return last;
-    }
 }
 
 #endif // ALGORITHM_H_INCLUDED

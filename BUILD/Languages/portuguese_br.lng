@@ -68,6 +68,8 @@
 &Carregar
 &Load configuration
 &Carregar configuração 
+&New
+&Novo
 &No
 &Não
 &OK
@@ -79,13 +81,19 @@
 &Restore
 &Restaurar
 &Retry
-&Tentar de Novo
+&Tentar Novamente
 &Save
 &Salvar
 &Yes
 &Sim
+(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
+(Note que apenas discos FAT/FAT32 são afetados por este problema!\nEm todos os outros casos pode-se desabilitar esta opção \"ignorar diferença de 1 hora\".)
 ,
 .
+- Other side's counterpart to %dir
+- Correspondente do outro lado a %dir
+- Other side's counterpart to %name
+- Correspondente do outro lado a %name
 - conflict
 - conflito
 - conflict (same date, different size)
@@ -110,10 +118,6 @@
 - direita
 - right newer
 - mais recente à direita
-- sibling of %dir
-- equivalente de %dir
-- sibling of %name
-- equivalente de %name
 -Open-Source file synchronization-
 -Sincronização de Arquivos Open-Source-
 .
@@ -154,16 +158,14 @@ Add folder
 Adicionar pasta
 Add folder pair
 Adicionar par de pastas
-All items have been synchronized!
-Todos os itens foram sincronizados!
 An exception occured!
 Ocorreu uma exceção!
 As a result the files are separated into the following categories:
 Como resultado, os arquivos são separados nas seguintes categorias:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
-Como o nome sugere, dois arquivos com o mesmo nome são assinalados como iguais se e somente se o seu conteúdo for idêntico. Esta opção é útil para controles de consistência mais do que para efeitos de backup. Portanto, a data dos arquivos não é levada em consideração.\n\nCom esta opção, a árvore de decisão é menor:
+Como o nome sugere, dois arquivos com o mesmo nome são assinalados como iguais se e somente se eles tiverem o mesmo conteúdo. Esta opção é útil para controles de consistência mais do que para efeitos de backup. Portanto, a data dos arquivos não é levada em consideração.\n\nCom esta opção, a árvore de decisão é menor:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
-Criar um arquivo batch para sincronização automatizada. Para iniciar o modo batch, passar o nome do arquivo para o executável do FreeFileSync: FreeFileSync.exe <arquivo batch>. Também pode ser programado no Agendador de Tarefas do sistema operacional.
+Monta um arquivo batch para sincronização automatizada. Para iniciar o modo batch, passar o nome do arquivo para o executável do FreeFileSync: FreeFileSync.exe <arquivo batch>. Também pode ser programado no Agendador de Tarefas do sistema operacional.
 Auto-adjust columns
 Autoajustar colunas
 Batch execution
@@ -208,6 +210,8 @@ Comparing content of files %x
 Comparando conteúdo do arquivo %x
 Comparing content...
 Comparando conteúdo...
+Comparing files by content failed.
+Comparação de arquivos pelo conteúdo falhou.
 Comparison Result
 Resultado da Comparação
 Comparison settings
@@ -232,6 +236,8 @@ Confirm
 Confirmar
 Conflict detected:
 Conflito detectado:
+Conflicts/files that cannot be categorized
+Conflitos/arquivos que não podem ser categorizados
 Continue
 Continuar
 Conversion error:
@@ -257,7 +263,7 @@ Não foi possível determinar o nome do volume para o arquivo:
 Could not initialize directory monitoring:
 Não foi possível inicializar o monitoramento de diretórios:
 Could not read values for the following XML nodes:
-
+Não foi possível ler os valores para os seguintes nós XML:
 Create a batch job
 Criar arquivo batch
 Creating folder %x
@@ -270,16 +276,20 @@ Customize columns
 Personalizar colunas
 Customize...
 Personalizar...
+D-Click
+Duplo Click
 DECISION TREE
 ÁRVORE DE DECISÃO
 Data remaining:
 Dados faltantes:
+Data verification error: Source and target file have different content!
+Erro de verificação de dados: Arquivo de origem e destino têm o mesmo conteúdo!
 Date
 Data
 Delay
 Atraso
-Delay between two invocations of the commandline
-Atraso entre duas chamadas de linhas de comando
+Delay between detection of changes and execution of commandline in seconds
+Atraso entre detecção de mudanças e execução de linha de comando em segundos
 Delete files/folders existing on left side only
 Apagar arquivos/pastas existentes apenas no lado esquerdo
 Delete files/folders existing on right side only
@@ -300,6 +310,8 @@ Deleting folder %x
 Apagando pasta %x
 Deletion handling
 Tratamento da exclusão
+Description
+Descrição
 Directories are dependent! Be careful when setting up synchronization rules:
 Diretórios são dependentes! Cuidado ao definir as regras de sincronização:
 Directories to watch
@@ -320,8 +332,6 @@ Do you really want to move the following objects(s) to the Recycle Bin?
 Quer mesmo mover o(s) seguinte(s) item(s) para a Lixeira?
 Do you want FreeFileSync to automatically check for updates every week?
 Deseja que o FreeFileSync procure automaticamente novas versões toda semana?
-Don't ask me again
-Não perguntar novamente
 Donate with PayPal
 Doar usando PayPal
 Download now?
@@ -392,14 +402,12 @@ Exit immediately and set returncode < 0
 Sair imediatamente e setar\nreturncode < 0
 Exit with RC < 0
 Sair com RC < 0
+External applications
+Aplicações externas
 Feedback and suggestions are welcome at:
 Comentários e sugestões são bem-vindos em:
 File %x has an invalid date!
 Arquivo %x tem uma data inválida!
-File Manager integration:
-Integração com Gerenciador de Arquivos:
-File Time tolerance (seconds):
-Tolerância de Tempo do Arquivo (segundos):
 File already exists. Overwrite?
 O arquivo já existe. Deseja substituir?
 File content
@@ -410,12 +418,10 @@ File list exported!
 Lista de arquivos exportada!
 File size and date
 Data e tamanho do arquivo
-File times that differ by up to the specified number of seconds are still handled as having same time.
-Arquivos com diferença de horário até o número especificado de segundos são tratados como tendo o mesmo horário.
 Filename
 Nome do arquivo
-Files %x have a file time difference of less than 1 hour! It's not safe to decide which one is newer due to Daylight Saving Time issues.
-Arquivos %x têm diferença no horário de criação menor do que 1 hora! Não é seguro decidir qual é o mais novo devido a problemas relacionados com o Horário de Verão.
+Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
+Arquivos %x têm diferença no horário de criação menor do que 1 hora!\n\nNão é seguro decidir qual é o mais novo devido a problemas relacionados com o Horário de Verão.
 Files %x have the same date but a different size!
 Arquivos %x têm a mesma data mas tamanhos diferentes!
 Files are found equal if\n     - file content\nis the same.
@@ -424,6 +430,8 @@ Files are found equal if\n     - filesize\n     - last write time and date\nare 
 Os arquivos são considerados iguais se\n     - o tamanho\n     - e a data e hora da última modificação\nsão iguais.
 Files remaining:
 Arquivos restantes:
+Files that are equal on both sides
+Arquivos que são iguais em ambos os lados
 Files that exist on both sides and have different content
 Arquivos que existem nos dois lados e têm conteúdo diferente
 Files that exist on both sides, left one is newer
@@ -448,8 +456,8 @@ Filter view
 Filtrar vista
 Folder Comparison and Synchronization
 Comparação e Sincronização de Pastas
-Folder pair
-Par de pastas
+Free disk space available:
+Espaço livre em disco:
 FreeFileSync - Folder Comparison and Synchronization
 FreeFileSync - Comparação e Sincronização de Pastas
 FreeFileSync Batch Job
@@ -470,6 +478,8 @@ Global settings
 Configurações
 Help
 Ajuda
+Hidden dialogs:
+Diálogos ocultos:
 Hide all error and warning messages
 Ocultar todas as mensagens de erro ou aviso
 Hide conflicts
@@ -486,10 +496,6 @@ Hide files that exist on left side only
 Ocultar arquivos que existem somente à esquerda
 Hide files that exist on right side only
 Ocultar arquivos que existem somente à direita
-Hide files that will be copied to the left side
-Ocultar arquivos que serão copiados para o lado esquerdo
-Hide files that will be copied to the right side
-Ocultar arquivos que serão copiados para o lado direito
 Hide files that will be created on the left side
 Ocultar arquivos que serão criados no lado esquerdo
 Hide files that will be created on the right side
@@ -498,6 +504,10 @@ Hide files that will be deleted on the left side
 Ocultar arquivos que serão apagados no lado esquerdo
 Hide files that will be deleted on the right side
 Ocultar arquivos que serão apagados no lado direito
+Hide files that will be overwritten on left side
+Ocultar arquivos que serão substituídos no lado esquerdo
+Hide files that will be overwritten on right side
+Ocultar arquivos que serão substituídos no lado direito
 Hide files that won't be copied
 Ocultar arquivos que não serão copiados
 Hide filtered items
@@ -511,7 +521,7 @@ Homepage
 If you like FFS
 Se gosta do FFS
 Ignore 1-hour file time difference
-Ignorar diferença de tempo do arquivo de 1 hora
+Ignorar diferença de tempo de 1 hora
 Ignore errors
 Ignorar erros
 Ignore subsequent errors
@@ -530,12 +540,16 @@ Info
 Info
 Information
 Informação
-Initialization of Recycle Bin failed!
-Inicialização da Lixeira falhou!
+Integrate external applications into context menu. The following macros are available:
+Integrar aplicações externas no menu de contexto. As seguintes macros estão disponíveis:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Não foi possível acessar a Lixeira!\n\nÉ possível que não esteja utilizando Windows.\nSe desejar esta opção incluída, favor contatar o autor. :)
+Leave as unresolved conflict
+Deixar como conflito não resolvido
 Left
 Esquerda
+Legend
+Legenda
 Load configuration from file
 Carregar configuração do arquivo
 Load configuration history (press DEL to delete items)
@@ -554,16 +568,16 @@ Move column down
 Mover coluna para baixo
 Move column up
 Mover coluna para cima
-Move files to a custom directory.
-Mover arquivos para um diretório escolhido.
-Move to custom directory
-Mover para um diretório escolhido
+Move files to a user-defined directory.
+Mover arquivos para um diretório especificado.
 Moving %x to Recycle Bin
 Movendo %x para a Lixeira
-Moving %x to custom directory
-Movendo %x para o diretório escolhido
-Not all items have been synchronized! Have a look at the list.
-Nem todos os itens foram sincronizados! Olhe a lista.
+Moving file %x to user-defined directory %y
+Movendo arquivo %x para o diretório especificado
+Moving folder %x to user-defined directory %y
+Movendo pasta %x para o diretório especificado
+Multiple...
+Múltiplos...
 Not enough free disk space available in:
 Espaço em disco insuficiente em:
 Nothing to synchronize according to configuration!
@@ -576,10 +590,8 @@ Number of files that will be overwritten
 Número de arquivos que serão substituídos
 OK
 OK
-Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the synchronization directories.
-Apenas arquivos/diretórios que passarem a filtragem serão selecionados para sincronização. O filtro será aplicado ao nome em relação(!) aos diretórios de sincronização.
-Open with File Manager\tD-Click
-Abrir com Gerenciador de Arquivos\tD-Click
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
+Apenas arquivos/diretórios que passarem o filtro serão selecionados para sincronização. O filtro será aplicado ao nome relativo(!) aos diretórios base de sincronização.
 Operation aborted!
 Operação cancelada!
 Operation:
@@ -594,8 +606,6 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Por favor, copie o \"Shadow.dll\" apropriado (localizado no arquivo \"Shadow.zip\") no diretório de instalação do FreeFileSync para habilitar essa funcionalidade.
 Please fill all empty directory fields.
 Por favor, preencha todos os campos de diretórios vazios.
-Please specify alternate directory for deletion!
-Por favor, especifique diretório alternativo para exclusão!
 Press button to activate filter
 Pressione para ativar o filtro
 Published under the GNU General Public License:
@@ -604,12 +614,16 @@ Question
 Questão
 Quit
 Sair
+Re-enable all hidden dialogs?
+Reabilitar todos os diálogos ocultos?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Sincronização Automátizada
 RealtimeSync configuration
 Configuração do RealtimeSync
 Relative path
 Caminho relativo
+Remove alternate settings
+Remover configurações alternativas
 Remove folder
 Remover pasta
 Remove folder pair
@@ -618,10 +632,6 @@ Report translation error
 Reportar erro de tradução
 Reset
 Reiniciar
-Reset all warning messages
-Resetar todas as mensagens de aviso
-Reset all warning messages?
-Resetar todas as mensagens de aviso?
 Result
 Resultado
 Right
@@ -640,6 +650,10 @@ Scanning:
 Pesquisando:
 Select a folder
 Selecione uma pasta
+Select alternate filter settings
+Selecionar configuração de filtro alternativa
+Select alternate synchronization settings
+Selecionar configuração de sincronização alternativa
 Select logfile directory:
 Escolha um diretório para salvar o arquivo log:
 Select variant:
@@ -660,10 +674,6 @@ Show files that exist on left side only
 Mostrar arquivos que existem somente à esquerda
 Show files that exist on right side only
 Mostrar arquivos que existem somente à direita
-Show files that will be copied to the left side
-Mostrar arquivos que serão copiados para o lado esquerdo
-Show files that will be copied to the right side
-Mostrar arquivos que serão copiados para o lado direito
 Show files that will be created on the left side
 Mostrar arquivos que serão criados no lado esquerdo
 Show files that will be created on the right side
@@ -672,8 +682,14 @@ Show files that will be deleted on the left side
 Mostrar arquivos que serão apagados no lado esquerdo
 Show files that will be deleted on the right side
 Mostrar arquivos que serão apagados no lado direito
+Show files that will be overwritten on left side
+Mostrar arquivos que serão substituídos no lado esquerdo
+Show files that will be overwritten on right side
+Mostrar arquivos que serão substituídos no lado direito
 Show files that won't be copied
 Mostrar arquivos que não serão copiados
+Show hidden dialogs
+Mostrar diálogos ocultos
 Show popup
 Mostrar popup
 Show popup on errors or warnings
@@ -684,8 +700,6 @@ Silent mode
 Modo silencioso
 Size
 Tamanho
-Sorting file list...
-Ordenando lista de arquivos...
 Source code written completely in C++ utilizing:
 Código fonte todo escrito em C++ utilizando:
 Speed:
@@ -728,8 +742,6 @@ Target file already existing!
 Arquivo de destino já existe!
 The file does not contain a valid configuration:
 O arquivo não contém uma configuração válida:
-This commandline will be executed on each doubleclick. The following macros are available:
-Esta linha de comando será executada em cada click-duplo. As seguintes macros estão disponíveis:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Esta variante avalia dois arquivos de nomes equivalentes como sendo iguais quando têm o mesmo tamanho E a mesma data e hora de modificação.
 Time
@@ -753,33 +765,37 @@ Não foi possível conectar a sourceforge.net!
 Unable to create logfile!
 Não foi possível criar arquivo log!
 Unable to initialize Recycle Bin!
-Não foi possível inicializar a Lixeira!
+Não foi possível abrir a Lixeira!
 Uncheck all
 Desmarcar todos
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
-Conflitos não resolvidos existentes! \n\nVocê pode ignorar conflitos e continuar a sincronização.
+Conflitos não resolvidos existentes! \n\nVocê pode ignorar os conflitos e continuar a sincronização.
 Update ->
 Atualizar ->
 Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
-Uso: Selecionar diretórios para monitoração e entre com uma linha de comando. Cada vez que os arquivos são modificados nesses diretórios (ou subdiretórios) a linha de comando é executada.
+Uso: Selecionar diretórios para monitoração e entrar com linha de comando. Cada vez que os arquivos são modificados nesses diretórios (ou subdiretórios) a linha de comando é executada.
 Use Recycle Bin
 Utilizar Lixeira
 Use Recycle Bin when deleting or overwriting files.
-Usar a Lixeira quando apagar ou sobrescrever arquivos.
+Usar a Lixeira quando apagar ou substituir arquivos.
+User-defined directory
+Diretório especificado
+User-defined directory for deletion was not specified!
+Diretório especificado para arquivos apagados não foi definido!
 Variant
 Variante
+Verifying file %x
+Verificando arquivo %x
 Volume name %x not part of filename %y!
 Nome do volume %x não é parte do arquivo %y!
 Warning
 Atenção
 Warning: Synchronization failed for %x item(s):
 Atenção: A sincronização falhou para %x item(s):
-Warnings:
-Avisos:
 When the comparison is started with this option set the following decision tree is processed:
 Quando a comparação é iniciada com esta opção, a seguinte árvore de decisão é processada:
 You can ignore the error to consider not existing directories as empty.
-Você pode ignorar o erro para considerar como diretórios não existente como vazios.
+Você pode ignorar o erro para considerar diretórios não existente como vazios.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Você pode tentar sincronizar os elementos restantes outra vez (SEM ter que comparar novamente)!
 different

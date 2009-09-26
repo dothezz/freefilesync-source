@@ -72,6 +72,7 @@
 			<Add option="-DTIXML_USE_STL" />
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
 			<Add directory="C:\Programme\C++\wxWidgets\contrib\include" />
+			<Add directory="..\shared\boost_1_40_0" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="C:\Programme\C++\wxWidgets\include" />

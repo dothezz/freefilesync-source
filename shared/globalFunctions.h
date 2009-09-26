@@ -18,17 +18,6 @@ class wxStopWatch;
 namespace globalFunctions
 {
 //------------------------------------------------
-//      GLOBALS
-//------------------------------------------------
-#ifdef FFS_WIN
-    const wxChar FILE_NAME_SEPARATOR = '\\';
-    static const wxChar* const LINE_BREAK = wxT("\r\n"); //internal linkage
-#elif defined FFS_LINUX
-    const wxChar FILE_NAME_SEPARATOR = '/';
-    static const wxChar* const LINE_BREAK = wxT("\n");
-#endif
-
-//------------------------------------------------
 //      FUNCTIONS
 //------------------------------------------------
     inline
@@ -78,31 +67,79 @@ namespace globalFunctions
     }
 
 
-    //Note: the following lines are a performance optimization for deleting elements from a vector. It is incredibly faster to create a new
-//vector and leave specific elements out than to delete row by row and force recopying of most elements for each single deletion (linear vs quadratic runtime)
+//Note: the following lines are a performance optimization for deleting elements from a vector: linear runtime at most!
     template <class T>
-    void removeRowsFromVector(const std::set<int>& rowsToRemove, std::vector<T>& grid)
+    void removeRowsFromVector(const std::set<unsigned int>& rowsToRemove, std::vector<T>& grid)
     {
-        if (rowsToRemove.size() > 0)
+        if (rowsToRemove.empty())
+            return;
+
+        std::set<unsigned int>::const_iterator rowToSkipIndex = rowsToRemove.begin();
+        unsigned int rowToSkip = *rowToSkipIndex;
+
+        if (rowToSkip >= grid.size())
+            return;
+
+        typename std::vector<T>::iterator insertPos = grid.begin() + rowToSkip;
+
+        for (unsigned int i = rowToSkip; i < grid.size(); ++i)
         {
-            std::vector<T> temp;
-
-            std::set<int>::const_iterator rowToSkipIndex = rowsToRemove.begin();
-            int rowToSkip = *rowToSkipIndex;
-
-            for (int i = 0; i < int(grid.size()); ++i)
+            if (i != rowToSkip)
             {
-                if (i != rowToSkip)
-                    temp.push_back(grid[i]);
-                else
-                {
-                    ++rowToSkipIndex;
-                    if (rowToSkipIndex != rowsToRemove.end())
-                        rowToSkip = *rowToSkipIndex;
-                }
+                *insertPos = grid[i];
+                ++insertPos;
             }
-            grid.swap(temp);
+            else
+            {
+                ++rowToSkipIndex;
+                if (rowToSkipIndex != rowsToRemove.end())
+                    rowToSkip = *rowToSkipIndex;
+            }
         }
+        grid.erase(insertPos, grid.end());
+    }
+
+    //bubble sort using swap() instead of assignment: useful if assignment is very expensive
+    template <class VectorData, typename CompareFct>
+    void bubbleSwapSort(VectorData& folderCmp, CompareFct compare)
+    {
+        for (int i = folderCmp.size() - 2; i >= 0; --i)
+        {
+            bool swapped = false;
+            for (int j = 0; j <= i; ++j)
+                if (compare(folderCmp[j + 1], folderCmp[j]))
+                {
+                    folderCmp[j + 1].swap(folderCmp[j]);
+                    swapped = true;
+                }
+
+            if (!swapped)
+                return;
+        }
+    }
+
+    //enhanced binary search template: returns an iterator
+    template <class ForwardIterator, class T>
+    inline
+    ForwardIterator custom_binary_search(ForwardIterator first, ForwardIterator last, const T& value)
+    {
+        first = lower_bound(first, last, value);
+        if (first != last && !(value < *first))
+            return first;
+        else
+            return last;
+    }
+
+    //enhanced binary search template: returns an iterator
+    template <class ForwardIterator, class T, typename Compare>
+    inline
+    ForwardIterator custom_binary_search(ForwardIterator first, ForwardIterator last, const T& value, Compare comp)
+    {
+        first = lower_bound(first, last, value, comp);
+        if (first != last && !comp(value, *first))
+            return first;
+        else
+            return last;
     }
 }
 
@@ -146,22 +183,6 @@ wxString getCodeLocation(const wxString file, const int line);
 //small macro for writing debug information into a logfile
 #define WRITE_DEBUG_LOG(x) logDebugInfo.write(getCodeLocation(__TFILE__, __LINE__) + x);
 //speed alternative: wxLogDebug(wxT("text")) + DebugView
-
-
-//############################################################################
-class RuntimeException //Exception class used to notify of general runtime exceptions
-{
-public:
-    RuntimeException(const wxString& txt) : errorMessage(txt) {}
-
-    wxString show() const
-    {
-        return errorMessage;
-    }
-
-private:
-    wxString errorMessage;
-};
 
 
 #endif // GLOBALFUNCTIONS_H_INCLUDED

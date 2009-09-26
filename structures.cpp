@@ -1,15 +1,16 @@
 #include "structures.h"
 #include "shared/fileHandling.h"
 #include <wx/intl.h>
-#include "shared/globalFunctions.h"
+#include "shared/systemConstants.h"
+
+using FreeFileSync::SyncConfiguration;
+using FreeFileSync::MainConfiguration;
 
 
-FreeFileSync::MainConfiguration::MainConfiguration() :
-        compareVar(CMP_BY_TIME_SIZE),
-        filterIsActive(false),        //do not filter by default
-        includeFilter(wxT("*")),      //include all files/folders
-        excludeFilter(wxEmptyString), //exclude nothing
-        handleDeletion(FreeFileSync::recycleBinExists() ? MOVE_TO_RECYCLE_BIN : DELETE_PERMANENTLY) {} //enable if OS supports it; else user will have to activate first and then get an error message
+bool FreeFileSync::recycleBinExistsWrap()
+{
+    return recycleBinExists();
+}
 
 
 wxString FreeFileSync::getVariantName(CompareVariant var)
@@ -27,51 +28,33 @@ wxString FreeFileSync::getVariantName(CompareVariant var)
 }
 
 
-using FreeFileSync::SyncConfiguration;
-
-
-SyncConfiguration::Variant SyncConfiguration::getVariant()
+SyncConfiguration::Variant SyncConfiguration::getVariant() const
 {
     if (    exLeftSideOnly  == SYNC_DIR_CFG_RIGHT &&
             exRightSideOnly == SYNC_DIR_CFG_RIGHT &&
             leftNewer       == SYNC_DIR_CFG_RIGHT &&
             rightNewer      == SYNC_DIR_CFG_RIGHT &&
-            different       == SYNC_DIR_CFG_RIGHT)
+            different       == SYNC_DIR_CFG_RIGHT &&
+            conflict        == SYNC_DIR_CFG_NONE)
         return MIRROR;    //one way ->
 
     else if (exLeftSideOnly  == SYNC_DIR_CFG_RIGHT &&
              exRightSideOnly == SYNC_DIR_CFG_NONE  &&
              leftNewer       == SYNC_DIR_CFG_RIGHT &&
              rightNewer      == SYNC_DIR_CFG_NONE  &&
-             different       == SYNC_DIR_CFG_NONE)
+             different       == SYNC_DIR_CFG_NONE  &&
+             conflict        == SYNC_DIR_CFG_NONE)
         return UPDATE;    //Update ->
 
     else if (exLeftSideOnly  == SYNC_DIR_CFG_RIGHT &&
              exRightSideOnly == SYNC_DIR_CFG_LEFT  &&
              leftNewer       == SYNC_DIR_CFG_RIGHT &&
              rightNewer      == SYNC_DIR_CFG_LEFT  &&
-             different       == SYNC_DIR_CFG_NONE)
+             different       == SYNC_DIR_CFG_NONE  &&
+             conflict        == SYNC_DIR_CFG_NONE)
         return TWOWAY;    //two way <->
     else
         return CUSTOM;    //other
-}
-
-
-wxString SyncConfiguration::getVariantName()
-{
-    switch (getVariant())
-    {
-    case MIRROR:
-        return _("Mirror ->>");
-    case UPDATE:
-        return _("Update ->");
-    case TWOWAY:
-        return _("Two way <->");
-    case CUSTOM:
-        return _("Custom");
-    }
-
-    return _("Error");
 }
 
 
@@ -85,6 +68,7 @@ void SyncConfiguration::setVariant(const Variant var)
         leftNewer       = SYNC_DIR_CFG_RIGHT;
         rightNewer      = SYNC_DIR_CFG_RIGHT;
         different       = SYNC_DIR_CFG_RIGHT;
+        conflict        = SYNC_DIR_CFG_NONE;
         break;
     case UPDATE:
         exLeftSideOnly  = SYNC_DIR_CFG_RIGHT;
@@ -92,6 +76,7 @@ void SyncConfiguration::setVariant(const Variant var)
         leftNewer       = SYNC_DIR_CFG_RIGHT;
         rightNewer      = SYNC_DIR_CFG_NONE;
         different       = SYNC_DIR_CFG_NONE;
+        conflict        = SYNC_DIR_CFG_NONE;
         break;
     case TWOWAY:
         exLeftSideOnly  = SYNC_DIR_CFG_RIGHT;
@@ -99,9 +84,140 @@ void SyncConfiguration::setVariant(const Variant var)
         leftNewer       = SYNC_DIR_CFG_RIGHT;
         rightNewer      = SYNC_DIR_CFG_LEFT;
         different       = SYNC_DIR_CFG_NONE;
+        conflict        = SYNC_DIR_CFG_NONE;
         break;
     case CUSTOM:
         assert(false);
         break;
     }
 }
+
+wxString MainConfiguration::getSyncVariantName()
+{
+    const SyncConfiguration::Variant mainVariant = syncConfiguration.getVariant();
+
+    //test if there's a deviating variant within the additional folder pairs
+    for (std::vector<FolderPairEnh>::const_iterator i = additionalPairs.begin(); i != additionalPairs.end(); ++i)
+        if (i->altSyncConfig.get() && i->altSyncConfig->syncConfiguration.getVariant() != mainVariant)
+            return _("Multiple...");
+
+    //seems to be all in sync...
+    switch (mainVariant)
+    {
+    case SyncConfiguration::MIRROR:
+        return _("Mirror ->>");
+    case SyncConfiguration::UPDATE:
+        return _("Update ->");
+    case SyncConfiguration::TWOWAY:
+        return _("Two way <->");
+    case SyncConfiguration::CUSTOM:
+        return _("Custom");
+    }
+
+    return _("Error");
+}
+
+
+wxString FreeFileSync::getDescription(CompareFilesResult cmpRes)
+{
+    switch (cmpRes)
+    {
+    case FILE_LEFT_SIDE_ONLY:
+        return _("Files/folders that exist on left side only");
+    case FILE_RIGHT_SIDE_ONLY:
+        return _("Files/folders that exist on right side only");
+    case FILE_LEFT_NEWER:
+        return _("Files that exist on both sides, left one is newer");
+    case FILE_RIGHT_NEWER:
+        return _("Files that exist on both sides, right one is newer");
+    case FILE_DIFFERENT:
+        return _("Files that exist on both sides and have different content");
+    case FILE_EQUAL:
+        return _("Files that are equal on both sides");
+    case FILE_CONFLICT:
+        return _("Conflicts/files that cannot be categorized");
+    }
+
+    assert(false);
+    return wxEmptyString;
+}
+
+
+wxString FreeFileSync::getSymbol(CompareFilesResult cmpRes)
+{
+    switch (cmpRes)
+    {
+    case FILE_LEFT_SIDE_ONLY:
+        return wxT("<|");
+    case FILE_RIGHT_SIDE_ONLY:
+        return wxT("|>");
+    case FILE_LEFT_NEWER:
+        return wxT("<<");
+    case FILE_RIGHT_NEWER:
+        return wxT(">>");
+    case FILE_DIFFERENT:
+        return wxT("!=");
+    case FILE_EQUAL:
+        return wxT("'=="); //added quotation mark to avoid error in Excel cell when exporting to *.cvs
+    case FILE_CONFLICT:
+        return wxT("\\/\\->");
+    }
+
+    assert(false);
+    return wxEmptyString;
+}
+
+
+wxString FreeFileSync::getDescription(SyncOperation op)
+{
+    switch (op)
+    {
+    case SO_CREATE_NEW_LEFT:
+        return _("Copy from right to left");
+    case SO_CREATE_NEW_RIGHT:
+        return _("Copy from left to right");
+    case SO_DELETE_LEFT:
+        return _("Delete files/folders existing on left side only");
+    case SO_DELETE_RIGHT:
+        return _("Delete files/folders existing on right side only");
+    case SO_OVERWRITE_LEFT:
+        return _("Copy from right to left overwriting");
+    case SO_OVERWRITE_RIGHT:
+        return _("Copy from left to right overwriting");
+    case SO_DO_NOTHING:
+        return _("Do nothing");
+    case SO_UNRESOLVED_CONFLICT:
+        return _("Conflicts/files that cannot be categorized");
+    };
+
+    assert(false);
+    return wxEmptyString;
+}
+
+
+wxString FreeFileSync::getSymbol(SyncOperation op)
+{
+    switch (op)
+    {
+    case SO_CREATE_NEW_LEFT:
+        return wxT("*-");
+    case SO_CREATE_NEW_RIGHT:
+        return wxT("-*");
+    case SO_DELETE_LEFT:
+        return wxT("D-");
+    case SO_DELETE_RIGHT:
+        return wxT("-D");
+    case SO_OVERWRITE_LEFT:
+        return wxT("<-");
+    case SO_OVERWRITE_RIGHT:
+        return wxT("->");
+    case SO_DO_NOTHING:
+        return wxT("-");
+    case SO_UNRESOLVED_CONFLICT:
+        return wxT("\\/\\->");
+    };
+
+    assert(false);
+    return wxEmptyString;
+}
+

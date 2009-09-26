@@ -6,7 +6,6 @@
 
 #include "application.h"
 #include "ui/mainDialog.h"
-#include "shared/globalFunctions.h"
 #include <wx/msgdlg.h>
 #include "comparison.h"
 #include "algorithm.h"
@@ -142,15 +141,6 @@ int Application::OnRun()
     {
         wxApp::OnRun();
     }
-    catch (const RuntimeException& e) //catch runtime errors during main event loop; wxApp::OnUnhandledException could be used alternatively
-    {
-        //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
-        wxFile safeOutput(FreeFileSync::getLastErrorTxtFile(), wxFile::write);
-        safeOutput.Write(e.show());
-
-        wxMessageBox(e.show(), _("An exception occured!"), wxOK | wxICON_ERROR);
-        return -8;
-    }
     catch (const std::exception& e) //catch all STL exceptions
     {
         //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
@@ -193,6 +183,8 @@ void Application::runGuiMode(const wxString& cfgFileName, xmlAccess::XmlGlobalSe
 
 void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSettings& globSettings)
 {
+    using namespace xmlAccess;
+
     //load XML settings
     xmlAccess::XmlBatchConfig batchCfg;  //structure to receive gui settings
     try
@@ -213,31 +205,32 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
     try //begin of synchronization process (all in one try-catch block)
     {
+        //set error handling for comparison: DON'T allow ignoring errors! Aborted file traversing can lead to data-loss when synchronizing!
+        const OnError compareErrHandling = batchCfg.handleError == ON_ERROR_IGNORE ?
+                                           ON_ERROR_EXIT : //in GUI mode ON_ERROR_EXIT means "showPopups = true" which is okay
+                                           batchCfg.handleError;
+
         //class handling status updates and error messages
         std::auto_ptr<BatchStatusHandler> statusHandler;  //delete object automatically
         if (batchCfg.silent)
-            statusHandler = std::auto_ptr<BatchStatusHandler>(new BatchStatusHandlerSilent(batchCfg.handleError, batchCfg.logFileDirectory, returnValue));
+            statusHandler.reset(new BatchStatusHandlerSilent(compareErrHandling, batchCfg.logFileDirectory, returnValue));
         else
-            statusHandler = std::auto_ptr<BatchStatusHandler>(new BatchStatusHandlerGui(batchCfg.handleError, returnValue));
-
-        //PREPARE FILTER
-        std::auto_ptr<FreeFileSync::FilterProcess> filterInstance(NULL);
-        if (batchCfg.mainCfg.filterIsActive)
-            filterInstance.reset(new FreeFileSync::FilterProcess(batchCfg.mainCfg.includeFilter, batchCfg.mainCfg.excludeFilter));
+            statusHandler.reset(new BatchStatusHandlerGui(compareErrHandling, returnValue));
 
         //COMPARE DIRECTORIES
         FreeFileSync::FolderComparison folderCmp;
-        FreeFileSync::CompareProcess comparison(globSettings.traverseDirectorySymlinks,
-                                                globSettings.fileTimeTolerance,
+        FreeFileSync::CompareProcess comparison(batchCfg.mainCfg.hidden.traverseDirectorySymlinks,
+                                                batchCfg.mainCfg.hidden.fileTimeTolerance,
                                                 globSettings.ignoreOneHourDiff,
-                                                globSettings.warnings,
-                                                filterInstance.get(),
+                                                globSettings.optDialogs,
                                                 statusHandler.get());
 
-        comparison.startCompareProcess(batchCfg.directoryPairs,
+        comparison.startCompareProcess(FreeFileSync::extractCompareCfg(batchCfg.mainCfg),
                                        batchCfg.mainCfg.compareVar,
-                                       batchCfg.mainCfg.syncConfiguration,
                                        folderCmp);
+
+        //set error handling for synchronization
+        statusHandler->setErrorStrategy(batchCfg.handleError);
 
         //check if there are files/folders to be sync'ed at all
         if (!synchronizationNeeded(folderCmp))
@@ -248,14 +241,16 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
         //START SYNCHRONIZATION
         FreeFileSync::SyncProcess synchronization(
-            batchCfg.mainCfg.handleDeletion,
-            batchCfg.mainCfg.customDeletionDirectory,
-            globSettings.copyFileSymlinks,
-            globSettings.traverseDirectorySymlinks,
-            globSettings.warnings,
+            batchCfg.mainCfg.hidden.copyFileSymlinks,
+            batchCfg.mainCfg.hidden.traverseDirectorySymlinks,
+            globSettings.optDialogs,
+            batchCfg.mainCfg.hidden.verifyFileCopy,
             statusHandler.get());
 
-        synchronization.startSynchronizationProcess(folderCmp);
+        const std::vector<FreeFileSync::FolderPairSyncCfg> syncProcessCfg = FreeFileSync::extractSyncCfg(batchCfg.mainCfg);
+        assert(syncProcessCfg.size() == folderCmp.size());
+
+        synchronization.startSynchronizationProcess(syncProcessCfg, folderCmp);
     }
     catch (FreeFileSync::AbortThisProcess&)  //exit used by statusHandler
     {

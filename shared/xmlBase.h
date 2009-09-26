@@ -38,6 +38,7 @@ namespace xmlAccess
     bool readXmlElement(const std::string& name, const TiXmlElement* parent, std::vector<wxString>& output);
 
     bool readXmlAttribute(const std::string& name, const TiXmlElement* node, std::string&  output);
+    bool readXmlAttribute(const std::string& name, const TiXmlElement* node, wxString&     output);
     bool readXmlAttribute(const std::string& name, const TiXmlElement* node, int&          output);
     bool readXmlAttribute(const std::string& name, const TiXmlElement* node, unsigned int& output);
     bool readXmlAttribute(const std::string& name, const TiXmlElement* node, bool&         output);
@@ -51,6 +52,7 @@ namespace xmlAccess
     void addXmlElement(const std::string& name, const std::vector<wxString>& value, TiXmlElement* parent);
 
     void addXmlAttribute(const std::string& name, const std::string& value, TiXmlElement* node);
+    void addXmlAttribute(const std::string& name, const wxString&    value, TiXmlElement* node);
     void addXmlAttribute(const std::string& name, const int          value, TiXmlElement* node);
     void addXmlAttribute(const std::string& name, const unsigned int value, TiXmlElement* node);
     void addXmlAttribute(const std::string& name, const bool         value, TiXmlElement* node);

@@ -68,6 +68,8 @@
 &Laden
 &Load configuration
 &Laad de configuratie
+&New
+&Nieuw
 &No
 &Nee
 &OK
@@ -84,8 +86,14 @@
 &Opslaan
 &Yes
 &Ja
+(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
+(Alleen FAT/FAT32 schijven hebben last van dit probleem!\nIn alle andere gevallen kunt u deze instelling uitschakelen \"negeer 1-uur tijdsverschil\".)
 ,
 .
+- Other side's counterpart to %dir
+- Tegenhander andere kant naar %dir
+- Other side's counterpart to %name
+- Tegenhanger andere kant naar %naam
 - conflict
 - conflict
 - conflict (same date, different size)
@@ -110,10 +118,6 @@
 - rechts
 - right newer
 - rechts is nieuwer
-- sibling of %dir
-- verwant aan %dir
-- sibling of %name
-- verwant aan &name
 -Open-Source file synchronization-
 -Open-Source bestandssynchronisatie-
 .
@@ -154,8 +158,6 @@ Add folder
 Map toevoegen
 Add folder pair
 Voeg 1 paar gekoppelde mappen toe
-All items have been synchronized!
-Alle bestanden zijn gesynchroniseerd!
 An exception occured!
 Er heeft een uitzondering plaatsgevonden!
 As a result the files are separated into the following categories:
@@ -201,13 +203,15 @@ Vergelijk met \"bestandsinhoud\"
 Compare by \"File size and date\"
 Vergelijk met \"bestandsgrootte en -datum\"
 Compare by...
-Vergelelijk met...
+Vergelijk met...
 Comparing content
 Vergelijken van inhoud
 Comparing content of files %x
 De inhoud van %x bestanden wordt vergeleken
 Comparing content...
 Inhoud vergelijken...
+Comparing files by content failed.
+Vergelijken van bestanden met de inhoud is mislukt.
 Comparison Result
 Resultaat vergelijken
 Comparison settings
@@ -232,6 +236,8 @@ Confirm
 Bevestig
 Conflict detected:
 Conflict gedetecteerd:
+Conflicts/files that cannot be categorized
+Conflicten/bestanden die niet kunnen worden gecategoriseerd
 Continue
 Doorgaan
 Conversion error:
@@ -257,7 +263,7 @@ Kon de schijfnaam niet vaststellen van bestand:
 Could not initialize directory monitoring:
 Initaliseren van locatie-controle niet mogelijk:
 Could not read values for the following XML nodes:
-
+Kon geen waarden inlezen voor de volgende XML punten:
 Create a batch job
 Creëer batchjob
 Creating folder %x
@@ -270,16 +276,20 @@ Customize columns
 Aanpassen kolommen
 Customize...
 Aanpassen...
+D-Click
+Dubbele klik
 DECISION TREE
 BESLISSINGSBOOM
 Data remaining:
 Resterende data:
+Data verification error: Source and target file have different content!
+Dataverificatie-fout: Bron en doelbestand hebben verschillende inhoud!
 Date
 Datum
 Delay
 Vertraging
-Delay between two invocations of the commandline
-Vertraging tussen het aanroepen van twee opdrachten van de opdrachtregel
+Delay between detection of changes and execution of commandline in seconds
+Vertraging tussen detecteren van veranderingen en uitvoering van de opdrachtregel in seconden
 Delete files/folders existing on left side only
 Verwijder bestanden/folders die alleen links bestaan
 Delete files/folders existing on right side only
@@ -300,6 +310,8 @@ Deleting folder %x
 Map %x wordt verwijderd
 Deletion handling
 Verwijder-afhandeling
+Description
+Beschrijving
 Directories are dependent! Be careful when setting up synchronization rules:
 Mappen zijn afhankelijk van elkaar! Wees voorzichtig met het maken van synchronisatieregels:
 Directories to watch
@@ -320,8 +332,6 @@ Do you really want to move the following objects(s) to the Recycle Bin?
 Weet u zeker dat u de/het volgende bestand(en) wilt verplaatsen naar de prullenbak?
 Do you want FreeFileSync to automatically check for updates every week?
 Wilt u FreeFileSync automatisch elke week laten controleren of er een nieuwe versie is?
-Don't ask me again
-Niet meer vragen
 Donate with PayPal
 Doneer met PayPal
 Download now?
@@ -392,14 +402,12 @@ Exit immediately and set returncode < 0
 Onmiddelijk afsluiten en zet de returncode < 0
 Exit with RC < 0
 Afsluiten met RC < 0
+External applications
+Externe applicaties
 Feedback and suggestions are welcome at:
 Tips en suggesties zijn welkom op:
 File %x has an invalid date!
 Bestand %x heeft een ongeldige datum!
-File Manager integration:
-Integratie bestandsbeheer:
-File Time tolerance (seconds):
-Bestandtijd tolerantie (seconden):
 File already exists. Overwrite?
 Het bestand bestaat al. Overschrijven?
 File content
@@ -410,12 +418,10 @@ File list exported!
 Bestandslijst geëxporteerd!
 File size and date
 Bestandsgrootte en -datum
-File times that differ by up to the specified number of seconds are still handled as having same time.
-Bestandstijden die verschillen met maximaal de gespecificeerde tijd worden nog steeds behandeld alsof ze dezelfde tijd hebben.
 Filename
 Bestandsnaam
-Files %x have a file time difference of less than 1 hour! It's not safe to decide which one is newer due to Daylight Saving Time issues.
-De bestanden %x hebben een bestandstijd verschil van minder dan één uur! Het is niet veilig te bepalen welke nieuwer is vanwege zomertijd instellingen
+Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
+De bestanden %x hebben een bestandstijd verschil van minder dan één uur!\n\nHet is niet veilig te bepalen welke nieuwer is vanwege zomertijd instellingen
 Files %x have the same date but a different size!
 De bestanden %x hebben dezelfde data maar een afwijkende grootte!
 Files are found equal if\n     - file content\nis the same.
@@ -424,6 +430,8 @@ Files are found equal if\n     - filesize\n     - last write time and date\nare 
 Bestanden worden gelijk beschouwd als,\n     - de grootte\n     - datum en tijdstip van de laatste wijziging\novereenkomt.
 Files remaining:
 Resterende bestanden:
+Files that are equal on both sides
+Bestanden die aan beide kanten gelijk zijn
 Files that exist on both sides and have different content
 Bestanden die aan beide kanten bestaan maar een verschillende inhoud hebben
 Files that exist on both sides, left one is newer
@@ -448,8 +456,8 @@ Filter view
 Bekijk het filter
 Folder Comparison and Synchronization
 Mappen vergelijken en synchroniseren
-Folder pair
-Gekoppelde mappen
+Free disk space available:
+Beschikbare vrije schijfruimte :
 FreeFileSync - Folder Comparison and Synchronization
 FreeFileSync - Mappen vergelijken en synchroniseren
 FreeFileSync Batch Job
@@ -470,6 +478,8 @@ Global settings
 Algemene instellingen
 Help
 Help
+Hidden dialogs:
+Verborgen dialogen:
 Hide all error and warning messages
 Verberg alle foutmeldingen en waarschuwingen
 Hide conflicts
@@ -486,10 +496,6 @@ Hide files that exist on left side only
 Verberg bestanden die alleen aan de linkerkant bestaan
 Hide files that exist on right side only
 Verberg bestanden die alleen aan de rechterkant bestaan
-Hide files that will be copied to the left side
-Verberg bestanden die naar de linkerkant zullen worden gekopieerd
-Hide files that will be copied to the right side
-Verberg bestanden die naar de rechterkant zullen worden gekopieerd
 Hide files that will be created on the left side
 Verberg bestanden die zullen worden aangemaakt aan de linkerkant
 Hide files that will be created on the right side
@@ -498,6 +504,10 @@ Hide files that will be deleted on the left side
 Verberg bestanden die zullen worden verwijderd aan de linkerkant
 Hide files that will be deleted on the right side
 Verberg bestanden die zullen worden verwijderd aan de rechterkant
+Hide files that will be overwritten on left side
+Verberg bestanden die zullen worden overschreven aan de linkerkant
+Hide files that will be overwritten on right side
+Verberg bestanden die zullen worden overschreven aan de rechterkant
 Hide files that won't be copied
 Verberg bestanden die niet zullen worden gekopieerd
 Hide filtered items
@@ -530,12 +540,16 @@ Info
 Info
 Information
 Informatie
-Initialization of Recycle Bin failed!
-Initialiseren van de prullenbak is mislukt.
+Integrate external applications into context menu. The following macros are available:
+Integreer externe applicaties in het context menu. De volgende macros zijn beschikbaar:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Het was niet mogelijk de prullenbak te initialiseren!\n\nHet is waarschijnlijk dat u niet Windows gebruikt.\nAls u deze optie wel wilt, neem dan alstublieft contact op met de auteur. :)
+Leave as unresolved conflict
+Beschouwen als onopgelost conflict
 Left
 Links
+Legend
+Legenda
 Load configuration from file
 Laad configuratie uit bestand
 Load configuration history (press DEL to delete items)
@@ -554,16 +568,16 @@ Move column down
 Verplaats kolom naar beneden
 Move column up
 Verplaats kolom naar boven
-Move files to a custom directory.
-Verplaats bestanden naar een te kiezen locatie.
-Move to custom directory
-Verplaats naar een te kiezen locatie
+Move files to a user-defined directory.
+Verplaats bestanden naar een door de gebruiker te definiëren map.
 Moving %x to Recycle Bin
 %x aan het verplaatsen naar de Prullenbak
-Moving %x to custom directory
-Verplaatsen van %x naar gekozen locatie
-Not all items have been synchronized! Have a look at the list.
-Niet alle bestanden zijn gesynchroniseerd! Bekijk de lijst.
+Moving file %x to user-defined directory %y
+Verplaatsen bestand %x naar een door de gebruiker gedefinieerde locatie %y
+Moving folder %x to user-defined directory %y
+Verplaatsen map %x naar een door de gebruiker gedefinieerde locatie %y
+Multiple...
+Meerdere...
 Not enough free disk space available in:
 Niet genoeg schijfruimte beschikbaar op:
 Nothing to synchronize according to configuration!
@@ -575,11 +589,9 @@ Aantal mappen en bestanden die zullen worden verwijderd
 Number of files that will be overwritten
 Aantal bestanden dat zal worden overschreven
 OK
-OKE
-Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the synchronization directories.
-Alleen bestanden/mappen die niet zijn gefilterd worden geselecteerd voor synchronisatie. Het filter wordt toegepast op de naam relatief(!) ten opzichte van de synchronisatiemappen.
-Open with File Manager\tD-Click
-Openen met bestandsbeheerder\tD-klik
+Oke
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
+Alleen bestanden /locatie die niet worden gefilterd zullen worden gesynchroniseerd. Het filter word toegepast op de relatieve(!) naam van de basislocatie van de synchronisatie.
 Operation aborted!
 Operatie afgebroken!
 Operation:
@@ -594,8 +606,6 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Kopiëer alstublieft \"Shadow.dll\" (locatie in \"Shadow.zip\" archief) naar de FreeFileSync installatiemap om het gebruik van deze optie mogelijk te maken
 Please fill all empty directory fields.
 Vul alstublieft aan beide kanten een pad in.
-Please specify alternate directory for deletion!
-Specificeer alstublieft een alternatieve locatie om te verwijderen!
 Press button to activate filter
 Druk op de knop om het filter te activeren.
 Published under the GNU General Public License:
@@ -604,12 +614,16 @@ Question
 Vraag
 Quit
 Afsluiten
+Re-enable all hidden dialogs?
+Herstellen van alle verborgen dialogen?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Automatische Synchronisatie
 RealtimeSync configuration
 RealtimeSync configuratie
 Relative path
 Relatieve pad
+Remove alternate settings
+Verwijder alternatieve instellingen
 Remove folder
 Verwijder map
 Remove folder pair
@@ -618,10 +632,6 @@ Report translation error
 Rapporteer een fout in de vertaling
 Reset
 Reset
-Reset all warning messages
-Reset alle waarchuwingen
-Reset all warning messages?
-Reset alle waarschuwingen?
 Result
 Resultaat
 Right
@@ -640,6 +650,10 @@ Scanning:
 Scannen:
 Select a folder
 Selecteer een map
+Select alternate filter settings
+Selecteer alternatieve filter instellingen
+Select alternate synchronization settings
+Selecteer alternatieve synchronisatie instellingen
 Select logfile directory:
 Selecteer een map voor het logbestand:
 Select variant:
@@ -660,10 +674,6 @@ Show files that exist on left side only
 Geef bestanden weer die alleen bestaan aan de linkerkant
 Show files that exist on right side only
 Geef bestanden weer die alleen bestaan aan de rechterkant
-Show files that will be copied to the left side
-Geef bestanden weer die naar de linkerkant worden gekopieerd
-Show files that will be copied to the right side
-Geef bestanden weer die naar de rechterkant worden gekopieerd
 Show files that will be created on the left side
 Geef bestanden weer die zullen worden aangemaakt aan de linkerkant
 Show files that will be created on the right side
@@ -672,8 +682,14 @@ Show files that will be deleted on the left side
 Geef bestanden weer die zullen worden verwijderd aan de linkerkant
 Show files that will be deleted on the right side
 Geef bestanden weer die zullen worden verwijderd aan de rechterkant
+Show files that will be overwritten on left side
+Geef bestanden weer die zullen worden overschreven aan de linkerkant
+Show files that will be overwritten on right side
+Geef bestanden weer die zullen worden overschreven aan de rechterkant
 Show files that won't be copied
 Geef bestanden weer die niet zullen worden gekopieerd
+Show hidden dialogs
+Geef verborgen dialogen weer
 Show popup
 Pop-up weergeven
 Show popup on errors or warnings
@@ -684,8 +700,6 @@ Silent mode
 Stille modus
 Size
 Grootte
-Sorting file list...
-Bestandslijst sorteren...
 Source code written completely in C++ utilizing:
 Broncode compleet geschreven in C++ met behulp van:
 Speed:
@@ -723,13 +737,11 @@ Aan het synchroniseren...
 System out of memory!
 Systeem heeft te weinig geheugen
 Target directory already existing!
-
+Doellocatie bestaal al!
 Target file already existing!
 Doelbestand bestaat al!
 The file does not contain a valid configuration:
 Het bestand bevat geen geldige configuratie:
-This commandline will be executed on each doubleclick. The following macros are available:
-Deze opdrachtregel zal worden uitgevoerd bij elke dubbele klik. De volgende macros zijn beschikbaar:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Deze variant ziet twee gelijknamige bestanden als gelijk wanneer ze dezelfde bestandsgrootte EN tijdstempel hebben.
 Time
@@ -766,16 +778,20 @@ Use Recycle Bin
 Gebruik de prullenbak
 Use Recycle Bin when deleting or overwriting files.
 Gebruik de prullenbak bij verwijderen of overschrijven van bestanden
+User-defined directory
+Door de gebruiker te definiëren locatie
+User-defined directory for deletion was not specified!
+Door de gebruiker te definiëren locatie voor verwijderen was niet opgegeven!
 Variant
 Variant
+Verifying file %x
+Verifiëren bestand %x
 Volume name %x not part of filename %y!
 Volume naam %x maakt niet deel uit van bestandsnaam %y!
 Warning
 Attentie
 Warning: Synchronization failed for %x item(s):
 Let op: %x item(s) konden niet worden gesynchroniseerd: 
-Warnings:
-Waarschuwingen:
 When the comparison is started with this option set the following decision tree is processed:
 Wanneer met deze optie aan de vergelijking wordt gestart zal de volgende vergelijkingsboom worden gebruikt:
 You can ignore the error to consider not existing directories as empty.

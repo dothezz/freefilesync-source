@@ -1,7 +1,7 @@
 #ifndef SMALLDIALOGS_H_INCLUDED
 #define SMALLDIALOGS_H_INCLUDED
 
-#include "../structures.h"
+#include "../fileHierarchy.h"
 #include "../library/processXml.h"
 #include "guiGenerated.h"
 #include <wx/stopwatch.h>
@@ -48,13 +48,13 @@ public:
 
     enum
     {
-        BUTTON_OKAY
+        BUTTON_APPLY = 1
     };
 
 private:
     void OnHelp(wxCommandEvent& event);
     void OnDefault(wxCommandEvent& event);
-    void OnOK(wxCommandEvent& event);
+    void OnApply(wxCommandEvent& event);
     void OnCancel(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);
 
@@ -67,9 +67,8 @@ class DeleteDialog : public DeleteDlgGenerated
 {
 public:
     DeleteDialog(wxWindow* main,
-                 const FreeFileSync::FolderComparison& folderCmp,
-                 const FreeFileSync::FolderCompRef& rowsOnLeft,
-                 const FreeFileSync::FolderCompRef& rowsOnRight,
+                 const std::vector<FreeFileSync::FileSystemObject*>& rowsOnLeft,
+                 const std::vector<FreeFileSync::FileSystemObject*>& rowsOnRight,
                  bool& deleteOnBothSides,
                  bool& useRecycleBin,
                  int& totalDeleteCount);
@@ -78,7 +77,7 @@ public:
 
     enum
     {
-        BUTTON_OKAY,
+        BUTTON_OKAY = 1,
         BUTTON_CANCEL
     };
 
@@ -91,9 +90,8 @@ private:
 
     void updateTexts();
 
-    const FreeFileSync::FolderComparison& m_folderCmp;
-    const FreeFileSync::FolderCompRef& rowsToDeleteOnLeft;
-    const FreeFileSync::FolderCompRef& rowsToDeleteOnRight;
+    const std::vector<FreeFileSync::FileSystemObject*>& rowsToDeleteOnLeft;
+    const std::vector<FreeFileSync::FileSystemObject*>& rowsToDeleteOnRight;
     bool& m_deleteOnBothSides;
     bool& m_useRecycleBin;
     int&  totalDelCount;
@@ -218,7 +216,7 @@ private:
 class CompareCfgDialog : public CmpCfgDlgGenerated
 {
 public:
-    CompareCfgDialog(wxWindow* parentWindow, FreeFileSync::CompareVariant& cmpVar);
+    CompareCfgDialog(wxWindow* parentWindow, const wxPoint& position, FreeFileSync::CompareVariant& cmpVar);
 
     enum
     {
@@ -249,10 +247,15 @@ public:
 
 private:
     void OnOkay(wxCommandEvent& event);
-    void OnResetWarnings(wxCommandEvent& event);
+    void OnResetDialogs(wxCommandEvent& event);
     void OnDefault(wxCommandEvent& event);
     void OnCancel(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);
+    void OnAddRow(wxCommandEvent& event);
+    void OnRemoveRow(wxCommandEvent& event);
+
+    void set(const xmlAccess::ExternalApps& extApp);
+    xmlAccess::ExternalApps getExtApp();
 
     xmlAccess::XmlGlobalSettings& settings;
 };

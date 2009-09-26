@@ -44,23 +44,7 @@ void Application::OnStartApplication(wxIdleEvent& event)
 #endif
 
     //set program language
-    try
-    {
-        FreeFileSync::CustomLocale::getInstance().setLanguage(RealtimeSync::getProgramLanguage());
-    }
-    catch (const xmlAccess::XmlError& error)
-    {
-        if (wxFileExists(FreeFileSync::getGlobalConfigFile()))
-        {
-            SetExitOnFrameDelete(false); //prevent error messagebox from becoming top-level window
-            if (error.getSeverity() == xmlAccess::XmlError::WARNING)
-                wxMessageBox(error.show(), _("Warning"), wxOK | wxICON_WARNING);
-            else
-                wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
-            SetExitOnFrameDelete(true);
-
-        }
-    }
+    FreeFileSync::CustomLocale::getInstance().setLanguage(RealtimeSync::getProgramLanguage());
 
     //try to set config/batch-filename set by %1 parameter
     wxString cfgFilename;

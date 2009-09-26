@@ -10,15 +10,45 @@
 
 
 #ifdef FFS_WIN
-class CmpNoCase
+struct CmpNoCase
 {
-public:
-    bool operator()(const wxString& a, const wxString& b)
+    bool operator()(const wxString& a, const wxString& b) const
     {
-        return FreeFileSync::compareStringsWin32(a.c_str(), b.c_str(), a.length(), b.length()) < 0;
+        return a.CmpNoCase(b) < 0;
     }
 };
 #endif
+
+
+xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& batchCfg, const wxString& filename)
+{
+    xmlAccess::XmlRealConfig output;
+
+#ifdef FFS_WIN
+    std::set<wxString, CmpNoCase> uniqueFolders;
+#elif defined FFS_LINUX
+    std::set<wxString> uniqueFolders;
+#endif
+
+    //add main folders
+    uniqueFolders.insert(batchCfg.mainCfg.mainFolderPair.leftDirectory.c_str());
+    uniqueFolders.insert(batchCfg.mainCfg.mainFolderPair.rightDirectory.c_str());
+
+    //additional folders
+    for (std::vector<FreeFileSync::FolderPairEnh>::const_iterator i = batchCfg.mainCfg.additionalPairs.begin();
+            i != batchCfg.mainCfg.additionalPairs.end(); ++i)
+    {
+        uniqueFolders.insert(i->leftDirectory.c_str());
+        uniqueFolders.insert(i->rightDirectory.c_str());
+    }
+
+    output.directories.insert(output.directories.end(), uniqueFolders.begin(), uniqueFolders.end());
+
+    output.commandline = FreeFileSync::getInstallationDir() + globalFunctions::FILE_NAME_SEPARATOR + wxT("FreeFileSync.exe ") +
+                         wxT("\"") + filename + wxT("\"");
+
+    return output;
+}
 
 
 void RealtimeSync::readRealOrBatchConfig(const wxString& filename, xmlAccess::XmlRealConfig& config)  //throw (xmlAccess::XmlError);
@@ -37,32 +67,26 @@ void RealtimeSync::readRealOrBatchConfig(const wxString& filename, xmlAccess::Xm
     }
     catch (const xmlAccess::XmlError& e)
     {
-        if (e.getSeverity() != xmlAccess::XmlError::WARNING) //ignore parsing errors
+        if (e.getSeverity() != xmlAccess::XmlError::WARNING)
             throw;
+
+        config = convertBatchToReal(batchCfg, filename); //do work despite parsing errors, then re-throw
+        throw;                                 //
     }
-
-#ifdef FFS_WIN
-    std::set<wxString, CmpNoCase> uniqueFolders;
-#elif defined FFS_LINUX
-    std::set<wxString> uniqueFolders;
-#endif
-
-    for (std::vector<FreeFileSync::FolderPair>::const_iterator i = batchCfg.directoryPairs.begin(); i != batchCfg.directoryPairs.end(); ++i)
-    {
-        uniqueFolders.insert(i->leftDirectory.c_str());
-        uniqueFolders.insert(i->rightDirectory.c_str());
-    }
-
-    config.directories.insert(config.directories.end(), uniqueFolders.begin(), uniqueFolders.end());
-
-    config.commandline = FreeFileSync::getInstallationDir() + globalFunctions::FILE_NAME_SEPARATOR + wxT("FreeFileSync.exe ") +
-                         wxT("\"") + filename + wxT("\"");
+        config = convertBatchToReal(batchCfg, filename);
 }
 
 
 int RealtimeSync::getProgramLanguage()
 {
     xmlAccess::XmlGlobalSettings settings;
-    xmlAccess::readGlobalSettings(settings);
+
+    try
+    {
+        xmlAccess::readGlobalSettings(settings);
+    }
+    catch (const xmlAccess::XmlError&)
+        {} //user default language if error occured
+
     return settings.programLanguage;
 }

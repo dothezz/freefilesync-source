@@ -1,15 +1,15 @@
 #include "standardPaths.h"
 #include <wx/stdpaths.h>
-#include "globalFunctions.h"
 #include <wx/filename.h>
+#include "systemConstants.h"
 
 
 wxString assembleFileForUserData(const wxString fileName)
 {
     static const bool isPortableVersion = !wxFileExists(FreeFileSync::getInstallationDir() + globalFunctions::FILE_NAME_SEPARATOR + wxT("uninstall.exe")); //this check is a bit lame...
 
-    if (isPortableVersion) //use same directory as executable
-        return FreeFileSync::getInstallationDir() + globalFunctions::FILE_NAME_SEPARATOR + fileName;
+    if (isPortableVersion) //use current working directory
+        return wxString(wxT(".")) + globalFunctions::FILE_NAME_SEPARATOR + fileName;
     else //usen OS' standard paths
     {
         wxString userDirectory = wxStandardPathsBase::Get().GetUserDataDir();

@@ -1,8 +1,13 @@
 #include "fileHandling.h"
 #include <wx/intl.h>
 #include "systemFunctions.h"
-#include "globalFunctions.h"
+#include "systemConstants.h"
 #include "fileTraverser.h"
+#include <wx/file.h>
+#include <stdexcept>
+#include <boost/bind.hpp>
+#include <algorithm>
+#include <wx/log.h>
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -55,7 +60,7 @@ public:
         return recycleBinAvailable;
     }
 
-    bool moveToRecycleBin(const Zstring& filename) const; //throw (RuntimeException)
+    bool moveToRecycleBin(const Zstring& filename) const; //throw (std::logic_error)
 
 private:
     RecycleBin() :
@@ -73,10 +78,10 @@ private:
 };
 
 
-bool RecycleBin::moveToRecycleBin(const Zstring& filename) const //throw (RuntimeException)
+bool RecycleBin::moveToRecycleBin(const Zstring& filename) const //throw (std::logic_error)
 {
     if (!recycleBinAvailable)   //this method should ONLY be called if recycle bin is available
-        throw RuntimeException(_("Initialization of Recycle Bin failed!"));
+        throw std::logic_error("Initialization of Recycle Bin failed!");
 
 #ifdef FFS_WIN
     Zstring filenameDoubleNull = filename + wxChar(0);
@@ -105,7 +110,7 @@ bool FreeFileSync::recycleBinExists()
 
 
 inline
-bool moveToRecycleBin(const Zstring& filename) //throw (RuntimeException)
+bool moveToRecycleBin(const Zstring& filename) //throw (std::logic_error)
 {
     return RecycleBin::getInstance().moveToRecycleBin(filename);
 }
@@ -159,7 +164,54 @@ bool FreeFileSync::symlinkExists(const DefaultChar* objname)
 }
 
 
-void FreeFileSync::removeFile(const Zstring& filename, const bool useRecycleBin) //throw (FileError, ::RuntimeException);
+bool FreeFileSync::isMovable(const Zstring& pathFrom, const Zstring& pathTo)
+{
+        wxLogNull noWxLogs; //prevent wxWidgets logging if dummy file creation failed
+
+    const Zstring dummyFileSource = pathFrom.EndsWith(globalFunctions::FILE_NAME_SEPARATOR) ?
+                                    pathFrom + wxT("DeleteMe.tmp") :
+                                    pathFrom + globalFunctions::FILE_NAME_SEPARATOR + wxT("DeleteMe.tmp");
+
+    const Zstring dummyFileTarget = pathTo.EndsWith(globalFunctions::FILE_NAME_SEPARATOR) ?
+                                    pathTo + wxT("DeleteMe.tmp") :
+                                    pathTo + globalFunctions::FILE_NAME_SEPARATOR + wxT("DeleteMe.tmp");
+    try
+    {
+        removeFile(dummyFileSource, false);
+        removeFile(dummyFileTarget, false);
+    }
+    catch  (...) {}
+
+    //create dummy file
+    {
+        wxFile dummy(dummyFileSource.c_str(), wxFile::write);
+        if (!dummy.IsOpened())
+            return false; //if there's no write access, files can't be moved neither
+        dummy.Write(wxT("FreeFileSync dummy file. May be deleted safely.\n"));
+    }
+
+    const bool result =
+        //try to move the file
+#ifdef FFS_WIN
+        ::MoveFileEx(dummyFileSource.c_str(), //__in      LPCTSTR lpExistingFileName,
+                     dummyFileTarget.c_str(), //__in_opt  LPCTSTR lpNewFileName,
+                     0) != 0;                      //__in      DWORD dwFlags
+#elif defined FFS_LINUX
+        ::rename(dummyFileSource.c_str(), dummyFileTarget.c_str()) == 0;
+#endif
+
+    try
+    {
+        removeFile(dummyFileSource, false);
+        removeFile(dummyFileTarget, false);
+    }
+    catch  (...) {}
+
+    return result;
+}
+
+
+void FreeFileSync::removeFile(const Zstring& filename, const bool useRecycleBin) //throw (FileError, std::logic_error);
 {
     //no error situation if file is not existing! manual deletion relies on it!
 #ifdef FFS_WIN
@@ -232,7 +284,7 @@ private:
 
 void FreeFileSync::moveFile(const Zstring& sourceFile, const Zstring& targetFile, MoveFileCallback* callback)   //throw (FileError);
 {
-    if (fileExists(targetFile)) //test file existence: e.g. Linux might silently overwrite existing symlinks
+    if (fileExists(targetFile.c_str())) //test file existence: e.g. Linux might silently overwrite existing symlinks
     {
         const wxString errorMessage = wxString(_("Error moving file:")) + wxT("\n\"") + sourceFile +  wxT("\" ->\n\"") + targetFile + wxT("\"");
         throw FileError(errorMessage + wxT("\n\n") + _("Target file already existing!"));
@@ -481,18 +533,21 @@ void FreeFileSync::removeDirectory(const Zstring& directory, const bool useRecyc
         return;
     }
 
-//attention: check if directory is a symlink! Do NOT traverse into it deleting contained files!!!
+
 #ifdef FFS_WIN
+    //initialize file attributes
+    if (!::SetFileAttributes(           // initialize file attributes: actually NEEDED for symbolic links also!
+                directory.c_str(),      // address of directory name
+                FILE_ATTRIBUTE_NORMAL)) // attributes to set
+    {
+        wxString errorMessage = wxString(_("Error deleting directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"");
+        throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
+    }
+
+
+//attention: check if directory is a symlink! Do NOT traverse into it deleting contained files!!!
     if (dirAttr & FILE_ATTRIBUTE_REPARSE_POINT) //remove symlink directly, support for \\?\-prefix
     {
-        if (!::SetFileAttributes(           // initialize file attributes: actually NEEDED for symbolic links also!
-                    directory.c_str(),      // address of directory name
-                    FILE_ATTRIBUTE_NORMAL)) // attributes to set
-        {
-            wxString errorMessage = wxString(_("Error deleting directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"");
-            throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
-        }
-
         if (!::RemoveDirectory(directory.c_str()))
         {
             wxString errorMessage = wxString(_("Error deleting directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"");
@@ -521,24 +576,13 @@ void FreeFileSync::removeDirectory(const Zstring& directory, const bool useRecyc
     FreeFileSync::traverseFolder(directory, false, &traverser);
 
     //delete files
-    for (std::vector<Zstring>::const_iterator j = fileList.begin(); j != fileList.end(); ++j)
-        FreeFileSync::removeFile(*j, false);
+    std::for_each(fileList.begin(), fileList.end(), boost::bind(removeFile, _1, false));
 
     //delete directories recursively
-    for (std::vector<Zstring>::const_iterator j = dirList.begin(); j != dirList.end(); ++j)
-        FreeFileSync::removeDirectory(*j, false); //call recursively to correctly handle symbolic links
+    std::for_each(dirList.begin(), dirList.end(), boost::bind(removeDirectory, _1, false)); //call recursively to correctly handle symbolic links
 
     //parent directory is deleted last
 #ifdef FFS_WIN
-    //initialize file attributes
-    if (!::SetFileAttributes(
-                directory.c_str(),      // address of directory name
-                FILE_ATTRIBUTE_NORMAL)) // attributes to set
-    {
-        wxString errorMessage = wxString(_("Error deleting directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"");
-        throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
-    }
-
     //remove directory, support for \\?\-prefix
     if (!::RemoveDirectory(directory.c_str()))
     {
@@ -563,14 +607,77 @@ public:
 
     ~CloseHandleOnExit()
     {
-        CloseHandle(fileHandle_);
+        ::CloseHandle(fileHandle_);
     }
 
 private:
     HANDLE fileHandle_;
 };
+#endif
 
 
+//optionally: copy directory last change date, DO NOTHING if something fails
+void FreeFileSync::copyDirLastChangeDate(const Zstring& sourceDir, const Zstring& targetDir)
+{
+    if (symlinkExists(sourceDir)) //don't handle symlinks (yet)
+        return;
+
+#ifdef FFS_WIN
+    HANDLE hDirRead = ::CreateFile(sourceDir.c_str(),
+                                   0,
+                                   FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                   NULL,
+                                   OPEN_EXISTING,
+                                   FILE_FLAG_BACKUP_SEMANTICS, //needed for directories
+                                   NULL);
+
+    if (hDirRead == INVALID_HANDLE_VALUE)
+        return;
+    CloseHandleOnExit dummy(hDirRead);
+
+    FILETIME lastWriteTime;
+    if (::GetFileTime(hDirRead,
+                      NULL,
+                      NULL,
+                      &lastWriteTime))
+    {
+        HANDLE hDirWrite = ::CreateFile(targetDir.c_str(),
+                                        FILE_WRITE_ATTRIBUTES,
+                                        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                        NULL,
+                                        OPEN_EXISTING,
+                                        FILE_FLAG_BACKUP_SEMANTICS, //needed for directories
+                                        NULL);
+
+        if (hDirWrite != INVALID_HANDLE_VALUE)
+        {
+            CloseHandleOnExit dummy2(hDirWrite);
+
+            //(try to) set new "last write time"
+            ::SetFileTime(hDirWrite,
+                          NULL,
+                          NULL,
+                          &lastWriteTime); //return value not evalutated!
+        }
+    }
+#elif defined FFS_LINUX
+
+    struct stat dirInfo;
+    if (::stat(sourceDir.c_str(), &dirInfo) == 0) //read file attributes from source directory
+    {
+        //adapt file modification time:
+        struct utimbuf newTimes;
+        ::time(&newTimes.actime); //set file access time to current time
+        newTimes.modtime = dirInfo.st_mtime;
+
+        //(try to) set new "last write time"
+        ::utime(targetDir.c_str(), &newTimes); //return value not evalutated!
+    }
+#endif
+}
+
+
+#ifdef FFS_WIN
 class KernelDllHandler //dynamically load windows API functions
 {
     typedef DWORD (WINAPI *GetFinalPath)(
@@ -640,6 +747,53 @@ Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target pa
 
     return targetPath;
 }
+
+
+//#include <aclapi.h>
+//optionally: copy additional metadata, DO NOTHING if something fails
+//void copyAdditionalMetadata(const Zstring& sourceDir, const Zstring& targetDir)
+//{
+//    PSECURITY_DESCRIPTOR pSD;
+//
+//    PSID pSidOwner;
+//    PSID pSidGroup;
+//    PACL pDacl;
+//    PACL pSacl;
+//    if (::GetNamedSecurityInfo(
+//                const_cast<DefaultChar*>(sourceDir.c_str()),
+//                SE_FILE_OBJECT, //file or directory
+//                OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION | SACL_SECURITY_INFORMATION,
+//                &pSidOwner,
+//                &pSidGroup,
+//                &pDacl,
+//                &pSacl,
+//                &pSD
+//            ) == ERROR_SUCCESS)
+//    {
+//        //(try to) set new security information
+//        if (::SetNamedSecurityInfo(
+//            const_cast<DefaultChar*>(targetDir.c_str()),
+//            SE_FILE_OBJECT, //file or directory
+//            OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION | DACL_SECURITY_INFORMATION | SACL_SECURITY_INFORMATION,
+//            pSidOwner,
+//            pSidGroup,
+//            pDacl,
+//            pSacl) != ERROR_SUCCESS) //return value not evalutated!
+//                        {
+//            const wxString errorMessage = wxString(wxT("Error 2:")) + wxT("\n\"") + targetDir.c_str() + wxT("\"");
+//            throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
+//        }
+//warning BUG!
+//
+//        LocalFree(pSD); //pSidOwner, pSidGroup, pDacl, pSacl must not be freed!
+//    }
+//    else
+//            {
+//            const wxString errorMessage = wxString(wxT("Error 1:")) + wxT("\n\"") + sourceDir.c_str() + wxT("\"");
+//            throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
+//        }
+//
+//}
 #endif
 
 
@@ -694,6 +848,9 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
                     const wxString errorMessage = wxString(_("Error creating directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"");
                     throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
                 }
+
+                //(try to) copy additional metadata like last modification time: no measurable performance drawback
+                //copyAdditionalMetadata(linkPath, directory);
             }
         }
         else //in all other cases
@@ -706,6 +863,9 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
                 const wxString errorMessage = wxString(_("Error creating directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"");
                 throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
             }
+
+            //(try to) copy additional metadata like last modification time: no measurable performance drawback
+            //copyAdditionalMetadata(templateDir, directory);
         }
     }
 #elif defined FFS_LINUX
@@ -874,13 +1034,15 @@ void FreeFileSync::copyFile(const Zstring& sourceFile,
         //don't suppress "lastError == ERROR_REQUEST_ABORTED": an user aborted operation IS an error condition!
 
         //if file is locked (try to) use Windows Volume Shadow Copy Service
-        if (lastError == ERROR_SHARING_VIOLATION && shadowCopyHandler != NULL)
+        if (shadowCopyHandler != NULL &&
+                (lastError == ERROR_SHARING_VIOLATION ||
+                 lastError == ERROR_LOCK_VIOLATION))
         {
             const Zstring shadowFilename(shadowCopyHandler->makeShadowCopy(sourceFile));
             FreeFileSync::copyFile(shadowFilename, //transferred bytes is automatically reset when new file is copied
                                    targetFile,
                                    copyFileSymLinks,
-                                   shadowCopyHandler,
+                                   NULL,
                                    callback);
             return;
         }
@@ -958,7 +1120,7 @@ void FreeFileSync::copyFile(const Zstring& sourceFile,
 
     //begin of regular file copy
     struct stat fileInfo;
-    if (stat(sourceFile.c_str(), &fileInfo) != 0) //read file attributes from source file (resolving symlinks)
+    if (stat(sourceFile.c_str(), &fileInfo) != 0) //read file attributes from source file (resolving symlinks; but cannot be one in this context)
     {
         const wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + sourceFile.c_str() + wxT("\"");
         throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());

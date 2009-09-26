@@ -1,4 +1,4 @@
-CPPFLAGS=-Wall -pipe -DNDEBUG `wx-config --cppflags` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -DZSTRING_CHAR -O3 -pthread -c
+CPPFLAGS=-Wall -pipe -DNDEBUG `wx-config --cppflags` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -DZSTRING_CHAR -O3 -pthread -c -Ishared/boost_1_40_0
 LINKFLAGS=`wx-config --libs` -O3 -pthread
 
 FILE_LIST=              #internal list of all *.cpp files needed for compilation
@@ -6,6 +6,7 @@ FILE_LIST+=structures.cpp
 FILE_LIST+=algorithm.cpp
 FILE_LIST+=comparison.cpp
 FILE_LIST+=synchronization.cpp
+FILE_LIST+=fileHierarchy.cpp
 FILE_LIST+=application.cpp
 FILE_LIST+=ui/guiGenerated.cpp
 FILE_LIST+=ui/gridView.cpp
@@ -37,6 +38,7 @@ FILE_LIST+=shared/standardPaths.cpp
 FILE_LIST+=shared/zstring.cpp
 FILE_LIST+=shared/xmlBase.cpp
 FILE_LIST+=shared/customButton.cpp
+FILE_LIST+=shared/toggleButton.cpp
 
 #list of all *.o files
 OBJECT_LIST=$(foreach file, $(FILE_LIST), OBJ/$(subst .cpp,.o,$(notdir $(file))))

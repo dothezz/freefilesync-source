@@ -11,18 +11,13 @@
 #include <cctype>
 #include <assert.h>
 #include <new>
+#include <stdlib.h>
+#include <vector>
+
 #ifdef __WXDEBUG__
 #include <set>
+#include <wx/thread.h>
 #endif
-
-
-namespace FreeFileSync
-{
-#ifdef FFS_WIN
-    //super fast case-insensitive string comparison: way faster than wxString::CmpNoCase()!!!
-    int compareStringsWin32(const wchar_t* a, const wchar_t* b, const int aCount = -1, const int bCount = -1);
-#endif  //FFS_WIN
-}
 
 
 #ifdef ZSTRING_CHAR
@@ -31,7 +26,6 @@ typedef char DefaultChar; //use char strings
 typedef wchar_t DefaultChar; //use wide character strings
 #endif
 
-class Zsubstr;
 
 class Zstring
 {
@@ -44,8 +38,9 @@ public:
 
     operator const DefaultChar*() const;               //implicit conversion to C string
 
-    //wxWidgets functions
+    //wxWidgets-like functions
     bool StartsWith(const DefaultChar* begin) const;
+    bool StartsWith(DefaultChar begin) const;
     bool StartsWith(const Zstring& begin) const;
     bool EndsWith(const DefaultChar* end) const;
     bool EndsWith(const DefaultChar end) const;
@@ -54,23 +49,25 @@ public:
 #ifdef FFS_WIN
     int CmpNoCase(const DefaultChar* other) const;
     int CmpNoCase(const Zstring& other) const;
+    Zstring& MakeLower();
 #endif
     int Cmp(const DefaultChar* other) const;
     int Cmp(const Zstring& other) const;
     Zstring& Replace(const DefaultChar* old, const DefaultChar* replacement, bool replaceAll = true);
-    Zstring AfterLast(DefaultChar ch) const;  //returns the whole string if ch not found
-    Zstring BeforeLast(DefaultChar ch) const; //returns empty string if ch not found
+    Zstring AfterLast(  DefaultChar ch) const;  //returns the whole string if ch not found
+    Zstring BeforeLast( DefaultChar ch) const;  //returns empty string if ch not found
+    Zstring AfterFirst( DefaultChar ch) const;  //returns empty string if ch not found
+    Zstring BeforeFirst(DefaultChar ch) const;  //returns the whole string if ch not found
     size_t Find(DefaultChar ch, bool fromEnd) const;
     bool Matches(const DefaultChar* mask) const;
     static bool Matches(const DefaultChar* name, const DefaultChar* mask);
     Zstring& Trim(bool fromRight); //from right or left
-    Zstring& MakeLower();
+    std::vector<Zstring> Tokenize(const DefaultChar delimiter) const;
 
     //std::string functions
     size_t length() const;
     const DefaultChar* c_str() const;
     Zstring substr(size_t pos = 0, size_t len = npos) const; //allocate new string
-    Zsubstr zsubstr(size_t pos = 0) const;                   //use ref-counting!
     bool empty() const;
     void clear();
     int compare(const DefaultChar* other) const;
@@ -81,16 +78,18 @@ public:
     size_t rfind(const DefaultChar ch, size_t pos = npos) const;
     Zstring& replace(size_t pos1, size_t n1, const DefaultChar* str, size_t n2);
     size_t size() const;
+    void reserve(size_t minCapacity);
+    Zstring& assign(const DefaultChar* source, size_t len);
 
     Zstring& operator=(const Zstring& source);
     Zstring& operator=(const DefaultChar* source);
 
-    bool operator == (const Zstring& other) const;
-    bool operator == (const DefaultChar* other) const;
-    bool operator < (const Zstring& other) const;
-    bool operator < (const DefaultChar* other) const;
-    bool operator != (const Zstring& other) const;
-    bool operator != (const DefaultChar* other) const;
+    bool operator==(const Zstring&     other) const;
+    bool operator==(const DefaultChar* other) const;
+    bool operator< (const Zstring&     other) const;
+    bool operator< (const DefaultChar* other) const;
+    bool operator!=(const Zstring&     other) const;
+    bool operator!=(const DefaultChar* other) const;
 
     const DefaultChar operator[](const size_t pos) const;
 
@@ -106,11 +105,11 @@ public:
 
 private:
     Zstring(int); //indicates usage error
+    DefaultChar* data();
 
     void initAndCopy(const DefaultChar* source, size_t length);
-    void incRef() const;                               //support for reference-counting
-    void decRef();                                     //
-    void copyBeforeWrite(const size_t capacityNeeded); //and copy-on-write
+    void incRef() const; //support for reference-counting
+    void decRef();       //
 
     struct StringDescriptor
     {
@@ -118,28 +117,9 @@ private:
         size_t               length;
         size_t               capacity; //allocated length without null-termination
     };
-    static void allocate(const size_t newLength, StringDescriptor*& newDescr, DefaultChar*& newData);
+    static StringDescriptor* allocate(const size_t newLength);
 
     StringDescriptor* descr;
-    DefaultChar*      data;
-};
-
-
-class Zsubstr //ref-counted substring of a Zstring
-{
-public:
-    Zsubstr();
-    Zsubstr(const Zstring& ref, const size_t pos);
-
-    const DefaultChar* c_str() const;
-    size_t length() const;
-    bool StartsWith(const Zstring& begin) const;
-    size_t findFromEnd(const DefaultChar ch) const;
-
-private:
-    Zstring m_ref;
-    const DefaultChar* m_data;
-    size_t m_length;
 };
 
 
@@ -181,15 +161,15 @@ inline
 bool defaultIsWhiteSpace(const char ch)
 {
     // some compilers (e.g. VC++ 6.0) return true for a call to isspace('\xEA') => exclude char(128) to char(255)
-    return ((unsigned char)ch < 128) && isspace((unsigned char)ch) != 0;
+    return (static_cast<unsigned char>(ch) < 128) && isspace((unsigned char)ch) != 0;
 }
 
-inline
-char defaultToLower(const char ch)
-{
-    return tolower((unsigned char)ch); //caution: although tolower() has int as input parameter it expects unsigned chars!
-}
-
+//inline
+//char defaultToLower(const char ch)
+//{
+//    return tolower(static_cast<unsigned char>(ch)); //caution: although tolower() has int as input parameter it expects unsigned chars!
+//}
+//
 #elif defined ZSTRING_WIDE_CHAR
 inline
 size_t defaultLength(const wchar_t* input)
@@ -228,11 +208,11 @@ bool defaultIsWhiteSpace(const wchar_t ch)
     return (ch < 128 || ch > 255) && iswspace(ch) != 0;
 }
 
-inline
-wchar_t defaultToLower(const wchar_t ch)
-{
-    return towlower(ch);
-}
+//inline
+//wchar_t defaultToLower(const wchar_t ch)
+//{
+//    return towlower(ch);
+//}
 #endif
 
 
@@ -242,11 +222,13 @@ class AllocationCount //small test for memory leaks in Zstring
 public:
     void inc(const DefaultChar* object)
     {
+        wxCriticalSectionLocker dummy(lockActStrings);
         activeStrings.insert(object);
     }
 
     void dec(const DefaultChar* object)
     {
+        wxCriticalSectionLocker dummy(lockActStrings);
         activeStrings.erase(object);
     }
 
@@ -256,6 +238,7 @@ private:
     AllocationCount() {}
     ~AllocationCount();
 
+    wxCriticalSection lockActStrings;
     std::set<const DefaultChar*> activeStrings;
 };
 #endif
@@ -269,23 +252,23 @@ size_t getCapacityToAllocate(const size_t length)
 
 
 inline
-void Zstring::allocate(const size_t       newLength,
-                       StringDescriptor*& newDescr,
-                       DefaultChar*&      newData)
+Zstring::StringDescriptor* Zstring::allocate(const size_t newLength)
 {   //allocate and set data for new string
     const size_t newCapacity = getCapacityToAllocate(newLength);
     assert(newCapacity);
 
-    newDescr = static_cast<StringDescriptor*>(operator new [] (sizeof(StringDescriptor) + (newCapacity + 1) * sizeof(DefaultChar)));
-    newData = reinterpret_cast<DefaultChar*>(newDescr + 1);
+    StringDescriptor* newDescr = static_cast<StringDescriptor*>(::malloc(sizeof(StringDescriptor) + (newCapacity + 1) * sizeof(DefaultChar))); //use C-memory functions because of realloc()
+    if (newDescr == NULL)
+        throw std::bad_alloc();
 
     newDescr->refCount = 1;
     newDescr->length   = newLength;
     newDescr->capacity = newCapacity;
 
 #ifdef __WXDEBUG__
-    AllocationCount::getInstance().inc(newData); //test Zstring for memory leaks
+    AllocationCount::getInstance().inc(reinterpret_cast<DefaultChar*>(newDescr + 1)); //test Zstring for memory leaks
 #endif
+    return newDescr;
 }
 
 
@@ -301,7 +284,6 @@ Zstring::Zstring()
 
     emptyString.incRef();
     descr = emptyString.descr;
-    data  = emptyString.data;
 }
 
 
@@ -323,7 +305,6 @@ inline
 Zstring::Zstring(const Zstring& source)
 {
     descr = source.descr;
-    data  = source.data;
     incRef(); //reference counting!
 }
 
@@ -338,9 +319,9 @@ Zstring::~Zstring()
 inline
 void Zstring::initAndCopy(const DefaultChar* source, size_t sourceLen)
 {
-    allocate(sourceLen, descr, data);
-    memcpy(data, source, sourceLen * sizeof(DefaultChar));
-    data[sourceLen] = 0;
+    descr = allocate(sourceLen);
+    ::memcpy(data(), source, sourceLen * sizeof(DefaultChar));
+    data()[sourceLen] = 0;
 }
 
 
@@ -358,29 +339,13 @@ void Zstring::decRef()
     assert(descr && descr->refCount >= 1); //descr points to the begin of the allocated memory block
     if (--descr->refCount == 0)
     {
-        operator delete [] (descr);   //this must NEVER be changed!! E.g. Trim() relies on descr being start of allocated memory block
-        descr = NULL;
 #ifdef __WXDEBUG__
-        AllocationCount::getInstance().dec(data); //test Zstring for memory leaks
+        AllocationCount::getInstance().dec(c_str()); //test Zstring for memory leaks
 #endif
+        ::free(descr); //beginning of whole memory block
+        descr = NULL;
     }
 }
-
-
-#ifdef FFS_WIN
-inline
-int Zstring::CmpNoCase(const DefaultChar* other) const
-{
-    return FreeFileSync::compareStringsWin32(c_str(), other); //way faster than wxString::CmpNoCase()!!
-}
-
-
-inline
-int Zstring::CmpNoCase(const Zstring& other) const
-{
-    return FreeFileSync::compareStringsWin32(c_str(), other.c_str(), length(), other.length()); //way faster than wxString::CmpNoCase()!!
-}
-#endif
 
 
 inline
@@ -396,7 +361,6 @@ Zstring& Zstring::operator=(const Zstring& source)
     source.incRef(); //implicitly handle case "this == &source" and avoid this check
     decRef();        //
     descr = source.descr;
-    data  = source.data;
 
     return *this;
 }
@@ -417,11 +381,11 @@ size_t Zstring::Find(DefaultChar ch, bool fromEnd) const
 inline
 Zstring Zstring::AfterLast(DefaultChar ch) const
 {
-    size_t pos = rfind(ch, npos);
-    if (pos == npos )
-        return *this;
+    const size_t pos = rfind(ch, npos);
+    if (pos != npos )
+        return Zstring(c_str() + pos + 1, length() - pos - 1);
     else
-        return c_str() + pos + 1;
+        return *this;
 }
 
 
@@ -430,12 +394,35 @@ Zstring Zstring::AfterLast(DefaultChar ch) const
 inline
 Zstring Zstring::BeforeLast(DefaultChar ch) const
 {
-    size_t pos = rfind(ch, npos);
-
-    if (pos != npos && pos != 0 )
-        return Zstring(data, pos); //data is non-empty string in this context: else ch would not have been found!
+    const size_t pos = rfind(ch, npos);
+    if (pos != npos)
+        return Zstring(c_str(), pos); //data is non-empty string in this context: else ch would not have been found!
     else
         return Zstring();
+}
+
+
+//returns empty string if ch not found
+inline
+Zstring Zstring::AfterFirst(DefaultChar ch) const
+{
+    const size_t pos = find(ch, 0);
+    if (pos != npos)
+        return Zstring(c_str() + pos + 1, length() - pos - 1);
+    else
+        return Zstring();
+
+}
+
+//returns the whole string if ch not found
+inline
+Zstring Zstring::BeforeFirst(DefaultChar ch) const
+{
+    const size_t pos = find(ch, 0);
+    if (pos != npos)
+        return Zstring(c_str(), pos); //data is non-empty string in this context: else ch would not have been found!
+    else
+        return *this;
 }
 
 
@@ -450,12 +437,20 @@ bool Zstring::StartsWith(const DefaultChar* begin) const
 
 
 inline
+bool Zstring::StartsWith(DefaultChar begin) const
+{
+    const size_t len = length();
+    return len && (this->operator[](0) == begin);
+}
+
+
+inline
 bool Zstring::StartsWith(const Zstring& begin) const
 {
     const size_t beginLength = begin.length();
     if (length() < beginLength)
         return false;
-    return compare(0, beginLength, begin) == 0;
+    return compare(0, beginLength, begin.c_str()) == 0;
 }
 
 
@@ -485,7 +480,7 @@ bool Zstring::EndsWith(const Zstring& end) const
     const size_t endLength  = end.length();
     if (thisLength < endLength)
         return false;
-    return compare(thisLength - endLength, endLength, end) == 0;
+    return compare(thisLength - endLength, endLength, end.c_str()) == 0;
 }
 
 
@@ -498,8 +493,8 @@ Zstring& Zstring::Truncate(size_t newLen)
             return *this = Zstring(c_str(), newLen);
         else //overwrite this string
         {
-            descr->length = newLen;
-            data[newLen]  = DefaultChar(0);
+            descr->length  = newLen;
+            data()[newLen] = 0;
         }
     }
 
@@ -622,7 +617,14 @@ size_t Zstring::size() const
 inline
 const DefaultChar* Zstring::c_str() const
 {
-    return data;
+    return reinterpret_cast<DefaultChar*>(descr + 1);
+}
+
+
+inline
+DefaultChar* Zstring::data()
+{
+    return reinterpret_cast<DefaultChar*>(descr + 1);
 }
 
 
@@ -644,7 +646,7 @@ inline
 const DefaultChar Zstring::operator[](const size_t pos) const
 {
     assert(pos < length());
-    return data[pos];
+    return c_str()[pos];
 }
 
 
@@ -667,68 +669,6 @@ const Zstring Zstring::operator+(const DefaultChar ch) const
 {
     return Zstring(*this)+=ch;
 }
-
-//##################### Zsubstr #############################
-inline
-Zsubstr Zstring::zsubstr(size_t pos) const
-{
-    assert(pos <= length());
-    return Zsubstr(*this, pos); //return reference counted string
-}
-
-
-inline
-Zsubstr::Zsubstr()
-{
-    m_data   = m_ref.c_str();
-    m_length = 0;
-}
-
-
-inline
-Zsubstr::Zsubstr(const Zstring& ref, const size_t pos) :
-        m_ref(ref),
-        m_data(ref.c_str() + pos),
-        m_length(ref.length() - pos) {}
-
-
-inline
-const DefaultChar* Zsubstr::c_str() const
-{
-    return m_data;
-}
-
-
-inline
-size_t Zsubstr::length() const
-{
-    return m_length;
-}
-
-
-inline
-bool Zsubstr::StartsWith(const Zstring& begin) const
-{
-    const size_t beginLength = begin.length();
-    if (length() < beginLength)
-        return false;
-
-    return defaultCompare(m_data, begin.c_str(), beginLength) == 0;
-}
-
-
-inline
-size_t Zsubstr::findFromEnd(const DefaultChar ch) const
-{
-    size_t pos = length();
-    while (--pos != static_cast<size_t>(-1))
-    {
-        if (m_data[pos] == ch)
-            return pos;
-    }
-    return Zstring::npos;
-}
-
 
 
 #endif // ZSTRING_H_INCLUDED

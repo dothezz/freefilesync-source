@@ -3,8 +3,10 @@
 #include <wx/zipstrm.h>
 #include <wx/image.h>
 #include <wx/icon.h>
-#include "../shared/globalFunctions.h"
+#include <memory>
+//#include "../shared/globalFunctions.h"
 #include "../shared/standardPaths.h"
+#include "../shared/systemConstants.h"
 
 
 const GlobalResources& GlobalResources::getInstance()

@@ -1,7 +1,7 @@
 ﻿#include "localization.h"
 #include <wx/msgdlg.h>
 #include "../shared/standardPaths.h"
-#include "../shared/globalFunctions.h"
+#include "systemConstants.h"
 #include <fstream>
 #include <map>
 #include <wx/ffile.h>
@@ -87,7 +87,7 @@ LocalizationInfo::LocalizationInfo()
     newEntry.languageID     = wxLANGUAGE_RUSSIAN;
     newEntry.languageName   = wxT("Pусский");
     newEntry.languageFile   = wxT("russian.lng");
-    newEntry.translatorName = wxT("Fayullin T.N. aka Svobodniy");
+    newEntry.translatorName = wxT("Fayzullin T.N. aka Svobodniy");
     newEntry.languageFlag   = wxT("russia.png");
     locMapping.push_back(newEntry);
 
@@ -132,6 +132,13 @@ LocalizationInfo::LocalizationInfo()
     newEntry.translatorName = wxT("CyberCowBoy");
     newEntry.languageFlag   = wxT("china.png");
     locMapping.push_back(newEntry);
+
+    newEntry.languageID     = wxLANGUAGE_CHINESE_TRADITIONAL;
+    newEntry.languageName   = wxT("正體中文");
+    newEntry.languageFile   = wxT("chinese_traditional.lng");
+    newEntry.translatorName = wxT("Carlos");
+    newEntry.languageFlag   = wxT("taiwan.png");
+    locMapping.push_back(newEntry);
 }
 
 
@@ -165,12 +172,14 @@ int mapLanguageDialect(const int language)
 
         //variants of wxLANGUAGE_CHINESE_SIMPLIFIED
     case wxLANGUAGE_CHINESE:
-    case wxLANGUAGE_CHINESE_TRADITIONAL:
+    case wxLANGUAGE_CHINESE_SINGAPORE:
+        return wxLANGUAGE_CHINESE_SIMPLIFIED;
+
+        //variants of wxLANGUAGE_CHINESE_TRADITIONAL
+    case wxLANGUAGE_CHINESE_TAIWAN:
     case wxLANGUAGE_CHINESE_HONGKONG:
     case wxLANGUAGE_CHINESE_MACAU:
-    case wxLANGUAGE_CHINESE_SINGAPORE:
-    case wxLANGUAGE_CHINESE_TAIWAN:
-        return wxLANGUAGE_CHINESE_SIMPLIFIED;
+        return wxLANGUAGE_CHINESE_TRADITIONAL;
 
         //variants of wxLANGUAGE_RUSSIAN
     case wxLANGUAGE_RUSSIAN_UKRAINE:
@@ -227,7 +236,7 @@ CustomLocale& CustomLocale::getInstance()
 
 
 CustomLocale::CustomLocale() :
-        wxLocale(wxLocale::GetSystemLanguage()), //wxLocale is a static object too => can be initialized just once
+        wxLocale(wxLANGUAGE_DEFAULT), //setting a different language needn't be supported on all systems!
         translationDB(new Translation),
         currentLanguage(wxLANGUAGE_ENGLISH) {}
 
@@ -372,14 +381,17 @@ void CustomLocale::setLanguage(const int language)
                     const wxString& translation = tmpString;
 
                     if (!translation.empty())
-                        translationDB->insert(std::pair<TextOriginal, TextTranslation>(original, translation));
+                        translationDB->insert(std::make_pair(original, translation));
                 }
 
                 ++rowNumber;
             }
         }
         else
+        {
             wxMessageBox(wxString(_("Error reading file:")) + wxT(" \"") + languageFile + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+            currentLanguage = wxLANGUAGE_ENGLISH; //reset to english language to show this error just once
+        }
     }
     else
         ;   //if languageFile is empty texts will be english per default

@@ -2,7 +2,7 @@
 #include "resources.h"
 #include "../shared/customButton.h"
 #include "../shared/standardPaths.h"
-#include "../shared/globalFunctions.h"
+//#include "../shared/globalFunctions.h"
 #include <wx/msgdlg.h>
 #include <wx/wupdlock.h>
 #include "watcher.h"
@@ -11,6 +11,7 @@
 #include "trayMenu.h"
 #include "../shared/fileHandling.h"
 #include "xmlFreeFileSync.h"
+#include "../shared/systemConstants.h"
 
 
 MainDialog::MainDialog(wxDialog *dlg, const wxString& cfgFilename)

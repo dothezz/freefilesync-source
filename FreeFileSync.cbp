@@ -100,6 +100,7 @@
 			<Add option="-DZSTRING_WIDE_CHAR" />
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
 			<Add directory="C:\Programme\C++\wxWidgets\contrib\include" />
+			<Add directory="shared\boost_1_40_0" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
@@ -135,6 +136,8 @@
 		<Unit filename="comparison.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="fileHierarchy.cpp" />
+		<Unit filename="fileHierarchy.h" />
 		<Unit filename="library\customGrid.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
@@ -260,16 +263,24 @@
 		<Unit filename="shared\localization.h" />
 		<Unit filename="shared\shadow.cpp" />
 		<Unit filename="shared\shadow.h" />
-		<Unit filename="shared\shared_ptr.h" />
 		<Unit filename="shared\standardPaths.cpp" />
 		<Unit filename="shared\standardPaths.h" />
 		<Unit filename="shared\staticAssert.h" />
+		<Unit filename="shared\systemConstants.h" />
 		<Unit filename="shared\systemFunctions.cpp" />
 		<Unit filename="shared\systemFunctions.h" />
 		<Unit filename="shared\tinyxml\tinystr.cpp" />
 		<Unit filename="shared\tinyxml\tinyxml.cpp" />
 		<Unit filename="shared\tinyxml\tinyxmlerror.cpp" />
 		<Unit filename="shared\tinyxml\tinyxmlparser.cpp" />
+		<Unit filename="shared\toggleButton.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="shared\toggleButton.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="shared\xmlBase.cpp" />
 		<Unit filename="shared\xmlBase.h" />
 		<Unit filename="shared\zstring.cpp" />
@@ -296,7 +307,7 @@
 		<Unit filename="ui\checkVersion.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="ui\dummyPanel.h">
+		<Unit filename="ui\folderPair.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>

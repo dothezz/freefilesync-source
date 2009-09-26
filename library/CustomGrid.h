@@ -6,6 +6,7 @@
 #include "processXml.h"
 #include <map>
 #include <memory>
+#include <set>
 
 class CustomGridTableRim;
 class CustomGridTableLeft;
@@ -18,6 +19,7 @@ class CustomGridRim;
 class CustomGridLeft;
 class CustomGridMiddle;
 class CustomGridRight;
+
 
 namespace FreeFileSync
 {
@@ -59,7 +61,7 @@ public:
                       CustomGridRight*  gridRight,
                       const FreeFileSync::GridView* gridDataView);
 
-    std::set<int> getAllSelectedRows() const;
+    std::set<unsigned int> getAllSelectedRows() const;
 
     //set sort direction indicator on UI
     typedef int SortColumn;

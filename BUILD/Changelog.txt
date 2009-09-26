@@ -2,8 +2,33 @@
 |FreeFileSync|
 --------------
 
+Changelog v2.3
+--------------
+New filter and sync configuration at folder pair level
+Improved sorting: sort across multiple folder pairs
+				  stable sorting in middle grid
+				  consolidated sorting of sync-direction
+Open external applications via context menu(customizable)
+Removed performance penalty when using include filters
+Improved filter syntax for strings beginning with wildcards
+Default handling for conflict files now configurable
+New option to show all hidden dialogs again
+Fixed issue with makros %nameCo, %dirCo
+New option in *.ffs_gui/ffs_batch files: Verify copied files
+Use Windows Volume Shadow Copy for shared and locked files(new)
+More detailed information in *.cvs export
+Use current working directory to save global configuration (portable version)
+Respect subdirectories when manually changing sync-direction
+Allow import of batch configuration into GUI mode
+Some small GUI improvements
+New shortcuts: SPACE: (de-)select rows; ENTER: start external application
+Performance improvements: Reduced CPU time by 28%, (peak) memory consumption by 20%
+Added Traditional Chinese translation
+Updated translation files
+
+
 Changelog v2.2
----------------
+--------------
 New user-defined recycle bin directory
 Possibility to create synchronization directories automatically (if not existing)
 Support for relative directory names (e.g. \foo, ..\bar) respecting current working directory

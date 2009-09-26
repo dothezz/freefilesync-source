@@ -4,8 +4,8 @@
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/mstream.h>
-#include "../shared/globalFunctions.h"
-//#include "../shared/systemFunctions.h"
+#include "../shared/systemConstants.h"
+#include <memory>
 #include "../shared/standardPaths.h"
 
 
@@ -58,6 +58,8 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("equal.png")]              = (bitmapEqual             = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("equalAct.png")]           = (bitmapEqualAct          = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("equalDeact.png")]         = (bitmapEqualDeact        = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("conflict.png")]           = (bitmapConflict          = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("conflictGrey.png")]       = (bitmapConflictGrey      = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("conflictAct.png")]        = (bitmapConflictAct       = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("conflictDeact.png")]      = (bitmapConflictDeact     = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("include.png")]            = (bitmapInclude           = new wxBitmap(wxNullBitmap));
@@ -65,6 +67,7 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("filter active.png")]      = (bitmapFilterOn          = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("filter not active.png")]  = (bitmapFilterOff         = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("filter_small.png")]       = (bitmapFilterSmall       = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("filterSmallGrey.png")]    = (bitmapFilterSmallGrey   = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("warning.png")]            = (bitmapWarning           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("warningSmall.png")]       = (bitmapWarningSmall      = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("error.png")]              = (bitmapError             = new wxBitmap(wxNullBitmap));
@@ -72,6 +75,9 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("small arrow down.png")]   = (bitmapSmallDown         = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("save.png")]               = (bitmapSave              = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("load.png")]               = (bitmapLoad              = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("saveSmall.png")]          = (bitmapSaveSmall         = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("loadSmall.png")]          = (bitmapLoadSmall         = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("newSmall.png")]           = (bitmapNewSmall          = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("FFS.png")]                = (bitmapFFS               = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("FFS paused.png")]         = (bitmapFFSPaused         = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("deleteFile.png")]         = (bitmapDeleteFile        = new wxBitmap(wxNullBitmap));
@@ -108,6 +114,8 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("recycler.png")]           = (bitmapRecycler          = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("shift.png")]              = (bitmapShift             = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("syncConfig.png")]         = (bitmapSyncCfg           = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("syncConfigSmall.png")]    = (bitmapSyncCfgSmall      = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("syncConfigSmallGrey.png")] = (bitmapSyncCfgSmallGrey  = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("cmpConfig.png")]          = (bitmapCmpCfg            = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("syncPreview.png")]        = (bitmapPreview           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("syncPreviewDisabl.png")]  = (bitmapPreviewDisabled   = new wxBitmap(wxNullBitmap));
@@ -119,6 +127,7 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("france.png")]             = (bitmapFrance            = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("germany.png")]            = (bitmapGermany           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("hungary.png")]            = (bitmapHungary           = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("taiwan.png")]             = (bitmapTaiwan            = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("italy.png")]              = (bitmapItaly             = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("japan.png")]              = (bitmapJapan             = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("poland.png")]             = (bitmapPoland            = new wxBitmap(wxNullBitmap));

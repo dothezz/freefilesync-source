@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Programme\C++\wxWidgets\include&quot;;&quot;C:\Programme\C++\wxWidgets\lib\vc_lib\mswud&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Programme\C++\wxWidgets\include&quot;;&quot;C:\Programme\C++\wxWidgets\lib\vc_lib\mswud&quot;;..\shared\boost_1_40_0"
 				PreprocessorDefinitions="wxUSE_UNICODE;__WXMSW__;FFS_WIN;__WXDEBUG__;TIXML_USE_STL;ZSTRING_WIDE_CHAR"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -50,6 +50,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
+				DisableSpecificWarnings="4804"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -126,13 +127,14 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="&quot;C:\Programme\C++\wxWidgets\include&quot;;&quot;C:\Programme\C++\wxWidgets\lib\vc_lib\mswu&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Programme\C++\wxWidgets\include&quot;;&quot;C:\Programme\C++\wxWidgets\lib\vc_lib\mswu&quot;;..\shared\boost_1_40_0"
 				PreprocessorDefinitions="wxUSE_UNICODE;__WXMSW__;FFS_WIN;NDEBUG;TIXML_USE_STL;ZSTRING_WIDE_CHAR"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
+				DisableSpecificWarnings="4804"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

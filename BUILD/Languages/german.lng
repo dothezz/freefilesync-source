@@ -68,6 +68,8 @@ Dateiliste e&xportieren
 &Laden
 &Load configuration
 Konfiguration &laden
+&New
+&Neu
 &No
 &Nein
 &OK
@@ -84,8 +86,14 @@ Konfiguration &laden
 &Speichern
 &Yes
 &Ja
+(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
+(Achtung: Nur FAT/FAT32 Laufwerke sind von diesem Problem betroffen!\nIn allen anderen Fällen kann die Einstellung \"Zeitunterschied von einer Stunde ignorieren\" deaktiviert werden.)
 ,
 .
+- Other side's counterpart to %dir
+- Entsprechung der anderen Seite zu %dir
+- Other side's counterpart to %name
+- Entsprechung der anderen Seite zu %name
 - conflict
 - Konflikt
 - conflict (same date, different size)
@@ -110,10 +118,6 @@ Konfiguration &laden
 - rechts
 - right newer
 - rechts neuer
-- sibling of %dir
-- Gegenstück zu %dir
-- sibling of %name
-- Gegenstück zu %name
 -Open-Source file synchronization-
 -Open-Source Datei-Synchronisation-
 .
@@ -154,8 +158,6 @@ Add folder
 Verzeichnis hinzufügen
 Add folder pair
 Verzeichnispaar hinzufügen
-All items have been synchronized!
-Alle Elemente wurden synchronisiert!
 An exception occured!
 Eine Ausnahme ist aufgetreten!
 As a result the files are separated into the following categories:
@@ -189,7 +191,7 @@ Gefilterte Dateien bzw. Verzeichnisse ein-/ausblenden
 Comma separated list
 Kommagetrennte Liste
 Commandline
-Kommandozeile
+Befehlszeile
 Commandline is empty!
 Die Kommandozeile ist leer!
 Compare
@@ -208,6 +210,8 @@ Comparing content of files %x
 Vergleiche Inhalt der Dateien %x
 Comparing content...
 Vergleiche Dateiinhalt...
+Comparing files by content failed.
+Vergleich nach Dateiinhalt ist fehlgeschlagen.
 Comparison Result
 Ergebnis des Vergleichs
 Comparison settings
@@ -232,6 +236,8 @@ Confirm
 Bestätigen
 Conflict detected:
 Ein Konflikt wurde erkannt:
+Conflicts/files that cannot be categorized
+Konflikte/Dateien, die nicht eingeordnet werden können
 Continue
 Fortfahren
 Conversion error:
@@ -270,16 +276,20 @@ Customize columns
 Spalten anpassen
 Customize...
 Anpassen...
+D-Click
+D-Klick
 DECISION TREE
 ENTSCHEIDUNGSBAUM
 Data remaining:
 Verbliebene Daten:
+Data verification error: Source and target file have different content!
+Verifizierungsfehler: Quell- und Zieldatei haben unterschiedlichen Inhalt!
 Date
 Datum
 Delay
 Verzögerung
-Delay between two invocations of the commandline
-Verzögerung zwischen zwei Aufrufen der Kommandozeile
+Delay between detection of changes and execution of commandline in seconds
+Verzögerung zwischen Erkennen einer Änderung und Aufrufen der Kommandozeile in Sekunden
 Delete files/folders existing on left side only
 Nur links existierende Dateien/Verzeichnisse löschen
 Delete files/folders existing on right side only
@@ -300,6 +310,8 @@ Deleting folder %x
 Lösche Verzeichnis %x
 Deletion handling
 Behandlung von Löschungen
+Description
+Beschreibung
 Directories are dependent! Be careful when setting up synchronization rules:
 Die Verzeichnisse sind voneinander abhängig! Achtung beim Festlegen der Synchronisationseinstellungen:
 Directories to watch
@@ -320,8 +332,6 @@ Do you really want to move the following objects(s) to the Recycle Bin?
 Sollen folgende Elemente wirklich in den Papierkorb verschoben werden?
 Do you want FreeFileSync to automatically check for updates every week?
 Soll FreeFileSync automatisch jede Woche nach Aktualisierungen suchen?
-Don't ask me again
-Nicht mehr nachfragen
 Donate with PayPal
 Mit PayPal spenden
 Download now?
@@ -392,14 +402,12 @@ Exit immediately and set returncode < 0
 Sofort beenden und Returncode < 0 setzen
 Exit with RC < 0
 Beenden mit RC < 0
+External applications
+Externe Anwendungen
 Feedback and suggestions are welcome at:
 Feedback und Vorschläge sind willkommen unter:
 File %x has an invalid date!
 Die Datei %x hat ein ungültiges Datum!
-File Manager integration:
-Einbinden des Dateimanagers:
-File Time tolerance (seconds):
-Abweichung der Dateizeit (Sekunden):
 File already exists. Overwrite?
 Die Datei existiert bereits. Überschreiben?
 File content
@@ -410,12 +418,10 @@ File list exported!
 Dateiliste exportiert!
 File size and date
 Dateigröße und -datum
-File times that differ by up to the specified number of seconds are still handled as having same time.
-Dateiänderungszeiten, die um bis zu der angegebenen Anzahl an Sekunden abweichen, werden trotzdem als gleich angesehen.
 Filename
 Dateiname
-Files %x have a file time difference of less than 1 hour! It's not safe to decide which one is newer due to Daylight Saving Time issues.
-Die Dateien %x haben eine Abweichung der Dateizeit von unter einer Stunde! Aufgrund der Zeitumstellungsproblematik kann nicht zweifelsfrei festgestellt werden, welche die aktuellere ist.
+Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
+Die Dateien %x haben eine Abweichung der Dateizeit von unter einer Stunde!\n\nAufgrund der Zeitumstellungsproblematik kann nicht zweifelsfrei festgestellt werden, welche die aktuellere ist.
 Files %x have the same date but a different size!
 Die Dateien %x haben dasselbe Datum, aber eine unterschiedliche Größe!
 Files are found equal if\n     - file content\nis the same.
@@ -424,6 +430,8 @@ Files are found equal if\n     - filesize\n     - last write time and date\nare 
 Dateien gelten als gleich, wenn\n     - die Größe\n     - Datum und Uhrzeit der letzten Änderung\ngleich sind.
 Files remaining:
 Verbliebene Dateien:
+Files that are equal on both sides
+Auf beiden Seiten gleiche Dateien
 Files that exist on both sides and have different content
 Auf beiden Seiten existierende Dateien mit unterschiedlichem Inhalt
 Files that exist on both sides, left one is newer
@@ -448,8 +456,8 @@ Filter view
 Ansicht filtern
 Folder Comparison and Synchronization
 Verzeichnisvergleich und Synchronisation
-Folder pair
-Verzeichnispaar
+Free disk space available:
+Verfügbarer freier Speicherplatz:
 FreeFileSync - Folder Comparison and Synchronization
 FreeFileSync - Verzeichnisvergleich und -synchronisation
 FreeFileSync Batch Job
@@ -470,6 +478,8 @@ Global settings
 Globale Einstellungen
 Help
 Hilfe
+Hidden dialogs:
+Versteckte Dialoge:
 Hide all error and warning messages
 Alle Fehler- und Warnmeldungen werden unterdrückt
 Hide conflicts
@@ -486,10 +496,6 @@ Hide files that exist on left side only
 Nur links existierende Dateien ausblenden
 Hide files that exist on right side only
 Nur rechts existierende Dateien ausblenden
-Hide files that will be copied to the left side
-Dateien die nach links kopiert werden ausblenden
-Hide files that will be copied to the right side
-Dateien die nach rechts kopiert werden ausblenden
 Hide files that will be created on the left side
 Dateien die links erstellt werden ausblenden
 Hide files that will be created on the right side
@@ -498,6 +504,10 @@ Hide files that will be deleted on the left side
 Dateien die links gelöscht werden ausblenden
 Hide files that will be deleted on the right side
 Dateien die rechts gelöscht werden ausblenden
+Hide files that will be overwritten on left side
+Dateien die links überschrieben werden ausblenden
+Hide files that will be overwritten on right side
+Dateien die rechts überschrieben werden ausblenden
 Hide files that won't be copied
 Dateien die nicht kopiert werden ausblenden
 Hide filtered items
@@ -530,12 +540,16 @@ Info
 Info
 Information
 Information
-Initialization of Recycle Bin failed!
-Die Initialisierung des Papierkorbs ist fehlgeschlagen!
+Integrate external applications into context menu. The following macros are available:
+Integriert externe Anwendungen in das Kontextmenu. Die folgenden Makros stehen zur Verfügung:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Die Papierkorbfunktion steht nicht zur Verfügung!\n\nWahrscheinlich benutzen Sie nicht Microsoft Windows.\nWenn Sie diese Funktion wirklich benötigen, kontaktieren Sie bitte den Autor. :)
+Leave as unresolved conflict
+Als unbehandelten Konflikt belassen
 Left
 Links
+Legend
+Legende
 Load configuration from file
 Konfiguration aus Datei laden
 Load configuration history (press DEL to delete items)
@@ -554,16 +568,16 @@ Move column down
 Spalte nach unten verschieben
 Move column up
 Spalte nach oben verschieben
-Move files to a custom directory.
-Verschiebe Dateien in ein benutzerdefiniertes Verzeichnis.
-Move to custom directory
-In eigenes Verzeichnis verschieben
+Move files to a user-defined directory.
+Verschiebe Dateien in benutzerdefiniertes Verzeichnis
 Moving %x to Recycle Bin
 Verschiebe %x in den Papierkorb
-Moving %x to custom directory
-Verschiebe %x in eigenes Verzeichnis
-Not all items have been synchronized! Have a look at the list.
-Nicht alle Elemente wurden synchronisiert! Siehe verbliebene Elemente im Hauptfenster.
+Moving file %x to user-defined directory %y
+Verschiebe Datei %x in benutzerdefiniertes Verzeichnis %y
+Moving folder %x to user-defined directory %y
+Verschiebe Ordner %x in benutzerdefiniertes Verzeichnis %y
+Multiple...
+Verschiedene...
 Not enough free disk space available in:
 Nicht genügend freier Speicher verfügbar unter:
 Nothing to synchronize according to configuration!
@@ -576,10 +590,8 @@ Number of files that will be overwritten
 Anzahl der zu überschreibenden Dateien
 OK
 OK
-Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the synchronization directories.
-Für die Synchronisation werden nur die Dateien/Verzeichnisse berücksichtigt, die den Filtereinstellungen genügen. Der Filter wird dabei auf den Dateinamen relativ(!) zu den zu synchronisierenden Verzeichnissen angewandt.
-Open with File Manager\tD-Click
-Mit Dateimanager öffnen\tD-Click
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
+Für die Synchronisation werden nur die Dateien/Verzeichnisse berücksichtigt, die den Filtereinstellungen genügen. Der Filter wird dabei auf den Dateinamen relativ(!) zu den Basis-Synchronisationsverzeichnissen angewandt.
 Operation aborted!
 Vorgang abgebrochen!
 Operation:
@@ -594,8 +606,6 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Um diese Funktionalität zu aktivieren, bitte die entsprechende Datei \"Shadow.dll\" (siehe Archiv \"Shadow.zip\") in das FreeFileSync Installationsverzeichnis kopieren.
 Please fill all empty directory fields.
 Bitte die leeren Verzeichnisfelder füllen.
-Please specify alternate directory for deletion!
-Bitte ein alternatives Löschverzeichnis angeben!
 Press button to activate filter
 Taste drücken, um Filter zu aktivieren
 Published under the GNU General Public License:
@@ -604,12 +614,16 @@ Question
 Frage
 Quit
 Beenden
+Re-enable all hidden dialogs?
+Alle versteckten Dialoge wieder anzeigen?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Automatisierte Synchronisation
 RealtimeSync configuration
 RealtimeSync Konfiguration
 Relative path
 Relativer Pfad
+Remove alternate settings
+Alternative Einstellungen entfernen
 Remove folder
 Verzeichnis entfernen
 Remove folder pair
@@ -618,10 +632,6 @@ Report translation error
 Übersetzungsfehler melden
 Reset
 Zurücksetzen
-Reset all warning messages
-Alle Warnmeldungen zurücksetzen
-Reset all warning messages?
-Sollen alle Warnmeldungen zurückgesetzt werden?
 Result
 Ergebnis
 Right
@@ -640,6 +650,10 @@ Scanning:
 Suche Dateien:
 Select a folder
 Verzeichnis auswählen
+Select alternate filter settings
+Alternative Filtereinstellungen auswählen
+Select alternate synchronization settings
+Alternative Synchronisationseinstellungen auswählen
 Select logfile directory:
 Verzeichnis für Logdatei wählen:
 Select variant:
@@ -660,10 +674,6 @@ Show files that exist on left side only
 Nur links existierende Dateien anzeigen
 Show files that exist on right side only
 Nur rechts existierende Dateien anzeigen
-Show files that will be copied to the left side
-Dateien die nach links kopiert werden anzeigen
-Show files that will be copied to the right side
-Dateien die nach rechts kopiert werden anzeigen
 Show files that will be created on the left side
 Dateien die links erstellt werden anzeigen
 Show files that will be created on the right side
@@ -672,8 +682,14 @@ Show files that will be deleted on the left side
 Dateien die links gelöscht werden anzeigen
 Show files that will be deleted on the right side
 Dateien die rechts gelöscht werden anzeigen
+Show files that will be overwritten on left side
+Dateien die links überschrieben werden anzeigen
+Show files that will be overwritten on right side
+Dateien die rechts überschrieben werden anzeigen
 Show files that won't be copied
 Dateien die nicht kopiert werden anzeigen
+Show hidden dialogs
+Zeige versteckte Dialoge
 Show popup
 Popup zeigen
 Show popup on errors or warnings
@@ -684,8 +700,6 @@ Silent mode
 Stiller Modus
 Size
 Größe
-Sorting file list...
-Sortiere Dateiliste...
 Source code written completely in C++ utilizing:
 Sourcecode komplett in C++ geschrieben mit Hilfe von:
 Speed:
@@ -728,8 +742,6 @@ Target file already existing!
 Die Zieldatei existiert bereits!
 The file does not contain a valid configuration:
 Die Datei enthält keine gültige Konfiguration:
-This commandline will be executed on each doubleclick. The following macros are available:
-Diese Befehlszeile wird bei jeden Doppelklick ausgeführt. Dabei stehen die folgenden Makros zur Verfügung:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Diese Variante identifiziert zwei gleichnamige Dateien als gleich, wenn sie die gleiche Dateigröße haben UND der Zeitpunkt der letzten Änderung derselbe ist.
 Time
@@ -766,16 +778,20 @@ Use Recycle Bin
 Papierkorb verwenden
 Use Recycle Bin when deleting or overwriting files.
 Papierkorb für zu löschende oder zu überschreibende Dateien nutzen.
+User-defined directory
+Benutzerdefiniertes Verzeichnis
+User-defined directory for deletion was not specified!
+Kein benutzerdefiniertes Verzeichnis zum Löschen angegeben!
 Variant
 Variante
+Verifying file %x
+Verifiziere Datei %x
 Volume name %x not part of filename %y!
 Laufwerksname %x ist kein Teil des Dateinamens %y!
 Warning
 Warnung
 Warning: Synchronization failed for %x item(s):
 Warnung: Synchronisation fehlgeschlagen für %x Element(e):
-Warnings:
-Warnungen:
 When the comparison is started with this option set the following decision tree is processed:
 Wenn der Vergleich mit dieser Option gestartet wurde, wird folgender Entscheidungsbaum abgearbeitet:
 You can ignore the error to consider not existing directories as empty.

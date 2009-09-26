@@ -1,8 +1,9 @@
 #include "guiStatusHandler.h"
 #include "smallDialogs.h"
-#include "../shared/globalFunctions.h"
+#include "../shared/systemConstants.h"
 #include "mainDialog.h"
 #include <wx/wupdlock.h>
+#include "../shared/globalFunctions.h"
 
 
 CompareStatusHandler::CompareStatusHandler(MainDialog* dlg) :
@@ -30,9 +31,6 @@ CompareStatusHandler::CompareStatusHandler(MainDialog* dlg) :
 
 CompareStatusHandler::~CompareStatusHandler()
 {
-    //ATTENTION: wxAPP->Yield() is called!  at this point in time there is a mismatch between
-    //gridDataView and currentGridData!! make sure gridDataView does NOT access currentGridData!!
-
     updateUiNow(); //ui update before enabling buttons again: prevent strange behaviour of delayed button clicks
 
     //reenable complete main dialog
@@ -225,19 +223,19 @@ SyncStatusHandler::~SyncStatusHandler()
     //notify to syncStatusFrame that current process has ended
     if (abortIsRequested())
     {
-        result+= wxString(_("Synchronization aborted!")) + wxT(" ") + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!");
+        result += wxString(_("Synchronization aborted!")) + wxT(" ") + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!");
         syncStatusFrame->setStatusText_NoUpdate(result.c_str());
         syncStatusFrame->processHasFinished(SyncStatus::ABORTED);  //enable okay and close events
     }
     else if (errorLog.errorsTotal() > 0)
     {
-        result+= wxString(_("Synchronization completed with errors!")) + wxT(" ") + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!");
+        result += wxString(_("Synchronization completed with errors!")) + wxT(" ") + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!");
         syncStatusFrame->setStatusText_NoUpdate(result.c_str());
         syncStatusFrame->processHasFinished(SyncStatus::FINISHED_WITH_ERROR);
     }
     else
     {
-        result+= _("Synchronization completed successfully!");
+        result += _("Synchronization completed successfully!");
         syncStatusFrame->setStatusText_NoUpdate(result.c_str());
         syncStatusFrame->processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS);
     }

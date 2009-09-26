@@ -4,10 +4,11 @@
 #include "../algorithm.h"
 #include <wx/ffile.h>
 #include <wx/msgdlg.h>
-#include "../shared/globalFunctions.h"
+#include "../shared/systemConstants.h"
 #include "../shared/standardPaths.h"
 #include "../shared/fileHandling.h"
 #include "../library/resources.h"
+#include "../shared/globalFunctions.h"
 
 
 class LogFile
@@ -259,12 +260,14 @@ private:
 //##############################################################################################################################
 
 BatchStatusHandlerSilent::BatchStatusHandlerSilent(const xmlAccess::OnError handleError, const wxString& logfileDirectory, int& returnVal) :
-        m_handleError(handleError),
+        m_handleError(xmlAccess::ON_ERROR_POPUP),
         currentProcess(StatusHandler::PROCESS_NONE),
         returnValue(returnVal),
         trayIcon(new FfsTrayIcon(this)),
         m_log(new LogFile(logfileDirectory))
 {
+    setErrorStrategy(handleError);
+
     //test if log was instantiated successfully
     if (!m_log->isOkay())
     {  //handle error: file load
@@ -446,6 +449,12 @@ void BatchStatusHandlerSilent::addFinalInfo(const wxString& infoMessage)
 }
 
 
+void BatchStatusHandlerSilent::setErrorStrategy(xmlAccess::OnError handleError)
+{
+    m_handleError = handleError;
+}
+
+
 void BatchStatusHandlerSilent::forceUiRefresh()
 {
     trayIcon->updateSysTray(); //needed by sys-tray icon only
@@ -466,21 +475,7 @@ BatchStatusHandlerGui::BatchStatusHandlerGui(const xmlAccess::OnError handleErro
         currentProcess(StatusHandler::PROCESS_NONE),
         returnValue(returnVal)
 {
-    switch (handleError)
-    {
-    case xmlAccess::ON_ERROR_POPUP:
-        showPopups = true;
-        break;
-
-    case xmlAccess::ON_ERROR_EXIT: //doesn't make much sense for "batch gui"-mode
-        showPopups = true;
-        break;
-
-    case xmlAccess::ON_ERROR_IGNORE:
-        showPopups = false;
-        break;
-    }
-
+    setErrorStrategy(handleError);
 
     syncStatusFrame = new SyncStatus(this, NULL);
     syncStatusFrame->Show();
@@ -683,4 +678,23 @@ void BatchStatusHandlerGui::abortThisProcess()
 void BatchStatusHandlerGui::addFinalInfo(const wxString& infoMessage)
 {
     finalInfo = infoMessage;
+}
+
+
+void BatchStatusHandlerGui::setErrorStrategy(xmlAccess::OnError handleError) //change error handling during process
+{
+    switch (handleError)
+    {
+    case xmlAccess::ON_ERROR_POPUP:
+        showPopups = true;
+        break;
+
+    case xmlAccess::ON_ERROR_EXIT: //doesn't make much sense for "batch gui"-mode
+        showPopups = true;
+        break;
+
+    case xmlAccess::ON_ERROR_IGNORE:
+        showPopups = false;
+        break;
+    }
 }

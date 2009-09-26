@@ -124,14 +124,14 @@ void Statistics::addMeasurement(const int objectsCurrent, const double dataCurre
 
     //remove all records earlier than "currentTime - windowSize"
     const long newBegin = newEntry.time - windowMax;
-    while (measurements.size() > 0 && measurements.front().time < newBegin)
+    while (!measurements.empty() && measurements.front().time < newBegin)
         measurements.pop_front();
 }
 
 
 wxString Statistics::getRemainingTime() const
 {
-    if (measurements.size() > 0)
+    if (!measurements.empty())
     {
         //find start of records "window"
         const record backElement = measurements.back();
@@ -158,7 +158,7 @@ wxString Statistics::getRemainingTime() const
 
 wxString Statistics::getBytesPerSecond() const
 {
-    if (measurements.size() > 0)
+    if (!measurements.empty())
     {
         //find start of records "window"
         const long frontTime = measurements.back().time - windowSizeBPS;

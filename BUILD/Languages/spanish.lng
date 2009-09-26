@@ -68,6 +68,8 @@
 &Cargar
 &Load configuration
 &Cargar configuración
+&New
+
 &No
 
 &OK
@@ -84,8 +86,14 @@
 &Guardar
 &Yes
 
+(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
+
 ,
 , 
+- Other side's counterpart to %dir
+
+- Other side's counterpart to %name
+
 - conflict
 
 - conflict (same date, different size)
@@ -110,10 +118,6 @@
 - derecha
 - right newer
 - el más nuevo en la derecha
-- sibling of %dir
-
-- sibling of %name
-
 -Open-Source file synchronization-
 -Sincronización de ficheros Open-Source-
 .
@@ -154,8 +158,6 @@ Add folder
 
 Add folder pair
 Añadir un par de carpetas
-All items have been synchronized!
-¡Todos los elementos han sido sincronizados!
 An exception occured!
 ¡Ha ocurrido una excepción!
 As a result the files are separated into the following categories:
@@ -208,6 +210,8 @@ Comparing content of files %x
 Comparación del contenido de %x ficheros
 Comparing content...
 
+Comparing files by content failed.
+
 Comparison Result
 
 Comparison settings
@@ -231,6 +235,8 @@ Configure sus propias reglas de sincronización.
 Confirm
 Confirmar
 Conflict detected:
+
+Conflicts/files that cannot be categorized
 
 Continue
 Continuar
@@ -270,15 +276,19 @@ Customize columns
 Personalizar columnas
 Customize...
 
+D-Click
+
 DECISION TREE
 ÁRBOL DE DECISIÓN
 Data remaining:
 Datos que faltan:
+Data verification error: Source and target file have different content!
+
 Date
 Fecha
 Delay
 
-Delay between two invocations of the commandline
+Delay between detection of changes and execution of commandline in seconds
 
 Delete files/folders existing on left side only
 Eliminar sólo ficheros/carpetas existentes en el lado izquierdo
@@ -300,6 +310,8 @@ Deleting folder %x
 Borrar carpeta %x
 Deletion handling
 
+Description
+
 Directories are dependent! Be careful when setting up synchronization rules:
 ¡Los directorios son dependientes! Cuidado al establecer las reglas de sincronización:
 Directories to watch
@@ -319,8 +331,6 @@ Do you really want to delete the following objects(s)?
 Do you really want to move the following objects(s) to the Recycle Bin?
 ¿Está seguro de querer mover el/los siguiente(s) objeto(s) a la Papelera?
 Do you want FreeFileSync to automatically check for updates every week?
-
-Don't ask me again
 
 Donate with PayPal
 Donar usando PayPal
@@ -392,13 +402,11 @@ Exit immediately and set returncode < 0
 Salir inmediatamente y enviar el código < 0
 Exit with RC < 0
 Salir com RC < 0
+External applications
+
 Feedback and suggestions are welcome at:
 Los comentarios y sugerencias será bienvenidos en:
 File %x has an invalid date!
-
-File Manager integration:
-Integración con el Explorador:
-File Time tolerance (seconds):
 
 File already exists. Overwrite?
 El fichero ya existe. ¿Sustituir?
@@ -410,11 +418,9 @@ File list exported!
 Lista de ficheros exportada!
 File size and date
 Fecha y tamaño del fichero
-File times that differ by up to the specified number of seconds are still handled as having same time.
-Las horas de los ficheros que difieren hasta el número de segundos especificados, son consideradas iguales.
 Filename
 Nombre del fichero
-Files %x have a file time difference of less than 1 hour! It's not safe to decide which one is newer due to Daylight Saving Time issues.
+Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
 
 Files %x have the same date but a different size!
 
@@ -424,6 +430,8 @@ Files are found equal if\n     - filesize\n     - last write time and date\nare 
 Los ficheros serán considerados iguales si\n     - la hora y fecha de la última escritura\nson iguales.
 Files remaining:
 Ficheros restantes:
+Files that are equal on both sides
+
 Files that exist on both sides and have different content
 Ficheros que existen en ambos lados y tienen contenidos diferentes
 Files that exist on both sides, left one is newer
@@ -448,8 +456,8 @@ Filter view
 Vista de filtros
 Folder Comparison and Synchronization
 Carpeta de Comparación y Sincronización
-Folder pair
-Par de carpetas
+Free disk space available:
+
 FreeFileSync - Folder Comparison and Synchronization
 FreeFileSync - Comparación y Sincronización de carpetas
 FreeFileSync Batch Job
@@ -470,6 +478,8 @@ Global settings
 Opciones globales
 Help
 Ayuda
+Hidden dialogs:
+
 Hide all error and warning messages
 Ocultar todos los mensajes de error y aviso
 Hide conflicts
@@ -486,10 +496,6 @@ Hide files that exist on left side only
 Ocultar los ficheros que existen sólo en el lado izquierdo
 Hide files that exist on right side only
 Ocultar los ficheros que existen sólo en el lado derecho
-Hide files that will be copied to the left side
-
-Hide files that will be copied to the right side
-
 Hide files that will be created on the left side
 
 Hide files that will be created on the right side
@@ -497,6 +503,10 @@ Hide files that will be created on the right side
 Hide files that will be deleted on the left side
 
 Hide files that will be deleted on the right side
+
+Hide files that will be overwritten on left side
+
+Hide files that will be overwritten on right side
 
 Hide files that won't be copied
 
@@ -530,11 +540,15 @@ Info
 Info
 Information
 Información
-Initialization of Recycle Bin failed!
-¡El inicio de la Papelera falló!
+Integrate external applications into context menu. The following macros are available:
+
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 ¡No fue posible iniciar la Papelera!\n\nEs probable que no esté usando Windows.\nSi quiere que este hecho sea considerado, por favor, contactate con el autor :)
+Leave as unresolved conflict
+
 Left
+
+Legend
 
 Load configuration from file
 Cargar configuración desde fichero
@@ -554,15 +568,15 @@ Move column down
 Mover columna abajo
 Move column up
 Mover columna arriba
-Move files to a custom directory.
-
-Move to custom directory
+Move files to a user-defined directory.
 
 Moving %x to Recycle Bin
 
-Moving %x to custom directory
+Moving file %x to user-defined directory %y
 
-Not all items have been synchronized! Have a look at the list.
+Moving folder %x to user-defined directory %y
+
+Multiple...
 
 Not enough free disk space available in:
 
@@ -576,10 +590,8 @@ Number of files that will be overwritten
 Número de ficheros que serán sustituídos
 OK
 OK
-Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the synchronization directories.
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 
-Open with File Manager\tD-Click
-Abrir con el Explorador\tD-Click
 Operation aborted!
 Operación abortada!
 Operation:
@@ -594,8 +606,6 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 
 Please fill all empty directory fields.
 Por favor, rellene todos los campos del directorio vacíos.
-Please specify alternate directory for deletion!
-
 Press button to activate filter
 Presione el botón para activar el filtro
 Published under the GNU General Public License:
@@ -604,12 +614,16 @@ Question
 
 Quit
 Salir
+Re-enable all hidden dialogs?
+
 RealtimeSync - Automated Synchronization
 
 RealtimeSync configuration
 
 Relative path
 Camino relativo
+Remove alternate settings
+
 Remove folder
 
 Remove folder pair
@@ -618,10 +632,6 @@ Report translation error
 
 Reset
 Reiniciar
-Reset all warning messages
-
-Reset all warning messages?
-¿Reiniciar todos los mensajes de aviso?
 Result
 Resultado
 Right
@@ -640,6 +650,10 @@ Scanning:
 Analizar:
 Select a folder
 Seleccione una carpeta
+Select alternate filter settings
+
+Select alternate synchronization settings
+
 Select logfile directory:
 
 Select variant:
@@ -660,10 +674,6 @@ Show files that exist on left side only
 Mostrar ficheros existentes en la izquierda sólamente
 Show files that exist on right side only
 Mostrar ficheros existentes en la derecha sólamente
-Show files that will be copied to the left side
-
-Show files that will be copied to the right side
-
 Show files that will be created on the left side
 
 Show files that will be created on the right side
@@ -672,7 +682,13 @@ Show files that will be deleted on the left side
 
 Show files that will be deleted on the right side
 
+Show files that will be overwritten on left side
+
+Show files that will be overwritten on right side
+
 Show files that won't be copied
+
+Show hidden dialogs
 
 Show popup
 Mostrar "popups"
@@ -684,8 +700,6 @@ Silent mode
 Modo silencioso
 Size
 Tamaño
-Sorting file list...
-Ordenar lista de ficheros...
 Source code written completely in C++ utilizing:
 Código fuente escrito en C++ utilizando:
 Speed:
@@ -728,8 +742,6 @@ Target file already existing!
 ¡El fichero objetivo existe ya!
 The file does not contain a valid configuration:
 El fichero no contiene una configuración válida:
-This commandline will be executed on each doubleclick. The following macros are available:
-
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Esta variante evalúa dos ficheros con el mismo nombre como iguales cuando tienen el mismo tamaño Y la misma fecha de modificación.
 Time
@@ -766,7 +778,13 @@ Use Recycle Bin
 Utilizar la Papelera
 Use Recycle Bin when deleting or overwriting files.
 
+User-defined directory
+
+User-defined directory for deletion was not specified!
+
 Variant
+
+Verifying file %x
 
 Volume name %x not part of filename %y!
 
@@ -774,8 +792,6 @@ Warning
 Atención
 Warning: Synchronization failed for %x item(s):
 Atención: La sincronización falló para %x item(s):
-Warnings:
-Avisos:
 When the comparison is started with this option set the following decision tree is processed:
 Cuando la comparación se inicia con este conjunto de opciones, se procesa el siguiente árbol de decisiones:
 You can ignore the error to consider not existing directories as empty.

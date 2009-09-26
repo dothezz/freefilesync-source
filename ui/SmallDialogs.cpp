@@ -1,5 +1,4 @@
 #include "smallDialogs.h"
-#include "../shared/globalFunctions.h"
 #include "../library/resources.h"
 #include "../algorithm.h"
 #include "../synchronization.h"
@@ -11,6 +10,7 @@
 #include "../shared/fileHandling.h"
 #include "../library/statusHandler.h"
 #include <wx/wupdlock.h>
+#include "../shared/globalFunctions.h"
 
 using namespace FreeFileSync;
 
@@ -168,14 +168,14 @@ void FilterDlg::OnDefault(wxCommandEvent& event)
 }
 
 
-void FilterDlg::OnOK(wxCommandEvent& event)
+void FilterDlg::OnApply(wxCommandEvent& event)
 {
     //only if user presses ApplyFilter, he wants the changes to be committed
     includeFilter = m_textCtrlInclude->GetValue();
     excludeFilter = m_textCtrlExclude->GetValue();
 
     //when leaving dialog: filter and redraw grid, if filter is active
-    EndModal(BUTTON_OKAY);
+    EndModal(BUTTON_APPLY);
 }
 
 
@@ -193,14 +193,12 @@ void FilterDlg::OnClose(wxCloseEvent& event)
 
 //########################################################################################
 DeleteDialog::DeleteDialog(wxWindow* main,
-                           const FreeFileSync::FolderComparison& folderCmp,
-                           const FreeFileSync::FolderCompRef& rowsOnLeft,
-                           const FreeFileSync::FolderCompRef& rowsOnRight,
+                           const std::vector<FileSystemObject*>& rowsOnLeft,
+                           const std::vector<FileSystemObject*>& rowsOnRight,
                            bool& deleteOnBothSides,
                            bool& useRecycleBin,
                            int& totalDeleteCount) :
         DeleteDlgGenerated(main),
-        m_folderCmp(folderCmp),
         rowsToDeleteOnLeft(rowsOnLeft),
         rowsToDeleteOnRight(rowsOnRight),
         m_deleteOnBothSides(deleteOnBothSides),
@@ -217,41 +215,25 @@ DeleteDialog::DeleteDialog(wxWindow* main,
 
 void DeleteDialog::updateTexts()
 {
-    wxString headerText;
     if (m_checkBoxUseRecycler->GetValue())
     {
-        headerText = _("Do you really want to move the following objects(s) to the Recycle Bin?");
+        m_staticTextHeader->SetLabel(_("Do you really want to move the following objects(s) to the Recycle Bin?"));
         m_bitmap12->SetBitmap(*GlobalResources::getInstance().bitmapRecycler);
     }
     else
     {
-        headerText = _("Do you really want to delete the following objects(s)?");
+        m_staticTextHeader->SetLabel(_("Do you really want to delete the following objects(s)?"));
         m_bitmap12->SetBitmap(*GlobalResources::getInstance().bitmapDeleteFile);
     }
-    m_staticTextHeader->SetLabel(headerText);
 
-    assert(m_folderCmp.size() == rowsToDeleteOnLeft.size());
-    assert(m_folderCmp.size() == rowsToDeleteOnRight.size());
+    const std::pair<wxString, int> delInfo = FreeFileSync::deleteFromGridAndHDPreview(
+                rowsToDeleteOnLeft,
+                rowsToDeleteOnRight,
+                m_checkBoxDeleteBothSides->GetValue());
 
-    wxString filesToDelete;
-    totalDelCount = 0;
-    for (FolderComparison::const_iterator j = m_folderCmp.begin(); j != m_folderCmp.end(); ++j)
-    {
-        const FileComparison& fileCmp = j->fileCmp;
+    const wxString filesToDelete = delInfo.first;
+    totalDelCount = delInfo.second;
 
-        const int pairIndex = j - m_folderCmp.begin();
-        if (    pairIndex < int(rowsToDeleteOnLeft.size()) && //just to be sure
-                pairIndex < int(rowsToDeleteOnRight.size()))
-        {
-            const std::pair<wxString, int> delInfo = FreeFileSync::deleteFromGridAndHDPreview(fileCmp,
-                    rowsToDeleteOnLeft[pairIndex],
-                    rowsToDeleteOnRight[pairIndex],
-                    m_checkBoxDeleteBothSides->GetValue());
-
-            filesToDelete += delInfo.first;
-            totalDelCount += delInfo.second;
-        }
-    }
     m_textCtrlMessage->SetValue(filesToDelete);
 
     Layout();
@@ -636,10 +618,13 @@ void SyncPreviewDlg::OnStartSync(wxCommandEvent& event)
 
 //########################################################################################
 
-CompareCfgDialog::CompareCfgDialog(wxWindow* parentWindow, CompareVariant& cmpVar) :
+CompareCfgDialog::CompareCfgDialog(wxWindow* parentWindow, const wxPoint& position, CompareVariant& cmpVar) :
         CmpCfgDlgGenerated(parentWindow),
         m_cmpVar(cmpVar)
 {
+    //move dialog up so that compare-config button and first config-variant are on same level
+    Move(wxPoint(position.x, std::max(0, position.y - (m_buttonTimeSize->GetScreenPosition() - GetScreenPosition()).y)));
+
     m_bpButtonHelp->SetBitmapLabel(*GlobalResources::getInstance().bitmapHelp);
 
     switch (cmpVar)
@@ -695,21 +680,22 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSetti
         settings(globalSettings)
 {
     m_bitmapSettings->SetBitmap(*GlobalResources::getInstance().bitmapSettings);
-    m_buttonResetWarnings->setBitmapFront(*GlobalResources::getInstance().bitmapWarningSmall, 5);
+    m_buttonResetDialogs->setBitmapFront(*GlobalResources::getInstance().bitmapWarningSmall, 5);
+    m_bpButtonAddRow->SetBitmapLabel(*GlobalResources::getInstance().bitmapAddFolderPair);
+    m_bpButtonRemoveRow->SetBitmapLabel(*GlobalResources::getInstance().bitmapRemoveFolderPair);
 
-    m_spinCtrlFileTimeTolerance->SetValue(globalSettings.fileTimeTolerance);
     m_checkBoxIgnoreOneHour->SetValue(globalSettings.ignoreOneHourDiff);
 
-    m_textCtrlCommand->SetValue(globalSettings.gui.commandLineFileManager);
+    set(globalSettings.gui.externelApplications);
 
-    const wxString toolTip = wxString(_("This commandline will be executed on each doubleclick. The following macros are available:")) + wxT("\n\n") +
+    const wxString toolTip = wxString(_("Integrate external applications into context menu. The following macros are available:")) + wxT("\n\n") +
                              wxT("%name   \t") + _("- full file or directory name") + wxT("\n") +
-                             wxT("%dir    \t") + _("- directory part only") + wxT("\n") +
-                             wxT("%nameCo \t") + _("- sibling of %name") + wxT("\n") +
-                             wxT("%dirCo  \t") + _("- sibling of %dir");
+                             wxT("%dir      \t") + _("- directory part only") + wxT("\n") +
+                             wxT("%nameCo \t") + _("- Other side's counterpart to %name") + wxT("\n") +
+                             wxT("%dirCo   \t") + _("- Other side's counterpart to %dir");
 
-    m_staticTextCommand->SetToolTip(toolTip);
-    m_textCtrlCommand->SetToolTip(toolTip);
+    m_gridCustomCommand->GetGridWindow()->SetToolTip(toolTip);
+    m_gridCustomCommand->GetGridColLabelWindow()->SetToolTip(toolTip);
 
     m_buttonOkay->SetFocus();
 
@@ -720,32 +706,29 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSetti
 void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 {
     //write global settings only when okay-button is pressed!
-    settings.fileTimeTolerance = m_spinCtrlFileTimeTolerance->GetValue();
     settings.ignoreOneHourDiff = m_checkBoxIgnoreOneHour->GetValue();
 
-    settings.gui.commandLineFileManager = m_textCtrlCommand->GetValue();
+    settings.gui.externelApplications = getExtApp();
 
     EndModal(BUTTON_OKAY);
 }
 
 
-void GlobalSettingsDlg::OnResetWarnings(wxCommandEvent& event)
+void GlobalSettingsDlg::OnResetDialogs(wxCommandEvent& event)
 {
-    wxMessageDialog* messageDlg = new wxMessageDialog(this, _("Reset all warning messages?"), _("Warning") , wxOK | wxCANCEL);
+    wxMessageDialog* messageDlg = new wxMessageDialog(this, _("Re-enable all hidden dialogs?"), _("Warning") , wxOK | wxCANCEL);
     if (messageDlg->ShowModal() == wxID_OK)
-        settings.warnings.resetWarnings();
+        settings.optDialogs.resetDialogs();
 }
 
 
 void GlobalSettingsDlg::OnDefault(wxCommandEvent& event)
 {
-    m_spinCtrlFileTimeTolerance->SetValue(2);
-    m_checkBoxIgnoreOneHour->SetValue(true);
-#ifdef FFS_WIN
-    m_textCtrlCommand->SetValue(wxT("explorer /select, %name"));
-#elif defined FFS_LINUX
-    m_textCtrlCommand->SetValue(wxT("konqueror \"%dir\""));
-#endif
+    xmlAccess::XmlGlobalSettings defaultCfg;
+
+    m_checkBoxIgnoreOneHour->SetValue(defaultCfg.ignoreOneHourDiff);
+
+    set(defaultCfg.gui.externelApplications);
 }
 
 
@@ -760,6 +743,54 @@ void GlobalSettingsDlg::OnClose(wxCloseEvent& event)
     EndModal(0);
 }
 
+
+void GlobalSettingsDlg::set(const xmlAccess::ExternalApps& extApp)
+{
+    const int rowCount = m_gridCustomCommand->GetNumberRows();
+    if (rowCount > 0)
+        m_gridCustomCommand->DeleteRows(0, rowCount);
+
+    m_gridCustomCommand->AppendRows(extApp.size());
+    for (xmlAccess::ExternalApps::const_iterator i = extApp.begin(); i != extApp.end(); ++i)
+    {
+        const int row = i - extApp.begin();
+        m_gridCustomCommand->SetCellValue(row, 0, i->first);  //description
+        m_gridCustomCommand->SetCellValue(row, 1, i->second); //commandline
+    }
+    Fit();
+}
+
+
+xmlAccess::ExternalApps GlobalSettingsDlg::getExtApp()
+{
+    xmlAccess::ExternalApps output;
+    for (int i = 0; i < m_gridCustomCommand->GetNumberRows(); ++i)
+        output.push_back(
+            std::make_pair(m_gridCustomCommand->GetCellValue(i, 0),   //description
+                           m_gridCustomCommand->GetCellValue(i, 1))); //commandline
+    return output;
+}
+
+
+void GlobalSettingsDlg::OnAddRow(wxCommandEvent& event)
+{
+    wxWindowUpdateLocker dummy(this); //avoid display distortion
+
+    m_gridCustomCommand->AppendRows();
+    Fit();
+}
+
+
+void GlobalSettingsDlg::OnRemoveRow(wxCommandEvent& event)
+{
+    if (m_gridCustomCommand->GetNumberRows() > 0)
+    {
+        wxWindowUpdateLocker dummy(this); //avoid display distortion
+
+        m_gridCustomCommand->DeleteRows(m_gridCustomCommand->GetNumberRows() - 1);
+        Fit();
+    }
+}
 
 //########################################################################################
 
@@ -1058,7 +1089,7 @@ void SyncStatus::updateStatusDialogNow()
         }
 
         //time elapsed
-        const wxString timeElapsedTmp = (wxTimeSpan::Milliseconds(timeElapsed.Time())).Format();
+        const wxString timeElapsedTmp = wxTimeSpan::Milliseconds(timeElapsed.Time()).Format();
         if (m_staticTextTimeElapsed->GetLabel() != timeElapsedTmp && (screenChanged = true)) //avoid screen flicker
             m_staticTextTimeElapsed->SetLabel(timeElapsedTmp);
 

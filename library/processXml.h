@@ -32,8 +32,12 @@ namespace xmlAccess
     };
     typedef std::vector<ColumnAttrib> ColumnAttributes;
 
-//---------------------------------------------------------------------
 
+    typedef wxString Description;
+    typedef wxString Commandline;
+    typedef std::vector<std::pair<Description, Commandline> > ExternalApps;
+
+//---------------------------------------------------------------------
     struct XmlGuiConfig
     {
         XmlGuiConfig() :
@@ -42,7 +46,6 @@ namespace xmlAccess
                 syncPreviewEnabled(true) {} //initialize values
 
         FreeFileSync::MainConfiguration mainCfg;
-        std::vector<FreeFileSync::FolderPair> directoryPairs;
 
         bool hideFilteredElements;
         bool ignoreErrors; //reaction on error situation during synchronization
@@ -51,7 +54,6 @@ namespace xmlAccess
         bool operator==(const XmlGuiConfig& other) const
         {
             return mainCfg                == other.mainCfg               &&
-                   directoryPairs         == other.directoryPairs        &&
                    hideFilteredElements   == other.hideFilteredElements  &&
                    ignoreErrors           == other.ignoreErrors          &&
                    syncPreviewEnabled     == other.syncPreviewEnabled;
@@ -69,7 +71,6 @@ namespace xmlAccess
         XmlBatchConfig() : silent(false), handleError(ON_ERROR_POPUP) {}
 
         FreeFileSync::MainConfiguration mainCfg;
-        std::vector<FreeFileSync::FolderPair> directoryPairs;
 
         bool silent;
         OnError handleError;       //reaction on error situation during synchronization
@@ -80,19 +81,21 @@ namespace xmlAccess
     bool recycleBinAvailable();
 
 
-    struct WarningMessages
+    struct OptionalDialogs
     {
-        WarningMessages()
+        OptionalDialogs()
         {
-            resetWarnings();
+            resetDialogs();
         }
 
-        void resetWarnings();
+        void resetDialogs();
 
         bool warningDependentFolders;
         bool warningSignificantDifference;
         bool warningNotEnoughDiskSpace;
         bool warningUnresolvedConflicts;
+        bool popupOnConfigChange;
+        bool showSummaryBeforeSync;
     };
 
 
@@ -102,20 +105,14 @@ namespace xmlAccess
         //Shared (GUI/BATCH) settings
         XmlGlobalSettings() :
                 programLanguage(retrieveSystemLanguage()),
-                fileTimeTolerance(2),  //default 2s: FAT vs NTFS
-                ignoreOneHourDiff(true),
-                traverseDirectorySymlinks(false),
-                copyFileSymlinks(true),
+                ignoreOneHourDiff(false),
                 lastUpdateCheck(0) {}
 
         int programLanguage;
-        unsigned int fileTimeTolerance; //max. allowed file time deviation
         bool ignoreOneHourDiff; //ignore +/- 1 hour due to DST change
-        bool traverseDirectorySymlinks;
-        bool copyFileSymlinks; //copy symbolic link instead of target file
-        long lastUpdateCheck;  //time of last update check
+        long lastUpdateCheck;   //time of last update check
 
-        WarningMessages warnings;
+        OptionalDialogs optDialogs;
 
 //---------------------------------------------------------------------
         struct _Gui
@@ -128,11 +125,6 @@ namespace xmlAccess
                     isMaximized(false),
                     autoAdjustColumnsLeft(false),
                     autoAdjustColumnsRight(false),
-#ifdef FFS_WIN
-                    commandLineFileManager(wxT("explorer /select, %name")),
-#elif defined FFS_LINUX
-                    commandLineFileManager(wxT("konqueror \"%dir\"")),
-#endif
                     cfgHistoryMax(10),
                     folderHistLeftMax(12),
                     folderHistRightMax(12),
@@ -140,9 +132,14 @@ namespace xmlAccess
                     deleteOnBothSides(false),
                     useRecyclerForManualDeletion(recycleBinAvailable()), //enable if OS supports it; else user will have to activate first and then get an error message
                     showFileIconsLeft(true),
-                    showFileIconsRight(true),
-                    popupOnConfigChange(true),
-                    showSummaryBeforeSync(true) {}
+                    showFileIconsRight(true)
+            {
+#ifdef FFS_WIN
+                externelApplications.push_back(std::make_pair(wxT("Open with Explorer"), wxT("explorer /select, %name")));
+#elif defined FFS_LINUX
+                externelApplications.push_back(std::make_pair(wxT("Open with Konqueror"), wxT("konqueror \"%dir\"")));
+#endif
+            }
 
             int widthNotMaximized;
             int heightNotMaximized;
@@ -156,7 +153,7 @@ namespace xmlAccess
             bool autoAdjustColumnsLeft;
             bool autoAdjustColumnsRight;
 
-            wxString commandLineFileManager;
+            ExternalApps externelApplications;
 
             std::vector<wxString> cfgFileHistory;
             unsigned int cfgHistoryMax;
@@ -173,8 +170,6 @@ namespace xmlAccess
             bool useRecyclerForManualDeletion;
             bool showFileIconsLeft;
             bool showFileIconsRight;
-            bool popupOnConfigChange;
-            bool showSummaryBeforeSync;
         } gui;
 
 //---------------------------------------------------------------------
@@ -209,6 +204,8 @@ namespace xmlAccess
     void readGuiConfig(  const wxString& filename, XmlGuiConfig&      config); //throw (xmlAccess::XmlError);
     void readBatchConfig(const wxString& filename, XmlBatchConfig&    config); //throw (xmlAccess::XmlError);
     void readGlobalSettings(                       XmlGlobalSettings& config); //throw (xmlAccess::XmlError);
+
+    void readGuiOrBatchConfig(const wxString& filename, XmlGuiConfig& config);  //throw (xmlAccess::XmlError);
 
     void writeGuiConfig(     const XmlGuiConfig&      outputCfg, const wxString& filename); //throw (xmlAccess::XmlError);
     void writeBatchConfig(   const XmlBatchConfig&    outputCfg, const wxString& filename); //throw (xmlAccess::XmlError);

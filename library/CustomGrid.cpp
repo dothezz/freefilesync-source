@@ -1,5 +1,5 @@
 #include "customGrid.h"
-#include "../shared/globalFunctions.h"
+#include "../shared/systemConstants.h"
 #include "resources.h"
 #include <wx/dc.h>
 #include "../algorithm.h"
@@ -73,7 +73,7 @@ public:
     virtual int GetNumberRows()
     {
         if (gridDataView)
-            return std::max(gridDataView->elementsOnView(), MIN_ROW_COUNT);
+            return std::max(gridDataView->rowsOnView(), MIN_ROW_COUNT);
         else
             return 0; //grid is initialized with zero number of rows
     }
@@ -180,12 +180,11 @@ public:
     }
 
 
-    const FileCompareLine* getRawData(const unsigned int row) const
+    const FileSystemObject* getRawData(const unsigned int row) const
     {
-        if (gridDataView && row < gridDataView->elementsOnView())
-        {
-            return &(*gridDataView)[row];
-        }
+        if (gridDataView)
+            return gridDataView->getObject(row); //returns NULL if request is not valid or not data found
+
         return NULL;
     }
 
@@ -212,6 +211,8 @@ private:
 class CustomGridTableRim : public CustomGridTable
 {
 public:
+    virtual ~CustomGridTableRim() {}
+
     virtual int GetNumberCols()
     {
         return columnPositions.size();
@@ -240,53 +241,55 @@ public:
 
     virtual Zstring getFileName(const unsigned int row) const = 0;
 
-private:
-    std::vector<xmlAccess::ColumnTypes> columnPositions;
-};
-
-
-class CustomGridTableLeft : public CustomGridTableRim
-{
-public:
-    virtual wxString GetValue(int row, int col)
+protected:
+    template <SelectedSide side>
+    wxString GetValueSub(int row, int col)
     {
-        const FileCompareLine* gridLine = getRawData(row);
-        if (gridLine)
+        const FileSystemObject* fsObj = getRawData(row);
+        if (fsObj)
         {
-            if (gridLine->fileDescrLeft.objType == FileDescrLine::TYPE_DIRECTORY)
+            if (!fsObj->isEmpty<side>())
             {
-                switch (getTypeAtPos(col))
+                const DirMapping* dirObj = dynamic_cast<const DirMapping*> (fsObj);
+                if (dirObj != NULL)
                 {
-                case xmlAccess::FULL_PATH:
-                    return wxString(gridLine->fileDescrLeft.fullName.c_str());
-                case xmlAccess::FILENAME:
-                    return wxEmptyString;
-                case xmlAccess::REL_PATH:
-                    return gridLine->fileDescrLeft.relativeName.c_str();
-                case xmlAccess::DIRECTORY:
-                    return gridDataView->getFolderPair(row).leftDirectory.c_str();
-                case xmlAccess::SIZE: //file size
-                    return _("<Directory>");
-                case xmlAccess::DATE: //date
-                    return wxEmptyString;
+                    switch (getTypeAtPos(col))
+                    {
+                    case xmlAccess::FULL_PATH:
+                        return dirObj->getFullName<side>().c_str();
+                    case xmlAccess::FILENAME:
+                        return wxEmptyString;
+                    case xmlAccess::REL_PATH:
+                        return dirObj->getRelativeName<side>().c_str();
+                    case xmlAccess::DIRECTORY:
+                        return dirObj->getBaseDirPf<side>().c_str();
+                    case xmlAccess::SIZE: //file size
+                        return _("<Directory>");
+                    case xmlAccess::DATE: //date
+                        return wxEmptyString;
+                    }
                 }
-            }
-            else if (gridLine->fileDescrLeft.objType == FileDescrLine::TYPE_FILE)
-            {
-                switch (getTypeAtPos(col))
+                else
                 {
-                case xmlAccess::FULL_PATH:
-                    return wxString(gridLine->fileDescrLeft.fullName.c_str()).BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);
-                case xmlAccess::FILENAME: //filename
-                    return wxString(gridLine->fileDescrLeft.relativeName.c_str()).AfterLast(globalFunctions::FILE_NAME_SEPARATOR);
-                case xmlAccess::REL_PATH: //relative path
-                    return wxString(gridLine->fileDescrLeft.relativeName.c_str()).BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);
-                case xmlAccess::DIRECTORY:
-                    return gridDataView->getFolderPair(row).leftDirectory.c_str();
-                case xmlAccess::SIZE: //file size
-                    return FreeFileSync::includeNumberSeparator(gridLine->fileDescrLeft.fileSize.ToString());
-                case xmlAccess::DATE: //date
-                    return FreeFileSync::utcTimeToLocalString(gridLine->fileDescrLeft.lastWriteTimeRaw, gridLine->fileDescrLeft.fullName);
+                    const FileMapping* fileObj = dynamic_cast<const FileMapping*>(fsObj);
+                    if (fileObj != NULL)
+                    {
+                        switch (getTypeAtPos(col))
+                        {
+                        case xmlAccess::FULL_PATH:
+                            return fileObj->getFullName<side>().BeforeLast(globalFunctions::FILE_NAME_SEPARATOR).c_str();
+                        case xmlAccess::FILENAME: //filename
+                            return fileObj->getShortName<side>().c_str();
+                        case xmlAccess::REL_PATH: //relative path
+                            return fileObj->getParentRelativeName<side>().c_str();
+                        case xmlAccess::DIRECTORY:
+                            return fileObj->getBaseDirPf<side>().c_str();
+                        case xmlAccess::SIZE: //file size
+                            return FreeFileSync::includeNumberSeparator(fileObj->getFileSize<side>().ToString());
+                        case xmlAccess::DATE: //date
+                            return FreeFileSync::utcTimeToLocalString(fileObj->getLastWriteTime<side>(), fileObj->getFullName<side>());
+                        }
+                    }
                 }
             }
         }
@@ -295,32 +298,44 @@ public:
     }
 
 
-    virtual Zstring getFileName(const unsigned int row) const
-    {
-        const FileCompareLine* gridLine = getRawData(row);
-        if (gridLine)
-            return Zstring(gridLine->fileDescrLeft.fullName);
-        else
-            return Zstring();
-    }
-
-
 private:
     virtual const wxColour& getRowColor(int row) //rows that are filtered out are shown in different color
     {
-        const FileCompareLine* gridLine = getRawData(row);
-        if (gridLine)
+        const FileSystemObject* fsObj = getRawData(row);
+        if (fsObj)
         {
             //mark filtered rows
-            if (!gridLine->selectedForSynchronization)
+            if (!fsObj->selectedForSynchronization)
                 return COLOR_BLUE;
             //mark directories
-            else if (gridLine->fileDescrLeft.objType == FileDescrLine::TYPE_DIRECTORY)
+            else if (dynamic_cast<const DirMapping*>(fsObj) != NULL)
                 return COLOR_GREY;
             else
                 return *wxWHITE;
         }
         return *wxWHITE;
+    }
+
+    std::vector<xmlAccess::ColumnTypes> columnPositions;
+};
+
+
+class CustomGridTableLeft : public CustomGridTableRim
+{
+public:
+
+    virtual wxString GetValue(int row, int col)
+    {
+        return CustomGridTableRim::GetValueSub<LEFT_SIDE>(row, col);
+    }
+
+    virtual Zstring getFileName(const unsigned int row) const
+    {
+        const FileSystemObject* fsObj = getRawData(row);
+        if (fsObj && !fsObj->isEmpty<LEFT_SIDE>())
+            return fsObj->getFullName<LEFT_SIDE>();
+        else
+            return Zstring();
     }
 };
 
@@ -330,77 +345,16 @@ class CustomGridTableRight : public CustomGridTableRim
 public:
     virtual wxString GetValue(int row, int col)
     {
-        const FileCompareLine* gridLine = getRawData(row);
-        if (gridLine)
-        {
-            if (gridLine->fileDescrRight.objType == FileDescrLine::TYPE_DIRECTORY)
-            {
-                switch (getTypeAtPos(col))
-                {
-                case xmlAccess::FULL_PATH:
-                    return wxString(gridLine->fileDescrRight.fullName.c_str());
-                case xmlAccess::FILENAME: //filename
-                    return wxEmptyString;
-                case xmlAccess::REL_PATH: //relative path
-                    return gridLine->fileDescrRight.relativeName.c_str();
-                case xmlAccess::DIRECTORY:
-                    return gridDataView->getFolderPair(row).rightDirectory.c_str();
-                case xmlAccess::SIZE: //file size
-                    return _("<Directory>");
-                case xmlAccess::DATE: //date
-                    return wxEmptyString;
-                }
-            }
-            else if (gridLine->fileDescrRight.objType == FileDescrLine::TYPE_FILE)
-            {
-                switch (getTypeAtPos(col))
-                {
-                case xmlAccess::FULL_PATH:
-                    return wxString(gridLine->fileDescrRight.fullName.c_str()).BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);
-                case xmlAccess::FILENAME: //filename
-                    return wxString(gridLine->fileDescrRight.relativeName.c_str()).AfterLast(globalFunctions::FILE_NAME_SEPARATOR);
-                case xmlAccess::REL_PATH: //relative path
-                    return wxString(gridLine->fileDescrRight.relativeName.c_str()).BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);
-                case xmlAccess::DIRECTORY:
-                    return gridDataView->getFolderPair(row).rightDirectory.c_str();
-                case xmlAccess::SIZE: //file size
-                    return FreeFileSync::includeNumberSeparator(gridLine->fileDescrRight.fileSize.ToString());
-                case xmlAccess::DATE: //date
-                    return FreeFileSync::utcTimeToLocalString(gridLine->fileDescrRight.lastWriteTimeRaw, gridLine->fileDescrRight.fullName);
-                }
-            }
-        }
-        //if data is not found:
-        return wxEmptyString;
+        return CustomGridTableRim::GetValueSub<RIGHT_SIDE>(row, col);
     }
-
 
     virtual Zstring getFileName(const unsigned int row) const
     {
-        const FileCompareLine* gridLine = getRawData(row);
-        if (gridLine)
-            return Zstring(gridLine->fileDescrRight.fullName);
+        const FileSystemObject* fsObj = getRawData(row);
+        if (fsObj && !fsObj->isEmpty<RIGHT_SIDE>())
+            return fsObj->getFullName<RIGHT_SIDE>();
         else
             return Zstring();
-    }
-
-
-private:
-    virtual const wxColour& getRowColor(int row) //rows that are filtered out are shown in different color
-    {
-        const FileCompareLine* gridLine = getRawData(row);
-        if (gridLine)
-        {
-            //mark filtered rows
-            if (!gridLine->selectedForSynchronization)
-                return COLOR_BLUE;
-            //mark directories
-            else if (gridLine->fileDescrRight.objType == FileDescrLine::TYPE_DIRECTORY)
-                return COLOR_GREY;
-            else
-                return *wxWHITE;
-        }
-        return *wxWHITE;
     }
 };
 
@@ -423,8 +377,16 @@ public:
         return wxEmptyString;
     }
 
-    virtual wxString GetValue(int row, int col)
+    virtual wxString GetValue(int row, int col) //method used for exporting .csv file only!
     {
+        const FileSystemObject* fsObj = getRawData(row);
+        if (fsObj)
+        {
+            if (syncPreviewActive) //synchronization preview
+                return getSymbol(getSyncOperation(*fsObj));
+            else
+                return getSymbol(fsObj->getCategory());
+        }
         return wxEmptyString;
     }
 
@@ -441,30 +403,31 @@ public:
 private:
     virtual const wxColour& getRowColor(int row) //rows that are filtered out are shown in different color
     {
-        const FileCompareLine* gridLine = getRawData(row);
-        if (gridLine)
+        const FileSystemObject* fsObj = getRawData(row);
+        if (fsObj)
         {
             //mark filtered rows
-            if (!gridLine->selectedForSynchronization)
+            if (!fsObj->selectedForSynchronization)
                 return COLOR_BLUE;
 
             if (syncPreviewActive) //synchronization preview
             {
-                switch (gridLine->syncDir)
+                switch (fsObj->syncDir)
                 {
                 case SYNC_DIR_LEFT:
                     return COLOR_SYNC_BLUE;
                 case SYNC_DIR_RIGHT:
                     return COLOR_SYNC_GREEN;
                 case SYNC_DIR_NONE:
-                    return *wxWHITE;
-                case SYNC_UNRESOLVED_CONFLICT:
-                    return COLOR_YELLOW;
+                    if (fsObj->getCategory() == FILE_CONFLICT)
+                        return COLOR_YELLOW;
+                    else
+                        return *wxWHITE;
                 }
             }
             else //comparison results view
             {
-                switch (gridLine->cmpResult)
+                switch (fsObj->getCategory())
                 {
                 case FILE_LEFT_SIDE_ONLY:
                 case FILE_RIGHT_SIDE_ONLY:
@@ -539,7 +502,8 @@ void CustomGrid::initSettings(CustomGridLeft*   gridLeft,
     Connect(wxEVT_SCROLLWIN_THUMBRELEASE,        wxEventHandler(CustomGrid::onGridAccess), NULL, this);
     Connect(wxEVT_GRID_LABEL_LEFT_CLICK,         wxEventHandler(CustomGrid::onGridAccess), NULL, this);
     GetGridWindow()->Connect(wxEVT_LEFT_DOWN,    wxEventHandler(CustomGrid::onGridAccess), NULL, this);
-    GetGridWindow()->Connect(wxEVT_RIGHT_DOWN,    wxEventHandler(CustomGrid::onGridAccess), NULL, this);
+    GetGridWindow()->Connect(wxEVT_RIGHT_DOWN,   wxEventHandler(CustomGrid::onGridAccess), NULL, this);
+
     GetGridWindow()->Connect(wxEVT_ENTER_WINDOW, wxEventHandler(CustomGrid::adjustGridHeights), NULL, this);
 }
 
@@ -573,7 +537,7 @@ inline
 void moveCursorWhileSelecting(const int anchor, const int oldPos, const int newPos, wxGrid* grid)
 {   //note: all positions are valid in this context!
 
-    grid->SetGridCursor(newPos, grid->GetGridCursorCol());
+    grid->SetGridCursor(  newPos, grid->GetGridCursorCol());
     grid->MakeCellVisible(newPos, grid->GetGridCursorCol());
 
     if (oldPos < newPos)
@@ -595,23 +559,24 @@ void moveCursorWhileSelecting(const int anchor, const int oldPos, const int newP
 }
 
 
-inline
-void additionalGridCommands(wxEvent& event, wxGrid* grid)
+void execGridCommands(wxEvent& event, wxGrid* grid)
 {
     static int anchorRow = 0;
-    assert(grid->GetNumberRows() != 0);
+    if (    grid->GetNumberRows() == 0 ||
+            grid->GetNumberCols() == 0)
+        return;
 
-    try
+    const wxKeyEvent* keyEvent = dynamic_cast<const wxKeyEvent*> (&event);
+    if (keyEvent)
     {
-        const wxKeyEvent& keyEvent = dynamic_cast<const wxKeyEvent&> (event);
+        //ensure cursorOldPos is always a valid row!
+        const int cursorOldPos    = std::max(std::min(grid->GetGridCursorRow(), grid->GetNumberRows() - 1), 0);
+        const int cursorOldColumn = std::max(std::min(grid->GetGridCursorCol(), grid->GetNumberCols() - 1), 0);
 
-        if (keyEvent.ShiftDown())
+        if (keyEvent->ShiftDown())
         {
-            //ensure cursorOldPos is always a valid row!
-            const int cursorOldPos = std::max(std::min(grid->GetGridCursorRow(), grid->GetNumberRows() - 1), 0);
-
             //support for shift + PageUp and shift + PageDown
-            switch (keyEvent.GetKeyCode())
+            switch (keyEvent->GetKeyCode())
             {
             case WXK_UP: //move grid cursor also
             {
@@ -626,6 +591,23 @@ void additionalGridCommands(wxEvent& event, wxGrid* grid)
                 moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
             }
             return; //no event.Skip()
+
+            case WXK_LEFT: //move grid cursor also
+            {
+                const int cursorColumn = std::max(cursorOldColumn - 1, 0);
+                grid->SetGridCursor(cursorOldPos, cursorColumn);
+                grid->MakeCellVisible(cursorOldPos, cursorColumn);
+            }
+            return; //no event.Skip()
+
+            case WXK_RIGHT: //move grid cursor also
+            {
+                const int cursorColumn = std::min(cursorOldColumn + 1, grid->GetNumberCols() - 1);
+                grid->SetGridCursor(cursorOldPos, cursorColumn);
+                grid->MakeCellVisible(cursorOldPos, cursorColumn);
+            }
+            return; //no event.Skip()
+
 
             case WXK_PAGEUP:
             case WXK_NUMPAD_PAGEUP:
@@ -665,8 +647,59 @@ void additionalGridCommands(wxEvent& event, wxGrid* grid)
         }
         else //button without shift is pressed
         {
-            switch (keyEvent.GetKeyCode())
+            switch (keyEvent->GetKeyCode())
             {
+            case WXK_UP: //move grid cursor also
+            {
+                const int cursorNewPos = std::max(cursorOldPos - 1, 0);
+                grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
+                grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
+            }
+            return; //no event.Skip()
+            case WXK_DOWN: //move grid cursor also
+            {
+                const int cursorNewPos = std::min(cursorOldPos + 1, grid->GetNumberRows() - 1);
+                grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
+                grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
+            }
+            return; //no event.Skip()
+
+            case WXK_LEFT: //move grid cursor also
+            {
+                const int cursorColumn = std::max(cursorOldColumn - 1, 0);
+                grid->SetGridCursor(cursorOldPos, cursorColumn);
+                grid->MakeCellVisible(cursorOldPos, cursorColumn);
+            }
+            return; //no event.Skip()
+            case WXK_RIGHT: //move grid cursor also
+            {
+                const int cursorColumn = std::min(cursorOldColumn + 1, grid->GetNumberCols() - 1);
+                grid->SetGridCursor(cursorOldPos, cursorColumn);
+                grid->MakeCellVisible(cursorOldPos, cursorColumn);
+            }
+            return; //no event.Skip()
+
+
+            case WXK_PAGEUP:
+            case WXK_NUMPAD_PAGEUP:
+            {
+                const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
+                const int cursorNewPos = std::max(cursorOldPos - rowsPerPage, 0);
+                grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
+                grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
+            }
+            return; //no event.Skip()
+
+            case WXK_PAGEDOWN:
+            case WXK_NUMPAD_PAGEDOWN:
+            {
+                const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
+                const int cursorNewPos = std::min(cursorOldPos + rowsPerPage, grid->GetNumberRows() - 1);
+                grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
+                grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
+            }
+            return; //no event.Skip()
+
             case WXK_HOME:
             case WXK_NUMPAD_HOME:
                 grid->SetGridCursor(0, grid->GetGridCursorCol());
@@ -681,62 +714,58 @@ void additionalGridCommands(wxEvent& event, wxGrid* grid)
             }
         }
     }
-    catch (std::bad_cast&) {}
 
     anchorRow = grid->GetGridCursorRow();
-    event.Skip();
+    event.Skip(); //let event delegate!
 }
 
 
 inline
 bool gridsShouldBeCleared(const wxEvent& event)
 {
-    try
+    const wxMouseEvent* mouseEvent = dynamic_cast<const wxMouseEvent*>(&event);
+    if (mouseEvent)
     {
-        const wxMouseEvent& mouseEvent = dynamic_cast<const wxMouseEvent&> (event);
-
-        if (mouseEvent.ControlDown() || mouseEvent.ShiftDown())
+        if (mouseEvent->ControlDown() || mouseEvent->ShiftDown())
             return false;
 
-        if (mouseEvent.ButtonDown(wxMOUSE_BTN_LEFT))
+        if (mouseEvent->ButtonDown(wxMOUSE_BTN_LEFT))
             return true;
 
         return false;
     }
-    catch (std::bad_cast&) {}
-
-    try
+    else
     {
-        const wxKeyEvent& keyEvent = dynamic_cast<const wxKeyEvent&> (event);
-
-        if (keyEvent.ControlDown() || keyEvent.ShiftDown())
-            return false;
-
-        switch (keyEvent.GetKeyCode())
+        const wxKeyEvent* keyEvent = dynamic_cast<const wxKeyEvent*>(&event);
+        if (keyEvent)
         {
-        case WXK_SPACE:
-        case WXK_TAB:
-        case WXK_RETURN:
-        case WXK_ESCAPE:
-        case WXK_NUMPAD_ENTER:
-        case WXK_LEFT:
-        case WXK_UP:
-        case WXK_RIGHT:
-        case WXK_DOWN:
-        case WXK_PAGEUP:
-        case WXK_PAGEDOWN:
-        case WXK_NUMPAD_PAGEUP:
-        case WXK_NUMPAD_PAGEDOWN:
-        case WXK_HOME:
-        case WXK_END:
-        case WXK_NUMPAD_HOME:
-        case WXK_NUMPAD_END:
-            return true;
-        }
+            if (keyEvent->ControlDown() || keyEvent->ShiftDown())
+                return false;
 
-        return false;
+            switch (keyEvent->GetKeyCode())
+            {
+            case WXK_TAB:
+            case WXK_RETURN:
+            case WXK_ESCAPE:
+            case WXK_NUMPAD_ENTER:
+            case WXK_LEFT:
+            case WXK_UP:
+            case WXK_RIGHT:
+            case WXK_DOWN:
+            case WXK_PAGEUP:
+            case WXK_PAGEDOWN:
+            case WXK_NUMPAD_PAGEUP:
+            case WXK_NUMPAD_PAGEDOWN:
+            case WXK_HOME:
+            case WXK_END:
+            case WXK_NUMPAD_HOME:
+            case WXK_NUMPAD_END:
+                return true;
+            }
+
+            return false;
+        }
     }
-    catch (std::bad_cast&) {}
 
     return false;
 }
@@ -766,8 +795,8 @@ void CustomGrid::onGridAccess(wxEvent& event)
     m_gridLeft->GetGridRowLabelWindow()->Update();
     m_gridRight->GetGridRowLabelWindow()->Update();
 
-    //support for additional short-cuts
-    additionalGridCommands(event, this); //event.Skip is handled here!
+    //support for custom short-cuts (overwriting wxWidgets functionality!)
+    execGridCommands(event, this); //event.Skip is handled here!
 }
 
 
@@ -831,9 +860,9 @@ void CustomGrid::DrawColLabel(wxDC& dc, int col)
 }
 
 
-std::set<int> CustomGrid::getAllSelectedRows() const
+std::set<unsigned int> CustomGrid::getAllSelectedRows() const
 {
-    std::set<int> output;
+    std::set<unsigned int> output;
 
     const wxArrayInt selectedRows = this->GetSelectedRows();
     if (!selectedRows.IsEmpty())
@@ -1526,8 +1555,8 @@ void CustomGridMiddle::OnLeaveWindow(wxMouseEvent& event)
 
 void CustomGridMiddle::showToolTip(int rowNumber, wxPoint pos)
 {
-    const FileCompareLine* const rowData = gridDataTable->getRawData(rowNumber);
-    if (rowData == NULL) //if invalid row...
+    const FileSystemObject* const fsObj = gridDataTable->getRawData(rowNumber);
+    if (fsObj == NULL) //if invalid row...
     {
         toolTip->hide();
         return;
@@ -1535,58 +1564,60 @@ void CustomGridMiddle::showToolTip(int rowNumber, wxPoint pos)
 
     if (gridDataTable->syncPreviewIsActive()) //synchronization preview
     {
-        switch (getSyncOperation(*rowData))
+        const SyncOperation syncOp = getSyncOperation(*fsObj);
+        switch (syncOp)
         {
         case SO_CREATE_NEW_LEFT:
-            toolTip->show(_("Copy from right to left"), pos, GlobalResources::getInstance().bitmapSyncCreateLeftAct);
+            toolTip->show(getDescription(syncOp), pos, GlobalResources::getInstance().bitmapSyncCreateLeftAct);
             break;
         case SO_CREATE_NEW_RIGHT:
-            toolTip->show(_("Copy from left to right"), pos, GlobalResources::getInstance().bitmapSyncCreateRightAct);
+            toolTip->show(getDescription(syncOp), pos, GlobalResources::getInstance().bitmapSyncCreateRightAct);
             break;
         case SO_DELETE_LEFT:
-            toolTip->show(_("Delete files/folders existing on left side only"), pos, GlobalResources::getInstance().bitmapSyncDeleteLeftAct);
+            toolTip->show(getDescription(syncOp), pos, GlobalResources::getInstance().bitmapSyncDeleteLeftAct);
             break;
         case SO_DELETE_RIGHT:
-            toolTip->show(_("Delete files/folders existing on right side only"), pos, GlobalResources::getInstance().bitmapSyncDeleteRightAct);
+            toolTip->show(getDescription(syncOp), pos, GlobalResources::getInstance().bitmapSyncDeleteRightAct);
             break;
         case SO_OVERWRITE_LEFT:
-            toolTip->show(_("Copy from right to left overwriting"), pos, GlobalResources::getInstance().bitmapSyncDirLeftAct);
+            toolTip->show(getDescription(syncOp), pos, GlobalResources::getInstance().bitmapSyncDirLeftAct);
             break;
         case SO_OVERWRITE_RIGHT:
-            toolTip->show(_("Copy from left to right overwriting"), pos, GlobalResources::getInstance().bitmapSyncDirRightAct);
+            toolTip->show(getDescription(syncOp), pos, GlobalResources::getInstance().bitmapSyncDirRightAct);
             break;
         case SO_DO_NOTHING:
-            toolTip->show(_("Do nothing"), pos, GlobalResources::getInstance().bitmapSyncDirNoneAct);
+            toolTip->show(getDescription(syncOp), pos, GlobalResources::getInstance().bitmapSyncDirNoneAct);
             break;
         case SO_UNRESOLVED_CONFLICT:
-            toolTip->show(rowData->conflictDescription.get(), pos, GlobalResources::getInstance().bitmapConflictAct);
+            toolTip->show(fsObj->getConflictDescription(), pos, GlobalResources::getInstance().bitmapConflictAct);
             break;
         };
     }
     else
     {
-        switch (rowData->cmpResult)
+        const CompareFilesResult cmpRes = fsObj->getCategory();
+        switch (cmpRes)
         {
         case FILE_LEFT_SIDE_ONLY:
-            toolTip->show(_("Files/folders that exist on left side only"), pos, GlobalResources::getInstance().bitmapLeftOnlyAct);
+            toolTip->show(getDescription(cmpRes), pos, GlobalResources::getInstance().bitmapLeftOnlyAct);
             break;
         case FILE_RIGHT_SIDE_ONLY:
-            toolTip->show(_("Files/folders that exist on right side only"), pos, GlobalResources::getInstance().bitmapRightOnlyAct);
+            toolTip->show(getDescription(cmpRes), pos, GlobalResources::getInstance().bitmapRightOnlyAct);
             break;
         case FILE_LEFT_NEWER:
-            toolTip->show(_("Files that exist on both sides, left one is newer"), pos, GlobalResources::getInstance().bitmapLeftNewerAct);
+            toolTip->show(getDescription(cmpRes), pos, GlobalResources::getInstance().bitmapLeftNewerAct);
             break;
         case FILE_RIGHT_NEWER:
-            toolTip->show(_("Files that exist on both sides, right one is newer"), pos, GlobalResources::getInstance().bitmapRightNewerAct);
+            toolTip->show(getDescription(cmpRes), pos, GlobalResources::getInstance().bitmapRightNewerAct);
             break;
         case FILE_DIFFERENT:
-            toolTip->show(_("Files that exist on both sides and have different content"), pos, GlobalResources::getInstance().bitmapDifferentAct);
+            toolTip->show(getDescription(cmpRes), pos, GlobalResources::getInstance().bitmapDifferentAct);
             break;
         case FILE_EQUAL:
-            toolTip->show(_(""), pos, GlobalResources::getInstance().bitmapEqualAct);
+            toolTip->show(getDescription(cmpRes), pos, GlobalResources::getInstance().bitmapEqualAct);
             break;
         case FILE_CONFLICT:
-            toolTip->show(rowData->conflictDescription.get(), pos, GlobalResources::getInstance().bitmapConflictAct);
+            toolTip->show(fsObj->getConflictDescription(), pos, GlobalResources::getInstance().bitmapConflictAct);
             break;
         }
     }
@@ -1711,8 +1742,8 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
                                   bool isSelected)
 {
     //retrieve grid data
-    const FileCompareLine* const rowData = m_gridMiddle->gridDataTable->getRawData(row);
-    if (rowData != NULL) //if valid row...
+    const FileSystemObject* const fsObj = m_gridMiddle->gridDataTable->getRawData(row);
+    if (fsObj != NULL) //if valid row...
     {
         if (rect.GetWidth() > CHECK_BOX_WIDTH)
         {
@@ -1730,13 +1761,13 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
             //HIGHLIGHTNING:
             if (rowIsHighlighted && m_gridMiddle->highlightedPos == CustomGridMiddle::BLOCKPOS_CHECK_BOX)
             {
-                if (rowData->selectedForSynchronization)
+                if (fsObj->selectedForSynchronization)
                     dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapCheckBoxTrueFocus, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
                 else
                     dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapCheckBoxFalseFocus, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
             }
             //default
-            else if (rowData->selectedForSynchronization)
+            else if (fsObj->selectedForSynchronization)
                 dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapCheckBoxTrue, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
             else
                 dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapCheckBoxFalse, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
@@ -1758,24 +1789,24 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
                     case CustomGridMiddle::BLOCKPOS_CHECK_BOX:
                         break;
                     case CustomGridMiddle::BLOCKPOS_LEFT:
-                        dc.DrawLabel(wxEmptyString, getSyncOpImage(rowData->cmpResult, true, SYNC_DIR_LEFT), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+                        dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->getCategory(), true, SYNC_DIR_LEFT), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
                         break;
                     case CustomGridMiddle::BLOCKPOS_MIDDLE:
-                        dc.DrawLabel(wxEmptyString, getSyncOpImage(rowData->cmpResult, true, SYNC_DIR_NONE), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                        dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->getCategory(), true, SYNC_DIR_NONE), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
                         break;
                     case CustomGridMiddle::BLOCKPOS_RIGHT:
-                        dc.DrawLabel(wxEmptyString, getSyncOpImage(rowData->cmpResult, true, SYNC_DIR_RIGHT), rectShrinked, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
+                        dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->getCategory(), true, SYNC_DIR_RIGHT), rectShrinked, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
                         break;
                     }
                 else //default
                 {
-                    const wxBitmap& syncOpIcon = getSyncOpImage(rowData->cmpResult, rowData->selectedForSynchronization, rowData->syncDir);
+                    const wxBitmap& syncOpIcon = getSyncOpImage(fsObj->getCategory(), fsObj->selectedForSynchronization, fsObj->syncDir);
                     dc.DrawLabel(wxEmptyString, syncOpIcon, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
                 }
             }
             else //comparison results view
             {
-                switch (rowData->cmpResult)
+                switch (fsObj->getCategory())
                 {
                 case FILE_LEFT_SIDE_ONLY:
                     dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapLeftOnlySmall, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);

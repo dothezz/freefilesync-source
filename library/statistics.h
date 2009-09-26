@@ -61,8 +61,8 @@ private:
     struct record
     {
         int    objects;
-        double data;
-        long   time;
+        double data; //unit: bytes
+        long   time; //unit: milliseconds
     };
 
     std::list<record> measurements;

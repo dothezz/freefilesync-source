@@ -10,7 +10,7 @@ namespace RealtimeSync
 {
     void readRealOrBatchConfig(const wxString& filename, xmlAccess::XmlRealConfig& config);  //throw (xmlAccess::XmlError);
 
-    int getProgramLanguage(); //throw (xmlAccess::XmlError);
+    int getProgramLanguage();
 }
 
 #endif // XMLFREEFILESYNC_H_INCLUDED

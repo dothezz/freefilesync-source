@@ -4,7 +4,7 @@
 #include <wx/string.h>
 #include "../shared/zstring.h"
 #include <set>
-#include "../structures.h"
+#include "../fileHierarchy.h"
 
 
 namespace FreeFileSync
@@ -14,15 +14,18 @@ namespace FreeFileSync
     public:
         FilterProcess(const wxString& includeFilter, const wxString& excludeFilter);
 
-        bool matchesFileFilterIncl(const DefaultChar* relFilename) const;
-        bool matchesFileFilterExcl(const DefaultChar* relFilename) const;
-        bool matchesDirFilterIncl(const DefaultChar* relDirname) const;
-        bool matchesDirFilterExcl(const DefaultChar* relDirname) const;
+        bool passFileFilter(const DefaultChar* relFilename) const;
+        bool passDirFilter(const DefaultChar* relDirname, bool* subObjMightMatch) const; //subObjMightMatch: file/dir in subdirectories could(!) match
+        //note: variable is only set if passDirFilter returns false!
+        void filterAll(HierarchyObject& baseDirectory) const; //filter complete data: files and dirs
 
-        void filterGridData(FolderComparison& folderCmp) const;
+        static void setActiveStatus(bool newStatus, FolderComparison& folderCmp); //activate or deactivate all rows
+        static void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or deactivate row
 
-        static void includeAllRowsOnGrid(FolderComparison& folderCmp);
-        static void excludeAllRowsOnGrid(FolderComparison& folderCmp);
+        static const FilterProcess& nullFilter(); //filter equivalent to include '*', exclude ''
+        bool operator==(const FilterProcess& other) const;
+        bool operator!=(const FilterProcess& other) const;
+        bool operator<(const FilterProcess& other) const;
 
     private:
         std::set<Zstring> filterFileIn;

@@ -13,16 +13,18 @@
 #include "../library/processXml.h"
 #include <memory>
 #include <map>
+#include <set>
 
 class CompareStatusHandler;
 class CompareStatus;
 class MainFolderDragDrop;
-class FolderPairPanel;
 class CustomGrid;
 class FFSCheckRowsEvent;
 class FFSSyncDirectionEvent;
 class IconUpdater;
 class ManualDeletionHandler;
+class FolderPairPanel;
+
 
 namespace FreeFileSync
 {
@@ -36,6 +38,7 @@ class MainDialog : public MainDialogGenerated
     friend class CompareStatusHandler;
     friend class ManualDeletionHandler;
     friend class MainFolderDragDrop;
+    friend class FolderPairPanel;
 
 //IDs for context menu items
     enum ContextIDRim //context menu for left and right grids
@@ -44,7 +47,7 @@ class MainDialog : public MainDialogGenerated
         CONTEXT_EXCLUDE_EXT,
         CONTEXT_EXCLUDE_OBJ,
         CONTEXT_CLIPBOARD,
-        CONTEXT_EXPLORER,
+        CONTEXT_EXTERNAL_APP,
         CONTEXT_DELETE_FILES,
         CONTEXT_SYNC_DIR_LEFT,
         CONTEXT_SYNC_DIR_NONE,
@@ -85,38 +88,44 @@ private:
     //configuration load/save
     bool readConfigurationFromXml(const wxString& filename, bool programStartup = false);
     bool writeConfigurationToXml(const wxString& filename);
+
     xmlAccess::XmlGuiConfig getCurrentConfiguration() const;
+    void setCurrentConfiguration(const xmlAccess::XmlGuiConfig& newGuiCfg);
+
     static const wxString& lastConfigFileName();
 
     xmlAccess::XmlGuiConfig lastConfigurationSaved; //support for: "Save changed configuration?" dialog
+    //used when saving configuration
+    wxString currentConfigFileName;
 
     void readGlobalSettings();
     void writeGlobalSettings();
 
-    void updateViewFilterButtons();
+    void initViewFilterButtons();
     void updateFilterButton(wxBitmapButton* filterButton, bool isActive);
 
     void addFileToCfgHistory(const wxString& filename);
     void addLeftFolderToHistory(const wxString& leftFolder);
     void addRightFolderToHistory(const wxString& rightFolder);
 
-    void addFolderPair(const std::vector<FreeFileSync::FolderPair>& newPairs, bool addFront = false);
-    void removeAddFolderPair(const int pos); //keep it an int, allow negative values!
+    void addFolderPair(const std::vector<FreeFileSync::FolderPairEnh>& newPairs, bool addFront = false);
+    void removeAddFolderPair(const unsigned int pos);
     void clearAddFolderPairs();
 
     //main method for putting gridDataView on UI: updates data respecting current view settings
     void updateGuiGrid();
-
     void updateGridViewData();
 
     //context menu functions
-    std::set<int> getSelectedRows(const CustomGrid* grid) const;
-    std::set<int> getSelectedRows() const;
-    void setSyncDirManually(const std::set<int>& rowsToSetOnUiTable, const FreeFileSync::SyncDirection dir);
-    void filterRangeManually(const std::set<int>& rowsToFilterOnUiTable, const int leadingRow);
+    std::set<unsigned int> getSelectedRows(const CustomGrid* grid) const;
+    std::set<unsigned int> getSelectedRows() const;
+    void setSyncDirManually(const std::set<unsigned int>& rowsToSetOnUiTable, const FreeFileSync::SyncDirection dir);
+    void filterRangeManually(const std::set<unsigned int>& rowsToFilterOnUiTable, const int leadingRow);
     void copySelectionToClipboard(const CustomGrid* selectedGrid);
-    void openWithFileManager(const int rowNumber, const bool leftSide);
     void deleteSelectedFiles();
+
+    void openExternalApplication(unsigned int rowNumber, bool leftSide, const wxString& commandline);
+    static const int externalAppIDFirst = 1000; //id of first external app item
 
     //work to be done in idle time
     void OnIdleEvent(wxEvent& event);
@@ -133,18 +142,31 @@ private:
     void onGridRightButtonEvent(       wxKeyEvent& event);
     void onGridMiddleButtonEvent(      wxKeyEvent& event);
     void OnContextRim(                 wxGridEvent& event);
-    void OnContextRimSelection(        wxCommandEvent& event);
     void OnContextRimLabelLeft(        wxGridEvent& event);
     void OnContextRimLabelRight(       wxGridEvent& event);
-    void OnContextRimLabelSelection(   wxCommandEvent& event);
     void OnContextMiddle(              wxGridEvent& event);
-    void OnContextMiddleSelection(     wxCommandEvent& event);
     void OnContextMiddleLabel(         wxGridEvent& event);
-    void OnContextMiddleLabelSelection(wxCommandEvent& event);
+
+    //context menu handler methods
+    void OnContextFilterTemp(wxCommandEvent& event);
+    void OnContextExcludeExtension(wxCommandEvent& event);
+    void OnContextExcludeObject(wxCommandEvent& event);
+    void OnContextCopyClipboard(wxCommandEvent& event);
+    void OnContextOpenWith(wxCommandEvent& event);
+    void OnContextDeleteFiles(wxCommandEvent& event);
+    void OnContextSyncDirLeft(wxCommandEvent& event);
+    void OnContextSyncDirNone(wxCommandEvent& event);
+    void OnContextSyncDirRight(wxCommandEvent& event);
+    void OnContextCustColumnLeft(wxCommandEvent& event);
+    void OnContextCustColumnRight(wxCommandEvent& event);
+    void OnContextAutoAdjustLeft(wxCommandEvent& event);
+    void OnContextAutoAdjustRight(wxCommandEvent& event);
+    void OnContextIncludeAll(wxCommandEvent& event);
+    void OnContextExcludeAll(wxCommandEvent& event);
+    void OnContextComparisonView(wxCommandEvent& event);
+    void OnContextSyncView(wxCommandEvent& event);
 
     void OnDirSelected(wxFileDirPickerEvent& event);
-
-    void requestShutdown(); //try to exit application
 
     void OnCheckRows(FFSCheckRowsEvent& event);
     void OnSetSyncDirection(FFSSyncDirectionEvent& event);
@@ -171,10 +193,13 @@ private:
     void OnSyncDirRight(        wxCommandEvent& event);
     void OnSyncDirNone(         wxCommandEvent& event);
 
+    void OnNewConfig(           wxCommandEvent& event);
     void OnSaveConfig(          wxCommandEvent& event);
     void OnLoadConfig(          wxCommandEvent& event);
     void OnLoadFromHistory(     wxCommandEvent& event);
     bool trySaveConfig(); //return true if saved successfully
+    bool saveOldConfig(); //return false on user abort
+
 
     void loadConfiguration(const wxString& filename);
     void OnCfgHistoryKeyEvent(  wxKeyEvent& event);
@@ -202,7 +227,9 @@ private:
 
     void OnAddFolderPair(       wxCommandEvent& event);
     void OnRemoveFolderPair(    wxCommandEvent& event);
-    void OnRemoveTopFolderPair( wxCommandEvent& event);
+
+    void updateFilterConfig(bool activateFilter);
+    void updateSyncConfig();
 
     //menu events
     void OnMenuGlobalSettings(  wxCommandEvent& event);
@@ -225,10 +252,7 @@ private:
     //global settings used by GUI and batch mode
     xmlAccess::XmlGlobalSettings& globalSettings;
 
-    //technical representation of grid-data
-    FreeFileSync::FolderComparison currentGridData;
-
-    //UI view of currentGridData
+    //UI view of FolderComparison structure
     std::auto_ptr<FreeFileSync::GridView> gridDataView;
 
 //-------------------------------------
@@ -246,9 +270,6 @@ private:
     int posYNotMaximized;
 //-------------------------------------
 
-    //convenience method to get all folder pairs (unformatted)
-    std::vector<FreeFileSync::FolderPair> getFolderPairs() const;
-
 
 //***********************************************
     std::auto_ptr<wxMenu> contextMenu;
@@ -263,17 +284,6 @@ private:
     //save the last used config filename history
     std::vector<wxString> cfgFileNames;
 
-    //used when saving configuration
-    wxString currentConfigFileName;
-
-    //temporal variables used by exclude via context menu
-    wxString exFilterCandidateExtension;
-    struct FilterObject
-    {
-        wxString relativeName;
-        FreeFileSync::FileDescrLine::ObjectType type;
-    };
-    std::vector<FilterObject> exFilterCandidateObj;
 
     bool cleanedUp; //determines if destructor code was already executed
 

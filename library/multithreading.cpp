@@ -159,3 +159,90 @@ void UpdateWhileExecuting::execute(StatusHandler* statusUpdater)
     }
 }
 
+
+
+//    ------------------------------------------------------
+//    |Pattern: workload queue and multiple worker threads |
+//    ------------------------------------------------------
+//typedef std::vector<DirectoryDescrType*> Workload;
+//
+//class ThreadSorting : public wxThread
+//{
+//public:
+//    ThreadSorting(wxCriticalSection& syncWorkload, Workload& workload) :
+//            wxThread(wxTHREAD_JOINABLE),
+//            syncWorkload_(syncWorkload),
+//            workload_(workload)
+//    {
+//        if (Create() != wxTHREAD_NO_ERROR)
+//            throw RuntimeException(wxString(wxT("Error creating thread for sorting!")));
+//    }
+//
+//    ~ThreadSorting() {}
+//
+//
+//    ExitCode Entry()
+//    {
+//        while (true)
+//        {
+//            DirectoryDescrType* descr = NULL;
+//            {  //see if there is work to do...
+//                wxCriticalSectionLocker dummy(syncWorkload_);
+//                if (workload_.empty())
+//                    return 0;
+//                else
+//                {
+//                    descr = workload_.back();
+//                    workload_.pop_back();
+//                }
+//            }
+//            //do work
+//            std::sort(descr->begin(), descr->end());
+//        }
+//    }
+//
+//private:
+//    wxCriticalSection& syncWorkload_;
+//    Workload& workload_;
+//};
+//
+//
+//void DirectoryDescrBuffer::preFillBuffers(const std::vector<FolderPairCfg>& fpConfigFormatted)
+//{
+//    //assemble workload
+//	...
+//
+//    //we use binary search when comparing the directory structures: so sort() first
+//    const int CPUCount = wxThread::GetCPUCount();
+//    if (CPUCount >= 2) //do it the multithreaded way:
+//    {
+//        wxCriticalSection syncWorkload;
+//
+//        typedef std::vector<boost::shared_ptr<ThreadSorting> > ThreadContainer;
+//        ThreadContainer sortThreads;
+//        sortThreads.reserve(CPUCount);
+//
+//        //start CPUCount worker threads
+//        for (size_t i = 0; i < std::min(static_cast<size_t>(CPUCount), workload.size()); ++i)
+//        {
+//            boost::shared_ptr<ThreadSorting> newWorker(new ThreadSorting(syncWorkload, workload));
+//
+//            if (newWorker->Run() != wxTHREAD_NO_ERROR)
+//                throw RuntimeException(wxString(wxT("Error starting thread for sorting!")));
+//
+//            sortThreads.push_back(newWorker);
+//        }
+//
+//        //wait until all worker are finished
+//        for (ThreadContainer::iterator i = sortThreads.begin(); i != sortThreads.end(); ++i)
+//        {
+//            if ((*i)->Wait() != 0)
+//                throw RuntimeException(wxString(wxT("Error waiting for thread (sorting)!")));
+//        }
+//    }
+//    else //single threaded
+//    {
+//        for (Workload::iterator i = workload.begin(); i != workload.end(); ++i)
+//            std::sort((*i)->begin(), (*i)->end());
+//    }
+//}

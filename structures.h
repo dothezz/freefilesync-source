@@ -2,11 +2,11 @@
 #define FREEFILESYNC_H_INCLUDED
 
 #include <wx/string.h>
-#include <set>
 #include <vector>
 #include "shared/zstring.h"
-#include <wx/longlong.h>
+#include "shared/systemConstants.h"
 #include "shared/staticAssert.h"
+#include <boost/shared_ptr.hpp>
 
 
 namespace FreeFileSync
@@ -29,20 +29,15 @@ namespace FreeFileSync
     //attention make sure these /|\  \|/ two enums match!!!
     enum SyncDirection
     {
-        SYNC_DIR_LEFT = 0,
-        SYNC_DIR_RIGHT,
-        SYNC_DIR_NONE,
-
-        SYNC_UNRESOLVED_CONFLICT
+        SYNC_DIR_LEFT  = SYNC_DIR_CFG_LEFT,
+        SYNC_DIR_RIGHT = SYNC_DIR_CFG_RIGHT,
+        SYNC_DIR_NONE  = SYNC_DIR_CFG_NONE,
     };
+
 
     inline
     SyncDirection convertToSyncDirection(SyncDirectionCfg syncCfg)
     {
-        assert_static(static_cast<SyncDirection>(SYNC_DIR_CFG_LEFT)  == SYNC_DIR_LEFT);
-        assert_static(static_cast<SyncDirection>(SYNC_DIR_CFG_RIGHT) == SYNC_DIR_RIGHT);
-        assert_static(static_cast<SyncDirection>(SYNC_DIR_CFG_NONE)  == SYNC_DIR_NONE);
-
         return static_cast<SyncDirection>(syncCfg);
     }
 
@@ -54,13 +49,15 @@ namespace FreeFileSync
                 exRightSideOnly(SYNC_DIR_CFG_LEFT),
                 leftNewer(      SYNC_DIR_CFG_RIGHT),
                 rightNewer(     SYNC_DIR_CFG_LEFT),
-                different(      SYNC_DIR_CFG_NONE) {}
+                different(      SYNC_DIR_CFG_NONE),
+                conflict(       SYNC_DIR_CFG_NONE) {}
 
         SyncDirectionCfg exLeftSideOnly;
         SyncDirectionCfg exRightSideOnly;
         SyncDirectionCfg leftNewer;
         SyncDirectionCfg rightNewer;
         SyncDirectionCfg different;
+        SyncDirectionCfg conflict;
 
         bool operator==(const SyncConfiguration& other) const
         {
@@ -68,7 +65,8 @@ namespace FreeFileSync
                    exRightSideOnly == other.exRightSideOnly &&
                    leftNewer       == other.leftNewer       &&
                    rightNewer      == other.rightNewer      &&
-                   different       == other.different;
+                   different       == other.different       &&
+                   conflict        == other.conflict;
         }
 
         //get/set default configuration variants
@@ -79,8 +77,7 @@ namespace FreeFileSync
             TWOWAY,
             CUSTOM
         };
-        Variant getVariant();
-        wxString getVariantName();
+        Variant getVariant() const;
         void setVariant(const Variant var);
     };
 
@@ -93,42 +90,83 @@ namespace FreeFileSync
     };
 
 
-    struct MainConfiguration
+    struct HiddenSettings
     {
-        MainConfiguration();
+        HiddenSettings() :
+                fileTimeTolerance(2),  //default 2s: FAT vs NTFS
+                traverseDirectorySymlinks(false),
+                copyFileSymlinks(true),
+                verifyFileCopy(false) {}
 
-        //Compare setting
-        CompareVariant compareVar;
+        unsigned int fileTimeTolerance; //max. allowed file time deviation
+        bool traverseDirectorySymlinks;
+        bool copyFileSymlinks; //copy symbolic link instead of target file
+        bool verifyFileCopy;   //verify copied files
+
+        bool operator==(const HiddenSettings& other) const
+        {
+            return fileTimeTolerance         == other.fileTimeTolerance         &&
+                   traverseDirectorySymlinks == other.traverseDirectorySymlinks &&
+                   copyFileSymlinks          == other.copyFileSymlinks          &&
+                   verifyFileCopy            == other.verifyFileCopy;
+        }
+    };
+
+
+    bool recycleBinExistsWrap();
+
+
+    struct AlternateSyncConfig
+    {
+        AlternateSyncConfig(const SyncConfiguration& syncCfg,
+                            const DeletionPolicy     handleDel,
+                            const wxString&          customDelDir) :
+                syncConfiguration(syncCfg),
+                handleDeletion(handleDel),
+                customDeletionDirectory(customDelDir) {};
+
+        AlternateSyncConfig() :  //construct with default values
+                handleDeletion(FreeFileSync::recycleBinExistsWrap() ? MOVE_TO_RECYCLE_BIN : DELETE_PERMANENTLY) {} //enable if OS supports it; else user will have to activate first and then get an error message
 
         //Synchronisation settings
         SyncConfiguration syncConfiguration;
-
-        //Filter setting
-        bool filterIsActive;
-        wxString includeFilter;
-        wxString excludeFilter;
 
         //misc options
         DeletionPolicy handleDeletion; //use Recycle, delete permanently or move to user-defined location
         wxString customDeletionDirectory;
 
-        bool operator==(const MainConfiguration& other) const
+        bool operator==(const AlternateSyncConfig& other) const
         {
-            return compareVar        == other.compareVar        &&
-                   syncConfiguration == other.syncConfiguration &&
-                   filterIsActive    == other.filterIsActive    &&
-                   includeFilter     == other.includeFilter     &&
-                   excludeFilter     == other.excludeFilter     &&
-                   handleDeletion    == other.handleDeletion    &&
+            return syncConfiguration       == other.syncConfiguration &&
+                   handleDeletion          == other.handleDeletion    &&
                    customDeletionDirectory == other.customDeletionDirectory;
+        }
+    };
+
+
+    struct AlternateFilter
+    {
+        AlternateFilter(const wxString& include, const wxString& exclude) :
+                includeFilter(include),
+                excludeFilter(exclude) {}
+
+        AlternateFilter() : //construct with default values
+                includeFilter(wxT("*")),        //include all files/folders
+                excludeFilter(wxEmptyString) {} //exclude nothing
+
+        wxString includeFilter;
+        wxString excludeFilter;
+
+        bool operator==(const AlternateFilter& other) const
+        {
+            return includeFilter == other.includeFilter &&
+                   excludeFilter == other.excludeFilter;
         }
     };
 
 
     struct FolderPair
     {
-        FolderPair() {}
-
         FolderPair(const Zstring& leftDir, const Zstring& rightDir) :
                 leftDirectory(leftDir),
                 rightDirectory(rightDir) {}
@@ -144,129 +182,138 @@ namespace FreeFileSync
     };
 
 
-    struct FileDescrLine
+    struct FolderPairEnh //enhanced folder pairs with (optional) alternate configuration
     {
-        FileDescrLine() : objType(TYPE_NOTHING) {}
+        FolderPairEnh() {}
 
-        enum ObjectType
+        FolderPairEnh(const Zstring& leftDir,
+                      const Zstring& rightDir,
+                      const boost::shared_ptr<const AlternateSyncConfig>& syncConfig,
+                      const boost::shared_ptr<const AlternateFilter>& filter) :
+                leftDirectory(leftDir),
+                rightDirectory(rightDir) ,
+                altSyncConfig(syncConfig),
+                altFilter(filter) {}
+
+        Zstring leftDirectory;
+        Zstring rightDirectory;
+
+        boost::shared_ptr<const AlternateSyncConfig> altSyncConfig; //optional
+        boost::shared_ptr<const AlternateFilter> altFilter;         //optional
+
+        bool operator==(const FolderPairEnh& other) const
         {
-            TYPE_NOTHING,
-            TYPE_DIRECTORY,
-            TYPE_FILE
-        };
+            return leftDirectory  == other.leftDirectory  &&
+                   rightDirectory == other.rightDirectory &&
 
-        Zstring fullName;  // == directory + relativeName
-        Zsubstr relativeName; //fullName without directory that is being synchronized
-        //Note on performance: Keep redundant information "relativeName"!
-        //Extracting info from "fullName" instead would result in noticeable performance loss, with only limited memory reduction (note ref. counting strings)!
-        wxLongLong lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
-        wxULongLong fileSize;
-        ObjectType objType; //is it a file or directory or initial?
+                   (altSyncConfig.get() && other.altSyncConfig.get() ?
+                    *altSyncConfig == *other.altSyncConfig :
+                    altSyncConfig.get() == other.altSyncConfig.get()) &&
 
-        bool operator < (const FileDescrLine& b) const //used by template class "set"
-        {
-            //quick check based on string length: we are not interested in a lexicographical order!
-            const size_t aLength = relativeName.length();
-            const size_t bLength = b.relativeName.length();
-            if (aLength != bLength)
-                return aLength < bLength;
-#ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
-            return FreeFileSync::compareStringsWin32(relativeName.c_str(), b.relativeName.c_str()) < 0;  //implementing a (reverse) comparison manually is a lot slower!
-#elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
-            return defaultCompare(relativeName.c_str(), b.relativeName.c_str()) < 0;
-#endif
+                   (altFilter.get() && other.altFilter.get() ?
+                    *altFilter == *other.altFilter :
+                    altFilter.get() == other.altFilter.get());
         }
     };
-    typedef std::vector<FileDescrLine> DirectoryDescrType;
+
+
+    struct MainConfiguration
+    {
+        MainConfiguration() :
+                mainFolderPair(Zstring(), Zstring()),
+                compareVar(CMP_BY_TIME_SIZE),
+                filterIsActive(false),        //do not filter by default
+                includeFilter(wxT("*")),      //include all files/folders
+                excludeFilter(wxEmptyString), //exclude nothing
+                handleDeletion(FreeFileSync::recycleBinExistsWrap() ? MOVE_TO_RECYCLE_BIN : DELETE_PERMANENTLY) {} //enable if OS supports it; else user will have to activate first and then get an error message
+
+        FolderPair mainFolderPair;
+        std::vector<FolderPairEnh> additionalPairs;
+
+        //Compare setting
+        CompareVariant compareVar;
+
+        //Synchronisation settings
+        SyncConfiguration syncConfiguration;
+
+        //Filter setting
+        bool filterIsActive;
+        wxString includeFilter;
+        wxString excludeFilter;
+
+        //misc options
+        HiddenSettings hidden; //settings not visible on GUI
+
+        DeletionPolicy handleDeletion; //use Recycle, delete permanently or move to user-defined location
+        wxString customDeletionDirectory;
+
+        wxString getSyncVariantName();
+
+        bool operator==(const MainConfiguration& other) const
+        {
+            return mainFolderPair    == other.mainFolderPair    &&
+                   additionalPairs   == other.additionalPairs   &&
+                   compareVar        == other.compareVar        &&
+                   syncConfiguration == other.syncConfiguration &&
+                   filterIsActive    == other.filterIsActive    &&
+                   includeFilter     == other.includeFilter     &&
+                   excludeFilter     == other.excludeFilter     &&
+                   hidden            == other.hidden            &&
+                   handleDeletion    == other.handleDeletion    &&
+                   customDeletionDirectory == other.customDeletionDirectory;
+        }
+    };
 
 
     enum CompareFilesResult
     {
-        FILE_LEFT_SIDE_ONLY,
+        FILE_LEFT_SIDE_ONLY = 0,
         FILE_RIGHT_SIDE_ONLY,
         FILE_LEFT_NEWER,
         FILE_RIGHT_NEWER,
         FILE_DIFFERENT,
         FILE_EQUAL,
-
-        FILE_CONFLICT,
+        FILE_CONFLICT
     };
-
-    //quick workaround until tr1::shared_ptr is available
-    class OptionalString
+    //attention make sure these /|\  \|/ two enums match!!!
+    enum CompareDirResult
     {
-    public:
-        OptionalString() : str(NULL) {}
-        OptionalString(const wxString& other) : str(new wxString(other)) {}
-        OptionalString(const OptionalString& other) : str(other.str == NULL ? NULL : new wxString(*other.str)) {}
-        ~OptionalString()
-        {
-            delete str;
-        }
-
-        OptionalString& operator=(const OptionalString& other)
-        {
-            wxString* newStr = other.str == NULL ? NULL : new wxString(*other.str);
-            delete str;
-            str = newStr;
-            return *this;
-        }
-
-        const wxString& get() const
-        {
-            static const wxString emptyStr;
-            return str == NULL ? emptyStr : *str;
-        }
-
-    private:
-        wxString* str;
+        DIR_LEFT_SIDE_ONLY  = FILE_LEFT_SIDE_ONLY,
+        DIR_RIGHT_SIDE_ONLY = FILE_RIGHT_SIDE_ONLY,
+        DIR_EQUAL           = FILE_EQUAL
     };
 
-    struct FileCompareLine
+
+    inline
+    CompareFilesResult convertToFilesResult(CompareDirResult value)
     {
-        FileCompareLine(const CompareFilesResult defaultCmpResult,
-                        const SyncDirection defaultDirection,
-                        const bool selected) :
-                cmpResult(defaultCmpResult),
-                syncDir(defaultDirection),
-                selectedForSynchronization(selected) {}
-
-        FileDescrLine fileDescrLeft;
-        FileDescrLine fileDescrRight;
-
-        CompareFilesResult cmpResult;
-        SyncDirection      syncDir;
-        bool selectedForSynchronization;
-
-        OptionalString conflictDescription; //filled only if cmpResult == FILE_CONFLICT
-
-    };
-    typedef std::vector<FileCompareLine> FileComparison;
+        return static_cast<CompareFilesResult>(value);
+    }
 
 
-    struct FolderCompareLine //support for multiple folder pairs
+
+    wxString getDescription(CompareFilesResult cmpRes);
+    wxString getSymbol(CompareFilesResult cmpRes);
+
+
+    enum SyncOperation
     {
-        FolderPair syncPair;  //directories to be synced (ending with separator)
-        FileComparison fileCmp;
-
-        void swap(FolderCompareLine& other)
-        {
-            std::swap(syncPair, other.syncPair);
-            fileCmp.swap(other.fileCmp);
-        }
+        SO_CREATE_NEW_LEFT,
+        SO_CREATE_NEW_RIGHT,
+        SO_DELETE_LEFT,
+        SO_DELETE_RIGHT,
+        SO_OVERWRITE_LEFT,
+        SO_OVERWRITE_RIGHT,
+        SO_DO_NOTHING,
+        SO_UNRESOLVED_CONFLICT
     };
-    typedef std::vector<FolderCompareLine> FolderComparison;
 
-    //References to single lines(in FileComparison) inside FolderComparison
-    typedef std::vector<std::set<int> > FolderCompRef;
+    wxString getDescription(SyncOperation op);
+    wxString getSymbol(SyncOperation op);
 
 
-    class AbortThisProcess  //Exception class used to abort the "compare" and "sync" process
-    {
-    public:
-        AbortThisProcess() {}
-        ~AbortThisProcess() {}
-    };
+    //Exception class used to abort the "compare" and "sync" process
+    class AbortThisProcess {};
 }
 
 #endif // FREEFILESYNC_H_INCLUDED

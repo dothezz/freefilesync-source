@@ -5,6 +5,7 @@
 #include <wx/stream.h>
 #include <wx/stopwatch.h>
 #include <cmath>
+#include "systemConstants.h"
 
 
 wxString globalFunctions::numberToWxString(const unsigned int number)
@@ -50,7 +51,6 @@ int globalFunctions::wxStringToInt(const wxString& number)
         return result;
     else
         return 0; //don't throw exceptions here: wxEmptyString shall be interpreted as 0
-    //throw RuntimeException(wxString(_("Conversion error:")) + wxT(" wxString -> long"));
 }
 
 
@@ -61,7 +61,6 @@ double globalFunctions::wxStringToDouble(const wxString& number)
         return result;
     else
         return 0; //don't throw exceptions here: wxEmptyString shall be interpreted as 0
-    //throw RuntimeException(wxString(_("Conversion error:")) + wxT(" wxString -> double"));
 }
 
 

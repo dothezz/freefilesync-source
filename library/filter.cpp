@@ -3,57 +3,11 @@
 #include <wx/string.h>
 #include <set>
 #include <vector>
-#include "../shared/globalFunctions.h"
+#include "../shared/systemConstants.h"
 #include "../structures.h"
+#include <boost/bind.hpp>
 
 using FreeFileSync::FilterProcess;
-
-
-void compoundStringToTable(const Zstring& compoundInput, const DefaultChar* delimiter, std::vector<Zstring>& output)
-{
-    output.clear();
-    Zstring input(compoundInput);
-
-    //make sure input ends with delimiter - no problem with empty strings here
-    if (!input.EndsWith(delimiter))
-        input += delimiter;
-
-    unsigned int indexStart = 0;
-    unsigned int indexEnd   = 0;
-    while ((indexEnd = input.find(delimiter, indexStart)) != Zstring::npos)
-    {
-        if (indexStart != indexEnd) //do not add empty strings
-        {
-            Zstring newEntry = input.substr(indexStart, indexEnd - indexStart);
-
-            newEntry.Trim(true);  //remove whitespace characters from right
-            newEntry.Trim(false); //remove whitespace characters from left
-
-            if (!newEntry.empty())
-                output.push_back(newEntry);
-        }
-        indexStart = indexEnd + 1;
-    }
-}
-
-
-std::vector<Zstring> compoundStringToFilter(const Zstring& filterString)
-{
-    //delimiters may be ';' or '\n'
-    std::vector<Zstring> filterList;
-    std::vector<Zstring> filterPreProcessing;
-    compoundStringToTable(filterString, wxT(";"), filterPreProcessing);
-
-    for (std::vector<Zstring>::const_iterator i = filterPreProcessing.begin(); i != filterPreProcessing.end(); ++i)
-    {
-        std::vector<Zstring> newEntries;
-        compoundStringToTable(*i, wxT("\n"), newEntries);
-
-        filterList.insert(filterList.end(), newEntries.begin(), newEntries.end());
-    }
-
-    return filterList;
-}
 
 
 inline
@@ -65,47 +19,63 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
     //Windows does NOT distinguish between upper/lower-case
     filterFormatted.MakeLower();
 #elif defined FFS_LINUX
-    //Linux DOES distinguish between upper/lower-case
-//nothing to do here
+    //Linux DOES distinguish between upper/lower-case: nothing to do here
 #endif
 
-    //remove leading separators (keep BEFORE test for Zstring::empty()!)
-    if (filterFormatted.length() > 0 && *filterFormatted.c_str() == globalFunctions::FILE_NAME_SEPARATOR)
-        filterFormatted = Zstring(filterFormatted.c_str() + 1);
+    static const Zstring sepAsterisk     = Zstring() + globalFunctions::FILE_NAME_SEPARATOR + wxT('*');
+    static const Zstring sepQuestionMark = Zstring() + globalFunctions::FILE_NAME_SEPARATOR + wxT('?');
+    static const Zstring asteriskSep     = Zstring(wxT("*")) + globalFunctions::FILE_NAME_SEPARATOR;
+    static const Zstring questionMarkSep = Zstring(wxT("?")) + globalFunctions::FILE_NAME_SEPARATOR;
 
-    if (!filterFormatted.empty())
+    //add some syntactic sugar: handle beginning of filtername
+    if (filterFormatted.StartsWith(globalFunctions::FILE_NAME_SEPARATOR))
+    {  //remove leading separators (keep BEFORE test for Zstring::empty()!)
+        filterFormatted = filterFormatted.AfterFirst(globalFunctions::FILE_NAME_SEPARATOR);
+    }
+    else if (filterFormatted.StartsWith(asteriskSep) ||   // *\abc
+             filterFormatted.StartsWith(questionMarkSep)) // ?\abc
     {
-        //Test if filterFormatted ends with globalFunctions::FILE_NAME_SEPARATOR, ignoring '*' and '?'.
-        //If so, treat as filter for directory and add to directoryFilter.
-        const DefaultChar* filter = filterFormatted.c_str();
-        int i = filterFormatted.length() - 1;
-        while (filter[i] == DefaultChar('*') || filter[i] == DefaultChar('?'))
-        {
-            --i;
+        addFilterEntry(Zstring(filterFormatted.c_str() + 1), fileFilter, directoryFilter); //prevent further recursion by prefix
+    }
 
-            if (i == -1)
-                break;
-        }
 
-        if (i >= 0 && filter[i] == globalFunctions::FILE_NAME_SEPARATOR) //last FILE_NAME_SEPARATOR found
-        {
-            if (i != int(filterFormatted.length()) - 1)  // "name\*"
-            {
-                fileFilter.insert(filterFormatted);
-                directoryFilter.insert(filterFormatted);
-            }
-            //else // "name\"
+    //even more syntactic sugar: handle end of filtername
+    if (filterFormatted.EndsWith(globalFunctions::FILE_NAME_SEPARATOR))
+    {
+        const Zstring candidate = filterFormatted.BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);
+        if (!candidate.empty())
+            directoryFilter.insert(candidate); //only relevant for directory filtering
+    }
+    else if (filterFormatted.EndsWith(sepAsterisk) ||   // abc\*
+             filterFormatted.EndsWith(sepQuestionMark)) // abc\?
+    {
+        fileFilter.insert(     filterFormatted);
+        directoryFilter.insert(filterFormatted);
 
-            if (i > 0) // "name\*" or "name\": add "name" to directory filter
-                directoryFilter.insert(Zstring(filterFormatted.c_str(), i));
-        }
-        else
-        {
-            fileFilter.insert(filterFormatted);
-            directoryFilter.insert(filterFormatted);
-        }
+        const Zstring candidate = filterFormatted.BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);
+        if (!candidate.empty())
+            directoryFilter.insert(candidate); //only relevant for directory filtering
+    }
+    else if (!filterFormatted.empty())
+    {
+        fileFilter.     insert(filterFormatted);
+        directoryFilter.insert(filterFormatted);
     }
 }
+
+
+class MatchFound : public std::unary_function<const DefaultChar*, bool>
+{
+public:
+    MatchFound(const DefaultChar* name) : name_(name) {}
+
+    bool operator()(const DefaultChar* mask) const
+    {
+        return Zstring::Matches(name_, mask);
+    }
+private:
+    const DefaultChar* name_;
+};
 
 
 inline
@@ -118,13 +88,65 @@ bool matchesFilter(const DefaultChar* name, const std::set<Zstring>& filter)
     const DefaultChar* const nameFormatted = name; //nothing to do here
 #endif
 
-    for (std::set<Zstring>::const_iterator j = filter.begin(); j != filter.end(); ++j)
-        if (Zstring::Matches(nameFormatted, j->c_str()))
-            return true;
-
-    return false;
+    return std::find_if(filter.begin(), filter.end(), MatchFound(nameFormatted)) != filter.end();
 }
 
+
+//returns true if string matches at least the beginning of mask
+inline
+bool matchesMaskBegin(const DefaultChar* string, const DefaultChar* mask)
+{
+    for (DefaultChar ch; (ch = *mask) != 0; ++mask, ++string)
+    {
+        if (*string == 0)
+            return true;
+
+        switch (ch)
+        {
+        case DefaultChar('?'):
+            break;
+
+        case DefaultChar('*'):
+            return true;
+
+        default:
+            if (*string != ch)
+                return false;
+        }
+    }
+    return *string == 0;
+}
+
+
+inline
+bool matchesFilterBegin(const DefaultChar* name, const std::set<Zstring>& filter)
+{
+#ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
+    Zstring nameFormatted = name;
+    nameFormatted.MakeLower();
+#elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
+    const DefaultChar* const nameFormatted = name; //nothing to do here
+#endif
+
+    return std::find_if(filter.begin(), filter.end(),
+                        boost::bind(matchesMaskBegin, nameFormatted, _1)) != filter.end();
+}
+
+
+std::vector<Zstring> compoundStringToFilter(const Zstring& filterString)
+{
+    //delimiters may be ';' or '\n'
+    std::vector<Zstring> output;
+
+    const std::vector<Zstring> filterPreProcessing = filterString.Tokenize(wxT(';'));
+    for (std::vector<Zstring>::const_iterator i = filterPreProcessing.begin(); i != filterPreProcessing.end(); ++i)
+    {
+        const std::vector<Zstring> newEntries = i->Tokenize(wxT('\n'));
+        output.insert(output.end(), newEntries.begin(), newEntries.end());
+    }
+
+    return output;
+}
 //##############################################################
 
 
@@ -138,102 +160,173 @@ FilterProcess::FilterProcess(const wxString& includeFilter, const wxString& excl
     const std::vector<Zstring> excludeList = compoundStringToFilter(excludeFilter.c_str());
 
     //setup include/exclude filters for files and directories
-    for (std::vector<Zstring>::const_iterator i = includeList.begin(); i != includeList.end(); ++i)
-        addFilterEntry(*i, filterFileIn, filterFolderIn);
-
-    for (std::vector<Zstring>::const_iterator i = excludeList.begin(); i != excludeList.end(); ++i)
-        addFilterEntry(*i, filterFileEx, filterFolderEx);
+    std::for_each(includeList.begin(), includeList.end(), boost::bind(addFilterEntry, _1, boost::ref(filterFileIn), boost::ref(filterFolderIn)));
+    std::for_each(excludeList.begin(), excludeList.end(), boost::bind(addFilterEntry, _1, boost::ref(filterFileEx), boost::ref(filterFolderEx)));
 }
 
 
-bool FilterProcess::matchesFileFilterIncl(const DefaultChar* relFilename) const
+bool FilterProcess::passFileFilter(const DefaultChar* relFilename) const
 {
-    return matchesFilter(relFilename, filterFileIn); //process include filters
+    return  matchesFilter(relFilename, filterFileIn) && //process include filters
+            !matchesFilter(relFilename, filterFileEx);  //process exclude filters
 }
 
 
-bool FilterProcess::matchesFileFilterExcl(const DefaultChar* relFilename) const
+bool FilterProcess::passDirFilter(const DefaultChar* relDirname, bool* subObjMightMatch) const
 {
-    return matchesFilter(relFilename, filterFileEx); //process exclude filters
-}
-
-
-bool FilterProcess::matchesDirFilterIncl(const DefaultChar* relDirname) const
-{
-    return matchesFilter(relDirname, filterFolderIn); //process include filters
-}
-
-
-bool FilterProcess::matchesDirFilterExcl(const DefaultChar* relDirname) const
-{
-    return matchesFilter(relDirname, filterFolderEx); //process exclude filters
-}
-
-
-void FilterProcess::filterGridData(FreeFileSync::FolderComparison& folderCmp) const
-{
-    //execute filtering...
-    for (FolderComparison::iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
+    if (matchesFilter(relDirname, filterFolderEx)) //process exclude filters
     {
-        FileComparison& fileCmp = j->fileCmp;
+        if (subObjMightMatch)
+            *subObjMightMatch = false; //exclude subfolders/subfiles as well
+        return false;
+    }
 
-        for (FileComparison::iterator i = fileCmp.begin(); i != fileCmp.end(); ++i)
+    if (!matchesFilter(relDirname, filterFolderIn)) //process include filters
+    {
+        if (subObjMightMatch)
         {
+            Zstring subNameBegin(relDirname);
+            subNameBegin += globalFunctions::FILE_NAME_SEPARATOR;
 
-            const FileDescrLine& fileDescr = i->fileDescrLeft.objType != FileDescrLine::TYPE_NOTHING ?
-                                             i->fileDescrLeft :
-                                             i->fileDescrRight;
-
-            if (fileDescr.objType == FileDescrLine::TYPE_FILE)
-            {
-                if (    !matchesFileFilterIncl(fileDescr.relativeName.c_str()) ||
-                        matchesFileFilterExcl(fileDescr.relativeName.c_str()))
-                {
-                    i->selectedForSynchronization = false;
-                    continue;
-                }
-            }
-            else if (fileDescr.objType == FileDescrLine::TYPE_DIRECTORY)
-            {
-                if (    !matchesDirFilterIncl(fileDescr.relativeName.c_str()) ||
-                        matchesDirFilterExcl(fileDescr.relativeName.c_str()))
-                {
-                    i->selectedForSynchronization = false;
-                    continue;
-                }
-            }
-            else
-                assert(false);
-
-            i->selectedForSynchronization = true;
+            *subObjMightMatch = matchesFilterBegin(subNameBegin, filterFileIn) || //might match a file in subdirectory
+                                matchesFilterBegin(subNameBegin, filterFolderIn); //or another subdirectory
         }
+        return false;
     }
+
+    assert(subObjMightMatch == NULL || *subObjMightMatch == true);
+    return true;
 }
 
 
-template <bool includeRows>
-inline
-void inOrExcludeAllRows(FreeFileSync::FolderComparison& folderCmp)
+class FilterData
 {
-    //remove all filters on folderCmp
-    for (FreeFileSync::FolderComparison::iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
+public:
+    FilterData(const FilterProcess& filterProcIn) : filterProc(filterProcIn) {}
+
+    void operator()(FreeFileSync::FileMapping& fileObj)
     {
-        FreeFileSync::FileComparison& fileCmp = j->fileCmp;
-        for (FreeFileSync::FileComparison::iterator i = fileCmp.begin(); i != fileCmp.end(); ++i)
-            i->selectedForSynchronization = includeRows;
+        const Zstring relName = fileObj.isEmpty<FreeFileSync::LEFT_SIDE>() ?
+                                fileObj.getRelativeName<FreeFileSync::RIGHT_SIDE>() :
+                                fileObj.getRelativeName<FreeFileSync::LEFT_SIDE>();
+
+        fileObj.selectedForSynchronization = filterProc.passFileFilter(relName);
+    }
+
+    void operator()(FreeFileSync::DirMapping& dirObj)
+    {
+        const Zstring relName = dirObj.isEmpty<FreeFileSync::LEFT_SIDE>() ?
+                                dirObj.getRelativeName<FreeFileSync::RIGHT_SIDE>() :
+                                dirObj.getRelativeName<FreeFileSync::LEFT_SIDE>();
+
+        bool subObjMightMatch = true;
+        dirObj.selectedForSynchronization = filterProc.passDirFilter(relName, &subObjMightMatch);
+
+        if (subObjMightMatch) //use same logic like directory traversing here: evaluate filter in subdirs only if objects could match
+            filterProc.filterAll(dirObj); //process sub-dirs/files
+        else
+            FilterProcess::setActiveStatus(false, dirObj); //exclude all files dirs in subfolders
+    }
+
+private:
+    const FilterProcess& filterProc;
+};
+
+
+void FilterProcess::filterAll(FreeFileSync::HierarchyObject& baseDirectory) const
+{
+    //files
+    std::for_each(baseDirectory.subFiles.begin(), baseDirectory.subFiles.end(), FilterData(*this));
+
+    //directories
+    std::for_each(baseDirectory.subDirs.begin(), baseDirectory.subDirs.end(), FilterData(*this));
+
+    //recursion happens in FilterData
+}
+
+
+template <bool include>
+struct SetSelected
+{
+    void operator()(FreeFileSync::FileSystemObject& fsObj) const
+    {
+        fsObj.selectedForSynchronization = include;
+    }
+};
+
+
+template <bool include>
+void inOrExcludeAllRows(FreeFileSync::HierarchyObject& hierObj)
+{
+    //directories
+    std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), SetSelected<include>());
+    //files
+    std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), SetSelected<include>());
+    //recurse into sub-dirs
+    std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), inOrExcludeAllRows<include>);
+}
+
+
+void FilterProcess::setActiveStatus(bool newStatus, FreeFileSync::FolderComparison& folderCmp)
+{
+    if (newStatus)
+        std::for_each(folderCmp.begin(), folderCmp.end(), inOrExcludeAllRows<true>); //include all rows
+    else
+        std::for_each(folderCmp.begin(), folderCmp.end(), inOrExcludeAllRows<false>); //exclude all rows
+}
+
+
+void FilterProcess::setActiveStatus(bool newStatus, FreeFileSync::FileSystemObject& fsObj)
+{
+    fsObj.selectedForSynchronization = newStatus;
+
+    DirMapping* dirObj = dynamic_cast<DirMapping*>(&fsObj);
+    if (dirObj) //process subdirectories also!
+    {
+        if (newStatus)
+            inOrExcludeAllRows<true>(*dirObj);
+        else
+            inOrExcludeAllRows<false>(*dirObj);
     }
 }
 
 
-void FilterProcess::includeAllRowsOnGrid(FreeFileSync::FolderComparison& folderCmp)
+const FilterProcess& FilterProcess::nullFilter() //filter equivalent to include '*', exclude ''
 {
-    //remove all filters on currentGridData
-    inOrExcludeAllRows<true>(folderCmp);
+    static FilterProcess output(wxT("*"), wxEmptyString);
+    return output;
 }
 
 
-void FilterProcess::excludeAllRowsOnGrid(FreeFileSync::FolderComparison& folderCmp)
+bool FilterProcess::operator==(const FilterProcess& other) const
 {
-    //exclude all rows on currentGridData
-    inOrExcludeAllRows<false>(folderCmp);
+    return filterFileIn   == other.filterFileIn   &&
+           filterFolderIn == other.filterFolderIn &&
+           filterFileEx   == other.filterFileEx   &&
+           filterFolderEx == other.filterFolderEx;
 }
+
+
+bool FilterProcess::operator!=(const FilterProcess& other) const
+{
+    return !(*this == other);
+}
+
+
+bool FilterProcess::operator<(const FilterProcess& other) const
+{
+    if (filterFileIn != other.filterFileIn)
+        return filterFileIn < other.filterFileIn;
+
+    if (filterFolderIn != other.filterFolderIn)
+        return filterFolderIn < other.filterFolderIn;
+
+    if (filterFileEx != other.filterFileEx)
+        return filterFileEx < other.filterFileEx;
+
+    if (filterFolderEx != other.filterFolderEx)
+        return filterFolderEx < other.filterFolderEx;
+
+    return false; //vectors equal
+}
+

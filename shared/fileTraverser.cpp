@@ -1,5 +1,5 @@
 #include "fileTraverser.h"
-#include "globalFunctions.h"
+#include "systemConstants.h"
 #include "systemFunctions.h"
 #include <wx/intl.h>
 
@@ -128,8 +128,9 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
                                        directory + globalFunctions::FILE_NAME_SEPARATOR;
 
     WIN32_FIND_DATA fileMetaData;
-    HANDLE searchHandle = FindFirstFile((directoryFormatted + DefaultChar('*')).c_str(), //pointer to name of file to search for
-                                        &fileMetaData);   //pointer to returned information
+    HANDLE searchHandle = FindFirstFile((directoryFormatted + DefaultChar('*')).c_str(), //__in   LPCTSTR lpFileName
+                                        &fileMetaData);                                  //__out  LPWIN32_FIND_DATA lpFindFileData
+    //no noticable performance difference compared to FindFirstFileEx with FindExInfoBasic, FIND_FIRST_EX_CASE_SENSITIVE and/or FIND_FIRST_EX_LARGE_FETCH
 
     if (searchHandle == INVALID_HANDLE_VALUE)
     {

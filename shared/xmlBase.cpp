@@ -37,8 +37,15 @@ xmlAccess::XmlType xmlAccess::getXmlType(const wxString& filename)
     FILE* inputFile = configFile.fp();
 
     TiXmlDocument doc;
-    if (!doc.LoadFile(inputFile)) //fails if inputFile is no proper XML
+    try
+    {
+        if (!doc.LoadFile(inputFile)) //fails if inputFile is no proper XML
+            return XML_OTHER;
+    }
+    catch (const std::exception&)
+    { //unfortunately TiXml isn't very smart and tries to allocate space for the complete file: length_error exception is thrown for large files!
         return XML_OTHER;
+    }
 
     TiXmlElement* root = doc.RootElement();
 
@@ -118,7 +125,10 @@ bool xmlAccess::saveXmlDocument(const wxString& fileName, const TiXmlDocument& d
 
     FILE* outputFile = dummyFile.fp();
 
-    return document.SaveFile(outputFile); //save XML
+    if (!document.SaveFile(outputFile)) //save XML
+        return false;
+
+    return dummyFile.Flush(); //flush data to disk! (think of multiple batch jobs writing/reading)
 }
 
 
@@ -244,6 +254,17 @@ bool xmlAccess::readXmlAttribute(const std::string& name, const TiXmlElement* no
 }
 
 
+bool xmlAccess::readXmlAttribute(const std::string& name, const TiXmlElement* node, wxString& output)
+{
+    std::string tempString;
+    if (!readXmlAttribute(name, node, tempString))
+        return false;
+
+    output = wxString::FromUTF8(tempString.c_str());
+    return true;
+}
+
+
 bool xmlAccess::readXmlAttribute(const std::string& name, const TiXmlElement* node, int& output)
 {
     std::string dummy;
@@ -344,6 +365,12 @@ void xmlAccess::addXmlAttribute(const std::string& name, const std::string& valu
 }
 
 
+void xmlAccess::addXmlAttribute(const std::string& name, const wxString& value, TiXmlElement* node)
+{
+    addXmlAttribute(name, std::string(value.ToUTF8()), node);
+}
+
+
 void xmlAccess::addXmlAttribute(const std::string& name, const int value, TiXmlElement* node)
 {
     addXmlAttribute(name, globalFunctions::numberToString(value), node);
@@ -372,10 +399,12 @@ void XmlParser::logError(const std::string& nodeName)
     failedNodes.push_back(wxString::FromUTF8(nodeName.c_str()));
 }
 
+
 bool XmlParser::errorsOccured() const
 {
     return !failedNodes.empty();
 }
+
 
 const wxString XmlParser::getErrorMessageFormatted() const
 {

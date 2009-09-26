@@ -13,6 +13,7 @@
 class CustomGridLeft;
 class CustomGridMiddle;
 class CustomGridRight;
+class ToggleButton;
 class wxButtonWithImage;
 
 #include <wx/string.h>
@@ -48,7 +49,6 @@ class wxButtonWithImage;
 #include <wx/animate.h>
 #include <wx/treectrl.h>
 #include <wx/checklst.h>
-#include <wx/spinctrl.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -66,6 +66,9 @@ class MainDialogGenerated : public wxFrame
 		wxMenuItem* m_menuItem10;
 		wxMenuItem* m_menuItem11;
 		wxMenuItem* m_menuItemSwitchView;
+		wxMenuItem* m_menuItemNew;
+		wxMenuItem* m_menuItemSave;
+		wxMenuItem* m_menuItemLoad;
 		wxMenu* m_menuAdvanced;
 		wxMenu* m_menuLanguages;
 		wxMenuItem* m_menuItemGlobSett;
@@ -97,7 +100,6 @@ class MainDialogGenerated : public wxFrame
 		wxBitmapButton* m_bpButtonSwapSides;
 		wxPanel* m_panelTopRight;
 		wxBitmapButton* m_bpButtonAddPair;
-		wxBitmapButton* m_bpButtonRemoveTopPair;
 		wxComboBox* m_directoryRight;
 		wxDirPickerCtrl* m_dirPickerRight;
 		wxScrolledWindow* m_scrolledWindowFolderPairs;
@@ -120,20 +122,20 @@ class MainDialogGenerated : public wxFrame
 		wxCheckBox* m_checkBoxHideFilt;
 		wxPanel* m_panel112;
 		
-		wxBitmapButton* m_bpButtonLeftOnly;
-		wxBitmapButton* m_bpButtonLeftNewer;
-		wxBitmapButton* m_bpButtonEqual;
-		wxBitmapButton* m_bpButtonDifferent;
-		wxBitmapButton* m_bpButtonRightNewer;
-		wxBitmapButton* m_bpButtonRightOnly;
-		wxBitmapButton* m_bpButtonSyncCreateLeft;
-		wxBitmapButton* m_bpButtonSyncDirLeft;
-		wxBitmapButton* m_bpButtonSyncDeleteLeft;
-		wxBitmapButton* m_bpButtonSyncDirNone;
-		wxBitmapButton* m_bpButtonSyncDeleteRight;
-		wxBitmapButton* m_bpButtonSyncDirRight;
-		wxBitmapButton* m_bpButtonSyncCreateRight;
-		wxBitmapButton* m_bpButtonConflict;
+		ToggleButton* m_bpButtonLeftOnly;
+		ToggleButton* m_bpButtonLeftNewer;
+		ToggleButton* m_bpButtonEqual;
+		ToggleButton* m_bpButtonDifferent;
+		ToggleButton* m_bpButtonRightNewer;
+		ToggleButton* m_bpButtonRightOnly;
+		ToggleButton* m_bpButtonSyncCreateLeft;
+		ToggleButton* m_bpButtonSyncDirOverwLeft;
+		ToggleButton* m_bpButtonSyncDeleteLeft;
+		ToggleButton* m_bpButtonSyncDirNone;
+		ToggleButton* m_bpButtonSyncDeleteRight;
+		ToggleButton* m_bpButtonSyncDirOverwRight;
+		ToggleButton* m_bpButtonSyncCreateRight;
+		ToggleButton* m_bpButtonConflict;
 		
 		wxBoxSizer* bSizerBottomRight;
 		
@@ -166,6 +168,7 @@ class MainDialogGenerated : public wxFrame
 		virtual void OnCompare( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnStartSync( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSwitchView( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnNewConfig( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSaveConfig( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnLoadConfig( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuQuit( wxCommandEvent& event ){ event.Skip(); }
@@ -180,7 +183,6 @@ class MainDialogGenerated : public wxFrame
 		virtual void OnDirSelected( wxFileDirPickerEvent& event ){ event.Skip(); }
 		virtual void OnSwapSides( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnAddFolderPair( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnRemoveTopFolderPair( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnLeftGridDoubleClick( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnContextRim( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnSortLeftGrid( wxGridEvent& event ){ event.Skip(); }
@@ -228,14 +230,16 @@ class FolderPairGenerated : public wxPanel
 	
 	protected:
 		wxPanel* m_panel20;
-		wxPanel* m_panel21;
+		
+		wxBitmapButton* m_bpButtonAltFilter;
+		wxBitmapButton* m_bpButtonAltSyncCfg;
 		
 	
 	public:
 		wxPanel* m_panelLeft;
 		wxTextCtrl* m_directoryLeft;
 		wxDirPickerCtrl* m_dirPickerLeft;
-		wxStaticBitmap* m_bitmap23;
+		wxPanel* m_panel21;
 		wxPanel* m_panelRight;
 		wxBitmapButton* m_bpButtonRemovePair;
 		wxTextCtrl* m_directoryRight;
@@ -257,7 +261,9 @@ class BatchFolderPairGenerated : public wxPanel
 		wxStaticText* m_staticText53;
 		wxStaticText* m_staticText541;
 		wxPanel* m_panelLeft;
+		wxBitmapButton* m_bpButtonAltSyncCfg;
 		wxPanel* m_panelRight;
+		wxBitmapButton* m_bpButtonAltFilter;
 		
 	
 	public:
@@ -303,13 +309,10 @@ class BatchDlgGenerated : public wxDialog
 		wxRadioButton* m_radioBtnSizeDate;
 		wxRadioButton* m_radioBtnContent;
 		
-		
 		wxCheckBox* m_checkBoxFilter;
 		wxCheckBox* m_checkBoxSilent;
 		
-		
 		wxChoice* m_choiceHandleError;
-		
 		wxChoice* m_choiceHandleDeletion;
 		wxPanel* m_panelCustomDeletionDir;
 		wxTextCtrl* m_textCtrlCustomDelFolder;
@@ -333,6 +336,9 @@ class BatchDlgGenerated : public wxDialog
 		wxStaticBitmap* m_bitmapDifferent;
 		
 		wxBitmapButton* m_bpButtonDifferent;
+		wxStaticBitmap* m_bitmapConflict;
+		
+		wxBitmapButton* m_bpButtonConflict;
 		wxPanel* m_panelFilter;
 		
 		wxStaticText* m_staticText15;
@@ -353,7 +359,6 @@ class BatchDlgGenerated : public wxDialog
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ){ event.Skip(); }
 		virtual void OnAddFolderPair( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnRemoveTopFolderPair( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnChangeCompareVar( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnCheckFilter( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnCheckLogging( wxCommandEvent& event ){ event.Skip(); }
@@ -364,6 +369,7 @@ class BatchDlgGenerated : public wxDialog
 		virtual void OnLeftNewer( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnRightNewer( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnDifferent( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnConflict( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSaveBatchJob( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnLoadBatchJob( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnCancel( wxCommandEvent& event ){ event.Skip(); }
@@ -371,7 +377,6 @@ class BatchDlgGenerated : public wxDialog
 	
 	public:
 		wxBitmapButton* m_bpButtonAddPair;
-		wxBitmapButton* m_bpButtonRemoveTopPair;
 		wxTextCtrl* m_directoryLeft;
 		wxDirPickerCtrl* m_dirPickerLeft;
 		wxTextCtrl* m_directoryRight;
@@ -440,8 +445,8 @@ class SyncCfgDlgGenerated : public wxDialog
 		wxStaticText* m_staticText9;
 		
 		wxBoxSizer* bSizer201;
+		wxStaticBoxSizer* sbSizerErrorHandling;
 		wxChoice* m_choiceHandleError;
-		
 		wxChoice* m_choiceHandleDeletion;
 		wxPanel* m_panelCustomDeletionDir;
 		wxTextCtrl* m_textCtrlCustomDelFolder;
@@ -469,6 +474,9 @@ class SyncCfgDlgGenerated : public wxDialog
 		wxStaticBitmap* m_bitmapDifferent;
 		
 		wxBitmapButton* m_bpButtonDifferent;
+		wxStaticBitmap* m_bitmapConflict;
+		
+		wxBitmapButton* m_bpButtonConflict;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ){ event.Skip(); }
@@ -485,6 +493,7 @@ class SyncCfgDlgGenerated : public wxDialog
 		virtual void OnLeftNewer( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnRightNewer( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnDifferent( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnConflict( wxCommandEvent& event ){ event.Skip(); }
 		
 	
 	public:
@@ -605,7 +614,6 @@ class HelpDlgGenerated : public wxDialog
 		wxStaticText* m_staticText77;
 		wxStaticText* m_staticText79;
 		wxStaticText* m_staticText80;
-		
 		wxStaticText* m_staticText78;
 		wxScrolledWindow* m_scrolledWindow5;
 		wxStaticText* m_staticText65;
@@ -850,7 +858,7 @@ class FilterDlgGenerated : public wxDialog
 		virtual void OnClose( wxCloseEvent& event ){ event.Skip(); }
 		virtual void OnHelp( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnDefault( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnOK( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnApply( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnCancel( wxCommandEvent& event ){ event.Skip(); }
 		
 	
@@ -900,22 +908,22 @@ class GlobalSettingsDlgGenerated : public wxDialog
 	
 	protected:
 		wxStaticBitmap* m_bitmapSettings;
+		
 		wxPanel* m_panel8;
 		wxStaticText* m_staticText56;
 		
-		
-		wxStaticText* m_staticText99;
-		wxSpinCtrl* m_spinCtrlFileTimeTolerance;
 		wxStaticText* m_staticText114;
 		
 		wxCheckBox* m_checkBoxIgnoreOneHour;
 		wxStaticLine* m_staticline10;
-		wxStaticText* m_staticTextCommand;
-		wxTextCtrl* m_textCtrlCommand;
-		wxStaticLine* m_staticline101;
 		wxStaticText* m_staticText100;
 		
-		wxButtonWithImage* m_buttonResetWarnings;
+		wxButtonWithImage* m_buttonResetDialogs;
+		
+		
+		wxGrid* m_gridCustomCommand;
+		wxBitmapButton* m_bpButtonAddRow;
+		wxBitmapButton* m_bpButtonRemoveRow;
 		
 		wxButton* m_buttonOkay;
 		wxButton* m_button9;
@@ -923,7 +931,9 @@ class GlobalSettingsDlgGenerated : public wxDialog
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ){ event.Skip(); }
-		virtual void OnResetWarnings( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnResetDialogs( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnAddRow( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnRemoveRow( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnOkay( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnDefault( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnCancel( wxCommandEvent& event ){ event.Skip(); }

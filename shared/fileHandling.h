@@ -10,16 +10,22 @@ namespace FreeFileSync
 {
     Zstring getFormattedDirectoryName(const Zstring& dirname);
 
-    bool fileExists(const DefaultChar* filename);   //replaces wxFileExists()!
-    bool dirExists(const DefaultChar* dirname);     //replaces wxDirExists(): optional 'cause wxDirExists treats symlinks correctly
-    bool symlinkExists(const DefaultChar* objname); //check if a symbolic link exists
+    bool fileExists(const DefaultChar* filename);   //throw()       replaces wxFileExists()!
+    bool dirExists(const DefaultChar* dirname);     //throw()       replaces wxDirExists(): optional 'cause wxDirExists treats symlinks correctly
+    bool symlinkExists(const DefaultChar* objname); //throw()       check if a symbolic link exists
+
+    //check if files can be moved between two EXISTING paths (without copying)
+    bool isMovable(const Zstring& pathFrom, const Zstring& pathTo); //throw()
+
+    //optionally: copy directory last change date, DOES NOTHING if something fails
+    void copyDirLastChangeDate(const Zstring& sourceDir, const Zstring& targetDir);
 
     //recycler
     bool recycleBinExists(); //test existence of Recycle Bin API on current system
 
     //file handling
-    void removeFile(const Zstring& filename, const bool useRecycleBin);       //throw (FileError, ::RuntimeException);
-    void removeDirectory(const Zstring& directory, const bool useRecycleBin); //throw (FileError);
+    void removeFile(const Zstring& filename, const bool useRecycleBin);       //throw (FileError, std::logic_error)
+    void removeDirectory(const Zstring& directory, const bool useRecycleBin); //throw (FileError)
 
 
     class MoveFileCallback //callback functionality

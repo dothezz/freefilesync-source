@@ -1,11 +1,15 @@
 #include "synchronization.h"
+#include <stdexcept>
 #include <wx/intl.h>
 #include <wx/msgdlg.h>
 #include <wx/log.h>
 #include "algorithm.h"
-#include "shared/globalFunctions.h"
+#include "shared/systemConstants.h"
 #include "library/statusHandler.h"
 #include "shared/fileHandling.h"
+#include <wx/file.h>
+#include <boost/bind.hpp>
+#include "shared/globalFunctions.h"
 
 using namespace FreeFileSync;
 
@@ -19,33 +23,21 @@ void SyncStatistics::init()
     deleteLeft     = 0;
     deleteRight    = 0;
     conflict       = 0;
+    rowsTotal      = 0;
 }
 
 
-SyncStatistics::SyncStatistics(const FileComparison& fileCmp)
+SyncStatistics::SyncStatistics(const BaseDirMapping& baseDir)
 {
     init();
-
-    FileComparison::const_iterator start = fileCmp.begin();
-    FileComparison::const_iterator end   = fileCmp.end();
-    for (; start != end; ++start)
-        getNumbers(*start);
+    getNumbersRecursively(baseDir);
 }
 
 
 SyncStatistics::SyncStatistics(const FolderComparison& folderCmp)
 {
     init();
-
-    for (FolderComparison::const_iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
-    {
-        const FileComparison& fileCmp = j->fileCmp;
-
-        FileComparison::const_iterator start = fileCmp.begin();
-        FileComparison::const_iterator end   = fileCmp.end();
-        for (; start != end; ++start)
-            getNumbers(*start);
-    }
+    std::for_each(folderCmp.begin(), folderCmp.end(), boost::bind(&SyncStatistics::getNumbersRecursively, this, _1));
 }
 
 
@@ -82,19 +74,44 @@ wxULongLong SyncStatistics::getDataToProcess() const
 }
 
 
-inline
-void SyncStatistics::getNumbers(const FileCompareLine& fileCmpLine)
+int SyncStatistics::getRowCount() const
 {
-    switch (FreeFileSync::getSyncOperation(fileCmpLine)) //evaluate comparison result and sync direction
+    return rowsTotal;
+}
+
+
+inline
+void SyncStatistics::getNumbersRecursively(const HierarchyObject& hierObj)
+{
+    //process directories
+    std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(),
+                  boost::bind(&SyncStatistics::getDirNumbers, this, _1));
+
+    //process files
+    std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(),
+                  boost::bind(&SyncStatistics::getFileNumbers, this, _1));
+
+    rowsTotal += hierObj.subDirs.size();
+    rowsTotal += hierObj.subFiles.size();
+
+    //recurse into sub-dirs
+    std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), boost::bind(&SyncStatistics::getNumbersRecursively, this, _1));
+}
+
+
+inline
+void SyncStatistics::getFileNumbers(const FileMapping& fileObj)
+{
+    switch (FreeFileSync::getSyncOperation(fileObj)) //evaluate comparison result and sync direction
     {
     case SO_CREATE_NEW_LEFT:
         ++createLeft;
-        dataToProcess += fileCmpLine.fileDescrRight.fileSize;
+        dataToProcess += fileObj.getFileSize<RIGHT_SIDE>();
         break;
 
     case SO_CREATE_NEW_RIGHT:
         ++createRight;
-        dataToProcess += fileCmpLine.fileDescrLeft.fileSize;
+        dataToProcess += fileObj.getFileSize<LEFT_SIDE>();
         break;
 
     case SO_DELETE_LEFT:
@@ -107,12 +124,12 @@ void SyncStatistics::getNumbers(const FileCompareLine& fileCmpLine)
 
     case SO_OVERWRITE_LEFT:
         ++overwriteLeft;
-        dataToProcess += fileCmpLine.fileDescrRight.fileSize;
+        dataToProcess += fileObj.getFileSize<RIGHT_SIDE>();
         break;
 
     case SO_OVERWRITE_RIGHT:
         ++overwriteRight;
-        dataToProcess += fileCmpLine.fileDescrLeft.fileSize;
+        dataToProcess += fileObj.getFileSize<LEFT_SIDE>();
         break;
 
     case SO_DO_NOTHING:
@@ -125,87 +142,163 @@ void SyncStatistics::getNumbers(const FileCompareLine& fileCmpLine)
 }
 
 
-template <bool recyclerUsed>
-std::pair<wxLongLong, wxLongLong> spaceNeededSub(const FileComparison& fileCmp)
+inline
+void SyncStatistics::getDirNumbers(const DirMapping& dirObj)
 {
-    wxLongLong spaceNeededLeft;
-    wxLongLong spaceNeededRight;
-
-    for (FileComparison::const_iterator i = fileCmp.begin(); i != fileCmp.end(); ++i)
+    switch (FreeFileSync::getSyncOperation(dirObj)) //evaluate comparison result and sync direction
     {
-        if (i->selectedForSynchronization) //do not add filtered entries
-        {
-            //get data to process
-            switch (i->syncDir)
-            {
-            case SYNC_DIR_LEFT:   //copy from right to left
-                if (!recyclerUsed)
-                    spaceNeededLeft -= globalFunctions::convertToSigned(i->fileDescrLeft.fileSize);
-                spaceNeededLeft += globalFunctions::convertToSigned(i->fileDescrRight.fileSize);
-                break;
+    case SO_CREATE_NEW_LEFT:
+        ++createLeft;
+        break;
 
-            case SYNC_DIR_RIGHT:  //copy from left to right
-                if (!recyclerUsed)
-                    spaceNeededRight -= globalFunctions::convertToSigned(i->fileDescrRight.fileSize);
-                spaceNeededRight += globalFunctions::convertToSigned(i->fileDescrLeft.fileSize);
-                break;
+    case SO_CREATE_NEW_RIGHT:
+        ++createRight;
+        break;
 
-            case SYNC_DIR_NONE:
-            case SYNC_UNRESOLVED_CONFLICT:
-                break;
-            }
-        }
+    case SO_DELETE_LEFT:
+        ++deleteLeft;
+        break;
+
+    case SO_DELETE_RIGHT:
+        ++deleteRight;
+        break;
+
+    case SO_OVERWRITE_LEFT:
+    case SO_OVERWRITE_RIGHT:
+    case SO_UNRESOLVED_CONFLICT:
+        assert(false);
+        break;
+
+    case SO_DO_NOTHING:
+        break;
     }
-
-    return std::pair<wxLongLong, wxLongLong>(spaceNeededLeft, spaceNeededRight);
 }
 
 
-std::pair<wxLongLong, wxLongLong> freeDiskSpaceNeeded(const FileComparison& fileCmp, const DeletionPolicy handleDeletion)
+std::vector<FreeFileSync::FolderPairSyncCfg> FreeFileSync::extractSyncCfg(const MainConfiguration& mainCfg)
+{
+    std::vector<FolderPairSyncCfg> output;
+
+    //add main pair
+    output.push_back(
+        FolderPairSyncCfg(mainCfg.handleDeletion,
+                          mainCfg.customDeletionDirectory));
+
+    //add additional pairs
+    for (std::vector<FolderPairEnh>::const_iterator i = mainCfg.additionalPairs.begin(); i != mainCfg.additionalPairs.end(); ++i)
+        output.push_back(
+            FolderPairSyncCfg(i->altSyncConfig.get() ? i->altSyncConfig->handleDeletion          : mainCfg.handleDeletion,
+                              i->altSyncConfig.get() ? i->altSyncConfig->customDeletionDirectory : mainCfg.customDeletionDirectory));
+    return output;
+}
+
+
+template <bool recyclerUsed>
+class DiskSpaceNeeded
+{
+public:
+    DiskSpaceNeeded(const BaseDirMapping& baseObj)
+    {
+        processRecursively(baseObj);
+    }
+
+    std::pair<wxLongLong, wxLongLong> getSpaceTotal() const
+    {
+        return std::make_pair(spaceNeededLeft, spaceNeededRight);
+    }
+
+private:
+    void processRecursively(const HierarchyObject& hierObj)
+    {
+        //don't process directories
+
+        //process files
+        for (HierarchyObject::SubFileMapping::const_iterator i = hierObj.subFiles.begin(); i != hierObj.subFiles.end(); ++i)
+            if (i->selectedForSynchronization) //do not add filtered entries
+            {
+                //get data to process
+                switch (i->syncDir)
+                {
+                case SYNC_DIR_LEFT:   //copy from right to left
+                    if (!recyclerUsed)
+                        spaceNeededLeft -= globalFunctions::convertToSigned(i->getFileSize<LEFT_SIDE>());
+                    spaceNeededLeft += globalFunctions::convertToSigned(i->getFileSize<RIGHT_SIDE>());
+                    break;
+
+                case SYNC_DIR_RIGHT:  //copy from left to right
+                    if (!recyclerUsed)
+                        spaceNeededRight -= globalFunctions::convertToSigned(i->getFileSize<RIGHT_SIDE>());
+                    spaceNeededRight += globalFunctions::convertToSigned(i->getFileSize<LEFT_SIDE>());
+                    break;
+
+                case SYNC_DIR_NONE:
+                    break;
+                }
+            }
+
+        //recurse into sub-dirs
+        std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), boost::bind(&DiskSpaceNeeded<recyclerUsed>::processRecursively, this, _1));
+    }
+
+    wxLongLong spaceNeededLeft;
+    wxLongLong spaceNeededRight;
+};
+
+
+std::pair<wxLongLong, wxLongLong> freeDiskSpaceNeeded(const BaseDirMapping& baseDirObj, const DeletionPolicy handleDeletion)
 {
     switch (handleDeletion)
     {
     case FreeFileSync::DELETE_PERMANENTLY:
-        return spaceNeededSub<false>(fileCmp);
+        return DiskSpaceNeeded<false>(baseDirObj).getSpaceTotal();
     case FreeFileSync::MOVE_TO_RECYCLE_BIN:
-        return spaceNeededSub<true>(fileCmp);
+        return DiskSpaceNeeded<true>(baseDirObj).getSpaceTotal();
     case FreeFileSync::MOVE_TO_CUSTOM_DIRECTORY:
-        return spaceNeededSub<true>(fileCmp); //this is not necessarily correct! it needs to be checked if user-def recycle bin dir and sync-dir are on same drive
+    //warning: this is not necessarily correct! it needs to be checked if user-def recycle bin dir and sync-dir are on same drive
+        return DiskSpaceNeeded<true>(baseDirObj).getSpaceTotal();
     }
 
     assert(false);
-    return spaceNeededSub<true>(fileCmp); //dummy
+    return std::make_pair(2000000000, 2000000000); //dummy
+}
+
+
+bool synchronizationNeeded(const SyncStatistics& statisticsTotal)
+{
+    return statisticsTotal.getCreate() +
+           statisticsTotal.getOverwrite() +
+           statisticsTotal.getDelete() +
+           //conflicts (unless excluded) justify a sync! Also note: if this method returns false, no warning about unresolved conflicts were shown!
+           statisticsTotal.getConflict() != 0;
 }
 
 
 bool FreeFileSync::synchronizationNeeded(const FolderComparison& folderCmp)
 {
     const SyncStatistics statisticsTotal(folderCmp);
-    return statisticsTotal.getCreate() + statisticsTotal.getOverwrite() + statisticsTotal.getDelete() != 0;
+    return ::synchronizationNeeded(statisticsTotal);
 }
 
 
 //test if user accidentally tries to sync the wrong folders
-bool significantDifferenceDetected(const FileComparison& fileCmp)
+bool significantDifferenceDetected(const SyncStatistics& folderPairStat)
 {
-    const SyncStatistics st(fileCmp);
-
     //initial file copying shall not be detected as major difference
-    if (    st.getCreate(true, false) == 0 &&
-            st.getOverwrite()         == 0 &&
-            st.getDelete()            == 0 &&
-            st.getConflict()          == 0) return false;
-    if (    st.getCreate(false, true) == 0 &&
-            st.getOverwrite()         == 0 &&
-            st.getDelete()            == 0 &&
-            st.getConflict()          == 0) return false;
+    if (    folderPairStat.getCreate(true, false) == 0 &&
+            folderPairStat.getOverwrite()         == 0 &&
+            folderPairStat.getDelete()            == 0 &&
+            folderPairStat.getConflict()          == 0) return false;
+    if (    folderPairStat.getCreate(false, true) == 0 &&
+            folderPairStat.getOverwrite()         == 0 &&
+            folderPairStat.getDelete()            == 0 &&
+            folderPairStat.getConflict()          == 0) return false;
 
-    const int changedRows = st.getCreate()    +
-                            st.getOverwrite() +
-                            st.getDelete()    +
-                            st.getConflict();
+    const int changedRows = folderPairStat.getCreate()    +
+                            folderPairStat.getOverwrite() +
+                            folderPairStat.getDelete()    +
+                            folderPairStat.getConflict();
 
-    return changedRows >= 10 && changedRows > 0.5 * fileCmp.size();
+    return changedRows >= 10 && changedRows > 0.5 * folderPairStat.getRowCount();
 }
 
 
@@ -227,8 +320,6 @@ FreeFileSync::SyncOperation FreeFileSync::getSyncOperation( //evaluate compariso
             return SO_CREATE_NEW_RIGHT; //copy files to right
         case SYNC_DIR_NONE:
             return SO_DO_NOTHING;
-        case SYNC_UNRESOLVED_CONFLICT:
-            assert(false);
         }
         break;
 
@@ -241,8 +332,6 @@ FreeFileSync::SyncOperation FreeFileSync::getSyncOperation( //evaluate compariso
             return SO_DELETE_RIGHT; //delete files on right
         case SYNC_DIR_NONE:
             return SO_DO_NOTHING;
-        case SYNC_UNRESOLVED_CONFLICT:
-            assert(false);
         }
         break;
 
@@ -257,8 +346,6 @@ FreeFileSync::SyncOperation FreeFileSync::getSyncOperation( //evaluate compariso
             return SO_OVERWRITE_RIGHT; //copy from left to right
         case SYNC_DIR_NONE:
             return SO_DO_NOTHING;
-        case SYNC_UNRESOLVED_CONFLICT:
-            assert(false);
         }
         break;
 
@@ -270,8 +357,6 @@ FreeFileSync::SyncOperation FreeFileSync::getSyncOperation( //evaluate compariso
         case SYNC_DIR_RIGHT:
             return SO_OVERWRITE_RIGHT; //copy from left to right
         case SYNC_DIR_NONE:
-            return SO_DO_NOTHING;
-        case SYNC_UNRESOLVED_CONFLICT:
             return SO_UNRESOLVED_CONFLICT;
         }
         break;
@@ -285,9 +370,9 @@ FreeFileSync::SyncOperation FreeFileSync::getSyncOperation( //evaluate compariso
 }
 
 
-SyncOperation FreeFileSync::getSyncOperation(const FileCompareLine& line) //convenience function
+SyncOperation FreeFileSync::getSyncOperation(const FileSystemObject& fsObj) //convenience function
 {
-    return getSyncOperation(line.cmpResult, line.selectedForSynchronization, line.syncDir);
+    return getSyncOperation(fsObj.getCategory(), fsObj.selectedForSynchronization, fsObj.syncDir);
 }
 
 
@@ -324,16 +409,14 @@ wxString getSessionDeletionDir(const wxString& customDeletionDirectory)
 }
 
 
-SyncProcess::SyncProcess(const DeletionPolicy handleDeletion,
-                         const wxString& custDelFolder,
-                         const bool copyFileSymLinks,
+SyncProcess::SyncProcess(const bool copyFileSymLinks,
                          const bool traverseDirSymLinks,
-                         xmlAccess::WarningMessages& warnings,
+                         xmlAccess::OptionalDialogs& warnings,
+                         const bool verifyCopiedFiles,
                          StatusHandler* handler) :
-        m_handleDeletion(handleDeletion),
-        sessionDeletionDirectory(getSessionDeletionDir(custDelFolder).c_str()),
         m_copyFileSymLinks(copyFileSymLinks),
         m_traverseDirSymLinks(traverseDirSymLinks),
+        m_verifyCopiedFiles(verifyCopiedFiles),
         m_warnings(warnings),
 #ifdef FFS_WIN
         shadowCopyHandler(new ShadowCopy),
@@ -342,15 +425,21 @@ SyncProcess::SyncProcess(const DeletionPolicy handleDeletion,
         txtCopyingFile(Zstring(_("Copying file %x to %y")).Replace(wxT("%x"), wxT("\"%x\""), false).Replace(wxT("%y"), wxT("\n\"%y\""), false)),
         txtOverwritingFile(Zstring(_("Copying file %x to %y overwriting target")).Replace(wxT("%x"), wxT("\"%x\""), false).Replace(wxT("%y"), wxT("\n\"%y\""), false)),
         txtCreatingFolder(Zstring(_("Creating folder %x")).Replace(wxT("%x"), wxT("\n\"%x\""), false)),
-
-        txtDeletingFile(m_handleDeletion == MOVE_TO_RECYCLE_BIN ? Zstring(_("Moving %x to Recycle Bin")).Replace(wxT("%x"), wxT("\"%x\""), false) :
-                        m_handleDeletion == DELETE_PERMANENTLY ? Zstring(_("Deleting file %x")).Replace(wxT("%x"), wxT("\n\"%x\""), false) :
-                        Zstring(_("Moving %x to custom directory")).Replace(wxT("%x"), wxT("\"%x\""), false)),
-
-        txtDeletingFolder(m_handleDeletion == MOVE_TO_RECYCLE_BIN ? Zstring(_("Moving %x to Recycle Bin")).Replace( wxT("%x"), wxT("\"%x\""), false) :
-                          m_handleDeletion == DELETE_PERMANENTLY ? Zstring(_("Deleting folder %x")).Replace( wxT("%x"), wxT("\n\"%x\""), false) :
-                          Zstring(_("Moving %x to custom directory")).Replace(wxT("%x"), wxT("\"%x\""), false))
+        txtDeletingFile(Zstring(_("Deleting file %x")).Replace(wxT("%x"), wxT("\n\"%x\""), false)),
+        txtDeletingFolder(Zstring(_("Deleting folder %x")).Replace( wxT("%x"), wxT("\n\"%x\""), false)),
+        txtMoveToRecycler(Zstring(_("Moving %x to Recycle Bin")).Replace(wxT("%x"), wxT("\"%x\""), false)),
+        txtVerifying(Zstring(_("Verifying file %x")).Replace(wxT("%x"), wxT("\n\"%x\""), false))
 {}
+
+
+SyncProcess::DeletionHandling::DeletionHandling(const DeletionPolicy handleDel,
+        const wxString& custDelFolder) :
+        handleDeletion(handleDel),
+        currentDelFolder(getSessionDeletionDir(custDelFolder).c_str()), //ends with path separator
+        txtMoveFileUserDefined(  Zstring(_("Moving file %x to user-defined directory %y")).  Replace(wxT("%x"), wxT("\"%x\"\n"), false).Replace(wxT("%y"), Zstring(wxT("\"")) + custDelFolder.c_str() + wxT("\""), false)),
+        txtMoveFolderUserDefined(Zstring(_("Moving folder %x to user-defined directory %y")).Replace(wxT("%x"), wxT("\"%x\"\n"), false).Replace(wxT("%y"), Zstring(wxT("\"")) + custDelFolder.c_str() + wxT("\""), false))
+{}
+
 
 
 class MoveFileCallbackImpl : public MoveFileCallback //callback functionality
@@ -375,21 +464,45 @@ private:
 };
 
 
+template <FreeFileSync::SelectedSide side>
 inline
-void SyncProcess::removeFile(const FileDescrLine& fildesc, const Zstring& altDeletionDir)
+void SyncProcess::removeFile(const FileMapping& fileObj, const DeletionHandling& delHandling, bool showStatusUpdate) const
 {
-    switch (m_handleDeletion)
+    Zstring statusText;
+
+    switch (delHandling.handleDeletion)
     {
     case FreeFileSync::DELETE_PERMANENTLY:
-        FreeFileSync::removeFile(fildesc.fullName, false);
+        if (showStatusUpdate) //status information
+        {
+            statusText = txtDeletingFile;
+            statusText.Replace(wxT("%x"), fileObj.getFullName<side>(), false);
+            statusUpdater->updateStatusText(statusText);
+            statusUpdater->requestUiRefresh(); //trigger display refresh
+        }
+        FreeFileSync::removeFile(fileObj.getFullName<side>(), false);
         break;
     case FreeFileSync::MOVE_TO_RECYCLE_BIN:
-        FreeFileSync::removeFile(fildesc.fullName, true);
+        if (showStatusUpdate) //status information
+        {
+            statusText = txtMoveToRecycler;
+            statusText.Replace(wxT("%x"), fileObj.getFullName<side>(), false);
+            statusUpdater->updateStatusText(statusText);
+            statusUpdater->requestUiRefresh(); //trigger display refresh
+        }
+        FreeFileSync::removeFile(fileObj.getFullName<side>(), true);
         break;
     case FreeFileSync::MOVE_TO_CUSTOM_DIRECTORY:
-        if (FreeFileSync::fileExists(fildesc.fullName))
+        if (FreeFileSync::fileExists(fileObj.getFullName<side>()))
         {
-            const Zstring targetFile = altDeletionDir + fildesc.relativeName.c_str(); //altDeletionDir ends with path separator
+            if (showStatusUpdate) //status information
+            {
+                statusText = delHandling.txtMoveFileUserDefined;
+                statusText.Replace(wxT("%x"), fileObj.getFullName<side>(), false);
+                statusUpdater->updateStatusText(statusText);
+                statusUpdater->requestUiRefresh(); //trigger display refresh
+            }
+            const Zstring targetFile = delHandling.currentDelFolder + fileObj.getRelativeName<side>(); //altDeletionDir ends with path separator
             const Zstring targetDir  = targetFile.BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);
 
             if (!FreeFileSync::dirExists(targetDir))
@@ -405,76 +518,72 @@ void SyncProcess::removeFile(const FileDescrLine& fildesc, const Zstring& altDel
             }
 
             MoveFileCallbackImpl callBack(statusUpdater); //if file needs to be copied we need callback functionality to update screen and offer abort
-            FreeFileSync::moveFile(fildesc.fullName, targetFile, &callBack);
+            FreeFileSync::moveFile(fileObj.getFullName<side>(), targetFile, &callBack);
         }
         break;
     }
 }
 
 
-void SyncProcess::synchronizeFile(const FileCompareLine& cmpLine, const FolderPair& folderPair, const Zstring& altDeletionDir)
+void SyncProcess::synchronizeFile(FileMapping& fileObj, const DeletionHandling& delHandling) const
 {
     Zstring statusText;
     Zstring target;
 
-    switch (getSyncOperation(cmpLine)) //evaluate comparison result and sync direction
+    switch (getSyncOperation(fileObj)) //evaluate comparison result and sync direction
     {
     case SO_CREATE_NEW_LEFT:
-        target = folderPair.leftDirectory + cmpLine.fileDescrRight.relativeName.c_str();
+        target = fileObj.getBaseDirPf<LEFT_SIDE>() + fileObj.getRelativeName<RIGHT_SIDE>();
 
         statusText = txtCopyingFile;
-        statusText.Replace(wxT("%x"), cmpLine.fileDescrRight.fullName.AfterLast(globalFunctions::FILE_NAME_SEPARATOR), false);
+        statusText.Replace(wxT("%x"), fileObj.getShortName<RIGHT_SIDE>(), false);
         statusText.Replace(wxT("%y"), target.BeforeLast(globalFunctions::FILE_NAME_SEPARATOR), false);
         statusUpdater->updateStatusText(statusText);
+        statusUpdater->requestUiRefresh(); //trigger display refresh
 
-        copyFileUpdating(cmpLine.fileDescrRight.fullName, target, cmpLine.fileDescrRight.fileSize);
+        copyFileUpdating(fileObj.getFullName<RIGHT_SIDE>(), target, fileObj.getFileSize<RIGHT_SIDE>());
         break;
 
     case SO_CREATE_NEW_RIGHT:
-        target = folderPair.rightDirectory + cmpLine.fileDescrLeft.relativeName.c_str();
+        target = fileObj.getBaseDirPf<RIGHT_SIDE>() + fileObj.getRelativeName<LEFT_SIDE>();
 
         statusText = txtCopyingFile;
-        statusText.Replace(wxT("%x"), cmpLine.fileDescrLeft.fullName.AfterLast(globalFunctions::FILE_NAME_SEPARATOR), false);
+        statusText.Replace(wxT("%x"), fileObj.getShortName<LEFT_SIDE>(), false);
         statusText.Replace(wxT("%y"), target.BeforeLast(globalFunctions::FILE_NAME_SEPARATOR), false);
         statusUpdater->updateStatusText(statusText);
+        statusUpdater->requestUiRefresh(); //trigger display refresh
 
-        copyFileUpdating(cmpLine.fileDescrLeft.fullName, target, cmpLine.fileDescrLeft.fileSize);
+        copyFileUpdating(fileObj.getFullName<LEFT_SIDE>(), target, fileObj.getFileSize<LEFT_SIDE>());
         break;
 
     case SO_DELETE_LEFT:
-        statusText = txtDeletingFile;
-        statusText.Replace(wxT("%x"), cmpLine.fileDescrLeft.fullName, false);
-        statusUpdater->updateStatusText(statusText);
-
-        removeFile(cmpLine.fileDescrLeft, altDeletionDir);
+        removeFile<LEFT_SIDE>(fileObj, delHandling, true); //status updates in subroutine
         break;
 
     case SO_DELETE_RIGHT:
-        statusText = txtDeletingFile;
-        statusText.Replace(wxT("%x"), cmpLine.fileDescrRight.fullName, false);
-        statusUpdater->updateStatusText(statusText);
-
-        removeFile(cmpLine.fileDescrRight, altDeletionDir);
+        removeFile<RIGHT_SIDE>(fileObj, delHandling, true); //status updates in subroutine
         break;
 
     case SO_OVERWRITE_RIGHT:
         statusText = txtOverwritingFile;
-        statusText.Replace(wxT("%x"), cmpLine.fileDescrLeft.fullName.AfterLast(globalFunctions::FILE_NAME_SEPARATOR), false);
-        statusText.Replace(wxT("%y"), cmpLine.fileDescrRight.fullName.BeforeLast(globalFunctions::FILE_NAME_SEPARATOR), false);
+        statusText.Replace(wxT("%x"), fileObj.getShortName<LEFT_SIDE>(), false);
+        statusText.Replace(wxT("%y"), fileObj.getFullName<RIGHT_SIDE>().BeforeLast(globalFunctions::FILE_NAME_SEPARATOR), false);
         statusUpdater->updateStatusText(statusText);
+        statusUpdater->requestUiRefresh(); //trigger display refresh
 
-        removeFile(cmpLine.fileDescrRight, altDeletionDir);
-        copyFileUpdating(cmpLine.fileDescrLeft.fullName, cmpLine.fileDescrRight.fullName, cmpLine.fileDescrLeft.fileSize);
+        removeFile<RIGHT_SIDE>(fileObj, delHandling, false);
+        copyFileUpdating(fileObj.getFullName<LEFT_SIDE>(), fileObj.getFullName<RIGHT_SIDE>(), fileObj.getFileSize<LEFT_SIDE>());
         break;
 
     case SO_OVERWRITE_LEFT:
         statusText = txtOverwritingFile;
-        statusText.Replace(wxT("%x"), cmpLine.fileDescrRight.fullName.AfterLast(globalFunctions::FILE_NAME_SEPARATOR), false);
-        statusText.Replace(wxT("%y"), cmpLine.fileDescrLeft.fullName.BeforeLast(globalFunctions::FILE_NAME_SEPARATOR), false);
+        statusText.Replace(wxT("%x"), fileObj.getShortName<RIGHT_SIDE>(), false);
+        statusText.Replace(wxT("%y"), fileObj.getFullName<LEFT_SIDE>().BeforeLast(globalFunctions::FILE_NAME_SEPARATOR), false);
         statusUpdater->updateStatusText(statusText);
+        statusUpdater->requestUiRefresh(); //trigger display refresh
 
-        removeFile(cmpLine.fileDescrLeft, altDeletionDir);
-        copyFileUpdating(cmpLine.fileDescrRight.fullName, cmpLine.fileDescrLeft.fullName, cmpLine.fileDescrRight.fileSize);
+        removeFile<LEFT_SIDE>(fileObj, delHandling, false);
+        copyFileUpdating(fileObj.getFullName<RIGHT_SIDE>(), fileObj.getFullName<LEFT_SIDE>(), fileObj.getFileSize<RIGHT_SIDE>());
         break;
 
     case SO_DO_NOTHING:
@@ -485,24 +594,59 @@ void SyncProcess::synchronizeFile(const FileCompareLine& cmpLine, const FolderPa
     //progress indicator update
     //indicator is updated only if file is sync'ed correctly (and if some sync was done)!
     statusUpdater->updateProcessedData(1, 0); //processed data is communicated in subfunctions!
+
+    //update FileMapping
+    switch (fileObj.syncDir)
+    {
+    case SYNC_DIR_LEFT:
+        fileObj.copyTo<LEFT_SIDE>();
+        break;
+    case SYNC_DIR_RIGHT:
+        fileObj.copyTo<RIGHT_SIDE>();
+        break;
+    case SYNC_DIR_NONE:
+        assert(!"if nothing's todo then why arrive here?");
+        break;
+    }
 }
 
 
+template <FreeFileSync::SelectedSide side>
 inline
-void SyncProcess::removeFolder(const FileDescrLine& fildesc, const Zstring& altDeletionDir)
+void SyncProcess::removeFolder(const DirMapping& dirObj, const DeletionHandling& delHandling) const
 {
-    switch (m_handleDeletion)
+    Zstring statusText;
+
+    switch (delHandling.handleDeletion)
     {
     case FreeFileSync::DELETE_PERMANENTLY:
-        FreeFileSync::removeDirectory(fildesc.fullName, false);
+        //status information
+        statusText = txtDeletingFolder;
+        statusText.Replace(wxT("%x"), dirObj.getFullName<side>(), false);
+        statusUpdater->updateStatusText(statusText);
+        statusUpdater->requestUiRefresh(); //trigger display refresh
+
+        FreeFileSync::removeDirectory(dirObj.getFullName<side>(), false);
         break;
     case FreeFileSync::MOVE_TO_RECYCLE_BIN:
-        FreeFileSync::removeDirectory(fildesc.fullName, true);
+        //status information
+        statusText = txtMoveToRecycler;
+        statusText.Replace(wxT("%x"), dirObj.getFullName<side>(), false);
+        statusUpdater->updateStatusText(statusText);
+        statusUpdater->requestUiRefresh(); //trigger display refresh
+
+        FreeFileSync::removeDirectory(dirObj.getFullName<side>(), true);
         break;
     case FreeFileSync::MOVE_TO_CUSTOM_DIRECTORY:
-        if (FreeFileSync::dirExists(fildesc.fullName))
+        if (FreeFileSync::dirExists(dirObj.getFullName<side>()))
         {
-            const Zstring targetDir      = altDeletionDir + fildesc.relativeName.c_str();
+            //status information
+            statusText = delHandling.txtMoveFolderUserDefined;
+            statusText.Replace(wxT("%x"), dirObj.getFullName<side>(), false);
+            statusUpdater->updateStatusText(statusText);
+            statusUpdater->requestUiRefresh(); //trigger display refresh
+
+            const Zstring targetDir      = delHandling.currentDelFolder + dirObj.getRelativeName<side>();
             const Zstring targetSuperDir = targetDir.BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);;
 
             if (!FreeFileSync::dirExists(targetSuperDir))
@@ -518,61 +662,55 @@ void SyncProcess::removeFolder(const FileDescrLine& fildesc, const Zstring& altD
             }
 
             MoveFileCallbackImpl callBack(statusUpdater); //if files need to be copied, we need callback functionality to update screen and offer abort
-            FreeFileSync::moveDirectory(fildesc.fullName, targetDir, true, &callBack);
+            FreeFileSync::moveDirectory(dirObj.getFullName<side>(), targetDir, true, &callBack);
         }
         break;
     }
 }
 
 
-void SyncProcess::synchronizeFolder(const FileCompareLine& cmpLine, const FolderPair& folderPair, const Zstring& altDeletionDir)
+void SyncProcess::synchronizeFolder(DirMapping& dirObj, const DeletionHandling& delHandling) const
 {
     Zstring statusText;
     Zstring target;
 
     //synchronize folders:
-    switch (getSyncOperation(cmpLine)) //evaluate comparison result and sync direction
+    switch (getSyncOperation(dirObj)) //evaluate comparison result and sync direction
     {
     case SO_CREATE_NEW_LEFT:
-        target = folderPair.leftDirectory + cmpLine.fileDescrRight.relativeName.c_str();
+        target = dirObj.getBaseDirPf<LEFT_SIDE>() + dirObj.getRelativeName<RIGHT_SIDE>();
 
         statusText = txtCreatingFolder;
         statusText.Replace(wxT("%x"), target, false);
         statusUpdater->updateStatusText(statusText);
+        statusUpdater->requestUiRefresh(); //trigger display refresh
 
         //some check to catch the error that directory on source has been deleted externally after "compare"...
-        if (!FreeFileSync::dirExists(cmpLine.fileDescrRight.fullName))
-            throw FileError(wxString(_("Error: Source directory does not exist anymore:")) + wxT("\n\"") + cmpLine.fileDescrRight.fullName.c_str() + wxT("\""));
-        createDirectory(target, cmpLine.fileDescrRight.fullName, !m_traverseDirSymLinks); //traverse symlinks <=> !copy symlinks
+        if (!FreeFileSync::dirExists(dirObj.getFullName<RIGHT_SIDE>()))
+            throw FileError(wxString(_("Error: Source directory does not exist anymore:")) + wxT("\n\"") + dirObj.getFullName<RIGHT_SIDE>() + wxT("\""));
+        createDirectory(target, dirObj.getFullName<RIGHT_SIDE>(), !m_traverseDirSymLinks); //traverse symlinks <=> !copy symlinks
         break;
 
     case SO_CREATE_NEW_RIGHT:
-        target = folderPair.rightDirectory + cmpLine.fileDescrLeft.relativeName.c_str();
+        target = dirObj.getBaseDirPf<RIGHT_SIDE>() + dirObj.getRelativeName<LEFT_SIDE>();
 
         statusText = txtCreatingFolder;
         statusText.Replace(wxT("%x"), target, false);
         statusUpdater->updateStatusText(statusText);
+        statusUpdater->requestUiRefresh(); //trigger display refresh
 
         //some check to catch the error that directory on source has been deleted externally after "compare"...
-        if (!FreeFileSync::dirExists(cmpLine.fileDescrLeft.fullName))
-            throw FileError(wxString(_("Error: Source directory does not exist anymore:")) + wxT("\n\"") + cmpLine.fileDescrLeft.fullName.c_str() + wxT("\""));
-        createDirectory(target, cmpLine.fileDescrLeft.fullName, !m_traverseDirSymLinks); //traverse symlinks <=> !copy symlinks
+        if (!FreeFileSync::dirExists(dirObj.getFullName<LEFT_SIDE>()))
+            throw FileError(wxString(_("Error: Source directory does not exist anymore:")) + wxT("\n\"") + dirObj.getFullName<LEFT_SIDE>() + wxT("\""));
+        createDirectory(target, dirObj.getFullName<LEFT_SIDE>(), !m_traverseDirSymLinks); //traverse symlinks <=> !copy symlinks
         break;
 
     case SO_DELETE_LEFT:
-        statusText = txtDeletingFolder;
-        statusText.Replace(wxT("%x"), cmpLine.fileDescrLeft.fullName, false);
-        statusUpdater->updateStatusText(statusText);
-
-        removeFolder(cmpLine.fileDescrLeft, altDeletionDir);
+        removeFolder<LEFT_SIDE>(dirObj, delHandling);
         break;
 
     case SO_DELETE_RIGHT:
-        statusText = txtDeletingFolder;
-        statusText.Replace(wxT("%x"), cmpLine.fileDescrRight.fullName, false);
-        statusUpdater->updateStatusText(statusText);
-
-        removeFolder(cmpLine.fileDescrRight, altDeletionDir);
+        removeFolder<RIGHT_SIDE>(dirObj, delHandling);
         break;
 
     case SO_OVERWRITE_RIGHT:
@@ -586,42 +724,137 @@ void SyncProcess::synchronizeFolder(const FileCompareLine& cmpLine, const Folder
     //progress indicator update
     //indicator is updated only if directory is sync'ed correctly (and if some work was done)!
     statusUpdater->updateProcessedData(1, 0);  //each call represents one processed file
+
+    //update DirMapping
+    switch (dirObj.syncDir)
+    {
+    case SYNC_DIR_LEFT:
+        dirObj.copyTo<LEFT_SIDE>();
+        break;
+    case SYNC_DIR_RIGHT:
+        dirObj.copyTo<RIGHT_SIDE>();
+        break;
+    case SYNC_DIR_NONE:
+        assert(!"if nothing's todo then why arrive here?");
+        break;
+    }
 }
 
 
 inline
-bool deletionImminent(const FileCompareLine& line)
+bool deletionImminent(const FileSystemObject& fsObj)
 {
     //test if current sync-line will result in deletion of files    -> used to avoid disc space bottlenecks
-    const SyncOperation op = FreeFileSync::getSyncOperation(line);
+    const SyncOperation op = FreeFileSync::getSyncOperation(fsObj);
     return op == FreeFileSync::SO_DELETE_LEFT || op == FreeFileSync::SO_DELETE_RIGHT;
 }
 
 
-class RemoveAtExit //this class ensures, that the result of the method below is ALWAYS written on exit, even if exceptions are thrown!
+class RemoveInvalid
 {
 public:
-    RemoveAtExit(FileComparison& fileCmp) :
-            gridToWrite(fileCmp) {}
+    RemoveInvalid(HierarchyObject& hierObj) :
+            hierObj_(hierObj) {}
 
-    ~RemoveAtExit()
+    ~RemoveInvalid()
     {
-        globalFunctions::removeRowsFromVector(rowsToDelete, gridToWrite);
-    }
-
-    void markRow(int nr)
-    {
-        rowsToDelete.insert(nr);
+        FileSystemObject::removeEmptyNonRec(hierObj_);
     }
 
 private:
-    FileComparison& gridToWrite;
-    std::set<int> rowsToDelete;
+    HierarchyObject& hierObj_;
 };
 
 
-//synchronize and returns all rows that have not been synced
-void SyncProcess::startSynchronizationProcess(FolderComparison& folderCmp)
+template <bool deleteOnly> //"true" if files deletion shall happen only
+class SyncProcess::SyncRecursively
+{
+public:
+    SyncRecursively(const SyncProcess* const syncProc, const SyncProcess::DeletionHandling& delHandling) :
+            syncProc_(syncProc),
+            delHandling_(delHandling) {}
+
+    void execute(HierarchyObject& hierObj)
+    {
+        //enforce removal of invalid entries (where both sides are empty)
+        RemoveInvalid dummy(hierObj); //non-recursive
+
+        //synchronize folders:
+        for (HierarchyObject::SubDirMapping::iterator i = hierObj.subDirs.begin(); i != hierObj.subDirs.end(); ++i)
+        {
+            if (deleteOnly) //no need, to process folders more than once!
+            {
+                while (true)
+                {
+                    try
+                    {
+                        syncProc_->synchronizeFolder(*i, delHandling_);
+                        break;
+                    }
+                    catch (FileError& error)
+                    {
+                        //User abort when copying files or moving files/directories into custom deletion directory:
+                        //windows build: abort if requested, don't show error message if cancelled by user!
+                        //linux build: this refresh is not necessary, because user abort triggers an AbortThisProcess() exception without a FileError()
+                        syncProc_->statusUpdater->requestUiRefresh(true);
+
+                        ErrorHandler::Response rv = syncProc_->statusUpdater->reportError(error.show());
+                        if (rv == ErrorHandler::IGNORE_ERROR)
+                            break;
+                        else if (rv == ErrorHandler::RETRY)
+                            ;  //continue with loop
+                        else
+                            assert (false);
+                    }
+                }
+            }
+
+            //recursive synchronization: don't recurse into already deleted subdirectories
+            if (!i->isEmpty())
+                execute(*i);
+        }
+
+
+        //synchronize files:
+        for (HierarchyObject::SubFileMapping::iterator i = hierObj.subFiles.begin(); i != hierObj.subFiles.end(); ++i)
+        {
+            if (    ( deleteOnly &&  deletionImminent(*i)) ||
+                    (!deleteOnly && !deletionImminent(*i)))
+            {
+                while (true)
+                {
+                    try
+                    {
+                        syncProc_->synchronizeFile(*i, delHandling_);
+                        break;
+                    }
+                    catch (FileError& error)
+                    {
+                        //User abort when copying files or moving files/directories into custom deletion directory:
+                        //windows build: abort if requested, don't show error message if cancelled by user!
+                        //linux build: this refresh is not necessary, because user abort triggers an AbortThisProcess() exception without a FileError()
+                        syncProc_->statusUpdater->requestUiRefresh(true);
+
+                        ErrorHandler::Response rv = syncProc_->statusUpdater->reportError(error.show());
+                        if ( rv == ErrorHandler::IGNORE_ERROR)
+                            break;
+                        else if (rv == ErrorHandler::RETRY)
+                            ;   //continue with loop
+                        else
+                            assert (false);
+                    }
+                }
+            }
+        }
+    }
+
+private:
+    const SyncProcess* const syncProc_;
+    const SyncProcess::DeletionHandling& delHandling_;
+};
+
+
+void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCfg>& syncConfig, FolderComparison& folderCmp)
 {
 #ifndef __WXDEBUG__
     wxLogNull noWxLogs; //prevent wxWidgets logging
@@ -637,61 +870,67 @@ void SyncProcess::startSynchronizationProcess(FolderComparison& folderCmp)
 
     //-------------------some basic checks:------------------------------------------
 
-    if (statisticsTotal.getOverwrite() + statisticsTotal.getDelete() > 0)
-    {
-        //test existence of Recycle Bin
-        if (m_handleDeletion == FreeFileSync::MOVE_TO_RECYCLE_BIN && !FreeFileSync::recycleBinExists())
-        {
-            statusUpdater->reportFatalError(_("Unable to initialize Recycle Bin!"));
-            return; //should be obsolete!
-        }
-
-        if (m_handleDeletion == FreeFileSync::MOVE_TO_CUSTOM_DIRECTORY)
-        {
-            //check if alternate directory for deletion was specified
-            if (sessionDeletionDirectory.empty())
-            {
-                statusUpdater->reportFatalError(_("Please specify alternate directory for deletion!"));
-                return; //should be obsolete!
-            }
-        }
-    }
+    if (syncConfig.size() != folderCmp.size())
+        throw std::logic_error("Programming Error: Contract violation!");
 
     for (FolderComparison::const_iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
     {
-        const FileComparison& fileCmp = j->fileCmp;
+        const SyncStatistics statisticsFolderPair(*j);
+        const FolderPairSyncCfg& folderPairCfg = syncConfig[j - folderCmp.begin()];
+
+        if (statisticsFolderPair.getOverwrite() + statisticsFolderPair.getDelete() > 0)
+        {
+            //test existence of Recycle Bin
+            if (folderPairCfg.handleDeletion == FreeFileSync::MOVE_TO_RECYCLE_BIN && !FreeFileSync::recycleBinExists())
+            {
+                statusUpdater->reportFatalError(_("Unable to initialize Recycle Bin!"));
+                return; //should be obsolete!
+            }
+
+            if (folderPairCfg.handleDeletion == FreeFileSync::MOVE_TO_CUSTOM_DIRECTORY)
+            {
+                //check if user-defined directory for deletion was specified
+                if (FreeFileSync::getFormattedDirectoryName(folderPairCfg.custDelFolder.c_str()).empty())
+                {
+                    statusUpdater->reportFatalError(_("User-defined directory for deletion was not specified!"));
+                    return; //should be obsolete!
+                }
+            }
+        }
 
         //check if more than 50% of total number of files/dirs are to be created/overwritten/deleted
-        if (significantDifferenceDetected(fileCmp))
+        if (significantDifferenceDetected(statisticsFolderPair))
         {
             statusUpdater->reportWarning(wxString(_("Significant difference detected:")) + wxT("\n") +
-                                         j->syncPair.leftDirectory + wxT(" <-> ") + wxT("\n") +
-                                         j->syncPair.rightDirectory + wxT("\n\n") +
+                                         j->getBaseDir<LEFT_SIDE>() + wxT(" <-> ") + wxT("\n") +
+                                         j->getBaseDir<RIGHT_SIDE>() + wxT("\n\n") +
                                          _("More than 50% of the total number of files will be copied or deleted!"),
                                          m_warnings.warningSignificantDifference);
         }
 
         //check for sufficient free diskspace in left directory
-        const std::pair<wxLongLong, wxLongLong> spaceNeeded = freeDiskSpaceNeeded(fileCmp, m_handleDeletion);
+        const std::pair<wxLongLong, wxLongLong> spaceNeeded = freeDiskSpaceNeeded(*j, folderPairCfg.handleDeletion);
 
         wxLongLong freeDiskSpaceLeft;
-        if (wxGetDiskSpace(j->syncPair.leftDirectory.c_str(), NULL, &freeDiskSpaceLeft))
+        if (wxGetDiskSpace(j->getBaseDir<LEFT_SIDE>().c_str(), NULL, &freeDiskSpaceLeft))
         {
             if (freeDiskSpaceLeft < spaceNeeded.first)
                 statusUpdater->reportWarning(wxString(_("Not enough free disk space available in:")) + wxT("\n") +
-                                             j->syncPair.leftDirectory + wxT("\n\n") +
-                                             _("Total required free disk space:") + wxT(" ") + formatFilesizeToShortString(spaceNeeded.first).c_str(),
+                                             wxT("\"") + j->getBaseDir<LEFT_SIDE>() + wxT("\"\n\n") +
+                                             _("Total required free disk space:") + wxT(" ") + formatFilesizeToShortString(spaceNeeded.first) + wxT("\n") +
+                                             _("Free disk space available:") + wxT(" ") + formatFilesizeToShortString(freeDiskSpaceLeft),
                                              m_warnings.warningNotEnoughDiskSpace);
         }
 
         //check for sufficient free diskspace in right directory
         wxLongLong freeDiskSpaceRight;
-        if (wxGetDiskSpace(j->syncPair.rightDirectory.c_str(), NULL, &freeDiskSpaceRight))
+        if (wxGetDiskSpace(j->getBaseDir<RIGHT_SIDE>().c_str(), NULL, &freeDiskSpaceRight))
         {
             if (freeDiskSpaceRight < spaceNeeded.second)
                 statusUpdater->reportWarning(wxString(_("Not enough free disk space available in:")) + wxT("\n") +
-                                             j->syncPair.rightDirectory + wxT("\n\n") +
-                                             _("Total required free disk space:") + wxT(" ") + formatFilesizeToShortString(spaceNeeded.second).c_str(),
+                                             wxT("\"") + j->getBaseDir<RIGHT_SIDE>() + wxT("\"\n\n") +
+                                             _("Total required free disk space:") + wxT(" ") + formatFilesizeToShortString(spaceNeeded.second) + wxT("\n") +
+                                             _("Free disk space available:") + wxT(" ") + formatFilesizeToShortString(freeDiskSpaceRight),
                                              m_warnings.warningNotEnoughDiskSpace);
         }
     }
@@ -706,119 +945,25 @@ void SyncProcess::startSynchronizationProcess(FolderComparison& folderCmp)
 
     try
     {
-        //loop over folder pairs
+        //loop through all directory pairs
+        assert(syncConfig.size() == folderCmp.size());
         for (FolderComparison::iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
         {
-            FileComparison& fileCmp = j->fileCmp;
-            const FolderPair& currentPair = j->syncPair;
+            const FolderPairSyncCfg& folderPairCfg = syncConfig[j - folderCmp.begin()];
 
             //generate name of alternate deletion directory (unique for session AND folder pair)
-            const Zstring alternateDeletionDir = folderCmp.size() > 1 ? //if multiple folder pairs are used create a subfolder for each pair
-                                                 sessionDeletionDirectory + globalFunctions::numberToWxString(j - folderCmp.begin() + 1).c_str() + globalFunctions::FILE_NAME_SEPARATOR :
-                                                 sessionDeletionDirectory;
+            const DeletionHandling currentDelHandling(folderPairCfg.handleDeletion, folderPairCfg.custDelFolder);
 
-            //ensure that folderCmp is always written to, even if method is left via exceptions
-            RemoveAtExit removeRowsAtExit(fileCmp); //note: running at individual folder pair level!
+            //execute synchronization recursively
 
-            // it should never happen, that a directory on left side has same name as file on right side. startCompareProcess() should take care of this
-            // and split into two "exists on one side only" cases
-            // Note: this case is not handled by this tool and must be solved by the user
-
-            //synchronize folders first; advantage: in case of deletions the whole folder is moved to recycle bin instead of single files
-            for (FileComparison::const_iterator i = fileCmp.begin(); i != fileCmp.end(); ++i)
-            {
-                if (    i->fileDescrLeft.objType  == FileDescrLine::TYPE_DIRECTORY ||
-                        i->fileDescrRight.objType == FileDescrLine::TYPE_DIRECTORY)
-                {
-                    while (true)
-                    {   //trigger display refresh
-                        statusUpdater->requestUiRefresh();
-
-                        try
-                        {
-                            synchronizeFolder(*i, currentPair, alternateDeletionDir);
-
-                            removeRowsAtExit.markRow(i - fileCmp.begin());
-                            break;
-                        }
-                        catch (FileError& error)
-                        {
-                            //User abort when copying files or moving files/directories into custom deletion directory:
-                            //windows build: abort if requested, don't show error message if cancelled by user!
-                            //linux build: this refresh is not necessary, because user abort triggers an AbortThisProcess() exception without a FileError()
-                            statusUpdater->requestUiRefresh(true);
-
-
-                            ErrorHandler::Response rv = statusUpdater->reportError(error.show());
-
-                            if (rv == ErrorHandler::IGNORE_ERROR)
-                                break;
-                            else if (rv == ErrorHandler::RETRY)
-                                ;  //continue with loop
-                            else
-                                assert (false);
-                        }
-                    }
-                }
-            }
-
-            //PERF_START;
-
-            //synchronize files:
-            for (int k = 0; k < 2; ++k) //loop over all files twice; reason: first delete, then copy (no sorting necessary: performance)
-            {
-                const bool deleteLoop = k == 0; //-> first loop: delete files, second loop: copy files
-
-                for (FileComparison::const_iterator i = fileCmp.begin(); i != fileCmp.end(); ++i)
-                {
-                    //skip processing of unresolved errors (do not remove row from GUI grid)
-                    if (getSyncOperation(*i) == SO_UNRESOLVED_CONFLICT)
-                        continue;
-
-                    if (    i->fileDescrLeft.objType  == FileDescrLine::TYPE_FILE ||
-                            i->fileDescrRight.objType == FileDescrLine::TYPE_FILE)
-                    {
-                        if (    (deleteLoop && deletionImminent(*i)) ||
-                                (!deleteLoop && !deletionImminent(*i)))
-                        {
-                            while (true)
-                            {    //trigger display refresh
-                                statusUpdater->requestUiRefresh();
-
-                                try
-                                {
-                                    synchronizeFile(*i, currentPair, alternateDeletionDir);
-
-                                    removeRowsAtExit.markRow(i - fileCmp.begin());
-                                    break;
-                                }
-                                catch (FileError& error)
-                                {
-                                    //User abort when copying files or moving files/directories into custom deletion directory:
-                                    //windows build: abort if requested, don't show error message if cancelled by user!
-                                    //linux build: this refresh is not necessary, because user abort triggers an AbortThisProcess() exception without a FileError()
-                                    statusUpdater->requestUiRefresh(true);
-
-
-                                    ErrorHandler::Response rv = statusUpdater->reportError(error.show());
-
-                                    if ( rv == ErrorHandler::IGNORE_ERROR)
-                                        break;
-                                    else if (rv == ErrorHandler::RETRY)
-                                        ;   //continue with loop
-                                    else
-                                        assert (false);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            //loop through all files twice; reason: first delete, then copy
+            SyncRecursively<true>( this, currentDelHandling).execute(*j);
+            SyncRecursively<false>(this, currentDelHandling).execute(*j);
         }
     }
-    catch (const RuntimeException& theException)
+    catch (const std::exception& e)
     {
-        statusUpdater->reportFatalError(theException.show().c_str());
+        statusUpdater->reportFatalError(wxString::From8BitData(e.what()));
         return; //should be obsolete!
     }
 }
@@ -861,7 +1006,7 @@ private:
 
 
 //copy file while executing statusUpdater->requestUiRefresh() calls
-void SyncProcess::copyFileUpdating(const Zstring& source, const Zstring& target, const wxULongLong& totalBytesToCpy)
+void SyncProcess::copyFileUpdating(const Zstring& source, const Zstring& target, const wxULongLong& totalBytesToCpy) const
 {
     //create folders first (see http://sourceforge.net/tracker/index.php?func=detail&aid=2628943&group_id=234430&atid=1093080)
     const Zstring targetDir = target.BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);
@@ -887,6 +1032,9 @@ void SyncProcess::copyFileUpdating(const Zstring& source, const Zstring& target,
 #elif defined FFS_LINUX
         FreeFileSync::copyFile(source, target, m_copyFileSymLinks, &callback);
 #endif
+
+        if (m_verifyCopiedFiles) //verify if data was copied correctly
+            verifyFileCopy(source, target);
     }
     catch (...)
     {
@@ -899,67 +1047,110 @@ void SyncProcess::copyFileUpdating(const Zstring& source, const Zstring& target,
     statusUpdater->updateProcessedData(0, globalFunctions::convertToSigned(totalBytesToCpy) - totalBytesTransferred);
 }
 
-/*
-//##### OLD IMPLEMENTATION WITHOUT SMOOTH PROGRESS INDICATOR ################
 
-#ifdef FFS_LINUX
-//handle execution of a method while updating the UI
-class UpdateWhileCopying : public UpdateWhileExecuting
+//--------------------- data verification -------------------------
+struct MemoryAllocator
 {
-public:
-    UpdateWhileCopying() {}
-    ~UpdateWhileCopying() {}
-
-    Zstring source;
-    Zstring target;
-    bool success;
-    Zstring errorMessage;
-
-private:
-    virtual void longRunner()
+    MemoryAllocator()
     {
-        try
-        {
-            FreeFileSync::copyFile(source, target);
-        }
-        catch (const FileError& e)
-        {
-            success = false;
-            errorMessage = e.show();
-            return;
-        }
-
-        success = true;
+        buffer = new unsigned char[bufferSize];
     }
+
+    ~MemoryAllocator()
+    {
+        delete [] buffer;
+    }
+
+    static const unsigned int bufferSize = 512 * 1024; //512 kb seems to be the perfect buffer size
+    unsigned char* buffer;
 };
 
-void copyFileUpdating(const Zstring& source, const Zstring& target, const wxULongLong& totalBytesToCpy, StatusHandler* updateClass)
+
+//callback functionality for status updates while verifying
+class VerifyCallback
 {
-    //create folders first (see http://sourceforge.net/tracker/index.php?func=detail&aid=2628943&group_id=234430&atid=1093080)
-    const Zstring targetDir = target.BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);
-    if (!wxDirExists(targetDir.c_str()))
+public:
+    virtual ~VerifyCallback() {}
+    virtual void updateStatus() = 0;
+};
+
+
+void verifyFiles(const Zstring& source, const Zstring& target, VerifyCallback* callback) // throw (FileError)
+{
+    static MemoryAllocator memory1;
+    static MemoryAllocator memory2;
+
+    wxFile file1(source.c_str(), wxFile::read); //don't use buffered file input for verification!
+    if (!file1.IsOpened())
+        throw FileError(wxString(_("Error opening file:")) + wxT(" \"") + source.c_str() + wxT("\""));
+
+    wxFile file2(target.c_str(), wxFile::read);
+    if (!file2.IsOpened()) //NO cleanup necessary for (wxFile) file1
+        throw FileError(wxString(_("Error opening file:")) + wxT(" \"") + target.c_str() + wxT("\""));
+
+    do
     {
-        const Zstring templateDir = source.BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);
-        FreeFileSync::createDirectory(targetDir, templateDir); //might throw FileError() exception
+        const size_t length1 = file1.Read(memory1.buffer, MemoryAllocator::bufferSize);
+        if (file1.Error()) throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + source.c_str() + wxT("\""));
+
+        const size_t length2 = file2.Read(memory2.buffer, MemoryAllocator::bufferSize);
+        if (file2.Error()) throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + target.c_str() + wxT("\""));
+
+        if (length1 != length2 || ::memcmp(memory1.buffer, memory2.buffer, length1) != 0)
+        {
+            const wxString errorMsg = wxString(_("Data verification error: Source and target file have different content!")) + wxT("\n");
+            throw FileError(errorMsg + wxT("\"") + source + wxT("\" -> \n\"") + target + wxT("\""));
+        }
+
+        //send progress updates
+        callback->updateStatus();
+    }
+    while (!file1.Eof());
+
+    if (!file2.Eof())
+    {
+        const wxString errorMsg = wxString(_("Data verification error: Source and target file have different content!")) + wxT("\n");
+        throw FileError(errorMsg + wxT("\"") + source + wxT("\" -> \n\"") + target + wxT("\""));
+    }
+}
+
+
+class VerifyStatusUpdater : public VerifyCallback
+{
+public:
+    VerifyStatusUpdater(StatusHandler* statusHandler) : m_statusHandler(statusHandler) {}
+
+    virtual void updateStatus()
+    {
+        m_statusHandler->requestUiRefresh(); //trigger display refresh
     }
 
-//update while copying via additional worker thread
-    static UpdateWhileCopying copyAndUpdate; //single instantiation: thread enters wait phase after each execution
+private:
+    StatusHandler* m_statusHandler;
+};
 
-    copyAndUpdate.waitUntilReady();
 
-    //longRunner is called from thread, but no mutex needed here, since thread is in waiting state!
-    copyAndUpdate.source = source;
-    copyAndUpdate.target = target;
+void SyncProcess::verifyFileCopy(const Zstring& source, const Zstring& target) const
+{
+    Zstring statusText = txtVerifying;
+    statusText.Replace(wxT("%x"), target, false);
+    statusUpdater->updateStatusText(statusText);
+    statusUpdater->requestUiRefresh(); //trigger display refresh
 
-    copyAndUpdate.execute(updateClass);
-
-    //no mutex needed here since longRunner is finished
-    if (!copyAndUpdate.success)
-        throw FileError(copyAndUpdate.errorMessage);
-
-    //inform about the processed amount of data
-    updateClass->updateProcessedData(0, totalBytesToCpy.ToDouble());
-#endif
+    VerifyStatusUpdater callback(statusUpdater);
+    try
+    {
+        verifyFiles(source, target, &callback);
+    }
+    catch (FileError& error)
+    {
+        switch (statusUpdater->reportError(error.show()))
+        {
+        case ErrorHandler::IGNORE_ERROR:
+            break;
+        case ErrorHandler::RETRY:
+            verifyFileCopy(source, target);
+            break;
+        }
+    }
 }
-*/

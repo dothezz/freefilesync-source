@@ -1,12 +1,12 @@
 #include "iconBuffer.h"
 #include <wx/thread.h>
-#include "../shared/globalFunctions.h"
 #include <wx/bitmap.h>
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include <wx/msgdlg.h>
 #include <wx/icon.h>
 #include <map>
 #include <queue>
+#include <stdexcept>
 
 using FreeFileSync::IconBuffer;
 
@@ -53,10 +53,10 @@ WorkerThread::WorkerThread(IconBuffer* iconBuff) :
         iconBuffer(iconBuff)
 {
     if (Create() != wxTHREAD_NO_ERROR)
-        throw RuntimeException(wxString(wxT("Error creating icon buffer worker thread!")));
+        throw std::runtime_error("Error creating icon buffer worker thread!");
 
     if (Run() != wxTHREAD_NO_ERROR)
-        throw RuntimeException(wxString(wxT("Error starting icon buffer worker thread!")));
+        throw std::runtime_error("Error starting icon buffer worker thread!");
 
     //wait until thread has aquired mutex
     bool hasMutex = false;
@@ -115,9 +115,9 @@ wxThread::ExitCode WorkerThread::Entry()
             doWork();
         }
     }
-    catch (RuntimeException& e) //exceptions must be catched per thread
+    catch (const std::exception& e) //exceptions must be catched per thread
     {
-        wxMessageBox(e.show());
+        wxMessageBox(wxString::From8BitData(e.what()), _("An exception occured!"), wxOK | wxICON_ERROR);
         return 0;
     }
 }
