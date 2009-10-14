@@ -1,0 +1,840 @@
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE
+ Byte
+ Bit
+ GB
+ GB
+ MB
+ MB
+ PB
+ PB
+ TB
+ TB
+ day(s)
+ gün(ler)
+ hour(s)
+ saat(ler)
+ kB
+ kB
+ min
+ dak
+ sec
+ san
+%x / %y objects deleted successfully
+%x / %y obje başarıyla silindi
+%x Percent
+Yüzde %x
+%x directories
+%x dizin
+%x files,
+%x dosya,
+%x is not a valid FreeFileSync batch file!
+%x geçerli bir FreeFileSync komut (batch) dosyası değildir!
+%x of %y rows in view
+%y satırdan %x'i görüntüleniyor
+%x of 1 row in view
+1 satırdan %x'i görüntüleniyor
+&Abort
+Va&zgeç
+&About...
+&Hakkında...
+&Advanced
+&Gelişmiş
+&Apply
+&Uygula
+&Cancel
+&İptal
+&Check for new version
+&Yeni sürüm kontrolü yap
+&Create batch job
+&Komut (batch) görevi oluştur
+&Default
+&Varsayılan
+&Exit
+Çı&kış
+&Export file list
+Dosya list&esini dışarı aktar
+&File
+&Dosya
+&Global settings
+&Genel ayarlar
+&Help
+&Yardım
+&Ignore
+&Yoksay
+&Language
+&Dil
+&Load
+&Yükle
+&Load configuration
+Konfigürasyon &yükle
+&New
+&Yeni
+&No
+&Hayır
+&OK
+&Tamam
+&Pause
+&Duraklat
+&Quit
+&Çık
+&Restore
+Ge&ri yükle
+&Retry
+&Yeniden dene
+&Save
+&Kaydet
+&Yes
+&Evet
+(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
+(Not: Sadece FAT/FAT32 olarak biçimlendirilmiş sürücüler bu problemden etkilenir!\nDiğer durumlarda, \"1-saat'lik zaman farkını yoksay\" ayarı devre dışı bırakılabilir.)
+,
+,
+- Other side's counterpart to %dir
+- %dir'e diğer tarafın karşılığı
+- Other side's counterpart to %name
+- %name'e diğer tarafın karşılığı
+- conflict
+- tutarsızlık
+- conflict (same date, different size)
+- tutarsızlık (aynı tarih, farklı ebat)
+- different
+- farklı
+- directory part only
+- sadece kısmi dizin
+- equal
+- eşit
+- exists left only
+- sadece solda olan
+- exists right only
+- sadece sağda olan
+- full file or directory name
+- tam dosya veya dizin adı
+- left
+- sol
+- left newer
+- soldaki daha yeni
+- right
+- sağ
+- right newer
+- sağdaki daha yeni
+-Open-Source file synchronization-
+-Açık kaynak dosya senkronizasyonu
+.
+.
+/sec
+/san
+1 directory
+1 dizin
+1 file,
+1 dosya,
+1. &Compare
+1. &Karşılaştır
+1. Enter relative file or directory names separated by ';' or a new line.
+1. ';' ile ayırarak veya herbiri yeni satırda olacak şekilde göreceli (relatif) dosya veya dizin adlarını girin.
+2. &Synchronize...
+2. &Senkronize et...
+2. Use wildcard characters '*' and '?'.
+2. Joker karakter olan '*' ve '?' kullan.
+3. Exclude files directly on main grid via context menu.
+3. Sağ fare tuşu ile açılan menüden ana listedeki dosyaları direk olarak hariç tutun.
+<Automatic>
+<Otomatik>
+<Directory>
+<Dizin>
+<Last session>
+<Önceki oturum>
+<multiple selection>
+<Çoklu seçim>
+A newer version of FreeFileSync is available:
+FreeFileSync'in yeni bir sürümü var:
+Abort requested: Waiting for current operation to finish...
+Vazgeçildi: Devam eden işlemin bitmesi bekleniyor...
+Aborted
+Vazgeçildi
+About
+Hakkında
+Action
+İşlem
+Add folder
+Klasör ekle
+Add folder pair
+Klasör çifti ekle
+An exception occured!
+Olağan dışı bir durum oluştu!
+As a result the files are separated into the following categories:
+Sonuç olarak dosyalar takibeden katagorilere göre ayrıldı:
+As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
+İsmindende anlaşılacağı gibi, aynı isme sahip iki dosya sadece ve sadece aynı içeriğe sahipse eşit olarak işaretlenir. Bu seçenek yedekleme işlemlerinden daha ziyade uyuşma kontrolü için faydalıdır. Bu yüzden dosya tarihleri hiç bir zaman dikkate alınmaz.\n\nBu seçenek etkinleştirildiğinde karar şeması küçülür:
+Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
+Otomatik senkronizasyon için bir komut (batch) dosyası oluşturun. Komut modunda başlamak için, komut dosyasını parametre olarak tanımlayarak FreeFileSync'i çalıştırın: FreeFileSync.exe <Komut Dosyası Adı>. Bu komut dosyası, istenirse, işletim sistemindeki görev zamanlayıcı ile istenilen zamanlarda çalıştırılabilir.
+Auto-adjust columns
+Kolonları otomatik olarak hizala
+Automatic mode
+Otomatik mod
+Batch execution
+Komut (batch) çalıştırılması
+Batch file created successfully!
+Komut (batch) dosyası başarıyla oluşturuldu!
+Batch job
+Komut (batch) görevi
+Big thanks for localizing FreeFileSync goes out to:
+FreeFileSync'in çevirisinden dolayı çok teşekkürler:
+Both sides have changed since last synchronization!
+En son senkronizasyondan sonra her iki tarafta deðiþmiþ bulunuyor!
+Browse
+Araştır
+Build:
+Derleme:
+Cancel
+İptal
+Cannot determine sync-direction: Changed filter settings!
+Senkronizasyon yönü belirlenemiyor: Filtre ayarlarý deðiþmiþ!
+Cannot determine sync-direction: No change since last synchronization!
+Senkronizasyon yönü belirlenemiyor: En son senkronizasyondan beri deðiþiklik yok!
+Category
+Kategori
+Change direction
+Yönü değiştir
+Check all
+Tümünü işaretle
+Choose to hide filtered files/directories from list
+Listedeki filtrelenmiş dosyaları/dizinleri gizlemek seçiniz
+Comma separated list
+Virgül ile ayrılmış liste
+Commandline
+Komut satırı
+Commandline is empty!
+Komut satırı boş!
+Compare
+Karşılaştır
+Compare both sides
+İki tarafıda karşılaştır
+Compare by \"File content\"
+\"Dosya içeriği\" ile karşılaştır
+Compare by \"File size and date\"
+\"Dosya ebadı ve tarihi\" ile karşılaştır
+Compare by...
+ile karşılaştır...
+Comparing content
+İçerik karşılaştırılıyor
+Comparing content of files %x
+%x dosyasının içeriği karşılaştırılıyor
+Comparing content...
+İçerik karşılaştırılıyor...
+Comparing files by content failed.
+Dosyaların içerik ile karşılaştırılması başarısız oldu.
+Comparison Result
+Karşılaştırma sonucu
+Comparison settings
+Karşılaştırma ayarları
+Completed
+Tamamlandı
+Configuration
+Konfigürasyon
+Configuration loaded!
+Konfigürasyon yüklendi!
+Configuration overview:
+Konfigürasyon özeti:
+Configuration saved!
+Konfigürasyon kaydedildi!
+Configure filter
+Filtrelemeyi ayarla
+Configure filter...
+Filtrelemeyi ayarla...
+Configure your own synchronization rules.
+Kendi senkronizasyon kurallarınızı ayarlayın.
+Confirm
+Doğrula
+Conflict detected:
+Tutarsızlık saptandı:
+Conflicts/files that cannot be categorized
+Katagorize edilemeyen tutarsızlıklar/dosyalar
+Continue
+Devam et
+Conversion error:
+Dönüştürme hatası:
+Copy from left to right
+Soldan sağa kopyala
+Copy from left to right overwriting
+Soldan sağa üzerine yazmaya izin vererek kopyala
+Copy from right to left
+Sağdan sola kopyala
+Copy from right to left overwriting
+Sağdan sola üzerine yazmaya izin vererek kopyala
+Copy new or updated files to right folder.
+Yeni veya güncellenmiş dosyaları sağdaki klasöre kopyala.
+Copy to clipboard\tCTRL+C
+Hafızaya kopyala\tCTRL+C
+Copying file %x to %y
+%x'den %y'e dosya kopyalanıyor
+Copying file %x to %y overwriting target
+%x'den %y'e üzerine yazmaya açık olarak dosya kopyalanıyor
+Could not determine volume name for file:
+Belirtilen dosya için birim adı belirlenemedi:
+Could not initialize directory monitoring:
+Dizin izlemesi başlatılamadı:
+Could not read values for the following XML nodes:
+Takibeden XML başlığındaki değerler okunamadı:
+Create a batch job
+Komut (batch) görevi oluştur
+Creating folder %x
+%x klasörü oluşturuluyor
+Current operation:
+Halihazırdaki işlem:
+Custom
+Özel
+Customize columns
+Kolonları özelleştir
+Customize...
+Özelleştir...
+D-Click
+D-Tuşu
+DECISION TREE
+Karar Şeması
+Data remaining:
+Kalan veri:
+Data verification error: Source and target file have different content!
+Veri doğrulama hatası: Kaynak ve hedef dosyası içeriği farklı!
+Date
+Tarih
+Delay
+Gecikme
+Delay between detection of changes and execution of commandline in seconds
+Saniye olarak, değişikliklerin tespiti ile komut satırının çalıştırılması arasındaki boşluk süresi
+Delete files/folders existing on left side only
+Sadece sol tarafta olan dosyaları/klasörleri sil
+Delete files/folders existing on right side only
+Sadece sağ tarafta olan dosyaları/klasörleri sil
+Delete files\tDEL
+Dosyaları sil\tDEL
+Delete on both sides
+Her iki taraftakini sil
+Delete on both sides even if the file is selected on one side only
+Dosya sadece bir tarafta seçili olsa bile her iki taraftakini de sil
+Delete or overwrite files permanently.
+Kalıcı olarak üzerine yaz veya sil.
+Delete permanently
+Kalıcı olarak sil
+Deleting file %x
+%x dosyası siliniyor
+Deleting folder %x
+%x klasörü siliniyor
+Deletion handling
+Silme işleminin idaresi
+Description
+Açıklama
+Directories are dependent! Be careful when setting up synchronization rules:
+Dizinler bağımlı! Senkronizasyon kurallarını koyarken dikkatli olun:
+Directories to watch
+İzlenecek dizinler
+Directory
+Dizin
+Directory does not exist:
+Dizin mevcut değil:
+Do not display visual status information but write to a logfile instead
+Görsel durum bilgisini ekrana getirme, fakat bir kayıt dosyasına yaz
+Do not show this dialog again
+Bu iletiyi tekrar gösterme
+Do nothing
+Hiçbir şey yapma
+Do you really want to delete the following objects(s)?
+Gerçekten şu objeleri silmek istiyormusunuz?
+Do you really want to move the following objects(s) to the Recycle Bin?
+Gerçekten şu objeleri geri dönüşüm kutusuna taşımak istiyormusunuz?
+Do you want FreeFileSync to automatically check for updates every week?
+Her hafta FreeFileSync'in güncellemeleri denetlemesini istermisiniz?
+Donate with PayPal
+PayPal ile bağış yapın
+Download now?
+Şimdi indirilsinmi?
+Drag && drop
+Sürükle bırak
+Email
+Eposta
+Enable filter to exclude files from synchronization
+Senkronizasyon sırasında dosya hariç tutmayı etkinleştir 
+Endless loop when traversing directory:
+Dizin işleminde sonsuz döngü:
+Error
+Hata
+Error changing modification time:
+Değişiklik tarihini değiştirirken hata:
+Error copying file:
+Dosya kopyalarken hata:
+Error copying locked file %x!
+Kilitli dosya %x'i kopyalarken hata!
+Error creating directory:
+Dizin oluştururken hata:
+Error deleting directory:
+Dizin silerken hata:
+Error deleting file:
+Dosya silerken hata:
+Error handling
+Hataları ele alma
+Error loading library function:
+Kütüphaneden fonksiyon yüklerken hata:
+Error moving directory:
+Dizin taşırken hata:
+Error moving file:
+Dosya taşırken hata:
+Error moving to Recycle Bin:
+Geri dönüşüm kutusuna taşırken hata:
+Error opening file:
+Dosya açarken hata:
+Error parsing configuration file:
+Konfigürasyon dosyasını çözümlerken hata:
+Error reading file attributes:
+Dosya özniteliklerini okurken hata:
+Error reading file:
+Dosyayı okurken hata:
+Error reading from synchronization database:
+Senkronizasyon veri tabanýndan okuma hatasý:
+Error resolving symbolic link:
+Sembolik bağlantıyı çözümlerken hata:
+Error starting Volume Shadow Copy Service!
+'Volume shadow copy' servisini başlatırken hata!
+Error traversing directory:
+Dizini okurken hata:
+Error when monitoring directories.
+Dizinler izlenirken hata.
+Error writing file attributes:
+Dosya özniteliklerini yazarken hata:
+Error writing file:
+Dosya yazarken hata:
+Error writing to synchronization database:
+Senkronizasyon veri tabanýna yazma hatasý:
+Example
+Örnek
+Exclude
+Dışarda bırak
+Exclude temporarily
+Geçici olarak dışarda bırak
+Exclude via filter:
+Filtrelemeyle dışarda bırak:
+Exit immediately and set returncode < 0
+Hemen çık ve 'returncode < 0' gerçekleştir
+Exit with RC < 0
+RC < 0 ile çık
+External applications
+Harici uygulamalar
+Feedback and suggestions are welcome at:
+Geri bildirim ve öneriler için:
+File %x has an invalid date!
+%x dosyası geçersiz bir tarihe sahip!
+File already exists. Overwrite?
+Dosya zaten mevcut. Üzerine yazılsınmı?
+File content
+Dosya içeriği
+File does not exist:
+Dosya mevcut değil:
+File list exported!
+Dosya listesi karışmış!
+File size and date
+Dosya ebatı ve tarihi
+Filename
+Dosya adı
+Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
+%X dosyaları 1 saat'ten daha az tarih farkına sahip!\n\Gün ışığından yararlanma ayarına bağlı olarak hangisinin daha yeni olduğuna karar vermek güvenli değil.
+Files %x have the same date but a different size!
+%x dosyalarının tarihleri aynı fakat ebatları farklı!
+Files are found equal if\n     - file content\nis the same.
+\n     - dosya içeriği\naynı ise dosyalar eşit kabul edilir.
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
+\n     - dosya ebadı\n     - son değişiklik tarihi\naynı ise dosyalar eşit kabul edilir.
+Files remaining:
+Kalan dosyalar:
+Files that are equal on both sides
+Her iki tarafta eşit olan dosyalar
+Files that exist on both sides and have different content
+Her iki tarafta aynı fakat içerikleri farklı dosyalar
+Files that exist on both sides, left one is newer
+Her iki tarafta mevcut olup solda olanı yeni olan dosyalar
+Files that exist on both sides, right one is newer
+Her iki tarafta mevcut olup sağda olanı yeni olan dosyalar
+Files/folders found:
+Bulunan dosyalar/klasörler:
+Files/folders remaining:
+Kalan dosyalar/klasörler:
+Files/folders that exist on left side only
+Sadece sol tarafta mevcut olan dosyalar/klasörler
+Files/folders that exist on right side only
+Sadece sağ tarafta mevcut olan dosyalar/klasörler
+Filter
+Filtre
+Filter active: Press again to deactivate
+Filtre etkin: Etkinliğini kaldırmak için tekrar basın
+Filter files
+Fltre dosyaları
+Filter view
+Filtre görünümü
+Folder Comparison and Synchronization
+Klasör Karşılaştırması ve Senkronizasyonu
+Free disk space available:
+Boşta kullanılabilir disk alanı:
+FreeFileSync - Folder Comparison and Synchronization
+FreeFileSync - Klasör Karşılaştırması ve Senkronizasyonu
+FreeFileSync Batch Job
+FreeFileSync Komut (Batch) Görevi
+FreeFileSync at Sourceforge
+Sourceforge'da FreeFileSync
+FreeFileSync batch file
+FreeFileSync komut (batch) dosyası
+FreeFileSync configuration
+FreeFileSync konfigürasyonu
+FreeFileSync is up to date!
+FreeFileSync güncel!
+Full path
+Tam dizin
+Generating database...
+Veri tabaný yaratýlýyor...
+Generating file list...
+Dosya listesi oluşturuluyor...
+Global settings
+Genel ayarlar
+Help
+Yardım
+Hidden dialogs:
+Gösterilmemiş iletiler:
+Hide all error and warning messages
+Hata ve uyarı mesajlarını gösterme
+Hide conflicts
+Tutarsızlıkları gösterme
+Hide files that are different
+Farklı olan dosyaları gösterme
+Hide files that are equal
+Eşit olan dosyaları gösterme
+Hide files that are newer on left
+Solda daha yeni olan dosyaları gösterme
+Hide files that are newer on right
+Sağda daha yeni olan dosyaları gösterme
+Hide files that exist on left side only
+Sadece sol tarafta mevcut olan dosyaları gösterme
+Hide files that exist on right side only
+Sadece sağ tarafta mevcut olan dosyaları gösterme
+Hide files that will be created on the left side
+Sol tarafta yaratılacak dosyaları gösterme
+Hide files that will be created on the right side
+Sağ tarafta yaratılacak dosyaları gösterme
+Hide files that will be deleted on the left side
+Sol tarafta silinecek dosyaları gösterme
+Hide files that will be deleted on the right side
+Sağ tarafta silinecek dosyaları gösterme
+Hide files that will be overwritten on left side
+Sol tarafta üzerine yazılacak dosyaları gösterme
+Hide files that will be overwritten on right side
+Sağ tarafta üzerine yazılacak dosyaları gösterme
+Hide files that won't be copied
+Kopyalanmayacak dosyaları gösterme
+Hide filtered items
+Filtrelenmiş olanları gösterme
+Hide further error messages during the current process
+Devam eden işlem süresince daha fazla hata mesajı gösterme
+Hints:
+İpuçları:
+Homepage
+Ana sayfa
+If you like FFS
+Eğer FFS’i sevdiyseniz
+Ignore 1-hour file time difference
+1 saatlik dosya tarihi farklılaşmasını yoksay
+Ignore errors
+Hataları yoksay
+Ignore subsequent errors
+Takibeden hataları yoksay
+Ignore this error, retry or abort synchronization?
+Bu hatayı yoksay, yeniden dene veya senkronizasyondan vazgeç?
+Ignore this error, retry or abort?
+Bu hatayı yoksay, yeniden dene veya vazgeç?
+Include
+Dahil et
+Include temporarily
+Geçici olarak dahil et
+Include: *.doc;*.zip;*.exe\nExclude: temp\\*
+Dahil et: *.doc;*.zip;*.exe\nHariç tut: temp\\*
+Incompatible synchronization database format:
+Uyumsuz senkronizasyon veritabaný formatý:
+Info
+Bilgi
+Information
+Bilgi
+Initial synchronization. Please verify default copy-directions!
+Baþlangýç senkronizasyonu. Lütfen ön tanýmlý kopyalama yönlerini doðrulayýnýz! 
+Integrate external applications into context menu. The following macros are available:
+Harici uygulamaları içerik menüsüne ekle. Şu makro’lar temin edilebilir:
+It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
+Geri dönüşüm kutusunu başlatmak mümkün olmadı!\n\nMuhtemelen Microsoft Windows kullanmıyorsunuz.\nEğer bu özelliğin eklenmesini istiyorsanız, lütfen program yazarı ile temasa geçin. :)
+Leave as unresolved conflict
+Çözülmemiş tutarsızlık olarak bırak
+Left
+Sol
+Legend
+Lejant
+Load configuration from file
+Dosyadan konfigürasyonu yükle
+Load configuration history (press DEL to delete items)
+Konfigürasyon geçmişini yükle (Öğeleri silmek için DEL’e basın)
+Log-messages:
+Kayıt mesajları:
+Logging
+Kayıt tutma
+Mirror ->>
+Yedekleme ->>
+Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
+Sol klasörün yedeklemesi: Senkronizasyondan sonra sol klasör ile tam olarak eşleşen sağ klasörün üzerine yazılacak.
+More than 50% of the total number of files will be copied or deleted!
+%50’den fazla dosya kopyalanacak veya silinecek!
+Move column down
+Kolonu aşağı taşı
+Move column up
+Kolonu yukarı taşı
+Move files to a user-defined directory.
+Dosyaları kullanıcı tanımlı bir dizine taşı.
+Moving %x to Recycle Bin
+%x geri dönüşüm kutusuna taşınıyor
+Moving file %x to user-defined directory %y
+%x dosyası kullanıcı tanımlı dizin %y’e taşınıyor
+Moving folder %x to user-defined directory %y
+%x klasörü kullanıcı tanımlı dizin %y’e taşınıyor
+Multiple...
+Çoklu...
+No database file existing yet:
+Henüz mevcut bir veritabaný yok:
+Not enough free disk space available in:
+Yeterli disk alanı yok :
+Nothing to synchronize according to configuration!
+Konfigürasyona göre senkronize edecek bir şey yok!
+Number of files and directories that will be created
+Oluşturulacak dosya ve dizinlerin sayısı
+Number of files and directories that will be deleted
+Silinecek dosya ve dizinlerin sayısı
+Number of files that will be overwritten
+Üzerine yazılacak dosyaların sayısı
+OK
+TAMAM
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
+Senkronizasyon için sadece filtrelenmiş dosyalar/dizinler seçilecek. Senkronizasyon taban dizinlerine göreceli isimlere filtereleme uygulanacaktır.
+Open directly
+Doðrudan aç
+Open with Explorer
+Gezgin ile aç
+Open with Konqueror
+Konqueror ile aç
+Operation aborted!
+İşlemden vazgeçildi!
+Operation:
+İşlem:
+Overview
+Değerlendirme
+Pause
+Duraklat
+Paused
+Duraklatıldı
+Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
+Bu özelliği etkinleştirmek için FreeFileSync’in kurulum dizinine \"Shadow.dll\" (\"Shadow.zip\" sıkıştırılmış dosyasındaki uygun olanı) kopyalayın.
+Please fill all empty directory fields.
+Lütfen boş dizin alanlarını doldurunuz.
+Press button to activate filter
+Filtrelemeyi etkinleştirmek için tuşa basın
+Published under the GNU General Public License:
+“GNU General Public License”a uygun olarak yayımlanmıştır:
+Question
+Soru
+Quit
+Çık
+Re-enable all hidden dialogs?
+Gösterilmeyen iletilerin görünmesini istermisiniz?
+RealtimeSync - Automated Synchronization
+RealtimeSync - Otomatik senkronizasyon
+RealtimeSync configuration
+RealtimeSync Konfigürasyon
+Relative path
+Göreceli dizin yolu
+Remove alternate settings
+Alternatif ayarları kaldır
+Remove folder
+Klasörü kaldır
+Remove folder pair
+Klasör çiftini kaldır
+Report translation error
+Çeviri hatasını bildir
+Reset
+Sıfırla
+Right
+Sağ
+S&ave configuration
+Konfigürasyonu &kaydet 
+S&witch view
+Görünümü &değiştir
+Save changes to current configuration?
+Değişiklikleri aktif konfigürasyona kaydetmek istermisiniz?
+Save current configuration to file
+Aktif konfigürasyonu dosyaya kaydet
+Scanning...
+Taranıyor...
+Scanning:
+Taranıyor:
+Select a folder
+Bir klasör seç
+Select alternate filter settings
+Alternatif filtreleme ayarı seç
+Select alternate synchronization settings
+Alternatif senkronizasyon ayarı seç
+Select logfile directory:
+Kayıt dosyası dizinini seç:
+Select variant:
+Değişkeni seç:
+Show conflicts
+Tutarsızlıkları göster
+Show file icons
+Dosya simgelerini göster
+Show files that are different
+Farklı olan dosyaları göster
+Show files that are equal
+Eşit olan dosyaları göster
+Show files that are newer on left
+Solda daha yeni olan dosyaları göster
+Show files that are newer on right
+Sağda daha yeni olan dosyaları göster
+Show files that exist on left side only
+Sadece sol tarafta var olan dosyaları göster
+Show files that exist on right side only
+Sadece sağ tarafta var olan dosyaları göster
+Show files that will be created on the left side
+Sadece sol tarafta yaratılacak dosyaları göster
+Show files that will be created on the right side
+Sadece sağ tarafta yaratılacak dosyaları göster
+Show files that will be deleted on the left side
+Sadece sol tarafta silinecek dosyaları göster
+Show files that will be deleted on the right side
+Sadece sağ tarafta silinecek dosyaları göster
+Show files that will be overwritten on left side
+Sadece sol tarafta üzerine yazılacak dosyaları göster
+Show files that will be overwritten on right side
+Sadece sağ tarafta üzerine yazılacak dosyaları göster
+Show files that won't be copied
+Kopyalanmayacak dosyaları göster
+Show hidden dialogs
+Gösterilmemiş diyalogları göster
+Show popup
+açılır bildirimleri göster
+Show popup on errors or warnings
+Hata ve uyarılarda açılır bildirimi göster
+Significant difference detected:
+Önemli fark saptandı:
+Silent mode
+Sessiz mod
+Size
+Ebat
+Source code written completely in C++ utilizing:
+Kaynak kod tümüyle C++ ile yazıldı:
+Source directory does not exist anymore:
+Kaynak dizin artık mevcut değil:
+Speed:
+Hız:
+Start
+Başla
+Start synchronization
+Senkronizasyonu başlat
+Statistics
+İstatistik
+Stop
+Durdur
+Swap sides
+Tarafları ters çevir
+Synchronization Preview
+Senkronizasyon Önizlemesi
+Synchronization aborted!
+Senkronizasyon durduruldu!
+Synchronization completed successfully!
+Senkronizasyon başarı ile tamamlandı!
+Synchronization completed with errors!
+Senkronizasyon hatalı olarak tamamlandı!
+Synchronization settings
+Senkronizasyon ayarları
+Synchronization status
+Senkronizasyon durumu
+Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
+\"temp\" alt klasöründeki herşey hariç, tüm .doc, .zip ve .exe dosyalarını senkronize et.
+Synchronize both sides simultaneously: Copy new or updated files in both directions.
+Her iki tarafı eşzamanlı olarak senkronize et: Yeni veya güncellenmiş dosyaları her iki yönede kopyala.
+Synchronize both sides using a database. Deletions are detected automatically.
+Bir veritabaný kullanarak iki tarafý senkronize et. Silmeler otomatik olarak algýlanýr.
+Synchronize...
+Senkronize et...
+Synchronizing...
+Senkronize ediliyor...
+System out of memory!
+Sistem hafızası yetersiz!
+Target directory already existing!
+Hedef dizin zaten mevcut!
+Target file already existing!
+Hedef dosya zaten mevcut!
+The file does not contain a valid configuration:
+Dosya geçerli bir konfigürasyon içermiyor:
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
+Bu değişken, aynı isimli iki dosyanın, aynı ebata ve aynı son değişikik tarihine sahip olması durumunda eşit olması anlamına gelir.
+Time
+Zaman
+Time elapsed:
+Geçen zaman:
+Time remaining:
+Kalan zaman:
+Total amount of data that will be transferred
+Transfer edilecek toplam veri miktarı
+Total required free disk space:
+Toplam gerekli boş disk alanı:
+Total time:
+Toplam zaman:
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
+Dosya tarihleri tam olarak +/- 1 saat farklı olduğunda dosyaları eşit olarak algıla. 1 saatten az tarih farklılıklarını ise tutarsızlık olarak belirt (Gün ışığından yararlanma durumu).
+Two way <->
+İki yönlü <->
+Unable to connect to sourceforge.net!
+sourceforge.net’e bağlanılamıyor!
+Unable to create logfile!
+Kayıt dosyası yaratılamıyor!
+Unable to initialize Recycle Bin!
+Geri dönüşüm kutusu başlatılamıyor!
+Uncheck all
+Tüm işaretlemeleri kaldır
+Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
+Çözülemeyen tutarsızlık mevcut! \n\nTutarsızlıkları yoksayıp senkronizasyona devam edebilirsiniz.
+Update ->
+Güncelle ->
+Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
+Kullanım: İzleme için dizinleri seç ve bir komut satırı ver.  Bu dizinlerdeki (veya alt dizinlerdeki) dosyalar değişikliğe her uğradığında, girilen komut satırı çalıştırılacaktır. 
+Use Recycle Bin
+Geri dönüşüm kutusunu kullan
+Use Recycle Bin when deleting or overwriting files.
+Silme ve üzerine yazma sırasında geri dönüşüm kutusunu kullan
+User-defined directory
+Kullanıcı tanımlı dizin
+User-defined directory for deletion was not specified!
+Silme için kulllanıcı tanımlı dizin belirtilmemiş!
+Using default synchronization directions. Please recheck.
+Ön tanýmlý senkronizasyon yönlerini kullanarak. Lütfen yeniden kontrol edin.
+Variant
+Değişken
+Verifying file %x
+%x dosyası doğrulanıyor
+Volume name %x not part of filename %y!
+%x birim adı, %y dosya adının bölümü değil!
+Warning
+Uyarı
+Warning: Synchronization failed for %x item(s):
+Uyarı: %x kadar öğe için senkronizasyon başarısız oldu:
+When the comparison is started with this option set the following decision tree is processed:
+Bu opsiyonla karşılaştırma başlatıldığı zaman, takibeden karar şemasının işleme konacağını tanımla:
+You can ignore the error to consider not existing directories as empty.
+Var olamayan dizinleri boş olarak tanımlama hatasını yoksay.
+You can ignore the error to skip current folder pair.
+Halihazýrdaki klasör çiftini es geçmek için hatayý yok sayabilirsiniz. 
+You may try to synchronize remaining items again (WITHOUT having to re-compare)!
+Kalan öğeleri tekrar senkronize etmeyi deneyebilirsiniz (Tekrar kaşılaştırma yapmadan)!
+different
+farklı
+file exists on both sides
+Dosya her iki tarafta da mevcut
+on one side only
+sadece tek tarafta

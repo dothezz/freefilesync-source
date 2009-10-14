@@ -45,12 +45,12 @@ private:
 
 
 WorkerThread::WorkerThread(IconBuffer* iconBuff) :
-        wxThread(wxTHREAD_JOINABLE),
-        threadHasMutex(false),
-        threadExitIsRequested(false),
-        threadIsListening(),
-        continueWork(threadIsListening),
-        iconBuffer(iconBuff)
+    wxThread(wxTHREAD_JOINABLE),
+    threadHasMutex(false),
+    threadExitIsRequested(false),
+    threadIsListening(),
+    continueWork(threadIsListening),
+    iconBuffer(iconBuff)
 {
     if (Create() != wxTHREAD_NO_ERROR)
         throw std::runtime_error("Error creating icon buffer worker thread!");
@@ -98,7 +98,8 @@ wxThread::ExitCode WorkerThread::Entry()
     try
     {
         wxMutexLocker dummy(threadIsListening); //this lock needs to be called from WITHIN the thread => calling it from constructor(Main thread) would be useless
-        {                                       //this mutex STAYS locked all the time except of continueWork.Wait()!
+        {
+            //this mutex STAYS locked all the time except of continueWork.Wait()!
             wxCriticalSectionLocker dummy2(lockWorkload);
             threadHasMutex = true;
         }
@@ -117,7 +118,7 @@ wxThread::ExitCode WorkerThread::Entry()
     }
     catch (const std::exception& e) //exceptions must be catched per thread
     {
-        wxMessageBox(wxString::From8BitData(e.what()), _("An exception occured!"), wxOK | wxICON_ERROR);
+        wxMessageBox(wxString::FromAscii(e.what()), _("An exception occured!"), wxOK | wxICON_ERROR);
         return 0;
     }
 }
@@ -162,7 +163,8 @@ void WorkerThread::doWork()
                                 SHGFI_ICON | SHGFI_SMALLICON) &&
 
                     fileInfo.hIcon != 0) //fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
-            {                            //bug report: https://sourceforge.net/tracker/?func=detail&aid=2768004&group_id=234430&atid=1093080
+            {
+                //bug report: https://sourceforge.net/tracker/?func=detail&aid=2768004&group_id=234430&atid=1093080
 
                 wxIcon newIcon; //attention: wxIcon uses reference counting!
                 newIcon.SetHICON(fileInfo.hIcon);
@@ -198,10 +200,10 @@ IconBuffer& IconBuffer::getInstance()
 
 
 IconBuffer::IconBuffer() :
-        lockIconDB( new wxCriticalSection),
-        buffer(     new IconDB),
-        bufSequence(new IconDbSequence),
-        worker(     new WorkerThread(this)) //might throw exceptions!
+    lockIconDB( new wxCriticalSection),
+    buffer(     new IconDB),
+    bufSequence(new IconDbSequence),
+    worker(     new WorkerThread(this)) //might throw exceptions!
 {}
 
 

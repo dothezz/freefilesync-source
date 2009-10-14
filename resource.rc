@@ -3,3 +3,4 @@
 //naming convention to set icon sequence in executable file
 A_PROGRAM_ICON ICON DISCARDABLE "library/FreeFileSync.ico"
 B_BATCH_ICON ICON DISCARDABLE "library/Batch.ico"
+C_SYNC_DB_ICON ICON DISCARDABLE "library/SyncDB.ico"

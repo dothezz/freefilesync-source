@@ -28,8 +28,8 @@ class FolderPairPanel;
 
 namespace FreeFileSync
 {
-    class CustomLocale;
-    class GridView;
+class CustomLocale;
+class GridView;
 }
 
 

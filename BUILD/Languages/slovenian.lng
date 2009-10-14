@@ -138,6 +138,8 @@ Duplikat z druge strani od %name
 2. Uporabite lahko tudi znake '*' in '?'.
 3. Exclude files directly on main grid via context menu.
 3. Izključite datoteke neposredno na glavni mreži s kontekstnim menujem.
+<Automatic>
+<Samodejno>
 <Directory>
 <Imenik>
 <Last session>
@@ -146,6 +148,8 @@ Duplikat z druge strani od %name
 <mnogokratna izbira>
 A newer version of FreeFileSync is available:
 Na voljo je nova različica FreeFileSync:
+ATTENTION: Failed directory access can lead to file deletions!
+POZOR: Neuspešen dostop do imenika lahko vodi do izbrisa datotek!
 Abort requested: Waiting for current operation to finish...
 Zahtevana je bila prekinitev: čakam, da se zaključi trenutna operacija...
 Aborted
@@ -168,6 +172,8 @@ Assemble a batch file for automated synchronization. To start in batch mode simp
 Sestavi batch datoteko za samodejno sinhronizacijo. Da začnete v batch načinu, preprosto podajte ime datoteke k FreeFileSync izvršilni datoteki: FreeFileSync.exe <imedatotekebatch>. To se lahko tudi nastavi v urniku opravil vašega operacijskega sistema.
 Auto-adjust columns
 Samo-prilagodi stolpce
+Automatic mode
+Samodejni način
 Batch execution
 Batch izvajanje
 Batch file created successfully!
@@ -176,12 +182,20 @@ Batch job
 Batch opravilo
 Big thanks for localizing FreeFileSync goes out to:
 Zahvale za prevod FreeFileSync gredo:
+Both sides have changed since last synchronization!
+Obe strani sta se spremenili od zadnje sinhronizacije!
 Browse
 Brskaj
 Build:
 Izgradnja:
 Cancel
 Prekliči
+Cannot determine sync-direction: Changed filter settings!
+Ne morem določiti smeri sinhronizacije: Spremenite nastavitve filtra!
+Cannot determine sync-direction: No change since last synchronization!
+Ne morem določiti smeri sinhronizacije: Ni bilo sprememb od zadnje sinhronizacije!
+Category
+Kategorija
 Change direction
 Spremeni smer
 Check all
@@ -376,6 +390,8 @@ Error reading file attributes:
 Napaka pri branju atributov datoteke:
 Error reading file:
 Napaka pri branju datoteke:
+Error reading from synchronization database:
+Napaka pri branju iz sinhronizacijske podatkovne baze:
 Error resolving symbolic link:
 Napaka pri razreševanju simbolične povezave:
 Error starting Volume Shadow Copy Service!
@@ -388,8 +404,10 @@ Error writing file attributes:
 Napaka pri pisanju atributov datoteke:
 Error writing file:
 Napaka pri pisanju datoteke:
-Error: Source directory does not exist anymore:
-Napaka: Izvorni imenik ne obstaja več:
+Error writing to synchronization database:
+Napaka pri pisanju v sinhronizacijsko podatkovno bazo:
+Source directory does not exist anymore:
+Izvorni imenik ne obstaja več:
 Example
 Primer
 Exclude
@@ -438,10 +456,10 @@ Files that exist on both sides, left one is newer
 Datoteke, ki obstajajo na obeh straneh, leva je novejša
 Files that exist on both sides, right one is newer
 Datoteke, ki obstajajo na obeh straneh, desna je novejša
+Files/folders found:
+Najdene datoteke/mape:
 Files/folders remaining:
 Preostale datoteke/mape:
-Files/folders scanned:
-Pregledane datoteke/mape:
 Files/folders that exist on left side only
 Datoteke/mape, ki obstajajo samo na levi strani
 Files/folders that exist on right side only
@@ -472,6 +490,8 @@ FreeFileSync is up to date!
 FreeFileSync je posodobljen!
 Full path
 Polna pot
+Generating database...
+Ustvarjam podatkovno bazo...
 Generating file list...
 Ustvarjam seznam datotek...
 Global settings
@@ -536,10 +556,14 @@ Include temporarily
 Trenutno vključi
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
 Vključi: *.doc;*.zip;*.exe\nIzključi: temp\\*
+Incompatible synchronization database format:
+Nekompatibilen format sinhronizacijske podatkovne baze:
 Info
 Info
 Information
 Informacije
+Initial synchronization. Please verify default copy-directions!
+Začetna sinhronizacija. Prosimo preverite privzete smeri kopiranja!
 Integrate external applications into context menu. The following macros are available:
 Integriraj zunanje aplikacije v kontekstni menu. Na voljo so naslednji makri:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +602,8 @@ Moving folder %x to user-defined directory %y
 Premikam mapo %x v uporabniško-določen imenik %y
 Multiple...
 Večkratno...
+No database file existing yet:
+Datoteka podatkovne baze še ne obstaja:
 Not enough free disk space available in:
 Na voljo ni dovolj prostega prostora na disku v:
 Nothing to synchronize according to configuration!
@@ -592,6 +618,12 @@ OK
 V redu
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Samo datoteke/imeniki, ki preidejo filtriranje bodo izbrani za sinhronizacijo. Filter bo uveljavljnen k imenu relativno(!) na bazo sinhroniziranih imenikov.
+Open directly
+Odpri neposredno
+Open with Explorer
+Odpri z Raziskovalcem
+Open with Konqueror
+Odpri s Konquerorjem
 Operation aborted!
 Operacija prekinjena!
 Operation:
@@ -632,8 +664,6 @@ Report translation error
 Poročaj o napaki prevoda
 Reset
 Ponastavi
-Result
-Rezultat
 Right
 Desno
 S&ave configuration
@@ -730,6 +760,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 Sinhroniziraj vse .doc, .zip in .exe datoteke, razen iz podmape \"temp\".
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Sinhroniziraj obe strani istočasno: Kopiraj nove ali posodobljene datoteke v obe smeri.
+Synchronize both sides using a database. Deletions are detected automatically.
+Sinhroniziraj obe strani z uporabo podatkovne baze. Izbrisi so zaznani samodejno.
 Synchronize...
 Sinhroniziraj...
 Synchronizing...
@@ -782,6 +814,8 @@ User-defined directory
 Uporabniško-določen imenik
 User-defined directory for deletion was not specified!
 Uporabniško-določen imenik za brisanje ni bil naveden!
+Using default synchronization directions. Please recheck.
+Uporabljam privzete sinhronizacijske smeri. Prosimo preverite ponovno.
 Variant
 Različica
 Verifying file %x
@@ -796,6 +830,8 @@ When the comparison is started with this option set the following decision tree 
 Ko se primerjava zažene s tem setom možnosti, se obdela naslednje drevo odločitev:
 You can ignore the error to consider not existing directories as empty.
 Ignoriraj napako za smatranje neobstoječih imenikv kot praznih.
+You can ignore the error to skip current folder pair.
+Ignoriraj napako tako, da se spusti trenutni par map.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Naslednje predmete lahko ponovno poskusite sinhronizirati (BREZ ponovne primerjave) !
 different

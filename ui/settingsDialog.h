@@ -10,7 +10,7 @@ class BatchFolderPairPanel;
 
 namespace FreeFileSync
 {
-    class DragDropOnDlg;
+class DragDropOnDlg;
 }
 
 
@@ -44,11 +44,13 @@ public:
                                   wxStaticBitmap* bitmapLeftNewer,
                                   wxStaticBitmap* bitmapRightNewer,
                                   wxStaticBitmap* bitmapDifferent,
-                                  wxStaticBitmap* bitmapConflict);
+                                  wxStaticBitmap* bitmapConflict,
+                                  wxSizer*        syncDirections);
     //some syntax relaxation
     void updateConfigIcons(const FreeFileSync::CompareVariant cmpVar, const FreeFileSync::SyncConfiguration& syncConfig);
 
 private:
+    virtual void OnSyncAutomatic(   wxCommandEvent& event);
     virtual void OnSyncLeftToRight( wxCommandEvent& event);
     virtual void OnSyncUpdate(      wxCommandEvent& event);
     virtual void OnSyncBothSides(   wxCommandEvent& event);
@@ -63,6 +65,9 @@ private:
     virtual void OnClose(           wxCloseEvent&   event);
     virtual void OnCancel(          wxCommandEvent& event);
     virtual void OnApply(           wxCommandEvent& event);
+
+    //set tooltip
+    void updateToolTipErrorHandling(bool ignoreErrors);
 
     //error handling
     bool getErrorHandling();
@@ -114,8 +119,9 @@ private:
     virtual void OnDifferent(          wxCommandEvent& event);
     virtual void OnConflict(           wxCommandEvent& event);
 
+    virtual void OnCheckAutomatic(     wxCommandEvent& event);
     virtual void OnCheckFilter(        wxCommandEvent& event);
-    virtual void OnCheckLogging(       wxCommandEvent& event);
+    virtual void OnCheckSilent(        wxCommandEvent& event);
     virtual void OnChangeCompareVar(   wxCommandEvent& event);
     virtual void OnClose(              wxCloseEvent&   event);
     virtual void OnCancel(             wxCommandEvent& event);
@@ -140,6 +146,9 @@ private:
     xmlAccess::OnError getSelectionHandleError() const;
     void setSelectionHandleError(const xmlAccess::OnError value);
     void OnChangeErrorHandling(wxCommandEvent& event);
+
+    //set tooltip
+    void updateToolTipErrorHandling(const xmlAccess::OnError value);
 
     //deletion handling
     FreeFileSync::DeletionPolicy getDeletionHandling() const;

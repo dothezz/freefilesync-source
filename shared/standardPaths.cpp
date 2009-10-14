@@ -2,20 +2,23 @@
 #include <wx/stdpaths.h>
 #include <wx/filename.h>
 #include "systemConstants.h"
+#include "stringConv.h"
+
+using namespace FreeFileSync;
 
 
 wxString assembleFileForUserData(const wxString fileName)
 {
-    static const bool isPortableVersion = !wxFileExists(FreeFileSync::getInstallationDir() + globalFunctions::FILE_NAME_SEPARATOR + wxT("uninstall.exe")); //this check is a bit lame...
+    static const bool isPortableVersion = !wxFileExists(FreeFileSync::getInstallationDir() + zToWx(globalFunctions::FILE_NAME_SEPARATOR) + wxT("uninstall.exe")); //this check is a bit lame...
 
     if (isPortableVersion) //use current working directory
-        return wxString(wxT(".")) + globalFunctions::FILE_NAME_SEPARATOR + fileName;
+        return wxString(wxT(".")) + zToWx(globalFunctions::FILE_NAME_SEPARATOR) + fileName;
     else //usen OS' standard paths
     {
         wxString userDirectory = wxStandardPathsBase::Get().GetUserDataDir();
 
-        if (!userDirectory.EndsWith(wxString(globalFunctions::FILE_NAME_SEPARATOR)))
-            userDirectory += globalFunctions::FILE_NAME_SEPARATOR;
+        if (!userDirectory.EndsWith(zToWx(globalFunctions::FILE_NAME_SEPARATOR)))
+            userDirectory += zToWx(globalFunctions::FILE_NAME_SEPARATOR);
 
         if (!wxDirExists(userDirectory))
             ::wxMkdir(userDirectory); //only top directory needs to be created: no recursion necessary

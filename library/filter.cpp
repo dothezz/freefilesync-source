@@ -22,14 +22,16 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
     //Linux DOES distinguish between upper/lower-case: nothing to do here
 #endif
 
-    static const Zstring sepAsterisk     = Zstring() + globalFunctions::FILE_NAME_SEPARATOR + wxT('*');
-    static const Zstring sepQuestionMark = Zstring() + globalFunctions::FILE_NAME_SEPARATOR + wxT('?');
-    static const Zstring asteriskSep     = Zstring(wxT("*")) + globalFunctions::FILE_NAME_SEPARATOR;
-    static const Zstring questionMarkSep = Zstring(wxT("?")) + globalFunctions::FILE_NAME_SEPARATOR;
+    static const Zstring sepAsterisk     = Zstring() + globalFunctions::FILE_NAME_SEPARATOR + DefaultChar('*');
+    static const Zstring sepQuestionMark = Zstring() + globalFunctions::FILE_NAME_SEPARATOR + DefaultChar('?');
+    static const Zstring asteriskSep     = Zstring(DefaultStr("*")) + globalFunctions::FILE_NAME_SEPARATOR;
+    static const Zstring questionMarkSep = Zstring(DefaultStr("?")) + globalFunctions::FILE_NAME_SEPARATOR;
 
+//--------------------------------------------------------------------------------------------------
     //add some syntactic sugar: handle beginning of filtername
     if (filterFormatted.StartsWith(globalFunctions::FILE_NAME_SEPARATOR))
-    {  //remove leading separators (keep BEFORE test for Zstring::empty()!)
+    {
+        //remove leading separators (keep BEFORE test for Zstring::empty()!)
         filterFormatted = filterFormatted.AfterFirst(globalFunctions::FILE_NAME_SEPARATOR);
     }
     else if (filterFormatted.StartsWith(asteriskSep) ||   // *\abc
@@ -38,7 +40,7 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
         addFilterEntry(Zstring(filterFormatted.c_str() + 1), fileFilter, directoryFilter); //prevent further recursion by prefix
     }
 
-
+//--------------------------------------------------------------------------------------------------
     //even more syntactic sugar: handle end of filtername
     if (filterFormatted.EndsWith(globalFunctions::FILE_NAME_SEPARATOR))
     {
@@ -150,14 +152,14 @@ std::vector<Zstring> compoundStringToFilter(const Zstring& filterString)
 //##############################################################
 
 
-FilterProcess::FilterProcess(const wxString& includeFilter, const wxString& excludeFilter)
+FilterProcess::FilterProcess(const Zstring& includeFilter, const Zstring& excludeFilter)
 {
     //no need for regular expressions! In tests wxRegex was by factor of 10 slower than wxString::Matches()!!
 
     //load filter into vectors of strings
     //delimiters may be ';' or '\n'
-    const std::vector<Zstring> includeList = compoundStringToFilter(includeFilter.c_str());
-    const std::vector<Zstring> excludeList = compoundStringToFilter(excludeFilter.c_str());
+    const std::vector<Zstring> includeList = compoundStringToFilter(includeFilter);
+    const std::vector<Zstring> excludeList = compoundStringToFilter(excludeFilter);
 
     //setup include/exclude filters for files and directories
     std::for_each(includeList.begin(), includeList.end(), boost::bind(addFilterEntry, _1, boost::ref(filterFileIn), boost::ref(filterFolderIn)));
@@ -199,101 +201,110 @@ bool FilterProcess::passDirFilter(const DefaultChar* relDirname, bool* subObjMig
 }
 
 
+template <bool include>
+class InOrExcludeAllRows
+{
+public:
+    void operator()(FreeFileSync::BaseDirMapping& baseDirectory) const //be careful with operator() to no get called by std::for_each!
+    {
+        execute(baseDirectory);
+    }
+
+    void execute(FreeFileSync::HierarchyObject& hierObj) const //don't create ambiguity by replacing with operator()
+    {
+        std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this); //files
+        std::for_each(hierObj.subDirs.begin(),  hierObj.subDirs.end(),  *this); //directories
+    }
+
+private:
+    template<typename Iterator, typename Function>
+    friend Function std::for_each(Iterator, Iterator, Function);
+
+    void operator()(FreeFileSync::FileMapping& fileObj) const
+    {
+        fileObj.setActive(include);
+    }
+
+    void operator()(FreeFileSync::DirMapping& dirObj) const
+    {
+        dirObj.setActive(include);
+        execute(dirObj); //recursion
+    }
+};
+
+
 class FilterData
 {
 public:
     FilterData(const FilterProcess& filterProcIn) : filterProc(filterProcIn) {}
 
+    void execute(FreeFileSync::HierarchyObject& hierObj)
+    {
+        //files
+        std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this);
+
+        //directories
+        std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), *this);
+    };
+
+private:
+    template<typename Iterator, typename Function>
+    friend Function std::for_each(Iterator, Iterator, Function);
+
+
     void operator()(FreeFileSync::FileMapping& fileObj)
     {
-        const Zstring relName = fileObj.isEmpty<FreeFileSync::LEFT_SIDE>() ?
-                                fileObj.getRelativeName<FreeFileSync::RIGHT_SIDE>() :
-                                fileObj.getRelativeName<FreeFileSync::LEFT_SIDE>();
-
-        fileObj.selectedForSynchronization = filterProc.passFileFilter(relName);
+        fileObj.setActive(filterProc.passFileFilter(fileObj.getObjRelativeName()));
     }
 
     void operator()(FreeFileSync::DirMapping& dirObj)
     {
-        const Zstring relName = dirObj.isEmpty<FreeFileSync::LEFT_SIDE>() ?
-                                dirObj.getRelativeName<FreeFileSync::RIGHT_SIDE>() :
-                                dirObj.getRelativeName<FreeFileSync::LEFT_SIDE>();
-
         bool subObjMightMatch = true;
-        dirObj.selectedForSynchronization = filterProc.passDirFilter(relName, &subObjMightMatch);
+        dirObj.setActive(filterProc.passDirFilter(dirObj.getObjRelativeName(), &subObjMightMatch));
 
-        if (subObjMightMatch) //use same logic like directory traversing here: evaluate filter in subdirs only if objects could match
-            filterProc.filterAll(dirObj); //process sub-dirs/files
+        if (subObjMightMatch) //use same logic as within directory traversing here: evaluate filter in subdirs only if objects could match
+            execute(dirObj);  //recursion
         else
-            FilterProcess::setActiveStatus(false, dirObj); //exclude all files dirs in subfolders
+            InOrExcludeAllRows<false>().execute(dirObj); //exclude all files dirs in subfolders
     }
 
-private:
     const FilterProcess& filterProc;
 };
 
 
 void FilterProcess::filterAll(FreeFileSync::HierarchyObject& baseDirectory) const
 {
-    //files
-    std::for_each(baseDirectory.subFiles.begin(), baseDirectory.subFiles.end(), FilterData(*this));
-
-    //directories
-    std::for_each(baseDirectory.subDirs.begin(), baseDirectory.subDirs.end(), FilterData(*this));
-
-    //recursion happens in FilterData
-}
-
-
-template <bool include>
-struct SetSelected
-{
-    void operator()(FreeFileSync::FileSystemObject& fsObj) const
-    {
-        fsObj.selectedForSynchronization = include;
-    }
-};
-
-
-template <bool include>
-void inOrExcludeAllRows(FreeFileSync::HierarchyObject& hierObj)
-{
-    //directories
-    std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), SetSelected<include>());
-    //files
-    std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), SetSelected<include>());
-    //recurse into sub-dirs
-    std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), inOrExcludeAllRows<include>);
+    FilterData(*this).execute(baseDirectory);
 }
 
 
 void FilterProcess::setActiveStatus(bool newStatus, FreeFileSync::FolderComparison& folderCmp)
 {
     if (newStatus)
-        std::for_each(folderCmp.begin(), folderCmp.end(), inOrExcludeAllRows<true>); //include all rows
+        std::for_each(folderCmp.begin(), folderCmp.end(), InOrExcludeAllRows<true>());  //include all rows
     else
-        std::for_each(folderCmp.begin(), folderCmp.end(), inOrExcludeAllRows<false>); //exclude all rows
+        std::for_each(folderCmp.begin(), folderCmp.end(), InOrExcludeAllRows<false>()); //exclude all rows
 }
 
 
 void FilterProcess::setActiveStatus(bool newStatus, FreeFileSync::FileSystemObject& fsObj)
 {
-    fsObj.selectedForSynchronization = newStatus;
+    fsObj.setActive(newStatus);
 
     DirMapping* dirObj = dynamic_cast<DirMapping*>(&fsObj);
     if (dirObj) //process subdirectories also!
     {
         if (newStatus)
-            inOrExcludeAllRows<true>(*dirObj);
+            InOrExcludeAllRows<true>().execute(*dirObj);
         else
-            inOrExcludeAllRows<false>(*dirObj);
+            InOrExcludeAllRows<false>().execute(*dirObj);
     }
 }
 
 
 const FilterProcess& FilterProcess::nullFilter() //filter equivalent to include '*', exclude ''
 {
-    static FilterProcess output(wxT("*"), wxEmptyString);
+    static FilterProcess output(DefaultStr("*"), Zstring());
     return output;
 }
 
@@ -329,4 +340,3 @@ bool FilterProcess::operator<(const FilterProcess& other) const
 
     return false; //vectors equal
 }
-

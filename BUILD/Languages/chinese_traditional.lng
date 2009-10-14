@@ -31,9 +31,9 @@
 %x is not a valid FreeFileSync batch file!
 %x 不是一個有效的 FreeFileSync 批次檔！
 %x of %y rows in view
-顯示 %x 之 %y 行
+顯示 %y 之 %x 行
 %x of 1 row in view
-顯示 %x 之 1 行
+顯示 1 之 %x 行
 &Abort
 取消(&A)
 &About...
@@ -138,6 +138,8 @@
 2. 使用萬用字元‘*’和‘?’。
 3. Exclude files directly on main grid via context menu.
 3. 經由內容選單直接在主要網格排除檔案。
+<Automatic>
+<自動>
 <Directory>
 <目錄>
 <Last session>
@@ -146,6 +148,8 @@
 <多重選擇>
 A newer version of FreeFileSync is available:
 有較新版本的 FreeFileSync 可用：
+ATTENTION: Failed directory access can lead to file deletions!
+注意：目錄讀取失敗可能會導致檔案刪除！
 Abort requested: Waiting for current operation to finish...
 中止請求：正在等待目前操作完成...
 Aborted
@@ -168,6 +172,8 @@ Assemble a batch file for automated synchronization. To start in batch mode simp
 組合一個用於自動同步的批次檔。若要開始批次處理模式，只需簡單的將批次檔名傳送给 FreeFileSync 可執行檔：FreeFileSync.exe <batchfile>。這個也可以安排在你的作業系統的計畫任務中。
 Auto-adjust columns
 自動調整欄寬
+Automatic mode
+自動模式
 Batch execution
 批次處理執行
 Batch file created successfully!
@@ -176,12 +182,20 @@ Batch job
 批次處理作業
 Big thanks for localizing FreeFileSync goes out to:
 非常感謝 FreeFileSync 當地語系化的工作人員：
+Both sides have changed since last synchronization!
+自上次同步後，兩邊均已更改過！
 Browse
 瀏覽
 Build:
 建立：
 Cancel
 取消
+Cannot determine sync-direction: Changed filter settings!
+不能判斷同步方向：已更改篩選器設定！
+Cannot determine sync-direction: No change since last synchronization!
+不能判斷同步方向：自上次同步後，沒有更改過！
+Category
+分類
 Change direction
 改變方向
 Check all
@@ -259,7 +273,7 @@ Copying file %x to %y
 Copying file %x to %y overwriting target
 正在複製檔案 %x 覆蓋到目標 %y
 Could not determine volume name for file:
-無法判定此檔案的卷標名稱：
+無法判斷此檔案的卷標名稱：
 Could not initialize directory monitoring:
 無法初始化目錄監測：
 Could not read values for the following XML nodes:
@@ -376,6 +390,8 @@ Error reading file attributes:
 讀取檔案屬性錯誤：
 Error reading file:
 讀取檔案錯誤：
+Error reading from synchronization database:
+讀取同步資料庫錯誤：
 Error resolving symbolic link:
 解决符號連結錯誤：
 Error starting Volume Shadow Copy Service!
@@ -388,8 +404,10 @@ Error writing file attributes:
 寫入檔案屬性錯誤：
 Error writing file:
 寫入檔案錯誤：
-Error: Source directory does not exist anymore:
-錯誤：來源目錄不存在：
+Error writing to synchronization database:
+寫入同步資料庫錯誤：
+Source directory does not exist anymore:
+來源目錄不存在：
 Example
 例如
 Exclude
@@ -438,10 +456,10 @@ Files that exist on both sides, left one is newer
 檔案存在於兩邊，左邊檔案較新
 Files that exist on both sides, right one is newer
 檔案存在於兩邊，右邊檔案較新
+Files/folders found:
+找到的檔案/資料夾：
 Files/folders remaining:
 剩餘的檔案/資料夾：
-Files/folders scanned:
-已掃瞄的檔案/資料夾：
 Files/folders that exist on left side only
 只存在於左邊的檔案/資料夾
 Files/folders that exist on right side only
@@ -449,7 +467,7 @@ Files/folders that exist on right side only
 Filter
 篩選器
 Filter active: Press again to deactivate
-篩選器啟動：再按一次會停用
+篩選器啟用：再按一次會停用
 Filter files
 篩選檔案
 Filter view
@@ -469,9 +487,11 @@ FreeFileSync 批次檔
 FreeFileSync configuration
 FreeFileSync 配置
 FreeFileSync is up to date!
-FreeFileSync 是最新版本！
+FreeFileSync 已是最新版本！
 Full path
 完整路徑
+Generating database...
+產生資料庫...
 Generating file list...
 產生檔案清單...
 Global settings
@@ -536,14 +556,18 @@ Include temporarily
 暫時包括
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
 包括：*.doc;*.zip;*.exe\n排除temp\\*
+Incompatible synchronization database format:
+同步資料庫格式不相容：
 Info
 訊息
 Information
 訊息
+Initial synchronization. Please verify default copy-directions!
+初始化同步。請驗證預設的複製方向！
 Integrate external applications into context menu. The following macros are available:
 整合上下文功能表中的外部應用程式。可以使用下面的巨集：
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
-不能初始化資源回收筒！\n\n可能你使用的不是Windows系統。\n如果你想包括此功能，請聯繫作者。:)
+不能初始化資源回收筒！\n\n可能你使用的不是 Windows 系統。\n如果你想包括此功能，請聯繫作者。:)
 Leave as unresolved conflict
 保留給未解決的衝突
 Left
@@ -578,6 +602,8 @@ Moving folder %x to user-defined directory %y
 移動資料夾 %x 到自定義資料夾 %y
 Multiple...
 多個...
+No database file existing yet:
+目前還沒有資料庫檔案：
 Not enough free disk space available in:
 沒有足夠的可用空間：
 Nothing to synchronize according to configuration!
@@ -592,6 +618,12 @@ OK
 確定
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 只有被選中篩選的檔案/目錄會進行同步。篩選器將套用到基本同步目錄的相對名稱。
+Open directly
+直接開啟
+Open with Explorer
+使用檔案總管開啟
+Open with Konqueror
+使用 Konqueror 開啟
 Operation aborted!
 中止操作！
 Operation:
@@ -607,7 +639,7 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Please fill all empty directory fields.
 請填滿所有空白目錄欄位。
 Press button to activate filter
-按下按鈕以啟動篩選器
+按下按鈕以啟用篩選器
 Published under the GNU General Public License:
 在GNU通用公共許可證下發佈：
 Question
@@ -623,17 +655,15 @@ RealtimeSync configuration
 Relative path
 相對路徑
 Remove alternate settings
-刪除備用設定
+移除備用設定
 Remove folder
-刪除資料夾
+移除資料夾
 Remove folder pair
-刪除兩個資料夾
+移除兩個資料夾
 Report translation error
 回報翻譯錯誤
 Reset
 重置
-Result
-結果
 Right
 右邊
 S&ave configuration
@@ -641,7 +671,7 @@ S&ave configuration
 S&witch view
 切換檢視(&W)
 Save changes to current configuration?
-保存對目前配置的更改嗎？
+儲存對目前配置的更改嗎？
 Save current configuration to file
 將目前配置儲存到檔案
 Scanning...
@@ -691,9 +721,9 @@ Show files that won't be copied
 Show hidden dialogs
 顯示隱藏的對話框
 Show popup
-顯示快顯功能表
+顯示彈出視窗
 Show popup on errors or warnings
-在快顯功能表上顯示錯誤或警告
+在彈出視窗上顯示錯誤或警告訊息
 Significant difference detected:
 檢測到顯著的差異：
 Silent mode
@@ -730,10 +760,12 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 同步所有 .doc, .zip 和 .exe 檔案, 除了\"temp\"中的一切。
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 同時雙向同步：雙向複製新的或已更新的檔案。
+Synchronize both sides using a database. Deletions are detected automatically.
+雙向同步使用一個資料庫。自動檢測要刪除的檔案。
 Synchronize...
 同步...
 Synchronizing...
-同步中...
+正在同步...
 System out of memory!
 系統記憶體不足！
 Target directory already existing!
@@ -751,11 +783,11 @@ Time elapsed:
 Time remaining:
 剩餘時間：
 Total amount of data that will be transferred
-將被傳輸的全部資料量
+將要傳輸的全部資料量
 Total required free disk space:
 全部所需要的可用磁碟空間：
 Total time:
-總時間：
+全部時間：
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
 對檔案時差在精確的+/-1小時的檔案判斷視為相同的，以小於1小時作為衝突，是為了處理日光節約時間的變化。
 Two way <->
@@ -763,7 +795,7 @@ Two way <->
 Unable to connect to sourceforge.net!
 無法連接到 sourceforge.net！
 Unable to create logfile!
-無法新建日誌檔案！
+無法新建日誌檔！
 Unable to initialize Recycle Bin!
 無法初始化資源回收筒！
 Uncheck all
@@ -782,6 +814,8 @@ User-defined directory
 自定義目錄
 User-defined directory for deletion was not specified!
 未指定要刪除的自定義目錄！
+Using default synchronization directions. Please recheck.
+使用預設同步方向。請重新檢查。
 Variant
 變數
 Verifying file %x
@@ -796,6 +830,8 @@ When the comparison is started with this option set the following decision tree 
 當比對開始，使用此選項設定時，以下決策樹將被處理：
 You can ignore the error to consider not existing directories as empty.
 你可以忽略該錯誤而將不存在的目錄視為空目錄。
+You can ignore the error to skip current folder pair.
+您可以忽略跳過目前兩個資料夾的錯誤。
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 您可能會嘗試再次同步剩餘項目(不用重新比對)！
 different

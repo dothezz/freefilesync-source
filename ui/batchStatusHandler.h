@@ -15,7 +15,6 @@ class BatchStatusHandler : public StatusHandler
 {
 public:
     virtual void addFinalInfo(const wxString& infoMessage) = 0;
-virtual void setErrorStrategy(xmlAccess::OnError handleError) = 0; //change error handling during process
 };
 
 
@@ -35,8 +34,6 @@ public:
     virtual void reportFatalError(const wxString& errorMessage);
     virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
     virtual void addFinalInfo(const wxString& infoMessage);
-
-virtual void setErrorStrategy(xmlAccess::OnError handleError); //change error handling during process
 
 private:
     virtual void abortThisProcess();
@@ -66,8 +63,6 @@ public:
     virtual void reportFatalError(const wxString& errorMessage);
     virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
     virtual void addFinalInfo(const wxString& infoMessage);
-
-virtual void setErrorStrategy(xmlAccess::OnError handleError); //change error handling during process
 
 private:
     virtual void abortThisProcess();

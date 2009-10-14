@@ -87,7 +87,7 @@
 &Yes
 &Sim
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Apenas as drives FAT/FAT32 são afectadas por esta causa! \nPara todas as outras situações pode desactivar a opção \"ignorar diferença de 1 hora\".)
+(Apenas as drives FAT/FAT32 são afectadas por este problema! \nPara todas as outras situações pode desactivar a opção \"ignorar diferença de 1 hora\".)
 ,
  
 - Other side's counterpart to %dir
@@ -138,6 +138,8 @@
 2. Usar '*' e '?' como caracteres de procura.
 3. Exclude files directly on main grid via context menu.
 3. Excluir ficheiros directamente da grelha através do menu de contexto.
+<Automatic>
+<Automático>
 <Directory>
 <Directório>
 <Last session>
@@ -146,6 +148,8 @@
 <Selecção Múltipla>
 A newer version of FreeFileSync is available:
 Mais recente versão do FreeFileSync disponível:
+ATTENTION: Failed directory access can lead to file deletions!
+ATENÇÃO: Falha no acesso ao directório pode levar à eliminação de ficheiros!
 Abort requested: Waiting for current operation to finish...
 Abortar pedido: À espera do fim da operação...
 Aborted
@@ -168,6 +172,8 @@ Assemble a batch file for automated synchronization. To start in batch mode simp
 Criar um batch para sincronização automática. Para iniciar o modo batch, passar o nome do ficheiro para o executável do FreeFileSync: FreeFileSync.exe <ficheiro batch>. Também pode ser calendarizado no programador de tarefas.
 Auto-adjust columns
 Auto ajustar colunas
+Automatic mode
+Modo automático
 Batch execution
 Execução do batch
 Batch file created successfully!
@@ -176,12 +182,20 @@ Batch job
 Ficheiro Batch
 Big thanks for localizing FreeFileSync goes out to:
 Pela tradução de FreeFileSync, um agradecimento a:
+Both sides have changed since last synchronization!
+Ambos os lados tiveram alterações desde a última sincronização!
 Browse
 Procurar
 Build:
 Criado:
 Cancel
 Cancelar
+Cannot determine sync-direction: Changed filter settings!
+Não é possível determinar a direcção de sincronização: Alterações na configuração do filtro!
+Cannot determine sync-direction: No change since last synchronization!
+Não é possível determinar a direcção de sincronização: Não há alterações desde a última sincronização!
+Category
+Categoria
 Change direction
 Mudar direcção
 Check all
@@ -223,7 +237,7 @@ Configuração
 Configuration loaded!
 Configuração carregada!
 Configuration overview:
-Parâmetros de configuração:
+Parametros de configuração:
 Configuration saved!
 Configuração guardada!
 Configure filter
@@ -376,6 +390,8 @@ Error reading file attributes:
 Erro ao ler atributos do ficheiro:
 Error reading file:
 Erro de leitura de ficheiro:
+Error reading from synchronization database:
+Erro ao ler a base de dados de sincronização:
 Error resolving symbolic link:
 Erro na resolução do link simbólico:
 Error starting Volume Shadow Copy Service!
@@ -388,8 +404,10 @@ Error writing file attributes:
 Erro na escrita dos atributos do ficheiro:
 Error writing file:
 Erro de escrita no ficheiro:
-Error: Source directory does not exist anymore:
-Erro: A pasta de origem já não existe:
+Error writing to synchronization database:
+Erro na escrita da base de dados de sincronização:
+Source directory does not exist anymore:
+A pasta de origem já não existe:
 Example
 Exemplo
 Exclude
@@ -438,10 +456,10 @@ Files that exist on both sides, left one is newer
 Ficheiros existentes dos dois lados, à esquerda é mais recente
 Files that exist on both sides, right one is newer
 Ficheiros existentes dos dois lados, à direita é mais recente
+Files/folders found:
+Ficheiros/pastas encontrados:
 Files/folders remaining:
 Ficheiros/pastas restantes:
-Files/folders scanned:
-Ficheiros/pastas analisados:
 Files/folders that exist on left side only
 Ficheiros/pastas existentes somente à esquerda
 Files/folders that exist on right side only
@@ -472,6 +490,8 @@ FreeFileSync is up to date!
 FreeFileSync está actualizado!
 Full path
 Caminho completo
+Generating database...
+A gerar base de dados...
 Generating file list...
 A gerar lista ficheiros...
 Global settings
@@ -536,10 +556,14 @@ Include temporarily
 Incluir temporariamente
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
 Incluir: *.doc;*.zip;*.exe\nExcluir: temp\\*
+Incompatible synchronization database format:
+Formato de base de dados de sincronização incompatível:
 Info
 Info
 Information
 Informação
+Initial synchronization. Please verify default copy-directions!
+Sincronização inicial. Verifique as direcções de cópia iniciais!
 Integrate external applications into context menu. The following macros are available:
 Integrar aplicações externas no menu de contexto. As seguintes macros estão disponíveis:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +602,8 @@ Moving folder %x to user-defined directory %y
 A mover pasta %x para o directório %y
 Multiple...
 Multiplo...
+No database file existing yet:
+Base de dados inexistente:
 Not enough free disk space available in:
 Não há espaço livre suficiente em:
 Nothing to synchronize according to configuration!
@@ -592,6 +618,12 @@ OK
 OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Apenas ficheiros/directórios que passem o filtro serão seleccionados para sincronização. O filtro será aplicado ao nome relativo(!) ao directório base de sincronização.
+Open directly
+Abrir
+Open with Explorer
+Abrir com o Explorer
+Open with Konqueror
+Abrir com o Konqueror
 Operation aborted!
 Operação abortada!
 Operation:
@@ -632,8 +664,6 @@ Report translation error
 Informar um erro de tradução
 Reset
 Reiniciar
-Result
-Resultado
 Right
 Direita
 S&ave configuration
@@ -730,6 +760,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 Sincronizar todos os ficheiros .doc, .zip e .exe excepto os da pasta \"temp\".
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Sincronizar ambos os lados simultaneamente: Copiar os ficheiros novos ou mais recentes em ambas as direcções.
+Synchronize both sides using a database. Deletions are detected automatically.
+Sincronizar ambos os lados usando uma base de dados. Eliminações são detectadas automaticamente.
 Synchronize...
 Sincronizar...
 Synchronizing...
@@ -782,6 +814,8 @@ User-defined directory
 Directório definido pelo utilizador
 User-defined directory for deletion was not specified!
 Directório para eliminação não foi especificado!
+Using default synchronization directions. Please recheck.
+Direcção de sincronização inicial em uso. Verifique de novo.
 Variant
 Variável
 Verifying file %x
@@ -796,6 +830,8 @@ When the comparison is started with this option set the following decision tree 
 Usar a seguinte árvore de decisão quando inicia com estas opções de comparação:
 You can ignore the error to consider not existing directories as empty.
 Pode ignorar o erro para considerar directórios não existentes como vazios.
+You can ignore the error to skip current folder pair.
+Pode ignorar o erro para saltar o par de pastas actual.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Pode tentar sincronizar os restantes elementos outra vez (SEM TER QUE comparar de novo) !
 different

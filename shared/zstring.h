@@ -13,6 +13,7 @@
 #include <new>
 #include <stdlib.h>
 #include <vector>
+#include <sstream>
 
 #ifdef __WXDEBUG__
 #include <set>
@@ -22,8 +23,10 @@
 
 #ifdef ZSTRING_CHAR
 typedef char DefaultChar; //use char strings
+#define DefaultStr(x) x   //
 #elif defined ZSTRING_WIDE_CHAR
 typedef wchar_t DefaultChar; //use wide character strings
+#define DefaultStr(x) L ## x //
 #endif
 
 
@@ -123,6 +126,10 @@ private:
 };
 
 
+template <class T>
+Zstring numberToZstring(const T& number); //convert number to Zstring
+
+
 //#######################################################################################
 //begin of implementation
 
@@ -146,13 +153,13 @@ int defaultCompare(const char* str1, const char* str2, const size_t count)
 }
 
 inline
-char* defaultStrFind(const char* str1, const char* str2)
+const char* defaultStrFind(const char* str1, const char* str2)
 {
     return strstr(str1, str2);
 }
 
 inline
-char* defaultStrFind(const char* str1, int ch)
+const char* defaultStrFind(const char* str1, int ch)
 {
     return strchr(str1, ch);
 }
@@ -236,6 +243,7 @@ public:
 
 private:
     AllocationCount() {}
+    AllocationCount(const AllocationCount&);
     ~AllocationCount();
 
     wxCriticalSection lockActStrings;
@@ -253,11 +261,12 @@ size_t getCapacityToAllocate(const size_t length)
 
 inline
 Zstring::StringDescriptor* Zstring::allocate(const size_t newLength)
-{   //allocate and set data for new string
+{
+    //allocate and set data for new string
     const size_t newCapacity = getCapacityToAllocate(newLength);
     assert(newCapacity);
 
-    StringDescriptor* newDescr = static_cast<StringDescriptor*>(::malloc(sizeof(StringDescriptor) + (newCapacity + 1) * sizeof(DefaultChar))); //use C-memory functions because of realloc()
+    StringDescriptor* const newDescr = static_cast<StringDescriptor*>(::malloc(sizeof(StringDescriptor) + (newCapacity + 1) * sizeof(DefaultChar))); //use C-memory functions because of realloc()
     if (newDescr == NULL)
         throw std::bad_alloc();
 
@@ -288,6 +297,7 @@ Zstring::Zstring()
 
 
 inline
+
 Zstring::Zstring(const DefaultChar* source)
 {
     initAndCopy(source, defaultLength(source));
@@ -670,5 +680,18 @@ const Zstring Zstring::operator+(const DefaultChar ch) const
     return Zstring(*this)+=ch;
 }
 
+
+template <class T>
+inline
+Zstring numberToZstring(const T& number) //convert number to string the C++ way
+{
+#ifdef ZSTRING_CHAR
+    std::stringstream ss;
+#elif defined ZSTRING_WIDE_CHAR
+    std::wstringstream ss;
+#endif
+    ss << number;
+    return Zstring(ss.str().c_str(), ss.str().length());
+}
 
 #endif // ZSTRING_H_INCLUDED

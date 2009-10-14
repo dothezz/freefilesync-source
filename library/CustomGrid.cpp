@@ -2,7 +2,9 @@
 #include "../shared/systemConstants.h"
 #include "resources.h"
 #include <wx/dc.h>
-#include "../algorithm.h"
+//#include "../algorithm.h"
+#include "../ui/util.h"
+#include "../shared/stringConv.h"
 #include "resources.h"
 #include <typeinfo>
 #include "../ui/gridView.h"
@@ -44,18 +46,18 @@ class CustomGridTable : public wxGridTableBase
 {
 public:
     CustomGridTable(int initialRows = 0, int initialCols = 0) : //note: initialRows/initialCols MUST match with GetNumberRows()/GetNumberCols() at initialization!!!
-            wxGridTableBase(),
-            COLOR_BLUE(      80,  110, 255),
-            COLOR_GREY(      212, 208, 200),
-            COLOR_CMP_RED(   249, 163, 165),
-            COLOR_CMP_BLUE(  144, 232, 246),
-            COLOR_CMP_GREEN( 147, 253, 159),
-            COLOR_SYNC_BLUE( 201, 203, 247),
-            COLOR_SYNC_GREEN(197, 248, 190),
-            COLOR_YELLOW(    247, 252,  62),
-            gridDataView(NULL),
-            lastNrRows(initialRows),
-            lastNrCols(initialCols) {}
+        wxGridTableBase(),
+        COLOR_BLUE(      80,  110, 255),
+        COLOR_GREY(      212, 208, 200),
+        COLOR_CMP_RED(   249, 163, 165),
+        COLOR_CMP_BLUE(  144, 232, 246),
+        COLOR_CMP_GREEN( 147, 253, 159),
+        COLOR_SYNC_BLUE( 201, 203, 247),
+        COLOR_SYNC_GREEN(197, 248, 190),
+        COLOR_YELLOW(    247, 252,  62),
+        gridDataView(NULL),
+        lastNrRows(initialRows),
+        lastNrCols(initialCols) {}
 
 
     virtual ~CustomGridTable() {}
@@ -256,13 +258,13 @@ protected:
                     switch (getTypeAtPos(col))
                     {
                     case xmlAccess::FULL_PATH:
-                        return dirObj->getFullName<side>().c_str();
+                        return zToWx(dirObj->getFullName<side>());
                     case xmlAccess::FILENAME:
                         return wxEmptyString;
                     case xmlAccess::REL_PATH:
-                        return dirObj->getRelativeName<side>().c_str();
+                        return zToWx(dirObj->getRelativeName<side>());
                     case xmlAccess::DIRECTORY:
-                        return dirObj->getBaseDirPf<side>().c_str();
+                        return zToWx(dirObj->getBaseDirPf<side>());
                     case xmlAccess::SIZE: //file size
                         return _("<Directory>");
                     case xmlAccess::DATE: //date
@@ -277,13 +279,13 @@ protected:
                         switch (getTypeAtPos(col))
                         {
                         case xmlAccess::FULL_PATH:
-                            return fileObj->getFullName<side>().BeforeLast(globalFunctions::FILE_NAME_SEPARATOR).c_str();
+                            return zToWx(fileObj->getFullName<side>().BeforeLast(globalFunctions::FILE_NAME_SEPARATOR));
                         case xmlAccess::FILENAME: //filename
-                            return fileObj->getShortName<side>().c_str();
+                            return zToWx(fileObj->getShortName<side>());
                         case xmlAccess::REL_PATH: //relative path
-                            return fileObj->getParentRelativeName<side>().c_str();
+                            return zToWx(fileObj->getParentRelativeName());
                         case xmlAccess::DIRECTORY:
-                            return fileObj->getBaseDirPf<side>().c_str();
+                            return zToWx(fileObj->getBaseDirPf<side>());
                         case xmlAccess::SIZE: //file size
                             return FreeFileSync::includeNumberSeparator(fileObj->getFileSize<side>().ToString());
                         case xmlAccess::DATE: //date
@@ -305,7 +307,7 @@ private:
         if (fsObj)
         {
             //mark filtered rows
-            if (!fsObj->selectedForSynchronization)
+            if (!fsObj->isActive())
                 return COLOR_BLUE;
             //mark directories
             else if (dynamic_cast<const DirMapping*>(fsObj) != NULL)
@@ -364,8 +366,8 @@ class CustomGridTableMiddle : public CustomGridTable
 public:
 //middle grid is created (first wxWidgets internal call to GetNumberCols()) with one column
     CustomGridTableMiddle() :
-            CustomGridTable(0, GetNumberCols()), //attention: static binding to virtual GetNumberCols() in a Constructor!
-            syncPreviewActive(false) {}
+        CustomGridTable(0, GetNumberCols()), //attention: static binding to virtual GetNumberCols() in a Constructor!
+        syncPreviewActive(false) {}
 
     virtual int GetNumberCols()
     {
@@ -383,7 +385,7 @@ public:
         if (fsObj)
         {
             if (syncPreviewActive) //synchronization preview
-                return getSymbol(getSyncOperation(*fsObj));
+                return getSymbol(fsObj->getSyncOperation());
             else
                 return getSymbol(fsObj->getCategory());
         }
@@ -407,22 +409,25 @@ private:
         if (fsObj)
         {
             //mark filtered rows
-            if (!fsObj->selectedForSynchronization)
+            if (!fsObj->isActive())
                 return COLOR_BLUE;
 
             if (syncPreviewActive) //synchronization preview
             {
-                switch (fsObj->syncDir)
+                switch (fsObj->getSyncOperation()) //evaluate comparison result and sync direction
                 {
-                case SYNC_DIR_LEFT:
+                case SO_CREATE_NEW_LEFT:
+                case SO_DELETE_LEFT:
+                case SO_OVERWRITE_LEFT:
                     return COLOR_SYNC_BLUE;
-                case SYNC_DIR_RIGHT:
+                case SO_CREATE_NEW_RIGHT:
+                case SO_DELETE_RIGHT:
+                case SO_OVERWRITE_RIGHT:
                     return COLOR_SYNC_GREEN;
-                case SYNC_DIR_NONE:
-                    if (fsObj->getCategory() == FILE_CONFLICT)
-                        return COLOR_YELLOW;
-                    else
-                        return *wxWHITE;
+                case SO_UNRESOLVED_CONFLICT:
+                    return COLOR_YELLOW;
+                case SO_DO_NOTHING:
+                    return *wxWHITE;
                 }
             }
             else //comparison results view
@@ -461,12 +466,12 @@ CustomGrid::CustomGrid(wxWindow *parent,
                        const wxSize& size,
                        long style,
                        const wxString& name) :
-        wxGrid(parent, id, pos, size, style, name),
-        m_gridLeft(NULL),
-        m_gridMiddle(NULL),
-        m_gridRight(NULL),
-        isLeading(false),
-        m_marker(-1, ASCENDING)
+    wxGrid(parent, id, pos, size, style, name),
+    m_gridLeft(NULL),
+    m_gridMiddle(NULL),
+    m_gridRight(NULL),
+    isLeading(false),
+    m_marker(-1, ASCENDING)
 {
     //set color of selections
     wxColour darkBlue(40, 35, 140);
@@ -535,7 +540,8 @@ void CustomGrid::DoPrepareDC(wxDC& dc)
 
 inline
 void moveCursorWhileSelecting(const int anchor, const int oldPos, const int newPos, wxGrid* grid)
-{   //note: all positions are valid in this context!
+{
+    //note: all positions are valid in this context!
 
     grid->SetGridCursor(  newPos, grid->GetGridCursorCol());
     grid->MakeCellVisible(newPos, grid->GetGridCursorCol());
@@ -921,8 +927,8 @@ class GridCellRenderer : public wxGridCellStringRenderer
 {
 public:
     GridCellRenderer(CustomGridRim::LoadSuccess& loadIconSuccess, const CustomGridTableRim* gridDataTable) :
-            m_loadIconSuccess(loadIconSuccess),
-            m_gridDataTable(gridDataTable) {}
+        m_loadIconSuccess(loadIconSuccess),
+        m_gridDataTable(gridDataTable) {}
 
 
     virtual void Draw(wxGrid& grid,
@@ -1038,9 +1044,9 @@ CustomGridRim::CustomGridRim(wxWindow *parent,
                              const wxSize& size,
                              long style,
                              const wxString& name) :
-        CustomGrid(parent, id, pos, size, style, name)
+    CustomGrid(parent, id, pos, size, style, name)
 #ifdef FFS_WIN
-        , fileIconsAreEnabled(false)
+    , fileIconsAreEnabled(false)
 #endif
 {}
 
@@ -1126,7 +1132,8 @@ void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
 
     columnSettings.clear();
     if (attr.size() == 0)
-    {   //default settings:
+    {
+        //default settings:
         columnSettings = getDefaultColumnAttributes();
     }
     else
@@ -1215,7 +1222,8 @@ wxString CustomGridRim::getTypeName(xmlAccess::ColumnTypes colType)
 
 
 CustomGridTableRim* CustomGridRim::getGridDataTable()
-{   //let the non-const call the const version: see Meyers Effective C++
+{
+    //let the non-const call the const version: see Meyers Effective C++
     return const_cast<CustomGridTableRim*>(static_cast<const CustomGridRim*>(this)->getGridDataTable());
 }
 
@@ -1314,9 +1322,9 @@ void CustomGridRim::getIconsToBeLoaded(std::vector<Zstring>& newLoad) //loads al
 
 //update file icons periodically: use SINGLE instance to coordinate left and right grid at once
 IconUpdater::IconUpdater(CustomGridLeft* leftGrid, CustomGridRight* rightGrid) :
-        m_leftGrid(leftGrid),
-        m_rightGrid(rightGrid),
-        m_timer(new wxTimer)      //connect timer event for async. icon loading
+    m_leftGrid(leftGrid),
+    m_rightGrid(rightGrid),
+    m_timer(new wxTimer)      //connect timer event for async. icon loading
 {
     m_timer->Connect(wxEVT_TIMER, wxEventHandler(IconUpdater::loadIconsAsynchronously), NULL, this);
     m_timer->Start(50); //timer interval in ms
@@ -1349,8 +1357,8 @@ CustomGridLeft::CustomGridLeft(wxWindow *parent,
                                const wxSize& size,
                                long style,
                                const wxString& name) :
-        CustomGridRim(parent, id, pos, size, style, name),
-        gridDataTable(NULL) {}
+    CustomGridRim(parent, id, pos, size, style, name),
+    gridDataTable(NULL) {}
 
 
 bool CustomGridLeft::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
@@ -1396,8 +1404,8 @@ CustomGridRight::CustomGridRight(wxWindow *parent,
                                  const wxSize& size,
                                  long style,
                                  const wxString& name) :
-        CustomGridRim(parent, id, pos, size, style, name),
-        gridDataTable(NULL) {}
+    CustomGridRim(parent, id, pos, size, style, name),
+    gridDataTable(NULL) {}
 
 
 bool CustomGridRight::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
@@ -1471,13 +1479,13 @@ CustomGridMiddle::CustomGridMiddle(wxWindow *parent,
                                    const wxSize& size,
                                    long style,
                                    const wxString& name) :
-        CustomGrid(parent, id, pos, size, style, name),
-        selectionRowBegin(-1),
-        selectionPos(BLOCKPOS_CHECK_BOX),
-        highlightedRow(-1),
-        highlightedPos(BLOCKPOS_CHECK_BOX),
-        gridDataTable(NULL),
-        toolTip(new CustomTooltip)
+    CustomGrid(parent, id, pos, size, style, name),
+    selectionRowBegin(-1),
+    selectionPos(BLOCKPOS_CHECK_BOX),
+    highlightedRow(-1),
+    highlightedPos(BLOCKPOS_CHECK_BOX),
+    gridDataTable(NULL),
+    toolTip(new CustomTooltip)
 {
     //connect events for dynamic selection of sync direction
     GetGridWindow()->Connect(wxEVT_MOTION, wxMouseEventHandler(CustomGridMiddle::OnMouseMovement), NULL, this);
@@ -1564,7 +1572,7 @@ void CustomGridMiddle::showToolTip(int rowNumber, wxPoint pos)
 
     if (gridDataTable->syncPreviewIsActive()) //synchronization preview
     {
-        const SyncOperation syncOp = getSyncOperation(*fsObj);
+        const SyncOperation syncOp = fsObj->getSyncOperation();
         switch (syncOp)
         {
         case SO_CREATE_NEW_LEFT:
@@ -1589,7 +1597,7 @@ void CustomGridMiddle::showToolTip(int rowNumber, wxPoint pos)
             toolTip->show(getDescription(syncOp), pos, GlobalResources::getInstance().bitmapSyncDirNoneAct);
             break;
         case SO_UNRESOLVED_CONFLICT:
-            toolTip->show(fsObj->getConflictDescription(), pos, GlobalResources::getInstance().bitmapConflictAct);
+            toolTip->show(fsObj->getSyncOpConflict(), pos, GlobalResources::getInstance().bitmapConflictAct);
             break;
         };
     }
@@ -1617,7 +1625,7 @@ void CustomGridMiddle::showToolTip(int rowNumber, wxPoint pos)
             toolTip->show(getDescription(cmpRes), pos, GlobalResources::getInstance().bitmapEqualAct);
             break;
         case FILE_CONFLICT:
-            toolTip->show(fsObj->getConflictDescription(), pos, GlobalResources::getInstance().bitmapConflictAct);
+            toolTip->show(fsObj->getCatConflict(), pos, GlobalResources::getInstance().bitmapConflictAct);
             break;
         }
     }
@@ -1761,13 +1769,13 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
             //HIGHLIGHTNING:
             if (rowIsHighlighted && m_gridMiddle->highlightedPos == CustomGridMiddle::BLOCKPOS_CHECK_BOX)
             {
-                if (fsObj->selectedForSynchronization)
+                if (fsObj->isActive())
                     dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapCheckBoxTrueFocus, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
                 else
                     dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapCheckBoxFalseFocus, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
             }
             //default
-            else if (fsObj->selectedForSynchronization)
+            else if (fsObj->isActive())
                 dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapCheckBoxTrue, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
             else
                 dc.DrawLabel(wxEmptyString, *GlobalResources::getInstance().bitmapCheckBoxFalse, rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
@@ -1789,18 +1797,18 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
                     case CustomGridMiddle::BLOCKPOS_CHECK_BOX:
                         break;
                     case CustomGridMiddle::BLOCKPOS_LEFT:
-                        dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->getCategory(), true, SYNC_DIR_LEFT), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+                        dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->testSyncOperation(true, SYNC_DIR_LEFT)), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
                         break;
                     case CustomGridMiddle::BLOCKPOS_MIDDLE:
-                        dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->getCategory(), true, SYNC_DIR_NONE), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                        dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->testSyncOperation(true, SYNC_DIR_NONE)), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
                         break;
                     case CustomGridMiddle::BLOCKPOS_RIGHT:
-                        dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->getCategory(), true, SYNC_DIR_RIGHT), rectShrinked, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
+                        dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->testSyncOperation(true, SYNC_DIR_RIGHT)), rectShrinked, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
                         break;
                     }
                 else //default
                 {
-                    const wxBitmap& syncOpIcon = getSyncOpImage(fsObj->getCategory(), fsObj->selectedForSynchronization, fsObj->syncDir);
+                    const wxBitmap& syncOpIcon = getSyncOpImage(fsObj->getSyncOperation());
                     dc.DrawLabel(wxEmptyString, syncOpIcon, rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
                 }
             }
@@ -1865,11 +1873,9 @@ void CustomGridMiddle::DrawColLabel(wxDC& dc, int col)
 }
 
 
-const wxBitmap& FreeFileSync::getSyncOpImage(const CompareFilesResult cmpResult,
-        const bool selectedForSynchronization,
-        const SyncDirection syncDir)
+const wxBitmap& FreeFileSync::getSyncOpImage(SyncOperation syncOp)
 {
-    switch (getSyncOperation(cmpResult, selectedForSynchronization, syncDir)) //evaluate comparison result and sync direction
+    switch (syncOp) //evaluate comparison result and sync direction
     {
     case SO_CREATE_NEW_LEFT:
         return *GlobalResources::getInstance().bitmapCreateLeftSmall;

@@ -7,9 +7,9 @@
 
 
 CompareStatusHandler::CompareStatusHandler(MainDialog* dlg) :
-        mainDialog(dlg),
-        ignoreErrors(false),
-        currentProcess(StatusHandler::PROCESS_NONE)
+    mainDialog(dlg),
+    ignoreErrors(false),
+    currentProcess(StatusHandler::PROCESS_NONE)
 {
     wxWindowUpdateLocker dummy(mainDialog); //avoid display distortion
 
@@ -189,7 +189,7 @@ void CompareStatusHandler::abortThisProcess()
 
 
 SyncStatusHandler::SyncStatusHandler(wxWindow* dlg, bool ignoreAllErrors) :
-        ignoreErrors(ignoreAllErrors)
+    ignoreErrors(ignoreAllErrors)
 {
     syncStatusFrame = new SyncStatus(this, dlg);
     syncStatusFrame->Show();
@@ -224,20 +224,17 @@ SyncStatusHandler::~SyncStatusHandler()
     if (abortIsRequested())
     {
         result += wxString(_("Synchronization aborted!")) + wxT(" ") + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!");
-        syncStatusFrame->setStatusText_NoUpdate(result.c_str());
-        syncStatusFrame->processHasFinished(SyncStatus::ABORTED);  //enable okay and close events
+        syncStatusFrame->processHasFinished(SyncStatus::ABORTED, result);  //enable okay and close events
     }
     else if (errorLog.errorsTotal() > 0)
     {
         result += wxString(_("Synchronization completed with errors!")) + wxT(" ") + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!");
-        syncStatusFrame->setStatusText_NoUpdate(result.c_str());
-        syncStatusFrame->processHasFinished(SyncStatus::FINISHED_WITH_ERROR);
+        syncStatusFrame->processHasFinished(SyncStatus::FINISHED_WITH_ERROR, result);
     }
     else
     {
         result += _("Synchronization completed successfully!");
-        syncStatusFrame->setStatusText_NoUpdate(result.c_str());
-        syncStatusFrame->processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS);
+        syncStatusFrame->processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS, result);
     }
 }
 

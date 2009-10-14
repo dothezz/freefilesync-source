@@ -40,12 +40,12 @@ class WorkerThread : public wxThread
 
 public:
     WorkerThread(UpdateWhileExecuting* handler) :
-            wxThread(wxTHREAD_DETACHED),
-            readyToBeginProcessing(),
-            beginProcessing(readyToBeginProcessing),
-            threadIsInitialized(false),
-            threadExitIsRequested(false),
-            threadHandler(handler)
+        wxThread(wxTHREAD_DETACHED),
+        readyToBeginProcessing(),
+        beginProcessing(readyToBeginProcessing),
+        threadIsInitialized(false),
+        threadExitIsRequested(false),
+        threadHandler(handler)
     { }
 
 
@@ -93,9 +93,9 @@ private:
 
 
 UpdateWhileExecuting::UpdateWhileExecuting() :
-        readyToReceiveResult(),
-        receivingResult(readyToReceiveResult),
-        workDone(false)
+    readyToReceiveResult(),
+    receivingResult(readyToReceiveResult),
+    workDone(false)
 {
     //mutex needs to be initially locked for condition receivingResult to work properly
     readyToReceiveResult.Lock();

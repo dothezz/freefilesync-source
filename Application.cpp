@@ -19,6 +19,7 @@
 #include "library/resources.h"
 #include "shared/standardPaths.h"
 #include "shared/localization.h"
+#include "shared/appMain.h"
 
 #ifdef FFS_LINUX
 #include <gtk/gtk.h>
@@ -45,6 +46,22 @@ bool Application::OnInit()
 void Application::OnStartApplication(wxIdleEvent& event)
 {
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), NULL, this);
+
+    struct HandleAppExit //wxWidgets app exit handling is a bit weird... we want the app to exit only if the logical main window is closed
+    {
+        HandleAppExit()
+        {
+            wxTheApp->SetExitOnFrameDelete(false); //avoid popup-windows from becoming temporary top windows leading to program exit after closure
+        }
+
+        ~HandleAppExit()
+        {
+            if (!FreeFileSync::AppMainWindow::mainWindowWasSet())
+                wxTheApp->ExitMainLoop(); //quit application, if no main window was set (batch silent mode)
+        }
+
+    } dummy;
+
 
     //if appname is not set, the default is the executable's name!
     SetAppName(wxT("FreeFileSync"));
@@ -83,21 +100,18 @@ void Application::OnStartApplication(wxIdleEvent& event)
     catch (const xmlAccess::XmlError& error)
     {
         if (wxFileExists(FreeFileSync::getGlobalConfigFile()))
-        {   //show messagebox and continue
-            SetExitOnFrameDelete(false); //prevent error messagebox from becoming top-level window
+        {
+            //show messagebox and continue
             if (error.getSeverity() == xmlAccess::XmlError::WARNING)
                 wxMessageBox(error.show(), _("Warning"), wxOK | wxICON_WARNING);
             else
                 wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
-            SetExitOnFrameDelete(true);
         }
         //else: globalSettings already has default values
     }
 
     //set program language
-    SetExitOnFrameDelete(false); //prevent error messagebox from becoming top-level window
     CustomLocale::getInstance().setLanguage(globalSettings.programLanguage);
-    SetExitOnFrameDelete(true);
 
 
     if (!cfgFilename.empty())
@@ -112,9 +126,6 @@ void Application::OnStartApplication(wxIdleEvent& event)
 
         case xmlAccess::XML_BATCH_CONFIG: //start in commandline mode
             runBatchMode(cfgFilename, globalSettings);
-
-            if (wxApp::GetTopWindow() == NULL) //if no windows are shown, program won't exit automatically
-                ExitMainLoop();
             break;
 
         case xmlAccess::XML_GLOBAL_SETTINGS:
@@ -145,9 +156,9 @@ int Application::OnRun()
     {
         //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
         wxFile safeOutput(FreeFileSync::getLastErrorTxtFile(), wxFile::write);
-        safeOutput.Write(wxString::From8BitData(e.what()));
+        safeOutput.Write(wxString::FromAscii(e.what()));
 
-        wxMessageBox(wxString::From8BitData(e.what()), _("An exception occured!"), wxOK | wxICON_ERROR);
+        wxMessageBox(wxString::FromAscii(e.what()), _("An exception occured!"), wxOK | wxICON_ERROR);
         return -9;
     }
 
@@ -178,6 +189,9 @@ void Application::runGuiMode(const wxString& cfgFileName, xmlAccess::XmlGlobalSe
     MainDialog* frame = new MainDialog(NULL, cfgFileName, settings);
     frame->SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
     frame->Show();
+
+    //notify about (logical) application main window
+    FreeFileSync::AppMainWindow::setMainWindow(frame);
 }
 
 
@@ -205,17 +219,12 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
     try //begin of synchronization process (all in one try-catch block)
     {
-        //set error handling for comparison: DON'T allow ignoring errors! Aborted file traversing can lead to data-loss when synchronizing!
-        const OnError compareErrHandling = batchCfg.handleError == ON_ERROR_IGNORE ?
-                                           ON_ERROR_EXIT : //in GUI mode ON_ERROR_EXIT means "showPopups = true" which is okay
-                                           batchCfg.handleError;
-
         //class handling status updates and error messages
         std::auto_ptr<BatchStatusHandler> statusHandler;  //delete object automatically
         if (batchCfg.silent)
-            statusHandler.reset(new BatchStatusHandlerSilent(compareErrHandling, batchCfg.logFileDirectory, returnValue));
+            statusHandler.reset(new BatchStatusHandlerSilent(batchCfg.handleError, batchCfg.logFileDirectory, returnValue));
         else
-            statusHandler.reset(new BatchStatusHandlerGui(compareErrHandling, returnValue));
+            statusHandler.reset(new BatchStatusHandlerGui(batchCfg.handleError, returnValue));
 
         //COMPARE DIRECTORIES
         FreeFileSync::FolderComparison folderCmp;
@@ -228,9 +237,6 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         comparison.startCompareProcess(FreeFileSync::extractCompareCfg(batchCfg.mainCfg),
                                        batchCfg.mainCfg.compareVar,
                                        folderCmp);
-
-        //set error handling for synchronization
-        statusHandler->setErrorStrategy(batchCfg.handleError);
 
         //check if there are files/folders to be sync'ed at all
         if (!synchronizationNeeded(folderCmp))

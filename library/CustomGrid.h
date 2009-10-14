@@ -23,11 +23,9 @@ class CustomGridRight;
 
 namespace FreeFileSync
 {
-    class GridView;
+class GridView;
 
-    const wxBitmap& getSyncOpImage(const CompareFilesResult cmpResult,
-                                   const bool selectedForSynchronization,
-                                   const SyncDirection syncDir);
+const wxBitmap& getSyncOpImage(SyncOperation syncOp);
 }
 //##################################################################################
 
@@ -299,9 +297,9 @@ class FFSCheckRowsEvent : public wxCommandEvent
 {
 public:
     FFSCheckRowsEvent(const int from, const int to) :
-            wxCommandEvent(FFS_CHECK_ROWS_EVENT),
-            rowFrom(from),
-            rowTo(to) {}
+        wxCommandEvent(FFS_CHECK_ROWS_EVENT),
+        rowFrom(from),
+        rowTo(to) {}
 
     virtual wxEvent* Clone() const
     {
@@ -326,10 +324,10 @@ class FFSSyncDirectionEvent : public wxCommandEvent
 {
 public:
     FFSSyncDirectionEvent(const int from, const int to, const FreeFileSync::SyncDirection dir) :
-            wxCommandEvent(FFS_SYNC_DIRECTION_EVENT),
-            rowFrom(from),
-            rowTo(to),
-            direction(dir) {}
+        wxCommandEvent(FFS_SYNC_DIRECTION_EVENT),
+        rowFrom(from),
+        rowTo(to),
+        direction(dir) {}
 
     virtual wxEvent* Clone() const
     {

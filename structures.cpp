@@ -7,6 +7,28 @@ using FreeFileSync::SyncConfiguration;
 using FreeFileSync::MainConfiguration;
 
 
+Zstring FreeFileSync::defaultIncludeFilter()
+{
+    static Zstring include(DefaultStr("*")); //include all files/folders
+    return include;
+}
+
+
+Zstring FreeFileSync::defaultExcludeFilter()
+{
+#ifdef FFS_WIN
+    static Zstring exclude(wxT("\
+\\System Volume Information\\\n\
+\\RECYCLER\\\n\
+\\RECYCLED\\\n\
+\\$Recycle.Bin\\")); //exclude Recycle Bin
+#elif defined FFS_LINUX
+    static Zstring exclude; //exclude nothing
+#endif
+    return exclude;
+}
+
+
 bool FreeFileSync::recycleBinExistsWrap()
 {
     return recycleBinExists();
@@ -30,28 +52,31 @@ wxString FreeFileSync::getVariantName(CompareVariant var)
 
 SyncConfiguration::Variant SyncConfiguration::getVariant() const
 {
-    if (    exLeftSideOnly  == SYNC_DIR_CFG_RIGHT &&
-            exRightSideOnly == SYNC_DIR_CFG_RIGHT &&
-            leftNewer       == SYNC_DIR_CFG_RIGHT &&
-            rightNewer      == SYNC_DIR_CFG_RIGHT &&
-            different       == SYNC_DIR_CFG_RIGHT &&
-            conflict        == SYNC_DIR_CFG_NONE)
+    if (automatic == true)
+        return AUTOMATIC;  //automatic mode
+
+    if (    exLeftSideOnly  == SYNC_DIR_RIGHT &&
+            exRightSideOnly == SYNC_DIR_RIGHT &&
+            leftNewer       == SYNC_DIR_RIGHT &&
+            rightNewer      == SYNC_DIR_RIGHT &&
+            different       == SYNC_DIR_RIGHT &&
+            conflict        == SYNC_DIR_RIGHT)
         return MIRROR;    //one way ->
 
-    else if (exLeftSideOnly  == SYNC_DIR_CFG_RIGHT &&
-             exRightSideOnly == SYNC_DIR_CFG_NONE  &&
-             leftNewer       == SYNC_DIR_CFG_RIGHT &&
-             rightNewer      == SYNC_DIR_CFG_NONE  &&
-             different       == SYNC_DIR_CFG_NONE  &&
-             conflict        == SYNC_DIR_CFG_NONE)
+    else if (exLeftSideOnly  == SYNC_DIR_RIGHT &&
+             exRightSideOnly == SYNC_DIR_NONE  &&
+             leftNewer       == SYNC_DIR_RIGHT &&
+             rightNewer      == SYNC_DIR_NONE  &&
+             different       == SYNC_DIR_NONE  &&
+             conflict        == SYNC_DIR_NONE)
         return UPDATE;    //Update ->
 
-    else if (exLeftSideOnly  == SYNC_DIR_CFG_RIGHT &&
-             exRightSideOnly == SYNC_DIR_CFG_LEFT  &&
-             leftNewer       == SYNC_DIR_CFG_RIGHT &&
-             rightNewer      == SYNC_DIR_CFG_LEFT  &&
-             different       == SYNC_DIR_CFG_NONE  &&
-             conflict        == SYNC_DIR_CFG_NONE)
+    else if (exLeftSideOnly  == SYNC_DIR_RIGHT &&
+             exRightSideOnly == SYNC_DIR_LEFT  &&
+             leftNewer       == SYNC_DIR_RIGHT &&
+             rightNewer      == SYNC_DIR_LEFT  &&
+             different       == SYNC_DIR_NONE  &&
+             conflict        == SYNC_DIR_NONE)
         return TWOWAY;    //two way <->
     else
         return CUSTOM;    //other
@@ -62,29 +87,35 @@ void SyncConfiguration::setVariant(const Variant var)
 {
     switch (var)
     {
+    case AUTOMATIC:
+        automatic = true;
+        break;
     case MIRROR:
-        exLeftSideOnly  = SYNC_DIR_CFG_RIGHT;
-        exRightSideOnly = SYNC_DIR_CFG_RIGHT;
-        leftNewer       = SYNC_DIR_CFG_RIGHT;
-        rightNewer      = SYNC_DIR_CFG_RIGHT;
-        different       = SYNC_DIR_CFG_RIGHT;
-        conflict        = SYNC_DIR_CFG_NONE;
+        automatic = false;
+        exLeftSideOnly  = SYNC_DIR_RIGHT;
+        exRightSideOnly = SYNC_DIR_RIGHT;
+        leftNewer       = SYNC_DIR_RIGHT;
+        rightNewer      = SYNC_DIR_RIGHT;
+        different       = SYNC_DIR_RIGHT;
+        conflict        = SYNC_DIR_RIGHT;
         break;
     case UPDATE:
-        exLeftSideOnly  = SYNC_DIR_CFG_RIGHT;
-        exRightSideOnly = SYNC_DIR_CFG_NONE;
-        leftNewer       = SYNC_DIR_CFG_RIGHT;
-        rightNewer      = SYNC_DIR_CFG_NONE;
-        different       = SYNC_DIR_CFG_NONE;
-        conflict        = SYNC_DIR_CFG_NONE;
+        automatic = false;
+        exLeftSideOnly  = SYNC_DIR_RIGHT;
+        exRightSideOnly = SYNC_DIR_NONE;
+        leftNewer       = SYNC_DIR_RIGHT;
+        rightNewer      = SYNC_DIR_NONE;
+        different       = SYNC_DIR_NONE;
+        conflict        = SYNC_DIR_NONE;
         break;
     case TWOWAY:
-        exLeftSideOnly  = SYNC_DIR_CFG_RIGHT;
-        exRightSideOnly = SYNC_DIR_CFG_LEFT;
-        leftNewer       = SYNC_DIR_CFG_RIGHT;
-        rightNewer      = SYNC_DIR_CFG_LEFT;
-        different       = SYNC_DIR_CFG_NONE;
-        conflict        = SYNC_DIR_CFG_NONE;
+        automatic = false;
+        exLeftSideOnly  = SYNC_DIR_RIGHT;
+        exRightSideOnly = SYNC_DIR_LEFT;
+        leftNewer       = SYNC_DIR_RIGHT;
+        rightNewer      = SYNC_DIR_LEFT;
+        different       = SYNC_DIR_NONE;
+        conflict        = SYNC_DIR_NONE;
         break;
     case CUSTOM:
         assert(false);
@@ -104,6 +135,8 @@ wxString MainConfiguration::getSyncVariantName()
     //seems to be all in sync...
     switch (mainVariant)
     {
+    case SyncConfiguration::AUTOMATIC:
+        return _("<Automatic>");
     case SyncConfiguration::MIRROR:
         return _("Mirror ->>");
     case SyncConfiguration::UPDATE:

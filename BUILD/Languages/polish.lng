@@ -138,6 +138,8 @@
 2. Użyj wieloznacznika (wildcard) '*' i '?'.
 3. Exclude files directly on main grid via context menu.
 3. Wyklucz pliki i foldery używając prawego przycisku myszki.
+<Automatic>
+<Automatycznie>
 <Directory>
 <Katalog>
 <Last session>
@@ -146,6 +148,8 @@
 <zaznaczone elementy>
 A newer version of FreeFileSync is available:
 Dostępna jest nowa wersja FreeFileSync:
+ATTENTION: Failed directory access can lead to file deletions!
+UWAGA: Niepoprawny dostęp do katalogu może spowodować utratę pliku!
 Abort requested: Waiting for current operation to finish...
 Żądanie przerwania: Czekaj na koniec aktualnie wykonywanego zadania...
 Aborted
@@ -168,6 +172,8 @@ Assemble a batch file for automated synchronization. To start in batch mode simp
 Twórz plik wsadowy dla automatyzacji procesu. By rozpocząć prace w tym trybie zwyczajnie uruchom plik klikając dwa razy lub dodaj go do zadań zaplanowanych Twojego systemu. Plik wsadowy może być również przekazywany jako parametr do programu w postaci: FreeFileSync.exe <plikwsadowy>.
 Auto-adjust columns
 Autodopasowanie kolumn
+Automatic mode
+Tryb automatyczny
 Batch execution
 Uruchomienie pliku wsadowego
 Batch file created successfully!
@@ -176,12 +182,20 @@ Batch job
 Plik wsadowy
 Big thanks for localizing FreeFileSync goes out to:
 Podziękowania za tłumaczenie FreeFileSync:
+Both sides have changed since last synchronization!
+Obie strony uległy zmianie od ostatniej synchronizacji!
 Browse
 Przeglądaj
 Build:
 Buduj:
 Cancel
 Anuluj
+Cannot determine sync-direction: Changed filter settings!
+Nie można określik kierunku synchronizacji: Zmieniono ustawienia filtra!
+Cannot determine sync-direction: No change since last synchronization!
+Nie można określik kierunku synchronizacji: Brak zmian od ostatniej synchronizacji!
+Category
+Kategoria
 Change direction
 Zmień kierunek
 Check all
@@ -376,6 +390,8 @@ Error reading file attributes:
 Błąd odczytu atrybutów pliku:
 Error reading file:
 Błąd odczytu pliku:
+Error reading from synchronization database:
+Błąd odczytu z bazy danych synchronizacji:
 Error resolving symbolic link:
 Błąd odczytu dowiązania symbolicznego:
 Error starting Volume Shadow Copy Service!
@@ -388,8 +404,10 @@ Error writing file attributes:
 Błąd zapisu atrybutów pliku:
 Error writing file:
 Błąd zapisu pliku:
-Error: Source directory does not exist anymore:
-Błąd: Katalog źródłowy nie istnieje:
+Error writing to synchronization database:
+Błąd zapisu do bazy danych synchronizacji:
+Source directory does not exist anymore:
+Katalog źródłowy nie istnieje:
 Example
 Przykład
 Exclude
@@ -438,10 +456,10 @@ Files that exist on both sides, left one is newer
 Pliki, które istnieją po obu stronach, lewa strona jest nowsza
 Files that exist on both sides, right one is newer
 Pliki, które istnieją po obu stronach, prawa strona jest nowsza
+Files/folders found:
+Znalezione pliki/katalogi:
 Files/folders remaining:
 Pozostałe Pliki/katalogi:
-Files/folders scanned:
-Przeskanowane Pliki/katalogi:
 Files/folders that exist on left side only
 Pliki/katalogi istniejące tylko po lewej stronie
 Files/folders that exist on right side only
@@ -472,6 +490,8 @@ FreeFileSync is up to date!
 FreeFileSync jest już uaktualniony!
 Full path
 Pełna scieżka
+Generating database...
+Generowanie bazy danych...
 Generating file list...
 Generowanie listy plików...
 Global settings
@@ -536,10 +556,14 @@ Include temporarily
 Dołącz tymczasowo
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
 Dołącz: *.doc;*.zip;*.exe\nWyklucz: temp\\*
+Incompatible synchronization database format:
+Niepoprawny format bazy danych dla synchronizacji:
 Info
 Info
 Information
 Informacja
+Initial synchronization. Please verify default copy-directions!
+Wstępna synchronizacja. Sprawdź domyślne kierunki synchronizacji!
 Integrate external applications into context menu. The following macros are available:
 Dołącz zewnętrzną aplikację do menu kontekstowego. Dostępne macra:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +602,8 @@ Moving folder %x to user-defined directory %y
 Przenoszenie folderu %x do katalogu użytkownika %y
 Multiple...
 Wiele...
+No database file existing yet:
+Brak pliku bazy danych:
 Not enough free disk space available in:
 Brak wystarczającej przestrzeni dyskowej na:
 Nothing to synchronize according to configuration!
@@ -592,6 +618,12 @@ OK
 OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Tylko pliki/katalogi zaakceptowane przez filtr będą synchronizowane. Filtr działa dla nazw nazw relatywnych(!) względem katalogu bazowego. 
+Open directly
+Otwórz bezpośrednio
+Open with Explorer
+Otwórz za pomocą Explorer
+Open with Konqueror
+Otwórz za pomocą Konqueror
 Operation aborted!
 Operacja przerwana!
 Operation:
@@ -632,8 +664,6 @@ Report translation error
 Zgłoś błąd w tłumaczeniu
 Reset
 Resetuj
-Result
-Rezultat
 Right
 Prawy
 S&ave configuration
@@ -730,6 +760,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 Synchronizuj wszystkie pliki .doc, .zip i exe z wyjątkiem folderu \"temp\"
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Synchronizuj obie strony jednocześnie: Kopiuj nowe albo uaktualniaj w obu folderach.
+Synchronize both sides using a database. Deletions are detected automatically.
+Synchronizuj strony przy użyciu bazy danych. Usunięcia wykrywane są automatycznie.
 Synchronize...
 Synchronizuj...
 Synchronizing...
@@ -782,6 +814,8 @@ User-defined directory
 Katalog użytkownika
 User-defined directory for deletion was not specified!
 Katalog użytkownika dla elementów usuniętych nie został określony!
+Using default synchronization directions. Please recheck.
+Ustawione są domyślne kierunki synchronizacji. Sprawdź ponownie.
 Variant
 Wariant
 Verifying file %x
@@ -796,6 +830,8 @@ When the comparison is started with this option set the following decision tree 
 Gdy porównywanie z zaznaczoną opcją jest w toku, podejmowane są następujące dezyje:
 You can ignore the error to consider not existing directories as empty.
 Możesz zignorować ten błąd i uznać nieistniejący katalog za pusty.
+You can ignore the error to skip current folder pair.
+Możesz zignorować problem i przejść do aktualnej pary folderów.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Możesz spróbować synchronizować pozostałe elementy ponownie (bez konieczności ponownego porównywania)!
 different

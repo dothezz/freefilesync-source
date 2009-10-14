@@ -14,8 +14,8 @@ public:
                  long               style = 0,
                  const wxValidator& validator = wxDefaultValidator,
                  const wxString&    name = wxButtonNameStr) :
-            wxBitmapButton(parent, id, bitmap, pos, size, style, validator, name),
-            active(false) {}
+        wxBitmapButton(parent, id, bitmap, pos, size, style, validator, name),
+        active(false) {}
 
     void init(const wxBitmap& activeBmp,
               const wxString& activeTooltip,

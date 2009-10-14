@@ -138,6 +138,8 @@
 2. Используйте символы '*' и '?' для замены неизвестных.
 3. Exclude files directly on main grid via context menu.
 3. Исключите файлы прямо в главном окне через контекстное меню.
+<Automatic>
+<Автоматический>
 <Directory>
 <Папка>
 <Last session>
@@ -146,6 +148,8 @@
 <групповое выделение>
 A newer version of FreeFileSync is available:
 Доступна новая версия FreeFileSync:
+ATTENTION: Failed directory access can lead to file deletions!
+ВНИМАНИЕ: Отказ в доступе к каталогу может привести к удалению файла!
 Abort requested: Waiting for current operation to finish...
 Запрос отмены: Ожидайте, пока текущая операция завершится...
 Aborted
@@ -157,7 +161,7 @@ Action
 Add folder
 Добавить папку
 Add folder pair
-Добавить папку
+Добавить пару папок
 An exception occured!
 Исключение произошло!
 As a result the files are separated into the following categories:
@@ -168,6 +172,8 @@ Assemble a batch file for automated synchronization. To start in batch mode simp
 Создайте файл задания для автоматизированной синхронизации. Чтобы запустить программу в этом режиме просто передайте название файла на выполнение FreeFileSync: FreeFileSync.exe <batchfile>. Это также может быть записано в планировщике задач Вашей операционной системы.
 Auto-adjust columns
 Автовыравнивание ширины колонок
+Automatic mode
+Автоматический режим
 Batch execution
 Выполнение пакетного задания
 Batch file created successfully!
@@ -176,12 +182,20 @@ Batch job
 Пакетное задание
 Big thanks for localizing FreeFileSync goes out to:
 Большое спасибо за перевод FreeFileSync:
+Both sides have changed since last synchronization!
+Со времени последней синхронизации с обеих сторон произошли изменения!
 Browse
 Обзор
 Build:
 Сборка:
 Cancel
 Отмена
+Cannot determine sync-direction: Changed filter settings!
+Невозможно определить направление синхронизации: Изменены настройки фильтра!
+Cannot determine sync-direction: No change since last synchronization!
+Невозможно определить направление синхронизации: Никаких изменений после последней синхронизации!
+Category
+Категория
 Change direction
 Поменять направление
 Check all
@@ -376,6 +390,8 @@ Error reading file attributes:
 Ошибка при чтении параметров файла:
 Error reading file:
 Ошибка при чтении файла:
+Error reading from synchronization database:
+Ошибка при чтении из базы данных синхронизации:
 Error resolving symbolic link:
 Ошибка при решении символической ссылки:
 Error starting Volume Shadow Copy Service!
@@ -388,8 +404,10 @@ Error writing file attributes:
 Ошибка при записи параметров файла:
 Error writing file:
 Ошибка при записи файла:
-Error: Source directory does not exist anymore:
-Ошибка: Исходная папка больше не существует:
+Error writing to synchronization database:
+Ошибка при записи в базу данных синхронизации:
+Source directory does not exist anymore:
+Исходная папка больше не существует:
 Example
 Пример
 Exclude
@@ -438,10 +456,10 @@ Files that exist on both sides, left one is newer
 Файлы, существующие на обоих сторонах, левый новее
 Files that exist on both sides, right one is newer
 Файлы, существующие на обоих сторонах, правый новее
+Files/folders found:
+Файлов/папок найдено:
 Files/folders remaining:
 Файлов/папок осталось:
-Files/folders scanned:
-Файлов/папок просканировано:
 Files/folders that exist on left side only
 Файлы/папки, существующие только на левой стороне
 Files/folders that exist on right side only
@@ -472,6 +490,8 @@ FreeFileSync is up to date!
 У Вас самая последняя версия FreeFileSync!
 Full path
 Полный путь
+Generating database...
+Создание базы данных...
 Generating file list...
 Создание списка файлов...
 Global settings
@@ -536,10 +556,14 @@ Include temporarily
 Включая временные
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
 Включая: *.doc;*.zip;*.exe\nИсключая: temp\\*
+Incompatible synchronization database format:
+Несовместимый формат базы данных синхронизации:
 Info
 Информация
 Information
 Информация
+Initial synchronization. Please verify default copy-directions!
+Первоначальная синхронизация. Пожалуйста, проверьте направление копирования!
 Integrate external applications into context menu. The following macros are available:
 Интегрирует внешние приложения в контекстное меню.\nСледующие команды доступны:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -561,7 +585,7 @@ Logging
 Mirror ->>
 Зеркало ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Резервная копия левой папки: правая папка будет перезаписана и после синхронизации будет точно соответствовать левой папке
+Резервная копия левой папки: правая папка будет перезаписана и после синхронизации будет точно соответствовать левой папке.
 More than 50% of the total number of files will be copied or deleted!
 Более 50% общего количества файлов будет скопировано или удалено!
 Move column down
@@ -578,6 +602,8 @@ Moving folder %x to user-defined directory %y
 Перемещение папки %x в заданную пользователем папку %y
 Multiple...
 Различные варианты синхронизации
+No database file existing yet:
+Файла базы данных еще не существует:
 Not enough free disk space available in:
 Не достаточно свободного места в:
 Nothing to synchronize according to configuration!
@@ -592,6 +618,12 @@ OK
 OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Только файлы/папки, которые проходят фильтрацию будут отобраны для синхронизации. Фильтр будет применяться ко всем именам, относящимся к основным синхронизируемым папкам.
+Open directly
+Открыть
+Open with Explorer
+Открыть путь в Проводнике
+Open with Konqueror
+Открыть путь в Konqueror
 Operation aborted!
 Операция отменена!
 Operation:
@@ -627,13 +659,11 @@ Remove alternate settings
 Remove folder
 Удалить папку
 Remove folder pair
-Удалить папку
+Удалить пару папок
 Report translation error
 Сообщить об ошибке перевода
 Reset
 Сбросить
-Result
-Описание
 Right
 Справа
 S&ave configuration
@@ -730,6 +760,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 Синхронизировать все .doc, .zip и .exe файлы, за исключением всех файлов из подпапки \"temp\"
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Синхронизировать обе стороны одновременно: копировать новые или обновлять файлы в обоих направлениях.
+Synchronize both sides using a database. Deletions are detected automatically.
+Синхронизировать обе стороны, используя базу данных. Удаленные файлы/папки определяются автоматически.
 Synchronize...
 Синхронизировать
 Synchronizing...
@@ -757,7 +789,7 @@ Total required free disk space:
 Total time:
 Общее время:
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
-Учитывать файлы, которые отличаются по времени на 1 час, как равные, менее чем на 1 час, как конфликтные, чтобы учесть переход на летнее время.
+Учитывать файлы, которые отличаются по времени на 1 час, как равные, менее чем на 1 час, как конфликтные, чтобы учесть переход на летнее время
 Two way <->
 В обоих направлениях <->
 Unable to connect to sourceforge.net!
@@ -782,6 +814,8 @@ User-defined directory
 Использовать заданную пользователем папку
 User-defined directory for deletion was not specified!
 Пользовательская папка для удаления не была указана!
+Using default synchronization directions. Please recheck.
+Используются направления синхронизации по-умолчанию. Пожалуйста, перепроверьте.
 Variant
 Вариант
 Verifying file %x
@@ -796,6 +830,8 @@ When the comparison is started with this option set the following decision tree 
 Когда сравнение запущено с этими критериями, алгоритм следующий:
 You can ignore the error to consider not existing directories as empty.
 Вы можете проигнорировать ошибку, приняв несуществующие папки за пустые.
+You can ignore the error to skip current folder pair.
+Вы можете проигнорировать ошибку, чтобы пропустить текущую пару папок и продолжить.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Вы можете попытаться синхронизировать оставшиеся пункты снова (без повторного сравнения)!
 different

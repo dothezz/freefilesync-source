@@ -138,6 +138,8 @@
 2. Usar '*' y '?' como caracteres comodín.
 3. Exclude files directly on main grid via context menu.
 3. Excluir directamente ficheros sobre la rejilla a través del menu de contexto.
+<Automatic>
+
 <Directory>
 <Directorio>
 <Last session>
@@ -145,6 +147,8 @@
 <multiple selection>
 <Selección múltiple>
 A newer version of FreeFileSync is available:
+
+ATTENTION: Failed directory access can lead to file deletions!
 
 Abort requested: Waiting for current operation to finish...
 Abortar pedido: Esperar a que la actual operación finalice...
@@ -168,6 +172,8 @@ Assemble a batch file for automated synchronization. To start in batch mode simp
 Crear un fichero "batch" para una sincronización automática. Para empezar en modo "batch" simplemente pasar el nombre del fichero al ejecutable FreeFileSyinc en la ventana de comandos (CMD): FreeFileSync.exe <nombre de fichero batch>. También puede ser planificada en el Administrador de Tareas programadas.
 Auto-adjust columns
 
+Automatic mode
+
 Batch execution
 Ejecución del "batch"
 Batch file created successfully!
@@ -176,12 +182,20 @@ Batch job
 Tarea Batch
 Big thanks for localizing FreeFileSync goes out to:
 Agradecimientos por la traducción de FreeFileSync a:
+Both sides have changed since last synchronization!
+
 Browse
 
 Build:
 Construído:
 Cancel
 Cancelar
+Cannot determine sync-direction: Changed filter settings!
+
+Cannot determine sync-direction: No change since last synchronization!
+
+Category
+
 Change direction
 
 Check all
@@ -376,6 +390,8 @@ Error reading file attributes:
 Error al leer atributos del fichero:
 Error reading file:
 Error al leer el fichero:
+Error reading from synchronization database:
+
 Error resolving symbolic link:
 Error al resolver enlace simbólico:
 Error starting Volume Shadow Copy Service!
@@ -388,8 +404,10 @@ Error writing file attributes:
 Error al escribir atributos del fichero:
 Error writing file:
 Error al escribir fichero:
-Error: Source directory does not exist anymore:
-Error: El directorio origen no existe ya:
+Error writing to synchronization database:
+
+Source directory does not exist anymore:
+El directorio origen no existe ya:
 Example
 Ejemplo
 Exclude
@@ -438,10 +456,10 @@ Files that exist on both sides, left one is newer
 Ficheros que existen en ambos lados, el de la izquierda es más reciente
 Files that exist on both sides, right one is newer
 Ficheros que existen en ambos lados, el de la derecha es más reciente
+Files/folders found:
+
 Files/folders remaining:
 Ficheros/carpetas restantes:
-Files/folders scanned:
-Ficheros/carpetas analizados:
 Files/folders that exist on left side only
 Ficheros/carpetas que existen sólo en el lado izquierdo
 Files/folders that exist on right side only
@@ -471,6 +489,8 @@ FreeFileSync configuración
 FreeFileSync is up to date!
 FreeFileSync está actualizado
 Full path
+
+Generating database...
 
 Generating file list...
 Generando lista de ficheros...
@@ -536,10 +556,14 @@ Include temporarily
 Incluir temporalmente
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
 
+Incompatible synchronization database format:
+
 Info
 Info
 Information
 Información
+Initial synchronization. Please verify default copy-directions!
+
 Integrate external applications into context menu. The following macros are available:
 
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +602,8 @@ Moving folder %x to user-defined directory %y
 
 Multiple...
 
+No database file existing yet:
+
 Not enough free disk space available in:
 
 Nothing to synchronize according to configuration!
@@ -591,6 +617,12 @@ Número de ficheros que serán sustituídos
 OK
 OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
+
+Open directly
+
+Open with Explorer
+
+Open with Konqueror
 
 Operation aborted!
 Operación abortada!
@@ -632,8 +664,6 @@ Report translation error
 
 Reset
 Reiniciar
-Result
-Resultado
 Right
 
 S&ave configuration
@@ -730,6 +760,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Sincronizar ambos lados simultáneamente: Copiar ficheros nuevos o actualizados en ambas direcciones.
+Synchronize both sides using a database. Deletions are detected automatically.
+
 Synchronize...
 
 Synchronizing...
@@ -782,6 +814,8 @@ User-defined directory
 
 User-defined directory for deletion was not specified!
 
+Using default synchronization directions. Please recheck.
+
 Variant
 
 Verifying file %x
@@ -795,6 +829,8 @@ Atención: La sincronización falló para %x item(s):
 When the comparison is started with this option set the following decision tree is processed:
 Cuando la comparación se inicia con este conjunto de opciones, se procesa el siguiente árbol de decisiones:
 You can ignore the error to consider not existing directories as empty.
+
+You can ignore the error to skip current folder pair.
 
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Puede intentar sincronizar los elementos restantes otra vez (SIN tener que volver a comparar)

@@ -10,53 +10,55 @@ class Translation;
 
 namespace FreeFileSync
 {
-    //language dependent global variables: need to be initialized by CustomLocale on program startup and language switch
+//language dependent global variables: need to be initialized by CustomLocale on program startup and language switch
 
-    extern const wxChar* THOUSANDS_SEPARATOR;
-    extern const wxChar* DECIMAL_POINT;
+extern const wxChar* THOUSANDS_SEPARATOR;
+extern const wxChar* DECIMAL_POINT;
 
 
-    struct LocInfoLine
+struct LocInfoLine
+{
+    int languageID;
+    wxString languageName;
+    wxString languageFile;
+    wxString translatorName;
+    wxString languageFlag;
+};
+
+class LocalizationInfo
+{
+public:
+    static const std::vector<LocInfoLine>& getMapping();
+
+private:
+    LocalizationInfo();
+    LocalizationInfo(const LocalizationInfo&);
+    LocalizationInfo& operator=(const LocalizationInfo&);
+
+    std::vector<LocInfoLine> locMapping;
+};
+
+
+class CustomLocale : public wxLocale
+{
+public:
+    static CustomLocale& getInstance();
+
+    void setLanguage(const int language);
+
+    int getLanguage() const
     {
-        int languageID;
-        wxString languageName;
-        wxString languageFile;
-        wxString translatorName;
-        wxString languageFlag;
-    };
+        return currentLanguage;
+    }
 
-    class LocalizationInfo
-    {
-    public:
-        static const std::vector<LocInfoLine>& getMapping();
+    virtual const wxChar* GetString(const wxChar* szOrigString, const wxChar* szDomain = NULL) const;
 
-    private:
-        LocalizationInfo();
+private:
+    CustomLocale();
 
-        std::vector<LocInfoLine> locMapping;
-    };
-
-
-    class CustomLocale : public wxLocale
-    {
-    public:
-        static CustomLocale& getInstance();
-
-        void setLanguage(const int language);
-
-        int getLanguage() const
-        {
-            return currentLanguage;
-        }
-
-        virtual const wxChar* GetString(const wxChar* szOrigString, const wxChar* szDomain = NULL) const;
-
-    private:
-        CustomLocale();
-
-        std::auto_ptr<Translation> translationDB;
-        int currentLanguage;
-    };
+    std::auto_ptr<Translation> translationDB;
+    int currentLanguage;
+};
 }
 
 #endif // MISC_H_INCLUDED

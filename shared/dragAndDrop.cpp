@@ -19,9 +19,9 @@ class FFSFileDropEvent : public wxCommandEvent
 {
 public:
     FFSFileDropEvent(const wxString& nameDropped, const wxWindow* dropWindow) :
-            wxCommandEvent(FFS_DROP_FILE_EVENT),
-            nameDropped_(nameDropped),
-            dropWindow_(dropWindow) {}
+        wxCommandEvent(FFS_DROP_FILE_EVENT),
+        nameDropped_(nameDropped),
+        dropWindow_(dropWindow) {}
 
     virtual wxEvent* Clone() const
     {
@@ -39,7 +39,7 @@ class WindowDropTarget : public wxFileDropTarget
 {
 public:
     WindowDropTarget(wxWindow* dropWindow) :
-            dropWindow_(dropWindow) {}
+        dropWindow_(dropWindow) {}
 
     virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
     {
@@ -68,10 +68,10 @@ DragDropOnMainDlg::DragDropOnMainDlg(wxWindow*        dropWindow1,
                                      wxWindow*        dropWindow2,
                                      wxDirPickerCtrl* dirPicker,
                                      wxComboBox*      dirName) :
-        dropWindow1_(dropWindow1),
-        dropWindow2_(dropWindow2),
-        dirPicker_(dirPicker),
-        dirName_(dirName)
+    dropWindow1_(dropWindow1),
+    dropWindow2_(dropWindow2),
+    dirPicker_(dirPicker),
+    dirName_(dirName)
 {
     //prepare drag & drop
     dropWindow1->SetDropTarget(new WindowDropTarget(dropWindow1)); //takes ownership
@@ -155,9 +155,9 @@ using FreeFileSync::DragDropOnDlg;
 DragDropOnDlg::DragDropOnDlg(wxWindow*        dropWindow,
                              wxDirPickerCtrl* dirPicker,
                              wxTextCtrl*      dirName) :
-        dropWindow_(dropWindow),
-        dirPicker_(dirPicker),
-        dirName_(dirName)
+    dropWindow_(dropWindow),
+    dirPicker_(dirPicker),
+    dirName_(dirName)
 {
     //prepare drag & drop
     dropWindow->SetDropTarget(new WindowDropTarget(dropWindow)); //takes ownership

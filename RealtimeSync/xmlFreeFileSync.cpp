@@ -4,9 +4,12 @@
 #include "../shared/zstring.h"
 #include "functions.h"
 #include "../shared/xmlBase.h"
+#include "../shared/stringConv.h"
 
 //include FreeFileSync xml headers
 #include "../library/processXml.h"
+
+using namespace FreeFileSync;
 
 
 #ifdef FFS_WIN
@@ -31,20 +34,20 @@ xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& bat
 #endif
 
     //add main folders
-    uniqueFolders.insert(batchCfg.mainCfg.mainFolderPair.leftDirectory.c_str());
-    uniqueFolders.insert(batchCfg.mainCfg.mainFolderPair.rightDirectory.c_str());
+    uniqueFolders.insert(zToWx(batchCfg.mainCfg.mainFolderPair.leftDirectory));
+    uniqueFolders.insert(zToWx(batchCfg.mainCfg.mainFolderPair.rightDirectory));
 
     //additional folders
     for (std::vector<FreeFileSync::FolderPairEnh>::const_iterator i = batchCfg.mainCfg.additionalPairs.begin();
             i != batchCfg.mainCfg.additionalPairs.end(); ++i)
     {
-        uniqueFolders.insert(i->leftDirectory.c_str());
-        uniqueFolders.insert(i->rightDirectory.c_str());
+        uniqueFolders.insert(zToWx(i->leftDirectory));
+        uniqueFolders.insert(zToWx(i->rightDirectory));
     }
 
     output.directories.insert(output.directories.end(), uniqueFolders.begin(), uniqueFolders.end());
 
-    output.commandline = FreeFileSync::getInstallationDir() + globalFunctions::FILE_NAME_SEPARATOR + wxT("FreeFileSync.exe ") +
+    output.commandline = FreeFileSync::getInstallationDir() + zToWx(globalFunctions::FILE_NAME_SEPARATOR) + wxT("FreeFileSync.exe ") +
                          wxT("\"") + filename + wxT("\"");
 
     return output;

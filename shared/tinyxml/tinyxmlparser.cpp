@@ -433,11 +433,11 @@ const char* TiXmlBase::ReadName( const char* p, TIXML_STRING * name, TiXmlEncodi
     {
         const char* start = p;
         while (		p && *p
-                 &&	(		IsAlphaNum( (unsigned char ) *p, encoding )
-                       || *p == '_'
-                       || *p == '-'
-                       || *p == '.'
-                       || *p == ':' ) )
+                    &&	(		IsAlphaNum( (unsigned char ) *p, encoding )
+                                || *p == '_'
+                                || *p == '-'
+                                || *p == '.'
+                                || *p == ':' ) )
         {
             //(*name) += *p; // expensive
             ++p;
@@ -588,11 +588,11 @@ bool TiXmlBase::StringEqual( const char* p,
 }
 
 const char* TiXmlBase::ReadText(	const char* p,
-                                 TIXML_STRING * text,
-                                 bool trimWhiteSpace,
-                                 const char* endTag,
-                                 bool caseInsensitive,
-                                 TiXmlEncoding encoding )
+                                    TIXML_STRING * text,
+                                    bool trimWhiteSpace,
+                                    const char* endTag,
+                                    bool caseInsensitive,
+                                    TiXmlEncoding encoding )
 {
     *text = "";
     if (    !trimWhiteSpace			// certain tags always keep whitespace

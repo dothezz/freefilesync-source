@@ -101,6 +101,7 @@
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
 			<Add directory="C:\Programme\C++\wxWidgets\contrib\include" />
 			<Add directory="shared\boost_1_40_0" />
+			<Add directory="shared" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
@@ -228,6 +229,14 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="shared\appMain.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="shared\appMain.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="shared\customButton.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
@@ -266,6 +275,7 @@
 		<Unit filename="shared\standardPaths.cpp" />
 		<Unit filename="shared\standardPaths.h" />
 		<Unit filename="shared\staticAssert.h" />
+		<Unit filename="shared\stringConv.h" />
 		<Unit filename="shared\systemConstants.h" />
 		<Unit filename="shared\systemFunctions.cpp" />
 		<Unit filename="shared\systemFunctions.h" />
@@ -293,12 +303,13 @@
 		<Unit filename="synchronization.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="ui\batchStatusHandler.cpp">
+		<Unit filename="ui\appMain.h">
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="ui\batchStatusHandler.h">
-			<Option target="&lt;{~None~}&gt;" />
+		<Unit filename="ui\batchStatusHandler.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="ui\checkVersion.cpp">
 			<Option target="Debug" />
@@ -339,6 +350,13 @@
 		<Unit filename="ui\mainDialog.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="ui\settingsDialog.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="ui\settingsDialog.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="ui\smallDialogs.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
@@ -349,13 +367,8 @@
 		<Unit filename="ui\sorting.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="ui\syncDialog.cpp">
-			<Option target="Debug" />
-			<Option target="Release" />
-		</Unit>
-		<Unit filename="ui\syncDialog.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
+		<Unit filename="ui\util.cpp" />
+		<Unit filename="ui\util.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

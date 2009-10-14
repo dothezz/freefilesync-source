@@ -1,5 +1,5 @@
-CPPFLAGS=-Wall -pipe -DNDEBUG `wx-config --cppflags` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -DZSTRING_CHAR -O3 -pthread -c -I../shared/boost_1_40_0
-LINKFLAGS=`wx-config --libs` -O3 -pthread
+CPPFLAGS=-Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -DZSTRING_CHAR -O3 -pthread -c -I../shared/boost_1_40_0
+LINKFLAGS=`wx-config --libs --debug=no --unicode=yes` -O3 -pthread
 
 FILE_LIST=              #internal list of all *.cpp files needed for compilation
 FILE_LIST+=application.cpp

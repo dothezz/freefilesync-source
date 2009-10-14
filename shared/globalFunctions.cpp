@@ -1,47 +1,9 @@
 #include "globalFunctions.h"
 #include <wx/msgdlg.h>
 #include <wx/file.h>
-#include <fstream>
-#include <wx/stream.h>
 #include <wx/stopwatch.h>
 #include <cmath>
 #include "systemConstants.h"
-
-
-wxString globalFunctions::numberToWxString(const unsigned int number)
-{
-    return wxString::Format(wxT("%u"), number);
-}
-
-
-wxString globalFunctions::numberToWxString(const int number)
-{
-    return wxString::Format(wxT("%i"), number);
-}
-
-
-wxString globalFunctions::numberToWxString(const float number)
-{
-    return wxString::Format(wxT("%f"), number);
-}
-
-
-int globalFunctions::stringToInt(const std::string& number)
-{
-    return atoi(number.c_str());
-}
-
-
-long globalFunctions::stringToLong(const std::string& number)
-{
-    return atol(number.c_str());
-}
-
-
-double globalFunctions::stringToDouble(const std::string& number)
-{
-    return atof(number.c_str());
-}
 
 
 int globalFunctions::wxStringToInt(const wxString& number)
@@ -70,42 +32,10 @@ unsigned int globalFunctions::getDigitCount(const unsigned int number) //count n
 }
 
 
-int globalFunctions::readInt(std::ifstream& stream)
-{
-    int result = 0;
-    char* buffer = reinterpret_cast<char*>(&result);
-    stream.read(buffer, sizeof(int));
-    return result;
-}
-
-
-void globalFunctions::writeInt(std::ofstream& stream, const int number)
-{
-    const char* buffer = reinterpret_cast<const char*>(&number);
-    stream.write(buffer, sizeof(int));
-}
-
-
-int globalFunctions::readInt(wxInputStream& stream)
-{
-    int result = 0;
-    char* buffer = reinterpret_cast<char*>(&result);
-    stream.Read(buffer, sizeof(int));
-    return result;
-}
-
-
-void globalFunctions::writeInt(wxOutputStream& stream, const int number)
-{
-    const char* buffer = reinterpret_cast<const char*>(&number);
-    stream.Write(buffer, sizeof(int));
-}
-
-
 //############################################################################
 Performance::Performance() :
-        resultWasShown(false),
-        timer(new wxStopWatch)
+    resultWasShown(false),
+    timer(new wxStopWatch)
 {
     timer->Start();
 }
@@ -128,8 +58,8 @@ void Performance::showResult()
 
 //############################################################################
 DebugLog::DebugLog() :
-        lineCount(0),
-        logFile(NULL)
+    lineCount(0),
+    logFile(NULL)
 {
     logFile = new wxFile;
     logfileName = assembleFileName();

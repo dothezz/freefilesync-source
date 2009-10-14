@@ -4,9 +4,12 @@
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/mstream.h>
+#include "../shared/stringConv.h"
 #include "../shared/systemConstants.h"
 #include <memory>
 #include "../shared/standardPaths.h"
+
+using namespace FreeFileSync;
 
 
 const GlobalResources& GlobalResources::getInstance()
@@ -127,7 +130,9 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("france.png")]             = (bitmapFrance            = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("germany.png")]            = (bitmapGermany           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("hungary.png")]            = (bitmapHungary           = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("romania.png")]            = (bitmapRomania           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("taiwan.png")]             = (bitmapTaiwan            = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("turkey.png")]             = (bitmapTurkey            = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("italy.png")]              = (bitmapItaly             = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("japan.png")]              = (bitmapJapan             = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("poland.png")]             = (bitmapPoland            = new wxBitmap(wxNullBitmap));
@@ -213,7 +218,7 @@ void loadAnimFromZip(wxZipInputStream& zipInput, wxAnimation* animation)
 
 void GlobalResources::load() const
 {
-    wxFFileInputStream input(FreeFileSync::getInstallationDir() + globalFunctions::FILE_NAME_SEPARATOR + wxT("Resources.dat"));
+    wxFFileInputStream input(FreeFileSync::getInstallationDir() + zToWx(globalFunctions::FILE_NAME_SEPARATOR) + wxT("Resources.dat"));
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files

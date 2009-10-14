@@ -138,6 +138,8 @@
 2. Usar '*' e '?' como caracteres coringa.
 3. Exclude files directly on main grid via context menu.
 3. Excluir arquivos diretamente do grid principal através do menu de contexto.
+<Automatic>
+<Automático>
 <Directory>
 <Diretório>
 <Last session>
@@ -168,6 +170,8 @@ Assemble a batch file for automated synchronization. To start in batch mode simp
 Monta um arquivo batch para sincronização automatizada. Para iniciar o modo batch, passar o nome do arquivo para o executável do FreeFileSync: FreeFileSync.exe <arquivo batch>. Também pode ser programado no Agendador de Tarefas do sistema operacional.
 Auto-adjust columns
 Autoajustar colunas
+Automatic mode
+Modo automático
 Batch execution
 Execução do batch
 Batch file created successfully!
@@ -176,12 +180,20 @@ Batch job
 Arquivo Batch
 Big thanks for localizing FreeFileSync goes out to:
 Pela tradução do FreeFileSync, um agradecimento a:
+Both sides have changed since last synchronization!
+Ambos os lados foram alterados desde a última sincronização!
 Browse
 Procurar
 Build:
 Criado:
 Cancel
 Cancelar
+Cannot determine sync-direction: Changed filter settings!
+Não foi possível determinar a direção de sicronização: Configurações do filtro alteradas!
+Cannot determine sync-direction: No change since last synchronization!
+Não foi possível determinar a direção de sicronização: Nenhuma alteração desde a última sincronização!
+Category
+Categoria
 Change direction
 Inverter sentido
 Check all
@@ -376,6 +388,8 @@ Error reading file attributes:
 Erro ao ler atributos do arquivo:
 Error reading file:
 Erro ao ler arquivo:
+Error reading from synchronization database:
+Erro ao ler do banco de dados de sincronização:
 Error resolving symbolic link:
 Erro na resolução de link simbólico:
 Error starting Volume Shadow Copy Service!
@@ -388,8 +402,10 @@ Error writing file attributes:
 Erro ao escrever atributos do arquivo:
 Error writing file:
 Erro ao escrever arquivo:
-Error: Source directory does not exist anymore:
-Erro: Diretório de origem não existe mais:
+Error writing to synchronization database:
+Erro ao escrever no banco de dados de sincronização:
+Source directory does not exist anymore:
+Diretório de origem não existe mais:
 Example
 Exemplo
 Exclude
@@ -438,10 +454,10 @@ Files that exist on both sides, left one is newer
 Arquivos que existem nos dois lados, sendo à esquerda mais recentes
 Files that exist on both sides, right one is newer
 Arquivos que existem nos dois lados, sendo à direita mais recentes
+Files/folders found:
+Arquivos/pastas encontrados:
 Files/folders remaining:
 Arquivos/pastas restantes:
-Files/folders scanned:
-Arquivos/pastas analisados:
 Files/folders that exist on left side only
 Arquivos/pastas que existem somente à esquerda
 Files/folders that exist on right side only
@@ -472,6 +488,8 @@ FreeFileSync is up to date!
 FreeFileSync está atualizado!
 Full path
 Caminho completo
+Generating database...
+Gerando banco de dados...
 Generating file list...
 Gerando lista de arquivos...
 Global settings
@@ -536,10 +554,14 @@ Include temporarily
 Incluir temporariamente
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
 Incluir: *.doc;*.zip;*.exe\nExcluir: temp\\*
+Incompatible synchronization database format:
+Formato de banco de dados de sincronização incompatível:
 Info
 Info
 Information
 Informação
+Initial synchronization. Please verify default copy-directions!
+Sincronização inicial. Por favor, verifique a direção de cópia padrão!
 Integrate external applications into context menu. The following macros are available:
 Integrar aplicações externas no menu de contexto. As seguintes macros estão disponíveis:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +600,8 @@ Moving folder %x to user-defined directory %y
 Movendo pasta %x para o diretório especificado
 Multiple...
 Múltiplos...
+No database file existing yet:
+Nenhum arquivo de banco de dados existe ainda:
 Not enough free disk space available in:
 Espaço em disco insuficiente em:
 Nothing to synchronize according to configuration!
@@ -592,6 +616,12 @@ OK
 OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Apenas arquivos/diretórios que passarem o filtro serão selecionados para sincronização. O filtro será aplicado ao nome relativo(!) aos diretórios base de sincronização.
+Open directly
+Abrir diretamente
+Open with Explorer
+Abrir com Explorer
+Open with Konqueror
+Abrir com Konqueror
 Operation aborted!
 Operação cancelada!
 Operation:
@@ -632,8 +662,6 @@ Report translation error
 Reportar erro de tradução
 Reset
 Reiniciar
-Result
-Resultado
 Right
 Direita
 S&ave configuration
@@ -730,6 +758,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 Sincronizar todos arquivos .doc, .zip e .exe exceto tudo que estiver na subpasta \"temp\".
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Sincronizar ambos os lados simultaneamente: Copia os arquivos novos ou mais recentes em ambas as direções.
+Synchronize both sides using a database. Deletions are detected automatically.
+Sincronizar ambos os lados usando um banco de dados. Eliminações são detectadas automaticamente.
 Synchronize...
 Sincronizar...
 Synchronizing...
@@ -782,6 +812,8 @@ User-defined directory
 Diretório especificado
 User-defined directory for deletion was not specified!
 Diretório especificado para arquivos apagados não foi definido!
+Using default synchronization directions. Please recheck.
+Usando direções de sincronização padrões. Por favor, verificar novamente.
 Variant
 Variante
 Verifying file %x
@@ -796,6 +828,8 @@ When the comparison is started with this option set the following decision tree 
 Quando a comparação é iniciada com esta opção, a seguinte árvore de decisão é processada:
 You can ignore the error to consider not existing directories as empty.
 Você pode ignorar o erro para considerar diretórios não existente como vazios.
+You can ignore the error to skip current folder pair.
+Você pode ignorar o erro para pular o par de pastas atual.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Você pode tentar sincronizar os elementos restantes outra vez (SEM ter que comparar novamente)!
 different

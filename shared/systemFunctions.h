@@ -8,9 +8,9 @@ namespace FreeFileSync
 {
 
 #ifdef FFS_WIN
-    wxString getLastErrorFormatted(const unsigned long lastError = 0); //try to get additional Windows error information
+wxString getLastErrorFormatted(unsigned long lastError = 0); //try to get additional Windows error information
 #elif defined FFS_LINUX
-    wxString getLastErrorFormatted(const int lastError = 0); //try to get additional Linux error information
+wxString getLastErrorFormatted(int lastError = 0); //try to get additional Linux error information
 #endif
 }
 

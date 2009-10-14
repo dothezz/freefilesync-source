@@ -3,224 +3,560 @@
 #include <stdexcept>
 #include <wx/log.h>
 #include "library/resources.h"
-#include "shared/systemFunctions.h"
 #include "shared/fileHandling.h"
 #include <wx/msgdlg.h>
-#include <wx/textctrl.h>
-#include <wx/combobox.h>
-#include <wx/filepicker.h>
-#include "shared/localization.h"
 #include "library/filter.h"
 #include <boost/bind.hpp>
+#include "shared/stringConv.h"
 #include "shared/globalFunctions.h"
-#include <wx/scrolwin.h>
-
-#ifdef FFS_WIN
-#include <wx/msw/wrapwin.h> //includes "windows.h"
-#endif
-
+#include "shared/loki/TypeManip.h"
+#include "shared/loki/NullType.h"
 
 using namespace FreeFileSync;
 
 
-wxString FreeFileSync::formatFilesizeToShortString(const wxLongLong& filesize)
+void FreeFileSync::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp)
 {
-    return FreeFileSync::formatFilesizeToShortString(filesize.ToDouble());
+    std::for_each(folderCmp.begin(), folderCmp.end(), boost::bind(&BaseDirMapping::swap, _1));
+    redetermineSyncDirection(config, folderCmp, NULL);
 }
 
 
-wxString FreeFileSync::formatFilesizeToShortString(const wxULongLong& filesize)
-{
-    return FreeFileSync::formatFilesizeToShortString(filesize.ToDouble());
-};
-
-
-wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
-{
-    if (filesize < 0)
-        return _("Error");
-
-    if (filesize <= 999)
-        return wxString::Format(wxT("%i"), static_cast<int>(filesize)) + _(" Byte"); //no decimal places in case of bytes
-
-    double nrOfBytes = filesize;
-
-    nrOfBytes /= 1024;
-    wxString unit = _(" kB");
-    if (nrOfBytes > 999)
-    {
-        nrOfBytes /= 1024;
-        unit = _(" MB");
-        if (nrOfBytes > 999)
-        {
-            nrOfBytes /= 1024;
-            unit = _(" GB");
-            if (nrOfBytes > 999)
-            {
-                nrOfBytes /= 1024;
-                unit = _(" TB");
-                if (nrOfBytes > 999)
-                {
-                    nrOfBytes /= 1024;
-                    unit = _(" PB");
-                }
-            }
-        }
-    }
-
-    //print just three significant digits: 0,01 | 0,11 | 1,11 | 11,1 | 111
-
-    const unsigned int leadDigitCount = globalFunctions::getDigitCount(static_cast<unsigned int>(nrOfBytes)); //number of digits before decimal point
-    if (leadDigitCount == 0 || leadDigitCount > 3)
-        return _("Error");
-
-    if (leadDigitCount == 3)
-        return wxString::Format(wxT("%i"), static_cast<int>(nrOfBytes)) + unit;
-    else if (leadDigitCount == 2)
-    {
-        wxString output = wxString::Format(wxT("%i"), static_cast<int>(nrOfBytes * 10));
-        output.insert(leadDigitCount, FreeFileSync::DECIMAL_POINT);
-        return output + unit;
-    }
-    else //leadDigitCount == 1
-    {
-        wxString output = wxString::Format(wxT("%03i"), static_cast<int>(nrOfBytes * 100));
-        output.insert(leadDigitCount, FreeFileSync::DECIMAL_POINT);
-        return output + unit;
-    }
-
-    //return wxString::Format(wxT("%.*f"), 3 - leadDigitCount, nrOfBytes) + unit;
-}
-
-
-wxString FreeFileSync::includeNumberSeparator(const wxString& number)
-{
-    wxString output(number);
-    for (int i = output.size() - 3; i > 0; i -= 3)
-        output.insert(i,  FreeFileSync::THOUSANDS_SEPARATOR);
-
-    return output;
-}
-
-
-template <class T>
-void setDirectoryNameImpl(const wxString& dirname, T* txtCtrl, wxDirPickerCtrl* dirPicker)
-{
-    txtCtrl->SetValue(dirname);
-    const Zstring leftDirFormatted = FreeFileSync::getFormattedDirectoryName(dirname.c_str());
-    if (wxDirExists(leftDirFormatted.c_str()))
-        dirPicker->SetPath(leftDirFormatted.c_str());
-}
-
-
-void FreeFileSync::setDirectoryName(const wxString& dirname, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker)
-{
-    setDirectoryNameImpl(dirname, txtCtrl, dirPicker);
-}
-
-
-void FreeFileSync::setDirectoryName(const wxString& dirname, wxComboBox* txtCtrl, wxDirPickerCtrl* dirPicker)
-{
-    txtCtrl->SetSelection(wxNOT_FOUND);
-    setDirectoryNameImpl(dirname, txtCtrl, dirPicker);
-}
-
-
-void FreeFileSync::scrollToBottom(wxScrolledWindow* scrWindow)
-{
-    int height = 0;
-    scrWindow->GetClientSize(NULL, &height);
-
-    int pixelPerLine = 0;
-    scrWindow->GetScrollPixelsPerUnit(NULL, &pixelPerLine);
-
-    if (height > 0 && pixelPerLine > 0)
-    {
-        const int scrollLinesTotal    = scrWindow->GetScrollLines(wxVERTICAL);
-        const int scrollLinesOnScreen = height / pixelPerLine;
-        const int scrollPosBottom     = scrollLinesTotal - scrollLinesOnScreen;
-
-        if (0 <= scrollPosBottom)
-            scrWindow->Scroll(0, scrollPosBottom);
-    }
-}
-
-
-void swapGridsFP(HierarchyObject& hierObj)
-{
-    //swap directories
-    std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), std::mem_fun_ref(&FileSystemObject::swap));
-    //swap files
-    std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), std::mem_fun_ref(&FileSystemObject::swap));
-    //recurse into sub-dirs
-    std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), swapGridsFP);
-}
-
-
-void FreeFileSync::swapGrids2(const MainConfiguration& config, FolderComparison& folderCmp)
-{
-    std::for_each(folderCmp.begin(), folderCmp.end(), swapGridsFP);
-    redetermineSyncDirection(config, folderCmp);
-}
-
-
+//----------------------------------------------------------------------------------------------
 class Redetermine
 {
 public:
     Redetermine(const SyncConfiguration& configIn) : config(configIn) {}
 
-    void operator()(FileSystemObject& fsObj) const
+    void execute(HierarchyObject& hierObj) const
     {
-        switch (fsObj.getCategory())
+        //process files
+        std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this);
+        //process directories
+        std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), *this);
+    }
+
+private:
+    template<typename Iterator, typename Function>
+    friend Function std::for_each(Iterator, Iterator, Function);
+
+    void operator()(FileMapping& fileObj) const
+    {
+        switch (fileObj.getCategory())
         {
         case FILE_LEFT_SIDE_ONLY:
-            fsObj.syncDir = convertToSyncDirection(config.exLeftSideOnly);
+            fileObj.setSyncDir(config.exLeftSideOnly);
             break;
-
         case FILE_RIGHT_SIDE_ONLY:
-            fsObj.syncDir = convertToSyncDirection(config.exRightSideOnly);
+            fileObj.setSyncDir(config.exRightSideOnly);
             break;
-
         case FILE_RIGHT_NEWER:
-            fsObj.syncDir = convertToSyncDirection(config.rightNewer);
+            fileObj.setSyncDir(config.rightNewer);
             break;
-
         case FILE_LEFT_NEWER:
-            fsObj.syncDir = convertToSyncDirection(config.leftNewer);
+            fileObj.setSyncDir(config.leftNewer);
             break;
-
         case FILE_DIFFERENT:
-            fsObj.syncDir = convertToSyncDirection(config.different);
+            fileObj.setSyncDir(config.different);
             break;
-
         case FILE_CONFLICT:
-            fsObj.syncDir = convertToSyncDirection(config.conflict);
+            fileObj.setSyncDir(config.conflict);
             break;
-
         case FILE_EQUAL:
-            fsObj.syncDir = SYNC_DIR_NONE;
+            fileObj.setSyncDir(SYNC_DIR_NONE);
+            break;
         }
     }
-private:
+
+    void operator()(DirMapping& dirObj) const
+    {
+        switch (dirObj.getDirCategory())
+        {
+        case DIR_LEFT_SIDE_ONLY:
+            dirObj.setSyncDir(config.exLeftSideOnly);
+            break;
+        case DIR_RIGHT_SIDE_ONLY:
+            dirObj.setSyncDir(config.exRightSideOnly);
+            break;
+        case DIR_EQUAL:
+            dirObj.setSyncDir(SYNC_DIR_NONE);
+            break;
+        }
+
+        //recursion
+        execute(dirObj);
+    }
+
     const SyncConfiguration& config;
 };
 
 
-void FreeFileSync::redetermineSyncDirection(const SyncConfiguration& config, HierarchyObject& baseDirectory)
+//---------------------------------------------------------------------------------------------------------------
+enum Answer
 {
-    //do not handle i->selectedForSynchronization in this method! handled in synchronizeFile(), synchronizeFolder()!
+    CHANGE_DETECTED,
+    NO_CHANGE,
+    CANT_SAY_FILTERING_CHANGED
+};
 
-    //swap directories
-    std::for_each(baseDirectory.subDirs.begin(), baseDirectory.subDirs.end(), Redetermine(config));
-    //swap files
-    std::for_each(baseDirectory.subFiles.begin(), baseDirectory.subFiles.end(), Redetermine(config));
-    //recurse into sub-dirs
-    std::for_each(baseDirectory.subDirs.begin(), baseDirectory.subDirs.end(),
-                  boost::bind(static_cast<void (*)(const SyncConfiguration&, HierarchyObject&)>(redetermineSyncDirection), boost::cref(config), _1));
+
+template <bool respectFiltering>
+class DetectChanges
+{
+public:
+    DetectChanges(const DirContainer* dirCont, //DirContainer in sense of a HierarchyObject
+                  const FilterProcess& dbFilter);
+
+    DetectChanges(const DirContainer* dirCont); //DirContainer in sense of a HierarchyObject
+
+    template <SelectedSide side>
+    Answer detectFileChange(const FileMapping& fileObj) const;
+
+    struct DirAnswer
+    {
+        DirAnswer(Answer status, const DetectChanges instance) : dirStatus(status), subDirInstance(instance) {}
+        Answer dirStatus;
+        DetectChanges subDirInstance; //not valid if dirStatus == CANT_SAY_FILTERING_CHANGED
+    };
+    template <SelectedSide side>
+    DirAnswer detectDirChange(const DirMapping& dirObj) const;
+
+private:
+    const DirContainer* const dirCont_; //if NULL: did not exist during db creation
+    typename Loki::Select<respectFiltering, const FilterProcess&, Loki::NullType>::Result dbFilter_; //filter setting that was used when db was created
+};
+
+
+template <>
+inline
+DetectChanges<true>::DetectChanges(const DirContainer* dirCont, //DirContainer in sense of a HierarchyObject
+                                   const FilterProcess& dbFilter) :
+    dirCont_(dirCont),
+    dbFilter_(dbFilter) {}
+
+
+template <>
+inline
+DetectChanges<false>::DetectChanges(const DirContainer* dirCont) : //DirContainer in sense of a HierarchyObject
+    dirCont_(dirCont) {}
+
+
+
+template <SelectedSide side>
+Answer detectFileChangeSub(const FileMapping& fileObj, const DirContainer* dbDirectory)
+{
+    if (dbDirectory)
+    {
+        DirContainer::SubFileList::const_iterator j = dbDirectory->getSubFiles().find(fileObj.getObjShortName());
+        if (j == dbDirectory->getSubFiles().end())
+        {
+            if (fileObj.isEmpty<side>())
+                return NO_CHANGE;
+            else
+                return CHANGE_DETECTED; //->create
+        }
+        else
+        {
+            if (fileObj.isEmpty<side>())
+                return CHANGE_DETECTED; //->delete
+            else
+            {
+                const FileDescriptor& dbData = j->second.getData();
+                if (    fileObj.getLastWriteTime<side>() == dbData.lastWriteTimeRaw &&
+                        fileObj.getFileSize<side>()      == dbData.fileSize)
+                    return NO_CHANGE;
+                else
+                    return CHANGE_DETECTED; //->update
+            }
+        }
+    }
+    else
+    {
+        if (fileObj.isEmpty<side>())
+            return NO_CHANGE;
+        else
+            return CHANGE_DETECTED; //->create
+    }
 }
 
 
-void FreeFileSync::redetermineSyncDirection(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp)
+template <>
+template <SelectedSide side>
+inline
+Answer DetectChanges<false>::detectFileChange(const FileMapping& fileObj) const
+{
+    return detectFileChangeSub<side>(fileObj, dirCont_);
+}
+
+
+template <>
+template <SelectedSide side>
+inline
+Answer DetectChanges<true>::detectFileChange(const FileMapping& fileObj) const
+{
+    //if filtering would have excluded file during database creation, then we can't say anything about its former state
+    if (!dbFilter_.passFileFilter(fileObj.getObjShortName()))
+        return CANT_SAY_FILTERING_CHANGED;
+
+    return detectFileChangeSub<side>(fileObj, dirCont_);
+}
+
+
+template <SelectedSide side>
+Answer detectDirChangeSub(const DirMapping& dirObj, const DirContainer* dbDirectory, const DirContainer*& dbSubDirectory)
+{
+    if (dbDirectory)
+    {
+        DirContainer::SubDirList::const_iterator j = dbDirectory->getSubDirs().find(dirObj.getObjShortName());
+        if (j == dbDirectory->getSubDirs().end())
+        {
+            if (dirObj.isEmpty<side>())
+                return NO_CHANGE;
+            else
+                return CHANGE_DETECTED; //->create
+        }
+        else
+        {
+            dbSubDirectory = &j->second;
+            if (dirObj.isEmpty<side>())
+                return CHANGE_DETECTED; //->delete
+            else
+                return NO_CHANGE;
+        }
+    }
+    else
+    {
+        if (dirObj.isEmpty<side>())
+            return NO_CHANGE;
+        else
+            return CHANGE_DETECTED; //->create
+    }
+}
+
+
+template <>
+template <SelectedSide side>
+DetectChanges<false>::DirAnswer DetectChanges<false>::detectDirChange(const DirMapping& dirObj) const
+{
+    const DirContainer* dbSubDir = NULL;
+    const Answer answer = detectDirChangeSub<side>(dirObj, dirCont_, dbSubDir);
+
+    return DirAnswer(answer, DetectChanges<false>(dbSubDir));
+}
+
+
+template <>
+template <SelectedSide side>
+DetectChanges<true>::DirAnswer DetectChanges<true>::detectDirChange(const DirMapping& dirObj) const
+{
+    //if filtering would have excluded file during database creation, then we can't say anything about its former state
+    if (!dbFilter_.passDirFilter(dirObj.getObjShortName(), NULL))
+        return DirAnswer(CANT_SAY_FILTERING_CHANGED, DetectChanges<true>(NULL, dbFilter_));
+
+    const DirContainer* dbSubDir = NULL;
+    const Answer answer = detectDirChangeSub<side>(dirObj, dirCont_, dbSubDir);
+
+    return DirAnswer(answer, DetectChanges<true>(dbSubDir, dbFilter_));
+}
+
+
+//----------------------------------------------------------------------------------------------
+class SetDirChangedFilter
+{
+public:
+    SetDirChangedFilter() :
+        txtFilterChanged(_("Cannot determine sync-direction: Changed filter settings!")) {}
+
+    void execute(HierarchyObject& hierObj) const
+    {
+        //files
+        std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this);
+        //directories
+        std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), *this);
+    }
+
+private:
+    template<typename Iterator, typename Function>
+    friend Function std::for_each(Iterator, Iterator, Function);
+
+    void operator()(FileMapping& fileObj) const
+    {
+        const CompareFilesResult cat = fileObj.getCategory();
+        if (cat == FILE_LEFT_SIDE_ONLY)
+            fileObj.setSyncDir(SYNC_DIR_RIGHT);
+        else if (cat == FILE_RIGHT_SIDE_ONLY)
+            fileObj.setSyncDir(SYNC_DIR_LEFT);
+        else
+            fileObj.setSyncDirConflict(txtFilterChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+    }
+
+    void operator()(DirMapping& dirObj) const
+    {
+        switch (dirObj.getDirCategory())
+        {
+        case DIR_LEFT_SIDE_ONLY:
+            dirObj.setSyncDir(SYNC_DIR_RIGHT);
+            break;
+        case DIR_RIGHT_SIDE_ONLY:
+            dirObj.setSyncDir(SYNC_DIR_LEFT);
+            break;
+        case DIR_EQUAL:
+            break;
+        }
+
+        execute(dirObj); //recursion
+    }
+
+    const wxString txtFilterChanged;
+};
+
+
+//----------------------------------------------------------------------------------------------
+class RedetermineAuto
+{
+public:
+    RedetermineAuto(BaseDirMapping& baseDirectory,
+                    DeterminationProblem* handler) :
+        txtBothSidesChanged(_("Both sides have changed since last synchronization!")),
+        txtNoSideChanged(_("Cannot determine sync-direction: No change since last synchronization!")),
+        txtFilterChanged(_("Cannot determine sync-direction: Changed filter settings!")),
+        handler_(handler)
+    {
+        //try to load sync-database files
+        boost::shared_ptr<const DirInformation> dirInfoLeft  = loadDBFile<LEFT_SIDE>(baseDirectory);
+        boost::shared_ptr<const DirInformation> dirInfoRight = dirInfoLeft.get() == NULL ? //don't load second DB if loading of first failed, to avoid duplicate error messages
+                boost::shared_ptr<const DirInformation>() : loadDBFile<RIGHT_SIDE>(baseDirectory);
+        if (    dirInfoLeft.get()  == NULL ||
+                dirInfoRight.get() == NULL)
+        {
+            //use standard settings:
+            SyncConfiguration defaultSync;
+            defaultSync.setVariant(SyncConfiguration::TWOWAY);
+            Redetermine(defaultSync).execute(baseDirectory);
+            return;
+        }
+
+        if (    respectFiltering(baseDirectory, *dirInfoLeft) &&
+                respectFiltering(baseDirectory, *dirInfoRight))
+        {
+            execute(baseDirectory,
+                    DetectChanges<true>(&dirInfoLeft->baseDirContainer,
+                                        FilterProcess(dirInfoLeft->includeFilter,
+                                                dirInfoLeft->excludeFilter)),
+                    DetectChanges<true>(&dirInfoRight->baseDirContainer,
+                                        FilterProcess(dirInfoRight->includeFilter,
+                                                dirInfoRight->excludeFilter)));
+        }
+        else if (   !respectFiltering(baseDirectory, *dirInfoLeft) &&
+                    respectFiltering(baseDirectory, *dirInfoRight))
+        {
+            execute(baseDirectory,
+                    DetectChanges<false>(&dirInfoLeft->baseDirContainer),
+                    DetectChanges<true>(&dirInfoRight->baseDirContainer,
+                                        FilterProcess(dirInfoRight->includeFilter,
+                                                dirInfoRight->excludeFilter)));
+        }
+        else if (   respectFiltering(baseDirectory, *dirInfoLeft) &&
+                    !respectFiltering(baseDirectory, *dirInfoRight))
+        {
+            execute(baseDirectory,
+                    DetectChanges<true>(&dirInfoLeft->baseDirContainer,
+                                        FilterProcess(dirInfoLeft->includeFilter,
+                                                dirInfoLeft->excludeFilter)),
+                    DetectChanges<false>(&dirInfoRight->baseDirContainer));
+        }
+        else
+        {
+            execute(baseDirectory,
+                    DetectChanges<false>(&dirInfoLeft->baseDirContainer),
+                    DetectChanges<false>(&dirInfoRight->baseDirContainer));
+        }
+    }
+
+
+private:
+    static bool respectFiltering(const BaseDirMapping& baseDirectory, const DirInformation& dirInfo)
+    {
+        return dirInfo.filterActive && //respect filtering if sync-DB filter is active && different from baseDir's filter
+
+               (!baseDirectory.getFilter().filterActive ||
+
+                FilterProcess(baseDirectory.getFilter().includeFilter,
+                              baseDirectory.getFilter().excludeFilter) !=
+
+                FilterProcess(dirInfo.includeFilter,
+                              dirInfo.excludeFilter));
+    }
+
+    template <SelectedSide side>
+    boost::shared_ptr<const DirInformation> loadDBFile(const BaseDirMapping& baseDirectory) //return NULL on failure
+    {
+        if (!FreeFileSync::fileExists(baseDirectory.getDBFilename<side>()))
+        {
+            if (handler_) handler_->reportWarning(
+                    wxString(_("Initial synchronization. Please verify default copy-directions!")) + wxT(" \n") +
+                    wxT("(") + _("No database file existing yet:") + wxT(" \"") + zToWx(baseDirectory.getBaseDir<side>()) + wxT("\")"));
+            return boost::shared_ptr<const DirInformation>(); //NULL
+        }
+
+        try
+        {
+            return loadFromDisk(baseDirectory.getDBFilename<side>());
+        }
+        catch (FileError& error) //e.g. incompatible database version
+        {
+            if (handler_) handler_->reportWarning(error.show() + wxT(" \n\n") +
+                                                      _("Using default synchronization directions. Please recheck."));
+        }
+        return boost::shared_ptr<const DirInformation>(); //NULL
+    }
+
+    template<typename Iterator, typename Function>
+    friend Function std::for_each(Iterator, Iterator, Function);
+
+    template <bool dbLeftFilterActive, bool dbRightFilterActive>
+    void execute(HierarchyObject& hierObj,
+                        const DetectChanges<dbLeftFilterActive>& dbLeft,
+                        const DetectChanges<dbRightFilterActive>& dbRight)
+    {
+        //process files
+        std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(),
+                      boost::bind(&RedetermineAuto::processFile<dbLeftFilterActive, dbRightFilterActive>, this, _1, boost::ref(dbLeft), boost::ref(dbRight)));
+        //process directories
+        std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(),
+                      boost::bind(&RedetermineAuto::processDir<dbLeftFilterActive, dbRightFilterActive>, this, _1, boost::ref(dbLeft), boost::ref(dbRight)));
+    }
+
+    template <bool dbLeftFilterActive, bool dbRightFilterActive>
+    void processFile(FileMapping& fileObj,
+                            const DetectChanges<dbLeftFilterActive>& dbLeft,
+                            const DetectChanges<dbRightFilterActive>& dbRight)
+    {
+        const CompareFilesResult cat = fileObj.getCategory();
+        if (cat == FILE_EQUAL)
+            return;
+
+        const Answer statusLeft  = dbLeft. template detectFileChange<LEFT_SIDE>(fileObj);
+        const Answer statusRight = dbRight.template detectFileChange<RIGHT_SIDE>(fileObj);
+
+        if (    statusLeft  == CANT_SAY_FILTERING_CHANGED ||
+                statusRight == CANT_SAY_FILTERING_CHANGED)
+        {
+            if (cat == FILE_LEFT_SIDE_ONLY)
+                fileObj.setSyncDir(SYNC_DIR_RIGHT);
+            else if (cat == FILE_RIGHT_SIDE_ONLY)
+                fileObj.setSyncDir(SYNC_DIR_LEFT);
+            else
+                fileObj.setSyncDirConflict(txtFilterChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+            return;
+        }
+
+
+        if (    statusLeft  == CHANGE_DETECTED &&
+                statusRight == NO_CHANGE)
+            fileObj.setSyncDir(SYNC_DIR_RIGHT);
+
+        else if (    statusLeft  == NO_CHANGE &&
+                     statusRight == CHANGE_DETECTED)
+            fileObj.setSyncDir(SYNC_DIR_LEFT);
+
+        else if (    statusLeft  == CHANGE_DETECTED &&
+                     statusRight == CHANGE_DETECTED)
+            fileObj.setSyncDirConflict(txtBothSidesChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+
+        else if (    statusLeft  == NO_CHANGE &&
+                     statusRight == NO_CHANGE)
+        {
+            if (cat == FILE_LEFT_SIDE_ONLY)
+                fileObj.setSyncDir(SYNC_DIR_RIGHT);
+            else if (cat == FILE_RIGHT_SIDE_ONLY)
+                fileObj.setSyncDir(SYNC_DIR_LEFT);
+            else
+                fileObj.setSyncDirConflict(txtNoSideChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+        }
+    }
+
+
+    template <bool dbLeftFilterActive, bool dbRightFilterActive>
+     void processDir(DirMapping& dirObj,
+                           const DetectChanges<dbLeftFilterActive>& dbLeft,
+                           const DetectChanges<dbRightFilterActive>& dbRight)
+    {
+        const typename DetectChanges<dbLeftFilterActive> ::DirAnswer statusLeft  = dbLeft. template detectDirChange<LEFT_SIDE>(dirObj);
+        const typename DetectChanges<dbRightFilterActive>::DirAnswer statusRight = dbRight.template detectDirChange<RIGHT_SIDE>(dirObj);
+
+        const CompareDirResult cat = dirObj.getDirCategory();
+        if (cat != DIR_EQUAL)
+        {
+            if (    (statusLeft.dirStatus  == CANT_SAY_FILTERING_CHANGED ||
+                     statusRight.dirStatus == CANT_SAY_FILTERING_CHANGED))
+            {
+                switch (cat)
+                {
+                case DIR_LEFT_SIDE_ONLY:
+                    dirObj.setSyncDir(SYNC_DIR_RIGHT);
+                    break;
+                case DIR_RIGHT_SIDE_ONLY:
+                    dirObj.setSyncDir(SYNC_DIR_LEFT);
+                    break;
+                case DIR_EQUAL:
+                    assert(false);
+                }
+
+                SetDirChangedFilter().execute(dirObj); //filter issue for this directory => treat subfiles/-dirs the same
+                return;
+            }
+            else if (    statusLeft.dirStatus  == CHANGE_DETECTED &&
+                         statusRight.dirStatus == NO_CHANGE)
+                dirObj.setSyncDir(SYNC_DIR_RIGHT);
+
+            else if (    statusLeft.dirStatus  == NO_CHANGE &&
+                         statusRight.dirStatus == CHANGE_DETECTED)
+                dirObj.setSyncDir(SYNC_DIR_LEFT);
+
+            else if (    statusLeft.dirStatus  == CHANGE_DETECTED &&
+                         statusRight.dirStatus == CHANGE_DETECTED)
+                dirObj.setSyncDirConflict(txtBothSidesChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+
+            else if (    statusLeft.dirStatus  == NO_CHANGE &&
+                         statusRight.dirStatus == NO_CHANGE)
+            {
+                switch (cat)
+                {
+                case DIR_LEFT_SIDE_ONLY:
+                    dirObj.setSyncDir(SYNC_DIR_RIGHT);
+                    break;
+                case DIR_RIGHT_SIDE_ONLY:
+                    dirObj.setSyncDir(SYNC_DIR_LEFT);
+                    break;
+                case DIR_EQUAL:
+                    assert(false);
+                }
+            }
+        }
+
+        execute(dirObj, statusLeft.subDirInstance, statusRight.subDirInstance); //recursion
+    }
+
+    const wxString txtBothSidesChanged;
+    const wxString txtNoSideChanged;
+    const wxString txtFilterChanged;
+
+    DeterminationProblem* const handler_;
+};
+
+
+//---------------------------------------------------------------------------------------------------------------
+void FreeFileSync::redetermineSyncDirection(const SyncConfiguration& config, BaseDirMapping& baseDirectory, DeterminationProblem* handler)
+{
+    if (config.automatic)
+        RedetermineAuto(baseDirectory, handler);
+    else
+        Redetermine(config).execute(baseDirectory);
+}
+
+
+void FreeFileSync::redetermineSyncDirection(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp, DeterminationProblem* handler)
 {
     if (folderCmp.size() == 0)
         return;
@@ -228,59 +564,67 @@ void FreeFileSync::redetermineSyncDirection(const MainConfiguration& currentMain
         throw std::logic_error("Programming Error: Contract violation!");
 
     //main pair
-    redetermineSyncDirection(currentMainCfg.syncConfiguration, folderCmp[0]);
+    redetermineSyncDirection(currentMainCfg.syncConfiguration, folderCmp[0], handler);
 
     //add. folder pairs
     for (std::vector<FolderPairEnh>::const_iterator i = currentMainCfg.additionalPairs.begin(); i != currentMainCfg.additionalPairs.end(); ++i)
     {
         redetermineSyncDirection(i->altSyncConfig.get() ? i->altSyncConfig->syncConfiguration : currentMainCfg.syncConfiguration,
-                                 folderCmp[i - currentMainCfg.additionalPairs.begin() + 1]);
+                                 folderCmp[i - currentMainCfg.additionalPairs.begin() + 1], handler);
     }
 }
 
 
+//---------------------------------------------------------------------------------------------------------------
 class SetNewDirection
 {
 public:
     SetNewDirection(SyncDirection newDirection) :
-            newDirection_(newDirection) {}
+        newDirection_(newDirection) {}
 
-    void operator()(FileSystemObject& fsObj) const
-    {
-        fsObj.syncDir = newDirection_;
-    }
-
-    void setSyncDirectionSub(FreeFileSync::HierarchyObject& hierObj)
+    void execute(HierarchyObject& hierObj) const
     {
         //directories
         std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), *this);
         //files
         std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this);
-        //recurse into sub-dirs
-        std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), boost::bind(&SetNewDirection::setSyncDirectionSub, this, _1));
     }
 
 private:
-    SyncDirection newDirection_;
+    template<typename Iterator, typename Function>
+    friend Function std::for_each(Iterator, Iterator, Function);
+
+    void operator()(FileMapping& fileObj) const
+    {
+        fileObj.setSyncDir(newDirection_);
+    }
+
+    void operator()(DirMapping& dirObj) const
+    {
+        dirObj.setSyncDir(newDirection_);
+        execute(dirObj); //recursion
+    }
+
+    const SyncDirection newDirection_;
 };
 
 
-void FreeFileSync::setSyncDirection(SyncDirection newDirection, FileSystemObject& fsObj)
+void FreeFileSync::setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsObj)
 {
-    fsObj.syncDir = newDirection;
+    fsObj.setSyncDir(newDirection);
 
     DirMapping* dirObj = dynamic_cast<DirMapping*>(&fsObj);
     if (dirObj) //process subdirectories also!
-        SetNewDirection(newDirection).setSyncDirectionSub(*dirObj);
+        SetNewDirection(newDirection).execute(*dirObj);
 }
 
 
 void FreeFileSync::applyFiltering(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp)
 {
-    assert (folderCmp.size() == 0 || folderCmp.size() == currentMainCfg.additionalPairs.size() + 1);
-
-    if (folderCmp.size() != currentMainCfg.additionalPairs.size() + 1)
+    if (folderCmp.size() == 0)
         return;
+    else if (folderCmp.size() != currentMainCfg.additionalPairs.size() + 1)
+        throw std::logic_error("Programming Error: Contract violation!");
 
     //main pair
     FreeFileSync::FilterProcess(currentMainCfg.includeFilter, currentMainCfg.excludeFilter).filterAll(folderCmp[0]);
@@ -319,13 +663,13 @@ std::pair<wxString, int> FreeFileSync::deleteFromGridAndHDPreview( //assemble me
 
             if (!currObj.isEmpty<LEFT_SIDE>())
             {
-                filesToDelete += (currObj.getFullName<LEFT_SIDE>() + wxT("\n")).c_str();
+                filesToDelete += zToWx(currObj.getFullName<LEFT_SIDE>()) + wxT("\n");
                 ++totalDelCount;
             }
 
             if (!currObj.isEmpty<RIGHT_SIDE>())
             {
-                filesToDelete += (currObj.getFullName<RIGHT_SIDE>() + wxT("\n")).c_str();
+                filesToDelete += zToWx(currObj.getFullName<RIGHT_SIDE>()) + wxT("\n");
                 ++totalDelCount;
             }
 
@@ -340,7 +684,7 @@ std::pair<wxString, int> FreeFileSync::deleteFromGridAndHDPreview( //assemble me
 
             if (!currObj.isEmpty<LEFT_SIDE>())
             {
-                filesToDelete += (currObj.getFullName<LEFT_SIDE>() + wxT("\n")).c_str();
+                filesToDelete += zToWx(currObj.getFullName<LEFT_SIDE>()) + wxT("\n");
                 ++totalDelCount;
             }
         }
@@ -351,7 +695,7 @@ std::pair<wxString, int> FreeFileSync::deleteFromGridAndHDPreview( //assemble me
 
             if (!currObj.isEmpty<RIGHT_SIDE>())
             {
-                filesToDelete += (currObj.getFullName<RIGHT_SIDE>() + wxT("\n")).c_str();
+                filesToDelete += zToWx(currObj.getFullName<RIGHT_SIDE>()) + wxT("\n");
                 ++totalDelCount;
             }
         }
@@ -418,13 +762,13 @@ class FinalizeDeletion
 {
 public:
     FinalizeDeletion(FolderComparison& folderCmp, const MainConfiguration& mainConfig) :
-            folderCmp_(folderCmp),
-            mainConfig_(mainConfig) {}
+        folderCmp_(folderCmp),
+        mainConfig_(mainConfig) {}
 
     ~FinalizeDeletion()
     {
         std::for_each(folderCmp_.begin(), folderCmp_.end(), FileSystemObject::removeEmpty);
-        redetermineSyncDirection(mainConfig_, folderCmp_);
+        redetermineSyncDirection(mainConfig_, folderCmp_, NULL);
     }
 
 private:
@@ -476,102 +820,9 @@ void FreeFileSync::deleteFromGridAndHD(FolderComparison& folderCmp,             
                                                statusHandler);
     }
 }
+
+
 //############################################################################################################
-
-
-inline
-void writeTwoDigitNumber(unsigned int number, wxString& string)
-{
-    assert (number < 100);
-
-    string += '0' + number / 10;
-    string += '0' + number % 10;
-}
-
-
-inline
-void writeFourDigitNumber(unsigned int number, wxString& string)
-{
-    assert (number < 10000);
-
-    string += '0' + number / 1000;
-    number %= 1000;
-    string += '0' + number / 100;
-    number %= 100;
-    string += '0' + number / 10;
-    number %= 10;
-    string += '0' + number;
-}
-
-
-wxString FreeFileSync::utcTimeToLocalString(const wxLongLong& utcTime, const Zstring& filename)
-{
-#ifdef FFS_WIN
-    //convert ansi C time to FILETIME
-    wxLongLong fileTimeLong(utcTime);
-
-    fileTimeLong += wxLongLong(2, 3054539008UL); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
-    fileTimeLong *= 10000000;
-
-    FILETIME lastWriteTimeUtc;
-    lastWriteTimeUtc.dwLowDateTime  = fileTimeLong.GetLo();             //GetLo() returns unsigned
-    lastWriteTimeUtc.dwHighDateTime = unsigned(fileTimeLong.GetHi());   //GetHi() returns signed
-
-
-    FILETIME localFileTime;
-    if (::FileTimeToLocalFileTime( //convert to local time
-                &lastWriteTimeUtc, //pointer to UTC file time to convert
-                &localFileTime 	   //pointer to converted file time
-            ) == 0)
-        throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" FILETIME -> local FILETIME: ") +
-                                              wxT("(") + wxULongLong(lastWriteTimeUtc.dwHighDateTime, lastWriteTimeUtc.dwLowDateTime).ToString() + wxT(") ") +
-                                              filename.c_str() + wxT("\n\n") + getLastErrorFormatted()).To8BitData()));
-
-    if (localFileTime.dwHighDateTime > 0x7fffffff)
-        return _("Error");  //this actually CAN happen if UTC time is just below this border and ::FileTimeToLocalFileTime() adds 2 hours due to DST or whatever!
-    //Testcase (UTC): dateHigh = 2147483647 (=0x7fffffff) -> year 30000
-    //                dateLow  = 4294967295
-
-    SYSTEMTIME time;
-    if (::FileTimeToSystemTime(
-                &localFileTime, //pointer to file time to convert
-                &time 	        //pointer to structure to receive system time
-            ) == 0)
-        throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" local FILETIME -> SYSTEMTIME: ") +
-                                              wxT("(") + wxULongLong(localFileTime.dwHighDateTime, localFileTime.dwLowDateTime).ToString() + wxT(") ") +
-                                              filename.c_str()  + wxT("\n\n") + getLastErrorFormatted()).To8BitData()));
-
-    //assemble time string (performance optimized)
-    wxString formattedTime;
-    formattedTime.reserve(20);
-
-    writeFourDigitNumber(time.wYear, formattedTime);
-    formattedTime += wxChar('-');
-    writeTwoDigitNumber(time.wMonth, formattedTime);
-    formattedTime += wxChar('-');
-    writeTwoDigitNumber(time.wDay, formattedTime);
-    formattedTime += wxChar(' ');
-    formattedTime += wxChar(' ');
-    writeTwoDigitNumber(time.wHour, formattedTime);
-    formattedTime += wxChar(':');
-    writeTwoDigitNumber(time.wMinute, formattedTime);
-    formattedTime += wxChar(':');
-    writeTwoDigitNumber(time.wSecond, formattedTime);
-
-    return formattedTime;
-
-#elif defined FFS_LINUX
-    tm* timeinfo;
-    const time_t fileTime = utcTime.ToLong();
-    timeinfo = localtime(&fileTime); //convert to local time
-    char buffer[50];
-    strftime(buffer, 50, "%Y-%m-%d  %H:%M:%S", timeinfo);
-
-    return wxString(buffer);
-#endif
-}
-
-
 /*Statistical theory: detect daylight saving time (DST) switch by comparing files that exist on both sides (and have same filesizes). If there are "enough"
 that have a shift by +-1h then assert that DST switch occured.
 What is "enough" =: N? N should be large enough AND small enough that the following two errors remain small:
@@ -724,3 +975,5 @@ void FreeFileSync::checkForDSTChange(const FileCompareResult& gridData,
 }
 #endif  //FFS_WIN
 */
+
+

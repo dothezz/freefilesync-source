@@ -138,6 +138,8 @@
 2. ワイルドカードに ' * ' と ' ? ' を使用出来ます。
 3. Exclude files directly on main grid via context menu.
 3. コンテキストメニューから直接ファイルを除外出来ます。
+<Automatic>
+<自動>
 <Directory>
 <ディレクトリ>
 <Last session>
@@ -146,6 +148,8 @@
 <複数選択>
 A newer version of FreeFileSync is available:
 FreeFileSync の新しいバージョンが利用可能です:
+ATTENTION: Failed directory access can lead to file deletions!
+注意: ディレクトリのアクセスに失敗した場合、ファイルは削除されます!
 Abort requested: Waiting for current operation to finish...
 ユーザによる中断: 現在の処理を終了しています.. お待ちください...
 Aborted
@@ -168,6 +172,8 @@ Assemble a batch file for automated synchronization. To start in batch mode simp
 一括で同期処理を行うためのバッチファイルを作成します。 一括モードを開始するときは、ファイルのパス名を実行ファイル\n< FreeFileSync.exe> \nにバッチファイルで渡すだけです。 また、この操作はOSのタスクスケジューラから実行することができます。
 Auto-adjust columns
 列の自動調整
+Automatic mode
+自動モード
 Batch execution
 一括処理を実行
 Batch file created successfully!
@@ -176,12 +182,20 @@ Batch job
 一括処理
 Big thanks for localizing FreeFileSync goes out to:
 FreeFileSync のローカライズへの協力に感謝します:
+Both sides have changed since last synchronization!
+前回最後の同期処理以降、両側とも変更があります!
 Browse
 参照
 Build:
 ビルド:
 Cancel
 中止
+Cannot determine sync-direction: Changed filter settings!
+同期方向を決定できません: フィルター設定が変更されています!
+Cannot determine sync-direction: No change since last synchronization!
+同期方向を決定できません: 前回最後の同期処理以降、変更はありません
+Category
+カテゴリ
 Change direction
 方向を変更
 Check all
@@ -376,6 +390,8 @@ Error reading file attributes:
 ファイル属性の取得に失敗:
 Error reading file:
 ファイル読み込みエラー:
+Error reading from synchronization database:
+同期データベースからの読み込みエラー:
 Error resolving symbolic link:
 シンボリックリンクの解決に失敗:
 Error starting Volume Shadow Copy Service!
@@ -388,8 +404,10 @@ Error writing file attributes:
 ファイル属性の書き込みエラー:
 Error writing file:
 ファイル書き込みエラー:
-Error: Source directory does not exist anymore:
-エラー: ソースディレクトリが存在しません:
+Error writing to synchronization database:
+同期データベースへの書き込みエラー:
+Source directory does not exist anymore:
+ソースディレクトリが存在しません:
 Example
 例
 Exclude
@@ -438,10 +456,10 @@ Files that exist on both sides, left one is newer
 両側に存在するが、左側の方がより新しい
 Files that exist on both sides, right one is newer
 両側に存在するが、右側の方がより新しい
+Files/folders found:
+発見したファイル/フォルダ:
 Files/folders remaining:
-ファイル/フォルダのリネーム:
-Files/folders scanned:
-ファイル/フォルダのスキャン:
+リネームされたファイル/フォルダ:
 Files/folders that exist on left side only
 左側のみに存在するファイル/フォルダ
 Files/folders that exist on right side only
@@ -472,6 +490,8 @@ FreeFileSync is up to date!
 FreeFileSync は最新です!
 Full path
 フルパス
+Generating database...
+データベースを作成中...
 Generating file list...
 ファイル一覧を作成中...
 Global settings
@@ -536,10 +556,14 @@ Include temporarily
 一時フォルダを含める
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
 含める: *.doc;*.zip;*.exe\n除外: temp\\*
+Incompatible synchronization database format:
+同期データベースの書式に互換性がありません:
 Info
 情報
 Information
 インフォメーション
+Initial synchronization. Please verify default copy-directions!
+同期処理の初期化.. デフォルトのコピー方向を再度確認してください!
 Integrate external applications into context menu. The following macros are available:
 外部のアプリケーションをコンテキストメニューに統合、以下のマクロが利用できます:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +602,8 @@ Moving folder %x to user-defined directory %y
 フォルダ %x をユーザ定義ディレクトリ %y に移動
 Multiple...
 複数処理...
+No database file existing yet:
+データベースが存在しません:
 Not enough free disk space available in:
 利用可能なディスク空き容量が足りません:
 Nothing to synchronize according to configuration!
@@ -592,6 +618,12 @@ OK
 OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 フィルターに適合するファイル/ディレクトリのみ同期対象に選択されます。このフィルターは、同期基準ディレクトリへの相対的(!)な名前に適用されます。
+Open directly
+ディレクトリを開く
+Open with Explorer
+エクスプローラで開く
+Open with Konqueror
+Konqueror で開く
 Operation aborted!
 操作の中断!
 Operation:
@@ -632,8 +664,6 @@ Report translation error
 翻訳エラーの詳細
 Reset
 リセット
-Result
-結果
 Right
 右側
 S&ave configuration
@@ -730,6 +760,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 \"temp\" のサブフォルダを除いて、すべての.doc、.zip、および.exeファイルを同期
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 両側を同時に処理: 両方のディレクトリのより新しいファイルをコピー
+Synchronize both sides using a database. Deletions are detected automatically.
+データベースを利用して両側を同期、削除されたものは自動的に検出されます。
 Synchronize...
 同期処理...
 Synchronizing...
@@ -782,6 +814,8 @@ User-defined directory
 ユーで定義ディレクトリ
 User-defined directory for deletion was not specified!
 ユーザ定義ディレクトリが指定されていません!
+Using default synchronization directions. Please recheck.
+デフォルトで使用する同期処理方向 (再確認してください)
 Variant
 変化
 Verifying file %x
@@ -796,6 +830,8 @@ When the comparison is started with this option set the following decision tree 
 このオプションで比較を開始した場合は、以下のツリーに従って処理が行われます:
 You can ignore the error to consider not existing directories as empty.
 既存のディレクトリが空ではないというエラーは無視できます。
+You can ignore the error to skip current folder pair.
+このフォルダペアのエラーを無視してスキップできます。
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 残っているファイルは、再び同期することができます (再比較とは別の動作)!
 different

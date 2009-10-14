@@ -14,123 +14,119 @@ class StatusHandler;
 
 namespace FreeFileSync
 {
-    class SyncStatistics
-    {
-    public:
-        SyncStatistics(const BaseDirMapping&   baseDir);
-        SyncStatistics(const FolderComparison& folderCmp);
+class SyncStatistics
+{
+public:
+    SyncStatistics(const HierarchyObject&  hierObj);
+    SyncStatistics(const FolderComparison& folderCmp);
 
-        int         getCreate(   bool inclLeft = true, bool inclRight = true) const;
-        int         getOverwrite(bool inclLeft = true, bool inclRight = true) const;
-        int         getDelete(   bool inclLeft = true, bool inclRight = true) const;
-        int         getConflict() const;
-        wxULongLong getDataToProcess() const;
-        int getRowCount() const;
+    int         getCreate(   bool inclLeft = true, bool inclRight = true) const;
+    int         getOverwrite(bool inclLeft = true, bool inclRight = true) const;
+    int         getDelete(   bool inclLeft = true, bool inclRight = true) const;
+    int         getConflict() const;
+    wxULongLong getDataToProcess() const;
+    int getRowCount() const;
 
-    private:
-        void init();
+private:
+    void init();
 
-        void getNumbersRecursively(const HierarchyObject& hierObj);
+    void getNumbersRecursively(const HierarchyObject& hierObj);
 
-        void getFileNumbers(const FileMapping& fileObj);
-        void getDirNumbers(const DirMapping& dirObj);
+    void getFileNumbers(const FileMapping& fileObj);
+    void getDirNumbers(const DirMapping& dirObj);
 
-        int createLeft,    createRight;
-        int overwriteLeft, overwriteRight;
-        int deleteLeft,    deleteRight;
-        int conflict;
-        wxULongLong dataToProcess;
-        int rowsTotal;
-    };
+    int createLeft,    createRight;
+    int overwriteLeft, overwriteRight;
+    int deleteLeft,    deleteRight;
+    int conflict;
+    wxULongLong dataToProcess;
+    int rowsTotal;
+};
 
-    bool synchronizationNeeded(const FolderComparison& folderCmp);
-
-    SyncOperation getSyncOperation(const CompareFilesResult cmpResult,
-                                   const bool selectedForSynchronization,
-                                   const SyncDirection syncDir); //evaluate comparison result and sync direction
+bool synchronizationNeeded(const FolderComparison& folderCmp);
 
 
-    SyncOperation getSyncOperation(const FileSystemObject& fsObj); //convenience function
+struct FolderPairSyncCfg
+{
+    FolderPairSyncCfg(bool inAutomaticMode,
+                      const DeletionPolicy handleDel,
+                      const Zstring& custDelDir) :
+        updateSyncDB(inAutomaticMode),
+        handleDeletion(handleDel),
+        custDelFolder(custDelDir) {}
+
+    bool updateSyncDB; //update database if in automatic mode
+    DeletionPolicy handleDeletion;
+    Zstring custDelFolder;
+};
+std::vector<FolderPairSyncCfg> extractSyncCfg(const MainConfiguration& mainCfg);
 
 
-    struct FolderPairSyncCfg
-    {
-        FolderPairSyncCfg(const DeletionPolicy handleDel,
-                          const wxString& custDelDir) :
-                handleDeletion(handleDel),
-                custDelFolder(custDelDir) {}
+//class handling synchronization process
+class SyncProcess
+{
+public:
+    SyncProcess(const bool copyFileSymLinks,
+                const bool traverseDirSymLinks,
+                xmlAccess::OptionalDialogs& warnings,
+                const bool verifyCopiedFiles,
+                StatusHandler* handler);
 
-        DeletionPolicy handleDeletion;
-        wxString custDelFolder;
-    };
-    std::vector<FolderPairSyncCfg> extractSyncCfg(const MainConfiguration& mainCfg);
+    //CONTRACT: syncConfig must have SAME SIZE folderCmp and correspond per row!
+    void startSynchronizationProcess(const std::vector<FolderPairSyncCfg>& syncConfig, FolderComparison& folderCmp);
 
-
-    //class handling synchronization process
-    class SyncProcess
-    {
-    public:
-        SyncProcess(const bool copyFileSymLinks,
-                    const bool traverseDirSymLinks,
-                    xmlAccess::OptionalDialogs& warnings,
-                    const bool verifyCopiedFiles,
-                    StatusHandler* handler);
-
-        //CONTRACT: syncConfig must have SAME SIZE folderCmp and correspond per row!
-        void startSynchronizationProcess(const std::vector<FolderPairSyncCfg>& syncConfig, FolderComparison& folderCmp);
-
-    private:
+private:
     template <bool deleteOnly>
     class SyncRecursively;
 
-        struct DeletionHandling
-        {
-            DeletionHandling(const DeletionPolicy handleDel,
-                             const wxString& custDelFolder);
+    struct DeletionHandling
+    {
+        DeletionHandling(const DeletionPolicy handleDel,
+                         const Zstring& custDelFolder);
 
-            DeletionPolicy handleDeletion;
-            Zstring currentDelFolder; //alternate deletion folder for current folder pair (with timestamp, ends with path separator)
-            //preloaded status texts:
-            const Zstring txtMoveFileUserDefined;
-            const Zstring txtMoveFolderUserDefined;
-        };
+        DeletionPolicy handleDeletion;
+        Zstring currentDelFolder; //alternate deletion folder for current folder pair (with timestamp, ends with path separator)
+        //preloaded status texts:
+        const Zstring txtMoveFileUserDefined;
+        const Zstring txtMoveFolderUserDefined;
+    };
 
-        void syncRecursively(HierarchyObject& hierObj);
-        void synchronizeFile(FileMapping& fileObj, const DeletionHandling& delHandling) const;
-        void synchronizeFolder(DirMapping& dirObj, const DeletionHandling& delHandling) const;
+    void syncRecursively(HierarchyObject& hierObj);
+    void synchronizeFile(FileMapping& fileObj, const DeletionHandling& delHandling) const;
+    void synchronizeFolder(DirMapping& dirObj, const DeletionHandling& delHandling) const;
 
-        template <FreeFileSync::SelectedSide side>
-        void removeFile(const FileMapping& fileObj, const DeletionHandling& delHandling, bool showStatusUpdate) const;
+    template <FreeFileSync::SelectedSide side>
+    void removeFile(const FileMapping& fileObj, const DeletionHandling& delHandling, bool showStatusUpdate) const;
 
-        template <FreeFileSync::SelectedSide side>
-        void removeFolder(const DirMapping& dirObj, const DeletionHandling& delHandling) const;
+    template <FreeFileSync::SelectedSide side>
+    void removeFolder(const DirMapping& dirObj, const DeletionHandling& delHandling) const;
 
-        void copyFileUpdating(const Zstring& source, const Zstring& target, const wxULongLong& sourceFileSize) const;
-        void verifyFileCopy(const Zstring& source, const Zstring& target) const;
+    void copyFileUpdating(const Zstring& source, const Zstring& target, const wxULongLong& sourceFileSize) const;
+    void verifyFileCopy(const Zstring& source, const Zstring& target) const;
 
-        const bool m_copyFileSymLinks;
-        const bool m_traverseDirSymLinks;
-        const bool m_verifyCopiedFiles;
+    const bool m_copyFileSymLinks;
+    const bool m_traverseDirSymLinks;
+    const bool m_verifyCopiedFiles;
 
-        //warnings
-        xmlAccess::OptionalDialogs& m_warnings;
+    //warnings
+    xmlAccess::OptionalDialogs& m_warnings;
 
 #ifdef FFS_WIN
-        //shadow copy buffer
-        std::auto_ptr<ShadowCopy> shadowCopyHandler;
+    //shadow copy buffer
+    std::auto_ptr<ShadowCopy> shadowCopyHandler;
 #endif
 
-        StatusHandler* const statusUpdater;
+    StatusHandler* const statusUpdater;
 
-        //preload status texts
-        const Zstring txtCopyingFile;
-        const Zstring txtOverwritingFile;
-        const Zstring txtCreatingFolder;
-        const Zstring txtDeletingFile;
-        const Zstring txtDeletingFolder;
-        const Zstring txtMoveToRecycler;
-        const Zstring txtVerifying;
-    };
+    //preload status texts
+    const Zstring txtCopyingFile;
+    const Zstring txtOverwritingFile;
+    const Zstring txtCreatingFolder;
+    const Zstring txtDeletingFile;
+    const Zstring txtDeletingFolder;
+    const Zstring txtMoveToRecycler;
+    const Zstring txtVerifying;
+};
 }
 
 #endif // SYNCHRONIZATION_H_INCLUDED

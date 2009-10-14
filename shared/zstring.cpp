@@ -1,8 +1,8 @@
 #include "zstring.h"
+#include <stdexcept>
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
-#include <stdexcept>
 #endif  //FFS_WIN
 
 #ifdef __WXDEBUG__
@@ -27,12 +27,12 @@ AllocationCount::~AllocationCount()
             leakingStrings += wxT("\"\n");
         }
 
-        MessageBox(NULL, wxString(wxT("Memory leak detected! (No problem if it occurs while Unit testing only!)")) + wxT("\n\n")
+        MessageBox(NULL, wxString(wxT("Memory leak detected!")) + wxT("\n\n")
                    + wxT("Candidates:\n") + leakingStrings,
                    wxString::Format(wxT("%i"), activeStrings.size()), 0);
     }
 #else
-        std::abort();
+        throw std::logic_error("Memory leak!");
 #endif
 }
 
@@ -198,7 +198,8 @@ Zstring& Zstring::Trim(bool fromRight)
             if (descr->refCount > 1) //allocate new string
                 *this = Zstring(cursor, thisLen - diff);
             else
-            {   //overwrite this string
+            {
+                //overwrite this string
                 ::memmove(strBegin, cursor, (thisLen - diff + 1) * sizeof(DefaultChar)); //note: do not simply let data point to different location: this corrupts reserve()!
                 descr->length -= diff;
             }
@@ -307,7 +308,8 @@ Zstring& Zstring::replace(size_t pos1, size_t n1, const DefaultChar* str, size_t
 
     const size_t newLen = oldLen - n1 + n2;
     if (newLen > oldLen || descr->refCount > 1)
-    {   //allocate a new string
+    {
+        //allocate a new string
         StringDescriptor* newDescr = allocate(newLen);
 
         //assemble new string with replacement
@@ -342,7 +344,8 @@ Zstring& Zstring::operator=(const DefaultChar* source)
     if (descr->refCount > 1 || descr->capacity < sourceLen) //allocate new string
         *this = Zstring(source, sourceLen);
     else
-    {   //overwrite this string
+    {
+        //overwrite this string
         ::memcpy(data(), source, (sourceLen + 1) * sizeof(DefaultChar)); //include null-termination
         descr->length = sourceLen;
     }
@@ -355,7 +358,8 @@ Zstring& Zstring::assign(const DefaultChar* source, size_t len)
     if (descr->refCount > 1 || descr->capacity < len) //allocate new string
         *this = Zstring(source, len);
     else
-    {   //overwrite this string
+    {
+        //overwrite this string
         ::memcpy(data(), source, len * sizeof(DefaultChar)); //don't know if source is null-terminated
         data()[len] = 0; //include null-termination
         descr->length = len;
@@ -412,7 +416,8 @@ void Zstring::reserve(size_t capacityNeeded) //make unshared and check capacity
     assert(capacityNeeded != 0);
 
     if (descr->refCount > 1)
-    {   //allocate a new string
+    {
+        //allocate a new string
         const size_t oldLength = length();
         assert(oldLength <= getCapacityToAllocate(capacityNeeded));
 
@@ -425,7 +430,8 @@ void Zstring::reserve(size_t capacityNeeded) //make unshared and check capacity
         descr = newDescr;
     }
     else if (descr->capacity < capacityNeeded)
-    {   //try to resize the current string (allocate anew if necessary)
+    {
+        //try to resize the current string (allocate anew if necessary)
         const size_t newCapacity = getCapacityToAllocate(capacityNeeded);
 
 #ifdef __WXDEBUG__

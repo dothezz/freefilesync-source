@@ -10,9 +10,9 @@ wxButtonWithImage::wxButtonWithImage(wxWindow *parent,
                                      long style,
                                      const wxValidator& validator,
                                      const wxString& name) :
-        wxBitmapButton(parent, id, wxNullBitmap, pos, size, style | wxBU_AUTODRAW, validator, name),
-        m_spaceAfter(0),
-        m_spaceBefore(0)
+    wxBitmapButton(parent, id, wxNullBitmap, pos, size, style | wxBU_AUTODRAW, validator, name),
+    m_spaceAfter(0),
+    m_spaceBefore(0)
 {
     setTextLabel(label);
 }

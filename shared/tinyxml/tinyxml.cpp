@@ -504,7 +504,7 @@ const TiXmlDocument* TiXmlNode::GetDocument() const
 
 
 TiXmlElement::TiXmlElement (const char * _value)
-        : TiXmlNode( TiXmlNode::ELEMENT )
+    : TiXmlNode( TiXmlNode::ELEMENT )
 {
     firstChild = lastChild = 0;
     value = _value;
@@ -513,7 +513,7 @@ TiXmlElement::TiXmlElement (const char * _value)
 
 #ifdef TIXML_USE_STL
 TiXmlElement::TiXmlElement( const std::string& _value )
-        : TiXmlNode( TiXmlNode::ELEMENT )
+    : TiXmlNode( TiXmlNode::ELEMENT )
 {
     firstChild = lastChild = 0;
     value = _value;
@@ -522,7 +522,7 @@ TiXmlElement::TiXmlElement( const std::string& _value )
 
 
 TiXmlElement::TiXmlElement( const TiXmlElement& copy)
-        : TiXmlNode( TiXmlNode::ELEMENT )
+    : TiXmlNode( TiXmlNode::ELEMENT )
 {
     firstChild = lastChild = 0;
     copy.CopyTo( this );
@@ -1418,7 +1418,7 @@ TiXmlNode* TiXmlText::Clone() const
 TiXmlDeclaration::TiXmlDeclaration( const char * _version,
                                     const char * _encoding,
                                     const char * _standalone )
-        : TiXmlNode( TiXmlNode::DECLARATION )
+    : TiXmlNode( TiXmlNode::DECLARATION )
 {
     version = _version;
     encoding = _encoding;
@@ -1430,7 +1430,7 @@ TiXmlDeclaration::TiXmlDeclaration( const char * _version,
 TiXmlDeclaration::TiXmlDeclaration(	const std::string& _version,
                                     const std::string& _encoding,
                                     const std::string& _standalone )
-        : TiXmlNode( TiXmlNode::DECLARATION )
+    : TiXmlNode( TiXmlNode::DECLARATION )
 {
     version = _version;
     encoding = _encoding;
@@ -1440,7 +1440,7 @@ TiXmlDeclaration::TiXmlDeclaration(	const std::string& _version,
 
 
 TiXmlDeclaration::TiXmlDeclaration( const TiXmlDeclaration& copy )
-        : TiXmlNode( TiXmlNode::DECLARATION )
+    : TiXmlNode( TiXmlNode::DECLARATION )
 {
     copy.CopyTo( this );
 }

@@ -3,18 +3,20 @@
 #include <wx/ffile.h>
 #include "../shared/globalFunctions.h"
 #include "statusHandler.h"
-#include "../algorithm.h"
+//#include "../algorithm.h"
+#include "../ui/util.h"
 #include <wx/intl.h>
 #include <limits>
 #include <wx/stopwatch.h>
 
 
 RetrieveStatistics::RetrieveStatistics() :
-        timer(new wxStopWatch) {}
+    timer(new wxStopWatch) {}
 
 
 RetrieveStatistics::~RetrieveStatistics()
-{   //write statistics to a file
+{
+    //write statistics to a file
     wxFFile outputFile(wxT("statistics.dat"), wxT("w"));
 
     outputFile.Write(wxT("Time(ms);Objects;Data\n"));
@@ -103,13 +105,13 @@ Statistics::Statistics(const int totalObjectCount,
                        const double totalDataAmount,
                        const unsigned windowSizeRemainingTime,
                        const unsigned windowSizeBytesPerSecond) :
-        objectsTotal(totalObjectCount),
-        dataTotal(totalDataAmount),
-        windowSizeRemTime(windowSizeRemainingTime),
-        windowSizeBPS(windowSizeBytesPerSecond),
-        windowMax(std::max(windowSizeRemainingTime, windowSizeBytesPerSecond)),
-        remainingTimeLast(256*256*256*100), //something "big"
-        timer(new wxStopWatch) {}
+    objectsTotal(totalObjectCount),
+    dataTotal(totalDataAmount),
+    windowSizeRemTime(windowSizeRemainingTime),
+    windowSizeBPS(windowSizeBytesPerSecond),
+    windowMax(std::max(windowSizeRemainingTime, windowSizeBytesPerSecond)),
+    remainingTimeLast(256*256*256*100), //something "big"
+    timer(new wxStopWatch) {}
 
 
 void Statistics::addMeasurement(const int objectsCurrent, const double dataCurrent)

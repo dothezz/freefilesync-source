@@ -138,6 +138,8 @@
 2. U kunt gebruik maken van wildcard karakters zoals '*' en '?'.
 3. Exclude files directly on main grid via context menu.
 3. Sluit bestanden direct uit in het hoofscherm via een contextmenu
+<Automatic>
+<Automatisch>
 <Directory>
 <Pad>
 <Last session>
@@ -168,6 +170,8 @@ Assemble a batch file for automated synchronization. To start in batch mode simp
 Assembleer een batchbestand voor automatische synchronisatie. Om te starten in batchmodus is het voldoende om de bestandsnaam achter de FreeFileSync toepassing te zetten: FreeFileSync.exe <batchbestand>. Het is mogelijk dit in te plannen in de systeemplanner.
 Auto-adjust columns
 Kolommen automatisch aanpassen
+Automatic mode
+Automatische modus
 Batch execution
 Batch taak uitvoeren
 Batch file created successfully!
@@ -176,12 +180,20 @@ Batch job
 Batch taak
 Big thanks for localizing FreeFileSync goes out to:
 Extra dank voor het vertalen van FreeFileSync gaat naar:
+Both sides have changed since last synchronization!
+Beide zijden zijn veranderd sinds de laatste synchronisatie!
 Browse
 Map opzoeken
 Build:
 Gebouwd:
 Cancel
 Annuleren
+Cannot determine sync-direction: Changed filter settings!
+Kan de synchronisatie-richting niet bepalen: verandering in
+Cannot determine sync-direction: No change since last synchronization!
+Kan de synchronisatie-richting niet bepalen: geen verandering sinds de laatste synchronisatie!
+Category
+Categorie
 Change direction
 Zijdes omwisselen
 Check all
@@ -376,6 +388,8 @@ Error reading file attributes:
 Er is een fout opgetreden bij het lezen van de bestands-eigenschappen
 Error reading file:
 Er is een fout opgetreden bij het lezen van het bestand:
+Error reading from synchronization database:
+Er is een fout opgetreden bij het lezen van de synchronisatie-database:
 Error resolving symbolic link:
 Er is een fout opgetreden bij het ophalen van een symbolische koppeling:
 Error starting Volume Shadow Copy Service!
@@ -388,8 +402,10 @@ Error writing file attributes:
 Er is een fout opgetreden bij het schrijven van de bestands-eigenschappen:
 Error writing file:
 Er is een fout opgetreden bij het schrijven naar bestand:
-Error: Source directory does not exist anymore:
-Er is een fout opgetreden. De oorspronkelijke map bestaat niet meer:
+Error writing to synchronization database:
+Er is een fout opgetreden bij het schrijven naar de synchronisatie-database:
+Source directory does not exist anymore:
+De oorspronkelijke map bestaat niet meer:
 Example
 Voorbeeld
 Exclude
@@ -438,10 +454,10 @@ Files that exist on both sides, left one is newer
 Bestanden die aan beide kanten bestaan, maar waarvan de linkerkant nieuwer is
 Files that exist on both sides, right one is newer
 Bestanden die aan beide kanten bestaan, maar waarvan de rechterkant nieuwer is
+Files/folders found:
+Gevonden bestanden/mappen:
 Files/folders remaining:
 Resterende bestanden/mappen:
-Files/folders scanned:
-Aantal bestanden/mappen gescand:
 Files/folders that exist on left side only
 Bestanden/mappen die alleen aan de linkerkant bestaan
 Files/folders that exist on right side only
@@ -472,6 +488,8 @@ FreeFileSync is up to date!
 U gebruikt de nieuwste versie van FreeFileSync!
 Full path
 Volledige bestandslocatie
+Generating database...
+Database genereren...
 Generating file list...
 Bestandslijst genereren...
 Global settings
@@ -536,10 +554,14 @@ Include temporarily
 Tijdelijk bijsluiten
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
 Bijsluiten: *.doc;*.zip;*.exe\nUitsluiten: temp\\*
+Incompatible synchronization database format:
+Opmaak van synchronisatie-database komt niet overeen:
 Info
 Info
 Information
 Informatie
+Initial synchronization. Please verify default copy-directions!
+Initiële  synchronisatie. Verifieer alstublieft de standaard kopieer-richtingen!
 Integrate external applications into context menu. The following macros are available:
 Integreer externe applicaties in het context menu. De volgende macros zijn beschikbaar:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +600,8 @@ Moving folder %x to user-defined directory %y
 Verplaatsen map %x naar een door de gebruiker gedefinieerde locatie %y
 Multiple...
 Meerdere...
+No database file existing yet:
+Er bestaat nog geen database bestand:
 Not enough free disk space available in:
 Niet genoeg schijfruimte beschikbaar op:
 Nothing to synchronize according to configuration!
@@ -592,6 +616,12 @@ OK
 Oke
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Alleen bestanden /locatie die niet worden gefilterd zullen worden gesynchroniseerd. Het filter word toegepast op de relatieve(!) naam van de basislocatie van de synchronisatie.
+Open directly
+Direct openen
+Open with Explorer
+Openen met Explorer
+Open with Konqueror
+Openen met Konqueror
 Operation aborted!
 Operatie afgebroken!
 Operation:
@@ -632,8 +662,6 @@ Report translation error
 Rapporteer een fout in de vertaling
 Reset
 Reset
-Result
-Resultaat
 Right
 Rechts
 S&ave configuration
@@ -730,6 +758,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 Synchroniseer alle .doc, .zip en .exe bestanden uitgezonderd alles in submap \"temp\"
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Synchroniseer beide zijde tegelijkertijd: kopieer nieuwe of geüpdatete bestanden in beide richtingen.
+Synchronize both sides using a database. Deletions are detected automatically.
+Synchroniseer beide zijdes met gebruik van een database. Verwijderde bestanden worden automatisch opgemerkt.
 Synchronize...
 Synchroniseer...
 Synchronizing...
@@ -782,6 +812,8 @@ User-defined directory
 Door de gebruiker te definiëren locatie
 User-defined directory for deletion was not specified!
 Door de gebruiker te definiëren locatie voor verwijderen was niet opgegeven!
+Using default synchronization directions. Please recheck.
+De standaardrichting voor synchronisatie wordt gebruikt. Alstublieft opnieuw controleren.
 Variant
 Variant
 Verifying file %x
@@ -796,6 +828,8 @@ When the comparison is started with this option set the following decision tree 
 Wanneer met deze optie aan de vergelijking wordt gestart zal de volgende vergelijkingsboom worden gebruikt:
 You can ignore the error to consider not existing directories as empty.
 U kunt de fout negeren om niet bestaande locaties als leeg te beschouwen.
+You can ignore the error to skip current folder pair.
+U kunt de foutmelding om de huidige mappencombinatie over te slaan negeren.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 U kunt proberen om de resterende bestanden opnieuw te synchroniseren (ZONDER opnieuw te hoeven vergelijken)!
 different

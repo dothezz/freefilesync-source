@@ -4,6 +4,7 @@
 #include <wx/intl.h>
 #include <wx/filefn.h>
 #include "../shared/fileHandling.h"
+#include "../shared/stringConv.h"
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -14,6 +15,8 @@
 #include "../shared/inotify/inotify-cxx.h"
 #include "../shared/fileTraverser.h"
 #endif
+
+using namespace FreeFileSync;
 
 
 #ifdef FFS_WIN
@@ -130,14 +133,14 @@ void RealtimeSync::waitForChanges(const std::vector<wxString>& dirNames, WaitCal
     //add all subdirectories
     for (std::vector<wxString>::const_iterator i = dirNames.begin(); i != dirNames.end(); ++i)
     {
-        const Zstring formattedDir = FreeFileSync::getFormattedDirectoryName(i->c_str());
+        const Zstring formattedDir = FreeFileSync::getFormattedDirectoryName(wxToZ(*i));
 
         if (formattedDir.empty())
             throw FreeFileSync::FileError(_("Please fill all empty directory fields."));
 
         else if (!FreeFileSync::dirExists(formattedDir))
             throw FreeFileSync::FileError(wxString(_("Directory does not exist:")) + wxT("\n") +
-                                          wxT("\"") + formattedDir + wxT("\"") + wxT("\n\n") +
+                                          wxT("\"") + zToWx(formattedDir) + wxT("\"") + wxT("\n\n") +
                                           FreeFileSync::getLastErrorFormatted());
 
         fullDirList.push_back(formattedDir.c_str());
@@ -170,8 +173,8 @@ void RealtimeSync::waitForChanges(const std::vector<wxString>& dirNames, WaitCal
             }
             catch (const InotifyException& e)
             {
-                const wxString errorMessage = wxString(_("Could not initialize directory monitoring:")) + wxT("\n\"") + *i + wxT("\"");
-                throw FreeFileSync::FileError(errorMessage + wxT("\n\n") + e.GetMessage().c_str());
+                const wxString errorMessage = wxString(_("Could not initialize directory monitoring:")) + wxT("\n\"") + zToWx(i->c_str()) + wxT("\"");
+                throw FreeFileSync::FileError(errorMessage + wxT("\n\n") + zToWx(e.GetMessage().c_str()));
             }
         }
 
@@ -188,11 +191,11 @@ void RealtimeSync::waitForChanges(const std::vector<wxString>& dirNames, WaitCal
     }
     catch (const InotifyException& e)
     {
-        throw FreeFileSync::FileError(wxString(_("Error when monitoring directories.")) + wxT("\n\n") + e.GetMessage().c_str());
+        throw FreeFileSync::FileError(wxString(_("Error when monitoring directories.")) + wxT("\n\n") + zToWx(e.GetMessage().c_str()));
     }
     catch (const std::exception& e)
     {
-        throw FreeFileSync::FileError(wxString(_("Error when monitoring directories.")) + wxT("\n\n") + e.what());
+        throw FreeFileSync::FileError(wxString(_("Error when monitoring directories.")) + wxT("\n\n") + zToWx(e.what()));
     }
 #endif
 }

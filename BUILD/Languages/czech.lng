@@ -81,7 +81,7 @@ U&končit
 &Restore
 &Obnovit
 &Retry
-&Znovu
+&Opakovat
 &Save
 &Uložit
 &Yes
@@ -91,9 +91,9 @@ U&končit
 ,
  
 - Other side's counterpart to %dir
-- pouze cesta z opačného panelu (protistarna k %dir)
+- pouze cesta z opačného panelu
 - Other side's counterpart to %name
-- celá cesta nebo jméno souboru z opačného panelu (protistrana k %name)
+- celá cesta nebo jméno souboru z opačného panelu
 - conflict
 - konflikt
 - conflict (same date, different size)
@@ -138,6 +138,8 @@ soubor: 1;
 2. Můžete použít zástupné znaky (wildcard) '*' a '?'.
 3. Exclude files directly on main grid via context menu.
 3. Můžete použít pro vynechávání souborů přímo kontextového menu.
+<Automatic>
+<Automaticky>
 <Directory>
 <Adresář>
 <Last session>
@@ -146,6 +148,8 @@ soubor: 1;
 <vícenásobný výběr>
 A newer version of FreeFileSync is available:
 je dostupná novější verze FreeFileSync:
+ATTENTION: Failed directory access can lead to file deletions!
+POZOR: Chyba přístupu k adresáři může vést ke smazání souborů!
 Abort requested: Waiting for current operation to finish...
 Požadavek na přerušení: Čekání na ukončení aktuální operace...
 Aborted
@@ -168,6 +172,8 @@ Assemble a batch file for automated synchronization. To start in batch mode simp
 Vytvoření dávkového souboru pro automatický provoz. Ke spuštění dávky jednoduše její jméno zadejte jako parametr při spuštění FreeFileSync: FreeFileSync.exe <batchfile>.
 Auto-adjust columns
 Automaticky přizpůsobit šířku
+Automatic mode
+Automatický mód
 Batch execution
 Spuštění dávky
 Batch file created successfully!
@@ -176,12 +182,20 @@ Batch job
 Dávkový soubor
 Big thanks for localizing FreeFileSync goes out to:
 Poděkování za překlad FreeFileSync:
+Both sides have changed since last synchronization!
+Došlo ke změně obou stran od poslední synchronizace!
 Browse
 Procházet
 Build:
 Build:
 Cancel
 Zrušit
+Cannot determine sync-direction: Changed filter settings!
+Nelze určit směr synchronizace: Změňte nastavení filtru!
+Cannot determine sync-direction: No change since last synchronization!
+Nelze určit směr synchronizace: Nedošlo ke změnám od poslední synchronizace!
+Category
+Kategorie
 Change direction
 Změnit akci
 Check all
@@ -289,7 +303,7 @@ Datum
 Delay
 Zpoždění
 Delay between detection of changes and execution of commandline in seconds
-Zpoždění detekce změn a suštění příkazu v sekundách
+Zpoždění detekce změn a spuštění příkazu v sekundách
 Delete files/folders existing on left side only
 Smazat soubory/adresáře existující pouze na levé straně
 Delete files/folders existing on right side only
@@ -323,7 +337,7 @@ Adresář neexistuje:
 Do not display visual status information but write to a logfile instead
 Nezobrazovat informace o stavu ale zapisovat přímo do souboru záznamů
 Do not show this dialog again
-tento dialog již nezobrazovat
+Tento dialog již nezobrazovat
 Do nothing
 Nic nedělat
 Do you really want to delete the following objects(s)?
@@ -376,6 +390,8 @@ Error reading file attributes:
 Chyba čtení atributů souboru:
 Error reading file:
 Chyba čtení souboru:
+Error reading from synchronization database:
+Chyba čtení synchronizační databáze:
 Error resolving symbolic link:
 Chyba odkazu zástupce:
 Error starting Volume Shadow Copy Service!
@@ -388,8 +404,10 @@ Error writing file attributes:
 Chyba zápisu atributů souboru:
 Error writing file:
 Chyba zápisu souboru:
-Error: Source directory does not exist anymore:
-Chyba: Zdrojový adresář již neexistuje:
+Error writing to synchronization database:
+Chyba zápisu synchronizační databáze:
+Source directory does not exist anymore:
+Zdrojový adresář již neexistuje:
 Example
 Příklad
 Exclude
@@ -399,9 +417,9 @@ Vynechat dočasně
 Exclude via filter:
 Vynechat pomocí filtru:
 Exit immediately and set returncode < 0
-Ukočit okamžitě a nastavit návratový kód < 0
+Ukončit okamžitě a nastavit návratový kód < 0
 Exit with RC < 0
-Ukočit s RC < 0
+Ukončit s RC < 0
 External applications
 Externí aplikace
 Feedback and suggestions are welcome at:
@@ -433,15 +451,15 @@ Zbývá souborů:
 Files that are equal on both sides
 Soubory shodné na obou stranách
 Files that exist on both sides and have different content
-Soubory, ketré existují na obou stranách a liší se obsahem
+Soubory, které existují na obou stranách a liší se obsahem
 Files that exist on both sides, left one is newer
 Soubory, které existují na obou stranách, z nichž vlevo je novější
 Files that exist on both sides, right one is newer
-Soubory, které existujé na obou stranách, z nichž vpravo je novější
+Soubory, které existují na obou stranách, z nichž vpravo je novější
+Files/folders found:
+Nalezené soubory/adresáře:
 Files/folders remaining:
 Zbývá souborů/adresářů:
-Files/folders scanned:
-Zpracované soubory/adresáře:
 Files/folders that exist on left side only
 Soubory/adresáře, které existují pouze vlevo
 Files/folders that exist on right side only
@@ -472,6 +490,8 @@ FreeFileSync is up to date!
 FreeFileSync je aktuální!
 Full path
 Plná cesta
+Generating database...
+Vytváření databáze...
 Generating file list...
 Vytváření seznamu souborů...
 Global settings
@@ -536,12 +556,16 @@ Include temporarily
 Přidat dočasně
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
 Přidat: *.doc;*.zip;*.exe\nVynechat: temp\\*
+Incompatible synchronization database format:
+Chyba formátu synchronizační databáze:
 Info
 Info
 Information
 Informace
+Initial synchronization. Please verify default copy-directions!
+Prvotní synchronizace. Prosím ověřte základní nastavení směru synchronizace!
 Integrate external applications into context menu. The following macros are available:
-Integrace externí apilkace do kontextového menu. K dispozici jsou následující makra:
+Integrace externí aplikace do kontextového menu. K dispozici jsou následující makra:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 Nebylo možné inicializovat Koš!\n\nPravděpodobně nepoužíváte Windows.\nPokud chcete tuto vlastnost využívat, kontaktujte autora. :)
 Leave as unresolved conflict
@@ -575,9 +599,11 @@ Přesouvání %x do Koše.
 Moving file %x to user-defined directory %y
 Přesouvání souboru %x do uživatelského adresáře %y
 Moving folder %x to user-defined directory %y
-Přesouvání adrsáře %x do uživatelského adresáře %y
+Přesouvání adresáře %x do uživatelského adresáře %y
 Multiple...
 Několikanásobný...
+No database file existing yet:
+Synchronizační databáze ještě neexistuje:
 Not enough free disk space available in:
 Nedostatek místa na disku:
 Nothing to synchronize according to configuration!
@@ -592,6 +618,12 @@ OK
 OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Pouze soubory/adresáře odpovídající nastavenému filtru budou vybrány pro synchronizaci. Filtr je aplikován relativně(!) k cestě synchronizovaných adresářů.
+Open directly
+Otevřít přímo
+Open with Explorer
+Otevřít v Průzkumníkovi
+Open with Konqueror
+Otevřít v Prohlížeči
 Operation aborted!
 Operace zrušena!
 Operation:
@@ -627,13 +659,11 @@ Odstranit jiné nastavení
 Remove folder
 Odstranit adresář
 Remove folder pair
-Odtsranit dvojici adresářů
+Odstranit dvojici adresářů
 Report translation error
 Hlásit chyby překladu
 Reset
 Resetovat
-Result
-Výsledek
 Right
 Pravý
 S&ave configuration
@@ -727,9 +757,11 @@ Nastavení synchronizace
 Synchronization status
 Stav synchronizace
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
-Synchronizuj všechny soubory .doc, .zip a .exe s výjimkou všeho v podadresáři \"temp\"
+Synchronizovat všechny soubory .doc, .zip a .exe s výjimkou všeho v podadresáři \"temp\"
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
-Synchronizuj obě strany zároveň: Kopíruj nové nebo aktualizované soubory z obou adresářů.
+Synchronizovat obě strany zároveň: Kopírovat nové nebo aktualizované soubory z obou adresářů.
+Synchronize both sides using a database. Deletions are detected automatically.
+Synchronizovat obě strany pomocí databáze. Mazání je určeno automaticky.
 Synchronize...
 Synchronizace...
 Synchronizing...
@@ -743,7 +775,7 @@ Cílový soubor již existuje!
 The file does not contain a valid configuration:
 Soubor neobsahuje platnou konfiguraci:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
-Tato variantra vyhodnotí dva stejně pojmenované soubory jako shodné pokud mají i stejnou velikost A ZÁROVEŇ i datum a čas poslední změny.
+Tato varianta vyhodnotí dva stejně pojmenované soubory jako shodné pokud mají i stejnou velikost A ZÁROVEŇ i datum a čas poslední změny.
 Time
 Čas
 Time elapsed:
@@ -782,6 +814,8 @@ User-defined directory
 Uživatelsky definovaný adresář
 User-defined directory for deletion was not specified!
 Uživatelsky definovaný adresář pro mazání nebyl zadán!
+Using default synchronization directions. Please recheck.
+Použito předdefinované nastavení. Prosím překontrolujte nastavení.
 Variant
 Varianta
 Verifying file %x
@@ -791,11 +825,13 @@ Disk %x není součástí jména souboru %y!
 Warning
 Varování
 Warning: Synchronization failed for %x item(s):
-Varování: Synchornizace se nepovedla pro \"%x\" položek:
+Varování: Synchronizace se nepovedla pro \"%x\" položek:
 When the comparison is started with this option set the following decision tree is processed:
 Když je zahájeno porovnávání s tímto nastavením, je použito následující schéma rozhodování:
 You can ignore the error to consider not existing directories as empty.
-Chybu považovaní neexistující adresářů jako prázdných můžete ignorovat.
+Pro považování neexistujících adresářů jako prázdných můžete chybu ignorovat.
+You can ignore the error to skip current folder pair.
+Pro přeskočení aktuálního páru adresářů můžete chybu ignorovat.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Můžete se pokusit synchronizovat zbývající položky (BEZ nutnosti znovuporovnávání)!
 different

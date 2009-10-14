@@ -2,6 +2,7 @@
 #include "systemConstants.h"
 #include "systemFunctions.h"
 #include <wx/intl.h>
+#include "stringConv.h"
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -108,11 +109,11 @@ private:
 template <bool traverseDirectorySymlinks>
 bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback* sink, const int level)
 {
-    using FreeFileSync::TraverseCallback;
+    using namespace FreeFileSync;
 
     if (level == 100) //catch endless recursion
     {
-        switch (sink->onError(wxString(_("Endless loop when traversing directory:")) + wxT("\n\"") + directory + wxT("\"")))
+        switch (sink->onError(wxString(_("Endless loop when traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"")))
         {
         case TraverseCallback::TRAVERSING_STOP:
             return false;
@@ -139,7 +140,7 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
             return true;
 
         //else: we have a problem... report it:
-        const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"") ;
+        const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") ;
         switch (sink->onError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted(lastError)))
         {
         case TraverseCallback::TRAVERSING_STOP:
@@ -151,7 +152,8 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
     CloseFindHandleOnExit dummy(searchHandle);
 
     do
-    {   //don't return "." and ".."
+    {
+        //don't return "." and ".."
         const wxChar* const shortName = fileMetaData.cFileName;
         if (    shortName[0] == wxChar('.') &&
                 ((shortName[1] == wxChar('.') && shortName[2] == wxChar('\0')) ||
@@ -211,7 +213,7 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
         return true; //everything okay
 
     //else: we have a problem... report it:
-    const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"") ;
+    const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") ;
     switch (sink->onError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted(lastError)))
     {
     case TraverseCallback::TRAVERSING_STOP:
@@ -224,7 +226,7 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
     DIR* dirObj = ::opendir(directory.c_str()); //directory must NOT end with path separator, except "/"
     if (dirObj == NULL)
     {
-        const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"") ;
+        const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") ;
         switch (sink->onError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted()))
         {
         case TraverseCallback::TRAVERSING_STOP:
@@ -245,7 +247,7 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
                 return true; //everything okay
 
             //else: we have a problem... report it:
-            const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"") ;
+            const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") ;
             switch (sink->onError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted()))
             {
             case TraverseCallback::TRAVERSING_STOP:
@@ -256,7 +258,7 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
         }
 
         //don't return "." and ".."
-        const wxChar* const shortName = dirEntry->d_name;
+        const DefaultChar* const shortName = dirEntry->d_name;
         if (      shortName[0] == wxChar('.') &&
                   ((shortName[1] == wxChar('.') && shortName[2] == wxChar('\0')) ||
                    shortName[1] == wxChar('\0')))
@@ -269,7 +271,7 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
         struct stat fileInfo;
         if (lstat(fullName.c_str(), &fileInfo) != 0) //lstat() does not resolve symlinks
         {
-            const wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + fullName.c_str() + wxT("\"");
+            const wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(fullName) + wxT("\"");
             switch (sink->onError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted()))
             {
             case TraverseCallback::TRAVERSING_STOP:

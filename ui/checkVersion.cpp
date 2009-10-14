@@ -13,8 +13,8 @@ class CloseConnectionOnExit
 {
 public:
     CloseConnectionOnExit(wxInputStream* httpStream, wxHTTP& webAccess) :
-            m_httpStream(httpStream),
-            m_webAccess(webAccess) {}
+        m_httpStream(httpStream),
+        m_webAccess(webAccess) {}
 
     ~CloseConnectionOnExit()
     {

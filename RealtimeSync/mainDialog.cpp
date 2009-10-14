@@ -12,6 +12,9 @@
 #include "../shared/fileHandling.h"
 #include "xmlFreeFileSync.h"
 #include "../shared/systemConstants.h"
+#include "../shared/stringConv.h"
+
+using namespace FreeFileSync;
 
 
 MainDialog::MainDialog(wxDialog *dlg, const wxString& cfgFilename)
@@ -75,8 +78,8 @@ MainDialog::MainDialog(wxDialog *dlg, const wxString& cfgFilename)
 
     if (startWatchingImmediately) //start watch mode directly
     {
-        wxCommandEvent dummy(wxEVT_COMMAND_BUTTON_CLICKED);
-        this->OnStart(dummy);
+        wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED);
+        this->OnStart(dummy2);
     }
 }
 
@@ -111,9 +114,9 @@ void MainDialog::OnQuit(wxCommandEvent &event)
 
 const wxString& MainDialog::lastConfigFileName()
 {
-    static wxString instance = FreeFileSync::getConfigDir().EndsWith(wxString(globalFunctions::FILE_NAME_SEPARATOR)) ?
+    static wxString instance = FreeFileSync::getConfigDir().EndsWith(zToWx(globalFunctions::FILE_NAME_SEPARATOR)) ?
                                FreeFileSync::getConfigDir() + wxT("LastRun.ffs_real") :
-                               FreeFileSync::getConfigDir() + globalFunctions::FILE_NAME_SEPARATOR + wxT("LastRun.ffs_real");
+                               FreeFileSync::getConfigDir() + zToWx(globalFunctions::FILE_NAME_SEPARATOR) + wxT("LastRun.ffs_real");
     return instance;
 }
 
@@ -249,9 +252,9 @@ void MainDialog::setConfiguration(const xmlAccess::XmlRealConfig& cfg)
         //fill top folder
         m_txtCtrlDirectoryMain->SetValue(*cfg.directories.begin());
 
-        const wxString dirFormatted = FreeFileSync::getFormattedDirectoryName(cfg.directories.begin()->c_str()).c_str();
-        if (wxDirExists(dirFormatted))
-            m_dirPickerMain->SetPath(dirFormatted);
+        const Zstring dirFormatted = FreeFileSync::getFormattedDirectoryName(wxToZ(*cfg.directories.begin()));
+        if (dirExists(dirFormatted))
+            m_dirPickerMain->SetPath(zToWx(dirFormatted));
 
         //fill additional folders
         addFolder(std::vector<wxString>(cfg.directories.begin() + 1, cfg.directories.end()));

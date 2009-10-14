@@ -1,6 +1,8 @@
 #include "smallDialogs.h"
 #include "../library/resources.h"
 #include "../algorithm.h"
+#include "../shared/stringConv.h"
+#include "util.h"
 #include "../synchronization.h"
 #include <wx/msgdlg.h>
 #include "../library/customGrid.h"
@@ -127,18 +129,18 @@ void HelpDlg::OnOK(wxCommandEvent& event)
 //########################################################################################
 
 
-FilterDlg::FilterDlg(wxWindow* window, wxString& filterIncl, wxString& filterExcl) :
-        FilterDlgGenerated(window),
-        includeFilter(filterIncl),
-        excludeFilter(filterExcl)
+FilterDlg::FilterDlg(wxWindow* window, Zstring& filterIncl, Zstring& filterExcl) :
+    FilterDlgGenerated(window),
+    includeFilter(filterIncl),
+    excludeFilter(filterExcl)
 {
     m_bitmap8->SetBitmap(*GlobalResources::getInstance().bitmapInclude);
     m_bitmap9->SetBitmap(*GlobalResources::getInstance().bitmapExclude);
     m_bitmap26->SetBitmap(*GlobalResources::getInstance().bitmapFilter);
     m_bpButtonHelp->SetBitmapLabel(*GlobalResources::getInstance().bitmapHelp);
 
-    m_textCtrlInclude->SetValue(includeFilter);
-    m_textCtrlExclude->SetValue(excludeFilter);
+    m_textCtrlInclude->SetValue(zToWx(includeFilter));
+    m_textCtrlExclude->SetValue(zToWx(excludeFilter));
 
     m_panel13->Hide();
     m_button10->SetFocus();
@@ -160,8 +162,8 @@ void FilterDlg::OnHelp(wxCommandEvent& event)
 
 void FilterDlg::OnDefault(wxCommandEvent& event)
 {
-    m_textCtrlInclude->SetValue(wxT("*"));
-    m_textCtrlExclude->SetValue(wxEmptyString);
+    m_textCtrlInclude->SetValue(zToWx(defaultIncludeFilter()));
+    m_textCtrlExclude->SetValue(zToWx(defaultExcludeFilter()));
 
     //changes to mainDialog are only committed when the OK button is pressed
     event.Skip();
@@ -171,8 +173,8 @@ void FilterDlg::OnDefault(wxCommandEvent& event)
 void FilterDlg::OnApply(wxCommandEvent& event)
 {
     //only if user presses ApplyFilter, he wants the changes to be committed
-    includeFilter = m_textCtrlInclude->GetValue();
-    excludeFilter = m_textCtrlExclude->GetValue();
+    includeFilter = wxToZ(m_textCtrlInclude->GetValue());
+    excludeFilter = wxToZ(m_textCtrlExclude->GetValue());
 
     //when leaving dialog: filter and redraw grid, if filter is active
     EndModal(BUTTON_APPLY);
@@ -198,12 +200,12 @@ DeleteDialog::DeleteDialog(wxWindow* main,
                            bool& deleteOnBothSides,
                            bool& useRecycleBin,
                            int& totalDeleteCount) :
-        DeleteDlgGenerated(main),
-        rowsToDeleteOnLeft(rowsOnLeft),
-        rowsToDeleteOnRight(rowsOnRight),
-        m_deleteOnBothSides(deleteOnBothSides),
-        m_useRecycleBin(useRecycleBin),
-        totalDelCount(totalDeleteCount)
+    DeleteDlgGenerated(main),
+    rowsToDeleteOnLeft(rowsOnLeft),
+    rowsToDeleteOnRight(rowsOnRight),
+    m_deleteOnBothSides(deleteOnBothSides),
+    m_useRecycleBin(useRecycleBin),
+    totalDelCount(totalDeleteCount)
 {
     m_checkBoxDeleteBothSides->SetValue(deleteOnBothSides);
     m_checkBoxUseRecycler->SetValue(useRecycleBin);
@@ -279,8 +281,8 @@ void DeleteDialog::OnUseRecycler(wxCommandEvent& event)
 
 
 ErrorDlg::ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxString messageText, bool& ignoreNextErrors) :
-        ErrorDlgGenerated(parentWindow),
-        ignoreErrors(ignoreNextErrors)
+    ErrorDlgGenerated(parentWindow),
+    ignoreErrors(ignoreNextErrors)
 {
     m_bitmap10->SetBitmap(*GlobalResources::getInstance().bitmapError);
     m_textCtrl8->SetValue(messageText);
@@ -340,8 +342,8 @@ void ErrorDlg::OnAbort(wxCommandEvent& event)
 
 
 WarningDlg::WarningDlg(wxWindow* parentWindow,  int activeButtons, const wxString messageText, bool& dontShowDlgAgain) :
-        WarningDlgGenerated(parentWindow),
-        dontShowAgain(dontShowDlgAgain)
+    WarningDlgGenerated(parentWindow),
+    dontShowAgain(dontShowDlgAgain)
 {
     m_bitmap10->SetBitmap(*GlobalResources::getInstance().bitmapWarning);
     m_textCtrl8->SetValue(messageText);
@@ -389,13 +391,16 @@ void WarningDlg::OnAbort(wxCommandEvent& event)
 //########################################################################################
 
 
-QuestionDlg::QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxString messageText, bool& dontShowDlgAgain) :
-        QuestionDlgGenerated(parentWindow),
-        dontShowAgain(dontShowDlgAgain)
+QuestionDlg::QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxString messageText, bool* dontShowDlgAgain) :
+    QuestionDlgGenerated(parentWindow),
+    dontShowAgain(dontShowDlgAgain)
 {
     m_bitmap10->SetBitmap(*GlobalResources::getInstance().bitmapQuestion);
     m_textCtrl8->SetValue(messageText);
-    m_checkBoxDontAskAgain->SetValue(dontShowAgain);
+    if (dontShowAgain)
+        m_checkBoxDontAskAgain->SetValue(*dontShowAgain);
+    else
+        m_checkBoxDontAskAgain->Hide();
 
     if (~activeButtons & BUTTON_YES)
         m_buttonYes->Hide();
@@ -421,27 +426,31 @@ QuestionDlg::QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxStri
 
 void QuestionDlg::OnClose(wxCloseEvent& event)
 {
-    dontShowAgain = m_checkBoxDontAskAgain->GetValue();
+    if (dontShowAgain)
+        *dontShowAgain = m_checkBoxDontAskAgain->GetValue();
     EndModal(BUTTON_CANCEL);
 }
 
 
 void QuestionDlg::OnCancel(wxCommandEvent& event)
 {
-    dontShowAgain = m_checkBoxDontAskAgain->GetValue();
+    if (dontShowAgain)
+        *dontShowAgain = m_checkBoxDontAskAgain->GetValue();
     EndModal(BUTTON_CANCEL);
 }
 
 
 void QuestionDlg::OnYes(wxCommandEvent& event)
 {
-    dontShowAgain = m_checkBoxDontAskAgain->GetValue();
+    if (dontShowAgain)
+        *dontShowAgain = m_checkBoxDontAskAgain->GetValue();
     EndModal(BUTTON_YES);
 }
 
 void QuestionDlg::OnNo(wxCommandEvent& event)
 {
-    dontShowAgain = m_checkBoxDontAskAgain->GetValue();
+    if (dontShowAgain)
+        *dontShowAgain = m_checkBoxDontAskAgain->GetValue();
     EndModal(BUTTON_NO);
 }
 
@@ -449,9 +458,9 @@ void QuestionDlg::OnNo(wxCommandEvent& event)
 
 
 CustomizeColsDlg::CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes& attr, bool& showFileIcons) :
-        CustomizeColsDlgGenerated(window),
-        output(attr),
-        m_showFileIcons(showFileIcons)
+    CustomizeColsDlgGenerated(window),
+    output(attr),
+    m_showFileIcons(showFileIcons)
 {
     m_bpButton29->SetBitmapLabel(*GlobalResources::getInstance().bitmapMoveUp);
     m_bpButton30->SetBitmapLabel(*GlobalResources::getInstance().bitmapMoveDown);
@@ -566,8 +575,8 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
                                const wxString& variantName,
                                const FreeFileSync::SyncStatistics& statistics,
                                bool& dontShowAgain) :
-        SyncPreviewDlgGenerated(parentWindow),
-        m_dontShowAgain(dontShowAgain)
+    SyncPreviewDlgGenerated(parentWindow),
+    m_dontShowAgain(dontShowAgain)
 {
     using FreeFileSync::includeNumberSeparator;
     using globalFunctions::numberToWxString;
@@ -619,8 +628,8 @@ void SyncPreviewDlg::OnStartSync(wxCommandEvent& event)
 //########################################################################################
 
 CompareCfgDialog::CompareCfgDialog(wxWindow* parentWindow, const wxPoint& position, CompareVariant& cmpVar) :
-        CmpCfgDlgGenerated(parentWindow),
-        m_cmpVar(cmpVar)
+    CmpCfgDlgGenerated(parentWindow),
+    m_cmpVar(cmpVar)
 {
     //move dialog up so that compare-config button and first config-variant are on same level
     Move(wxPoint(position.x, std::max(0, position.y - (m_buttonTimeSize->GetScreenPosition() - GetScreenPosition()).y)));
@@ -676,8 +685,8 @@ void CompareCfgDialog::OnShowHelp(wxCommandEvent& event)
 
 //########################################################################################
 GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSettings& globalSettings) :
-        GlobalSettingsDlgGenerated(window),
-        settings(globalSettings)
+    GlobalSettingsDlgGenerated(window),
+    settings(globalSettings)
 {
     m_bitmapSettings->SetBitmap(*GlobalResources::getInstance().bitmapSettings);
     m_buttonResetDialogs->setBitmapFront(*GlobalResources::getInstance().bitmapWarningSmall, 5);
@@ -716,8 +725,11 @@ void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 
 void GlobalSettingsDlg::OnResetDialogs(wxCommandEvent& event)
 {
-    wxMessageDialog* messageDlg = new wxMessageDialog(this, _("Re-enable all hidden dialogs?"), _("Warning") , wxOK | wxCANCEL);
-    if (messageDlg->ShowModal() == wxID_OK)
+    QuestionDlg* messageDlg = new QuestionDlg(this,
+            QuestionDlg::BUTTON_YES | QuestionDlg::BUTTON_CANCEL,
+            _("Re-enable all hidden dialogs?"));
+
+    if (messageDlg->ShowModal() == QuestionDlg::BUTTON_YES)
         settings.optDialogs.resetDialogs();
 }
 
@@ -776,7 +788,12 @@ void GlobalSettingsDlg::OnAddRow(wxCommandEvent& event)
 {
     wxWindowUpdateLocker dummy(this); //avoid display distortion
 
-    m_gridCustomCommand->AppendRows();
+    const int selectedRow = m_gridCustomCommand->GetGridCursorRow();
+    if (0 <= selectedRow && selectedRow < m_gridCustomCommand->GetNumberRows())
+        m_gridCustomCommand->InsertRows(selectedRow);
+    else
+        m_gridCustomCommand->AppendRows();
+
     Fit();
 }
 
@@ -787,7 +804,12 @@ void GlobalSettingsDlg::OnRemoveRow(wxCommandEvent& event)
     {
         wxWindowUpdateLocker dummy(this); //avoid display distortion
 
-        m_gridCustomCommand->DeleteRows(m_gridCustomCommand->GetNumberRows() - 1);
+        const int selectedRow = m_gridCustomCommand->GetGridCursorRow();
+        if (0 <= selectedRow && selectedRow < m_gridCustomCommand->GetNumberRows())
+            m_gridCustomCommand->DeleteRows(selectedRow);
+        else
+            m_gridCustomCommand->DeleteRows(m_gridCustomCommand->GetNumberRows() - 1);
+
         Fit();
     }
 }
@@ -795,16 +817,16 @@ void GlobalSettingsDlg::OnRemoveRow(wxCommandEvent& event)
 //########################################################################################
 
 CompareStatus::CompareStatus(wxWindow* parentWindow) :
-        CompareStatusGenerated(parentWindow),
-        scannedObjects(0),
-        totalObjects(0),
-        totalData(0),
-        currentObjects(0),
-        currentData(0),
-        scalingFactor(0),
-        statistics(NULL),
-        lastStatCallSpeed(-1000000), //some big number
-        lastStatCallRemTime(-1000000)
+    CompareStatusGenerated(parentWindow),
+    scannedObjects(0),
+    totalObjects(0),
+    totalData(0),
+    currentObjects(0),
+    currentData(0),
+    scalingFactor(0),
+    statistics(NULL),
+    lastStatCallSpeed(-1000000), //some big number
+    lastStatCallRemTime(-1000000)
 {
     init();
 }
@@ -892,7 +914,7 @@ void CompareStatus::updateStatusPanelNow()
         bool screenChanged = false; //avoid screen flicker by calling layout() only if necessary
 
         //remove linebreaks from currentStatusText
-        wxString formattedStatusText = currentStatusText.c_str();
+        wxString formattedStatusText = zToWx(currentStatusText);
         for (wxString::iterator i = formattedStatusText.begin(); i != formattedStatusText.end(); ++i)
             if (*i == wxChar('\n'))
                 *i = wxChar(' ');
@@ -960,20 +982,20 @@ void CompareStatus::updateStatusPanelNow()
 //########################################################################################
 
 SyncStatus::SyncStatus(StatusHandler* updater, wxWindow* parentWindow) :
-        SyncStatusDlgGenerated(parentWindow),
-        currentStatusHandler(updater),
-        windowToDis(parentWindow),
-        currentProcessIsRunning(true),
-        totalObjects(0),
-        totalData(0),
-        currentObjects(0),
-        currentData(0),
-        scalingFactor(0),
-        processPaused(false),
-        currentStatus(SyncStatus::ABORTED),
-        statistics(NULL),
-        lastStatCallSpeed(-1000000), //some big number
-        lastStatCallRemTime(-1000000)
+    SyncStatusDlgGenerated(parentWindow),
+    currentStatusHandler(updater),
+    windowToDis(parentWindow),
+    currentProcessIsRunning(true),
+    totalObjects(0),
+    totalData(0),
+    currentObjects(0),
+    currentData(0),
+    scalingFactor(0),
+    processPaused(false),
+    currentStatus(SyncStatus::ABORTED),
+    statistics(NULL),
+    lastStatCallSpeed(-1000000), //some big number
+    lastStatCallRemTime(-1000000)
 {
     m_animationControl1->SetAnimation(*GlobalResources::getInstance().animationSync);
     m_animationControl1->Play();
@@ -1050,8 +1072,9 @@ void SyncStatus::updateStatusDialogNow()
         m_gauge1->SetValue(globalFunctions::round(currentData.ToDouble() * scalingFactor));
 
         //status text
-        if (m_textCtrlInfo->GetValue() != wxString(currentStatusText.c_str()) && (screenChanged = true)) //avoid screen flicker
-            m_textCtrlInfo->SetValue(currentStatusText.c_str());
+        const wxString statusTxt = zToWx(currentStatusText);
+        if (m_textCtrlInfo->GetValue() != statusTxt && (screenChanged = true)) //avoid screen flicker
+            m_textCtrlInfo->SetValue(statusTxt);
 
         //remaining objects
         const wxString remainingObjTmp = globalFunctions::numberToWxString(totalObjects - currentObjects);
@@ -1157,8 +1180,9 @@ void SyncStatus::setCurrentStatus(SyncStatusID id)
 }
 
 
-void SyncStatus::processHasFinished(SyncStatusID id) //essential to call this in StatusHandler derived class destructor
-{                                                    //at the LATEST(!) to prevent access to currentStatusHandler
+void SyncStatus::processHasFinished(SyncStatusID id, const wxString& finalMessage) //essential to call this in StatusHandler derived class destructor
+{
+    //at the LATEST(!) to prevent access to currentStatusHandler
     currentProcessIsRunning = false; //enable okay and close events; may be set in this method ONLY
 
     setCurrentStatus(id);
@@ -1177,6 +1201,7 @@ void SyncStatus::processHasFinished(SyncStatusID id) //essential to call this in
     bSizerRemTime->Show(false);
 
     updateStatusDialogNow(); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
+    m_textCtrlInfo->SetValue(finalMessage);
     Layout();                //
 }
 
@@ -1230,7 +1255,7 @@ void SyncStatus::OnAbort(wxCommandEvent& event)
         m_buttonPause->Disable();
         m_buttonPause->Hide();
 
-        setStatusText_NoUpdate(_("Abort requested: Waiting for current operation to finish..."));
+        setStatusText_NoUpdate(wxToZ(_("Abort requested: Waiting for current operation to finish...")));
         //no Layout() or UI-update here to avoid cascaded Yield()-call
 
         currentStatusHandler->requestAbortion();

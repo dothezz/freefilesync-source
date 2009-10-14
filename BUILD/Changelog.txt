@@ -2,6 +2,24 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.0
+--------------
+New synchronization mode: <Automatic>
+Consolidated batch mode error handling
+Fixed crash when comparing multiple pairs by content
+Fixed calculation of remaining objects
+Fixed swapping grids
+Show scanned files when traversing with filter enabled
+New default filter values
+New macros %time%, %date% for creating time-stamped directories
+Avoid corrupted data when program is terminated unexpectedly
+Prevent deletion when source-directory (temporarily) is not accessible
+Native Unicode support for Linux build
+Added Romanian translation
+Added Turkish translation
+Updated translation files
+
+
 Changelog v2.3
 --------------
 New filter and sync configuration at folder pair level
@@ -13,7 +31,7 @@ Removed performance penalty when using include filters
 Improved filter syntax for strings beginning with wildcards
 Default handling for conflict files now configurable
 New option to show all hidden dialogs again
-Fixed issue with makros %nameCo, %dirCo
+Fixed issue with macros %nameCo, %dirCo
 New option in *.ffs_gui/ffs_batch files: Verify copied files
 Use Windows Volume Shadow Copy for shared and locked files(new)
 More detailed information in *.cvs export

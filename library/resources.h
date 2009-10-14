@@ -123,7 +123,9 @@ public:
     wxBitmap* bitmapFrance;
     wxBitmap* bitmapGermany;
     wxBitmap* bitmapHungary;
+    wxBitmap* bitmapRomania;
     wxBitmap* bitmapTaiwan;
+    wxBitmap* bitmapTurkey;
     wxBitmap* bitmapItaly;
     wxBitmap* bitmapJapan;
     wxBitmap* bitmapPoland;

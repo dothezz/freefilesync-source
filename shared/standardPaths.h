@@ -9,11 +9,11 @@ namespace FreeFileSync
 //------------------------------------------------------------------------------
 //global functions
 //------------------------------------------------------------------------------
-    const wxString& getGlobalConfigFile();
-    const wxString& getDefaultLogDirectory();
-    const wxString& getLastErrorTxtFile();
-    const wxString& getInstallationDir(); //FreeFileSync installation directory without path separator
-    const wxString& getConfigDir();
+const wxString& getGlobalConfigFile();
+const wxString& getDefaultLogDirectory();
+const wxString& getLastErrorTxtFile();
+const wxString& getInstallationDir(); //FreeFileSync installation directory without path separator
+const wxString& getConfigDir();
 //------------------------------------------------------------------------------
 }
 

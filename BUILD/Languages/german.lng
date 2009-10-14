@@ -138,6 +138,8 @@ Konfiguration &laden
 2. Die Platzhalter '*' und '?' werden unterstützt.
 3. Exclude files directly on main grid via context menu.
 3. Dateien können direkt über das Kontextmenü im Hauptfenster ausgeschlossen werden.
+<Automatic>
+<Automatik>
 <Directory>
 <Verzeichnis>
 <Last session>
@@ -146,6 +148,8 @@ Konfiguration &laden
 <Mehrfachauswahl>
 A newer version of FreeFileSync is available:
 Eine neuere Version von FreeFileSync ist verfügbar:
+ATTENTION: Failed directory access can lead to file deletions!
+ACHTUNG: Fehler beim Verzeichniszugriff können zum Löschen von Dateien führen!
 Abort requested: Waiting for current operation to finish...
 Abbruch initiiert: Warte, bis aktuelle Operation beendet ist...
 Aborted
@@ -168,6 +172,8 @@ Assemble a batch file for automated synchronization. To start in batch mode simp
 Erzeuge eine Batchdatei für die automatisierte Synchronisation. Um den Batch-Modus zu starten, muss nur der Dateiname an die Programmdatei übergeben werden: FreeFileSync.exe <Batchdatei>. Dies kann auch in den Taskplaner des Betriebssystems eingetragen werden.
 Auto-adjust columns
 Spalten automatisch anpassen
+Automatic mode
+Automatik Modus
 Batch execution
 Batchlauf
 Batch file created successfully!
@@ -176,12 +182,20 @@ Batch job
 Batch-Job
 Big thanks for localizing FreeFileSync goes out to:
 Vielen Dank für die Lokalisation von FreeFileSync an:
+Both sides have changed since last synchronization!
+Beide Seiten wurden seit der letzten Synchronisation verändert!
 Browse
 Auswählen
 Build:
 Build:
 Cancel
 Abbrechen
+Cannot determine sync-direction: Changed filter settings!
+Synchronisationsrichtung konnte nicht bestimmt werden:  Filtereinstellungen wurden geändert!
+Cannot determine sync-direction: No change since last synchronization!
+Synchronisationsrichtung konnte nicht bestimmt werden: Keine Änderungen seit der letzten Synchronisation!
+Category
+Kategorie
 Change direction
 Richtung ändern
 Check all
@@ -376,6 +390,8 @@ Error reading file attributes:
 Fehler beim Lesen der Dateiattribute:
 Error reading file:
 Fehler beim Lesen der Datei:
+Error reading from synchronization database:
+Fehler beim Lesen der Synchronisationsdatenbank:
 Error resolving symbolic link:
 Fehler beim Auflösen des Symbolischen Links:
 Error starting Volume Shadow Copy Service!
@@ -388,8 +404,10 @@ Error writing file attributes:
 Fehler beim Schreiben der Dateiattribute:
 Error writing file:
 Fehler beim Schreiben der Datei:
-Error: Source directory does not exist anymore:
-Fehler: Quellverzeichnis existiert nicht mehr:
+Error writing to synchronization database:
+Fehler beim Schreiben der Synchronisationsdatenbank:
+Source directory does not exist anymore:
+Quellverzeichnis existiert nicht mehr:
 Example
 Beispiel
 Exclude
@@ -438,10 +456,10 @@ Files that exist on both sides, left one is newer
 Auf beiden Seiten existierende Dateien; linke Datei ist neuer
 Files that exist on both sides, right one is newer
 Auf beiden Seiten existierende Dateien; rechte Datei ist neuer
+Files/folders found:
+Gefundene Dateien/Ordner:
 Files/folders remaining:
 Verbliebene Dateien/Ordner:
-Files/folders scanned:
-Eingelesene Dateien/Ordner:
 Files/folders that exist on left side only
 Nur links exisitierende Dateien/Verzeichnisse
 Files/folders that exist on right side only
@@ -472,6 +490,8 @@ FreeFileSync is up to date!
 FreeFileSync ist auf dem neuesten Stand!
 Full path
 Absoluter Pfad
+Generating database...
+Erzeuge Synchronisationsdatenbank...
 Generating file list...
 Erzeuge Dateiliste...
 Global settings
@@ -536,10 +556,14 @@ Include temporarily
 Temporär einschließen
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
 Einschließen: *.doc;*.zip;*.exe\nAusschließen: temp\\*
+Incompatible synchronization database format:
+Inkompatibles Datenbankformat:
 Info
 Info
 Information
 Information
+Initial synchronization. Please verify default copy-directions!
+Erstmalige Synchronisation. Bitte die gesetzten Kopierrichtungen überprüfen!
 Integrate external applications into context menu. The following macros are available:
 Integriert externe Anwendungen in das Kontextmenu. Die folgenden Makros stehen zur Verfügung:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +602,8 @@ Moving folder %x to user-defined directory %y
 Verschiebe Ordner %x in benutzerdefiniertes Verzeichnis %y
 Multiple...
 Verschiedene...
+No database file existing yet:
+Es existiert noch keine Datenbankdatei:
 Not enough free disk space available in:
 Nicht genügend freier Speicher verfügbar unter:
 Nothing to synchronize according to configuration!
@@ -592,6 +618,12 @@ OK
 OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Für die Synchronisation werden nur die Dateien/Verzeichnisse berücksichtigt, die den Filtereinstellungen genügen. Der Filter wird dabei auf den Dateinamen relativ(!) zu den Basis-Synchronisationsverzeichnissen angewandt.
+Open directly
+Direkt öffnen
+Open with Explorer
+Mit Explorer öffnen
+Open with Konqueror
+Mit Konqueror öffnen
 Operation aborted!
 Vorgang abgebrochen!
 Operation:
@@ -632,8 +664,6 @@ Report translation error
 Übersetzungsfehler melden
 Reset
 Zurücksetzen
-Result
-Ergebnis
 Right
 Rechts
 S&ave configuration
@@ -730,6 +760,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 Alle .doc, .zip und .exe Dateien mit Ausnahme des Verzeichnisses \"temp\" werden synchronisiert.
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Beide Seiten gleichzeitig synchronisieren: Neue oder aktualisierte Dateien werden in beide Richtungen kopiert.
+Synchronize both sides using a database. Deletions are detected automatically.
+Beide Seiten mit Hilfe einer Datenbank synchronisieren. Löschungen werden automatisch erkannt.
 Synchronize...
 Synchronisieren
 Synchronizing...
@@ -782,6 +814,8 @@ User-defined directory
 Benutzerdefiniertes Verzeichnis
 User-defined directory for deletion was not specified!
 Kein benutzerdefiniertes Verzeichnis zum Löschen angegeben!
+Using default synchronization directions. Please recheck.
+Benutze die Standard-Synchronisationsrichtungen. Bitte überprüfen.
 Variant
 Variante
 Verifying file %x
@@ -796,6 +830,8 @@ When the comparison is started with this option set the following decision tree 
 Wenn der Vergleich mit dieser Option gestartet wurde, wird folgender Entscheidungsbaum abgearbeitet:
 You can ignore the error to consider not existing directories as empty.
 Dieser Fehler kann ignoriert werden, um nicht existierende Verzeichnisse als leer anzusehen.
+You can ignore the error to skip current folder pair.
+Der Fehler kann ignoriert und das aktuelle Verzeichnispaar übersprungen werden.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Verbliebene Elemente können nochmals synchronisiert werden (OHNE dass ein erneuter Vergleich notwendig ist)!
 different

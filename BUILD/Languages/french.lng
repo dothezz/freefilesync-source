@@ -138,6 +138,8 @@
 2. Les caractères génériques '*' et '?' sont acceptés.
 3. Exclude files directly on main grid via context menu.
 3. Exclure les fichiers directement sur le tableau principal à l'aide du menu contextuel.
+<Automatic>
+<Automatique>
 <Directory>
 <Répertoire>
 <Last session>
@@ -168,6 +170,8 @@ Assemble a batch file for automated synchronization. To start in batch mode simp
 Créer un fichier de commandespour une synchronisation automatique. Pour démarrer en mode batch, indiquer le nom du fichier à l'exécutable FreeFileSync : freefilesync.exe <fichier de commandes>. Ceci peut aussi être programmé dans le plannificateur de tâches.
 Auto-adjust columns
 Auto-ajustement des colonnes
+Automatic mode
+Mode automatique
 Batch execution
 Exécution du fichier de commandes
 Batch file created successfully!
@@ -176,12 +180,20 @@ Batch job
 Fichier de commandes
 Big thanks for localizing FreeFileSync goes out to:
 Pour les traductions de FreeFileSync, un grand merci à :
+Both sides have changed since last synchronization!
+Les deux côtés ont changé depuis la dernière synchronisation !
 Browse
 Parcourir
 Build:
 Créé le :
 Cancel
 Annuler
+Cannot determine sync-direction: Changed filter settings!
+Impossible de déterminer le sens de la synchro : la configuration a été modifiée !
+Cannot determine sync-direction: No change since last synchronization!
+Impossible de déterminer le sens de la synchro : Aucune modification depuis la dernière synchro !
+Category
+Catégorie
 Change direction
 Changer la direction
 Check all
@@ -376,6 +388,8 @@ Error reading file attributes:
 Erreur lors de la lecture des attributs du fichier :
 Error reading file:
 Erreur lors de la lecture du fichier :
+Error reading from synchronization database:
+Erreur lors de la lecture de la base de données de synchro :
 Error resolving symbolic link:
 Erreur lors de la résolution du lien symbolique :
 Error starting Volume Shadow Copy Service!
@@ -388,8 +402,10 @@ Error writing file attributes:
 Erreur lors de l'écriture des attributs du fichier :
 Error writing file:
 Erreur lors de l'écriture du fichier :
-Error: Source directory does not exist anymore:
-Erreur : le répertoire source n'existe plus :
+Error writing to synchronization database:
+Erreur lors de l'écriture de la base de données de synchro :
+Source directory does not exist anymore:
+Le répertoire source n'existe plus :
 Example
 Exemple
 Exclude
@@ -438,10 +454,10 @@ Files that exist on both sides, left one is newer
 Fichiers existants des deux côtés, celui de gauche est plus récent
 Files that exist on both sides, right one is newer
 Fichiers existants des deux côtés, celui de droite est plus récent
+Files/folders found:
+Fichiers/Dossiers trouvés :
 Files/folders remaining:
 Fichiers/dossiers restants :
-Files/folders scanned:
-Fichiers/dossiers analysés :
 Files/folders that exist on left side only
 Fichiers/répertoires existants seulement à gauche
 Files/folders that exist on right side only
@@ -472,6 +488,8 @@ FreeFileSync is up to date!
 FreeFileSync a été mis à jour !
 Full path
 Chemin complet
+Generating database...
+Génération de la base de données...
 Generating file list...
 Génération de la liste des fichiers...
 Global settings
@@ -536,10 +554,14 @@ Include temporarily
 Inclure temporairement
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
 Inclure : *.doc;*.zip;*.exe\nExclure : temp\\*
+Incompatible synchronization database format:
+Format de la base de données de synchro incompatible :
 Info
 Info
 Information
 Information
+Initial synchronization. Please verify default copy-directions!
+Première synchronisation. Veuillez vérifier le sens de la copie par défaut !
 Integrate external applications into context menu. The following macros are available:
 Inclure les applications externes dans le menu contextuel. Les macros suivantes sont disponibles :
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +600,8 @@ Moving folder %x to user-defined directory %y
 Déplacement du dossier %x vers le répertoire défini par l'utilisateur %y
 Multiple...
 Multiple...
+No database file existing yet:
+Aucun fichier base de données n'existe actuellement :
 Not enough free disk space available in:
 Espace disque insuffisant sur :
 Nothing to synchronize according to configuration!
@@ -592,6 +616,12 @@ OK
 OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Seuls les fichiers/répertoires filtrés seront sélectionnés pour la synchronisation. Le filtre sera appliqué au nom relatif (!) pour les répertoires de synchroniqation de base.
+Open directly
+Ouvrir directement
+Open with Explorer
+Ouvrir avec Explorer
+Open with Konqueror
+Ouvrir avec Konqueror
 Operation aborted!
 Opération abandonnée !
 Operation:
@@ -632,8 +662,6 @@ Report translation error
 Etat d'erreurs de transfert
 Reset
 Réinitialiser
-Result
-Situation
 Right
 Droite
 S&ave configuration
@@ -730,6 +758,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 Synchroniser rous les fichiers .doc, .zip et .exe sauf ceux du dossier \"temp\".
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Synchronisation simultanée des deux côtés : Copie des fichiers nouveaux ou mis à jour.
+Synchronize both sides using a database. Deletions are detected automatically.
+Synchronisation des deux côtés à l'aide d'une base de données. Les suppressions sont détectées automatiquement.
 Synchronize...
 Synchroniser...
 Synchronizing...
@@ -782,6 +812,8 @@ User-defined directory
 Réoertoire défini par l'utilisateur
 User-defined directory for deletion was not specified!
 Le réoertoire défini par l'utilisateur pour la suppression n'a pas été indiqué !
+Using default synchronization directions. Please recheck.
+Sens de la synchronisation par défaut. Veuillez revérifier.
 Variant
 Variante
 Verifying file %x
@@ -796,6 +828,8 @@ When the comparison is started with this option set the following decision tree 
 Lorsque la comparaison démarre avec cette option, l'arbre de décision suivant est exécuté :
 You can ignore the error to consider not existing directories as empty.
 Vous pouvez ignorer l'erreur considérant qu'un dossier inexistant est vide.
+You can ignore the error to skip current folder pair.
+Vous pouvez ignorer l'erreur pour sauter la paire de dossiers courante.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Vous pouvez essayer de synchroniser à nouveau les éléments restants (SANS avoir à les re-comparer) !
 different

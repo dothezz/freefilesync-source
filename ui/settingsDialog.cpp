@@ -1,10 +1,12 @@
-#include "syncDialog.h"
+#include "settingsDialog.h"
 #include "../shared/systemConstants.h"
 #include "../library/resources.h"
 #include <wx/msgdlg.h>
 #include "../shared/customButton.h"
 #include "../synchronization.h"
-#include "../algorithm.h"
+//#include "../algorithm.h"
+#include "../shared/stringConv.h"
+#include "util.h"
 #include <wx/dnd.h>
 #include "../shared/dragAndDrop.h"
 #include "../shared/fileHandling.h"
@@ -21,14 +23,14 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* window,
                              DeletionPolicy&    handleDeletion,
                              wxString&          customDeletionDirectory,
                              bool*              ignoreErrors) :
-        SyncCfgDlgGenerated(window),
-        cmpVariant(compareVar),
-        localSyncConfiguration(syncConfiguration),  //make working copy of syncConfiguration
-        refSyncConfiguration(syncConfiguration),
-        refHandleDeletion(handleDeletion),
-        refCustomDeletionDirectory(customDeletionDirectory),
-        refIgnoreErrors(ignoreErrors),
-        dragDropCustomDelFolder(new DragDropOnDlg(m_panelCustomDeletionDir, m_dirPickerCustomDelFolder, m_textCtrlCustomDelFolder))
+    SyncCfgDlgGenerated(window),
+    cmpVariant(compareVar),
+    localSyncConfiguration(syncConfiguration),  //make working copy of syncConfiguration
+    refSyncConfiguration(syncConfiguration),
+    refHandleDeletion(handleDeletion),
+    refCustomDeletionDirectory(customDeletionDirectory),
+    refIgnoreErrors(ignoreErrors),
+    dragDropCustomDelFolder(new DragDropOnDlg(m_panelCustomDeletionDir, m_dirPickerCustomDelFolder, m_textCtrlCustomDelFolder))
 {
     setDeletionHandling(handleDeletion);
     m_textCtrlCustomDelFolder->SetValue(customDeletionDirectory);
@@ -55,23 +57,6 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* window,
 
     bSizer201->Layout(); //wxButtonWithImage size might have changed
 
-    //set radiobutton
-    switch (localSyncConfiguration.getVariant())
-    {
-    case SyncConfiguration::MIRROR:
-        m_radioBtn1->SetValue(true);      //one way ->
-        break;
-    case SyncConfiguration::UPDATE:
-        m_radioBtnUpdate->SetValue(true); //Update ->
-        break;
-    case SyncConfiguration::TWOWAY:
-        m_radioBtn2->SetValue(true);      //two way <->
-        break;
-    case SyncConfiguration::CUSTOM:
-        m_radioBtn3->SetValue(true);      //other
-        break;
-    }
-
     m_buttonApply->SetFocus();
 
     Fit();
@@ -84,6 +69,16 @@ SyncCfgDialog::~SyncCfgDialog() {}
 
 void SyncCfgDialog::updateConfigIcons(const FreeFileSync::CompareVariant cmpVar, const FreeFileSync::SyncConfiguration& syncConfig)
 {
+    //wxWindowUpdateLocker dummy(this); //avoid display distortion
+    wxWindowUpdateLocker dummy2(m_panelCustomDeletionDir); //avoid display distortion
+    wxWindowUpdateLocker dummy3(m_bpButtonLeftOnly);
+    wxWindowUpdateLocker dummy4(m_bpButtonRightOnly);
+    wxWindowUpdateLocker dummy5(m_bpButtonLeftNewer);
+    wxWindowUpdateLocker dummy6(m_bpButtonRightNewer);
+    wxWindowUpdateLocker dummy7(m_bpButtonDifferent);
+    wxWindowUpdateLocker dummy8(m_bpButtonConflict);
+
+
     updateConfigIcons(cmpVar,
                       syncConfig,
                       m_bpButtonLeftOnly,
@@ -97,7 +92,30 @@ void SyncCfgDialog::updateConfigIcons(const FreeFileSync::CompareVariant cmpVar,
                       m_bitmapLeftNewer,
                       m_bitmapRightNewer,
                       m_bitmapDifferent,
-                      m_bitmapConflict);
+                      m_bitmapConflict,
+                      sbSizerSyncDirections);
+
+    //set radiobuttons -> have no parameter-ownership at all!
+    switch (localSyncConfiguration.getVariant())
+    {
+    case SyncConfiguration::AUTOMATIC:
+        m_radioBtnAutomatic->SetValue(true); //automatic mode
+        break;
+    case SyncConfiguration::MIRROR:
+        m_radioBtnMirror->SetValue(true);    //one way ->
+        break;
+    case SyncConfiguration::UPDATE:
+        m_radioBtnUpdate->SetValue(true);    //Update ->
+        break;
+    case SyncConfiguration::TWOWAY:
+        m_radioBtnTwoWay->SetValue(true);    //two way <->
+        break;
+    case SyncConfiguration::CUSTOM:
+        m_radioBtnCustom->SetValue(true);    //custom
+        break;
+    }
+
+    GetSizer()->SetSizeHints(this); //this works like a charm for GTK2 with window resizing problems!!! (includes call to Fit())
 }
 
 
@@ -114,44 +132,45 @@ void SyncCfgDialog::updateConfigIcons(const CompareVariant compareVar,
                                       wxStaticBitmap* bitmapLeftNewer,
                                       wxStaticBitmap* bitmapRightNewer,
                                       wxStaticBitmap* bitmapDifferent,
-                                      wxStaticBitmap* bitmapConflict)
+                                      wxStaticBitmap* bitmapConflict,
+                                      wxSizer*        syncDirections) //sizer containing all sync-directions
 {
     //display only relevant sync options
+    syncDirections->Show(true);
+
+    buttonLeftOnly  ->Show(); //
+    buttonRightOnly ->Show(); //
+    buttonLeftNewer ->Show(); //
+    buttonRightNewer->Show(); // enable everything by default
+    buttonDifferent ->Show(); //
+    buttonConflict  ->Show(); //
+
+    bitmapLeftOnly  ->Show(); //
+    bitmapRightOnly ->Show(); //
+    bitmapLeftNewer ->Show(); //
+    bitmapRightNewer->Show(); //
+    bitmapDifferent ->Show(); //
+    bitmapConflict  ->Show(); //
+
     switch (compareVar)
     {
     case CMP_BY_TIME_SIZE:
-        buttonLeftOnly  ->Show();
-        buttonRightOnly ->Show();
-        buttonLeftNewer ->Show();
-        buttonRightNewer->Show();
         buttonDifferent ->Hide();
-        buttonConflict  ->Show();
 
-        bitmapLeftOnly  ->Show();
-        bitmapRightOnly ->Show();
-        bitmapLeftNewer ->Show();
-        bitmapRightNewer->Show();
         bitmapDifferent ->Hide();
-        bitmapConflict  ->Show();
         break;
 
     case CMP_BY_CONTENT:
-        buttonLeftOnly  ->Show();
-        buttonRightOnly ->Show();
         buttonLeftNewer ->Hide();
         buttonRightNewer->Hide();
-        buttonDifferent ->Show();
-        buttonConflict  ->Show();
 
-        bitmapLeftOnly  ->Show();
-        bitmapRightOnly ->Show();
         bitmapLeftNewer ->Hide();
         bitmapRightNewer->Hide();
-        bitmapDifferent ->Show();
-        bitmapConflict  ->Show();
         break;
     }
 
+    if (syncConfig.automatic) //automatic mode needs no sync-directions
+        syncDirections->Show(false);
 
     switch (syncConfig.exLeftSideOnly)
     {
@@ -276,23 +295,12 @@ void SyncCfgDialog::OnApply(wxCommandEvent& event)
 }
 
 
-void updateToolTipErrorHandling(wxChoice* choiceHandleError, const xmlAccess::OnError value)
+void SyncCfgDialog::updateToolTipErrorHandling(bool ignoreErrors)
 {
-    switch (value)
-    {
-    case xmlAccess::ON_ERROR_POPUP:
-        choiceHandleError->SetToolTip(_("Show popup on errors or warnings"));
-        break;
-    case xmlAccess::ON_ERROR_IGNORE:
-        choiceHandleError->SetToolTip(_("Hide all error and warning messages"));
-        break;
-    case xmlAccess::ON_ERROR_EXIT:
-        choiceHandleError->SetToolTip(_("Exit immediately and set returncode < 0"));
-        break;
-    default:
-        assert(false);
-        choiceHandleError->SetToolTip(wxEmptyString);
-    }
+    if (ignoreErrors)
+        m_choiceHandleError->SetToolTip(_("Hide all error and warning messages"));
+    else
+        m_choiceHandleError->SetToolTip(_("Show popup on errors or warnings"));
 }
 
 
@@ -316,13 +324,13 @@ void SyncCfgDialog::setErrorHandling(bool ignoreErrors)
     else
         m_choiceHandleError->SetSelection(0);
 
-    updateToolTipErrorHandling(m_choiceHandleError, ignoreErrors ? xmlAccess::ON_ERROR_IGNORE : xmlAccess::ON_ERROR_POPUP);
+    updateToolTipErrorHandling(ignoreErrors);
 }
 
 
 void SyncCfgDialog::OnChangeErrorHandling(wxCommandEvent& event)
 {
-    updateToolTipErrorHandling(m_choiceHandleError, getErrorHandling() ? xmlAccess::ON_ERROR_IGNORE : xmlAccess::ON_ERROR_POPUP);
+    updateToolTipErrorHandling(getErrorHandling());
 }
 
 //-------------------
@@ -396,51 +404,46 @@ void SyncCfgDialog::OnChangeDeletionHandling(wxCommandEvent& event)
 }
 
 
+void SyncCfgDialog::OnSyncAutomatic(wxCommandEvent& event)
+{
+    localSyncConfiguration.setVariant(SyncConfiguration::AUTOMATIC);
+    updateConfigIcons(cmpVariant, localSyncConfiguration);
+}
+
+
 void SyncCfgDialog::OnSyncLeftToRight(wxCommandEvent& event)
 {
     localSyncConfiguration.setVariant(SyncConfiguration::MIRROR);
-
     updateConfigIcons(cmpVariant, localSyncConfiguration);
-
-    //if event is triggered by button
-    m_radioBtn1->SetValue(true);
 }
 
 
 void SyncCfgDialog::OnSyncUpdate(wxCommandEvent& event)
 {
     localSyncConfiguration.setVariant(SyncConfiguration::UPDATE);
-
     updateConfigIcons(cmpVariant, localSyncConfiguration);
-
-    //if event is triggered by button
-    m_radioBtnUpdate->SetValue(true);
 }
 
 
 void SyncCfgDialog::OnSyncBothSides(wxCommandEvent& event)
 {
     localSyncConfiguration.setVariant(SyncConfiguration::TWOWAY);
-
     updateConfigIcons(cmpVariant, localSyncConfiguration);
-
-    //if event is triggered by button
-    m_radioBtn2->SetValue(true);
 }
 
 
-void toggleSyncDirection(SyncDirectionCfg& current)
+void toggleSyncDirection(SyncDirection& current)
 {
     switch (current)
     {
-    case SYNC_DIR_CFG_RIGHT:
-        current = SYNC_DIR_CFG_LEFT;
+    case SYNC_DIR_RIGHT:
+        current = SYNC_DIR_LEFT;
         break;
-    case SYNC_DIR_CFG_LEFT:
-        current = SYNC_DIR_CFG_NONE;
+    case SYNC_DIR_LEFT:
+        current = SYNC_DIR_NONE;
         break;
-    case SYNC_DIR_CFG_NONE:
-        current = SYNC_DIR_CFG_RIGHT;
+    case SYNC_DIR_NONE:
+        current = SYNC_DIR_RIGHT;
         break;
     }
 }
@@ -450,8 +453,6 @@ void SyncCfgDialog::OnExLeftSideOnly( wxCommandEvent& event )
 {
     toggleSyncDirection(localSyncConfiguration.exLeftSideOnly);
     updateConfigIcons(cmpVariant, localSyncConfiguration);
-    //set custom config button
-    m_radioBtn3->SetValue(true);
 }
 
 
@@ -459,8 +460,6 @@ void SyncCfgDialog::OnExRightSideOnly( wxCommandEvent& event )
 {
     toggleSyncDirection(localSyncConfiguration.exRightSideOnly);
     updateConfigIcons(cmpVariant, localSyncConfiguration);
-    //set custom config button
-    m_radioBtn3->SetValue(true);
 }
 
 
@@ -468,8 +467,6 @@ void SyncCfgDialog::OnLeftNewer( wxCommandEvent& event )
 {
     toggleSyncDirection(localSyncConfiguration.leftNewer);
     updateConfigIcons(cmpVariant, localSyncConfiguration);
-    //set custom config button
-    m_radioBtn3->SetValue(true);
 }
 
 
@@ -477,8 +474,6 @@ void SyncCfgDialog::OnRightNewer( wxCommandEvent& event )
 {
     toggleSyncDirection(localSyncConfiguration.rightNewer);
     updateConfigIcons(cmpVariant, localSyncConfiguration);
-    //set custom config button
-    m_radioBtn3->SetValue(true);
 }
 
 
@@ -486,8 +481,6 @@ void SyncCfgDialog::OnDifferent( wxCommandEvent& event )
 {
     toggleSyncDirection(localSyncConfiguration.different);
     updateConfigIcons(cmpVariant, localSyncConfiguration);
-    //set custom config button
-    m_radioBtn3->SetValue(true);
 }
 
 
@@ -495,8 +488,6 @@ void SyncCfgDialog::OnConflict(wxCommandEvent& event)
 {
     toggleSyncDirection(localSyncConfiguration.conflict);
     updateConfigIcons(cmpVariant, localSyncConfiguration);
-    //set custom config button
-    m_radioBtn3->SetValue(true);
 }
 //###################################################################################################################################
 
@@ -507,8 +498,8 @@ class BatchFolderPairPanel : public FolderPairParent
 {
 public:
     BatchFolderPairPanel(wxWindow* parent, BatchDialog* batchDialog) :
-            FolderPairParent(parent),
-            batchDlg(batchDialog) {}
+        FolderPairParent(parent),
+        batchDlg(batchDialog) {}
 
 private:
     virtual wxWindow* getParentWindow()
@@ -540,7 +531,7 @@ class BatchFileDropEvent : public wxFileDropTarget
 {
 public:
     BatchFileDropEvent(BatchDialog* dlg) :
-            batchDlg(dlg) {}
+        batchDlg(dlg) {}
 
     virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
     {
@@ -569,7 +560,7 @@ private:
 
 
 BatchDialog::BatchDialog(wxWindow* window, const xmlAccess::XmlBatchConfig& batchCfg) :
-        BatchDlgGenerated(window)
+    BatchDlgGenerated(window)
 {
     init();
     loadBatchCfg(batchCfg);
@@ -577,7 +568,7 @@ BatchDialog::BatchDialog(wxWindow* window, const xmlAccess::XmlBatchConfig& batc
 
 
 BatchDialog::BatchDialog(wxWindow* window, const wxString& filename) :
-        BatchDlgGenerated(window)
+    BatchDlgGenerated(window)
 {
     init();
     loadBatchFile(filename);
@@ -631,12 +622,33 @@ xmlAccess::OnError BatchDialog::getSelectionHandleError() const
 }
 
 
+void BatchDialog::updateToolTipErrorHandling(const xmlAccess::OnError value)
+{
+    switch (value)
+    {
+    case xmlAccess::ON_ERROR_POPUP:
+        m_choiceHandleError->SetToolTip(_("Show popup on errors or warnings"));
+        break;
+    case xmlAccess::ON_ERROR_IGNORE:
+        m_choiceHandleError->SetToolTip(_("Hide all error and warning messages"));
+        break;
+    case xmlAccess::ON_ERROR_EXIT:
+        m_choiceHandleError->SetToolTip(_("Exit immediately and set returncode < 0"));
+        break;
+    }
+}
+
+
 void BatchDialog::setSelectionHandleError(const xmlAccess::OnError value)
 {
     m_choiceHandleError->Clear();
     m_choiceHandleError->Append(_("Show popup"));
     m_choiceHandleError->Append(_("Ignore errors"));
-    m_choiceHandleError->Append(_("Exit with RC < 0"));
+    if (m_checkBoxSilent->GetValue()) //this option shall be available for silent mode only!
+        m_choiceHandleError->Append(_("Exit with RC < 0"));
+
+    //default
+    m_choiceHandleError->SetSelection(0);
 
     switch (value)
     {
@@ -647,20 +659,18 @@ void BatchDialog::setSelectionHandleError(const xmlAccess::OnError value)
         m_choiceHandleError->SetSelection(1);
         break;
     case xmlAccess::ON_ERROR_EXIT:
-        m_choiceHandleError->SetSelection(2);
+        if (m_checkBoxSilent->GetValue()) //this option shall be available for silent mode only!
+            m_choiceHandleError->SetSelection(2);
         break;
-    default:
-        assert(false);
-        m_choiceHandleError->SetSelection(0);
     }
 
-    updateToolTipErrorHandling(m_choiceHandleError, getSelectionHandleError());
+    updateToolTipErrorHandling(getSelectionHandleError());
 }
 
 
 void BatchDialog::OnChangeErrorHandling(wxCommandEvent& event)
 {
-    updateToolTipErrorHandling(m_choiceHandleError, getSelectionHandleError());
+    updateToolTipErrorHandling(getSelectionHandleError());
 }
 
 
@@ -762,9 +772,27 @@ void BatchDialog::OnCheckFilter(wxCommandEvent& event)
 }
 
 
-void BatchDialog::OnCheckLogging(wxCommandEvent& event)
+void BatchDialog::OnCheckAutomatic(wxCommandEvent& event)
+{
+    wxWindowUpdateLocker dummy(m_panelOverview); //avoid display distortion
+
+    //toggle automatic setting
+    localSyncConfiguration.automatic = !localSyncConfiguration.automatic;
+
+    if (localSyncConfiguration.automatic)
+        localSyncConfiguration.setVariant(SyncConfiguration::AUTOMATIC); //reset conflict-setting
+
+    updateConfigIcons(getCurrentCompareVar(), localSyncConfiguration);
+    Fit();
+}
+
+
+void BatchDialog::OnCheckSilent(wxCommandEvent& event)
 {
     updateVisibleTabs();
+
+    //reset error handling depending on "m_checkBoxSilent"
+    setSelectionHandleError(getSelectionHandleError());
 }
 
 
@@ -821,6 +849,8 @@ CompareVariant BatchDialog::getCurrentCompareVar() const
 
 void BatchDialog::updateConfigIcons(const FreeFileSync::CompareVariant cmpVar, const FreeFileSync::SyncConfiguration& syncConfig)
 {
+    wxWindowUpdateLocker dummy(m_panelOverview); //avoid display distortion
+
     SyncCfgDialog::updateConfigIcons(cmpVar,
                                      syncConfig,
                                      m_bpButtonLeftOnly,
@@ -834,15 +864,21 @@ void BatchDialog::updateConfigIcons(const FreeFileSync::CompareVariant cmpVar, c
                                      m_bitmapLeftNewer,
                                      m_bitmapRightNewer,
                                      m_bitmapDifferent,
-                                     m_bitmapConflict);
+                                     m_bitmapConflict,
+                                     sbSizerSyncDirections);
+
+    //parameter ownership lies within localSyncConfiguration, NOT m_checkBoxAutomatic!!!
+    m_checkBoxAutomatic->SetValue(localSyncConfiguration.automatic);
+
+    m_panelOverview->Layout(); //needed
 }
 
 
 void BatchDialog::OnChangeCompareVar(wxCommandEvent& event)
 {
+    wxWindowUpdateLocker dummy(m_panelOverview); //avoid display distortion
     updateConfigIcons(getCurrentCompareVar(), localSyncConfiguration);
 
-    m_panelOverview->Layout(); //needed
     Fit();
 }
 
@@ -868,11 +904,13 @@ void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
     if (filePicker->ShowModal() == wxID_OK)
     {
         const wxString newFileName = filePicker->GetPath();
-        if (FreeFileSync::fileExists(newFileName.c_str()))
+        if (FreeFileSync::fileExists(wxToZ(newFileName)))
         {
-            wxMessageDialog* messageDlg = new wxMessageDialog(this, wxString(_("File already exists. Overwrite?")) + wxT(" \"") + newFileName + wxT("\""), _("Warning") , wxOK | wxCANCEL);
+            QuestionDlg* messageDlg = new QuestionDlg(this,
+                    QuestionDlg::BUTTON_YES | QuestionDlg::BUTTON_CANCEL,
+                    wxString(_("File already exists. Overwrite?")) + wxT(" \"") + newFileName + wxT("\""));
 
-            if (messageDlg->ShowModal() != wxID_OK)
+            if (messageDlg->ShowModal() != QuestionDlg::BUTTON_YES)
             {
                 OnSaveBatchJob(event); //retry
                 return;
@@ -898,8 +936,8 @@ void BatchDialog::OnLoadBatchJob(wxCommandEvent& event)
 inline
 FolderPairEnh getEnahncedPair(const BatchFolderPairPanel* panel)
 {
-    return FolderPairEnh(panel->m_directoryLeft->GetValue().c_str(),
-                         panel->m_directoryRight->GetValue().c_str(),
+    return FolderPairEnh(wxToZ(panel->m_directoryLeft->GetValue()),
+                         wxToZ(panel->m_directoryRight->GetValue()),
                          panel->altSyncConfig,
                          panel->altFilter);
 }
@@ -913,14 +951,14 @@ xmlAccess::XmlBatchConfig BatchDialog::getCurrentConfiguration() const
     batchCfg.mainCfg.compareVar        = getCurrentCompareVar();
     batchCfg.mainCfg.syncConfiguration = localSyncConfiguration;
     batchCfg.mainCfg.filterIsActive    = m_checkBoxFilter->GetValue();
-    batchCfg.mainCfg.includeFilter     = m_textCtrlInclude->GetValue();
-    batchCfg.mainCfg.excludeFilter     = m_textCtrlExclude->GetValue();
+    batchCfg.mainCfg.includeFilter     = wxToZ(m_textCtrlInclude->GetValue());
+    batchCfg.mainCfg.excludeFilter     = wxToZ(m_textCtrlExclude->GetValue());
     batchCfg.mainCfg.handleDeletion    = getDeletionHandling();
     batchCfg.mainCfg.customDeletionDirectory = m_textCtrlCustomDelFolder->GetValue();
 
     //main pair
-    batchCfg.mainCfg.mainFolderPair.leftDirectory  = m_directoryLeft->GetValue().c_str();
-    batchCfg.mainCfg.mainFolderPair.rightDirectory = m_directoryRight->GetValue().c_str();
+    batchCfg.mainCfg.mainFolderPair.leftDirectory  = wxToZ(m_directoryLeft->GetValue());
+    batchCfg.mainCfg.mainFolderPair.rightDirectory = wxToZ(m_directoryRight->GetValue());
 
     //add additional pairs
     batchCfg.mainCfg.additionalPairs.clear();
@@ -994,8 +1032,6 @@ void BatchDialog::loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg)
     setDeletionHandling(batchCfg.mainCfg.handleDeletion);
     m_textCtrlCustomDelFolder->SetValue(batchCfg.mainCfg.customDeletionDirectory);
 
-    setSelectionHandleError(batchCfg.handleError);
-
     switch (batchCfg.mainCfg.compareVar)
     {
     case CMP_BY_TIME_SIZE:
@@ -1009,16 +1045,18 @@ void BatchDialog::loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg)
     updateConfigIcons(batchCfg.mainCfg.compareVar, batchCfg.mainCfg.syncConfiguration);
 
     m_checkBoxFilter->SetValue(batchCfg.mainCfg.filterIsActive);
-    m_textCtrlInclude->SetValue(batchCfg.mainCfg.includeFilter);
-    m_textCtrlExclude->SetValue(batchCfg.mainCfg.excludeFilter);
+    m_textCtrlInclude->SetValue(zToWx(batchCfg.mainCfg.includeFilter));
+    m_textCtrlExclude->SetValue(zToWx(batchCfg.mainCfg.excludeFilter));
 
     m_checkBoxSilent->SetValue(batchCfg.silent);
     m_textCtrlLogfileDir->SetValue(batchCfg.logFileDirectory);
+    //error handling is dependent from m_checkBoxSilent! /|\   \|/
+    setSelectionHandleError(batchCfg.handleError);
 
 
     //set main folder pair
-    FreeFileSync::setDirectoryName(batchCfg.mainCfg.mainFolderPair.leftDirectory.c_str(),  m_directoryLeft, m_dirPickerLeft);
-    FreeFileSync::setDirectoryName(batchCfg.mainCfg.mainFolderPair.rightDirectory.c_str(), m_directoryRight, m_dirPickerRight);
+    FreeFileSync::setDirectoryName(zToWx(batchCfg.mainCfg.mainFolderPair.leftDirectory),  m_directoryLeft, m_dirPickerLeft);
+    FreeFileSync::setDirectoryName(zToWx(batchCfg.mainCfg.mainFolderPair.rightDirectory), m_directoryRight, m_dirPickerRight);
 
     //remove existing additional folder pairs
     clearAddFolderPairs();
@@ -1111,8 +1149,8 @@ void BatchDialog::addFolderPair(const std::vector<FreeFileSync::FolderPairEnh>& 
         newPair->m_bpButtonRemovePair->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BatchDialog::OnRemoveFolderPair), NULL, this );
 
         //insert directory names
-        FreeFileSync::setDirectoryName(i->leftDirectory.c_str(),  newPair->m_directoryLeft,  newPair->m_dirPickerLeft);
-        FreeFileSync::setDirectoryName(i->rightDirectory.c_str(), newPair->m_directoryRight, newPair->m_dirPickerRight);
+        FreeFileSync::setDirectoryName(zToWx(i->leftDirectory),  newPair->m_directoryLeft,  newPair->m_dirPickerLeft);
+        FreeFileSync::setDirectoryName(zToWx(i->rightDirectory), newPair->m_directoryRight, newPair->m_dirPickerRight);
 
         //set alternate configuration
         newPair->altSyncConfig = i->altSyncConfig;

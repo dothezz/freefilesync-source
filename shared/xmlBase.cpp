@@ -43,7 +43,8 @@ xmlAccess::XmlType xmlAccess::getXmlType(const wxString& filename)
             return XML_OTHER;
     }
     catch (const std::exception&)
-    { //unfortunately TiXml isn't very smart and tries to allocate space for the complete file: length_error exception is thrown for large files!
+    {
+        //unfortunately TiXml isn't very smart and tries to allocate space for the complete file: length_error exception is thrown for large files!
         return XML_OTHER;
     }
 

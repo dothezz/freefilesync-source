@@ -200,6 +200,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\shared\appMain.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ui\batchStatusHandler.cpp"
 				>
 			</File>
@@ -284,6 +288,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ui\settingsDialog.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\shared\shadow.cpp"
 				>
 			</File>
@@ -305,10 +313,6 @@
 			</File>
 			<File
 				RelativePath=".\structures.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ui\syncDialog.cpp"
 				>
 			</File>
 			<File
@@ -337,6 +341,10 @@
 			</File>
 			<File
 				RelativePath=".\shared\toggleButton.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ui\util.cpp"
 				>
 			</File>
 			<File

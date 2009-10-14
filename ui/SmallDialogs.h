@@ -12,7 +12,7 @@ class StatusHandler;
 
 namespace FreeFileSync
 {
-    class SyncStatistics;
+class SyncStatistics;
 }
 
 
@@ -43,7 +43,7 @@ private:
 class FilterDlg : public FilterDlgGenerated
 {
 public:
-    FilterDlg(wxWindow* window, wxString& filterIncl, wxString& filterExcl);
+    FilterDlg(wxWindow* window, Zstring& filterIncl, Zstring& filterExcl);
     ~FilterDlg() {}
 
     enum
@@ -58,8 +58,8 @@ private:
     void OnCancel(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);
 
-    wxString& includeFilter;
-    wxString& excludeFilter;
+    Zstring& includeFilter;
+    Zstring& excludeFilter;
 };
 
 
@@ -147,7 +147,7 @@ private:
 class QuestionDlg : public QuestionDlgGenerated
 {
 public:
-    QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxString messageText, bool& dontShowAgain);
+    QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxString messageText, bool* dontShowAgain = NULL);
 
     enum
     {
@@ -162,7 +162,7 @@ private:
     void OnYes(wxCommandEvent& event);
     void OnNo(wxCommandEvent& event);
 
-    bool& dontShowAgain;
+    bool* dontShowAgain; //optional
 };
 
 
@@ -318,7 +318,7 @@ public:
     void updateStatusDialogNow();
 
     void setCurrentStatus(SyncStatusID id);
-    void processHasFinished(SyncStatusID id);  //essential to call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater
+    void processHasFinished(SyncStatusID id, const wxString& finalMessage);  //essential to call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater
 
 private:
     void OnOkay(wxCommandEvent& event);

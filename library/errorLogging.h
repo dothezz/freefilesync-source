@@ -8,36 +8,36 @@ class Zstring;
 
 namespace FreeFileSync
 {
-    class ErrorLogging
+class ErrorLogging
+{
+public:
+    ErrorLogging() : errorCount(0) {}
+
+    void logError(const wxString& errorMessage);
+    void logWarning(const wxString& warningMessage);
+    void logInfo(const wxString& infoMessage);
+
+    int errorsTotal()
     {
-    public:
-        ErrorLogging() : errorCount(0) {}
+        return errorCount;
+    }
 
-        void logError(const wxString& errorMessage);
-        void logWarning(const wxString& warningMessage);
-        void logInfo(const wxString& infoMessage);
+    const std::vector<wxString>& getFormattedMessages()
+    {
+        return formattedMessages;
+    }
 
-        int errorsTotal()
-        {
-            return errorCount;
-        }
+    size_t messageCount()
+    {
+        return formattedMessages.size();
+    }
 
-        const std::vector<wxString>& getFormattedMessages()
-        {
-            return formattedMessages;
-        }
+private:
+    wxString assembleMessage(const wxString& prefix, const wxString& message);
 
-        size_t messageCount()
-        {
-            return formattedMessages.size();
-        }
-
-    private:
-        wxString assembleMessage(const wxString& prefix, const wxString& message);
-
-        std::vector<wxString> formattedMessages; //list of non-resolved errors and warnings
-        int errorCount;
-    };
+    std::vector<wxString> formattedMessages; //list of non-resolved errors and warnings
+    int errorCount;
+};
 }
 
 #endif // ERRORLOGGING_H_INCLUDED

@@ -1,6 +1,7 @@
 ﻿#include "localization.h"
 #include <wx/msgdlg.h>
 #include "../shared/standardPaths.h"
+#include "../shared/stringConv.h"
 #include "systemConstants.h"
 #include <fstream>
 #include <map>
@@ -112,11 +113,25 @@ LocalizationInfo::LocalizationInfo()
     newEntry.languageFlag   = wxT("brazil.png");
     locMapping.push_back(newEntry);
 
+    newEntry.languageID     = wxLANGUAGE_ROMANIAN;
+    newEntry.languageName   = wxT("Română");
+    newEntry.languageFile   = wxT("romanian.lng");
+    newEntry.translatorName = wxT("Alexandru Bogdan Munteanu");
+    newEntry.languageFlag   = wxT("romania.png");
+    locMapping.push_back(newEntry);
+
     newEntry.languageID     = wxLANGUAGE_SLOVENIAN;
     newEntry.languageName   = wxT("Slovenščina");
     newEntry.languageFile   = wxT("slovenian.lng");
     newEntry.translatorName = wxT("Matej Badalic");
     newEntry.languageFlag   = wxT("slovakia.png");
+    locMapping.push_back(newEntry);
+
+    newEntry.languageID     = wxLANGUAGE_TURKISH;
+    newEntry.languageName   = wxT("Türkçe");
+    newEntry.languageFile   = wxT("turkish.lng");
+    newEntry.translatorName = wxT("H.Barbaros BIÇAKCI");
+    newEntry.languageFlag   = wxT("turkey.png");
     locMapping.push_back(newEntry);
 
     newEntry.languageID     = wxLANGUAGE_JAPANESE;
@@ -236,9 +251,9 @@ CustomLocale& CustomLocale::getInstance()
 
 
 CustomLocale::CustomLocale() :
-        wxLocale(wxLANGUAGE_DEFAULT), //setting a different language needn't be supported on all systems!
-        translationDB(new Translation),
-        currentLanguage(wxLANGUAGE_ENGLISH) {}
+    wxLocale(wxLANGUAGE_DEFAULT), //setting a different language needn't be supported on all systems!
+    translationDB(new Translation),
+    currentLanguage(wxLANGUAGE_ENGLISH) {}
 
 
 inline
@@ -290,7 +305,7 @@ class UnicodeFileReader
 {
 public:
     UnicodeFileReader(const wxString& filename) :
-            inputFile(NULL)
+        inputFile(NULL)
     {
         //workaround to get a FILE* from a unicode filename
         wxFFile dummyFile(filename, wxT("rb"));
@@ -363,8 +378,8 @@ void CustomLocale::setLanguage(const int language)
     translationDB->clear();
     if (!languageFile.empty())
     {
-        UnicodeFileReader langFile(FreeFileSync::getInstallationDir() + globalFunctions::FILE_NAME_SEPARATOR +
-                                   wxT("Languages") + globalFunctions::FILE_NAME_SEPARATOR + languageFile);
+        UnicodeFileReader langFile(FreeFileSync::getInstallationDir() + zToWx(globalFunctions::FILE_NAME_SEPARATOR) +
+                                   wxT("Languages") + zToWx(globalFunctions::FILE_NAME_SEPARATOR) + languageFile);
         if (langFile.isOkay())
         {
             int rowNumber = 0;

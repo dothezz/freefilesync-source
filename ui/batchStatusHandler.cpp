@@ -7,8 +7,12 @@
 #include "../shared/systemConstants.h"
 #include "../shared/standardPaths.h"
 #include "../shared/fileHandling.h"
+#include "../shared/stringConv.h"
 #include "../library/resources.h"
 #include "../shared/globalFunctions.h"
+#include "../shared/appMain.h"
+
+using namespace FreeFileSync;
 
 
 class LogFile
@@ -18,10 +22,10 @@ public:
     {
         //create logfile directory
         const wxString logfileDir = logfileDirectory.empty() ? FreeFileSync::getDefaultLogDirectory() : logfileDirectory;
-        if (!FreeFileSync::dirExists(logfileDir))
+        if (!FreeFileSync::dirExists(wxToZ(logfileDir)))
             try
             {
-                FreeFileSync::createDirectory(logfileDir.c_str()); //create recursively if necessary
+                FreeFileSync::createDirectory(wxToZ(logfileDir)); //create recursively if necessary
             }
             catch (FreeFileSync::FileError&)
             {
@@ -121,12 +125,12 @@ class FfsTrayIcon : public wxTaskBarIcon
 {
 public:
     FfsTrayIcon(StatusHandler* statusHandler) :
-            m_statusHandler(statusHandler),
-            processPaused(false),
-            percentage(_("%x Percent")),
-            currentProcess(StatusHandler::PROCESS_NONE),
-            totalObjects(0),
-            currentObjects(0)
+        m_statusHandler(statusHandler),
+        processPaused(false),
+        percentage(_("%x Percent")),
+        currentProcess(StatusHandler::PROCESS_NONE),
+        totalObjects(0),
+        currentObjects(0)
     {
         running.reset(new wxIcon(*GlobalResources::getInstance().programIcon));
         paused.reset(new wxIcon);
@@ -260,17 +264,16 @@ private:
 //##############################################################################################################################
 
 BatchStatusHandlerSilent::BatchStatusHandlerSilent(const xmlAccess::OnError handleError, const wxString& logfileDirectory, int& returnVal) :
-        m_handleError(xmlAccess::ON_ERROR_POPUP),
-        currentProcess(StatusHandler::PROCESS_NONE),
-        returnValue(returnVal),
-        trayIcon(new FfsTrayIcon(this)),
-        m_log(new LogFile(logfileDirectory))
+    m_handleError(handleError),
+    currentProcess(StatusHandler::PROCESS_NONE),
+    returnValue(returnVal),
+    trayIcon(new FfsTrayIcon(this)),
+    m_log(new LogFile(logfileDirectory))
 {
-    setErrorStrategy(handleError);
-
     //test if log was instantiated successfully
     if (!m_log->isOkay())
-    {  //handle error: file load
+    {
+        //handle error: file load
         wxMessageBox(_("Unable to create logfile!"), _("Error"), wxOK | wxICON_ERROR);
         returnValue = -7;
         throw FreeFileSync::AbortThisProcess();
@@ -305,7 +308,7 @@ void BatchStatusHandlerSilent::updateStatusText(const Zstring& text)
     case StatusHandler::PROCESS_COMPARING_CONTENT:
         break;
     case StatusHandler::PROCESS_SYNCHRONIZING:
-        m_log->logInfo(text.c_str());
+        m_log->logInfo(zToWx(text));
         break;
     case StatusHandler::PROCESS_NONE:
         assert(false);
@@ -449,12 +452,6 @@ void BatchStatusHandlerSilent::addFinalInfo(const wxString& infoMessage)
 }
 
 
-void BatchStatusHandlerSilent::setErrorStrategy(xmlAccess::OnError handleError)
-{
-    m_handleError = handleError;
-}
-
-
 void BatchStatusHandlerSilent::forceUiRefresh()
 {
     trayIcon->updateSysTray(); //needed by sys-tray icon only
@@ -471,14 +468,31 @@ void BatchStatusHandlerSilent::abortThisProcess() //used by sys-tray menu
 
 
 BatchStatusHandlerGui::BatchStatusHandlerGui(const xmlAccess::OnError handleError, int& returnVal) :
-        showPopups(true),
-        currentProcess(StatusHandler::PROCESS_NONE),
-        returnValue(returnVal)
+    showPopups(true),
+    currentProcess(StatusHandler::PROCESS_NONE),
+    returnValue(returnVal)
 {
-    setErrorStrategy(handleError);
+    switch (handleError)
+    {
+    case xmlAccess::ON_ERROR_POPUP:
+        showPopups = true;
+        break;
+
+    case xmlAccess::ON_ERROR_EXIT: //doesn't make much sense for "batch gui"-mode
+        showPopups = true;
+        break;
+
+    case xmlAccess::ON_ERROR_IGNORE:
+        showPopups = false;
+        break;
+    }
+
 
     syncStatusFrame = new SyncStatus(this, NULL);
     syncStatusFrame->Show();
+
+    //notify about (logical) application main window
+    FreeFileSync::AppMainWindow::setMainWindow(syncStatusFrame);
 }
 
 
@@ -513,21 +527,18 @@ BatchStatusHandlerGui::~BatchStatusHandlerGui()
     {
         returnValue = -4;
         finalMessage += _("Synchronization aborted!");
-        syncStatusFrame->setStatusText_NoUpdate(finalMessage.c_str());
-        syncStatusFrame->processHasFinished(SyncStatus::ABORTED);  //enable okay and close events
+        syncStatusFrame->processHasFinished(SyncStatus::ABORTED, finalMessage);  //enable okay and close events
     }
     else if (errorLog.errorsTotal())
     {
         returnValue = -5;
         finalMessage += _("Synchronization completed with errors!");
-        syncStatusFrame->setStatusText_NoUpdate(finalMessage.c_str());
-        syncStatusFrame->processHasFinished(SyncStatus::FINISHED_WITH_ERROR);
+        syncStatusFrame->processHasFinished(SyncStatus::FINISHED_WITH_ERROR, finalMessage);
     }
     else
     {
         finalMessage += _("Synchronization completed successfully!");
-        syncStatusFrame->setStatusText_NoUpdate(finalMessage.c_str());
-        syncStatusFrame->processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS);
+        syncStatusFrame->processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS, finalMessage);
     }
 }
 
@@ -678,23 +689,4 @@ void BatchStatusHandlerGui::abortThisProcess()
 void BatchStatusHandlerGui::addFinalInfo(const wxString& infoMessage)
 {
     finalInfo = infoMessage;
-}
-
-
-void BatchStatusHandlerGui::setErrorStrategy(xmlAccess::OnError handleError) //change error handling during process
-{
-    switch (handleError)
-    {
-    case xmlAccess::ON_ERROR_POPUP:
-        showPopups = true;
-        break;
-
-    case xmlAccess::ON_ERROR_EXIT: //doesn't make much sense for "batch gui"-mode
-        showPopups = true;
-        break;
-
-    case xmlAccess::ON_ERROR_IGNORE:
-        showPopups = false;
-        break;
-    }
 }

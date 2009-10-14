@@ -7,18 +7,18 @@ using namespace FreeFileSync;
 
 
 GridView::StatusCmpResult::StatusCmpResult() :
-        existsLeftOnly(false),
-        existsRightOnly(false),
-        existsLeftNewer(false),
-        existsRightNewer(false),
-        existsDifferent(false),
-        existsEqual(false),
-        existsConflict(false),
+    existsLeftOnly(false),
+    existsRightOnly(false),
+    existsLeftNewer(false),
+    existsRightNewer(false),
+    existsDifferent(false),
+    existsEqual(false),
+    existsConflict(false),
 
-        filesOnLeftView(0),
-        foldersOnLeftView(0),
-        filesOnRightView(0),
-        foldersOnRightView(0) {}
+    filesOnLeftView(0),
+    foldersOnLeftView(0),
+    filesOnRightView(0),
+    foldersOnRightView(0) {}
 
 
 GridView::StatusCmpResult GridView::updateCmpResult(bool hideFiltered, //maps sortedRef to viewRef
@@ -40,7 +40,7 @@ GridView::StatusCmpResult GridView::updateCmpResult(bool hideFiltered, //maps so
         if (fsObj)
         {
             //hide filtered row, if corresponding option is set
-            if (hideFiltered && !fsObj->selectedForSynchronization)
+            if (hideFiltered && !fsObj->isActive())
                 continue;
 
             switch (fsObj->getCategory())
@@ -112,19 +112,19 @@ GridView::StatusCmpResult GridView::updateCmpResult(bool hideFiltered, //maps so
 
 
 GridView::StatusSyncPreview::StatusSyncPreview() :
-        existsSyncCreateLeft(false),
-        existsSyncCreateRight(false),
-        existsSyncDeleteLeft(false),
-        existsSyncDeleteRight(false),
-        existsSyncDirLeft(false),
-        existsSyncDirRight(false),
-        existsSyncDirNone(false),
-        existsConflict(false),
+    existsSyncCreateLeft(false),
+    existsSyncCreateRight(false),
+    existsSyncDeleteLeft(false),
+    existsSyncDeleteRight(false),
+    existsSyncDirLeft(false),
+    existsSyncDirRight(false),
+    existsSyncDirNone(false),
+    existsConflict(false),
 
-        filesOnLeftView(0),
-        foldersOnLeftView(0),
-        filesOnRightView(0),
-        foldersOnRightView(0) {}
+    filesOnLeftView(0),
+    foldersOnLeftView(0),
+    filesOnRightView(0),
+    foldersOnRightView(0) {}
 
 
 GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //maps sortedRef to viewRef
@@ -154,11 +154,11 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
                 continue;
 
             //hide filtered row, if corresponding option is set
-            if (hideFiltered && !fsObj->selectedForSynchronization)
+            if (hideFiltered && !fsObj->isActive())
                 continue;
 
 
-            switch (FreeFileSync::getSyncOperation(*fsObj)) //evaluate comparison result and sync direction
+            switch (fsObj->getSyncOperation()) //evaluate comparison result and sync direction
             {
             case SO_CREATE_NEW_LEFT:
                 output.existsSyncCreateLeft = true;
@@ -274,8 +274,8 @@ class GridView::SerializeHierarchy
 {
 public:
     SerializeHierarchy(std::vector<GridView::RefIndex>& sortedRef, unsigned int index) :
-            index_(index),
-            sortedRef_(sortedRef) {}
+        index_(index),
+        sortedRef_(sortedRef) {}
 
     void execute(const HierarchyObject& hierObj)
     {

@@ -27,7 +27,7 @@
 %x directories
 %x 目录
 %x files,
-%x 文件,
+%x 个文件,
 %x is not a valid FreeFileSync batch file!
 %x 不是有效的 FreeFileSync 批处理文件
 %x of %y rows in view
@@ -69,9 +69,9 @@
 &Load configuration
 加载配置(&L)
 &New
-
+新建(&N)
 &No
-否
+否(&N)
 &OK
 确定(&O)
 &Pause
@@ -85,15 +85,15 @@
 &Save
 保存(&S)
 &Yes
-是
+是(&Y)
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-
+(请注意只有FAT/FAT32分区受此问题影响!\n在所有其他情况下你可禁用\"忽略一小时差异\"这一选项.)
 ,
 .
 - Other side's counterpart to %dir
-
+- 另一侧参照 %dir
 - Other side's counterpart to %name
-
+- 另一侧参照 %name
 - conflict
 - 冲突
 - conflict (same date, different size)
@@ -138,6 +138,8 @@
 2. 使用通配符‘*’和‘?’.
 3. Exclude files directly on main grid via context menu.
 3. 通过右键菜单在主网格排除文件.
+<Automatic>
+自动
 <Directory>
 <目录>
 <Last session>
@@ -146,6 +148,8 @@
 <多选>
 A newer version of FreeFileSync is available:
 FreeFileSync 有新版可用:
+ATTENTION: Failed directory access can lead to file deletions!
+请注意:失败的目录存取会导致文件删除!
 Abort requested: Waiting for current operation to finish...
 取消请求: 正在等待当前操作完成...
 Aborted
@@ -168,6 +172,8 @@ Assemble a batch file for automated synchronization. To start in batch mode simp
 装配一个批处理文件用于自动同步. 要开始批处理模式只需简单地将批处理文件名传送给FreeFileSync可执行文件:FreeFileSync.exe <batchfile>. 这个也可以安排在您的操作系统的计划任务中.
 Auto-adjust columns
 自动调整栏宽
+Automatic mode
+自动模式
 Batch execution
 批处理执行
 Batch file created successfully!
@@ -176,12 +182,20 @@ Batch job
 批处理作业
 Big thanks for localizing FreeFileSync goes out to:
 非常感谢以下本地化 FreeFileSync 的工作人员:
+Both sides have changed since last synchronization!
+在最后的同步之后两边均已改变!
 Browse
 浏览
 Build:
 开发:
 Cancel
 取消
+Cannot determine sync-direction: Changed filter settings!
+不能确定同步方向: 过滤器设置已改变!
+Cannot determine sync-direction: No change since last synchronization!
+不能确定同步方向: 在最后同步之后没有改变!
+Category
+分类
 Change direction
 改变方向
 Check all
@@ -211,7 +225,7 @@ Comparing content of files %x
 Comparing content...
 正在比较文件内容...
 Comparing files by content failed.
-
+按文件内容比较失败.
 Comparison Result
 比较结果
 Comparison settings
@@ -237,7 +251,7 @@ Confirm
 Conflict detected:
 检测到冲突:
 Conflicts/files that cannot be categorized
-
+冲突/文件不能被归类
 Continue
 继续
 Conversion error:
@@ -263,7 +277,7 @@ Could not determine volume name for file:
 Could not initialize directory monitoring:
 不能初始化目录监视:
 Could not read values for the following XML nodes:
-
+不能从如下XML节点读取数值:
 Create a batch job
 创建一个批处理作业
 Creating folder %x
@@ -277,19 +291,19 @@ Customize columns
 Customize...
 自定义...
 D-Click
-
+双击
 DECISION TREE
 决策树
 Data remaining:
 剩余数据:
 Data verification error: Source and target file have different content!
-
+数据校验错误:源文件和目标文件内容不同!
 Date
 日期
 Delay
 延时
 Delay between detection of changes and execution of commandline in seconds
-
+在检测和执行命令行之间的延时秒数
 Delete files/folders existing on left side only
 删除仅在左侧存在的文件/文件夹
 Delete files/folders existing on right side only
@@ -311,7 +325,7 @@ Deleting folder %x
 Deletion handling
 删除处理
 Description
-
+描述
 Directories are dependent! Be careful when setting up synchronization rules:
 目录有依赖性！在设立同步规则时请小心:
 Directories to watch
@@ -376,6 +390,8 @@ Error reading file attributes:
 读取文件属性出错:
 Error reading file:
 读取文件出错:
+Error reading from synchronization database:
+从同步数据库中读取时出错:
 Error resolving symbolic link:
 解决符号链接出错:
 Error starting Volume Shadow Copy Service!
@@ -388,8 +404,10 @@ Error writing file attributes:
 写文件属性出错:
 Error writing file:
 写入文件出错:
-Error: Source directory does not exist anymore:
-错误:源目录已经不存在:
+Error writing to synchronization database:
+向同步数据库中写入时出错:
+Source directory does not exist anymore:
+源目录已经不存在:
 Example
 例如
 Exclude
@@ -403,7 +421,7 @@ Exit immediately and set returncode < 0
 Exit with RC < 0
 退出并设置返回码 <0
 External applications
-
+外部应用程序
 Feedback and suggestions are welcome at:
 欢迎在下面提出反馈意见和建议:
 File %x has an invalid date!
@@ -431,17 +449,17 @@ Files are found equal if\n     - filesize\n     - last write time and date\nare 
 Files remaining:
 剩余文件:
 Files that are equal on both sides
-
+两边文件相同
 Files that exist on both sides and have different content
 两侧都有并且内容不同的文件
 Files that exist on both sides, left one is newer
 两侧都有,左侧较新的文件
 Files that exist on both sides, right one is newer
 两侧都有,右侧较新的文件
+Files/folders found:
+找到的文件/文件夹数:
 Files/folders remaining:
 文件/文件夹剩余:
-Files/folders scanned:
-文件/文件夹已扫描:
 Files/folders that exist on left side only
 仅在左侧存在的文件/文件夹
 Files/folders that exist on right side only
@@ -457,7 +475,7 @@ Filter view
 Folder Comparison and Synchronization
 文件夹比较与同步
 Free disk space available:
-
+可用磁盘空间:
 FreeFileSync - Folder Comparison and Synchronization
 FreeFileSync - 文件夹比较与同步
 FreeFileSync Batch Job
@@ -472,6 +490,8 @@ FreeFileSync is up to date!
 FreeFileSync 已是最新!
 Full path
 完整路径
+Generating database...
+正在生成数据库...
 Generating file list...
 生成文件列表...
 Global settings
@@ -479,7 +499,7 @@ Global settings
 Help
 帮助
 Hidden dialogs:
-
+隐藏对话框:
 Hide all error and warning messages
 隐藏所有错误与警告信息
 Hide conflicts
@@ -505,9 +525,9 @@ Hide files that will be deleted on the left side
 Hide files that will be deleted on the right side
 隐藏将在右侧被删除的文件
 Hide files that will be overwritten on left side
-
+隐藏将在左侧被覆盖的文件
 Hide files that will be overwritten on right side
-
+隐藏将在右侧被覆盖的文件
 Hide files that won't be copied
 隐藏将不会被复制的文件
 Hide filtered items
@@ -536,20 +556,24 @@ Include temporarily
 暂时包括
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
 包括: *.doc;*.zip;*.exe\n排除temp\\*
+Incompatible synchronization database format:
+不兼容的同步数据库格式:
 Info
 信息
 Information
 信息
+Initial synchronization. Please verify default copy-directions!
+初始化同步. 请校对默认的复制方向!
 Integrate external applications into context menu. The following macros are available:
-
+集成外部应用程序到右键菜单. 如下宏可用:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
 初始化回收站是不大可能了!\n\n估计你使用的不是Windows系统.\n如果你想包含此特性,请联系作者. :)
 Leave as unresolved conflict
-
+遗留为未解决的冲突
 Left
 左侧
 Legend
-
+图例
 Load configuration from file
 从文件加载配置
 Load configuration history (press DEL to delete items)
@@ -569,15 +593,17 @@ Move column down
 Move column up
 上移一行
 Move files to a user-defined directory.
-
+移动文件到用户定义的目录
 Moving %x to Recycle Bin
 移动 %x 到回收站
 Moving file %x to user-defined directory %y
-
+移动文件 %x 到用户定义目录 %y
 Moving folder %x to user-defined directory %y
-
+移动文件夹 %x 到用户定义目录 %y
 Multiple...
-
+倍数...
+No database file existing yet:
+还没有数据库文件存在:
 Not enough free disk space available in:
 没有足够的可用磁盘空间用于:
 Nothing to synchronize according to configuration!
@@ -591,7 +617,13 @@ Number of files that will be overwritten
 OK
 确定
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
-
+只有通过过滤的文件/文件夹能被选择用于同步. 过滤中的路径均为同步基础文件夹的相对路径.
+Open directly
+直接打开
+Open with Explorer
+用Explorer打开
+Open with Konqueror
+用Konqueror打开
 Operation aborted!
 操作已取消!
 Operation:
@@ -615,7 +647,7 @@ Question
 Quit
 退出
 Re-enable all hidden dialogs?
-
+重新启用所有隐藏的对话框?
 RealtimeSync - Automated Synchronization
 实时同步 - 自动同步
 RealtimeSync configuration
@@ -623,7 +655,7 @@ RealtimeSync configuration
 Relative path
 相对路径
 Remove alternate settings
-
+移除替换设置
 Remove folder
 删除文件夹
 Remove folder pair
@@ -632,8 +664,6 @@ Report translation error
 报告翻译错误
 Reset
 重置
-Result
-结果
 Right
 右侧
 S&ave configuration
@@ -651,9 +681,9 @@ Scanning:
 Select a folder
 选择一个文件夹
 Select alternate filter settings
-
+选择替换过滤设置
 Select alternate synchronization settings
-
+选择替换同步设置
 Select logfile directory:
 选择日志保存位置:
 Select variant:
@@ -683,13 +713,13 @@ Show files that will be deleted on the left side
 Show files that will be deleted on the right side
 显示将在右侧被删除的文件
 Show files that will be overwritten on left side
-
+显示将在左侧被覆盖的文件
 Show files that will be overwritten on right side
-
+显示将在右侧被覆盖的文件
 Show files that won't be copied
 显示将不被复制的文件
 Show hidden dialogs
-
+显示隐藏的对话框
 Show popup
 显示弹出窗口
 Show popup on errors or warnings
@@ -730,6 +760,8 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 同步所有 .doc, .zip和 .exe 文件, 除了\"temp\"中的一切.
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 同时同步两侧:  双向复制新的或更新的文件.
+Synchronize both sides using a database. Deletions are detected automatically.
+使用数据库同步两侧. 删除会被自动检测到.
 Synchronize...
 同步...
 Synchronizing...
@@ -779,13 +811,15 @@ Use Recycle Bin
 Use Recycle Bin when deleting or overwriting files.
 当删除或覆盖文件时使用回收站.
 User-defined directory
-
+用户定义目录
 User-defined directory for deletion was not specified!
-
+用于删除的用户定义目录没有指定!
+Using default synchronization directions. Please recheck.
+使用默认的同步方向. 请重新检查.
 Variant
 变化
 Verifying file %x
-
+校验文件 %x
 Volume name %x not part of filename %y!
 卷名 %x 并非文件名 %y 的一部分!
 Warning
@@ -796,6 +830,8 @@ When the comparison is started with this option set the following decision tree 
 当以此选项开始比较时以下决定树被处理:
 You can ignore the error to consider not existing directories as empty.
 您可忽略此错误而将不存在的目录视为空.
+You can ignore the error to skip current folder pair.
+你可忽略此错误以跳过当前文件夹对.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 您可能会尝试再次同步剩余的项目(而不必重新比较)!
 different
