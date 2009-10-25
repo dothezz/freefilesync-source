@@ -1,4 +1,4 @@
-FreeFileSync v3.0
+FreeFileSync v3.1
 -----------------
 
 ---------
@@ -17,7 +17,7 @@ FreeFileSync v3.0
 2. No limitations: An arbitrary number of files can be synchronized.
 3. Unicode support.
 4. Network support.
-5. Synchronization database for automated setting of sync-directions
+5. Synchronization database for automated setting of sync-directions and conflict detection
 6. Support for multiple folder pairs with distinct configuration
 7. Full support for Windows/Linux Symbolic Links and Windows Junction Points.
 8. Lean & easily accessible UI: Highly optimized for speed and huge sets of data.
@@ -54,6 +54,7 @@ FreeFileSync v3.0
 28. Copy locked files using Windows Volume Shadow Copy. (Windows only)
 29. Load file icons asynchronously for maximum display performance.
 30. Create regular backups with macros %time%, %date% within directory names
+31. Copy file and folder create/access/modification times when synchronizing
 
 
 

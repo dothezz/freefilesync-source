@@ -17,6 +17,8 @@ wxString formatFilesizeToShortString(const wxLongLong& filesize);
 wxString formatFilesizeToShortString(const wxULongLong& filesize);
 wxString formatFilesizeToShortString(const double filesize);
 
+wxString fromatPercentage(const wxLongLong& dividend, const wxLongLong& divisor);
+
 wxString includeNumberSeparator(const wxString& number);
 
 void setDirectoryName(const wxString& dirname, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker);

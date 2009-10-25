@@ -562,8 +562,8 @@ Info
 Info
 Information
 Informații
-Initial synchronization. Please verify default copy-directions!
-Sincronizare inițială. Verificați sensurile de copiere implicite!
+Initial synchronization.
+Sincronizare inițială.
 Integrate external applications into context menu. The following macros are available:
 Include aplicațiile externe în meniul contextual. Sînt disponibile următoarele macrocomenzi:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)

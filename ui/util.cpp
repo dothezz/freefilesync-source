@@ -85,6 +85,16 @@ wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
 }
 
 
+wxString FreeFileSync::fromatPercentage(const wxLongLong& dividend, const wxLongLong& divisor)
+{
+    const double ratio = dividend.ToDouble() * 100 / divisor.ToDouble();
+    wxString output = _("%x Percent");
+    output.Replace(wxT("%x"), wxString::Format(wxT("%3.2f"), ratio), false);
+    return output;
+}
+
+
+
 wxString FreeFileSync::includeNumberSeparator(const wxString& number)
 {
     wxString output(number);

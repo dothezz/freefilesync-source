@@ -139,7 +139,7 @@ A(z) %x nem megfelelő FreeFileSync kötegelt feladat fájl!
 3. Exclude files directly on main grid via context menu.
 3. Fájlok közvetlen kizárása a fő listából helyi menü segítségével.
 <Automatic>
-
+<Automatikus>
 <Directory>
 <Mappa>
 <Last session>
@@ -171,7 +171,7 @@ Egy kötegelt feladat fájl létrehozása az automatizált szinkronizációhoz. 
 Auto-adjust columns
 Oszlopok automatikus igazítása
 Automatic mode
-
+Automatikus mód
 Batch execution
 Kötegelt végrehajtás
 Batch file created successfully!
@@ -181,7 +181,7 @@ Kötegelt feladat
 Big thanks for localizing FreeFileSync goes out to:
 Nagy köszönet a FreeFileSync lokalizációjáért\na következő személyeknek:
 Both sides have changed since last synchronization!
-
+Mindkét oldal megváltozott az utolsó szikronizálás óta!
 Browse
 Tallózás
 Build:
@@ -189,11 +189,11 @@ Build:
 Cancel
 Mégsem
 Cannot determine sync-direction: Changed filter settings!
-
+Nem lehet meghatározni a szinkronizáció irányát: A szűrőbeállítások megváltoztak!
 Cannot determine sync-direction: No change since last synchronization!
-
+Nem lehet meghatározni a szinkronizáció irányát: Nem volt változás az utolsó szinkronizáció óta!
 Category
-
+Kategória
 Change direction
 Irány megváltoztatása
 Check all
@@ -389,7 +389,7 @@ A fájl attribútumainak olvasása sikertelen:
 Error reading file:
 A fájl olvasása sikertelen:
 Error reading from synchronization database:
-
+Hiba történt a szinkronizációs adatbázis olvasása közben:
 Error resolving symbolic link:
 A szimbolikus link feloldása sikertelen:
 Error starting Volume Shadow Copy Service!
@@ -403,9 +403,7 @@ A fájl attribútumainak írása sikertelen:
 Error writing file:
 A fájl írása sikertelen:
 Error writing to synchronization database:
-
-Source directory does not exist anymore:
-A forrásként megadott mappa többé nem létezik:
+Hiba történt a szinkronizációs adatbázis írása közben:
 Example
 Példa
 Exclude
@@ -455,7 +453,7 @@ Mindkét oldalon létező fájlok, de a bal oldali újabb
 Files that exist on both sides, right one is newer
 Mindkét oldalon létező fájlok, de a jobb oldali újabb
 Files/folders found:
-
+Talált fájlok/mappák:
 Files/folders remaining:
 Hátralévő fájlok/mappák:
 Files/folders that exist on left side only
@@ -489,7 +487,7 @@ A FreeFileSync naprakész!
 Full path
 Teljes elérési útvonal
 Generating database...
-
+Adatbázis generálása...
 Generating file list...
 Fájllista generálása...
 Global settings
@@ -555,13 +553,13 @@ Ideiglenesen tartalmaz
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
 Csatol: *.doc;*.zip;*.exe\nKizár: temp\\*
 Incompatible synchronization database format:
-
+Inkompatibilis szinkronizációs adatbázis formátum:
 Info
 Információ
 Information
 Információ
-Initial synchronization. Please verify default copy-directions!
-
+Initial synchronization.
+Első szinkronizáció.
 Integrate external applications into context menu. The following macros are available:
 Külső alkalmazás integrálása a helyi menübe. Az elérhető makrók a következők:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -601,7 +599,7 @@ Moving folder %x to user-defined directory %y
 Multiple...
 Sokszorosítás
 No database file existing yet:
-
+Nem létező adatbázis fájl:
 Not enough free disk space available in:
 Nincs elég szabad lemezterület:
 Nothing to synchronize according to configuration!
@@ -617,11 +615,11 @@ OK
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Csak a szűrésnek megfelelő fájlok/mappák lesznek kijelölve szinkronizáláshoz. A szűrő a szinkronizálás alap mappáihoz relatív fájl- és mappanevekre lesz alkalmazva.
 Open directly
-
+Megnyitás közvetlenül
 Open with Explorer
-
+Megnyitás Explorerrel
 Open with Konqueror
-
+Megnyitás Konquerorral
 Operation aborted!
 Művelet megszakítva!
 Operation:
@@ -730,6 +728,8 @@ Size
 Méret
 Source code written completely in C++ utilizing:
 A forráskód teljes egészében C++-ban íródott\na következők felhasználásával:
+Source directory does not exist anymore:
+A forrásként megadott mappa többé nem létezik:
 Speed:
 Sebesség:
 Start
@@ -759,7 +759,7 @@ Minden .doc, .zip és .exe fájl szinkronizálása a \"temp\" almappában talál
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Mindkét oldal szinkronizálása egyszerre: Új és frissített fájlok másolása mindkét irányban.
 Synchronize both sides using a database. Deletions are detected automatically.
-
+Mindkét oldal szinkronizálása adatbázis segítségével. A törlések automatikusan felismerődnek.
 Synchronize...
 Szinkronizálás
 Synchronizing...
@@ -813,7 +813,7 @@ Felhasználó által megadott mappa
 User-defined directory for deletion was not specified!
 A törléshez nem lett mappa megadva a felhasználó által!
 Using default synchronization directions. Please recheck.
-
+Az alapértelmezett szinkronizációs irányok vannak használatban. Kérjük, ellenőrizze újra.
 Variant
 Variáns
 Verifying file %x
@@ -829,7 +829,7 @@ Ha az összehasonlítás ezekkel a beállításokkal lesz elindítva, akkor a k�
 You can ignore the error to consider not existing directories as empty.
 Figyelmen kívül hagyhatja a hibákat a nem létező mappákat üresnek tekintve.
 You can ignore the error to skip current folder pair.
-
+Figyelmen kívül hagyhatja a hibát az aktuális mappapár átugrásához.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Meg lehet próbálni újra a megmaradt elemek szinkronizálását (az összehasonlítás újbóli elvégzése NÉLKÜL)!
 different

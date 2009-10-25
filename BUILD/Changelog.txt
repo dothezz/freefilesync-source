@@ -2,6 +2,15 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.1
+--------------
+Support for multiple datasources in Automatic mode
+Copy file and folder create/access/modification times when synchronizing
+Progress dialog can be minimized to systray (Batch and GUI mode)
+Allow switching between silent/non-silent batch mode interactively
+Some GUI improvements
+
+
 Changelog v3.0
 --------------
 New synchronization mode: <Automatic>

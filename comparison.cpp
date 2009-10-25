@@ -459,7 +459,7 @@ public:
 
 bool filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback* callback)
 {
-        const unsigned int BUFFER_SIZE = 512 * 1024; //512 kb seems to be the perfect buffer size
+    const unsigned int BUFFER_SIZE = 512 * 1024; //512 kb seems to be the perfect buffer size
     static boost::scoped_array<unsigned char> memory1(new unsigned char[BUFFER_SIZE]);
     static boost::scoped_array<unsigned char> memory2(new unsigned char[BUFFER_SIZE]);
 
@@ -724,7 +724,7 @@ wxString getConflictSameDateDiffSize(const FileMapping& fileObj)
     //some beautification...
     wxString left = wxString(_("Left")) + wxT(": ");
     wxString right = wxString(_("Right")) + wxT(": ");
-    const int maxPref = std::max(left.length(), right.length());
+    const size_t maxPref = std::max(left.length(), right.length());
     left.Pad(maxPref - left.length(), wxT(' '), true);
     right.Pad(maxPref - right.length(), wxT(' '), true);
 
@@ -745,7 +745,7 @@ wxString getConflictChangeWithinHour(const FileMapping& fileObj)
     //some beautification...
     wxString left = wxString(_("Left")) + wxT(": ");
     wxString right = wxString(_("Right")) + wxT(": ");
-    const int maxPref = std::max(left.length(), right.length());
+    const size_t maxPref = std::max(left.length(), right.length());
     left.Pad(maxPref - left.length(), wxT(' '), true);
     right.Pad(maxPref - right.length(), wxT(' '), true);
 
@@ -907,7 +907,7 @@ void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& director
 
 
 
-    const int objectsTotal       = filesToCompareBytewise.size() * 2;
+    const size_t objectsTotal       = filesToCompareBytewise.size() * 2;
     const wxULongLong bytesTotal = getBytesToCompare(filesToCompareBytewise);
 
     statusUpdater->initNewProcess(objectsTotal,

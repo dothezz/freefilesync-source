@@ -10,6 +10,7 @@
 #include "../ui/gridView.h"
 #include "../synchronization.h"
 #include "../shared/customTooltip.h"
+#include <wx/dcclient.h>
 
 #ifdef FFS_WIN
 #include <wx/timer.h>
@@ -81,7 +82,7 @@ public:
     }
 
 
-    virtual bool IsEmptyCell( int row, int col )
+    virtual bool IsEmptyCell(int row, int col)
     {
         return false; //avoid overlapping cells
 
@@ -895,11 +896,11 @@ std::set<unsigned int> CustomGrid::getAllSelectedRows() const
     {
         wxGridCellCoordsArray tmpArrayBottom = this->GetSelectionBlockBottomRight();
 
-        unsigned int arrayCount = tmpArrayTop.GetCount();
+        size_t arrayCount = tmpArrayTop.GetCount();
 
         if (arrayCount == tmpArrayBottom.GetCount())
         {
-            for (unsigned int i = 0; i < arrayCount; ++i)
+            for (size_t i = 0; i < arrayCount; ++i)
             {
                 const int rowTop    = tmpArrayTop[i].GetRow();
                 const int rowBottom = tmpArrayBottom[i].GetRow();
@@ -1036,7 +1037,6 @@ private:
 #endif
 
 //----------------------------------------------------------------------------------------
-
 
 CustomGridRim::CustomGridRim(wxWindow *parent,
                              wxWindowID id,
@@ -1182,7 +1182,7 @@ void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
         if (getTypeAtPos(i) == xmlAccess::SIZE)
         {
             wxGridCellAttr* cellAttributes = GetOrCreateCellAttr(0, i);
-            cellAttributes->SetAlignment(wxALIGN_RIGHT,wxALIGN_CENTRE);
+            cellAttributes->SetAlignment(wxALIGN_RIGHT, wxALIGN_CENTRE);
             SetColAttr(i, cellAttributes); //make filesize right justified on grids
             break;
         }
@@ -1225,6 +1225,60 @@ CustomGridTableRim* CustomGridRim::getGridDataTable()
 {
     //let the non-const call the const version: see Meyers Effective C++
     return const_cast<CustomGridTableRim*>(static_cast<const CustomGridRim*>(this)->getGridDataTable());
+}
+
+
+void CustomGridRim::autoSizeColumns()  //performance optimized column resizer (analog to wxGrid::AutoSizeColumns()
+{
+    for (int col = 0; col < GetNumberCols(); ++col)
+    {
+        if (col < 0)
+            return;
+
+        int rowMax = -1;
+        size_t lenMax = 0;
+        for (int row = 0; row < GetNumberRows(); ++row)
+            if (GetCellValue(row, col).size() > lenMax)
+            {
+                lenMax = GetCellValue(row, col).size();
+                rowMax = row;
+            }
+
+        wxCoord extentMax = 0;
+
+        //calculate width of (most likely) widest cell
+        wxClientDC dc(GetGridWindow());
+        if (rowMax > -1)
+        {
+            wxGridCellAttr* attr = GetCellAttr(rowMax, col);
+            if (attr)
+            {
+                wxGridCellRenderer* renderer = attr->GetRenderer(this, rowMax, col);
+                if (renderer)
+                {
+                    const wxSize size = renderer->GetBestSize(*this, *attr, dc, rowMax, col);
+                    extentMax = std::max(extentMax, size.x);
+                    renderer->DecRef();
+                }
+                attr->DecRef();
+            }
+        }
+
+        //consider column label
+        dc.SetFont(GetLabelFont());
+        wxCoord w = 0;
+        wxCoord h = 0;
+        dc.GetMultiLineTextExtent(GetColLabelValue(col), &w, &h );
+        if (GetColLabelTextOrientation() == wxVERTICAL)
+            w = h;
+        extentMax = std::max(extentMax, w);
+
+        extentMax += 15; //leave some space around text
+
+        SetColSize(col, extentMax);
+
+    }
+    Refresh();
 }
 
 
@@ -1897,3 +1951,8 @@ const wxBitmap& FreeFileSync::getSyncOpImage(SyncOperation syncOp)
 
     return wxNullBitmap; //dummy
 }
+
+
+
+
+

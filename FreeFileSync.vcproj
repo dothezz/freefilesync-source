@@ -48,9 +48,10 @@
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="4"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4804"
+				DisableSpecificWarnings="4804;4100"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -132,9 +133,9 @@
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="4"
 				DebugInformationFormat="3"
-				DisableSpecificWarnings="4804"
+				DisableSpecificWarnings="4804;4100"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -260,6 +261,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\shared\guid.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ui\guiGenerated.cpp"
 				>
 			</File>
@@ -298,6 +303,22 @@
 			<File
 				RelativePath=".\ui\smallDialogs.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableSpecificWarnings="4706"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						DisableSpecificWarnings="4706"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\shared\standardPaths.cpp"
@@ -341,6 +362,10 @@
 			</File>
 			<File
 				RelativePath=".\shared\toggleButton.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ui\trayIcon.cpp"
 				>
 			</File>
 			<File

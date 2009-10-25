@@ -562,8 +562,8 @@ Info
 Info
 Information
 Informacja
-Initial synchronization. Please verify default copy-directions!
-Wstępna synchronizacja. Sprawdź domyślne kierunki synchronizacji!
+Initial synchronization.
+Wstępna synchronizacja.
 Integrate external applications into context menu. The following macros are available:
 Dołącz zewnętrzną aplikację do menu kontekstowego. Dostępne macra:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)

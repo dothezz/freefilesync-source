@@ -17,8 +17,8 @@ bool symlinkExists(const DefaultChar* objname); //throw()       check if a symbo
 //check if files can be moved between two EXISTING paths (without copying)
 bool isMovable(const Zstring& pathFrom, const Zstring& pathTo); //throw()
 
-//optionally: copy directory last change date, DOES NOTHING if something fails
-void copyDirLastChangeDate(const Zstring& sourceDir, const Zstring& targetDir);
+//optionally: copy creation/last change date, DOES NOTHING if something fails
+void copyFileTimes(const Zstring& sourceDir, const Zstring& targetDir); //throw()
 
 //recycler
 bool recycleBinExists(); //test existence of Recycle Bin API on current system
@@ -39,6 +39,9 @@ struct MoveFileCallback //callback functionality
     };
     virtual Response requestUiRefresh() = 0;  //DON'T throw exceptions here, at least in Windows build!
 };
+
+//rename file: no copying!!!
+void renameFile(const Zstring& oldName, const Zstring& newName); //throw (FileError);
 
 //move source to target; expectations: target not existing, all super-directories of target exist
 void moveFile(const Zstring& sourceFile, const Zstring& targetFile, MoveFileCallback* callback = NULL); //throw (FileError);

@@ -149,6 +149,9 @@ public:
     xmlAccess::ColumnTypes getTypeAtPos(unsigned pos) const;
     static wxString getTypeName(xmlAccess::ColumnTypes colType);
 
+    void autoSizeColumns();        //performance optimized column resizer
+    void autoSizeColumns(int col, bool doRefresh = true); //
+
 #ifdef FFS_WIN
     void enableFileIcons(const bool value);
 #endif

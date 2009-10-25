@@ -6,12 +6,10 @@
 using FreeFileSync::ErrorLogging;
 
 
-void ErrorLogging::logError(const wxString& errorMessage)
+void ErrorLogging::logInfo(const wxString& infoMessage)
 {
-    ++errorCount;
-
-    const wxString prefix = wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + _("Error") + wxT(": ");
-    formattedMessages.push_back(assembleMessage(prefix, errorMessage));
+    const wxString prefix = wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + _("Info") + wxT(": ");
+    formattedMessages.push_back(assembleMessage(prefix, infoMessage));
 }
 
 
@@ -22,10 +20,21 @@ void ErrorLogging::logWarning(const wxString& warningMessage)
 }
 
 
-void ErrorLogging::logInfo(const wxString& infoMessage)
+void ErrorLogging::logError(const wxString& errorMessage)
 {
-    const wxString prefix = wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + _("Info") + wxT(": ");
-    formattedMessages.push_back(assembleMessage(prefix, infoMessage));
+    ++errorCount;
+
+    const wxString prefix = wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + _("Error") + wxT(": ");
+    formattedMessages.push_back(assembleMessage(prefix, errorMessage));
+}
+
+
+void ErrorLogging::logFatalError(const wxString& errorMessage)
+{
+    ++errorCount;
+
+    const wxString prefix = wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + _("Fatal Error") + wxT(": ");
+    formattedMessages.push_back(assembleMessage(prefix, errorMessage));
 }
 
 

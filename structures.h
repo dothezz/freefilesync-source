@@ -61,6 +61,7 @@ public:
     };
     Variant getVariant() const;
     void setVariant(const Variant var);
+    wxString getVariantName() const;
 
     bool automatic; //use sync-database
     SyncDirection exLeftSideOnly;

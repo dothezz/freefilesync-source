@@ -123,17 +123,10 @@ void SyncConfiguration::setVariant(const Variant var)
     }
 }
 
-wxString MainConfiguration::getSyncVariantName()
+
+wxString SyncConfiguration::getVariantName() const
 {
-    const SyncConfiguration::Variant mainVariant = syncConfiguration.getVariant();
-
-    //test if there's a deviating variant within the additional folder pairs
-    for (std::vector<FolderPairEnh>::const_iterator i = additionalPairs.begin(); i != additionalPairs.end(); ++i)
-        if (i->altSyncConfig.get() && i->altSyncConfig->syncConfiguration.getVariant() != mainVariant)
-            return _("Multiple...");
-
-    //seems to be all in sync...
-    switch (mainVariant)
+    switch (getVariant())
     {
     case SyncConfiguration::AUTOMATIC:
         return _("<Automatic>");
@@ -146,8 +139,21 @@ wxString MainConfiguration::getSyncVariantName()
     case SyncConfiguration::CUSTOM:
         return _("Custom");
     }
-
     return _("Error");
+}
+
+
+wxString MainConfiguration::getSyncVariantName()
+{
+    const SyncConfiguration::Variant mainVariant = syncConfiguration.getVariant();
+
+    //test if there's a deviating variant within the additional folder pairs
+    for (std::vector<FolderPairEnh>::const_iterator i = additionalPairs.begin(); i != additionalPairs.end(); ++i)
+        if (i->altSyncConfig.get() && i->altSyncConfig->syncConfiguration.getVariant() != mainVariant)
+            return _("Multiple...");
+
+    //seems to be all in sync...
+    return syncConfiguration.getVariantName();
 }
 
 

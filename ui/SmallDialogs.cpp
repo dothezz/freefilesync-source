@@ -13,6 +13,7 @@
 #include "../library/statusHandler.h"
 #include <wx/wupdlock.h>
 #include "../shared/globalFunctions.h"
+#include "trayIcon.h"
 
 using namespace FreeFileSync;
 
@@ -166,7 +167,7 @@ void FilterDlg::OnDefault(wxCommandEvent& event)
     m_textCtrlExclude->SetValue(zToWx(defaultExcludeFilter()));
 
     //changes to mainDialog are only committed when the OK button is pressed
-    event.Skip();
+    Fit();
 }
 
 
@@ -739,7 +740,6 @@ void GlobalSettingsDlg::OnDefault(wxCommandEvent& event)
     xmlAccess::XmlGlobalSettings defaultCfg;
 
     m_checkBoxIgnoreOneHour->SetValue(defaultCfg.ignoreOneHourDiff);
-
     set(defaultCfg.gui.externelApplications);
 }
 
@@ -919,10 +919,10 @@ void CompareStatus::updateStatusPanelNow()
             if (*i == wxChar('\n'))
                 *i = wxChar(' ');
 
-        //status texts
+        //status texts 
         if (m_textCtrlStatus->GetValue() != formattedStatusText && (screenChanged = true)) //avoid screen flicker
             m_textCtrlStatus->SetValue(formattedStatusText);
-
+ 
         //nr of scanned objects
         const wxString scannedObjTmp = globalFunctions::numberToWxString(scannedObjects);
         if (m_staticTextScanned->GetLabel() != scannedObjTmp && (screenChanged = true)) //avoid screen flicker
@@ -942,7 +942,7 @@ void CompareStatus::updateStatusPanelNow()
             m_staticTextDataRemaining->SetLabel(remainingBytesTmp);
 
         if (statistics.get())
-        {
+        { 
             if (timeElapsed.Time() - lastStatCallSpeed >= 500) //call method every 500 ms
             {
                 lastStatCallSpeed = timeElapsed.Time();
@@ -982,10 +982,15 @@ void CompareStatus::updateStatusPanelNow()
 //########################################################################################
 
 SyncStatus::SyncStatus(StatusHandler* updater, wxWindow* parentWindow) :
-    SyncStatusDlgGenerated(parentWindow),
-    currentStatusHandler(updater),
-    windowToDis(parentWindow),
-    currentProcessIsRunning(true),
+    SyncStatusDlgGenerated(parentWindow,
+                           wxID_ANY,
+                           parentWindow ? wxEmptyString : _("FreeFileSync - Folder Comparison and Synchronization"),
+                           wxDefaultPosition, wxSize(638, 376),
+                           parentWindow ?
+                           wxDEFAULT_FRAME_STYLE | wxFRAME_NO_TASKBAR | wxFRAME_FLOAT_ON_PARENT :
+                           wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL),
+    processStatusHandler(updater),
+    mainDialog(parentWindow),
     totalObjects(0),
     totalData(0),
     currentObjects(0),
@@ -1006,21 +1011,25 @@ SyncStatus::SyncStatus(StatusHandler* updater, wxWindow* parentWindow) :
 
     m_buttonAbort->SetFocus();
 
-    if (windowToDis)    //disable (main) window while this status dialog is shown
-        windowToDis->Disable();
+    if (mainDialog)    //disable (main) window while this status dialog is shown
+        mainDialog->Disable();
 
+    SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
     timeElapsed.Start(); //measure total time
 }
 
 
 SyncStatus::~SyncStatus()
 {
-    if (windowToDis)
+    if (mainDialog)
     {
-        windowToDis->Enable();
-        windowToDis->Raise();
-        windowToDis->SetFocus();
+        mainDialog->Enable();
+        mainDialog->Raise();
+        mainDialog->SetFocus();
     }
+
+    if (minimizedToSysTray.get())
+        minimizedToSysTray->keepHidden(); //avoid window flashing shortly before it is destroyed
 }
 
 
@@ -1059,17 +1068,43 @@ void SyncStatus::setStatusText_NoUpdate(const Zstring& text)
 
 void SyncStatus::updateStatusDialogNow()
 {
-
     //static RetrieveStatistics statistic;
     //statistic.writeEntry(currentData, currentObjects);
 
+    //write status information systray, too, if window is minimized
+    if (minimizedToSysTray.get())
+        switch (currentStatus)
+        {
+        case SCANNING:
+            minimizedToSysTray->setToolTip(wxString(wxT("FreeFileSync - ")) + wxString(_("Scanning...")));
+            //+ wxT(" ") + globalFunctions::numberToWxString(currentObjects));
+            break;
+        case COMPARING_CONTENT:
+            minimizedToSysTray->setToolTip(wxString(wxT("FreeFileSync - ")) + wxString(_("Comparing content...")) + wxT(" ") +
+                                           fromatPercentage(currentData, totalData));
+            break;
+        case SYNCHRONIZING:
+            minimizedToSysTray->setToolTip(wxString(wxT("FreeFileSync - ")) + wxString(_("Synchronizing...")) + wxT(" ") +
+                                           fromatPercentage(currentData, totalData));
+            break;
+        case ABORTED:
+        case FINISHED_WITH_SUCCESS:
+        case FINISHED_WITH_ERROR:
+        case PAUSE:
+            minimizedToSysTray->setToolTip(wxT("FreeFileSync"));
+        }
+
+    //write regular status information (if dialog is visible or not)
     {
         wxWindowUpdateLocker dummy(this); //reduce display distortion
 
         bool screenChanged = false; //avoid screen flicker by calling layout() only if necessary
 
         //progress indicator
-        m_gauge1->SetValue(globalFunctions::round(currentData.ToDouble() * scalingFactor));
+        if (currentStatus == SCANNING)
+            m_gauge1->Pulse();
+        else
+            m_gauge1->SetValue(globalFunctions::round(currentData.ToDouble() * scalingFactor));
 
         //status text
         const wxString statusTxt = zToWx(currentStatusText);
@@ -1126,12 +1161,18 @@ void SyncStatus::updateStatusDialogNow()
     }
     updateUiNow();
 
-    //support for pause button
-    while (processPaused && currentProcessIsRunning)
+//support for pause button
+    while (processPaused && currentProcessIsRunning())
     {
         wxMilliSleep(UI_UPDATE_INTERVAL);
         updateUiNow();
     }
+}
+
+
+bool SyncStatus::currentProcessIsRunning()
+{
+    return processStatusHandler != NULL;
 }
 
 
@@ -1183,9 +1224,13 @@ void SyncStatus::setCurrentStatus(SyncStatusID id)
 void SyncStatus::processHasFinished(SyncStatusID id, const wxString& finalMessage) //essential to call this in StatusHandler derived class destructor
 {
     //at the LATEST(!) to prevent access to currentStatusHandler
-    currentProcessIsRunning = false; //enable okay and close events; may be set in this method ONLY
+    //enable okay and close events; may be set in this method ONLY
+
+    processStatusHandler = NULL; //avoid callback to (maybe) deleted parent process
 
     setCurrentStatus(id);
+
+    resumeFromSystray(); //if in tray mode...
 
     m_buttonAbort->Disable();
     m_buttonAbort->Hide();
@@ -1208,7 +1253,7 @@ void SyncStatus::processHasFinished(SyncStatusID id, const wxString& finalMessag
 
 void SyncStatus::OnOkay(wxCommandEvent& event)
 {
-    if (!currentProcessIsRunning) Destroy();
+    if (!currentProcessIsRunning()) Destroy();
 }
 
 
@@ -1248,7 +1293,7 @@ void SyncStatus::OnPause(wxCommandEvent& event)
 void SyncStatus::OnAbort(wxCommandEvent& event)
 {
     processPaused = false;
-    if (currentProcessIsRunning)
+    if (currentProcessIsRunning())
     {
         m_buttonAbort->Disable();
         m_buttonAbort->Hide();
@@ -1258,7 +1303,7 @@ void SyncStatus::OnAbort(wxCommandEvent& event)
         setStatusText_NoUpdate(wxToZ(_("Abort requested: Waiting for current operation to finish...")));
         //no Layout() or UI-update here to avoid cascaded Yield()-call
 
-        currentStatusHandler->requestAbortion();
+        processStatusHandler->requestAbortion();
     }
 }
 
@@ -1266,8 +1311,28 @@ void SyncStatus::OnAbort(wxCommandEvent& event)
 void SyncStatus::OnClose(wxCloseEvent& event)
 {
     processPaused = false;
-    if (currentProcessIsRunning)
-        currentStatusHandler->requestAbortion();
+    if (processStatusHandler)
+        processStatusHandler->requestAbortion();
     else
         Destroy();
 }
+
+
+void SyncStatus::OnIconize(wxIconizeEvent& event)
+{
+    if (event.Iconized()) //ATTENTION: iconize event is also triggered on "Restore"! (at least under Linux)
+        minimizeToTray();
+}
+
+
+void SyncStatus::minimizeToTray()
+{
+    minimizedToSysTray.reset(new MinimizeToTray(this, mainDialog));
+}
+
+
+void SyncStatus::resumeFromSystray()
+{
+    minimizedToSysTray.reset();
+}
+

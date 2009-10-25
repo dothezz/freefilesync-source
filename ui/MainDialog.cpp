@@ -736,9 +736,9 @@ void MainDialog::openExternalApplication(unsigned int rowNumber, bool leftSide, 
         if (name.empty())
         {
             if (leftSide)
-                wxExecute(wxString(wxT("explorer ")) + fsObj->getBaseDirPf<LEFT_SIDE>());
+                wxExecute(wxString(wxT("explorer ")) + zToWx(fsObj->getBaseDirPf<LEFT_SIDE>()));
             else
-                wxExecute(wxString(wxT("explorer ")) + fsObj->getBaseDirPf<RIGHT_SIDE>());
+                wxExecute(wxString(wxT("explorer ")) + zToWx(fsObj->getBaseDirPf<RIGHT_SIDE>()));
             return;
         }
 #endif
@@ -815,6 +815,7 @@ void MainDialog::disableAllElements()
     m_menubar1->EnableTop(0, false);
     m_menubar1->EnableTop(1, false);
     m_menubar1->EnableTop(2, false);
+    EnableCloseButton(false);
 
     //show abort button
     m_buttonAbort->Enable();
@@ -852,6 +853,7 @@ void MainDialog::enableAllElements()
     m_menubar1->EnableTop(0, true);
     m_menubar1->EnableTop(1, true);
     m_menubar1->EnableTop(2, true);
+    EnableCloseButton(true);
 
     //show compare button
     m_buttonAbort->Disable();
@@ -914,7 +916,7 @@ void MainDialog::onGridLeftButtonEvent(wxKeyEvent& event)
         else if (keyCode == 65) //CTRL + A
             m_gridLeft->SelectAll();
         else if (keyCode == WXK_NUMPAD_ADD) //CTRL + '+'
-            m_gridLeft->AutoSizeColumns(false);
+            m_gridLeft->autoSizeColumns();
     }
     else
         switch (keyCode)
@@ -969,7 +971,7 @@ void MainDialog::onGridRightButtonEvent(wxKeyEvent& event)
         else if (keyCode == 65) //CTRL + A
             m_gridRight->SelectAll();
         else if (keyCode == WXK_NUMPAD_ADD) //CTRL + '+'
-            m_gridRight->AutoSizeColumns(false);
+            m_gridRight->autoSizeColumns();
     }
     else
         switch (keyCode)
@@ -2034,8 +2036,8 @@ FolderPairEnh getEnahncedPair(const FolderPairPanel* panel)
 {
     return FolderPairEnh(wxToZ(panel->m_directoryLeft->GetValue()),
                          wxToZ(panel->m_directoryRight->GetValue()),
-                         panel->altSyncConfig,
-                         panel->altFilter);
+                         panel->getAltSyncConfig(),
+                         panel->getAltFilterConfig());
 }
 
 
@@ -2458,9 +2460,9 @@ void MainDialog::updateGuiGrid()
 
     //support for column auto adjustment
     if (globalSettings.gui.autoAdjustColumnsLeft)
-        m_gridLeft->AutoSizeColumns(false);
+        m_gridLeft->autoSizeColumns();
     if (globalSettings.gui.autoAdjustColumnsRight)
-        m_gridRight->AutoSizeColumns(false);
+        m_gridRight->autoSizeColumns();
 
     //update sync preview statistics
     calculatePreview();
@@ -2585,7 +2587,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
                 currentCfg.mainCfg.hidden.traverseDirectorySymlinks,
                 globalSettings.optDialogs,
                 currentCfg.mainCfg.hidden.verifyFileCopy,
-                &statusHandler);
+                statusHandler);
 
             const std::vector<FreeFileSync::FolderPairSyncCfg> syncProcessCfg = FreeFileSync::extractSyncCfg(getCurrentConfiguration().mainCfg);
             FolderComparison& dataToSync = gridDataView->getDataTentative();
@@ -3183,9 +3185,7 @@ void MainDialog::addFolderPair(const std::vector<FolderPairEnh>& newPairs, bool 
         FreeFileSync::setDirectoryName(zToWx(i->rightDirectory), newPair->m_directoryRight, newPair->m_dirPickerRight);
 
         //set alternate configuration
-        newPair->altSyncConfig = i->altSyncConfig;
-        newPair->altFilter     = i->altFilter;
-        newPair->updateAltButtonColor();
+        newPair->setValues(i->altSyncConfig, i->altFilter);
     }
 
     //set size of scrolled window

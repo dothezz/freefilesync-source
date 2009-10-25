@@ -109,8 +109,7 @@ ErrorHandler::Response CompareStatusHandler::reportError(const wxString& message
     ErrorDlg* errorDlg = new ErrorDlg(mainDialog,
                                       ErrorDlg::BUTTON_IGNORE |  ErrorDlg::BUTTON_RETRY | ErrorDlg::BUTTON_ABORT,
                                       errorMessage, ignoreNextErrors);
-    int rv = errorDlg->ShowModal();
-    switch (rv)
+    switch (static_cast<ErrorDlg::ReturnCodes>(errorDlg->ShowModal()))
     {
     case ErrorDlg::BUTTON_IGNORE:
         ignoreErrors = ignoreNextErrors;
@@ -308,7 +307,7 @@ ErrorHandler::Response SyncStatusHandler::reportError(const wxString& errorMessa
 
 void SyncStatusHandler::reportFatalError(const wxString& errorMessage)
 {
-    errorLog.logError(errorMessage);
+    errorLog.logFatalError(errorMessage);
     abortThisProcess();
 }
 

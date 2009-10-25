@@ -562,8 +562,8 @@ Info
 訊息
 Information
 訊息
-Initial synchronization. Please verify default copy-directions!
-初始化同步。請驗證預設的複製方向！
+Initial synchronization.
+初始化同步。
 Integrate external applications into context menu. The following macros are available:
 整合上下文功能表中的外部應用程式。可以使用下面的巨集：
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)

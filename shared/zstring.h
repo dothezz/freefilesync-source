@@ -107,7 +107,11 @@ public:
     static const size_t	npos = static_cast<size_t>(-1);
 
 private:
-    Zstring(int); //indicates usage error
+    //detect usage errors
+    Zstring(int);
+    friend const Zstring operator+(const DefaultChar* lhs, const Zstring& rhs);
+    friend const Zstring operator+(const DefaultChar ch, const Zstring& rhs);
+
     DefaultChar* data();
 
     void initAndCopy(const DefaultChar* source, size_t length);

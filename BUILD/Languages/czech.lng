@@ -562,8 +562,8 @@ Info
 Info
 Information
 Informace
-Initial synchronization. Please verify default copy-directions!
-Prvotní synchronizace. Prosím ověřte základní nastavení směru synchronizace!
+Initial synchronization.
+Prvotní synchronizace.
 Integrate external applications into context menu. The following macros are available:
 Integrace externí aplikace do kontextového menu. K dispozici jsou následující makra:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)

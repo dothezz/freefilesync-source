@@ -43,7 +43,7 @@ bool Application::OnInit()
 }
 
 
-void Application::OnStartApplication(wxIdleEvent& event)
+void Application::OnStartApplication(wxIdleEvent&)
 {
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), NULL, this);
 
@@ -222,9 +222,9 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         //class handling status updates and error messages
         std::auto_ptr<BatchStatusHandler> statusHandler;  //delete object automatically
         if (batchCfg.silent)
-            statusHandler.reset(new BatchStatusHandlerSilent(batchCfg.handleError, batchCfg.logFileDirectory, returnValue));
+            statusHandler.reset(new BatchStatusHandler(true, &batchCfg.logFileDirectory, batchCfg.handleError, returnValue));
         else
-            statusHandler.reset(new BatchStatusHandlerGui(batchCfg.handleError, returnValue));
+            statusHandler.reset(new BatchStatusHandler(false, NULL, batchCfg.handleError, returnValue));
 
         //COMPARE DIRECTORIES
         FreeFileSync::FolderComparison folderCmp;
@@ -241,7 +241,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         //check if there are files/folders to be sync'ed at all
         if (!synchronizationNeeded(folderCmp))
         {
-            statusHandler->addFinalInfo(_("Nothing to synchronize according to configuration!")); //inform about this special case
+            statusHandler->reportInfo(_("Nothing to synchronize according to configuration!")); //inform about this special case
             return;
         }
 
@@ -251,7 +251,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
             batchCfg.mainCfg.hidden.traverseDirectorySymlinks,
             globSettings.optDialogs,
             batchCfg.mainCfg.hidden.verifyFileCopy,
-            statusHandler.get());
+            *statusHandler);
 
         const std::vector<FreeFileSync::FolderPairSyncCfg> syncProcessCfg = FreeFileSync::extractSyncCfg(batchCfg.mainCfg);
         assert(syncProcessCfg.size() == folderCmp.size());

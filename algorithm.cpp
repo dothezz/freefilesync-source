@@ -322,12 +322,13 @@ public:
         txtFilterChanged(_("Cannot determine sync-direction: Changed filter settings!")),
         handler_(handler)
     {
+        if (baseDirectory.subFiles.empty() && baseDirectory.subDirs.empty()) //don't show nag-screens in this case
+            return;
+
         //try to load sync-database files
-        boost::shared_ptr<const DirInformation> dirInfoLeft  = loadDBFile<LEFT_SIDE>(baseDirectory);
-        boost::shared_ptr<const DirInformation> dirInfoRight = dirInfoLeft.get() == NULL ? //don't load second DB if loading of first failed, to avoid duplicate error messages
-                boost::shared_ptr<const DirInformation>() : loadDBFile<RIGHT_SIDE>(baseDirectory);
-        if (    dirInfoLeft.get()  == NULL ||
-                dirInfoRight.get() == NULL)
+        std::pair<DirInfoPtr, DirInfoPtr> dirInfo = loadDBFile(baseDirectory);
+        if (    dirInfo.first.get()  == NULL ||
+                dirInfo.second.get() == NULL)
         {
             //use standard settings:
             SyncConfiguration defaultSync;
@@ -336,40 +337,43 @@ public:
             return;
         }
 
-        if (    respectFiltering(baseDirectory, *dirInfoLeft) &&
-                respectFiltering(baseDirectory, *dirInfoRight))
+        const DirInformation& dirInfoLeft  = *dirInfo.first;
+        const DirInformation& dirInfoRight = *dirInfo.second;
+
+        if (    respectFiltering(baseDirectory, dirInfoLeft) &&
+                respectFiltering(baseDirectory, dirInfoRight))
         {
             execute(baseDirectory,
-                    DetectChanges<true>(&dirInfoLeft->baseDirContainer,
-                                        FilterProcess(dirInfoLeft->includeFilter,
-                                                dirInfoLeft->excludeFilter)),
-                    DetectChanges<true>(&dirInfoRight->baseDirContainer,
-                                        FilterProcess(dirInfoRight->includeFilter,
-                                                dirInfoRight->excludeFilter)));
+                    DetectChanges<true>(&dirInfoLeft.baseDirContainer,
+                                        FilterProcess(dirInfoLeft.includeFilter,
+                                                dirInfoLeft.excludeFilter)),
+                    DetectChanges<true>(&dirInfoRight.baseDirContainer,
+                                        FilterProcess(dirInfoRight.includeFilter,
+                                                dirInfoRight.excludeFilter)));
         }
-        else if (   !respectFiltering(baseDirectory, *dirInfoLeft) &&
-                    respectFiltering(baseDirectory, *dirInfoRight))
+        else if (   !respectFiltering(baseDirectory, dirInfoLeft) &&
+                    respectFiltering( baseDirectory, dirInfoRight))
         {
             execute(baseDirectory,
-                    DetectChanges<false>(&dirInfoLeft->baseDirContainer),
-                    DetectChanges<true>(&dirInfoRight->baseDirContainer,
-                                        FilterProcess(dirInfoRight->includeFilter,
-                                                dirInfoRight->excludeFilter)));
+                    DetectChanges<false>(&dirInfoLeft.baseDirContainer),
+                    DetectChanges<true>(&dirInfoRight.baseDirContainer,
+                                        FilterProcess(dirInfoRight.includeFilter,
+                                                dirInfoRight.excludeFilter)));
         }
-        else if (   respectFiltering(baseDirectory, *dirInfoLeft) &&
-                    !respectFiltering(baseDirectory, *dirInfoRight))
+        else if (   respectFiltering( baseDirectory, dirInfoLeft) &&
+                    !respectFiltering(baseDirectory, dirInfoRight))
         {
             execute(baseDirectory,
-                    DetectChanges<true>(&dirInfoLeft->baseDirContainer,
-                                        FilterProcess(dirInfoLeft->includeFilter,
-                                                dirInfoLeft->excludeFilter)),
-                    DetectChanges<false>(&dirInfoRight->baseDirContainer));
+                    DetectChanges<true>(&dirInfoLeft.baseDirContainer,
+                                        FilterProcess(dirInfoLeft.includeFilter,
+                                                dirInfoLeft.excludeFilter)),
+                    DetectChanges<false>(&dirInfoRight.baseDirContainer));
         }
         else
         {
             execute(baseDirectory,
-                    DetectChanges<false>(&dirInfoLeft->baseDirContainer),
-                    DetectChanges<false>(&dirInfoRight->baseDirContainer));
+                    DetectChanges<false>(&dirInfoLeft.baseDirContainer),
+                    DetectChanges<false>(&dirInfoRight.baseDirContainer));
         }
     }
 
@@ -388,27 +392,18 @@ private:
                               dirInfo.excludeFilter));
     }
 
-    template <SelectedSide side>
-    boost::shared_ptr<const DirInformation> loadDBFile(const BaseDirMapping& baseDirectory) //return NULL on failure
+    std::pair<DirInfoPtr, DirInfoPtr> loadDBFile(const BaseDirMapping& baseDirectory) //return NULL on failure
     {
-        if (!FreeFileSync::fileExists(baseDirectory.getDBFilename<side>()))
-        {
-            if (handler_) handler_->reportWarning(
-                    wxString(_("Initial synchronization. Please verify default copy-directions!")) + wxT(" \n") +
-                    wxT("(") + _("No database file existing yet:") + wxT(" \"") + zToWx(baseDirectory.getBaseDir<side>()) + wxT("\")"));
-            return boost::shared_ptr<const DirInformation>(); //NULL
-        }
-
         try
         {
-            return loadFromDisk(baseDirectory.getDBFilename<side>());
+            return loadFromDisk(baseDirectory);
         }
         catch (FileError& error) //e.g. incompatible database version
         {
             if (handler_) handler_->reportWarning(error.show() + wxT(" \n\n") +
                                                       _("Using default synchronization directions. Please recheck."));
         }
-        return boost::shared_ptr<const DirInformation>(); //NULL
+        return std::pair<DirInfoPtr, DirInfoPtr>(); //NULL
     }
 
     template<typename Iterator, typename Function>
@@ -416,8 +411,8 @@ private:
 
     template <bool dbLeftFilterActive, bool dbRightFilterActive>
     void execute(HierarchyObject& hierObj,
-                        const DetectChanges<dbLeftFilterActive>& dbLeft,
-                        const DetectChanges<dbRightFilterActive>& dbRight)
+                 const DetectChanges<dbLeftFilterActive>& dbLeft,
+                 const DetectChanges<dbRightFilterActive>& dbRight)
     {
         //process files
         std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(),
@@ -429,8 +424,8 @@ private:
 
     template <bool dbLeftFilterActive, bool dbRightFilterActive>
     void processFile(FileMapping& fileObj,
-                            const DetectChanges<dbLeftFilterActive>& dbLeft,
-                            const DetectChanges<dbRightFilterActive>& dbRight)
+                     const DetectChanges<dbLeftFilterActive>& dbLeft,
+                     const DetectChanges<dbRightFilterActive>& dbRight)
     {
         const CompareFilesResult cat = fileObj.getCategory();
         if (cat == FILE_EQUAL)
@@ -478,9 +473,9 @@ private:
 
 
     template <bool dbLeftFilterActive, bool dbRightFilterActive>
-     void processDir(DirMapping& dirObj,
-                           const DetectChanges<dbLeftFilterActive>& dbLeft,
-                           const DetectChanges<dbRightFilterActive>& dbRight)
+    void processDir(DirMapping& dirObj,
+                    const DetectChanges<dbLeftFilterActive>& dbLeft,
+                    const DetectChanges<dbRightFilterActive>& dbRight)
     {
         const typename DetectChanges<dbLeftFilterActive> ::DirAnswer statusLeft  = dbLeft. template detectDirChange<LEFT_SIDE>(dirObj);
         const typename DetectChanges<dbRightFilterActive>::DirAnswer statusRight = dbRight.template detectDirChange<RIGHT_SIDE>(dirObj);

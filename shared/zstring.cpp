@@ -88,7 +88,7 @@ Zstring& Zstring::Replace(const DefaultChar* old, const DefaultChar* replacement
     const size_t replacementLen = defaultLength(replacement);
 
     size_t pos = 0;
-    while (true)
+    for (;;)
     {
         pos = find(old, pos);
         if (pos == npos)
@@ -216,7 +216,7 @@ std::vector<Zstring> Zstring::Tokenize(const DefaultChar delimiter) const
 
     const size_t thisLen = length();
     size_t indexStart = 0;
-    while (true)
+    for (;;)
     {
         size_t indexEnd = find(delimiter, indexStart);
         if (indexEnd == Zstring::npos)

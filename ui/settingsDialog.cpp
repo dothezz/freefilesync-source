@@ -938,8 +938,8 @@ FolderPairEnh getEnahncedPair(const BatchFolderPairPanel* panel)
 {
     return FolderPairEnh(wxToZ(panel->m_directoryLeft->GetValue()),
                          wxToZ(panel->m_directoryRight->GetValue()),
-                         panel->altSyncConfig,
-                         panel->altFilter);
+                         panel->getAltSyncConfig(),
+                         panel->getAltFilterConfig());
 }
 
 
@@ -1153,9 +1153,7 @@ void BatchDialog::addFolderPair(const std::vector<FreeFileSync::FolderPairEnh>& 
         FreeFileSync::setDirectoryName(zToWx(i->rightDirectory), newPair->m_directoryRight, newPair->m_dirPickerRight);
 
         //set alternate configuration
-        newPair->altSyncConfig = i->altSyncConfig;
-        newPair->altFilter     = i->altFilter;
-        newPair->updateAltButtonColor();
+        newPair->setValues(i->altSyncConfig, i->altFilter);
     }
     //set size of scrolled window
     const int visiblePairs = std::min(additionalFolderPairs.size() + 1, MAX_FOLDER_PAIRS); //up to MAX_FOLDER_PAIRS pairs shall be shown

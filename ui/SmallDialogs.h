@@ -9,6 +9,7 @@
 
 class Statistics;
 class StatusHandler;
+class MinimizeToTray;
 
 namespace FreeFileSync
 {
@@ -320,17 +321,22 @@ public:
     void setCurrentStatus(SyncStatusID id);
     void processHasFinished(SyncStatusID id, const wxString& finalMessage);  //essential to call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater
 
+    void minimizeToTray();
+
 private:
-    void OnOkay(wxCommandEvent& event);
-    void OnPause(wxCommandEvent& event);
-    void OnAbort(wxCommandEvent& event);
-    void OnClose(wxCloseEvent& event);
+    virtual void OnOkay(wxCommandEvent& event);
+    virtual void OnPause(wxCommandEvent& event);
+    virtual void OnAbort(wxCommandEvent& event);
+    virtual void OnClose(wxCloseEvent& event);
+    virtual void OnIconize(wxIconizeEvent& event);
+
+    void resumeFromSystray();
+    bool currentProcessIsRunning();
 
     wxStopWatch timeElapsed;
 
-    StatusHandler* currentStatusHandler;
-    wxWindow* windowToDis;
-    bool currentProcessIsRunning;
+    StatusHandler* processStatusHandler;
+    wxWindow* mainDialog;
 
     //gauge variables
     int        totalObjects;
@@ -347,6 +353,8 @@ private:
     std::auto_ptr<Statistics> statistics;
     long lastStatCallSpeed;   //used for calculating intervals between statistics update
     long lastStatCallRemTime; //
+
+    boost::shared_ptr<MinimizeToTray> minimizedToSysTray; //optional: if filled, hides all visible windows, shows again if destroyed
 };
 
 #endif // SMALLDIALOGS_H_INCLUDED

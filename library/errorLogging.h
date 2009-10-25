@@ -13,16 +13,17 @@ class ErrorLogging
 public:
     ErrorLogging() : errorCount(0) {}
 
-    void logError(const wxString& errorMessage);
-    void logWarning(const wxString& warningMessage);
-    void logInfo(const wxString& infoMessage);
+    void logInfo(      const wxString& infoMessage);
+    void logWarning(   const wxString& warningMessage);
+    void logError(     const wxString& errorMessage);
+    void logFatalError(const wxString& errorMessage);
 
     int errorsTotal()
     {
         return errorCount;
     }
 
-    const std::vector<wxString>& getFormattedMessages()
+    const std::vector<wxString>& getFormattedMessages() const
     {
         return formattedMessages;
     }

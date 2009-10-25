@@ -9,6 +9,7 @@
 #include <vector>
 #include "structures.h"
 #include <boost/shared_ptr.hpp>
+#include "shared/guid.h"
 
 class DirectoryBuffer;
 
@@ -104,8 +105,10 @@ struct DirInformation
 
 //save/load full directory information
 const Zstring& getSyncDBFilename(); //get short filename of database file
-void saveToDisk(const BaseDirMapping& baseMapping, SelectedSide side, const Zstring& filename); //throw (FileError) -> return value always bound!
-boost::shared_ptr<const DirInformation> loadFromDisk(const Zstring& filename);                  //throw (FileError)
+void saveToDisk(const BaseDirMapping& baseMapping); //throw (FileError)
+
+typedef boost::shared_ptr<const DirInformation> DirInfoPtr;
+std::pair<DirInfoPtr, DirInfoPtr> loadFromDisk(const BaseDirMapping& baseMapping); //throw (FileError) -> return value always bound!
 
 //------------------------------------------------------------------
 /*    class hierarchy:

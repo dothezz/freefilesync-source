@@ -271,6 +271,29 @@ void FreeFileSync::removeFile(const Zstring& filename, const bool useRecycleBin)
 }
 
 
+//rename file: no copying!!!
+void FreeFileSync::renameFile(const Zstring& oldName, const Zstring& newName) //throw (FileError);
+{
+#ifdef FFS_WIN
+    if (!::MoveFileEx(oldName.c_str(),  //__in      LPCTSTR lpExistingFileName,
+                      newName.c_str(), //__in_opt  LPCTSTR lpNewFileName,
+                      0))                 //__in      DWORD dwFlags
+    {
+        const wxString errorMessage = wxString(_("Error moving file:")) + wxT("\n\"") + zToWx(oldName) +  wxT("\" ->\n\"") + zToWx(newName) + wxT("\"");
+        throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
+    }
+#elif defined FFS_LINUX
+    //rename temporary file
+    if (::rename(oldName.c_str(), newName.c_str()) != 0)
+    {
+        const wxString errorMessage = wxString(_("Error moving file:")) + wxT("\n\"") + zToWx(oldName) +  wxT("\" ->\n\"") + zToWx(newName) + wxT("\"");
+        throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
+    }
+#endif
+}
+
+
+
 using FreeFileSync::MoveFileCallback;
 
 class CopyCallbackImpl : public FreeFileSync::CopyFileCallback //callback functionality
@@ -633,7 +656,7 @@ private:
 
 
 //optionally: copy directory last change date, DO NOTHING if something fails
-void FreeFileSync::copyDirLastChangeDate(const Zstring& sourceDir, const Zstring& targetDir)
+void FreeFileSync::copyFileTimes(const Zstring& sourceDir, const Zstring& targetDir)
 {
     if (symlinkExists(sourceDir)) //don't handle symlinks (yet)
         return;
@@ -646,15 +669,16 @@ void FreeFileSync::copyDirLastChangeDate(const Zstring& sourceDir, const Zstring
                                    OPEN_EXISTING,
                                    FILE_FLAG_BACKUP_SEMANTICS, //needed for directories
                                    NULL);
-
     if (hDirRead == INVALID_HANDLE_VALUE)
         return;
     CloseHandleOnExit dummy(hDirRead);
 
+    FILETIME creationTime;
+    FILETIME accessTime;
     FILETIME lastWriteTime;
     if (::GetFileTime(hDirRead,
-                      NULL,
-                      NULL,
+                      &creationTime,
+                      &accessTime,
                       &lastWriteTime))
     {
         HANDLE hDirWrite = ::CreateFile(targetDir.c_str(),
@@ -664,17 +688,15 @@ void FreeFileSync::copyDirLastChangeDate(const Zstring& sourceDir, const Zstring
                                         OPEN_EXISTING,
                                         FILE_FLAG_BACKUP_SEMANTICS, //needed for directories
                                         NULL);
+        if (hDirWrite == INVALID_HANDLE_VALUE)
+            return;
+        CloseHandleOnExit dummy2(hDirWrite);
 
-        if (hDirWrite != INVALID_HANDLE_VALUE)
-        {
-            CloseHandleOnExit dummy2(hDirWrite);
-
-            //(try to) set new "last write time"
-            ::SetFileTime(hDirWrite,
-                          NULL,
-                          NULL,
-                          &lastWriteTime); //return value not evalutated!
-        }
+        //(try to) set new "last write time"
+        ::SetFileTime(hDirWrite,
+                      &creationTime,
+                      &accessTime,
+                      &lastWriteTime); //return value not evalutated!
     }
 #elif defined FFS_LINUX
 
@@ -683,7 +705,8 @@ void FreeFileSync::copyDirLastChangeDate(const Zstring& sourceDir, const Zstring
     {
         //adapt file modification time:
         struct utimbuf newTimes;
-        ::time(&newTimes.actime); //set file access time to current time
+        //::time(&newTimes.actime); //set file access time to current time
+        newTimes.actime  = dirInfo.st_atime;
         newTimes.modtime = dirInfo.st_mtime;
 
         //(try to) set new "last write time"
@@ -706,6 +729,10 @@ public:
     static const KernelDllHandler& getInstance() //lazy creation of KernelDllHandler
     {
         static KernelDllHandler instance;
+
+        if (instance.getFinalPathNameByHandle == NULL)
+            throw FileError(wxString(_("Error loading library function:")) + wxT("\n\"") + wxT("GetFinalPathNameByHandleW") + wxT("\""));
+
         return instance;
     }
 
@@ -745,9 +772,6 @@ Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target pa
         return Zstring();
 
     CloseHandleOnExit dummy(hDir);
-
-    if (KernelDllHandler::getInstance().getFinalPathNameByHandle == NULL )
-        throw FileError(wxString(_("Error loading library function:")) + wxT("\n\"") + wxT("GetFinalPathNameByHandleW") + wxT("\""));
 
     const unsigned int BUFFER_SIZE = 10000;
     TCHAR targetPath[BUFFER_SIZE];
@@ -973,8 +997,9 @@ Zstring createTempName(const Zstring& filename)
         while (FreeFileSync::fileExists(output + DefaultChar('_') + numberToZstring(postfix)))
             ++postfix;
 
-        output += DefaultChar('_') + numberToZstring(postfix);
+        output += Zstring(DefaultStr("_")) + numberToZstring(postfix);
     }
+
     return output;
 }
 
@@ -1088,13 +1113,10 @@ void FreeFileSync::copyFile(const Zstring& sourceFile,
     }
 
     //rename temporary file
-    if (!::MoveFileEx(temporary.c_str(),  //__in      LPCTSTR lpExistingFileName,
-                      targetFile.c_str(), //__in_opt  LPCTSTR lpNewFileName,
-                      0))                 //__in      DWORD dwFlags
-    {
-        const wxString errorMessage = wxString(_("Error moving file:")) + wxT("\n\"") + temporary +  wxT("\" ->\n\"") + targetFile + wxT("\"");
-        throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
-    }
+    FreeFileSync::renameFile(temporary, targetFile);
+
+    //copy creation date (last modification date is redundantly written, too)
+    copyFileTimes(sourceFile, targetFile); //throw()
 }
 
 
@@ -1239,11 +1261,7 @@ void FreeFileSync::copyFile(const Zstring& sourceFile,
         }
 
         //rename temporary file
-        if (::rename(temporary.c_str(), targetFile.c_str()) != 0)
-        {
-            const wxString errorMessage = wxString(_("Error moving file:")) + wxT("\n\"") + zToWx(temporary) +  wxT("\" ->\n\"") + zToWx(targetFile) + wxT("\"");
-            throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
-        }
+        FreeFileSync::renameFile(temporary, targetFile);
 
         //set file access rights
         if (::chmod(targetFile.c_str(), fileInfo.st_mode) != 0)

@@ -13,8 +13,8 @@ public:
     //direct data access via row number
     const FileSystemObject* getObject(unsigned int row) const;  //returns NULL if object is not found; logarithmic complexity
     FileSystemObject* getObject(unsigned int row);              //
-    unsigned int rowsOnView() const; //only the currently visible elements
-    unsigned int rowsTotal() const;  //total number of rows available
+    size_t rowsOnView() const; //only the currently visible elements
+    size_t rowsTotal() const;  //total number of rows available
 
     //get references to FileSystemObject: no NULL-check needed! Everything's bound.
     void getAllFileRef(const std::set<unsigned int>& guiRows, std::vector<FileSystemObject*>& output);
@@ -185,7 +185,7 @@ FileSystemObject* GridView::getObject(unsigned int row)
 
 
 inline
-unsigned int GridView::rowsOnView() const
+size_t GridView::rowsOnView() const
 {
     return viewRef.size();
 }
@@ -198,7 +198,7 @@ FolderComparison& GridView::getDataTentative()
 }
 
 inline
-unsigned int GridView::rowsTotal() const //total number of rows available
+size_t GridView::rowsTotal() const //total number of rows available
 {
     return sortedRef.size();
 }

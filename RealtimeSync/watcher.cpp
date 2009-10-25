@@ -91,7 +91,7 @@ void RealtimeSync::waitForChanges(const std::vector<wxString>& dirNames, WaitCal
             throw FreeFileSync::FileError(_("Please fill all empty directory fields."));
         else if (!FreeFileSync::dirExists(formattedDir))
             throw FreeFileSync::FileError(wxString(_("Directory does not exist:")) + wxT("\n") +
-                                          wxT("\"") + formattedDir + wxT("\"") + wxT("\n\n") +
+                                          wxT("\"") + zToWx(formattedDir) + wxT("\"") + wxT("\n\n") +
                                           FreeFileSync::getLastErrorFormatted());
 
         const HANDLE rv = ::FindFirstChangeNotification(

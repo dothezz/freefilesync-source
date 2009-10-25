@@ -34,23 +34,27 @@ public:
         GuiPanel::m_bpButtonRemovePair->SetBitmapLabel(*GlobalResources::getInstance().bitmapRemoveFolderPair);
     }
 
-    //alternate configuration attached to it
-    boost::shared_ptr<const FreeFileSync::AlternateSyncConfig> altSyncConfig; //optional
-    boost::shared_ptr<const FreeFileSync::AlternateFilter>     altFilter;     //optional
+    typedef boost::shared_ptr<const FreeFileSync::AlternateSyncConfig> AltSyncCfgPtr;
+    typedef boost::shared_ptr<const FreeFileSync::AlternateFilter>     AltFilterPtr;
 
-
-    void updateAltButtonColor()
+    AltSyncCfgPtr getAltSyncConfig() const
     {
-        if (altSyncConfig.get())
-            m_bpButtonAltSyncCfg->SetBitmapLabel(*GlobalResources::getInstance().bitmapSyncCfgSmall);
-        else
-            m_bpButtonAltSyncCfg->SetBitmapLabel(*GlobalResources::getInstance().bitmapSyncCfgSmallGrey);
-
-        if (altFilter.get())
-            m_bpButtonAltFilter->SetBitmapLabel(*GlobalResources::getInstance().bitmapFilterSmall);
-        else
-            m_bpButtonAltFilter->SetBitmapLabel(*GlobalResources::getInstance().bitmapFilterSmallGrey);
+        return altSyncConfig;
     }
+
+    AltFilterPtr getAltFilterConfig() const
+    {
+        return altFilter;
+    }
+
+    void setValues(AltSyncCfgPtr syncCfg,  AltFilterPtr filter)
+    {
+        altSyncConfig = syncCfg;
+        altFilter     = filter;
+
+        updateAltButtonColor();
+    }
+
 
 protected:
     virtual void OnAltFilterCfgRemoveConfirm(wxCommandEvent& event)
@@ -67,6 +71,28 @@ protected:
 
 
 private:
+    void updateAltButtonColor()
+    {
+        if (altSyncConfig.get())
+            m_bpButtonAltSyncCfg->SetBitmapLabel(*GlobalResources::getInstance().bitmapSyncCfgSmall);
+        else
+            m_bpButtonAltSyncCfg->SetBitmapLabel(*GlobalResources::getInstance().bitmapSyncCfgSmallGrey);
+
+        if (altFilter.get())
+            m_bpButtonAltFilter->SetBitmapLabel(*GlobalResources::getInstance().bitmapFilterSmall);
+        else
+            m_bpButtonAltFilter->SetBitmapLabel(*GlobalResources::getInstance().bitmapFilterSmallGrey);
+
+        //set tooltips
+        if (altSyncConfig.get())
+            m_bpButtonAltSyncCfg->SetToolTip(wxString(_("Select alternate synchronization settings")) + wxT("  \n") +
+                                             wxT("(") + altSyncConfig->syncConfiguration.getVariantName() + wxT(")"));
+        else
+            m_bpButtonAltSyncCfg->SetToolTip(_("Select alternate synchronization settings"));
+
+        m_bpButtonAltFilter->SetToolTip(_("Select alternate filter settings"));
+    }
+
     void OnAltFilterCfgRemove(wxCommandEvent& event)
     {
         contextMenu.reset(new wxMenu); //re-create context menu
@@ -90,13 +116,12 @@ private:
 
     void OnAltSyncCfg(wxCommandEvent& event)
     {
-        const MainConfiguration& mainCfg = getMainConfig();
+        const MainConfiguration mainCfg = getMainConfig();
+        const AlternateSyncConfig syncConfigMain(mainCfg.syncConfiguration,
+                mainCfg.handleDeletion,
+                mainCfg.customDeletionDirectory);
 
-        AlternateSyncConfig altSyncCfg = altSyncConfig.get() ?
-                                         *altSyncConfig :
-                                         AlternateSyncConfig(mainCfg.syncConfiguration,
-                                                 mainCfg.handleDeletion,
-                                                 mainCfg.customDeletionDirectory);
+        AlternateSyncConfig altSyncCfg = altSyncConfig.get() ? *altSyncConfig : syncConfigMain;
         SyncCfgDialog* syncDlg = new SyncCfgDialog(getParentWindow(),
                 mainCfg.compareVar,
                 altSyncCfg.syncConfiguration,
@@ -116,12 +141,10 @@ private:
 
     void OnAltFilterCfg(wxCommandEvent& event)
     {
-        const MainConfiguration& mainCfg = getMainConfig();
+        const MainConfiguration mainCfg = getMainConfig();
+        const AlternateFilter filterMain(mainCfg.includeFilter, mainCfg.excludeFilter);
 
-        AlternateFilter altFilt = altFilter.get() ?
-                                  *altFilter :
-                                  AlternateFilter(mainCfg.includeFilter, mainCfg.excludeFilter);
-
+        AlternateFilter altFilt = altFilter.get() ? *altFilter : filterMain;
         FilterDlg* filterDlg = new FilterDlg(getParentWindow(), altFilt.includeFilter, altFilt.excludeFilter);
         if (filterDlg->ShowModal() == FilterDlg::BUTTON_APPLY)
         {
@@ -136,6 +159,10 @@ private:
         }
     }
 
+    //alternate configuration attached to it
+    AltSyncCfgPtr altSyncConfig; //optional
+    AltFilterPtr  altFilter;     //optional
+
     std::auto_ptr<wxMenu> contextMenu;
 
     //support for drag and drop
@@ -146,3 +173,4 @@ private:
 
 
 #endif // FOLDERPAIR_H_INCLUDED
+
