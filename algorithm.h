@@ -6,6 +6,8 @@
 
 namespace FreeFileSync
 {
+class FilterProcess;
+
 void swapGrids(const MainConfiguration& config, FolderComparison& folderCmp);
 
 struct DeterminationProblem //callback
@@ -18,7 +20,15 @@ void redetermineSyncDirection(const MainConfiguration& currentMainCfg, FolderCom
 
 void setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsObj); //set new direction (recursively)
 
+bool allElementsEqual(const FolderComparison& folderCmp);
+
+//filtering
 void applyFiltering(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp);
+void applyFiltering(const FilterProcess& filter, BaseDirMapping& baseDirectory);
+
+void setActiveStatus(bool newStatus, FolderComparison& folderCmp); //activate or deactivate all rows
+void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or deactivate row: works recursively!
+
 
 //manual deletion of files on main grid
 std::pair<wxString, int> deleteFromGridAndHDPreview(           //returns wxString with elements to be deleted and total count

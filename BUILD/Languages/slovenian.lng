@@ -148,8 +148,6 @@ Duplikat z druge strani od %name
 <mnogokratna izbira>
 A newer version of FreeFileSync is available:
 Na voljo je nova različica FreeFileSync:
-ATTENTION: Failed directory access can lead to file deletions!
-POZOR: Neuspešen dostop do imenika lahko vodi do izbrisa datotek!
 Abort requested: Waiting for current operation to finish...
 Zahtevana je bila prekinitev: čakam, da se zaključi trenutna operacija...
 Aborted
@@ -158,10 +156,14 @@ About
 O programu(1)
 Action
 Ukrep
+Activate filter
+Aktiviraj filter
 Add folder
 Dodaj mapo
 Add folder pair
 Dodaj par imenikov
+All directories in sync!
+Vsi imeniki so sinhronizirani!
 An exception occured!
 Zgodila se je napaka!
 As a result the files are separated into the following categories:
@@ -169,7 +171,7 @@ Kot rezultat so datoteke razdeljene v naslednje kategorije:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
 Kot že samo ime pove, sta dve datoteki označeni kot enaki samo takrat, ko imata enako vsebino. Ta možnost je bolj uporabna za preverjanje doslednosti kot za operacije varnostnega shranjevanja. Zaradi tega se časi datotek ne upoštevajo.\n\nZ omogočeno to možnostjo je drevo odločanja manjše:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
-Sestavi batch datoteko za samodejno sinhronizacijo. Da začnete v batch načinu, preprosto podajte ime datoteke k FreeFileSync izvršilni datoteki: FreeFileSync.exe <imedatotekebatch>. To se lahko tudi nastavi v urniku opravil vašega operacijskega sistema.
+Sestavi batch datoteko za samodejno sinhronizacijo. Da začnete v batch načinu, preprosto podajte ime batch datoteke k FreeFileSync izvršilni datoteki: FreeFileSync.exe <imedatotekebatch>. To se lahko nastavi tudi v urniku opravil vašega operacijskega sistema.
 Auto-adjust columns
 Samo-prilagodi stolpce
 Automatic mode
@@ -198,10 +200,6 @@ Category
 Kategorija
 Change direction
 Spremeni smer
-Check all
-Preveri vse
-Choose to hide filtered files/directories from list
-Skrij filtrirane datoteke/imenike iz seznama
 Comma separated list
 Seznam ločen z vejico
 Commandline
@@ -242,8 +240,6 @@ Configuration saved!
 Konfiguracija shranjena!
 Configure filter
 Konfiguriraj filter
-Configure filter...
-Konfiguriraj filter...
 Configure your own synchronization rules.
 Konfigurirajte vaša lastna sinhronizacijska pravila.
 Confirm
@@ -334,8 +330,6 @@ Directory
 Imenik
 Directory does not exist:
 Imenik ne obstaja:
-Do not display visual status information but write to a logfile instead
-Ne prikazuj vidnih statusnih informacij, ampak piši v dnevniško datoteko
 Do not show this dialog again
 Ne prikaži več tega pogovornega okna
 Do nothing
@@ -355,7 +349,7 @@ Povleci && spusti
 Email
 Email
 Enable filter to exclude files from synchronization
-Omogoči filter, da se datoteke izključi iz sinhronizacije
+Omogoči filter da se datoteke izključi iz sinhronizacije
 Endless loop when traversing directory:
 Neskončna zanka pri prehodu imenika:
 Error
@@ -406,12 +400,12 @@ Error writing file:
 Napaka pri pisanju datoteke:
 Error writing to synchronization database:
 Napaka pri pisanju v sinhronizacijsko podatkovno bazo:
-Source directory does not exist anymore:
-Izvorni imenik ne obstaja več:
 Example
 Primer
 Exclude
 Izključi
+Exclude all rows
+Izključi vse vrstice
 Exclude temporarily
 Začasno izključi
 Exclude via filter:
@@ -422,6 +416,8 @@ Exit with RC < 0
 Zapusti z RC < 0
 External applications
 Zunanje aplikacije
+Fatal Error
+Usodna napaka
 Feedback and suggestions are welcome at:
 Povratne informacije in predlogi so dobrodošli na:
 File %x has an invalid date!
@@ -466,12 +462,14 @@ Files/folders that exist on right side only
 Datoteke/mape, ki obstajajo samo na desni strani
 Filter
 Filter
-Filter active: Press again to deactivate
-Filter aktiven: Ponovno kliknite za deaktivacijo
 Filter files
 Filtriraj datoteke
+Filter has been selected
+Filter je bil izbran
 Filter view
 Filtriran pogled
+Filtering is deactivated
+Filter je deaktiviran
 Folder Comparison and Synchronization
 Primerjava in sinhronizacija imenika
 Free disk space available:
@@ -494,6 +492,8 @@ Generating database...
 Ustvarjam podatkovno bazo...
 Generating file list...
 Ustvarjam seznam datotek...
+Global filter
+Globalni filter
 Global settings
 Globalne nastavitve
 Help
@@ -504,6 +504,8 @@ Hide all error and warning messages
 Skrij vsa obvestila o napakah in opozorilih
 Hide conflicts
 Skrij spore
+Hide excluded items
+Skrij izključene predmete
 Hide files that are different
 Skrij datoteke ki so različne
 Hide files that are equal
@@ -530,14 +532,16 @@ Hide files that will be overwritten on right side
 Skrij datoteke, ki bodo prepisane na desni strani
 Hide files that won't be copied
 Skrij datoteke, ki ne bodo kopirane
-Hide filtered items
-Skrij filtrirane predmete
+Hide filtered or temporarily excluded files
+Skrij filtrirane ali začasno izključene datoteke
 Hide further error messages during the current process
 Skrijte nadaljnja obvestila o napakah med trenutnim procesom
 Hints:
 Namigi:
 Homepage
 Domača stran
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+Prepoznaj in širi spremembe na obeh straneh z uporabo podatkovne baze. Izbrisi in spori so zaznani samodejno.
 If you like FFS
 Če vam je FFS všeč
 Ignore 1-hour file time difference
@@ -552,6 +556,8 @@ Ignore this error, retry or abort?
 Ignoriraj to napako, poskusi ponovno ali prekini?
 Include
 Vključi
+Include all rows
+Vključi se vrstice
 Include temporarily
 Trenutno vključi
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
@@ -562,8 +568,8 @@ Info
 Info
 Information
 Informacije
-Initial synchronization.
-Začetna sinhronizacija.
+Initial synchronization:
+Začetna sinhronizacija:
 Integrate external applications into context menu. The following macros are available:
 Integriraj zunanje aplikacije v kontekstni menu. Na voljo so naslednji makri:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +584,8 @@ Load configuration from file
 Naloži konfiguracijo iz datoteke
 Load configuration history (press DEL to delete items)
 Naloži zgodovino konfiguracije (pritisnite DEL za brisanje predmetov)
+Local filter
+Lokalni filter
 Log-messages:
 Sporočila beleženja:
 Logging
@@ -602,8 +610,8 @@ Moving folder %x to user-defined directory %y
 Premikam mapo %x v uporabniško-določen imenik %y
 Multiple...
 Večkratno...
-No database file existing yet:
-Datoteka podatkovne baze še ne obstaja:
+No filter selected
+Noben filter ni izbran
 Not enough free disk space available in:
 Na voljo ni dovolj prostega prostora na disku v:
 Nothing to synchronize according to configuration!
@@ -638,8 +646,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Prosim prekopirajte ustrezno \"Shadow.dll\" (ki se nahaja v \"Shadow.zip\" arhivu) v FreeFileSync namestitveni imenik, da omogočite to lastnost.
 Please fill all empty directory fields.
 Prosim izpolnite vse imenike s praznimi polji.
-Press button to activate filter
-Kliknite za aktivacijo filtra
+Please run a Compare first before synchronizing!
+Prosim najprej zaženite Primerjaj preden sinhronizirate!
 Published under the GNU General Public License:
 Objavljeno pod licenco GNU General Public:
 Question
@@ -660,12 +668,16 @@ Remove folder
 Odstrani v mapo
 Remove folder pair
 Odstrani par imenikov
+Remove local filter settings
+Odstrani nastavitve lokalnega filtra
 Report translation error
 Poročaj o napaki prevoda
 Reset
 Ponastavi
 Right
 Desno
+Run minimized and write status information to a logfile
+Poženi minimizirano in zapisuj statusne informacije v dnevniško datoteko
 S&ave configuration
 Shr&ani konfiguracijo
 S&witch view
@@ -680,14 +692,14 @@ Scanning:
 Pregledujem:
 Select a folder
 Izberite mapo
-Select alternate filter settings
-Izberite nadomestne nastavitve filtra
 Select alternate synchronization settings
 Izberite nadomestne nastavitve sinhronizacije
 Select logfile directory:
 Izberite imenik datoteke za beleženje:
 Select variant:
 Izberite varianto:
+Setting default synchronization directions. Please check whether they are appropriate for you.
+Nastavljam privzete sinhronizacijske smeri. Prosim preverite ali vam ustrezajo.
 Show conflicts
 Prikaži spore
 Show file icons
@@ -732,6 +744,8 @@ Size
 Velikost
 Source code written completely in C++ utilizing:
 Izvorna koda napisana celotno v C++ z uporabo:
+Source directory does not exist anymore:
+Izvorni imenik ne obstaja več:
 Speed:
 Hitrost:
 Start
@@ -772,8 +786,12 @@ Target directory already existing!
 Ciljni imenik že obstaja!
 Target file already existing!
 Ciljna datoteka že obstaja!
+The database file is not yet existing, but will be created during synchronization:
+Datoteka podatkovne baze še ne obstaja, ampak bo ustvarjena med sinhronizacijo:
 The file does not contain a valid configuration:
 Datoteka ne vsebuje veljavne konfiguracije:
+The required database entry is not yet existing, but will be created during synchronization:
+Zahteavan vnos v podatkovni bazi še en obstaja, ampak bo ustvarjen med sinhronizacijo:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Ta varianta oceni dve datoteki z enakim imenom kot enaki, ko imata enako velikost IN enak datum ter čas zadnjega spreminjanja.
 Time
@@ -798,8 +816,6 @@ Unable to create logfile!
 Ne morem ustvariti datoteko za beleženje!
 Unable to initialize Recycle Bin!
 Ne morem inicializirati Koša!
-Uncheck all
-Odznači vse
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Obstajajo nerešeni spori! \n\nLahko ignorirate spore in nadaljujete s sinhronizacijo.
 Update ->
@@ -814,8 +830,6 @@ User-defined directory
 Uporabniško-določen imenik
 User-defined directory for deletion was not specified!
 Uporabniško-določen imenik za brisanje ni bil naveden!
-Using default synchronization directions. Please recheck.
-Uporabljam privzete sinhronizacijske smeri. Prosimo preverite ponovno.
 Variant
 Različica
 Verifying file %x

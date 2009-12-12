@@ -46,6 +46,8 @@
 &Abbrechen
 &Check for new version
 &Auf neuere Version prüfen
+&Content
+&Inhalt
 &Create batch job
 &Batch-Job erstellen
 &Default
@@ -148,8 +150,6 @@ Konfiguration &laden
 <Mehrfachauswahl>
 A newer version of FreeFileSync is available:
 Eine neuere Version von FreeFileSync ist verfügbar:
-ATTENTION: Failed directory access can lead to file deletions!
-ACHTUNG: Fehler beim Verzeichniszugriff können zum Löschen von Dateien führen!
 Abort requested: Waiting for current operation to finish...
 Abbruch initiiert: Warte, bis aktuelle Operation beendet ist...
 Aborted
@@ -158,10 +158,14 @@ About
 Über
 Action
 Aktion
+Activate filter
+Aktiviere Filter
 Add folder
 Verzeichnis hinzufügen
 Add folder pair
 Verzeichnispaar hinzufügen
+All directories in sync!
+Alle Verzeichnisse sind synchron!
 An exception occured!
 Eine Ausnahme ist aufgetreten!
 As a result the files are separated into the following categories:
@@ -198,16 +202,12 @@ Category
 Kategorie
 Change direction
 Richtung ändern
-Check all
-Alles auswählen
-Choose to hide filtered files/directories from list
-Gefilterte Dateien bzw. Verzeichnisse ein-/ausblenden
 Comma separated list
 Kommagetrennte Liste
 Commandline
 Befehlszeile
 Commandline is empty!
-Die Kommandozeile ist leer!
+Die Befehlszeile ist leer!
 Compare
 Vergleichen
 Compare both sides
@@ -242,8 +242,6 @@ Configuration saved!
 Konfiguration gespeichert!
 Configure filter
 Konfiguriere Filter
-Configure filter...
-Konfiguriere Filter...
 Configure your own synchronization rules.
 Eigene Synchronisationsregeln definieren.
 Confirm
@@ -264,6 +262,8 @@ Copy from right to left
 Von rechts nach links kopieren
 Copy from right to left overwriting
 Von rechts nach links kopieren und überschreiben
+Copy locked files
+Gesperrte Dateien kopieren
 Copy new or updated files to right folder.
 Neue oder aktualisierte Dateien vom linken in das rechte Verzeichnis kopieren.
 Copy to clipboard\tCTRL+C
@@ -276,6 +276,8 @@ Could not determine volume name for file:
 Der Laufwerksname für folgende Datei konnte nicht ermittelt werden:
 Could not initialize directory monitoring:
 Die Verzeichnisüberwachung konnte nicht gestartet werden:
+Could not load a required DLL:
+Eine benötigte DLL konnte nicht geladen werden:
 Could not read values for the following XML nodes:
 Die folgenden XML Knoten konnten nicht gelesen werden:
 Create a batch job
@@ -295,7 +297,7 @@ D-Klick
 DECISION TREE
 ENTSCHEIDUNGSBAUM
 Data remaining:
-Verbliebene Daten:
+Verbleibende Daten:
 Data verification error: Source and target file have different content!
 Verifizierungsfehler: Quell- und Zieldatei haben unterschiedlichen Inhalt!
 Date
@@ -303,7 +305,7 @@ Datum
 Delay
 Verzögerung
 Delay between detection of changes and execution of commandline in seconds
-Verzögerung zwischen Erkennen einer Änderung und Aufrufen der Kommandozeile in Sekunden
+Verzögerung zwischen Erkennen einer Änderung und Aufrufen der Befehlszeile in Sekunden
 Delete files/folders existing on left side only
 Nur links existierende Dateien/Verzeichnisse löschen
 Delete files/folders existing on right side only
@@ -334,8 +336,6 @@ Directory
 Verzeichnis
 Directory does not exist:
 Das Verzeichnis existiert nicht:
-Do not display visual status information but write to a logfile instead
-Keine graphischen Statusinformationen anzeigen, sondern eine Logdatei schreiben
 Do not show this dialog again
 Diesen Dialog nicht mehr anzeigen
 Do nothing
@@ -406,12 +406,12 @@ Error writing file:
 Fehler beim Schreiben der Datei:
 Error writing to synchronization database:
 Fehler beim Schreiben der Synchronisationsdatenbank:
-Source directory does not exist anymore:
-Quellverzeichnis existiert nicht mehr:
 Example
 Beispiel
 Exclude
 Ausschließen
+Exclude all rows
+Alle Zeilen ausschließen
 Exclude temporarily
 Temporär ausschließen
 Exclude via filter:
@@ -422,6 +422,8 @@ Exit with RC < 0
 Beenden mit RC < 0
 External applications
 Externe Anwendungen
+Fatal Error
+Fataler Fehler
 Feedback and suggestions are welcome at:
 Feedback und Vorschläge sind willkommen unter:
 File %x has an invalid date!
@@ -447,7 +449,7 @@ Dateien gelten als gleich, wenn\n     - der Inhalt\ngleich ist.
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
 Dateien gelten als gleich, wenn\n     - die Größe\n     - Datum und Uhrzeit der letzten Änderung\ngleich sind.
 Files remaining:
-Verbliebene Dateien:
+Verbleibende Dateien:
 Files that are equal on both sides
 Auf beiden Seiten gleiche Dateien
 Files that exist on both sides and have different content
@@ -459,19 +461,21 @@ Auf beiden Seiten existierende Dateien; rechte Datei ist neuer
 Files/folders found:
 Gefundene Dateien/Ordner:
 Files/folders remaining:
-Verbliebene Dateien/Ordner:
+Verbleibende Dateien/Ordner:
 Files/folders that exist on left side only
 Nur links exisitierende Dateien/Verzeichnisse
 Files/folders that exist on right side only
 Nur rechts exisitierende Dateien/Verzeichnisse
 Filter
 Filter
-Filter active: Press again to deactivate
-Filter aktiviert: Zum Deaktivieren erneut anwählen
 Filter files
 Dateien filtern
+Filter has been selected
+Filter ist ausgewählt
 Filter view
 Ansicht filtern
+Filtering is deactivated
+Filter ist deaktiviert
 Folder Comparison and Synchronization
 Verzeichnisvergleich und Synchronisation
 Free disk space available:
@@ -494,6 +498,8 @@ Generating database...
 Erzeuge Synchronisationsdatenbank...
 Generating file list...
 Erzeuge Dateiliste...
+Global filter
+Globaler Filter
 Global settings
 Globale Einstellungen
 Help
@@ -504,6 +510,8 @@ Hide all error and warning messages
 Alle Fehler- und Warnmeldungen werden unterdrückt
 Hide conflicts
 Konflikte ausblenden
+Hide excluded items
+Ausgeschlossene Elemente verstecken
 Hide files that are different
 Ungleiche Dateien ausblenden
 Hide files that are equal
@@ -530,14 +538,16 @@ Hide files that will be overwritten on right side
 Dateien die rechts überschrieben werden ausblenden
 Hide files that won't be copied
 Dateien die nicht kopiert werden ausblenden
-Hide filtered items
-Gefilterte Elemente ausblenden
+Hide filtered or temporarily excluded files
+Gefilterte oder temporär ausgeschlossene Dateien ausblenden
 Hide further error messages during the current process
 Weitere Fehlermeldungen während des laufenden Prozesses ausblenden
 Hints:
 Tipps:
 Homepage
 Homepage
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+Identifiziere und propagiere Änderungen auf beiden Seiten mit Hilfe einer Datenbank. Löschungen und Konflikte werden automatisch erkannt.
 If you like FFS
 FFS unterstützen
 Ignore 1-hour file time difference
@@ -552,6 +562,8 @@ Ignore this error, retry or abort?
 Fehler ignorieren, wiederholen oder abbrechen?
 Include
 Einschließen
+Include all rows
+Alle Zeilen einschließen
 Include temporarily
 Temporär einschließen
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
@@ -562,8 +574,8 @@ Info
 Info
 Information
 Information
-Initial synchronization.
-Erstmalige Synchronisation.
+Initial synchronization:
+Erstmalige Synchronisation:
 Integrate external applications into context menu. The following macros are available:
 Integriert externe Anwendungen in das Kontextmenu. Die folgenden Makros stehen zur Verfügung:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +590,8 @@ Load configuration from file
 Konfiguration aus Datei laden
 Load configuration history (press DEL to delete items)
 Lade Konfigurationshistorie (DEL-Taste löscht Einträge)
+Local filter
+Lokaler Filter
 Log-messages:
 Protokollmeldungen:
 Logging
@@ -602,8 +616,8 @@ Moving folder %x to user-defined directory %y
 Verschiebe Ordner %x in benutzerdefiniertes Verzeichnis %y
 Multiple...
 Verschiedene...
-No database file existing yet:
-Es existiert noch keine Datenbankdatei:
+No filter selected
+Kein Filter ausgewählt
 Not enough free disk space available in:
 Nicht genügend freier Speicher verfügbar unter:
 Nothing to synchronize according to configuration!
@@ -634,12 +648,10 @@ Pause
 Pause
 Paused
 Angehalten
-Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
-Um diese Funktionalität zu aktivieren, bitte die entsprechende Datei \"Shadow.dll\" (siehe Archiv \"Shadow.zip\") in das FreeFileSync Installationsverzeichnis kopieren.
 Please fill all empty directory fields.
 Bitte die leeren Verzeichnisfelder füllen.
-Press button to activate filter
-Taste drücken, um Filter zu aktivieren
+Please run a Compare first before synchronizing!
+Vor der Synchronisation bitte zuerst einen Vergleich ausführen!
 Published under the GNU General Public License:
 Veröffentlicht unter der GNU General Public License:
 Question
@@ -660,12 +672,18 @@ Remove folder
 Verzeichnis entfernen
 Remove folder pair
 Verzeichnispaar entfernen
+Remove local filter settings
+Lokale Filtereinstellungen entfernen
 Report translation error
 Übersetzungsfehler melden
 Reset
 Zurücksetzen
 Right
 Rechts
+Run minimized and write status information to a logfile
+Minimiert ausführen und Statusinformationen in eine Logdatei schreiben
+Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
+Das Erstellen von Schattenkopien unter WOW64 wird nicht unterstützt. Bitte benutzen Sie die FreeFileSync 64-Bit Version.
 S&ave configuration
 Konfiguration s&peichern 
 S&witch view
@@ -680,14 +698,14 @@ Scanning:
 Suche Dateien:
 Select a folder
 Verzeichnis auswählen
-Select alternate filter settings
-Alternative Filtereinstellungen auswählen
 Select alternate synchronization settings
 Alternative Synchronisationseinstellungen auswählen
 Select logfile directory:
 Verzeichnis für Logdatei wählen:
 Select variant:
 Variante auswählen:
+Setting default synchronization directions. Please check whether they are appropriate for you.
+Setze Standardsynchronisationsrichtungen. Bitte prüfen Sie, ob diese für Sie passend gewählt wurden.
 Show conflicts
 Konflikte zeigen
 Show file icons
@@ -732,6 +750,8 @@ Size
 Größe
 Source code written completely in C++ utilizing:
 Sourcecode komplett in C++ geschrieben mit Hilfe von:
+Source directory does not exist anymore:
+Quellverzeichnis existiert nicht mehr:
 Speed:
 Geschwindigkeit:
 Start
@@ -772,8 +792,12 @@ Target directory already existing!
 Zielverzeichnis existiert bereits!
 Target file already existing!
 Die Zieldatei existiert bereits!
+The database file is not yet existing, but will be created during synchronization:
+Die Datenbankdatei existiert noch nicht, wird jedoch während der Synchronisation erzeugt werden:
 The file does not contain a valid configuration:
 Die Datei enthält keine gültige Konfiguration:
+The required database entry is not yet existing, but will be created during synchronization:
+Der benötigte Datenbankeintrag existiert noch nicht, wird jedoch während der Synchronisation erzeugt werden.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Diese Variante identifiziert zwei gleichnamige Dateien als gleich, wenn sie die gleiche Dateigröße haben UND der Zeitpunkt der letzten Änderung derselbe ist.
 Time
@@ -781,7 +805,7 @@ Uhrzeit
 Time elapsed:
 Vergangene Zeit:
 Time remaining:
-Verbliebene Zeit:
+Verbleibende Zeit:
 Total amount of data that will be transferred
 Gesamtmenge der zu übertragenden Daten
 Total required free disk space:
@@ -798,24 +822,22 @@ Unable to create logfile!
 Die Protokolldatei konnte nicht erstellt werden!
 Unable to initialize Recycle Bin!
 Der Papierkorb konnte nicht initialisiert werden!
-Uncheck all
-Nichts auswählen
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Es existieren ungelöste Konflikte! \n\nDie Konflikte können ignoriert und die Synchronisation fortgesetzt werden.
 Update ->
 Aktualisieren ->
 Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
-Verwendung: Die zu überwachenden Verzeichnisse auswählen und eine Kommandozeile angeben. Jedesmal wenn Dateien innerhalb dieser Verzeichnisse (oder Unterverzeichnisse) verändert werden, wird die Kommandozeile ausgeführt.
+Verwendung: Die zu überwachenden Verzeichnisse auswählen und eine Befehlszeile angeben. Jedesmal wenn Dateien innerhalb dieser Verzeichnisse (oder Unterverzeichnisse) verändert werden, wird die Befehlszeile ausgeführt.
 Use Recycle Bin
 Papierkorb verwenden
 Use Recycle Bin when deleting or overwriting files.
 Papierkorb für zu löschende oder zu überschreibende Dateien nutzen.
+Use Volume Shadow Copy Service to copy locked or shared files.
+Verwende den Volume Shadow Copy Service um gesperrte oder gemeinsam verwendete Dateien zu kopieren.
 User-defined directory
 Benutzerdefiniertes Verzeichnis
 User-defined directory for deletion was not specified!
 Kein benutzerdefiniertes Verzeichnis zum Löschen angegeben!
-Using default synchronization directions. Please recheck.
-Die Standard-Synchronisationsrichtungen wurden gesetzt. Bitte überprüfen.
 Variant
 Variante
 Verifying file %x

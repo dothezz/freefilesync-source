@@ -17,8 +17,11 @@
 using namespace FreeFileSync;
 
 
-MainDialog::MainDialog(wxDialog *dlg, const wxString& cfgFilename)
-        : MainDlgGenerated(dlg)
+MainDialog::MainDialog(wxDialog *dlg,
+                       const wxString& cfgFilename,
+                       wxHelpController& helpController)
+        : MainDlgGenerated(dlg),
+        helpController_(helpController)
 {
     wxWindowUpdateLocker dummy(this); //avoid display distortion
 
@@ -93,7 +96,7 @@ MainDialog::~MainDialog()
     {
         writeRealConfig(currentCfg, lastConfigFileName());
     }
-    catch (const FreeFileSync::FileError& error)
+    catch (const xmlAccess::XmlError& error)
     {
         wxMessageBox(error.show().c_str(), _("Error"), wxOK | wxICON_ERROR);
     }
@@ -118,6 +121,16 @@ const wxString& MainDialog::lastConfigFileName()
                                FreeFileSync::getConfigDir() + wxT("LastRun.ffs_real") :
                                FreeFileSync::getConfigDir() + zToWx(globalFunctions::FILE_NAME_SEPARATOR) + wxT("LastRun.ffs_real");
     return instance;
+}
+
+
+void MainDialog::OnShowHelp(wxCommandEvent& event)
+{
+    #ifdef FFS_WIN
+    helpController_.DisplaySection(wxT("html\\advanced\\RealtimeSync.html"));
+    #elif defined FFS_LINUX
+    helpController_.DisplaySection(wxT("html/advanced/RealtimeSync.html"));
+    #endif
 }
 
 

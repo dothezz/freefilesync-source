@@ -61,7 +61,7 @@ public:
     Zstring BeforeLast( DefaultChar ch) const;  //returns empty string if ch not found
     Zstring AfterFirst( DefaultChar ch) const;  //returns empty string if ch not found
     Zstring BeforeFirst(DefaultChar ch) const;  //returns the whole string if ch not found
-    size_t Find(DefaultChar ch, bool fromEnd) const;
+    size_t Find(DefaultChar ch, bool fromEnd) const; //returns npos if not found
     bool Matches(const DefaultChar* mask) const;
     static bool Matches(const DefaultChar* name, const DefaultChar* mask);
     Zstring& Trim(bool fromRight); //from right or left
@@ -333,6 +333,7 @@ Zstring::~Zstring()
 inline
 void Zstring::initAndCopy(const DefaultChar* source, size_t sourceLen)
 {
+    assert(source);
     descr = allocate(sourceLen);
     ::memcpy(data(), source, sourceLen * sizeof(DefaultChar));
     data()[sourceLen] = 0;

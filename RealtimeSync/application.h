@@ -9,6 +9,8 @@
 #define REALTIMESYNCAPP_H
 
 #include <wx/app.h>
+#include <wx/help.h>
+#include <memory>
 
 class Application : public wxApp
 {
@@ -17,6 +19,8 @@ public:
 
 private:
     void OnStartApplication(wxIdleEvent& event);
+
+        std::auto_ptr<wxHelpController> helpController; //global help controller
 };
 
 #endif // REALTIMESYNCAPP_H

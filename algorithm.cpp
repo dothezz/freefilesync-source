@@ -92,6 +92,49 @@ private:
 
 
 //---------------------------------------------------------------------------------------------------------------
+class FindNonEqual //test if non-equal items exist in scanned data
+{
+public:
+    bool findNonEqual(const HierarchyObject& hierObj) const
+    {
+        //files
+        if (std::find_if(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this) != hierObj.subFiles.end())
+            return true;
+
+        //directories
+        return std::find_if(hierObj.subDirs.begin(), hierObj.subDirs.end(), *this) != hierObj.subDirs.end();
+    }
+
+    bool operator()(const FileMapping& fileObj) const
+    {
+        return fileObj.getCategory() != FILE_EQUAL;
+    }
+
+    bool operator()(const DirMapping& dirObj) const
+    {
+        if (dirObj.getDirCategory() != DIR_EQUAL)
+            return true;
+
+        return findNonEqual(dirObj); //recursion
+    }
+};
+
+
+struct AllElementsEqual : public std::unary_function<BaseDirMapping, bool>
+{
+    bool operator()(const BaseDirMapping& baseMapping) const
+    {
+        return !FindNonEqual().findNonEqual(baseMapping);
+    }
+};
+
+
+bool FreeFileSync::allElementsEqual(const FolderComparison& folderCmp)
+{
+    return std::find_if(folderCmp.begin(), folderCmp.end(), std::not1(AllElementsEqual())) == folderCmp.end();
+}
+
+//---------------------------------------------------------------------------------------------------------------
 enum Answer
 {
     CHANGE_DETECTED,
@@ -105,7 +148,7 @@ class DetectChanges
 {
 public:
     DetectChanges(const DirContainer* dirCont, //DirContainer in sense of a HierarchyObject
-                  const FilterProcess& dbFilter);
+                  const FilterProcess::FilterRef& dbFilter);
 
     DetectChanges(const DirContainer* dirCont); //DirContainer in sense of a HierarchyObject
 
@@ -123,14 +166,14 @@ public:
 
 private:
     const DirContainer* const dirCont_; //if NULL: did not exist during db creation
-    typename Loki::Select<respectFiltering, const FilterProcess&, Loki::NullType>::Result dbFilter_; //filter setting that was used when db was created
+    typename Loki::Select<respectFiltering, const FilterProcess::FilterRef, Loki::NullType>::Result dbFilter_; //filter setting that was used when db was created
 };
 
 
 template <>
 inline
 DetectChanges<true>::DetectChanges(const DirContainer* dirCont, //DirContainer in sense of a HierarchyObject
-                                   const FilterProcess& dbFilter) :
+                                   const FilterProcess::FilterRef& dbFilter) :
     dirCont_(dirCont),
     dbFilter_(dbFilter) {}
 
@@ -195,7 +238,7 @@ inline
 Answer DetectChanges<true>::detectFileChange(const FileMapping& fileObj) const
 {
     //if filtering would have excluded file during database creation, then we can't say anything about its former state
-    if (!dbFilter_.passFileFilter(fileObj.getObjShortName()))
+    if (!dbFilter_->passFileFilter(fileObj.getObjShortName()))
         return CANT_SAY_FILTERING_CHANGED;
 
     return detectFileChangeSub<side>(fileObj, dirCont_);
@@ -250,7 +293,7 @@ template <SelectedSide side>
 DetectChanges<true>::DirAnswer DetectChanges<true>::detectDirChange(const DirMapping& dirObj) const
 {
     //if filtering would have excluded file during database creation, then we can't say anything about its former state
-    if (!dbFilter_.passDirFilter(dirObj.getObjShortName(), NULL))
+    if (!dbFilter_->passDirFilter(dirObj.getObjShortName(), NULL))
         return DirAnswer(CANT_SAY_FILTERING_CHANGED, DetectChanges<true>(NULL, dbFilter_));
 
     const DirContainer* dbSubDir = NULL;
@@ -322,7 +365,7 @@ public:
         txtFilterChanged(_("Cannot determine sync-direction: Changed filter settings!")),
         handler_(handler)
     {
-        if (baseDirectory.subFiles.empty() && baseDirectory.subDirs.empty()) //don't show nag-screens in this case
+        if (AllElementsEqual()(baseDirectory)) //nothing to do: abort and don't show any nag-screens
             return;
 
         //try to load sync-database files
@@ -344,29 +387,21 @@ public:
                 respectFiltering(baseDirectory, dirInfoRight))
         {
             execute(baseDirectory,
-                    DetectChanges<true>(&dirInfoLeft.baseDirContainer,
-                                        FilterProcess(dirInfoLeft.includeFilter,
-                                                dirInfoLeft.excludeFilter)),
-                    DetectChanges<true>(&dirInfoRight.baseDirContainer,
-                                        FilterProcess(dirInfoRight.includeFilter,
-                                                dirInfoRight.excludeFilter)));
+                    DetectChanges<true>(&dirInfoLeft.baseDirContainer,  dirInfoLeft.filter),
+                    DetectChanges<true>(&dirInfoRight.baseDirContainer, dirInfoRight.filter));
         }
         else if (   !respectFiltering(baseDirectory, dirInfoLeft) &&
                     respectFiltering( baseDirectory, dirInfoRight))
         {
             execute(baseDirectory,
                     DetectChanges<false>(&dirInfoLeft.baseDirContainer),
-                    DetectChanges<true>(&dirInfoRight.baseDirContainer,
-                                        FilterProcess(dirInfoRight.includeFilter,
-                                                dirInfoRight.excludeFilter)));
+                    DetectChanges<true>( &dirInfoRight.baseDirContainer, dirInfoRight.filter));
         }
         else if (   respectFiltering( baseDirectory, dirInfoLeft) &&
                     !respectFiltering(baseDirectory, dirInfoRight))
         {
             execute(baseDirectory,
-                    DetectChanges<true>(&dirInfoLeft.baseDirContainer,
-                                        FilterProcess(dirInfoLeft.includeFilter,
-                                                dirInfoLeft.excludeFilter)),
+                    DetectChanges<true>( &dirInfoLeft.baseDirContainer, dirInfoLeft.filter),
                     DetectChanges<false>(&dirInfoRight.baseDirContainer));
         }
         else
@@ -381,15 +416,10 @@ public:
 private:
     static bool respectFiltering(const BaseDirMapping& baseDirectory, const DirInformation& dirInfo)
     {
-        return dirInfo.filterActive && //respect filtering if sync-DB filter is active && different from baseDir's filter
-
-               (!baseDirectory.getFilter().filterActive ||
-
-                FilterProcess(baseDirectory.getFilter().includeFilter,
-                              baseDirectory.getFilter().excludeFilter) !=
-
-                FilterProcess(dirInfo.includeFilter,
-                              dirInfo.excludeFilter));
+        //respect filtering if sync-DB filter is active && different from baseDir's filter:
+        // in all other cases "view on files" is smaller for baseDirectory(current) than it was for dirInfo(old)
+        // => dirInfo can be queried as if it were a scan without filters
+        return !dirInfo.filter->isNull() && *dirInfo.filter != *baseDirectory.getFilter();
     }
 
     std::pair<DirInfoPtr, DirInfoPtr> loadDBFile(const BaseDirMapping& baseDirectory) //return NULL on failure
@@ -401,7 +431,7 @@ private:
         catch (FileError& error) //e.g. incompatible database version
         {
             if (handler_) handler_->reportWarning(error.show() + wxT(" \n\n") +
-                                                      _("Using default synchronization directions. Please recheck."));
+                                                      _("Setting default synchronization directions. Please check whether they are appropriate for you."));
         }
         return std::pair<DirInfoPtr, DirInfoPtr>(); //NULL
     }
@@ -558,14 +588,17 @@ void FreeFileSync::redetermineSyncDirection(const MainConfiguration& currentMain
     else if (folderCmp.size() != currentMainCfg.additionalPairs.size() + 1)
         throw std::logic_error("Programming Error: Contract violation!");
 
-    //main pair
-    redetermineSyncDirection(currentMainCfg.syncConfiguration, folderCmp[0], handler);
+    //merge first and additional pairs
+    std::vector<FolderPairEnh> allPairs;
+    allPairs.push_back(currentMainCfg.firstPair);
+    allPairs.insert(allPairs.end(),
+                    currentMainCfg.additionalPairs.begin(), //add additional pairs
+                    currentMainCfg.additionalPairs.end());
 
-    //add. folder pairs
-    for (std::vector<FolderPairEnh>::const_iterator i = currentMainCfg.additionalPairs.begin(); i != currentMainCfg.additionalPairs.end(); ++i)
+    for (std::vector<FolderPairEnh>::const_iterator i = allPairs.begin(); i != allPairs.end(); ++i)
     {
         redetermineSyncDirection(i->altSyncConfig.get() ? i->altSyncConfig->syncConfiguration : currentMainCfg.syncConfiguration,
-                                 folderCmp[i - currentMainCfg.additionalPairs.begin() + 1], handler);
+                                 folderCmp[i - allPairs.begin()], handler);
     }
 }
 
@@ -614,6 +647,109 @@ void FreeFileSync::setSyncDirectionRec(SyncDirection newDirection, FileSystemObj
 }
 
 
+//--------------- functions related to filtering ------------------------------------------------------------------------------------
+
+template <bool include>
+class InOrExcludeAllRows
+{
+public:
+    void operator()(FreeFileSync::BaseDirMapping& baseDirectory) const //be careful with operator() to no get called by std::for_each!
+    {
+        execute(baseDirectory);
+    }
+
+    void execute(FreeFileSync::HierarchyObject& hierObj) const //don't create ambiguity by replacing with operator()
+    {
+        std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this); //files
+        std::for_each(hierObj.subDirs.begin(),  hierObj.subDirs.end(),  *this); //directories
+    }
+
+private:
+    template<typename Iterator, typename Function>
+    friend Function std::for_each(Iterator, Iterator, Function);
+
+    void operator()(FreeFileSync::FileMapping& fileObj) const
+    {
+        fileObj.setActive(include);
+    }
+
+    void operator()(FreeFileSync::DirMapping& dirObj) const
+    {
+        dirObj.setActive(include);
+        execute(dirObj); //recursion
+    }
+};
+
+
+void FreeFileSync::setActiveStatus(bool newStatus, FreeFileSync::FolderComparison& folderCmp)
+{
+    if (newStatus)
+        std::for_each(folderCmp.begin(), folderCmp.end(), InOrExcludeAllRows<true>());  //include all rows
+    else
+        std::for_each(folderCmp.begin(), folderCmp.end(), InOrExcludeAllRows<false>()); //exclude all rows
+}
+
+
+void FreeFileSync::setActiveStatus(bool newStatus, FreeFileSync::FileSystemObject& fsObj)
+{
+    fsObj.setActive(newStatus);
+
+    DirMapping* dirObj = dynamic_cast<DirMapping*>(&fsObj);
+    if (dirObj) //process subdirectories also!
+    {
+        if (newStatus)
+            InOrExcludeAllRows<true>().execute(*dirObj);
+        else
+            InOrExcludeAllRows<false>().execute(*dirObj);
+    }
+}
+
+
+class FilterData
+{
+public:
+    FilterData(const FilterProcess& filterProcIn) : filterProc(filterProcIn) {}
+
+    void execute(FreeFileSync::HierarchyObject& hierObj)
+    {
+        //files
+        std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this);
+
+        //directories
+        std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), *this);
+    };
+
+private:
+    template<typename Iterator, typename Function>
+    friend Function std::for_each(Iterator, Iterator, Function);
+
+
+    void operator()(FreeFileSync::FileMapping& fileObj)
+    {
+        fileObj.setActive(filterProc.passFileFilter(fileObj.getObjRelativeName()));
+    }
+
+    void operator()(FreeFileSync::DirMapping& dirObj)
+    {
+        bool subObjMightMatch = true;
+        dirObj.setActive(filterProc.passDirFilter(dirObj.getObjRelativeName(), &subObjMightMatch));
+
+        if (subObjMightMatch) //use same logic as within directory traversing here: evaluate filter in subdirs only if objects could match
+            execute(dirObj);  //recursion
+        else
+            InOrExcludeAllRows<false>().execute(dirObj); //exclude all files dirs in subfolders
+    }
+
+    const FilterProcess& filterProc;
+};
+
+
+void FreeFileSync::applyFiltering(const FilterProcess& filter, FreeFileSync::BaseDirMapping& baseDirectory)
+{
+    FilterData(filter).execute(baseDirectory);
+}
+
+
 void FreeFileSync::applyFiltering(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp)
 {
     if (folderCmp.size() == 0)
@@ -621,18 +757,26 @@ void FreeFileSync::applyFiltering(const MainConfiguration& currentMainCfg, Folde
     else if (folderCmp.size() != currentMainCfg.additionalPairs.size() + 1)
         throw std::logic_error("Programming Error: Contract violation!");
 
-    //main pair
-    FreeFileSync::FilterProcess(currentMainCfg.includeFilter, currentMainCfg.excludeFilter).filterAll(folderCmp[0]);
 
-    //add. folder pairs
-    for (std::vector<FolderPairEnh>::const_iterator i = currentMainCfg.additionalPairs.begin(); i != currentMainCfg.additionalPairs.end(); ++i)
+    //merge first and additional pairs
+    std::vector<FolderPairEnh> allPairs;
+    allPairs.push_back(currentMainCfg.firstPair);
+    allPairs.insert(allPairs.end(),
+                    currentMainCfg.additionalPairs.begin(), //add additional pairs
+                    currentMainCfg.additionalPairs.end());
+
+
+    const FilterProcess::FilterRef globalFilter(new NameFilter(currentMainCfg.includeFilter, currentMainCfg.excludeFilter));
+
+    for (std::vector<FolderPairEnh>::const_iterator i = allPairs.begin(); i != allPairs.end(); ++i)
     {
-        HierarchyObject& baseDirectory = folderCmp[i - currentMainCfg.additionalPairs.begin() + 1];
+        BaseDirMapping& baseDirectory = folderCmp[i - allPairs.begin()];
 
-        if (i->altFilter.get())
-            FreeFileSync::FilterProcess(i->altFilter->includeFilter, i->altFilter->excludeFilter).filterAll(baseDirectory);
-        else
-            FreeFileSync::FilterProcess(currentMainCfg.includeFilter, currentMainCfg.excludeFilter).filterAll(baseDirectory);
+        applyFiltering(*combineFilters(globalFilter,
+                                       FilterProcess::FilterRef(new NameFilter(
+                                               i->localFilter.includeFilter,
+                                               i->localFilter.excludeFilter))),
+                       baseDirectory);
     }
 }
 

@@ -363,14 +363,16 @@ Zstring getSessionDeletionDir(const Zstring& customDeletionDirectory)
 }
 
 
-SyncProcess::SyncProcess(const bool copyFileSymLinks,
-                         const bool traverseDirSymLinks,
+SyncProcess::SyncProcess(bool copyFileSymLinks,
+                         bool traverseDirSymLinks,
                          xmlAccess::OptionalDialogs& warnings,
-                         const bool verifyCopiedFiles,
+                         bool verifyCopiedFiles,
+                         bool copyLockedFiles,
                          StatusHandler& handler) :
     m_copyFileSymLinks(copyFileSymLinks),
     m_traverseDirSymLinks(traverseDirSymLinks),
     m_verifyCopiedFiles(verifyCopiedFiles),
+    copyLockedFiles_(copyLockedFiles),
     m_warnings(warnings),
     statusUpdater(handler) {}
 
@@ -453,7 +455,7 @@ class FreeFileSync::SyncRecursively
 public:
     SyncRecursively(const SyncProcess& syncProc,
 #ifdef FFS_WIN
-                    ShadowCopy& shadowCopyHandler,
+                    ShadowCopy* shadowCopyHandler,
 #endif
                     const DeletionHandling& delHandling) :
         statusUpdater_(syncProc.statusUpdater),
@@ -536,7 +538,7 @@ private:
 
     StatusHandler& statusUpdater_;
 #ifdef FFS_WIN
-    ShadowCopy& shadowCopyHandler_;
+    ShadowCopy* shadowCopyHandler_; //optional!
 #endif
     const DeletionHandling& delHandling_;
 
@@ -983,7 +985,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
 
 #ifdef FFS_WIN
     //shadow copy buffer: per sync-instance, not folder pair
-    std::auto_ptr<ShadowCopy> shadowCopyHandler(new ShadowCopy);
+    std::auto_ptr<ShadowCopy> shadowCopyHandler(copyLockedFiles_ ? new ShadowCopy : NULL);
 #endif
 
     try
@@ -997,18 +999,21 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             //generate name of alternate deletion directory (unique for session AND folder pair)
             const DeletionHandling currentDelHandling(folderPairCfg.handleDeletion, folderPairCfg.custDelFolder);
 
+            //exclude some pathological case (leftdir, rightdir are empty)
+            if (j->getBaseDir<LEFT_SIDE>() == j->getBaseDir<RIGHT_SIDE>())
+                continue;
 //------------------------------------------------------------------------------------------
             //execute synchronization recursively
 
             //loop through all files twice; reason: first delete, then copy
             SyncRecursively( *this,
 #ifdef FFS_WIN
-                             *shadowCopyHandler,
+                             shadowCopyHandler.get(),
 #endif
                              currentDelHandling).execute<true>(*j);
             SyncRecursively(*this,
 #ifdef FFS_WIN
-                            *shadowCopyHandler,
+                            shadowCopyHandler.get(),
 #endif
                             currentDelHandling).execute<false>(*j);
 //------------------------------------------------------------------------------------------
@@ -1090,7 +1095,7 @@ void SyncRecursively::copyFileUpdating(const Zstring& source, const Zstring& tar
     try
     {
 #ifdef FFS_WIN
-        FreeFileSync::copyFile(source, target, copyFileSymLinks_, &shadowCopyHandler_, &callback);
+        FreeFileSync::copyFile(source, target, copyFileSymLinks_, shadowCopyHandler_, &callback);
 #elif defined FFS_LINUX
         FreeFileSync::copyFile(source, target, copyFileSymLinks_, &callback);
 #endif
@@ -1209,12 +1214,5 @@ void SyncRecursively::verifyFileCopy(const Zstring& source, const Zstring& targe
         }
     }
 }
-
-
-
-
-
-
-
 
 

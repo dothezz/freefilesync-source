@@ -156,10 +156,14 @@ About
 A programról
 Action
 Művelet
+Activate filter
+Szűrő aktiválása
 Add folder
 Mappa hozzáadása
 Add folder pair
 Mappa pár megadása
+All directories in sync!
+Minden mappa szinkronban!
 An exception occured!
 Kivétel keletkezett!
 As a result the files are separated into the following categories:
@@ -196,10 +200,6 @@ Category
 Kategória
 Change direction
 Irány megváltoztatása
-Check all
-Mindent kijelöl
-Choose to hide filtered files/directories from list
-Szűrt fájlok/mappák elrejtése a listában
 Comma separated list
 Comma separated values
 Commandline
@@ -239,8 +239,6 @@ Beállítások áttekintése:
 Configuration saved!
 Beállítások elmentve!
 Configure filter
-Szűrő beállítása
-Configure filter...
 Szűrő beállítása
 Configure your own synchronization rules.
 Saját szinkronizálási szabályok beállítása.
@@ -332,8 +330,6 @@ Directory
 Mappa
 Directory does not exist:
 A mappa nem létezik:
-Do not display visual status information but write to a logfile instead
-Ne mutasd a vizuális állapotinformációkat, helyette naplózd
 Do not show this dialog again
 Ne mutasd újra ezt a párbeszédablakot
 Do nothing
@@ -408,6 +404,8 @@ Example
 Példa
 Exclude
 Kizár
+Exclude all rows
+Minden sor kizárása
 Exclude temporarily
 Ideiglenesen kizár
 Exclude via filter:
@@ -418,6 +416,8 @@ Exit with RC < 0
 Kilépés (visszatérési érték < 0)
 External applications
 Külső alkalmazások
+Fatal Error
+Kritikus hiba
 Feedback and suggestions are welcome at:
 A visszajelzéseket és javaslatokat ide várjuk:
 File %x has an invalid date!
@@ -462,12 +462,14 @@ Files/folders that exist on right side only
 Csak a jobb oldalon létező fájlok/mappák
 Filter
 Szűrő
-Filter active: Press again to deactivate
-Szűrő aktív: Nyomja meg újra a deaktiváláshoz
 Filter files
 Fájlok szűrése
+Filter has been selected
+Szűrő kiválasztva
 Filter view
 Szűrő nézet
+Filtering is deactivated
+A szűrés kikapcsolva
 Folder Comparison and Synchronization
 Mappa összehasonlítás és szinkronizáció
 Free disk space available:
@@ -490,6 +492,8 @@ Generating database...
 Adatbázis generálása...
 Generating file list...
 Fájllista generálása...
+Global filter
+Globális szűrő
 Global settings
 Globális beállítások
 Help
@@ -500,6 +504,8 @@ Hide all error and warning messages
 Összes hibaüzenet és figyelmeztetés elrejtése
 Hide conflicts
 Ütközések elrejtése
+Hide excluded items
+A kizárt elemek elrejtése
 Hide files that are different
 A nem egyező fájlok elrejtése
 Hide files that are equal
@@ -526,14 +532,16 @@ Hide files that will be overwritten on right side
 A jobb oldalon felülírandó fájlok elrejtése
 Hide files that won't be copied
 A nem másolandó fájlok elrejtése
-Hide filtered items
-A szűrt elemek elrejtése
+Hide filtered or temporarily excluded files
+A kiszűrt vagy ideiglenesen kizárt fájlok elrejtése
 Hide further error messages during the current process
 A további hibaüzenetek elrejtése az aktuális folyamat során
 Hints:
 Tippek:
 Homepage
 Honlap
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+Mindkét oldal változásainak azonosítása és tárolása adatbázis segítségével. A törlések és ütközések automatikusan észlelődnek.
 If you like FFS
 FFS támogatása
 Ignore 1-hour file time difference
@@ -548,8 +556,10 @@ Ignore this error, retry or abort?
 Figyelmen kívül hagyja ezt a hibát, újra megpróbálja vagy megszakítja?
 Include
 Csatol
+Include all rows
+Minden sort csatolni
 Include temporarily
-Ideiglenesen tartalmaz
+Ideiglenesen csatolni
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
 Csatol: *.doc;*.zip;*.exe\nKizár: temp\\*
 Incompatible synchronization database format:
@@ -558,8 +568,8 @@ Info
 Információ
 Information
 Információ
-Initial synchronization.
-Első szinkronizáció.
+Initial synchronization:
+Első szinkronizáció:
 Integrate external applications into context menu. The following macros are available:
 Külső alkalmazás integrálása a helyi menübe. Az elérhető makrók a következők:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -574,6 +584,8 @@ Load configuration from file
 Beállítások betöltése fájlból
 Load configuration history (press DEL to delete items)
 Beállítások előzményeinek a betöltése (Nyomja meg a DEL gombot a törléshez)
+Local filter
+Lokális szűrő
 Log-messages:
 Naplóbejegyzések:
 Logging
@@ -598,8 +610,8 @@ Moving folder %x to user-defined directory %y
 %x mappa mozgatása a felhasználó által megadott %y mappába
 Multiple...
 Sokszorosítás
-No database file existing yet:
-Nem létező adatbázis fájl:
+No filter selected
+Nincs szűrő kiválasztva
 Not enough free disk space available in:
 Nincs elég szabad lemezterület:
 Nothing to synchronize according to configuration!
@@ -634,8 +646,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Ennek a funkciónak a használatához, kérjük, másold a megfelelő \"Shadow.dll\" fájlt (megtalálható a \"Shadow.zip\" archívumban) abba a mappába, amelybe a FreeFileSync-et telepítetted.
 Please fill all empty directory fields.
 Kérjük, töltse ki az összes üres mappa mezőt.
-Press button to activate filter
-Nyomja meg a gombot a szűrő aktiválásához
+Please run a Compare first before synchronizing!
+Kérjük, futtass le egy összehasonlítást mielőtt szinkronizálnál!
 Published under the GNU General Public License:
 Kiadva a GNU General Public License alatt:
 Question
@@ -656,12 +668,16 @@ Remove folder
 Mappa eltávolítása
 Remove folder pair
 Mappa párok eltávolítása
+Remove local filter settings
+Lokális szűrőbeállítások eltávolítása
 Report translation error
 Fordítói hiba bejelentése
 Reset
 Helyreállítás
 Right
 Jobb oldal
+Run minimized and write status information to a logfile
+Futtatás lekicsinyítve és a státuszinformációk mentése naplófájlba
 S&ave configuration
 Beállítások mentés&e
 S&witch view
@@ -676,14 +692,14 @@ Scanning:
 Vizsgálat:
 Select a folder
 Mappa kiválasztása
-Select alternate filter settings
-Alternatív szűrőbeállítások kiválasztása
 Select alternate synchronization settings
 Alternatív szinkronizációs beállítások kiválasztása
 Select logfile directory:
 Naplófájl mappájának kiválasztása:
 Select variant:
 Változat kiválasztása:
+Setting default synchronization directions. Please check whether they are appropriate for you.
+Alapértelmezett szinkronizációs irányok beállítása. Kérjük, ellenőrizd a helyességüket.
 Show conflicts
 Ütközések mutatása
 Show file icons
@@ -770,8 +786,12 @@ Target directory already existing!
 A célmappa már létezik!
 Target file already existing!
 A célként megadott fájl már létezik!
+The database file is not yet existing, but will be created during synchronization:
+Az adatbázisfájl nem létezik, de létre lesz hozva a szinkronizáció folyamán:
 The file does not contain a valid configuration:
 A következő fájl nem tartalmaz érvényes beállításokat:
+The required database entry is not yet existing, but will be created during synchronization:
+A szükséges adatbázisbejegyzés nem létezik, de létre lesz hozva a szinkronizáció folyamán:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Ez a változat akkor tekint egyezőnek két azonos nevű fájlt, ha azok mérete ÉS az utolsó módosításuk ideje azonos.
 Time
@@ -796,8 +816,6 @@ Unable to create logfile!
 Nem lehet létrehozni a naplófájlt!
 Unable to initialize Recycle Bin!
 Nem lehet inicializálni a Lomtárat (Recycle Bin)!
-Uncheck all
-Összes kijelölést megszűntet
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Feloldatlan ütközések vannak! \n\nFigyelmen kívül hagyhatod az ütközéseket és folytathatod a szinkronizálást.
 Update ->
@@ -812,8 +830,6 @@ User-defined directory
 Felhasználó által megadott mappa
 User-defined directory for deletion was not specified!
 A törléshez nem lett mappa megadva a felhasználó által!
-Using default synchronization directions. Please recheck.
-Az alapértelmezett szinkronizációs irányok vannak használatban. Kérjük, ellenőrizze újra.
 Variant
 Variáns
 Verifying file %x

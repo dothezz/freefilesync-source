@@ -11,8 +11,10 @@
 #include <wx/log.h>
 #include <wx/datetime.h>
 #include "stringConv.h"
+#include <wx/utils.h>
 
 #ifdef FFS_WIN
+#include "dllLoader.h"
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "shadow.h"
 
@@ -30,10 +32,70 @@
 using FreeFileSync::FileError;
 
 
+bool replaceMacro(wxString& macro) //macro without %-characters, return true if replaced successfully
+{
+    if (macro.IsEmpty())
+        return false;
+
+    //there are equally named environment variables %TIME%, %DATE% existing, so replace these first!
+    if (macro.CmpNoCase(wxT("time")) == 0)
+    {
+        macro = wxDateTime::Now().FormatISOTime();
+        macro.Replace(wxT(":"), wxT("-"));
+        return true;
+    }
+
+    if (macro.CmpNoCase(wxT("date")) == 0)
+    {
+        macro = wxDateTime::Now().FormatISODate();
+        return true;
+    }
+
+    //try to apply environment variables
+    wxString envValue;
+    if (wxGetEnv(macro, &envValue))
+    {
+        macro = envValue;
+        return true;
+    }
+
+    return false;
+}
+
+
+void expandMacros(wxString& text)
+{
+    const wxChar SEPARATOR = '%';
+
+    if (text.Find(SEPARATOR) != wxNOT_FOUND)
+    {
+        wxString prefix  = text.BeforeFirst(SEPARATOR);
+        wxString postfix = text.AfterFirst(SEPARATOR);
+        if (postfix.Find(SEPARATOR) != wxNOT_FOUND)
+        {
+            wxString potentialMacro = postfix.BeforeFirst(SEPARATOR);
+            wxString rest           = postfix.AfterFirst(SEPARATOR); //text == prefix + SEPARATOR + potentialMacro + SEPARATOR + rest
+
+            if (replaceMacro(potentialMacro))
+            {
+                expandMacros(rest);
+                text = prefix + potentialMacro + rest;
+            }
+            else
+            {
+                rest = wxString() + SEPARATOR + rest;
+                expandMacros(rest);
+                text = prefix + SEPARATOR + potentialMacro + rest;
+            }
+        }
+    }
+}
+
+
 Zstring FreeFileSync::getFormattedDirectoryName(const Zstring& dirname)
 {
     //Formatting is needed since functions expect the directory to end with '\' to be able to split the relative names.
-    //Also improves usability.
+    //note: don't do directory formatting with wxFileName, as it doesn't respect //?/ - prefix!
 
     wxString dirnameTmp = zToWx(dirname);
     dirnameTmp.Trim(true);  //remove whitespace characters from right
@@ -46,14 +108,8 @@ Zstring FreeFileSync::getFormattedDirectoryName(const Zstring& dirname)
         dirnameTmp += zToWx(globalFunctions::FILE_NAME_SEPARATOR);
 
     //replace macros
-    wxString timeNow = wxDateTime::Now().FormatISOTime();
-    timeNow.Replace(wxT(":"), wxT("-"));
-    dirnameTmp.Replace(wxT("%time%"), timeNow.c_str());
+    expandMacros(dirnameTmp);
 
-    const wxString dateToday = wxDateTime::Now().FormatISODate();
-    dirnameTmp.Replace(wxT("%date%"), dateToday.c_str());
-
-    //don't do directory formatting with wxFileName, as it doesn't respect //?/ - prefix
     return wxToZ(dirnameTmp);
 }
 
@@ -717,57 +773,16 @@ void FreeFileSync::copyFileTimes(const Zstring& sourceDir, const Zstring& target
 
 
 #ifdef FFS_WIN
-class KernelDllHandler //dynamically load windows API functions
-{
-    typedef DWORD (WINAPI *GetFinalPath)(
-        HANDLE hFile,
-        LPTSTR lpszFilePath,
-        DWORD cchFilePath,
-        DWORD dwFlags);
-
-public:
-    static const KernelDllHandler& getInstance() //lazy creation of KernelDllHandler
-    {
-        static KernelDllHandler instance;
-
-        if (instance.getFinalPathNameByHandle == NULL)
-            throw FileError(wxString(_("Error loading library function:")) + wxT("\n\"") + wxT("GetFinalPathNameByHandleW") + wxT("\""));
-
-        return instance;
-    }
-
-    GetFinalPath getFinalPathNameByHandle;
-
-private:
-    KernelDllHandler() :
-        getFinalPathNameByHandle(NULL),
-        hKernel(NULL)
-    {
-        //get a handle to the DLL module containing required functionality
-        hKernel = ::LoadLibrary(wxT("kernel32.dll"));
-        if (hKernel)
-            getFinalPathNameByHandle = reinterpret_cast<GetFinalPath>(::GetProcAddress(hKernel, "GetFinalPathNameByHandleW")); //load unicode version!
-    }
-
-    ~KernelDllHandler()
-    {
-        if (hKernel) ::FreeLibrary(hKernel);
-    }
-
-    HINSTANCE hKernel;
-};
-
-
 Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target path of symbolic link to a directory
 {
     //open handle to target of symbolic link
-    HANDLE hDir = CreateFile(dirLinkName.c_str(),
-                             0,
-                             FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                             NULL,
-                             OPEN_EXISTING,
-                             FILE_FLAG_BACKUP_SEMANTICS,
-                             NULL);
+    HANDLE hDir = ::CreateFile(dirLinkName.c_str(),
+                               0,
+                               FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                               NULL,
+                               OPEN_EXISTING,
+                               FILE_FLAG_BACKUP_SEMANTICS,
+                               NULL);
     if (hDir == INVALID_HANDLE_VALUE)
         return Zstring();
 
@@ -776,7 +791,20 @@ Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target pa
     const unsigned int BUFFER_SIZE = 10000;
     TCHAR targetPath[BUFFER_SIZE];
 
-    const DWORD rv = KernelDllHandler::getInstance().getFinalPathNameByHandle(
+
+    //dynamically load windows API function
+    typedef DWORD (WINAPI *GetFinalPathNameByHandleWFunc)(
+        HANDLE hFile,
+        LPTSTR lpszFilePath,
+        DWORD cchFilePath,
+        DWORD dwFlags);
+    static const GetFinalPathNameByHandleWFunc getFinalPathNameByHandle =
+        Utility::loadDllFunKernel<GetFinalPathNameByHandleWFunc>("GetFinalPathNameByHandleW");
+
+    if (getFinalPathNameByHandle == NULL)
+        throw FileError(wxString(_("Error loading library function:")) + wxT("\n\"") + wxT("GetFinalPathNameByHandleW") + wxT("\""));
+
+    const DWORD rv = (*getFinalPathNameByHandle)(
                          hDir,
                          targetPath,
                          BUFFER_SIZE,
@@ -987,7 +1015,7 @@ void FreeFileSync::createDirectory(const Zstring& directory, const Zstring& temp
 
 Zstring createTempName(const Zstring& filename)
 {
-    Zstring output = filename + DefaultStr(".tmp");
+    Zstring output = filename + DefaultStr(".ffs_tmp");
 
     //ensure uniqueness
     if (FreeFileSync::fileExists(output))
@@ -1007,7 +1035,7 @@ Zstring createTempName(const Zstring& filename)
 #ifdef FFS_WIN
 
 #ifndef COPY_FILE_COPY_SYMLINK
-const DWORD COPY_FILE_COPY_SYMLINK = 0x00000800;
+#define COPY_FILE_COPY_SYMLINK                0x00000800
 #endif
 
 DWORD CALLBACK copyCallbackInternal(
@@ -1063,7 +1091,26 @@ bool supportForSymbolicLinks()
     //symbolic links are supported starting with Vista
     if (GetVersionEx(&osvi))
         return osvi.dwMajorVersion > 5; //XP has majorVersion == 5, minorVersion == 1, Vista majorVersion == 6
+    //overview: http://msdn.microsoft.com/en-us/library/ms724834(VS.85).aspx
+    return false;
+}
 
+
+#ifndef COPY_FILE_ALLOW_DECRYPTED_DESTINATION
+#define COPY_FILE_ALLOW_DECRYPTED_DESTINATION 0x00000008
+#endif
+
+
+bool supportForNonEncryptedDestination()
+{
+    OSVERSIONINFO osvi;
+    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+    //symbolic links are supported starting with Vista
+    if (GetVersionEx(&osvi))
+        return osvi.dwMajorVersion >= 5 && osvi.dwMinorVersion >= 1; //XP has majorVersion == 5, minorVersion == 1, Vista majorVersion == 6
+    //overview: http://msdn.microsoft.com/en-us/library/ms724834(VS.85).aspx
     return false;
 }
 
@@ -1080,6 +1127,12 @@ void FreeFileSync::copyFile(const Zstring& sourceFile,
     static const bool symlinksSupported = supportForSymbolicLinks(); //only set "true" if supported by OS: else copying in Windows XP fails
     if (copyFileSymLinks && symlinksSupported)
         copyFlags |= COPY_FILE_COPY_SYMLINK;
+
+    //allow copying from encrypted to non-encrytped location
+    static const bool nonEncSupported = supportForNonEncryptedDestination();
+    if (nonEncSupported)
+        copyFlags |= COPY_FILE_ALLOW_DECRYPTED_DESTINATION;
+
 
     const Zstring temporary = createTempName(targetFile); //use temporary file until a correct date has been set
     if (!::CopyFileEx( //same performance as CopyFile()
@@ -1312,3 +1365,4 @@ bool FreeFileSync::isFatDrive(const Zstring& directoryName)
 }
 #endif  //FFS_WIN
 */
+

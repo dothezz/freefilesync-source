@@ -83,8 +83,8 @@ protected:
 private:
     virtual void setGridDataTable(const FreeFileSync::GridView* gridDataView) = 0;
 
-//this method is called when grid view changes: useful for parallel updating of multiple grids
-    virtual void DoPrepareDC(wxDC& dc);
+    //this method is called when grid view changes: useful for parallel updating of multiple grids
+    void OnPaintGrid(wxEvent& event);
 
     virtual void alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight) = 0;
 

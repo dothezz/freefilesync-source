@@ -12,14 +12,17 @@
 		<Platform
 			Name="Win32"
 		/>
+		<Platform
+			Name="x64"
+		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="..\OBJ\$(ConfigurationName)_RTS_VCPP"
-			IntermediateDirectory="..\OBJ\$(ConfigurationName)_RTS_VCPP"
+			OutputDirectory="OBJ\$(ProjectName)_$(ConfigurationName)_$(PlatformName)_VCPP"
+			IntermediateDirectory="OBJ\$(ProjectName)_$(ConfigurationName)_$(PlatformName)_VCPP"
 			ConfigurationType="1"
 			CharacterSet="1"
 			>
@@ -42,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Programme\C++\wxWidgets\include&quot;;&quot;C:\Programme\C++\wxWidgets\lib\vc_lib\mswud&quot;;..\shared\boost_1_40_0"
+				AdditionalIncludeDirectories="&quot;C:\Programme\C++\wxWidgets\include&quot;;&quot;C:\Programme\C++\wxWidgets\lib\vc_lib\mswud&quot;;..\shared\boost_1_x"
 				PreprocessorDefinitions="wxUSE_UNICODE;__WXMSW__;FFS_WIN;__WXDEBUG__;TIXML_USE_STL;ZSTRING_WIDE_CHAR"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -100,9 +103,93 @@
 			/>
 		</Configuration>
 		<Configuration
+			Name="Debug|x64"
+			OutputDirectory="OBJ\$(ProjectName)_$(ConfigurationName)_$(PlatformName)_VCPP"
+			IntermediateDirectory="OBJ\$(ProjectName)_$(ConfigurationName)_$(PlatformName)_VCPP"
+			ConfigurationType="1"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+				CommandLine=""
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="&quot;D:\Programme\C++\wxWidgets-x64\include&quot;;&quot;D:\Programme\C++\wxWidgets-x64\lib\vc_lib\mswud&quot;;..\shared\boost_1_x"
+				PreprocessorDefinitions="wxUSE_UNICODE;__WXMSW__;FFS_WIN;__WXDEBUG__;TIXML_USE_STL;ZSTRING_WIDE_CHAR"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="1"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				DisableSpecificWarnings="4804"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				Culture="0"
+				AdditionalIncludeDirectories="D:\Programme\C++\wxWidgets-x64\include;D:\Programme\C++\wxWidgets-x64\lib\vc_lib\mswud"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="wxmsw28ud_adv.lib &#x0A;wxmsw28ud_core.lib &#x0A;wxbase28ud.lib &#x0A;wxpngd.lib&#x0A; wxzlibd.lib &#x0A;wxbase28ud_net.lib comctl32.lib ws2_32.lib Rpcrt4.lib"
+				OutputFile="..\BUILD\$(ProjectName).exe"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="D:\Programme\C++\wxWidgets-x64\lib\vc_lib"
+				GenerateManifest="true"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+				EmbedManifest="true"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				Description="clean up"
+				CommandLine=""
+			/>
+		</Configuration>
+		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="..\OBJ\$(ConfigurationName)_RTS_VCPP"
-			IntermediateDirectory="..\OBJ\$(ConfigurationName)_RTS_VCPP"
+			OutputDirectory="OBJ\$(ProjectName)_$(ConfigurationName)_$(PlatformName)_VCPP"
+			IntermediateDirectory="OBJ\$(ProjectName)_$(ConfigurationName)_$(PlatformName)_VCPP"
 			ConfigurationType="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -127,7 +214,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="&quot;C:\Programme\C++\wxWidgets\include&quot;;&quot;C:\Programme\C++\wxWidgets\lib\vc_lib\mswu&quot;;..\shared\boost_1_40_0"
+				AdditionalIncludeDirectories="&quot;C:\Programme\C++\wxWidgets\include&quot;;&quot;C:\Programme\C++\wxWidgets\lib\vc_lib\mswu&quot;;..\shared\boost_1_x"
 				PreprocessorDefinitions="wxUSE_UNICODE;__WXMSW__;FFS_WIN;NDEBUG;TIXML_USE_STL;ZSTRING_WIDE_CHAR"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -182,6 +269,90 @@
 				CommandLine=""
 			/>
 		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory="OBJ\$(ProjectName)_$(ConfigurationName)_$(PlatformName)_VCPP"
+			IntermediateDirectory="OBJ\$(ProjectName)_$(ConfigurationName)_$(PlatformName)_VCPP"
+			ConfigurationType="1"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="&quot;D:\Programme\C++\wxWidgets-x64\include&quot;;&quot;D:\Programme\C++\wxWidgets-x64\lib\vc_lib\mswu&quot;;..\shared\boost_1_x"
+				PreprocessorDefinitions="wxUSE_UNICODE;__WXMSW__;FFS_WIN;NDEBUG;TIXML_USE_STL;ZSTRING_WIDE_CHAR"
+				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				DisableSpecificWarnings="4804"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				Culture="1033"
+				AdditionalIncludeDirectories="&quot;D:\Programme\C++\wxWidgets-x64\include&quot;;&quot;D:\Programme\C++\wxWidgets-x64\lib\vc_lib\mswu&quot;"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="wxmsw28u_adv.lib &#x0A;wxmsw28u_core.lib &#x0A;wxbase28u.lib &#x0A;wxpng.lib &#x0A;wxzlib.lib &#x0A;wxbase28u_net.lib comctl32.lib ws2_32.lib"
+				OutputFile="..\BUILD\$(ProjectName).exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="D:\Programme\C++\wxWidgets-x64\lib\vc_lib"
+				GenerateDebugInformation="false"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				TargetMachine="17"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine=""
+			/>
+		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -197,6 +368,10 @@
 			</File>
 			<File
 				RelativePath="..\shared\customButton.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\shared\dllLoader.cpp"
 				>
 			</File>
 			<File
@@ -313,7 +488,23 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions="_UNICODE;UNICODE;wxUSE_NO_MANIFEST"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
 					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCResourceCompilerTool"
+						PreprocessorDefinitions="_UNICODE;UNICODE;wxUSE_NO_MANIFEST"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCResourceCompilerTool"

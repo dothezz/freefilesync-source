@@ -13,6 +13,7 @@ public:
 
     void setToolTip(const wxString& toolTipText);
     void keepHidden(); //do not show windows again: avoid window flashing shortly before it is destroyed
+
 private:
     void OnContextMenuSelection(wxCommandEvent& event);
     void OnDoubleClick(wxCommandEvent& event);

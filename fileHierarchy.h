@@ -10,6 +10,7 @@
 #include "structures.h"
 #include <boost/shared_ptr.hpp>
 #include "shared/guid.h"
+#include "library/filter.h"
 
 class DirectoryBuffer;
 
@@ -95,9 +96,8 @@ private:
 struct DirInformation
 {
     //filter settings (used when retrieving directory data)
-    bool filterActive;
-    Zstring includeFilter;
-    Zstring excludeFilter;
+    FilterProcess::FilterRef filter;
+
     //hierarchical directory information
     DirContainer baseDirContainer;
 };
@@ -209,10 +209,10 @@ public:
 
     //comparison result
     virtual CompareFilesResult getCategory() const = 0;
-    virtual const wxString& getCatConflict() const = 0; //only filled if cmpResult == FILE_CONFLICT
+    virtual const wxString& getCatConflict() const = 0; //only filled if getCategory() == FILE_CONFLICT
     //sync operation
     SyncOperation getSyncOperation() const;
-    const wxString& getSyncOpConflict() const; //only filled if syncDir == SYNC_DIR_INT_CONFLICT
+    const wxString& getSyncOpConflict() const; //only filled if getSyncOperation() == SYNC_DIR_INT_CONFLICT
     SyncOperation testSyncOperation(bool selected, SyncDirection syncDir) const; //get syncOp with provided settings
 
     //sync settings
@@ -367,31 +367,16 @@ class BaseDirMapping : public HierarchyObject //synchronization base directory
 public:
     BaseDirMapping(const Zstring& dirPostfixedLeft,
                    const Zstring& dirPostfixedRight,
-                   bool filterActive,
-                   const Zstring& includeFilter,
-                   const Zstring& excludeFilter) :
+                   const FilterProcess::FilterRef& filterIn) :
         HierarchyObject(dirPostfixedLeft, dirPostfixedRight),
-        filter(filterActive, includeFilter, excludeFilter) {}
+        filter(filterIn) {}
 
-    struct FilterSettings
-    {
-        FilterSettings(bool active,
-                       const Zstring& include,
-                       const Zstring& exclude) :
-            filterActive(active),
-            includeFilter(include),
-            excludeFilter(exclude) {}
-        bool filterActive;
-        Zstring includeFilter;
-        Zstring excludeFilter;
-    };
-
-    const FilterSettings& getFilter() const;
+    const FilterProcess::FilterRef& getFilter() const;
     template <SelectedSide side> Zstring getDBFilename() const;
     virtual void swap();
 
 private:
-    FilterSettings filter;
+    FilterProcess::FilterRef filter;
 };
 
 
@@ -834,7 +819,7 @@ void DirMapping::copyToR()
 
 
 inline
-const BaseDirMapping::FilterSettings& BaseDirMapping::getFilter() const
+const FilterProcess::FilterRef& BaseDirMapping::getFilter() const
 {
     return filter;
 }

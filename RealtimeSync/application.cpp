@@ -43,6 +43,15 @@ void Application::OnStartApplication(wxIdleEvent& event)
     ::gtk_rc_parse("styles.rc"); //remove inner border from bitmap buttons
 #endif
 
+    //initialize help controller
+    helpController.reset(new wxHelpController);
+    helpController->Initialize(FreeFileSync::getInstallationDir() +
+#ifdef FFS_WIN
+                               wxT("FreeFileSync.chm"));
+#elif defined FFS_LINUX
+                               wxT("Help/FreeFileSync.hhp"));
+#endif
+
     //set program language
     FreeFileSync::CustomLocale::getInstance().setLanguage(RealtimeSync::getProgramLanguage());
 
@@ -67,7 +76,7 @@ void Application::OnStartApplication(wxIdleEvent& event)
 
     GlobalResources::getInstance().load(); //loads bitmap resources on program startup
 
-    MainDialog* frame = new MainDialog(NULL, cfgFilename);
+    MainDialog* frame = new MainDialog(NULL, cfgFilename, *helpController);
     frame->SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
     frame->Show();
 }

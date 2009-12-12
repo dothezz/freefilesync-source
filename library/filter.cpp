@@ -2,14 +2,69 @@
 #include "../shared/zstring.h"
 #include <wx/string.h>
 #include <set>
+#include <stdexcept>
 #include <vector>
 #include "../shared/systemConstants.h"
 #include "../structures.h"
 #include <boost/bind.hpp>
+#include "../shared/loki/LokiTypeInfo.h"
+#include "../shared/serialize.h"
 
 using FreeFileSync::FilterProcess;
+using FreeFileSync::NameFilter;
 
 
+//--------------------------------------------------------------------------------------------------
+bool FilterProcess::operator==(const FilterProcess& other) const
+{
+    return !(*this < other) && !(other < *this);
+}
+
+
+bool FilterProcess::operator!=(const FilterProcess& other) const
+{
+    return !(*this == other);
+}
+
+
+bool FilterProcess::operator<(const FilterProcess& other) const
+{
+    if (Loki::TypeInfo(typeid(*this)) != typeid(other))
+        return Loki::TypeInfo(typeid(*this)) < typeid(other);
+
+    //this and other are same type:
+    return cmpLessSameType(other);
+}
+
+
+void FilterProcess::saveFilter(wxOutputStream& stream) const //serialize derived object
+{
+    //save type information
+    Utility::writeString(stream, uniqueClassIdentifier());
+
+    //save actual object
+    save(stream);
+}
+
+
+FilterProcess::FilterRef FilterProcess::loadFilter(wxInputStream& stream)
+{
+    //read type information
+    const Zstring uniqueClassId = Utility::readString(stream);
+
+    //read actual object
+    if (uniqueClassId == DefaultStr("NullFilter"))
+        return NullFilter::load(stream);
+    else if (uniqueClassId == DefaultStr("NameFilter"))
+        return NameFilter::load(stream);
+    else if (uniqueClassId == DefaultStr("CombinedFilter"))
+        return CombinedFilter::load(stream);
+    else
+        throw std::logic_error("Programming Error: Unknown filter!");
+}
+
+
+//--------------------------------------------------------------------------------------------------
 inline
 void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, std::set<Zstring>& directoryFilter)
 {
@@ -149,10 +204,11 @@ std::vector<Zstring> compoundStringToFilter(const Zstring& filterString)
 
     return output;
 }
-//##############################################################
 
-
-FilterProcess::FilterProcess(const Zstring& includeFilter, const Zstring& excludeFilter)
+//#################################################################################################
+NameFilter::NameFilter(const Zstring& includeFilter, const Zstring& excludeFilter) :
+    includeFilterTmp(includeFilter), //save constructor arguments for serialization
+    excludeFilterTmp(excludeFilter)
 {
     //no need for regular expressions! In tests wxRegex was by factor of 10 slower than wxString::Matches()!!
 
@@ -167,15 +223,17 @@ FilterProcess::FilterProcess(const Zstring& includeFilter, const Zstring& exclud
 }
 
 
-bool FilterProcess::passFileFilter(const DefaultChar* relFilename) const
+bool NameFilter::passFileFilter(const DefaultChar* relFilename) const
 {
     return  matchesFilter(relFilename, filterFileIn) && //process include filters
             !matchesFilter(relFilename, filterFileEx);  //process exclude filters
 }
 
 
-bool FilterProcess::passDirFilter(const DefaultChar* relDirname, bool* subObjMightMatch) const
+bool NameFilter::passDirFilter(const DefaultChar* relDirname, bool* subObjMightMatch) const
 {
+    assert(subObjMightMatch == NULL || *subObjMightMatch == true); //check correct usage
+
     if (matchesFilter(relDirname, filterFolderEx)) //process exclude filters
     {
         if (subObjMightMatch)
@@ -196,147 +254,56 @@ bool FilterProcess::passDirFilter(const DefaultChar* relDirname, bool* subObjMig
         return false;
     }
 
-    assert(subObjMightMatch == NULL || *subObjMightMatch == true);
     return true;
 }
 
 
-template <bool include>
-class InOrExcludeAllRows
+bool NameFilter::isNull() const
 {
-public:
-    void operator()(FreeFileSync::BaseDirMapping& baseDirectory) const //be careful with operator() to no get called by std::for_each!
-    {
-        execute(baseDirectory);
-    }
-
-    void execute(FreeFileSync::HierarchyObject& hierObj) const //don't create ambiguity by replacing with operator()
-    {
-        std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this); //files
-        std::for_each(hierObj.subDirs.begin(),  hierObj.subDirs.end(),  *this); //directories
-    }
-
-private:
-    template<typename Iterator, typename Function>
-    friend Function std::for_each(Iterator, Iterator, Function);
-
-    void operator()(FreeFileSync::FileMapping& fileObj) const
-    {
-        fileObj.setActive(include);
-    }
-
-    void operator()(FreeFileSync::DirMapping& dirObj) const
-    {
-        dirObj.setActive(include);
-        execute(dirObj); //recursion
-    }
-};
-
-
-class FilterData
-{
-public:
-    FilterData(const FilterProcess& filterProcIn) : filterProc(filterProcIn) {}
-
-    void execute(FreeFileSync::HierarchyObject& hierObj)
-    {
-        //files
-        std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this);
-
-        //directories
-        std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), *this);
-    };
-
-private:
-    template<typename Iterator, typename Function>
-    friend Function std::for_each(Iterator, Iterator, Function);
-
-
-    void operator()(FreeFileSync::FileMapping& fileObj)
-    {
-        fileObj.setActive(filterProc.passFileFilter(fileObj.getObjRelativeName()));
-    }
-
-    void operator()(FreeFileSync::DirMapping& dirObj)
-    {
-        bool subObjMightMatch = true;
-        dirObj.setActive(filterProc.passDirFilter(dirObj.getObjRelativeName(), &subObjMightMatch));
-
-        if (subObjMightMatch) //use same logic as within directory traversing here: evaluate filter in subdirs only if objects could match
-            execute(dirObj);  //recursion
-        else
-            InOrExcludeAllRows<false>().execute(dirObj); //exclude all files dirs in subfolders
-    }
-
-    const FilterProcess& filterProc;
-};
-
-
-void FilterProcess::filterAll(FreeFileSync::HierarchyObject& baseDirectory) const
-{
-    FilterData(*this).execute(baseDirectory);
+    static NameFilter output(DefaultStr("*"), Zstring());
+    return *this == output;
 }
 
 
-void FilterProcess::setActiveStatus(bool newStatus, FreeFileSync::FolderComparison& folderCmp)
+bool NameFilter::cmpLessSameType(const FilterProcess& other) const
 {
-    if (newStatus)
-        std::for_each(folderCmp.begin(), folderCmp.end(), InOrExcludeAllRows<true>());  //include all rows
-    else
-        std::for_each(folderCmp.begin(), folderCmp.end(), InOrExcludeAllRows<false>()); //exclude all rows
-}
+    //typeid(*this) == typeid(other) in this context!
+    assert(typeid(*this) == typeid(other));
+    const NameFilter& otherNameFilt = static_cast<const NameFilter&>(other);
 
+    if (filterFileIn != otherNameFilt.filterFileIn)
+        return filterFileIn < otherNameFilt.filterFileIn;
 
-void FilterProcess::setActiveStatus(bool newStatus, FreeFileSync::FileSystemObject& fsObj)
-{
-    fsObj.setActive(newStatus);
+    if (filterFolderIn != otherNameFilt.filterFolderIn)
+        return filterFolderIn < otherNameFilt.filterFolderIn;
 
-    DirMapping* dirObj = dynamic_cast<DirMapping*>(&fsObj);
-    if (dirObj) //process subdirectories also!
-    {
-        if (newStatus)
-            InOrExcludeAllRows<true>().execute(*dirObj);
-        else
-            InOrExcludeAllRows<false>().execute(*dirObj);
-    }
-}
+    if (filterFileEx != otherNameFilt.filterFileEx)
+        return filterFileEx < otherNameFilt.filterFileEx;
 
-
-const FilterProcess& FilterProcess::nullFilter() //filter equivalent to include '*', exclude ''
-{
-    static FilterProcess output(DefaultStr("*"), Zstring());
-    return output;
-}
-
-
-bool FilterProcess::operator==(const FilterProcess& other) const
-{
-    return filterFileIn   == other.filterFileIn   &&
-           filterFolderIn == other.filterFolderIn &&
-           filterFileEx   == other.filterFileEx   &&
-           filterFolderEx == other.filterFolderEx;
-}
-
-
-bool FilterProcess::operator!=(const FilterProcess& other) const
-{
-    return !(*this == other);
-}
-
-
-bool FilterProcess::operator<(const FilterProcess& other) const
-{
-    if (filterFileIn != other.filterFileIn)
-        return filterFileIn < other.filterFileIn;
-
-    if (filterFolderIn != other.filterFolderIn)
-        return filterFolderIn < other.filterFolderIn;
-
-    if (filterFileEx != other.filterFileEx)
-        return filterFileEx < other.filterFileEx;
-
-    if (filterFolderEx != other.filterFolderEx)
-        return filterFolderEx < other.filterFolderEx;
+    if (filterFolderEx != otherNameFilt.filterFolderEx)
+        return filterFolderEx < otherNameFilt.filterFolderEx;
 
     return false; //vectors equal
+}
+
+
+Zstring NameFilter::uniqueClassIdentifier() const
+{
+    return DefaultStr("NameFilter");
+}
+
+
+void NameFilter::save(wxOutputStream& stream) const
+{
+    Utility::writeString(stream, includeFilterTmp);
+    Utility::writeString(stream, excludeFilterTmp);
+}
+
+
+FilterProcess::FilterRef NameFilter::load(wxInputStream& stream) //"constructor"
+{
+    const Zstring include = Utility::readString(stream);
+    const Zstring exclude = Utility::readString(stream);
+
+    return FilterRef(new NameFilter(include, exclude));
 }

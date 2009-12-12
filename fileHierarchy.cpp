@@ -3,11 +3,11 @@
 #include <wx/zstream.h>
 #include "shared/globalFunctions.h"
 #include "shared/fileError.h"
-#include <boost/scoped_array.hpp>
 #include <wx/intl.h>
 #include "shared/stringConv.h"
 #include "shared/fileHandling.h"
 #include <wx/mstream.h>
+#include "shared/serialize.h"
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -192,98 +192,20 @@ const Zstring& FreeFileSync::getSyncDBFilename()
 }
 
 
-inline
-Zstring readString(wxInputStream& stream)  //read string from file stream
-{
-    const size_t strLength = readNumber<size_t>(stream);
-    if (strLength <= 1000)
-    {
-        DefaultChar buffer[1000];
-        stream.Read(buffer, sizeof(DefaultChar) * strLength);
-        return Zstring(buffer, strLength);
-    }
-    else
-    {
-        boost::scoped_array<DefaultChar> buffer(new DefaultChar[strLength]);
-        stream.Read(buffer.get(), sizeof(DefaultChar) * strLength);
-        return Zstring(buffer.get(), strLength);
-    }
-}
-
-
-inline
-void writeString(wxOutputStream& stream, const Zstring& str)  //write string to filestream
-{
-    globalFunctions::writeNumber<size_t>(stream, str.length());
-    stream.Write(str.c_str(), sizeof(DefaultChar) * str.length());
-}
-
-
 //-------------------------------------------------------------------------------------------------------------------------------
 const char FILE_FORMAT_DESCR[] = "FreeFileSync";
-const int FILE_FORMAT_VER = 2;
+const int FILE_FORMAT_VER = 3;
 //-------------------------------------------------------------------------------------------------------------------------------
 
-class ReadInputStream
-{
-protected:
-    ReadInputStream(wxInputStream& stream, const Zstring& errorObjName) : stream_(stream), errorObjName_(errorObjName) {}
 
-    void check()
-    {
-        if (stream_.GetLastError() != wxSTREAM_NO_ERROR)
-            throw FileError(wxString(_("Error reading from synchronization database:")) + wxT(" \n") +
-                            wxT("\"") +  zToWx(errorObjName_) + wxT("\""));
-    }
-
-    template <class T>
-    T readNumberC() //checked read operation
-    {
-        T output = readNumber<T>(stream_);
-        check();
-        return output;
-    }
-
-    Zstring readStringC() //checked read operation
-    {
-        Zstring output = readString(stream_);
-        check();
-        return output;
-    }
-
-    typedef boost::shared_ptr<std::vector<char> > CharArray;
-    CharArray readArrayC()
-    {
-        CharArray buffer(new std::vector<char>);
-        const size_t byteCount = readNumberC<size_t>();
-        if (byteCount > 0)
-        {
-            buffer->resize(byteCount);
-            stream_.Read(&(*buffer)[0], byteCount);
-            check();
-            if (stream_.LastRead() != byteCount) //some additional check
-                throw FileError(wxString(_("Error reading from synchronization database:")) + wxT(" \n") +
-                                wxT("\"") +  zToWx(errorObjName_) + wxT("\""));
-        }
-        return buffer;
-    }
-
-protected:
-    wxInputStream& stream_;
-private:
-    const Zstring& errorObjName_; //used for error text only
-};
-
-
-class ReadDirInfo : public ReadInputStream
+class ReadDirInfo : public Utility::ReadInputStream
 {
 public:
-    ReadDirInfo(wxInputStream& stream, const Zstring& errorObjName, DirInformation& dirInfo) : ReadInputStream(stream, errorObjName)
+    ReadDirInfo(wxInputStream& stream, const wxString& errorObjName, DirInformation& dirInfo) : ReadInputStream(stream, errorObjName)
     {
-        //save filter settings
-        dirInfo.filterActive  = readNumberC<bool>();
-        dirInfo.includeFilter = readStringC();
-        dirInfo.excludeFilter = readStringC();
+        //read filter settings
+        dirInfo.filter = FilterProcess::loadFilter(stream_);
+        check();
 
         //start recursion
         execute(dirInfo.baseDirContainer);
@@ -334,17 +256,17 @@ left side              right side
 DB-ID 123     <-\  /-> DB-ID 567
                  \/
 Partner-ID 111   /\    Partner-ID 222
-Partner-ID 567 -/  \-  Partner-ID 123
+Partner-ID 567 _/  \_  Partner-ID 123
     ...                     ...
 */
 
-class ReadFileStream : public ReadInputStream
+class ReadFileStream : public Utility::ReadInputStream
 {
 public:
-    ReadFileStream(wxInputStream& stream, const Zstring& filename, DbStreamData& output) : ReadInputStream(stream, filename)
+    ReadFileStream(wxInputStream& stream, const wxString& filename, DbStreamData& output) : ReadInputStream(stream, filename)
     {
         if (readNumberC<int>() != FILE_FORMAT_VER) //read file format version
-            throw FileError(wxString(_("Incompatible synchronization database format:")) + wxT(" \n") + wxT("\"") + zToWx(filename) + wxT("\""));
+            throw FileError(wxString(_("Incompatible synchronization database format:")) + wxT(" \n") + wxT("\"") + filename + wxT("\""));
 
         //read DB id
         output.first = Utility::UniqueId(stream_);
@@ -370,8 +292,9 @@ public:
 DbStreamData loadFile(const Zstring& filename) //throw (FileError)
 {
     if (!FreeFileSync::fileExists(filename))
-        throw FileError(wxString(_("Initial synchronization.")) + wxT(" \n") +
-                        wxT("(") + _("No database file existing yet:") + wxT(" \"") + zToWx(filename) + wxT("\")"));
+        throw FileError(wxString(_("Initial synchronization:")) + wxT(" ") +
+                        _("The database file is not yet existing, but will be created during synchronization:") + wxT("\n") +
+                        wxT(" \"") + zToWx(filename) + wxT("\""));
 
 
     //read format description (uncompressed)
@@ -389,7 +312,7 @@ DbStreamData loadFile(const Zstring& filename) //throw (FileError)
     wxZlibInputStream input(uncompressed, wxZLIB_ZLIB);
 
     DbStreamData output;
-    ReadFileStream(input, filename, output);
+    ReadFileStream(input, zToWx(filename), output);
     return output;
 }
 
@@ -406,22 +329,24 @@ std::pair<DirInfoPtr, DirInfoPtr> FreeFileSync::loadFromDisk(const BaseDirMappin
     //find associated DirInfo-streams
     DirectoryTOC::const_iterator dbLeft = dbEntriesLeft.second.find(dbEntriesRight.first); //find left db-entry that corresponds to right database
     if (dbLeft == dbEntriesLeft.second.end())
-        throw FileError(wxString(_("Initial synchronization.")) + wxT(" \n") +
-                        wxT("(") + _("No database entry existing in file:") + wxT(" \"") + zToWx(fileNameLeft) + wxT("\")"));
+        throw FileError(wxString(_("Initial synchronization:")) + wxT(" ") +
+                        _("The required database entry is not yet existing, but will be created during synchronization:") + wxT("\n") +
+                        wxT(" \"") + zToWx(fileNameLeft) + wxT("\""));
 
     DirectoryTOC::const_iterator dbRight = dbEntriesRight.second.find(dbEntriesLeft.first); //find left db-entry that corresponds to right database
     if (dbRight == dbEntriesRight.second.end())
-        throw FileError(wxString(_("Initial synchronization.")) + wxT(" \n") +
-                        wxT("(") + _("No database entry existing in file:") + wxT(" \"") + zToWx(fileNameRight) + wxT("\")"));
+        throw FileError(wxString(_("Initial synchronization:")) + wxT(" ") +
+                        _("The required database entry is not yet existing, but will be created during synchronization:") + wxT("\n") +
+                        wxT(" \"") + zToWx(fileNameRight) + wxT("\""));
 
     //read streams into DirInfo
     boost::shared_ptr<DirInformation> dirInfoLeft(new DirInformation);
     wxMemoryInputStream buffer(&(*dbLeft->second)[0], dbLeft->second->size()); //convert char-array to inputstream: no copying, ownership not transferred
-    ReadDirInfo(buffer, fileNameLeft, *dirInfoLeft);  //read file/dir information
+    ReadDirInfo(buffer, zToWx(fileNameLeft), *dirInfoLeft);  //read file/dir information
 
     boost::shared_ptr<DirInformation> dirInfoRight(new DirInformation);
     wxMemoryInputStream buffer2(&(*dbRight->second)[0], dbRight->second->size()); //convert char-array to inputstream: no copying, ownership not transferred
-    ReadDirInfo(buffer2, fileNameRight, *dirInfoRight);  //read file/dir information
+    ReadDirInfo(buffer2, zToWx(fileNameRight), *dirInfoRight);  //read file/dir information
 
     return std::make_pair(dirInfoLeft, dirInfoRight);
 }
@@ -439,61 +364,15 @@ struct IsNonEmpty
 };
 
 
-class WriteOutputStream
-{
-protected:
-    WriteOutputStream(const Zstring& errorObjName, wxOutputStream& stream) : stream_(stream), errorObjName_(errorObjName) {}
-
-    void check()
-    {
-        if (stream_.GetLastError() != wxSTREAM_NO_ERROR)
-            throw FileError(wxString(_("Error writing to synchronization database:")) + wxT(" \n") +
-                            wxT("\"") + zToWx(errorObjName_) + wxT("\""));
-    }
-
-    template <class T>
-    void writeNumberC(T number) //checked write operation
-    {
-        writeNumber<T>(stream_, number);
-        check();
-    }
-
-    void writeStringC(const Zstring& str) //checked write operation
-    {
-        writeString(stream_, str);
-        check();
-    }
-
-    void writeArrayC(const std::vector<char>& buffer)
-    {
-        writeNumberC<size_t>(buffer.size());
-        if (buffer.size() > 0)
-        {
-            stream_.Write(&buffer[0], buffer.size());
-            check();
-            if (stream_.LastWrite() != buffer.size()) //some additional check
-                throw FileError(wxString(_("Error writing to synchronization database:")) + wxT(" \n") +
-                                wxT("\"") +  zToWx(errorObjName_) + wxT("\""));
-        }
-    }
-
-protected:
-    wxOutputStream& stream_;
-private:
-    const Zstring& errorObjName_; //used for error text only!
-};
-
-
 template <SelectedSide side>
-class SaveDirInfo : public WriteOutputStream
+class SaveDirInfo : public Utility::WriteOutputStream
 {
 public:
-    SaveDirInfo(const BaseDirMapping& baseMapping, const Zstring& errorObjName, wxOutputStream& stream) : WriteOutputStream(errorObjName, stream)
+    SaveDirInfo(const BaseDirMapping& baseMapping, const wxString& errorObjName, wxOutputStream& stream) : WriteOutputStream(errorObjName, stream)
     {
         //save filter settings
-        writeNumberC<bool>(baseMapping.getFilter().filterActive);
-        writeStringC(baseMapping.getFilter().includeFilter.c_str());
-        writeStringC(baseMapping.getFilter().excludeFilter.c_str());
+        baseMapping.getFilter()->saveFilter(stream_);
+        check();
 
         //start recursion
         execute(baseMapping);
@@ -535,10 +414,10 @@ private:
 };
 
 
-class WriteFileStream : public WriteOutputStream
+class WriteFileStream : public Utility::WriteOutputStream
 {
 public:
-    WriteFileStream(const DbStreamData& input, const Zstring& filename, wxOutputStream& stream) : WriteOutputStream(filename, stream)
+    WriteFileStream(const DbStreamData& input, const wxString& filename, wxOutputStream& stream) : WriteOutputStream(filename, stream)
     {
         //save file format version
         writeNumberC<int>(FILE_FORMAT_VER);
@@ -580,7 +459,7 @@ void saveFile(const DbStreamData& dbStream, const Zstring& filename) //throw (Fi
     6                       1,77 MB -  613 ms
     9 (maximal compression) 1,74 MB - 3330 ms */
 
-    WriteFileStream(dbStream, filename, output);
+    WriteFileStream(dbStream, zToWx(filename), output);
 
     //(try to) hide database file
 #ifdef FFS_WIN
@@ -627,7 +506,7 @@ void FreeFileSync::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileEr
         MemoryStreamPtr dbEntryLeft(new std::vector<char>);
         {
             wxMemoryOutputStream buffer;
-            SaveDirInfo<LEFT_SIDE>(baseMapping, baseMapping.getDBFilename<LEFT_SIDE>(), buffer);
+            SaveDirInfo<LEFT_SIDE>(baseMapping, zToWx(baseMapping.getDBFilename<LEFT_SIDE>()), buffer);
             dbEntryLeft->resize(buffer.GetSize());               //convert output stream to char-array
             buffer.CopyTo(&(*dbEntryLeft)[0], buffer.GetSize()); //
         }
@@ -635,7 +514,7 @@ void FreeFileSync::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileEr
         MemoryStreamPtr dbEntryRight(new std::vector<char>);
         {
             wxMemoryOutputStream buffer;
-            SaveDirInfo<RIGHT_SIDE>(baseMapping, baseMapping.getDBFilename<RIGHT_SIDE>(), buffer);
+            SaveDirInfo<RIGHT_SIDE>(baseMapping, zToWx(baseMapping.getDBFilename<RIGHT_SIDE>()), buffer);
             dbEntryRight->resize(buffer.GetSize());               //convert output stream to char-array
             buffer.CopyTo(&(*dbEntryRight)[0], buffer.GetSize()); //
         }
@@ -650,7 +529,7 @@ void FreeFileSync::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileEr
 
         //operation finished: rename temp files -> this should work transactionally:
         //if there were no write access, creation of temp files would have failed
-        removeFile(baseMapping.getDBFilename<LEFT_SIDE>(), false);
+        removeFile(baseMapping.getDBFilename<LEFT_SIDE>(),  false);
         removeFile(baseMapping.getDBFilename<RIGHT_SIDE>(), false);
         renameFile(fileNameLeftTmp, baseMapping.getDBFilename<LEFT_SIDE>()); //throw (FileError);
         renameFile(fileNameRightTmp, baseMapping.getDBFilename<RIGHT_SIDE>()); //throw (FileError);
@@ -660,7 +539,7 @@ void FreeFileSync::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileEr
     {
         try //clean up: (try to) delete old tmp file
         {
-            removeFile(fileNameLeftTmp, false);
+            removeFile(fileNameLeftTmp,  false);
             removeFile(fileNameRightTmp, false);
         }
         catch (...) {}

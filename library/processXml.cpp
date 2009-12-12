@@ -29,7 +29,7 @@ public:
 
 private:
     //read alternate configuration (optional) => might point to NULL
-    void readXmlAlternateConfig(const TiXmlElement& folderPair, FolderPairEnh& enhPair);
+    void readXmlLocalConfig(const TiXmlElement& folderPair, FolderPairEnh& enhPair);
 
     //read basic FreefileSync settings (used by commandline and GUI), return true if ALL values have been retrieved successfully
     void readXmlMainConfig(MainConfiguration& mainCfg);
@@ -43,7 +43,7 @@ bool writeXmlBatchConfig(const xmlAccess::XmlBatchConfig& outputCfg, TiXmlDocume
 //write global settings
 bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& outputCfg, TiXmlDocument& doc);
 //write alternate configuration (optional) => might point to NULL
-void writeXmlAlternateConfig(const FolderPairEnh& enhPair, TiXmlElement& parent);
+void writeXmlLocalConfig(const FolderPairEnh& enhPair, TiXmlElement& parent);
 //write basic FreefileSync settings (used by commandline and GUI), return true if everything was written successfully
 bool writeXmlMainConfig(const MainConfiguration& mainCfg, TiXmlDocument& doc);
 
@@ -247,7 +247,7 @@ bool readXmlAttribute(const std::string& name, const TiXmlElement* node, xmlAcce
 
 
 //################################################################################################################
-void FfsXmlParser::readXmlAlternateConfig(const TiXmlElement& folderPair, FolderPairEnh& enhPair)
+void FfsXmlParser::readXmlLocalConfig(const TiXmlElement& folderPair, FolderPairEnh& enhPair)
 {
     //read folder pairs
     readXmlElementLogging("Left",  &folderPair, enhPair.leftDirectory);
@@ -281,15 +281,12 @@ void FfsXmlParser::readXmlAlternateConfig(const TiXmlElement& folderPair, Folder
 
 //###########################################################
     //alternate filter configuration
-    const TiXmlElement* filterCfg = TiXmlHandleConst(&folderPair).FirstChild("AlternateFilter").ToElement();
+    const TiXmlElement* filterCfg = TiXmlHandleConst(&folderPair).FirstChild("LocalFilter").ToElement();
     if (filterCfg)
     {
-        AlternateFilter* altFilterCfg = new AlternateFilter;
-        enhPair.altFilter.reset(altFilterCfg);
-
         //read filter settings
-        readXmlElementLogging("Include", filterCfg, altFilterCfg->includeFilter);
-        readXmlElementLogging("Exclude", filterCfg, altFilterCfg->excludeFilter);
+        readXmlElementLogging("Include", filterCfg, enhPair.localFilter.includeFilter);
+        readXmlElementLogging("Exclude", filterCfg, enhPair.localFilter.excludeFilter);
     }
 }
 
@@ -349,24 +346,21 @@ void FfsXmlParser::readXmlMainConfig(MainConfiguration& mainCfg)
 //###########################################################
     const TiXmlElement* pairs = hRoot.FirstChild("MainConfig").FirstChild("FolderPairs").FirstChild("Pair").ToElement();
 
-    //read main folder pair
-    if (pairs)
-    {
-        readXmlElementLogging("Left",  pairs, mainCfg.mainFolderPair.leftDirectory);
-        readXmlElementLogging("Right", pairs, mainCfg.mainFolderPair.rightDirectory);
-        pairs = pairs->NextSiblingElement();
-    }
-    else
-        logError("Pair");
-
-
-    //read additional folder pairs
+    //read all folder pairs
     mainCfg.additionalPairs.clear();
+    bool firstLoop = true;
     while (pairs)
     {
         FolderPairEnh newPair;
-        readXmlAlternateConfig(*pairs, newPair);
-        mainCfg.additionalPairs.push_back(newPair);
+        readXmlLocalConfig(*pairs, newPair);
+
+        if (firstLoop)   //read first folder pair
+        {
+            firstLoop = false;
+            mainCfg.firstPair = newPair;
+        }
+        else  //read additional folder pairs
+            mainCfg.additionalPairs.push_back(newPair);
 
         pairs = pairs->NextSiblingElement();
     }
@@ -415,6 +409,9 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
 
     //ignore +/- 1 hour due to DST change
     readXmlElementLogging("IgnoreOneHourDifference", global, outputCfg.ignoreOneHourDiff);
+
+    //copy locked files using VSS
+    readXmlElementLogging("CopyLockedFiles", global, outputCfg.copyLockedFiles);
 
     //last update check
     readXmlElementLogging("LastCheckForUpdates", global, outputCfg.lastUpdateCheck);
@@ -617,7 +614,7 @@ void addXmlAttribute(const std::string& name, const xmlAccess::ColumnTypes value
 }
 
 
-void writeXmlAlternateConfig(const FolderPairEnh& enhPair, TiXmlElement& parent)
+void writeXmlLocalConfig(const FolderPairEnh& enhPair, TiXmlElement& parent)
 {
     //write folder pairs
     TiXmlElement* newfolderPair = new TiXmlElement("Pair");
@@ -661,16 +658,12 @@ void writeXmlAlternateConfig(const FolderPairEnh& enhPair, TiXmlElement& parent)
 
 //###########################################################
     //alternate filter configuration
-    const AlternateFilter* altFilter = enhPair.altFilter.get();
-    if (altFilter)
-    {
-        TiXmlElement* filterCfg = new TiXmlElement("AlternateFilter");
-        newfolderPair->LinkEndChild(filterCfg);
+    TiXmlElement* filterCfg = new TiXmlElement("LocalFilter");
+    newfolderPair->LinkEndChild(filterCfg);
 
-        //write filter settings
-        addXmlElement("Include", altFilter->includeFilter, filterCfg);
-        addXmlElement("Exclude", altFilter->excludeFilter, filterCfg);
-    }
+    //write filter settings
+    addXmlElement("Include", enhPair.localFilter.includeFilter, filterCfg);
+    addXmlElement("Exclude", enhPair.localFilter.excludeFilter, filterCfg);
 }
 
 
@@ -744,16 +737,12 @@ bool writeXmlMainConfig(const MainConfiguration& mainCfg, TiXmlDocument& doc)
     TiXmlElement* pairs = new TiXmlElement("FolderPairs");
     settings->LinkEndChild(pairs);
 
-    //write main folder pair
-    TiXmlElement* mainPair = new TiXmlElement("Pair");
-    pairs->LinkEndChild(mainPair);
-
-    addXmlElement("Left",  mainCfgLocal.mainFolderPair.leftDirectory,  mainPair);
-    addXmlElement("Right", mainCfgLocal.mainFolderPair.rightDirectory, mainPair);
+    //write first folder pair
+    writeXmlLocalConfig(mainCfgLocal.firstPair, *pairs);
 
     //write additional folder pairs
     for (std::vector<FolderPairEnh>::const_iterator i = mainCfgLocal.additionalPairs.begin(); i != mainCfgLocal.additionalPairs.end(); ++i)
-        writeXmlAlternateConfig(*i, *pairs);
+        writeXmlLocalConfig(*i, *pairs);
 
     return true;
 }
@@ -818,6 +807,9 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
 
     //ignore +/- 1 hour due to DST change
     addXmlElement("IgnoreOneHourDifference", inputCfg.ignoreOneHourDiff, global);
+
+    //copy locked files using VSS
+    addXmlElement("CopyLockedFiles", inputCfg.copyLockedFiles, global);
 
     //last update check
     addXmlElement("LastCheckForUpdates", inputCfg.lastUpdateCheck, global);

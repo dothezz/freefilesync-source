@@ -148,8 +148,6 @@
 <多重選擇>
 A newer version of FreeFileSync is available:
 有較新版本的 FreeFileSync 可用：
-ATTENTION: Failed directory access can lead to file deletions!
-注意：目錄讀取失敗可能會導致檔案刪除！
 Abort requested: Waiting for current operation to finish...
 中止請求：正在等待目前操作完成...
 Aborted
@@ -158,10 +156,14 @@ About
 關於
 Action
 動作
+Activate filter
+啟動篩選器
 Add folder
 新增資料夾
 Add folder pair
 新增兩個資料夾
+All directories in sync!
+同步所有目錄！
 An exception occured!
 發生異常！
 As a result the files are separated into the following categories:
@@ -198,10 +200,6 @@ Category
 分類
 Change direction
 改變方向
-Check all
-全選
-Choose to hide filtered files/directories from list
-從清單中選擇隱藏被篩選的檔案/目錄
 Comma separated list
 逗號分隔清單
 Commandline
@@ -242,8 +240,6 @@ Configuration saved!
 配置已儲存！
 Configure filter
 配置篩選
-Configure filter...
-配置篩選...
 Configure your own synchronization rules.
 配置你自己的同步規則。
 Confirm
@@ -334,8 +330,6 @@ Directory
 目錄
 Directory does not exist:
 目錄不存在：
-Do not display visual status information but write to a logfile instead
-不顯示視覺狀態資訊，使用寫入日誌檔代替。
 Do not show this dialog again
 不要再顯示此對話框
 Do nothing
@@ -406,12 +400,12 @@ Error writing file:
 寫入檔案錯誤：
 Error writing to synchronization database:
 寫入同步資料庫錯誤：
-Source directory does not exist anymore:
-來源目錄不存在：
 Example
 例如
 Exclude
 排除
+Exclude all rows
+排除所有行
 Exclude temporarily
 暫時排除
 Exclude via filter:
@@ -422,6 +416,8 @@ Exit with RC < 0
 結束並設定返回碼 <0
 External applications
 外部應用程式
+Fatal Error
+嚴重錯誤
 Feedback and suggestions are welcome at:
 歡迎在下面提出回報和建議：
 File %x has an invalid date!
@@ -466,12 +462,14 @@ Files/folders that exist on right side only
 只存在於右邊的檔案/資料夾
 Filter
 篩選器
-Filter active: Press again to deactivate
-篩選器啟用：再按一次會停用
 Filter files
 篩選檔案
+Filter has been selected
+已選擇篩選器
 Filter view
 篩選檢視
+Filtering is deactivated
+篩選已停用
 Folder Comparison and Synchronization
 資料夾比對和同步
 Free disk space available:
@@ -494,6 +492,8 @@ Generating database...
 產生資料庫...
 Generating file list...
 產生檔案清單...
+Global filter
+整體性篩選器
 Global settings
 整體設定
 Help
@@ -504,6 +504,8 @@ Hide all error and warning messages
 隱藏所有錯誤和警告訊息
 Hide conflicts
 隱藏衝突
+Hide excluded items
+隱藏被排除的項目
 Hide files that are different
 隱藏不同的檔案
 Hide files that are equal
@@ -530,14 +532,16 @@ Hide files that will be overwritten on right side
 隱藏右邊將被覆蓋的檔案
 Hide files that won't be copied
 隱藏將不會被複製的檔案
-Hide filtered items
-隱藏已篩選的項目
+Hide filtered or temporarily excluded files
+隱藏篩選或暫時被排除的檔案
 Hide further error messages during the current process
 在目前進程中隱藏進一步的錯誤訊息
 Hints:
 提示：
 Homepage
 首頁
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+對兩邊使用同一個資料庫的識別和傳送更改。自動檢測刪除和衝突部份。
 If you like FFS
 如果你喜歡 FFS
 Ignore 1-hour file time difference
@@ -552,6 +556,8 @@ Ignore this error, retry or abort?
 忽略此錯誤、重試或中止嗎？
 Include
 包括
+Include all rows
+包括所有行
 Include temporarily
 暫時包括
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
@@ -562,8 +568,8 @@ Info
 訊息
 Information
 訊息
-Initial synchronization.
-初始化同步。
+Initial synchronization:
+初始化同步:
 Integrate external applications into context menu. The following macros are available:
 整合上下文功能表中的外部應用程式。可以使用下面的巨集：
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +584,8 @@ Load configuration from file
 從檔案載入配置
 Load configuration history (press DEL to delete items)
 載入配置的歷史記錄(按DEL鍵刪除項目)
+Local filter
+局部性篩選器
 Log-messages:
 日誌訊息：
 Logging
@@ -585,7 +593,7 @@ Logging
 Mirror ->>
 鏡像 ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-左邊資料夾的鏡像備份：同步之後， 右邊資料夾將被覆蓋，完全和左邊資料夾一模一樣。
+左邊資料夾的鏡像備份：同步之後，右邊資料夾將被覆蓋，完全和左邊資料夾一模一樣。
 More than 50% of the total number of files will be copied or deleted!
 超過總數 50% 以上的檔案將被複製或刪除！
 Move column down
@@ -602,8 +610,8 @@ Moving folder %x to user-defined directory %y
 移動資料夾 %x 到自定義資料夾 %y
 Multiple...
 多個...
-No database file existing yet:
-目前還沒有資料庫檔案：
+No filter selected
+沒有選擇篩選器
 Not enough free disk space available in:
 沒有足夠的可用空間：
 Nothing to synchronize according to configuration!
@@ -638,8 +646,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 請複製適當的\"Shadow.dll\"(位於\"Shadow.zip\"壓縮檔)到 FreeFileSync 安裝目錄以啟用此功能。
 Please fill all empty directory fields.
 請填滿所有空白目錄欄位。
-Press button to activate filter
-按下按鈕以啟用篩選器
+Please run a Compare first before synchronizing!
+請執行同步前先比對！
 Published under the GNU General Public License:
 在GNU通用公共許可證下發佈：
 Question
@@ -660,12 +668,16 @@ Remove folder
 移除資料夾
 Remove folder pair
 移除兩個資料夾
+Remove local filter settings
+移除局部性篩選器設定
 Report translation error
 回報翻譯錯誤
 Reset
 重置
 Right
 右邊
+Run minimized and write status information to a logfile
+執行最小化和狀態資訊寫入到日誌檔
 S&ave configuration
 儲存配置(&A)
 S&witch view
@@ -680,14 +692,14 @@ Scanning:
 掃瞄中：
 Select a folder
 選擇一個資料夾
-Select alternate filter settings
-選擇備用篩選設定
 Select alternate synchronization settings
 選擇備用同步設定
 Select logfile directory:
 選擇日誌檔目錄：
 Select variant:
 選擇變數：
+Setting default synchronization directions. Please check whether they are appropriate for you.
+設定預設同步方向。請檢查這些設定是否適合於你。
 Show conflicts
 顯示衝突
 Show file icons
@@ -732,6 +744,8 @@ Size
 大小
 Source code written completely in C++ utilizing:
 原始碼完全使用C++編寫：
+Source directory does not exist anymore:
+來源目錄不存在：
 Speed:
 速度：
 Start
@@ -757,7 +771,7 @@ Synchronization settings
 Synchronization status
 同步狀態
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
-同步所有 .doc, .zip 和 .exe 檔案, 除了\"temp\"中的一切。
+同步所有 .doc, .zip 和 .exe 檔案，除了\"temp\"中的一切。
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 同時雙向同步：雙向複製新的或已更新的檔案。
 Synchronize both sides using a database. Deletions are detected automatically.
@@ -772,8 +786,12 @@ Target directory already existing!
 目標目錄已存在！
 Target file already existing!
 目標檔案已存在！
+The database file is not yet existing, but will be created during synchronization:
+資料庫檔未存在，但會在同步過程中新建：
 The file does not contain a valid configuration:
 該檔案不包含有效的配置：
+The required database entry is not yet existing, but will be created during synchronization:
+所需的資料庫條目未存在，但會在同步過程中新建：
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 此變數計算結果為兩個檔名相同的檔案，只有當他們的檔案大小和最後修改日期時間也相同，才會判斷他們是相同的檔案。
 Time
@@ -798,8 +816,6 @@ Unable to create logfile!
 無法新建日誌檔！
 Unable to initialize Recycle Bin!
 無法初始化資源回收筒！
-Uncheck all
-取消全部選中
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 存在未解決的衝突！\n\n你可以忽略衝突，並繼續同步。
 Update ->
@@ -814,8 +830,6 @@ User-defined directory
 自定義目錄
 User-defined directory for deletion was not specified!
 未指定要刪除的自定義目錄！
-Using default synchronization directions. Please recheck.
-使用預設同步方向。請重新檢查。
 Variant
 變數
 Verifying file %x

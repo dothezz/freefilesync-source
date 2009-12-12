@@ -134,45 +134,26 @@ struct AlternateSyncConfig
     }
 };
 
-//standard filter settings, OS dependent
-Zstring defaultIncludeFilter();
-Zstring defaultExcludeFilter();
+//standard exclude filter settings, OS dependent
+Zstring standardExcludeFilter();
 
 
-struct AlternateFilter
+struct FilterConfig
 {
-    AlternateFilter(const Zstring& include, const Zstring& exclude) :
+    FilterConfig(const Zstring& include, const Zstring& exclude) :
         includeFilter(include),
         excludeFilter(exclude) {}
 
-    AlternateFilter() : //construct with default values
-        includeFilter(defaultIncludeFilter()),
-        excludeFilter(defaultExcludeFilter()) {}
+    FilterConfig() : //construct with default values
+        includeFilter(DefaultStr("*")) {}
 
     Zstring includeFilter;
     Zstring excludeFilter;
 
-    bool operator==(const AlternateFilter& other) const
+    bool operator==(const FilterConfig& other) const
     {
         return includeFilter == other.includeFilter &&
                excludeFilter == other.excludeFilter;
-    }
-};
-
-
-struct FolderPair
-{
-    FolderPair(const Zstring& leftDir, const Zstring& rightDir) :
-        leftDirectory(leftDir),
-        rightDirectory(rightDir) {}
-
-    Zstring leftDirectory;
-    Zstring rightDirectory;
-
-    bool operator==(const FolderPair& other) const
-    {
-        return leftDirectory  == other.leftDirectory &&
-               rightDirectory == other.rightDirectory;
     }
 };
 
@@ -184,17 +165,17 @@ struct FolderPairEnh //enhanced folder pairs with (optional) alternate configura
     FolderPairEnh(const Zstring& leftDir,
                   const Zstring& rightDir,
                   const boost::shared_ptr<const AlternateSyncConfig>& syncConfig,
-                  const boost::shared_ptr<const AlternateFilter>& filter) :
+                  const FilterConfig& filter) :
         leftDirectory(leftDir),
         rightDirectory(rightDir) ,
         altSyncConfig(syncConfig),
-        altFilter(filter) {}
+        localFilter(filter) {}
 
     Zstring leftDirectory;
     Zstring rightDirectory;
 
     boost::shared_ptr<const AlternateSyncConfig> altSyncConfig; //optional
-    boost::shared_ptr<const AlternateFilter> altFilter;         //optional
+    FilterConfig localFilter;
 
     bool operator==(const FolderPairEnh& other) const
     {
@@ -205,9 +186,7 @@ struct FolderPairEnh //enhanced folder pairs with (optional) alternate configura
                 *altSyncConfig == *other.altSyncConfig :
                 altSyncConfig.get() == other.altSyncConfig.get()) &&
 
-               (altFilter.get() && other.altFilter.get() ?
-                *altFilter == *other.altFilter :
-                altFilter.get() == other.altFilter.get());
+               localFilter == other.localFilter;
     }
 };
 
@@ -215,18 +194,13 @@ struct FolderPairEnh //enhanced folder pairs with (optional) alternate configura
 struct MainConfiguration
 {
     MainConfiguration() :
-        mainFolderPair(Zstring(), Zstring()),
         compareVar(CMP_BY_TIME_SIZE),
-#ifdef FFS_WIN
         filterIsActive(true),
-#elif defined FFS_LINUX
-        filterIsActive(false),
-#endif
-        includeFilter(defaultIncludeFilter()),
-        excludeFilter(defaultExcludeFilter()),
+        includeFilter(DefaultStr("*")),
+        excludeFilter(standardExcludeFilter()),
         handleDeletion(FreeFileSync::recycleBinExistsWrap() ? MOVE_TO_RECYCLE_BIN : DELETE_PERMANENTLY) {} //enable if OS supports it; else user will have to activate first and then get an error message
 
-    FolderPair mainFolderPair;
+    FolderPairEnh firstPair; //there needs to be at least one pair!
     std::vector<FolderPairEnh> additionalPairs;
 
     //Compare setting
@@ -235,7 +209,7 @@ struct MainConfiguration
     //Synchronisation settings
     SyncConfiguration syncConfiguration;
 
-    //Filter setting
+    //GLOBAL filter settings
     bool filterIsActive;
     Zstring includeFilter;
     Zstring excludeFilter;
@@ -250,7 +224,7 @@ struct MainConfiguration
 
     bool operator==(const MainConfiguration& other) const
     {
-        return mainFolderPair    == other.mainFolderPair    &&
+        return firstPair         == other.firstPair         &&
                additionalPairs   == other.additionalPairs   &&
                compareVar        == other.compareVar        &&
                syncConfiguration == other.syncConfiguration &&

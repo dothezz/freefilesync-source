@@ -108,10 +108,12 @@ struct XmlGlobalSettings
     XmlGlobalSettings() :
         programLanguage(retrieveSystemLanguage()),
         ignoreOneHourDiff(false),
+        copyLockedFiles(true),
         lastUpdateCheck(0) {}
 
     int programLanguage;
     bool ignoreOneHourDiff; //ignore +/- 1 hour due to DST change
+    bool copyLockedFiles;   //VSS usage
     long lastUpdateCheck;   //time of last update check
 
     OptionalDialogs optDialogs;
@@ -137,7 +139,7 @@ struct XmlGlobalSettings
             showFileIconsRight(true)
         {
 #ifdef FFS_WIN
-            externelApplications.push_back(std::make_pair(_("Open with Explorer"), wxT("explorer /select, %name")));
+            externelApplications.push_back(std::make_pair(_("Open with Explorer"), wxT("explorer /select, \"%name\"")));
             externelApplications.push_back(std::make_pair(_("Open directly"), wxT("cmd /c start \"\" \"%name\"")));
 #elif defined FFS_LINUX
             externelApplications.push_back(std::make_pair(_("Open with Konqueror"), wxT("konqueror \"%dir\"")));

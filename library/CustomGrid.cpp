@@ -2,7 +2,6 @@
 #include "../shared/systemConstants.h"
 #include "resources.h"
 #include <wx/dc.h>
-//#include "../algorithm.h"
 #include "../ui/util.h"
 #include "../shared/stringConv.h"
 #include "resources.h"
@@ -76,7 +75,7 @@ public:
     virtual int GetNumberRows()
     {
         if (gridDataView)
-            return std::max(gridDataView->rowsOnView(), MIN_ROW_COUNT);
+            return std::max(static_cast<unsigned int>(gridDataView->rowsOnView()), MIN_ROW_COUNT);
         else
             return 0; //grid is initialized with zero number of rows
     }
@@ -242,7 +241,8 @@ public:
             return xmlAccess::ColumnTypes(1000);
     }
 
-    virtual Zstring getFileName(const unsigned int row) const = 0;
+    //get filename in order to retrieve the icon from it
+    virtual Zstring getIconFile(const unsigned int row) const = 0;
 
 protected:
     template <SelectedSide side>
@@ -332,7 +332,7 @@ public:
         return CustomGridTableRim::GetValueSub<LEFT_SIDE>(row, col);
     }
 
-    virtual Zstring getFileName(const unsigned int row) const
+    virtual Zstring getIconFile(const unsigned int row) const
     {
         const FileSystemObject* fsObj = getRawData(row);
         if (fsObj && !fsObj->isEmpty<LEFT_SIDE>())
@@ -351,11 +351,18 @@ public:
         return CustomGridTableRim::GetValueSub<RIGHT_SIDE>(row, col);
     }
 
-    virtual Zstring getFileName(const unsigned int row) const
+    virtual Zstring getIconFile(const unsigned int row) const
     {
         const FileSystemObject* fsObj = getRawData(row);
         if (fsObj && !fsObj->isEmpty<RIGHT_SIDE>())
-            return fsObj->getFullName<RIGHT_SIDE>();
+        {
+            //Optimization: if filename exists on both sides, always use left side's file:
+            //Icon should be the same on both sides anyway...
+            if (!fsObj->isEmpty<LEFT_SIDE>())
+                return fsObj->getFullName<LEFT_SIDE>();
+            else
+                return fsObj->getFullName<RIGHT_SIDE>();
+        }
         else
             return Zstring();
     }
@@ -511,6 +518,9 @@ void CustomGrid::initSettings(CustomGridLeft*   gridLeft,
     GetGridWindow()->Connect(wxEVT_RIGHT_DOWN,   wxEventHandler(CustomGrid::onGridAccess), NULL, this);
 
     GetGridWindow()->Connect(wxEVT_ENTER_WINDOW, wxEventHandler(CustomGrid::adjustGridHeights), NULL, this);
+
+    //parallel grid scrolling: do NOT use DoPrepareDC() to align grids! GDI resource leak! Use regular paint event instead:
+    GetGridWindow()->Connect(wxEVT_PAINT, wxEventHandler(CustomGrid::OnPaintGrid), NULL, this);
 }
 
 
@@ -530,12 +540,11 @@ void CustomGrid::RefreshCell(int row, int col)
 }
 
 
-void CustomGrid::DoPrepareDC(wxDC& dc)
+void CustomGrid::OnPaintGrid(wxEvent& event)
 {
-    wxScrollHelper::DoPrepareDC(dc);
-
     if (isLeadGrid())  //avoid back coupling
         alignOtherGrids(m_gridLeft, m_gridMiddle, m_gridRight); //scroll other grids
+    event.Skip();
 }
 
 
@@ -652,7 +661,11 @@ void execGridCommands(wxEvent& event, wxGrid* grid)
 
             }
         }
-        else //button without shift is pressed
+        else if (keyEvent->AltDown())
+            ;
+        else if (keyEvent->ControlDown())
+            ;
+        else //button without additonal control keys pressed
         {
             switch (keyEvent->GetKeyCode())
             {
@@ -746,7 +759,7 @@ bool gridsShouldBeCleared(const wxEvent& event)
         const wxKeyEvent* keyEvent = dynamic_cast<const wxKeyEvent*>(&event);
         if (keyEvent)
         {
-            if (keyEvent->ControlDown() || keyEvent->ShiftDown())
+            if (keyEvent->ControlDown() || keyEvent->AltDown() || keyEvent->ShiftDown())
                 return false;
 
             switch (keyEvent->GetKeyCode())
@@ -964,7 +977,7 @@ public:
 
                 //try to draw icon
                 //retrieve grid data
-                const Zstring fileName = m_gridDataTable->getFileName(row);
+                const Zstring fileName = m_gridDataTable->getIconFile(row);
                 if (!fileName.empty())
                 {
                     wxIcon icon;
@@ -1347,7 +1360,7 @@ void CustomGridRim::getIconsToBeLoaded(std::vector<Zstring>& newLoad) //loads al
             LoadSuccess::const_iterator j = loadIconSuccess.find(currentRow);
             if (j != loadIconSuccess.end() && j->second == false) //find failed attempts to load icon
             {
-                const Zstring fileName = gridDataTable->getFileName(currentRow);
+                const Zstring fileName = gridDataTable->getIconFile(currentRow);
                 if (!fileName.empty())
                 {
                     //test if they are already loaded in buffer:
@@ -1446,6 +1459,7 @@ void CustomGridLeft::alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddl
     int x = 0;
     int y = 0;
     GetViewStart(&x, &y);
+
     gridMiddle->Scroll(-1, y); //scroll in y-direction only
     gridRight->Scroll(x, y);
 }

@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Win32)">
+	<META NAME="CREATED" CONTENT="20091206;16574000">
+	<META NAME="CHANGED" CONTENT="20091213;16011300">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 2cm }
+		P { margin-bottom: 0.21cm }
+		H3 { margin-bottom: 0.21cm }
+		H3.western { font-family: "Arial", sans-serif }
+		H3.cjk { font-family: "MS Mincho" }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="de-DE" DIR="LTR">
+<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Synchronize USB
+sticks with variable drive letters</FONT></H3>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">USB
+sticks often have different volume names assigned to them when
+plugged into two distinct computers. In order to handle this
+flexibility FreeFileSync is able to process directory names relative
+to the current working directory.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Thus
+the following workflow is possible:</FONT></P>
+<UL>
+	<OL>
+		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Replace
+		the absolute USB directory name in your configuration by a relative
+		one:<BR>E.g. &quot;<FONT FACE="Courier New, monospace">E:\SyncDir</FONT>&quot;
+		-&gt; &quot;<FONT FACE="Courier New, monospace">\SyncDir</FONT>&quot;</FONT></P>
+		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Save
+		and copy synchronization settings to the USB stick:
+		&quot;<FONT FACE="Courier New, monospace">E:\settings.ffs_gui</FONT>&quot;</FONT></P>
+		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Start
+		FreeFileSync by double-clicking on &quot;</FONT><FONT FACE="Courier New, monospace">E:\settings.ffs_gui</FONT><FONT FACE="Tahoma, sans-serif">&quot;<BR>=&gt;
+		Working directory automatically is set to &quot;</FONT><FONT FACE="Courier New, monospace">E:\</FONT><FONT FACE="Tahoma, sans-serif">&quot;
+		by the operating system so that &quot;</FONT><FONT FACE="Courier New, monospace">\SyncDir</FONT><FONT FACE="Tahoma, sans-serif">&quot;
+		is interpreted as &quot;</FONT><FONT FACE="Courier New, monospace">E:\SyncDir</FONT><FONT FACE="Tahoma, sans-serif">&quot;
+		during synchronization.</FONT></P>
+	</OL>
+</UL>
+</BODY>
+</HTML>

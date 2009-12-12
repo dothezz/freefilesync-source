@@ -33,7 +33,6 @@ class HelpDlg : public HelpDlgGenerated
 {
 public:
     HelpDlg(wxWindow* window);
-    ~HelpDlg();
 
 private:
     void OnClose(wxCloseEvent& event);
@@ -44,7 +43,11 @@ private:
 class FilterDlg : public FilterDlgGenerated
 {
 public:
-    FilterDlg(wxWindow* window, Zstring& filterIncl, Zstring& filterExcl);
+    FilterDlg(wxWindow* window,
+              bool isGlobalFilter,
+              Zstring& filterIncl,
+              Zstring& filterExcl,
+              bool filterActive);
     ~FilterDlg() {}
 
     enum
@@ -59,6 +62,7 @@ private:
     void OnCancel(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);
 
+    const bool isGlobalFilter_;
     Zstring& includeFilter;
     Zstring& excludeFilter;
 };
@@ -324,6 +328,7 @@ public:
     void minimizeToTray();
 
 private:
+    void OnKeyPressed(wxKeyEvent& event);
     virtual void OnOkay(wxCommandEvent& event);
     virtual void OnPause(wxCommandEvent& event);
     virtual void OnAbort(wxCommandEvent& event);

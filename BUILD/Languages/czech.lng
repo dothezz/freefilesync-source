@@ -148,8 +148,6 @@ soubor: 1;
 <vícenásobný výběr>
 A newer version of FreeFileSync is available:
 je dostupná novější verze FreeFileSync:
-ATTENTION: Failed directory access can lead to file deletions!
-POZOR: Chyba přístupu k adresáři může vést ke smazání souborů!
 Abort requested: Waiting for current operation to finish...
 Požadavek na přerušení: Čekání na ukončení aktuální operace...
 Aborted
@@ -158,10 +156,14 @@ About
 O Programu
 Action
 Akce
+Activate filter
+Povolit filtr
 Add folder
 Přidat adresář
 Add folder pair
 Přidat adresář pro porovnání
+All directories in sync!
+Všechny adresáře jsou synchronizovány!
 An exception occured!
 Vyskytla se chyba!
 As a result the files are separated into the following categories:
@@ -198,10 +200,6 @@ Category
 Kategorie
 Change direction
 Změnit akci
-Check all
-Označit vše
-Choose to hide filtered files/directories from list
-Vyberte pro skrytí filtrovaných souborů/adresářů ze seznamu
 Comma separated list
 Text oddělený čárkami
 Commandline
@@ -242,8 +240,6 @@ Configuration saved!
 Konfigurace uložena.
 Configure filter
 Nastavení filtru
-Configure filter...
-Nastavení filtru...
 Configure your own synchronization rules.
 Nastavení vlastních pravidel synchronizace.
 Confirm
@@ -334,8 +330,6 @@ Directory
 Adresář
 Directory does not exist:
 Adresář neexistuje:
-Do not display visual status information but write to a logfile instead
-Nezobrazovat informace o stavu ale zapisovat přímo do souboru záznamů
 Do not show this dialog again
 Tento dialog již nezobrazovat
 Do nothing
@@ -406,12 +400,12 @@ Error writing file:
 Chyba zápisu souboru:
 Error writing to synchronization database:
 Chyba zápisu synchronizační databáze:
-Source directory does not exist anymore:
-Zdrojový adresář již neexistuje:
 Example
 Příklad
 Exclude
 Vynechat
+Exclude all rows
+Vynechat všechny řádky
 Exclude temporarily
 Vynechat dočasně
 Exclude via filter:
@@ -422,6 +416,8 @@ Exit with RC < 0
 Ukončit s RC < 0
 External applications
 Externí aplikace
+Fatal Error
+Závažná chyba
 Feedback and suggestions are welcome at:
 Komentáře a náměty zasílejte na:
 File %x has an invalid date!
@@ -466,12 +462,14 @@ Files/folders that exist on right side only
 Soubory/adresáře, které existují pouze vpravo
 Filter
 Filtr
-Filter active: Press again to deactivate
-Filtr aktivní: Klikněte znovu pro deaktivaci
 Filter files
 Filtrovat soubory
+Filter has been selected
+Filtr je zapnut
 Filter view
 Filtrovat seznam
+Filtering is deactivated
+Filtr je vypnut
 Folder Comparison and Synchronization
 Porovnání a Synchronizace adresářů
 Free disk space available:
@@ -494,6 +492,8 @@ Generating database...
 Vytváření databáze...
 Generating file list...
 Vytváření seznamu souborů...
+Global filter
+Globální filtr
 Global settings
 Nastavení programu
 Help
@@ -504,6 +504,8 @@ Hide all error and warning messages
 Skrýt všechny chyby a varování
 Hide conflicts
 Skrýt konflikty
+Hide excluded items
+Skrýt vynechané položky
 Hide files that are different
 Skrýt rozdílné soubory
 Hide files that are equal
@@ -530,14 +532,16 @@ Hide files that will be overwritten on right side
 Skrýt soubory, které budou vpravo přepsány
 Hide files that won't be copied
 Skrýt soubory, které nebudou kopírovány
-Hide filtered items
-Skrýt filtrované soubory
+Hide filtered or temporarily excluded files
+Skrýt filtrované nebo dočasně vynechané soubory
 Hide further error messages during the current process
 Nezobrazovat další chybová hlášení během zpracování
 Hints:
 Nápověda:
 Homepage
 Homepage
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+Rozpoznat a provést změny na obou stranách pomocí databáze. Odstraněné soubory a konflikty budou detekovány automaticky.
 If you like FFS
 Pokud se Vám FSS líbí
 Ignore 1-hour file time difference
@@ -552,6 +556,8 @@ Ignore this error, retry or abort?
 Ignorovat chybu, opakovat nebo přerušit?
 Include
 Přidat
+Include all rows
+Použít všechny řádky
 Include temporarily
 Přidat dočasně
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
@@ -562,8 +568,8 @@ Info
 Info
 Information
 Informace
-Initial synchronization.
-Prvotní synchronizace.
+Initial synchronization:
+Prvotní synchronizace:
 Integrate external applications into context menu. The following macros are available:
 Integrace externí aplikace do kontextového menu. K dispozici jsou následující makra:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +584,8 @@ Load configuration from file
 Načíst konfiguraci ze souboru
 Load configuration history (press DEL to delete items)
 Načíst historii konfigurace (pomocí DEL můžete položku smazat)
+Local filter
+Místní filtr
 Log-messages:
 Záznamy:
 Logging
@@ -602,8 +610,8 @@ Moving folder %x to user-defined directory %y
 Přesouvání adresáře %x do uživatelského adresáře %y
 Multiple...
 Několikanásobný...
-No database file existing yet:
-Synchronizační databáze ještě neexistuje:
+No filter selected
+Není vybrán žádný filtr
 Not enough free disk space available in:
 Nedostatek místa na disku:
 Nothing to synchronize according to configuration!
@@ -638,8 +646,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Prosím zkopírujte odpovídající \"Shadow.dll\" (umístěný v \"Shadow.zip\") do instalačního adresáře FreeFileSync, aby bylo možné použít tuto funkci.
 Please fill all empty directory fields.
 Zadejte adresáře pro synchronizaci.
-Press button to activate filter
-Kliknutím aktivujete filtr
+Please run a Compare first before synchronizing!
+Prosím proveďte nejdřív porovnání před synchronizací!
 Published under the GNU General Public License:
 Vydáno podl GNU General Public License (GPL):
 Question
@@ -660,12 +668,16 @@ Remove folder
 Odstranit adresář
 Remove folder pair
 Odstranit dvojici adresářů
+Remove local filter settings
+Odstranit nastavení místního filtru
 Report translation error
 Hlásit chyby překladu
 Reset
 Resetovat
 Right
 Pravý
+Run minimized and write status information to a logfile
+Spustit minimalizovaný a zapisovat informace do souboru
 S&ave configuration
 &Uložení konfigurace
 S&witch view
@@ -680,14 +692,14 @@ Scanning:
 Zpracováváno:
 Select a folder
 Vyberte adresář
-Select alternate filter settings
-Vyberte alternativní nastavení filtru
 Select alternate synchronization settings
 Vyberte alternativní nastavení synchronizace
 Select logfile directory:
 Vyberte adresář pro záznamy:
 Select variant:
 Vyberte variantu:
+Setting default synchronization directions. Please check whether they are appropriate for you.
+Nastaven výchozí způsob synchronizace. Prosím zkontrolujte, zda odpovídá Vašim požadavkům.
 Show conflicts
 Zobrazit konflikty
 Show file icons
@@ -732,6 +744,8 @@ Size
 Velikost
 Source code written completely in C++ utilizing:
 Zdrojový kód byl napsán kompletně v C++ s pomocí:
+Source directory does not exist anymore:
+Zdrojový adresář již neexistuje:
 Speed:
 Rychlost:
 Start
@@ -772,8 +786,12 @@ Target directory already existing!
 Cílový adresář již existuje!
 Target file already existing!
 Cílový soubor již existuje!
+The database file is not yet existing, but will be created during synchronization:
+Databáze ještě neexistuje, ale bude během synchronizace vytvořena:
 The file does not contain a valid configuration:
 Soubor neobsahuje platnou konfiguraci:
+The required database entry is not yet existing, but will be created during synchronization:
+Požadovaný záznam v databázi ještě neexistuje, ale bude během synchronizace vztvořen:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Tato varianta vyhodnotí dva stejně pojmenované soubory jako shodné pokud mají i stejnou velikost A ZÁROVEŇ i datum a čas poslední změny.
 Time
@@ -798,8 +816,6 @@ Unable to create logfile!
 není možné vytvořit záznamový soubor!
 Unable to initialize Recycle Bin!
 Není možné použít Koš!
-Uncheck all
-Odznačit vše
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Nevyřešené konflikty! \n\nJe možné konflikt ignorovat a pokračovat v synchronizaci.
 Update ->
@@ -814,8 +830,6 @@ User-defined directory
 Uživatelsky definovaný adresář
 User-defined directory for deletion was not specified!
 Uživatelsky definovaný adresář pro mazání nebyl zadán!
-Using default synchronization directions. Please recheck.
-Použito předdefinované nastavení. Prosím překontrolujte nastavení.
 Variant
 Varianta
 Verifying file %x

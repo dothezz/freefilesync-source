@@ -34,8 +34,8 @@ xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& bat
 #endif
 
     //add main folders
-    uniqueFolders.insert(zToWx(batchCfg.mainCfg.mainFolderPair.leftDirectory));
-    uniqueFolders.insert(zToWx(batchCfg.mainCfg.mainFolderPair.rightDirectory));
+    uniqueFolders.insert(zToWx(batchCfg.mainCfg.firstPair.leftDirectory));
+    uniqueFolders.insert(zToWx(batchCfg.mainCfg.firstPair.rightDirectory));
 
     //additional folders
     for (std::vector<FreeFileSync::FolderPairEnh>::const_iterator i = batchCfg.mainCfg.additionalPairs.begin();
@@ -47,8 +47,13 @@ xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& bat
 
     output.directories.insert(output.directories.end(), uniqueFolders.begin(), uniqueFolders.end());
 
-    output.commandline = FreeFileSync::getInstallationDir() + zToWx(globalFunctions::FILE_NAME_SEPARATOR) + wxT("FreeFileSync.exe ") +
-                         wxT("\"") + filename + wxT("\"");
+    output.commandline = FreeFileSync::getInstallationDir() +
+#ifdef FFS_WIN
+                         wxT("FreeFileSync.exe") +
+#elif defined FFS_LINUX
+                         wxT("FreeFileSync") +
+#endif
+                         wxT(" \"") + filename + wxT("\"");
 
     return output;
 }
@@ -76,7 +81,7 @@ void RealtimeSync::readRealOrBatchConfig(const wxString& filename, xmlAccess::Xm
         config = convertBatchToReal(batchCfg, filename); //do work despite parsing errors, then re-throw
         throw;                                 //
     }
-        config = convertBatchToReal(batchCfg, filename);
+    config = convertBatchToReal(batchCfg, filename);
 }
 
 

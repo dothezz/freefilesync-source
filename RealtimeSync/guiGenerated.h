@@ -70,6 +70,7 @@ class MainDlgGenerated : public wxFrame
 		virtual void OnSaveConfig( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnLoadConfig( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnQuit( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnShowHelp( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuAbout( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnAddFolder( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnRemoveTopFolder( wxCommandEvent& event ){ event.Skip(); }

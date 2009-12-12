@@ -10,6 +10,7 @@
 
 #include <wx/intl.h>
 
+class CustomComboBox;
 class CustomGridLeft;
 class CustomGridMiddle;
 class CustomGridRight;
@@ -36,7 +37,6 @@ class wxButtonWithImage;
 #include <wx/scrolwin.h>
 #include <wx/grid.h>
 #include <wx/choice.h>
-#include <wx/hyperlink.h>
 #include <wx/checkbox.h>
 #include <wx/notebook.h>
 #include <wx/statbmp.h>
@@ -48,6 +48,7 @@ class wxButtonWithImage;
 #include <wx/gauge.h>
 #include <wx/animate.h>
 #include <wx/treectrl.h>
+#include <wx/hyperlink.h>
 #include <wx/checklst.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -90,25 +91,20 @@ class MainDialogGenerated : public wxFrame
 		wxBitmapButton* m_bpButtonSyncConfig;
 		wxButtonWithImage* m_buttonStartSync;
 		
-		wxPanel* m_panelTopLeft;
 		wxStaticBoxSizer* sbSizer2;
-		wxComboBox* m_directoryLeft;
-		wxDirPickerCtrl* m_dirPickerLeft;
 		wxPanel* m_panelTopMiddle;
 		
 		wxBoxSizer* bSizerMiddle;
 		wxBitmapButton* m_bpButtonSwapSides;
-		wxPanel* m_panelTopRight;
+		
+		
+		
 		wxBitmapButton* m_bpButtonAddPair;
-		wxComboBox* m_directoryRight;
-		wxDirPickerCtrl* m_dirPickerRight;
 		wxScrolledWindow* m_scrolledWindowFolderPairs;
 		wxBoxSizer* bSizerAddFolderPairs;
-		wxPanel* m_panelLeft;
 		CustomGridLeft* m_gridLeft;
 		wxPanel* m_panelMiddle;
 		CustomGridMiddle* m_gridMiddle;
-		wxPanel* m_panelRight;
 		CustomGridRight* m_gridRight;
 		wxBoxSizer* bSizer3;
 		wxNotebook* m_notebookBottomLeft;
@@ -118,7 +114,7 @@ class MainDialogGenerated : public wxFrame
 		wxChoice* m_choiceHistory;
 		wxPanel* m_panelFilter;
 		wxBitmapButton* m_bpButtonFilter;
-		wxHyperlinkCtrl* m_hyperlinkCfgFilter;
+		wxCheckBox* m_checkBoxActivateFilter;
 		wxCheckBox* m_checkBoxHideFilt;
 		wxPanel* m_panel112;
 		
@@ -175,14 +171,15 @@ class MainDialogGenerated : public wxFrame
 		virtual void OnMenuGlobalSettings( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuBatchJob( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuExportFileList( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnShowHelp( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuCheckVersion( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnMenuAbout( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnCmpSettings( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSyncSettings( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnFolderHistoryKeyEvent( wxKeyEvent& event ){ event.Skip(); }
 		virtual void OnDirSelected( wxFileDirPickerEvent& event ){ event.Skip(); }
 		virtual void OnSwapSides( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnAddFolderPair( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnRemoveTopFolderPair( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnLeftGridDoubleClick( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnContextRim( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnSortLeftGrid( wxGridEvent& event ){ event.Skip(); }
@@ -195,8 +192,8 @@ class MainDialogGenerated : public wxFrame
 		virtual void OnContextRimLabelRight( wxGridEvent& event ){ event.Skip(); }
 		virtual void OnCfgHistoryKeyEvent( wxKeyEvent& event ){ event.Skip(); }
 		virtual void OnLoadFromHistory( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnConfigureFilter( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnFilterButton( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnConfigureFilter( wxHyperlinkEvent& event ){ event.Skip(); }
 		virtual void OnHideFilteredButton( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnLeftOnlyFiles( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnLeftNewerFiles( wxCommandEvent& event ){ event.Skip(); }
@@ -216,6 +213,17 @@ class MainDialogGenerated : public wxFrame
 		
 	
 	public:
+		wxPanel* m_panelTopLeft;
+		CustomComboBox* m_directoryLeft;
+		wxDirPickerCtrl* m_dirPickerLeft;
+		wxBitmapButton* m_bpButtonLocalFilter;
+		wxBitmapButton* m_bpButtonAltSyncCfg;
+		wxPanel* m_panelTopRight;
+		wxBitmapButton* m_bpButtonRemovePair;
+		CustomComboBox* m_directoryRight;
+		wxDirPickerCtrl* m_dirPickerRight;
+		wxPanel* m_panelLeft;
+		wxPanel* m_panelRight;
 		MainDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("FreeFileSync - Folder Comparison and Synchronization"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 933,612 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		~MainDialogGenerated();
 	
@@ -231,8 +239,7 @@ class FolderPairGenerated : public wxPanel
 	protected:
 		wxPanel* m_panel20;
 		
-		wxBitmapButton* m_bpButtonAltFilter;
-		wxBitmapButton* m_bpButtonAltSyncCfg;
+		
 		
 	
 	public:
@@ -240,6 +247,8 @@ class FolderPairGenerated : public wxPanel
 		wxTextCtrl* m_directoryLeft;
 		wxDirPickerCtrl* m_dirPickerLeft;
 		wxPanel* m_panel21;
+		wxBitmapButton* m_bpButtonLocalFilter;
+		wxBitmapButton* m_bpButtonAltSyncCfg;
 		wxPanel* m_panelRight;
 		wxBitmapButton* m_bpButtonRemovePair;
 		wxTextCtrl* m_directoryRight;
@@ -261,17 +270,17 @@ class BatchFolderPairGenerated : public wxPanel
 		wxStaticText* m_staticText53;
 		wxStaticText* m_staticText541;
 		wxPanel* m_panelLeft;
-		wxBitmapButton* m_bpButtonAltFilter;
 		wxPanel* m_panelRight;
-		wxBitmapButton* m_bpButtonAltSyncCfg;
 		
 	
 	public:
 		wxBitmapButton* m_bpButtonRemovePair;
 		wxTextCtrl* m_directoryLeft;
 		wxDirPickerCtrl* m_dirPickerLeft;
+		wxBitmapButton* m_bpButtonLocalFilter;
 		wxTextCtrl* m_directoryRight;
 		wxDirPickerCtrl* m_dirPickerRight;
+		wxBitmapButton* m_bpButtonAltSyncCfg;
 		BatchFolderPairGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
 		~BatchFolderPairGenerated();
 	
@@ -297,13 +306,10 @@ class BatchDlgGenerated : public wxDialog
 		wxStaticText* m_staticText531;
 		wxNotebook* m_notebookSettings;
 		wxPanel* m_panelOverview;
-		wxScrolledWindow* m_scrolledWindow6;
 		wxBoxSizer* sbSizerMainPair;
 		wxPanel* m_panelMainPair;
 		wxStaticText* m_staticText532;
 		wxStaticText* m_staticText5411;
-		wxPanel* m_panelLeft;
-		wxPanel* m_panelRight;
 		wxBoxSizer* bSizerAddFolderPairs;
 		
 		
@@ -363,6 +369,7 @@ class BatchDlgGenerated : public wxDialog
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ){ event.Skip(); }
 		virtual void OnAddFolderPair( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnRemoveTopFolderPair( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnChangeCompareVar( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnCheckAutomatic( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnCheckFilter( wxCommandEvent& event ){ event.Skip(); }
@@ -381,11 +388,17 @@ class BatchDlgGenerated : public wxDialog
 		
 	
 	public:
+		wxScrolledWindow* m_scrolledWindow6;
 		wxBitmapButton* m_bpButtonAddPair;
+		wxBitmapButton* m_bpButtonRemovePair;
+		wxPanel* m_panelLeft;
 		wxTextCtrl* m_directoryLeft;
 		wxDirPickerCtrl* m_dirPickerLeft;
+		wxBitmapButton* m_bpButtonLocalFilter;
+		wxPanel* m_panelRight;
 		wxTextCtrl* m_directoryRight;
 		wxDirPickerCtrl* m_dirPickerRight;
+		wxBitmapButton* m_bpButtonAltSyncCfg;
 		BatchDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Create a batch job"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~BatchDlgGenerated();
 	
@@ -520,8 +533,10 @@ class CmpCfgDlgGenerated : public wxDialog
 	
 	protected:
 		wxRadioButton* m_radioBtnSizeDate;
+		wxStaticBitmap* m_bitmapByTime;
 		wxButton* m_buttonTimeSize;
 		wxRadioButton* m_radioBtnContent;
+		wxStaticBitmap* m_bitmapByContent;
 		wxButton* m_buttonContent;
 		wxStaticLine* m_staticline14;
 		wxBitmapButton* m_bpButtonHelp;
@@ -644,6 +659,35 @@ class HelpDlgGenerated : public wxDialog
 	public:
 		HelpDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 565,501 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
 		~HelpDlgGenerated();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class ReadmeDlgGenerated
+///////////////////////////////////////////////////////////////////////////////
+class ReadmeDlgGenerated : public wxDialog 
+{
+	private:
+	
+	protected:
+		
+		wxStaticBitmap* m_bitmap25;
+		wxPanel* m_panel8;
+		
+		wxStaticText* m_staticText56;
+		
+		
+		wxTextCtrl* m_textCtrlMain;
+		wxButton* m_buttonOkay;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ){ event.Skip(); }
+		virtual void OnOK( wxCommandEvent& event ){ event.Skip(); }
+		
+	
+	public:
+		ReadmeDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 706,475 ), long style = wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
+		~ReadmeDlgGenerated();
 	
 };
 
@@ -836,7 +880,7 @@ class FilterDlgGenerated : public wxDialog
 	protected:
 		wxStaticBitmap* m_bitmap26;
 		wxPanel* m_panel8;
-		wxStaticText* m_staticText56;
+		wxStaticText* m_staticTexHeader;
 		
 		wxStaticText* m_staticText44;
 		wxBitmapButton* m_bpButtonHelp;
@@ -849,6 +893,7 @@ class FilterDlgGenerated : public wxDialog
 		wxStaticText* m_staticText85;
 		wxStaticText* m_staticText181;
 		wxStaticText* m_staticText1811;
+		wxStaticText* m_staticTextFilteringInactive;
 		
 		wxStaticText* m_staticText15;
 		wxStaticBitmap* m_bitmap8;
@@ -924,6 +969,9 @@ class GlobalSettingsDlgGenerated : public wxDialog
 		wxStaticText* m_staticText114;
 		
 		wxCheckBox* m_checkBoxIgnoreOneHour;
+		wxStaticText* m_staticTextCopyLocked;
+		
+		wxCheckBox* m_checkBoxCopyLocked;
 		wxStaticLine* m_staticline10;
 		wxStaticText* m_staticText100;
 		

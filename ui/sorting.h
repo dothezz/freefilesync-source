@@ -72,7 +72,8 @@ bool sortByFileName(const FileSystemObject& a, const FileSystemObject& b)
         if (dynamic_cast<const DirMapping*>(&b))
             return true;
         else
-            return Compare<ascending>().isSmallerThan(a.getShortName<side>(), b.getShortName<side>());
+            return Compare<ascending>().isSmallerThan(
+                       compareString(a.getShortName<side>(), b.getShortName<side>()), 0);
     }
 }
 

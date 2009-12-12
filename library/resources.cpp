@@ -22,6 +22,8 @@ const GlobalResources& GlobalResources::getInstance()
 GlobalResources::GlobalResources()
 {
     //map, allocate and initialize pictures
+    bitmapResource[wxT("CmpByTime.png")]          = (bitmapCmpByTime         = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("CmpByContent.png")]       = (bitmapCmpByContent      = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("left arrow.png")]         = (bitmapArrowLeft         = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("right arrow.png")]        = (bitmapArrowRight        = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("left arrow create.png")]  = (bitmapArrowLeftCr       = new wxBitmap(wxNullBitmap));
@@ -41,7 +43,7 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("sync.png")]               = (bitmapSync              = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("sync disabled.png")]      = (bitmapSyncDisabled      = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("swap.png")]               = (bitmapSwap              = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("swapSmall.png")]          = (bitmapSwapSmall         = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("swap_slim.png")]          = (bitmapSwapSlim          = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("help.png")]               = (bitmapHelp              = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("leftOnly.png")]           = (bitmapLeftOnly          = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("leftOnlyAct.png")]        = (bitmapLeftOnlyAct       = new wxBitmap(wxNullBitmap));
@@ -81,8 +83,7 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("saveSmall.png")]          = (bitmapSaveSmall         = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("loadSmall.png")]          = (bitmapLoadSmall         = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("newSmall.png")]           = (bitmapNewSmall          = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("FFS.png")]                = (bitmapFFS               = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("FFS paused.png")]         = (bitmapFFSPaused         = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("FreeFileSync.png")]       = (bitmapFFS               = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("deleteFile.png")]         = (bitmapDeleteFile        = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("gpl.png")]                = (bitmapGPL               = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("statusPause.png")]        = (bitmapStatusPause       = new wxBitmap(wxNullBitmap));
@@ -103,7 +104,6 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("sync_small.png")]         = (bitmapSyncSmall         = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("clock_small.png")]        = (bitmapClockSmall        = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("clock.png")]              = (bitmapClock             = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("filter.png")]             = (bitmapFilter            = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("batch.png")]              = (bitmapBatch             = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("batch_small.png")]        = (bitmapBatchSmall        = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("move up.png")]            = (bitmapMoveUp            = new wxBitmap(wxNullBitmap));
@@ -128,6 +128,7 @@ GlobalResources::GlobalResources()
     bitmapResource[wxT("holland.png")]            = (bitmapHolland           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("england.png")]            = (bitmapEngland           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("france.png")]             = (bitmapFrance            = new wxBitmap(wxNullBitmap));
+    bitmapResource[wxT("finland.png")]            = (bitmapFinland           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("germany.png")]            = (bitmapGermany           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("hungary.png")]            = (bitmapHungary           = new wxBitmap(wxNullBitmap));
     bitmapResource[wxT("romania.png")]            = (bitmapRomania           = new wxBitmap(wxNullBitmap));
@@ -218,7 +219,7 @@ void loadAnimFromZip(wxZipInputStream& zipInput, wxAnimation* animation)
 
 void GlobalResources::load() const
 {
-    wxFFileInputStream input(FreeFileSync::getInstallationDir() + zToWx(globalFunctions::FILE_NAME_SEPARATOR) + wxT("Resources.dat"));
+    wxFFileInputStream input(FreeFileSync::getInstallationDir() + wxT("Resources.dat"));
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files
@@ -246,10 +247,14 @@ void GlobalResources::load() const
     }
 
 #ifdef FFS_WIN
+    //for compatibility it seems we need to stick with a "real" icon
     *programIcon = wxIcon(wxT("A_PROGRAM_ICON"));
 #else
-#include "FreeFileSync.xpm"
-    *programIcon = wxIcon(FreeFileSync_xpm);
+    //#include "FreeFileSync.xpm"
+    //*programIcon = wxIcon(FreeFileSync_xpm);
+
+    //use big FFS logo bitmap for better quality
+    programIcon->CopyFromBitmap(*bitmapFFS);
 #endif
 }
 

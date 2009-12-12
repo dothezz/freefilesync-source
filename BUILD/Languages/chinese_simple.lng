@@ -148,8 +148,6 @@
 <多选>
 A newer version of FreeFileSync is available:
 FreeFileSync 有新版可用:
-ATTENTION: Failed directory access can lead to file deletions!
-请注意:失败的目录存取会导致文件删除!
 Abort requested: Waiting for current operation to finish...
 取消请求: 正在等待当前操作完成...
 Aborted
@@ -158,10 +156,14 @@ About
 关于
 Action
 动作
+Activate filter
+激活过滤器
 Add folder
 添加文件夹
 Add folder pair
 添加成对文件夹
+All directories in sync!
+所有目录同步!
 An exception occured!
 发生异常!
 As a result the files are separated into the following categories:
@@ -198,10 +200,6 @@ Category
 分类
 Change direction
 改变方向
-Check all
-全选
-Choose to hide filtered files/directories from list
-从列表中选择隐藏被过滤的文件/文件夹
 Comma separated list
 逗号分隔的列表
 Commandline
@@ -242,8 +240,6 @@ Configuration saved!
 配置已保存!
 Configure filter
 配置过滤
-Configure filter...
-设置过滤...
 Configure your own synchronization rules.
 配置你自己的同步规则.
 Confirm
@@ -334,8 +330,6 @@ Directory
 目录
 Directory does not exist:
 目录不存在:
-Do not display visual status information but write to a logfile instead
-不显示视觉状态信息,使用写入日志文件代替。
 Do not show this dialog again
 不要再显示此对话框
 Do nothing
@@ -406,12 +400,12 @@ Error writing file:
 写入文件出错:
 Error writing to synchronization database:
 向同步数据库中写入时出错:
-Source directory does not exist anymore:
-源目录已经不存在:
 Example
 例如
 Exclude
 排除
+Exclude all rows
+排除所有行
 Exclude temporarily
 暂时排除
 Exclude via filter:
@@ -422,6 +416,8 @@ Exit with RC < 0
 退出并设置返回码 <0
 External applications
 外部应用程序
+Fatal Error
+致命错误
 Feedback and suggestions are welcome at:
 欢迎在下面提出反馈意见和建议:
 File %x has an invalid date!
@@ -466,12 +462,14 @@ Files/folders that exist on right side only
 仅在右侧存在的文件/文件夹
 Filter
 过滤
-Filter active: Press again to deactivate
-过滤激活: 再按一次可关闭激活
 Filter files
 过滤文件
+Filter has been selected
+过滤器已选择
 Filter view
 过滤查看
+Filtering is deactivated
+过滤为非活跃状态
 Folder Comparison and Synchronization
 文件夹比较与同步
 Free disk space available:
@@ -494,6 +492,8 @@ Generating database...
 正在生成数据库...
 Generating file list...
 生成文件列表...
+Global filter
+全局过滤器
 Global settings
 全局设置
 Help
@@ -504,6 +504,8 @@ Hide all error and warning messages
 隐藏所有错误与警告信息
 Hide conflicts
 隐藏冲突
+Hide excluded items
+隐藏已排除的项目
 Hide files that are different
 隐藏不同的文件
 Hide files that are equal
@@ -530,14 +532,16 @@ Hide files that will be overwritten on right side
 隐藏将在右侧被覆盖的文件
 Hide files that won't be copied
 隐藏将不会被复制的文件
-Hide filtered items
-隐藏已过滤的项目
+Hide filtered or temporarily excluded files
+隐藏已过滤或临时排除的文件
 Hide further error messages during the current process
 在当前进程中隐藏进一步的错误信息
 Hints:
 提示:
 Homepage
 主页
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+使用数据库来识别和传送两边的改变. 自动检测删除和冲突状态.
 If you like FFS
 如果你喜欢 FFS
 Ignore 1-hour file time difference
@@ -552,6 +556,8 @@ Ignore this error, retry or abort?
 忽略这个错误,重试或取消?
 Include
 包括
+Include all rows
+包括所有行
 Include temporarily
 暂时包括
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
@@ -562,8 +568,8 @@ Info
 信息
 Information
 信息
-Initial synchronization.
-初始化同步.
+Initial synchronization:
+初始化同步:
 Integrate external applications into context menu. The following macros are available:
 集成外部应用程序到右键菜单. 如下宏可用:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +584,8 @@ Load configuration from file
 从文件加载配置
 Load configuration history (press DEL to delete items)
 加载配置历史记录(按DEL键删除项目)
+Local filter
+局部过滤器
 Log-messages:
 日志信息:
 Logging
@@ -602,8 +610,8 @@ Moving folder %x to user-defined directory %y
 移动文件夹 %x 到用户定义目录 %y
 Multiple...
 倍数...
-No database file existing yet:
-还没有数据库文件存在:
+No filter selected
+没有选定过滤器
 Not enough free disk space available in:
 没有足够的可用磁盘空间用于:
 Nothing to synchronize according to configuration!
@@ -638,8 +646,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 请复制适当的\"Shadow.dll\"(位于\"Shadow.zip\"压缩包中)到FreeFileSync安装目录以启用此特性.
 Please fill all empty directory fields.
 请填满所有空的目录区域.
-Press button to activate filter
-请按键以激活过滤
+Please run a Compare first before synchronizing!
+同步之前请先进行对比
 Published under the GNU General Public License:
 在GNU通用公共许可下发布:
 Question
@@ -660,12 +668,16 @@ Remove folder
 删除文件夹
 Remove folder pair
 删除文件夹对
+Remove local filter settings
+移除局部过滤器
 Report translation error
 报告翻译错误
 Reset
 重置
 Right
 右侧
+Run minimized and write status information to a logfile
+最小化运行并将状态信息写到一个记录文件中
 S&ave configuration
 保存配置(&A)
 S&witch view
@@ -680,14 +692,14 @@ Scanning:
 扫描中:
 Select a folder
 选择一个文件夹
-Select alternate filter settings
-选择替换过滤设置
 Select alternate synchronization settings
 选择替换同步设置
 Select logfile directory:
 选择日志保存位置:
 Select variant:
 选择变化的:
+Setting default synchronization directions. Please check whether they are appropriate for you.
+设置默认同步方向. 请检查是否适合.
 Show conflicts
 显示冲突
 Show file icons
@@ -732,6 +744,8 @@ Size
 大小
 Source code written completely in C++ utilizing:
 源代码完全使用C++工具编写:
+Source directory does not exist anymore:
+源目录已经不存在:
 Speed:
 速度:
 Start
@@ -772,8 +786,12 @@ Target directory already existing!
 目标目录已经存在!
 Target file already existing!
 目标文件已经存在!
+The database file is not yet existing, but will be created during synchronization:
+数据库文件未存在, 但在同步期间会被创建:
 The file does not contain a valid configuration:
 该文件不包含有效的配置:
+The required database entry is not yet existing, but will be created during synchronization:
+请求的数据库入口未存在, 但在同步期间会被创建:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 此变化评估两个文件名相同的文件,只有当他们有同样的文件大小并且最后修改日期和时间也相同\n时才认为它们是相同的.
 Time
@@ -798,8 +816,6 @@ Unable to create logfile!
 无法创建日志!
 Unable to initialize Recycle Bin!
 无法初始化回收站!
-Uncheck all
-全部取消选中
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 存在不可解决的冲突!\n\n你可忽略冲突并继续同步.
 Update ->
@@ -814,8 +830,6 @@ User-defined directory
 用户定义目录
 User-defined directory for deletion was not specified!
 用于删除的用户定义目录没有指定!
-Using default synchronization directions. Please recheck.
-使用默认的同步方向. 请重新检查.
 Variant
 变化
 Verifying file %x

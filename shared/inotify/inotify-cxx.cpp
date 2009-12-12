@@ -18,7 +18,9 @@
  * please visit http://www.gnu.org/licenses/license-list.html.
  * 
  */
- 
+
+//added by ZenJu
+#include <cstdio>
 
 #include <errno.h>
 #include <unistd.h>

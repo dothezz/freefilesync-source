@@ -127,6 +127,13 @@ LocalizationInfo::LocalizationInfo()
     newEntry.languageFlag   = wxT("slovakia.png");
     locMapping.push_back(newEntry);
 
+    newEntry.languageID     = wxLANGUAGE_FINNISH;
+    newEntry.languageName   = wxT("Suomi");
+    newEntry.languageFile   = wxT("finnish.lng");
+    newEntry.translatorName = wxT("Nalle Juslén");
+    newEntry.languageFlag   = wxT("finland.png");
+    locMapping.push_back(newEntry);
+
     newEntry.languageID     = wxLANGUAGE_TURKISH;
     newEntry.languageName   = wxT("Türkçe");
     newEntry.languageFile   = wxT("turkish.lng");
@@ -224,6 +231,7 @@ int mapLanguageDialect(const int language)
         return wxLANGUAGE_SPANISH;
 
         //case wxLANGUAGE_CZECH:
+        //case wxLANGUAGE_FINNISH:
         //case wxLANGUAGE_JAPANESE:
         //case wxLANGUAGE_POLISH:
         //case wxLANGUAGE_SLOVENIAN:
@@ -378,8 +386,8 @@ void CustomLocale::setLanguage(const int language)
     translationDB->clear();
     if (!languageFile.empty())
     {
-        UnicodeFileReader langFile(FreeFileSync::getInstallationDir() + zToWx(globalFunctions::FILE_NAME_SEPARATOR) +
-                                   wxT("Languages") + zToWx(globalFunctions::FILE_NAME_SEPARATOR) + languageFile);
+        UnicodeFileReader langFile(FreeFileSync::getInstallationDir() +  wxT("Languages") +
+                                   zToWx(globalFunctions::FILE_NAME_SEPARATOR) + languageFile);
         if (langFile.isOkay())
         {
             int rowNumber = 0;

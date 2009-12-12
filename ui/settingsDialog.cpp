@@ -489,48 +489,14 @@ void SyncCfgDialog::OnConflict(wxCommandEvent& event)
     toggleSyncDirection(localSyncConfiguration.conflict);
     updateConfigIcons(cmpVariant, localSyncConfiguration);
 }
+
+
 //###################################################################################################################################
-
-
-typedef FreeFileSync::FolderPairPanelBasic<BatchFolderPairGenerated> FolderPairParent;
-
-class BatchFolderPairPanel : public FolderPairParent
-{
-public:
-    BatchFolderPairPanel(wxWindow* parent, BatchDialog* batchDialog) :
-        FolderPairParent(parent),
-        batchDlg(batchDialog) {}
-
-private:
-    virtual wxWindow* getParentWindow()
-    {
-        return batchDlg;
-    }
-
-    virtual MainConfiguration getMainConfig() const
-    {
-        return batchDlg->getCurrentConfiguration().mainCfg;
-    }
-
-    virtual void OnAltFilterCfgChange(bool defaultValueSet)
-    {
-        if (!defaultValueSet)
-        {
-            //activate filter
-            batchDlg->m_checkBoxFilter->SetValue(true);
-            batchDlg->updateVisibleTabs();
-        }
-    }
-
-    BatchDialog* batchDlg;
-};
-//###################################################################################################################################
-
 
 class BatchFileDropEvent : public wxFileDropTarget
 {
 public:
-    BatchFileDropEvent(BatchDialog* dlg) :
+    BatchFileDropEvent(BatchDialog& dlg) :
         batchDlg(dlg) {}
 
     virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& filenames)
@@ -543,7 +509,7 @@ public:
 
             //test if ffs batch file has been dropped
             if (fileType == xmlAccess::XML_BATCH_CONFIG)
-                batchDlg->loadBatchFile(droppedFileName);
+                batchDlg.loadBatchFile(droppedFileName);
             else
             {
                 wxString errorMessage = _("%x is not a valid FreeFileSync batch file!");
@@ -555,10 +521,89 @@ public:
     }
 
 private:
-    BatchDialog* batchDlg;
+    BatchDialog& batchDlg;
+};
+
+//###################################################################################################################################
+
+//------------------------------------------------------------------
+/*    class hierarchy:
+
+            template<>
+            FolderPairPanelBasic
+                    /|\
+                     |
+             template<>
+             FolderPairCallback      BatchFolderPairGenerated
+                    /|\                        /|\
+            _________|______________    ________|
+           |                        |  |
+  FirstBatchFolderPairCfg    BatchFolderPairPanel
+*/
+
+template <class GuiPanel>
+class FolderPairCallback : public FolderPairPanelBasic<GuiPanel> //implements callback functionality to BatchDialog as imposed by FolderPairPanelBasic
+{
+public:
+    FolderPairCallback(GuiPanel& basicPanel, BatchDialog& batchDialog) :
+        FolderPairPanelBasic<GuiPanel>(basicPanel), //pass FolderPairGenerated part...
+        batchDlg(batchDialog) {}
+
+private:
+    virtual wxWindow* getParentWindow()
+    {
+        return &batchDlg;
+    }
+
+    virtual MainConfiguration getMainConfig() const
+    {
+        return batchDlg.getCurrentConfiguration().mainCfg;
+    }
+
+    BatchDialog& batchDlg;
 };
 
 
+class BatchFolderPairPanel :
+    public BatchFolderPairGenerated, //BatchFolderPairPanel "owns" BatchFolderPairGenerated!
+    public FolderPairCallback<BatchFolderPairGenerated>
+{
+public:
+    BatchFolderPairPanel(wxWindow* parent, BatchDialog& batchDialog) :
+        BatchFolderPairGenerated(parent),
+        FolderPairCallback<BatchFolderPairGenerated>(static_cast<BatchFolderPairGenerated&>(*this), batchDialog), //pass BatchFolderPairGenerated part...
+        dragDropOnLeft( m_panelLeft,  m_dirPickerLeft,  m_directoryLeft),
+        dragDropOnRight(m_panelRight, m_dirPickerRight, m_directoryRight) {}
+
+private:
+    //support for drag and drop
+    DragDropOnDlg dragDropOnLeft;
+    DragDropOnDlg dragDropOnRight;
+};
+
+
+class FirstBatchFolderPairCfg : public FolderPairCallback<BatchDlgGenerated>
+{
+public:
+    FirstBatchFolderPairCfg(BatchDialog& batchDialog) :
+        FolderPairCallback<BatchDlgGenerated>(batchDialog, batchDialog),
+
+        //prepare drag & drop
+        dragDropOnLeft(batchDialog.m_panelLeft,
+                       batchDialog.m_dirPickerLeft,
+                       batchDialog.m_directoryLeft),
+        dragDropOnRight(batchDialog.m_panelRight,
+                        batchDialog.m_dirPickerRight,
+                        batchDialog.m_directoryRight) {}
+
+private:
+    //support for drag and drop
+    DragDropOnDlg dragDropOnLeft;
+    DragDropOnDlg dragDropOnRight;
+};
+
+
+//###################################################################################################################################
 BatchDialog::BatchDialog(wxWindow* window, const xmlAccess::XmlBatchConfig& batchCfg) :
     BatchDlgGenerated(window)
 {
@@ -577,14 +622,17 @@ BatchDialog::BatchDialog(wxWindow* window, const wxString& filename) :
 
 void BatchDialog::init()
 {
+    wxWindowUpdateLocker dummy(this); //avoid display distortion
+
+    //init handling of first folder pair
+    firstFolderPair.reset(new FirstBatchFolderPairCfg(*this));
+
+
     //prepare drag & drop for loading of *.ffs_batch files
-    SetDropTarget(new BatchFileDropEvent(this));
+    SetDropTarget(new BatchFileDropEvent(*this));
     dragDropOnLogfileDir.reset(new DragDropOnDlg(m_panelLogging, m_dirPickerLogfileDir, m_textCtrlLogfileDir));
 
-    //support for drag and drop on main pair
-    dragDropOnLeft.reset( new DragDropOnDlg(m_panelLeft,  m_dirPickerLeft,  m_directoryLeft));
-    dragDropOnRight.reset(new DragDropOnDlg(m_panelRight, m_dirPickerRight, m_directoryRight));
-
+    //support for drag and drop: user-defined deletion directory
     dragDropCustomDelFolder.reset(new DragDropOnDlg(m_panelCustomDeletionDir, m_dirPickerCustomDelFolder, m_textCtrlCustomDelFolder));
 
 
@@ -769,6 +817,16 @@ void BatchDialog::OnConflict(wxCommandEvent& event)
 void BatchDialog::OnCheckFilter(wxCommandEvent& event)
 {
     updateVisibleTabs();
+
+    //update main local filter
+    firstFolderPair->refreshButtons();
+
+    //update folder pairs
+    for (std::vector<BatchFolderPairPanel*>::const_iterator i = additionalFolderPairs.begin(); i != additionalFolderPairs.end(); ++i)
+    {
+        BatchFolderPairPanel* dirPair = *i;
+        dirPair->refreshButtons();
+    }
 }
 
 
@@ -798,7 +856,7 @@ void BatchDialog::OnCheckSilent(wxCommandEvent& event)
 
 void BatchDialog::updateVisibleTabs()
 {
-    showNotebookpage(m_panelFilter, _("Filter"), m_checkBoxFilter->GetValue());
+    showNotebookpage(m_panelFilter,  _("Filter"),  m_checkBoxFilter->GetValue());
     showNotebookpage(m_panelLogging, _("Logging"), m_checkBoxSilent->GetValue());
 }
 
@@ -936,8 +994,8 @@ void BatchDialog::OnLoadBatchJob(wxCommandEvent& event)
 inline
 FolderPairEnh getEnahncedPair(const BatchFolderPairPanel* panel)
 {
-    return FolderPairEnh(wxToZ(panel->m_directoryLeft->GetValue()),
-                         wxToZ(panel->m_directoryRight->GetValue()),
+    return FolderPairEnh(panel->getLeftDir(),
+                         panel->getRightDir(),
                          panel->getAltSyncConfig(),
                          panel->getAltFilterConfig());
 }
@@ -956,9 +1014,11 @@ xmlAccess::XmlBatchConfig BatchDialog::getCurrentConfiguration() const
     batchCfg.mainCfg.handleDeletion    = getDeletionHandling();
     batchCfg.mainCfg.customDeletionDirectory = m_textCtrlCustomDelFolder->GetValue();
 
-    //main pair
-    batchCfg.mainCfg.mainFolderPair.leftDirectory  = wxToZ(m_directoryLeft->GetValue());
-    batchCfg.mainCfg.mainFolderPair.rightDirectory = wxToZ(m_directoryRight->GetValue());
+    //first folder pair
+    batchCfg.mainCfg.firstPair = FolderPairEnh(firstFolderPair->getLeftDir(),
+                                 firstFolderPair->getRightDir(),
+                                 firstFolderPair->getAltSyncConfig(),
+                                 firstFolderPair->getAltFilterConfig());
 
     //add additional pairs
     batchCfg.mainCfg.additionalPairs.clear();
@@ -1053,10 +1113,11 @@ void BatchDialog::loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg)
     //error handling is dependent from m_checkBoxSilent! /|\   \|/
     setSelectionHandleError(batchCfg.handleError);
 
-
-    //set main folder pair
-    FreeFileSync::setDirectoryName(zToWx(batchCfg.mainCfg.mainFolderPair.leftDirectory),  m_directoryLeft, m_dirPickerLeft);
-    FreeFileSync::setDirectoryName(zToWx(batchCfg.mainCfg.mainFolderPair.rightDirectory), m_directoryRight, m_dirPickerRight);
+    //set first folder pair
+    firstFolderPair->setValues(batchCfg.mainCfg.firstPair.leftDirectory,
+                               batchCfg.mainCfg.firstPair.rightDirectory,
+                               batchCfg.mainCfg.firstPair.altSyncConfig,
+                               batchCfg.mainCfg.firstPair.localFilter);
 
     //remove existing additional folder pairs
     clearAddFolderPairs();
@@ -1074,14 +1135,19 @@ void BatchDialog::loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg)
 
 void BatchDialog::OnAddFolderPair(wxCommandEvent& event)
 {
-    std::vector<FolderPairEnh> newPairs;
-    newPairs.push_back(
-        FolderPairEnh(Zstring(),
-                      Zstring(),
-                      boost::shared_ptr<AlternateSyncConfig>(),
-                      boost::shared_ptr<AlternateFilter>()));
+    wxWindowUpdateLocker dummy(this); //avoid display distortion
 
-    addFolderPair(newPairs, false); //add pair at the end of additional pairs
+    std::vector<FolderPairEnh> newPairs;
+    newPairs.push_back(getCurrentConfiguration().mainCfg.firstPair);
+
+    addFolderPair(newPairs, true); //add pair in front of additonal pairs
+
+    //clear first pair
+                const FolderPairEnh cfgEmpty;
+        firstFolderPair->setValues(cfgEmpty.leftDirectory,
+                                   cfgEmpty.rightDirectory,
+                                   cfgEmpty.altSyncConfig,
+                                   cfgEmpty.localFilter);
 }
 
 
@@ -1104,13 +1170,16 @@ void BatchDialog::OnRemoveTopFolderPair(wxCommandEvent& event)
 {
     if (additionalFolderPairs.size() > 0)
     {
-        const wxString leftDir  = (*additionalFolderPairs.begin())->m_directoryLeft ->GetValue().c_str();
-        const wxString rightDir = (*additionalFolderPairs.begin())->m_directoryRight->GetValue().c_str();
+        //get settings from second folder pair
+        const FolderPairEnh cfgSecond = getEnahncedPair(additionalFolderPairs[0]);
 
-        FreeFileSync::setDirectoryName(leftDir,  m_directoryLeft,  m_dirPickerLeft);
-        FreeFileSync::setDirectoryName(rightDir, m_directoryRight, m_dirPickerRight);
+        //reset first pair
+        firstFolderPair->setValues(cfgSecond.leftDirectory,
+                                   cfgSecond.rightDirectory,
+                                   cfgSecond.altSyncConfig,
+                                   cfgSecond.localFilter);
 
-        removeAddFolderPair(0); //remove first of additional folder pairs
+        removeAddFolderPair(0); //remove second folder pair (first of additional folder pairs)
     }
 }
 
@@ -1118,18 +1187,45 @@ void BatchDialog::OnRemoveTopFolderPair(wxCommandEvent& event)
 const size_t MAX_FOLDER_PAIRS = 3;
 
 
+void BatchDialog::updateGuiForFolderPair()
+{
+    //adapt delete top folder pair button
+    if (additionalFolderPairs.size() == 0)
+        m_bpButtonRemovePair->Hide();
+    else
+        m_bpButtonRemovePair->Show();
+
+    //adapt local filter and sync cfg for first folder pair
+    if (    additionalFolderPairs.size() == 0 &&
+            firstFolderPair->getAltSyncConfig().get() == NULL &&
+            NameFilter(firstFolderPair->getAltFilterConfig().includeFilter,
+                       firstFolderPair->getAltFilterConfig().excludeFilter).isNull())
+    {
+        m_bpButtonLocalFilter->Hide();
+        m_bpButtonAltSyncCfg->Hide();
+    }
+    else
+    {
+        m_bpButtonLocalFilter->Show();
+        m_bpButtonAltSyncCfg->Show();
+    }
+
+    m_scrolledWindow6->Fit();  //adjust scrolled window size
+    m_panelOverview->Layout(); //adjust stuff inside scrolled window
+}
+
+
 void BatchDialog::addFolderPair(const std::vector<FreeFileSync::FolderPairEnh>& newPairs, bool addFront)
 {
-    if (newPairs.size() == 0)
-        return;
-
     wxWindowUpdateLocker dummy(m_panelOverview); //avoid display distortion
 
+    if (!newPairs.empty())
+{
     //add folder pairs
     int pairHeight = 0;
     for (std::vector<FreeFileSync::FolderPairEnh>::const_iterator i = newPairs.begin(); i != newPairs.end(); ++i)
     {
-        BatchFolderPairPanel* newPair = new BatchFolderPairPanel(m_scrolledWindow6, this);
+        BatchFolderPairPanel* newPair = new BatchFolderPairPanel(m_scrolledWindow6, *this);
 
         if (addFront)
         {
@@ -1148,12 +1244,11 @@ void BatchDialog::addFolderPair(const std::vector<FreeFileSync::FolderPairEnh>& 
         //register events
         newPair->m_bpButtonRemovePair->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BatchDialog::OnRemoveFolderPair), NULL, this );
 
-        //insert directory names
-        FreeFileSync::setDirectoryName(zToWx(i->leftDirectory),  newPair->m_directoryLeft,  newPair->m_dirPickerLeft);
-        FreeFileSync::setDirectoryName(zToWx(i->rightDirectory), newPair->m_directoryRight, newPair->m_dirPickerRight);
-
         //set alternate configuration
-        newPair->setValues(i->altSyncConfig, i->altFilter);
+        newPair->setValues(i->leftDirectory,
+                           i->rightDirectory,
+                           i->altSyncConfig,
+                           i->localFilter);
     }
     //set size of scrolled window
     const int visiblePairs = std::min(additionalFolderPairs.size() + 1, MAX_FOLDER_PAIRS); //up to MAX_FOLDER_PAIRS pairs shall be shown
@@ -1168,13 +1263,16 @@ void BatchDialog::addFolderPair(const std::vector<FreeFileSync::FolderPairEnh>& 
     m_bpButtonLeftOnly->SetFocus();
 }
 
+    updateGuiForFolderPair();
+}
+
 
 void BatchDialog::removeAddFolderPair(const int pos)
 {
-    if (0 <= pos && pos < static_cast<int>(additionalFolderPairs.size()))
-    {
         wxWindowUpdateLocker dummy(m_panelOverview); //avoid display distortion
 
+    if (0 <= pos && pos < static_cast<int>(additionalFolderPairs.size()))
+    {
         //remove folder pairs from window
         BatchFolderPairPanel* pairToDelete = additionalFolderPairs[pos];
         const int pairHeight = pairToDelete->GetSize().GetHeight();
@@ -1197,6 +1295,8 @@ void BatchDialog::removeAddFolderPair(const int pos)
         //after changing folder pairs window focus is lost: results in scrolled window scrolling to top each time window is shown: we don't want this
         m_bpButtonLeftOnly->SetFocus();
     }
+
+        updateGuiForFolderPair();
 }
 
 

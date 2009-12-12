@@ -26,7 +26,8 @@ del BUILD\RealtimeSync.ilk
 del library\ShadowCopy\ShadowCopy.ncb
 attrib library\ShadowCopy\ShadowCopy.suo -h
 del library\ShadowCopy\ShadowCopy.suo
-del library\ShadowCopy\ShadowDll.vcproj.*.user
+del library\ShadowCopy\Shadow_2003.vcproj.*.user
+del library\ShadowCopy\Shadow_XP.vcproj.*.user
 del library\ShadowCopy\ShadowTest.vcproj.*.user
 del library\ShadowCopy\Shadow.pdb
 del library\ShadowCopy\Shadow.ilk

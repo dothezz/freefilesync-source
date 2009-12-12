@@ -9,7 +9,7 @@ using namespace FreeFileSync;
 
 wxString assembleFileForUserData(const wxString fileName)
 {
-    static const bool isPortableVersion = !wxFileExists(FreeFileSync::getInstallationDir() + zToWx(globalFunctions::FILE_NAME_SEPARATOR) + wxT("uninstall.exe")); //this check is a bit lame...
+    static const bool isPortableVersion = !wxFileExists(FreeFileSync::getInstallationDir() + wxT("uninstall.exe")); //this check is a bit lame...
 
     if (isPortableVersion) //use current working directory
         return wxString(wxT(".")) + zToWx(globalFunctions::FILE_NAME_SEPARATOR) + fileName;
@@ -51,7 +51,7 @@ const wxString& FreeFileSync::getLastErrorTxtFile()
 
 const wxString& FreeFileSync::getInstallationDir()
 {
-    static wxString instance = wxFileName(wxStandardPaths::Get().GetExecutablePath()).GetPath();
+    static wxString instance = wxFileName(wxStandardPaths::Get().GetExecutablePath()).GetPath() + zToWx(globalFunctions::FILE_NAME_SEPARATOR);
     return instance;
 }
 

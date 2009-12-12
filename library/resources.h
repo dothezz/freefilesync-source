@@ -15,6 +15,8 @@ public:
     const wxBitmap& getImageByName(const wxString& imageName) const;
 
     //image resource objects
+    wxBitmap* bitmapCmpByTime;
+    wxBitmap* bitmapCmpByContent;
     wxBitmap* bitmapArrowLeft;
     wxBitmap* bitmapArrowRight;
     wxBitmap* bitmapArrowLeftCr;
@@ -34,7 +36,7 @@ public:
     wxBitmap* bitmapSync;
     wxBitmap* bitmapSyncDisabled;
     wxBitmap* bitmapSwap;
-    wxBitmap* bitmapSwapSmall;
+    wxBitmap* bitmapSwapSlim;
     wxBitmap* bitmapHelp;
     wxBitmap* bitmapLeftOnly;
     wxBitmap* bitmapLeftOnlyAct;
@@ -75,7 +77,6 @@ public:
     wxBitmap* bitmapLoadSmall;
     wxBitmap* bitmapNewSmall;
     wxBitmap* bitmapFFS;
-    wxBitmap* bitmapFFSPaused;
     wxBitmap* bitmapDeleteFile;
     wxBitmap* bitmapGPL;
     wxBitmap* bitmapStatusPause;
@@ -96,7 +97,6 @@ public:
     wxBitmap* bitmapSyncSmall;
     wxBitmap* bitmapClockSmall;
     wxBitmap* bitmapClock;
-    wxBitmap* bitmapFilter;
     wxBitmap* bitmapBatch;
     wxBitmap* bitmapBatchSmall;
     wxBitmap* bitmapMoveUp;
@@ -121,6 +121,7 @@ public:
     wxBitmap* bitmapHolland;
     wxBitmap* bitmapEngland;
     wxBitmap* bitmapFrance;
+    wxBitmap* bitmapFinland;
     wxBitmap* bitmapGermany;
     wxBitmap* bitmapHungary;
     wxBitmap* bitmapRomania;

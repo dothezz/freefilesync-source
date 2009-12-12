@@ -12,6 +12,7 @@
 #include <vector>
 #include <memory>
 #include "../shared/dragAndDrop.h"
+#include <wx/help.h>
 
 namespace xmlAccess
 {
@@ -36,7 +37,7 @@ private:
 class MainDialog: public MainDlgGenerated
 {
 public:
-    MainDialog(wxDialog *dlg, const wxString& cfgFilename);
+    MainDialog(wxDialog *dlg, const wxString& cfgFilename, wxHelpController& helpController);
     ~MainDialog();
 
     void loadConfig(const wxString& filename);
@@ -44,6 +45,7 @@ public:
 private:
     virtual void OnClose(           wxCloseEvent& event);
     virtual void OnQuit(            wxCommandEvent& event);
+    virtual void OnShowHelp(        wxCommandEvent& event);
     virtual void OnMenuAbout(       wxCommandEvent& event);
     virtual void OnAddFolder(       wxCommandEvent& event);
     virtual void OnRemoveFolder(    wxCommandEvent& event);
@@ -68,6 +70,7 @@ private:
     //additional folders
     std::vector<FolderPanel*> additionalFolders; //additional pairs to the standard pair
 
+    wxHelpController& helpController_;
     //support for drag and drop on main folder
     std::auto_ptr<FreeFileSync::DragDropOnDlg> dragDropOnFolder;
 };

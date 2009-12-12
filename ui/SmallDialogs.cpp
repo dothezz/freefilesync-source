@@ -114,9 +114,6 @@ HelpDlg::HelpDlg(wxWindow* window) : HelpDlgGenerated(window)
 }
 
 
-HelpDlg::~HelpDlg() {}
-
-
 void HelpDlg::OnClose(wxCloseEvent& event)
 {
     Destroy();
@@ -127,17 +124,22 @@ void HelpDlg::OnOK(wxCommandEvent& event)
 {
     Destroy();
 }
+
+
 //########################################################################################
-
-
-FilterDlg::FilterDlg(wxWindow* window, Zstring& filterIncl, Zstring& filterExcl) :
+FilterDlg::FilterDlg(wxWindow* window,
+                     bool isGlobalFilter, //global or local filter dialog?
+                     Zstring& filterIncl,
+                     Zstring& filterExcl,
+                     bool filterActive) :
     FilterDlgGenerated(window),
+    isGlobalFilter_(isGlobalFilter),
     includeFilter(filterIncl),
     excludeFilter(filterExcl)
 {
     m_bitmap8->SetBitmap(*GlobalResources::getInstance().bitmapInclude);
     m_bitmap9->SetBitmap(*GlobalResources::getInstance().bitmapExclude);
-    m_bitmap26->SetBitmap(*GlobalResources::getInstance().bitmapFilter);
+    m_bitmap26->SetBitmap(*GlobalResources::getInstance().bitmapFilterOn);
     m_bpButtonHelp->SetBitmapLabel(*GlobalResources::getInstance().bitmapHelp);
 
     m_textCtrlInclude->SetValue(zToWx(includeFilter));
@@ -145,6 +147,15 @@ FilterDlg::FilterDlg(wxWindow* window, Zstring& filterIncl, Zstring& filterExcl)
 
     m_panel13->Hide();
     m_button10->SetFocus();
+
+    if (filterActive)
+        m_staticTextFilteringInactive->Hide();
+
+    //adapt header for global/local dialog
+    if (isGlobalFilter_)
+        m_staticTexHeader->SetLabel(_("Global filter"));
+    else
+        m_staticTexHeader->SetLabel(_("Local filter"));
 
     Fit();
 }
@@ -163,8 +174,19 @@ void FilterDlg::OnHelp(wxCommandEvent& event)
 
 void FilterDlg::OnDefault(wxCommandEvent& event)
 {
-    m_textCtrlInclude->SetValue(zToWx(defaultIncludeFilter()));
-    m_textCtrlExclude->SetValue(zToWx(defaultExcludeFilter()));
+    const FilterConfig nullFilter;
+
+    if (isGlobalFilter_)
+    {
+        m_textCtrlInclude->SetValue(zToWx(nullFilter.includeFilter));
+        //exclude various recycle bin directories with global filter
+        m_textCtrlExclude->SetValue(zToWx(standardExcludeFilter()));
+    }
+    else
+    {
+        m_textCtrlInclude->SetValue(zToWx(nullFilter.includeFilter));
+        m_textCtrlExclude->SetValue(zToWx(nullFilter.excludeFilter));
+    }
 
     //changes to mainDialog are only committed when the OK button is pressed
     Fit();
@@ -636,6 +658,8 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parentWindow, const wxPoint& positi
     Move(wxPoint(position.x, std::max(0, position.y - (m_buttonTimeSize->GetScreenPosition() - GetScreenPosition()).y)));
 
     m_bpButtonHelp->SetBitmapLabel(*GlobalResources::getInstance().bitmapHelp);
+    m_bitmapByTime->SetBitmap(*GlobalResources::getInstance().bitmapCmpByTime);
+    m_bitmapByContent->SetBitmap(*GlobalResources::getInstance().bitmapCmpByContent);
 
     switch (cmpVar)
     {
@@ -648,6 +672,7 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parentWindow, const wxPoint& positi
         m_buttonTimeSize->SetFocus(); //set focus on the other button
         break;
     }
+    Fit();
 }
 
 
@@ -695,12 +720,18 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSetti
     m_bpButtonRemoveRow->SetBitmapLabel(*GlobalResources::getInstance().bitmapRemoveFolderPair);
 
     m_checkBoxIgnoreOneHour->SetValue(globalSettings.ignoreOneHourDiff);
+    m_checkBoxCopyLocked->SetValue(globalSettings.copyLockedFiles);
+
+#ifndef FFS_WIN
+m_staticTextCopyLocked->Hide();
+m_checkBoxCopyLocked->Hide();
+#endif
 
     set(globalSettings.gui.externelApplications);
 
     const wxString toolTip = wxString(_("Integrate external applications into context menu. The following macros are available:")) + wxT("\n\n") +
                              wxT("%name   \t") + _("- full file or directory name") + wxT("\n") +
-                             wxT("%dir      \t") + _("- directory part only") + wxT("\n") +
+                             wxT("%dir        \t") + _("- directory part only") + wxT("\n") +
                              wxT("%nameCo \t") + _("- Other side's counterpart to %name") + wxT("\n") +
                              wxT("%dirCo   \t") + _("- Other side's counterpart to %dir");
 
@@ -717,6 +748,7 @@ void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 {
     //write global settings only when okay-button is pressed!
     settings.ignoreOneHourDiff = m_checkBoxIgnoreOneHour->GetValue();
+    settings.copyLockedFiles   = m_checkBoxCopyLocked->GetValue();
 
     settings.gui.externelApplications = getExtApp();
 
@@ -740,6 +772,7 @@ void GlobalSettingsDlg::OnDefault(wxCommandEvent& event)
     xmlAccess::XmlGlobalSettings defaultCfg;
 
     m_checkBoxIgnoreOneHour->SetValue(defaultCfg.ignoreOneHourDiff);
+    m_checkBoxCopyLocked->SetValue(defaultCfg.copyLockedFiles);
     set(defaultCfg.gui.externelApplications);
 }
 
@@ -762,7 +795,7 @@ void GlobalSettingsDlg::set(const xmlAccess::ExternalApps& extApp)
     if (rowCount > 0)
         m_gridCustomCommand->DeleteRows(0, rowCount);
 
-    m_gridCustomCommand->AppendRows(extApp.size());
+    m_gridCustomCommand->AppendRows(static_cast<int>(extApp.size()));
     for (xmlAccess::ExternalApps::const_iterator i = extApp.begin(); i != extApp.end(); ++i)
     {
         const int row = i - extApp.begin();
@@ -919,10 +952,10 @@ void CompareStatus::updateStatusPanelNow()
             if (*i == wxChar('\n'))
                 *i = wxChar(' ');
 
-        //status texts 
+        //status texts
         if (m_textCtrlStatus->GetValue() != formattedStatusText && (screenChanged = true)) //avoid screen flicker
             m_textCtrlStatus->SetValue(formattedStatusText);
- 
+
         //nr of scanned objects
         const wxString scannedObjTmp = globalFunctions::numberToWxString(scannedObjects);
         if (m_staticTextScanned->GetLabel() != scannedObjTmp && (screenChanged = true)) //avoid screen flicker
@@ -942,7 +975,7 @@ void CompareStatus::updateStatusPanelNow()
             m_staticTextDataRemaining->SetLabel(remainingBytesTmp);
 
         if (statistics.get())
-        { 
+        {
             if (timeElapsed.Time() - lastStatCallSpeed >= 500) //call method every 500 ms
             {
                 lastStatCallSpeed = timeElapsed.Time();
@@ -1014,8 +1047,14 @@ SyncStatus::SyncStatus(StatusHandler* updater, wxWindow* parentWindow) :
     if (mainDialog)    //disable (main) window while this status dialog is shown
         mainDialog->Disable();
 
-    SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
     timeElapsed.Start(); //measure total time
+
+
+    SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
+
+    //register key event
+    Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(SyncStatus::OnKeyPressed), NULL, this);
+
 }
 
 
@@ -1030,6 +1069,16 @@ SyncStatus::~SyncStatus()
 
     if (minimizedToSysTray.get())
         minimizedToSysTray->keepHidden(); //avoid window flashing shortly before it is destroyed
+}
+
+
+void SyncStatus::OnKeyPressed(wxKeyEvent& event)
+{
+    const int keyCode = event.GetKeyCode();
+    if (keyCode == WXK_ESCAPE)
+        Close(); //generate close event: do NOT destroy window unconditionally!
+
+    event.Skip();
 }
 
 

@@ -1,7 +1,6 @@
 #include "functions.h"
 #include <wx/textctrl.h>
 #include <wx/filepicker.h>
-//#include "../shared/globalFunctions.h"
 #include "../shared/stringConv.h"
 #include "../shared/fileHandling.h"
 

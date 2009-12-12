@@ -39,6 +39,8 @@ public:
                const unsigned windowSizeRemainingTime,   //time in ms
                const unsigned windowSizeBytesPerSecond); //time in ms
 
+	~Statistics();
+
     void addMeasurement(const int objectsCurrent, const double dataCurrent);
     wxString getRemainingTime() const; //returns the remaining time in milliseconds
     wxString getBytesPerSecond() const;
@@ -66,7 +68,7 @@ private:
     };
 
     std::list<record> measurements;
-    std::auto_ptr<wxStopWatch> timer;
+    wxStopWatch* timer;
 };
 
 #endif // STATISTICS_H_INCLUDED

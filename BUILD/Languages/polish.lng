@@ -148,8 +148,6 @@
 <zaznaczone elementy>
 A newer version of FreeFileSync is available:
 Dostępna jest nowa wersja FreeFileSync:
-ATTENTION: Failed directory access can lead to file deletions!
-UWAGA: Niepoprawny dostęp do katalogu może spowodować utratę pliku!
 Abort requested: Waiting for current operation to finish...
 Żądanie przerwania: Czekaj na koniec aktualnie wykonywanego zadania...
 Aborted
@@ -158,10 +156,14 @@ About
 O Programie
 Action
 Akcja
+Activate filter
+Aktywuj filtr
 Add folder
 Dodaj folder
 Add folder pair
 Dodaj foldery do porównania
+All directories in sync!
+Wszystkie katalogi zsynchronizowane!
 An exception occured!
 Wystąpił wyjątek!
 As a result the files are separated into the following categories:
@@ -198,10 +200,6 @@ Category
 Kategoria
 Change direction
 Zmień kierunek
-Check all
-Sprawdź wszystko
-Choose to hide filtered files/directories from list
-Zaznacz aby ukryć przefiltrowane pliki/katalogi z listy
 Comma separated list
 Lista oddzielona przecinkami
 Commandline
@@ -242,8 +240,6 @@ Configuration saved!
 Konfiguracja zapisana!
 Configure filter
 Konfiguruj filtr
-Configure filter...
-Konfiguruj filtr...
 Configure your own synchronization rules.
 Skonfiguruj swoje własne zasady synchronizacji.
 Confirm
@@ -334,8 +330,6 @@ Directory
 Katalog
 Directory does not exist:
 Katalog nie istnieje:
-Do not display visual status information but write to a logfile instead
-Nie wyświetla graficznej informacji o statusie, ale tworzy plik z logami
 Do not show this dialog again
 Nie pokazuj tego okna ponownie
 Do nothing
@@ -406,12 +400,12 @@ Error writing file:
 Błąd zapisu pliku:
 Error writing to synchronization database:
 Błąd zapisu do bazy danych synchronizacji:
-Source directory does not exist anymore:
-Katalog źródłowy nie istnieje:
 Example
 Przykład
 Exclude
 Wyklucz
+Exclude all rows
+Wyklucz wszystkie rzędy
 Exclude temporarily
 Wyklucz tymczasowo
 Exclude via filter:
@@ -422,6 +416,8 @@ Exit with RC < 0
 Zakończ z RC < 0
 External applications
 Aplikacje zewnętrzne
+Fatal Error
+Błąd krytyczny
 Feedback and suggestions are welcome at:
 Komentarze i sugestie mile widziane na:
 File %x has an invalid date!
@@ -466,12 +462,14 @@ Files/folders that exist on right side only
 Pliki/katalogi istniejące tylko po prawej stronie
 Filter
 Filtr
-Filter active: Press again to deactivate
-Filtr aktywny: Kliknij ponownie aby wyłączyć
 Filter files
 Filtruj pliki
+Filter has been selected
+Filtr został zaznaczony
 Filter view
 Filtr podglądu
+Filtering is deactivated
+Filtrowanie jest wyłączone
 Folder Comparison and Synchronization
 Porównywanie i Synchronizacja folderów
 Free disk space available:
@@ -494,6 +492,8 @@ Generating database...
 Generowanie bazy danych...
 Generating file list...
 Generowanie listy plików...
+Global filter
+Filtr globalny
 Global settings
 Ustawienia programu
 Help
@@ -504,6 +504,8 @@ Hide all error and warning messages
 Ukryj wszystkie informacje błędach i ostrzeżeniach
 Hide conflicts
 Ukryj konflikty
+Hide excluded items
+Ukryj wykluczone pliki
 Hide files that are different
 Ukryj pliki, które są różne
 Hide files that are equal
@@ -530,14 +532,16 @@ Hide files that will be overwritten on right side
 Ukryj pliki, które zostaną nadpisane po prawej stronie
 Hide files that won't be copied
 Ukryj pliki, które nie będą kopiowane
-Hide filtered items
-Ukryj elementy przefiltrowane
+Hide filtered or temporarily excluded files
+Ukryj pliki filtrowane lub tymczasowo wykluczone
 Hide further error messages during the current process
 Ukryj kolejne informacje o błędach dla tego zadania
 Hints:
 Wskazówki:
 Homepage
 Strona domowa
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+Wykryj i zastosuj zmiany po obu stronach używając bazy danych. Usunięcia i konflikty są wykrywane automatycznie.
 If you like FFS
 Jeżeli Ci się podoba
 Ignore 1-hour file time difference
@@ -552,6 +556,8 @@ Ignore this error, retry or abort?
 Ignorować błąd, powtórzyć albo zakończyć?
 Include
 Dołącz
+Include all rows
+Dołącz wszystkie rzędy
 Include temporarily
 Dołącz tymczasowo
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
@@ -562,8 +568,8 @@ Info
 Info
 Information
 Informacja
-Initial synchronization.
-Wstępna synchronizacja.
+Initial synchronization:
+Wstępna synchronizacja:
 Integrate external applications into context menu. The following macros are available:
 Dołącz zewnętrzną aplikację do menu kontekstowego. Dostępne macra:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +584,8 @@ Load configuration from file
 Wczytaj konfigurację z pliku
 Load configuration history (press DEL to delete items)
 Wczytaj historie konfiguracji (naciśnij Del aby usunąć element)
+Local filter
+Filtr lokalny
 Log-messages:
 Logi:
 Logging
@@ -602,8 +610,8 @@ Moving folder %x to user-defined directory %y
 Przenoszenie folderu %x do katalogu użytkownika %y
 Multiple...
 Wiele...
-No database file existing yet:
-Brak pliku bazy danych:
+No filter selected
+Nie wybrano żadnego filtra
 Not enough free disk space available in:
 Brak wystarczającej przestrzeni dyskowej na:
 Nothing to synchronize according to configuration!
@@ -638,8 +646,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Skopiuj odpowiedni plik \"Shadow.dll\" (ulokowany w \"Shadow.zip\") do folderu z instalacją FreeFileSync aby uaktywnić tą opcję.
 Please fill all empty directory fields.
 Podaj foldery do synchronizacji.
-Press button to activate filter
-Kliknij aby aktywować filtr
+Please run a Compare first before synchronizing!
+Przed synchronizacją należy uruchomić Porównaj!
 Published under the GNU General Public License:
 Udostępnione na zasadach licencji GNU General Public License:
 Question
@@ -660,12 +668,16 @@ Remove folder
 Usuń folder
 Remove folder pair
 Usuń parę folderów
+Remove local filter settings
+Usuń ustawienia lokalnego filtra
 Report translation error
 Zgłoś błąd w tłumaczeniu
 Reset
 Resetuj
 Right
 Prawy
+Run minimized and write status information to a logfile
+Uruchom w trybie ukrytym i zapisz informacje w logu
 S&ave configuration
 Z&apisz konfigurację
 S&witch view
@@ -680,14 +692,14 @@ Scanning:
 Skanowanie:
 Select a folder
 Wybierz folder
-Select alternate filter settings
-Stwórz alternatywne ustawienia filtra
 Select alternate synchronization settings
 Stwórz alternatywne reguły synchronizacji
 Select logfile directory:
 Wybierz katalog z logami:
 Select variant:
 Wybierz wariant:
+Setting default synchronization directions. Please check whether they are appropriate for you.
+Ustawiono domyślne kierunki synchronizacji. Sprawdź czy są dla Ciebie odpowiednie.
 Show conflicts
 Pokaż konflikty
 Show file icons
@@ -732,6 +744,8 @@ Size
 Rozmiar
 Source code written completely in C++ utilizing:
 Kod źródłowy napisany całkowicie w C++ z wykorzystaniem:
+Source directory does not exist anymore:
+Katalog źródłowy nie istnieje:
 Speed:
 Prędkość:
 Start
@@ -772,8 +786,12 @@ Target directory already existing!
 Katalog docelowy już istnieje!
 Target file already existing!
 Plik docelowy już istnieje!
+The database file is not yet existing, but will be created during synchronization:
+Plik bazy danych nie istnieje, ale zostanie utworzony podczas synchronizacji:
 The file does not contain a valid configuration:
 Nieprawidłowy format pliku:
+The required database entry is not yet existing, but will be created during synchronization:
+Wymagany wpis bazy danych nie istnieje, ale zostanie utworzony podczas synchronizacji:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Ten wariant traktuje dwa pliki jako równe w przypadku gdy mają jednakowy rozmiar oraz tą samą datę i czas ostatniej modyfikacji.
 Time
@@ -798,8 +816,6 @@ Unable to create logfile!
 Nie można utworzyć pliku z logami!
 Unable to initialize Recycle Bin!
 Nie można zainicjalizować Kosz!
-Uncheck all
-Odznacz wszystko
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Istnieją nierozwiązane konflikty! \n\nMożesz je zignorować i kontynułować synchronizację.
 Update ->
@@ -814,8 +830,6 @@ User-defined directory
 Katalog użytkownika
 User-defined directory for deletion was not specified!
 Katalog użytkownika dla elementów usuniętych nie został określony!
-Using default synchronization directions. Please recheck.
-Ustawione są domyślne kierunki synchronizacji. Sprawdź ponownie.
 Variant
 Wariant
 Verifying file %x

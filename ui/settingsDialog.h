@@ -7,6 +7,7 @@
 
 class BatchFileDropEvent;
 class BatchFolderPairPanel;
+class FirstBatchFolderPairCfg;
 
 namespace FreeFileSync
 {
@@ -97,7 +98,8 @@ private:
 class BatchDialog: public BatchDlgGenerated
 {
     friend class BatchFileDropEvent;
-    friend class BatchFolderPairPanel;
+    template <class GuiPanel>
+    friend class FolderPairCallback;
 
 public:
     BatchDialog(wxWindow* window, const xmlAccess::XmlBatchConfig& batchCfg);
@@ -135,6 +137,8 @@ private:
     void removeAddFolderPair(const int pos);
     void clearAddFolderPairs();
 
+void updateGuiForFolderPair();
+
     FreeFileSync::CompareVariant getCurrentCompareVar() const;
 
     void updateConfigIcons(const FreeFileSync::CompareVariant cmpVar, const FreeFileSync::SyncConfiguration& syncConfig);
@@ -163,6 +167,8 @@ private:
     xmlAccess::XmlBatchConfig getCurrentConfiguration() const;
 
     FreeFileSync::SyncConfiguration localSyncConfiguration;
+
+    boost::shared_ptr<FirstBatchFolderPairCfg> firstFolderPair; //always bound!!!
     std::vector<BatchFolderPairPanel*> additionalFolderPairs;
 
     //used when saving batch file
@@ -170,11 +176,6 @@ private:
 
     //add drag & drop support when selecting logfile directory
     std::auto_ptr<FreeFileSync::DragDropOnDlg> dragDropOnLogfileDir;
-
-    //support for drag and drop on main pair
-    std::auto_ptr<FreeFileSync::DragDropOnDlg> dragDropOnLeft;
-    std::auto_ptr<FreeFileSync::DragDropOnDlg> dragDropOnRight;
-
     std::auto_ptr<FreeFileSync::DragDropOnDlg> dragDropCustomDelFolder;
 };
 

@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Win32)">
+	<META NAME="CREATED" CONTENT="20091206;16574000">
+	<META NAME="CHANGED" CONTENT="20091213;16013600">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 2cm }
+		P { margin-bottom: 0.21cm }
+		H3 { margin-bottom: 0.21cm }
+		H3.western { font-family: "Arial", sans-serif }
+		H3.cjk { font-family: "MS Mincho" }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="de-DE" DIR="LTR">
+<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Create regular
+backups with time-stamped directory names</FONT></H3>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">You can
+use macros <FONT FACE="Courier New, monospace">%time%</FONT>, <FONT FACE="Courier New, monospace">%date%</FONT>
+within directory names you want to synchronize.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Let's
+assume you have a directory &quot;<FONT FACE="Courier New, monospace">C:\Source</FONT>&quot;
+which you want to backup each day into a time-stamped target
+directory like &quot;<FONT FACE="Courier New, monospace">C:\Target_2009-10-08</FONT>&quot;.
+All that needs to be done is setting up base directories like these:</FONT></P>
+<UL>
+	<P STYLE="margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+		<UL>
+			<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Source
+			folder: &quot;<FONT FACE="Courier New, monospace">C:\Source</FONT>&quot;<BR>Target
+			folder: &quot;<FONT FACE="Courier New, monospace">C:\Target_%date%</FONT>&quot;</FONT></P>
+		</UL>
+	</SPAN><BR CLEAR=LEFT>
+	</P>
+</UL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Latter
+will be interactively replaced with the current date during
+synchronization. In order to further automate this process, you can
+create a *.ffs_batch file with this configuration and choose &quot;<I>ignore
+errors</I>&quot; to avoid the warning that target directory is not
+(yet) existing.</FONT></P>
+</BODY>
+</HTML>

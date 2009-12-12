@@ -100,7 +100,7 @@
 			<Add option="-DZSTRING_WIDE_CHAR" />
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
 			<Add directory="C:\Programme\C++\wxWidgets\contrib\include" />
-			<Add directory="shared\boost_1_40_0" />
+			<Add directory="shared\boost_1_x" />
 			<Add directory="shared" />
 		</Compiler>
 		<ResourceCompiler>
@@ -117,6 +117,7 @@
 			<Add library="libgdi32.a" />
 			<Add library="libcomdlg32.a" />
 			<Add library="libws2_32.a" />
+			<Add library="libwinmm.a" />
 			<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 		</Linker>
 		<Unit filename="WxWizFrame.fbp">
@@ -245,6 +246,8 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="shared\customComboBox.cpp" />
+		<Unit filename="shared\customComboBox.h" />
 		<Unit filename="shared\customTooltip.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
@@ -253,6 +256,8 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="shared\dllLoader.cpp" />
+		<Unit filename="shared\dllLoader.h" />
 		<Unit filename="shared\dragAndDrop.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
@@ -272,6 +277,8 @@
 		<Unit filename="shared\guid.h" />
 		<Unit filename="shared\localization.cpp" />
 		<Unit filename="shared\localization.h" />
+		<Unit filename="shared\serialize.cpp" />
+		<Unit filename="shared\serialize.h" />
 		<Unit filename="shared\shadow.cpp" />
 		<Unit filename="shared\shadow.h" />
 		<Unit filename="shared\standardPaths.cpp" />

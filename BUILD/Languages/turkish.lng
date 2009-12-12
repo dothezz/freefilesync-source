@@ -156,10 +156,14 @@ About
 Hakkında
 Action
 İşlem
+Activate filter
+
 Add folder
 Klasör ekle
 Add folder pair
 Klasör çifti ekle
+All directories in sync!
+
 An exception occured!
 Olağan dışı bir durum oluştu!
 As a result the files are separated into the following categories:
@@ -196,10 +200,6 @@ Category
 Kategori
 Change direction
 Yönü değiştir
-Check all
-Tümünü işaretle
-Choose to hide filtered files/directories from list
-Listedeki filtrelenmiş dosyaları/dizinleri gizlemek seçiniz
 Comma separated list
 Virgül ile ayrılmış liste
 Commandline
@@ -240,8 +240,6 @@ Configuration saved!
 Konfigürasyon kaydedildi!
 Configure filter
 Filtrelemeyi ayarla
-Configure filter...
-Filtrelemeyi ayarla...
 Configure your own synchronization rules.
 Kendi senkronizasyon kurallarınızı ayarlayın.
 Confirm
@@ -332,8 +330,6 @@ Directory
 Dizin
 Directory does not exist:
 Dizin mevcut değil:
-Do not display visual status information but write to a logfile instead
-Görsel durum bilgisini ekrana getirme, fakat bir kayıt dosyasına yaz
 Do not show this dialog again
 Bu iletiyi tekrar gösterme
 Do nothing
@@ -408,6 +404,8 @@ Example
 Örnek
 Exclude
 Dışarda bırak
+Exclude all rows
+
 Exclude temporarily
 Geçici olarak dışarda bırak
 Exclude via filter:
@@ -418,6 +416,8 @@ Exit with RC < 0
 RC < 0 ile çık
 External applications
 Harici uygulamalar
+Fatal Error
+
 Feedback and suggestions are welcome at:
 Geri bildirim ve öneriler için:
 File %x has an invalid date!
@@ -462,12 +462,14 @@ Files/folders that exist on right side only
 Sadece sağ tarafta mevcut olan dosyalar/klasörler
 Filter
 Filtre
-Filter active: Press again to deactivate
-Filtre etkin: Etkinliğini kaldırmak için tekrar basın
 Filter files
 Fltre dosyaları
+Filter has been selected
+
 Filter view
 Filtre görünümü
+Filtering is deactivated
+
 Folder Comparison and Synchronization
 Klasör Karşılaştırması ve Senkronizasyonu
 Free disk space available:
@@ -490,6 +492,8 @@ Generating database...
 Veri tabaný yaratýlýyor...
 Generating file list...
 Dosya listesi oluşturuluyor...
+Global filter
+
 Global settings
 Genel ayarlar
 Help
@@ -500,6 +504,8 @@ Hide all error and warning messages
 Hata ve uyarı mesajlarını gösterme
 Hide conflicts
 Tutarsızlıkları gösterme
+Hide excluded items
+
 Hide files that are different
 Farklı olan dosyaları gösterme
 Hide files that are equal
@@ -526,14 +532,16 @@ Hide files that will be overwritten on right side
 Sağ tarafta üzerine yazılacak dosyaları gösterme
 Hide files that won't be copied
 Kopyalanmayacak dosyaları gösterme
-Hide filtered items
-Filtrelenmiş olanları gösterme
+Hide filtered or temporarily excluded files
+
 Hide further error messages during the current process
 Devam eden işlem süresince daha fazla hata mesajı gösterme
 Hints:
 İpuçları:
 Homepage
 Ana sayfa
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+
 If you like FFS
 Eğer FFS’i sevdiyseniz
 Ignore 1-hour file time difference
@@ -548,6 +556,8 @@ Ignore this error, retry or abort?
 Bu hatayı yoksay, yeniden dene veya vazgeç?
 Include
 Dahil et
+Include all rows
+
 Include temporarily
 Geçici olarak dahil et
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
@@ -558,8 +568,8 @@ Info
 Bilgi
 Information
 Bilgi
-Initial synchronization.
-Baþlangýç senkronizasyonu.
+Initial synchronization:
+Baþlangýç senkronizasyonu:
 Integrate external applications into context menu. The following macros are available:
 Harici uygulamaları içerik menüsüne ekle. Şu makro’lar temin edilebilir:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -574,6 +584,8 @@ Load configuration from file
 Dosyadan konfigürasyonu yükle
 Load configuration history (press DEL to delete items)
 Konfigürasyon geçmişini yükle (Öğeleri silmek için DEL’e basın)
+Local filter
+
 Log-messages:
 Kayıt mesajları:
 Logging
@@ -598,8 +610,8 @@ Moving folder %x to user-defined directory %y
 %x klasörü kullanıcı tanımlı dizin %y’e taşınıyor
 Multiple...
 Çoklu...
-No database file existing yet:
-Henüz mevcut bir veritabaný yok:
+No filter selected
+
 Not enough free disk space available in:
 Yeterli disk alanı yok :
 Nothing to synchronize according to configuration!
@@ -634,8 +646,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Bu özelliği etkinleştirmek için FreeFileSync’in kurulum dizinine \"Shadow.dll\" (\"Shadow.zip\" sıkıştırılmış dosyasındaki uygun olanı) kopyalayın.
 Please fill all empty directory fields.
 Lütfen boş dizin alanlarını doldurunuz.
-Press button to activate filter
-Filtrelemeyi etkinleştirmek için tuşa basın
+Please run a Compare first before synchronizing!
+
 Published under the GNU General Public License:
 “GNU General Public License”a uygun olarak yayımlanmıştır:
 Question
@@ -656,12 +668,16 @@ Remove folder
 Klasörü kaldır
 Remove folder pair
 Klasör çiftini kaldır
+Remove local filter settings
+
 Report translation error
 Çeviri hatasını bildir
 Reset
 Sıfırla
 Right
 Sağ
+Run minimized and write status information to a logfile
+
 S&ave configuration
 Konfigürasyonu &kaydet 
 S&witch view
@@ -676,14 +692,14 @@ Scanning:
 Taranıyor:
 Select a folder
 Bir klasör seç
-Select alternate filter settings
-Alternatif filtreleme ayarı seç
 Select alternate synchronization settings
 Alternatif senkronizasyon ayarı seç
 Select logfile directory:
 Kayıt dosyası dizinini seç:
 Select variant:
 Değişkeni seç:
+Setting default synchronization directions. Please check whether they are appropriate for you.
+
 Show conflicts
 Tutarsızlıkları göster
 Show file icons
@@ -770,8 +786,12 @@ Target directory already existing!
 Hedef dizin zaten mevcut!
 Target file already existing!
 Hedef dosya zaten mevcut!
+The database file is not yet existing, but will be created during synchronization:
+
 The file does not contain a valid configuration:
 Dosya geçerli bir konfigürasyon içermiyor:
+The required database entry is not yet existing, but will be created during synchronization:
+
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Bu değişken, aynı isimli iki dosyanın, aynı ebata ve aynı son değişikik tarihine sahip olması durumunda eşit olması anlamına gelir.
 Time
@@ -796,8 +816,6 @@ Unable to create logfile!
 Kayıt dosyası yaratılamıyor!
 Unable to initialize Recycle Bin!
 Geri dönüşüm kutusu başlatılamıyor!
-Uncheck all
-Tüm işaretlemeleri kaldır
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Çözülemeyen tutarsızlık mevcut! \n\nTutarsızlıkları yoksayıp senkronizasyona devam edebilirsiniz.
 Update ->
@@ -812,8 +830,6 @@ User-defined directory
 Kullanıcı tanımlı dizin
 User-defined directory for deletion was not specified!
 Silme için kulllanıcı tanımlı dizin belirtilmemiş!
-Using default synchronization directions. Please recheck.
-Ön tanýmlý senkronizasyon yönlerini kullanarak. Lütfen yeniden kontrol edin.
 Variant
 Değişken
 Verifying file %x

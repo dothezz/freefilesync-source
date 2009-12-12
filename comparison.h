@@ -8,32 +8,25 @@ class StatusHandler;
 
 namespace FreeFileSync
 {
-class FilterProcess;
 
 struct FolderPairCfg
 {
     FolderPairCfg(const Zstring& leftDir,
                   const Zstring& rightDir,
-                  bool filterAct,
-                  const Zstring& include,
-                  const Zstring& exclude,
+                  const FilterProcess::FilterRef& filterIn,
                   const SyncConfiguration& syncCfg) :
         leftDirectory(leftDir),
         rightDirectory(rightDir),
-        filterIsActive(filterAct),
-        includeFilter(include),
-        excludeFilter(exclude),
+        filter(filterIn),
         syncConfiguration(syncCfg) {}
 
     Zstring leftDirectory;
     Zstring rightDirectory;
 
-    bool filterIsActive;
-    Zstring includeFilter;
-    Zstring excludeFilter;
-
+    FilterProcess::FilterRef filter; //filter interface: always bound by design!
     SyncConfiguration syncConfiguration;
 };
+
 std::vector<FolderPairCfg> extractCompareCfg(const MainConfiguration& mainCfg);
 
 

@@ -26,25 +26,29 @@ using namespace FreeFileSync;
 
 std::vector<FreeFileSync::FolderPairCfg> FreeFileSync::extractCompareCfg(const MainConfiguration& mainCfg)
 {
+    //merge first and additional pairs
+    std::vector<FolderPairEnh> allPairs;
+    allPairs.push_back(mainCfg.firstPair);
+    allPairs.insert(allPairs.end(),
+                    mainCfg.additionalPairs.begin(), //add additional pairs
+                    mainCfg.additionalPairs.end());
+
+    const FilterProcess::FilterRef globalFilter(new NameFilter(mainCfg.includeFilter, mainCfg.excludeFilter));
+
     std::vector<FolderPairCfg> output;
-
-    //add main pair
-    output.push_back(
-        FolderPairCfg(mainCfg.mainFolderPair.leftDirectory,
-                      mainCfg.mainFolderPair.rightDirectory,
-                      mainCfg.filterIsActive,
-                      mainCfg.includeFilter,
-                      mainCfg.excludeFilter,
-                      mainCfg.syncConfiguration));
-
-    //add additional pairs
-    for (std::vector<FolderPairEnh>::const_iterator i = mainCfg.additionalPairs.begin(); i != mainCfg.additionalPairs.end(); ++i)
+    for (std::vector<FolderPairEnh>::const_iterator i = allPairs.begin(); i != allPairs.end(); ++i)
         output.push_back(
             FolderPairCfg(i->leftDirectory,
                           i->rightDirectory,
-                          mainCfg.filterIsActive,
-                          i->altFilter.get() ? i->altFilter->includeFilter : mainCfg.includeFilter,
-                          i->altFilter.get() ? i->altFilter->excludeFilter : mainCfg.excludeFilter,
+
+                          mainCfg.filterIsActive ?
+                          combineFilters(globalFilter,
+                                         FilterProcess::FilterRef(
+                                             new NameFilter(
+                                                     i->localFilter.includeFilter,
+                                                     i->localFilter.excludeFilter))) :
+                          FilterProcess::FilterRef(new NullFilter),
+
                           i->altSyncConfig.get() ? i->altSyncConfig->syncConfiguration : mainCfg.syncConfiguration));
 
     return output;
@@ -52,19 +56,12 @@ std::vector<FreeFileSync::FolderPairCfg> FreeFileSync::extractCompareCfg(const M
 
 
 
-
-
-
-
-template <bool filterActive>
 class BaseDirCallback;
 
-
-template <bool filterActive>
 class DirCallback : public FreeFileSync::TraverseCallback
 {
 public:
-    DirCallback(BaseDirCallback<filterActive>* baseCallback,
+    DirCallback(BaseDirCallback* baseCallback,
                 const Zstring& relNameParentPf, //postfixed with FILE_NAME_SEPARATOR!
                 DirContainer& output,
                 StatusHandler* handler) :
@@ -80,7 +77,7 @@ public:
     virtual ReturnValue onError(const wxString& errorText);
 
 private:
-    BaseDirCallback<filterActive>* const baseCallback_;
+    BaseDirCallback* const baseCallback_;
     const Zstring relNameParentPf_;
     DirContainer& output_;
     StatusHandler* const statusHandler;
@@ -88,29 +85,28 @@ private:
 
 
 
-template <bool filterActive>
-class BaseDirCallback : public DirCallback<filterActive>
+class BaseDirCallback : public DirCallback
 {
-    friend class DirCallback<filterActive>;
+    friend class DirCallback;
 public:
-    BaseDirCallback(DirContainer& output, const FilterProcess* filter, StatusHandler* handler) :
-        DirCallback<filterActive>(this, Zstring(), output, handler),
+    BaseDirCallback(DirContainer& output, const FilterProcess::FilterRef& filter, StatusHandler* handler) :
+        DirCallback(this, Zstring(), output, handler),
         textScanning(wxToZ(wxString(_("Scanning:")) + wxT(" \n"))),
         filterInstance(filter) {}
 
     virtual TraverseCallback::ReturnValue onFile(const DefaultChar* shortName, const Zstring& fullName, const TraverseCallback::FileInfo& details);
 
 private:
-    typedef boost::shared_ptr<const DirCallback<filterActive> > CallbackPointer;
+    typedef boost::shared_ptr<const DirCallback> CallbackPointer;
 
     const Zstring textScanning;
     std::vector<CallbackPointer> callBackBox;  //collection of callback pointers to handle ownership
-    const FilterProcess* const filterInstance; //must NOT be NULL if (filterActive)
+
+    const FilterProcess::FilterRef filterInstance; //always bound!
 };
 
 
-template <bool filterActive>
-TraverseCallback::ReturnValue DirCallback<filterActive>::onFile(const DefaultChar* shortName, const Zstring& fullName, const FileInfo& details)
+TraverseCallback::ReturnValue DirCallback::onFile(const DefaultChar* shortName, const Zstring& fullName, const FileInfo& details)
 {
     //assemble status message (performance optimized)  = textScanning + wxT("\"") + fullName + wxT("\"")
     Zstring statusText = baseCallback_->textScanning;
@@ -124,13 +120,10 @@ TraverseCallback::ReturnValue DirCallback<filterActive>::onFile(const DefaultCha
 
 //------------------------------------------------------------------------------------
     //apply filter before processing (use relative name!)
-    if (filterActive)
+    if (!baseCallback_->filterInstance->passFileFilter(relNameParentPf_ + shortName))
     {
-        if (!baseCallback_->filterInstance->passFileFilter(relNameParentPf_ + shortName))
-        {
-            statusHandler->requestUiRefresh();
-            return TRAVERSING_CONTINUE;
-        }
+        statusHandler->requestUiRefresh();
+        return TRAVERSING_CONTINUE;
     }
 
     output_.addSubFile(shortName, FileDescriptor(details.lastWriteTimeRaw, details.fileSize));
@@ -144,8 +137,7 @@ TraverseCallback::ReturnValue DirCallback<filterActive>::onFile(const DefaultCha
 }
 
 
-template <bool filterActive>
-TraverseCallback::ReturnValDir DirCallback<filterActive>::onDir(const DefaultChar* shortName, const Zstring& fullName)
+TraverseCallback::ReturnValDir DirCallback::onDir(const DefaultChar* shortName, const Zstring& fullName)
 {
     using globalFunctions::FILE_NAME_SEPARATOR;
 
@@ -164,27 +156,25 @@ TraverseCallback::ReturnValDir DirCallback<filterActive>::onDir(const DefaultCha
     relName += shortName;
 
     //apply filter before processing (use relative name!)
-    if (filterActive)
+    bool subObjMightMatch = true;
+    if (!baseCallback_->filterInstance->passDirFilter(relName, &subObjMightMatch))
     {
-        bool subObjMightMatch = true;
-        if (!baseCallback_->filterInstance->passDirFilter(relName, &subObjMightMatch))
+        statusHandler->requestUiRefresh();
+
+        if (subObjMightMatch)
         {
-            statusHandler->requestUiRefresh();
+            DirContainer& subDir = output_.addSubDir(shortName);
 
-            if (subObjMightMatch)
-            {
-                DirContainer& subDir = output_.addSubDir(shortName);
+            DirCallback* subDirCallback = new DirCallback(baseCallback_, relName += FILE_NAME_SEPARATOR, subDir, statusHandler);
+            baseCallback_->callBackBox.push_back(BaseDirCallback::CallbackPointer(subDirCallback)); //handle ownership
 
-                DirCallback* subDirCallback = new DirCallback(baseCallback_, relName += FILE_NAME_SEPARATOR, subDir, statusHandler);
-                baseCallback_->callBackBox.push_back(typename BaseDirCallback<filterActive>::CallbackPointer(subDirCallback)); //handle ownership
-
-                //attention: ensure directory filtering is applied to exclude actually filtered directories
-                return ReturnValDir(ReturnValDir::Continue(), subDirCallback);
-            }
-            else
-                return ReturnValDir::Ignore(); //do NOT traverse subdirs
+            //attention: ensure directory filtering is applied later to exclude actually filtered directories
+            return ReturnValDir(ReturnValDir::Continue(), subDirCallback);
         }
+        else
+            return ReturnValDir::Ignore(); //do NOT traverse subdirs
     }
+
 
     DirContainer& subDir = output_.addSubDir(shortName);
 
@@ -194,14 +184,13 @@ TraverseCallback::ReturnValDir DirCallback<filterActive>::onDir(const DefaultCha
     statusHandler->requestUiRefresh();
 
     DirCallback* subDirCallback = new DirCallback(baseCallback_, relName += FILE_NAME_SEPARATOR, subDir, statusHandler);
-    baseCallback_->callBackBox.push_back(typename BaseDirCallback<filterActive>::CallbackPointer(subDirCallback)); //handle ownership
+    baseCallback_->callBackBox.push_back(BaseDirCallback::CallbackPointer(subDirCallback)); //handle ownership
 
     return ReturnValDir(ReturnValDir::Continue(), subDirCallback);
 }
 
 
-template <bool filterActive>
-TraverseCallback::ReturnValue DirCallback<filterActive>::onError(const wxString& errorText)
+TraverseCallback::ReturnValue DirCallback::onError(const wxString& errorText)
 {
     while (true)
     {
@@ -218,8 +207,7 @@ TraverseCallback::ReturnValue DirCallback<filterActive>::onError(const wxString&
 }
 
 
-template <bool filterActive>
-TraverseCallback::ReturnValue BaseDirCallback<filterActive>::onFile(
+TraverseCallback::ReturnValue BaseDirCallback::onFile(
     const DefaultChar* shortName,
     const Zstring& fullName,
     const TraverseCallback::FileInfo& details)
@@ -232,7 +220,7 @@ TraverseCallback::ReturnValue BaseDirCallback<filterActive>::onFile(
 #endif
         return TraverseCallback::TRAVERSING_CONTINUE;
 
-    return DirCallback<filterActive>::onFile(shortName, fullName, details);
+    return DirCallback::onFile(shortName, fullName, details);
 }
 
 
@@ -240,12 +228,14 @@ TraverseCallback::ReturnValue BaseDirCallback<filterActive>::onFile(
 struct DirBufferKey
 {
     DirBufferKey(const Zstring& dirname,
-                 boost::shared_ptr<const FilterProcess>& filterInst) :
+                 const FilterProcess::FilterRef& filterIn) : //filter interface: always bound by design!
         directoryName(dirname),
-        filterInstance(filterInst) {}
+        filter(filterIn->isNull() ? //some optimization of "Null" filter
+               FilterProcess::FilterRef(new NullFilter) :
+               filterIn) {}
 
-    Zstring directoryName;
-    boost::shared_ptr<const FilterProcess> filterInstance; //buffering has to consider filtering!
+    const Zstring directoryName;
+    const FilterProcess::FilterRef filter;  //buffering has to consider filtering!
 
     bool operator < (const DirBufferKey& b) const
     {
@@ -257,9 +247,7 @@ struct DirBufferKey
         if (rv != 0)
             return rv < 0;
 
-        return filterInstance.get() && b.filterInstance.get() ?
-               *filterInstance < *b.filterInstance :
-               filterInstance.get() < b.filterInstance.get(); //at least one of these is NULL
+        return *filter < *b.filter;
     }
 };
 
@@ -272,13 +260,12 @@ public:
         m_traverseDirectorySymlinks(traverseDirectorySymlinks),
         m_statusUpdater(statusUpdater) {}
 
-    const DirContainer& getDirectoryDescription(const Zstring& directoryPostfixed, bool filterActive, const Zstring& includeFilter, const Zstring& excludeFilter);
+    const DirContainer& getDirectoryDescription(const Zstring& directoryPostfixed, const FilterProcess::FilterRef& filter);
 
 private:
     typedef boost::shared_ptr<DirContainer> DirBufferValue; //exception safety: avoid memory leak
     typedef std::map<DirBufferKey, DirBufferValue> BufferType;
 
-    static DirBufferKey createKey(const Zstring& directoryPostfixed, bool filterActive, const Zstring& includeFilter, const Zstring& excludeFilter);
     DirContainer& insertIntoBuffer(const DirBufferKey& newKey);
 
     BufferType buffer;
@@ -288,17 +275,6 @@ private:
 };
 //------------------------------------------------------------------------------------------
 
-
-DirBufferKey CompareProcess::DirectoryBuffer::createKey(const Zstring& directoryPostfixed, bool filterActive, const Zstring& includeFilter, const Zstring& excludeFilter)
-{
-    boost::shared_ptr<const FilterProcess> filterInstance(
-        filterActive && FilterProcess(includeFilter, excludeFilter) != FilterProcess::nullFilter() ? //nullfilter: in: '*', ex ''
-        new FilterProcess(includeFilter, excludeFilter) : NULL);
-
-    return DirBufferKey(directoryPostfixed, filterInstance);
-}
-
-
 DirContainer& CompareProcess::DirectoryBuffer::insertIntoBuffer(const DirBufferKey& newKey)
 {
     DirBufferValue baseContainer(new DirContainer);
@@ -306,9 +282,7 @@ DirContainer& CompareProcess::DirectoryBuffer::insertIntoBuffer(const DirBufferK
 
     if (FreeFileSync::dirExists(newKey.directoryName.c_str())) //folder existence already checked in startCompareProcess(): do not treat as error when arriving here!
     {
-        std::auto_ptr<TraverseCallback> traverser(newKey.filterInstance.get() ?
-                static_cast<TraverseCallback*>(new BaseDirCallback<true>(*baseContainer.get(), newKey.filterInstance.get(), m_statusUpdater)) :
-                static_cast<TraverseCallback*>(new BaseDirCallback<false>(*baseContainer.get(), NULL, m_statusUpdater)));
+        std::auto_ptr<TraverseCallback> traverser(new BaseDirCallback(*baseContainer, newKey.filter, m_statusUpdater));
 
         //get all files and folders from directoryPostfixed (and subdirectories)
         traverseFolder(newKey.directoryName, m_traverseDirectorySymlinks, traverser.get()); //exceptions may be thrown!
@@ -319,11 +293,9 @@ DirContainer& CompareProcess::DirectoryBuffer::insertIntoBuffer(const DirBufferK
 
 const DirContainer& CompareProcess::DirectoryBuffer::getDirectoryDescription(
     const Zstring& directoryPostfixed,
-    bool filterActive,
-    const Zstring& includeFilter,
-    const Zstring& excludeFilter)
+    const FilterProcess::FilterRef& filter)
 {
-    const DirBufferKey searchKey = createKey(directoryPostfixed, filterActive, includeFilter, excludeFilter);
+    const DirBufferKey searchKey(directoryPostfixed, filter);
 
     BufferType::const_iterator entryFound = buffer.find(searchKey);
     if (entryFound != buffer.end())
@@ -396,13 +368,24 @@ void foldersAreValidForComparison(const std::vector<FolderPairCfg>& folderPairsF
 bool dependencyExists(const std::set<Zstring>& folders, const Zstring& newFolder, wxString& warningMessage)
 {
     for (std::set<Zstring>::const_iterator i = folders.begin(); i != folders.end(); ++i)
-        if (newFolder.StartsWith(*i) || i->StartsWith(newFolder))
+    {
+        Zstring newFolderFmt = newFolder;
+        Zstring refFolderFmt = *i;
+#ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
+        newFolderFmt.MakeLower();
+        refFolderFmt.MakeLower();
+#elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
+        //nothing to do here
+#endif
+
+        if (newFolderFmt.StartsWith(refFolderFmt) || refFolderFmt.StartsWith(newFolderFmt))
         {
             warningMessage = wxString(_("Directories are dependent! Be careful when setting up synchronization rules:")) + wxT("\n") +
-                             wxT("\"") + zToWx(*i) + wxT("\",\n") +
+                             wxT("\"") + zToWx(*i) + wxT("\"\n") +
                              wxT("\"") + zToWx(newFolder) + wxT("\"");
             return true;
         }
+    }
     return false;
 }
 
@@ -607,15 +590,6 @@ void formatPair(FolderPairCfg& input)
 
 //#############################################################################################################################
 
-//filters and removes all excluded directories (but keeps those serving as parent folders)
-void filterAndRemoveDirs(BaseDirMapping& baseDir, const Zstring& include, const Zstring& exclude)
-{
-    FilterProcess filterProc(include, exclude);
-
-    RemoveFilteredDirs(filterProc).execute(baseDir);
-}
-
-
 void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& directoryPairs,
         const CompareVariant cmpVar,
         FolderComparison& output)
@@ -669,8 +643,11 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& direc
             const FolderPairCfg& fpCfg = directoryPairsFormatted[j - output_tmp.begin()];
 
             //attention: some filtered directories are still in the comparison result! (see include filter handling!)
-            if (fpCfg.filterIsActive) //let's filter them now... (and remove those that contain excluded elements only)
-                filterAndRemoveDirs(*j, fpCfg.includeFilter.c_str(), fpCfg.excludeFilter.c_str());
+            if (!fpCfg.filter->isNull()) //let's filter them now... (and remove those that contain excluded elements only)
+            {
+                //filters and removes all excluded directories (but keeps those serving as parent folders)
+                RemoveFilteredDirs(*fpCfg.filter).execute(*j);
+            }
 
             //set initial sync-direction
             class RedetermineCallback : public DeterminationProblem
@@ -778,9 +755,7 @@ void CompareProcess::compareByTimeSize(const std::vector<FolderPairCfg>& directo
     {
         BaseDirMapping newEntry(pair->leftDirectory,
                                 pair->rightDirectory,
-                                pair->filterIsActive,
-                                pair->includeFilter,
-                                pair->excludeFilter);
+                                pair->filter);
         output.push_back(newEntry); //attention: push_back() copies by value!!! performance: append BEFORE writing values into fileCmp!
 
         //do basis scan and retrieve files existing on both sides as "compareCandidates"
@@ -881,9 +856,7 @@ void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& director
     {
         BaseDirMapping newEntry(pair->leftDirectory,
                                 pair->rightDirectory,
-                                pair->filterIsActive,
-                                pair->includeFilter,
-                                pair->excludeFilter);
+                                pair->filter);
         output.push_back(newEntry); //attention: push_back() copies by value!!! performance: append BEFORE writing values into fileCmp!
 
         //do basis scan and retrieve candidates for binary comparison (files existing on both sides)
@@ -1072,15 +1045,11 @@ void CompareProcess::performBaseComparison(BaseDirMapping& output, std::vector<F
     //scan directories
     const DirContainer& directoryLeft = directoryBuffer->getDirectoryDescription(
                                             output.getBaseDir<LEFT_SIDE>(),
-                                            output.getFilter().filterActive,
-                                            output.getFilter().includeFilter,
-                                            output.getFilter().excludeFilter);
+                                            output.getFilter());
 
     const DirContainer& directoryRight = directoryBuffer->getDirectoryDescription(
             output.getBaseDir<RIGHT_SIDE>(),
-            output.getFilter().filterActive,
-            output.getFilter().includeFilter,
-            output.getFilter().excludeFilter);
+            output.getFilter());
 
 
     statusUpdater->updateStatusText(wxToZ(_("Generating file list...")));
@@ -1090,3 +1059,5 @@ void CompareProcess::performBaseComparison(BaseDirMapping& output, std::vector<F
 
     MergeSides(appendUndefined).execute(directoryLeft, directoryRight, output);
 }
+
+

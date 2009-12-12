@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<meta name="GENERATOR" content="Microsoft&reg; HTML Help Workshop 4.1">
+<!-- Sitemap 1.0 -->
+</HEAD><BODY>
+<OBJECT type="text/site properties">
+	<param name="Window Styles" value="0x800025">
+	<param name="ImageType" value="Folder">
+</OBJECT>
+<UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Overview">
+		<param name="Local" value="html\Overview.html">
+		<param name="ImageNumber" value="17">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Features">
+		<param name="Local" value="html\Features.html">
+		<param name="ImageNumber" value="11">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Links">
+		<param name="Local" value="html\Links.html">
+		<param name="ImageNumber" value="19">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Advanced">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Compare by filesize">
+			<param name="Local" value="html\advanced\CompareFileSize.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Daylight saving time">
+			<param name="Local" value="html\advanced\DaylightSavingTime.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Drag &amp; drop support">
+			<param name="Local" value="html\advanced\DragDrop.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Environment Variables">
+			<param name="Local" value="html\advanced\EnvironmentVariables.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Error notification">
+			<param name="Local" value="html\advanced\SendMail.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Exclude subfolders">
+			<param name="Local" value="html\advanced\ExcludeSubfolder.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="External applications">
+			<param name="Local" value="html\advanced\ExternalApp.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="RealtimeSync">
+			<param name="Local" value="html\advanced\RealtimeSync.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Schedule a Batch Job">
+			<param name="Local" value="html\advanced\ScheduleBatch.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Symbolic link handling">
+			<param name="Local" value="html\advanced\SymbolicLinks.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Synchronize with FTP">
+			<param name="Local" value="html\advanced\Ftp.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Time-stamped directories">
+			<param name="Local" value="html\advanced\TimeStamped.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Variable drive letters">
+			<param name="Local" value="html\advanced\VariableDrive.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Volume Shadow Copy">
+			<param name="Local" value="html\advanced\ShadowCopy.html">
+			</OBJECT>
+	</UL>
+</UL>
+</BODY></HTML>

@@ -2,6 +2,27 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.2
+--------------
+Native Windows 64-Bit version (including Volume Shadow Copy Service)
+Harmonized filter handling: global and local file filters
+Unified handling of first folder pair: all pairs now semantically equal
+Use environment variables within directory names (e.g. %USERNAME%)
+New keyboard shortcuts to set sync-direction: ALT + <arrow key>
+Allow copying to non-encrypted target directory
+Fixed sort by filename
+Fixed GDI resource leak when scrolling large grids
+Fixed string comparison for 'ß' and 'ss' (Windows >= Vista)
+Faster file icon loading
+Remove elements in folder dropdown list via DEL key
+New integrated help file
+Play optional sound after synchronization: "Sync_Complete.wav"
+Several GUI/usability improvements
+Created package for PortableApps.com
+Added Finnish translation
+Updated translation files
+
+
 Changelog v3.1
 --------------
 Support for multiple datasources in Automatic mode
@@ -385,7 +406,7 @@ New function to delete files (or move them to recycle bin) manually on the UI (w
 	while catching error situations and allowing to resolve them
 Improved manual filtering of rows: If folders are marked all dependent subfolders and files are marked as well 
 (keeping sort sequence when "hide filtered elements" is marked)
-Comprehensive performance optimization of the two features above (manual filtering, deletion) for large grids (> 200.000 rows)
+Comprehensive performance optimization of the two features above (manual filtering, deletion) for large grids (> 200,000 rows)
 Improved usability: resizable borders, keyboard shortcuts, default buttons, dialog standard focus
 Main window will remember restored position even if maximized
 Updated sources to become more Linux and Unicode friendly

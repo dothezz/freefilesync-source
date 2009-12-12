@@ -148,8 +148,6 @@
 <групповое выделение>
 A newer version of FreeFileSync is available:
 Доступна новая версия FreeFileSync:
-ATTENTION: Failed directory access can lead to file deletions!
-ВНИМАНИЕ: Отказ в доступе к каталогу может привести к удалению файла!
 Abort requested: Waiting for current operation to finish...
 Запрос отмены: Ожидайте, пока текущая операция завершится...
 Aborted
@@ -158,10 +156,14 @@ About
 О программе
 Action
 Действие
+Activate filter
+Включить фильтр
 Add folder
 Добавить папку
 Add folder pair
 Добавить пару папок
+All directories in sync!
+Все папки синхронизированы!
 An exception occured!
 Исключение произошло!
 As a result the files are separated into the following categories:
@@ -198,10 +200,6 @@ Category
 Категория
 Change direction
 Поменять направление
-Check all
-Проверить все
-Choose to hide filtered files/directories from list
-Выберите для скрытия отфильтрованных файлов/папок из списка
 Comma separated list
 Список, разделяемый запятыми
 Commandline
@@ -242,8 +240,6 @@ Configuration saved!
 Настройка сохранена!
 Configure filter
 Настройка фильтра
-Configure filter...
-Настроить фильтр
 Configure your own synchronization rules.
 Настроить свои собственные правила синхронизации.
 Confirm
@@ -334,8 +330,6 @@ Directory
 Папка
 Directory does not exist:
 Папка не существует:
-Do not display visual status information but write to a logfile instead
-Не показывать информацию по статусу, но записывать в лог-файл
 Do not show this dialog again
 Больше не показывать это окно
 Do nothing
@@ -406,12 +400,12 @@ Error writing file:
 Ошибка при записи файла:
 Error writing to synchronization database:
 Ошибка при записи в базу данных синхронизации:
-Source directory does not exist anymore:
-Исходная папка больше не существует:
 Example
 Пример
 Exclude
 Исключая
+Exclude all rows
+Исключить все строки
 Exclude temporarily
 Исключить временные
 Exclude via filter:
@@ -422,6 +416,8 @@ Exit with RC < 0
 Выход с RC <0
 External applications
 Внешние приложения
+Fatal Error
+Критическая ошибка
 Feedback and suggestions are welcome at:
 Отзывы и предложения присылайте по адресу:
 File %x has an invalid date!
@@ -466,12 +462,14 @@ Files/folders that exist on right side only
 Файлы/папки, существующие только на правой стороне
 Filter
 Фильтр
-Filter active: Press again to deactivate
-Фильтр активен: Нажмите еще раз для отключения
 Filter files
 Фильтр файлов
+Filter has been selected
+Фильтр установлен
 Filter view
 Вид фильтра
+Filtering is deactivated
+Фильтрация выключена
 Folder Comparison and Synchronization
 Сравнение и синхронизация
 Free disk space available:
@@ -494,6 +492,8 @@ Generating database...
 Создание базы данных...
 Generating file list...
 Создание списка файлов...
+Global filter
+Глобальный фильтр
 Global settings
 Глобальные настройки
 Help
@@ -504,6 +504,8 @@ Hide all error and warning messages
 Скрывать все ошибки и сообщения с предупреждениями
 Hide conflicts
 Скрыть конфликтующие файлы
+Hide excluded items
+Скрыть исключенные пункты
 Hide files that are different
 Скрыть различающиеся файлы
 Hide files that are equal
@@ -530,14 +532,16 @@ Hide files that will be overwritten on right side
 Скрыть файлы, которые будут перезаписаны на правой стороне
 Hide files that won't be copied
 Скрыть файлы, которые не будут скопированы
-Hide filtered items
-Скрыть отфильтрованные
+Hide filtered or temporarily excluded files
+Скрыть отфильтрованные или временно исключенные файлы
 Hide further error messages during the current process
 Скрыть последующие ошибки во время текущего процесса
 Hints:
 Подсказка:
 Homepage
 Оф.сайт
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+Выявление и распространение изменений на обеих сторонах с использованием базы данных. Удаленные файлы и конфликты определяются автоматически.
 If you like FFS
 Если Вам понравился FFS
 Ignore 1-hour file time difference
@@ -552,6 +556,8 @@ Ignore this error, retry or abort?
 Игнорировать эту ошибку, повторить или отменить?
 Include
 Включая
+Include all rows
+Включая все строки
 Include temporarily
 Включая временные
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
@@ -562,8 +568,8 @@ Info
 Информация
 Information
 Информация
-Initial synchronization.
-Первоначальная синхронизация.
+Initial synchronization:
+Первоначальная синхронизация:
 Integrate external applications into context menu. The following macros are available:
 Интегрирует внешние приложения в контекстное меню.\nСледующие команды доступны:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +584,8 @@ Load configuration from file
 Загрузить конфигурацию из файла
 Load configuration history (press DEL to delete items)
 Выбрать конфигурацию из списка (нажмите DEL для удаления пунктов)
+Local filter
+Локальный фильтр
 Log-messages:
 Лог-сообщения:
 Logging
@@ -602,8 +610,8 @@ Moving folder %x to user-defined directory %y
 Перемещение папки %x в заданную пользователем папку %y
 Multiple...
 Различные варианты синхронизации
-No database file existing yet:
-Файла базы данных еще не существует:
+No filter selected
+Ни один фильтр не выбран
 Not enough free disk space available in:
 Не достаточно свободного места в:
 Nothing to synchronize according to configuration!
@@ -638,8 +646,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Пожалуйста, скопируйте соответствующий \"Shadow.dll\" (находящийся в архиве \"Shadow.zip\") в папку установки FreeFileSync для включения этой функции.
 Please fill all empty directory fields.
 Пожалуйста, заполните все пустые поля папок
-Press button to activate filter
-Включить фильтр
+Please run a Compare first before synchronizing!
+Пожалуйста, запустите сравнение перед синхронизацией!
 Published under the GNU General Public License:
 Издается под GNU General Public License:
 Question
@@ -660,12 +668,16 @@ Remove folder
 Удалить папку
 Remove folder pair
 Удалить пару папок
+Remove local filter settings
+Удалить настройки локального фильтра
 Report translation error
 Сообщить об ошибке перевода
 Reset
 Сбросить
 Right
 Справа
+Run minimized and write status information to a logfile
+Запустить свернутым и писать информацию по статусу в лог-файл
 S&ave configuration
 Сохранить конфигурацию...
 S&witch view
@@ -680,14 +692,14 @@ Scanning:
 Сканирую:
 Select a folder
 Выбрать папку
-Select alternate filter settings
-Выбрать альтернативные настройки фильтра
 Select alternate synchronization settings
 Выбрать альтернативные настройки синхронизации
 Select logfile directory:
 Выберите папку для лог-файлов:
 Select variant:
 Выберите вариант:
+Setting default synchronization directions. Please check whether they are appropriate for you.
+Направление синхронизации выставлено по умолчанию. Пожалуйста, проверьте, подходит ли оно для Вас.
 Show conflicts
 Показать конфликтующие файлы
 Show file icons
@@ -732,6 +744,8 @@ Size
 Размер
 Source code written completely in C++ utilizing:
 Исходный код написан на С++ с использованием:
+Source directory does not exist anymore:
+Исходная папка больше не существует:
 Speed:
 Скорость:
 Start
@@ -761,7 +775,7 @@ Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\
 Synchronize both sides simultaneously: Copy new or updated files in both directions.
 Синхронизировать обе стороны одновременно: копировать новые или обновлять файлы в обоих направлениях.
 Synchronize both sides using a database. Deletions are detected automatically.
-Синхронизировать обе стороны, используя базу данных. Удаленные файлы/папки определяются автоматически.
+Синхронизировать обе стороны, используя базу данных\nУдаленные файлы/папки определяются автоматически
 Synchronize...
 Синхронизировать
 Synchronizing...
@@ -772,8 +786,12 @@ Target directory already existing!
 Конечная папка уже существует!
 Target file already existing!
 Конечный файл уже существует!
+The database file is not yet existing, but will be created during synchronization:
+Файл базы данных еще не существует, но будет создан во время синхронизации:
 The file does not contain a valid configuration:
 Файл не содержит действительную конфигурацию:
+The required database entry is not yet existing, but will be created during synchronization:
+Требуемой записи еще не существует в базе данных, но она будет создана во время синхронизации:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Этот вариант сравнивает два файла с одинаковыми именами и считает их равными, если они имеют одинаковый размер файла и одинаковую дату и время последнего изменения.
 Time
@@ -798,8 +816,6 @@ Unable to create logfile!
 Невозможно создать лог!
 Unable to initialize Recycle Bin!
 Невозможно инициализировать "Корзину"!
-Uncheck all
-Снять выделение со всех
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Существуют нерешенные конфликты \n\nВы можете проигнорировать их и продолжить синхронизацию.
 Update ->
@@ -814,8 +830,6 @@ User-defined directory
 Использовать заданную пользователем папку
 User-defined directory for deletion was not specified!
 Пользовательская папка для удаления не была указана!
-Using default synchronization directions. Please recheck.
-Используются направления синхронизации по-умолчанию. Пожалуйста, перепроверьте.
 Variant
 Вариант
 Verifying file %x

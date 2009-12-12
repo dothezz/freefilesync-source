@@ -20,6 +20,9 @@
 #include "shared/standardPaths.h"
 #include "shared/localization.h"
 #include "shared/appMain.h"
+#include <wx/sound.h>
+#include "shared/fileHandling.h"
+#include "shared/stringConv.h"
 
 #ifdef FFS_LINUX
 #include <gtk/gtk.h>
@@ -68,6 +71,15 @@ void Application::OnStartApplication(wxIdleEvent&)
 
 #ifdef FFS_LINUX
     ::gtk_rc_parse("styles.rc"); //remove inner border from bitmap buttons
+#endif
+
+    //initialize help controller
+    helpController.reset(new wxHelpController);
+    helpController->Initialize(FreeFileSync::getInstallationDir() +
+#ifdef FFS_WIN
+                               wxT("FreeFileSync.chm"));
+#elif defined FFS_LINUX
+                               wxT("Help/FreeFileSync.hhp"));
 #endif
 
     //test if FFS is to be started on UI with config file passed as commandline parameter
@@ -180,13 +192,16 @@ int Application::OnExit()
         wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
     }
 
+    //delete help provider: "Cross-Platform GUI Programming with wxWidgets" says this should be done here...
+    helpController.reset();
+
     return 0;
 }
 
 
 void Application::runGuiMode(const wxString& cfgFileName, xmlAccess::XmlGlobalSettings& settings)
 {
-    MainDialog* frame = new MainDialog(NULL, cfgFileName, settings);
+    MainDialog* frame = new MainDialog(NULL, cfgFileName, settings, *helpController);
     frame->SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
     frame->Show();
 
@@ -251,12 +266,18 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
             batchCfg.mainCfg.hidden.traverseDirectorySymlinks,
             globSettings.optDialogs,
             batchCfg.mainCfg.hidden.verifyFileCopy,
+            globSettings.copyLockedFiles,
             *statusHandler);
 
         const std::vector<FreeFileSync::FolderPairSyncCfg> syncProcessCfg = FreeFileSync::extractSyncCfg(batchCfg.mainCfg);
         assert(syncProcessCfg.size() == folderCmp.size());
 
         synchronization.startSynchronizationProcess(syncProcessCfg, folderCmp);
+
+        //play (optional) sound notification after sync has completed (GUI and batch mode)
+        const wxString soundFile = FreeFileSync::getInstallationDir() + wxT("Sync_Complete.wav");
+        if (FreeFileSync::fileExists(FreeFileSync::wxToZ(soundFile)))
+            wxSound::Play(soundFile, wxSOUND_ASYNC);
     }
     catch (FreeFileSync::AbortThisProcess&)  //exit used by statusHandler
     {

@@ -143,14 +143,14 @@ void WorkerThread::doWork()
             break; //icon already in buffer: enter waiting state
 
         //despite what docu says about SHGetFileInfo() it can't handle all relative filenames, e.g. "\DirName"
-        const unsigned int BUFFER_SIZE = 10000;
-        DefaultChar fullName[BUFFER_SIZE];
+        const unsigned int MAX_SIZE = 10000;
+        DefaultChar fullName[MAX_SIZE];
         const DWORD rv = ::GetFullPathName(
                              &fileName[0], //__in   LPCTSTR lpFileName,
-                             BUFFER_SIZE,  //__in   DWORD nBufferLength,
+                             MAX_SIZE,     //__in   DWORD nBufferLength,
                              fullName,     //__out  LPTSTR lpBuffer,
                              NULL);        //__out  LPTSTR *lpFilePart
-        if (rv < BUFFER_SIZE && rv != 0)
+        if (rv < MAX_SIZE && rv != 0)
         {
             //load icon
             SHFILEINFO fileInfo;
@@ -251,7 +251,7 @@ void IconBuffer::insertIntoBuffer(const DefaultChar* fileName, const wxIcon& ico
         assert(buffer->size() == bufSequence->size());
 
         //remove elements if buffer becomes too big:
-        if (buffer->size() > 1000) //limit buffer size: critical because large buffers seem to cause various wxIcon/wxBitmap issues!
+        if (buffer->size() > BUFFER_SIZE) //limit buffer size: critical because GDI resources are limited (e.g. 10000 on XP per process)
         {
             //remove oldest element
             buffer->erase(bufSequence->front());

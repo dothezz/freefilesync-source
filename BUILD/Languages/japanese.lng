@@ -148,8 +148,6 @@
 <複数選択>
 A newer version of FreeFileSync is available:
 FreeFileSync の新しいバージョンが利用可能です:
-ATTENTION: Failed directory access can lead to file deletions!
-注意: ディレクトリのアクセスに失敗した場合、ファイルは削除されます!
 Abort requested: Waiting for current operation to finish...
 ユーザによる中断: 現在の処理を終了しています.. お待ちください...
 Aborted
@@ -158,10 +156,14 @@ About
 情報
 Action
 操作
+Activate filter
+フィルターを有効化
 Add folder
 フォルダを追加
 Add folder pair
 フォルダのペアを追加
+All directories in sync!
+すべてのディレクトリを同期!
 An exception occured!
 例外が発生しました!
 As a result the files are separated into the following categories:
@@ -198,10 +200,6 @@ Category
 カテゴリ
 Change direction
 方向を変更
-Check all
-すべて選択
-Choose to hide filtered files/directories from list
-リストから除外したいファイル/ディレクトリを選択
 Comma separated list
 カンマ区切り
 Commandline
@@ -242,8 +240,6 @@ Configuration saved!
 構成設定は保存されました!
 Configure filter
 フィルター設定
-Configure filter...
-フィルター設定...
 Configure your own synchronization rules.
 あなたの設定した同期規則
 Confirm
@@ -334,8 +330,6 @@ Directory
 ディレクトリ
 Directory does not exist:
 ディレクトリが存在しません:
-Do not display visual status information but write to a logfile instead
-進捗状況などのメッセージを表示しないで、ログファイルの書き込みは実施する。
 Do not show this dialog again
 次回から表示しない
 Do nothing
@@ -406,12 +400,12 @@ Error writing file:
 ファイル書き込みエラー:
 Error writing to synchronization database:
 同期データベースへの書き込みエラー:
-Source directory does not exist anymore:
-ソースディレクトリが存在しません:
 Example
 例
 Exclude
 除外
+Exclude all rows
+すべての行を除外
 Exclude temporarily
 一時フォルダを除外
 Exclude via filter:
@@ -422,6 +416,8 @@ Exit with RC < 0
 RC で終了 < 0
 External applications
 外部アプリケーション
+Fatal Error
+致命的なエラー
 Feedback and suggestions are welcome at:
 フィードバック、提案など:
 File %x has an invalid date!
@@ -466,18 +462,20 @@ Files/folders that exist on right side only
 右側のみに存在するファイル/フォルダ
 Filter
 フィルター
-Filter active: Press again to deactivate
-フィルター有効化: 再度押すと無効化
 Filter files
 ファイルフィルター
+Filter has been selected
+フィルターは選択済みです
 Filter view
 表示フィルター
+Filtering is deactivated
+フィルタリングは非アクティブです
 Folder Comparison and Synchronization
 フォルダの比較と同期
 Free disk space available:
 利用可能なディスク空き容量:
 FreeFileSync - Folder Comparison and Synchronization
-FreeFileSync - Folder Comparison and Synchronization
+FreeFileSync - フォルダ比較と同期処理
 FreeFileSync Batch Job
 FreeFileSync 一括ジョブ
 FreeFileSync at Sourceforge
@@ -494,6 +492,8 @@ Generating database...
 データベースを作成中...
 Generating file list...
 ファイル一覧を作成中...
+Global filter
+全般フィルター
 Global settings
 全般的な設定
 Help
@@ -504,6 +504,8 @@ Hide all error and warning messages
 すべてのエラーと警告メッセージを非表示
 Hide conflicts
 不一致を隠す
+Hide excluded items
+除外アイテムを隠す
 Hide files that are different
 異なるファイルを非表示
 Hide files that are equal
@@ -530,14 +532,16 @@ Hide files that will be overwritten on right side
 右側で上書きされたファイルを非表示にする
 Hide files that won't be copied
 コピーしなかったファイルを隠す
-Hide filtered items
-適合するアイテムを非表示にする
+Hide filtered or temporarily excluded files
+フィルター、または一時除外ファイルを隠す
 Hide further error messages during the current process
 現在の処理中は以降のエラーメッセージを表示しない
 Hints:
 ヒント:
 Homepage
 ホームページ
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+データベースを使用して、両側アイテムの変更を特定します。削除、競合は自動的に検出することができます。
 If you like FFS
 FFS が気に入った場合
 Ignore 1-hour file time difference
@@ -552,6 +556,8 @@ Ignore this error, retry or abort?
 このエラーを無視して再試行/中断しますか?
 Include
 含める
+Include all rows
+すべての行を含める
 Include temporarily
 一時フォルダを含める
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
@@ -562,8 +568,8 @@ Info
 情報
 Information
 インフォメーション
-Initial synchronization.
-同期処理の初期化.
+Initial synchronization:
+同期処理の初期化:
 Integrate external applications into context menu. The following macros are available:
 外部のアプリケーションをコンテキストメニューに統合、以下のマクロが利用できます:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +584,8 @@ Load configuration from file
 外部ファイルから構成設定を読み込みます
 Load configuration history (press DEL to delete items)
 構成設定履歴の読み込み(DELキーでアイテムを削除)
+Local filter
+ローカルフィルター
 Log-messages:
 ログメッセージ:
 Logging
@@ -602,8 +610,8 @@ Moving folder %x to user-defined directory %y
 フォルダ %x をユーザ定義ディレクトリ %y に移動
 Multiple...
 複数処理...
-No database file existing yet:
-データベースが存在しません:
+No filter selected
+フィルター選択なし
 Not enough free disk space available in:
 利用可能なディスク空き容量が足りません:
 Nothing to synchronize according to configuration!
@@ -638,8 +646,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
  \"Shadow.dll\" (\"Shadow.zip\" アーカイブ内) を、FreeFileSync インストールフォルダにコピーすることで、この機能を利用できるようになります。
 Please fill all empty directory fields.
 アイテムが選択されていません!
-Press button to activate filter
-ボタンをクリックで有効化
+Please run a Compare first before synchronizing!
+同期処理を実行する前に比較を行ってください!
 Published under the GNU General Public License:
 Published under the GNU General Public License:
 Question
@@ -660,12 +668,16 @@ Remove folder
 フォルダ除去
 Remove folder pair
 フォルダペアを除去
+Remove local filter settings
+ローカルフィルター設定を除去
 Report translation error
 翻訳エラーの詳細
 Reset
 リセット
 Right
 右側
+Run minimized and write status information to a logfile
+最小化で起動して、ステータス情報をログに書き込む
 S&ave configuration
 構成設定を保存(&A)
 S&witch view
@@ -680,14 +692,14 @@ Scanning:
 スキャン:
 Select a folder
 フォルダを選択
-Select alternate filter settings
-代替フィルター設定を選択
 Select alternate synchronization settings
 代替同期設定を選択
 Select logfile directory:
 ログファイルの保存先を選択:
 Select variant:
 変数を選択:
+Setting default synchronization directions. Please check whether they are appropriate for you.
+デフォルトの同期方向を設定します、そしてその方向が適切であるかを確認してください。
 Show conflicts
 不一致を表示
 Show file icons
@@ -732,6 +744,8 @@ Size
 サイズ
 Source code written completely in C++ utilizing:
 ソースコードは C++ で書かれ、コンパイルされています:
+Source directory does not exist anymore:
+ソースディレクトリが存在しません:
 Speed:
 速度:
 Start
@@ -772,8 +786,12 @@ Target directory already existing!
 対象ディレクトリはすでに存在します!
 Target file already existing!
 対象ファイルは既に存在します!
+The database file is not yet existing, but will be created during synchronization:
+このデータベースファイルは、まだ存在しませんが、同期処理の実行中に作成されます:
 The file does not contain a valid configuration:
 このファイルには有効な構成が含まれていません:
+The required database entry is not yet existing, but will be created during synchronization:
+必要なデータベースエントリはまだ存在しませんが、同期処理の実行中に作成されます:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 この変数では、ふたつの同名ファイルが存在した場合、 それぞれのファイルサイズと最終更新日付/時間を比較します。
 Time
@@ -798,8 +816,6 @@ Unable to create logfile!
 ログファイルを作成出来ません!
 Unable to initialize Recycle Bin!
 ゴミ箱の初期化が出来ません!
-Uncheck all
-すべて解除
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 未解決の不一致があります! \n\nこの不一致を無視して同期を続行することが出来ます。
 Update ->
@@ -814,8 +830,6 @@ User-defined directory
 ユーで定義ディレクトリ
 User-defined directory for deletion was not specified!
 ユーザ定義ディレクトリが指定されていません!
-Using default synchronization directions. Please recheck.
-デフォルトで使用する同期処理方向 (再確認してください)
 Variant
 変化
 Verifying file %x

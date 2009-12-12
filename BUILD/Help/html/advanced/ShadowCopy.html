@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Win32)">
+	<META NAME="CREATED" CONTENT="20091206;16574000">
+	<META NAME="CHANGED" CONTENT="20091213;16112500">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 2cm }
+		P { margin-bottom: 0.21cm }
+		H3 { margin-bottom: 0.21cm }
+		H3.western { font-family: "Arial", sans-serif }
+		H3.cjk { font-family: "MS Mincho" }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="de-DE" DIR="LTR">
+<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Volume Shadow
+Copy Service <SPAN STYLE="font-weight: normal">(Windows only)</SPAN></FONT></H3>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">FreeFileSync
+supports copying locked or shared files by creating a Volume Shadow
+Copy of the source drive. To enable this feature go to </FONT><FONT FACE="Tahoma, sans-serif"><I>Menu
+-&gt; Advanced -&gt; Global settings: Copy locked files</I></FONT><FONT FACE="Tahoma, sans-serif">.</FONT></P>
+<UL>
+	<P><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+		<FONT FACE="Tahoma, sans-serif"><B>Note:</B><BR>This functionality
+		is applied to locked files only. Regular files will not use the
+		Volume Shadow Copy Service when being synchronized.</FONT></P>
+	</SPAN><BR CLEAR=LEFT>
+	</P>
+</UL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Troubleshooting</B></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If you
+experience problems using the Volume Shadow Copy Service a renewal of
+registration might help. Create and execute a *.cmd batch file with
+the follow content or enter directly via commandline:</FONT></P>
+<UL>
+	<P STYLE="margin-right: 0.98cm"><SPAN ID="Rahmen3" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+		<FONT FACE="Courier New, monospace">cd /d %windir%\system32<BR>Net
+		stop vss<BR>Net stop swprv<BR>regsvr32 ole32.dll<BR>regsvr32
+		oleaut32.dll<BR>regsvr32 vss_ps.dll<BR>Vssvc /register<BR>regsvr32
+		/i swprv.dll<BR>regsvr32 /i eventcls.dll<BR>regsvr32
+		es.dll<BR>regsvr32 stdprov.dll<BR>regsvr32 vssui.dll<BR>regsvr32
+		msxml.dll<BR>regsvr32 msxml3.dll<BR>regsvr32 msxml4.dll</FONT></P>
+	</SPAN><BR CLEAR=LEFT>
+	</P>
+</UL>
+<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">(Reference:
+<A HREF="http://support.microsoft.com/kb/940032">http://support.microsoft.com/kb/940032</A>)</FONT></P>
+</BODY>
+</HTML>

@@ -1,4 +1,4 @@
-CPPFLAGS=-Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -DZSTRING_CHAR -O3 -pthread -c -Ishared/boost_1_40_0
+CPPFLAGS=-Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -DZSTRING_CHAR -O3 -pthread -c -Ishared/boost_1_x
 LINKFLAGS=`wx-config --libs --debug=no --unicode=yes` shared/ossp_uuid/.libs/libuuid++.a -O3 -pthread
 
 FILE_LIST=              #internal list of all *.cpp files needed for compilation
@@ -43,6 +43,8 @@ FILE_LIST+=shared/xmlBase.cpp
 FILE_LIST+=shared/appMain.cpp
 FILE_LIST+=shared/customButton.cpp
 FILE_LIST+=shared/toggleButton.cpp
+FILE_LIST+=shared/customComboBox.cpp
+FILE_LIST+=shared/serialize.cpp
 
 #list of all *.o files
 OBJECT_LIST=$(foreach file, $(FILE_LIST), OBJ/$(subst .cpp,.o,$(notdir $(file))))

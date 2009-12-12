@@ -3,6 +3,7 @@
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
+#include "dllLoader.h"
 #endif  //FFS_WIN
 
 #ifdef __WXDEBUG__
@@ -46,24 +47,58 @@ AllocationCount& AllocationCount::getInstance()
 
 
 #ifdef FFS_WIN
+
+#ifndef LOCALE_INVARIANT
+#define LOCALE_INVARIANT                0x007f
+#endif
+
+
 inline
 int compareStringsWin32(const wchar_t* a, const wchar_t* b, const int aCount = -1, const int bCount = -1)
 {
-    //DON'T use lstrcmpi() here! It uses word sort, which unfortunately is NOT always a strict weak sorting function for some locales (e.g. swedish)
-    //Use CompareString() with "SORT_STRINGSORT" instead!!!
+    //try to call "CompareStringOrdinal" first for low-level string comparison: unfortunately available not before Windows Vista!
+    typedef int (WINAPI *CompareStringOrdinalFunc)(
+        LPCWSTR lpString1,
+        int     cchCount1,
+        LPCWSTR lpString2,
+        int     cchCount2,
+        BOOL    bIgnoreCase);
+    static const CompareStringOrdinalFunc ordinalCompare = Utility::loadDllFunKernel<CompareStringOrdinalFunc>("CompareStringOrdinal");
 
-    const int rv = CompareString(
-                       LOCALE_USER_DEFAULT, //locale identifier
-                       NORM_IGNORECASE | SORT_STRINGSORT, //comparison-style options
-                       a,  	                //pointer to first string
-                       aCount,	            //size, in bytes or characters, of first string
-                       b,	                //pointer to second string
-                       bCount); 	        //size, in bytes or characters, of second string
 
-    if (rv == 0)
-        throw std::runtime_error("Error comparing strings!");
-    else
-        return rv - 2; //convert to C-style string compare result
+    //we're lucky here! This additional test for "CompareStringOrdinal" has no noticeable performance impact!!
+    if (ordinalCompare != NULL)
+    {
+        const int rv = (*ordinalCompare)(
+                           a,  	      //pointer to first string
+                           aCount,	  //size, in bytes or characters, of first string
+                           b,	      //pointer to second string
+                           bCount,    //size, in bytes or characters, of second string
+                           true); 	  //ignore case
+
+        if (rv == 0)
+            throw std::runtime_error("Error comparing strings (ordinal)!");
+        else
+            return rv - 2; //convert to C-style string compare result
+    }
+    else  //fallback to "CompareString". Attention: this function is NOT accurate: for example "weiﬂ" == "weiss"!!!
+    {
+        //DON'T use lstrcmpi() here! It uses word sort and is locale dependent!
+        //Use CompareString() with "SORT_STRINGSORT" instead!!!
+
+        const int rv = CompareString(
+                           LOCALE_INVARIANT,    //locale independent
+                           NORM_IGNORECASE | SORT_STRINGSORT, //comparison-style options
+                           a,  	                //pointer to first string
+                           aCount,	            //size, in bytes or characters, of first string
+                           b,	                //pointer to second string
+                           bCount); 	        //size, in bytes or characters, of second string
+
+        if (rv == 0)
+            throw std::runtime_error("Error comparing strings!");
+        else
+            return rv - 2; //convert to C-style string compare result
+    }
 }
 #endif
 

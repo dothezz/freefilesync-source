@@ -4,7 +4,6 @@
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <memory>
-#include "../shared/stringConv.h"
 #include "../shared/standardPaths.h"
 #include "../shared/systemConstants.h"
 
@@ -42,7 +41,7 @@ GlobalResources::~GlobalResources()
 
 void GlobalResources::load() const
 {
-    wxFFileInputStream input(FreeFileSync::getInstallationDir() + zToWx(globalFunctions::FILE_NAME_SEPARATOR) + wxT("Resources.dat"));
+    wxFFileInputStream input(FreeFileSync::getInstallationDir() + wxT("Resources.dat"));
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files

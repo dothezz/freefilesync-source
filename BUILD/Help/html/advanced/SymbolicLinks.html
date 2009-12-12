@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Win32)">
+	<META NAME="CREATED" CONTENT="20091206;16574000">
+	<META NAME="CHANGED" CONTENT="20091213;16130900">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 2cm }
+		P { margin-bottom: 0.21cm }
+		H3 { margin-bottom: 0.21cm }
+		H3.western { font-family: "Arial", sans-serif }
+		H3.cjk { font-family: "MS Mincho" }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="de-DE" DIR="LTR">
+<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Symbolic link
+handling <SPAN STYLE="font-weight: normal">(Windows since Vista and
+Linux)</SPAN></FONT></H3>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">FreeFileSync
+offers the following two advanced options contained in each
+*.ffs_gui/*.ffs_batch file to configure processing of Symbolic Links
+(also called Symlinks or Soft Links):</FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Default
+Settings (View and edit these in the text editor of your choice):</FONT></P>
+<UL>
+	<P><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+		<UL>
+			<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Courier New, monospace">&lt;CopyFileSymlinks&gt;true&lt;/CopyFileSymlinks&gt;<BR>&lt;TraverseDirectorySymlinks&gt;false&lt;/TraverseDirectorySymlinks&gt;</FONT></P>
+		</UL>
+	</SPAN><BR CLEAR=LEFT>
+	</P>
+</UL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">&quot;<I>CopyFileSymlinks</I>&quot;
+defines the behavior for copying Symbolic Links pointing to files:</FONT></P>
+<P STYLE="margin-left: 2cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If
+set to <I>true</I> it copies the Symbolik Link to its destination.<BR>If
+set to <I>false</I> the target of the link, in this case a file, is
+being copied instead.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">&quot;<I>TraverseDirectorySymlinks</I>&quot;
+specifies handling of Symbolic Links to directories:</FONT></P>
+<P STYLE="margin-left: 2cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If
+<I>true</I>, they are being traversed like ordinary directories
+during comparison and are copied as if they were regular directories
+(i.e. not as Symbolic Links) during synchronization.<BR>If <I>false</I>
+is selected, these Symbolic Links are not traversed at all. During
+synchronization copying them results in a direct copy of the Symbolic
+Link, not the target directory.</FONT></P>
+<P STYLE="margin-left: 2cm; margin-bottom: 0cm"><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+	<FONT FACE="Tahoma, sans-serif"><B>Note:</B><BR>As the link's
+	content is not parsed by FreeFileSync, this usually only makes sense
+	when you use relative paths within your Symolic Links.</FONT></P>
+</SPAN><BR CLEAR=LEFT><BR>
+</P>
+</BODY>
+</HTML>

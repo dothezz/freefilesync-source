@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Win32)">
+	<META NAME="CREATED" CONTENT="20091208;20054200">
+	<META NAME="CHANGED" CONTENT="20091211;18381300">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 2cm }
+		P { margin-bottom: 0.21cm }
+		H2 { margin-bottom: 0.21cm }
+		H2.western { font-family: "Arial", sans-serif; font-size: 14pt; font-style: italic }
+		H2.cjk { font-family: "MS Mincho"; font-size: 14pt; font-style: italic }
+		H2.ctl { font-size: 14pt; font-style: italic }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="de-DE" DIR="LTR">
+<H2 CLASS="western" STYLE="font-style: normal"><FONT FACE="Tahoma, sans-serif">Daylight
+saving time</FONT></H2>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The
+Windows operating system exhibits quite a unique behavior when
+handling timestamps on NTFS file systems. This leads to a well-known
+issue that all file synchronization software has to handle:</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">During
+daylight saving time switching, (local) file times are shifted by one
+hour on NTFS file systems, while NO shift occurs on FAT/FAT32 drives
+(as used by most USB sticks)! Thus when synchronizing an NTFS against
+a FAT32 volume file times become asynchronous twice a year!</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">For a
+comprehensive discussion about this issue refer
+to:<BR><A HREF="http://www.codeproject.com/KB/datetime/dstbugs.aspx">http://www.codeproject.com/KB/datetime/dstbugs.aspx</A></FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Solution:</B></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">In
+order to avoid re-copying files that have a modification time
+difference of +-1h FreeFileSync offers a global option: <I>Menu -&gt;
+Advanced -&gt; Global settings: Ignore 1-hour file time difference</I>.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If
+&quot;<I>Ignore 1-hour file time difference</I>&quot; is checked, all
+files with a +-1h difference are treated as having the same time.
+This also handles different file time precisions (NTFS: 100ns,
+FAT/FAT32: 2 seconds) by allowing a 2 second tolerance .</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Files
+that have a deviation of less than one hour are categorized as
+conflicts. The reasoning is that these files surely have been
+modified on at least one side since last synchronization. But during
+one of the two daylight saving time switches per year the older file
+is shown pretending a newer date which can lead to data loss (when
+using the rule to overwrite older with newer files).</FONT></P>
+<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+	<FONT FACE="Tahoma, sans-serif"><B>Note:</B><BR>If synchronization
+	takes place between NTFS &harr; NTFS or FAT32 &harr; FAT32 this
+	checkbox provides no advantage and can be left unchecked.</FONT></P>
+</SPAN><BR CLEAR=LEFT><BR>
+</P>
+</BODY>
+</HTML>

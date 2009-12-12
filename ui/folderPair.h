@@ -6,99 +6,127 @@
 #include "../library/resources.h"
 #include "smallDialogs.h"
 #include "settingsDialog.h"
+#include <wx/event.h>
 
 
 namespace FreeFileSync
 {
-//basic functionality for changing alternate folder pair configuration: adaptable to generated gui class
+//basic functionality for handling alternate folder pair configuration: change sync-cfg/filter cfg, right-click context menu, button icons...
 
 template <class GuiPanel>
-class FolderPairPanelBasic : public GuiPanel
+class FolderPairPanelBasic : private wxEvtHandler
 {
-    using GuiPanel::m_bpButtonAltSyncCfg;
-    using GuiPanel::m_bpButtonAltFilter;
-
 public:
-    FolderPairPanelBasic(wxWindow* parent) :
-        GuiPanel(parent),
-        dragDropOnLeft(new DragDropOnDlg( GuiPanel::m_panelLeft,  GuiPanel::m_dirPickerLeft,  GuiPanel::m_directoryLeft)),
-        dragDropOnRight(new DragDropOnDlg(GuiPanel::m_panelRight, GuiPanel::m_dirPickerRight, GuiPanel::m_directoryRight))
+    typedef boost::shared_ptr<const FreeFileSync::AlternateSyncConfig> AltSyncCfgPtr;
+
+
+    Zstring getLeftDir() const
     {
-        //register events for removal of alternate configuration
-        m_bpButtonAltFilter->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnAltFilterCfgRemove), NULL, this);
-        m_bpButtonAltSyncCfg->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfgRemove), NULL, this);
-
-        m_bpButtonAltSyncCfg->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfg), NULL, this);
-        m_bpButtonAltFilter-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltFilterCfg), NULL, this);
-
-        GuiPanel::m_bpButtonRemovePair->SetBitmapLabel(*GlobalResources::getInstance().bitmapRemoveFolderPair);
+        return wxToZ(basicPanel_.m_directoryLeft->GetValue());
     }
 
-    typedef boost::shared_ptr<const FreeFileSync::AlternateSyncConfig> AltSyncCfgPtr;
-    typedef boost::shared_ptr<const FreeFileSync::AlternateFilter>     AltFilterPtr;
+    Zstring getRightDir() const
+    {
+        return wxToZ(basicPanel_.m_directoryRight->GetValue());
+    }
 
     AltSyncCfgPtr getAltSyncConfig() const
     {
         return altSyncConfig;
     }
 
-    AltFilterPtr getAltFilterConfig() const
+    FilterConfig getAltFilterConfig() const
     {
-        return altFilter;
+        return localFilter;
     }
 
-    void setValues(AltSyncCfgPtr syncCfg,  AltFilterPtr filter)
+    void setValues(const Zstring& leftDir,
+                   const Zstring& rightDir,
+                   AltSyncCfgPtr syncCfg,
+                   const FilterConfig& filter)
     {
         altSyncConfig = syncCfg;
-        altFilter     = filter;
+        localFilter   = filter;
 
-        updateAltButtonColor();
+        //insert directory names
+        FreeFileSync::setDirectoryName(zToWx(leftDir),  basicPanel_.m_directoryLeft,  basicPanel_.m_dirPickerLeft);
+        FreeFileSync::setDirectoryName(zToWx(rightDir), basicPanel_.m_directoryRight, basicPanel_.m_dirPickerRight);
+
+        refreshButtons();
     }
 
 
-protected:
-    virtual void OnAltFilterCfgRemoveConfirm(wxCommandEvent& event)
+    void refreshButtons()
     {
-        altFilter.reset();
-        updateAltButtonColor();
+        if (altSyncConfig.get())
+        {
+            basicPanel_.m_bpButtonAltSyncCfg->SetBitmapLabel(*GlobalResources::getInstance().bitmapSyncCfgSmall);
+            basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(wxString(_("Select alternate synchronization settings")) +  wxT(" ") + globalFunctions::LINE_BREAK +
+                    wxT("(") + altSyncConfig->syncConfiguration.getVariantName() + wxT(")"));
+        }
+        else
+        {
+            basicPanel_.m_bpButtonAltSyncCfg->SetBitmapLabel(*GlobalResources::getInstance().bitmapSyncCfgSmallGrey);
+            basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Select alternate synchronization settings"));
+        }
+
+
+        if (getMainConfig().filterIsActive)
+        {
+            //test for Null-filter
+            const bool isNullFilter = NameFilter(localFilter.includeFilter, localFilter.excludeFilter).isNull();
+            if (isNullFilter)
+            {
+                basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(*GlobalResources::getInstance().bitmapFilterSmallGrey);
+                basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("No filter selected"));
+            }
+            else
+            {
+                basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(*GlobalResources::getInstance().bitmapFilterSmall);
+                basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("Filter has been selected"));
+            }
+        }
+        else
+        {
+            basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(*GlobalResources::getInstance().bitmapFilterSmallGrey);
+            basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("Filtering is deactivated"));
+        }
+    }
+
+protected:
+    FolderPairPanelBasic(GuiPanel& basicPanel) : //takes reference on basic panel to be enhanced
+        basicPanel_(basicPanel)
+    {
+        //register events for removal of alternate configuration
+        basicPanel_.m_bpButtonAltSyncCfg->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfgRemove), NULL, this);
+        basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfgRemove), NULL, this);
+
+        basicPanel_.m_bpButtonAltSyncCfg-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfg), NULL, this);
+        basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfg), NULL, this);
+
+        basicPanel_.m_bpButtonRemovePair->SetBitmapLabel(*GlobalResources::getInstance().bitmapRemoveFolderPair);
+    }
+
+    virtual void OnLocalFilterCfgRemoveConfirm(wxCommandEvent& event)
+    {
+        localFilter = FilterConfig();
+        refreshButtons();
     }
 
     virtual void OnAltSyncCfgRemoveConfirm(wxCommandEvent& event)
     {
         altSyncConfig.reset();
-        updateAltButtonColor();
+        refreshButtons();
     }
 
 
 private:
-    void updateAltButtonColor()
-    {
-        if (altSyncConfig.get())
-            m_bpButtonAltSyncCfg->SetBitmapLabel(*GlobalResources::getInstance().bitmapSyncCfgSmall);
-        else
-            m_bpButtonAltSyncCfg->SetBitmapLabel(*GlobalResources::getInstance().bitmapSyncCfgSmallGrey);
-
-        if (altFilter.get())
-            m_bpButtonAltFilter->SetBitmapLabel(*GlobalResources::getInstance().bitmapFilterSmall);
-        else
-            m_bpButtonAltFilter->SetBitmapLabel(*GlobalResources::getInstance().bitmapFilterSmallGrey);
-
-        //set tooltips
-        if (altSyncConfig.get())
-            m_bpButtonAltSyncCfg->SetToolTip(wxString(_("Select alternate synchronization settings")) + wxT("  \n") +
-                                             wxT("(") + altSyncConfig->syncConfiguration.getVariantName() + wxT(")"));
-        else
-            m_bpButtonAltSyncCfg->SetToolTip(_("Select alternate synchronization settings"));
-
-        m_bpButtonAltFilter->SetToolTip(_("Select alternate filter settings"));
-    }
-
-    void OnAltFilterCfgRemove(wxCommandEvent& event)
+    void OnLocalFilterCfgRemove(wxCommandEvent& event)
     {
         contextMenu.reset(new wxMenu); //re-create context menu
-        contextMenu->Append(wxID_ANY, _("Remove alternate settings"));
-        contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FolderPairPanelBasic::OnAltFilterCfgRemoveConfirm), NULL, this);
-        GuiPanel::PopupMenu(contextMenu.get()); //show context menu
+        contextMenu->Append(wxID_ANY, _("Remove local filter settings"));
+        contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfgRemoveConfirm), NULL, this);
+        basicPanel_.PopupMenu(contextMenu.get()); //show context menu
     }
 
     void OnAltSyncCfgRemove(wxCommandEvent& event)
@@ -106,7 +134,7 @@ private:
         contextMenu.reset(new wxMenu); //re-create context menu
         contextMenu->Append(wxID_ANY, _("Remove alternate settings"));
         contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfgRemoveConfirm), NULL, this);
-        GuiPanel::PopupMenu(contextMenu.get()); //show context menu
+        basicPanel_.PopupMenu(contextMenu.get()); //show context menu
     }
 
     virtual MainConfiguration getMainConfig() const = 0;
@@ -131,46 +159,42 @@ private:
         if (syncDlg->ShowModal() == SyncCfgDialog::BUTTON_APPLY)
         {
             altSyncConfig.reset(new AlternateSyncConfig(altSyncCfg));
-            updateAltButtonColor();
+            refreshButtons();
 
             OnAltSyncCfgChange();
         }
     }
 
-    virtual void OnAltFilterCfgChange(bool defaultValueSet) {};
+    virtual void OnLocalFilterCfgChange() {};
 
-    void OnAltFilterCfg(wxCommandEvent& event)
+    void OnLocalFilterCfg(wxCommandEvent& event)
     {
-        const MainConfiguration mainCfg = getMainConfig();
-        const AlternateFilter filterMain(mainCfg.includeFilter, mainCfg.excludeFilter);
-
-        AlternateFilter altFilt = altFilter.get() ? *altFilter : filterMain;
-        FilterDlg* filterDlg = new FilterDlg(getParentWindow(), altFilt.includeFilter, altFilt.excludeFilter);
+        FilterConfig localFiltTmp = localFilter;
+        FilterDlg* filterDlg = new FilterDlg(getParentWindow(),
+                                             false, //is local filter dialog
+                                             localFiltTmp.includeFilter,
+                                             localFiltTmp.excludeFilter,
+                                             getMainConfig().filterIsActive);
         if (filterDlg->ShowModal() == FilterDlg::BUTTON_APPLY)
         {
-            altFilter.reset(new AlternateFilter(altFilt));
-            updateAltButtonColor();
+            localFilter = localFiltTmp;
+            refreshButtons();
 
-            if (    altFilt.includeFilter == defaultIncludeFilter() &&
-                    altFilt.excludeFilter == defaultExcludeFilter()) //default
-                OnAltFilterCfgChange(true);
-            else
-                OnAltFilterCfgChange(false);
+            OnLocalFilterCfgChange();
         }
     }
 
+    GuiPanel& basicPanel_; //panel to be enhanced by this template
+
     //alternate configuration attached to it
-    AltSyncCfgPtr altSyncConfig; //optional
-    AltFilterPtr  altFilter;     //optional
+    AltSyncCfgPtr altSyncConfig; //optional: present if non-NULL
+    FilterConfig  localFilter;
 
     std::auto_ptr<wxMenu> contextMenu;
-
-    //support for drag and drop
-    std::auto_ptr<DragDropOnDlg> dragDropOnLeft;
-    std::auto_ptr<DragDropOnDlg> dragDropOnRight;
 };
 }
 
 
 #endif // FOLDERPAIR_H_INCLUDED
+
 

@@ -12,7 +12,7 @@ namespace FreeFileSync
 const wxString& getGlobalConfigFile();
 const wxString& getDefaultLogDirectory();
 const wxString& getLastErrorTxtFile();
-const wxString& getInstallationDir(); //FreeFileSync installation directory without path separator
+const wxString& getInstallationDir(); //FreeFileSync installation directory WITH path separator at end
 const wxString& getConfigDir();
 //------------------------------------------------------------------------------
 }

@@ -156,10 +156,14 @@ About
 A propos de
 Action
 Action
+Activate filter
+Activer le filtre
 Add folder
 Ajout d'un dossier
 Add folder pair
 Ajout d'un couple de dossiers
+All directories in sync!
+Tous les répertoires en synchro !
 An exception occured!
 Une violation s'est produite !
 As a result the files are separated into the following categories:
@@ -196,10 +200,6 @@ Category
 Catégorie
 Change direction
 Changer la direction
-Check all
-Cocher tout
-Choose to hide filtered files/directories from list
-Masquer les fichiers/répertoires filtrés
 Comma separated list
 Liste d'éléments séparés par une virgule
 Commandline
@@ -240,8 +240,6 @@ Configuration saved!
 Configuration enregistrée !
 Configure filter
 Configuration des filtres
-Configure filter...
-Configuration des filtres...
 Configure your own synchronization rules.
 Paramétrage de vos règles de synchronisation.
 Confirm
@@ -332,8 +330,6 @@ Directory
 Répertoire
 Directory does not exist:
 Le répertoire n'existe pas :
-Do not display visual status information but write to a logfile instead
-Ne pas afficher les informations d'état à l'écran mais les enregistrer plutôt dans un fichier log
 Do not show this dialog again
 Ne pas afficher cette boîte de dialogue
 Do nothing
@@ -404,12 +400,12 @@ Error writing file:
 Erreur lors de l'écriture du fichier :
 Error writing to synchronization database:
 Erreur lors de l'écriture de la base de données de synchro :
-Source directory does not exist anymore:
-Le répertoire source n'existe plus :
 Example
 Exemple
 Exclude
 Exclure
+Exclude all rows
+Exclure toutes les lignes
 Exclude temporarily
 Exclure temporairement
 Exclude via filter:
@@ -420,6 +416,8 @@ Exit with RC < 0
 Sortie avec RC < 0
 External applications
 Applications externes
+Fatal Error
+Erreur Fatale
 Feedback and suggestions are welcome at:
 Commentaires et suggestions sont les bienvenus à :
 File %x has an invalid date!
@@ -464,12 +462,14 @@ Files/folders that exist on right side only
 Fichiers/répertoires existants seulement à droite
 Filter
 Filtrage
-Filter active: Press again to deactivate
-Filtrage actif : Cliquez de nouveau pour le désactiver
 Filter files
 Filtrage des fichiers
+Filter has been selected
+Le filtre a été sélectionné
 Filter view
 Filtrage de la vue
+Filtering is deactivated
+Le filtrage est désactivé
 Folder Comparison and Synchronization
 Comparaison de Dossiers et Synchronisation
 Free disk space available:
@@ -492,6 +492,8 @@ Generating database...
 Génération de la base de données...
 Generating file list...
 Génération de la liste des fichiers...
+Global filter
+Filtre global
 Global settings
 Paramètres généraux
 Help
@@ -502,6 +504,8 @@ Hide all error and warning messages
 Masquer tous les messages d'erreurs et les avertissements
 Hide conflicts
 Conflits sur le masquage
+Hide excluded items
+Masquer les éléments exclus
 Hide files that are different
 Masquer les fichiers différents
 Hide files that are equal
@@ -528,14 +532,16 @@ Hide files that will be overwritten on right side
 Fichiers masqués qui ont été écrasés à droite
 Hide files that won't be copied
 Masquer les fichiers qui ne seront pas copiés
-Hide filtered items
-Masquer les éléments filtrés
+Hide filtered or temporarily excluded files
+Masquer les fichiers filtrés ou exclus temporairement
 Hide further error messages during the current process
 Masquer les messages d'erreur suivants pendant le traitement
 Hints:
 Conseils :
 Homepage
 Accueil
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+Identifier et propager les modifications des deux côtés en utilisant une base de données. Les suppressions et les conflits sont détectés automatiquement.
 If you like FFS
 Si vous aimez FFS
 Ignore 1-hour file time difference
@@ -550,6 +556,8 @@ Ignore this error, retry or abort?
 Ignorer l'erreur, réessayer ou abandonner ?
 Include
 Inclure
+Include all rows
+Inclure toutes les lignes
 Include temporarily
 Inclure temporairement
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
@@ -560,8 +568,8 @@ Info
 Info
 Information
 Information
-Initial synchronization.
-Première synchronisation.
+Initial synchronization:
+Première synchronisation:
 Integrate external applications into context menu. The following macros are available:
 Inclure les applications externes dans le menu contextuel. Les macros suivantes sont disponibles :
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -576,6 +584,8 @@ Load configuration from file
 Charger la configuration à partir du fichier
 Load configuration history (press DEL to delete items)
 Charger l'historique des configuration (appuyez sur Suppr pour supprimer des éléments)
+Local filter
+Filtre local
 Log-messages:
 Messages log :
 Logging
@@ -600,8 +610,8 @@ Moving folder %x to user-defined directory %y
 Déplacement du dossier %x vers le répertoire défini par l'utilisateur %y
 Multiple...
 Multiple...
-No database file existing yet:
-Aucun fichier base de données n'existe actuellement :
+No filter selected
+Aucun filtre sélectionné
 Not enough free disk space available in:
 Espace disque insuffisant sur :
 Nothing to synchronize according to configuration!
@@ -636,8 +646,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Veuillez copier le fichier \"Shadow.dll\" (situé dans l'archive \"Shadow.zip\") vers le répertoire d'installation de FreeFileSync pour utiliser cette fonctionnalité.
 Please fill all empty directory fields.
 Veuillez remplir tous les champs vides du répertoire.
-Press button to activate filter
-Cliquez pour activer le filtrage
+Please run a Compare first before synchronizing!
+Veuillez cliquer sur "Compareré avant de lancer la synchronisation !
 Published under the GNU General Public License:
 Publié sous la licence GNU General Public :
 Question
@@ -658,12 +668,16 @@ Remove folder
 Supprimer le dossier
 Remove folder pair
 Supprimer le couple de dossiers
+Remove local filter settings
+Supprimer la configuration du filtre local
 Report translation error
 Etat d'erreurs de transfert
 Reset
 Réinitialiser
 Right
 Droite
+Run minimized and write status information to a logfile
+Exécution en mode réduit. Les informations d'état sont enregitrées dans un fichier .log
 S&ave configuration
 S&auvegarder la configuration
 S&witch view
@@ -678,14 +692,14 @@ Scanning:
 Lecture en cours :
 Select a folder
 Choisissez un répertoire
-Select alternate filter settings
-Sélectionner une autre configuration du filtre
 Select alternate synchronization settings
 Sélectionner une autre configuration de la synchronisation
 Select logfile directory:
 Choisissez un dossier pour le fichier .log :
 Select variant:
 Choisissez une variante :
+Setting default synchronization directions. Please check whether they are appropriate for you.
+Configuration de synchronisation par défaut. Veuillez vérifiez si elles vous conviennent.
 Show conflicts
 Afficher les conflits
 Show file icons
@@ -730,6 +744,8 @@ Size
 Taille
 Source code written completely in C++ utilizing:
 Code source écrit totalement en C++ et utilisant :
+Source directory does not exist anymore:
+Le répertoire source n'existe plus :
 Speed:
 Vitesse :
 Start
@@ -770,8 +786,12 @@ Target directory already existing!
 Le répertoire de destination existe déjà !
 Target file already existing!
 Le fichier de destination existe déjà !
+The database file is not yet existing, but will be created during synchronization:
+La base de données n'existe pas encore, mais elle sera créée pendant la synchronisation :
 The file does not contain a valid configuration:
 Le fichier ne contient pas de configuration valide :
+The required database entry is not yet existing, but will be created during synchronization:
+L'entrée demandée de la base de données n'existe pas encore, mais elle sera créée pendant la synchronisation :
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Cette variante définit comme identiques deux fichiers de même nom lorsqu'ils ont la même taille et le même date et heure de modification.
 Time
@@ -796,8 +816,6 @@ Unable to create logfile!
 Impossible de créer un fichier log !
 Unable to initialize Recycle Bin!
 Impossible d'initialiser la corbeille !
-Uncheck all
-Décocher tout
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Il y a des conflits non résolus !\n\nVous pouvez ignorer ces conflits et continuer la synchronisation.
 Update ->
@@ -812,8 +830,6 @@ User-defined directory
 Réoertoire défini par l'utilisateur
 User-defined directory for deletion was not specified!
 Le réoertoire défini par l'utilisateur pour la suppression n'a pas été indiqué !
-Using default synchronization directions. Please recheck.
-Sens de la synchronisation par défaut. Veuillez revérifier.
 Variant
 Variante
 Verifying file %x

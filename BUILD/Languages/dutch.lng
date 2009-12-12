@@ -156,10 +156,14 @@ About
 Informatie
 Action
 Actie
+Activate filter
+Activeer filter
 Add folder
 Map toevoegen
 Add folder pair
 Voeg 1 paar gekoppelde mappen toe
+All directories in sync!
+Alle paden zijn gesynchroniseerd!
 An exception occured!
 Er heeft een uitzondering plaatsgevonden!
 As a result the files are separated into the following categories:
@@ -196,10 +200,6 @@ Category
 Categorie
 Change direction
 Zijdes omwisselen
-Check all
-Alles controleren
-Choose to hide filtered files/directories from list
-Gefilterde bestanden niet/wel weergeven
 Comma separated list
 Komma gescheiden lijst
 Commandline
@@ -240,8 +240,6 @@ Configuration saved!
 Configuratie opgeslagen!
 Configure filter
 Configuratie filter
-Configure filter...
-Configuratie filter...
 Configure your own synchronization rules.
 Configureer uw eigen synchronisatieregels.
 Confirm
@@ -327,13 +325,11 @@ Beschrijving
 Directories are dependent! Be careful when setting up synchronization rules:
 Mappen zijn afhankelijk van elkaar! Wees voorzichtig met het maken van synchronisatieregels:
 Directories to watch
-Locaties om te controleren
+Paden om te controleren
 Directory
-Map
+Pad
 Directory does not exist:
-Map bestaat niet:
-Do not display visual status information but write to a logfile instead
-In plaats van visuele statusinformatie weergeven, alles naar een logbestand schrijven
+Pad bestaat niet:
 Do not show this dialog again
 Deze melding niet meer weergeven
 Do nothing
@@ -404,12 +400,12 @@ Error writing file:
 Er is een fout opgetreden bij het schrijven naar bestand:
 Error writing to synchronization database:
 Er is een fout opgetreden bij het schrijven naar de synchronisatie-database:
-Source directory does not exist anymore:
-De oorspronkelijke map bestaat niet meer:
 Example
 Voorbeeld
 Exclude
 Uitsluiten
+Exclude all rows
+Alle rijen uitsluiten
 Exclude temporarily
 Tijdelijk uitsluiten
 Exclude via filter:
@@ -420,6 +416,8 @@ Exit with RC < 0
 Afsluiten met RC < 0
 External applications
 Externe applicaties
+Fatal Error
+Fatale fout
 Feedback and suggestions are welcome at:
 Tips en suggesties zijn welkom op:
 File %x has an invalid date!
@@ -464,12 +462,14 @@ Files/folders that exist on right side only
 Bestanden/mappen die alleen aan de rechterkant bestaan
 Filter
 Filter
-Filter active: Press again to deactivate
-Filter actief: nogmaals klikken om uit te zetten
 Filter files
 Filter bestanden
+Filter has been selected
+Filter is geselecteerd
 Filter view
 Bekijk het filter
+Filtering is deactivated
+Filteren is uitgeschakeld
 Folder Comparison and Synchronization
 Mappen vergelijken en synchroniseren
 Free disk space available:
@@ -492,6 +492,8 @@ Generating database...
 Database genereren...
 Generating file list...
 Bestandslijst genereren...
+Global filter
+Algemeen filter
 Global settings
 Algemene instellingen
 Help
@@ -502,6 +504,8 @@ Hide all error and warning messages
 Verberg alle foutmeldingen en waarschuwingen
 Hide conflicts
 Verberg conflicten
+Hide excluded items
+Verberg uitgesloten items
 Hide files that are different
 Verberg bestanden die verschillend zijn
 Hide files that are equal
@@ -528,14 +532,16 @@ Hide files that will be overwritten on right side
 Verberg bestanden die zullen worden overschreven aan de rechterkant
 Hide files that won't be copied
 Verberg bestanden die niet zullen worden gekopieerd
-Hide filtered items
-Verberg gefilterde items
+Hide filtered or temporarily excluded files
+Verberg gefilterde of tijdelijk uitgesloten bestanden
 Hide further error messages during the current process
 Volgende foutmeldingen niet meer weergeven tijdens de huidige handeling
 Hints:
 Tips:
 Homepage
 Homepage
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+Identificeer en verwerk verandereringen aan beide kanten dmv een database. Verschillen en conflicten worden automatisch gedecteerd.
 If you like FFS
 Als het programma u bevalt
 Ignore 1-hour file time difference
@@ -550,6 +556,8 @@ Ignore this error, retry or abort?
 Negeer deze fout, opnieuw proberen of de handeling afbreken?
 Include
 Gebruiken
+Include all rows
+Alle rijen gebruiken
 Include temporarily
 Tijdelijk bijsluiten
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
@@ -560,8 +568,8 @@ Info
 Info
 Information
 Informatie
-Initial synchronization.
-Initiële  synchronisatie.
+Initial synchronization:
+Initiële  synchronisatie:
 Integrate external applications into context menu. The following macros are available:
 Integreer externe applicaties in het context menu. De volgende macros zijn beschikbaar:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -576,6 +584,8 @@ Load configuration from file
 Laad configuratie uit bestand
 Load configuration history (press DEL to delete items)
 Laad configuratiegeschiedenis (druk op DEL om items te verwijderen)
+Local filter
+Lokaal filter
 Log-messages:
 Logberichten:
 Logging
@@ -600,8 +610,8 @@ Moving folder %x to user-defined directory %y
 Verplaatsen map %x naar een door de gebruiker gedefinieerde locatie %y
 Multiple...
 Meerdere...
-No database file existing yet:
-Er bestaat nog geen database bestand:
+No filter selected
+Geen filter geselecteerd
 Not enough free disk space available in:
 Niet genoeg schijfruimte beschikbaar op:
 Nothing to synchronize according to configuration!
@@ -636,8 +646,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Kopiëer alstublieft \"Shadow.dll\" (locatie in \"Shadow.zip\" archief) naar de FreeFileSync installatiemap om het gebruik van deze optie mogelijk te maken
 Please fill all empty directory fields.
 Vul alstublieft aan beide kanten een pad in.
-Press button to activate filter
-Druk op de knop om het filter te activeren.
+Please run a Compare first before synchronizing!
+Voer eerst een Vergelijking uit voordat u synchroniseerd.
 Published under the GNU General Public License:
 Gepubliceerd onder de GNU General Public License:
 Question
@@ -658,12 +668,16 @@ Remove folder
 Verwijder map
 Remove folder pair
 Verwijder 1 paar gekoppelde mappen
+Remove local filter settings
+Verwijder lokale filter instellingen
 Report translation error
 Rapporteer een fout in de vertaling
 Reset
 Reset
 Right
 Rechts
+Run minimized and write status information to a logfile
+Tijdens het synchroniseren het venster minimaliseren en alle informatie opslaan in een log-bestand
 S&ave configuration
 S&la de instellingen op
 S&witch view
@@ -678,14 +692,14 @@ Scanning:
 Scannen:
 Select a folder
 Selecteer een map
-Select alternate filter settings
-Selecteer alternatieve filter instellingen
 Select alternate synchronization settings
 Selecteer alternatieve synchronisatie instellingen
 Select logfile directory:
 Selecteer een map voor het logbestand:
 Select variant:
 Selecteer een variant:
+Setting default synchronization directions. Please check whether they are appropriate for you.
+De standaard synchronisatie-richtingen worden gebruikt. Controleer alstublieft of dit geschikt is voor u.
 Show conflicts
 Geef conflicten weer
 Show file icons
@@ -730,6 +744,8 @@ Size
 Grootte
 Source code written completely in C++ utilizing:
 Broncode compleet geschreven in C++ met behulp van:
+Source directory does not exist anymore:
+De oorspronkelijke map bestaat niet meer:
 Speed:
 Snelheid:
 Start
@@ -770,8 +786,12 @@ Target directory already existing!
 Doellocatie bestaal al!
 Target file already existing!
 Doelbestand bestaat al!
+The database file is not yet existing, but will be created during synchronization:
+Database-bestand bestaat nog niet, maar zal worden aangemaakt tijdens het synchroniseren:
 The file does not contain a valid configuration:
 Het bestand bevat geen geldige configuratie:
+The required database entry is not yet existing, but will be created during synchronization:
+De nodige database-informatie bestaan nog niet, maar zal worden aangemaakt tijdens synchroniseren:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Deze variant ziet twee gelijknamige bestanden als gelijk wanneer ze dezelfde bestandsgrootte EN tijdstempel hebben.
 Time
@@ -796,8 +816,6 @@ Unable to create logfile!
 Niet mogelijk om een logbestand aan te maken!
 Unable to initialize Recycle Bin!
 De prullenbak kon niet worden geïnitialiseerd!
-Uncheck all
-Alles uitvinken
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Er bestaan onopgeloste conflicten! \n\nU kunt de conflicten negeren en doorgaan met synchroniseren.
 Update ->
@@ -812,8 +830,6 @@ User-defined directory
 Door de gebruiker te definiëren locatie
 User-defined directory for deletion was not specified!
 Door de gebruiker te definiëren locatie voor verwijderen was niet opgegeven!
-Using default synchronization directions. Please recheck.
-De standaardrichting voor synchronisatie wordt gebruikt. Alstublieft opnieuw controleren.
 Variant
 Variant
 Verifying file %x

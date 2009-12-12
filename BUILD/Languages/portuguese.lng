@@ -148,8 +148,6 @@
 <Selecção Múltipla>
 A newer version of FreeFileSync is available:
 Mais recente versão do FreeFileSync disponível:
-ATTENTION: Failed directory access can lead to file deletions!
-ATENÇÃO: Falha no acesso ao directório pode levar à eliminação de ficheiros!
 Abort requested: Waiting for current operation to finish...
 Abortar pedido: À espera do fim da operação...
 Aborted
@@ -158,10 +156,14 @@ About
 Sobre
 Action
 Acção
+Activate filter
+
 Add folder
 Adicionar pasta
 Add folder pair
 Adicionar um par de pastas
+All directories in sync!
+
 An exception occured!
 Ocorreu uma excepção!
 As a result the files are separated into the following categories:
@@ -198,10 +200,6 @@ Category
 Categoria
 Change direction
 Mudar direcção
-Check all
-Verificar tudo
-Choose to hide filtered files/directories from list
-Ocultar itens filtrados da lista
 Comma separated list
 Lista de itens separados por virgula
 Commandline
@@ -242,8 +240,6 @@ Configuration saved!
 Configuração guardada!
 Configure filter
 Configuração dos filtros
-Configure filter...
-Configurar filtros...
 Configure your own synchronization rules.
 Configure as suas regras de sincronização.
 Confirm
@@ -334,8 +330,6 @@ Directory
 Directório
 Directory does not exist:
 A pasta não existe:
-Do not display visual status information but write to a logfile instead
-Não apresentar informação de estado, mas escrever num ficheiro log
 Do not show this dialog again
 Não mostrar novamente
 Do nothing
@@ -406,12 +400,12 @@ Error writing file:
 Erro de escrita no ficheiro:
 Error writing to synchronization database:
 Erro na escrita da base de dados de sincronização:
-Source directory does not exist anymore:
-A pasta de origem já não existe:
 Example
 Exemplo
 Exclude
 Excluir
+Exclude all rows
+
 Exclude temporarily
 Excluir temporariamente
 Exclude via filter:
@@ -422,6 +416,8 @@ Exit with RC < 0
 Sair com RC < 0
 External applications
 Aplicações externas
+Fatal Error
+
 Feedback and suggestions are welcome at:
 Comentários e sugestões são benvindos em:
 File %x has an invalid date!
@@ -466,12 +462,14 @@ Files/folders that exist on right side only
 Ficheiros/pastas existentes somente à direita
 Filter
 Filtro
-Filter active: Press again to deactivate
-Filtro activo: Clique aqui para desactivar
 Filter files
 Filtrar ficheiros
+Filter has been selected
+
 Filter view
 Filtrar vista
+Filtering is deactivated
+
 Folder Comparison and Synchronization
 Comparação e Sincronização de pastas
 Free disk space available:
@@ -494,6 +492,8 @@ Generating database...
 A gerar base de dados...
 Generating file list...
 A gerar lista ficheiros...
+Global filter
+
 Global settings
 Opções
 Help
@@ -504,6 +504,8 @@ Hide all error and warning messages
 Ocultar todas as mensagens de erro ou aviso
 Hide conflicts
 Ocultar conflitos
+Hide excluded items
+
 Hide files that are different
 Ocultar ficheiros diferentes
 Hide files that are equal
@@ -530,14 +532,16 @@ Hide files that will be overwritten on right side
 Ocultar ficheiros a ser substituidos do lado direito
 Hide files that won't be copied
 Ocultar ficheiros que não serão copiados
-Hide filtered items
-Ocultar itens filtrados
+Hide filtered or temporarily excluded files
+
 Hide further error messages during the current process
 Ocultar próximas mensagens de erro durante este processo
 Hints:
 Dicas:
 Homepage
 Site
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+
 If you like FFS
 Se gosta do FreeFileSync
 Ignore 1-hour file time difference
@@ -552,6 +556,8 @@ Ignore this error, retry or abort?
 Ignorar erro, tentar de novo ou abortar?
 Include
 Incluir
+Include all rows
+
 Include temporarily
 Incluir temporariamente
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
@@ -562,8 +568,8 @@ Info
 Info
 Information
 Informação
-Initial synchronization.
-Sincronização inicial.
+Initial synchronization:
+Sincronização inicial:
 Integrate external applications into context menu. The following macros are available:
 Integrar aplicações externas no menu de contexto. As seguintes macros estão disponíveis:
 It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
@@ -578,6 +584,8 @@ Load configuration from file
 Carregar configuração do ficheiro
 Load configuration history (press DEL to delete items)
 Carregar histórico de configuração (pressione DEL para apagar itens)
+Local filter
+
 Log-messages:
 Log de mensagens:
 Logging
@@ -602,8 +610,8 @@ Moving folder %x to user-defined directory %y
 A mover pasta %x para o directório %y
 Multiple...
 Multiplo...
-No database file existing yet:
-Base de dados inexistente:
+No filter selected
+
 Not enough free disk space available in:
 Não há espaço livre suficiente em:
 Nothing to synchronize according to configuration!
@@ -638,8 +646,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 Por favor copie o \"Shadow.dll\" correcto (localizado no arquivo \"Shadow.zip\") para a pasta da instalação do FreeFileSync para activar esta opção.
 Please fill all empty directory fields.
 Por favor, preencha todos os campos vazios.
-Press button to activate filter
-Pressione para activar o filtro
+Please run a Compare first before synchronizing!
+
 Published under the GNU General Public License:
 Publicado sobre GNU General Public License:
 Question
@@ -660,12 +668,16 @@ Remove folder
 Remover pasta(s)
 Remove folder pair
 Remover o par de pastas
+Remove local filter settings
+
 Report translation error
 Informar um erro de tradução
 Reset
 Reiniciar
 Right
 Direita
+Run minimized and write status information to a logfile
+
 S&ave configuration
 G&uardar a configuração
 S&witch view
@@ -680,14 +692,14 @@ Scanning:
 A pesquisar:
 Select a folder
 Seleccione uma pasta
-Select alternate filter settings
-Seleccionar opções alternativas de filtros
 Select alternate synchronization settings
 Seleccionar opções alternativas de sincronização
 Select logfile directory:
 Seleccione directório para ficheiro log:
 Select variant:
 Seleccione uma variante:
+Setting default synchronization directions. Please check whether they are appropriate for you.
+
 Show conflicts
 Mostrar conflitos
 Show file icons
@@ -732,6 +744,8 @@ Size
 Tamanho
 Source code written completely in C++ utilizing:
 Código fonte todo escrito em C++ utilizando:
+Source directory does not exist anymore:
+A pasta de origem já não existe:
 Speed:
 Velocidade:
 Start
@@ -772,8 +786,12 @@ Target directory already existing!
 Directório de destino já existe!
 Target file already existing!
 Ficheiro de destino já existe!
+The database file is not yet existing, but will be created during synchronization:
+
 The file does not contain a valid configuration:
 O ficheiro não contém uma configuração válida:
+The required database entry is not yet existing, but will be created during synchronization:
+
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Esta variante avalia dois ficheiros de nome igual como iguais quando têm o mesmo tamanho e a mesma data e hora de modificação.
 Time
@@ -798,8 +816,6 @@ Unable to create logfile!
 Não é possível criar ficheiro log!
 Unable to initialize Recycle Bin!
 Não é possível iniciar a Reciclagem!
-Uncheck all
-Deseleccionar todos
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Existem conflitos não resolvidos! \n\nPode ignorá-los e continuar a sincronização.
 Update ->
@@ -814,8 +830,6 @@ User-defined directory
 Directório definido pelo utilizador
 User-defined directory for deletion was not specified!
 Directório para eliminação não foi especificado!
-Using default synchronization directions. Please recheck.
-Direcção de sincronização inicial em uso. Verifique de novo.
 Variant
 Variável
 Verifying file %x

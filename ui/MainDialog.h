@@ -14,6 +14,7 @@
 #include <memory>
 #include <map>
 #include <set>
+#include <wx/help.h>
 
 class CompareStatusHandler;
 class CompareStatus;
@@ -24,6 +25,7 @@ class FFSSyncDirectionEvent;
 class IconUpdater;
 class ManualDeletionHandler;
 class FolderPairPanel;
+class FirstFolderPairCfg;
 
 
 namespace FreeFileSync
@@ -38,7 +40,8 @@ class MainDialog : public MainDialogGenerated
     friend class CompareStatusHandler;
     friend class ManualDeletionHandler;
     friend class MainFolderDragDrop;
-    friend class FolderPairPanel;
+    template <class GuiPanel>
+    friend class FolderPairCallback;
 
 //IDs for context menu items
     enum ContextIDRim //context menu for left and right grids
@@ -78,7 +81,8 @@ class MainDialog : public MainDialogGenerated
 public:
     MainDialog(wxFrame* frame,
                const wxString& cfgFileName,
-               xmlAccess::XmlGlobalSettings& settings);
+               xmlAccess::XmlGlobalSettings& settings,
+    wxHelpController& helpController);
 
     ~MainDialog();
 
@@ -102,7 +106,7 @@ private:
     void writeGlobalSettings();
 
     void initViewFilterButtons();
-    void updateFilterButton(wxBitmapButton* filterButton, bool isActive);
+    void updateFilterButtons();
 
     void addFileToCfgHistory(const wxString& filename);
     void addLeftFolderToHistory(const wxString& leftFolder);
@@ -111,6 +115,8 @@ private:
     void addFolderPair(const std::vector<FreeFileSync::FolderPairEnh>& newPairs, bool addFront = false);
     void removeAddFolderPair(const unsigned int pos);
     void clearAddFolderPairs();
+
+void updateGuiForFolderPair(); //helper method: add usability by showing/hiding buttons related to folder pairs
 
     //main method for putting gridDataView on UI: updates data respecting current view settings
     void updateGuiGrid();
@@ -203,7 +209,6 @@ private:
 
     void loadConfiguration(const wxString& filename);
     void OnCfgHistoryKeyEvent(  wxKeyEvent& event);
-    void OnFolderHistoryKeyEvent(wxKeyEvent& event);
     void OnRegularUpdateCheck(  wxIdleEvent& event);
     void OnLayoutWindowAsync(   wxIdleEvent& event);
 
@@ -213,7 +218,7 @@ private:
     void OnResizeFolderPairs(   wxSizeEvent& event);
     void OnFilterButton(        wxCommandEvent& event);
     void OnHideFilteredButton(  wxCommandEvent& event);
-    void OnConfigureFilter(     wxHyperlinkEvent& event);
+    void OnConfigureFilter(     wxCommandEvent& event);
     void OnSwapSides(           wxCommandEvent& event);
     void OnCompare(             wxCommandEvent& event);
     void OnSwitchView(          wxCommandEvent& event);
@@ -227,8 +232,9 @@ private:
 
     void OnAddFolderPair(       wxCommandEvent& event);
     void OnRemoveFolderPair(    wxCommandEvent& event);
+    void OnRemoveTopFolderPair( wxCommandEvent& event);
 
-    void updateFilterConfig(bool activateFilter);
+    void updateFilterConfig();
     void updateSyncConfig();
 
     //menu events
@@ -237,6 +243,7 @@ private:
     void OnMenuBatchJob(        wxCommandEvent& event);
     void OnMenuCheckVersion(    wxCommandEvent& event);
     void OnMenuAbout(           wxCommandEvent& event);
+    void OnShowHelp(            wxCommandEvent& event);
     void OnMenuQuit(            wxCommandEvent& event);
     void OnMenuLanguageSwitch(  wxCommandEvent& event);
 
@@ -260,8 +267,8 @@ private:
     xmlAccess::XmlGuiConfig currentCfg;
 
     //folder pairs:
-    //m_directoryLeft, m_directoryRight
-    std::vector<FolderPairPanel*> additionalFolderPairs; //additional pairs to the standard pair
+        std::auto_ptr<FirstFolderPairCfg> firstFolderPair; //always bound!!!
+    std::vector<FolderPairPanel*> additionalFolderPairs; //additional pairs to the first pair
 
     //gui settings
     int widthNotMaximized;
@@ -291,14 +298,13 @@ private:
     int lastSortColumn;
     const wxGrid* lastSortGrid;
 
-    //support for drag and drop
-    std::auto_ptr<MainFolderDragDrop> dragDropOnLeft;
-    std::auto_ptr<MainFolderDragDrop> dragDropOnRight;
-
 #ifdef FFS_WIN
     //update icons periodically: one updater instance for both left and right grids
     std::auto_ptr<IconUpdater> updateFileIcons;
 #endif
+
+    //global help controller
+    wxHelpController& helpController_;
 
     //encapsulation of handling of sync preview
     class SyncPreview //encapsulates MainDialog functionality for synchronization preview (friend class)

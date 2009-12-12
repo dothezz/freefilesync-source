@@ -1,0 +1,32 @@
+[OPTIONS]
+Compatibility=1.1 or later
+Compiled file=..\FreeFileSync.chm
+Contents file=Table of Contents.hhc
+Default topic=html\Overview.html
+Display compile progress=No
+Full-text search=Yes
+Language=0x409 Englisch (USA)
+Title=FreeFileSync - Help
+
+
+[FILES]
+html\Features.html
+html\Links.html
+html\advanced\CompareFileSize.html
+html\advanced\DragDrop.html
+html\advanced\ExcludeSubfolder.html
+html\advanced\ExternalApp.html
+html\advanced\Ftp.html
+html\advanced\ScheduleBatch.html
+html\advanced\SendMail.html
+html\advanced\SymbolicLinks.html
+html\advanced\TimeStamped.html
+html\advanced\VariableDrive.html
+html\Overview.html
+html\advanced\DaylightSavingTime.html
+html\advanced\EnvironmentVariables.html
+html\advanced\RealtimeSync.html
+html\advanced\ShadowCopy.html
+
+[INFOTYPES]
+

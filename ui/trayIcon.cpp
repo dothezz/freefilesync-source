@@ -1,7 +1,7 @@
 #include "trayIcon.h"
 #include "../library/resources.h"
 #include "smallDialogs.h"
-#include "../library/statusHandler.h"
+//#include "../library/statusHandler.h"
 #include <wx/taskbar.h>
 
 
@@ -79,7 +79,7 @@ void MinimizeToTray::resumeFromTray() //remove trayIcon and restore windows:  Mi
         trayIcon->RemoveIcon(); //hide icon until final deletion takes place
         trayIcon->Disconnect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(MinimizeToTray::OnDoubleClick), NULL, this);
 
-        //delayed destruction: delete during next idle loop iteration (handle late window messages, e.g. when double-clicking)
+        //use wxWidgets delayed destruction: delete during next idle loop iteration (handle late window messages, e.g. when double-clicking)
         if (!wxPendingDelete.Member(trayIcon))
             wxPendingDelete.Append(trayIcon);
 

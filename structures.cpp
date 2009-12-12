@@ -7,14 +7,7 @@ using FreeFileSync::SyncConfiguration;
 using FreeFileSync::MainConfiguration;
 
 
-Zstring FreeFileSync::defaultIncludeFilter()
-{
-    static Zstring include(DefaultStr("*")); //include all files/folders
-    return include;
-}
-
-
-Zstring FreeFileSync::defaultExcludeFilter()
+Zstring FreeFileSync::standardExcludeFilter()
 {
 #ifdef FFS_WIN
     static Zstring exclude(wxT("\
@@ -145,15 +138,27 @@ wxString SyncConfiguration::getVariantName() const
 
 wxString MainConfiguration::getSyncVariantName()
 {
-    const SyncConfiguration::Variant mainVariant = syncConfiguration.getVariant();
+    const SyncConfiguration firstSyncCfg =
+        firstPair.altSyncConfig.get() ?
+        firstPair.altSyncConfig->syncConfiguration :
+        syncConfiguration; //fallback to main sync cfg
+
+    const SyncConfiguration::Variant firstVariant = firstSyncCfg.getVariant();
 
     //test if there's a deviating variant within the additional folder pairs
     for (std::vector<FolderPairEnh>::const_iterator i = additionalPairs.begin(); i != additionalPairs.end(); ++i)
-        if (i->altSyncConfig.get() && i->altSyncConfig->syncConfiguration.getVariant() != mainVariant)
+    {
+        const SyncConfiguration::Variant thisVariant =
+            i->altSyncConfig.get() ?
+            i->altSyncConfig->syncConfiguration.getVariant() :
+            syncConfiguration.getVariant();
+
+        if (thisVariant != firstVariant)
             return _("Multiple...");
+    }
 
     //seems to be all in sync...
-    return syncConfiguration.getVariantName();
+    return firstSyncCfg.getVariantName();
 }
 
 
@@ -259,4 +264,5 @@ wxString FreeFileSync::getSymbol(SyncOperation op)
     assert(false);
     return wxEmptyString;
 }
+
 

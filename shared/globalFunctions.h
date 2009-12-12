@@ -10,10 +10,7 @@
 #include <memory>
 #include <sstream>
 #include <fstream>
-#include <wx/stream.h>
 
-class wxInputStream;
-class wxOutputStream;
 class wxStopWatch;
 
 
@@ -60,9 +57,6 @@ unsigned int getDigitCount(const unsigned int number); //count number of digits
 //read/write numbers: int, long, unsigned int ... ect
 template <class T> T readNumber(std::ifstream& stream);
 template <class T> void writeNumber(std::ofstream& stream, T number);
-
-template <class T> T readNumber(wxInputStream& stream);
-template <class T> void writeNumber(wxOutputStream& stream, T number);
 
 inline
 wxLongLong convertToSigned(const wxULongLong number)
@@ -218,24 +212,6 @@ inline
 void globalFunctions::writeNumber(std::ofstream& stream, T number)
 {
     stream.write(reinterpret_cast<const char*>(&number), sizeof(T));
-}
-
-
-template <class T>
-inline
-T globalFunctions::readNumber(wxInputStream& stream)
-{
-    T result = 0;
-    stream.Read(&result, sizeof(T));
-    return result;
-}
-
-
-template <class T>
-inline
-void globalFunctions::writeNumber(wxOutputStream& stream, T number)
-{
-    stream.Write(&number, sizeof(T));
 }
 
 

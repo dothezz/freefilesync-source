@@ -148,8 +148,6 @@
 <Selección múltiple>
 A newer version of FreeFileSync is available:
 
-ATTENTION: Failed directory access can lead to file deletions!
-
 Abort requested: Waiting for current operation to finish...
 Abortar pedido: Esperar a que la actual operación finalice...
 Aborted
@@ -158,10 +156,14 @@ About
 Sobre
 Action
 Acción
+Activate filter
+
 Add folder
 
 Add folder pair
 Añadir un par de carpetas
+All directories in sync!
+
 An exception occured!
 ¡Ha ocurrido una excepción!
 As a result the files are separated into the following categories:
@@ -198,10 +200,6 @@ Category
 
 Change direction
 
-Check all
-Verificar todo
-Choose to hide filtered files/directories from list
-Ocultar en la lista ficheros/directorios filtrados
 Comma separated list
 Lista de "items" separados por coma
 Commandline
@@ -242,8 +240,6 @@ Configuration saved!
 ¡Configuración guardada!
 Configure filter
 Configurar filtro
-Configure filter...
-Configurar filtros...
 Configure your own synchronization rules.
 Configure sus propias reglas de sincronización.
 Confirm
@@ -334,8 +330,6 @@ Directory
 
 Directory does not exist:
 El directorio no existe:
-Do not display visual status information but write to a logfile instead
-
 Do not show this dialog again
 
 Do nothing
@@ -406,12 +400,12 @@ Error writing file:
 Error al escribir fichero:
 Error writing to synchronization database:
 
-Source directory does not exist anymore:
-El directorio origen no existe ya:
 Example
 Ejemplo
 Exclude
 Excluir
+Exclude all rows
+
 Exclude temporarily
 Excluir temporalmente
 Exclude via filter:
@@ -421,6 +415,8 @@ Salir inmediatamente y enviar el código < 0
 Exit with RC < 0
 Salir com RC < 0
 External applications
+
+Fatal Error
 
 Feedback and suggestions are welcome at:
 Los comentarios y sugerencias será bienvenidos en:
@@ -466,12 +462,14 @@ Files/folders that exist on right side only
 Ficheros/carpetas que existen sólo en el lado derecho
 Filter
 
-Filter active: Press again to deactivate
-Filtro activo: Clique aquí para desactivar
 Filter files
 Filtrar ficheros
+Filter has been selected
+
 Filter view
 Vista de filtros
+Filtering is deactivated
+
 Folder Comparison and Synchronization
 Carpeta de Comparación y Sincronización
 Free disk space available:
@@ -494,6 +492,8 @@ Generating database...
 
 Generating file list...
 Generando lista de ficheros...
+Global filter
+
 Global settings
 Opciones globales
 Help
@@ -503,6 +503,8 @@ Hidden dialogs:
 Hide all error and warning messages
 Ocultar todos los mensajes de error y aviso
 Hide conflicts
+
+Hide excluded items
 
 Hide files that are different
 Ocultar ficheros diferentes
@@ -530,14 +532,16 @@ Hide files that will be overwritten on right side
 
 Hide files that won't be copied
 
-Hide filtered items
-Ocultar items filtrados
+Hide filtered or temporarily excluded files
+
 Hide further error messages during the current process
 Ocultar próximos mensajes de error durante este processo
 Hints:
 Consejos:
 Homepage
 Homepage
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+
 If you like FFS
 Si te gusta FFS
 Ignore 1-hour file time difference
@@ -552,6 +556,8 @@ Ignore this error, retry or abort?
 ¿Ignorar este error, reintentar o abortar?
 Include
 Incluir
+Include all rows
+
 Include temporarily
 Incluir temporalmente
 Include: *.doc;*.zip;*.exe\nExclude: temp\\*
@@ -562,7 +568,7 @@ Info
 Info
 Information
 Información
-Initial synchronization. Please verify default copy-directions!
+Initial synchronization:
 
 Integrate external applications into context menu. The following macros are available:
 
@@ -578,6 +584,8 @@ Load configuration from file
 Cargar configuración desde fichero
 Load configuration history (press DEL to delete items)
 Cargar histórico de configuración (presionar DEL para borrar elementos)
+Local filter
+
 Log-messages:
 Log de mensajes:
 Logging
@@ -602,7 +610,7 @@ Moving folder %x to user-defined directory %y
 
 Multiple...
 
-No database file existing yet:
+No filter selected
 
 Not enough free disk space available in:
 
@@ -638,8 +646,8 @@ Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) i
 
 Please fill all empty directory fields.
 Por favor, rellene todos los campos del directorio vacíos.
-Press button to activate filter
-Presione el botón para activar el filtro
+Please run a Compare first before synchronizing!
+
 Published under the GNU General Public License:
 Publicado bajo "GNU General Public License":
 Question
@@ -660,11 +668,15 @@ Remove folder
 
 Remove folder pair
 Eliminar par de carpetas
+Remove local filter settings
+
 Report translation error
 
 Reset
 Reiniciar
 Right
+
+Run minimized and write status information to a logfile
 
 S&ave configuration
 G&uardar configuración
@@ -680,14 +692,14 @@ Scanning:
 Analizar:
 Select a folder
 Seleccione una carpeta
-Select alternate filter settings
-
 Select alternate synchronization settings
 
 Select logfile directory:
 
 Select variant:
 Sleccione una variante:
+Setting default synchronization directions. Please check whether they are appropriate for you.
+
 Show conflicts
 
 Show file icons
@@ -732,6 +744,8 @@ Size
 Tamaño
 Source code written completely in C++ utilizing:
 Código fuente escrito en C++ utilizando:
+Source directory does not exist anymore:
+El directorio origen no existe ya:
 Speed:
 
 Start
@@ -772,8 +786,12 @@ Target directory already existing!
 
 Target file already existing!
 ¡El fichero objetivo existe ya!
+The database file is not yet existing, but will be created during synchronization:
+
 The file does not contain a valid configuration:
 El fichero no contiene una configuración válida:
+The required database entry is not yet existing, but will be created during synchronization:
+
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Esta variante evalúa dos ficheros con el mismo nombre como iguales cuando tienen el mismo tamaño Y la misma fecha de modificación.
 Time
@@ -798,8 +816,6 @@ Unable to create logfile!
 Permitir crear logfile
 Unable to initialize Recycle Bin!
 Permitir iniciar la Papelera
-Uncheck all
-Deseleccionar todos
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 
 Update ->
@@ -813,8 +829,6 @@ Use Recycle Bin when deleting or overwriting files.
 User-defined directory
 
 User-defined directory for deletion was not specified!
-
-Using default synchronization directions. Please recheck.
 
 Variant
 

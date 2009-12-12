@@ -10,6 +10,7 @@
 
 #include <wx/app.h>
 #include "library/processXml.h"
+#include <wx/help.h>
 
 
 class Application : public wxApp
@@ -27,6 +28,7 @@ private:
 
     xmlAccess::XmlGlobalSettings globalSettings; //settings used by GUI, batch mode or both
 
+    boost::shared_ptr<wxHelpController> helpController; //global help controller
     int returnValue;
 };
 

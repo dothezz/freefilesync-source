@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Win32)">
+	<META NAME="CREATED" CONTENT="20091206;16574000">
+	<META NAME="CHANGED" CONTENT="20091213;16073500">
+	<META NAME="Info 1" CONTENT="">
+	<META NAME="Info 2" CONTENT="">
+	<META NAME="Info 3" CONTENT="">
+	<META NAME="Info 4" CONTENT="">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 2cm }
+		P { margin-bottom: 0.21cm }
+		H3 { margin-bottom: 0.21cm }
+		H3.western { font-family: "Arial", sans-serif }
+		H3.cjk { font-family: "MS Mincho" }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="de-DE" DIR="LTR">
+<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">RealtimeSync</FONT></H3>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">RealtimeSync's
+primary function is to trigger synchronization immediately after
+files in a source directory have changed. However its implementation
+is much more flexible to cover an even broader range of use: A list
+of directories provided by the user is monitored for changes.
+Whenever a file or a subdirectory is modified, RealtimeSync responds
+by executing the user-specified commandline.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT>
+<FONT FACE="Tahoma, sans-serif">(Real time synchronization - in
+combination with FreeFileSync)</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">First
+specify all directories that shall be monitored. Instead of doing
+this manually you can simply import a *.ffs_batch file via </FONT><FONT FACE="Tahoma, sans-serif"><I>Menu
+-&gt; File -&gt; Load configuration</I></FONT><FONT FACE="Tahoma, sans-serif">.
+This not only extracts all directories relevant for synchronization
+but also sets up the commandline to execute the *.ffs_batch file
+every time changes are detected. Then press start to begin
+monitoring.</FONT></P>
+<UL>
+	<P STYLE="margin-bottom: 0cm"><IMG SRC="RealtimeSync_html_72dda21b.gif" NAME="Grafik1" ALIGN=MIDDLE WIDTH=382 HEIGHT=395 BORDER=0></P>
+</UL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<UL>
+	<P STYLE="margin-bottom: 0cm"><SPAN ID="Rahmen3" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+		<UL>
+			<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note:</B></FONT></P>
+			<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm">
+			<FONT FACE="Tahoma, sans-serif">Using RealtimeSync is not
+			restricted to starting FreeFileSync. It can also be used for other
+			scenarios, like sending an email whenever a certain directory is
+			modified.</FONT></P>
+			<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm">
+			<FONT FACE="Tahoma, sans-serif">Starting the tool can be automated
+			by passing a RealtimeSync configuration file (*.ffs_real) OR a
+			FreeFileSync Batch file (*.ffs_batch) as first commandline
+			argument. This allows for integration with your operating system's
+			autostart facility:</FONT></P>
+		</UL>
+	</SPAN><BR CLEAR=LEFT>
+	</P>
+</UL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<UL>
+	<P><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+		<FONT FACE="Courier New, monospace">C:\Program
+		Files\FreeFileSync\RealtimeSync.exe C:\MyConfig.ffs_real<BR>C:\Program
+		Files\FreeFileSync\RealtimeSync.exe C:\SyncJob.ffs_batch</FONT></P>
+	</SPAN><BR CLEAR=LEFT>
+	</P>
+</UL>
+</BODY>
+</HTML>

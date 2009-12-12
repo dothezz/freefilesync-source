@@ -72,7 +72,7 @@
 			<Add option="-DTIXML_USE_STL" />
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
 			<Add directory="C:\Programme\C++\wxWidgets\contrib\include" />
-			<Add directory="..\shared\boost_1_40_0" />
+			<Add directory="..\shared\boost_1_x" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
@@ -123,6 +123,8 @@
 		<Unit filename="..\Shared\zstring.cpp" />
 		<Unit filename="..\Shared\zstring.h" />
 		<Unit filename="..\library\processXml.cpp" />
+		<Unit filename="..\shared\dllLoader.cpp" />
+		<Unit filename="..\shared\dllLoader.h" />
 		<Unit filename="..\shared\fileError.h" />
 		<Unit filename="..\shared\fileHandling.cpp" />
 		<Unit filename="..\shared\fileHandling.h" />
