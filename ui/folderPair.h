@@ -60,13 +60,13 @@ public:
     {
         if (altSyncConfig.get())
         {
-            basicPanel_.m_bpButtonAltSyncCfg->SetBitmapLabel(*GlobalResources::getInstance().bitmapSyncCfgSmall);
+            basicPanel_.m_bpButtonAltSyncCfg->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("syncConfigSmall")));
             basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(wxString(_("Select alternate synchronization settings")) +  wxT(" ") + globalFunctions::LINE_BREAK +
                     wxT("(") + altSyncConfig->syncConfiguration.getVariantName() + wxT(")"));
         }
         else
         {
-            basicPanel_.m_bpButtonAltSyncCfg->SetBitmapLabel(*GlobalResources::getInstance().bitmapSyncCfgSmallGrey);
+            basicPanel_.m_bpButtonAltSyncCfg->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("syncConfigSmallGrey")));
             basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Select alternate synchronization settings"));
         }
 
@@ -77,18 +77,18 @@ public:
             const bool isNullFilter = NameFilter(localFilter.includeFilter, localFilter.excludeFilter).isNull();
             if (isNullFilter)
             {
-                basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(*GlobalResources::getInstance().bitmapFilterSmallGrey);
+                basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("filterSmallGrey")));
                 basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("No filter selected"));
             }
             else
             {
-                basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(*GlobalResources::getInstance().bitmapFilterSmall);
+                basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("filterSmall")));
                 basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("Filter has been selected"));
             }
         }
         else
         {
-            basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(*GlobalResources::getInstance().bitmapFilterSmallGrey);
+            basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("filterSmallGrey")));
             basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("Filtering is deactivated"));
         }
     }
@@ -104,7 +104,7 @@ protected:
         basicPanel_.m_bpButtonAltSyncCfg-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfg), NULL, this);
         basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfg), NULL, this);
 
-        basicPanel_.m_bpButtonRemovePair->SetBitmapLabel(*GlobalResources::getInstance().bitmapRemoveFolderPair);
+        basicPanel_.m_bpButtonRemovePair->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("removeFolderPair")));
     }
 
     virtual void OnLocalFilterCfgRemoveConfirm(wxCommandEvent& event)

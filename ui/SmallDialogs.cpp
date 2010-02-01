@@ -14,16 +14,18 @@
 #include <wx/wupdlock.h>
 #include "../shared/globalFunctions.h"
 #include "trayIcon.h"
+#include "../shared/staticAssert.h"
+#include "../shared/buildInfo.h"
 
 using namespace FreeFileSync;
 
 
 AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
 {
-    m_bitmap9->SetBitmap(*GlobalResources::getInstance().bitmapWebsite);
-    m_bitmap10->SetBitmap(*GlobalResources::getInstance().bitmapEmail);
-    m_bitmap11->SetBitmap(*GlobalResources::getInstance().bitmapLogo);
-    m_bitmap13->SetBitmap(*GlobalResources::getInstance().bitmapGPL);
+    m_bitmap9->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("website")));
+    m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("email")));
+    m_bitmap11->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("logo")));
+    m_bitmap13->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("gpl")));
 
     //create language credits
     for (std::vector<LocInfoLine>::const_iterator i = LocalizationInfo::getMapping().begin(); i != LocalizationInfo::getMapping().end(); ++i)
@@ -49,10 +51,19 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
     //build information
     wxString build = wxString(wxT("(")) + _("Build:") + wxT(" ") + __TDATE__;
 #if wxUSE_UNICODE
-    build += wxT(" - Unicode)");
+    build += wxT(" - Unicode");
 #else
-    build += wxT(" - ANSI)");
+    build += wxT(" - ANSI");
 #endif //wxUSE_UNICODE
+
+    //compile time info about 32/64-bit build
+    if (Utility::is64BitBuild)
+        build += wxT(" x64)");
+    else
+        build += wxT(" x86)");
+    assert_static(Utility::is32BitBuild || Utility::is64BitBuild);
+
+
     m_build->SetLabel(build);
 
     m_animationControl1->SetAnimation(*GlobalResources::getInstance().animationMoney);
@@ -80,7 +91,7 @@ HelpDlg::HelpDlg(wxWindow* window) : HelpDlgGenerated(window)
 {
     m_notebook1->SetFocus();
 
-    m_bitmap25->SetBitmap(*GlobalResources::getInstance().bitmapHelp);
+    m_bitmap25->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("help")));
 
     //populate decision trees: "compare by date"
     wxTreeItemId treeRoot      = m_treeCtrl1->AddRoot(_("DECISION TREE"));
@@ -137,10 +148,10 @@ FilterDlg::FilterDlg(wxWindow* window,
     includeFilter(filterIncl),
     excludeFilter(filterExcl)
 {
-    m_bitmap8->SetBitmap(*GlobalResources::getInstance().bitmapInclude);
-    m_bitmap9->SetBitmap(*GlobalResources::getInstance().bitmapExclude);
-    m_bitmap26->SetBitmap(*GlobalResources::getInstance().bitmapFilterOn);
-    m_bpButtonHelp->SetBitmapLabel(*GlobalResources::getInstance().bitmapHelp);
+    m_bitmap8->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("include")));
+    m_bitmap9->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("exclude")));
+    m_bitmap26->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("filterOn")));
+    m_bpButtonHelp->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("help")));
 
     m_textCtrlInclude->SetValue(zToWx(includeFilter));
     m_textCtrlExclude->SetValue(zToWx(excludeFilter));
@@ -243,12 +254,12 @@ void DeleteDialog::updateTexts()
     if (m_checkBoxUseRecycler->GetValue())
     {
         m_staticTextHeader->SetLabel(_("Do you really want to move the following objects(s) to the Recycle Bin?"));
-        m_bitmap12->SetBitmap(*GlobalResources::getInstance().bitmapRecycler);
+        m_bitmap12->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("recycler")));
     }
     else
     {
         m_staticTextHeader->SetLabel(_("Do you really want to delete the following objects(s)?"));
-        m_bitmap12->SetBitmap(*GlobalResources::getInstance().bitmapDeleteFile);
+        m_bitmap12->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("deleteFile")));
     }
 
     const std::pair<wxString, int> delInfo = FreeFileSync::deleteFromGridAndHDPreview(
@@ -292,7 +303,7 @@ void DeleteDialog::OnUseRecycler(wxCommandEvent& event)
     {
         if (!FreeFileSync::recycleBinExists())
         {
-            wxMessageBox(_("It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)"), _("Error") , wxOK | wxICON_ERROR);
+            wxMessageBox(_("Unable to initialize Recycle Bin!"), _("Error") , wxOK | wxICON_ERROR);
             m_checkBoxUseRecycler->SetValue(false);
         }
     }
@@ -307,7 +318,7 @@ ErrorDlg::ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxStri
     ErrorDlgGenerated(parentWindow),
     ignoreErrors(ignoreNextErrors)
 {
-    m_bitmap10->SetBitmap(*GlobalResources::getInstance().bitmapError);
+    m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("error")));
     m_textCtrl8->SetValue(messageText);
     m_checkBoxIgnoreErrors->SetValue(ignoreNextErrors);
 
@@ -368,7 +379,7 @@ WarningDlg::WarningDlg(wxWindow* parentWindow,  int activeButtons, const wxStrin
     WarningDlgGenerated(parentWindow),
     dontShowAgain(dontShowDlgAgain)
 {
-    m_bitmap10->SetBitmap(*GlobalResources::getInstance().bitmapWarning);
+    m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("warning")));
     m_textCtrl8->SetValue(messageText);
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
 
@@ -418,7 +429,7 @@ QuestionDlg::QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxStri
     QuestionDlgGenerated(parentWindow),
     dontShowAgain(dontShowDlgAgain)
 {
-    m_bitmap10->SetBitmap(*GlobalResources::getInstance().bitmapQuestion);
+    m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("question")));
     m_textCtrl8->SetValue(messageText);
     if (dontShowAgain)
         m_checkBoxDontAskAgain->SetValue(*dontShowAgain);
@@ -485,8 +496,8 @@ CustomizeColsDlg::CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes
     output(attr),
     m_showFileIcons(showFileIcons)
 {
-    m_bpButton29->SetBitmapLabel(*GlobalResources::getInstance().bitmapMoveUp);
-    m_bpButton30->SetBitmapLabel(*GlobalResources::getInstance().bitmapMoveDown);
+    m_bpButton29->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("moveUp")));
+    m_bpButton30->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("moveDown")));
 
     xmlAccess::ColumnAttributes columnSettings = attr;
 
@@ -604,12 +615,11 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
     using FreeFileSync::includeNumberSeparator;
     using globalFunctions::numberToWxString;
 
-    //m_bitmapPreview->SetBitmap(*GlobalResources::getInstance().bitmapSync);
-    m_buttonStartSync->setBitmapFront(*GlobalResources::getInstance().bitmapStartSync);
-    m_bitmapCreate->SetBitmap(*GlobalResources::getInstance().bitmapCreate);
-    m_bitmapUpdate->SetBitmap(*GlobalResources::getInstance().bitmapUpdate);
-    m_bitmapDelete->SetBitmap(*GlobalResources::getInstance().bitmapDelete);
-    m_bitmapData->SetBitmap(*GlobalResources::getInstance().bitmapData);
+    m_buttonStartSync->setBitmapFront(GlobalResources::getInstance().getImageByName(wxT("startSync")));
+    m_bitmapCreate->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("create")));
+    m_bitmapUpdate->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("update")));
+    m_bitmapDelete->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("delete")));
+    m_bitmapData->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("data")));
 
     m_staticTextVariant->SetLabel(variantName);
     m_textCtrlData->SetValue(FreeFileSync::formatFilesizeToShortString(statistics.getDataToProcess()));
@@ -657,9 +667,9 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parentWindow, const wxPoint& positi
     //move dialog up so that compare-config button and first config-variant are on same level
     Move(wxPoint(position.x, std::max(0, position.y - (m_buttonTimeSize->GetScreenPosition() - GetScreenPosition()).y)));
 
-    m_bpButtonHelp->SetBitmapLabel(*GlobalResources::getInstance().bitmapHelp);
-    m_bitmapByTime->SetBitmap(*GlobalResources::getInstance().bitmapCmpByTime);
-    m_bitmapByContent->SetBitmap(*GlobalResources::getInstance().bitmapCmpByContent);
+    m_bpButtonHelp->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("help")));
+    m_bitmapByTime->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("cmpByTime")));
+    m_bitmapByContent->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("cmpByContent")));
 
     switch (cmpVar)
     {
@@ -714,17 +724,17 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSetti
     GlobalSettingsDlgGenerated(window),
     settings(globalSettings)
 {
-    m_bitmapSettings->SetBitmap(*GlobalResources::getInstance().bitmapSettings);
-    m_buttonResetDialogs->setBitmapFront(*GlobalResources::getInstance().bitmapWarningSmall, 5);
-    m_bpButtonAddRow->SetBitmapLabel(*GlobalResources::getInstance().bitmapAddFolderPair);
-    m_bpButtonRemoveRow->SetBitmapLabel(*GlobalResources::getInstance().bitmapRemoveFolderPair);
+    m_bitmapSettings->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("settings")));
+    m_buttonResetDialogs->setBitmapFront(GlobalResources::getInstance().getImageByName(wxT("warningSmall")), 5);
+    m_bpButtonAddRow->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("addFolderPair")));
+    m_bpButtonRemoveRow->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("removeFolderPair")));
 
     m_checkBoxIgnoreOneHour->SetValue(globalSettings.ignoreOneHourDiff);
     m_checkBoxCopyLocked->SetValue(globalSettings.copyLockedFiles);
 
 #ifndef FFS_WIN
-m_staticTextCopyLocked->Hide();
-m_checkBoxCopyLocked->Hide();
+    m_staticTextCopyLocked->Hide();
+    m_checkBoxCopyLocked->Hide();
 #endif
 
     set(globalSettings.gui.externelApplications);
@@ -1130,11 +1140,11 @@ void SyncStatus::updateStatusDialogNow()
             break;
         case COMPARING_CONTENT:
             minimizedToSysTray->setToolTip(wxString(wxT("FreeFileSync - ")) + wxString(_("Comparing content...")) + wxT(" ") +
-                                           fromatPercentage(currentData, totalData));
+                                           fromatPercentage(currentData, totalData), currentData.ToDouble() * 100 / totalData.ToDouble());
             break;
         case SYNCHRONIZING:
             minimizedToSysTray->setToolTip(wxString(wxT("FreeFileSync - ")) + wxString(_("Synchronizing...")) + wxT(" ") +
-                                           fromatPercentage(currentData, totalData));
+                                           fromatPercentage(currentData, totalData), currentData.ToDouble() * 100 / totalData.ToDouble());
             break;
         case ABORTED:
         case FINISHED_WITH_SUCCESS:
@@ -1230,37 +1240,37 @@ void SyncStatus::setCurrentStatus(SyncStatusID id)
     switch (id)
     {
     case ABORTED:
-        m_bitmapStatus->SetBitmap(*GlobalResources::getInstance().bitmapStatusError);
+        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusError")));
         m_staticTextStatus->SetLabel(_("Aborted"));
         break;
 
     case FINISHED_WITH_SUCCESS:
-        m_bitmapStatus->SetBitmap(*GlobalResources::getInstance().bitmapStatusSuccess);
+        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusSuccess")));
         m_staticTextStatus->SetLabel(_("Completed"));
         break;
 
     case FINISHED_WITH_ERROR:
-        m_bitmapStatus->SetBitmap(*GlobalResources::getInstance().bitmapStatusWarning);
+        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusWarning")));
         m_staticTextStatus->SetLabel(_("Completed"));
         break;
 
     case PAUSE:
-        m_bitmapStatus->SetBitmap(*GlobalResources::getInstance().bitmapStatusPause);
+        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusPause")));
         m_staticTextStatus->SetLabel(_("Paused"));
         break;
 
     case SCANNING:
-        m_bitmapStatus->SetBitmap(*GlobalResources::getInstance().bitmapStatusScanning);
+        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusScanning")));
         m_staticTextStatus->SetLabel(_("Scanning..."));
         break;
 
     case COMPARING_CONTENT:
-        m_bitmapStatus->SetBitmap(*GlobalResources::getInstance().bitmapStatusBinCompare);
+        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusBinaryCompare")));
         m_staticTextStatus->SetLabel(_("Comparing content..."));
         break;
 
     case SYNCHRONIZING:
-        m_bitmapStatus->SetBitmap(*GlobalResources::getInstance().bitmapStatusSyncing);
+        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusSyncing")));
         m_staticTextStatus->SetLabel(_("Synchronizing..."));
         break;
     }

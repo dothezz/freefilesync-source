@@ -109,12 +109,15 @@ struct XmlGlobalSettings
         programLanguage(retrieveSystemLanguage()),
         ignoreOneHourDiff(false),
         copyLockedFiles(true),
-        lastUpdateCheck(0) {}
+        detectRenameThreshold(1024 *1024),
+        lastUpdateCheck(0)
+    {}
 
     int programLanguage;
-    bool ignoreOneHourDiff; //ignore +/- 1 hour due to DST change
-    bool copyLockedFiles;   //VSS usage
-    long lastUpdateCheck;   //time of last update check
+    bool ignoreOneHourDiff;        //ignore +/- 1 hour due to DST change
+    bool copyLockedFiles;          //VSS usage
+    unsigned int detectRenameThreshold;  //minimum size (in bytes) for files to be considered for rename-detection
+    long lastUpdateCheck;          //time of last update check
 
     OptionalDialogs optDialogs;
 

@@ -92,15 +92,11 @@ GridView::StatusCmpResult GridView::updateCmpResult(bool hideFiltered, //maps so
             }
             else
             {
-                const DirMapping* dirObj = dynamic_cast<const DirMapping*>(fsObj);
-                if (dirObj)
-                {
-                    if (!dirObj->isEmpty<LEFT_SIDE>())
+                    if (!fsObj->isEmpty<LEFT_SIDE>())
                         ++output.foldersOnLeftView;
 
-                    if (!dirObj->isEmpty<RIGHT_SIDE>())
+                    if (!fsObj->isEmpty<RIGHT_SIDE>())
                         ++output.foldersOnRightView;
-                }
             }
 
             viewRef.push_back(*j);
@@ -119,6 +115,7 @@ GridView::StatusSyncPreview::StatusSyncPreview() :
     existsSyncDirLeft(false),
     existsSyncDirRight(false),
     existsSyncDirNone(false),
+    existsSyncEqual(false),
     existsConflict(false),
 
     filesOnLeftView(0),
@@ -135,6 +132,7 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
         bool syncDirOverwLeftActive,
         bool syncDirOverwRightActive,
         bool syncDirNoneActive,
+        bool syncEqualActive,
         bool conflictFilesActive)
 {
     StatusSyncPreview output;
@@ -146,13 +144,6 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
         const FileSystemObject* fsObj = getReferencedRow(*j);
         if (fsObj)
         {
-            //synchronization preview
-
-            //exclude result "=="
-//#warning na dann consider mal!
-            if (fsObj->getCategory() == FILE_EQUAL) //note: consider "objectsTotal"
-                continue;
-
             //hide filtered row, if corresponding option is set
             if (hideFiltered && !fsObj->isActive())
                 continue;
@@ -188,6 +179,10 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
                 output.existsSyncDirNone = true;
                 if (!syncDirNoneActive) continue;
                 break;
+            case SO_EQUAL:
+                output.existsSyncEqual = true;
+                if (!syncEqualActive) continue;
+                break;
             case SO_UNRESOLVED_CONFLICT:
                 output.existsConflict = true;
                 if (!conflictFilesActive) continue;
@@ -211,15 +206,11 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
             }
             else
             {
-                const DirMapping* dirObj = dynamic_cast<const DirMapping*>(fsObj);
-                if (dirObj)
-                {
-                    if (!dirObj->isEmpty<LEFT_SIDE>())
+                    if (!fsObj->isEmpty<LEFT_SIDE>())
                         ++output.foldersOnLeftView;
 
-                    if (!dirObj->isEmpty<RIGHT_SIDE>())
+                    if (!fsObj->isEmpty<RIGHT_SIDE>())
                         ++output.foldersOnRightView;
-                }
             }
 
             viewRef.push_back(*j);

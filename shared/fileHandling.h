@@ -1,5 +1,5 @@
-#ifndef RECYCLER_H_INCLUDED
-#define RECYCLER_H_INCLUDED
+#ifndef RECYCLER2_H_INCLUDED
+#define RECYCLER2_H_INCLUDED
 
 #include "zstring.h"
 #include "fileError.h"
@@ -83,4 +83,4 @@ void copyFile(const Zstring& sourceFile,
 }
 
 
-#endif // RECYCLER_H_INCLUDED
+#endif // RECYCLER2_H_INCLUDED

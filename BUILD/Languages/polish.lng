@@ -46,6 +46,8 @@
 &Anuluj
 &Check for new version
 &Aktualizuj
+&Content
+&Zawartość
 &Create batch job
 &Twórz plik wsadowy
 &Default
@@ -88,6 +90,8 @@
 &Tak
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Pamiętaj, że ten problem dotyczy tylko FAT/FAT32!\nW każdym innym przypadku możesz wyłączyć opcję \"Ignoruj 1-godzinną różnicę\".)
+(Requires an Internet connection!)
+(Wymaga połączenia z Internetem!)
 ,
 .
 - Other side's counterpart to %dir
@@ -132,12 +136,18 @@
 1. &Porównaj
 1. Enter relative file or directory names separated by ';' or a new line.
 1. Wprowdź relatywne scieżki do plików lub katalogów oddzielone ';' lub nową linią.
+1. Select directories to monitor.
+1. Wprowadź katalogi do nadzorowania
 2. &Synchronize...
 2. &Synchronizuj...
+2. Enter a command line.
+2. Wprowadź komendę.
 2. Use wildcard characters '*' and '?'.
 2. Użyj wieloznacznika (wildcard) '*' i '?'.
 3. Exclude files directly on main grid via context menu.
 3. Wyklucz pliki i foldery używając prawego przycisku myszki.
+3. Press 'Start'.
+3. Wciśnij 'Start'.
 <Automatic>
 <Automatycznie>
 <Directory>
@@ -172,6 +182,8 @@ As the name suggests, two files which share the same name are marked as equal if
 Jak wskazuje nazwa, dwa pliki o tej samej nazwie są równe tylko i wyłącznie jeżeli ich zawartość jest jednakowa. Czas modyfikacji nie jest brany pod uwagę. Ta opcja jest raczej użyteczna do sprawdzania spójności plików niż zadań kopii zapasowej.\n\nDrzewko decyzyjne dla tej opcji jest mniejsze:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Twórz plik wsadowy dla automatyzacji procesu. By rozpocząć prace w tym trybie zwyczajnie uruchom plik klikając dwa razy lub dodaj go do zadań zaplanowanych Twojego systemu. Plik wsadowy może być również przekazywany jako parametr do programu w postaci: FreeFileSync.exe <plikwsadowy>.
+At least one directory input field is empty.
+Przynajmniej jedno pole jest puste.
 Auto-adjust columns
 Autodopasowanie kolumn
 Automatic mode
@@ -192,20 +204,18 @@ Build:
 Buduj:
 Cancel
 Anuluj
-Cannot determine sync-direction: Changed filter settings!
-Nie można określik kierunku synchronizacji: Zmieniono ustawienia filtra!
-Cannot determine sync-direction: No change since last synchronization!
-Nie można określik kierunku synchronizacji: Brak zmian od ostatniej synchronizacji!
+Cannot determine sync-direction:
+Nie można określić kierunku synchronizacji:
 Category
 Kategoria
 Change direction
 Zmień kierunek
 Comma separated list
 Lista oddzielona przecinkami
-Commandline
-Wiersz poleceń
-Commandline is empty!
-Wiersz poleceń jest pusty!
+Command line
+Linia komend
+Command line is empty!
+Linia komend jest pusta!
 Compare
 Porównaj
 Compare both sides
@@ -260,8 +270,12 @@ Copy from right to left
 Kopiuj z prawej do lewej
 Copy from right to left overwriting
 Kopiuj z prawej do lewej nadpisując
+Copy locked files
+Kopiuj zablokowane pliki
 Copy new or updated files to right folder.
 Kopiuj nowe lub aktualniejsze pliki na prawą stronę.
+Copy shared or locked files using Volume Shadow Copy Service.
+Kopiuj współdzielone lub zablokowane pliki używając Volume Shadow Copy Service.
 Copy to clipboard\tCTRL+C
 Kopiuj do pamięci\tCTRL+C
 Copying file %x to %y
@@ -272,6 +286,8 @@ Could not determine volume name for file:
 Nie można określić nazwy dysku dla pliku:
 Could not initialize directory monitoring:
 Nie można uruchomić monitora katalogów:
+Could not load a required DLL:
+Nie można załadować wymaganej biblioteki DLL:
 Could not read values for the following XML nodes:
 Nie można odczytać wartości dla danych gałęzi XML:
 Create a batch job
@@ -298,7 +314,7 @@ Date
 Data
 Delay
 Opóźnienie
-Delay between detection of changes and execution of commandline in seconds
+Delay between detection of changes and execution of command line in seconds
 Opóźnienie pomiędzy wykryciem zmian, a wykonaniem komendy w sekundach
 Delete files/folders existing on left side only
 Usuń pliki/foldery istniejące tylko po lewej stronie
@@ -386,6 +402,8 @@ Error reading file:
 Błąd odczytu pliku:
 Error reading from synchronization database:
 Błąd odczytu z bazy danych synchronizacji:
+Error resolving full path name:
+Bład odczytu pełnej nazwy dla ścieżki:
 Error resolving symbolic link:
 Błąd odczytu dowiązania symbolicznego:
 Error starting Volume Shadow Copy Service!
@@ -466,6 +484,8 @@ Filter files
 Filtruj pliki
 Filter has been selected
 Filtr został zaznaczony
+Filter settings have changed!
+Ustawienia filtra uległy zmianie!
 Filter view
 Filtr podglądu
 Filtering is deactivated
@@ -560,8 +580,8 @@ Include all rows
 Dołącz wszystkie rzędy
 Include temporarily
 Dołącz tymczasowo
-Include: *.doc;*.zip;*.exe\nExclude: temp\\*
-Dołącz: *.doc;*.zip;*.exe\nWyklucz: temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
+Dołącz: *.doc;*.zip;*.exe\nWyklucz: \\stuff\\temp\\*
 Incompatible synchronization database format:
 Niepoprawny format bazy danych dla synchronizacji:
 Info
@@ -572,8 +592,6 @@ Initial synchronization:
 Wstępna synchronizacja:
 Integrate external applications into context menu. The following macros are available:
 Dołącz zewnętrzną aplikację do menu kontekstowego. Dostępne macra:
-It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
-Inicjalizacja Kosza nie była możliwa!\n\nPrawdopodobnie nie używasz Windowsa.\nJeżeli chcesz dołączyć tą cechę, skontaktuj się z autorem. :)
 Leave as unresolved conflict
 Zostaw jako nierozwiązany konflikt
 Left
@@ -590,18 +608,22 @@ Log-messages:
 Logi:
 Logging
 Tworzenie logów
+Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
+Tworzenie Shadow Copies dla WOW64 nie jest obsługiwane. Zainstaluj 64 bitową wersję FreeFileSync.
 Mirror ->>
 Lustrzana ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Kopia lustrzana lewego folderu: Prawy folder będzie nadpisany zawartością lewego folderu.
+Monitoring active...
+Monitorowanie aktywne...
 More than 50% of the total number of files will be copied or deleted!
 Ponad 50% plików zostanie skopiowanych lub usuniętych!
 Move column down
 Przesuń kolumnę w dół
 Move column up
 Przesuń kolumnę do góry
-Move files to a user-defined directory.
-Przenieś pliki do katalogu użytkownika.
+Move files into a time-stamped subdirectory.
+Przenieś pliki do oznaczonego podkatalogu.
 Moving %x to Recycle Bin
 Przenoszenie %x do kosza.
 Moving file %x to user-defined directory %y
@@ -610,6 +632,8 @@ Moving folder %x to user-defined directory %y
 Przenoszenie folderu %x do katalogu użytkownika %y
 Multiple...
 Wiele...
+No change since last synchronization!
+Brak zmian od ostatniej synchronizacji!
 No filter selected
 Nie wybrano żadnego filtra
 Not enough free disk space available in:
@@ -642,12 +666,10 @@ Pause
 Pauza
 Paused
 Pauza
-Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
-Skopiuj odpowiedni plik \"Shadow.dll\" (ulokowany w \"Shadow.zip\") do folderu z instalacją FreeFileSync aby uaktywnić tą opcję.
-Please fill all empty directory fields.
-Podaj foldery do synchronizacji.
 Please run a Compare first before synchronizing!
 Przed synchronizacją należy uruchomić Porównaj!
+Processing folder pair:
+Przetwarzanie folderów:
 Published under the GNU General Public License:
 Udostępnione na zasadach licencji GNU General Public License:
 Question
@@ -670,6 +692,8 @@ Remove folder pair
 Usuń parę folderów
 Remove local filter settings
 Usuń ustawienia lokalnego filtra
+Renaming file %x to %y
+Zmiana nazwy pliku %X na %Y
 Report translation error
 Zgłoś błąd w tłumaczeniu
 Reset
@@ -786,6 +810,8 @@ Target directory already existing!
 Katalog docelowy już istnieje!
 Target file already existing!
 Plik docelowy już istnieje!
+The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
+Komenda ta jest wykonywana za każdym razem gdy:\n- Pliki w tych katalogach (lub podkatalogach) są modyfikowane\n- Odpowiednia litera dysku jest aktywna (Podłączenie USB)
 The database file is not yet existing, but will be created during synchronization:
 Plik bazy danych nie istnieje, ale zostanie utworzony podczas synchronizacji:
 The file does not contain a valid configuration:
@@ -816,12 +842,14 @@ Unable to create logfile!
 Nie można utworzyć pliku z logami!
 Unable to initialize Recycle Bin!
 Nie można zainicjalizować Kosz!
+Unresolved conflicts existing!
+Istnieją nierozwiązane konflikty!
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Istnieją nierozwiązane konflikty! \n\nMożesz je zignorować i kontynułować synchronizację.
 Update ->
 Uaktualnij ->
-Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
-Użycie: Wybierz katalogi do monitorowania i wprowadź komendę. Gdy któryś z plików zostanie zmodyfikowany, w obrębie katalogów, zostanie uruchomiona podana komenda.
+Usage:
+Użycie:
 Use Recycle Bin
 Użyj kosza
 Use Recycle Bin when deleting or overwriting files.
@@ -842,6 +870,8 @@ Warning: Synchronization failed for %x item(s):
 Uwaga: Błąd synchronizacji dla \"%x\" elementów:
 When the comparison is started with this option set the following decision tree is processed:
 Gdy porównywanie z zaznaczoną opcją jest w toku, podejmowane są następujące dezyje:
+You can ignore conflicts and continue synchronization.
+Możesz je zignorować i kontynułować synchronizację.
 You can ignore the error to consider not existing directories as empty.
 Możesz zignorować ten błąd i uznać nieistniejący katalog za pusty.
 You can ignore the error to skip current folder pair.

@@ -416,6 +416,9 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
     //last update check
     readXmlElementLogging("LastCheckForUpdates", global, outputCfg.lastUpdateCheck);
 
+    //minimum size (in bytes) for files to be considered for rename-detection
+    readXmlElementLogging("DetectRenameThreshold", global, outputCfg.detectRenameThreshold);
+
 
     const TiXmlElement* optionalDialogs = TiXmlHandleConst(root).FirstChild("Shared").FirstChild("ShowOptionalDialogs").ToElement();
 
@@ -813,6 +816,9 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
 
     //last update check
     addXmlElement("LastCheckForUpdates", inputCfg.lastUpdateCheck, global);
+
+    //minimum size (in bytes) for files to be considered for rename-detection
+    addXmlElement("DetectRenameThreshold", inputCfg.detectRenameThreshold, global);
 
 
     //optional dialogs

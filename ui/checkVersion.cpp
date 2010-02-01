@@ -1,12 +1,12 @@
 #include "checkVersion.h"
-
+#include <wx/msgdlg.h>
 #include <wx/protocol/http.h>
 #include <wx/sstream.h>
 #include "../version/version.h"
-#include <wx/msgdlg.h>
 #include <wx/utils.h>
 #include <wx/timer.h>
 #include "../shared/globalFunctions.h"
+#include "smallDialogs.h"
 
 
 class CloseConnectionOnExit
@@ -112,9 +112,15 @@ void FreeFileSync::checkForUpdatePeriodically(long& lastUpdateCheck)
     {
         if (lastUpdateCheck == 0)
         {
-            const int rv = wxMessageBox(_("Do you want FreeFileSync to automatically check for updates every week?"), _("Information"), wxYES_NO | wxICON_QUESTION);
-            if (rv == wxYES)
-            {
+            QuestionDlg* const messageDlg = new QuestionDlg(NULL,
+                    QuestionDlg::BUTTON_YES | QuestionDlg::BUTTON_CANCEL,
+                    wxString(_("Do you want FreeFileSync to automatically check for updates every week?")) + wxT("\n") +
+                    _("(Requires an Internet connection!)"));
+
+            const bool checkRegularly = messageDlg->ShowModal() == QuestionDlg::BUTTON_YES;
+            messageDlg->Destroy();
+            if (checkRegularly)
+             {
                 lastUpdateCheck = 123; //some old date (few seconds after 1970)
 
                 checkForUpdatePeriodically(lastUpdateCheck); //check for updates now
@@ -139,7 +145,4 @@ void FreeFileSync::checkForUpdatePeriodically(long& lastUpdateCheck)
         }
     }
 }
-
-
-
 

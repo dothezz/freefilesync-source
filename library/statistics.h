@@ -39,7 +39,7 @@ public:
                const unsigned windowSizeRemainingTime,   //time in ms
                const unsigned windowSizeBytesPerSecond); //time in ms
 
-	~Statistics();
+    ~Statistics();
 
     void addMeasurement(const int objectsCurrent, const double dataCurrent);
     wxString getRemainingTime() const; //returns the remaining time in milliseconds

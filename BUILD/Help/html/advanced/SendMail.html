@@ -3,9 +3,9 @@
 <HEAD>
 	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
 	<TITLE></TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Win32)">
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.1  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20091213;15581500">
+	<META NAME="CHANGED" CONTENT="20091231;16373900">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -32,7 +32,7 @@ Batch Mode and send error notification via email</FONT></H3>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Set
 	error handling to &quot;<I>Exit with Returncode &lt; 0</I>&quot; or
 	&quot;<I>ignore errors</I>&quot; to avoid having a popup stop the
-	program flow. In case errors occur FreeFileSync will abort with a
+	program flow. In case errors occur FreeFileSync will exit with a
 	returncode &lt; 0 which can be checked via the ERRORLEVEL batch
 	command.</FONT></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Create
@@ -41,11 +41,12 @@ Batch Mode and send error notification via email</FONT></H3>
 	e.g.:</FONT></P>
 </OL>
 <UL>
-	<P STYLE="margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+	<P><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
 		<UL>
-			<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Courier New, monospace">C:\Program
-			Files\FreeFileSync\FreeFileSync.exe C:\SyncJob.ffs_batch<BR>if not
-			errorlevel 0 echo An error occured! &amp;&amp; pause</FONT></P>
+			<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Courier New, monospace">&quot;C:\Program
+			Files\FreeFileSync\FreeFileSync.exe&quot;
+			&quot;C:\SyncJob.ffs_batch&quot;<BR>@if not errorlevel 0
+			(<BR>&nbsp;&nbsp;&nbsp;&nbsp;echo An error occured!<BR>&nbsp;&nbsp;&nbsp;&nbsp;pause<BR>)</FONT></P>
 		</UL>
 	</SPAN><BR CLEAR=LEFT>
 	</P>

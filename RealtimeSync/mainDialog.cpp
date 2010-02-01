@@ -2,7 +2,6 @@
 #include "resources.h"
 #include "../shared/customButton.h"
 #include "../shared/standardPaths.h"
-//#include "../shared/globalFunctions.h"
 #include <wx/msgdlg.h>
 #include <wx/wupdlock.h>
 #include "watcher.h"
@@ -13,6 +12,8 @@
 #include "xmlFreeFileSync.h"
 #include "../shared/systemConstants.h"
 #include "../shared/stringConv.h"
+#include "../shared/staticAssert.h"
+#include "../shared/buildInfo.h"
 
 using namespace FreeFileSync;
 
@@ -20,17 +21,17 @@ using namespace FreeFileSync;
 MainDialog::MainDialog(wxDialog *dlg,
                        const wxString& cfgFilename,
                        wxHelpController& helpController)
-        : MainDlgGenerated(dlg),
-        helpController_(helpController)
+    : MainDlgGenerated(dlg),
+    helpController_(helpController)
 {
     wxWindowUpdateLocker dummy(this); //avoid display distortion
 
     m_bpButtonRemoveTopFolder->Hide();
     m_panelMainFolder->Layout();
 
-    m_bpButtonAddFolder->SetBitmapLabel(*GlobalResources::getInstance().bitmapAddFolderPair);
-    m_bpButtonRemoveTopFolder->SetBitmapLabel(*GlobalResources::getInstance().bitmapRemoveFolderPair);
-    m_buttonStart->setBitmapFront(*GlobalResources::getInstance().bitmapStart);
+    m_bpButtonAddFolder->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("addFolderPair")));
+    m_bpButtonRemoveTopFolder->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("removeFolderPair")));
+    m_buttonStart->setBitmapFront(GlobalResources::getInstance().getImageByName(wxT("startRed")));
     m_buttonStart->SetFocus();
 
     //register key event
@@ -126,11 +127,11 @@ const wxString& MainDialog::lastConfigFileName()
 
 void MainDialog::OnShowHelp(wxCommandEvent& event)
 {
-    #ifdef FFS_WIN
+#ifdef FFS_WIN
     helpController_.DisplaySection(wxT("html\\advanced\\RealtimeSync.html"));
-    #elif defined FFS_LINUX
+#elif defined FFS_LINUX
     helpController_.DisplaySection(wxT("html/advanced/RealtimeSync.html"));
-    #endif
+#endif
 }
 
 
@@ -139,10 +140,17 @@ void MainDialog::OnMenuAbout(wxCommandEvent& event)
     //build information
     wxString build = wxString(wxT("(")) + _("Build:") + wxT(" ") + __TDATE__;
 #if wxUSE_UNICODE
-    build += wxT(" - Unicode)");
+    build += wxT(" - Unicode");
 #else
-    build += wxT(" - ANSI)");
+    build += wxT(" - ANSI");
 #endif //wxUSE_UNICODE
+
+    //compile time info about 32/64-bit build
+    if (Utility::is64BitBuild)
+        build += wxT(" x64)");
+    else
+        build += wxT(" x86)");
+    assert_static(Utility::is32BitBuild || Utility::is64BitBuild);
 
     wxMessageDialog* aboutDlg = new wxMessageDialog(this, wxString(wxT("RealtimeSync")) + wxT("\n\n") + build, _("About"), wxOK);
     aboutDlg->ShowModal();
@@ -356,7 +364,7 @@ void MainDialog::addFolder(const std::vector<wxString>& newFolders, bool addFron
     {
         //add new folder pair
         FolderPanel* newFolder = new FolderPanel(m_scrolledWinFolders);
-        newFolder->m_bpButtonRemoveFolder->SetBitmapLabel(*GlobalResources::getInstance().bitmapRemoveFolderPair);
+        newFolder->m_bpButtonRemoveFolder->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("removeFolderPair")));
 
         //get size of scrolled window
         folderHeight = newFolder->GetSize().GetHeight();

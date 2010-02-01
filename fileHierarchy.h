@@ -11,6 +11,7 @@
 #include <boost/shared_ptr.hpp>
 #include "shared/guid.h"
 #include "library/filter.h"
+#include "shared/fileID.h"
 
 class DirectoryBuffer;
 
@@ -19,11 +20,16 @@ namespace FreeFileSync
 {
 struct FileDescriptor
 {
-    FileDescriptor(const wxLongLong&  lastWriteTimeRawIn, const wxULongLong& fileSizeIn) :
+    FileDescriptor(const wxLongLong& lastWriteTimeRawIn,
+                   const wxULongLong& fileSizeIn) :
+        //const Utility::FileID fileId) :
         lastWriteTimeRaw(lastWriteTimeRawIn),
         fileSize(fileSizeIn) {}
-    wxLongLong  lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
+    wxLongLong  lastWriteTimeRaw;   //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
     wxULongLong fileSize;
+
+    //#warning: what about memory consumption?? (assume large comparisons!!?)
+    //Utility::FileID fileIdentifier; //unique file identifier, optional: may be NULL!
 };
 
 
@@ -96,7 +102,7 @@ private:
 struct DirInformation
 {
     //filter settings (used when retrieving directory data)
-    FilterProcess::FilterRef filter;
+    BaseFilter::FilterRef filter;
 
     //hierarchical directory information
     DirContainer baseDirContainer;
@@ -198,7 +204,7 @@ class FileSystemObject
 public:
     const Zstring getParentRelativeName() const; //get name relative to base sync dir without FILE_NAME_SEPARATOR postfix
     const Zstring getObjRelativeName() const;    //same as getRelativeName() but also returns value if either side is empty
-    const Zstring& getObjShortName() const;       //same as getShortName() but also returns value if either side is empty
+    const Zstring& getObjShortName() const;      //same as getShortName() but also returns value if either side is empty
     template <SelectedSide side>           bool     isEmpty()         const;
     template <SelectedSide side> const Zstring&     getShortName()    const;
     template <SelectedSide side> const Zstring      getRelativeName() const; //get name relative to base sync dir without FILE_NAME_SEPARATOR prefix
@@ -310,6 +316,7 @@ class FileMapping : public FileSystemObject
 public:
     template <SelectedSide side> const wxLongLong&  getLastWriteTime() const;
     template <SelectedSide side> const wxULongLong& getFileSize() const;
+    //template <SelectedSide side> const Utility::FileID& getFileID() const;
 
     virtual CompareFilesResult getCategory() const;
     virtual const wxString& getCatConflict() const;
@@ -367,16 +374,16 @@ class BaseDirMapping : public HierarchyObject //synchronization base directory
 public:
     BaseDirMapping(const Zstring& dirPostfixedLeft,
                    const Zstring& dirPostfixedRight,
-                   const FilterProcess::FilterRef& filterIn) :
+                   const BaseFilter::FilterRef& filterIn) :
         HierarchyObject(dirPostfixedLeft, dirPostfixedRight),
         filter(filterIn) {}
 
-    const FilterProcess::FilterRef& getFilter() const;
+    const BaseFilter::FilterRef& getFilter() const;
     template <SelectedSide side> Zstring getDBFilename() const;
     virtual void swap();
 
 private:
-    FilterProcess::FilterRef filter;
+    BaseFilter::FilterRef filter;
 };
 
 
@@ -384,8 +391,9 @@ typedef std::vector<BaseDirMapping> FolderComparison;
 
 //------------------------------------------------------------------
 
-
-
+//convenience methods
+//test whether FileSystemObject is a DirMapping
+bool isDirectoryMapping(const FileSystemObject& fsObj);
 
 
 
@@ -819,7 +827,7 @@ void DirMapping::copyToR()
 
 
 inline
-const FilterProcess::FilterRef& BaseDirMapping::getFilter() const
+const BaseFilter::FilterRef& BaseDirMapping::getFilter() const
 {
     return filter;
 }
@@ -888,7 +896,7 @@ inline
 void FileMapping::removeObjectL()
 {
     cmpResult = FILE_RIGHT_SIDE_ONLY;
-    dataLeft = FileDescriptor(0, 0);
+    dataLeft  = FileDescriptor(0, 0);
 }
 
 
@@ -904,7 +912,9 @@ inline
 void FileMapping::copyToL()
 {
     cmpResult = FILE_EQUAL;
-    dataLeft = dataRight;
+    dataLeft = FileDescriptor(dataRight.lastWriteTimeRaw,
+                              dataRight.fileSize);
+    //Utility::FileID()); //attention! do not copy FileID! It is retained on file renaming only!
 }
 
 
@@ -912,7 +922,9 @@ inline
 void FileMapping::copyToR()
 {
     cmpResult = FILE_EQUAL;
-    dataRight = dataLeft;
+    dataRight = FileDescriptor(dataLeft.lastWriteTimeRaw,
+                               dataLeft.fileSize);
+    //Utility::FileID()); //attention! do not copy FileID! It is retained on file renaming only!
 }
 
 
@@ -946,6 +958,31 @@ const wxULongLong& FileMapping::getFileSize<RIGHT_SIDE>() const
 {
     return dataRight.fileSize;
 }
+
+
+//template <>
+//inline
+//const Utility::FileID& FileMapping::getFileID<LEFT_SIDE>() const
+//{
+//    return dataLeft.fileIdentifier;
+//}
+//
+//
+//template <>
+//inline
+//const Utility::FileID& FileMapping::getFileID<RIGHT_SIDE>() const
+//{
+//    return dataRight.fileIdentifier;
+//}
+
+inline
+bool isDirectoryMapping(const FileSystemObject& fsObj)
+{
+    return dynamic_cast<const DirMapping*>(&fsObj) != NULL;
+}
+
 }
 
 #endif // FILEHIERARCHY_H_INCLUDED
+
+

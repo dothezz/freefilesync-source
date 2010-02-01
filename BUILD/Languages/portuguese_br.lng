@@ -46,6 +46,8 @@
 &Cancelar
 &Check for new version
 &Procurar novas versões
+&Content
+Conteúdo
 &Create batch job
 &Criar um arquivo batch
 &Default
@@ -88,6 +90,8 @@
 &Sim
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Note que apenas discos FAT/FAT32 são afetados por este problema!\nEm todos os outros casos pode-se desabilitar esta opção \"ignorar diferença de 1 hora\".)
+(Requires an Internet connection!)
+(Requer conexão com a Internet!)
 ,
 .
 - Other side's counterpart to %dir
@@ -132,12 +136,18 @@
 1. &Comparar
 1. Enter relative file or directory names separated by ';' or a new line.
 1. Entre os nomes dos arquivos ou diretórios relativos separados por ';' ou uma nova linha.
+1. Select directories to monitor.
+1. Selecione os diretórios para monitorar.
 2. &Synchronize...
 2. &Sincronizar...
+2. Enter a command line.
+2. Entre uma linha de comando.
 2. Use wildcard characters '*' and '?'.
 2. Usar '*' e '?' como caracteres coringa.
 3. Exclude files directly on main grid via context menu.
 3. Excluir arquivos diretamente do grid principal através do menu de contexto.
+3. Press 'Start'.
+3. Pressione 'Iniciar'.
 <Automatic>
 <Automático>
 <Directory>
@@ -172,6 +182,8 @@ As the name suggests, two files which share the same name are marked as equal if
 Como o nome sugere, dois arquivos com o mesmo nome são assinalados como iguais se e somente se eles tiverem o mesmo conteúdo. Esta opção é útil para controles de consistência mais do que para efeitos de backup. Portanto, a data dos arquivos não é levada em consideração.\n\nCom esta opção, a árvore de decisão é menor:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Monta um arquivo batch para sincronização automatizada. Para iniciar o modo batch, passar o nome do arquivo para o executável do FreeFileSync: FreeFileSync.exe <arquivo batch>. Também pode ser programado no Agendador de Tarefas do sistema operacional.
+At least one directory input field is empty.
+Pelo menos um dos campos de entrada de diretório está vazio.
 Auto-adjust columns
 Autoajustar colunas
 Automatic mode
@@ -192,20 +204,18 @@ Build:
 Criado:
 Cancel
 Cancelar
-Cannot determine sync-direction: Changed filter settings!
-Não foi possível determinar a direção de sicronização: Configurações do filtro alteradas!
-Cannot determine sync-direction: No change since last synchronization!
-Não foi possível determinar a direção de sicronização: Nenhuma alteração desde a última sincronização!
+Cannot determine sync-direction:
+Não foi possível determinar a direção de sincronização:
 Category
 Categoria
 Change direction
 Inverter sentido
 Comma separated list
 Lista de itens separada por vírgula
-Commandline
+Command line
 Linha de comando
-Commandline is empty!
-A linha de comando está vazia!
+Command line is empty!
+Linha de comando está vazia!
 Compare
 Comparar
 Compare both sides
@@ -260,8 +270,12 @@ Copy from right to left
 Copiar da direita para a esquerda
 Copy from right to left overwriting
 Copiar da direita para a esquerda com sobreposição
+Copy locked files
+Copiar arquivos bloqueados (em uso)
 Copy new or updated files to right folder.
 Copiar arquivos novos ou atualizados para a pasta da direita
+Copy shared or locked files using Volume Shadow Copy Service.
+Copiar arquivos compartilhados ou bloqueados usando o Serviço de Cópias de Sombra de Volume.
 Copy to clipboard\tCTRL+C
 Copiar para a Área de transferência\tCTRL+C
 Copying file %x to %y
@@ -272,6 +286,8 @@ Could not determine volume name for file:
 Não foi possível determinar o nome do volume para o arquivo:
 Could not initialize directory monitoring:
 Não foi possível inicializar o monitoramento de diretórios:
+Could not load a required DLL:
+Não foi possível carregar uma DLL requerida:
 Could not read values for the following XML nodes:
 Não foi possível ler os valores para os seguintes nós XML:
 Create a batch job
@@ -298,7 +314,7 @@ Date
 Data
 Delay
 Atraso
-Delay between detection of changes and execution of commandline in seconds
+Delay between detection of changes and execution of command line in seconds
 Atraso entre detecção de mudanças e execução de linha de comando em segundos
 Delete files/folders existing on left side only
 Apagar arquivos/pastas existentes apenas no lado esquerdo
@@ -386,6 +402,8 @@ Error reading file:
 Erro ao ler arquivo:
 Error reading from synchronization database:
 Erro ao ler do banco de dados de sincronização:
+Error resolving full path name:
+Erro na resolução do caminho completo:
 Error resolving symbolic link:
 Erro na resolução de link simbólico:
 Error starting Volume Shadow Copy Service!
@@ -466,6 +484,8 @@ Filter files
 Filtrar arquivos
 Filter has been selected
 Filtro foi selecionado
+Filter settings have changed!
+As configurações do filtro foram alteradas!
 Filter view
 Filtrar vista
 Filtering is deactivated
@@ -541,11 +561,11 @@ Dicas:
 Homepage
 Homepage
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
-Identificar e propagar mudanças em ambos os lados usando o banco de dados. Exclusões e conflitos serão detectados automaticamente.
+Identificar e propagar mudanças em ambos os lados utilizando um banco de dados. Exclusões e conflitos serão detectados automaticamente.
 If you like FFS
 Se gosta do FFS
 Ignore 1-hour file time difference
-Ignorar diferença de tempo de 1 hora
+Ignorar diferenças de 1 hora nos arquivos
 Ignore errors
 Ignorar erros
 Ignore subsequent errors
@@ -560,8 +580,8 @@ Include all rows
 Incluir todas as linhas
 Include temporarily
 Incluir temporariamente
-Include: *.doc;*.zip;*.exe\nExclude: temp\\*
-Incluir: *.doc;*.zip;*.exe\nExcluir: temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
+Incluir: *.doc;*.zip;*.exe\nExcluir: \\stuff\\temp\\*
 Incompatible synchronization database format:
 Formato de banco de dados de sincronização incompatível:
 Info
@@ -572,8 +592,6 @@ Initial synchronization:
 Sincronização inicial:
 Integrate external applications into context menu. The following macros are available:
 Integrar aplicações externas no menu de contexto. As seguintes macros estão disponíveis:
-It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
-Não foi possível acessar a Lixeira!\n\nÉ possível que não esteja utilizando Windows.\nSe desejar esta opção incluída, favor contatar o autor. :)
 Leave as unresolved conflict
 Deixar como conflito não resolvido
 Left
@@ -590,18 +608,22 @@ Log-messages:
 Log de mensagens:
 Logging
 Gravando log
+Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
+Cópias de sombra no WOW64 não são suportadas. Por favor use a versão 64-bits do FreeFileSync.
 Mirror ->>
 Espelhar ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Espelhar pasta da esquerda: A pasta da direita vai ser sobreposta e será feita uma cópia exata da pasta da esquerda após a sincronização.
+Monitoring active...
+Monitoramento ativo...
 More than 50% of the total number of files will be copied or deleted!
 Mais de 50% do número total de arquivos será copiado ou apagado!
 Move column down
 Mover coluna para baixo
 Move column up
 Mover coluna para cima
-Move files to a user-defined directory.
-Mover arquivos para um diretório especificado.
+Move files into a time-stamped subdirectory.
+Mover arquivos para um subdiretório com carimbo de tempo.
 Moving %x to Recycle Bin
 Movendo %x para a Lixeira
 Moving file %x to user-defined directory %y
@@ -610,6 +632,8 @@ Moving folder %x to user-defined directory %y
 Movendo pasta %x para o diretório especificado
 Multiple...
 Múltiplos...
+No change since last synchronization!
+Nenhuma mudança desde a última sincronização!
 No filter selected
 Nenhum filtro selecionado
 Not enough free disk space available in:
@@ -642,12 +666,10 @@ Pause
 Pausa
 Paused
 Pausado
-Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
-Por favor, copie o \"Shadow.dll\" apropriado (localizado no arquivo \"Shadow.zip\") no diretório de instalação do FreeFileSync para habilitar essa funcionalidade.
-Please fill all empty directory fields.
-Por favor, preencha todos os campos de diretórios vazios.
 Please run a Compare first before synchronizing!
 Por favor execute primeiro a Comparação antes de sincronizar!
+Processing folder pair:
+Processando par de pastas:
 Published under the GNU General Public License:
 Publicado sobre a GNU General Public License:
 Question
@@ -670,6 +692,8 @@ Remove folder pair
 Remover par de pastas
 Remove local filter settings
 Remover configurações locais de filtro
+Renaming file %x to %y
+Renomeando arquivo %x para %y
 Report translation error
 Reportar erro de tradução
 Reset
@@ -786,6 +810,8 @@ Target directory already existing!
 Diretório de destino já existe!
 Target file already existing!
 Arquivo de destino já existe!
+The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
+A linha de comando é executada cada vez que:\n- Arquivos dentro desses diretórios (ou subdiretórios) são modificados\n- A letra correspondente do disco se torna disponível (inserção de USB)
 The database file is not yet existing, but will be created during synchronization:
 O arquivo de banco de dados ainda não existe, mas será criado durante a sincronização:
 The file does not contain a valid configuration:
@@ -816,12 +842,14 @@ Unable to create logfile!
 Não foi possível criar arquivo log!
 Unable to initialize Recycle Bin!
 Não foi possível abrir a Lixeira!
+Unresolved conflicts existing!
+Conflitos não resolvidos existentes!
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Conflitos não resolvidos existentes! \n\nVocê pode ignorar os conflitos e continuar a sincronização.
 Update ->
 Atualizar ->
-Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
-Uso: Selecionar diretórios para monitoração e entrar com linha de comando. Cada vez que os arquivos são modificados nesses diretórios (ou subdiretórios) a linha de comando é executada.
+Usage:
+Uso:
 Use Recycle Bin
 Utilizar Lixeira
 Use Recycle Bin when deleting or overwriting files.
@@ -842,6 +870,8 @@ Warning: Synchronization failed for %x item(s):
 Atenção: A sincronização falhou para %x item(s):
 When the comparison is started with this option set the following decision tree is processed:
 Quando a comparação é iniciada com esta opção, a seguinte árvore de decisão é processada:
+You can ignore conflicts and continue synchronization.
+Você pode ignorar os conflitos e continuar a sincronização.
 You can ignore the error to consider not existing directories as empty.
 Você pode ignorar o erro para considerar diretórios não existente como vazios.
 You can ignore the error to skip current folder pair.

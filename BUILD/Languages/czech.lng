@@ -46,6 +46,8 @@ souborů: %x;
 &Zrušit
 &Check for new version
 Zkontrolovat &aktualizace
+&Content
+&Obsah
 &Create batch job
 &Vytvořit dávku
 &Default
@@ -88,6 +90,8 @@ U&končit
 &Ano
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Platí pouze pro souborové systémy FAT/FAT32. V ostatních případech můžete nastavení \"Ignorovat 1 hodinu rozdílu v čase mezi soubory\" nechat vypnuté.)
+(Requires an Internet connection!)
+(Vyžaduje připojení k internetu!)
 ,
  
 - Other side's counterpart to %dir
@@ -132,12 +136,18 @@ soubor: 1;
 1. &Porovnat
 1. Enter relative file or directory names separated by ';' or a new line.
 1. Můžete použít relativní cesty k souboru nebo adresáři oddělené ';' nebo řádkem.
+1. Select directories to monitor.
+1. Vyberte adresáře pro sledování.
 2. &Synchronize...
 2. &Synchronizovat...
+2. Enter a command line.
+2. Zadejte příkazovou řádku.
 2. Use wildcard characters '*' and '?'.
 2. Můžete použít zástupné znaky (wildcard) '*' a '?'.
 3. Exclude files directly on main grid via context menu.
 3. Můžete použít pro vynechávání souborů přímo kontextového menu.
+3. Press 'Start'.
+3. Zmáčkněte 'Start'
 <Automatic>
 <Automaticky>
 <Directory>
@@ -172,6 +182,8 @@ As the name suggests, two files which share the same name are marked as equal if
 Jak název napovídá, dva soubory mající stejné jméno jsou označeny za shodné jen a pouze pokud mají shodný obsah. Toto nastavení je vhodné spíše pro sledování konzistence než pro zálohování. Proto nejsou data změn souborů brána vůbec v potaz.\n\nPokud vyberete toto nastavení bude schéma rozhodování kratší:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Vytvoření dávkového souboru pro automatický provoz. Ke spuštění dávky jednoduše její jméno zadejte jako parametr při spuštění FreeFileSync: FreeFileSync.exe <batchfile>.
+At least one directory input field is empty.
+Alespoň jedno zadání adresáře je prázdné.
 Auto-adjust columns
 Automaticky přizpůsobit šířku
 Automatic mode
@@ -192,19 +204,17 @@ Build:
 Build:
 Cancel
 Zrušit
-Cannot determine sync-direction: Changed filter settings!
-Nelze určit směr synchronizace: Změňte nastavení filtru!
-Cannot determine sync-direction: No change since last synchronization!
-Nelze určit směr synchronizace: Nedošlo ke změnám od poslední synchronizace!
+Cannot determine sync-direction:
+Nelze určit směr synchronizace:
 Category
 Kategorie
 Change direction
 Změnit akci
 Comma separated list
 Text oddělený čárkami
-Commandline
+Command line
 Příkazová řádka
-Commandline is empty!
+Command line is empty!
 Příkazová řádka je prázdná!
 Compare
 Porovnat
@@ -260,8 +270,12 @@ Copy from right to left
 Kopírovat z prava do leva
 Copy from right to left overwriting
 Kopírovat z prava do leva přepisem
+Copy locked files
+Kopírovat zamčené soubory
 Copy new or updated files to right folder.
 Kopírovat nové nebo aktualizované soubory do adresáře vpravo.
+Copy shared or locked files using Volume Shadow Copy Service.
+Kopírovat sdílené nebo zamčené soubory pomocí Volume Shadow Copy Service.
 Copy to clipboard\tCTRL+C
 Vložit do schránky\tCTRL+C
 Copying file %x to %y
@@ -272,6 +286,8 @@ Could not determine volume name for file:
 Není možné zjistit jméno jednotky souboru:
 Could not initialize directory monitoring:
 Nelze nastavit monitorování adresáře:
+Could not load a required DLL:
+Nelze načíst požadovanou knihovnu DLL:
 Could not read values for the following XML nodes:
 Nelze načíst hodnoty následujících XML elementy:
 Create a batch job
@@ -298,7 +314,7 @@ Date
 Datum
 Delay
 Zpoždění
-Delay between detection of changes and execution of commandline in seconds
+Delay between detection of changes and execution of command line in seconds
 Zpoždění detekce změn a spuštění příkazu v sekundách
 Delete files/folders existing on left side only
 Smazat soubory/adresáře existující pouze na levé straně
@@ -386,6 +402,8 @@ Error reading file:
 Chyba čtení souboru:
 Error reading from synchronization database:
 Chyba čtení synchronizační databáze:
+Error resolving full path name:
+Chyba názvu plné cesty:
 Error resolving symbolic link:
 Chyba odkazu zástupce:
 Error starting Volume Shadow Copy Service!
@@ -466,6 +484,8 @@ Filter files
 Filtrovat soubory
 Filter has been selected
 Filtr je zapnut
+Filter settings have changed!
+Nastavení filtru bylo změněno!
 Filter view
 Filtrovat seznam
 Filtering is deactivated
@@ -560,8 +580,8 @@ Include all rows
 Použít všechny řádky
 Include temporarily
 Přidat dočasně
-Include: *.doc;*.zip;*.exe\nExclude: temp\\*
-Přidat: *.doc;*.zip;*.exe\nVynechat: temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
+Přidat: *.doc;*.zip;*.exe\nVynechat: \\stuff\\temp\\*
 Incompatible synchronization database format:
 Chyba formátu synchronizační databáze:
 Info
@@ -572,8 +592,6 @@ Initial synchronization:
 Prvotní synchronizace:
 Integrate external applications into context menu. The following macros are available:
 Integrace externí aplikace do kontextového menu. K dispozici jsou následující makra:
-It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
-Nebylo možné inicializovat Koš!\n\nPravděpodobně nepoužíváte Windows.\nPokud chcete tuto vlastnost využívat, kontaktujte autora. :)
 Leave as unresolved conflict
 Ponechat jako nevyřešený konflikt
 Left
@@ -590,18 +608,22 @@ Log-messages:
 Záznamy:
 Logging
 Zaznamenávání
+Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
+Vytváření stínových kopíí na WOW64 není podporováno. Prosím použijte 64 bitovou verzi FreeFileSync.
 Mirror ->>
 Zrcadlení ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Zrcadlení levého adresáře: Pravý adresář bude přepsán a po synchronizaci bude totožný s levým.
+Monitoring active...
+Sledování zapnuto...
 More than 50% of the total number of files will be copied or deleted!
 Více než 50% souborů bude kopírovaných nebo mazaných!
 Move column down
 Přesunout sloupec dolů
 Move column up
 Přesunout sloupec nahoru
-Move files to a user-defined directory.
-Přesunout soubory do uživatelem definovaného adresáře.
+Move files into a time-stamped subdirectory.
+Přesunout soubory do časově označeného podadresáře.
 Moving %x to Recycle Bin
 Přesouvání %x do Koše.
 Moving file %x to user-defined directory %y
@@ -610,6 +632,8 @@ Moving folder %x to user-defined directory %y
 Přesouvání adresáře %x do uživatelského adresáře %y
 Multiple...
 Několikanásobný...
+No change since last synchronization!
+Žádné změny od poslední synchronizace!
 No filter selected
 Není vybrán žádný filtr
 Not enough free disk space available in:
@@ -642,12 +666,10 @@ Pause
 Pauza
 Paused
 Pauza
-Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
-Prosím zkopírujte odpovídající \"Shadow.dll\" (umístěný v \"Shadow.zip\") do instalačního adresáře FreeFileSync, aby bylo možné použít tuto funkci.
-Please fill all empty directory fields.
-Zadejte adresáře pro synchronizaci.
 Please run a Compare first before synchronizing!
 Prosím proveďte nejdřív porovnání před synchronizací!
+Processing folder pair:
+Zpracovávání adresářové páru:
 Published under the GNU General Public License:
 Vydáno podl GNU General Public License (GPL):
 Question
@@ -670,6 +692,8 @@ Remove folder pair
 Odstranit dvojici adresářů
 Remove local filter settings
 Odstranit nastavení místního filtru
+Renaming file %x to %y
+Přejmenovávání souboru %x na %y
 Report translation error
 Hlásit chyby překladu
 Reset
@@ -786,6 +810,8 @@ Target directory already existing!
 Cílový adresář již existuje!
 Target file already existing!
 Cílový soubor již existuje!
+The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
+Příkazová řádka je spuštěna pokaždé když:\n- dojde ke změně souborů v adresáři (nebo podadresářích)\n- je připojen odpovídající disk (vložením USB disku)
 The database file is not yet existing, but will be created during synchronization:
 Databáze ještě neexistuje, ale bude během synchronizace vytvořena:
 The file does not contain a valid configuration:
@@ -816,12 +842,14 @@ Unable to create logfile!
 není možné vytvořit záznamový soubor!
 Unable to initialize Recycle Bin!
 Není možné použít Koš!
+Unresolved conflicts existing!
+Nevyřešené konflikty!
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Nevyřešené konflikty! \n\nJe možné konflikt ignorovat a pokračovat v synchronizaci.
 Update ->
 Aktualizuj ->
-Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
-Použití: Vyberte adresáře, které mají být monitorovány a vložte příkaz. Pokaždé, když dojde ke změně v těchto adresářích (nebo podadresářích), bude příkaz spuštěn.
+Usage:
+Použití:
 Use Recycle Bin
 Použít Koš
 Use Recycle Bin when deleting or overwriting files.
@@ -842,6 +870,8 @@ Warning: Synchronization failed for %x item(s):
 Varování: Synchronizace se nepovedla pro \"%x\" položek:
 When the comparison is started with this option set the following decision tree is processed:
 Když je zahájeno porovnávání s tímto nastavením, je použito následující schéma rozhodování:
+You can ignore conflicts and continue synchronization.
+Je možné konflikt ignorovat a pokračovat v synchronizaci.
 You can ignore the error to consider not existing directories as empty.
 Pro považování neexistujících adresářů jako prázdných můžete chybu ignorovat.
 You can ignore the error to skip current folder pair.

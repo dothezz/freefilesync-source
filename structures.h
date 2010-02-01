@@ -277,7 +277,8 @@ enum SyncOperation
     SO_DELETE_RIGHT,
     SO_OVERWRITE_LEFT,
     SO_OVERWRITE_RIGHT,
-    SO_DO_NOTHING,
+    SO_DO_NOTHING, //= both sides differ, but nothing will be synced
+    SO_EQUAL,      //= both sides are equal, so nothing will be synced
     SO_UNRESOLVED_CONFLICT
 };
 

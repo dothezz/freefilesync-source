@@ -13,9 +13,11 @@
 #include "shared/globalFunctions.h"
 #include <boost/scoped_array.hpp>
 #include <memory>
+//#include "library/detectRenaming.h"
 
 #ifdef FFS_WIN
 #include "shared/shadow.h"
+#include "shared/longPathPrefix.h"
 #endif
 
 using namespace FreeFileSync;
@@ -74,6 +76,10 @@ int SyncStatistics::getConflict() const
     return conflict;
 }
 
+const SyncStatistics::ConflictTexts& SyncStatistics::getFirstConflicts() const //get first few sync conflicts
+{
+    return firstConflicts;
+}
 
 wxULongLong SyncStatistics::getDataToProcess() const
 {
@@ -100,9 +106,6 @@ void SyncStatistics::getNumbersRecursively(const HierarchyObject& hierObj)
 
     rowsTotal += hierObj.subDirs.size();
     rowsTotal += hierObj.subFiles.size();
-
-    //recurse into sub-dirs
-    std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), boost::bind(&SyncStatistics::getNumbersRecursively, this, _1));
 }
 
 
@@ -140,10 +143,13 @@ void SyncStatistics::getFileNumbers(const FileMapping& fileObj)
         break;
 
     case SO_DO_NOTHING:
+    case SO_EQUAL:
         break;
 
     case SO_UNRESOLVED_CONFLICT:
         ++conflict;
+        if (firstConflicts.size() < 3) //save the first 3 conflict texts
+            firstConflicts.push_back(std::make_pair(fileObj.getObjRelativeName(), fileObj.getSyncOpConflict()));
         break;
     }
 }
@@ -177,8 +183,12 @@ void SyncStatistics::getDirNumbers(const DirMapping& dirObj)
         break;
 
     case SO_DO_NOTHING:
+    case SO_EQUAL:
         break;
     }
+
+    //recurse into sub-dirs
+    getNumbersRecursively(dirObj);
 }
 
 
@@ -256,6 +266,7 @@ private:
                 break;
 
             case SO_DO_NOTHING:
+            case SO_EQUAL:
             case SO_UNRESOLVED_CONFLICT:
                 break;
             }
@@ -437,16 +448,16 @@ bool deletionImminent(const FileSystemObject& fsObj)
 class RemoveInvalid
 {
 public:
-    RemoveInvalid(HierarchyObject& hierObj) :
-        hierObj_(hierObj) {}
+    RemoveInvalid(BaseDirMapping& baseDir) :
+        baseDir_(baseDir) {}
 
     ~RemoveInvalid()
     {
-        FileSystemObject::removeEmptyNonRec(hierObj_);
+        FileSystemObject::removeEmpty(baseDir_);
     }
 
 private:
-    HierarchyObject& hierObj_;
+    BaseDirMapping& baseDir_;
 };
 
 
@@ -477,9 +488,6 @@ public:
     template <bool deleteOnly> //"true" if files deletion shall happen only
     void execute(HierarchyObject& hierObj)
     {
-        //enforce removal of invalid entries (where both sides are empty)
-        RemoveInvalid dummy(hierObj); //non-recursive
-
         //synchronize files:
         for (HierarchyObject::SubFileMapping::iterator i = hierObj.subFiles.begin(); i != hierObj.subFiles.end(); ++i)
         {
@@ -516,7 +524,8 @@ public:
             case SO_DELETE_LEFT:
             case SO_DELETE_RIGHT:
             case SO_DO_NOTHING:
-                ;
+            case SO_EQUAL:
+                break;
             }
         }
     }
@@ -680,6 +689,8 @@ void SyncRecursively::synchronizeFile(FileMapping& fileObj) const
         break;
 
     case SO_OVERWRITE_RIGHT:
+        target = fileObj.getBaseDirPf<RIGHT_SIDE>() + fileObj.getRelativeName<LEFT_SIDE>();
+
         statusText = txtOverwritingFile;
         statusText.Replace(DefaultStr("%x"), fileObj.getShortName<LEFT_SIDE>(), false);
         statusText.Replace(DefaultStr("%y"), fileObj.getFullName<RIGHT_SIDE>().BeforeLast(globalFunctions::FILE_NAME_SEPARATOR), false);
@@ -687,10 +698,14 @@ void SyncRecursively::synchronizeFile(FileMapping& fileObj) const
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         removeFile<RIGHT_SIDE>(fileObj, false);
-        copyFileUpdating(fileObj.getFullName<LEFT_SIDE>(), fileObj.getFullName<RIGHT_SIDE>(), fileObj.getFileSize<LEFT_SIDE>());
+        fileObj.removeObject<RIGHT_SIDE>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
+
+        copyFileUpdating(fileObj.getFullName<LEFT_SIDE>(), target, fileObj.getFileSize<LEFT_SIDE>());
         break;
 
     case SO_OVERWRITE_LEFT:
+        target = fileObj.getBaseDirPf<LEFT_SIDE>() + fileObj.getRelativeName<RIGHT_SIDE>();
+
         statusText = txtOverwritingFile;
         statusText.Replace(DefaultStr("%x"), fileObj.getShortName<RIGHT_SIDE>(), false);
         statusText.Replace(DefaultStr("%y"), fileObj.getFullName<LEFT_SIDE>().BeforeLast(globalFunctions::FILE_NAME_SEPARATOR), false);
@@ -698,10 +713,13 @@ void SyncRecursively::synchronizeFile(FileMapping& fileObj) const
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         removeFile<LEFT_SIDE>(fileObj, false);
-        copyFileUpdating(fileObj.getFullName<RIGHT_SIDE>(), fileObj.getFullName<LEFT_SIDE>(), fileObj.getFileSize<RIGHT_SIDE>());
+        fileObj.removeObject<LEFT_SIDE>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
+
+        copyFileUpdating(fileObj.getFullName<RIGHT_SIDE>(), target, fileObj.getFileSize<RIGHT_SIDE>());
         break;
 
     case SO_DO_NOTHING:
+    case SO_EQUAL:
     case SO_UNRESOLVED_CONFLICT:
         return; //no update on processed data!
     }
@@ -713,6 +731,72 @@ void SyncRecursively::synchronizeFile(FileMapping& fileObj) const
     //indicator is updated only if file is sync'ed correctly (and if some sync was done)!
     statusUpdater_.updateProcessedData(1, 0); //processed data is communicated in subfunctions!
 }
+
+
+//class DetectRenamedFiles
+//{
+//public:
+//    static void execute(BaseDirMapping& baseMap, StatusHandler& statusUpdater)
+//    {
+//        DetectRenamedFiles(baseMap, statusUpdater);
+//    }
+//
+//private:
+//    DetectRenamedFiles(BaseDirMapping& baseMap, StatusHandler& statusUpdater);
+//
+//    template <SelectedSide renameOnSide>
+//    void renameFile(FileMapping& fileObjCreate, FileMapping& fileObjDelete) const;
+//
+//    const Zstring txtRenamingFile;
+//    StatusHandler& statusUpdater_;
+//};
+
+
+//DetectRenamedFiles::DetectRenamedFiles(BaseDirMapping& baseMap, StatusHandler& statusUpdater) :
+//    txtRenamingFile(wxToZ(_("Renaming file %x to %y")).Replace(DefaultStr("%x"), DefaultStr("\"%x\""), false).Replace(DefaultStr("%y"), DefaultStr("\n\"%y\""), false)),
+//    statusUpdater_(statusUpdater)
+//{
+//    typedef std::vector<std::pair<CreateOnLeft, DeleteOnLeft> > RenameList;
+//    RenameList renameOnLeft;
+//    RenameList renameOnRight;
+//    FreeFileSync::getRenameCandidates(baseMap, renameOnLeft, renameOnRight); //throw()!
+//
+//    for (RenameList::const_iterator i = renameOnLeft.begin(); i != renameOnLeft.end(); ++i)
+//        tryReportingError(statusUpdater_, boost::bind(&DetectRenamedFiles::renameFile<LEFT_SIDE>, this, boost::ref(*i->first), boost::ref(*i->second)));
+//
+//    for (RenameList::const_iterator i = renameOnRight.begin(); i != renameOnRight.end(); ++i)
+//        tryReportingError(statusUpdater_, boost::bind(&DetectRenamedFiles::renameFile<RIGHT_SIDE>, this, boost::ref(*i->first), boost::ref(*i->second)));
+//}
+
+
+//template <SelectedSide renameOnSide>
+//void DetectRenamedFiles::renameFile(FileMapping& fileObjCreate, FileMapping& fileObjDelete) const
+//{
+//    const SelectedSide sourceSide = renameOnSide == LEFT_SIDE ? RIGHT_SIDE : LEFT_SIDE;
+//
+//    Zstring statusText = txtRenamingFile;
+//    statusText.Replace(DefaultStr("%x"), fileObjDelete.getFullName<renameOnSide>(), false);
+//    statusText.Replace(DefaultStr("%y"), fileObjCreate.getRelativeName<sourceSide>(), false);
+//    statusUpdater_.updateStatusText(statusText);
+//    statusUpdater_.requestUiRefresh(); //trigger display refresh
+//
+//    FreeFileSync::renameFile(fileObjDelete.getFullName<renameOnSide>(),
+//                             fileObjDelete.getBaseDirPf<renameOnSide>() + fileObjCreate.getRelativeName<sourceSide>()); //throw (FileError);
+//
+//    //update FileMapping
+//    fileObjCreate.synchronizeSides();
+//    fileObjDelete.synchronizeSides();
+//
+//#ifndef _MSC_VER
+//#warning  set FileID!
+//#warning  Test: zweimaliger rename sollte dann klappen
+//
+//#warning  allgemein: FileID nach jedem kopieren neu bestimmen?
+//#endif
+//    //progress indicator update
+//    //indicator is updated only if file is sync'ed correctly (and if some sync was done)!
+//    statusUpdater_.updateProcessedData(2, globalFunctions::convertToSigned(fileObjCreate.getFileSize<sourceSide>()));
+//}
 
 
 template <FreeFileSync::SelectedSide side>
@@ -838,6 +922,7 @@ void SyncRecursively::synchronizeFolder(DirMapping& dirObj) const
     case SO_UNRESOLVED_CONFLICT:
         assert(false);
     case SO_DO_NOTHING:
+    case SO_EQUAL:
         return; //no update on processed data!
     }
 
@@ -877,6 +962,16 @@ bool dataLossPossible(const Zstring& dirName, const SyncStatistics& folderPairSt
     return folderPairStat.getCreate() +  folderPairStat.getOverwrite() + folderPairStat.getConflict() == 0 &&
            folderPairStat.getDelete() > 0 && //deletions only... (respect filtered items!)
            !dirName.empty() && !FreeFileSync::dirExists(dirName);
+}
+
+namespace
+{
+void makeSameLength(wxString& first, wxString& second)
+{
+    const size_t maxPref = std::max(first.length(), second.length());
+    first.Pad(maxPref - first.length(), wxT(' '), true);
+    second.Pad(maxPref - second.length(), wxT(' '), true);
+}
 }
 
 
@@ -978,8 +1073,24 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
 
     //check if unresolved conflicts exist
     if (statisticsTotal.getConflict() > 0)
-        statusUpdater.reportWarning(_("Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization."),
-                                    m_warnings.warningUnresolvedConflicts);
+    {
+        //show the first few conflicts in warning message also:
+        wxString warningMessage = wxString(_("Unresolved conflicts existing!")) +
+                                  wxT(" (") + globalFunctions::numberToWxString(statisticsTotal.getConflict()) + wxT(")\n\n");
+
+        const SyncStatistics::ConflictTexts& firstConflicts = statisticsTotal.getFirstConflicts(); //get first few sync conflicts
+        for (SyncStatistics::ConflictTexts::const_iterator i = firstConflicts.begin(); i != firstConflicts.end(); ++i)
+            warningMessage += wxString(wxT("\"")) + zToWx(i->first) + wxT("\": \t") + i->second + wxT("\n");
+
+        if (statisticsTotal.getConflict() > static_cast<int>(firstConflicts.size()))
+            warningMessage += wxT("[...]\n");
+        else
+            warningMessage += wxT("\n");
+
+        warningMessage += _("You can ignore conflicts and continue synchronization.");
+
+        statusUpdater.reportWarning(warningMessage, m_warnings.warningUnresolvedConflicts);
+    }
 
     //-------------------end of basic checks------------------------------------------
 
@@ -996,6 +1107,17 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         {
             const FolderPairSyncCfg& folderPairCfg = syncConfig[j - folderCmp.begin()];
 
+//------------------------------------------------------------------------------------------
+            //info about folder pair to be processed (useful for logfile)
+            wxString left  = wxString(_("Left"))  + wxT(": ");
+            wxString right = wxString(_("Right")) + wxT(": ");
+            makeSameLength(left, right);
+            const wxString statusTxt = wxString(_("Processing folder pair:")) + wxT(" \n") +
+                                       wxT("\t") + left  + wxT("\"") + zToWx(j->getBaseDir<LEFT_SIDE>())  + wxT("\"")+ wxT(" \n") +
+                                       wxT("\t") + right + wxT("\"") + zToWx(j->getBaseDir<RIGHT_SIDE>()) + wxT("\"");
+            statusUpdater.updateStatusText(wxToZ(statusTxt));
+//------------------------------------------------------------------------------------------
+
             //generate name of alternate deletion directory (unique for session AND folder pair)
             const DeletionHandling currentDelHandling(folderPairCfg.handleDeletion, folderPairCfg.custDelFolder);
 
@@ -1004,6 +1126,13 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
                 continue;
 //------------------------------------------------------------------------------------------
             //execute synchronization recursively
+
+            //enforce removal of invalid entries (where both sides are empty)
+            RemoveInvalid dummy(*j);
+
+            //detect renamed files: currently in automatic mode only
+            //   if (folderPairCfg.inAutomaticMode)
+            //     DetectRenamedFiles::execute(*j, statusUpdater);
 
             //loop through all files twice; reason: first delete, then copy
             SyncRecursively( *this,
@@ -1019,7 +1148,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
 //------------------------------------------------------------------------------------------
 
             //update synchronization database (automatic sync only)
-            if (folderPairCfg.updateSyncDB)
+            if (folderPairCfg.inAutomaticMode)
             {
                 UpdateDatabase syncDB(*j, statusUpdater);
                 statusUpdater.updateStatusText(wxToZ(_("Generating database...")));
@@ -1133,7 +1262,7 @@ void verifyFiles(const Zstring& source, const Zstring& target, VerifyCallback* c
     static boost::scoped_array<unsigned char> memory2(new unsigned char[BUFFER_SIZE]);
 
 #ifdef FFS_WIN
-    wxFile file1(source.c_str(), wxFile::read); //don't use buffered file input for verification!
+    wxFile file1(FreeFileSync::applyLongPathPrefix(source).c_str(), wxFile::read); //don't use buffered file input for verification!
 #elif defined FFS_LINUX
     wxFile file1(::open(source.c_str(), O_RDONLY)); //utilize UTF-8 filename
 #endif
@@ -1141,7 +1270,7 @@ void verifyFiles(const Zstring& source, const Zstring& target, VerifyCallback* c
         throw FileError(wxString(_("Error opening file:")) + wxT(" \"") + zToWx(source) + wxT("\""));
 
 #ifdef FFS_WIN
-    wxFile file2(target.c_str(), wxFile::read); //don't use buffered file input for verification!
+    wxFile file2(FreeFileSync::applyLongPathPrefix(target).c_str(), wxFile::read); //don't use buffered file input for verification!
 #elif defined FFS_LINUX
     wxFile file2(::open(target.c_str(), O_RDONLY)); //utilize UTF-8 filename
 #endif
@@ -1214,5 +1343,10 @@ void SyncRecursively::verifyFileCopy(const Zstring& source, const Zstring& targe
         }
     }
 }
+
+
+
+
+
 
 

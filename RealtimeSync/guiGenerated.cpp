@@ -13,7 +13,7 @@
 
 MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	this->SetSizeHints( wxSize( 420,440 ), wxDefaultSize );
 	
 	m_menubar1 = new wxMenuBar( 0 );
 	m_menuFile = new wxMenu();
@@ -56,9 +56,35 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	
 	bSizer1->Add( 0, 10, 0, 0, 5 );
 	
-	m_staticText2 = new wxStaticText( m_panelMain, wxID_ANY, _("Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed."), wxDefaultPosition, wxDefaultSize, 0|wxDOUBLE_BORDER );
-	m_staticText2->Wrap( 350 );
-	bSizer1->Add( m_staticText2, 0, wxALIGN_CENTER_HORIZONTAL|wxRIGHT|wxLEFT, 40 );
+	wxStaticBoxSizer* sbSizer41;
+	sbSizer41 = new wxStaticBoxSizer( new wxStaticBox( m_panelMain, wxID_ANY, wxEmptyString ), wxVERTICAL );
+	
+	m_staticText2 = new wxStaticText( m_panelMain, wxID_ANY, _("Usage:"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText2->Wrap( -1 );
+	m_staticText2->SetFont( wxFont( 10, 74, 90, 90, true, wxT("Tahoma") ) );
+	
+	sbSizer41->Add( m_staticText2, 0, wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+	
+	m_staticText3 = new wxStaticText( m_panelMain, wxID_ANY, _("1. Select directories to monitor."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText3->Wrap( -1 );
+	sbSizer41->Add( m_staticText3, 0, wxLEFT, 10 );
+	
+	m_staticText4 = new wxStaticText( m_panelMain, wxID_ANY, _("2. Enter a command line."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText4->Wrap( -1 );
+	sbSizer41->Add( m_staticText4, 0, wxLEFT, 10 );
+	
+	m_staticText5 = new wxStaticText( m_panelMain, wxID_ANY, _("3. Press 'Start'."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText5->Wrap( -1 );
+	sbSizer41->Add( m_staticText5, 0, wxLEFT, 10 );
+	
+	m_staticline3 = new wxStaticLine( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+	sbSizer41->Add( m_staticline3, 0, wxEXPAND|wxTOP|wxBOTTOM, 5 );
+	
+	m_staticText21 = new wxStaticText( m_panelMain, wxID_ANY, _("The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText21->Wrap( -1 );
+	sbSizer41->Add( m_staticText21, 0, wxRIGHT|wxLEFT|wxEXPAND, 5 );
+	
+	bSizer1->Add( sbSizer41, 0, wxALIGN_CENTER_HORIZONTAL|wxRIGHT|wxLEFT|wxEXPAND, 40 );
 	
 	m_staticline2 = new wxStaticLine( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
 	bSizer1->Add( m_staticline2, 0, wxTOP|wxBOTTOM|wxEXPAND, 10 );
@@ -119,7 +145,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	bSizer1->Add( bSizer8, 1, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer3;
-	sbSizer3 = new wxStaticBoxSizer( new wxStaticBox( m_panelMain, wxID_ANY, _("Commandline") ), wxVERTICAL );
+	sbSizer3 = new wxStaticBoxSizer( new wxStaticBox( m_panelMain, wxID_ANY, _("Command line") ), wxVERTICAL );
 	
 	m_textCtrlCommand = new wxTextCtrl( m_panelMain, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer3->Add( m_textCtrlCommand, 0, wxEXPAND|wxBOTTOM, 5 );
@@ -133,7 +159,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	sbSizer4 = new wxStaticBoxSizer( new wxStaticBox( m_panelMain, wxID_ANY, _("Delay") ), wxVERTICAL );
 	
 	m_spinCtrlDelay = new wxSpinCtrl( m_panelMain, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxSP_WRAP, 0, 2000000000, 0 );
-	m_spinCtrlDelay->SetToolTip( _("Delay between detection of changes and execution of commandline in seconds") );
+	m_spinCtrlDelay->SetToolTip( _("Delay between detection of changes and execution of command line in seconds") );
 	
 	sbSizer4->Add( m_spinCtrlDelay, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxALIGN_CENTER_HORIZONTAL, 5 );
 	

@@ -48,12 +48,12 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* window,
     updateConfigIcons(cmpVariant, localSyncConfiguration);
 
     //set icons for this dialog
-    m_bitmapLeftOnly->SetBitmap(*GlobalResources::getInstance().bitmapLeftOnly);
-    m_bitmapRightOnly->SetBitmap(*GlobalResources::getInstance().bitmapRightOnly);
-    m_bitmapLeftNewer->SetBitmap(*GlobalResources::getInstance().bitmapLeftNewer);
-    m_bitmapRightNewer->SetBitmap(*GlobalResources::getInstance().bitmapRightNewer);
-    m_bitmapDifferent->SetBitmap(*GlobalResources::getInstance().bitmapDifferent);
-    m_bitmapConflict->SetBitmap(*GlobalResources::getInstance().bitmapConflictGrey);
+    m_bitmapLeftOnly->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("leftOnly")));
+    m_bitmapRightOnly->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("rightOnly")));
+    m_bitmapLeftNewer->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("leftNewer")));
+    m_bitmapRightNewer->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("rightNewer")));
+    m_bitmapDifferent->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("different")));
+    m_bitmapConflict->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("conflictGrey")));
 
     bSizer201->Layout(); //wxButtonWithImage size might have changed
 
@@ -175,15 +175,15 @@ void SyncCfgDialog::updateConfigIcons(const CompareVariant compareVar,
     switch (syncConfig.exLeftSideOnly)
     {
     case SYNC_DIR_RIGHT:
-        buttonLeftOnly->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowRightCr);
+        buttonLeftOnly->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowRightCr")));
         buttonLeftOnly->SetToolTip(getDescription(SO_CREATE_NEW_RIGHT));
         break;
     case SYNC_DIR_LEFT:
-        buttonLeftOnly->SetBitmapLabel(*GlobalResources::getInstance().bitmapDeleteLeft);
+        buttonLeftOnly->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("deleteLeft")));
         buttonLeftOnly->SetToolTip(getDescription(SO_DELETE_LEFT));
         break;
     case SYNC_DIR_NONE:
-        buttonLeftOnly->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowNone);
+        buttonLeftOnly->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowNone")));
         buttonLeftOnly->SetToolTip(getDescription(SO_DO_NOTHING));
         break;
     }
@@ -191,15 +191,15 @@ void SyncCfgDialog::updateConfigIcons(const CompareVariant compareVar,
     switch (syncConfig.exRightSideOnly)
     {
     case SYNC_DIR_RIGHT:
-        buttonRightOnly->SetBitmapLabel(*GlobalResources::getInstance().bitmapDeleteRight);
+        buttonRightOnly->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("deleteRight")));
         buttonRightOnly->SetToolTip(getDescription(SO_DELETE_RIGHT));
         break;
     case SYNC_DIR_LEFT:
-        buttonRightOnly->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowLeftCr);
+        buttonRightOnly->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowLeftCr")));
         buttonRightOnly->SetToolTip(getDescription(SO_CREATE_NEW_LEFT));
         break;
     case SYNC_DIR_NONE:
-        buttonRightOnly->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowNone);
+        buttonRightOnly->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowNone")));
         buttonRightOnly->SetToolTip(getDescription(SO_DO_NOTHING));
         break;
     }
@@ -207,15 +207,15 @@ void SyncCfgDialog::updateConfigIcons(const CompareVariant compareVar,
     switch (syncConfig.leftNewer)
     {
     case SYNC_DIR_RIGHT:
-        buttonLeftNewer->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowRight);
+        buttonLeftNewer->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowRight")));
         buttonLeftNewer->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
         break;
     case SYNC_DIR_LEFT:
-        buttonLeftNewer->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowLeft);
+        buttonLeftNewer->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowLeft")));
         buttonLeftNewer->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
         break;
     case SYNC_DIR_NONE:
-        buttonLeftNewer->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowNone);
+        buttonLeftNewer->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowNone")));
         buttonLeftNewer->SetToolTip(getDescription(SO_DO_NOTHING));
         break;
     }
@@ -223,15 +223,15 @@ void SyncCfgDialog::updateConfigIcons(const CompareVariant compareVar,
     switch (syncConfig.rightNewer)
     {
     case SYNC_DIR_RIGHT:
-        buttonRightNewer->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowRight);
+        buttonRightNewer->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowRight")));
         buttonRightNewer->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
         break;
     case SYNC_DIR_LEFT:
-        buttonRightNewer->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowLeft);
+        buttonRightNewer->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowLeft")));
         buttonRightNewer->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
         break;
     case SYNC_DIR_NONE:
-        buttonRightNewer->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowNone);
+        buttonRightNewer->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowNone")));
         buttonRightNewer->SetToolTip(getDescription(SO_DO_NOTHING));
         break;
     }
@@ -239,15 +239,15 @@ void SyncCfgDialog::updateConfigIcons(const CompareVariant compareVar,
     switch (syncConfig.different)
     {
     case SYNC_DIR_RIGHT:
-        buttonDifferent->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowRight);
+        buttonDifferent->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowRight")));
         buttonDifferent->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
         break;
     case SYNC_DIR_LEFT:
-        buttonDifferent->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowLeft);
+        buttonDifferent->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowLeft")));
         buttonDifferent->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
         break;
     case SYNC_DIR_NONE:
-        buttonDifferent->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowNone);
+        buttonDifferent->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowNone")));
         buttonDifferent->SetToolTip(getDescription(SO_DO_NOTHING));
         break;
     }
@@ -255,15 +255,15 @@ void SyncCfgDialog::updateConfigIcons(const CompareVariant compareVar,
     switch (syncConfig.conflict)
     {
     case SYNC_DIR_RIGHT:
-        buttonConflict->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowRight);
+        buttonConflict->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowRight")));
         buttonConflict->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
         break;
     case SYNC_DIR_LEFT:
-        buttonConflict->SetBitmapLabel(*GlobalResources::getInstance().bitmapArrowLeft);
+        buttonConflict->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowLeft")));
         buttonConflict->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
         break;
     case SYNC_DIR_NONE:
-        buttonConflict->SetBitmapLabel(*GlobalResources::getInstance().bitmapConflict);
+        buttonConflict->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("conflict")));
         buttonConflict->SetToolTip(_("Leave as unresolved conflict"));
         break;
     }
@@ -350,7 +350,7 @@ void updateToolTipDeletionHandling(wxChoice* choiceHandleError, wxPanel* customD
         break;
 
     case FreeFileSync::MOVE_TO_CUSTOM_DIRECTORY:
-        choiceHandleError->SetToolTip(_("Move files to a user-defined directory."));
+        choiceHandleError->SetToolTip(_("Move files into a time-stamped subdirectory."));
         customDir->Enable();
         break;
     }
@@ -637,16 +637,16 @@ void BatchDialog::init()
 
 
     //set icons for this dialog
-    m_bpButtonAddPair->SetBitmapLabel(*GlobalResources::getInstance().bitmapAddFolderPair);
-    m_bitmapLeftOnly->SetBitmap(*GlobalResources::getInstance().bitmapLeftOnly);
-    m_bitmapRightOnly->SetBitmap(*GlobalResources::getInstance().bitmapRightOnly);
-    m_bitmapLeftNewer->SetBitmap(*GlobalResources::getInstance().bitmapLeftNewer);
-    m_bitmapRightNewer->SetBitmap(*GlobalResources::getInstance().bitmapRightNewer);
-    m_bitmapDifferent->SetBitmap(*GlobalResources::getInstance().bitmapDifferent);
-    m_bitmapConflict->SetBitmap(*GlobalResources::getInstance().bitmapConflictGrey);
-    m_bitmap8->SetBitmap(*GlobalResources::getInstance().bitmapInclude);
-    m_bitmap9->SetBitmap(*GlobalResources::getInstance().bitmapExclude);
-    m_bitmap27->SetBitmap(*GlobalResources::getInstance().bitmapBatch);
+    m_bpButtonAddPair->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("addFolderPair")));
+    m_bitmapLeftOnly->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("leftOnly")));
+    m_bitmapRightOnly->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("rightOnly")));
+    m_bitmapLeftNewer->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("leftNewer")));
+    m_bitmapRightNewer->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("rightNewer")));
+    m_bitmapDifferent->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("different")));
+    m_bitmapConflict->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("conflictGrey")));
+    m_bitmap8->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("include")));
+    m_bitmap9->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("exclude")));
+    m_bitmap27->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("batch")));
 
     m_buttonSave->SetFocus();
 }
@@ -1143,11 +1143,11 @@ void BatchDialog::OnAddFolderPair(wxCommandEvent& event)
     addFolderPair(newPairs, true); //add pair in front of additonal pairs
 
     //clear first pair
-                const FolderPairEnh cfgEmpty;
-        firstFolderPair->setValues(cfgEmpty.leftDirectory,
-                                   cfgEmpty.rightDirectory,
-                                   cfgEmpty.altSyncConfig,
-                                   cfgEmpty.localFilter);
+    const FolderPairEnh cfgEmpty;
+    firstFolderPair->setValues(cfgEmpty.leftDirectory,
+                               cfgEmpty.rightDirectory,
+                               cfgEmpty.altSyncConfig,
+                               cfgEmpty.localFilter);
 }
 
 
@@ -1220,48 +1220,48 @@ void BatchDialog::addFolderPair(const std::vector<FreeFileSync::FolderPairEnh>& 
     wxWindowUpdateLocker dummy(m_panelOverview); //avoid display distortion
 
     if (!newPairs.empty())
-{
-    //add folder pairs
-    int pairHeight = 0;
-    for (std::vector<FreeFileSync::FolderPairEnh>::const_iterator i = newPairs.begin(); i != newPairs.end(); ++i)
     {
-        BatchFolderPairPanel* newPair = new BatchFolderPairPanel(m_scrolledWindow6, *this);
-
-        if (addFront)
+        //add folder pairs
+        int pairHeight = 0;
+        for (std::vector<FreeFileSync::FolderPairEnh>::const_iterator i = newPairs.begin(); i != newPairs.end(); ++i)
         {
-            bSizerAddFolderPairs->Insert(0, newPair, 0, wxEXPAND, 5);
-            additionalFolderPairs.insert(additionalFolderPairs.begin(), newPair);
+            BatchFolderPairPanel* newPair = new BatchFolderPairPanel(m_scrolledWindow6, *this);
+
+            if (addFront)
+            {
+                bSizerAddFolderPairs->Insert(0, newPair, 0, wxEXPAND, 5);
+                additionalFolderPairs.insert(additionalFolderPairs.begin(), newPair);
+            }
+            else
+            {
+                bSizerAddFolderPairs->Add(newPair, 0, wxEXPAND, 5);
+                additionalFolderPairs.push_back(newPair);
+            }
+
+            //get size of scrolled window
+            pairHeight = newPair->GetSize().GetHeight();
+
+            //register events
+            newPair->m_bpButtonRemovePair->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BatchDialog::OnRemoveFolderPair), NULL, this );
+
+            //set alternate configuration
+            newPair->setValues(i->leftDirectory,
+                               i->rightDirectory,
+                               i->altSyncConfig,
+                               i->localFilter);
         }
-        else
-        {
-            bSizerAddFolderPairs->Add(newPair, 0, wxEXPAND, 5);
-            additionalFolderPairs.push_back(newPair);
-        }
+        //set size of scrolled window
+        const int visiblePairs = std::min(additionalFolderPairs.size() + 1, MAX_FOLDER_PAIRS); //up to MAX_FOLDER_PAIRS pairs shall be shown
+        m_scrolledWindow6->SetMinSize(wxSize( -1, pairHeight * visiblePairs));
 
-        //get size of scrolled window
-        pairHeight = newPair->GetSize().GetHeight();
+        //update controls
+        m_scrolledWindow6->Fit();  //adjust scrolled window size
+        m_panelOverview->Layout(); //adjust stuff inside scrolled window
+        Fit();                     //adapt dialog size
 
-        //register events
-        newPair->m_bpButtonRemovePair->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BatchDialog::OnRemoveFolderPair), NULL, this );
-
-        //set alternate configuration
-        newPair->setValues(i->leftDirectory,
-                           i->rightDirectory,
-                           i->altSyncConfig,
-                           i->localFilter);
+        //after changing folder pairs window focus is lost: results in scrolled window scrolling to top each time window is shown: we don't want this
+        m_bpButtonLeftOnly->SetFocus();
     }
-    //set size of scrolled window
-    const int visiblePairs = std::min(additionalFolderPairs.size() + 1, MAX_FOLDER_PAIRS); //up to MAX_FOLDER_PAIRS pairs shall be shown
-    m_scrolledWindow6->SetMinSize(wxSize( -1, pairHeight * visiblePairs));
-
-    //update controls
-    m_scrolledWindow6->Fit();  //adjust scrolled window size
-    m_panelOverview->Layout(); //adjust stuff inside scrolled window
-    Fit();                     //adapt dialog size
-
-    //after changing folder pairs window focus is lost: results in scrolled window scrolling to top each time window is shown: we don't want this
-    m_bpButtonLeftOnly->SetFocus();
-}
 
     updateGuiForFolderPair();
 }
@@ -1269,7 +1269,7 @@ void BatchDialog::addFolderPair(const std::vector<FreeFileSync::FolderPairEnh>& 
 
 void BatchDialog::removeAddFolderPair(const int pos)
 {
-        wxWindowUpdateLocker dummy(m_panelOverview); //avoid display distortion
+    wxWindowUpdateLocker dummy(m_panelOverview); //avoid display distortion
 
     if (0 <= pos && pos < static_cast<int>(additionalFolderPairs.size()))
     {
@@ -1296,7 +1296,7 @@ void BatchDialog::removeAddFolderPair(const int pos)
         m_bpButtonLeftOnly->SetFocus();
     }
 
-        updateGuiForFolderPair();
+    updateGuiForFolderPair();
 }
 
 

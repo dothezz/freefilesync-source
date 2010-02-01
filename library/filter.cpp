@@ -10,24 +10,24 @@
 #include "../shared/loki/LokiTypeInfo.h"
 #include "../shared/serialize.h"
 
-using FreeFileSync::FilterProcess;
+using FreeFileSync::BaseFilter;
 using FreeFileSync::NameFilter;
 
 
 //--------------------------------------------------------------------------------------------------
-bool FilterProcess::operator==(const FilterProcess& other) const
+bool BaseFilter::operator==(const BaseFilter& other) const
 {
     return !(*this < other) && !(other < *this);
 }
 
 
-bool FilterProcess::operator!=(const FilterProcess& other) const
+bool BaseFilter::operator!=(const BaseFilter& other) const
 {
     return !(*this == other);
 }
 
 
-bool FilterProcess::operator<(const FilterProcess& other) const
+bool BaseFilter::operator<(const BaseFilter& other) const
 {
     if (Loki::TypeInfo(typeid(*this)) != typeid(other))
         return Loki::TypeInfo(typeid(*this)) < typeid(other);
@@ -37,7 +37,7 @@ bool FilterProcess::operator<(const FilterProcess& other) const
 }
 
 
-void FilterProcess::saveFilter(wxOutputStream& stream) const //serialize derived object
+void BaseFilter::saveFilter(wxOutputStream& stream) const //serialize derived object
 {
     //save type information
     Utility::writeString(stream, uniqueClassIdentifier());
@@ -47,7 +47,7 @@ void FilterProcess::saveFilter(wxOutputStream& stream) const //serialize derived
 }
 
 
-FilterProcess::FilterRef FilterProcess::loadFilter(wxInputStream& stream)
+BaseFilter::FilterRef BaseFilter::loadFilter(wxInputStream& stream)
 {
     //read type information
     const Zstring uniqueClassId = Utility::readString(stream);
@@ -72,7 +72,7 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
 
 #ifdef FFS_WIN
     //Windows does NOT distinguish between upper/lower-case
-    filterFormatted.MakeLower();
+    filterFormatted.MakeUpper();
 #elif defined FFS_LINUX
     //Linux DOES distinguish between upper/lower-case: nothing to do here
 #endif
@@ -140,7 +140,7 @@ bool matchesFilter(const DefaultChar* name, const std::set<Zstring>& filter)
 {
 #ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
     Zstring nameFormatted = name;
-    nameFormatted.MakeLower();
+    nameFormatted.MakeUpper();
 #elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
     const DefaultChar* const nameFormatted = name; //nothing to do here
 #endif
@@ -180,7 +180,7 @@ bool matchesFilterBegin(const DefaultChar* name, const std::set<Zstring>& filter
 {
 #ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
     Zstring nameFormatted = name;
-    nameFormatted.MakeLower();
+    nameFormatted.MakeUpper();
 #elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
     const DefaultChar* const nameFormatted = name; //nothing to do here
 #endif
@@ -265,7 +265,7 @@ bool NameFilter::isNull() const
 }
 
 
-bool NameFilter::cmpLessSameType(const FilterProcess& other) const
+bool NameFilter::cmpLessSameType(const BaseFilter& other) const
 {
     //typeid(*this) == typeid(other) in this context!
     assert(typeid(*this) == typeid(other));
@@ -300,7 +300,7 @@ void NameFilter::save(wxOutputStream& stream) const
 }
 
 
-FilterProcess::FilterRef NameFilter::load(wxInputStream& stream) //"constructor"
+BaseFilter::FilterRef NameFilter::load(wxInputStream& stream) //"constructor"
 {
     const Zstring include = Utility::readString(stream);
     const Zstring exclude = Utility::readString(stream);

@@ -1,44 +1,55 @@
 #include "dllLoader.h"
 #include <wx/msw/wrapwin.h> //includes "windows.h"
+#include <map>
+#include <assert.h>
 
 namespace
 {
-class KernelDllHandler //dynamically load "kernel32.dll"
+class DllHandler //dynamically load "kernel32.dll"
 {
 public:
-    static const KernelDllHandler& getInstance()
+    static DllHandler& getInstance()
     {
-        static KernelDllHandler instance;
+        static DllHandler instance;
         return instance;
     }
 
-    HINSTANCE getHandle() const
+    HINSTANCE getHandle(const std::wstring& libraryName)
     {
-        return hKernel;
+        HandleMap::const_iterator foundEntry = handles.find(libraryName);
+        if (foundEntry == handles.end())
+        {
+            HINSTANCE newHandle = ::LoadLibrary(libraryName.c_str());
+            handles.insert(std::make_pair(libraryName, newHandle));
+
+            assert(handles.find(libraryName) != handles.end());
+            return newHandle;
+        }
+        else
+            return foundEntry->second;
     }
 
 private:
-    KernelDllHandler() :
-        hKernel(NULL)
+    DllHandler() {}
+
+    ~DllHandler()
     {
-        //get a handle to the DLL module containing required functionality
-        hKernel = ::LoadLibrary(L"kernel32.dll");
+        for (HandleMap::const_iterator i = handles.begin(); i != handles.end(); ++i)
+            if (i->second != NULL) ::FreeLibrary(i->second);
     }
 
-    ~KernelDllHandler()
-    {
-        if (hKernel) ::FreeLibrary(hKernel);
-    }
-
-    HINSTANCE hKernel;
+    typedef std::map<std::wstring, HINSTANCE> HandleMap;
+    HandleMap handles;
 };
 }
 
 
-void* Utility::loadSymbolKernel(const std::string& functionName)
+void* Utility::loadSymbol(const std::wstring& libraryName, const std::string& functionName)
 {
-    if (KernelDllHandler::getInstance().getHandle() != NULL)
-        return reinterpret_cast<void*>(::GetProcAddress(KernelDllHandler::getInstance().getHandle(), functionName.c_str()));
+    const HINSTANCE libHandle = DllHandler::getInstance().getHandle(libraryName);
+
+    if (libHandle != NULL)
+        return reinterpret_cast<void*>(::GetProcAddress(libHandle, functionName.c_str()));
     else
         return NULL;
 }

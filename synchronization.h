@@ -20,6 +20,10 @@ public:
     int         getOverwrite(bool inclLeft = true, bool inclRight = true) const;
     int         getDelete(   bool inclLeft = true, bool inclRight = true) const;
     int         getConflict() const;
+
+    typedef std::vector<std::pair<Zstring, wxString> > ConflictTexts; // Pair(filename/conflict text)
+    const ConflictTexts& getFirstConflicts() const; //get first few sync conflicts
+
     wxULongLong getDataToProcess() const;
     int getRowCount() const;
 
@@ -35,6 +39,7 @@ private:
     int overwriteLeft, overwriteRight;
     int deleteLeft,    deleteRight;
     int conflict;
+    ConflictTexts firstConflicts; //save the first few conflict texts to display as a warning message
     wxULongLong dataToProcess;
     int rowsTotal;
 };
@@ -45,14 +50,14 @@ class SyncRecursively;
 
 struct FolderPairSyncCfg
 {
-    FolderPairSyncCfg(bool inAutomaticMode,
+    FolderPairSyncCfg(bool automaticMode,
                       const DeletionPolicy handleDel,
                       const Zstring& custDelDir) :
-        updateSyncDB(inAutomaticMode),
+        inAutomaticMode(automaticMode),
         handleDeletion(handleDel),
         custDelFolder(custDelDir) {}
 
-    bool updateSyncDB; //update database if in automatic mode
+    bool inAutomaticMode; //update database if in automatic mode
     DeletionPolicy handleDeletion;
     Zstring custDelFolder;
 };

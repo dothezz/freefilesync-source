@@ -277,17 +277,17 @@ void wxButtonWithImage::refreshButtonLabel()
 
     //wxDC::DrawLabel() unfortunately isn't working for transparent images on Linux, so we need to use custom image-concatenation
     if (bitmapFront.IsOk())
-        writeToImage(wxImage(bitmapFront.ConvertToImage()),
+        writeToImage(bitmapFront.ConvertToImage(),
                      wxPoint(0, (transparentImage.GetHeight() - bitmapFront.GetHeight()) / 2),
                      transparentImage);
 
     if (bitmapText.IsOk())
-        writeToImage(wxImage(bitmapText.ConvertToImage()),
+        writeToImage(bitmapText.ConvertToImage(),
                      wxPoint(bitmapFront.GetWidth() + m_spaceAfter, (transparentImage.GetHeight() - bitmapText.GetHeight()) / 2),
                      transparentImage);
 
     if (bitmapBack.IsOk())
-        writeToImage(wxImage(bitmapBack.ConvertToImage()),
+        writeToImage(bitmapBack.ConvertToImage(),
                      wxPoint(bitmapFront.GetWidth() + m_spaceAfter + bitmapText.GetWidth() + m_spaceBefore, (transparentImage.GetHeight() - bitmapBack.GetHeight()) / 2),
                      transparentImage);
 

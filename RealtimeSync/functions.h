@@ -9,7 +9,7 @@ class wxDirPickerCtrl;
 
 namespace RealtimeSync
 {
-    void setDirectoryName(const wxString& dirname, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker);
+void setDirectoryName(const wxString& dirname, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker);
 }
 
 #endif // FUNCTIONS_H_INCLUDED

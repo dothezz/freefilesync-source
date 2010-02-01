@@ -60,16 +60,16 @@ bool sortByFileName(const FileSystemObject& a, const FileSystemObject& b)
         return true;  //empty rows always last
 
 
-    if (dynamic_cast<const DirMapping*>(&a)) //sort directories by relative name
+    if (isDirectoryMapping(a)) //sort directories by relative name
     {
-        if (dynamic_cast<const DirMapping*>(&b))
+        if (isDirectoryMapping(b))
             return stringSmallerThan(a.getRelativeName<side>(), b.getRelativeName<side>());
         else
             return false;
     }
     else
     {
-        if (dynamic_cast<const DirMapping*>(&b))
+        if (isDirectoryMapping(b))
             return true;
         else
             return Compare<ascending>().isSmallerThan(
@@ -86,15 +86,16 @@ bool sortByRelativeName(const FileSystemObject& a, const FileSystemObject& b)
     else if (b.isEmpty<side>())
         return true;  //empty rows always last
 
-    const FileMapping* fileObjA = dynamic_cast<const FileMapping*>(&a);
-    const Zstring relDirNameA = fileObjA != NULL ?
-                                a.getParentRelativeName() : //file
-                                a.getRelativeName<side>();  //directory
+    const bool isDirectoryA = isDirectoryMapping(a);
+    const Zstring relDirNameA = isDirectoryA ?
+                                a.getRelativeName<side>() : //directory
+                                a.getParentRelativeName();  //file
 
-    const FileMapping* fileObjB = dynamic_cast<const FileMapping*>(&b);
-    const Zstring relDirNameB = fileObjB != NULL ?
-                                b.getParentRelativeName() : //file
-                                b.getRelativeName<side>();  //directory
+    const bool isDirectoryB = isDirectoryMapping(b);
+    const Zstring relDirNameB = isDirectoryB ?
+                                b.getRelativeName<side>() : //directory
+                                b.getParentRelativeName();  //file
+
 
     //compare relative names without filenames first
     const int rv = compareString(relDirNameA, relDirNameB);
@@ -102,9 +103,9 @@ bool sortByRelativeName(const FileSystemObject& a, const FileSystemObject& b)
         return Compare<ascending>().isSmallerThan(rv, 0);
     else //compare the filenames
     {
-        if (fileObjB == NULL) //directories shall appear before files
+        if (isDirectoryB) //directories shall appear before files
             return false;
-        else if (fileObjA == NULL)
+        else if (isDirectoryA)
             return true;
 
         return stringSmallerThan(a.getShortName<side>(), b.getShortName<side>());

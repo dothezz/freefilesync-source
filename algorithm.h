@@ -6,7 +6,7 @@
 
 namespace FreeFileSync
 {
-class FilterProcess;
+class BaseFilter;
 
 void swapGrids(const MainConfiguration& config, FolderComparison& folderCmp);
 
@@ -24,7 +24,7 @@ bool allElementsEqual(const FolderComparison& folderCmp);
 
 //filtering
 void applyFiltering(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp);
-void applyFiltering(const FilterProcess& filter, BaseDirMapping& baseDirectory);
+void applyFiltering(const BaseFilter& filter, BaseDirMapping& baseDirectory);
 
 void setActiveStatus(bool newStatus, FolderComparison& folderCmp); //activate or deactivate all rows
 void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or deactivate row: works recursively!

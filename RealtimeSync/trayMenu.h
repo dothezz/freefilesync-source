@@ -7,13 +7,13 @@
 
 namespace RealtimeSync
 {
-    enum MonitorResponse
-    {
-        RESUME,
-        QUIT
-    };
+enum MonitorResponse
+{
+    RESUME,
+    QUIT
+};
 
-    MonitorResponse startDirectoryMonitor(const xmlAccess::XmlRealConfig& config);
+MonitorResponse startDirectoryMonitor(const xmlAccess::XmlRealConfig& config);
 }
 
 

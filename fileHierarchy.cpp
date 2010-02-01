@@ -8,9 +8,11 @@
 #include "shared/fileHandling.h"
 #include <wx/mstream.h>
 #include "shared/serialize.h"
+#include "shared/buildInfo.h"
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
+#include "shared/longPathPrefix.h"
 #endif
 
 using namespace FreeFileSync;
@@ -110,7 +112,10 @@ SyncOperation FileSystemObject::getSyncOperation(const CompareFilesResult cmpRes
         const bool selectedForSynchronization,
         const SyncDirectionIntern syncDir)
 {
-    if (!selectedForSynchronization) return SO_DO_NOTHING;
+    if (!selectedForSynchronization)
+        return cmpResult == FILE_EQUAL ?
+               SO_EQUAL :
+               SO_DO_NOTHING;
 
     switch (cmpResult)
     {
@@ -173,7 +178,7 @@ SyncOperation FileSystemObject::getSyncOperation(const CompareFilesResult cmpRes
 
     case FILE_EQUAL:
         assert(syncDir == SYNC_DIR_INT_NONE);
-        return SO_DO_NOTHING;
+        return SO_EQUAL;
     }
 
     return SO_DO_NOTHING; //dummy
@@ -194,7 +199,7 @@ const Zstring& FreeFileSync::getSyncDBFilename()
 
 //-------------------------------------------------------------------------------------------------------------------------------
 const char FILE_FORMAT_DESCR[] = "FreeFileSync";
-const int FILE_FORMAT_VER = 3;
+const int FILE_FORMAT_VER = Utility::is64BitBuild ? -3 : 3; //32 and 64 bit builds are binary incompatible! So give them different IDs
 //-------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -204,7 +209,7 @@ public:
     ReadDirInfo(wxInputStream& stream, const wxString& errorObjName, DirInformation& dirInfo) : ReadInputStream(stream, errorObjName)
     {
         //read filter settings
-        dirInfo.filter = FilterProcess::loadFilter(stream_);
+        dirInfo.filter = BaseFilter::loadFilter(stream_);
         check();
 
         //start recursion
@@ -234,8 +239,12 @@ private:
         const unsigned long sizeHigh = readNumberC<unsigned long>();
         const unsigned long sizeLow  = readNumberC<unsigned long>();
 
+        //const Utility::FileID fileIdentifier(stream_);
+        //check();
+
         dirCont.addSubFile(shortName,
-                           FileDescriptor(wxLongLong(modHigh, modLow), wxULongLong(sizeHigh, sizeLow)));
+                           FileDescriptor(wxLongLong(modHigh, modLow),
+                                          wxULongLong(sizeHigh, sizeLow)));
     }
 
     void readSubDirectory(DirContainer& dirCont)
@@ -400,6 +409,9 @@ private:
             writeNumberC<unsigned long>(fileMap.getLastWriteTime<side>().GetLo()); //
             writeNumberC<unsigned long>(fileMap.getFileSize<side>().GetHi()); //filesize
             writeNumberC<unsigned long>(fileMap.getFileSize<side>().GetLo()); //
+
+            //fileMap.getFileID<side>().toStream(stream_); //unique file identifier
+            //check();
         }
     }
 
@@ -464,7 +476,7 @@ void saveFile(const DbStreamData& dbStream, const Zstring& filename) //throw (Fi
     //(try to) hide database file
 #ifdef FFS_WIN
     output.Close();
-    ::SetFileAttributes(filename.c_str(), FILE_ATTRIBUTE_HIDDEN);
+    ::SetFileAttributes(FreeFileSync::applyLongPathPrefix(filename).c_str(), FILE_ATTRIBUTE_HIDDEN);
 #endif
 }
 
@@ -533,7 +545,6 @@ void FreeFileSync::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileEr
         removeFile(baseMapping.getDBFilename<RIGHT_SIDE>(), false);
         renameFile(fileNameLeftTmp, baseMapping.getDBFilename<LEFT_SIDE>()); //throw (FileError);
         renameFile(fileNameRightTmp, baseMapping.getDBFilename<RIGHT_SIDE>()); //throw (FileError);
-
     }
     catch (...)
     {
@@ -547,4 +558,5 @@ void FreeFileSync::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileEr
         throw;
     }
 }
+
 

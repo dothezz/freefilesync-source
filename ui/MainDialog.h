@@ -82,7 +82,7 @@ public:
     MainDialog(wxFrame* frame,
                const wxString& cfgFileName,
                xmlAccess::XmlGlobalSettings& settings,
-    wxHelpController& helpController);
+               wxHelpController& helpController);
 
     ~MainDialog();
 
@@ -116,7 +116,7 @@ private:
     void removeAddFolderPair(const unsigned int pos);
     void clearAddFolderPairs();
 
-void updateGuiForFolderPair(); //helper method: add usability by showing/hiding buttons related to folder pairs
+    void updateGuiForFolderPair(); //helper method: add usability by showing/hiding buttons related to folder pairs
 
     //main method for putting gridDataView on UI: updates data respecting current view settings
     void updateGuiGrid();
@@ -267,7 +267,7 @@ void updateGuiForFolderPair(); //helper method: add usability by showing/hiding 
     xmlAccess::XmlGuiConfig currentCfg;
 
     //folder pairs:
-        std::auto_ptr<FirstFolderPairCfg> firstFolderPair; //always bound!!!
+    std::auto_ptr<FirstFolderPairCfg> firstFolderPair; //always bound!!!
     std::vector<FolderPairPanel*> additionalFolderPairs; //additional pairs to the first pair
 
     //gui settings

@@ -147,6 +147,7 @@
 		<Unit filename="library\customGrid.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="library\detectRenaming.h" />
 		<Unit filename="library\errorLogging.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
@@ -230,6 +231,7 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="shared\Recycler.h" />
 		<Unit filename="shared\appMain.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
@@ -238,6 +240,7 @@
 			<Option target="Debug" />
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="shared\buildInfo.h" />
 		<Unit filename="shared\customButton.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
@@ -269,6 +272,8 @@
 		<Unit filename="shared\fileError.h" />
 		<Unit filename="shared\fileHandling.cpp" />
 		<Unit filename="shared\fileHandling.h" />
+		<Unit filename="shared\fileID.cpp" />
+		<Unit filename="shared\fileID.h" />
 		<Unit filename="shared\fileTraverser.cpp" />
 		<Unit filename="shared\fileTraverser.h" />
 		<Unit filename="shared\globalFunctions.cpp" />
@@ -277,6 +282,10 @@
 		<Unit filename="shared\guid.h" />
 		<Unit filename="shared\localization.cpp" />
 		<Unit filename="shared\localization.h" />
+		<Unit filename="shared\longPathPrefix.cpp" />
+		<Unit filename="shared\longPathPrefix.h" />
+		<Unit filename="shared\recycler.cpp" />
+		<Unit filename="shared\recycler.h" />
 		<Unit filename="shared\serialize.cpp" />
 		<Unit filename="shared\serialize.h" />
 		<Unit filename="shared\shadow.cpp" />

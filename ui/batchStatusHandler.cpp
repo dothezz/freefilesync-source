@@ -63,14 +63,18 @@ private:
         using namespace globalFunctions;
 
         //create logfile directory
-        const wxString logfileDir = logfileDirectory.empty() ? FreeFileSync::getDefaultLogDirectory() : logfileDirectory;
-        if (!FreeFileSync::dirExists(wxToZ(logfileDir)))
-            FreeFileSync::createDirectory(wxToZ(logfileDir)); //create recursively if necessary: may throw (FileError&)
+        Zstring logfileDir = logfileDirectory.empty() ?
+                             wxToZ(FreeFileSync::getDefaultLogDirectory()) :
+                             FreeFileSync::getFormattedDirectoryName(wxToZ(logfileDirectory));
+
+        if (!FreeFileSync::dirExists(logfileDir))
+            FreeFileSync::createDirectory(logfileDir); //create recursively if necessary: may throw (FileError&)
 
         //assemble logfile name
-        wxString logfileName = logfileDir;
-        if (!logfileName.empty() && logfileName.Last() != FILE_NAME_SEPARATOR)
-            logfileName += FILE_NAME_SEPARATOR;
+        if (!logfileDir.EndsWith(FILE_NAME_SEPARATOR))
+            logfileDir += FILE_NAME_SEPARATOR;
+
+        wxString logfileName = zToWx(logfileDir);
 
         wxString timeNow = wxDateTime::Now().FormatISOTime();
         timeNow.Replace(wxT(":"), wxT("-"));

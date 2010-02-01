@@ -13,7 +13,7 @@ struct FolderPairCfg
 {
     FolderPairCfg(const Zstring& leftDir,
                   const Zstring& rightDir,
-                  const FilterProcess::FilterRef& filterIn,
+                  const BaseFilter::FilterRef& filterIn,
                   const SyncConfiguration& syncCfg) :
         leftDirectory(leftDir),
         rightDirectory(rightDir),
@@ -23,7 +23,7 @@ struct FolderPairCfg
     Zstring leftDirectory;
     Zstring rightDirectory;
 
-    FilterProcess::FilterRef filter; //filter interface: always bound by design!
+    BaseFilter::FilterRef filter; //filter interface: always bound by design!
     SyncConfiguration syncConfiguration;
 };
 
@@ -34,9 +34,13 @@ std::vector<FolderPairCfg> extractCompareCfg(const MainConfiguration& mainCfg);
 class CompareProcess
 {
 public:
-    CompareProcess(const bool traverseSymLinks,
-                   const unsigned int fileTimeTol,
-                   const bool ignoreOneHourDiff,
+    CompareProcess(bool traverseSymLinks,
+                   unsigned int fileTimeTol,
+                   bool ignoreOneHourDiff,
+#ifndef _MSC_VER
+#warning remove threshold, if not used!
+#endif
+                   unsigned int detectRenameThreshold,
                    xmlAccess::OptionalDialogs& warnings,
                    StatusHandler* handler);
 

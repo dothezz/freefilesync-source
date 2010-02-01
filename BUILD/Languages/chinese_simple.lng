@@ -46,6 +46,8 @@
 取消(&C)
 &Check for new version
 检查更新(&C)
+&Content
+内容(&C)
 &Create batch job
 创建批处理作业(&C)
 &Default
@@ -88,6 +90,8 @@
 是(&Y)
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (请注意只有FAT/FAT32分区受此问题影响!\n在所有其他情况下你可禁用\"忽略一小时差异\"这一选项.)
+(Requires an Internet connection!)
+(需要因特网连接!)
 ,
 .
 - Other side's counterpart to %dir
@@ -132,12 +136,18 @@
 1. 比较(&C)
 1. Enter relative file or directory names separated by ';' or a new line.
 1. 输入相对文件或文件夹名称,用';'或空行分隔.
+1. Select directories to monitor.
+1. 选择要监视的目录.
 2. &Synchronize...
 2. 同步(&S)...
+2. Enter a command line.
+2. 输入一个命令行.
 2. Use wildcard characters '*' and '?'.
 2. 使用通配符‘*’和‘?’.
 3. Exclude files directly on main grid via context menu.
 3. 通过右键菜单在主网格排除文件.
+3. Press 'Start'.
+3. 点击'开始'.
 <Automatic>
 自动
 <Directory>
@@ -172,6 +182,8 @@ As the name suggests, two files which share the same name are marked as equal if
 顾名思义,两个相同文件名的文件当且仅当它们具有相同的内容时会被认为是相同的。\n此选项对于一致性检查比较有用，而不是备份操作. 因此,文件时间没有被考虑到. \n\n通过此选项使决策树较小:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 装配一个批处理文件用于自动同步. 要开始批处理模式只需简单地将批处理文件名传送给FreeFileSync可执行文件:FreeFileSync.exe <batchfile>. 这个也可以安排在您的操作系统的计划任务中.
+At least one directory input field is empty.
+至少有一个目录输入字段是空的.
 Auto-adjust columns
 自动调整栏宽
 Automatic mode
@@ -192,20 +204,18 @@ Build:
 开发:
 Cancel
 取消
-Cannot determine sync-direction: Changed filter settings!
-不能确定同步方向: 过滤器设置已改变!
-Cannot determine sync-direction: No change since last synchronization!
-不能确定同步方向: 在最后同步之后没有改变!
+Cannot determine sync-direction:
+不能检测同步方向:
 Category
 分类
 Change direction
 改变方向
 Comma separated list
 逗号分隔的列表
-Commandline
+Command line
 命令行
-Commandline is empty!
-命令行为空!
+Command line is empty!
+命令行是空的!
 Compare
 比较
 Compare both sides
@@ -260,8 +270,12 @@ Copy from right to left
 从右侧复制到左侧
 Copy from right to left overwriting
 从右侧复制到左侧(覆盖模式)
+Copy locked files
+复制被锁定的文件
 Copy new or updated files to right folder.
 复制新的或修改过的文件到右侧文件夹
+Copy shared or locked files using Volume Shadow Copy Service.
+使用卷影复制服务来复制共享或锁定的文件.
 Copy to clipboard\tCTRL+C
 复制到剪贴板\tCTRL+C
 Copying file %x to %y
@@ -272,6 +286,8 @@ Could not determine volume name for file:
 不能确定此文件的卷名称:
 Could not initialize directory monitoring:
 不能初始化目录监视:
+Could not load a required DLL:
+不能加载所需的动态连接库:
 Could not read values for the following XML nodes:
 不能从如下XML节点读取数值:
 Create a batch job
@@ -298,7 +314,7 @@ Date
 日期
 Delay
 延时
-Delay between detection of changes and execution of commandline in seconds
+Delay between detection of changes and execution of command line in seconds
 在检测和执行命令行之间的延时秒数
 Delete files/folders existing on left side only
 删除仅在左侧存在的文件/文件夹
@@ -386,6 +402,8 @@ Error reading file:
 读取文件出错:
 Error reading from synchronization database:
 从同步数据库中读取时出错:
+Error resolving full path name:
+解决完整路径时出错:
 Error resolving symbolic link:
 解决符号链接出错:
 Error starting Volume Shadow Copy Service!
@@ -466,6 +484,8 @@ Filter files
 过滤文件
 Filter has been selected
 过滤器已选择
+Filter settings have changed!
+过滤设置已改变!
 Filter view
 过滤查看
 Filtering is deactivated
@@ -560,8 +580,8 @@ Include all rows
 包括所有行
 Include temporarily
 暂时包括
-Include: *.doc;*.zip;*.exe\nExclude: temp\\*
-包括: *.doc;*.zip;*.exe\n排除temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
+包括: *.doc;*.zip;*.exe\n排除\\stuff\\temp\\*
 Incompatible synchronization database format:
 不兼容的同步数据库格式:
 Info
@@ -572,8 +592,6 @@ Initial synchronization:
 初始化同步:
 Integrate external applications into context menu. The following macros are available:
 集成外部应用程序到右键菜单. 如下宏可用:
-It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
-初始化回收站是不大可能了!\n\n估计你使用的不是Windows系统.\n如果你想包含此特性,请联系作者. :)
 Leave as unresolved conflict
 遗留为未解决的冲突
 Left
@@ -590,18 +608,22 @@ Log-messages:
 日志信息:
 Logging
 记录
+Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
+不支持在WOW64上使用卷影复制. 请使用 FreeFileSync 64位版本.
 Mirror ->>
 镜像 ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 左侧文件夹镜像备份: 同步后右侧文件夹将被覆盖并且完全匹配左边的文件夹.
+Monitoring active...
+监视激活...
 More than 50% of the total number of files will be copied or deleted!
 超过总数 50% 以上的文件要被复制或删除!
 Move column down
 下移一行
 Move column up
 上移一行
-Move files to a user-defined directory.
-移动文件到用户定义的目录
+Move files into a time-stamped subdirectory.
+移动文件到时间标记子目录.
 Moving %x to Recycle Bin
 移动 %x 到回收站
 Moving file %x to user-defined directory %y
@@ -610,6 +632,8 @@ Moving folder %x to user-defined directory %y
 移动文件夹 %x 到用户定义目录 %y
 Multiple...
 倍数...
+No change since last synchronization!
+自从最后一次同步以来没有变动!
 No filter selected
 没有选定过滤器
 Not enough free disk space available in:
@@ -642,12 +666,10 @@ Pause
 暂停
 Paused
 已暂停
-Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
-请复制适当的\"Shadow.dll\"(位于\"Shadow.zip\"压缩包中)到FreeFileSync安装目录以启用此特性.
-Please fill all empty directory fields.
-请填满所有空的目录区域.
 Please run a Compare first before synchronizing!
 同步之前请先进行对比
+Processing folder pair:
+正在处理成对文件夹:
 Published under the GNU General Public License:
 在GNU通用公共许可下发布:
 Question
@@ -670,6 +692,8 @@ Remove folder pair
 删除文件夹对
 Remove local filter settings
 移除局部过滤器
+Renaming file %x to %y
+将 %x 重命名为 %y
 Report translation error
 报告翻译错误
 Reset
@@ -786,6 +810,8 @@ Target directory already existing!
 目标目录已经存在!
 Target file already existing!
 目标文件已经存在!
+The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
+命令行会被执行每当:\n- 这些目录(或子目录)里面的文件有修改\n- 相应的盘符变成可用(插入U盘)
 The database file is not yet existing, but will be created during synchronization:
 数据库文件未存在, 但在同步期间会被创建:
 The file does not contain a valid configuration:
@@ -816,12 +842,14 @@ Unable to create logfile!
 无法创建日志!
 Unable to initialize Recycle Bin!
 无法初始化回收站!
+Unresolved conflicts existing!
+存在不可解决的冲突!
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 存在不可解决的冲突!\n\n你可忽略冲突并继续同步.
 Update ->
 升级 ->
-Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
-用法: 选择要监视的目录并输入一命令行. 每次目录(或子目录)中的文件被修改时此命令行就会执行.
+Usage:
+用法:
 Use Recycle Bin
 使用回收站
 Use Recycle Bin when deleting or overwriting files.
@@ -842,6 +870,8 @@ Warning: Synchronization failed for %x item(s):
 警告:同步失败 %x (某些)项目:
 When the comparison is started with this option set the following decision tree is processed:
 当以此选项开始比较时以下决定树被处理:
+You can ignore conflicts and continue synchronization.
+你可忽略冲突并继续同步.
 You can ignore the error to consider not existing directories as empty.
 您可忽略此错误而将不存在的目录视为空.
 You can ignore the error to skip current folder pair.

@@ -16,11 +16,13 @@ class Application : public wxApp
 {
 public:
     virtual bool OnInit();
+    virtual int OnRun();
+    virtual bool OnExceptionInMainLoop();
 
 private:
     void OnStartApplication(wxIdleEvent& event);
 
-        std::auto_ptr<wxHelpController> helpController; //global help controller
+    std::auto_ptr<wxHelpController> helpController; //global help controller
 };
 
 #endif // REALTIMESYNCAPP_H

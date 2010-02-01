@@ -46,6 +46,8 @@
 キャンセル(&C)
 &Check for new version
 バージョン更新の確認(&C)
+&Content
+トピック(&C)
 &Create batch job
 一括ジョブを作成(&C)
 &Default
@@ -88,6 +90,8 @@
 はい(&Y)
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (注意: FAT/FAT32 ドライブのみこの影響を受けます! \n その他のケースでは設定を無効にすることができます。"1 時間の差異は無視" )
+(Requires an Internet connection!)
+(インターネット接続を必要とします!)
 ,
 .
 - Other side's counterpart to %dir
@@ -132,12 +136,18 @@
 1. 比較(&C)
 1. Enter relative file or directory names separated by ';' or a new line.
 1. 相対ファイル、またはディレクトリを ';' または 改行で区切って入力
+1. Select directories to monitor.
+1. 監視するディレクトリを選択
 2. &Synchronize...
 2. 同期処理(&S)...
+2. Enter a command line.
+2. コマンドラインを入力
 2. Use wildcard characters '*' and '?'.
 2. ワイルドカードに ' * ' と ' ? ' を使用出来ます。
 3. Exclude files directly on main grid via context menu.
 3. コンテキストメニューから直接ファイルを除外出来ます。
+3. Press 'Start'.
+3. 'スタート'をクリック
 <Automatic>
 <自動>
 <Directory>
@@ -172,6 +182,8 @@ As the name suggests, two files which share the same name are marked as equal if
 このオプションでは、同じ名前を共有するファイルで内容が同じ場合は、同一として扱われます。  バックアップ操作より、むしろ整合性のチェックを行う時に役立つオプションです。  従ってファイルの日時については全く考慮されていません。\n\n設定が有効な時は、ツリー表示が小さくなります。
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 一括で同期処理を行うためのバッチファイルを作成します。 一括モードを開始するときは、ファイルのパス名を実行ファイル\n< FreeFileSync.exe> \nにバッチファイルで渡すだけです。 また、この操作はOSのタスクスケジューラから実行することができます。
+At least one directory input field is empty.
+少なくともひとつのディレクトリを選択してください
 Auto-adjust columns
 列の自動調整
 Automatic mode
@@ -192,19 +204,17 @@ Build:
 ビルド:
 Cancel
 中止
-Cannot determine sync-direction: Changed filter settings!
-同期方向を決定できません: フィルター設定が変更されています!
-Cannot determine sync-direction: No change since last synchronization!
-同期方向を決定できません: 前回最後の同期処理以降、変更はありません
+Cannot determine sync-direction:
+同期方向が決定されていません:
 Category
 カテゴリ
 Change direction
 方向を変更
 Comma separated list
 カンマ区切り
-Commandline
+Command line
 コマンドライン
-Commandline is empty!
+Command line is empty!
 コマンドラインが空白です!
 Compare
 比較
@@ -260,8 +270,12 @@ Copy from right to left
 右から左にコピー
 Copy from right to left overwriting
 右から左に上書きコピー
+Copy locked files
+ロックされたファイルをコピー
 Copy new or updated files to right folder.
 新しい(更新)ファイルを右フォルダにコピー
+Copy shared or locked files using Volume Shadow Copy Service.
+共有、またはボリュームシャドウコピーでロックされたファイルをコピー
 Copy to clipboard\tCTRL+C
 クリップボードにコピー\tCTRL+C
 Copying file %x to %y
@@ -272,6 +286,8 @@ Could not determine volume name for file:
 ファイルのボリューム名が決定されていません:
 Could not initialize directory monitoring:
 監視するディレクトリを初期化できません:
+Could not load a required DLL:
+必要なDLLを読み込めません:
 Could not read values for the following XML nodes:
 以下の XMLノードの値を読み込むことが出来ません:
 Create a batch job
@@ -298,7 +314,7 @@ Date
 データ
 Delay
 遅延時間
-Delay between detection of changes and execution of commandline in seconds
+Delay between detection of changes and execution of command line in seconds
 変更の検出とコマンドライン実行間の遅延(秒)
 Delete files/folders existing on left side only
 左側のみに存在するファイル/フォルダを削除
@@ -386,6 +402,8 @@ Error reading file:
 ファイル読み込みエラー:
 Error reading from synchronization database:
 同期データベースからの読み込みエラー:
+Error resolving full path name:
+フルパス名の解決エラー:
 Error resolving symbolic link:
 シンボリックリンクの解決に失敗:
 Error starting Volume Shadow Copy Service!
@@ -466,6 +484,8 @@ Filter files
 ファイルフィルター
 Filter has been selected
 フィルターは選択済みです
+Filter settings have changed!
+フィルター設定は変更されています!
 Filter view
 表示フィルター
 Filtering is deactivated
@@ -541,7 +561,7 @@ Hints:
 Homepage
 ホームページ
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
-データベースを使用して、両側アイテムの変更を特定します。削除、競合は自動的に検出することができます。
+データベースを使用して、両側アイテムの変更を特定します。 削除、競合は自動的に検出することができます。
 If you like FFS
 FFS が気に入った場合
 Ignore 1-hour file time difference
@@ -560,8 +580,8 @@ Include all rows
 すべての行を含める
 Include temporarily
 一時フォルダを含める
-Include: *.doc;*.zip;*.exe\nExclude: temp\\*
-含める: *.doc;*.zip;*.exe\n除外: temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
+含める: *.doc;*.zip;*.exe\n除外: \\stuff\\temp\\*
 Incompatible synchronization database format:
 同期データベースの書式に互換性がありません:
 Info
@@ -572,8 +592,6 @@ Initial synchronization:
 同期処理の初期化:
 Integrate external applications into context menu. The following macros are available:
 外部のアプリケーションをコンテキストメニューに統合、以下のマクロが利用できます:
-It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
-ゴミ箱を初期化することが出来ませんでした!\n\n使用している OS が、Windows 以外の OS です。\nこの機能を使用したい場合は、作者までご連絡ください :)
 Leave as unresolved conflict
 未解決の競合を残す
 Left
@@ -590,18 +608,22 @@ Log-messages:
 ログメッセージ:
 Logging
 ログ
+Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
+WOW64 では、ボリュームシャドウコピーに対応していません、FreeFileSync 64-bit 版をお試しください。
 Mirror ->>
 ミラー >>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 左側フォルダをミラーリングバックアップ: 同期完了後は、左側フォルダに合わせて右側フォルダは上書きされます。
+Monitoring active...
+監視を開始します...
 More than 50% of the total number of files will be copied or deleted!
 ファイル合計総数の 50% 以上が削除、またはコピーされます
 Move column down
 列を下に移動
 Move column up
 列を上に移動
-Move files to a user-defined directory.
-ユーザ定義ディレクトリにファイルを移動
+Move files into a time-stamped subdirectory.
+ファイルをタイムスタンプ名のサブフォルダに移動
 Moving %x to Recycle Bin
 %x をゴミ箱に移動中
 Moving file %x to user-defined directory %y
@@ -610,6 +632,8 @@ Moving folder %x to user-defined directory %y
 フォルダ %x をユーザ定義ディレクトリ %y に移動
 Multiple...
 複数処理...
+No change since last synchronization!
+前回の同期以降、変更はありません!
 No filter selected
 フィルター選択なし
 Not enough free disk space available in:
@@ -642,12 +666,10 @@ Pause
 一時停止
 Paused
 一時停止中
-Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
- \"Shadow.dll\" (\"Shadow.zip\" アーカイブ内) を、FreeFileSync インストールフォルダにコピーすることで、この機能を利用できるようになります。
-Please fill all empty directory fields.
-アイテムが選択されていません!
 Please run a Compare first before synchronizing!
 同期処理を実行する前に比較を行ってください!
+Processing folder pair:
+フォルダペアを処理中:
 Published under the GNU General Public License:
 Published under the GNU General Public License:
 Question
@@ -670,6 +692,8 @@ Remove folder pair
 フォルダペアを除去
 Remove local filter settings
 ローカルフィルター設定を除去
+Renaming file %x to %y
+ファイル %x を %y にリネーム中
 Report translation error
 翻訳エラーの詳細
 Reset
@@ -786,6 +810,8 @@ Target directory already existing!
 対象ディレクトリはすでに存在します!
 Target file already existing!
 対象ファイルは既に存在します!
+The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
+このコマンドラインは逐次実行されます:\n- これらのディレクトリ(サブディレクトリ)内のファイルは変更されています。\n- 対応するドライブレターは、USB 挿入時に有効になります。
 The database file is not yet existing, but will be created during synchronization:
 このデータベースファイルは、まだ存在しませんが、同期処理の実行中に作成されます:
 The file does not contain a valid configuration:
@@ -816,12 +842,14 @@ Unable to create logfile!
 ログファイルを作成出来ません!
 Unable to initialize Recycle Bin!
 ゴミ箱の初期化が出来ません!
+Unresolved conflicts existing!
+未解決の不一致があります!
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 未解決の不一致があります! \n\nこの不一致を無視して同期を続行することが出来ます。
 Update ->
 更新 ->
-Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
-使用方法: 監視するディレクトリを選択して、コマンドを入力します。 選択されたディレクトリ(サブディレクトリ)内のファイルが変更される度に、入力したコマンドが実行されます。
+Usage:
+使用方法:
 Use Recycle Bin
 ゴミ箱を使用
 Use Recycle Bin when deleting or overwriting files.
@@ -842,6 +870,8 @@ Warning: Synchronization failed for %x item(s):
 警告: %x アイテムの同期に失敗しました:
 When the comparison is started with this option set the following decision tree is processed:
 このオプションで比較を開始した場合は、以下のツリーに従って処理が行われます:
+You can ignore conflicts and continue synchronization.
+この不一致を無視して同期を続行することが出来ます。
 You can ignore the error to consider not existing directories as empty.
 既存のディレクトリが空ではないというエラーは無視できます。
 You can ignore the error to skip current folder pair.

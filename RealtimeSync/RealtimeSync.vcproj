@@ -69,7 +69,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wxmsw28ud_adv.lib &#x0A;wxmsw28ud_core.lib &#x0A;wxbase28ud.lib &#x0A;wxpngd.lib&#x0A; wxzlibd.lib &#x0A;wxbase28ud_net.lib comctl32.lib ws2_32.lib Rpcrt4.lib"
-				OutputFile="..\BUILD\$(ProjectName).exe"
+				OutputFile="..\BUILD\$(ProjectName)_$(PlatformName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="C:\Programme\C++\wxWidgets\lib\vc_lib"
 				GenerateManifest="true"
@@ -129,7 +129,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;D:\Programme\C++\wxWidgets-x64\include&quot;;&quot;D:\Programme\C++\wxWidgets-x64\lib\vc_lib\mswud&quot;;..\shared\boost_1_x"
+				AdditionalIncludeDirectories="&quot;C:\Programme\C++\wxWidgets-x64\include&quot;;&quot;C:\Programme\C++\wxWidgets-x64\lib\vc_lib\mswud&quot;;..\shared\boost_1_x"
 				PreprocessorDefinitions="wxUSE_UNICODE;__WXMSW__;FFS_WIN;__WXDEBUG__;TIXML_USE_STL;ZSTRING_WIDE_CHAR"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -145,7 +145,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				Culture="0"
-				AdditionalIncludeDirectories="D:\Programme\C++\wxWidgets-x64\include;D:\Programme\C++\wxWidgets-x64\lib\vc_lib\mswud"
+				AdditionalIncludeDirectories="C:\Programme\C++\wxWidgets-x64\include;C:\Programme\C++\wxWidgets-x64\lib\vc_lib\mswud"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -153,9 +153,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wxmsw28ud_adv.lib &#x0A;wxmsw28ud_core.lib &#x0A;wxbase28ud.lib &#x0A;wxpngd.lib&#x0A; wxzlibd.lib &#x0A;wxbase28ud_net.lib comctl32.lib ws2_32.lib Rpcrt4.lib"
-				OutputFile="..\BUILD\$(ProjectName).exe"
+				OutputFile="..\BUILD\$(ProjectName)_$(PlatformName).exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="D:\Programme\C++\wxWidgets-x64\lib\vc_lib"
+				AdditionalLibraryDirectories="C:\Programme\C++\wxWidgets-x64\lib\vc_lib"
 				GenerateManifest="true"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -237,7 +237,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wxmsw28u_adv.lib &#x0A;wxmsw28u_core.lib &#x0A;wxbase28u.lib &#x0A;wxpng.lib &#x0A;wxzlib.lib &#x0A;wxbase28u_net.lib comctl32.lib ws2_32.lib"
-				OutputFile="..\BUILD\$(ProjectName).exe"
+				OutputFile="..\BUILD\$(ProjectName)_$(PlatformName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="C:\Programme\C++\wxWidgets\lib\vc_lib"
 				GenerateDebugInformation="false"
@@ -298,12 +298,13 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="&quot;D:\Programme\C++\wxWidgets-x64\include&quot;;&quot;D:\Programme\C++\wxWidgets-x64\lib\vc_lib\mswu&quot;;..\shared\boost_1_x"
+				AdditionalIncludeDirectories="&quot;C:\Programme\C++\wxWidgets-x64\include&quot;;&quot;C:\Programme\C++\wxWidgets-x64\lib\vc_lib\mswu&quot;;..\shared\boost_1_x"
 				PreprocessorDefinitions="wxUSE_UNICODE;__WXMSW__;FFS_WIN;NDEBUG;TIXML_USE_STL;ZSTRING_WIDE_CHAR"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
+				SuppressStartupBanner="false"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4804"
 			/>
@@ -313,7 +314,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				Culture="1033"
-				AdditionalIncludeDirectories="&quot;D:\Programme\C++\wxWidgets-x64\include&quot;;&quot;D:\Programme\C++\wxWidgets-x64\lib\vc_lib\mswu&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Programme\C++\wxWidgets-x64\include&quot;;&quot;C:\Programme\C++\wxWidgets-x64\lib\vc_lib\mswu&quot;"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -321,9 +322,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wxmsw28u_adv.lib &#x0A;wxmsw28u_core.lib &#x0A;wxbase28u.lib &#x0A;wxpng.lib &#x0A;wxzlib.lib &#x0A;wxbase28u_net.lib comctl32.lib ws2_32.lib"
-				OutputFile="..\BUILD\$(ProjectName).exe"
+				OutputFile="..\BUILD\$(ProjectName)_$(PlatformName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="D:\Programme\C++\wxWidgets-x64\lib\vc_lib"
+				AdditionalLibraryDirectories="C:\Programme\C++\wxWidgets-x64\lib\vc_lib"
 				GenerateDebugInformation="false"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -383,6 +384,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\shared\fileID.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\shared\fileTraverser.cpp"
 				>
 			</File>
@@ -403,11 +408,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\shared\longPathPrefix.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\mainDialog.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\library\processXml.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\shared\recycler.cpp"
 				>
 			</File>
 			<File

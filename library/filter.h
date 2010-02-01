@@ -11,17 +11,23 @@ namespace FreeFileSync
 //------------------------------------------------------------------
 /*    class hierarchy:
 
-          FilterProcess (interface)
+          BaseFilter (interface)
                /|\
        _________|_____________
       |         |             |
 NullFilter  NameFilter  CombinedFilter
 */
 
-class FilterProcess //interface for filtering
+/*
+Semantics of BaseFilter:
+1. using it creates a NEW folder hierarchy! -> must be respected by <Automatic>-mode!
+2. it applies equally to both sides => it always matches either both sides or none! => can be used while traversing a single folder!
+*/
+
+class BaseFilter //interface for filtering
 {
 public:
-    virtual ~FilterProcess() {}
+    virtual ~BaseFilter() {}
 
     //filtering
     virtual bool passFileFilter(const DefaultChar* relFilename) const = 0;
@@ -32,11 +38,11 @@ public:
     virtual bool isNull() const = 0; //filter is equivalent to NullFilter, but may be technically slower
 
     //comparison
-    bool operator<(const FilterProcess& other)  const;
-    bool operator==(const FilterProcess& other) const;
-    bool operator!=(const FilterProcess& other) const;
+    bool operator<(const BaseFilter& other)  const;
+    bool operator==(const BaseFilter& other) const;
+    bool operator!=(const BaseFilter& other) const;
 
-    typedef boost::shared_ptr<const FilterProcess> FilterRef; //always bound by design!
+    typedef boost::shared_ptr<const BaseFilter> FilterRef; //always bound by design!
 
     //serialization
     void saveFilter(wxOutputStream& stream) const; //serialize derived object
@@ -45,11 +51,11 @@ public:
 private:
     virtual Zstring uniqueClassIdentifier() const = 0; //get identifier, used for serialization
     virtual void save(wxOutputStream& stream) const = 0; //serialization
-    virtual bool cmpLessSameType(const FilterProcess& other) const = 0; //typeid(*this) == typeid(other) in this context!
+    virtual bool cmpLessSameType(const BaseFilter& other) const = 0; //typeid(*this) == typeid(other) in this context!
 };
 
 
-class NullFilter : public FilterProcess  //no filtering at all
+class NullFilter : public BaseFilter  //no filtering at all
 {
 public:
     static FilterRef load(wxInputStream& stream); //"serial constructor"
@@ -60,11 +66,11 @@ public:
 private:
     virtual Zstring uniqueClassIdentifier() const;
     virtual void save(wxOutputStream& stream) const {}
-    virtual bool cmpLessSameType(const FilterProcess& other) const;
+    virtual bool cmpLessSameType(const BaseFilter& other) const;
 };
 
 
-class NameFilter : public FilterProcess  //standard filter by filename
+class NameFilter : public BaseFilter  //standard filter by filename
 {
 public:
     NameFilter(const Zstring& includeFilter, const Zstring& excludeFilter);
@@ -77,7 +83,7 @@ public:
 private:
     virtual Zstring uniqueClassIdentifier() const;
     virtual void save(wxOutputStream& stream) const;
-    virtual bool cmpLessSameType(const FilterProcess& other) const;
+    virtual bool cmpLessSameType(const BaseFilter& other) const;
 
     std::set<Zstring> filterFileIn;
     std::set<Zstring> filterFolderIn;
@@ -89,7 +95,7 @@ private:
 };
 
 
-class CombinedFilter : public FilterProcess  //combine two filters to match if and only if both match
+class CombinedFilter : public BaseFilter  //combine two filters to match if and only if both match
 {
 public:
     CombinedFilter(const FilterRef& first, const FilterRef& second) : first_(first), second_(second) {}
@@ -102,7 +108,7 @@ public:
 private:
     virtual Zstring uniqueClassIdentifier() const;
     virtual void save(wxOutputStream& stream) const;
-    virtual bool cmpLessSameType(const FilterProcess& other) const;
+    virtual bool cmpLessSameType(const BaseFilter& other) const;
 
     const FilterRef first_;
     const FilterRef second_;
@@ -110,8 +116,8 @@ private:
 
 
 //small helper method: remove Null-filters
-FilterProcess::FilterRef combineFilters(const FilterProcess::FilterRef& first,
-                                        const FilterProcess::FilterRef& second);
+BaseFilter::FilterRef combineFilters(const BaseFilter::FilterRef& first,
+                                     const BaseFilter::FilterRef& second);
 
 
 
@@ -132,7 +138,7 @@ FilterProcess::FilterRef combineFilters(const FilterProcess::FilterRef& first,
 
 //---------------Inline Implementation---------------------------------------------------
 inline
-FilterProcess::FilterRef NullFilter::load(wxInputStream& stream) //"serial constructor"
+BaseFilter::FilterRef NullFilter::load(wxInputStream& stream) //"serial constructor"
 {
     return FilterRef(new NullFilter);
 }
@@ -161,7 +167,7 @@ bool NullFilter::isNull() const
 
 
 inline
-bool NullFilter::cmpLessSameType(const FilterProcess& other) const
+bool NullFilter::cmpLessSameType(const BaseFilter& other) const
 {
     //typeid(*this) == typeid(other) in this context!
     assert(typeid(*this) == typeid(other));
@@ -200,7 +206,7 @@ bool CombinedFilter::isNull() const
 
 
 inline
-bool CombinedFilter::cmpLessSameType(const FilterProcess& other) const
+bool CombinedFilter::cmpLessSameType(const BaseFilter& other) const
 {
     //typeid(*this) == typeid(other) in this context!
     assert(typeid(*this) == typeid(other));
@@ -229,7 +235,7 @@ void CombinedFilter::save(wxOutputStream& stream) const
 
 
 inline
-FilterProcess::FilterRef CombinedFilter::load(wxInputStream& stream) //"constructor"
+BaseFilter::FilterRef CombinedFilter::load(wxInputStream& stream) //"constructor"
 {
     FilterRef first  = loadFilter(stream);
     FilterRef second = loadFilter(stream);
@@ -239,13 +245,13 @@ FilterProcess::FilterRef CombinedFilter::load(wxInputStream& stream) //"construc
 
 
 inline
-FilterProcess::FilterRef combineFilters(const FilterProcess::FilterRef& first,
-                                        const FilterProcess::FilterRef& second)
+BaseFilter::FilterRef combineFilters(const BaseFilter::FilterRef& first,
+                                     const BaseFilter::FilterRef& second)
 {
     if (first->isNull())
     {
         if (second->isNull())
-            return FilterProcess::FilterRef(new NullFilter);
+            return BaseFilter::FilterRef(new NullFilter);
         else
             return second;
     }
@@ -254,7 +260,7 @@ FilterProcess::FilterRef combineFilters(const FilterProcess::FilterRef& first,
         if (second->isNull())
             return first;
         else
-            return FilterProcess::FilterRef(new CombinedFilter(first, second));
+            return BaseFilter::FilterRef(new CombinedFilter(first, second));
     }
 }
 

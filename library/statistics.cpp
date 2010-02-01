@@ -113,10 +113,10 @@ Statistics::Statistics(const int totalObjectCount,
     remainingTimeLast(256*256*256*100), //something "big"
     timer(new wxStopWatch) {}
 
-	Statistics::~Statistics()
-	{
-		delete timer;
-	}
+Statistics::~Statistics()
+{
+    delete timer;
+}
 
 void Statistics::addMeasurement(const int objectsCurrent, const double dataCurrent)
 {

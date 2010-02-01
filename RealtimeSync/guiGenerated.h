@@ -23,14 +23,14 @@ class wxButtonWithImage;
 #include <wx/settings.h>
 #include <wx/stattext.h>
 #include <wx/statline.h>
+#include <wx/sizer.h>
+#include <wx/statbox.h>
 #include <wx/bmpbuttn.h>
 #include <wx/button.h>
-#include <wx/sizer.h>
 #include <wx/textctrl.h>
 #include <wx/filepicker.h>
 #include <wx/panel.h>
 #include <wx/scrolwin.h>
-#include <wx/statbox.h>
 #include <wx/spinctrl.h>
 #include <wx/frame.h>
 
@@ -52,6 +52,11 @@ class MainDlgGenerated : public wxFrame
 		wxPanel* m_panelMain;
 		
 		wxStaticText* m_staticText2;
+		wxStaticText* m_staticText3;
+		wxStaticText* m_staticText4;
+		wxStaticText* m_staticText5;
+		wxStaticLine* m_staticline3;
+		wxStaticText* m_staticText21;
 		wxStaticLine* m_staticline2;
 		wxPanel* m_panelMainFolder;
 		wxBitmapButton* m_bpButtonAddFolder;

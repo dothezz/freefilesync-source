@@ -46,6 +46,8 @@
 取消(&C)
 &Check for new version
 檢查更新(&C)
+&Content
+內容
 &Create batch job
 新建批次處理作業(&C)
 &Default
@@ -87,7 +89,9 @@
 &Yes
 是
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(請注意只有 FAT/FAT32 磁碟機會受到此問題的影響！\n在所有其他狀況下，可以關閉這個設定\"忽略1小時的誤差"\。)
+(請注意只有 FAT/FAT32 磁碟機會受到此問題的影響！\n在所有其他狀況下，可以關閉這個設定\"忽略1小時的誤差\"。)
+(Requires an Internet connection!)
+(需要連接到網際網路！)
 ,
 .
 - Other side's counterpart to %dir
@@ -132,12 +136,18 @@
 1. 比對(&C)
 1. Enter relative file or directory names separated by ';' or a new line.
 1. 輸入相對檔案或目錄名稱，使用';'或空行分隔。
+1. Select directories to monitor.
+1. 選擇要監測的目錄。
 2. &Synchronize...
 2. 同步(&S)...
+2. Enter a command line.
+2. 輸入命令列。
 2. Use wildcard characters '*' and '?'.
 2. 使用萬用字元‘*’和‘?’。
 3. Exclude files directly on main grid via context menu.
 3. 經由內容選單直接在主要網格排除檔案。
+3. Press 'Start'.
+3. 按下 '開始'。
 <Automatic>
 <自動>
 <Directory>
@@ -172,6 +182,8 @@ As the name suggests, two files which share the same name are marked as equal if
 顧名思義，兩個相同檔名的檔案，只有當他們具有同樣的内容時會被判斷是相同的。\n此選項對於一致性檢查比較有用，而不是備份操作。因此，檔案時間沒有列入考慮。\n\n啟用此選項使決策樹較小：
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 組合一個用於自動同步的批次檔。若要開始批次處理模式，只需簡單的將批次檔名傳送给 FreeFileSync 可執行檔：FreeFileSync.exe <batchfile>。這個也可以安排在你的作業系統的計畫任務中。
+At least one directory input field is empty.
+至少有一個目錄輸入欄位是空的。
 Auto-adjust columns
 自動調整欄寬
 Automatic mode
@@ -192,19 +204,17 @@ Build:
 建立：
 Cancel
 取消
-Cannot determine sync-direction: Changed filter settings!
-不能判斷同步方向：已更改篩選器設定！
-Cannot determine sync-direction: No change since last synchronization!
-不能判斷同步方向：自上次同步後，沒有更改過！
+Cannot determine sync-direction:
+無法判斷同步方向：
 Category
 分類
 Change direction
 改變方向
 Comma separated list
 逗號分隔清單
-Commandline
+Command line
 命令列
-Commandline is empty!
+Command line is empty!
 命令列是空的！
 Compare
 比對
@@ -260,8 +270,12 @@ Copy from right to left
 從右邊複製到左邊
 Copy from right to left overwriting
 從右邊複製到左邊覆蓋檔案
+Copy locked files
+複製被鎖定的檔案
 Copy new or updated files to right folder.
 將新的或更新過的檔案複製到右邊的資料夾中。
+Copy shared or locked files using Volume Shadow Copy Service.
+使用卷影複製服務來複製共享或鎖定的檔案。
 Copy to clipboard\tCTRL+C
 複製到剪貼簿\tCTRL+C
 Copying file %x to %y
@@ -272,6 +286,8 @@ Could not determine volume name for file:
 無法判斷此檔案的卷標名稱：
 Could not initialize directory monitoring:
 無法初始化目錄監測：
+Could not load a required DLL:
+無法載入一個所需的DLL：
 Could not read values for the following XML nodes:
 無法讀取 XML 之後節點的值：
 Create a batch job
@@ -298,7 +314,7 @@ Date
 日期
 Delay
 延遲
-Delay between detection of changes and execution of commandline in seconds
+Delay between detection of changes and execution of command line in seconds
 檢測更改和執行命令列的延遲時間，以秒為單位。
 Delete files/folders existing on left side only
 刪除只存在於左邊的檔案/資料夾
@@ -386,6 +402,8 @@ Error reading file:
 讀取檔案錯誤：
 Error reading from synchronization database:
 讀取同步資料庫錯誤：
+Error resolving full path name:
+完整路徑名稱解析錯誤：
 Error resolving symbolic link:
 解决符號連結錯誤：
 Error starting Volume Shadow Copy Service!
@@ -393,7 +411,7 @@ Error starting Volume Shadow Copy Service!
 Error traversing directory:
 遍歷目錄錯誤：
 Error when monitoring directories.
-監測目錄錯誤：
+監測目錄錯誤。
 Error writing file attributes:
 寫入檔案屬性錯誤：
 Error writing file:
@@ -466,6 +484,8 @@ Filter files
 篩選檔案
 Filter has been selected
 已選擇篩選器
+Filter settings have changed!
+篩選器設定已更改！
 Filter view
 篩選檢視
 Filtering is deactivated
@@ -560,8 +580,8 @@ Include all rows
 包括所有行
 Include temporarily
 暫時包括
-Include: *.doc;*.zip;*.exe\nExclude: temp\\*
-包括：*.doc;*.zip;*.exe\n排除temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
+包括：*.doc;*.zip;*.exe\n排除\\stuff\\temp\\*
 Incompatible synchronization database format:
 同步資料庫格式不相容：
 Info
@@ -569,11 +589,9 @@ Info
 Information
 訊息
 Initial synchronization:
-初始化同步:
+初始化同步：
 Integrate external applications into context menu. The following macros are available:
 整合上下文功能表中的外部應用程式。可以使用下面的巨集：
-It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
-不能初始化資源回收筒！\n\n可能你使用的不是 Windows 系統。\n如果你想包括此功能，請聯繫作者。:)
 Leave as unresolved conflict
 保留給未解決的衝突
 Left
@@ -590,18 +608,22 @@ Log-messages:
 日誌訊息：
 Logging
 日誌記錄
+Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
+不支援製作 WOW64 上的卷影副本。請使用 FreeFileSync 64位元版本。
 Mirror ->>
 鏡像 ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-左邊資料夾的鏡像備份：同步之後，右邊資料夾將被覆蓋，完全和左邊資料夾一模一樣。
+左邊資料夾的鏡像備份： 同步之後，右邊資料夾將被覆蓋，完全和左邊資料夾一模一樣。
+Monitoring active...
+監測活動...
 More than 50% of the total number of files will be copied or deleted!
 超過總數 50% 以上的檔案將被複製或刪除！
 Move column down
 下移一行
 Move column up
 上移一行
-Move files to a user-defined directory.
-將檔案移動到自定義目錄。
+Move files into a time-stamped subdirectory.
+移動檔案到一個時間標記的子目錄。
 Moving %x to Recycle Bin
 移動 %x 到資源回收筒
 Moving file %x to user-defined directory %y
@@ -610,6 +632,8 @@ Moving folder %x to user-defined directory %y
 移動資料夾 %x 到自定義資料夾 %y
 Multiple...
 多個...
+No change since last synchronization!
+自上次同步以來都沒有變更！
 No filter selected
 沒有選擇篩選器
 Not enough free disk space available in:
@@ -642,12 +666,10 @@ Pause
 暫停
 Paused
 已暫停
-Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
-請複製適當的\"Shadow.dll\"(位於\"Shadow.zip\"壓縮檔)到 FreeFileSync 安裝目錄以啟用此功能。
-Please fill all empty directory fields.
-請填滿所有空白目錄欄位。
 Please run a Compare first before synchronizing!
 請執行同步前先比對！
+Processing folder pair:
+處理兩個資料夾：
 Published under the GNU General Public License:
 在GNU通用公共許可證下發佈：
 Question
@@ -670,6 +692,8 @@ Remove folder pair
 移除兩個資料夾
 Remove local filter settings
 移除局部性篩選器設定
+Renaming file %x to %y
+檔案重新命名 %x 為 %y
 Report translation error
 回報翻譯錯誤
 Reset
@@ -786,6 +810,8 @@ Target directory already existing!
 目標目錄已存在！
 Target file already existing!
 目標檔案已存在！
+The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
+命令行每次執行時：\n- 檔案在這些目錄(或子目錄)會被修改\n- 可供使用相應的磁碟機代號(USB插入)
 The database file is not yet existing, but will be created during synchronization:
 資料庫檔未存在，但會在同步過程中新建：
 The file does not contain a valid configuration:
@@ -816,12 +842,14 @@ Unable to create logfile!
 無法新建日誌檔！
 Unable to initialize Recycle Bin!
 無法初始化資源回收筒！
+Unresolved conflicts existing!
+存在未解決的衝突！
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 存在未解決的衝突！\n\n你可以忽略衝突，並繼續同步。
 Update ->
 更新 ->
-Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
-用法：選擇監測的目錄並輸入命令行。每次目錄(或子目錄)中的檔案被修改時，此命令列就會執行。
+Usage:
+使用量：
 Use Recycle Bin
 使用資源回收筒
 Use Recycle Bin when deleting or overwriting files.
@@ -842,6 +870,8 @@ Warning: Synchronization failed for %x item(s):
 警告：同步失敗的名稱為 %x 項目：
 When the comparison is started with this option set the following decision tree is processed:
 當比對開始，使用此選項設定時，以下決策樹將被處理：
+You can ignore conflicts and continue synchronization.
+你可以忽略衝突，並繼續同步。
 You can ignore the error to consider not existing directories as empty.
 你可以忽略該錯誤而將不存在的目錄視為空目錄。
 You can ignore the error to skip current folder pair.

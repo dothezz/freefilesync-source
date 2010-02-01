@@ -16,7 +16,7 @@
 
 namespace xmlAccess
 {
-    struct XmlRealConfig;
+struct XmlRealConfig;
 }
 
 
@@ -24,8 +24,8 @@ class FolderPanel : public FolderGenerated
 {
 public:
     FolderPanel(wxWindow* parent) :
-            FolderGenerated(parent),
-            dragDropOnFolder(new FreeFileSync::DragDropOnDlg(this, m_dirPicker, m_txtCtrlDirectory)) {}
+        FolderGenerated(parent),
+        dragDropOnFolder(new FreeFileSync::DragDropOnDlg(this, m_dirPicker, m_txtCtrlDirectory)) {}
 
 private:
     //support for drag and drop

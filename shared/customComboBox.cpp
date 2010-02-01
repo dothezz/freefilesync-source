@@ -50,6 +50,10 @@ void CustomComboBox::OnKeyEvent(wxKeyEvent& event)
 
 void CustomComboBox::addPairToFolderHistory(const wxString& newFolder, unsigned int maxHistSize)
 {
+    //don't add empty directories
+    if (newFolder.empty())
+        return;
+
     const wxString oldVal = this->GetValue();
 
     //insert new folder or put it to the front if already existing

@@ -14,10 +14,6 @@ public:
     const wxBitmap& getImageByName(const wxString& imageName) const;
 
     //image resource objects
-    wxBitmap* bitmapStart;
-    wxBitmap* bitmapAddFolderPair;
-    wxBitmap* bitmapRemoveFolderPair;
-
     wxIcon* programIcon;
 
     void load() const; //loads bitmap resources on program startup: logical const!

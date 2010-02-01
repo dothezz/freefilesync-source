@@ -13,6 +13,7 @@
 #include "../shared/localization.h"
 #include "xmlFreeFileSync.h"
 #include "../shared/standardPaths.h"
+#include <wx/file.h>
 
 #ifdef FFS_LINUX
 #include <gtk/gtk.h>
@@ -80,3 +81,30 @@ void Application::OnStartApplication(wxIdleEvent& event)
     frame->SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
     frame->Show();
 }
+
+
+bool Application::OnExceptionInMainLoop()
+{
+    throw; //just re-throw exception and avoid display of additional exception messagebox: it will be caught in OnRun()
+}
+
+
+int Application::OnRun()
+{
+    try
+    {
+        wxApp::OnRun();
+    }
+    catch (const std::exception& e) //catch all STL exceptions
+    {
+        //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
+        wxFile safeOutput(FreeFileSync::getLastErrorTxtFile(), wxFile::write);
+        safeOutput.Write(wxString::FromAscii(e.what()));
+
+        wxMessageBox(wxString::FromAscii(e.what()), _("An exception occured!"), wxOK | wxICON_ERROR);
+        return -9;
+    }
+
+    return 0; //program's return value
+}
+

@@ -7,9 +7,81 @@
 #include <map>
 #include <queue>
 #include <stdexcept>
+#include <set>
 
 using FreeFileSync::IconBuffer;
 
+
+const wxIcon& IconBuffer::getDirectoryIcon() //one folder icon should be sufficient...
+{
+    static wxIcon folderIcon;
+
+    static bool isInitalized = false;
+    if (!isInitalized)
+    {
+        isInitalized = true;
+
+        SHFILEINFO fileInfo;
+        fileInfo.hIcon = 0; //initialize hIcon
+
+        //NOTE: CoInitializeEx()/CoUninitialize() implicitly called by wxWidgets on program startup!
+        if (::SHGetFileInfo(DefaultStr("dummy"), //Windows Seven doesn't like this parameter to be an empty string
+                            FILE_ATTRIBUTE_DIRECTORY,
+                            &fileInfo,
+                            sizeof(fileInfo),
+                            SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES) &&
+
+                fileInfo.hIcon != 0) //fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
+        {
+            folderIcon.SetHICON(fileInfo.hIcon);
+            folderIcon.SetSize(IconBuffer::ICON_SIZE, IconBuffer::ICON_SIZE);
+        }
+    }
+    return folderIcon;
+}
+
+namespace
+{
+Zstring getFileExtension(const Zstring& filename)
+{
+    const Zstring shortName = filename.AfterLast(DefaultChar('\\')); //Zstring::AfterLast() returns the whole string if ch not found
+    const size_t pos = shortName.Find(DefaultChar('.'), true);
+    return pos == Zstring::npos ?
+           Zstring() :
+           Zstring(shortName.c_str() + pos + 1);
+}
+
+
+struct CmpFilenameWin
+{
+    bool operator()(const Zstring& a, const Zstring& b) const
+    {
+        return a.CmpNoCase(b) < 0;
+    }
+};
+
+
+//test for extension for icons that physically have to be retrieved from disc
+bool isPriceyExtension(const Zstring& extension)
+{
+    static std::set<Zstring, CmpFilenameWin> exceptions;
+    static bool isInitalized = false;
+    if (!isInitalized)
+    {
+        isInitalized = true;
+        exceptions.insert(DefaultStr("exe"));
+        exceptions.insert(DefaultStr("lnk"));
+        exceptions.insert(DefaultStr("ico"));
+        exceptions.insert(DefaultStr("ani"));
+        exceptions.insert(DefaultStr("cur"));
+        exceptions.insert(DefaultStr("url"));
+        exceptions.insert(DefaultStr("msc"));
+        exceptions.insert(DefaultStr("scr"));
+    }
+    return exceptions.find(extension) != exceptions.end();
+}
+}
+//################################################################################################################################################
 
 typedef std::vector<DefaultChar> BasicString; //simple thread safe string class: std::vector is guaranteed to not use reference counting, Effective STL, item 13
 
@@ -112,7 +184,7 @@ wxThread::ExitCode WorkerThread::Entry()
             if (threadExitIsRequested) //no mutex here: atomicity is not prob for a bool, but visibility (e.g. caching in registers)
                 return 0;              //shouldn't be a problem nevertheless because of implicit memory barrier caused by mutex.Lock() in .Wait()
 
-            //do work: get the file icon.
+            //do work: get the file icons
             doWork();
         }
     }
@@ -139,29 +211,25 @@ void WorkerThread::doWork()
             workload.pop_back();
         }
 
-        if (iconBuffer->requestIcon(Zstring(&fileName[0]))) //thread safety: Zstring okay, won't be reference-counted in requestIcon(), fileName is NOT empty
-            break; //icon already in buffer: enter waiting state
+        if (iconBuffer->requestFileIcon(Zstring(&fileName[0]))) //thread safety: Zstring okay, won't be reference-counted in requestIcon(), fileName is NOT empty
+            continue; //icon already in buffer: skip
 
         //despite what docu says about SHGetFileInfo() it can't handle all relative filenames, e.g. "\DirName"
-        const unsigned int MAX_SIZE = 10000;
-        DefaultChar fullName[MAX_SIZE];
-        const DWORD rv = ::GetFullPathName(
-                             &fileName[0], //__in   LPCTSTR lpFileName,
-                             MAX_SIZE,     //__in   DWORD nBufferLength,
-                             fullName,     //__out  LPTSTR lpBuffer,
-                             NULL);        //__out  LPTSTR *lpFilePart
-        if (rv < MAX_SIZE && rv != 0)
-        {
-            //load icon
-            SHFILEINFO fileInfo;
-            fileInfo.hIcon = 0; //initialize hIcon
+        //but no problem, directory formatting takes care that filenames are always absolute!
 
-            if (::SHGetFileInfo(fullName, //NOTE: CoInitializeEx()/CoUninitialize() implicitly called by wxWidgets on program startup!
+        //load icon
+        SHFILEINFO fileInfo;
+        fileInfo.hIcon = 0; //initialize hIcon
+
+        const Zstring extension = getFileExtension(&fileName[0]); //thread-safe: no sharing!
+        if (isPriceyExtension(extension)) //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
+        {
+            //NOTE: CoInitializeEx()/CoUninitialize() implicitly called by wxWidgets on program startup!
+            if (::SHGetFileInfo(&fileName[0], //FreeFileSync::removeLongPathPrefix(&fileName[0]), //::SHGetFileInfo() can't handle \\?\-prefix!
                                 0,
                                 &fileInfo,
                                 sizeof(fileInfo),
                                 SHGFI_ICON | SHGFI_SMALLICON) &&
-
                     fileInfo.hIcon != 0) //fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
             {
                 //bug report: https://sourceforge.net/tracker/?func=detail&aid=2768004&group_id=234430&atid=1093080
@@ -170,7 +238,8 @@ void WorkerThread::doWork()
                 newIcon.SetHICON(fileInfo.hIcon);
                 newIcon.SetSize(IconBuffer::ICON_SIZE, IconBuffer::ICON_SIZE);
 
-                iconBuffer->insertIntoBuffer(&fileName[0], newIcon); //thread safety: icon may be deleted only within insertIntoBuffer()
+                iconBuffer->insertIntoBuffer(&fileName[0], newIcon); //thread safety: icon buffer is written by this thread and this call only, so
+                //newIcon can safely go out of scope without race-condition because of ref-counting
 
                 //freeing of icon handle seems to happen somewhere beyond wxIcon destructor
                 //if (!DestroyIcon(fileInfo.hIcon))
@@ -178,16 +247,32 @@ void WorkerThread::doWork()
                 continue;
             }
         }
+        else //no read-access to disk! determine icon by extension
+        {
+            if (::SHGetFileInfo((Zstring(DefaultStr("dummy.")) + extension).c_str(),  //Windows Seven doesn't like this parameter to be without short name
+                                FILE_ATTRIBUTE_NORMAL,
+                                &fileInfo,
+                                sizeof(fileInfo),
+                                SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES) &&
+                    fileInfo.hIcon != 0) //fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
+            {
+                wxIcon newIcon; //attention: wxIcon uses reference counting!
+                newIcon.SetHICON(fileInfo.hIcon);
+                newIcon.SetSize(IconBuffer::ICON_SIZE, IconBuffer::ICON_SIZE);
+
+                iconBuffer->insertIntoBuffer(extension.c_str(), newIcon); //thread safety: icon buffer is written by this thread and this call only, so
+                continue;
+            }
+        }
+
         //if loading of icon fails for whatever reason, just save a dummy icon to avoid re-loading
         iconBuffer->insertIntoBuffer(&fileName[0], wxNullIcon);
     }
 }
 
 //---------------------------------------------------------------------------------------------------
-
-typedef Zstring FileName;
-class IconDB : public std::map<FileName, wxIcon> {};
-class IconDbSequence : public std::queue<FileName> {};
+class IconDB : public std::map<Zstring, wxIcon> {};    // entryName/icon
+class IconDbSequence : public std::queue<Zstring> {};  // entryName
 
 //---------------------------------------------------------------------------------------------------
 
@@ -213,11 +298,16 @@ IconBuffer::~IconBuffer()
 }
 
 
-bool IconBuffer::requestIcon(const Zstring& fileName, wxIcon* icon)
+bool IconBuffer::requestFileIcon(const Zstring& fileName, wxIcon* icon)
 {
-    wxCriticalSectionLocker dummy(*lockIconDB);
-    IconDB::const_iterator i = buffer->find(fileName);
+    const Zstring extension = getFileExtension(fileName);
 
+    wxCriticalSectionLocker dummy(*lockIconDB);
+
+    IconDB::const_iterator i = buffer->find( //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
+                                   isPriceyExtension(extension) ?
+                                   fileName :
+                                   extension);
     if (i != buffer->end())
     {
         if (icon != NULL)
@@ -235,13 +325,13 @@ void IconBuffer::setWorkload(const std::vector<Zstring>& load)
 }
 
 
-void IconBuffer::insertIntoBuffer(const DefaultChar* fileName, const wxIcon& icon) //called by worker thread
+void IconBuffer::insertIntoBuffer(const DefaultChar* entryName, const wxIcon& icon) //called by worker thread
 {
     if (icon.IsOk()) //this check won't hurt
     {
         wxCriticalSectionLocker dummy(*lockIconDB);
 
-        const Zstring fileNameZ = fileName;
+        const Zstring fileNameZ = entryName;
 
         const std::pair<IconDB::iterator, bool> rc = buffer->insert(IconDB::value_type(fileNameZ, icon));
 
@@ -259,4 +349,7 @@ void IconBuffer::insertIntoBuffer(const DefaultChar* fileName, const wxIcon& ico
         }
     }
 }
+
+
+
 

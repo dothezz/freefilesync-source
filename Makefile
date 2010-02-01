@@ -45,6 +45,7 @@ FILE_LIST+=shared/customButton.cpp
 FILE_LIST+=shared/toggleButton.cpp
 FILE_LIST+=shared/customComboBox.cpp
 FILE_LIST+=shared/serialize.cpp
+FILE_LIST+=shared/fileID.cpp
 
 #list of all *.o files
 OBJECT_LIST=$(foreach file, $(FILE_LIST), OBJ/$(subst .cpp,.o,$(notdir $(file))))

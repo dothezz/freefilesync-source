@@ -64,13 +64,13 @@ SyncConfiguration::Variant SyncConfiguration::getVariant() const
              conflict        == SYNC_DIR_NONE)
         return UPDATE;    //Update ->
 
-    else if (exLeftSideOnly  == SYNC_DIR_RIGHT &&
-             exRightSideOnly == SYNC_DIR_LEFT  &&
-             leftNewer       == SYNC_DIR_RIGHT &&
-             rightNewer      == SYNC_DIR_LEFT  &&
-             different       == SYNC_DIR_NONE  &&
-             conflict        == SYNC_DIR_NONE)
-        return TWOWAY;    //two way <->
+//    else if (exLeftSideOnly  == SYNC_DIR_RIGHT && -> variant "twoway" is not selectable via gui anymore
+//             exRightSideOnly == SYNC_DIR_LEFT  &&
+//             leftNewer       == SYNC_DIR_RIGHT &&
+//             rightNewer      == SYNC_DIR_LEFT  &&
+//             different       == SYNC_DIR_NONE  &&
+//             conflict        == SYNC_DIR_NONE)
+//        return TWOWAY;    //two way <->
     else
         return CUSTOM;    //other
 }
@@ -127,8 +127,7 @@ wxString SyncConfiguration::getVariantName() const
         return _("Mirror ->>");
     case SyncConfiguration::UPDATE:
         return _("Update ->");
-    case SyncConfiguration::TWOWAY:
-        return _("Two way <->");
+    case SyncConfiguration::TWOWAY: //variant "twoway" is not selectable via gui anymore
     case SyncConfiguration::CUSTOM:
         return _("Custom");
     }
@@ -230,6 +229,8 @@ wxString FreeFileSync::getDescription(SyncOperation op)
         return _("Copy from left to right overwriting");
     case SO_DO_NOTHING:
         return _("Do nothing");
+    case SO_EQUAL:
+        return _("Files that are equal on both sides");
     case SO_UNRESOLVED_CONFLICT:
         return _("Conflicts/files that cannot be categorized");
     };
@@ -257,6 +258,8 @@ wxString FreeFileSync::getSymbol(SyncOperation op)
         return wxT("->");
     case SO_DO_NOTHING:
         return wxT("-");
+    case SO_EQUAL:
+        return wxT("'=="); //added quotation mark to avoid error in Excel cell when exporting to *.cvs
     case SO_UNRESOLVED_CONFLICT:
         return wxT("\\/\\->");
     };
@@ -264,5 +267,3 @@ wxString FreeFileSync::getSymbol(SyncOperation op)
     assert(false);
     return wxEmptyString;
 }
-
-

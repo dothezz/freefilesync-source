@@ -11,7 +11,7 @@ public:
     MinimizeToTray(wxTopLevelWindow* callerWnd, wxWindow* secondWnd = NULL); //ensure callerWind has longer lifetime!
     ~MinimizeToTray(); //show windows again
 
-    void setToolTip(const wxString& toolTipText);
+    void setToolTip(const wxString& toolTipText, size_t percent = 0); //percent (optional), number between [0, 100], for small progress indicator
     void keepHidden(); //do not show windows again: avoid window flashing shortly before it is destroyed
 
 private:

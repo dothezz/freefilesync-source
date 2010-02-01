@@ -52,7 +52,7 @@ public:
 #ifdef FFS_WIN
     int CmpNoCase(const DefaultChar* other) const;
     int CmpNoCase(const Zstring& other) const;
-    Zstring& MakeLower();
+    Zstring& MakeUpper();
 #endif
     int Cmp(const DefaultChar* other) const;
     int Cmp(const Zstring& other) const;
@@ -132,6 +132,28 @@ private:
 
 template <class T>
 Zstring numberToZstring(const T& number); //convert number to Zstring
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //#######################################################################################

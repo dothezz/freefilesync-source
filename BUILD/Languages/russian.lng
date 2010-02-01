@@ -46,6 +46,8 @@
 &Отмена
 &Check for new version
 &Проверить наличие новой версии
+&Content
+&Справка
 &Create batch job
 &Создать задание...
 &Default
@@ -88,6 +90,8 @@
 &Да
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Помните, что только диски FAT/FAT32 страдают от этой проблемы!\nВо всех остальных случаях вы можете отключить параметр \"игнорировать 1-часовую разницу\".)
+(Requires an Internet connection!)
+(Требуется подключение к Интернету!)
 ,
 .
 - Other side's counterpart to %dir
@@ -132,12 +136,18 @@
 1. &Сравнить
 1. Enter relative file or directory names separated by ';' or a new line.
 1. Введите имена файлов или папок, разделяя знаком ';' или с новой строки.
+1. Select directories to monitor.
+1. Выберите папки для мониторинга;
 2. &Synchronize...
 2. &Синхронизировать
+2. Enter a command line.
+2. Введите командную строку;
 2. Use wildcard characters '*' and '?'.
 2. Используйте символы '*' и '?' для замены неизвестных.
 3. Exclude files directly on main grid via context menu.
 3. Исключите файлы прямо в главном окне через контекстное меню.
+3. Press 'Start'.
+3. Нажмите 'Старт'.
 <Automatic>
 <Автоматический>
 <Directory>
@@ -172,6 +182,8 @@ As the name suggests, two files which share the same name are marked as equal if
 Как написано в названии, два файла с одинаковым именем отмечаются равными, только если они имеют то же самое содержание. Эта опция полезна для проверки согласованности, а не операции резервного копирования. Поэтому даты файлов не учитываются вообще.\n\nС этой опцией алгоритм короче:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Создайте файл задания для автоматизированной синхронизации. Чтобы запустить программу в этом режиме просто передайте название файла на выполнение FreeFileSync: FreeFileSync.exe <batchfile>. Это также может быть записано в планировщике задач Вашей операционной системы.
+At least one directory input field is empty.
+По крайней мере, одно поле путей папок не заполнено.
 Auto-adjust columns
 Автовыравнивание ширины колонок
 Automatic mode
@@ -192,19 +204,17 @@ Build:
 Сборка:
 Cancel
 Отмена
-Cannot determine sync-direction: Changed filter settings!
-Невозможно определить направление синхронизации: Изменены настройки фильтра!
-Cannot determine sync-direction: No change since last synchronization!
-Невозможно определить направление синхронизации: Никаких изменений после последней синхронизации!
+Cannot determine sync-direction:
+Невозможно определить направление синхронизации:
 Category
 Категория
 Change direction
 Поменять направление
 Comma separated list
 Список, разделяемый запятыми
-Commandline
+Command line
 Командная строка
-Commandline is empty!
+Command line is empty!
 Командная строка пуста!
 Compare
 Сравнить
@@ -260,8 +270,12 @@ Copy from right to left
 Скопировать справа налево
 Copy from right to left overwriting
 Скопировать справа налево с перезаписью
+Copy locked files
+Копировать заблокированные файлы
 Copy new or updated files to right folder.
 Копировать новые или обновлять файлы на правой стороне.
+Copy shared or locked files using Volume Shadow Copy Service.
+Копировать общие или заблокированные файлы с помощью Службы Теневого Копирования Тома.
 Copy to clipboard\tCTRL+C
 Копировать в буфер обмена\tCTRL+C
 Copying file %x to %y
@@ -272,6 +286,8 @@ Could not determine volume name for file:
 Не удалось определить название тома для файла:
 Could not initialize directory monitoring:
 Не удалось инициализировать папку для мониторинга:
+Could not load a required DLL:
+Не удалось загрузить необходимые DLL:
 Could not read values for the following XML nodes:
 Не удалось прочитать значения для следующих XML записей:
 Create a batch job
@@ -298,7 +314,7 @@ Date
 Дата
 Delay
 Задержка
-Delay between detection of changes and execution of commandline in seconds
+Delay between detection of changes and execution of command line in seconds
 Задержка между обнаружением изменений и выполнением командной строки в секундах
 Delete files/folders existing on left side only
 Удалять файлы/папки, существующие только на левой стороне
@@ -386,6 +402,8 @@ Error reading file:
 Ошибка при чтении файла:
 Error reading from synchronization database:
 Ошибка при чтении из базы данных синхронизации:
+Error resolving full path name:
+Ошибка при восстановлении абсолютного пути из относительного:
 Error resolving symbolic link:
 Ошибка при решении символической ссылки:
 Error starting Volume Shadow Copy Service!
@@ -466,6 +484,8 @@ Filter files
 Фильтр файлов
 Filter has been selected
 Фильтр установлен
+Filter settings have changed!
+Настройки фильтра были изменены!
 Filter view
 Вид фильтра
 Filtering is deactivated
@@ -560,8 +580,8 @@ Include all rows
 Включая все строки
 Include temporarily
 Включая временные
-Include: *.doc;*.zip;*.exe\nExclude: temp\\*
-Включая: *.doc;*.zip;*.exe\nИсключая: temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
+Включая: *.doc;*.zip;*.exe\nИсключая: \\stuff\\temp\\*
 Incompatible synchronization database format:
 Несовместимый формат базы данных синхронизации:
 Info
@@ -572,8 +592,6 @@ Initial synchronization:
 Первоначальная синхронизация:
 Integrate external applications into context menu. The following macros are available:
 Интегрирует внешние приложения в контекстное меню.\nСледующие команды доступны:
-It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
-Невозможно инициализировать "Корзину"!\n\nВероятно, что Вы не используете Windows.\nЕсли Вы хотите, чтобы эта функция была, пожалуйста свяжитесь с автором. :)
 Leave as unresolved conflict
 Оставить как нерешенный конфликт
 Left
@@ -590,18 +608,22 @@ Log-messages:
 Лог-сообщения:
 Logging
 Лог-файлы
+Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
+Создание теневых копий на WOW64 не поддерживается. Пожалуйста, используйте FreeFileSync 64-разрядной версии.
 Mirror ->>
 Зеркало ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Резервная копия левой папки: правая папка будет перезаписана и после синхронизации будет точно соответствовать левой папке.
+Monitoring active...
+Мониторинг включен...
 More than 50% of the total number of files will be copied or deleted!
 Более 50% общего количества файлов будет скопировано или удалено!
 Move column down
 Переместить вниз
 Move column up
 Переместить вверх
-Move files to a user-defined directory.
-Переместить файлы в заданную пользователем папку
+Move files into a time-stamped subdirectory.
+Переместить файлы во временно-отмеченную подпапку.
 Moving %x to Recycle Bin
 Отправка %x в "Корзину"
 Moving file %x to user-defined directory %y
@@ -610,6 +632,8 @@ Moving folder %x to user-defined directory %y
 Перемещение папки %x в заданную пользователем папку %y
 Multiple...
 Различные варианты синхронизации
+No change since last synchronization!
+Никаких изменений с последней синхронизации!
 No filter selected
 Ни один фильтр не выбран
 Not enough free disk space available in:
@@ -642,12 +666,10 @@ Pause
 Пауза
 Paused
 Пауза
-Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
-Пожалуйста, скопируйте соответствующий \"Shadow.dll\" (находящийся в архиве \"Shadow.zip\") в папку установки FreeFileSync для включения этой функции.
-Please fill all empty directory fields.
-Пожалуйста, заполните все пустые поля папок
 Please run a Compare first before synchronizing!
 Пожалуйста, запустите сравнение перед синхронизацией!
+Processing folder pair:
+Обработка пары папок:
 Published under the GNU General Public License:
 Издается под GNU General Public License:
 Question
@@ -670,6 +692,8 @@ Remove folder pair
 Удалить пару папок
 Remove local filter settings
 Удалить настройки локального фильтра
+Renaming file %x to %y
+Переименование файла %x в %y
 Report translation error
 Сообщить об ошибке перевода
 Reset
@@ -786,6 +810,8 @@ Target directory already existing!
 Конечная папка уже существует!
 Target file already existing!
 Конечный файл уже существует!
+The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
+Командная строка выполняется когда:\n- Файлы в этих папках (или подпапках) были изменены\n- Соответствующая буква диска становится доступной (добавление USB устройства)
 The database file is not yet existing, but will be created during synchronization:
 Файл базы данных еще не существует, но будет создан во время синхронизации:
 The file does not contain a valid configuration:
@@ -816,12 +842,14 @@ Unable to create logfile!
 Невозможно создать лог!
 Unable to initialize Recycle Bin!
 Невозможно инициализировать "Корзину"!
+Unresolved conflicts existing!
+Существуют нерешенные конфликты
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
-Существуют нерешенные конфликты \n\nВы можете проигнорировать их и продолжить синхронизацию.
+Существуют нерешенные конфликты! \n\nВы можете проигнорировать их и продолжить синхронизацию.
 Update ->
 Обновить ->
-Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
-Выберите папки для мониторинга и введите командную строку. Каждый раз при обновлении этих папок (или их подпапок) командная строка будет выполняться.
+Usage:
+Инструкция:
 Use Recycle Bin
 Использовать "Корзину"
 Use Recycle Bin when deleting or overwriting files.
@@ -842,6 +870,8 @@ Warning: Synchronization failed for %x item(s):
 Внимание: Синхронизация провалена для %x 
 When the comparison is started with this option set the following decision tree is processed:
 Когда сравнение запущено с этими критериями, алгоритм следующий:
+You can ignore conflicts and continue synchronization.
+Вы можете проигнорировать их и продолжить синхронизацию.
 You can ignore the error to consider not existing directories as empty.
 Вы можете проигнорировать ошибку, приняв несуществующие папки за пустые.
 You can ignore the error to skip current folder pair.

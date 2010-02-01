@@ -53,7 +53,7 @@ LocalizationInfo::LocalizationInfo()
     newEntry.languageID     = wxLANGUAGE_SPANISH;
     newEntry.languageName   = wxT("Español");
     newEntry.languageFile   = wxT("spanish.lng");
-    newEntry.translatorName = wxT("David Rodríguez");
+    newEntry.translatorName = wxT("Alexis Martínez");
     newEntry.languageFlag   = wxT("spain.png");
     locMapping.push_back(newEntry);
 
@@ -132,6 +132,13 @@ LocalizationInfo::LocalizationInfo()
     newEntry.languageFile   = wxT("finnish.lng");
     newEntry.translatorName = wxT("Nalle Juslén");
     newEntry.languageFlag   = wxT("finland.png");
+    locMapping.push_back(newEntry);
+
+    newEntry.languageID     = wxLANGUAGE_SWEDISH;
+    newEntry.languageName   = wxT("Svenska");
+    newEntry.languageFile   = wxT("swedish.lng");
+    newEntry.translatorName = wxT("Åke Engelbrektson");
+    newEntry.languageFlag   = wxT("sweden.png");
     locMapping.push_back(newEntry);
 
     newEntry.languageID     = wxLANGUAGE_TURKISH;
@@ -229,6 +236,10 @@ int mapLanguageDialect(const int language)
     case wxLANGUAGE_SPANISH_US:
     case wxLANGUAGE_SPANISH_VENEZUELA:
         return wxLANGUAGE_SPANISH;
+
+        //variants of wxLANGUAGE_SWEDISH
+    case wxLANGUAGE_SWEDISH_FINLAND:
+        return wxLANGUAGE_SWEDISH;
 
         //case wxLANGUAGE_CZECH:
         //case wxLANGUAGE_FINNISH:

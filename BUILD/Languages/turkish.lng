@@ -46,6 +46,8 @@ Va&zgeç
 &İptal
 &Check for new version
 &Yeni sürüm kontrolü yap
+&Content
+
 &Create batch job
 &Komut (batch) görevi oluştur
 &Default
@@ -88,6 +90,8 @@ Ge&ri yükle
 &Evet
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Not: Sadece FAT/FAT32 olarak biçimlendirilmiş sürücüler bu problemden etkilenir!\nDiğer durumlarda, \"1-saat'lik zaman farkını yoksay\" ayarı devre dışı bırakılabilir.)
+(Requires an Internet connection!)
+
 ,
 ,
 - Other side's counterpart to %dir
@@ -132,12 +136,18 @@ Ge&ri yükle
 1. &Karşılaştır
 1. Enter relative file or directory names separated by ';' or a new line.
 1. ';' ile ayırarak veya herbiri yeni satırda olacak şekilde göreceli (relatif) dosya veya dizin adlarını girin.
+1. Select directories to monitor.
+
 2. &Synchronize...
 2. &Senkronize et...
+2. Enter a command line.
+
 2. Use wildcard characters '*' and '?'.
 2. Joker karakter olan '*' ve '?' kullan.
 3. Exclude files directly on main grid via context menu.
 3. Sağ fare tuşu ile açılan menüden ana listedeki dosyaları direk olarak hariç tutun.
+3. Press 'Start'.
+
 <Automatic>
 <Otomatik>
 <Directory>
@@ -172,6 +182,8 @@ As the name suggests, two files which share the same name are marked as equal if
 İsmindende anlaşılacağı gibi, aynı isme sahip iki dosya sadece ve sadece aynı içeriğe sahipse eşit olarak işaretlenir. Bu seçenek yedekleme işlemlerinden daha ziyade uyuşma kontrolü için faydalıdır. Bu yüzden dosya tarihleri hiç bir zaman dikkate alınmaz.\n\nBu seçenek etkinleştirildiğinde karar şeması küçülür:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Otomatik senkronizasyon için bir komut (batch) dosyası oluşturun. Komut modunda başlamak için, komut dosyasını parametre olarak tanımlayarak FreeFileSync'i çalıştırın: FreeFileSync.exe <Komut Dosyası Adı>. Bu komut dosyası, istenirse, işletim sistemindeki görev zamanlayıcı ile istenilen zamanlarda çalıştırılabilir.
+At least one directory input field is empty.
+
 Auto-adjust columns
 Kolonları otomatik olarak hizala
 Automatic mode
@@ -192,20 +204,18 @@ Build:
 Derleme:
 Cancel
 İptal
-Cannot determine sync-direction: Changed filter settings!
-Senkronizasyon yönü belirlenemiyor: Filtre ayarlarý deðiþmiþ!
-Cannot determine sync-direction: No change since last synchronization!
-Senkronizasyon yönü belirlenemiyor: En son senkronizasyondan beri deðiþiklik yok!
+Cannot determine sync-direction:
+
 Category
 Kategori
 Change direction
 Yönü değiştir
 Comma separated list
 Virgül ile ayrılmış liste
-Commandline
+Command line
 Komut satırı
-Commandline is empty!
-Komut satırı boş!
+Command line is empty!
+
 Compare
 Karşılaştır
 Compare both sides
@@ -260,8 +270,12 @@ Copy from right to left
 Sağdan sola kopyala
 Copy from right to left overwriting
 Sağdan sola üzerine yazmaya izin vererek kopyala
+Copy locked files
+
 Copy new or updated files to right folder.
 Yeni veya güncellenmiş dosyaları sağdaki klasöre kopyala.
+Copy shared or locked files using Volume Shadow Copy Service.
+
 Copy to clipboard\tCTRL+C
 Hafızaya kopyala\tCTRL+C
 Copying file %x to %y
@@ -272,6 +286,8 @@ Could not determine volume name for file:
 Belirtilen dosya için birim adı belirlenemedi:
 Could not initialize directory monitoring:
 Dizin izlemesi başlatılamadı:
+Could not load a required DLL:
+
 Could not read values for the following XML nodes:
 Takibeden XML başlığındaki değerler okunamadı:
 Create a batch job
@@ -298,7 +314,7 @@ Date
 Tarih
 Delay
 Gecikme
-Delay between detection of changes and execution of commandline in seconds
+Delay between detection of changes and execution of command line in seconds
 Saniye olarak, değişikliklerin tespiti ile komut satırının çalıştırılması arasındaki boşluk süresi
 Delete files/folders existing on left side only
 Sadece sol tarafta olan dosyaları/klasörleri sil
@@ -386,6 +402,8 @@ Error reading file:
 Dosyayı okurken hata:
 Error reading from synchronization database:
 Senkronizasyon veri tabanýndan okuma hatasý:
+Error resolving full path name:
+
 Error resolving symbolic link:
 Sembolik bağlantıyı çözümlerken hata:
 Error starting Volume Shadow Copy Service!
@@ -465,6 +483,8 @@ Filtre
 Filter files
 Fltre dosyaları
 Filter has been selected
+
+Filter settings have changed!
 
 Filter view
 Filtre görünümü
@@ -560,8 +580,8 @@ Include all rows
 
 Include temporarily
 Geçici olarak dahil et
-Include: *.doc;*.zip;*.exe\nExclude: temp\\*
-Dahil et: *.doc;*.zip;*.exe\nHariç tut: temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
+Dahil et: *.doc;*.zip;*.exe\nHariç tut: \\stuff\\temp\\*
 Incompatible synchronization database format:
 Uyumsuz senkronizasyon veritabaný formatý:
 Info
@@ -572,8 +592,6 @@ Initial synchronization:
 Baþlangýç senkronizasyonu:
 Integrate external applications into context menu. The following macros are available:
 Harici uygulamaları içerik menüsüne ekle. Şu makro’lar temin edilebilir:
-It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
-Geri dönüşüm kutusunu başlatmak mümkün olmadı!\n\nMuhtemelen Microsoft Windows kullanmıyorsunuz.\nEğer bu özelliğin eklenmesini istiyorsanız, lütfen program yazarı ile temasa geçin. :)
 Leave as unresolved conflict
 Çözülmemiş tutarsızlık olarak bırak
 Left
@@ -590,18 +608,22 @@ Log-messages:
 Kayıt mesajları:
 Logging
 Kayıt tutma
+Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
+
 Mirror ->>
 Yedekleme ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Sol klasörün yedeklemesi: Senkronizasyondan sonra sol klasör ile tam olarak eşleşen sağ klasörün üzerine yazılacak.
+Monitoring active...
+
 More than 50% of the total number of files will be copied or deleted!
 %50’den fazla dosya kopyalanacak veya silinecek!
 Move column down
 Kolonu aşağı taşı
 Move column up
 Kolonu yukarı taşı
-Move files to a user-defined directory.
-Dosyaları kullanıcı tanımlı bir dizine taşı.
+Move files into a time-stamped subdirectory.
+
 Moving %x to Recycle Bin
 %x geri dönüşüm kutusuna taşınıyor
 Moving file %x to user-defined directory %y
@@ -610,6 +632,8 @@ Moving folder %x to user-defined directory %y
 %x klasörü kullanıcı tanımlı dizin %y’e taşınıyor
 Multiple...
 Çoklu...
+No change since last synchronization!
+
 No filter selected
 
 Not enough free disk space available in:
@@ -642,11 +666,9 @@ Pause
 Duraklat
 Paused
 Duraklatıldı
-Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
-Bu özelliği etkinleştirmek için FreeFileSync’in kurulum dizinine \"Shadow.dll\" (\"Shadow.zip\" sıkıştırılmış dosyasındaki uygun olanı) kopyalayın.
-Please fill all empty directory fields.
-Lütfen boş dizin alanlarını doldurunuz.
 Please run a Compare first before synchronizing!
+
+Processing folder pair:
 
 Published under the GNU General Public License:
 “GNU General Public License”a uygun olarak yayımlanmıştır:
@@ -669,6 +691,8 @@ Klasörü kaldır
 Remove folder pair
 Klasör çiftini kaldır
 Remove local filter settings
+
+Renaming file %x to %y
 
 Report translation error
 Çeviri hatasını bildir
@@ -786,6 +810,8 @@ Target directory already existing!
 Hedef dizin zaten mevcut!
 Target file already existing!
 Hedef dosya zaten mevcut!
+The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
+
 The database file is not yet existing, but will be created during synchronization:
 
 The file does not contain a valid configuration:
@@ -816,12 +842,14 @@ Unable to create logfile!
 Kayıt dosyası yaratılamıyor!
 Unable to initialize Recycle Bin!
 Geri dönüşüm kutusu başlatılamıyor!
+Unresolved conflicts existing!
+
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Çözülemeyen tutarsızlık mevcut! \n\nTutarsızlıkları yoksayıp senkronizasyona devam edebilirsiniz.
 Update ->
 Güncelle ->
-Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
-Kullanım: İzleme için dizinleri seç ve bir komut satırı ver.  Bu dizinlerdeki (veya alt dizinlerdeki) dosyalar değişikliğe her uğradığında, girilen komut satırı çalıştırılacaktır. 
+Usage:
+
 Use Recycle Bin
 Geri dönüşüm kutusunu kullan
 Use Recycle Bin when deleting or overwriting files.
@@ -842,6 +870,8 @@ Warning: Synchronization failed for %x item(s):
 Uyarı: %x kadar öğe için senkronizasyon başarısız oldu:
 When the comparison is started with this option set the following decision tree is processed:
 Bu opsiyonla karşılaştırma başlatıldığı zaman, takibeden karar şemasının işleme konacağını tanımla:
+You can ignore conflicts and continue synchronization.
+
 You can ignore the error to consider not existing directories as empty.
 Var olamayan dizinleri boş olarak tanımlama hatasını yoksay.
 You can ignore the error to skip current folder pair.

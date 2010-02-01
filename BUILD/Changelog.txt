@@ -2,6 +2,26 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.3
+--------------
+New installer package for portable/local/32/64-bit versions
+Built-in support for very long filenames: apply \\?\-prefix automatically
+New button for synchonization preview: show equal files
+RealtimeSync: Respond to directory or volume arrival, e.g. USB stick insert
+Start comparison automatically when double-clicking on *.ffs_gui files
+Visual progress indicator for sys-tray icon
+Fixed string comparison for 'ß' and 'ss' (all Windows versions)
+Fixed general string comparison for Windows 2000
+Significantly faster file icon loading
+Applied new IFileOperation interface for recycle bin (Windows >= Vista)
+Patched <Automatic> mode to handle FAT32 2-second file time precision
+Play optional sound after comparison: "Compare_Complete.wav"
+Allow environment variables for logfile-directory
+Enhanced conflict reporting
+Added Swedish translation
+Updated translation files
+
+
 Changelog v3.2
 --------------
 Native Windows 64-Bit version (including Volume Shadow Copy Service)

@@ -137,7 +137,7 @@ private:
     void removeAddFolderPair(const int pos);
     void clearAddFolderPairs();
 
-void updateGuiForFolderPair();
+    void updateGuiForFolderPair();
 
     FreeFileSync::CompareVariant getCurrentCompareVar() const;
 

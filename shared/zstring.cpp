@@ -4,6 +4,7 @@
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "dllLoader.h"
+#include <boost/scoped_array.hpp>
 #endif  //FFS_WIN
 
 #ifdef __WXDEBUG__
@@ -45,60 +46,122 @@ AllocationCount& AllocationCount::getInstance()
 }
 #endif
 
-
 #ifdef FFS_WIN
+bool hasInvariantLocale()
+{
+    OSVERSIONINFO osvi;
+    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+
+    //invariant locale has been introduced with XP
+    if (GetVersionEx(&osvi))
+        return osvi.dwMajorVersion > 5 ||
+               (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion >= 1); //XP    has majorVersion == 5, minorVersion == 1
+    //overview: http://msdn.microsoft.com/en-us/library/ms724834(VS.85).aspx
+    return false;
+}
 
 #ifndef LOCALE_INVARIANT
 #define LOCALE_INVARIANT                0x007f
 #endif
 
 
-inline
-int compareStringsWin32(const wchar_t* a, const wchar_t* b, const int aCount = -1, const int bCount = -1)
+//warning: LOCALE_INVARIANT is NOT available with Windows 2000, so we have to make yet another distinction...
+namespace
 {
-    //try to call "CompareStringOrdinal" first for low-level string comparison: unfortunately available not before Windows Vista!
+const LCID invariantLocale = hasInvariantLocale() ?
+                             LOCALE_INVARIANT :
+                             MAKELCID(MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), SORT_DEFAULT); //see: http://msdn.microsoft.com/en-us/goglobal/bb688122.aspx
+}
+
+inline
+int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size_t sizeB)
+{
+    //try to call "CompareStringOrdinal" for low-level string comparison: unfortunately available not before Windows Vista!
+    //by a factor ~3 faster than old string comparison using "LCMapString"
     typedef int (WINAPI *CompareStringOrdinalFunc)(
         LPCWSTR lpString1,
         int     cchCount1,
         LPCWSTR lpString2,
         int     cchCount2,
         BOOL    bIgnoreCase);
-    static const CompareStringOrdinalFunc ordinalCompare = Utility::loadDllFunKernel<CompareStringOrdinalFunc>("CompareStringOrdinal");
+    static const CompareStringOrdinalFunc ordinalCompare = Utility::loadDllFunction<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal");
 
-
-    //we're lucky here! This additional test for "CompareStringOrdinal" has no noticeable performance impact!!
-    if (ordinalCompare != NULL)
+    if (ordinalCompare != NULL) //this additional test has no noticeable performance impact
     {
         const int rv = (*ordinalCompare)(
                            a,  	      //pointer to first string
-                           aCount,	  //size, in bytes or characters, of first string
+                           sizeA,	  //size, in bytes or characters, of first string
                            b,	      //pointer to second string
-                           bCount,    //size, in bytes or characters, of second string
+                           sizeB,     //size, in bytes or characters, of second string
                            true); 	  //ignore case
-
         if (rv == 0)
             throw std::runtime_error("Error comparing strings (ordinal)!");
         else
             return rv - 2; //convert to C-style string compare result
     }
-    else  //fallback to "CompareString". Attention: this function is NOT accurate: for example "weiﬂ" == "weiss"!!!
+    else //fallback
     {
-        //DON'T use lstrcmpi() here! It uses word sort and is locale dependent!
-        //Use CompareString() with "SORT_STRINGSORT" instead!!!
+//do NOT use "CompareString"; this function is NOT accurate (even with LOCALE_INVARIANT and SORT_STRINGSORT): for example "weiﬂ" == "weiss"!!!
+//the only reliable way to compare filenames (with XP) is to call "CharUpper" or "LCMapString":
 
-        const int rv = CompareString(
-                           LOCALE_INVARIANT,    //locale independent
-                           NORM_IGNORECASE | SORT_STRINGSORT, //comparison-style options
-                           a,  	                //pointer to first string
-                           aCount,	            //size, in bytes or characters, of first string
-                           b,	                //pointer to second string
-                           bCount); 	        //size, in bytes or characters, of second string
+        const size_t minSize = std::min(sizeA, sizeB);
 
-        if (rv == 0)
-            throw std::runtime_error("Error comparing strings!");
-        else
-            return rv - 2; //convert to C-style string compare result
+        if (minSize == 0) //LCMapString does not allow input sizes of 0!
+            return sizeA - sizeB;
+
+        int rv = 0; //always initialize...
+        if (minSize <= 5000) //performance optimization: stack
+        {
+            wchar_t bufferA[5000];
+            wchar_t bufferB[5000];
+
+            if (::LCMapString(   //faster than CharUpperBuff + wmemcpy or CharUpper + wmemcpy and same speed like ::CompareString()
+                        invariantLocale,  //__in   LCID Locale,
+                        LCMAP_UPPERCASE,  //__in   DWORD dwMapFlags,
+                        a,                //__in   LPCTSTR lpSrcStr,
+                        minSize,          //__in   int cchSrc,
+                        bufferA,          //__out  LPTSTR lpDestStr,
+                        5000              //__in   int cchDest
+                    ) == 0)
+                throw std::runtime_error("Error comparing strings! (LCMapString)");
+
+            if (::LCMapString(invariantLocale, LCMAP_UPPERCASE, b, minSize, bufferB, 5000) == 0)
+                throw std::runtime_error("Error comparing strings! (LCMapString)");
+
+            rv = ::wmemcmp(bufferA, bufferB, minSize);
+        }
+        else //use freestore
+        {
+            boost::scoped_array<wchar_t> bufferA(new wchar_t[minSize]);
+            boost::scoped_array<wchar_t> bufferB(new wchar_t[minSize]);
+
+            if (::LCMapString(invariantLocale, LCMAP_UPPERCASE, a, minSize, bufferA.get(), minSize) == 0)
+                throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
+
+            if (::LCMapString(invariantLocale, LCMAP_UPPERCASE, b, minSize, bufferB.get(), minSize) == 0)
+                throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
+
+            rv = ::wmemcmp(bufferA.get(), bufferB.get(), minSize);
+        }
+
+        return rv == 0 ?
+               sizeA - sizeB :
+               rv;
     }
+
+//        const int rv = CompareString(
+//                           invariantLocale,    //locale independent
+//                           NORM_IGNORECASE | SORT_STRINGSORT, //comparison-style options
+//                           a,  	                //pointer to first string
+//                           aCount,	            //size, in bytes or characters, of first string
+//                           b,	                //pointer to second string
+//                           bCount); 	        //size, in bytes or characters, of second string
+//
+//        if (rv == 0)
+//            throw std::runtime_error("Error comparing strings!");
+//        else
+//            return rv - 2; //convert to C-style string compare result
 }
 #endif
 
@@ -106,13 +169,13 @@ int compareStringsWin32(const wchar_t* a, const wchar_t* b, const int aCount = -
 #ifdef FFS_WIN
 int Zstring::CmpNoCase(const DefaultChar* other) const
 {
-    return ::compareStringsWin32(c_str(), other); //way faster than wxString::CmpNoCase()!!
+    return ::compareFilenamesWin32(c_str(), other, length(), ::wcslen(other)); //way faster than wxString::CmpNoCase()
 }
 
 
 int Zstring::CmpNoCase(const Zstring& other) const
 {
-    return ::compareStringsWin32(c_str(), other.c_str(), length(), other.length()); //way faster than wxString::CmpNoCase()!!
+    return ::compareFilenamesWin32(c_str(), other.c_str(), length(), other.length()); //way faster than wxString::CmpNoCase()
 }
 #endif
 
@@ -277,14 +340,17 @@ std::vector<Zstring> Zstring::Tokenize(const DefaultChar delimiter) const
 
 
 #ifdef FFS_WIN
-Zstring& Zstring::MakeLower()
+Zstring& Zstring::MakeUpper()
 {
     const size_t thisLen = length();
     if (thisLen == 0)
         return *this;
 
     reserve(thisLen);    //make unshared
-    ::CharLower(data()); //use Windows' lower case conversion
+
+    //use Windows' upper case conversion: faster than ::CharUpper()
+    if (::LCMapString(invariantLocale, LCMAP_UPPERCASE, data(), thisLen, data(), thisLen) == 0)
+        throw std::runtime_error("Error converting to upper case! (LCMapString)");
 
     return *this;
 }
@@ -484,3 +550,4 @@ void Zstring::reserve(size_t capacityNeeded) //make unshared and check capacity
         descr->capacity = newCapacity;
     }
 }
+

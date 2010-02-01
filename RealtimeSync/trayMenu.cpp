@@ -10,6 +10,8 @@
 #include <wx/timer.h>
 #include <wx/utils.h>
 #include <wx/log.h>
+#include "../shared/staticAssert.h"
+#include "../shared/buildInfo.h"
 
 class RtsTrayIcon;
 
@@ -42,9 +44,9 @@ class RtsTrayIcon : public wxTaskBarIcon
 {
 public:
     RtsTrayIcon(WaitCallbackImpl* callback) :
-            m_callback(callback)
+        m_callback(callback)
     {
-        wxTaskBarIcon::SetIcon(*GlobalResources::getInstance().programIcon, wxT("RealtimeSync"));
+        wxTaskBarIcon::SetIcon(*GlobalResources::getInstance().programIcon, wxString(wxT("RealtimeSync")) + wxT(" - ") + _("Monitoring active..."));
 
         //register double-click
         Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(RtsTrayIcon::resumeToMain), NULL, this);
@@ -89,10 +91,17 @@ private:
             //build information
             wxString build = wxString(wxT("(")) + _("Build:") + wxT(" ") + __TDATE__;
 #if wxUSE_UNICODE
-            build += wxT(" - Unicode)");
+            build += wxT(" - Unicode");
 #else
-            build += wxT(" - ANSI)");
+            build += wxT(" - ANSI");
 #endif //wxUSE_UNICODE
+
+            //compile time info about 32/64-bit build
+            if (Utility::is64BitBuild)
+                build += wxT(" x64)");
+            else
+                build += wxT(" x86)");
+            assert_static(Utility::is32BitBuild || Utility::is64BitBuild);
 
             wxMessageDialog* aboutDlg = new wxMessageDialog(NULL, wxString(wxT("RealtimeSync")) + wxT("\n\n") + build, _("About"), wxOK);
             aboutDlg->ShowModal();
@@ -145,8 +154,8 @@ private:
 
 
 WaitCallbackImpl::WaitCallbackImpl() :
-        m_abortRequested(false),
-        m_resumeRequested(false)
+    m_abortRequested(false),
+    m_resumeRequested(false)
 {
     trayMenu.reset(new RtsTrayIcon(this));
 }
@@ -172,7 +181,7 @@ RealtimeSync::MonitorResponse RealtimeSync::startDirectoryMonitor(const xmlAcces
         WaitCallbackImpl callback;
 
         if (config.commandline.empty())
-            throw FreeFileSync::FileError(_("Commandline is empty!"));
+            throw FreeFileSync::FileError(_("Command line is empty!"));
 
         long lastExec = 0;
         while (true)

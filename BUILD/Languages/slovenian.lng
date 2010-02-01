@@ -46,6 +46,8 @@
 &Prekliči
 &Check for new version
 &Preveri za novo različico
+&Content
+&Vsebina
 &Create batch job
 &Ustvari batch opravilo
 &Default
@@ -75,7 +77,7 @@ Na&loži konfiguracijo
 &OK
 &V redu
 &Pause
-&Pavza
+&Premor
 &Quit
 &Zapri
 &Restore
@@ -88,6 +90,8 @@ Na&loži konfiguracijo
 &Da
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Vedite, da samo na pogonih s FAT/FAT32 lahko pride do teh težav!\nV vseh drugih primerih lahko onemogočite nastavitev \"prezri 1-urno razliko\".)
+(Requires an Internet connection!)
+(Zahteva povezavo z Internetom!)
 ,
 , 
 - Other side's counterpart to %dir
@@ -132,12 +136,18 @@ Duplikat z druge strani od %name
 1. &Primerjaj
 1. Enter relative file or directory names separated by ';' or a new line.
 1. Vnesite relativna imena datotek ali imenikov ločenih z ';' ali novo vrstico.
+1. Select directories to monitor.
+1. Izberite imenike za nadziranje
 2. &Synchronize...
 2. &Sinhroniziraj...
+2. Enter a command line.
+2. Vnesite ukazno-vrstico.
 2. Use wildcard characters '*' and '?'.
 2. Uporabite lahko tudi znake '*' in '?'.
 3. Exclude files directly on main grid via context menu.
 3. Izključite datoteke neposredno na glavni mreži s kontekstnim menujem.
+3. Press 'Start'.
+3. Pritisnite 'Začni'.
 <Automatic>
 <Samodejno>
 <Directory>
@@ -172,6 +182,8 @@ As the name suggests, two files which share the same name are marked as equal if
 Kot že samo ime pove, sta dve datoteki označeni kot enaki samo takrat, ko imata enako vsebino. Ta možnost je bolj uporabna za preverjanje doslednosti kot za operacije varnostnega shranjevanja. Zaradi tega se časi datotek ne upoštevajo.\n\nZ omogočeno to možnostjo je drevo odločanja manjše:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Sestavi batch datoteko za samodejno sinhronizacijo. Da začnete v batch načinu, preprosto podajte ime batch datoteke k FreeFileSync izvršilni datoteki: FreeFileSync.exe <imedatotekebatch>. To se lahko nastavi tudi v urniku opravil vašega operacijskega sistema.
+At least one directory input field is empty.
+Vsaj eno vnosno polje za vpis imenika je prazno.
 Auto-adjust columns
 Samo-prilagodi stolpce
 Automatic mode
@@ -192,19 +204,17 @@ Build:
 Izgradnja:
 Cancel
 Prekliči
-Cannot determine sync-direction: Changed filter settings!
-Ne morem določiti smeri sinhronizacije: Spremenite nastavitve filtra!
-Cannot determine sync-direction: No change since last synchronization!
-Ne morem določiti smeri sinhronizacije: Ni bilo sprememb od zadnje sinhronizacije!
+Cannot determine sync-direction:
+Ne morem določiti sinhronizacijske smeri.
 Category
 Kategorija
 Change direction
 Spremeni smer
 Comma separated list
 Seznam ločen z vejico
-Commandline
+Command line
 Ukazna vrstica
-Commandline is empty!
+Command line is empty!
 Ukazna vrstica je prazna!
 Compare
 Primerjaj
@@ -260,8 +270,12 @@ Copy from right to left
 Kopiraj iz desne na levo
 Copy from right to left overwriting
 Kopiraj iz desne na levo s prepisovanjem
+Copy locked files
+Kopiraj zaklenjene datoteke
 Copy new or updated files to right folder.
 Kopiraj nove ali posodobljene datoteke v desno mapo.
+Copy shared or locked files using Volume Shadow Copy Service.
+Kopiraj deljene ali zaklenjene datoteke z uporabo servisa Volume Shadow Copy.
 Copy to clipboard\tCTRL+C
 Kopiraj v odložišče\tCTRL+C
 Copying file %x to %y
@@ -272,6 +286,8 @@ Could not determine volume name for file:
 Ne morem določiti imena volumna za datoteko:
 Could not initialize directory monitoring:
 Ne morem začeti nadzorovanja imenikov:
+Could not load a required DLL:
+Ne morem naložiti zahtevano DLL:
 Could not read values for the following XML nodes:
 Ne morem brati vrednosti za naslednja XML vozlišča:
 Create a batch job
@@ -298,7 +314,7 @@ Date
 Datum
 Delay
 Zakasnitev
-Delay between detection of changes and execution of commandline in seconds
+Delay between detection of changes and execution of command line in seconds
 Zakasnitev med zaznavo sprememb in izvršitvijo ukazov v sekundah
 Delete files/folders existing on left side only
 Izbriši datoteke/mape, ki obstajajo samo na levi strani
@@ -386,6 +402,8 @@ Error reading file:
 Napaka pri branju datoteke:
 Error reading from synchronization database:
 Napaka pri branju iz sinhronizacijske podatkovne baze:
+Error resolving full path name:
+Napaka pri razreševanju polnega imena poti:
 Error resolving symbolic link:
 Napaka pri razreševanju simbolične povezave:
 Error starting Volume Shadow Copy Service!
@@ -466,6 +484,8 @@ Filter files
 Filtriraj datoteke
 Filter has been selected
 Filter je bil izbran
+Filter settings have changed!
+Nastavitve filtra so bile spremenjene!
 Filter view
 Filtriran pogled
 Filtering is deactivated
@@ -560,8 +580,8 @@ Include all rows
 Vključi se vrstice
 Include temporarily
 Trenutno vključi
-Include: *.doc;*.zip;*.exe\nExclude: temp\\*
-Vključi: *.doc;*.zip;*.exe\nIzključi: temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
+Vključi: *.doc;*.zip;*.exe\nIzključi: \\stuff\\temp\\*
 Incompatible synchronization database format:
 Nekompatibilen format sinhronizacijske podatkovne baze:
 Info
@@ -572,8 +592,6 @@ Initial synchronization:
 Začetna sinhronizacija:
 Integrate external applications into context menu. The following macros are available:
 Integriraj zunanje aplikacije v kontekstni menu. Na voljo so naslednji makri:
-It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
-Ni bilo mogoče inicializirati Koša!\n\nZgleda, da ne uporabljate Windowsov.\nČe želite imeti vključeno to lastnost, prosimo kontaktirajte avtorja. :)
 Leave as unresolved conflict
 Pusti kot nerešeni spor
 Left
@@ -590,18 +608,22 @@ Log-messages:
 Sporočila beleženja:
 Logging
 Beležim
+Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
+Ustvarjanje senčnih kopij na WOW63 ni podprto. Prosimo uporabite 64-bitno FreeFileSync različico.
 Mirror ->>
 Zrcalno ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Zrcalna kopija leve mape: Desna mapa bo prepisana in se bo natančno ujemala z levo mapo po sinhronizaciji.
+Monitoring active...
+Nadziranje aktivno...
 More than 50% of the total number of files will be copied or deleted!
 Več kot 50% od celotnega števila datotek bo kopiranih ali izbrisanih!
 Move column down
 Premakni stolpec dol
 Move column up
 Premakni stolpec gor
-Move files to a user-defined directory.
-Premakne datoteke v uporabniško-določen imenik.
+Move files into a time-stamped subdirectory.
+Premakni datoteke v časovno-označen podimenik.
 Moving %x to Recycle Bin
 Premikam %x v Koš
 Moving file %x to user-defined directory %y
@@ -610,6 +632,8 @@ Moving folder %x to user-defined directory %y
 Premikam mapo %x v uporabniško-določen imenik %y
 Multiple...
 Večkratno...
+No change since last synchronization!
+Ni sprememb od zadnje sinhronizacije!
 No filter selected
 Noben filter ni izbran
 Not enough free disk space available in:
@@ -639,15 +663,13 @@ Operacija:
 Overview
 Pregled
 Pause
-Pavza
+Premor
 Paused
-Na pavzi
-Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
-Prosim prekopirajte ustrezno \"Shadow.dll\" (ki se nahaja v \"Shadow.zip\" arhivu) v FreeFileSync namestitveni imenik, da omogočite to lastnost.
-Please fill all empty directory fields.
-Prosim izpolnite vse imenike s praznimi polji.
+Na premoru
 Please run a Compare first before synchronizing!
 Prosim najprej zaženite Primerjaj preden sinhronizirate!
+Processing folder pair:
+Obdelujem par map:
 Published under the GNU General Public License:
 Objavljeno pod licenco GNU General Public:
 Question
@@ -670,6 +692,8 @@ Remove folder pair
 Odstrani par imenikov
 Remove local filter settings
 Odstrani nastavitve lokalnega filtra
+Renaming file %x to %y
+Preimenujem datoteko %x v %y
 Report translation error
 Poročaj o napaki prevoda
 Reset
@@ -786,6 +810,8 @@ Target directory already existing!
 Ciljni imenik že obstaja!
 Target file already existing!
 Ciljna datoteka že obstaja!
+The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
+Ta ukazna-vrstica se izvede vsakič:\n- Datoteke znotraj teh imenikov (ali podimenikov) so spremenjene\n- Ustrezna črka pogona postane na razpolago (vstavitev USB-ja)
 The database file is not yet existing, but will be created during synchronization:
 Datoteka podatkovne baze še ne obstaja, ampak bo ustvarjena med sinhronizacijo:
 The file does not contain a valid configuration:
@@ -816,12 +842,14 @@ Unable to create logfile!
 Ne morem ustvariti datoteko za beleženje!
 Unable to initialize Recycle Bin!
 Ne morem inicializirati Koša!
+Unresolved conflicts existing!
+Obstajajo nerešeni spori!
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Obstajajo nerešeni spori! \n\nLahko ignorirate spore in nadaljujete s sinhronizacijo.
 Update ->
 Posodobi ->
-Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
-Uporaba: Izberite imenike za nadzorovanje in vnesite ukazno vrstico. Vsakič ko se spremenijo datoteke znotraj teh imenikov (ali podimenikov) se izvrši ukazna vrstica.
+Usage:
+Uporaba:
 Use Recycle Bin
 Uporabi Koš
 Use Recycle Bin when deleting or overwriting files.
@@ -842,6 +870,8 @@ Warning: Synchronization failed for %x item(s):
 Pozor: Sinhronizacija ni uspela za %x predmetov:
 When the comparison is started with this option set the following decision tree is processed:
 Ko se primerjava zažene s tem setom možnosti, se obdela naslednje drevo odločitev:
+You can ignore conflicts and continue synchronization.
+Lahko ignorirate spore in nadaljujete s sinhronizacijo.
 You can ignore the error to consider not existing directories as empty.
 Ignoriraj napako za smatranje neobstoječih imenikv kot praznih.
 You can ignore the error to skip current folder pair.

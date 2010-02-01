@@ -25,10 +25,12 @@ class IconBuffer
 public:
     static IconBuffer& getInstance();
 
-    bool requestIcon(const Zstring& fileName, wxIcon* icon = NULL); //returns false if icon is not in buffer
+    static const wxIcon& getDirectoryIcon(); //one folder icon should be sufficient...
+
+    bool requestFileIcon(const Zstring& fileName, wxIcon* icon = NULL); //returns false if icon is not in buffer
     void setWorkload(const std::vector<Zstring>& load); //(re-)set new workload of icons to be retrieved;
 
-    static const int    ICON_SIZE   = 16; //size in pixel
+    static const int    ICON_SIZE   = 16;  //size in pixel
     static const size_t BUFFER_SIZE = 800; //maximum number if icons to buffer
 
 private:
@@ -36,7 +38,7 @@ private:
     ~IconBuffer();
 
     //methods used by worker thread
-    void insertIntoBuffer(const DefaultChar* fileName, const wxIcon& icon);
+    void insertIntoBuffer(const DefaultChar* entryName, const wxIcon& icon);
 
 //---------------------- Shared Data -------------------------
     std::auto_ptr<wxCriticalSection> lockIconDB;

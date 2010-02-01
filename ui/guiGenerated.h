@@ -118,16 +118,16 @@ class MainDialogGenerated : public wxFrame
 		wxCheckBox* m_checkBoxHideFilt;
 		wxPanel* m_panel112;
 		
+		ToggleButton* m_bpButtonSyncCreateLeft;
+		ToggleButton* m_bpButtonSyncDirOverwLeft;
+		ToggleButton* m_bpButtonSyncDeleteLeft;
 		ToggleButton* m_bpButtonLeftOnly;
 		ToggleButton* m_bpButtonLeftNewer;
 		ToggleButton* m_bpButtonEqual;
 		ToggleButton* m_bpButtonDifferent;
+		ToggleButton* m_bpButtonSyncDirNone;
 		ToggleButton* m_bpButtonRightNewer;
 		ToggleButton* m_bpButtonRightOnly;
-		ToggleButton* m_bpButtonSyncCreateLeft;
-		ToggleButton* m_bpButtonSyncDirOverwLeft;
-		ToggleButton* m_bpButtonSyncDeleteLeft;
-		ToggleButton* m_bpButtonSyncDirNone;
 		ToggleButton* m_bpButtonSyncDeleteRight;
 		ToggleButton* m_bpButtonSyncDirOverwRight;
 		ToggleButton* m_bpButtonSyncCreateRight;
@@ -195,16 +195,16 @@ class MainDialogGenerated : public wxFrame
 		virtual void OnConfigureFilter( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnFilterButton( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnHideFilteredButton( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnSyncCreateLeft( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnSyncDirLeft( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnSyncDeleteLeft( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnLeftOnlyFiles( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnLeftNewerFiles( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnEqualFiles( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnDifferentFiles( wxCommandEvent& event ){ event.Skip(); }
+		virtual void OnSyncDirNone( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnRightNewerFiles( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnRightOnlyFiles( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnSyncCreateLeft( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnSyncDirLeft( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnSyncDeleteLeft( wxCommandEvent& event ){ event.Skip(); }
-		virtual void OnSyncDirNone( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSyncDeleteRight( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSyncDirRight( wxCommandEvent& event ){ event.Skip(); }
 		virtual void OnSyncCreateRight( wxCommandEvent& event ){ event.Skip(); }

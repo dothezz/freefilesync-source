@@ -46,6 +46,8 @@
 &Annuleren
 &Check for new version
 &Controleer op nieuwe versie
+&Content
+&Help artikelen
 &Create batch job
 &Creëer batchjob
 &Default
@@ -88,6 +90,8 @@
 &Ja
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Alleen FAT/FAT32 schijven hebben last van dit probleem!\nIn alle andere gevallen kunt u deze instelling uitschakelen \"negeer 1-uur tijdsverschil\".)
+(Requires an Internet connection!)
+(Vereist een internetverbinding)
 ,
 .
 - Other side's counterpart to %dir
@@ -132,12 +136,18 @@
 1. &Vergelijk
 1. Enter relative file or directory names separated by ';' or a new line.
 1. Vul de relatieve bestandsnaam of map in, gescheiden bij ';' of een nieuwe regel.
+1. Select directories to monitor.
+1. Selecteer mappen om te observeren.
 2. &Synchronize...
 2. &Synchroniseer...
+2. Enter a command line.
+2. Geef een opdrachtregel in.
 2. Use wildcard characters '*' and '?'.
 2. U kunt gebruik maken van wildcard karakters zoals '*' en '?'.
 3. Exclude files directly on main grid via context menu.
 3. Sluit bestanden direct uit in het hoofscherm via een contextmenu
+3. Press 'Start'.
+3. Klik op 'Start'.
 <Automatic>
 <Automatisch>
 <Directory>
@@ -172,6 +182,8 @@ As the name suggests, two files which share the same name are marked as equal if
 Zoals de naam suggereert, worden twee bestanden met dezelfde naam alleen gemarkeerd als gelijk, als ze precies dezelfde inhoud hebben. Deze optie is handig voor een consistentiecontrole in plaats van back-up handelingen. Daarom worden de tijdstempels niet bekeken.\n\n Met deze optie aan is de beslissingsboom korter:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Assembleer een batchbestand voor automatische synchronisatie. Om te starten in batchmodus is het voldoende om de bestandsnaam achter de FreeFileSync toepassing te zetten: FreeFileSync.exe <batchbestand>. Het is mogelijk dit in te plannen in de systeemplanner.
+At least one directory input field is empty.
+Er is minimaal één locatie-veld leeg.
 Auto-adjust columns
 Kolommen automatisch aanpassen
 Automatic mode
@@ -192,19 +204,17 @@ Build:
 Gebouwd:
 Cancel
 Annuleren
-Cannot determine sync-direction: Changed filter settings!
-Kan de synchronisatie-richting niet bepalen: verandering in
-Cannot determine sync-direction: No change since last synchronization!
-Kan de synchronisatie-richting niet bepalen: geen verandering sinds de laatste synchronisatie!
+Cannot determine sync-direction:
+Kan de synchronisatie-richting niet bepalen:
 Category
 Categorie
 Change direction
 Zijdes omwisselen
 Comma separated list
 Komma gescheiden lijst
-Commandline
+Command line
 Opdrachtregel
-Commandline is empty!
+Command line is empty!
 Opdrachtregel is leeg!
 Compare
 Vergelijk
@@ -260,8 +270,12 @@ Copy from right to left
 Kopieer van rechts naar links
 Copy from right to left overwriting
 Kopieer en overschrijf van rechts naar links
+Copy locked files
+Kopieer 'alleen lezen' bestanden
 Copy new or updated files to right folder.
 Kopieer nieuwe of geupdate bestanden naar de rechter map.
+Copy shared or locked files using Volume Shadow Copy Service.
+Kopieer gedeelde of alleen-lezen bestanden met Volume Shadow Copy Service.
 Copy to clipboard\tCTRL+C
 Kopieer naar het klembord\tCTRL+C
 Copying file %x to %y
@@ -271,7 +285,9 @@ Aan het overschrijven van bestand %x naar %y
 Could not determine volume name for file:
 Kon de schijfnaam niet vaststellen van bestand:
 Could not initialize directory monitoring:
-Initaliseren van locatie-controle niet mogelijk:
+Initaliseren van locatie-observatie niet mogelijk:
+Could not load a required DLL:
+Kon een benodigde DLL niet laden:
 Could not read values for the following XML nodes:
 Kon geen waarden inlezen voor de volgende XML punten:
 Create a batch job
@@ -298,7 +314,7 @@ Date
 Datum
 Delay
 Vertraging
-Delay between detection of changes and execution of commandline in seconds
+Delay between detection of changes and execution of command line in seconds
 Vertraging tussen detecteren van veranderingen en uitvoering van de opdrachtregel in seconden
 Delete files/folders existing on left side only
 Verwijder bestanden/folders die alleen links bestaan
@@ -386,6 +402,8 @@ Error reading file:
 Er is een fout opgetreden bij het lezen van het bestand:
 Error reading from synchronization database:
 Er is een fout opgetreden bij het lezen van de synchronisatie-database:
+Error resolving full path name:
+Er is een fout opgetreden bij het ophalen van de locatie van bestand:
 Error resolving symbolic link:
 Er is een fout opgetreden bij het ophalen van een symbolische koppeling:
 Error starting Volume Shadow Copy Service!
@@ -393,7 +411,7 @@ Er is een fout opgetreden bij het starten van de Volume Schadow Copy Service!
 Error traversing directory:
 Er is een fout opgetreden bij het doorzoeken van map:
 Error when monitoring directories.
-Er is een fout opgetreden bij het controleren van locaties.
+Er is een fout opgetreden bij het observeren van locaties.
 Error writing file attributes:
 Er is een fout opgetreden bij het schrijven van de bestands-eigenschappen:
 Error writing file:
@@ -466,6 +484,8 @@ Filter files
 Filter bestanden
 Filter has been selected
 Filter is geselecteerd
+Filter settings have changed!
+Filter instellingen opgeslagen!
 Filter view
 Bekijk het filter
 Filtering is deactivated
@@ -560,8 +580,8 @@ Include all rows
 Alle rijen gebruiken
 Include temporarily
 Tijdelijk bijsluiten
-Include: *.doc;*.zip;*.exe\nExclude: temp\\*
-Bijsluiten: *.doc;*.zip;*.exe\nUitsluiten: temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
+Bijsluiten: *.doc;*.zip;*.exe\nUitsluiten: \\stuff\\temp\\*
 Incompatible synchronization database format:
 Opmaak van synchronisatie-database komt niet overeen:
 Info
@@ -572,8 +592,6 @@ Initial synchronization:
 Initiële  synchronisatie:
 Integrate external applications into context menu. The following macros are available:
 Integreer externe applicaties in het context menu. De volgende macros zijn beschikbaar:
-It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
-Het was niet mogelijk de prullenbak te initialiseren!\n\nHet is waarschijnlijk dat u niet Windows gebruikt.\nAls u deze optie wel wilt, neem dan alstublieft contact op met de auteur. :)
 Leave as unresolved conflict
 Beschouwen als onopgelost conflict
 Left
@@ -590,18 +608,22 @@ Log-messages:
 Logberichten:
 Logging
 Loggen
+Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
+Schaduw kopieen op WOW64 worden niet ondersteund. Gebruik alstublieft de 64-bit versie van FreeFileSync.
 Mirror ->>
 Spiegelen ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Spiegel backup van de linkerkant: de rechterkant wordt overschreven en komt na synchronisatie exact overeen met de linkerkant.
+Monitoring active...
+Observeren actief...
 More than 50% of the total number of files will be copied or deleted!
 Meer dan 50% van alle bestanden zal worden gekopieerd of verwijderd!
 Move column down
 Verplaats kolom naar beneden
 Move column up
 Verplaats kolom naar boven
-Move files to a user-defined directory.
-Verplaats bestanden naar een door de gebruiker te definiëren map.
+Move files into a time-stamped subdirectory.
+Verplaats de bestanden in een tijd-gemarkeerde sublocatie.
 Moving %x to Recycle Bin
 %x aan het verplaatsen naar de Prullenbak
 Moving file %x to user-defined directory %y
@@ -610,6 +632,8 @@ Moving folder %x to user-defined directory %y
 Verplaatsen map %x naar een door de gebruiker gedefinieerde locatie %y
 Multiple...
 Meerdere...
+No change since last synchronization!
+Geen veranderingen sinds de laatste synchronisatie!
 No filter selected
 Geen filter geselecteerd
 Not enough free disk space available in:
@@ -642,12 +666,10 @@ Pause
 Pause
 Paused
 Gepauseerd
-Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
-Kopiëer alstublieft \"Shadow.dll\" (locatie in \"Shadow.zip\" archief) naar de FreeFileSync installatiemap om het gebruik van deze optie mogelijk te maken
-Please fill all empty directory fields.
-Vul alstublieft aan beide kanten een pad in.
 Please run a Compare first before synchronizing!
 Voer eerst een Vergelijking uit voordat u synchroniseerd.
+Processing folder pair:
+Verwerken van gekoppelde folder:
 Published under the GNU General Public License:
 Gepubliceerd onder de GNU General Public License:
 Question
@@ -670,6 +692,8 @@ Remove folder pair
 Verwijder 1 paar gekoppelde mappen
 Remove local filter settings
 Verwijder lokale filter instellingen
+Renaming file %x to %y
+Hernoemen van bestand %x naar %y
 Report translation error
 Rapporteer een fout in de vertaling
 Reset
@@ -786,6 +810,8 @@ Target directory already existing!
 Doellocatie bestaal al!
 Target file already existing!
 Doelbestand bestaat al!
+The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
+De opdrachtregel wordt elke keer uitgevoerd als:\n- Bestanden in deze folders (of subfolders) zijn gewijzigd\n- De gekoppelde schijf beschikbaar wordt (USB-invoegen)
 The database file is not yet existing, but will be created during synchronization:
 Database-bestand bestaat nog niet, maar zal worden aangemaakt tijdens het synchroniseren:
 The file does not contain a valid configuration:
@@ -816,12 +842,14 @@ Unable to create logfile!
 Niet mogelijk om een logbestand aan te maken!
 Unable to initialize Recycle Bin!
 De prullenbak kon niet worden geïnitialiseerd!
+Unresolved conflicts existing!
+Er bestaan onopgeloste conflicten!
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Er bestaan onopgeloste conflicten! \n\nU kunt de conflicten negeren en doorgaan met synchroniseren.
 Update ->
 Overschrijven ->
-Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
-Uitleg: Selecteer locaties om te controleren en type een opdrachtregel. Elke keer dat bestanden worden aangepast binnen die locaties (en/of sublocaties) wordt de opdrachtregel uitgevoerd.
+Usage:
+Gebruik:
 Use Recycle Bin
 Gebruik de prullenbak
 Use Recycle Bin when deleting or overwriting files.
@@ -842,6 +870,8 @@ Warning: Synchronization failed for %x item(s):
 Let op: %x item(s) konden niet worden gesynchroniseerd: 
 When the comparison is started with this option set the following decision tree is processed:
 Wanneer met deze optie aan de vergelijking wordt gestart zal de volgende vergelijkingsboom worden gebruikt:
+You can ignore conflicts and continue synchronization.
+U kunt de conflicten negeren en doorgaan met synchroniseren.
 You can ignore the error to consider not existing directories as empty.
 U kunt de fout negeren om niet bestaande locaties als leeg te beschouwen.
 You can ignore the error to skip current folder pair.

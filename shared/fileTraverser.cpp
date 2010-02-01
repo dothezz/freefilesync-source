@@ -6,6 +6,7 @@
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
+#include "longPathPrefix.h"
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
@@ -22,7 +23,7 @@ public:
 
     ~CloseHandleOnExit()
     {
-        CloseHandle(fileHandle_);
+        ::CloseHandle(fileHandle_);
     }
 
 private:
@@ -65,7 +66,7 @@ inline
 bool setWin32FileInformationFromSymlink(const Zstring linkName, FreeFileSync::TraverseCallback::FileInfo& output)
 {
     //open handle to target of symbolic link
-    HANDLE hFile = ::CreateFile(linkName.c_str(),
+    HANDLE hFile = ::CreateFile(FreeFileSync::applyLongPathPrefix(linkName).c_str(),
                                 0,
                                 FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                                 NULL,
@@ -129,8 +130,8 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
                                        directory + globalFunctions::FILE_NAME_SEPARATOR;
 
     WIN32_FIND_DATA fileMetaData;
-    HANDLE searchHandle = FindFirstFile((directoryFormatted + DefaultChar('*')).c_str(), //__in   LPCTSTR lpFileName
-                                        &fileMetaData);                                  //__out  LPWIN32_FIND_DATA lpFindFileData
+    HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(directoryFormatted + DefaultChar('*')).c_str(), //__in   LPCTSTR lpFileName
+                                          &fileMetaData);                                                     //__out  LPWIN32_FIND_DATA lpFindFileData
     //no noticable performance difference compared to FindFirstFileEx with FindExInfoBasic, FIND_FIRST_EX_CASE_SENSITIVE and/or FIND_FIRST_EX_LARGE_FETCH
 
     if (searchHandle == INVALID_HANDLE_VALUE)
@@ -140,8 +141,10 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
             return true;
 
         //else: we have a problem... report it:
-        const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") ;
-        switch (sink->onError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted(lastError)))
+        const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") + wxT("\n\n") +
+                                      FreeFileSync::getLastErrorFormatted(lastError);
+
+        switch (sink->onError(errorMessage))
         {
         case TraverseCallback::TRAVERSING_STOP:
             return false;
@@ -205,8 +208,8 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
             }
         }
     }
-    while (FindNextFile(searchHandle,	 // handle to search
-                        &fileMetaData)); // pointer to structure for data on found file
+    while (::FindNextFile(searchHandle,	   // handle to search
+                          &fileMetaData)); // pointer to structure for data on found file
 
     const DWORD lastError = ::GetLastError();
     if (lastError == ERROR_NO_MORE_FILES)
@@ -362,3 +365,6 @@ void FreeFileSync::traverseFolder(const Zstring& directory,
     else
         traverseDirectory<false>(directoryFormatted, sink, 0);
 }
+
+
+

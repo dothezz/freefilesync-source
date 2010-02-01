@@ -46,6 +46,8 @@
 &Anulează
 &Check for new version
 &Caută Versiune Nouă
+&Content
+&Conținut
 &Create batch job
 &Creează o Sarcină Lot
 &Default
@@ -88,12 +90,14 @@
 &Da
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Doar dispozitivele FAT/FAT32 sînt afectate de această problemă!\nÎn celelalte cazuri, puteți dezactiva setarea \"ignoră diferența de 1-oră\".)
+(Requires an Internet connection!)
+(Necesită o conexiune la internet!)
 ,
 .
 - Other side's counterpart to %dir
-- Corespondentul din partea opusă al lui %dir
+- corespondentul din partea opusă al lui %dir
 - Other side's counterpart to %name
-- Corespondentul din partea opusă al lui %name
+- corespondentul din partea opusă al lui %name
 - conflict
 - conflict
 - conflict (same date, different size)
@@ -132,12 +136,18 @@
 1. &Compară
 1. Enter relative file or directory names separated by ';' or a new line.
 1. Introduceți numele relative ale fișierelor sau dosarelor, separate de semnul ';' sau de un rînd nou.
+1. Select directories to monitor.
+1. Selectați dosarele de monitorizat.
 2. &Synchronize...
 2. &Sincronizează...
+2. Enter a command line.
+2. Introduceți calea.
 2. Use wildcard characters '*' and '?'.
 2. Folosiți metacaracterele '*' și '?' (asterisc și semn de întrebare).
 3. Exclude files directly on main grid via context menu.
 3. Excludeți fișierele și dosarele direct de pe grila principală cu ajutorul meniului contextual.
+3. Press 'Start'.
+3. Apăsați 'Start'.
 <Automatic>
 <Sincronizare Inteligentă>
 <Directory>
@@ -172,6 +182,8 @@ As the name suggests, two files which share the same name are marked as equal if
 Așa cum sugerează și numele, două fișiere cu același nume sînt considerate identice dacă și numai dacă este identic și conținutul lor. Această opțiune este utilă mai degrabă pentru verificările de consecvență decît pentru operațiunile de salvgardare [backup]. Așa că timpurile fișierelor (data și ora) nu sînt luați deloc în considerare.\n\nCu această opțiune activată, arborele de decizie e mai simplu:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Se poate crea un fișier cu un lot de comenzi [batch file] pentru sincronizarea inteligentă. Pentru a porni în modul lot, indicați astfel numele fișierului lot pentru prelucrarea sa de către executabilul FreeFileSync: freefilesync.exe <fișier lot>. Această operațiune poate fi programată în planificatorul de sarcini al sistemului de operare [task scheduler].
+At least one directory input field is empty.
+Cel puțin un cîmp de introducere a dosarului este gol.
 Auto-adjust columns
 Autoajustează Coloanele
 Automatic mode
@@ -192,19 +204,17 @@ Build:
 Compilat la:
 Cancel
 Anulează
-Cannot determine sync-direction: Changed filter settings!
-Nu se poate determina sensul de sincronizare: Setările filtrului s-au schimbat!
-Cannot determine sync-direction: No change since last synchronization!
-Nu se poate determina sensul de sincronizare: Nici o modificare de la ultima sincronizare!
+Cannot determine sync-direction:
+Nu se poate determina sensul de sincronizare:
 Category
 Categorie
 Change direction
 Schimbă în Sensul Iconiței
 Comma separated list
 Listă de elemente separate prin virgulă
-Commandline
+Command line
 Linie de comandă
-Commandline is empty!
+Command line is empty!
 Linia de comandă este goală!
 Compare
 Compară
@@ -260,8 +270,12 @@ Copy from right to left
 Copiază de la Dreapta la Stînga
 Copy from right to left overwriting
 Copiază de la Dreapta la Stînga cu Suprascriere
+Copy locked files
+Copiază fișierele zăvorîte [locked]
 Copy new or updated files to right folder.
 Copiere în dosarul din dreapta a fișierelor actualizate sau noi.
+Copy shared or locked files using Volume Shadow Copy Service.
+Copiază fișierele partajate sau zăvorîte folosind serviciul de salvgardare din Windows.
 Copy to clipboard\tCTRL+C
 Copiază în Cliplanșetă\tCTRL+C
 Copying file %x to %y
@@ -272,6 +286,8 @@ Could not determine volume name for file:
 Nu pot determina numele volumului pentru fișierul:
 Could not initialize directory monitoring:
 Nu pot inițializa monitorizarea dosarelor:
+Could not load a required DLL:
+Nu pot încărca un fișier DLL necesar:
 Could not read values for the following XML nodes:
 Nu pot citi valorile pentru următoarele noduri XML:
 Create a batch job
@@ -298,7 +314,7 @@ Date
 Dată
 Delay
 Întîrziere
-Delay between detection of changes and execution of commandline in seconds
+Delay between detection of changes and execution of command line in seconds
 Întîrziere în secunde între detectarea modificărilor și executarea liniei de comandă
 Delete files/folders existing on left side only
 Șterge Itemul din Stînga
@@ -386,6 +402,8 @@ Error reading file:
 Eroare la citirea fișierului:
 Error reading from synchronization database:
 Eroare la citirea din baza de date a sincronizării:
+Error resolving full path name:
+Eroare la rezolvarea numelui căii complete: 
 Error resolving symbolic link:
 Eroare la rezolvarea legăturii simbolice:
 Error starting Volume Shadow Copy Service!
@@ -466,6 +484,8 @@ Filter files
 Filtrează Fișierele
 Filter has been selected
 Filtrul a fost selectat
+Filter settings have changed!
+Setările filtrului au fost schimbate!
 Filter view
 Filtru de Vedere
 Filtering is deactivated
@@ -560,8 +580,8 @@ Include all rows
 Include Toate Rîndurile
 Include temporarily
 Include Temporar
-Include: *.doc;*.zip;*.exe\nExclude: temp\\*
-Incluse: *.doc;*.zip;*.exe\nExcluse: temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
+Incluse: *.doc;*.zip;*.exe\nExcluse: \\stuff\\temp\\*
 Incompatible synchronization database format:
 Format incompatibil al bazei de date a sincronizării:
 Info
@@ -572,8 +592,6 @@ Initial synchronization:
 Sincronizare inițială:
 Integrate external applications into context menu. The following macros are available:
 Include aplicațiile externe în meniul contextual. Sînt disponibile următoarele macrocomenzi:
-It was not possible to initialize the Recycle Bin!\n\nIt's likely that you are not using Windows.\nIf you want this feature included, please contact the author. :)
-Inițializarea Reciclatorului nu a fost posibilă!\n\nCauza poate fi faptul că nu utilizați SO Windows.\nDacă doriți să utilizați această funcționalitate, contactați autorul. :)
 Leave as unresolved conflict
 Lasă ca Conflict Nerezolvat
 Left
@@ -590,18 +608,22 @@ Log-messages:
 Mesaje de jurnalizare:
 Logging
 Jurnalizez
+Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
+Realizarea de copii de rezervă prin sistemul WOW64 nu este suportată. Folosiți versiunea pe 64-biți a FreeFileSync.
 Mirror ->>
 Clonare =>>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Salvgardare [backup] prin clonare a dosarului stîng: dosarul din dreapta va fi suprascris și va fi identic după sincronizare cu dosarul din stînga.
+Monitoring active...
+Monitorizare activă...
 More than 50% of the total number of files will be copied or deleted!
 Peste 50% din numărul total de fișiere vor fi copiate sau distruse!
 Move column down
 Mută coloana în jos
 Move column up
 Mută coloana în sus
-Move files to a user-defined directory.
-Fișierele sînt mutate într-un dosar ales de utilizator.
+Move files into a time-stamped subdirectory.
+Mută fișierele într-un subdosar cu marcaj de timp.
 Moving %x to Recycle Bin
 Mut %x în Reciclator
 Moving file %x to user-defined directory %y
@@ -610,6 +632,8 @@ Moving folder %x to user-defined directory %y
 Mut dosarul %x în dosarul %y ales de utilizator
 Multiple...
 Multiplu...
+No change since last synchronization!
+Nu sînt schimbări de la ultima sincronizare!
 No filter selected
 Nu a fost selectat nici un filtru
 Not enough free disk space available in:
@@ -642,12 +666,10 @@ Pause
 Pauză
 Paused
 Pauzat
-Please copy the appropriate \"Shadow.dll\" (located in \"Shadow.zip\" archive) into the FreeFileSync installation directory to enable this feature.
-Copiați fișierul \"Shadow.dll\" (din arhiva \"Shadow.zip\") în dosarul de instalare FreeFileSync pentru a putea utiliza această funcționalitate.
-Please fill all empty directory fields.
-Completați toate cîmpurile unde trebuie să apară adrese ale dosarelor comparate.
 Please run a Compare first before synchronizing!
 Rulați compararea înainte de a sincroniza!
+Processing folder pair:
+Procesez perechea de dosare:
 Published under the GNU General Public License:
 Publicat sub licența GNU GPL:
 Question
@@ -670,6 +692,8 @@ Remove folder pair
 Înlătură Perechea de Dosare
 Remove local filter settings
 Înlătură Configurația Filtrului Local
+Renaming file %x to %y
+Redenumesc fișierul %x în %y
 Report translation error
 Raportarea erorilor de traducere
 Reset
@@ -786,6 +810,8 @@ Target directory already existing!
 Dosarul țintă există deja!
 Target file already existing!
 Fișierul țintă există deja!
+The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
+Linia de comandă este executată de fiecare dată:\n- Fișierele din aceste dosare (sau subdosare) sînt modificate\n- Litera corespunzătoare a dispozitivului devine disponibilă (introducere-USB)
 The database file is not yet existing, but will be created during synchronization:
 Fișierul cu baza de date nu există încă, dar va fi creat în cursul sincronizării:
 The file does not contain a valid configuration:
@@ -816,12 +842,14 @@ Unable to create logfile!
 Fișierul jurnal nu poate fi creat!
 Unable to initialize Recycle Bin!
 Reciclatorul nu poate fi inițializat!
+Unresolved conflicts existing!
+Există conflicte nerezolvate!
 Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
 Există conflicte nerezolvate!\n\nPuteți ignora conflictele pentru a continua cu sincronizarea.
 Update ->
 Actualizare =>
-Usage: Select directories for monitoring and enter a commandline. Each time files are modified within these directories (or subdirectories) the commandline is executed.
-Utilizare: Selectați dosarele de sincronizat și introduceți o linie de comandă. De fiecare dată cînd un fișier este modificat în aceste dosare (sau subdosare), este executată linia de comandă.
+Usage:
+Utilizare:
 Use Recycle Bin
 Mută în reciclator
 Use Recycle Bin when deleting or overwriting files.
@@ -842,6 +870,8 @@ Warning: Synchronization failed for %x item(s):
 Atenție: Sincronizarea a eșuat pentru %x itemuri:
 When the comparison is started with this option set the following decision tree is processed:
 Cînd compararea este pornită cu acest set de opțiuni, este executat următorul arbore de decizie:
+You can ignore conflicts and continue synchronization.
+Puteți ignora conflictele pentru a continua cu sincronizarea.
 You can ignore the error to consider not existing directories as empty.
 Puteți ignora eroarea care consideră că un dosar inexistent este gol.
 You can ignore the error to skip current folder pair.

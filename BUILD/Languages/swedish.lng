@@ -1,0 +1,886 @@
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE
+ Byte
+ Byte
+ GB
+ GB
+ MB
+ MB
+ PB
+ PB
+ TB
+ TB
+ day(s)
+ dag(ar)
+ hour(s)
+ timma(r)
+ kB
+ kB
+ min
+ min.
+ sec
+ sek.
+%x / %y objects deleted successfully
+%x / %y objekt borttagna
+%x Percent
+%x Procent
+%x directories
+%x kataloger
+%x files,
+%x filer,
+%x is not a valid FreeFileSync batch file!
+%x är ingen giltig FreeFileSync batch-fil!
+%x of %y rows in view
+%x rader av %y i vyn
+%x of 1 row in view
+%x av 1 rad i vyn
+&Abort
+&Avbryt
+&About...
+&Om...
+&Advanced
+&Avancerat
+&Apply
+&Verkställ
+&Cancel
+&Avbryt
+&Check for new version
+&Sök efter uppdatering
+&Content
+&Innehåll
+&Create batch job
+&Skapa batch-jobb
+&Default
+&Standard
+&Exit
+&Avsluta
+&Export file list
+&Exportera fillista
+&File
+&Arkiv
+&Global settings
+&Allmäna inställningar
+&Help
+&Hjälp
+&Ignore
+&Ignorera
+&Language
+&Språk
+&Load
+&Läs från fil
+&Load configuration
+&Hämta inställningar från fil
+&New
+&Nytt
+&No
+&Nej
+&OK
+&OK
+&Pause
+&Paus
+&Quit
+&Sluta
+&Restore
+&Återställ
+&Retry
+&Försök igen
+&Save
+&Spara
+&Yes
+&Ja
+(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
+(Notera att endast FAT/FAT32-formaterade diskar berörs av detta problem!\nI alla andra fall kan du inaktivera alternativet \"Ignorera sommartid\".)
+(Requires an Internet connection!)
+(Kräver Internetuppkoppling!)
+,
+.
+- Other side's counterpart to %dir
+- Andra sidans motsvarighet till %dir
+- Other side's counterpart to %name
+- Andra sidans motsvarighet till %name
+- conflict
+- konflikt
+- conflict (same date, different size)
+- konflikt (samma datum, olika storlek)
+- different
+- olika
+- directory part only
+- Endast fil-/katalognamn
+- equal
+- lika
+- exists left only
+- finns endast till vänster
+- exists right only
+- finns endast till höger
+- full file or directory name
+- Full sökväg
+- left
+- vänster
+- left newer
+- vänster nyare
+- right
+- höger
+- right newer
+- höger nyare
+-Open-Source file synchronization-
+-Öppen källkod filsynkronisering-
+.
+,
+/sec
+/s
+1 directory
+1 katalog
+1 file,
+1 fil,
+1. &Compare
+1. &Jämför
+1. Enter relative file or directory names separated by ';' or a new line.
+1. Ange fil- eller katalognamn avgränsade med "," eller en ny rad
+1. Select directories to monitor.
+1. Välj kataloger att övervaka.
+2. &Synchronize...
+2. &Synkronisera...
+2. Enter a command line.
+2. Mata in ett kommando.
+2. Use wildcard characters '*' and '?'.
+2. Använd wildcard-tecknen '*' och '?' .
+3. Exclude files directly on main grid via context menu.
+3. Undanta filer direkt i huvudfönstret, via högerklicksmenyn.
+3. Press 'Start'.
+3. Tryck 'Start'.
+<Automatic>
+<Automatisk>
+<Directory>
+<Katalog>
+<Last session>
+<Senaste session>
+<multiple selection>
+<flerval>
+A newer version of FreeFileSync is available:
+En nyare version av FreeFileSync finns tillgänglig:
+Abort requested: Waiting for current operation to finish...
+Avbryter: Väntar på att aktuell process skall slutföras...
+Aborted
+Användaren avbröt
+About
+Om
+Action
+Aktivitet
+Activate filter
+Aktivera filter
+Add folder
+Lägg till katalog
+Add folder pair
+Lägg till katalogpar
+All directories in sync!
+Alla kataloger synkade!
+An exception occured!
+Ett undantag inträffade!
+As a result the files are separated into the following categories:
+Som ett resultat blir filerna separerade i följande kategorier:
+As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
+Som namnet antyder, två filer med samma namn beräknas som lika, endast om dom har samma innehåll. Den här funktionen är mer användbar för konsistenskontroll, snarare än säkerhetskopiering. Därför tas inte tidsattributen med i beräkningen.\n\nMed det här alternativet aktiverat, blir beslutsträdet mindre:
+Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
+Montera en batch-fil för automatisk synkronisering. För att starta i batch-läge, lägg till filnamnet i startkommandot: FreeFileSync.exe <batch-fil>. Det kan också schemaläggas i Windows Schemaläggaren.
+At least one directory input field is empty.
+Minst 1 adressfält är tomt.
+Auto-adjust columns
+Autojustera kollumner
+Automatic mode
+Autoläge
+Batch execution
+Batch-körning
+Batch file created successfully!
+Batch-filen skapades korrekt!
+Batch job
+Batch-jobb
+Big thanks for localizing FreeFileSync goes out to:
+Stort tack för översättningen av FreeFileSync går till:
+Both sides have changed since last synchronization!
+Båda sidor har ändrats sedan senaste synkroniseringen!
+Browse
+Bläddra
+Build:
+Bygg:
+Cancel
+Avbryt
+Cannot determine sync-direction:
+Kan inte bestämma synk-riktning:
+Category
+Kategori
+Change direction
+Ändra riktning
+Comma separated list
+Komma-separerad lista
+Command line
+Kommandofält
+Command line is empty!
+Kommandofältet är tomt
+Compare
+Jämför
+Compare both sides
+Jämför båda sidor
+Compare by \"File content\"
+Jämför: \"Filinnehåll\"
+Compare by \"File size and date\"
+Jämför: \"Filstorlek och datum\"
+Compare by...
+Jämför...
+Comparing content
+Jämför innehåll
+Comparing content of files %x
+Jämför filinnehåll för %x
+Comparing content...
+Jämför innehåll...
+Comparing files by content failed.
+Kunde inte jämföra filinnehåll.
+Comparison Result
+Jämförelseresultat
+Comparison settings
+Jämförelseinställningar
+Completed
+Klar
+Configuration
+Inställningar
+Configuration loaded!
+Inställningar inlästa!
+Configuration overview:
+Översikt:
+Configuration saved!
+Inställningar sparade!
+Configure filter
+Filterinställningar
+Configure your own synchronization rules.
+Konfigurera dina egna synkroniseringsregler.
+Confirm
+Bekräfta
+Conflict detected:
+Konflikt upptäckt:
+Conflicts/files that cannot be categorized
+Konflikter/filer som inte kan kategoriseras
+Continue
+Fortsätt
+Conversion error:
+Konversionsfel:
+Copy from left to right
+Kopiera från vänster till höger 
+Copy from left to right overwriting
+Kopiera från vänster till höger och skriv över målet
+Copy from right to left
+Kopiera från höger till vänster 
+Copy from right to left overwriting
+Kopiera från höger till vänster och skriv över målet
+Copy locked files
+Kopiera låsta filer
+Copy new or updated files to right folder.
+Kopiera nya och uppdaterade filer till höger katalog.
+Copy shared or locked files using Volume Shadow Copy Service.
+Använd Volume Shadow Copy Service för att kopiera låsta eller delade filer.
+Copy to clipboard\tCTRL+C
+Kopiera till urklipp\tCTRL+C
+Copying file %x to %y
+Kopierar fil %x till %y
+Copying file %x to %y overwriting target
+Kopierar fil %x till %y skriver över målet
+Could not determine volume name for file:
+Kan inte bestämma volym för fil:
+Could not initialize directory monitoring:
+Kan inte initiera katalogskanner:
+Could not load a required DLL:
+Kan inte läsa in nödvändig DLL: 
+Could not read values for the following XML nodes:
+Kan inte läsa värden för följande XML-noder:
+Create a batch job
+Skapa ett batch-jobb
+Creating folder %x
+Skapar katalog %x
+Current operation:
+Aktuell uppgift:
+Custom
+Anpassat
+Customize columns
+Anpassa kollumner
+Customize...
+Anpassar...
+D-Click
+Håll ner D
+DECISION TREE
+BESLUTSTRÄD
+Data remaining:
+Återstående data:
+Data verification error: Source and target file have different content!
+Verifikationsfel: Källfil och målfil har olika innehåll!
+Date
+Datum
+Delay
+Fördröjning
+Delay between detection of changes and execution of command line in seconds
+Fördröjning mellan ändringars upptäckt och åtgärd i sekunder
+Delete files/folders existing on left side only
+Ta bort filer/kataloger som endast finns på vänster sida
+Delete files/folders existing on right side only
+Ta bort filer/kataloger som endast finns på höger sida
+Delete files\tDEL
+Ta bort filer\tDEL
+Delete on both sides
+Ta bort på båda sidor
+Delete on both sides even if the file is selected on one side only
+Ta bort på båda sidor, även om filen är markerad på endast en sida
+Delete or overwrite files permanently.
+Ta bort eller skriv över permanent
+Delete permanently
+Ta bort permanent
+Deleting file %x
+Tar bort filen %x
+Deleting folder %x
+Tar bort katalogen %x
+Deletion handling
+Borttagning
+Description
+Beskrivning
+Directories are dependent! Be careful when setting up synchronization rules:
+Kataloger är beroende! Var försiktig när du sätter upp synkroniseringsregler:
+Directories to watch
+Kataloger att övervaka
+Directory
+Katalog
+Directory does not exist:
+Katalogen finns inte:
+Do not show this dialog again
+Visa inte den här dialogrutan igen
+Do nothing
+Gör ingenting
+Do you really want to delete the following objects(s)?
+Vill du verkligen ta bort följande objekt?
+Do you really want to move the following objects(s) to the Recycle Bin?
+Vill du verkligen flytta följande objekt till papperskorgen?
+Do you want FreeFileSync to automatically check for updates every week?
+Vill du att FreeFileSync skall söka efter uppdateringar varje vecka?
+Donate with PayPal
+Donera via PayPal
+Download now?
+Ladda ner nu?
+Drag && drop
+Dra && släpp
+Email
+e-post
+Enable filter to exclude files from synchronization
+Aktivera filter för att undanta filer från synkronisering
+Endless loop when traversing directory:
+Oändlig loop vid accessförsök på katalog:
+Error
+Fel
+Error changing modification time:
+Kan inte modifiera tidsstämpel:
+Error copying file:
+Kan inte kopiera fil:
+Error copying locked file %x!
+Kan inte kopiera låst fil %x!
+Error creating directory:
+Kan inte skapa katalog:
+Error deleting directory:
+Kan inte ta bort katalog:
+Error deleting file:
+Kan inte ta bort fil:
+Error handling
+Felhantering
+Error loading library function:
+Kan inte starta biblioteksfunktion:
+Error moving directory:
+Kan inte flytta katalog:
+Error moving file:
+Kan inte flytta fil:
+Error moving to Recycle Bin:
+Kan inte flytta till papperskorgen:
+Error opening file:
+Kan inte öppna fil:
+Error parsing configuration file:
+Kan inte läsa in konfigurationsfil:
+Error reading file attributes:
+Kan inte läsa filattribut:
+Error reading file:
+Kan inte läsa fil:
+Error reading from synchronization database:
+Kan inte läsa från databasen:
+Error resolving full path name:
+Kan inte läsa in full sökväg:
+Error resolving symbolic link:
+Kan inte tyda symbolisk länk:
+Error starting Volume Shadow Copy Service!
+Kan inte starta 'Volume Shadow Copy Service'!
+Error traversing directory:
+Accessfel på katalog:
+Error when monitoring directories.
+Fel vid övervakning av kataloger.
+Error writing file attributes:
+Kan inte skriva filattribut:
+Error writing file:
+Kan inte skriva fil:
+Error writing to synchronization database:
+Kan inte skriva till databas:
+Example
+Exempel
+Exclude
+Undanta
+Exclude all rows
+Undanta alla rader 
+Exclude temporarily
+Undanta tillfälligt
+Exclude via filter:
+Lägg till i undantag:
+Exit immediately and set returncode < 0
+Avsluta omedelbart och sätt returkod < 0
+Exit with RC < 0
+Avsluta med RC < 0
+External applications
+Externa program
+Fatal Error
+Allvarligt fel
+Feedback and suggestions are welcome at:
+Feedback och förslag är välkommna här:
+File %x has an invalid date!
+Filen %x har ett ogiltigt datum!
+File already exists. Overwrite?
+Filen finns redan. Vill du skriva över: 
+File content
+Filinnehåll
+File does not exist:
+Filen finns inte:
+File list exported!
+Fillista exporterad!
+File size and date
+Filstorlek och datum
+Filename
+Filnamn
+Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
+Filerna %x har en tidsstämpling som skiljer mindre än en timme!\n\nDet är inte helt säkert att avgöra vilken som är nyast, p.g.a sommartids-problem.
+Files %x have the same date but a different size!
+Filerna %x har samma datum men olika storlek!
+Files are found equal if\n     - file content\nis the same.
+Filerna betecknas som lika om, \n     - filinnehållet\när lika.
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
+Filerna betecknas som lika om, \n     - filstorlek\n     - 'senast använd' och datum\när lika.
+Files remaining:
+Filer kvar:
+Files that are equal on both sides
+Filer som är lika på båda sidor
+Files that exist on both sides and have different content
+Filer som finns på båda sidor och har olika innehåll
+Files that exist on both sides, left one is newer
+Filer som finns på båda sidor, vänster är nyare
+Files that exist on both sides, right one is newer
+Filer som finns på båda sidor, höger är nyare
+Files/folders found:
+Funna filer/kataloger:
+Files/folders remaining:
+Filer/kataloger kvar:
+Files/folders that exist on left side only
+Filer/kataloger som finns på vänster sida enbart
+Files/folders that exist on right side only
+Filer/kataloger som finns på höger sida enbart
+Filter
+Filter
+Filter files
+Undantag
+Filter has been selected
+Filter aktiverat
+Filter settings have changed!
+Filterinställningar har ändrats!
+Filter view
+Filtervy
+Filtering is deactivated
+Filter inaktiverat
+Folder Comparison and Synchronization
+Katalogjämförelse och synkronisering
+Free disk space available:
+Ledigt diskutrymme:
+FreeFileSync - Folder Comparison and Synchronization
+FreeFileSync - Jämför och Synkronisera
+FreeFileSync Batch Job
+FreeFileSync Batch-jobb
+FreeFileSync at Sourceforge
+FreeFileSync på Sourceforge
+FreeFileSync batch file
+FreeFileSync batch-fil
+FreeFileSync configuration
+FreeFileSync konfiguration
+FreeFileSync is up to date!
+FreeFileSync är uppdaterad!
+Full path
+Fullständig sökväg
+Generating database...
+Skapar databas...
+Generating file list...
+Skapar fillista...
+Global filter
+Allmänt filter
+Global settings
+Allmäna inställningar
+Help
+Hjälp
+Hidden dialogs:
+Dolda meddelanden:
+Hide all error and warning messages
+Visa inte fel- och varningsmeddelanden
+Hide conflicts
+Visa inte konflikter 
+Hide excluded items
+Visa inte undantagna objekt
+Hide files that are different
+Visa inte filer som är olika
+Hide files that are equal
+Visa inte filer som är lika
+Hide files that are newer on left
+Visa inte filer som är nyare till vänster
+Hide files that are newer on right
+Visa inte filer som är nyare till höger
+Hide files that exist on left side only
+Visa inte filer som endast finns till vänster
+Hide files that exist on right side only
+Visa inte filer som endast finns till höger
+Hide files that will be created on the left side
+Visa inte filer som kommer att skapas på vänster sida
+Hide files that will be created on the right side
+Visa inte filer som kommer att skapas på höger sida
+Hide files that will be deleted on the left side
+Visa inte filer som kommer att tas bort på vänster sida
+Hide files that will be deleted on the right side
+Visa inte filer som kommer att tas bort på höger sida
+Hide files that will be overwritten on left side
+Visa inte filer som kommer att skrivas över på vänster sida
+Hide files that will be overwritten on right side
+Visa inte filer som kommer att skrivas över på höger sida
+Hide files that won't be copied
+Visa inte filer som som inte kopieras
+Hide filtered or temporarily excluded files
+Visa inte filtrerade eller temporärt undantagna filer
+Hide further error messages during the current process
+Dölj vidare felmeddelanden under aktuell process
+Hints:
+Ledtråd:
+Homepage
+Hemsida
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+Identifiera och visa förändringar på båda sidor via databas. Borttagningar och konflikter upptäcks automatiskt.
+If you like FFS
+Om du gillar FFS
+Ignore 1-hour file time difference
+Ignorera sommartid
+Ignore errors
+Ignorera fel
+Ignore subsequent errors
+Ignorera följdfel
+Ignore this error, retry or abort synchronization?
+Ignorera felet, försök igen eller avbryt synkroniseringen?
+Ignore this error, retry or abort?
+Ignorera felet, försök igen eller avbryt?
+Include
+Inkludera
+Include all rows
+Inkludera alla rader
+Include temporarily
+Inkludera tillfälligt
+Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
+Inkludera: *.doc;*.zip;*.exe\nUndanta: \\stuff\\temp\\*
+Incompatible synchronization database format:
+Inkompatibelt databasformat:
+Info
+Info
+Information
+Information
+Initial synchronization:
+Initial synkronisering:
+Integrate external applications into context menu. The following macros are available:
+Integrera externa program i högerklicksmeny. Följande variabler finns tillgängliga:
+Leave as unresolved conflict
+Ignorera konflikt
+Left
+Vänster
+Legend
+Förklaring
+Load configuration from file
+Hämta inställningar från fil 
+Load configuration history (press DEL to delete items)
+Konfigurationshistoria (Tryck DEL för att ta bort objekt)
+Local filter
+Lokalt filter
+Log-messages:
+Log-meddelanden:
+Logging
+Loggar
+Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
+Skuggkopior av wow64 stöds ej. Använd FreeFileSync x64 istället!
+Mirror ->>
+Spegla ->>
+Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
+Speglad kopia av vänster sida: Höger sida kommer att skrivas över med en exakt kopia av vänster sida.
+Monitoring active...
+Övervakning aktiverad...
+More than 50% of the total number of files will be copied or deleted!
+mer än 50% av totalt filantal kommer att kopieras eller tas bort!
+Move column down
+Flytta ner kollumn
+Move column up
+Flytta upp kollumn
+Move files into a time-stamped subdirectory.
+Flytta filer till en tidsstämplad underkatalog
+Moving %x to Recycle Bin
+Flyttar %x till papperskorgen
+Moving file %x to user-defined directory %y
+Flyttar %x till %y
+Moving folder %x to user-defined directory %y
+Flyttar %x till %y
+Multiple...
+Multipla...
+No change since last synchronization!
+Inga ändringar sedan senaste synkronisering!
+No filter selected
+Inga filter aktiverade
+Not enough free disk space available in:
+Ej tillräckligt ledigt diskutrymme på:
+Nothing to synchronize according to configuration!
+Inget att synkronisera enligt aktuella inställningar!
+Number of files and directories that will be created
+Antal filer och kataloger som kommer att skapas
+Number of files and directories that will be deleted
+Antal filer och kataloger som kommer att tas bort
+Number of files that will be overwritten
+Antal filer som kommer att skrivas över
+OK
+OK
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
+Endast filer/kataloger som kvarstår efter filtrering, kommer att markeras för synkronisering.
+Open directly
+Öppna fil
+Open with Explorer
+Öppna katalog
+Open with Konqueror
+Öppna med Konqueror
+Operation aborted!
+Processen avbruten!
+Operation:
+Arbetsuppgift:
+Overview
+Översikt
+Pause
+Paus
+Paused
+Pausad
+Please run a Compare first before synchronizing!
+Du måste trycka \"Jämför\" innan du kan synkronisera. 
+Processing folder pair:
+Processar katalogpar:
+Published under the GNU General Public License:
+Publiserad under GNU General Public License:
+Question
+Fråga
+Quit
+Avsluta
+Re-enable all hidden dialogs?
+Återaktivera alla dolda meddelanden?
+RealtimeSync - Automated Synchronization
+RealtimeSync - Automatiserad synkronisering
+RealtimeSync configuration
+RealtimeSync konfiguration
+Relative path
+Sökväg
+Remove alternate settings
+Ta bort alternativa inställningar
+Remove folder
+Ta bort katalog
+Remove folder pair
+Ta bort katalogpar
+Remove local filter settings
+Ta bort lokala filterinställningar
+Renaming file %x to %y
+Byter namn på %x till %y
+Report translation error
+Rapportera översättningsfel
+Reset
+Återställ
+Right
+Höger
+Run minimized and write status information to a logfile
+Kör minimerad och skriv statusinformation till loggfil
+S&ave configuration
+S&para inställningar 
+S&witch view
+B&yt sida
+Save changes to current configuration?
+Vill du spara ändringarna i aktuella inställningar?
+Save current configuration to file
+Spara aktuella inställningar till fil
+Scanning...
+Skannar...
+Scanning:
+Skannar:
+Select a folder
+Markera en katalog
+Select alternate synchronization settings
+Välj alternativa synkroniseringsinställningar
+Select logfile directory:
+Välj loggfilsdestination:
+Select variant:
+Välj variant:
+Setting default synchronization directions. Please check whether they are appropriate for you.
+Kontrollera om standard synkroniseringskataloger passar dina önskemål.
+Show conflicts
+Visa konflikter
+Show file icons
+Visa filikoner
+Show files that are different
+Visa filer som är olika
+Show files that are equal
+Visa filer som är lika
+Show files that are newer on left
+Visa filer som är nyare till vänster
+Show files that are newer on right
+Visa filer som är nyare till höger
+Show files that exist on left side only
+Visa filer som endast finns till vänster
+Show files that exist on right side only
+Visa filer som endast finns till höger
+Show files that will be created on the left side
+Visa filer som kommer att skapas till vänster
+Show files that will be created on the right side
+Visa filer som kommer att skapas till höger
+Show files that will be deleted on the left side
+Visa filer som kommer att tas bort till vänster
+Show files that will be deleted on the right side
+Visa filer som kommer att tas bort till höger
+Show files that will be overwritten on left side
+Visa filer som skrivas över till vänster
+Show files that will be overwritten on right side
+Visa filer som skrivas över till höger
+Show files that won't be copied
+Visa filer som inte kommer att kopieras
+Show hidden dialogs
+Visa dolda meddelanden
+Show popup
+Visa popups
+Show popup on errors or warnings
+Visa popup vid fel eller varningar
+Significant difference detected:
+Betydande skillnad upptäckt:
+Silent mode
+Tyst läge
+Size
+Storlek
+Source code written completely in C++ utilizing:
+Source code written completely in C++ utilizing:
+Source directory does not exist anymore:
+Källkatalogen finns inte längre:
+Speed:
+Hastighet:
+Start
+Start
+Start synchronization
+Starta synkronisering
+Statistics
+Statistik
+Stop
+Stopp
+Swap sides
+Byt sida
+Synchronization Preview
+Förhandsvisning
+Synchronization aborted!
+Synkronisering avbruten!
+Synchronization completed successfully!
+Synkronisering slutförd!
+Synchronization completed with errors!
+Synkronisering slutförd med fel!
+Synchronization settings
+Synkroniseringsinställningar
+Synchronization status
+Synkroniseringsstatus
+Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
+Synkronisera alla filer, .doc, .zip och .exe men inga undermappar \"temp\".
+Synchronize both sides simultaneously: Copy new or updated files in both directions.
+Synkronisera båda sidor simultant: Kopiera nya eller uppdaterade filer i bägge riktningar.
+Synchronize both sides using a database. Deletions are detected automatically.
+Synkronisera båda sidor med hjälp av databas. Borttagningar upptäcks automatiskt.
+Synchronize...
+Synkronisera
+Synchronizing...
+Synkroniserar...
+System out of memory!
+Systemminnet är fullt!
+Target directory already existing!
+Målkatalogen finns redan!
+Target file already existing!
+Filen finns redan!
+The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
+Kommandot kommer att exekveras varje gång:\n- Innehållet i dessa kataloger (eller underkataloger) ändras\n- Enheten med aktuell enhetsbokstav ansluts (USB-anslutning)
+The database file is not yet existing, but will be created during synchronization:
+Databasfilen finns inte ännu, men kommer att skapas under synkroniseringen.
+The file does not contain a valid configuration:
+Filen är ingen giltig konfigureringsfil:
+The required database entry is not yet existing, but will be created during synchronization:
+Databasobjektet finns inte ännu, men kommer att skapas under synkroniseringen:
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
+Denna variant betecknar 2 filer med samma namn som lika, när dom har samma storlek OCH samma tidsstämpling.
+Time
+Tid
+Time elapsed:
+Förfluten tid:
+Time remaining:
+Kvarvarande tid:
+Total amount of data that will be transferred
+Total mängd data som kommer att överföras
+Total required free disk space:
+Ledigt diskutrymme som krävs:
+Total time:
+Total tid:
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
+Betrakta tidsstämplar som skiljer exakt +/- 1 timme som lika, och mindre än 1 timme som konflikt, för att hantera sommartid.
+Two way <->
+Bägge riktningar <->
+Unable to connect to sourceforge.net!
+Kan inte ansluta sourceforge.net!
+Unable to create logfile!
+Kan inte skapa loggfil!
+Unable to initialize Recycle Bin!
+Kan inte initiera papperskorgen!
+Unresolved conflicts existing!
+Obehandlad konflikt upptäckt!
+Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
+Obehandlad konflikt upptäckt! \n\nDu kan ignorera konflikter och fortsätta synkroniseringen.
+Update ->
+Uppdatera ->
+Usage:
+Användning:
+Use Recycle Bin
+Använd papperskorgen
+Use Recycle Bin when deleting or overwriting files.
+Use Volume Shadow Copy Service to copy locked or shared files.
+User-defined directory
+Användardefinierad katalog
+User-defined directory for deletion was not specified!
+Katalog för borttagning ej specifiserad!
+Variant
+Variant
+Verifying file %x
+Verifierar %x
+Volume name %x not part of filename %y!
+Volymnamn %x saknas i filnamn %y!
+Warning
+Varning
+Warning: Synchronization failed for %x item(s):
+Varning: Synkronisering misslyckades för %x objekt:
+When the comparison is started with this option set the following decision tree is processed:
+När jämförelse startas med detta alternativ aktiverat, processas följande beslutsträd:
+You can ignore conflicts and continue synchronization.
+Du kan ignorera konflikter och fortsätta synkroniseringen.
+You can ignore the error to consider not existing directories as empty.
+Du kan ignorera felet att inte betrakta befintliga kataloger som tomma.
+You can ignore the error to skip current folder pair.
+Du kan ignorera felet att hoppa över aktuellt katalogpar.
+You may try to synchronize remaining items again (WITHOUT having to re-compare)!
+Du kan försöka synkronisera återstående objekt igen (utan att trycka \"Jämför\")!
+different
+olika
+file exists on both sides
+Filen finns på båda sidor
+on one side only
+endast på en sida

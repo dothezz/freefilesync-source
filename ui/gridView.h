@@ -61,6 +61,7 @@ public:
         bool existsSyncDirLeft;
         bool existsSyncDirRight;
         bool existsSyncDirNone;
+        bool existsSyncEqual;
         bool existsConflict;
 
         unsigned int filesOnLeftView;
@@ -81,6 +82,7 @@ public:
                                         bool syncDirOverwLeftActive,
                                         bool syncDirOverwRightActive,
                                         bool syncDirNoneActive,
+                                        bool syncEqualActive,
                                         bool conflictFilesActive);
 
 
@@ -125,7 +127,7 @@ private:
     //              |
     //              | (update...)
     //             \|/
-    std::vector<RefIndex> sortedRef; //equivalent to folerCmp, but may be sorted
+    std::vector<RefIndex> sortedRef; //equivalent to folderCmp, but may be sorted
     //              |
     //              | (setData)
     //             \|/

@@ -228,6 +228,16 @@ private:
 };
 
 
+struct DirNotFound
+{
+    bool operator()(const FolderPairEnh& fp) const
+    {
+        return !dirExists(FreeFileSync::getFormattedDirectoryName(fp.leftDirectory)) ||
+               !dirExists(FreeFileSync::getFormattedDirectoryName(fp.rightDirectory));
+    }
+};
+
+
 //##################################################################################################################################
 MainDialog::MainDialog(wxFrame* frame,
                        const wxString& cfgFileName,
@@ -256,42 +266,43 @@ MainDialog::MainDialog(wxFrame* frame,
     //initialize and load configuration
     readGlobalSettings();
 
+    bool loadCfgSuccess = false;
     if (cfgFileName.empty())
-        readConfigurationFromXml(lastConfigFileName(), true);
+        loadCfgSuccess = readConfigurationFromXml(lastConfigFileName(), true);
     else
-        readConfigurationFromXml(cfgFileName, true);
+        loadCfgSuccess = readConfigurationFromXml(cfgFileName, true);
 
     //set icons for this dialog
-    m_bpButton10->SetBitmapLabel(*GlobalResources::getInstance().bitmapExit);
-    m_buttonCompare->setBitmapFront(*GlobalResources::getInstance().bitmapCompare);
-    m_bpButtonSyncConfig->SetBitmapLabel(*GlobalResources::getInstance().bitmapSyncCfg);
-    m_bpButtonCmpConfig->SetBitmapLabel(*GlobalResources::getInstance().bitmapCmpCfg);
-    m_bpButtonSave->SetBitmapLabel(*GlobalResources::getInstance().bitmapSave);
-    m_bpButtonLoad->SetBitmapLabel(*GlobalResources::getInstance().bitmapLoad);
-    m_bpButtonAddPair->SetBitmapLabel(*GlobalResources::getInstance().bitmapAddFolderPair);
-    m_bitmap15->SetBitmap(*GlobalResources::getInstance().bitmapStatusEdge);
+    m_bpButton10->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("exit")));
+    m_buttonCompare->setBitmapFront(GlobalResources::getInstance().getImageByName(wxT("compare")));
+    m_bpButtonSyncConfig->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("syncConfig")));
+    m_bpButtonCmpConfig->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("cmpConfig")));
+    m_bpButtonSave->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("save")));
+    m_bpButtonLoad->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("load")));
+    m_bpButtonAddPair->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("addFolderPair")));
+    m_bitmap15->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusEdge")));
 
-    m_bitmapCreate->SetBitmap(*GlobalResources::getInstance().bitmapCreate);
-    m_bitmapUpdate->SetBitmap(*GlobalResources::getInstance().bitmapUpdate);
-    m_bitmapDelete->SetBitmap(*GlobalResources::getInstance().bitmapDelete);
-    m_bitmapData->SetBitmap(*GlobalResources::getInstance().bitmapData);
+    m_bitmapCreate->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("create")));
+    m_bitmapUpdate->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("update")));
+    m_bitmapDelete->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("delete")));
+    m_bitmapData->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("data")));
 
     bSizer6->Layout(); //wxButtonWithImage size might have changed
 
     //menu icons: workaround for wxWidgets: small hack to update menu items: actually this is a wxWidgets bug (affects Windows- and Linux-build)
     MenuItemUpdater updateMenuFile(m_menuFile);
-    updateMenuFile.addForUpdate(m_menuItem10,   *GlobalResources::getInstance().bitmapCompareSmall);
-    updateMenuFile.addForUpdate(m_menuItem11,   *GlobalResources::getInstance().bitmapSyncSmall);
-    updateMenuFile.addForUpdate(m_menuItemNew,  *GlobalResources::getInstance().bitmapNewSmall);
-    updateMenuFile.addForUpdate(m_menuItemSave, *GlobalResources::getInstance().bitmapSaveSmall);
-    updateMenuFile.addForUpdate(m_menuItemLoad, *GlobalResources::getInstance().bitmapLoadSmall);
+    updateMenuFile.addForUpdate(m_menuItem10,   GlobalResources::getInstance().getImageByName(wxT("compareSmall")));
+    updateMenuFile.addForUpdate(m_menuItem11,   GlobalResources::getInstance().getImageByName(wxT("syncSmall")));
+    updateMenuFile.addForUpdate(m_menuItemNew,  GlobalResources::getInstance().getImageByName(wxT("newSmall")));
+    updateMenuFile.addForUpdate(m_menuItemSave, GlobalResources::getInstance().getImageByName(wxT("saveSmall")));
+    updateMenuFile.addForUpdate(m_menuItemLoad, GlobalResources::getInstance().getImageByName(wxT("loadSmall")));
 
     MenuItemUpdater updateMenuAdv(m_menuAdvanced);
-    updateMenuAdv.addForUpdate(m_menuItemGlobSett, *GlobalResources::getInstance().bitmapSettingsSmall);
-    updateMenuAdv.addForUpdate(m_menuItem7, *GlobalResources::getInstance().bitmapBatchSmall);
+    updateMenuAdv.addForUpdate(m_menuItemGlobSett, GlobalResources::getInstance().getImageByName(wxT("settingsSmall")));
+    updateMenuAdv.addForUpdate(m_menuItem7, GlobalResources::getInstance().getImageByName(wxT("batchSmall")));
 
     MenuItemUpdater updateMenuHelp(m_menuHelp);
-    updateMenuHelp.addForUpdate(m_menuItemAbout, *GlobalResources::getInstance().bitmapAboutSmall);
+    updateMenuHelp.addForUpdate(m_menuItemAbout, GlobalResources::getInstance().getImageByName(wxT("aboutSmall")));
 
 
     //create language selection menu
@@ -353,6 +364,22 @@ MainDialog::MainDialog(wxFrame* frame,
 
     //asynchronous call to wxWindow::Layout(): fix superfluous frame on right and bottom when FFS is started in fullscreen mode
     Connect(wxEVT_IDLE, wxIdleEventHandler(MainDialog::OnLayoutWindowAsync), NULL, this);
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //some convenience: if FFS is started with a *.ffs_gui file as commandline parameter AND all directories contained exist, comparison shall be started right off
+    if (!cfgFileName.empty() && loadCfgSuccess)
+    {
+        const FreeFileSync::MainConfiguration currMainCfg = getCurrentConfiguration().mainCfg;
+        const bool allFoldersExist = !DirNotFound()(currMainCfg.firstPair) &&
+                                     std::find_if(currMainCfg.additionalPairs.begin(), currMainCfg.additionalPairs.end(),
+                                             DirNotFound()) == currMainCfg.additionalPairs.end();
+        if (allFoldersExist)
+        {
+            wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED);
+            m_buttonCompare->AddPendingEvent(dummy2); //simulate button click on "compare"
+        }
+    }
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------
 }
 
 
@@ -735,20 +762,15 @@ void exstractNames(const FileSystemObject& fsObj, wxString& name, wxString& dir)
 {
     if (!fsObj.isEmpty<side>())
     {
-        const FileMapping* fileObj = dynamic_cast<const FileMapping*>(&fsObj);
-        if (fileObj != NULL)
+        if (isDirectoryMapping(fsObj))
         {
             name = zToWx(fsObj.getFullName<side>());
-            dir  = zToWx(fsObj.getFullName<side>().BeforeLast(globalFunctions::FILE_NAME_SEPARATOR));
+            dir  = name;
         }
         else
         {
-            const DirMapping* dirObj = dynamic_cast<const DirMapping*>(&fsObj);
-            if (dirObj != NULL)
-            {
-                name = zToWx(fsObj.getFullName<side>());
-                dir  = name;
-            }
+            name = zToWx(fsObj.getFullName<side>());
+            dir  = zToWx(fsObj.getFullName<side>().BeforeLast(globalFunctions::FILE_NAME_SEPARATOR));
         }
     }
     else
@@ -1190,9 +1212,10 @@ void MainDialog::OnContextRim(wxGridEvent& event)
     //re-create context menu
     contextMenu.reset(new wxMenu);
 
-    if (syncPreview.previewIsEnabled())
+    if (syncPreview.previewIsEnabled() &&
+            fsObj && fsObj->getSyncOperation() != SO_EQUAL)
     {
-        if (fsObj && (selectionLeft.size() + selectionRight.size() > 0))
+        if (selectionLeft.size() + selectionRight.size() > 0)
         {
             //CONTEXT_SYNC_DIR_LEFT
             wxMenuItem* menuItemSyncDirLeft = new wxMenuItem(contextMenu.get(), CONTEXT_SYNC_DIR_LEFT, wxString(_("Change direction")) + wxT("\tALT + LEFT"));
@@ -1220,13 +1243,13 @@ void MainDialog::OnContextRim(wxGridEvent& event)
         if (fsObj->isActive())
         {
             wxMenuItem* menuItemExclTemp = new wxMenuItem(contextMenu.get(), CONTEXT_FILTER_TEMP, wxString(_("Exclude temporarily")) + wxT("\tSPACE"));
-            menuItemExclTemp->SetBitmap(*GlobalResources::getInstance().bitmapCheckBoxFalse);
+            menuItemExclTemp->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("checkboxFalse")));
             contextMenu->Append(menuItemExclTemp);
         }
         else
         {
             wxMenuItem* menuItemInclTemp = new wxMenuItem(contextMenu.get(), CONTEXT_FILTER_TEMP, wxString(_("Include temporarily")) + wxT("\tSPACE"));
-            menuItemInclTemp->SetBitmap(*GlobalResources::getInstance().bitmapCheckBoxTrue);
+            menuItemInclTemp->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("checkboxTrue")));
             contextMenu->Append(menuItemInclTemp);
         }
     }
@@ -1244,16 +1267,14 @@ void MainDialog::OnContextRim(wxGridEvent& event)
         const FileSystemObject* currObj = gridDataView->getObject(*i);
         if (currObj && !currObj->isEmpty<LEFT_SIDE>())
             exFilterCandidateObj.push_back(
-                FilterObject(currObj->getRelativeName<LEFT_SIDE>(),
-                             dynamic_cast<const DirMapping*>(currObj) != NULL));
+                FilterObject(currObj->getRelativeName<LEFT_SIDE>(), isDirectoryMapping(*currObj)));
     }
     for (std::set<unsigned int>::const_iterator i = selectionRight.begin(); i != selectionRight.end(); ++i)
     {
         const FileSystemObject* currObj = gridDataView->getObject(*i);
         if (currObj && !currObj->isEmpty<RIGHT_SIDE>())
             exFilterCandidateObj.push_back(
-                FilterObject(currObj->getRelativeName<RIGHT_SIDE>(),
-                             dynamic_cast<const DirMapping*>(currObj) != NULL));
+                FilterObject(currObj->getRelativeName<RIGHT_SIDE>(), isDirectoryMapping(*currObj)));
     }
     //###############################################################################################
 
@@ -1267,7 +1288,7 @@ void MainDialog::OnContextRim(wxGridEvent& event)
 
             //add context menu item
             wxMenuItem* menuItemExclExt = new wxMenuItem(contextMenu.get(), CONTEXT_EXCLUDE_EXT, wxString(_("Exclude via filter:")) + wxT(" ") + wxT("*.") + zToWx(extension));
-            menuItemExclExt->SetBitmap(*GlobalResources::getInstance().bitmapFilterSmall);
+            menuItemExclExt->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("filterSmall")));
             contextMenu->Append(menuItemExclExt);
 
             //connect event
@@ -1289,7 +1310,7 @@ void MainDialog::OnContextRim(wxGridEvent& event)
 
     if (menuItemExclObj != NULL)
     {
-        menuItemExclObj->SetBitmap(*GlobalResources::getInstance().bitmapFilterSmall);
+        menuItemExclObj->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("filterSmall")));
         contextMenu->Append(menuItemExclObj);
 
         //connect event
@@ -1603,9 +1624,9 @@ void MainDialog::OnContextMiddleLabel(wxGridEvent& event)
     wxMenuItem* itemCmpResult   = new wxMenuItem(contextMenu.get(), CONTEXT_COMPARISON_RESULT, _("Comparison Result"));
 
     if (syncPreview.previewIsEnabled())
-        itemSyncPreview->SetBitmap(*GlobalResources::getInstance().bitmapSyncViewSmall);
+        itemSyncPreview->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("syncViewSmall")));
     else
-        itemCmpResult->SetBitmap(*GlobalResources::getInstance().bitmapCmpViewSmall);
+        itemCmpResult->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("cmpViewSmall")));
 
     contextMenu->Append(itemCmpResult);
     contextMenu->Append(itemSyncPreview);
@@ -1667,44 +1688,19 @@ wxString getFormattedHistoryElement(const wxString& filename)
 }
 
 
-wxString getFullFilename(const wxString& name)
-{
-    //resolve relative names to avoid problems after working directory is changed
-    wxFileName filename(name);
-    if (!filename.Normalize())
-        return name; //fallback
-
-    return filename.GetFullPath();
-}
-
-
-//tests if the same filenames are specified, even if they are relative to the current working directory
-inline
-bool sameFileSpecified(const wxString& file1, const wxString& file2)
-{
-    const wxString file1Full = getFullFilename(file1);
-    const wxString file2Full = getFullFilename(file2);
-
-#ifdef FFS_WIN //don't respect case in windows build
-    return file1Full.CmpNoCase(file2Full) == 0;
-#elif defined FFS_LINUX
-    return file1Full == file2Full;
-#endif
-}
-
-
+//tests if the same filenames are specified, even if they are relative to the current working directory/include symlinks or \\?\ prefix
 class FindDuplicates
 {
 public:
-    FindDuplicates(const wxString& name) : m_name(name) {}
+    FindDuplicates(const Zstring& name) : m_name(name) {}
 
     bool operator()(const wxString& other) const
     {
-        return sameFileSpecified(m_name, other);
+        return Utility::sameFileSpecified(m_name, wxToZ(other));
     }
 
 private:
-    const wxString& m_name;
+    const Zstring& m_name;
 };
 
 
@@ -1714,7 +1710,7 @@ void MainDialog::addFileToCfgHistory(const wxString& filename)
     if (!wxFileExists(filename))
         return;
 
-    std::vector<wxString>::const_iterator i = find_if(cfgFileNames.begin(), cfgFileNames.end(), FindDuplicates(filename));
+    std::vector<wxString>::const_iterator i = find_if(cfgFileNames.begin(), cfgFileNames.end(), FindDuplicates(wxToZ(filename)));
     if (i != cfgFileNames.end())
     {
         //if entry is in the list, then jump to element
@@ -1725,7 +1721,7 @@ void MainDialog::addFileToCfgHistory(const wxString& filename)
         cfgFileNames.insert(cfgFileNames.begin(), filename);
 
         //the default config file should receive another name on GUI
-        if (sameFileSpecified(lastConfigFileName(), filename))
+        if (Utility::sameFileSpecified(wxToZ(lastConfigFileName()), wxToZ(filename)))
             m_choiceHistory->Insert(_("<Last session>"), 0);  //insert at beginning of list
         else
             m_choiceHistory->Insert(getFormattedHistoryElement(filename), 0);  //insert at beginning of list
@@ -1763,7 +1759,11 @@ void MainDialog::OnSaveConfig(wxCommandEvent& event)
 
 bool MainDialog::trySaveConfig() //return true if saved successfully
 {
-    const wxString defaultFileName = currentConfigFileName.empty() ? wxT("SyncSettings.ffs_gui") : currentConfigFileName;
+    wxString defaultFileName = currentConfigFileName.empty() ? wxT("SyncSettings.ffs_gui") : currentConfigFileName;
+    //attention: currentConfigFileName may be an imported *.ffs_batch file! We don't want to overwrite it with a GUI config!
+    if (defaultFileName.EndsWith(wxT(".ffs_batch")))
+        defaultFileName.Replace(wxT(".ffs_batch"), wxT(".ffs_gui"), false);
+
 
     wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, defaultFileName, wxString(_("FreeFileSync configuration")) + wxT(" (*.ffs_gui)|*.ffs_gui"), wxFD_SAVE);
     if (filePicker->ShowModal() == wxID_OK)
@@ -1937,7 +1937,7 @@ void MainDialog::OnSetSyncDirection(FFSSyncDirectionEvent& event)
             if (fsObj)
             {
                 setSyncDirectionRec(event.direction, *fsObj); //set new direction (recursively)
-                FreeFileSync::setActiveStatus(true, *fsObj); //works recursively for directories
+                FreeFileSync::setActiveStatus(true, *fsObj);  //works recursively for directories
             }
         }
 
@@ -2291,75 +2291,75 @@ void MainDialog::OnSyncDirNone(wxCommandEvent& event)
 void MainDialog::initViewFilterButtons()
 {
     //compare result buttons
-    m_bpButtonLeftOnly->init(*GlobalResources::getInstance().bitmapLeftOnlyAct,
+    m_bpButtonLeftOnly->init(GlobalResources::getInstance().getImageByName(wxT("leftOnlyAct")),
                              _("Hide files that exist on left side only"),
-                             *GlobalResources::getInstance().bitmapLeftOnlyDeact,
+                             GlobalResources::getInstance().getImageByName(wxT("leftOnlyDeact")),
                              _("Show files that exist on left side only"));
 
-    m_bpButtonRightOnly->init(*GlobalResources::getInstance().bitmapRightOnlyAct,
+    m_bpButtonRightOnly->init(GlobalResources::getInstance().getImageByName(wxT("rightOnlyAct")),
                               _("Hide files that exist on right side only"),
-                              *GlobalResources::getInstance().bitmapRightOnlyDeact,
+                              GlobalResources::getInstance().getImageByName(wxT("rightOnlyDeact")),
                               _("Show files that exist on right side only"));
 
-    m_bpButtonLeftNewer->init(*GlobalResources::getInstance().bitmapLeftNewerAct,
+    m_bpButtonLeftNewer->init(GlobalResources::getInstance().getImageByName(wxT("leftNewerAct")),
                               _("Hide files that are newer on left"),
-                              *GlobalResources::getInstance().bitmapLeftNewerDeact,
+                              GlobalResources::getInstance().getImageByName(wxT("leftNewerDeact")),
                               _("Show files that are newer on left"));
 
-    m_bpButtonRightNewer->init(*GlobalResources::getInstance().bitmapRightNewerAct,
+    m_bpButtonRightNewer->init(GlobalResources::getInstance().getImageByName(wxT("rightNewerAct")),
                                _("Hide files that are newer on right"),
-                               *GlobalResources::getInstance().bitmapRightNewerDeact,
+                               GlobalResources::getInstance().getImageByName(wxT("rightNewerDeact")),
                                _("Show files that are newer on right"));
 
-    m_bpButtonEqual->init(*GlobalResources::getInstance().bitmapEqualAct,
+    m_bpButtonEqual->init(GlobalResources::getInstance().getImageByName(wxT("equalAct")),
                           _("Hide files that are equal"),
-                          *GlobalResources::getInstance().bitmapEqualDeact,
+                          GlobalResources::getInstance().getImageByName(wxT("equalDeact")),
                           _("Show files that are equal"));
 
-    m_bpButtonDifferent->init(*GlobalResources::getInstance().bitmapDifferentAct,
+    m_bpButtonDifferent->init(GlobalResources::getInstance().getImageByName(wxT("differentAct")),
                               _("Hide files that are different"),
-                              *GlobalResources::getInstance().bitmapDifferentDeact,
+                              GlobalResources::getInstance().getImageByName(wxT("differentDeact")),
                               _("Show files that are different"));
 
-    m_bpButtonConflict->init(*GlobalResources::getInstance().bitmapConflictAct,
+    m_bpButtonConflict->init(GlobalResources::getInstance().getImageByName(wxT("conflictAct")),
                              _("Hide conflicts"),
-                             *GlobalResources::getInstance().bitmapConflictDeact,
+                             GlobalResources::getInstance().getImageByName(wxT("conflictDeact")),
                              _("Show conflicts"));
 
     //sync preview buttons
-    m_bpButtonSyncCreateLeft->init(*GlobalResources::getInstance().bitmapSyncCreateLeftAct,
+    m_bpButtonSyncCreateLeft->init(GlobalResources::getInstance().getImageByName(wxT("syncCreateLeftAct")),
                                    _("Hide files that will be created on the left side"),
-                                   *GlobalResources::getInstance().bitmapSyncCreateLeftDeact,
+                                   GlobalResources::getInstance().getImageByName(wxT("syncCreateLeftDeact")),
                                    _("Show files that will be created on the left side"));
 
-    m_bpButtonSyncCreateRight->init(*GlobalResources::getInstance().bitmapSyncCreateRightAct,
+    m_bpButtonSyncCreateRight->init(GlobalResources::getInstance().getImageByName(wxT("syncCreateRightAct")),
                                     _("Hide files that will be created on the right side"),
-                                    *GlobalResources::getInstance().bitmapSyncCreateRightDeact,
+                                    GlobalResources::getInstance().getImageByName(wxT("syncCreateRightDeact")),
                                     _("Show files that will be created on the right side"));
 
-    m_bpButtonSyncDeleteLeft->init(*GlobalResources::getInstance().bitmapSyncDeleteLeftAct,
+    m_bpButtonSyncDeleteLeft->init(GlobalResources::getInstance().getImageByName(wxT("syncDeleteLeftAct")),
                                    _("Hide files that will be deleted on the left side"),
-                                   *GlobalResources::getInstance().bitmapSyncDeleteLeftDeact,
+                                   GlobalResources::getInstance().getImageByName(wxT("syncDeleteLeftDeact")),
                                    _("Show files that will be deleted on the left side"));
 
-    m_bpButtonSyncDeleteRight->init(*GlobalResources::getInstance().bitmapSyncDeleteRightAct,
+    m_bpButtonSyncDeleteRight->init(GlobalResources::getInstance().getImageByName(wxT("syncDeleteRightAct")),
                                     _("Hide files that will be deleted on the right side"),
-                                    *GlobalResources::getInstance().bitmapSyncDeleteRightDeact,
+                                    GlobalResources::getInstance().getImageByName(wxT("syncDeleteRightDeact")),
                                     _("Show files that will be deleted on the right side"));
 
-    m_bpButtonSyncDirOverwLeft->init(*GlobalResources::getInstance().bitmapSyncDirLeftAct,
+    m_bpButtonSyncDirOverwLeft->init(GlobalResources::getInstance().getImageByName(wxT("syncDirLeftAct")),
                                      _("Hide files that will be overwritten on left side"),
-                                     *GlobalResources::getInstance().bitmapSyncDirLeftDeact,
+                                     GlobalResources::getInstance().getImageByName(wxT("syncDirLeftDeact")),
                                      _("Show files that will be overwritten on left side"));
 
-    m_bpButtonSyncDirOverwRight->init(*GlobalResources::getInstance().bitmapSyncDirRightAct,
+    m_bpButtonSyncDirOverwRight->init(GlobalResources::getInstance().getImageByName(wxT("syncDirRightAct")),
                                       _("Hide files that will be overwritten on right side"),
-                                      *GlobalResources::getInstance().bitmapSyncDirRightDeact,
+                                      GlobalResources::getInstance().getImageByName(wxT("syncDirRightDeact")),
                                       _("Show files that will be overwritten on right side"));
 
-    m_bpButtonSyncDirNone->init(*GlobalResources::getInstance().bitmapSyncDirNoneAct,
+    m_bpButtonSyncDirNone->init(GlobalResources::getInstance().getImageByName(wxT("syncDirNoneAct")),
                                 _("Hide files that won't be copied"),
-                                *GlobalResources::getInstance().bitmapSyncDirNoneDeact,
+                                GlobalResources::getInstance().getImageByName(wxT("syncDirNoneDeact")),
                                 _("Show files that won't be copied"));
 
     //compare result buttons
@@ -2388,8 +2388,8 @@ void MainDialog::updateFilterButtons()
     if (m_notebookBottomLeft->GetImageList() == NULL)
     {
         wxImageList* panelIcons = new wxImageList(16, 16);
-        panelIcons->Add(wxBitmap(*GlobalResources::getInstance().bitmapFilterSmall));
-        panelIcons->Add(wxBitmap(*GlobalResources::getInstance().bitmapFilterSmallGrey));
+        panelIcons->Add(wxBitmap(GlobalResources::getInstance().getImageByName(wxT("filterSmall"))));
+        panelIcons->Add(wxBitmap(GlobalResources::getInstance().getImageByName(wxT("filterSmallGrey"))));
         m_notebookBottomLeft->AssignImageList(panelIcons); //pass ownership
     }
 
@@ -2400,7 +2400,7 @@ void MainDialog::updateFilterButtons()
         const bool isNullFilter = NameFilter(currentCfg.mainCfg.includeFilter, currentCfg.mainCfg.excludeFilter).isNull();
         if (isNullFilter)
         {
-            m_bpButtonFilter->SetBitmapLabel(*GlobalResources::getInstance().bitmapFilterOff);
+            m_bpButtonFilter->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("filterOff")));
             m_bpButtonFilter->SetToolTip(_("No filter selected"));
 
             //additional filter icon
@@ -2408,7 +2408,7 @@ void MainDialog::updateFilterButtons()
         }
         else
         {
-            m_bpButtonFilter->SetBitmapLabel(*GlobalResources::getInstance().bitmapFilterOn);
+            m_bpButtonFilter->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("filterOn")));
             m_bpButtonFilter->SetToolTip(_("Filter has been selected"));
 
             //show filter icon
@@ -2417,7 +2417,7 @@ void MainDialog::updateFilterButtons()
     }
     else
     {
-        m_bpButtonFilter->SetBitmapLabel(*GlobalResources::getInstance().bitmapFilterOff);
+        m_bpButtonFilter->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("filterOff")));
         m_bpButtonFilter->SetToolTip(_("Filtering is deactivated"));
 
         //additional filter icon
@@ -2457,6 +2457,7 @@ void MainDialog::OnCompare(wxCommandEvent &event)
         FreeFileSync::CompareProcess comparison(currentCfg.mainCfg.hidden.traverseDirectorySymlinks,
                                                 currentCfg.mainCfg.hidden.fileTimeTolerance,
                                                 globalSettings.ignoreOneHourDiff,
+                                                globalSettings.detectRenameThreshold,
                                                 globalSettings.optDialogs,
                                                 &statusHandler);
 
@@ -2469,6 +2470,11 @@ void MainDialog::OnCompare(wxCommandEvent &event)
             newCompareData);
 
         gridDataView->setData(newCompareData); //newCompareData is invalidated after this call
+
+        //play (optional) sound notification after sync has completed (GUI and batch mode)
+        const wxString soundFile = FreeFileSync::getInstallationDir() + wxT("Compare_Complete.wav");
+        if (fileExists(wxToZ(soundFile)))
+            wxSound::Play(soundFile, wxSOUND_ASYNC);
     }
     catch (AbortThisProcess&)
     {
@@ -2932,6 +2938,7 @@ void MainDialog::updateGridViewData()
                 m_bpButtonSyncDirOverwLeft-> isActive(),
                 m_bpButtonSyncDirOverwRight->isActive(),
                 m_bpButtonSyncDirNone->      isActive(),
+                m_bpButtonEqual->            isActive(),
                 m_bpButtonConflict->         isActive());
 
         filesOnLeftView    = result.filesOnLeftView;
@@ -2950,6 +2957,7 @@ void MainDialog::updateGridViewData()
         m_bpButtonSyncDirOverwLeft-> Show(result.existsSyncDirLeft);
         m_bpButtonSyncDirOverwRight->Show(result.existsSyncDirRight);
         m_bpButtonSyncDirNone->      Show(result.existsSyncDirNone);
+        m_bpButtonEqual->            Show(result.existsSyncEqual);
         m_bpButtonConflict->         Show(result.existsConflict);
 
         if (    m_bpButtonSyncCreateLeft->   IsShown() ||
@@ -2959,6 +2967,7 @@ void MainDialog::updateGridViewData()
                 m_bpButtonSyncDirOverwLeft-> IsShown() ||
                 m_bpButtonSyncDirOverwRight->IsShown() ||
                 m_bpButtonSyncDirNone->      IsShown() ||
+                m_bpButtonEqual->            IsShown() ||
                 m_bpButtonConflict->         IsShown())
         {
             m_panel112->Show();
@@ -3269,14 +3278,14 @@ void MainDialog::updateGuiForFolderPair()
         m_bpButtonLocalFilter->Hide();
         m_bpButtonAltSyncCfg->Hide();
 
-        m_bpButtonSwapSides->SetBitmapLabel(*GlobalResources::getInstance().bitmapSwap);
+        m_bpButtonSwapSides->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("swap")));
     }
     else
     {
         m_bpButtonLocalFilter->Show();
         m_bpButtonAltSyncCfg->Show();
 
-        m_bpButtonSwapSides->SetBitmapLabel(*GlobalResources::getInstance().bitmapSwapSlim);
+        m_bpButtonSwapSides->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("swapSlim")));
     }
 
     m_panelTopMiddle->Layout();
@@ -3427,6 +3436,7 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
             exportString += wxString(wxT("\"")) + getDescription(SO_OVERWRITE_LEFT)      + wxT("\";") + getSymbol(SO_OVERWRITE_LEFT)      + wxT('\n');
             exportString += wxString(wxT("\"")) + getDescription(SO_OVERWRITE_RIGHT)     + wxT("\";") + getSymbol(SO_OVERWRITE_RIGHT)     + wxT('\n');
             exportString += wxString(wxT("\"")) + getDescription(SO_DO_NOTHING)          + wxT("\";") + getSymbol(SO_DO_NOTHING)          + wxT('\n');
+            exportString += wxString(wxT("\"")) + getDescription(SO_DO_NOTHING)          + wxT("\";") + getSymbol(SO_EQUAL)               + wxT('\n');
             exportString += wxString(wxT("\"")) + getDescription(SO_UNRESOLVED_CONFLICT) + wxT("\";") + getSymbol(SO_UNRESOLVED_CONFLICT) + wxT('\n');
         }
         else
@@ -3644,13 +3654,13 @@ void MainDialog::SyncPreview::enableSynchronization(bool value)
     {
         synchronizationEnabled = true;
         mainDlg_->m_buttonStartSync->SetForegroundColour(*wxBLACK);
-        mainDlg_->m_buttonStartSync->setBitmapFront(*GlobalResources::getInstance().bitmapSync);
+        mainDlg_->m_buttonStartSync->setBitmapFront(GlobalResources::getInstance().getImageByName(wxT("sync")));
     }
     else
     {
         synchronizationEnabled = false;
         mainDlg_->m_buttonStartSync->SetForegroundColour(wxColor(128, 128, 128)); //Some colors seem to have problems with 16Bit color depth, well this one hasn't!
-        mainDlg_->m_buttonStartSync->setBitmapFront(*GlobalResources::getInstance().bitmapSyncDisabled);
+        mainDlg_->m_buttonStartSync->setBitmapFront(GlobalResources::getInstance().getImageByName(wxT("syncDisabled")));
     }
 }
 
@@ -3659,6 +3669,7 @@ bool MainDialog::SyncPreview::synchronizationIsEnabled() const
 {
     return synchronizationEnabled;
 }
+
 
 
 

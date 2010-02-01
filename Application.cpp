@@ -246,6 +246,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         FreeFileSync::CompareProcess comparison(batchCfg.mainCfg.hidden.traverseDirectorySymlinks,
                                                 batchCfg.mainCfg.hidden.fileTimeTolerance,
                                                 globSettings.ignoreOneHourDiff,
+                                                globSettings.detectRenameThreshold,
                                                 globSettings.optDialogs,
                                                 statusHandler.get());
 

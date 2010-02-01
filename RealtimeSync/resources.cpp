@@ -19,12 +19,7 @@ const GlobalResources& GlobalResources::getInstance()
 
 GlobalResources::GlobalResources()
 {
-    //map, allocate and initialize pictures
-    bitmapResource[wxT("start red.png")]          = (bitmapStart             = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("add pair.png")]           = (bitmapAddFolderPair     = new wxBitmap(wxNullBitmap));
-    bitmapResource[wxT("remove pair.png")]        = (bitmapRemoveFolderPair  = new wxBitmap(wxNullBitmap));
-
-    programIcon    = new wxIcon(wxNullIcon);
+    programIcon = new wxIcon(wxNullIcon);
 }
 
 
@@ -49,7 +44,6 @@ void GlobalResources::load() const
 
         wxZipInputStream resourceFile(input);
 
-        std::map<wxString, wxBitmap*>::iterator bmp;
         while (true)
         {
             std::auto_ptr<wxZipEntry> entry(resourceFile.GetNextEntry());
@@ -58,24 +52,31 @@ void GlobalResources::load() const
 
             const wxString name = entry->GetName();
 
-            //search if entry is available in map
-            if ((bmp = bitmapResource.find(name)) != bitmapResource.end())
-                *(bmp->second) = wxBitmap(wxImage(resourceFile, wxBITMAP_TYPE_PNG));
+            //generic image loading
+            if (name.EndsWith(wxT(".png")))
+            {
+                if (bitmapResource.find(name) == bitmapResource.end()) //avoid duplicate entry: prevent memory leak!
+                    bitmapResource[name] = new wxBitmap(wxImage(resourceFile, wxBITMAP_TYPE_PNG));
+            }
         }
     }
 
 #ifdef FFS_WIN
+    //for compatibility it seems we need to stick with a "real" icon
     *programIcon = wxIcon(wxT("A_PROGRAM_ICON"));
 #else
-#include "RealtimeSync.xpm"
-    *programIcon = wxIcon(RealtimeSync_xpm);
+    //use big logo bitmap for better quality
+    programIcon->CopyFromBitmap(getImageByName(wxT("RealtimeSync.png")));
 #endif
 }
 
 
 const wxBitmap& GlobalResources::getImageByName(const wxString& imageName) const
 {
-    std::map<wxString, wxBitmap*>::const_iterator bmp = bitmapResource.find(imageName);
+    const std::map<wxString, wxBitmap*>::const_iterator bmp = imageName.Find(wxChar('.')) == wxNOT_FOUND ? //assume .png ending if nothing else specified
+            bitmapResource.find(imageName + wxT(".png")) :
+            bitmapResource.find(imageName);
+
     if (bmp != bitmapResource.end())
         return *bmp->second;
     else
