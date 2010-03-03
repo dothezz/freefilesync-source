@@ -1,4 +1,9 @@
-CPPFLAGS=-Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -DZSTRING_CHAR -O3 -pthread -c -I../shared/boost_1_x
+APPNAME = RealtimeSync
+
+prefix = /usr
+BINDIR = $(DESTDIR)$(prefix)/bin
+
+FFS_CPPFLAGS=-Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -DZSTRING_CHAR -O3 -pthread -c -I../shared/boost_1_x
 LINKFLAGS=`wx-config --libs --debug=no --unicode=yes` -O3 -pthread
 
 FILE_LIST=              #internal list of all *.cpp files needed for compilation
@@ -28,6 +33,7 @@ FILE_LIST+=../shared/fileHandling.cpp
 FILE_LIST+=../shared/fileTraverser.cpp
 FILE_LIST+=../shared/localization.cpp
 FILE_LIST+=../shared/standardPaths.cpp
+FILE_LIST+=../shared/helpProvider.cpp
 
 #list of all *.o files
 OBJECT_LIST=$(foreach file, $(FILE_LIST), OBJ/$(subst .cpp,.o,$(notdir $(file))))
@@ -48,10 +54,17 @@ removeBOM: ../tools/removeBOM.cpp
 
 %.dep : %.cpp 
  #strip path information
-	g++ $(CPPFLAGS) $< -o OBJ/$(subst .cpp,.o,$(notdir $<))
+	g++ $(FFS_CPPFLAGS) $< -o OBJ/$(subst .cpp,.o,$(notdir $<))
 
 RealtimeSync: init removeBOM $(DEP_LIST)
-	g++ $(LINKFLAGS) -o ../BUILD/RealtimeSync $(OBJECT_LIST)
+	g++ $(LINKFLAGS) -o ../BUILD/$(APPNAME) $(OBJECT_LIST)
 
 clean:
-	find OBJ -type f -exec rm {} \;
+	rm -rf OBJ
+	rm -f ../BUILD/$(APPNAME)
+	rm -f removeBOM
+
+install:
+	if [ ! -d $(BINDIR) ] ; then mkdir -p $(BINDIR); fi
+
+	cp ../BUILD/$(APPNAME) $(BINDIR)

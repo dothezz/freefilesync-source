@@ -1,10 +1,15 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "settingsDialog.h"
 #include "../shared/systemConstants.h"
 #include "../library/resources.h"
 #include <wx/msgdlg.h>
 #include "../shared/customButton.h"
 #include "../synchronization.h"
-//#include "../algorithm.h"
 #include "../shared/stringConv.h"
 #include "util.h"
 #include <wx/dnd.h>
@@ -13,6 +18,8 @@
 #include "../shared/xmlBase.h"
 #include <wx/wupdlock.h>
 #include "folderPair.h"
+#include "messagePopup.h"
+#include "../shared/helpProvider.h"
 
 using namespace FreeFileSync;
 
@@ -25,7 +32,7 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* window,
                              bool*              ignoreErrors) :
     SyncCfgDlgGenerated(window),
     cmpVariant(compareVar),
-    localSyncConfiguration(syncConfiguration),  //make working copy of syncConfiguration
+    currentSyncConfig(syncConfiguration),  //make working copy of syncConfiguration
     refSyncConfiguration(syncConfiguration),
     refHandleDeletion(handleDeletion),
     refCustomDeletionDirectory(customDeletionDirectory),
@@ -45,7 +52,7 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* window,
     }
 
     //set sync config icons
-    updateConfigIcons(cmpVariant, localSyncConfiguration);
+    updateConfigIcons(cmpVariant, currentSyncConfig);
 
     //set icons for this dialog
     m_bitmapLeftOnly->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("leftOnly")));
@@ -57,14 +64,14 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* window,
 
     bSizer201->Layout(); //wxButtonWithImage size might have changed
 
-    m_buttonApply->SetFocus();
+    m_buttonOK->SetFocus();
 
     Fit();
 }
 
 //#################################################################################################################
 
-SyncCfgDialog::~SyncCfgDialog() {}
+SyncCfgDialog::~SyncCfgDialog() {} //non-inline destructor for std::auto_ptr to work with forward declaration
 
 
 void SyncCfgDialog::updateConfigIcons(const FreeFileSync::CompareVariant cmpVar, const FreeFileSync::SyncConfiguration& syncConfig)
@@ -96,7 +103,7 @@ void SyncCfgDialog::updateConfigIcons(const FreeFileSync::CompareVariant cmpVar,
                       sbSizerSyncDirections);
 
     //set radiobuttons -> have no parameter-ownership at all!
-    switch (localSyncConfiguration.getVariant())
+    switch (FreeFileSync::getVariant(currentSyncConfig))
     {
     case SyncConfiguration::AUTOMATIC:
         m_radioBtnAutomatic->SetValue(true); //automatic mode
@@ -106,9 +113,6 @@ void SyncCfgDialog::updateConfigIcons(const FreeFileSync::CompareVariant cmpVar,
         break;
     case SyncConfiguration::UPDATE:
         m_radioBtnUpdate->SetValue(true);    //Update ->
-        break;
-    case SyncConfiguration::TWOWAY:
-        m_radioBtnTwoWay->SetValue(true);    //two way <->
         break;
     case SyncConfiguration::CUSTOM:
         m_radioBtnCustom->SetValue(true);    //custom
@@ -285,7 +289,7 @@ void SyncCfgDialog::OnCancel(wxCommandEvent& event)
 void SyncCfgDialog::OnApply(wxCommandEvent& event)
 {
     //write configuration to main dialog
-    refSyncConfiguration = localSyncConfiguration;
+    refSyncConfiguration = currentSyncConfig;
     refHandleDeletion    = getDeletionHandling();
     refCustomDeletionDirectory = m_textCtrlCustomDelFolder->GetValue();
     if (refIgnoreErrors)
@@ -342,15 +346,15 @@ void updateToolTipDeletionHandling(wxChoice* choiceHandleError, wxPanel* customD
     switch (value)
     {
     case FreeFileSync::DELETE_PERMANENTLY:
-        choiceHandleError->SetToolTip(_("Delete or overwrite files permanently."));
+        choiceHandleError->SetToolTip(_("Delete or overwrite files permanently"));
         break;
 
     case FreeFileSync::MOVE_TO_RECYCLE_BIN:
-        choiceHandleError->SetToolTip(_("Use Recycle Bin when deleting or overwriting files."));
+        choiceHandleError->SetToolTip(_("Use Recycle Bin when deleting or overwriting files"));
         break;
 
     case FreeFileSync::MOVE_TO_CUSTOM_DIRECTORY:
-        choiceHandleError->SetToolTip(_("Move files into a time-stamped subdirectory."));
+        choiceHandleError->SetToolTip(_("Move files into a time-stamped subdirectory"));
         customDir->Enable();
         break;
     }
@@ -406,29 +410,22 @@ void SyncCfgDialog::OnChangeDeletionHandling(wxCommandEvent& event)
 
 void SyncCfgDialog::OnSyncAutomatic(wxCommandEvent& event)
 {
-    localSyncConfiguration.setVariant(SyncConfiguration::AUTOMATIC);
-    updateConfigIcons(cmpVariant, localSyncConfiguration);
+    FreeFileSync::setVariant(currentSyncConfig, SyncConfiguration::AUTOMATIC);
+    updateConfigIcons(cmpVariant, currentSyncConfig);
 }
 
 
 void SyncCfgDialog::OnSyncLeftToRight(wxCommandEvent& event)
 {
-    localSyncConfiguration.setVariant(SyncConfiguration::MIRROR);
-    updateConfigIcons(cmpVariant, localSyncConfiguration);
+    FreeFileSync::setVariant(currentSyncConfig, SyncConfiguration::MIRROR);
+    updateConfigIcons(cmpVariant, currentSyncConfig);
 }
 
 
 void SyncCfgDialog::OnSyncUpdate(wxCommandEvent& event)
 {
-    localSyncConfiguration.setVariant(SyncConfiguration::UPDATE);
-    updateConfigIcons(cmpVariant, localSyncConfiguration);
-}
-
-
-void SyncCfgDialog::OnSyncBothSides(wxCommandEvent& event)
-{
-    localSyncConfiguration.setVariant(SyncConfiguration::TWOWAY);
-    updateConfigIcons(cmpVariant, localSyncConfiguration);
+    FreeFileSync::setVariant(currentSyncConfig, SyncConfiguration::UPDATE);
+    updateConfigIcons(cmpVariant, currentSyncConfig);
 }
 
 
@@ -449,45 +446,45 @@ void toggleSyncDirection(SyncDirection& current)
 }
 
 
-void SyncCfgDialog::OnExLeftSideOnly( wxCommandEvent& event )
+void SyncCfgDialog::OnExLeftSideOnly(wxCommandEvent& event )
 {
-    toggleSyncDirection(localSyncConfiguration.exLeftSideOnly);
-    updateConfigIcons(cmpVariant, localSyncConfiguration);
+    toggleSyncDirection(currentSyncConfig.exLeftSideOnly);
+    updateConfigIcons(cmpVariant, currentSyncConfig);
 }
 
 
-void SyncCfgDialog::OnExRightSideOnly( wxCommandEvent& event )
+void SyncCfgDialog::OnExRightSideOnly(wxCommandEvent& event )
 {
-    toggleSyncDirection(localSyncConfiguration.exRightSideOnly);
-    updateConfigIcons(cmpVariant, localSyncConfiguration);
+    toggleSyncDirection(currentSyncConfig.exRightSideOnly);
+    updateConfigIcons(cmpVariant, currentSyncConfig);
 }
 
 
-void SyncCfgDialog::OnLeftNewer( wxCommandEvent& event )
+void SyncCfgDialog::OnLeftNewer(wxCommandEvent& event )
 {
-    toggleSyncDirection(localSyncConfiguration.leftNewer);
-    updateConfigIcons(cmpVariant, localSyncConfiguration);
+    toggleSyncDirection(currentSyncConfig.leftNewer);
+    updateConfigIcons(cmpVariant, currentSyncConfig);
 }
 
 
-void SyncCfgDialog::OnRightNewer( wxCommandEvent& event )
+void SyncCfgDialog::OnRightNewer(wxCommandEvent& event )
 {
-    toggleSyncDirection(localSyncConfiguration.rightNewer);
-    updateConfigIcons(cmpVariant, localSyncConfiguration);
+    toggleSyncDirection(currentSyncConfig.rightNewer);
+    updateConfigIcons(cmpVariant, currentSyncConfig);
 }
 
 
-void SyncCfgDialog::OnDifferent( wxCommandEvent& event )
+void SyncCfgDialog::OnDifferent(wxCommandEvent& event )
 {
-    toggleSyncDirection(localSyncConfiguration.different);
-    updateConfigIcons(cmpVariant, localSyncConfiguration);
+    toggleSyncDirection(currentSyncConfig.different);
+    updateConfigIcons(cmpVariant, currentSyncConfig);
 }
 
 
 void SyncCfgDialog::OnConflict(wxCommandEvent& event)
 {
-    toggleSyncDirection(localSyncConfiguration.conflict);
-    updateConfigIcons(cmpVariant, localSyncConfiguration);
+    toggleSyncDirection(currentSyncConfig.conflict);
+    updateConfigIcons(cmpVariant, currentSyncConfig);
 }
 
 
@@ -620,9 +617,14 @@ BatchDialog::BatchDialog(wxWindow* window, const wxString& filename) :
 }
 
 
+BatchDialog::~BatchDialog() {} //non-inline destructor for std::auto_ptr to work with forward declaration
+
+
 void BatchDialog::init()
 {
     wxWindowUpdateLocker dummy(this); //avoid display distortion
+
+    m_bpButtonHelp->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("help")));
 
     //init handling of first folder pair
     firstFolderPair.reset(new FirstBatchFolderPairCfg(*this));
@@ -681,7 +683,7 @@ void BatchDialog::updateToolTipErrorHandling(const xmlAccess::OnError value)
         m_choiceHandleError->SetToolTip(_("Hide all error and warning messages"));
         break;
     case xmlAccess::ON_ERROR_EXIT:
-        m_choiceHandleError->SetToolTip(_("Exit immediately and set returncode < 0"));
+        m_choiceHandleError->SetToolTip(_("Abort synchronization immediately"));
         break;
     }
 }
@@ -693,7 +695,7 @@ void BatchDialog::setSelectionHandleError(const xmlAccess::OnError value)
     m_choiceHandleError->Append(_("Show popup"));
     m_choiceHandleError->Append(_("Ignore errors"));
     if (m_checkBoxSilent->GetValue()) //this option shall be available for silent mode only!
-        m_choiceHandleError->Append(_("Exit with RC < 0"));
+        m_choiceHandleError->Append(_("Exit instantly"));
 
     //default
     m_choiceHandleError->SetSelection(0);
@@ -814,6 +816,16 @@ void BatchDialog::OnConflict(wxCommandEvent& event)
 }
 
 
+void BatchDialog::OnHelp(wxCommandEvent& event)
+{
+#ifdef FFS_WIN
+    FreeFileSync::displayHelpEntry(wxT("html\\advanced\\ScheduleBatch.html"));
+#elif defined FFS_LINUX
+    FreeFileSync::displayHelpEntry(wxT("html/advanced/ScheduleBatch.html"));
+#endif
+}
+
+
 void BatchDialog::OnCheckFilter(wxCommandEvent& event)
 {
     updateVisibleTabs();
@@ -836,9 +848,6 @@ void BatchDialog::OnCheckAutomatic(wxCommandEvent& event)
 
     //toggle automatic setting
     localSyncConfiguration.automatic = !localSyncConfiguration.automatic;
-
-    if (localSyncConfiguration.automatic)
-        localSyncConfiguration.setVariant(SyncConfiguration::AUTOMATIC); //reset conflict-setting
 
     updateConfigIcons(getCurrentCompareVar(), localSyncConfiguration);
     Fit();

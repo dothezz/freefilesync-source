@@ -1,9 +1,9 @@
-/***************************************************************
- * Purpose:   wxButton with bitmap label
- * Author:    ZenJu (zhnmju123@gmx.de)
- * Created:   Feb. 2009
- **************************************************************/
-
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef CUSTOMBUTTON_H_INCLUDED
 #define CUSTOMBUTTON_H_INCLUDED
 

@@ -1,9 +1,9 @@
-/***************************************************************
- * Purpose:   Code for Application Class
- * Author:    ZenJu (zhnmju123@gmx.de)
- * Created:   2008-07-16
- **************************************************************/
-
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "application.h"
 #include "ui/mainDialog.h"
 #include <wx/msgdlg.h>
@@ -31,7 +31,7 @@
 using FreeFileSync::CustomLocale;
 
 
-IMPLEMENT_APP(Application);
+IMPLEMENT_APP(Application)
 
 bool Application::OnInit()
 {
@@ -70,16 +70,7 @@ void Application::OnStartApplication(wxIdleEvent&)
     SetAppName(wxT("FreeFileSync"));
 
 #ifdef FFS_LINUX
-    ::gtk_rc_parse("styles.rc"); //remove inner border from bitmap buttons
-#endif
-
-    //initialize help controller
-    helpController.reset(new wxHelpController);
-    helpController->Initialize(FreeFileSync::getInstallationDir() +
-#ifdef FFS_WIN
-                               wxT("FreeFileSync.chm"));
-#elif defined FFS_LINUX
-                               wxT("Help/FreeFileSync.hhp"));
+    ::gtk_rc_parse(FreeFileSync::wxToZ(FreeFileSync::getResourceDir()) + "styles.rc"); //remove inner border from bitmap buttons
 #endif
 
     //test if FFS is to be started on UI with config file passed as commandline parameter
@@ -111,7 +102,7 @@ void Application::OnStartApplication(wxIdleEvent&)
     }
     catch (const xmlAccess::XmlError& error)
     {
-        if (wxFileExists(FreeFileSync::getGlobalConfigFile()))
+        if (wxFileExists(xmlAccess::getGlobalConfigFile()))
         {
             //show messagebox and continue
             if (error.getSeverity() == xmlAccess::XmlError::WARNING)
@@ -167,7 +158,7 @@ int Application::OnRun()
     catch (const std::exception& e) //catch all STL exceptions
     {
         //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
-        wxFile safeOutput(FreeFileSync::getLastErrorTxtFile(), wxFile::write);
+        wxFile safeOutput(FreeFileSync::getConfigDir() + wxT("LastError.txt"), wxFile::write);
         safeOutput.Write(wxString::FromAscii(e.what()));
 
         wxMessageBox(wxString::FromAscii(e.what()), _("An exception occured!"), wxOK | wxICON_ERROR);
@@ -192,16 +183,13 @@ int Application::OnExit()
         wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
     }
 
-    //delete help provider: "Cross-Platform GUI Programming with wxWidgets" says this should be done here...
-    helpController.reset();
-
     return 0;
 }
 
 
 void Application::runGuiMode(const wxString& cfgFileName, xmlAccess::XmlGlobalSettings& settings)
 {
-    MainDialog* frame = new MainDialog(NULL, cfgFileName, settings, *helpController);
+    MainDialog* frame = new MainDialog(NULL, cfgFileName, settings);
     frame->SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
     frame->Show();
 
@@ -227,26 +215,24 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
     }
     //all settings have been read successfully...
 
-    //regular check for program updates
-    if (!batchCfg.silent)
-        FreeFileSync::checkForUpdatePeriodically(globSettings.lastUpdateCheck);
-
+    //regular check for program updates -> disabled for batch
+    //if (!batchCfg.silent)
+    //    FreeFileSync::checkForUpdatePeriodically(globSettings.lastUpdateCheck);
 
     try //begin of synchronization process (all in one try-catch block)
     {
         //class handling status updates and error messages
         std::auto_ptr<BatchStatusHandler> statusHandler;  //delete object automatically
         if (batchCfg.silent)
-            statusHandler.reset(new BatchStatusHandler(true, &batchCfg.logFileDirectory, batchCfg.handleError, returnValue));
+            statusHandler.reset(new BatchStatusHandler(true, filename, &batchCfg.logFileDirectory, batchCfg.handleError, returnValue));
         else
-            statusHandler.reset(new BatchStatusHandler(false, NULL, batchCfg.handleError, returnValue));
+            statusHandler.reset(new BatchStatusHandler(false, filename, NULL, batchCfg.handleError, returnValue));
 
         //COMPARE DIRECTORIES
         FreeFileSync::FolderComparison folderCmp;
         FreeFileSync::CompareProcess comparison(batchCfg.mainCfg.hidden.traverseDirectorySymlinks,
                                                 batchCfg.mainCfg.hidden.fileTimeTolerance,
                                                 globSettings.ignoreOneHourDiff,
-                                                globSettings.detectRenameThreshold,
                                                 globSettings.optDialogs,
                                                 statusHandler.get());
 
@@ -276,7 +262,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         synchronization.startSynchronizationProcess(syncProcessCfg, folderCmp);
 
         //play (optional) sound notification after sync has completed (GUI and batch mode)
-        const wxString soundFile = FreeFileSync::getInstallationDir() + wxT("Sync_Complete.wav");
+        const wxString soundFile = FreeFileSync::getResourceDir() + wxT("Sync_Complete.wav");
         if (FreeFileSync::fileExists(FreeFileSync::wxToZ(soundFile)))
             wxSound::Play(soundFile, wxSOUND_ASYNC);
     }

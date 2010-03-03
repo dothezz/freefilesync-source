@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef CUSTOMGRID_H_INCLUDED
 #define CUSTOMGRID_H_INCLUDED
 
@@ -67,7 +73,7 @@ public:
     enum SortDirection
     {
         ASCENDING,
-        DESCENDING,
+        DESCENDING
     };
 
     typedef std::pair<SortColumn, SortDirection> SortMarker;
@@ -111,6 +117,7 @@ class IconUpdater : private wxEvtHandler //update file icons periodically: use S
 {
 public:
     IconUpdater(CustomGridLeft* leftGrid, CustomGridRight* rightGrid);
+    ~IconUpdater(); //non-inline destructor for std::auto_ptr to work with forward declaration
 
 private:
     void loadIconsAsynchronously(wxEvent& event); //loads all (not yet) drawn icons
@@ -239,6 +246,8 @@ public:
                      const wxSize& size   = wxDefaultSize,
                      long style           = wxWANTS_CHARS,
                      const wxString& name = wxGridNameStr);
+
+    ~CustomGridMiddle(); //non-inline destructor for std::auto_ptr to work with forward declaration
 
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
 

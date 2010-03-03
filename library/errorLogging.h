@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef ERRORLOGGING_H_INCLUDED
 #define ERRORLOGGING_H_INCLUDED
 
@@ -23,20 +29,16 @@ public:
         return errorCount;
     }
 
-    const std::vector<wxString>& getFormattedMessages() const
+    typedef std::vector<wxString> MessageEntry;
+    const MessageEntry& getFormattedMessages() const
     {
         return formattedMessages;
-    }
-
-    size_t messageCount()
-    {
-        return formattedMessages.size();
     }
 
 private:
     wxString assembleMessage(const wxString& prefix, const wxString& message);
 
-    std::vector<wxString> formattedMessages; //list of non-resolved errors and warnings
+    MessageEntry formattedMessages; //list of non-resolved errors and warnings
     int errorCount;
 };
 }

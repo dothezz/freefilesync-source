@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef FOLDERPAIR_H_INCLUDED
 #define FOLDERPAIR_H_INCLUDED
 
@@ -62,7 +68,7 @@ public:
         {
             basicPanel_.m_bpButtonAltSyncCfg->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("syncConfigSmall")));
             basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(wxString(_("Select alternate synchronization settings")) +  wxT(" ") + globalFunctions::LINE_BREAK +
-                    wxT("(") + altSyncConfig->syncConfiguration.getVariantName() + wxT(")"));
+                    wxT("(") + getVariantName(altSyncConfig->syncConfiguration) + wxT(")"));
         }
         else
         {
@@ -123,21 +129,31 @@ protected:
 private:
     void OnLocalFilterCfgRemove(wxCommandEvent& event)
     {
+        const int menuId = 1234;
         contextMenu.reset(new wxMenu); //re-create context menu
-        contextMenu->Append(wxID_ANY, _("Remove local filter settings"));
+        contextMenu->Append(menuId, _("Remove local filter settings"));
         contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfgRemoveConfirm), NULL, this);
+
+        if (NameFilter(localFilter.includeFilter, localFilter.excludeFilter).isNull())
+            contextMenu->Enable(menuId, false); //disable menu item, if clicking wouldn't make sense anyway
+
         basicPanel_.PopupMenu(contextMenu.get()); //show context menu
     }
 
     void OnAltSyncCfgRemove(wxCommandEvent& event)
     {
+        const int menuId = 1234;
         contextMenu.reset(new wxMenu); //re-create context menu
-        contextMenu->Append(wxID_ANY, _("Remove alternate settings"));
+        contextMenu->Append(menuId, _("Remove alternate settings"));
         contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfgRemoveConfirm), NULL, this);
+
+        if (!altSyncConfig.get())
+            contextMenu->Enable(menuId, false); //disable menu item, if clicking wouldn't make sense anyway
+
         basicPanel_.PopupMenu(contextMenu.get()); //show context menu
     }
 
-    virtual MainConfiguration getMainConfig() const = 0;
+    virtual MainConfiguration getMainConfig()   const = 0;
     virtual wxWindow* getParentWindow() = 0;
 
     virtual void OnAltSyncCfgChange() {};
@@ -170,12 +186,11 @@ private:
     void OnLocalFilterCfg(wxCommandEvent& event)
     {
         FilterConfig localFiltTmp = localFilter;
-        FilterDlg* filterDlg = new FilterDlg(getParentWindow(),
-                                             false, //is local filter dialog
-                                             localFiltTmp.includeFilter,
-                                             localFiltTmp.excludeFilter,
-                                             getMainConfig().filterIsActive);
-        if (filterDlg->ShowModal() == FilterDlg::BUTTON_APPLY)
+
+        if (showFilterDialog(false, //is local filter dialog
+                             localFiltTmp.includeFilter,
+                             localFiltTmp.excludeFilter,
+                             getMainConfig().filterIsActive) == DefaultReturnCode::BUTTON_OKAY)
         {
             localFilter = localFiltTmp;
             refreshButtons();

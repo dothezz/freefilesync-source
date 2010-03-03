@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef FREEFILESYNC_H_INCLUDED
 #define FREEFILESYNC_H_INCLUDED
 
@@ -24,13 +30,83 @@ enum SyncDirection
 {
     SYNC_DIR_LEFT  = 0,
     SYNC_DIR_RIGHT,
-    SYNC_DIR_NONE, //NOTE: align with SyncDirectionIntern before adding anything here!
+    SYNC_DIR_NONE //NOTE: align with SyncDirectionIntern before adding anything here!
 };
 
 
-class SyncConfiguration
+enum CompareFilesResult
 {
-public:
+    FILE_LEFT_SIDE_ONLY = 0,
+    FILE_RIGHT_SIDE_ONLY,
+    FILE_LEFT_NEWER,
+    FILE_RIGHT_NEWER,
+    FILE_DIFFERENT,
+    FILE_EQUAL,
+    FILE_CONFLICT
+};
+//attention make sure these /|\  \|/ two enums match!!!
+enum CompareDirResult
+{
+    DIR_LEFT_SIDE_ONLY  = FILE_LEFT_SIDE_ONLY,
+    DIR_RIGHT_SIDE_ONLY = FILE_RIGHT_SIDE_ONLY,
+    DIR_EQUAL           = FILE_EQUAL
+};
+
+
+inline
+CompareFilesResult convertToFilesResult(CompareDirResult value)
+{
+    return static_cast<CompareFilesResult>(value);
+}
+
+
+
+wxString getDescription(CompareFilesResult cmpRes);
+wxString getSymbol(CompareFilesResult cmpRes);
+
+
+enum SyncOperation
+{
+    SO_CREATE_NEW_LEFT,
+    SO_CREATE_NEW_RIGHT,
+    SO_DELETE_LEFT,
+    SO_DELETE_RIGHT,
+    SO_OVERWRITE_LEFT,
+    SO_OVERWRITE_RIGHT,
+    SO_DO_NOTHING, //= both sides differ, but nothing will be synced
+    SO_EQUAL,      //= both sides are equal, so nothing will be synced
+    SO_UNRESOLVED_CONFLICT
+};
+
+wxString getDescription(SyncOperation op);
+wxString getSymbol(SyncOperation op);
+
+
+//Exception class used to abort the "compare" and "sync" process
+class AbortThisProcess {};
+
+
+struct SyncConfigCustom //save last used custom config settings
+{
+    SyncConfigCustom() :
+        exLeftSideOnly( SYNC_DIR_NONE),
+        exRightSideOnly(SYNC_DIR_NONE),
+        leftNewer(      SYNC_DIR_NONE),
+        rightNewer(     SYNC_DIR_NONE),
+        different(      SYNC_DIR_NONE),
+        conflict(       SYNC_DIR_NONE) {}
+
+    SyncDirection exLeftSideOnly;
+    SyncDirection exRightSideOnly;
+    SyncDirection leftNewer;
+    SyncDirection rightNewer;
+    SyncDirection different;
+    SyncDirection conflict;
+};
+
+
+struct SyncConfiguration //technical representation of sync-config: not to be edited by GUI directly!
+{
     SyncConfiguration() :
         automatic(true),
         exLeftSideOnly( SYNC_DIR_RIGHT),
@@ -40,28 +116,24 @@ public:
         different(      SYNC_DIR_NONE),
         conflict(       SYNC_DIR_NONE) {}
 
+    enum Variant
+    {
+        AUTOMATIC,
+        MIRROR,
+        UPDATE,
+        CUSTOM
+    };
+
     bool operator==(const SyncConfiguration& other) const
     {
-        return exLeftSideOnly  == other.exLeftSideOnly  &&
+        return automatic       == other.automatic       &&
+               exLeftSideOnly  == other.exLeftSideOnly  &&
                exRightSideOnly == other.exRightSideOnly &&
                leftNewer       == other.leftNewer       &&
                rightNewer      == other.rightNewer      &&
                different       == other.different       &&
                conflict        == other.conflict;
     }
-
-    //get/set default configuration variants
-    enum Variant
-    {
-        AUTOMATIC,
-        MIRROR,
-        UPDATE,
-        TWOWAY,
-        CUSTOM
-    };
-    Variant getVariant() const;
-    void setVariant(const Variant var);
-    wxString getVariantName() const;
 
     bool automatic; //use sync-database
     SyncDirection exLeftSideOnly;
@@ -71,6 +143,12 @@ public:
     SyncDirection different;
     SyncDirection conflict;
 };
+
+
+SyncConfiguration::Variant getVariant(const SyncConfiguration& syncCfg);
+void setVariant(SyncConfiguration& syncCfg, const SyncConfiguration::Variant var);
+wxString getVariantName(const SyncConfiguration& syncCfg);
+void setTwoWay(SyncConfiguration& syncCfg); //helper method used by <Automatic> mode fallback to overwrite old with newer files
 
 
 enum DeletionPolicy
@@ -104,9 +182,6 @@ struct HiddenSettings
 };
 
 
-bool recycleBinExistsWrap();
-
-
 struct AlternateSyncConfig
 {
     AlternateSyncConfig(const SyncConfiguration& syncCfg,
@@ -117,7 +192,7 @@ struct AlternateSyncConfig
         customDeletionDirectory(customDelDir) {};
 
     AlternateSyncConfig() :  //construct with default values
-        handleDeletion(FreeFileSync::recycleBinExistsWrap() ? MOVE_TO_RECYCLE_BIN : DELETE_PERMANENTLY) {} //enable if OS supports it; else user will have to activate first and then get an error message
+        handleDeletion(MOVE_TO_RECYCLE_BIN) {}
 
     //Synchronisation settings
     SyncConfiguration syncConfiguration;
@@ -198,7 +273,7 @@ struct MainConfiguration
         filterIsActive(true),
         includeFilter(DefaultStr("*")),
         excludeFilter(standardExcludeFilter()),
-        handleDeletion(FreeFileSync::recycleBinExistsWrap() ? MOVE_TO_RECYCLE_BIN : DELETE_PERMANENTLY) {} //enable if OS supports it; else user will have to activate first and then get an error message
+        handleDeletion(MOVE_TO_RECYCLE_BIN) {}
 
     FolderPairEnh firstPair; //there needs to be at least one pair!
     std::vector<FolderPairEnh> additionalPairs;
@@ -236,58 +311,6 @@ struct MainConfiguration
                customDeletionDirectory == other.customDeletionDirectory;
     }
 };
-
-
-enum CompareFilesResult
-{
-    FILE_LEFT_SIDE_ONLY = 0,
-    FILE_RIGHT_SIDE_ONLY,
-    FILE_LEFT_NEWER,
-    FILE_RIGHT_NEWER,
-    FILE_DIFFERENT,
-    FILE_EQUAL,
-    FILE_CONFLICT
-};
-//attention make sure these /|\  \|/ two enums match!!!
-enum CompareDirResult
-{
-    DIR_LEFT_SIDE_ONLY  = FILE_LEFT_SIDE_ONLY,
-    DIR_RIGHT_SIDE_ONLY = FILE_RIGHT_SIDE_ONLY,
-    DIR_EQUAL           = FILE_EQUAL
-};
-
-
-inline
-CompareFilesResult convertToFilesResult(CompareDirResult value)
-{
-    return static_cast<CompareFilesResult>(value);
-}
-
-
-
-wxString getDescription(CompareFilesResult cmpRes);
-wxString getSymbol(CompareFilesResult cmpRes);
-
-
-enum SyncOperation
-{
-    SO_CREATE_NEW_LEFT,
-    SO_CREATE_NEW_RIGHT,
-    SO_DELETE_LEFT,
-    SO_DELETE_RIGHT,
-    SO_OVERWRITE_LEFT,
-    SO_OVERWRITE_RIGHT,
-    SO_DO_NOTHING, //= both sides differ, but nothing will be synced
-    SO_EQUAL,      //= both sides are equal, so nothing will be synced
-    SO_UNRESOLVED_CONFLICT
-};
-
-wxString getDescription(SyncOperation op);
-wxString getSymbol(SyncOperation op);
-
-
-//Exception class used to abort the "compare" and "sync" process
-class AbortThisProcess {};
 }
 
 #endif // FREEFILESYNC_H_INCLUDED

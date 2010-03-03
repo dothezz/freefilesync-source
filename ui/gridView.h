@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef GRIDVIEW_H_INCLUDED
 #define GRIDVIEW_H_INCLUDED
 
@@ -99,6 +105,7 @@ public:
         SORT_BY_FILENAME,
         SORT_BY_FILESIZE,
         SORT_BY_DATE,
+        SORT_BY_EXTENSION,
         SORT_BY_CMP_RESULT,
         SORT_BY_DIRECTORY,
         SORT_BY_SYNC_DIRECTION
@@ -149,6 +156,9 @@ private:
 
     template <bool ascending, SelectedSide side>
     class SortByDate;
+
+    template <bool ascending, SelectedSide side>
+    class SortByExtension;
 
     template <bool ascending>
     class SortByCmpResult;

@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef FILEHIERARCHY_H_INCLUDED
 #define FILEHIERARCHY_H_INCLUDED
 
@@ -316,6 +322,7 @@ class FileMapping : public FileSystemObject
 public:
     template <SelectedSide side> const wxLongLong&  getLastWriteTime() const;
     template <SelectedSide side> const wxULongLong& getFileSize() const;
+    template <SelectedSide side> const Zstring getExtension() const;
     //template <SelectedSide side> const Utility::FileID& getFileID() const;
 
     virtual CompareFilesResult getCategory() const;
@@ -443,11 +450,7 @@ bool DirContainer::CmpFilename::operator()(const Zstring& a, const Zstring& b) c
 //        if (aLength != bLength)
 //            return aLength < bLength;
 
-#ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
-    return a.CmpNoCase(b) < 0;
-#elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
-    return a.Cmp(b) < 0;
-#endif
+    return a.cmpFileName(b) < 0;
 }
 
 inline
@@ -957,6 +960,20 @@ inline
 const wxULongLong& FileMapping::getFileSize<RIGHT_SIDE>() const
 {
     return dataRight.fileSize;
+}
+
+
+template <SelectedSide side>
+inline
+const Zstring FileMapping::getExtension() const
+{
+    //attention: Zstring::AfterLast() returns whole string if char not found! -> don't use
+    const Zstring& shortName = getShortName<side>();
+
+    const size_t pos = shortName.Find(DefaultChar('.'), true);
+    return pos == Zstring::npos ?
+           Zstring() :
+           Zstring(shortName.c_str() + pos + 1);
 }
 
 

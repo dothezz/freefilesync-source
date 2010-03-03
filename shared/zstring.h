@@ -1,9 +1,9 @@
-/***************************************************************
- * Purpose:   High performance string class
- * Author:    ZenJu (zhnmju123@gmx.de)
- * Created:   Jan. 2009
- **************************************************************/
-
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef ZSTRING_H_INCLUDED
 #define ZSTRING_H_INCLUDED
 
@@ -41,6 +41,10 @@ public:
 
     operator const DefaultChar*() const;               //implicit conversion to C string
 
+    //Compare filenames: Windows does NOT distinguish between upper/lower-case, while Linux DOES
+    int cmpFileName(const Zstring& other) const;
+    int cmpFileName(const DefaultChar* other) const;
+
     //wxWidgets-like functions
     bool StartsWith(const DefaultChar* begin) const;
     bool StartsWith(DefaultChar begin) const;
@@ -50,12 +54,9 @@ public:
     bool EndsWith(const Zstring& end) const;
     Zstring& Truncate(size_t newLen);
 #ifdef FFS_WIN
-    int CmpNoCase(const DefaultChar* other) const;
-    int CmpNoCase(const Zstring& other) const;
     Zstring& MakeUpper();
 #endif
-    int Cmp(const DefaultChar* other) const;
-    int Cmp(const Zstring& other) const;
+
     Zstring& Replace(const DefaultChar* old, const DefaultChar* replacement, bool replaceAll = true);
     Zstring AfterLast(  DefaultChar ch) const;  //returns the whole string if ch not found
     Zstring BeforeLast( DefaultChar ch) const;  //returns empty string if ch not found
@@ -83,6 +84,7 @@ public:
     size_t size() const;
     void reserve(size_t minCapacity);
     Zstring& assign(const DefaultChar* source, size_t len);
+    void resize(size_t newSize, DefaultChar fillChar = 0 );
 
     Zstring& operator=(const Zstring& source);
     Zstring& operator=(const DefaultChar* source);
@@ -194,7 +196,7 @@ inline
 bool defaultIsWhiteSpace(const char ch)
 {
     // some compilers (e.g. VC++ 6.0) return true for a call to isspace('\xEA') => exclude char(128) to char(255)
-    return (static_cast<unsigned char>(ch) < 128) && isspace((unsigned char)ch) != 0;
+    return (static_cast<unsigned char>(ch) < 128) && isspace(static_cast<unsigned char>(ch)) != 0;
 }
 
 //inline
@@ -560,20 +562,6 @@ size_t Zstring::find(const DefaultChar ch, const size_t pos) const
 
 
 inline
-int Zstring::Cmp(const DefaultChar* other) const
-{
-    return compare(other);
-}
-
-
-inline
-int Zstring::Cmp(const Zstring& other) const
-{
-    return defaultCompare(c_str(), other.c_str()); //overload using strcmp(char*, char*) should be fastest!
-}
-
-
-inline
 bool Zstring::operator == (const Zstring& other) const
 {
     return length() != other.length() ? false : defaultCompare(c_str(), other.c_str()) == 0;
@@ -705,6 +693,39 @@ inline
 const Zstring Zstring::operator+(const DefaultChar ch) const
 {
     return Zstring(*this)+=ch;
+}
+
+
+inline
+void Zstring::resize(size_t newSize, DefaultChar fillChar)
+{
+    const size_t oldSize = length();
+    if (oldSize < newSize)
+    {
+        reserve(newSize);    //make unshared and ensure capacity
+
+        //fill up...
+        DefaultChar* strPtr = data() + oldSize;
+        const DefaultChar* const strEnd   = data() + newSize;
+        while (strPtr != strEnd)
+        {
+            *strPtr = fillChar;
+            ++strPtr;
+        }
+
+        data()[newSize] = 0;
+        descr->length = newSize;
+    }
+    else if (oldSize > newSize)
+    {
+        if (descr->refCount > 1)
+            *this = Zstring(c_str(), newSize); //no need to reserve() and copy the old string completely!
+        else //overwrite this string
+        {
+            data()[newSize] = 0;
+            descr->length  = newSize;
+        }
+    }
 }
 
 

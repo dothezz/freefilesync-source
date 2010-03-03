@@ -40,26 +40,26 @@ souborů: %x;
 &O Programu...
 &Advanced
 &Upřesnit
-&Apply
-&Použít
 &Cancel
 &Zrušit
 &Check for new version
 Zkontrolovat &aktualizace
 &Content
 &Obsah
-&Create batch job
-&Vytvořit dávku
+&Create batch job...
+&Vytvořit dávku...
 &Default
 &Předdefinované
 &Exit
 &Konec
-&Export file list
-&Exportovat seznam souborů
+&Export file list...
+&Exportovat seznam souborů...
 &File
 &Soubor
-&Global settings
-&Nastavení
+&Find next
+&Najít další
+&Global settings...
+&Nastavení...
 &Help
 &Pomoc
 &Ignore
@@ -68,8 +68,8 @@ Zkontrolovat &aktualizace
 &Jazyk
 &Load
 &Načíst
-&Load configuration
-&Načíst konfiguraci
+&Load configuration...
+&Načíst konfiguraci...
 &New
 &Nový
 &No
@@ -160,6 +160,8 @@ A newer version of FreeFileSync is available:
 je dostupná novější verze FreeFileSync:
 Abort requested: Waiting for current operation to finish...
 Požadavek na přerušení: Čekání na ukončení aktuální operace...
+Abort synchronization immediately
+Přerušit synchronizaci ihned
 Aborted
 Přerušeno
 About
@@ -202,14 +204,12 @@ Browse
 Procházet
 Build:
 Build:
-Cancel
-Zrušit
 Cannot determine sync-direction:
 Nelze určit směr synchronizace:
+Cannot find %x
+Nelze najít %x
 Category
 Kategorie
-Change direction
-Změnit akci
 Comma separated list
 Text oddělený čárkami
 Command line
@@ -274,8 +274,8 @@ Copy locked files
 Kopírovat zamčené soubory
 Copy new or updated files to right folder.
 Kopírovat nové nebo aktualizované soubory do adresáře vpravo.
-Copy shared or locked files using Volume Shadow Copy Service.
-Kopírovat sdílené nebo zamčené soubory pomocí Volume Shadow Copy Service.
+Copy shared or locked files using Volume Shadow Copy Service
+Kopírovat sdílené nebo zamčené soubory pomocí Volume Shadow Copy Service
 Copy to clipboard\tCTRL+C
 Vložit do schránky\tCTRL+C
 Copying file %x to %y
@@ -308,6 +308,8 @@ DECISION TREE
 ROZHODOVÁNÍ
 Data remaining:
 Zbývá dat:
+Data transferred:
+Přeneseno dat:
 Data verification error: Source and target file have different content!
 Chyba verifikace dat: Zdrojový a cílový soubor mají rozdílný obsah!
 Date
@@ -326,8 +328,8 @@ Delete on both sides
 Smazat z obou stran
 Delete on both sides even if the file is selected on one side only
 Smazat na obou stranách i když je soubor vybrán pouze na jedné z nich
-Delete or overwrite files permanently.
-Smazat nebo přepsat soubory trvale.
+Delete or overwrite files permanently
+Smazat nebo přepsat soubory trvale
 Delete permanently
 Odstranit trvale
 Deleting file %x
@@ -376,6 +378,8 @@ Error copying file:
 Chyba kopírování souboru:
 Error copying locked file %x!
 Chyba kopírování zamčeného souboru %x!
+Error copying symbolic link:
+Chyba kopírování zástupce:
 Error creating directory:
 Chyba vytvoření adresáře:
 Error deleting directory:
@@ -402,8 +406,6 @@ Error reading file:
 Chyba čtení souboru:
 Error reading from synchronization database:
 Chyba čtení synchronizační databáze:
-Error resolving full path name:
-Chyba názvu plné cesty:
 Error resolving symbolic link:
 Chyba odkazu zástupce:
 Error starting Volume Shadow Copy Service!
@@ -428,10 +430,10 @@ Exclude temporarily
 Vynechat dočasně
 Exclude via filter:
 Vynechat pomocí filtru:
-Exit immediately and set returncode < 0
-Ukončit okamžitě a nastavit návratový kód < 0
-Exit with RC < 0
-Ukončit s RC < 0
+Exit instantly
+Ukončit ihned
+Extension
+Přípona
 External applications
 Externí aplikace
 Fatal Error
@@ -456,10 +458,10 @@ Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to de
 Soubory %x se liší o méně než 1 hodinu.\n\nnení možné bezpečně rozhodnout, který z nich je novější kvůli používání Letního času.
 Files %x have the same date but a different size!
 Soubory %x mají stejné datum a čas ale rozdílnou velikost!
-Files are found equal if\n     - file content\nis the same.
-Soubory jsou shodné jestliže\n     - obsah souboru\nje stejný.
-Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
-Soubory jsou shodné jestliže\n     - velikost souboru\n     - datum i čas poslední změny\njsou stejné.
+Files are found equal if\n     - file content\nis the same
+Soubory jsou shodné jestliže\n     - obsah souboru\nje stejný
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same
+Soubory jsou shodné jestliže\n     - velikost souboru\n     - datum i čas poslední změny\njsou stejné
 Files remaining:
 Zbývá souborů:
 Files that are equal on both sides
@@ -472,6 +474,8 @@ Files that exist on both sides, right one is newer
 Soubory, které existují na obou stranách, z nichž vpravo je novější
 Files/folders found:
 Nalezené soubory/adresáře:
+Files/folders processed:
+Zpracované soubory/adresáře:
 Files/folders remaining:
 Zbývá souborů/adresářů:
 Files/folders that exist on left side only
@@ -490,6 +494,10 @@ Filter view
 Filtrovat seznam
 Filtering is deactivated
 Filtr je vypnut
+Find
+Najít
+Find what:
+Najít:
 Folder Comparison and Synchronization
 Porovnání a Synchronizace adresářů
 Free disk space available:
@@ -592,6 +600,8 @@ Initial synchronization:
 Prvotní synchronizace:
 Integrate external applications into context menu. The following macros are available:
 Integrace externí aplikace do kontextového menu. K dispozici jsou následující makra:
+Last synchronization not completed!
+Poslední synchronizace nebyla dokončena!
 Leave as unresolved conflict
 Ponechat jako nevyřešený konflikt
 Left
@@ -610,6 +620,8 @@ Logging
 Zaznamenávání
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Vytváření stínových kopíí na WOW64 není podporováno. Prosím použijte 64 bitovou verzi FreeFileSync.
+Match case
+Rozlišovat malá a velká písmena
 Mirror ->>
 Zrcadlení ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -622,8 +634,8 @@ Move column down
 Přesunout sloupec dolů
 Move column up
 Přesunout sloupec nahoru
-Move files into a time-stamped subdirectory.
-Přesunout soubory do časově označeného podadresáře.
+Move files into a time-stamped subdirectory
+Přesunout soubory do časově označeného podadresáře
 Moving %x to Recycle Bin
 Přesouvání %x do Koše.
 Moving file %x to user-defined directory %y
@@ -646,8 +658,10 @@ Number of files and directories that will be deleted
 Počet souborů a adresářů ke smazání
 Number of files that will be overwritten
 Počet souborů a adresářů k přepsání
-OK
-OK
+One of the FreeFileSync database entries within the following file is not yet existing:
+Některá z položek databáze FreeFileSync k následujícímu souboru ještě neexistuje:
+One of the FreeFileSync database files is not yet existing:
+Některý z databázových souborů FreeFileSync neexistuje:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Pouze soubory/adresáře odpovídající nastavenému filtru budou vybrány pro synchronizaci. Filtr je aplikován relativně(!) k cestě synchronizovaných adresářů.
 Open directly
@@ -682,6 +696,8 @@ RealtimeSync - Automated Synchronization
 RealtimeSync - Automatická synchronizace
 RealtimeSync configuration
 Konfigurace RealtimeSync
+Recycle Bin not yet supported for this system!
+
 Relative path
 Relativní cesta
 Remove alternate settings
@@ -702,8 +718,8 @@ Right
 Pravý
 Run minimized and write status information to a logfile
 Spustit minimalizovaný a zapisovat informace do souboru
-S&ave configuration
-&Uložení konfigurace
+S&ave configuration...
+&Uložení konfigurace...
 S&witch view
 &Změnit zobrazení
 Save changes to current configuration?
@@ -722,12 +738,12 @@ Select logfile directory:
 Vyberte adresář pro záznamy:
 Select variant:
 Vyberte variantu:
-Setting default synchronization directions. Please check whether they are appropriate for you.
-Nastaven výchozí způsob synchronizace. Prosím zkontrolujte, zda odpovídá Vašim požadavkům.
+Set direction:
+Nastavit asresář:
+Setting default synchronization directions: Old files will be overwritten by newer files.
+Nastaven výchozí způsob synchronizace: Staré soubory budou nahrazeny novými.
 Show conflicts
 Zobrazit konflikty
-Show file icons
-Zobrazit ikony souborů
 Show files that are different
 Zobrazit rozdílené soubory
 Show files that are equal
@@ -796,10 +812,8 @@ Synchronization status
 Stav synchronizace
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Synchronizovat všechny soubory .doc, .zip a .exe s výjimkou všeho v podadresáři \"temp\"
-Synchronize both sides simultaneously: Copy new or updated files in both directions.
-Synchronizovat obě strany zároveň: Kopírovat nové nebo aktualizované soubory z obou adresářů.
-Synchronize both sides using a database. Deletions are detected automatically.
-Synchronizovat obě strany pomocí databáze. Mazání je určeno automaticky.
+Synchronize both sides using a database. Deletions are detected automatically
+Synchronizovat obě strany pomocí databáze. Mazání je určeno automaticky
 Synchronize...
 Synchronizace...
 Synchronizing...
@@ -810,14 +824,10 @@ Target directory already existing!
 Cílový adresář již existuje!
 Target file already existing!
 Cílový soubor již existuje!
-The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
-Příkazová řádka je spuštěna pokaždé když:\n- dojde ke změně souborů v adresáři (nebo podadresářích)\n- je připojen odpovídající disk (vložením USB disku)
-The database file is not yet existing, but will be created during synchronization:
-Databáze ještě neexistuje, ale bude během synchronizace vytvořena:
+The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+Příkazová řádka je spuštěna pokaždé když:\n- je k dispozici daný adresář (např. vložením USB disku)\n- dojde ke změně souborů v adresáři nebo podadresářích
 The file does not contain a valid configuration:
 Soubor neobsahuje platnou konfiguraci:
-The required database entry is not yet existing, but will be created during synchronization:
-Požadovaný záznam v databázi ještě neexistuje, ale bude během synchronizace vztvořen:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Tato varianta vyhodnotí dva stejně pojmenované soubory jako shodné pokud mají i stejnou velikost A ZÁROVEŇ i datum a čas poslední změny.
 Time
@@ -832,28 +842,22 @@ Total required free disk space:
 Požadované volné místo na disku:
 Total time:
 Celkový čas:
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
-Považovat čas souboru lišící se přesně o +/- 1 hodinu jako shodný, méně než 1 hodinu jako konflikt, kvůli zpracování a přechodům na Letní čas.
-Two way <->
-Obousměrná <->
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
+Považovat čas souboru lišící se přesně o +/- 1 hodinu jako shodný, méně než 1 hodinu jako konflikt, kvůli zpracování a přechodům na Letní čas
 Unable to connect to sourceforge.net!
 Není možné se připojit k sourceforge.net!
 Unable to create logfile!
 není možné vytvořit záznamový soubor!
-Unable to initialize Recycle Bin!
-Není možné použít Koš!
 Unresolved conflicts existing!
 Nevyřešené konflikty!
-Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
-Nevyřešené konflikty! \n\nJe možné konflikt ignorovat a pokračovat v synchronizaci.
 Update ->
 Aktualizuj ->
 Usage:
 Použití:
 Use Recycle Bin
 Použít Koš
-Use Recycle Bin when deleting or overwriting files.
-Použít Koš při mazání nebo přepisu souborů.
+Use Recycle Bin when deleting or overwriting files
+Použít Koš při mazání nebo přepisu souborů
 User-defined directory
 Uživatelsky definovaný adresář
 User-defined directory for deletion was not specified!
@@ -874,8 +878,6 @@ You can ignore conflicts and continue synchronization.
 Je možné konflikt ignorovat a pokračovat v synchronizaci.
 You can ignore the error to consider not existing directories as empty.
 Pro považování neexistujících adresářů jako prázdných můžete chybu ignorovat.
-You can ignore the error to skip current folder pair.
-Pro přeskočení aktuálního páru adresářů můžete chybu ignorovat.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Můžete se pokusit synchronizovat zbývající položky (BEZ nutnosti znovuporovnávání)!
 different

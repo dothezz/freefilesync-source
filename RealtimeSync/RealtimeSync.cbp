@@ -132,6 +132,7 @@
 		<Unit filename="..\shared\fileTraverser.cpp" />
 		<Unit filename="..\shared\globalFunctions.cpp" />
 		<Unit filename="..\shared\globalFunctions.h" />
+		<Unit filename="..\shared\helpProvider.cpp" />
 		<Unit filename="..\shared\localization.cpp" />
 		<Unit filename="..\shared\localization.h" />
 		<Unit filename="..\shared\longPathPrefix.cpp" />

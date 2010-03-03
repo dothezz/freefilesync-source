@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef ICONBUFFER_H_INCLUDED
 #define ICONBUFFER_H_INCLUDED
 
@@ -8,25 +14,21 @@ header should be used in the windows build only!
 #include <vector>
 #include "../shared/zstring.h"
 #include <memory>
+#include <boost/shared_ptr.hpp>
 
 class wxCriticalSection;
-class WorkerThread;
-class IconDB;
-class IconDbSequence;
 class wxIcon;
 
 
 namespace FreeFileSync
 {
+
 class IconBuffer
 {
-    friend class ::WorkerThread;
-
 public:
-    static IconBuffer& getInstance();
-
     static const wxIcon& getDirectoryIcon(); //one folder icon should be sufficient...
 
+    static IconBuffer& getInstance();
     bool requestFileIcon(const Zstring& fileName, wxIcon* icon = NULL); //returns false if icon is not in buffer
     void setWorkload(const std::vector<Zstring>& load); //(re-)set new workload of icons to be retrieved;
 
@@ -37,15 +39,23 @@ private:
     IconBuffer();
     ~IconBuffer();
 
+    class WorkerThread;
+    friend class WorkerThread;
+
+    class IconDB;
+    class IconHolder;
+    class IconDbSequence;
+    typedef boost::shared_ptr<IconHolder> CountedIconPtr;
+
+
     //methods used by worker thread
-    void insertIntoBuffer(const DefaultChar* entryName, const wxIcon& icon);
+    void insertIntoBuffer(const DefaultChar* entryName, IconHolder& icon); //icon is invalidated by this call!!
 
 //---------------------- Shared Data -------------------------
     std::auto_ptr<wxCriticalSection> lockIconDB;
     std::auto_ptr<IconDB> buffer;  //use synchronisation when accessing this!
+    std::auto_ptr<IconDbSequence> bufSequence; //save sequence of buffer entry to delete oldest elements (implicitly shared by sharing Zstring with IconDB!!!)
 //------------------------------------------------------------
-
-    std::auto_ptr<IconDbSequence> bufSequence; //save sequence of buffer entry to delte olderst elements
 
     std::auto_ptr<WorkerThread> worker;
 };

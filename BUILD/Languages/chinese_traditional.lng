@@ -40,26 +40,26 @@
 關於(&A)...
 &Advanced
 進階(&A)
-&Apply
-套用(&Y)
 &Cancel
 取消(&C)
 &Check for new version
 檢查更新(&C)
 &Content
 內容
-&Create batch job
-新建批次處理作業(&C)
+&Create batch job...
+新建批次處理作業(&C)...
 &Default
 預設(&D)
 &Exit
 結束(&E)
-&Export file list
-匯出檔案清單(&E)
+&Export file list...
+匯出檔案清單(&E)...
 &File
 檔案(&F)
-&Global settings
-整體設定(&G)
+&Find next
+找下一個(&F)
+&Global settings...
+整體設定(&G)...
 &Help
 說明(&H)
 &Ignore
@@ -68,8 +68,8 @@
 語言(&L)
 &Load
 載入(&L)
-&Load configuration
-載入配置(&L)
+&Load configuration...
+載入配置(&L)...
 &New
 新增專案(&N)
 &No
@@ -160,6 +160,8 @@ A newer version of FreeFileSync is available:
 有較新版本的 FreeFileSync 可用：
 Abort requested: Waiting for current operation to finish...
 中止請求：正在等待目前操作完成...
+Abort synchronization immediately
+立即中止同步
 Aborted
 已中止
 About
@@ -202,14 +204,12 @@ Browse
 瀏覽
 Build:
 建立：
-Cancel
-取消
 Cannot determine sync-direction:
 無法判斷同步方向：
+Cannot find %x
+找不到 %x
 Category
 分類
-Change direction
-改變方向
 Comma separated list
 逗號分隔清單
 Command line
@@ -274,8 +274,8 @@ Copy locked files
 複製被鎖定的檔案
 Copy new or updated files to right folder.
 將新的或更新過的檔案複製到右邊的資料夾中。
-Copy shared or locked files using Volume Shadow Copy Service.
-使用卷影複製服務來複製共享或鎖定的檔案。
+Copy shared or locked files using Volume Shadow Copy Service
+使用卷影複製服務來複製共享或鎖定的檔案
 Copy to clipboard\tCTRL+C
 複製到剪貼簿\tCTRL+C
 Copying file %x to %y
@@ -308,6 +308,8 @@ DECISION TREE
 決策樹
 Data remaining:
 剩餘資料：
+Data transferred:
+已傳輸資料：
 Data verification error: Source and target file have different content!
 資料驗證錯誤：來源和目的檔案內容不同！
 Date
@@ -326,8 +328,8 @@ Delete on both sides
 兩邊都刪除
 Delete on both sides even if the file is selected on one side only
 即使只在一邊中選好檔案，還是刪除兩邊檔案。
-Delete or overwrite files permanently.
-永久刪除或覆蓋檔案。
+Delete or overwrite files permanently
+永久刪除或覆蓋檔案
 Delete permanently
 永久刪除
 Deleting file %x
@@ -376,6 +378,8 @@ Error copying file:
 複製檔案錯誤：
 Error copying locked file %x!
 複製已鎖定檔案錯誤 %x！
+Error copying symbolic link:
+複製符號連結錯誤：
 Error creating directory:
 新建目錄錯誤：
 Error deleting directory:
@@ -402,8 +406,6 @@ Error reading file:
 讀取檔案錯誤：
 Error reading from synchronization database:
 讀取同步資料庫錯誤：
-Error resolving full path name:
-完整路徑名稱解析錯誤：
 Error resolving symbolic link:
 解决符號連結錯誤：
 Error starting Volume Shadow Copy Service!
@@ -428,10 +430,10 @@ Exclude temporarily
 暫時排除
 Exclude via filter:
 使用篩選器排除：
-Exit immediately and set returncode < 0
-立即結束，並設定返回碼 <0
-Exit with RC < 0
-結束並設定返回碼 <0
+Exit instantly
+立即退出
+Extension
+擴展
 External applications
 外部應用程式
 Fatal Error
@@ -456,10 +458,10 @@ Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to de
 檔案 %x 有一個檔案時差在1小時內！\n\n這不是安全的決定，其中之一是由於新的日光節約時間的問題。
 Files %x have the same date but a different size!
 檔案 %x 日期相同但大小不同！
-Files are found equal if\n     - file content\nis the same.
-如果檔案内容相同則判斷兩者相同。
-Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
-如果檔案大小和最後修改時間和日期相同則判斷兩者相同。
+Files are found equal if\n     - file content\nis the same
+如果檔案内容相同則判斷兩者相同
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same
+如果檔案大小和最後修改時間和日期相同則判斷兩者相同
 Files remaining:
 剩餘檔案：
 Files that are equal on both sides
@@ -472,6 +474,8 @@ Files that exist on both sides, right one is newer
 檔案存在於兩邊，右邊檔案較新
 Files/folders found:
 找到的檔案/資料夾：
+Files/folders processed:
+已處理的檔案/資料夾：
 Files/folders remaining:
 剩餘的檔案/資料夾：
 Files/folders that exist on left side only
@@ -490,6 +494,10 @@ Filter view
 篩選檢視
 Filtering is deactivated
 篩選已停用
+Find
+尋找
+Find what:
+尋找內容：
 Folder Comparison and Synchronization
 資料夾比對和同步
 Free disk space available:
@@ -592,6 +600,8 @@ Initial synchronization:
 初始化同步：
 Integrate external applications into context menu. The following macros are available:
 整合上下文功能表中的外部應用程式。可以使用下面的巨集：
+Last synchronization not completed!
+最後一次同步未完成！
 Leave as unresolved conflict
 保留給未解決的衝突
 Left
@@ -610,6 +620,8 @@ Logging
 日誌記錄
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 不支援製作 WOW64 上的卷影副本。請使用 FreeFileSync 64位元版本。
+Match case
+區分大小寫
 Mirror ->>
 鏡像 ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -622,8 +634,8 @@ Move column down
 下移一行
 Move column up
 上移一行
-Move files into a time-stamped subdirectory.
-移動檔案到一個時間標記的子目錄。
+Move files into a time-stamped subdirectory
+移動檔案到一個時間標記的子目錄
 Moving %x to Recycle Bin
 移動 %x 到資源回收筒
 Moving file %x to user-defined directory %y
@@ -646,8 +658,10 @@ Number of files and directories that will be deleted
 一些檔案和目錄將被刪除
 Number of files that will be overwritten
 一些檔案和目錄將被覆蓋
-OK
-確定
+One of the FreeFileSync database entries within the following file is not yet existing:
+以下數據庫條目的其中一個 FreeFileSync 檔案不存在：
+One of the FreeFileSync database files is not yet existing:
+其中一個 FreeFileSync 資料庫檔案不存在：
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 只有被選中篩選的檔案/目錄會進行同步。篩選器將套用到基本同步目錄的相對名稱。
 Open directly
@@ -682,6 +696,8 @@ RealtimeSync - Automated Synchronization
 即時同步 - 自動同步
 RealtimeSync configuration
 即時同步配置
+Recycle Bin not yet supported for this system!
+
 Relative path
 相對路徑
 Remove alternate settings
@@ -702,8 +718,8 @@ Right
 右邊
 Run minimized and write status information to a logfile
 執行最小化和狀態資訊寫入到日誌檔
-S&ave configuration
-儲存配置(&A)
+S&ave configuration...
+儲存配置(&A)...
 S&witch view
 切換檢視(&W)
 Save changes to current configuration?
@@ -722,12 +738,12 @@ Select logfile directory:
 選擇日誌檔目錄：
 Select variant:
 選擇變數：
-Setting default synchronization directions. Please check whether they are appropriate for you.
-設定預設同步方向。請檢查這些設定是否適合於你。
+Set direction:
+設定方向：
+Setting default synchronization directions: Old files will be overwritten by newer files.
+設定預設同步方向：舊檔案會被較新的檔案覆蓋。
 Show conflicts
 顯示衝突
-Show file icons
-顯示檔案圖示
 Show files that are different
 顯示不同的檔案
 Show files that are equal
@@ -796,10 +812,8 @@ Synchronization status
 同步狀態
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 同步所有 .doc, .zip 和 .exe 檔案，除了\"temp\"中的一切。
-Synchronize both sides simultaneously: Copy new or updated files in both directions.
-同時雙向同步：雙向複製新的或已更新的檔案。
-Synchronize both sides using a database. Deletions are detected automatically.
-雙向同步使用一個資料庫。自動檢測要刪除的檔案。
+Synchronize both sides using a database. Deletions are detected automatically
+雙向同步使用一個資料庫。自動檢測要刪除的檔案
 Synchronize...
 同步...
 Synchronizing...
@@ -810,14 +824,10 @@ Target directory already existing!
 目標目錄已存在！
 Target file already existing!
 目標檔案已存在！
-The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
-命令行每次執行時：\n- 檔案在這些目錄(或子目錄)會被修改\n- 可供使用相應的磁碟機代號(USB插入)
-The database file is not yet existing, but will be created during synchronization:
-資料庫檔未存在，但會在同步過程中新建：
+The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+命令列每次執行：\n- 可用的目錄（例如插入USB隨身碟）\n- 檔案在這些目錄或子目錄會被修改
 The file does not contain a valid configuration:
 該檔案不包含有效的配置：
-The required database entry is not yet existing, but will be created during synchronization:
-所需的資料庫條目未存在，但會在同步過程中新建：
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 此變數計算結果為兩個檔名相同的檔案，只有當他們的檔案大小和最後修改日期時間也相同，才會判斷他們是相同的檔案。
 Time
@@ -832,28 +842,22 @@ Total required free disk space:
 全部所需要的可用磁碟空間：
 Total time:
 全部時間：
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
-對檔案時差在精確的+/-1小時的檔案判斷視為相同的，以小於1小時作為衝突，是為了處理日光節約時間的變化。
-Two way <->
-雙向 <->
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
+對檔案時差在精確的+/-1小時的檔案判斷視為相同的，以小於1小時作為衝突，是為了處理日光節約時間的變化
 Unable to connect to sourceforge.net!
 無法連接到 sourceforge.net！
 Unable to create logfile!
 無法新建日誌檔！
-Unable to initialize Recycle Bin!
-無法初始化資源回收筒！
 Unresolved conflicts existing!
 存在未解決的衝突！
-Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
-存在未解決的衝突！\n\n你可以忽略衝突，並繼續同步。
 Update ->
 更新 ->
 Usage:
 使用量：
 Use Recycle Bin
 使用資源回收筒
-Use Recycle Bin when deleting or overwriting files.
-當刪除或覆蓋檔案時使用資源回收筒。
+Use Recycle Bin when deleting or overwriting files
+當刪除或覆蓋檔案時使用資源回收筒
 User-defined directory
 自定義目錄
 User-defined directory for deletion was not specified!
@@ -874,8 +878,6 @@ You can ignore conflicts and continue synchronization.
 你可以忽略衝突，並繼續同步。
 You can ignore the error to consider not existing directories as empty.
 你可以忽略該錯誤而將不存在的目錄視為空目錄。
-You can ignore the error to skip current folder pair.
-您可以忽略跳過目前兩個資料夾的錯誤。
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 您可能會嘗試再次同步剩餘項目(不用重新比對)！
 different

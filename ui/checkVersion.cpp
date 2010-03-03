@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "checkVersion.h"
 #include <wx/msgdlg.h>
 #include <wx/protocol/http.h>
@@ -6,7 +12,9 @@
 #include <wx/utils.h>
 #include <wx/timer.h>
 #include "../shared/globalFunctions.h"
-#include "smallDialogs.h"
+//#include "smallDialogs.h"
+#include "messagePopup.h"
+#include "../shared/standardPaths.h"
 
 
 class CloseConnectionOnExit
@@ -108,6 +116,11 @@ void FreeFileSync::checkForUpdateNow()
 
 void FreeFileSync::checkForUpdatePeriodically(long& lastUpdateCheck)
 {
+#ifdef FFS_LINUX
+    if (!FreeFileSync::isPortableVersion()) //don't check for updates in installer version -> else: handled by .deb
+        return;
+#endif
+
     if (lastUpdateCheck != -1)
     {
         if (lastUpdateCheck == 0)
@@ -120,7 +133,7 @@ void FreeFileSync::checkForUpdatePeriodically(long& lastUpdateCheck)
             const bool checkRegularly = messageDlg->ShowModal() == QuestionDlg::BUTTON_YES;
             messageDlg->Destroy();
             if (checkRegularly)
-             {
+            {
                 lastUpdateCheck = 123; //some old date (few seconds after 1970)
 
                 checkForUpdatePeriodically(lastUpdateCheck); //check for updates now

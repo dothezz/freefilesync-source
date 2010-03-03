@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "zstring.h"
 #include <stdexcept>
 
@@ -91,9 +97,9 @@ int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size
     {
         const int rv = (*ordinalCompare)(
                            a,  	      //pointer to first string
-                           sizeA,	  //size, in bytes or characters, of first string
+                           static_cast<int>(sizeA),	  //size, in bytes or characters, of first string
                            b,	      //pointer to second string
-                           sizeB,     //size, in bytes or characters, of second string
+                           static_cast<int>(sizeB),     //size, in bytes or characters, of second string
                            true); 	  //ignore case
         if (rv == 0)
             throw std::runtime_error("Error comparing strings (ordinal)!");
@@ -102,13 +108,13 @@ int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size
     }
     else //fallback
     {
-//do NOT use "CompareString"; this function is NOT accurate (even with LOCALE_INVARIANT and SORT_STRINGSORT): for example "weiß" == "weiss"!!!
+//do NOT use "CompareString"; this function is NOT accurate (even with LOCALE_INVARIANT and SORT_STRINGSORT): for example "weiï¿½" == "weiss"!!!
 //the only reliable way to compare filenames (with XP) is to call "CharUpper" or "LCMapString":
 
         const size_t minSize = std::min(sizeA, sizeB);
 
         if (minSize == 0) //LCMapString does not allow input sizes of 0!
-            return sizeA - sizeB;
+            return static_cast<int>(sizeA - sizeB);
 
         int rv = 0; //always initialize...
         if (minSize <= 5000) //performance optimization: stack
@@ -120,13 +126,13 @@ int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size
                         invariantLocale,  //__in   LCID Locale,
                         LCMAP_UPPERCASE,  //__in   DWORD dwMapFlags,
                         a,                //__in   LPCTSTR lpSrcStr,
-                        minSize,          //__in   int cchSrc,
+                        static_cast<int>(minSize), //__in   int cchSrc,
                         bufferA,          //__out  LPTSTR lpDestStr,
                         5000              //__in   int cchDest
                     ) == 0)
                 throw std::runtime_error("Error comparing strings! (LCMapString)");
 
-            if (::LCMapString(invariantLocale, LCMAP_UPPERCASE, b, minSize, bufferB, 5000) == 0)
+            if (::LCMapString(invariantLocale, LCMAP_UPPERCASE, b, static_cast<int>(minSize), bufferB, 5000) == 0)
                 throw std::runtime_error("Error comparing strings! (LCMapString)");
 
             rv = ::wmemcmp(bufferA, bufferB, minSize);
@@ -136,17 +142,17 @@ int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size
             boost::scoped_array<wchar_t> bufferA(new wchar_t[minSize]);
             boost::scoped_array<wchar_t> bufferB(new wchar_t[minSize]);
 
-            if (::LCMapString(invariantLocale, LCMAP_UPPERCASE, a, minSize, bufferA.get(), minSize) == 0)
+            if (::LCMapString(invariantLocale, LCMAP_UPPERCASE, a, static_cast<int>(minSize), bufferA.get(), static_cast<int>(minSize)) == 0)
                 throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
 
-            if (::LCMapString(invariantLocale, LCMAP_UPPERCASE, b, minSize, bufferB.get(), minSize) == 0)
+            if (::LCMapString(invariantLocale, LCMAP_UPPERCASE, b, static_cast<int>(minSize), bufferB.get(), static_cast<int>(minSize)) == 0)
                 throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
 
             rv = ::wmemcmp(bufferA.get(), bufferB.get(), minSize);
         }
 
         return rv == 0 ?
-               sizeA - sizeB :
+               static_cast<int>(sizeA - sizeB) :
                rv;
     }
 
@@ -166,18 +172,24 @@ int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size
 #endif
 
 
+int Zstring::cmpFileName(const Zstring& other) const
+{
 #ifdef FFS_WIN
-int Zstring::CmpNoCase(const DefaultChar* other) const
-{
-    return ::compareFilenamesWin32(c_str(), other, length(), ::wcslen(other)); //way faster than wxString::CmpNoCase()
-}
-
-
-int Zstring::CmpNoCase(const Zstring& other) const
-{
     return ::compareFilenamesWin32(c_str(), other.c_str(), length(), other.length()); //way faster than wxString::CmpNoCase()
-}
+#elif defined FFS_LINUX
+    return this->compare(other);
 #endif
+}
+
+
+int Zstring::cmpFileName(const DefaultChar* other) const
+{
+#ifdef FFS_WIN
+    return ::compareFilenamesWin32(c_str(), other, length(), ::wcslen(other)); //way faster than wxString::CmpNoCase()
+#elif defined FFS_LINUX
+    return this->compare(other);
+#endif
+}
 
 
 Zstring& Zstring::Replace(const DefaultChar* old, const DefaultChar* replacement, bool replaceAll)
@@ -223,15 +235,15 @@ bool matchesHelper(const DefaultChar* string, const DefaultChar* mask)
             }
             while (ch == DefaultChar('*') || ch == DefaultChar('?'));
             //if match ends with '*':
-            if (ch == DefaultChar(0))
+            if (ch == 0)
                 return true;
 
             ++mask;
             while ((string = defaultStrFind(string, ch)) != NULL)
             {
-                if (matchesHelper(string + 1, mask))
-                    return true;
                 ++string;
+                if (matchesHelper(string, mask))
+                    return true;
             }
             return false;
 
@@ -349,7 +361,7 @@ Zstring& Zstring::MakeUpper()
     reserve(thisLen);    //make unshared
 
     //use Windows' upper case conversion: faster than ::CharUpper()
-    if (::LCMapString(invariantLocale, LCMAP_UPPERCASE, data(), thisLen, data(), thisLen) == 0)
+    if (::LCMapString(invariantLocale, LCMAP_UPPERCASE, data(), static_cast<int>(thisLen), data(), static_cast<int>(thisLen)) == 0)
         throw std::runtime_error("Error converting to upper case! (LCMapString)");
 
     return *this;
@@ -520,9 +532,8 @@ void Zstring::reserve(size_t capacityNeeded) //make unshared and check capacity
     {
         //allocate a new string
         const size_t oldLength = length();
-        assert(oldLength <= getCapacityToAllocate(capacityNeeded));
 
-        StringDescriptor* newDescr = allocate(capacityNeeded);
+        StringDescriptor* newDescr = allocate(std::max(capacityNeeded, oldLength)); //reserve() must NEVER shrink the string
         newDescr->length = oldLength;
 
         ::memcpy(reinterpret_cast<DefaultChar*>(newDescr + 1), c_str(), (oldLength + 1) * sizeof(DefaultChar)); //include NULL-termination

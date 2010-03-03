@@ -1,5 +1,12 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "batchStatusHandler.h"
-#include "smallDialogs.h"
+//#include "smallDialogs.h"
+#include "messagePopup.h"
 #include <wx/ffile.h>
 #include <wx/msgdlg.h>
 #include "../shared/standardPaths.h"
@@ -14,9 +21,9 @@ using namespace FreeFileSync;
 class LogFile
 {
 public:
-    LogFile(const wxString& logfileDirectory) //throw (FileError&)
+    LogFile(const wxString& logfileDirectory, const wxString& batchFilename) //throw (FileError&)
     {
-        const wxString logfileName = findUniqueLogname(logfileDirectory);
+        const wxString logfileName = findUniqueLogname(logfileDirectory, batchFilename);
 
         logFile.Open(logfileName, wxT("w"));
         if (!logFile.IsOpened())
@@ -42,8 +49,8 @@ public:
     void writeLog(const ErrorLogging& log)
     {
         //write actual logfile
-        const std::vector<wxString>& messages = log.getFormattedMessages();
-        for (std::vector<wxString>::const_iterator i = messages.begin(); i != messages.end(); ++i)
+        const ErrorLogging::MessageEntry& messages = log.getFormattedMessages();
+        for (ErrorLogging::MessageEntry::const_iterator i = messages.begin(); i != messages.end(); ++i)
             logFile.Write(*i + wxChar('\n'));
     }
 
@@ -58,13 +65,23 @@ public:
     }
 
 private:
-    static wxString findUniqueLogname(const wxString& logfileDirectory)
+    static wxString extractJobName(const wxString& batchFilename)
+    {
+        using namespace globalFunctions;
+
+        const wxString shortName = batchFilename.AfterLast(FILE_NAME_SEPARATOR); //returns the whole string if seperator not found
+        const wxString jobName = shortName.BeforeLast(wxChar('.')); //returns empty string if seperator not found
+        return jobName.IsEmpty() ? shortName : jobName;
+    }
+
+
+    static wxString findUniqueLogname(const wxString& logfileDirectory, const wxString& batchFilename)
     {
         using namespace globalFunctions;
 
         //create logfile directory
         Zstring logfileDir = logfileDirectory.empty() ?
-                             wxToZ(FreeFileSync::getDefaultLogDirectory()) :
+                             wxToZ(FreeFileSync::getConfigDir() + wxT("Logs")) :
                              FreeFileSync::getFormattedDirectoryName(wxToZ(logfileDirectory));
 
         if (!FreeFileSync::dirExists(logfileDir))
@@ -76,6 +93,10 @@ private:
 
         wxString logfileName = zToWx(logfileDir);
 
+        //add prefix
+        logfileName += extractJobName(batchFilename) + wxT(" ");
+
+        //add timestamp
         wxString timeNow = wxDateTime::Now().FormatISOTime();
         timeNow.Replace(wxT(":"), wxT("-"));
         logfileName += wxDateTime::Now().FormatISODate() + wxChar(' ') + timeNow;
@@ -103,19 +124,21 @@ private:
 
 //##############################################################################################################################
 BatchStatusHandler::BatchStatusHandler(bool runSilent,
+                                       const wxString& batchFilename,
                                        const wxString* logfileDirectory,
                                        const xmlAccess::OnError handleError,
                                        int& returnVal) :
     exitWhenFinished(runSilent), //=> exit immediately when finished
     handleError_(handleError),
     currentProcess(StatusHandler::PROCESS_NONE),
-    returnValue(returnVal)
+    returnValue(returnVal),
+    syncStatusFrame(*this, NULL, runSilent)
 {
     if (logfileDirectory)
     {
         try
         {
-            logFile.reset(new LogFile(*logfileDirectory));
+            logFile.reset(new LogFile(*logfileDirectory, batchFilename));
         }
         catch (FreeFileSync::FileError& error)
         {
@@ -126,12 +149,6 @@ BatchStatusHandler::BatchStatusHandler(bool runSilent,
     }
 
     assert(runSilent || handleError != xmlAccess::ON_ERROR_EXIT); //shouldn't be selectable from GUI settings
-
-    syncStatusFrame = new SyncStatus(this, NULL);
-    if (runSilent)
-        syncStatusFrame->minimizeToTray();
-    else
-        syncStatusFrame->Show();
 }
 
 
@@ -159,7 +176,7 @@ BatchStatusHandler::~BatchStatusHandler()
         logFile->writeLog(errorLog);
 
     //decide whether to stay on status screen or exit immediately...
-    if (!exitWhenFinished || syncStatusFrame->IsShown()) //warning: wxWindow::Show() is called within processHasFinished()!
+    if (!exitWhenFinished || syncStatusFrame.getAsWindow()->IsShown()) //warning: wxWindow::Show() is called within processHasFinished()!
     {
         //print the results list: GUI
         wxString finalMessage;
@@ -170,36 +187,36 @@ BatchStatusHandler::~BatchStatusHandler()
             finalMessage += header + wxT("\n\n");
         }
 
-        const std::vector<wxString>& messages = errorLog.getFormattedMessages();
-        for (std::vector<wxString>::const_iterator i = messages.begin(); i != messages.end(); ++i)
+        const ErrorLogging::MessageEntry& messages = errorLog.getFormattedMessages();
+        for (ErrorLogging::MessageEntry::const_iterator i = messages.begin(); i != messages.end(); ++i)
         {
             finalMessage += *i;
-            finalMessage += wxChar('\n');
+            finalMessage += wxT("\n\n");
         }
 
         //notify about (logical) application main window => program won't quit, but stay on this dialog
-        FreeFileSync::AppMainWindow::setMainWindow(syncStatusFrame);
+        FreeFileSync::AppMainWindow::setMainWindow(syncStatusFrame.getAsWindow());
 
         //notify to syncStatusFrame that current process has ended
         if (abortIsRequested())
-            syncStatusFrame->processHasFinished(SyncStatus::ABORTED, finalMessage);  //enable okay and close events
-        else if (errorLog.errorsTotal())
-            syncStatusFrame->processHasFinished(SyncStatus::FINISHED_WITH_ERROR, finalMessage);
+            syncStatusFrame.processHasFinished(SyncStatus::ABORTED, finalMessage);  //enable okay and close events
+        else if (totalErrors)
+            syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_ERROR, finalMessage);
         else
-            syncStatusFrame->processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS, finalMessage);
+            syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS, finalMessage);
     }
     else
-        syncStatusFrame->Destroy(); //syncStatusFrame is not main window => program will quit directly
+        syncStatusFrame.closeWindowDirectly(); //syncStatusFrame is main window => program will quit directly
 }
 
 
 inline
 void BatchStatusHandler::updateStatusText(const Zstring& text)
 {
-    if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING && logFile.get()) //write file transfer information to logfile
+    if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING && logFile.get()) //write file transfer information to log
         errorLog.logInfo(zToWx(text));
 
-    syncStatusFrame->setStatusText_NoUpdate(text);
+    syncStatusFrame.setStatusText_NoUpdate(text);
 }
 
 
@@ -210,16 +227,16 @@ void BatchStatusHandler::initNewProcess(int objectsTotal, wxLongLong dataTotal, 
     switch (currentProcess)
     {
     case StatusHandler::PROCESS_SCANNING:
-        syncStatusFrame->resetGauge(0, 0); //dummy call to initialize some gui elements (remaining time, speed)
-        syncStatusFrame->setCurrentStatus(SyncStatus::SCANNING);
+        syncStatusFrame.resetGauge(0, 0); //dummy call to initialize some gui elements (remaining time, speed)
+        syncStatusFrame.setCurrentStatus(SyncStatus::SCANNING);
         break;
     case StatusHandler::PROCESS_COMPARING_CONTENT:
-        syncStatusFrame->resetGauge(objectsTotal, dataTotal);
-        syncStatusFrame->setCurrentStatus(SyncStatus::COMPARING_CONTENT);
+        syncStatusFrame.resetGauge(objectsTotal, dataTotal);
+        syncStatusFrame.setCurrentStatus(SyncStatus::COMPARING_CONTENT);
         break;
     case StatusHandler::PROCESS_SYNCHRONIZING:
-        syncStatusFrame->resetGauge(objectsTotal, dataTotal);
-        syncStatusFrame->setCurrentStatus(SyncStatus::SYNCHRONIZING);
+        syncStatusFrame.resetGauge(objectsTotal, dataTotal);
+        syncStatusFrame.setCurrentStatus(SyncStatus::SYNCHRONIZING);
         break;
     case StatusHandler::PROCESS_NONE:
         assert(false);
@@ -237,7 +254,7 @@ void BatchStatusHandler::updateProcessedData(int objectsProcessed, wxLongLong da
         break;
     case StatusHandler::PROCESS_COMPARING_CONTENT:
     case StatusHandler::PROCESS_SYNCHRONIZING:
-        syncStatusFrame->incProgressIndicator_NoUpdate(objectsProcessed, dataProcessed);
+        syncStatusFrame.incProgressIndicator_NoUpdate(objectsProcessed, dataProcessed);
         break;
     case StatusHandler::PROCESS_NONE:
         assert(false);
@@ -353,7 +370,7 @@ void BatchStatusHandler::reportFatalError(const wxString& errorMessage)
 inline
 void BatchStatusHandler::forceUiRefresh()
 {
-    syncStatusFrame->updateStatusDialogNow();
+    syncStatusFrame.updateStatusDialogNow();
 }
 
 

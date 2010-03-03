@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "watcher.h"
 #include "../shared/systemFunctions.h"
 #include "functions.h"
@@ -253,7 +259,7 @@ public:
     virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName)
     {
         m_dirs.push_back(fullName.c_str());
-        return ReturnValDir(ReturnValDir::Continue(), this);
+        return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), this);
     }
     virtual ReturnValue onError(const wxString& errorText)
     {
@@ -354,7 +360,7 @@ void RealtimeSync::waitForChanges(const std::vector<wxString>& dirNames, WaitCal
         if (notifications.getSize() > 0)
         {
             const DWORD rv = ::WaitForMultipleObjects(     //NOTE: notifications.getArray() returns valid pointer, because it cannot be empty in this context
-                                 notifications.getSize(),  //__in  DWORD nCount,
+                                 static_cast<DWORD>(notifications.getSize()),  //__in  DWORD nCount,
                                  notifications.getArray(), //__in  const HANDLE *lpHandles,
                                  false,                    //__in  BOOL bWaitAll,
                                  UI_UPDATE_INTERVAL);      //__in  DWORD dwMilliseconds
@@ -449,10 +455,4 @@ void RealtimeSync::waitForChanges(const std::vector<wxString>& dirNames, WaitCal
     }
 #endif
 }
-
-
-
-
-
-
 

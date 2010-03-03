@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "xmlFreeFileSync.h"
 #include "../shared/standardPaths.h"
 #include "../shared/globalFunctions.h"
@@ -47,7 +53,7 @@ xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& bat
 
     output.directories.insert(output.directories.end(), uniqueFolders.begin(), uniqueFolders.end());
 
-    output.commandline = FreeFileSync::getInstallationDir() +
+    output.commandline = FreeFileSync::getBinaryDir() +
 #ifdef FFS_WIN
                          wxT("FreeFileSync.exe") +
 #elif defined FFS_LINUX

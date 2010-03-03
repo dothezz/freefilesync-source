@@ -1,10 +1,9 @@
-/***************************************************************
- * Name:      mainDialog.h
- * Purpose:   Main Application Dialog
- * Author:    ZenJu (zhnmju123@gmx.de)
- * Created:   2008-07-16
- **************************************************************/
-
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef MAINDIALOG_H
 #define MAINDIALOG_H
 
@@ -14,10 +13,10 @@
 #include <memory>
 #include <map>
 #include <set>
-#include <wx/help.h>
+#include "mouseMoveWindow.h"
+#include "progressIndicator.h"
 
 class CompareStatusHandler;
-class CompareStatus;
 class MainFolderDragDrop;
 class CustomGrid;
 class FFSCheckRowsEvent;
@@ -81,8 +80,7 @@ class MainDialog : public MainDialogGenerated
 public:
     MainDialog(wxFrame* frame,
                const wxString& cfgFileName,
-               xmlAccess::XmlGlobalSettings& settings,
-               wxHelpController& helpController);
+               xmlAccess::XmlGlobalSettings& settings);
 
     ~MainDialog();
 
@@ -206,7 +204,6 @@ private:
     bool trySaveConfig(); //return true if saved successfully
     bool saveOldConfig(); //return false on user abort
 
-
     void loadConfiguration(const wxString& filename);
     void OnCfgHistoryKeyEvent(  wxKeyEvent& event);
     void OnRegularUpdateCheck(  wxIdleEvent& event);
@@ -286,7 +283,7 @@ private:
     std::stack<wxString> stackObjects;
 
     //compare status panel (hidden on start, shown when comparing)
-    CompareStatus* compareStatus;
+    CompareStatus compareStatus;
 
     //save the last used config filename history
     std::vector<wxString> cfgFileNames;
@@ -301,10 +298,10 @@ private:
 #ifdef FFS_WIN
     //update icons periodically: one updater instance for both left and right grids
     std::auto_ptr<IconUpdater> updateFileIcons;
-#endif
 
-    //global help controller
-    wxHelpController& helpController_;
+    //enable moving window by clicking on sub-windows instead of header line
+    FreeFileSync::MouseMoveWindow moveWholeWindow;
+#endif
 
     //encapsulation of handling of sync preview
     class SyncPreview //encapsulates MainDialog functionality for synchronization preview (friend class)

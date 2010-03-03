@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20100118;18123600">
+	<META NAME="CHANGED" CONTENT="20100301;18020000">
 	<STYLE TYPE="text/css">
 	<!--
 		@page { margin: 2cm }
@@ -30,8 +30,12 @@ XP)</SPAN></FONT></H3>
 	it, for example, as &quot;<FONT FACE="Courier New, monospace">C:\SyncJob.ffs_
 	batch</FONT>&quot;.</FONT></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Make
-	sure you enable checkbox &quot;<I>silent mode</I>&quot; to prevent
+	sure you enable checkbox &quot;<I>Silent mode</I>&quot; to prevent
 	showing a status dialog at the end of the process.</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If
+	you want to avoid error or warning popup messages from stopping the
+	process set &quot;<I>Error handling</I>&quot; to either &quot;<I>Exit
+	instantly</I>&quot; or &quot;<I>Ignore errors</I>&quot;.</FONT></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Start
 	Windows Task Scheduler: Go to <I>Start-&gt;Control Panel-&gt;Scheduled
 	Tasks</I> and select &quot;<I>Add Scheduled Task</I>&quot;.</FONT></P>
@@ -40,27 +44,16 @@ XP)</SPAN></FONT></H3>
 	as program to run.</FONT></P>
 	<UL>
 		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If
-		you are using the installer-based version of FreeFileSync,
+		you are using the locally installed version of FreeFileSync,
 		</FONT><FONT FACE="Courier New, monospace">*.ffs_batch</FONT> <FONT FACE="Tahoma, sans-serif">files
 		are automatically associated with the tool and field &quot;</FONT><FONT FACE="Tahoma, sans-serif"><I>Run:</I></FONT><FONT FACE="Tahoma, sans-serif">&quot;
-		can be filled with the filename directly:<BR>&quot;</FONT><FONT FACE="Courier New, monospace">C:\SyncJob.ffs_batch</FONT><FONT FACE="Tahoma, sans-serif">&quot;<BR><IMG SRC="scheduleBatch_html_m22c860a2.gif" NAME="Grafik1" ALIGN=BOTTOM WIDTH=406 HEIGHT=455 BORDER=0></FONT></P>
+		can be directly filled with the filename:<BR>&quot;</FONT><FONT FACE="Courier New, monospace">C:\SyncJob.ffs_batch</FONT><FONT FACE="Tahoma, sans-serif">&quot;<BR><IMG SRC="ScheduleBatch_html_372f0f3.gif" NAME="Grafik1" ALIGN=BOTTOM WIDTH=406 HEIGHT=455 BORDER=0></FONT></P>
 		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If
-		file associations have not been set (portable/zip-version),</FONT>
+		file associations have not been set (portable installation),</FONT>
 		&quot;<FONT FACE="Tahoma, sans-serif"><I>Run:</I></FONT><FONT FACE="Tahoma, sans-serif">&quot;
 		has to be prefixed with the
 		executable:<BR>&quot;D</FONT><FONT FACE="Courier New, monospace">:\FreeFileSync\FreeFileSync.exe&quot;
-		&quot;C:\SyncJob.ffs_batch</FONT><FONT FACE="Tahoma, sans-serif">&quot;<BR><IMG SRC="scheduleBatch_html_28bb3203.gif" NAME="Grafik2" ALIGN=BOTTOM WIDTH=406 HEIGHT=455 BORDER=0></FONT></P>
-		<P><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
-			<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
-			<FONT FACE="Tahoma, sans-serif"><B>Attention:</B><BR>The portable
-			version of FreeFileSync reads/writes all global settings from the
-			current working directory, while the installer based version uses
-			&quot;<FONT FACE="Courier New, monospace">%appdata%\FreeFileSync</FONT>&quot;.
-			So in former case make sure the working directory is filled
-			appropriately in field &quot;<I>Start in:</I>&quot; to point to
-			the directory containing respective GlobalSettings.xml.</FONT></P>
-		</SPAN><BR CLEAR=LEFT>
-		</P>
+		&quot;C:\SyncJob.ffs_batch</FONT><FONT FACE="Tahoma, sans-serif">&quot;<BR><IMG SRC="ScheduleBatch_html_m10bf0d36.gif" NAME="Grafik2" ALIGN=BOTTOM WIDTH=406 HEIGHT=455 BORDER=0></FONT></P>
 	</UL>
 </OL>
 </BODY>

@@ -1,9 +1,16 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "fileID.h"
 
 #ifdef FFS_WIN
 #include "staticAssert.h"
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "longPathPrefix.h"
+#include <boost/shared_ptr.hpp>
 
 #elif defined FFS_LINUX
 
@@ -12,21 +19,6 @@
 
 
 #ifdef FFS_WIN
-class CloseHandleOnExit
-{
-public:
-    CloseHandleOnExit(HANDLE fileHandle) : fileHandle_(fileHandle) {}
-
-    ~CloseHandleOnExit()
-    {
-        ::CloseHandle(fileHandle_);
-    }
-
-private:
-    HANDLE fileHandle_;
-};
-
-
 Utility::FileID Utility::retrieveFileID(const Zstring& filename)
 {
     //ensure our DWORD_FFS really is the same as DWORD
@@ -44,7 +36,7 @@ Utility::FileID Utility::retrieveFileID(const Zstring& filename)
                                       NULL);
     if (hFile != INVALID_HANDLE_VALUE)
     {
-        CloseHandleOnExit dummy(hFile);
+         boost::shared_ptr<void> dummy(hFile, ::CloseHandle);
 
         BY_HANDLE_FILE_INFORMATION info;
         if (::GetFileInformationByHandle(hFile, &info))

@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef SYNCHRONIZATION_H_INCLUDED
 #define SYNCHRONIZATION_H_INCLUDED
 
@@ -46,20 +52,17 @@ private:
 
 bool synchronizationNeeded(const FolderComparison& folderCmp);
 
-class SyncRecursively;
+class SynchronizeFolderPair;
 
 struct FolderPairSyncCfg
 {
     FolderPairSyncCfg(bool automaticMode,
                       const DeletionPolicy handleDel,
-                      const Zstring& custDelDir) :
-        inAutomaticMode(automaticMode),
-        handleDeletion(handleDel),
-        custDelFolder(custDelDir) {}
+                      const Zstring& custDelDir);
 
     bool inAutomaticMode; //update database if in automatic mode
     DeletionPolicy handleDeletion;
-    Zstring custDelFolder;
+    Zstring custDelFolder; //formatted directory name
 };
 std::vector<FolderPairSyncCfg> extractSyncCfg(const MainConfiguration& mainCfg);
 
@@ -79,7 +82,7 @@ public:
     void startSynchronizationProcess(const std::vector<FolderPairSyncCfg>& syncConfig, FolderComparison& folderCmp);
 
 private:
-    friend class SyncRecursively;
+    friend class SynchronizeFolderPair;
 
     const bool m_copyFileSymLinks;
     const bool m_traverseDirSymLinks;

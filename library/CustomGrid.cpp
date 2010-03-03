@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "customGrid.h"
 #include "../shared/systemConstants.h"
 #include "resources.h"
@@ -217,7 +223,7 @@ public:
 
     virtual int GetNumberCols()
     {
-        return columnPositions.size();
+        return static_cast<int>(columnPositions.size());
     }
 
     virtual wxString GetColLabelValue( int col )
@@ -270,6 +276,8 @@ protected:
                         return _("<Directory>");
                     case xmlAccess::DATE: //date
                         return wxEmptyString;
+                    case xmlAccess::EXTENSION: //file extension
+                        return wxEmptyString;
                     }
                 }
                 else
@@ -291,6 +299,8 @@ protected:
                             return FreeFileSync::includeNumberSeparator(fileObj->getFileSize<side>().ToString());
                         case xmlAccess::DATE: //date
                             return FreeFileSync::utcTimeToLocalString(fileObj->getLastWriteTime<side>(), fileObj->getFullName<side>());
+                        case xmlAccess::EXTENSION: //file extension
+                            return zToWx(fileObj->getExtension<side>());
                         }
                     }
                 }
@@ -492,6 +502,10 @@ CustomGrid::CustomGrid(wxWindow *parent,
     isLeading(false),
     m_marker(-1, ASCENDING)
 {
+    SetLayoutDirection(wxLayout_LeftToRight);                          //
+    GetGridWindow()->SetLayoutDirection(wxLayout_LeftToRight);         //avoid mirroring this dialog in RTL languages like Hebrew or Arabic
+    GetGridColLabelWindow()->SetLayoutDirection(wxLayout_LeftToRight); //
+
     //set color of selections
     wxColour darkBlue(40, 35, 140);
     SetSelectionBackground(darkBlue);
@@ -525,6 +539,7 @@ void CustomGrid::initSettings(CustomGridLeft*   gridLeft,
     Connect(wxEVT_SCROLLWIN_THUMBTRACK,          wxEventHandler(CustomGrid::onGridAccess), NULL, this);
     Connect(wxEVT_SCROLLWIN_THUMBRELEASE,        wxEventHandler(CustomGrid::onGridAccess), NULL, this);
     Connect(wxEVT_GRID_LABEL_LEFT_CLICK,         wxEventHandler(CustomGrid::onGridAccess), NULL, this);
+    Connect(wxEVT_SET_FOCUS,                     wxEventHandler(CustomGrid::onGridAccess), NULL, this); //used by grid text-search
     GetGridWindow()->Connect(wxEVT_LEFT_DOWN,    wxEventHandler(CustomGrid::onGridAccess), NULL, this);
     GetGridWindow()->Connect(wxEVT_RIGHT_DOWN,   wxEventHandler(CustomGrid::onGridAccess), NULL, this);
 
@@ -600,149 +615,139 @@ void execGridCommands(wxEvent& event, wxGrid* grid)
         const int cursorOldPos    = std::max(std::min(grid->GetGridCursorRow(), grid->GetNumberRows() - 1), 0);
         const int cursorOldColumn = std::max(std::min(grid->GetGridCursorCol(), grid->GetNumberCols() - 1), 0);
 
-        if (keyEvent->ShiftDown())
+        const bool shiftPressed  = keyEvent->ShiftDown();
+        const bool altPressed    = keyEvent->AltDown();
+        const bool ctrlPressed   = keyEvent->ControlDown();
+        const bool noModPressed  = !shiftPressed && !altPressed && !ctrlPressed;
+        const int keyCode        = keyEvent->GetKeyCode();
+
+
+        //SHIFT + X
+        if (shiftPressed && keyCode == WXK_UP)
         {
-            //support for shift + PageUp and shift + PageDown
-            switch (keyEvent->GetKeyCode())
-            {
-            case WXK_UP: //move grid cursor also
-            {
-                const int cursorNewPos = std::max(cursorOldPos - 1, 0);
-                moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
-            }
+            const int cursorNewPos = std::max(cursorOldPos - 1, 0);
+            moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
             return; //no event.Skip()
-
-            case WXK_DOWN: //move grid cursor also
-            {
-                const int cursorNewPos = std::min(cursorOldPos + 1, grid->GetNumberRows() - 1);
-                moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
-            }
-            return; //no event.Skip()
-
-            case WXK_LEFT: //move grid cursor also
-            {
-                const int cursorColumn = std::max(cursorOldColumn - 1, 0);
-                grid->SetGridCursor(cursorOldPos, cursorColumn);
-                grid->MakeCellVisible(cursorOldPos, cursorColumn);
-            }
-            return; //no event.Skip()
-
-            case WXK_RIGHT: //move grid cursor also
-            {
-                const int cursorColumn = std::min(cursorOldColumn + 1, grid->GetNumberCols() - 1);
-                grid->SetGridCursor(cursorOldPos, cursorColumn);
-                grid->MakeCellVisible(cursorOldPos, cursorColumn);
-            }
-            return; //no event.Skip()
-
-
-            case WXK_PAGEUP:
-            case WXK_NUMPAD_PAGEUP:
-            {
-                const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
-                const int cursorNewPos = std::max(cursorOldPos - rowsPerPage, 0);
-                moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
-            }
-            return; //no event.Skip()
-
-            case WXK_PAGEDOWN:
-            case WXK_NUMPAD_PAGEDOWN:
-            {
-                const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
-                const int cursorNewPos = std::min(cursorOldPos + rowsPerPage, grid->GetNumberRows() - 1);
-                moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
-            }
-            return; //no event.Skip()
-
-            case WXK_HOME:
-            case WXK_NUMPAD_HOME:
-            {
-                const int cursorNewPos = 0;
-                moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
-            }
-            return; //no event.Skip()
-
-            case WXK_END:
-            case WXK_NUMPAD_END:
-            {
-                const int cursorNewPos = grid->GetNumberRows() - 1;
-                moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
-            }
-            return; //no event.Skip()
-
-            }
         }
-        else if (keyEvent->AltDown())
-            ;
-        else if (keyEvent->ControlDown())
-            ;
-        else //button without additonal control keys pressed
+        else if (shiftPressed && keyCode == WXK_DOWN)
         {
-            switch (keyEvent->GetKeyCode())
-            {
-            case WXK_UP: //move grid cursor also
-            {
-                const int cursorNewPos = std::max(cursorOldPos - 1, 0);
-                grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
-                grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
-            }
+            const int cursorNewPos = std::min(cursorOldPos + 1, grid->GetNumberRows() - 1);
+            moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
             return; //no event.Skip()
-            case WXK_DOWN: //move grid cursor also
-            {
-                const int cursorNewPos = std::min(cursorOldPos + 1, grid->GetNumberRows() - 1);
-                grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
-                grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
-            }
+        }
+        else if (shiftPressed && keyCode == WXK_LEFT)
+        {
+            const int cursorColumn = std::max(cursorOldColumn - 1, 0);
+            grid->SetGridCursor(cursorOldPos, cursorColumn);
+            grid->MakeCellVisible(cursorOldPos, cursorColumn);
             return; //no event.Skip()
-
-            case WXK_LEFT: //move grid cursor also
-            {
-                const int cursorColumn = std::max(cursorOldColumn - 1, 0);
-                grid->SetGridCursor(cursorOldPos, cursorColumn);
-                grid->MakeCellVisible(cursorOldPos, cursorColumn);
-            }
+        }
+        else if (shiftPressed && keyCode == WXK_RIGHT)
+        {
+            const int cursorColumn = std::min(cursorOldColumn + 1, grid->GetNumberCols() - 1);
+            grid->SetGridCursor(cursorOldPos, cursorColumn);
+            grid->MakeCellVisible(cursorOldPos, cursorColumn);
             return; //no event.Skip()
-            case WXK_RIGHT: //move grid cursor also
-            {
-                const int cursorColumn = std::min(cursorOldColumn + 1, grid->GetNumberCols() - 1);
-                grid->SetGridCursor(cursorOldPos, cursorColumn);
-                grid->MakeCellVisible(cursorOldPos, cursorColumn);
-            }
+        }
+        else if (shiftPressed && (keyCode == WXK_PAGEUP || keyCode == WXK_NUMPAD_PAGEUP))
+        {
+            const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
+            const int cursorNewPos = std::max(cursorOldPos - rowsPerPage, 0);
+            moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
             return; //no event.Skip()
-
-
-            case WXK_PAGEUP:
-            case WXK_NUMPAD_PAGEUP:
-            {
-                const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
-                const int cursorNewPos = std::max(cursorOldPos - rowsPerPage, 0);
-                grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
-                grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
-            }
+        }
+        else if (shiftPressed && (keyCode == WXK_PAGEDOWN || keyCode == WXK_NUMPAD_PAGEDOWN))
+        {
+            const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
+            const int cursorNewPos = std::min(cursorOldPos + rowsPerPage, grid->GetNumberRows() - 1);
+            moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
             return; //no event.Skip()
-
-            case WXK_PAGEDOWN:
-            case WXK_NUMPAD_PAGEDOWN:
-            {
-                const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
-                const int cursorNewPos = std::min(cursorOldPos + rowsPerPage, grid->GetNumberRows() - 1);
-                grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
-                grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
-            }
+        }
+        else if (shiftPressed && (keyCode == WXK_HOME || keyCode == WXK_NUMPAD_HOME))
+        {
+            const int cursorNewPos = 0;
+            moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
             return; //no event.Skip()
+        }
+        else if (shiftPressed && (keyCode == WXK_END || keyCode == WXK_NUMPAD_END))
+        {
+            const int cursorNewPos = grid->GetNumberRows() - 1;
+            moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
+            return; //no event.Skip()
+        }
 
-            case WXK_HOME:
-            case WXK_NUMPAD_HOME:
-                grid->SetGridCursor(0, grid->GetGridCursorCol());
-                grid->MakeCellVisible(0, grid->GetGridCursorCol());
-                return; //no event.Skip()
+        //CTRL + X
+        else if (ctrlPressed && keyCode == WXK_LEFT)
+        {
+            grid->SetGridCursor(grid->GetGridCursorRow(), 0);
+            grid->MakeCellVisible(grid->GetGridCursorRow(), 0);
+            return; //no event.Skip()
+        }
+        else if (ctrlPressed && keyCode == WXK_RIGHT)
+        {
+            grid->SetGridCursor(grid->GetGridCursorRow(), grid->GetNumberCols() - 1);
+            grid->MakeCellVisible(grid->GetGridCursorRow(), grid->GetNumberCols() - 1);
+            return; //no event.Skip()
+        }
+        else if ((ctrlPressed && keyCode == WXK_UP) ||
+                 ((noModPressed || ctrlPressed) && (keyCode == WXK_HOME || keyCode == WXK_NUMPAD_HOME)))
+        {
+            grid->SetGridCursor(0, grid->GetGridCursorCol());
+            grid->MakeCellVisible(0, grid->GetGridCursorCol());
+            return; //no event.Skip()
+        }
+        else if ((ctrlPressed && keyCode == WXK_DOWN) ||
+                 ((noModPressed || ctrlPressed) && (keyCode == WXK_END || keyCode == WXK_NUMPAD_END)))
+        {
+            grid->SetGridCursor(grid->GetNumberRows() - 1, grid->GetGridCursorCol());
+            grid->MakeCellVisible(grid->GetNumberRows() - 1, grid->GetGridCursorCol());
+            return; //no event.Skip()
+        }
 
-            case WXK_END:
-            case WXK_NUMPAD_END:
-                grid->SetGridCursor(grid->GetNumberRows() - 1, grid->GetGridCursorCol());
-                grid->MakeCellVisible(grid->GetNumberRows() - 1, grid->GetGridCursorCol());
-                return; //no event.Skip()
-            }
+        //button without additonal control keys pressed
+        else if (noModPressed && keyCode == WXK_UP)
+        {
+            const int cursorNewPos = std::max(cursorOldPos - 1, 0);
+            grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
+            grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
+            return; //no event.Skip()
+        }
+        else if (noModPressed && keyCode == WXK_DOWN)
+        {
+            const int cursorNewPos = std::min(cursorOldPos + 1, grid->GetNumberRows() - 1);
+            grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
+            grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
+            return; //no event.Skip()
+        }
+        else if (noModPressed && keyCode == WXK_LEFT)
+        {
+            const int cursorColumn = std::max(cursorOldColumn - 1, 0);
+            grid->SetGridCursor(cursorOldPos, cursorColumn);
+            grid->MakeCellVisible(cursorOldPos, cursorColumn);
+            return; //no event.Skip()
+        }
+        else if (noModPressed && keyCode == WXK_RIGHT)
+        {
+            const int cursorColumn = std::min(cursorOldColumn + 1, grid->GetNumberCols() - 1);
+            grid->SetGridCursor(cursorOldPos, cursorColumn);
+            grid->MakeCellVisible(cursorOldPos, cursorColumn);
+            return; //no event.Skip()
+        }
+        else if ((noModPressed || ctrlPressed) && (keyCode == WXK_PAGEUP || keyCode == WXK_NUMPAD_PAGEUP))
+        {
+            const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
+            const int cursorNewPos = std::max(cursorOldPos - rowsPerPage, 0);
+            grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
+            grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
+            return; //no event.Skip()
+        }
+        else if ((noModPressed || ctrlPressed) && (keyCode == WXK_PAGEDOWN || keyCode == WXK_NUMPAD_PAGEDOWN))
+        {
+            const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
+            const int cursorNewPos = std::min(cursorOldPos + rowsPerPage, grid->GetNumberRows() - 1);
+            grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
+            grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
+            return; //no event.Skip()
         }
     }
 
@@ -1128,6 +1133,12 @@ xmlAccess::ColumnAttributes CustomGridRim::getDefaultColumnAttributes()
     newEntry.width    = 113;
     defaultColumnSettings.push_back(newEntry);
 
+    newEntry.type     = xmlAccess::EXTENSION;
+    newEntry.visible  = false;
+    newEntry.position = 6;
+    newEntry.width    = 60;
+    defaultColumnSettings.push_back(newEntry);
+
     return defaultColumnSettings;
 }
 
@@ -1177,10 +1188,10 @@ void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
 
             if (i < attr.size())
                 newEntry = attr[i];
-            else
+            else //fix corrupted data:
             {
-                newEntry.type     = xmlAccess::FILENAME;
-                newEntry.visible  = true;
+                newEntry.type     = static_cast<xmlAccess::ColumnTypes>(xmlAccess::COLUMN_TYPE_COUNT); //sort additional rows to the end
+                newEntry.visible  = false;
                 newEntry.position = i;
                 newEntry.width    = 100;
             }
@@ -1189,7 +1200,7 @@ void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
 
         std::sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByType);
         for (unsigned int i = 0; i < xmlAccess::COLUMN_TYPE_COUNT; ++i) //just be sure that each type exists only once
-            columnSettings[i].type = xmlAccess::ColumnTypes(i);
+            columnSettings[i].type = static_cast<xmlAccess::ColumnTypes>(i);
 
         std::sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByPositionOnly);
         for (unsigned int i = 0; i < xmlAccess::COLUMN_TYPE_COUNT; ++i) //just be sure that positions are numbered correctly
@@ -1248,6 +1259,8 @@ wxString CustomGridRim::getTypeName(xmlAccess::ColumnTypes colType)
         return _("Size");
     case xmlAccess::DATE:
         return _("Date");
+    case xmlAccess::EXTENSION:
+        return _("Extension");
     }
 
     return wxEmptyString; //dummy
@@ -1418,6 +1431,9 @@ IconUpdater::IconUpdater(CustomGridLeft* leftGrid, CustomGridRight* rightGrid) :
 }
 
 
+IconUpdater::~IconUpdater() {} //non-inline destructor for std::auto_ptr to work with forward declaration
+
+
 void IconUpdater::loadIconsAsynchronously(wxEvent& event) //loads all (not yet) drawn icons
 {
     std::vector<Zstring> iconsLeft;
@@ -1576,11 +1592,14 @@ CustomGridMiddle::CustomGridMiddle(wxWindow *parent,
     toolTip(new CustomTooltip)
 {
     //connect events for dynamic selection of sync direction
-    GetGridWindow()->Connect(wxEVT_MOTION, wxMouseEventHandler(CustomGridMiddle::OnMouseMovement), NULL, this);
-    GetGridWindow()->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CustomGridMiddle::OnLeaveWindow), NULL, this);
-    GetGridWindow()->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CustomGridMiddle::OnLeftMouseUp), NULL, this);
-    GetGridWindow()->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CustomGridMiddle::OnLeftMouseDown), NULL, this);
+    GetGridWindow()->Connect(wxEVT_MOTION,       wxMouseEventHandler(CustomGridMiddle::OnMouseMovement), NULL, this);
+    GetGridWindow()->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CustomGridMiddle::OnLeaveWindow),   NULL, this);
+    GetGridWindow()->Connect(wxEVT_LEFT_UP,      wxMouseEventHandler(CustomGridMiddle::OnLeftMouseUp),   NULL, this);
+    GetGridWindow()->Connect(wxEVT_LEFT_DOWN,    wxMouseEventHandler(CustomGridMiddle::OnLeftMouseDown), NULL, this);
 }
+
+
+CustomGridMiddle::~CustomGridMiddle() {} //non-inline destructor for std::auto_ptr to work with forward declaration
 
 
 bool CustomGridMiddle::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
@@ -1998,13 +2017,4 @@ const wxBitmap& FreeFileSync::getSyncOpImage(SyncOperation syncOp)
 
     return wxNullBitmap; //dummy
 }
-
-
-
-
-
-
-
-
-
 

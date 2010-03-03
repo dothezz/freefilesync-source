@@ -1,10 +1,15 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "structures.h"
-#include "shared/fileHandling.h"
 #include <wx/intl.h>
 #include "shared/systemConstants.h"
+#include <stdexcept>
 
-using FreeFileSync::SyncConfiguration;
-using FreeFileSync::MainConfiguration;
+using namespace FreeFileSync;
 
 
 Zstring FreeFileSync::standardExcludeFilter()
@@ -19,12 +24,6 @@ Zstring FreeFileSync::standardExcludeFilter()
     static Zstring exclude; //exclude nothing
 #endif
     return exclude;
-}
-
-
-bool FreeFileSync::recycleBinExistsWrap()
-{
-    return recycleBinExists();
 }
 
 
@@ -43,83 +42,9 @@ wxString FreeFileSync::getVariantName(CompareVariant var)
 }
 
 
-SyncConfiguration::Variant SyncConfiguration::getVariant() const
+wxString FreeFileSync::getVariantName(const SyncConfiguration& syncCfg)
 {
-    if (automatic == true)
-        return AUTOMATIC;  //automatic mode
-
-    if (    exLeftSideOnly  == SYNC_DIR_RIGHT &&
-            exRightSideOnly == SYNC_DIR_RIGHT &&
-            leftNewer       == SYNC_DIR_RIGHT &&
-            rightNewer      == SYNC_DIR_RIGHT &&
-            different       == SYNC_DIR_RIGHT &&
-            conflict        == SYNC_DIR_RIGHT)
-        return MIRROR;    //one way ->
-
-    else if (exLeftSideOnly  == SYNC_DIR_RIGHT &&
-             exRightSideOnly == SYNC_DIR_NONE  &&
-             leftNewer       == SYNC_DIR_RIGHT &&
-             rightNewer      == SYNC_DIR_NONE  &&
-             different       == SYNC_DIR_NONE  &&
-             conflict        == SYNC_DIR_NONE)
-        return UPDATE;    //Update ->
-
-//    else if (exLeftSideOnly  == SYNC_DIR_RIGHT && -> variant "twoway" is not selectable via gui anymore
-//             exRightSideOnly == SYNC_DIR_LEFT  &&
-//             leftNewer       == SYNC_DIR_RIGHT &&
-//             rightNewer      == SYNC_DIR_LEFT  &&
-//             different       == SYNC_DIR_NONE  &&
-//             conflict        == SYNC_DIR_NONE)
-//        return TWOWAY;    //two way <->
-    else
-        return CUSTOM;    //other
-}
-
-
-void SyncConfiguration::setVariant(const Variant var)
-{
-    switch (var)
-    {
-    case AUTOMATIC:
-        automatic = true;
-        break;
-    case MIRROR:
-        automatic = false;
-        exLeftSideOnly  = SYNC_DIR_RIGHT;
-        exRightSideOnly = SYNC_DIR_RIGHT;
-        leftNewer       = SYNC_DIR_RIGHT;
-        rightNewer      = SYNC_DIR_RIGHT;
-        different       = SYNC_DIR_RIGHT;
-        conflict        = SYNC_DIR_RIGHT;
-        break;
-    case UPDATE:
-        automatic = false;
-        exLeftSideOnly  = SYNC_DIR_RIGHT;
-        exRightSideOnly = SYNC_DIR_NONE;
-        leftNewer       = SYNC_DIR_RIGHT;
-        rightNewer      = SYNC_DIR_NONE;
-        different       = SYNC_DIR_NONE;
-        conflict        = SYNC_DIR_NONE;
-        break;
-    case TWOWAY:
-        automatic = false;
-        exLeftSideOnly  = SYNC_DIR_RIGHT;
-        exRightSideOnly = SYNC_DIR_LEFT;
-        leftNewer       = SYNC_DIR_RIGHT;
-        rightNewer      = SYNC_DIR_LEFT;
-        different       = SYNC_DIR_NONE;
-        conflict        = SYNC_DIR_NONE;
-        break;
-    case CUSTOM:
-        assert(false);
-        break;
-    }
-}
-
-
-wxString SyncConfiguration::getVariantName() const
-{
-    switch (getVariant())
+    switch (getVariant(syncCfg))
     {
     case SyncConfiguration::AUTOMATIC:
         return _("<Automatic>");
@@ -127,12 +52,81 @@ wxString SyncConfiguration::getVariantName() const
         return _("Mirror ->>");
     case SyncConfiguration::UPDATE:
         return _("Update ->");
-    case SyncConfiguration::TWOWAY: //variant "twoway" is not selectable via gui anymore
     case SyncConfiguration::CUSTOM:
         return _("Custom");
     }
     return _("Error");
 }
+
+
+void FreeFileSync::setTwoWay(SyncConfiguration& syncCfg) //helper method used by <Automatic> mode fallback to overwrite old with newer files
+{
+    syncCfg.automatic = false;
+    syncCfg.exLeftSideOnly  = SYNC_DIR_RIGHT;
+    syncCfg.exRightSideOnly = SYNC_DIR_LEFT;
+    syncCfg.leftNewer       = SYNC_DIR_RIGHT;
+    syncCfg.rightNewer      = SYNC_DIR_LEFT;
+    syncCfg.different       = SYNC_DIR_NONE;
+    syncCfg.conflict        = SYNC_DIR_NONE;
+}
+
+
+SyncConfiguration::Variant FreeFileSync::getVariant(const SyncConfiguration& syncCfg)
+{
+    if (syncCfg.automatic == true)
+        return SyncConfiguration::AUTOMATIC;  //automatic mode
+
+    if (    syncCfg.exLeftSideOnly  == SYNC_DIR_RIGHT &&
+            syncCfg.exRightSideOnly == SYNC_DIR_RIGHT &&
+            syncCfg.leftNewer       == SYNC_DIR_RIGHT &&
+            syncCfg.rightNewer      == SYNC_DIR_RIGHT &&
+            syncCfg.different       == SYNC_DIR_RIGHT &&
+            syncCfg.conflict        == SYNC_DIR_RIGHT)
+        return SyncConfiguration::MIRROR;    //one way ->
+
+    else if (syncCfg.exLeftSideOnly  == SYNC_DIR_RIGHT &&
+             syncCfg.exRightSideOnly == SYNC_DIR_NONE  &&
+             syncCfg.leftNewer       == SYNC_DIR_RIGHT &&
+             syncCfg.rightNewer      == SYNC_DIR_NONE  &&
+             syncCfg.different       == SYNC_DIR_NONE  &&
+             syncCfg.conflict        == SYNC_DIR_NONE)
+        return SyncConfiguration::UPDATE;    //Update ->
+    else
+        return SyncConfiguration::CUSTOM;    //other
+}
+
+
+void FreeFileSync::setVariant(SyncConfiguration& syncCfg, const SyncConfiguration::Variant var)
+{
+    switch (var)
+    {
+    case SyncConfiguration::AUTOMATIC:
+        syncCfg.automatic = true;
+        break;
+    case SyncConfiguration::MIRROR:
+        syncCfg.automatic = false;
+        syncCfg.exLeftSideOnly  = SYNC_DIR_RIGHT;
+        syncCfg.exRightSideOnly = SYNC_DIR_RIGHT;
+        syncCfg.leftNewer       = SYNC_DIR_RIGHT;
+        syncCfg.rightNewer      = SYNC_DIR_RIGHT;
+        syncCfg.different       = SYNC_DIR_RIGHT;
+        syncCfg.conflict        = SYNC_DIR_RIGHT;
+        break;
+    case SyncConfiguration::UPDATE:
+        syncCfg.automatic = false;
+        syncCfg.exLeftSideOnly  = SYNC_DIR_RIGHT;
+        syncCfg.exRightSideOnly = SYNC_DIR_NONE;
+        syncCfg.leftNewer       = SYNC_DIR_RIGHT;
+        syncCfg.rightNewer      = SYNC_DIR_NONE;
+        syncCfg.different       = SYNC_DIR_NONE;
+        syncCfg.conflict        = SYNC_DIR_NONE;
+        break;
+    case SyncConfiguration::CUSTOM:
+    assert(false);
+        break;
+    }
+}
+
 
 
 wxString MainConfiguration::getSyncVariantName()
@@ -142,22 +136,22 @@ wxString MainConfiguration::getSyncVariantName()
         firstPair.altSyncConfig->syncConfiguration :
         syncConfiguration; //fallback to main sync cfg
 
-    const SyncConfiguration::Variant firstVariant = firstSyncCfg.getVariant();
+    const SyncConfiguration::Variant firstVariant = getVariant(firstSyncCfg);
 
     //test if there's a deviating variant within the additional folder pairs
     for (std::vector<FolderPairEnh>::const_iterator i = additionalPairs.begin(); i != additionalPairs.end(); ++i)
     {
         const SyncConfiguration::Variant thisVariant =
             i->altSyncConfig.get() ?
-            i->altSyncConfig->syncConfiguration.getVariant() :
-            syncConfiguration.getVariant();
+            getVariant(i->altSyncConfig->syncConfiguration) :
+            getVariant(syncConfiguration);
 
         if (thisVariant != firstVariant)
             return _("Multiple...");
     }
 
     //seems to be all in sync...
-    return firstSyncCfg.getVariantName();
+    return getVariantName(firstSyncCfg);
 }
 
 
@@ -257,7 +251,7 @@ wxString FreeFileSync::getSymbol(SyncOperation op)
     case SO_OVERWRITE_RIGHT:
         return wxT("->");
     case SO_DO_NOTHING:
-        return wxT("-");
+        return wxT(" -");
     case SO_EQUAL:
         return wxT("'=="); //added quotation mark to avoid error in Excel cell when exporting to *.cvs
     case SO_UNRESOLVED_CONFLICT:

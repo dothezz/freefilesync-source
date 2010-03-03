@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "trayMenu.h"
 #include <wx/msgdlg.h>
 #include <wx/taskbar.h>
@@ -12,6 +18,7 @@
 #include <wx/log.h>
 #include "../shared/staticAssert.h"
 #include "../shared/buildInfo.h"
+#include <wx/icon.h> //Linux needs this
 
 class RtsTrayIcon;
 
@@ -46,7 +53,13 @@ public:
     RtsTrayIcon(WaitCallbackImpl* callback) :
         m_callback(callback)
     {
-        wxTaskBarIcon::SetIcon(*GlobalResources::getInstance().programIcon, wxString(wxT("RealtimeSync")) + wxT(" - ") + _("Monitoring active..."));
+#ifdef FFS_WIN
+        const wxIcon& realtimeIcon = *GlobalResources::getInstance().programIcon;
+#elif defined FFS_LINUX
+        wxIcon realtimeIcon;
+        realtimeIcon.CopyFromBitmap(GlobalResources::getInstance().getImageByName(wxT("RTS_tray_linux.png"))); //use a 22x22 bitmap for perfect fit
+#endif
+        wxTaskBarIcon::SetIcon(realtimeIcon, wxString(wxT("RealtimeSync")) + wxT(" - ") + _("Monitoring active..."));
 
         //register double-click
         Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(RtsTrayIcon::resumeToMain), NULL, this);
@@ -216,3 +229,4 @@ RealtimeSync::MonitorResponse RealtimeSync::startDirectoryMonitor(const xmlAcces
 
     return RESUME;
 }
+

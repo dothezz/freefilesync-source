@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "resources.h"
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
@@ -61,7 +67,7 @@ void loadAnimFromZip(wxZipInputStream& zipInput, wxAnimation* animation)
 
 void GlobalResources::load() const
 {
-    wxFFileInputStream input(FreeFileSync::getInstallationDir() + wxT("Resources.dat"));
+    wxFFileInputStream input(FreeFileSync::getResourceDir() + wxT("Resources.dat"));
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files

@@ -40,26 +40,26 @@
 &Informatie...
 &Advanced
 &Geavanceerd
-&Apply
-&Toepassen
 &Cancel
 &Annuleren
 &Check for new version
 &Controleer op nieuwe versie
 &Content
 &Help artikelen
-&Create batch job
-&Creëer batchjob
+&Create batch job...
+&Creëer batchjob...
 &Default
 &Standaard
 &Exit
 &Afsluiten
-&Export file list
-&Exporteer bestandslijst
+&Export file list...
+&Exporteer bestandslijst...
 &File
 &Bestand
-&Global settings
-&Algemene instellingen
+&Find next
+
+&Global settings...
+&Algemene instellingen...
 &Help
 &Help
 &Ignore
@@ -68,8 +68,8 @@
 &Taal
 &Load
 &Laden
-&Load configuration
-&Laad de configuratie
+&Load configuration...
+&Laad de configuratie...
 &New
 &Nieuw
 &No
@@ -160,6 +160,8 @@ A newer version of FreeFileSync is available:
 Een nieuwe versie van FreeFileSync is beschikbaar:
 Abort requested: Waiting for current operation to finish...
 Bezig met afbreken: wachten op beëindigen huidige handeling...
+Abort synchronization immediately
+
 Aborted
 Afgebroken
 About
@@ -202,14 +204,12 @@ Browse
 Map opzoeken
 Build:
 Gebouwd:
-Cancel
-Annuleren
 Cannot determine sync-direction:
 Kan de synchronisatie-richting niet bepalen:
+Cannot find %x
+
 Category
 Categorie
-Change direction
-Zijdes omwisselen
 Comma separated list
 Komma gescheiden lijst
 Command line
@@ -274,8 +274,8 @@ Copy locked files
 Kopieer 'alleen lezen' bestanden
 Copy new or updated files to right folder.
 Kopieer nieuwe of geupdate bestanden naar de rechter map.
-Copy shared or locked files using Volume Shadow Copy Service.
-Kopieer gedeelde of alleen-lezen bestanden met Volume Shadow Copy Service.
+Copy shared or locked files using Volume Shadow Copy Service
+Kopieer gedeelde of alleen-lezen bestanden met Volume Shadow Copy Service
 Copy to clipboard\tCTRL+C
 Kopieer naar het klembord\tCTRL+C
 Copying file %x to %y
@@ -308,6 +308,8 @@ DECISION TREE
 BESLISSINGSBOOM
 Data remaining:
 Resterende data:
+Data transferred:
+
 Data verification error: Source and target file have different content!
 Dataverificatie-fout: Bron en doelbestand hebben verschillende inhoud!
 Date
@@ -326,8 +328,8 @@ Delete on both sides
 Verwijder aan beide kanten
 Delete on both sides even if the file is selected on one side only
 Verwijder aan beide kanten ookal is het bestand maar aan één kant geselecteerd
-Delete or overwrite files permanently.
-Verwijder of overschrijf bestanden onomkeerbaar. 
+Delete or overwrite files permanently
+Verwijder of overschrijf bestanden onomkeerbaar
 Delete permanently
 Verwijder onomkeerbaar
 Deleting file %x
@@ -376,6 +378,8 @@ Error copying file:
 Er is een fout opgetreden bij het kopiëren van bestand:
 Error copying locked file %x!
 Er is een fout opgetreden bij het kopiëren van %x omdat het bestand in gebruik is!
+Error copying symbolic link:
+
 Error creating directory:
 Er is een fout opgetreden bij het aanmaken van pad:
 Error deleting directory:
@@ -402,8 +406,6 @@ Error reading file:
 Er is een fout opgetreden bij het lezen van het bestand:
 Error reading from synchronization database:
 Er is een fout opgetreden bij het lezen van de synchronisatie-database:
-Error resolving full path name:
-Er is een fout opgetreden bij het ophalen van de locatie van bestand:
 Error resolving symbolic link:
 Er is een fout opgetreden bij het ophalen van een symbolische koppeling:
 Error starting Volume Shadow Copy Service!
@@ -428,10 +430,10 @@ Exclude temporarily
 Tijdelijk uitsluiten
 Exclude via filter:
 Uitsluiten door filter:
-Exit immediately and set returncode < 0
-Onmiddelijk afsluiten en zet de returncode < 0
-Exit with RC < 0
-Afsluiten met RC < 0
+Exit instantly
+
+Extension
+
 External applications
 Externe applicaties
 Fatal Error
@@ -456,10 +458,10 @@ Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to de
 De bestanden %x hebben een bestandstijd verschil van minder dan één uur!\n\nHet is niet veilig te bepalen welke nieuwer is vanwege zomertijd instellingen
 Files %x have the same date but a different size!
 De bestanden %x hebben dezelfde data maar een afwijkende grootte!
-Files are found equal if\n     - file content\nis the same.
-Bestanden worden gelijk beschouwd als,\n     - de inhoud\novereenkomt.
-Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
-Bestanden worden gelijk beschouwd als,\n     - de grootte\n     - datum en tijdstip van de laatste wijziging\novereenkomt.
+Files are found equal if\n     - file content\nis the same
+Bestanden worden gelijk beschouwd als,\n     - de inhoud\novereenkomt
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same
+Bestanden worden gelijk beschouwd als,\n     - de grootte\n     - datum en tijdstip van de laatste wijziging\novereenkomt
 Files remaining:
 Resterende bestanden:
 Files that are equal on both sides
@@ -472,6 +474,8 @@ Files that exist on both sides, right one is newer
 Bestanden die aan beide kanten bestaan, maar waarvan de rechterkant nieuwer is
 Files/folders found:
 Gevonden bestanden/mappen:
+Files/folders processed:
+
 Files/folders remaining:
 Resterende bestanden/mappen:
 Files/folders that exist on left side only
@@ -490,6 +494,10 @@ Filter view
 Bekijk het filter
 Filtering is deactivated
 Filteren is uitgeschakeld
+Find
+
+Find what:
+
 Folder Comparison and Synchronization
 Mappen vergelijken en synchroniseren
 Free disk space available:
@@ -592,6 +600,8 @@ Initial synchronization:
 Initiële  synchronisatie:
 Integrate external applications into context menu. The following macros are available:
 Integreer externe applicaties in het context menu. De volgende macros zijn beschikbaar:
+Last synchronization not completed!
+
 Leave as unresolved conflict
 Beschouwen als onopgelost conflict
 Left
@@ -610,6 +620,8 @@ Logging
 Loggen
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Schaduw kopieen op WOW64 worden niet ondersteund. Gebruik alstublieft de 64-bit versie van FreeFileSync.
+Match case
+
 Mirror ->>
 Spiegelen ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -622,8 +634,8 @@ Move column down
 Verplaats kolom naar beneden
 Move column up
 Verplaats kolom naar boven
-Move files into a time-stamped subdirectory.
-Verplaats de bestanden in een tijd-gemarkeerde sublocatie.
+Move files into a time-stamped subdirectory
+Verplaats de bestanden in een tijd-gemarkeerde sublocatie
 Moving %x to Recycle Bin
 %x aan het verplaatsen naar de Prullenbak
 Moving file %x to user-defined directory %y
@@ -646,8 +658,10 @@ Number of files and directories that will be deleted
 Aantal mappen en bestanden die zullen worden verwijderd
 Number of files that will be overwritten
 Aantal bestanden dat zal worden overschreven
-OK
-Oke
+One of the FreeFileSync database entries within the following file is not yet existing:
+
+One of the FreeFileSync database files is not yet existing:
+
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Alleen bestanden /locatie die niet worden gefilterd zullen worden gesynchroniseerd. Het filter word toegepast op de relatieve(!) naam van de basislocatie van de synchronisatie.
 Open directly
@@ -682,6 +696,8 @@ RealtimeSync - Automated Synchronization
 RealtimeSync - Automatische Synchronisatie
 RealtimeSync configuration
 RealtimeSync configuratie
+Recycle Bin not yet supported for this system!
+
 Relative path
 Relatieve pad
 Remove alternate settings
@@ -702,8 +718,8 @@ Right
 Rechts
 Run minimized and write status information to a logfile
 Tijdens het synchroniseren het venster minimaliseren en alle informatie opslaan in een log-bestand
-S&ave configuration
-S&la de instellingen op
+S&ave configuration...
+S&la de instellingen op...
 S&witch view
 &Wijzig weergave
 Save changes to current configuration?
@@ -722,12 +738,12 @@ Select logfile directory:
 Selecteer een map voor het logbestand:
 Select variant:
 Selecteer een variant:
-Setting default synchronization directions. Please check whether they are appropriate for you.
-De standaard synchronisatie-richtingen worden gebruikt. Controleer alstublieft of dit geschikt is voor u.
+Set direction:
+
+Setting default synchronization directions: Old files will be overwritten by newer files.
+
 Show conflicts
 Geef conflicten weer
-Show file icons
-Geef bestandsiconen weer
 Show files that are different
 Geef bestanden die verschillend zijn weer
 Show files that are equal
@@ -796,10 +812,8 @@ Synchronization status
 Synchronisatie: status
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Synchroniseer alle .doc, .zip en .exe bestanden uitgezonderd alles in submap \"temp\"
-Synchronize both sides simultaneously: Copy new or updated files in both directions.
-Synchroniseer beide zijde tegelijkertijd: kopieer nieuwe of geüpdatete bestanden in beide richtingen.
-Synchronize both sides using a database. Deletions are detected automatically.
-Synchroniseer beide zijdes met gebruik van een database. Verwijderde bestanden worden automatisch opgemerkt.
+Synchronize both sides using a database. Deletions are detected automatically
+Synchroniseer beide zijdes met gebruik van een database. Verwijderde bestanden worden automatisch opgemerkt
 Synchronize...
 Synchroniseer...
 Synchronizing...
@@ -810,14 +824,10 @@ Target directory already existing!
 Doellocatie bestaal al!
 Target file already existing!
 Doelbestand bestaat al!
-The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
-De opdrachtregel wordt elke keer uitgevoerd als:\n- Bestanden in deze folders (of subfolders) zijn gewijzigd\n- De gekoppelde schijf beschikbaar wordt (USB-invoegen)
-The database file is not yet existing, but will be created during synchronization:
-Database-bestand bestaat nog niet, maar zal worden aangemaakt tijdens het synchroniseren:
+The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+
 The file does not contain a valid configuration:
 Het bestand bevat geen geldige configuratie:
-The required database entry is not yet existing, but will be created during synchronization:
-De nodige database-informatie bestaan nog niet, maar zal worden aangemaakt tijdens synchroniseren:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Deze variant ziet twee gelijknamige bestanden als gelijk wanneer ze dezelfde bestandsgrootte EN tijdstempel hebben.
 Time
@@ -832,27 +842,21 @@ Total required free disk space:
 Benodigde hoeveelheid vrije schijfruimte:
 Total time:
 Totale tijd:
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
-Behandel bestandstijden die verschillen met precies +/- 1 uur als gelijk en minder als 1 uur als conflict om zomertijd veranderingen te verwerken.
-Two way <->
-Beide zijden <->
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
+Behandel bestandstijden die verschillen met precies +/- 1 uur als gelijk en minder als 1 uur als conflict om zomertijd veranderingen te verwerken
 Unable to connect to sourceforge.net!
 Niet in staat verbinding te maken met sourceforge.net!
 Unable to create logfile!
 Niet mogelijk om een logbestand aan te maken!
-Unable to initialize Recycle Bin!
-De prullenbak kon niet worden geïnitialiseerd!
 Unresolved conflicts existing!
 Er bestaan onopgeloste conflicten!
-Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
-Er bestaan onopgeloste conflicten! \n\nU kunt de conflicten negeren en doorgaan met synchroniseren.
 Update ->
 Overschrijven ->
 Usage:
 Gebruik:
 Use Recycle Bin
 Gebruik de prullenbak
-Use Recycle Bin when deleting or overwriting files.
+Use Recycle Bin when deleting or overwriting files
 Gebruik de prullenbak bij verwijderen of overschrijven van bestanden
 User-defined directory
 Door de gebruiker te definiëren locatie
@@ -874,8 +878,6 @@ You can ignore conflicts and continue synchronization.
 U kunt de conflicten negeren en doorgaan met synchroniseren.
 You can ignore the error to consider not existing directories as empty.
 U kunt de fout negeren om niet bestaande locaties als leeg te beschouwen.
-You can ignore the error to skip current folder pair.
-U kunt de foutmelding om de huidige mappencombinatie over te slaan negeren.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 U kunt proberen om de resterende bestanden opnieuw te synchroniseren (ZONDER opnieuw te hoeven vergelijken)!
 different

@@ -40,26 +40,26 @@
 关于(&A)...
 &Advanced
 高级(&A)
-&Apply
-应用(&Y)
 &Cancel
 取消(&C)
 &Check for new version
 检查更新(&C)
 &Content
 内容(&C)
-&Create batch job
-创建批处理作业(&C)
+&Create batch job...
+创建批处理作业(&C)...
 &Default
 默认(&D)
 &Exit
 退出(&E)
-&Export file list
-导出文件列表(&E)
+&Export file list...
+导出文件列表(&E)...
 &File
 文件(&F)
-&Global settings
-全局设置(&G)
+&Find next
+查找下一个(&F)
+&Global settings...
+全局设置(&G)...
 &Help
 帮助(&H)
 &Ignore
@@ -68,8 +68,8 @@
 切换语言(&L)
 &Load
 加载(&L)
-&Load configuration
-加载配置(&L)
+&Load configuration...
+加载配置(&L)...
 &New
 新建(&N)
 &No
@@ -160,6 +160,8 @@ A newer version of FreeFileSync is available:
 FreeFileSync 有新版可用:
 Abort requested: Waiting for current operation to finish...
 取消请求: 正在等待当前操作完成...
+Abort synchronization immediately
+立即中止同步
 Aborted
 已取消
 About
@@ -202,14 +204,12 @@ Browse
 浏览
 Build:
 开发:
-Cancel
-取消
 Cannot determine sync-direction:
 不能检测同步方向:
+Cannot find %x
+找不到 %x
 Category
 分类
-Change direction
-改变方向
 Comma separated list
 逗号分隔的列表
 Command line
@@ -274,8 +274,8 @@ Copy locked files
 复制被锁定的文件
 Copy new or updated files to right folder.
 复制新的或修改过的文件到右侧文件夹
-Copy shared or locked files using Volume Shadow Copy Service.
-使用卷影复制服务来复制共享或锁定的文件.
+Copy shared or locked files using Volume Shadow Copy Service
+使用卷影复制服务来复制共享或锁定的文件
 Copy to clipboard\tCTRL+C
 复制到剪贴板\tCTRL+C
 Copying file %x to %y
@@ -308,6 +308,8 @@ DECISION TREE
 决策树
 Data remaining:
 剩余数据:
+Data transferred:
+已传送的数据:
 Data verification error: Source and target file have different content!
 数据校验错误:源文件和目标文件内容不同!
 Date
@@ -326,8 +328,8 @@ Delete on both sides
 从两侧删除
 Delete on both sides even if the file is selected on one side only
 从两侧删除(即使仅在一侧选择文件)
-Delete or overwrite files permanently.
-永久性删除或覆盖文件。
+Delete or overwrite files permanently
+永久性删除或覆盖文件
 Delete permanently
 永久性删除
 Deleting file %x
@@ -376,6 +378,8 @@ Error copying file:
 复制文件出错:
 Error copying locked file %x!
 复制已锁定的文件时出错 %x!
+Error copying symbolic link:
+复制符号链接时出错:
 Error creating directory:
 创建目录出错:
 Error deleting directory:
@@ -402,8 +406,6 @@ Error reading file:
 读取文件出错:
 Error reading from synchronization database:
 从同步数据库中读取时出错:
-Error resolving full path name:
-解决完整路径时出错:
 Error resolving symbolic link:
 解决符号链接出错:
 Error starting Volume Shadow Copy Service!
@@ -428,10 +430,10 @@ Exclude temporarily
 暂时排除
 Exclude via filter:
 通过过滤器排除:
-Exit immediately and set returncode < 0
-立即退出，并设置返回码 <0
-Exit with RC < 0
-退出并设置返回码 <0
+Exit instantly
+立即退出
+Extension
+扩展名
 External applications
 外部应用程序
 Fatal Error
@@ -456,10 +458,10 @@ Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to de
 文件 %x 的时间差异小于1小时！\n\n由于夏令时的问题因此不能安全地判断哪一个比较新.
 Files %x have the same date but a different size!
 文件 %x 日期相同但大小不同!
-Files are found equal if\n     - file content\nis the same.
+Files are found equal if\n     - file content\nis the same
 如果文件内容相同则认为两者相同
-Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
-如果文件大小和最后修改时间和日期相同则认为两者相同.
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same
+如果文件大小和最后修改时间和日期相同则认为两者相同
 Files remaining:
 剩余文件:
 Files that are equal on both sides
@@ -472,6 +474,8 @@ Files that exist on both sides, right one is newer
 两侧都有,右侧较新的文件
 Files/folders found:
 找到的文件/文件夹数:
+Files/folders processed:
+已处理的文件/文件夹:
 Files/folders remaining:
 文件/文件夹剩余:
 Files/folders that exist on left side only
@@ -490,6 +494,10 @@ Filter view
 过滤查看
 Filtering is deactivated
 过滤为非活跃状态
+Find
+查找
+Find what:
+要查找什么:
 Folder Comparison and Synchronization
 文件夹比较与同步
 Free disk space available:
@@ -592,6 +600,8 @@ Initial synchronization:
 初始化同步:
 Integrate external applications into context menu. The following macros are available:
 集成外部应用程序到右键菜单. 如下宏可用:
+Last synchronization not completed!
+最后一次同步未完成!
 Leave as unresolved conflict
 遗留为未解决的冲突
 Left
@@ -610,6 +620,8 @@ Logging
 记录
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 不支持在WOW64上使用卷影复制. 请使用 FreeFileSync 64位版本.
+Match case
+匹配大小写
 Mirror ->>
 镜像 ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -622,8 +634,8 @@ Move column down
 下移一行
 Move column up
 上移一行
-Move files into a time-stamped subdirectory.
-移动文件到时间标记子目录.
+Move files into a time-stamped subdirectory
+移动文件到时间标记子目录
 Moving %x to Recycle Bin
 移动 %x 到回收站
 Moving file %x to user-defined directory %y
@@ -646,8 +658,10 @@ Number of files and directories that will be deleted
 一些文件和目录将被删除
 Number of files that will be overwritten
 一些文件和目录将被覆盖
-OK
-确定
+One of the FreeFileSync database entries within the following file is not yet existing:
+以下文件中的FreeFileSync数据库入口其中一个不存在：
+One of the FreeFileSync database files is not yet existing:
+FreeFileSync数据库文件其中一个不存在:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 只有通过过滤的文件/文件夹能被选择用于同步. 过滤中的路径均为同步基础文件夹的相对路径.
 Open directly
@@ -682,6 +696,8 @@ RealtimeSync - Automated Synchronization
 实时同步 - 自动同步
 RealtimeSync configuration
 实时同步配置
+Recycle Bin not yet supported for this system!
+
 Relative path
 相对路径
 Remove alternate settings
@@ -702,8 +718,8 @@ Right
 右侧
 Run minimized and write status information to a logfile
 最小化运行并将状态信息写到一个记录文件中
-S&ave configuration
-保存配置(&A)
+S&ave configuration...
+保存配置(&A)...
 S&witch view
 切换视图(&W)
 Save changes to current configuration?
@@ -722,12 +738,12 @@ Select logfile directory:
 选择日志保存位置:
 Select variant:
 选择变化的:
-Setting default synchronization directions. Please check whether they are appropriate for you.
-设置默认同步方向. 请检查是否适合.
+Set direction:
+设置方向:
+Setting default synchronization directions: Old files will be overwritten by newer files.
+设置默认的同步方向:旧文件会被新文件覆盖.
 Show conflicts
 显示冲突
-Show file icons
-显示文件图标
 Show files that are different
 显示不同的文件
 Show files that are equal
@@ -796,10 +812,8 @@ Synchronization status
 同步状态
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 同步所有 .doc, .zip和 .exe 文件, 除了\"temp\"中的一切.
-Synchronize both sides simultaneously: Copy new or updated files in both directions.
-同时同步两侧:  双向复制新的或更新的文件.
-Synchronize both sides using a database. Deletions are detected automatically.
-使用数据库同步两侧. 删除会被自动检测到.
+Synchronize both sides using a database. Deletions are detected automatically
+使用数据库同步两侧. 删除会被自动检测到
 Synchronize...
 同步...
 Synchronizing...
@@ -810,14 +824,10 @@ Target directory already existing!
 目标目录已经存在!
 Target file already existing!
 目标文件已经存在!
-The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
-命令行会被执行每当:\n- 这些目录(或子目录)里面的文件有修改\n- 相应的盘符变成可用(插入U盘)
-The database file is not yet existing, but will be created during synchronization:
-数据库文件未存在, 但在同步期间会被创建:
+The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+有如下情况时此命令行会执行:\n- 一个文件夹变成可用时(例如:插入U盘)\n- 这些文件夹或其子文件夹中的文件被改动
 The file does not contain a valid configuration:
 该文件不包含有效的配置:
-The required database entry is not yet existing, but will be created during synchronization:
-请求的数据库入口未存在, 但在同步期间会被创建:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 此变化评估两个文件名相同的文件,只有当他们有同样的文件大小并且最后修改日期和时间也相同\n时才认为它们是相同的.
 Time
@@ -832,28 +842,22 @@ Total required free disk space:
 所需可用磁盘空间总量:
 Total time:
 总共时间:
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
-对文件时间差异在精确的+/-1小时的文件认为是相同的,小于1小时的认为是冲突以此来处理夏令时的变化.
-Two way <->
-双向 <->
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
+对文件时间差异在精确的+/-1小时的文件认为是相同的,小于1小时的认为是冲突以此来处理夏令时的变化
 Unable to connect to sourceforge.net!
 无法链接到 Sourceforge.net!
 Unable to create logfile!
 无法创建日志!
-Unable to initialize Recycle Bin!
-无法初始化回收站!
 Unresolved conflicts existing!
 存在不可解决的冲突!
-Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
-存在不可解决的冲突!\n\n你可忽略冲突并继续同步.
 Update ->
 升级 ->
 Usage:
 用法:
 Use Recycle Bin
 使用回收站
-Use Recycle Bin when deleting or overwriting files.
-当删除或覆盖文件时使用回收站.
+Use Recycle Bin when deleting or overwriting files
+当删除或覆盖文件时使用回收站
 User-defined directory
 用户定义目录
 User-defined directory for deletion was not specified!
@@ -874,8 +878,6 @@ You can ignore conflicts and continue synchronization.
 你可忽略冲突并继续同步.
 You can ignore the error to consider not existing directories as empty.
 您可忽略此错误而将不存在的目录视为空.
-You can ignore the error to skip current folder pair.
-你可忽略此错误以跳过当前文件夹对.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 您可能会尝试再次同步剩余的项目(而不必重新比较)!
 different

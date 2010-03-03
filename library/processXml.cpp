@@ -1,9 +1,14 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "processXml.h"
 #include "../shared/xmlBase.h"
 #include <wx/filefn.h>
 #include <wx/intl.h>
 #include "../shared/globalFunctions.h"
-#include "../shared/fileHandling.h"
 #include "../shared/standardPaths.h"
 #include "../shared/stringConv.h"
 
@@ -89,18 +94,18 @@ void xmlAccess::readBatchConfig(const wxString& filename, xmlAccess::XmlBatchCon
 void xmlAccess::readGlobalSettings(xmlAccess::XmlGlobalSettings& config)
 {
     //load XML
-    if (!wxFileExists(FreeFileSync::getGlobalConfigFile()))
-        throw XmlError(wxString(_("File does not exist:")) + wxT(" \"") + FreeFileSync::getGlobalConfigFile() + wxT("\""));
+    if (!wxFileExists(getGlobalConfigFile()))
+        throw XmlError(wxString(_("File does not exist:")) + wxT(" \"") + getGlobalConfigFile() + wxT("\""));
 
     TiXmlDocument doc;
-    if (!loadXmlDocument(FreeFileSync::getGlobalConfigFile(), XML_GLOBAL_SETTINGS, doc))
-        throw XmlError(wxString(_("Error reading file:")) + wxT(" \"") + FreeFileSync::getGlobalConfigFile() + wxT("\""));
+    if (!loadXmlDocument(getGlobalConfigFile(), XML_GLOBAL_SETTINGS, doc))
+        throw XmlError(wxString(_("Error reading file:")) + wxT(" \"") + getGlobalConfigFile() + wxT("\""));
 
     FfsXmlParser parser(doc.RootElement());
     parser.readXmlGlobalSettings(config); //read GUI layout configuration
 
     if (parser.errorsOccured())
-        throw XmlError(wxString(_("Error parsing configuration file:")) + wxT(" \"") + FreeFileSync::getGlobalConfigFile() + wxT("\"\n\n") +
+        throw XmlError(wxString(_("Error parsing configuration file:")) + wxT(" \"") + getGlobalConfigFile() + wxT("\"\n\n") +
                        parser.getErrorMessageFormatted(), XmlError::WARNING);
 }
 
@@ -138,8 +143,8 @@ void xmlAccess::writeGlobalSettings(const XmlGlobalSettings& outputCfg)
 
     //populate and write XML tree
     if (    !writeXmlGlobalSettings(outputCfg, doc) || //add GUI layout configuration settings
-            !saveXmlDocument(FreeFileSync::getGlobalConfigFile(), doc)) //save XML
-        throw XmlError(wxString(_("Error writing file:")) + wxT(" \"") + FreeFileSync::getGlobalConfigFile() + wxT("\""));
+            !saveXmlDocument(getGlobalConfigFile(), doc)) //save XML
+        throw XmlError(wxString(_("Error writing file:")) + wxT(" \"") + getGlobalConfigFile() + wxT("\""));
     return;
 }
 
@@ -416,9 +421,6 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
     //last update check
     readXmlElementLogging("LastCheckForUpdates", global, outputCfg.lastUpdateCheck);
 
-    //minimum size (in bytes) for files to be considered for rename-detection
-    readXmlElementLogging("DetectRenameThreshold", global, outputCfg.detectRenameThreshold);
-
 
     const TiXmlElement* optionalDialogs = TiXmlHandleConst(root).FirstChild("Shared").FirstChild("ShowOptionalDialogs").ToElement();
 
@@ -450,12 +452,13 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
 
     readXmlElementLogging("ManualDeletionOnBothSides", mainWindow, outputCfg.gui.deleteOnBothSides);
     readXmlElementLogging("ManualDeletionUseRecycler", mainWindow, outputCfg.gui.useRecyclerForManualDeletion);
-    readXmlElementLogging("ShowFileIconsLeft",         mainWindow, outputCfg.gui.showFileIconsLeft);
-    readXmlElementLogging("ShowFileIconsRight",        mainWindow, outputCfg.gui.showFileIconsRight);
+
+    readXmlElementLogging("RespectCaseOnSearch", mainWindow, outputCfg.gui.textSearchRespectCase);
 
 //###########################################################
     //read column attributes
     readXmlAttributeLogging("AutoAdjust", TiXmlHandleConst(mainWindow).FirstChild("LeftColumns").ToElement(), outputCfg.gui.autoAdjustColumnsLeft);
+    readXmlAttributeLogging("ShowFileIcons", TiXmlHandleConst(mainWindow).FirstChild("LeftColumns").ToElement(), outputCfg.gui.showFileIconsLeft);
 
     const TiXmlElement* leftColumn = TiXmlHandleConst(mainWindow).FirstChild("LeftColumns").FirstChild("Column").ToElement();
     unsigned int colPos = 0;
@@ -472,6 +475,7 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
     }
 
     readXmlAttributeLogging("AutoAdjust", TiXmlHandleConst(mainWindow).FirstChild("RightColumns").ToElement(), outputCfg.gui.autoAdjustColumnsRight);
+    readXmlAttributeLogging("ShowFileIcons", TiXmlHandleConst(mainWindow).FirstChild("RightColumns").ToElement(), outputCfg.gui.showFileIconsRight);
 
     const TiXmlElement* rightColumn = TiXmlHandleConst(mainWindow).FirstChild("RightColumns").FirstChild("Column").ToElement();
     colPos = 0;
@@ -817,9 +821,6 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
     //last update check
     addXmlElement("LastCheckForUpdates", inputCfg.lastUpdateCheck, global);
 
-    //minimum size (in bytes) for files to be considered for rename-detection
-    addXmlElement("DetectRenameThreshold", inputCfg.detectRenameThreshold, global);
-
 
     //optional dialogs
     TiXmlElement* optionalDialogs = new TiXmlElement("ShowOptionalDialogs");
@@ -866,14 +867,15 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
 
     addXmlElement("ManualDeletionOnBothSides", inputCfg.gui.deleteOnBothSides,            mainWindow);
     addXmlElement("ManualDeletionUseRecycler", inputCfg.gui.useRecyclerForManualDeletion, mainWindow);
-    addXmlElement("ShowFileIconsLeft",         inputCfg.gui.showFileIconsLeft,            mainWindow);
-    addXmlElement("ShowFileIconsRight",        inputCfg.gui.showFileIconsRight,           mainWindow);
+
+    addXmlElement("RespectCaseOnSearch", inputCfg.gui.textSearchRespectCase, mainWindow);
 
     //write column attributes
     TiXmlElement* leftColumn = new TiXmlElement("LeftColumns");
     mainWindow->LinkEndChild(leftColumn);
 
     addXmlAttribute("AutoAdjust", inputCfg.gui.autoAdjustColumnsLeft, leftColumn);
+    addXmlAttribute("ShowFileIcons", inputCfg.gui.showFileIconsLeft, leftColumn);
 
     ColumnAttributes columnAtrribLeftCopy = inputCfg.gui.columnAttribLeft; //can't change const vector
     sort(columnAtrribLeftCopy.begin(), columnAtrribLeftCopy.end(), xmlAccess::sortByPositionOnly);
@@ -892,6 +894,7 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
     mainWindow->LinkEndChild(rightColumn);
 
     addXmlAttribute("AutoAdjust", inputCfg.gui.autoAdjustColumnsRight, rightColumn);
+    addXmlAttribute("ShowFileIcons", inputCfg.gui.showFileIconsRight, rightColumn);
 
     ColumnAttributes columnAtrribRightCopy = inputCfg.gui.columnAttribRight;
     sort(columnAtrribRightCopy.begin(), columnAtrribRightCopy.end(), xmlAccess::sortByPositionOnly);
@@ -956,12 +959,6 @@ int xmlAccess::retrieveSystemLanguage()
 }
 
 
-bool xmlAccess::recycleBinAvailable()
-{
-    return FreeFileSync::recycleBinExists();
-}
-
-
 void xmlAccess::OptionalDialogs::resetDialogs()
 {
     warningDependentFolders        = true;
@@ -1006,4 +1003,10 @@ void xmlAccess::readGuiOrBatchConfig(const wxString& filename, XmlGuiConfig& con
     }
 
     config = convertBatchToGui(batchCfg);
+}
+
+
+wxString xmlAccess::getGlobalConfigFile()
+{
+    return FreeFileSync::getConfigDir() + wxT("GlobalSettings.xml");
 }

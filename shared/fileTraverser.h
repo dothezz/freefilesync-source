@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef FILETRAVERSER_H_INCLUDED
 #define FILETRAVERSER_H_INCLUDED
 
@@ -5,6 +11,7 @@
 #include <set>
 #include <memory>
 #include <wx/longlong.h>
+#include "loki/TypeManip.h"
 
 //advanced file traverser returning metadata and hierarchical information on files and directories
 
@@ -30,22 +37,17 @@ public:
     class ReturnValDir
     {
     public:
-        //some proxy classes
-        class Stop {};
-        class Ignore {};
-        class Continue {};
-
-        ReturnValDir(const Stop&) : returnCode(TRAVERSING_STOP), subDirCb(NULL) {}
-        ReturnValDir(const Ignore&) : returnCode(TRAVERSING_IGNORE_DIR), subDirCb(NULL) {}
-        ReturnValDir(const Continue&, TraverseCallback* subDirCallback) : returnCode(TRAVERSING_CONTINUE), subDirCb(subDirCallback) {}
-
-
         enum ReturnValueEnh
         {
-            TRAVERSING_STOP,
-            TRAVERSING_IGNORE_DIR,
-            TRAVERSING_CONTINUE
+            TRAVERSING_DIR_STOP,
+            TRAVERSING_DIR_IGNORE,
+            TRAVERSING_DIR_CONTINUE
         };
+
+        ReturnValDir(Loki::Int2Type<TRAVERSING_DIR_STOP>) : returnCode(TRAVERSING_DIR_STOP), subDirCb(NULL) {}
+        ReturnValDir(Loki::Int2Type<TRAVERSING_DIR_IGNORE>) : returnCode(TRAVERSING_DIR_IGNORE), subDirCb(NULL) {}
+        ReturnValDir(Loki::Int2Type<TRAVERSING_DIR_CONTINUE>, TraverseCallback* subDirCallback) : returnCode(TRAVERSING_DIR_CONTINUE), subDirCb(subDirCallback) {}
+
 
         const ReturnValueEnh returnCode;
         TraverseCallback* const subDirCb;

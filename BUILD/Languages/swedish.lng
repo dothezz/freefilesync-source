@@ -40,26 +40,26 @@
 &Om...
 &Advanced
 &Avancerat
-&Apply
-&Verkställ
 &Cancel
 &Avbryt
 &Check for new version
 &Sök efter uppdatering
 &Content
 &Innehåll
-&Create batch job
-&Skapa batch-jobb
+&Create batch job...
+&Skapa batch-jobb...
 &Default
 &Standard
 &Exit
 &Avsluta
-&Export file list
-&Exportera fillista
+&Export file list...
+&Exportera fillista...
 &File
 &Arkiv
-&Global settings
-&Allmäna inställningar
+&Find next
+&Sök nästa
+&Global settings...
+&Allmäna inställningar...
 &Help
 &Hjälp
 &Ignore
@@ -68,8 +68,8 @@
 &Språk
 &Load
 &Läs från fil
-&Load configuration
-&Hämta inställningar från fil
+&Load configuration...
+&Hämta inställningar från fil...
 &New
 &Nytt
 &No
@@ -93,7 +93,7 @@
 (Requires an Internet connection!)
 (Kräver Internetuppkoppling!)
 ,
-.
+,
 - Other side's counterpart to %dir
 - Andra sidans motsvarighet till %dir
 - Other side's counterpart to %name
@@ -125,7 +125,7 @@
 -Open-Source file synchronization-
 -Öppen källkod filsynkronisering-
 .
-,
+.
 /sec
 /s
 1 directory
@@ -160,6 +160,8 @@ A newer version of FreeFileSync is available:
 En nyare version av FreeFileSync finns tillgänglig:
 Abort requested: Waiting for current operation to finish...
 Avbryter: Väntar på att aktuell process skall slutföras...
+Abort synchronization immediately
+Avbryt synkronisering omedelbart
 Aborted
 Användaren avbröt
 About
@@ -202,14 +204,12 @@ Browse
 Bläddra
 Build:
 Bygg:
-Cancel
-Avbryt
 Cannot determine sync-direction:
 Kan inte bestämma synk-riktning:
+Cannot find %x
+Kan inte hitta %x
 Category
 Kategori
-Change direction
-Ändra riktning
 Comma separated list
 Komma-separerad lista
 Command line
@@ -274,8 +274,8 @@ Copy locked files
 Kopiera låsta filer
 Copy new or updated files to right folder.
 Kopiera nya och uppdaterade filer till höger katalog.
-Copy shared or locked files using Volume Shadow Copy Service.
-Använd Volume Shadow Copy Service för att kopiera låsta eller delade filer.
+Copy shared or locked files using Volume Shadow Copy Service
+Använd Volume Shadow Copy Service för att kopiera låsta eller delade filer
 Copy to clipboard\tCTRL+C
 Kopiera till urklipp\tCTRL+C
 Copying file %x to %y
@@ -308,6 +308,8 @@ DECISION TREE
 BESLUTSTRÄD
 Data remaining:
 Återstående data:
+Data transferred:
+Överförd data:
 Data verification error: Source and target file have different content!
 Verifikationsfel: Källfil och målfil har olika innehåll!
 Date
@@ -326,7 +328,7 @@ Delete on both sides
 Ta bort på båda sidor
 Delete on both sides even if the file is selected on one side only
 Ta bort på båda sidor, även om filen är markerad på endast en sida
-Delete or overwrite files permanently.
+Delete or overwrite files permanently
 Ta bort eller skriv över permanent
 Delete permanently
 Ta bort permanent
@@ -376,6 +378,8 @@ Error copying file:
 Kan inte kopiera fil:
 Error copying locked file %x!
 Kan inte kopiera låst fil %x!
+Error copying symbolic link:
+Kan inte kopiera symbolisk länk:
 Error creating directory:
 Kan inte skapa katalog:
 Error deleting directory:
@@ -402,8 +406,6 @@ Error reading file:
 Kan inte läsa fil:
 Error reading from synchronization database:
 Kan inte läsa från databasen:
-Error resolving full path name:
-Kan inte läsa in full sökväg:
 Error resolving symbolic link:
 Kan inte tyda symbolisk länk:
 Error starting Volume Shadow Copy Service!
@@ -428,10 +430,10 @@ Exclude temporarily
 Undanta tillfälligt
 Exclude via filter:
 Lägg till i undantag:
-Exit immediately and set returncode < 0
-Avsluta omedelbart och sätt returkod < 0
-Exit with RC < 0
-Avsluta med RC < 0
+Exit instantly
+Avsluta omedelbart
+Extension
+Filformat
 External applications
 Externa program
 Fatal Error
@@ -456,10 +458,10 @@ Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to de
 Filerna %x har en tidsstämpling som skiljer mindre än en timme!\n\nDet är inte helt säkert att avgöra vilken som är nyast, p.g.a sommartids-problem.
 Files %x have the same date but a different size!
 Filerna %x har samma datum men olika storlek!
-Files are found equal if\n     - file content\nis the same.
-Filerna betecknas som lika om, \n     - filinnehållet\när lika.
-Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
-Filerna betecknas som lika om, \n     - filstorlek\n     - 'senast använd' och datum\när lika.
+Files are found equal if\n     - file content\nis the same
+Filerna betecknas som lika om, \n     - filinnehållet\när lika
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same
+Filerna betecknas som lika om, \n     - filstorlek\n     - 'senast använd' och datum\när lika
 Files remaining:
 Filer kvar:
 Files that are equal on both sides
@@ -472,6 +474,8 @@ Files that exist on both sides, right one is newer
 Filer som finns på båda sidor, höger är nyare
 Files/folders found:
 Funna filer/kataloger:
+Files/folders processed:
+Filer/kataloger klara:
 Files/folders remaining:
 Filer/kataloger kvar:
 Files/folders that exist on left side only
@@ -490,6 +494,10 @@ Filter view
 Filtervy
 Filtering is deactivated
 Filter inaktiverat
+Find
+Sök
+Find what:
+Sök efter:
 Folder Comparison and Synchronization
 Katalogjämförelse och synkronisering
 Free disk space available:
@@ -592,6 +600,8 @@ Initial synchronization:
 Initial synkronisering:
 Integrate external applications into context menu. The following macros are available:
 Integrera externa program i högerklicksmeny. Följande variabler finns tillgängliga:
+Last synchronization not completed!
+Senaste synkronisering ej slutförd!
 Leave as unresolved conflict
 Ignorera konflikt
 Left
@@ -610,6 +620,8 @@ Logging
 Loggar
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Skuggkopior av wow64 stöds ej. Använd FreeFileSync x64 istället!
+Match case
+Matcha gemener/VERSALER
 Mirror ->>
 Spegla ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -622,7 +634,7 @@ Move column down
 Flytta ner kollumn
 Move column up
 Flytta upp kollumn
-Move files into a time-stamped subdirectory.
+Move files into a time-stamped subdirectory
 Flytta filer till en tidsstämplad underkatalog
 Moving %x to Recycle Bin
 Flyttar %x till papperskorgen
@@ -646,8 +658,10 @@ Number of files and directories that will be deleted
 Antal filer och kataloger som kommer att tas bort
 Number of files that will be overwritten
 Antal filer som kommer att skrivas över
-OK
-OK
+One of the FreeFileSync database entries within the following file is not yet existing:
+Ett av FreeFileSync´s databasobjekt i följande fil saknas:
+One of the FreeFileSync database files is not yet existing:
+En av FreeFileSync´s databasfiler saknas:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Endast filer/kataloger som kvarstår efter filtrering, kommer att markeras för synkronisering.
 Open directly
@@ -682,6 +696,8 @@ RealtimeSync - Automated Synchronization
 RealtimeSync - Automatiserad synkronisering
 RealtimeSync configuration
 RealtimeSync konfiguration
+Recycle Bin not yet supported for this system!
+
 Relative path
 Sökväg
 Remove alternate settings
@@ -702,8 +718,8 @@ Right
 Höger
 Run minimized and write status information to a logfile
 Kör minimerad och skriv statusinformation till loggfil
-S&ave configuration
-S&para inställningar 
+S&ave configuration...
+S&para inställningar...
 S&witch view
 B&yt sida
 Save changes to current configuration?
@@ -722,12 +738,12 @@ Select logfile directory:
 Välj loggfilsdestination:
 Select variant:
 Välj variant:
-Setting default synchronization directions. Please check whether they are appropriate for you.
-Kontrollera om standard synkroniseringskataloger passar dina önskemål.
+Set direction:
+Ange riktning:
+Setting default synchronization directions: Old files will be overwritten by newer files.
+Standardsynkronisering: Gamla filer kommer att skrivas över av nyare versioner.
 Show conflicts
 Visa konflikter
-Show file icons
-Visa filikoner
 Show files that are different
 Visa filer som är olika
 Show files that are equal
@@ -796,10 +812,8 @@ Synchronization status
 Synkroniseringsstatus
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Synkronisera alla filer, .doc, .zip och .exe men inga undermappar \"temp\".
-Synchronize both sides simultaneously: Copy new or updated files in both directions.
-Synkronisera båda sidor simultant: Kopiera nya eller uppdaterade filer i bägge riktningar.
-Synchronize both sides using a database. Deletions are detected automatically.
-Synkronisera båda sidor med hjälp av databas. Borttagningar upptäcks automatiskt.
+Synchronize both sides using a database. Deletions are detected automatically
+Synkronisera båda sidor med hjälp av databas. Borttagningar upptäcks automatiskt
 Synchronize...
 Synkronisera
 Synchronizing...
@@ -810,14 +824,10 @@ Target directory already existing!
 Målkatalogen finns redan!
 Target file already existing!
 Filen finns redan!
-The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
-Kommandot kommer att exekveras varje gång:\n- Innehållet i dessa kataloger (eller underkataloger) ändras\n- Enheten med aktuell enhetsbokstav ansluts (USB-anslutning)
-The database file is not yet existing, but will be created during synchronization:
-Databasfilen finns inte ännu, men kommer att skapas under synkroniseringen.
+The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+Kommandot kommer att verkställas varje gång:\n- målkatalogen blir tillgänglig (t.ex USB-anslutning)\n- filer i dessa kataloger eller underkataloger ändras
 The file does not contain a valid configuration:
 Filen är ingen giltig konfigureringsfil:
-The required database entry is not yet existing, but will be created during synchronization:
-Databasobjektet finns inte ännu, men kommer att skapas under synkroniseringen:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Denna variant betecknar 2 filer med samma namn som lika, när dom har samma storlek OCH samma tidsstämpling.
 Time
@@ -832,28 +842,22 @@ Total required free disk space:
 Ledigt diskutrymme som krävs:
 Total time:
 Total tid:
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
-Betrakta tidsstämplar som skiljer exakt +/- 1 timme som lika, och mindre än 1 timme som konflikt, för att hantera sommartid.
-Two way <->
-Bägge riktningar <->
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
+Betrakta tidsstämplar som skiljer exakt +/- 1 timme som lika, och mindre än 1 timme som konflikt, för att hantera sommartid
 Unable to connect to sourceforge.net!
 Kan inte ansluta sourceforge.net!
 Unable to create logfile!
 Kan inte skapa loggfil!
-Unable to initialize Recycle Bin!
-Kan inte initiera papperskorgen!
 Unresolved conflicts existing!
 Obehandlad konflikt upptäckt!
-Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
-Obehandlad konflikt upptäckt! \n\nDu kan ignorera konflikter och fortsätta synkroniseringen.
 Update ->
 Uppdatera ->
 Usage:
 Användning:
 Use Recycle Bin
 Använd papperskorgen
-Use Recycle Bin when deleting or overwriting files.
-Use Volume Shadow Copy Service to copy locked or shared files.
+Use Recycle Bin when deleting or overwriting files
+Use Volume Shadow Copy Service to copy locked or shared files
 User-defined directory
 Användardefinierad katalog
 User-defined directory for deletion was not specified!
@@ -874,8 +878,6 @@ You can ignore conflicts and continue synchronization.
 Du kan ignorera konflikter och fortsätta synkroniseringen.
 You can ignore the error to consider not existing directories as empty.
 Du kan ignorera felet att inte betrakta befintliga kataloger som tomma.
-You can ignore the error to skip current folder pair.
-Du kan ignorera felet att hoppa över aktuellt katalogpar.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Du kan försöka synkronisera återstående objekt igen (utan att trycka \"Jämför\")!
 different

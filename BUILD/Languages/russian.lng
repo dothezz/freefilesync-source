@@ -29,7 +29,7 @@
 %x files,
 %x файл(ов),
 %x is not a valid FreeFileSync batch file!
-%x не корректная группа FreeFileSync файл!
+%x не корректный файл пакетного задания FreeFileSync!
 %x of %y rows in view
 %x из %y строк(и) показано
 %x of 1 row in view
@@ -40,25 +40,25 @@
 &О программе...
 &Advanced
 &Дополнительно
-&Apply
-&Принять
 &Cancel
 &Отмена
 &Check for new version
 &Проверить наличие новой версии
 &Content
 &Справка
-&Create batch job
+&Create batch job...
 &Создать задание...
 &Default
 &По-умолчанию
 &Exit
 &Выход
-&Export file list
+&Export file list...
 &Экспортировать список файлов...
 &File
 &Файл
-&Global settings
+&Find next
+&Найти далее
+&Global settings...
 &Глобальные настройки...
 &Help
 &Помощь
@@ -68,7 +68,7 @@
 &Язык
 &Load
 &Загрузить
-&Load configuration
+&Load configuration...
 &Загрузить конфигурацию...
 &New
 &Новая
@@ -160,6 +160,8 @@ A newer version of FreeFileSync is available:
 Доступна новая версия FreeFileSync:
 Abort requested: Waiting for current operation to finish...
 Запрос отмены: Ожидайте, пока текущая операция завершится...
+Abort synchronization immediately
+Отменить синхронизацию немедленно
 Aborted
 Отменено
 About
@@ -202,14 +204,12 @@ Browse
 Обзор
 Build:
 Сборка:
-Cancel
-Отмена
 Cannot determine sync-direction:
 Невозможно определить направление синхронизации:
+Cannot find %x
+Невозможно найти %x
 Category
 Категория
-Change direction
-Поменять направление
 Comma separated list
 Список, разделяемый запятыми
 Command line
@@ -274,8 +274,8 @@ Copy locked files
 Копировать заблокированные файлы
 Copy new or updated files to right folder.
 Копировать новые или обновлять файлы на правой стороне.
-Copy shared or locked files using Volume Shadow Copy Service.
-Копировать общие или заблокированные файлы с помощью Службы Теневого Копирования Тома.
+Copy shared or locked files using Volume Shadow Copy Service
+Копировать общие или заблокированные файлы с помощью Службы Теневого Копирования Тома
 Copy to clipboard\tCTRL+C
 Копировать в буфер обмена\tCTRL+C
 Copying file %x to %y
@@ -308,6 +308,8 @@ DECISION TREE
 Древо решений
 Data remaining:
 Осталось:
+Data transferred:
+Данных передано:
 Data verification error: Source and target file have different content!
 Ошибка проверки данных: исходный и конечный файлы имеют разное содержание!
 Date
@@ -326,7 +328,7 @@ Delete on both sides
 Удалить с обеих сторон
 Delete on both sides even if the file is selected on one side only
 Удалить с обеих сторон, если даже файл выделен только на одной стороне
-Delete or overwrite files permanently.
+Delete or overwrite files permanently
 Удалять или перезаписать файлы, не помещая в "Корзину"
 Delete permanently
 Удалять, не помещая в "Корзину"
@@ -376,6 +378,8 @@ Error copying file:
 Ошибка при копировании файла:
 Error copying locked file %x!
 Ошибка при копировании заблокированного файла %x!
+Error copying symbolic link:
+Ошибка при копировании символьной ссылки:
 Error creating directory:
 Ошибка при создании папки:
 Error deleting directory:
@@ -402,8 +406,6 @@ Error reading file:
 Ошибка при чтении файла:
 Error reading from synchronization database:
 Ошибка при чтении из базы данных синхронизации:
-Error resolving full path name:
-Ошибка при восстановлении абсолютного пути из относительного:
 Error resolving symbolic link:
 Ошибка при решении символической ссылки:
 Error starting Volume Shadow Copy Service!
@@ -421,17 +423,17 @@ Error writing to synchronization database:
 Example
 Пример
 Exclude
-Исключая
+Исключить
 Exclude all rows
-Исключить все строки
+Не отмечать ничего
 Exclude temporarily
-Исключить временные
+Исключить
 Exclude via filter:
 Исключить через фильтр:
-Exit immediately and set returncode < 0
-Выйти немедленно и установить код возврата <0
-Exit with RC < 0
-Выход с RC <0
+Exit instantly
+Выйти немедленно
+Extension
+Расширение
 External applications
 Внешние приложения
 Fatal Error
@@ -456,9 +458,9 @@ Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to de
 Файлы %x имеют время отличающееся менее чем на 1 час!\n\nРешать какой новее небезопасно ввиду перехода на летнее время.
 Files %x have the same date but a different size!
 Файлы %x имеют одинаковую дату, но различаются по размеру!
-Files are found equal if\n     - file content\nis the same.
+Files are found equal if\n     - file content\nis the same
 Файлы считаются равными, если содержание файлов одинаковое
-Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same
 Файлы считаются равными, если одинаковые\n - размер файла\n - дата и время последнего изменения
 Files remaining:
 Файлов осталось:
@@ -472,6 +474,8 @@ Files that exist on both sides, right one is newer
 Файлы, существующие на обоих сторонах, правый новее
 Files/folders found:
 Файлов/папок найдено:
+Files/folders processed:
+Файлов/папок обработано:
 Files/folders remaining:
 Файлов/папок осталось:
 Files/folders that exist on left side only
@@ -490,6 +494,10 @@ Filter view
 Вид фильтра
 Filtering is deactivated
 Фильтрация выключена
+Find
+Найти
+Find what:
+Найти:
 Folder Comparison and Synchronization
 Сравнение и синхронизация
 Free disk space available:
@@ -575,13 +583,13 @@ Ignore this error, retry or abort synchronization?
 Ignore this error, retry or abort?
 Игнорировать эту ошибку, повторить или отменить?
 Include
-Включая
+Включить
 Include all rows
-Включая все строки
+Отметить все
 Include temporarily
-Включая временные
+Включить
 Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
-Включая: *.doc;*.zip;*.exe\nИсключая: \\stuff\\temp\\*
+Включить: *.doc;*.zip;*.exe\nИсключить: \\stuff\\temp\\*
 Incompatible synchronization database format:
 Несовместимый формат базы данных синхронизации:
 Info
@@ -592,6 +600,8 @@ Initial synchronization:
 Первоначальная синхронизация:
 Integrate external applications into context menu. The following macros are available:
 Интегрирует внешние приложения в контекстное меню.\nСледующие команды доступны:
+Last synchronization not completed!
+Последняя синхронизация не была завершена!
 Leave as unresolved conflict
 Оставить как нерешенный конфликт
 Left
@@ -610,6 +620,8 @@ Logging
 Лог-файлы
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Создание теневых копий на WOW64 не поддерживается. Пожалуйста, используйте FreeFileSync 64-разрядной версии.
+Match case
+Учитывать регистр
 Mirror ->>
 Зеркало ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -622,8 +634,8 @@ Move column down
 Переместить вниз
 Move column up
 Переместить вверх
-Move files into a time-stamped subdirectory.
-Переместить файлы во временно-отмеченную подпапку.
+Move files into a time-stamped subdirectory
+Переместить файлы во временно-отмеченную подпапку
 Moving %x to Recycle Bin
 Отправка %x в "Корзину"
 Moving file %x to user-defined directory %y
@@ -646,8 +658,10 @@ Number of files and directories that will be deleted
 Число файлов и папок, которые будут удалены
 Number of files that will be overwritten
 Число файлов, которые будут перезаписаны
-OK
-OK
+One of the FreeFileSync database entries within the following file is not yet existing:
+Записей, относящихся к следующим файлам, в базе данных FreeFileSync еще не существует:
+One of the FreeFileSync database files is not yet existing:
+Файла базы данных FreeFileSync еще не существует:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Только файлы/папки, которые проходят фильтрацию будут отобраны для синхронизации. Фильтр будет применяться ко всем именам, относящимся к основным синхронизируемым папкам.
 Open directly
@@ -682,6 +696,8 @@ RealtimeSync - Automated Synchronization
 RealtimeSync - Автоматическая синхронизация
 RealtimeSync configuration
 Настройка RealtimeSync
+Recycle Bin not yet supported for this system!
+
 Relative path
 Относительный путь
 Remove alternate settings
@@ -702,7 +718,7 @@ Right
 Справа
 Run minimized and write status information to a logfile
 Запустить свернутым и писать информацию по статусу в лог-файл
-S&ave configuration
+S&ave configuration...
 Сохранить конфигурацию...
 S&witch view
 Переключить вид
@@ -722,12 +738,12 @@ Select logfile directory:
 Выберите папку для лог-файлов:
 Select variant:
 Выберите вариант:
-Setting default synchronization directions. Please check whether they are appropriate for you.
-Направление синхронизации выставлено по умолчанию. Пожалуйста, проверьте, подходит ли оно для Вас.
+Set direction:
+Выберите направление:
+Setting default synchronization directions: Old files will be overwritten by newer files.
+Настройка направления синхронизации по умолчанию:\nСтарые файлы будут заменены более новыми файлами.
 Show conflicts
 Показать конфликтующие файлы
-Show file icons
-Показывать иконки файлов
 Show files that are different
 Показать различающиеся файлы
 Show files that are equal
@@ -796,9 +812,7 @@ Synchronization status
 Статус синхронизации
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Синхронизировать все .doc, .zip и .exe файлы, за исключением всех файлов из подпапки \"temp\"
-Synchronize both sides simultaneously: Copy new or updated files in both directions.
-Синхронизировать обе стороны одновременно: копировать новые или обновлять файлы в обоих направлениях.
-Synchronize both sides using a database. Deletions are detected automatically.
+Synchronize both sides using a database. Deletions are detected automatically
 Синхронизировать обе стороны, используя базу данных\nУдаленные файлы/папки определяются автоматически
 Synchronize...
 Синхронизировать
@@ -810,14 +824,10 @@ Target directory already existing!
 Конечная папка уже существует!
 Target file already existing!
 Конечный файл уже существует!
-The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
-Командная строка выполняется когда:\n- Файлы в этих папках (или подпапках) были изменены\n- Соответствующая буква диска становится доступной (добавление USB устройства)
-The database file is not yet existing, but will be created during synchronization:
-Файл базы данных еще не существует, но будет создан во время синхронизации:
+The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+Командная строка выполняется, если:\n- папка становится доступной (например, при подключении USB флеш-накопителя);\n- файлы в обозначенных папках или подпапках были изменены.
 The file does not contain a valid configuration:
 Файл не содержит действительную конфигурацию:
-The required database entry is not yet existing, but will be created during synchronization:
-Требуемой записи еще не существует в базе данных, но она будет создана во время синхронизации:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Этот вариант сравнивает два файла с одинаковыми именами и считает их равными, если они имеют одинаковый размер файла и одинаковую дату и время последнего изменения.
 Time
@@ -832,27 +842,21 @@ Total required free disk space:
 Общее требуемое свободное дисковое пространство:
 Total time:
 Общее время:
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 Учитывать файлы, которые отличаются по времени на 1 час, как равные, менее чем на 1 час, как конфликтные, чтобы учесть переход на летнее время
-Two way <->
-В обоих направлениях <->
 Unable to connect to sourceforge.net!
 Невозможно соединиться с sourceforge.net!
 Unable to create logfile!
 Невозможно создать лог!
-Unable to initialize Recycle Bin!
-Невозможно инициализировать "Корзину"!
 Unresolved conflicts existing!
 Существуют нерешенные конфликты
-Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
-Существуют нерешенные конфликты! \n\nВы можете проигнорировать их и продолжить синхронизацию.
 Update ->
 Обновить ->
 Usage:
 Инструкция:
 Use Recycle Bin
 Использовать "Корзину"
-Use Recycle Bin when deleting or overwriting files.
+Use Recycle Bin when deleting or overwriting files
 Использовать "Корзину" при удалении или перезаписи файлов
 User-defined directory
 Использовать заданную пользователем папку
@@ -874,8 +878,6 @@ You can ignore conflicts and continue synchronization.
 Вы можете проигнорировать их и продолжить синхронизацию.
 You can ignore the error to consider not existing directories as empty.
 Вы можете проигнорировать ошибку, приняв несуществующие папки за пустые.
-You can ignore the error to skip current folder pair.
-Вы можете проигнорировать ошибку, чтобы пропустить текущую пару папок и продолжить.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Вы можете попытаться синхронизировать оставшиеся пункты снова (без повторного сравнения)!
 different

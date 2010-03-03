@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "mainDialog.h"
 #include "resources.h"
 #include "../shared/customButton.h"
@@ -14,15 +20,14 @@
 #include "../shared/stringConv.h"
 #include "../shared/staticAssert.h"
 #include "../shared/buildInfo.h"
+#include "../shared/helpProvider.h"
 
 using namespace FreeFileSync;
 
 
 MainDialog::MainDialog(wxDialog *dlg,
-                       const wxString& cfgFilename,
-                       wxHelpController& helpController)
-    : MainDlgGenerated(dlg),
-    helpController_(helpController)
+                       const wxString& cfgFilename)
+    : MainDlgGenerated(dlg)
 {
     wxWindowUpdateLocker dummy(this); //avoid display distortion
 
@@ -118,9 +123,7 @@ void MainDialog::OnQuit(wxCommandEvent &event)
 
 const wxString& MainDialog::lastConfigFileName()
 {
-    static wxString instance = FreeFileSync::getConfigDir().EndsWith(zToWx(globalFunctions::FILE_NAME_SEPARATOR)) ?
-                               FreeFileSync::getConfigDir() + wxT("LastRun.ffs_real") :
-                               FreeFileSync::getConfigDir() + zToWx(globalFunctions::FILE_NAME_SEPARATOR) + wxT("LastRun.ffs_real");
+    static wxString instance = FreeFileSync::getConfigDir() + wxT("LastRun.ffs_real");
     return instance;
 }
 
@@ -128,9 +131,9 @@ const wxString& MainDialog::lastConfigFileName()
 void MainDialog::OnShowHelp(wxCommandEvent& event)
 {
 #ifdef FFS_WIN
-    helpController_.DisplaySection(wxT("html\\advanced\\RealtimeSync.html"));
+    FreeFileSync::displayHelpEntry(wxT("html\\advanced\\RealtimeSync.html"));
 #elif defined FFS_LINUX
-    helpController_.DisplaySection(wxT("html/advanced/RealtimeSync.html"));
+    FreeFileSync::displayHelpEntry(wxT("html/advanced/RealtimeSync.html"));
 #endif
 }
 
@@ -388,8 +391,8 @@ void MainDialog::addFolder(const std::vector<wxString>& newFolders, bool addFron
     }
 
     //set size of scrolled window
-    const int additionalRows = std::min(additionalFolders.size(), MAX_ADD_FOLDERS); //up to MAX_ADD_FOLDERS additional folders shall be shown
-    m_scrolledWinFolders->SetMinSize(wxSize( -1, folderHeight * additionalRows));
+    const size_t additionalRows = std::min(additionalFolders.size(), MAX_ADD_FOLDERS); //up to MAX_ADD_FOLDERS additional folders shall be shown
+    m_scrolledWinFolders->SetMinSize(wxSize( -1, folderHeight * static_cast<int>(additionalRows)));
 
     //adapt delete top folder pair button
     m_bpButtonRemoveTopFolder->Show();
@@ -419,8 +422,8 @@ void MainDialog::removeAddFolder(const int pos)
 
 
         //set size of scrolled window
-        const int additionalRows = std::min(additionalFolders.size(), MAX_ADD_FOLDERS); //up to MAX_ADD_FOLDERS additional folders shall be shown
-        m_scrolledWinFolders->SetMinSize(wxSize( -1, folderHeight * additionalRows));
+        const size_t additionalRows = std::min(additionalFolders.size(), MAX_ADD_FOLDERS); //up to MAX_ADD_FOLDERS additional folders shall be shown
+        m_scrolledWinFolders->SetMinSize(wxSize( -1, folderHeight * static_cast<int>(additionalRows)));
 
         //adapt delete top folder pair button
         if (additionalFolders.size() == 0)

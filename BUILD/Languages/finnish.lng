@@ -40,26 +40,26 @@
 &Ohje...
 &Advanced
 &Laajennettu
-&Apply
-&Käytä
 &Cancel
 &Lopeta
 &Check for new version
 Etsi &uusi versio
 &Content
-
-&Create batch job
-&Tee eräajo
+&Sisältö
+&Create batch job...
+&Tee eräajo...
 &Default
 &Vakio
 &Exit
 &Poistu
-&Export file list
-&Vie tiedostojoukko
+&Export file list...
+&Vie tiedostojoukko...
 &File
 &Tiedosto
-&Global settings
-&Yleiset asetukset
+&Find next
+&Esi seuraava
+&Global settings...
+&Yleiset asetukset...
 &Help
 &Ohje
 &Ignore
@@ -68,8 +68,8 @@ Etsi &uusi versio
 &Kieli
 &Load
 &Lataa
-&Load configuration
-Asetusten &lataus
+&Load configuration...
+Asetusten &lataus...
 &New
 &Uusi
 &No
@@ -91,7 +91,7 @@ Asetusten &lataus
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (HUOM: Tämä ongelma vaikuttaa vain FAT/FAT32 ohjaimiin!\nOptio voidaan poistaa kaikissa muissa tapauksissa \"jätetään 1. tunnin ero huomiotta\".)
 (Requires an Internet connection!)
-
+(Vaatii Internet-yhteyden!)
 ,
 .
 - Other side's counterpart to %dir
@@ -137,17 +137,17 @@ Asetusten &lataus
 1. Enter relative file or directory names separated by ';' or a new line.
 1. Anna tiedostojen tai hakemistojen suhteelliset nimet eroteltuina ';' tai rivivaihto
 1. Select directories to monitor.
-
+1. Valitse seurattavat hakemistot
 2. &Synchronize...
 2. &Täsmäytä...
 2. Enter a command line.
-
+2. Anna komentokehoite
 2. Use wildcard characters '*' and '?'.
 2. Käytä jokerimerkkejä '*' ja '?' .
 3. Exclude files directly on main grid via context menu.
 3. Sulje tiedostoja pois suoraan pääikkunassa viite hakemiston avulla.
 3. Press 'Start'.
-
+3. Paina 'Käynnistä'.
 <Automatic>
 <- Automaattinen ->
 <Directory>
@@ -160,6 +160,8 @@ A newer version of FreeFileSync is available:
 FreeFileSync:n uusi versio on olemassa:
 Abort requested: Waiting for current operation to finish...
 Ohjelma on lopetettava: Odotetaan toiminnon lopettamista...
+Abort synchronization immediately
+Keskeytä täsmäytys välittömästi
 Aborted
 Keskeytetty
 About
@@ -183,7 +185,7 @@ Nimensä mukaisesti, tiedostot joilla on sama nimi, merkitään samoiksi vain jo
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Luo automaattiseen täsmäytykseen eräajon komentotiedosto. Käynnistä eräajo liittämällä FreeFileSyn ohjelmalle komentotiedosto: FreeFileSync.exe <eräajotiedosto>. Tehtävän suoritusta voit ajoittaa käyttöjärjestelmän toimilla.
 At least one directory input field is empty.
-
+Vähintäin yksi hakemiston syöttökenttä on tyhjä.
 Auto-adjust columns
 Säädä sarakeleveys automaattisesti
 Automatic mode
@@ -202,20 +204,18 @@ Browse
 Selaa
 Build:
 Luotu:
-Cancel
-Keskeytä
 Cannot determine sync-direction:
-
+Täsmäytys suuntä tuntematon:
+Cannot find %x
+En löydä %x
 Category
 Luokka
-Change direction
-Vaihda suunta
 Comma separated list
 CSV-muotoinen lista
 Command line
 Komentokehote
 Command line is empty!
-
+Tyhjä komentokehoite!
 Compare
 Vertaile
 Compare both sides
@@ -271,11 +271,11 @@ Kopioidaan oikea -> vasen
 Copy from right to left overwriting
 Kopioidaan oikea -> vasen ylikirjoittaen
 Copy locked files
-
+Kopioi lukitut tiedostot
 Copy new or updated files to right folder.
 Kopioidaan uudet tai muuttuneet tiedostot oikeaan hakemistoon.
-Copy shared or locked files using Volume Shadow Copy Service.
-
+Copy shared or locked files using Volume Shadow Copy Service
+Kopioi jaetut ja lukitut tiedostot käyttäen Volume Shadow Copy Service
 Copy to clipboard\tCTRL+C
 Kopioi Leikepöydälle\tCTRL+C
 Copying file %x to %y
@@ -287,7 +287,7 @@ Levyasemaa ei tunnistettu tiedostolle:
 Could not initialize directory monitoring:
 Ei voitu käynnistää hakemiston tarkkailua:
 Could not load a required DLL:
-
+Tarvittu DLL ei lataudu:
 Could not read values for the following XML nodes:
 Tietoja lukeminen epäonnistui, XML jäsen:
 Create a batch job
@@ -308,6 +308,8 @@ DECISION TREE
 PÄÄTÖSPUU
 Data remaining:
 Dataa jäljellä:
+Data transferred:
+Siirrettyä dataa:
 Data verification error: Source and target file have different content!
 Tiedon varmennusvirhe: Lähteellä ja kohteella on eri sisältö!
 Date
@@ -326,7 +328,7 @@ Delete on both sides
 Poista molemmilta puolilta
 Delete on both sides even if the file is selected on one side only
 Poista molemmilta puolilta vaikka tiedosto valittu vain toisella puolella
-Delete or overwrite files permanently.
+Delete or overwrite files permanently
 Poista tai ylikirjoita tiedostoja pysyvästi
 Delete permanently
 Poista pysyvästi
@@ -376,6 +378,8 @@ Error copying file:
 Virhe kopioitaessa tiedostoa:
 Error copying locked file %x!
 Virhe kopioitaessa lukittua tiedostoa  %x!
+Error copying symbolic link:
+Symboolisen linkin kopiointi epäonnistui:
 Error creating directory:
 Virhe tapahtui  hakemistoa luotassa:
 Error deleting directory:
@@ -402,8 +406,6 @@ Error reading file:
 Virhe lukiessa tiedostoa:
 Error reading from synchronization database:
 Virhe lukiessa täsmäytyksen tietokantaa:
-Error resolving full path name:
-
 Error resolving symbolic link:
 Virhe selvittäessä symbolista linkkiä:
 Error starting Volume Shadow Copy Service!
@@ -428,10 +430,10 @@ Exclude temporarily
 Sulje pois tilapäisesti
 Exclude via filter:
 Sulje pois suotimella:
-Exit immediately and set returncode < 0
-Välitön poistuminen ja aseta paluukoodi < 0
-Exit with RC < 0
-Poistu ja RC < 0
+Exit instantly
+Poistu välittömästi
+Extension
+Laajennus
 External applications
 Ulkopuolinen sovellus
 Fatal Error
@@ -456,10 +458,10 @@ Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to de
 Tiedostojen %x aikaleima poikkeaa alle tunnin!\n\nEi voida päättää turvallisesti, kesäajan takia, kumpi on uudempi.
 Files %x have the same date but a different size!
 Tiedostot %x samalta päivältä mutta koko poikkeaa!
-Files are found equal if\n     - file content\nis the same.
-Tiedostot samat jos, \n     - tiedoston sisältö\non sama.
-Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
-Tiedosto samat jos, \n     - koko\n     - viimeinen aikaleima\non sama.
+Files are found equal if\n     - file content\nis the same
+Tiedostot samat jos, \n     - tiedoston sisältö\non sama
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same
+Tiedosto samat jos, \n     - koko\n     - viimeinen aikaleima\non sama
 Files remaining:
 Tiedostoja jäljellä:
 Files that are equal on both sides
@@ -472,6 +474,8 @@ Files that exist on both sides, right one is newer
 Tiedosto löytyy molemmilla puolilla, oikea on uudempi
 Files/folders found:
 Löydetty tiedostoja/hakemistoja:
+Files/folders processed:
+Käsiteltyjä tiedostoja/hakemistoja:
 Files/folders remaining:
 Tiedostoja/hakemistoja jäljellä:
 Files/folders that exist on left side only
@@ -485,11 +489,15 @@ Suodata tiedostoja
 Filter has been selected
 Suodin valittu
 Filter settings have changed!
-
+Suodinasetukset muutettu!
 Filter view
 Näytä suodattimet
 Filtering is deactivated
 Suodatus pois päältä
+Find
+Etsi
+Find what:
+Etsi:
 Folder Comparison and Synchronization
 Hakemistojen vertailu ja täsmäytys
 Free disk space available:
@@ -565,11 +573,11 @@ Tunnista ja monista muutokset molemmilla puolilla tietokannalla. Poistot ja rist
 If you like FFS
 Jos pidät FFS:tä
 Ignore 1-hour file time difference
-Älä huomioi 1n tunnin poikkeamaa
+Älä huomioi 1. tunnin poikkeamaa
 Ignore errors
 Älä huomioi virheitä
 Ignore subsequent errors
-Jätä huomioimatta toistuvia virheitä
+Jätä toistuvia virheitä huomiotta 
 Ignore this error, retry or abort synchronization?
 Jätä virhe huomiotta, kokeile uudestaan tai keskeytä täsmäytys?
 Ignore this error, retry or abort?
@@ -592,6 +600,8 @@ Initial synchronization:
 Ensi täsmäytys:
 Integrate external applications into context menu. The following macros are available:
 Liitä ulkoinen sovellus viitekehysvalikkoon. Seuraavat makrot ovat valittavissa:
+Last synchronization not completed!
+Viimeine täsmäytys jäi kesken!
 Leave as unresolved conflict
 Jätä ratkaisemattomana virheenä
 Left
@@ -609,21 +619,23 @@ Lokin viestit:
 Logging
 Kirjaa
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
-
+WOW64 varjokopiointia ei tueta. Käytä FreeFileSync 64-bittistä versiota.
+Match case
+Täsmää kirjainkoko
 Mirror ->>
 Peilaava ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Vasemman hakemiston varmuuskopio: Oikea ylikirjoitetaan ja on täsmäytyksen jälkeen vasemman tarkka kopio.
 Monitoring active...
-
+Seuranta käynnissä...
 More than 50% of the total number of files will be copied or deleted!
 Enemmän kuin 50% tiedostoista kopioidaan tai poistetaan!
 Move column down
 Siirrä sarake alas
 Move column up
 Siirrä sarake ylös
-Move files into a time-stamped subdirectory.
-
+Move files into a time-stamped subdirectory
+Siirrä tiedostot aikaleimattuun hakemistoon
 Moving %x to Recycle Bin
 Siirrä %x Roskakoriin
 Moving file %x to user-defined directory %y
@@ -633,7 +645,7 @@ Siirrä hakemisto %x valittuun hakemistoon %y
 Multiple...
 Moninkertainen...
 No change since last synchronization!
-
+Ei muutoksia edellisen täsmäytyksen jälkeen!
 No filter selected
 Suodin valitsematta
 Not enough free disk space available in:
@@ -646,8 +658,10 @@ Number of files and directories that will be deleted
 Poistetaan tiedostojen ja hakemistojen lukumäärää
 Number of files that will be overwritten
 Ylikirjoitettavien tiedostojen ja hakemistojen lukumäärä
-OK
-OK
+One of the FreeFileSync database entries within the following file is not yet existing:
+Jokin FreeFileSynk tietokannan olioista puuttuu vielä tiedostossa:
+One of the FreeFileSync database files is not yet existing:
+Jokin FreeFileSynk tietokannan tiedostoista puuttuu vielä:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Täsmäytykseen valitaan vain suodatetut tiedostot/hakemistot. Suodatus suoritetaan täsmäytyksen perus hakemistojen mukaisiin suhteellisiin nimiin.
 Open directly
@@ -669,7 +683,7 @@ Pysäytetty
 Please run a Compare first before synchronizing!
 Aja tarkistus ennen täsmäytystä. 
 Processing folder pair:
-
+Käsitellään hakemistoparia:
 Published under the GNU General Public License:
 Julkaistu lisenssillä GNU General Public License:
 Question
@@ -682,6 +696,8 @@ RealtimeSync - Automated Synchronization
 RealtimeSync - Automaattinen täsmäytys
 RealtimeSync configuration
 RealtimeSync Asetukset
+Recycle Bin not yet supported for this system!
+
 Relative path
 Suhteellinen polku
 Remove alternate settings
@@ -693,7 +709,7 @@ Poista hakemistopari
 Remove local filter settings
 Poista paikalliset suotimet
 Renaming file %x to %y
-
+Nimeän tiedostoa %x nimellä %y
 Report translation error
 Ilmoita käännösvirheestä
 Reset
@@ -702,8 +718,8 @@ Right
 Oikea
 Run minimized and write status information to a logfile
 Suorita pienenettynä vie status tiedot lokiin
-S&ave configuration
-Asetukset t&allennetaan 
+S&ave configuration...
+Asetukset t&allennetaan...
 S&witch view
 Vaihda &näkymää
 Save changes to current configuration?
@@ -722,12 +738,12 @@ Select logfile directory:
 Hakemisto lokitiedostoille:
 Select variant:
 Valitse vaihtoehto:
-Setting default synchronization directions. Please check whether they are appropriate for you.
-Oletus täsmäytys kansioille valittu. Tarkista soveltuvuus.
+Set direction:
+Aseta suunta:
+Setting default synchronization directions: Old files will be overwritten by newer files.
+Aseta oletu suunta täsmäytykselle: Vanhat tiedostot ylikirjoitetaan uudemilla tiedostoilla.
 Show conflicts
 Näytä ristiriidat
-Show file icons
-Näytä tiedostokuvakkeet
 Show files that are different
 Näytä poikkeavat tiedostot
 Show files that are equal
@@ -796,10 +812,8 @@ Synchronization status
 Täsmäytyksen status
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Täsmäytä kaikki .doc, .zip und .exe tiedostot paitsi hakemistossa \"temp\" oleva.
-Synchronize both sides simultaneously: Copy new or updated files in both directions.
-Täsmäytetään molemmat puolet: Kopioidaan uudet tai päivitetyt tiedostot molempiin hakemistoihin.
-Synchronize both sides using a database. Deletions are detected automatically.
-Täsmäytetään molemmat puolet käyttäen tietokantaa. Poistot suoritetaan automaattisesti.
+Synchronize both sides using a database. Deletions are detected automatically
+Täsmäytetään molemmat puolet käyttäen tietokantaa. Poistot suoritetaan automaattisesti
 Synchronize...
 Täsmäytä...
 Synchronizing...
@@ -810,14 +824,10 @@ Target directory already existing!
 Haluttu tiedosto on jo olemassa!
 Target file already existing!
 Kohde tiedosto on jo olemassa!
-The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
-
-The database file is not yet existing, but will be created during synchronization:
-Tietokanta puuttuu, luodaan täsmäytyksen aikana.
+The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+Komentokehote suoritetaan joka kerta kun:\n- hakemisto on saatavilla (esim. USB tikku asennetaan)\n- tiedostot näissä hakemistoisa ja alihakemistoissa muutetaan
 The file does not contain a valid configuration:
 Asetustiedosto ei ole kelvollinen:
-The required database entry is not yet existing, but will be created during synchronization:
-Tarvittava alkio puuttuu tietokannasta, se luodaan täsmäytyksen aikana:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Tämä vaihtoehto todennetaan kaksi samannimistä tiedostoa samaksi, jos koko JA viimeinen tallennusaika on sama.
 Time
@@ -832,28 +842,22 @@ Total required free disk space:
 Vaadittu vapaa levytila:
 Total time:
 Kokonaisaika:
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
-Kohtele tiedostoja jolla aikaleima on tasan +/- tunti samoina, korjaa kesäajan siirtoa.
-Two way <->
-Molempiin suuntiin <->
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
+Kohtele tiedostoja jolla aikaleima on tasan +/- tunti samoina, korjaa kesäajan siirtoa
 Unable to connect to sourceforge.net!
 Kytkeytyminen ei onnistu kohteeseen sourceforge.net!
 Unable to create logfile!
 Lokitiedostoa ei pystytä luomaan!
-Unable to initialize Recycle Bin!
-Roskakorin initialisointi ei onnistu!
 Unresolved conflicts existing!
-
-Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
-Ristiriita sovittamatta! \n\nVoit ohittaa ristiriita ja jatkaa täsmäytystä.
+Ratkaisemattomia poikkeamia!
 Update ->
 Päivittävä ->
 Usage:
-
+Käyttöaste:
 Use Recycle Bin
 Käytä Roskakoria
-Use Recycle Bin when deleting or overwriting files.
-Käytä Roskakoria kun poistat tai ylikirjoitat tiedostoja.
+Use Recycle Bin when deleting or overwriting files
+Käytä Roskakoria kun poistat tai ylikirjoitat tiedostoja
 User-defined directory
 Käytä valittua hakemistoa
 User-defined directory for deletion was not specified!
@@ -871,11 +875,9 @@ Varoitus: täsmäytys epäonnistui %x kohdassa:
 When the comparison is started with this option set the following decision tree is processed:
 Käynnistäessä täsmäytystä näillä asetuksilla ottaa käyttöön tämä päätöspuu:
 You can ignore conflicts and continue synchronization.
-
+Voit jatkaa poikkeamista huolimatta täsmäytystä.
 You can ignore the error to consider not existing directories as empty.
 Sivuta virhe ja kohtele puuttuvat hakemistot tyhjinä.
-You can ignore the error to skip current folder pair.
-Sivuta virhe ja hylkää tämä hakemistopari.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Yritä täsmäytystä lopuille uudestaan (ILMAN uutta vertailua)!
 different

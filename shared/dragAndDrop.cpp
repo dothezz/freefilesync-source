@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "dragAndDrop.h"
 #include <wx/dnd.h>
 #include <wx/window.h>
@@ -5,7 +11,8 @@
 #include <wx/textctrl.h>
 #include <wx/filepicker.h>
 #include <wx/filename.h>
-
+#include "fileHandling.h"
+#include "stringConv.h"
 
 //define new event type
 const wxEventType FFS_DROP_FILE_EVENT = wxNewEventType();
@@ -115,24 +122,14 @@ void DragDropOnMainDlg::OnFilesDropped(FFSFileDropEvent& event)
     }
     else //should never be reached
         event.Skip();
-};
-
-
-wxString formatDirectory(const wxString& dirname)
-{
-    wxString dirnameTmp = dirname;
-    dirnameTmp.Trim(true);  //remove whitespace characters from right
-    dirnameTmp.Trim(false); //remove whitespace characters from left
-
-    return dirnameTmp;
 }
 
 
 void DragDropOnMainDlg::OnWriteDirManually(wxCommandEvent& event)
 {
-    const wxString newDir = formatDirectory(event.GetString());
-    if (wxDirExists(newDir))
-        dirPicker_->SetPath(newDir);
+    const Zstring newDir = getFormattedDirectoryName(wxToZ(event.GetString()));
+    if (dirExists(newDir))
+        dirPicker_->SetPath(zToWx(newDir));
 
     event.Skip();
 }
@@ -193,14 +190,14 @@ void DragDropOnDlg::OnFilesDropped(FFSFileDropEvent& event)
     }
     else //should never be reached
         event.Skip();
-};
+}
 
 
 void DragDropOnDlg::OnWriteDirManually(wxCommandEvent& event)
 {
-    const wxString newDir = formatDirectory(event.GetString());
-    if (wxDirExists(newDir))
-        dirPicker_->SetPath(newDir);
+    const Zstring newDir = FreeFileSync::getFormattedDirectoryName(wxToZ(event.GetString()));
+    if (dirExists(newDir))
+        dirPicker_->SetPath(zToWx(newDir));
 
     event.Skip();
 }

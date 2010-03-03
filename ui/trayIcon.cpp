@@ -1,93 +1,17 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "trayIcon.h"
 #include "../library/resources.h"
 #include "smallDialogs.h"
 #include <wx/taskbar.h>
 #include <cmath>
-
-
-enum Selection
-{
-    CONTEXT_RESTORE,
-    CONTEXT_ABOUT
-};
-
-
-class MinimizeToTray::TaskBarImpl : public wxTaskBarIcon
-{
-public:
-    TaskBarImpl(MinimizeToTray* parent) : parent_(parent) {}
-
-    void parentHasDied()
-    {
-        parent_ = NULL;
-    }
-private:
-    virtual wxMenu* CreatePopupMenu()
-    {
-        if (!parent_)
-            return NULL;
-
-        wxMenu* contextMenu = new wxMenu;
-        contextMenu->Append(CONTEXT_ABOUT, _("&About..."));
-        contextMenu->AppendSeparator();
-        contextMenu->Append(CONTEXT_RESTORE, _("&Restore"));
-        //event handling
-        contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MinimizeToTray::OnContextMenuSelection), NULL, parent_);
-
-        return contextMenu; //ownership transferred to library
-    }
-
-    MinimizeToTray* parent_;
-};
-
-
-MinimizeToTray::MinimizeToTray(wxTopLevelWindow* callerWnd, wxWindow* secondWnd) :
-    callerWnd_(callerWnd),
-    secondWnd_(secondWnd),
-    trayIcon(new TaskBarImpl(this))
-{
-    trayIcon->SetIcon(*GlobalResources::getInstance().programIcon, wxT("FreeFileSync"));
-    trayIcon->Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(MinimizeToTray::OnDoubleClick), NULL, this); //register double-click
-
-    if (callerWnd_)
-        callerWnd_->Hide();
-    if (secondWnd_)
-        secondWnd_->Hide();
-}
-
-
-MinimizeToTray::~MinimizeToTray()
-{
-    resumeFromTray();
-}
-
-
-void MinimizeToTray::resumeFromTray() //remove trayIcon and restore windows:  MinimizeToTray is now a zombie object...
-{
-    if (trayIcon)
-    {
-        if (secondWnd_)
-            secondWnd_->Show();
-
-        if (callerWnd_) //usecase: avoid dialog flashing in batch silent mode
-        {
-            callerWnd_->Iconize(false);
-            callerWnd_->Show();
-            callerWnd_->Raise();
-            callerWnd_->SetFocus();
-        }
-        trayIcon->RemoveIcon(); //hide icon until final deletion takes place
-        trayIcon->Disconnect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(MinimizeToTray::OnDoubleClick), NULL, this);
-
-        //use wxWidgets delayed destruction: delete during next idle loop iteration (handle late window messages, e.g. when double-clicking)
-        if (!wxPendingDelete.Member(trayIcon))
-            wxPendingDelete.Append(trayIcon);
-
-        trayIcon->parentHasDied(); //TaskBarImpl (potentially) has longer lifetime than MinimizeToTray: avoid callback!
-        trayIcon = NULL; //avoid reentrance
-    }
-}
-
+#include <wx/image.h>
+#include <wx/menu.h>
+#include <wx/icon.h> //req. by Linux
 
 namespace
 {
@@ -169,6 +93,91 @@ wxIcon generateIcon(size_t percent) //generate icon with progress indicator
 }
 
 
+//------------------------------------------------------------------------------------------------
+enum Selection
+{
+    CONTEXT_RESTORE,
+    CONTEXT_ABOUT
+};
+
+
+class MinimizeToTray::TaskBarImpl : public wxTaskBarIcon
+{
+public:
+    TaskBarImpl(MinimizeToTray* parent) : parent_(parent) {}
+
+    void parentHasDied()
+    {
+        parent_ = NULL;
+    }
+private:
+    virtual wxMenu* CreatePopupMenu()
+    {
+        if (!parent_)
+            return NULL;
+
+        wxMenu* contextMenu = new wxMenu;
+        contextMenu->Append(CONTEXT_ABOUT, _("&About..."));
+        contextMenu->AppendSeparator();
+        contextMenu->Append(CONTEXT_RESTORE, _("&Restore"));
+        //event handling
+        contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MinimizeToTray::OnContextMenuSelection), NULL, parent_);
+
+        return contextMenu; //ownership transferred to library
+    }
+
+    MinimizeToTray* parent_;
+};
+
+
+MinimizeToTray::MinimizeToTray(wxTopLevelWindow* callerWnd, wxWindow* secondWnd) :
+    callerWnd_(callerWnd),
+    secondWnd_(secondWnd),
+    trayIcon(new TaskBarImpl(this))
+{
+    trayIcon->SetIcon(generateIcon(0), wxT("FreeFileSync"));
+    trayIcon->Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(MinimizeToTray::OnDoubleClick), NULL, this); //register double-click
+
+    if (callerWnd_)
+        callerWnd_->Hide();
+    if (secondWnd_)
+        secondWnd_->Hide();
+}
+
+
+MinimizeToTray::~MinimizeToTray()
+{
+    resumeFromTray();
+}
+
+
+void MinimizeToTray::resumeFromTray() //remove trayIcon and restore windows:  MinimizeToTray is now a zombie object...
+{
+    if (trayIcon)
+    {
+        if (secondWnd_)
+            secondWnd_->Show();
+
+        if (callerWnd_) //usecase: avoid dialog flashing in batch silent mode
+        {
+            callerWnd_->Iconize(false);
+            callerWnd_->Show();
+            callerWnd_->Raise();
+            callerWnd_->SetFocus();
+        }
+        trayIcon->RemoveIcon(); //hide icon until final deletion takes place
+        trayIcon->Disconnect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(MinimizeToTray::OnDoubleClick), NULL, this);
+
+        //use wxWidgets delayed destruction: delete during next idle loop iteration (handle late window messages, e.g. when double-clicking)
+        if (!wxPendingDelete.Member(trayIcon))
+            wxPendingDelete.Append(trayIcon);
+
+        trayIcon->parentHasDied(); //TaskBarImpl (potentially) has longer lifetime than MinimizeToTray: avoid callback!
+        trayIcon = NULL; //avoid reentrance
+    }
+}
+
+
 void MinimizeToTray::setToolTip(const wxString& toolTipText, size_t percent)
 {
     if (trayIcon)
@@ -189,12 +198,8 @@ void MinimizeToTray::OnContextMenuSelection(wxCommandEvent& event)
     switch (eventId)
     {
     case CONTEXT_ABOUT:
-    {
-        AboutDlg* aboutDlg = new AboutDlg(NULL);
-        aboutDlg->ShowModal();
-        aboutDlg->Destroy();
-    }
-    break;
+        FreeFileSync::showAboutDialog();
+        break;
     case CONTEXT_RESTORE:
         resumeFromTray();
     }

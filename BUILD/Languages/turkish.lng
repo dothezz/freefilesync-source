@@ -40,26 +40,26 @@ Va&zgeç
 &Hakkında...
 &Advanced
 &Gelişmiş
-&Apply
-&Uygula
 &Cancel
 &İptal
 &Check for new version
 &Yeni sürüm kontrolü yap
 &Content
 
-&Create batch job
-&Komut (batch) görevi oluştur
+&Create batch job...
+&Komut (batch) görevi oluştur...
 &Default
 &Varsayılan
 &Exit
 Çı&kış
-&Export file list
-Dosya list&esini dışarı aktar
+&Export file list...
+Dosya list&esini dışarı aktar...
 &File
 &Dosya
-&Global settings
-&Genel ayarlar
+&Find next
+
+&Global settings...
+&Genel ayarlar...
 &Help
 &Yardım
 &Ignore
@@ -68,8 +68,8 @@ Dosya list&esini dışarı aktar
 &Dil
 &Load
 &Yükle
-&Load configuration
-Konfigürasyon &yükle
+&Load configuration...
+Konfigürasyon &yükle...
 &New
 &Yeni
 &No
@@ -160,6 +160,8 @@ A newer version of FreeFileSync is available:
 FreeFileSync'in yeni bir sürümü var:
 Abort requested: Waiting for current operation to finish...
 Vazgeçildi: Devam eden işlemin bitmesi bekleniyor...
+Abort synchronization immediately
+
 Aborted
 Vazgeçildi
 About
@@ -202,14 +204,12 @@ Browse
 Araştır
 Build:
 Derleme:
-Cancel
-İptal
 Cannot determine sync-direction:
+
+Cannot find %x
 
 Category
 Kategori
-Change direction
-Yönü değiştir
 Comma separated list
 Virgül ile ayrılmış liste
 Command line
@@ -274,7 +274,7 @@ Copy locked files
 
 Copy new or updated files to right folder.
 Yeni veya güncellenmiş dosyaları sağdaki klasöre kopyala.
-Copy shared or locked files using Volume Shadow Copy Service.
+Copy shared or locked files using Volume Shadow Copy Service
 
 Copy to clipboard\tCTRL+C
 Hafızaya kopyala\tCTRL+C
@@ -308,6 +308,8 @@ DECISION TREE
 Karar Şeması
 Data remaining:
 Kalan veri:
+Data transferred:
+
 Data verification error: Source and target file have different content!
 Veri doğrulama hatası: Kaynak ve hedef dosyası içeriği farklı!
 Date
@@ -326,8 +328,8 @@ Delete on both sides
 Her iki taraftakini sil
 Delete on both sides even if the file is selected on one side only
 Dosya sadece bir tarafta seçili olsa bile her iki taraftakini de sil
-Delete or overwrite files permanently.
-Kalıcı olarak üzerine yaz veya sil.
+Delete or overwrite files permanently
+Kalıcı olarak üzerine yaz veya sil
 Delete permanently
 Kalıcı olarak sil
 Deleting file %x
@@ -376,6 +378,8 @@ Error copying file:
 Dosya kopyalarken hata:
 Error copying locked file %x!
 Kilitli dosya %x'i kopyalarken hata!
+Error copying symbolic link:
+
 Error creating directory:
 Dizin oluştururken hata:
 Error deleting directory:
@@ -402,8 +406,6 @@ Error reading file:
 Dosyayı okurken hata:
 Error reading from synchronization database:
 Senkronizasyon veri tabanýndan okuma hatasý:
-Error resolving full path name:
-
 Error resolving symbolic link:
 Sembolik bağlantıyı çözümlerken hata:
 Error starting Volume Shadow Copy Service!
@@ -428,10 +430,10 @@ Exclude temporarily
 Geçici olarak dışarda bırak
 Exclude via filter:
 Filtrelemeyle dışarda bırak:
-Exit immediately and set returncode < 0
-Hemen çık ve 'returncode < 0' gerçekleştir
-Exit with RC < 0
-RC < 0 ile çık
+Exit instantly
+
+Extension
+
 External applications
 Harici uygulamalar
 Fatal Error
@@ -456,10 +458,10 @@ Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to de
 %X dosyaları 1 saat'ten daha az tarih farkına sahip!\n\Gün ışığından yararlanma ayarına bağlı olarak hangisinin daha yeni olduğuna karar vermek güvenli değil.
 Files %x have the same date but a different size!
 %x dosyalarının tarihleri aynı fakat ebatları farklı!
-Files are found equal if\n     - file content\nis the same.
-\n     - dosya içeriği\naynı ise dosyalar eşit kabul edilir.
-Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
-\n     - dosya ebadı\n     - son değişiklik tarihi\naynı ise dosyalar eşit kabul edilir.
+Files are found equal if\n     - file content\nis the same
+\n     - dosya içeriği\naynı ise dosyalar eşit kabul edilir
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same
+\n     - dosya ebadı\n     - son değişiklik tarihi\naynı ise dosyalar eşit kabul edilir
 Files remaining:
 Kalan dosyalar:
 Files that are equal on both sides
@@ -472,6 +474,8 @@ Files that exist on both sides, right one is newer
 Her iki tarafta mevcut olup sağda olanı yeni olan dosyalar
 Files/folders found:
 Bulunan dosyalar/klasörler:
+Files/folders processed:
+
 Files/folders remaining:
 Kalan dosyalar/klasörler:
 Files/folders that exist on left side only
@@ -489,6 +493,10 @@ Filter settings have changed!
 Filter view
 Filtre görünümü
 Filtering is deactivated
+
+Find
+
+Find what:
 
 Folder Comparison and Synchronization
 Klasör Karşılaştırması ve Senkronizasyonu
@@ -592,6 +600,8 @@ Initial synchronization:
 Baþlangýç senkronizasyonu:
 Integrate external applications into context menu. The following macros are available:
 Harici uygulamaları içerik menüsüne ekle. Şu makro’lar temin edilebilir:
+Last synchronization not completed!
+
 Leave as unresolved conflict
 Çözülmemiş tutarsızlık olarak bırak
 Left
@@ -610,6 +620,8 @@ Logging
 Kayıt tutma
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 
+Match case
+
 Mirror ->>
 Yedekleme ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -622,7 +634,7 @@ Move column down
 Kolonu aşağı taşı
 Move column up
 Kolonu yukarı taşı
-Move files into a time-stamped subdirectory.
+Move files into a time-stamped subdirectory
 
 Moving %x to Recycle Bin
 %x geri dönüşüm kutusuna taşınıyor
@@ -646,8 +658,10 @@ Number of files and directories that will be deleted
 Silinecek dosya ve dizinlerin sayısı
 Number of files that will be overwritten
 Üzerine yazılacak dosyaların sayısı
-OK
-TAMAM
+One of the FreeFileSync database entries within the following file is not yet existing:
+
+One of the FreeFileSync database files is not yet existing:
+
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Senkronizasyon için sadece filtrelenmiş dosyalar/dizinler seçilecek. Senkronizasyon taban dizinlerine göreceli isimlere filtereleme uygulanacaktır.
 Open directly
@@ -682,6 +696,8 @@ RealtimeSync - Automated Synchronization
 RealtimeSync - Otomatik senkronizasyon
 RealtimeSync configuration
 RealtimeSync Konfigürasyon
+Recycle Bin not yet supported for this system!
+
 Relative path
 Göreceli dizin yolu
 Remove alternate settings
@@ -702,8 +718,8 @@ Right
 Sağ
 Run minimized and write status information to a logfile
 
-S&ave configuration
-Konfigürasyonu &kaydet 
+S&ave configuration...
+Konfigürasyonu &kaydet...
 S&witch view
 Görünümü &değiştir
 Save changes to current configuration?
@@ -722,12 +738,12 @@ Select logfile directory:
 Kayıt dosyası dizinini seç:
 Select variant:
 Değişkeni seç:
-Setting default synchronization directions. Please check whether they are appropriate for you.
+Set direction:
+
+Setting default synchronization directions: Old files will be overwritten by newer files.
 
 Show conflicts
 Tutarsızlıkları göster
-Show file icons
-Dosya simgelerini göster
 Show files that are different
 Farklı olan dosyaları göster
 Show files that are equal
@@ -796,10 +812,8 @@ Synchronization status
 Senkronizasyon durumu
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 \"temp\" alt klasöründeki herşey hariç, tüm .doc, .zip ve .exe dosyalarını senkronize et.
-Synchronize both sides simultaneously: Copy new or updated files in both directions.
-Her iki tarafı eşzamanlı olarak senkronize et: Yeni veya güncellenmiş dosyaları her iki yönede kopyala.
-Synchronize both sides using a database. Deletions are detected automatically.
-Bir veritabaný kullanarak iki tarafý senkronize et. Silmeler otomatik olarak algýlanýr.
+Synchronize both sides using a database. Deletions are detected automatically
+Bir veritabaný kullanarak iki tarafý senkronize et. Silmeler otomatik olarak algýlanýr
 Synchronize...
 Senkronize et...
 Synchronizing...
@@ -810,14 +824,10 @@ Target directory already existing!
 Hedef dizin zaten mevcut!
 Target file already existing!
 Hedef dosya zaten mevcut!
-The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
-
-The database file is not yet existing, but will be created during synchronization:
+The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
 
 The file does not contain a valid configuration:
 Dosya geçerli bir konfigürasyon içermiyor:
-The required database entry is not yet existing, but will be created during synchronization:
-
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Bu değişken, aynı isimli iki dosyanın, aynı ebata ve aynı son değişikik tarihine sahip olması durumunda eşit olması anlamına gelir.
 Time
@@ -832,27 +842,21 @@ Total required free disk space:
 Toplam gerekli boş disk alanı:
 Total time:
 Toplam zaman:
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
-Dosya tarihleri tam olarak +/- 1 saat farklı olduğunda dosyaları eşit olarak algıla. 1 saatten az tarih farklılıklarını ise tutarsızlık olarak belirt (Gün ışığından yararlanma durumu).
-Two way <->
-İki yönlü <->
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
+Dosya tarihleri tam olarak +/- 1 saat farklı olduğunda dosyaları eşit olarak algıla. 1 saatten az tarih farklılıklarını ise tutarsızlık olarak belirt (Gün ışığından yararlanma durumu)
 Unable to connect to sourceforge.net!
 sourceforge.net’e bağlanılamıyor!
 Unable to create logfile!
 Kayıt dosyası yaratılamıyor!
-Unable to initialize Recycle Bin!
-Geri dönüşüm kutusu başlatılamıyor!
 Unresolved conflicts existing!
 
-Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
-Çözülemeyen tutarsızlık mevcut! \n\nTutarsızlıkları yoksayıp senkronizasyona devam edebilirsiniz.
 Update ->
 Güncelle ->
 Usage:
 
 Use Recycle Bin
 Geri dönüşüm kutusunu kullan
-Use Recycle Bin when deleting or overwriting files.
+Use Recycle Bin when deleting or overwriting files
 Silme ve üzerine yazma sırasında geri dönüşüm kutusunu kullan
 User-defined directory
 Kullanıcı tanımlı dizin
@@ -874,8 +878,6 @@ You can ignore conflicts and continue synchronization.
 
 You can ignore the error to consider not existing directories as empty.
 Var olamayan dizinleri boş olarak tanımlama hatasını yoksay.
-You can ignore the error to skip current folder pair.
-Halihazýrdaki klasör çiftini es geçmek için hatayý yok sayabilirsiniz. 
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Kalan öğeleri tekrar senkronize etmeyi deneyebilirsiniz (Tekrar kaşılaştırma yapmadan)!
 different

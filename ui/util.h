@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef UTIL_H_INCLUDED
 #define UTIL_H_INCLUDED
 
@@ -17,7 +23,7 @@ wxString formatFilesizeToShortString(const wxLongLong& filesize);
 wxString formatFilesizeToShortString(const wxULongLong& filesize);
 wxString formatFilesizeToShortString(const double filesize);
 
-wxString fromatPercentage(const wxLongLong& dividend, const wxLongLong& divisor);
+wxString formatPercentage(const wxLongLong& dividend, const wxLongLong& divisor);
 
 wxString includeNumberSeparator(const wxString& number);
 

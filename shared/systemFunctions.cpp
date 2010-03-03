@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "systemFunctions.h"
 
 #ifdef FFS_WIN
@@ -30,7 +36,7 @@ wxString FreeFileSync::getLastErrorFormatted(int lastError) //try to get additio
 {
     //determine error code if none was specified
     if (lastError == 0)
-        lastError = errno; //don't use :: errno is a macro!
+        lastError = errno; //don't use "::", errno is a macro!
 
     wxString output = wxString(wxT("Linux Error Code ")) + wxString::Format(wxT("%i"), lastError);
     output += wxString(wxT(": ")) + wxString::FromUTF8(::strerror(lastError));

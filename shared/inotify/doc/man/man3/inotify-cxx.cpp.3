@@ -1,8 +1,10 @@
-.TH "inotify-cxx.cpp" 3 "18 Apr 2007" "Version 0.7.2" "inotify-cxx" \" -*- nroff -*-
+.TH "inotify-cxx.cpp" 3 "9 Dec 2009" "Version 0.7.3" "inotify-cxx" \" -*- nroff -*-
 .ad l
 .nh
 .SH NAME
-inotify-cxx.cpp \- inotify C++ interface implementation 
+inotify-cxx.cpp \- inotify C++ interface implementation  
+
+.PP
 .SH SYNOPSIS
 .br
 .PP
@@ -11,6 +13,12 @@ inotify-cxx.cpp \- inotify C++ interface implementation
 \fC#include <unistd.h>\fP
 .br
 \fC#include <fcntl.h>\fP
+.br
+\fC#include <fstream>\fP
+.br
+\fC#include <sys/syscall.h>\fP
+.br
+\fC#include <sys/inotify-syscalls.h>\fP
 .br
 \fC#include 'inotify-cxx.h'\fP
 .br
@@ -33,7 +41,7 @@ inotify C++ interface implementation
 
 inotify C++ interface
 .PP
-Copyright (C) 2006, 2007 Lukas Jelinek <lukas@aiken.cz>
+Copyright (C) 2006, 2007, 2009 Lukas Jelinek <lukas@aiken.cz>
 .PP
 This program is free software; you can redistribute it and/or modify it under the terms of one of the following licenses:
 .PP
@@ -45,7 +53,9 @@ This program is free software; you can redistribute it and/or modify it under th
 .IP "\(bu" 2
 3. GNU General Public License, version 2 (see LICENSE-GPL)
 .PP
-If you want to help with choosing the best license for you, please visit http://www.gnu.org/licenses/license-list.html. 
+If you want to help with choosing the best license for you, please visit http://www.gnu.org/licenses/license-list.html.
+.PP
+Credits: Mike Frysinger (cleanup of includes) 
 .SH "Define Documentation"
 .PP 
 .SS "#define DUMP_SEP"

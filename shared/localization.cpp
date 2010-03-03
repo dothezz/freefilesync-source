@@ -1,4 +1,10 @@
-﻿#include "localization.h"
+﻿// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
+#include "localization.h"
 #include <wx/msgdlg.h>
 #include "../shared/standardPaths.h"
 #include "../shared/stringConv.h"
@@ -250,6 +256,26 @@ int mapLanguageDialect(const int language)
         //case wxLANGUAGE_PORTUGUESE:
         //case wxLANGUAGE_PORTUGUESE_BRAZILIAN:
 
+//variants of wxLANGUAGE_ARABIC -> needed to detect RTL languages
+    case wxLANGUAGE_ARABIC_ALGERIA:
+    case wxLANGUAGE_ARABIC_BAHRAIN:
+    case wxLANGUAGE_ARABIC_EGYPT:
+    case wxLANGUAGE_ARABIC_IRAQ:
+    case wxLANGUAGE_ARABIC_JORDAN:
+    case wxLANGUAGE_ARABIC_KUWAIT:
+    case wxLANGUAGE_ARABIC_LEBANON:
+    case wxLANGUAGE_ARABIC_LIBYA:
+    case wxLANGUAGE_ARABIC_MOROCCO:
+    case wxLANGUAGE_ARABIC_OMAN:
+    case wxLANGUAGE_ARABIC_QATAR:
+    case wxLANGUAGE_ARABIC_SAUDI_ARABIA:
+    case wxLANGUAGE_ARABIC_SUDAN:
+    case wxLANGUAGE_ARABIC_SYRIA:
+    case wxLANGUAGE_ARABIC_TUNISIA:
+    case wxLANGUAGE_ARABIC_UAE:
+    case wxLANGUAGE_ARABIC_YEMEN:
+        return wxLANGUAGE_ARABIC;
+
     default:
         return language;
     }
@@ -270,9 +296,18 @@ CustomLocale& CustomLocale::getInstance()
 
 
 CustomLocale::CustomLocale() :
-    wxLocale(wxLANGUAGE_DEFAULT), //setting a different language needn't be supported on all systems!
     translationDB(new Translation),
-    currentLanguage(wxLANGUAGE_ENGLISH) {}
+    currentLanguage(wxLANGUAGE_ENGLISH)
+{
+    //avoid RTL mirroring (for now) by mapping Hebrew and Arabic to English
+    const int mappedSystemLang = mapLanguageDialect(wxLocale::GetSystemLanguage());
+    const bool isRTLLanguage = mappedSystemLang == wxLANGUAGE_HEBREW ||
+                               mappedSystemLang == wxLANGUAGE_ARABIC;
+    Init(isRTLLanguage ? wxLANGUAGE_ENGLISH : wxLANGUAGE_DEFAULT); //setting a different language needn't be supported on all systems!
+}
+
+
+CustomLocale::~CustomLocale() {} //non-inline destructor for std::auto_ptr to work with forward declaration
 
 
 inline
@@ -397,7 +432,7 @@ void CustomLocale::setLanguage(const int language)
     translationDB->clear();
     if (!languageFile.empty())
     {
-        UnicodeFileReader langFile(FreeFileSync::getInstallationDir() +  wxT("Languages") +
+        UnicodeFileReader langFile(FreeFileSync::getResourceDir() +  wxT("Languages") +
                                    zToWx(globalFunctions::FILE_NAME_SEPARATOR) + languageFile);
         if (langFile.isOkay())
         {
@@ -408,7 +443,7 @@ void CustomLocale::setLanguage(const int language)
             {
                 exchangeEscapeChars(tmpString);
 
-                if (rowNumber % 2 == 0)
+                if (rowNumber++ % 2 == 0)
                     original = tmpString;
                 else
                 {
@@ -417,8 +452,6 @@ void CustomLocale::setLanguage(const int language)
                     if (!translation.empty())
                         translationDB->insert(std::make_pair(original, translation));
                 }
-
-                ++rowNumber;
             }
         }
         else

@@ -1,23 +1,37 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
+#include "guiGenerated.h"
 #include "smallDialogs.h"
+#include "messagePopup.h"
 #include "../library/resources.h"
 #include "../algorithm.h"
 #include "../shared/stringConv.h"
 #include "util.h"
 #include "../synchronization.h"
-#include <wx/msgdlg.h>
 #include "../library/customGrid.h"
 #include "../shared/customButton.h"
-#include "../library/statistics.h"
 #include "../shared/localization.h"
-#include "../shared/fileHandling.h"
-#include "../library/statusHandler.h"
-#include <wx/wupdlock.h>
 #include "../shared/globalFunctions.h"
-#include "trayIcon.h"
-#include "../shared/staticAssert.h"
 #include "../shared/buildInfo.h"
+#include <wx/wupdlock.h>
+#include <wx/msgdlg.h>
 
 using namespace FreeFileSync;
+
+
+class AboutDlg : public AboutDlgGenerated
+{
+public:
+    AboutDlg(wxWindow* window);
+
+private:
+    void OnClose(wxCloseEvent& event);
+    void OnOK(wxCommandEvent& event);
+};
 
 
 AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
@@ -84,7 +98,26 @@ void AboutDlg::OnOK(wxCommandEvent& event)
 {
     EndModal(0);
 }
+
+
+void FreeFileSync::showAboutDialog()
+{
+    AboutDlg* aboutDlg = new AboutDlg(NULL);
+    aboutDlg->ShowModal();
+    aboutDlg->Destroy();
+}
 //########################################################################################
+
+
+class HelpDlg : public HelpDlgGenerated
+{
+public:
+    HelpDlg(wxWindow* window);
+
+private:
+    void OnClose(wxCloseEvent& event);
+    void OnOK(wxCommandEvent& event);
+};
 
 
 HelpDlg::HelpDlg(wxWindow* window) : HelpDlgGenerated(window)
@@ -137,7 +170,43 @@ void HelpDlg::OnOK(wxCommandEvent& event)
 }
 
 
+void FreeFileSync::showHelpDialog()
+{
+    HelpDlg* helpDlg = new HelpDlg(NULL);
+    helpDlg->ShowModal();
+    helpDlg->Destroy();
+}
 //########################################################################################
+
+
+class FilterDlg : public FilterDlgGenerated
+{
+public:
+    FilterDlg(wxWindow* window,
+              bool isGlobalFilter,
+              Zstring& filterIncl,
+              Zstring& filterExcl,
+              bool filterActive);
+    ~FilterDlg() {}
+
+    enum
+    {
+        BUTTON_APPLY = 1
+    };
+
+private:
+    void OnHelp(wxCommandEvent& event);
+    void OnDefault(wxCommandEvent& event);
+    void OnApply(wxCommandEvent& event);
+    void OnCancel(wxCommandEvent& event);
+    void OnClose(wxCloseEvent& event);
+
+    const bool isGlobalFilter_;
+    Zstring& includeFilter;
+    Zstring& excludeFilter;
+};
+
+
 FilterDlg::FilterDlg(wxWindow* window,
                      bool isGlobalFilter, //global or local filter dialog?
                      Zstring& filterIncl,
@@ -227,7 +296,60 @@ void FilterDlg::OnClose(wxCloseEvent& event)
 }
 
 
+
+DefaultReturnCode::Response FreeFileSync::showFilterDialog(bool isGlobalFilter,
+        Zstring& filterIncl,
+        Zstring& filterExcl,
+        bool filterActive)
+{
+    DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
+    FilterDlg* filterDlg = new FilterDlg(NULL,
+                                         isGlobalFilter, //is main filter dialog
+                                         filterIncl,
+                                         filterExcl,
+                                         filterActive);
+    if (filterDlg->ShowModal() == FilterDlg::BUTTON_APPLY)
+        rv = DefaultReturnCode::BUTTON_OKAY;
+
+    filterDlg->Destroy();
+    return rv;
+}
 //########################################################################################
+
+
+class DeleteDialog : public DeleteDlgGenerated
+{
+public:
+    DeleteDialog(wxWindow* main,
+                 const std::vector<FreeFileSync::FileSystemObject*>& rowsOnLeft,
+                 const std::vector<FreeFileSync::FileSystemObject*>& rowsOnRight,
+                 bool& deleteOnBothSides,
+                 bool& useRecycleBin,
+                 int& totalDeleteCount);
+
+    enum
+    {
+        BUTTON_OKAY = 1,
+        BUTTON_CANCEL
+    };
+
+private:
+    void OnOK(wxCommandEvent& event);
+    void OnCancel(wxCommandEvent& event);
+    void OnClose(wxCloseEvent& event);
+    void OnDelOnBothSides(wxCommandEvent& event);
+    void OnUseRecycler(wxCommandEvent& event);
+
+    void updateTexts();
+
+    const std::vector<FreeFileSync::FileSystemObject*>& rowsToDeleteOnLeft;
+    const std::vector<FreeFileSync::FileSystemObject*>& rowsToDeleteOnRight;
+    bool& m_deleteOnBothSides;
+    bool& m_useRecycleBin;
+    int&  totalDelCount;
+};
+
+
 DeleteDialog::DeleteDialog(wxWindow* main,
                            const std::vector<FileSystemObject*>& rowsOnLeft,
                            const std::vector<FileSystemObject*>& rowsOnRight,
@@ -299,202 +421,60 @@ void DeleteDialog::OnDelOnBothSides(wxCommandEvent& event)
 
 void DeleteDialog::OnUseRecycler(wxCommandEvent& event)
 {
-    if (m_checkBoxUseRecycler->GetValue())
-    {
-        if (!FreeFileSync::recycleBinExists())
-        {
-            wxMessageBox(_("Unable to initialize Recycle Bin!"), _("Error") , wxOK | wxICON_ERROR);
-            m_checkBoxUseRecycler->SetValue(false);
-        }
-    }
-
     m_useRecycleBin = m_checkBoxUseRecycler->GetValue();
     updateTexts();
 }
+
+
+DefaultReturnCode::Response FreeFileSync::showDeleteDialog(const std::vector<FreeFileSync::FileSystemObject*>& rowsOnLeft,
+        const std::vector<FreeFileSync::FileSystemObject*>& rowsOnRight,
+        bool& deleteOnBothSides,
+        bool& useRecycleBin,
+        int& totalDeleteCount)
+{
+    DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
+
+    DeleteDialog* confirmDeletion = new DeleteDialog(NULL,
+            rowsOnLeft,
+            rowsOnRight,
+            deleteOnBothSides,
+            useRecycleBin,
+            totalDeleteCount);
+    if (confirmDeletion->ShowModal() == DeleteDialog::BUTTON_OKAY)
+        rv = DefaultReturnCode::BUTTON_OKAY;
+
+    confirmDeletion->Destroy();
+    return rv;
+}
 //########################################################################################
 
 
-ErrorDlg::ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxString messageText, bool& ignoreNextErrors) :
-    ErrorDlgGenerated(parentWindow),
-    ignoreErrors(ignoreNextErrors)
+class CustomizeColsDlg : public CustomizeColsDlgGenerated
 {
-    m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("error")));
-    m_textCtrl8->SetValue(messageText);
-    m_checkBoxIgnoreErrors->SetValue(ignoreNextErrors);
+public:
+    CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes& attr);
 
-    if (~activeButtons & BUTTON_IGNORE)
+    enum
     {
-        m_buttonIgnore->Hide();
-        m_checkBoxIgnoreErrors->Hide();
-    }
+        BUTTON_OKAY = 10
+    };
 
-    if (~activeButtons & BUTTON_RETRY)
-        m_buttonRetry->Hide();
+private:
+    void OnOkay(wxCommandEvent& event);
+    void OnDefault(wxCommandEvent& event);
+    void OnCancel(wxCommandEvent& event);
+    void OnClose(wxCloseEvent& event);
 
-    if (~activeButtons & BUTTON_ABORT)
-        m_buttonAbort->Hide();
+    void OnMoveUp(wxCommandEvent& event);
+    void OnMoveDown(wxCommandEvent& event);
 
-    //set button focus precedence
-    if (activeButtons & BUTTON_RETRY)
-        m_buttonRetry->SetFocus();
-    else if (activeButtons & BUTTON_IGNORE)
-        m_buttonIgnore->SetFocus();
-    else if (activeButtons & BUTTON_ABORT)
-        m_buttonAbort->SetFocus();
-}
-
-ErrorDlg::~ErrorDlg() {}
+    xmlAccess::ColumnAttributes& output;
+};
 
 
-void ErrorDlg::OnClose(wxCloseEvent& event)
-{
-    ignoreErrors = m_checkBoxIgnoreErrors->GetValue();
-    EndModal(BUTTON_ABORT);
-}
-
-
-void ErrorDlg::OnIgnore(wxCommandEvent& event)
-{
-    ignoreErrors = m_checkBoxIgnoreErrors->GetValue();
-    EndModal(BUTTON_IGNORE);
-}
-
-
-void ErrorDlg::OnRetry(wxCommandEvent& event)
-{
-    ignoreErrors = m_checkBoxIgnoreErrors->GetValue();
-    EndModal(BUTTON_RETRY);
-}
-
-
-void ErrorDlg::OnAbort(wxCommandEvent& event)
-{
-    ignoreErrors = m_checkBoxIgnoreErrors->GetValue();
-    EndModal(BUTTON_ABORT);
-}
-//########################################################################################
-
-
-WarningDlg::WarningDlg(wxWindow* parentWindow,  int activeButtons, const wxString messageText, bool& dontShowDlgAgain) :
-    WarningDlgGenerated(parentWindow),
-    dontShowAgain(dontShowDlgAgain)
-{
-    m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("warning")));
-    m_textCtrl8->SetValue(messageText);
-    m_checkBoxDontShowAgain->SetValue(dontShowAgain);
-
-    if (~activeButtons & BUTTON_IGNORE)
-    {
-        m_buttonIgnore->Hide();
-        m_checkBoxDontShowAgain->Hide();
-    }
-
-    if (~activeButtons & BUTTON_ABORT)
-        m_buttonAbort->Hide();
-
-    //set button focus precedence
-    if (activeButtons & BUTTON_IGNORE)
-        m_buttonIgnore->SetFocus();
-    else if (activeButtons & BUTTON_ABORT)
-        m_buttonAbort->SetFocus();
-}
-
-WarningDlg::~WarningDlg() {}
-
-
-void WarningDlg::OnClose(wxCloseEvent& event)
-{
-    dontShowAgain = m_checkBoxDontShowAgain->GetValue();
-    EndModal(BUTTON_ABORT);
-}
-
-
-void WarningDlg::OnIgnore(wxCommandEvent& event)
-{
-    dontShowAgain = m_checkBoxDontShowAgain->GetValue();
-    EndModal(BUTTON_IGNORE);
-}
-
-
-void WarningDlg::OnAbort(wxCommandEvent& event)
-{
-    dontShowAgain = m_checkBoxDontShowAgain->GetValue();
-    EndModal(BUTTON_ABORT);
-}
-
-//########################################################################################
-
-
-QuestionDlg::QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxString messageText, bool* dontShowDlgAgain) :
-    QuestionDlgGenerated(parentWindow),
-    dontShowAgain(dontShowDlgAgain)
-{
-    m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("question")));
-    m_textCtrl8->SetValue(messageText);
-    if (dontShowAgain)
-        m_checkBoxDontAskAgain->SetValue(*dontShowAgain);
-    else
-        m_checkBoxDontAskAgain->Hide();
-
-    if (~activeButtons & BUTTON_YES)
-        m_buttonYes->Hide();
-
-    if (~activeButtons & BUTTON_NO)
-    {
-        m_buttonNo->Hide();
-        m_checkBoxDontAskAgain->Hide();
-    }
-
-    if (~activeButtons & BUTTON_CANCEL)
-        m_buttonCancel->Hide();
-
-    //set button focus precedence
-    if (activeButtons & BUTTON_YES)
-        m_buttonYes->SetFocus();
-    else if (activeButtons & BUTTON_CANCEL)
-        m_buttonCancel->SetFocus();
-    else if (activeButtons & BUTTON_NO)
-        m_buttonNo->SetFocus();
-}
-
-
-void QuestionDlg::OnClose(wxCloseEvent& event)
-{
-    if (dontShowAgain)
-        *dontShowAgain = m_checkBoxDontAskAgain->GetValue();
-    EndModal(BUTTON_CANCEL);
-}
-
-
-void QuestionDlg::OnCancel(wxCommandEvent& event)
-{
-    if (dontShowAgain)
-        *dontShowAgain = m_checkBoxDontAskAgain->GetValue();
-    EndModal(BUTTON_CANCEL);
-}
-
-
-void QuestionDlg::OnYes(wxCommandEvent& event)
-{
-    if (dontShowAgain)
-        *dontShowAgain = m_checkBoxDontAskAgain->GetValue();
-    EndModal(BUTTON_YES);
-}
-
-void QuestionDlg::OnNo(wxCommandEvent& event)
-{
-    if (dontShowAgain)
-        *dontShowAgain = m_checkBoxDontAskAgain->GetValue();
-    EndModal(BUTTON_NO);
-}
-
-//########################################################################################
-
-
-CustomizeColsDlg::CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes& attr, bool& showFileIcons) :
+CustomizeColsDlg::CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes& attr) :
     CustomizeColsDlgGenerated(window),
-    output(attr),
-    m_showFileIcons(showFileIcons)
+    output(attr)
 {
     m_bpButton29->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("moveUp")));
     m_bpButton30->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("moveDown")));
@@ -508,12 +488,6 @@ CustomizeColsDlg::CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes
         m_checkListColumns->Append(CustomGridRim::getTypeName(i->type));
         m_checkListColumns->Check(i - columnSettings.begin(), i->visible);
     }
-
-#ifdef FFS_LINUX //file icons currently supported on Windows only
-    m_checkBoxShowFileIcons->Hide();
-#endif
-
-    m_checkBoxShowFileIcons->SetValue(m_showFileIcons);
 
     m_checkListColumns->SetSelection(0);
     Fit();
@@ -536,8 +510,6 @@ void CustomizeColsDlg::OnOkay(wxCommandEvent& event)
         }
     }
 
-    m_showFileIcons = m_checkBoxShowFileIcons->GetValue();
-
     EndModal(BUTTON_OKAY);
 }
 
@@ -552,8 +524,6 @@ void CustomizeColsDlg::OnDefault(wxCommandEvent& event)
         m_checkListColumns->Append(CustomGridRim::getTypeName(i->type));
         m_checkListColumns->Check(i - defaultColumnAttr.begin(), i->visible);
     }
-
-    m_checkBoxShowFileIcons->SetValue(true);
 }
 
 
@@ -602,7 +572,42 @@ void CustomizeColsDlg::OnMoveDown(wxCommandEvent& event)
     }
 }
 
+
+DefaultReturnCode::Response FreeFileSync::showCustomizeColsDlg(xmlAccess::ColumnAttributes& attr)
+{
+    DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
+
+    CustomizeColsDlg* customizeDlg = new CustomizeColsDlg(NULL, attr);
+    if (customizeDlg->ShowModal() == CustomizeColsDlg::BUTTON_OKAY)
+        rv = DefaultReturnCode::BUTTON_OKAY;
+    customizeDlg->Destroy();
+
+    return rv;
+}
 //########################################################################################
+
+
+class SyncPreviewDlg : public SyncPreviewDlgGenerated
+{
+public:
+    SyncPreviewDlg(wxWindow* parentWindow,
+                   const wxString& variantName,
+                   const FreeFileSync::SyncStatistics& statistics,
+                   bool& dontShowAgain);
+    enum
+    {
+        BUTTON_START  = 1,
+        BUTTON_CANCEL = 2
+    };
+
+private:
+    void OnClose(wxCloseEvent& event);
+    void OnCancel(wxCommandEvent& event);
+    void OnStartSync(wxCommandEvent& event);
+
+    bool& m_dontShowAgain;
+};
+
 
 
 SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
@@ -658,7 +663,48 @@ void SyncPreviewDlg::OnStartSync(wxCommandEvent& event)
 }
 
 
+DefaultReturnCode::Response FreeFileSync::showSyncPreviewDlg(
+    const wxString& variantName,
+    const FreeFileSync::SyncStatistics& statistics,
+    bool& dontShowAgain)
+{
+    DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
+
+    SyncPreviewDlg* preview = new SyncPreviewDlg(NULL,
+            variantName,
+            statistics,
+            dontShowAgain);
+
+    if (preview->ShowModal() == SyncPreviewDlg::BUTTON_START)
+        rv = DefaultReturnCode::BUTTON_OKAY;
+
+    preview->Destroy();
+
+    return rv;
+}
 //########################################################################################
+
+
+class CompareCfgDialog : public CmpCfgDlgGenerated
+{
+public:
+    CompareCfgDialog(wxWindow* parentWindow, const wxPoint& position, FreeFileSync::CompareVariant& cmpVar);
+
+    enum
+    {
+        BUTTON_OKAY = 10
+    };
+
+private:
+    void OnClose(wxCloseEvent& event);
+    void OnCancel(wxCommandEvent& event);
+    void OnTimeSize(wxCommandEvent& event);
+    void OnContent(wxCommandEvent& event);
+    void OnShowHelp(wxCommandEvent& event);
+
+    FreeFileSync::CompareVariant& m_cmpVar;
+};
+
 
 CompareCfgDialog::CompareCfgDialog(wxWindow* parentWindow, const wxPoint& position, CompareVariant& cmpVar) :
     CmpCfgDlgGenerated(parentWindow),
@@ -719,7 +765,47 @@ void CompareCfgDialog::OnShowHelp(wxCommandEvent& event)
 }
 
 
+DefaultReturnCode::Response FreeFileSync::showCompareCfgDialog(const wxPoint& position, CompareVariant& cmpVar)
+{
+    DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
+
+    CompareCfgDialog* syncDlg = new CompareCfgDialog(NULL, position, cmpVar);
+    if (syncDlg->ShowModal() == CompareCfgDialog::BUTTON_OKAY)
+        rv = DefaultReturnCode::BUTTON_OKAY;
+
+    syncDlg->Destroy();
+
+    return rv;
+}
 //########################################################################################
+
+
+class GlobalSettingsDlg : public GlobalSettingsDlgGenerated
+{
+public:
+    GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSettings& globalSettings);
+
+    enum
+    {
+        BUTTON_OKAY = 10
+    };
+
+private:
+    void OnOkay(wxCommandEvent& event);
+    void OnResetDialogs(wxCommandEvent& event);
+    void OnDefault(wxCommandEvent& event);
+    void OnCancel(wxCommandEvent& event);
+    void OnClose(wxCloseEvent& event);
+    void OnAddRow(wxCommandEvent& event);
+    void OnRemoveRow(wxCommandEvent& event);
+
+    void set(const xmlAccess::ExternalApps& extApp);
+    xmlAccess::ExternalApps getExtApp();
+
+    xmlAccess::XmlGlobalSettings& settings;
+};
+
+
 GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSettings& globalSettings) :
     GlobalSettingsDlgGenerated(window),
     settings(globalSettings)
@@ -857,541 +943,16 @@ void GlobalSettingsDlg::OnRemoveRow(wxCommandEvent& event)
     }
 }
 
-//########################################################################################
 
-CompareStatus::CompareStatus(wxWindow* parentWindow) :
-    CompareStatusGenerated(parentWindow),
-    scannedObjects(0),
-    totalObjects(0),
-    totalData(0),
-    currentObjects(0),
-    currentData(0),
-    scalingFactor(0),
-    statistics(NULL),
-    lastStatCallSpeed(-1000000), //some big number
-    lastStatCallRemTime(-1000000)
+DefaultReturnCode::Response FreeFileSync::showGlobalSettingsDlg(xmlAccess::XmlGlobalSettings& globalSettings)
 {
-    init();
+    DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
+
+    wxDialog* settingsDlg = new GlobalSettingsDlg(NULL, globalSettings);
+    if (settingsDlg->ShowModal() == GlobalSettingsDlg::BUTTON_OKAY)
+        rv = DefaultReturnCode::BUTTON_OKAY;
+
+    settingsDlg->Destroy();
+
+    return rv;
 }
-
-
-void CompareStatus::init()
-{
-    //initialize gauge
-    m_gauge2->SetRange(50000);
-    m_gauge2->SetValue(0);
-
-    //initially hide status that's relevant for comparing bytewise only
-    bSizer42->Hide(sbSizer13);
-    m_gauge2->Hide();
-    bSizer42->Layout();
-
-    scannedObjects = 0;
-    currentStatusText.clear();
-
-    totalObjects   = 0;
-    totalData      = 0;
-    currentObjects = 0;
-    currentData    = 0;
-    scalingFactor  = 0;
-
-    statistics.reset();
-
-    timeElapsed.Start(); //measure total time
-
-    updateStatusPanelNow();
-}
-
-
-void CompareStatus::switchToCompareBytewise(int totalObjectsToProcess, wxLongLong totalDataToProcess)
-{
-    currentData = 0;
-    totalData = totalDataToProcess;
-
-    currentObjects = 0;
-    totalObjects   = totalObjectsToProcess;
-
-    if (totalData != 0)
-        scalingFactor = 50000 / totalData.ToDouble(); //let's normalize to 50000
-    else
-        scalingFactor = 0;
-
-    //set new statistics handler: 10 seconds "window" for remaining time, 5 seconds for speed
-    statistics.reset(new Statistics(totalObjectsToProcess, totalDataToProcess.ToDouble(), 10000, 5000));
-    lastStatCallSpeed   = -1000000; //some big number
-    lastStatCallRemTime = -1000000;
-
-    //show status for comparing bytewise
-    bSizer42->Show(sbSizer13);
-    m_gauge2->Show();
-    bSizer42->Layout();
-}
-
-
-void CompareStatus::incScannedObjects_NoUpdate(int number)
-{
-    scannedObjects += number;
-}
-
-
-void CompareStatus::incProcessedCmpData_NoUpdate(int objectsProcessed, wxLongLong dataProcessed)
-{
-    currentData    +=    dataProcessed;
-    currentObjects += objectsProcessed;
-}
-
-
-void CompareStatus::setStatusText_NoUpdate(const Zstring& text)
-{
-    currentStatusText = text;
-}
-
-
-void CompareStatus::updateStatusPanelNow()
-{
-    //static RetrieveStatistics statistic;
-    //statistic.writeEntry(currentData, currentObjects);
-    {
-        wxWindowUpdateLocker dummy(this); //reduce display distortion
-
-        bool screenChanged = false; //avoid screen flicker by calling layout() only if necessary
-
-        //remove linebreaks from currentStatusText
-        wxString formattedStatusText = zToWx(currentStatusText);
-        for (wxString::iterator i = formattedStatusText.begin(); i != formattedStatusText.end(); ++i)
-            if (*i == wxChar('\n'))
-                *i = wxChar(' ');
-
-        //status texts
-        if (m_textCtrlStatus->GetValue() != formattedStatusText && (screenChanged = true)) //avoid screen flicker
-            m_textCtrlStatus->SetValue(formattedStatusText);
-
-        //nr of scanned objects
-        const wxString scannedObjTmp = globalFunctions::numberToWxString(scannedObjects);
-        if (m_staticTextScanned->GetLabel() != scannedObjTmp && (screenChanged = true)) //avoid screen flicker
-            m_staticTextScanned->SetLabel(scannedObjTmp);
-
-        //progress indicator for "compare file content"
-        m_gauge2->SetValue(int(currentData.ToDouble() * scalingFactor));
-
-        //remaining files left for file comparison
-        const wxString filesToCompareTmp = globalFunctions::numberToWxString(totalObjects - currentObjects);
-        if (m_staticTextFilesRemaining->GetLabel() != filesToCompareTmp && (screenChanged = true)) //avoid screen flicker
-            m_staticTextFilesRemaining->SetLabel(filesToCompareTmp);
-
-        //remaining bytes left for file comparison
-        const wxString remainingBytesTmp = FreeFileSync::formatFilesizeToShortString(totalData - currentData);
-        if (m_staticTextDataRemaining->GetLabel() != remainingBytesTmp && (screenChanged = true)) //avoid screen flicker
-            m_staticTextDataRemaining->SetLabel(remainingBytesTmp);
-
-        if (statistics.get())
-        {
-            if (timeElapsed.Time() - lastStatCallSpeed >= 500) //call method every 500 ms
-            {
-                lastStatCallSpeed = timeElapsed.Time();
-
-                statistics->addMeasurement(currentObjects, currentData.ToDouble());
-
-                //current speed
-                const wxString speedTmp = statistics->getBytesPerSecond();
-                if (m_staticTextSpeed->GetLabel() != speedTmp && (screenChanged = true)) //avoid screen flicker
-                    m_staticTextSpeed->SetLabel(speedTmp);
-
-                if (timeElapsed.Time() - lastStatCallRemTime >= 2000) //call method every two seconds only
-                {
-                    lastStatCallRemTime = timeElapsed.Time();
-
-                    //remaining time
-                    const wxString timeRemainingTmp = statistics->getRemainingTime();
-                    if (m_staticTextTimeRemaining->GetLabel() != timeRemainingTmp && (screenChanged = true)) //avoid screen flicker
-                        m_staticTextTimeRemaining->SetLabel(timeRemainingTmp);
-                }
-            }
-        }
-
-        //time elapsed
-        const wxString timeElapsedTmp = (wxTimeSpan::Milliseconds(timeElapsed.Time())).Format();
-        if (m_staticTextTimeElapsed->GetLabel() != timeElapsedTmp && (screenChanged = true)) //avoid screen flicker
-            m_staticTextTimeElapsed->SetLabel(timeElapsedTmp);
-
-        //do the ui update
-        if (screenChanged)
-            bSizer42->Layout();
-    }
-    updateUiNow();
-}
-
-
-//########################################################################################
-
-SyncStatus::SyncStatus(StatusHandler* updater, wxWindow* parentWindow) :
-    SyncStatusDlgGenerated(parentWindow,
-                           wxID_ANY,
-                           parentWindow ? wxEmptyString : _("FreeFileSync - Folder Comparison and Synchronization"),
-                           wxDefaultPosition, wxSize(638, 376),
-                           parentWindow ?
-                           wxDEFAULT_FRAME_STYLE | wxFRAME_NO_TASKBAR | wxFRAME_FLOAT_ON_PARENT :
-                           wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL),
-    processStatusHandler(updater),
-    mainDialog(parentWindow),
-    totalObjects(0),
-    totalData(0),
-    currentObjects(0),
-    currentData(0),
-    scalingFactor(0),
-    processPaused(false),
-    currentStatus(SyncStatus::ABORTED),
-    statistics(NULL),
-    lastStatCallSpeed(-1000000), //some big number
-    lastStatCallRemTime(-1000000)
-{
-    m_animationControl1->SetAnimation(*GlobalResources::getInstance().animationSync);
-    m_animationControl1->Play();
-
-    //initialize gauge
-    m_gauge1->SetRange(50000);
-    m_gauge1->SetValue(0);
-
-    m_buttonAbort->SetFocus();
-
-    if (mainDialog)    //disable (main) window while this status dialog is shown
-        mainDialog->Disable();
-
-    timeElapsed.Start(); //measure total time
-
-
-    SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
-
-    //register key event
-    Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(SyncStatus::OnKeyPressed), NULL, this);
-
-}
-
-
-SyncStatus::~SyncStatus()
-{
-    if (mainDialog)
-    {
-        mainDialog->Enable();
-        mainDialog->Raise();
-        mainDialog->SetFocus();
-    }
-
-    if (minimizedToSysTray.get())
-        minimizedToSysTray->keepHidden(); //avoid window flashing shortly before it is destroyed
-}
-
-
-void SyncStatus::OnKeyPressed(wxKeyEvent& event)
-{
-    const int keyCode = event.GetKeyCode();
-    if (keyCode == WXK_ESCAPE)
-        Close(); //generate close event: do NOT destroy window unconditionally!
-
-    event.Skip();
-}
-
-
-void SyncStatus::resetGauge(int totalObjectsToProcess, wxLongLong totalDataToProcess)
-{
-    currentData = 0;
-    totalData = totalDataToProcess;
-
-    currentObjects = 0;
-    totalObjects   = totalObjectsToProcess;
-
-    if (totalData != 0)
-        scalingFactor = 50000 / totalData.ToDouble(); //let's normalize to 50000
-    else
-        scalingFactor = 0;
-
-    //set new statistics handler: 10 seconds "window" for remaining time, 5 seconds for speed
-    statistics.reset(new Statistics(totalObjectsToProcess, totalDataToProcess.ToDouble(), 10000, 5000));
-    lastStatCallSpeed   = -1000000; //some big number
-    lastStatCallRemTime = -1000000;
-}
-
-
-void SyncStatus::incProgressIndicator_NoUpdate(int objectsProcessed, wxLongLong dataProcessed)
-{
-    currentData    +=    dataProcessed;
-    currentObjects += objectsProcessed;
-}
-
-
-void SyncStatus::setStatusText_NoUpdate(const Zstring& text)
-{
-    currentStatusText = text;
-}
-
-
-void SyncStatus::updateStatusDialogNow()
-{
-    //static RetrieveStatistics statistic;
-    //statistic.writeEntry(currentData, currentObjects);
-
-    //write status information systray, too, if window is minimized
-    if (minimizedToSysTray.get())
-        switch (currentStatus)
-        {
-        case SCANNING:
-            minimizedToSysTray->setToolTip(wxString(wxT("FreeFileSync - ")) + wxString(_("Scanning...")));
-            //+ wxT(" ") + globalFunctions::numberToWxString(currentObjects));
-            break;
-        case COMPARING_CONTENT:
-            minimizedToSysTray->setToolTip(wxString(wxT("FreeFileSync - ")) + wxString(_("Comparing content...")) + wxT(" ") +
-                                           fromatPercentage(currentData, totalData), currentData.ToDouble() * 100 / totalData.ToDouble());
-            break;
-        case SYNCHRONIZING:
-            minimizedToSysTray->setToolTip(wxString(wxT("FreeFileSync - ")) + wxString(_("Synchronizing...")) + wxT(" ") +
-                                           fromatPercentage(currentData, totalData), currentData.ToDouble() * 100 / totalData.ToDouble());
-            break;
-        case ABORTED:
-        case FINISHED_WITH_SUCCESS:
-        case FINISHED_WITH_ERROR:
-        case PAUSE:
-            minimizedToSysTray->setToolTip(wxT("FreeFileSync"));
-        }
-
-    //write regular status information (if dialog is visible or not)
-    {
-        wxWindowUpdateLocker dummy(this); //reduce display distortion
-
-        bool screenChanged = false; //avoid screen flicker by calling layout() only if necessary
-
-        //progress indicator
-        if (currentStatus == SCANNING)
-            m_gauge1->Pulse();
-        else
-            m_gauge1->SetValue(globalFunctions::round(currentData.ToDouble() * scalingFactor));
-
-        //status text
-        const wxString statusTxt = zToWx(currentStatusText);
-        if (m_textCtrlInfo->GetValue() != statusTxt && (screenChanged = true)) //avoid screen flicker
-            m_textCtrlInfo->SetValue(statusTxt);
-
-        //remaining objects
-        const wxString remainingObjTmp = globalFunctions::numberToWxString(totalObjects - currentObjects);
-        if (m_staticTextRemainingObj->GetLabel() != remainingObjTmp && (screenChanged = true)) //avoid screen flicker
-            m_staticTextRemainingObj->SetLabel(remainingObjTmp);
-
-        //remaining bytes left for copy
-        const wxString remainingBytesTmp = FreeFileSync::formatFilesizeToShortString(totalData - currentData);
-        if (m_staticTextDataRemaining->GetLabel() != remainingBytesTmp && (screenChanged = true)) //avoid screen flicker
-            m_staticTextDataRemaining->SetLabel(remainingBytesTmp);
-
-        if (statistics.get())
-        {
-            if (timeElapsed.Time() - lastStatCallSpeed >= 500) //call method every 500 ms
-            {
-                lastStatCallSpeed = timeElapsed.Time();
-
-                statistics->addMeasurement(currentObjects, currentData.ToDouble());
-
-                //current speed
-                const wxString speedTmp = statistics->getBytesPerSecond();
-                if (m_staticTextSpeed->GetLabel() != speedTmp && (screenChanged = true)) //avoid screen flicker
-                    m_staticTextSpeed->SetLabel(speedTmp);
-
-                if (timeElapsed.Time() - lastStatCallRemTime >= 2000) //call method every two seconds only
-                {
-                    lastStatCallRemTime = timeElapsed.Time();
-
-                    //remaining time
-                    const wxString timeRemainingTmp = statistics->getRemainingTime();
-                    if (m_staticTextTimeRemaining->GetLabel() != timeRemainingTmp && (screenChanged = true)) //avoid screen flicker
-                        m_staticTextTimeRemaining->SetLabel(timeRemainingTmp);
-                }
-            }
-        }
-
-        //time elapsed
-        const wxString timeElapsedTmp = wxTimeSpan::Milliseconds(timeElapsed.Time()).Format();
-        if (m_staticTextTimeElapsed->GetLabel() != timeElapsedTmp && (screenChanged = true)) //avoid screen flicker
-            m_staticTextTimeElapsed->SetLabel(timeElapsedTmp);
-
-
-        //do the ui update
-        if (screenChanged)
-        {
-            bSizer28->Layout();
-            bSizer31->Layout();
-        }
-    }
-    updateUiNow();
-
-//support for pause button
-    while (processPaused && currentProcessIsRunning())
-    {
-        wxMilliSleep(UI_UPDATE_INTERVAL);
-        updateUiNow();
-    }
-}
-
-
-bool SyncStatus::currentProcessIsRunning()
-{
-    return processStatusHandler != NULL;
-}
-
-
-void SyncStatus::setCurrentStatus(SyncStatusID id)
-{
-    switch (id)
-    {
-    case ABORTED:
-        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusError")));
-        m_staticTextStatus->SetLabel(_("Aborted"));
-        break;
-
-    case FINISHED_WITH_SUCCESS:
-        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusSuccess")));
-        m_staticTextStatus->SetLabel(_("Completed"));
-        break;
-
-    case FINISHED_WITH_ERROR:
-        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusWarning")));
-        m_staticTextStatus->SetLabel(_("Completed"));
-        break;
-
-    case PAUSE:
-        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusPause")));
-        m_staticTextStatus->SetLabel(_("Paused"));
-        break;
-
-    case SCANNING:
-        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusScanning")));
-        m_staticTextStatus->SetLabel(_("Scanning..."));
-        break;
-
-    case COMPARING_CONTENT:
-        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusBinaryCompare")));
-        m_staticTextStatus->SetLabel(_("Comparing content..."));
-        break;
-
-    case SYNCHRONIZING:
-        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusSyncing")));
-        m_staticTextStatus->SetLabel(_("Synchronizing..."));
-        break;
-    }
-
-    currentStatus = id;
-    Layout();
-}
-
-
-void SyncStatus::processHasFinished(SyncStatusID id, const wxString& finalMessage) //essential to call this in StatusHandler derived class destructor
-{
-    //at the LATEST(!) to prevent access to currentStatusHandler
-    //enable okay and close events; may be set in this method ONLY
-
-    processStatusHandler = NULL; //avoid callback to (maybe) deleted parent process
-
-    setCurrentStatus(id);
-
-    resumeFromSystray(); //if in tray mode...
-
-    m_buttonAbort->Disable();
-    m_buttonAbort->Hide();
-    m_buttonPause->Disable();
-    m_buttonPause->Hide();
-    m_buttonOK->Show();
-    m_buttonOK->SetFocus();
-
-    m_animationControl1->Stop();
-    m_animationControl1->Hide();
-
-    bSizerSpeed->Show(false);
-    bSizerRemTime->Show(false);
-
-    updateStatusDialogNow(); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
-    m_textCtrlInfo->SetValue(finalMessage);
-    Layout();                //
-}
-
-
-void SyncStatus::OnOkay(wxCommandEvent& event)
-{
-    if (!currentProcessIsRunning()) Destroy();
-}
-
-
-void SyncStatus::OnPause(wxCommandEvent& event)
-{
-    static SyncStatusID previousStatus = SyncStatus::ABORTED;
-
-    if (processPaused)
-    {
-        setCurrentStatus(previousStatus);
-        processPaused = false;
-        m_buttonPause->SetLabel(_("Pause"));
-        m_animationControl1->Play();
-
-        //resume timers
-        timeElapsed.Resume();
-        if (statistics.get())
-            statistics->resumeTimer();
-    }
-    else
-    {
-        previousStatus = currentStatus; //save current status
-
-        setCurrentStatus(SyncStatus::PAUSE);
-        processPaused = true;
-        m_buttonPause->SetLabel(_("Continue"));
-        m_animationControl1->Stop();
-
-        //pause timers
-        timeElapsed.Pause();
-        if (statistics.get())
-            statistics->pauseTimer();
-    }
-}
-
-
-void SyncStatus::OnAbort(wxCommandEvent& event)
-{
-    processPaused = false;
-    if (currentProcessIsRunning())
-    {
-        m_buttonAbort->Disable();
-        m_buttonAbort->Hide();
-        m_buttonPause->Disable();
-        m_buttonPause->Hide();
-
-        setStatusText_NoUpdate(wxToZ(_("Abort requested: Waiting for current operation to finish...")));
-        //no Layout() or UI-update here to avoid cascaded Yield()-call
-
-        processStatusHandler->requestAbortion();
-    }
-}
-
-
-void SyncStatus::OnClose(wxCloseEvent& event)
-{
-    processPaused = false;
-    if (processStatusHandler)
-        processStatusHandler->requestAbortion();
-    else
-        Destroy();
-}
-
-
-void SyncStatus::OnIconize(wxIconizeEvent& event)
-{
-    if (event.Iconized()) //ATTENTION: iconize event is also triggered on "Restore"! (at least under Linux)
-        minimizeToTray();
-}
-
-
-void SyncStatus::minimizeToTray()
-{
-    minimizedToSysTray.reset(new MinimizeToTray(this, mainDialog));
-}
-
-
-void SyncStatus::resumeFromSystray()
-{
-    minimizedToSysTray.reset();
-}
-

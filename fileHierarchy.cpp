@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "fileHierarchy.h"
 #include <wx/wfstream.h>
 #include <wx/zstream.h>
@@ -301,9 +307,9 @@ public:
 DbStreamData loadFile(const Zstring& filename) //throw (FileError)
 {
     if (!FreeFileSync::fileExists(filename))
-        throw FileError(wxString(_("Initial synchronization:")) + wxT(" ") +
-                        _("The database file is not yet existing, but will be created during synchronization:") + wxT("\n") +
-                        wxT(" \"") + zToWx(filename) + wxT("\""));
+        throw FileError(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
+                        _("One of the FreeFileSync database files is not yet existing:") + wxT(" \n") +
+                        wxT("\"") + zToWx(filename) + wxT("\""));
 
 
     //read format description (uncompressed)
@@ -338,15 +344,15 @@ std::pair<DirInfoPtr, DirInfoPtr> FreeFileSync::loadFromDisk(const BaseDirMappin
     //find associated DirInfo-streams
     DirectoryTOC::const_iterator dbLeft = dbEntriesLeft.second.find(dbEntriesRight.first); //find left db-entry that corresponds to right database
     if (dbLeft == dbEntriesLeft.second.end())
-        throw FileError(wxString(_("Initial synchronization:")) + wxT(" ") +
-                        _("The required database entry is not yet existing, but will be created during synchronization:") + wxT("\n") +
-                        wxT(" \"") + zToWx(fileNameLeft) + wxT("\""));
+        throw FileError(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
+                        _("One of the FreeFileSync database entries within the following file is not yet existing:") + wxT(" \n") +
+                        wxT("\"") + zToWx(fileNameLeft) + wxT("\""));
 
     DirectoryTOC::const_iterator dbRight = dbEntriesRight.second.find(dbEntriesLeft.first); //find left db-entry that corresponds to right database
     if (dbRight == dbEntriesRight.second.end())
-        throw FileError(wxString(_("Initial synchronization:")) + wxT(" ") +
-                        _("The required database entry is not yet existing, but will be created during synchronization:") + wxT("\n") +
-                        wxT(" \"") + zToWx(fileNameRight) + wxT("\""));
+        throw FileError(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
+                        _("One of the FreeFileSync database entries within the following file is not yet existing:") + wxT(" \n") +
+                        wxT("\"") + zToWx(fileNameRight) + wxT("\""));
 
     //read streams into DirInfo
     boost::shared_ptr<DirInformation> dirInfoLeft(new DirInformation);
@@ -488,8 +494,8 @@ void FreeFileSync::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileEr
     const Zstring fileNameRightTmp = baseMapping.getDBFilename<RIGHT_SIDE>() + DefaultStr(".tmp");;
 
     //delete old tmp file, if necessary -> throws if deletion fails!
-    removeFile(fileNameLeftTmp,  false);
-    removeFile(fileNameRightTmp, false);
+    removeFile(fileNameLeftTmp);
+    removeFile(fileNameRightTmp);
 
     try
     {
@@ -541,17 +547,21 @@ void FreeFileSync::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileEr
 
         //operation finished: rename temp files -> this should work transactionally:
         //if there were no write access, creation of temp files would have failed
-        removeFile(baseMapping.getDBFilename<LEFT_SIDE>(),  false);
-        removeFile(baseMapping.getDBFilename<RIGHT_SIDE>(), false);
+        removeFile(baseMapping.getDBFilename<LEFT_SIDE>());
+        removeFile(baseMapping.getDBFilename<RIGHT_SIDE>());
         renameFile(fileNameLeftTmp, baseMapping.getDBFilename<LEFT_SIDE>()); //throw (FileError);
         renameFile(fileNameRightTmp, baseMapping.getDBFilename<RIGHT_SIDE>()); //throw (FileError);
     }
     catch (...)
     {
-        try //clean up: (try to) delete old tmp file
+        try //clean up: (try to) delete old tmp files
         {
-            removeFile(fileNameLeftTmp,  false);
-            removeFile(fileNameRightTmp, false);
+            removeFile(fileNameLeftTmp);
+        }
+        catch (...) {}
+        try
+        {
+            removeFile(fileNameRightTmp);
         }
         catch (...) {}
 

@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "statistics.h"
 
 #include <wx/ffile.h>
@@ -16,6 +22,8 @@ RetrieveStatistics::RetrieveStatistics() :
 
 RetrieveStatistics::~RetrieveStatistics()
 {
+    //keep non-inline destructor for std::auto_ptr to work with forward declaration
+
     //write statistics to a file
     wxFFile outputFile(wxT("statistics.dat"), wxT("w"));
 

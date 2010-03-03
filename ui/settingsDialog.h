@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef SYNCDIALOG_H_INCLUDED
 #define SYNCDIALOG_H_INCLUDED
 
@@ -8,6 +14,7 @@
 class BatchFileDropEvent;
 class BatchFolderPairPanel;
 class FirstBatchFolderPairCfg;
+class wxHelpController;
 
 namespace FreeFileSync
 {
@@ -54,7 +61,6 @@ private:
     virtual void OnSyncAutomatic(   wxCommandEvent& event);
     virtual void OnSyncLeftToRight( wxCommandEvent& event);
     virtual void OnSyncUpdate(      wxCommandEvent& event);
-    virtual void OnSyncBothSides(   wxCommandEvent& event);
 
     virtual void OnExLeftSideOnly(  wxCommandEvent& event);
     virtual void OnExRightSideOnly( wxCommandEvent& event);
@@ -83,7 +89,7 @@ private:
     const FreeFileSync::CompareVariant cmpVariant;
 
     //temporal copy of maindialog.cfg.syncConfiguration
-    FreeFileSync::SyncConfiguration localSyncConfiguration;
+    FreeFileSync::SyncConfiguration currentSyncConfig;
 
     //changing data
     FreeFileSync::SyncConfiguration& refSyncConfiguration;
@@ -104,7 +110,7 @@ class BatchDialog: public BatchDlgGenerated
 public:
     BatchDialog(wxWindow* window, const xmlAccess::XmlBatchConfig& batchCfg);
     BatchDialog(wxWindow* window, const wxString& filename);
-    ~BatchDialog() {};
+    ~BatchDialog();
 
     enum
     {
@@ -120,6 +126,7 @@ private:
     virtual void OnRightNewer(         wxCommandEvent& event);
     virtual void OnDifferent(          wxCommandEvent& event);
     virtual void OnConflict(           wxCommandEvent& event);
+    virtual void OnHelp(               wxCommandEvent& event);
 
     virtual void OnCheckAutomatic(     wxCommandEvent& event);
     virtual void OnCheckFilter(        wxCommandEvent& event);

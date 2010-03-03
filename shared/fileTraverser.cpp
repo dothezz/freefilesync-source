@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "fileTraverser.h"
 #include "systemConstants.h"
 #include "systemFunctions.h"
@@ -7,6 +13,7 @@
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "longPathPrefix.h"
+#include <boost/shared_ptr.hpp>
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
@@ -16,36 +23,6 @@
 
 
 #ifdef FFS_WIN
-class CloseHandleOnExit
-{
-public:
-    CloseHandleOnExit(HANDLE fileHandle) : fileHandle_(fileHandle) {}
-
-    ~CloseHandleOnExit()
-    {
-        ::CloseHandle(fileHandle_);
-    }
-
-private:
-    HANDLE fileHandle_;
-};
-
-
-class CloseFindHandleOnExit
-{
-public:
-    CloseFindHandleOnExit(HANDLE searchHandle) : searchHandle_(searchHandle) {}
-
-    ~CloseFindHandleOnExit()
-    {
-        FindClose(searchHandle_);
-    }
-
-private:
-    HANDLE searchHandle_;
-};
-
-
 inline
 void setWin32FileInformation(const FILETIME& lastWriteTime,
                              const DWORD fileSizeHigh,
@@ -76,7 +53,7 @@ bool setWin32FileInformationFromSymlink(const Zstring linkName, FreeFileSync::Tr
     if (hFile == INVALID_HANDLE_VALUE)
         return false;
 
-    CloseHandleOnExit dummy(hFile);
+                 boost::shared_ptr<void> dummy(hFile, ::CloseHandle);
 
     BY_HANDLE_FILE_INFORMATION fileInfoByHandle;
 
@@ -152,7 +129,8 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
             return true;
         }
     }
-    CloseFindHandleOnExit dummy(searchHandle);
+
+boost::shared_ptr<void> dummy(searchHandle, ::FindClose);
 
     do
     {
@@ -170,13 +148,13 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
             const TraverseCallback::ReturnValDir rv = sink->onDir(shortName, fullName);
             switch (rv.returnCode)
             {
-            case TraverseCallback::ReturnValDir::TRAVERSING_STOP:
+            case TraverseCallback::ReturnValDir::TRAVERSING_DIR_STOP:
                 return false;
 
-            case TraverseCallback::ReturnValDir::TRAVERSING_IGNORE_DIR:
+            case TraverseCallback::ReturnValDir::TRAVERSING_DIR_IGNORE:
                 break;
 
-            case TraverseCallback::ReturnValDir::TRAVERSING_CONTINUE:
+            case TraverseCallback::ReturnValDir::TRAVERSING_DIR_CONTINUE:
                 //traverse into symbolic links, junctions, etc. if requested only:
                 if (traverseDirectorySymlinks || (~fileMetaData.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT))
                     if (!traverseDirectory<traverseDirectorySymlinks>(fullName, rv.subDirCb, level + 1))
@@ -312,13 +290,13 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
             const TraverseCallback::ReturnValDir rv = sink->onDir(shortName, fullName);
             switch (rv.returnCode)
             {
-            case TraverseCallback::ReturnValDir::TRAVERSING_STOP:
+            case TraverseCallback::ReturnValDir::TRAVERSING_DIR_STOP:
                 return false;
 
-            case TraverseCallback::ReturnValDir::TRAVERSING_IGNORE_DIR:
+            case TraverseCallback::ReturnValDir::TRAVERSING_DIR_IGNORE:
                 break;
 
-            case TraverseCallback::ReturnValDir::TRAVERSING_CONTINUE:
+            case TraverseCallback::ReturnValDir::TRAVERSING_DIR_CONTINUE:
                 //traverse into symbolic links, junctions, etc. if requested only:
                 if (traverseDirectorySymlinks || !isSymbolicLink) //traverse into symbolic links if requested only
                     if (!traverseDirectory<traverseDirectorySymlinks>(fullName, rv.subDirCb, level + 1))
@@ -365,6 +343,3 @@ void FreeFileSync::traverseFolder(const Zstring& directory,
     else
         traverseDirectory<false>(directoryFormatted, sink, 0);
 }
-
-
-

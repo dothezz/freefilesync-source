@@ -1,0 +1,3 @@
+<area shape="rect" href="$classInotify.html#66d90ebfa516d4bd1463749def2b58f9" title="Sets the maximum number of events in the kernel queue." alt="" coords="204,5,351,32">
+<area shape="rect" href="$classInotify.html#620c891962fe5acd26485c64e9b28d19" title="Sets the maximum number of inotify instances per process." alt="" coords="196,56,359,83">
+<area shape="rect" href="$classInotify.html#5064380cdb4a726ab33f3fa18d15c77a" title="Sets the maximum number of inotify watches per instance." alt="" coords="197,107,357,133">

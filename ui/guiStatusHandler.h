@@ -1,9 +1,16 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef GUISTATUSHANDLER_H_INCLUDED
 #define GUISTATUSHANDLER_H_INCLUDED
 
 #include "../library/statusHandler.h"
 #include <wx/event.h>
 #include "../library/errorLogging.h"
+#include "progressIndicator.h"
 
 class SyncStatus;
 class MainDialog;
@@ -55,7 +62,7 @@ public:
 private:
     virtual void abortThisProcess();
 
-    SyncStatus* syncStatusFrame;
+    SyncStatus syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!
     bool ignoreErrors;
     FreeFileSync::ErrorLogging errorLog;
 };

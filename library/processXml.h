@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef PROCESSXML_H_INCLUDED
 #define PROCESSXML_H_INCLUDED
 
@@ -20,9 +26,10 @@ enum ColumnTypes
     REL_PATH,
     FILENAME,
     SIZE,
-    DATE
+    DATE,
+    EXTENSION
 };
-const unsigned int COLUMN_TYPE_COUNT = 6;
+const unsigned int COLUMN_TYPE_COUNT = 7;
 
 struct ColumnAttrib
 {
@@ -79,7 +86,6 @@ struct XmlBatchConfig
 };
 
 int retrieveSystemLanguage();
-bool recycleBinAvailable();
 
 
 struct OptionalDialogs
@@ -101,6 +107,8 @@ struct OptionalDialogs
 };
 
 
+wxString getGlobalConfigFile();
+
 struct XmlGlobalSettings
 {
 //---------------------------------------------------------------------
@@ -109,14 +117,12 @@ struct XmlGlobalSettings
         programLanguage(retrieveSystemLanguage()),
         ignoreOneHourDiff(false),
         copyLockedFiles(true),
-        detectRenameThreshold(1024 *1024),
         lastUpdateCheck(0)
     {}
 
     int programLanguage;
     bool ignoreOneHourDiff;        //ignore +/- 1 hour due to DST change
     bool copyLockedFiles;          //VSS usage
-    unsigned int detectRenameThreshold;  //minimum size (in bytes) for files to be considered for rename-detection
     long lastUpdateCheck;          //time of last update check
 
     OptionalDialogs optDialogs;
@@ -125,10 +131,10 @@ struct XmlGlobalSettings
     struct _Gui
     {
         _Gui() :
-            widthNotMaximized(wxDefaultCoord),
+            widthNotMaximized( wxDefaultCoord),
             heightNotMaximized(wxDefaultCoord),
-            posXNotMaximized(wxDefaultCoord),
-            posYNotMaximized(wxDefaultCoord),
+            posXNotMaximized(  wxDefaultCoord),
+            posYNotMaximized(  wxDefaultCoord),
             isMaximized(false),
             autoAdjustColumnsLeft(false),
             autoAdjustColumnsRight(false),
@@ -137,15 +143,24 @@ struct XmlGlobalSettings
             folderHistRightMax(12),
             selectedTabBottomLeft(0),
             deleteOnBothSides(false),
-            useRecyclerForManualDeletion(recycleBinAvailable()), //enable if OS supports it; else user will have to activate first and then get an error message
+            useRecyclerForManualDeletion(true), //enable if OS supports it; else user will have to activate first and then get an error message
+#ifdef FFS_WIN
+            textSearchRespectCase(false),
+#elif defined FFS_LINUX
+            textSearchRespectCase(true),
+#endif
             showFileIconsLeft(true),
             showFileIconsRight(true)
         {
+            //default external apps will be translated "on the fly"!!!
 #ifdef FFS_WIN
-            externelApplications.push_back(std::make_pair(_("Open with Explorer"), wxT("explorer /select, \"%name\"")));
-            externelApplications.push_back(std::make_pair(_("Open directly"), wxT("cmd /c start \"\" \"%name\"")));
+            externelApplications.push_back(std::make_pair(wxT("Open with Explorer"), //mark for extraction: _("Open with Explorer")
+                                           wxT("explorer /select, \"%name\"")));
+            externelApplications.push_back(std::make_pair(wxT("Open directly"), //mark for extraction: _("Open directly")
+                                           wxT("cmd /c start \"\" \"%name\"")));
 #elif defined FFS_LINUX
-            externelApplications.push_back(std::make_pair(_("Open with Konqueror"), wxT("konqueror \"%dir\"")));
+            externelApplications.push_back(std::make_pair(wxT("Open with Konqueror"), //mark for extraction: _("Open with Konqueror")
+                                           wxT("konqueror \"%dir\"")));
 #endif
         }
 
@@ -176,6 +191,7 @@ struct XmlGlobalSettings
 
         bool deleteOnBothSides;
         bool useRecyclerForManualDeletion;
+        bool textSearchRespectCase;
         bool showFileIconsLeft;
         bool showFileIconsRight;
     } gui;

@@ -40,26 +40,26 @@
 &O programu...
 &Advanced
 &Napredno
-&Apply
-&Uveljavi
 &Cancel
 &Prekliči
 &Check for new version
 &Preveri za novo različico
 &Content
 &Vsebina
-&Create batch job
-&Ustvari batch opravilo
+&Create batch job...
+&Ustvari batch opravilo...
 &Default
 &Privzeto
 &Exit
 &Izhod
-&Export file list
-&Izvozi seznam datotek
+&Export file list...
+&Izvozi seznam datotek...
 &File
 &Datoteka
-&Global settings
-&Globalne nastavitve
+&Find next
+&Najdi naslednje
+&Global settings...
+&Globalne nastavitve...
 &Help
 &Pomoč
 &Ignore
@@ -68,8 +68,8 @@
 &Jezik
 &Load
 &Naloži
-&Load configuration
-Na&loži konfiguracijo
+&Load configuration...
+Na&loži konfiguracijo...
 &New
 &Novo
 &No
@@ -160,6 +160,8 @@ A newer version of FreeFileSync is available:
 Na voljo je nova različica FreeFileSync:
 Abort requested: Waiting for current operation to finish...
 Zahtevana je bila prekinitev: čakam, da se zaključi trenutna operacija...
+Abort synchronization immediately
+Takoj prekimi sinhronizacijo
 Aborted
 Prekinitev uspela
 About
@@ -202,14 +204,12 @@ Browse
 Brskaj
 Build:
 Izgradnja:
-Cancel
-Prekliči
 Cannot determine sync-direction:
 Ne morem določiti sinhronizacijske smeri.
+Cannot find %x
+Ne najdem %x
 Category
 Kategorija
-Change direction
-Spremeni smer
 Comma separated list
 Seznam ločen z vejico
 Command line
@@ -274,8 +274,8 @@ Copy locked files
 Kopiraj zaklenjene datoteke
 Copy new or updated files to right folder.
 Kopiraj nove ali posodobljene datoteke v desno mapo.
-Copy shared or locked files using Volume Shadow Copy Service.
-Kopiraj deljene ali zaklenjene datoteke z uporabo servisa Volume Shadow Copy.
+Copy shared or locked files using Volume Shadow Copy Service
+Kopiraj deljene ali zaklenjene datoteke z uporabo servisa Volume Shadow Copy
 Copy to clipboard\tCTRL+C
 Kopiraj v odložišče\tCTRL+C
 Copying file %x to %y
@@ -308,6 +308,8 @@ DECISION TREE
 DREVO ODLOČITEV
 Data remaining:
 Preostanek podatkov:
+Data transferred:
+Prenesenih podatkov:
 Data verification error: Source and target file have different content!
 Napaka pri preverjanju podatkov: izvorna in tarčna datoteka imata različno vsebino!
 Date
@@ -326,8 +328,8 @@ Delete on both sides
 Izbriši na obeh straneh
 Delete on both sides even if the file is selected on one side only
 Izbriši na obeh straneh, četudi je datoteka izbrana na samo eni strani
-Delete or overwrite files permanently.
-Trajno izbriši ali prepiši datoteke.
+Delete or overwrite files permanently
+Trajno izbriši ali prepiši datoteke
 Delete permanently
 Trajno izbriši
 Deleting file %x
@@ -376,6 +378,8 @@ Error copying file:
 Napaka pri kopiranju datoteke:
 Error copying locked file %x!
 Napaka pri kopiranju zaklenjene datoteke %x!
+Error copying symbolic link:
+Napaka pri kopiranju simboličnih povezav:
 Error creating directory:
 Napaka pri ustvarjanju imenika:
 Error deleting directory:
@@ -402,8 +406,6 @@ Error reading file:
 Napaka pri branju datoteke:
 Error reading from synchronization database:
 Napaka pri branju iz sinhronizacijske podatkovne baze:
-Error resolving full path name:
-Napaka pri razreševanju polnega imena poti:
 Error resolving symbolic link:
 Napaka pri razreševanju simbolične povezave:
 Error starting Volume Shadow Copy Service!
@@ -428,10 +430,10 @@ Exclude temporarily
 Začasno izključi
 Exclude via filter:
 Izključi preko filtra:
-Exit immediately and set returncode < 0
-Takoj zapusti in vrni povratno kodo < 0
-Exit with RC < 0
-Zapusti z RC < 0
+Exit instantly
+Zapusti v trenutku
+Extension
+Razširitev
 External applications
 Zunanje aplikacije
 Fatal Error
@@ -456,10 +458,10 @@ Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to de
 Datoteki %x imata razliko v času spremembe manj kot 1 uro!\n\nNi se varno odločiti katera je novejša zaradi vprašanj v zvezi s Poletnim časom.
 Files %x have the same date but a different size!
 Datoteki %x imata enak datum ampak različno velikost!
-Files are found equal if\n     - file content\nis the same.
-Datoteki sta enaki, če\n     - je vsebina datoteke\nenaka.
-Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
-Datoteki sta enaki, če so\n     - velikost datoteke\n     - zadnji čas spremembe in datum\nenaki.
+Files are found equal if\n     - file content\nis the same
+Datoteki sta enaki, če\n     - je vsebina datoteke\nenaka
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same
+Datoteki sta enaki, če so\n     - velikost datoteke\n     - zadnji čas spremembe in datum\nenaki
 Files remaining:
 Preostale datoteke:
 Files that are equal on both sides
@@ -472,6 +474,8 @@ Files that exist on both sides, right one is newer
 Datoteke, ki obstajajo na obeh straneh, desna je novejša
 Files/folders found:
 Najdene datoteke/mape:
+Files/folders processed:
+Obdelane datoteke/mape:
 Files/folders remaining:
 Preostale datoteke/mape:
 Files/folders that exist on left side only
@@ -490,6 +494,10 @@ Filter view
 Filtriran pogled
 Filtering is deactivated
 Filter je deaktiviran
+Find
+Najdi
+Find what:
+Najdi kaj
 Folder Comparison and Synchronization
 Primerjava in sinhronizacija imenika
 Free disk space available:
@@ -592,6 +600,8 @@ Initial synchronization:
 Začetna sinhronizacija:
 Integrate external applications into context menu. The following macros are available:
 Integriraj zunanje aplikacije v kontekstni menu. Na voljo so naslednji makri:
+Last synchronization not completed!
+Zadnja sinhronizacija se ni zaključila!
 Leave as unresolved conflict
 Pusti kot nerešeni spor
 Left
@@ -610,6 +620,8 @@ Logging
 Beležim
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Ustvarjanje senčnih kopij na WOW63 ni podprto. Prosimo uporabite 64-bitno FreeFileSync različico.
+Match case
+Ujemaj se s primerom
 Mirror ->>
 Zrcalno ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -622,8 +634,8 @@ Move column down
 Premakni stolpec dol
 Move column up
 Premakni stolpec gor
-Move files into a time-stamped subdirectory.
-Premakni datoteke v časovno-označen podimenik.
+Move files into a time-stamped subdirectory
+Premakni datoteke v časovno-označen podimenik
 Moving %x to Recycle Bin
 Premikam %x v Koš
 Moving file %x to user-defined directory %y
@@ -646,8 +658,10 @@ Number of files and directories that will be deleted
 Število datotek in imenikov, ki bodo izbrisani
 Number of files that will be overwritten
 Število datotek, ki bodo prepisane
-OK
-V redu
+One of the FreeFileSync database entries within the following file is not yet existing:
+Eden od FreeFileSync vnosov v podatkovni bazi znotraj naslednje datoteke še ne obstaja:
+One of the FreeFileSync database files is not yet existing:
+Ena od FreeFileSync datotek podatkovne baze še en obstaja:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Samo datoteke/imeniki, ki preidejo filtriranje bodo izbrani za sinhronizacijo. Filter bo uveljavljnen k imenu relativno(!) na bazo sinhroniziranih imenikov.
 Open directly
@@ -682,6 +696,8 @@ RealtimeSync - Automated Synchronization
 RealtimeSync - Avtomatizirana sinhronizacija
 RealtimeSync configuration
 RealtimeSync nastavitve
+Recycle Bin not yet supported for this system!
+
 Relative path
 Relativna pot
 Remove alternate settings
@@ -702,8 +718,8 @@ Right
 Desno
 Run minimized and write status information to a logfile
 Poženi minimizirano in zapisuj statusne informacije v dnevniško datoteko
-S&ave configuration
-Shr&ani konfiguracijo
+S&ave configuration...
+Shr&ani konfiguracijo...
 S&witch view
 Sp&remeni pogled
 Save changes to current configuration?
@@ -722,12 +738,12 @@ Select logfile directory:
 Izberite imenik datoteke za beleženje:
 Select variant:
 Izberite varianto:
-Setting default synchronization directions. Please check whether they are appropriate for you.
-Nastavljam privzete sinhronizacijske smeri. Prosim preverite ali vam ustrezajo.
+Set direction:
+Nastavi smer:
+Setting default synchronization directions: Old files will be overwritten by newer files.
+Nastavljanje privzetih smeri sinhronizacije: Stare datoteke bodo prepisane z novimi datotekami.
 Show conflicts
 Prikaži spore
-Show file icons
-Prikaži ikone datotek
 Show files that are different
 Prikaži datoteke, ki so različne
 Show files that are equal
@@ -796,10 +812,8 @@ Synchronization status
 Status sinhronizacije
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Sinhroniziraj vse .doc, .zip in .exe datoteke, razen iz podmape \"temp\".
-Synchronize both sides simultaneously: Copy new or updated files in both directions.
-Sinhroniziraj obe strani istočasno: Kopiraj nove ali posodobljene datoteke v obe smeri.
-Synchronize both sides using a database. Deletions are detected automatically.
-Sinhroniziraj obe strani z uporabo podatkovne baze. Izbrisi so zaznani samodejno.
+Synchronize both sides using a database. Deletions are detected automatically
+Sinhroniziraj obe strani z uporabo podatkovne baze. Izbrisi so zaznani samodejno
 Synchronize...
 Sinhroniziraj...
 Synchronizing...
@@ -810,14 +824,10 @@ Target directory already existing!
 Ciljni imenik že obstaja!
 Target file already existing!
 Ciljna datoteka že obstaja!
-The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
-Ta ukazna-vrstica se izvede vsakič:\n- Datoteke znotraj teh imenikov (ali podimenikov) so spremenjene\n- Ustrezna črka pogona postane na razpolago (vstavitev USB-ja)
-The database file is not yet existing, but will be created during synchronization:
-Datoteka podatkovne baze še ne obstaja, ampak bo ustvarjena med sinhronizacijo:
+The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+Ukazna vrstica se izvrši vsakič ko:\n- postane imenik na voljo (npr. vstavitem USB ključa)\n- datoteke znotraj teh imenikov ali podimenikov so spremenjene
 The file does not contain a valid configuration:
 Datoteka ne vsebuje veljavne konfiguracije:
-The required database entry is not yet existing, but will be created during synchronization:
-Zahteavan vnos v podatkovni bazi še en obstaja, ampak bo ustvarjen med sinhronizacijo:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Ta varianta oceni dve datoteki z enakim imenom kot enaki, ko imata enako velikost IN enak datum ter čas zadnjega spreminjanja.
 Time
@@ -832,28 +842,22 @@ Total required free disk space:
 Skupno zahtevani prosti prostor na disku:
 Total time:
 Celoten čas:
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
-Obravnavaj čas spremembe datoteke, ki se razlikuje za točno +/- 1 uro kot enak, če pa je manjši kot 1 ura, pa kot spor, da lahko obravnavamo spremembe Poletnega časa.
-Two way <->
-Obojesmerno <->
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
+Obravnavaj čas spremembe datoteke, ki se razlikuje za točno +/- 1 uro kot enak, če pa je manjši kot 1 ura, pa kot spor, da lahko obravnavamo spremembe Poletnega časa
 Unable to connect to sourceforge.net!
 Ne morem se povezati na sourceforge.net!
 Unable to create logfile!
 Ne morem ustvariti datoteko za beleženje!
-Unable to initialize Recycle Bin!
-Ne morem inicializirati Koša!
 Unresolved conflicts existing!
 Obstajajo nerešeni spori!
-Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
-Obstajajo nerešeni spori! \n\nLahko ignorirate spore in nadaljujete s sinhronizacijo.
 Update ->
 Posodobi ->
 Usage:
 Uporaba:
 Use Recycle Bin
 Uporabi Koš
-Use Recycle Bin when deleting or overwriting files.
-Uporabi Koš pri brisanju ali prepisovanju datotek.
+Use Recycle Bin when deleting or overwriting files
+Uporabi Koš pri brisanju ali prepisovanju datotek
 User-defined directory
 Uporabniško-določen imenik
 User-defined directory for deletion was not specified!
@@ -873,9 +877,7 @@ Ko se primerjava zažene s tem setom možnosti, se obdela naslednje drevo odloč
 You can ignore conflicts and continue synchronization.
 Lahko ignorirate spore in nadaljujete s sinhronizacijo.
 You can ignore the error to consider not existing directories as empty.
-Ignoriraj napako za smatranje neobstoječih imenikv kot praznih.
-You can ignore the error to skip current folder pair.
-Ignoriraj napako tako, da se spusti trenutni par map.
+Ignoriraj napako za smatranje neobstoječih imenikov kot praznih.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Naslednje predmete lahko ponovno poskusite sinhronizirati (BREZ ponovne primerjave) !
 different

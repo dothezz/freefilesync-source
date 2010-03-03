@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "fileHandling.h"
 #include <wx/intl.h>
 #include "systemFunctions.h"
@@ -5,7 +11,6 @@
 #include "systemConstants.h"
 #include "fileTraverser.h"
 #include <wx/file.h>
-#include <stdexcept>
 #include <boost/bind.hpp>
 #include <algorithm>
 #include <wx/log.h>
@@ -14,11 +19,12 @@
 #include <wx/utils.h>
 
 #ifdef FFS_WIN
-#include "recycler.h"
 #include "dllLoader.h"
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "shadow.h"
 #include "longPathPrefix.h"
+#include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
@@ -29,9 +35,44 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <errno.h>
+#include <stdlib.h>
 #endif
 
 using FreeFileSync::FileError;
+
+
+
+namespace
+{
+#ifdef FFS_WIN
+Zstring resolveRelativePath(const Zstring& relativeName, DWORD proposedBufferSize = 1000)
+{
+    boost::scoped_array<DefaultChar> fullPath(new DefaultChar[proposedBufferSize]);
+    const DWORD rv = ::GetFullPathName(
+                         relativeName.c_str(), //__in   LPCTSTR lpFileName,
+                         proposedBufferSize,   //__in   DWORD nBufferLength,
+                         fullPath.get(),       //__out  LPTSTR lpBuffer,
+                         NULL);                //__out  LPTSTR *lpFilePart
+    if (rv == 0 || rv == proposedBufferSize)
+        //ERROR! Don't do anything
+        return relativeName;
+    if (rv > proposedBufferSize)
+        return resolveRelativePath(relativeName, rv);
+
+    return fullPath.get();
+}
+
+#elif defined FFS_LINUX
+Zstring resolveRelativePath(const Zstring& relativeName) //additional: resolves symbolic links!!!
+{
+    char absolutePath[PATH_MAX + 1];
+    if (::realpath(relativeName.c_str(), absolutePath) == NULL)
+        //ERROR! Don't do anything
+        return relativeName;
+
+    return Zstring(absolutePath);
+}
+#endif
 
 
 bool replaceMacro(wxString& macro) //macro without %-characters, return true if replaced successfully
@@ -92,6 +133,7 @@ void expandMacros(wxString& text)
         }
     }
 }
+}
 
 
 Zstring FreeFileSync::getFormattedDirectoryName(const Zstring& dirname)
@@ -109,45 +151,21 @@ Zstring FreeFileSync::getFormattedDirectoryName(const Zstring& dirname)
     //replace macros
     expandMacros(dirnameTmp);
 
-#ifdef FFS_WIN
     /*
     resolve relative names; required by:
+    WINDOWS:
      - \\?\-prefix which needs absolute names
      - Volume Shadow Copy: volume name needs to be part of each filename
-     - file icon buffer (at least for extensions that are acutally read from disk, e.g. "exe")
+     - file icon buffer (at least for extensions that are actually read from disk, e.g. "exe")
+    WINDOWS/LINUX:
      - detection of dependent directories, e.g. "\" and "C:\test"
      */
-    dirnameTmp = resolveRelativePath(dirnameTmp.c_str()).c_str();
-#endif
+    dirnameTmp = zToWx(resolveRelativePath(wxToZ(dirnameTmp)));
 
     if (!dirnameTmp.EndsWith(zToWx(globalFunctions::FILE_NAME_SEPARATOR)))
         dirnameTmp += zToWx(globalFunctions::FILE_NAME_SEPARATOR);
 
     return wxToZ(dirnameTmp);
-}
-
-
-bool FreeFileSync::recycleBinExists()
-{
-#ifdef FFS_WIN
-    return true;
-#else
-    return false;
-#endif  // FFS_WIN
-}
-
-
-inline
-void moveToRecycleBin(const Zstring& filename) //throw (std::logic_error), throw (FileError)
-{
-    if (!FreeFileSync::recycleBinExists())   //this method should ONLY be called if recycle bin is available
-        throw std::logic_error("Initialization of Recycle Bin failed!");
-
-#ifdef FFS_WIN
-    FreeFileSync::moveToWindowsRecycler(filename);  //throw (FileError)
-#else
-    throw std::logic_error("No Recycler for Linux available at the moment!");
-#endif
 }
 
 
@@ -214,8 +232,8 @@ bool FreeFileSync::isMovable(const Zstring& pathFrom, const Zstring& pathTo)
                                     pathTo + globalFunctions::FILE_NAME_SEPARATOR + DefaultStr("DeleteMe.tmp");
     try
     {
-        removeFile(dummyFileSource, false);
-        removeFile(dummyFileTarget, false);
+        removeFile(dummyFileSource);
+        removeFile(dummyFileTarget);
     }
     catch  (...) {}
 
@@ -232,15 +250,15 @@ bool FreeFileSync::isMovable(const Zstring& pathFrom, const Zstring& pathTo)
 #ifdef FFS_WIN
         ::MoveFileEx(applyLongPathPrefix(dummyFileSource).c_str(), //__in      LPCTSTR lpExistingFileName,
                      applyLongPathPrefix(dummyFileTarget).c_str(), //__in_opt  LPCTSTR lpNewFileName,
-                     0) != 0;                 //__in      DWORD dwFlags
+                     0) != 0;                                      //__in      DWORD dwFlags
 #elif defined FFS_LINUX
         ::rename(dummyFileSource.c_str(), dummyFileTarget.c_str()) == 0;
 #endif
 
     try
     {
-        removeFile(dummyFileSource, false);
-        removeFile(dummyFileTarget, false);
+        removeFile(dummyFileSource);
+        removeFile(dummyFileTarget);
     }
     catch  (...) {}
 
@@ -248,7 +266,7 @@ bool FreeFileSync::isMovable(const Zstring& pathFrom, const Zstring& pathTo)
 }
 
 
-void FreeFileSync::removeFile(const Zstring& filename, const bool useRecycleBin) //throw (FileError, std::logic_error);
+void FreeFileSync::removeFile(const Zstring& filename) //throw (FileError, std::logic_error);
 {
     //no error situation if file is not existing! manual deletion relies on it!
 #ifdef FFS_WIN
@@ -263,25 +281,23 @@ void FreeFileSync::removeFile(const Zstring& filename, const bool useRecycleBin)
         return; //neither file nor any other object (e.g. broken symlink) with that name existing
 #endif
 
-    if (useRecycleBin)
-    {
-        ::moveToRecycleBin(filename);
-        return;
-    }
-
 #ifdef FFS_WIN
-    //initialize file attributes
-    if (!::SetFileAttributes(
-                filenameFmt.c_str(),    //address of filename
-                FILE_ATTRIBUTE_NORMAL)) //attributes to set
-    {
-        wxString errorMessage = wxString(_("Error deleting file:")) + wxT("\n\"") + zToWx(filename) + wxT("\"");
-        throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
-    }
-
     //remove file, support for \\?\-prefix
     if (!::DeleteFile(filenameFmt.c_str()))
     {
+        //optimization: change file attributes ONLY when necessary!
+        if (::GetLastError() == ERROR_ACCESS_DENIED) //function fails if file is read-only
+        {
+            //initialize file attributes
+            if (::SetFileAttributes(filenameFmt.c_str(),    //address of filename
+                                    FILE_ATTRIBUTE_NORMAL)) //attributes to set
+            {
+                //now try again...
+                if (::DeleteFile(filenameFmt.c_str()))
+                    return;
+            }
+        }
+
         wxString errorMessage = wxString(_("Error deleting file:")) + wxT("\n\"") + zToWx(filename) + wxT("\"");
         throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
     }
@@ -295,25 +311,77 @@ void FreeFileSync::removeFile(const Zstring& filename, const bool useRecycleBin)
 }
 
 
-//rename file: no copying!!!
-void FreeFileSync::renameFile(const Zstring& oldName, const Zstring& newName) //throw (FileError);
+namespace
+{
+//(low-level) wrapper for file system rename function: last error code may be retrieved directly after this call!
+//Windows: ::GetLastError()     Linux: errno
+bool renameFileInternal(const Zstring& oldName, const Zstring& newName) //throw ();
 {
 #ifdef FFS_WIN
-    if (!::MoveFileEx(applyLongPathPrefix(oldName).c_str(), //__in      LPCTSTR lpExistingFileName,
-                      applyLongPathPrefix(newName).c_str(), //__in_opt  LPCTSTR lpNewFileName,
-                      0))              //__in      DWORD dwFlags
+    using namespace FreeFileSync;
+
+    const Zstring oldNameFmt = applyLongPathPrefix(oldName);
+    const Zstring newNameFmt = applyLongPathPrefix(newName);
+
+    if (!::MoveFileEx(oldNameFmt.c_str(), //__in      LPCTSTR lpExistingFileName,
+                      newNameFmt.c_str(), //__in_opt  LPCTSTR lpNewFileName,
+                      0))                 //__in      DWORD dwFlags
     {
-        const wxString errorMessage = wxString(_("Error moving file:")) + wxT("\n\"") + zToWx(oldName) +  wxT("\" ->\n\"") + zToWx(newName) + wxT("\"");
-        throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
+        if (::GetLastError() == ERROR_ACCESS_DENIED) //MoveFileEx may fail to rename a read-only file on a SAMBA-share -> (try to) handle this
+        {
+            const DWORD oldNameAttrib = ::GetFileAttributes(oldNameFmt.c_str());
+            if (oldNameAttrib != INVALID_FILE_ATTRIBUTES)
+            {
+                if (::SetFileAttributes(oldNameFmt.c_str(),     //address of filename
+                                        FILE_ATTRIBUTE_NORMAL)) //remove readonly-attribute
+                {
+                    //try again...
+                    if (::MoveFileEx(oldNameFmt.c_str(), //__in      LPCTSTR lpExistingFileName,
+                                     newNameFmt.c_str(), //__in_opt  LPCTSTR lpNewFileName,
+                                     0))                 //__in      DWORD dwFlags
+                    {
+                        //(try to) restore file attributes
+                        ::SetFileAttributes(newNameFmt.c_str(),
+                                            oldNameAttrib);
+                        //don't handle error
+                        return true;
+                    }
+                    else
+                    {
+                        const DWORD errorCode = ::GetLastError();
+                        //cleanup: (try to) restore file attributes: assume oldName is still existing
+                        ::SetFileAttributes(oldNameFmt.c_str(),
+                                            oldNameAttrib);
+
+                        ::SetLastError(errorCode); //set error code from ::MoveFileEx()
+                    }
+                }
+            }
+        }
+
+        return false;
     }
+    return true;
+
 #elif defined FFS_LINUX
     //rename temporary file
     if (::rename(oldName.c_str(), newName.c_str()) != 0)
+        return false;
+
+    return true;
+#endif
+}
+}
+
+
+//rename file: no copying!!!
+void FreeFileSync::renameFile(const Zstring& oldName, const Zstring& newName) //throw (FileError);
+{
+    if (!renameFileInternal(oldName, newName))
     {
         const wxString errorMessage = wxString(_("Error moving file:")) + wxT("\n\"") + zToWx(oldName) +  wxT("\" ->\n\"") + zToWx(newName) + wxT("\"");
         throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
     }
-#endif
 }
 
 
@@ -354,41 +422,19 @@ void FreeFileSync::moveFile(const Zstring& sourceFile, const Zstring& targetFile
 
     //moving of symbolic links should work correctly:
 
+    //first try to move the file directly without copying
+    if (::renameFileInternal(sourceFile,
+                             targetFile)) //throw ();
+        return;
+    //if moving failed treat as error (except when it tried to move to a different volume: in this case we will copy the file)
 #ifdef FFS_WIN
-    //first try to move the file directly without copying
-    if (::MoveFileEx(applyLongPathPrefix(sourceFile).c_str(), //__in      LPCTSTR lpExistingFileName,
-                     applyLongPathPrefix(targetFile).c_str(), //__in_opt  LPCTSTR lpNewFileName,
-                     0))                 //__in      DWORD dwFlags
-        return;
-
-    //if moving failed treat as error (except when it tried to move to a different volume: in this case we will copy the file)
-    const DWORD lastError = ::GetLastError();
-    if (lastError != ERROR_NOT_SAME_DEVICE)
-    {
-        const wxString errorMessage = wxString(_("Error moving file:")) + wxT("\n\"") + zToWx(sourceFile) +  wxT("\" ->\n\"") +
-                                      zToWx(targetFile) + wxT("\"");
-        throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted(lastError));
-    }
-
-    //file is on a different volume: let's copy it
-    std::auto_ptr<CopyCallbackImpl> copyCallback(callback != NULL ? new CopyCallbackImpl(callback) : NULL);
-
-    copyFile(sourceFile,
-             targetFile,
-             true, //copy symbolic links
-             NULL, //supply handler for making shadow copies
-             copyCallback.get()); //throw (FileError);
-
+    if (::GetLastError() != ERROR_NOT_SAME_DEVICE)
 #elif defined FFS_LINUX
-    //first try to move the file directly without copying
-    if (::rename(sourceFile.c_str(), targetFile.c_str()) == 0)
-        return;
-
-    //if moving failed treat as error (except when it tried to move to a different volume: in this case we will copy the file)
     if (errno != EXDEV)
+#endif
     {
-        const wxString errorMessage = wxString(_("Error moving file:")) + wxT("\n\"") + zToWx(sourceFile) +  wxT("\" ->\n\"") +
-                                      zToWx(targetFile) + wxT("\"");
+        const wxString errorMessage = wxString(_("Error moving file:")) + wxT("\n\"") +
+                                      zToWx(sourceFile) +  wxT("\" ->\n\"") + zToWx(targetFile) + wxT("\"");
         throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
     }
 
@@ -398,12 +444,14 @@ void FreeFileSync::moveFile(const Zstring& sourceFile, const Zstring& targetFile
     copyFile(sourceFile,
              targetFile,
              true, //copy symbolic links
-             copyCallback.get()); //throw (FileError);
+#ifdef FFS_WIN
+             NULL, //supply handler for making shadow copies
 #endif
+             copyCallback.get()); //throw (FileError);
 
     //attention: if copy-operation was cancelled an exception is thrown => sourcefile is not deleted, as we wish!
 
-    removeFile(sourceFile, false);
+    removeFile(sourceFile);
 }
 
 
@@ -424,7 +472,7 @@ public:
     virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName)
     {
         m_dirs.push_back(std::make_pair(Zstring(shortName), fullName));
-        return ReturnValDir::Ignore(); //DON'T traverse into subdirs; moveDirectory works recursively!
+        return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //DON'T traverse into subdirs; moveDirectory works recursively!
     }
     virtual ReturnValue onError(const wxString& errorText)
     {
@@ -445,7 +493,7 @@ void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, bool 
     if (symlinkExists(sourceDir))
     {
         createDirectory(targetDir, sourceDir, true); //copy symbolic link
-        removeDirectory(sourceDir, false);           //if target is already another symlink or directory, sourceDir-symlink is silently deleted
+        removeDirectory(sourceDir);           //if target is already another symlink or directory, sourceDir-symlink is silently deleted
         return;
     }
 
@@ -461,32 +509,21 @@ void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, bool 
     else
     {
         //first try to move the directory directly without copying
+        if (::renameFileInternal(sourceDir,
+                                 targetDir)) //throw ();
+            return;
+
+        //if moving failed treat as error (except when it tried to move to a different volume: in this case we will copy the directory)
 #ifdef FFS_WIN
-        if (::MoveFileEx(applyLongPathPrefix(sourceDir).c_str(), //__in      LPCTSTR lpExistingFileName,
-                         applyLongPathPrefix(targetDir).c_str(), //__in_opt  LPCTSTR lpNewFileName,
-                         0))                //__in      DWORD dwFlags
-            return;
-
-        //if moving failed treat as error (except when it tried to move to a different volume: in this case we will copy the directory)
-        const DWORD lastError = ::GetLastError();
-        if (lastError != ERROR_NOT_SAME_DEVICE)
-        {
-            const wxString errorMessage = wxString(_("Error moving directory:")) + wxT("\n\"") + zToWx(sourceDir) +  wxT("\" ->\n\"") +
-                                          zToWx(targetDir) + wxT("\"");
-            throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted(lastError));
-        }
+        if (::GetLastError() != ERROR_NOT_SAME_DEVICE)
 #elif defined FFS_LINUX
-        if (::rename(sourceDir.c_str(), targetDir.c_str()) == 0)
-            return;
-
-        //if moving failed treat as error (except when it tried to move to a different volume: in this case we will copy the directory)
         if (errno != EXDEV)
+#endif
         {
             const wxString errorMessage = wxString(_("Error moving directory:")) + wxT("\n\"") +
                                           zToWx(sourceDir) +  wxT("\" ->\n\"") + zToWx(targetDir) + wxT("\"");
             throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
         }
-#endif
 
         //create target
         createDirectory(targetDir, sourceDir, false); //throw (FileError);
@@ -527,7 +564,7 @@ void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, bool 
     //attention: if move-operation was cancelled an exception is thrown => sourceDir is not deleted, as we wish!
 
     //delete source
-    removeDirectory(sourceDir, false); //throw (FileError);
+    removeDirectory(sourceDir); //throw (FileError);
 }
 
 
@@ -536,6 +573,7 @@ void FreeFileSync::moveDirectory(const Zstring& sourceDir, const Zstring& target
 #ifdef FFS_WIN
     const Zstring& sourceDirFormatted = sourceDir;
     const Zstring& targetDirFormatted = targetDir;
+
 #elif defined FFS_LINUX
     const Zstring sourceDirFormatted = //remove trailing slash
         sourceDir.size() > 1 && sourceDir.EndsWith(globalFunctions::FILE_NAME_SEPARATOR) ?  //exception: allow '/'
@@ -566,7 +604,7 @@ public:
     virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName)
     {
         m_dirs.push_back(fullName);
-        return ReturnValDir::Ignore(); //DON'T traverse into subdirs; removeDirectory works recursively!
+        return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //DON'T traverse into subdirs; removeDirectory works recursively!
     }
     virtual ReturnValue onError(const wxString& errorText)
     {
@@ -579,7 +617,7 @@ private:
 };
 
 
-void FreeFileSync::removeDirectory(const Zstring& directory, const bool useRecycleBin)
+void FreeFileSync::removeDirectory(const Zstring& directory)
 {
     //no error situation if directory is not existing! manual deletion relies on it!
 #ifdef FFS_WIN
@@ -591,21 +629,15 @@ void FreeFileSync::removeDirectory(const Zstring& directory, const bool useRecyc
 
 #elif defined FFS_LINUX
     struct stat dirInfo;
-    if (lstat(directory.c_str(), &dirInfo) != 0)
+    if (::lstat(directory.c_str(), &dirInfo) != 0)
         return; //neither directory nor any other object (e.g. broken symlink) with that name existing
 #endif
-
-    if (useRecycleBin)
-    {
-        ::moveToRecycleBin(directory);
-        return;
-    }
 
 
 #ifdef FFS_WIN
     //initialize file attributes
     if (!::SetFileAttributes(           // initialize file attributes: actually NEEDED for symbolic links also!
-                directoryFmt.c_str(),      // address of directory name
+                directoryFmt.c_str(),   // address of directory name
                 FILE_ATTRIBUTE_NORMAL)) // attributes to set
     {
         wxString errorMessage = wxString(_("Error deleting directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"");
@@ -644,10 +676,10 @@ void FreeFileSync::removeDirectory(const Zstring& directory, const bool useRecyc
     FreeFileSync::traverseFolder(directory, false, &traverser);
 
     //delete files
-    std::for_each(fileList.begin(), fileList.end(), boost::bind(removeFile, _1, false));
+    std::for_each(fileList.begin(), fileList.end(), removeFile);
 
     //delete directories recursively
-    std::for_each(dirList.begin(), dirList.end(), boost::bind(removeDirectory, _1, false)); //call recursively to correctly handle symbolic links
+    std::for_each(dirList.begin(), dirList.end(), removeDirectory); //call recursively to correctly handle symbolic links
 
     //parent directory is deleted last
 #ifdef FFS_WIN
@@ -661,23 +693,6 @@ void FreeFileSync::removeDirectory(const Zstring& directory, const bool useRecyc
         throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
     }
 }
-
-
-#ifdef FFS_WIN
-class CloseHandleOnExit
-{
-public:
-    CloseHandleOnExit(HANDLE fileHandle) : fileHandle_(fileHandle) {}
-
-    ~CloseHandleOnExit()
-    {
-        ::CloseHandle(fileHandle_);
-    }
-
-private:
-    HANDLE fileHandle_;
-};
-#endif
 
 
 //optionally: copy directory last change date, DO NOTHING if something fails
@@ -696,7 +711,8 @@ void FreeFileSync::copyFileTimes(const Zstring& sourceDir, const Zstring& target
                                    NULL);
     if (hDirRead == INVALID_HANDLE_VALUE)
         return;
-    CloseHandleOnExit dummy(hDirRead);
+
+                 boost::shared_ptr<void> dummy(hDirRead, ::CloseHandle);
 
     FILETIME creationTime;
     FILETIME accessTime;
@@ -715,7 +731,8 @@ void FreeFileSync::copyFileTimes(const Zstring& sourceDir, const Zstring& target
                                         NULL);
         if (hDirWrite == INVALID_HANDLE_VALUE)
             return;
-        CloseHandleOnExit dummy2(hDirWrite);
+
+                 boost::shared_ptr<void> dummy2(hDirWrite, ::CloseHandle);
 
         //(try to) set new "last write time"
         ::SetFileTime(hDirWrite,
@@ -755,7 +772,7 @@ Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target pa
     if (hDir == INVALID_HANDLE_VALUE)
         return Zstring();
 
-    CloseHandleOnExit dummy(hDir);
+                 boost::shared_ptr<void> dummy(hDir, ::CloseHandle);
 
     const unsigned int BUFFER_SIZE = 10000;
     TCHAR targetPath[BUFFER_SIZE];
@@ -785,7 +802,6 @@ Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target pa
     return targetPath;
 }
 
-//#warning teste
 //#include <aclapi.h>
 ////optionally: copy additional metadata, DO NOTHING if something fails
 //void copyAdditionalMetadata(const Zstring& sourceDir, const Zstring& targetDir)
@@ -1156,7 +1172,7 @@ void FreeFileSync::copyFile(const Zstring& sourceFile,
     {
         try
         {
-            removeFile(temporary, false); //throw (FileError, std::logic_error);
+            removeFile(temporary); //throw (FileError, std::logic_error);
         }
         catch(...) {}
 
@@ -1368,4 +1384,3 @@ bool FreeFileSync::isFatDrive(const Zstring& directoryName)
 }
 #endif  //FFS_WIN
 */
-

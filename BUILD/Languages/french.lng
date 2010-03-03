@@ -35,31 +35,31 @@
 %x of 1 row in view
 %x sur 1 ligne affichée
 &Abort
-&Abandon
+&Abandonner
 &About...
 &A propos de...
 &Advanced
 &Avancé
-&Apply
-&Appliquer
 &Cancel
 &Annuler
 &Check for new version
 &Rechercher une nouvelle version
 &Content
 &Contenu
-&Create batch job
-&Créer un fichier de commandes
+&Create batch job...
+&Créer une tâche de traitement par lots...
 &Default
 &Défaut
 &Exit
 &Quitter
-&Export file list
-&Exportation de la liste des fichiers
+&Export file list...
+&Exportation de la liste des fichiers...
 &File
 &Fichier
-&Global settings
-&Paramètres généraux
+&Find next
+&Chercher le suivant
+&Global settings...
+&Paramètres généraux...
 &Help
 &Aide
 &Ignore
@@ -68,8 +68,8 @@
 &Langue
 &Load
 &Charger
-&Load configuration
-&Charger la configuration
+&Load configuration...
+&Charger la configuration...
 &New
 &Nouveau
 &No
@@ -89,7 +89,7 @@
 &Yes
 &Oui
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Notez que seuls les lecteurs FAT/FAT32 sont touchées par ce problème ! \ NDans les autres cas, vous pouvez désactiver le paramètre \ "ignorer la différence d'une heure \".)
+(Notez que seuls les lecteurs FAT/FAT32 sont concernés par ce problème !\nDans tous les autres cas, vous pouvez désactiver le paramètre \"ignorer la différence d'une heure\".)
 (Requires an Internet connection!)
 (Nécessite une connexion internet)
 ,
@@ -160,6 +160,8 @@ A newer version of FreeFileSync is available:
 Une version plus récente de FreeFileSync est disponible :
 Abort requested: Waiting for current operation to finish...
 Abandon demandé : En attente de la fin de l'opération en cours...
+Abort synchronization immediately
+Abandon immédiat de la synchronisation
 Aborted
 Abandonné
 About
@@ -173,15 +175,15 @@ Ajout d'un dossier
 Add folder pair
 Ajout d'un couple de dossiers
 All directories in sync!
-Tous les répertoires en synchro !
+Tous les répertoires sont synchronisés !
 An exception occured!
-Une violation s'est produite !
+Une erreur s'est produite !
 As a result the files are separated into the following categories:
 En conclusion, les fichiers sont répartis dans les catégories suivantes :
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
 Comme le nom le suggère, deux fichiers qui ont le même nom sont considérés comme identiques si, et seulement si, leur contenu est identique. Cette option est utile pour les contrôles de cohérence plutôt que pour les opérations de sauvegarde. Toutefois, les dates et heures ne sont pas du tout prises en compte.\n\nAvec cette option, l'arbre de décision est plus simple :
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
-Créer un fichier de commandespour une synchronisation automatique. Pour démarrer en mode batch, indiquer le nom du fichier à l'exécutable FreeFileSync : freefilesync.exe <fichier de commandes>. Ceci peut aussi être programmé dans le plannificateur de tâches.
+Crée un fichier de traitement par lots pour une synchronisation automatique. Pour démarrer en mode de traitement par lots, indiquer le nom du fichier à l'exécutable FreeFileSync : freefilesync.exe <fichier de commandes>. Ceci peut aussi être programmé dans le plannificateur de tâches.
 At least one directory input field is empty.
 Au moins un champ répertoire est vide.
 Auto-adjust columns
@@ -189,9 +191,9 @@ Auto-ajustement des colonnes
 Automatic mode
 Mode automatique
 Batch execution
-Exécution du fichier de commandes
+Exécution du traitement par lots
 Batch file created successfully!
-Fichier de commandes créé avec succès !
+Fichier de traitement par lots créé avec succès !
 Batch job
 Fichier de commandes
 Big thanks for localizing FreeFileSync goes out to:
@@ -202,14 +204,12 @@ Browse
 Parcourir
 Build:
 Créé le :
-Cancel
-Annuler
 Cannot determine sync-direction:
 Impossible de déterminer le sens de la synchro :
+Cannot find %x
+Impossible de trouver %x
 Category
 Catégorie
-Change direction
-Changer la direction
 Comma separated list
 Liste d'éléments séparés par une virgule
 Command line
@@ -233,7 +233,7 @@ Comparaison du contenu des fichiers %x
 Comparing content...
 Comparaison du contenu...
 Comparing files by content failed.
-La comparaison des fichiers par leur contenu a échouée.
+La comparaison des fichiers par leur contenu a échoué.
 Comparison Result
 Résultat de la comparaison
 Comparison settings
@@ -271,10 +271,10 @@ Copie de droite à gauche
 Copy from right to left overwriting
 Copie de droite à gauche avec remplacement
 Copy locked files
-Copier les fichiers verrouilés
+Copier les fichiers verrouillés
 Copy new or updated files to right folder.
 Copie de fichiers nouveaux ou modifiés dans le dossier de droite.
-Copy shared or locked files using Volume Shadow Copy Service.
+Copy shared or locked files using Volume Shadow Copy Service
 Copier les fichiers partagés ou verrouilés en utilisant le service Volume Shadow Copy
 Copy to clipboard\tCTRL+C
 Copier dans le presse-papiers\tCTRL+C
@@ -285,13 +285,13 @@ Copie le fichier %x vers %y avec écrasement
 Could not determine volume name for file:
 Impossible de trouver le nom de volume pour le fichier :
 Could not initialize directory monitoring:
-Impossible d'initialiser la surveillance des dossiers:
+Impossible d'initialiser la surveillance des dossiers :
 Could not load a required DLL:
 Impossible de charger une DLL :
 Could not read values for the following XML nodes:
 Impossible de lire les valeurs des noeuds XML suivants :
 Create a batch job
-Création du fichier de commandes
+Créer une tâche de traitement par lots
 Creating folder %x
 Création du dossier %x
 Current operation:
@@ -308,12 +308,14 @@ DECISION TREE
 ARBRE DE DECISION
 Data remaining:
 Données restantes :
+Data transferred:
+Données transférées
 Data verification error: Source and target file have different content!
 Erreur lors du contrôle des données : Les fichiers source et destination ont des contenus différents !
 Date
 Date
 Delay
-délai
+Délai
 Delay between detection of changes and execution of command line in seconds
 Intervalle entre la détection des changements et l'exécution de la ligne de commande en secondes
 Delete files/folders existing on left side only
@@ -325,9 +327,9 @@ Suppression des fichiers\tDEL
 Delete on both sides
 Suppression des deux côtés
 Delete on both sides even if the file is selected on one side only
-Suppression des deux côtés même si le fichier est sélectionné d'un seul côté
-Delete or overwrite files permanently.
-Supprimer ou écraser les fichiers définitivement.
+Suppression des deux côtés même si le fichier n'est sélectionné que d'un seul côté
+Delete or overwrite files permanently
+Supprimer ou écraser les fichiers définitivement
 Delete permanently
 Suppression définitive
 Deleting file %x
@@ -347,7 +349,7 @@ Répertoire
 Directory does not exist:
 Le répertoire n'existe pas :
 Do not show this dialog again
-Ne pas afficher cette boîte de dialogue
+Ne plus afficher ce message les prochaines fois
 Do nothing
 Ne rien faire
 Do you really want to delete the following objects(s)?
@@ -367,7 +369,7 @@ Email
 Enable filter to exclude files from synchronization
 Activer le filtrage pour exclure les fichiers de la synchronisation
 Endless loop when traversing directory:
-Boucle sans fin lors de la sucration du dossier
+Boucle sans fin lors du parcours du répertoire : 
 Error
 Erreur
 Error changing modification time:
@@ -376,6 +378,8 @@ Error copying file:
 Erreur lors de la copie du fichier :
 Error copying locked file %x!
 Erreur lors de la copie du fichier verrouillé %x !
+Error copying symbolic link:
+Erreur lors de la copie du lien symbolique :
 Error creating directory:
 Erreur lors de la création d'un répertoire :
 Error deleting directory:
@@ -402,8 +406,6 @@ Error reading file:
 Erreur lors de la lecture du fichier :
 Error reading from synchronization database:
 Erreur lors de la lecture de la base de données de synchro :
-Error resolving full path name:
-Erreur lors de la résolution du chemin :
 Error resolving symbolic link:
 Erreur lors de la résolution du lien symbolique :
 Error starting Volume Shadow Copy Service!
@@ -428,10 +430,10 @@ Exclude temporarily
 Exclure temporairement
 Exclude via filter:
 Exclure à l'aide du filtre :
-Exit immediately and set returncode < 0
-Sortie immédiate avec le returncode < 0
-Exit with RC < 0
-Sortie avec RC < 0
+Exit instantly
+Sortie immédiate
+Extension
+Extension
 External applications
 Applications externes
 Fatal Error
@@ -453,13 +455,13 @@ Taille et date du fichier
 Filename
 Nom du fichier
 Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-Les fichiers %x ont une différence de date inférieure à 1 heure !\n\nIl n'est pas sain de décider quelle est la plus récente à cause de l'heure d'été.
+Les fichiers %x ont une différence de date inférieure à 1 heure !\n\nIl est dangereux de décider quel est le plus récent à cause de l'heure d'été.
 Files %x have the same date but a different size!
-Les fichiers %x ont la même data mais une taille différente !
-Files are found equal if\n     - file content\nis the same.
-Les fichiers sont considérés comme identiques, si\n     - leur contenu est identique.
-Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
-Les fichiers sont considérés comme identiques, si\n     - leur taille\n     - leur date et heure sont identiques.
+Les fichiers %x ont la même date mais une taille différente !
+Files are found equal if\n     - file content\nis the same
+Les fichiers sont considérés comme identiques, si\n     - leur contenu\nest identique
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same
+Les fichiers sont considérés comme identiques, si\n     - leur taille\n     - leur date et heure de dernière modification\nsont identiques
 Files remaining:
 Fichiers restants :
 Files that are equal on both sides
@@ -472,12 +474,14 @@ Files that exist on both sides, right one is newer
 Fichiers existants des deux côtés, celui de droite est plus récent
 Files/folders found:
 Fichiers/Dossiers trouvés :
+Files/folders processed:
+Fichiers/dossiers traités :
 Files/folders remaining:
 Fichiers/dossiers restants :
 Files/folders that exist on left side only
-Fichiers/répertoires existants seulement à gauche
+Fichiers/répertoires existant seulement à gauche
 Files/folders that exist on right side only
-Fichiers/répertoires existants seulement à droite
+Fichiers/répertoires existant seulement à droite
 Filter
 Filtrage
 Filter files
@@ -490,6 +494,10 @@ Filter view
 Filtrage de la vue
 Filtering is deactivated
 Le filtrage est désactivé
+Find
+Chercher
+Find what:
+Chercher cela :
 Folder Comparison and Synchronization
 Comparaison de Dossiers et Synchronisation
 Free disk space available:
@@ -505,7 +513,7 @@ FreeFileSync fichier de commandes
 FreeFileSync configuration
 FreeFileSync configuration
 FreeFileSync is up to date!
-FreeFileSync a été mis à jour !
+FreeFileSync est à jour !
 Full path
 Chemin complet
 Generating database...
@@ -523,7 +531,7 @@ Boîtes de dialogue masquées :
 Hide all error and warning messages
 Masquer tous les messages d'erreurs et les avertissements
 Hide conflicts
-Conflits sur le masquage
+Masquer les conflits
 Hide excluded items
 Masquer les éléments exclus
 Hide files that are different
@@ -535,7 +543,7 @@ Masquer les fichiers plus récents à gauche
 Hide files that are newer on right
 Masquer les fichiers plus récents à droite
 Hide files that exist on left side only
-Masquer les fichiers existant des deux côtés
+Masquer les fichiers n'existant qu'à gauche
 Hide files that exist on right side only
 Masquer les fichiers n'existant qu'à droite
 Hide files that will be created on the left side
@@ -581,7 +589,7 @@ Inclure toutes les lignes
 Include temporarily
 Inclure temporairement
 Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
-Inclure : *.doc;*.zip;*.exe\nExclure : \\stuff\\temp\\*
+Inclure : *.doc;*.zip;*.exe\nExclure : \\truc\\temp\\*
 Incompatible synchronization database format:
 Format de la base de données de synchro incompatible :
 Info
@@ -589,9 +597,11 @@ Info
 Information
 Information
 Initial synchronization:
-Première synchronisation:
+Première synchronisation :
 Integrate external applications into context menu. The following macros are available:
 Inclure les applications externes dans le menu contextuel. Les macros suivantes sont disponibles :
+Last synchronization not completed!
+La dernière syncronisation n'a pas été totalement terminée !
 Leave as unresolved conflict
 Abandonner en tant que conflit non résolu
 Left
@@ -601,7 +611,7 @@ Légende
 Load configuration from file
 Charger la configuration à partir du fichier
 Load configuration history (press DEL to delete items)
-Charger l'historique des configuration (appuyez sur Suppr pour supprimer des éléments)
+Charger l'historique des configurations (appuyez sur Suppr pour supprimer des éléments)
 Local filter
 Filtre local
 Log-messages:
@@ -610,8 +620,10 @@ Logging
 Connexion
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 La copie en tâche de fond sur WOW64 n'est pas possible. Utilisez pour cela la version 64 bits de FreeFileSync.
+Match case
+Respecter la casse
 Mirror ->>
-Mirroir ->>
+Miroir ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Sauvegarde miroir du répertoire de gauche : Le répertoire de droite sera écrasé et exactement identique au répertoire de gauche après la synchronisation.
 Monitoring active...
@@ -622,8 +634,8 @@ Move column down
 Déplacer la colonne vers le bas
 Move column up
 Déplacer la colonne vers le haut
-Move files into a time-stamped subdirectory.
-Déplacer les fichiers vers un sous-répertoire daté.
+Move files into a time-stamped subdirectory
+Déplacer les fichiers vers un sous-répertoire daté
 Moving %x to Recycle Bin
 Déplacement de %x vers la Corbeille
 Moving file %x to user-defined directory %y
@@ -646,8 +658,10 @@ Number of files and directories that will be deleted
 Nombre de fichiers et de répertoires qui seront supprimés
 Number of files that will be overwritten
 Nombre de fichiers qui seront remplacés
-OK
-OK
+One of the FreeFileSync database entries within the following file is not yet existing:
+L'une des entrées de la base de données FreeFileSync n'exite plus dans le fichier :
+One of the FreeFileSync database files is not yet existing:
+L'une des entrées de la base de données FreeFileSync n'exite plus :
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Seuls les fichiers/répertoires filtrés seront sélectionnés pour la synchronisation. Le filtre sera appliqué au nom relatif (!) pour les répertoires de synchroniqation de base.
 Open directly
@@ -667,23 +681,25 @@ Pause
 Paused
 En pause
 Please run a Compare first before synchronizing!
-Veuillez cliquer sur "Compareré avant de lancer la synchronisation !
+Veuillez lancer une Comparaison avant de lancer la synchronisation !
 Processing folder pair:
 Traitement de la paire de dossiers :
 Published under the GNU General Public License:
-Publié sous la licence GNU General Public :
+Publié sous licence GNU General Public License :
 Question
 Question
 Quit
 Quitter
 Re-enable all hidden dialogs?
-Ré-autoriser les boîtes de dialogues masquées ?
+Réactiver les boîtes de dialogues masquées ?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Synchronisation Automatisée
 RealtimeSync configuration
-RealtimeSync configuration
+Configuration RealtimeSync
+Recycle Bin not yet supported for this system!
+
 Relative path
-Chemin
+Chemin relatif
 Remove alternate settings
 Supprimer les paramètres de rechange
 Remove folder
@@ -691,25 +707,25 @@ Supprimer le dossier
 Remove folder pair
 Supprimer le couple de dossiers
 Remove local filter settings
-Supprimer la configuration du filtre local
+Supprimer la configuration locale de filtrage
 Renaming file %x to %y
 Renommage des fichiers %x en %y
 Report translation error
-Etat d'erreurs de transfert
+Etat des erreurs de transfert
 Reset
 Réinitialiser
 Right
 Droite
 Run minimized and write status information to a logfile
-Exécution en mode réduit. Les informations d'état sont enregitrées dans un fichier .log
-S&ave configuration
-S&auvegarder la configuration
+Exécution en mode réduit. Les informations d'état sont enregistrées dans un fichier .log
+S&ave configuration...
+S&auvegarder la configuration...
 S&witch view
 Changer de &vue
 Save changes to current configuration?
-Voulez-vous enregistrer les modifications dans la configuration courante ?
+Voulez-vous enregistrer les modifications dans la configuration actuelle ?
 Save current configuration to file
-Enregistrer la configuration courante
+Enregistrer la configuration actuelle
 Scanning...
 Lecture en cours...
 Scanning:
@@ -722,12 +738,12 @@ Select logfile directory:
 Choisissez un dossier pour le fichier .log :
 Select variant:
 Choisissez une variante :
-Setting default synchronization directions. Please check whether they are appropriate for you.
-Configuration de synchronisation par défaut. Veuillez vérifiez si elles vous conviennent.
+Set direction:
+Choix de la direction :
+Setting default synchronization directions: Old files will be overwritten by newer files.
+Directions de la synchronisation par défaut : les anciens fichiers seront remplacés par les nouveaux.
 Show conflicts
 Afficher les conflits
-Show file icons
-Afficher les icônes
 Show files that are different
 Afficher les fichiers différents
 Show files that are equal
@@ -737,29 +753,29 @@ Afficher les fichiers de gauche plus récents que ceux de droite
 Show files that are newer on right
 Afficher les fichiers de droite plus récents que ceux de gauche
 Show files that exist on left side only
-Afficher les fichiers existants seulement à gauche
+Afficher les fichiers existant seulement à gauche
 Show files that exist on right side only
-Afficher les fichiers existants seulement à droite
+Afficher les fichiers existant seulement à droite
 Show files that will be created on the left side
-Afficher les ficgier qui seront créés à gauche
+Afficher les fichiers qui seront créés à gauche
 Show files that will be created on the right side
-Afficher les ficgier qui seront créés à droite
+Afficher les fichiers qui seront créés à droite
 Show files that will be deleted on the left side
-Afficher les ficgier qui seront supprimiés à gauche
+Afficher les fichiers qui seront supprimés à gauche
 Show files that will be deleted on the right side
-Afficher les ficgier qui seront supprimiés à droite
+Afficher les fichiers qui seront supprimés à droite
 Show files that will be overwritten on left side
 Afficher les fichiers qui seront écrasés à gauche
 Show files that will be overwritten on right side
 Afficher les fichiers qui seront écrasés à droite
 Show files that won't be copied
-Afficher les ficgier qui ne seront pas copiés
+Afficher les fichiers qui ne seront pas copiés
 Show hidden dialogs
 Afficher les boîtes de dialogue masquées
 Show popup
 Afficher la boîte de dialogue
 Show popup on errors or warnings
-Affiche une boîte de dialogue pour chaque erreur ou avertissement
+Affiche la boîte de dialogue pour chaque erreur ou avertissement
 Significant difference detected:
 Différence significative détectée :
 Silent mode
@@ -767,7 +783,7 @@ Mode silencieux
 Size
 Taille
 Source code written completely in C++ utilizing:
-Code source écrit totalement en C++ et utilisant :
+Code source écrit entièrement en C++ et utilisant :
 Source directory does not exist anymore:
 Le répertoire source n'existe plus :
 Speed:
@@ -783,7 +799,7 @@ Arrêt
 Swap sides
 Permuter les côtés
 Synchronization Preview
-Prévisualisation de la synchronisation
+Prévisualisation de la Synchronisation
 Synchronization aborted!
 Synchronisation abandonnée !
 Synchronization completed successfully!
@@ -795,31 +811,25 @@ Paramétrage de la synchronisation
 Synchronization status
 Etat de la synchronisation
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
-Synchroniser rous les fichiers .doc, .zip et .exe sauf ceux du dossier \"temp\".
-Synchronize both sides simultaneously: Copy new or updated files in both directions.
-Synchronisation simultanée des deux côtés : Copie des fichiers nouveaux ou mis à jour.
-Synchronize both sides using a database. Deletions are detected automatically.
-Synchronisation des deux côtés à l'aide d'une base de données. Les suppressions sont détectées automatiquement.
+Synchroniser tous les fichiers .doc, .zip et .exe sauf ceux du dossier \"temp\".
+Synchronize both sides using a database. Deletions are detected automatically
+Synchronisation des deux côtés à l'aide d'une base de données. Les suppressions sont détectées automatiquement
 Synchronize...
 Synchroniser...
 Synchronizing...
 Synchronisation en cours...
 System out of memory!
-Erreur mémoire système !
+Plus de mémoire disponible dans le système !
 Target directory already existing!
 Le répertoire de destination existe déjà !
 Target file already existing!
 Le fichier de destination existe déjà !
-The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
-La ligne de commande est exécutée chque fois que :\n- Les fichiers de ces répertoires (ou sous-répertoires sont modifiés\n- La lettre correspondant au disque devient accessible (insertion USB)
-The database file is not yet existing, but will be created during synchronization:
-La base de données n'existe pas encore, mais elle sera créée pendant la synchronisation :
+The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+La ligne de commande est exécutée chaque fois : \n- qu'un répertoire est disponible (insertion d'une clé USB)\n- que les fichiers de ces répertoires ou sous-répertoires sont mofifiés
 The file does not contain a valid configuration:
 Le fichier ne contient pas de configuration valide :
-The required database entry is not yet existing, but will be created during synchronization:
-L'entrée demandée de la base de données n'existe pas encore, mais elle sera créée pendant la synchronisation :
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
-Cette variante définit comme identiques deux fichiers de même nom lorsqu'ils ont la même taille et le même date et heure de modification.
+Cette variante définit comme identiques deux fichiers de même nom lorsqu'ils ont la même taille ET le même date et heure de modification.
 Time
 Heure
 Time elapsed:
@@ -831,33 +841,27 @@ Volume de données à transférer
 Total required free disk space:
 Espace disque nécessaire :
 Total time:
-Temps total :
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
-Traiter les heures qui différent exactement de +/- 1 heure comme égales, et celles qui diffèrent de moins d'une heure comme conflit sur la gestion de l'heure d'été.
-Two way <->
-Des 2 côtés <->
+Durée totale :
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
+Traiter les heures qui diffèrent exactement de +/- 1 heure comme égales, et celles qui diffèrent de moins d'une heure comme conflit sur la gestion de l'heure d'été
 Unable to connect to sourceforge.net!
 Impossible de se connecter à sourceforge.net !
 Unable to create logfile!
 Impossible de créer un fichier log !
-Unable to initialize Recycle Bin!
-Impossible d'initialiser la corbeille !
 Unresolved conflicts existing!
 Il y a des conflits non résolus !
-Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
-Il y a des conflits non résolus !\n\nVous pouvez ignorer ces conflits et continuer la synchronisation.
 Update ->
 Mise à Jour ->
 Usage:
 Utilisation :
 Use Recycle Bin
 Utilisation de la corbeille
-Use Recycle Bin when deleting or overwriting files.
-Utiliser la Corbeille lors de la suppression ou du remplacement d'un fichier.
+Use Recycle Bin when deleting or overwriting files
+Utiliser la Corbeille lors de la suppression ou du remplacement d'un fichier
 User-defined directory
-Réoertoire défini par l'utilisateur
+Répertoire défini par l'utilisateur
 User-defined directory for deletion was not specified!
-Le réoertoire défini par l'utilisateur pour la suppression n'a pas été indiqué !
+Le répertoire défini par l'utilisateur pour la suppression n'a pas été indiqué !
 Variant
 Variante
 Verifying file %x
@@ -867,20 +871,18 @@ Le nom de volume %x ne fait pas partie du nom de fichier %y !
 Warning
 Attention
 Warning: Synchronization failed for %x item(s):
-Attention : La synchronisation a échouée pour %x élément(s) :
+Attention : La synchronisation a échoué pour %x élément(s) :
 When the comparison is started with this option set the following decision tree is processed:
 Lorsque la comparaison démarre avec cette option, l'arbre de décision suivant est exécuté :
 You can ignore conflicts and continue synchronization.
 Vous pouvez ignorer ces conflits et continuer la synchronisation.
 You can ignore the error to consider not existing directories as empty.
 Vous pouvez ignorer l'erreur considérant qu'un dossier inexistant est vide.
-You can ignore the error to skip current folder pair.
-Vous pouvez ignorer l'erreur pour sauter la paire de dossiers courante.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
-Vous pouvez essayer de synchroniser à nouveau les éléments restants (SANS avoir à les re-comparer) !
+Vous pouvez essayer de synchroniser à nouveau les éléments restants (SANS avoir à les comparer à nouveau) !
 different
 fichiers différents
 file exists on both sides
-Le fichier existe des deux côtés
+le fichier existe des deux côtés
 on one side only
-Le fichier existe sur un seul côté seulement
+le fichier existe sur un seul côté seulement

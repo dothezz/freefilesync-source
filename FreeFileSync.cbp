@@ -85,8 +85,10 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wshadow" />
+			<Add option="-Winit-self" />
 			<Add option="-Wredundant-decls" />
 			<Add option="-Wcast-align" />
+			<Add option="-Wmissing-include-dirs" />
 			<Add option="-Wswitch-enum" />
 			<Add option="-Wall" />
 			<Add option="-pipe" />
@@ -140,6 +142,8 @@
 		</Unit>
 		<Unit filename="fileHierarchy.cpp" />
 		<Unit filename="fileHierarchy.h" />
+		<Unit filename="library\binary.cpp" />
+		<Unit filename="library\binary.h" />
 		<Unit filename="library\customGrid.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
@@ -163,19 +167,10 @@
 		<Unit filename="library\gtest\main.cpp">
 			<Option target="Unit Test" />
 		</Unit>
-		<Unit filename="library\gtest\src\gtest-death-test.cc">
+		<Unit filename="library\gtest\src\gtest-all.cc">
 			<Option target="Unit Test" />
 		</Unit>
-		<Unit filename="library\gtest\src\gtest-filepath.cc">
-			<Option target="Unit Test" />
-		</Unit>
-		<Unit filename="library\gtest\src\gtest-port.cc">
-			<Option target="Unit Test" />
-		</Unit>
-		<Unit filename="library\gtest\src\gtest-typed-test.cc">
-			<Option target="Unit Test" />
-		</Unit>
-		<Unit filename="library\gtest\src\gtest.cc">
+		<Unit filename="library\gtest\src\gtest-internal-inl.h">
 			<Option target="Unit Test" />
 		</Unit>
 		<Unit filename="library\gtest\unittest.h">
@@ -280,6 +275,14 @@
 		<Unit filename="shared\globalFunctions.h" />
 		<Unit filename="shared\guid.cpp" />
 		<Unit filename="shared\guid.h" />
+		<Unit filename="shared\helpProvider.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="shared\helpProvider.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
 		<Unit filename="shared\localization.cpp" />
 		<Unit filename="shared\localization.h" />
 		<Unit filename="shared\longPathPrefix.cpp" />
@@ -320,10 +323,6 @@
 		<Unit filename="synchronization.cpp" />
 		<Unit filename="synchronization.h">
 			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="ui\appMain.h">
-			<Option target="Debug" />
-			<Option target="Release" />
 		</Unit>
 		<Unit filename="ui\batchStatusHandler.cpp">
 			<Option target="Debug" />
@@ -369,6 +368,23 @@
 		<Unit filename="ui\mainDialog.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="ui\messagePopup.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="ui\messagePopup.h" />
+		<Unit filename="ui\mouseMoveWindow.cpp" />
+		<Unit filename="ui\mouseMoveWindow.h" />
+		<Unit filename="ui\progressIndicator.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="ui\progressIndicator.h" />
+		<Unit filename="ui\search.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="ui\search.h" />
 		<Unit filename="ui\settingsDialog.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />

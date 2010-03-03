@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef STANDARDPATHS_H_INCLUDED
 #define STANDARDPATHS_H_INCLUDED
 
@@ -7,14 +13,14 @@
 namespace FreeFileSync
 {
 //------------------------------------------------------------------------------
-//global functions
+//global program directories
 //------------------------------------------------------------------------------
-const wxString& getGlobalConfigFile();
-const wxString& getDefaultLogDirectory();
-const wxString& getLastErrorTxtFile();
-const wxString& getInstallationDir(); //FreeFileSync installation directory WITH path separator at end
-const wxString& getConfigDir();
+const wxString& getBinaryDir();   //directory containing executable WITH path separator at end
+const wxString& getResourceDir(); //resource directory WITH path separator at end
+const wxString& getConfigDir();   //config directory WITH path separator at end
 //------------------------------------------------------------------------------
+
+bool isPortableVersion();
 }
 
 #endif // STANDARDPATHS_H_INCLUDED

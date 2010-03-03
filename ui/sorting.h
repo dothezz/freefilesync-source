@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef SORTING_H_INCLUDED
 #define SORTING_H_INCLUDED
 
@@ -12,11 +18,7 @@ namespace FreeFileSync
 inline
 int compareString(const Zstring& stringA, const Zstring& stringB)
 {
-#ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
-    return stringA.CmpNoCase(stringB);
-#elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
-    return stringA.Cmp(stringB);
-#endif
+    return stringA.cmpFileName(stringB);
 }
 
 
@@ -131,7 +133,7 @@ bool sortByFileSize(const FileSystemObject& a, const FileSystemObject& b)
     else if (fileObjB == NULL)
         return true;  //directories last
 
-    //sortAscending shall result in list beginning with largest files first
+    //return list beginning with largest files first
     return Compare<!ascending>().isSmallerThan(fileObjA->getFileSize<side>(), fileObjB->getFileSize<side>());
 }
 
@@ -154,7 +156,30 @@ bool sortByDate(const FileSystemObject& a, const FileSystemObject& b)
     else if (fileObjB == NULL)
         return true;  //directories last
 
+    //return list beginning with newest files first
     return Compare<!ascending>().isSmallerThan(fileObjA->getLastWriteTime<side>(), fileObjB->getLastWriteTime<side>());
+}
+
+
+template <bool ascending, SelectedSide side>
+inline
+bool sortByExtension(const FileSystemObject& a, const FileSystemObject& b)
+{
+    if (a.isEmpty<side>())
+        return false;  //empty rows always last
+    else if (b.isEmpty<side>())
+        return true;  //empty rows always last
+
+
+    const FileMapping* fileObjA = dynamic_cast<const FileMapping*>(&a);
+    const FileMapping* fileObjB = dynamic_cast<const FileMapping*>(&b);
+
+    if (fileObjA == NULL)
+        return false; //directories last
+    else if (fileObjB == NULL)
+        return true;  //directories last
+
+    return Compare<ascending>().isSmallerThan(fileObjA->getExtension<side>(), fileObjB->getExtension<side>());
 }
 
 

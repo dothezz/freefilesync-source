@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef RECYCLER2_H_INCLUDED
 #define RECYCLER2_H_INCLUDED
 
@@ -20,12 +26,9 @@ bool isMovable(const Zstring& pathFrom, const Zstring& pathTo); //throw()
 //optionally: copy creation/last change date, DOES NOTHING if something fails
 void copyFileTimes(const Zstring& sourceDir, const Zstring& targetDir); //throw()
 
-//recycler
-bool recycleBinExists(); //test existence of Recycle Bin API on current system
-
 //file handling
-void removeFile(const Zstring& filename, const bool useRecycleBin);       //throw (FileError, std::logic_error)
-void removeDirectory(const Zstring& directory, const bool useRecycleBin); //throw (FileError)
+void removeFile(const Zstring& filename);       //throw (FileError, std::logic_error)
+void removeDirectory(const Zstring& directory); //throw (FileError)
 
 
 struct MoveFileCallback //callback functionality
@@ -40,7 +43,7 @@ struct MoveFileCallback //callback functionality
     virtual Response requestUiRefresh() = 0;  //DON'T throw exceptions here, at least in Windows build!
 };
 
-//rename file: no copying!!!
+//rename file or directory: no copying!!!
 void renameFile(const Zstring& oldName, const Zstring& newName); //throw (FileError);
 
 //move source to target; expectations: target not existing, all super-directories of target exist
@@ -72,7 +75,7 @@ void copyFile(const Zstring& sourceFile,
               const Zstring& targetFile,
               const bool copyFileSymLinks,
               ShadowCopy* shadowCopyHandler = NULL, //supply handler for making shadow copies
-              CopyFileCallback* callback = NULL); //throw (FileError);
+              CopyFileCallback* callback = NULL);   //throw (FileError);
 
 #elif defined FFS_LINUX
 void copyFile(const Zstring& sourceFile,

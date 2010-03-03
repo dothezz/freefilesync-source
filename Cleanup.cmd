@@ -15,13 +15,23 @@ attrib FreeFileSync.suo -h
 del FreeFileSync.suo
 attrib RealtimeSync\RealtimeSync.suo -h
 del RealtimeSync\RealtimeSync.suo
-del FreeFileSync.vcproj.*.user
-del RealtimeSync\RealtimeSync.vcproj.*.user
 
-del BUILD\FreeFileSync.pdb
-del BUILD\FreeFileSync.ilk
-del BUILD\RealtimeSync.pdb
-del BUILD\RealtimeSync.ilk
+del BUILD\FreeFileSync*.pdb
+del BUILD\FreeFileSync*.ilk
+del BUILD\FreeFileSync*.lib
+del BUILD\FreeFileSync*.exp
+
+del BUILD\RealtimeSync*.pdb
+del BUILD\RealtimeSync*.ilk
+del BUILD\RealtimeSync*.lib
+del BUILD\RealtimeSync*.exp
+
+del BUILD\FreeFileSync.exe
+del BUILD\FreeFileSync_Win32.exe
+del BUILD\FreeFileSync_x64.exe
+del BUILD\RealtimeSync.exe
+del BUILD\RealtimeSync_Win32.exe
+del BUILD\RealtimeSync_x64.exe
 
 del library\ShadowCopy\ShadowCopy.ncb
 attrib library\ShadowCopy\ShadowCopy.suo -h
@@ -36,6 +46,8 @@ del library\ShadowCopy\Shadow.lib
 del library\ShadowCopy\ShadowTest.ilk
 del library\ShadowCopy\ShadowTest.pdb
 
-::remove precompiled headers
-del library\pch.h.gch
-del RealtimeSync\pch.h.gch
+del library\Recycler\Recycler_Vista.ncb
+attrib library\Recycler\Recycler_Vista.suo -h
+del library\Recycler\Recycler_Vista.suo
+del library\Recycler\Recycler_Vista.vcproj.*.user
+del library\Recycler\Test.vcproj.*.user

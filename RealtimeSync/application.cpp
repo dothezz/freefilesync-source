@@ -1,10 +1,9 @@
-/***************************************************************
- * Purpose:   Code for Application Class
- * Author:    ZenJu (zhnmju123@gmx.de)
- * Created:   2009-07-06
- * Copyright: ZenJu (http://sourceforge.net/projects/freefilesync/)
- **************************************************************/
-
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "application.h"
 #include "mainDialog.h"
 #include <wx/event.h>
@@ -14,6 +13,7 @@
 #include "xmlFreeFileSync.h"
 #include "../shared/standardPaths.h"
 #include <wx/file.h>
+#include "../shared/stringConv.h"
 
 #ifdef FFS_LINUX
 #include <gtk/gtk.h>
@@ -41,16 +41,7 @@ void Application::OnStartApplication(wxIdleEvent& event)
     SetAppName(wxT("FreeFileSync")); //use a different app name, to have "GetUserDataDir()" return the same directory as for FreeFileSync
 
 #ifdef FFS_LINUX
-    ::gtk_rc_parse("styles.rc"); //remove inner border from bitmap buttons
-#endif
-
-    //initialize help controller
-    helpController.reset(new wxHelpController);
-    helpController->Initialize(FreeFileSync::getInstallationDir() +
-#ifdef FFS_WIN
-                               wxT("FreeFileSync.chm"));
-#elif defined FFS_LINUX
-                               wxT("Help/FreeFileSync.hhp"));
+    ::gtk_rc_parse(FreeFileSync::wxToZ(FreeFileSync::getResourceDir()) + "styles.rc"); //remove inner border from bitmap buttons
 #endif
 
     //set program language
@@ -77,7 +68,7 @@ void Application::OnStartApplication(wxIdleEvent& event)
 
     GlobalResources::getInstance().load(); //loads bitmap resources on program startup
 
-    MainDialog* frame = new MainDialog(NULL, cfgFilename, *helpController);
+    MainDialog* frame = new MainDialog(NULL, cfgFilename);
     frame->SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
     frame->Show();
 }
@@ -98,7 +89,7 @@ int Application::OnRun()
     catch (const std::exception& e) //catch all STL exceptions
     {
         //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
-        wxFile safeOutput(FreeFileSync::getLastErrorTxtFile(), wxFile::write);
+        wxFile safeOutput(FreeFileSync::getConfigDir() + wxT("LastError.txt"), wxFile::write);
         safeOutput.Write(wxString::FromAscii(e.what()));
 
         wxMessageBox(wxString::FromAscii(e.what()), _("An exception occured!"), wxOK | wxICON_ERROR);

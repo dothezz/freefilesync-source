@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef COMPARISON_H_INCLUDED
 #define COMPARISON_H_INCLUDED
 
@@ -37,10 +43,6 @@ public:
     CompareProcess(bool traverseSymLinks,
                    unsigned int fileTimeTol,
                    bool ignoreOneHourDiff,
-#ifndef _MSC_VER
-#warning remove threshold, if not used!
-#endif
-                   unsigned int detectRenameThreshold,
                    xmlAccess::OptionalDialogs& warnings,
                    StatusHandler* handler);
 
@@ -53,12 +55,12 @@ private:
 
     void compareByContent(const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output);
 
-    //create comparison result table and fill relation except for files existing on both sides
+    //create comparison result table and fill category except for files existing on both sides
     void performBaseComparison(BaseDirMapping& output, std::vector<FileMapping*>& appendUndefined);
 
     //buffer accesses to the same directories; useful when multiple folder pairs are used
     class DirectoryBuffer;
-    boost::shared_ptr<DirectoryBuffer> directoryBuffer; //std::auto_ptr does not work with forward declarations!
+    boost::shared_ptr<DirectoryBuffer> directoryBuffer; //std::auto_ptr does not work with forward declarations (Or we need a non-inline ~CompareProcess())!
 
     const unsigned int fileTimeTolerance; //max allowed file time deviation
     const bool ignoreOneHourDifference;

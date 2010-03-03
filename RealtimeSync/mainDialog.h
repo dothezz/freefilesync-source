@@ -1,10 +1,9 @@
-/***************************************************************
- * Purpose:   Defines Application Frame
- * Author:    ZenJu (zhnmju123@gmx.de)
- * Created:   2009-07-06
- * Copyright: ZenJu (http://sourceforge.net/projects/freefilesync/)
- **************************************************************/
-
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef REALTIMESYNCMAIN_H
 #define REALTIMESYNCMAIN_H
 
@@ -12,7 +11,6 @@
 #include <vector>
 #include <memory>
 #include "../shared/dragAndDrop.h"
-#include <wx/help.h>
 
 namespace xmlAccess
 {
@@ -37,7 +35,7 @@ private:
 class MainDialog: public MainDlgGenerated
 {
 public:
-    MainDialog(wxDialog *dlg, const wxString& cfgFilename, wxHelpController& helpController);
+    MainDialog(wxDialog *dlg, const wxString& cfgFilename);
     ~MainDialog();
 
     void loadConfig(const wxString& filename);
@@ -70,7 +68,6 @@ private:
     //additional folders
     std::vector<FolderPanel*> additionalFolders; //additional pairs to the standard pair
 
-    wxHelpController& helpController_;
     //support for drag and drop on main folder
     std::auto_ptr<FreeFileSync::DragDropOnDlg> dragDropOnFolder;
 };

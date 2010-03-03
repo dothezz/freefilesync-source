@@ -40,26 +40,26 @@
 情報(&A)...
 &Advanced
 拡張(&A)
-&Apply
-適用(&A)
 &Cancel
 キャンセル(&C)
 &Check for new version
 バージョン更新の確認(&C)
 &Content
 トピック(&C)
-&Create batch job
-一括ジョブを作成(&C)
+&Create batch job...
+一括ジョブを作成(&C)...
 &Default
 デフォルト(&D)
 &Exit
 終了(&E)
-&Export file list
-ファイル一覧をエクスポート(&E)
+&Export file list...
+ファイル一覧をエクスポート(&E)...
 &File
 ファイル(&F)
-&Global settings
-全般的な設定(&G)
+&Find next
+次を検索(&F)
+&Global settings...
+全般的な設定(&G)...
 &Help
 ヘルプ(&H)
 &Ignore
@@ -68,8 +68,8 @@
 使用言語(&L)
 &Load
 読み込み(&L)
-&Load configuration
-構成設定の読み込み(&L)
+&Load configuration...
+構成設定の読み込み(&L)...
 &New
 新規(&N)
 &No
@@ -160,6 +160,8 @@ A newer version of FreeFileSync is available:
 FreeFileSync の新しいバージョンが利用可能です:
 Abort requested: Waiting for current operation to finish...
 ユーザによる中断: 現在の処理を終了しています.. お待ちください...
+Abort synchronization immediately
+今すぐに同期処理を中断
 Aborted
 中断
 About
@@ -202,14 +204,12 @@ Browse
 参照
 Build:
 ビルド:
-Cancel
-中止
 Cannot determine sync-direction:
 同期方向が決定されていません:
+Cannot find %x
+%x は見つかりません
 Category
 カテゴリ
-Change direction
-方向を変更
 Comma separated list
 カンマ区切り
 Command line
@@ -274,7 +274,7 @@ Copy locked files
 ロックされたファイルをコピー
 Copy new or updated files to right folder.
 新しい(更新)ファイルを右フォルダにコピー
-Copy shared or locked files using Volume Shadow Copy Service.
+Copy shared or locked files using Volume Shadow Copy Service
 共有、またはボリュームシャドウコピーでロックされたファイルをコピー
 Copy to clipboard\tCTRL+C
 クリップボードにコピー\tCTRL+C
@@ -308,6 +308,8 @@ DECISION TREE
 [判定ツリー]
 Data remaining:
 残りのデータ:
+Data transferred:
+転送済データ:
 Data verification error: Source and target file have different content!
 データ検証エラー: ソースと対象ファイルに異なる内容が含まれています!
 Date
@@ -326,7 +328,7 @@ Delete on both sides
 両方を削除
 Delete on both sides even if the file is selected on one side only
 片側のペインのみ選択されている場合でも両方を削除する
-Delete or overwrite files permanently.
+Delete or overwrite files permanently
 ファイルを上書き、または完全に削除
 Delete permanently
 完全に削除
@@ -376,6 +378,8 @@ Error copying file:
 ファイルのコピーに失敗:
 Error copying locked file %x!
 コピーに失敗! ファイル%x はロックされています!
+Error copying symbolic link:
+シンボリックリンクのコピーに失敗:
 Error creating directory:
 ディレクトリ作成エラー:
 Error deleting directory:
@@ -402,8 +406,6 @@ Error reading file:
 ファイル読み込みエラー:
 Error reading from synchronization database:
 同期データベースからの読み込みエラー:
-Error resolving full path name:
-フルパス名の解決エラー:
 Error resolving symbolic link:
 シンボリックリンクの解決に失敗:
 Error starting Volume Shadow Copy Service!
@@ -428,10 +430,10 @@ Exclude temporarily
 一時フォルダを除外
 Exclude via filter:
 フィルターを通して除外
-Exit immediately and set returncode < 0
-すぐに終了する場合の戻り値設定 < 0
-Exit with RC < 0
-RC で終了 < 0
+Exit instantly
+すぐに終了
+Extension
+拡張子
 External applications
 外部アプリケーション
 Fatal Error
@@ -456,9 +458,9 @@ Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to de
 ファイル %x の時間には、一時間未満の誤差があります!\n\n夏時間の問題により、より新しい方を時間で決定するのは安全ではありません。
 Files %x have the same date but a different size!
 ファイル %x は、同じ時間ですがサイズが異なっています!
-Files are found equal if\n     - file content\nis the same.
+Files are found equal if\n     - file content\nis the same
 ファイルが同様だった場合\n     - ファイル内容\nで判断する
-Files are found equal if\n     - filesize\n     - last write time and date\nare the same.
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same
 ファイルが同様だった場合\n   - ファイルサイズ\n   - 最終書き込み時間と日付\nで判断する
 Files remaining:
 残りのファイル:
@@ -472,6 +474,8 @@ Files that exist on both sides, right one is newer
 両側に存在するが、右側の方がより新しい
 Files/folders found:
 発見したファイル/フォルダ:
+Files/folders processed:
+処理済ファイル/フォルダ:
 Files/folders remaining:
 リネームされたファイル/フォルダ:
 Files/folders that exist on left side only
@@ -490,6 +494,10 @@ Filter view
 表示フィルター
 Filtering is deactivated
 フィルタリングは非アクティブです
+Find
+検索
+Find what:
+検索語:
 Folder Comparison and Synchronization
 フォルダの比較と同期
 Free disk space available:
@@ -592,6 +600,8 @@ Initial synchronization:
 同期処理の初期化:
 Integrate external applications into context menu. The following macros are available:
 外部のアプリケーションをコンテキストメニューに統合、以下のマクロが利用できます:
+Last synchronization not completed!
+最後の同期が完了していません!
 Leave as unresolved conflict
 未解決の競合を残す
 Left
@@ -610,6 +620,8 @@ Logging
 ログ
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 WOW64 では、ボリュームシャドウコピーに対応していません、FreeFileSync 64-bit 版をお試しください。
+Match case
+文字種を区別
 Mirror ->>
 ミラー >>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -622,7 +634,7 @@ Move column down
 列を下に移動
 Move column up
 列を上に移動
-Move files into a time-stamped subdirectory.
+Move files into a time-stamped subdirectory
 ファイルをタイムスタンプ名のサブフォルダに移動
 Moving %x to Recycle Bin
 %x をゴミ箱に移動中
@@ -646,8 +658,10 @@ Number of files and directories that will be deleted
 削除されたファイルとディレクトリ数
 Number of files that will be overwritten
 上書きされたファイル数
-OK
-OK
+One of the FreeFileSync database entries within the following file is not yet existing:
+FreeFileSync データベースに、以下のファイルに関するエントリは存在しません:
+One of the FreeFileSync database files is not yet existing:
+FreeFileSync データベースファイルが存在しません:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 フィルターに適合するファイル/ディレクトリのみ同期対象に選択されます。このフィルターは、同期基準ディレクトリへの相対的(!)な名前に適用されます。
 Open directly
@@ -682,6 +696,8 @@ RealtimeSync - Automated Synchronization
 リアルタイム同期 - 自動同期
 RealtimeSync configuration
 リアルタイム同期の構成設定
+Recycle Bin not yet supported for this system!
+
 Relative path
 相対パス
 Remove alternate settings
@@ -702,8 +718,8 @@ Right
 右側
 Run minimized and write status information to a logfile
 最小化で起動して、ステータス情報をログに書き込む
-S&ave configuration
-構成設定を保存(&A)
+S&ave configuration...
+構成設定を保存(&A)...
 S&witch view
 表示切り替え(&W)
 Save changes to current configuration?
@@ -722,12 +738,12 @@ Select logfile directory:
 ログファイルの保存先を選択:
 Select variant:
 変数を選択:
-Setting default synchronization directions. Please check whether they are appropriate for you.
-デフォルトの同期方向を設定します、そしてその方向が適切であるかを確認してください。
+Set direction:
+方向の設定:
+Setting default synchronization directions: Old files will be overwritten by newer files.
+同期方向のデフォルト設定: 古いファイルに新しいファイルを上書き
 Show conflicts
 不一致を表示
-Show file icons
-アイコンを表示
 Show files that are different
 差異のあるファイルを表示
 Show files that are equal
@@ -796,10 +812,8 @@ Synchronization status
 同期処理: ステータス
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 \"temp\" のサブフォルダを除いて、すべての.doc、.zip、および.exeファイルを同期
-Synchronize both sides simultaneously: Copy new or updated files in both directions.
-両側を同時に処理: 両方のディレクトリのより新しいファイルをコピー
-Synchronize both sides using a database. Deletions are detected automatically.
-データベースを利用して両側を同期、削除されたものは自動的に検出されます。
+Synchronize both sides using a database. Deletions are detected automatically
+データベースを利用して両側を同期、削除されたものは自動的に検出されます
 Synchronize...
 同期処理...
 Synchronizing...
@@ -810,14 +824,10 @@ Target directory already existing!
 対象ディレクトリはすでに存在します!
 Target file already existing!
 対象ファイルは既に存在します!
-The command line is executed each time:\n- Files within these directories (or subdirectories) are modified\n- The corresponding drive letter becomes available (USB-insert)
-このコマンドラインは逐次実行されます:\n- これらのディレクトリ(サブディレクトリ)内のファイルは変更されています。\n- 対応するドライブレターは、USB 挿入時に有効になります。
-The database file is not yet existing, but will be created during synchronization:
-このデータベースファイルは、まだ存在しませんが、同期処理の実行中に作成されます:
+The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+このコマンドラインは逐次実行されます:\n- ディレクトリに利用可能です(例.USBメモリ、ドライブなど)\n- これらディレクトリ/サブディレクトリのファイルの更新
 The file does not contain a valid configuration:
 このファイルには有効な構成が含まれていません:
-The required database entry is not yet existing, but will be created during synchronization:
-必要なデータベースエントリはまだ存在しませんが、同期処理の実行中に作成されます:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 この変数では、ふたつの同名ファイルが存在した場合、 それぞれのファイルサイズと最終更新日付/時間を比較します。
 Time
@@ -832,27 +842,21 @@ Total required free disk space:
 必要な合計ディスク空き容量:
 Total time:
 合計時間:
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes.
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 ファイルの時間の +/- を正確に 1 時間以上の差異は不一致、1 時間未満の差異は同様ファイルとして取り扱います(夏時間は変換されます)
-Two way <->
-両方向 <->
 Unable to connect to sourceforge.net!
 Sourceforge.net に接続できません!
 Unable to create logfile!
 ログファイルを作成出来ません!
-Unable to initialize Recycle Bin!
-ゴミ箱の初期化が出来ません!
 Unresolved conflicts existing!
 未解決の不一致があります!
-Unresolved conflicts existing! \n\nYou can ignore conflicts and continue synchronization.
-未解決の不一致があります! \n\nこの不一致を無視して同期を続行することが出来ます。
 Update ->
 更新 ->
 Usage:
 使用方法:
 Use Recycle Bin
 ゴミ箱を使用
-Use Recycle Bin when deleting or overwriting files.
+Use Recycle Bin when deleting or overwriting files
 ファイルの削除、上書き時にゴミ箱を使用する
 User-defined directory
 ユーで定義ディレクトリ
@@ -874,8 +878,6 @@ You can ignore conflicts and continue synchronization.
 この不一致を無視して同期を続行することが出来ます。
 You can ignore the error to consider not existing directories as empty.
 既存のディレクトリが空ではないというエラーは無視できます。
-You can ignore the error to skip current folder pair.
-このフォルダペアのエラーを無視してスキップできます。
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 残っているファイルは、再び同期することができます (再比較とは別の動作)!
 different

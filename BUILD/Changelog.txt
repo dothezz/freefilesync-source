@@ -2,6 +2,27 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.4
+--------------
+Performance: Reduced Recycle Bin access time by 90%
+Recycle Bin support for Linux
+Performance: Reduced binary comparison sequential read time (by up to 75% for CD/DVD access)
+Improved synchronization sequence to avoid disk space shortage: overwrite large files by small ones first
+Fixed problems with file renaming on Samba share
+New free text grid search via shortcuts CTRL + F and F3
+Show number of processed files at end of synchronization
+New optional grid column: file extension
+New comparison category icons
+Fixed handling sync-config of first folder pair
+Allow moving main dialog by dragging client area instead of title bar only
+Enhanced helpfile: Run RealtimeSync as Service
+Prefix logfiles with name of batchjob
+Fixed GUI right-to-left mirroring for locales Hebrew and Arabic
+Portable version: save configuration in installation folder
+Many small GUI enhancements
+Updated translation files
+
+
 Changelog v3.3
 --------------
 New installer package for portable/local/32/64-bit versions

@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "iconBuffer.h"
 #include <wx/thread.h>
 #include <wx/bitmap.h>
@@ -56,7 +62,7 @@ struct CmpFilenameWin
 {
     bool operator()(const Zstring& a, const Zstring& b) const
     {
-        return a.CmpNoCase(b) < 0;
+        return a.cmpFileName(b) < 0;
     }
 };
 
@@ -83,10 +89,43 @@ bool isPriceyExtension(const Zstring& extension)
 }
 //################################################################################################################################################
 
+
+class IconBuffer::IconHolder //handle HICON ownership WITHOUT ref-counting to allow a deep-copy (in contrast to wxIcon)
+{
+public:
+    IconHolder(HICON handle = 0) : handle_(handle) {}
+
+    ~IconHolder()
+    {
+        if (handle_ != 0)
+            ::DestroyIcon(handle_);
+    }
+
+    HICON clone() const //copy HICON, caller needs to take ownership!
+    {
+        return handle_ != 0 ? ::CopyIcon(handle_) : 0;
+    }
+
+    void swap(IconHolder& other) //throw()
+    {
+        std::swap(handle_, other.handle_);
+    }
+
+private:
+    IconHolder(const IconHolder&);
+    IconHolder& operator=(const IconHolder&);
+
+    HICON handle_;
+};
+
+
+//---------------------------------------------------------------------------------------------------
 typedef std::vector<DefaultChar> BasicString; //simple thread safe string class: std::vector is guaranteed to not use reference counting, Effective STL, item 13
+//avoid reference-counted objects as shared data: NOT THREADSAFE!!! (implicitly shared variables: ref-count + c-string)
+//---------------------------------------------------------------------------------------------------
 
 
-class WorkerThread : public wxThread
+class IconBuffer::WorkerThread : public wxThread
 {
 public:
     WorkerThread(IconBuffer* iconBuff);
@@ -116,7 +155,7 @@ private:
 };
 
 
-WorkerThread::WorkerThread(IconBuffer* iconBuff) :
+IconBuffer::WorkerThread::WorkerThread(IconBuffer* iconBuff) :
     wxThread(wxTHREAD_JOINABLE),
     threadHasMutex(false),
     threadExitIsRequested(false),
@@ -141,7 +180,7 @@ WorkerThread::WorkerThread(IconBuffer* iconBuff) :
 }
 
 
-void WorkerThread::setWorkload(const std::vector<Zstring>& load) //(re-)set new workload of icons to be retrieved
+void IconBuffer::WorkerThread::setWorkload(const std::vector<Zstring>& load) //(re-)set new workload of icons to be retrieved
 {
     wxCriticalSectionLocker dummy(lockWorkload);
 
@@ -154,7 +193,7 @@ void WorkerThread::setWorkload(const std::vector<Zstring>& load) //(re-)set new 
 }
 
 
-void WorkerThread::quitThread()
+void IconBuffer::WorkerThread::quitThread()
 {
     {
         wxMutexLocker dummy(threadIsListening); //wait until thread is in waiting state
@@ -165,7 +204,7 @@ void WorkerThread::quitThread()
 }
 
 
-wxThread::ExitCode WorkerThread::Entry()
+wxThread::ExitCode IconBuffer::WorkerThread::Entry()
 {
     try
     {
@@ -196,9 +235,9 @@ wxThread::ExitCode WorkerThread::Entry()
 }
 
 
-void WorkerThread::doWork()
+void IconBuffer::WorkerThread::doWork()
 {
-    FileName fileName; //don't use Zstring: reference-counted objects are NOT THREADSAFE!!! e.g. double deletion might happen
+    Zstring fileName;
 
     //do work: get the file icon.
     while (true)
@@ -207,11 +246,11 @@ void WorkerThread::doWork()
             wxCriticalSectionLocker dummy(lockWorkload);
             if (workload.empty())
                 break; //enter waiting state
-            fileName = workload.back();
+            fileName = &workload.back()[0]; //deep copy: fileName is NOT empty (includes NULL-termination)
             workload.pop_back();
         }
 
-        if (iconBuffer->requestFileIcon(Zstring(&fileName[0]))) //thread safety: Zstring okay, won't be reference-counted in requestIcon(), fileName is NOT empty
+        if (iconBuffer->requestFileIcon(fileName)) //thread safety: Zstring okay, won't be reference-counted in requestIcon()
             continue; //icon already in buffer: skip
 
         //despite what docu says about SHGetFileInfo() it can't handle all relative filenames, e.g. "\DirName"
@@ -219,61 +258,40 @@ void WorkerThread::doWork()
 
         //load icon
         SHFILEINFO fileInfo;
-        fileInfo.hIcon = 0; //initialize hIcon
+        fileInfo.hIcon = 0; //initialize hIcon -> fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
+        //bug report: https://sourceforge.net/tracker/?func=detail&aid=2768004&group_id=234430&atid=1093080
 
-        const Zstring extension = getFileExtension(&fileName[0]); //thread-safe: no sharing!
+        const Zstring extension = getFileExtension(fileName); //thread-safe: no sharing!
         if (isPriceyExtension(extension)) //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
         {
             //NOTE: CoInitializeEx()/CoUninitialize() implicitly called by wxWidgets on program startup!
-            if (::SHGetFileInfo(&fileName[0], //FreeFileSync::removeLongPathPrefix(&fileName[0]), //::SHGetFileInfo() can't handle \\?\-prefix!
-                                0,
-                                &fileInfo,
-                                sizeof(fileInfo),
-                                SHGFI_ICON | SHGFI_SMALLICON) &&
-                    fileInfo.hIcon != 0) //fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
-            {
-                //bug report: https://sourceforge.net/tracker/?func=detail&aid=2768004&group_id=234430&atid=1093080
+            ::SHGetFileInfo(fileName.c_str(), //FreeFileSync::removeLongPathPrefix(fileName), //::SHGetFileInfo() can't handle \\?\-prefix!
+                            0,
+                            &fileInfo,
+                            sizeof(fileInfo),
+                            SHGFI_ICON | SHGFI_SMALLICON);
 
-                wxIcon newIcon; //attention: wxIcon uses reference counting!
-                newIcon.SetHICON(fileInfo.hIcon);
-                newIcon.SetSize(IconBuffer::ICON_SIZE, IconBuffer::ICON_SIZE);
-
-                iconBuffer->insertIntoBuffer(&fileName[0], newIcon); //thread safety: icon buffer is written by this thread and this call only, so
-                //newIcon can safely go out of scope without race-condition because of ref-counting
-
-                //freeing of icon handle seems to happen somewhere beyond wxIcon destructor
-                //if (!DestroyIcon(fileInfo.hIcon))
-                //  throw RuntimeException(wxString(wxT("Error deallocating Icon handle!\n\n")) + FreeFileSync::getLastErrorFormatted());
-                continue;
-            }
+            IconBuffer::IconHolder newIcon(fileInfo.hIcon); //pass icon ownership (may be 0)
+            iconBuffer->insertIntoBuffer(fileName, newIcon);
         }
         else //no read-access to disk! determine icon by extension
         {
-            if (::SHGetFileInfo((Zstring(DefaultStr("dummy.")) + extension).c_str(),  //Windows Seven doesn't like this parameter to be without short name
-                                FILE_ATTRIBUTE_NORMAL,
-                                &fileInfo,
-                                sizeof(fileInfo),
-                                SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES) &&
-                    fileInfo.hIcon != 0) //fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
-            {
-                wxIcon newIcon; //attention: wxIcon uses reference counting!
-                newIcon.SetHICON(fileInfo.hIcon);
-                newIcon.SetSize(IconBuffer::ICON_SIZE, IconBuffer::ICON_SIZE);
+            ::SHGetFileInfo((Zstring(DefaultStr("dummy.")) + extension).c_str(),  //Windows Seven doesn't like this parameter to be without short name
+                            FILE_ATTRIBUTE_NORMAL,
+                            &fileInfo,
+                            sizeof(fileInfo),
+                            SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES);
 
-                iconBuffer->insertIntoBuffer(extension.c_str(), newIcon); //thread safety: icon buffer is written by this thread and this call only, so
-                continue;
-            }
+            IconBuffer::IconHolder newIcon(fileInfo.hIcon); //pass icon ownership (may be 0)
+            iconBuffer->insertIntoBuffer(extension, newIcon);
         }
-
-        //if loading of icon fails for whatever reason, just save a dummy icon to avoid re-loading
-        iconBuffer->insertIntoBuffer(&fileName[0], wxNullIcon);
     }
 }
 
-//---------------------------------------------------------------------------------------------------
-class IconDB : public std::map<Zstring, wxIcon> {};    // entryName/icon
-class IconDbSequence : public std::queue<Zstring> {};  // entryName
 
+//---------------------------------------------------------------------------------------------------
+class IconBuffer::IconDB : public std::map<Zstring, IconBuffer::CountedIconPtr> {}; //entryName/icon -> ATTENTION: consider ref-counting for this shared data structure!!!
+class IconBuffer::IconDbSequence : public std::queue<Zstring> {}; //entryName
 //---------------------------------------------------------------------------------------------------
 
 
@@ -294,6 +312,8 @@ IconBuffer::IconBuffer() :
 
 IconBuffer::~IconBuffer()
 {
+    //keep non-inline destructor for std::auto_ptr to work with forward declarations
+
     worker->quitThread();
 }
 
@@ -311,7 +331,19 @@ bool IconBuffer::requestFileIcon(const Zstring& fileName, wxIcon* icon)
     if (i != buffer->end())
     {
         if (icon != NULL)
-            *icon = i->second;
+        {
+            HICON clonedIcon = i->second->clone(); //thread safety: make deep copy!
+            if (clonedIcon != 0)
+            {
+                //create wxIcon from handle
+                wxIcon newIcon; //attention: wxIcon uses reference counting!
+                newIcon.SetHICON(clonedIcon); //transfer ownership!!
+                newIcon.SetSize(IconBuffer::ICON_SIZE, IconBuffer::ICON_SIZE);
+                *icon = newIcon;
+            }
+            else
+                *icon = wxNullIcon;
+        }
         return true;
     }
 
@@ -325,31 +357,28 @@ void IconBuffer::setWorkload(const std::vector<Zstring>& load)
 }
 
 
-void IconBuffer::insertIntoBuffer(const DefaultChar* entryName, const wxIcon& icon) //called by worker thread
+void IconBuffer::insertIntoBuffer(const DefaultChar* entryName, IconHolder& icon) //called by worker thread
 {
-    if (icon.IsOk()) //this check won't hurt
+    wxCriticalSectionLocker dummy(*lockIconDB);
+
+    //thread safety, ref-counting: (implicitly) make deep copy!
+    const Zstring fileNameZ = entryName;
+    const IconBuffer::CountedIconPtr newIcon(new IconBuffer::IconHolder); //exception safety!
+    newIcon->swap(icon);                                                  //
+
+    const std::pair<IconDB::iterator, bool> rc = buffer->insert(IconDB::value_type(fileNameZ, newIcon)); //thread saftey: icon uses ref-counting! But is NOT shared with main thread!
+
+    if (rc.second) //if insertion took place
+        bufSequence->push(fileNameZ); //note: sharing Zstring with IconDB!!!
+
+    assert(buffer->size() == bufSequence->size());
+
+    //remove elements if buffer becomes too big:
+    if (buffer->size() > BUFFER_SIZE) //limit buffer size: critical because GDI resources are limited (e.g. 10000 on XP per process)
     {
-        wxCriticalSectionLocker dummy(*lockIconDB);
-
-        const Zstring fileNameZ = entryName;
-
-        const std::pair<IconDB::iterator, bool> rc = buffer->insert(IconDB::value_type(fileNameZ, icon));
-
-        if (rc.second) //if insertion took place
-            bufSequence->push(fileNameZ);
-
-        assert(buffer->size() == bufSequence->size());
-
-        //remove elements if buffer becomes too big:
-        if (buffer->size() > BUFFER_SIZE) //limit buffer size: critical because GDI resources are limited (e.g. 10000 on XP per process)
-        {
-            //remove oldest element
-            buffer->erase(bufSequence->front());
-            bufSequence->pop();
-        }
+        //remove oldest element
+        buffer->erase(bufSequence->front());
+        bufSequence->pop();
     }
 }
-
-
-
 

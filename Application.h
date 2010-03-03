@@ -1,16 +1,14 @@
-/***************************************************************
- * Name:      FreeFileSyncApp.h
- * Purpose:   Defines Application Class
- * Author:    ZenJu (zhnmju123@gmx.de)
- * Created:   2008-07-16
- **************************************************************/
-
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef FREEFILESYNCAPP_H
 #define FREEFILESYNCAPP_H
 
 #include <wx/app.h>
 #include "library/processXml.h"
-#include <wx/help.h>
 
 
 class Application : public wxApp
@@ -27,8 +25,6 @@ private:
     void runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSettings& globSettings);
 
     xmlAccess::XmlGlobalSettings globalSettings; //settings used by GUI, batch mode or both
-
-    boost::shared_ptr<wxHelpController> helpController; //global help controller
     int returnValue;
 };
 

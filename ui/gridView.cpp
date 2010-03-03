@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "gridView.h"
 #include "sorting.h"
 #include "../synchronization.h"
@@ -92,11 +98,11 @@ GridView::StatusCmpResult GridView::updateCmpResult(bool hideFiltered, //maps so
             }
             else
             {
-                    if (!fsObj->isEmpty<LEFT_SIDE>())
-                        ++output.foldersOnLeftView;
+                if (!fsObj->isEmpty<LEFT_SIDE>())
+                    ++output.foldersOnLeftView;
 
-                    if (!fsObj->isEmpty<RIGHT_SIDE>())
-                        ++output.foldersOnRightView;
+                if (!fsObj->isEmpty<RIGHT_SIDE>())
+                    ++output.foldersOnRightView;
             }
 
             viewRef.push_back(*j);
@@ -206,11 +212,11 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
             }
             else
             {
-                    if (!fsObj->isEmpty<LEFT_SIDE>())
-                        ++output.foldersOnLeftView;
+                if (!fsObj->isEmpty<LEFT_SIDE>())
+                    ++output.foldersOnLeftView;
 
-                    if (!fsObj->isEmpty<RIGHT_SIDE>())
-                        ++output.foldersOnRightView;
+                if (!fsObj->isEmpty<RIGHT_SIDE>())
+                    ++output.foldersOnRightView;
             }
 
             viewRef.push_back(*j);
@@ -416,6 +422,28 @@ private:
 };
 
 
+template <bool ascending, FreeFileSync::SelectedSide side>
+class GridView::SortByExtension : public std::binary_function<RefIndex, RefIndex, bool>
+{
+public:
+    SortByExtension(const GridView& view) : m_view(view) {}
+
+    bool operator()(const RefIndex a, const RefIndex b) const
+    {
+        const FileSystemObject* fsObjA = m_view.getReferencedRow(a);
+        const FileSystemObject* fsObjB = m_view.getReferencedRow(b);
+        if (fsObjA == NULL) //invalid rows shall appear at the end
+            return false;
+        else if (fsObjB == NULL)
+            return true;
+
+        return sortByExtension<ascending, side>(*fsObjA, *fsObjB);
+    }
+private:
+    const GridView& m_view;
+};
+
+
 template <bool ascending>
 class GridView::SortByCmpResult : public std::binary_function<RefIndex, RefIndex, bool>
 {
@@ -489,6 +517,12 @@ void GridView::sortView(const SortType type, const bool onLeft, const bool ascen
         else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByDate<true,  RIGHT_SIDE>(*this));
         else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByDate<false, LEFT_SIDE >(*this));
         else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByDate<false, RIGHT_SIDE>(*this));
+        break;
+    case SORT_BY_EXTENSION:
+        if      ( ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByExtension<true,  LEFT_SIDE >(*this));
+        else if ( ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByExtension<true,  RIGHT_SIDE>(*this));
+        else if (!ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByExtension<false, LEFT_SIDE >(*this));
+        else if (!ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByExtension<false, RIGHT_SIDE>(*this));
         break;
     case SORT_BY_CMP_RESULT:
         if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByCmpResult<true >(*this));

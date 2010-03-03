@@ -61,6 +61,10 @@
 			<param name="Local" value="html\advanced\RealtimeSync.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Run as Service">
+			<param name="Local" value="html\advanced\RunAsService.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Schedule a Batch Job">
 			<param name="Local" value="html\advanced\ScheduleBatch.html">
 			</OBJECT>

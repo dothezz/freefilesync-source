@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "util.h"
 #include <wx/scrolwin.h>
 #include <wx/textctrl.h>
@@ -24,7 +30,7 @@ wxString FreeFileSync::formatFilesizeToShortString(const wxLongLong& filesize)
 wxString FreeFileSync::formatFilesizeToShortString(const wxULongLong& filesize)
 {
     return FreeFileSync::formatFilesizeToShortString(filesize.ToDouble());
-};
+}
 
 
 wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
@@ -85,9 +91,9 @@ wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
 }
 
 
-wxString FreeFileSync::fromatPercentage(const wxLongLong& dividend, const wxLongLong& divisor)
+wxString FreeFileSync::formatPercentage(const wxLongLong& dividend, const wxLongLong& divisor)
 {
-    const double ratio = dividend.ToDouble() * 100 / divisor.ToDouble();
+    const double ratio = divisor != 0 ? dividend.ToDouble() * 100 / divisor.ToDouble() : 0;
     wxString output = _("%x Percent");
     output.Replace(wxT("%x"), wxString::Format(wxT("%3.2f"), ratio), false);
     return output;

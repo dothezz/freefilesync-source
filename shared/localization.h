@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef MISC_H_INCLUDED
 #define MISC_H_INCLUDED
 
@@ -55,8 +61,9 @@ public:
 
 private:
     CustomLocale();
+    ~CustomLocale(); //non-inline destructor for std::auto_ptr to work with forward declaration -> superfluous in this case: singleton pattern!
 
-    std::auto_ptr<Translation> translationDB;
+    std::auto_ptr<Translation> translationDB; //careful with forward-declarations and auto_ptr! save in this case, 'cause full class info available
     int currentLanguage;
 };
 }

@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "customButton.h"
 #include <wx/dcmemory.h>
 #include <wx/image.h>
@@ -149,7 +155,7 @@ wxBitmap wxButtonWithImage::createBitmapFromText(const wxString& text)
     if ((accelPos = text.find(wxT("&"))) != wxString::npos)
     {
         textLabelFormatted.Replace(wxT("&"), wxT(""), false); //remove accelerator
-        indexAccel = accelPos;
+        indexAccel = static_cast<int>(accelPos);
     }
 
     dc.SetTextForeground(textColor);

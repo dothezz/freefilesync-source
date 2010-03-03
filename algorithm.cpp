@@ -1,9 +1,16 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "algorithm.h"
 #include <wx/intl.h>
 #include <stdexcept>
 #include <wx/log.h>
 #include "library/resources.h"
 #include "shared/fileHandling.h"
+#include "shared/recycler.h"
 #include <wx/msgdlg.h>
 #include "library/filter.h"
 #include <boost/bind.hpp>
@@ -152,22 +159,14 @@ public:
         lastWriteTime_(NULL),
         fileSize_(NULL)
     {
-        if (!fileObj.isEmpty<LEFT_SIDE>())
-        {
-            lastWriteTime_ = &fileObj.getLastWriteTime<LEFT_SIDE>();
-            fileSize_      = &fileObj.getFileSize<LEFT_SIDE>();
-        }
+        init<LEFT_SIDE>(fileObj);
     }
 
     DataSetFile(const FileMapping& fileObj, Loki::Int2Type<RIGHT_SIDE>) :
         lastWriteTime_(NULL),
         fileSize_(NULL)
     {
-        if (!fileObj.isEmpty<RIGHT_SIDE>())
-        {
-            lastWriteTime_ = &fileObj.getLastWriteTime<RIGHT_SIDE>();
-            fileSize_      = &fileObj.getFileSize<RIGHT_SIDE>();
-        }
+        init<RIGHT_SIDE>(fileObj);
     }
 
 
@@ -207,6 +206,16 @@ public:
     }
 
 private:
+    template <SelectedSide side>
+    void init(const FileMapping& fileObj)
+    {
+        if (!fileObj.isEmpty<side>())
+        {
+            lastWriteTime_ = &fileObj.getLastWriteTime<side>();
+            fileSize_      = &fileObj.getFileSize<side>();
+        }
+    }
+
     const wxLongLong*  lastWriteTime_; //optional
     const wxULongLong* fileSize_;      //optional
 };
@@ -246,7 +255,7 @@ DataSetFile retrieveDataSetFile(const Zstring& objShortName, const DirContainer*
 {
     if (dbDirectory)
     {
-            const DirContainer::SubFileList& fileList = dbDirectory->getSubFiles();
+        const DirContainer::SubFileList& fileList = dbDirectory->getSubFiles();
         const DirContainer::SubFileList::const_iterator j = fileList.find(objShortName);
         if (j != fileList.end())
             return DataSetFile(&j->second);
@@ -294,6 +303,10 @@ private:
     void operator()(FileMapping& fileObj) const
     {
         const CompareFilesResult cat = fileObj.getCategory();
+
+        if (cat == FILE_EQUAL)
+            return;
+
         if (cat == FILE_LEFT_SIDE_ONLY)
             fileObj.setSyncDir(SYNC_DIR_RIGHT);
         else if (cat == FILE_RIGHT_SIDE_ONLY)
@@ -347,7 +360,7 @@ public:
         {
             //use standard settings:
             SyncConfiguration defaultSync;
-            defaultSync.setVariant(SyncConfiguration::TWOWAY);
+            FreeFileSync::setTwoWay(defaultSync);
             Redetermine(defaultSync).execute(baseDirectory);
             return;
         }
@@ -387,7 +400,7 @@ private:
         catch (FileError& error) //e.g. incompatible database version
         {
             if (handler_) handler_->reportWarning(error.show() + wxT(" \n\n") +
-                                                      _("Setting default synchronization directions. Please check whether they are appropriate for you."));
+                                                      _("Setting default synchronization directions: Old files will be overwritten by newer files."));
         }
         return std::pair<DirInfoPtr, DirInfoPtr>(); //NULL
     }
@@ -514,7 +527,7 @@ private:
                 dirObj.setSyncDir(SYNC_DIR_LEFT);
                 break;
             case DIR_EQUAL:
-                assert(false);
+                ; //assert(false);
             }
 
             SetDirChangedFilter().execute(dirObj); //filter issue for this directory => treat subfiles/-dirs the same
@@ -525,15 +538,15 @@ private:
         const std::pair<DataSetDir, const DirContainer*> dataDbLeftStuff  = retrieveDataSetDir(dirObj.getObjShortName(), dbDirectoryLeft);
         const std::pair<DataSetDir, const DirContainer*> dataDbRightStuff = retrieveDataSetDir(dirObj.getObjShortName(), dbDirectoryRight);
 
-        const DataSetDir dataCurrentLeft( dirObj, Loki::Int2Type<LEFT_SIDE>());
-        const DataSetDir dataCurrentRight(dirObj, Loki::Int2Type<RIGHT_SIDE>());
-
-        //evaluation
-        const bool changeOnLeft  = dataDbLeftStuff.first  != dataCurrentLeft;
-        const bool changeOnRight = dataDbRightStuff.first != dataCurrentRight;
-
         if (cat != DIR_EQUAL)
         {
+            const DataSetDir dataCurrentLeft( dirObj, Loki::Int2Type<LEFT_SIDE>());
+            const DataSetDir dataCurrentRight(dirObj, Loki::Int2Type<RIGHT_SIDE>());
+
+            //evaluation
+            const bool changeOnLeft  = dataDbLeftStuff.first  != dataCurrentLeft;
+            const bool changeOnRight = dataDbRightStuff.first != dataCurrentRight;
+
             if (dataDbLeftStuff.first == dataDbRightStuff.first) //last sync seems to have been successful
             {
                 if (changeOnLeft)
@@ -882,46 +895,40 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDeleteOneS
 {
     for (std::vector<FileSystemObject*>::const_iterator i = rowsToDeleteOneSide.begin(); i != rowsToDeleteOneSide.end(); ++i)
     {
-        if (!(*i)->isEmpty<side>())
+        while (true)
         {
-            while (true)
+            try
             {
-                try
+                FileSystemObject* const fsObj = *i; //all pointers are required(!) to be bound
+                if (!fsObj->isEmpty<side>())
                 {
-                    FileMapping* fileObj = dynamic_cast<FileMapping*>(*i);
-                    if (fileObj != NULL)
-                    {
-                        FreeFileSync::removeFile(fileObj->getFullName<side>(), useRecycleBin);
-                        fileObj->removeObject<side>();
-                        statusHandler->deletionSuccessful(); //notify successful file/folder deletion
-                    }
+                    if (useRecycleBin)
+                        FreeFileSync::moveToRecycleBin(fsObj->getFullName<side>());  //throw (FileError)
                     else
                     {
-                        DirMapping* dirObj = dynamic_cast<DirMapping*>(*i);
-                        if (dirObj != NULL)
-                        {
-                            FreeFileSync::removeDirectory(dirObj->getFullName<side>(), useRecycleBin);
-                            dirObj->removeObject<side>(); //directory: removes recursively!
-                            statusHandler->deletionSuccessful(); //notify successful file/folder deletion
-                        }
+                        if (isDirectoryMapping(*fsObj))
+                            FreeFileSync::removeDirectory(fsObj->getFullName<side>());
                         else
-                            assert(!"It's no file, no dir, what is it then?");
+                            FreeFileSync::removeFile(fsObj->getFullName<side>());
                     }
 
+                    fsObj->removeObject<side>(); //if directory: removes recursively!
+                }
+                statusHandler->deletionSuccessful(); //notify successful file/folder deletion
+
+                break;
+            }
+            catch (const FileError& error)
+            {
+                DeleteFilesHandler::Response rv = statusHandler->reportError(error.show());
+
+                if (rv == DeleteFilesHandler::IGNORE_ERROR)
                     break;
-                }
-                catch (const FileError& error)
-                {
-                    DeleteFilesHandler::Response rv = statusHandler->reportError(error.show());
 
-                    if (rv == DeleteFilesHandler::IGNORE_ERROR)
-                        break;
-
-                    else if (rv == DeleteFilesHandler::RETRY)
-                        ;   //continue in loop
-                    else
-                        assert (false);
-                }
+                else if (rv == DeleteFilesHandler::RETRY)
+                    ;   //continue in loop
+                else
+                    assert (false);
             }
         }
     }
@@ -1145,14 +1152,4 @@ void FreeFileSync::checkForDSTChange(const FileCompareResult& gridData,
 }
 #endif  //FFS_WIN
 */
-
-
-
-
-
-
-
-
-
-
 

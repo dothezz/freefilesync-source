@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #ifndef LONGPATHPREFIX_H_INCLUDED
 #define LONGPATHPREFIX_H_INCLUDED
 
@@ -9,9 +15,6 @@ use in windows build only!
 
 namespace FreeFileSync
 {
-
-Zstring resolveRelativePath(const Zstring& path); //throw()
-
 //handle filenames longer-equal 260 (== MAX_PATH) characters by applying \\?\-prefix (Reference: http://msdn.microsoft.com/en-us/library/aa365247(VS.85).aspx#maxpath)
 /*
 1. path must be absolute

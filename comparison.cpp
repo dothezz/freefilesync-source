@@ -1,14 +1,18 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "comparison.h"
 #include <stdexcept>
 #include "shared/globalFunctions.h"
 #include <wx/intl.h>
 #include <wx/timer.h>
-#include <wx/ffile.h>
 #include <wx/msgdlg.h>
 #include <wx/log.h>
 #include "algorithm.h"
 #include "ui/util.h"
-#include <wx/thread.h>
 #include <memory>
 #include "shared/stringConv.h"
 #include "library/statusHandler.h"
@@ -19,11 +23,7 @@
 #include <map>
 #include "fileHierarchy.h"
 #include <boost/bind.hpp>
-#include <boost/scoped_array.hpp>
-
-#ifdef FFS_WIN
-#include "shared/longPathPrefix.h"
-#endif
+#include "library/binary.h"
 
 using namespace FreeFileSync;
 
@@ -95,11 +95,9 @@ class BaseDirCallback : public DirCallback
 public:
     BaseDirCallback(DirContainer& output,
                     const BaseFilter::FilterRef& filter,
-                    unsigned int detectRenameThreshold,
                     StatusHandler* handler) :
         DirCallback(this, Zstring(), output, handler),
         textScanning(wxToZ(wxString(_("Scanning:")) + wxT(" \n"))),
-        detectRenameThreshold_(detectRenameThreshold),
         filterInstance(filter) {}
 
     virtual TraverseCallback::ReturnValue onFile(const DefaultChar* shortName, const Zstring& fullName, const TraverseCallback::FileInfo& details);
@@ -110,7 +108,6 @@ private:
     const Zstring textScanning;
     std::vector<CallbackPointer> callBackBox;  //collection of callback pointers to handle ownership
 
-    const unsigned int detectRenameThreshold_;
     const BaseFilter::FilterRef filterInstance; //always bound!
 };
 
@@ -188,10 +185,10 @@ TraverseCallback::ReturnValDir DirCallback::onDir(const DefaultChar* shortName, 
             baseCallback_->callBackBox.push_back(BaseDirCallback::CallbackPointer(subDirCallback)); //handle ownership
 
             //attention: ensure directory filtering is applied later to exclude actually filtered directories
-            return ReturnValDir(ReturnValDir::Continue(), subDirCallback);
+            return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), subDirCallback);
         }
         else
-            return ReturnValDir::Ignore(); //do NOT traverse subdirs
+            return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //do NOT traverse subdirs
     }
 
 
@@ -205,7 +202,7 @@ TraverseCallback::ReturnValDir DirCallback::onDir(const DefaultChar* shortName, 
     DirCallback* subDirCallback = new DirCallback(baseCallback_, relName += FILE_NAME_SEPARATOR, subDir, statusHandler);
     baseCallback_->callBackBox.push_back(BaseDirCallback::CallbackPointer(subDirCallback)); //handle ownership
 
-    return ReturnValDir(ReturnValDir::Continue(), subDirCallback);
+    return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), subDirCallback);
 }
 
 
@@ -232,11 +229,7 @@ TraverseCallback::ReturnValue BaseDirCallback::onFile(
     const TraverseCallback::FileInfo& details)
 {
     //do not list the database file sync.ffs_db
-#ifdef FFS_WIN
-    if (getSyncDBFilename().CmpNoCase(shortName) == 0)
-#elif defined FFS_LINUX
-    if (getSyncDBFilename().Cmp(shortName) == 0)
-#endif
+    if (getSyncDBFilename().cmpFileName(shortName) == 0)
         return TraverseCallback::TRAVERSING_CONTINUE;
 
     return DirCallback::onFile(shortName, fullName, details);
@@ -249,20 +242,16 @@ struct DirBufferKey
     DirBufferKey(const Zstring& dirname,
                  const BaseFilter::FilterRef& filterIn) : //filter interface: always bound by design!
         directoryName(dirname),
-        filter(filterIn->isNull() ? //some optimization of "Null" filter
+        filter(filterIn->isNull() ? //some optimization for "Null" filter
                BaseFilter::FilterRef(new NullFilter) :
                filterIn) {}
 
     const Zstring directoryName;
     const BaseFilter::FilterRef filter;  //buffering has to consider filtering!
 
-    bool operator < (const DirBufferKey& b) const
+    bool operator<(const DirBufferKey& b) const
     {
-#ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
-        const int rv = directoryName.CmpNoCase(b.directoryName);
-#elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
-        const int rv = directoryName.Cmp(b.directoryName);
-#endif
+        const int rv = directoryName.cmpFileName(b.directoryName);
         if (rv != 0)
             return rv < 0;
 
@@ -276,10 +265,8 @@ class CompareProcess::DirectoryBuffer  //buffer multiple scans of the same direc
 {
 public:
     DirectoryBuffer(const bool traverseDirectorySymlinks,
-                    const unsigned int detectRenameThreshold,
                     StatusHandler* statusUpdater) :
         m_traverseDirectorySymlinks(traverseDirectorySymlinks),
-        detectRenameThreshold_(detectRenameThreshold),
         m_statusUpdater(statusUpdater) {}
 
     const DirContainer& getDirectoryDescription(const Zstring& directoryPostfixed, const BaseFilter::FilterRef& filter);
@@ -293,7 +280,6 @@ private:
     BufferType buffer;
 
     const bool m_traverseDirectorySymlinks;
-    const unsigned int detectRenameThreshold_;
     StatusHandler* m_statusUpdater;
 };
 //------------------------------------------------------------------------------------------
@@ -307,7 +293,6 @@ DirContainer& CompareProcess::DirectoryBuffer::insertIntoBuffer(const DirBufferK
     {
         std::auto_ptr<TraverseCallback> traverser(new BaseDirCallback(*baseContainer,
                 newKey.filter,
-                detectRenameThreshold_,
                 m_statusUpdater));
 
         //get all files and folders from directoryPostfixed (and subdirectories)
@@ -397,16 +382,8 @@ bool dependencyExists(const std::set<Zstring>& folders, const Zstring& newFolder
 {
     for (std::set<Zstring>::const_iterator i = folders.begin(); i != folders.end(); ++i)
     {
-        Zstring newFolderFmt = newFolder;
-        Zstring refFolderFmt = *i;
-#ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
-        newFolderFmt.MakeUpper();
-        refFolderFmt.MakeUpper();
-#elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
-        //nothing to do here
-#endif
-
-        if (newFolderFmt.StartsWith(refFolderFmt) || refFolderFmt.StartsWith(newFolderFmt))
+        const size_t commonLen = std::min(newFolder.length(), i->length());
+        if (Zstring(newFolder.c_str(), commonLen).cmpFileName(Zstring(i->c_str(), commonLen)) == 0) //test wheter i begins with newFolder or the other way round
         {
             warningMessage = wxString(_("Directories are dependent! Be careful when setting up synchronization rules:")) + wxT("\n") +
                              wxT("\"") + zToWx(*i) + wxT("\"\n") +
@@ -447,7 +424,6 @@ bool foldersHaveDependencies(const std::vector<FolderPairCfg>& folderPairsFrom, 
 CompareProcess::CompareProcess(const bool traverseSymLinks,
                                const unsigned int fileTimeTol,
                                const bool ignoreOneHourDiff,
-                               const unsigned int detectRenameThreshold,
                                xmlAccess::OptionalDialogs& warnings,
                                StatusHandler* handler) :
     fileTimeTolerance(fileTimeTol),
@@ -456,64 +432,7 @@ CompareProcess::CompareProcess(const bool traverseSymLinks,
     statusUpdater(handler),
     txtComparingContentOfFiles(wxToZ(_("Comparing content of files %x")).Replace(DefaultStr("%x"), DefaultStr("\n\"%x\""), false))
 {
-    directoryBuffer.reset(new DirectoryBuffer(traverseSymLinks, detectRenameThreshold, handler));
-}
-
-
-//callback functionality for status updates while comparing
-class CompareCallback
-{
-public:
-    virtual ~CompareCallback() {}
-    virtual void updateCompareStatus(const wxLongLong& totalBytesTransferred) = 0;
-};
-
-
-bool filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback* callback)
-{
-    const unsigned int BUFFER_SIZE = 512 * 1024; //512 kb seems to be the perfect buffer size
-    static boost::scoped_array<unsigned char> memory1(new unsigned char[BUFFER_SIZE]);
-    static boost::scoped_array<unsigned char> memory2(new unsigned char[BUFFER_SIZE]);
-
-#ifdef FFS_WIN
-    wxFFile file1(FreeFileSync::applyLongPathPrefix(filename1).c_str(), DefaultStr("rb"));
-#elif defined FFS_LINUX
-    wxFFile file1(::fopen(filename1.c_str(), DefaultStr("rb"))); //utilize UTF-8 filename
-#endif
-    if (!file1.IsOpened())
-        throw FileError(wxString(_("Error opening file:")) + wxT(" \"") + zToWx(filename1) + wxT("\""));
-
-#ifdef FFS_WIN
-    wxFFile file2(FreeFileSync::applyLongPathPrefix(filename2).c_str(), DefaultStr("rb"));
-#elif defined FFS_LINUX
-    wxFFile file2(::fopen(filename2.c_str(), DefaultStr("rb"))); //utilize UTF-8 filename
-#endif
-    if (!file2.IsOpened()) //NO cleanup necessary for (wxFFile) file1
-        throw FileError(wxString(_("Error opening file:")) + wxT(" \"") + zToWx(filename2) + wxT("\""));
-
-    wxLongLong bytesCompared;
-    do
-    {
-        const size_t length1 = file1.Read(memory1.get(), BUFFER_SIZE);
-        if (file1.Error()) throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + zToWx(filename1) + wxT("\""));
-
-        const size_t length2 = file2.Read(memory2.get(), BUFFER_SIZE);
-        if (file2.Error()) throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + zToWx(filename2) + wxT("\""));
-
-        if (length1 != length2 || ::memcmp(memory1.get(), memory2.get(), length1) != 0)
-            return false;
-
-        bytesCompared += length1 * 2;
-
-        //send progress updates
-        callback->updateCompareStatus(bytesCompared);
-    }
-    while (!file1.Eof());
-
-    if (!file2.Eof())
-        return false;
-
-    return true;
+    directoryBuffer.reset(new DirectoryBuffer(traverseSymLinks, handler));
 }
 
 
@@ -977,99 +896,115 @@ public:
     MergeSides(std::vector<FileMapping*>& appendUndefinedOut) :
         appendUndefined(appendUndefinedOut) {}
 
-    void execute(const DirContainer& leftSide, const DirContainer& rightSide, HierarchyObject& output)
-    {
-        //ATTENTION: HierarchyObject::retrieveById() can only work correctly if the following conditions are fulfilled:
-        //1. on each level, files are added first, then directories (=> file id < dir id)
-        //2. when a directory is added, all subdirectories must be added immediately (recursion) before the next dir on this level is added
-        //3. entries may be deleted but NEVER new ones inserted!!!
-        //=> this allows for a quasi-binary search by id!
-
-        //reserve() fulfills two task here: 1. massive performance improvement! 2. ensure references in appendUndefined remain valid!
-        output.subFiles.reserve(leftSide.getSubFiles().size() + rightSide.getSubFiles().size()); //assume worst case!
-        output.subDirs.reserve( leftSide.getSubDirs().size()  + rightSide.getSubDirs().size());  //
-
-        for (DirContainer::SubFileList::const_iterator i = leftSide.getSubFiles().begin(); i != leftSide.getSubFiles().end(); ++i)
-        {
-            DirContainer::SubFileList::const_iterator j = rightSide.getSubFiles().find(i->first);
-
-            //find files that exist on left but not on right
-            if (j == rightSide.getSubFiles().end())
-                output.addSubFile(i->second.getData(), i->first);
-            //find files that exist on left and right
-            else
-            {
-                appendUndefined.push_back(
-                    &output.addSubFile(i->second.getData(), i->first, FILE_EQUAL, j->second.getData())); //FILE_EQUAL is just a dummy-value here
-            }
-        }
-
-        //find files that exist on right but not on left
-        for (DirContainer::SubFileList::const_iterator j = rightSide.getSubFiles().begin(); j != rightSide.getSubFiles().end(); ++j)
-        {
-            if (leftSide.getSubFiles().find(j->first) == leftSide.getSubFiles().end())
-                output.addSubFile(j->first, j->second.getData());
-        }
-
-
-//-----------------------------------------------------------------------------------------------
-        for (DirContainer::SubDirList::const_iterator i = leftSide.getSubDirs().begin(); i != leftSide.getSubDirs().end(); ++i)
-        {
-            DirContainer::SubDirList::const_iterator j = rightSide.getSubDirs().find(i->first);
-
-            //find directories that exist on left but not on right
-            if (j == rightSide.getSubDirs().end())
-            {
-                DirMapping& newDirMap = output.addSubDir(true, i->first, false);
-                fillOneSide<true>(i->second, newDirMap); //recurse into subdirectories
-            }
-            else //directories that exist on both sides
-            {
-                DirMapping& newDirMap = output.addSubDir(true, i->first, true);
-                execute(i->second, j->second, newDirMap); //recurse into subdirectories
-            }
-        }
-
-        //find directories that exist on right but not on left
-        for (DirContainer::SubDirList::const_iterator j = rightSide.getSubDirs().begin(); j != rightSide.getSubDirs().end(); ++j)
-        {
-            if (leftSide.getSubDirs().find(j->first) == leftSide.getSubDirs().end())
-            {
-                DirMapping& newDirMap = output.addSubDir(false, j->first, true);
-                fillOneSide<false>(j->second, newDirMap); //recurse into subdirectories
-            }
-        }
-    }
+    void execute(const DirContainer& leftSide, const DirContainer& rightSide, HierarchyObject& output);
 
 private:
-    template <bool leftSide>
-    void fillOneSide(const DirContainer& dirCont, HierarchyObject& output)
-    {
-        //reserve() fulfills two task here: 1. massive performance improvement! 2. ensure references in appendUndefined remain valid!
-        output.subFiles.reserve(dirCont.getSubFiles().size());
-        output.subDirs.reserve( dirCont.getSubDirs(). size());
-
-        for (DirContainer::SubFileList::const_iterator i = dirCont.getSubFiles().begin(); i != dirCont.getSubFiles().end(); ++i)
-        {
-            if (leftSide)
-                output.addSubFile(i->second.getData(), i->first);
-            else
-                output.addSubFile(i->first, i->second.getData());
-        }
-
-        for (DirContainer::SubDirList::const_iterator i = dirCont.getSubDirs().begin(); i != dirCont.getSubDirs().end(); ++i)
-        {
-            DirMapping& newDirMap = leftSide ?
-                                    output.addSubDir(true, i->first, false) :
-                                    output.addSubDir(false, i->first, true);
-
-            fillOneSide<leftSide>(i->second, newDirMap); //recurse into subdirectories
-        }
-    }
-
+    template <SelectedSide side>
+    void fillOneSide(const DirContainer& dirCont, HierarchyObject& output);
 
     std::vector<FileMapping*>& appendUndefined;
 };
+
+
+template <>
+void MergeSides::fillOneSide<LEFT_SIDE>(const DirContainer& dirCont, HierarchyObject& output)
+{
+    //reserve() fulfills two task here: 1. massive performance improvement! 2. ensure references in appendUndefined remain valid!
+    output.subFiles.reserve(dirCont.getSubFiles().size());
+    output.subDirs.reserve( dirCont.getSubDirs(). size());
+
+    for (DirContainer::SubFileList::const_iterator i = dirCont.getSubFiles().begin(); i != dirCont.getSubFiles().end(); ++i)
+        output.addSubFile(i->second.getData(), i->first);
+
+    for (DirContainer::SubDirList::const_iterator i = dirCont.getSubDirs().begin(); i != dirCont.getSubDirs().end(); ++i)
+    {
+        DirMapping& newDirMap = output.addSubDir(true, i->first, false);
+        fillOneSide<LEFT_SIDE>(i->second, newDirMap); //recurse into subdirectories
+    }
+}
+
+
+template <>
+void MergeSides::fillOneSide<RIGHT_SIDE>(const DirContainer& dirCont, HierarchyObject& output)
+{
+    //reserve() fulfills two task here: 1. massive performance improvement! 2. ensure references in appendUndefined remain valid!
+    output.subFiles.reserve(dirCont.getSubFiles().size());
+    output.subDirs.reserve( dirCont.getSubDirs(). size());
+
+    for (DirContainer::SubFileList::const_iterator i = dirCont.getSubFiles().begin(); i != dirCont.getSubFiles().end(); ++i)
+        output.addSubFile(i->first, i->second.getData());
+
+    for (DirContainer::SubDirList::const_iterator i = dirCont.getSubDirs().begin(); i != dirCont.getSubDirs().end(); ++i)
+    {
+        DirMapping& newDirMap = output.addSubDir(false, i->first, true);
+        fillOneSide<RIGHT_SIDE>(i->second, newDirMap); //recurse into subdirectories
+    }
+}
+
+
+void MergeSides::execute(const DirContainer& leftSide, const DirContainer& rightSide, HierarchyObject& output)
+{
+    //ATTENTION: HierarchyObject::retrieveById() can only work correctly if the following conditions are fulfilled:
+    //1. on each level, files are added first, then directories (=> file id < dir id)
+    //2. when a directory is added, all subdirectories must be added immediately (recursion) before the next dir on this level is added
+    //3. entries may be deleted but NEVER new ones inserted!!!
+    //=> this allows for a quasi-binary search by id!
+
+    //reserve() fulfills two task here: 1. massive performance improvement! 2. ensure references in appendUndefined remain valid!
+    output.subFiles.reserve(leftSide.getSubFiles().size() + rightSide.getSubFiles().size()); //assume worst case!
+    output.subDirs.reserve( leftSide.getSubDirs().size()  + rightSide.getSubDirs().size());  //
+
+    for (DirContainer::SubFileList::const_iterator i = leftSide.getSubFiles().begin(); i != leftSide.getSubFiles().end(); ++i)
+    {
+        DirContainer::SubFileList::const_iterator j = rightSide.getSubFiles().find(i->first);
+
+        //find files that exist on left but not on right
+        if (j == rightSide.getSubFiles().end())
+            output.addSubFile(i->second.getData(), i->first);
+        //find files that exist on left and right
+        else
+        {
+            appendUndefined.push_back(
+                &output.addSubFile(i->second.getData(), i->first, FILE_EQUAL, j->second.getData())); //FILE_EQUAL is just a dummy-value here
+        }
+    }
+
+    //find files that exist on right but not on left
+    for (DirContainer::SubFileList::const_iterator j = rightSide.getSubFiles().begin(); j != rightSide.getSubFiles().end(); ++j)
+    {
+        if (leftSide.getSubFiles().find(j->first) == leftSide.getSubFiles().end())
+            output.addSubFile(j->first, j->second.getData());
+    }
+
+
+//-----------------------------------------------------------------------------------------------
+    for (DirContainer::SubDirList::const_iterator i = leftSide.getSubDirs().begin(); i != leftSide.getSubDirs().end(); ++i)
+    {
+        DirContainer::SubDirList::const_iterator j = rightSide.getSubDirs().find(i->first);
+
+        //find directories that exist on left but not on right
+        if (j == rightSide.getSubDirs().end())
+        {
+            DirMapping& newDirMap = output.addSubDir(true, i->first, false);
+            fillOneSide<LEFT_SIDE>(i->second, newDirMap); //recurse into subdirectories
+        }
+        else //directories that exist on both sides
+        {
+            DirMapping& newDirMap = output.addSubDir(true, i->first, true);
+            execute(i->second, j->second, newDirMap); //recurse into subdirectories
+        }
+    }
+
+    //find directories that exist on right but not on left
+    for (DirContainer::SubDirList::const_iterator j = rightSide.getSubDirs().begin(); j != rightSide.getSubDirs().end(); ++j)
+    {
+        if (leftSide.getSubDirs().find(j->first) == leftSide.getSubDirs().end())
+        {
+            DirMapping& newDirMap = output.addSubDir(false, j->first, true);
+            fillOneSide<RIGHT_SIDE>(j->second, newDirMap); //recurse into subdirectories
+        }
+    }
+}
 
 
 void CompareProcess::performBaseComparison(BaseDirMapping& output, std::vector<FileMapping*>& appendUndefined)

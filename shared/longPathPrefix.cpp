@@ -1,45 +1,11 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "longPathPrefix.h"
-#include <boost/scoped_array.hpp>
 #include <wx/msw/wrapwin.h> //includes "windows.h"
-#include "fileError.h"
-#include "systemFunctions.h"
-#include "stringConv.h"
-#include <wx/intl.h>
-
-namespace
-{
-Zstring getFullPathName(const Zstring& relativeName, size_t proposedBufferSize = 1000)
-{
-    using namespace FreeFileSync;
-
-    boost::scoped_array<DefaultChar> fullPath(new DefaultChar[proposedBufferSize]);
-    const DWORD rv = ::GetFullPathName(
-                         relativeName.c_str(), //__in   LPCTSTR lpFileName,
-                         proposedBufferSize,   //__in   DWORD nBufferLength,
-                         fullPath.get(),       //__out  LPTSTR lpBuffer,
-                         NULL);                //__out  LPTSTR *lpFilePart
-    if (rv == 0 || rv == proposedBufferSize)
-        throw FileError(wxString(_("Error resolving full path name:")) + wxT("\n\"") + zToWx(relativeName) + wxT("\"") +
-                        wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
-    if (rv > proposedBufferSize)
-        return getFullPathName(relativeName, rv);
-
-    return fullPath.get();
-}
-}
-
-
-Zstring FreeFileSync::resolveRelativePath(const Zstring& path) //throw()
-{
-    try
-    {
-        return getFullPathName(path);
-    }
-    catch (...)
-    {
-        return path;
-    }
-}
 
 
 //there are two flavors of long path prefix: one for UNC paths, one for regular paths

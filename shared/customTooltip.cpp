@@ -1,3 +1,9 @@
+// **************************************************************************
+// * This file is part of the FreeFileSync project. It is distributed under *
+// * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
+// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// **************************************************************************
+//
 #include "customTooltip.h"
 #include <wx/stattext.h>
 #include <wx/sizer.h>
@@ -78,7 +84,7 @@ void CustomTooltip::show(const wxString& text, wxPoint pos, const wxBitmap* bmp)
     if (pos != tipWindow->GetScreenPosition())
         tipWindow->SetSize(pos.x + 30, pos.y, wxDefaultCoord, wxDefaultCoord);
     //attention!!! possible endless loop: mouse pointer must NOT be within tipWindow!
-    //Else it will trigger a wxEVT_LEAVE_WINDOW which will hide the window, causing the window to be shown again in via this method, etc.
+    //Else it will trigger a wxEVT_LEAVE_WINDOW which will hide the window, causing the window to be shown again via this method, etc.
 
     if (!tipWindow->IsShown())
         tipWindow->Show();
