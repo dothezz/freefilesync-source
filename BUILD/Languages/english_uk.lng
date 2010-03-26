@@ -1,0 +1,888 @@
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+ Byte
+ Byte
+ GB
+ GB
+ MB
+ MB
+ PB
+ PB
+ TB
+ TB
+ day(s)
+ day(s)
+ hour(s)
+ hour(s)
+ kB
+ kB
+ min
+ min
+ sec
+ sec
+%x / %y objects deleted successfully
+%x / %y objects deleted successfully
+%x Percent
+%x Percent
+%x directories
+%x directories
+%x files,
+%x files,
+%x is not a valid FreeFileSync batch file!
+%x is not a valid FreeFileSync batch file!
+%x of %y rows in view
+%x of %y rows in view
+%x of 1 row in view
+%x of 1 row in view
+&Abort
+&Abort
+&About...
+&About...
+&Advanced
+&Advanced
+&Cancel
+&Cancel
+&Check for new version
+&Check for new version
+&Content
+&Content
+&Create batch job...
+&Create batch job...
+&Default
+&Default
+&Exit
+&Exit
+&Export file list...
+&Export file list...
+&File
+&File
+&Find next
+&Find next
+&Global settings...
+&Global settings...
+&Help
+&Help
+&Ignore
+&Ignore
+&Language
+&Language
+&Load
+&Load
+&Load configuration...
+&Load configuration...
+&New
+&New
+&No
+&No
+&OK
+&OK
+&Pause
+&Pause
+&Quit
+&Quit
+&Restore
+&Restore
+&Retry
+&Retry
+&Save
+&Save
+&Yes
+&Yes
+(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
+(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
+(Requires an Internet connection!)
+(Requires an Internet connection!)
+,
+,
+- Other side's counterpart to %dir
+- Other side's counterpart to %dir
+- Other side's counterpart to %name
+- Other side's counterpart to %name
+- conflict
+- conflict
+- conflict (same date, different size)
+- conflict (same date, different size)
+- different
+- different
+- directory part only
+- directory part only
+- equal
+- equal
+- exists left only
+- exists left only
+- exists right only
+- exists right only
+- full file or directory name
+- full file or directory name
+- left
+- left
+- left newer
+- left newer
+- right
+- right
+- right newer
+- right newer
+-Open-Source file synchronization-
+-Open-Source file synchronisation-
+.
+.
+/sec
+/sec
+1 directory
+1 directory
+1 file,
+1 file,
+1. &Compare
+1. &Compare
+1. Enter relative file or directory names separated by ';' or a new line.
+1. Enter relative file or directory names separated by ';' or a new line.
+1. Select directories to monitor.
+1. Select directories to monitor.
+2. &Synchronize...
+2. &Synchronise...
+2. Enter a command line.
+2. Enter a command line.
+2. Use wildcard characters '*' and '?'.
+2. Use wildcard characters '*' and '?'.
+3. Exclude files directly on main grid via context menu.
+3. Exclude files directly on main grid via context menu.
+3. Press 'Start'.
+3. Press 'Start'.
+<Automatic>
+<Automatic>
+<Directory>
+<Directory>
+<Last session>
+<Last session>
+<multiple selection>
+<multiple selection>
+A newer version of FreeFileSync is available:
+A newer version of FreeFileSync is available:
+Abort requested: Waiting for current operation to finish...
+Abort requested: Waiting for current operation to finish...
+Abort synchronization immediately
+Abort synchronisation immediately
+Aborted
+Aborted
+About
+About
+Action
+Action
+Activate filter
+Activate filter
+Add folder
+Add folder
+Add folder pair
+Add folder pair
+All directories in sync!
+All directories in sync!
+An exception occured!
+An exception occured!
+As a result the files are separated into the following categories:
+As a result the files are separated into the following categories:
+As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
+As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
+Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
+Assemble a batch file for automated synchronisation. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
+At least one directory input field is empty.
+At least one directory input field is empty.
+Auto-adjust columns
+Auto-adjust columns
+Automatic mode
+Automatic mode
+Batch execution
+Batch execution
+Batch file created successfully!
+Batch file created successfully!
+Batch job
+Batch job
+Big thanks for localizing FreeFileSync goes out to:
+Big thanks for localising FreeFileSync goes out to:
+Both sides have changed since last synchronization!
+Both sides have changed since last synchronisation!
+Browse
+Browse
+Build:
+Build:
+Cannot determine sync-direction:
+Cannot determine sync-direction:
+Cannot find %x
+Cannot find %x
+Category
+Category
+Comma separated list
+Comma separated list
+Command line
+Command line
+Command line is empty!
+Command line is empty!
+Compare
+Compare
+Compare both sides
+Compare both sides
+Compare by \"File content\"
+Compare by \"File content\"
+Compare by \"File size and date\"
+Compare by \"File size and date\"
+Compare by...
+Compare by...
+Comparing content
+Comparing content
+Comparing content of files %x
+Comparing content of files %x
+Comparing content...
+Comparing content...
+Comparing files by content failed.
+Comparing files by content failed.
+Comparison Result
+Comparison Result
+Comparison settings
+Comparison settings
+Completed
+Completed
+Configuration
+Configuration
+Configuration loaded!
+Configuration loaded!
+Configuration overview:
+Configuration overview:
+Configuration saved!
+Configuration saved!
+Configure filter
+Configure filter
+Configure your own synchronization rules.
+Configure your own synchronisation rules.
+Confirm
+Confirm
+Conflict detected:
+Conflict detected:
+Conflicts/files that cannot be categorized
+Conflicts/files that cannot be categorised
+Continue
+Continue
+Conversion error:
+Conversion error:
+Copy from left to right
+Copy from left to right
+Copy from left to right overwriting
+Copy from left to right overwriting
+Copy from right to left
+Copy from right to left
+Copy from right to left overwriting
+Copy from right to left overwriting
+Copy locked files
+Copy locked files
+Copy new or updated files to right folder.
+Copy new or updated files to right folder.
+Copy shared or locked files using Volume Shadow Copy Service
+Copy shared or locked files using Volume Shadow Copy Service
+Copy to clipboard\tCTRL+C
+Copy to clipboard\tCTRL+C
+Copying file %x to %y
+Copying file %x to %y
+Copying file %x to %y overwriting target
+Copying file %x to %y overwriting target
+Could not determine volume name for file:
+Could not determine volume name for file:
+Could not initialize directory monitoring:
+Could not initialise directory monitoring:
+Could not load a required DLL:
+Could not load a required DLL:
+Could not read values for the following XML nodes:
+Could not read values for the following XML nodes:
+Create a batch job
+Create a batch job
+Creating folder %x
+Creating folder %x
+Current operation:
+Current operation:
+Custom
+Custom
+Customize columns
+Customise columns
+Customize...
+Customise...
+D-Click
+D-Click
+DECISION TREE
+DECISION TREE
+Data remaining:
+Data remaining:
+Data transferred:
+Data transferred:
+Data verification error: Source and target file have different content!
+Data verification error: Source and target file have different content!
+Date
+Date
+Delay
+Delay
+Delay between detection of changes and execution of command line in seconds
+Delay between detection of changes and execution of command line in seconds
+Delete files/folders existing on left side only
+Delete files/folders existing on left side only
+Delete files/folders existing on right side only
+Delete files/folders existing on right side only
+Delete files\tDEL
+Delete files\tDEL
+Delete on both sides
+Delete on both sides
+Delete on both sides even if the file is selected on one side only
+Delete on both sides even if the file is selected on one side only
+Delete or overwrite files permanently
+Delete or overwrite files permanently
+Delete permanently
+Delete permanently
+Deleting file %x
+Deleting file %x
+Deleting folder %x
+Deleting folder %x
+Deletion handling
+Deletion handling
+Description
+Description
+Directories are dependent! Be careful when setting up synchronization rules:
+Directories are dependent! Be careful when setting up synchronisation rules:
+Directories to watch
+Directories to watch
+Directory
+Directory
+Directory does not exist:
+Directory does not exist:
+Do not show this dialog again
+Do not show this dialogue again
+Do nothing
+Do nothing
+Do you really want to delete the following objects(s)?
+Do you really want to delete the following objects(s)?
+Do you really want to move the following objects(s) to the Recycle Bin?
+Do you really want to move the following objects(s) to the Recycle Bin?
+Do you want FreeFileSync to automatically check for updates every week?
+Do you want FreeFileSync to automatically check for updates every week?
+Donate with PayPal
+Donate with PayPal
+Download now?
+Download now?
+Drag && drop
+Drag && drop
+Email
+E-mail
+Enable filter to exclude files from synchronization
+Enable filter to exclude files from synchronisation
+Endless loop when traversing directory:
+Endless loop when traversing directory:
+Error
+Error
+Error changing modification time:
+Error changing modification time:
+Error copying file:
+Error copying file:
+Error copying locked file %x!
+Error copying locked file %x!
+Error copying symbolic link:
+Error copying symbolic link:
+Error creating directory:
+Error creating directory:
+Error deleting directory:
+Error deleting directory:
+Error deleting file:
+Error deleting file:
+Error handling
+Error handling
+Error loading library function:
+Error loading library function:
+Error moving directory:
+Error moving directory:
+Error moving file:
+Error moving file:
+Error moving to Recycle Bin:
+Error moving to Recycle Bin:
+Error opening file:
+Error opening file:
+Error parsing configuration file:
+Error parsing configuration file:
+Error reading file attributes:
+Error reading file attributes:
+Error reading file:
+Error reading file:
+Error reading from synchronization database:
+Error reading from synchronisation database:
+Error resolving symbolic link:
+Error resolving symbolic link:
+Error starting Volume Shadow Copy Service!
+Error starting Volume Shadow Copy Service!
+Error traversing directory:
+Error traversing directory:
+Error when monitoring directories.
+Error when monitoring directories.
+Error writing file attributes:
+Error writing file attributes:
+Error writing file:
+Error writing file:
+Error writing to synchronization database:
+Error writing to synchronisation database:
+Example
+Example
+Exclude
+Exclude
+Exclude all rows
+Exclude all rows
+Exclude temporarily
+Exclude temporarily
+Exclude via filter:
+Exclude via filter:
+Exit instantly
+Exit instantly
+Extension
+Extension
+External applications
+External applications
+Fatal Error
+Fatal Error
+Feedback and suggestions are welcome at:
+Feedback and suggestions are welcome at:
+File %x has an invalid date!
+File %x has an invalid date!
+File already exists. Overwrite?
+File already exists. Overwrite?
+File content
+File content
+File does not exist:
+File does not exist:
+File list exported!
+File list exported!
+File size and date
+File size and date
+Filename
+Filename
+Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
+Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
+Files %x have the same date but a different size!
+Files %x have the same date but a different size!
+Files are found equal if\n     - file content\nis the same
+Files are found equal if\n     - file content\nis the same
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same
+Files remaining:
+Files remaining:
+Files that are equal on both sides
+Files that are equal on both sides
+Files that exist on both sides and have different content
+Files that exist on both sides and have different content
+Files that exist on both sides, left one is newer
+Files that exist on both sides, left one is newer
+Files that exist on both sides, right one is newer
+Files that exist on both sides, right one is newer
+Files/folders found:
+Files/folders found:
+Files/folders processed:
+Files/folders processed:
+Files/folders remaining:
+Files/folders remaining:
+Files/folders that exist on left side only
+Files/folders that exist on left side only
+Files/folders that exist on right side only
+Files/folders that exist on right side only
+Filter
+Filter
+Filter files
+Filter files
+Filter has been selected
+Filter has been selected
+Filter settings have changed!
+Filter settings have changed!
+Filter view
+Filter view
+Filtering is deactivated
+Filtering is deactivated
+Find
+Find
+Find what:
+Find what:
+Folder Comparison and Synchronization
+Folder Comparison and Synchronisation
+Free disk space available:
+Free disk space available:
+FreeFileSync - Folder Comparison and Synchronization
+FreeFileSync - Folder Comparison and Synchronisation
+FreeFileSync Batch Job
+FreeFileSync Batch Job
+FreeFileSync at Sourceforge
+FreeFileSync at Sourceforge
+FreeFileSync batch file
+FreeFileSync batch file
+FreeFileSync configuration
+FreeFileSync configuration
+FreeFileSync is up to date!
+FreeFileSync is up to date!
+Full path
+Full path
+Generating database...
+Generating database...
+Generating file list...
+Generating file list...
+Global filter
+Global filter
+Global settings
+Global settings
+Help
+Help
+Hidden dialogs:
+Hidden dialogues:
+Hide all error and warning messages
+Hide all error and warning messages
+Hide conflicts
+Hide conflicts
+Hide excluded items
+Hide excluded items
+Hide files that are different
+Hide files that are different
+Hide files that are equal
+Hide files that are equal
+Hide files that are newer on left
+Hide files that are newer on left
+Hide files that are newer on right
+Hide files that are newer on right
+Hide files that exist on left side only
+Hide files that exist on left side only
+Hide files that exist on right side only
+Hide files that exist on right side only
+Hide files that will be created on the left side
+Hide files that will be created on the left side
+Hide files that will be created on the right side
+Hide files that will be created on the right side
+Hide files that will be deleted on the left side
+Hide files that will be deleted on the left side
+Hide files that will be deleted on the right side
+Hide files that will be deleted on the right side
+Hide files that will be overwritten on left side
+Hide files that will be overwritten on left side
+Hide files that will be overwritten on right side
+Hide files that will be overwritten on right side
+Hide files that won't be copied
+Hide files that won't be copied
+Hide filtered or temporarily excluded files
+Hide filtered or temporarily excluded files
+Hide further error messages during the current process
+Hide further error messages during the current process
+Hints:
+Hints:
+Homepage
+Homepage
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+If you like FFS
+If you like FFS
+Ignore 1-hour file time difference
+Ignore 1-hour file time difference
+Ignore errors
+Ignore errors
+Ignore subsequent errors
+Ignore subsequent errors
+Ignore this error, retry or abort synchronization?
+Ignore this error, retry or abort synchronisation?
+Ignore this error, retry or abort?
+Ignore this error, retry or abort?
+Include
+Include
+Include all rows
+Include all rows
+Include temporarily
+Include temporarily
+Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
+Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
+Incompatible synchronization database format:
+Incompatible synchronisation database format:
+Info
+Info
+Information
+Information
+Initial synchronization:
+Initial synchronisation:
+Integrate external applications into context menu. The following macros are available:
+Integrate external applications into context menu. The following macros are available:
+Last synchronization not completed!
+Last synchronisation not completed!
+Leave as unresolved conflict
+Leave as unresolved conflict
+Left
+Left
+Legend
+Legend
+Load configuration from file
+Load configuration from file
+Load configuration history (press DEL to delete items)
+Load configuration history (press DEL to delete items)
+Local filter
+Local filter
+Log-messages:
+Log-messages:
+Logging
+Logging
+Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
+Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
+Match case
+Match case
+Mirror ->>
+Mirror ->>
+Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
+Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronisation.
+Monitoring active...
+Monitoring active...
+More than 50% of the total number of files will be copied or deleted!
+More than 50% of the total number of files will be copied or deleted!
+Move column down
+Move column down
+Move column up
+Move column up
+Move files into a time-stamped subdirectory
+Move files into a time-stamped subdirectory
+Moving %x to Recycle Bin
+Moving %x to Recycle Bin
+Moving file %x to user-defined directory %y
+Moving file %x to user-defined directory %y
+Moving folder %x to user-defined directory %y
+Moving folder %x to user-defined directory %y
+Multiple...
+Multiple...
+No change since last synchronization!
+No change since last synchronisation!
+No filter selected
+No filter selected
+Not enough free disk space available in:
+Not enough free disk space available in:
+Nothing to synchronize according to configuration!
+Nothing to synchronise according to configuration!
+Number of files and directories that will be created
+Number of files and directories that will be created
+Number of files and directories that will be deleted
+Number of files and directories that will be deleted
+Number of files that will be overwritten
+Number of files that will be overwritten
+One of the FreeFileSync database entries within the following file is not yet existing:
+One of the FreeFileSync database entries within the following file is not yet existing:
+One of the FreeFileSync database files is not yet existing:
+One of the FreeFileSync database files is not yet existing:
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
+Only files/directories that pass filtering will be selected for synchronisation. The filter will be applied to the name relative(!) to the base synchronisation directories.
+Open directly
+Open directly
+Open with Explorer
+Open with Explorer
+Open with Konqueror
+Open with Konqueror
+Operation aborted!
+Operation aborted!
+Operation:
+Operation:
+Overview
+Overview
+Pause
+Pause
+Paused
+Paused
+Please run a Compare first before synchronizing!
+Please run a Compare first before synchronising!
+Processing folder pair:
+Processing folder pair:
+Published under the GNU General Public License:
+Published under the GNU General Public Licence:
+Question
+Question
+Quit
+Quit
+Re-enable all hidden dialogs?
+Re-enable all hidden dialogues?
+RealtimeSync - Automated Synchronization
+RealtimeSync - Automated Synchronisation
+RealtimeSync configuration
+RealtimeSync configuration
+Recycle Bin not yet supported for this system!
+Recycle Bin not yet supported for this system!
+Relative path
+Relative path
+Remove alternate settings
+Remove alternate settings
+Remove folder
+Remove folder
+Remove folder pair
+Remove folder pair
+Remove local filter settings
+Remove local filter settings
+Renaming file %x to %y
+Renaming file %x to %y
+Report translation error
+Report translation error
+Reset
+Reset
+Right
+Right
+Run minimized and write status information to a logfile
+Run minimised and write status information to a logfile
+S&ave configuration...
+S&ave configuration...
+S&witch view
+S&witch view
+Save changes to current configuration?
+Save changes to current configuration?
+Save current configuration to file
+Save current configuration to file
+Scanning...
+Scanning...
+Scanning:
+Scanning:
+Select a folder
+Select a folder
+Select alternate synchronization settings
+Select alternate synchronisation settings
+Select logfile directory:
+Select logfile directory:
+Select variant:
+Select variant:
+Set direction:
+Set direction:
+Setting default synchronization directions: Old files will be overwritten by newer files.
+Setting default synchronisation directions: Old files will be overwritten by newer files.
+Show conflicts
+Show conflicts
+Show files that are different
+Show files that are different
+Show files that are equal
+Show files that are equal
+Show files that are newer on left
+Show files that are newer on left
+Show files that are newer on right
+Show files that are newer on right
+Show files that exist on left side only
+Show files that exist on left side only
+Show files that exist on right side only
+Show files that exist on right side only
+Show files that will be created on the left side
+Show files that will be created on the left side
+Show files that will be created on the right side
+Show files that will be created on the right side
+Show files that will be deleted on the left side
+Show files that will be deleted on the left side
+Show files that will be deleted on the right side
+Show files that will be deleted on the right side
+Show files that will be overwritten on left side
+Show files that will be overwritten on left side
+Show files that will be overwritten on right side
+Show files that will be overwritten on right side
+Show files that won't be copied
+Show files that won't be copied
+Show hidden dialogs
+Show hidden dialogues
+Show popup
+Show popup
+Show popup on errors or warnings
+Show popup on errors or warnings
+Significant difference detected:
+Significant difference detected:
+Silent mode
+Silent mode
+Size
+Size
+Source code written completely in C++ utilizing:
+Source code written completely in C++ utilising:
+Source directory does not exist anymore:
+Source directory does not exist anymore:
+Speed:
+Speed:
+Start
+Start
+Start synchronization
+Start synchronisation
+Statistics
+Statistics
+Stop
+Stop
+Swap sides
+Swap sides
+Synchronization Preview
+Synchronisation Preview
+Synchronization aborted!
+Synchronisation aborted!
+Synchronization completed successfully!
+Synchronisation completed successfully!
+Synchronization completed with errors!
+Synchronisation completed with errors!
+Synchronization settings
+Synchronisation settings
+Synchronization status
+Synchronisation status
+Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
+Synchronise all .doc, .zip and .exe files except everything in subfolder \"temp\".
+Synchronize both sides using a database. Deletions are detected automatically
+Synchronise both sides using a database. Deletions are detected automatically
+Synchronize...
+Synchronise...
+Synchronizing...
+Synchronising...
+System out of memory!
+System out of memory!
+Target directory already existing!
+Target directory already existing!
+Target file already existing!
+Target file already existing!
+The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+The file does not contain a valid configuration:
+The file does not contain a valid configuration:
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
+Time
+Time
+Time elapsed:
+Time elapsed:
+Time remaining:
+Time remaining:
+Total amount of data that will be transferred
+Total amount of data that will be transferred
+Total required free disk space:
+Total required free disk space:
+Total time:
+Total time:
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
+Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
+Unable to connect to sourceforge.net!
+Unable to connect to sourceforge.net!
+Unable to create logfile!
+Unable to create logfile!
+Unresolved conflicts existing!
+Unresolved conflicts existing!
+Update ->
+Update ->
+Usage:
+Usage:
+Use Recycle Bin
+Use Recycle Bin
+Use Recycle Bin when deleting or overwriting files
+Use Recycle Bin when deleting or overwriting files
+User-defined directory
+User-defined directory
+User-defined directory for deletion was not specified!
+User-defined directory for deletion was not specified!
+Variant
+Variant
+Verifying file %x
+Verifying file %x
+Volume name %x not part of filename %y!
+Volume name %x not part of filename %y!
+Warning
+Warning
+Warning: Synchronization failed for %x item(s):
+Warning: Synchronisation failed for %x item(s):
+When the comparison is started with this option set the following decision tree is processed:
+When the comparison is started with this option set the following decision tree is processed:
+You can ignore conflicts and continue synchronization.
+You can ignore conflicts and continue synchronisation.
+You can ignore the error to consider not existing directories as empty.
+You can ignore the error to consider not existing directories as empty.
+You may try to synchronize remaining items again (WITHOUT having to re-compare)!
+You may try to synchronise remaining items again (WITHOUT having to re-compare)!
+different
+different
+file exists on both sides
+file exists on both sides
+on one side only
+on one side only

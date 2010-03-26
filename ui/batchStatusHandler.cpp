@@ -14,6 +14,7 @@
 #include "../shared/stringConv.h"
 #include "../shared/globalFunctions.h"
 #include "../shared/appMain.h"
+#include "../shared/util.h"
 
 using namespace FreeFileSync;
 
@@ -108,10 +109,10 @@ private:
         {
             //if it's not unique, add a postfix number
             int postfix = 1;
-            while (FreeFileSync::fileExists(wxToZ(logfileName + wxT('_') + numberToWxString(postfix) + wxT(".log"))))
+            while (FreeFileSync::fileExists(wxToZ(logfileName + wxT('_') + FreeFileSync::numberToWxString(postfix, false) + wxT(".log"))))
                 ++postfix;
 
-            output = logfileName + wxT('_') + numberToWxString(postfix) + wxT(".log");
+            output = logfileName + wxT('_') + numberToWxString(postfix, false) + wxT(".log");
         }
 
         return output;
@@ -183,7 +184,7 @@ BatchStatusHandler::~BatchStatusHandler()
         if (totalErrors > 0)
         {
             wxString header(_("Warning: Synchronization failed for %x item(s):"));
-            header.Replace(wxT("%x"), globalFunctions::numberToWxString(totalErrors), false);
+            header.Replace(wxT("%x"), FreeFileSync::numberToWxString(totalErrors, true), false);
             finalMessage += header + wxT("\n\n");
         }
 
@@ -227,7 +228,7 @@ void BatchStatusHandler::initNewProcess(int objectsTotal, wxLongLong dataTotal, 
     switch (currentProcess)
     {
     case StatusHandler::PROCESS_SCANNING:
-        syncStatusFrame.resetGauge(0, 0); //dummy call to initialize some gui elements (remaining time, speed)
+        syncStatusFrame.resetGauge(0, 0); //initialize some gui elements (remaining time, speed)
         syncStatusFrame.setCurrentStatus(SyncStatus::SCANNING);
         break;
     case StatusHandler::PROCESS_COMPARING_CONTENT:
@@ -251,6 +252,7 @@ void BatchStatusHandler::updateProcessedData(int objectsProcessed, wxLongLong da
     switch (currentProcess)
     {
     case StatusHandler::PROCESS_SCANNING:
+        syncStatusFrame.incScannedObjects_NoUpdate(objectsProcessed);
         break;
     case StatusHandler::PROCESS_COMPARING_CONTENT:
     case StatusHandler::PROCESS_SYNCHRONIZING:
@@ -282,12 +284,12 @@ void BatchStatusHandler::reportWarning(const wxString& warningMessage, bool& war
     {
         //show popup and ask user how to handle warning
         bool dontWarnAgain = false;
-        WarningDlg* warningDlg = new WarningDlg(NULL,
-                                                WarningDlg::BUTTON_IGNORE | WarningDlg::BUTTON_ABORT,
-                                                warningMessage,
-                                                dontWarnAgain);
-        const WarningDlg::Response rv = static_cast<WarningDlg::Response>(warningDlg->ShowModal());
-        warningDlg->Destroy();
+        WarningDlg warningDlg(NULL,
+                              WarningDlg::BUTTON_IGNORE | WarningDlg::BUTTON_ABORT,
+                              warningMessage,
+                              dontWarnAgain);
+        warningDlg.Raise();
+        const WarningDlg::Response rv = static_cast<WarningDlg::Response>(warningDlg.ShowModal());
         switch (rv)
         {
         case WarningDlg::BUTTON_ABORT:
@@ -318,12 +320,12 @@ ErrorHandler::Response BatchStatusHandler::reportError(const wxString& errorMess
     case xmlAccess::ON_ERROR_POPUP:
     {
         bool ignoreNextErrors = false;
-        ErrorDlg* errorDlg = new ErrorDlg(NULL,
-                                          ErrorDlg::BUTTON_IGNORE |  ErrorDlg::BUTTON_RETRY | ErrorDlg::BUTTON_ABORT,
-                                          errorMessage + wxT("\n\n\n") + _("Ignore this error, retry or abort?"),
-                                          ignoreNextErrors);
-        const ErrorDlg::ReturnCodes rv = static_cast<ErrorDlg::ReturnCodes>(errorDlg->ShowModal());
-        errorDlg->Destroy();
+        ErrorDlg errorDlg(NULL,
+                          ErrorDlg::BUTTON_IGNORE |  ErrorDlg::BUTTON_RETRY | ErrorDlg::BUTTON_ABORT,
+                          errorMessage + wxT("\n\n\n") + _("Ignore this error, retry or abort?"),
+                          ignoreNextErrors);
+        errorDlg.Raise();
+        const ErrorDlg::ReturnCodes rv = static_cast<ErrorDlg::ReturnCodes>(errorDlg.ShowModal());
         switch (rv)
         {
         case ErrorDlg::BUTTON_IGNORE:

@@ -37,7 +37,6 @@ MainDialog::MainDialog(wxDialog *dlg,
     m_bpButtonAddFolder->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("addFolderPair")));
     m_bpButtonRemoveTopFolder->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("removeFolderPair")));
     m_buttonStart->setBitmapFront(GlobalResources::getInstance().getImageByName(wxT("startRed")));
-    m_buttonStart->SetFocus();
 
     //register key event
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), NULL, this);
@@ -81,7 +80,6 @@ MainDialog::MainDialog(wxDialog *dlg,
 
     setConfiguration(newConfig);
 
-    m_buttonStart->SetFocus();
     Fit();
     Center();
 
@@ -90,6 +88,8 @@ MainDialog::MainDialog(wxDialog *dlg,
         wxCommandEvent dummy2(wxEVT_COMMAND_BUTTON_CLICKED);
         this->OnStart(dummy2);
     }
+    else
+        m_buttonStart->SetFocus(); //don't "steal" focus if program is running from sys-tray"
 }
 
 

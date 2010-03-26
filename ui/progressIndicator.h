@@ -8,22 +8,20 @@
 #define PROGRESSINDICATOR_H_INCLUDED
 
 #include "../shared/zstring.h"
-#include <wx/window.h>
-
-class CompareStatusImpl;
-class SyncStatusImpl;
-class StatusHandler;
+#include <wx/toplevel.h>
+#include "../library/statusHandler.h"
 
 
 class CompareStatus
 {
 public:
-    CompareStatus(wxWindow& parentWindow); //CompareStatus will be owned by parentWindow!
+    CompareStatus(wxTopLevelWindow& parentWindow); //CompareStatus will be owned by parentWindow!
     ~CompareStatus();
 
     wxWindow* getAsWindow(); //convenience! don't abuse!
 
-    void init(); //initialize all status values
+    void init();     //make visible, initialize all status values
+    void finalize(); //hide again
 
     void switchToCompareBytewise(int totalObjectsToProcess, wxLongLong totalDataToProcess);
     void incScannedObjects_NoUpdate(int number);
@@ -32,6 +30,7 @@ public:
     void updateStatusPanelNow();
 
 private:
+    class CompareStatusImpl;
     CompareStatusImpl* const pimpl;
 };
 
@@ -40,7 +39,7 @@ class SyncStatus
 {
 public:
     SyncStatus(StatusHandler& updater,
-               wxWindow* parentWindow, //may be NULL
+               wxTopLevelWindow* parentWindow, //may be NULL
                bool startSilent);
     ~SyncStatus();
 
@@ -58,6 +57,7 @@ public:
     };
 
     void resetGauge(int totalObjectsToProcess, wxLongLong totalDataToProcess);
+    void incScannedObjects_NoUpdate(int number);
     void incProgressIndicator_NoUpdate(int objectsProcessed, wxLongLong dataProcessed);
     void setStatusText_NoUpdate(const Zstring& text);
     void updateStatusDialogNow();
@@ -70,6 +70,7 @@ public:
     void closeWindowDirectly(); //don't wait for user
 
 private:
+    class SyncStatusImpl;
     SyncStatusImpl* const pimpl;
 };
 

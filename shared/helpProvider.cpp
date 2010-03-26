@@ -7,7 +7,7 @@
 #include "helpProvider.h"
 #include <wx/help.h>
 #include "standardPaths.h"
-
+#include <wx/image.h>
 
 namespace
 {
@@ -18,9 +18,11 @@ public:
     {
         controller.Initialize(FreeFileSync::getResourceDir() +
 #ifdef FFS_WIN
-                               wxT("FreeFileSync.chm"));
+                              wxT("FreeFileSync.chm"));
 #elif defined FFS_LINUX
-                               wxT("Help/FreeFileSync.hhp"));
+                              wxT("Help/FreeFileSync.hhp"));
+
+        wxImage::AddHandler(new wxJPEGHandler); //ownership passed; display .jpg files correctly in Linux
 #endif
     }
 
@@ -29,7 +31,7 @@ public:
         if (section.empty())
             controller.DisplayContents();
         else
-        controller.DisplaySection(section);
+            controller.DisplaySection(section);
     }
 
 private:

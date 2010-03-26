@@ -1,0 +1,7 @@
+cp /cdrom/Backup/* . -r
+chmod -R 0755 .
+touch *
+touch ui/*
+touch shared/*
+touch library/*
+touch RealtimeSync/*

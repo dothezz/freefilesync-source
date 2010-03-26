@@ -35,6 +35,7 @@ public:
     virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
 
 private:
+void OnKeyPressed(wxKeyEvent& event);
     void OnAbortCompare(wxCommandEvent& event); //handle abort button click
     virtual void abortThisProcess();
 
@@ -47,7 +48,7 @@ private:
 class SyncStatusHandler : public StatusHandler
 {
 public:
-    SyncStatusHandler(wxWindow* dlg, bool ignoreAllErrors);
+    SyncStatusHandler(wxTopLevelWindow* parentDlg, bool ignoreAllErrors);
     ~SyncStatusHandler();
 
     virtual void updateStatusText(const Zstring& text);

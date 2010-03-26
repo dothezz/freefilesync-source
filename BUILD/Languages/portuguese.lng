@@ -22,8 +22,6 @@
  seg
 %x / %y objects deleted successfully
 %x / %y objectos eliminados com sucesso
-%x Percent
-%x Por cento
 %x directories
 %x pastas
 %x files,
@@ -34,6 +32,8 @@
 %x de %y ficheiros
 %x of 1 row in view
 %x de 1 linha
+%x%
+
 &Abort
 &Abortar
 &About...
@@ -45,7 +45,7 @@
 &Check for new version
 &Procurar actualizações
 &Content
-
+&Conteúdo
 &Create batch job...
 &Criar um ficheiro batch...
 &Default
@@ -57,7 +57,7 @@
 &File
 &Ficheiro
 &Find next
-
+&Procurar seguinte
 &Global settings...
 &Opções......
 &Help
@@ -91,9 +91,7 @@
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Apenas as drives FAT/FAT32 são afectadas por este problema! \nPara todas as outras situações pode desactivar a opção \"ignorar diferença de 1 hora\".)
 (Requires an Internet connection!)
-
-,
- 
+(Necessita acesso à Internet!)
 - Other side's counterpart to %dir
 - Contrapartida de %dir
 - Other side's counterpart to %name
@@ -122,10 +120,6 @@
 - direita
 - right newer
 - mais novo à direita
--Open-Source file synchronization-
--Sincronização open-source de ficheiros-
-.
-,
 /sec
 /seg
 1 directory
@@ -137,17 +131,17 @@
 1. Enter relative file or directory names separated by ';' or a new line.
 1. Inserir caminho(s) do(s) ficheiro(s) ou pasta(s) separados por ';' ou numa nova linha.
 1. Select directories to monitor.
-
+1. Seleccionar directórios a monitorizar.
 2. &Synchronize...
 2. &Sincronizar...
 2. Enter a command line.
-
+2. Insira linha de comando.
 2. Use wildcard characters '*' and '?'.
 2. Usar '*' e '?' como caracteres de procura.
 3. Exclude files directly on main grid via context menu.
 3. Excluir ficheiros directamente da grelha através do menu de contexto.
 3. Press 'Start'.
-
+3. Pressione 'Iniciar'.
 <Automatic>
 <Automático>
 <Directory>
@@ -161,7 +155,7 @@ Mais recente versão do FreeFileSync disponível:
 Abort requested: Waiting for current operation to finish...
 Abortar pedido: À espera do fim da operação...
 Abort synchronization immediately
-
+Abortar sincronização imediatamente
 Aborted
 Abortado
 About
@@ -169,13 +163,13 @@ Sobre
 Action
 Acção
 Activate filter
-
+Activar filtro
 Add folder
 Adicionar pasta
 Add folder pair
 Adicionar um par de pastas
 All directories in sync!
-
+Todas as pastas sincronizadas!
 An exception occured!
 Ocorreu uma excepção!
 As a result the files are separated into the following categories:
@@ -185,7 +179,7 @@ Como o nome sugere, dois ficheiros com o mesmo nome são assinalados iguais se e
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Criar um batch para sincronização automática. Para iniciar o modo batch, passar o nome do ficheiro para o executável do FreeFileSync: FreeFileSync.exe <ficheiro batch>. Também pode ser calendarizado no programador de tarefas.
 At least one directory input field is empty.
-
+Pelo menos um dos campos está vazio.
 Auto-adjust columns
 Auto ajustar colunas
 Automatic mode
@@ -205,9 +199,9 @@ Procurar
 Build:
 Criado:
 Cannot determine sync-direction:
-
+Não é possível saber a direcção de sincronização:
 Cannot find %x
-
+Não é possível descobrir %x
 Category
 Categoria
 Comma separated list
@@ -215,7 +209,7 @@ Lista de itens separados por virgula
 Command line
 Linha de comandos
 Command line is empty!
-
+Linha de comandos vazia!
 Compare
 Comparar
 Compare both sides
@@ -271,11 +265,11 @@ Copiar da direita para a esquerda
 Copy from right to left overwriting
 Copiar da direita para a esquerda com sobreposição
 Copy locked files
-
+Copiar ficheiros bloqueados
 Copy new or updated files to right folder.
 Copiar ficheiros novos ou actualizados para a direita
 Copy shared or locked files using Volume Shadow Copy Service
-
+Copiar ficheiros partilhados ou bloqueados usando o serviço Volume Shadow Copy
 Copy to clipboard\tCTRL+C
 Copiar para a Área de transferência\tCTRL+C
 Copying file %x to %y
@@ -287,7 +281,7 @@ Não é possível determinar o nome do volume para o ficheiro:
 Could not initialize directory monitoring:
 Não é possível iniciar monitorização do directório:
 Could not load a required DLL:
-
+Não foi possível carregar a DLL:
 Could not read values for the following XML nodes:
 Não foi possível ler os valores dos seguintes nós XML:
 Create a batch job
@@ -309,7 +303,7 @@ DECISION TREE
 Data remaining:
 Dados em falta:
 Data transferred:
-
+Dados transferidos:
 Data verification error: Source and target file have different content!
 Erro na verificação de dados: ficheiro fonte e de destino têm conteúdo diferente!
 Date
@@ -379,7 +373,7 @@ Erro ao copiar ficheiro:
 Error copying locked file %x!
 Erro ao copiar ficheiro bloqueado %x!
 Error copying symbolic link:
-
+Erro ao copiar o link:
 Error creating directory:
 Erro ao criar a pasta:
 Error deleting directory:
@@ -425,19 +419,19 @@ Exemplo
 Exclude
 Excluir
 Exclude all rows
-
+Excluir todas linhas
 Exclude temporarily
 Excluir temporariamente
 Exclude via filter:
 Excluir por filtro:
 Exit instantly
-
+Sair imediatamente
 Extension
-
+Extensão
 External applications
 Aplicações externas
 Fatal Error
-
+Erro fatal
 Feedback and suggestions are welcome at:
 Comentários e sugestões são benvindos em:
 File %x has an invalid date!
@@ -475,7 +469,7 @@ Ficheiros existentes dos dois lados, à direita é mais recente
 Files/folders found:
 Ficheiros/pastas encontrados:
 Files/folders processed:
-
+Ficheiros/pastas processados:
 Files/folders remaining:
 Ficheiros/pastas restantes:
 Files/folders that exist on left side only
@@ -487,17 +481,17 @@ Filtro
 Filter files
 Filtrar ficheiros
 Filter has been selected
-
+Filtro seleccionado
 Filter settings have changed!
-
+Opções de filtro alteradas!
 Filter view
 Filtrar vista
 Filtering is deactivated
-
+Filtragem desactivada
 Find
-
+Procurar
 Find what:
-
+Procurar:
 Folder Comparison and Synchronization
 Comparação e Sincronização de pastas
 Free disk space available:
@@ -521,7 +515,7 @@ A gerar base de dados...
 Generating file list...
 A gerar lista ficheiros...
 Global filter
-
+Filtro global
 Global settings
 Opções
 Help
@@ -533,7 +527,7 @@ Ocultar todas as mensagens de erro ou aviso
 Hide conflicts
 Ocultar conflitos
 Hide excluded items
-
+Ocultar itens excluidos
 Hide files that are different
 Ocultar ficheiros diferentes
 Hide files that are equal
@@ -561,7 +555,7 @@ Ocultar ficheiros a ser substituidos do lado direito
 Hide files that won't be copied
 Ocultar ficheiros que não serão copiados
 Hide filtered or temporarily excluded files
-
+Ocultar ficheiros filtrados ou temporariamente excluidos
 Hide further error messages during the current process
 Ocultar próximas mensagens de erro durante este processo
 Hints:
@@ -569,7 +563,7 @@ Dicas:
 Homepage
 Site
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
-
+Identificar e propagar as mudanças usando base de dados. Eliminações e conflitos serão detectados automaticamente.
 If you like FFS
 Se gosta do FreeFileSync
 Ignore 1-hour file time difference
@@ -585,7 +579,7 @@ Ignorar erro, tentar de novo ou abortar?
 Include
 Incluir
 Include all rows
-
+Incluir todas as linhas
 Include temporarily
 Incluir temporariamente
 Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
@@ -601,7 +595,7 @@ Sincronização inicial:
 Integrate external applications into context menu. The following macros are available:
 Integrar aplicações externas no menu de contexto. As seguintes macros estão disponíveis:
 Last synchronization not completed!
-
+Última sincronização incompleta!
 Leave as unresolved conflict
 Deixar como conflito
 Left
@@ -613,13 +607,13 @@ Carregar configuração do ficheiro
 Load configuration history (press DEL to delete items)
 Carregar histórico de configuração (pressione DEL para apagar itens)
 Local filter
-
+Filtro local
 Log-messages:
 Log de mensagens:
 Logging
 A escrever em log
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
-
+Fazer cópias fantasma em WOW64 não é suportado. Por favor usar a versão 64-bit.
 Match case
 
 Mirror ->>
@@ -627,7 +621,7 @@ Espelhar ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
 Espelhar pasta da esquerda: A pasta da direita vai ser sobreposta e uma cópia exacta da pasta esquerda após sincronização.
 Monitoring active...
-
+Monitorizar activo...
 More than 50% of the total number of files will be copied or deleted!
 Mais de 50% dos ficheiros vai ser copiado ou apagado!
 Move column down
@@ -635,7 +629,7 @@ Mover coluna para baixo
 Move column up
 Mover coluna para cima
 Move files into a time-stamped subdirectory
-
+Mover ficheiros para uma pasta com a data
 Moving %x to Recycle Bin
 A mover %x para a Reciclagem
 Moving file %x to user-defined directory %y
@@ -645,9 +639,9 @@ A mover pasta %x para o directório %y
 Multiple...
 Multiplo...
 No change since last synchronization!
-
+Não há alterações desde a sincronização!
 No filter selected
-
+Nenhum filtro seleccionado
 Not enough free disk space available in:
 Não há espaço livre suficiente em:
 Nothing to synchronize according to configuration!
@@ -659,9 +653,9 @@ Número de itens a ser eliminados
 Number of files that will be overwritten
 Número de ficheiros substituidos
 One of the FreeFileSync database entries within the following file is not yet existing:
-
+Uma das entradas da base de dados dentro do seguinte ficheiro não existe:
 One of the FreeFileSync database files is not yet existing:
-
+Um dos ficheiros da base de dados não existe:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Apenas ficheiros/directórios que passem o filtro serão seleccionados para sincronização. O filtro será aplicado ao nome relativo(!) ao directório base de sincronização.
 Open directly
@@ -681,9 +675,9 @@ Pausa
 Paused
 Em pausa
 Please run a Compare first before synchronizing!
-
+Use Comparar antes da primeira sincronização!
 Processing folder pair:
-
+A processar o par do directorio:
 Published under the GNU General Public License:
 Publicado sobre GNU General Public License:
 Question
@@ -697,7 +691,7 @@ RealtimeSync - Sincronização Automática
 RealtimeSync configuration
 Configuração do RealtimeSync
 Recycle Bin not yet supported for this system!
-
+Reciclagem não é suportada para este sistema!
 Relative path
 Caminho
 Remove alternate settings
@@ -707,9 +701,9 @@ Remover pasta(s)
 Remove folder pair
 Remover o par de pastas
 Remove local filter settings
-
+Remover as opções de filtro local
 Renaming file %x to %y
-
+Mudar o nome de %x para %y
 Report translation error
 Informar um erro de tradução
 Reset
@@ -717,7 +711,7 @@ Reiniciar
 Right
 Direita
 Run minimized and write status information to a logfile
-
+Minimizar o programa e enviar status para um ficheiro log
 S&ave configuration...
 G&uardar a configuração...
 S&witch view
@@ -725,7 +719,7 @@ S&witch view
 Save changes to current configuration?
 Guardar alterações à configuração?
 Save current configuration to file
-Guardar o corrente ficheiro de configuração
+Guardar o actual ficheiro de configuração
 Scanning...
 A pesquisar...
 Scanning:
@@ -739,9 +733,9 @@ Seleccione directório para ficheiro log:
 Select variant:
 Seleccione uma variante:
 Set direction:
-
+Escolher direcção:
 Setting default synchronization directions: Old files will be overwritten by newer files.
-
+Escolher direcção de sincronização por defeito: Os ficheiros antigos serão substituídos pelos novos.
 Show conflicts
 Mostrar conflitos
 Show files that are different
@@ -825,7 +819,7 @@ Directório de destino já existe!
 Target file already existing!
 Ficheiro de destino já existe!
 The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-
+Linha de comnados a executar sempre que: \n- um directorio fica disponível (i.e. pen USB)\n- ficheiros dentro deste directórios ou sub-directórios forem alterados
 The file does not contain a valid configuration:
 O ficheiro não contém uma configuração válida:
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
@@ -849,11 +843,11 @@ Não é possível ligar a sourceforge.net!
 Unable to create logfile!
 Não é possível criar ficheiro log!
 Unresolved conflicts existing!
-
+Existem conflitos por resolver!
 Update ->
 Actualizar ->
 Usage:
-
+Uso:
 Use Recycle Bin
 Utilizar Reciclagem
 Use Recycle Bin when deleting or overwriting files
@@ -875,7 +869,7 @@ Atenção: A sincronização falhou para %x item(s):
 When the comparison is started with this option set the following decision tree is processed:
 Usar a seguinte árvore de decisão quando inicia com estas opções de comparação:
 You can ignore conflicts and continue synchronization.
-
+Pode ignorar os conflitos e continuar a sincronização.
 You can ignore the error to consider not existing directories as empty.
 Pode ignorar o erro para considerar directórios não existentes como vazios.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!

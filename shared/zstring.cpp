@@ -53,6 +53,8 @@ AllocationCount& AllocationCount::getInstance()
 #endif
 
 #ifdef FFS_WIN
+namespace
+{
 bool hasInvariantLocale()
 {
     OSVERSIONINFO osvi;
@@ -73,12 +75,10 @@ bool hasInvariantLocale()
 
 
 //warning: LOCALE_INVARIANT is NOT available with Windows 2000, so we have to make yet another distinction...
-namespace
-{
 const LCID invariantLocale = hasInvariantLocale() ?
                              LOCALE_INVARIANT :
                              MAKELCID(MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), SORT_DEFAULT); //see: http://msdn.microsoft.com/en-us/goglobal/bb688122.aspx
-}
+
 
 inline
 int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size_t sizeB)
@@ -108,7 +108,7 @@ int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size
     }
     else //fallback
     {
-//do NOT use "CompareString"; this function is NOT accurate (even with LOCALE_INVARIANT and SORT_STRINGSORT): for example "wei�" == "weiss"!!!
+//do NOT use "CompareString"; this function is NOT accurate (even with LOCALE_INVARIANT and SORT_STRINGSORT): for example "weiß" == "weiss"!!!
 //the only reliable way to compare filenames (with XP) is to call "CharUpper" or "LCMapString":
 
         const size_t minSize = std::min(sizeA, sizeB);
@@ -169,6 +169,7 @@ int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size
 //        else
 //            return rv - 2; //convert to C-style string compare result
 }
+}
 #endif
 
 
@@ -177,7 +178,7 @@ int Zstring::cmpFileName(const Zstring& other) const
 #ifdef FFS_WIN
     return ::compareFilenamesWin32(c_str(), other.c_str(), length(), other.length()); //way faster than wxString::CmpNoCase()
 #elif defined FFS_LINUX
-    return this->compare(other);
+    return defaultCompare(c_str(), other.c_str());
 #endif
 }
 
@@ -187,7 +188,7 @@ int Zstring::cmpFileName(const DefaultChar* other) const
 #ifdef FFS_WIN
     return ::compareFilenamesWin32(c_str(), other, length(), ::wcslen(other)); //way faster than wxString::CmpNoCase()
 #elif defined FFS_LINUX
-    return this->compare(other);
+    return defaultCompare(c_str(), other);
 #endif
 }
 
@@ -215,7 +216,7 @@ Zstring& Zstring::Replace(const DefaultChar* old, const DefaultChar* replacement
 }
 
 
-bool matchesHelper(const DefaultChar* string, const DefaultChar* mask)
+bool Zstring::matchesHelper(const DefaultChar* string, const DefaultChar* mask)
 {
     for (DefaultChar ch; (ch = *mask) != 0; ++mask, ++string)
     {
@@ -265,6 +266,27 @@ bool Zstring::Matches(const DefaultChar* mask) const
 bool Zstring::Matches(const DefaultChar* name, const DefaultChar* mask)
 {
     return matchesHelper(name, mask);
+}
+
+
+namespace
+{
+#ifdef ZSTRING_CHAR
+inline
+bool defaultIsWhiteSpace(const char ch)
+{
+    // some compilers (e.g. VC++ 6.0) return true for a call to isspace('\xEA') => exclude char(128) to char(255)
+    return (static_cast<unsigned char>(ch) < 128) && isspace(static_cast<unsigned char>(ch)) != 0;
+}
+
+#elif defined ZSTRING_WIDE_CHAR
+inline
+bool defaultIsWhiteSpace(const wchar_t ch)
+{
+    // some compilers (e.g. VC++ 6.0) return true for a call to isspace('\xEA') => exclude char(128) to char(255)
+    return (ch < 128 || ch > 255) && iswspace(ch) != 0;
+}
+#endif
 }
 
 
@@ -386,7 +408,7 @@ Zstring Zstring::substr(size_t pos, size_t len) const
 }
 
 
-size_t Zstring::rfind(const DefaultChar ch, size_t pos) const
+size_t Zstring::rfind(DefaultChar ch, size_t pos) const
 {
     const size_t thisLen = length();
     if (thisLen == 0)
@@ -403,6 +425,7 @@ size_t Zstring::rfind(const DefaultChar ch, size_t pos) const
             return pos;
     }
     while (--pos != static_cast<size_t>(-1));
+
     return npos;
 }
 

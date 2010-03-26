@@ -65,7 +65,7 @@ public:
                       CustomGridRight*  gridRight,
                       const FreeFileSync::GridView* gridDataView);
 
-    std::set<unsigned int> getAllSelectedRows() const;
+    std::set<size_t> getAllSelectedRows() const;
 
     //set sort direction indicator on UI
     typedef int SortColumn;

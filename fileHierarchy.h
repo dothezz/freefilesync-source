@@ -78,8 +78,18 @@ public:
     typedef std::map<Zstring, FileContainer, CmpFilename> SubFileList; //
     //------------------------------------------------------------------
 
-    const SubDirList&  getSubDirs() const;
-    const SubFileList& getSubFiles() const;
+    //iterator access: std::map is implementation detail! don't expose
+    SubDirList::const_iterator dirBegin()   const;
+    SubDirList::const_iterator dirEnd()     const;
+
+    SubFileList::const_iterator fileBegin() const;
+    SubFileList::const_iterator fileEnd()   const;
+
+    size_t dirCount() const;
+    size_t fileCount() const;
+
+    const DirContainer*  findDir (const Zstring& shortName) const; //returns NULL if not found
+    const FileContainer* findFile(const Zstring& shortName) const; //
 
     DirContainer() {} //default constructor use for base directory only!
 
@@ -117,10 +127,6 @@ struct DirInformation
 
 //save/load full directory information
 const Zstring& getSyncDBFilename(); //get short filename of database file
-void saveToDisk(const BaseDirMapping& baseMapping); //throw (FileError)
-
-typedef boost::shared_ptr<const DirInformation> DirInfoPtr;
-std::pair<DirInfoPtr, DirInfoPtr> loadFromDisk(const BaseDirMapping& baseMapping); //throw (FileError) -> return value always bound!
 
 //------------------------------------------------------------------
 /*    class hierarchy:
@@ -136,7 +142,7 @@ FileMapping      DirMapping    BaseDirMapping
 class HierarchyObject
 {
 public:
-    typedef unsigned int ObjectID;
+    typedef size_t ObjectID;
     FileSystemObject* retrieveById(ObjectID id);             //returns NULL if object is not found; logarithmic complexity
     const FileSystemObject* retrieveById(ObjectID id) const; //
 
@@ -162,8 +168,10 @@ public:
     typedef std::vector<FileMapping> SubFileMapping;
     typedef std::vector<DirMapping>  SubDirMapping;
 
-    SubFileMapping subFiles; //contained file maps
-    SubDirMapping  subDirs;  //contained directory maps
+    SubDirMapping&  useSubDirs();
+    SubFileMapping& useSubFiles();
+    const SubDirMapping& useSubDirs() const;
+    const SubFileMapping& useSubFiles() const;
 
 protected:
     //constructor used by DirMapping
@@ -182,6 +190,9 @@ protected:
     virtual void swap();
 
 private:
+    SubDirMapping  subDirs;  //contained directory maps
+    SubFileMapping subFiles; //contained file maps
+
     Zstring relNamePf;
     Zstring baseDirLeft;  //directory name ending with FILE_NAME_SEPARATOR
     Zstring baseDirRight; //directory name ending with FILE_NAME_SEPARATOR
@@ -436,7 +447,7 @@ HierarchyObject::ObjectID FileSystemObject::getId() const
 inline
 HierarchyObject::ObjectID FileSystemObject::getUniqueId()
 {
-    static unsigned int id = 0;
+    static HierarchyObject::ObjectID id = 0;
     return ++id;
 }
 
@@ -453,17 +464,62 @@ bool DirContainer::CmpFilename::operator()(const Zstring& a, const Zstring& b) c
     return a.cmpFileName(b) < 0;
 }
 
+
 inline
-const DirContainer::SubDirList& DirContainer::getSubDirs() const
+DirContainer::SubDirList::const_iterator DirContainer::dirBegin() const
 {
-    return subDirs;
+    return subDirs.begin();
 }
 
 
 inline
-const DirContainer::SubFileList& DirContainer::getSubFiles() const
+DirContainer::SubDirList::const_iterator DirContainer::dirEnd() const
 {
-    return subFiles;
+    return subDirs.end();
+}
+
+
+inline
+DirContainer::SubFileList::const_iterator DirContainer::fileBegin() const
+{
+    return subFiles.begin();
+}
+
+
+inline
+DirContainer::SubFileList::const_iterator DirContainer::fileEnd() const
+{
+    return subFiles.end();
+}
+
+
+inline
+size_t DirContainer::dirCount() const
+{
+    return subDirs.size();
+}
+
+
+inline
+size_t DirContainer::fileCount() const
+{
+    return subFiles.size();
+}
+
+
+inline
+const DirContainer* DirContainer::findDir(const Zstring& shortName) const
+{
+    const SubDirList::const_iterator iter = subDirs.find(shortName);
+    return iter == subDirs.end() ? NULL : &iter->second;
+}
+
+
+inline
+const FileContainer* DirContainer::findFile(const Zstring& shortName) const
+{
+    const SubFileList::const_iterator iter = subFiles.find(shortName);
+    return iter == subFiles.end() ? NULL : &iter->second;
 }
 
 
@@ -768,6 +824,34 @@ void HierarchyObject::addSubFile(const Zstring&          fileNameShort, //file e
 
 
 inline
+const HierarchyObject::SubDirMapping& HierarchyObject::useSubDirs() const
+{
+    return subDirs;
+}
+
+
+inline
+const HierarchyObject::SubFileMapping& HierarchyObject::useSubFiles() const
+{
+    return subFiles;
+}
+
+
+inline
+HierarchyObject::SubDirMapping& HierarchyObject::useSubDirs()
+{
+    return const_cast<SubDirMapping&>(static_cast<const HierarchyObject*>(this)->useSubDirs());
+}
+
+
+inline
+HierarchyObject::SubFileMapping& HierarchyObject::useSubFiles()
+{
+    return const_cast<SubFileMapping&>(static_cast<const HierarchyObject*>(this)->useSubFiles());
+}
+
+
+inline
 void BaseDirMapping::swap()
 {
     //call base class versions
@@ -801,8 +885,8 @@ inline
 void DirMapping::removeObjectL()
 {
     cmpResult = DIR_RIGHT_SIDE_ONLY;
-    std::for_each(subFiles.begin(), subFiles.end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
-    std::for_each(subDirs.begin(),  subDirs.end(),  std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
+    std::for_each(useSubFiles().begin(), useSubFiles().end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
+    std::for_each(useSubDirs().begin(),  useSubDirs().end(),  std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
 }
 
 
@@ -810,8 +894,8 @@ inline
 void DirMapping::removeObjectR()
 {
     cmpResult = DIR_LEFT_SIDE_ONLY;
-    std::for_each(subFiles.begin(), subFiles.end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
-    std::for_each(subDirs.begin(),  subDirs.end(),  std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
+    std::for_each(useSubFiles().begin(), useSubFiles().end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
+    std::for_each(useSubDirs().begin(),  useSubDirs().end(),  std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
 }
 
 

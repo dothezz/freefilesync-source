@@ -22,7 +22,7 @@ public:
     virtual void updateCompareStatus(const wxLongLong& totalBytesTransferred) = 0;
 };
 
-bool filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback* callback); //throw FileError
+bool filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback& callback); //throw FileError
 }
 
 #endif // BINARY_H_INCLUDED

@@ -8,7 +8,7 @@
 #include "../shared/systemConstants.h"
 #include "resources.h"
 #include <wx/dc.h>
-#include "../ui/util.h"
+#include "../shared/util.h"
 #include "../shared/stringConv.h"
 #include "resources.h"
 #include <typeinfo>
@@ -296,7 +296,7 @@ protected:
                         case xmlAccess::DIRECTORY:
                             return zToWx(fileObj->getBaseDirPf<side>());
                         case xmlAccess::SIZE: //file size
-                            return FreeFileSync::includeNumberSeparator(fileObj->getFileSize<side>().ToString());
+                            return FreeFileSync::numberToWxString(fileObj->getFileSize<side>(), true);
                         case xmlAccess::DATE: //date
                             return FreeFileSync::utcTimeToLocalString(fileObj->getLastWriteTime<side>(), fileObj->getFullName<side>());
                         case xmlAccess::EXTENSION: //file extension
@@ -896,14 +896,14 @@ void CustomGrid::DrawColLabel(wxDC& dc, int col)
 }
 
 
-std::set<unsigned int> CustomGrid::getAllSelectedRows() const
+std::set<size_t> CustomGrid::getAllSelectedRows() const
 {
-    std::set<unsigned int> output;
+    std::set<size_t> output;
 
     const wxArrayInt selectedRows = this->GetSelectedRows();
     if (!selectedRows.IsEmpty())
     {
-        for (unsigned int i = 0; i < selectedRows.GetCount(); ++i)
+        for (size_t i = 0; i < selectedRows.GetCount(); ++i)
             output.insert(selectedRows[i]);
     }
 

@@ -2,6 +2,20 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.5
+--------------
+Allow <automatic> mode syncs between 32 bit, 64 bit, Windows and Linux builds
+Show progess indicator in window title
+Support for progess indicator in Windows 7 Superbar
+Reduced progress indicator flicker
+Prevent silent batch mode from taking keyboard focus
+Improved error messages (loading/saving/copying files)
+Improved environment variable tolerance: strip blanks and double-quotes
+RealtimeSync: Fixed crash when double-clicking systray icon
+Allow aborting all operations via Escape key
+Added British English translation
+
+
 Changelog v3.4
 --------------
 Performance: Reduced Recycle Bin access time by 90%
@@ -21,6 +35,7 @@ Fixed GUI right-to-left mirroring for locales Hebrew and Arabic
 Portable version: save configuration in installation folder
 Many small GUI enhancements
 Updated translation files
+New Linux .deb package: ppa:freefilesync/ffs
 
 
 Changelog v3.3

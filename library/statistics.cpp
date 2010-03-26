@@ -10,7 +10,7 @@
 #include "../shared/globalFunctions.h"
 #include "statusHandler.h"
 //#include "../algorithm.h"
-#include "../ui/util.h"
+#include "../shared/util.h"
 #include <wx/intl.h>
 #include <limits>
 #include <wx/stopwatch.h>
@@ -31,11 +31,11 @@ RetrieveStatistics::~RetrieveStatistics()
 
     for (std::vector<statEntry>::const_iterator i = data.begin(); i != data.end(); ++i)
     {
-        outputFile.Write(globalFunctions::numberToWxString(int(i->time)));
+        outputFile.Write(FreeFileSync::numberToWxString(static_cast<int>(i->time), false));
         outputFile.Write(wxT(";"));
-        outputFile.Write(globalFunctions::numberToWxString(i->objects));
+        outputFile.Write(FreeFileSync::numberToWxString(i->objects, false));
         outputFile.Write(wxT(";"));
-        outputFile.Write(globalFunctions::numberToWxString(float(i->value)));
+        outputFile.Write(FreeFileSync::numberToWxString(static_cast<int>(i->value), false));
         outputFile.Write(wxT("\n"));
     }
 }
@@ -104,7 +104,7 @@ wxString Statistics::formatRemainingTime(const double timeInMs) const
     }
     remainingTimeLast = formattedTime;
 
-    return globalFunctions::numberToWxString(formattedTime) + unit;
+    return FreeFileSync::numberToWxString(formattedTime, false) + unit;
     //+ wxT("(") + globalFunctions::numberToWxString(globalFunctions::round(timeInMs / 1000)) + wxT(")");
 }
 

@@ -273,8 +273,8 @@ bool NameFilter::isNull() const
 
 bool NameFilter::cmpLessSameType(const BaseFilter& other) const
 {
-    //typeid(*this) == typeid(other) in this context!
-    assert(typeid(*this) == typeid(other));
+    assert(typeid(*this) == typeid(other)); //always given in this context!
+
     const NameFilter& otherNameFilt = static_cast<const NameFilter&>(other);
 
     if (filterFileIn != otherNameFilt.filterFileIn)

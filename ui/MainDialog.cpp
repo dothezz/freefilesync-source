@@ -18,7 +18,7 @@
 #include "../comparison.h"
 #include "../synchronization.h"
 #include "../algorithm.h"
-#include "util.h"
+#include "../shared/util.h"
 #include "checkVersion.h"
 #include "guiStatusHandler.h"
 #include "settingsDialog.h"
@@ -269,8 +269,8 @@ MainDialog::MainDialog(wxFrame* frame,
     wxWindowUpdateLocker dummy(this); //avoid display distortion
 
 //avoid mirroring this dialog in RTL languages like Hebrew or Arabic
-SetLayoutDirection(wxLayout_LeftToRight);
-m_panelStatusBar->SetLayoutDirection(wxLayout_LeftToRight);
+    SetLayoutDirection(wxLayout_LeftToRight);
+    m_panelStatusBar->SetLayoutDirection(wxLayout_LeftToRight);
 
 
     //init handling of first folder pair
@@ -513,11 +513,11 @@ void MainDialog::writeGlobalSettings()
 }
 
 
-void MainDialog::setSyncDirManually(const std::set<unsigned int>& rowsToSetOnUiTable, const FreeFileSync::SyncDirection dir)
+void MainDialog::setSyncDirManually(const std::set<size_t>& rowsToSetOnUiTable, const FreeFileSync::SyncDirection dir)
 {
     if (rowsToSetOnUiTable.size() > 0)
     {
-        for (std::set<unsigned int>::const_iterator i = rowsToSetOnUiTable.begin(); i != rowsToSetOnUiTable.end(); ++i)
+        for (std::set<size_t>::const_iterator i = rowsToSetOnUiTable.begin(); i != rowsToSetOnUiTable.end(); ++i)
         {
             FileSystemObject* fsObj = gridDataView->getObject(*i);
             if (fsObj)
@@ -532,7 +532,7 @@ void MainDialog::setSyncDirManually(const std::set<unsigned int>& rowsToSetOnUiT
 }
 
 
-void MainDialog::filterRangeManually(const std::set<unsigned int>& rowsToFilterOnUiTable, const int leadingRow)
+void MainDialog::filterRangeManually(const std::set<size_t>& rowsToFilterOnUiTable, int leadingRow)
 {
     if (rowsToFilterOnUiTable.size() > 0)
     {
@@ -584,16 +584,16 @@ void MainDialog::OnIdleEvent(wxEvent& event)
 
 void MainDialog::copySelectionToClipboard(const CustomGrid* selectedGrid)
 {
-    const std::set<unsigned int> selectedRows = getSelectedRows(selectedGrid);
+    const std::set<size_t> selectedRows = getSelectedRows(selectedGrid);
     if (selectedRows.size() > 0)
     {
         wxString clipboardString;
 
-        for (std::set<unsigned int>::const_iterator i = selectedRows.begin(); i != selectedRows.end(); ++i)
+        for (std::set<size_t>::const_iterator i = selectedRows.begin(); i != selectedRows.end(); ++i)
         {
             for (int k = 0; k < const_cast<CustomGrid*>(selectedGrid)->GetNumberCols(); ++k)
             {
-                clipboardString+= const_cast<CustomGrid*>(selectedGrid)->GetCellValue(*i, k);
+                clipboardString+= const_cast<CustomGrid*>(selectedGrid)->GetCellValue(static_cast<int>(*i), k);
                 if (k != const_cast<CustomGrid*>(selectedGrid)->GetNumberCols() - 1)
                     clipboardString+= '\t';
             }
@@ -613,9 +613,9 @@ void MainDialog::copySelectionToClipboard(const CustomGrid* selectedGrid)
 }
 
 
-std::set<unsigned int> MainDialog::getSelectedRows(const CustomGrid* grid) const
+std::set<size_t> MainDialog::getSelectedRows(const CustomGrid* grid) const
 {
-    std::set<unsigned int> output = grid->getAllSelectedRows();
+    std::set<size_t> output = grid->getAllSelectedRows();
 
     //remove invalid rows
     output.erase(output.lower_bound(gridDataView->rowsOnView()), output.end());
@@ -624,11 +624,11 @@ std::set<unsigned int> MainDialog::getSelectedRows(const CustomGrid* grid) const
 }
 
 
-std::set<unsigned int> MainDialog::getSelectedRows() const
+std::set<size_t> MainDialog::getSelectedRows() const
 {
     //merge selections from left and right grid
-    std::set<unsigned int> selection  = getSelectedRows(m_gridLeft);
-    std::set<unsigned int> additional = getSelectedRows(m_gridRight);
+    std::set<size_t> selection  = getSelectedRows(m_gridLeft);
+    std::set<size_t> additional = getSelectedRows(m_gridRight);
     selection.insert(additional.begin(), additional.end());
     return selection;
 }
@@ -637,7 +637,7 @@ std::set<unsigned int> MainDialog::getSelectedRows() const
 class ManualDeletionHandler : private wxEvtHandler, public DeleteFilesHandler
 {
 public:
-    ManualDeletionHandler(MainDialog* main, int totalObjToDel) :
+    ManualDeletionHandler(MainDialog* main, size_t totalObjToDel) :
         mainDlg(main),
         totalObjToDelete(totalObjToDel),
         abortRequested(false),
@@ -695,8 +695,8 @@ public:
         if (updateUiIsAllowed())  //test if specific time span between ui updates is over
         {
             wxString statusMessage = _("%x / %y objects deleted successfully");
-            statusMessage.Replace(wxT("%x"), globalFunctions::numberToWxString(deletionCount), false);
-            statusMessage.Replace(wxT("%y"), globalFunctions::numberToWxString(totalObjToDelete), false);
+            statusMessage.Replace(wxT("%x"), FreeFileSync::numberToWxString(deletionCount, true), false);
+            statusMessage.Replace(wxT("%y"), FreeFileSync::numberToWxString(totalObjToDelete, true), false);
 
             mainDlg->m_staticTextStatusMiddle->SetLabel(statusMessage);
             mainDlg->m_panelStatusBar->Layout();
@@ -715,19 +715,19 @@ private:
     }
 
     MainDialog* const mainDlg;
-    const int totalObjToDelete;
+    const size_t totalObjToDelete;
 
     bool abortRequested;
     bool ignoreErrors;
-    unsigned int deletionCount;
+    size_t deletionCount;
 };
 
 
 void MainDialog::deleteSelectedFiles()
 {
     //get set of selected rows on view
-    const std::set<unsigned int> viewSelectionLeft  = getSelectedRows(m_gridLeft);
-    const std::set<unsigned int> viewSelectionRight = getSelectedRows(m_gridRight);
+    const std::set<size_t> viewSelectionLeft  = getSelectedRows(m_gridLeft);
+    const std::set<size_t> viewSelectionRight = getSelectedRows(m_gridRight);
 
     if (viewSelectionLeft.size() + viewSelectionRight.size())
     {
@@ -806,7 +806,7 @@ void exstractNames(const FileSystemObject& fsObj, wxString& name, wxString& dir)
 }
 
 
-void MainDialog::openExternalApplication(unsigned int rowNumber, bool leftSide, const wxString& commandline)
+void MainDialog::openExternalApplication(size_t rowNumber, bool leftSide, const wxString& commandline)
 {
     if (commandline.empty())
         return;
@@ -1241,10 +1241,10 @@ void MainDialog::OnContextRim(wxGridEvent& event)
     //------------------------------------------------------------------------------
 
 
-    const std::set<unsigned int> selectionLeft  = getSelectedRows(m_gridLeft);
-    const std::set<unsigned int> selectionRight = getSelectedRows(m_gridRight);
+    const std::set<size_t> selectionLeft  = getSelectedRows(m_gridLeft);
+    const std::set<size_t> selectionRight = getSelectedRows(m_gridRight);
 
-    const unsigned int selectionBegin = selectionLeft.size() + selectionRight.size() == 0 ? 0 :
+    const size_t selectionBegin = selectionLeft.size() + selectionRight.size() == 0 ? 0 :
                                         selectionLeft.size()  == 0 ? *selectionRight.begin() :
                                         selectionRight.size() == 0 ? *selectionLeft.begin()  :
                                         std::min(*selectionLeft.begin(), *selectionRight.begin());
@@ -1312,14 +1312,14 @@ void MainDialog::OnContextRim(wxGridEvent& event)
     //###############################################################################################
     //get list of relative file/dir-names for filtering
     FilterObjList exFilterCandidateObj;
-    for (std::set<unsigned int>::const_iterator i = selectionLeft.begin(); i != selectionLeft.end(); ++i)
+    for (std::set<size_t>::const_iterator i = selectionLeft.begin(); i != selectionLeft.end(); ++i)
     {
         const FileSystemObject* currObj = gridDataView->getObject(*i);
         if (currObj && !currObj->isEmpty<LEFT_SIDE>())
             exFilterCandidateObj.push_back(
                 FilterObject(currObj->getRelativeName<LEFT_SIDE>(), isDirectoryMapping(*currObj)));
     }
-    for (std::set<unsigned int>::const_iterator i = selectionRight.begin(); i != selectionRight.end(); ++i)
+    for (std::set<size_t>::const_iterator i = selectionRight.begin(); i != selectionRight.end(); ++i)
     {
         const FileSystemObject* currObj = gridDataView->getObject(*i);
         if (currObj && !currObj->isEmpty<RIGHT_SIDE>())
@@ -1441,9 +1441,9 @@ void MainDialog::OnContextRim(wxGridEvent& event)
 void MainDialog::OnContextFilterTemp(wxCommandEvent& event)
 {
     //merge selections from left and right grid
-    std::set<unsigned int> selection = getSelectedRows();
+    std::set<size_t> selection = getSelectedRows();
     if (!selection.empty())
-        filterRangeManually(selection, *selection.begin());
+        filterRangeManually(selection, static_cast<int>(*selection.begin()));
 }
 
 
@@ -1524,12 +1524,12 @@ void MainDialog::OnContextOpenWith(wxCommandEvent& event)
         const CustomGrid* leadGrid = m_gridLeft->isLeadGrid() ?
                                      static_cast<CustomGrid*>(m_gridLeft) :
                                      static_cast<CustomGrid*>(m_gridRight);
-        std::set<unsigned int> selection = getSelectedRows(leadGrid);
+        std::set<size_t> selection = getSelectedRows(leadGrid);
 
         const int index = event.GetId() - externalAppIDFirst;
 
         if (        selection.size() == 1     &&
-                    0 <= index && static_cast<unsigned>(index) <  globalSettings.gui.externelApplications.size())
+                    0 <= index && static_cast<size_t>(index) <  globalSettings.gui.externelApplications.size())
             openExternalApplication(*selection.begin(), m_gridLeft->isLeadGrid(), globalSettings.gui.externelApplications[index].second);
     }
 }
@@ -1544,7 +1544,7 @@ void MainDialog::OnContextDeleteFiles(wxCommandEvent& event)
 void MainDialog::OnContextSyncDirLeft(wxCommandEvent& event)
 {
     //merge selections from left and right grid
-    const std::set<unsigned int> selection = getSelectedRows();
+    const std::set<size_t> selection = getSelectedRows();
     setSyncDirManually(selection, FreeFileSync::SYNC_DIR_LEFT);
 }
 
@@ -1552,7 +1552,7 @@ void MainDialog::OnContextSyncDirLeft(wxCommandEvent& event)
 void MainDialog::OnContextSyncDirNone(wxCommandEvent& event)
 {
     //merge selections from left and right grid
-    const std::set<unsigned int> selection = getSelectedRows();
+    const std::set<size_t> selection = getSelectedRows();
     setSyncDirManually(selection, FreeFileSync::SYNC_DIR_NONE);
 }
 
@@ -1560,7 +1560,7 @@ void MainDialog::OnContextSyncDirNone(wxCommandEvent& event)
 void MainDialog::OnContextSyncDirRight(wxCommandEvent& event)
 {
     //merge selections from left and right grid
-    const std::set<unsigned int> selection = getSelectedRows();
+    const std::set<size_t> selection = getSelectedRows();
     setSyncDirManually(selection, FreeFileSync::SYNC_DIR_RIGHT);
 }
 
@@ -1963,7 +1963,7 @@ void MainDialog::OnCheckRows(FFSCheckRowsEvent& event)
 
     if (0 <= lowerBound)
     {
-        std::set<unsigned int> selectedRowsOnView;
+        std::set<size_t> selectedRowsOnView;
 
         for (int i = lowerBound; i <= std::min(upperBound, int(gridDataView->rowsOnView()) - 1); ++i)
             selectedRowsOnView.insert(i);
@@ -2010,15 +2010,15 @@ bool MainDialog::readConfigurationFromXml(const wxString& filename, bool program
             ;
         else
         {
+            parsingError = true;
+
             if (error.getSeverity() == xmlAccess::XmlError::WARNING)
-            {
                 wxMessageBox(error.show(), _("Warning"), wxOK | wxICON_WARNING);
-                parsingError = true;
-            }
             else
             {
                 wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
-                return false;
+                if (!programStartup)
+                    return false;
             }
         }
     }
@@ -2027,8 +2027,6 @@ bool MainDialog::readConfigurationFromXml(const wxString& filename, bool program
 
     //###########################################################
     addFileToCfgHistory(filename); //put filename on list of last used config files
-
-    lastConfigurationSaved = parsingError ? xmlAccess::XmlGuiConfig() : currentCfg; //simulate changed config on parsing errors
 
     //set title
     if (filename == lastConfigFileName())
@@ -2040,9 +2038,11 @@ bool MainDialog::readConfigurationFromXml(const wxString& filename, bool program
     {
         SetTitle(wxString(wxT("FreeFileSync - ")) + filename);
         currentConfigFileName = filename;
+
+        lastConfigurationSaved = parsingError ? xmlAccess::XmlGuiConfig() : currentCfg; //simulate changed config on parsing errors
     }
 
-    return true;
+    return !parsingError;
 }
 
 
@@ -2611,9 +2611,9 @@ void MainDialog::calculatePreview()
 {
     //update preview of bytes to be transferred:
     const SyncStatistics st(gridDataView->getDataTentative());
-    const wxString toCreate = FreeFileSync::includeNumberSeparator(globalFunctions::numberToWxString(st.getCreate()));
-    const wxString toUpdate = FreeFileSync::includeNumberSeparator(globalFunctions::numberToWxString(st.getOverwrite()));
-    const wxString toDelete = FreeFileSync::includeNumberSeparator(globalFunctions::numberToWxString(st.getDelete()));
+    const wxString toCreate = FreeFileSync::numberToWxString(st.getCreate(),    true);
+    const wxString toUpdate = FreeFileSync::numberToWxString(st.getOverwrite(), true);
+    const wxString toDelete = FreeFileSync::numberToWxString(st.getDelete(),    true);
     const wxString data     = FreeFileSync::formatFilesizeToShortString(st.getDataToProcess());
 
     m_textCtrlCreate->SetValue(toCreate);
@@ -2948,10 +2948,10 @@ void MainDialog::OnSwapSides(wxCommandEvent& event)
 
 void MainDialog::updateGridViewData()
 {
-    unsigned int filesOnLeftView    = 0;
-    unsigned int foldersOnLeftView  = 0;
-    unsigned int filesOnRightView   = 0;
-    unsigned int foldersOnRightView = 0;
+    size_t filesOnLeftView    = 0;
+    size_t foldersOnLeftView  = 0;
+    size_t filesOnRightView   = 0;
+    size_t foldersOnRightView = 0;
     wxULongLong filesizeLeftView;
     wxULongLong filesizeRightView;
 
@@ -3086,7 +3086,7 @@ void MainDialog::updateGridViewData()
             statusLeftNew += _("1 directory");
         else
         {
-            wxString folderCount = FreeFileSync::includeNumberSeparator(globalFunctions::numberToWxString(foldersOnLeftView));
+            wxString folderCount = FreeFileSync::numberToWxString(foldersOnLeftView, true);
 
             wxString outputString = _("%x directories");
             outputString.Replace(wxT("%x"), folderCount, false);
@@ -3103,7 +3103,7 @@ void MainDialog::updateGridViewData()
             statusLeftNew += _("1 file,");
         else
         {
-            wxString fileCount = FreeFileSync::includeNumberSeparator(globalFunctions::numberToWxString(filesOnLeftView));
+            wxString fileCount = FreeFileSync::numberToWxString(filesOnLeftView, true);
 
             wxString outputString = _("%x files,");
             outputString.Replace(wxT("%x"), fileCount, false);
@@ -3113,8 +3113,7 @@ void MainDialog::updateGridViewData()
         statusLeftNew += FreeFileSync::formatFilesizeToShortString(filesizeLeftView);
     }
 
-    const wxString objectsView = FreeFileSync::includeNumberSeparator(
-                                     globalFunctions::numberToWxString(static_cast<unsigned int>(gridDataView->rowsOnView())));
+    const wxString objectsView = FreeFileSync::numberToWxString(gridDataView->rowsOnView(), true);
     if (gridDataView->rowsTotal() == 1)
     {
         wxString outputString = _("%x of 1 row in view");
@@ -3123,8 +3122,7 @@ void MainDialog::updateGridViewData()
     }
     else
     {
-        const wxString objectsTotal = FreeFileSync::includeNumberSeparator(
-                                          globalFunctions::numberToWxString(static_cast<unsigned int>(gridDataView->rowsTotal())));
+        const wxString objectsTotal = FreeFileSync::numberToWxString(gridDataView->rowsTotal(), true);
 
         wxString outputString = _("%x of %y rows in view");
         outputString.Replace(wxT("%x"), objectsView, false);
@@ -3138,7 +3136,7 @@ void MainDialog::updateGridViewData()
             statusRightNew += _("1 directory");
         else
         {
-            wxString folderCount = FreeFileSync::includeNumberSeparator(globalFunctions::numberToWxString(foldersOnRightView));
+            wxString folderCount = FreeFileSync::numberToWxString(foldersOnRightView, true);
 
             wxString outputString = _("%x directories");
             outputString.Replace(wxT("%x"), folderCount, false);
@@ -3155,7 +3153,7 @@ void MainDialog::updateGridViewData()
             statusRightNew += _("1 file,");
         else
         {
-            wxString fileCount = FreeFileSync::includeNumberSeparator(globalFunctions::numberToWxString(filesOnRightView));
+            wxString fileCount = FreeFileSync::numberToWxString(filesOnRightView, true);
 
             wxString outputString = _("%x files,");
             outputString.Replace(wxT("%x"), fileCount, false);
@@ -3383,8 +3381,8 @@ void MainDialog::addFolderPair(const std::vector<FolderPairEnh>& newPairs, bool 
         }
 
         //set size of scrolled window
-        const int visiblePairs = std::min(additionalFolderPairs.size(), MAX_ADD_FOLDER_PAIRS); //up to MAX_ADD_FOLDER_PAIRS additional pairs shall be shown
-        m_scrolledWindowFolderPairs->SetMinSize(wxSize( -1, pairHeight * visiblePairs));
+        const size_t visiblePairs = std::min(additionalFolderPairs.size(), MAX_ADD_FOLDER_PAIRS); //up to MAX_ADD_FOLDER_PAIRS additional pairs shall be shown
+        m_scrolledWindowFolderPairs->SetMinSize(wxSize( -1, pairHeight * static_cast<int>(visiblePairs)));
 
         //update controls
         m_scrolledWindowFolderPairs->Fit();    //adjust scrolled window size
@@ -3413,7 +3411,7 @@ void MainDialog::removeAddFolderPair(const unsigned int pos)
         //set size of scrolled window
         const size_t additionalRows = additionalFolderPairs.size();
         if (additionalRows <= MAX_ADD_FOLDER_PAIRS) //up to MAX_ADD_FOLDER_PAIRS additional pairs shall be shown
-            m_scrolledWindowFolderPairs->SetMinSize(wxSize(-1, pairHeight * additionalRows));
+            m_scrolledWindowFolderPairs->SetMinSize(wxSize(-1, pairHeight * static_cast<int>(additionalRows)));
 
         //update controls
         m_scrolledWindowFolderPairs->Fit();    //adjust scrolled window size
@@ -3586,7 +3584,7 @@ void MainDialog::OnRegularUpdateCheck(wxIdleEvent& event)
     //execute just once per startup!
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(MainDialog::OnRegularUpdateCheck), NULL, this);
 
-    FreeFileSync::checkForUpdatePeriodically(globalSettings.lastUpdateCheck);
+    FreeFileSync::checkForUpdatePeriodically(globalSettings.gui.lastUpdateCheck);
 }
 
 
@@ -3613,7 +3611,7 @@ void MainDialog::OnMenuAbout(wxCommandEvent& event)
 
 void MainDialog::OnShowHelp(wxCommandEvent& event)
 {
-FreeFileSync::displayHelpEntry();
+    FreeFileSync::displayHelpEntry();
 }
 
 
@@ -3712,10 +3710,3 @@ bool MainDialog::SyncPreview::synchronizationIsEnabled() const
 {
     return synchronizationEnabled;
 }
-
-
-
-
-
-
-

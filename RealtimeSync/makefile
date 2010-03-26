@@ -34,6 +34,7 @@ FILE_LIST+=../shared/fileTraverser.cpp
 FILE_LIST+=../shared/localization.cpp
 FILE_LIST+=../shared/standardPaths.cpp
 FILE_LIST+=../shared/helpProvider.cpp
+FILE_LIST+=../shared/fileIO.cpp
 
 #list of all *.o files
 OBJECT_LIST=$(foreach file, $(FILE_LIST), OBJ/$(subst .cpp,.o,$(notdir $(file))))

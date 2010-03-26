@@ -19,9 +19,24 @@ using FreeFileSync::LocalizationInfo;
 //_("Browse") <- dummy string for wxDirPickerCtrl to be recognized by automatic text extraction!
 
 
-//these two global variables are language-dependent => cannot be set constant! See CustomLocale
-const wxChar* FreeFileSync::THOUSANDS_SEPARATOR = wxEmptyString;
-const wxChar* FreeFileSync::DECIMAL_POINT       = wxEmptyString;
+namespace
+{
+//will receive their proper value in CustomLocale::CustomLocale()
+wxString THOUSANDS_SEPARATOR = wxT(",");
+wxString DECIMAL_POINT       = wxT(".");
+}
+
+
+wxString FreeFileSync::getThousandsSeparator()
+{
+    return THOUSANDS_SEPARATOR;
+}
+
+
+wxString FreeFileSync::getDecimalPoint()
+{
+    return DECIMAL_POINT;
+}
 
 
 const std::vector<FreeFileSync::LocInfoLine>& LocalizationInfo::getMapping()
@@ -49,11 +64,18 @@ LocalizationInfo::LocalizationInfo()
     newEntry.languageFlag   = wxT("germany.png");
     locMapping.push_back(newEntry);
 
+    newEntry.languageID     = wxLANGUAGE_ENGLISH_UK;
+    newEntry.languageName   = wxT("English (UK)");
+    newEntry.languageFile   = wxT("english_uk.lng");
+    newEntry.translatorName = wxT("Robert Readman");
+    newEntry.languageFlag   = wxT("england.png");
+    locMapping.push_back(newEntry);
+
     newEntry.languageID     = wxLANGUAGE_ENGLISH;
-    newEntry.languageName   = wxT("English");
+    newEntry.languageName   = wxT("English (US)");
     newEntry.languageFile   = wxT("");
     newEntry.translatorName = wxT("ZenJu");
-    newEntry.languageFlag   = wxT("england.png");
+    newEntry.languageFlag   = wxT("usa.png");
     locMapping.push_back(newEntry);
 
     newEntry.languageID     = wxLANGUAGE_SPANISH;
@@ -256,7 +278,7 @@ int mapLanguageDialect(const int language)
         //case wxLANGUAGE_PORTUGUESE:
         //case wxLANGUAGE_PORTUGUESE_BRAZILIAN:
 
-//variants of wxLANGUAGE_ARABIC -> needed to detect RTL languages
+        //variants of wxLANGUAGE_ARABIC -> needed to detect RTL languages
     case wxLANGUAGE_ARABIC_ALGERIA:
     case wxLANGUAGE_ARABIC_BAHRAIN:
     case wxLANGUAGE_ARABIC_EGYPT:
@@ -275,6 +297,20 @@ int mapLanguageDialect(const int language)
     case wxLANGUAGE_ARABIC_UAE:
     case wxLANGUAGE_ARABIC_YEMEN:
         return wxLANGUAGE_ARABIC;
+
+        //variants of wxLANGUAGE_ENGLISH_UK
+    case wxLANGUAGE_ENGLISH_AUSTRALIA:
+    case wxLANGUAGE_ENGLISH_NEW_ZEALAND:
+    case wxLANGUAGE_ENGLISH_TRINIDAD:
+    case wxLANGUAGE_ENGLISH_CARIBBEAN:
+    case wxLANGUAGE_ENGLISH_JAMAICA:
+    case wxLANGUAGE_ENGLISH_BELIZE:
+    case wxLANGUAGE_ENGLISH_EIRE:
+    case wxLANGUAGE_ENGLISH_SOUTH_AFRICA:
+    case wxLANGUAGE_ENGLISH_ZIMBABWE:
+    case wxLANGUAGE_ENGLISH_BOTSWANA:
+    case wxLANGUAGE_ENGLISH_DENMARK:
+        return wxLANGUAGE_ENGLISH_UK;
 
     default:
         return language;
@@ -304,6 +340,11 @@ CustomLocale::CustomLocale() :
     const bool isRTLLanguage = mappedSystemLang == wxLANGUAGE_HEBREW ||
                                mappedSystemLang == wxLANGUAGE_ARABIC;
     Init(isRTLLanguage ? wxLANGUAGE_ENGLISH : wxLANGUAGE_DEFAULT); //setting a different language needn't be supported on all systems!
+
+    //actually these two parameters are language dependent, but we take system setting to handle all kinds of language derivations
+    const lconv* localInfo = localeconv();
+    THOUSANDS_SEPARATOR = wxString::FromUTF8(localInfo->thousands_sep);
+    DECIMAL_POINT       = wxString::FromUTF8(localInfo->decimal_point);
 }
 
 
@@ -462,10 +503,6 @@ void CustomLocale::setLanguage(const int language)
     }
     else
         ;   //if languageFile is empty texts will be english per default
-
-    //these global variables (logical const) need to be redetermined on language selection
-    FreeFileSync::THOUSANDS_SEPARATOR = _(",");
-    FreeFileSync::DECIMAL_POINT       = _(".");
 
     //static const wxString dummy1 = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).decimal_point();
     //static const wxString dummy2 = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).thousands_sep();

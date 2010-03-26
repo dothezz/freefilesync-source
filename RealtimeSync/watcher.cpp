@@ -31,6 +31,19 @@
 using namespace FreeFileSync;
 
 
+bool RealtimeSync::updateUiIsAllowed()
+{
+    static wxLongLong lastExec = 0;
+    const wxLongLong  newExec  = wxGetLocalTimeMillis();
+
+    if (newExec - lastExec >= RealtimeSync::UI_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
+    {
+        lastExec = newExec;
+        return true;
+    }
+    return false;
+}
+
 #ifdef FFS_WIN
 /*
 template <class T>    //have a disctinct static variable per class!
@@ -216,6 +229,7 @@ private:
 };
 */
 
+
 //--------------------------------------------------------------------------------------------------------------
 class ChangeNotifications
 {
@@ -232,7 +246,7 @@ public:
         arrayHandle.push_back(hndl);
     }
 
-    size_t getSize()
+    size_t getSize() const
     {
         return arrayHandle.size();
     }
@@ -307,7 +321,7 @@ public:
     }
 
 private:
-    std::map<Zstring, bool> availablility; //save avail. status for each directory
+    std::map<Zstring, bool> availablility; //save avail. status for each directory, avoid double-entries
 };
 
 

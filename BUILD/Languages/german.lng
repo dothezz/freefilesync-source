@@ -22,8 +22,6 @@
  Sek.
 %x / %y objects deleted successfully
 %x von %y Objekten erfolgreich gelöscht
-%x Percent
-%x Prozent
 %x directories
 %x Verzeichnisse
 %x files,
@@ -34,6 +32,8 @@
 %x von %y Zeilen zur Ansicht
 %x of 1 row in view
 %x von 1 Zeile zur Ansicht
+%x%
+
 &Abort
 &Abbrechen
 &About...
@@ -92,8 +92,6 @@ Konfiguration &laden...
 (Achtung: Nur FAT/FAT32 Laufwerke sind von diesem Problem betroffen!\nIn allen anderen Fällen kann die Einstellung \"Zeitunterschied von einer Stunde ignorieren\" deaktiviert werden.)
 (Requires an Internet connection!)
 (Eine Internetverbindung wird benötigt!)
-,
-.
 - Other side's counterpart to %dir
 - Entsprechung der anderen Seite zu %dir
 - Other side's counterpart to %name
@@ -124,8 +122,6 @@ Konfiguration &laden...
 - rechts neuer
 -Open-Source file synchronization-
 -Open-Source Datei-Synchronisation-
-.
-,
 /sec
 /s
 1 directory
@@ -466,12 +462,14 @@ Files remaining:
 Verbleibende Dateien:
 Files that are equal on both sides
 Auf beiden Seiten gleiche Dateien
-Files that exist on both sides and have different content
-Auf beiden Seiten existierende Dateien mit unterschiedlichem Inhalt
 Files that exist on both sides, left one is newer
 Auf beiden Seiten existierende Dateien; linke Datei ist neuer
 Files that exist on both sides, right one is newer
 Auf beiden Seiten existierende Dateien; rechte Datei ist neuer
+Files that exist on both sides and have different content
+Auf beiden Seiten existierende Dateien mit unterschiedlichem Inhalt
+Files that have different content
+
 Files/folders found:
 Gefundene Dateien/Ordner:
 Files/folders processed:

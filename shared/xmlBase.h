@@ -25,11 +25,11 @@ enum XmlType
     XML_OTHER
 };
 
-XmlType getXmlType(const wxString& filename);
+XmlType getXmlType(const wxString& filename); //throw()
 
-bool loadXmlDocument(const wxString& fileName, const XmlType type, TiXmlDocument& document);
+void loadXmlDocument(const wxString& fileName, const XmlType type, TiXmlDocument& document); //throw (XmlError)
 void getDefaultXmlDocument(const XmlType type, TiXmlDocument& document);
-bool saveXmlDocument(const wxString& fileName, const TiXmlDocument& document);
+void saveXmlDocument(const wxString& fileName, const TiXmlDocument& document); //throw (XmlError)
 
 
 //------------------------------------------------------------------------------------------
@@ -90,6 +90,12 @@ protected:
             logError(name);
     }
 
+    const TiXmlElement* const getRoot() const
+    {
+        return root;
+    }
+
+private:
     const TiXmlElement* const root;
     std::vector<wxString> failedNodes;
 };

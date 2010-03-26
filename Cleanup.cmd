@@ -32,6 +32,7 @@ del BUILD\FreeFileSync_x64.exe
 del BUILD\RealtimeSync.exe
 del BUILD\RealtimeSync_Win32.exe
 del BUILD\RealtimeSync_x64.exe
+del BUILD\gmon.out
 
 del library\ShadowCopy\ShadowCopy.ncb
 attrib library\ShadowCopy\ShadowCopy.suo -h
@@ -51,3 +52,7 @@ attrib library\Recycler\Recycler_Vista.suo -h
 del library\Recycler\Recycler_Vista.suo
 del library\Recycler\Recycler_Vista.vcproj.*.user
 del library\Recycler\Test.vcproj.*.user
+
+attrib library\Taskbar_Seven\Taskbar_Seven.suo -h
+del library\Taskbar_Seven\Taskbar_Seven.suo
+del library\Taskbar_Seven\Taskbar_Seven.vcproj.*.user

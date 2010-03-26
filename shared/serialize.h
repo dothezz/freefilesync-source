@@ -42,9 +42,13 @@ protected:
     void check();
 
 protected:
-    wxInputStream& stream_;
+    wxInputStream& getStream()
+    {
+        return stream_;
+    }
 
 private:
+    wxInputStream& stream_;
     void throwReadError();  //throw FileError()
     const wxString& errorObjName_; //used for error text only
 };
@@ -65,9 +69,13 @@ protected:
     void check();
 
 protected:
-    wxOutputStream& stream_;
+    wxOutputStream& getStream()
+    {
+        return stream_;
+    }
 
 private:
+    wxOutputStream& stream_;
     void throwWriteError();  //throw FileError()
     const wxString& errorObjName_; //used for error text only!
 };

@@ -17,29 +17,23 @@
 #include <wx/datetime.h>
 #include "stringConv.h"
 #include <wx/utils.h>
+#include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
 
 #ifdef FFS_WIN
 #include "dllLoader.h"
 #include <wx/msw/wrapwin.h> //includes "windows.h"
-#include "shadow.h"
 #include "longPathPrefix.h"
-#include <boost/scoped_array.hpp>
-#include <boost/shared_ptr.hpp>
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
-#include <stdio.h> //for rename()
+#include "fileIO.h"
 #include <time.h>
 #include <utime.h>
-#include <fstream>
-#include <unistd.h>
-#include <dirent.h>
 #include <errno.h>
-#include <stdlib.h>
 #endif
 
 using FreeFileSync::FileError;
-
 
 
 namespace
@@ -99,6 +93,17 @@ bool replaceMacro(wxString& macro) //macro without %-characters, return true if 
     if (wxGetEnv(macro, &envValue))
     {
         macro = envValue;
+
+        //some postprocessing:
+        macro.Trim(true);  //remove leading, trailing blanks
+        macro.Trim(false); //
+
+        //remove leading, trailing double-quotes
+        if (    macro.StartsWith(wxT("\"")) &&
+                macro.EndsWith(wxT("\"")) &&
+                macro.length() >= 2)
+            macro = wxString(macro.c_str() + 1, macro.length() - 2);
+
         return true;
     }
 
@@ -145,7 +150,7 @@ Zstring FreeFileSync::getFormattedDirectoryName(const Zstring& dirname)
     dirnameTmp.Trim(true);  //remove whitespace characters from right
     dirnameTmp.Trim(false); //remove whitespace characters from left
 
-    if (dirnameTmp.empty()) //an empty string is interpreted as "\"; this is not desired
+    if (dirnameTmp.empty()) //an empty string will later be returned as "\"; this is not desired
         return Zstring();
 
     //replace macros
@@ -157,6 +162,7 @@ Zstring FreeFileSync::getFormattedDirectoryName(const Zstring& dirname)
      - \\?\-prefix which needs absolute names
      - Volume Shadow Copy: volume name needs to be part of each filename
      - file icon buffer (at least for extensions that are actually read from disk, e.g. "exe")
+     - ::SHFileOperation(): Using relative path names is not thread safe
     WINDOWS/LINUX:
      - detection of dependent directories, e.g. "\" and "C:\test"
      */
@@ -707,12 +713,12 @@ void FreeFileSync::copyFileTimes(const Zstring& sourceDir, const Zstring& target
                                    FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                                    NULL,
                                    OPEN_EXISTING,
-                                   FILE_FLAG_BACKUP_SEMANTICS, //needed for directories
+                                   FILE_FLAG_BACKUP_SEMANTICS, //needed to open a directory
                                    NULL);
     if (hDirRead == INVALID_HANDLE_VALUE)
         return;
 
-                 boost::shared_ptr<void> dummy(hDirRead, ::CloseHandle);
+    boost::shared_ptr<void> dummy(hDirRead, ::CloseHandle);
 
     FILETIME creationTime;
     FILETIME accessTime;
@@ -727,12 +733,12 @@ void FreeFileSync::copyFileTimes(const Zstring& sourceDir, const Zstring& target
                                         FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                                         NULL,
                                         OPEN_EXISTING,
-                                        FILE_FLAG_BACKUP_SEMANTICS, //needed for directories
+                                        FILE_FLAG_BACKUP_SEMANTICS, //needed to open a directory
                                         NULL);
         if (hDirWrite == INVALID_HANDLE_VALUE)
             return;
 
-                 boost::shared_ptr<void> dummy2(hDirWrite, ::CloseHandle);
+        boost::shared_ptr<void> dummy2(hDirWrite, ::CloseHandle);
 
         //(try to) set new "last write time"
         ::SetFileTime(hDirWrite,
@@ -767,12 +773,12 @@ Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target pa
                                      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                                      NULL,
                                      OPEN_EXISTING,
-                                     FILE_FLAG_BACKUP_SEMANTICS,
+                                     FILE_FLAG_BACKUP_SEMANTICS,  //needed to open a directory
                                      NULL);
     if (hDir == INVALID_HANDLE_VALUE)
         return Zstring();
 
-                 boost::shared_ptr<void> dummy(hDir, ::CloseHandle);
+    boost::shared_ptr<void> dummy(hDir, ::CloseHandle);
 
     const unsigned int BUFFER_SIZE = 10000;
     TCHAR targetPath[BUFFER_SIZE];
@@ -1190,23 +1196,6 @@ void FreeFileSync::copyFile(const Zstring& sourceFile,
 
 
 #elif defined FFS_LINUX
-struct MemoryAllocator
-{
-    MemoryAllocator()
-    {
-        buffer = new char[bufferSize];
-    }
-
-    ~MemoryAllocator()
-    {
-        delete [] buffer;
-    }
-
-    static const unsigned int bufferSize = 512 * 1024;
-    char* buffer;
-};
-
-
 void FreeFileSync::copyFile(const Zstring& sourceFile,
                             const Zstring& targetFile,
                             const bool copyFileSymLinks,
@@ -1263,41 +1252,27 @@ void FreeFileSync::copyFile(const Zstring& sourceFile,
     }
 
     //open sourceFile for reading
-    std::ifstream fileIn(sourceFile.c_str(), std::ios_base::binary);
-    if (fileIn.fail())
-        throw FileError(wxString(_("Error opening file:")) + wxT("\n\"") + zToWx(sourceFile) +  wxT("\""));
+    FileInput fileIn(sourceFile); //throw FileError()
 
     //create targetFile and open it for writing
     const Zstring temporary = createTempName(targetFile); //use temporary file until a correct date has been set
 
     try
     {
-        std::ofstream fileOut(temporary.c_str(), std::ios_base::binary);
-        if (fileOut.fail())
-            throw FileError(wxString(_("Error opening file:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\""));
+        FileOutput fileOut(temporary); //throw FileError()
+
+        const size_t BUFFER_SIZE = 512 * 1024; //512 kb seems to be the perfect buffer size
+        static boost::scoped_array<unsigned char> memory(new unsigned char[BUFFER_SIZE]);
 
         //copy contents of sourceFile to targetFile
         wxULongLong totalBytesTransferred;
-        static MemoryAllocator memory;
-        while (true)
+        do
         {
-            fileIn.read(memory.buffer, memory.bufferSize);
-            if (fileIn.eof())  //end of file? fail bit is set in this case also!
-            {
-                fileOut.write(memory.buffer, fileIn.gcount());
-                if (fileOut.bad())
-                    throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\""));
-                break;
-            }
-            else if (fileIn.fail())
-                throw FileError(wxString(_("Error reading file:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\""));
+            const size_t bytesRead = fileIn.read(memory.get(), BUFFER_SIZE); //throw FileError()
 
+            fileOut.write(memory.get(), bytesRead); //throw FileError()
 
-            fileOut.write(memory.buffer, memory.bufferSize);
-            if (fileOut.bad())
-                throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\""));
-
-            totalBytesTransferred += memory.bufferSize;
+            totalBytesTransferred += bytesRead;
 
             //invoke callback method to update progress indicators
             if (callback != NULL)
@@ -1313,17 +1288,18 @@ void FreeFileSync::copyFile(const Zstring& sourceFile,
                                     zToWx(targetFile) + wxT("\"\n\n") + _("Operation aborted!"));
                 }
             }
-        }
 
-        //close streams before changing attributes
-        fileIn.close();
+        }
+        while (!fileIn.eof());
+
+        //close output stream before changing attributes
         fileOut.close();
 
         //adapt file modification time:
         struct utimbuf newTimes;
         ::time(&newTimes.actime); //set file access time to current time
         newTimes.modtime = fileInfo.st_mtime;
-        if (utime(temporary.c_str(), &newTimes) != 0)
+        if (::utime(temporary.c_str(), &newTimes) != 0)
         {
             wxString errorMessage = wxString(_("Error changing modification time:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"");
             throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());

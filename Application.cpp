@@ -73,6 +73,7 @@ void Application::OnStartApplication(wxIdleEvent&)
     ::gtk_rc_parse(FreeFileSync::wxToZ(FreeFileSync::getResourceDir()) + "styles.rc"); //remove inner border from bitmap buttons
 #endif
 
+
     //test if FFS is to be started on UI with config file passed as commandline parameter
 
     //try to set config/batch-filename set by %1 parameter

@@ -11,7 +11,7 @@
 #include "../shared/customButton.h"
 #include "../synchronization.h"
 #include "../shared/stringConv.h"
-#include "util.h"
+#include "../shared/util.h"
 #include <wx/dnd.h>
 #include "../shared/dragAndDrop.h"
 #include "../shared/fileHandling.h"
@@ -874,10 +874,9 @@ void BatchDialog::showNotebookpage(wxWindow* page, const wxString& pageName, boo
 {
     int windowPosition = -1;
     for (size_t i = 0; i < m_notebookSettings->GetPageCount(); ++i)
-        if (    static_cast<wxWindow*>(m_notebookSettings->GetPage(i)) ==
-                static_cast<wxWindow*>(page))
+        if (m_notebookSettings->GetPage(i) == page)
         {
-            windowPosition = i;
+            windowPosition = static_cast<int>(i);
             break;
         }
 
@@ -1260,8 +1259,8 @@ void BatchDialog::addFolderPair(const std::vector<FreeFileSync::FolderPairEnh>& 
                                i->localFilter);
         }
         //set size of scrolled window
-        const int visiblePairs = std::min(additionalFolderPairs.size() + 1, MAX_FOLDER_PAIRS); //up to MAX_FOLDER_PAIRS pairs shall be shown
-        m_scrolledWindow6->SetMinSize(wxSize( -1, pairHeight * visiblePairs));
+        const size_t visiblePairs = std::min(additionalFolderPairs.size() + 1, MAX_FOLDER_PAIRS); //up to MAX_FOLDER_PAIRS pairs shall be shown
+        m_scrolledWindow6->SetMinSize(wxSize( -1, pairHeight * static_cast<int>(visiblePairs)));
 
         //update controls
         m_scrolledWindow6->Fit();  //adjust scrolled window size
@@ -1291,8 +1290,8 @@ void BatchDialog::removeAddFolderPair(const int pos)
         additionalFolderPairs.erase(additionalFolderPairs.begin() + pos); //remove last element in vector
 
         //set size of scrolled window
-        const int visiblePairs = std::min(additionalFolderPairs.size() + 1, MAX_FOLDER_PAIRS); //up to MAX_FOLDER_PAIRS pairs shall be shown
-        m_scrolledWindow6->SetMinSize(wxSize(-1, pairHeight * visiblePairs));
+        const size_t visiblePairs = std::min(additionalFolderPairs.size() + 1, MAX_FOLDER_PAIRS); //up to MAX_FOLDER_PAIRS pairs shall be shown
+        m_scrolledWindow6->SetMinSize(wxSize(-1, pairHeight * static_cast<int>(visiblePairs)));
 
         //update controls
         m_scrolledWindow6->Fit();  //adjust scrolled window size

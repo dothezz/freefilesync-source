@@ -227,13 +227,13 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
 }
 
 
-void GridView::getAllFileRef(const std::set<unsigned int>& guiRows, std::vector<FileSystemObject*>& output)
+void GridView::getAllFileRef(const std::set<size_t>& guiRows, std::vector<FileSystemObject*>& output)
 {
-    std::set<unsigned int>::const_iterator upperEnd = guiRows.lower_bound(rowsOnView()); //loop over valid rows only!
+    std::set<size_t>::const_iterator upperEnd = guiRows.lower_bound(rowsOnView()); //loop over valid rows only!
 
     output.clear();
     output.reserve(guiRows.size());
-    for (std::set<unsigned int>::const_iterator i = guiRows.begin(); i != upperEnd; ++i)
+    for (std::set<size_t>::const_iterator i = guiRows.begin(); i != upperEnd; ++i)
     {
         FileSystemObject* fsObj = getReferencedRow(viewRef[*i]);
         if (fsObj)
@@ -277,10 +277,10 @@ public:
     void execute(const HierarchyObject& hierObj)
     {
         //add file references
-        std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this);
+        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this);
 
         //add dir references
-        std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), *this);
+        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), *this);
     }
 
     void operator()(const FileMapping& fileObj)

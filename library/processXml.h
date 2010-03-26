@@ -8,7 +8,6 @@
 #define PROCESSXML_H_INCLUDED
 
 #include "../structures.h"
-#include <wx/intl.h>
 
 namespace xmlAccess
 {
@@ -116,14 +115,12 @@ struct XmlGlobalSettings
     XmlGlobalSettings() :
         programLanguage(retrieveSystemLanguage()),
         ignoreOneHourDiff(false),
-        copyLockedFiles(true),
-        lastUpdateCheck(0)
+        copyLockedFiles(true)
     {}
 
     int programLanguage;
     bool ignoreOneHourDiff;        //ignore +/- 1 hour due to DST change
     bool copyLockedFiles;          //VSS usage
-    long lastUpdateCheck;          //time of last update check
 
     OptionalDialogs optDialogs;
 
@@ -150,7 +147,8 @@ struct XmlGlobalSettings
             textSearchRespectCase(true),
 #endif
             showFileIconsLeft(true),
-            showFileIconsRight(true)
+            showFileIconsRight(true),
+            lastUpdateCheck(0)
         {
             //default external apps will be translated "on the fly"!!!
 #ifdef FFS_WIN
@@ -194,6 +192,8 @@ struct XmlGlobalSettings
         bool textSearchRespectCase;
         bool showFileIconsLeft;
         bool showFileIconsRight;
+
+        long lastUpdateCheck;          //time of last update check
     } gui;
 
 //---------------------------------------------------------------------

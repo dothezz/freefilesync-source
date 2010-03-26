@@ -82,6 +82,33 @@
 					<Add library="libwxzlibd.a" />
 				</Linker>
 			</Target>
+			<Target title="Performance Test">
+				<Option output="BUILD\FreeFileSync" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="BUILD\" />
+				<Option object_output="OBJ\Release_FFS_GCC\" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-O3" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-DNDEBUG" />
+					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib\mswu" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib\mswu" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add library="libwxmsw28u_adv.a" />
+					<Add library="libwxmsw28u_core.a" />
+					<Add library="libwxbase28u.a" />
+					<Add library="libwxpng.a" />
+					<Add library="libwxzlib.a" />
+					<Add library="libwxbase28u_net.a" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wshadow" />
@@ -132,6 +159,7 @@
 		<Unit filename="application.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="application.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -147,18 +175,27 @@
 		<Unit filename="library\customGrid.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="library\customGrid.h">
 			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="library\dbFile.cpp" />
+		<Unit filename="library\dbFile.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="library\detectRenaming.h" />
 		<Unit filename="library\errorLogging.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="library\errorLogging.h">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="library\filter.cpp" />
 		<Unit filename="library\filter.h">
@@ -188,10 +225,12 @@
 		<Unit filename="library\iconBuffer.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="library\iconBuffer.h">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="library\multithreading.cpp">
 			<Option target="Unit Test" />
@@ -210,9 +249,12 @@
 		<Unit filename="library\resources.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="library\softFilter.cpp" />
+		<Unit filename="library\softFilter.h" />
 		<Unit filename="library\statistics.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="library\statistics.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -225,50 +267,61 @@
 			<Option compilerVar="WINDRES" />
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="shared\Recycler.h" />
 		<Unit filename="shared\appMain.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="shared\appMain.h">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="shared\buildInfo.h" />
 		<Unit filename="shared\customButton.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="shared\customButton.h">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="shared\customComboBox.cpp" />
 		<Unit filename="shared\customComboBox.h" />
 		<Unit filename="shared\customTooltip.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="shared\customTooltip.h">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="shared\dllLoader.cpp" />
 		<Unit filename="shared\dllLoader.h" />
 		<Unit filename="shared\dragAndDrop.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="shared\dragAndDrop.h">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="shared\fileError.h" />
 		<Unit filename="shared\fileHandling.cpp" />
 		<Unit filename="shared\fileHandling.h" />
 		<Unit filename="shared\fileID.cpp" />
 		<Unit filename="shared\fileID.h" />
+		<Unit filename="shared\fileIO.cpp" />
+		<Unit filename="shared\fileIO.h" />
 		<Unit filename="shared\fileTraverser.cpp" />
 		<Unit filename="shared\fileTraverser.h" />
 		<Unit filename="shared\globalFunctions.cpp" />
@@ -278,10 +331,12 @@
 		<Unit filename="shared\helpProvider.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="shared\helpProvider.h">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="shared\localization.cpp" />
 		<Unit filename="shared\localization.h" />
@@ -300,6 +355,16 @@
 		<Unit filename="shared\systemConstants.h" />
 		<Unit filename="shared\systemFunctions.cpp" />
 		<Unit filename="shared\systemFunctions.h" />
+		<Unit filename="shared\taskbar.cpp">
+			<Option target="Debug" />
+			<Option target="Release" />
+			<Option target="Performance Test" />
+		</Unit>
+		<Unit filename="shared\taskbar.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+			<Option target="Performance Test" />
+		</Unit>
 		<Unit filename="shared\tinyxml\tinystr.cpp" />
 		<Unit filename="shared\tinyxml\tinyxml.cpp" />
 		<Unit filename="shared\tinyxml\tinyxmlerror.cpp" />
@@ -307,11 +372,15 @@
 		<Unit filename="shared\toggleButton.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="shared\toggleButton.h">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
+		<Unit filename="shared\util.cpp" />
+		<Unit filename="shared\util.h" />
 		<Unit filename="shared\xmlBase.cpp" />
 		<Unit filename="shared\xmlBase.h" />
 		<Unit filename="shared\zstring.cpp" />
@@ -327,11 +396,13 @@
 		<Unit filename="ui\batchStatusHandler.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="ui\batchStatusHandler.h" />
 		<Unit filename="ui\checkVersion.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="ui\checkVersion.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -339,10 +410,12 @@
 		<Unit filename="ui\folderPair.h">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="ui\gridView.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="ui\gridView.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -350,6 +423,7 @@
 		<Unit filename="ui\guiGenerated.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="ui\guiGenerated.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -357,6 +431,7 @@
 		<Unit filename="ui\guiStatusHandler.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="ui\guiStatusHandler.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -364,6 +439,7 @@
 		<Unit filename="ui\mainDialog.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="ui\mainDialog.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -371,6 +447,7 @@
 		<Unit filename="ui\messagePopup.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="ui\messagePopup.h" />
 		<Unit filename="ui\mouseMoveWindow.cpp" />
@@ -378,16 +455,19 @@
 		<Unit filename="ui\progressIndicator.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="ui\progressIndicator.h" />
 		<Unit filename="ui\search.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="ui\search.h" />
 		<Unit filename="ui\settingsDialog.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="ui\settingsDialog.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -395,6 +475,7 @@
 		<Unit filename="ui\smallDialogs.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="ui\smallDialogs.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -405,9 +486,9 @@
 		<Unit filename="ui\trayIcon.cpp">
 			<Option target="Debug" />
 			<Option target="Release" />
+			<Option target="Performance Test" />
 		</Unit>
 		<Unit filename="ui\trayIcon.h" />
-		<Unit filename="ui\util.cpp" />
 		<Unit filename="ui\util.h" />
 		<Extensions>
 			<code_completion />

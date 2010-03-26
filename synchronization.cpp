@@ -10,7 +10,7 @@
 #include <wx/msgdlg.h>
 #include <wx/log.h>
 #include "shared/stringConv.h"
-#include "ui/util.h"
+#include "shared/util.h"
 #include "shared/systemConstants.h"
 #include "library/statusHandler.h"
 #include "shared/fileHandling.h"
@@ -20,10 +20,9 @@
 #include "shared/globalFunctions.h"
 #include <boost/scoped_array.hpp>
 #include <memory>
-//#include "library/detectRenaming.h"
+#include "library/dbFile.h"
 
 #ifdef FFS_WIN
-#include "shared/shadow.h"
 #include "shared/longPathPrefix.h"
 #include <boost/scoped_ptr.hpp>
 #endif
@@ -95,7 +94,7 @@ wxULongLong SyncStatistics::getDataToProcess() const
 }
 
 
-int SyncStatistics::getRowCount() const
+size_t SyncStatistics::getRowCount() const
 {
     return rowsTotal;
 }
@@ -105,15 +104,15 @@ inline
 void SyncStatistics::getNumbersRecursively(const HierarchyObject& hierObj)
 {
     //process directories
-    std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(),
+    std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(),
                   boost::bind(&SyncStatistics::getDirNumbers, this, _1));
 
     //process files
-    std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(),
+    std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(),
                   boost::bind(&SyncStatistics::getFileNumbers, this, _1));
 
-    rowsTotal += hierObj.subDirs.size();
-    rowsTotal += hierObj.subFiles.size();
+    rowsTotal += hierObj.useSubDirs().size();
+    rowsTotal += hierObj.useSubFiles().size();
 }
 
 
@@ -248,7 +247,7 @@ private:
         //don't process directories
 
         //process files
-        for (HierarchyObject::SubFileMapping::const_iterator i = hierObj.subFiles.begin(); i != hierObj.subFiles.end(); ++i)
+        for (HierarchyObject::SubFileMapping::const_iterator i = hierObj.useSubFiles().begin(); i != hierObj.useSubFiles().end(); ++i)
             switch (i->getSyncOperation()) //evaluate comparison result and sync direction
             {
             case SO_CREATE_NEW_LEFT:
@@ -289,7 +288,7 @@ private:
 
 
         //recurse into sub-dirs
-        std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), boost::bind(&DiskSpaceNeeded<recyclerUsed>::processRecursively, this, _1));
+        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), boost::bind(&DiskSpaceNeeded<recyclerUsed>::processRecursively, this, _1));
     }
 
     wxLongLong spaceNeededLeft;
@@ -859,7 +858,7 @@ template <bool reduceDiskSpace> //"true" if files deletion shall happen only
 void SynchronizeFolderPair::execute(HierarchyObject& hierObj)
 {
     //synchronize files:
-    for (HierarchyObject::SubFileMapping::iterator i = hierObj.subFiles.begin(); i != hierObj.subFiles.end(); ++i)
+    for (HierarchyObject::SubFileMapping::iterator i = hierObj.useSubFiles().begin(); i != hierObj.useSubFiles().end(); ++i)
     {
         if (    ( reduceDiskSpace &&  diskSpaceIsReduced(*i)) ||
                 (!reduceDiskSpace && !diskSpaceIsReduced(*i)))
@@ -867,7 +866,7 @@ void SynchronizeFolderPair::execute(HierarchyObject& hierObj)
     }
 
     //synchronize folders:
-    for (HierarchyObject::SubDirMapping::iterator i = hierObj.subDirs.begin(); i != hierObj.subDirs.end(); ++i)
+    for (HierarchyObject::SubDirMapping::iterator i = hierObj.useSubDirs().begin(); i != hierObj.useSubDirs().end(); ++i)
     {
         const SyncOperation syncOp = i->getSyncOperation();
 
@@ -1109,8 +1108,8 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
             //progress indicator update: DON'T forget to notify about implicitly deleted objects!
             const SyncStatistics subObjects(dirObj);
             //...then remove everything
-            dirObj.subFiles.clear();
-            dirObj.subDirs.clear();
+            dirObj.useSubFiles().clear();
+            dirObj.useSubDirs().clear();
             statusUpdater_.updateProcessedData(subObjects.getCreate() + subObjects.getOverwrite() + subObjects.getDelete(), subObjects.getDataToProcess().ToDouble());
         }
         break;
@@ -1127,8 +1126,8 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
             //progress indicator update: DON'T forget to notify about implicitly deleted objects!
             const SyncStatistics subObjects(dirObj);
             //...then remove everything
-            dirObj.subFiles.clear();
-            dirObj.subDirs.clear();
+            dirObj.useSubFiles().clear();
+            dirObj.useSubDirs().clear();
             statusUpdater_.updateProcessedData(subObjects.getCreate() + subObjects.getOverwrite() + subObjects.getDelete(), subObjects.getDataToProcess().ToDouble());
         }
         break;
@@ -1245,7 +1244,8 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         wxLongLong freeDiskSpaceLeft;
         if (wxGetDiskSpace(zToWx(j->getBaseDir<LEFT_SIDE>()), NULL, &freeDiskSpaceLeft))
         {
-            if (freeDiskSpaceLeft < spaceNeeded.first)
+            if (0 < freeDiskSpaceLeft && //zero disk space is either an error or not: in both cases this warning message is obsolete (WebDav seems to report 0)
+                    freeDiskSpaceLeft < spaceNeeded.first)
                 statusUpdater.reportWarning(wxString(_("Not enough free disk space available in:")) + wxT("\n") +
                                             wxT("\"") + zToWx(j->getBaseDir<LEFT_SIDE>()) + wxT("\"\n\n") +
                                             _("Total required free disk space:") + wxT(" ") + formatFilesizeToShortString(spaceNeeded.first) + wxT("\n") +
@@ -1257,7 +1257,8 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         wxLongLong freeDiskSpaceRight;
         if (wxGetDiskSpace(zToWx(j->getBaseDir<RIGHT_SIDE>()), NULL, &freeDiskSpaceRight))
         {
-            if (freeDiskSpaceRight < spaceNeeded.second)
+            if (0 < freeDiskSpaceRight && //zero disk space is either an error or not: in both cases this warning message is obsolete (WebDav seems to report 0)
+                    freeDiskSpaceRight < spaceNeeded.second)
                 statusUpdater.reportWarning(wxString(_("Not enough free disk space available in:")) + wxT("\n") +
                                             wxT("\"") + zToWx(j->getBaseDir<RIGHT_SIDE>()) + wxT("\"\n\n") +
                                             _("Total required free disk space:") + wxT(" ") + formatFilesizeToShortString(spaceNeeded.second) + wxT("\n") +
@@ -1271,7 +1272,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
     {
         //show the first few conflicts in warning message also:
         wxString warningMessage = wxString(_("Unresolved conflicts existing!")) +
-                                  wxT(" (") + globalFunctions::numberToWxString(statisticsTotal.getConflict()) + wxT(")\n\n");
+                                  wxT(" (") + numberToWxString(statisticsTotal.getConflict(), true) + wxT(")\n\n");
 
         const SyncStatistics::ConflictTexts& firstConflicts = statisticsTotal.getFirstConflicts(); //get first few sync conflicts
         for (SyncStatistics::ConflictTexts::const_iterator i = firstConflicts.begin(); i != firstConflicts.end(); ++i)

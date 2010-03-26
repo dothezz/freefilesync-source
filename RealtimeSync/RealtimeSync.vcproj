@@ -50,10 +50,12 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough="$(ProjectDir)../library/pch.h"
 				WarningLevel="4"
 				DebugInformationFormat="4"
 				DisableSpecificWarnings="4804;4100"
+				ForcedIncludeFiles="$(ProjectDir)../library/pch.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -134,10 +136,12 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough="$(ProjectDir)../library/pch.h"
 				WarningLevel="4"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4804;4100"
+				ForcedIncludeFiles="$(ProjectDir)../library/pch.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -385,6 +389,10 @@
 			</File>
 			<File
 				RelativePath="..\shared\fileID.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\shared\fileIO.cpp"
 				>
 			</File>
 			<File

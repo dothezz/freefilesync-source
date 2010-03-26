@@ -121,14 +121,14 @@ private:
     void updateGridViewData();
 
     //context menu functions
-    std::set<unsigned int> getSelectedRows(const CustomGrid* grid) const;
-    std::set<unsigned int> getSelectedRows() const;
-    void setSyncDirManually(const std::set<unsigned int>& rowsToSetOnUiTable, const FreeFileSync::SyncDirection dir);
-    void filterRangeManually(const std::set<unsigned int>& rowsToFilterOnUiTable, const int leadingRow);
+    std::set<size_t> getSelectedRows(const CustomGrid* grid) const;
+    std::set<size_t> getSelectedRows() const;
+    void setSyncDirManually(const std::set<size_t>& rowsToSetOnUiTable, const FreeFileSync::SyncDirection dir);
+    void filterRangeManually(const std::set<size_t>& rowsToFilterOnUiTable, int leadingRow);
     void copySelectionToClipboard(const CustomGrid* selectedGrid);
     void deleteSelectedFiles();
 
-    void openExternalApplication(unsigned int rowNumber, bool leftSide, const wxString& commandline);
+    void openExternalApplication(size_t rowNumber, bool leftSide, const wxString& commandline);
     static const int externalAppIDFirst = 1000; //id of first external app item
 
     //work to be done in idle time

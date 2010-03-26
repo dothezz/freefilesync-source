@@ -16,7 +16,7 @@ FILE_LIST+=synchronization.cpp
 FILE_LIST+=fileHierarchy.cpp
 FILE_LIST+=application.cpp
 FILE_LIST+=ui/guiGenerated.cpp
-FILE_LIST+=ui/util.cpp
+FILE_LIST+=shared/util.cpp
 FILE_LIST+=ui/gridView.cpp
 FILE_LIST+=ui/mainDialog.cpp
 FILE_LIST+=ui/settingsDialog.cpp
@@ -36,6 +36,8 @@ FILE_LIST+=library/processXml.cpp
 FILE_LIST+=library/statistics.cpp
 FILE_LIST+=library/filter.cpp
 FILE_LIST+=library/binary.cpp
+FILE_LIST+=library/dbFile.cpp
+FILE_LIST+=shared/fileIO.cpp
 FILE_LIST+=shared/dragAndDrop.cpp
 FILE_LIST+=shared/localization.cpp
 FILE_LIST+=shared/guid.cpp
@@ -110,8 +112,8 @@ FreeFileSync: init removeBOM osspUUID $(DEP_LIST)
 clean:
 	rm -rf OBJ
 	rm -f BUILD/$(APPNAME)
-	cd shared/ossp_uuid && make clean
 	rm -f removeBOM
+	if [ -e shared/ossp_uuid/Makefile ]; then cd shared/ossp_uuid && make clean; fi
 
 install:
 	if [ ! -d $(BINDIR) ] ; then mkdir -p $(BINDIR); fi

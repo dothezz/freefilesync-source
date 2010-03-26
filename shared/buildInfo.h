@@ -10,7 +10,7 @@
 namespace Utility
 {
 //determine build info
-//seems to be safer than checking for _WIN64 (defined on windows for 64-bit compilations only) while _WIN32 is always defined
+//seems to be safer than checking for _WIN64 (defined on windows for 64-bit compilations only) while _WIN32 is always defined (even for x64 compiler!)
 static const bool is32BitBuild = sizeof(void*) == 4;
 static const bool is64BitBuild = sizeof(void*) == 8;
 }

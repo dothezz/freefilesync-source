@@ -59,7 +59,7 @@ Performance::~Performance()
 void Performance::showResult()
 {
     resultWasShown = true;
-    wxMessageBox(globalFunctions::numberToWxString(unsigned(timer->Time())) + wxT(" ms"));
+    wxMessageBox(wxLongLong(timer->Time()).ToString() + wxT(" ms"));
     timer->Start(); //reset timer
 }
 
@@ -110,5 +110,5 @@ void DebugLog::write(const wxString& logText)
 
 wxString getCodeLocation(const wxString file, const int line)
 {
-    return wxString(file).AfterLast(globalFunctions::FILE_NAME_SEPARATOR) + wxT(", LINE ") + globalFunctions::numberToWxString(line) + wxT(" | ");
+    return wxString(file).AfterLast(globalFunctions::FILE_NAME_SEPARATOR) + wxT(", LINE ") + wxLongLong(line).ToString() + wxT(" | ");
 }

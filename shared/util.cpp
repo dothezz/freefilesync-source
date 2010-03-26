@@ -33,7 +33,7 @@ wxString FreeFileSync::formatFilesizeToShortString(const wxULongLong& filesize)
 }
 
 
-wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
+wxString FreeFileSync::formatFilesizeToShortString(double filesize)
 {
     if (filesize < 0)
         return _("Error");
@@ -41,25 +41,23 @@ wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
     if (filesize <= 999)
         return wxString::Format(wxT("%i"), static_cast<int>(filesize)) + _(" Byte"); //no decimal places in case of bytes
 
-    double nrOfBytes = filesize;
-
-    nrOfBytes /= 1024;
+    filesize /= 1024;
     wxString unit = _(" kB");
-    if (nrOfBytes > 999)
+    if (filesize > 999)
     {
-        nrOfBytes /= 1024;
+        filesize /= 1024;
         unit = _(" MB");
-        if (nrOfBytes > 999)
+        if (filesize > 999)
         {
-            nrOfBytes /= 1024;
+            filesize /= 1024;
             unit = _(" GB");
-            if (nrOfBytes > 999)
+            if (filesize > 999)
             {
-                nrOfBytes /= 1024;
+                filesize /= 1024;
                 unit = _(" TB");
-                if (nrOfBytes > 999)
+                if (filesize > 999)
                 {
-                    nrOfBytes /= 1024;
+                    filesize /= 1024;
                     unit = _(" PB");
                 }
             }
@@ -68,46 +66,69 @@ wxString FreeFileSync::formatFilesizeToShortString(const double filesize)
 
     //print just three significant digits: 0,01 | 0,11 | 1,11 | 11,1 | 111
 
-    const unsigned int leadDigitCount = globalFunctions::getDigitCount(static_cast<unsigned int>(nrOfBytes)); //number of digits before decimal point
+    const unsigned int leadDigitCount = globalFunctions::getDigitCount(static_cast<unsigned int>(filesize)); //number of digits before decimal point
     if (leadDigitCount == 0 || leadDigitCount > 3)
         return _("Error");
 
     if (leadDigitCount == 3)
-        return wxString::Format(wxT("%i"), static_cast<int>(nrOfBytes)) + unit;
+        return wxString::Format(wxT("%i"), static_cast<int>(filesize)) + unit;
     else if (leadDigitCount == 2)
     {
-        wxString output = wxString::Format(wxT("%i"), static_cast<int>(nrOfBytes * 10));
-        output.insert(leadDigitCount, FreeFileSync::DECIMAL_POINT);
+        wxString output = wxString::Format(wxT("%i"), static_cast<int>(filesize * 10));
+        output.insert(leadDigitCount, getDecimalPoint());
         return output + unit;
     }
     else //leadDigitCount == 1
     {
-        wxString output = wxString::Format(wxT("%03i"), static_cast<int>(nrOfBytes * 100));
-        output.insert(leadDigitCount, FreeFileSync::DECIMAL_POINT);
+        wxString output = wxString::Format(wxT("%03i"), static_cast<int>(filesize * 100));
+        output.insert(leadDigitCount, getDecimalPoint());
         return output + unit;
     }
 
-    //return wxString::Format(wxT("%.*f"), 3 - leadDigitCount, nrOfBytes) + unit;
+    //return wxString::Format(wxT("%.*f"), 3 - leadDigitCount, filesize) + unit;
 }
 
 
 wxString FreeFileSync::formatPercentage(const wxLongLong& dividend, const wxLongLong& divisor)
 {
     const double ratio = divisor != 0 ? dividend.ToDouble() * 100 / divisor.ToDouble() : 0;
-    wxString output = _("%x Percent");
+    wxString output = _("%x%");
     output.Replace(wxT("%x"), wxString::Format(wxT("%3.2f"), ratio), false);
     return output;
 }
 
 
-
-wxString FreeFileSync::includeNumberSeparator(const wxString& number)
+namespace
+{
+wxString includeNumberSeparator(const wxString& number)
 {
     wxString output(number);
-    for (int i = output.size() - 3; i > 0; i -= 3)
-        output.insert(i,  FreeFileSync::THOUSANDS_SEPARATOR);
+	for (size_t i = output.size(); i > 3; i -= 3)
+        output.insert(i - 3, FreeFileSync::getThousandsSeparator());
 
     return output;
+}
+}
+
+
+wxString FreeFileSync::numberToWxString(size_t number, bool includeNumberSep)
+{
+    const wxString output = wxString::Format(wxT("%u"), number);
+    return includeNumberSep ? includeNumberSeparator(output) : output;
+}
+
+
+
+wxString FreeFileSync::numberToWxString(int number, bool includeNumberSep)
+{
+    const wxString output = wxString::Format(wxT("%i"), number);
+    return includeNumberSep ? includeNumberSeparator(output) : output;
+}
+
+
+wxString FreeFileSync::numberToWxString(const wxULongLong& number, bool includeNumberSep)
+{
+    return includeNumberSep ? includeNumberSeparator(number.ToString()) : number.ToString();
 }
 
 
@@ -154,9 +175,6 @@ void FreeFileSync::scrollToBottom(wxScrolledWindow* scrWindow)
             scrWindow->Scroll(0, scrollPosBottom);
     }
 }
-
-
-
 
 
 inline

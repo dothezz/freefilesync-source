@@ -55,7 +55,7 @@ public:
     static FilterRef loadFilter(wxInputStream& stream); //CAVEAT!!! adapt this method for each new derivation!!!
 
 private:
-    virtual Zstring uniqueClassIdentifier() const = 0; //get identifier, used for serialization
+    virtual Zstring uniqueClassIdentifier() const = 0;   //get identifier, used for serialization
     virtual void save(wxOutputStream& stream) const = 0; //serialization
     virtual bool cmpLessSameType(const BaseFilter& other) const = 0; //typeid(*this) == typeid(other) in this context!
 };
@@ -91,10 +91,10 @@ private:
     virtual void save(wxOutputStream& stream) const;
     virtual bool cmpLessSameType(const BaseFilter& other) const;
 
-    std::set<Zstring> filterFileIn;
-    std::set<Zstring> filterFolderIn;
-    std::set<Zstring> filterFileEx;
-    std::set<Zstring> filterFolderEx;
+    std::set<Zstring> filterFileIn;   //upper case (windows)
+    std::set<Zstring> filterFolderIn; //
+    std::set<Zstring> filterFileEx;   //
+    std::set<Zstring> filterFolderEx; //
 
     const Zstring includeFilterTmp; //save constructor arguments for serialization
     const Zstring excludeFilterTmp; //
@@ -175,8 +175,7 @@ bool NullFilter::isNull() const
 inline
 bool NullFilter::cmpLessSameType(const BaseFilter& other) const
 {
-    //typeid(*this) == typeid(other) in this context!
-    assert(typeid(*this) == typeid(other));
+    assert(typeid(*this) == typeid(other)); //always given in this context!
     return false;
 }
 
@@ -214,8 +213,8 @@ bool CombinedFilter::isNull() const
 inline
 bool CombinedFilter::cmpLessSameType(const BaseFilter& other) const
 {
-    //typeid(*this) == typeid(other) in this context!
-    assert(typeid(*this) == typeid(other));
+    assert(typeid(*this) == typeid(other)); //always given in this context!
+
     const CombinedFilter& otherCombFilt = static_cast<const CombinedFilter&>(other);
 
     if (*first_ != *otherCombFilt.first_)

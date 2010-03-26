@@ -32,11 +32,11 @@ Utility::FileID Utility::retrieveFileID(const Zstring& filename)
                                       FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                                       NULL,
                                       OPEN_EXISTING,
-                                      FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS, //FILE_FLAG_BACKUP_SEMANTICS needed to open directories
+                                      FILE_FLAG_OPEN_REPARSE_POINT | FILE_FLAG_BACKUP_SEMANTICS, //FILE_FLAG_BACKUP_SEMANTICS needed to open a directory
                                       NULL);
     if (hFile != INVALID_HANDLE_VALUE)
     {
-         boost::shared_ptr<void> dummy(hFile, ::CloseHandle);
+        boost::shared_ptr<void> dummy(hFile, ::CloseHandle);
 
         BY_HANDLE_FILE_INFORMATION info;
         if (::GetFileInformationByHandle(hFile, &info))

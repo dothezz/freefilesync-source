@@ -17,13 +17,13 @@ class GridView
 {
 public:
     //direct data access via row number
-    const FileSystemObject* getObject(unsigned int row) const;  //returns NULL if object is not found; logarithmic complexity
-    FileSystemObject* getObject(unsigned int row);              //
+    const FileSystemObject* getObject(size_t row) const;  //returns NULL if object is not found; logarithmic complexity
+    FileSystemObject* getObject(size_t row);              //
     size_t rowsOnView() const; //only the currently visible elements
     size_t rowsTotal() const;  //total number of rows available
 
     //get references to FileSystemObject: no NULL-check needed! Everything's bound.
-    void getAllFileRef(const std::set<unsigned int>& guiRows, std::vector<FileSystemObject*>& output);
+    void getAllFileRef(const std::set<size_t>& guiRows, std::vector<FileSystemObject*>& output);
 
     struct StatusCmpResult
     {
@@ -180,7 +180,7 @@ private:
 //inline implementation
 
 inline
-const FileSystemObject* GridView::getObject(unsigned int row) const
+const FileSystemObject* GridView::getObject(size_t row) const
 {
     if (row < rowsOnView())
         return getReferencedRow(viewRef[row]);
@@ -189,7 +189,7 @@ const FileSystemObject* GridView::getObject(unsigned int row) const
 }
 
 inline
-FileSystemObject* GridView::getObject(unsigned int row)
+FileSystemObject* GridView::getObject(size_t row)
 {
     //code re-use of const method: see Meyers Effective C++
     return const_cast<FileSystemObject*>(static_cast<const GridView&>(*this).getObject(row));

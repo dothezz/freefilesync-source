@@ -17,6 +17,7 @@
 #include "shared/stringConv.h"
 #include "shared/globalFunctions.h"
 #include "shared/loki/TypeManip.h"
+#include "library/dbFile.h"
 //#include "shared/loki/NullType.h"
 
 using namespace FreeFileSync;
@@ -38,9 +39,9 @@ public:
     void execute(HierarchyObject& hierObj) const
     {
         //process files
-        std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this);
+        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this);
         //process directories
-        std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), *this);
+        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), *this);
     }
 
 private:
@@ -105,11 +106,11 @@ public:
     bool findNonEqual(const HierarchyObject& hierObj) const
     {
         //files
-        if (std::find_if(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this) != hierObj.subFiles.end())
+        if (std::find_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this) != hierObj.useSubFiles().end())
             return true;
 
         //directories
-        return std::find_if(hierObj.subDirs.begin(), hierObj.subDirs.end(), *this) != hierObj.subDirs.end();
+        return std::find_if(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), *this) != hierObj.useSubDirs().end();
     }
 
     bool operator()(const FileMapping& fileObj) const
@@ -146,9 +147,9 @@ inline
 bool sameFileTime(const wxLongLong& a, const wxLongLong& b, const unsigned int tolerance)
 {
     if (a < b)
-        return b - a <= tolerance;
+        return b <= a + tolerance;
     else
-        return a - b <= tolerance;
+        return a <= b + tolerance;
 }
 //---------------------------------------------------------------------------------------------------------------
 
@@ -254,12 +255,7 @@ private:
 DataSetFile retrieveDataSetFile(const Zstring& objShortName, const DirContainer* dbDirectory)
 {
     if (dbDirectory)
-    {
-        const DirContainer::SubFileList& fileList = dbDirectory->getSubFiles();
-        const DirContainer::SubFileList::const_iterator j = fileList.find(objShortName);
-        if (j != fileList.end())
-            return DataSetFile(&j->second);
-    }
+        return dbDirectory->findFile(objShortName); //return value may be NULL
 
     //object not found
     return DataSetFile(NULL);
@@ -270,10 +266,9 @@ std::pair<DataSetDir, const DirContainer*> retrieveDataSetDir(const Zstring& obj
 {
     if (dbDirectory)
     {
-        const DirContainer::SubDirList& dirList = dbDirectory->getSubDirs();
-        const DirContainer::SubDirList::const_iterator j = dirList.find(objShortName);
-        if (j != dirList.end())
-            return std::make_pair(DataSetDir(true), &j->second);
+        const DirContainer* dbDir = dbDirectory->findDir(objShortName);
+        if (dbDir)
+            return std::make_pair(DataSetDir(true), dbDir);
     }
 
     //object not found
@@ -291,9 +286,9 @@ public:
     void execute(HierarchyObject& hierObj) const
     {
         //files
-        std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this);
+        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this);
         //directories
-        std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), *this);
+        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), *this);
     }
 
 private:
@@ -431,10 +426,10 @@ private:
                  const DirContainer* dbDirectoryRight)
     {
         //process files
-        std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(),
+        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(),
                       boost::bind(&RedetermineAuto::processFile, this, _1, dbDirectoryLeft, dbDirectoryRight));
         //process directories
-        std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(),
+        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(),
                       boost::bind(&RedetermineAuto::processDir, this, _1, dbDirectoryLeft, dbDirectoryRight));
     }
 
@@ -654,9 +649,9 @@ public:
     void execute(HierarchyObject& hierObj) const
     {
         //directories
-        std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), *this);
+        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), *this);
         //files
-        std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this);
+        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this);
     }
 
 private:
@@ -704,8 +699,8 @@ public:
 
     void execute(FreeFileSync::HierarchyObject& hierObj) const //don't create ambiguity by replacing with operator()
     {
-        std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this); //files
-        std::for_each(hierObj.subDirs.begin(),  hierObj.subDirs.end(),  *this); //directories
+        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this); //files
+        std::for_each(hierObj.useSubDirs(). begin(), hierObj.useSubDirs().end(),  *this); //directories
     }
 
 private:
@@ -754,13 +749,13 @@ class FilterData
 public:
     FilterData(const BaseFilter& filterProcIn) : filterProc(filterProcIn) {}
 
-    void execute(FreeFileSync::HierarchyObject& hierObj)
+    void execute(FreeFileSync::HierarchyObject& hierObj) const
     {
         //files
-        std::for_each(hierObj.subFiles.begin(), hierObj.subFiles.end(), *this);
+        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this);
 
         //directories
-        std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), *this);
+        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), *this);
     };
 
 private:
@@ -768,12 +763,12 @@ private:
     friend Function std::for_each(Iterator, Iterator, Function);
 
 
-    void operator()(FreeFileSync::FileMapping& fileObj)
+    void operator()(FreeFileSync::FileMapping& fileObj) const
     {
         fileObj.setActive(filterProc.passFileFilter(fileObj.getObjRelativeName()));
     }
 
-    void operator()(FreeFileSync::DirMapping& dirObj)
+    void operator()(FreeFileSync::DirMapping& dirObj) const
     {
         bool subObjMightMatch = true;
         dirObj.setActive(filterProc.passDirFilter(dirObj.getObjRelativeName(), &subObjMightMatch));
@@ -1038,16 +1033,6 @@ N(M) =
 125/1000000 * M + 5 for    500 <  M <= 50000
 77/1000000 * M + 10 for  50000 <  M <= 400000
 60/1000000 * M + 35 for 400000 <  M
-
-
-inline
-bool sameFileTime(const time_t a, const time_t b)
-{
-    if (a < b)
-        return b - a <= FILE_TIME_PRECISION;
-    else
-        return a - b <= FILE_TIME_PRECISION;
-}
 
 
 #ifdef FFS_WIN

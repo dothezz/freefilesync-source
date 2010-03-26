@@ -12,10 +12,9 @@
 #include <wx/msgdlg.h>
 #include <wx/log.h>
 #include "algorithm.h"
-#include "ui/util.h"
+#include "shared/util.h"
 #include <memory>
 #include "shared/stringConv.h"
-#include "library/statusHandler.h"
 #include "shared/fileHandling.h"
 #include "shared/systemFunctions.h"
 #include "shared/fileTraverser.h"
@@ -228,8 +227,8 @@ TraverseCallback::ReturnValue BaseDirCallback::onFile(
     const Zstring& fullName,
     const TraverseCallback::FileInfo& details)
 {
-    //do not list the database file sync.ffs_db
-    if (getSyncDBFilename().cmpFileName(shortName) == 0)
+    //do not list the database file(s) sync.ffs_db, sync.x64.ffs_db, etc.
+    if (Zstring(shortName).AfterLast(DefaultChar('.')).cmpFileName(DefaultStr("ffs_db")) == 0)
         return TraverseCallback::TRAVERSING_CONTINUE;
 
     return DirCallback::onFile(shortName, fullName, details);
@@ -470,7 +469,7 @@ bool filesHaveSameContentUpdating(const Zstring& filename1, const Zstring& filen
     bool sameContent = true;
     try
     {
-        sameContent = filesHaveSameContent(filename1, filename2, &callback);
+        sameContent = filesHaveSameContent(filename1, filename2, callback);
     }
     catch (...)
     {
@@ -491,7 +490,9 @@ struct ToBeRemoved
 {
     bool operator()(const DirMapping& dirObj) const
     {
-        return !dirObj.isActive() && dirObj.subDirs.size() == 0 && dirObj.subFiles.size() == 0;
+        return !dirObj.isActive() &&
+               dirObj.useSubDirs(). size() == 0 &&
+               dirObj.useSubFiles().size() == 0;
     }
 };
 
@@ -505,10 +506,11 @@ public:
     void execute(HierarchyObject& hierObj)
     {
         //process subdirs recursively
-        std::for_each(hierObj.subDirs.begin(), hierObj.subDirs.end(), *this);
+        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), *this);
 
         //remove superfluous directories
-        hierObj.subDirs.erase(std::remove_if(hierObj.subDirs.begin(), hierObj.subDirs.end(), ::ToBeRemoved()), hierObj.subDirs.end());
+        hierObj.useSubDirs().erase(std::remove_if(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(),
+                                   ::ToBeRemoved()), hierObj.useSubDirs().end());
     }
 
 private:
@@ -696,9 +698,9 @@ inline
 bool sameFileTime(const wxLongLong& a, const wxLongLong& b, const unsigned int tolerance)
 {
     if (a < b)
-        return b - a <= tolerance;
+        return b <= a + tolerance;
     else
-        return a - b <= tolerance;
+        return a <= b + tolerance;
 }
 
 
@@ -839,7 +841,7 @@ void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& director
     const size_t objectsTotal    = filesToCompareBytewise.size() * 2;
     const wxULongLong bytesTotal = getBytesToCompare(filesToCompareBytewise);
 
-    statusUpdater->initNewProcess(objectsTotal,
+    statusUpdater->initNewProcess(static_cast<int>(objectsTotal),
                                   globalFunctions::convertToSigned(bytesTotal),
                                   StatusHandler::PROCESS_COMPARING_CONTENT);
 
@@ -910,13 +912,13 @@ template <>
 void MergeSides::fillOneSide<LEFT_SIDE>(const DirContainer& dirCont, HierarchyObject& output)
 {
     //reserve() fulfills two task here: 1. massive performance improvement! 2. ensure references in appendUndefined remain valid!
-    output.subFiles.reserve(dirCont.getSubFiles().size());
-    output.subDirs.reserve( dirCont.getSubDirs(). size());
+    output.useSubFiles().reserve(dirCont.fileCount());
+    output.useSubDirs(). reserve(dirCont.dirCount());
 
-    for (DirContainer::SubFileList::const_iterator i = dirCont.getSubFiles().begin(); i != dirCont.getSubFiles().end(); ++i)
+    for (DirContainer::SubFileList::const_iterator i = dirCont.fileBegin(); i != dirCont.fileEnd(); ++i)
         output.addSubFile(i->second.getData(), i->first);
 
-    for (DirContainer::SubDirList::const_iterator i = dirCont.getSubDirs().begin(); i != dirCont.getSubDirs().end(); ++i)
+    for (DirContainer::SubDirList::const_iterator i = dirCont.dirBegin(); i != dirCont.dirEnd(); ++i)
     {
         DirMapping& newDirMap = output.addSubDir(true, i->first, false);
         fillOneSide<LEFT_SIDE>(i->second, newDirMap); //recurse into subdirectories
@@ -928,13 +930,13 @@ template <>
 void MergeSides::fillOneSide<RIGHT_SIDE>(const DirContainer& dirCont, HierarchyObject& output)
 {
     //reserve() fulfills two task here: 1. massive performance improvement! 2. ensure references in appendUndefined remain valid!
-    output.subFiles.reserve(dirCont.getSubFiles().size());
-    output.subDirs.reserve( dirCont.getSubDirs(). size());
+    output.useSubFiles().reserve(dirCont.fileCount());
+    output.useSubDirs(). reserve(dirCont.dirCount());
 
-    for (DirContainer::SubFileList::const_iterator i = dirCont.getSubFiles().begin(); i != dirCont.getSubFiles().end(); ++i)
+    for (DirContainer::SubFileList::const_iterator i = dirCont.fileBegin(); i != dirCont.fileEnd(); ++i)
         output.addSubFile(i->first, i->second.getData());
 
-    for (DirContainer::SubDirList::const_iterator i = dirCont.getSubDirs().begin(); i != dirCont.getSubDirs().end(); ++i)
+    for (DirContainer::SubDirList::const_iterator i = dirCont.dirBegin(); i != dirCont.dirEnd(); ++i)
     {
         DirMapping& newDirMap = output.addSubDir(false, i->first, true);
         fillOneSide<RIGHT_SIDE>(i->second, newDirMap); //recurse into subdirectories
@@ -951,39 +953,39 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
     //=> this allows for a quasi-binary search by id!
 
     //reserve() fulfills two task here: 1. massive performance improvement! 2. ensure references in appendUndefined remain valid!
-    output.subFiles.reserve(leftSide.getSubFiles().size() + rightSide.getSubFiles().size()); //assume worst case!
-    output.subDirs.reserve( leftSide.getSubDirs().size()  + rightSide.getSubDirs().size());  //
+    output.useSubFiles().reserve(leftSide.fileCount() + rightSide.fileCount()); //assume worst case!
+    output.useSubDirs(). reserve(leftSide.dirCount()  + rightSide.dirCount());  //
 
-    for (DirContainer::SubFileList::const_iterator i = leftSide.getSubFiles().begin(); i != leftSide.getSubFiles().end(); ++i)
+    for (DirContainer::SubFileList::const_iterator i = leftSide.fileBegin(); i != leftSide.fileEnd(); ++i)
     {
-        DirContainer::SubFileList::const_iterator j = rightSide.getSubFiles().find(i->first);
+        const FileContainer* rightFile = rightSide.findFile(i->first);
 
         //find files that exist on left but not on right
-        if (j == rightSide.getSubFiles().end())
+        if (rightFile == NULL)
             output.addSubFile(i->second.getData(), i->first);
         //find files that exist on left and right
         else
         {
             appendUndefined.push_back(
-                &output.addSubFile(i->second.getData(), i->first, FILE_EQUAL, j->second.getData())); //FILE_EQUAL is just a dummy-value here
+                &output.addSubFile(i->second.getData(), i->first, FILE_EQUAL, rightFile->getData())); //FILE_EQUAL is just a dummy-value here
         }
     }
 
     //find files that exist on right but not on left
-    for (DirContainer::SubFileList::const_iterator j = rightSide.getSubFiles().begin(); j != rightSide.getSubFiles().end(); ++j)
+    for (DirContainer::SubFileList::const_iterator j = rightSide.fileBegin(); j != rightSide.fileEnd(); ++j)
     {
-        if (leftSide.getSubFiles().find(j->first) == leftSide.getSubFiles().end())
+        if (leftSide.findFile(j->first) == NULL)
             output.addSubFile(j->first, j->second.getData());
     }
 
 
 //-----------------------------------------------------------------------------------------------
-    for (DirContainer::SubDirList::const_iterator i = leftSide.getSubDirs().begin(); i != leftSide.getSubDirs().end(); ++i)
+    for (DirContainer::SubDirList::const_iterator i = leftSide.dirBegin(); i != leftSide.dirEnd(); ++i)
     {
-        DirContainer::SubDirList::const_iterator j = rightSide.getSubDirs().find(i->first);
+        const DirContainer* rightDir = rightSide.findDir(i->first);
 
         //find directories that exist on left but not on right
-        if (j == rightSide.getSubDirs().end())
+        if (rightDir == NULL)
         {
             DirMapping& newDirMap = output.addSubDir(true, i->first, false);
             fillOneSide<LEFT_SIDE>(i->second, newDirMap); //recurse into subdirectories
@@ -991,14 +993,14 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
         else //directories that exist on both sides
         {
             DirMapping& newDirMap = output.addSubDir(true, i->first, true);
-            execute(i->second, j->second, newDirMap); //recurse into subdirectories
+            execute(i->second, *rightDir, newDirMap); //recurse into subdirectories
         }
     }
 
     //find directories that exist on right but not on left
-    for (DirContainer::SubDirList::const_iterator j = rightSide.getSubDirs().begin(); j != rightSide.getSubDirs().end(); ++j)
+    for (DirContainer::SubDirList::const_iterator j = rightSide.dirBegin(); j != rightSide.dirEnd(); ++j)
     {
-        if (leftSide.getSubDirs().find(j->first) == leftSide.getSubDirs().end())
+        if (leftSide.findDir(j->first) == NULL)
         {
             DirMapping& newDirMap = output.addSubDir(false, j->first, true);
             fillOneSide<RIGHT_SIDE>(j->second, newDirMap); //recurse into subdirectories
@@ -1009,8 +1011,8 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
 
 void CompareProcess::performBaseComparison(BaseDirMapping& output, std::vector<FileMapping*>& appendUndefined)
 {
-    assert(output.subDirs.empty());
-    assert(output.subFiles.empty());
+    assert(output.useSubDirs(). empty());
+    assert(output.useSubFiles().empty());
 
     //PERF_START;
 

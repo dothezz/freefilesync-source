@@ -11,6 +11,10 @@
 #include "fileError.h"
 #include <wx/longlong.h>
 
+#ifdef FFS_WIN
+#include "shadow.h"
+#endif
+
 
 namespace FreeFileSync
 {
@@ -68,21 +72,14 @@ struct CopyFileCallback //callback functionality
     virtual Response updateCopyStatus(const wxULongLong& totalBytesTransferred) = 0; //DON'T throw exceptions here, at least in Windows build!
 };
 
-#ifdef FFS_WIN
-class ShadowCopy;
-
 void copyFile(const Zstring& sourceFile,
               const Zstring& targetFile,
               const bool copyFileSymLinks,
+#ifdef FFS_WIN
               ShadowCopy* shadowCopyHandler = NULL, //supply handler for making shadow copies
+#endif
               CopyFileCallback* callback = NULL);   //throw (FileError);
 
-#elif defined FFS_LINUX
-void copyFile(const Zstring& sourceFile,
-              const Zstring& targetFile,
-              const bool copyFileSymLinks,
-              CopyFileCallback* callback = NULL); //throw (FileError);
-#endif
 }
 
 

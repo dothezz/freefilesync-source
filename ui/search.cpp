@@ -198,11 +198,15 @@ void executeSearch(bool forceShowDialog,
                    wxGrid& leftGrid,
                    wxGrid& rightGrid)
 {
+    bool searchDialogWasShown = false;
+
     if (forceShowDialog || lastSearchString.IsEmpty())
     {
         SearchDlg* searchDlg = new SearchDlg(parentWindow, lastSearchString, respectCase); //wxWidgets deletion handling -> deleted by parentWindow
         if (static_cast<SearchDlg::ReturnCodes>(searchDlg->ShowModal()) != SearchDlg::BUTTON_OKAY)
             return;
+
+        searchDialogWasShown = true;
     }
 
     wxGrid* targetGrid = NULL;     //filled if match is found
@@ -246,7 +250,8 @@ void executeSearch(bool forceShowDialog,
         wxMessageBox(messageNotFound, _("Find"), wxOK);
 
         //show search dialog again
-        executeSearch(true, respectCase, parentWindow, leftGrid, rightGrid);
+        if (searchDialogWasShown)
+            executeSearch(true, respectCase, parentWindow, leftGrid, rightGrid);
     }
 }
 //###########################################################################################

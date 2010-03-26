@@ -1919,7 +1919,7 @@ SyncCfgDlgGenerated::SyncCfgDlgGenerated( wxWindow* parent, wxWindowID id, const
 	bSizer1151 = new wxBoxSizer( wxHORIZONTAL );
 	
 	m_textCtrlCustomDelFolder = new wxTextCtrl( m_panelCustomDeletionDir, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_textCtrlCustomDelFolder->SetMinSize( wxSize( 160,-1 ) );
+	m_textCtrlCustomDelFolder->SetMinSize( wxSize( 200,-1 ) );
 	
 	bSizer1151->Add( m_textCtrlCustomDelFolder, 1, wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -2389,9 +2389,10 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 	
 	m_buttonOK = new wxButton( this, wxID_OK, _("&OK"), wxDefaultPosition, wxSize( 100,32 ), 0 );
 	m_buttonOK->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
+	m_buttonOK->Enable( false );
 	m_buttonOK->Hide();
 	
-	bSizer28->Add( m_buttonOK, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	bSizer28->Add( m_buttonOK, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 5 );
 	
 	m_buttonPause = new wxButton( this, wxID_ANY, _("&Pause"), wxDefaultPosition, wxSize( 100,32 ), 0 );
 	m_buttonPause->SetFont( wxFont( 10, 74, 90, 90, false, wxT("Tahoma") ) );
@@ -2684,12 +2685,6 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	m_panel5->Layout();
 	bSizer36->Fit( m_panel5 );
 	bSizer31->Add( m_panel5, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	m_staticText15 = new wxStaticText( this, wxID_ANY, _("-Open-Source file synchronization-"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText15->Wrap( -1 );
-	m_staticText15->SetFont( wxFont( 8, 74, 90, 92, false, wxT("Tahoma") ) );
-	
-	bSizer31->Add( m_staticText15, 0, wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
 	m_build = new wxStaticText( this, wxID_ANY, _("dummy"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_build->Wrap( -1 );

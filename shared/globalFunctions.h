@@ -47,9 +47,6 @@ std::string numberToString(const T& number) //convert number to string the C++ w
     return ss.str();
 }
 
-wxString numberToWxString(const unsigned int number); //convert number to wxString
-wxString numberToWxString(const int number);          //convert number to wxString
-wxString numberToWxString(const float number);        //convert number to wxString
 
 int    stringToInt(   const std::string& number); //convert String to number
 long   stringToLong(  const std::string& number); //convert String to number
@@ -218,27 +215,6 @@ inline
 void globalFunctions::writeNumber(std::ofstream& stream, T number)
 {
     stream.write(reinterpret_cast<const char*>(&number), sizeof(T));
-}
-
-
-inline
-wxString globalFunctions::numberToWxString(const unsigned int number)
-{
-    return wxString::Format(wxT("%u"), number);
-}
-
-
-inline
-wxString globalFunctions::numberToWxString(const int number)
-{
-    return wxString::Format(wxT("%i"), number);
-}
-
-
-inline
-wxString globalFunctions::numberToWxString(const float number)
-{
-    return wxString::Format(wxT("%f"), number);
 }
 
 

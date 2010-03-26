@@ -6,8 +6,15 @@
 //
 #include "xmlBase.h"
 #include "globalFunctions.h"
-#include <wx/ffile.h>
 #include <wx/intl.h>
+#include <wx/ffile.h>
+#include "fileIO.h"
+#include "stringConv.h"
+#include "systemConstants.h"
+#include <boost/scoped_array.hpp>
+#include <wx/log.h>
+
+using namespace FreeFileSync;
 
 
 std::string getTypeName(xmlAccess::XmlType type)
@@ -30,8 +37,12 @@ std::string getTypeName(xmlAccess::XmlType type)
 }
 
 
-xmlAccess::XmlType xmlAccess::getXmlType(const wxString& filename)
+xmlAccess::XmlType xmlAccess::getXmlType(const wxString& filename) //throw()
 {
+#ifndef __WXDEBUG__
+    wxLogNull noWxLogs; //hide wxWidgets log messages in release build
+#endif
+
     if (!wxFileExists(filename))
         return XML_OTHER;
 
@@ -77,34 +88,70 @@ xmlAccess::XmlType xmlAccess::getXmlType(const wxString& filename)
     return XML_OTHER;
 }
 
-
-bool xmlAccess::loadXmlDocument(const wxString& fileName, const xmlAccess::XmlType type, TiXmlDocument& document)
+namespace
 {
-    if (!wxFileExists(fileName)) //avoid wxWidgets error message when wxFFile receives not existing file
-        return false;
+//convert (0xD, 0xA) and (0xD) to 0xA: just like in TiXmlDocument::LoadFile(); not sure if actually needed
+void normalize(std::vector<char>& stream)
+{
+    std::vector<char> tmp;
+    for (std::vector<char>::const_iterator i = stream.begin(); i != stream.end(); ++i)
+        switch (*i)
+        {
+        case 0xD:
+            tmp.push_back(0xA);
+            if (i + 1 != stream.end() && *(i + 1) == 0xA)
+                ++i;
+            break;
+        default:
+            tmp.push_back(*i);
+        }
 
-    //workaround to get a FILE* from a unicode filename
-    wxFFile dummyFile(fileName, wxT("rb")); //binary mode needed for TiXml to work correctly in this case
-    if (dummyFile.IsOpened())
+    stream.swap(tmp);
+}
+}
+
+
+void xmlAccess::loadXmlDocument(const wxString& filename, const xmlAccess::XmlType type, TiXmlDocument& document) //throw FileError()
+{
+    std::vector<char> inputStream;
+
+    try
     {
-        FILE* inputFile = dummyFile.fp();
+        const size_t BUFFER_SIZE = 512 * 1024;
+        static boost::scoped_array<unsigned char> buffer(new unsigned char[BUFFER_SIZE]);
+
+        FileInput inputFile(wxToZ(filename)); //throw FileError();
+        do
+        {
+            const size_t bytesRead = inputFile.read(buffer.get(), BUFFER_SIZE); //throw FileError()
+            inputStream.insert(inputStream.end(), buffer.get(), buffer.get() + bytesRead);
+        }
+        while (!inputFile.eof());
+    }
+    catch (const FileError& error) //more detailed error messages than with wxWidgets
+    {
+        throw XmlError(error.show());
+    }
+
+    if (!inputStream.empty())
+    {
+        //convert (0xD, 0xA) and (0xD) to (0xA): just like in TiXmlDocument::LoadFile(); not sure if actually needed
+        ::normalize(inputStream);
 
         TiXmlBase::SetCondenseWhiteSpace(false); //do not condense whitespace characters
+        document.Parse(&inputStream[0], 0, TIXML_DEFAULT_ENCODING);
 
-        if (document.LoadFile(inputFile)) //load XML; fails if inputFile is no proper XML
+        TiXmlElement* root = document.RootElement();
+
+        if (root && (root->ValueStr() == std::string("FreeFileSync"))) //check for FFS configuration xml
         {
-            TiXmlElement* root = document.RootElement();
-
-            if (root && (root->ValueStr() == std::string("FreeFileSync"))) //check for FFS configuration xml
-            {
-                const char* cfgType = root->Attribute("XmlType");
-                if (cfgType)
-                    return std::string(cfgType) == getTypeName(type);
-            }
+            const char* cfgType = root->Attribute("XmlType");
+            if (cfgType && std::string(cfgType) == getTypeName(type))
+                return; //finally... success!
         }
     }
 
-    return false;
+    throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\""));
 }
 
 
@@ -123,22 +170,24 @@ void xmlAccess::getDefaultXmlDocument(const XmlType type, TiXmlDocument& documen
 }
 
 
-bool xmlAccess::saveXmlDocument(const wxString& fileName, const TiXmlDocument& document)
+void xmlAccess::saveXmlDocument(const wxString& filename, const TiXmlDocument& document) //throw (XmlError)
 {
-    //workaround to get a FILE* from a unicode filename
-    wxFFile dummyFile(fileName, wxT("w")); //no need for "binary" mode here
-    if (!dummyFile.IsOpened())
-        return false;
+    //convert XML into continuous byte sequence
+    TiXmlPrinter printer;
+    printer.SetLineBreak(wxString(globalFunctions::LINE_BREAK).ToUTF8());
+    document.Accept(&printer);
+    const std::string buffer = printer.Str();
 
-    FILE* outputFile = dummyFile.fp();
-
-    if (!document.SaveFile(outputFile)) //save XML
-        return false;
-
-    return dummyFile.Flush(); //flush data to disk! (think of multiple batch jobs writing/reading)
+    try
+    {
+        FileOutput outputFile(wxToZ(filename));            //throw FileError()
+        outputFile.write(buffer.c_str(), buffer.length()); //
+    }
+    catch (const FileError& error) //more detailed error messages than with wxWidgets
+    {
+        throw XmlError(error.show());
+    }
 }
-
-
 //################################################################################################################
 
 

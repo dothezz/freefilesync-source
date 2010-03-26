@@ -16,10 +16,9 @@ class Translation;
 
 namespace FreeFileSync
 {
-//language dependent global variables: need to be initialized by CustomLocale on program startup and language switch
-
-extern const wxChar* THOUSANDS_SEPARATOR;
-extern const wxChar* DECIMAL_POINT;
+//language independent global variables: just use operating system's default setting!
+wxString getThousandsSeparator();
+wxString getDecimalPoint();
 
 
 struct LocInfoLine

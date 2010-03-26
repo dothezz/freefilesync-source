@@ -123,7 +123,7 @@ private:
         //event handling
         contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MinimizeToTray::OnContextMenuSelection), NULL, parent_);
 
-        return contextMenu; //ownership transferred to library
+        return contextMenu; //ownership transferred to caller
     }
 
     MinimizeToTray* parent_;
@@ -167,12 +167,12 @@ void MinimizeToTray::resumeFromTray() //remove trayIcon and restore windows:  Mi
         }
         trayIcon->RemoveIcon(); //hide icon until final deletion takes place
         trayIcon->Disconnect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(MinimizeToTray::OnDoubleClick), NULL, this);
+        trayIcon->parentHasDied(); //TaskBarImpl (potentially) has longer lifetime than MinimizeToTray: avoid callback!
 
         //use wxWidgets delayed destruction: delete during next idle loop iteration (handle late window messages, e.g. when double-clicking)
         if (!wxPendingDelete.Member(trayIcon))
             wxPendingDelete.Append(trayIcon);
 
-        trayIcon->parentHasDied(); //TaskBarImpl (potentially) has longer lifetime than MinimizeToTray: avoid callback!
         trayIcon = NULL; //avoid reentrance
     }
 }

@@ -31,7 +31,7 @@ public:
     const ConflictTexts& getFirstConflicts() const; //get first few sync conflicts
 
     wxULongLong getDataToProcess() const;
-    int getRowCount() const;
+    size_t getRowCount() const;
 
 private:
     void init();
@@ -47,7 +47,7 @@ private:
     int conflict;
     ConflictTexts firstConflicts; //save the first few conflict texts to display as a warning message
     wxULongLong dataToProcess;
-    int rowsTotal;
+    size_t rowsTotal;
 };
 
 bool synchronizationNeeded(const FolderComparison& folderCmp);

@@ -7,11 +7,9 @@
 #ifndef ZSTRING_H_INCLUDED
 #define ZSTRING_H_INCLUDED
 
-#include <cstring>
-#include <cctype>
+#include <cstring> //size_t, memcpy(), memcmp()
+#include <cstdlib> //malloc(), free()
 #include <assert.h>
-#include <new>
-#include <stdlib.h>
 #include <vector>
 #include <sstream>
 
@@ -74,12 +72,10 @@ public:
     Zstring substr(size_t pos = 0, size_t len = npos) const; //allocate new string
     bool empty() const;
     void clear();
-    int compare(const DefaultChar* other) const;
-    int compare(const Zstring& other) const;
-    int compare(const size_t pos1, const size_t n1, const DefaultChar* other) const;
-    size_t find(const DefaultChar* str, const size_t pos = 0 ) const;
-    size_t find(const DefaultChar ch, const size_t pos = 0) const;
-    size_t rfind(const DefaultChar ch, size_t pos = npos) const;
+    int compare(size_t pos1, size_t n1, const DefaultChar* other) const;
+    size_t find(const DefaultChar* str, size_t pos = 0 ) const;
+    size_t find(DefaultChar ch, size_t pos = 0) const;
+    size_t rfind(DefaultChar ch, size_t pos = npos) const;
     Zstring& replace(size_t pos1, size_t n1, const DefaultChar* str, size_t n2);
     size_t size() const;
     void reserve(size_t minCapacity);
@@ -119,6 +115,14 @@ private:
     void initAndCopy(const DefaultChar* source, size_t length);
     void incRef() const; //support for reference-counting
     void decRef();       //
+
+    //helper methods
+    static size_t defaultLength (const DefaultChar* input); //strlen()
+    static int    defaultCompare(const DefaultChar* str1, const DefaultChar* str2); //strcmp()
+    static int    defaultCompare(const DefaultChar* str1, const DefaultChar* str2, size_t count); //strncmp()
+    static const DefaultChar* defaultStrFind(const DefaultChar* str1, DefaultChar ch); //strchr()
+    static const DefaultChar* defaultStrFind(const DefaultChar* str1, const DefaultChar* str1End, const DefaultChar* str2); //"analog" to strstr()
+    static bool matchesHelper(const DefaultChar* string, const DefaultChar* mask);
 
     struct StringDescriptor
     {
@@ -161,94 +165,83 @@ Zstring numberToZstring(const T& number); //convert number to Zstring
 //#######################################################################################
 //begin of implementation
 
-#ifdef ZSTRING_CHAR
+//-------------standard helper functions ---------------------------------------------------------------
 inline
-size_t defaultLength(const char* input)
+size_t Zstring::defaultLength(const DefaultChar* input) //strlen()
 {
-    return strlen(input);
+    const DefaultChar* const startPos = input;
+    while (*input != 0)
+        ++input;
+
+    return input - startPos;
 }
 
-inline
-int defaultCompare(const char* str1, const char* str2)
-{
-    return strcmp(str1, str2);
-}
 
 inline
-int defaultCompare(const char* str1, const char* str2, const size_t count)
+int Zstring::defaultCompare(const DefaultChar* str1, const DefaultChar* str2) //strcmp()
 {
-    return strncmp(str1, str2, count);
+    while (*str1 == *str2)
+    {
+        if (*str1 == 0)
+            return 0;
+        ++str1;
+        ++str2;
+    }
+
+    return *str1 - *str2;
 }
+
 
 inline
-const char* defaultStrFind(const char* str1, const char* str2)
+int Zstring::defaultCompare(const DefaultChar* str1, const DefaultChar* str2, size_t count) //strncmp()
 {
-    return strstr(str1, str2);
+    while (count-- != 0)
+    {
+        if (*str1 != *str2)
+            return *str1 - *str2;
+
+        if (*str1 == 0)
+            return 0;
+        ++str1;
+        ++str2;
+    }
+
+    return 0;
 }
+
 
 inline
-const char* defaultStrFind(const char* str1, int ch)
+const DefaultChar* Zstring::defaultStrFind(const DefaultChar* str1, DefaultChar ch) //strchr()
 {
-    return strchr(str1, ch);
+    while (*str1 != ch) //ch is allowed to be 0 by contract! must return end of string in this case
+    {
+        if (*str1 == 0)
+            return NULL;
+
+        ++str1;
+    }
+
+    return str1;
 }
+
 
 inline
-bool defaultIsWhiteSpace(const char ch)
+const DefaultChar* Zstring::defaultStrFind(const DefaultChar* str1, const DefaultChar* str1End, const DefaultChar* str2) //"analog" to strstr()
 {
-    // some compilers (e.g. VC++ 6.0) return true for a call to isspace('\xEA') => exclude char(128) to char(255)
-    return (static_cast<unsigned char>(ch) < 128) && isspace(static_cast<unsigned char>(ch)) != 0;
-}
+    const size_t str2Len = defaultLength(str2);
 
-//inline
-//char defaultToLower(const char ch)
-//{
-//    return tolower(static_cast<unsigned char>(ch)); //caution: although tolower() has int as input parameter it expects unsigned chars!
-//}
-//
-#elif defined ZSTRING_WIDE_CHAR
-inline
-size_t defaultLength(const wchar_t* input)
-{
-    return wcslen(input);
-}
+    str1End -= str2Len; //no need to process the "last chunk" of str1
+    ++str1End;          //
 
-inline
-int defaultCompare(const wchar_t* str1, const wchar_t* str2)
-{
-    return wcscmp(str1, str2);
+    while(str1 < str1End) //don't use !=; str1End may be smaller than str1!
+    {
+        if(::memcmp(str1, str2, str2Len * sizeof(DefaultChar)) == 0)
+            return str1;
+        ++str1;
+    }
+    return NULL;
 }
-
-inline
-int defaultCompare(const wchar_t* str1, const wchar_t* str2, const size_t count)
-{
-    return wcsncmp(str1, str2, count);
-}
-
-inline
-const wchar_t* defaultStrFind(const wchar_t* str1, const wchar_t* str2)
-{
-    return wcsstr(str1, str2);
-}
-
-inline
-const wchar_t* defaultStrFind(const wchar_t* str1, wchar_t ch)
-{
-    return wcschr(str1, ch);
-}
-
-inline
-bool defaultIsWhiteSpace(const wchar_t ch)
-{
-    // some compilers (e.g. VC++ 6.0) return true for a call to isspace('\xEA') => exclude char(128) to char(255)
-    return (ch < 128 || ch > 255) && iswspace(ch) != 0;
-}
-
-//inline
-//wchar_t defaultToLower(const wchar_t ch)
-//{
-//    return towlower(ch);
-//}
-#endif
+//--------------------------------------------------------------------------------------------------
 
 
 #ifdef __WXDEBUG__
@@ -408,10 +401,9 @@ Zstring& Zstring::operator=(const Zstring& source)
 inline
 size_t Zstring::Find(DefaultChar ch, bool fromEnd) const
 {
-    if (fromEnd)
-        return rfind(ch, npos);
-    else
-        return find(ch, 0);
+    return fromEnd ?
+           rfind(ch, npos) :
+           find(ch, 0);
 }
 
 
@@ -542,17 +534,16 @@ Zstring& Zstring::Truncate(size_t newLen)
 
 
 inline
-size_t Zstring::find(const DefaultChar* str, const size_t pos) const
+size_t Zstring::find(const DefaultChar* str, size_t pos) const
 {
     assert(pos <= length());
-    const DefaultChar* thisStr = c_str();
-    const DefaultChar* found = defaultStrFind(thisStr + pos, str);
-    return found == NULL ? npos : found - thisStr;
+    const DefaultChar* const found = defaultStrFind(c_str() + pos, c_str() + length(),  str);
+    return found == NULL ? npos : found - c_str();
 }
 
 
 inline
-size_t Zstring::find(const DefaultChar ch, const size_t pos) const
+size_t Zstring::find(DefaultChar ch, size_t pos) const
 {
     assert(pos <= length());
     const DefaultChar* thisStr = c_str();
@@ -562,65 +553,51 @@ size_t Zstring::find(const DefaultChar ch, const size_t pos) const
 
 
 inline
-bool Zstring::operator == (const Zstring& other) const
+bool Zstring::operator==(const Zstring& other) const
 {
-    return length() != other.length() ? false : defaultCompare(c_str(), other.c_str()) == 0;
+    return length() != other.length() ? false : defaultCompare(c_str(), other.c_str()) == 0; //memcmp() offers no better performance here...
 }
 
 
 inline
-bool Zstring::operator == (const DefaultChar* other) const
+bool Zstring::operator==(const DefaultChar* other) const
 {
     return defaultCompare(c_str(), other) == 0; //overload using strcmp(char*, char*) should be fastest!
 }
 
 
 inline
-bool Zstring::operator < (const Zstring& other) const
+bool Zstring::operator<(const Zstring& other) const
 {
     return defaultCompare(c_str(), other.c_str()) < 0;
 }
 
 
 inline
-bool Zstring::operator < (const DefaultChar* other) const
+bool Zstring::operator<(const DefaultChar* other) const
 {
     return defaultCompare(c_str(), other) < 0; //overload using strcmp(char*, char*) should be fastest!
 }
 
 
 inline
-bool Zstring::operator != (const Zstring& other) const
+bool Zstring::operator!=(const Zstring& other) const
 {
-    return length() != other.length() ? true: defaultCompare(c_str(), other.c_str()) != 0;
+    return !(*this==other);
 }
 
 
 inline
-bool Zstring::operator != (const DefaultChar* other) const
+bool Zstring::operator!=(const DefaultChar* other) const
 {
-    return defaultCompare(c_str(), other) != 0; //overload using strcmp(char*, char*) should be fastest!
+    return !(*this==other);
 }
 
 
 inline
-int Zstring::compare(const Zstring& other) const
+int Zstring::compare(size_t pos1, size_t n1, const DefaultChar* other) const
 {
-    return defaultCompare(c_str(), other.c_str()); //overload using strcmp(char*, char*) should be fastest!
-}
-
-
-inline
-int Zstring::compare(const DefaultChar* other) const
-{
-    return defaultCompare(c_str(), other); //overload using strcmp(char*, char*) should be fastest!
-}
-
-
-inline
-int Zstring::compare(const size_t pos1, const size_t n1, const DefaultChar* other) const
-{
-    assert(length() - pos1 >= n1);
+    assert(n1 <= length() - pos1);
     return defaultCompare(c_str() + pos1, other, n1);
 }
 

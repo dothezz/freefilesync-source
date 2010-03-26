@@ -10,7 +10,7 @@
 #include "../library/resources.h"
 #include "../algorithm.h"
 #include "../shared/stringConv.h"
-#include "util.h"
+#include "../shared/util.h"
 #include "../synchronization.h"
 #include "../library/customGrid.h"
 #include "../shared/customButton.h"
@@ -617,8 +617,7 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
     SyncPreviewDlgGenerated(parentWindow),
     m_dontShowAgain(dontShowAgain)
 {
-    using FreeFileSync::includeNumberSeparator;
-    using globalFunctions::numberToWxString;
+    using FreeFileSync::numberToWxString;
 
     m_buttonStartSync->setBitmapFront(GlobalResources::getInstance().getImageByName(wxT("startSync")));
     m_bitmapCreate->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("create")));
@@ -629,13 +628,13 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
     m_staticTextVariant->SetLabel(variantName);
     m_textCtrlData->SetValue(FreeFileSync::formatFilesizeToShortString(statistics.getDataToProcess()));
 
-    m_textCtrlCreateL->SetValue(includeNumberSeparator(numberToWxString(statistics.getCreate(   true, false))));
-    m_textCtrlUpdateL->SetValue(includeNumberSeparator(numberToWxString(statistics.getOverwrite(true, false))));
-    m_textCtrlDeleteL->SetValue(includeNumberSeparator(numberToWxString(statistics.getDelete(   true, false))));
+    m_textCtrlCreateL->SetValue(numberToWxString(statistics.getCreate(   true, false), true));
+    m_textCtrlUpdateL->SetValue(numberToWxString(statistics.getOverwrite(true, false), true));
+    m_textCtrlDeleteL->SetValue(numberToWxString(statistics.getDelete(   true, false), true));
 
-    m_textCtrlCreateR->SetValue(includeNumberSeparator(numberToWxString(statistics.getCreate(   false, true))));
-    m_textCtrlUpdateR->SetValue(includeNumberSeparator(numberToWxString(statistics.getOverwrite(false, true))));
-    m_textCtrlDeleteR->SetValue(includeNumberSeparator(numberToWxString(statistics.getDelete(   false, true))));
+    m_textCtrlCreateR->SetValue(numberToWxString(statistics.getCreate(   false, true), true));
+    m_textCtrlUpdateR->SetValue(numberToWxString(statistics.getOverwrite(false, true), true));
+    m_textCtrlDeleteR->SetValue(numberToWxString(statistics.getDelete(   false, true), true));
 
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
 

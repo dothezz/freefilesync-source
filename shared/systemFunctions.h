@@ -12,11 +12,11 @@
 
 namespace FreeFileSync
 {
-
+//evaluate GetLastError()/errno and assemble specific error message
 #ifdef FFS_WIN
-wxString getLastErrorFormatted(unsigned long lastError = 0); //try to get additional Windows error information
+wxString getLastErrorFormatted(unsigned long lastError = 0);
 #elif defined FFS_LINUX
-wxString getLastErrorFormatted(int lastError = 0); //try to get additional Linux error information
+wxString getLastErrorFormatted(int lastError = 0);
 #endif
 }
 

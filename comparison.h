@@ -9,8 +9,8 @@
 
 #include "fileHierarchy.h"
 #include "library/processXml.h"
+#include "library/statusHandler.h"
 
-class StatusHandler;
 
 namespace FreeFileSync
 {

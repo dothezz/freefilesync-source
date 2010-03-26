@@ -123,6 +123,7 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
         {
             //#warning moving long file paths to recycler does not work! clarify!
             //filenameDoubleNull += removeLongPathPrefix(*i); //::SHFileOperation() can't handle \\?\-prefix!
+            //You should use fully-qualified path names with this function. Using it with relative path names is not thread safe.
             filenameDoubleNull += *i; //::SHFileOperation() can't handle \\?\-prefix!
             filenameDoubleNull += DefaultChar(0);
         }
@@ -164,7 +165,7 @@ void FreeFileSync::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileE
         return; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
 
 #ifdef RECYCLER_GIO
-    boost::shared_ptr<GFile> fileObj(g_file_new_for_path(fileToDelete.c_str()), &g_object_unref);
+    boost::shared_ptr<GFile> fileObj(g_file_new_for_path(fileToDelete.c_str()), &g_object_unref); //g_file_new_for_path never fails => g_object_unref can always be safely called
     GError* error = NULL;
     if (g_file_trash(fileObj.get(), NULL, &error) == FALSE)
     {
@@ -199,8 +200,7 @@ bool FreeFileSync::recycleBinExists()
 #elif defined RECYCLER_NONE
     return false;
 #else
-you have to choose a recycler!
+    you have to choose a recycler!
 #endif
-
 #endif
 }

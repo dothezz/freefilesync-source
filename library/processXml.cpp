@@ -6,15 +6,11 @@
 //
 #include "processXml.h"
 #include "../shared/xmlBase.h"
-#include <wx/filefn.h>
 #include <wx/intl.h>
+#include <wx/filefn.h>
 #include "../shared/globalFunctions.h"
 #include "../shared/standardPaths.h"
 #include "../shared/stringConv.h"
-
-#ifdef FFS_WIN
-#include <wx/msw/wrapwin.h> //includes "windows.h"
-#endif
 
 using namespace FreeFileSync;
 using namespace xmlAccess; //functionally needed!!!
@@ -57,17 +53,16 @@ void xmlAccess::readGuiConfig(const wxString& filename, xmlAccess::XmlGuiConfig&
 {
     //load XML
     if (!wxFileExists(filename))
-        throw XmlError(wxString(_("File does not exist:")) + wxT(" \"") + filename + wxT("\""));
+        throw XmlError(wxString(_("File does not exist:")) + wxT("\n\"") + filename + wxT("\""));
 
     TiXmlDocument doc;
-    if (!loadXmlDocument(filename, XML_GUI_CONFIG, doc))
-        throw XmlError(wxString(_("Error reading file:")) + wxT(" \"") + filename + wxT("\""));
+    loadXmlDocument(filename, XML_GUI_CONFIG, doc); //throw (XmlError)
 
     FfsXmlParser parser(doc.RootElement());
     parser.readXmlGuiConfig(config); //read GUI layout configuration
 
     if (parser.errorsOccured())
-        throw XmlError(wxString(_("Error parsing configuration file:")) + wxT(" \"") + filename + wxT("\"\n\n") +
+        throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\"\n\n") +
                        parser.getErrorMessageFormatted(), XmlError::WARNING);
 }
 
@@ -76,17 +71,16 @@ void xmlAccess::readBatchConfig(const wxString& filename, xmlAccess::XmlBatchCon
 {
     //load XML
     if (!wxFileExists(filename))
-        throw XmlError(wxString(_("File does not exist:")) + wxT(" \"") + filename + wxT("\""));
+        throw XmlError(wxString(_("File does not exist:")) + wxT("\n\"") + filename + wxT("\""));
 
     TiXmlDocument doc;
-    if (!loadXmlDocument(filename, XML_BATCH_CONFIG, doc))
-        throw XmlError(wxString(_("Error reading file:")) + wxT(" \"") + filename + wxT("\""));
+    loadXmlDocument(filename, XML_BATCH_CONFIG, doc); //throw (XmlError)
 
     FfsXmlParser parser(doc.RootElement());
     parser.readXmlBatchConfig(config); //read GUI layout configuration
 
     if (parser.errorsOccured())
-        throw XmlError(wxString(_("Error parsing configuration file:")) + wxT(" \"") + filename + wxT("\"\n\n") +
+        throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\"\n\n") +
                        parser.getErrorMessageFormatted(), XmlError::WARNING);
 }
 
@@ -95,17 +89,16 @@ void xmlAccess::readGlobalSettings(xmlAccess::XmlGlobalSettings& config)
 {
     //load XML
     if (!wxFileExists(getGlobalConfigFile()))
-        throw XmlError(wxString(_("File does not exist:")) + wxT(" \"") + getGlobalConfigFile() + wxT("\""));
+        throw XmlError(wxString(_("File does not exist:")) + wxT("\n\"") + getGlobalConfigFile() + wxT("\""));
 
     TiXmlDocument doc;
-    if (!loadXmlDocument(getGlobalConfigFile(), XML_GLOBAL_SETTINGS, doc))
-        throw XmlError(wxString(_("Error reading file:")) + wxT(" \"") + getGlobalConfigFile() + wxT("\""));
+    loadXmlDocument(getGlobalConfigFile(), XML_GLOBAL_SETTINGS, doc); //throw (XmlError)
 
     FfsXmlParser parser(doc.RootElement());
     parser.readXmlGlobalSettings(config); //read GUI layout configuration
 
     if (parser.errorsOccured())
-        throw XmlError(wxString(_("Error parsing configuration file:")) + wxT(" \"") + getGlobalConfigFile() + wxT("\"\n\n") +
+        throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + getGlobalConfigFile() + wxT("\"\n\n") +
                        parser.getErrorMessageFormatted(), XmlError::WARNING);
 }
 
@@ -116,10 +109,10 @@ void xmlAccess::writeGuiConfig(const XmlGuiConfig& outputCfg, const wxString& fi
     getDefaultXmlDocument(XML_GUI_CONFIG, doc);
 
     //populate and write XML tree
-    if (    !writeXmlGuiConfig(outputCfg, doc) || //add GUI layout configuration settings
-            !saveXmlDocument(filename, doc)) //save XML
-        throw XmlError(wxString(_("Error writing file:")) + wxT(" \"") + filename + wxT("\""));
-    return;
+    if (!writeXmlGuiConfig(outputCfg, doc)) //add GUI layout configuration settings
+        throw XmlError(wxString(_("Error writing file:")) + wxT("\n\"") + filename + wxT("\""));
+
+    saveXmlDocument(filename, doc); //throw (XmlError)
 }
 
 
@@ -129,10 +122,10 @@ void xmlAccess::writeBatchConfig(const XmlBatchConfig& outputCfg, const wxString
     getDefaultXmlDocument(XML_BATCH_CONFIG, doc);
 
     //populate and write XML tree
-    if (    !writeXmlBatchConfig(outputCfg, doc) || //add batch configuration settings
-            !saveXmlDocument(filename, doc)) //save XML
-        throw XmlError(wxString(_("Error writing file:")) + wxT(" \"") + filename + wxT("\""));
-    return;
+    if (!writeXmlBatchConfig(outputCfg, doc)) //add batch configuration settings
+        throw XmlError(wxString(_("Error writing file:")) + wxT("\n\"") + filename + wxT("\""));
+
+    saveXmlDocument(filename, doc); //throw (XmlError)
 }
 
 
@@ -142,10 +135,10 @@ void xmlAccess::writeGlobalSettings(const XmlGlobalSettings& outputCfg)
     getDefaultXmlDocument(XML_GLOBAL_SETTINGS, doc);
 
     //populate and write XML tree
-    if (    !writeXmlGlobalSettings(outputCfg, doc) || //add GUI layout configuration settings
-            !saveXmlDocument(getGlobalConfigFile(), doc)) //save XML
-        throw XmlError(wxString(_("Error writing file:")) + wxT(" \"") + getGlobalConfigFile() + wxT("\""));
-    return;
+    if (!writeXmlGlobalSettings(outputCfg, doc)) //add GUI layout configuration settings
+        throw XmlError(wxString(_("Error writing file:")) + wxT("\n\"") + getGlobalConfigFile() + wxT("\""));
+
+    saveXmlDocument(getGlobalConfigFile(), doc); //throw (XmlError)
 }
 
 
@@ -298,7 +291,7 @@ void FfsXmlParser::readXmlLocalConfig(const TiXmlElement& folderPair, FolderPair
 
 void FfsXmlParser::readXmlMainConfig(MainConfiguration& mainCfg)
 {
-    TiXmlHandleConst hRoot(root); //custom const handle: TiXml API seems broken in this regard
+    TiXmlHandleConst hRoot(getRoot()); //custom const handle: TiXml API seems broken in this regard
 
 //###########################################################
     const TiXmlElement* cmpSettings  = hRoot.FirstChild("MainConfig").FirstChild("Comparison").ToElement();
@@ -378,7 +371,7 @@ void FfsXmlParser::readXmlGuiConfig(xmlAccess::XmlGuiConfig& outputCfg)
     readXmlMainConfig(outputCfg.mainCfg);
 
     //read GUI specific config data
-    const TiXmlElement* guiConfig = TiXmlHandleConst(root).FirstChild("GuiConfig").ToElement();
+    const TiXmlElement* guiConfig = TiXmlHandleConst(getRoot()).FirstChild("GuiConfig").ToElement();
 
     readXmlElementLogging("HideFiltered", guiConfig, outputCfg.hideFilteredElements);
 
@@ -396,7 +389,7 @@ void FfsXmlParser::readXmlBatchConfig(xmlAccess::XmlBatchConfig& outputCfg)
     readXmlMainConfig(outputCfg.mainCfg);
 
     //read batch specific config
-    const TiXmlElement* batchConfig = TiXmlHandleConst(root).FirstChild("BatchConfig").ToElement();
+    const TiXmlElement* batchConfig = TiXmlHandleConst(getRoot()).FirstChild("BatchConfig").ToElement();
 
     readXmlElementLogging("Silent", batchConfig, outputCfg.silent);
     readXmlElementLogging("LogfileDirectory", batchConfig, outputCfg.logFileDirectory);
@@ -407,7 +400,7 @@ void FfsXmlParser::readXmlBatchConfig(xmlAccess::XmlBatchConfig& outputCfg)
 void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg)
 {
     //read global settings
-    const TiXmlElement* global = TiXmlHandleConst(root).FirstChild("Shared").ToElement();
+    const TiXmlElement* global = TiXmlHandleConst(getRoot()).FirstChild("Shared").ToElement();
 
     //try to read program language setting
     readXmlElementLogging("Language", global, outputCfg.programLanguage);
@@ -418,11 +411,8 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
     //copy locked files using VSS
     readXmlElementLogging("CopyLockedFiles", global, outputCfg.copyLockedFiles);
 
-    //last update check
-    readXmlElementLogging("LastCheckForUpdates", global, outputCfg.lastUpdateCheck);
 
-
-    const TiXmlElement* optionalDialogs = TiXmlHandleConst(root).FirstChild("Shared").FirstChild("ShowOptionalDialogs").ToElement();
+    const TiXmlElement* optionalDialogs = TiXmlHandleConst(getRoot()).FirstChild("Shared").FirstChild("ShowOptionalDialogs").ToElement();
 
     //folder dependency check
     readXmlElementLogging("CheckForDependentFolders", optionalDialogs, outputCfg.optDialogs.warningDependentFolders);
@@ -441,7 +431,8 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
 
 
     //gui specific global settings (optional)
-    const TiXmlElement* mainWindow = TiXmlHandleConst(root).FirstChild("Gui").FirstChild("Windows").FirstChild("Main").ToElement();
+    const TiXmlElement* gui = TiXmlHandleConst(getRoot()).FirstChild("Gui").ToElement();
+    const TiXmlElement* mainWindow = TiXmlHandleConst(gui).FirstChild("Windows").FirstChild("Main").ToElement();
 
     //read application window size and position
     readXmlElementLogging("Width",     mainWindow, outputCfg.gui.widthNotMaximized);
@@ -509,8 +500,6 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
     readXmlElementLogging("SelectedTabBottomLeft", mainWindow, outputCfg.gui.selectedTabBottomLeft);
 
 
-    const TiXmlElement* gui = TiXmlHandleConst(root).FirstChild("Gui").ToElement();
-
     //external applications
     const TiXmlElement* extApps = TiXmlHandleConst(gui).FirstChild("ExternalApplications").FirstChild("Commandline").ToElement();
     if (extApps)
@@ -530,13 +519,16 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
         }
     }
     //load config file history
-    const TiXmlElement* cfgHistory = TiXmlHandleConst(root).FirstChild("Gui").FirstChild("ConfigHistory").ToElement();
+    const TiXmlElement* cfgHistory = TiXmlHandleConst(gui).FirstChild("ConfigHistory").ToElement();
 
     //load max. history size
     readXmlAttributeLogging("MaximumSize", cfgHistory, outputCfg.gui.cfgHistoryMax);
 
     //load config history elements
     readXmlElementLogging("File", cfgHistory, outputCfg.gui.cfgFileHistory);
+
+    //last update check
+    readXmlElementLogging("LastUpdateCheck", gui, outputCfg.gui.lastUpdateCheck);
 
 
     //batch specific global settings
@@ -818,9 +810,6 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
     //copy locked files using VSS
     addXmlElement("CopyLockedFiles", inputCfg.copyLockedFiles, global);
 
-    //last update check
-    addXmlElement("LastCheckForUpdates", inputCfg.lastUpdateCheck, global);
-
 
     //optional dialogs
     TiXmlElement* optionalDialogs = new TiXmlElement("ShowOptionalDialogs");
@@ -942,6 +931,10 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
 
     addXmlAttribute("MaximumSize", inputCfg.gui.cfgHistoryMax, cfgHistory);
     addXmlElement("File", inputCfg.gui.cfgFileHistory, cfgHistory);
+
+
+    //last update check
+    addXmlElement("LastUpdateCheck", inputCfg.gui.lastUpdateCheck, gui);
 
     //###################################################################
     //write global batch settings

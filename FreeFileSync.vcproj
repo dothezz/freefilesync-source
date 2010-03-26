@@ -50,11 +50,13 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough="$(ProjectDir)library\pch.h"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
-				DisableSpecificWarnings="4804;4100"
+				DisableSpecificWarnings="4100"
+				ForcedIncludeFiles="$(ProjectDir)library/pch.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -136,11 +138,13 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough="$(ProjectDir)library\pch.h"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				DisableSpecificWarnings="4804;4100"
+				DisableSpecificWarnings="4100"
+				ForcedIncludeFiles="$(ProjectDir)library/pch.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -224,7 +228,7 @@
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				DebugInformationFormat="3"
-				DisableSpecificWarnings="4804;4100"
+				DisableSpecificWarnings="4100"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -309,7 +313,7 @@
 				WarningLevel="4"
 				SuppressStartupBanner="false"
 				DebugInformationFormat="3"
-				DisableSpecificWarnings="4804;4100"
+				DisableSpecificWarnings="4100"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -411,6 +415,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\library\dbFile.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\shared\dllLoader.cpp"
 				>
 			</File>
@@ -432,6 +440,10 @@
 			</File>
 			<File
 				RelativePath=".\shared\fileID.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\shared\fileIO.cpp"
 				>
 			</File>
 			<File
@@ -559,6 +571,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\library\softFilter.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\shared\standardPaths.cpp"
 				>
 			</File>
@@ -580,6 +596,10 @@
 			</File>
 			<File
 				RelativePath=".\shared\systemFunctions.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\shared\taskbar.cpp"
 				>
 			</File>
 			<File
@@ -607,7 +627,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ui\util.cpp"
+				RelativePath=".\shared\util.cpp"
 				>
 			</File>
 			<File

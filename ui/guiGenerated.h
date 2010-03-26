@@ -682,7 +682,6 @@ class AboutDlgGenerated : public wxDialog
 		
 		wxPanel* m_panel5;
 		wxStaticBitmap* m_bitmap11;
-		wxStaticText* m_staticText15;
 		wxStaticText* m_build;
 		
 		wxScrolledWindow* m_scrolledWindowCodeInfo;

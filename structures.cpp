@@ -122,7 +122,7 @@ void FreeFileSync::setVariant(SyncConfiguration& syncCfg, const SyncConfiguratio
         syncCfg.conflict        = SYNC_DIR_NONE;
         break;
     case SyncConfiguration::CUSTOM:
-    assert(false);
+        assert(false);
         break;
     }
 }

@@ -9,11 +9,11 @@
 #include "systemFunctions.h"
 #include <wx/intl.h>
 #include "stringConv.h"
+#include <boost/shared_ptr.hpp>
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "longPathPrefix.h"
-#include <boost/shared_ptr.hpp>
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
@@ -23,6 +23,38 @@
 
 
 #ifdef FFS_WIN
+//Note: this class is superfluous for 64 bit applications!
+//class DisableWow64Redirection
+//{
+//public:
+//    DisableWow64Redirection() :
+//        wow64DisableWow64FsRedirection(Utility::loadDllFunction<Wow64DisableWow64FsRedirectionFunc>(L"kernel32.dll", "Wow64DisableWow64FsRedirection")),
+//        wow64RevertWow64FsRedirection(Utility::loadDllFunction<Wow64RevertWow64FsRedirectionFunc>(L"kernel32.dll", "Wow64RevertWow64FsRedirection")),
+//        oldValue(NULL)
+//    {
+//        if (    wow64DisableWow64FsRedirection &&
+//                wow64RevertWow64FsRedirection)
+//            (*wow64DisableWow64FsRedirection)(&oldValue); //__out  PVOID *OldValue
+//    }
+//
+//    ~DisableWow64Redirection()
+//    {
+//        if (    wow64DisableWow64FsRedirection &&
+//                wow64RevertWow64FsRedirection)
+//            (*wow64RevertWow64FsRedirection)(oldValue); //__in  PVOID OldValue
+//    }
+//
+//private:
+//    typedef BOOL (WINAPI *Wow64DisableWow64FsRedirectionFunc)(PVOID* OldValue);
+//    typedef BOOL (WINAPI *Wow64RevertWow64FsRedirectionFunc)(PVOID OldValue);
+//
+//    const Wow64DisableWow64FsRedirectionFunc wow64DisableWow64FsRedirection;
+//    const Wow64RevertWow64FsRedirectionFunc  wow64RevertWow64FsRedirection;
+//
+//    PVOID oldValue;
+//};
+
+
 inline
 void setWin32FileInformation(const FILETIME& lastWriteTime,
                              const DWORD fileSizeHigh,
@@ -53,7 +85,7 @@ bool setWin32FileInformationFromSymlink(const Zstring linkName, FreeFileSync::Tr
     if (hFile == INVALID_HANDLE_VALUE)
         return false;
 
-                 boost::shared_ptr<void> dummy(hFile, ::CloseHandle);
+    boost::shared_ptr<void> dummy(hFile, ::CloseHandle);
 
     BY_HANDLE_FILE_INFORMATION fileInfoByHandle;
 
@@ -66,21 +98,6 @@ bool setWin32FileInformationFromSymlink(const Zstring linkName, FreeFileSync::Tr
     setWin32FileInformation(fileInfoByHandle.ftLastWriteTime, fileInfoByHandle.nFileSizeHigh, fileInfoByHandle.nFileSizeLow, output);
     return true;
 }
-
-#elif defined FFS_LINUX
-class CloseDirOnExit
-{
-public:
-    CloseDirOnExit(DIR* dir) : m_dir(dir) {}
-
-    ~CloseDirOnExit()
-    {
-        ::closedir(m_dir); //no error handling here
-    }
-
-private:
-    DIR* m_dir;
-};
 #endif
 
 
@@ -130,7 +147,7 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
         }
     }
 
-boost::shared_ptr<void> dummy(searchHandle, ::FindClose);
+    boost::shared_ptr<void> dummy(searchHandle, ::FindClose);
 
     do
     {
@@ -168,8 +185,9 @@ boost::shared_ptr<void> dummy(searchHandle, ::FindClose);
 
             if (fileMetaData.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) //dereference symlinks!
             {
-                if (!setWin32FileInformationFromSymlink(fullName, details)) //broken symlink
+                if (!setWin32FileInformationFromSymlink(fullName, details))
                 {
+                    //broken symlink...
                     details.lastWriteTimeRaw = 0; //we are not interested in the modifiation time of the link
                     details.fileSize         = 0;
                 }
@@ -216,7 +234,8 @@ boost::shared_ptr<void> dummy(searchHandle, ::FindClose);
             return true;
         }
     }
-    CloseDirOnExit dummy(dirObj);
+
+    boost::shared_ptr<DIR> dummy(dirObj, &::closedir); //never close NULL handles! -> crash
 
     while (true)
     {
