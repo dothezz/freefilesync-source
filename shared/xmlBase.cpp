@@ -135,6 +135,8 @@ void xmlAccess::loadXmlDocument(const wxString& filename, const xmlAccess::XmlTy
 
     if (!inputStream.empty())
     {
+		inputStream.push_back(0);
+
         //convert (0xD, 0xA) and (0xD) to (0xA): just like in TiXmlDocument::LoadFile(); not sure if actually needed
         ::normalize(inputStream);
 
