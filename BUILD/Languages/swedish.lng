@@ -22,8 +22,6 @@
  sek.
 %x / %y objects deleted successfully
 %x / %y objekt borttagna
-%x Percent
-%x Procent
 %x directories
 %x kataloger
 %x files,
@@ -34,6 +32,8 @@
 %x rader av %y i vyn
 %x of 1 row in view
 %x av 1 rad i vyn
+%x%
+%x%
 &Abort
 &Avbryt
 &About...
@@ -86,14 +86,14 @@
 &Försök igen
 &Save
 &Spara
+&Switch
+&Växla
 &Yes
 &Ja
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Notera att endast FAT/FAT32-formaterade diskar berörs av detta problem!\nI alla andra fall kan du inaktivera alternativet \"Ignorera sommartid\".)
 (Requires an Internet connection!)
 (Kräver Internetuppkoppling!)
-,
-,
 - Other side's counterpart to %dir
 - Andra sidans motsvarighet till %dir
 - Other side's counterpart to %name
@@ -122,10 +122,6 @@
 - höger
 - right newer
 - höger nyare
--Open-Source file synchronization-
--Öppen källkod filsynkronisering-
-.
-.
 /sec
 /s
 1 directory
@@ -168,8 +164,6 @@ About
 Om
 Action
 Aktivitet
-Activate filter
-Aktivera filter
 Add folder
 Lägg till katalog
 Add folder pair
@@ -188,8 +182,6 @@ At least one directory input field is empty.
 Minst 1 adressfält är tomt.
 Auto-adjust columns
 Autojustera kollumner
-Automatic mode
-Autoläge
 Batch execution
 Batch-körning
 Batch file created successfully!
@@ -202,6 +194,8 @@ Both sides have changed since last synchronization!
 Båda sidor har ändrats sedan senaste synkroniseringen!
 Browse
 Bläddra
+Browse directory
+Sök upp katalog
 Build:
 Bygg:
 Cannot determine sync-direction:
@@ -210,6 +204,8 @@ Cannot find %x
 Kan inte hitta %x
 Category
 Kategori
+Clear filter settings
+Rensa filterinställningar
 Comma separated list
 Komma-separerad lista
 Command line
@@ -226,8 +222,6 @@ Compare by \"File size and date\"
 Jämför: \"Filstorlek och datum\"
 Compare by...
 Jämför...
-Comparing content
-Jämför innehåll
 Comparing content of files %x
 Jämför filinnehåll för %x
 Comparing content...
@@ -294,8 +288,6 @@ Create a batch job
 Skapa ett batch-jobb
 Creating folder %x
 Skapar katalog %x
-Current operation:
-Aktuell uppgift:
 Custom
 Anpassat
 Customize columns
@@ -306,10 +298,6 @@ D-Click
 Håll ner D
 DECISION TREE
 BESLUTSTRÄD
-Data remaining:
-Återstående data:
-Data transferred:
-Överförd data:
 Data verification error: Source and target file have different content!
 Verifikationsfel: Källfil och målfil har olika innehåll!
 Date
@@ -364,10 +352,14 @@ Download now?
 Ladda ner nu?
 Drag && drop
 Dra && släpp
+Elements found:
+Funna poster:
+Elements processed:
+Processade poster
+Elements remaining:
+Återstående poster:
 Email
 e-post
-Enable filter to exclude files from synchronization
-Aktivera filter för att undanta filer från synkronisering
 Endless loop when traversing directory:
 Oändlig loop vid accessförsök på katalog:
 Error
@@ -462,38 +454,30 @@ Files are found equal if\n     - file content\nis the same
 Filerna betecknas som lika om, \n     - filinnehållet\när lika
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
 Filerna betecknas som lika om, \n     - filstorlek\n     - 'senast använd' och datum\när lika
-Files remaining:
-Filer kvar:
 Files that are equal on both sides
 Filer som är lika på båda sidor
-Files that exist on both sides and have different content
-Filer som finns på båda sidor och har olika innehåll
 Files that exist on both sides, left one is newer
 Filer som finns på båda sidor, vänster är nyare
 Files that exist on both sides, right one is newer
 Filer som finns på båda sidor, höger är nyare
-Files/folders found:
-Funna filer/kataloger:
-Files/folders processed:
-Filer/kataloger klara:
-Files/folders remaining:
-Filer/kataloger kvar:
+Files that have different content
+Filer som har olika innehåll
 Files/folders that exist on left side only
 Filer/kataloger som finns på vänster sida enbart
 Files/folders that exist on right side only
 Filer/kataloger som finns på höger sida enbart
-Filter
-Filter
 Filter files
 Undantag
-Filter has been selected
-Filter aktiverat
+Filter is active
+Filter är aktiverat
 Filter settings have changed!
 Filterinställningar har ändrats!
 Filter view
 Filtervy
-Filtering is deactivated
-Filter inaktiverat
+Filter: All pairs
+Filter: Generella undantag
+Filter: Single pair
+Filter: Enstaka undantag
 Find
 Sök
 Find what:
@@ -502,8 +486,6 @@ Folder Comparison and Synchronization
 Katalogjämförelse och synkronisering
 Free disk space available:
 Ledigt diskutrymme:
-FreeFileSync - Folder Comparison and Synchronization
-FreeFileSync - Jämför och Synkronisera
 FreeFileSync Batch Job
 FreeFileSync Batch-jobb
 FreeFileSync at Sourceforge
@@ -520,8 +502,6 @@ Generating database...
 Skapar databas...
 Generating file list...
 Skapar fillista...
-Global filter
-Allmänt filter
 Global settings
 Allmäna inställningar
 Help
@@ -578,12 +558,10 @@ Ignore errors
 Ignorera fel
 Ignore subsequent errors
 Ignorera följdfel
-Ignore this error, retry or abort synchronization?
-Ignorera felet, försök igen eller avbryt synkroniseringen?
-Ignore this error, retry or abort?
-Ignorera felet, försök igen eller avbryt?
 Include
 Inkludera
+Include Symbolic Links
+Inkludera symboliska länkar
 Include all rows
 Inkludera alla rader
 Include temporarily
@@ -600,8 +578,6 @@ Initial synchronization:
 Initial synkronisering:
 Integrate external applications into context menu. The following macros are available:
 Integrera externa program i högerklicksmeny. Följande variabler finns tillgängliga:
-Last synchronization not completed!
-Senaste synkronisering ej slutförd!
 Leave as unresolved conflict
 Ignorera konflikt
 Left
@@ -612,8 +588,6 @@ Load configuration from file
 Hämta inställningar från fil 
 Load configuration history (press DEL to delete items)
 Konfigurationshistoria (Tryck DEL för att ta bort objekt)
-Local filter
-Lokalt filter
 Log-messages:
 Log-meddelanden:
 Logging
@@ -659,17 +633,15 @@ Antal filer och kataloger som kommer att tas bort
 Number of files that will be overwritten
 Antal filer som kommer att skrivas över
 One of the FreeFileSync database entries within the following file is not yet existing:
-Ett av FreeFileSync´s databasobjekt i följande fil saknas:
+Ett av FreeFileSyncs databasobjekt saknas i följande fil:
 One of the FreeFileSync database files is not yet existing:
-En av FreeFileSync´s databasfiler saknas:
+En av FreeFileSyncs databasfiler saknas:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Endast filer/kataloger som kvarstår efter filtrering, kommer att markeras för synkronisering.
-Open directly
-Öppna fil
 Open with Explorer
 Öppna katalog
-Open with Konqueror
-Öppna med Konqueror
+Open with default application
+Öppna med standardprogram
 Operation aborted!
 Processen avbruten!
 Operation:
@@ -680,8 +652,12 @@ Pause
 Paus
 Paused
 Pausad
+Planned directory deletion is in conflict with its subdirectories and -files!
+Planerad katalogborttagning är i konflikt med sina underkataloger och filer
 Please run a Compare first before synchronizing!
 Du måste trycka \"Jämför\" innan du kan synkronisera. 
+Press \"Switch\" to open FreeFileSync GUI modus.
+Tryck på \"Växla\" för att öppna FreeFileSyncs grafiska läge
 Processing folder pair:
 Processar katalogpar:
 Published under the GNU General Public License:
@@ -697,7 +673,7 @@ RealtimeSync - Automatiserad synkronisering
 RealtimeSync configuration
 RealtimeSync konfiguration
 Recycle Bin not yet supported for this system!
-
+Stödet för papperskorg finns ännu inte i detta system
 Relative path
 Sökväg
 Remove alternate settings
@@ -706,8 +682,6 @@ Remove folder
 Ta bort katalog
 Remove folder pair
 Ta bort katalogpar
-Remove local filter settings
-Ta bort lokala filterinställningar
 Renaming file %x to %y
 Byter namn på %x till %y
 Report translation error
@@ -740,7 +714,7 @@ Select variant:
 Välj variant:
 Set direction:
 Ange riktning:
-Setting default synchronization directions: Old files will be overwritten by newer files.
+Setting default synchronization directions: Old files will be overwritten with newer files.
 Standardsynkronisering: Gamla filer kommer att skrivas över av nyare versioner.
 Show conflicts
 Visa konflikter
@@ -794,10 +768,14 @@ Start synchronization
 Starta synkronisering
 Statistics
 Statistik
+Status feedback
+Status
 Stop
 Stopp
 Swap sides
 Byt sida
+Switching to FreeFileSync GUI modus...
+Växlar till FreeFileSyncs grafiska läge
 Synchronization Preview
 Förhandsvisning
 Synchronization aborted!
@@ -812,8 +790,6 @@ Synchronization status
 Synkroniseringsstatus
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Synkronisera alla filer, .doc, .zip och .exe men inga undermappar \"temp\".
-Synchronize both sides using a database. Deletions are detected automatically
-Synkronisera båda sidor med hjälp av databas. Borttagningar upptäcks automatiskt
 Synchronize...
 Synkronisera
 Synchronizing...
@@ -828,6 +804,8 @@ The command line is executed each time:\n- a directory becomes available (e.g. U
 Kommandot kommer att verkställas varje gång:\n- målkatalogen blir tillgänglig (t.ex USB-anslutning)\n- filer i dessa kataloger eller underkataloger ändras
 The file does not contain a valid configuration:
 Filen är ingen giltig konfigureringsfil:
+The file was not processed by last synchronization!
+Filen bearbetades inte vid senaste synkroniseringen
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Denna variant betecknar 2 filer med samma namn som lika, när dom har samma storlek OCH samma tidsstämpling.
 Time
@@ -868,6 +846,8 @@ Verifying file %x
 Verifierar %x
 Volume name %x not part of filename %y!
 Volymnamn %x saknas i filnamn %y!
+Waiting for all directories to become available...
+Väntar på att alla sökvägar skall bli åtkommliga...
 Warning
 Varning
 Warning: Synchronization failed for %x item(s):

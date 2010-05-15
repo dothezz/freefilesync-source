@@ -43,7 +43,7 @@ const wxString& FreeFileSync::getResourceDir()
         isInitalized = true;
 
         if (isPortableVersion())
-            return getBinaryDir();
+            resourceDir = getBinaryDir();
         else //use OS' standard paths
         {
             resourceDir = wxStandardPathsBase::Get().GetResourcesDir();

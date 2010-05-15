@@ -54,14 +54,14 @@ void RetrieveStatistics::writeEntry(const double value, const int objects)
 //########################################################################################
 
 inline
-bool isNull(const double number)
+bool isNull(double number)
 {
-    return globalFunctions::abs(number) <= std::numeric_limits<double>::epsilon();
+    return globalFunctions::abs(number) < std::numeric_limits<double>::epsilon();
 }
 
 
 inline
-wxString Statistics::formatRemainingTime(const double timeInMs) const
+wxString Statistics::formatRemainingTime(double timeInMs) const
 {
     bool unitSec = true;
     double remainingTime = timeInMs / 1000;
@@ -118,7 +118,7 @@ Statistics::Statistics(const int totalObjectCount,
     windowSizeRemTime(windowSizeRemainingTime),
     windowSizeBPS(windowSizeBytesPerSecond),
     windowMax(std::max(windowSizeRemainingTime, windowSizeBytesPerSecond)),
-    remainingTimeLast(256*256*256*100), //something "big"
+    remainingTimeLast(std::numeric_limits<int>::max()), //something "big"
     timer(new wxStopWatch) {}
 
 Statistics::~Statistics()

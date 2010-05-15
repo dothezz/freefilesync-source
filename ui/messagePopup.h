@@ -36,21 +36,19 @@ class WarningDlg : public WarningDlgGenerated
 {
 public:
     WarningDlg(wxWindow* parentWindow, int activeButtons, const wxString messageText, bool& dontShowAgain);
-    ~WarningDlg();
 
     enum Response
     {
         BUTTON_IGNORE  = 1,
-        BUTTON_ABORT   = 2
+        BUTTON_SWITCH  = 2,
+        BUTTON_ABORT   = 4
     };
 
 private:
     void OnClose(wxCloseEvent& event);
     void OnIgnore(wxCommandEvent& event);
-    void OnResolve(wxCommandEvent& event);
+    void OnSwitch(wxCommandEvent& event);
     void OnAbort(wxCommandEvent& event);
-    void OnOkay(wxCommandEvent& event);
-
     bool& dontShowAgain;
 };
 

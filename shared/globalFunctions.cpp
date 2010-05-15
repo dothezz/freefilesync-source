@@ -32,9 +32,9 @@ double globalFunctions::wxStringToDouble(const wxString& number)
 }
 
 
-unsigned int globalFunctions::getDigitCount(const unsigned int number) //count number of digits
+size_t globalFunctions::getDigitCount(size_t number) //count number of digits
 {
-    return number == 0 ? 1 : static_cast<unsigned int>(::log10(static_cast<double>(number))) + 1;
+    return number == 0 ? 1 : static_cast<size_t>(::log10(static_cast<double>(number))) + 1;
 }
 
 

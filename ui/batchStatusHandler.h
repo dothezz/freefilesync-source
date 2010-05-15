@@ -11,6 +11,7 @@
 #include "../library/processXml.h"
 #include "../library/errorLogging.h"
 #include "progressIndicator.h"
+#include "switchToGui.h"
 
 class LogFile;
 class SyncStatus;
@@ -23,6 +24,7 @@ public:
                        const wxString& batchFilename,
                        const wxString* logfileDirectory, //optional: enable logging if available
                        const xmlAccess::OnError handleError,
+                       const FreeFileSync::SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
                        int& returnVal);
     ~BatchStatusHandler();
 
@@ -39,7 +41,9 @@ public:
 private:
     virtual void abortThisProcess();
 
+    const FreeFileSync::SwitchToGui& switchBatchToGui_; //functionality to change from batch mode to GUI mode
     bool exitWhenFinished;
+    bool switchToGuiRequested;
     xmlAccess::OnError handleError_;
     FreeFileSync::ErrorLogging errorLog; //list of non-resolved errors and warnings
     Process currentProcess;

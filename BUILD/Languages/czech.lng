@@ -22,8 +22,6 @@
  s
 %x / %y objects deleted successfully
 %x / %y objektů úspěšně smazáno
-%x Percent
-%x procent
 %x directories
 adresářů: %x
 %x files,
@@ -34,6 +32,8 @@ souborů: %x;
 %x z %y řádků
 %x of 1 row in view
 %x z 1 řádku
+%x%
+%x%
 &Abort
 &Přerušit
 &About...
@@ -86,14 +86,14 @@ U&končit
 &Opakovat
 &Save
 &Uložit
+&Switch
+&Přepnout
 &Yes
 &Ano
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Platí pouze pro souborové systémy FAT/FAT32. V ostatních případech můžete nastavení \"Ignorovat 1 hodinu rozdílu v čase mezi soubory\" nechat vypnuté.)
 (Requires an Internet connection!)
 (Vyžaduje připojení k internetu!)
-,
- 
 - Other side's counterpart to %dir
 - pouze cesta z opačného panelu
 - Other side's counterpart to %name
@@ -122,10 +122,6 @@ U&končit
 - vpravo
 - right newer
 - vpravo novější
--Open-Source file synchronization-
--synchronizace souborů Open-Source-
-.
-,
 /sec
 /s
 1 directory
@@ -168,8 +164,6 @@ About
 O Programu
 Action
 Akce
-Activate filter
-Povolit filtr
 Add folder
 Přidat adresář
 Add folder pair
@@ -188,8 +182,6 @@ At least one directory input field is empty.
 Alespoň jedno zadání adresáře je prázdné.
 Auto-adjust columns
 Automaticky přizpůsobit šířku
-Automatic mode
-Automatický mód
 Batch execution
 Spuštění dávky
 Batch file created successfully!
@@ -202,6 +194,8 @@ Both sides have changed since last synchronization!
 Došlo ke změně obou stran od poslední synchronizace!
 Browse
 Procházet
+Browse directory
+Procházet adresář
 Build:
 Build:
 Cannot determine sync-direction:
@@ -210,6 +204,8 @@ Cannot find %x
 Nelze najít %x
 Category
 Kategorie
+Clear filter settings
+Smazat nastavení filtru
 Comma separated list
 Text oddělený čárkami
 Command line
@@ -217,7 +213,7 @@ Příkazová řádka
 Command line is empty!
 Příkazová řádka je prázdná!
 Compare
-Porovnat
+Porovnání
 Compare both sides
 Porovnat obě strany
 Compare by \"File content\"
@@ -226,8 +222,6 @@ Compare by \"File size and date\"
 Porovnat \"podle velikosti a data souboru\"
 Compare by...
 Porovnat ...
-Comparing content
-Porovnání obsahu
 Comparing content of files %x
 Porovnávání obsahu souborů %x
 Comparing content...
@@ -294,8 +288,6 @@ Create a batch job
 Vytvořit dávku
 Creating folder %x
 Vytváření adresáře %x
-Current operation:
-Aktuální operace:
 Custom
 Vlastní
 Customize columns
@@ -306,10 +298,6 @@ D-Click
 Dvojklik
 DECISION TREE
 ROZHODOVÁNÍ
-Data remaining:
-Zbývá dat:
-Data transferred:
-Přeneseno dat:
 Data verification error: Source and target file have different content!
 Chyba verifikace dat: Zdrojový a cílový soubor mají rozdílný obsah!
 Date
@@ -364,10 +352,14 @@ Download now?
 Stáhnout nyní?
 Drag && drop
 Drag && Drop
+Elements found:
+Nalezeno položek:
+Elements processed:
+Zpracováno položek:
+Elements remaining:
+Zbývá položek:
 Email
 Email
-Enable filter to exclude files from synchronization
-Povolit filtr pro vynechání souborů ze synchronizace
 Endless loop when traversing directory:
 Zacyklení při procházení adresáře:
 Error
@@ -462,38 +454,30 @@ Files are found equal if\n     - file content\nis the same
 Soubory jsou shodné jestliže\n     - obsah souboru\nje stejný
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
 Soubory jsou shodné jestliže\n     - velikost souboru\n     - datum i čas poslední změny\njsou stejné
-Files remaining:
-Zbývá souborů:
 Files that are equal on both sides
 Soubory shodné na obou stranách
-Files that exist on both sides and have different content
-Soubory, které existují na obou stranách a liší se obsahem
 Files that exist on both sides, left one is newer
 Soubory, které existují na obou stranách, z nichž vlevo je novější
 Files that exist on both sides, right one is newer
 Soubory, které existují na obou stranách, z nichž vpravo je novější
-Files/folders found:
-Nalezené soubory/adresáře:
-Files/folders processed:
-Zpracované soubory/adresáře:
-Files/folders remaining:
-Zbývá souborů/adresářů:
+Files that have different content
+Soubory, které mají rozdílný obsah
 Files/folders that exist on left side only
 Soubory/adresáře, které existují pouze vlevo
 Files/folders that exist on right side only
 Soubory/adresáře, které existují pouze vpravo
-Filter
-Filtr
 Filter files
-Filtrovat soubory
-Filter has been selected
-Filtr je zapnut
+Filtr souborů
+Filter is active
+Filtr je zapnutý
 Filter settings have changed!
 Nastavení filtru bylo změněno!
 Filter view
 Filtrovat seznam
-Filtering is deactivated
-Filtr je vypnut
+Filter: All pairs
+Filtr: Všechny páry
+Filter: Single pair
+Filtr: Jeden pár
 Find
 Najít
 Find what:
@@ -502,8 +486,6 @@ Folder Comparison and Synchronization
 Porovnání a Synchronizace adresářů
 Free disk space available:
 Volné místo k dispozici:
-FreeFileSync - Folder Comparison and Synchronization
-FreeFileSync - Porovnání a Synchronizace adresářů
 FreeFileSync Batch Job
 FreeFileSync Dávkové zpracování
 FreeFileSync at Sourceforge
@@ -520,8 +502,6 @@ Generating database...
 Vytváření databáze...
 Generating file list...
 Vytváření seznamu souborů...
-Global filter
-Globální filtr
 Global settings
 Nastavení programu
 Help
@@ -578,12 +558,10 @@ Ignore errors
 Ignorovat chyby
 Ignore subsequent errors
 Ignorovat další chyby
-Ignore this error, retry or abort synchronization?
-Ignorovat chybu, opakovat nebo přerušit synchronizaci.
-Ignore this error, retry or abort?
-Ignorovat chybu, opakovat nebo přerušit?
 Include
 Přidat
+Include Symbolic Links
+Zahrnout symboliké odkazy
 Include all rows
 Použít všechny řádky
 Include temporarily
@@ -600,8 +578,6 @@ Initial synchronization:
 Prvotní synchronizace:
 Integrate external applications into context menu. The following macros are available:
 Integrace externí aplikace do kontextového menu. K dispozici jsou následující makra:
-Last synchronization not completed!
-Poslední synchronizace nebyla dokončena!
 Leave as unresolved conflict
 Ponechat jako nevyřešený konflikt
 Left
@@ -612,8 +588,6 @@ Load configuration from file
 Načíst konfiguraci ze souboru
 Load configuration history (press DEL to delete items)
 Načíst historii konfigurace (pomocí DEL můžete položku smazat)
-Local filter
-Místní filtr
 Log-messages:
 Záznamy:
 Logging
@@ -664,12 +638,10 @@ One of the FreeFileSync database files is not yet existing:
 Některý z databázových souborů FreeFileSync neexistuje:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Pouze soubory/adresáře odpovídající nastavenému filtru budou vybrány pro synchronizaci. Filtr je aplikován relativně(!) k cestě synchronizovaných adresářů.
-Open directly
-Otevřít přímo
 Open with Explorer
 Otevřít v Průzkumníkovi
-Open with Konqueror
-Otevřít v Prohlížeči
+Open with default application
+Otevřít výchozí aplikací
 Operation aborted!
 Operace zrušena!
 Operation:
@@ -680,8 +652,12 @@ Pause
 Pauza
 Paused
 Pauza
+Planned directory deletion is in conflict with its subdirectories and -files!
+Naplánované smazání adresáře je v konfliktu s podadresáři a/nebo soubory!
 Please run a Compare first before synchronizing!
 Prosím proveďte nejdřív porovnání před synchronizací!
+Press \"Switch\" to open FreeFileSync GUI modus.
+Talčítkem \"Přepnout\" otevřete okno FreeFileSync.
 Processing folder pair:
 Zpracovávání adresářové páru:
 Published under the GNU General Public License:
@@ -697,7 +673,7 @@ RealtimeSync - Automatická synchronizace
 RealtimeSync configuration
 Konfigurace RealtimeSync
 Recycle Bin not yet supported for this system!
-
+Koš není na tomto systému zatím podporován!
 Relative path
 Relativní cesta
 Remove alternate settings
@@ -706,8 +682,6 @@ Remove folder
 Odstranit adresář
 Remove folder pair
 Odstranit dvojici adresářů
-Remove local filter settings
-Odstranit nastavení místního filtru
 Renaming file %x to %y
 Přejmenovávání souboru %x na %y
 Report translation error
@@ -740,7 +714,7 @@ Select variant:
 Vyberte variantu:
 Set direction:
 Nastavit asresář:
-Setting default synchronization directions: Old files will be overwritten by newer files.
+Setting default synchronization directions: Old files will be overwritten with newer files.
 Nastaven výchozí způsob synchronizace: Staré soubory budou nahrazeny novými.
 Show conflicts
 Zobrazit konflikty
@@ -794,10 +768,14 @@ Start synchronization
 Start synchronizace
 Statistics
 Statistika
+Status feedback
+Běh programu
 Stop
 Stop
 Swap sides
 Změna stran
+Switching to FreeFileSync GUI modus...
+Otevírání okna FreeFileSync...
 Synchronization Preview
 Náhled synchronizace
 Synchronization aborted!
@@ -812,10 +790,8 @@ Synchronization status
 Stav synchronizace
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Synchronizovat všechny soubory .doc, .zip a .exe s výjimkou všeho v podadresáři \"temp\"
-Synchronize both sides using a database. Deletions are detected automatically
-Synchronizovat obě strany pomocí databáze. Mazání je určeno automaticky
 Synchronize...
-Synchronizace...
+Synchronizace
 Synchronizing...
 Synchronizuji...
 System out of memory!
@@ -828,6 +804,8 @@ The command line is executed each time:\n- a directory becomes available (e.g. U
 Příkazová řádka je spuštěna pokaždé když:\n- je k dispozici daný adresář (např. vložením USB disku)\n- dojde ke změně souborů v adresáři nebo podadresářích
 The file does not contain a valid configuration:
 Soubor neobsahuje platnou konfiguraci:
+The file was not processed by last synchronization!
+Soubor nebyl poslední synchronizací zpracován!
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Tato varianta vyhodnotí dva stejně pojmenované soubory jako shodné pokud mají i stejnou velikost A ZÁROVEŇ i datum a čas poslední změny.
 Time
@@ -868,6 +846,8 @@ Verifying file %x
 Kontroluji soubor %x
 Volume name %x not part of filename %y!
 Disk %x není součástí jména souboru %y!
+Waiting for all directories to become available...
+Čekání na zpřístupnění všech adresářů...
 Warning
 Varování
 Warning: Synchronization failed for %x item(s):

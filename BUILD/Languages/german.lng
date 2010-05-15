@@ -33,7 +33,7 @@
 %x of 1 row in view
 %x von 1 Zeile zur Ansicht
 %x%
-
+%x%
 &Abort
 &Abbrechen
 &About...
@@ -86,6 +86,8 @@ Konfiguration &laden...
 &Wiederholen
 &Save
 &Speichern
+&Switch
+&Wechseln
 &Yes
 &Ja
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
@@ -120,8 +122,6 @@ Konfiguration &laden...
 - rechts
 - right newer
 - rechts neuer
--Open-Source file synchronization-
--Open-Source Datei-Synchronisation-
 /sec
 /s
 1 directory
@@ -164,8 +164,6 @@ About
 Über
 Action
 Aktion
-Activate filter
-Aktiviere Filter
 Add folder
 Verzeichnis hinzufügen
 Add folder pair
@@ -184,8 +182,6 @@ At least one directory input field is empty.
 Mindestens ein Verzeichniseingabefeld ist leer.
 Auto-adjust columns
 Spalten automatisch ausrichten
-Automatic mode
-Automatik Modus
 Batch execution
 Batchlauf
 Batch file created successfully!
@@ -198,6 +194,8 @@ Both sides have changed since last synchronization!
 Beide Seiten wurden seit der letzten Synchronisation verändert!
 Browse
 Auswählen
+Browse directory
+Verzeichnis öffnen
 Build:
 Build:
 Cannot determine sync-direction:
@@ -206,6 +204,8 @@ Cannot find %x
 %x wurde nicht gefunden.
 Category
 Kategorie
+Clear filter settings
+Filtereinstellungen zurücksetzen
 Comma separated list
 Kommagetrennte Liste
 Command line
@@ -222,8 +222,6 @@ Compare by \"File size and date\"
 Vergleich nach \"Dateigröße und -datum\"
 Compare by...
 Vergleichen nach...
-Comparing content
-Vergleiche Dateiinhalt
 Comparing content of files %x
 Vergleiche Inhalt der Dateien %x
 Comparing content...
@@ -290,8 +288,6 @@ Create a batch job
 Batch-Job erstellen
 Creating folder %x
 Erstelle Verzeichnis %x
-Current operation:
-Aktuelle Operation:
 Custom
 Eigene
 Customize columns
@@ -302,10 +298,6 @@ D-Click
 D-Klick
 DECISION TREE
 ENTSCHEIDUNGSBAUM
-Data remaining:
-Verbleibende Daten:
-Data transferred:
-Kopierte Daten:
 Data verification error: Source and target file have different content!
 Verifizierungsfehler: Quell- und Zieldatei haben unterschiedlichen Inhalt!
 Date
@@ -360,10 +352,14 @@ Download now?
 Jetzt herunterladen?
 Drag && drop
 Drag && Drop
+Elements found:
+Gefundene Elemente:
+Elements processed:
+Verarbeitete Elemente:
+Elements remaining:
+Verbleibende Elemente:
 Email
 Email
-Enable filter to exclude files from synchronization
-Aktiviere Filter, um Dateien von der Synchronisation auszuschließen
 Endless loop when traversing directory:
 Endlosschleife beim Lesen des Verzeichnisses:
 Error
@@ -458,40 +454,30 @@ Files are found equal if\n     - file content\nis the same
 Dateien gelten als gleich, wenn\n     - der Inhalt\ngleich ist
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
 Dateien gelten als gleich, wenn\n     - die Größe\n     - Datum und Uhrzeit der letzten Änderung\ngleich sind
-Files remaining:
-Verbleibende Dateien:
 Files that are equal on both sides
 Auf beiden Seiten gleiche Dateien
 Files that exist on both sides, left one is newer
 Auf beiden Seiten existierende Dateien; linke Datei ist neuer
 Files that exist on both sides, right one is newer
 Auf beiden Seiten existierende Dateien; rechte Datei ist neuer
-Files that exist on both sides and have different content
-Auf beiden Seiten existierende Dateien mit unterschiedlichem Inhalt
 Files that have different content
-
-Files/folders found:
-Gefundene Dateien/Ordner:
-Files/folders processed:
-Verarbeitete Dateien/Ordner:
-Files/folders remaining:
-Verbleibende Dateien/Ordner:
+Dateien mit verschiedenem Inhalt
 Files/folders that exist on left side only
 Nur links exisitierende Dateien/Verzeichnisse
 Files/folders that exist on right side only
 Nur rechts exisitierende Dateien/Verzeichnisse
-Filter
-Filter
 Filter files
 Dateien filtern
-Filter has been selected
-Filter ist ausgewählt
+Filter is active
+Filter ist aktiv
 Filter settings have changed!
 Die Filtereinstellungen wurden geändert!
 Filter view
 Ansicht filtern
-Filtering is deactivated
-Filter ist deaktiviert
+Filter: All pairs
+Filter: Alle Verzeichnispaare
+Filter: Single pair
+Filter: Einzelnes Verzeichnispaar
 Find
 Suchen
 Find what:
@@ -500,8 +486,6 @@ Folder Comparison and Synchronization
 Verzeichnisvergleich und Synchronisation
 Free disk space available:
 Verfügbarer freier Speicherplatz:
-FreeFileSync - Folder Comparison and Synchronization
-FreeFileSync - Verzeichnisvergleich und -synchronisation
 FreeFileSync Batch Job
 FreeFileSync Batch-Job
 FreeFileSync at Sourceforge
@@ -518,8 +502,6 @@ Generating database...
 Erzeuge Synchronisationsdatenbank...
 Generating file list...
 Erzeuge Dateiliste...
-Global filter
-Globaler Filter
 Global settings
 Globale Einstellungen
 Help
@@ -576,12 +558,10 @@ Ignore errors
 Fehler ignorieren
 Ignore subsequent errors
 Nachfolgende Fehler ignorieren
-Ignore this error, retry or abort synchronization?
-Fehler ignorieren, wiederholen oder Synchronisation abbrechen?
-Ignore this error, retry or abort?
-Fehler ignorieren, wiederholen oder abbrechen?
 Include
 Einschließen
+Include Symbolic Links
+Symbolische Links aufnehmen
 Include all rows
 Alle Zeilen einschließen
 Include temporarily
@@ -598,8 +578,6 @@ Initial synchronization:
 Erstmalige Synchronisation:
 Integrate external applications into context menu. The following macros are available:
 Integriert externe Anwendungen in das Kontextmenu. Die folgenden Makros stehen zur Verfügung:
-Last synchronization not completed!
-Letzte Synchronisation nicht vollendet!
 Leave as unresolved conflict
 Als unbehandelten Konflikt belassen
 Left
@@ -610,8 +588,6 @@ Load configuration from file
 Konfiguration aus Datei laden
 Load configuration history (press DEL to delete items)
 Lade Konfigurationshistorie (DEL-Taste löscht Einträge)
-Local filter
-Lokaler Filter
 Log-messages:
 Protokollmeldungen:
 Logging
@@ -662,12 +638,10 @@ One of the FreeFileSync database files is not yet existing:
 Eine der FreeFileSync Datenbankdateien existiert noch nicht:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Für die Synchronisation werden nur die Dateien/Verzeichnisse berücksichtigt, die den Filtereinstellungen genügen. Der Filter wird dabei auf den Dateinamen relativ(!) zu den Basis-Synchronisationsverzeichnissen angewandt.
-Open directly
-Direkt öffnen
 Open with Explorer
 Mit Explorer öffnen
-Open with Konqueror
-Mit Konqueror öffnen
+Open with default application
+Mit Standardanwendung öffnen
 Operation aborted!
 Vorgang abgebrochen!
 Operation:
@@ -678,10 +652,14 @@ Pause
 Pause
 Paused
 Angehalten
+Planned directory deletion is in conflict with its subdirectories and -files!
+Das geplante Löschen des Verzeichnisses steht in Konflikt mit seinen Unterverzeichnissen und -dateien
 Please run a Compare first before synchronizing!
 Vor der Synchronisation bitte zuerst einen Vergleich ausführen!
+Press \"Switch\" to open FreeFileSync GUI modus.
+\"Wechseln\" öffnet FreeFileSync in der graphischen Ansicht.
 Processing folder pair:
-Verarbeite Verzeichnispaar:
+Bearbeite Verzeichnispaar:
 Published under the GNU General Public License:
 Veröffentlicht unter der GNU General Public License:
 Question
@@ -695,7 +673,7 @@ RealtimeSync - Automatisierte Synchronisation
 RealtimeSync configuration
 RealtimeSync Konfiguration
 Recycle Bin not yet supported for this system!
-
+Der Papierkorb wird für dieses System noch nicht unterstützt!
 Relative path
 Relativer Pfad
 Remove alternate settings
@@ -704,8 +682,6 @@ Remove folder
 Verzeichnis entfernen
 Remove folder pair
 Verzeichnispaar entfernen
-Remove local filter settings
-Lokale Filtereinstellungen entfernen
 Renaming file %x to %y
 Benenne Datei %x um nach %y
 Report translation error
@@ -717,7 +693,7 @@ Rechts
 Run minimized and write status information to a logfile
 Minimiert ausführen und Statusinformationen in eine Logdatei schreiben
 S&ave configuration...
-Konfiguration s&peichern ...
+Konfiguration s&peichern...
 S&witch view
 Ansicht &wechseln
 Save changes to current configuration?
@@ -738,7 +714,7 @@ Select variant:
 Variante auswählen:
 Set direction:
 Setze Richtung:
-Setting default synchronization directions: Old files will be overwritten by newer files.
+Setting default synchronization directions: Old files will be overwritten with newer files.
 Setze Standardwerte für Synchronisationsrichtungen: Alte Dateien werden durch neuere überschrieben.
 Show conflicts
 Konflikte zeigen
@@ -792,10 +768,14 @@ Start synchronization
 Synchronisation starten
 Statistics
 Statistiken
+Status feedback
+Statusbericht
 Stop
 Stop
 Swap sides
 Seiten vertauschen
+Switching to FreeFileSync GUI modus...
+Wechsle in die graphische Ansicht...
 Synchronization Preview
 Vorschau auf Synchronisation
 Synchronization aborted!
@@ -810,8 +790,6 @@ Synchronization status
 Synchronisationsstatus
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Alle .doc, .zip und .exe Dateien mit Ausnahme des Verzeichnisses \"temp\" werden synchronisiert.
-Synchronize both sides using a database. Deletions are detected automatically
-Beide Seiten mit Hilfe einer Datenbank synchronisieren. Löschungen werden automatisch erkannt
 Synchronize...
 Synchronisieren
 Synchronizing...
@@ -826,6 +804,8 @@ The command line is executed each time:\n- a directory becomes available (e.g. U
 Die Befehlszeile wird ausgeführt wenn:\n- ein Verzeichnis verfügbar wird (z.B. beim Anschluss eines USB Sticks)\n- Dateien innerhalb dieser Verzeichnisse oder Unterverzeichnisse geändert werden
 The file does not contain a valid configuration:
 Die Datei enthält keine gültige Konfiguration:
+The file was not processed by last synchronization!
+Die Datei wurde in der letzten Synchronisation nicht verarbeitet!
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Diese Variante identifiziert zwei gleichnamige Dateien als gleich, wenn sie die gleiche Dateigröße haben UND der Zeitpunkt der letzten Änderung derselbe ist.
 Time
@@ -866,6 +846,8 @@ Verifying file %x
 Verifiziere Datei %x
 Volume name %x not part of filename %y!
 Laufwerksname %x ist kein Teil des Dateinamens %y!
+Waiting for all directories to become available...
+Warte, bis alle Verzeichnisse verfügbar sind...
 Warning
 Warnung
 Warning: Synchronization failed for %x item(s):

@@ -33,7 +33,7 @@ void setDirectoryName(const wxString& dirname, wxTextCtrl* txtCtrl, wxDirPickerC
 void setDirectoryName(const wxString& dirname, wxComboBox* txtCtrl, wxDirPickerCtrl* dirPicker);
 void scrollToBottom(wxScrolledWindow* scrWindow);
 
-wxString utcTimeToLocalString(const wxLongLong& utcTime, const Zstring& filename);
+wxString utcTimeToLocalString(const wxLongLong& utcTime); //throw std::runtime_error
 }
 
 

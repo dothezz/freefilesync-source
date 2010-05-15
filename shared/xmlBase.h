@@ -8,9 +8,11 @@
 #define XMLBASE_H_INCLUDED
 
 #include "tinyxml/tinyxml.h"
+#include "globalFunctions.h"
 #include <string>
 #include <vector>
 #include <wx/string.h>
+#include "xmlError.h"
 
 
 namespace xmlAccess
@@ -35,32 +37,31 @@ void saveXmlDocument(const wxString& fileName, const TiXmlDocument& document); /
 //------------------------------------------------------------------------------------------
 
 //small helper functions
+template <class T>
+bool readXmlElement(const std::string& name, const TiXmlElement* parent, T&            output);
 bool readXmlElement(const std::string& name, const TiXmlElement* parent, std::string&  output);
 bool readXmlElement(const std::string& name, const TiXmlElement* parent, wxString&     output);
-bool readXmlElement(const std::string& name, const TiXmlElement* parent, int&          output);
-bool readXmlElement(const std::string& name, const TiXmlElement* parent, unsigned int& output);
-bool readXmlElement(const std::string& name, const TiXmlElement* parent, long&         output);
 bool readXmlElement(const std::string& name, const TiXmlElement* parent, bool&         output);
 bool readXmlElement(const std::string& name, const TiXmlElement* parent, std::vector<wxString>& output);
 
+
+template <class T>
+bool readXmlAttribute(const std::string& name, const TiXmlElement* node, T&            output);
 bool readXmlAttribute(const std::string& name, const TiXmlElement* node, std::string&  output);
 bool readXmlAttribute(const std::string& name, const TiXmlElement* node, wxString&     output);
-bool readXmlAttribute(const std::string& name, const TiXmlElement* node, int&          output);
-bool readXmlAttribute(const std::string& name, const TiXmlElement* node, unsigned int& output);
 bool readXmlAttribute(const std::string& name, const TiXmlElement* node, bool&         output);
 
+template <class T>
+void addXmlElement(const std::string& name, T                  value, TiXmlElement* parent);
 void addXmlElement(const std::string& name, const std::string& value, TiXmlElement* parent);
 void addXmlElement(const std::string& name, const wxString&    value, TiXmlElement* parent);
-void addXmlElement(const std::string& name, const int          value, TiXmlElement* parent);
-void addXmlElement(const std::string& name, const unsigned int value, TiXmlElement* parent);
-void addXmlElement(const std::string& name, const long         value, TiXmlElement* parent);
 void addXmlElement(const std::string& name, const bool         value, TiXmlElement* parent);
 void addXmlElement(const std::string& name, const std::vector<wxString>& value, TiXmlElement* parent);
 
+template <class T>
+void addXmlAttribute(const std::string& name, T                  value, TiXmlElement* node);
 void addXmlAttribute(const std::string& name, const std::string& value, TiXmlElement* node);
 void addXmlAttribute(const std::string& name, const wxString&    value, TiXmlElement* node);
-void addXmlAttribute(const std::string& name, const int          value, TiXmlElement* node);
-void addXmlAttribute(const std::string& name, const unsigned int value, TiXmlElement* node);
 void addXmlAttribute(const std::string& name, const bool         value, TiXmlElement* node);
 
 
@@ -99,31 +100,6 @@ private:
     const TiXmlElement* const root;
     std::vector<wxString> failedNodes;
 };
-
-
-class XmlError //Exception class
-{
-public:
-    enum Severity
-    {
-        WARNING = 77,
-        FATAL
-    };
-
-    XmlError(const wxString& message, Severity sev = FATAL) : errorMessage(message), m_severity(sev) {}
-
-    const wxString& show() const
-    {
-        return errorMessage;
-    }
-    Severity getSeverity() const
-    {
-        return m_severity;
-    }
-private:
-    const wxString errorMessage;
-    const Severity m_severity;
-};
 }
 
 
@@ -146,5 +122,89 @@ private:
     const TiXmlElement* const m_element;
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//++++++++++++++ inline implementation +++++++++++++++++++++++++++++++++++++++
+template <class T>
+inline
+bool xmlAccess::readXmlElement(const std::string& name, const TiXmlElement* parent, T& output)
+{
+    std::string temp;
+    if (!readXmlElement(name, parent, temp))
+        return false;
+
+    globalFunctions::stringToNumber(temp, output);
+    return true;
+}
+
+
+template <class T>
+inline
+void xmlAccess::addXmlElement(const std::string& name, T value, TiXmlElement* parent)
+{
+    addXmlElement(name, globalFunctions::numberToString(value), parent);
+}
+
+
+template <class T>
+inline
+bool xmlAccess::readXmlAttribute(const std::string& name, const TiXmlElement* node, T& output)
+{
+    std::string dummy;
+    if (readXmlAttribute(name, node, dummy))
+    {
+        globalFunctions::stringToNumber(dummy, output);
+        return true;
+    }
+    else
+        return false;
+}
+
+
+template <class T>
+inline
+void xmlAccess::addXmlAttribute(const std::string& name, T value, TiXmlElement* node)
+{
+    addXmlAttribute(name, globalFunctions::numberToString(value), node);
+}
 
 #endif // XMLBASE_H_INCLUDED

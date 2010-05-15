@@ -22,8 +22,6 @@
  sek
 %x / %y objects deleted successfully
 %x / %y objektov uspešno izbrisanih
-%x Percent
-%x Procentov
 %x directories
 %x imeniki
 %x files,
@@ -34,6 +32,8 @@
 %x od %y vrstic prikazanih
 %x of 1 row in view
 %x od 1 vrstice prikazane
+%x%
+%x%
 &Abort
 &Prekini
 &About...
@@ -86,14 +86,14 @@ Na&loži konfiguracijo...
 &Ponovi
 &Save
 &Shrani
+&Switch
+&Zamenjaj
 &Yes
 &Da
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Vedite, da samo na pogonih s FAT/FAT32 lahko pride do teh težav!\nV vseh drugih primerih lahko onemogočite nastavitev \"prezri 1-urno razliko\".)
 (Requires an Internet connection!)
 (Zahteva povezavo z Internetom!)
-,
-, 
 - Other side's counterpart to %dir
 Duplikat z druge strani od %dir
 - Other side's counterpart to %name
@@ -122,10 +122,6 @@ Duplikat z druge strani od %name
 - desno
 - right newer
 - desna novejša
--Open-Source file synchronization-
--Odprto-kodna sinhronizacija datotek-
-.
-,
 /sec
 /sek
 1 directory
@@ -135,7 +131,7 @@ Duplikat z druge strani od %name
 1. &Compare
 1. &Primerjaj
 1. Enter relative file or directory names separated by ';' or a new line.
-1. Vnesite relativna imena datotek ali imenikov ločenih z ';' ali novo vrstico.
+1. Vnesite relativna imena datotek ali imenikov ločenih s ';' ali novo vrstico.
 1. Select directories to monitor.
 1. Izberite imenike za nadziranje
 2. &Synchronize...
@@ -168,8 +164,6 @@ About
 O programu(1)
 Action
 Ukrep
-Activate filter
-Aktiviraj filter
 Add folder
 Dodaj mapo
 Add folder pair
@@ -188,8 +182,6 @@ At least one directory input field is empty.
 Vsaj eno vnosno polje za vpis imenika je prazno.
 Auto-adjust columns
 Samo-prilagodi stolpce
-Automatic mode
-Samodejni način
 Batch execution
 Batch izvajanje
 Batch file created successfully!
@@ -202,6 +194,8 @@ Both sides have changed since last synchronization!
 Obe strani sta se spremenili od zadnje sinhronizacije!
 Browse
 Brskaj
+Browse directory
+Brskaj po imeniku
 Build:
 Izgradnja:
 Cannot determine sync-direction:
@@ -210,6 +204,8 @@ Cannot find %x
 Ne najdem %x
 Category
 Kategorija
+Clear filter settings
+Počisti nastavitve filtra
 Comma separated list
 Seznam ločen z vejico
 Command line
@@ -226,8 +222,6 @@ Compare by \"File size and date\"
 Primerjaj po \"Datumu in velikosti\"
 Compare by...
 Primerjaj po...
-Comparing content
-Primerjam vsebino
 Comparing content of files %x
 Primerjam vsebino datotek %x
 Comparing content...
@@ -294,8 +288,6 @@ Create a batch job
 Ustvari batch opravilo
 Creating folder %x
 Ustvarjam mapo %x
-Current operation:
-Trenutna operacija:
 Custom
 Po meri
 Customize columns
@@ -306,10 +298,6 @@ D-Click
 D-Klik
 DECISION TREE
 DREVO ODLOČITEV
-Data remaining:
-Preostanek podatkov:
-Data transferred:
-Prenesenih podatkov:
 Data verification error: Source and target file have different content!
 Napaka pri preverjanju podatkov: izvorna in tarčna datoteka imata različno vsebino!
 Date
@@ -364,10 +352,14 @@ Download now?
 Prenesem sedaj?
 Drag && drop
 Povleci && spusti
+Elements found:
+Najdenih elementov:
+Elements processed:
+Obdelanih elementov:
+Elements remaining:
+Preostalih elementov:
 Email
 Email
-Enable filter to exclude files from synchronization
-Omogoči filter da se datoteke izključi iz sinhronizacije
 Endless loop when traversing directory:
 Neskončna zanka pri prehodu imenika:
 Error
@@ -462,38 +454,30 @@ Files are found equal if\n     - file content\nis the same
 Datoteki sta enaki, če\n     - je vsebina datoteke\nenaka
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
 Datoteki sta enaki, če so\n     - velikost datoteke\n     - zadnji čas spremembe in datum\nenaki
-Files remaining:
-Preostale datoteke:
 Files that are equal on both sides
 Datoteki, ki sta enaki na obeh straneh
-Files that exist on both sides and have different content
-Datoteke, ki obstajajo na obeh straneh in imajo različno vesbino
 Files that exist on both sides, left one is newer
 Datoteke, ki obstajajo na obeh straneh, leva je novejša
 Files that exist on both sides, right one is newer
 Datoteke, ki obstajajo na obeh straneh, desna je novejša
-Files/folders found:
-Najdene datoteke/mape:
-Files/folders processed:
-Obdelane datoteke/mape:
-Files/folders remaining:
-Preostale datoteke/mape:
+Files that have different content
+Datoteke, ki imajo različno vsebino
 Files/folders that exist on left side only
 Datoteke/mape, ki obstajajo samo na levi strani
 Files/folders that exist on right side only
 Datoteke/mape, ki obstajajo samo na desni strani
-Filter
-Filter
 Filter files
 Filtriraj datoteke
-Filter has been selected
-Filter je bil izbran
+Filter is active
+Filterj je aktiven
 Filter settings have changed!
 Nastavitve filtra so bile spremenjene!
 Filter view
 Filtriran pogled
-Filtering is deactivated
-Filter je deaktiviran
+Filter: All pairs
+Filtriraj: Vse pare
+Filter: Single pair
+Filtriraj: En sam par
 Find
 Najdi
 Find what:
@@ -502,8 +486,6 @@ Folder Comparison and Synchronization
 Primerjava in sinhronizacija imenika
 Free disk space available:
 Prosti disk, ki je na voljo:
-FreeFileSync - Folder Comparison and Synchronization
-FreeFileSync - Primerjava in sinhronizacija map
 FreeFileSync Batch Job
 FreeFileSync Batch opravilo
 FreeFileSync at Sourceforge
@@ -520,8 +502,6 @@ Generating database...
 Ustvarjam podatkovno bazo...
 Generating file list...
 Ustvarjam seznam datotek...
-Global filter
-Globalni filter
 Global settings
 Globalne nastavitve
 Help
@@ -578,12 +558,10 @@ Ignore errors
 Ignoriraj napake
 Ignore subsequent errors
 Ignoriraj vse nadaljnje napake
-Ignore this error, retry or abort synchronization?
-Ignoriraj to napako, poskusi ponovno ali prekini sinhronizacijo?
-Ignore this error, retry or abort?
-Ignoriraj to napako, poskusi ponovno ali prekini?
 Include
 Vključi
+Include Symbolic Links
+Vključi simbolične povezave
 Include all rows
 Vključi se vrstice
 Include temporarily
@@ -600,8 +578,6 @@ Initial synchronization:
 Začetna sinhronizacija:
 Integrate external applications into context menu. The following macros are available:
 Integriraj zunanje aplikacije v kontekstni menu. Na voljo so naslednji makri:
-Last synchronization not completed!
-Zadnja sinhronizacija se ni zaključila!
 Leave as unresolved conflict
 Pusti kot nerešeni spor
 Left
@@ -612,8 +588,6 @@ Load configuration from file
 Naloži konfiguracijo iz datoteke
 Load configuration history (press DEL to delete items)
 Naloži zgodovino konfiguracije (pritisnite DEL za brisanje predmetov)
-Local filter
-Lokalni filter
 Log-messages:
 Sporočila beleženja:
 Logging
@@ -664,12 +638,10 @@ One of the FreeFileSync database files is not yet existing:
 Ena od FreeFileSync datotek podatkovne baze še en obstaja:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Samo datoteke/imeniki, ki preidejo filtriranje bodo izbrani za sinhronizacijo. Filter bo uveljavljnen k imenu relativno(!) na bazo sinhroniziranih imenikov.
-Open directly
-Odpri neposredno
 Open with Explorer
 Odpri z Raziskovalcem
-Open with Konqueror
-Odpri s Konquerorjem
+Open with default application
+Odpri s privzeto aplikacijo
 Operation aborted!
 Operacija prekinjena!
 Operation:
@@ -680,8 +652,12 @@ Pause
 Premor
 Paused
 Na premoru
+Planned directory deletion is in conflict with its subdirectories and -files!
+Načrtovano brisanje imenika je v sporu z njegovimi podimeniki in -datotekami!
 Please run a Compare first before synchronizing!
 Prosim najprej zaženite Primerjaj preden sinhronizirate!
+Press \"Switch\" to open FreeFileSync GUI modus.
+Pritisnite \"Zamenjaj\", da odprete FreeFileSync GUI način.
 Processing folder pair:
 Obdelujem par map:
 Published under the GNU General Public License:
@@ -697,7 +673,7 @@ RealtimeSync - Avtomatizirana sinhronizacija
 RealtimeSync configuration
 RealtimeSync nastavitve
 Recycle Bin not yet supported for this system!
-
+Koš še ni podprt za ta sistem!
 Relative path
 Relativna pot
 Remove alternate settings
@@ -706,8 +682,6 @@ Remove folder
 Odstrani v mapo
 Remove folder pair
 Odstrani par imenikov
-Remove local filter settings
-Odstrani nastavitve lokalnega filtra
 Renaming file %x to %y
 Preimenujem datoteko %x v %y
 Report translation error
@@ -740,7 +714,7 @@ Select variant:
 Izberite varianto:
 Set direction:
 Nastavi smer:
-Setting default synchronization directions: Old files will be overwritten by newer files.
+Setting default synchronization directions: Old files will be overwritten with newer files.
 Nastavljanje privzetih smeri sinhronizacije: Stare datoteke bodo prepisane z novimi datotekami.
 Show conflicts
 Prikaži spore
@@ -794,10 +768,14 @@ Start synchronization
 Začni sinhronizacijo
 Statistics
 Statistika
+Status feedback
+Povratne informacije statusa
 Stop
 Ustavi
 Swap sides
 Zamenjaj strani
+Switching to FreeFileSync GUI modus...
+Preklapljam v FreeFileSync GUI način...
 Synchronization Preview
 Predogled sinhronizacije
 Synchronization aborted!
@@ -812,8 +790,6 @@ Synchronization status
 Status sinhronizacije
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Sinhroniziraj vse .doc, .zip in .exe datoteke, razen iz podmape \"temp\".
-Synchronize both sides using a database. Deletions are detected automatically
-Sinhroniziraj obe strani z uporabo podatkovne baze. Izbrisi so zaznani samodejno
 Synchronize...
 Sinhroniziraj...
 Synchronizing...
@@ -828,6 +804,8 @@ The command line is executed each time:\n- a directory becomes available (e.g. U
 Ukazna vrstica se izvrši vsakič ko:\n- postane imenik na voljo (npr. vstavitem USB ključa)\n- datoteke znotraj teh imenikov ali podimenikov so spremenjene
 The file does not contain a valid configuration:
 Datoteka ne vsebuje veljavne konfiguracije:
+The file was not processed by last synchronization!
+Datoteka ni bila obdelana z zadnjo sinhronizacijo!
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Ta varianta oceni dve datoteki z enakim imenom kot enaki, ko imata enako velikost IN enak datum ter čas zadnjega spreminjanja.
 Time
@@ -868,6 +846,8 @@ Verifying file %x
 Preverjam datoteko %x
 Volume name %x not part of filename %y!
 Ime volumna %x ni del imena datoteke %y!
+Waiting for all directories to become available...
+Čakam, da bodo vsi imeniki na voljo...
 Warning
 Pozor
 Warning: Synchronization failed for %x item(s):

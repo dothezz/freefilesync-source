@@ -22,8 +22,6 @@
  Sek.
 %x / %y objects deleted successfully
 %x / %y Kohteiden poisto onnistui
-%x Percent
-%x Prosenttia
 %x directories
 %x hakemistoja
 %x files,
@@ -34,6 +32,8 @@
 %x riviä %y rivistä näytössä
 %x of 1 row in view
 %x 1 rivistä näytössä
+%x%
+%x%
 &Abort
 &Keskeytä
 &About...
@@ -86,14 +86,14 @@ Asetusten &lataus...
 &Uudestaan
 &Save
 &Tallenna
+&Switch
+&Vaihda
 &Yes
 &Kyllä
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (HUOM: Tämä ongelma vaikuttaa vain FAT/FAT32 ohjaimiin!\nOptio voidaan poistaa kaikissa muissa tapauksissa \"jätetään 1. tunnin ero huomiotta\".)
 (Requires an Internet connection!)
 (Vaatii Internet-yhteyden!)
-,
-.
 - Other side's counterpart to %dir
 - Toisen puolen vastaavuus on %dir
 - Other side's counterpart to %name
@@ -122,10 +122,6 @@ Asetusten &lataus...
 - oikea
 - right newer
 - uudempi oikealla
--Open-Source file synchronization-
--Open-Source tiedoston täsmäytys-
-.
-,
 /sec
 /s
 1 directory
@@ -168,8 +164,6 @@ About
 Ohje
 Action
 Suorita
-Activate filter
-Käynnistä suodatus
 Add folder
 Lisää hakemisto
 Add folder pair
@@ -188,8 +182,6 @@ At least one directory input field is empty.
 Vähintäin yksi hakemiston syöttökenttä on tyhjä.
 Auto-adjust columns
 Säädä sarakeleveys automaattisesti
-Automatic mode
-Automaattinen toimi
 Batch execution
 Eräajo
 Batch file created successfully!
@@ -202,6 +194,8 @@ Both sides have changed since last synchronization!
 Molemmat puolet muuttuneet edellisestä täsmäytyksestä!
 Browse
 Selaa
+Browse directory
+Selaa hakemistoa
 Build:
 Luotu:
 Cannot determine sync-direction:
@@ -210,6 +204,8 @@ Cannot find %x
 En löydä %x
 Category
 Luokka
+Clear filter settings
+Nollaa suodin
 Comma separated list
 CSV-muotoinen lista
 Command line
@@ -226,8 +222,6 @@ Compare by \"File size and date\"
 Vertaa: \"tiedoston koko ja -päiväys\"
 Compare by...
 Vertaile...
-Comparing content
-Vertaa tietosisältöä
 Comparing content of files %x
 Vertaa tiedostojen %x tietosisältöä
 Comparing content...
@@ -294,8 +288,6 @@ Create a batch job
 Eräajon luonti
 Creating folder %x
 Luo hakemisto %x
-Current operation:
-Tämä toiminto:
 Custom
 Oma määritelmä
 Customize columns
@@ -306,10 +298,6 @@ D-Click
 Klikkaa D
 DECISION TREE
 PÄÄTÖSPUU
-Data remaining:
-Dataa jäljellä:
-Data transferred:
-Siirrettyä dataa:
 Data verification error: Source and target file have different content!
 Tiedon varmennusvirhe: Lähteellä ja kohteella on eri sisältö!
 Date
@@ -364,10 +352,14 @@ Download now?
 Lataa nyt?
 Drag && drop
 Vedä ja pudota
+Elements found:
+Osia löytyi:
+Elements processed:
+Osia käsitelty:
+Elements remaining:
+Osia jäljellä:
 Email
 S-posti
-Enable filter to exclude files from synchronization
-Aktivoi tiedostojen täsmäytyksen suodattimia
 Endless loop when traversing directory:
 Suorita hakemiston läpikulku jatkuvana:
 Error
@@ -379,7 +371,7 @@ Virhe kopioitaessa tiedostoa:
 Error copying locked file %x!
 Virhe kopioitaessa lukittua tiedostoa  %x!
 Error copying symbolic link:
-Symboolisen linkin kopiointi epäonnistui:
+Symbolisen linkin kopiointi epäonnistui:
 Error creating directory:
 Virhe tapahtui  hakemistoa luotassa:
 Error deleting directory:
@@ -462,38 +454,30 @@ Files are found equal if\n     - file content\nis the same
 Tiedostot samat jos, \n     - tiedoston sisältö\non sama
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
 Tiedosto samat jos, \n     - koko\n     - viimeinen aikaleima\non sama
-Files remaining:
-Tiedostoja jäljellä:
 Files that are equal on both sides
 Tiedosto sama molemmilla puolilla
-Files that exist on both sides and have different content
-Tiedosto löytyy molemmilla puolilla mutta eri sisältö
 Files that exist on both sides, left one is newer
 Tiedosto löytyy molemmilla puolilla, vasen on uudempi
 Files that exist on both sides, right one is newer
 Tiedosto löytyy molemmilla puolilla, oikea on uudempi
-Files/folders found:
-Löydetty tiedostoja/hakemistoja:
-Files/folders processed:
-Käsiteltyjä tiedostoja/hakemistoja:
-Files/folders remaining:
-Tiedostoja/hakemistoja jäljellä:
+Files that have different content
+Tiedostoja joissa eri sisältö
 Files/folders that exist on left side only
 Tiedostoja/hakemistoja vain vasemmalla
 Files/folders that exist on right side only
 Tiedostoja/hakemistoja vain oikealla
-Filter
-Suodatin
 Filter files
 Suodata tiedostoja
-Filter has been selected
-Suodin valittu
+Filter is active
+Suodin aktivoitu
 Filter settings have changed!
 Suodinasetukset muutettu!
 Filter view
 Näytä suodattimet
-Filtering is deactivated
-Suodatus pois päältä
+Filter: All pairs
+Suodata: kaikki parit
+Filter: Single pair
+Suodata: Yksi pari
 Find
 Etsi
 Find what:
@@ -502,8 +486,6 @@ Folder Comparison and Synchronization
 Hakemistojen vertailu ja täsmäytys
 Free disk space available:
 Levytilaa jäljellä:
-FreeFileSync - Folder Comparison and Synchronization
-FreeFileSync - hakemisto vertailu ja täsmäytys
 FreeFileSync Batch Job
 FreeFileSync Eräajo
 FreeFileSync at Sourceforge
@@ -520,8 +502,6 @@ Generating database...
 Luodaan tietokantaa...
 Generating file list...
 Luodaan tiedostolista...
-Global filter
-Globaali suodin
 Global settings
 Yleiset asetukset
 Help
@@ -578,12 +558,10 @@ Ignore errors
 Älä huomioi virheitä
 Ignore subsequent errors
 Jätä toistuvia virheitä huomiotta 
-Ignore this error, retry or abort synchronization?
-Jätä virhe huomiotta, kokeile uudestaan tai keskeytä täsmäytys?
-Ignore this error, retry or abort?
-Jätä virhe huomiotta, kokeile uudestaan tai keskeytä?
 Include
 Sisällytä
+Include Symbolic Links
+Sisällytä symbolisia linkkejä
 Include all rows
 Sisällytä kaikki rivit
 Include temporarily
@@ -600,8 +578,6 @@ Initial synchronization:
 Ensi täsmäytys:
 Integrate external applications into context menu. The following macros are available:
 Liitä ulkoinen sovellus viitekehysvalikkoon. Seuraavat makrot ovat valittavissa:
-Last synchronization not completed!
-Viimeine täsmäytys jäi kesken!
 Leave as unresolved conflict
 Jätä ratkaisemattomana virheenä
 Left
@@ -612,8 +588,6 @@ Load configuration from file
 Lataa asetuksia tiedostosta 
 Load configuration history (press DEL to delete items)
 Lataa asetusten historia (DEL poistaa osia - paina DEL)
-Local filter
-Paikallinen suodin
 Log-messages:
 Lokin viestit:
 Logging
@@ -664,12 +638,10 @@ One of the FreeFileSync database files is not yet existing:
 Jokin FreeFileSynk tietokannan tiedostoista puuttuu vielä:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Täsmäytykseen valitaan vain suodatetut tiedostot/hakemistot. Suodatus suoritetaan täsmäytyksen perus hakemistojen mukaisiin suhteellisiin nimiin.
-Open directly
-Suora avaus
 Open with Explorer
 Avaa Explorerilla
-Open with Konqueror
-Avaa Konquerorilla
+Open with default application
+Avaa oletus sovelluksessa
 Operation aborted!
 Toiminto keskeytetty!
 Operation:
@@ -680,8 +652,12 @@ Pause
 Tauko
 Paused
 Pysäytetty
+Planned directory deletion is in conflict with its subdirectories and -files!
+Suunniteltu hakemiston poistaminen on ristiriidassa alihakemiston ja tiedostojen kanssa!
 Please run a Compare first before synchronizing!
 Aja tarkistus ennen täsmäytystä. 
+Press \"Switch\" to open FreeFileSync GUI modus.
+Paina \"Vaihda\" Avaa FreeFileSync GUI toimintoa.
 Processing folder pair:
 Käsitellään hakemistoparia:
 Published under the GNU General Public License:
@@ -697,7 +673,7 @@ RealtimeSync - Automaattinen täsmäytys
 RealtimeSync configuration
 RealtimeSync Asetukset
 Recycle Bin not yet supported for this system!
-
+Roskakori ei vielä tue tätä järjestelmää!
 Relative path
 Suhteellinen polku
 Remove alternate settings
@@ -706,8 +682,6 @@ Remove folder
 Poista hakemisto
 Remove folder pair
 Poista hakemistopari
-Remove local filter settings
-Poista paikalliset suotimet
 Renaming file %x to %y
 Nimeän tiedostoa %x nimellä %y
 Report translation error
@@ -740,7 +714,7 @@ Select variant:
 Valitse vaihtoehto:
 Set direction:
 Aseta suunta:
-Setting default synchronization directions: Old files will be overwritten by newer files.
+Setting default synchronization directions: Old files will be overwritten with newer files.
 Aseta oletu suunta täsmäytykselle: Vanhat tiedostot ylikirjoitetaan uudemilla tiedostoilla.
 Show conflicts
 Näytä ristiriidat
@@ -794,10 +768,14 @@ Start synchronization
 Käynnistä täsmäytys
 Statistics
 Tilastot
+Status feedback
+Tilan palaute
 Stop
 Stop
 Swap sides
 Puolten vaihto
+Switching to FreeFileSync GUI modus...
+Siirtyminen FreeFileSync GUI toimintoon...
 Synchronization Preview
 Täsmäytyksen esikatselu
 Synchronization aborted!
@@ -812,8 +790,6 @@ Synchronization status
 Täsmäytyksen status
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Täsmäytä kaikki .doc, .zip und .exe tiedostot paitsi hakemistossa \"temp\" oleva.
-Synchronize both sides using a database. Deletions are detected automatically
-Täsmäytetään molemmat puolet käyttäen tietokantaa. Poistot suoritetaan automaattisesti
 Synchronize...
 Täsmäytä...
 Synchronizing...
@@ -828,6 +804,8 @@ The command line is executed each time:\n- a directory becomes available (e.g. U
 Komentokehote suoritetaan joka kerta kun:\n- hakemisto on saatavilla (esim. USB tikku asennetaan)\n- tiedostot näissä hakemistoisa ja alihakemistoissa muutetaan
 The file does not contain a valid configuration:
 Asetustiedosto ei ole kelvollinen:
+The file was not processed by last synchronization!
+Tiedostoa ei käsitelty viime täsmäytyksessä!
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Tämä vaihtoehto todennetaan kaksi samannimistä tiedostoa samaksi, jos koko JA viimeinen tallennusaika on sama.
 Time
@@ -868,6 +846,8 @@ Verifying file %x
 Tarkistan tiedosto %x
 Volume name %x not part of filename %y!
 Osan nimi %x ei esiinny tiedostonimessä %y!
+Waiting for all directories to become available...
+Odotan että kaikki hakemistot ovat saatavilla ...
 Warning
 Varoitus
 Warning: Synchronization failed for %x item(s):

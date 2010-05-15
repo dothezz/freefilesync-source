@@ -29,6 +29,30 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError()
                               NULL,
                               OPEN_EXISTING,
                               FILE_FLAG_SEQUENTIAL_SCAN,
+                              /* possible values: (Reference http://msdn.microsoft.com/en-us/library/aa363858(VS.85).aspx#caching_behavior)
+                                FILE_FLAG_NO_BUFFERING
+                                FILE_FLAG_RANDOM_ACCESS
+                                FILE_FLAG_SEQUENTIAL_SCAN
+
+                                tests on Win7 x64 show that FILE_FLAG_SEQUENTIAL_SCAN provides best performance for binary comparison in all cases:
+                                - comparing different physical disks (DVD <-> HDD and HDD <-> HDD)
+                                - even on same physical disk! (HDD <-> HDD)
+                                - independent from client buffer size!
+
+                                tests on XP show that FILE_FLAG_SEQUENTIAL_SCAN provides best performance for binary comparison when
+                                - comparing different physical disks (DVD <-> HDD)
+
+                                while FILE_FLAG_RANDOM_ACCESS offers best performance for
+                                - same physical disk (HDD <-> HDD)
+
+                              Problem: bad XP implementation of prefetch makes flag FILE_FLAG_SEQUENTIAL_SCAN effectively load two files at once from one drive
+                              swapping every 64 kB (or similar). File access times explode!
+                              => For XP it is critical to use FILE_FLAG_RANDOM_ACCESS (to disable prefetch) if reading two files on same disk and
+                              FILE_FLAG_SEQUENTIAL_SCAN when reading from different disk (e.g. massive performance improvement compared to random access for DVD <-> HDD!)
+                              => there is no compromise that satisfies all cases! (on XP)
+
+                              for FFS most comparisons are probably between different disks => let's use FILE_FLAG_SEQUENTIAL_SCAN
+                               */
                               NULL);
     if (fileHandle == INVALID_HANDLE_VALUE)
         throw FileError(wxString(_("Error opening file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"") +

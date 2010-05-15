@@ -17,7 +17,7 @@
 
 #define assert_static(e) \
 do { \
-enum { assert_static__ = 1/(e) }; \
+enum { assert_static__ = 1/(static_cast<int>(e)) }; \
 } while (0)
 #endif
 

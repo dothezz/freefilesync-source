@@ -49,9 +49,9 @@ enum SelectedSide
 class FileContainer;
 class FileMapping;
 class DirMapping;
-class CompareProcess;
 class FileSystemObject;
 class BaseDirMapping;
+class HierarchyObject;
 //------------------------------------------------------------------
 /*
   DirContainer    FileContainer
@@ -160,25 +160,22 @@ public:
                     const FileDescriptor&   right);
 
     const Zstring& getRelativeNamePf() const; //get name relative to base sync dir with FILE_NAME_SEPARATOR postfix: "blah\"
-    template <SelectedSide side> const Zstring& getBaseDir() const //postfixed!
-    {
-        return side == LEFT_SIDE ? baseDirLeft : baseDirRight;
-    }
+    template <SelectedSide side> const Zstring& getBaseDir() const; //postfixed!
 
-    typedef std::vector<FileMapping> SubFileMapping;
-    typedef std::vector<DirMapping>  SubDirMapping;
+    typedef std::vector<FileMapping> SubFileMapping; //MergeSides::execute() requires a structure that doesn't invalidate pointers after push_back()
+    typedef std::vector<DirMapping>  SubDirMapping;  //Note: deque<> has circular reference in VCPP!
 
     SubDirMapping&  useSubDirs();
     SubFileMapping& useSubFiles();
-    const SubDirMapping& useSubDirs() const;
+    const SubDirMapping&  useSubDirs()  const;
     const SubFileMapping& useSubFiles() const;
 
 protected:
     //constructor used by DirMapping
     HierarchyObject(const HierarchyObject& parent, const Zstring& shortName) :
         relNamePf(parent.getRelativeNamePf() + shortName + globalFunctions::FILE_NAME_SEPARATOR),
-        baseDirLeft(parent.getBaseDir<LEFT_SIDE>()),
-        baseDirRight(parent.getBaseDir<RIGHT_SIDE>()) {}
+        baseDirLeft(parent.baseDirLeft),
+        baseDirRight(parent.baseDirRight) {}
 
     //constructor used by BaseDirMapping
     HierarchyObject(const Zstring& dirPostfixedLeft,
@@ -197,6 +194,21 @@ private:
     Zstring baseDirLeft;  //directory name ending with FILE_NAME_SEPARATOR
     Zstring baseDirRight; //directory name ending with FILE_NAME_SEPARATOR
 };
+
+template <>
+inline
+const Zstring& HierarchyObject::getBaseDir<LEFT_SIDE>() const //postfixed!
+{
+    return baseDirLeft;
+}
+
+
+template <>
+inline
+const Zstring& HierarchyObject::getBaseDir<RIGHT_SIDE>() const //postfixed!
+{
+    return baseDirRight;
+}
 
 
 //------------------------------------------------------------------
@@ -248,7 +260,7 @@ public:
     void synchronizeSides();          //copy one side to the other (NOT recursive!!!)
     template <SelectedSide side> void removeObject();    //removes file or directory (recursively!): used by manual deletion
     bool isEmpty() const; //true, if both sides are empty
-    static void removeEmpty(BaseDirMapping& baseDir);  //remove all invalid entries (where both sides are empty) recursively
+    static void removeEmpty(BaseDirMapping& baseDir);        //remove all invalid entries (where both sides are empty) recursively
     static void removeEmptyNonRec(HierarchyObject& hierObj); //remove all invalid entries (where both sides are empty) non-recursively
 
 protected:
@@ -412,6 +424,17 @@ typedef std::vector<BaseDirMapping> FolderComparison;
 //convenience methods
 //test whether FileSystemObject is a DirMapping
 bool isDirectoryMapping(const FileSystemObject& fsObj);
+
+
+
+
+
+
+
+
+
+
+
 
 
 

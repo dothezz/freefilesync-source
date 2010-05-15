@@ -11,9 +11,11 @@
 #include "../shared/dragAndDrop.h"
 #include "../library/resources.h"
 #include "smallDialogs.h"
-#include "settingsDialog.h"
+#include "syncConfig.h"
 #include <wx/event.h>
-
+#include "isNullFilter.h"
+#include "../shared/util.h"
+#include "../shared/stringConv.h"
 
 namespace FreeFileSync
 {
@@ -76,26 +78,16 @@ public:
             basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Select alternate synchronization settings"));
         }
 
-
-        if (getMainConfig().filterIsActive)
+        //test for Null-filter
+        if (isNullFilter(localFilter))
         {
-            //test for Null-filter
-            const bool isNullFilter = NameFilter(localFilter.includeFilter, localFilter.excludeFilter).isNull();
-            if (isNullFilter)
-            {
-                basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("filterSmallGrey")));
-                basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("No filter selected"));
-            }
-            else
-            {
-                basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("filterSmall")));
-                basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("Filter has been selected"));
-            }
+            basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("filterSmallGrey")));
+            basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("No filter selected"));
         }
         else
         {
-            basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("filterSmallGrey")));
-            basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("Filtering is deactivated"));
+            basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("filterSmall")));
+            basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("Filter is active"));
         }
     }
 
@@ -131,7 +123,7 @@ private:
     {
         const int menuId = 1234;
         contextMenu.reset(new wxMenu); //re-create context menu
-        contextMenu->Append(menuId, _("Remove local filter settings"));
+        contextMenu->Append(menuId, _("Clear filter settings"));
         contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfgRemoveConfirm), NULL, this);
 
         if (NameFilter(localFilter.includeFilter, localFilter.excludeFilter).isNull())
@@ -189,8 +181,7 @@ private:
 
         if (showFilterDialog(false, //is local filter dialog
                              localFiltTmp.includeFilter,
-                             localFiltTmp.excludeFilter,
-                             getMainConfig().filterIsActive) == DefaultReturnCode::BUTTON_OKAY)
+                             localFiltTmp.excludeFilter) == DefaultReturnCode::BUTTON_OKAY)
         {
             localFilter = localFiltTmp;
             refreshButtons();

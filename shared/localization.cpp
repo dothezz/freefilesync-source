@@ -109,7 +109,7 @@ LocalizationInfo::LocalizationInfo()
     newEntry.languageID     = wxLANGUAGE_DUTCH;
     newEntry.languageName   = wxT("Nederlands");
     newEntry.languageFile   = wxT("dutch.lng");
-    newEntry.translatorName = wxT("M.D. Vrakking");
+    newEntry.translatorName = wxT("Mikhail Frolov");
     newEntry.languageFlag   = wxT("holland.png");
     locMapping.push_back(newEntry);
 

@@ -19,7 +19,6 @@ void FreeFileSync::AppMainWindow::setMainWindow(wxWindow* window)
     wxTheApp->SetTopWindow(window);
     wxTheApp->SetExitOnFrameDelete(true);
 
-    assert (!mainWndAct);
     mainWndAct = true;
 }
 

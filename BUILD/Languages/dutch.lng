@@ -22,8 +22,6 @@
  sec
 %x / %y objects deleted successfully
 %x / %y objecten succesvol verwijderd
-%x Percent
-%x procent
 %x directories
 %x paden
 %x files,
@@ -34,6 +32,8 @@
 %x van de %y rijen in zicht
 %x of 1 row in view
 %x van 1 rij in zicht
+%x%
+
 &Abort
 &Afbreken
 &About...
@@ -86,14 +86,14 @@
 &Opnieuw proberen
 &Save
 &Opslaan
+&Switch
+
 &Yes
 &Ja
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Alleen FAT/FAT32 schijven hebben last van dit probleem!\nIn alle andere gevallen kunt u deze instelling uitschakelen \"negeer 1-uur tijdsverschil\".)
 (Requires an Internet connection!)
 (Vereist een internetverbinding)
-,
-.
 - Other side's counterpart to %dir
 - Tegenhander andere kant naar %dir
 - Other side's counterpart to %name
@@ -122,10 +122,6 @@
 - rechts
 - right newer
 - rechts is nieuwer
--Open-Source file synchronization-
--Open-Source bestandssynchronisatie-
-.
-,
 /sec
 /sec
 1 directory
@@ -168,8 +164,6 @@ About
 Informatie
 Action
 Actie
-Activate filter
-Activeer filter
 Add folder
 Map toevoegen
 Add folder pair
@@ -188,8 +182,6 @@ At least one directory input field is empty.
 Er is minimaal één locatie-veld leeg.
 Auto-adjust columns
 Kolommen automatisch aanpassen
-Automatic mode
-Automatische modus
 Batch execution
 Batch taak uitvoeren
 Batch file created successfully!
@@ -202,6 +194,8 @@ Both sides have changed since last synchronization!
 Beide zijden zijn veranderd sinds de laatste synchronisatie!
 Browse
 Map opzoeken
+Browse directory
+
 Build:
 Gebouwd:
 Cannot determine sync-direction:
@@ -210,6 +204,8 @@ Cannot find %x
 
 Category
 Categorie
+Clear filter settings
+
 Comma separated list
 Komma gescheiden lijst
 Command line
@@ -226,8 +222,6 @@ Compare by \"File size and date\"
 Vergelijk met \"bestandsgrootte en -datum\"
 Compare by...
 Vergelijk met...
-Comparing content
-Vergelijken van inhoud
 Comparing content of files %x
 De inhoud van %x bestanden wordt vergeleken
 Comparing content...
@@ -294,8 +288,6 @@ Create a batch job
 Creëer batchjob
 Creating folder %x
 Map %x wordt aangemaakt
-Current operation:
-Huidige operatie:
 Custom
 Eigen regels
 Customize columns
@@ -306,10 +298,6 @@ D-Click
 Dubbele klik
 DECISION TREE
 BESLISSINGSBOOM
-Data remaining:
-Resterende data:
-Data transferred:
-
 Data verification error: Source and target file have different content!
 Dataverificatie-fout: Bron en doelbestand hebben verschillende inhoud!
 Date
@@ -364,10 +352,14 @@ Download now?
 Nu downloaden?
 Drag && drop
 Drag en drop
+Elements found:
+
+Elements processed:
+
+Elements remaining:
+
 Email
 E-mail
-Enable filter to exclude files from synchronization
-Filter gebruiken om bestanden uit te sluiten van synchronisatie
 Endless loop when traversing directory:
 Oneindige lus bij het nalopen van locatie:
 Error
@@ -462,38 +454,30 @@ Files are found equal if\n     - file content\nis the same
 Bestanden worden gelijk beschouwd als,\n     - de inhoud\novereenkomt
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
 Bestanden worden gelijk beschouwd als,\n     - de grootte\n     - datum en tijdstip van de laatste wijziging\novereenkomt
-Files remaining:
-Resterende bestanden:
 Files that are equal on both sides
 Bestanden die aan beide kanten gelijk zijn
-Files that exist on both sides and have different content
-Bestanden die aan beide kanten bestaan maar een verschillende inhoud hebben
 Files that exist on both sides, left one is newer
 Bestanden die aan beide kanten bestaan, maar waarvan de linkerkant nieuwer is
 Files that exist on both sides, right one is newer
 Bestanden die aan beide kanten bestaan, maar waarvan de rechterkant nieuwer is
-Files/folders found:
-Gevonden bestanden/mappen:
-Files/folders processed:
+Files that have different content
 
-Files/folders remaining:
-Resterende bestanden/mappen:
 Files/folders that exist on left side only
 Bestanden/mappen die alleen aan de linkerkant bestaan
 Files/folders that exist on right side only
 Bestanden/mappen die alleen aan de rechterkant bestaan
-Filter
-Filter
 Filter files
 Filter bestanden
-Filter has been selected
-Filter is geselecteerd
+Filter is active
+
 Filter settings have changed!
 Filter instellingen opgeslagen!
 Filter view
 Bekijk het filter
-Filtering is deactivated
-Filteren is uitgeschakeld
+Filter: All pairs
+
+Filter: Single pair
+
 Find
 
 Find what:
@@ -502,8 +486,6 @@ Folder Comparison and Synchronization
 Mappen vergelijken en synchroniseren
 Free disk space available:
 Beschikbare vrije schijfruimte :
-FreeFileSync - Folder Comparison and Synchronization
-FreeFileSync - Mappen vergelijken en synchroniseren
 FreeFileSync Batch Job
 FreeFileSync batchjob
 FreeFileSync at Sourceforge
@@ -520,8 +502,6 @@ Generating database...
 Database genereren...
 Generating file list...
 Bestandslijst genereren...
-Global filter
-Algemeen filter
 Global settings
 Algemene instellingen
 Help
@@ -578,12 +558,10 @@ Ignore errors
 Negeer foutmeldingen
 Ignore subsequent errors
 Negeer verdere foutmeldingen
-Ignore this error, retry or abort synchronization?
-Negeer deze fout, opnieuw proberen of afbreken van deze synchronisatie?
-Ignore this error, retry or abort?
-Negeer deze fout, opnieuw proberen of de handeling afbreken?
 Include
 Gebruiken
+Include Symbolic Links
+
 Include all rows
 Alle rijen gebruiken
 Include temporarily
@@ -600,8 +578,6 @@ Initial synchronization:
 Initiële  synchronisatie:
 Integrate external applications into context menu. The following macros are available:
 Integreer externe applicaties in het context menu. De volgende macros zijn beschikbaar:
-Last synchronization not completed!
-
 Leave as unresolved conflict
 Beschouwen als onopgelost conflict
 Left
@@ -612,8 +588,6 @@ Load configuration from file
 Laad configuratie uit bestand
 Load configuration history (press DEL to delete items)
 Laad configuratiegeschiedenis (druk op DEL om items te verwijderen)
-Local filter
-Lokaal filter
 Log-messages:
 Logberichten:
 Logging
@@ -664,12 +638,10 @@ One of the FreeFileSync database files is not yet existing:
 
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Alleen bestanden /locatie die niet worden gefilterd zullen worden gesynchroniseerd. Het filter word toegepast op de relatieve(!) naam van de basislocatie van de synchronisatie.
-Open directly
-Direct openen
 Open with Explorer
 Openen met Explorer
-Open with Konqueror
-Openen met Konqueror
+Open with default application
+
 Operation aborted!
 Operatie afgebroken!
 Operation:
@@ -680,8 +652,12 @@ Pause
 Pause
 Paused
 Gepauseerd
+Planned directory deletion is in conflict with its subdirectories and -files!
+
 Please run a Compare first before synchronizing!
 Voer eerst een Vergelijking uit voordat u synchroniseerd.
+Press \"Switch\" to open FreeFileSync GUI modus.
+
 Processing folder pair:
 Verwerken van gekoppelde folder:
 Published under the GNU General Public License:
@@ -706,8 +682,6 @@ Remove folder
 Verwijder map
 Remove folder pair
 Verwijder 1 paar gekoppelde mappen
-Remove local filter settings
-Verwijder lokale filter instellingen
 Renaming file %x to %y
 Hernoemen van bestand %x naar %y
 Report translation error
@@ -740,7 +714,7 @@ Select variant:
 Selecteer een variant:
 Set direction:
 
-Setting default synchronization directions: Old files will be overwritten by newer files.
+Setting default synchronization directions: Old files will be overwritten with newer files.
 
 Show conflicts
 Geef conflicten weer
@@ -794,10 +768,14 @@ Start synchronization
 Start synchroniseren
 Statistics
 Statistieken
+Status feedback
+
 Stop
 Stop
 Swap sides
 Wissel zijdes
+Switching to FreeFileSync GUI modus...
+
 Synchronization Preview
 Synchronisatie voorbeeldweergave
 Synchronization aborted!
@@ -812,8 +790,6 @@ Synchronization status
 Synchronisatie: status
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Synchroniseer alle .doc, .zip en .exe bestanden uitgezonderd alles in submap \"temp\"
-Synchronize both sides using a database. Deletions are detected automatically
-Synchroniseer beide zijdes met gebruik van een database. Verwijderde bestanden worden automatisch opgemerkt
 Synchronize...
 Synchroniseer...
 Synchronizing...
@@ -828,6 +804,8 @@ The command line is executed each time:\n- a directory becomes available (e.g. U
 
 The file does not contain a valid configuration:
 Het bestand bevat geen geldige configuratie:
+The file was not processed by last synchronization!
+
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Deze variant ziet twee gelijknamige bestanden als gelijk wanneer ze dezelfde bestandsgrootte EN tijdstempel hebben.
 Time
@@ -868,6 +846,8 @@ Verifying file %x
 Verifiëren bestand %x
 Volume name %x not part of filename %y!
 Volume naam %x maakt niet deel uit van bestandsnaam %y!
+Waiting for all directories to become available...
+
 Warning
 Attentie
 Warning: Synchronization failed for %x item(s):

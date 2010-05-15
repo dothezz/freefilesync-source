@@ -18,6 +18,7 @@
 #include <functional>
 #include <vector>
 #include "longPathPrefix.h"
+#include "IFileOperation/fileOp.h"
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
@@ -37,8 +38,8 @@ const std::wstring& getRecyclerDllName()
 {
     static const std::wstring filename(
         Utility::is64BitBuild ?
-        L"Recycler_x64.dll":
-        L"Recycler_Win32.dll");
+        L"FileOperation_x64.dll":
+        L"FileOperation_Win32.dll");
 
     assert_static(Utility::is32BitBuild || Utility::is64BitBuild);
 
@@ -85,16 +86,15 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
 
     if (useIFileOperation) //new recycle bin usage: available since Vista
     {
-        typedef bool (*MoveToRecycleBinFunc)(
-            const wchar_t* fileNames[],
-            size_t         fileNo, //size of fileNames array
-            wchar_t*	   errorMessage,
-            size_t         errorBufferLen);
+        using namespace FileOp;
 
-        static const MoveToRecycleBinFunc moveToRecycler =
-            Utility::loadDllFunction<MoveToRecycleBinFunc>(getRecyclerDllName().c_str(), "moveToRecycleBin");
+        static const MoveToRecycleBinFct moveToRecycler =
+            Utility::loadDllFunction<MoveToRecycleBinFct>(getRecyclerDllName().c_str(), moveToRecycleBinFctName);
 
-        if (moveToRecycler == NULL)
+        static const GetLastErrorFct getLastError =
+            Utility::loadDllFunction<GetLastErrorFct>(getRecyclerDllName().c_str(), getLastErrorFctName);
+
+        if (moveToRecycler == NULL || getLastError == NULL)
             throw FileError(wxString(_("Could not load a required DLL:")) + wxT(" \"") + getRecyclerDllName().c_str() + wxT("\""));
 
         //#warning moving long file paths to recycler does not work! clarify!
@@ -106,12 +106,11 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
         std::transform(filesToDelete.begin(), filesToDelete.end(),
                        std::back_inserter(fileNames), std::mem_fun_ref(&Zstring::c_str));
 
-        wchar_t errorMessage[2000];
         if (!(*moveToRecycler)(&fileNames[0], //array must not be empty
-                               fileNames.size(),
-                               errorMessage,
-                               2000))
+                               fileNames.size()))
         {
+            wchar_t errorMessage[2000];
+            (*getLastError)(errorMessage, 2000);
             throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + fileNames[0] + wxT("\"\n\n") + //report first file only... better than nothing
                             wxT("(") + errorMessage + wxT(")"));
         }

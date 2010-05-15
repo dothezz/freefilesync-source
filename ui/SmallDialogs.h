@@ -30,8 +30,7 @@ void showHelpDialog();
 
 DefaultReturnCode::Response showFilterDialog(bool isGlobalFilter,
         Zstring& filterIncl,
-        Zstring& filterExcl,
-        bool filterActive);
+        Zstring& filterExcl);
 
 DefaultReturnCode::Response showDeleteDialog(
     const std::vector<FileSystemObject*>& rowsOnLeft,
@@ -47,7 +46,12 @@ DefaultReturnCode::Response showSyncPreviewDlg(
     const SyncStatistics& statistics,
     bool& dontShowAgain);
 
-DefaultReturnCode::Response showCompareCfgDialog(const wxPoint& position, CompareVariant& cmpVar);
+DefaultReturnCode::Response showCompareCfgDialog(
+    const wxPoint& position,
+    CompareVariant& cmpVar,
+    bool& processSymlinks,
+    bool& traverseDirectorySymlinks,
+    bool& copyFileSymlinks);
 
 DefaultReturnCode::Response showGlobalSettingsDlg(xmlAccess::XmlGlobalSettings& globalSettings);
 }

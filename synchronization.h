@@ -62,7 +62,7 @@ struct FolderPairSyncCfg
 
     bool inAutomaticMode; //update database if in automatic mode
     DeletionPolicy handleDeletion;
-    Zstring custDelFolder; //formatted directory name
+    Zstring custDelFolder; //formatted(!) directory name
 };
 std::vector<FolderPairSyncCfg> extractSyncCfg(const MainConfiguration& mainCfg);
 

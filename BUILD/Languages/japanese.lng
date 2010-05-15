@@ -22,8 +22,6 @@
  秒
 %x / %y objects deleted successfully
 %x / %y のオブジェクトを削除しました
-%x Percent
-%x パーセント
 %x directories
 %x ディレクトリ
 %x files,
@@ -34,6 +32,8 @@
 %x / %y 行を表示
 %x of 1 row in view
 %x / 1 行を表示
+%x%
+%x%
 &Abort
 情報(&A)
 &About...
@@ -86,14 +86,14 @@
 再試行(&R)
 &Save
 保存(&S)
+&Switch
+切り替え(&S)
 &Yes
 はい(&Y)
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (注意: FAT/FAT32 ドライブのみこの影響を受けます! \n その他のケースでは設定を無効にすることができます。"1 時間の差異は無視" )
 (Requires an Internet connection!)
 (インターネット接続を必要とします!)
-,
-.
 - Other side's counterpart to %dir
 - %dir の反対側の対象
 - Other side's counterpart to %name
@@ -122,10 +122,6 @@
 - 右側
 - right newer
 - 右側の方が新しい
--Open-Source file synchronization-
--Open-Source ファイル同期ツール-
-.
-,
 /sec
 /秒
 1 directory
@@ -168,8 +164,6 @@ About
 情報
 Action
 操作
-Activate filter
-フィルターを有効化
 Add folder
 フォルダを追加
 Add folder pair
@@ -188,8 +182,6 @@ At least one directory input field is empty.
 少なくともひとつのディレクトリを選択してください
 Auto-adjust columns
 列の自動調整
-Automatic mode
-自動モード
 Batch execution
 一括処理を実行
 Batch file created successfully!
@@ -202,6 +194,8 @@ Both sides have changed since last synchronization!
 前回最後の同期処理以降、両側とも変更があります!
 Browse
 参照
+Browse directory
+ディレクトリを参照
 Build:
 ビルド:
 Cannot determine sync-direction:
@@ -210,6 +204,8 @@ Cannot find %x
 %x は見つかりません
 Category
 カテゴリ
+Clear filter settings
+フィルター設定をクリア
 Comma separated list
 カンマ区切り
 Command line
@@ -226,8 +222,6 @@ Compare by \"File size and date\"
 \"ファイルサイズと日付\" を比較
 Compare by...
 比較対象...
-Comparing content
-内容の比較中
 Comparing content of files %x
 ファイル %x の内容を比較中
 Comparing content...
@@ -251,13 +245,13 @@ Configuration saved!
 Configure filter
 フィルター設定
 Configure your own synchronization rules.
-あなたの設定した同期規則
+あなたの設定した同期規則を使用します。
 Confirm
 確認
 Conflict detected:
 検出された競合:
 Conflicts/files that cannot be categorized
-ファイルに競合があるため分類できません
+分類のできない競合/ファイル
 Continue
 続行
 Conversion error:
@@ -294,8 +288,6 @@ Create a batch job
 一括ジョブを作成
 Creating folder %x
 フォルダ %x を作成中
-Current operation:
-現在の操作:
 Custom
 カスタム
 Customize columns
@@ -303,13 +295,9 @@ Customize columns
 Customize...
 カスタマイズ...
 D-Click
-D-クリック
+W-クリック
 DECISION TREE
 [判定ツリー]
-Data remaining:
-残りのデータ:
-Data transferred:
-転送済データ:
 Data verification error: Source and target file have different content!
 データ検証エラー: ソースと対象ファイルに異なる内容が含まれています!
 Date
@@ -364,10 +352,14 @@ Download now?
 ダウンロードしますか?
 Drag && drop
 ドラッグ && ドロップ
+Elements found:
+見つかった要素:
+Elements processed:
+処理された要素:
+Elements remaining:
+残りの要素:
 Email
 E-メール
-Enable filter to exclude files from synchronization
-同期処理の際、除外ファイルフィルターを有効にする。
 Endless loop when traversing directory:
 ディレクトリ移動中に無限ループが発生:
 Error
@@ -462,38 +454,30 @@ Files are found equal if\n     - file content\nis the same
 ファイルが同様だった場合\n     - ファイル内容\nで判断する
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
 ファイルが同様だった場合\n   - ファイルサイズ\n   - 最終書き込み時間と日付\nで判断する
-Files remaining:
-残りのファイル:
 Files that are equal on both sides
 両側で同様のファイル
-Files that exist on both sides and have different content
-両側に存在するが、内容が異なるファイル
 Files that exist on both sides, left one is newer
 両側に存在するが、左側の方がより新しい
 Files that exist on both sides, right one is newer
 両側に存在するが、右側の方がより新しい
-Files/folders found:
-発見したファイル/フォルダ:
-Files/folders processed:
-処理済ファイル/フォルダ:
-Files/folders remaining:
-リネームされたファイル/フォルダ:
+Files that have different content
+内容が異なるファイル
 Files/folders that exist on left side only
 左側のみに存在するファイル/フォルダ
 Files/folders that exist on right side only
 右側のみに存在するファイル/フォルダ
-Filter
-フィルター
 Filter files
 ファイルフィルター
-Filter has been selected
-フィルターは選択済みです
+Filter is active
+フィルターを有効化
 Filter settings have changed!
 フィルター設定は変更されています!
 Filter view
 表示フィルター
-Filtering is deactivated
-フィルタリングは非アクティブです
+Filter: All pairs
+フィルター:すべてのペア
+Filter: Single pair
+フィルター:単一ペア
 Find
 検索
 Find what:
@@ -502,8 +486,6 @@ Folder Comparison and Synchronization
 フォルダの比較と同期
 Free disk space available:
 利用可能なディスク空き容量:
-FreeFileSync - Folder Comparison and Synchronization
-FreeFileSync - フォルダ比較と同期処理
 FreeFileSync Batch Job
 FreeFileSync 一括ジョブ
 FreeFileSync at Sourceforge
@@ -520,8 +502,6 @@ Generating database...
 データベースを作成中...
 Generating file list...
 ファイル一覧を作成中...
-Global filter
-全般フィルター
 Global settings
 全般的な設定
 Help
@@ -578,12 +558,10 @@ Ignore errors
 エラーを無視
 Ignore subsequent errors
 以降のエラーを無視
-Ignore this error, retry or abort synchronization?
-このエラーを無視して再試行、或いは同期を中止しますか?
-Ignore this error, retry or abort?
-このエラーを無視して再試行/中断しますか?
 Include
 含める
+Include Symbolic Links
+シンボリックリンクを含める
 Include all rows
 すべての行を含める
 Include temporarily
@@ -600,10 +578,8 @@ Initial synchronization:
 同期処理の初期化:
 Integrate external applications into context menu. The following macros are available:
 外部のアプリケーションをコンテキストメニューに統合、以下のマクロが利用できます:
-Last synchronization not completed!
-最後の同期が完了していません!
 Leave as unresolved conflict
-未解決の競合を残す
+未解決の競合はそのまま残す
 Left
 左側
 Legend
@@ -612,8 +588,6 @@ Load configuration from file
 外部ファイルから構成設定を読み込みます
 Load configuration history (press DEL to delete items)
 構成設定履歴の読み込み(DELキーでアイテムを削除)
-Local filter
-ローカルフィルター
 Log-messages:
 ログメッセージ:
 Logging
@@ -664,12 +638,10 @@ One of the FreeFileSync database files is not yet existing:
 FreeFileSync データベースファイルが存在しません:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 フィルターに適合するファイル/ディレクトリのみ同期対象に選択されます。このフィルターは、同期基準ディレクトリへの相対的(!)な名前に適用されます。
-Open directly
-ディレクトリを開く
 Open with Explorer
 エクスプローラで開く
-Open with Konqueror
-Konqueror で開く
+Open with default application
+既定アプリケーションで開く
 Operation aborted!
 操作の中断!
 Operation:
@@ -680,8 +652,12 @@ Pause
 一時停止
 Paused
 一時停止中
+Planned directory deletion is in conflict with its subdirectories and -files!
+ディレクトリを削除すると、サブディレクトリ、ファイルの競合が起こる可能姓があります!
 Please run a Compare first before synchronizing!
 同期処理を実行する前に比較を行ってください!
+Press \"Switch\" to open FreeFileSync GUI modus.
+ \"切り替え\" を押すと FreeFileSync GUI モードで開きます
 Processing folder pair:
 フォルダペアを処理中:
 Published under the GNU General Public License:
@@ -697,7 +673,7 @@ RealtimeSync - Automated Synchronization
 RealtimeSync configuration
 リアルタイム同期の構成設定
 Recycle Bin not yet supported for this system!
-
+このシステムでは、ゴミ箱に対応していません!
 Relative path
 相対パス
 Remove alternate settings
@@ -706,8 +682,6 @@ Remove folder
 フォルダ除去
 Remove folder pair
 フォルダペアを除去
-Remove local filter settings
-ローカルフィルター設定を除去
 Renaming file %x to %y
 ファイル %x を %y にリネーム中
 Report translation error
@@ -740,7 +714,7 @@ Select variant:
 変数を選択:
 Set direction:
 方向の設定:
-Setting default synchronization directions: Old files will be overwritten by newer files.
+Setting default synchronization directions: Old files will be overwritten with newer files.
 同期方向のデフォルト設定: 古いファイルに新しいファイルを上書き
 Show conflicts
 不一致を表示
@@ -794,10 +768,14 @@ Start synchronization
 同期の開始
 Statistics
 統計
+Status feedback
+状態 フィードバック
 Stop
 停止
 Swap sides
 パネルを入れ替え
+Switching to FreeFileSync GUI modus...
+FreeFileSync GUI モードの切り替え中...
 Synchronization Preview
 同期処理のプレビュー
 Synchronization aborted!
@@ -812,8 +790,6 @@ Synchronization status
 同期処理: ステータス
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 \"temp\" のサブフォルダを除いて、すべての.doc、.zip、および.exeファイルを同期
-Synchronize both sides using a database. Deletions are detected automatically
-データベースを利用して両側を同期、削除されたものは自動的に検出されます
 Synchronize...
 同期処理...
 Synchronizing...
@@ -828,6 +804,8 @@ The command line is executed each time:\n- a directory becomes available (e.g. U
 このコマンドラインは逐次実行されます:\n- ディレクトリに利用可能です(例.USBメモリ、ドライブなど)\n- これらディレクトリ/サブディレクトリのファイルの更新
 The file does not contain a valid configuration:
 このファイルには有効な構成が含まれていません:
+The file was not processed by last synchronization!
+このファイルは最後の同期操作時に処理されていません!
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 この変数では、ふたつの同名ファイルが存在した場合、 それぞれのファイルサイズと最終更新日付/時間を比較します。
 Time
@@ -868,6 +846,8 @@ Verifying file %x
 ファイル %x の検証中
 Volume name %x not part of filename %y!
 ボリューム名 %x にファイル名 %y はありません!
+Waiting for all directories to become available...
+すべてのディレクトリが利用可能になるまで待機中...
 Warning
 警告
 Warning: Synchronization failed for %x item(s):

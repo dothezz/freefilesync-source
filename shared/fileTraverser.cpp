@@ -72,7 +72,7 @@ void setWin32FileInformation(const FILETIME& lastWriteTime,
 
 
 inline
-bool setWin32FileInformationFromSymlink(const Zstring linkName, FreeFileSync::TraverseCallback::FileInfo& output)
+bool setWin32FileInformationFromSymlink(const Zstring& linkName, FreeFileSync::TraverseCallback::FileInfo& output)
 {
     //open handle to target of symbolic link
     HANDLE hFile = ::CreateFile(FreeFileSync::applyLongPathPrefix(linkName).c_str(),
@@ -88,10 +88,7 @@ bool setWin32FileInformationFromSymlink(const Zstring linkName, FreeFileSync::Tr
     boost::shared_ptr<void> dummy(hFile, ::CloseHandle);
 
     BY_HANDLE_FILE_INFORMATION fileInfoByHandle;
-
-    if (!::GetFileInformationByHandle(
-                hFile,
-                &fileInfoByHandle))
+    if (!::GetFileInformationByHandle(hFile, &fileInfoByHandle))
         return false;
 
     //write output
@@ -101,7 +98,6 @@ bool setWin32FileInformationFromSymlink(const Zstring linkName, FreeFileSync::Tr
 #endif
 
 
-template <bool traverseDirectorySymlinks>
 bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback* sink, const int level)
 {
     using namespace FreeFileSync;
@@ -159,10 +155,11 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
             continue;
 
         const Zstring fullName = directoryFormatted + shortName;
+        const bool isSymbolicLink = (fileMetaData.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
 
         if (fileMetaData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) //a directory... (for directory symlinks this flag is set too!)
         {
-            const TraverseCallback::ReturnValDir rv = sink->onDir(shortName, fullName);
+            const TraverseCallback::ReturnValDir rv = sink->onDir(shortName, fullName, isSymbolicLink);
             switch (rv.returnCode)
             {
             case TraverseCallback::ReturnValDir::TRAVERSING_DIR_STOP:
@@ -172,10 +169,8 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
                 break;
 
             case TraverseCallback::ReturnValDir::TRAVERSING_DIR_CONTINUE:
-                //traverse into symbolic links, junctions, etc. if requested only:
-                if (traverseDirectorySymlinks || (~fileMetaData.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT))
-                    if (!traverseDirectory<traverseDirectorySymlinks>(fullName, rv.subDirCb, level + 1))
-                        return false;
+                if (!traverseDirectory(fullName, rv.subDirCb, level + 1))
+                    return false;
                 break;
             }
         }
@@ -183,7 +178,7 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
         {
             TraverseCallback::FileInfo details;
 
-            if (fileMetaData.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) //dereference symlinks!
+            if (isSymbolicLink) //dereference symlinks!
             {
                 if (!setWin32FileInformationFromSymlink(fullName, details))
                 {
@@ -195,7 +190,7 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
             else
                 setWin32FileInformation(fileMetaData.ftLastWriteTime, fileMetaData.nFileSizeHigh, fileMetaData.nFileSizeLow, details);
 
-            switch (sink->onFile(shortName, fullName, details))
+            switch (sink->onFile(shortName, fullName, isSymbolicLink, details))
             {
             case TraverseCallback::TRAVERSING_STOP:
                 return false;
@@ -292,7 +287,7 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
                 details.lastWriteTimeRaw = 0; //we are not interested in the modifiation time of the link
                 details.fileSize         = 0;
 
-                switch (sink->onFile(shortName, fullName, details))
+                switch (sink->onFile(shortName, fullName, isSymbolicLink, details))
                 {
                 case TraverseCallback::TRAVERSING_STOP:
                     return false;
@@ -304,9 +299,9 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
         }
 
 
-        if (S_ISDIR(fileInfo.st_mode)) //a directory... (note: symbolic links need to be dereferenced to test if they point to a directory!)
+        if (S_ISDIR(fileInfo.st_mode)) //a directory... (note: symbolic links need to be dereferenced to test whether they point to a directory!)
         {
-            const TraverseCallback::ReturnValDir rv = sink->onDir(shortName, fullName);
+            const TraverseCallback::ReturnValDir rv = sink->onDir(shortName, fullName, isSymbolicLink);
             switch (rv.returnCode)
             {
             case TraverseCallback::ReturnValDir::TRAVERSING_DIR_STOP:
@@ -316,10 +311,8 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
                 break;
 
             case TraverseCallback::ReturnValDir::TRAVERSING_DIR_CONTINUE:
-                //traverse into symbolic links, junctions, etc. if requested only:
-                if (traverseDirectorySymlinks || !isSymbolicLink) //traverse into symbolic links if requested only
-                    if (!traverseDirectory<traverseDirectorySymlinks>(fullName, rv.subDirCb, level + 1))
-                        return false;
+                if (!traverseDirectory(fullName, rv.subDirCb, level + 1))
+                    return false;
                 break;
             }
         }
@@ -329,7 +322,7 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
             details.lastWriteTimeRaw = fileInfo.st_mtime; //UTC time(ANSI C format); unit: 1 second
             details.fileSize         = fileInfo.st_size;
 
-            switch (sink->onFile(shortName, fullName, details))
+            switch (sink->onFile(shortName, fullName, isSymbolicLink, details))
             {
             case TraverseCallback::TRAVERSING_STOP:
                 return false;
@@ -345,7 +338,6 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
 
 
 void FreeFileSync::traverseFolder(const Zstring& directory,
-                                  const bool traverseDirectorySymlinks,
                                   TraverseCallback* sink)
 {
 #ifdef FFS_WIN
@@ -357,8 +349,5 @@ void FreeFileSync::traverseFolder(const Zstring& directory,
         directory;
 #endif
 
-    if (traverseDirectorySymlinks)
-        traverseDirectory<true>(directoryFormatted, sink, 0);
-    else
-        traverseDirectory<false>(directoryFormatted, sink, 0);
+    traverseDirectory(directoryFormatted, sink, 0);
 }

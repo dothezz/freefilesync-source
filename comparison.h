@@ -40,8 +40,9 @@ std::vector<FolderPairCfg> extractCompareCfg(const MainConfiguration& mainCfg);
 class CompareProcess
 {
 public:
-    CompareProcess(bool traverseSymLinks,
-                   unsigned int fileTimeTol,
+    CompareProcess(bool processSymLinks,
+                   bool traverseSymLinks,
+                   size_t fileTimeTol,
                    bool ignoreOneHourDiff,
                    xmlAccess::OptionalDialogs& warnings,
                    StatusHandler* handler);
@@ -62,7 +63,7 @@ private:
     class DirectoryBuffer;
     boost::shared_ptr<DirectoryBuffer> directoryBuffer; //std::auto_ptr does not work with forward declarations (Or we need a non-inline ~CompareProcess())!
 
-    const unsigned int fileTimeTolerance; //max allowed file time deviation
+    const size_t fileTimeTolerance; //max allowed file time deviation
     const bool ignoreOneHourDifference;
 
     xmlAccess::OptionalDialogs& m_warnings;

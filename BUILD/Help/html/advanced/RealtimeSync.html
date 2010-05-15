@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20100125;20445600">
+	<META NAME="CHANGED" CONTENT="20100428;21351600">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -68,8 +68,9 @@ to begin monitoring.</FONT></P>
 			<FONT FACE="Tahoma, sans-serif">Starting the tool can be automated
 			by passing a RealtimeSync configuration file (<FONT FACE="Courier New, monospace">*.ffs_real</FONT>)
 			OR a FreeFileSync Batch file (<FONT FACE="Courier New, monospace">*.ffs_batch</FONT>)
-			as first command-line argument. This allows for integration with
-			your operating system's autostart facility:</FONT></P>
+			as first command-line argument. Latter is implicitly converted to
+			a *.ffs_real file with default settings. This allows for
+			integration with your operating system's autostart facility:</FONT></P>
 		</UL>
 	</SPAN><BR CLEAR=LEFT>
 	</P>
@@ -131,15 +132,15 @@ batch file similar to this one:</FONT></P>
 		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
 		<FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B>::first
 		check whether USB-stick contains a sync-configuration at all</B></I></FONT></FONT><FONT FACE="Courier New, monospace"><BR>@if
-		exist &quot;H:\Silent_Config.ffs_batch&quot; (<BR></FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B>::configuration
-		found, now execute the synchronization batch job</B></I></FONT></FONT><FONT FACE="Courier New, monospace"><BR>&quot;C:\Program
+		exist &quot;H:\Silent_Config.ffs_batch&quot; (<BR></FONT><FONT COLOR="#808080">&nbsp;&nbsp;</FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B>::configuration
+		found, now execute the synchronization batch job</B></I></FONT></FONT><FONT FACE="Courier New, monospace"><BR></FONT><FONT COLOR="#808080">&nbsp;&nbsp;</FONT><FONT FACE="Courier New, monospace">&quot;C:\Program
 		Files\FreeFileSync\FreeFileSync.exe&quot;
-		&quot;H:\Silent_Config.ffs_batch&quot;<BR>@if not errorlevel 0
-		(<BR></FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B>::if
+		&quot;H:\Silent_Config.ffs_batch&quot;<BR></FONT><FONT COLOR="#808080">&nbsp;&nbsp;</FONT><FONT FACE="Courier New, monospace">@if
+		not errorlevel 0 (<BR></FONT><FONT COLOR="#808080">&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B>::if
 		something went wrong, start FreeFileSync in GUI
-		mode</B></I></FONT></FONT><FONT FACE="Courier New, monospace"><BR></FONT>&nbsp;&nbsp;&nbsp;&nbsp;<FONT FACE="Courier New, monospace">&quot;C:\Program
+		mode</B></I></FONT></FONT><FONT FACE="Courier New, monospace"><BR></FONT><FONT COLOR="#808080">&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT FACE="Courier New, monospace">&quot;C:\Program
 		Files\FreeFileSync\FreeFileSync.exe&quot;
-		&quot;H:\GUI_Config.ffs_gui&quot;<BR>)<BR>)</FONT></P>
+		&quot;H:\GUI_Config.ffs_gui&quot;<BR></FONT><FONT COLOR="#808080">&nbsp;&nbsp;</FONT><FONT FACE="Courier New, monospace">)<BR>)</FONT></P>
 	</SPAN><BR CLEAR=LEFT>
 	</P>
 </UL>

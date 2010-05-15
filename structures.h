@@ -14,7 +14,6 @@
 #include "shared/staticAssert.h"
 #include <boost/shared_ptr.hpp>
 
-
 namespace FreeFileSync
 {
 enum CompareVariant
@@ -163,21 +162,15 @@ struct HiddenSettings
 {
     HiddenSettings() :
         fileTimeTolerance(2),  //default 2s: FAT vs NTFS
-        traverseDirectorySymlinks(false),
-        copyFileSymlinks(true),
         verifyFileCopy(false) {}
 
-    unsigned int fileTimeTolerance; //max. allowed file time deviation
-    bool traverseDirectorySymlinks;
-    bool copyFileSymlinks; //copy symbolic link instead of target file
+    size_t fileTimeTolerance; //max. allowed file time deviation
     bool verifyFileCopy;   //verify copied files
 
     bool operator==(const HiddenSettings& other) const
     {
-        return fileTimeTolerance         == other.fileTimeTolerance         &&
-               traverseDirectorySymlinks == other.traverseDirectorySymlinks &&
-               copyFileSymlinks          == other.copyFileSymlinks          &&
-               verifyFileCopy            == other.verifyFileCopy;
+        return fileTimeTolerance == other.fileTimeTolerance &&
+               verifyFileCopy    == other.verifyFileCopy;
     }
 };
 
@@ -270,9 +263,10 @@ struct MainConfiguration
 {
     MainConfiguration() :
         compareVar(CMP_BY_TIME_SIZE),
-        filterIsActive(true),
-        includeFilter(DefaultStr("*")),
-        excludeFilter(standardExcludeFilter()),
+        processSymlinks(false),
+        traverseDirectorySymlinks(true),
+        copyFileSymlinks(false),
+        globalFilter(DefaultStr("*"), standardExcludeFilter()),
         handleDeletion(MOVE_TO_RECYCLE_BIN) {}
 
     FolderPairEnh firstPair; //there needs to be at least one pair!
@@ -281,13 +275,15 @@ struct MainConfiguration
     //Compare setting
     CompareVariant compareVar;
 
+    bool processSymlinks; //include Symbolic links into file listing at all?
+    bool traverseDirectorySymlinks; //traverse dir symlinks <=> not copying symlink
+    bool copyFileSymlinks; //copy symbolic link instead of target file
+
     //Synchronisation settings
     SyncConfiguration syncConfiguration;
 
     //GLOBAL filter settings
-    bool filterIsActive;
-    Zstring includeFilter;
-    Zstring excludeFilter;
+    FilterConfig globalFilter;
 
     //misc options
     HiddenSettings hidden; //settings not visible on GUI
@@ -302,10 +298,11 @@ struct MainConfiguration
         return firstPair         == other.firstPair         &&
                additionalPairs   == other.additionalPairs   &&
                compareVar        == other.compareVar        &&
+               processSymlinks   == other.processSymlinks   &&
+               traverseDirectorySymlinks == other.traverseDirectorySymlinks &&
+               copyFileSymlinks  == other.copyFileSymlinks  &&
                syncConfiguration == other.syncConfiguration &&
-               filterIsActive    == other.filterIsActive    &&
-               includeFilter     == other.includeFilter     &&
-               excludeFilter     == other.excludeFilter     &&
+               globalFilter      == other.globalFilter      &&
                hidden            == other.hidden            &&
                handleDeletion    == other.handleDeletion    &&
                customDeletionDirectory == other.customDeletionDirectory;

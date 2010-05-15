@@ -22,8 +22,6 @@
  秒
 %x / %y objects deleted successfully
 %x / %y 個物件已删除成功
-%x Percent
-百分之 %x
 %x directories
 %x 目錄
 %x files,
@@ -34,6 +32,8 @@
 顯示 %y 之 %x 行
 %x of 1 row in view
 顯示 1 之 %x 行
+%x%
+
 &Abort
 取消(&A)
 &About...
@@ -86,14 +86,14 @@
 重試(&R)
 &Save
 儲存(&S)
+&Switch
+
 &Yes
 是
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (請注意只有 FAT/FAT32 磁碟機會受到此問題的影響！\n在所有其他狀況下，可以關閉這個設定\"忽略1小時的誤差\"。)
 (Requires an Internet connection!)
 (需要連接到網際網路！)
-,
-.
 - Other side's counterpart to %dir
 - 另一邊對應到 %dir
 - Other side's counterpart to %name
@@ -122,10 +122,6 @@
 - 右邊
 - right newer
 - 右邊較新
--Open-Source file synchronization-
--開放原始碼檔案同步-
-.
-,
 /sec
 /秒
 1 directory
@@ -168,8 +164,6 @@ About
 關於
 Action
 動作
-Activate filter
-啟動篩選器
 Add folder
 新增資料夾
 Add folder pair
@@ -188,8 +182,6 @@ At least one directory input field is empty.
 至少有一個目錄輸入欄位是空的。
 Auto-adjust columns
 自動調整欄寬
-Automatic mode
-自動模式
 Batch execution
 批次處理執行
 Batch file created successfully!
@@ -202,6 +194,8 @@ Both sides have changed since last synchronization!
 自上次同步後，兩邊均已更改過！
 Browse
 瀏覽
+Browse directory
+
 Build:
 建立：
 Cannot determine sync-direction:
@@ -210,6 +204,8 @@ Cannot find %x
 找不到 %x
 Category
 分類
+Clear filter settings
+
 Comma separated list
 逗號分隔清單
 Command line
@@ -226,8 +222,6 @@ Compare by \"File size and date\"
 以檔案大小和日期比對
 Compare by...
 比對選項...
-Comparing content
-正在比對内容
 Comparing content of files %x
 正在比對檔案内容的百分比 %x
 Comparing content...
@@ -294,8 +288,6 @@ Create a batch job
 新建一個批次處理作業
 Creating folder %x
 正在新建資料夾 %x
-Current operation:
-目前操作：
 Custom
 自訂
 Customize columns
@@ -306,10 +298,6 @@ D-Click
 點兩下
 DECISION TREE
 決策樹
-Data remaining:
-剩餘資料：
-Data transferred:
-已傳輸資料：
 Data verification error: Source and target file have different content!
 資料驗證錯誤：來源和目的檔案內容不同！
 Date
@@ -364,10 +352,14 @@ Download now?
 要立即下載嗎？
 Drag && drop
 拖放
+Elements found:
+
+Elements processed:
+
+Elements remaining:
+
 Email
 信箱
-Enable filter to exclude files from synchronization
-啟用篩選器從同步中排除檔案
 Endless loop when traversing directory:
 當遍歷目錄時無限循環：
 Error
@@ -462,38 +454,30 @@ Files are found equal if\n     - file content\nis the same
 如果檔案内容相同則判斷兩者相同
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
 如果檔案大小和最後修改時間和日期相同則判斷兩者相同
-Files remaining:
-剩餘檔案：
 Files that are equal on both sides
 兩邊相同的檔案
-Files that exist on both sides and have different content
-檔案存在於兩邊而且內容不同
 Files that exist on both sides, left one is newer
 檔案存在於兩邊，左邊檔案較新
 Files that exist on both sides, right one is newer
 檔案存在於兩邊，右邊檔案較新
-Files/folders found:
-找到的檔案/資料夾：
-Files/folders processed:
-已處理的檔案/資料夾：
-Files/folders remaining:
-剩餘的檔案/資料夾：
+Files that have different content
+
 Files/folders that exist on left side only
 只存在於左邊的檔案/資料夾
 Files/folders that exist on right side only
 只存在於右邊的檔案/資料夾
-Filter
-篩選器
 Filter files
 篩選檔案
-Filter has been selected
-已選擇篩選器
+Filter is active
+
 Filter settings have changed!
 篩選器設定已更改！
 Filter view
 篩選檢視
-Filtering is deactivated
-篩選已停用
+Filter: All pairs
+
+Filter: Single pair
+
 Find
 尋找
 Find what:
@@ -502,8 +486,6 @@ Folder Comparison and Synchronization
 資料夾比對和同步
 Free disk space available:
 可用的磁碟空間：
-FreeFileSync - Folder Comparison and Synchronization
-FreeFileSync - 資料夾比對和同步
 FreeFileSync Batch Job
 FreeFileSync 批次處理作業
 FreeFileSync at Sourceforge
@@ -520,8 +502,6 @@ Generating database...
 產生資料庫...
 Generating file list...
 產生檔案清單...
-Global filter
-整體性篩選器
 Global settings
 整體設定
 Help
@@ -578,12 +558,10 @@ Ignore errors
 忽略錯誤
 Ignore subsequent errors
 忽略後續錯誤
-Ignore this error, retry or abort synchronization?
-忽略此錯誤、重試或中止同步嗎？
-Ignore this error, retry or abort?
-忽略此錯誤、重試或中止嗎？
 Include
 包括
+Include Symbolic Links
+
 Include all rows
 包括所有行
 Include temporarily
@@ -600,8 +578,6 @@ Initial synchronization:
 初始化同步：
 Integrate external applications into context menu. The following macros are available:
 整合上下文功能表中的外部應用程式。可以使用下面的巨集：
-Last synchronization not completed!
-最後一次同步未完成！
 Leave as unresolved conflict
 保留給未解決的衝突
 Left
@@ -612,8 +588,6 @@ Load configuration from file
 從檔案載入配置
 Load configuration history (press DEL to delete items)
 載入配置的歷史記錄(按DEL鍵刪除項目)
-Local filter
-局部性篩選器
 Log-messages:
 日誌訊息：
 Logging
@@ -664,12 +638,10 @@ One of the FreeFileSync database files is not yet existing:
 其中一個 FreeFileSync 資料庫檔案不存在：
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 只有被選中篩選的檔案/目錄會進行同步。篩選器將套用到基本同步目錄的相對名稱。
-Open directly
-直接開啟
 Open with Explorer
 使用檔案總管開啟
-Open with Konqueror
-使用 Konqueror 開啟
+Open with default application
+
 Operation aborted!
 中止操作！
 Operation:
@@ -680,8 +652,12 @@ Pause
 暫停
 Paused
 已暫停
+Planned directory deletion is in conflict with its subdirectories and -files!
+
 Please run a Compare first before synchronizing!
 請執行同步前先比對！
+Press \"Switch\" to open FreeFileSync GUI modus.
+
 Processing folder pair:
 處理兩個資料夾：
 Published under the GNU General Public License:
@@ -706,8 +682,6 @@ Remove folder
 移除資料夾
 Remove folder pair
 移除兩個資料夾
-Remove local filter settings
-移除局部性篩選器設定
 Renaming file %x to %y
 檔案重新命名 %x 為 %y
 Report translation error
@@ -740,7 +714,7 @@ Select variant:
 選擇變數：
 Set direction:
 設定方向：
-Setting default synchronization directions: Old files will be overwritten by newer files.
+Setting default synchronization directions: Old files will be overwritten with newer files.
 設定預設同步方向：舊檔案會被較新的檔案覆蓋。
 Show conflicts
 顯示衝突
@@ -794,10 +768,14 @@ Start synchronization
 開始同步
 Statistics
 統計
+Status feedback
+
 Stop
 停止
 Swap sides
 兩邊交換
+Switching to FreeFileSync GUI modus...
+
 Synchronization Preview
 同步預覽
 Synchronization aborted!
@@ -812,8 +790,6 @@ Synchronization status
 同步狀態
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 同步所有 .doc, .zip 和 .exe 檔案，除了\"temp\"中的一切。
-Synchronize both sides using a database. Deletions are detected automatically
-雙向同步使用一個資料庫。自動檢測要刪除的檔案
 Synchronize...
 同步...
 Synchronizing...
@@ -828,6 +804,8 @@ The command line is executed each time:\n- a directory becomes available (e.g. U
 命令列每次執行：\n- 可用的目錄（例如插入USB隨身碟）\n- 檔案在這些目錄或子目錄會被修改
 The file does not contain a valid configuration:
 該檔案不包含有效的配置：
+The file was not processed by last synchronization!
+
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 此變數計算結果為兩個檔名相同的檔案，只有當他們的檔案大小和最後修改日期時間也相同，才會判斷他們是相同的檔案。
 Time
@@ -868,6 +846,8 @@ Verifying file %x
 驗證檔 %x
 Volume name %x not part of filename %y!
 卷名 %x 並非檔名 %y 的一部份！
+Waiting for all directories to become available...
+
 Warning
 警告
 Warning: Synchronization failed for %x item(s):

@@ -31,7 +31,7 @@
 using namespace FreeFileSync;
 
 
-const unsigned int MIN_ROW_COUNT = 15;
+const size_t MIN_ROW_COUNT = 15;
 
 //class containing pure grid data: basically the same as wxGridStringTable, but adds cell formatting
 
@@ -81,7 +81,7 @@ public:
     virtual int GetNumberRows()
     {
         if (gridDataView)
-            return std::max(static_cast<unsigned int>(gridDataView->rowsOnView()), MIN_ROW_COUNT);
+            return static_cast<int>(std::max(gridDataView->rowsOnView(), MIN_ROW_COUNT));
         else
             return 0; //grid is initialized with zero number of rows
     }
@@ -188,7 +188,7 @@ public:
     }
 
 
-    const FileSystemObject* getRawData(const unsigned int row) const
+    const FileSystemObject* getRawData(size_t row) const
     {
         if (gridDataView)
             return gridDataView->getObject(row); //returns NULL if request is not valid or not data found
@@ -239,16 +239,16 @@ public:
     }
 
 
-    xmlAccess::ColumnTypes getTypeAtPos(unsigned pos) const
+    xmlAccess::ColumnTypes getTypeAtPos(size_t pos) const
     {
         if (pos < columnPositions.size())
             return columnPositions[pos];
         else
-            return xmlAccess::ColumnTypes(1000);
+            return xmlAccess::DIRECTORY;
     }
 
     //get filename in order to retrieve the icon from it
-    virtual Zstring getIconFile(const unsigned int row) const = 0;  //return "folder" if row points to a folder
+    virtual Zstring getIconFile(size_t row) const = 0;  //return "folder" if row points to a folder
 
 protected:
     template <SelectedSide side>
@@ -298,7 +298,7 @@ protected:
                         case xmlAccess::SIZE: //file size
                             return FreeFileSync::numberToWxString(fileObj->getFileSize<side>(), true);
                         case xmlAccess::DATE: //date
-                            return FreeFileSync::utcTimeToLocalString(fileObj->getLastWriteTime<side>(), fileObj->getFullName<side>());
+                            return FreeFileSync::utcTimeToLocalString(fileObj->getLastWriteTime<side>());
                         case xmlAccess::EXTENSION: //file extension
                             return zToWx(fileObj->getExtension<side>());
                         }
@@ -342,7 +342,7 @@ public:
         return CustomGridTableRim::GetValueSub<LEFT_SIDE>(row, col);
     }
 
-    virtual Zstring getIconFile(const unsigned int row) const  //return "folder" if row points to a folder
+    virtual Zstring getIconFile(size_t row) const  //return "folder" if row points to a folder
     {
         const FileSystemObject* fsObj = getRawData(row);
         if (fsObj && !fsObj->isEmpty<LEFT_SIDE>())
@@ -366,7 +366,7 @@ public:
         return CustomGridTableRim::GetValueSub<RIGHT_SIDE>(row, col);
     }
 
-    virtual Zstring getIconFile(const unsigned int row) const //return "folder" if row points to a folder
+    virtual Zstring getIconFile(size_t row) const //return "folder" if row points to a folder
     {
         const FileSystemObject* fsObj = getRawData(row);
         if (fsObj && !fsObj->isEmpty<RIGHT_SIDE>())
@@ -916,7 +916,7 @@ std::set<size_t> CustomGrid::getAllSelectedRows() const
     const wxGridCellCoordsArray singlySelected = this->GetSelectedCells();
     if (!singlySelected.IsEmpty())
     {
-        for (unsigned int k = 0; k < singlySelected.GetCount(); ++k)
+        for (size_t k = 0; k < singlySelected.GetCount(); ++k)
             output.insert(singlySelected[k].GetRow());
     }
 
@@ -1149,11 +1149,11 @@ xmlAccess::ColumnAttributes CustomGridRim::getColumnAttributes()
 
     xmlAccess::ColumnAttributes output;
     xmlAccess::ColumnAttrib newEntry;
-    for (unsigned int i = 0; i < columnSettings.size(); ++i)
+    for (size_t i = 0; i < columnSettings.size(); ++i)
     {
         newEntry = columnSettings[i];
         if (newEntry.visible)
-            newEntry.width = GetColSize(i); //hidden columns are sorted to the end of vector!
+            newEntry.width = GetColSize(static_cast<int>(i)); //hidden columns are sorted to the end of vector!
         output.push_back(newEntry);
     }
 
@@ -1182,7 +1182,7 @@ void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
     }
     else
     {
-        for (unsigned int i = 0; i < xmlAccess::COLUMN_TYPE_COUNT; ++i)
+        for (size_t i = 0; i < xmlAccess::COLUMN_TYPE_COUNT; ++i)
         {
             xmlAccess::ColumnAttrib newEntry;
 
@@ -1199,17 +1199,17 @@ void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
         }
 
         std::sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByType);
-        for (unsigned int i = 0; i < xmlAccess::COLUMN_TYPE_COUNT; ++i) //just be sure that each type exists only once
+        for (size_t i = 0; i < xmlAccess::COLUMN_TYPE_COUNT; ++i) //just be sure that each type exists only once
             columnSettings[i].type = static_cast<xmlAccess::ColumnTypes>(i);
 
         std::sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByPositionOnly);
-        for (unsigned int i = 0; i < xmlAccess::COLUMN_TYPE_COUNT; ++i) //just be sure that positions are numbered correctly
+        for (size_t i = 0; i < xmlAccess::COLUMN_TYPE_COUNT; ++i) //just be sure that positions are numbered correctly
             columnSettings[i].position = i;
     }
 
     std::sort(columnSettings.begin(), columnSettings.end(), xmlAccess::sortByPositionAndVisibility);
     std::vector<xmlAccess::ColumnTypes> newPositions;
-    for (unsigned int i = 0; i < columnSettings.size() && columnSettings[i].visible; ++i)  //hidden columns are sorted to the end of vector!
+    for (size_t i = 0; i < columnSettings.size() && columnSettings[i].visible; ++i)  //hidden columns are sorted to the end of vector!
         newPositions.push_back(columnSettings[i].type);
 
     //set column positions
@@ -1217,8 +1217,8 @@ void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
     getGridDataTable()->setupColumns(newPositions);
 
     //set column width (set them after setupColumns!)
-    for (unsigned int i = 0; i < newPositions.size(); ++i)
-        SetColSize(i, columnSettings[i].width);
+    for (size_t i = 0; i < newPositions.size(); ++i)
+        SetColSize(static_cast<int>(i), columnSettings[i].width);
 
 //--------------------------------------------------------------------------------------------------------
     //set special alignment for column "size"
@@ -1236,7 +1236,7 @@ void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
 }
 
 
-xmlAccess::ColumnTypes CustomGridRim::getTypeAtPos(unsigned pos) const
+xmlAccess::ColumnTypes CustomGridRim::getTypeAtPos(size_t pos) const
 {
     assert(getGridDataTable());
     return getGridDataTable()->getTypeAtPos(pos);
@@ -1379,7 +1379,7 @@ void CustomGridRim::getIconsToBeLoaded(std::vector<Zstring>& newLoad) //loads al
         const int totalRows = const_cast<CustomGridTableRim*>(gridDataTable)->GetNumberRows();
 
         //loop over all visible rows
-        const int firstRow = rowsOnScreen.first;
+        const int firstRow = static_cast<int>(rowsOnScreen.first);
         const int lastRow  = std::min(int(rowsOnScreen.second), totalRows - 1);
         const int rowNo = lastRow - firstRow + 1;
 

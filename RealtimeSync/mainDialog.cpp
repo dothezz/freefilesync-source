@@ -8,6 +8,7 @@
 #include "resources.h"
 #include "../shared/customButton.h"
 #include "../shared/standardPaths.h"
+#include "functions.h"
 #include <wx/msgdlg.h>
 #include <wx/wupdlock.h>
 #include "watcher.h"
@@ -288,7 +289,7 @@ void MainDialog::setConfiguration(const xmlAccess::XmlRealConfig& cfg)
     m_textCtrlCommand->SetValue(cfg.commandline);
 
     //set delay
-    m_spinCtrlDelay->SetValue(cfg.delay);
+    m_spinCtrlDelay->SetValue(static_cast<int>(cfg.delay));
 }
 
 

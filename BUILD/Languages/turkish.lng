@@ -22,8 +22,6 @@
  san
 %x / %y objects deleted successfully
 %x / %y obje başarıyla silindi
-%x Percent
-Yüzde %x
 %x directories
 %x dizin
 %x files,
@@ -34,6 +32,8 @@ Yüzde %x
 %y satırdan %x'i görüntüleniyor
 %x of 1 row in view
 1 satırdan %x'i görüntüleniyor
+%x%
+
 &Abort
 Va&zgeç
 &About...
@@ -86,14 +86,14 @@ Ge&ri yükle
 &Yeniden dene
 &Save
 &Kaydet
+&Switch
+
 &Yes
 &Evet
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Not: Sadece FAT/FAT32 olarak biçimlendirilmiş sürücüler bu problemden etkilenir!\nDiğer durumlarda, \"1-saat'lik zaman farkını yoksay\" ayarı devre dışı bırakılabilir.)
 (Requires an Internet connection!)
 
-,
-,
 - Other side's counterpart to %dir
 - %dir'e diğer tarafın karşılığı
 - Other side's counterpart to %name
@@ -122,10 +122,6 @@ Ge&ri yükle
 - sağ
 - right newer
 - sağdaki daha yeni
--Open-Source file synchronization-
--Açık kaynak dosya senkronizasyonu
-.
-.
 /sec
 /san
 1 directory
@@ -168,8 +164,6 @@ About
 Hakkında
 Action
 İşlem
-Activate filter
-
 Add folder
 Klasör ekle
 Add folder pair
@@ -188,8 +182,6 @@ At least one directory input field is empty.
 
 Auto-adjust columns
 Kolonları otomatik olarak hizala
-Automatic mode
-Otomatik mod
 Batch execution
 Komut (batch) çalıştırılması
 Batch file created successfully!
@@ -202,6 +194,8 @@ Both sides have changed since last synchronization!
 En son senkronizasyondan sonra her iki tarafta deðiþmiþ bulunuyor!
 Browse
 Araştır
+Browse directory
+
 Build:
 Derleme:
 Cannot determine sync-direction:
@@ -210,6 +204,8 @@ Cannot find %x
 
 Category
 Kategori
+Clear filter settings
+
 Comma separated list
 Virgül ile ayrılmış liste
 Command line
@@ -226,8 +222,6 @@ Compare by \"File size and date\"
 \"Dosya ebadı ve tarihi\" ile karşılaştır
 Compare by...
 ile karşılaştır...
-Comparing content
-İçerik karşılaştırılıyor
 Comparing content of files %x
 %x dosyasının içeriği karşılaştırılıyor
 Comparing content...
@@ -294,8 +288,6 @@ Create a batch job
 Komut (batch) görevi oluştur
 Creating folder %x
 %x klasörü oluşturuluyor
-Current operation:
-Halihazırdaki işlem:
 Custom
 Özel
 Customize columns
@@ -306,10 +298,6 @@ D-Click
 D-Tuşu
 DECISION TREE
 Karar Şeması
-Data remaining:
-Kalan veri:
-Data transferred:
-
 Data verification error: Source and target file have different content!
 Veri doğrulama hatası: Kaynak ve hedef dosyası içeriği farklı!
 Date
@@ -364,10 +352,14 @@ Download now?
 Şimdi indirilsinmi?
 Drag && drop
 Sürükle bırak
+Elements found:
+
+Elements processed:
+
+Elements remaining:
+
 Email
 Eposta
-Enable filter to exclude files from synchronization
-Senkronizasyon sırasında dosya hariç tutmayı etkinleştir 
 Endless loop when traversing directory:
 Dizin işleminde sonsuz döngü:
 Error
@@ -462,37 +454,29 @@ Files are found equal if\n     - file content\nis the same
 \n     - dosya içeriği\naynı ise dosyalar eşit kabul edilir
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
 \n     - dosya ebadı\n     - son değişiklik tarihi\naynı ise dosyalar eşit kabul edilir
-Files remaining:
-Kalan dosyalar:
 Files that are equal on both sides
 Her iki tarafta eşit olan dosyalar
-Files that exist on both sides and have different content
-Her iki tarafta aynı fakat içerikleri farklı dosyalar
 Files that exist on both sides, left one is newer
 Her iki tarafta mevcut olup solda olanı yeni olan dosyalar
 Files that exist on both sides, right one is newer
 Her iki tarafta mevcut olup sağda olanı yeni olan dosyalar
-Files/folders found:
-Bulunan dosyalar/klasörler:
-Files/folders processed:
+Files that have different content
 
-Files/folders remaining:
-Kalan dosyalar/klasörler:
 Files/folders that exist on left side only
 Sadece sol tarafta mevcut olan dosyalar/klasörler
 Files/folders that exist on right side only
 Sadece sağ tarafta mevcut olan dosyalar/klasörler
-Filter
-Filtre
 Filter files
 Fltre dosyaları
-Filter has been selected
+Filter is active
 
 Filter settings have changed!
 
 Filter view
 Filtre görünümü
-Filtering is deactivated
+Filter: All pairs
+
+Filter: Single pair
 
 Find
 
@@ -502,8 +486,6 @@ Folder Comparison and Synchronization
 Klasör Karşılaştırması ve Senkronizasyonu
 Free disk space available:
 Boşta kullanılabilir disk alanı:
-FreeFileSync - Folder Comparison and Synchronization
-FreeFileSync - Klasör Karşılaştırması ve Senkronizasyonu
 FreeFileSync Batch Job
 FreeFileSync Komut (Batch) Görevi
 FreeFileSync at Sourceforge
@@ -520,8 +502,6 @@ Generating database...
 Veri tabaný yaratýlýyor...
 Generating file list...
 Dosya listesi oluşturuluyor...
-Global filter
-
 Global settings
 Genel ayarlar
 Help
@@ -578,12 +558,10 @@ Ignore errors
 Hataları yoksay
 Ignore subsequent errors
 Takibeden hataları yoksay
-Ignore this error, retry or abort synchronization?
-Bu hatayı yoksay, yeniden dene veya senkronizasyondan vazgeç?
-Ignore this error, retry or abort?
-Bu hatayı yoksay, yeniden dene veya vazgeç?
 Include
 Dahil et
+Include Symbolic Links
+
 Include all rows
 
 Include temporarily
@@ -600,8 +578,6 @@ Initial synchronization:
 Baþlangýç senkronizasyonu:
 Integrate external applications into context menu. The following macros are available:
 Harici uygulamaları içerik menüsüne ekle. Şu makro’lar temin edilebilir:
-Last synchronization not completed!
-
 Leave as unresolved conflict
 Çözülmemiş tutarsızlık olarak bırak
 Left
@@ -612,8 +588,6 @@ Load configuration from file
 Dosyadan konfigürasyonu yükle
 Load configuration history (press DEL to delete items)
 Konfigürasyon geçmişini yükle (Öğeleri silmek için DEL’e basın)
-Local filter
-
 Log-messages:
 Kayıt mesajları:
 Logging
@@ -664,12 +638,10 @@ One of the FreeFileSync database files is not yet existing:
 
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Senkronizasyon için sadece filtrelenmiş dosyalar/dizinler seçilecek. Senkronizasyon taban dizinlerine göreceli isimlere filtereleme uygulanacaktır.
-Open directly
-Doðrudan aç
 Open with Explorer
 Gezgin ile aç
-Open with Konqueror
-Konqueror ile aç
+Open with default application
+
 Operation aborted!
 İşlemden vazgeçildi!
 Operation:
@@ -680,7 +652,11 @@ Pause
 Duraklat
 Paused
 Duraklatıldı
+Planned directory deletion is in conflict with its subdirectories and -files!
+
 Please run a Compare first before synchronizing!
+
+Press \"Switch\" to open FreeFileSync GUI modus.
 
 Processing folder pair:
 
@@ -706,8 +682,6 @@ Remove folder
 Klasörü kaldır
 Remove folder pair
 Klasör çiftini kaldır
-Remove local filter settings
-
 Renaming file %x to %y
 
 Report translation error
@@ -740,7 +714,7 @@ Select variant:
 Değişkeni seç:
 Set direction:
 
-Setting default synchronization directions: Old files will be overwritten by newer files.
+Setting default synchronization directions: Old files will be overwritten with newer files.
 
 Show conflicts
 Tutarsızlıkları göster
@@ -794,10 +768,14 @@ Start synchronization
 Senkronizasyonu başlat
 Statistics
 İstatistik
+Status feedback
+
 Stop
 Durdur
 Swap sides
 Tarafları ters çevir
+Switching to FreeFileSync GUI modus...
+
 Synchronization Preview
 Senkronizasyon Önizlemesi
 Synchronization aborted!
@@ -812,8 +790,6 @@ Synchronization status
 Senkronizasyon durumu
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 \"temp\" alt klasöründeki herşey hariç, tüm .doc, .zip ve .exe dosyalarını senkronize et.
-Synchronize both sides using a database. Deletions are detected automatically
-Bir veritabaný kullanarak iki tarafý senkronize et. Silmeler otomatik olarak algýlanýr
 Synchronize...
 Senkronize et...
 Synchronizing...
@@ -828,6 +804,8 @@ The command line is executed each time:\n- a directory becomes available (e.g. U
 
 The file does not contain a valid configuration:
 Dosya geçerli bir konfigürasyon içermiyor:
+The file was not processed by last synchronization!
+
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Bu değişken, aynı isimli iki dosyanın, aynı ebata ve aynı son değişikik tarihine sahip olması durumunda eşit olması anlamına gelir.
 Time
@@ -868,6 +846,8 @@ Verifying file %x
 %x dosyası doğrulanıyor
 Volume name %x not part of filename %y!
 %x birim adı, %y dosya adının bölümü değil!
+Waiting for all directories to become available...
+
 Warning
 Uyarı
 Warning: Synchronization failed for %x item(s):

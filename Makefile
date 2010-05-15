@@ -19,12 +19,14 @@ FILE_LIST+=ui/guiGenerated.cpp
 FILE_LIST+=shared/util.cpp
 FILE_LIST+=ui/gridView.cpp
 FILE_LIST+=ui/mainDialog.cpp
-FILE_LIST+=ui/settingsDialog.cpp
+FILE_LIST+=ui/batchConfig.cpp
+FILE_LIST+=ui/syncConfig.cpp
 FILE_LIST+=ui/checkVersion.cpp
 FILE_LIST+=ui/batchStatusHandler.cpp
 FILE_LIST+=ui/guiStatusHandler.cpp
 FILE_LIST+=ui/trayIcon.cpp
 FILE_LIST+=ui/search.cpp
+FILE_LIST+=ui/switchToGui.cpp
 FILE_LIST+=ui/messagePopup.cpp
 FILE_LIST+=ui/progressIndicator.cpp
 FILE_LIST+=library/customGrid.cpp
@@ -37,9 +39,9 @@ FILE_LIST+=library/statistics.cpp
 FILE_LIST+=library/filter.cpp
 FILE_LIST+=library/binary.cpp
 FILE_LIST+=library/dbFile.cpp
+FILE_LIST+=shared/localization_no_BOM.cpp
 FILE_LIST+=shared/fileIO.cpp
 FILE_LIST+=shared/dragAndDrop.cpp
-FILE_LIST+=shared/localization.cpp
 FILE_LIST+=shared/guid.cpp
 FILE_LIST+=shared/tinyxml/tinyxml.cpp
 FILE_LIST+=shared/tinyxml/tinystr.cpp
@@ -91,10 +93,12 @@ init:
 
 #remove byte ordering mark: needed by Visual C++ but an error with GCC
 removeBOM: tools/removeBOM.cpp
-	g++ -o removeBOM tools/removeBOM.cpp 
-	./removeBOM shared/localization.cpp
+	g++ -o OBJ/removeBOM tools/removeBOM.cpp 
+	./OBJ/removeBOM shared/localization.cpp shared/localization_no_BOM.cpp
 
-osspUUID: 
+osspUUID:
+#some files within ossp_uuid may need to have readonly attribute removed
+	chmod -R 0755 shared/ossp_uuid && \
 	cd shared/ossp_uuid && \
 	chmod +x configure && \
 	chmod +x shtool && \
@@ -112,12 +116,20 @@ FreeFileSync: init removeBOM osspUUID $(DEP_LIST)
 clean:
 	rm -rf OBJ
 	rm -f BUILD/$(APPNAME)
-	rm -f removeBOM
 	if [ -e shared/ossp_uuid/Makefile ]; then cd shared/ossp_uuid && make clean; fi
+	rm -f shared/localization_no_BOM.cpp
 
 install:
 	if [ ! -d $(BINDIR) ] ; then mkdir -p $(BINDIR); fi
 	if [ ! -d $(APPSHAREDIR) ] ; then mkdir -p $(APPSHAREDIR); fi
 
 	cp BUILD/$(APPNAME) $(BINDIR)
-	cp -R BUILD/Languages/ BUILD/Help/ BUILD/Compare_Complete.wav  BUILD/Sync_Complete.wav BUILD/Resources.dat  BUILD/Changelog.txt  BUILD/License.txt BUILD/styles.rc $(APPSHAREDIR)
+	cp -R BUILD/Languages/ \
+	BUILD/Help/ \
+	BUILD/Compare_Complete.wav \
+	BUILD/Sync_Complete.wav \
+	BUILD/Resources.dat \
+	BUILD/Changelog.txt \
+	BUILD/License.txt \
+	BUILD/styles.rc \
+	$(APPSHAREDIR)

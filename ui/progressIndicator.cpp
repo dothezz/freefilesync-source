@@ -184,7 +184,11 @@ void CompareStatus::CompareStatusImpl::init()
     m_gauge2->SetValue(0);
 
     //initially hide status that's relevant for comparing bytewise only
-    bSizer42->Hide(sbSizer13);
+    bSizerFilesFound->Show(true);
+    bSizerFilesRemaining->Show(false);
+    sSizerSpeed->Show(false);
+    sSizerTimeRemaining->Show(false);
+
     m_gauge2->Hide();
     bSizer42->Layout();
 
@@ -239,7 +243,11 @@ void CompareStatus::CompareStatusImpl::switchToCompareBytewise(int totalObjectsT
     lastStatCallRemTime = -1000000;
 
     //show status for comparing bytewise
-    bSizer42->Show(sbSizer13);
+    bSizerFilesFound->Show(false);
+    bSizerFilesRemaining->Show(true);
+    sSizerSpeed->Show(true);
+    sSizerTimeRemaining->Show(true);
+
     m_gauge2->Show();
     bSizer42->Layout();
 }
@@ -502,7 +510,7 @@ void SyncStatus::processHasFinished(SyncStatusID id, const wxString& finalMessag
 SyncStatus::SyncStatusImpl::SyncStatusImpl(StatusHandler& updater, wxTopLevelWindow* parentWindow) :
     SyncStatusDlgGenerated(parentWindow,
                            wxID_ANY,
-                           parentWindow ? wxEmptyString : _("FreeFileSync - Folder Comparison and Synchronization"),
+                           parentWindow ? wxString(wxEmptyString) : (wxString(wxT("FreeFileSync - ")) + _("Folder Comparison and Synchronization")),
                            wxDefaultPosition, wxSize(638, 376),
                            parentWindow ?
                            wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL | wxFRAME_NO_TASKBAR | wxFRAME_FLOAT_ON_PARENT : //wxTAB_TRAVERSAL is needed for standard button handling: wxID_OK/wxID_CANCEL
@@ -551,7 +559,7 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(StatusHandler& updater, wxTopLevelWin
 
     //hide "processed" statistics until end of process
     bSizerObjectsProcessed->Show(false);
-    bSizerDataProcessed->Show(false);
+    //bSizerDataProcessed->Show(false);
 
     SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
 
@@ -865,13 +873,13 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id,
             totalData    == currentData)
     {
         bSizerObjectsRemaining->Show(false);
-        bSizerDataRemaining   ->Show(false);
+        //bSizerDataRemaining   ->Show(false);
 
         //show processed statistics at the end (but only if there was some work to be done)
         if (totalObjects != 0 || totalData != 0)
         {
             bSizerObjectsProcessed->Show(true);
-            bSizerDataProcessed   ->Show(true);
+            //bSizerDataProcessed   ->Show(true);
 
             m_staticTextProcessedObj->SetLabel(numberToWxString(currentObjects, true));
             m_staticTextDataProcessed->SetLabel(FreeFileSync::formatFilesizeToShortString(currentData));

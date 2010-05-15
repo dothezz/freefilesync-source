@@ -11,7 +11,7 @@
 #include <wx/timer.h>
 /*
 Semantics of SoftFilter:
-1. It potentially can match only one side => it MUST NOT be applied while traversing a single folder to avoid mismatches
+1. It potentially may match only one side => it MUST NOT be applied while traversing a single folder to avoid mismatches
 2. => it is applied after traversing and just marks rows, (NO deletions after comparison are allowed)
 3. => not relevant for <Automatic>-mode! ;)
 
@@ -28,19 +28,23 @@ public:
         timeWindow_(timeWindow),
         currentTime(wxGetUTCTime()) {}
 
+//    typedef boost::shared_ptr<const SoftFilter> FilterRef; //always bound by design!
+
     bool passFilter(const FileMapping& fileMap) const;
     bool passFilter(const DirMapping& dirMap) const;
 
 private:
-    const size_t timeWindow_;     //point in time from "now" (in seconds) for oldest modification date to be allowed
-    const long currentTime; //number of seconds since GMT 00:00:00 Jan 1st 1970.
+    const size_t timeWindow_; //point in time from "now" (in seconds) for oldest modification date to be allowed
+    const long currentTime;   //number of seconds since GMT 00:00:00 Jan 1st 1970.
 };
 
 
-
-
-
-
+//SoftFilter::FilterRef combineFilters(const SoftFilter& first,
+//                                     const SoftFilter& second);
+//
+//
+//
+//
 
 
 

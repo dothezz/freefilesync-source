@@ -35,7 +35,7 @@ public:
     virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
 
 private:
-void OnKeyPressed(wxKeyEvent& event);
+    void OnKeyPressed(wxKeyEvent& event);
     void OnAbortCompare(wxCommandEvent& event); //handle abort button click
     virtual void abortThisProcess();
 

@@ -9,7 +9,9 @@
 #include <wx/taskbar.h>
 #include <wx/app.h>
 #include "resources.h"
-//#include <memory>
+#include <algorithm>
+#include <iterator>
+#include "../shared/stringConv.h"
 #include <wx/utils.h>
 #include <wx/menu.h>
 #include "watcher.h"
@@ -23,13 +25,16 @@
 using namespace RealtimeSync;
 
 
-class WaitCallbackImpl : private wxEvtHandler, public RealtimeSync::WaitCallback //keep this order: else VC++ generated wrong code
+class WaitCallbackImpl : private wxEvtHandler, public RealtimeSync::WaitCallback //keep this order: else VC++ generates wrong code
 {
 public:
     WaitCallbackImpl();
     ~WaitCallbackImpl();
 
     virtual void requestUiRefresh();
+
+    void showIconActive();
+    void showIconWaiting();
 
     void requestAbort()
     {
@@ -114,13 +119,7 @@ WaitCallbackImpl::WaitCallbackImpl() :
 {
     trayMenu = new RtsTrayIcon(this); //not in initialization list: give it a valid parent object!
 
-#ifdef FFS_WIN
-    const wxIcon& realtimeIcon = *GlobalResources::getInstance().programIcon;
-#elif defined FFS_LINUX
-    wxIcon realtimeIcon;
-    realtimeIcon.CopyFromBitmap(GlobalResources::getInstance().getImageByName(wxT("RTS_tray_linux.png"))); //use a 22x22 bitmap for perfect fit
-#endif
-    trayMenu->SetIcon(realtimeIcon, wxString(wxT("RealtimeSync")) + wxT(" - ") + _("Monitoring active..."));
+    showIconActive();
 
     //register double-click
     trayMenu->Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(WaitCallbackImpl::OnRequestResume), NULL, this);
@@ -136,6 +135,30 @@ WaitCallbackImpl::~WaitCallbackImpl()
     //use wxWidgets delayed destruction: delete during next idle loop iteration (handle late window messages, e.g. when double-clicking)
     if (!wxPendingDelete.Member(trayMenu))
         wxPendingDelete.Append(trayMenu);
+}
+
+
+void WaitCallbackImpl::showIconActive()
+{
+    wxIcon realtimeIcon;
+#ifdef FFS_WIN
+    realtimeIcon.CopyFromBitmap(GlobalResources::getInstance().getImageByName(wxT("RTS_tray_win.png"))); //use a 16x16 bitmap
+#elif defined FFS_LINUX
+    realtimeIcon.CopyFromBitmap(GlobalResources::getInstance().getImageByName(wxT("RTS_tray_linux.png"))); //use a 22x22 bitmap for perfect fit
+#endif
+    trayMenu->SetIcon(realtimeIcon, wxString(wxT("RealtimeSync")) + wxT(" - ") + _("Monitoring active..."));
+}
+
+
+void WaitCallbackImpl::showIconWaiting()
+{
+    wxIcon realtimeIcon;
+#ifdef FFS_WIN
+    realtimeIcon.CopyFromBitmap(GlobalResources::getInstance().getImageByName(wxT("RTS_tray_waiting_win.png"))); //use a 16x16 bitmap
+#elif defined FFS_LINUX
+    realtimeIcon.CopyFromBitmap(GlobalResources::getInstance().getImageByName(wxT("RTS_tray_waiting_linux.png"))); //use a 22x22 bitmap for perfect fit
+#endif
+    trayMenu->SetIcon(realtimeIcon, wxString(wxT("RealtimeSync")) + wxT(" - ") + _("Waiting for all directories to become available..."));
 }
 
 
@@ -188,9 +211,22 @@ void WaitCallbackImpl::requestUiRefresh()
 }
 //##############################################################################################################
 
+namespace
+{
+std::vector<Zstring> convert(const std::vector<wxString>& dirList)
+{
+    std::vector<Zstring> output;
+    std::transform(dirList.begin(), dirList.end(),
+                   std::back_inserter(output), static_cast<Zstring (*)(const wxString&)>(FreeFileSync::wxToZ));
+    return output;
+}
+}
+
 
 RealtimeSync::MonitorResponse RealtimeSync::startDirectoryMonitor(const xmlAccess::XmlRealConfig& config)
 {
+    const std::vector<Zstring> dirList = convert(config.directories);
+
     try
     {
         WaitCallbackImpl callback;
@@ -198,18 +234,31 @@ RealtimeSync::MonitorResponse RealtimeSync::startDirectoryMonitor(const xmlAcces
         if (config.commandline.empty())
             throw FreeFileSync::FileError(_("Command line is empty!"));
 
-        long lastExec = 0;
         while (true)
         {
+            //execute commandline
+            callback.showIconWaiting();
+            waitForMissingDirs(dirList, &callback);
+            callback.showIconActive();
+
             wxExecute(config.commandline, wxEXEC_SYNC); //execute command
             wxLog::FlushActive(); //show wxWidgets error messages (if any)
 
-            //wait
-            waitForChanges(config.directories, &callback);
-            lastExec = wxGetLocalTime();
+            //wait for changes (and for all directories to become available)
+            switch (waitForChanges(dirList, &callback))
+            {
+            case CHANGE_DIR_MISSING: //don't execute the commandline before all directories are available!
+                callback.showIconWaiting();
+                waitForMissingDirs(dirList, &callback);
+                callback.showIconActive();
+                break;
+            case CHANGE_DETECTED:
+                break;
+            }
 
             //some delay
-            while (wxGetLocalTime() - lastExec < static_cast<long>(config.delay))
+            const long nextExec = wxGetLocalTime() + static_cast<long>(config.delay);
+            while (wxGetLocalTime() < nextExec)
             {
                 callback.requestUiRefresh();
                 wxMilliSleep(RealtimeSync::UI_UPDATE_INTERVAL);
@@ -222,7 +271,7 @@ RealtimeSync::MonitorResponse RealtimeSync::startDirectoryMonitor(const xmlAcces
     }
     catch (const FreeFileSync::FileError& error)
     {
-        wxMessageBox(error.show().c_str(), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
         return RESUME;
     }
 

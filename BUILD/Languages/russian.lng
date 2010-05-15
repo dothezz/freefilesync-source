@@ -22,8 +22,6 @@
  сек.
 %x / %y objects deleted successfully
 %x / %y объектов удалено удачно
-%x Percent
-%x %
 %x directories
 %x папки
 %x files,
@@ -34,6 +32,8 @@
 %x из %y строк(и) показано
 %x of 1 row in view
 %x из 1 строка показана
+%x%
+
 &Abort
 &Отмена
 &About...
@@ -86,14 +86,14 @@
 &Повторить
 &Save
 &Сохранить
+&Switch
+
 &Yes
 &Да
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Помните, что только диски FAT/FAT32 страдают от этой проблемы!\nВо всех остальных случаях вы можете отключить параметр \"игнорировать 1-часовую разницу\".)
 (Requires an Internet connection!)
 (Требуется подключение к Интернету!)
-,
-.
 - Other side's counterpart to %dir
 - аналогичная папка с другой стороны
 - Other side's counterpart to %name
@@ -122,10 +122,6 @@
 - правые
 - right newer
 - правые новее
--Open-Source file synchronization-
-Синхронизатор файлов с открытым исходным кодом
-.
-,
 /sec
 /сек.
 1 directory
@@ -168,8 +164,6 @@ About
 О программе
 Action
 Действие
-Activate filter
-Включить фильтр
 Add folder
 Добавить папку
 Add folder pair
@@ -188,8 +182,6 @@ At least one directory input field is empty.
 По крайней мере, одно поле путей папок не заполнено.
 Auto-adjust columns
 Автовыравнивание ширины колонок
-Automatic mode
-Автоматический режим
 Batch execution
 Выполнение пакетного задания
 Batch file created successfully!
@@ -202,6 +194,8 @@ Both sides have changed since last synchronization!
 Со времени последней синхронизации с обеих сторон произошли изменения!
 Browse
 Обзор
+Browse directory
+
 Build:
 Сборка:
 Cannot determine sync-direction:
@@ -210,6 +204,8 @@ Cannot find %x
 Невозможно найти %x
 Category
 Категория
+Clear filter settings
+
 Comma separated list
 Список, разделяемый запятыми
 Command line
@@ -226,8 +222,6 @@ Compare by \"File size and date\"
 Сравнивать по размеру и дате
 Compare by...
 Критерии сравнения
-Comparing content
-Сравнивать содержание
 Comparing content of files %x
 Сравнение содержания файлов %x
 Comparing content...
@@ -294,8 +288,6 @@ Create a batch job
 Создать пакетное задание
 Creating folder %x
 Создание папки %x
-Current operation:
-Текущая операция:
 Custom
 Выборочно
 Customize columns
@@ -306,10 +298,6 @@ D-Click
 Двойной клик
 DECISION TREE
 Древо решений
-Data remaining:
-Осталось:
-Data transferred:
-Данных передано:
 Data verification error: Source and target file have different content!
 Ошибка проверки данных: исходный и конечный файлы имеют разное содержание!
 Date
@@ -364,10 +352,14 @@ Download now?
 Загрузить сейчас?
 Drag && drop
 Drag && drop
+Elements found:
+
+Elements processed:
+
+Elements remaining:
+
 Email
 Почта
-Enable filter to exclude files from synchronization
-Применить фильтр, чтобы исключить файлы из задания на синхронизацию
 Endless loop when traversing directory:
 Зацикливание при встрече пересекающихся путей:
 Error
@@ -462,38 +454,30 @@ Files are found equal if\n     - file content\nis the same
 Файлы считаются равными, если содержание файлов одинаковое
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
 Файлы считаются равными, если одинаковые\n - размер файла\n - дата и время последнего изменения
-Files remaining:
-Файлов осталось:
 Files that are equal on both sides
 Файлы, одинаковые с обеих сторон
-Files that exist on both sides and have different content
-Файлы, существующие на обоих сторонах и имеющие разное содержание
 Files that exist on both sides, left one is newer
 Файлы, существующие на обоих сторонах, левый новее
 Files that exist on both sides, right one is newer
 Файлы, существующие на обоих сторонах, правый новее
-Files/folders found:
-Файлов/папок найдено:
-Files/folders processed:
-Файлов/папок обработано:
-Files/folders remaining:
-Файлов/папок осталось:
+Files that have different content
+
 Files/folders that exist on left side only
 Файлы/папки, существующие только на левой стороне
 Files/folders that exist on right side only
 Файлы/папки, существующие только на правой стороне
-Filter
-Фильтр
 Filter files
 Фильтр файлов
-Filter has been selected
-Фильтр установлен
+Filter is active
+
 Filter settings have changed!
 Настройки фильтра были изменены!
 Filter view
 Вид фильтра
-Filtering is deactivated
-Фильтрация выключена
+Filter: All pairs
+
+Filter: Single pair
+
 Find
 Найти
 Find what:
@@ -502,8 +486,6 @@ Folder Comparison and Synchronization
 Сравнение и синхронизация
 Free disk space available:
 Доступно свободного места на диске:
-FreeFileSync - Folder Comparison and Synchronization
-FreeFileSync - Сравнение и синхронизация
 FreeFileSync Batch Job
 Пакетное задание FreeFileSync
 FreeFileSync at Sourceforge
@@ -520,8 +502,6 @@ Generating database...
 Создание базы данных...
 Generating file list...
 Создание списка файлов...
-Global filter
-Глобальный фильтр
 Global settings
 Глобальные настройки
 Help
@@ -578,12 +558,10 @@ Ignore errors
 Игнорировать ошибки
 Ignore subsequent errors
 Игнорировать последующие ошибки
-Ignore this error, retry or abort synchronization?
-Игнорировать эту ошибку, повторить или отменить синхронизацию?
-Ignore this error, retry or abort?
-Игнорировать эту ошибку, повторить или отменить?
 Include
 Включить
+Include Symbolic Links
+
 Include all rows
 Отметить все
 Include temporarily
@@ -600,8 +578,6 @@ Initial synchronization:
 Первоначальная синхронизация:
 Integrate external applications into context menu. The following macros are available:
 Интегрирует внешние приложения в контекстное меню.\nСледующие команды доступны:
-Last synchronization not completed!
-Последняя синхронизация не была завершена!
 Leave as unresolved conflict
 Оставить как нерешенный конфликт
 Left
@@ -612,8 +588,6 @@ Load configuration from file
 Загрузить конфигурацию из файла
 Load configuration history (press DEL to delete items)
 Выбрать конфигурацию из списка (нажмите DEL для удаления пунктов)
-Local filter
-Локальный фильтр
 Log-messages:
 Лог-сообщения:
 Logging
@@ -664,12 +638,10 @@ One of the FreeFileSync database files is not yet existing:
 Файла базы данных FreeFileSync еще не существует:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Только файлы/папки, которые проходят фильтрацию будут отобраны для синхронизации. Фильтр будет применяться ко всем именам, относящимся к основным синхронизируемым папкам.
-Open directly
-Открыть
 Open with Explorer
 Открыть путь в Проводнике
-Open with Konqueror
-Открыть путь в Konqueror
+Open with default application
+
 Operation aborted!
 Операция отменена!
 Operation:
@@ -680,8 +652,12 @@ Pause
 Пауза
 Paused
 Пауза
+Planned directory deletion is in conflict with its subdirectories and -files!
+
 Please run a Compare first before synchronizing!
 Пожалуйста, запустите сравнение перед синхронизацией!
+Press \"Switch\" to open FreeFileSync GUI modus.
+
 Processing folder pair:
 Обработка пары папок:
 Published under the GNU General Public License:
@@ -706,8 +682,6 @@ Remove folder
 Удалить папку
 Remove folder pair
 Удалить пару папок
-Remove local filter settings
-Удалить настройки локального фильтра
 Renaming file %x to %y
 Переименование файла %x в %y
 Report translation error
@@ -740,7 +714,7 @@ Select variant:
 Выберите вариант:
 Set direction:
 Выберите направление:
-Setting default synchronization directions: Old files will be overwritten by newer files.
+Setting default synchronization directions: Old files will be overwritten with newer files.
 Настройка направления синхронизации по умолчанию:\nСтарые файлы будут заменены более новыми файлами.
 Show conflicts
 Показать конфликтующие файлы
@@ -794,10 +768,14 @@ Start synchronization
 Начать синхронизацию
 Statistics
 Статистика
+Status feedback
+
 Stop
 Стоп
 Swap sides
 Поменять направление
+Switching to FreeFileSync GUI modus...
+
 Synchronization Preview
 Предпросмотр синхронизации
 Synchronization aborted!
@@ -812,8 +790,6 @@ Synchronization status
 Статус синхронизации
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Синхронизировать все .doc, .zip и .exe файлы, за исключением всех файлов из подпапки \"temp\"
-Synchronize both sides using a database. Deletions are detected automatically
-Синхронизировать обе стороны, используя базу данных\nУдаленные файлы/папки определяются автоматически
 Synchronize...
 Синхронизировать
 Synchronizing...
@@ -828,6 +804,8 @@ The command line is executed each time:\n- a directory becomes available (e.g. U
 Командная строка выполняется, если:\n- папка становится доступной (например, при подключении USB флеш-накопителя);\n- файлы в обозначенных папках или подпапках были изменены.
 The file does not contain a valid configuration:
 Файл не содержит действительную конфигурацию:
+The file was not processed by last synchronization!
+
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Этот вариант сравнивает два файла с одинаковыми именами и считает их равными, если они имеют одинаковый размер файла и одинаковую дату и время последнего изменения.
 Time
@@ -868,6 +846,8 @@ Verifying file %x
 Проверка файла %x
 Volume name %x not part of filename %y!
 Имя тома %x не является частью имени файла %y!
+Waiting for all directories to become available...
+
 Warning
 Внимание
 Warning: Synchronization failed for %x item(s):

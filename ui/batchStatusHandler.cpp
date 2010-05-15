@@ -99,21 +99,14 @@ private:
 
         //add timestamp
         wxString timeNow = wxDateTime::Now().FormatISOTime();
-        timeNow.Replace(wxT(":"), wxT("-"));
+        timeNow.Replace(wxT(":"), wxT(""));
         logfileName += wxDateTime::Now().FormatISODate() + wxChar(' ') + timeNow;
 
         wxString output = logfileName + wxT(".log");
 
         //ensure uniqueness
-        if (FreeFileSync::fileExists(wxToZ(output)))
-        {
-            //if it's not unique, add a postfix number
-            int postfix = 1;
-            while (FreeFileSync::fileExists(wxToZ(logfileName + wxT('_') + FreeFileSync::numberToWxString(postfix, false) + wxT(".log"))))
-                ++postfix;
-
-            output = logfileName + wxT('_') + numberToWxString(postfix, false) + wxT(".log");
-        }
+        for (int i = 1; FreeFileSync::somethingExists(wxToZ(output)); ++i)
+            output = logfileName + wxChar('_') + numberToWxString(i, false) + wxT(".log");
 
         return output;
     }
@@ -128,8 +121,11 @@ BatchStatusHandler::BatchStatusHandler(bool runSilent,
                                        const wxString& batchFilename,
                                        const wxString* logfileDirectory,
                                        const xmlAccess::OnError handleError,
+                                       const SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
                                        int& returnVal) :
+    switchBatchToGui_(switchBatchToGui),
     exitWhenFinished(runSilent), //=> exit immediately when finished
+    switchToGuiRequested(false),
     handleError_(handleError),
     currentProcess(StatusHandler::PROCESS_NONE),
     returnValue(returnVal),
@@ -177,7 +173,12 @@ BatchStatusHandler::~BatchStatusHandler()
         logFile->writeLog(errorLog);
 
     //decide whether to stay on status screen or exit immediately...
-    if (!exitWhenFinished || syncStatusFrame.getAsWindow()->IsShown()) //warning: wxWindow::Show() is called within processHasFinished()!
+    if (switchToGuiRequested) //-> avoid recursive yield() calls, thous switch not before ending batch mode
+    {
+        switchBatchToGui_.execute(); //open FreeFileSync GUI
+        syncStatusFrame.closeWindowDirectly(); //syncStatusFrame is main window => program will quit directly
+    }
+    else if (!exitWhenFinished || syncStatusFrame.getAsWindow()->IsShown()) //warning: wxWindow::Show() is called within processHasFinished()!
     {
         //print the results list: GUI
         wxString finalMessage;
@@ -285,14 +286,20 @@ void BatchStatusHandler::reportWarning(const wxString& warningMessage, bool& war
         //show popup and ask user how to handle warning
         bool dontWarnAgain = false;
         WarningDlg warningDlg(NULL,
-                              WarningDlg::BUTTON_IGNORE | WarningDlg::BUTTON_ABORT,
-                              warningMessage,
+                              WarningDlg::BUTTON_IGNORE | WarningDlg::BUTTON_SWITCH | WarningDlg::BUTTON_ABORT,
+                              warningMessage + wxT("\n\n") + _("Press \"Switch\" to open FreeFileSync GUI modus."),
                               dontWarnAgain);
         warningDlg.Raise();
         const WarningDlg::Response rv = static_cast<WarningDlg::Response>(warningDlg.ShowModal());
         switch (rv)
         {
         case WarningDlg::BUTTON_ABORT:
+            abortThisProcess();
+            break;
+
+        case WarningDlg::BUTTON_SWITCH:
+            errorLog.logWarning(_("Switching to FreeFileSync GUI modus..."));
+            switchToGuiRequested = true;
             abortThisProcess();
             break;
 
@@ -322,7 +329,7 @@ ErrorHandler::Response BatchStatusHandler::reportError(const wxString& errorMess
         bool ignoreNextErrors = false;
         ErrorDlg errorDlg(NULL,
                           ErrorDlg::BUTTON_IGNORE |  ErrorDlg::BUTTON_RETRY | ErrorDlg::BUTTON_ABORT,
-                          errorMessage + wxT("\n\n\n") + _("Ignore this error, retry or abort?"),
+                          errorMessage,
                           ignoreNextErrors);
         errorDlg.Raise();
         const ErrorDlg::ReturnCodes rv = static_cast<ErrorDlg::ReturnCodes>(errorDlg.ShowModal());

@@ -53,10 +53,16 @@ private:
         switch (fileObj.getCategory())
         {
         case FILE_LEFT_SIDE_ONLY:
-            fileObj.setSyncDir(config.exLeftSideOnly);
+            if (fileObj.getFullName<LEFT_SIDE>().EndsWith(FreeFileSync::TEMP_FILE_ENDING))
+                fileObj.setSyncDir(SYNC_DIR_LEFT); //schedule potentially existing temporary files for deletion
+            else
+                fileObj.setSyncDir(config.exLeftSideOnly);
             break;
         case FILE_RIGHT_SIDE_ONLY:
-            fileObj.setSyncDir(config.exRightSideOnly);
+            if (fileObj.getFullName<RIGHT_SIDE>().EndsWith(FreeFileSync::TEMP_FILE_ENDING))
+                fileObj.setSyncDir(SYNC_DIR_RIGHT); //schedule potentially existing temporary files for deletion
+            else
+                fileObj.setSyncDir(config.exRightSideOnly);
             break;
         case FILE_RIGHT_NEWER:
             fileObj.setSyncDir(config.rightNewer);
@@ -105,14 +111,11 @@ class FindNonEqual //test if non-equal items exist in scanned data
 public:
     bool findNonEqual(const HierarchyObject& hierObj) const
     {
-        //files
-        if (std::find_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this) != hierObj.useSubFiles().end())
-            return true;
-
-        //directories
-        return std::find_if(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), *this) != hierObj.useSubDirs().end();
+        return std::find_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this) != hierObj.useSubFiles().end() || //files
+               std::find_if(hierObj.useSubDirs(). begin(), hierObj.useSubDirs(). end(), *this) != hierObj.useSubDirs(). end();   //directories
     }
 
+    //logical private! => __find_if (used by std::find_if) needs public access
     bool operator()(const FileMapping& fileObj) const
     {
         return fileObj.getCategory() != FILE_EQUAL;
@@ -144,7 +147,7 @@ bool FreeFileSync::allElementsEqual(const FolderComparison& folderCmp)
 
 //---------------------------------------------------------------------------------------------------------------
 inline
-bool sameFileTime(const wxLongLong& a, const wxLongLong& b, const unsigned int tolerance)
+bool sameFileTime(const wxLongLong& a, const wxLongLong& b, size_t tolerance)
 {
     if (a < b)
         return b <= a + tolerance;
@@ -331,6 +334,39 @@ private:
 };
 
 
+//test whether planned deletion of a directory is in conflict with (direct!) sub-elements that are not categorized for deletion (e.g. shall be copied or are in conflict themselves)
+class FindDeleteDirConflictNonRec
+{
+public:
+    bool conflictFound(const HierarchyObject& hierObj) const
+    {
+        return std::find_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this) != hierObj.useSubFiles().end() || //files
+               std::find_if(hierObj.useSubDirs(). begin(), hierObj.useSubDirs(). end(), *this) != hierObj.useSubDirs(). end();   //directories
+    }
+
+    //logical private! => __find_if (used by std::find_if) needs public access
+    bool operator()(const FileSystemObject& fsObj) const
+    {
+        switch (fsObj.getSyncOperation())
+        {
+        case SO_CREATE_NEW_LEFT:
+        case SO_CREATE_NEW_RIGHT:
+        case SO_UNRESOLVED_CONFLICT:
+            return true;
+
+        case SO_DELETE_LEFT:
+        case SO_DELETE_RIGHT:
+        case SO_OVERWRITE_LEFT:
+        case SO_OVERWRITE_RIGHT:
+        case SO_DO_NOTHING:
+        case SO_EQUAL:
+            ;
+        }
+        return false;
+    }
+};
+
+
 //----------------------------------------------------------------------------------------------
 class RedetermineAuto
 {
@@ -340,7 +376,8 @@ public:
         txtBothSidesChanged(_("Both sides have changed since last synchronization!")),
         txtNoSideChanged(wxString(_("Cannot determine sync-direction:")) + wxT(" \n") + _("No change since last synchronization!")),
         txtFilterChanged(wxString(_("Cannot determine sync-direction:")) + wxT(" \n") + _("Filter settings have changed!")),
-        txtLastSyncFail(wxString(_("Cannot determine sync-direction:")) + wxT(" \n") + _("Last synchronization not completed!")),
+        txtLastSyncFail(wxString(_("Cannot determine sync-direction:")) + wxT(" \n") + _("The file was not processed by last synchronization!")),
+        txtDirDeleteConflict(_("Planned directory deletion is in conflict with its subdirectories and -files!")),
         dbFilterLeft(NULL),
         dbFilterRight(NULL),
         handler_(handler)
@@ -395,7 +432,7 @@ private:
         catch (FileError& error) //e.g. incompatible database version
         {
             if (handler_) handler_->reportWarning(error.show() + wxT(" \n\n") +
-                                                      _("Setting default synchronization directions: Old files will be overwritten by newer files."));
+                                                      _("Setting default synchronization directions: Old files will be overwritten with newer files."));
         }
         return std::pair<DirInfoPtr, DirInfoPtr>(); //NULL
     }
@@ -442,6 +479,21 @@ private:
         if (cat == FILE_EQUAL)
             return;
 
+
+        //##################### schedule potentially existing temporary files for deletion ####################
+        if (cat == FILE_LEFT_SIDE_ONLY && fileObj.getFullName<LEFT_SIDE>().EndsWith(FreeFileSync::TEMP_FILE_ENDING))
+        {
+            fileObj.setSyncDir(SYNC_DIR_LEFT);
+            return;
+        }
+        else if (cat == FILE_RIGHT_SIDE_ONLY && fileObj.getFullName<RIGHT_SIDE>().EndsWith(FreeFileSync::TEMP_FILE_ENDING))
+        {
+            fileObj.setSyncDir(SYNC_DIR_RIGHT);
+            return;
+        }
+        //#####################################################################################################
+
+
         if (filterConflictFound(fileObj))
         {
             if (cat == FILE_LEFT_SIDE_ONLY)
@@ -478,14 +530,7 @@ private:
                 if (changeOnRight)
                     fileObj.setSyncDir(SYNC_DIR_LEFT);
                 else
-                {
-                    if (cat == FILE_LEFT_SIDE_ONLY)
-                        fileObj.setSyncDir(SYNC_DIR_RIGHT);
-                    else if (cat == FILE_RIGHT_SIDE_ONLY)
-                        fileObj.setSyncDir(SYNC_DIR_LEFT);
-                    else
-                        fileObj.setSyncDirConflict(txtNoSideChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
-                }
+                    fileObj.setSyncDirConflict(txtNoSideChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
             }
         }
         else //object did not complete last sync
@@ -494,12 +539,12 @@ private:
                 fileObj.setSyncDirConflict(txtBothSidesChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
             else
             {
-                if (cat == FILE_LEFT_SIDE_ONLY)
-                    fileObj.setSyncDir(SYNC_DIR_RIGHT);
-                else if (cat == FILE_RIGHT_SIDE_ONLY)
-                    fileObj.setSyncDir(SYNC_DIR_LEFT);
-                else
-                    fileObj.setSyncDirConflict(txtLastSyncFail);   //set syncDir = SYNC_DIR_INT_CONFLICT
+//                if (cat == FILE_LEFT_SIDE_ONLY)
+//                    fileObj.setSyncDir(SYNC_DIR_RIGHT);
+//                else if (cat == FILE_RIGHT_SIDE_ONLY)
+//                    fileObj.setSyncDir(SYNC_DIR_LEFT);
+//                else
+                fileObj.setSyncDirConflict(txtLastSyncFail);   //set syncDir = SYNC_DIR_INT_CONFLICT
             }
         }
     }
@@ -557,17 +602,8 @@ private:
                         dirObj.setSyncDir(SYNC_DIR_LEFT);
                     else
                     {
-                        switch (cat)
-                        {
-                        case DIR_LEFT_SIDE_ONLY:
-                            dirObj.setSyncDir(SYNC_DIR_RIGHT);
-                            break;
-                        case DIR_RIGHT_SIDE_ONLY:
-                            dirObj.setSyncDir(SYNC_DIR_LEFT);
-                            break;
-                        case DIR_EQUAL:
-                            assert(false);
-                        }
+                        assert(false);
+                        dirObj.setSyncDirConflict(txtNoSideChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
                     }
                 }
             }
@@ -577,28 +613,41 @@ private:
                     dirObj.setSyncDirConflict(txtBothSidesChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
                 else
                 {
-                    switch (cat)
-                    {
-                    case DIR_LEFT_SIDE_ONLY:
-                        dirObj.setSyncDir(SYNC_DIR_RIGHT);
-                        break;
-                    case DIR_RIGHT_SIDE_ONLY:
-                        dirObj.setSyncDir(SYNC_DIR_LEFT);
-                        break;
-                    case DIR_EQUAL:
-                        assert(false);
-                    }
+//                    switch (cat)
+//                    {
+//                    case DIR_LEFT_SIDE_ONLY:
+//                        dirObj.setSyncDir(SYNC_DIR_RIGHT);
+//                        break;
+//                    case DIR_RIGHT_SIDE_ONLY:
+//                        dirObj.setSyncDir(SYNC_DIR_LEFT);
+//                        break;
+//                    case DIR_EQUAL:
+//                        assert(false);
+//                    }
+
+                    dirObj.setSyncDirConflict(txtLastSyncFail);   //set syncDir = SYNC_DIR_INT_CONFLICT
                 }
             }
         }
 
         execute(dirObj, dataDbLeftStuff.second, dataDbRightStuff.second); //recursion
+        //###################################################################################################
+
+        //if a directory is to be deleted on one side, ensure that directions of sub-elements are "d’accord"
+        const SyncOperation syncOp = dirObj.getSyncOperation();
+        if (    syncOp == SO_DELETE_LEFT ||
+                syncOp == SO_DELETE_RIGHT)
+        {
+            if (FindDeleteDirConflictNonRec().conflictFound(dirObj))
+                dirObj.setSyncDirConflict(txtDirDeleteConflict);
+        }
     }
 
     const wxString txtBothSidesChanged;
     const wxString txtNoSideChanged;
     const wxString txtFilterChanged;
     const wxString txtLastSyncFail;
+    const wxString txtDirDeleteConflict;
 
     const BaseFilter* dbFilterLeft;  //optional
     const BaseFilter* dbFilterRight; //optional
@@ -771,9 +820,11 @@ private:
     void operator()(FreeFileSync::DirMapping& dirObj) const
     {
         bool subObjMightMatch = true;
-        dirObj.setActive(filterProc.passDirFilter(dirObj.getObjRelativeName(), &subObjMightMatch));
+        const bool filterPassed = filterProc.passDirFilter(dirObj.getObjRelativeName(), &subObjMightMatch);
 
-        if (subObjMightMatch) //use same logic as within directory traversing here: evaluate filter in subdirs only if objects could match
+        dirObj.setActive(filterPassed);
+
+        if (subObjMightMatch) //use same logic like directory traversing here: evaluate filter in subdirs only if objects could match
             execute(dirObj);  //recursion
         else
             InOrExcludeAllRows<false>().execute(dirObj); //exclude all files dirs in subfolders
@@ -805,7 +856,7 @@ void FreeFileSync::applyFiltering(const MainConfiguration& currentMainCfg, Folde
                     currentMainCfg.additionalPairs.end());
 
 
-    const BaseFilter::FilterRef globalFilter(new NameFilter(currentMainCfg.includeFilter, currentMainCfg.excludeFilter));
+    const BaseFilter::FilterRef globalFilter(new NameFilter(currentMainCfg.globalFilter.includeFilter, currentMainCfg.globalFilter.excludeFilter));
 
     for (std::vector<FolderPairEnh>::const_iterator i = allPairs.begin(); i != allPairs.end(); ++i)
     {

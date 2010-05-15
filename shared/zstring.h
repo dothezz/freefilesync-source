@@ -51,20 +51,19 @@ public:
     bool EndsWith(const DefaultChar end) const;
     bool EndsWith(const Zstring& end) const;
     Zstring& Truncate(size_t newLen);
-#ifdef FFS_WIN
-    Zstring& MakeUpper();
-#endif
-
     Zstring& Replace(const DefaultChar* old, const DefaultChar* replacement, bool replaceAll = true);
     Zstring AfterLast(  DefaultChar ch) const;  //returns the whole string if ch not found
     Zstring BeforeLast( DefaultChar ch) const;  //returns empty string if ch not found
     Zstring AfterFirst( DefaultChar ch) const;  //returns empty string if ch not found
     Zstring BeforeFirst(DefaultChar ch) const;  //returns the whole string if ch not found
-    size_t Find(DefaultChar ch, bool fromEnd) const; //returns npos if not found
+    size_t Find(DefaultChar ch, bool fromEnd = false) const; //returns npos if not found
     bool Matches(const DefaultChar* mask) const;
     static bool Matches(const DefaultChar* name, const DefaultChar* mask);
     Zstring& Trim(bool fromRight); //from right or left
     std::vector<Zstring> Tokenize(const DefaultChar delimiter) const;
+#ifdef FFS_WIN
+    Zstring& MakeUpper();
+#endif
 
     //std::string functions
     size_t length() const;
@@ -85,22 +84,24 @@ public:
     Zstring& operator=(const Zstring& source);
     Zstring& operator=(const DefaultChar* source);
 
-    bool operator==(const Zstring&     other) const;
-    bool operator==(const DefaultChar* other) const;
-    bool operator< (const Zstring&     other) const;
-    bool operator< (const DefaultChar* other) const;
-    bool operator!=(const Zstring&     other) const;
-    bool operator!=(const DefaultChar* other) const;
 
-    const DefaultChar operator[](const size_t pos) const;
+    friend bool operator==(const Zstring&     lhs, const Zstring& rhs);
+    friend bool operator==(const Zstring&     lhs, const DefaultChar* rhs);
+    friend bool operator==(const DefaultChar* lhs, const Zstring& rhs);
+
+    friend bool operator< (const Zstring&     lhs, const Zstring& rhs);
+    friend bool operator< (const Zstring&     lhs, const DefaultChar* rhs);
+    friend bool operator< (const DefaultChar* lhs, const Zstring& rhs);
+
+    friend bool operator!=(const Zstring&     lhs, const Zstring& rhs);
+    friend bool operator!=(const Zstring&     lhs, const DefaultChar* rhs);
+    friend bool operator!=(const DefaultChar* lhs, const Zstring& rhs);
+
+    const DefaultChar operator[](size_t pos) const;
 
     Zstring& operator+=(const Zstring& other);
     Zstring& operator+=(const DefaultChar* other);
     Zstring& operator+=(DefaultChar ch);
-
-    const Zstring operator+(const Zstring& string2) const;
-    const Zstring operator+(const DefaultChar* string2) const;
-    const Zstring operator+(const DefaultChar ch) const;
 
     static const size_t	npos = static_cast<size_t>(-1);
 
@@ -134,6 +135,13 @@ private:
 
     StringDescriptor* descr;
 };
+
+
+const Zstring operator+(const Zstring&     lhs, const Zstring& rhs);
+const Zstring operator+(const Zstring&     lhs, const DefaultChar* rhs);
+const Zstring operator+(const DefaultChar* lhs, const Zstring& rhs);
+const Zstring operator+(DefaultChar        lhs, const Zstring& rhs);
+const Zstring operator+(const Zstring&     lhs, DefaultChar rhs);
 
 
 template <class T>
@@ -375,7 +383,6 @@ void Zstring::decRef()
         AllocationCount::getInstance().dec(c_str()); //test Zstring for memory leaks
 #endif
         ::free(descr); //beginning of whole memory block
-        descr = NULL;
     }
 }
 
@@ -553,44 +560,65 @@ size_t Zstring::find(DefaultChar ch, size_t pos) const
 
 
 inline
-bool Zstring::operator==(const Zstring& other) const
+bool operator==(const Zstring& lhs, const Zstring& rhs)
 {
-    return length() != other.length() ? false : defaultCompare(c_str(), other.c_str()) == 0; //memcmp() offers no better performance here...
+    return lhs.length() != rhs.length() ? false : Zstring::defaultCompare(lhs.c_str(), rhs.c_str()) == 0; //memcmp() offers no better performance here...
 }
 
 
 inline
-bool Zstring::operator==(const DefaultChar* other) const
+bool operator==(const Zstring& lhs, const DefaultChar* rhs)
 {
-    return defaultCompare(c_str(), other) == 0; //overload using strcmp(char*, char*) should be fastest!
+    return Zstring::defaultCompare(lhs.c_str(), rhs) == 0; //overload using strcmp(char*, char*) should be fastest!
 }
 
 
 inline
-bool Zstring::operator<(const Zstring& other) const
+bool operator==(const DefaultChar* lhs, const Zstring& rhs)
 {
-    return defaultCompare(c_str(), other.c_str()) < 0;
+    return operator==(rhs, lhs);
 }
 
 
 inline
-bool Zstring::operator<(const DefaultChar* other) const
+bool operator<(const Zstring& lhs, const Zstring& rhs)
 {
-    return defaultCompare(c_str(), other) < 0; //overload using strcmp(char*, char*) should be fastest!
+    return Zstring::defaultCompare(lhs.c_str(), rhs.c_str()) < 0;
 }
 
 
 inline
-bool Zstring::operator!=(const Zstring& other) const
+bool operator<(const Zstring& lhs, const DefaultChar* rhs)
 {
-    return !(*this==other);
+    return Zstring::defaultCompare(lhs.c_str(), rhs) < 0;
 }
 
 
 inline
-bool Zstring::operator!=(const DefaultChar* other) const
+bool operator<(const DefaultChar* lhs, const Zstring& rhs)
 {
-    return !(*this==other);
+    return Zstring::defaultCompare(lhs, rhs.c_str()) < 0;
+}
+
+
+inline
+bool operator!=(const Zstring& lhs, const Zstring& rhs)
+{
+    return !operator==(lhs, rhs);
+}
+
+
+inline
+bool operator!=(const Zstring& lhs, const DefaultChar* rhs)
+{
+    return !operator==(lhs, rhs);
+}
+
+
+inline
+bool operator!=(const DefaultChar* lhs, const Zstring& rhs)
+{
+    return !operator==(lhs, rhs);
 }
 
 
@@ -653,23 +681,37 @@ const DefaultChar Zstring::operator[](const size_t pos) const
 
 
 inline
-const Zstring Zstring::operator+(const Zstring& string2) const
+const Zstring operator+(const Zstring& lhs, const Zstring& rhs)
 {
-    return Zstring(*this)+=string2;
+       return Zstring(lhs) += rhs;
 }
 
 
 inline
-const Zstring Zstring::operator+(const DefaultChar* string2) const
+const Zstring operator+(const Zstring& lhs, const DefaultChar* rhs)
 {
-    return Zstring(*this)+=string2;
+    return Zstring(lhs) += rhs;
 }
 
 
 inline
-const Zstring Zstring::operator+(const DefaultChar ch) const
+const Zstring operator+(const DefaultChar* lhs, const Zstring& rhs)
 {
-    return Zstring(*this)+=ch;
+    return Zstring(lhs) += rhs;
+}
+
+
+inline
+const Zstring operator+(DefaultChar lhs, const Zstring& rhs)
+{
+return Zstring(lhs) += rhs;
+}
+
+
+inline
+const Zstring operator+(const Zstring& lhs, DefaultChar rhs)
+{
+ return Zstring(lhs) += rhs;
 }
 
 
@@ -716,7 +758,7 @@ Zstring numberToZstring(const T& number) //convert number to string the C++ way
     std::wstringstream ss;
 #endif
     ss << number;
-    return Zstring(ss.str().c_str(), ss.str().length());
+    return Zstring(ss.str().c_str());
 }
 
 #endif // ZSTRING_H_INCLUDED

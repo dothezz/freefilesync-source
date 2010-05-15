@@ -32,9 +32,8 @@ void CustomComboBox::OnKeyEvent(wxKeyEvent& event)
         //try to delete the currently selected config history item
         const int selectedItem = this->GetCurrentSelection();
         if (0 <= selectedItem && selectedItem < static_cast<int>(this->GetCount()) &&
-                (GetValue() != GetString(selectedItem) || //avoid problems when letter shall be deleted instead of list item
-                 GetValue() == wxEmptyString) //exception: always allow removing empty entry
-           )
+                (GetValue() != GetString(selectedItem) || //avoid problems when a character shall be deleted instead of list item
+                 GetValue() == wxEmptyString)) //exception: always allow removing empty entry
         {
             //save old (selected) value: deletion seems to have influence on this
             const wxString currentVal = this->GetValue();

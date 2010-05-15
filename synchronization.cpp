@@ -185,10 +185,10 @@ void SyncStatistics::getDirNumbers(const DirMapping& dirObj)
 
     case SO_OVERWRITE_LEFT:
     case SO_OVERWRITE_RIGHT:
-    case SO_UNRESOLVED_CONFLICT:
         assert(false);
         break;
 
+    case SO_UNRESOLVED_CONFLICT:
     case SO_DO_NOTHING:
     case SO_EQUAL:
         break;
@@ -226,12 +226,15 @@ std::vector<FreeFileSync::FolderPairSyncCfg> FreeFileSync::extractSyncCfg(const 
 }
 //------------------------------------------------------------------------------------------------------------
 
+namespace
+{
 
-template <bool recyclerUsed>
 class DiskSpaceNeeded
 {
 public:
-    DiskSpaceNeeded(const BaseDirMapping& baseObj)
+    DiskSpaceNeeded(const BaseDirMapping& baseObj, bool freeSpaceDelLeft, bool freeSpaceDelRight) :
+        freeSpaceDelLeft_(freeSpaceDelLeft),
+        freeSpaceDelRight_(freeSpaceDelRight)
     {
         processRecursively(baseObj);
     }
@@ -259,23 +262,23 @@ private:
                 break;
 
             case SO_DELETE_LEFT:
-                if (!recyclerUsed)
+                if (freeSpaceDelLeft_)
                     spaceNeededLeft -= globalFunctions::convertToSigned(i->getFileSize<LEFT_SIDE>());
                 break;
 
             case SO_DELETE_RIGHT:
-                if (!recyclerUsed)
+                if (freeSpaceDelRight_)
                     spaceNeededRight -= globalFunctions::convertToSigned(i->getFileSize<RIGHT_SIDE>());
                 break;
 
             case SO_OVERWRITE_LEFT:
-                if (!recyclerUsed)
+                if (freeSpaceDelLeft_)
                     spaceNeededLeft -= globalFunctions::convertToSigned(i->getFileSize<LEFT_SIDE>());
                 spaceNeededLeft += globalFunctions::convertToSigned(i->getFileSize<RIGHT_SIDE>());
                 break;
 
             case SO_OVERWRITE_RIGHT:
-                if (!recyclerUsed)
+                if (freeSpaceDelRight_)
                     spaceNeededRight -= globalFunctions::convertToSigned(i->getFileSize<RIGHT_SIDE>());
                 spaceNeededRight += globalFunctions::convertToSigned(i->getFileSize<LEFT_SIDE>());
                 break;
@@ -288,29 +291,54 @@ private:
 
 
         //recurse into sub-dirs
-        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), boost::bind(&DiskSpaceNeeded<recyclerUsed>::processRecursively, this, _1));
+        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), boost::bind(&DiskSpaceNeeded::processRecursively, this, _1));
     }
+
+    const bool freeSpaceDelLeft_;
+    const bool freeSpaceDelRight_;
 
     wxLongLong spaceNeededLeft;
     wxLongLong spaceNeededRight;
 };
 
 
-std::pair<wxLongLong, wxLongLong> freeDiskSpaceNeeded(const BaseDirMapping& baseDirObj, const DeletionPolicy handleDeletion)
+//evaluate whether a deletion will actually free space within a volume
+bool deletionFreesSpace(const Zstring& baseDir,
+                        const DeletionPolicy handleDeletion,
+                        const Zstring& custDelFolderFmt)
 {
     switch (handleDeletion)
     {
-    case FreeFileSync::DELETE_PERMANENTLY:
-        return DiskSpaceNeeded<false>(baseDirObj).getSpaceTotal();
-    case FreeFileSync::MOVE_TO_RECYCLE_BIN:
-        return DiskSpaceNeeded<true>(baseDirObj).getSpaceTotal();
-    case FreeFileSync::MOVE_TO_CUSTOM_DIRECTORY:
-        //warning: this is not necessarily correct! it needs to be checked if user-def recycle bin dir and sync-dir are on same drive
-        return DiskSpaceNeeded<true>(baseDirObj).getSpaceTotal();
+    case DELETE_PERMANENTLY:
+        return true;
+    case MOVE_TO_RECYCLE_BIN:
+        return false; //in general... (unless Recycle Bin is full)
+    case MOVE_TO_CUSTOM_DIRECTORY:
+        switch (FreeFileSync::onSameVolume(baseDir, custDelFolderFmt))
+        {
+        case VOLUME_SAME:
+            return false;
+        case VOLUME_DIFFERENT:
+            return true; //but other volume (custDelFolderFmt) may become full...
+        case VOLUME_CANT_SAY:
+            return true; //a rough guess!
+        }
     }
-
     assert(false);
-    return std::make_pair(2000000000, 2000000000); //dummy
+    return true;
+}
+
+
+std::pair<wxLongLong, wxLongLong> freeDiskSpaceNeeded(
+    const BaseDirMapping& baseDirObj,
+    const DeletionPolicy handleDeletion,
+    const Zstring& custDelFolderFmt)
+{
+    const bool freeSpaceDelLeft  = deletionFreesSpace(baseDirObj.getBaseDir<LEFT_SIDE>(),  handleDeletion, custDelFolderFmt);
+    const bool freeSpaceDelRight = deletionFreesSpace(baseDirObj.getBaseDir<RIGHT_SIDE>(), handleDeletion, custDelFolderFmt);
+
+    return DiskSpaceNeeded(baseDirObj, freeSpaceDelLeft, freeSpaceDelRight).getSpaceTotal();
+}
 }
 //------------------------------------------------------------------------------------------------------------
 
@@ -399,32 +427,29 @@ add some postfix to alternate deletion directory: deletionDirectory\<prefix>2010
 */
 Zstring getSessionDeletionDir(const Zstring& deletionDirectory, const Zstring& prefix = Zstring())
 {
-    Zstring formattedDirectory = deletionDirectory;
-    if (formattedDirectory.empty())
+    Zstring formattedDir = deletionDirectory;
+    if (formattedDir.empty())
         return Zstring(); //no valid directory for deletion specified (checked later)
 
-    if (!formattedDirectory.EndsWith(globalFunctions::FILE_NAME_SEPARATOR))
-        formattedDirectory += globalFunctions::FILE_NAME_SEPARATOR;
+    if (!formattedDir.EndsWith(globalFunctions::FILE_NAME_SEPARATOR))
+        formattedDir += globalFunctions::FILE_NAME_SEPARATOR;
 
     wxString timeNow = wxDateTime::Now().FormatISOTime();
     timeNow.Replace(wxT(":"), wxT("-"));
 
     const wxString sessionName = wxDateTime::Now().FormatISODate() + wxChar(' ') + timeNow;
-    formattedDirectory += prefix + wxToZ(sessionName);
+    formattedDir += prefix + wxToZ(sessionName);
+
 
     //ensure that session directory does not yet exist (must be unique)
-    if (FreeFileSync::dirExists(formattedDirectory))
-    {
-        //if it's not unique, add a postfix number
-        int postfix = 1;
-        while (FreeFileSync::dirExists(formattedDirectory + DefaultStr("_") + numberToZstring(postfix)))
-            ++postfix;
+    Zstring output = formattedDir;
 
-        formattedDirectory += Zstring(DefaultStr("_")) + numberToZstring(postfix);
-    }
+    //ensure uniqueness
+    for (int i = 1; FreeFileSync::somethingExists(output); ++i)
+        output = formattedDir + DefaultChar('_') + numberToZstring(i);
 
-    formattedDirectory += globalFunctions::FILE_NAME_SEPARATOR;
-    return formattedDirectory;
+    output += globalFunctions::FILE_NAME_SEPARATOR;
+    return output;
 }
 
 
@@ -767,8 +792,8 @@ bool diskSpaceIsReduced(const DirMapping& dirObj)
 
     case SO_OVERWRITE_LEFT:
     case SO_OVERWRITE_RIGHT:
-    case SO_UNRESOLVED_CONFLICT:
         assert(false);
+    case SO_UNRESOLVED_CONFLICT:
     case SO_CREATE_NEW_LEFT:
     case SO_CREATE_NEW_RIGHT:
     case SO_DO_NOTHING:
@@ -778,22 +803,6 @@ bool diskSpaceIsReduced(const DirMapping& dirObj)
     return false; //dummy
 }
 //----------------------------------------------------------------------------------------
-
-
-class RemoveInvalid
-{
-public:
-    RemoveInvalid(BaseDirMapping& baseDir) :
-        baseDir_(baseDir) {}
-
-    ~RemoveInvalid()
-    {
-        FileSystemObject::removeEmpty(baseDir_);
-    }
-
-private:
-    BaseDirMapping& baseDir_;
-};
 
 
 class FreeFileSync::SynchronizeFolderPair
@@ -888,8 +897,8 @@ void SynchronizeFolderPair::execute(HierarchyObject& hierObj)
             break;
         case SO_OVERWRITE_RIGHT:
         case SO_OVERWRITE_LEFT:
-        case SO_UNRESOLVED_CONFLICT:
             assert(false);
+        case SO_UNRESOLVED_CONFLICT:
         case SO_DELETE_LEFT:
         case SO_DELETE_RIGHT:
         case SO_DO_NOTHING:
@@ -1134,8 +1143,8 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
 
     case SO_OVERWRITE_RIGHT:
     case SO_OVERWRITE_LEFT:
-    case SO_UNRESOLVED_CONFLICT:
         assert(false);
+    case SO_UNRESOLVED_CONFLICT:
     case SO_DO_NOTHING:
     case SO_EQUAL:
         return; //no update on processed data!
@@ -1239,7 +1248,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         }
 
         //check for sufficient free diskspace in left directory
-        const std::pair<wxLongLong, wxLongLong> spaceNeeded = freeDiskSpaceNeeded(*j, folderPairCfg.handleDeletion);
+        const std::pair<wxLongLong, wxLongLong> spaceNeeded = freeDiskSpaceNeeded(*j, folderPairCfg.handleDeletion, folderPairCfg.custDelFolder);
 
         wxLongLong freeDiskSpaceLeft;
         if (wxGetDiskSpace(zToWx(j->getBaseDir<LEFT_SIDE>()), NULL, &freeDiskSpaceLeft))
@@ -1324,20 +1333,26 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
 //------------------------------------------------------------------------------------------
 
             //generate name of alternate deletion directory (unique for session AND folder pair)
-            const DeletionHandling currentDelHandling(folderPairCfg.handleDeletion,
-                    folderPairCfg.custDelFolder,
-                    j->getBaseDir<LEFT_SIDE>(), j->getBaseDir<RIGHT_SIDE>(),
-                    statusUpdater);
+            const DeletionHandling currentDelHandling(
+                folderPairCfg.handleDeletion,
+                folderPairCfg.custDelFolder,
+                j->getBaseDir<LEFT_SIDE>(), j->getBaseDir<RIGHT_SIDE>(),
+                statusUpdater);
 
 //------------------------------------------------------------------------------------------
             //execute synchronization recursively
 
             //enforce removal of invalid entries (where both sides are empty)
-            RemoveInvalid dummy(*j);
+            struct RemoveInvalid
+            {
+                RemoveInvalid(BaseDirMapping& baseDir) : baseDir_(baseDir) {}
+                ~RemoveInvalid()
+                {
+                    FileSystemObject::removeEmpty(baseDir_);
+                }
+                BaseDirMapping& baseDir_;
+            } dummy1(*j);
 
-            //detect renamed files: currently in automatic mode only
-            //   if (folderPairCfg.inAutomaticMode)
-            //     DetectRenamedFiles::execute(*j, statusUpdater);
 
             SynchronizeFolderPair syncFP( *this,
 #ifdef FFS_WIN
@@ -1366,7 +1381,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
     }
     catch (const std::exception& e)
     {
-        statusUpdater.reportFatalError(wxString::FromAscii(e.what()));
+        statusUpdater.reportFatalError(wxString::FromUTF8(e.what()));
         return; //should be obsolete!
     }
 }
@@ -1430,11 +1445,13 @@ void SynchronizeFolderPair::copyFileUpdating(const Zstring& source, const Zstrin
 
     try
     {
+        FreeFileSync::copyFile(source,
+                               target,
+                               copyFileSymLinks_,
 #ifdef FFS_WIN
-        FreeFileSync::copyFile(source, target, copyFileSymLinks_, shadowCopyHandler_, &callback);
-#elif defined FFS_LINUX
-        FreeFileSync::copyFile(source, target, copyFileSymLinks_, &callback);
+                               shadowCopyHandler_,
 #endif
+                               &callback);
 
         if (verifyCopiedFiles_) //verify if data was copied correctly
             verifyFileCopy(source, target);
@@ -1464,9 +1481,9 @@ public:
 
 void verifyFiles(const Zstring& source, const Zstring& target, VerifyCallback* callback) // throw (FileError)
 {
-    const unsigned int BUFFER_SIZE = 512 * 1024; //512 kb seems to be the perfect buffer size
-    static boost::scoped_array<unsigned char> memory1(new unsigned char[BUFFER_SIZE]);
-    static boost::scoped_array<unsigned char> memory2(new unsigned char[BUFFER_SIZE]);
+    const size_t BUFFER_SIZE = 1024 * 1024; //1024 kb seems to be a reasonable buffer size
+    static const boost::scoped_array<char> memory1(new char[BUFFER_SIZE]);
+    static const boost::scoped_array<char> memory2(new char[BUFFER_SIZE]);
 
 #ifdef FFS_WIN
     wxFile file1(FreeFileSync::applyLongPathPrefix(source).c_str(), wxFile::read); //don't use buffered file input for verification!
@@ -1488,18 +1505,17 @@ void verifyFiles(const Zstring& source, const Zstring& target, VerifyCallback* c
     {
         const size_t length1 = file1.Read(memory1.get(), BUFFER_SIZE);
         if (file1.Error()) throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + zToWx(source) + wxT("\""));
+        callback->updateStatus(); //send progress updates
 
         const size_t length2 = file2.Read(memory2.get(), BUFFER_SIZE);
         if (file2.Error()) throw FileError(wxString(_("Error reading file:")) + wxT(" \"") + zToWx(target) + wxT("\""));
+        callback->updateStatus(); //send progress updates
 
         if (length1 != length2 || ::memcmp(memory1.get(), memory2.get(), length1) != 0)
         {
             const wxString errorMsg = wxString(_("Data verification error: Source and target file have different content!")) + wxT("\n");
             throw FileError(errorMsg + wxT("\"") + zToWx(source) + wxT("\" -> \n\"") + zToWx(target) + wxT("\""));
         }
-
-        //send progress updates
-        callback->updateStatus();
     }
     while (!file1.Eof());
 

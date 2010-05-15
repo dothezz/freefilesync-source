@@ -15,6 +15,7 @@
 #include <wx/mstream.h>
 #include "../shared/serialize.h"
 #include "../shared/fileIO.h"
+#include "../shared/loki/ScopeGuard.h"
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -173,7 +174,6 @@ DbStreamData loadFile(const Zstring& filename) //throw (FileError)
                         _("One of the FreeFileSync database files is not yet existing:") + wxT(" \n") +
                         wxT("\"") + zToWx(filename) + wxT("\""));
 
-
     //read format description (uncompressed)
     FileInputStreamDB uncompressed(filename); //throw (FileError)
 
@@ -190,33 +190,40 @@ std::pair<DirInfoPtr, DirInfoPtr> FreeFileSync::loadFromDisk(const BaseDirMappin
     const Zstring fileNameLeft  = baseMapping.getDBFilename<LEFT_SIDE>();
     const Zstring fileNameRight = baseMapping.getDBFilename<RIGHT_SIDE>();
 
-    //read file data: db ID + mapping of partner-ID/DirInfo-stream
-    const DbStreamData dbEntriesLeft  = ::loadFile(fileNameLeft);
-    const DbStreamData dbEntriesRight = ::loadFile(fileNameRight);
+    try
+    {
+        //read file data: db ID + mapping of partner-ID/DirInfo-stream
+        const DbStreamData dbEntriesLeft  = ::loadFile(fileNameLeft);
+        const DbStreamData dbEntriesRight = ::loadFile(fileNameRight);
 
-    //find associated DirInfo-streams
-    DirectoryTOC::const_iterator dbLeft = dbEntriesLeft.second.find(dbEntriesRight.first); //find left db-entry that corresponds to right database
-    if (dbLeft == dbEntriesLeft.second.end())
-        throw FileError(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
-                        _("One of the FreeFileSync database entries within the following file is not yet existing:") + wxT(" \n") +
-                        wxT("\"") + zToWx(fileNameLeft) + wxT("\""));
+        //find associated DirInfo-streams
+        DirectoryTOC::const_iterator dbLeft = dbEntriesLeft.second.find(dbEntriesRight.first); //find left db-entry that corresponds to right database
+        if (dbLeft == dbEntriesLeft.second.end())
+            throw FileError(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
+                            _("One of the FreeFileSync database entries within the following file is not yet existing:") + wxT(" \n") +
+                            wxT("\"") + zToWx(fileNameLeft) + wxT("\""));
 
-    DirectoryTOC::const_iterator dbRight = dbEntriesRight.second.find(dbEntriesLeft.first); //find left db-entry that corresponds to right database
-    if (dbRight == dbEntriesRight.second.end())
-        throw FileError(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
-                        _("One of the FreeFileSync database entries within the following file is not yet existing:") + wxT(" \n") +
-                        wxT("\"") + zToWx(fileNameRight) + wxT("\""));
+        DirectoryTOC::const_iterator dbRight = dbEntriesRight.second.find(dbEntriesLeft.first); //find left db-entry that corresponds to right database
+        if (dbRight == dbEntriesRight.second.end())
+            throw FileError(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
+                            _("One of the FreeFileSync database entries within the following file is not yet existing:") + wxT(" \n") +
+                            wxT("\"") + zToWx(fileNameRight) + wxT("\""));
 
-    //read streams into DirInfo
-    boost::shared_ptr<DirInformation> dirInfoLeft(new DirInformation);
-    wxMemoryInputStream buffer(&(*dbLeft->second)[0], dbLeft->second->size()); //convert char-array to inputstream: no copying, ownership not transferred
-    ReadDirInfo(buffer, zToWx(fileNameLeft), *dirInfoLeft);  //read file/dir information
+        //read streams into DirInfo
+        boost::shared_ptr<DirInformation> dirInfoLeft(new DirInformation);
+        wxMemoryInputStream buffer(&(*dbLeft->second)[0], dbLeft->second->size()); //convert char-array to inputstream: no copying, ownership not transferred
+        ReadDirInfo(buffer, zToWx(fileNameLeft), *dirInfoLeft);  //read file/dir information
 
-    boost::shared_ptr<DirInformation> dirInfoRight(new DirInformation);
-    wxMemoryInputStream buffer2(&(*dbRight->second)[0], dbRight->second->size()); //convert char-array to inputstream: no copying, ownership not transferred
-    ReadDirInfo(buffer2, zToWx(fileNameRight), *dirInfoRight);  //read file/dir information
+        boost::shared_ptr<DirInformation> dirInfoRight(new DirInformation);
+        wxMemoryInputStream buffer2(&(*dbRight->second)[0], dbRight->second->size()); //convert char-array to inputstream: no copying, ownership not transferred
+        ReadDirInfo(buffer2, zToWx(fileNameRight), *dirInfoRight);  //read file/dir information
 
-    return std::make_pair(dirInfoLeft, dirInfoRight);
+        return std::make_pair(dirInfoLeft, dirInfoRight);
+    }
+    catch (const std::bad_alloc&) //this is most likely caused by a corrupted database file
+    {
+        throw FileError(wxString(_("Error reading from synchronization database:")) + wxT(" (bad_alloc)"));
+    }
 }
 
 
@@ -346,74 +353,75 @@ void FreeFileSync::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileEr
     removeFile(fileNameLeftTmp);
     removeFile(fileNameRightTmp);
 
-    try
-    {
-        //load old database files...
+    //load old database files...
 
-        //read file data: db ID + mapping of partner-ID/DirInfo-stream: may throw!
-        DbStreamData dbEntriesLeft;
-        if (FreeFileSync::fileExists(baseMapping.getDBFilename<LEFT_SIDE>()))
-            try
-            {
-                dbEntriesLeft = ::loadFile(baseMapping.getDBFilename<LEFT_SIDE>());
-            }
-            catch(FileError&) {} //if error occurs: just overwrite old file! User is informed about issues right after comparing!
-        //else -> dbEntriesLeft has empty mapping, but already a DB-ID!
-
-        //read file data: db ID + mapping of partner-ID/DirInfo-stream: may throw!
-        DbStreamData dbEntriesRight;
-        if (FreeFileSync::fileExists(baseMapping.getDBFilename<RIGHT_SIDE>()))
-            try
-            {
-                dbEntriesRight = ::loadFile(baseMapping.getDBFilename<RIGHT_SIDE>());
-            }
-            catch(FileError&) {} //if error occurs: just overwrite old file! User is informed about issues right after comparing!
-
-        //create new database entries
-        MemoryStreamPtr dbEntryLeft(new std::vector<char>);
-        {
-            wxMemoryOutputStream buffer;
-            SaveDirInfo<LEFT_SIDE>(baseMapping, zToWx(baseMapping.getDBFilename<LEFT_SIDE>()), buffer);
-            dbEntryLeft->resize(buffer.GetSize());               //convert output stream to char-array
-            buffer.CopyTo(&(*dbEntryLeft)[0], buffer.GetSize()); //
-        }
-
-        MemoryStreamPtr dbEntryRight(new std::vector<char>);
-        {
-            wxMemoryOutputStream buffer;
-            SaveDirInfo<RIGHT_SIDE>(baseMapping, zToWx(baseMapping.getDBFilename<RIGHT_SIDE>()), buffer);
-            dbEntryRight->resize(buffer.GetSize());               //convert output stream to char-array
-            buffer.CopyTo(&(*dbEntryRight)[0], buffer.GetSize()); //
-        }
-
-        //create/update DirInfo-streams
-        dbEntriesLeft.second[dbEntriesRight.first] = dbEntryLeft;
-        dbEntriesRight.second[dbEntriesLeft.first] = dbEntryRight;
-
-        //write (temp-) files...
-        saveFile(dbEntriesLeft,  fileNameLeftTmp);  //throw (FileError)
-        saveFile(dbEntriesRight, fileNameRightTmp); //throw (FileError)
-
-        //operation finished: rename temp files -> this should work transactionally:
-        //if there were no write access, creation of temp files would have failed
-        removeFile(baseMapping.getDBFilename<LEFT_SIDE>());
-        removeFile(baseMapping.getDBFilename<RIGHT_SIDE>());
-        renameFile(fileNameLeftTmp, baseMapping.getDBFilename<LEFT_SIDE>()); //throw (FileError);
-        renameFile(fileNameRightTmp, baseMapping.getDBFilename<RIGHT_SIDE>()); //throw (FileError);
-    }
-    catch (...)
-    {
-        try //clean up: (try to) delete old tmp files
-        {
-            removeFile(fileNameLeftTmp);
-        }
-        catch (...) {}
+    //read file data: db ID + mapping of partner-ID/DirInfo-stream: may throw!
+    DbStreamData dbEntriesLeft;
+    if (FreeFileSync::fileExists(baseMapping.getDBFilename<LEFT_SIDE>()))
         try
         {
-            removeFile(fileNameRightTmp);
+            dbEntriesLeft = ::loadFile(baseMapping.getDBFilename<LEFT_SIDE>());
         }
-        catch (...) {}
+        catch(FileError&) {} //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
+    //else -> dbEntriesLeft has empty mapping, but already a DB-ID!
 
-        throw;
+    //read file data: db ID + mapping of partner-ID/DirInfo-stream: may throw!
+    DbStreamData dbEntriesRight;
+    if (FreeFileSync::fileExists(baseMapping.getDBFilename<RIGHT_SIDE>()))
+        try
+        {
+            dbEntriesRight = ::loadFile(baseMapping.getDBFilename<RIGHT_SIDE>());
+        }
+        catch(FileError&) {} //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
+
+    //create new database entries
+    MemoryStreamPtr dbEntryLeft(new std::vector<char>);
+    {
+        wxMemoryOutputStream buffer;
+        SaveDirInfo<LEFT_SIDE>(baseMapping, zToWx(baseMapping.getDBFilename<LEFT_SIDE>()), buffer);
+        dbEntryLeft->resize(buffer.GetSize());               //convert output stream to char-array
+        buffer.CopyTo(&(*dbEntryLeft)[0], buffer.GetSize()); //
     }
+
+    MemoryStreamPtr dbEntryRight(new std::vector<char>);
+    {
+        wxMemoryOutputStream buffer;
+        SaveDirInfo<RIGHT_SIDE>(baseMapping, zToWx(baseMapping.getDBFilename<RIGHT_SIDE>()), buffer);
+        dbEntryRight->resize(buffer.GetSize());               //convert output stream to char-array
+        buffer.CopyTo(&(*dbEntryRight)[0], buffer.GetSize()); //
+    }
+
+    //create/update DirInfo-streams
+    dbEntriesLeft.second[dbEntriesRight.first] = dbEntryLeft;
+    dbEntriesRight.second[dbEntriesLeft.first] = dbEntryRight;
+
+
+    struct TryCleanUp //ensure cleanup if working with temporary failed!
+    {
+        static void tryDeleteFile(const Zstring& filename) //throw ()
+        {
+            try
+            {
+                removeFile(filename);
+            }
+            catch (...) {}
+        }
+    };
+
+    //write (temp-) files...
+    Loki::ScopeGuard guardTempFileLeft = Loki::MakeGuard(&TryCleanUp::tryDeleteFile, fileNameLeftTmp);
+    saveFile(dbEntriesLeft, fileNameLeftTmp);  //throw (FileError)
+
+    Loki::ScopeGuard guardTempFileRight = Loki::MakeGuard(&TryCleanUp::tryDeleteFile, fileNameRightTmp);
+    saveFile(dbEntriesRight, fileNameRightTmp); //throw (FileError)
+
+    //operation finished: rename temp files -> this should work transactionally:
+    //if there were no write access, creation of temp files would have failed
+    removeFile(baseMapping.getDBFilename<LEFT_SIDE>());
+    removeFile(baseMapping.getDBFilename<RIGHT_SIDE>());
+    renameFile(fileNameLeftTmp, baseMapping.getDBFilename<LEFT_SIDE>());   //throw (FileError);
+    renameFile(fileNameRightTmp, baseMapping.getDBFilename<RIGHT_SIDE>()); //throw (FileError);
+
+    guardTempFileLeft.Dismiss(); //no need to delete temp file anymore
+    guardTempFileRight.Dismiss(); //
 }

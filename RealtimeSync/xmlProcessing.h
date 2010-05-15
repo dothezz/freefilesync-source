@@ -19,7 +19,7 @@ struct XmlRealConfig
     XmlRealConfig() : delay(5) {}
     std::vector<wxString> directories;
     wxString commandline;
-    unsigned int delay;
+    size_t delay;
 };
 
 void readRealConfig(const wxString& filename, XmlRealConfig& config);           //throw (xmlAccess::XmlError);

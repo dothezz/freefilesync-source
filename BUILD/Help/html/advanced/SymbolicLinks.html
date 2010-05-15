@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20091213;19145800">
+	<META NAME="CHANGED" CONTENT="20100420;21220800">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -28,46 +28,67 @@ Linux)</SPAN></FONT></H3>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">FreeFileSync
-offers the following two advanced options contained in each
-*.ffs_gui/*.ffs_batch file to configure processing of Symbolic Links
-(also called Symlinks or Soft Links):</FONT></P>
+offers three advanced options to configure processing of Symbolic
+Links (also called Symlinks or Soft Links). They can be configured
+directly within a *.ffs_gui/ffs_batch file via a text editor. Only
+the first option is presented on GUI:</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Default
-Settings (View and edit these in the text editor of your choice):</FONT></P>
-<UL>
-	<P><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
-		<UL>
-			<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Courier New, monospace">&lt;CopyFileSymlinks&gt;true&lt;/CopyFileSymlinks&gt;<BR>&lt;TraverseDirectorySymlinks&gt;false&lt;/TraverseDirectorySymlinks&gt;</FONT></P>
-		</UL>
+<OL>
+	<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><SPAN ID="Rahmen7" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+		<FONT FACE="Courier New, monospace">&lt;IncludeSymlinks&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;false&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/IncludeSymlinks&gt;<BR>&lt;TraverseDirectorySymlinks&gt;true&nbsp;&lt;/TraverseDirectorySymlinks&gt;<BR>&lt;CopyFileSymlinks&gt;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;false&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;/CopyFileSymlinks&gt;</FONT></P>
 	</SPAN><BR CLEAR=LEFT>
 	</P>
+</OL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<UL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Enable
+	&quot;<I>Include Symbolic Links</I>&quot; in order to process
+	Symbolic Links at all, i.e. add them to the file and directory
+	listing.<BR></FONT>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">&quot;<I>Traverse
+	Directory Links</I>&quot; specifies handling of Symbolic Links to
+	directories:<BR>If this option is enabled, they are traversed like
+	ordinary directories during comparison. When synchronizing, the
+	target of the Symbolic Link will be copied. If disabled, Symbolic
+	Links are not traversed. During synchronization, copying them
+	results in a copy of the Symbolic Link.<BR></FONT>&nbsp;</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">&quot;<I>Copy
+	File Links</I>&quot; defines the behavior for copying Symbolic Links
+	pointing to files:<BR>If checked, the Symbolic Link itself will be
+	copied. If unchecked, the target of the Link will be copied instead.</FONT></P>
 </UL>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">&quot;<I>CopyFileSymlinks</I>&quot;
-defines the behavior for copying Symbolic Links pointing to files:</FONT></P>
-<P STYLE="margin-left: 2cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If
-set to <I>true</I> it copies the Symbolik Link to its destination.<BR>If
-set to <I>false</I> the target of the link, in this case a file, is
-being copied instead.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">On GUI
+only the first option is available for configuration, while &quot;<I>Traverse
+Directory Links</I>&quot; is implicitly enabled and </FONT><FONT FACE="Tahoma, sans-serif">&quot;</FONT><FONT FACE="Tahoma, sans-serif"><I>Copy
+File Links</I></FONT><FONT FACE="Tahoma, sans-serif">&quot; disabled.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">&quot;<I>TraverseDirectorySymlinks</I>&quot;
-specifies handling of Symbolic Links to directories:</FONT></P>
-<P STYLE="margin-left: 2cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If
-<I>true</I>, they are being traversed like regular directories during
-comparison and are copied as if they were regular directories (i.e.
-not as Symbolic Links) during synchronization.<BR>If <I>false</I> is
-selected, these Symbolic Links are not traversed at all. During
-synchronization copying them results in a direct copy of the Symbolic
-Link, not the target directory.</FONT></P>
-<P STYLE="margin-left: 2cm; margin-bottom: 0cm"><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+<P STYLE="margin-bottom: 0cm"><IMG SRC="CmpSettings.png" NAME="Grafik1" ALIGN=BOTTOM WIDTH=292 HEIGHT=225 BORDER=0></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
 	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
-	<FONT FACE="Tahoma, sans-serif"><B>Note:</B><BR>As the link's
-	content is not parsed by FreeFileSync, this usually only makes sense
-	when you use relative paths within your Symolic Links.</FONT></P>
+	<FONT FACE="Tahoma, sans-serif"><B>Note:</B></FONT></P>
+	<UL>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">In
+		the Windows build the options described above always apply to
+		</FONT><FONT FACE="Tahoma, sans-serif"><I>&quot;Reparse Points&quot;</I></FONT><FONT FACE="Tahoma, sans-serif">.
+		Reparse Points are a more general concept including for example
+		Symbolic Links, Junctions and Mount Points. The term </FONT><FONT FACE="Tahoma, sans-serif"><I>&quot;Symbolic
+		Link&quot; </I></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-style: normal">has
+		been retained nevertheless for harmonization with Linux.</SPAN></FONT></P>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm; font-style: normal"><FONT FACE="Tahoma, sans-serif">Creating
+		or copying Symbolic Links requires the application to be started
+		with Administrator rights.</FONT></P>
+	</UL>
 </SPAN><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
 </P>
 </BODY>
 </HTML>

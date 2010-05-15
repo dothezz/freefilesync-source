@@ -81,6 +81,9 @@ WarningDlg::WarningDlg(wxWindow* parentWindow,  int activeButtons, const wxStrin
         m_checkBoxDontShowAgain->Hide();
     }
 
+    if (~activeButtons & BUTTON_SWITCH)
+        m_buttonSwitch->Hide();
+
     if (~activeButtons & BUTTON_ABORT)
         m_buttonAbort->Hide();
 
@@ -90,8 +93,6 @@ WarningDlg::WarningDlg(wxWindow* parentWindow,  int activeButtons, const wxStrin
     else if (activeButtons & BUTTON_ABORT)
         m_buttonAbort->SetFocus();
 }
-
-WarningDlg::~WarningDlg() {}
 
 
 void WarningDlg::OnClose(wxCloseEvent& event)
@@ -105,6 +106,13 @@ void WarningDlg::OnIgnore(wxCommandEvent& event)
 {
     dontShowAgain = m_checkBoxDontShowAgain->GetValue();
     EndModal(BUTTON_IGNORE);
+}
+
+
+void WarningDlg::OnSwitch(wxCommandEvent& event)
+{
+    dontShowAgain = m_checkBoxDontShowAgain->GetValue();
+    EndModal(BUTTON_SWITCH);
 }
 
 

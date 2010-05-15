@@ -2,9 +2,33 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.7
+--------------
+RealtimeSync: Trigger commandline only if all directories are existing
+Allow for drag and drop of very large files
+Batch modus: New "Switch" button opens GUI modus when warnings occur
+Support copying old 8.3 filenames correctly
+Handling of Symbolic Links configurable via GUI
+Fine tuned calculation of remaining disk space for custom deletion directories
+Save default config files only if actually changed
+NSIS installer: Support for /D and /S switches
+Fixed resource loading if installation folder is not working directory (Linux build)
+Consolidated batch creation dialog
+<Automatic> mode: Detect conflict when a directory shall be deleted while new sub-elements are to be copied
+Automatically mark left behind temporary files (*.ffs_tmp) for deletion with next sync
+New Project website: http://freefilesync.sourceforge.net
+A lot of small GUI fixes
+Updated translation files
+
+
+Changelog v3.6
+--------------
+Fixed occasional crash when starting FreeFileSync
+
+
 Changelog v3.5
 --------------
-Allow <automatic> mode syncs between 32 bit, 64 bit, Windows and Linux builds
+Allow <Automatic> mode syncs between 32 bit, 64 bit, Windows and Linux builds
 Show progess indicator in window title
 Support for progess indicator in Windows 7 Superbar
 Reduced progress indicator flicker

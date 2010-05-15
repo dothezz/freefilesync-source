@@ -127,28 +127,28 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
 }
 
 
-class MatchFound : public std::unary_function<const DefaultChar*, bool>
+class MatchFound : public std::unary_function<Zstring, bool>
 {
 public:
-    MatchFound(const DefaultChar* name) : name_(name) {}
+    MatchFound(const Zstring& name) : name_(name) {}
 
-    bool operator()(const DefaultChar* mask) const
+    bool operator()(const Zstring& mask) const
     {
-        return Zstring::Matches(name_, mask);
+        return Zstring::Matches(name_.c_str(), mask.c_str());
     }
 private:
-    const DefaultChar* name_;
+    const Zstring& name_;
 };
 
 
 inline
-bool matchesFilter(const DefaultChar* name, const std::set<Zstring>& filter)
+bool matchesFilter(const Zstring& name, const std::set<Zstring>& filter)
 {
 #ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
     Zstring nameFormatted = name;
     nameFormatted.MakeUpper();
 #elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
-    const DefaultChar* const nameFormatted = name; //nothing to do here
+    const Zstring& nameFormatted = name; //nothing to do here
 #endif
 
     return std::find_if(filter.begin(), filter.end(), MatchFound(nameFormatted)) != filter.end();
@@ -182,17 +182,17 @@ bool matchesMaskBegin(const DefaultChar* string, const DefaultChar* mask)
 
 
 inline
-bool matchesFilterBegin(const DefaultChar* name, const std::set<Zstring>& filter)
+bool matchesFilterBegin(const Zstring& name, const std::set<Zstring>& filter)
 {
 #ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
     Zstring nameFormatted = name;
     nameFormatted.MakeUpper();
 #elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
-    const DefaultChar* const nameFormatted = name; //nothing to do here
+    const Zstring& nameFormatted = name; //nothing to do here
 #endif
 
     return std::find_if(filter.begin(), filter.end(),
-                        boost::bind(matchesMaskBegin, nameFormatted, _1)) != filter.end();
+                        boost::bind(matchesMaskBegin, nameFormatted.c_str(), _1)) != filter.end();
 }
 
 
@@ -229,14 +229,14 @@ NameFilter::NameFilter(const Zstring& includeFilter, const Zstring& excludeFilte
 }
 
 
-bool NameFilter::passFileFilter(const DefaultChar* relFilename) const
+bool NameFilter::passFileFilter(const Zstring& relFilename) const
 {
     return  matchesFilter(relFilename, filterFileIn) && //process include filters
             !matchesFilter(relFilename, filterFileEx);  //process exclude filters
 }
 
 
-bool NameFilter::passDirFilter(const DefaultChar* relDirname, bool* subObjMightMatch) const
+bool NameFilter::passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const
 {
     assert(subObjMightMatch == NULL || *subObjMightMatch == true); //check correct usage
 
@@ -251,7 +251,7 @@ bool NameFilter::passDirFilter(const DefaultChar* relDirname, bool* subObjMightM
     {
         if (subObjMightMatch)
         {
-            Zstring subNameBegin(relDirname);
+            Zstring subNameBegin = relDirname;
             subNameBegin += globalFunctions::FILE_NAME_SEPARATOR;
 
             *subObjMightMatch = matchesFilterBegin(subNameBegin, filterFileIn) || //might match a file in subdirectory

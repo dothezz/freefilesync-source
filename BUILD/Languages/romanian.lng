@@ -22,8 +22,6 @@
  sec
 %x / %y objects deleted successfully
 %x / %y obiecte șterse cu succes
-%x Percent
-%x Procente
 %x directories
 %x dosare
 %x files,
@@ -34,6 +32,8 @@
 %x din %y rînduri afișate
 %x of 1 row in view
 %x din 1 rînd afișat
+%x%
+%x%
 &Abort
 &Anulează
 &About...
@@ -86,14 +86,14 @@
 &Reîncearcă
 &Save
 &Salvează
+&Switch
+&Comută
 &Yes
 &Da
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Doar dispozitivele FAT/FAT32 sînt afectate de această problemă!\nÎn celelalte cazuri, puteți dezactiva setarea \"ignoră diferența de 1-oră\".)
 (Requires an Internet connection!)
 (Necesită o conexiune la internet!)
-,
-.
 - Other side's counterpart to %dir
 - corespondentul din partea opusă al lui %dir
 - Other side's counterpart to %name
@@ -122,10 +122,6 @@
 - dreapta
 - right newer
 - cel mai nou e în dreapta
--Open-Source file synchronization-
--Soft cu sursă deschisă pentru sincronizarea de fișiere-
-.
-,
 /sec
 /sec
 1 directory
@@ -168,8 +164,6 @@ About
 Despre
 Action
 Acțiune
-Activate filter
-Activează filtrul
 Add folder
 Adaugă Dosar
 Add folder pair
@@ -188,8 +182,6 @@ At least one directory input field is empty.
 Cel puțin un cîmp de introducere a dosarului este gol.
 Auto-adjust columns
 Autoajustează Coloanele
-Automatic mode
-Mod inteligent
 Batch execution
 Execută Fișierul Lot
 Batch file created successfully!
@@ -202,6 +194,8 @@ Both sides have changed since last synchronization!
 Ambele părți s-au modificat de la ultima sincronizare!
 Browse
 Explorează
+Browse directory
+Explorează Dosarul
 Build:
 Compilat la:
 Cannot determine sync-direction:
@@ -210,6 +204,8 @@ Cannot find %x
 Nu pot găsi %x
 Category
 Categorie
+Clear filter settings
+Curăță Setările Filtrului
 Comma separated list
 Listă de elemente separate prin virgulă
 Command line
@@ -226,8 +222,6 @@ Compare by \"File size and date\"
 Compară după \"Data și Mărimea Fișierelor\"
 Compare by...
 Compară după:
-Comparing content
-Compar conținutul
 Comparing content of files %x
 Compar conținutul fișierelor %x
 Comparing content...
@@ -294,8 +288,6 @@ Create a batch job
 Creează o Sarcină Lot
 Creating folder %x
 Creez dosarul %x
-Current operation:
-Operațiunea Curentă:
 Custom
 Sincronizare Personalizată
 Customize columns
@@ -306,10 +298,6 @@ D-Click
 Clic-Dreapta
 DECISION TREE
 ARBORE DECIZIONAL
-Data remaining:
-Date Rămase:
-Data transferred:
-Date Transferate:
 Data verification error: Source and target file have different content!
 Eroare la verificarea datelor: Fișierele sursă și țintă au conținut diferit!
 Date
@@ -364,10 +352,14 @@ Download now?
 Descarc acum ?
 Drag && drop
 Trageți un dosar peste compartiment sau folosiți butonul Explorează
+Elements found:
+Elemente găsite:
+Elements processed:
+Elemente procesate:
+Elements remaining:
+Elemente rămase:
 Email
 E-mail
-Enable filter to exclude files from synchronization
-Se activează filtrul pentru excluderea fișierelor din sincronizare
 Endless loop when traversing directory:
 Buclă infinită la parcurgerea dosarului:
 Error
@@ -462,38 +454,30 @@ Files are found equal if\n     - file content\nis the same
 Fișierele sînt considerate identice dacă\n     - conținutul\neste identic
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
 Fișierele sînt considerate identice dacă\n     - mărimea\n     - și data ultimei modificări\nsînt identice
-Files remaining:
-Fișiere Rămase:
 Files that are equal on both sides
 Fișiere identice în ambele părți
-Files that exist on both sides and have different content
-Fișiere care există în ambele părți și au conținut diferit
 Files that exist on both sides, left one is newer
 Fișiere care există în ambele părți, cel din stînga fiind mai nou
 Files that exist on both sides, right one is newer
 Fișiere care există în ambele părți, cel din dreapta fiind mai nou
-Files/folders found:
-Fișiere/dosare găsite:
-Files/folders processed:
-Fișiere/dosare procesate:
-Files/folders remaining:
-Itemuri Rămase:
+Files that have different content
+Fișiere care au conținut diferit
 Files/folders that exist on left side only
 Fișiere sau dosare care există doar în partea stîngă
 Files/folders that exist on right side only
 Fișiere sau dosare care există doar în partea dreaptă
-Filter
-Filtrare
 Filter files
 Filtrează Fișierele
-Filter has been selected
-Filtrul a fost selectat
+Filter is active
+Filtrul este activ
 Filter settings have changed!
 Setările filtrului au fost schimbate!
 Filter view
 Filtru de Vedere
-Filtering is deactivated
-Filtrarea este dezactivată
+Filter: All pairs
+Filtru: Toate perechile
+Filter: Single pair
+Filtru: O singură pereche
 Find
 Găsește
 Find what:
@@ -502,8 +486,6 @@ Folder Comparison and Synchronization
 Comparare și Sincronizare de Dosare
 Free disk space available:
 Spațiu de stocare disponibil:
-FreeFileSync - Folder Comparison and Synchronization
-FreeFileSync - Comparare și Sincronizare de Dosare
 FreeFileSync Batch Job
 FreeFileSync Sarcină cu Lot de Comenzi
 FreeFileSync at Sourceforge
@@ -520,8 +502,6 @@ Generating database...
 Generez baza de date...
 Generating file list...
 Generez lista de fișiere...
-Global filter
-Filtru Global
 Global settings
 Setări Globale
 Help
@@ -578,12 +558,10 @@ Ignore errors
 Ignoră erorile
 Ignore subsequent errors
 Ignoră (nu lua în seamă) erorile ulterioare
-Ignore this error, retry or abort synchronization?
-Ignorați eroarea, reîncercați sau anulați sincronizarea?
-Ignore this error, retry or abort?
-Ignorați eroarea, reîncercați sau anulați?
 Include
 Incluse
+Include Symbolic Links
+Include Legăturile Simbolice
 Include all rows
 Include Toate Rîndurile
 Include temporarily
@@ -600,8 +578,6 @@ Initial synchronization:
 Sincronizare inițială:
 Integrate external applications into context menu. The following macros are available:
 Include aplicațiile externe în meniul contextual. Sînt disponibile următoarele macrocomenzi:
-Last synchronization not completed!
-Ultima sinconizare nu a fost terminată!
 Leave as unresolved conflict
 Lasă ca Conflict Nerezolvat
 Left
@@ -612,8 +588,6 @@ Load configuration from file
 Încarcă configurația dintr-un fișier
 Load configuration history (press DEL to delete items)
 Încarcă istoricul configurației (apăsați tasta DEL pentru a șterge itemuri)
-Local filter
-Filtru Local
 Log-messages:
 Mesaje de jurnalizare:
 Logging
@@ -659,17 +633,15 @@ Numărul de fișiere și dosare care vor fi șterse
 Number of files that will be overwritten
 Numărul de fișiere care vor fi suprascrise
 One of the FreeFileSync database entries within the following file is not yet existing:
-Una din intrările în baza de date FreeFileSync din fișierul următor nu există:
+Una dintre intrările în baza de date FreeFileSync din fișierul următor nu există:
 One of the FreeFileSync database files is not yet existing:
-Una din părți nu are un fișier de tip bază de date FreeFileSync:
+Una dintre părți nu are un fișier de tip bază de date FreeFileSync:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Doar fișierele sau dosarele care trec de filtru vor fi selecționate pentru sincronizare. Filtrul va fi aplicat la numele elementelor aflate ierarhic sub dosarul de sincronizat.
-Open directly
-Deschide Direct
 Open with Explorer
-Deschide cu Windows Explorer
-Open with Konqueror
-Deschide cu Konqueror
+Deschide în Windows Explorer
+Open with default application
+Deschide cu Aplicația Implicită
 Operation aborted!
 Operațiune abandonată!
 Operation:
@@ -680,8 +652,12 @@ Pause
 Pauză
 Paused
 Pauzat
+Planned directory deletion is in conflict with its subdirectories and -files!
+Ștergerea plănuită a dosarului intră în conflict cu subdosarele și fișierele sale!
 Please run a Compare first before synchronizing!
 Rulați compararea înainte de a sincroniza!
+Press \"Switch\" to open FreeFileSync GUI modus.
+Apăsați \"Comută\" pentru a deschide modul grafic al FreeFileSync
 Processing folder pair:
 Procesez perechea de dosare:
 Published under the GNU General Public License:
@@ -697,7 +673,7 @@ RealtimeSync - Sincronizare Inteligentă
 RealtimeSync configuration
 RealtimeSync configurație
 Recycle Bin not yet supported for this system!
-
+Reciclatorul nu este încă suportat pentru acest sistem de operare!
 Relative path
 Calea Relativă
 Remove alternate settings
@@ -706,8 +682,6 @@ Remove folder
 Înlătură Dosarul
 Remove folder pair
 Înlătură Perechea de Dosare
-Remove local filter settings
-Înlătură Configurația Filtrului Local
 Renaming file %x to %y
 Redenumesc fișierul %x în %y
 Report translation error
@@ -740,7 +714,7 @@ Select variant:
 Selectați Varianta de Sincronizare:
 Set direction:
 Setează Acțiunea ca în Iconița Alăturată:
-Setting default synchronization directions: Old files will be overwritten by newer files.
+Setting default synchronization directions: Old files will be overwritten with newer files.
 Va fi setat sensul implicit de sincronizare: Fișierele vechi vor fi suprascrise de cele noi.
 Show conflicts
 Arată conflictele
@@ -794,10 +768,14 @@ Start synchronization
 Pornește Sincronizarea
 Statistics
 Statistici
+Status feedback
+Evoluția stării
 Stop
 Oprește
 Swap sides
 Schimbă părțile între ele
+Switching to FreeFileSync GUI modus...
+Comut la modul grafic al FreeFileSync...
 Synchronization Preview
 Previzionarea Sincronizării
 Synchronization aborted!
@@ -812,8 +790,6 @@ Synchronization status
 Starea Sincronizării
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Sincronizează fișierele .doc, .zip și .exe, cu excepția celor din dosarul \"temp\".
-Synchronize both sides using a database. Deletions are detected automatically
-Sincronizare simultană a celor două părți folosind o bază de date. Ștergerile sînt detectate automat
 Synchronize...
 Sincronizează
 Synchronizing...
@@ -828,6 +804,8 @@ The command line is executed each time:\n- a directory becomes available (e.g. U
 Linia de comandă este executată de fiecare dată cînd:\n- un dosar devine disponibil (de ex. se introduce un dispozitiv USB)\n- fișierele conținute în aceste dosare sau subdosare sînt modificate
 The file does not contain a valid configuration:
 Fișierul nu conține o configurație validă:
+The file was not processed by last synchronization!
+Fișierul nu a fost procesat la ultima sincronizare!
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Această variantă definește două fișiere cu același nume ca fiind identice atunci cînd au aceeași mărime ȘI aceeași dată și oră a ultimei modificări.
 Time
@@ -868,6 +846,8 @@ Verifying file %x
 Verific fișierul %x
 Volume name %x not part of filename %y!
 Numele volumului %x nu face parte din numele fișierului %y !
+Waiting for all directories to become available...
+Aștept ca toate dosarele să devină disponibile...
 Warning
 Avertisment
 Warning: Synchronization failed for %x item(s):

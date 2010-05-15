@@ -32,12 +32,12 @@ protected:
     ReadInputStream(wxInputStream& stream, const wxString& errorObjName) : stream_(stream), errorObjName_(errorObjName) {}
 
     template <class T>
-    T readNumberC(); //checked read operation
+    T readNumberC(); //throw FileError(), checked read operation
 
-    Zstring readStringC(); //checked read operation
+    Zstring readStringC(); //throw FileError(), checked read operation
 
     typedef boost::shared_ptr<std::vector<char> > CharArray;
-    CharArray readArrayC();
+    CharArray readArrayC(); //throw FileError()
 
     void check();
 
@@ -60,11 +60,11 @@ protected:
     WriteOutputStream(const wxString& errorObjName, wxOutputStream& stream) : stream_(stream), errorObjName_(errorObjName) {}
 
     template <class T>
-    void writeNumberC(T number); //checked write operation
+    void writeNumberC(T number); //throw FileError(), checked write operation
 
-    void writeStringC(const Zstring& str); //checked write operation
+    void writeStringC(const Zstring& str); //throw FileError(), checked write operation
 
-    void writeArrayC(const std::vector<char>& buffer);
+    void writeArrayC(const std::vector<char>& buffer); //throw FileError()
 
     void check();
 

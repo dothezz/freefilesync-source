@@ -7,7 +7,7 @@
 #ifndef WATCHER_H_INCLUDED
 #define WATCHER_H_INCLUDED
 
-#include "functions.h"
+#include "../shared/zstring.h"
 #include <vector>
 #include "../shared/fileError.h"
 
@@ -26,7 +26,17 @@ public:
     virtual void requestUiRefresh() = 0; //opportunity to abort must be implemented in a frequently executed method like requestUiRefresh()
 };
 
-void waitForChanges(const std::vector<wxString>& dirNames, WaitCallback* statusHandler); //throw(FreeFileSync::FileError);
+
+//wait until changes are detected or if a directory is not available (anymore)
+enum WaitResult
+{
+	CHANGE_DETECTED,
+	CHANGE_DIR_MISSING
+ };
+WaitResult waitForChanges(const std::vector<Zstring>& dirNames, WaitCallback* statusHandler); //throw(FileError)
+
+//wait until all directories become available (again)
+void waitForMissingDirs(const std::vector<Zstring>& dirNames, WaitCallback* statusHandler); //throw(FileError)
 }
 
 #endif // WATCHER_H_INCLUDED

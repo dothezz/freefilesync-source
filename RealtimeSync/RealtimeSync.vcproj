@@ -432,10 +432,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\shared\recycler.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\resources.cpp"
 				>
 			</File>

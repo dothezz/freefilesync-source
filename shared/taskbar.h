@@ -19,7 +19,7 @@ namespace Utility
 {
 class TaskbarNotAvailable {};
 
-//show progress in windows superbar via ITaskbarList3 Interfce (http://msdn.microsoft.com/en-us/library/dd391692(VS.85).aspx)
+//show progress in windows superbar via ITaskbarList3 Interface (http://msdn.microsoft.com/en-us/library/dd391692(VS.85).aspx)
 class TaskbarProgress
 {
 public:

@@ -22,8 +22,6 @@
  sec
 %x / %y objects deleted successfully
 %x / %y objects deleted successfully
-%x Percent
-%x Percent
 %x directories
 %x directories
 %x files,
@@ -34,6 +32,8 @@
 %x of %y rows in view
 %x of 1 row in view
 %x of 1 row in view
+%x%
+%x%
 &Abort
 &Abort
 &About...
@@ -86,14 +86,14 @@
 &Retry
 &Save
 &Save
+&Switch
+&Switch
 &Yes
 &Yes
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Requires an Internet connection!)
 (Requires an Internet connection!)
-,
-,
 - Other side's counterpart to %dir
 - Other side's counterpart to %dir
 - Other side's counterpart to %name
@@ -122,10 +122,6 @@
 - right
 - right newer
 - right newer
--Open-Source file synchronization-
--Open-Source file synchronisation-
-.
-.
 /sec
 /sec
 1 directory
@@ -168,8 +164,6 @@ About
 About
 Action
 Action
-Activate filter
-Activate filter
 Add folder
 Add folder
 Add folder pair
@@ -188,8 +182,6 @@ At least one directory input field is empty.
 At least one directory input field is empty.
 Auto-adjust columns
 Auto-adjust columns
-Automatic mode
-Automatic mode
 Batch execution
 Batch execution
 Batch file created successfully!
@@ -202,6 +194,8 @@ Both sides have changed since last synchronization!
 Both sides have changed since last synchronisation!
 Browse
 Browse
+Browse directory
+Browse directory
 Build:
 Build:
 Cannot determine sync-direction:
@@ -210,6 +204,8 @@ Cannot find %x
 Cannot find %x
 Category
 Category
+Clear filter settings
+Clear filter settings
 Comma separated list
 Comma separated list
 Command line
@@ -226,8 +222,6 @@ Compare by \"File size and date\"
 Compare by \"File size and date\"
 Compare by...
 Compare by...
-Comparing content
-Comparing content
 Comparing content of files %x
 Comparing content of files %x
 Comparing content...
@@ -294,8 +288,6 @@ Create a batch job
 Create a batch job
 Creating folder %x
 Creating folder %x
-Current operation:
-Current operation:
 Custom
 Custom
 Customize columns
@@ -306,10 +298,6 @@ D-Click
 D-Click
 DECISION TREE
 DECISION TREE
-Data remaining:
-Data remaining:
-Data transferred:
-Data transferred:
 Data verification error: Source and target file have different content!
 Data verification error: Source and target file have different content!
 Date
@@ -364,10 +352,14 @@ Download now?
 Download now?
 Drag && drop
 Drag && drop
+Elements found:
+Elements found:
+Elements processed:
+Elements processed:
+Elements remaining:
+Elements remaining:
 Email
 E-mail
-Enable filter to exclude files from synchronization
-Enable filter to exclude files from synchronisation
 Endless loop when traversing directory:
 Endless loop when traversing directory:
 Error
@@ -462,38 +454,30 @@ Files are found equal if\n     - file content\nis the same
 Files are found equal if\n     - file content\nis the same
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
-Files remaining:
-Files remaining:
 Files that are equal on both sides
 Files that are equal on both sides
-Files that exist on both sides and have different content
-Files that exist on both sides and have different content
 Files that exist on both sides, left one is newer
 Files that exist on both sides, left one is newer
 Files that exist on both sides, right one is newer
 Files that exist on both sides, right one is newer
-Files/folders found:
-Files/folders found:
-Files/folders processed:
-Files/folders processed:
-Files/folders remaining:
-Files/folders remaining:
+Files that have different content
+Files that have different content
 Files/folders that exist on left side only
 Files/folders that exist on left side only
 Files/folders that exist on right side only
 Files/folders that exist on right side only
-Filter
-Filter
 Filter files
 Filter files
-Filter has been selected
-Filter has been selected
+Filter is active
+Filter is active
 Filter settings have changed!
 Filter settings have changed!
 Filter view
 Filter view
-Filtering is deactivated
-Filtering is deactivated
+Filter: All pairs
+Filter: All pairs
+Filter: Single pair
+Filter: Single pair
 Find
 Find
 Find what:
@@ -502,8 +486,6 @@ Folder Comparison and Synchronization
 Folder Comparison and Synchronisation
 Free disk space available:
 Free disk space available:
-FreeFileSync - Folder Comparison and Synchronization
-FreeFileSync - Folder Comparison and Synchronisation
 FreeFileSync Batch Job
 FreeFileSync Batch Job
 FreeFileSync at Sourceforge
@@ -520,8 +502,6 @@ Generating database...
 Generating database...
 Generating file list...
 Generating file list...
-Global filter
-Global filter
 Global settings
 Global settings
 Help
@@ -578,12 +558,10 @@ Ignore errors
 Ignore errors
 Ignore subsequent errors
 Ignore subsequent errors
-Ignore this error, retry or abort synchronization?
-Ignore this error, retry or abort synchronisation?
-Ignore this error, retry or abort?
-Ignore this error, retry or abort?
 Include
 Include
+Include Symbolic Links
+Include Symbolic Links
 Include all rows
 Include all rows
 Include temporarily
@@ -600,8 +578,6 @@ Initial synchronization:
 Initial synchronisation:
 Integrate external applications into context menu. The following macros are available:
 Integrate external applications into context menu. The following macros are available:
-Last synchronization not completed!
-Last synchronisation not completed!
 Leave as unresolved conflict
 Leave as unresolved conflict
 Left
@@ -612,8 +588,6 @@ Load configuration from file
 Load configuration from file
 Load configuration history (press DEL to delete items)
 Load configuration history (press DEL to delete items)
-Local filter
-Local filter
 Log-messages:
 Log-messages:
 Logging
@@ -664,12 +638,10 @@ One of the FreeFileSync database files is not yet existing:
 One of the FreeFileSync database files is not yet existing:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Only files/directories that pass filtering will be selected for synchronisation. The filter will be applied to the name relative(!) to the base synchronisation directories.
-Open directly
-Open directly
 Open with Explorer
 Open with Explorer
-Open with Konqueror
-Open with Konqueror
+Open with default application
+Open with default application
 Operation aborted!
 Operation aborted!
 Operation:
@@ -680,8 +652,12 @@ Pause
 Pause
 Paused
 Paused
+Planned directory deletion is in conflict with its subdirectories and -files!
+Planned directory deletion is in conflict with its subdirectories and -files!
 Please run a Compare first before synchronizing!
 Please run a Compare first before synchronising!
+Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI modus.
 Processing folder pair:
 Processing folder pair:
 Published under the GNU General Public License:
@@ -706,8 +682,6 @@ Remove folder
 Remove folder
 Remove folder pair
 Remove folder pair
-Remove local filter settings
-Remove local filter settings
 Renaming file %x to %y
 Renaming file %x to %y
 Report translation error
@@ -740,8 +714,8 @@ Select variant:
 Select variant:
 Set direction:
 Set direction:
-Setting default synchronization directions: Old files will be overwritten by newer files.
-Setting default synchronisation directions: Old files will be overwritten by newer files.
+Setting default synchronization directions: Old files will be overwritten with newer files.
+Setting default synchronization directions: Old files will be overwritten with newer files.
 Show conflicts
 Show conflicts
 Show files that are different
@@ -794,10 +768,14 @@ Start synchronization
 Start synchronisation
 Statistics
 Statistics
+Status feedback
+Status feedback
 Stop
 Stop
 Swap sides
 Swap sides
+Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI modus...
 Synchronization Preview
 Synchronisation Preview
 Synchronization aborted!
@@ -812,8 +790,6 @@ Synchronization status
 Synchronisation status
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Synchronise all .doc, .zip and .exe files except everything in subfolder \"temp\".
-Synchronize both sides using a database. Deletions are detected automatically
-Synchronise both sides using a database. Deletions are detected automatically
 Synchronize...
 Synchronise...
 Synchronizing...
@@ -828,6 +804,8 @@ The command line is executed each time:\n- a directory becomes available (e.g. U
 The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
 The file does not contain a valid configuration:
 The file does not contain a valid configuration:
+The file was not processed by last synchronization!
+The file was not processed by last synchronisation!
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Time
@@ -868,6 +846,8 @@ Verifying file %x
 Verifying file %x
 Volume name %x not part of filename %y!
 Volume name %x not part of filename %y!
+Waiting for all directories to become available...
+Waiting for all directories to become available...
 Warning
 Warning
 Warning: Synchronization failed for %x item(s):

@@ -34,25 +34,26 @@ del BUILD\RealtimeSync_Win32.exe
 del BUILD\RealtimeSync_x64.exe
 del BUILD\gmon.out
 
-del library\ShadowCopy\ShadowCopy.ncb
-attrib library\ShadowCopy\ShadowCopy.suo -h
-del library\ShadowCopy\ShadowCopy.suo
-del library\ShadowCopy\Shadow_2003.vcproj.*.user
-del library\ShadowCopy\Shadow_XP.vcproj.*.user
-del library\ShadowCopy\ShadowTest.vcproj.*.user
-del library\ShadowCopy\Shadow.pdb
-del library\ShadowCopy\Shadow.ilk
-del library\ShadowCopy\Shadow.exp
-del library\ShadowCopy\Shadow.lib
-del library\ShadowCopy\ShadowTest.ilk
-del library\ShadowCopy\ShadowTest.pdb
+del shared\ShadowCopy\ShadowCopy.ncb
+attrib shared\ShadowCopy\ShadowCopy.suo -h
+del shared\ShadowCopy\ShadowCopy.suo
+del shared\ShadowCopy\Shadow_2003.vcproj.*.user
+del shared\ShadowCopy\Shadow_XP.vcproj.*.user
+del shared\ShadowCopy\ShadowTest.vcproj.*.user
+del shared\ShadowCopy\Shadow.pdb
+del shared\ShadowCopy\Shadow.ilk
+del shared\ShadowCopy\Shadow.exp
+del shared\ShadowCopy\Shadow.lib
+del shared\ShadowCopy\ShadowTest.ilk
+del shared\ShadowCopy\ShadowTest.pdb
 
-del library\Recycler\Recycler_Vista.ncb
-attrib library\Recycler\Recycler_Vista.suo -h
-del library\Recycler\Recycler_Vista.suo
-del library\Recycler\Recycler_Vista.vcproj.*.user
-del library\Recycler\Test.vcproj.*.user
+del shared\IFileOperation\FileOperation_Vista.ncb
+attrib shared\IFileOperation\FileOperation_Vista.suo -h
+del shared\IFileOperation\FileOperation_Vista.suo
+del shared\IFileOperation\FileOperation_Vista.vcproj.*.user
+del shared\IFileOperation\Test.vcproj.*.user
+del shared\IFileOperation\Test.ilk
 
-attrib library\Taskbar_Seven\Taskbar_Seven.suo -h
-del library\Taskbar_Seven\Taskbar_Seven.suo
-del library\Taskbar_Seven\Taskbar_Seven.vcproj.*.user
+attrib shared\Taskbar_Seven\Taskbar_Seven.suo -h
+del shared\Taskbar_Seven\Taskbar_Seven.suo
+del shared\Taskbar_Seven\Taskbar_Seven.vcproj.*.user

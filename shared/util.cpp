@@ -66,26 +66,26 @@ wxString FreeFileSync::formatFilesizeToShortString(double filesize)
 
     //print just three significant digits: 0,01 | 0,11 | 1,11 | 11,1 | 111
 
-    const unsigned int leadDigitCount = globalFunctions::getDigitCount(static_cast<unsigned int>(filesize)); //number of digits before decimal point
+    const size_t leadDigitCount = globalFunctions::getDigitCount(static_cast<size_t>(filesize)); //number of digits before decimal point
     if (leadDigitCount == 0 || leadDigitCount > 3)
         return _("Error");
 
-    if (leadDigitCount == 3)
-        return wxString::Format(wxT("%i"), static_cast<int>(filesize)) + unit;
-    else if (leadDigitCount == 2)
-    {
-        wxString output = wxString::Format(wxT("%i"), static_cast<int>(filesize * 10));
-        output.insert(leadDigitCount, getDecimalPoint());
-        return output + unit;
-    }
-    else //leadDigitCount == 1
-    {
-        wxString output = wxString::Format(wxT("%03i"), static_cast<int>(filesize * 100));
-        output.insert(leadDigitCount, getDecimalPoint());
-        return output + unit;
-    }
+//    if (leadDigitCount == 3)
+//        return wxString::Format(wxT("%i"), static_cast<int>(filesize)) + unit;
+//    else if (leadDigitCount == 2)
+//    {
+//        wxString output = wxString::Format(wxT("%i"), static_cast<int>(filesize * 10));
+//        output.insert(leadDigitCount, getDecimalPoint());
+//        return output + unit;
+//    }
+//    else //leadDigitCount == 1
+//    {
+//        wxString output = wxString::Format(wxT("%03i"), static_cast<int>(filesize * 100));
+//        output.insert(leadDigitCount, getDecimalPoint());
+//        return output + unit;
+//    }
 
-    //return wxString::Format(wxT("%.*f"), 3 - leadDigitCount, filesize) + unit;
+    return wxString::Format(wxT("%.*f"), static_cast<int>(3 - leadDigitCount), filesize) + unit;
 }
 
 
@@ -103,7 +103,7 @@ namespace
 wxString includeNumberSeparator(const wxString& number)
 {
     wxString output(number);
-	for (size_t i = output.size(); i > 3; i -= 3)
+    for (size_t i = output.size(); i > 3; i -= 3)
         output.insert(i - 3, FreeFileSync::getThousandsSeparator());
 
     return output;
@@ -177,32 +177,34 @@ void FreeFileSync::scrollToBottom(wxScrolledWindow* scrWindow)
 }
 
 
+namespace
+{
 inline
-void writeTwoDigitNumber(unsigned int number, wxString& string)
+void writeTwoDigitNumber(size_t number, wxString& string)
 {
     assert (number < 100);
 
-    string += '0' + number / 10;
-    string += '0' + number % 10;
+    string += wxChar('0' + number / 10);
+    string += wxChar('0' + number % 10);
 }
 
 
 inline
-void writeFourDigitNumber(unsigned int number, wxString& string)
+void writeFourDigitNumber(size_t number, wxString& string)
 {
     assert (number < 10000);
 
-    string += '0' + number / 1000;
+    string += wxChar('0' + number / 1000);
     number %= 1000;
-    string += '0' + number / 100;
+    string += wxChar('0' + number / 100);
     number %= 100;
-    string += '0' + number / 10;
+    string += wxChar('0' + number / 10);
     number %= 10;
-    string += '0' + number;
+    string += wxChar('0' + number);
+}
 }
 
-
-wxString FreeFileSync::utcTimeToLocalString(const wxLongLong& utcTime, const Zstring& filename)
+wxString FreeFileSync::utcTimeToLocalString(const wxLongLong& utcTime)
 {
 #ifdef FFS_WIN
     //convert ansi C time to FILETIME
@@ -223,7 +225,7 @@ wxString FreeFileSync::utcTimeToLocalString(const wxLongLong& utcTime, const Zst
             ) == 0)
         throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" FILETIME -> local FILETIME: ") +
                                               wxT("(") + wxULongLong(lastWriteTimeUtc.dwHighDateTime, lastWriteTimeUtc.dwLowDateTime).ToString() + wxT(") ") +
-                                              filename.c_str() + wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
+                                              wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
 
     if (localFileTime.dwHighDateTime > 0x7fffffff)
         return _("Error");  //this actually CAN happen if UTC time is just below this border and ::FileTimeToLocalFileTime() adds 2 hours due to DST or whatever!
@@ -237,7 +239,7 @@ wxString FreeFileSync::utcTimeToLocalString(const wxLongLong& utcTime, const Zst
             ) == 0)
         throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" local FILETIME -> SYSTEMTIME: ") +
                                               wxT("(") + wxULongLong(localFileTime.dwHighDateTime, localFileTime.dwLowDateTime).ToString() + wxT(") ") +
-                                              filename.c_str()  + wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
+                                              wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
 
     //assemble time string (performance optimized)
     wxString formattedTime;

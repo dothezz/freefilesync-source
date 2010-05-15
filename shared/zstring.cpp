@@ -273,7 +273,7 @@ namespace
 {
 #ifdef ZSTRING_CHAR
 inline
-bool defaultIsWhiteSpace(const char ch)
+bool defaultIsWhiteSpace(char ch)
 {
     // some compilers (e.g. VC++ 6.0) return true for a call to isspace('\xEA') => exclude char(128) to char(255)
     return (static_cast<unsigned char>(ch) < 128) && isspace(static_cast<unsigned char>(ch)) != 0;
@@ -281,7 +281,7 @@ bool defaultIsWhiteSpace(const char ch)
 
 #elif defined ZSTRING_WIDE_CHAR
 inline
-bool defaultIsWhiteSpace(const wchar_t ch)
+bool defaultIsWhiteSpace(wchar_t ch)
 {
     // some compilers (e.g. VC++ 6.0) return true for a call to isspace('\xEA') => exclude char(128) to char(255)
     return (ch < 128 || ch > 255) && iswspace(ch) != 0;

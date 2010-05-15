@@ -8,6 +8,7 @@
 #include "guiGenerated.h"
 #include <wx/msgdlg.h>
 #include <wx/utils.h>
+#include <utility>
 
 
 class SearchDlg : public SearchDialogGenerated

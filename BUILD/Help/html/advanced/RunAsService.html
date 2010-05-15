@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20100218;105200">
+	<META NAME="CHANGED" CONTENT="20100420;20042700">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -58,10 +58,8 @@ the new Service with RealtimeSync:</FONT></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Open
 	the Registry editor (Regedit.exe) and navigate to key
 	&quot;</FONT><FONT FACE="Courier New, monospace">HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\&lt;ServiceName&gt;</FONT><FONT FACE="Tahoma, sans-serif">&quot;</FONT></P>
-	<P STYLE="margin-bottom: 0cm"></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Add
 	a new key &quot;</FONT><FONT FACE="Courier New, monospace">Parameters</FONT><FONT FACE="Tahoma, sans-serif">&quot;.<BR><IMG SRC="bf02de4e-7b45-4353-97e8-85b55cff3ac5.jpeg" NAME="Grafik8" ALIGN=BOTTOM WIDTH=249 HEIGHT=101 BORDER=0></FONT></P>
-	<P STYLE="margin-bottom: 0cm"></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Add
 	a new String value named &quot;</FONT><FONT FACE="Courier New, monospace">Application</FONT><FONT FACE="Tahoma, sans-serif">&quot;
 	and specify a command line that shall be executed as value.<BR><IMG SRC="RunAsService_html_m3be0f332.jpg" NAME="Grafik10" ALIGN=BOTTOM WIDTH=620 HEIGHT=58 BORDER=0></FONT></P>
@@ -72,7 +70,24 @@ the new Service with RealtimeSync:</FONT></P>
 it!</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P STYLE="margin-bottom: 0cm"><BR>
+<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+	<FONT FACE="Tahoma, sans-serif"><B>Attention:</B><BR>When running
+	RealtimeSync as a service the application has no means to interact
+	with the user. Therefore any popup dialog will stop the process
+	flow! Consequently consider the following rules when setting up a
+	FreeFileSync batch job:</FONT></P>
+	<UL>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Enable
+		checkbox &quot;<I>Silent mode</I>&quot; to prevent showing a status
+		dialog at the end of the process.</FONT></P>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Set
+		&quot;<I>Error handling</I>&quot; to either &quot;<I>Exit
+		instantly</I>&quot; or &quot;<I>Ignore errors</I>&quot;.</FONT></P>
+	</UL>
+</SPAN><BR CLEAR=LEFT><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">The new
 service can now be started via commandline or Windows Service

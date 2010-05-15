@@ -36,8 +36,8 @@ public:
     virtual ~BaseFilter() {}
 
     //filtering
-    virtual bool passFileFilter(const DefaultChar* relFilename) const = 0;
-    virtual bool passDirFilter(const DefaultChar* relDirname, bool* subObjMightMatch) const = 0;
+    virtual bool passFileFilter(const Zstring& relFilename) const = 0;
+    virtual bool passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const = 0;
     //subObjMightMatch: file/dir in subdirectories could(!) match
     //note: variable is only set if passDirFilter returns false!
 
@@ -65,8 +65,8 @@ class NullFilter : public BaseFilter  //no filtering at all
 {
 public:
     static FilterRef load(wxInputStream& stream); //"serial constructor"
-    virtual bool passFileFilter(const DefaultChar* relFilename) const;
-    virtual bool passDirFilter(const DefaultChar* relDirname, bool* subObjMightMatch) const;
+    virtual bool passFileFilter(const Zstring& relFilename) const;
+    virtual bool passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const;
     virtual bool isNull() const;
 
 private:
@@ -82,8 +82,8 @@ public:
     NameFilter(const Zstring& includeFilter, const Zstring& excludeFilter);
     static FilterRef load(wxInputStream& stream); //"serial constructor"
 
-    virtual bool passFileFilter(const DefaultChar* relFilename) const;
-    virtual bool passDirFilter(const DefaultChar* relDirname, bool* subObjMightMatch) const;
+    virtual bool passFileFilter(const Zstring& relFilename) const;
+    virtual bool passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const;
     virtual bool isNull() const;
 
 private:
@@ -107,8 +107,8 @@ public:
     CombinedFilter(const FilterRef& first, const FilterRef& second) : first_(first), second_(second) {}
     static FilterRef load(wxInputStream& stream); //"serial constructor"
 
-    virtual bool passFileFilter(const DefaultChar* relFilename) const;
-    virtual bool passDirFilter(const DefaultChar* relDirname, bool* subObjMightMatch) const;
+    virtual bool passFileFilter(const Zstring& relFilename) const;
+    virtual bool passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const;
     virtual bool isNull() const;
 
 private:
@@ -151,14 +151,14 @@ BaseFilter::FilterRef NullFilter::load(wxInputStream& stream) //"serial construc
 
 
 inline
-bool NullFilter::passFileFilter(const DefaultChar* relFilename) const
+bool NullFilter::passFileFilter(const Zstring& relFilename) const
 {
     return true;
 }
 
 
 inline
-bool NullFilter::passDirFilter(const DefaultChar* relDirname, bool* subObjMightMatch) const
+bool NullFilter::passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const
 {
     assert(subObjMightMatch == NULL || *subObjMightMatch == true); //check correct usage
     return true;
@@ -188,7 +188,7 @@ Zstring NullFilter::uniqueClassIdentifier() const
 
 
 inline
-bool CombinedFilter::passFileFilter(const DefaultChar* relFilename) const
+bool CombinedFilter::passFileFilter(const Zstring& relFilename) const
 {
     return first_->passFileFilter(relFilename) && //short-circuit behavior
            second_->passFileFilter(relFilename);
@@ -196,7 +196,7 @@ bool CombinedFilter::passFileFilter(const DefaultChar* relFilename) const
 
 
 inline
-bool CombinedFilter::passDirFilter(const DefaultChar* relDirname, bool* subObjMightMatch) const
+bool CombinedFilter::passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const
 {
     return first_->passDirFilter(relDirname, subObjMightMatch) && //short-circuit behavior: subObjMightMatch handled correctly!
            second_->passDirFilter(relDirname, subObjMightMatch);

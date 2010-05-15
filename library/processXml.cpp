@@ -302,8 +302,11 @@ void FfsXmlParser::readXmlMainConfig(MainConfiguration& mainCfg)
     //max. allowed file time deviation
     readXmlElementLogging("FileTimeTolerance", cmpSettings, mainCfg.hidden.fileTimeTolerance);
 
+    //include symbolic links at all?
+    readXmlElementLogging("IncludeSymlinks", cmpSettings, mainCfg.processSymlinks);
+
     //traverse into symbolic links (to folders)
-    readXmlElementLogging("TraverseDirectorySymlinks", cmpSettings, mainCfg.hidden.traverseDirectorySymlinks);
+    readXmlElementLogging("TraverseDirectorySymlinks", cmpSettings, mainCfg.traverseDirectorySymlinks);
 
 //###########################################################
     const TiXmlElement* syncCfg = hRoot.FirstChild("MainConfig").FirstChild("Synchronization").ToElement();
@@ -322,7 +325,7 @@ void FfsXmlParser::readXmlMainConfig(MainConfiguration& mainCfg)
     const TiXmlElement* syncConfig = hRoot.FirstChild("MainConfig").FirstChild("Synchronization").ToElement();
 
     //copy symbolic links to files
-    readXmlElementLogging("CopyFileSymlinks", syncConfig, mainCfg.hidden.copyFileSymlinks);
+    readXmlElementLogging("CopyFileSymlinks", syncConfig, mainCfg.copyFileSymlinks);
 
     //verify file copying
     readXmlElementLogging("VerifyCopiedFiles", syncConfig, mainCfg.hidden.verifyFileCopy);
@@ -337,9 +340,12 @@ void FfsXmlParser::readXmlMainConfig(MainConfiguration& mainCfg)
     const TiXmlElement* filter = TiXmlHandleConst(miscSettings).FirstChild("Filter").ToElement();
 
     //read filter settings
-    readXmlElementLogging("Active",  filter, mainCfg.filterIsActive);
-    readXmlElementLogging("Include", filter, mainCfg.includeFilter);
-    readXmlElementLogging("Exclude", filter, mainCfg.excludeFilter);
+    Zstring includeFilter;
+    Zstring excludeFilter;
+    readXmlElementLogging("Include", filter, includeFilter);
+    readXmlElementLogging("Exclude", filter, excludeFilter);
+
+    mainCfg.globalFilter = FilterConfig(includeFilter, excludeFilter);
 
 //###########################################################
     const TiXmlElement* pairs = hRoot.FirstChild("MainConfig").FirstChild("FolderPairs").FirstChild("Pair").ToElement();
@@ -375,7 +381,7 @@ void FfsXmlParser::readXmlGuiConfig(xmlAccess::XmlGuiConfig& outputCfg)
 
     readXmlElementLogging("HideFiltered", guiConfig, outputCfg.hideFilteredElements);
 
-    xmlAccess::OnError errorHand;
+    xmlAccess::OnError errorHand = ON_ERROR_POPUP;
     readXmlElementLogging("HandleError", guiConfig, errorHand);
     outputCfg.ignoreErrors = errorHand == xmlAccess::ON_ERROR_IGNORE;
 
@@ -423,7 +429,7 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
     //check for unresolved conflicts
     readXmlElementLogging("CheckForUnresolvedConflicts", optionalDialogs, outputCfg.optDialogs.warningUnresolvedConflicts);
 
-    readXmlElementLogging("CheckSyncDatabase", optionalDialogs, outputCfg.optDialogs.warningSyncDatabase);
+    readXmlElementLogging("NotifyDatabaseError", optionalDialogs, outputCfg.optDialogs.warningSyncDatabase);
 
     readXmlElementLogging("PopupOnConfigChange",       optionalDialogs, outputCfg.optDialogs.popupOnConfigChange);
 
@@ -452,7 +458,7 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
     readXmlAttributeLogging("ShowFileIcons", TiXmlHandleConst(mainWindow).FirstChild("LeftColumns").ToElement(), outputCfg.gui.showFileIconsLeft);
 
     const TiXmlElement* leftColumn = TiXmlHandleConst(mainWindow).FirstChild("LeftColumns").FirstChild("Column").ToElement();
-    unsigned int colPos = 0;
+    size_t colPos = 0;
     while (leftColumn)
     {
         ColumnAttrib newAttrib;
@@ -689,8 +695,11 @@ bool writeXmlMainConfig(const MainConfiguration& mainCfg, TiXmlDocument& doc)
     //max. allowed file time deviation
     addXmlElement("FileTimeTolerance", mainCfgLocal.hidden.fileTimeTolerance, cmpSettings);
 
+    //include symbolic links at all?
+    addXmlElement("IncludeSymlinks", mainCfgLocal.processSymlinks, cmpSettings);
+
     //traverse into symbolic links (to folders)
-    addXmlElement("TraverseDirectorySymlinks", mainCfgLocal.hidden.traverseDirectorySymlinks, cmpSettings);
+    addXmlElement("TraverseDirectorySymlinks", mainCfgLocal.traverseDirectorySymlinks, cmpSettings);
 
 //###########################################################
     TiXmlElement* syncSettings = new TiXmlElement("Synchronization");
@@ -711,7 +720,7 @@ bool writeXmlMainConfig(const MainConfiguration& mainCfg, TiXmlDocument& doc)
 
 //###########################################################
     //copy symbolic links to files
-    addXmlElement("CopyFileSymlinks", mainCfgLocal.hidden.copyFileSymlinks, syncSettings);
+    addXmlElement("CopyFileSymlinks", mainCfgLocal.copyFileSymlinks, syncSettings);
 
     //verify file copying
     addXmlElement("VerifyCopiedFiles", mainCfgLocal.hidden.verifyFileCopy, syncSettings);
@@ -724,9 +733,8 @@ bool writeXmlMainConfig(const MainConfiguration& mainCfg, TiXmlDocument& doc)
     TiXmlElement* filter = new TiXmlElement("Filter");
     miscSettings->LinkEndChild(filter);
 
-    addXmlElement("Active",  mainCfgLocal.filterIsActive, filter);
-    addXmlElement("Include", mainCfgLocal.includeFilter,  filter);
-    addXmlElement("Exclude", mainCfgLocal.excludeFilter,  filter);
+    addXmlElement("Include", mainCfgLocal.globalFilter.includeFilter, filter);
+    addXmlElement("Exclude", mainCfgLocal.globalFilter.excludeFilter, filter);
 
     //other
     addXmlElement("DeletionPolicy", mainCfgLocal.handleDeletion, miscSettings);
@@ -827,7 +835,7 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
     //check for unresolved conflicts
     addXmlElement("CheckForUnresolvedConflicts", inputCfg.optDialogs.warningUnresolvedConflicts, optionalDialogs);
 
-    addXmlElement("CheckSyncDatabase", inputCfg.optDialogs.warningSyncDatabase, optionalDialogs);
+    addXmlElement("NotifyDatabaseError", inputCfg.optDialogs.warningSyncDatabase, optionalDialogs);
 
     addXmlElement("PopupOnConfigChange", inputCfg.optDialogs.popupOnConfigChange, optionalDialogs);
 
@@ -868,7 +876,7 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
 
     ColumnAttributes columnAtrribLeftCopy = inputCfg.gui.columnAttribLeft; //can't change const vector
     sort(columnAtrribLeftCopy.begin(), columnAtrribLeftCopy.end(), xmlAccess::sortByPositionOnly);
-    for (unsigned int i = 0; i < columnAtrribLeftCopy.size(); ++i)
+    for (size_t i = 0; i < columnAtrribLeftCopy.size(); ++i)
     {
         TiXmlElement* subElement = new TiXmlElement("Column");
         leftColumn->LinkEndChild(subElement);
@@ -887,7 +895,7 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
 
     ColumnAttributes columnAtrribRightCopy = inputCfg.gui.columnAttribRight;
     sort(columnAtrribRightCopy.begin(), columnAtrribRightCopy.end(), xmlAccess::sortByPositionOnly);
-    for (unsigned int i = 0; i < columnAtrribRightCopy.size(); ++i)
+    for (size_t i = 0; i < columnAtrribRightCopy.size(); ++i)
     {
         TiXmlElement* subElement = new TiXmlElement("Column");
         rightColumn->LinkEndChild(subElement);
@@ -964,7 +972,7 @@ void xmlAccess::OptionalDialogs::resetDialogs()
 }
 
 
-xmlAccess::XmlGuiConfig convertBatchToGui(const xmlAccess::XmlBatchConfig& batchCfg)
+xmlAccess::XmlGuiConfig xmlAccess::convertBatchToGui(const xmlAccess::XmlBatchConfig& batchCfg)
 {
     xmlAccess::XmlGuiConfig output;
     output.mainCfg = batchCfg.mainCfg;

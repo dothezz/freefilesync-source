@@ -55,12 +55,13 @@ public:
 
     //overwrite these virtual methods
     virtual ReturnValue  onError(const wxString& errorText) = 0;
-    virtual ReturnValue  onFile(const DefaultChar* shortName, const Zstring& fullName, const FileInfo& details) = 0;
-    virtual ReturnValDir onDir(const DefaultChar*  shortName, const Zstring& fullName) = 0;
+    virtual ReturnValue  onFile(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink, const FileInfo& details) = 0;
+    virtual ReturnValDir onDir(const DefaultChar*  shortName, const Zstring& fullName, bool isSymlink) = 0;
 };
 
 //custom traverser with detail information about files
-void traverseFolder(const Zstring& directory, const bool traverseDirectorySymlinks, TraverseCallback* sink); //throw()
+//directory may end with PATH_SEPARATOR
+void traverseFolder(const Zstring& directory, TraverseCallback* sink); //throw()
 }
 
 #endif // FILETRAVERSER_H_INCLUDED

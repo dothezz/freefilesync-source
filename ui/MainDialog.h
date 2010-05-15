@@ -13,8 +13,6 @@
 #include <memory>
 #include <map>
 #include <set>
-#include "mouseMoveWindow.h"
-#include "progressIndicator.h"
 
 class CompareStatusHandler;
 class MainFolderDragDrop;
@@ -25,17 +23,30 @@ class IconUpdater;
 class ManualDeletionHandler;
 class FolderPairPanel;
 class FirstFolderPairCfg;
+class CompareStatus;
 
 
 namespace FreeFileSync
 {
 class CustomLocale;
 class GridView;
+class MouseMoveWindow;
 }
 
 
 class MainDialog : public MainDialogGenerated
 {
+public:
+    MainDialog(const wxString& cfgFileName,
+               xmlAccess::XmlGlobalSettings& settings);
+
+    MainDialog(const xmlAccess::XmlGuiConfig& guiCfg,
+               xmlAccess::XmlGlobalSettings& settings,
+               bool startComparison);
+
+    ~MainDialog();
+
+private:
     friend class CompareStatusHandler;
     friend class ManualDeletionHandler;
     friend class MainFolderDragDrop;
@@ -76,20 +87,18 @@ class MainDialog : public MainDialogGenerated
         CONTEXT_SYNC_PREVIEW
     };
 
+    MainDialog();
 
-public:
-    MainDialog(wxFrame* frame,
-               const wxString& cfgFileName,
-               xmlAccess::XmlGlobalSettings& settings);
+    void init(const xmlAccess::XmlGuiConfig guiCfg,
+              xmlAccess::XmlGlobalSettings& settings,
+              bool startComparison);
 
-    ~MainDialog();
-
-private:
-    void cleanUp();
+void cleanUp(bool saveLastUsedConfig);
 
     //configuration load/save
-    bool readConfigurationFromXml(const wxString& filename, bool programStartup = false);
+    bool readConfigurationFromXml(const wxString& filename);
     bool writeConfigurationToXml(const wxString& filename);
+    void setLastUsedConfig(const wxString& filename, const xmlAccess::XmlGuiConfig& guiConfig);
 
     xmlAccess::XmlGuiConfig getCurrentConfiguration() const;
     void setCurrentConfiguration(const xmlAccess::XmlGuiConfig& newGuiCfg);
@@ -111,7 +120,7 @@ private:
     void addRightFolderToHistory(const wxString& rightFolder);
 
     void addFolderPair(const std::vector<FreeFileSync::FolderPairEnh>& newPairs, bool addFront = false);
-    void removeAddFolderPair(const unsigned int pos);
+    void removeAddFolderPair(size_t pos);
     void clearAddFolderPairs();
 
     void updateGuiForFolderPair(); //helper method: add usability by showing/hiding buttons related to folder pairs
@@ -213,7 +222,6 @@ private:
 
     void OnResize(              wxSizeEvent& event);
     void OnResizeFolderPairs(   wxSizeEvent& event);
-    void OnFilterButton(        wxCommandEvent& event);
     void OnHideFilteredButton(  wxCommandEvent& event);
     void OnConfigureFilter(     wxCommandEvent& event);
     void OnSwapSides(           wxCommandEvent& event);
@@ -224,6 +232,9 @@ private:
     void OnStartSync(           wxCommandEvent& event);
     void OnClose(               wxCloseEvent&   event);
     void OnQuit(                wxCommandEvent& event);
+
+    void OnGlobalFilterOpenContext(wxCommandEvent& event);
+    void OnGlobalFilterRemConfirm(wxCommandEvent& event);
 
     void calculatePreview();
 
@@ -254,7 +265,7 @@ private:
     //application variables are stored here:
 
     //global settings used by GUI and batch mode
-    xmlAccess::XmlGlobalSettings& globalSettings;
+    xmlAccess::XmlGlobalSettings* globalSettings; //always bound
 
     //UI view of FolderComparison structure
     std::auto_ptr<FreeFileSync::GridView> gridDataView;
@@ -283,13 +294,13 @@ private:
     std::stack<wxString> stackObjects;
 
     //compare status panel (hidden on start, shown when comparing)
-    CompareStatus compareStatus;
+    std::auto_ptr<CompareStatus> compareStatus; //always bound
+
+bool cleanedUp;
 
     //save the last used config filename history
     std::vector<wxString> cfgFileNames;
 
-
-    bool cleanedUp; //determines if destructor code was already executed
 
     //remember last sort executed (for determination of sort order)
     int lastSortColumn;
@@ -300,7 +311,7 @@ private:
     std::auto_ptr<IconUpdater> updateFileIcons;
 
     //enable moving window by clicking on sub-windows instead of header line
-    FreeFileSync::MouseMoveWindow moveWholeWindow;
+    std::auto_ptr<FreeFileSync::MouseMoveWindow> moveWholeWindow;
 #endif
 
     //encapsulation of handling of sync preview
@@ -319,7 +330,8 @@ private:
         MainDialog* mainDlg_;
         bool syncPreviewEnabled; //toggle to display configuration preview instead of comparison result
         bool synchronizationEnabled; //determines whether synchronization should be allowed
-    } syncPreview;
+    };
+    std::auto_ptr<SyncPreview> syncPreview; //always bound
 };
 
 #endif // MAINDIALOG_H

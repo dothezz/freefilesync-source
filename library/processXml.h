@@ -8,6 +8,8 @@
 #define PROCESSXML_H_INCLUDED
 
 #include "../structures.h"
+#include "../shared/xmlError.h"
+
 
 namespace xmlAccess
 {
@@ -20,7 +22,7 @@ enum OnError
 
 enum ColumnTypes
 {
-    DIRECTORY,
+    DIRECTORY, //this needs to begin with 0 and be continuous (some code relies on it)
     FULL_PATH,
     REL_PATH,
     FILENAME,
@@ -28,13 +30,13 @@ enum ColumnTypes
     DATE,
     EXTENSION
 };
-const unsigned int COLUMN_TYPE_COUNT = 7;
+const size_t COLUMN_TYPE_COUNT = 7;
 
 struct ColumnAttrib
 {
     ColumnTypes type;
     bool         visible;
-    unsigned int position;
+    size_t       position;
     int          width;
 };
 typedef std::vector<ColumnAttrib> ColumnAttributes;
@@ -80,8 +82,8 @@ struct XmlBatchConfig
     FreeFileSync::MainConfiguration mainCfg;
 
     bool silent;
+    wxString logFileDirectory;
     OnError handleError;       //reaction on error situation during synchronization
-    wxString logFileDirectory; //
 };
 
 int retrieveSystemLanguage();
@@ -154,11 +156,13 @@ struct XmlGlobalSettings
 #ifdef FFS_WIN
             externelApplications.push_back(std::make_pair(wxT("Open with Explorer"), //mark for extraction: _("Open with Explorer")
                                            wxT("explorer /select, \"%name\"")));
-            externelApplications.push_back(std::make_pair(wxT("Open directly"), //mark for extraction: _("Open directly")
+            externelApplications.push_back(std::make_pair(wxT("Open with default application"), //mark for extraction: _("Open with default application")
                                            wxT("cmd /c start \"\" \"%name\"")));
 #elif defined FFS_LINUX
-            externelApplications.push_back(std::make_pair(wxT("Open with Konqueror"), //mark for extraction: _("Open with Konqueror")
-                                           wxT("konqueror \"%dir\"")));
+            externelApplications.push_back(std::make_pair(wxT("Browse directory"), //mark for extraction: _("Browse directory")
+                                           wxT("xdg-open \"%dir\"")));
+            externelApplications.push_back(std::make_pair(wxT("Open with default application"), //mark for extraction: _("Open with default application")
+                                           wxT("xdg-open \"%name\"")));
 #endif
         }
 
@@ -230,6 +234,7 @@ void readBatchConfig(const wxString& filename, XmlBatchConfig&    config); //thr
 void readGlobalSettings(                       XmlGlobalSettings& config); //throw (xmlAccess::XmlError);
 
 void readGuiOrBatchConfig(const wxString& filename, XmlGuiConfig& config);  //throw (xmlAccess::XmlError);
+XmlGuiConfig convertBatchToGui(const XmlBatchConfig& batchCfg);
 
 void writeGuiConfig(     const XmlGuiConfig&      outputCfg, const wxString& filename); //throw (xmlAccess::XmlError);
 void writeBatchConfig(   const XmlBatchConfig&    outputCfg, const wxString& filename); //throw (xmlAccess::XmlError);

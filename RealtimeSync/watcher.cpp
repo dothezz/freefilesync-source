@@ -6,24 +6,22 @@
 //
 #include "watcher.h"
 #include "../shared/systemFunctions.h"
-#include "functions.h"
+//#include "functions.h"
 #include <wx/intl.h>
-#include <wx/filefn.h>
-#include "../shared/fileHandling.h"
+//#include <wx/filefn.h>
 #include "../shared/stringConv.h"
+#include "../shared/fileHandling.h"
 #include <stdexcept>
-#include <map>
+#include <set>
 #include <wx/timer.h>
+#include <algorithm>
 
 #ifdef FFS_WIN
-//#include "../shared/fileId.h"
-//#include "Dbt.h"
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "../shared/longPathPrefix.h"
 
 #elif defined FFS_LINUX
-#include <wx/timer.h>
-#include <exception>
+//#include <exception>
 #include "../shared/inotify/inotify-cxx.h"
 #include "../shared/fileTraverser.h"
 #endif
@@ -33,8 +31,8 @@ using namespace FreeFileSync;
 
 bool RealtimeSync::updateUiIsAllowed()
 {
-    static wxLongLong lastExec = 0;
-    const wxLongLong  newExec  = wxGetLocalTimeMillis();
+    static wxLongLong lastExec;
+    const wxLongLong  newExec = wxGetLocalTimeMillis();
 
     if (newExec - lastExec >= RealtimeSync::UI_UPDATE_INTERVAL)  //perform ui updates not more often than necessary
     {
@@ -241,7 +239,7 @@ public:
                 ::FindCloseChangeNotification(*i);
     }
 
-    void addHandle(const HANDLE hndl)
+    void addHandle(HANDLE hndl)
     {
         arrayHandle.push_back(hndl);
     }
@@ -266,14 +264,18 @@ class DirsOnlyTraverser : public FreeFileSync::TraverseCallback
 public:
     DirsOnlyTraverser(std::vector<std::string>& dirs) : m_dirs(dirs) {}
 
-    virtual ReturnValue onFile(const DefaultChar* shortName, const Zstring& fullName, const FileInfo& details)
+    virtual ReturnValue onFile(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink, const FileInfo& details)
     {
         return TRAVERSING_CONTINUE;
     }
-    virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName)
+    virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink)
     {
         m_dirs.push_back(fullName.c_str());
-        return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), this);
+
+        if (isSymlink) //don't traverse into symlinks (analog to windows build)
+            return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>());
+        else
+            return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), this);
     }
     virtual ReturnValue onError(const wxString& errorText)
     {
@@ -286,107 +288,104 @@ private:
 #endif
 
 
-class NotifyDirectoryArrival //detect changes to directory availability
+class WatchDirectories //detect changes to directory availability
 {
 public:
+    WatchDirectories() : allExistingBuffer(true) {}
+
     //initialization
-    void addForMonitoring(const Zstring& dirName, bool isExisting) //dir-existence already checked by calling method, avoid double-checking -> consistency!
+    void addForMonitoring(const Zstring& dirName)
     {
-        availablility[dirName] = isExisting;
+        dirList.insert(dirName);
     }
 
-    //detection
-    bool changeDetected() //polling explicitly allowed!
+    bool allExisting() const //polling explicitly allowed!
     {
         const int UPDATE_INTERVAL = 1000; //1 second interval
 
-        static wxLongLong lastExec = 0;
-        const wxLongLong  newExec  = wxGetLocalTimeMillis();
-
+        const wxLongLong newExec = wxGetLocalTimeMillis();
         if (newExec - lastExec >= UPDATE_INTERVAL)
         {
             lastExec = newExec;
-
-            for (std::map<Zstring, bool>::iterator i = availablility.begin(); i != availablility.end(); ++i)
-                if (FreeFileSync::dirExists(i->first) != i->second) //change in availability
-                {
-                    if (i->second) //directory doesn't exist anymore: no reason to trigger the commandline! (sometimes triggered by ChangeNotifications anyway...)
-                        i->second = false; //update value, so that dir-arrival will be detected next time
-                    else //directory arrival: trigger commandline!
-                        return true;
-                }
+            allExistingBuffer = std::find_if(dirList.begin(), dirList.end(), notExisting) == dirList.end();
         }
 
-        return false;
+        return allExistingBuffer;
     }
 
 private:
-    std::map<Zstring, bool> availablility; //save avail. status for each directory, avoid double-entries
+    static bool notExisting(const Zstring& dirname)
+    {
+        return !FreeFileSync::dirExists(dirname);
+    }
+
+    mutable wxLongLong lastExec;
+    mutable bool allExistingBuffer;
+
+    std::set<Zstring> dirList; //save avail. directories, avoid double-entries
 };
 
 
-void RealtimeSync::waitForChanges(const std::vector<wxString>& dirNames, WaitCallback* statusHandler)
+RealtimeSync::WaitResult RealtimeSync::waitForChanges(const std::vector<Zstring>& dirNames, WaitCallback* statusHandler) //throw(FileError)
 {
-    if (dirNames.empty()) //pathological case, but check is needed later
-        return;
+    if (dirNames.empty()) //pathological case, but check is needed nevertheless
+        throw FreeFileSync::FileError(_("At least one directory input field is empty."));
 
-    //new: support for monitoring newly connected directories volumes (e.g.: USB-sticks)
-    NotifyDirectoryArrival monitorAvailability;
+    //detect when volumes are removed/are not available anymore
+    WatchDirectories dirWatcher;
 
 #ifdef FFS_WIN
     ChangeNotifications notifications;
 
-    for (std::vector<wxString>::const_iterator i = dirNames.begin(); i != dirNames.end(); ++i)
+    for (std::vector<Zstring>::const_iterator i = dirNames.begin(); i != dirNames.end(); ++i)
     {
-        const Zstring formattedDir = FreeFileSync::getFormattedDirectoryName(i->c_str());
+        const Zstring formattedDir = FreeFileSync::getFormattedDirectoryName(*i);
 
         if (formattedDir.empty())
             throw FreeFileSync::FileError(_("At least one directory input field is empty."));
 
-        const bool isExisting = FreeFileSync::dirExists(formattedDir);
-        if (isExisting)
+        dirWatcher.addForMonitoring(formattedDir);
+
+        const HANDLE rv = ::FindFirstChangeNotification(
+                              FreeFileSync::applyLongPathPrefix(formattedDir).c_str(), //__in  LPCTSTR lpPathName,
+                              true,                           //__in  BOOL bWatchSubtree,
+                              FILE_NOTIFY_CHANGE_FILE_NAME |
+                              FILE_NOTIFY_CHANGE_DIR_NAME  |
+                              FILE_NOTIFY_CHANGE_SIZE      |
+                              FILE_NOTIFY_CHANGE_LAST_WRITE); //__in  DWORD dwNotifyFilter
+
+        if (rv == INVALID_HANDLE_VALUE)
         {
-            const HANDLE rv = ::FindFirstChangeNotification(
-                                  FreeFileSync::applyLongPathPrefix(formattedDir).c_str(),           //__in  LPCTSTR lpPathName,
-                                  true,                           //__in  BOOL bWatchSubtree,
-                                  FILE_NOTIFY_CHANGE_FILE_NAME |
-                                  FILE_NOTIFY_CHANGE_DIR_NAME  |
-                                  FILE_NOTIFY_CHANGE_SIZE      |
-                                  FILE_NOTIFY_CHANGE_LAST_WRITE); //__in  DWORD dwNotifyFilter
+            if (::GetLastError() == ERROR_FILE_NOT_FOUND) //no need to check this condition any earlier!
+                return CHANGE_DIR_MISSING;
 
-            if (rv == INVALID_HANDLE_VALUE)
-            {
-                const wxString errorMessage = wxString(_("Could not initialize directory monitoring:")) + wxT("\n\"") + *i + wxT("\"");
-                throw FreeFileSync::FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
-            }
-
-            notifications.addHandle(rv);
+            const wxString errorMessage = wxString(_("Could not initialize directory monitoring:")) + wxT("\n\"") + zToWx(*i) + wxT("\"");
+            throw FreeFileSync::FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
         }
-        //else: we silently ignore this error: it may be that the directory becomes available later, e.g. if it is a USB-stick
 
-        monitorAvailability.addForMonitoring(formattedDir, isExisting); //all directories (including not yet existing) are relevant
+        notifications.addHandle(rv);
     }
 
+
+    if (notifications.getSize() == 0)
+        throw FreeFileSync::FileError(_("At least one directory input field is empty."));
 
     while (true)
     {
         //check for changes within directories:
-        if (notifications.getSize() > 0)
-        {
-            const DWORD rv = ::WaitForMultipleObjects(     //NOTE: notifications.getArray() returns valid pointer, because it cannot be empty in this context
-                                 static_cast<DWORD>(notifications.getSize()),  //__in  DWORD nCount,
-                                 notifications.getArray(), //__in  const HANDLE *lpHandles,
-                                 false,                    //__in  BOOL bWaitAll,
-                                 UI_UPDATE_INTERVAL);      //__in  DWORD dwMilliseconds
-            if (WAIT_OBJECT_0 <= rv && rv < WAIT_OBJECT_0 + notifications.getSize())
-                return; //directory change detected
-            else if (rv == WAIT_FAILED)
-                throw FreeFileSync::FileError(wxString(_("Error when monitoring directories.")) + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
-            //else if (rv == WAIT_TIMEOUT)
-        }
+        const DWORD rv = ::WaitForMultipleObjects(     //NOTE: notifications.getArray() returns valid pointer, because it cannot be empty in this context
+                             static_cast<DWORD>(notifications.getSize()),  //__in  DWORD nCount,
+                             notifications.getArray(), //__in  const HANDLE *lpHandles,
+                             false,                    //__in  BOOL bWaitAll,
+                             UI_UPDATE_INTERVAL);      //__in  DWORD dwMilliseconds
+        if (WAIT_OBJECT_0 <= rv && rv < WAIT_OBJECT_0 + notifications.getSize())
+            return CHANGE_DETECTED; //directory change detected
+        else if (rv == WAIT_FAILED)
+            throw FreeFileSync::FileError(wxString(_("Error when monitoring directories.")) + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
+        //else if (rv == WAIT_TIMEOUT)
 
-        if (monitorAvailability.changeDetected()) //check for newly arrived devices:
-            return;
+        if (!dirWatcher.allExisting()) //check for removed devices:
+            return CHANGE_DIR_MISSING;
 
         statusHandler->requestUiRefresh();
     }
@@ -395,24 +394,30 @@ void RealtimeSync::waitForChanges(const std::vector<wxString>& dirNames, WaitCal
     std::vector<std::string> fullDirList; //including subdirectories!
 
     //add all subdirectories
-    for (std::vector<wxString>::const_iterator i = dirNames.begin(); i != dirNames.end(); ++i)
+    for (std::vector<Zstring>::const_iterator i = dirNames.begin(); i != dirNames.end(); ++i)
     {
-        const Zstring formattedDir = FreeFileSync::getFormattedDirectoryName(wxToZ(*i));
+        const Zstring formattedDir = FreeFileSync::getFormattedDirectoryName(*i);
 
         if (formattedDir.empty())
             throw FreeFileSync::FileError(_("At least one directory input field is empty."));
 
-        const bool isExisting = FreeFileSync::dirExists(formattedDir);
-        if (isExisting)
-        {
-            fullDirList.push_back(formattedDir.c_str());
-            //get all subdirectories
-            DirsOnlyTraverser traverser(fullDirList);
-            FreeFileSync::traverseFolder(formattedDir, false, &traverser); //don't traverse into symlinks (analog to windows build)
-        }
-        //else: we silently ignore this error: it may be that the directory becomes available later, e.g. if it is a USB-stick
+        dirWatcher.addForMonitoring(formattedDir);
 
-        monitorAvailability.addForMonitoring(formattedDir, isExisting); //all directories (including not yet existing) are relevant
+
+        fullDirList.push_back(formattedDir.c_str());
+
+        try //get all subdirectories
+        {
+            DirsOnlyTraverser traverser(fullDirList);
+            FreeFileSync::traverseFolder(formattedDir, &traverser); //don't traverse into symlinks (analog to windows build)
+        }
+        catch (const FreeFileSync::FileError&)
+        {
+            if (!FreeFileSync::dirExists(formattedDir)) //that's no good locking behavior, but better than nothing
+                return CHANGE_DIR_MISSING;
+
+            throw;
+        }
     }
 
     try
@@ -439,21 +444,27 @@ void RealtimeSync::waitForChanges(const std::vector<wxString>& dirNames, WaitCal
             }
             catch (const InotifyException& e)
             {
+                if (!FreeFileSync::dirExists(i->c_str())) //that's no good locking behavior, but better than nothing
+                    return CHANGE_DIR_MISSING;
+
                 const wxString errorMessage = wxString(_("Could not initialize directory monitoring:")) + wxT("\n\"") + zToWx(i->c_str()) + wxT("\"");
                 throw FreeFileSync::FileError(errorMessage + wxT("\n\n") + zToWx(e.GetMessage().c_str()));
             }
         }
 
 
+        if (notifications.GetWatchCount() == 0)
+            throw FreeFileSync::FileError(_("At least one directory input field is empty."));
+
         while (true)
         {
             notifications.WaitForEvents(); //called in non-blocking mode
 
             if (notifications.GetEventCount() > 0)
-                return; //directory change detected
+                return CHANGE_DETECTED; //directory change detected
 
-            if (monitorAvailability.changeDetected()) //check for newly arrived devices:
-                return;
+            if (!dirWatcher.allExisting()) //check for removed devices:
+                return CHANGE_DIR_MISSING;
 
             wxMilliSleep(RealtimeSync::UI_UPDATE_INTERVAL);
             statusHandler->requestUiRefresh();
@@ -470,3 +481,28 @@ void RealtimeSync::waitForChanges(const std::vector<wxString>& dirNames, WaitCal
 #endif
 }
 
+
+void RealtimeSync::waitForMissingDirs(const std::vector<Zstring>& dirNames, WaitCallback* statusHandler) //throw(FileError)
+{
+    //new: support for monitoring newly connected directories volumes (e.g.: USB-sticks)
+    WatchDirectories dirWatcher;
+
+    for (std::vector<Zstring>::const_iterator i = dirNames.begin(); i != dirNames.end(); ++i)
+    {
+        const Zstring formattedDir = FreeFileSync::getFormattedDirectoryName(*i);
+
+        if (formattedDir.empty())
+            throw FreeFileSync::FileError(_("At least one directory input field is empty."));
+
+        dirWatcher.addForMonitoring(formattedDir);
+    }
+
+    while (true)
+    {
+        if (dirWatcher.allExisting()) //check for newly arrived devices:
+            return;
+
+        wxMilliSleep(RealtimeSync::UI_UPDATE_INTERVAL);
+        statusHandler->requestUiRefresh();
+    }
+}

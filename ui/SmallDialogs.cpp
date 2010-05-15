@@ -185,8 +185,7 @@ public:
     FilterDlg(wxWindow* window,
               bool isGlobalFilter,
               Zstring& filterIncl,
-              Zstring& filterExcl,
-              bool filterActive);
+              Zstring& filterExcl);
     ~FilterDlg() {}
 
     enum
@@ -210,8 +209,7 @@ private:
 FilterDlg::FilterDlg(wxWindow* window,
                      bool isGlobalFilter, //global or local filter dialog?
                      Zstring& filterIncl,
-                     Zstring& filterExcl,
-                     bool filterActive) :
+                     Zstring& filterExcl) :
     FilterDlgGenerated(window),
     isGlobalFilter_(isGlobalFilter),
     includeFilter(filterIncl),
@@ -228,14 +226,11 @@ FilterDlg::FilterDlg(wxWindow* window,
     m_panel13->Hide();
     m_button10->SetFocus();
 
-    if (filterActive)
-        m_staticTextFilteringInactive->Hide();
-
     //adapt header for global/local dialog
     if (isGlobalFilter_)
-        m_staticTexHeader->SetLabel(_("Global filter"));
+        m_staticTexHeader->SetLabel(_("Filter: All pairs"));
     else
-        m_staticTexHeader->SetLabel(_("Local filter"));
+        m_staticTexHeader->SetLabel(_("Filter: Single pair"));
 
     Fit();
 }
@@ -299,15 +294,13 @@ void FilterDlg::OnClose(wxCloseEvent& event)
 
 DefaultReturnCode::Response FreeFileSync::showFilterDialog(bool isGlobalFilter,
         Zstring& filterIncl,
-        Zstring& filterExcl,
-        bool filterActive)
+        Zstring& filterExcl)
 {
     DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
     FilterDlg* filterDlg = new FilterDlg(NULL,
                                          isGlobalFilter, //is main filter dialog
                                          filterIncl,
-                                         filterExcl,
-                                         filterActive);
+                                         filterExcl);
     if (filterDlg->ShowModal() == FilterDlg::BUTTON_APPLY)
         rv = DefaultReturnCode::BUTTON_OKAY;
 
@@ -687,7 +680,12 @@ DefaultReturnCode::Response FreeFileSync::showSyncPreviewDlg(
 class CompareCfgDialog : public CmpCfgDlgGenerated
 {
 public:
-    CompareCfgDialog(wxWindow* parentWindow, const wxPoint& position, FreeFileSync::CompareVariant& cmpVar);
+    CompareCfgDialog(wxWindow* parentWindow,
+                     const wxPoint& position,
+                     FreeFileSync::CompareVariant& cmpVar,
+                     bool& processSymlinks,
+                     bool& traverseDirectorySymlinks,
+                     bool& copyFileSymlinks);
 
     enum
     {
@@ -695,19 +693,35 @@ public:
     };
 
 private:
+    void OnOkay(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);
     void OnCancel(wxCommandEvent& event);
     void OnTimeSize(wxCommandEvent& event);
     void OnContent(wxCommandEvent& event);
+    void OnIncludeSymlinks(wxCommandEvent& event);
+    void OnTraverseDirSymlink(wxCommandEvent& event);
     void OnShowHelp(wxCommandEvent& event);
 
-    FreeFileSync::CompareVariant& m_cmpVar;
+    void updateView();
+
+    FreeFileSync::CompareVariant& cmpVarOut;
+    bool& processSymlinksOut;
+    bool& traverseDirectorySymlinksOut;
+    bool& copyFileSymlinksOut;
 };
 
 
-CompareCfgDialog::CompareCfgDialog(wxWindow* parentWindow, const wxPoint& position, CompareVariant& cmpVar) :
+CompareCfgDialog::CompareCfgDialog(wxWindow* parentWindow,
+                                   const wxPoint& position,
+                                   CompareVariant& cmpVar,
+                                   bool& processSymlinks,
+                                   bool& traverseDirectorySymlinks,
+                                   bool& copyFileSymlinks) :
     CmpCfgDlgGenerated(parentWindow),
-    m_cmpVar(cmpVar)
+    cmpVarOut(cmpVar),
+    processSymlinksOut(processSymlinks),
+    traverseDirectorySymlinksOut(traverseDirectorySymlinks),
+    copyFileSymlinksOut(copyFileSymlinks)
 {
     //move dialog up so that compare-config button and first config-variant are on same level
     Move(wxPoint(position.x, std::max(0, position.y - (m_buttonTimeSize->GetScreenPosition() - GetScreenPosition()).y)));
@@ -727,7 +741,47 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parentWindow, const wxPoint& positi
         m_buttonTimeSize->SetFocus(); //set focus on the other button
         break;
     }
+
+    m_checkBoxIncludeSymlinks->SetValue(processSymlinksOut);
+//    m_checkBoxTraverseDirSymlink->SetValue(traverseDirectorySymlinksOut);
+//    m_checkBoxCopyFileSymlink->SetValue(copyFileSymlinksOut);
+
+    updateView();
+}
+
+void CompareCfgDialog::updateView()
+{
     Fit();
+}
+
+void CompareCfgDialog::OnOkay(wxCommandEvent& event)
+{
+    if (m_radioBtnContent->GetValue())
+        cmpVarOut = CMP_BY_CONTENT;
+    else
+        cmpVarOut = CMP_BY_TIME_SIZE;
+
+    processSymlinksOut           = m_checkBoxIncludeSymlinks->GetValue();
+//    traverseDirectorySymlinksOut = m_checkBoxTraverseDirSymlink->GetValue();
+//    copyFileSymlinksOut          = m_checkBoxCopyFileSymlink->GetValue();
+
+    //simplify GUI: set reasonable default values for "traverseDirectorySymlinks" and "copyFileSymlinks"
+    traverseDirectorySymlinksOut = true;
+    copyFileSymlinksOut          = false;
+
+    EndModal(BUTTON_OKAY);
+}
+
+void CompareCfgDialog::OnIncludeSymlinks(wxCommandEvent& event)
+{
+    updateView();
+    event.Skip();
+}
+
+void CompareCfgDialog::OnTraverseDirSymlink(wxCommandEvent& event)
+{
+    updateView();
+    event.Skip();
 }
 
 
@@ -745,15 +799,15 @@ void CompareCfgDialog::OnCancel(wxCommandEvent& event)
 
 void CompareCfgDialog::OnTimeSize(wxCommandEvent& event)
 {
-    m_cmpVar = CMP_BY_TIME_SIZE;
-    EndModal(BUTTON_OKAY);
+    m_radioBtnSizeDate->SetValue(true);
+    OnOkay(event);
 }
 
 
 void CompareCfgDialog::OnContent(wxCommandEvent& event)
 {
-    m_cmpVar = CMP_BY_CONTENT;
-    EndModal(BUTTON_OKAY);
+    m_radioBtnContent->SetValue(true);
+    OnOkay(event);
 }
 
 
@@ -764,17 +818,18 @@ void CompareCfgDialog::OnShowHelp(wxCommandEvent& event)
 }
 
 
-DefaultReturnCode::Response FreeFileSync::showCompareCfgDialog(const wxPoint& position, CompareVariant& cmpVar)
+DefaultReturnCode::Response FreeFileSync::showCompareCfgDialog(
+    const wxPoint& position,
+    CompareVariant& cmpVar,
+    bool& processSymlinks,
+    bool& traverseDirectorySymlinks,
+    bool& copyFileSymlinks)
 {
-    DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
+    CompareCfgDialog syncDlg(NULL, position, cmpVar, processSymlinks, traverseDirectorySymlinks, copyFileSymlinks);
 
-    CompareCfgDialog* syncDlg = new CompareCfgDialog(NULL, position, cmpVar);
-    if (syncDlg->ShowModal() == CompareCfgDialog::BUTTON_OKAY)
-        rv = DefaultReturnCode::BUTTON_OKAY;
-
-    syncDlg->Destroy();
-
-    return rv;
+    return syncDlg.ShowModal() == CompareCfgDialog::BUTTON_OKAY ?
+           DefaultReturnCode::BUTTON_OKAY :
+           DefaultReturnCode::BUTTON_CANCEL;
 }
 //########################################################################################
 
@@ -818,7 +873,6 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSetti
     m_checkBoxCopyLocked->SetValue(globalSettings.copyLockedFiles);
 
 #ifndef FFS_WIN
-    m_staticTextCopyLocked->Hide();
     m_checkBoxCopyLocked->Hide();
 #endif
 

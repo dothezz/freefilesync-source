@@ -12,11 +12,13 @@
 
 namespace FreeFileSync
 {
-class FileError //Exception class used to notify file/directory copy/delete errors
+class FileError //Exception base class used to notify file/directory copy/delete errors
 {
 public:
     FileError(const wxString& message) :
         errorMessage(message) {}
+
+    virtual ~FileError() {}
 
     const wxString& show() const
     {
@@ -24,7 +26,7 @@ public:
     }
 
 private:
-    wxString errorMessage;
+    const wxString errorMessage;
 };
 }
 

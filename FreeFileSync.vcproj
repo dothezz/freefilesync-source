@@ -229,6 +229,7 @@
 				WarningLevel="4"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4100"
+				ForcedIncludeFiles=""
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -383,6 +384,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ui\batchConfig.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ui\batchStatusHandler.cpp"
 				>
 			</File>
@@ -527,10 +532,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ui\settingsDialog.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\shared\shadow.cpp"
 				>
 			</File>
@@ -588,6 +589,14 @@
 			</File>
 			<File
 				RelativePath=".\structures.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ui\switchToGui.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ui\syncConfig.cpp"
 				>
 			</File>
 			<File

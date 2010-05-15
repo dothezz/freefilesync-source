@@ -5,14 +5,12 @@
 // **************************************************************************
 //
 #include "xmlBase.h"
-#include "globalFunctions.h"
 #include <wx/intl.h>
-#include <wx/ffile.h>
 #include "fileIO.h"
 #include "stringConv.h"
 #include "systemConstants.h"
 #include <boost/scoped_array.hpp>
-#include <wx/log.h>
+#include "fileHandling.h"
 
 using namespace FreeFileSync;
 
@@ -37,57 +35,6 @@ std::string getTypeName(xmlAccess::XmlType type)
 }
 
 
-xmlAccess::XmlType xmlAccess::getXmlType(const wxString& filename) //throw()
-{
-#ifndef __WXDEBUG__
-    wxLogNull noWxLogs; //hide wxWidgets log messages in release build
-#endif
-
-    if (!wxFileExists(filename))
-        return XML_OTHER;
-
-    //workaround to get a FILE* from a unicode filename
-    wxFFile configFile(filename, wxT("rb"));
-    if (!configFile.IsOpened())
-        return XML_OTHER;
-
-    FILE* inputFile = configFile.fp();
-
-    TiXmlDocument doc;
-    try
-    {
-        if (!doc.LoadFile(inputFile)) //fails if inputFile is no proper XML
-            return XML_OTHER;
-    }
-    catch (const std::exception&)
-    {
-        //unfortunately TiXml isn't very smart and tries to allocate space for the complete file: length_error exception is thrown for large files!
-        return XML_OTHER;
-    }
-
-    TiXmlElement* root = doc.RootElement();
-
-    if (!root || (root->ValueStr() != std::string("FreeFileSync"))) //check for FFS configuration xml
-        return XML_OTHER;
-
-    const char* cfgType = root->Attribute("XmlType");
-    if (!cfgType)
-        return XML_OTHER;
-
-    const std::string type(cfgType);
-
-    if (type == getTypeName(XML_GUI_CONFIG))
-        return XML_GUI_CONFIG;
-    else if (type == getTypeName(XML_BATCH_CONFIG))
-        return XML_BATCH_CONFIG;
-    else if (type == getTypeName(XML_GLOBAL_SETTINGS))
-        return XML_GLOBAL_SETTINGS;
-    else if (type == getTypeName(XML_REAL_CONFIG))
-        return XML_REAL_CONFIG;
-
-    return XML_OTHER;
-}
-
 namespace
 {
 //convert (0xD, 0xA) and (0xD) to 0xA: just like in TiXmlDocument::LoadFile(); not sure if actually needed
@@ -108,49 +55,90 @@ void normalize(std::vector<char>& stream)
 
     stream.swap(tmp);
 }
-}
 
 
-void xmlAccess::loadXmlDocument(const wxString& filename, const xmlAccess::XmlType type, TiXmlDocument& document) //throw FileError()
+void loadRawXmlDocument(const wxString& filename, TiXmlDocument& document) //throw XmlError()
 {
-    std::vector<char> inputStream;
+    using xmlAccess::XmlError;
+
+    const size_t BUFFER_SIZE = 2 * 1024 * 1024; //maximum size of a valid FreeFileSync XML file!
+
+    std::vector<char> inputBuffer;
+    inputBuffer.resize(BUFFER_SIZE);
 
     try
     {
-        const size_t BUFFER_SIZE = 512 * 1024;
-        static boost::scoped_array<unsigned char> buffer(new unsigned char[BUFFER_SIZE]);
-
         FileInput inputFile(wxToZ(filename)); //throw FileError();
-        do
-        {
-            const size_t bytesRead = inputFile.read(buffer.get(), BUFFER_SIZE); //throw FileError()
-            inputStream.insert(inputStream.end(), buffer.get(), buffer.get() + bytesRead);
-        }
-        while (!inputFile.eof());
+        const size_t bytesRead = inputFile.read(&inputBuffer[0], inputBuffer.size()); //throw FileError()
+
+        if (bytesRead == 0 || bytesRead >= inputBuffer.size()) //treat XML files larger than 2 MB as erroneous: loading larger files just wastes CPU + memory
+            throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\""));
+
+        inputBuffer.resize(bytesRead + 1);
+        inputBuffer[bytesRead] = 0; //set null-termination!!!!
     }
     catch (const FileError& error) //more detailed error messages than with wxWidgets
     {
         throw XmlError(error.show());
     }
 
-    if (!inputStream.empty())
+    //convert (0xD, 0xA) and (0xD) to (0xA): just like in TiXmlDocument::LoadFile(); not sure if actually needed
+    normalize(inputBuffer);
+
+    document.Parse(&inputBuffer[0], 0, TIXML_DEFAULT_ENCODING); //respect null-termination!
+
+    TiXmlElement* root = document.RootElement();
+
+    if (root && (root->ValueStr() == std::string("FreeFileSync"))) //check for FFS configuration xml
+        return; //finally... success!
+
+    throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\""));
+}
+}
+
+
+xmlAccess::XmlType xmlAccess::getXmlType(const wxString& filename) //throw()
+{
+    try
     {
-		inputStream.push_back(0);
+        TiXmlDocument doc;
+        ::loadRawXmlDocument(filename, doc); //throw XmlError()
 
-        //convert (0xD, 0xA) and (0xD) to (0xA): just like in TiXmlDocument::LoadFile(); not sure if actually needed
-        ::normalize(inputStream);
-
-        TiXmlBase::SetCondenseWhiteSpace(false); //do not condense whitespace characters
-        document.Parse(&inputStream[0], 0, TIXML_DEFAULT_ENCODING);
-
-        TiXmlElement* root = document.RootElement();
-
-        if (root && (root->ValueStr() == std::string("FreeFileSync"))) //check for FFS configuration xml
+        TiXmlElement* root = doc.RootElement();
+        if (root)
         {
             const char* cfgType = root->Attribute("XmlType");
-            if (cfgType && std::string(cfgType) == getTypeName(type))
-                return; //finally... success!
+            if (cfgType)
+            {
+                const std::string type(cfgType);
+
+                if (type == getTypeName(XML_GUI_CONFIG))
+                    return XML_GUI_CONFIG;
+                else if (type == getTypeName(XML_BATCH_CONFIG))
+                    return XML_BATCH_CONFIG;
+                else if (type == getTypeName(XML_GLOBAL_SETTINGS))
+                    return XML_GLOBAL_SETTINGS;
+                else if (type == getTypeName(XML_REAL_CONFIG))
+                    return XML_REAL_CONFIG;
+            }
         }
+    }
+    catch (const XmlError&) {}
+
+    return XML_OTHER;
+}
+
+
+void xmlAccess::loadXmlDocument(const wxString& filename, const xmlAccess::XmlType type, TiXmlDocument& document) //throw XmlError()
+{
+    ::loadRawXmlDocument(filename, document); //throw XmlError()
+
+    TiXmlElement* root = document.RootElement();
+    if (root)
+    {
+        const char* cfgType = root->Attribute("XmlType");
+        if (cfgType && std::string(cfgType) == getTypeName(type))
+            return; //finally... success!
     }
 
     throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\""));
@@ -159,35 +147,64 @@ void xmlAccess::loadXmlDocument(const wxString& filename, const xmlAccess::XmlTy
 
 void xmlAccess::getDefaultXmlDocument(const XmlType type, TiXmlDocument& document)
 {
-    TiXmlBase::SetCondenseWhiteSpace(false); //do not condense whitespace characters
-
     TiXmlDeclaration* decl = new TiXmlDeclaration("1.0", "UTF-8", ""); //delete won't be necessary later; ownership passed to TiXmlDocument!
     document.LinkEndChild(decl);
 
     TiXmlElement* root = new TiXmlElement("FreeFileSync");
-
     root->SetAttribute("XmlType", getTypeName(type)); //xml configuration type
 
     document.LinkEndChild(root);
 }
 
 
+namespace
+{
+bool saveNecessary(const Zstring& filename, const std::string& dataToWrite) //throw()
+{
+    try
+    {
+        if (FreeFileSync::getFilesize(filename) != static_cast<unsigned long>(dataToWrite.size())) //throw FileError();
+            return true;
+
+        boost::scoped_array<char> inputBuffer(new char[dataToWrite.size() + 1]); //+ 1 in order to test for end of file!
+
+        FileInput inputFile(filename); //throw FileError();
+
+        const size_t bytesRead = inputFile.read(inputBuffer.get(), dataToWrite.size() + 1); //throw FileError()
+        if (bytesRead != dataToWrite.size()) //implicit test for eof!
+            return true;
+
+        return ::memcmp(inputBuffer.get(), dataToWrite.c_str(), dataToWrite.size()) != 0;
+    }
+    catch (const FileError&)
+    {
+        return true;
+    }
+}
+}
+
+
 void xmlAccess::saveXmlDocument(const wxString& filename, const TiXmlDocument& document) //throw (XmlError)
 {
+    TiXmlBase::SetCondenseWhiteSpace(false); //do not condense whitespace characters
+
     //convert XML into continuous byte sequence
     TiXmlPrinter printer;
     printer.SetLineBreak(wxString(globalFunctions::LINE_BREAK).ToUTF8());
     document.Accept(&printer);
     const std::string buffer = printer.Str();
 
-    try
+    if (saveNecessary(wxToZ(filename), buffer)) //only write file if different data will be written
     {
-        FileOutput outputFile(wxToZ(filename));            //throw FileError()
-        outputFile.write(buffer.c_str(), buffer.length()); //
-    }
-    catch (const FileError& error) //more detailed error messages than with wxWidgets
-    {
-        throw XmlError(error.show());
+        try
+        {
+            FileOutput outputFile(wxToZ(filename));            //throw FileError()
+            outputFile.write(buffer.c_str(), buffer.length()); //
+        }
+        catch (const FileError& error) //more detailed error messages than with wxWidgets
+        {
+            throw XmlError(error.show());
+        }
     }
 }
 //################################################################################################################
@@ -221,41 +238,6 @@ bool xmlAccess::readXmlElement(const std::string& name, const TiXmlElement* pare
 
     output = wxString::FromUTF8(tempString.c_str());
     return true;
-}
-
-
-bool xmlAccess::readXmlElement(const std::string& name, const TiXmlElement* parent, int& output)
-{
-    std::string temp;
-    if (!readXmlElement(name, parent, temp))
-        return false;
-
-    output = globalFunctions::stringToInt(temp);
-    return true;
-}
-
-
-bool xmlAccess::readXmlElement(const std::string& name, const TiXmlElement* parent, unsigned int& output)
-{
-    int dummy = 0;
-    if (!xmlAccess::readXmlElement(name, parent, dummy))
-        return false;
-
-    output = static_cast<unsigned int>(dummy);
-    return true;
-}
-
-
-bool xmlAccess::readXmlElement(const std::string& name, const TiXmlElement* parent, long& output)
-{
-    std::string temp;
-    if (readXmlElement(name, parent, temp))
-    {
-        output = globalFunctions::stringToLong(temp);
-        return true;
-    }
-    else
-        return false;
 }
 
 
@@ -323,32 +305,6 @@ bool xmlAccess::readXmlAttribute(const std::string& name, const TiXmlElement* no
 }
 
 
-bool xmlAccess::readXmlAttribute(const std::string& name, const TiXmlElement* node, int& output)
-{
-    std::string dummy;
-    if (readXmlAttribute(name, node, dummy))
-    {
-        output = globalFunctions::stringToInt(dummy);
-        return true;
-    }
-    else
-        return false;
-}
-
-
-bool xmlAccess::readXmlAttribute(const std::string& name, const TiXmlElement* node, unsigned int& output)
-{
-    std::string dummy;
-    if (readXmlAttribute(name, node, dummy))
-    {
-        output = globalFunctions::stringToInt(dummy);
-        return true;
-    }
-    else
-        return false;
-}
-
-
 bool xmlAccess::readXmlAttribute(const std::string& name, const TiXmlElement* node, bool& output)
 {
     std::string dummy;
@@ -382,24 +338,6 @@ void xmlAccess::addXmlElement(const std::string& name, const wxString& value, Ti
 }
 
 
-void xmlAccess::addXmlElement(const std::string& name, const int value, TiXmlElement* parent)
-{
-    addXmlElement(name, globalFunctions::numberToString(value), parent);
-}
-
-
-void xmlAccess::addXmlElement(const std::string& name, const unsigned int value, TiXmlElement* parent)
-{
-    addXmlElement(name, static_cast<int>(value), parent);
-}
-
-
-void xmlAccess::addXmlElement(const std::string& name, const long value, TiXmlElement* parent)
-{
-    addXmlElement(name, globalFunctions::numberToString(value), parent);
-}
-
-
 void xmlAccess::addXmlElement(const std::string& name, const bool value, TiXmlElement* parent)
 {
     if (value)
@@ -426,18 +364,6 @@ void xmlAccess::addXmlAttribute(const std::string& name, const std::string& valu
 void xmlAccess::addXmlAttribute(const std::string& name, const wxString& value, TiXmlElement* node)
 {
     addXmlAttribute(name, std::string(value.ToUTF8()), node);
-}
-
-
-void xmlAccess::addXmlAttribute(const std::string& name, const int value, TiXmlElement* node)
-{
-    addXmlAttribute(name, globalFunctions::numberToString(value), node);
-}
-
-
-void xmlAccess::addXmlAttribute(const std::string& name, const unsigned int value, TiXmlElement* node)
-{
-    addXmlAttribute(name, globalFunctions::numberToString(value), node);
 }
 
 

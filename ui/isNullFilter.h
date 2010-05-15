@@ -4,24 +4,21 @@
 // * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
+#ifndef ISNULLFILTER_H_INCLUDED
+#define ISNULLFILTER_H_INCLUDED
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include "../structures.h"
+#include "../library/filter.h"
 
-
-BOOL APIENTRY DllMain( HMODULE hModule,
-                       DWORD  ul_reason_for_call,
-                       LPVOID lpReserved
-                     )
+namespace FreeFileSync
 {
-    switch (ul_reason_for_call)
-    {
-    case DLL_PROCESS_ATTACH:
-    case DLL_THREAD_ATTACH:
-    case DLL_THREAD_DETACH:
-    case DLL_PROCESS_DETACH:
-        break;
-    }
-    return TRUE;
+
+inline
+bool isNullFilter(const FilterConfig& filterCfg)
+{
+     return NameFilter(filterCfg.includeFilter, filterCfg.excludeFilter).isNull();
 }
 
+}
+
+#endif // ISNULLFILTER_H_INCLUDED

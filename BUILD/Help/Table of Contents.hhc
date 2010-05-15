@@ -29,6 +29,10 @@
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Batch Scripting">
+			<param name="Local" value="html\advanced\Batch Scripting.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Compare by filesize">
 			<param name="Local" value="html\advanced\CompareFileSize.html">
 			</OBJECT>

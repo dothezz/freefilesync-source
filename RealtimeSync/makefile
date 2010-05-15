@@ -18,6 +18,7 @@ FILE_LIST+=xmlProcessing.cpp
 FILE_LIST+=xmlFreeFileSync.cpp
 FILE_LIST+=../library/processXml.cpp
 FILE_LIST+=../structures.cpp
+FILE_LIST+=../shared/localization_no_BOM.cpp
 FILE_LIST+=../shared/inotify/inotify-cxx.cpp
 FILE_LIST+=../shared/tinyxml/tinyxml.cpp
 FILE_LIST+=../shared/tinyxml/tinystr.cpp
@@ -31,7 +32,6 @@ FILE_LIST+=../shared/xmlBase.cpp
 FILE_LIST+=../shared/customButton.cpp
 FILE_LIST+=../shared/fileHandling.cpp
 FILE_LIST+=../shared/fileTraverser.cpp
-FILE_LIST+=../shared/localization.cpp
 FILE_LIST+=../shared/standardPaths.cpp
 FILE_LIST+=../shared/helpProvider.cpp
 FILE_LIST+=../shared/fileIO.cpp
@@ -50,8 +50,8 @@ init:
 
 #remove byte ordering mark: needed by Visual C++ but an error with GCC
 removeBOM: ../tools/removeBOM.cpp
-	g++ -o removeBOM ../tools/removeBOM.cpp 
-	./removeBOM ../shared/localization.cpp
+	g++ -o OBJ/removeBOM ../tools/removeBOM.cpp 
+	./OBJ/removeBOM ../shared/localization.cpp ../shared/localization_no_BOM.cpp
 
 %.dep : %.cpp 
  #strip path information
@@ -63,7 +63,7 @@ RealtimeSync: init removeBOM $(DEP_LIST)
 clean:
 	rm -rf OBJ
 	rm -f ../BUILD/$(APPNAME)
-	rm -f removeBOM
+	rm -f ../shared/localization_no_BOM.cpp
 
 install:
 	if [ ! -d $(BINDIR) ] ; then mkdir -p $(BINDIR); fi

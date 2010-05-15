@@ -17,6 +17,7 @@
 #include <wx/file.h>
 #include "shared/xmlBase.h"
 #include "library/resources.h"
+#include "ui/switchToGui.h"
 #include "shared/standardPaths.h"
 #include "shared/localization.h"
 #include "shared/appMain.h"
@@ -29,6 +30,7 @@
 #endif
 
 using FreeFileSync::CustomLocale;
+using FreeFileSync::SwitchToGui;
 
 
 IMPLEMENT_APP(Application)
@@ -48,6 +50,8 @@ bool Application::OnInit()
 
 void Application::OnStartApplication(wxIdleEvent&)
 {
+    using namespace FreeFileSync;
+
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), NULL, this);
 
     struct HandleAppExit //wxWidgets app exit handling is a bit weird... we want the app to exit only if the logical main window is closed
@@ -82,11 +86,11 @@ void Application::OnStartApplication(wxIdleEvent&)
     {
         const wxString filename(argv[1]);
 
-        if (wxFileExists(filename))  //load file specified by %1 parameter:
+        if (fileExists(wxToZ(filename)))  //load file specified by %1 parameter:
             cfgFilename = filename;
-        else if (wxFileExists(filename + wxT(".ffs_batch")))
+        else if (fileExists(wxToZ(filename + wxT(".ffs_batch"))))
             cfgFilename = filename + wxT(".ffs_batch");
-        else if (wxFileExists(filename + wxT(".ffs_gui")))
+        else if (fileExists(wxToZ(filename + wxT(".ffs_gui"))))
             cfgFilename = filename + wxT(".ffs_gui");
         else
         {
@@ -99,19 +103,17 @@ void Application::OnStartApplication(wxIdleEvent&)
 
     try //load global settings from XML
     {
-        xmlAccess::readGlobalSettings(globalSettings);
+        if (fileExists(wxToZ(xmlAccess::getGlobalConfigFile())))
+            xmlAccess::readGlobalSettings(globalSettings);
+        //else: globalSettings already has default values
     }
     catch (const xmlAccess::XmlError& error)
     {
-        if (wxFileExists(xmlAccess::getGlobalConfigFile()))
-        {
-            //show messagebox and continue
-            if (error.getSeverity() == xmlAccess::XmlError::WARNING)
-                wxMessageBox(error.show(), _("Warning"), wxOK | wxICON_WARNING);
-            else
-                wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
-        }
-        //else: globalSettings already has default values
+        //show messagebox and continue
+        if (error.getSeverity() == xmlAccess::XmlError::WARNING)
+            ; //wxMessageBox(error.show(), _("Warning"), wxOK | wxICON_WARNING); -> ignore parsing errors: should be migration problems only *cross-fingers*
+        else
+            wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
     }
 
     //set program language
@@ -190,12 +192,8 @@ int Application::OnExit()
 
 void Application::runGuiMode(const wxString& cfgFileName, xmlAccess::XmlGlobalSettings& settings)
 {
-    MainDialog* frame = new MainDialog(NULL, cfgFileName, settings);
-    frame->SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
+    MainDialog* frame = new MainDialog(cfgFileName, settings);
     frame->Show();
-
-    //notify about (logical) application main window
-    FreeFileSync::AppMainWindow::setMainWindow(frame);
 }
 
 
@@ -222,16 +220,19 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
     try //begin of synchronization process (all in one try-catch block)
     {
+        const SwitchToGui switchBatchToGui(batchCfg, globSettings); //prepare potential operational switch
+
         //class handling status updates and error messages
         std::auto_ptr<BatchStatusHandler> statusHandler;  //delete object automatically
         if (batchCfg.silent)
-            statusHandler.reset(new BatchStatusHandler(true, filename, &batchCfg.logFileDirectory, batchCfg.handleError, returnValue));
+            statusHandler.reset(new BatchStatusHandler(true, filename, &batchCfg.logFileDirectory, batchCfg.handleError, switchBatchToGui, returnValue));
         else
-            statusHandler.reset(new BatchStatusHandler(false, filename, NULL, batchCfg.handleError, returnValue));
+            statusHandler.reset(new BatchStatusHandler(false, filename, NULL, batchCfg.handleError, switchBatchToGui, returnValue));
 
         //COMPARE DIRECTORIES
         FreeFileSync::FolderComparison folderCmp;
-        FreeFileSync::CompareProcess comparison(batchCfg.mainCfg.hidden.traverseDirectorySymlinks,
+        FreeFileSync::CompareProcess comparison(batchCfg.mainCfg.processSymlinks,
+                                                batchCfg.mainCfg.traverseDirectorySymlinks,
                                                 batchCfg.mainCfg.hidden.fileTimeTolerance,
                                                 globSettings.ignoreOneHourDiff,
                                                 globSettings.optDialogs,
@@ -250,8 +251,8 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
         //START SYNCHRONIZATION
         FreeFileSync::SyncProcess synchronization(
-            batchCfg.mainCfg.hidden.copyFileSymlinks,
-            batchCfg.mainCfg.hidden.traverseDirectorySymlinks,
+            batchCfg.mainCfg.copyFileSymlinks,
+            batchCfg.mainCfg.traverseDirectorySymlinks,
             globSettings.optDialogs,
             batchCfg.mainCfg.hidden.verifyFileCopy,
             globSettings.copyLockedFiles,

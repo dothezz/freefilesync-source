@@ -88,7 +88,7 @@ void removeEmptyRec(HierarchyObject& hierObj)
 {
     FileSystemObject::removeEmptyNonRec(hierObj);
 
-    //recurse into remaining directories
+    //recurse
     std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), removeEmptyRec);
 }
 

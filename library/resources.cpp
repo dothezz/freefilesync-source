@@ -52,7 +52,7 @@ void loadAnimFromZip(wxZipInputStream& zipInput, wxAnimation* animation)
     //Workaround for wxWidgets:
     //construct seekable input stream (zip-input stream is non-seekable) for wxAnimation::Load()
     //luckily this method call is very fast: below measurement precision!
-    std::vector<unsigned char> data;
+    std::vector<char> data;
     data.reserve(10000);
 
     int newValue = 0;

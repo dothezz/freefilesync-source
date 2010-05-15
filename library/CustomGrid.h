@@ -153,7 +153,7 @@ public:
     xmlAccess::ColumnAttributes getColumnAttributes();
     void setColumnAttributes(const xmlAccess::ColumnAttributes& attr);
 
-    xmlAccess::ColumnTypes getTypeAtPos(unsigned pos) const;
+    xmlAccess::ColumnTypes getTypeAtPos(size_t pos) const;
     static wxString getTypeName(xmlAccess::ColumnTypes colType);
 
     void autoSizeColumns();        //performance optimized column resizer
@@ -171,14 +171,14 @@ private:
     //asynchronous icon loading
     void getIconsToBeLoaded(std::vector<Zstring>& newLoad); //loads all (not yet) drawn icons
 
-    typedef unsigned int FromRow;
-    typedef unsigned int ToRow;
+    typedef size_t FromRow;
+    typedef size_t ToRow;
     typedef std::pair<FromRow, ToRow> VisibleRowRange;
     VisibleRowRange getVisibleRows();
 
 
-    typedef unsigned int RowNumber;
-    typedef bool         IconLoaded;
+    typedef size_t RowNumber;
+    typedef bool   IconLoaded;
     typedef std::map<RowNumber, IconLoaded> LoadSuccess;
     LoadSuccess loadIconSuccess; //save status of last icon load when drawing on GUI
 

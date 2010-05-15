@@ -22,8 +22,6 @@
  másodperc
 %x / %y objects deleted successfully
 %X / %Y objektum sikeresen törölve
-%x Percent
-%x százalék
 %x directories
 %x mappa
 %x files,
@@ -34,6 +32,8 @@ A(z) %x nem megfelelő FreeFileSync kötegelt feladat fájl!
 %x sor látható a(z) %y sorból
 %x of 1 row in view
 %x sor látható az 1 sorból
+%x%
+
 &Abort
 &Megszakít
 &About...
@@ -86,14 +86,14 @@ A(z) %x nem megfelelő FreeFileSync kötegelt feladat fájl!
 &Ismét
 &Save
 &Mestés
+&Switch
+
 &Yes
 &Igen
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Megjegyzés: Csak a FAT/FAT32 meghajtókat érinti ez a probléma!\nMinden más esetben ki lehet kapcsolni az \"1 órás különbség figyelmen kívül hagyása\" beállítást.)
 (Requires an Internet connection!)
 (Internetkapcsolat szükséges!)
-,
-.
 - Other side's counterpart to %dir
 - A %dir másik oldalon szereplő párja
 - Other side's counterpart to %name
@@ -122,10 +122,6 @@ A(z) %x nem megfelelő FreeFileSync kötegelt feladat fájl!
 - jobb oldali
 - right newer
 - a jobb oldali újabb
--Open-Source file synchronization-
--Nyílt forráskódú fájlszinkronizálás-
-.
-,
 /sec
 /másodperc
 1 directory
@@ -168,8 +164,6 @@ About
 A programról
 Action
 Művelet
-Activate filter
-Szűrő aktiválása
 Add folder
 Mappa hozzáadása
 Add folder pair
@@ -188,8 +182,6 @@ At least one directory input field is empty.
 Legalább az egyik mappa beviteli mező üres.
 Auto-adjust columns
 Oszlopok automatikus igazítása
-Automatic mode
-Automatikus mód
 Batch execution
 Kötegelt végrehajtás
 Batch file created successfully!
@@ -202,6 +194,8 @@ Both sides have changed since last synchronization!
 Mindkét oldal megváltozott az utolsó szikronizálás óta!
 Browse
 Tallózás
+Browse directory
+
 Build:
 Build:
 Cannot determine sync-direction:
@@ -210,6 +204,8 @@ Cannot find %x
 
 Category
 Kategória
+Clear filter settings
+
 Comma separated list
 Comma separated values
 Command line
@@ -226,8 +222,6 @@ Compare by \"File size and date\"
 Összehasonlítás \"fájlméret és dátum alapján\"
 Compare by...
 Összehasonlítás
-Comparing content
-Tartalom összehasonlítása
 Comparing content of files %x
 %x fájlok tartalmának összehasonlítása
 Comparing content...
@@ -294,8 +288,6 @@ Create a batch job
 Kötegelt feladat létrehozása
 Creating folder %x
 %x mappa létrehozása
-Current operation:
-Aktuális művelet:
 Custom
 Egyedi
 Customize columns
@@ -306,10 +298,6 @@ D-Click
 D-Klikk
 DECISION TREE
 DÖNTÉSI FA
-Data remaining:
-Hátralévő adat:
-Data transferred:
-
 Data verification error: Source and target file have different content!
 Adatellenőrzési hiba: A forrás és cél fájl tartalma különbözik!
 Date
@@ -364,10 +352,14 @@ Download now?
 Letöltsem most?
 Drag && drop
 Húzd && Ejtsd
+Elements found:
+
+Elements processed:
+
+Elements remaining:
+
 Email
 E-mail
-Enable filter to exclude files from synchronization
-Szűrő engedélyezése fájlok a szinkronizációból való kizárásához
 Endless loop when traversing directory:
 Végtelen hurok a mappák bejárásakor:
 Error
@@ -462,38 +454,30 @@ Files are found equal if\n     - file content\nis the same
 A fájlok megegyező ha\n  - a fájlok tartalma\nmegegyezik
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
 A fájlok megegyező ha\n  - a fájlméret\n  - az utolsó módosítás dátuma\nmegegyezik
-Files remaining:
-Hátralévő fájlok:
 Files that are equal on both sides
 Megegyező fájlok mindkét oldalon
-Files that exist on both sides and have different content
-Mindkét oldalon létező fájlok különböző tartalommal
 Files that exist on both sides, left one is newer
 Mindkét oldalon létező fájlok, de a bal oldali újabb
 Files that exist on both sides, right one is newer
 Mindkét oldalon létező fájlok, de a jobb oldali újabb
-Files/folders found:
-Talált fájlok/mappák:
-Files/folders processed:
+Files that have different content
 
-Files/folders remaining:
-Hátralévő fájlok/mappák:
 Files/folders that exist on left side only
 Csak a bal oldalon létező fájlok/mappák
 Files/folders that exist on right side only
 Csak a jobb oldalon létező fájlok/mappák
-Filter
-Szűrő
 Filter files
 Fájlok szűrése
-Filter has been selected
-Szűrő kiválasztva
+Filter is active
+
 Filter settings have changed!
 A szűrőbeállítások megváltoztak!
 Filter view
 Szűrő nézet
-Filtering is deactivated
-A szűrés kikapcsolva
+Filter: All pairs
+
+Filter: Single pair
+
 Find
 
 Find what:
@@ -502,8 +486,6 @@ Folder Comparison and Synchronization
 Mappa összehasonlítás és szinkronizáció
 Free disk space available:
 Szabad lemezterület:
-FreeFileSync - Folder Comparison and Synchronization
-FreeFileSync - Mappa összehasonlítás és szinkronizáció
 FreeFileSync Batch Job
 FreeFileSync kötegelt feladat
 FreeFileSync at Sourceforge
@@ -520,8 +502,6 @@ Generating database...
 Adatbázis generálása...
 Generating file list...
 Fájllista generálása...
-Global filter
-Globális szűrő
 Global settings
 Globális beállítások
 Help
@@ -578,12 +558,10 @@ Ignore errors
 Hibák figyelmen kívül hagyása
 Ignore subsequent errors
 Későbbi hibák figyelmen kívül hagyása
-Ignore this error, retry or abort synchronization?
-Figyelmen kívül hagyja ezt a hibát, újra megpróbálja vagy megszakítja a szinkronizálást?
-Ignore this error, retry or abort?
-Figyelmen kívül hagyja ezt a hibát, újra megpróbálja vagy megszakítja?
 Include
 Csatol
+Include Symbolic Links
+
 Include all rows
 Minden sort csatolni
 Include temporarily
@@ -600,8 +578,6 @@ Initial synchronization:
 Első szinkronizáció:
 Integrate external applications into context menu. The following macros are available:
 Külső alkalmazás integrálása a helyi menübe. Az elérhető makrók a következők:
-Last synchronization not completed!
-
 Leave as unresolved conflict
 Feloldatlan ütközésként hagyni
 Left
@@ -612,8 +588,6 @@ Load configuration from file
 Beállítások betöltése fájlból
 Load configuration history (press DEL to delete items)
 Beállítások előzményeinek a betöltése (Nyomja meg a DEL gombot a törléshez)
-Local filter
-Lokális szűrő
 Log-messages:
 Naplóbejegyzések:
 Logging
@@ -664,12 +638,10 @@ One of the FreeFileSync database files is not yet existing:
 
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Csak a szűrésnek megfelelő fájlok/mappák lesznek kijelölve szinkronizáláshoz. A szűrő a szinkronizálás alap mappáihoz relatív fájl- és mappanevekre lesz alkalmazva.
-Open directly
-Megnyitás közvetlenül
 Open with Explorer
 Megnyitás Explorerrel
-Open with Konqueror
-Megnyitás Konquerorral
+Open with default application
+
 Operation aborted!
 Művelet megszakítva!
 Operation:
@@ -680,8 +652,12 @@ Pause
 Szünet
 Paused
 Szüneteltetve
+Planned directory deletion is in conflict with its subdirectories and -files!
+
 Please run a Compare first before synchronizing!
 Kérjük, futtass le egy összehasonlítást mielőtt szinkronizálnál!
+Press \"Switch\" to open FreeFileSync GUI modus.
+
 Processing folder pair:
 Mappapár feldolgozása:
 Published under the GNU General Public License:
@@ -706,8 +682,6 @@ Remove folder
 Mappa eltávolítása
 Remove folder pair
 Mappa párok eltávolítása
-Remove local filter settings
-Lokális szűrőbeállítások eltávolítása
 Renaming file %x to %y
 %x fájl átnevezése %y névre
 Report translation error
@@ -740,7 +714,7 @@ Select variant:
 Változat kiválasztása:
 Set direction:
 
-Setting default synchronization directions: Old files will be overwritten by newer files.
+Setting default synchronization directions: Old files will be overwritten with newer files.
 
 Show conflicts
 Ütközések mutatása
@@ -794,10 +768,14 @@ Start synchronization
 Szinkronizáció indítása
 Statistics
 Statisztikák
+Status feedback
+
 Stop
 Megállítás
 Swap sides
 Oldalak felcserélése
+Switching to FreeFileSync GUI modus...
+
 Synchronization Preview
 Szinkronizáció előnézete
 Synchronization aborted!
@@ -812,8 +790,6 @@ Synchronization status
 Szinkronizáció állapota
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Minden .doc, .zip és .exe fájl szinkronizálása a \"temp\" almappában találhatók kivételével.
-Synchronize both sides using a database. Deletions are detected automatically
-Mindkét oldal szinkronizálása adatbázis segítségével. A törlések automatikusan felismerődnek
 Synchronize...
 Szinkronizálás
 Synchronizing...
@@ -828,6 +804,8 @@ The command line is executed each time:\n- a directory becomes available (e.g. U
 
 The file does not contain a valid configuration:
 A következő fájl nem tartalmaz érvényes beállításokat:
+The file was not processed by last synchronization!
+
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Ez a változat akkor tekint egyezőnek két azonos nevű fájlt, ha azok mérete ÉS az utolsó módosításuk ideje azonos.
 Time
@@ -868,6 +846,8 @@ Verifying file %x
 %x fájl ellenőrzése
 Volume name %x not part of filename %y!
 A(z) %x kötetnevet nem tartalmazza a(z) %y fájlnév!
+Waiting for all directories to become available...
+
 Warning
 Figyelem
 Warning: Synchronization failed for %x item(s):

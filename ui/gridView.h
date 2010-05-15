@@ -118,10 +118,10 @@ private:
 
     struct RefIndex
     {
-        RefIndex(unsigned int folderInd, HierarchyObject::ObjectID id) :
+        RefIndex(size_t folderInd, HierarchyObject::ObjectID id) :
             folderIndex(folderInd),
             objId(id) {}
-        unsigned int folderIndex;
+        size_t folderIndex;
         HierarchyObject::ObjectID objId;
     };
 

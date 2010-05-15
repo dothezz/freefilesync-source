@@ -270,7 +270,7 @@ void GridView::clearAllRows()
 class GridView::SerializeHierarchy
 {
 public:
-    SerializeHierarchy(std::vector<GridView::RefIndex>& sortedRef, unsigned int index) :
+    SerializeHierarchy(std::vector<GridView::RefIndex>& sortedRef, size_t index) :
         index_(index),
         sortedRef_(sortedRef) {}
 
@@ -295,7 +295,7 @@ public:
     }
 
 private:
-    unsigned int index_;
+    size_t index_;
     std::vector<GridView::RefIndex>& sortedRef_;
 };
 
@@ -306,11 +306,9 @@ void GridView::setData(FolderComparison& newData)
     sortedRef.clear();
     folderCmp.swap(newData);
 
-    unsigned int index = 0;
-
     //fill sortedRef
     for (FolderComparison::const_iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
-        SerializeHierarchy(sortedRef, index++).execute(*j);
+        SerializeHierarchy(sortedRef, j - folderCmp.begin()).execute(*j);
 }
 
 

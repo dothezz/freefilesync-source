@@ -6,7 +6,6 @@
 //
 #include "structures.h"
 #include <wx/intl.h>
-#include "shared/systemConstants.h"
 #include <stdexcept>
 
 using namespace FreeFileSync;
@@ -168,7 +167,7 @@ wxString FreeFileSync::getDescription(CompareFilesResult cmpRes)
     case FILE_RIGHT_NEWER:
         return _("Files that exist on both sides, right one is newer");
     case FILE_DIFFERENT:
-        return _("Files that exist on both sides and have different content");
+        return _("Files that have different content");
     case FILE_EQUAL:
         return _("Files that are equal on both sides");
     case FILE_CONFLICT:

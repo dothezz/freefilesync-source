@@ -36,7 +36,7 @@ std::vector<FreeFileSync::FolderPairCfg> FreeFileSync::extractCompareCfg(const M
                     mainCfg.additionalPairs.begin(), //add additional pairs
                     mainCfg.additionalPairs.end());
 
-    const BaseFilter::FilterRef globalFilter(new NameFilter(mainCfg.includeFilter, mainCfg.excludeFilter));
+    const BaseFilter::FilterRef globalFilter(new NameFilter(mainCfg.globalFilter.includeFilter, mainCfg.globalFilter.excludeFilter));
 
     std::vector<FolderPairCfg> output;
     for (std::vector<FolderPairEnh>::const_iterator i = allPairs.begin(); i != allPairs.end(); ++i)
@@ -44,13 +44,11 @@ std::vector<FreeFileSync::FolderPairCfg> FreeFileSync::extractCompareCfg(const M
             FolderPairCfg(i->leftDirectory,
                           i->rightDirectory,
 
-                          mainCfg.filterIsActive ?
                           combineFilters(globalFilter,
                                          BaseFilter::FilterRef(
                                              new NameFilter(
                                                      i->localFilter.includeFilter,
-                                                     i->localFilter.excludeFilter))) :
-                          BaseFilter::FilterRef(new NullFilter),
+                                                     i->localFilter.excludeFilter))),
 
                           i->altSyncConfig.get() ? i->altSyncConfig->syncConfiguration : mainCfg.syncConfiguration));
 
@@ -75,9 +73,9 @@ public:
 
     virtual ~DirCallback() {}
 
-    virtual ReturnValue onFile(const DefaultChar* shortName, const Zstring& fullName, const FileInfo& details);
-    virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName);
-    virtual ReturnValue onError(const wxString& errorText);
+    virtual ReturnValue  onFile(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink, const FileInfo& details);
+    virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink);
+    virtual ReturnValue  onError(const wxString& errorText);
 
 private:
     BaseDirCallback* const baseCallback_;
@@ -93,17 +91,23 @@ class BaseDirCallback : public DirCallback
     friend class DirCallback;
 public:
     BaseDirCallback(DirContainer& output,
+                    bool processSymlinks,
+                    bool traverseDirSymlinks,
                     const BaseFilter::FilterRef& filter,
                     StatusHandler* handler) :
         DirCallback(this, Zstring(), output, handler),
+        processSymlinks_(processSymlinks),
+        traverseDirSymlinks_(traverseDirSymlinks),
         textScanning(wxToZ(wxString(_("Scanning:")) + wxT(" \n"))),
         filterInstance(filter) {}
 
-    virtual TraverseCallback::ReturnValue onFile(const DefaultChar* shortName, const Zstring& fullName, const TraverseCallback::FileInfo& details);
+    virtual TraverseCallback::ReturnValue onFile(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink, const TraverseCallback::FileInfo& details);
 
 private:
     typedef boost::shared_ptr<const DirCallback> CallbackPointer;
 
+    bool processSymlinks_;
+    bool traverseDirSymlinks_;
     const Zstring textScanning;
     std::vector<CallbackPointer> callBackBox;  //collection of callback pointers to handle ownership
 
@@ -111,7 +115,7 @@ private:
 };
 
 
-TraverseCallback::ReturnValue DirCallback::onFile(const DefaultChar* shortName, const Zstring& fullName, const FileInfo& details)
+TraverseCallback::ReturnValue DirCallback::onFile(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink, const FileInfo& details)
 {
     //assemble status message (performance optimized)  = textScanning + wxT("\"") + fullName + wxT("\"")
     Zstring statusText = baseCallback_->textScanning;
@@ -124,6 +128,12 @@ TraverseCallback::ReturnValue DirCallback::onFile(const DefaultChar* shortName, 
     statusHandler->updateStatusText(statusText);
 
 //------------------------------------------------------------------------------------
+    if (isSymlink && !baseCallback_->processSymlinks_) //handle symbolic links
+    {
+        statusHandler->requestUiRefresh();
+        return TRAVERSING_CONTINUE;
+    }
+
     //apply filter before processing (use relative name!)
     if (!baseCallback_->filterInstance->passFileFilter(relNameParentPf_ + shortName))
     {
@@ -152,7 +162,7 @@ TraverseCallback::ReturnValue DirCallback::onFile(const DefaultChar* shortName, 
 }
 
 
-TraverseCallback::ReturnValDir DirCallback::onDir(const DefaultChar* shortName, const Zstring& fullName)
+TraverseCallback::ReturnValDir DirCallback::onDir(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink)
 {
     using globalFunctions::FILE_NAME_SEPARATOR;
 
@@ -167,6 +177,20 @@ TraverseCallback::ReturnValDir DirCallback::onDir(const DefaultChar* shortName, 
     statusHandler->updateStatusText(statusText);
 
 //------------------------------------------------------------------------------------
+
+    bool traverseSubdirs = true;
+
+    if (isSymlink) //handle symbolic links
+    {
+        if  (!baseCallback_->processSymlinks_)
+        {
+            statusHandler->requestUiRefresh();
+            return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //do NOT traverse subdirs
+        }
+        else
+            traverseSubdirs = baseCallback_->traverseDirSymlinks_;
+    }
+
     Zstring relName = relNameParentPf_;
     relName += shortName;
 
@@ -180,11 +204,15 @@ TraverseCallback::ReturnValDir DirCallback::onDir(const DefaultChar* shortName, 
         {
             DirContainer& subDir = output_.addSubDir(shortName);
 
-            DirCallback* subDirCallback = new DirCallback(baseCallback_, relName += FILE_NAME_SEPARATOR, subDir, statusHandler);
-            baseCallback_->callBackBox.push_back(BaseDirCallback::CallbackPointer(subDirCallback)); //handle ownership
-
-            //attention: ensure directory filtering is applied later to exclude actually filtered directories
-            return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), subDirCallback);
+            if (traverseSubdirs)
+            {
+                DirCallback* subDirCallback = new DirCallback(baseCallback_, relName += FILE_NAME_SEPARATOR, subDir, statusHandler);
+                baseCallback_->callBackBox.push_back(BaseDirCallback::CallbackPointer(subDirCallback)); //handle ownership
+                //attention: ensure directory filtering is applied later to exclude actually filtered directories
+                return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), subDirCallback);
+            }
+            else
+                return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>();
         }
         else
             return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //do NOT traverse subdirs
@@ -198,10 +226,15 @@ TraverseCallback::ReturnValDir DirCallback::onDir(const DefaultChar* shortName, 
     //trigger display refresh
     statusHandler->requestUiRefresh();
 
-    DirCallback* subDirCallback = new DirCallback(baseCallback_, relName += FILE_NAME_SEPARATOR, subDir, statusHandler);
-    baseCallback_->callBackBox.push_back(BaseDirCallback::CallbackPointer(subDirCallback)); //handle ownership
+    if (traverseSubdirs)
+    {
+        DirCallback* subDirCallback = new DirCallback(baseCallback_, relName += FILE_NAME_SEPARATOR, subDir, statusHandler);
+        baseCallback_->callBackBox.push_back(BaseDirCallback::CallbackPointer(subDirCallback)); //handle ownership
 
-    return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), subDirCallback);
+        return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), subDirCallback);
+    }
+    else
+        return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>();
 }
 
 
@@ -225,13 +258,14 @@ TraverseCallback::ReturnValue DirCallback::onError(const wxString& errorText)
 TraverseCallback::ReturnValue BaseDirCallback::onFile(
     const DefaultChar* shortName,
     const Zstring& fullName,
+    bool isSymlink,
     const TraverseCallback::FileInfo& details)
 {
     //do not list the database file(s) sync.ffs_db, sync.x64.ffs_db, etc.
     if (Zstring(shortName).AfterLast(DefaultChar('.')).cmpFileName(DefaultStr("ffs_db")) == 0)
         return TraverseCallback::TRAVERSING_CONTINUE;
 
-    return DirCallback::onFile(shortName, fullName, details);
+    return DirCallback::onFile(shortName, fullName, isSymlink, details);
 }
 
 
@@ -263,10 +297,12 @@ struct DirBufferKey
 class CompareProcess::DirectoryBuffer  //buffer multiple scans of the same directories
 {
 public:
-    DirectoryBuffer(const bool traverseDirectorySymlinks,
+    DirectoryBuffer(bool processSymLinks,
+                    bool traverseDirectorySymlinks,
                     StatusHandler* statusUpdater) :
-        m_traverseDirectorySymlinks(traverseDirectorySymlinks),
-        m_statusUpdater(statusUpdater) {}
+        processSymLinks_(processSymLinks),
+        traverseDirectorySymlinks_(traverseDirectorySymlinks),
+        statusUpdater_(statusUpdater) {}
 
     const DirContainer& getDirectoryDescription(const Zstring& directoryPostfixed, const BaseFilter::FilterRef& filter);
 
@@ -278,8 +314,9 @@ private:
 
     BufferType buffer;
 
-    const bool m_traverseDirectorySymlinks;
-    StatusHandler* m_statusUpdater;
+    const bool processSymLinks_;
+    const bool traverseDirectorySymlinks_;
+    StatusHandler* statusUpdater_;
 };
 //------------------------------------------------------------------------------------------
 
@@ -288,16 +325,16 @@ DirContainer& CompareProcess::DirectoryBuffer::insertIntoBuffer(const DirBufferK
     DirBufferValue baseContainer(new DirContainer);
     buffer.insert(std::make_pair(newKey, baseContainer));
 
-    if (FreeFileSync::dirExists(newKey.directoryName.c_str())) //folder existence already checked in startCompareProcess(): do not treat as error when arriving here!
+    if (FreeFileSync::dirExists(newKey.directoryName)) //folder existence already checked in startCompareProcess(): do not treat as error when arriving here!
     {
         std::auto_ptr<TraverseCallback> traverser(new BaseDirCallback(*baseContainer,
+                processSymLinks_,
+                traverseDirectorySymlinks_,
                 newKey.filter,
-                m_statusUpdater));
+                statusUpdater_));
 
         //get all files and folders from directoryPostfixed (and subdirectories)
-        traverseFolder(newKey.directoryName,
-                       m_traverseDirectorySymlinks,
-                       traverser.get()); //exceptions may be thrown!
+        traverseFolder(newKey.directoryName, traverser.get()); //exceptions may be thrown!
     }
     return *baseContainer.get();
 }
@@ -318,6 +355,8 @@ const DirContainer& CompareProcess::DirectoryBuffer::getDirectoryDescription(
 
 
 //------------------------------------------------------------------------------------------
+namespace
+{
 void foldersAreValidForComparison(const std::vector<FolderPairCfg>& folderPairsForm, StatusHandler* statusUpdater)
 {
     bool checkEmptyDirnameActive = true; //check for empty dirs just once
@@ -347,7 +386,7 @@ void foldersAreValidForComparison(const std::vector<FolderPairCfg>& folderPairsF
 
         //check if folders exist
         if (!i->leftDirectory.empty())
-            while (!FreeFileSync::dirExists(i->leftDirectory.c_str()))
+            while (!FreeFileSync::dirExists(i->leftDirectory))
             {
                 ErrorHandler::Response rv = statusUpdater->reportError(wxString(_("Directory does not exist:")) + wxT(" \n") +
                                             wxT("\"") + zToWx(i->leftDirectory) + wxT("\"") + wxT("\n\n") +
@@ -361,7 +400,7 @@ void foldersAreValidForComparison(const std::vector<FolderPairCfg>& folderPairsF
             }
 
         if (!i->rightDirectory.empty())
-            while (!FreeFileSync::dirExists(i->rightDirectory.c_str()))
+            while (!FreeFileSync::dirExists(i->rightDirectory))
             {
                 ErrorHandler::Response rv = statusUpdater->reportError(wxString(_("Directory does not exist:")) + wxT("\n") +
                                             wxT("\"") + zToWx(i->rightDirectory) + wxT("\"") + wxT("\n\n") +
@@ -417,21 +456,6 @@ bool foldersHaveDependencies(const std::vector<FolderPairCfg>& folderPairsFrom, 
     }
 
     return false;
-}
-
-
-CompareProcess::CompareProcess(const bool traverseSymLinks,
-                               const unsigned int fileTimeTol,
-                               const bool ignoreOneHourDiff,
-                               xmlAccess::OptionalDialogs& warnings,
-                               StatusHandler* handler) :
-    fileTimeTolerance(fileTimeTol),
-    ignoreOneHourDifference(ignoreOneHourDiff),
-    m_warnings(warnings),
-    statusUpdater(handler),
-    txtComparingContentOfFiles(wxToZ(_("Comparing content of files %x")).Replace(DefaultStr("%x"), DefaultStr("\n\"%x\""), false))
-{
-    directoryBuffer.reset(new DirectoryBuffer(traverseSymLinks, handler));
 }
 
 
@@ -505,12 +529,15 @@ public:
 
     void execute(HierarchyObject& hierObj)
     {
+        HierarchyObject::SubDirMapping& subDirs = hierObj.useSubDirs();
+
         //process subdirs recursively
-        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), *this);
+        std::for_each(subDirs.begin(), subDirs.end(), *this);
 
         //remove superfluous directories
-        hierObj.useSubDirs().erase(std::remove_if(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(),
-                                   ::ToBeRemoved()), hierObj.useSubDirs().end());
+        subDirs.erase(
+            std::remove_if(subDirs.begin(), subDirs.end(), ::ToBeRemoved()),
+            subDirs.end());
     }
 
 private:
@@ -527,18 +554,32 @@ private:
 };
 
 
-inline
 void formatPair(FolderPairCfg& input)
 {
     //ensure they end with globalFunctions::FILE_NAME_SEPARATOR and replace macros
     input.leftDirectory  = FreeFileSync::getFormattedDirectoryName(input.leftDirectory);
     input.rightDirectory = FreeFileSync::getFormattedDirectoryName(input.rightDirectory);
 }
-
-
+}
 
 
 //#############################################################################################################################
+
+CompareProcess::CompareProcess(bool processSymLinks,
+                               bool traverseSymLinks,
+                               size_t fileTimeTol,
+                               bool ignoreOneHourDiff,
+                               xmlAccess::OptionalDialogs& warnings,
+                               StatusHandler* handler) :
+    fileTimeTolerance(fileTimeTol),
+    ignoreOneHourDifference(ignoreOneHourDiff),
+    m_warnings(warnings),
+    statusUpdater(handler),
+    txtComparingContentOfFiles(wxToZ(_("Comparing content of files %x")).Replace(DefaultStr("%x"), DefaultStr("\n\"%x\""), false))
+{
+    directoryBuffer.reset(new DirectoryBuffer(processSymLinks, traverseSymLinks, handler));
+}
+
 
 void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& directoryPairs,
         const CompareVariant cmpVar,
@@ -562,8 +603,8 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& direc
     //check if folders are valid
     foldersAreValidForComparison(directoryPairsFormatted, statusUpdater);
 
-    //check if folders have dependencies
     {
+        //check if folders have dependencies
         wxString warningMessage;
         if (foldersHaveDependencies(directoryPairsFormatted, warningMessage))
             statusUpdater->reportWarning(warningMessage.c_str(), m_warnings.warningDependentFolders);
@@ -623,13 +664,13 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& direc
         //note: output mustn't change during this process to be in sync with GUI grid view!!!
         output_tmp.swap(output);
     }
+    catch (const std::bad_alloc& e)
+    {
+        statusUpdater->reportFatalError(wxString(_("System out of memory!")) + wxT(" ") + wxString::FromAscii(e.what()));
+    }
     catch (const std::exception& e)
     {
-        if (dynamic_cast<const std::bad_alloc*>(&e) != NULL)
-            statusUpdater->reportFatalError(wxString(_("System out of memory!")) + wxT(" ") + wxString::FromAscii(e.what()));
-        else
-            statusUpdater->reportFatalError(wxString::FromAscii(e.what()));
-        return; //should be obsolete!
+        statusUpdater->reportFatalError(wxString::FromAscii(e.what()));
     }
 }
 
@@ -640,7 +681,7 @@ wxString getConflictInvalidDate(const Zstring& fileNameFull, const wxLongLong& u
 {
     wxString msg = _("File %x has an invalid date!");
     msg.Replace(wxT("%x"), wxString(wxT("\"")) + zToWx(fileNameFull) + wxT("\""));
-    msg += wxString(wxT("\n\n")) + _("Date") + wxT(": ") + utcTimeToLocalString(utcTime, fileNameFull);
+    msg += wxString(wxT("\n\n")) + _("Date") + wxT(": ") + utcTimeToLocalString(utcTime);
     return wxString(_("Conflict detected:")) + wxT("\n") + msg;
 }
 
@@ -668,10 +709,10 @@ wxString getConflictSameDateDiffSize(const FileMapping& fileObj)
     wxString msg = _("Files %x have the same date but a different size!");
     msg.Replace(wxT("%x"), wxString(wxT("\"")) + zToWx(fileObj.getRelativeName<LEFT_SIDE>()) + wxT("\""));
     msg += wxT("\n\n");
-    msg += left + wxT("\t") + _("Date") + wxT(": ") + utcTimeToLocalString(fileObj.getLastWriteTime<LEFT_SIDE>(),
-            fileObj.getFullName<LEFT_SIDE>()) + wxT(" \t") + _("Size") + wxT(": ") + fileObj.getFileSize<LEFT_SIDE>().ToString() + wxT("\n");
-    msg += right + wxT("\t") + _("Date") + wxT(": ") + utcTimeToLocalString(fileObj.getLastWriteTime<RIGHT_SIDE>(),
-            fileObj.getFullName<RIGHT_SIDE>()) + wxT(" \t") + _("Size") + wxT(": ") + fileObj.getFileSize<RIGHT_SIDE>().ToString();
+    msg += left + wxT("\t") + _("Date") + wxT(": ") + utcTimeToLocalString(fileObj.getLastWriteTime<LEFT_SIDE>()) +
+           wxT(" \t") + _("Size") + wxT(": ") + fileObj.getFileSize<LEFT_SIDE>().ToString() + wxT("\n");
+    msg += right + wxT("\t") + _("Date") + wxT(": ") + utcTimeToLocalString(fileObj.getLastWriteTime<RIGHT_SIDE>()) +
+           wxT(" \t") + _("Size") + wxT(": ") + fileObj.getFileSize<RIGHT_SIDE>().ToString();
     return wxString(_("Conflict detected:")) + wxT("\n") + msg;
 }
 
@@ -688,14 +729,14 @@ wxString getConflictChangeWithinHour(const FileMapping& fileObj)
     msg += wxString(wxT("\n")) + _("(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)");
     msg.Replace(wxT("%x"), wxString(wxT("\"")) + zToWx(fileObj.getRelativeName<LEFT_SIDE>()) + wxT("\""));
     msg += wxT("\n\n");
-    msg += left + wxT("\t") + _("Date") + wxT(": ") + utcTimeToLocalString(fileObj.getLastWriteTime<LEFT_SIDE>(), fileObj.getFullName<LEFT_SIDE>()) + wxT("\n");
-    msg += right + wxT("\t") + _("Date") + wxT(": ") + utcTimeToLocalString(fileObj.getLastWriteTime<RIGHT_SIDE>(), fileObj.getFullName<RIGHT_SIDE>());
+    msg += left + wxT("\t") + _("Date") + wxT(": ") + utcTimeToLocalString(fileObj.getLastWriteTime<LEFT_SIDE>()) + wxT("\n");
+    msg += right + wxT("\t") + _("Date") + wxT(": ") + utcTimeToLocalString(fileObj.getLastWriteTime<RIGHT_SIDE>());
     return wxString(_("Conflict detected:")) + wxT("\n") + msg;
 }
 
 //-----------------------------------------------------------------------------
 inline
-bool sameFileTime(const wxLongLong& a, const wxLongLong& b, const unsigned int tolerance)
+bool sameFileTime(const wxLongLong& a, const wxLongLong& b, size_t tolerance)
 {
     if (a < b)
         return b <= a + tolerance;
@@ -952,6 +993,8 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
     //3. entries may be deleted but NEVER new ones inserted!!!
     //=> this allows for a quasi-binary search by id!
 
+    //HierarchyObject::addSubFile() must not invalidate references used in "appendUndefined"! Currently a std::list, so no problem.
+
     //reserve() fulfills two task here: 1. massive performance improvement! 2. ensure references in appendUndefined remain valid!
     output.useSubFiles().reserve(leftSide.fileCount() + rightSide.fileCount()); //assume worst case!
     output.useSubDirs(). reserve(leftSide.dirCount()  + rightSide.dirCount());  //
@@ -966,8 +1009,12 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
         //find files that exist on left and right
         else
         {
-            appendUndefined.push_back(
-                &output.addSubFile(i->second.getData(), i->first, FILE_EQUAL, rightFile->getData())); //FILE_EQUAL is just a dummy-value here
+            FileMapping& newEntry = output.addSubFile(
+                                        i->second.getData(),
+                                        i->first,
+                                        FILE_EQUAL, //FILE_EQUAL is just a dummy-value here
+                                        rightFile->getData());
+            appendUndefined.push_back(&newEntry);
         }
     }
 
@@ -1033,4 +1080,3 @@ void CompareProcess::performBaseComparison(BaseDirMapping& output, std::vector<F
 
     MergeSides(appendUndefined).execute(directoryLeft, directoryRight, output);
 }
-
