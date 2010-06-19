@@ -37,7 +37,7 @@ AllocationCount::~AllocationCount()
 
         MessageBox(NULL, wxString(wxT("Memory leak detected!")) + wxT("\n\n")
                    + wxT("Candidates:\n") + leakingStrings,
-                   wxString::Format(wxT("%i"), activeStrings.size()), 0);
+                   wxString::Format(wxT("%u"), activeStrings.size()), 0);
     }
 #else
         throw std::logic_error("Memory leak!");

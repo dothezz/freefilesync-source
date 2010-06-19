@@ -9,12 +9,12 @@
 #include <wx/textctrl.h>
 #include <wx/combobox.h>
 #include <wx/filepicker.h>
-#include "../shared/globalFunctions.h"
-#include "../shared/localization.h"
-#include "../shared/fileHandling.h"
-#include "../shared/stringConv.h"
+#include "localization.h"
+#include "fileHandling.h"
+#include "stringConv.h"
 #include <stdexcept>
-#include "../shared/systemFunctions.h"
+#include "systemFunctions.h"
+#include "checkExist.h"
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -38,54 +38,45 @@ wxString FreeFileSync::formatFilesizeToShortString(double filesize)
     if (filesize < 0)
         return _("Error");
 
-    if (filesize <= 999)
-        return wxString::Format(wxT("%i"), static_cast<int>(filesize)) + _(" Byte"); //no decimal places in case of bytes
+    wxString output = _("%x Byte");
 
-    filesize /= 1024;
-    wxString unit = _(" kB");
     if (filesize > 999)
     {
         filesize /= 1024;
-        unit = _(" MB");
+        output = _("%x kB");
         if (filesize > 999)
         {
             filesize /= 1024;
-            unit = _(" GB");
+            output = _("%x MB");
             if (filesize > 999)
             {
                 filesize /= 1024;
-                unit = _(" TB");
+                output = _("%x GB");
                 if (filesize > 999)
                 {
                     filesize /= 1024;
-                    unit = _(" PB");
+                    output = _("%x TB");
+                    if (filesize > 999)
+                    {
+                        filesize /= 1024;
+                        output = _("%x PB");
+                    }
                 }
             }
         }
+        //print just three significant digits: 0,01 | 0,11 | 1,11 | 11,1 | 111
+        const size_t leadDigitCount = globalFunctions::getDigitCount(static_cast<size_t>(filesize)); //number of digits before decimal point
+        if (leadDigitCount == 0 || leadDigitCount > 3)
+            return _("Error");
+
+        output.Replace(wxT("%x"), wxString::Format(wxT("%.*f"), static_cast<int>(3 - leadDigitCount), filesize));
+    }
+    else
+    {
+        output.Replace(wxT("%x"), globalFunctions::numberToString(static_cast<int>(filesize))); //no decimal places in case of bytes
     }
 
-    //print just three significant digits: 0,01 | 0,11 | 1,11 | 11,1 | 111
-
-    const size_t leadDigitCount = globalFunctions::getDigitCount(static_cast<size_t>(filesize)); //number of digits before decimal point
-    if (leadDigitCount == 0 || leadDigitCount > 3)
-        return _("Error");
-
-//    if (leadDigitCount == 3)
-//        return wxString::Format(wxT("%i"), static_cast<int>(filesize)) + unit;
-//    else if (leadDigitCount == 2)
-//    {
-//        wxString output = wxString::Format(wxT("%i"), static_cast<int>(filesize * 10));
-//        output.insert(leadDigitCount, getDecimalPoint());
-//        return output + unit;
-//    }
-//    else //leadDigitCount == 1
-//    {
-//        wxString output = wxString::Format(wxT("%03i"), static_cast<int>(filesize * 100));
-//        output.insert(leadDigitCount, getDecimalPoint());
-//        return output + unit;
-//    }
-
-    return wxString::Format(wxT("%.*f"), static_cast<int>(3 - leadDigitCount), filesize) + unit;
+    return output;
 }
 
 
@@ -98,37 +89,13 @@ wxString FreeFileSync::formatPercentage(const wxLongLong& dividend, const wxLong
 }
 
 
-namespace
-{
-wxString includeNumberSeparator(const wxString& number)
+wxString FreeFileSync_Impl::includeNumberSeparator(const wxString& number)
 {
     wxString output(number);
     for (size_t i = output.size(); i > 3; i -= 3)
         output.insert(i - 3, FreeFileSync::getThousandsSeparator());
 
     return output;
-}
-}
-
-
-wxString FreeFileSync::numberToWxString(size_t number, bool includeNumberSep)
-{
-    const wxString output = wxString::Format(wxT("%u"), number);
-    return includeNumberSep ? includeNumberSeparator(output) : output;
-}
-
-
-
-wxString FreeFileSync::numberToWxString(int number, bool includeNumberSep)
-{
-    const wxString output = wxString::Format(wxT("%i"), number);
-    return includeNumberSep ? includeNumberSeparator(output) : output;
-}
-
-
-wxString FreeFileSync::numberToWxString(const wxULongLong& number, bool includeNumberSep)
-{
-    return includeNumberSep ? includeNumberSeparator(number.ToString()) : number.ToString();
 }
 
 
@@ -138,9 +105,10 @@ void setDirectoryNameImpl(const wxString& dirname, T* txtCtrl, wxDirPickerCtrl* 
     using namespace FreeFileSync;
 
     txtCtrl->SetValue(dirname);
-    const Zstring leftDirFormatted = FreeFileSync::getFormattedDirectoryName(wxToZ(dirname));
-    if (FreeFileSync::dirExists(leftDirFormatted))
-        dirPicker->SetPath(zToWx(leftDirFormatted));
+    const Zstring dirFormatted = FreeFileSync::getFormattedDirectoryName(wxToZ(dirname));
+
+    if (Utility::dirExists(dirFormatted, 200) == Utility::EXISTING_TRUE) //potentially slow network access: wait 200ms at most
+        dirPicker->SetPath(zToWx(dirFormatted));
 }
 
 
@@ -241,7 +209,7 @@ wxString FreeFileSync::utcTimeToLocalString(const wxLongLong& utcTime)
                                               wxT("(") + wxULongLong(localFileTime.dwHighDateTime, localFileTime.dwLowDateTime).ToString() + wxT(") ") +
                                               wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
 
-    //assemble time string (performance optimized)
+    //assemble time string (performance optimized) -> note: performance argument may not be valid any more
     wxString formattedTime;
     formattedTime.reserve(20);
 

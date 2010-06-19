@@ -38,15 +38,15 @@ public:
 
     void execute(HierarchyObject& hierObj) const
     {
-        //process files
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this);
-        //process directories
-        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), *this);
+        Utility::Proxy<const Redetermine> prx(*this); //grant std::for_each access to private parts of this class
+
+        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //process files
+        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //process links
+        std::for_each(hierObj.useSubDirs().begin(),  hierObj.useSubDirs().end(),  prx); //process directories
     }
 
 private:
-    template<typename Iterator, typename Function>
-    friend Function std::for_each(Iterator, Iterator, Function);
+    friend class Utility::Proxy<const Redetermine>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
 
     void operator()(FileMapping& fileObj) const
     {
@@ -82,6 +82,31 @@ private:
         }
     }
 
+    void operator()(SymLinkMapping& linkObj) const
+    {
+        switch (linkObj.getLinkCategory())
+        {
+        case SYMLINK_LEFT_SIDE_ONLY:
+            linkObj.setSyncDir(config.exLeftSideOnly);
+            break;
+        case SYMLINK_RIGHT_SIDE_ONLY:
+            linkObj.setSyncDir(config.exRightSideOnly);
+            break;
+        case SYMLINK_LEFT_NEWER:
+            linkObj.setSyncDir(config.leftNewer);
+            break;
+        case SYMLINK_RIGHT_NEWER:
+            linkObj.setSyncDir(config.rightNewer);
+            break;
+        case SYMLINK_CONFLICT:
+            linkObj.setSyncDir(config.conflict);
+            break;
+        case SYMLINK_EQUAL:
+            linkObj.setSyncDir(SYNC_DIR_NONE);
+            break;
+        }
+    }
+
     void operator()(DirMapping& dirObj) const
     {
         switch (dirObj.getDirCategory())
@@ -111,14 +136,20 @@ class FindNonEqual //test if non-equal items exist in scanned data
 public:
     bool findNonEqual(const HierarchyObject& hierObj) const
     {
-        return std::find_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this) != hierObj.useSubFiles().end() || //files
-               std::find_if(hierObj.useSubDirs(). begin(), hierObj.useSubDirs(). end(), *this) != hierObj.useSubDirs(). end();   //directories
+        return std::find_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this) != hierObj.useSubFiles().end()  || //files
+               std::find_if(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), *this) != hierObj.useSubLinks(). end() || //symlinks
+               std::find_if(hierObj.useSubDirs(). begin(), hierObj.useSubDirs(). end(), *this) != hierObj.useSubDirs(). end();    //directories
     }
 
     //logical private! => __find_if (used by std::find_if) needs public access
     bool operator()(const FileMapping& fileObj) const
     {
         return fileObj.getCategory() != FILE_EQUAL;
+    }
+
+    bool operator()(const SymLinkMapping& linkObj) const
+    {
+        return linkObj.getLinkCategory() != SYMLINK_EQUAL;
     }
 
     bool operator()(const DirMapping& dirObj) const
@@ -225,7 +256,91 @@ private:
 };
 
 
-//-----------------------------------
+//--------------------------------------------------------------------
+class DataSetSymlink
+{
+public:
+    DataSetSymlink(const SymLinkMapping& linkObj, Loki::Int2Type<LEFT_SIDE>)
+    {
+        init<LEFT_SIDE>(linkObj);
+    }
+
+    DataSetSymlink(const SymLinkMapping& linkObj, Loki::Int2Type<RIGHT_SIDE>)
+    {
+        init<RIGHT_SIDE>(linkObj);
+    }
+
+    DataSetSymlink(const SymLinkContainer* linkCont)
+    {
+        if (linkCont)
+        {
+            const LinkDescriptor& dbData = linkCont->getData();
+            data.lastWriteTime = &dbData.lastWriteTimeRaw;
+            data.targetPath    = &dbData.targetPath;
+#ifdef FFS_WIN //type of symbolic link is relevant for Windows only
+            data.type = dbData.type;
+#endif
+        }
+    }
+
+    bool operator==(const DataSetSymlink& other) const
+    {
+        if (data.lastWriteTime == NULL) //implicit test if object is existing at all
+            return other.data.lastWriteTime == NULL;
+        else
+        {
+            if (other.data.lastWriteTime == NULL)
+                return false;
+            else
+            {
+                //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
+                return *data.targetPath == *other.data.targetPath &&
+#ifdef FFS_WIN //comparison of symbolic link type is relevant for Windows only
+                       data.type == other.data.type &&
+#endif
+                       (!data.targetPath->empty() || ::sameFileTime(*data.lastWriteTime, *other.data.lastWriteTime, 2)); //date may be ignored, if targetPaths can actually be considered
+            }
+        }
+    }
+
+    template <class T>
+    bool operator!=(const T& other) const
+    {
+        return !(*this == other);
+    }
+
+private:
+    template <SelectedSide side>
+    void init(const SymLinkMapping& linkObj)
+    {
+        if (!linkObj.isEmpty<side>())
+        {
+            data.lastWriteTime = &linkObj.getLastWriteTime<side>();
+            data.targetPath    = &linkObj.getTargetPath<side>();
+#ifdef FFS_WIN //type of symbolic link is relevant for Windows only
+            data.type = linkObj.getLinkType<side>();
+#endif
+        }
+    }
+
+    struct DataReferences
+    {
+        DataReferences() :
+#ifdef FFS_WIN //type of symbolic link is relevant for Windows only
+            type(LinkDescriptor::TYPE_FILE),
+#endif
+            lastWriteTime(NULL), targetPath(NULL) {}
+
+#ifdef FFS_WIN
+        LinkDescriptor::LinkType type;
+#endif
+        const wxLongLong* lastWriteTime; //use to test for overall object existence!
+        const Zstring* targetPath;
+    } data;
+};
+
+
+//--------------------------------------------------------------------
 class DataSetDir
 {
 public:
@@ -264,6 +379,15 @@ DataSetFile retrieveDataSetFile(const Zstring& objShortName, const DirContainer*
     return DataSetFile(NULL);
 }
 
+DataSetSymlink retrieveDataSetSymlink(const Zstring& objShortName, const DirContainer* dbDirectory)
+{
+    if (dbDirectory)
+        return dbDirectory->findLink(objShortName); //return value may be NULL
+
+    //object not found
+    return DataSetSymlink(NULL);
+}
+
 
 std::pair<DataSetDir, const DirContainer*> retrieveDataSetDir(const Zstring& objShortName, const DirContainer* dbDirectory)
 {
@@ -288,15 +412,15 @@ public:
 
     void execute(HierarchyObject& hierObj) const
     {
-        //files
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this);
-        //directories
-        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), *this);
+        Utility::Proxy<const SetDirChangedFilter> prx(*this); //grant std::for_each access to private parts of this class
+
+        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //process files
+        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //process links
+        std::for_each(hierObj.useSubDirs().begin(),  hierObj.useSubDirs().end(),  prx); //process directories
     }
 
 private:
-    template<typename Iterator, typename Function>
-    friend Function std::for_each(Iterator, Iterator, Function);
+    friend class Utility::Proxy<const SetDirChangedFilter>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
 
     void operator()(FileMapping& fileObj) const
     {
@@ -311,6 +435,21 @@ private:
             fileObj.setSyncDir(SYNC_DIR_LEFT);
         else
             fileObj.setSyncDirConflict(txtFilterChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+    }
+
+    void operator()(SymLinkMapping& linkObj) const
+    {
+        const CompareSymlinkResult cat = linkObj.getLinkCategory();
+
+        if (cat == SYMLINK_EQUAL)
+            return;
+
+        if (cat == SYMLINK_LEFT_SIDE_ONLY)
+            linkObj.setSyncDir(SYNC_DIR_RIGHT);
+        else if (cat == SYMLINK_RIGHT_SIDE_ONLY)
+            linkObj.setSyncDir(SYNC_DIR_LEFT);
+        else
+            linkObj.setSyncDirConflict(txtFilterChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
     }
 
     void operator()(DirMapping& dirObj) const
@@ -341,6 +480,7 @@ public:
     bool conflictFound(const HierarchyObject& hierObj) const
     {
         return std::find_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this) != hierObj.useSubFiles().end() || //files
+               std::find_if(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), *this) != hierObj.useSubLinks().end() || //symlinks
                std::find_if(hierObj.useSubDirs(). begin(), hierObj.useSubDirs(). end(), *this) != hierObj.useSubDirs(). end();   //directories
     }
 
@@ -438,19 +578,19 @@ private:
     }
 
 
-    bool filterConflictFound(const FileMapping& fileObj) const
+    bool filterFileConflictFound(const Zstring& shortname) const
     {
         //if filtering would have excluded file during database creation, then we can't say anything about its former state
-        return (dbFilterLeft  && !dbFilterLeft ->passFileFilter(fileObj.getObjShortName())) ||
-               (dbFilterRight && !dbFilterRight->passFileFilter(fileObj.getObjShortName()));
+        return (dbFilterLeft  && !dbFilterLeft ->passFileFilter(shortname)) ||
+               (dbFilterRight && !dbFilterRight->passFileFilter(shortname));
     }
 
 
-    bool filterConflictFound(const DirMapping& dirObj) const
+    bool filterDirConflictFound(const Zstring& shortname) const
     {
         //if filtering would have excluded directory during database creation, then we can't say anything about its former state
-        return (dbFilterLeft  && !dbFilterLeft ->passDirFilter(dirObj.getObjShortName(), NULL)) ||
-               (dbFilterRight && !dbFilterRight->passDirFilter(dirObj.getObjShortName(), NULL));
+        return (dbFilterLeft  && !dbFilterLeft ->passDirFilter(shortname, NULL)) ||
+               (dbFilterRight && !dbFilterRight->passDirFilter(shortname, NULL));
     }
 
 
@@ -465,6 +605,9 @@ private:
         //process files
         std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(),
                       boost::bind(&RedetermineAuto::processFile, this, _1, dbDirectoryLeft, dbDirectoryRight));
+        //process symbolic links
+        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(),
+                      boost::bind(&RedetermineAuto::processSymlink, this, _1, dbDirectoryLeft, dbDirectoryRight));
         //process directories
         std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(),
                       boost::bind(&RedetermineAuto::processDir, this, _1, dbDirectoryLeft, dbDirectoryRight));
@@ -494,7 +637,7 @@ private:
         //#####################################################################################################
 
 
-        if (filterConflictFound(fileObj))
+        if (filterFileConflictFound(fileObj.getObjShortName()))
         {
             if (cat == FILE_LEFT_SIDE_ONLY)
                 fileObj.setSyncDir(SYNC_DIR_RIGHT);
@@ -550,13 +693,70 @@ private:
     }
 
 
+    void processSymlink(SymLinkMapping& linkObj,
+                        const DirContainer* dbDirectoryLeft,
+                        const DirContainer* dbDirectoryRight)
+    {
+        const CompareSymlinkResult cat = linkObj.getLinkCategory();
+        if (cat == SYMLINK_EQUAL)
+            return;
+
+        if (filterFileConflictFound(linkObj.getObjShortName())) //always use file filter: Link type may not be "stable" on Linux!
+        {
+            if (cat == SYMLINK_LEFT_SIDE_ONLY)
+                linkObj.setSyncDir(SYNC_DIR_RIGHT);
+            else if (cat == SYMLINK_RIGHT_SIDE_ONLY)
+                linkObj.setSyncDir(SYNC_DIR_LEFT);
+            else
+                linkObj.setSyncDirConflict(txtFilterChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+            return;
+        }
+
+        //determine datasets for change detection
+        const DataSetSymlink dataDbLeft  = retrieveDataSetSymlink(linkObj.getObjShortName(), dbDirectoryLeft);
+        const DataSetSymlink dataDbRight = retrieveDataSetSymlink(linkObj.getObjShortName(), dbDirectoryRight);
+
+        const DataSetSymlink dataCurrentLeft( linkObj, Loki::Int2Type<LEFT_SIDE>());
+        const DataSetSymlink dataCurrentRight(linkObj, Loki::Int2Type<RIGHT_SIDE>());
+
+        //evaluation
+        const bool changeOnLeft  = dataDbLeft  != dataCurrentLeft;
+        const bool changeOnRight = dataDbRight != dataCurrentRight;
+
+        if (dataDbLeft == dataDbRight) //last sync seems to have been successful
+        {
+            if (changeOnLeft)
+            {
+                if (changeOnRight)
+                    linkObj.setSyncDirConflict(txtBothSidesChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                else
+                    linkObj.setSyncDir(SYNC_DIR_RIGHT);
+            }
+            else
+            {
+                if (changeOnRight)
+                    linkObj.setSyncDir(SYNC_DIR_LEFT);
+                else
+                    linkObj.setSyncDirConflict(txtNoSideChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+            }
+        }
+        else //object did not complete last sync
+        {
+            if (changeOnLeft && changeOnRight)
+                linkObj.setSyncDirConflict(txtBothSidesChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+            else
+                linkObj.setSyncDirConflict(txtLastSyncFail);   //set syncDir = SYNC_DIR_INT_CONFLICT
+        }
+    }
+
+
     void processDir(DirMapping& dirObj,
                     const DirContainer* dbDirectoryLeft,
                     const DirContainer* dbDirectoryRight)
     {
         const CompareDirResult cat = dirObj.getDirCategory();
 
-        if (filterConflictFound(dirObj))
+        if (filterDirConflictFound(dirObj.getObjShortName()))
         {
             switch (cat)
             {
@@ -567,7 +767,7 @@ private:
                 dirObj.setSyncDir(SYNC_DIR_LEFT);
                 break;
             case DIR_EQUAL:
-                ; //assert(false);
+                ;
             }
 
             SetDirChangedFilter().execute(dirObj); //filter issue for this directory => treat subfiles/-dirs the same
@@ -697,20 +897,26 @@ public:
 
     void execute(HierarchyObject& hierObj) const
     {
-        //directories
-        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), *this);
-        //files
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this);
+        Utility::Proxy<const SetNewDirection> prx(*this); //grant std::for_each access to private parts of this class
+
+        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //process files
+        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //process links
+        std::for_each(hierObj.useSubDirs().begin(),  hierObj.useSubDirs().end(),  prx); //process directories
     }
 
 private:
-    template<typename Iterator, typename Function>
-    friend Function std::for_each(Iterator, Iterator, Function);
+    friend class Utility::Proxy<const SetNewDirection>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
 
     void operator()(FileMapping& fileObj) const
     {
         if (fileObj.getCategory() != FILE_EQUAL)
             fileObj.setSyncDir(newDirection_);
+    }
+
+    void operator()(SymLinkMapping& linkObj) const
+    {
+        if (linkObj.getLinkCategory() != SYMLINK_EQUAL)
+            linkObj.setSyncDir(newDirection_);
     }
 
     void operator()(DirMapping& dirObj) const
@@ -729,9 +935,20 @@ void FreeFileSync::setSyncDirectionRec(SyncDirection newDirection, FileSystemObj
     if (fsObj.getCategory() != FILE_EQUAL)
         fsObj.setSyncDir(newDirection);
 
-    DirMapping* dirObj = dynamic_cast<DirMapping*>(&fsObj);
-    if (dirObj) //process subdirectories also!
-        SetNewDirection(newDirection).execute(*dirObj);
+    //process subdirectories also!
+    struct Recurse: public FSObjectVisitor
+    {
+        Recurse(SyncDirection newDirect) : newDirection_(newDirect) {}
+        virtual void visit(const FileMapping& fileObj) {}
+        virtual void visit(const SymLinkMapping& linkObj) {}
+        virtual void visit(const DirMapping& dirObj)
+        {
+            SetNewDirection(newDirection_).execute(const_cast<DirMapping&>(dirObj)); //phyiscal object is not const in this method anyway
+        }
+private:
+        const SyncDirection newDirection_;
+    } recurse(newDirection);
+    fsObj.accept(recurse);
 }
 
 
@@ -748,17 +965,24 @@ public:
 
     void execute(FreeFileSync::HierarchyObject& hierObj) const //don't create ambiguity by replacing with operator()
     {
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this); //files
-        std::for_each(hierObj.useSubDirs(). begin(), hierObj.useSubDirs().end(),  *this); //directories
+        Utility::Proxy<const InOrExcludeAllRows<include> > prx(*this); //grant std::for_each access to private parts of this class
+
+        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //process files
+        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //process links
+        std::for_each(hierObj.useSubDirs().begin(),  hierObj.useSubDirs().end(),  prx); //process directories
     }
 
 private:
-    template<typename Iterator, typename Function>
-    friend Function std::for_each(Iterator, Iterator, Function);
+    friend class Utility::Proxy<const InOrExcludeAllRows<include> >; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
 
     void operator()(FreeFileSync::FileMapping& fileObj) const
     {
         fileObj.setActive(include);
+    }
+
+    void operator()(FreeFileSync::SymLinkMapping& linkObj) const
+    {
+        linkObj.setActive(include);
     }
 
     void operator()(FreeFileSync::DirMapping& dirObj) const
@@ -782,17 +1006,36 @@ void FreeFileSync::setActiveStatus(bool newStatus, FreeFileSync::FileSystemObjec
 {
     fsObj.setActive(newStatus);
 
-    DirMapping* dirObj = dynamic_cast<DirMapping*>(&fsObj);
-    if (dirObj) //process subdirectories also!
+//process subdirectories also!
+    struct Recurse: public FSObjectVisitor
     {
-        if (newStatus)
-            InOrExcludeAllRows<true>().execute(*dirObj);
-        else
-            InOrExcludeAllRows<false>().execute(*dirObj);
-    }
+        Recurse(bool newStat) : newStatus_(newStat) {}
+        virtual void visit(const FileMapping& fileObj) {}
+        virtual void visit(const SymLinkMapping& linkObj) {}
+        virtual void visit(const DirMapping& dirObj)
+        {
+            if (newStatus_)
+                InOrExcludeAllRows<true>().execute(const_cast<DirMapping&>(dirObj)); //object is not physically const here anyway
+            else
+                InOrExcludeAllRows<false>().execute(const_cast<DirMapping&>(dirObj)); //
+        }
+private:
+        const bool newStatus_;
+    } recurse(newStatus);
+    fsObj.accept(recurse);
 }
 
+namespace
+{
+enum FilterStrategy
+{
+    STRATEGY_ALL,
+    STRATEGY_ACTIVE_ONLY
+    //STRATEGY_INACTIVE_ONLY -> logical conflict with InOrExcludeAllRows<false>
+};
 
+
+template <FilterStrategy strategy>
 class FilterData
 {
 public:
@@ -800,21 +1043,28 @@ public:
 
     void execute(FreeFileSync::HierarchyObject& hierObj) const
     {
-        //files
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this);
+        Utility::Proxy<const FilterData> prx(*this); //grant std::for_each access to private parts of this class
 
-        //directories
-        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), *this);
+        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //files
+        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //symlinks
+        std::for_each(hierObj.useSubDirs(). begin(), hierObj.useSubDirs(). end(), prx); //directories
     };
 
 private:
-    template<typename Iterator, typename Function>
-    friend Function std::for_each(Iterator, Iterator, Function);
+    friend class Utility::Proxy<const FilterData>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
 
+    bool processObject(FreeFileSync::FileSystemObject& fsObj) const;
 
     void operator()(FreeFileSync::FileMapping& fileObj) const
     {
-        fileObj.setActive(filterProc.passFileFilter(fileObj.getObjRelativeName()));
+        if (processObject(fileObj))
+            fileObj.setActive(filterProc.passFileFilter(fileObj.getObjRelativeName()));
+    }
+
+    void operator()(FreeFileSync::SymLinkMapping& linkObj) const
+    {
+        if (processObject(linkObj))
+            linkObj.setActive(filterProc.passFileFilter(linkObj.getObjRelativeName()));
     }
 
     void operator()(FreeFileSync::DirMapping& dirObj) const
@@ -822,21 +1072,42 @@ private:
         bool subObjMightMatch = true;
         const bool filterPassed = filterProc.passDirFilter(dirObj.getObjRelativeName(), &subObjMightMatch);
 
-        dirObj.setActive(filterPassed);
+        if (processObject(dirObj))
+            dirObj.setActive(filterPassed);
 
-        if (subObjMightMatch) //use same logic like directory traversing here: evaluate filter in subdirs only if objects could match
-            execute(dirObj);  //recursion
-        else
+        if (!subObjMightMatch) //use same logic like directory traversing here: evaluate filter in subdirs only if objects could match
+        {
             InOrExcludeAllRows<false>().execute(dirObj); //exclude all files dirs in subfolders
+            return;
+        }
+
+        execute(dirObj);  //recursion
     }
 
     const BaseFilter& filterProc;
 };
 
 
-void FreeFileSync::applyFiltering(const BaseFilter& filter, FreeFileSync::BaseDirMapping& baseDirectory)
+template <> //process all elements
+inline
+bool FilterData<STRATEGY_ALL>::processObject(FreeFileSync::FileSystemObject& fsObj) const
 {
-    FilterData(filter).execute(baseDirectory);
+    return true;
+}
+
+template <>
+inline
+bool FilterData<STRATEGY_ACTIVE_ONLY>::processObject(FreeFileSync::FileSystemObject& fsObj) const
+{
+    return fsObj.isActive();
+}
+}
+
+
+void FreeFileSync::addExcludeFiltering(const Zstring& excludeFilter, FolderComparison& folderCmp)
+{
+    for (std::vector<BaseDirMapping>::iterator i = folderCmp.begin(); i != folderCmp.end(); ++i)
+        FilterData<STRATEGY_ACTIVE_ONLY>(*BaseFilter::FilterRef(new NameFilter(DefaultStr("*"), excludeFilter))).execute(*i);
 }
 
 
@@ -862,11 +1133,10 @@ void FreeFileSync::applyFiltering(const MainConfiguration& currentMainCfg, Folde
     {
         BaseDirMapping& baseDirectory = folderCmp[i - allPairs.begin()];
 
-        applyFiltering(*combineFilters(globalFilter,
-                                       BaseFilter::FilterRef(new NameFilter(
-                                               i->localFilter.includeFilter,
-                                               i->localFilter.excludeFilter))),
-                       baseDirectory);
+        FilterData<STRATEGY_ALL>(*combineFilters(globalFilter,
+                                 BaseFilter::FilterRef(new NameFilter(
+                                             i->localFilter.includeFilter,
+                                             i->localFilter.excludeFilter)))).execute(baseDirectory);
     }
 }
 
@@ -952,10 +1222,33 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDeleteOneS
                         FreeFileSync::moveToRecycleBin(fsObj->getFullName<side>());  //throw (FileError)
                     else
                     {
-                        if (isDirectoryMapping(*fsObj))
-                            FreeFileSync::removeDirectory(fsObj->getFullName<side>());
-                        else
-                            FreeFileSync::removeFile(fsObj->getFullName<side>());
+                        //del directories and symlinks
+                        struct DeletePermanently : public FSObjectVisitor
+                        {
+                            virtual void visit(const FileMapping& fileObj)
+                            {
+                                FreeFileSync::removeFile(fileObj.getFullName<side>());
+                            }
+
+                            virtual void visit(const SymLinkMapping& linkObj)
+                            {
+                                switch (linkObj.getLinkType<side>())
+                                {
+                                case LinkDescriptor::TYPE_DIR:
+                                    FreeFileSync::removeDirectory(linkObj.getFullName<side>());
+                                    break;
+                                case LinkDescriptor::TYPE_FILE:
+                                    FreeFileSync::removeFile(linkObj.getFullName<side>());
+                                    break;
+                                }
+                            }
+
+                            virtual void visit(const DirMapping& dirObj)
+                            {
+                                FreeFileSync::removeDirectory(dirObj.getFullName<side>());
+                            }
+                        } delPerm;
+                        fsObj->accept(delPerm);
                     }
 
                     fsObj->removeObject<side>(); //if directory: removes recursively!

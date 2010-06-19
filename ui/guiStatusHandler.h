@@ -59,6 +59,7 @@ public:
     virtual ErrorHandler::Response reportError(const wxString& text);
     virtual void reportFatalError(const wxString& errorMessage);
     virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
+    void reportInfo(const wxString& infoMessage);
 
 private:
     virtual void abortThisProcess();

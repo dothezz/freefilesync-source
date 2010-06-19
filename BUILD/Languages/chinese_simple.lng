@@ -6,10 +6,6 @@
  GB
  MB
  MB
- PB
- PB
- TB
- TB
  day(s)
  日
  hour(s)
@@ -22,12 +18,24 @@
  秒
 %x / %y objects deleted successfully
 %x / %y 个对象被成功删除
+%x Byte
+
+%x GB
+
+%x MB
+
+%x PB
+
+%x TB
+
 %x directories
 %x 目录
-%x files,
-%x 个文件,
+%x files
+%x 个文件
 %x is not a valid FreeFileSync batch file!
 %x 不是有效的 FreeFileSync 批处理文件
+%x kB
+
 %x of %y rows in view
 %x of %y 横向视图
 %x of 1 row in view
@@ -90,6 +98,8 @@
 切换(&S)
 &Yes
 是(&Y)
+(Build: %x)
+
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (请注意只有FAT/FAT32分区受此问题影响!\n在所有其他情况下你可禁用\"忽略一小时差异\"这一选项.)
 (Requires an Internet connection!)
@@ -126,8 +136,8 @@
 /秒
 1 directory
 1 目录
-1 file,
-1 文件,
+1 file
+1 文件
 1. &Compare
 1. 比较(&C)
 1. Enter relative file or directory names separated by ';' or a new line.
@@ -150,6 +160,8 @@
 <目录>
 <Last session>
 <最后会话>
+<Symlink>
+
 <multiple selection>
 <多选>
 A newer version of FreeFileSync is available:
@@ -196,8 +208,6 @@ Browse
 浏览
 Browse directory
 浏览目录
-Build:
-开发:
 Cannot determine sync-direction:
 不能检测同步方向:
 Cannot find %x
@@ -272,10 +282,14 @@ Copy shared or locked files using Volume Shadow Copy Service
 使用卷影复制服务来复制共享或锁定的文件
 Copy to clipboard\tCTRL+C
 复制到剪贴板\tCTRL+C
+Copying Symbolic Link %x overwriting %y
+
+Copying Symbolic Link %x to %y
+
+Copying file %x overwriting %y
+
 Copying file %x to %y
 正复制文件 %x 到 %y
-Copying file %x to %y overwriting target
-复制文件 %x 并覆盖到目标 %y
 Could not determine volume name for file:
 不能确定此文件的卷名称:
 Could not initialize directory monitoring:
@@ -320,6 +334,8 @@ Delete or overwrite files permanently
 永久性删除或覆盖文件
 Delete permanently
 永久性删除
+Deleting Symbolic Link %x
+
 Deleting file %x
 正删除文件 %x
 Deleting folder %x
@@ -328,6 +344,8 @@ Deletion handling
 删除处理
 Description
 描述
+Direct
+
 Directories are dependent! Be careful when setting up synchronization rules:
 目录有依赖性！在设立同步规则时请小心:
 Directories to watch
@@ -340,9 +358,9 @@ Do not show this dialog again
 不要再显示此对话框
 Do nothing
 保持不动
-Do you really want to delete the following objects(s)?
+Do you really want to delete the following object(s)?
 你确定要删除下列对象吗?
-Do you really want to move the following objects(s) to the Recycle Bin?
+Do you really want to move the following object(s) to the Recycle Bin?
 你确定要移动下列对象到回收站吗?
 Do you want FreeFileSync to automatically check for updates every week?
 要让 FreeFileSync 保持每周检查一次更新吗?>
@@ -484,6 +502,8 @@ Find what:
 要查找什么:
 Folder Comparison and Synchronization
 文件夹比较与同步
+Follow
+
 Free disk space available:
 可用磁盘空间:
 FreeFileSync Batch Job
@@ -552,6 +572,8 @@ Identify and propagate changes on both sides using a database. Deletions and con
 使用数据库来识别和传送两边的改变. 自动检测删除和冲突状态.
 If you like FFS
 如果你喜欢 FFS
+Ignore
+
 Ignore 1-hour file time difference
 忽略1小时文件时间差异
 Ignore errors
@@ -560,8 +582,6 @@ Ignore subsequent errors
 忽略随后的错误
 Include
 包括
-Include Symbolic Links
-包含符号连结
 Include all rows
 包括所有行
 Include temporarily
@@ -612,6 +632,8 @@ Move files into a time-stamped subdirectory
 移动文件到时间标记子目录
 Moving %x to Recycle Bin
 移动 %x 到回收站
+Moving Symbolic Link %x to user-defined directory %y
+
 Moving file %x to user-defined directory %y
 移动文件 %x 到用户定义目录 %y
 Moving folder %x to user-defined directory %y
@@ -682,8 +704,6 @@ Remove folder
 删除文件夹
 Remove folder pair
 删除文件夹对
-Renaming file %x to %y
-将 %x 重命名为 %y
 Report translation error
 报告翻译错误
 Reset
@@ -776,6 +796,10 @@ Swap sides
 两侧互换
 Switching to FreeFileSync GUI modus...
 切换至FreeFileSync图形用户界面模块...
+Symbolic Link handling
+
+Symlinks %x have the same date but a different target!
+
 Synchronization Preview
 同步预览
 Synchronization aborted!
@@ -800,8 +824,8 @@ Target directory already existing!
 目标目录已经存在!
 Target file already existing!
 目标文件已经存在!
-The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-有如下情况时此命令行会执行:\n- 一个文件夹变成可用时(例如:插入U盘)\n- 这些文件夹或其子文件夹中的文件被改动
+The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+
 The file does not contain a valid configuration:
 该文件不包含有效的配置:
 The file was not processed by last synchronization!

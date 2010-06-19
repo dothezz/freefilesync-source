@@ -51,6 +51,17 @@ enum CompareDirResult
     DIR_EQUAL           = FILE_EQUAL
 };
 
+//attention make sure these /|\  \|/ two enums match!!!
+enum CompareSymlinkResult
+{
+    SYMLINK_LEFT_SIDE_ONLY  = FILE_LEFT_SIDE_ONLY,
+    SYMLINK_RIGHT_SIDE_ONLY = FILE_RIGHT_SIDE_ONLY,
+    SYMLINK_LEFT_NEWER      = FILE_LEFT_NEWER,
+    SYMLINK_RIGHT_NEWER     = FILE_RIGHT_NEWER,
+    SYMLINK_EQUAL           = FILE_EQUAL,
+    SYMLINK_CONFLICT        = FILE_CONFLICT
+};
+
 
 inline
 CompareFilesResult convertToFilesResult(CompareDirResult value)
@@ -58,6 +69,12 @@ CompareFilesResult convertToFilesResult(CompareDirResult value)
     return static_cast<CompareFilesResult>(value);
 }
 
+
+inline
+CompareFilesResult convertToFilesResult(CompareSymlinkResult value)
+{
+    return static_cast<CompareFilesResult>(value);
+}
 
 
 wxString getDescription(CompareFilesResult cmpRes);
@@ -259,13 +276,19 @@ struct FolderPairEnh //enhanced folder pairs with (optional) alternate configura
 };
 
 
+enum SymLinkHandling
+{
+    SYMLINK_IGNORE,
+    SYMLINK_USE_DIRECTLY,
+    SYMLINK_FOLLOW_LINK
+};
+
+
 struct MainConfiguration
 {
     MainConfiguration() :
         compareVar(CMP_BY_TIME_SIZE),
-        processSymlinks(false),
-        traverseDirectorySymlinks(true),
-        copyFileSymlinks(false),
+        handleSymlinks(SYMLINK_IGNORE),
         globalFilter(DefaultStr("*"), standardExcludeFilter()),
         handleDeletion(MOVE_TO_RECYCLE_BIN) {}
 
@@ -275,9 +298,7 @@ struct MainConfiguration
     //Compare setting
     CompareVariant compareVar;
 
-    bool processSymlinks; //include Symbolic links into file listing at all?
-    bool traverseDirectorySymlinks; //traverse dir symlinks <=> not copying symlink
-    bool copyFileSymlinks; //copy symbolic link instead of target file
+    SymLinkHandling handleSymlinks;
 
     //Synchronisation settings
     SyncConfiguration syncConfiguration;
@@ -298,9 +319,7 @@ struct MainConfiguration
         return firstPair         == other.firstPair         &&
                additionalPairs   == other.additionalPairs   &&
                compareVar        == other.compareVar        &&
-               processSymlinks   == other.processSymlinks   &&
-               traverseDirectorySymlinks == other.traverseDirectorySymlinks &&
-               copyFileSymlinks  == other.copyFileSymlinks  &&
+               handleSymlinks    == other.handleSymlinks    &&
                syncConfiguration == other.syncConfiguration &&
                globalFilter      == other.globalFilter      &&
                hidden            == other.hidden            &&

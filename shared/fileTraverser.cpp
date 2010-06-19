@@ -10,19 +10,20 @@
 #include <wx/intl.h>
 #include "stringConv.h"
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_array.hpp>
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
+#include "WinIoCtl.h"
 #include "longPathPrefix.h"
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
 #include <dirent.h>
-#include <errno.h>
+#include <cerrno>
 #endif
 
 
-#ifdef FFS_WIN
 //Note: this class is superfluous for 64 bit applications!
 //class DisableWow64Redirection
 //{
@@ -54,6 +55,110 @@
 //    PVOID oldValue;
 //};
 
+#ifdef _MSC_VER //I don't have Windows Driver Kit at hands right now, so unfortunately we need to redefine this structures and cross fingers...
+typedef struct _REPARSE_DATA_BUFFER
+{
+    ULONG  ReparseTag;
+    USHORT ReparseDataLength;
+    USHORT Reserved;
+    union
+    {
+        struct
+        {
+            USHORT SubstituteNameOffset;
+            USHORT SubstituteNameLength;
+            USHORT PrintNameOffset;
+            USHORT PrintNameLength;
+            ULONG  Flags;
+            WCHAR  PathBuffer[1];
+        } SymbolicLinkReparseBuffer;
+        struct
+        {
+            USHORT SubstituteNameOffset;
+            USHORT SubstituteNameLength;
+            USHORT PrintNameOffset;
+            USHORT PrintNameLength;
+            WCHAR  PathBuffer[1];
+        } MountPointReparseBuffer;
+        struct
+        {
+            UCHAR DataBuffer[1];
+        } GenericReparseBuffer;
+    };
+} REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
+#define REPARSE_DATA_BUFFER_HEADER_SIZE   FIELD_OFFSET(REPARSE_DATA_BUFFER, GenericReparseBuffer)
+#endif
+
+
+Zstring getSymlinkTarget(const Zstring& linkPath) //throw(); returns empty string on error
+{
+#ifdef FFS_WIN
+//FSCTL_GET_REPARSE_POINT: http://msdn.microsoft.com/en-us/library/aa364571(VS.85).aspx
+
+    const HANDLE hLink = ::CreateFile(linkPath.c_str(),
+                                      GENERIC_READ,
+                                      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                      NULL,
+                                      OPEN_EXISTING,
+                                      FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
+                                      NULL);
+    if (hLink == INVALID_HANDLE_VALUE)
+        return Zstring();
+
+    boost::shared_ptr<void> dummy(hLink, ::CloseHandle);
+
+    //respect alignment issues...
+    const size_t bufferSize = REPARSE_DATA_BUFFER_HEADER_SIZE + MAXIMUM_REPARSE_DATA_BUFFER_SIZE;
+    boost::scoped_array<char> buffer(new char[bufferSize]);
+
+    DWORD bytesReturned; //dummy value required by FSCTL_GET_REPARSE_POINT!
+    if (!::DeviceIoControl(hLink,                   //__in         HANDLE hDevice,
+                           FSCTL_GET_REPARSE_POINT, //__in         DWORD dwIoControlCode,
+                           NULL,                    //__in_opt     LPVOID lpInBuffer,
+                           0,                       //__in         DWORD nInBufferSize,
+                           buffer.get(),            //__out_opt    LPVOID lpOutBuffer,
+                           bufferSize,              //__in         DWORD nOutBufferSize,
+                           &bytesReturned,          //__out_opt    LPDWORD lpBytesReturned,
+                           NULL))                   //__inout_opt  LPOVERLAPPED lpOverlapped
+        return Zstring();
+
+    REPARSE_DATA_BUFFER& reparseData = *reinterpret_cast<REPARSE_DATA_BUFFER*>(buffer.get()); //REPARSE_DATA_BUFFER needs to be artificially enlarged!
+
+    if (reparseData.ReparseTag == IO_REPARSE_TAG_SYMLINK)
+        return Zstring(reparseData.SymbolicLinkReparseBuffer.PathBuffer + reparseData.SymbolicLinkReparseBuffer.SubstituteNameOffset / sizeof(WCHAR),
+                       reparseData.SymbolicLinkReparseBuffer.SubstituteNameLength / sizeof(WCHAR));
+    else if (reparseData.ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
+        return Zstring(reparseData.MountPointReparseBuffer.PathBuffer + reparseData.MountPointReparseBuffer.SubstituteNameOffset / sizeof(WCHAR),
+                       reparseData.MountPointReparseBuffer.SubstituteNameLength / sizeof(WCHAR));
+    else
+        return Zstring(); //unknown reparse point
+
+#elif defined FFS_LINUX
+    const int BUFFER_SIZE = 10000;
+    char buffer[BUFFER_SIZE];
+
+    const int bytesWritten = ::readlink(linkPath.c_str(), buffer, BUFFER_SIZE);
+    if (bytesWritten < 0 || bytesWritten >= BUFFER_SIZE)
+        return Zstring(); //error
+
+    buffer[bytesWritten] = 0; //set null-terminating char
+
+    return buffer;
+#endif
+}
+
+
+#ifdef FFS_WIN
+inline
+wxLongLong getWin32TimeInformation(const FILETIME& lastWriteTime)
+{
+    //convert UTC FILETIME to ANSI C format (number of seconds since Jan. 1st 1970 UTC)
+    wxLongLong writeTimeLong(wxInt32(lastWriteTime.dwHighDateTime), lastWriteTime.dwLowDateTime);
+    writeTimeLong /= 10000000;                    //reduce precision to 1 second (FILETIME has unit 10^-7 s)
+    writeTimeLong -= wxLongLong(2, 3054539008UL); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
+    return writeTimeLong;
+}
+
 
 inline
 void setWin32FileInformation(const FILETIME& lastWriteTime,
@@ -61,12 +166,7 @@ void setWin32FileInformation(const FILETIME& lastWriteTime,
                              const DWORD fileSizeLow,
                              FreeFileSync::TraverseCallback::FileInfo& output)
 {
-    //convert UTC FILETIME to ANSI C format (number of seconds since Jan. 1st 1970 UTC)
-    wxLongLong writeTimeLong(wxInt32(lastWriteTime.dwHighDateTime), lastWriteTime.dwLowDateTime);
-    writeTimeLong /= 10000000;                    //reduce precision to 1 second (FILETIME has unit 10^-7 s)
-    writeTimeLong -= wxLongLong(2, 3054539008UL); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
-    output.lastWriteTimeRaw = writeTimeLong;
-
+    output.lastWriteTimeRaw = getWin32TimeInformation(lastWriteTime);
     output.fileSize = wxULongLong(fileSizeHigh, fileSizeLow);
 }
 
@@ -98,19 +198,15 @@ bool setWin32FileInformationFromSymlink(const Zstring& linkName, FreeFileSync::T
 #endif
 
 
-bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback* sink, const int level)
+template <bool followSymlinks>
+void traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback* sink, int level)
 {
     using namespace FreeFileSync;
 
     if (level == 100) //catch endless recursion
     {
-        switch (sink->onError(wxString(_("Endless loop when traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"")))
-        {
-        case TraverseCallback::TRAVERSING_STOP:
-            return false;
-        case TraverseCallback::TRAVERSING_CONTINUE:
-            return true;
-        }
+        sink->onError(wxString(_("Endless loop when traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\""));
+        return;
     }
 
 #ifdef FFS_WIN
@@ -128,19 +224,14 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
     {
         const DWORD lastError = ::GetLastError();
         if (lastError == ERROR_FILE_NOT_FOUND)
-            return true;
+            return;
 
         //else: we have a problem... report it:
         const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") + wxT("\n\n") +
                                       FreeFileSync::getLastErrorFormatted(lastError);
 
-        switch (sink->onError(errorMessage))
-        {
-        case TraverseCallback::TRAVERSING_STOP:
-            return false;
-        case TraverseCallback::TRAVERSING_CONTINUE:
-            return true;
-        }
+        sink->onError(errorMessage);
+        return;
     }
 
     boost::shared_ptr<void> dummy(searchHandle, ::FindClose);
@@ -149,32 +240,37 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
     {
         //don't return "." and ".."
         const wxChar* const shortName = fileMetaData.cFileName;
-        if (    shortName[0] == wxChar('.') &&
-                ((shortName[1] == wxChar('.') && shortName[2] == wxChar('\0')) ||
-                 shortName[1] == wxChar('\0')))
+        if (     shortName[0] == wxChar('.') &&
+                 ((shortName[1] == wxChar('.') && shortName[2] == wxChar('\0')) ||
+                  shortName[1] == wxChar('\0')))
             continue;
 
         const Zstring fullName = directoryFormatted + shortName;
+
         const bool isSymbolicLink = (fileMetaData.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
 
-        if (fileMetaData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) //a directory... (for directory symlinks this flag is set too!)
+        if (isSymbolicLink && !followSymlinks) //evaluate symlink directly
         {
-            const TraverseCallback::ReturnValDir rv = sink->onDir(shortName, fullName, isSymbolicLink);
+            TraverseCallback::SymlinkInfo details;
+            details.lastWriteTimeRaw = getWin32TimeInformation(fileMetaData.ftLastWriteTime);
+            details.targetPath       = getSymlinkTarget(fullName); //throw(); returns empty string on error
+            details.dirLink          = (fileMetaData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0; //directory symlinks have this flag on Windows
+            sink->onSymlink(shortName, fullName, details);
+        }
+        else if (fileMetaData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) //a directory... or symlink that needs to be followed (for directory symlinks this flag is set too!)
+        {
+            const TraverseCallback::ReturnValDir rv = sink->onDir(shortName, fullName);
             switch (rv.returnCode)
             {
-            case TraverseCallback::ReturnValDir::TRAVERSING_DIR_STOP:
-                return false;
-
             case TraverseCallback::ReturnValDir::TRAVERSING_DIR_IGNORE:
                 break;
 
             case TraverseCallback::ReturnValDir::TRAVERSING_DIR_CONTINUE:
-                if (!traverseDirectory(fullName, rv.subDirCb, level + 1))
-                    return false;
+                traverseDirectory<followSymlinks>(fullName, rv.subDirCb, level + 1);
                 break;
             }
         }
-        else //a file...
+        else //a file or symlink that is followed...
         {
             TraverseCallback::FileInfo details;
 
@@ -190,13 +286,7 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
             else
                 setWin32FileInformation(fileMetaData.ftLastWriteTime, fileMetaData.nFileSizeHigh, fileMetaData.nFileSizeLow, details);
 
-            switch (sink->onFile(shortName, fullName, isSymbolicLink, details))
-            {
-            case TraverseCallback::TRAVERSING_STOP:
-                return false;
-            case TraverseCallback::TRAVERSING_CONTINUE:
-                break;
-            }
+            sink->onFile(shortName, fullName, details);
         }
     }
     while (::FindNextFile(searchHandle,	   // handle to search
@@ -204,30 +294,20 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
 
     const DWORD lastError = ::GetLastError();
     if (lastError == ERROR_NO_MORE_FILES)
-        return true; //everything okay
+        return; //everything okay
 
     //else: we have a problem... report it:
     const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") ;
-    switch (sink->onError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted(lastError)))
-    {
-    case TraverseCallback::TRAVERSING_STOP:
-        return false;
-    case TraverseCallback::TRAVERSING_CONTINUE:
-        return true;
-    }
+    sink->onError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted(lastError));
+    return;
 
 #elif defined FFS_LINUX
     DIR* dirObj = ::opendir(directory.c_str()); //directory must NOT end with path separator, except "/"
     if (dirObj == NULL)
     {
         const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") ;
-        switch (sink->onError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted()))
-        {
-        case TraverseCallback::TRAVERSING_STOP:
-            return false;
-        case TraverseCallback::TRAVERSING_CONTINUE:
-            return true;
-        }
+        sink->onError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
+        return;
     }
 
     boost::shared_ptr<DIR> dummy(dirObj, &::closedir); //never close NULL handles! -> crash
@@ -239,17 +319,12 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
         if (dirEntry == NULL)
         {
             if (errno == 0)
-                return true; //everything okay
+                return; //everything okay
 
             //else: we have a problem... report it:
             const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") ;
-            switch (sink->onError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted()))
-            {
-            case TraverseCallback::TRAVERSING_STOP:
-                return false;
-            case TraverseCallback::TRAVERSING_CONTINUE:
-                return true;
-            }
+            sink->onError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
+            return;
         }
 
         //don't return "." and ".."
@@ -264,80 +339,70 @@ bool traverseDirectory(const Zstring& directory, FreeFileSync::TraverseCallback*
                                  directory + globalFunctions::FILE_NAME_SEPARATOR + shortName;
 
         struct stat fileInfo;
-        if (lstat(fullName.c_str(), &fileInfo) != 0) //lstat() does not resolve symlinks
+        if (::lstat(fullName.c_str(), &fileInfo) != 0) //lstat() does not resolve symlinks
         {
             const wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(fullName) + wxT("\"");
-            switch (sink->onError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted()))
-            {
-            case TraverseCallback::TRAVERSING_STOP:
-                return false;
-            case TraverseCallback::TRAVERSING_CONTINUE:
-                break;
-            }
+            sink->onError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
             continue;
         }
 
         const bool isSymbolicLink = S_ISLNK(fileInfo.st_mode);
-        if (isSymbolicLink) //dereference symbolic links
-        {
-            if (stat(fullName.c_str(), &fileInfo) != 0) //stat() resolves symlinks
-            {
-                //a broken symbolic link
-                TraverseCallback::FileInfo details;
-                details.lastWriteTimeRaw = 0; //we are not interested in the modifiation time of the link
-                details.fileSize         = 0;
 
-                switch (sink->onFile(shortName, fullName, isSymbolicLink, details))
+        if (isSymbolicLink)
+        {
+            if (followSymlinks) //on Linux Symlinks need to be followed to evaluate whether they point to a file or directory
+            {
+                if (::stat(fullName.c_str(), &fileInfo) != 0) //stat() resolves symlinks
                 {
-                case TraverseCallback::TRAVERSING_STOP:
-                    return false;
-                case TraverseCallback::TRAVERSING_CONTINUE:
-                    break;
+                    //a broken symbolic link
+                    TraverseCallback::FileInfo details;
+                    details.lastWriteTimeRaw = 0; //we are not interested in the modifiation time of the link
+                    details.fileSize         = 0;
+                    sink->onFile(shortName, fullName, details); //report broken symlink as file!
+                    continue;
                 }
+            }
+            else //evaluate symlink directly
+            {
+                TraverseCallback::SymlinkInfo details;
+                details.lastWriteTimeRaw = fileInfo.st_mtime; //UTC time(ANSI C format); unit: 1 second
+                details.targetPath       = getSymlinkTarget(fullName); //throw(); returns empty string on error
+                details.dirLink          = ::stat(fullName.c_str(), &fileInfo) == 0 && S_ISDIR(fileInfo.st_mode); //S_ISDIR and S_ISLNK are mutually exclusive on Linux => need to follow link
+                sink->onSymlink(shortName, fullName, details);
                 continue;
             }
         }
 
+        //fileInfo contains dereferenced data in any case from here on
 
-        if (S_ISDIR(fileInfo.st_mode)) //a directory... (note: symbolic links need to be dereferenced to test whether they point to a directory!)
+        if (S_ISDIR(fileInfo.st_mode)) //a directory... cannot be a symlink on Linux in this case
         {
-            const TraverseCallback::ReturnValDir rv = sink->onDir(shortName, fullName, isSymbolicLink);
+            const TraverseCallback::ReturnValDir rv = sink->onDir(shortName, fullName);
             switch (rv.returnCode)
             {
-            case TraverseCallback::ReturnValDir::TRAVERSING_DIR_STOP:
-                return false;
-
             case TraverseCallback::ReturnValDir::TRAVERSING_DIR_IGNORE:
                 break;
 
             case TraverseCallback::ReturnValDir::TRAVERSING_DIR_CONTINUE:
-                if (!traverseDirectory(fullName, rv.subDirCb, level + 1))
-                    return false;
+                traverseDirectory<followSymlinks>(fullName, rv.subDirCb, level + 1);
                 break;
             }
         }
-        else //a file...
+        else //a file... (or symlink; pathological!)
         {
             TraverseCallback::FileInfo details;
             details.lastWriteTimeRaw = fileInfo.st_mtime; //UTC time(ANSI C format); unit: 1 second
             details.fileSize         = fileInfo.st_size;
 
-            switch (sink->onFile(shortName, fullName, isSymbolicLink, details))
-            {
-            case TraverseCallback::TRAVERSING_STOP:
-                return false;
-            case TraverseCallback::TRAVERSING_CONTINUE:
-                break;
-            }
+            sink->onFile(shortName, fullName, details);
         }
     }
 #endif
-
-    return true; //dummy value
 }
 
 
 void FreeFileSync::traverseFolder(const Zstring& directory,
+                                  bool followSymlinks,
                                   TraverseCallback* sink)
 {
 #ifdef FFS_WIN
@@ -349,5 +414,8 @@ void FreeFileSync::traverseFolder(const Zstring& directory,
         directory;
 #endif
 
-    traverseDirectory(directoryFormatted, sink, 0);
+    if (followSymlinks)
+        traverseDirectory<true>(directoryFormatted, sink, 0);
+    else
+        traverseDirectory<false>(directoryFormatted, sink, 0);
 }

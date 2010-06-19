@@ -7,7 +7,7 @@
 #include "dllLoader.h"
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include <map>
-#include <assert.h>
+#include <cassert>
 
 namespace
 {

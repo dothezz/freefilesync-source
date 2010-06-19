@@ -13,6 +13,8 @@
 #include <wx/filename.h>
 #include "fileHandling.h"
 #include "stringConv.h"
+#include "checkExist.h"
+
 
 //define new event type
 const wxEventType FFS_DROP_FILE_EVENT = wxNewEventType();
@@ -128,7 +130,8 @@ void DragDropOnMainDlg::OnFilesDropped(FFSFileDropEvent& event)
 void DragDropOnMainDlg::OnWriteDirManually(wxCommandEvent& event)
 {
     const Zstring newDir = getFormattedDirectoryName(wxToZ(event.GetString()));
-    if (dirExists(newDir))
+
+    if (Utility::dirExists(newDir, 100) == Utility::EXISTING_TRUE) //potentially slow network access: wait 100 ms at most
         dirPicker_->SetPath(zToWx(newDir));
 
     event.Skip();
@@ -196,7 +199,7 @@ void DragDropOnDlg::OnFilesDropped(FFSFileDropEvent& event)
 void DragDropOnDlg::OnWriteDirManually(wxCommandEvent& event)
 {
     const Zstring newDir = FreeFileSync::getFormattedDirectoryName(wxToZ(event.GetString()));
-    if (dirExists(newDir))
+    if (Utility::dirExists(newDir, 100) == Utility::EXISTING_TRUE) //potentially slow network access: wait 100 ms at most
         dirPicker_->SetPath(zToWx(newDir));
 
     event.Skip();
@@ -210,4 +213,3 @@ void DragDropOnDlg::OnDirSelected(wxFileDirPickerEvent& event)
 
     event.Skip();
 }
-

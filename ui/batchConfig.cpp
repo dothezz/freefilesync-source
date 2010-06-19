@@ -7,6 +7,7 @@
 #include "batchConfig.h"
 #include "../shared/xmlBase.h"
 #include "folderPair.h"
+#include <iterator>
 #include <wx/wupdlock.h>
 #include "../shared/helpProvider.h"
 #include "../shared/fileHandling.h"
@@ -252,9 +253,7 @@ void BatchDialog::OnCmpSettings(wxCommandEvent& event)
 
     if (FreeFileSync::showCompareCfgDialog(windowPos,
                                            localBatchCfg.mainCfg.compareVar,
-                                           localBatchCfg.mainCfg.processSymlinks,
-                                           localBatchCfg.mainCfg.traverseDirectorySymlinks,
-                                           localBatchCfg.mainCfg.copyFileSymlinks) == DefaultReturnCode::BUTTON_OKAY)
+                                           localBatchCfg.mainCfg.handleSymlinks) == DefaultReturnCode::BUTTON_OKAY)
     {
         updateGui();
     }

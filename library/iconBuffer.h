@@ -7,14 +7,9 @@
 #ifndef ICONBUFFER_H_INCLUDED
 #define ICONBUFFER_H_INCLUDED
 
-#ifndef FFS_WIN
-header should be used in the windows build only!
-#endif
-
 #include <vector>
 #include "../shared/zstring.h"
 #include <memory>
-#include <boost/shared_ptr.hpp>
 
 class wxCriticalSection;
 class wxIcon;
@@ -32,24 +27,27 @@ public:
     bool requestFileIcon(const Zstring& fileName, wxIcon* icon = NULL); //returns false if icon is not in buffer
     void setWorkload(const std::vector<Zstring>& load); //(re-)set new workload of icons to be retrieved;
 
-    static const int    ICON_SIZE   = 16;  //size in pixel
-    static const size_t BUFFER_SIZE = 800; //maximum number if icons to buffer
+#ifdef FFS_WIN
+    static const int ICON_SIZE = 16;  //size in pixel
+#elif defined FFS_LINUX
+    static const int ICON_SIZE = 24;  //size in pixel
+#endif
 
 private:
     IconBuffer();
     ~IconBuffer();
 
-    class WorkerThread;
-    friend class WorkerThread;
+    static const size_t BUFFER_SIZE = 800; //maximum number of icons to buffer
 
     class IconDB;
     class IconHolder;
     class IconDbSequence;
-    typedef boost::shared_ptr<IconHolder> CountedIconPtr;
-
 
     //methods used by worker thread
-    void insertIntoBuffer(const DefaultChar* entryName, IconHolder& icon); //icon is invalidated by this call!!
+    void insertIntoBuffer(const DefaultChar* entryName, const IconHolder& icon);
+
+    static IconHolder getAssociatedIcon(const Zstring& filename);
+    static IconHolder getAssociatedIconByExt(const Zstring& extension);
 
 //---------------------- Shared Data -------------------------
     std::auto_ptr<wxCriticalSection> lockIconDB;
@@ -57,7 +55,8 @@ private:
     std::auto_ptr<IconDbSequence> bufSequence; //save sequence of buffer entry to delete oldest elements (implicitly shared by sharing Zstring with IconDB!!!)
 //------------------------------------------------------------
 
-    std::auto_ptr<WorkerThread> worker;
+    class WorkerThread;
+    WorkerThread* worker; //detached thread => destroys itself
 };
 }
 

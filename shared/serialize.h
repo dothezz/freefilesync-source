@@ -32,16 +32,15 @@ protected:
     ReadInputStream(wxInputStream& stream, const wxString& errorObjName) : stream_(stream), errorObjName_(errorObjName) {}
 
     template <class T>
-    T readNumberC(); //throw FileError(), checked read operation
+    T readNumberC() const; //throw FileError(), checked read operation
 
-    Zstring readStringC(); //throw FileError(), checked read operation
+    Zstring readStringC() const; //throw FileError(), checked read operation
 
     typedef boost::shared_ptr<std::vector<char> > CharArray;
-    CharArray readArrayC(); //throw FileError()
+    CharArray readArrayC() const; //throw FileError()
 
-    void check();
+    void check() const;
 
-protected:
     wxInputStream& getStream()
     {
         return stream_;
@@ -49,7 +48,7 @@ protected:
 
 private:
     wxInputStream& stream_;
-    void throwReadError();  //throw FileError()
+    void throwReadError() const;  //throw FileError()
     const wxString& errorObjName_; //used for error text only
 };
 
@@ -60,15 +59,14 @@ protected:
     WriteOutputStream(const wxString& errorObjName, wxOutputStream& stream) : stream_(stream), errorObjName_(errorObjName) {}
 
     template <class T>
-    void writeNumberC(T number); //throw FileError(), checked write operation
+    void writeNumberC(T number) const; //throw FileError(), checked write operation
 
-    void writeStringC(const Zstring& str); //throw FileError(), checked write operation
+    void writeStringC(const Zstring& str) const; //throw FileError(), checked write operation
 
-    void writeArrayC(const std::vector<char>& buffer); //throw FileError()
+    void writeArrayC(const std::vector<char>& buffer) const; //throw FileError()
 
-    void check();
+    void check() const;
 
-protected:
     wxOutputStream& getStream()
     {
         return stream_;
@@ -76,7 +74,7 @@ protected:
 
 private:
     wxOutputStream& stream_;
-    void throwWriteError();  //throw FileError()
+    void throwWriteError() const;  //throw FileError()
     const wxString& errorObjName_; //used for error text only!
 };
 
@@ -155,7 +153,7 @@ void writeString(wxOutputStream& stream, const Zstring& str)  //write string to 
 
 
 inline
-void ReadInputStream::check()
+void ReadInputStream::check() const
 {
     if (stream_.GetLastError() != wxSTREAM_NO_ERROR)
         throwReadError();
@@ -164,7 +162,7 @@ void ReadInputStream::check()
 
 template <class T>
 inline
-T ReadInputStream::readNumberC() //checked read operation
+T ReadInputStream::readNumberC() const //checked read operation
 {
     T output = readNumber<T>(stream_);
     check();
@@ -173,7 +171,7 @@ T ReadInputStream::readNumberC() //checked read operation
 
 
 inline
-Zstring ReadInputStream::readStringC() //checked read operation
+Zstring ReadInputStream::readStringC() const //checked read operation
 {
     Zstring output = readString(stream_);
     check();
@@ -183,7 +181,7 @@ Zstring ReadInputStream::readStringC() //checked read operation
 
 template <class T>
 inline
-void WriteOutputStream::writeNumberC(T number) //checked write operation
+void WriteOutputStream::writeNumberC(T number) const //checked write operation
 {
     writeNumber<T>(stream_, number);
     check();
@@ -191,7 +189,7 @@ void WriteOutputStream::writeNumberC(T number) //checked write operation
 
 
 inline
-void WriteOutputStream::writeStringC(const Zstring& str) //checked write operation
+void WriteOutputStream::writeStringC(const Zstring& str) const //checked write operation
 {
     writeString(stream_, str);
     check();
@@ -200,7 +198,7 @@ void WriteOutputStream::writeStringC(const Zstring& str) //checked write operati
 
 
 inline
-void WriteOutputStream::check()
+void WriteOutputStream::check() const
 {
     if (stream_.GetLastError() != wxSTREAM_NO_ERROR)
         throwWriteError();

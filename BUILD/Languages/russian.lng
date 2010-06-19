@@ -6,10 +6,6 @@
  ГБ
  MB
  МБ
- PB
- ПБ
- TB
- ТБ
  day(s)
  день(ей)
  hour(s)
@@ -22,12 +18,24 @@
  сек.
 %x / %y objects deleted successfully
 %x / %y объектов удалено удачно
+%x Byte
+
+%x GB
+
+%x MB
+
+%x PB
+
+%x TB
+
 %x directories
 %x папки
-%x files,
-%x файл(ов),
+%x files
+%x файл(ов)
 %x is not a valid FreeFileSync batch file!
 %x не корректный файл пакетного задания FreeFileSync!
+%x kB
+
 %x of %y rows in view
 %x из %y строк(и) показано
 %x of 1 row in view
@@ -90,6 +98,8 @@
 
 &Yes
 &Да
+(Build: %x)
+
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Помните, что только диски FAT/FAT32 страдают от этой проблемы!\nВо всех остальных случаях вы можете отключить параметр \"игнорировать 1-часовую разницу\".)
 (Requires an Internet connection!)
@@ -126,8 +136,8 @@
 /сек.
 1 directory
 1 папка
-1 file,
-1 файл,
+1 file
+1 файл
 1. &Compare
 1. &Сравнить
 1. Enter relative file or directory names separated by ';' or a new line.
@@ -150,6 +160,8 @@
 <Папка>
 <Last session>
 <Последняя сессия>
+<Symlink>
+
 <multiple selection>
 <групповое выделение>
 A newer version of FreeFileSync is available:
@@ -196,8 +208,6 @@ Browse
 Обзор
 Browse directory
 
-Build:
-Сборка:
 Cannot determine sync-direction:
 Невозможно определить направление синхронизации:
 Cannot find %x
@@ -272,10 +282,14 @@ Copy shared or locked files using Volume Shadow Copy Service
 Копировать общие или заблокированные файлы с помощью Службы Теневого Копирования Тома
 Copy to clipboard\tCTRL+C
 Копировать в буфер обмена\tCTRL+C
+Copying Symbolic Link %x overwriting %y
+
+Copying Symbolic Link %x to %y
+
+Copying file %x overwriting %y
+
 Copying file %x to %y
 Копирование файла %x в %y
-Copying file %x to %y overwriting target
-Копирование файла %x в %y с заменой
 Could not determine volume name for file:
 Не удалось определить название тома для файла:
 Could not initialize directory monitoring:
@@ -320,6 +334,8 @@ Delete or overwrite files permanently
 Удалять или перезаписать файлы, не помещая в "Корзину"
 Delete permanently
 Удалять, не помещая в "Корзину"
+Deleting Symbolic Link %x
+
 Deleting file %x
 Удаление файла %x
 Deleting folder %x
@@ -328,6 +344,8 @@ Deletion handling
 Настройки удаления
 Description
 Описание
+Direct
+
 Directories are dependent! Be careful when setting up synchronization rules:
 Зависимые папки! Будьте внимательны при настройке правил синхронизации:
 Directories to watch
@@ -340,9 +358,9 @@ Do not show this dialog again
 Больше не показывать это окно
 Do nothing
 Ничего не делать
-Do you really want to delete the following objects(s)?
+Do you really want to delete the following object(s)?
 Вы действительно хотите удалить следующие объекты?
-Do you really want to move the following objects(s) to the Recycle Bin?
+Do you really want to move the following object(s) to the Recycle Bin?
 Вы действительно хотите отправить следующие объекты в "Корзину"?
 Do you want FreeFileSync to automatically check for updates every week?
 Вы хотите, чтобы FreeFileSync автоматически проверял наличие обновлений каждую неделю?
@@ -484,6 +502,8 @@ Find what:
 Найти:
 Folder Comparison and Synchronization
 Сравнение и синхронизация
+Follow
+
 Free disk space available:
 Доступно свободного места на диске:
 FreeFileSync Batch Job
@@ -552,6 +572,8 @@ Identify and propagate changes on both sides using a database. Deletions and con
 Выявление и распространение изменений на обеих сторонах с использованием базы данных. Удаленные файлы и конфликты определяются автоматически.
 If you like FFS
 Если Вам понравился FFS
+Ignore
+
 Ignore 1-hour file time difference
 Игнорировать 1-часовую разницу во времени
 Ignore errors
@@ -560,8 +582,6 @@ Ignore subsequent errors
 Игнорировать последующие ошибки
 Include
 Включить
-Include Symbolic Links
-
 Include all rows
 Отметить все
 Include temporarily
@@ -612,6 +632,8 @@ Move files into a time-stamped subdirectory
 Переместить файлы во временно-отмеченную подпапку
 Moving %x to Recycle Bin
 Отправка %x в "Корзину"
+Moving Symbolic Link %x to user-defined directory %y
+
 Moving file %x to user-defined directory %y
 Перемещение файла %x в заданную пользователем папку %y
 Moving folder %x to user-defined directory %y
@@ -682,8 +704,6 @@ Remove folder
 Удалить папку
 Remove folder pair
 Удалить пару папок
-Renaming file %x to %y
-Переименование файла %x в %y
 Report translation error
 Сообщить об ошибке перевода
 Reset
@@ -776,6 +796,10 @@ Swap sides
 Поменять направление
 Switching to FreeFileSync GUI modus...
 
+Symbolic Link handling
+
+Symlinks %x have the same date but a different target!
+
 Synchronization Preview
 Предпросмотр синхронизации
 Synchronization aborted!
@@ -800,8 +824,8 @@ Target directory already existing!
 Конечная папка уже существует!
 Target file already existing!
 Конечный файл уже существует!
-The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-Командная строка выполняется, если:\n- папка становится доступной (например, при подключении USB флеш-накопителя);\n- файлы в обозначенных папках или подпапках были изменены.
+The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+
 The file does not contain a valid configuration:
 Файл не содержит действительную конфигурацию:
 The file was not processed by last synchronization!

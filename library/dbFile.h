@@ -13,7 +13,13 @@ namespace FreeFileSync
 {
 void saveToDisk(const BaseDirMapping& baseMapping); //throw (FileError)
 
+struct DirInformation
+{
+    BaseFilter::FilterRef filter; //filter settings (used when retrieving directory data)
+    DirContainer baseDirContainer; //hierarchical directory information
+};
 typedef boost::shared_ptr<const DirInformation> DirInfoPtr;
+
 std::pair<DirInfoPtr, DirInfoPtr> loadFromDisk(const BaseDirMapping& baseMapping); //throw (FileError) -> return value always bound!
 }
 

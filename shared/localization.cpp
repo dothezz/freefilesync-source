@@ -46,6 +46,18 @@ const std::vector<FreeFileSync::LocInfoLine>& LocalizationInfo::getMapping()
 }
 
 
+namespace
+{
+struct CompareByName
+{
+    bool operator()(const FreeFileSync::LocInfoLine& lhs, const FreeFileSync::LocInfoLine& rhs) const
+    {
+        return lhs.languageName < rhs.languageName;
+    }
+};
+}
+
+
 LocalizationInfo::LocalizationInfo()
 {
     FreeFileSync::LocInfoLine newEntry;
@@ -176,11 +188,32 @@ LocalizationInfo::LocalizationInfo()
     newEntry.languageFlag   = wxT("turkey.png");
     locMapping.push_back(newEntry);
 
+//    newEntry.languageID     = wxLANGUAGE_HEBREW;
+//    newEntry.languageName   = wxT("עִבְרִית");
+//    newEntry.languageFile   = wxT("hebrew.lng");
+//    newEntry.translatorName = wxT("Moshe Olshevsky");
+//    newEntry.languageFlag   = wxT("isreal.png");
+//    locMapping.push_back(newEntry);
+
+//    newEntry.languageID     = wxLANGUAGE_ARABIC;
+//    newEntry.languageName   = wxT("العربية");
+//    newEntry.languageFile   = wxT("arabic.lng");
+//    newEntry.translatorName = wxT("Yousef Shamshoum");
+//    newEntry.languageFlag   = wxT("arabic-language.png");
+//    locMapping.push_back(newEntry);
+
     newEntry.languageID     = wxLANGUAGE_JAPANESE;
     newEntry.languageName   = wxT("日本語");
     newEntry.languageFile   = wxT("japanese.lng");
     newEntry.translatorName = wxT("Tilt");
     newEntry.languageFlag   = wxT("japan.png");
+    locMapping.push_back(newEntry);
+
+    newEntry.languageID     = wxLANGUAGE_CHINESE_TRADITIONAL;
+    newEntry.languageName   = wxT("正體中文");
+    newEntry.languageFile   = wxT("chinese_traditional.lng");
+    newEntry.translatorName = wxT("Carlos");
+    newEntry.languageFlag   = wxT("taiwan.png");
     locMapping.push_back(newEntry);
 
     newEntry.languageID     = wxLANGUAGE_CHINESE_SIMPLIFIED;
@@ -190,12 +223,7 @@ LocalizationInfo::LocalizationInfo()
     newEntry.languageFlag   = wxT("china.png");
     locMapping.push_back(newEntry);
 
-    newEntry.languageID     = wxLANGUAGE_CHINESE_TRADITIONAL;
-    newEntry.languageName   = wxT("正體中文");
-    newEntry.languageFile   = wxT("chinese_traditional.lng");
-    newEntry.translatorName = wxT("Carlos");
-    newEntry.languageFlag   = wxT("taiwan.png");
-    locMapping.push_back(newEntry);
+    //std::sort(locMapping.begin(), locMapping.end(), CompareByName());
 }
 
 
@@ -278,7 +306,7 @@ int mapLanguageDialect(const int language)
         //case wxLANGUAGE_PORTUGUESE:
         //case wxLANGUAGE_PORTUGUESE_BRAZILIAN:
 
-        //variants of wxLANGUAGE_ARABIC -> needed to detect RTL languages
+        //variants of wxLANGUAGE_ARABIC (also needed to detect RTL languages)
     case wxLANGUAGE_ARABIC_ALGERIA:
     case wxLANGUAGE_ARABIC_BAHRAIN:
     case wxLANGUAGE_ARABIC_EGYPT:
@@ -335,16 +363,16 @@ CustomLocale::CustomLocale() :
     translationDB(new Translation),
     currentLanguage(wxLANGUAGE_ENGLISH)
 {
-    //avoid RTL mirroring (for now) by mapping Hebrew and Arabic to English
-    const int mappedSystemLang = mapLanguageDialect(wxLocale::GetSystemLanguage());
-    const bool isRTLLanguage = mappedSystemLang == wxLANGUAGE_HEBREW ||
-                               mappedSystemLang == wxLANGUAGE_ARABIC;
-    Init(isRTLLanguage ? wxLANGUAGE_ENGLISH : wxLANGUAGE_DEFAULT); //setting a different language needn't be supported on all systems!
+    Init(wxLANGUAGE_DEFAULT); //setting a different language needn't be supported on all systems!
 
     //actually these two parameters are language dependent, but we take system setting to handle all kinds of language derivations
     const lconv* localInfo = localeconv();
     THOUSANDS_SEPARATOR = wxString::FromUTF8(localInfo->thousands_sep);
     DECIMAL_POINT       = wxString::FromUTF8(localInfo->decimal_point);
+
+    // why not working?
+    // THOUSANDS_SEPARATOR = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).thousands_sep();
+    // DECIMAL_POINT       = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).decimal_point();
 }
 
 
@@ -503,9 +531,6 @@ void CustomLocale::setLanguage(const int language)
     }
     else
         ;   //if languageFile is empty texts will be english per default
-
-    //static const wxString dummy1 = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).decimal_point();
-    //static const wxString dummy2 = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).thousands_sep();
 }
 
 

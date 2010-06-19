@@ -1,15 +1,11 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port od GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI ogrodje\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
  Byte
- Byte
+ Bajt
  GB
  GB
  MB
  MB
- PB
- PB
- TB
- TB
  day(s)
  dni
  hour(s)
@@ -22,12 +18,24 @@
  sek
 %x / %y objects deleted successfully
 %x / %y objektov uspešno izbrisanih
+%x Byte
+%x Bajt
+%x GB
+%x GB
+%x MB
+%x MB
+%x PB
+%x PB
+%x TB
+%x TB
 %x directories
 %x imeniki
-%x files,
-%x datoteke,
+%x files
+%x datoteke
 %x is not a valid FreeFileSync batch file!
 %x ni veljavna FreeFileSync batch datoteka!
+%x kB
+%x kB
 %x of %y rows in view
 %x od %y vrstic prikazanih
 %x of 1 row in view
@@ -90,6 +98,8 @@ Na&loži konfiguracijo...
 &Zamenjaj
 &Yes
 &Da
+(Build: %x)
+(Izgradnja: %x)
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Vedite, da samo na pogonih s FAT/FAT32 lahko pride do teh težav!\nV vseh drugih primerih lahko onemogočite nastavitev \"prezri 1-urno razliko\".)
 (Requires an Internet connection!)
@@ -126,8 +136,8 @@ Duplikat z druge strani od %name
 /sek
 1 directory
 1 imenik
-1 file,
-1 datoteka,
+1 file
+1 datoteka
 1. &Compare
 1. &Primerjaj
 1. Enter relative file or directory names separated by ';' or a new line.
@@ -150,6 +160,8 @@ Duplikat z druge strani od %name
 <Imenik>
 <Last session>
 <Zadnja seja>
+<Symlink>
+<Simbolična povezava>
 <multiple selection>
 <mnogokratna izbira>
 A newer version of FreeFileSync is available:
@@ -157,7 +169,7 @@ Na voljo je nova različica FreeFileSync:
 Abort requested: Waiting for current operation to finish...
 Zahtevana je bila prekinitev: čakam, da se zaključi trenutna operacija...
 Abort synchronization immediately
-Takoj prekimi sinhronizacijo
+Takoj prekini sinhronizacijo
 Aborted
 Prekinitev uspela
 About
@@ -196,8 +208,6 @@ Browse
 Brskaj
 Browse directory
 Brskaj po imeniku
-Build:
-Izgradnja:
 Cannot determine sync-direction:
 Ne morem določiti sinhronizacijske smeri.
 Cannot find %x
@@ -272,10 +282,14 @@ Copy shared or locked files using Volume Shadow Copy Service
 Kopiraj deljene ali zaklenjene datoteke z uporabo servisa Volume Shadow Copy
 Copy to clipboard\tCTRL+C
 Kopiraj v odložišče\tCTRL+C
+Copying Symbolic Link %x overwriting %y
+Kopiram simbolično povezavo %x s prepisovanjem %y
+Copying Symbolic Link %x to %y
+Kopiram simbolično povezavo %x v %y
+Copying file %x overwriting %y
+Kopiram datoteko %x s prepisovanjem %y
 Copying file %x to %y
 Kopiram datoteko %x v %y
-Copying file %x to %y overwriting target
-Kopiram datoteko %x v %y s prepisovanjem cilja
 Could not determine volume name for file:
 Ne morem določiti imena volumna za datoteko:
 Could not initialize directory monitoring:
@@ -299,7 +313,7 @@ D-Klik
 DECISION TREE
 DREVO ODLOČITEV
 Data verification error: Source and target file have different content!
-Napaka pri preverjanju podatkov: izvorna in tarčna datoteka imata različno vsebino!
+Napaka pri preverjanju podatkov: izvorna in ciljna datoteka imata različno vsebino!
 Date
 Datum
 Delay
@@ -320,14 +334,18 @@ Delete or overwrite files permanently
 Trajno izbriši ali prepiši datoteke
 Delete permanently
 Trajno izbriši
+Deleting Symbolic Link %x
+Brisanje simbolične povezave %x
 Deleting file %x
 Brisanje datoteke %x
 Deleting folder %x
 Brisanje mape %x
 Deletion handling
-Postopanje pri brisanju
+Ravnanje pri brisanju
 Description
 Opis
+Direct
+Neposredno
 Directories are dependent! Be careful when setting up synchronization rules:
 Imeniki so v odvisnosti! Bodite pozorni, ko nastavljate sinhronizacijska pravila:
 Directories to watch
@@ -340,9 +358,9 @@ Do not show this dialog again
 Ne prikaži več tega pogovornega okna
 Do nothing
 Ne naredi ničesar
-Do you really want to delete the following objects(s)?
+Do you really want to delete the following object(s)?
 Ali resnično želite izbrisati naslednje objekte?
-Do you really want to move the following objects(s) to the Recycle Bin?
+Do you really want to move the following object(s) to the Recycle Bin?
 Ali resnično želite premakniti naslednje objekte v Koš?
 Do you want FreeFileSync to automatically check for updates every week?
 Ali želite, da FreeFileSync samodejno preverja za posodobitve vsak teden?
@@ -484,6 +502,8 @@ Find what:
 Najdi kaj
 Folder Comparison and Synchronization
 Primerjava in sinhronizacija imenika
+Follow
+Sledi
 Free disk space available:
 Prosti disk, ki je na voljo:
 FreeFileSync Batch Job
@@ -552,6 +572,8 @@ Identify and propagate changes on both sides using a database. Deletions and con
 Prepoznaj in širi spremembe na obeh straneh z uporabo podatkovne baze. Izbrisi in spori so zaznani samodejno.
 If you like FFS
 Če vam je FFS všeč
+Ignore
+Ignoriraj
 Ignore 1-hour file time difference
 Ignoriraj 1-urno časovno razliko
 Ignore errors
@@ -560,8 +582,6 @@ Ignore subsequent errors
 Ignoriraj vse nadaljnje napake
 Include
 Vključi
-Include Symbolic Links
-Vključi simbolične povezave
 Include all rows
 Vključi se vrstice
 Include temporarily
@@ -612,6 +632,8 @@ Move files into a time-stamped subdirectory
 Premakni datoteke v časovno-označen podimenik
 Moving %x to Recycle Bin
 Premikam %x v Koš
+Moving Symbolic Link %x to user-defined directory %y
+Premikam simbolično povezavo %x v uporabniško določen imenik %y
 Moving file %x to user-defined directory %y
 Premikam datoteko %x v uporabniško-določen imenik %y
 Moving folder %x to user-defined directory %y
@@ -682,8 +704,6 @@ Remove folder
 Odstrani v mapo
 Remove folder pair
 Odstrani par imenikov
-Renaming file %x to %y
-Preimenujem datoteko %x v %y
 Report translation error
 Poročaj o napaki prevoda
 Reset
@@ -709,7 +729,7 @@ Izberite mapo
 Select alternate synchronization settings
 Izberite nadomestne nastavitve sinhronizacije
 Select logfile directory:
-Izberite imenik datoteke za beleženje:
+Izberite imenik za datoteko beleženja:
 Select variant:
 Izberite varianto:
 Set direction:
@@ -776,6 +796,10 @@ Swap sides
 Zamenjaj strani
 Switching to FreeFileSync GUI modus...
 Preklapljam v FreeFileSync GUI način...
+Symbolic Link handling
+Rokovanje s simboličnimi povezavami
+Symlinks %x have the same date but a different target!
+Simbolične povezave %x imajo isti datum, vendar različni cilj!
 Synchronization Preview
 Predogled sinhronizacije
 Synchronization aborted!
@@ -800,8 +824,8 @@ Target directory already existing!
 Ciljni imenik že obstaja!
 Target file already existing!
 Ciljna datoteka že obstaja!
-The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-Ukazna vrstica se izvrši vsakič ko:\n- postane imenik na voljo (npr. vstavitem USB ključa)\n- datoteke znotraj teh imenikov ali podimenikov so spremenjene
+The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+Ukazna vrstica se izvrši vsakič ko:\n- vsi imeniki postanejo dostopni (npr. ob vstavitvi USB ključa)\n- so datoteke znotraj teh imenikov in podimenikov spremenjene
 The file does not contain a valid configuration:
 Datoteka ne vsebuje veljavne konfiguracije:
 The file was not processed by last synchronization!

@@ -49,9 +49,7 @@ DefaultReturnCode::Response showSyncPreviewDlg(
 DefaultReturnCode::Response showCompareCfgDialog(
     const wxPoint& position,
     CompareVariant& cmpVar,
-    bool& processSymlinks,
-    bool& traverseDirectorySymlinks,
-    bool& copyFileSymlinks);
+    SymLinkHandling& handleSymlinks);
 
 DefaultReturnCode::Response showGlobalSettingsDlg(xmlAccess::XmlGlobalSettings& globalSettings);
 }

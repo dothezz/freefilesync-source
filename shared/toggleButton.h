@@ -21,7 +21,10 @@ public:
                  const wxValidator& validator = wxDefaultValidator,
                  const wxString&    name = wxButtonNameStr) :
         wxBitmapButton(parent, id, bitmap, pos, size, style, validator, name),
-        active(false) {}
+        active(false)
+    {
+        SetLayoutDirection(wxLayout_LeftToRight); //avoid mirroring RTL languages like Hebrew or Arabic
+    }
 
     void init(const wxBitmap& activeBmp,
               const wxString& activeTooltip,

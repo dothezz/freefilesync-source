@@ -12,7 +12,7 @@
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #elif defined FFS_LINUX
-#include <stdio.h>
+#include <cstdio>
 #endif
 
 #include "zstring.h"

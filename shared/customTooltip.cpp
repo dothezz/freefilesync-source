@@ -10,7 +10,7 @@
 #include <wx/statbmp.h>
 
 
-class PopupFrameGenerated : public wxFrame
+class CustomTooltip::PopupFrameGenerated : public wxFrame
 {
 public:
     PopupFrameGenerated(wxWindow* parent,
@@ -25,7 +25,7 @@ public:
 };
 
 
-PopupFrameGenerated::PopupFrameGenerated(
+CustomTooltip::PopupFrameGenerated::PopupFrameGenerated(
     wxWindow* parent,
     wxWindowID id,
     const wxString& title,
@@ -53,6 +53,10 @@ PopupFrameGenerated::PopupFrameGenerated(
 
 CustomTooltip::CustomTooltip() : tipWindow(new PopupFrameGenerated(NULL)), lastBmp(NULL)
 {
+#ifdef FFS_WIN //neither looks good nor works at all on Linux
+    tipWindow->Disable(); //prevent window stealing focus!
+#endif
+
     hide();
 }
 

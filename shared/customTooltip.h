@@ -9,9 +9,6 @@
 
 #include <wx/frame.h>
 
-class PopupFrameGenerated;
-
-
 class CustomTooltip
 {
 public:
@@ -22,6 +19,7 @@ public:
     void hide();
 
 private:
+    class PopupFrameGenerated;
     PopupFrameGenerated* tipWindow;
     const wxBitmap* lastBmp; //buffer last used bitmap pointer
 };

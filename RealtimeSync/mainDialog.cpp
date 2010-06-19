@@ -141,8 +141,8 @@ void MainDialog::OnShowHelp(wxCommandEvent& event)
 
 void MainDialog::OnMenuAbout(wxCommandEvent& event)
 {
-    //build information
-    wxString build = wxString(wxT("(")) + _("Build:") + wxT(" ") + __TDATE__;
+        //build information
+    wxString build = __TDATE__;
 #if wxUSE_UNICODE
     build += wxT(" - Unicode");
 #else
@@ -151,12 +151,15 @@ void MainDialog::OnMenuAbout(wxCommandEvent& event)
 
     //compile time info about 32/64-bit build
     if (Utility::is64BitBuild)
-        build += wxT(" x64)");
+        build += wxT(" x64");
     else
-        build += wxT(" x86)");
+        build += wxT(" x86");
     assert_static(Utility::is32BitBuild || Utility::is64BitBuild);
 
-    wxMessageDialog* aboutDlg = new wxMessageDialog(this, wxString(wxT("RealtimeSync")) + wxT("\n\n") + build, _("About"), wxOK);
+wxString buildFormatted = _("(Build: %x)");
+buildFormatted.Replace(wxT("%x"), build);
+
+    wxMessageDialog* aboutDlg = new wxMessageDialog(this, wxString(wxT("RealtimeSync")) + wxT("\n\n") + buildFormatted, _("About"), wxOK);
     aboutDlg->ShowModal();
 }
 

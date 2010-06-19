@@ -10,6 +10,7 @@
 #include "../shared/systemConstants.h"
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
+#include <iterator>
 #include <wx/ffile.h>
 #include "../library/customGrid.h"
 #include "../shared/customButton.h"
@@ -48,6 +49,7 @@
 #include "../shared/helpProvider.h"
 #include "isNullFilter.h"
 #include "batchConfig.h"
+#include "../shared/checkExist.h"
 
 using namespace FreeFileSync;
 using FreeFileSync::CustomLocale;
@@ -312,6 +314,21 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
 {
     wxWindowUpdateLocker dummy(this); //avoid display distortion
 
+    //--------- avoid mirroring this dialog in RTL languages like Hebrew or Arabic --------------------
+    m_panelViewFilter->SetLayoutDirection(wxLayout_LeftToRight);
+    m_panelStatusBar->SetLayoutDirection(wxLayout_LeftToRight);
+//           if (GetLayoutDirection() == wxLayout_RightToLeft)
+//{
+//    bSizerGridHolder->Detach(m_panelRight);
+//    bSizerGridHolder->Detach(m_panelLeft);
+//    bSizerGridHolder->Add(m_panelLeft);
+//    bSizerGridHolder->Prepend(m_panelRight);
+//bSizerGridHolder->Fit(this);
+//
+//    bSizerGridHolder->Layout();
+//}
+//------------------------------------------------------------------------------------------------------
+
     globalSettings = &settings;
     gridDataView.reset(new FreeFileSync::GridView);
     contextMenu.reset(new wxMenu); //initialize right-click context menu; will be dynamically re-created on each R-mouse-click
@@ -320,19 +337,18 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
     cleanedUp = false;
     lastSortColumn = -1;
     lastSortGrid = NULL;
-#ifdef FFS_WIN
+
     updateFileIcons.reset(new IconUpdater(m_gridLeft, m_gridRight));
+
+#ifdef FFS_WIN
     moveWholeWindow.reset(new MouseMoveWindow(this));
 #endif
     syncPreview.reset(new SyncPreview(this));
 
     SetTitle(wxString(wxT("FreeFileSync - ")) + _("Folder Comparison and Synchronization"));
 
-    //avoid mirroring this dialog in RTL languages like Hebrew or Arabic
-    SetLayoutDirection(wxLayout_LeftToRight);
-    m_panelStatusBar->SetLayoutDirection(wxLayout_LeftToRight);
-
     SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
+
 
     //notify about (logical) application main window => program won't quit, but stay on this dialog
     FreeFileSync::AppMainWindow::setMainWindow(this);
@@ -477,6 +493,10 @@ void MainDialog::cleanUp(bool saveLastUsedConfig)
 
         //no need for wxEventHandler::Disconnect() here; done automatically when window is destoyed!
 
+        m_gridLeft  ->release(); //handle wxGrid-related callback on grid data after MainDialog has died... (Linux only)
+        m_gridMiddle->release();
+        m_gridRight ->release();
+
         //save configuration
         if (saveLastUsedConfig)
             writeConfigurationToXml(lastConfigFileName());   //don't throw exceptions in destructors
@@ -525,10 +545,8 @@ void MainDialog::readGlobalSettings()
         addRightFolderToHistory(*i);
 
     //show/hide file icons
-#ifdef FFS_WIN
     m_gridLeft->enableFileIcons(globalSettings->gui.showFileIconsLeft);
     m_gridRight->enableFileIcons(globalSettings->gui.showFileIconsRight);
-#endif
 
     //set selected tab
     m_notebookBottomLeft->ChangeSelection(globalSettings->gui.selectedTabBottomLeft);
@@ -749,8 +767,8 @@ public:
         if (updateUiIsAllowed())  //test if specific time span between ui updates is over
         {
             wxString statusMessage = _("%x / %y objects deleted successfully");
-            statusMessage.Replace(wxT("%x"), FreeFileSync::numberToWxString(deletionCount, true), false);
-            statusMessage.Replace(wxT("%y"), FreeFileSync::numberToWxString(totalObjToDelete, true), false);
+            statusMessage.Replace(wxT("%x"), FreeFileSync::numberToStringSep(deletionCount), false);
+            statusMessage.Replace(wxT("%y"), FreeFileSync::numberToStringSep(totalObjToDelete), false);
 
             mainDlg->m_staticTextStatusMiddle->SetLabel(statusMessage);
             mainDlg->m_panelStatusBar->Layout();
@@ -841,16 +859,29 @@ void exstractNames(const FileSystemObject& fsObj, wxString& name, wxString& dir)
 {
     if (!fsObj.isEmpty<side>())
     {
-        if (isDirectoryMapping(fsObj))
+        struct GetNames : public FSObjectVisitor
         {
-            name = zToWx(fsObj.getFullName<side>());
-            dir  = name;
-        }
-        else
-        {
-            name = zToWx(fsObj.getFullName<side>());
-            dir  = zToWx(fsObj.getFullName<side>().BeforeLast(globalFunctions::FILE_NAME_SEPARATOR));
-        }
+            GetNames(wxString& nameIn, wxString& dirIn) : name_(nameIn), dir_(dirIn) {}
+            virtual void visit(const FileMapping& fileObj)
+            {
+                name_ = zToWx(fileObj.getFullName<side>());
+                dir_  = zToWx(fileObj.getFullName<side>().BeforeLast(globalFunctions::FILE_NAME_SEPARATOR));
+            }
+            virtual void visit(const SymLinkMapping& linkObj)
+            {
+                name_ = zToWx(linkObj.getFullName<side>());
+                dir_  = zToWx(linkObj.getFullName<side>().BeforeLast(globalFunctions::FILE_NAME_SEPARATOR));
+            }
+            virtual void visit(const DirMapping& dirObj)
+            {
+                dir_  = name_ = zToWx(dirObj.getFullName<side>());
+            }
+
+            wxString& name_;
+            wxString& dir_;
+            ;
+        } getNames(name, dir);
+        fsObj.accept(getNames);
     }
     else
     {
@@ -1366,19 +1397,40 @@ void MainDialog::OnContextRim(wxGridEvent& event)
     //###############################################################################################
     //get list of relative file/dir-names for filtering
     FilterObjList exFilterCandidateObj;
+
+    class AddFilter : public FSObjectVisitor
+    {
+    public:
+        AddFilter(FilterObjList& fl) : filterList_(fl) {}
+        virtual void visit(const FileMapping& fileObj)
+        {
+            filterList_.push_back(FilterObject(fileObj.getObjRelativeName(), false));
+        }
+        virtual void visit(const SymLinkMapping& linkObj)
+        {
+            filterList_.push_back(FilterObject(linkObj.getObjRelativeName(), false));
+        }
+        virtual void visit(const DirMapping& dirObj)
+        {
+            filterList_.push_back(FilterObject(dirObj.getObjRelativeName(), true));
+        }
+
+    private:
+        FilterObjList& filterList_;
+    } newFilterEntry(exFilterCandidateObj);
+
+
     for (std::set<size_t>::const_iterator i = selectionLeft.begin(); i != selectionLeft.end(); ++i)
     {
         const FileSystemObject* currObj = gridDataView->getObject(*i);
         if (currObj && !currObj->isEmpty<LEFT_SIDE>())
-            exFilterCandidateObj.push_back(
-                FilterObject(currObj->getRelativeName<LEFT_SIDE>(), isDirectoryMapping(*currObj)));
+            currObj->accept(newFilterEntry);
     }
     for (std::set<size_t>::const_iterator i = selectionRight.begin(); i != selectionRight.end(); ++i)
     {
         const FileSystemObject* currObj = gridDataView->getObject(*i);
         if (currObj && !currObj->isEmpty<RIGHT_SIDE>())
-            exFilterCandidateObj.push_back(
-                FilterObject(currObj->getRelativeName<RIGHT_SIDE>(), isDirectoryMapping(*currObj)));
+            currObj->accept(newFilterEntry);
     }
     //###############################################################################################
 
@@ -1386,7 +1438,7 @@ void MainDialog::OnContextRim(wxGridEvent& event)
     if (exFilterCandidateObj.size() > 0 && !exFilterCandidateObj[0].isDir)
     {
         const Zstring filename = exFilterCandidateObj[0].relativeName.AfterLast(globalFunctions::FILE_NAME_SEPARATOR);
-        if (filename.Find(wxChar('.'), false) !=  Zstring::npos) //be careful: AfterLast will return the whole string if '.' is not found!
+        if (filename.Find(wxChar('.'), false) !=  Zstring::npos) //be careful: AfterLast would return the whole string if '.' were not found!
         {
             const Zstring extension = filename.AfterLast(DefaultChar('.'));
 
@@ -1506,16 +1558,19 @@ void MainDialog::OnContextExcludeExtension(wxCommandEvent& event)
     SelectedExtension* selExtension = dynamic_cast<SelectedExtension*>(event.m_callbackUserData);
     if (selExtension)
     {
-        Zstring& excludeFilter = currentCfg.mainCfg.globalFilter.excludeFilter;
+        const Zstring newExclude = Zstring(DefaultStr("*.")) + selExtension->extension;
 
+        //add to filter config
+        Zstring& excludeFilter = currentCfg.mainCfg.globalFilter.excludeFilter;
         if (!excludeFilter.empty() && !excludeFilter.EndsWith(DefaultStr(";")))
             excludeFilter += DefaultStr("\n");
-
-        excludeFilter += Zstring(DefaultStr("*.")) + selExtension->extension + DefaultStr(";"); //';' is appended to 'mark' that next exclude extension entry won't write to new line
+        excludeFilter += newExclude + DefaultStr(";"); //';' is appended to 'mark' that next exclude extension entry won't write to new line
 
         updateFilterButtons();
 
-        applyFiltering(getCurrentConfiguration().mainCfg, gridDataView->getDataTentative());
+        //do not fully apply filter, just exclude new items
+        addExcludeFiltering(newExclude, gridDataView->getDataTentative());
+        //applyFiltering(getCurrentConfiguration().mainCfg, gridDataView->getDataTentative());
         updateGuiGrid();
 
         if (currentCfg.hideFilteredElements)
@@ -1535,22 +1590,28 @@ void MainDialog::OnContextExcludeObject(wxCommandEvent& event)
     {
         if (objCont->selectedObjects.size() > 0) //check needed to determine if filtering is needed
         {
+            Zstring newExclude;
             for (std::vector<FilterObject>::const_iterator i = objCont->selectedObjects.begin(); i != objCont->selectedObjects.end(); ++i)
             {
-                Zstring& excludeFilter = currentCfg.mainCfg.globalFilter.excludeFilter;
+                if (i != objCont->selectedObjects.begin())
+                    newExclude += DefaultStr("\n");
 
-                if (!excludeFilter.empty() && !excludeFilter.EndsWith(DefaultStr("\n")))
-                    excludeFilter += DefaultStr("\n");
-
-                if (!i->isDir)
-                    excludeFilter += Zstring() + globalFunctions::FILE_NAME_SEPARATOR + i->relativeName;
-                else
-                    excludeFilter += Zstring() + globalFunctions::FILE_NAME_SEPARATOR + i->relativeName + globalFunctions::FILE_NAME_SEPARATOR;
+                newExclude += globalFunctions::FILE_NAME_SEPARATOR + i->relativeName;
+                if (i->isDir)
+                    newExclude += globalFunctions::FILE_NAME_SEPARATOR;
             }
+
+            //add to filter config
+            Zstring& excludeFilter = currentCfg.mainCfg.globalFilter.excludeFilter;
+            if (!excludeFilter.empty() && !excludeFilter.EndsWith(DefaultStr("\n")))
+                excludeFilter += DefaultStr("\n");
+            excludeFilter += newExclude;
 
             updateFilterButtons();
 
-            applyFiltering(getCurrentConfiguration().mainCfg, gridDataView->getDataTentative());
+            //do not fully apply filter, just exclude new items
+            addExcludeFiltering(newExclude, gridDataView->getDataTentative());
+            //applyFiltering(getCurrentConfiguration().mainCfg, gridDataView->getDataTentative());
             updateGuiGrid();
 
             if (currentCfg.hideFilteredElements)
@@ -1812,7 +1873,7 @@ private:
 void MainDialog::addFileToCfgHistory(const wxString& filename)
 {
     //only (still) existing files should be included in the list
-    if (!fileExists(wxToZ(filename)))
+    if (Utility::fileExists(wxToZ(filename), 200) == Utility::EXISTING_FALSE) //potentially slow network access: wait 200ms
         return;
 
     std::vector<wxString>::const_iterator i = find_if(cfgFileNames.begin(), cfgFileNames.end(), FindDuplicates(wxToZ(filename)));
@@ -2535,8 +2596,7 @@ void MainDialog::OnCompare(wxCommandEvent &event)
         CompareStatusHandler statusHandler(this);
 
         //begin comparison
-        FreeFileSync::CompareProcess comparison(currentCfg.mainCfg.processSymlinks,
-                                                currentCfg.mainCfg.traverseDirectorySymlinks,
+        FreeFileSync::CompareProcess comparison(currentCfg.mainCfg.handleSymlinks,
                                                 currentCfg.mainCfg.hidden.fileTimeTolerance,
                                                 globalSettings->ignoreOneHourDiff,
                                                 globalSettings->optDialogs,
@@ -2595,18 +2655,17 @@ void MainDialog::OnCompare(wxCommandEvent &event)
         //refresh grid in ANY case! (also on abort)
         updateGuiGrid();
 
+        //prepare status information
+        wxString statusInfo;
         if (allElementsEqual(gridDataView->getDataTentative()))
-            pushStatusInformation(_("All directories in sync!"));
+            statusInfo += _("All directories in sync!");
+        pushStatusInformation(statusInfo);
     }
 }
 
 
 void MainDialog::updateGuiGrid()
 {
-    m_gridLeft  ->BeginBatch(); //necessary??
-    m_gridMiddle->BeginBatch();
-    m_gridRight ->BeginBatch();
-
     updateGridViewData(); //update gridDataView and write status information
 
     //all three grids retrieve their data directly via gridDataView
@@ -2638,9 +2697,9 @@ void MainDialog::updateGuiGrid()
     //update sync preview statistics
     calculatePreview();
 
-    m_gridLeft  ->EndBatch();
-    m_gridMiddle->EndBatch();
-    m_gridRight ->EndBatch();
+    m_gridLeft  ->Refresh();
+    m_gridMiddle->Refresh();
+    m_gridRight ->Refresh();
 }
 
 
@@ -2648,9 +2707,9 @@ void MainDialog::calculatePreview()
 {
     //update preview of bytes to be transferred:
     const SyncStatistics st(gridDataView->getDataTentative());
-    const wxString toCreate = FreeFileSync::numberToWxString(st.getCreate(),    true);
-    const wxString toUpdate = FreeFileSync::numberToWxString(st.getOverwrite(), true);
-    const wxString toDelete = FreeFileSync::numberToWxString(st.getDelete(),    true);
+    const wxString toCreate = FreeFileSync::numberToStringSep(st.getCreate());
+    const wxString toUpdate = FreeFileSync::numberToStringSep(st.getOverwrite());
+    const wxString toDelete = FreeFileSync::numberToStringSep(st.getDelete());
     const wxString data     = FreeFileSync::formatFilesizeToShortString(st.getDataToProcess());
 
     m_textCtrlCreate->SetValue(toCreate);
@@ -2690,9 +2749,7 @@ void MainDialog::OnCmpSettings(wxCommandEvent& event)
 
     if (FreeFileSync::showCompareCfgDialog(windowPos,
                                            currentCfg.mainCfg.compareVar,
-                                           currentCfg.mainCfg.processSymlinks,
-                                           currentCfg.mainCfg.traverseDirectorySymlinks,
-                                           currentCfg.mainCfg.copyFileSymlinks) == DefaultReturnCode::BUTTON_OKAY)
+                                           currentCfg.mainCfg.handleSymlinks) == DefaultReturnCode::BUTTON_OKAY)
     {
         //update compare variant name
         m_staticTextCmpVariant->SetLabel(wxString(wxT("(")) + getVariantName(currentCfg.mainCfg.compareVar) + wxT(")"));
@@ -2732,13 +2789,6 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
         globalSettings->optDialogs.showSummaryBeforeSync = !dontShowAgain;
     }
 
-    //check if there are files/folders to be sync'ed at all
-    if (!synchronizationNeeded(gridDataView->getDataTentative()))
-    {
-        wxMessageBox(_("Nothing to synchronize according to configuration!"), _("Information"), wxICON_WARNING);
-        return;
-    }
-
     wxBusyCursor dummy; //show hourglass cursor
 
     clearStatusBar();
@@ -2749,10 +2799,12 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
         //class handling status updates and error messages
         SyncStatusHandler statusHandler(this, currentCfg.ignoreErrors);
 
+        //check if there are files/folders to be sync'ed at all
+        if (!synchronizationNeeded(gridDataView->getDataTentative()))
+            statusHandler.reportInfo(_("Nothing to synchronize according to configuration!")); //inform about this special case
+
         //start synchronization and mark all elements processed
         FreeFileSync::SyncProcess synchronization(
-            currentCfg.mainCfg.copyFileSymlinks,
-            currentCfg.mainCfg.traverseDirectorySymlinks,
             globalSettings->optDialogs,
             currentCfg.mainCfg.hidden.verifyFileCopy,
             globalSettings->copyLockedFiles,
@@ -2810,41 +2862,48 @@ void MainDialog::OnSortLeftGrid(wxGridEvent& event)
     const int currentSortColumn = event.GetCol();
     if (0 <= currentSortColumn && currentSortColumn < int(xmlAccess::COLUMN_TYPE_COUNT))
     {
-        static bool sortAscending = true;
+        static bool sortDefault = true;
         if (lastSortColumn != currentSortColumn || lastSortGrid != m_gridLeft)
-            sortAscending = true;
+            sortDefault = true;
         else
-            sortAscending = !sortAscending;
+            sortDefault = !sortDefault;
 
         lastSortColumn = currentSortColumn;
         lastSortGrid   = m_gridLeft;
 
-        //start sort
+        GridView::SortType st = GridView::SORT_BY_REL_NAME;
+
         const xmlAccess::ColumnTypes columnType = m_gridLeft->getTypeAtPos(currentSortColumn);
         switch (columnType)
         {
         case xmlAccess::FULL_PATH:
-            gridDataView->sortView(GridView::SORT_BY_REL_NAME, true, sortAscending);
+            st = GridView::SORT_BY_REL_NAME;
             break;
         case xmlAccess::FILENAME:
-            gridDataView->sortView(GridView::SORT_BY_FILENAME, true, sortAscending);
+            st = GridView::SORT_BY_FILENAME;
             break;
         case xmlAccess::REL_PATH:
-            gridDataView->sortView(GridView::SORT_BY_REL_NAME, true, sortAscending);
+            st = GridView::SORT_BY_REL_NAME;
             break;
         case xmlAccess::DIRECTORY:
-            gridDataView->sortView(GridView::SORT_BY_DIRECTORY, true, sortAscending);
+            st = GridView::SORT_BY_DIRECTORY;
             break;
         case xmlAccess::SIZE:
-            gridDataView->sortView(GridView::SORT_BY_FILESIZE, true, sortAscending);
+            st = GridView::SORT_BY_FILESIZE;
             break;
         case xmlAccess::DATE:
-            gridDataView->sortView(GridView::SORT_BY_DATE, true, sortAscending);
+            st = GridView::SORT_BY_DATE;
             break;
         case xmlAccess::EXTENSION:
-            gridDataView->sortView(GridView::SORT_BY_EXTENSION, true, sortAscending);
+            st = GridView::SORT_BY_EXTENSION;
             break;
         }
+
+        const bool sortAscending = sortDefault ?
+                                   GridView::getDefaultDirection(st) :
+                                   !GridView::getDefaultDirection(st);
+
+        gridDataView->sortView(st, true, sortAscending);
 
         updateGuiGrid(); //refresh gridDataView
 
@@ -2859,26 +2918,26 @@ void MainDialog::OnSortLeftGrid(wxGridEvent& event)
 void MainDialog::OnSortMiddleGrid(wxGridEvent& event)
 {
     //determine direction for std::sort()
-    static bool sortAscending = true;
+    static bool sortDefault = true;
     if (lastSortColumn != 0 || lastSortGrid != m_gridMiddle)
-        sortAscending = true;
+        sortDefault = true;
     else
-        sortAscending = !sortAscending;
+        sortDefault = !sortDefault;
     lastSortColumn = 0;
     lastSortGrid   = m_gridMiddle;
 
     //start sort
     if (syncPreview->previewIsEnabled())
-        gridDataView->sortView(GridView::SORT_BY_SYNC_DIRECTION, true, sortAscending);
+        gridDataView->sortView(GridView::SORT_BY_SYNC_DIRECTION, true, sortDefault);
     else
-        gridDataView->sortView(GridView::SORT_BY_CMP_RESULT, true, sortAscending);
+        gridDataView->sortView(GridView::SORT_BY_CMP_RESULT, true, sortDefault);
 
     updateGuiGrid(); //refresh gridDataView
 
     //set sort direction indicator on UI
     m_gridLeft->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
     m_gridRight->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
-    m_gridMiddle->setSortMarker(CustomGrid::SortMarker(0, sortAscending ? CustomGrid::ASCENDING : CustomGrid::DESCENDING));
+    m_gridMiddle->setSortMarker(CustomGrid::SortMarker(0, sortDefault ? CustomGrid::ASCENDING : CustomGrid::DESCENDING));
 }
 
 
@@ -2888,41 +2947,48 @@ void MainDialog::OnSortRightGrid(wxGridEvent& event)
     const int currentSortColumn = event.GetCol();
     if (0 <= currentSortColumn && currentSortColumn < int(xmlAccess::COLUMN_TYPE_COUNT))
     {
-        static bool sortAscending = true;
+        static bool sortDefault = true;
         if (lastSortColumn != currentSortColumn || lastSortGrid != m_gridRight)
-            sortAscending = true;
+            sortDefault = true;
         else
-            sortAscending = !sortAscending;
+            sortDefault = !sortDefault;
 
         lastSortColumn = currentSortColumn;
         lastSortGrid   = m_gridRight;
 
-        //start sort
+        GridView::SortType st = GridView::SORT_BY_REL_NAME;
+
         const xmlAccess::ColumnTypes columnType = m_gridRight->getTypeAtPos(currentSortColumn);
         switch (columnType)
         {
         case xmlAccess::FULL_PATH:
-            gridDataView->sortView(GridView::SORT_BY_REL_NAME, false, sortAscending);
+            st = GridView::SORT_BY_REL_NAME;
             break;
         case xmlAccess::FILENAME:
-            gridDataView->sortView(GridView::SORT_BY_FILENAME, false, sortAscending);
+            st = GridView::SORT_BY_FILENAME;
             break;
         case xmlAccess::REL_PATH:
-            gridDataView->sortView(GridView::SORT_BY_REL_NAME, false, sortAscending);
+            st = GridView::SORT_BY_REL_NAME;
             break;
         case xmlAccess::DIRECTORY:
-            gridDataView->sortView(GridView::SORT_BY_DIRECTORY, false, sortAscending);
+            st = GridView::SORT_BY_DIRECTORY;
             break;
         case xmlAccess::SIZE:
-            gridDataView->sortView(GridView::SORT_BY_FILESIZE, false, sortAscending);
+            st = GridView::SORT_BY_FILESIZE;
             break;
         case xmlAccess::DATE:
-            gridDataView->sortView(GridView::SORT_BY_DATE, false, sortAscending);
+            st = GridView::SORT_BY_DATE;
             break;
         case xmlAccess::EXTENSION:
-            gridDataView->sortView(GridView::SORT_BY_EXTENSION, false, sortAscending);
+            st = GridView::SORT_BY_EXTENSION;
             break;
         }
+
+        const bool sortAscending = sortDefault ?
+                                   GridView::getDefaultDirection(st) :
+                                   !GridView::getDefaultDirection(st);
+
+        gridDataView->sortView(st, false, sortAscending);
 
         updateGuiGrid(); //refresh gridDataView
 
@@ -3007,7 +3073,6 @@ void MainDialog::updateGridViewData()
     m_bpButtonSyncDirNone->      Show(false);
 
 
-
     if (syncPreview->previewIsEnabled())
     {
         const GridView::StatusSyncPreview result = gridDataView->updateSyncPreview(currentCfg.hideFilteredElements,
@@ -3050,11 +3115,11 @@ void MainDialog::updateGridViewData()
                 m_bpButtonEqual->            IsShown() ||
                 m_bpButtonConflict->         IsShown())
         {
-            m_panel112->Show();
-            m_panel112->Layout();
+            m_panelViewFilter->Show();
+            m_panelViewFilter->Layout();
         }
         else
-            m_panel112->Hide();
+            m_panelViewFilter->Hide();
 
     }
     else
@@ -3092,11 +3157,11 @@ void MainDialog::updateGridViewData()
                 m_bpButtonEqual->     IsShown() ||
                 m_bpButtonConflict->  IsShown())
         {
-            m_panel112->Show();
-            m_panel112->Layout();
+            m_panelViewFilter->Show();
+            m_panelViewFilter->Layout();
         }
         else
-            m_panel112->Hide();
+            m_panelViewFilter->Hide();
     }
 
 
@@ -3120,7 +3185,7 @@ void MainDialog::updateGridViewData()
             statusLeftNew += _("1 directory");
         else
         {
-            wxString folderCount = FreeFileSync::numberToWxString(foldersOnLeftView, true);
+            wxString folderCount = FreeFileSync::numberToStringSep(foldersOnLeftView);
 
             wxString outputString = _("%x directories");
             outputString.Replace(wxT("%x"), folderCount, false);
@@ -3128,26 +3193,26 @@ void MainDialog::updateGridViewData()
         }
 
         if (filesOnLeftView)
-            statusLeftNew += wxT(", ");
+            statusLeftNew += wxT(" - ");
     }
 
     if (filesOnLeftView)
     {
         if (filesOnLeftView == 1)
-            statusLeftNew += _("1 file,");
+            statusLeftNew += _("1 file");
         else
         {
-            wxString fileCount = FreeFileSync::numberToWxString(filesOnLeftView, true);
+            wxString fileCount = FreeFileSync::numberToStringSep(filesOnLeftView);
 
-            wxString outputString = _("%x files,");
+            wxString outputString = _("%x files");
             outputString.Replace(wxT("%x"), fileCount, false);
             statusLeftNew += outputString;
         }
-        statusLeftNew += wxT(" ");
+        statusLeftNew += wxT(" - ");
         statusLeftNew += FreeFileSync::formatFilesizeToShortString(filesizeLeftView);
     }
 
-    const wxString objectsView = FreeFileSync::numberToWxString(gridDataView->rowsOnView(), true);
+    const wxString objectsView = FreeFileSync::numberToStringSep(gridDataView->rowsOnView());
     if (gridDataView->rowsTotal() == 1)
     {
         wxString outputString = _("%x of 1 row in view");
@@ -3156,7 +3221,7 @@ void MainDialog::updateGridViewData()
     }
     else
     {
-        const wxString objectsTotal = FreeFileSync::numberToWxString(gridDataView->rowsTotal(), true);
+        const wxString objectsTotal = FreeFileSync::numberToStringSep(gridDataView->rowsTotal());
 
         wxString outputString = _("%x of %y rows in view");
         outputString.Replace(wxT("%x"), objectsView, false);
@@ -3170,7 +3235,7 @@ void MainDialog::updateGridViewData()
             statusRightNew += _("1 directory");
         else
         {
-            wxString folderCount = FreeFileSync::numberToWxString(foldersOnRightView, true);
+            wxString folderCount = FreeFileSync::numberToStringSep(foldersOnRightView);
 
             wxString outputString = _("%x directories");
             outputString.Replace(wxT("%x"), folderCount, false);
@@ -3178,23 +3243,23 @@ void MainDialog::updateGridViewData()
         }
 
         if (filesOnRightView)
-            statusRightNew += wxT(", ");
+            statusRightNew += wxT(" - ");
     }
 
     if (filesOnRightView)
     {
         if (filesOnRightView == 1)
-            statusRightNew += _("1 file,");
+            statusRightNew += _("1 file");
         else
         {
-            wxString fileCount = FreeFileSync::numberToWxString(filesOnRightView, true);
+            wxString fileCount = FreeFileSync::numberToStringSep(filesOnRightView);
 
-            wxString outputString = _("%x files,");
+            wxString outputString = _("%x files");
             outputString.Replace(wxT("%x"), fileCount, false);
             statusRightNew += outputString;
         }
 
-        statusRightNew += wxT(" ");
+        statusRightNew += wxT(" - ");
         statusRightNew += FreeFileSync::formatFilesizeToShortString(filesizeRightView);
     }
 

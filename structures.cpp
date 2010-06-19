@@ -87,7 +87,7 @@ SyncConfiguration::Variant FreeFileSync::getVariant(const SyncConfiguration& syn
              syncCfg.exRightSideOnly == SYNC_DIR_NONE  &&
              syncCfg.leftNewer       == SYNC_DIR_RIGHT &&
              syncCfg.rightNewer      == SYNC_DIR_NONE  &&
-             syncCfg.different       == SYNC_DIR_NONE  &&
+             syncCfg.different       == SYNC_DIR_RIGHT  &&
              syncCfg.conflict        == SYNC_DIR_NONE)
         return SyncConfiguration::UPDATE;    //Update ->
     else
@@ -117,7 +117,7 @@ void FreeFileSync::setVariant(SyncConfiguration& syncCfg, const SyncConfiguratio
         syncCfg.exRightSideOnly = SYNC_DIR_NONE;
         syncCfg.leftNewer       = SYNC_DIR_RIGHT;
         syncCfg.rightNewer      = SYNC_DIR_NONE;
-        syncCfg.different       = SYNC_DIR_NONE;
+        syncCfg.different       = SYNC_DIR_RIGHT;
         syncCfg.conflict        = SYNC_DIR_NONE;
         break;
     case SyncConfiguration::CUSTOM:

@@ -8,6 +8,7 @@
 #include "stringConv.h"
 #include <wx/intl.h>
 #include <stdexcept>
+#include <iterator>
 
 #ifdef FFS_WIN
 #include "dllLoader.h"
@@ -22,12 +23,7 @@
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
-
-#ifdef RECYCLER_GIO
-#include <gio/gio.h>
-#include <boost/shared_ptr.hpp>
-#endif
-
+#include <giomm/file.h>
 #endif
 
 
@@ -163,27 +159,23 @@ void FreeFileSync::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileE
     if (::lstat(fileToDelete.c_str(), &fileInfo) != 0)
         return; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
 
-#ifdef RECYCLER_GIO
-    boost::shared_ptr<GFile> fileObj(g_file_new_for_path(fileToDelete.c_str()), &g_object_unref); //g_file_new_for_path never fails => g_object_unref can always be safely called
-    GError* error = NULL;
-    if (g_file_trash(fileObj.get(), NULL, &error) == FALSE)
+
+    Glib::RefPtr<Gio::File> fileObj = Gio::File::create_for_path(fileToDelete.c_str()); //never fails
+
+    try
     {
-        if (!error)
+        if (!fileObj->trash())
             throw std::runtime_error("Recycle Bin failed but did not provide error information!");
-
-        boost::shared_ptr<GError> errorObj(error, &g_error_free);
-
+    }
+    catch (const Glib::Error& errorObj)
+    {
         //assemble error message
-        const wxString errorMessage = wxString(wxT("Error Code ")) + wxString::Format(wxT("%i"), errorObj->code) +
-                                      + wxT(", ") + wxString::FromUTF8(g_quark_to_string(errorObj->domain)) + wxT(": ") + wxString::FromUTF8(errorObj->message);
+        const wxString errorMessage = wxString(wxT("Glib Error Code ")) + wxString::Format(wxT("%i"), errorObj.code()) + wxT(", ") +
+                                      wxString::FromUTF8(g_quark_to_string(errorObj.domain())) + wxT(": ") + wxString::FromUTF8(errorObj.what().c_str());
+
         throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + zToWx(fileToDelete) + wxT("\"\n\n") +
                         wxT("(") + errorMessage + wxT(")"));
     }
-
-#elif defined RECYCLER_NONE
-    throw std::logic_error("No Recycler for this Linux version available at the moment!"); //user will never arrive here: recycler option cannot be activated in this case!
-#endif
-
 #endif
 }
 
@@ -193,13 +185,6 @@ bool FreeFileSync::recycleBinExists()
 #ifdef FFS_WIN
     return true;
 #elif defined FFS_LINUX
-
-#ifdef RECYCLER_GIO
     return true;
-#elif defined RECYCLER_NONE
-    return false;
-#else
-    you have to choose a recycler!
-#endif
 #endif
 }

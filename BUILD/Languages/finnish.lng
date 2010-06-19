@@ -6,10 +6,6 @@
  GB
  MB
  MB
- PB
- PB
- TB
- TB
  day(s)
  päivää(e)
  hour(s)
@@ -22,12 +18,24 @@
  Sek.
 %x / %y objects deleted successfully
 %x / %y Kohteiden poisto onnistui
+%x Byte
+%x Tavua
+%x GB
+%x GB
+%x MB
+%x MB
+%x PB
+%x PB
+%x TB
+%x TB
 %x directories
-%x hakemistoja
-%x files,
-%x tiedostoja,
+%x hakemistoa
+%x files
+%x tiedostoista
 %x is not a valid FreeFileSync batch file!
 %x ei kelvollinen FreeFileSync eräajotiedosto!
+%x kB
+%x kB
 %x of %y rows in view
 %x riviä %y rivistä näytössä
 %x of 1 row in view
@@ -35,7 +43,7 @@
 %x%
 %x%
 &Abort
-&Keskeytä
+&Lopeta
 &About...
 &Ohje...
 &Advanced
@@ -90,6 +98,8 @@ Asetusten &lataus...
 &Vaihda
 &Yes
 &Kyllä
+(Build: %x)
+(Versio: %x)
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (HUOM: Tämä ongelma vaikuttaa vain FAT/FAT32 ohjaimiin!\nOptio voidaan poistaa kaikissa muissa tapauksissa \"jätetään 1. tunnin ero huomiotta\".)
 (Requires an Internet connection!)
@@ -126,8 +136,8 @@ Asetusten &lataus...
 /s
 1 directory
 1 hakemisto
-1 file,
-1 tiedosto,
+1 file
+1 tiedosto
 1. &Compare
 1. &Vertaa
 1. Enter relative file or directory names separated by ';' or a new line.
@@ -150,6 +160,8 @@ Asetusten &lataus...
 <Hakemisto>
 <Last session>
 <Edellinen istunto>
+<Symlink>
+<Symlinkki>
 <multiple selection>
 <monivalinta>
 A newer version of FreeFileSync is available:
@@ -157,9 +169,9 @@ FreeFileSync:n uusi versio on olemassa:
 Abort requested: Waiting for current operation to finish...
 Ohjelma on lopetettava: Odotetaan toiminnon lopettamista...
 Abort synchronization immediately
-Keskeytä täsmäytys välittömästi
+Lopeta täsmäytys välittömästi
 Aborted
-Keskeytetty
+Lopetettu
 About
 Ohje
 Action
@@ -196,8 +208,6 @@ Browse
 Selaa
 Browse directory
 Selaa hakemistoa
-Build:
-Luotu:
 Cannot determine sync-direction:
 Täsmäytys suuntä tuntematon:
 Cannot find %x
@@ -272,10 +282,14 @@ Copy shared or locked files using Volume Shadow Copy Service
 Kopioi jaetut ja lukitut tiedostot käyttäen Volume Shadow Copy Service
 Copy to clipboard\tCTRL+C
 Kopioi Leikepöydälle\tCTRL+C
+Copying Symbolic Link %x overwriting %y
+Kopioin Symlinkki %x ylikirjoittamalla %y
+Copying Symbolic Link %x to %y
+Kopioin Symlinkki %x -> %y
+Copying file %x overwriting %y
+Kopioin tiedostoa %x ylikirjoittaen %y
 Copying file %x to %y
-Kopioidaan tiedostoa %x -> %y
-Copying file %x to %y overwriting target
-Kopioidaan tiedostoa %x -> %y ylikirjoittaen
+Kopioin tiedostoa %x -> %y
 Could not determine volume name for file:
 Levyasemaa ei tunnistettu tiedostolle:
 Could not initialize directory monitoring:
@@ -320,6 +334,8 @@ Delete or overwrite files permanently
 Poista tai ylikirjoita tiedostoja pysyvästi
 Delete permanently
 Poista pysyvästi
+Deleting Symbolic Link %x
+Poista Symlinkki %x
 Deleting file %x
 Poista tiedosto %x
 Deleting folder %x
@@ -328,6 +344,8 @@ Deletion handling
 Poistotapa
 Description
 Seloste
+Direct
+Suoraan
 Directories are dependent! Be careful when setting up synchronization rules:
 Hakemistot riippuvuussuhteessa! Aseta täsmäytyssääntöjä varovasti:
 Directories to watch
@@ -340,9 +358,9 @@ Do not show this dialog again
 Älä näytä tätä jatkossa
 Do nothing
 Älä tee mitään
-Do you really want to delete the following objects(s)?
+Do you really want to delete the following object(s)?
 Haluatko varmasti poista valittuja kohteita?
-Do you really want to move the following objects(s) to the Recycle Bin?
+Do you really want to move the following object(s) to the Recycle Bin?
 Haluatko varmasti siirtää valittuja kohteita Roskakoriin?
 Do you want FreeFileSync to automatically check for updates every week?
 Haluatko että FreeFileSync hakee päivityksiä automaattisesti viikoittain?
@@ -484,6 +502,8 @@ Find what:
 Etsi:
 Folder Comparison and Synchronization
 Hakemistojen vertailu ja täsmäytys
+Follow
+Seuraa
 Free disk space available:
 Levytilaa jäljellä:
 FreeFileSync Batch Job
@@ -552,6 +572,8 @@ Identify and propagate changes on both sides using a database. Deletions and con
 Tunnista ja monista muutokset molemmilla puolilla tietokannalla. Poistot ja ristiriidat hoidetaan automaattisesti.
 If you like FFS
 Jos pidät FFS:tä
+Ignore
+Sivuta
 Ignore 1-hour file time difference
 Älä huomioi 1. tunnin poikkeamaa
 Ignore errors
@@ -560,8 +582,6 @@ Ignore subsequent errors
 Jätä toistuvia virheitä huomiotta 
 Include
 Sisällytä
-Include Symbolic Links
-Sisällytä symbolisia linkkejä
 Include all rows
 Sisällytä kaikki rivit
 Include temporarily
@@ -612,6 +632,8 @@ Move files into a time-stamped subdirectory
 Siirrä tiedostot aikaleimattuun hakemistoon
 Moving %x to Recycle Bin
 Siirrä %x Roskakoriin
+Moving Symbolic Link %x to user-defined directory %y
+Siirrä Symlinkki %x valittuun hakemistoon %y
 Moving file %x to user-defined directory %y
 Siirretään tiedostoa %x valittuun hakemistoon %y
 Moving folder %x to user-defined directory %y
@@ -643,7 +665,7 @@ Avaa Explorerilla
 Open with default application
 Avaa oletus sovelluksessa
 Operation aborted!
-Toiminto keskeytetty!
+Toiminto lopetettiin!
 Operation:
 Toiminto:
 Overview
@@ -682,8 +704,6 @@ Remove folder
 Poista hakemisto
 Remove folder pair
 Poista hakemistopari
-Renaming file %x to %y
-Nimeän tiedostoa %x nimellä %y
 Report translation error
 Ilmoita käännösvirheestä
 Reset
@@ -776,10 +796,14 @@ Swap sides
 Puolten vaihto
 Switching to FreeFileSync GUI modus...
 Siirtyminen FreeFileSync GUI toimintoon...
+Symbolic Link handling
+Symlinkkien hallinta
+Symlinks %x have the same date but a different target!
+Symlinkki %x samalta päivältä mutta kohde on toinen!
 Synchronization Preview
 Täsmäytyksen esikatselu
 Synchronization aborted!
-Täsmäytys keskeytetty!
+Täsmäytys lopetettiin!
 Synchronization completed successfully!
 Täsmäytys suoritettu onnistuneesti!
 Synchronization completed with errors!
@@ -800,8 +824,8 @@ Target directory already existing!
 Haluttu tiedosto on jo olemassa!
 Target file already existing!
 Kohde tiedosto on jo olemassa!
-The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-Komentokehote suoritetaan joka kerta kun:\n- hakemisto on saatavilla (esim. USB tikku asennetaan)\n- tiedostot näissä hakemistoisa ja alihakemistoissa muutetaan
+The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+Komento suoritetaan kun:\n- nämä hakemistot ovat saatavilla (esim. USB tikku asennetaan)\n- tiedostot näissä hakemistoissa tai alihakemistoissa muutetaan  
 The file does not contain a valid configuration:
 Asetustiedosto ei ole kelvollinen:
 The file was not processed by last synchronization!

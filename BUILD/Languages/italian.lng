@@ -6,10 +6,6 @@
  GB
  MB
  MB
- PB
- PB
- TB
- TB
  day(s)
  giorno(i)
  hour(s)
@@ -22,18 +18,30 @@
  sec
 %x / %y objects deleted successfully
 %x / %y oggetti cancellati con successo
+%x Byte
+
+%x GB
+
+%x MB
+
+%x PB
+
+%x TB
+
 %x directories
 %x cartelle
-%x files,
-%x files,
+%x files
+%x files
 %x is not a valid FreeFileSync batch file!
 %x non è un batch file valido per FreeFileSync!
+%x kB
+
 %x of %y rows in view
 %x di %y righe visualizzate
 %x of 1 row in view
 %x di 1 riga visualizzata
 %x%
-
+%x%
 &Abort
 &Abbandona
 &About...
@@ -87,9 +95,11 @@
 &Save
 &Salva
 &Switch
-
+&Switch
 &Yes
 &Si
+(Build: %x)
+
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Solo volumi con file-system FAT/FAT32 risentono di questo problema!\nIn tutti gli altri casi puoi disabilitare l'impostazione \"ignora differenze di 1 ora\".)
 (Requires an Internet connection!)
@@ -126,8 +136,8 @@
 /sec
 1 directory
 1 directory
-1 file,
-1 file,
+1 file
+1 file
 1. &Compare
 1. &Compara
 1. Enter relative file or directory names separated by ';' or a new line.
@@ -150,6 +160,8 @@
 <Directory>
 <Last session>
 <Ultima sessione>
+<Symlink>
+
 <multiple selection>
 <selezione multipla>
 A newer version of FreeFileSync is available:
@@ -195,9 +207,7 @@ Entrambi i lati sono cambiati dall'ultima sincronizzazione!
 Browse
 Sfoglia
 Browse directory
-
-Build:
-Build:
+Sfoglia cartelle
 Cannot determine sync-direction:
 Impossibile determinare direzione di sincronia:
 Cannot find %x
@@ -205,7 +215,7 @@ Impossibile trovare %x
 Category
 Categoria
 Clear filter settings
-
+Pulisci impostazioni filtro
 Comma separated list
 Lista di elementi separati da virgola
 Command line
@@ -272,10 +282,14 @@ Copy shared or locked files using Volume Shadow Copy Service
 Copia file condivisi o bloccati usando il servizio Volume Shadow Copy
 Copy to clipboard\tCTRL+C
 Copia nella clipboard\tCTRL+C
+Copying Symbolic Link %x overwriting %y
+
+Copying Symbolic Link %x to %y
+
+Copying file %x overwriting %y
+
 Copying file %x to %y
 Copia di file da %x a %y
-Copying file %x to %y overwriting target
-Copia file %x su %y sovrascrivendo la destinazione
 Could not determine volume name for file:
 Impossibile determinare il nome volume per il file:
 Could not initialize directory monitoring:
@@ -320,6 +334,8 @@ Delete or overwrite files permanently
 Cancella o sovrascrivi file definitivamente
 Delete permanently
 Cancella definitivamente
+Deleting Symbolic Link %x
+
 Deleting file %x
 Eliminazione file %x
 Deleting folder %x
@@ -328,6 +344,8 @@ Deletion handling
 Gestione cancellazione
 Description
 Descrizione
+Direct
+
 Directories are dependent! Be careful when setting up synchronization rules:
 Le directory sono dipendenti! Fai attenzione quando configuri le regole di sincronizzazione:
 Directories to watch
@@ -340,9 +358,9 @@ Do not show this dialog again
 Non visualizzare più questo messaggio
 Do nothing
 Non fare nulla
-Do you really want to delete the following objects(s)?
+Do you really want to delete the following object(s)?
 Vuoi veramente eliminare i seguenti oggetti?
-Do you really want to move the following objects(s) to the Recycle Bin?
+Do you really want to move the following object(s) to the Recycle Bin?
 Vuoi veramente spostare i seguenti oggetti nel Cestino?
 Do you want FreeFileSync to automatically check for updates every week?
 Vuoi che FreeFileSync controlli automaticamente gli aggiornamenti ogni settimana?
@@ -353,11 +371,11 @@ Scaricare ora?
 Drag && drop
 Drag && drop
 Elements found:
-
+Elementi trovati:
 Elements processed:
-
+Elementi processati:
 Elements remaining:
-
+Elementi rimanenti:
 Email
 Email
 Endless loop when traversing directory:
@@ -461,7 +479,7 @@ Files esistenti su entrambi i lati, più recenti a sinistra
 Files that exist on both sides, right one is newer
 Files esistenti su entrambi i lati, più recenti a destra
 Files that have different content
-
+Files con contenuto differente
 Files/folders that exist on left side only
 Files/cartelle esistenti solo a sinistra
 Files/folders that exist on right side only
@@ -469,21 +487,23 @@ Files/cartelle esistenti solo a destra
 Filter files
 Filtro dei files
 Filter is active
-
+Il filtro e' attivo
 Filter settings have changed!
 Le impostazioni del filtro sono cambiate!
 Filter view
 Filtro della vista
 Filter: All pairs
-
+Filtro: Tutte le coppie
 Filter: Single pair
-
+Filtro: Singola coppia
 Find
 Trova
 Find what:
 Trova cosa:
 Folder Comparison and Synchronization
 Comparazione di Cartelle e Sincronizzazione
+Follow
+
 Free disk space available:
 Spazio libero su disco disponibile:
 FreeFileSync Batch Job
@@ -552,6 +572,8 @@ Identify and propagate changes on both sides using a database. Deletions and con
 Identifica e propaga cambiamenti su entrambi i lati usando un database. Cancellazioni e conflitti sono riconosciuti automaticamente.
 If you like FFS
 Se ti piace FFS
+Ignore
+
 Ignore 1-hour file time difference
 Ignora la differenza di file time di 1 ora
 Ignore errors
@@ -560,8 +582,6 @@ Ignore subsequent errors
 Ignora gli errori successivi
 Include
 Includi
-Include Symbolic Links
-
 Include all rows
 Includi tutte le righe
 Include temporarily
@@ -612,6 +632,8 @@ Move files into a time-stamped subdirectory
 Sposta file in una sotto-cartella datata
 Moving %x to Recycle Bin
 Spostamento di %x nel Cestino
+Moving Symbolic Link %x to user-defined directory %y
+
 Moving file %x to user-defined directory %y
 Spostamento del file %x nella directory personalizzata %y
 Moving folder %x to user-defined directory %y
@@ -641,7 +663,7 @@ Solo file e directory che passano il filtro saranno selezionati per la sincroniz
 Open with Explorer
 Apri con Explorer
 Open with default application
-
+Apri con applicazione di default
 Operation aborted!
 Operazione abortita!
 Operation:
@@ -653,11 +675,11 @@ Pausa
 Paused
 In pausa
 Planned directory deletion is in conflict with its subdirectories and -files!
-
+La cancellazione della directory pianificata e' in conflitto con queste sottodirectory e files!
 Please run a Compare first before synchronizing!
 Prima di sincronizzare effettua una Comparazione!
 Press \"Switch\" to open FreeFileSync GUI modus.
-
+Premi \"Switch\" per aprire modalità GUI di FreeFileSync
 Processing folder pair:
 Elaborazione coppia di cartelle:
 Published under the GNU General Public License:
@@ -673,7 +695,7 @@ RealtimeSync - Sincronizzazione Automatizzata
 RealtimeSync configuration
 Configurazione di RealtimeSync
 Recycle Bin not yet supported for this system!
-
+Cestino non ancora supportato per questo sistema!
 Relative path
 Percorso relativo
 Remove alternate settings
@@ -682,8 +704,6 @@ Remove folder
 Rimuovi cartella
 Remove folder pair
 Elimina la coppia di cartelle
-Renaming file %x to %y
-Rinomina file %x in %y
 Report translation error
 Segnala errori di traduzione
 Reset
@@ -769,12 +789,16 @@ Avvia sincronizzazione
 Statistics
 Statistiche
 Status feedback
-
+Feedback di stato
 Stop
 Stop
 Swap sides
 Inverti i lati
 Switching to FreeFileSync GUI modus...
+Switch alla modalità GUI di FreeFileSync...
+Symbolic Link handling
+
+Symlinks %x have the same date but a different target!
 
 Synchronization Preview
 Anteprima Sincronizzazione
@@ -800,12 +824,12 @@ Target directory already existing!
 Directory di destinazione già esistente!
 Target file already existing!
 File destinazione già esistente!
-The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-La linea di comando è eseguita ogni volta che:\n- una directory diviene disponibile (es: inserimento USB key)\n- file all'interno di queste directory o sotto-directory vengono modificati
+The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+
 The file does not contain a valid configuration:
 Il file non contiene una configurazione valida
 The file was not processed by last synchronization!
-
+Il file non era processato nell'ultima sincronizzazione!
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Questa variante definisce identici due file con lo stesso nome quando hanno la stessa dimensione E la stessa data e ora.
 Time
@@ -847,7 +871,7 @@ Verifica di file %x
 Volume name %x not part of filename %y!
 Il nome volume %x non è parte del nome file %y!
 Waiting for all directories to become available...
-
+In attesa che tutte le directory siano disponibili...
 Warning
 Attenzione
 Warning: Synchronization failed for %x item(s):

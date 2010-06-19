@@ -1,0 +1,2 @@
+#define VER_FREEFILESYNC     3,8,0,0
+#define VER_FREEFILESYNC_STR "3.8\0"

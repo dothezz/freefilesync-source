@@ -93,7 +93,7 @@ private:
               xmlAccess::XmlGlobalSettings& settings,
               bool startComparison);
 
-void cleanUp(bool saveLastUsedConfig);
+    void cleanUp(bool saveLastUsedConfig);
 
     //configuration load/save
     bool readConfigurationFromXml(const wxString& filename);
@@ -296,7 +296,7 @@ void cleanUp(bool saveLastUsedConfig);
     //compare status panel (hidden on start, shown when comparing)
     std::auto_ptr<CompareStatus> compareStatus; //always bound
 
-bool cleanedUp;
+    bool cleanedUp;
 
     //save the last used config filename history
     std::vector<wxString> cfgFileNames;
@@ -306,10 +306,10 @@ bool cleanedUp;
     int lastSortColumn;
     const wxGrid* lastSortGrid;
 
-#ifdef FFS_WIN
     //update icons periodically: one updater instance for both left and right grids
     std::auto_ptr<IconUpdater> updateFileIcons;
 
+#ifdef FFS_WIN
     //enable moving window by clicking on sub-windows instead of header line
     std::auto_ptr<FreeFileSync::MouseMoveWindow> moveWholeWindow;
 #endif

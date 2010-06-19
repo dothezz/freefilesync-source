@@ -60,10 +60,12 @@ public:
 
     virtual ~CustomGrid() {}
 
-    void initSettings(CustomGridLeft*   gridLeft,
+    void initSettings(CustomGridLeft*   gridLeft,  //create connection with FreeFileSync::GridView
                       CustomGridMiddle* gridMiddle,
                       CustomGridRight*  gridRight,
                       const FreeFileSync::GridView* gridDataView);
+
+    void release(); //release connection to FreeFileSync::GridView
 
     std::set<size_t> getAllSelectedRows() const;
 
@@ -112,7 +114,6 @@ class GridCellRenderer;
 
 
 //-----------------------------------------------------------
-#ifdef FFS_WIN
 class IconUpdater : private wxEvtHandler //update file icons periodically: use SINGLE instance to coordinate left and right grid at once
 {
 public:
@@ -127,7 +128,6 @@ private:
 
     std::auto_ptr<wxTimer> m_timer; //user timer event to periodically update icons: better than idle event because also active when scrolling! :)
 };
-#endif
 
 
 //############## SPECIALIZATIONS ###################
@@ -159,15 +159,12 @@ public:
     void autoSizeColumns();        //performance optimized column resizer
     void autoSizeColumns(int col, bool doRefresh = true); //
 
-#ifdef FFS_WIN
     void enableFileIcons(const bool value);
-#endif
 
 private:
     CustomGridTableRim* getGridDataTable();
     virtual const CustomGridTableRim* getGridDataTable() const = 0;
 
-#ifdef FFS_WIN
     //asynchronous icon loading
     void getIconsToBeLoaded(std::vector<Zstring>& newLoad); //loads all (not yet) drawn icons
 
@@ -183,7 +180,6 @@ private:
     LoadSuccess loadIconSuccess; //save status of last icon load when drawing on GUI
 
     bool fileIconsAreEnabled;
-#endif
 
     xmlAccess::ColumnAttributes columnSettings; //set visibility, position and width of columns
 };

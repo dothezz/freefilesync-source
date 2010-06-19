@@ -94,9 +94,13 @@ void CompareStatusHandler::initNewProcess(int objectsTotal, wxLongLong dataTotal
     case StatusHandler::PROCESS_SCANNING:
         break;
     case StatusHandler::PROCESS_COMPARING_CONTENT:
+    {
+        wxWindowUpdateLocker dummy(mainDialog);
         mainDialog->compareStatus->switchToCompareBytewise(objectsTotal, dataTotal);
-        mainDialog->Layout();
-        break;
+        mainDialog->Layout();  //show progress bar...
+        mainDialog->Refresh(); //remove distortion...
+    }
+    break;
     case StatusHandler::PROCESS_SYNCHRONIZING:
     case StatusHandler::PROCESS_NONE:
         assert(false);
@@ -241,7 +245,7 @@ SyncStatusHandler::~SyncStatusHandler()
     if (totalErrors > 0)
     {
         wxString header(_("Warning: Synchronization failed for %x item(s):"));
-        header.Replace(wxT("%x"), FreeFileSync::numberToWxString(totalErrors, true), false);
+        header.Replace(wxT("%x"), FreeFileSync::numberToStringSep(totalErrors), false);
         finalMessage += header + wxT("\n\n");
     }
 
@@ -371,6 +375,12 @@ void SyncStatusHandler::reportWarning(const wxString& warningMessage, bool& warn
 
         assert(false);
     }
+}
+
+
+void SyncStatusHandler::reportInfo(const wxString& infoMessage)
+{
+    errorLog.logInfo(infoMessage);
 }
 
 

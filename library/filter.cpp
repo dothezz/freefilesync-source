@@ -251,8 +251,7 @@ bool NameFilter::passDirFilter(const Zstring& relDirname, bool* subObjMightMatch
     {
         if (subObjMightMatch)
         {
-            Zstring subNameBegin = relDirname;
-            subNameBegin += globalFunctions::FILE_NAME_SEPARATOR;
+            const Zstring& subNameBegin = relDirname + globalFunctions::FILE_NAME_SEPARATOR; //const-ref optimization
 
             *subObjMightMatch = matchesFilterBegin(subNameBegin, filterFileIn) || //might match a file in subdirectory
                                 matchesFilterBegin(subNameBegin, filterFolderIn); //or another subdirectory

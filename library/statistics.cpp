@@ -31,11 +31,12 @@ RetrieveStatistics::~RetrieveStatistics()
 
     for (std::vector<statEntry>::const_iterator i = data.begin(); i != data.end(); ++i)
     {
-        outputFile.Write(FreeFileSync::numberToWxString(static_cast<int>(i->time), false));
+        using globalFunctions::numberToString;
+        outputFile.Write(numberToString(i->time));
         outputFile.Write(wxT(";"));
-        outputFile.Write(FreeFileSync::numberToWxString(i->objects, false));
+        outputFile.Write(numberToString(i->objects));
         outputFile.Write(wxT(";"));
-        outputFile.Write(FreeFileSync::numberToWxString(static_cast<int>(i->value), false));
+        outputFile.Write(numberToString(i->value));
         outputFile.Write(wxT("\n"));
     }
 }
@@ -63,6 +64,10 @@ bool isNull(double number)
 inline
 wxString Statistics::formatRemainingTime(double timeInMs) const
 {
+#ifndef _MSC_VER
+#warning adapt units "%x sec"
+#endif
+
     bool unitSec = true;
     double remainingTime = timeInMs / 1000;
     wxString unit = _(" sec");
@@ -82,7 +87,6 @@ wxString Statistics::formatRemainingTime(double timeInMs) const
             }
         }
     }
-
 
     int formattedTime = globalFunctions::round(remainingTime);
 
@@ -104,7 +108,7 @@ wxString Statistics::formatRemainingTime(double timeInMs) const
     }
     remainingTimeLast = formattedTime;
 
-    return FreeFileSync::numberToWxString(formattedTime, false) + unit;
+    return globalFunctions::numberToString(formattedTime) + unit;
     //+ wxT("(") + globalFunctions::numberToWxString(globalFunctions::round(timeInMs / 1000)) + wxT(")");
 }
 

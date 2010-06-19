@@ -215,7 +215,26 @@ bool readXmlElement(const std::string& name, const TiXmlElement* parent , FreeFi
 
         return true;
     }
+    return false;
+}
 
+
+bool readXmlElement(const std::string& name, const TiXmlElement* parent , FreeFileSync::SymLinkHandling& output)
+{
+    std::string dummy;
+    if (xmlAccess::readXmlElement(name, parent, dummy))
+    {
+        if (dummy == "Ignore")
+            output = FreeFileSync::SYMLINK_IGNORE;
+        else if (dummy == "UseDirectly")
+            output = FreeFileSync::SYMLINK_USE_DIRECTLY;
+        else if (dummy == "FollowLink")
+            output = FreeFileSync::SYMLINK_FOLLOW_LINK;
+        else
+            return false;
+
+        return true;
+    }
     return false;
 }
 
@@ -233,7 +252,7 @@ bool readXmlElement(const std::string& name, const TiXmlElement* parent, Zstring
 
 bool readXmlAttribute(const std::string& name, const TiXmlElement* node, xmlAccess::ColumnTypes& output)
 {
-    int dummy;
+    int dummy = 0;
     if (xmlAccess::readXmlAttribute(name, node, dummy))
     {
         output = static_cast<xmlAccess::ColumnTypes>(dummy);
@@ -303,10 +322,7 @@ void FfsXmlParser::readXmlMainConfig(MainConfiguration& mainCfg)
     readXmlElementLogging("FileTimeTolerance", cmpSettings, mainCfg.hidden.fileTimeTolerance);
 
     //include symbolic links at all?
-    readXmlElementLogging("IncludeSymlinks", cmpSettings, mainCfg.processSymlinks);
-
-    //traverse into symbolic links (to folders)
-    readXmlElementLogging("TraverseDirectorySymlinks", cmpSettings, mainCfg.traverseDirectorySymlinks);
+    readXmlElementLogging("HandleSymlinks", cmpSettings, mainCfg.handleSymlinks);
 
 //###########################################################
     const TiXmlElement* syncCfg = hRoot.FirstChild("MainConfig").FirstChild("Synchronization").ToElement();
@@ -323,9 +339,6 @@ void FfsXmlParser::readXmlMainConfig(MainConfiguration& mainCfg)
 
 //###########################################################
     const TiXmlElement* syncConfig = hRoot.FirstChild("MainConfig").FirstChild("Synchronization").ToElement();
-
-    //copy symbolic links to files
-    readXmlElementLogging("CopyFileSymlinks", syncConfig, mainCfg.copyFileSymlinks);
 
     //verify file copying
     readXmlElementLogging("VerifyCopiedFiles", syncConfig, mainCfg.hidden.verifyFileCopy);
@@ -607,6 +620,23 @@ void addXmlElement(const std::string& name, const FreeFileSync::DeletionPolicy v
 }
 
 
+void addXmlElement(const std::string& name, const FreeFileSync::SymLinkHandling value, TiXmlElement* parent)
+{
+    switch (value)
+    {
+    case FreeFileSync::SYMLINK_IGNORE:
+        xmlAccess::addXmlElement(name, std::string("Ignore"), parent);
+        break;
+    case FreeFileSync::SYMLINK_USE_DIRECTLY:
+        xmlAccess::addXmlElement(name, std::string("UseDirectly"), parent);
+        break;
+    case FreeFileSync::SYMLINK_FOLLOW_LINK:
+        xmlAccess::addXmlElement(name, std::string("FollowLink"), parent);
+        break;
+    }
+}
+
+
 void addXmlElement(const std::string& name, const Zstring& value, TiXmlElement* parent)
 {
     xmlAccess::addXmlElement(name, wxString(zToWx(value)), parent);
@@ -696,10 +726,7 @@ bool writeXmlMainConfig(const MainConfiguration& mainCfg, TiXmlDocument& doc)
     addXmlElement("FileTimeTolerance", mainCfgLocal.hidden.fileTimeTolerance, cmpSettings);
 
     //include symbolic links at all?
-    addXmlElement("IncludeSymlinks", mainCfgLocal.processSymlinks, cmpSettings);
-
-    //traverse into symbolic links (to folders)
-    addXmlElement("TraverseDirectorySymlinks", mainCfgLocal.traverseDirectorySymlinks, cmpSettings);
+    addXmlElement("HandleSymlinks", mainCfgLocal.handleSymlinks, cmpSettings);
 
 //###########################################################
     TiXmlElement* syncSettings = new TiXmlElement("Synchronization");
@@ -719,9 +746,6 @@ bool writeXmlMainConfig(const MainConfiguration& mainCfg, TiXmlDocument& doc)
     addXmlElement("Conflict",   mainCfgLocal.syncConfiguration.conflict,        syncDirections);
 
 //###########################################################
-    //copy symbolic links to files
-    addXmlElement("CopyFileSymlinks", mainCfgLocal.copyFileSymlinks, syncSettings);
-
     //verify file copying
     addXmlElement("VerifyCopiedFiles", mainCfgLocal.hidden.verifyFileCopy, syncSettings);
 

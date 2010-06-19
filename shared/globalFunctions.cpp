@@ -8,28 +8,7 @@
 #include <wx/msgdlg.h>
 #include <wx/file.h>
 #include <wx/stopwatch.h>
-#include <cmath>
 #include "systemConstants.h"
-
-
-int globalFunctions::wxStringToInt(const wxString& number)
-{
-    long result = 0;
-    if (number.ToLong(&result))
-        return result;
-    else
-        return 0; //don't throw exceptions here: wxEmptyString shall be interpreted as 0
-}
-
-
-double globalFunctions::wxStringToDouble(const wxString& number)
-{
-    double result = 0;
-    if (number.ToDouble(&result))
-        return result;
-    else
-        return 0; //don't throw exceptions here: wxEmptyString shall be interpreted as 0
-}
 
 
 size_t globalFunctions::getDigitCount(size_t number) //count number of digits

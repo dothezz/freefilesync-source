@@ -19,6 +19,12 @@ public:
 
 private:
     void OnStartApplication(wxIdleEvent& event);
+
+	virtual wxLayoutDirection GetLayoutDirection() const //disable RTL languages for now...
+{
+ return wxLayout_LeftToRight;
+}
+
 };
 
 #endif // REALTIMESYNCAPP_H

@@ -39,6 +39,7 @@ private:
     void getNumbersRecursively(const HierarchyObject& hierObj);
 
     void getFileNumbers(const FileMapping& fileObj);
+    void getLinkNumbers(const SymLinkMapping& linkObj);
     void getDirNumbers(const DirMapping& dirObj);
 
     int createLeft,    createRight;
@@ -71,9 +72,7 @@ std::vector<FolderPairSyncCfg> extractSyncCfg(const MainConfiguration& mainCfg);
 class SyncProcess
 {
 public:
-    SyncProcess(bool copyFileSymLinks,
-                bool traverseDirSymLinks,
-                xmlAccess::OptionalDialogs& warnings,
+    SyncProcess(xmlAccess::OptionalDialogs& warnings,
                 bool verifyCopiedFiles,
                 bool copyLockedFiles,
                 StatusHandler& handler);
@@ -84,8 +83,6 @@ public:
 private:
     friend class SynchronizeFolderPair;
 
-    const bool m_copyFileSymLinks;
-    const bool m_traverseDirSymLinks;
     const bool m_verifyCopiedFiles;
     const bool copyLockedFiles_;
 

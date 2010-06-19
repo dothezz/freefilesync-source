@@ -6,10 +6,6 @@
  GB
  MB
  MB
- PB
- PB
- TB
- TB
  day(s)
  gün(ler)
  hour(s)
@@ -22,12 +18,24 @@
  san
 %x / %y objects deleted successfully
 %x / %y obje başarıyla silindi
+%x Byte
+
+%x GB
+
+%x MB
+
+%x PB
+
+%x TB
+
 %x directories
 %x dizin
-%x files,
-%x dosya,
+%x files
+%x dosya
 %x is not a valid FreeFileSync batch file!
 %x geçerli bir FreeFileSync komut (batch) dosyası değildir!
+%x kB
+
 %x of %y rows in view
 %y satırdan %x'i görüntüleniyor
 %x of 1 row in view
@@ -90,6 +98,8 @@ Ge&ri yükle
 
 &Yes
 &Evet
+(Build: %x)
+
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Not: Sadece FAT/FAT32 olarak biçimlendirilmiş sürücüler bu problemden etkilenir!\nDiğer durumlarda, \"1-saat'lik zaman farkını yoksay\" ayarı devre dışı bırakılabilir.)
 (Requires an Internet connection!)
@@ -126,8 +136,8 @@ Ge&ri yükle
 /san
 1 directory
 1 dizin
-1 file,
-1 dosya,
+1 file
+1 dosya
 1. &Compare
 1. &Karşılaştır
 1. Enter relative file or directory names separated by ';' or a new line.
@@ -150,6 +160,8 @@ Ge&ri yükle
 <Dizin>
 <Last session>
 <Önceki oturum>
+<Symlink>
+
 <multiple selection>
 <Çoklu seçim>
 A newer version of FreeFileSync is available:
@@ -196,8 +208,6 @@ Browse
 Araştır
 Browse directory
 
-Build:
-Derleme:
 Cannot determine sync-direction:
 
 Cannot find %x
@@ -272,10 +282,14 @@ Copy shared or locked files using Volume Shadow Copy Service
 
 Copy to clipboard\tCTRL+C
 Hafızaya kopyala\tCTRL+C
+Copying Symbolic Link %x overwriting %y
+
+Copying Symbolic Link %x to %y
+
+Copying file %x overwriting %y
+
 Copying file %x to %y
 %x'den %y'e dosya kopyalanıyor
-Copying file %x to %y overwriting target
-%x'den %y'e üzerine yazmaya açık olarak dosya kopyalanıyor
 Could not determine volume name for file:
 Belirtilen dosya için birim adı belirlenemedi:
 Could not initialize directory monitoring:
@@ -320,6 +334,8 @@ Delete or overwrite files permanently
 Kalıcı olarak üzerine yaz veya sil
 Delete permanently
 Kalıcı olarak sil
+Deleting Symbolic Link %x
+
 Deleting file %x
 %x dosyası siliniyor
 Deleting folder %x
@@ -328,6 +344,8 @@ Deletion handling
 Silme işleminin idaresi
 Description
 Açıklama
+Direct
+
 Directories are dependent! Be careful when setting up synchronization rules:
 Dizinler bağımlı! Senkronizasyon kurallarını koyarken dikkatli olun:
 Directories to watch
@@ -340,9 +358,9 @@ Do not show this dialog again
 Bu iletiyi tekrar gösterme
 Do nothing
 Hiçbir şey yapma
-Do you really want to delete the following objects(s)?
+Do you really want to delete the following object(s)?
 Gerçekten şu objeleri silmek istiyormusunuz?
-Do you really want to move the following objects(s) to the Recycle Bin?
+Do you really want to move the following object(s) to the Recycle Bin?
 Gerçekten şu objeleri geri dönüşüm kutusuna taşımak istiyormusunuz?
 Do you want FreeFileSync to automatically check for updates every week?
 Her hafta FreeFileSync'in güncellemeleri denetlemesini istermisiniz?
@@ -484,6 +502,8 @@ Find what:
 
 Folder Comparison and Synchronization
 Klasör Karşılaştırması ve Senkronizasyonu
+Follow
+
 Free disk space available:
 Boşta kullanılabilir disk alanı:
 FreeFileSync Batch Job
@@ -552,6 +572,8 @@ Identify and propagate changes on both sides using a database. Deletions and con
 
 If you like FFS
 Eğer FFS’i sevdiyseniz
+Ignore
+
 Ignore 1-hour file time difference
 1 saatlik dosya tarihi farklılaşmasını yoksay
 Ignore errors
@@ -560,8 +582,6 @@ Ignore subsequent errors
 Takibeden hataları yoksay
 Include
 Dahil et
-Include Symbolic Links
-
 Include all rows
 
 Include temporarily
@@ -612,6 +632,8 @@ Move files into a time-stamped subdirectory
 
 Moving %x to Recycle Bin
 %x geri dönüşüm kutusuna taşınıyor
+Moving Symbolic Link %x to user-defined directory %y
+
 Moving file %x to user-defined directory %y
 %x dosyası kullanıcı tanımlı dizin %y’e taşınıyor
 Moving folder %x to user-defined directory %y
@@ -682,8 +704,6 @@ Remove folder
 Klasörü kaldır
 Remove folder pair
 Klasör çiftini kaldır
-Renaming file %x to %y
-
 Report translation error
 Çeviri hatasını bildir
 Reset
@@ -776,6 +796,10 @@ Swap sides
 Tarafları ters çevir
 Switching to FreeFileSync GUI modus...
 
+Symbolic Link handling
+
+Symlinks %x have the same date but a different target!
+
 Synchronization Preview
 Senkronizasyon Önizlemesi
 Synchronization aborted!
@@ -800,7 +824,7 @@ Target directory already existing!
 Hedef dizin zaten mevcut!
 Target file already existing!
 Hedef dosya zaten mevcut!
-The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
 
 The file does not contain a valid configuration:
 Dosya geçerli bir konfigürasyon içermiyor:

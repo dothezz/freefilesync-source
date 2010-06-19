@@ -16,11 +16,11 @@
 #include "../synchronization.h"
 #include "../shared/customTooltip.h"
 #include <wx/dcclient.h>
+#include "iconBuffer.h"
+#include <wx/icon.h>
 
 #ifdef FFS_WIN
 #include <wx/timer.h>
-#include <wx/icon.h>
-#include "iconBuffer.h"
 #include "statusHandler.h"
 #include <cmath>
 
@@ -53,14 +53,6 @@ class CustomGridTable : public wxGridTableBase
 public:
     CustomGridTable(int initialRows = 0, int initialCols = 0) : //note: initialRows/initialCols MUST match with GetNumberRows()/GetNumberCols() at initialization!!!
         wxGridTableBase(),
-        COLOR_BLUE(      80,  110, 255),
-        COLOR_GREY(      212, 208, 200),
-        COLOR_CMP_RED(   249, 163, 165),
-        COLOR_CMP_BLUE(  144, 232, 246),
-        COLOR_CMP_GREEN( 147, 253, 159),
-        COLOR_SYNC_BLUE( 201, 203, 247),
-        COLOR_SYNC_GREEN(197, 248, 190),
-        COLOR_YELLOW(    247, 252,  62),
         gridDataView(NULL),
         lastNrRows(initialRows),
         lastNrCols(initialCols) {}
@@ -162,7 +154,7 @@ public:
 
     virtual wxGridCellAttr* GetAttr(int row, int col, wxGridCellAttr::wxAttrKind  kind)
     {
-        const wxColour& color = getRowColor(row);
+        const wxColour color = getRowColor(row);
 
         //add color to some rows
         wxGridCellAttr* result = wxGridTableBase::GetAttr(row, col, kind);
@@ -197,23 +189,35 @@ public:
     }
 
 protected:
-    const wxColour COLOR_BLUE;
-    const wxColour COLOR_GREY;
-    const wxColour COLOR_CMP_RED;
-    const wxColour COLOR_CMP_BLUE;
-    const wxColour COLOR_CMP_GREEN;
-    const wxColour COLOR_SYNC_BLUE;
-    const wxColour COLOR_SYNC_GREEN;
-    const wxColour COLOR_YELLOW;
+    static const wxColour COLOR_BLUE;
+    static const wxColour COLOR_GREY;
+    static const wxColour COLOR_ORANGE;
+    static const wxColour COLOR_CMP_RED;
+    static const wxColour COLOR_CMP_BLUE;
+    static const wxColour COLOR_CMP_GREEN;
+    static const wxColour COLOR_SYNC_BLUE;
+    static const wxColour COLOR_SYNC_GREEN;
+    static const wxColour COLOR_YELLOW;
 
     const GridView* gridDataView; //(very fast) access to underlying grid data :)
 
 private:
-    virtual const wxColour& getRowColor(int row) = 0; //rows that are filtered out are shown in different color
+    virtual const wxColour getRowColor(int row) = 0; //rows that are filtered out are shown in different color
 
     int lastNrRows;
     int lastNrCols;
 };
+
+//see http://www.latiumsoftware.com/en/articles/00015.php#12 for "safe" colors
+const wxColour CustomGridTable::COLOR_ORANGE(    238, 201, 0);
+const wxColour CustomGridTable::COLOR_BLUE(      80,  110, 255);
+const wxColour CustomGridTable::COLOR_GREY(      212, 208, 200);
+const wxColour CustomGridTable::COLOR_CMP_RED(   249, 163, 165);
+const wxColour CustomGridTable::COLOR_CMP_BLUE(  144, 232, 246);
+const wxColour CustomGridTable::COLOR_CMP_GREEN( 147, 253, 159);
+const wxColour CustomGridTable::COLOR_SYNC_BLUE( 201, 203, 247);
+const wxColour CustomGridTable::COLOR_SYNC_GREEN(197, 248, 190);
+const wxColour CustomGridTable::COLOR_YELLOW(    247, 252,  62);
 
 
 class CustomGridTableRim : public CustomGridTable
@@ -259,60 +263,143 @@ protected:
         {
             if (!fsObj->isEmpty<side>())
             {
-                const DirMapping* dirObj = dynamic_cast<const DirMapping*> (fsObj);
-                if (dirObj != NULL)
+                struct GetValue : public FSObjectVisitor
                 {
-                    switch (getTypeAtPos(col))
+                    GetValue(xmlAccess::ColumnTypes colType) : colType_(colType) {}
+                    virtual void visit(const FileMapping& fileObj)
                     {
-                    case xmlAccess::FULL_PATH:
-                        return zToWx(dirObj->getFullName<side>());
-                    case xmlAccess::FILENAME:
-                        return wxEmptyString;
-                    case xmlAccess::REL_PATH:
-                        return zToWx(dirObj->getRelativeName<side>());
-                    case xmlAccess::DIRECTORY:
-                        return zToWx(dirObj->getBaseDirPf<side>());
-                    case xmlAccess::SIZE: //file size
-                        return _("<Directory>");
-                    case xmlAccess::DATE: //date
-                        return wxEmptyString;
-                    case xmlAccess::EXTENSION: //file extension
-                        return wxEmptyString;
-                    }
-                }
-                else
-                {
-                    const FileMapping* fileObj = dynamic_cast<const FileMapping*>(fsObj);
-                    if (fileObj != NULL)
-                    {
-                        switch (getTypeAtPos(col))
+                        switch (colType_)
                         {
                         case xmlAccess::FULL_PATH:
-                            return zToWx(fileObj->getFullName<side>().BeforeLast(globalFunctions::FILE_NAME_SEPARATOR));
+                            value = zToWx(fileObj.getFullName<side>().BeforeLast(globalFunctions::FILE_NAME_SEPARATOR));
+                            break;
                         case xmlAccess::FILENAME: //filename
-                            return zToWx(fileObj->getShortName<side>());
+                            value = zToWx(fileObj.getShortName<side>());
+                            break;
                         case xmlAccess::REL_PATH: //relative path
-                            return zToWx(fileObj->getParentRelativeName());
+                            value = zToWx(fileObj.getParentRelativeName());
+                            break;
                         case xmlAccess::DIRECTORY:
-                            return zToWx(fileObj->getBaseDirPf<side>());
+                            value = zToWx(fileObj.getBaseDirPf<side>());
+                            break;
                         case xmlAccess::SIZE: //file size
-                            return FreeFileSync::numberToWxString(fileObj->getFileSize<side>(), true);
+                            value = FreeFileSync::numberToStringSep(fileObj.getFileSize<side>());
+                            break;
                         case xmlAccess::DATE: //date
-                            return FreeFileSync::utcTimeToLocalString(fileObj->getLastWriteTime<side>());
+                            value = FreeFileSync::utcTimeToLocalString(fileObj.getLastWriteTime<side>());
+                            break;
                         case xmlAccess::EXTENSION: //file extension
-                            return zToWx(fileObj->getExtension<side>());
+                            value = zToWx(fileObj.getExtension<side>());
+                            break;
                         }
                     }
-                }
+
+                    virtual void visit(const SymLinkMapping& linkObj)
+                    {
+                        switch (colType_)
+                        {
+                        case xmlAccess::FULL_PATH:
+                            value = zToWx(linkObj.getFullName<side>().BeforeLast(globalFunctions::FILE_NAME_SEPARATOR));
+                            break;
+                        case xmlAccess::FILENAME: //filename
+                            value = zToWx(linkObj.getShortName<side>());
+                            break;
+                        case xmlAccess::REL_PATH: //relative path
+                            value = zToWx(linkObj.getParentRelativeName());
+                            break;
+                        case xmlAccess::DIRECTORY:
+                            value = zToWx(linkObj.getBaseDirPf<side>());
+                            break;
+                        case xmlAccess::SIZE: //file size
+                            value = _("<Symlink>");
+                            break;
+                        case xmlAccess::DATE: //date
+                            value = FreeFileSync::utcTimeToLocalString(linkObj.getLastWriteTime<side>());
+                            break;
+                        case xmlAccess::EXTENSION: //file extension
+                            value = wxEmptyString;
+                            break;
+                        }
+                    }
+
+                    virtual void visit(const DirMapping& dirObj)
+                    {
+                        switch (colType_)
+                        {
+                        case xmlAccess::FULL_PATH:
+                            value = zToWx(dirObj.getFullName<side>());
+                            break;
+                        case xmlAccess::FILENAME:
+                            value = wxEmptyString;
+                            break;
+                        case xmlAccess::REL_PATH:
+                            value = zToWx(dirObj.getRelativeName<side>());
+                            break;
+                        case xmlAccess::DIRECTORY:
+                            value = zToWx(dirObj.getBaseDirPf<side>());
+                            break;
+                        case xmlAccess::SIZE: //file size
+                            value = _("<Directory>");
+                            break;
+                        case xmlAccess::DATE: //date
+                            value = wxEmptyString;
+                            break;
+                        case xmlAccess::EXTENSION: //file extension
+                            value = wxEmptyString;
+                            break;
+                        }
+                    }
+                    xmlAccess::ColumnTypes colType_;
+                    wxString value;
+                } getVal(getTypeAtPos(col));
+                fsObj->accept(getVal);
+                return getVal.value;
             }
         }
         //if data is not found:
         return wxEmptyString;
     }
 
+    template <SelectedSide side>
+    Zstring getIconFileImpl(size_t row) const  //return "folder" if row points to a folder
+    {
+        const FileSystemObject* fsObj = getRawData(row);
+        if (fsObj && !fsObj->isEmpty<side>())
+        {
+            struct GetIcon : public FSObjectVisitor
+            {
+                virtual void visit(const FileMapping& fileObj)
+                {
+                    //Optimization: if filename exists on both sides, always use left side's file:
+                    //Icon should be the same on both sides anyway...
+                    if (!fileObj.isEmpty<LEFT_SIDE>() && !fileObj.isEmpty<RIGHT_SIDE>())
+                        iconName = fileObj.getFullName<LEFT_SIDE>();
+                    else
+                        iconName = fileObj.getFullName<side>();
+                }
+                virtual void visit(const SymLinkMapping& linkObj)
+                {
+                    iconName = linkObj.getLinkType<side>() == LinkDescriptor::TYPE_DIR ?
+                               DefaultStr("folder") :
+                               linkObj.getFullName<side>();
+                }
+                virtual void visit(const DirMapping& dirObj)
+                {
+                    iconName = DefaultStr("folder");
+                }
+
+                Zstring iconName;
+            } getIcon;
+            fsObj->accept(getIcon);
+            return getIcon.iconName;
+        }
+
+        return Zstring();
+    }
+
 
 private:
-    virtual const wxColour& getRowColor(int row) //rows that are filtered out are shown in different color
+    virtual const wxColour getRowColor(int row) //rows that are filtered out are shown in different color
     {
         const FileSystemObject* fsObj = getRawData(row);
         if (fsObj)
@@ -320,11 +407,27 @@ private:
             //mark filtered rows
             if (!fsObj->isActive())
                 return COLOR_BLUE;
-            //mark directories
-            else if (isDirectoryMapping(*fsObj))
-                return COLOR_GREY;
-            else
-                return *wxWHITE;
+
+            //mark directories and symlinks
+            struct GetRowColor : public FSObjectVisitor
+            {
+                virtual void visit(const FileMapping& fileObj)
+                {
+                    rowColor = *wxWHITE;
+                }
+                virtual void visit(const SymLinkMapping& linkObj)
+                {
+                    rowColor = COLOR_ORANGE;
+                }
+                virtual void visit(const DirMapping& dirObj)
+                {
+                    rowColor = COLOR_GREY;
+                }
+
+                wxColour rowColor;
+            } getCol;
+            fsObj->accept(getCol);
+            return getCol.rowColor;
         }
         return *wxWHITE;
     }
@@ -344,16 +447,7 @@ public:
 
     virtual Zstring getIconFile(size_t row) const  //return "folder" if row points to a folder
     {
-        const FileSystemObject* fsObj = getRawData(row);
-        if (fsObj && !fsObj->isEmpty<LEFT_SIDE>())
-        {
-            if (isDirectoryMapping(*fsObj))  //it's a directory icon
-                return DefaultStr("folder");
-            else
-                return fsObj->getFullName<LEFT_SIDE>();
-        }
-
-        return Zstring();
+        return getIconFileImpl<LEFT_SIDE>(row);
     }
 };
 
@@ -368,23 +462,7 @@ public:
 
     virtual Zstring getIconFile(size_t row) const //return "folder" if row points to a folder
     {
-        const FileSystemObject* fsObj = getRawData(row);
-        if (fsObj && !fsObj->isEmpty<RIGHT_SIDE>())
-        {
-            if (isDirectoryMapping(*fsObj))  //it's a directory icon
-                return DefaultStr("folder");
-            else
-            {
-                //Optimization: if filename exists on both sides, always use left side's file:
-                //Icon should be the same on both sides anyway...
-                if (!fsObj->isEmpty<LEFT_SIDE>())
-                    return fsObj->getFullName<LEFT_SIDE>();
-                else
-                    return fsObj->getFullName<RIGHT_SIDE>();
-            }
-        }
-
-        return Zstring();
+        return getIconFileImpl<RIGHT_SIDE>(row);
     }
 };
 
@@ -431,7 +509,7 @@ public:
     }
 
 private:
-    virtual const wxColour& getRowColor(int row) //rows that are filtered out are shown in different color
+    virtual const wxColour getRowColor(int row) //rows that are filtered out are shown in different color
     {
         const FileSystemObject* fsObj = getRawData(row);
         if (fsObj)
@@ -502,10 +580,6 @@ CustomGrid::CustomGrid(wxWindow *parent,
     isLeading(false),
     m_marker(-1, ASCENDING)
 {
-    SetLayoutDirection(wxLayout_LeftToRight);                          //
-    GetGridWindow()->SetLayoutDirection(wxLayout_LeftToRight);         //avoid mirroring this dialog in RTL languages like Hebrew or Arabic
-    GetGridColLabelWindow()->SetLayoutDirection(wxLayout_LeftToRight); //
-
     //set color of selections
     wxColour darkBlue(40, 35, 140);
     SetSelectionBackground(darkBlue);
@@ -550,6 +624,12 @@ void CustomGrid::initSettings(CustomGridLeft*   gridLeft,
 }
 
 
+void CustomGrid::release() //release connection to FreeFileSync::GridView
+{
+    setGridDataTable(NULL);
+}
+
+
 bool CustomGrid::isLeadGrid() const
 {
     return isLeading;
@@ -574,7 +654,6 @@ void CustomGrid::OnPaintGrid(wxEvent& event)
 }
 
 
-inline
 void moveCursorWhileSelecting(const int anchor, const int oldPos, const int newPos, wxGrid* grid)
 {
     //note: all positions are valid in this context!
@@ -951,7 +1030,6 @@ std::set<size_t> CustomGrid::getAllSelectedRows() const
 //############################################################################################
 //CustomGrid specializations
 
-#ifdef FFS_WIN
 template <bool showFileIcons>
 class GridCellRenderer : public wxGridCellStringRenderer
 {
@@ -1039,8 +1117,8 @@ public:
                         m_loadIconSuccess[row] = iconLoaded && iconDrawnFully;
                     }
                 }
+                return;
             }
-            return;
         }
 
         //default
@@ -1072,7 +1150,6 @@ private:
 
     static const int LEFT_BORDER = 2;
 };
-#endif
 
 //----------------------------------------------------------------------------------------
 
@@ -1082,10 +1159,7 @@ CustomGridRim::CustomGridRim(wxWindow *parent,
                              const wxSize& size,
                              long style,
                              const wxString& name) :
-    CustomGrid(parent, id, pos, size, style, name)
-#ifdef FFS_WIN
-    , fileIconsAreEnabled(false)
-#endif
+    CustomGrid(parent, id, pos, size, style, name), fileIconsAreEnabled(false)
 {}
 
 
@@ -1164,14 +1238,15 @@ xmlAccess::ColumnAttributes CustomGridRim::getColumnAttributes()
 void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
 {
     //remove special alignment for column "size"
-    for (int i = 0; i < GetNumberCols(); ++i)
-        if (getTypeAtPos(i) == xmlAccess::SIZE)
-        {
-            wxGridCellAttr* cellAttributes = GetOrCreateCellAttr(0, i);
-            cellAttributes->SetAlignment(wxALIGN_LEFT,wxALIGN_CENTRE);
-            SetColAttr(i, cellAttributes);
-            break;
-        }
+    if (GetLayoutDirection() != wxLayout_RightToLeft) //don't change for RTL languages
+        for (int i = 0; i < GetNumberCols(); ++i)
+            if (getTypeAtPos(i) == xmlAccess::SIZE)
+            {
+                wxGridCellAttr* cellAttributes = GetOrCreateCellAttr(0, i);
+                cellAttributes->SetAlignment(wxALIGN_LEFT,wxALIGN_CENTRE);
+                SetColAttr(i, cellAttributes);
+                break;
+            }
 //----------------------------------------------------------------------------------
 
     columnSettings.clear();
@@ -1222,14 +1297,15 @@ void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
 
 //--------------------------------------------------------------------------------------------------------
     //set special alignment for column "size"
-    for (int i = 0; i < GetNumberCols(); ++i)
-        if (getTypeAtPos(i) == xmlAccess::SIZE)
-        {
-            wxGridCellAttr* cellAttributes = GetOrCreateCellAttr(0, i);
-            cellAttributes->SetAlignment(wxALIGN_RIGHT, wxALIGN_CENTRE);
-            SetColAttr(i, cellAttributes); //make filesize right justified on grids
-            break;
-        }
+    if (GetLayoutDirection() != wxLayout_RightToLeft) //don't change for RTL languages
+        for (int i = 0; i < GetNumberCols(); ++i)
+            if (getTypeAtPos(i) == xmlAccess::SIZE)
+            {
+                wxGridCellAttr* cellAttributes = GetOrCreateCellAttr(0, i);
+                cellAttributes->SetAlignment(wxALIGN_RIGHT, wxALIGN_CENTRE);
+                SetColAttr(i, cellAttributes); //make filesize right justified on grids
+                break;
+            }
 
     ClearSelection();
     ForceRefresh();
@@ -1328,7 +1404,6 @@ void CustomGridRim::autoSizeColumns()  //performance optimized column resizer (a
 }
 
 
-#ifdef FFS_WIN
 void CustomGridRim::enableFileIcons(const bool value)
 {
     fileIconsAreEnabled = value;
@@ -1449,7 +1524,6 @@ void IconUpdater::loadIconsAsynchronously(wxEvent& event) //loads all (not yet) 
 
     //event.Skip();
 }
-#endif
 
 //----------------------------------------------------------------------------------------
 
@@ -1591,6 +1665,11 @@ CustomGridMiddle::CustomGridMiddle(wxWindow *parent,
     gridDataTable(NULL),
     toolTip(new CustomTooltip)
 {
+    SetLayoutDirection(wxLayout_LeftToRight);                          //
+    GetGridWindow()->SetLayoutDirection(wxLayout_LeftToRight);         //avoid mirroring this dialog in RTL languages like Hebrew or Arabic
+    GetGridColLabelWindow()->SetLayoutDirection(wxLayout_LeftToRight); //
+
+
     //connect events for dynamic selection of sync direction
     GetGridWindow()->Connect(wxEVT_MOTION,       wxMouseEventHandler(CustomGridMiddle::OnMouseMovement), NULL, this);
     GetGridWindow()->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CustomGridMiddle::OnLeaveWindow),   NULL, this);
@@ -1848,6 +1927,11 @@ void CustomGridMiddle::enableSyncPreview(bool value)
 {
     assert(gridDataTable);
     gridDataTable->enableSyncPreview(value);
+
+    if (value)
+        GetGridColLabelWindow()->SetToolTip(_("Synchronization Preview"));
+    else
+        GetGridColLabelWindow()->SetToolTip(_("Comparison Result"));
 }
 
 

@@ -9,7 +9,8 @@
 
 using namespace FreeFileSync;
 
-
+namespace
+{
 struct LowerID
 {
     bool operator()(const FileSystemObject& a, HierarchyObject::ObjectID b) const
@@ -27,12 +28,13 @@ struct LowerID
         return a < b.getId();
     }
 };
+}
 
 
 const FileSystemObject* HierarchyObject::retrieveById(ObjectID id) const //returns NULL if object is not found
 {
     //ATTENTION: HierarchyObject::retrieveById() can only work correctly if the following conditions are fulfilled:
-    //1. on each level, files are added first, then directories (=> file id < dir id)
+    //1. on each level, files are added first, symlinks, then directories (=> file id < link id < dir id)
     //2. when a directory is added, all subdirectories must be added immediately (recursion) before the next dir on this level is added
     //3. entries may be deleted but NEVER new ones inserted!!!
     //=> this allows for a quasi-binary search by id!
@@ -50,16 +52,26 @@ const FileSystemObject* HierarchyObject::retrieveById(ObjectID id) const //retur
         else //id found
             return &(*i);
     }
-    else //search within sub-directories
+
+    //search within sub-symlinks
+    SubLinkMapping::const_iterator j = std::lower_bound(subLinks.begin(), subLinks.end(), id, LowerID()); //binary search!
+    if (j != subLinks.end())
     {
-        SubDirMapping::const_iterator j = std::lower_bound(subDirs.begin(), subDirs.end(), id, LowerID()); //binary search!
-        if (j != subDirs.end() && !LowerID()(id, *j)) //id == j
+        //id <= i
+        if (LowerID()(id, *j))
+            return NULL; // --i < id < i
+        else //id found
             return &(*j);
-        else if (j == subDirs.begin()) //either begin() == end() or id < begin()
-            return NULL;
-        else
-            return (--j)->retrieveById(id); //j != begin() and id < j
     }
+
+    //search within sub-directories
+    SubDirMapping::const_iterator k = std::lower_bound(subDirs.begin(), subDirs.end(), id, LowerID()); //binary search!
+    if (k != subDirs.end() && !LowerID()(id, *k)) //id == j
+        return &(*k);
+    else if (k == subDirs.begin()) //either begin() == end() or id < begin()
+        return NULL;
+    else
+        return (--k)->retrieveById(id); //j != begin() and id < j
 }
 
 
@@ -74,13 +86,12 @@ struct IsInvalid
 
 void FileSystemObject::removeEmptyNonRec(HierarchyObject& hierObj)
 {
-    //remove invalid files
-    hierObj.useSubFiles().erase(std::remove_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), IsInvalid()),
-                                hierObj.useSubFiles().end());
-
-    //remove invalid directories
-    hierObj.useSubDirs().erase(std::remove_if(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), IsInvalid()),
-                               hierObj.useSubDirs().end());
+    //remove invalid files:
+    hierObj.useSubFiles().erase(std::remove_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), IsInvalid()), hierObj.useSubFiles().end());
+    //remove invalid symlinks:
+    hierObj.useSubLinks().erase(std::remove_if(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), IsInvalid()), hierObj.useSubLinks().end());
+    //remove invalid directories:
+    hierObj.useSubDirs(). erase(std::remove_if(hierObj.useSubDirs(). begin(), hierObj.useSubDirs(). end(), IsInvalid()), hierObj.useSubDirs(). end());
 }
 
 

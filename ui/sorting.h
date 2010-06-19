@@ -15,6 +15,22 @@
 
 namespace FreeFileSync
 {
+namespace
+{
+struct CompileTimeReminder : public FSObjectVisitor
+{
+    virtual void visit(const FileMapping& fileObj) {}
+    virtual void visit(const SymLinkMapping& linkObj) {}
+    virtual void visit(const DirMapping& dirObj) {}
+} checkDymanicCasts; //just a compile-time reminder to check dynamic casts in this file
+}
+
+inline
+bool isDirectoryMapping(const FileSystemObject& fsObj)
+{
+    return dynamic_cast<const DirMapping*>(&fsObj) != NULL;
+}
+
 inline
 int compareString(const Zstring& stringA, const Zstring& stringB)
 {
@@ -91,12 +107,12 @@ bool sortByRelativeName(const FileSystemObject& a, const FileSystemObject& b)
     const bool isDirectoryA = isDirectoryMapping(a);
     const Zstring relDirNameA = isDirectoryA ?
                                 a.getRelativeName<side>() : //directory
-                                a.getParentRelativeName();  //file
+                                a.getParentRelativeName();  //file or symlink
 
     const bool isDirectoryB = isDirectoryMapping(b);
     const Zstring relDirNameB = isDirectoryB ?
                                 b.getRelativeName<side>() : //directory
-                                b.getParentRelativeName();  //file
+                                b.getParentRelativeName();  //file or symlink
 
 
     //compare relative names without filenames first
@@ -124,7 +140,6 @@ bool sortByFileSize(const FileSystemObject& a, const FileSystemObject& b)
     else if (b.isEmpty<side>())
         return true;  //empty rows always last
 
-
     const FileMapping* fileObjA = dynamic_cast<const FileMapping*>(&a);
     const FileMapping* fileObjB = dynamic_cast<const FileMapping*>(&b);
 
@@ -134,7 +149,7 @@ bool sortByFileSize(const FileSystemObject& a, const FileSystemObject& b)
         return true;  //directories last
 
     //return list beginning with largest files first
-    return Compare<!ascending>().isSmallerThan(fileObjA->getFileSize<side>(), fileObjB->getFileSize<side>());
+    return Compare<ascending>().isSmallerThan(fileObjA->getFileSize<side>(), fileObjB->getFileSize<side>());
 }
 
 
@@ -151,13 +166,19 @@ bool sortByDate(const FileSystemObject& a, const FileSystemObject& b)
     const FileMapping* fileObjA = dynamic_cast<const FileMapping*>(&a);
     const FileMapping* fileObjB = dynamic_cast<const FileMapping*>(&b);
 
-    if (fileObjA == NULL)
+    const SymLinkMapping* linkObjA = dynamic_cast<const SymLinkMapping*>(&a);
+    const SymLinkMapping* linkObjB = dynamic_cast<const SymLinkMapping*>(&b);
+
+    if (!fileObjA && !linkObjA)
         return false; //directories last
-    else if (fileObjB == NULL)
+    else if (!fileObjB && !linkObjB)
         return true;  //directories last
 
+    const wxLongLong& dateA = fileObjA ? fileObjA->getLastWriteTime<side>() : linkObjA->getLastWriteTime<side>();
+    const wxLongLong& dateB = fileObjB ? fileObjB->getLastWriteTime<side>() : linkObjB->getLastWriteTime<side>();
+
     //return list beginning with newest files first
-    return Compare<!ascending>().isSmallerThan(fileObjA->getLastWriteTime<side>(), fileObjB->getLastWriteTime<side>());
+    return Compare<ascending>().isSmallerThan(dateA, dateB);
 }
 
 

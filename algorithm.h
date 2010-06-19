@@ -29,8 +29,8 @@ void setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsObj); /
 bool allElementsEqual(const FolderComparison& folderCmp);
 
 //filtering
-void applyFiltering(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp);
-void applyFiltering(const BaseFilter& filter, BaseDirMapping& baseDirectory);
+void applyFiltering(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp); //full filter apply
+void addExcludeFiltering(const Zstring& excludeFilter, FolderComparison& folderCmp); //exclude additional entries only
 
 void setActiveStatus(bool newStatus, FolderComparison& folderCmp); //activate or deactivate all rows
 void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or deactivate row: works recursively!

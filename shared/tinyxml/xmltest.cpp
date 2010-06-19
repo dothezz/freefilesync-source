@@ -583,7 +583,7 @@ int main()
 			// Check the round trip.
 			char savedBuf[256];
 			char verifyBuf[256];
-			int okay = 1;
+			int okay = 1; 
 
 			FILE* saved  = fopen( "utf8testout.xml", "r" );
 			FILE* verify = fopen( "utf8testverify.xml", "r" );

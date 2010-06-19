@@ -172,7 +172,7 @@ bool xmlAccess::readXmlElement(const std::string& name, const TiXmlElement* pare
     if (!readXmlElement(name, parent, temp))
         return false;
 
-    globalFunctions::stringToNumber(temp, output);
+    output = globalFunctions::stringToNumber<T>(temp);
     return true;
 }
 
@@ -181,7 +181,7 @@ template <class T>
 inline
 void xmlAccess::addXmlElement(const std::string& name, T value, TiXmlElement* parent)
 {
-    addXmlElement(name, globalFunctions::numberToString(value), parent);
+    addXmlElement(name, globalFunctions::numberToString<std::string::value_type>(value), parent);
 }
 
 
@@ -192,7 +192,7 @@ bool xmlAccess::readXmlAttribute(const std::string& name, const TiXmlElement* no
     std::string dummy;
     if (readXmlAttribute(name, node, dummy))
     {
-        globalFunctions::stringToNumber(dummy, output);
+        output = globalFunctions::stringToNumber<T>(dummy);
         return true;
     }
     else
@@ -204,7 +204,7 @@ template <class T>
 inline
 void xmlAccess::addXmlAttribute(const std::string& name, T value, TiXmlElement* node)
 {
-    addXmlAttribute(name, globalFunctions::numberToString(value), node);
+    addXmlAttribute(name, globalFunctions::numberToString<std::string::value_type>(value), node);
 }
 
 #endif // XMLBASE_H_INCLUDED

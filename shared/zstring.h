@@ -9,9 +9,10 @@
 
 #include <cstring> //size_t, memcpy(), memcmp()
 #include <cstdlib> //malloc(), free()
-#include <assert.h>
+#include <cassert>
 #include <vector>
 #include <sstream>
+#include <algorithm> //specialize std::swap
 
 #ifdef __WXDEBUG__
 #include <set>
@@ -97,6 +98,8 @@ public:
     friend bool operator!=(const Zstring&     lhs, const DefaultChar* rhs);
     friend bool operator!=(const DefaultChar* lhs, const Zstring& rhs);
 
+    void swap(Zstring& other);
+
     const DefaultChar operator[](size_t pos) const;
 
     Zstring& operator+=(const Zstring& other);
@@ -106,10 +109,7 @@ public:
     static const size_t	npos = static_cast<size_t>(-1);
 
 private:
-    //detect usage errors
-    Zstring(int);
-    friend const Zstring operator+(const DefaultChar* lhs, const Zstring& rhs);
-    friend const Zstring operator+(const DefaultChar ch, const Zstring& rhs);
+    Zstring(int); //detect usage errors
 
     DefaultChar* data();
 
@@ -137,20 +137,24 @@ private:
 };
 
 
-const Zstring operator+(const Zstring&     lhs, const Zstring& rhs);
+const Zstring operator+(const Zstring&     lhs, const Zstring&     rhs);
 const Zstring operator+(const Zstring&     lhs, const DefaultChar* rhs);
-const Zstring operator+(const DefaultChar* lhs, const Zstring& rhs);
-const Zstring operator+(DefaultChar        lhs, const Zstring& rhs);
-const Zstring operator+(const Zstring&     lhs, DefaultChar rhs);
-
+const Zstring operator+(const DefaultChar* lhs, const Zstring&     rhs);
+const Zstring operator+(DefaultChar        lhs, const Zstring&     rhs);
+const Zstring operator+(const Zstring&     lhs, DefaultChar        rhs);
 
 template <class T>
 Zstring numberToZstring(const T& number); //convert number to Zstring
 
-
-
-
-
+namespace std
+{
+template<>
+inline
+void swap(Zstring& rhs, Zstring& lhs)
+{
+    rhs.swap(lhs);
+}
+}
 
 
 
@@ -397,10 +401,7 @@ Zstring::operator const DefaultChar*() const
 inline
 Zstring& Zstring::operator=(const Zstring& source)
 {
-    source.incRef(); //implicitly handle case "this == &source" and avoid this check
-    decRef();        //
-    descr = source.descr;
-
+    Zstring(source).swap(*this);
     return *this;
 }
 
@@ -683,7 +684,7 @@ const DefaultChar Zstring::operator[](const size_t pos) const
 inline
 const Zstring operator+(const Zstring& lhs, const Zstring& rhs)
 {
-       return Zstring(lhs) += rhs;
+    return Zstring(lhs) += rhs;
 }
 
 
@@ -704,14 +705,14 @@ const Zstring operator+(const DefaultChar* lhs, const Zstring& rhs)
 inline
 const Zstring operator+(DefaultChar lhs, const Zstring& rhs)
 {
-return Zstring(lhs) += rhs;
+    return (Zstring() += lhs) += rhs;
 }
 
 
 inline
 const Zstring operator+(const Zstring& lhs, DefaultChar rhs)
 {
- return Zstring(lhs) += rhs;
+    return Zstring(lhs) += rhs;
 }
 
 
@@ -748,15 +749,18 @@ void Zstring::resize(size_t newSize, DefaultChar fillChar)
 }
 
 
+inline
+void Zstring::swap(Zstring& other)
+{
+    std::swap(descr, other.descr);
+}
+
+
 template <class T>
 inline
 Zstring numberToZstring(const T& number) //convert number to string the C++ way
 {
-#ifdef ZSTRING_CHAR
-    std::stringstream ss;
-#elif defined ZSTRING_WIDE_CHAR
-    std::wstringstream ss;
-#endif
+    std::basic_ostringstream<DefaultChar> ss;
     ss << number;
     return Zstring(ss.str().c_str());
 }

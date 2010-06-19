@@ -1,33 +1,33 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE
- Byte
- Byte
- GB
- GB
- MB
- MB
- PB
- PB
- TB
- TB
  day(s)
  Tag(e)
  hour(s)
  Stunde(n)
- kB
- kB
  min
  Min.
  sec
  Sek.
 %x / %y objects deleted successfully
 %x von %y Objekten erfolgreich gelöscht
+%x Byte
+%x Byte
+%x GB
+%x GB
+%x MB
+%x MB
+%x PB
+%x PB
+%x TB
+%x TB
 %x directories
 %x Verzeichnisse
-%x files,
-%x Dateien,
+%x files
+%x Dateien
 %x is not a valid FreeFileSync batch file!
 %x ist keine gültige FreeFileSync-Batchdatei!
+%x kB
+%x kB
 %x of %y rows in view
 %x von %y Zeilen zur Ansicht
 %x of 1 row in view
@@ -90,6 +90,8 @@ Konfiguration &laden...
 &Wechseln
 &Yes
 &Ja
+(Build: %x)
+(Build: %x)
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Achtung: Nur FAT/FAT32 Laufwerke sind von diesem Problem betroffen!\nIn allen anderen Fällen kann die Einstellung \"Zeitunterschied von einer Stunde ignorieren\" deaktiviert werden.)
 (Requires an Internet connection!)
@@ -126,8 +128,8 @@ Konfiguration &laden...
 /s
 1 directory
 1 Verzeichnis
-1 file,
-1 Datei,
+1 file
+1 Datei
 1. &Compare
 1. &Vergleichen
 1. Enter relative file or directory names separated by ';' or a new line.
@@ -150,6 +152,8 @@ Konfiguration &laden...
 <Verzeichnis>
 <Last session>
 <Letzte Sitzung>
+<Symlink>
+<Symlink>
 <multiple selection>
 <Mehrfachauswahl>
 A newer version of FreeFileSync is available:
@@ -196,8 +200,6 @@ Browse
 Auswählen
 Browse directory
 Verzeichnis öffnen
-Build:
-Build:
 Cannot determine sync-direction:
 Die Synchronisationsrichtung konnte nicht bestimmt werden:
 Cannot find %x
@@ -205,7 +207,7 @@ Cannot find %x
 Category
 Kategorie
 Clear filter settings
-Filtereinstellungen zurücksetzen
+Filtereinstellungen löschen
 Comma separated list
 Kommagetrennte Liste
 Command line
@@ -272,10 +274,14 @@ Copy shared or locked files using Volume Shadow Copy Service
 Gesperrte oder gemeinsam verwendete Dateien mit Hilfe des Volume Shadow Copy Service kopieren
 Copy to clipboard\tCTRL+C
 In die Zwischenablage kopieren\tCTRL+C
+Copying Symbolic Link %x overwriting %y
+Kopiere Symbolischen Link %x und überschreibe %y
+Copying Symbolic Link %x to %y
+Kopiere Symbolischen Link %x nach %y
+Copying file %x overwriting %y
+Kopiere Datei %x und überschreibe %y
 Copying file %x to %y
 Kopiere Datei %x nach %y
-Copying file %x to %y overwriting target
-Kopiere Datei %x nach %y und überschreibe Ziel
 Could not determine volume name for file:
 Der Laufwerksname für folgende Datei konnte nicht ermittelt werden:
 Could not initialize directory monitoring:
@@ -320,6 +326,8 @@ Delete or overwrite files permanently
 Dateien endgültig löschen oder überschreiben
 Delete permanently
 Endgültig löschen
+Deleting Symbolic Link %x
+Lösche Symbolischen Link %x
 Deleting file %x
 Lösche Datei %x
 Deleting folder %x
@@ -328,6 +336,8 @@ Deletion handling
 Behandlung von Löschungen
 Description
 Beschreibung
+Direct
+Direkt
 Directories are dependent! Be careful when setting up synchronization rules:
 Die Verzeichnisse sind voneinander abhängig! Achtung beim Festlegen der Synchronisationseinstellungen:
 Directories to watch
@@ -340,9 +350,9 @@ Do not show this dialog again
 Diesen Dialog nicht mehr anzeigen
 Do nothing
 Nichts tun
-Do you really want to delete the following objects(s)?
+Do you really want to delete the following object(s)?
 Sollen folgende Elemente wirklich gelöscht werden?
-Do you really want to move the following objects(s) to the Recycle Bin?
+Do you really want to move the following object(s) to the Recycle Bin?
 Sollen folgende Elemente wirklich in den Papierkorb verschoben werden?
 Do you want FreeFileSync to automatically check for updates every week?
 Soll FreeFileSync automatisch jede Woche nach Aktualisierungen suchen?
@@ -484,6 +494,8 @@ Find what:
 Suchen nach:
 Folder Comparison and Synchronization
 Verzeichnisvergleich und Synchronisation
+Follow
+Folgen
 Free disk space available:
 Verfügbarer freier Speicherplatz:
 FreeFileSync Batch Job
@@ -552,6 +564,8 @@ Identify and propagate changes on both sides using a database. Deletions and con
 Identifiziere und propagiere Änderungen auf beiden Seiten mit Hilfe einer Datenbank. Löschungen und Konflikte werden automatisch erkannt.
 If you like FFS
 FFS unterstützen
+Ignore
+Ignorieren
 Ignore 1-hour file time difference
 Zeitunterschied von einer Stunde ignorieren
 Ignore errors
@@ -560,8 +574,6 @@ Ignore subsequent errors
 Nachfolgende Fehler ignorieren
 Include
 Einschließen
-Include Symbolic Links
-Symbolische Links aufnehmen
 Include all rows
 Alle Zeilen einschließen
 Include temporarily
@@ -612,6 +624,8 @@ Move files into a time-stamped subdirectory
 Verschiebe Dateien in ein Unterverzeichnis mit Zeitstempel
 Moving %x to Recycle Bin
 Verschiebe %x in den Papierkorb
+Moving Symbolic Link %x to user-defined directory %y
+Verschiebe Symbolischen Link %x in benutzerdefiniertes Verzeichnis %y
 Moving file %x to user-defined directory %y
 Verschiebe Datei %x in benutzerdefiniertes Verzeichnis %y
 Moving folder %x to user-defined directory %y
@@ -682,8 +696,6 @@ Remove folder
 Verzeichnis entfernen
 Remove folder pair
 Verzeichnispaar entfernen
-Renaming file %x to %y
-Benenne Datei %x um nach %y
 Report translation error
 Übersetzungsfehler melden
 Reset
@@ -776,6 +788,10 @@ Swap sides
 Seiten vertauschen
 Switching to FreeFileSync GUI modus...
 Wechsle in die graphische Ansicht...
+Symbolic Link handling
+Verwendung Symbolischer Links
+Symlinks %x have the same date but a different target!
+Die Symbolischen Links %x haben dasselbe Datum, aber ein unterschiedliches Ziel!
 Synchronization Preview
 Vorschau auf Synchronisation
 Synchronization aborted!
@@ -800,8 +816,8 @@ Target directory already existing!
 Zielverzeichnis existiert bereits!
 Target file already existing!
 Die Zieldatei existiert bereits!
-The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-Die Befehlszeile wird ausgeführt wenn:\n- ein Verzeichnis verfügbar wird (z.B. beim Anschluss eines USB Sticks)\n- Dateien innerhalb dieser Verzeichnisse oder Unterverzeichnisse geändert werden
+The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+Die Befehlszeile wird ausgeführt wenn:\n- alle Verzeichnisse verfügbar werden (z.B. beim Anschluss eines USB Sticks)\n- Dateien innerhalb dieser Verzeichnisse oder Unterverzeichnisse geändert werden
 The file does not contain a valid configuration:
 Die Datei enthält keine gültige Konfiguration:
 The file was not processed by last synchronization!

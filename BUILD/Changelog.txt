@@ -2,6 +2,22 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.8
+--------------
+New options handling Symlinks: ignore/direct/follow => warning: new database format for <Automatic> mode
+Fixed crash when starting sync for Windows XP SP2
+Prevent tooltip from stealing focus
+Show associated file icons (Linux)
+Run folder existence checks in separate thread (faster network share access)
+Write <Automatic> mode database file even if both sides are already in sync
+Don't raise status dialog to the top after synchronisation
+Embedded version information into executable (Windows)
+Migrated Compiler to Visual C++ 2010 (Windows)
+Avoid losing manual changes when excluding via context menu
+Adjusted auto-updater web-address
+Updated translation files
+
+
 Changelog v3.7
 --------------
 RealtimeSync: Trigger commandline only if all directories are existing

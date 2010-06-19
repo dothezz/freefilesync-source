@@ -10,8 +10,8 @@
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 
 #elif defined FFS_LINUX
-#include <string.h>
-#include <errno.h>
+#include <cstring>
+#include <cerrno>
 #endif
 
 

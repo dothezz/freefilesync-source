@@ -6,10 +6,6 @@
  GB
  MB
  MB
- PB
- PB
- TB
- TB
  day(s)
  dia(s)
  hour(s)
@@ -22,12 +18,24 @@
  seg
 %x / %y objects deleted successfully
 %x / %y objetos borrados satisfactoriamente
+%x Byte
+%x Bytes
+%x GB
+%x GB
+%x MB
+%x MB
+%x PB
+%x PB
+%x TB
+%x TB
 %x directories
 %x directorios
-%x files,
-%x archivos,
+%x files
+%x archivos
 %x is not a valid FreeFileSync batch file!
 %x no es un archivo batch de FreeFileSync válido!
+%x kB
+%x kB
 %x of %y rows in view
 %x de %y filas en vista
 %x of 1 row in view
@@ -89,7 +97,9 @@
 &Switch
 &Cambiar
 &Yes
-&Yes
+&Si
+(Build: %x)
+(Completado: %x)
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Tenga en cuenta que sólo las unidades FAT/FAT32 se ven afectadas por este problema!\nEn los demás casos puede deshabilitar la opción \"ignorar 1-hora de diferencia\".)
 (Requires an Internet connection!)
@@ -126,8 +136,8 @@
 /seg
 1 directory
 1 directorio
-1 file,
-1 archivo,
+1 file
+1 archivo
 1. &Compare
 1. &Comparar
 1. Enter relative file or directory names separated by ';' or a new line.
@@ -150,6 +160,8 @@
 <Directorio>
 <Last session>
 <Última sesión>
+<Symlink>
+<Enlace simbólico>
 <multiple selection>
 <selección múltiple>
 A newer version of FreeFileSync is available:
@@ -196,8 +208,6 @@ Browse
 Examinar
 Browse directory
 Examinar directorio
-Build:
-Realizado:
 Cannot determine sync-direction:
 No se puede determinar la dirección de la sincronización:
 Cannot find %x
@@ -272,10 +282,14 @@ Copy shared or locked files using Volume Shadow Copy Service
 Copiar archivos compartidos o bloqueados usando el servicio "Volume Shadow Copy"
 Copy to clipboard\tCTRL+C
 Copiar al Portapapeles\tCTRL+C
+Copying Symbolic Link %x overwriting %y
+Copiando enlace simbólico %x y sobreescribiendo %y
+Copying Symbolic Link %x to %y
+Copiando enlace simbólico %x a %y
+Copying file %x overwriting %y
+Copiando archivo %x y sobreescribiendo %y
 Copying file %x to %y
 Copiar archivo %x a %y
-Copying file %x to %y overwriting target
-Copiar archivo %x a %y sobreescribiendo el destino
 Could not determine volume name for file:
 No se ha podido determinar el nombre del volumen para el archivo:
 Could not initialize directory monitoring:
@@ -320,6 +334,8 @@ Delete or overwrite files permanently
 Borrar o sobreescribir archivos permanentemente
 Delete permanently
 Borrar permanentemente
+Deleting Symbolic Link %x
+Eliminando enlace simbólico %x
 Deleting file %x
 Borrar archivo %x
 Deleting folder %x
@@ -328,6 +344,8 @@ Deletion handling
 Gestión de borrado
 Description
 Descripción
+Direct
+Enviar
 Directories are dependent! Be careful when setting up synchronization rules:
 ¡Los directorios son dependientes! Tenga cuidado al establecer las reglas de sincronización:
 Directories to watch
@@ -340,9 +358,9 @@ Do not show this dialog again
 No volver a mostrar este diálogo
 Do nothing
 No hacer nada
-Do you really want to delete the following objects(s)?
+Do you really want to delete the following object(s)?
 ¿Está seguro de querer borrar el/los siguiente(s) elemento(s)?
-Do you really want to move the following objects(s) to the Recycle Bin?
+Do you really want to move the following object(s) to the Recycle Bin?
 ¿Está seguro de querer mover el/los siguiente(s) elemento(s) a la Papelera de Reciclaje?
 Do you want FreeFileSync to automatically check for updates every week?
 ¿Quiere que FreeFileSync detecte automáticamente actualizaciones cada semana?
@@ -484,6 +502,8 @@ Find what:
 Buscar:
 Folder Comparison and Synchronization
 Comparación y Sincronización de Carpetas
+Follow
+Seguir
 Free disk space available:
 Espacio de disco disponible:
 FreeFileSync Batch Job
@@ -552,6 +572,8 @@ Identify and propagate changes on both sides using a database. Deletions and con
 Identificar y aplicar cambios en ambos lados usando una base de datos. Las eliminaciones y los conflictos se detectan automáticamente.
 If you like FFS
 Si te gusta FFS
+Ignore
+Ignorar
 Ignore 1-hour file time difference
 Ignorar el archivo de 1-hora de tiempo de diferencia
 Ignore errors
@@ -560,8 +582,6 @@ Ignore subsequent errors
 Ignorar errores posteriores
 Include
 Incluir
-Include Symbolic Links
-Incluir enlaces simbólicos
 Include all rows
 Incluir todas las filas
 Include temporarily
@@ -612,10 +632,12 @@ Move files into a time-stamped subdirectory
 Mover archivos a un subdirectorio con marca de tiempo
 Moving %x to Recycle Bin
 Mover %x a la Papelera de Reciclaje
+Moving Symbolic Link %x to user-defined directory %y
+Mover enlace simbólico %x al directorio definido por el usuario %y
 Moving file %x to user-defined directory %y
-Mover el archivo %x al directorio definido por el usuario %y.
+Mover el archivo %x al directorio definido por el usuario %y
 Moving folder %x to user-defined directory %y
-Mover la carpeta %x al directorio definido por el usuario %y.
+Mover la carpeta %x al directorio definido por el usuario %y
 Multiple...
 Múltiple...
 No change since last synchronization!
@@ -682,8 +704,6 @@ Remove folder
 Eliminar carpeta
 Remove folder pair
 Eliminar un par de carpetas
-Renaming file %x to %y
-Renombrando archivo %x a %y
 Report translation error
 Informar de errores de traducción
 Reset
@@ -776,6 +796,10 @@ Swap sides
 Intercambiar lados
 Switching to FreeFileSync GUI modus...
 Cambiando al modo GUI de FreeFileSync...
+Symbolic Link handling
+Gestión de enlaces simbólicos
+Symlinks %x have the same date but a different target!
+¡Los enlaces simbólicos %x tienen la misma fecha pero un destino diferente!
 Synchronization Preview
 Previsualización de la sincronización
 Synchronization aborted!
@@ -800,8 +824,8 @@ Target directory already existing!
 ¡El directorio de destino ya existe!
 Target file already existing!
 ¡El archivo de destino ya existe!
-The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-Cada vez que la línea de comandos se ejecuta:\n- un directorio se muestra disponible (por ejemplo, la inserción de una memoria USB)\n- los archivos dentro de estos directorios o subdirectorios son modificados
+The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+La línea de comandos se ejecuta cada vez:\n- todos los directorios estan disponibles (ej. inserción de un lápiz USB)\n- archivos dentro de directorios o subdirectorios son modificados
 The file does not contain a valid configuration:
 El archivo no contiene una configuración válida:
 The file was not processed by last synchronization!

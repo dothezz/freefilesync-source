@@ -175,22 +175,25 @@ void WaitCallbackImpl::OnContextMenuSelection(wxCommandEvent& event)
         break;
     case CONTEXT_ABOUT:
     {
-        //build information
-        wxString build = wxString(wxT("(")) + _("Build:") + wxT(" ") + __TDATE__;
+    //build information
+    wxString build = __TDATE__;
 #if wxUSE_UNICODE
-        build += wxT(" - Unicode");
+    build += wxT(" - Unicode");
 #else
-        build += wxT(" - ANSI");
+    build += wxT(" - ANSI");
 #endif //wxUSE_UNICODE
 
-        //compile time info about 32/64-bit build
-        if (Utility::is64BitBuild)
-            build += wxT(" x64)");
-        else
-            build += wxT(" x86)");
-        assert_static(Utility::is32BitBuild || Utility::is64BitBuild);
+    //compile time info about 32/64-bit build
+    if (Utility::is64BitBuild)
+        build += wxT(" x64");
+    else
+        build += wxT(" x86");
+    assert_static(Utility::is32BitBuild || Utility::is64BitBuild);
 
-        wxMessageDialog aboutDlg(NULL, wxString(wxT("RealtimeSync")) + wxT("\n\n") + build, _("About"), wxOK);
+wxString buildFormatted = _("(Build: %x)");
+buildFormatted.Replace(wxT("%x"), build);
+
+        wxMessageDialog aboutDlg(NULL, wxString(wxT("RealtimeSync")) + wxT("\n\n") + buildFormatted, _("About"), wxOK);
         aboutDlg.ShowModal();
     }
     break;

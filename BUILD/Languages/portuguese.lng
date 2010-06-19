@@ -6,10 +6,6 @@
  GB
  MB
  MB
- PB
- PB
- TB
- TB
  day(s)
  dia(s)
  hour(s)
@@ -22,12 +18,24 @@
  seg
 %x / %y objects deleted successfully
 %x / %y objectos eliminados com sucesso
+%x Byte
+
+%x GB
+
+%x MB
+
+%x PB
+
+%x TB
+
 %x directories
 %x pastas
-%x files,
-%x ficheiros,
+%x files
+%x ficheiros
 %x is not a valid FreeFileSync batch file!
 %x não é um batch válido do FreeFileSync!
+%x kB
+
 %x of %y rows in view
 %x de %y ficheiros
 %x of 1 row in view
@@ -90,6 +98,8 @@
 
 &Yes
 &Sim
+(Build: %x)
+
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Apenas as drives FAT/FAT32 são afectadas por este problema! \nPara todas as outras situações pode desactivar a opção \"ignorar diferença de 1 hora\".)
 (Requires an Internet connection!)
@@ -126,8 +136,8 @@
 /seg
 1 directory
 1 pastas
-1 file,
-1 ficheiro,
+1 file
+1 ficheiro
 1. &Compare
 1. &Comparar
 1. Enter relative file or directory names separated by ';' or a new line.
@@ -150,6 +160,8 @@
 <Directório>
 <Last session>
 <Última Sessão>
+<Symlink>
+
 <multiple selection>
 <Selecção Múltipla>
 A newer version of FreeFileSync is available:
@@ -196,8 +208,6 @@ Browse
 Procurar
 Browse directory
 
-Build:
-Criado:
 Cannot determine sync-direction:
 Não é possível saber a direcção de sincronização:
 Cannot find %x
@@ -272,10 +282,14 @@ Copy shared or locked files using Volume Shadow Copy Service
 Copiar ficheiros partilhados ou bloqueados usando o serviço Volume Shadow Copy
 Copy to clipboard\tCTRL+C
 Copiar para a Área de transferência\tCTRL+C
+Copying Symbolic Link %x overwriting %y
+
+Copying Symbolic Link %x to %y
+
+Copying file %x overwriting %y
+
 Copying file %x to %y
 Copiar ficheiro %x para %y
-Copying file %x to %y overwriting target
-Copiar ficheiro %x para %y substituindo
 Could not determine volume name for file:
 Não é possível determinar o nome do volume para o ficheiro:
 Could not initialize directory monitoring:
@@ -320,6 +334,8 @@ Delete or overwrite files permanently
 Apagar ou substituir ficheiros permanentemente
 Delete permanently
 Apagar permanentemente
+Deleting Symbolic Link %x
+
 Deleting file %x
 Apagar ficheiro %x
 Deleting folder %x
@@ -328,6 +344,8 @@ Deletion handling
 Controlo eliminação
 Description
 Descrição
+Direct
+
 Directories are dependent! Be careful when setting up synchronization rules:
 Directórios são dependentes! Cuidado ao definir as regras de sincronização:
 Directories to watch
@@ -340,9 +358,9 @@ Do not show this dialog again
 Não mostrar novamente
 Do nothing
 Não fazer nada
-Do you really want to delete the following objects(s)?
+Do you really want to delete the following object(s)?
 Quer mesmo eliminar o(s) seguinte(s) item(s) ?
-Do you really want to move the following objects(s) to the Recycle Bin?
+Do you really want to move the following object(s) to the Recycle Bin?
 Quer mesmo mover o(s) seguinte(s) objecto(s) para a Reciclagem?
 Do you want FreeFileSync to automatically check for updates every week?
 Deseja que o FreeFileSync procure automaticamente actualizações todas as semanas?
@@ -484,6 +502,8 @@ Find what:
 Procurar:
 Folder Comparison and Synchronization
 Comparação e Sincronização de pastas
+Follow
+
 Free disk space available:
 Espaço livre em disco:
 FreeFileSync Batch Job
@@ -552,6 +572,8 @@ Identify and propagate changes on both sides using a database. Deletions and con
 Identificar e propagar as mudanças usando base de dados. Eliminações e conflitos serão detectados automaticamente.
 If you like FFS
 Se gosta do FreeFileSync
+Ignore
+
 Ignore 1-hour file time difference
 Ignorar diferenças de 1 hora entre ficheiros
 Ignore errors
@@ -560,8 +582,6 @@ Ignore subsequent errors
 Ignorar erros subsequentes
 Include
 Incluir
-Include Symbolic Links
-
 Include all rows
 Incluir todas as linhas
 Include temporarily
@@ -612,6 +632,8 @@ Move files into a time-stamped subdirectory
 Mover ficheiros para uma pasta com a data
 Moving %x to Recycle Bin
 A mover %x para a Reciclagem
+Moving Symbolic Link %x to user-defined directory %y
+
 Moving file %x to user-defined directory %y
 A mover ficheiro %x para o directório &y
 Moving folder %x to user-defined directory %y
@@ -682,8 +704,6 @@ Remove folder
 Remover pasta(s)
 Remove folder pair
 Remover o par de pastas
-Renaming file %x to %y
-Mudar o nome de %x para %y
 Report translation error
 Informar um erro de tradução
 Reset
@@ -776,6 +796,10 @@ Swap sides
 Trocar lados
 Switching to FreeFileSync GUI modus...
 
+Symbolic Link handling
+
+Symlinks %x have the same date but a different target!
+
 Synchronization Preview
 Previsualizar sincronização
 Synchronization aborted!
@@ -800,8 +824,8 @@ Target directory already existing!
 Directório de destino já existe!
 Target file already existing!
 Ficheiro de destino já existe!
-The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-Linha de comnados a executar sempre que: \n- um directorio fica disponível (i.e. pen USB)\n- ficheiros dentro deste directórios ou sub-directórios forem alterados
+The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+
 The file does not contain a valid configuration:
 O ficheiro não contém uma configuração válida:
 The file was not processed by last synchronization!

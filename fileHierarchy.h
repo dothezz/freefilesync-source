@@ -22,11 +22,29 @@
 class DirectoryBuffer;
 
 
+namespace Utility //helper class to allow algorithms like std::for_each access to private parts of a predicate class
+{
+template <class T>
+class Proxy
+{
+public:
+    Proxy(T& target) : target_(target) {}
+    template <class FS> void operator()(FS& obj) const
+    {
+        target_(obj);
+    }
+
+private:
+    T& target_;
+};
+}
+
+
 namespace FreeFileSync
 {
 struct FileDescriptor
 {
-    FileDescriptor(const wxLongLong& lastWriteTimeRawIn,
+    FileDescriptor(const wxLongLong&  lastWriteTimeRawIn,
                    const wxULongLong& fileSizeIn) :
         //const Utility::FileID fileId) :
         lastWriteTimeRaw(lastWriteTimeRawIn),
@@ -39,6 +57,27 @@ struct FileDescriptor
 };
 
 
+struct LinkDescriptor
+{
+    enum LinkType
+    {
+        TYPE_DIR, //Windows: dir  symlink; Linux: dir symlink
+        TYPE_FILE //Windows: file symlink; Linux: file symlink or broken link (or other symlink, pathological)
+    };
+
+    LinkDescriptor(const wxLongLong& lastWriteTimeRawIn,
+                   const Zstring& targetPathIn,
+                   LinkType lt) :
+        lastWriteTimeRaw(lastWriteTimeRawIn),
+        targetPath(targetPathIn),
+        type(lt) {}
+
+    wxLongLong lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
+    Zstring    targetPath;       //symlink "content", may be empty if determination failed
+    LinkType   type;             //type is required for Windows only! On Linux there is no such thing => consider this when comparing Symbolic Links!
+};
+
+
 enum SelectedSide
 {
     LEFT_SIDE,
@@ -47,8 +86,10 @@ enum SelectedSide
 
 
 class FileContainer;
-class FileMapping;
+class SymLinkContainer;
 class DirMapping;
+class FileMapping;
+class SymLinkMapping;
 class FileSystemObject;
 class BaseDirMapping;
 class HierarchyObject;
@@ -66,6 +107,7 @@ class DirContainer
 {
 public:
     void addSubFile(const Zstring& shortName, const FileDescriptor& fileData);
+    void addSubLink(const Zstring& shortName, const LinkDescriptor& linkData);
     DirContainer& addSubDir(const Zstring& shortName);
 
     //------------------------------------------------------------------
@@ -74,8 +116,9 @@ public:
         bool operator()(const Zstring& a, const Zstring& b) const;
     };
 
-    typedef std::map<Zstring, DirContainer,  CmpFilename> SubDirList;  //key: shortName
-    typedef std::map<Zstring, FileContainer, CmpFilename> SubFileList; //
+    typedef std::map<Zstring, DirContainer,     CmpFilename> SubDirList;  //key: shortName
+    typedef std::map<Zstring, FileContainer,    CmpFilename> SubFileList; //
+    typedef std::map<Zstring, SymLinkContainer, CmpFilename> SubLinkList; //
     //------------------------------------------------------------------
 
     //iterator access: std::map is implementation detail! don't expose
@@ -85,17 +128,23 @@ public:
     SubFileList::const_iterator fileBegin() const;
     SubFileList::const_iterator fileEnd()   const;
 
+    SubLinkList::const_iterator linkBegin() const;
+    SubLinkList::const_iterator linkEnd()   const;
+
     size_t dirCount() const;
     size_t fileCount() const;
+    size_t linkCount() const;
 
-    const DirContainer*  findDir (const Zstring& shortName) const; //returns NULL if not found
-    const FileContainer* findFile(const Zstring& shortName) const; //
+    const DirContainer*     findDir (const Zstring& shortName) const; //returns NULL if not found
+    const FileContainer*    findFile(const Zstring& shortName) const; //
+    const SymLinkContainer* findLink(const Zstring& shortName) const; //
 
     DirContainer() {} //default constructor use for base directory only!
 
 private:
     SubDirList  subDirs;  //contained directories
     SubFileList subFiles; //contained files
+    SubLinkList subLinks; //contained symlinks (note: only symlinks that are not treated as their target are placed here!)
 };
 
 //------------------------------------------------------------------
@@ -106,39 +155,41 @@ public:
 
 private:
     friend class DirContainer;
-
-    FileContainer(const FileDescriptor& fileData) :
-        data(fileData) {}
+    FileContainer(const FileDescriptor& fileData) : data(fileData) {}
 
     const FileDescriptor data;
 };
 
-
-//------------------------------------------------------------------
-struct DirInformation
+class SymLinkContainer
 {
-    //filter settings (used when retrieving directory data)
-    BaseFilter::FilterRef filter;
+public:
+    const LinkDescriptor& getData() const;
 
-    //hierarchical directory information
-    DirContainer baseDirContainer;
+private:
+    friend class DirContainer;
+    SymLinkContainer(const LinkDescriptor& linkData) : data(linkData) {}
+
+    const LinkDescriptor data;
 };
 
 
+//------------------------------------------------------------------
 //save/load full directory information
 const Zstring& getSyncDBFilename(); //get short filename of database file
 
 //------------------------------------------------------------------
 /*    class hierarchy:
 
-      FileSystemObject  HierarchyObject
-            /|\              /|\
-       ______|______    ______|______
-      |             |  |             |
-FileMapping      DirMapping    BaseDirMapping
+               FileSystemObject         HierarchyObject
+                     /|\                      /|\
+       _______________|______________    ______|______
+      |               |              |  |             |
+SymLinkMapping    FileMapping     DirMapping    BaseDirMapping
 */
 
 //------------------------------------------------------------------
+
+
 class HierarchyObject
 {
 public:
@@ -159,16 +210,28 @@ public:
     void addSubFile(const Zstring&          fileNameShort, //file exists on right side only
                     const FileDescriptor&   right);
 
+    SymLinkMapping& addSubLink(const LinkDescriptor& left,  //link exists on both sides
+                               const Zstring&           linkNameShort,
+                               CompareSymlinkResult     defaultCmpResult,
+                               const LinkDescriptor&    right);
+    void addSubLink(const LinkDescriptor& left,          //link exists on left side only
+                    const Zstring&        linkNameShort);
+    void addSubLink(const Zstring&        linkNameShort, //link exists on right side only
+                    const LinkDescriptor& right);
+
     const Zstring& getRelativeNamePf() const; //get name relative to base sync dir with FILE_NAME_SEPARATOR postfix: "blah\"
     template <SelectedSide side> const Zstring& getBaseDir() const; //postfixed!
 
-    typedef std::vector<FileMapping> SubFileMapping; //MergeSides::execute() requires a structure that doesn't invalidate pointers after push_back()
-    typedef std::vector<DirMapping>  SubDirMapping;  //Note: deque<> has circular reference in VCPP!
+    typedef std::vector<FileMapping>    SubFileMapping; //MergeSides::execute() requires a structure that doesn't invalidate pointers after push_back()
+    typedef std::vector<DirMapping>     SubDirMapping;  //Note: deque<> has circular reference in VCPP!
+    typedef std::vector<SymLinkMapping> SubLinkMapping;
 
-    SubDirMapping&  useSubDirs();
     SubFileMapping& useSubFiles();
-    const SubDirMapping&  useSubDirs()  const;
+    SubLinkMapping& useSubLinks();
+    SubDirMapping&  useSubDirs();
     const SubFileMapping& useSubFiles() const;
+    const SubLinkMapping& useSubLinks() const;
+    const SubDirMapping&  useSubDirs()  const;
 
 protected:
     //constructor used by DirMapping
@@ -182,13 +245,15 @@ protected:
                     const Zstring& dirPostfixedRight) :
         baseDirLeft(dirPostfixedLeft),
         baseDirRight(dirPostfixedRight) {}
+
     ~HierarchyObject() {} //don't need polymorphic deletion
 
     virtual void swap();
 
 private:
-    SubDirMapping  subDirs;  //contained directory maps
     SubFileMapping subFiles; //contained file maps
+    SubLinkMapping subLinks; //contained symbolic link maps
+    SubDirMapping  subDirs;  //contained directory maps
 
     Zstring relNamePf;
     Zstring baseDirLeft;  //directory name ending with FILE_NAME_SEPARATOR
@@ -227,10 +292,22 @@ struct RelNamesBuffered
 };
 
 
+
+class FSObjectVisitor
+{
+public:
+    virtual ~FSObjectVisitor() {}
+    virtual void visit(const FileMapping&    fileObj) = 0;
+    virtual void visit(const SymLinkMapping& linkObj) = 0;
+    virtual void visit(const DirMapping&     dirObj)  = 0;
+};
+
 //------------------------------------------------------------------
 class FileSystemObject
 {
 public:
+    virtual void accept(FSObjectVisitor& visitor) const = 0;
+
     const Zstring getParentRelativeName() const; //get name relative to base sync dir without FILE_NAME_SEPARATOR postfix
     const Zstring getObjRelativeName() const;    //same as getRelativeName() but also returns value if either side is empty
     const Zstring& getObjShortName() const;      //same as getShortName() but also returns value if either side is empty
@@ -313,8 +390,10 @@ private:
 class DirMapping : public FileSystemObject, public HierarchyObject
 {
 public:
+    virtual void accept(FSObjectVisitor& visitor) const;
+
     virtual CompareFilesResult getCategory() const;
-    CompareDirResult getDirCategory() const; //returns actually used subsed of CompareFilesResult
+    CompareDirResult getDirCategory() const; //returns actually used subset of CompareFilesResult
     virtual const wxString& getCatConflict() const;
 
 private:
@@ -333,7 +412,7 @@ private:
                const HierarchyObject& parent) :
         FileSystemObject(existsLeft, existsRight, dirNameShort, parent),
         HierarchyObject(parent, dirNameShort),
-        cmpResult(!existsRight ? DIR_LEFT_SIDE_ONLY : existsLeft ? DIR_EQUAL : DIR_RIGHT_SIDE_ONLY) {}
+        cmpResult(!existsRight ? DIR_LEFT_SIDE_ONLY : (existsLeft ? DIR_EQUAL : DIR_RIGHT_SIDE_ONLY)) {}
 
     //categorization
     CompareDirResult cmpResult;
@@ -343,10 +422,11 @@ private:
 class FileMapping : public FileSystemObject
 {
 public:
+    virtual void accept(FSObjectVisitor& visitor) const;
+
     template <SelectedSide side> const wxLongLong&  getLastWriteTime() const;
     template <SelectedSide side> const wxULongLong& getFileSize() const;
     template <SelectedSide side> const Zstring getExtension() const;
-    //template <SelectedSide side> const Utility::FileID& getFileID() const;
 
     virtual CompareFilesResult getCategory() const;
     virtual const wxString& getCatConflict() const;
@@ -399,6 +479,66 @@ private:
 };
 
 //------------------------------------------------------------------
+class SymLinkMapping : public FileSystemObject //this class models a TRUE symbolic link, i.e. one that is NEVER dereferenced: deref-links should be directly placed in class File/DirMapping
+{
+public:
+    virtual void accept(FSObjectVisitor& visitor) const;
+
+    template <SelectedSide side> const wxLongLong&  getLastWriteTime() const; //write time of the link, NOT target!
+    template <SelectedSide side> LinkDescriptor::LinkType getLinkType() const;
+    template <SelectedSide side> const Zstring& getTargetPath() const;
+
+    virtual CompareFilesResult getCategory() const;
+    CompareSymlinkResult getLinkCategory()   const; //returns actually used subset of CompareFilesResult
+    virtual const wxString& getCatConflict() const;
+
+private:
+    friend class CompareProcess;  //only CompareProcess shall be allowed to change cmpResult
+    friend class HierarchyObject; //construction
+    virtual void swap();
+    virtual void removeObjectL();
+    virtual void removeObjectR();
+    virtual void copyToL();
+    virtual void copyToR();
+
+    template <CompareSymlinkResult res>
+    void setCategory();
+    void setCategoryConflict(const wxString& description);
+
+    SymLinkMapping(const LinkDescriptor& left, //link exists on both sides
+                   const Zstring&           linkNameShort,
+                   CompareSymlinkResult     defaultCmpResult,
+                   const LinkDescriptor&    right,
+                   const HierarchyObject&   parent) :
+        FileSystemObject(true, true, linkNameShort, parent),
+        cmpResult(defaultCmpResult),
+        dataLeft(left),
+        dataRight(right) {}
+    SymLinkMapping(const LinkDescriptor& left, //link exists on left side only
+                   const Zstring&           linkNameShort,
+                   const HierarchyObject&    parent) :
+        FileSystemObject(true, false, linkNameShort, parent),
+        cmpResult(SYMLINK_LEFT_SIDE_ONLY),
+        dataLeft(left),
+        dataRight(0, Zstring(), LinkDescriptor::TYPE_FILE) {}
+    SymLinkMapping(const Zstring&      linkNameShort, //link exists on right side only
+                   const LinkDescriptor&  right,
+                   const HierarchyObject& parent) :
+        FileSystemObject(false, true, linkNameShort, parent),
+        cmpResult(SYMLINK_RIGHT_SIDE_ONLY),
+        dataLeft(0, Zstring(), LinkDescriptor::TYPE_FILE),
+        dataRight(right) {}
+    //------------------------------------------------------------------
+
+    //categorization
+    CompareSymlinkResult cmpResult;
+    wxString cmpConflictDescr; //only filled if cmpResult == SYMLINK_CONFLICT
+
+    LinkDescriptor dataLeft;
+    LinkDescriptor dataRight;
+};
+
+//------------------------------------------------------------------
 class BaseDirMapping : public HierarchyObject //synchronization base directory
 {
 public:
@@ -421,9 +561,9 @@ typedef std::vector<BaseDirMapping> FolderComparison;
 
 //------------------------------------------------------------------
 
-//convenience methods
-//test whether FileSystemObject is a DirMapping
-bool isDirectoryMapping(const FileSystemObject& fsObj);
+
+
+
 
 
 
@@ -452,6 +592,27 @@ bool isDirectoryMapping(const FileSystemObject& fsObj);
 
 
 //---------------Inline Implementation---------------------------------------------------
+inline //inline virtual... admittedly its use may be limited
+void FileMapping::accept(FSObjectVisitor& visitor) const
+{
+    visitor.visit(*this);
+}
+
+
+inline
+void DirMapping::accept(FSObjectVisitor& visitor) const
+{
+    visitor.visit(*this);
+}
+
+
+inline
+void SymLinkMapping::accept(FSObjectVisitor& visitor) const
+{
+    visitor.visit(*this);
+}
+
+
 inline
 FileSystemObject* HierarchyObject::retrieveById(ObjectID id) //returns NULL if object is not found
 {
@@ -517,6 +678,20 @@ DirContainer::SubFileList::const_iterator DirContainer::fileEnd() const
 
 
 inline
+DirContainer::SubLinkList::const_iterator DirContainer::linkBegin() const
+{
+    return subLinks.begin();
+}
+
+
+inline
+DirContainer::SubLinkList::const_iterator DirContainer::linkEnd() const
+{
+    return subLinks.end();
+}
+
+
+inline
 size_t DirContainer::dirCount() const
 {
     return subDirs.size();
@@ -527,6 +702,13 @@ inline
 size_t DirContainer::fileCount() const
 {
     return subFiles.size();
+}
+
+
+inline
+size_t DirContainer::linkCount() const
+{
+    return subLinks.size();
 }
 
 
@@ -547,7 +729,22 @@ const FileContainer* DirContainer::findFile(const Zstring& shortName) const
 
 
 inline
+const SymLinkContainer* DirContainer::findLink(const Zstring& shortName) const
+{
+    const SubLinkList::const_iterator iter = subLinks.find(shortName);
+    return iter == subLinks.end() ? NULL : &iter->second;
+}
+
+
+inline
 const FileDescriptor& FileContainer::getData() const
+{
+    return data;
+}
+
+
+inline
+const LinkDescriptor& SymLinkContainer::getData() const
 {
     return data;
 }
@@ -564,6 +761,13 @@ inline
 void DirContainer::addSubFile(const Zstring& shortName, const FileDescriptor& fileData)
 {
     subFiles.insert(std::make_pair(shortName, FileContainer(fileData)));
+}
+
+
+inline
+void DirContainer::addSubLink(const Zstring& shortName, const LinkDescriptor& linkData)
+{
+    subLinks.insert(std::make_pair(shortName, SymLinkContainer(linkData)));
 }
 
 
@@ -799,6 +1003,8 @@ void HierarchyObject::swap()
     std::for_each(subFiles.begin(), subFiles.end(), std::mem_fun_ref(&FileMapping::swap));
     //directories
     std::for_each(subDirs.begin(), subDirs.end(), std::mem_fun_ref(&DirMapping::swap));
+    //symbolic links
+    std::for_each(subLinks.begin(), subLinks.end(), std::mem_fun_ref(&SymLinkMapping::swap));
 }
 
 
@@ -847,6 +1053,33 @@ void HierarchyObject::addSubFile(const Zstring&          fileNameShort, //file e
 
 
 inline
+SymLinkMapping& HierarchyObject::addSubLink(const LinkDescriptor& left,          //link exists on both sides
+        const Zstring&          linkNameShort,
+        CompareSymlinkResult      defaultCmpResult,
+        const LinkDescriptor&   right)
+{
+    subLinks.push_back(SymLinkMapping(left, linkNameShort, defaultCmpResult, right, *this));
+    return subLinks.back();
+}
+
+
+inline
+void HierarchyObject::addSubLink(const LinkDescriptor& left,          //link exists on left side only
+                                 const Zstring&        linkNameShort)
+{
+    subLinks.push_back(SymLinkMapping(left, linkNameShort, *this));
+}
+
+
+inline
+void HierarchyObject::addSubLink(const Zstring&        linkNameShort, //link exists on right side only
+                                 const LinkDescriptor& right)
+{
+    subLinks.push_back(SymLinkMapping(linkNameShort, right, *this));
+}
+
+
+inline
 const HierarchyObject::SubDirMapping& HierarchyObject::useSubDirs() const
 {
     return subDirs;
@@ -861,6 +1094,13 @@ const HierarchyObject::SubFileMapping& HierarchyObject::useSubFiles() const
 
 
 inline
+const HierarchyObject::SubLinkMapping& HierarchyObject::useSubLinks() const
+{
+    return subLinks;
+}
+
+
+inline
 HierarchyObject::SubDirMapping& HierarchyObject::useSubDirs()
 {
     return const_cast<SubDirMapping&>(static_cast<const HierarchyObject*>(this)->useSubDirs());
@@ -871,6 +1111,13 @@ inline
 HierarchyObject::SubFileMapping& HierarchyObject::useSubFiles()
 {
     return const_cast<SubFileMapping&>(static_cast<const HierarchyObject*>(this)->useSubFiles());
+}
+
+
+inline
+HierarchyObject::SubLinkMapping& HierarchyObject::useSubLinks()
+{
+    return const_cast<SubLinkMapping&>(static_cast<const HierarchyObject*>(this)->useSubLinks());
 }
 
 
@@ -909,7 +1156,8 @@ void DirMapping::removeObjectL()
 {
     cmpResult = DIR_RIGHT_SIDE_ONLY;
     std::for_each(useSubFiles().begin(), useSubFiles().end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
-    std::for_each(useSubDirs().begin(),  useSubDirs().end(),  std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
+    std::for_each(useSubLinks().begin(), useSubLinks().end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
+    std::for_each(useSubDirs(). begin(), useSubDirs() .end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
 }
 
 
@@ -918,7 +1166,8 @@ void DirMapping::removeObjectR()
 {
     cmpResult = DIR_LEFT_SIDE_ONLY;
     std::for_each(useSubFiles().begin(), useSubFiles().end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
-    std::for_each(useSubDirs().begin(),  useSubDirs().end(),  std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
+    std::for_each(useSubLinks().begin(), useSubLinks().end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
+    std::for_each(useSubDirs(). begin(), useSubDirs(). end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
 }
 
 
@@ -1022,8 +1271,7 @@ inline
 void FileMapping::copyToL()
 {
     cmpResult = FILE_EQUAL;
-    dataLeft = FileDescriptor(dataRight.lastWriteTimeRaw,
-                              dataRight.fileSize);
+    dataLeft = dataRight;
     //Utility::FileID()); //attention! do not copy FileID! It is retained on file renaming only!
 }
 
@@ -1032,8 +1280,7 @@ inline
 void FileMapping::copyToR()
 {
     cmpResult = FILE_EQUAL;
-    dataRight = FileDescriptor(dataLeft.lastWriteTimeRaw,
-                               dataLeft.fileSize);
+    dataRight = dataLeft;
     //Utility::FileID()); //attention! do not copy FileID! It is retained on file renaming only!
 }
 
@@ -1084,25 +1331,156 @@ const Zstring FileMapping::getExtension() const
 }
 
 
-//template <>
-//inline
-//const Utility::FileID& FileMapping::getFileID<LEFT_SIDE>() const
-//{
-//    return dataLeft.fileIdentifier;
-//}
-//
-//
-//template <>
-//inline
-//const Utility::FileID& FileMapping::getFileID<RIGHT_SIDE>() const
-//{
-//    return dataRight.fileIdentifier;
-//}
+template <>
+inline
+const wxLongLong& SymLinkMapping::getLastWriteTime<LEFT_SIDE>() const
+{
+    return dataLeft.lastWriteTimeRaw;
+}
+
+
+template <>
+inline
+const wxLongLong& SymLinkMapping::getLastWriteTime<RIGHT_SIDE>() const
+{
+    return dataRight.lastWriteTimeRaw;
+}
+
+
+template <>
+inline
+
+LinkDescriptor::LinkType SymLinkMapping::getLinkType<LEFT_SIDE>() const
+{
+    return dataLeft.type;
+}
+
+
+template <>
+inline
+LinkDescriptor::LinkType SymLinkMapping::getLinkType<RIGHT_SIDE>() const
+{
+    return dataRight.type;
+}
+
+
+template <>
+inline
+const Zstring& SymLinkMapping::getTargetPath<LEFT_SIDE>() const
+{
+    return dataLeft.targetPath;
+}
+
+
+template <>
+inline
+const Zstring& SymLinkMapping::getTargetPath<RIGHT_SIDE>() const
+{
+    return dataRight.targetPath;
+}
+
 
 inline
-bool isDirectoryMapping(const FileSystemObject& fsObj)
+CompareFilesResult SymLinkMapping::getCategory() const
 {
-    return dynamic_cast<const DirMapping*>(&fsObj) != NULL;
+    return convertToFilesResult(cmpResult);
+}
+
+
+inline
+CompareSymlinkResult SymLinkMapping::getLinkCategory() const
+{
+    return cmpResult;
+}
+
+
+inline
+const wxString& SymLinkMapping::getCatConflict() const
+{
+    return cmpConflictDescr;
+}
+
+
+inline
+void SymLinkMapping::swap()
+{
+    //call base class versions
+    FileSystemObject::swap();
+
+    //swap compare result
+    switch (cmpResult)
+    {
+    case SYMLINK_LEFT_SIDE_ONLY:
+        cmpResult = SYMLINK_RIGHT_SIDE_ONLY;
+        break;
+    case SYMLINK_RIGHT_SIDE_ONLY:
+        cmpResult = SYMLINK_LEFT_SIDE_ONLY;
+        break;
+    case SYMLINK_LEFT_NEWER:
+        cmpResult = SYMLINK_RIGHT_NEWER;
+        break;
+    case SYMLINK_RIGHT_NEWER:
+        cmpResult = SYMLINK_LEFT_NEWER;
+        break;
+    case SYMLINK_EQUAL:
+    case SYMLINK_CONFLICT:
+        break;
+    }
+
+    std::swap(dataLeft, dataRight);
+}
+
+
+inline
+void SymLinkMapping::removeObjectL()
+{
+    cmpResult = SYMLINK_RIGHT_SIDE_ONLY;
+    dataLeft  = LinkDescriptor(0, Zstring(), LinkDescriptor::TYPE_FILE);
+}
+
+
+inline
+void SymLinkMapping::removeObjectR()
+{
+    cmpResult = SYMLINK_LEFT_SIDE_ONLY;
+    dataRight = LinkDescriptor(0, Zstring(), LinkDescriptor::TYPE_FILE);
+}
+
+
+inline
+void SymLinkMapping::copyToL()
+{
+    cmpResult = SYMLINK_EQUAL;
+    dataLeft = dataRight;
+}
+
+
+inline
+void SymLinkMapping::copyToR()
+{
+    cmpResult = SYMLINK_EQUAL;
+    dataRight = dataLeft;
+}
+
+
+template <CompareSymlinkResult res>
+inline
+void SymLinkMapping::setCategory()
+{
+    cmpResult = res;
+}
+
+
+template <>
+inline
+void SymLinkMapping::setCategory<SYMLINK_CONFLICT>(); //if conflict is detected, use setCategoryConflict! => method is not defined!
+
+
+inline
+void SymLinkMapping::setCategoryConflict(const wxString& description)
+{
+    cmpResult = SYMLINK_CONFLICT;
+    cmpConflictDescr = description;
 }
 
 }

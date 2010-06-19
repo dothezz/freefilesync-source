@@ -120,6 +120,7 @@
 		<Unit filename="..\Shared\zstring.cpp" />
 		<Unit filename="..\Shared\zstring.h" />
 		<Unit filename="..\library\processXml.cpp" />
+		<Unit filename="..\shared\checkExist.cpp" />
 		<Unit filename="..\shared\dllLoader.cpp" />
 		<Unit filename="..\shared\dllLoader.h" />
 		<Unit filename="..\shared\fileError.h" />
@@ -135,6 +136,7 @@
 		<Unit filename="..\shared\localization.h" />
 		<Unit filename="..\shared\longPathPrefix.cpp" />
 		<Unit filename="..\shared\longPathPrefix.h" />
+		<Unit filename="..\shared\parallelCall.cpp" />
 		<Unit filename="..\shared\shadow.cpp" />
 		<Unit filename="..\shared\standardPaths.cpp" />
 		<Unit filename="..\shared\standardPaths.h" />

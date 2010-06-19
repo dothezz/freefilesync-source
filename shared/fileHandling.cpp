@@ -31,7 +31,8 @@
 #include "fileIO.h"
 #include <time.h>
 #include <utime.h>
-#include <errno.h>
+#include <cerrno>
+#include <sys/time.h>
 #endif
 
 using FreeFileSync::FileError;
@@ -256,9 +257,7 @@ wxULongLong getFileSizeSymlink(const Zstring& linkName) //throw (FileError)
 
         BY_HANDLE_FILE_INFORMATION fileInfoByHandle;
         if (::GetFileInformationByHandle(hFile, &fileInfoByHandle))
-        {
             return wxULongLong(fileInfoByHandle.nFileSizeHigh, fileInfoByHandle.nFileSizeLow);
-        }
     }
 
     const wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + FreeFileSync::zToWx(linkName) + wxT("\"");
@@ -681,17 +680,24 @@ public:
         m_files(filesShort),
         m_dirs(dirsShort) {}
 
-    virtual ReturnValue onFile(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink, const FileInfo& details)
+    virtual void onFile(const DefaultChar* shortName, const Zstring& fullName, const FileInfo& details)
     {
         m_files.push_back(std::make_pair(Zstring(shortName), fullName));
-        return TRAVERSING_CONTINUE;
     }
-    virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink)
+    virtual void onSymlink(const DefaultChar* shortName, const Zstring& fullName, const SymlinkInfo& details)
+    {
+        if (details.dirLink)
+            m_dirs.push_back(std::make_pair(Zstring(shortName), fullName));
+        else
+            m_files.push_back(std::make_pair(Zstring(shortName), fullName));
+    }
+
+    virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName)
     {
         m_dirs.push_back(std::make_pair(Zstring(shortName), fullName));
         return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //DON'T traverse into subdirs; moveDirectory works recursively!
     }
-    virtual ReturnValue onError(const wxString& errorText)
+    virtual void onError(const wxString& errorText)
     {
         throw FileError(errorText);
     }
@@ -714,9 +720,9 @@ void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, bool 
         return;
     }
 
-    if (dirExists(targetDir))
+    if (somethingExists(targetDir))
     {
-        if (!ignoreExistingDirs) //directory or symlink exists
+        if (!ignoreExistingDirs) //directory or symlink exists (or even a file... this error will be caught later)
         {
             const wxString errorMessage = wxString(_("Error moving directory:")) + wxT("\n\"") + zToWx(sourceDir) +  wxT("\" ->\n\"") + zToWx(targetDir) + wxT("\"");
             throw FileError(errorMessage + wxT("\n\n") + _("Target directory already existing!"));
@@ -755,7 +761,7 @@ void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, bool 
 
     //traverse source directory one level
     TraverseOneLevel traverseCallback(fileList, dirList);
-    traverseFolder(sourceDir, &traverseCallback); //traverse one level
+    traverseFolder(sourceDir, false, &traverseCallback); //traverse one level, don't follow symlinks
 
     const Zstring targetDirFormatted = targetDir.EndsWith(globalFunctions::FILE_NAME_SEPARATOR) ? //ends with path separator
                                        targetDir :
@@ -804,17 +810,23 @@ public:
         m_files(files),
         m_dirs(dirs) {}
 
-    virtual ReturnValue onFile(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink, const FileInfo& details)
+    virtual void onFile(const DefaultChar* shortName, const Zstring& fullName, const FileInfo& details)
     {
         m_files.push_back(fullName);
-        return TRAVERSING_CONTINUE;
     }
-    virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink)
+    virtual void onSymlink(const DefaultChar* shortName, const Zstring& fullName, const SymlinkInfo& details)
+    {
+        if (details.dirLink)
+            m_dirs.push_back(fullName);
+        else
+            m_files.push_back(fullName);
+    }
+    virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName)
     {
         m_dirs.push_back(fullName);
         return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //DON'T traverse into subdirs; removeDirectory works recursively!
     }
-    virtual ReturnValue onError(const wxString& errorText)
+    virtual void onError(const wxString& errorText)
     {
         throw FileError(errorText);
     }
@@ -865,7 +877,7 @@ void FreeFileSync::removeDirectory(const Zstring& directory)
 
     //get all files and directories from current directory (WITHOUT subdirectories!)
     FilesDirsOnlyTraverser traverser(fileList, dirList);
-    FreeFileSync::traverseFolder(directory, &traverser);
+    FreeFileSync::traverseFolder(directory, false, &traverser); //don't follow symlinks
 
     //delete files
     std::for_each(fileList.begin(), fileList.end(), removeFile);
@@ -887,53 +899,106 @@ void FreeFileSync::removeDirectory(const Zstring& directory)
 
 
 //optionally: copy directory last change date, DO NOTHING if something fails
-void FreeFileSync::copyFileTimes(const Zstring& sourceDir, const Zstring& targetDir)
+bool FreeFileSync::copyFileTimes(const Zstring& sourceDir, const Zstring& targetDir, bool deRefSymlinks) //throw()
 {
-    if (symlinkExists(sourceDir)) //don't handle symlinks (yet)
-        return;
-
 #ifdef FFS_WIN
-    WIN32_FILE_ATTRIBUTE_DATA sourceAttr;
-    if (!::GetFileAttributesEx(applyLongPathPrefix(sourceDir).c_str(), //__in   LPCTSTR lpFileName,
-                               GetFileExInfoStandard,                  //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
-                               &sourceAttr))                           //__out  LPVOID lpFileInformation
-        return;
+    FILETIME creationTime   = {0};
+    FILETIME lastAccessTime = {0};
+    FILETIME lastWriteTime  = {0};
+
+    {
+        WIN32_FILE_ATTRIBUTE_DATA sourceAttr;
+        if (!::GetFileAttributesEx(applyLongPathPrefix(sourceDir).c_str(), //__in   LPCTSTR lpFileName,
+                                   GetFileExInfoStandard,                  //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
+                                   &sourceAttr))                           //__out  LPVOID lpFileInformation
+            return false;
+
+        if ((sourceAttr.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) && deRefSymlinks) //we have a symlink AND need to dereference...
+        {
+            HANDLE hDirRead = ::CreateFile(applyLongPathPrefix(sourceDir).c_str(),
+                                           FILE_READ_ATTRIBUTES,
+                                           FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                           NULL,
+                                           OPEN_EXISTING,
+                                           FILE_FLAG_BACKUP_SEMANTICS, //needed to open a directory; no FILE_FLAG_OPEN_REPARSE_POINT => deref symlinks
+                                           NULL);
+            if (hDirRead == INVALID_HANDLE_VALUE)
+                return false;
+
+            boost::shared_ptr<void> dummy(hDirRead, ::CloseHandle);
+
+            if (!::GetFileTime(hDirRead,        //__in       HANDLE hFile,
+                               &creationTime,   //__out_opt  LPFILETIME lpCreationTime,
+                               &lastAccessTime, //__out_opt  LPFILETIME lpLastAccessTime,
+                               &lastWriteTime)) //__out_opt  LPFILETIME lpLastWriteTime
+                return false;
+        }
+        else
+        {
+            creationTime   = sourceAttr.ftCreationTime;
+            lastAccessTime = sourceAttr.ftLastAccessTime;
+            lastWriteTime  = sourceAttr.ftLastWriteTime;
+        }
+    }
+
 
     HANDLE hDirWrite = ::CreateFile(applyLongPathPrefix(targetDir).c_str(),
                                     FILE_WRITE_ATTRIBUTES,
                                     FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                                     NULL,
                                     OPEN_EXISTING,
-                                    FILE_FLAG_BACKUP_SEMANTICS, //needed to open a directory
+                                    FILE_FLAG_BACKUP_SEMANTICS | //needed to open a directory
+                                    (deRefSymlinks ? 0 : FILE_FLAG_OPEN_REPARSE_POINT), //process symlinks
                                     NULL);
     if (hDirWrite == INVALID_HANDLE_VALUE)
-        return;
+        return false;
 
     boost::shared_ptr<void> dummy(hDirWrite, ::CloseHandle);
 
-    //(try to) set new "last write time"
-    ::SetFileTime(hDirWrite,
-                  &sourceAttr.ftCreationTime,
-                  &sourceAttr.ftLastAccessTime,
-                  &sourceAttr.ftLastWriteTime); //return value not evalutated!
-#elif defined FFS_LINUX
+    if (!::SetFileTime(hDirWrite,
+                       &creationTime,
+                       &lastAccessTime,
+                       &lastWriteTime)) //return value not evalutated!
+        return false;
 
-    struct stat dirInfo;
-    if (::stat(sourceDir.c_str(), &dirInfo) == 0) //read file attributes from source directory
+#elif defined FFS_LINUX
+    if (deRefSymlinks)
     {
-        //adapt file modification time:
+        struct stat dirInfo;
+        if (::stat(sourceDir.c_str(), &dirInfo) != 0) //read file attributes from source directory
+            return false;
+
         struct utimbuf newTimes;
-        //::time(&newTimes.actime); //set file access time to current time
         newTimes.actime  = dirInfo.st_atime;
         newTimes.modtime = dirInfo.st_mtime;
 
         //(try to) set new "last write time"
-        ::utime(targetDir.c_str(), &newTimes); //return value not evalutated!
+        if (::utime(targetDir.c_str(), &newTimes) != 0) //return value not evalutated!
+            return false;
+    }
+    else
+    {
+        struct stat dirInfo;
+        if (::lstat(sourceDir.c_str(), &dirInfo) != 0) //read file attributes from source directory
+            return false;
+
+        struct timeval newTimes[2];
+        newTimes[0].tv_sec  = dirInfo.st_atime;	/* seconds */
+        newTimes[0].tv_usec = 0;	            /* microseconds */
+
+        newTimes[1].tv_sec  = dirInfo.st_mtime;	/* seconds */
+        newTimes[1].tv_usec = 0;            	/* microseconds */
+
+        if (::lutimes(targetDir.c_str(), newTimes) != 0) //return value not evalutated!
+            return false;
     }
 #endif
+    return true;
 }
 
 
+namespace
+{
 #ifdef FFS_WIN
 Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target path of symbolic link to a directory
 {
@@ -1021,8 +1086,44 @@ Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target pa
 //    }
 //
 //}
-#endif
 
+#elif defined FFS_LINUX
+void copySymlinkInternal(const Zstring& sourceLink, const Zstring& targetLink) //throw (FileError)
+{
+    using namespace FreeFileSync;
+
+    //copy symbolic link
+    const int BUFFER_SIZE = 10000;
+    char buffer[BUFFER_SIZE];
+    const int bytesWritten = ::readlink(sourceLink.c_str(), buffer, BUFFER_SIZE);
+    if (bytesWritten < 0 || bytesWritten == BUFFER_SIZE)
+    {
+        wxString errorMessage = wxString(_("Error resolving symbolic link:")) + wxT("\n\"") + zToWx(sourceLink) + wxT("\"");
+        if (bytesWritten < 0) errorMessage += wxString(wxT("\n\n")) + FreeFileSync::getLastErrorFormatted();
+        throw FileError(errorMessage);
+    }
+    //set null-terminating char
+    buffer[bytesWritten] = 0;
+
+    if (::symlink(buffer, targetLink.c_str()) != 0)
+    {
+        const wxString errorMessage = wxString(_("Error copying symbolic link:")) + wxT("\n\"") + zToWx(sourceLink) +  wxT("\" ->\n\"") + zToWx(targetLink) + wxT("\"");
+        throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
+    }
+
+    //allow only consistent objects to be created -> don't place before ::symlink, targetLink may already exist
+    Loki::ScopeGuard guardTargetLink = Loki::MakeGuard(::unlink, targetLink);
+
+    if (!copyFileTimes(sourceLink, targetLink, false))
+    {
+        wxString errorMessage = wxString(_("Error changing modification time:")) + wxT("\n\"") + zToWx(targetLink) + wxT("\"");
+        throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
+    }
+
+    guardTargetLink.Dismiss();
+}
+#endif
+}
 
 void createDirectoryRecursively(const Zstring& directory, const Zstring& templateDir, const bool copyDirectorySymLinks, const int level)
 {
@@ -1059,8 +1160,10 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
     }
     else
     {
+        const bool isSymlink = (templateAttr & FILE_ATTRIBUTE_REPARSE_POINT) != 0; //syntax required to shut MSVC up
+
         //symbolic link handling
-        if (!copyDirectorySymLinks && templateAttr & FILE_ATTRIBUTE_REPARSE_POINT) //create directory based on target of symbolic link
+        if (!copyDirectorySymLinks && isSymlink) //create directory based on target of symbolic link
         {
             //get target directory of symbolic link
             const Zstring linkPath = resolveDirectorySymlink(templateDir);
@@ -1091,12 +1194,38 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
                         applyLongPathPrefixCreateDir(directory).c_str(),   // pointer to a directory path string
                         NULL) && level == 0)
             {
-                const wxString errorMessage = templateAttr & FILE_ATTRIBUTE_REPARSE_POINT ?
+                const wxString errorMessage = isSymlink ?
                                               //give a more meaningful errormessage if copying a symbolic link failed, e.g. "C:\Users\ZenJu\Application Data"
                                               (wxString(_("Error copying symbolic link:")) + wxT("\n\"") + templateDir.c_str() +  wxT("\" ->\n\"") + directory.c_str() + wxT("\"")) :
 
                                               (wxString(_("Error creating directory:")) + wxT("\n\"") + directory.c_str() + wxT("\""));
                 throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
+            }
+
+
+            if (copyDirectorySymLinks && isSymlink) //we need to copy the Symbolic Link's change date manually
+            {
+                struct TryCleanUp
+                {
+                    static void tryDeleteLink(const Zstring& linkname) //throw ()
+                    {
+                        try
+                        {
+                            removeDirectory(linkname);
+                        }
+                        catch (...) {}
+                    }
+                };
+                //allow only consistent objects to be created -> don't place before ::CreateDirectoryEx, targetLink may already exist
+                Loki::ScopeGuard guardTargetLink = Loki::MakeGuard(&TryCleanUp::tryDeleteLink, directory);
+
+                if (!copyFileTimes(templateDir, directory, false))
+                {
+                    wxString errorMessage = wxString(_("Error changing modification time:")) + wxT("\n\"") + zToWx(directory) + wxT("\"");
+                    throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
+                }
+
+                guardTargetLink.Dismiss();
             }
 
             //(try to) copy additional metadata like last modification time: no measurable performance drawback
@@ -1105,32 +1234,11 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
     }
 #elif defined FFS_LINUX
     //symbolic link handling
-    if (copyDirectorySymLinks)
-    {
-        if (    !templateDir.empty() && //test if templateDir is a symbolic link
-                symlinkExists(templateDir))
-        {
-            //copy symbolic link
-            const int BUFFER_SIZE = 10000;
-            char buffer[BUFFER_SIZE];
-            const int bytesWritten = readlink(templateDir.c_str(), buffer, BUFFER_SIZE);
-            if (bytesWritten < 0 || bytesWritten >= BUFFER_SIZE)
-            {
-                wxString errorMessage = wxString(_("Error resolving symbolic link:")) + wxT("\n\"") + zToWx(templateDir) + wxT("\"");
-                if (bytesWritten < 0) errorMessage += wxString(wxT("\n\n")) + FreeFileSync::getLastErrorFormatted();
-                throw FileError(errorMessage);
-            }
-            //set null-terminating char
-            buffer[bytesWritten] = 0;
-
-            if (::symlink(buffer, directory.c_str()) != 0)
-            {
-                const wxString errorMessage = wxString(_("Error copying symbolic link:")) + wxT("\n\"") + zToWx(templateDir) +  wxT("\" ->\n\"") + zToWx(directory) + wxT("\"");
-                throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
-            }
-            return; //symlink created successfully
-        }
-    }
+    if (    copyDirectorySymLinks &&
+            !templateDir.empty()  &&
+            symlinkExists(templateDir))
+        //there is no directory-type symlink in Linux! => just copy as file
+        return copySymlinkInternal(templateDir, directory); //throw (FileError)
 
     //default directory creation
     if (::mkdir(directory.c_str(), 0755) != 0 && level == 0)
@@ -1163,7 +1271,7 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
 }
 
 
-void FreeFileSync::createDirectory(const Zstring& directory, const Zstring& templateDir, const bool copyDirectorySymLinks)
+void FreeFileSync::createDirectory(const Zstring& directory, const Zstring& templateDir, bool copyDirectorySymLinks)
 {
     //remove trailing separator
     const Zstring dirFormatted = directory.EndsWith(globalFunctions::FILE_NAME_SEPARATOR) ?
@@ -1319,7 +1427,7 @@ void FreeFileSync::copyFile(const Zstring& sourceFile,
     if (!::CopyFileEx( //same performance as CopyFile()
                 applyLongPathPrefix(sourceFile).c_str(),
                 applyLongPathPrefix(temporary).c_str(),
-                copyCallbackInternal,
+                callback != NULL ? copyCallbackInternal : NULL,
                 callback,
                 NULL,
                 copyFlags))
@@ -1351,8 +1459,8 @@ void FreeFileSync::copyFile(const Zstring& sourceFile,
 
     guardTempFile.Dismiss(); //no need to delete temp file anymore
 
-    //copy creation date (last modification date is redundantly written, too)
-    copyFileTimes(sourceFile, targetFile); //throw()
+    //copy creation date (last modification date is redundantly written, too, even for symlinks)
+    copyFileTimes(sourceFile, targetFile, !copyFileSymLinks); //throw()
 }
 
 
@@ -1365,32 +1473,9 @@ void FreeFileSync::copyFile(const Zstring& sourceFile,
     using FreeFileSync::CopyFileCallback;
 
     //symbolic link handling
-    if (copyFileSymLinks)
-    {
-        if (symlinkExists(sourceFile))
-        {
-            //copy symbolic link
-            const int BUFFER_SIZE = 10000;
-            char buffer[BUFFER_SIZE];
-            const int bytesWritten = readlink(sourceFile.c_str(), buffer, BUFFER_SIZE);
-            if (bytesWritten < 0 || bytesWritten == BUFFER_SIZE)
-            {
-                wxString errorMessage = wxString(_("Error resolving symbolic link:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\"");
-                if (bytesWritten < 0) errorMessage += wxString(wxT("\n\n")) + FreeFileSync::getLastErrorFormatted();
-                throw FileError(errorMessage);
-            }
-            //set null-terminating char
-            buffer[bytesWritten] = 0;
-
-            if (symlink(buffer, targetFile.c_str()) != 0)
-            {
-                const wxString errorMessage = wxString(_("Error copying symbolic link:")) + wxT("\n\"") + zToWx(sourceFile) +  wxT("\" ->\n\"") + zToWx(targetFile) + wxT("\"");
-                throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());
-            }
-
-            return; //symlink created successfully
-        }
-    }
+    if (    copyFileSymLinks &&
+            symlinkExists(sourceFile))
+        return copySymlinkInternal(sourceFile, targetFile); //throw (FileError)
 
     //begin of regular file copy
     struct stat fileInfo;
@@ -1444,10 +1529,7 @@ void FreeFileSync::copyFile(const Zstring& sourceFile,
     fileOut.close();
 
     //adapt file modification time:
-    struct utimbuf newTimes;
-    ::time(&newTimes.actime); //set file access time to current time
-    newTimes.modtime = fileInfo.st_mtime;
-    if (::utime(temporary.c_str(), &newTimes) != 0)
+    if (!copyFileTimes(sourceFile, temporary, true)) //throw()
     {
         wxString errorMessage = wxString(_("Error changing modification time:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"");
         throw FileError(errorMessage + wxT("\n\n") + FreeFileSync::getLastErrorFormatted());

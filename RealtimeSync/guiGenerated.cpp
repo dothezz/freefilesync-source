@@ -61,7 +61,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	
 	m_staticText2 = new wxStaticText( m_panelMain, wxID_ANY, _("Usage:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText2->Wrap( -1 );
-	m_staticText2->SetFont( wxFont( 10, 74, 90, 90, true, wxT("Tahoma") ) );
+	m_staticText2->SetFont( wxFont( 10, 74, 90, 90, true, wxEmptyString ) );
 	
 	sbSizer41->Add( m_staticText2, 0, wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
@@ -80,7 +80,7 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	m_staticline3 = new wxStaticLine( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
 	sbSizer41->Add( m_staticline3, 0, wxEXPAND|wxTOP|wxBOTTOM, 5 );
 	
-	m_staticText21 = new wxStaticText( m_panelMain, wxID_ANY, _("The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText21 = new wxStaticText( m_panelMain, wxID_ANY, _("The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText21->Wrap( -1 );
 	sbSizer41->Add( m_staticText21, 0, wxRIGHT|wxLEFT|wxEXPAND, 5 );
 	

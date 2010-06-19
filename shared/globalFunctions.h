@@ -37,19 +37,22 @@ T abs(const T& d) //absolute value
     return(d < 0 ? -d : d);
 }
 
-template <class T>
-std::string numberToString(const T& number); //convert number to string the C++ way
 
-template <class T>
-void stringToNumber(const std::string& input, T& number); //convert string to number the C++ way
+//number conversion C++ ANSI/wide char versions
+template <class CharType, class T>
+std::basic_string<CharType> numberToString(const T& number); //convert number to string the C++ way
 
+template <class T, class CharType>
+T stringToNumber(const std::basic_string<CharType>& input); //convert number to string the C++ way
 
-int    wxStringToInt(   const wxString& number); //convert wxString to number
-double wxStringToDouble(const wxString& number); //convert wxString to number
+//number conversion wxWidgets
+template <class T> wxString numberToString(const T& number);
+template <class T> T stringToNumber(const wxString& input);
+
 
 size_t getDigitCount(size_t number); //count number of digits
 
-//read/write numbers: int, long, unsigned int ... ect
+//serialization: read/write numbers: int, long, unsigned int ... ect
 template <class T> T readNumber(std::istream& stream);
 template <class T> void writeNumber(std::ostream& stream, T number);
 
@@ -63,10 +66,6 @@ wxLongLong convertToSigned(const wxULongLong number)
 //Note: the following lines are a performance optimization for deleting elements from a vector: linear runtime at most!
 template <class T>
 void removeRowsFromVector(const std::set<size_t>& rowsToRemove, std::vector<T>& grid);
-
-//bubble sort using swap() instead of assignment: useful if assignment is very expensive
-template <class VectorData, typename CompareFct>
-void bubbleSwapSort(VectorData& folderCmp, CompareFct compare);
 
 //enhanced binary search template: returns an iterator
 template <class ForwardIterator, class T, typename Compare>
@@ -135,22 +134,41 @@ wxString getCodeLocation(const wxString file, const int line);
 
 
 //---------------Inline Implementation---------------------------------------------------
-template <class T>
+template <class CharType, class T>
 inline
-std::string globalFunctions::numberToString(const T& number) //convert number to string the C++ way
+std::basic_string<CharType> globalFunctions::numberToString(const T& number) //convert number to string the C++ way
 {
-    std::ostringstream ss;
+    std::basic_ostringstream<CharType> ss;
     ss << number;
     return ss.str();
 }
 
 
+template <class T, class CharType>
+inline
+T globalFunctions::stringToNumber(const std::basic_string<CharType>& input) //convert number to string the C++ way
+{
+    std::basic_istringstream<CharType> ss(input);
+    T number;
+    ss >> number;
+    return number;
+}
+
+
 template <class T>
 inline
-void globalFunctions::stringToNumber(const std::string& input, T& number) //convert number to string the C++ way
+wxString globalFunctions::numberToString(const T& number)
 {
-    std::istringstream ss(input);
-    ss >> number;
+    return numberToString<wxChar, T>(number).c_str();
+}
+
+
+template <class T>
+inline
+T globalFunctions::stringToNumber(const wxString& input)
+{
+    const std::basic_string<wxChar> inputConv = input.c_str();
+    return stringToNumber<T, wxChar>(inputConv);
 }
 
 
@@ -184,26 +202,6 @@ void globalFunctions::removeRowsFromVector(const std::set<size_t>& rowsToRemove,
         }
     }
     grid.erase(insertPos, grid.end());
-}
-
-
-//bubble sort using swap() instead of assignment: useful if assignment is very expensive
-template <class VectorData, typename CompareFct>
-void globalFunctions::bubbleSwapSort(VectorData& folderCmp, CompareFct compare)
-{
-    for (int i = folderCmp.size() - 2; i >= 0; --i)
-    {
-        bool swapped = false;
-        for (int j = 0; j <= i; ++j)
-            if (compare(folderCmp[j + 1], folderCmp[j]))
-            {
-                folderCmp[j + 1].swap(folderCmp[j]);
-                swapped = true;
-            }
-
-        if (!swapped)
-            return;
-    }
 }
 
 

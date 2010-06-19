@@ -7,7 +7,6 @@
 #include "iconBuffer.h"
 #include <wx/thread.h>
 #include <wx/bitmap.h>
-#include <wx/msw/wrapwin.h> //includes "windows.h"
 #include <wx/msgdlg.h>
 #include <wx/icon.h>
 #include <map>
@@ -15,50 +14,22 @@
 #include <stdexcept>
 #include <set>
 
+#ifdef FFS_WIN
+#include <wx/msw/wrapwin.h> //includes "windows.h"
+
+#elif defined FFS_LINUX
+#include <giomm/file.h>
+#include <gtkmm/icontheme.h>
+#include <gtkmm/main.h>
+#endif
+
+
 using FreeFileSync::IconBuffer;
 
 
-const wxIcon& IconBuffer::getDirectoryIcon() //one folder icon should be sufficient...
-{
-    static wxIcon folderIcon;
-
-    static bool isInitalized = false;
-    if (!isInitalized)
-    {
-        isInitalized = true;
-
-        SHFILEINFO fileInfo;
-        fileInfo.hIcon = 0; //initialize hIcon
-
-        //NOTE: CoInitializeEx()/CoUninitialize() implicitly called by wxWidgets on program startup!
-        if (::SHGetFileInfo(DefaultStr("dummy"), //Windows Seven doesn't like this parameter to be an empty string
-                            FILE_ATTRIBUTE_DIRECTORY,
-                            &fileInfo,
-                            sizeof(fileInfo),
-                            SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES) &&
-
-                fileInfo.hIcon != 0) //fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
-        {
-            folderIcon.SetHICON(fileInfo.hIcon);
-            folderIcon.SetSize(IconBuffer::ICON_SIZE, IconBuffer::ICON_SIZE);
-        }
-    }
-    return folderIcon;
-}
-
 namespace
 {
-Zstring getFileExtension(const Zstring& filename)
-{
-    const Zstring shortName = filename.AfterLast(DefaultChar('\\')); //Zstring::AfterLast() returns the whole string if ch not found
-    const size_t pos = shortName.Find(DefaultChar('.'), true);
-    return pos == Zstring::npos ?
-           Zstring() :
-           Zstring(shortName.c_str() + pos + 1);
-}
-
-
-struct CmpFilenameWin
+struct CmpFilename
 {
     bool operator()(const Zstring& a, const Zstring& b) const
     {
@@ -67,10 +38,21 @@ struct CmpFilenameWin
 };
 
 
+#ifdef FFS_WIN
+Zstring getFileExtension(const Zstring& filename)
+{
+    const Zstring shortName = filename.AfterLast(DefaultChar('\\')); //warning: using windows file name separator!
+    const size_t pos = shortName.Find(DefaultChar('.'), true);
+    return pos == Zstring::npos ?
+           Zstring() :
+           Zstring(shortName.c_str() + pos + 1);
+}
+
+
 //test for extension for icons that physically have to be retrieved from disc
 bool isPriceyExtension(const Zstring& extension)
 {
-    static std::set<Zstring, CmpFilenameWin> exceptions;
+    static std::set<Zstring, CmpFilename> exceptions;
     static bool isInitalized = false;
     if (!isInitalized)
     {
@@ -86,24 +68,45 @@ bool isPriceyExtension(const Zstring& extension)
     }
     return exceptions.find(extension) != exceptions.end();
 }
+#endif
 }
 //################################################################################################################################################
 
 
-class IconBuffer::IconHolder //handle HICON ownership WITHOUT ref-counting to allow a deep-copy (in contrast to wxIcon)
+class IconBuffer::IconHolder //handle HICON/GdkPixbuf ownership WITHOUT ref-counting to allow thread-safe usage (in contrast to wxIcon)
 {
 public:
-    IconHolder(HICON handle = 0) : handle_(handle) {}
+#ifdef FFS_WIN
+    typedef HICON HandleType;
+#elif defined FFS_LINUX
+    typedef GdkPixbuf* HandleType;
+#endif
+
+    IconHolder(HandleType handle = 0) : handle_(handle) {} //take ownership!
+
+    //icon holder has value semantics!
+    IconHolder(const IconHolder& other) : handle_(other.handle_ == 0 ? 0 :
+#ifdef FFS_WIN
+                ::CopyIcon(other.handle_)
+#elif defined FFS_LINUX
+                gdk_pixbuf_copy(other.handle_) //create new Pix buf with reference count 1 or return 0 on error
+#endif
+                                                     ) {}
+
+    IconHolder& operator=(const IconHolder& other)
+    {
+        IconHolder(other).swap(*this);
+        return *this;
+    }
 
     ~IconHolder()
     {
         if (handle_ != 0)
+#ifdef FFS_WIN
             ::DestroyIcon(handle_);
-    }
-
-    HICON clone() const //copy HICON, caller needs to take ownership!
-    {
-        return handle_ != 0 ? ::CopyIcon(handle_) : 0;
+#elif defined FFS_LINUX
+            g_object_unref(handle_);
+#endif
     }
 
     void swap(IconHolder& other) //throw()
@@ -111,12 +114,150 @@ public:
         std::swap(handle_, other.handle_);
     }
 
-private:
-    IconHolder(const IconHolder&);
-    IconHolder& operator=(const IconHolder&);
+    wxIcon toWxIcon() const //copy HandleType, caller needs to take ownership!
+    {
+        IconHolder clone(*this);
+        if (clone.handle_ != 0)
+        {
+            wxIcon newIcon; //attention: wxIcon uses reference counting!
+#ifdef FFS_WIN
+            newIcon.SetHICON(clone.handle_);  //
+            newIcon.SetSize(IconBuffer::ICON_SIZE, IconBuffer::ICON_SIZE); //icon is actually scaled to this size (just in case referenced HICON differs)
+#elif defined FFS_LINUX                       //
+            newIcon.SetPixbuf(clone.handle_); // transfer ownership!!
+#endif                                        //
+            clone.handle_ = 0;                //
+            return newIcon;
+        }
+        return wxNullIcon;
+    }
 
-    HICON handle_;
+private:
+    HandleType handle_;
 };
+
+
+const wxIcon& IconBuffer::getDirectoryIcon() //one folder icon should be sufficient...
+{
+    static wxIcon folderIcon;
+
+    static bool isInitalized = false;
+    if (!isInitalized)
+    {
+        isInitalized = true;
+
+#ifdef FFS_WIN
+        SHFILEINFO fileInfo;
+        fileInfo.hIcon = 0; //initialize hIcon
+
+        //NOTE: CoInitializeEx()/CoUninitialize() implicitly called by wxWidgets on program startup!
+        if (::SHGetFileInfo(DefaultStr("dummy"), //Windows Seven doesn't like this parameter to be an empty string
+                            FILE_ATTRIBUTE_DIRECTORY,
+                            &fileInfo,
+                            sizeof(fileInfo),
+                            SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES) &&
+
+                fileInfo.hIcon != 0) //fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
+        {
+            folderIcon.SetHICON(fileInfo.hIcon); //transfer ownership!
+            folderIcon.SetSize(IconBuffer::ICON_SIZE, IconBuffer::ICON_SIZE);
+        }
+
+#elif defined FFS_LINUX
+        folderIcon = getAssociatedIcon(DefaultStr("/usr/")).toWxIcon(); //all directories will look like "/usr/"
+#endif
+    }
+    return folderIcon;
+}
+
+
+IconBuffer::IconHolder IconBuffer::getAssociatedIcon(const Zstring& filename)
+{
+#ifdef FFS_WIN
+    //despite what docu says about SHGetFileInfo() it can't handle all relative filenames, e.g. "\DirName"
+    //but no problem, directory formatting takes care that filenames are always absolute!
+
+    SHFILEINFO fileInfo;
+    fileInfo.hIcon = 0; //initialize hIcon -> fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
+    //bug report: https://sourceforge.net/tracker/?func=detail&aid=2768004&group_id=234430&atid=1093080
+
+    //NOTE: CoInitializeEx()/CoUninitialize() implicitly called by wxWidgets on program startup!
+    ::SHGetFileInfo(filename.c_str(), //FreeFileSync::removeLongPathPrefix(fileName), //::SHGetFileInfo() can't handle \\?\-prefix!
+                    0,
+                    &fileInfo,
+                    sizeof(fileInfo),
+                    SHGFI_ICON | SHGFI_SMALLICON);
+
+    return IconHolder(fileInfo.hIcon); //pass icon ownership (may be 0)
+
+#elif defined FFS_LINUX
+    static struct RunOnce
+    {
+        RunOnce()
+        {
+            Gtk::Main::init_gtkmm_internals();
+        }
+    } dummy;
+
+    try
+    {
+        Glib::RefPtr<Gio::File> fileObj = Gio::File::create_for_path(filename.c_str()); //never fails
+        Glib::RefPtr<Gio::FileInfo> fileInfo = fileObj->query_info(G_FILE_ATTRIBUTE_STANDARD_ICON);
+        if (fileInfo)
+        {
+            Glib::RefPtr<Gio::Icon> gicon = fileInfo->get_icon();
+            if (gicon)
+            {
+                Glib::RefPtr<Gtk::IconTheme> iconTheme = Gtk::IconTheme::get_default();
+                if (iconTheme)
+                {
+                    Gtk::IconInfo iconInfo = iconTheme->lookup_icon(gicon, ICON_SIZE, Gtk::ICON_LOOKUP_USE_BUILTIN); //this may fail if icon is not installed on system
+                    if (iconInfo)
+                    {
+                        Glib::RefPtr<Gdk::Pixbuf> iconPixbuf = iconInfo.load_icon(); //render icon into Pixbuf
+                        if (iconPixbuf)
+                            return IconHolder(iconPixbuf->gobj_copy()); //copy and pass icon ownership (may be 0)
+                    }
+                }
+            }
+        }
+    }
+    catch (const Glib::Error&) {}
+
+
+    //fallback: icon lookup may fail because some icons are currently not present on system
+    Glib::RefPtr<Gtk::IconTheme> iconTheme = Gtk::IconTheme::get_default();
+    if (iconTheme)
+    {
+        Glib::RefPtr<Gdk::Pixbuf> iconPixbuf = iconTheme->load_icon("misc", ICON_SIZE, Gtk::ICON_LOOKUP_USE_BUILTIN);
+        if (!iconPixbuf)
+            iconPixbuf = iconTheme->load_icon("text-x-generic", ICON_SIZE, Gtk::ICON_LOOKUP_USE_BUILTIN);
+        if (iconPixbuf)
+            return IconHolder(iconPixbuf->gobj_copy()); //copy and pass icon ownership (may be 0)
+    }
+
+    //fallback fallback
+    return IconHolder();
+#endif
+}
+
+
+#ifdef FFS_WIN
+IconBuffer::IconHolder IconBuffer::getAssociatedIconByExt(const Zstring& extension)
+{
+    SHFILEINFO fileInfo;
+    fileInfo.hIcon = 0; //initialize hIcon -> fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
+
+    //no read-access to disk! determine icon by extension
+    ::SHGetFileInfo((Zstring(DefaultStr("dummy.")) + extension).c_str(),  //Windows Seven doesn't like this parameter to be without short name
+                    FILE_ATTRIBUTE_NORMAL,
+                    &fileInfo,
+                    sizeof(fileInfo),
+                    SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES);
+
+    return IconHolder(fileInfo.hIcon); //pass icon ownership (may be 0)
+}
+#endif
 
 
 //---------------------------------------------------------------------------------------------------
@@ -144,10 +285,9 @@ private:
     wxCriticalSection lockWorkload; //use for locking shared data
     std::vector<FileName> workload; //processes last elements of vector first!
     bool threadHasMutex;
-    bool threadExitIsRequested;
 //------------------------------------------------------------
 
-    //event: icon buffer -> woker thread
+    //signal event: icon buffer(main thread) -> worker thread
     wxMutex threadIsListening;
     wxCondition continueWork; //wake up thread
 
@@ -156,9 +296,8 @@ private:
 
 
 IconBuffer::WorkerThread::WorkerThread(IconBuffer* iconBuff) :
-    wxThread(wxTHREAD_JOINABLE),
+    wxThread(wxTHREAD_DETACHED), //we're using the thread encapsulated in a static object => use "detached" to avoid main thread waiting for this thread on exit(which in turn would prevent deletion of static object...ect.) => deadlock!
     threadHasMutex(false),
-    threadExitIsRequested(false),
     threadIsListening(),
     continueWork(threadIsListening),
     iconBuffer(iconBuff)
@@ -195,12 +334,8 @@ void IconBuffer::WorkerThread::setWorkload(const std::vector<Zstring>& load) //(
 
 void IconBuffer::WorkerThread::quitThread()
 {
-    {
-        wxMutexLocker dummy(threadIsListening); //wait until thread is in waiting state
-        threadExitIsRequested = true; //no sharing conflicts in this situation
-        continueWork.Signal(); //exit thread
-    }
-    Wait(); //wait until thread has exitted
+    setWorkload(std::vector<Zstring>());
+    Delete(); //gracefully terminate a detached thread...
 }
 
 
@@ -208,22 +343,20 @@ wxThread::ExitCode IconBuffer::WorkerThread::Entry()
 {
     try
     {
-        wxMutexLocker dummy(threadIsListening); //this lock needs to be called from WITHIN the thread => calling it from constructor(Main thread) would be useless
+        //this lock needs to be called from WITHIN the thread => calling it from constructor(Main thread) would be useless (signal direction: main -> thread)
+        wxMutexLocker dummy(threadIsListening); //this mutex STAYS locked all the time except of continueWork.Wait()!
         {
-            //this mutex STAYS locked all the time except of continueWork.Wait()!
             wxCriticalSectionLocker dummy2(lockWorkload);
             threadHasMutex = true;
         }
 
         while (true)
         {
-            continueWork.Wait(); //waiting for continueWork.Signal(); unlocks Mutex "threadIsListening"
+            continueWork.WaitTimeout(100); //waiting for continueWork.Signal(); unlocks Mutex "threadIsListening"
 
-            //no mutex needed in this context
-            if (threadExitIsRequested) //no mutex here: atomicity is not prob for a bool, but visibility (e.g. caching in registers)
-                return 0;              //shouldn't be a problem nevertheless because of implicit memory barrier caused by mutex.Lock() in .Wait()
+            if (TestDestroy())
+                return 0;
 
-            //do work: get the file icons
             doWork();
         }
     }
@@ -237,60 +370,43 @@ wxThread::ExitCode IconBuffer::WorkerThread::Entry()
 
 void IconBuffer::WorkerThread::doWork()
 {
-    Zstring fileName;
-
     //do work: get the file icon.
     while (true)
     {
+        Zstring fileName;
         {
             wxCriticalSectionLocker dummy(lockWorkload);
             if (workload.empty())
                 break; //enter waiting state
-            fileName = &workload.back()[0]; //deep copy: fileName is NOT empty (includes NULL-termination)
+            fileName = &workload.back()[0]; //deep copy (includes NULL-termination)
             workload.pop_back();
         }
 
         if (iconBuffer->requestFileIcon(fileName)) //thread safety: Zstring okay, won't be reference-counted in requestIcon()
             continue; //icon already in buffer: skip
 
-        //despite what docu says about SHGetFileInfo() it can't handle all relative filenames, e.g. "\DirName"
-        //but no problem, directory formatting takes care that filenames are always absolute!
-
-        //load icon
-        SHFILEINFO fileInfo;
-        fileInfo.hIcon = 0; //initialize hIcon -> fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
-        //bug report: https://sourceforge.net/tracker/?func=detail&aid=2768004&group_id=234430&atid=1093080
-
+#ifdef FFS_WIN
         const Zstring extension = getFileExtension(fileName); //thread-safe: no sharing!
         if (isPriceyExtension(extension)) //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
         {
-            //NOTE: CoInitializeEx()/CoUninitialize() implicitly called by wxWidgets on program startup!
-            ::SHGetFileInfo(fileName.c_str(), //FreeFileSync::removeLongPathPrefix(fileName), //::SHGetFileInfo() can't handle \\?\-prefix!
-                            0,
-                            &fileInfo,
-                            sizeof(fileInfo),
-                            SHGFI_ICON | SHGFI_SMALLICON);
-
-            IconBuffer::IconHolder newIcon(fileInfo.hIcon); //pass icon ownership (may be 0)
+            const IconHolder newIcon = IconBuffer::getAssociatedIcon(fileName);
             iconBuffer->insertIntoBuffer(fileName, newIcon);
         }
         else //no read-access to disk! determine icon by extension
         {
-            ::SHGetFileInfo((Zstring(DefaultStr("dummy.")) + extension).c_str(),  //Windows Seven doesn't like this parameter to be without short name
-                            FILE_ATTRIBUTE_NORMAL,
-                            &fileInfo,
-                            sizeof(fileInfo),
-                            SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES);
-
-            IconBuffer::IconHolder newIcon(fileInfo.hIcon); //pass icon ownership (may be 0)
+            const IconHolder newIcon = IconBuffer::getAssociatedIconByExt(extension);
             iconBuffer->insertIntoBuffer(extension, newIcon);
         }
+#elif defined FFS_LINUX
+        const IconHolder newIcon = IconBuffer::getAssociatedIcon(fileName);
+        iconBuffer->insertIntoBuffer(fileName, newIcon);
+#endif
     }
 }
 
 
 //---------------------------------------------------------------------------------------------------
-class IconBuffer::IconDB : public std::map<Zstring, IconBuffer::CountedIconPtr> {}; //entryName/icon -> ATTENTION: consider ref-counting for this shared data structure!!!
+class IconBuffer::IconDB : public std::map<Zstring, IconBuffer::IconHolder> {}; //entryName/icon -> ATTENTION: avoid ref-counting for this shared data structure!!! (== don't copy instances between threads)
 class IconBuffer::IconDbSequence : public std::queue<Zstring> {}; //entryName
 //---------------------------------------------------------------------------------------------------
 
@@ -312,42 +428,29 @@ IconBuffer::IconBuffer() :
 
 IconBuffer::~IconBuffer()
 {
-    //keep non-inline destructor for std::auto_ptr to work with forward declarations
-
     worker->quitThread();
 }
 
 
 bool IconBuffer::requestFileIcon(const Zstring& fileName, wxIcon* icon)
 {
-    const Zstring extension = getFileExtension(fileName);
-
     wxCriticalSectionLocker dummy(*lockIconDB);
 
-    IconDB::const_iterator i = buffer->find( //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
-                                   isPriceyExtension(extension) ?
-                                   fileName :
-                                   extension);
-    if (i != buffer->end())
-    {
-        if (icon != NULL)
-        {
-            HICON clonedIcon = i->second->clone(); //thread safety: make deep copy!
-            if (clonedIcon != 0)
-            {
-                //create wxIcon from handle
-                wxIcon newIcon; //attention: wxIcon uses reference counting!
-                newIcon.SetHICON(clonedIcon); //transfer ownership!!
-                newIcon.SetSize(IconBuffer::ICON_SIZE, IconBuffer::ICON_SIZE);
-                *icon = newIcon;
-            }
-            else
-                *icon = wxNullIcon;
-        }
-        return true;
-    }
+#ifdef FFS_WIN
+    //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
+    const Zstring extension = getFileExtension(fileName);
+    IconDB::const_iterator i = buffer->find(isPriceyExtension(extension) ? fileName : extension);
+#elif defined FFS_LINUX
+    IconDB::const_iterator i = buffer->find(fileName);
+#endif
 
-    return false;
+    if (i == buffer->end())
+        return false;
+
+    if (icon != NULL)
+        *icon = i->second.toWxIcon();
+
+    return true;
 }
 
 
@@ -357,16 +460,14 @@ void IconBuffer::setWorkload(const std::vector<Zstring>& load)
 }
 
 
-void IconBuffer::insertIntoBuffer(const DefaultChar* entryName, IconHolder& icon) //called by worker thread
+void IconBuffer::insertIntoBuffer(const DefaultChar* entryName, const IconHolder& icon) //called by worker thread
 {
     wxCriticalSectionLocker dummy(*lockIconDB);
 
     //thread safety, ref-counting: (implicitly) make deep copy!
     const Zstring fileNameZ = entryName;
-    const IconBuffer::CountedIconPtr newIcon(new IconBuffer::IconHolder); //exception safety!
-    newIcon->swap(icon);                                                  //
 
-    const std::pair<IconDB::iterator, bool> rc = buffer->insert(IconDB::value_type(fileNameZ, newIcon)); //thread saftey: icon uses ref-counting! But is NOT shared with main thread!
+    const std::pair<IconDB::iterator, bool> rc = buffer->insert(std::make_pair(fileNameZ, icon)); //thread saftey: icon uses ref-counting! But is NOT shared with main thread!
 
     if (rc.second) //if insertion took place
         bufSequence->push(fileNameZ); //note: sharing Zstring with IconDB!!!
@@ -381,4 +482,3 @@ void IconBuffer::insertIntoBuffer(const DefaultChar* entryName, IconHolder& icon
         bufSequence->pop();
     }
 }
-

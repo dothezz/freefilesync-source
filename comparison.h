@@ -10,6 +10,7 @@
 #include "fileHierarchy.h"
 #include "library/processXml.h"
 #include "library/statusHandler.h"
+#include "structures.h"
 
 
 namespace FreeFileSync
@@ -40,8 +41,7 @@ std::vector<FolderPairCfg> extractCompareCfg(const MainConfiguration& mainCfg);
 class CompareProcess
 {
 public:
-    CompareProcess(bool processSymLinks,
-                   bool traverseSymLinks,
+    CompareProcess(SymLinkHandling handleSymlinks,
                    size_t fileTimeTol,
                    bool ignoreOneHourDiff,
                    xmlAccess::OptionalDialogs& warnings,
@@ -52,12 +52,13 @@ public:
                              FolderComparison& output);
 
 private:
-    void compareByTimeSize(const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output);
-
-    void compareByContent(const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output);
+    void compareByTimeSize(const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output) const;
+    void compareByContent( const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output) const;
 
     //create comparison result table and fill category except for files existing on both sides
-    void performBaseComparison(BaseDirMapping& output, std::vector<FileMapping*>& appendUndefined);
+    void performBaseComparison(BaseDirMapping& output, std::vector<FileMapping*>& appendUndefined) const;
+
+    void categorizeSymlink(SymLinkMapping* linkObj) const;
 
     //buffer accesses to the same directories; useful when multiple folder pairs are used
     class DirectoryBuffer;

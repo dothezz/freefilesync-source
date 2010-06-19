@@ -63,7 +63,7 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
 
 
     //build information
-    wxString build = wxString(wxT("(")) + _("Build:") + wxT(" ") + __TDATE__;
+    wxString build = __TDATE__;
 #if wxUSE_UNICODE
     build += wxT(" - Unicode");
 #else
@@ -72,13 +72,15 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
 
     //compile time info about 32/64-bit build
     if (Utility::is64BitBuild)
-        build += wxT(" x64)");
+        build += wxT(" x64");
     else
-        build += wxT(" x86)");
+        build += wxT(" x86");
     assert_static(Utility::is32BitBuild || Utility::is64BitBuild);
 
+    wxString buildFormatted = _("(Build: %x)");
+    buildFormatted.Replace(wxT("%x"), build);
 
-    m_build->SetLabel(build);
+    m_build->SetLabel(buildFormatted);
 
     m_animationControl1->SetAnimation(*GlobalResources::getInstance().animationMoney);
     m_animationControl1->Play();
@@ -368,12 +370,12 @@ void DeleteDialog::updateTexts()
 {
     if (m_checkBoxUseRecycler->GetValue())
     {
-        m_staticTextHeader->SetLabel(_("Do you really want to move the following objects(s) to the Recycle Bin?"));
+        m_staticTextHeader->SetLabel(_("Do you really want to move the following object(s) to the Recycle Bin?"));
         m_bitmap12->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("recycler")));
     }
     else
     {
-        m_staticTextHeader->SetLabel(_("Do you really want to delete the following objects(s)?"));
+        m_staticTextHeader->SetLabel(_("Do you really want to delete the following object(s)?"));
         m_bitmap12->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("deleteFile")));
     }
 
@@ -610,7 +612,7 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
     SyncPreviewDlgGenerated(parentWindow),
     m_dontShowAgain(dontShowAgain)
 {
-    using FreeFileSync::numberToWxString;
+    using FreeFileSync::numberToStringSep;
 
     m_buttonStartSync->setBitmapFront(GlobalResources::getInstance().getImageByName(wxT("startSync")));
     m_bitmapCreate->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("create")));
@@ -621,13 +623,13 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
     m_staticTextVariant->SetLabel(variantName);
     m_textCtrlData->SetValue(FreeFileSync::formatFilesizeToShortString(statistics.getDataToProcess()));
 
-    m_textCtrlCreateL->SetValue(numberToWxString(statistics.getCreate(   true, false), true));
-    m_textCtrlUpdateL->SetValue(numberToWxString(statistics.getOverwrite(true, false), true));
-    m_textCtrlDeleteL->SetValue(numberToWxString(statistics.getDelete(   true, false), true));
+    m_textCtrlCreateL->SetValue(numberToStringSep(statistics.getCreate(   true, false)));
+    m_textCtrlUpdateL->SetValue(numberToStringSep(statistics.getOverwrite(true, false)));
+    m_textCtrlDeleteL->SetValue(numberToStringSep(statistics.getDelete(   true, false)));
 
-    m_textCtrlCreateR->SetValue(numberToWxString(statistics.getCreate(   false, true), true));
-    m_textCtrlUpdateR->SetValue(numberToWxString(statistics.getOverwrite(false, true), true));
-    m_textCtrlDeleteR->SetValue(numberToWxString(statistics.getDelete(   false, true), true));
+    m_textCtrlCreateR->SetValue(numberToStringSep(statistics.getCreate(   false, true)));
+    m_textCtrlUpdateR->SetValue(numberToStringSep(statistics.getOverwrite(false, true)));
+    m_textCtrlDeleteR->SetValue(numberToStringSep(statistics.getDelete(   false, true)));
 
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
 
@@ -683,9 +685,7 @@ public:
     CompareCfgDialog(wxWindow* parentWindow,
                      const wxPoint& position,
                      FreeFileSync::CompareVariant& cmpVar,
-                     bool& processSymlinks,
-                     bool& traverseDirectorySymlinks,
-                     bool& copyFileSymlinks);
+                     SymLinkHandling& handleSymlinks);
 
     enum
     {
@@ -698,30 +698,66 @@ private:
     void OnCancel(wxCommandEvent& event);
     void OnTimeSize(wxCommandEvent& event);
     void OnContent(wxCommandEvent& event);
-    void OnIncludeSymlinks(wxCommandEvent& event);
-    void OnTraverseDirSymlink(wxCommandEvent& event);
     void OnShowHelp(wxCommandEvent& event);
 
     void updateView();
 
     FreeFileSync::CompareVariant& cmpVarOut;
-    bool& processSymlinksOut;
-    bool& traverseDirectorySymlinksOut;
-    bool& copyFileSymlinksOut;
+    SymLinkHandling& handleSymlinksOut;
 };
 
+
+namespace
+{
+void setValue(wxChoice& choiceCtrl, FreeFileSync::SymLinkHandling value)
+{
+    choiceCtrl.Clear();
+    choiceCtrl.Append(_("Ignore"));
+    choiceCtrl.Append(_("Direct"));
+    choiceCtrl.Append(_("Follow"));
+
+    //default
+    choiceCtrl.SetSelection(0);
+
+    switch (value)
+    {
+    case FreeFileSync::SYMLINK_IGNORE:
+        choiceCtrl.SetSelection(0);
+        break;
+    case FreeFileSync::SYMLINK_USE_DIRECTLY:
+        choiceCtrl.SetSelection(1);
+        break;
+    case FreeFileSync::SYMLINK_FOLLOW_LINK:
+        choiceCtrl.SetSelection(2);
+        break;
+    }
+}
+
+
+FreeFileSync::SymLinkHandling getValue(const wxChoice& choiceCtrl)
+{
+    switch (choiceCtrl.GetSelection())
+    {
+    case 0:
+        return FreeFileSync::SYMLINK_IGNORE;
+    case 1:
+        return FreeFileSync::SYMLINK_USE_DIRECTLY;
+    case 2:
+        return FreeFileSync::SYMLINK_FOLLOW_LINK;
+    default:
+        assert(false);
+        return FreeFileSync::SYMLINK_IGNORE;
+    }
+}
+}
 
 CompareCfgDialog::CompareCfgDialog(wxWindow* parentWindow,
                                    const wxPoint& position,
                                    CompareVariant& cmpVar,
-                                   bool& processSymlinks,
-                                   bool& traverseDirectorySymlinks,
-                                   bool& copyFileSymlinks) :
+                                   SymLinkHandling& handleSymlinks) :
     CmpCfgDlgGenerated(parentWindow),
     cmpVarOut(cmpVar),
-    processSymlinksOut(processSymlinks),
-    traverseDirectorySymlinksOut(traverseDirectorySymlinks),
-    copyFileSymlinksOut(copyFileSymlinks)
+    handleSymlinksOut(handleSymlinks)
 {
     //move dialog up so that compare-config button and first config-variant are on same level
     Move(wxPoint(position.x, std::max(0, position.y - (m_buttonTimeSize->GetScreenPosition() - GetScreenPosition()).y)));
@@ -742,9 +778,8 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parentWindow,
         break;
     }
 
-    m_checkBoxIncludeSymlinks->SetValue(processSymlinksOut);
-//    m_checkBoxTraverseDirSymlink->SetValue(traverseDirectorySymlinksOut);
-//    m_checkBoxCopyFileSymlink->SetValue(copyFileSymlinksOut);
+
+    setValue(*m_choiceHandleSymlinks, handleSymlinks);
 
     updateView();
 }
@@ -761,27 +796,9 @@ void CompareCfgDialog::OnOkay(wxCommandEvent& event)
     else
         cmpVarOut = CMP_BY_TIME_SIZE;
 
-    processSymlinksOut           = m_checkBoxIncludeSymlinks->GetValue();
-//    traverseDirectorySymlinksOut = m_checkBoxTraverseDirSymlink->GetValue();
-//    copyFileSymlinksOut          = m_checkBoxCopyFileSymlink->GetValue();
-
-    //simplify GUI: set reasonable default values for "traverseDirectorySymlinks" and "copyFileSymlinks"
-    traverseDirectorySymlinksOut = true;
-    copyFileSymlinksOut          = false;
+    handleSymlinksOut = getValue(*m_choiceHandleSymlinks);;
 
     EndModal(BUTTON_OKAY);
-}
-
-void CompareCfgDialog::OnIncludeSymlinks(wxCommandEvent& event)
-{
-    updateView();
-    event.Skip();
-}
-
-void CompareCfgDialog::OnTraverseDirSymlink(wxCommandEvent& event)
-{
-    updateView();
-    event.Skip();
 }
 
 
@@ -821,11 +838,9 @@ void CompareCfgDialog::OnShowHelp(wxCommandEvent& event)
 DefaultReturnCode::Response FreeFileSync::showCompareCfgDialog(
     const wxPoint& position,
     CompareVariant& cmpVar,
-    bool& processSymlinks,
-    bool& traverseDirectorySymlinks,
-    bool& copyFileSymlinks)
+    SymLinkHandling& handleSymlinks)
 {
-    CompareCfgDialog syncDlg(NULL, position, cmpVar, processSymlinks, traverseDirectorySymlinks, copyFileSymlinks);
+    CompareCfgDialog syncDlg(NULL, position, cmpVar, handleSymlinks);
 
     return syncDlg.ShowModal() == CompareCfgDialog::BUTTON_OKAY ?
            DefaultReturnCode::BUTTON_OKAY :

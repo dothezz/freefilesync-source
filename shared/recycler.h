@@ -23,10 +23,11 @@ Recycler always available: during runtime dynamically either SHFileOperation or 
 
 Linux
 -----
-During compilation set:
-RECYCLER_GIO if available ("pkg-config --exists gio-2.0")
-or
-RECYCLER_NONE to disable the recycler
+Include compilation flag:
+`pkg-config --cflags gtkmm-2.4`
+
+Linker flag:
+`pkg-config --libs gtkmm-2.4`
 */
 
 bool recycleBinExists(); //test existence of Recycle Bin API on current system

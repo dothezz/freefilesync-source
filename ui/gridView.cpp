@@ -27,6 +27,50 @@ GridView::StatusCmpResult::StatusCmpResult() :
     foldersOnRightView(0) {}
 
 
+template <class StatusResult>
+void getNumbers(const FileSystemObject& fsObj, StatusResult& result)
+{
+    struct GetValues : public FSObjectVisitor
+    {
+        GetValues(StatusResult& res) : result_(res) {}
+
+        virtual void visit(const FileMapping& fileObj)
+        {
+            if (!fileObj.isEmpty<LEFT_SIDE>())
+            {
+                result_.filesizeLeftView += fileObj.getFileSize<LEFT_SIDE>();
+                ++result_.filesOnLeftView;
+            }
+            if (!fileObj.isEmpty<RIGHT_SIDE>())
+            {
+                result_.filesizeRightView += fileObj.getFileSize<RIGHT_SIDE>();
+                ++result_.filesOnRightView;
+            }
+        }
+
+        virtual void visit(const SymLinkMapping& linkObj)
+        {
+            if (!linkObj.isEmpty<LEFT_SIDE>())
+                ++result_.filesOnLeftView;
+
+            if (!linkObj.isEmpty<RIGHT_SIDE>())
+                ++result_.filesOnRightView;
+        }
+
+        virtual void visit(const DirMapping& dirObj)
+        {
+            if (!dirObj.isEmpty<LEFT_SIDE>())
+                ++result_.foldersOnLeftView;
+
+            if (!dirObj.isEmpty<RIGHT_SIDE>())
+                ++result_.foldersOnRightView;
+        }
+        StatusResult& result_;
+    } getVal(result);
+    fsObj.accept(getVal);
+}
+
+
 GridView::StatusCmpResult GridView::updateCmpResult(bool hideFiltered, //maps sortedRef to viewRef
         bool leftOnlyFilesActive,
         bool rightOnlyFilesActive,
@@ -82,28 +126,7 @@ GridView::StatusCmpResult GridView::updateCmpResult(bool hideFiltered, //maps so
             }
 
             //calculate total number of bytes for each side
-            const FileMapping* fileObj = dynamic_cast<const FileMapping*>(fsObj);
-            if (fileObj)
-            {
-                if (!fileObj->isEmpty<LEFT_SIDE>())
-                {
-                    output.filesizeLeftView += fileObj->getFileSize<LEFT_SIDE>();
-                    ++output.filesOnLeftView;
-                }
-                if (!fileObj->isEmpty<RIGHT_SIDE>())
-                {
-                    output.filesizeRightView += fileObj->getFileSize<RIGHT_SIDE>();
-                    ++output.filesOnRightView;
-                }
-            }
-            else
-            {
-                if (!fsObj->isEmpty<LEFT_SIDE>())
-                    ++output.foldersOnLeftView;
-
-                if (!fsObj->isEmpty<RIGHT_SIDE>())
-                    ++output.foldersOnRightView;
-            }
+            getNumbers(*fsObj, output);
 
             viewRef.push_back(*j);
         }
@@ -196,28 +219,7 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
             }
 
             //calculate total number of bytes for each side
-            const FileMapping* fileObj = dynamic_cast<const FileMapping*>(fsObj);
-            if (fileObj)
-            {
-                if (!fileObj->isEmpty<LEFT_SIDE>())
-                {
-                    output.filesizeLeftView += fileObj->getFileSize<LEFT_SIDE>();
-                    ++output.filesOnLeftView;
-                }
-                if (!fileObj->isEmpty<RIGHT_SIDE>())
-                {
-                    output.filesizeRightView += fileObj->getFileSize<RIGHT_SIDE>();
-                    ++output.filesOnRightView;
-                }
-            }
-            else
-            {
-                if (!fsObj->isEmpty<LEFT_SIDE>())
-                    ++output.foldersOnLeftView;
-
-                if (!fsObj->isEmpty<RIGHT_SIDE>())
-                    ++output.foldersOnRightView;
-            }
+            getNumbers(*fsObj, output);
 
             viewRef.push_back(*j);
         }
@@ -279,6 +281,9 @@ public:
         //add file references
         std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this);
 
+        //add symlink references
+        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), *this);
+
         //add dir references
         std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), *this);
     }
@@ -286,6 +291,11 @@ public:
     void operator()(const FileMapping& fileObj)
     {
         sortedRef_.push_back(RefIndex(index_, fileObj.getId()));
+    }
+
+    void operator()(const SymLinkMapping& linkObj)
+    {
+        sortedRef_.push_back(RefIndex(index_, linkObj.getId()));
     }
 
     void operator()(const DirMapping& dirObj)
@@ -486,7 +496,28 @@ private:
 };
 
 //-------------------------------------------------------------------------------------------------------
-void GridView::sortView(const SortType type, const bool onLeft, const bool ascending)
+bool GridView::getDefaultDirection(SortType type) //true: ascending; false: descending
+{
+    switch (type)
+    {
+    case SORT_BY_FILESIZE:
+    case SORT_BY_DATE:
+        return false;
+
+    case SORT_BY_REL_NAME:
+    case SORT_BY_FILENAME:
+    case SORT_BY_EXTENSION:
+    case SORT_BY_CMP_RESULT:
+    case SORT_BY_DIRECTORY:
+    case SORT_BY_SYNC_DIRECTION:
+        return true;
+    }
+    assert(false);
+    return true;
+}
+
+
+void GridView::sortView(SortType type, bool onLeft, bool ascending)
 {
     viewRef.clear();
 

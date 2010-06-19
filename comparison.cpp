@@ -73,9 +73,10 @@ public:
 
     virtual ~DirCallback() {}
 
-    virtual ReturnValue  onFile(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink, const FileInfo& details);
-    virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink);
-    virtual ReturnValue  onError(const wxString& errorText);
+    virtual void onFile(const DefaultChar* shortName, const Zstring& fullName, const FileInfo& details);
+    virtual void onSymlink(const DefaultChar* shortName, const Zstring& fullName, const SymlinkInfo& details);
+    virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName);
+    virtual void onError(const wxString& errorText);
 
 private:
     BaseDirCallback* const baseCallback_;
@@ -91,23 +92,20 @@ class BaseDirCallback : public DirCallback
     friend class DirCallback;
 public:
     BaseDirCallback(DirContainer& output,
-                    bool processSymlinks,
-                    bool traverseDirSymlinks,
+                    SymLinkHandling handleSymlinks,
                     const BaseFilter::FilterRef& filter,
                     StatusHandler* handler) :
         DirCallback(this, Zstring(), output, handler),
-        processSymlinks_(processSymlinks),
-        traverseDirSymlinks_(traverseDirSymlinks),
+        handleSymlinks_(handleSymlinks),
         textScanning(wxToZ(wxString(_("Scanning:")) + wxT(" \n"))),
         filterInstance(filter) {}
 
-    virtual TraverseCallback::ReturnValue onFile(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink, const TraverseCallback::FileInfo& details);
+    virtual void onFile(const DefaultChar* shortName, const Zstring& fullName, const TraverseCallback::FileInfo& details);
 
 private:
     typedef boost::shared_ptr<const DirCallback> CallbackPointer;
 
-    bool processSymlinks_;
-    bool traverseDirSymlinks_;
+    const SymLinkHandling handleSymlinks_;
     const Zstring textScanning;
     std::vector<CallbackPointer> callBackBox;  //collection of callback pointers to handle ownership
 
@@ -115,7 +113,7 @@ private:
 };
 
 
-TraverseCallback::ReturnValue DirCallback::onFile(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink, const FileInfo& details)
+void DirCallback::onFile(const DefaultChar* shortName, const Zstring& fullName, const FileInfo& details)
 {
     //assemble status message (performance optimized)  = textScanning + wxT("\"") + fullName + wxT("\"")
     Zstring statusText = baseCallback_->textScanning;
@@ -128,17 +126,11 @@ TraverseCallback::ReturnValue DirCallback::onFile(const DefaultChar* shortName, 
     statusHandler->updateStatusText(statusText);
 
 //------------------------------------------------------------------------------------
-    if (isSymlink && !baseCallback_->processSymlinks_) //handle symbolic links
-    {
-        statusHandler->requestUiRefresh();
-        return TRAVERSING_CONTINUE;
-    }
-
     //apply filter before processing (use relative name!)
     if (!baseCallback_->filterInstance->passFileFilter(relNameParentPf_ + shortName))
     {
         statusHandler->requestUiRefresh();
-        return TRAVERSING_CONTINUE;
+        return;
     }
 
     //warning: for windows retrieveFileID is slow as hell! approximately 3 * 10^-4 s per file!
@@ -157,12 +149,44 @@ TraverseCallback::ReturnValue DirCallback::onFile(const DefaultChar* shortName, 
     statusHandler->updateProcessedData(1, 0); //NO performance issue at all
     //trigger display refresh
     statusHandler->requestUiRefresh();
-
-    return TRAVERSING_CONTINUE;
 }
 
 
-TraverseCallback::ReturnValDir DirCallback::onDir(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink)
+void DirCallback::onSymlink(const DefaultChar* shortName, const Zstring& fullName, const SymlinkInfo& details)
+{
+    if (baseCallback_->handleSymlinks_ == SYMLINK_IGNORE)
+        return;
+
+    //assemble status message (performance optimized)  = textScanning + wxT("\"") + fullName + wxT("\"")
+    Zstring statusText = baseCallback_->textScanning;
+    statusText.reserve(statusText.length() + fullName.length() + 2);
+    statusText += DefaultChar('\"');
+    statusText += fullName;
+    statusText += DefaultChar('\"');
+
+    //update UI/commandline status information
+    statusHandler->updateStatusText(statusText);
+
+//------------------------------------------------------------------------------------
+    const Zstring& relName = relNameParentPf_ + shortName;
+
+    //apply filter before processing (use relative name!)
+    if (!baseCallback_->filterInstance->passFileFilter(relName)) //always use file filter: Link type may not be "stable" on Linux!
+    {
+        statusHandler->requestUiRefresh();
+        return;
+    }
+
+    output_.addSubLink(shortName, LinkDescriptor(details.lastWriteTimeRaw, details.targetPath, details.dirLink ? LinkDescriptor::TYPE_DIR : LinkDescriptor::TYPE_FILE));
+
+    //add 1 element to the progress indicator
+    statusHandler->updateProcessedData(1, 0); //NO performance issue at all
+    //trigger display refresh
+    statusHandler->requestUiRefresh();
+}
+
+
+TraverseCallback::ReturnValDir DirCallback::onDir(const DefaultChar* shortName, const Zstring& fullName)
 {
     using globalFunctions::FILE_NAME_SEPARATOR;
 
@@ -177,22 +201,7 @@ TraverseCallback::ReturnValDir DirCallback::onDir(const DefaultChar* shortName, 
     statusHandler->updateStatusText(statusText);
 
 //------------------------------------------------------------------------------------
-
-    bool traverseSubdirs = true;
-
-    if (isSymlink) //handle symbolic links
-    {
-        if  (!baseCallback_->processSymlinks_)
-        {
-            statusHandler->requestUiRefresh();
-            return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //do NOT traverse subdirs
-        }
-        else
-            traverseSubdirs = baseCallback_->traverseDirSymlinks_;
-    }
-
-    Zstring relName = relNameParentPf_;
-    relName += shortName;
+    const Zstring& relName = relNameParentPf_ + shortName;
 
     //apply filter before processing (use relative name!)
     bool subObjMightMatch = true;
@@ -200,72 +209,46 @@ TraverseCallback::ReturnValDir DirCallback::onDir(const DefaultChar* shortName, 
     {
         statusHandler->requestUiRefresh();
 
-        if (subObjMightMatch)
-        {
-            DirContainer& subDir = output_.addSubDir(shortName);
-
-            if (traverseSubdirs)
-            {
-                DirCallback* subDirCallback = new DirCallback(baseCallback_, relName += FILE_NAME_SEPARATOR, subDir, statusHandler);
-                baseCallback_->callBackBox.push_back(BaseDirCallback::CallbackPointer(subDirCallback)); //handle ownership
-                //attention: ensure directory filtering is applied later to exclude actually filtered directories
-                return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), subDirCallback);
-            }
-            else
-                return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>();
-        }
-        else
+        if (!subObjMightMatch)
             return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //do NOT traverse subdirs
     }
-
+    else
+    {
+        statusHandler->updateProcessedData(1, 0); //NO performance issue at all
+        statusHandler->requestUiRefresh();        //trigger display refresh
+    }
 
     DirContainer& subDir = output_.addSubDir(shortName);
 
-    //add 1 element to the progress indicator
-    statusHandler->updateProcessedData(1, 0);     //NO performance issue at all
-    //trigger display refresh
-    statusHandler->requestUiRefresh();
-
-    if (traverseSubdirs)
-    {
-        DirCallback* subDirCallback = new DirCallback(baseCallback_, relName += FILE_NAME_SEPARATOR, subDir, statusHandler);
-        baseCallback_->callBackBox.push_back(BaseDirCallback::CallbackPointer(subDirCallback)); //handle ownership
-
-        return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), subDirCallback);
-    }
-    else
-        return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>();
+    DirCallback* subDirCallback = new DirCallback(baseCallback_, relName + FILE_NAME_SEPARATOR, subDir, statusHandler);
+    baseCallback_->callBackBox.push_back(BaseDirCallback::CallbackPointer(subDirCallback)); //handle ownership
+    //attention: ensure directory filtering is applied later to exclude actually filtered directories
+    return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), subDirCallback);
 }
 
 
-TraverseCallback::ReturnValue DirCallback::onError(const wxString& errorText)
+void DirCallback::onError(const wxString& errorText)
 {
     while (true)
     {
         switch (statusHandler->reportError(errorText))
         {
         case ErrorHandler::IGNORE_ERROR:
-            return TRAVERSING_CONTINUE;
+            return;
         case ErrorHandler::RETRY:
             break; //I have to admit "retry" is a bit of a fake here... at least the user has opportunity to abort!
         }
     }
-
-    return TRAVERSING_CONTINUE; //dummy value
 }
 
 
-TraverseCallback::ReturnValue BaseDirCallback::onFile(
-    const DefaultChar* shortName,
-    const Zstring& fullName,
-    bool isSymlink,
-    const TraverseCallback::FileInfo& details)
+void BaseDirCallback::onFile(const DefaultChar* shortName, const Zstring& fullName, const TraverseCallback::FileInfo& details)
 {
     //do not list the database file(s) sync.ffs_db, sync.x64.ffs_db, etc.
     if (Zstring(shortName).AfterLast(DefaultChar('.')).cmpFileName(DefaultStr("ffs_db")) == 0)
-        return TraverseCallback::TRAVERSING_CONTINUE;
+        return;
 
-    return DirCallback::onFile(shortName, fullName, isSymlink, details);
+    DirCallback::onFile(shortName, fullName, details);
 }
 
 
@@ -297,11 +280,9 @@ struct DirBufferKey
 class CompareProcess::DirectoryBuffer  //buffer multiple scans of the same directories
 {
 public:
-    DirectoryBuffer(bool processSymLinks,
-                    bool traverseDirectorySymlinks,
+    DirectoryBuffer(SymLinkHandling handleSymlinks,
                     StatusHandler* statusUpdater) :
-        processSymLinks_(processSymLinks),
-        traverseDirectorySymlinks_(traverseDirectorySymlinks),
+        handleSymlinks_(handleSymlinks),
         statusUpdater_(statusUpdater) {}
 
     const DirContainer& getDirectoryDescription(const Zstring& directoryPostfixed, const BaseFilter::FilterRef& filter);
@@ -314,8 +295,7 @@ private:
 
     BufferType buffer;
 
-    const bool processSymLinks_;
-    const bool traverseDirectorySymlinks_;
+    const SymLinkHandling handleSymlinks_;
     StatusHandler* statusUpdater_;
 };
 //------------------------------------------------------------------------------------------
@@ -328,13 +308,26 @@ DirContainer& CompareProcess::DirectoryBuffer::insertIntoBuffer(const DirBufferK
     if (FreeFileSync::dirExists(newKey.directoryName)) //folder existence already checked in startCompareProcess(): do not treat as error when arriving here!
     {
         std::auto_ptr<TraverseCallback> traverser(new BaseDirCallback(*baseContainer,
-                processSymLinks_,
-                traverseDirectorySymlinks_,
+                handleSymlinks_,
                 newKey.filter,
                 statusUpdater_));
 
+        bool followSymlinks = false;
+        switch (handleSymlinks_)
+        {
+        case SYMLINK_IGNORE:
+            followSymlinks = false; //=> symlinks will be reported via onSymlink() where they are excluded
+            break;
+        case SYMLINK_USE_DIRECTLY:
+            followSymlinks = false;
+            break;
+        case SYMLINK_FOLLOW_LINK:
+            followSymlinks = true;
+            break;
+        }
+
         //get all files and folders from directoryPostfixed (and subdirectories)
-        traverseFolder(newKey.directoryName, traverser.get()); //exceptions may be thrown!
+        traverseFolder(newKey.directoryName, followSymlinks, traverser.get()); //exceptions may be thrown!
     }
     return *baseContainer.get();
 }
@@ -516,6 +509,7 @@ struct ToBeRemoved
     {
         return !dirObj.isActive() &&
                dirObj.useSubDirs(). size() == 0 &&
+               dirObj.useSubLinks().size() == 0 &&
                dirObj.useSubFiles().size() == 0;
     }
 };
@@ -532,7 +526,8 @@ public:
         HierarchyObject::SubDirMapping& subDirs = hierObj.useSubDirs();
 
         //process subdirs recursively
-        std::for_each(subDirs.begin(), subDirs.end(), *this);
+        Utility::Proxy<RemoveFilteredDirs> prx(*this); //grant std::for_each access to private parts of this class
+        std::for_each(subDirs.begin(), subDirs.end(), prx);
 
         //remove superfluous directories
         subDirs.erase(
@@ -541,8 +536,7 @@ public:
     }
 
 private:
-    template<typename Iterator, typename Function>
-    friend Function std::for_each(Iterator, Iterator, Function);
+    friend class Utility::Proxy<RemoveFilteredDirs>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
 
     void operator()(DirMapping& dirObj)
     {
@@ -565,8 +559,7 @@ void formatPair(FolderPairCfg& input)
 
 //#############################################################################################################################
 
-CompareProcess::CompareProcess(bool processSymLinks,
-                               bool traverseSymLinks,
+CompareProcess::CompareProcess(SymLinkHandling handleSymlinks,
                                size_t fileTimeTol,
                                bool ignoreOneHourDiff,
                                xmlAccess::OptionalDialogs& warnings,
@@ -577,7 +570,7 @@ CompareProcess::CompareProcess(bool processSymLinks,
     statusUpdater(handler),
     txtComparingContentOfFiles(wxToZ(_("Comparing content of files %x")).Replace(DefaultStr("%x"), DefaultStr("\n\"%x\""), false))
 {
-    directoryBuffer.reset(new DirectoryBuffer(processSymLinks, traverseSymLinks, handler));
+    directoryBuffer.reset(new DirectoryBuffer(handleSymlinks, handler));
 }
 
 
@@ -718,7 +711,8 @@ wxString getConflictSameDateDiffSize(const FileMapping& fileObj)
 
 
 //check for files that have a difference in file modification date below 1 hour when DST check is active
-wxString getConflictChangeWithinHour(const FileMapping& fileObj)
+template <class FileOrLinkMapping>
+wxString getConflictChangeWithinHour(const FileOrLinkMapping& fileObj)
 {
     //some beautification...
     wxString left = wxString(_("Left")) + wxT(": ");
@@ -727,25 +721,81 @@ wxString getConflictChangeWithinHour(const FileMapping& fileObj)
 
     wxString msg = _("Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.");
     msg += wxString(wxT("\n")) + _("(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)");
-    msg.Replace(wxT("%x"), wxString(wxT("\"")) + zToWx(fileObj.getRelativeName<LEFT_SIDE>()) + wxT("\""));
+    msg.Replace(wxT("%x"), wxString(wxT("\"")) + zToWx(fileObj.template getRelativeName<LEFT_SIDE>()) + wxT("\""));
     msg += wxT("\n\n");
-    msg += left + wxT("\t") + _("Date") + wxT(": ") + utcTimeToLocalString(fileObj.getLastWriteTime<LEFT_SIDE>()) + wxT("\n");
-    msg += right + wxT("\t") + _("Date") + wxT(": ") + utcTimeToLocalString(fileObj.getLastWriteTime<RIGHT_SIDE>());
+    msg += left + wxT("\t") + _("Date") + wxT(": ") + utcTimeToLocalString(fileObj.template getLastWriteTime<LEFT_SIDE>()) + wxT("\n");
+    msg += right + wxT("\t") + _("Date") + wxT(": ") + utcTimeToLocalString(fileObj.template getLastWriteTime<RIGHT_SIDE>());
     return wxString(_("Conflict detected:")) + wxT("\n") + msg;
 }
 
 //-----------------------------------------------------------------------------
-inline
-bool sameFileTime(const wxLongLong& a, const wxLongLong& b, size_t tolerance)
+class CmpFileTime
 {
-    if (a < b)
-        return b <= a + tolerance;
-    else
-        return a <= b + tolerance;
-}
+public:
+    CmpFileTime(bool ignoreOneHourDifference, size_t tolerance) :
+        ignoreOneHourDifference_(ignoreOneHourDifference),
+        tolerance_(tolerance) {}
+
+    enum Result
+    {
+        TIME_EQUAL,
+        TIME_LEFT_NEWER,
+        TIME_RIGHT_NEWER,
+        TIME_LEFT_INVALID,
+        TIME_RIGHT_INVALID,
+        TIME_DST_CHANGE_WITHIN_HOUR
+    };
+
+    Result getResult(const wxLongLong& lhs, const wxLongLong& rhs) const
+    {
+        if (lhs == rhs)
+            return TIME_EQUAL;
+
+        //number of seconds since Jan 1st 1970 + 1 year (needn't be too precise)
+        static const long oneYearFromNow = wxGetUTCTime() + 365 * 24 * 3600;
+
+        //check for erroneous dates (but only if dates are not (EXACTLY) the same)
+        if (lhs < 0 || lhs > oneYearFromNow) //earlier than Jan 1st 1970 or more than one year in future
+            return TIME_LEFT_INVALID;
+
+        if (rhs < 0 || rhs > oneYearFromNow)
+            return TIME_RIGHT_INVALID;
+
+        if (sameFileTime(lhs, rhs, tolerance_)) //last write time may differ by up to 2 seconds (NTFS vs FAT32)
+            return TIME_EQUAL;
+
+        //DST +/- 1-hour check: test if time diff is exactly +/- 1-hour (respecting 2 second FAT precision)
+        if (ignoreOneHourDifference_ && sameFileTime(lhs, rhs, 3600 + 2))
+        {
+            //date diff < 1 hour is a conflict: it's not safe to determine which file is newer
+            if (sameFileTime(lhs, rhs, 3600 - 2 - 1))
+                return TIME_DST_CHANGE_WITHIN_HOUR;
+            else //exact +/- 1-hour detected: treat as equal
+                return TIME_EQUAL;
+        }
+
+        //regular time comparison
+        if (lhs < rhs)
+            return TIME_RIGHT_NEWER;
+        else
+            return TIME_LEFT_NEWER;
+    }
+
+private:
+    static bool sameFileTime(const wxLongLong& a, const wxLongLong& b, size_t tolerance)
+    {
+        if (a < b)
+            return b <= a + tolerance;
+        else
+            return a <= b + tolerance;
+    }
+
+    const bool ignoreOneHourDifference_;
+    const size_t tolerance_;
+};
 
 
-void CompareProcess::compareByTimeSize(const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output)
+void CompareProcess::compareByTimeSize(const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output) const
 {
     output.reserve(output.size() + directoryPairsFormatted.size());
 
@@ -762,69 +812,41 @@ void CompareProcess::compareByTimeSize(const std::vector<FolderPairCfg>& directo
         performBaseComparison(output.back(), compareCandidates);
 
         //PERF_START;
+        const CmpFileTime timeCmp(ignoreOneHourDifference, fileTimeTolerance);
 
         //categorize files that exist on both sides
         for (std::vector<FileMapping*>::iterator i = compareCandidates.begin(); i != compareCandidates.end(); ++i)
         {
             FileMapping* const line = *i;
-            if (line->getLastWriteTime<LEFT_SIDE>() != line->getLastWriteTime<RIGHT_SIDE>())
-            {
-                //number of seconds since Jan 1st 1970 + 1 year (needn't be too precise)
-                static const long oneYearFromNow = wxGetUTCTime() + 365 * 24 * 3600;
 
-                //check for erroneous dates (but only if dates are not (EXACTLY) the same)
-                if (    line->getLastWriteTime<LEFT_SIDE>()  < 0 || //earlier than Jan 1st 1970
-                        line->getLastWriteTime<RIGHT_SIDE>() < 0 || //earlier than Jan 1st 1970
-                        line->getLastWriteTime<LEFT_SIDE>()  > oneYearFromNow || //dated more than one year in future
-                        line->getLastWriteTime<RIGHT_SIDE>() > oneYearFromNow)   //dated more than one year in future
-                {
-                    if (line->getLastWriteTime<LEFT_SIDE>() < 0 || line->getLastWriteTime<LEFT_SIDE>() > oneYearFromNow)
-                        line->setCategoryConflict(getConflictInvalidDate(line->getFullName<LEFT_SIDE>(), line->getLastWriteTime<LEFT_SIDE>()));
-                    else
-                        line->setCategoryConflict(getConflictInvalidDate(line->getFullName<RIGHT_SIDE>(), line->getLastWriteTime<RIGHT_SIDE>()));
-                }
-                else //from this block on all dates are at least "valid"
-                {
-                    //last write time may differ by up to 2 seconds (NTFS vs FAT32)
-                    if (sameFileTime(line->getLastWriteTime<LEFT_SIDE>(), line->getLastWriteTime<RIGHT_SIDE>(), fileTimeTolerance))
-                    {
-                        if (line->getFileSize<LEFT_SIDE>() == line->getFileSize<RIGHT_SIDE>())
-                            line->setCategory<FILE_EQUAL>();
-                        else
-                            line->setCategoryConflict(getConflictSameDateDiffSize(*line)); //same date, different filesize
-                    }
-                    else
-                    {
-                        //finally: DST +/- 1-hour check: test if time diff is exactly +/- 1-hour (respecting 2 second FAT precision)
-                        if (ignoreOneHourDifference && sameFileTime(line->getLastWriteTime<LEFT_SIDE>(), line->getLastWriteTime<RIGHT_SIDE>(), 3600 + 2))
-                        {
-                            //date diff < 1 hour is a conflict: it's not safe to determine which file is newer
-                            if (sameFileTime(line->getLastWriteTime<LEFT_SIDE>(), line->getLastWriteTime<RIGHT_SIDE>(), 3600 - 2 - 1))
-                                line->setCategoryConflict(getConflictChangeWithinHour(*line));
-                            else //exact +/- 1-hour detected: treat as equal
-                            {
-                                if (line->getFileSize<LEFT_SIDE>() == line->getFileSize<RIGHT_SIDE>())
-                                    line->setCategory<FILE_EQUAL>();
-                                else
-                                    line->setCategoryConflict(getConflictSameDateDiffSize(*line)); //same date, different filesize
-                            }
-                        }
-                        else
-                        {
-                            if (line->getLastWriteTime<LEFT_SIDE>() < line->getLastWriteTime<RIGHT_SIDE>())
-                                line->setCategory<FILE_RIGHT_NEWER>();
-                            else
-                                line->setCategory<FILE_LEFT_NEWER>();
-                        }
-                    }
-                }
-            }
-            else //same write time
+            switch (timeCmp.getResult(line->getLastWriteTime<LEFT_SIDE>(), line->getLastWriteTime<RIGHT_SIDE>()))
             {
+            case CmpFileTime::TIME_EQUAL:
                 if (line->getFileSize<LEFT_SIDE>() == line->getFileSize<RIGHT_SIDE>())
                     line->setCategory<FILE_EQUAL>();
                 else
                     line->setCategoryConflict(getConflictSameDateDiffSize(*line)); //same date, different filesize
+                break;
+
+            case CmpFileTime::TIME_LEFT_NEWER:
+                line->setCategory<FILE_LEFT_NEWER>();
+                break;
+
+            case CmpFileTime::TIME_RIGHT_NEWER:
+                line->setCategory<FILE_RIGHT_NEWER>();
+                break;
+
+            case CmpFileTime::TIME_LEFT_INVALID:
+                line->setCategoryConflict(getConflictInvalidDate(line->getFullName<LEFT_SIDE>(), line->getLastWriteTime<LEFT_SIDE>()));
+                break;
+
+            case CmpFileTime::TIME_RIGHT_INVALID:
+                line->setCategoryConflict(getConflictInvalidDate(line->getFullName<RIGHT_SIDE>(), line->getLastWriteTime<RIGHT_SIDE>()));
+                break;
+
+            case CmpFileTime::TIME_DST_CHANGE_WITHIN_HOUR:
+                line->setCategoryConflict(getConflictChangeWithinHour(*line));
+                break;
             }
         }
     }
@@ -842,7 +864,7 @@ wxULongLong getBytesToCompare(const std::vector<FileMapping*>& rowsToCompare)
 }
 
 
-void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output)
+void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output) const
 {
     //PERF_START;
     std::vector<FileMapping*> compareCandidates;
@@ -936,8 +958,10 @@ void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& director
 class MergeSides
 {
 public:
-    MergeSides(std::vector<FileMapping*>& appendUndefinedOut) :
-        appendUndefined(appendUndefinedOut) {}
+    MergeSides(std::vector<FileMapping*>& appendUndefinedFileOut,
+               std::vector<SymLinkMapping*>& appendUndefinedLinkOut) :
+        appendUndefinedFile(appendUndefinedFileOut),
+        appendUndefinedLink(appendUndefinedLinkOut) {}
 
     void execute(const DirContainer& leftSide, const DirContainer& rightSide, HierarchyObject& output);
 
@@ -945,19 +969,24 @@ private:
     template <SelectedSide side>
     void fillOneSide(const DirContainer& dirCont, HierarchyObject& output);
 
-    std::vector<FileMapping*>& appendUndefined;
+    std::vector<FileMapping*>& appendUndefinedFile;
+    std::vector<SymLinkMapping*>& appendUndefinedLink;
 };
 
 
 template <>
 void MergeSides::fillOneSide<LEFT_SIDE>(const DirContainer& dirCont, HierarchyObject& output)
 {
-    //reserve() fulfills two task here: 1. massive performance improvement! 2. ensure references in appendUndefined remain valid!
+    //reserve() fulfills one task here: massive performance improvement!
     output.useSubFiles().reserve(dirCont.fileCount());
     output.useSubDirs(). reserve(dirCont.dirCount());
+    output.useSubLinks().reserve(dirCont.linkCount());
 
     for (DirContainer::SubFileList::const_iterator i = dirCont.fileBegin(); i != dirCont.fileEnd(); ++i)
         output.addSubFile(i->second.getData(), i->first);
+
+    for (DirContainer::SubLinkList::const_iterator i = dirCont.linkBegin(); i != dirCont.linkEnd(); ++i)
+        output.addSubLink(i->second.getData(), i->first);
 
     for (DirContainer::SubDirList::const_iterator i = dirCont.dirBegin(); i != dirCont.dirEnd(); ++i)
     {
@@ -970,12 +999,16 @@ void MergeSides::fillOneSide<LEFT_SIDE>(const DirContainer& dirCont, HierarchyOb
 template <>
 void MergeSides::fillOneSide<RIGHT_SIDE>(const DirContainer& dirCont, HierarchyObject& output)
 {
-    //reserve() fulfills two task here: 1. massive performance improvement! 2. ensure references in appendUndefined remain valid!
+    //reserve() fulfills one task here: massive performance improvement!
     output.useSubFiles().reserve(dirCont.fileCount());
     output.useSubDirs(). reserve(dirCont.dirCount());
+    output.useSubLinks().reserve(dirCont.linkCount());
 
     for (DirContainer::SubFileList::const_iterator i = dirCont.fileBegin(); i != dirCont.fileEnd(); ++i)
         output.addSubFile(i->first, i->second.getData());
+
+    for (DirContainer::SubLinkList::const_iterator i = dirCont.linkBegin(); i != dirCont.linkEnd(); ++i)
+        output.addSubLink(i->first, i->second.getData());
 
     for (DirContainer::SubDirList::const_iterator i = dirCont.dirBegin(); i != dirCont.dirEnd(); ++i)
     {
@@ -988,7 +1021,7 @@ void MergeSides::fillOneSide<RIGHT_SIDE>(const DirContainer& dirCont, HierarchyO
 void MergeSides::execute(const DirContainer& leftSide, const DirContainer& rightSide, HierarchyObject& output)
 {
     //ATTENTION: HierarchyObject::retrieveById() can only work correctly if the following conditions are fulfilled:
-    //1. on each level, files are added first, then directories (=> file id < dir id)
+    //1. on each level, files are added first, symlinks, then directories (=> file id < link id < dir id)
     //2. when a directory is added, all subdirectories must be added immediately (recursion) before the next dir on this level is added
     //3. entries may be deleted but NEVER new ones inserted!!!
     //=> this allows for a quasi-binary search by id!
@@ -998,6 +1031,7 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
     //reserve() fulfills two task here: 1. massive performance improvement! 2. ensure references in appendUndefined remain valid!
     output.useSubFiles().reserve(leftSide.fileCount() + rightSide.fileCount()); //assume worst case!
     output.useSubDirs(). reserve(leftSide.dirCount()  + rightSide.dirCount());  //
+    output.useSubLinks().reserve(leftSide.linkCount() + rightSide.linkCount()); //
 
     for (DirContainer::SubFileList::const_iterator i = leftSide.fileBegin(); i != leftSide.fileEnd(); ++i)
     {
@@ -1014,7 +1048,7 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
                                         i->first,
                                         FILE_EQUAL, //FILE_EQUAL is just a dummy-value here
                                         rightFile->getData());
-            appendUndefined.push_back(&newEntry);
+            appendUndefinedFile.push_back(&newEntry);
         }
     }
 
@@ -1023,6 +1057,34 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
     {
         if (leftSide.findFile(j->first) == NULL)
             output.addSubFile(j->first, j->second.getData());
+    }
+
+
+//-----------------------------------------------------------------------------------------------
+    for (DirContainer::SubLinkList::const_iterator i = leftSide.linkBegin(); i != leftSide.linkEnd(); ++i)
+    {
+        const SymLinkContainer* rightLink = rightSide.findLink(i->first);
+
+        //find files that exist on left but not on right
+        if (rightLink == NULL)
+            output.addSubLink(i->second.getData(), i->first);
+        //find files that exist on left and right
+        else
+        {
+            SymLinkMapping& newEntry = output.addSubLink(
+                                           i->second.getData(),
+                                           i->first,
+                                           SYMLINK_EQUAL, //SYMLINK_EQUAL is just a dummy-value here
+                                           rightLink->getData());
+            appendUndefinedLink.push_back(&newEntry);
+        }
+    }
+
+    //find files that exist on right but not on left
+    for (DirContainer::SubLinkList::const_iterator j = rightSide.linkBegin(); j != rightSide.linkEnd(); ++j)
+    {
+        if (leftSide.findLink(j->first) == NULL)
+            output.addSubLink(j->first, j->second.getData());
     }
 
 
@@ -1056,9 +1118,65 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
 }
 
 
-void CompareProcess::performBaseComparison(BaseDirMapping& output, std::vector<FileMapping*>& appendUndefined)
+void CompareProcess::categorizeSymlink(SymLinkMapping* linkObj) const
+{
+    //categorize symlinks that exist on both sides
+    if (
+#ifdef FFS_WIN //type of symbolic link is relevant for Windows only
+        linkObj->getLinkType<LEFT_SIDE>() == linkObj->getLinkType<RIGHT_SIDE>() &&
+#endif
+        !linkObj->getTargetPath<LEFT_SIDE>().empty() &&
+        linkObj->getTargetPath<LEFT_SIDE>() == linkObj->getTargetPath<RIGHT_SIDE>())
+
+    {
+        linkObj->setCategory<SYMLINK_EQUAL>();
+        return;
+    }
+
+    switch (CmpFileTime(ignoreOneHourDifference, fileTimeTolerance).getResult(linkObj->getLastWriteTime<LEFT_SIDE>(), linkObj->getLastWriteTime<RIGHT_SIDE>()))
+    {
+    case CmpFileTime::TIME_EQUAL:
+        if (
+#ifdef FFS_WIN //type of symbolic link is relevant for Windows only
+            linkObj->getLinkType<LEFT_SIDE>() == linkObj->getLinkType<RIGHT_SIDE>() &&
+#endif
+            linkObj->getTargetPath<LEFT_SIDE>() == linkObj->getTargetPath<RIGHT_SIDE>()) //may both be empty if following link failed
+            linkObj->setCategory<SYMLINK_EQUAL>();
+        else
+        {
+            wxString conflictMsg = wxString(_("Conflict detected:")) + wxT("\n") + _("Symlinks %x have the same date but a different target!");
+            conflictMsg.Replace(wxT("%x"), wxString(wxT("\"")) + zToWx(linkObj->getRelativeName<LEFT_SIDE>()) + wxT("\""));
+            linkObj->setCategoryConflict(conflictMsg);
+        }
+        break;
+
+    case CmpFileTime::TIME_LEFT_NEWER:
+        linkObj->setCategory<SYMLINK_LEFT_NEWER>();
+        break;
+
+    case CmpFileTime::TIME_RIGHT_NEWER:
+        linkObj->setCategory<SYMLINK_RIGHT_NEWER>();
+        break;
+
+    case CmpFileTime::TIME_LEFT_INVALID:
+        linkObj->setCategoryConflict(getConflictInvalidDate(linkObj->getFullName<LEFT_SIDE>(), linkObj->getLastWriteTime<LEFT_SIDE>()));
+        break;
+
+    case CmpFileTime::TIME_RIGHT_INVALID:
+        linkObj->setCategoryConflict(getConflictInvalidDate(linkObj->getFullName<RIGHT_SIDE>(), linkObj->getLastWriteTime<RIGHT_SIDE>()));
+        break;
+
+    case CmpFileTime::TIME_DST_CHANGE_WITHIN_HOUR:
+        linkObj->setCategoryConflict(getConflictChangeWithinHour(*linkObj));
+        break;
+    }
+}
+
+
+void CompareProcess::performBaseComparison(BaseDirMapping& output, std::vector<FileMapping*>& appendUndefined) const
 {
     assert(output.useSubDirs(). empty());
+    assert(output.useSubLinks().empty());
     assert(output.useSubFiles().empty());
 
     //PERF_START;
@@ -1078,5 +1196,9 @@ void CompareProcess::performBaseComparison(BaseDirMapping& output, std::vector<F
 
     //PERF_STOP;
 
-    MergeSides(appendUndefined).execute(directoryLeft, directoryRight, output);
+    std::vector<SymLinkMapping*> undefinedLinks;
+    MergeSides(appendUndefined, undefinedLinks).execute(directoryLeft, directoryRight, output);
+
+    //finish symlink categorization
+    std::for_each(undefinedLinks.begin(), undefinedLinks.end(), boost::bind(&CompareProcess::categorizeSymlink, this, _1));
 }

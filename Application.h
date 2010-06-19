@@ -24,6 +24,12 @@ private:
     void runGuiMode(const wxString& cfgFileName, xmlAccess::XmlGlobalSettings& settings);
     void runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSettings& globSettings);
 
+    virtual wxLayoutDirection GetLayoutDirection() const //disable RTL languages for now...
+    {
+        return wxLayout_LeftToRight;
+    }
+
+
     xmlAccess::XmlGlobalSettings globalSettings; //settings used by GUI, batch mode or both
     int returnValue;
 };

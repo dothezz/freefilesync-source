@@ -6,10 +6,6 @@
  GB
  MB
  MB
- PB
- PB
- TB
- TB
  day(s)
  nap
  hour(s)
@@ -22,18 +18,30 @@
  másodperc
 %x / %y objects deleted successfully
 %X / %Y objektum sikeresen törölve
+%x Byte
+%x bájt
+%x GB
+%x GB
+%x MB
+%x MB
+%x PB
+%x PB
+%x TB
+%x TB
 %x directories
 %x mappa
-%x files,
-%x fájl,
+%x files
+%x fájl
 %x is not a valid FreeFileSync batch file!
 A(z) %x nem megfelelő FreeFileSync kötegelt feladat fájl!
+%x kB
+%x kB
 %x of %y rows in view
 %x sor látható a(z) %y sorból
 %x of 1 row in view
 %x sor látható az 1 sorból
 %x%
-
+%x%
 &Abort
 &Megszakít
 &About...
@@ -57,7 +65,7 @@ A(z) %x nem megfelelő FreeFileSync kötegelt feladat fájl!
 &File
 &Fájl
 &Find next
-
+&Következő keresése
 &Global settings...
 &Globális beállítások...
 &Help
@@ -85,11 +93,13 @@ A(z) %x nem megfelelő FreeFileSync kötegelt feladat fájl!
 &Retry
 &Ismét
 &Save
-&Mestés
+&Mentés
 &Switch
-
+&Váltás
 &Yes
 &Igen
+(Build: %x)
+(Build: %x)
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Megjegyzés: Csak a FAT/FAT32 meghajtókat érinti ez a probléma!\nMinden más esetben ki lehet kapcsolni az \"1 órás különbség figyelmen kívül hagyása\" beállítást.)
 (Requires an Internet connection!)
@@ -126,8 +136,8 @@ A(z) %x nem megfelelő FreeFileSync kötegelt feladat fájl!
 /másodperc
 1 directory
 1 mappa
-1 file,
-1 fájl,
+1 file
+1 fájl
 1. &Compare
 1. &Összehasonlítás
 1. Enter relative file or directory names separated by ';' or a new line.
@@ -150,6 +160,8 @@ A(z) %x nem megfelelő FreeFileSync kötegelt feladat fájl!
 <Mappa>
 <Last session>
 <Utolsó munkamenet>
+<Symlink>
+<Symlink>
 <multiple selection>
 <többszörös kijelölés>
 A newer version of FreeFileSync is available:
@@ -157,7 +169,7 @@ Elérhető a FreeFileSync egy újabb verziója:
 Abort requested: Waiting for current operation to finish...
 Megszakítási kérelem: Várakozás a folyamatban lévő művelet befejezésére...
 Abort synchronization immediately
-
+Szinkronizáció azonnali megszakítása
 Aborted
 Megszakítva
 About
@@ -195,17 +207,15 @@ Mindkét oldal megváltozott az utolsó szikronizálás óta!
 Browse
 Tallózás
 Browse directory
-
-Build:
-Build:
+Mappa tallózása
 Cannot determine sync-direction:
 Nem lehet meghatározni a szinkronizáció irányát:
 Cannot find %x
-
+Nem található: %x
 Category
 Kategória
 Clear filter settings
-
+Szűrőbeállítások törlése
 Comma separated list
 Comma separated values
 Command line
@@ -272,10 +282,14 @@ Copy shared or locked files using Volume Shadow Copy Service
 Megosztott vagy zárolt fájlok másolása a Volume Shadow Copy Service segítségével
 Copy to clipboard\tCTRL+C
 Másolás a vágólapra\tCTRL+C
+Copying Symbolic Link %x overwriting %y
+A(z) %x symlink másolása fölülírva a következőt: %y
+Copying Symbolic Link %x to %y
+A(z) %x symlink másolása ide: %y
+Copying file %x overwriting %y
+A(z) %x fájl másolása fölülírva a következőt: %y
 Copying file %x to %y
 %x fájl másolása a(z) %y fájlba
-Copying file %x to %y overwriting target
-A(z) %x fájl másolása a(z) %y fájlba fölülírva a célt
 Could not determine volume name for file:
 A következő fájlnak nem lehet meghatározni a kötetnevét:
 Could not initialize directory monitoring:
@@ -320,6 +334,8 @@ Delete or overwrite files permanently
 A fájlok folyamatos törlése vagy felülírása
 Delete permanently
 Folyamatosan törölni
+Deleting Symbolic Link %x
+Symlink törlése: %x
 Deleting file %x
 Fájl törlése %x
 Deleting folder %x
@@ -328,6 +344,8 @@ Deletion handling
 Törlések kezelése
 Description
 Megjegyzés
+Direct
+Közvetlen
 Directories are dependent! Be careful when setting up synchronization rules:
 A mappák függenek egymástól! Legyen óvatos, amikor megadja a szinkronizálási szabályokat:
 Directories to watch
@@ -340,9 +358,9 @@ Do not show this dialog again
 Ne mutasd újra ezt a párbeszédablakot
 Do nothing
 Nincs mit csinálni
-Do you really want to delete the following objects(s)?
+Do you really want to delete the following object(s)?
 Valóban törölni akarja a az alábbi objektumo(ka)t?
-Do you really want to move the following objects(s) to the Recycle Bin?
+Do you really want to move the following object(s) to the Recycle Bin?
 Valóban a Lomtárba (Recycle Bin) akarja mozgatni az alábbi objektumo(ka)t?
 Do you want FreeFileSync to automatically check for updates every week?
 Akarod, hogy a FreeFileSync automatikusan minden héten keressen frissítést?
@@ -353,11 +371,11 @@ Letöltsem most?
 Drag && drop
 Húzd && Ejtsd
 Elements found:
-
+Talált elemek száma:
 Elements processed:
-
+Feldolgozott elemek száma:
 Elements remaining:
-
+Hátralévő elemek száma:
 Email
 E-mail
 Endless loop when traversing directory:
@@ -371,7 +389,7 @@ A fájl másolása sikertelen:
 Error copying locked file %x!
 Hiba történt a(z) %x zárolt fájl másolása közben!
 Error copying symbolic link:
-
+Hiba történt a szimbolikus link másolása közben:
 Error creating directory:
 A mappa létrehozása sikertelen:
 Error deleting directory:
@@ -423,9 +441,9 @@ Ideiglenesen kizár
 Exclude via filter:
 Kizárás szűrő segítségével:
 Exit instantly
-
+Kilépés azonnal
 Extension
-
+Kiterjesztés
 External applications
 Külső alkalmazások
 Fatal Error
@@ -461,7 +479,7 @@ Mindkét oldalon létező fájlok, de a bal oldali újabb
 Files that exist on both sides, right one is newer
 Mindkét oldalon létező fájlok, de a jobb oldali újabb
 Files that have different content
-
+Fájlok, amelyeknek különböző a tartalmuk:
 Files/folders that exist on left side only
 Csak a bal oldalon létező fájlok/mappák
 Files/folders that exist on right side only
@@ -469,21 +487,23 @@ Csak a jobb oldalon létező fájlok/mappák
 Filter files
 Fájlok szűrése
 Filter is active
-
+A szűrő aktív
 Filter settings have changed!
 A szűrőbeállítások megváltoztak!
 Filter view
 Szűrő nézet
 Filter: All pairs
-
+Szűrő: Minden pár
 Filter: Single pair
-
+Szűrő: Egy pár
 Find
-
+Keresés:
 Find what:
-
+Mit keresünk:
 Folder Comparison and Synchronization
 Mappa összehasonlítás és szinkronizáció
+Follow
+Követés
 Free disk space available:
 Szabad lemezterület:
 FreeFileSync Batch Job
@@ -552,6 +572,8 @@ Identify and propagate changes on both sides using a database. Deletions and con
 Mindkét oldal változásainak azonosítása és tárolása adatbázis segítségével. A törlések és ütközések automatikusan észlelődnek.
 If you like FFS
 FFS támogatása
+Ignore
+Figyelmen kívül hagy
 Ignore 1-hour file time difference
 1 órás fájl dátum különbségek figyelmen kívül hagyása
 Ignore errors
@@ -560,8 +582,6 @@ Ignore subsequent errors
 Későbbi hibák figyelmen kívül hagyása
 Include
 Csatol
-Include Symbolic Links
-
 Include all rows
 Minden sort csatolni
 Include temporarily
@@ -595,7 +615,7 @@ Naplózás
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 A Shadow Copy a WOW64-en nem támogatott. Kérjük, használja a 64-bites FreeFileSync-et.
 Match case
-
+Kis-/nagybetű egyezés
 Mirror ->>
 Tükrözés ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -611,7 +631,9 @@ Oszlop mozgatása felfelé
 Move files into a time-stamped subdirectory
 Fájlok másolása időbélyeggel ellátott almappába
 Moving %x to Recycle Bin
-%x mozgatása a Lomtárba
+%x mozgatása a Lomtárba (Recycle Bin)
+Moving Symbolic Link %x to user-defined directory %y
+A(z) %x symlink másolása a felhasználó által megadott %y mappába
 Moving file %x to user-defined directory %y
 %x fájl mozgatása a felhasználó által megadott %y mappába
 Moving folder %x to user-defined directory %y
@@ -633,15 +655,15 @@ A törlendő fájlok és mappák száma
 Number of files that will be overwritten
 A felülírandó fájlok száma
 One of the FreeFileSync database entries within the following file is not yet existing:
-
+A FreeFileSync a következő fájlban lévő egyik adatbázisbejegyzése nem található:
 One of the FreeFileSync database files is not yet existing:
-
+A FreeFileSync egyik adatbázisfájlja nem létezik:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Csak a szűrésnek megfelelő fájlok/mappák lesznek kijelölve szinkronizáláshoz. A szűrő a szinkronizálás alap mappáihoz relatív fájl- és mappanevekre lesz alkalmazva.
 Open with Explorer
 Megnyitás Explorerrel
 Open with default application
-
+Megnyitás az alapértelmezett alkalmazással
 Operation aborted!
 Művelet megszakítva!
 Operation:
@@ -653,11 +675,11 @@ Szünet
 Paused
 Szüneteltetve
 Planned directory deletion is in conflict with its subdirectories and -files!
-
+A tervezett mappának a törlése ütközik az almappáival és fájljaival.
 Please run a Compare first before synchronizing!
 Kérjük, futtass le egy összehasonlítást mielőtt szinkronizálnál!
 Press \"Switch\" to open FreeFileSync GUI modus.
-
+Kérjük, nyomja meg a \"Váltás\" gombot a GUI mód megnyitásához.
 Processing folder pair:
 Mappapár feldolgozása:
 Published under the GNU General Public License:
@@ -673,7 +695,7 @@ RealtimeSync - Automatikus szinkronizálás
 RealtimeSync configuration
 RealtimeSync beállítások
 Recycle Bin not yet supported for this system!
-
+A Lomtár (Recycle Bin) nem támogatott ezen a rendszeren!
 Relative path
 Relatív útvonal
 Remove alternate settings
@@ -682,8 +704,6 @@ Remove folder
 Mappa eltávolítása
 Remove folder pair
 Mappa párok eltávolítása
-Renaming file %x to %y
-%x fájl átnevezése %y névre
 Report translation error
 Fordítói hiba bejelentése
 Reset
@@ -713,9 +733,9 @@ Naplófájl mappájának kiválasztása:
 Select variant:
 Változat kiválasztása:
 Set direction:
-
+Irány
 Setting default synchronization directions: Old files will be overwritten with newer files.
-
+Alapértelmezett szinkronizációs irányok beállítása: a régebbi fájlok felülíródnak az újabbakkal.
 Show conflicts
 Ütközések mutatása
 Show files that are different
@@ -769,13 +789,17 @@ Szinkronizáció indítása
 Statistics
 Statisztikák
 Status feedback
-
+Státusz visszajelzés
 Stop
 Megállítás
 Swap sides
 Oldalak felcserélése
 Switching to FreeFileSync GUI modus...
-
+Váltás a FreeFileSync GUI módjára...
+Symbolic Link handling
+Symlink kezelés
+Symlinks %x have the same date but a different target!
+A(z) %x symlinknek megegyezik a dátuma, de a célpontja nem!
 Synchronization Preview
 Szinkronizáció előnézete
 Synchronization aborted!
@@ -800,12 +824,12 @@ Target directory already existing!
 A célmappa már létezik!
 Target file already existing!
 A célként megadott fájl már létezik!
-The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-
+The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+A parancssor végrehajtódik minden alkalommal, ha:\n- minden mappa elérhetővé válik (pl. USB-kulcs csatlakoztatása)\n- fájlok módosulnak az adott mappákban és almappákban
 The file does not contain a valid configuration:
 A következő fájl nem tartalmaz érvényes beállításokat:
 The file was not processed by last synchronization!
-
+A fájl nem lett feldolgozva az utolsó szinkronizáció alkalmával!
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Ez a változat akkor tekint egyezőnek két azonos nevű fájlt, ha azok mérete ÉS az utolsó módosításuk ideje azonos.
 Time
@@ -835,7 +859,7 @@ Használat:
 Use Recycle Bin
 Lomtár (Recycle Bin) használata
 Use Recycle Bin when deleting or overwriting files
-A Lomtár használata fájlok törlésénél vagy felülírásánál
+A Lomtár (Recycle Bin) használata fájlok törlésénél vagy felülírásánál
 User-defined directory
 Felhasználó által megadott mappa
 User-defined directory for deletion was not specified!
@@ -847,7 +871,7 @@ Verifying file %x
 Volume name %x not part of filename %y!
 A(z) %x kötetnevet nem tartalmazza a(z) %y fájlnév!
 Waiting for all directories to become available...
-
+Várakozás az összes mappa elérhetővé válására...
 Warning
 Figyelem
 Warning: Synchronization failed for %x item(s):

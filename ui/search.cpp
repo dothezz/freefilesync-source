@@ -41,6 +41,7 @@ SearchDlg::SearchDlg(wxWindow& parentWindow, wxString& searchText, bool& respect
     m_textCtrlSearchTxt->SetValue(searchText_);
 
     CentreOnParent(); //this requires a parent window!
+    m_textCtrlSearchTxt->SetFocus();
 }
 
 

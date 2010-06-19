@@ -6,28 +6,36 @@
  Go
  MB
  Mo
- PB
- Po
- TB
- To
  day(s)
  jour(s)
  hour(s)
  heure(s)
  kB
- ko
+ Ko
  min
  min
  sec
  sec
 %x / %y objects deleted successfully
-%x / %y objets détruits avec succès
+%x / %y objets supprimés avec succès
+%x Byte
+%x Octets
+%x GB
+%x Go
+%x MB
+%x Mo
+%x PB
+%x Po
+%x TB
+%x To
 %x directories
-%x dossiers
-%x files,
-%x fichiers,
+%x répertoires
+%x files
+%x fichiers
 %x is not a valid FreeFileSync batch file!
 %x n'est pas un fichier batch FreeFileSync valide !
+%x kB
+%x Ko
 %x of %y rows in view
 %x sur %y lignes affichées
 %x of 1 row in view
@@ -90,10 +98,12 @@
 &Changer
 &Yes
 &Oui
+(Build: %x)
+(Généré : %x)
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Notez que seuls les lecteurs FAT/FAT32 sont concernés par ce problème !\nDans tous les autres cas, vous pouvez désactiver le paramètre \"ignorer la différence d'une heure\".)
 (Requires an Internet connection!)
-(Nécessite une connexion internet)
+(Nécessite une connexion Internet)
 - Other side's counterpart to %dir
 - équivalent de %dir de l'autre côté
 - Other side's counterpart to %name
@@ -113,7 +123,7 @@
 - exists right only
 - le fichier existe seulement à droite
 - full file or directory name
-- nom complet du fichier ou du dossier
+- nom complet du fichier ou du répertoire
 - left
 - à gauche
 - left newer
@@ -125,9 +135,9 @@
 /sec
 /sec
 1 directory
-1 dossier
-1 file,
-1 fichier,
+1 répertoire
+1 file
+1 fichier
 1. &Compare
 1. &Comparer
 1. Enter relative file or directory names separated by ';' or a new line.
@@ -150,6 +160,8 @@
 <Répertoire>
 <Last session>
 <Dernière session>
+<Symlink>
+<Lien symbolique>
 <multiple selection>
 <sélection multiple>
 A newer version of FreeFileSync is available:
@@ -195,9 +207,7 @@ Les deux côtés ont changé depuis la dernière synchronisation !
 Browse
 Parcourir
 Browse directory
-Prcourir le dossier
-Build:
-Créé le :
+Prcourir le répertoire
 Cannot determine sync-direction:
 Impossible de déterminer le sens de la synchro :
 Cannot find %x
@@ -267,15 +277,19 @@ Copie de droite à gauche avec remplacement
 Copy locked files
 Copier les fichiers verrouillés
 Copy new or updated files to right folder.
-Copie de fichiers nouveaux ou modifiés dans le dossier de droite.
+Copie les fichiers nouveaux ou modifiés dans le dossier de droite.
 Copy shared or locked files using Volume Shadow Copy Service
 Copier les fichiers partagés ou verrouilés en utilisant le service Volume Shadow Copy
 Copy to clipboard\tCTRL+C
 Copier dans le presse-papiers\tCTRL+C
+Copying Symbolic Link %x overwriting %y
+Copie du Lien Symbolique %x remplaçant %y
+Copying Symbolic Link %x to %y
+Copie du Lien Symbolique %x vers %y
+Copying file %x overwriting %y
+Copie du fichier %x remplaçant %y
 Copying file %x to %y
 Copie le fichier %x vers %y
-Copying file %x to %y overwriting target
-Copie le fichier %x vers %y avec écrasement
 Could not determine volume name for file:
 Impossible de trouver le nom de volume pour le fichier :
 Could not initialize directory monitoring:
@@ -307,9 +321,9 @@ Délai
 Delay between detection of changes and execution of command line in seconds
 Intervalle entre la détection des changements et l'exécution de la ligne de commande en secondes
 Delete files/folders existing on left side only
-Suppression des fichiers/répertoires n'existant que sur le côté gauche
+Suppression des fichiers/dossiers n'existant que sur le côté gauche
 Delete files/folders existing on right side only
-Suppression des fichiers/répertoires n'existant que sur le côté droit
+Suppression des fichiers/dossiers n'existant que sur le côté droit
 Delete files\tDEL
 Suppression des fichiers\tDEL
 Delete on both sides
@@ -320,6 +334,8 @@ Delete or overwrite files permanently
 Supprimer ou écraser les fichiers définitivement
 Delete permanently
 Suppression définitive
+Deleting Symbolic Link %x
+Suppression du Lien Symbolique %x
 Deleting file %x
 Suppression du fichier %x
 Deleting folder %x
@@ -328,24 +344,26 @@ Deletion handling
 Gestion des suppressions
 Description
 Description
+Direct
+Direct
 Directories are dependent! Be careful when setting up synchronization rules:
-Les dossiers sont imbriqués ! Attention à la mise à jour des règles de synchronisation :
+Les répertoires sont imbriqués ! Attention à la mise à jour des règles de synchronisation :
 Directories to watch
-Dossiers à surveiller
+Réperoires à surveiller
 Directory
 Répertoire
 Directory does not exist:
 Le répertoire n'existe pas :
 Do not show this dialog again
-Ne plus afficher ce message les prochaines fois
+Ne plus afficher ce message la prochaine fois
 Do nothing
 Ne rien faire
-Do you really want to delete the following objects(s)?
+Do you really want to delete the following object(s)?
 Voulez-vous vraiment supprimer les objets suivants ?
-Do you really want to move the following objects(s) to the Recycle Bin?
-Voulez-vous vraiment déplacer les objets suivants dans la corbeille ?
+Do you really want to move the following object(s) to the Recycle Bin?
+Voulez-vous vraiment déplacer les objets suivants dans la Corbeille ?
 Do you want FreeFileSync to automatically check for updates every week?
-Voulez-vous que FreeFileSync recherche automatiquement de nouvelles versions chaque semaine ?
+Voulez-vous que FreeFileSync recherche automatiquement une nouvelle version chaque semaine ?
 Donate with PayPal
 Faites un don avec PayPal
 Download now?
@@ -383,11 +401,11 @@ Erreur de gestion de fichiers
 Error loading library function:
 Erreur lors du chargement de la bibliothèque de fonctions :
 Error moving directory:
-Erreur lors du déplacement du dossier :
+Erreur lors du déplacement du répertoire :
 Error moving file:
 Erreur lors du déplacement du fichier :
 Error moving to Recycle Bin:
-Erreur lors du déplacement dans la corbeille :
+Erreur lors du déplacement dans la Corbeille :
 Error opening file:
 Erreur lors de l'ouverture du fichier :
 Error parsing configuration file:
@@ -405,7 +423,7 @@ Erreur lors du démarrage du service 'Volume Shadow Copy' !
 Error traversing directory:
 Erreur lors du parcours du répertoire :
 Error when monitoring directories.
-Erreur lors de la surveillance des dossiers.
+Erreur lors de la surveillance des répertoires.
 Error writing file attributes:
 Erreur lors de l'écriture des attributs du fichier :
 Error writing file:
@@ -483,7 +501,9 @@ Chercher
 Find what:
 Chercher cela :
 Folder Comparison and Synchronization
-Comparaison de Dossiers et Synchronisation
+Comparaison de dossiers et Synchronisation
+Follow
+Suivre
 Free disk space available:
 Espace disque disponible :
 FreeFileSync Batch Job
@@ -552,6 +572,8 @@ Identify and propagate changes on both sides using a database. Deletions and con
 Identifier et propager les modifications des deux côtés en utilisant une base de données. Les suppressions et les conflits sont détectés automatiquement.
 If you like FFS
 Si vous aimez FFS
+Ignore
+Ignorer
 Ignore 1-hour file time difference
 Ignorer les diférences d'une heure
 Ignore errors
@@ -560,8 +582,6 @@ Ignore subsequent errors
 Ignorer les erreurs ultérieures
 Include
 Inclure
-Include Symbolic Links
-Inclure les liens symboliques
 Include all rows
 Inclure toutes les lignes
 Include temporarily
@@ -599,7 +619,7 @@ Respecter la casse
 Mirror ->>
 Miroir ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Sauvegarde miroir du répertoire de gauche : Le répertoire de droite sera écrasé et exactement identique au répertoire de gauche après la synchronisation.
+Sauvegarde miroir du répertoire de gauche : Le répertoire de droite sera écrasé et totalement identique au répertoire de gauche après la synchronisation.
 Monitoring active...
 Surveillance en cours...
 More than 50% of the total number of files will be copied or deleted!
@@ -612,10 +632,12 @@ Move files into a time-stamped subdirectory
 Déplacer les fichiers vers un sous-répertoire daté
 Moving %x to Recycle Bin
 Déplacement de %x vers la Corbeille
+Moving Symbolic Link %x to user-defined directory %y
+Déplacement du Lien Symbolique %x vers le répertoire utilisateur %y
 Moving file %x to user-defined directory %y
-Déplacement du fichier %x vers le répertoire défini par l'utilisateur %y
+Déplacement du fichier %x vers le répertoire utilisateur %y
 Moving folder %x to user-defined directory %y
-Déplacement du dossier %x vers le répertoire défini par l'utilisateur %y
+Déplacement du dossier %x vers le répertoire utilisateur %y
 Multiple...
 Multiple...
 No change since last synchronization!
@@ -635,9 +657,9 @@ Nombre de fichiers qui seront remplacés
 One of the FreeFileSync database entries within the following file is not yet existing:
 L'une des entrées de la base de données FreeFileSync n'existe plus dans le fichier :
 One of the FreeFileSync database files is not yet existing:
-L'une des entrées de la base de données FreeFileSync n'existe plus :
+L'un des fichiers de la base de données FreeFileSync n'existe plus :
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
-Seuls les fichiers/répertoires filtrés seront sélectionnés pour la synchronisation. Le filtre sera appliqué au nom relatif (!) pour les répertoires de synchroniqation de base.
+Seuls les fichiers/répertoires filtrés seront sélectionnés pour la synchronisation. Le filtre sera appliqué au nom relatif (!) pour les répertoires de synchronisation de base.
 Open with Explorer
 Ouvrir avec Explorer
 Open with default application
@@ -653,7 +675,7 @@ Pause
 Paused
 En pause
 Planned directory deletion is in conflict with its subdirectories and -files!
-Le répertoire de suppression choisi est en conflit avec ses sous répertoires et -fichiers !
+Le répertoire de suppression choisi est en conflit avec ses sous-répertoires et -fichiers !
 Please run a Compare first before synchronizing!
 Veuillez lancer une Comparaison avant de lancer la synchronisation !
 Press \"Switch\" to open FreeFileSync GUI modus.
@@ -673,7 +695,7 @@ RealtimeSync - Synchronisation Automatisée
 RealtimeSync configuration
 Configuration RealtimeSync
 Recycle Bin not yet supported for this system!
-La corbeille n'est pas supportée par ce système !
+La Corbeille n'est pas supportée par ce système !
 Relative path
 Chemin relatif
 Remove alternate settings
@@ -682,8 +704,6 @@ Remove folder
 Supprimer le dossier
 Remove folder pair
 Supprimer le couple de dossiers
-Renaming file %x to %y
-Renommage des fichiers %x en %y
 Report translation error
 Etat des erreurs de transfert
 Reset
@@ -705,7 +725,7 @@ Lecture en cours...
 Scanning:
 Lecture en cours :
 Select a folder
-Choisissez un répertoire
+Choisissez un dossier
 Select alternate synchronization settings
 Sélectionner une autre configuration de la synchronisation
 Select logfile directory:
@@ -757,7 +777,7 @@ Mode silencieux
 Size
 Taille
 Source code written completely in C++ utilizing:
-Code source écrit entièrement en C++ et utilisant :
+Code source écrit entièrement en C++ utilisant :
 Source directory does not exist anymore:
 Le répertoire source n'existe plus :
 Speed:
@@ -776,6 +796,10 @@ Swap sides
 Permuter les côtés
 Switching to FreeFileSync GUI modus...
 Changement en mode FreeFileSync GUI...
+Symbolic Link handling
+Gestion des Liens Symboliques
+Symlinks %x have the same date but a different target!
+Le Lien Symbolique %x a la même date mais une destination différente !
 Synchronization Preview
 Prévisualisation de la Synchronisation
 Synchronization aborted!
@@ -800,14 +824,14 @@ Target directory already existing!
 Le répertoire de destination existe déjà !
 Target file already existing!
 Le fichier de destination existe déjà !
-The command line is executed each time:\n- a directory becomes available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-La ligne de commande est exécutée chaque fois : \n- qu'un répertoire est disponible (insertion d'une clé USB)\n- que les fichiers de ces répertoires ou sous-répertoires sont mofifiés
+The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+La ligne de commande est exécutée chaque fois que :\n- tous les répertoires deviennent accessibles (par exemple, lors de l'insertion d'une clé USB)\n- les fichiers de ces répertoires ou sous-répertoires sont modifiés
 The file does not contain a valid configuration:
 Le fichier ne contient pas de configuration valide :
 The file was not processed by last synchronization!
-Le ficgier n'a pas été traité par la dernière synchronisation !
+Le fichier n'a pas été traité par la dernière synchronisation !
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
-Cette variante définit comme identiques deux fichiers de même nom lorsqu'ils ont la même taille ET le même date et heure de modification.
+Cette variante définit comme identiques deux fichiers de même nom lorsqu'ils ont la même taille ET les mêmes date et heure de modification.
 Time
 Heure
 Time elapsed:
@@ -833,7 +857,7 @@ Mise à Jour ->
 Usage:
 Utilisation :
 Use Recycle Bin
-Utilisation de la corbeille
+Utiliser la Corbeille
 Use Recycle Bin when deleting or overwriting files
 Utiliser la Corbeille lors de la suppression ou du remplacement d'un fichier
 User-defined directory
@@ -847,7 +871,7 @@ Contrôle du fichier %x
 Volume name %x not part of filename %y!
 Le nom de volume %x ne fait pas partie du nom de fichier %y !
 Waiting for all directories to become available...
-En attente de la disponibilité de tous les dossiers...
+En attente de la disponibilité de tous les répertoires...
 Warning
 Attention
 Warning: Synchronization failed for %x item(s):
@@ -865,4 +889,4 @@ fichiers différents
 file exists on both sides
 le fichier existe des deux côtés
 on one side only
-le fichier existe sur un seul côté seulement
+le fichier existe d'un seul côté seulement

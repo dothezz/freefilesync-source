@@ -106,7 +106,7 @@ private:
 
         //ensure uniqueness
         for (int i = 1; FreeFileSync::somethingExists(wxToZ(output)); ++i)
-            output = logfileName + wxChar('_') + numberToWxString(i, false) + wxT(".log");
+            output = logfileName + wxChar('_') + globalFunctions::numberToString(i) + wxT(".log");
 
         return output;
     }
@@ -185,7 +185,7 @@ BatchStatusHandler::~BatchStatusHandler()
         if (totalErrors > 0)
         {
             wxString header(_("Warning: Synchronization failed for %x item(s):"));
-            header.Replace(wxT("%x"), FreeFileSync::numberToWxString(totalErrors, true), false);
+            header.Replace(wxT("%x"), FreeFileSync::numberToStringSep(totalErrors), false);
             finalMessage += header + wxT("\n\n");
         }
 

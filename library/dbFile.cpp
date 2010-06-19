@@ -29,7 +29,7 @@ namespace
 {
 //-------------------------------------------------------------------------------------------------------------------------------
 const char FILE_FORMAT_DESCR[] = "FreeFileSync";
-const int FILE_FORMAT_VER = 3;
+const int FILE_FORMAT_VER = 4;
 //-------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -86,18 +86,22 @@ public:
     }
 
 private:
-    void execute(DirContainer& dirCont)
+    void execute(DirContainer& dirCont) const
     {
-        unsigned int fileCount = readNumberC<unsigned int>();
+        size_t fileCount = readNumberC<size_t>();
         while (fileCount-- != 0)
             readSubFile(dirCont);
 
-        unsigned int dirCount = readNumberC<unsigned int>();
+        size_t symlinkCount = readNumberC<size_t>();
+        while (symlinkCount-- != 0)
+            readSubLink(dirCont);
+
+        size_t dirCount = readNumberC<size_t>();
         while (dirCount-- != 0)
             readSubDirectory(dirCont);
     }
 
-    void readSubFile(DirContainer& dirCont)
+    void readSubFile(DirContainer& dirCont) const
     {
         //attention: order of function argument evaluation is undefined! So do it one after the other...
         const Zstring shortName = readStringC(); //file name
@@ -116,7 +120,22 @@ private:
                                           wxULongLong(sizeHigh, sizeLow)));
     }
 
-    void readSubDirectory(DirContainer& dirCont)
+
+    void readSubLink(DirContainer& dirCont) const
+    {
+        //attention: order of function argument evaluation is undefined! So do it one after the other...
+        const Zstring        shortName  = readStringC(); //file name
+        const long           modHigh    = readNumberC<long>();
+        const unsigned long  modLow     = readNumberC<unsigned long>();
+        const Zstring        targetPath = readStringC(); //file name
+        const LinkDescriptor::LinkType linkType  = static_cast<LinkDescriptor::LinkType>(readNumberC<int>());
+
+        dirCont.addSubLink(shortName,
+                           LinkDescriptor(wxLongLong(modHigh, modLow), targetPath, linkType));
+    }
+
+
+    void readSubDirectory(DirContainer& dirCont) const
     {
         const Zstring shortName = readStringC(); //directory name
         DirContainer& subDir = dirCont.addSubDir(shortName);
@@ -254,16 +273,20 @@ public:
     }
 
 private:
-    template<typename Iterator, typename Function>
-    friend Function std::for_each(Iterator, Iterator, Function);
+    friend class Utility::Proxy<SaveDirInfo<side> >; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
 
     void execute(const HierarchyObject& hierObj)
     {
-        writeNumberC<unsigned int>(std::count_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), IsNonEmpty<side>())); //number of (existing) files
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this);
+        Utility::Proxy<SaveDirInfo<side> > prx(*this); //grant std::for_each access to private parts of this class
 
-        writeNumberC<unsigned int>(std::count_if(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), IsNonEmpty<side>())); //number of (existing) directories
-        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), *this);
+        writeNumberC<size_t>(std::count_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), IsNonEmpty<side>())); //number of (existing) files
+        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx);
+
+        writeNumberC<size_t>(std::count_if(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), IsNonEmpty<side>())); //number of (existing) files
+        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx);
+
+        writeNumberC<size_t>(std::count_if(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), IsNonEmpty<side>())); //number of (existing) directories
+        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), prx);
     }
 
     void operator()(const FileMapping& fileMap)
@@ -278,6 +301,18 @@ private:
 
             //fileMap.getFileID<side>().toStream(stream_); //unique file identifier
             //check();
+        }
+    }
+
+    void operator()(const SymLinkMapping& linkObj)
+    {
+        if (!linkObj.isEmpty<side>())
+        {
+            writeStringC(linkObj.getObjShortName());
+            writeNumberC<long>(         linkObj.getLastWriteTime<side>().GetHi()); //last modification time
+            writeNumberC<unsigned long>(linkObj.getLastWriteTime<side>().GetLo()); //
+            writeStringC(linkObj.getTargetPath<side>());
+            writeNumberC<int>(linkObj.getLinkType<side>());
         }
     }
 

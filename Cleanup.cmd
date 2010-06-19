@@ -15,6 +15,8 @@ attrib FreeFileSync.suo -h
 del FreeFileSync.suo
 attrib RealtimeSync\RealtimeSync.suo -h
 del RealtimeSync\RealtimeSync.suo
+del FreeFileSync.sdf
+del RealtimeSync\RealtimeSync.sdf
 
 del BUILD\FreeFileSync*.pdb
 del BUILD\FreeFileSync*.ilk

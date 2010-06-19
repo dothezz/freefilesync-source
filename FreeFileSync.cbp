@@ -138,6 +138,7 @@
 		<Unit filename="fileHierarchy.h" />
 		<Unit filename="library\binary.cpp" />
 		<Unit filename="library\binary.h" />
+		<Unit filename="library\checkExist.h" />
 		<Unit filename="library\customGrid.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
@@ -192,9 +193,6 @@
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="library\multithreading.cpp">
-			<Option target="Unit Test" />
-		</Unit>
 		<Unit filename="library\pch.h">
 			<Option compile="1" />
 			<Option weight="0" />
@@ -237,6 +235,8 @@
 			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="shared\buildInfo.h" />
+		<Unit filename="shared\checkExist.cpp" />
+		<Unit filename="shared\checkExist.h" />
 		<Unit filename="shared\customButton.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
@@ -289,8 +289,12 @@
 		</Unit>
 		<Unit filename="shared\localization.cpp" />
 		<Unit filename="shared\localization.h" />
+		<Unit filename="shared\lock.cpp" />
+		<Unit filename="shared\lock.h" />
 		<Unit filename="shared\longPathPrefix.cpp" />
 		<Unit filename="shared\longPathPrefix.h" />
+		<Unit filename="shared\parallelCall.cpp" />
+		<Unit filename="shared\parallelCall.h" />
 		<Unit filename="shared\recycler.cpp" />
 		<Unit filename="shared\recycler.h" />
 		<Unit filename="shared\serialize.cpp" />

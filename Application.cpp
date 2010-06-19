@@ -231,8 +231,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
         //COMPARE DIRECTORIES
         FreeFileSync::FolderComparison folderCmp;
-        FreeFileSync::CompareProcess comparison(batchCfg.mainCfg.processSymlinks,
-                                                batchCfg.mainCfg.traverseDirectorySymlinks,
+        FreeFileSync::CompareProcess comparison(batchCfg.mainCfg.handleSymlinks,
                                                 batchCfg.mainCfg.hidden.fileTimeTolerance,
                                                 globSettings.ignoreOneHourDiff,
                                                 globSettings.optDialogs,
@@ -246,13 +245,11 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         if (!synchronizationNeeded(folderCmp))
         {
             statusHandler->reportInfo(_("Nothing to synchronize according to configuration!")); //inform about this special case
-            return;
+            //return; -> disabled: <automatic> mode requires database to be written in any case
         }
 
         //START SYNCHRONIZATION
         FreeFileSync::SyncProcess synchronization(
-            batchCfg.mainCfg.copyFileSymlinks,
-            batchCfg.mainCfg.traverseDirectorySymlinks,
             globSettings.optDialogs,
             batchCfg.mainCfg.hidden.verifyFileCopy,
             globSettings.copyLockedFiles,

@@ -12,7 +12,6 @@
 #include <wx/utils.h>
 #include <wx/timer.h>
 #include "../shared/globalFunctions.h"
-//#include "smallDialogs.h"
 #include "messagePopup.h"
 #include "../shared/standardPaths.h"
 
@@ -45,13 +44,13 @@ bool getOnlineVersion(wxString& version)
     CloseConnectionOnExit dummy2(httpStream, webAccess);
 
     webAccess.SetHeader(wxT("Content-type"), wxT("text/html; charset=utf-8"));
-    webAccess.SetTimeout(10); //10 seconds of timeout instead of 10 minutes...
+    webAccess.SetTimeout(5); //5 seconds of timeout instead of 10 minutes...
 
     if (webAccess.Connect(wxT("freefilesync.cvs.sourceforge.net"))) //only the server, no pages here yet...
     {
         //wxApp::IsMainLoopRunning(); // should return true
 
-        httpStream = webAccess.GetInputStream(wxT("/viewvc/*checkout*/freefilesync/version/version.txt"));
+        httpStream = webAccess.GetInputStream(wxT("/viewvc/freefilesync/version/version.txt"));
 
         if (httpStream && webAccess.GetError() == wxPROTO_NOERR)
         {
@@ -77,11 +76,13 @@ bool newerVersionExists(const wxString& onlineVersion)
 
     const wxChar VERSION_SEP = wxT('.');
 
+    using globalFunctions::stringToNumber;
+
     while ( currentVersionCpy.Find(VERSION_SEP) != wxNOT_FOUND ||
             onlineVersionCpy.Find(VERSION_SEP) != wxNOT_FOUND)
     {
-        const int currentMajor = globalFunctions::wxStringToInt(currentVersionCpy.BeforeFirst(VERSION_SEP));  //Returns the whole string if VERSION_SEP is not found.
-        const int onlineMajor  = globalFunctions::wxStringToInt(onlineVersionCpy.BeforeFirst(VERSION_SEP));   //Returns the whole string if VERSION_SEP is not found.
+        const int currentMajor = stringToNumber<int>(currentVersionCpy.BeforeFirst(VERSION_SEP));  //Returns the whole string if VERSION_SEP is not found.
+        const int onlineMajor  = stringToNumber<int>(onlineVersionCpy.BeforeFirst(VERSION_SEP));   //Returns the whole string if VERSION_SEP is not found.
 
         if (currentMajor != onlineMajor)
             return currentMajor < onlineMajor;
@@ -90,7 +91,7 @@ bool newerVersionExists(const wxString& onlineVersion)
         onlineVersionCpy  = onlineVersionCpy.AfterFirst(VERSION_SEP);  //Returns the empty string if VERSION_SEP is not found.
     }
 
-    return globalFunctions::wxStringToInt(currentVersionCpy) < globalFunctions::wxStringToInt(onlineVersionCpy);
+    return stringToNumber<int>(currentVersionCpy) < stringToNumber<int>(onlineVersionCpy);
 }
 
 

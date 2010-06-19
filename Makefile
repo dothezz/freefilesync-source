@@ -6,7 +6,11 @@ SHAREDIR = $(DESTDIR)$(prefix)/share
 APPSHAREDIR = $(SHAREDIR)/$(APPNAME)
 
 FFS_CPPFLAGS=-Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -DZSTRING_CHAR -O3 -pthread -c -Ishared/boost_1_x
-LINKFLAGS=`wx-config --libs --debug=no --unicode=yes` shared/ossp_uuid/.libs/libuuid++.a -O3 -pthread
+LINKFLAGS=`wx-config --libs --debug=no --unicode=yes` -O3 -pthread
+
+#support for GTKMM
+FFS_CPPFLAGS+=`pkg-config --cflags gtkmm-2.4`
+LINKFLAGS+=`pkg-config --libs gtkmm-2.4`
 
 FILE_LIST=              #internal list of all *.cpp files needed for compilation
 FILE_LIST+=structures.cpp
@@ -35,6 +39,7 @@ FILE_LIST+=library/statusHandler.cpp
 FILE_LIST+=library/resources.cpp
 FILE_LIST+=ui/smallDialogs.cpp
 FILE_LIST+=library/processXml.cpp
+FILE_LIST+=library/iconBuffer.cpp
 FILE_LIST+=library/statistics.cpp
 FILE_LIST+=library/filter.cpp
 FILE_LIST+=library/binary.cpp
@@ -43,8 +48,9 @@ FILE_LIST+=shared/localization_no_BOM.cpp
 FILE_LIST+=shared/fileIO.cpp
 FILE_LIST+=shared/dragAndDrop.cpp
 FILE_LIST+=shared/guid.cpp
+FILE_LIST+=shared/checkExist.cpp
+FILE_LIST+=shared/parallelCall.cpp
 FILE_LIST+=shared/tinyxml/tinyxml.cpp
-FILE_LIST+=shared/tinyxml/tinystr.cpp
 FILE_LIST+=shared/tinyxml/tinyxmlerror.cpp
 FILE_LIST+=shared/tinyxml/tinyxmlparser.cpp
 FILE_LIST+=shared/globalFunctions.cpp
@@ -70,21 +76,6 @@ OBJECT_LIST=$(foreach file, $(FILE_LIST), OBJ/$(subst .cpp,.o,$(notdir $(file)))
 #build list of all dependencies
 DEP_LIST=$(foreach file, $(FILE_LIST), $(subst .cpp,.dep,$(file)))
 
-#support for Glib-IO/GIO recycler
-#Recycle bin: check whether GLIB library is existing (and add relevant compiler and linker flags)
-GIO_EXISTING=$(shell pkg-config --exists gio-2.0 && echo YES)
-ifeq ($(GIO_EXISTING),YES)
-FFS_CPPFLAGS+=-DRECYCLER_GIO `pkg-config --cflags gio-2.0`
-LINKFLAGS+=`pkg-config --libs gio-2.0`
-else
-FFS_CPPFLAGS+=-DRECYCLER_NONE
-$(warning )
-$(warning -----------------------------------------------------------------------------------------)
-$(warning | Warning: No gio-2.0 package found: Recycle Bin will NOT be available for this system! |)
-$(warning -----------------------------------------------------------------------------------------)
-$(warning )
-endif
-
 
 all: FreeFileSync
 
@@ -96,27 +87,16 @@ removeBOM: tools/removeBOM.cpp
 	g++ -o OBJ/removeBOM tools/removeBOM.cpp 
 	./OBJ/removeBOM shared/localization.cpp shared/localization_no_BOM.cpp
 
-osspUUID:
-#some files within ossp_uuid may need to have readonly attribute removed
-	chmod -R 0755 shared/ossp_uuid && \
-	cd shared/ossp_uuid && \
-	chmod +x configure && \
-	chmod +x shtool && \
-	./configure --with-cxx --disable-shared && \
-	make && \
-	make check
-
 %.dep : %.cpp 
 #strip path information
 	g++ $(FFS_CPPFLAGS) $< -o OBJ/$(subst .cpp,.o,$(notdir $<))
 
-FreeFileSync: init removeBOM osspUUID $(DEP_LIST)
+FreeFileSync: init removeBOM $(DEP_LIST)
 	g++ -o BUILD/$(APPNAME) $(OBJECT_LIST) $(LINKFLAGS)
 
 clean:
 	rm -rf OBJ
 	rm -f BUILD/$(APPNAME)
-	if [ -e shared/ossp_uuid/Makefile ]; then cd shared/ossp_uuid && make clean; fi
 	rm -f shared/localization_no_BOM.cpp
 
 install:

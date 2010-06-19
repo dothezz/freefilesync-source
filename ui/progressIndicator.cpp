@@ -307,15 +307,16 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
     {
         //wxWindowUpdateLocker dummy(this) -> not needed
 
+        const float percent = totalData == 0 ? 0 : currentData.ToDouble() * 100 / totalData.ToDouble();
+
         //write status information to taskbar, parent title ect.
         switch (status)
         {
         case SCANNING:
-            showProgressExternally(numberToWxString(scannedObjects, true) + wxT(" - ") + _("Scanning..."));
+            showProgressExternally(numberToStringSep(scannedObjects) + wxT(" - ") + _("Scanning..."));
             break;
         case COMPARING_CONTENT:
-            showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Comparing content..."),
-                                   currentData.ToDouble() * 100 / totalData.ToDouble());
+            showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Comparing content..."), percent);
             break;
         }
 
@@ -333,13 +334,13 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
             m_textCtrlStatus->ChangeValue(formattedStatusText);
 
         //nr of scanned objects
-        setNewText(numberToWxString(scannedObjects, true), *m_staticTextScanned, updateLayout);
+        setNewText(numberToStringSep(scannedObjects), *m_staticTextScanned, updateLayout);
 
         //progress indicator for "compare file content"
         m_gauge2->SetValue(int(currentData.ToDouble() * scalingFactor));
 
         //remaining files left for file comparison
-        const wxString filesToCompareTmp = numberToWxString(totalObjects - currentObjects, true);
+        const wxString filesToCompareTmp = numberToStringSep(totalObjects - currentObjects);
         setNewText(filesToCompareTmp, *m_staticTextFilesRemaining, updateLayout);
 
         //remaining bytes left for file comparison
@@ -692,32 +693,29 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
     //static RetrieveStatistics statistic;
     //statistic.writeEntry(currentData, currentObjects);
 
+    const float percent = totalData == 0 ? 0 : currentData.ToDouble() * 100 / totalData.ToDouble();
+
     //write status information to systray, taskbar, parent title ect.
     switch (currentStatus)
     {
     case SyncStatus::SCANNING:
-        showProgressExternally(numberToWxString(scannedObjects, true) + wxT(" - ") + _("Scanning..."));
+        showProgressExternally(numberToStringSep(scannedObjects) + wxT(" - ") + _("Scanning..."));
         break;
     case SyncStatus::COMPARING_CONTENT:
-        showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Comparing content..."),
-                               currentData.ToDouble() * 100 / totalData.ToDouble());
+        showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Comparing content..."), percent);
         break;
     case SyncStatus::SYNCHRONIZING:
-        showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Synchronizing..."),
-                               currentData.ToDouble() * 100 / totalData.ToDouble());
+        showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Synchronizing..."), percent);
         break;
     case SyncStatus::PAUSE:
-        showProgressExternally((totalData != 0 ? formatPercentage(currentData, totalData) + wxT(" - ") : wxString()) + _("Paused"),
-                               currentData.ToDouble() * 100 / totalData.ToDouble());
+        showProgressExternally((totalData != 0 ? formatPercentage(currentData, totalData) + wxT(" - ") : wxString()) + _("Paused"), percent);
         break;
     case SyncStatus::ABORTED:
-        showProgressExternally(_("Aborted"),
-                               currentData.ToDouble() * 100 / totalData.ToDouble());
+        showProgressExternally(_("Aborted"), percent);
         break;
     case SyncStatus::FINISHED_WITH_SUCCESS:
     case SyncStatus::FINISHED_WITH_ERROR:
-        showProgressExternally(_("Completed"),
-                               currentData.ToDouble() * 100 / totalData.ToDouble());
+        showProgressExternally(_("Completed"), percent);
         break;
     }
 
@@ -739,7 +737,7 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
             m_textCtrlInfo->ChangeValue(statusTxt);
 
         //remaining objects
-        const wxString remainingObjTmp = numberToWxString(totalObjects - currentObjects, true);
+        const wxString remainingObjTmp = numberToStringSep(totalObjects - currentObjects);
         setNewText(remainingObjTmp, *m_staticTextRemainingObj, updateLayout);
 
         //remaining bytes left for copy
@@ -873,24 +871,18 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id,
             totalData    == currentData)
     {
         bSizerObjectsRemaining->Show(false);
-        //bSizerDataRemaining   ->Show(false);
 
-        //show processed statistics at the end (but only if there was some work to be done)
-        if (totalObjects != 0 || totalData != 0)
-        {
-            bSizerObjectsProcessed->Show(true);
-            //bSizerDataProcessed   ->Show(true);
+        bSizerObjectsProcessed->Show(true);
 
-            m_staticTextProcessedObj->SetLabel(numberToWxString(currentObjects, true));
-            m_staticTextDataProcessed->SetLabel(FreeFileSync::formatFilesizeToShortString(currentData));
-        }
+        m_staticTextProcessedObj->SetLabel(numberToStringSep(currentObjects));
+        m_staticTextDataProcessed->SetLabel(FreeFileSync::formatFilesizeToShortString(currentData));
     }
 
     updateStatusDialogNow(); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
     m_textCtrlInfo->SetValue(finalMessage); //
     Layout();                               //
 
-    Raise();
+    //Raise(); -> don't! user may be watching a movie in the meantime ;)
 }
 
 

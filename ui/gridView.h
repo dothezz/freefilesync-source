@@ -111,7 +111,9 @@ public:
         SORT_BY_SYNC_DIRECTION
     };
 
-    void sortView(const SortType type, const bool onLeft, const bool ascending); //always call this method for sorting, never sort externally!
+    bool static getDefaultDirection(SortType type); //true: ascending; false: descending
+
+    void sortView(SortType type, bool onLeft, bool ascending); //always call this method for sorting, never sort externally!
 
 private:
     class SerializeHierarchy;

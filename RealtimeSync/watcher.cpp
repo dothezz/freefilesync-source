@@ -264,20 +264,14 @@ class DirsOnlyTraverser : public FreeFileSync::TraverseCallback
 public:
     DirsOnlyTraverser(std::vector<std::string>& dirs) : m_dirs(dirs) {}
 
-    virtual ReturnValue onFile(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink, const FileInfo& details)
-    {
-        return TRAVERSING_CONTINUE;
-    }
-    virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName, bool isSymlink)
+    virtual void onFile(const DefaultChar* shortName, const Zstring& fullName, const FileInfo& details) {}
+        virtual void onSymlink(const DefaultChar* shortName, const Zstring& fullName, const SymlinkInfo& details) {}
+    virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName)
     {
         m_dirs.push_back(fullName.c_str());
-
-        if (isSymlink) //don't traverse into symlinks (analog to windows build)
-            return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>());
-        else
             return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), this);
     }
-    virtual ReturnValue onError(const wxString& errorText)
+    virtual void onError(const wxString& errorText)
     {
         throw FreeFileSync::FileError(errorText);
     }
@@ -409,7 +403,7 @@ RealtimeSync::WaitResult RealtimeSync::waitForChanges(const std::vector<Zstring>
         try //get all subdirectories
         {
             DirsOnlyTraverser traverser(fullDirList);
-            FreeFileSync::traverseFolder(formattedDir, &traverser); //don't traverse into symlinks (analog to windows build)
+            FreeFileSync::traverseFolder(formattedDir, false, &traverser); //don't traverse into symlinks (analog to windows build)
         }
         catch (const FreeFileSync::FileError&)
         {

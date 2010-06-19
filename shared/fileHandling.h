@@ -35,8 +35,9 @@ enum ResponseSameVol
 };
 ResponseSameVol onSameVolume(const Zstring& folderLeft, const Zstring& folderRight); //throw()
 
-//optionally: copy creation/last change date, DOES NOTHING if something fails
-void copyFileTimes(const Zstring& sourceDir, const Zstring& targetDir); //throw()
+//optionally: copy file or directory create/last change date, DOES NOTHING if something fails
+//does NOT dereference symlinks!
+bool copyFileTimes(const Zstring& sourceDir, const Zstring& targetDir, bool deRefSymlinks); //throw(); returns true on success
 
 //symlink handling: always evaluate target
 wxULongLong getFilesize(const Zstring& filename); //throw (FileError)
@@ -70,7 +71,7 @@ void moveFile(const Zstring& sourceFile, const Zstring& targetFile, MoveFileCall
 void moveDirectory(const Zstring& sourceDir, const Zstring& targetDir, bool ignoreExistingDirs, MoveFileCallback* callback = NULL); //throw (FileError);
 
 //creates superdirectories automatically:
-void createDirectory(const Zstring& directory, const Zstring& templateDir = Zstring(), const bool copyDirectorySymLinks = false); //throw (FileError);
+void createDirectory(const Zstring& directory, const Zstring& templateDir = Zstring(), bool copyDirectorySymLinks = false); //throw (FileError);
 
 struct CopyFileCallback //callback functionality
 {
