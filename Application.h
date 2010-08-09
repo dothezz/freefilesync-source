@@ -8,7 +8,7 @@
 #define FREEFILESYNCAPP_H
 
 #include <wx/app.h>
-#include "library/processXml.h"
+#include "library/process_xml.h"
 
 
 class Application : public wxApp

@@ -7,13 +7,13 @@
 #ifndef COMPARISON_H_INCLUDED
 #define COMPARISON_H_INCLUDED
 
-#include "fileHierarchy.h"
-#include "library/processXml.h"
-#include "library/statusHandler.h"
+#include "file_hierarchy.h"
+#include "library/process_xml.h"
+#include "library/status_handler.h"
 #include "structures.h"
 
 
-namespace FreeFileSync
+namespace ffs3
 {
 
 struct FolderPairCfg
@@ -55,10 +55,11 @@ private:
     void compareByTimeSize(const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output) const;
     void compareByContent( const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output) const;
 
-    //create comparison result table and fill category except for files existing on both sides
-    void performBaseComparison(BaseDirMapping& output, std::vector<FileMapping*>& appendUndefined) const;
+    //create comparison result table and fill category except for files existing on both sides: undefinedFiles and undefinedLinks are appended!
+    void performBaseComparison(BaseDirMapping& output, std::vector<FileMapping*>& undefinedFiles, std::vector<SymLinkMapping*>& undefinedLinks) const;
 
-    void categorizeSymlink(SymLinkMapping* linkObj) const;
+    void categorizeSymlinkByTime(SymLinkMapping* linkObj) const;
+    void categorizeSymlinkByContent(SymLinkMapping* linkObj) const;
 
     //buffer accesses to the same directories; useful when multiple folder pairs are used
     class DirectoryBuffer;

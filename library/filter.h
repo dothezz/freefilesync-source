@@ -12,7 +12,7 @@
 #include <boost/shared_ptr.hpp>
 #include <wx/stream.h>
 
-namespace FreeFileSync
+namespace ffs3
 {
 //------------------------------------------------------------------
 /*    class hierarchy:

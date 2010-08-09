@@ -1,21 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
- Byte
- Byte
- GB
- GB
- MB
- MB
- day(s)
- day(s)
- hour(s)
- hour(s)
- kB
- kB
- min
- min
- sec
- sec
 %x / %y objects deleted successfully
 %x / %y objects deleted successfully
 %x Byte
@@ -28,18 +12,24 @@
 %x PB
 %x TB
 %x TB
+%x day(s)
+%x day(s)
 %x directories
 %x directories
 %x files
 %x files
-%x is not a valid FreeFileSync batch file!
-%x is not a valid FreeFileSync batch file!
+%x hour(s)
+%x hour(s)
 %x kB
 %x kB
+%x min
+%x min
 %x of %y rows in view
 %x of %y rows in view
 %x of 1 row in view
 %x of 1 row in view
+%x sec
+%x sec
 %x%
 %x%
 &Abort
@@ -182,8 +172,8 @@ Add folder pair
 Add folder pair
 All directories in sync!
 All directories in sync!
-An exception occured!
-An exception occured!
+An exception occurred!
+An exception occurred!
 As a result the files are separated into the following categories:
 As a result the files are separated into the following categories:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
@@ -266,6 +256,8 @@ Continue
 Continue
 Conversion error:
 Conversion error:
+Copy filesystem permissions
+Copy filesystem permissions
 Copy from left to right
 Copy from left to right
 Copy from left to right overwriting
@@ -278,8 +270,8 @@ Copy locked files
 Copy locked files
 Copy new or updated files to right folder.
 Copy new or updated files to right folder.
-Copy shared or locked files using Volume Shadow Copy Service
-Copy shared or locked files using Volume Shadow Copy Service
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
 Copy to clipboard\tCTRL+C
 Copy to clipboard\tCTRL+C
 Copying Symbolic Link %x overwriting %y
@@ -384,6 +376,8 @@ Error
 Error
 Error changing modification time:
 Error changing modification time:
+Error copying file permissions:
+Error copying file permissions:
 Error copying file:
 Error copying file:
 Error copying locked file %x!
@@ -418,14 +412,14 @@ Error reading from synchronization database:
 Error reading from synchronisation database:
 Error resolving symbolic link:
 Error resolving symbolic link:
+Error setting privilege:
+Error setting privilege:
 Error starting Volume Shadow Copy Service!
 Error starting Volume Shadow Copy Service!
 Error traversing directory:
 Error traversing directory:
 Error when monitoring directories.
 Error when monitoring directories.
-Error writing file attributes:
-Error writing file attributes:
 Error writing file:
 Error writing file:
 Error writing to synchronization database:
@@ -598,6 +592,8 @@ Initial synchronization:
 Initial synchronisation:
 Integrate external applications into context menu. The following macros are available:
 Integrate external applications into context menu. The following macros are available:
+Invalid FreeFileSync config file!
+Invalid FreeFileSync config file!
 Leave as unresolved conflict
 Leave as unresolved conflict
 Left
@@ -678,8 +674,8 @@ Planned directory deletion is in conflict with its subdirectories and -files!
 Planned directory deletion is in conflict with its subdirectories and -files!
 Please run a Compare first before synchronizing!
 Please run a Compare first before synchronising!
-Press \"Switch\" to open FreeFileSync GUI modus.
-Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI mode.
+Press \"Switch\" to open FreeFileSync GUI mode.
 Processing folder pair:
 Processing folder pair:
 Published under the GNU General Public License:
@@ -794,8 +790,8 @@ Stop
 Stop
 Swap sides
 Swap sides
-Switching to FreeFileSync GUI modus...
-Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI mode...
+Switching to FreeFileSync GUI mode...
 Symbolic Link handling
 Symbolic Link handling
 Symlinks %x have the same date but a different target!
@@ -844,6 +840,8 @@ Total required free disk space:
 Total required free disk space:
 Total time:
 Total time:
+Transfer file and directory permissions\n(Requires Administrator rights)
+Transfer file and directory permissions\n(Requires Administrator rights)
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 Unable to connect to sourceforge.net!

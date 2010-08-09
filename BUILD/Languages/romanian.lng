@@ -1,21 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port din GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
- Byte
- Baiți
- GB
- GB
- MB
- MB
- day(s)
- zile
- hour(s)
- ore
- kB
- KB
- min
- min
- sec
- sec
 %x / %y objects deleted successfully
 %x / %y obiecte șterse cu succes
 %x Byte
@@ -28,18 +12,24 @@
 %x PB
 %x TB
 %x TB
+%x day(s)
+%x zile
 %x directories
 %x dosare
 %x files
 %x file
-%x is not a valid FreeFileSync batch file!
-%x nu este o filă lot FreeFileSync validă !
+%x hour(s)
+%x ore
 %x kB
 %x KB
+%x min
+%x min
 %x of %y rows in view
 %x din %y rînduri afișate
 %x of 1 row in view
 %x din 1 rînd afișat
+%x sec
+%x sec
 %x%
 %x%
 &Abort
@@ -85,7 +75,7 @@
 &OK
 &OK
 &Pause
-&Pauză
+&Pauzează
 &Quit
 &Ieși
 &Restore
@@ -182,7 +172,7 @@ Add folder pair
 Adaugă Pereche Nouă de Dosare
 All directories in sync!
 Toate dosarele au fost sincronizate!
-An exception occured!
+An exception occurred!
 A apărut o excepție !
 As a result the files are separated into the following categories:
 În concluzie, filele sînt repartizate în categoriile următoare:
@@ -266,6 +256,8 @@ Continue
 Continuă
 Conversion error:
 Eroare de convertire:
+Copy filesystem permissions
+Copiază permisiunile sistemului de file
 Copy from left to right
 Copiază de la Stînga la Dreapta
 Copy from left to right overwriting
@@ -278,8 +270,8 @@ Copy locked files
 Copiază filele zăvorîte [locked]
 Copy new or updated files to right folder.
 Copiază în dosarul din dreapta filele actualizate sau noi.
-Copy shared or locked files using Volume Shadow Copy Service
-Copiază filele partajate sau zăvorîte folosind serviciul de salvgardare din Windows
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+Copiază filele partajate sau zăvorîte folosind Serviciul de Salvgardare a Volumelor [Volume Shadow Copy]\n(Necesită drepturi de Administrator)
 Copy to clipboard\tCTRL+C
 Copiază în Cliplanșetă\tCTRL+C
 Copying Symbolic Link %x overwriting %y
@@ -384,6 +376,8 @@ Error
 Eroare
 Error changing modification time:
 Eroare la schimbarea datei de modificare:
+Error copying file permissions:
+Eroare la copierea permisiunilor filei:
 Error copying file:
 Eroare la copierea filei:
 Error copying locked file %x!
@@ -418,14 +412,16 @@ Error reading from synchronization database:
 Eroare la citirea din baza de date a sincronizării:
 Error resolving symbolic link:
 Eroare la rezolvarea legăturii simbolice:
+Error setting directory lock:
+
+Error setting privilege:
+Eroare la setarea privilegiului:
 Error starting Volume Shadow Copy Service!
 Eroare la pornirea serviciului Volume Shadow Copy!
 Error traversing directory:
 Eroare la parcurgerea dosarului:
 Error when monitoring directories.
 Eroare la monitorizarea dosarelor.
-Error writing file attributes:
-Eroare la scrierea atributelor filei:
 Error writing file:
 Eroare la scrierea filei:
 Error writing to synchronization database:
@@ -598,6 +594,8 @@ Initial synchronization:
 Sincronizare inițială:
 Integrate external applications into context menu. The following macros are available:
 Include aplicațiile externe în meniul contextual. Sînt disponibile următoarele macrocomenzi:
+Invalid FreeFileSync config file!
+Filă de configurare FreeFileSync nevalidă!
 Leave as unresolved conflict
 Lasă ca Conflict Nerezolvat
 Left
@@ -678,7 +676,7 @@ Planned directory deletion is in conflict with its subdirectories and -files!
 Ștergerea plănuită a dosarului intră în conflict cu subdosarele și filele sale!
 Please run a Compare first before synchronizing!
 Rulează compararea înainte de a sincroniza!
-Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI mode.
 Apasă \"Comută\" pentru a deschide modul grafic al FreeFileSync
 Processing folder pair:
 Procesez perechea de dosare:
@@ -704,6 +702,8 @@ Remove folder
 Înlătură Dosarul
 Remove folder pair
 Înlătură Perechea de Dosare
+Removing abandoned directory lock (%x)...
+
 Report translation error
 Raportarea erorilor de traducere
 Reset
@@ -794,7 +794,7 @@ Stop
 Oprește
 Swap sides
 Schimbă părțile între ele
-Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI mode...
 Comut la modul grafic al FreeFileSync...
 Symbolic Link handling
 Prelucrarea Legăturilor Simbolice (Simlegături)
@@ -844,6 +844,8 @@ Total required free disk space:
 Spațiu de stocare necesar:
 Total time:
 Timp Total:
+Transfer file and directory permissions\n(Requires Administrator rights)
+Transferă permisiunile filelor și dosarelor\n(Necesită drepturi de Administrator)
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 Tratează ca egale timpurile filelor care diferă exact cu +/- 1 oră, iar cele care diferă cu mai puțin de 1 oră, ca niște conflicte generate de gestionarea orei de vară
 Unable to connect to sourceforge.net!
@@ -872,6 +874,8 @@ Volume name %x not part of filename %y!
 Numele volumului %x nu face parte din numele filei %y !
 Waiting for all directories to become available...
 Aștept ca toate dosarele să devină disponibile...
+Waiting while directory is locked (%x)...
+
 Warning
 Avertisment
 Warning: Synchronization failed for %x item(s):

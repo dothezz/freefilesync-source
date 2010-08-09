@@ -9,10 +9,10 @@
 
 #include "../shared/zstring.h"
 #include <vector>
-#include "../shared/fileError.h"
+#include "../shared/file_error.h"
 
 
-namespace RealtimeSync
+namespace rts
 {
 const int UI_UPDATE_INTERVAL = 100; //perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
 

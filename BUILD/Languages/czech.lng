@@ -1,21 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
- Byte
- Byte
- GB
- GB
- MB
- MB
- day(s)
- d
- hour(s)
- hod
- kB
- kB
- min
- min
- sec
- s
 %x / %y objects deleted successfully
 %x / %y objektů úspěšně smazáno
 %x Byte
@@ -28,18 +12,24 @@
 %x PB
 %x TB
 %x TB
+%x day(s)
+%x d
 %x directories
 adresářů: %x
 %x files
 souborů: %x
-%x is not a valid FreeFileSync batch file!
-%x není platným dávkovým souborem programu FreeFileSync!
+%x hour(s)
+%x h
 %x kB
 %x kB
+%x min
+%x min
 %x of %y rows in view
 %x z %y řádků
 %x of 1 row in view
 %x z 1 řádku
+%x sec
+%x s
 %x%
 %x%
 &Abort
@@ -182,7 +172,7 @@ Add folder pair
 Přidat adresář pro porovnání
 All directories in sync!
 Všechny adresáře jsou synchronizovány!
-An exception occured!
+An exception occurred!
 Vyskytla se chyba!
 As a result the files are separated into the following categories:
 Jako výsledek jsou soubory rozděleny do následujících kategorií:
@@ -266,6 +256,8 @@ Continue
 Pokračovat
 Conversion error:
 Chyba konverze:
+Copy filesystem permissions
+Kopírovat oprávnění k souborům
 Copy from left to right
 Kopírovat z leva do prava
 Copy from left to right overwriting
@@ -278,8 +270,8 @@ Copy locked files
 Kopírovat zamčené soubory
 Copy new or updated files to right folder.
 Kopírovat nové nebo aktualizované soubory do adresáře vpravo.
-Copy shared or locked files using Volume Shadow Copy Service
-Kopírovat sdílené nebo zamčené soubory pomocí Volume Shadow Copy Service
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+Kopírovat sdílené nebo zamčené soubory pomocí Volume Shadow Copy Service\n(Vyžaduje administrátorské oprávnění)
 Copy to clipboard\tCTRL+C
 Vložit do schránky\tCTRL+C
 Copying Symbolic Link %x overwriting %y
@@ -384,6 +376,8 @@ Error
 Chyba
 Error changing modification time:
 Chyba nastavení času změny:
+Error copying file permissions:
+Chyba kopírování oprávnění souborů:
 Error copying file:
 Chyba kopírování souboru:
 Error copying locked file %x!
@@ -418,14 +412,16 @@ Error reading from synchronization database:
 Chyba čtení synchronizační databáze:
 Error resolving symbolic link:
 Chyba odkazu zástupce:
+Error setting directory lock:
+
+Error setting privilege:
+Chyba nastavení práv:
 Error starting Volume Shadow Copy Service!
 Chyba spuštění služby Volume Shadow Copy Service!
 Error traversing directory:
 Chyba procházení adresáře:
 Error when monitoring directories.
 Chyba při sledování adresářů.
-Error writing file attributes:
-Chyba zápisu atributů souboru:
 Error writing file:
 Chyba zápisu souboru:
 Error writing to synchronization database:
@@ -598,6 +594,8 @@ Initial synchronization:
 Prvotní synchronizace:
 Integrate external applications into context menu. The following macros are available:
 Integrace externí aplikace do kontextového menu. K dispozici jsou následující makra:
+Invalid FreeFileSync config file!
+Chybný konfigurační soubor FreeFileSync!
 Leave as unresolved conflict
 Ponechat jako nevyřešený konflikt
 Left
@@ -613,7 +611,7 @@ Záznamy:
 Logging
 Zaznamenávání
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
-Vytváření stínových kopíí na WOW64 není podporováno. Prosím použijte 64 bitovou verzi FreeFileSync.
+Vytváření stínových kopií na WOW64 není podporováno. Prosím použijte 64 bitovou verzi FreeFileSync.
 Match case
 Rozlišovat malá a velká písmena
 Mirror ->>
@@ -678,12 +676,12 @@ Planned directory deletion is in conflict with its subdirectories and -files!
 Naplánované smazání adresáře je v konfliktu s podadresáři a/nebo soubory!
 Please run a Compare first before synchronizing!
 Prosím proveďte nejdřív porovnání před synchronizací!
-Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI mode.
 Talčítkem \"Přepnout\" otevřete okno FreeFileSync.
 Processing folder pair:
 Zpracovávání adresářové páru:
 Published under the GNU General Public License:
-Vydáno podl GNU General Public License (GPL):
+Vydáno podle GNU General Public License (GPL):
 Question
 Otázky
 Quit
@@ -704,6 +702,8 @@ Remove folder
 Odstranit adresář
 Remove folder pair
 Odstranit dvojici adresářů
+Removing abandoned directory lock (%x)...
+
 Report translation error
 Hlásit chyby překladu
 Reset
@@ -733,7 +733,7 @@ Vyberte adresář pro záznamy:
 Select variant:
 Vyberte variantu:
 Set direction:
-Nastavit asresář:
+Nastavit adresář:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Nastaven výchozí způsob synchronizace: Staré soubory budou nahrazeny novými.
 Show conflicts
@@ -794,7 +794,7 @@ Stop
 Stop
 Swap sides
 Změna stran
-Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI mode...
 Otevírání okna FreeFileSync...
 Symbolic Link handling
 Zpracování symbolických odkazů
@@ -844,6 +844,8 @@ Total required free disk space:
 Požadované volné místo na disku:
 Total time:
 Celkový čas:
+Transfer file and directory permissions\n(Requires Administrator rights)
+Přenést přístupová oprávnění souborů a adresářů\n(Vyžaduje administrátorké oprávnění)
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 Považovat čas souboru lišící se přesně o +/- 1 hodinu jako shodný, méně než 1 hodinu jako konflikt, kvůli zpracování a přechodům na Letní čas
 Unable to connect to sourceforge.net!
@@ -872,6 +874,8 @@ Volume name %x not part of filename %y!
 Disk %x není součástí jména souboru %y!
 Waiting for all directories to become available...
 Čekání na zpřístupnění všech adresářů...
+Waiting while directory is locked (%x)...
+
 Warning
 Varování
 Warning: Synchronization failed for %x item(s):

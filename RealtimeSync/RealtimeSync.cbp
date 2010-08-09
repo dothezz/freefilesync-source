@@ -8,7 +8,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Release">
-				<Option output="..\BUILD\RealtimeSync" prefix_auto="1" extension_auto="1" />
+				<Option output="..\BUILD\RealtimeSync_Win32" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="..\BUILD" />
 				<Option object_output="..\OBJ\Release_RTS_GCC" />
 				<Option type="0" />
@@ -21,16 +21,18 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-static" />
 					<Add library="libwxmsw28u_core.a" />
 					<Add library="libwxmsw28u_adv.a" />
 					<Add library="libwxbase28u.a" />
 					<Add library="libwxpng.a" />
 					<Add library="libwxzlib.a" />
+					<Add library="libboost_thread-mgw45-mt-s-1_43.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 				</Linker>
 			</Target>
 			<Target title="Debug-DLL">
-				<Option output="..\BUILD\RealtimeSync" prefix_auto="1" extension_auto="1" />
+				<Option output="..\BUILD\RealtimeSync_Debug" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="..\BUILD" />
 				<Option object_output="..\OBJ\Debug_RTS_GCC" />
 				<Option type="0" />
@@ -49,6 +51,7 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
+					<Add library="libboost_thread-mgw45-mt-sd-1_43.a" />
 					<Add directory="C:\Program Files\C++\wxWidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
@@ -68,7 +71,7 @@
 			<Add option="-DZSTRING_WIDE_CHAR" />
 			<Add option="-DTIXML_USE_STL" />
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
-			<Add directory="..\shared\boost_1_x" />
+			<Add directory="C:\Program Files\C++\Boost" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
@@ -85,16 +88,20 @@
 			<Add library="liboleaut32.a" />
 			<Add library="libcomdlg32.a" />
 			<Add library="libws2_32.a" />
+			<Add library="libwinspool.a" />
+			<Add directory="C:\Program Files\C++\Boost\stage\lib" />
 		</Linker>
 		<Unit filename="WxWizDialog.fbp" />
 		<Unit filename="application.cpp" />
 		<Unit filename="application.h" />
 		<Unit filename="functions.cpp" />
 		<Unit filename="functions.h" />
-		<Unit filename="guiGenerated.cpp" />
-		<Unit filename="guiGenerated.h" />
-		<Unit filename="mainDialog.cpp" />
-		<Unit filename="mainDialog.h" />
+		<Unit filename="gui_generated.cpp" />
+		<Unit filename="gui_generated.h" />
+		<Unit filename="main_dlg.cpp" />
+		<Unit filename="main_dlg.h" />
+		<Unit filename="notify.cpp" />
+		<Unit filename="notify.h" />
 		<Unit filename="pch.h">
 			<Option compile="1" />
 			<Option weight="0" />
@@ -105,49 +112,48 @@
 		</Unit>
 		<Unit filename="resources.cpp" />
 		<Unit filename="resources.h" />
-		<Unit filename="trayMenu.cpp" />
-		<Unit filename="trayMenu.h" />
+		<Unit filename="tray_menu.cpp" />
+		<Unit filename="tray_menu.h" />
 		<Unit filename="watcher.cpp" />
 		<Unit filename="watcher.h" />
-		<Unit filename="xmlFreeFileSync.cpp" />
-		<Unit filename="xmlFreeFileSync.h" />
-		<Unit filename="xmlProcessing.cpp" />
-		<Unit filename="xmlProcessing.h" />
-		<Unit filename="..\Shared\customButton.cpp" />
-		<Unit filename="..\Shared\customButton.h" />
-		<Unit filename="..\Shared\dragAndDrop.cpp" />
-		<Unit filename="..\Shared\dragAndDrop.h" />
+		<Unit filename="xml_ffs.cpp" />
+		<Unit filename="xml_ffs.h" />
+		<Unit filename="xml_proc.cpp" />
+		<Unit filename="xml_proc.h" />
+		<Unit filename="..\Shared\custom_button.cpp" />
+		<Unit filename="..\Shared\custom_button.h" />
+		<Unit filename="..\Shared\drag_n_drop.cpp" />
+		<Unit filename="..\Shared\drag_n_drop.h" />
 		<Unit filename="..\Shared\zstring.cpp" />
 		<Unit filename="..\Shared\zstring.h" />
-		<Unit filename="..\library\processXml.cpp" />
-		<Unit filename="..\shared\checkExist.cpp" />
-		<Unit filename="..\shared\dllLoader.cpp" />
-		<Unit filename="..\shared\dllLoader.h" />
-		<Unit filename="..\shared\fileError.h" />
-		<Unit filename="..\shared\fileHandling.cpp" />
-		<Unit filename="..\shared\fileHandling.h" />
-		<Unit filename="..\shared\fileID.cpp" />
-		<Unit filename="..\shared\fileIO.cpp" />
-		<Unit filename="..\shared\fileTraverser.cpp" />
-		<Unit filename="..\shared\globalFunctions.cpp" />
-		<Unit filename="..\shared\globalFunctions.h" />
-		<Unit filename="..\shared\helpProvider.cpp" />
+		<Unit filename="..\library\process_xml.cpp" />
+		<Unit filename="..\shared\check_exist.cpp" />
+		<Unit filename="..\shared\dll_loader.cpp" />
+		<Unit filename="..\shared\dll_loader.h" />
+		<Unit filename="..\shared\file_error.h" />
+		<Unit filename="..\shared\file_handling.cpp" />
+		<Unit filename="..\shared\file_handling.h" />
+		<Unit filename="..\shared\file_id.cpp" />
+		<Unit filename="..\shared\file_io.cpp" />
+		<Unit filename="..\shared\file_traverser.cpp" />
+		<Unit filename="..\shared\global_func.cpp" />
+		<Unit filename="..\shared\global_func.h" />
+		<Unit filename="..\shared\help_provider.cpp" />
 		<Unit filename="..\shared\localization.cpp" />
 		<Unit filename="..\shared\localization.h" />
-		<Unit filename="..\shared\longPathPrefix.cpp" />
-		<Unit filename="..\shared\longPathPrefix.h" />
-		<Unit filename="..\shared\parallelCall.cpp" />
+		<Unit filename="..\shared\long_path_prefix.cpp" />
+		<Unit filename="..\shared\long_path_prefix.h" />
 		<Unit filename="..\shared\shadow.cpp" />
-		<Unit filename="..\shared\standardPaths.cpp" />
-		<Unit filename="..\shared\standardPaths.h" />
-		<Unit filename="..\shared\systemFunctions.cpp" />
-		<Unit filename="..\shared\systemFunctions.h" />
+		<Unit filename="..\shared\standard_paths.cpp" />
+		<Unit filename="..\shared\standard_paths.h" />
+		<Unit filename="..\shared\system_func.cpp" />
+		<Unit filename="..\shared\system_func.h" />
 		<Unit filename="..\shared\tinyxml\tinystr.cpp" />
 		<Unit filename="..\shared\tinyxml\tinyxml.cpp" />
 		<Unit filename="..\shared\tinyxml\tinyxmlerror.cpp" />
 		<Unit filename="..\shared\tinyxml\tinyxmlparser.cpp" />
-		<Unit filename="..\shared\xmlBase.cpp" />
-		<Unit filename="..\shared\xmlBase.h" />
+		<Unit filename="..\shared\xml_base.cpp" />
+		<Unit filename="..\shared\xml_base.h" />
 		<Unit filename="..\structures.cpp" />
 		<Extensions>
 			<code_completion />

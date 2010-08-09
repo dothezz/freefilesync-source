@@ -1,21 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
- Byte
- Byte
- GB
- GB
- MB
- MB
- day(s)
- dag(en)
- hour(s)
- u(u)r(en)
- kB
- kB
- min
- min
- sec
- sec
 %x / %y objects deleted successfully
 %x / %y objecten succesvol verwijderd
 %x Byte
@@ -28,18 +12,24 @@
 
 %x TB
 
+%x day(s)
+
 %x directories
 %x paden
 %x files
 %x bestanden
-%x is not a valid FreeFileSync batch file!
-%x is geen geldig FreeFileSync batch-bestand!
+%x hour(s)
+
 %x kB
+
+%x min
 
 %x of %y rows in view
 %x van de %y rijen in zicht
 %x of 1 row in view
 %x van 1 rij in zicht
+%x sec
+
 %x%
 
 &Abort
@@ -182,7 +172,7 @@ Add folder pair
 Voeg 1 paar gekoppelde mappen toe
 All directories in sync!
 Alle paden zijn gesynchroniseerd!
-An exception occured!
+An exception occurred!
 Er heeft een uitzondering plaatsgevonden!
 As a result the files are separated into the following categories:
 Hierdoor worden de bestanden gescheiden in de volgende categorieën:
@@ -266,6 +256,8 @@ Continue
 Doorgaan
 Conversion error:
 Fout bij het converteren:
+Copy filesystem permissions
+
 Copy from left to right
 Kopieer van links naar rechts
 Copy from left to right overwriting
@@ -278,8 +270,8 @@ Copy locked files
 Kopieer 'alleen lezen' bestanden
 Copy new or updated files to right folder.
 Kopieer nieuwe of geupdate bestanden naar de rechter map.
-Copy shared or locked files using Volume Shadow Copy Service
-Kopieer gedeelde of alleen-lezen bestanden met Volume Shadow Copy Service
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+
 Copy to clipboard\tCTRL+C
 Kopieer naar het klembord\tCTRL+C
 Copying Symbolic Link %x overwriting %y
@@ -384,6 +376,8 @@ Error
 Fout
 Error changing modification time:
 Er is een fout opgetreden bij het aanpassen van de bestandstijd:
+Error copying file permissions:
+
 Error copying file:
 Er is een fout opgetreden bij het kopiëren van bestand:
 Error copying locked file %x!
@@ -418,14 +412,14 @@ Error reading from synchronization database:
 Er is een fout opgetreden bij het lezen van de synchronisatie-database:
 Error resolving symbolic link:
 Er is een fout opgetreden bij het ophalen van een symbolische koppeling:
+Error setting privilege:
+
 Error starting Volume Shadow Copy Service!
 Er is een fout opgetreden bij het starten van de Volume Schadow Copy Service! 
 Error traversing directory:
 Er is een fout opgetreden bij het doorzoeken van map:
 Error when monitoring directories.
 Er is een fout opgetreden bij het observeren van locaties.
-Error writing file attributes:
-Er is een fout opgetreden bij het schrijven van de bestands-eigenschappen:
 Error writing file:
 Er is een fout opgetreden bij het schrijven naar bestand:
 Error writing to synchronization database:
@@ -598,6 +592,8 @@ Initial synchronization:
 Initiële  synchronisatie:
 Integrate external applications into context menu. The following macros are available:
 Integreer externe applicaties in het context menu. De volgende macros zijn beschikbaar:
+Invalid FreeFileSync config file!
+
 Leave as unresolved conflict
 Beschouwen als onopgelost conflict
 Left
@@ -678,7 +674,7 @@ Planned directory deletion is in conflict with its subdirectories and -files!
 
 Please run a Compare first before synchronizing!
 Voer eerst een Vergelijking uit voordat u synchroniseerd.
-Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI mode.
 
 Processing folder pair:
 Verwerken van gekoppelde folder:
@@ -794,7 +790,7 @@ Stop
 Stop
 Swap sides
 Wissel zijdes
-Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI mode...
 
 Symbolic Link handling
 
@@ -844,6 +840,8 @@ Total required free disk space:
 Benodigde hoeveelheid vrije schijfruimte:
 Total time:
 Totale tijd:
+Transfer file and directory permissions\n(Requires Administrator rights)
+
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 Behandel bestandstijden die verschillen met precies +/- 1 uur als gelijk en minder als 1 uur als conflict om zomertijd veranderingen te verwerken
 Unable to connect to sourceforge.net!

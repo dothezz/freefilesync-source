@@ -7,13 +7,13 @@
 #include "statistics.h"
 
 #include <wx/ffile.h>
-#include "../shared/globalFunctions.h"
-#include "statusHandler.h"
-//#include "../algorithm.h"
+#include "../shared/global_func.h"
+#include "status_handler.h"
 #include "../shared/util.h"
 #include <wx/intl.h>
 #include <limits>
 #include <wx/stopwatch.h>
+#include "../shared/assert_static.h"
 
 
 RetrieveStatistics::RetrieveStatistics() :
@@ -31,7 +31,7 @@ RetrieveStatistics::~RetrieveStatistics()
 
     for (std::vector<statEntry>::const_iterator i = data.begin(); i != data.end(); ++i)
     {
-        using globalFunctions::numberToString;
+        using common::numberToString;
         outputFile.Write(numberToString(i->time));
         outputFile.Write(wxT(";"));
         outputFile.Write(numberToString(i->objects));
@@ -53,42 +53,42 @@ void RetrieveStatistics::writeEntry(const double value, const int objects)
 
 
 //########################################################################################
-
-inline
-bool isNull(double number)
+namespace
 {
-    return globalFunctions::abs(number) < std::numeric_limits<double>::epsilon();
+template <class T>
+inline
+bool isNull(T number)
+{
+    return common::abs(number) <= std::numeric_limits<T>::epsilon(); //epsilon == 0 for integer types, therefore less-equal(!)
+}
 }
 
 
 inline
 wxString Statistics::formatRemainingTime(double timeInMs) const
 {
-#ifndef _MSC_VER
-#warning adapt units "%x sec"
-#endif
-
     bool unitSec = true;
     double remainingTime = timeInMs / 1000;
-    wxString unit = _(" sec");
+
+    wxString output = _("%x sec");
     if (remainingTime > 55)
     {
         unitSec = false;
         remainingTime /= 60;
-        unit = _(" min");
+        output = _("%x min");
         if (remainingTime > 59)
         {
             remainingTime /= 60;
-            unit = _(" hour(s)");
+            output = _("%x hour(s)");
             if (remainingTime > 23)
             {
                 remainingTime /= 24;
-                unit = _(" day(s)");
+                output = _("%x day(s)");
             }
         }
     }
 
-    int formattedTime = globalFunctions::round(remainingTime);
+    int formattedTime = common::round(remainingTime);
 
     //reduce precision to 5 seconds
     if (unitSec && formattedTime % 5 != 0)
@@ -100,7 +100,7 @@ wxString Statistics::formatRemainingTime(double timeInMs) const
     {
         if (unitSec)
         {
-            formattedTime = globalFunctions::round(remainingTime);
+            formattedTime = common::round(remainingTime);
             formattedTime -= formattedTime % 5; //"floor"
         }
         else
@@ -108,8 +108,10 @@ wxString Statistics::formatRemainingTime(double timeInMs) const
     }
     remainingTimeLast = formattedTime;
 
-    return globalFunctions::numberToString(formattedTime) + unit;
-    //+ wxT("(") + globalFunctions::numberToWxString(globalFunctions::round(timeInMs / 1000)) + wxT(")");
+    output.Replace(wxT("%x"), common::numberToString(formattedTime));
+
+    return output;
+    //+ wxT("(") + common::numberToWxString(common::round(timeInMs / 1000)) + wxT(")");
 }
 
 
@@ -191,7 +193,7 @@ wxString Statistics::getBytesPerSecond() const
         const double dataDelta = measurements.back().data - frontElement->data;
 
         if (!isNull(timeDelta))
-            return FreeFileSync::formatFilesizeToShortString(dataDelta * 1000 / timeDelta) + _("/sec");
+            return ffs3::formatFilesizeToShortString(dataDelta * 1000 / timeDelta) + _("/sec");
     }
 
     return wxT("-"); //fallback

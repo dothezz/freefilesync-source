@@ -7,13 +7,13 @@
 #ifndef SYNCHRONIZATION_H_INCLUDED
 #define SYNCHRONIZATION_H_INCLUDED
 
-#include "fileHierarchy.h"
-#include "library/processXml.h"
+#include "file_hierarchy.h"
+#include "library/process_xml.h"
 
 class StatusHandler;
 
 
-namespace FreeFileSync
+namespace ffs3
 {
 
 class SyncStatistics
@@ -75,6 +75,7 @@ public:
     SyncProcess(xmlAccess::OptionalDialogs& warnings,
                 bool verifyCopiedFiles,
                 bool copyLockedFiles,
+                bool copyFilePermissions,
                 StatusHandler& handler);
 
     //CONTRACT: syncConfig must have SAME SIZE folderCmp and correspond per row!
@@ -83,8 +84,9 @@ public:
 private:
     friend class SynchronizeFolderPair;
 
-    const bool m_verifyCopiedFiles;
+    const bool verifyCopiedFiles_;
     const bool copyLockedFiles_;
+    const bool copyFilePermissions_;
 
     //warnings
     xmlAccess::OptionalDialogs& m_warnings;

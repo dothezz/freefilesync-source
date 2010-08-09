@@ -10,12 +10,12 @@
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/mstream.h>
-#include "../shared/stringConv.h"
-#include "../shared/systemConstants.h"
+#include "../shared/string_conv.h"
+#include "../shared/system_constants.h"
 #include <memory>
-#include "../shared/standardPaths.h"
+#include "../shared/standard_paths.h"
 
-using namespace FreeFileSync;
+using namespace ffs3;
 
 
 const GlobalResources& GlobalResources::getInstance()
@@ -67,7 +67,7 @@ void loadAnimFromZip(wxZipInputStream& zipInput, wxAnimation* animation)
 
 void GlobalResources::load() const
 {
-    wxFFileInputStream input(FreeFileSync::getResourceDir() + wxT("Resources.dat"));
+    wxFFileInputStream input(ffs3::getResourceDir() + wxT("Resources.dat"));
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files

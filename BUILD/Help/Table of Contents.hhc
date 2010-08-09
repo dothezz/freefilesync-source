@@ -53,7 +53,7 @@
 			<param name="Local" value="html\advanced\SendMail.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Exclude subfolders">
+			<param name="Name" value="Exclude via filter">
 			<param name="Local" value="html\advanced\ExcludeSubfolder.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">

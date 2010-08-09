@@ -10,30 +10,30 @@
 #include <wx/combobox.h>
 #include <wx/filepicker.h>
 #include "localization.h"
-#include "fileHandling.h"
-#include "stringConv.h"
+#include "file_handling.h"
+#include "string_conv.h"
 #include <stdexcept>
-#include "systemFunctions.h"
-#include "checkExist.h"
+#include "system_func.h"
+#include "check_exist.h"
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #endif
 
 
-wxString FreeFileSync::formatFilesizeToShortString(const wxLongLong& filesize)
+wxString ffs3::formatFilesizeToShortString(const wxLongLong& filesize)
 {
-    return FreeFileSync::formatFilesizeToShortString(filesize.ToDouble());
+    return ffs3::formatFilesizeToShortString(filesize.ToDouble());
 }
 
 
-wxString FreeFileSync::formatFilesizeToShortString(const wxULongLong& filesize)
+wxString ffs3::formatFilesizeToShortString(const wxULongLong& filesize)
 {
-    return FreeFileSync::formatFilesizeToShortString(filesize.ToDouble());
+    return ffs3::formatFilesizeToShortString(filesize.ToDouble());
 }
 
 
-wxString FreeFileSync::formatFilesizeToShortString(double filesize)
+wxString ffs3::formatFilesizeToShortString(double filesize)
 {
     if (filesize < 0)
         return _("Error");
@@ -65,7 +65,7 @@ wxString FreeFileSync::formatFilesizeToShortString(double filesize)
             }
         }
         //print just three significant digits: 0,01 | 0,11 | 1,11 | 11,1 | 111
-        const size_t leadDigitCount = globalFunctions::getDigitCount(static_cast<size_t>(filesize)); //number of digits before decimal point
+        const size_t leadDigitCount = common::getDigitCount(static_cast<size_t>(filesize)); //number of digits before decimal point
         if (leadDigitCount == 0 || leadDigitCount > 3)
             return _("Error");
 
@@ -73,14 +73,14 @@ wxString FreeFileSync::formatFilesizeToShortString(double filesize)
     }
     else
     {
-        output.Replace(wxT("%x"), globalFunctions::numberToString(static_cast<int>(filesize))); //no decimal places in case of bytes
+        output.Replace(wxT("%x"), common::numberToString(static_cast<int>(filesize))); //no decimal places in case of bytes
     }
 
     return output;
 }
 
 
-wxString FreeFileSync::formatPercentage(const wxLongLong& dividend, const wxLongLong& divisor)
+wxString ffs3::formatPercentage(const wxLongLong& dividend, const wxLongLong& divisor)
 {
     const double ratio = divisor != 0 ? dividend.ToDouble() * 100 / divisor.ToDouble() : 0;
     wxString output = _("%x%");
@@ -89,11 +89,11 @@ wxString FreeFileSync::formatPercentage(const wxLongLong& dividend, const wxLong
 }
 
 
-wxString FreeFileSync_Impl::includeNumberSeparator(const wxString& number)
+wxString ffs_Impl::includeNumberSeparator(const wxString& number)
 {
     wxString output(number);
     for (size_t i = output.size(); i > 3; i -= 3)
-        output.insert(i - 3, FreeFileSync::getThousandsSeparator());
+        output.insert(i - 3, ffs3::getThousandsSeparator());
 
     return output;
 }
@@ -102,30 +102,30 @@ wxString FreeFileSync_Impl::includeNumberSeparator(const wxString& number)
 template <class T>
 void setDirectoryNameImpl(const wxString& dirname, T* txtCtrl, wxDirPickerCtrl* dirPicker)
 {
-    using namespace FreeFileSync;
+    using namespace ffs3;
 
     txtCtrl->SetValue(dirname);
-    const Zstring dirFormatted = FreeFileSync::getFormattedDirectoryName(wxToZ(dirname));
+    const Zstring dirFormatted = ffs3::getFormattedDirectoryName(wxToZ(dirname));
 
-    if (Utility::dirExists(dirFormatted, 200) == Utility::EXISTING_TRUE) //potentially slow network access: wait 200ms at most
+    if (util::dirExists(dirFormatted, 200) == util::EXISTING_TRUE) //potentially slow network access: wait 200ms at most
         dirPicker->SetPath(zToWx(dirFormatted));
 }
 
 
-void FreeFileSync::setDirectoryName(const wxString& dirname, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker)
+void ffs3::setDirectoryName(const wxString& dirname, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker)
 {
     setDirectoryNameImpl(dirname, txtCtrl, dirPicker);
 }
 
 
-void FreeFileSync::setDirectoryName(const wxString& dirname, wxComboBox* txtCtrl, wxDirPickerCtrl* dirPicker)
+void ffs3::setDirectoryName(const wxString& dirname, wxComboBox* txtCtrl, wxDirPickerCtrl* dirPicker)
 {
     txtCtrl->SetSelection(wxNOT_FOUND);
     setDirectoryNameImpl(dirname, txtCtrl, dirPicker);
 }
 
 
-void FreeFileSync::scrollToBottom(wxScrolledWindow* scrWindow)
+void ffs3::scrollToBottom(wxScrolledWindow* scrWindow)
 {
     int height = 0;
     scrWindow->GetClientSize(NULL, &height);
@@ -172,7 +172,7 @@ void writeFourDigitNumber(size_t number, wxString& string)
 }
 }
 
-wxString FreeFileSync::utcTimeToLocalString(const wxLongLong& utcTime)
+wxString ffs3::utcTimeToLocalString(const wxLongLong& utcTime)
 {
 #ifdef FFS_WIN
     //convert ansi C time to FILETIME

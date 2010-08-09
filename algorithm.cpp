@@ -9,21 +9,21 @@
 #include <stdexcept>
 #include <wx/log.h>
 #include "library/resources.h"
-#include "shared/fileHandling.h"
+#include "shared/file_handling.h"
 #include "shared/recycler.h"
 #include <wx/msgdlg.h>
 #include "library/filter.h"
 #include <boost/bind.hpp>
-#include "shared/stringConv.h"
-#include "shared/globalFunctions.h"
+#include "shared/string_conv.h"
+#include "shared/global_func.h"
 #include "shared/loki/TypeManip.h"
-#include "library/dbFile.h"
+#include "library/db_file.h"
 //#include "shared/loki/NullType.h"
 
-using namespace FreeFileSync;
+using namespace ffs3;
 
 
-void FreeFileSync::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp)
+void ffs3::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp)
 {
     std::for_each(folderCmp.begin(), folderCmp.end(), boost::bind(&BaseDirMapping::swap, _1));
     redetermineSyncDirection(config, folderCmp, NULL);
@@ -38,7 +38,7 @@ public:
 
     void execute(HierarchyObject& hierObj) const
     {
-        Utility::Proxy<const Redetermine> prx(*this); //grant std::for_each access to private parts of this class
+        util::ProxyForEach<const Redetermine> prx(*this); //grant std::for_each access to private parts of this class
 
         std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //process files
         std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //process links
@@ -46,20 +46,20 @@ public:
     }
 
 private:
-    friend class Utility::Proxy<const Redetermine>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
+    friend class util::ProxyForEach<const Redetermine>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
 
     void operator()(FileMapping& fileObj) const
     {
         switch (fileObj.getCategory())
         {
         case FILE_LEFT_SIDE_ONLY:
-            if (fileObj.getFullName<LEFT_SIDE>().EndsWith(FreeFileSync::TEMP_FILE_ENDING))
+            if (fileObj.getFullName<LEFT_SIDE>().EndsWith(ffs3::TEMP_FILE_ENDING))
                 fileObj.setSyncDir(SYNC_DIR_LEFT); //schedule potentially existing temporary files for deletion
             else
                 fileObj.setSyncDir(config.exLeftSideOnly);
             break;
         case FILE_RIGHT_SIDE_ONLY:
-            if (fileObj.getFullName<RIGHT_SIDE>().EndsWith(FreeFileSync::TEMP_FILE_ENDING))
+            if (fileObj.getFullName<RIGHT_SIDE>().EndsWith(ffs3::TEMP_FILE_ENDING))
                 fileObj.setSyncDir(SYNC_DIR_RIGHT); //schedule potentially existing temporary files for deletion
             else
                 fileObj.setSyncDir(config.exRightSideOnly);
@@ -100,6 +100,9 @@ private:
             break;
         case SYMLINK_CONFLICT:
             linkObj.setSyncDir(config.conflict);
+           break;
+        case SYMLINK_DIFFERENT:
+            linkObj.setSyncDir(config.different);
             break;
         case SYMLINK_EQUAL:
             linkObj.setSyncDir(SYNC_DIR_NONE);
@@ -171,7 +174,7 @@ struct AllElementsEqual : public std::unary_function<BaseDirMapping, bool>
 };
 
 
-bool FreeFileSync::allElementsEqual(const FolderComparison& folderCmp)
+bool ffs3::allElementsEqual(const FolderComparison& folderCmp)
 {
     return std::find_if(folderCmp.begin(), folderCmp.end(), std::not1(AllElementsEqual())) == folderCmp.end();
 }
@@ -412,7 +415,7 @@ public:
 
     void execute(HierarchyObject& hierObj) const
     {
-        Utility::Proxy<const SetDirChangedFilter> prx(*this); //grant std::for_each access to private parts of this class
+        util::ProxyForEach<const SetDirChangedFilter> prx(*this); //grant std::for_each access to private parts of this class
 
         std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //process files
         std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //process links
@@ -420,7 +423,7 @@ public:
     }
 
 private:
-    friend class Utility::Proxy<const SetDirChangedFilter>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
+    friend class util::ProxyForEach<const SetDirChangedFilter>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
 
     void operator()(FileMapping& fileObj) const
     {
@@ -532,7 +535,7 @@ public:
         {
             //use standard settings:
             SyncConfiguration defaultSync;
-            FreeFileSync::setTwoWay(defaultSync);
+            ffs3::setTwoWay(defaultSync);
             Redetermine(defaultSync).execute(baseDirectory);
             return;
         }
@@ -571,7 +574,7 @@ private:
         }
         catch (FileError& error) //e.g. incompatible database version
         {
-            if (handler_) handler_->reportWarning(error.show() + wxT(" \n\n") +
+            if (handler_) handler_->reportWarning(error.msg() + wxT(" \n\n") +
                                                       _("Setting default synchronization directions: Old files will be overwritten with newer files."));
         }
         return std::pair<DirInfoPtr, DirInfoPtr>(); //NULL
@@ -624,12 +627,12 @@ private:
 
 
         //##################### schedule potentially existing temporary files for deletion ####################
-        if (cat == FILE_LEFT_SIDE_ONLY && fileObj.getFullName<LEFT_SIDE>().EndsWith(FreeFileSync::TEMP_FILE_ENDING))
+        if (cat == FILE_LEFT_SIDE_ONLY && fileObj.getFullName<LEFT_SIDE>().EndsWith(ffs3::TEMP_FILE_ENDING))
         {
             fileObj.setSyncDir(SYNC_DIR_LEFT);
             return;
         }
-        else if (cat == FILE_RIGHT_SIDE_ONLY && fileObj.getFullName<RIGHT_SIDE>().EndsWith(FreeFileSync::TEMP_FILE_ENDING))
+        else if (cat == FILE_RIGHT_SIDE_ONLY && fileObj.getFullName<RIGHT_SIDE>().EndsWith(ffs3::TEMP_FILE_ENDING))
         {
             fileObj.setSyncDir(SYNC_DIR_RIGHT);
             return;
@@ -857,7 +860,7 @@ private:
 
 
 //---------------------------------------------------------------------------------------------------------------
-void FreeFileSync::redetermineSyncDirection(const SyncConfiguration& config, BaseDirMapping& baseDirectory, DeterminationProblem* handler)
+void ffs3::redetermineSyncDirection(const SyncConfiguration& config, BaseDirMapping& baseDirectory, DeterminationProblem* handler)
 {
     if (config.automatic)
         RedetermineAuto(baseDirectory, handler);
@@ -866,7 +869,7 @@ void FreeFileSync::redetermineSyncDirection(const SyncConfiguration& config, Bas
 }
 
 
-void FreeFileSync::redetermineSyncDirection(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp, DeterminationProblem* handler)
+void ffs3::redetermineSyncDirection(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp, DeterminationProblem* handler)
 {
     if (folderCmp.size() == 0)
         return;
@@ -897,7 +900,7 @@ public:
 
     void execute(HierarchyObject& hierObj) const
     {
-        Utility::Proxy<const SetNewDirection> prx(*this); //grant std::for_each access to private parts of this class
+        util::ProxyForEach<const SetNewDirection> prx(*this); //grant std::for_each access to private parts of this class
 
         std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //process files
         std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //process links
@@ -905,7 +908,7 @@ public:
     }
 
 private:
-    friend class Utility::Proxy<const SetNewDirection>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
+    friend class util::ProxyForEach<const SetNewDirection>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
 
     void operator()(FileMapping& fileObj) const
     {
@@ -930,7 +933,7 @@ private:
 };
 
 
-void FreeFileSync::setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsObj)
+void ffs3::setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsObj)
 {
     if (fsObj.getCategory() != FILE_EQUAL)
         fsObj.setSyncDir(newDirection);
@@ -958,14 +961,14 @@ template <bool include>
 class InOrExcludeAllRows
 {
 public:
-    void operator()(FreeFileSync::BaseDirMapping& baseDirectory) const //be careful with operator() to no get called by std::for_each!
+    void operator()(ffs3::BaseDirMapping& baseDirectory) const //be careful with operator() to no get called by std::for_each!
     {
         execute(baseDirectory);
     }
 
-    void execute(FreeFileSync::HierarchyObject& hierObj) const //don't create ambiguity by replacing with operator()
+    void execute(ffs3::HierarchyObject& hierObj) const //don't create ambiguity by replacing with operator()
     {
-        Utility::Proxy<const InOrExcludeAllRows<include> > prx(*this); //grant std::for_each access to private parts of this class
+        util::ProxyForEach<const InOrExcludeAllRows<include> > prx(*this); //grant std::for_each access to private parts of this class
 
         std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //process files
         std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //process links
@@ -973,19 +976,19 @@ public:
     }
 
 private:
-    friend class Utility::Proxy<const InOrExcludeAllRows<include> >; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
+    friend class util::ProxyForEach<const InOrExcludeAllRows<include> >; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
 
-    void operator()(FreeFileSync::FileMapping& fileObj) const
+    void operator()(ffs3::FileMapping& fileObj) const
     {
         fileObj.setActive(include);
     }
 
-    void operator()(FreeFileSync::SymLinkMapping& linkObj) const
+    void operator()(ffs3::SymLinkMapping& linkObj) const
     {
         linkObj.setActive(include);
     }
 
-    void operator()(FreeFileSync::DirMapping& dirObj) const
+    void operator()(ffs3::DirMapping& dirObj) const
     {
         dirObj.setActive(include);
         execute(dirObj); //recursion
@@ -993,7 +996,7 @@ private:
 };
 
 
-void FreeFileSync::setActiveStatus(bool newStatus, FreeFileSync::FolderComparison& folderCmp)
+void ffs3::setActiveStatus(bool newStatus, ffs3::FolderComparison& folderCmp)
 {
     if (newStatus)
         std::for_each(folderCmp.begin(), folderCmp.end(), InOrExcludeAllRows<true>());  //include all rows
@@ -1002,7 +1005,7 @@ void FreeFileSync::setActiveStatus(bool newStatus, FreeFileSync::FolderCompariso
 }
 
 
-void FreeFileSync::setActiveStatus(bool newStatus, FreeFileSync::FileSystemObject& fsObj)
+void ffs3::setActiveStatus(bool newStatus, ffs3::FileSystemObject& fsObj)
 {
     fsObj.setActive(newStatus);
 
@@ -1041,9 +1044,9 @@ class FilterData
 public:
     FilterData(const BaseFilter& filterProcIn) : filterProc(filterProcIn) {}
 
-    void execute(FreeFileSync::HierarchyObject& hierObj) const
+    void execute(ffs3::HierarchyObject& hierObj) const
     {
-        Utility::Proxy<const FilterData> prx(*this); //grant std::for_each access to private parts of this class
+        util::ProxyForEach<const FilterData> prx(*this); //grant std::for_each access to private parts of this class
 
         std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //files
         std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //symlinks
@@ -1051,23 +1054,23 @@ public:
     };
 
 private:
-    friend class Utility::Proxy<const FilterData>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
+    friend class util::ProxyForEach<const FilterData>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
 
-    bool processObject(FreeFileSync::FileSystemObject& fsObj) const;
+    bool processObject(ffs3::FileSystemObject& fsObj) const;
 
-    void operator()(FreeFileSync::FileMapping& fileObj) const
+    void operator()(ffs3::FileMapping& fileObj) const
     {
         if (processObject(fileObj))
             fileObj.setActive(filterProc.passFileFilter(fileObj.getObjRelativeName()));
     }
 
-    void operator()(FreeFileSync::SymLinkMapping& linkObj) const
+    void operator()(ffs3::SymLinkMapping& linkObj) const
     {
         if (processObject(linkObj))
             linkObj.setActive(filterProc.passFileFilter(linkObj.getObjRelativeName()));
     }
 
-    void operator()(FreeFileSync::DirMapping& dirObj) const
+    void operator()(ffs3::DirMapping& dirObj) const
     {
         bool subObjMightMatch = true;
         const bool filterPassed = filterProc.passDirFilter(dirObj.getObjRelativeName(), &subObjMightMatch);
@@ -1090,28 +1093,28 @@ private:
 
 template <> //process all elements
 inline
-bool FilterData<STRATEGY_ALL>::processObject(FreeFileSync::FileSystemObject& fsObj) const
+bool FilterData<STRATEGY_ALL>::processObject(ffs3::FileSystemObject& fsObj) const
 {
     return true;
 }
 
 template <>
 inline
-bool FilterData<STRATEGY_ACTIVE_ONLY>::processObject(FreeFileSync::FileSystemObject& fsObj) const
+bool FilterData<STRATEGY_ACTIVE_ONLY>::processObject(ffs3::FileSystemObject& fsObj) const
 {
     return fsObj.isActive();
 }
 }
 
 
-void FreeFileSync::addExcludeFiltering(const Zstring& excludeFilter, FolderComparison& folderCmp)
+void ffs3::addExcludeFiltering(const Zstring& excludeFilter, FolderComparison& folderCmp)
 {
     for (std::vector<BaseDirMapping>::iterator i = folderCmp.begin(); i != folderCmp.end(); ++i)
         FilterData<STRATEGY_ACTIVE_ONLY>(*BaseFilter::FilterRef(new NameFilter(DefaultStr("*"), excludeFilter))).execute(*i);
 }
 
 
-void FreeFileSync::applyFiltering(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp)
+void ffs3::applyFiltering(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp)
 {
     if (folderCmp.size() == 0)
         return;
@@ -1142,7 +1145,7 @@ void FreeFileSync::applyFiltering(const MainConfiguration& currentMainCfg, Folde
 
 
 //############################################################################################################
-std::pair<wxString, int> FreeFileSync::deleteFromGridAndHDPreview( //assemble message containing all files to be deleted
+std::pair<wxString, int> ffs3::deleteFromGridAndHDPreview( //assemble message containing all files to be deleted
     const std::vector<FileSystemObject*>& rowsToDeleteOnLeft,
     const std::vector<FileSystemObject*>& rowsToDeleteOnRight,
     const bool deleteOnBothSides)
@@ -1219,7 +1222,7 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDeleteOneS
                 if (!fsObj->isEmpty<side>())
                 {
                     if (useRecycleBin)
-                        FreeFileSync::moveToRecycleBin(fsObj->getFullName<side>());  //throw (FileError)
+                        ffs3::moveToRecycleBin(fsObj->getFullName<side>());  //throw (FileError)
                     else
                     {
                         //del directories and symlinks
@@ -1227,7 +1230,7 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDeleteOneS
                         {
                             virtual void visit(const FileMapping& fileObj)
                             {
-                                FreeFileSync::removeFile(fileObj.getFullName<side>());
+                                ffs3::removeFile(fileObj.getFullName<side>());
                             }
 
                             virtual void visit(const SymLinkMapping& linkObj)
@@ -1235,17 +1238,17 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDeleteOneS
                                 switch (linkObj.getLinkType<side>())
                                 {
                                 case LinkDescriptor::TYPE_DIR:
-                                    FreeFileSync::removeDirectory(linkObj.getFullName<side>());
+                                    ffs3::removeDirectory(linkObj.getFullName<side>());
                                     break;
                                 case LinkDescriptor::TYPE_FILE:
-                                    FreeFileSync::removeFile(linkObj.getFullName<side>());
+                                    ffs3::removeFile(linkObj.getFullName<side>());
                                     break;
                                 }
                             }
 
                             virtual void visit(const DirMapping& dirObj)
                             {
-                                FreeFileSync::removeDirectory(dirObj.getFullName<side>());
+                                ffs3::removeDirectory(dirObj.getFullName<side>());
                             }
                         } delPerm;
                         fsObj->accept(delPerm);
@@ -1259,7 +1262,7 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDeleteOneS
             }
             catch (const FileError& error)
             {
-                DeleteFilesHandler::Response rv = statusHandler->reportError(error.show());
+                DeleteFilesHandler::Response rv = statusHandler->reportError(error.msg());
 
                 if (rv == DeleteFilesHandler::IGNORE_ERROR)
                     break;
@@ -1293,7 +1296,7 @@ private:
 };
 
 
-void FreeFileSync::deleteFromGridAndHD(FolderComparison& folderCmp,                         //attention: rows will be physically deleted!
+void ffs3::deleteFromGridAndHD(FolderComparison& folderCmp,                         //attention: rows will be physically deleted!
                                        std::vector<FileSystemObject*>& rowsToDeleteOnLeft,  //refresh GUI grid after deletion to remove invalid rows
                                        std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
                                        const bool deleteOnBothSides,
@@ -1340,7 +1343,7 @@ void FreeFileSync::deleteFromGridAndHD(FolderComparison& folderCmp,             
 
 //############################################################################################################
 /*Statistical theory: detect daylight saving time (DST) switch by comparing files that exist on both sides (and have same filesizes). If there are "enough"
-that have a shift by +-1h then assert that DST switch occured.
+that have a shift by +-1h then assert that DST switch occurred.
 What is "enough" =: N? N should be large enough AND small enough that the following two errors remain small:
 
 Error 1: A DST switch is detected although there was none
@@ -1393,7 +1396,7 @@ unsigned int getThreshold(const unsigned filesWithSameSizeTotal)
 }
 
 
-void FreeFileSync::checkForDSTChange(const FileCompareResult& gridData,
+void ffs3::checkForDSTChange(const FileCompareResult& gridData,
                                      const std::vector<FolderPair>& directoryPairsFormatted,
                                      int& timeShift, wxString& driveName)
 {

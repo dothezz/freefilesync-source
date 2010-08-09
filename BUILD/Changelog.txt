@@ -2,6 +2,25 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.9
+--------------
+Advanced locking strategy to allow multiple processes synchronize the same directories (e.g. via network share)
+Merge multiple *.ffs_batch, *.ffs_gui files or combinations of both via drag & drop
+Copy file and folder permissions (requires admin rights):
+	- Windows: owner, group, DACL, SACL
+	- Linux: owner, group, permissions
+	- correctly handle Symbolic Links 
+	- new option in global settings
+Compare by content evaluates Symbolic Links
+32-Bit build compiled with MinGW/GCC to preserve Windows 2000 compatibility
+RealtimeSync: Handle requests for device removal (USB stick) while monitoring
+Sort by filesize: group symlinks before directories
+Added macros %week%, %month%, %year% for creating time-stamped directories
+Touch database file when changes occured only
+Moved settings "file time tolerance" and "verify copied files" to GlobalSettings.xml
+Updated translation files
+
+
 Changelog v3.8
 --------------
 New options handling Symlinks: ignore/direct/follow => warning: new database format for <Automatic> mode

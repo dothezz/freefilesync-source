@@ -7,15 +7,15 @@
 #include "functions.h"
 #include <wx/textctrl.h>
 #include <wx/filepicker.h>
-#include "../shared/stringConv.h"
-#include "../shared/fileHandling.h"
+#include "../shared/string_conv.h"
+#include "../shared/file_handling.h"
 
-using namespace FreeFileSync;
+using namespace ffs3;
 
-void RealtimeSync::setDirectoryName(const wxString& dirname, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker)
+void rts::setDirectoryName(const wxString& dirname, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker)
 {
     txtCtrl->SetValue(dirname);
-    const Zstring leftDirFormatted = FreeFileSync::getFormattedDirectoryName(wxToZ(dirname));
+    const Zstring leftDirFormatted = ffs3::getFormattedDirectoryName(wxToZ(dirname));
     if (dirExists(leftDirFormatted))
         dirPicker->SetPath(zToWx(leftDirFormatted));
 }

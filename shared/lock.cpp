@@ -5,18 +5,18 @@
 // **************************************************************************
 //
 #include "lock.h"
-#include "fileHandling.h"
+#include "file_handling.h"
 //
 //
-//Utility::LockDirectory::LockDirectory(const Zstring& dirname)
+//util::LockDirectory::LockDirectory(const Zstring& dirname)
 //{
 //
 //}
 //
 //
-//Utility::LockDirectory::~LockDirectory()
+//util::LockDirectory::~LockDirectory()
 //{
 //}
 //
 //
-//bool Utility::LockDirectoryisLocked(const Zstring& dirname);
+//bool util::LockDirectoryisLocked(const Zstring& dirname);

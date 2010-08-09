@@ -1,21 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- A GNU fordítócsomag Windows portja\n  wxWidgets \t- Nyílt forráskódú GUI keretrendszer\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Nyílt forráskódú IDE
- Byte
- Bájt
- GB
- GB
- MB
- MB
- day(s)
- nap
- hour(s)
- óra
- kB
- kB
- min
- perc
- sec
- másodperc
 %x / %y objects deleted successfully
 %X / %Y objektum sikeresen törölve
 %x Byte
@@ -28,18 +12,24 @@
 %x PB
 %x TB
 %x TB
+%x day(s)
+%x nap
 %x directories
 %x mappa
 %x files
 %x fájl
-%x is not a valid FreeFileSync batch file!
-A(z) %x nem megfelelő FreeFileSync kötegelt feladat fájl!
+%x hour(s)
+%x óra
 %x kB
 %x kB
+%x min
+%x perc
 %x of %y rows in view
 %x sor látható a(z) %y sorból
 %x of 1 row in view
 %x sor látható az 1 sorból
+%x sec
+%x másodperc
 %x%
 %x%
 &Abort
@@ -182,7 +172,7 @@ Add folder pair
 Mappa pár megadása
 All directories in sync!
 Minden mappa szinkronban!
-An exception occured!
+An exception occurred!
 Kivétel keletkezett!
 As a result the files are separated into the following categories:
 Eredményképpen a fájlok a következő kategóriákra bomlanak:
@@ -266,6 +256,8 @@ Continue
 Folytatás
 Conversion error:
 Konverziós hiba:
+Copy filesystem permissions
+Fájlrendszer jogosultságok másolása
 Copy from left to right
 Másolás a bal oldalról a jobb oldalra
 Copy from left to right overwriting
@@ -278,8 +270,8 @@ Copy locked files
 Zárolt fájlok másolása
 Copy new or updated files to right folder.
 Új vagy frissített fájlok másolása a jobb oldali mappába.
-Copy shared or locked files using Volume Shadow Copy Service
-Megosztott vagy zárolt fájlok másolása a Volume Shadow Copy Service segítségével
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+A megosztott vagy zárolt fájlok másolása a Volume Shadow Copy szolgáltatással\n(Adminisztrátori jogok szükségesek)
 Copy to clipboard\tCTRL+C
 Másolás a vágólapra\tCTRL+C
 Copying Symbolic Link %x overwriting %y
@@ -384,6 +376,8 @@ Error
 Hiba
 Error changing modification time:
 Az utolsó változtatás dátumának módosítása sikertelen:
+Error copying file permissions:
+Hiba történt a fájl jogosultságainak másolása közben:
 Error copying file:
 A fájl másolása sikertelen:
 Error copying locked file %x!
@@ -418,14 +412,16 @@ Error reading from synchronization database:
 Hiba történt a szinkronizációs adatbázis olvasása közben:
 Error resolving symbolic link:
 A szimbolikus link feloldása sikertelen:
+Error setting directory lock:
+
+Error setting privilege:
+Hiba történt a jogok beállítása közben:
 Error starting Volume Shadow Copy Service!
 Hiba történt a Volume Shadow Copy szolgáltatás indítása közben!
 Error traversing directory:
 A mappa átnézése sikertelen:
 Error when monitoring directories.
 Hiba történt a mappák figyelése közben.
-Error writing file attributes:
-A fájl attribútumainak írása sikertelen:
 Error writing file:
 A fájl írása sikertelen:
 Error writing to synchronization database:
@@ -598,6 +594,8 @@ Initial synchronization:
 Első szinkronizáció:
 Integrate external applications into context menu. The following macros are available:
 Külső alkalmazás integrálása a helyi menübe. Az elérhető makrók a következők:
+Invalid FreeFileSync config file!
+Érvénytelen a FreeFileSync beállításait tartalmazó fájl!
 Leave as unresolved conflict
 Feloldatlan ütközésként hagyni
 Left
@@ -678,7 +676,7 @@ Planned directory deletion is in conflict with its subdirectories and -files!
 A tervezett mappának a törlése ütközik az almappáival és fájljaival.
 Please run a Compare first before synchronizing!
 Kérjük, futtass le egy összehasonlítást mielőtt szinkronizálnál!
-Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI mode.
 Kérjük, nyomja meg a \"Váltás\" gombot a GUI mód megnyitásához.
 Processing folder pair:
 Mappapár feldolgozása:
@@ -704,6 +702,8 @@ Remove folder
 Mappa eltávolítása
 Remove folder pair
 Mappa párok eltávolítása
+Removing abandoned directory lock (%x)...
+
 Report translation error
 Fordítói hiba bejelentése
 Reset
@@ -794,7 +794,7 @@ Stop
 Megállítás
 Swap sides
 Oldalak felcserélése
-Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI mode...
 Váltás a FreeFileSync GUI módjára...
 Symbolic Link handling
 Symlink kezelés
@@ -844,6 +844,8 @@ Total required free disk space:
 Összes igényelt szabad lemezterület:
 Total time:
 Becsült idő:
+Transfer file and directory permissions\n(Requires Administrator rights)
+Fájlok és mappák jogosultságainak átvitele\n(Adminisztrátori jogok szükségesek)
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 A fájlok dátumának pontosan +/- 1 órával való eltérése esetén a fájlok egyeznek, a kevesebb mint 1 órával való eltérés esetén pedig ütköznek, a Nyári Időszámítás kezeléséhez
 Unable to connect to sourceforge.net!
@@ -872,6 +874,8 @@ Volume name %x not part of filename %y!
 A(z) %x kötetnevet nem tartalmazza a(z) %y fájlnév!
 Waiting for all directories to become available...
 Várakozás az összes mappa elérhetővé válására...
+Waiting while directory is locked (%x)...
+
 Warning
 Figyelem
 Warning: Synchronization failed for %x item(s):

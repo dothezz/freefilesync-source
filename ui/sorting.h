@@ -7,13 +7,13 @@
 #ifndef SORTING_H_INCLUDED
 #define SORTING_H_INCLUDED
 
-#include "../fileHierarchy.h"
-#include "../shared/systemConstants.h"
+#include "../file_hierarchy.h"
+#include "../shared/system_constants.h"
 #include "../synchronization.h"
-#include "../shared/staticAssert.h"
+#include "../shared/assert_static.h"
 
 
-namespace FreeFileSync
+namespace ffs3
 {
 namespace
 {
@@ -29,12 +29,6 @@ inline
 bool isDirectoryMapping(const FileSystemObject& fsObj)
 {
     return dynamic_cast<const DirMapping*>(&fsObj) != NULL;
-}
-
-inline
-int compareString(const Zstring& stringA, const Zstring& stringB)
-{
-    return stringA.cmpFileName(stringB);
 }
 
 
@@ -60,13 +54,6 @@ struct Compare<false>
 };
 
 
-inline
-bool stringSmallerThan(const Zstring& stringA, const Zstring& stringB)
-{
-    return compareString(stringA, stringB) < 0;
-}
-
-
 template <bool ascending, SelectedSide side>
 inline
 bool sortByFileName(const FileSystemObject& a, const FileSystemObject& b)
@@ -81,7 +68,7 @@ bool sortByFileName(const FileSystemObject& a, const FileSystemObject& b)
     if (isDirectoryMapping(a)) //sort directories by relative name
     {
         if (isDirectoryMapping(b))
-            return stringSmallerThan(a.getRelativeName<side>(), b.getRelativeName<side>());
+            return cmpFileName(a.getRelativeName<side>(), b.getRelativeName<side>()) < 0;
         else
             return false;
     }
@@ -91,7 +78,7 @@ bool sortByFileName(const FileSystemObject& a, const FileSystemObject& b)
             return true;
         else
             return Compare<ascending>().isSmallerThan(
-                       compareString(a.getShortName<side>(), b.getShortName<side>()), 0);
+                       cmpFileName(a.getShortName<side>(), b.getShortName<side>()), 0);
     }
 }
 
@@ -116,7 +103,7 @@ bool sortByRelativeName(const FileSystemObject& a, const FileSystemObject& b)
 
 
     //compare relative names without filenames first
-    const int rv = compareString(relDirNameA, relDirNameB);
+    const int rv = cmpFileName(relDirNameA, relDirNameB);
     if (rv != 0)
         return Compare<ascending>().isSmallerThan(rv, 0);
     else //compare the filenames
@@ -126,7 +113,7 @@ bool sortByRelativeName(const FileSystemObject& a, const FileSystemObject& b)
         else if (isDirectoryA)
             return true;
 
-        return stringSmallerThan(a.getShortName<side>(), b.getShortName<side>());
+        return cmpFileName(a.getShortName<side>(), b.getShortName<side>()) < 0;
     }
 }
 
@@ -135,18 +122,29 @@ template <bool ascending, SelectedSide side>
 inline
 bool sortByFileSize(const FileSystemObject& a, const FileSystemObject& b)
 {
+    //empty rows always last
     if (a.isEmpty<side>())
-        return false;  //empty rows always last
+        return false;
     else if (b.isEmpty<side>())
-        return true;  //empty rows always last
+        return true;
+
+    const bool isDirA = dynamic_cast<const DirMapping*>(&a) != NULL;
+    const bool isDirB = dynamic_cast<const DirMapping*>(&b) != NULL;
+
+    //directories second last
+    if (isDirA)
+        return false;
+    else if (isDirB)
+        return true;
 
     const FileMapping* fileObjA = dynamic_cast<const FileMapping*>(&a);
     const FileMapping* fileObjB = dynamic_cast<const FileMapping*>(&b);
 
+    //then symlinks
     if (fileObjA == NULL)
-        return false; //directories last
+        return false;
     else if (fileObjB == NULL)
-        return true;  //directories last
+        return true;
 
     //return list beginning with largest files first
     return Compare<ascending>().isSmallerThan(fileObjA->getFileSize<side>(), fileObjB->getFileSize<side>());

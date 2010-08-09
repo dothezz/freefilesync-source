@@ -1,21 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
- Byte
- Byte
- GB
- GB
- MB
- MB
- day(s)
- dia(s)
- hour(s)
- hora(s)
- kB
- kB
- min
- min
- sec
- seg
 %x / %y objects deleted successfully
 %x / %y objetos borrados satisfactoriamente
 %x Byte
@@ -28,18 +12,24 @@
 %x PB
 %x TB
 %x TB
+%x day(s)
+
 %x directories
 %x directorios
 %x files
 %x archivos
-%x is not a valid FreeFileSync batch file!
-%x no es un archivo batch de FreeFileSync válido!
+%x hour(s)
+
 %x kB
 %x kB
+%x min
+
 %x of %y rows in view
 %x de %y filas en vista
 %x of 1 row in view
 %x de 1 fila en vista
+%x sec
+
 %x%
 %x%
 &Abort
@@ -182,7 +172,7 @@ Add folder pair
 Añadir un par de carpetas
 All directories in sync!
 ¡Todos los directorios en sincronización!
-An exception occured!
+An exception occurred!
 ¡Ha ocurrido una excepción!
 As a result the files are separated into the following categories:
 Como resultado, los archivos están separados en las siguientes categorías:
@@ -266,6 +256,8 @@ Continue
 Continuar
 Conversion error:
 Error de conversión:
+Copy filesystem permissions
+
 Copy from left to right
 Copiar de izquierda a derecha
 Copy from left to right overwriting
@@ -278,8 +270,8 @@ Copy locked files
 Copiar archivos bloqueados
 Copy new or updated files to right folder.
 Copiar archivos nuevos o actualizados a la carpeta de la derecha.
-Copy shared or locked files using Volume Shadow Copy Service
-Copiar archivos compartidos o bloqueados usando el servicio "Volume Shadow Copy"
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+
 Copy to clipboard\tCTRL+C
 Copiar al Portapapeles\tCTRL+C
 Copying Symbolic Link %x overwriting %y
@@ -384,6 +376,8 @@ Error
 Error
 Error changing modification time:
 Error al cambiar hora de modificación:
+Error copying file permissions:
+
 Error copying file:
 Error al copiar archivo:
 Error copying locked file %x!
@@ -418,14 +412,14 @@ Error reading from synchronization database:
 Error al leer de la base de datos de sincronización:
 Error resolving symbolic link:
 Error al resolver enlace simbólico:
+Error setting privilege:
+
 Error starting Volume Shadow Copy Service!
 ¡Error al iniciar el servicio "Volume Shadow Copy"!
 Error traversing directory:
 Error al buscar en el directorio:
 Error when monitoring directories.
 Error al visualizar los directorios.
-Error writing file attributes:
-Error al escribir atributos de archivo:
 Error writing file:
 Error al escribir archivo:
 Error writing to synchronization database:
@@ -598,6 +592,8 @@ Initial synchronization:
 Sincronización inicial:
 Integrate external applications into context menu. The following macros are available:
 Integrar aplicaciones externas en el menú de contexto. Los siguientes macros están disponibles:
+Invalid FreeFileSync config file!
+
 Leave as unresolved conflict
 Dejar como conflicto sin resolver
 Left
@@ -678,7 +674,7 @@ Planned directory deletion is in conflict with its subdirectories and -files!
 ¡La eliminación planeada del directorio se encuentra en conflicto con sus subdirectorios y archivos!
 Please run a Compare first before synchronizing!
 ¡Por favor, ejecute la comparación antes de la sincronización!
-Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI mode.
 Presionar \"Cambiar\" para abrir el modo GUI de FreeFileSync.
 Processing folder pair:
 Procesar un par de carpetas:
@@ -794,7 +790,7 @@ Stop
 Detener
 Swap sides
 Intercambiar lados
-Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI mode...
 Cambiando al modo GUI de FreeFileSync...
 Symbolic Link handling
 Gestión de enlaces simbólicos
@@ -844,6 +840,8 @@ Total required free disk space:
 Espacio total de disco necesario:
 Total time:
 Tiempo total:
+Transfer file and directory permissions\n(Requires Administrator rights)
+
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 El archivo en cuestión tiene una diferencia de tiempo de +/- 1 hora, menos de una hora entra en conflicto para gestionar los cambios referentes al horario de verano
 Unable to connect to sourceforge.net!

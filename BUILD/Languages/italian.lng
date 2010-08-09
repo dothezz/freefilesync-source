@@ -1,45 +1,35 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port della GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
- Byte
- Byte
- GB
- GB
- MB
- MB
- day(s)
- giorno(i)
- hour(s)
- ora(e)
- kB
- kB
- min
- min
- sec
- sec
 %x / %y objects deleted successfully
 %x / %y oggetti cancellati con successo
 %x Byte
-
+%x Byte
 %x GB
-
+%x GB
 %x MB
-
+%x MB
 %x PB
-
+%x PB
 %x TB
-
+%x TB
+%x day(s)
+%x giorno(i)
 %x directories
 %x cartelle
 %x files
 %x files
-%x is not a valid FreeFileSync batch file!
-%x non è un batch file valido per FreeFileSync!
+%x hour(s)
+%x ora(e)
 %x kB
-
+%x kB
+%x min
+%x min
 %x of %y rows in view
 %x di %y righe visualizzate
 %x of 1 row in view
 %x di 1 riga visualizzata
+%x sec
+%x sec
 %x%
 %x%
 &Abort
@@ -99,7 +89,7 @@
 &Yes
 &Si
 (Build: %x)
-
+(Build: %x)
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Solo volumi con file-system FAT/FAT32 risentono di questo problema!\nIn tutti gli altri casi puoi disabilitare l'impostazione \"ignora differenze di 1 ora\".)
 (Requires an Internet connection!)
@@ -161,7 +151,7 @@
 <Last session>
 <Ultima sessione>
 <Symlink>
-
+<Symlink>
 <multiple selection>
 <selezione multipla>
 A newer version of FreeFileSync is available:
@@ -182,7 +172,7 @@ Add folder pair
 Aggiungi una coppia di cartelle
 All directories in sync!
 Tutte le directory in sync!
-An exception occured!
+An exception occurred!
 Si è verificato un problema!
 As a result the files are separated into the following categories:
 I file risultano infine ripartiti nelle seguenti categorie:
@@ -266,6 +256,8 @@ Continue
 Continua
 Conversion error:
 Errore di conversione:
+Copy filesystem permissions
+Copia permessi del filesystem
 Copy from left to right
 Copia da sinistra a destra
 Copy from left to right overwriting
@@ -278,16 +270,16 @@ Copy locked files
 Copia file bloccati
 Copy new or updated files to right folder.
 Copia file nuovi o aggiornati nella cartella di destra.
-Copy shared or locked files using Volume Shadow Copy Service
-Copia file condivisi o bloccati usando il servizio Volume Shadow Copy
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+Copia file condivisi o bloccati usando il Servizio Volume Shadow Copy\n(Richiede diritti di Administrator)
 Copy to clipboard\tCTRL+C
 Copia nella clipboard\tCTRL+C
 Copying Symbolic Link %x overwriting %y
-
+Copia Link Simbolico %x sovrascrivendo %y
 Copying Symbolic Link %x to %y
-
+Copia Link Simbolico %x su %y
 Copying file %x overwriting %y
-
+Copia file %x sovrascrivendo %y
 Copying file %x to %y
 Copia di file da %x a %y
 Could not determine volume name for file:
@@ -335,7 +327,7 @@ Cancella o sovrascrivi file definitivamente
 Delete permanently
 Cancella definitivamente
 Deleting Symbolic Link %x
-
+Eliminazione Link Simbolico %x
 Deleting file %x
 Eliminazione file %x
 Deleting folder %x
@@ -345,7 +337,7 @@ Gestione cancellazione
 Description
 Descrizione
 Direct
-
+Diretto
 Directories are dependent! Be careful when setting up synchronization rules:
 Le directory sono dipendenti! Fai attenzione quando configuri le regole di sincronizzazione:
 Directories to watch
@@ -384,6 +376,8 @@ Error
 Errore
 Error changing modification time:
 Errore durante la modifica della data:
+Error copying file permissions:
+Errore durante la copia dei permessi su file:
 Error copying file:
 Errore durante la copia del file:
 Error copying locked file %x!
@@ -418,14 +412,16 @@ Error reading from synchronization database:
 Errore in lettura dal database di sincronizzione:
 Error resolving symbolic link:
 Errore nella risoluzione di collegamento simbolico:
+Error setting directory lock:
+
+Error setting privilege:
+Errore nel settaggio dei privilegi:
 Error starting Volume Shadow Copy Service!
 Errore in avvio del Servizio Volume Shadow Copy!
 Error traversing directory:
 Errore nel percorso della directory:
 Error when monitoring directories.
 Errore durante il monitoraggio directory.
-Error writing file attributes:
-Errore nella scrittura degli attributi file:
 Error writing file:
 Errore durante la scrittura del file:
 Error writing to synchronization database:
@@ -503,7 +499,7 @@ Trova cosa:
 Folder Comparison and Synchronization
 Comparazione di Cartelle e Sincronizzazione
 Follow
-
+Segui
 Free disk space available:
 Spazio libero su disco disponibile:
 FreeFileSync Batch Job
@@ -573,7 +569,7 @@ Identifica e propaga cambiamenti su entrambi i lati usando un database. Cancella
 If you like FFS
 Se ti piace FFS
 Ignore
-
+Ignora
 Ignore 1-hour file time difference
 Ignora la differenza di file time di 1 ora
 Ignore errors
@@ -598,6 +594,8 @@ Initial synchronization:
 Prima sincronizzazione:
 Integrate external applications into context menu. The following macros are available:
 Integra applicazioni esterne nel menu contestuale. Sono disponibili le seguenti macro:
+Invalid FreeFileSync config file!
+File di configurazione FreeFileSync non valido!
 Leave as unresolved conflict
 Lascia come conflitti irrisolti
 Left
@@ -633,7 +631,7 @@ Sposta file in una sotto-cartella datata
 Moving %x to Recycle Bin
 Spostamento di %x nel Cestino
 Moving Symbolic Link %x to user-defined directory %y
-
+Spostamento Link Simbolico %x su directory definita dall'utente %y
 Moving file %x to user-defined directory %y
 Spostamento del file %x nella directory personalizzata %y
 Moving folder %x to user-defined directory %y
@@ -678,7 +676,7 @@ Planned directory deletion is in conflict with its subdirectories and -files!
 La cancellazione della directory pianificata e' in conflitto con queste sottodirectory e files!
 Please run a Compare first before synchronizing!
 Prima di sincronizzare effettua una Comparazione!
-Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI mode.
 Premi \"Switch\" per aprire modalità GUI di FreeFileSync
 Processing folder pair:
 Elaborazione coppia di cartelle:
@@ -704,6 +702,8 @@ Remove folder
 Rimuovi cartella
 Remove folder pair
 Elimina la coppia di cartelle
+Removing abandoned directory lock (%x)...
+
 Report translation error
 Segnala errori di traduzione
 Reset
@@ -794,12 +794,12 @@ Stop
 Stop
 Swap sides
 Inverti i lati
-Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI mode...
 Switch alla modalità GUI di FreeFileSync...
 Symbolic Link handling
-
+Gestione Link Simbolico
 Symlinks %x have the same date but a different target!
-
+Symlinks %x hanno stessa data ma differente target!
 Synchronization Preview
 Anteprima Sincronizzazione
 Synchronization aborted!
@@ -825,7 +825,7 @@ Directory di destinazione già esistente!
 Target file already existing!
 File destinazione già esistente!
 The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-
+La linea di comando è eseguita ogni volta che:\n- tutte le cartelle diventano disponibili (es: inserimento memoria USB)\n- file in queste cartelle o sottocartelle vengono modificati
 The file does not contain a valid configuration:
 Il file non contiene una configurazione valida
 The file was not processed by last synchronization!
@@ -844,6 +844,8 @@ Total required free disk space:
 Spazio libero su disco richiesto:
 Total time:
 Tempo totale:
+Transfer file and directory permissions\n(Requires Administrator rights)
+Trasferisci file e permessi sulle cartelle\n(Richiede diritti di Administrator)
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 Tratta file time che differiscono di esattamente +/- 1 ora come uguali, meno di 1 ora come conflitto per gestire i cambiamenti di Daylight Saving Time
 Unable to connect to sourceforge.net!
@@ -872,6 +874,8 @@ Volume name %x not part of filename %y!
 Il nome volume %x non è parte del nome file %y!
 Waiting for all directories to become available...
 In attesa che tutte le directory siano disponibili...
+Waiting while directory is locked (%x)...
+
 Warning
 Attenzione
 Warning: Synchronization failed for %x item(s):

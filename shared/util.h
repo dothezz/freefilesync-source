@@ -10,7 +10,7 @@
 #include "../shared/zstring.h"
 #include <wx/string.h>
 #include <wx/longlong.h>
-#include "../shared/globalFunctions.h"
+#include "../shared/global_func.h"
 
 class wxComboBox;
 class wxTextCtrl;
@@ -18,7 +18,7 @@ class wxDirPickerCtrl;
 class wxScrolledWindow;
 
 
-namespace FreeFileSync
+namespace ffs3
 {
 wxString formatFilesizeToShortString(const wxLongLong& filesize);
 wxString formatFilesizeToShortString(const wxULongLong& filesize);
@@ -64,20 +64,20 @@ wxString utcTimeToLocalString(const wxLongLong& utcTime); //throw std::runtime_e
 //--------------- inline impelementation -------------------------------------------
 
 //helper function! not to be used directly
-namespace FreeFileSync_Impl
+namespace ffs_Impl
 {
 wxString includeNumberSeparator(const wxString& number);
 }
 
 
-namespace FreeFileSync
+namespace ffs3
 {
 //wxULongLongNative doesn't support operator<<(std::ostream&, wxULongLongNative)
 template <>
 inline
 wxString numberToStringSep(wxULongLongNative number)
 {
-    return FreeFileSync_Impl::includeNumberSeparator(number.ToString());
+    return ffs_Impl::includeNumberSeparator(number.ToString());
 }
 
 
@@ -85,7 +85,7 @@ template <class NumberType>
 inline
 wxString numberToStringSep(NumberType number)
 {
-    return FreeFileSync_Impl::includeNumberSeparator(globalFunctions::numberToString(number));
+    return ffs_Impl::includeNumberSeparator(common::numberToString(number));
 }
 }
 

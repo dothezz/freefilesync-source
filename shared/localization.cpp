@@ -6,15 +6,15 @@
 //
 #include "localization.h"
 #include <wx/msgdlg.h>
-#include "../shared/standardPaths.h"
-#include "../shared/stringConv.h"
-#include "systemConstants.h"
+#include "../shared/standard_paths.h"
+#include "../shared/string_conv.h"
+#include "system_constants.h"
 #include <fstream>
 #include <map>
 #include <wx/ffile.h>
 
-using FreeFileSync::CustomLocale;
-using FreeFileSync::LocalizationInfo;
+using ffs3::CustomLocale;
+using ffs3::LocalizationInfo;
 
 //_("Browse") <- dummy string for wxDirPickerCtrl to be recognized by automatic text extraction!
 
@@ -27,19 +27,19 @@ wxString DECIMAL_POINT       = wxT(".");
 }
 
 
-wxString FreeFileSync::getThousandsSeparator()
+wxString ffs3::getThousandsSeparator()
 {
     return THOUSANDS_SEPARATOR;
 }
 
 
-wxString FreeFileSync::getDecimalPoint()
+wxString ffs3::getDecimalPoint()
 {
     return DECIMAL_POINT;
 }
 
 
-const std::vector<FreeFileSync::LocInfoLine>& LocalizationInfo::getMapping()
+const std::vector<ffs3::LocInfoLine>& LocalizationInfo::getMapping()
 {
     static LocalizationInfo instance;
     return instance.locMapping;
@@ -50,7 +50,7 @@ namespace
 {
 struct CompareByName
 {
-    bool operator()(const FreeFileSync::LocInfoLine& lhs, const FreeFileSync::LocInfoLine& rhs) const
+    bool operator()(const ffs3::LocInfoLine& lhs, const ffs3::LocInfoLine& rhs) const
     {
         return lhs.languageName < rhs.languageName;
     }
@@ -60,7 +60,7 @@ struct CompareByName
 
 LocalizationInfo::LocalizationInfo()
 {
-    FreeFileSync::LocInfoLine newEntry;
+    ffs3::LocInfoLine newEntry;
 
     newEntry.languageID     = wxLANGUAGE_CZECH;
     newEntry.languageName   = wxT("Čeština");
@@ -501,8 +501,8 @@ void CustomLocale::setLanguage(const int language)
     translationDB->clear();
     if (!languageFile.empty())
     {
-        UnicodeFileReader langFile(FreeFileSync::getResourceDir() +  wxT("Languages") +
-                                   zToWx(globalFunctions::FILE_NAME_SEPARATOR) + languageFile);
+        UnicodeFileReader langFile(ffs3::getResourceDir() +  wxT("Languages") +
+                                   zToWx(common::FILE_NAME_SEPARATOR) + languageFile);
         if (langFile.isOkay())
         {
             int rowNumber = 0;

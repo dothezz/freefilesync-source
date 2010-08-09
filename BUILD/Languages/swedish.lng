@@ -1,21 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE
- Byte
- Byte
- GB
- GB
- MB
- MB
- day(s)
- dag(ar)
- hour(s)
- timma(r)
- kB
- kB
- min
- min.
- sec
- sek.
 %x / %y objects deleted successfully
 %x / %y objekt borttagna
 %x Byte
@@ -28,18 +12,24 @@
 %x PB
 %x TB
 %x TB
+%x day(s)
+%x dag(ar)
 %x directories
 %x kataloger
 %x files
 %x filer
-%x is not a valid FreeFileSync batch file!
-%x är ingen giltig FreeFileSync batch-fil!
+%x hour(s)
+%x timma(r)
 %x kB
 %x kB
+%x min
+%x min
 %x of %y rows in view
 %x rader av %y i vyn
 %x of 1 row in view
 %x av 1 rad i vyn
+%x sec
+%x sek
 %x%
 %x%
 &Abort
@@ -182,7 +172,7 @@ Add folder pair
 Lägg till katalogpar
 All directories in sync!
 Alla kataloger synkade!
-An exception occured!
+An exception occurred!
 Ett undantag inträffade!
 As a result the files are separated into the following categories:
 Som ett resultat blir filerna separerade i följande kategorier:
@@ -266,6 +256,8 @@ Continue
 Fortsätt
 Conversion error:
 Konversionsfel:
+Copy filesystem permissions
+Kopiera filsystembehörigheter
 Copy from left to right
 Kopiera från vänster till höger 
 Copy from left to right overwriting
@@ -278,8 +270,8 @@ Copy locked files
 Kopiera låsta filer
 Copy new or updated files to right folder.
 Kopiera nya och uppdaterade filer till höger katalog.
-Copy shared or locked files using Volume Shadow Copy Service
-Använd Volume Shadow Copy Service för att kopiera låsta eller delade filer
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+Kopiera delade eller låsta filer med hjälp av Volume Shadow Copy Service\n(Kräver administratörsrättighet)
 Copy to clipboard\tCTRL+C
 Kopiera till urklipp\tCTRL+C
 Copying Symbolic Link %x overwriting %y
@@ -384,6 +376,8 @@ Error
 Fel
 Error changing modification time:
 Kan inte modifiera tidsstämpel:
+Error copying file permissions:
+Kan inte kopiera filsystembehörighet:
 Error copying file:
 Kan inte kopiera fil:
 Error copying locked file %x!
@@ -418,14 +412,14 @@ Error reading from synchronization database:
 Kan inte läsa från databasen:
 Error resolving symbolic link:
 Kan inte tyda symbolisk länk:
+Error setting privilege:
+Kan inte ange privilegie:
 Error starting Volume Shadow Copy Service!
 Kan inte starta 'Volume Shadow Copy Service'!
 Error traversing directory:
 Accessfel på katalog:
 Error when monitoring directories.
 Fel vid övervakning av kataloger.
-Error writing file attributes:
-Kan inte skriva filattribut:
 Error writing file:
 Kan inte skriva fil:
 Error writing to synchronization database:
@@ -598,6 +592,8 @@ Initial synchronization:
 Initial synkronisering:
 Integrate external applications into context menu. The following macros are available:
 Integrera externa program i högerklicksmeny. Följande variabler finns tillgängliga:
+Invalid FreeFileSync config file!
+Felaktig FreeFileSync konfigurationsfil!
 Leave as unresolved conflict
 Ignorera konflikt
 Left
@@ -678,7 +674,7 @@ Planned directory deletion is in conflict with its subdirectories and -files!
 Planerad katalogborttagning är i konflikt med sina underkataloger och filer
 Please run a Compare first before synchronizing!
 Du måste trycka \"Jämför\" innan du kan synkronisera. 
-Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI mode.
 Tryck på \"Växla\" för att öppna FreeFileSyncs grafiska läge
 Processing folder pair:
 Processar katalogpar:
@@ -794,7 +790,7 @@ Stop
 Stopp
 Swap sides
 Byt sida
-Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI mode...
 Växlar till FreeFileSyncs grafiska läge
 Symbolic Link handling
 Hantering av Symboliska länkar
@@ -844,6 +840,8 @@ Total required free disk space:
 Ledigt diskutrymme som krävs:
 Total time:
 Total tid:
+Transfer file and directory permissions\n(Requires Administrator rights)
+Överför fil- och katalogrättigheter\n(Kräver administratörsrättigheter)
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 Betrakta tidsstämplar som skiljer exakt +/- 1 timme som lika, och mindre än 1 timme som konflikt, för att hantera sommartid
 Unable to connect to sourceforge.net!

@@ -1,21 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
- Byte
- Byte
- GB
- GB
- MB
- MB
- day(s)
- dia(s)
- hour(s)
- hora(s)
- kB
- kB
- min
- min
- sec
- seg
 %x / %y objects deleted successfully
 %x / %y objectos eliminados com sucesso
 %x Byte
@@ -28,18 +12,24 @@
 
 %x TB
 
+%x day(s)
+
 %x directories
 %x pastas
 %x files
 %x ficheiros
-%x is not a valid FreeFileSync batch file!
-%x não é um batch válido do FreeFileSync!
+%x hour(s)
+
 %x kB
+
+%x min
 
 %x of %y rows in view
 %x de %y ficheiros
 %x of 1 row in view
 %x de 1 linha
+%x sec
+
 %x%
 
 &Abort
@@ -182,7 +172,7 @@ Add folder pair
 Adicionar um par de pastas
 All directories in sync!
 Todas as pastas sincronizadas!
-An exception occured!
+An exception occurred!
 Ocorreu uma excepção!
 As a result the files are separated into the following categories:
 Como resultado, os ficheiros foram separados nas seguintes categorias:
@@ -266,6 +256,8 @@ Continue
 Continuar
 Conversion error:
 Erro de conversão:
+Copy filesystem permissions
+
 Copy from left to right
 Copiar da esquerda para a direita
 Copy from left to right overwriting
@@ -278,8 +270,8 @@ Copy locked files
 Copiar ficheiros bloqueados
 Copy new or updated files to right folder.
 Copiar ficheiros novos ou actualizados para a direita
-Copy shared or locked files using Volume Shadow Copy Service
-Copiar ficheiros partilhados ou bloqueados usando o serviço Volume Shadow Copy
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+
 Copy to clipboard\tCTRL+C
 Copiar para a Área de transferência\tCTRL+C
 Copying Symbolic Link %x overwriting %y
@@ -384,6 +376,8 @@ Error
 Erro
 Error changing modification time:
 Erro ao mudar a hora de modificação:
+Error copying file permissions:
+
 Error copying file:
 Erro ao copiar ficheiro:
 Error copying locked file %x!
@@ -418,14 +412,14 @@ Error reading from synchronization database:
 Erro ao ler a base de dados de sincronização:
 Error resolving symbolic link:
 Erro na resolução do link simbólico:
+Error setting privilege:
+
 Error starting Volume Shadow Copy Service!
 Erro ao iniciar o serviço Volume Shadow Copy!
 Error traversing directory:
 Erro ao percorrer a pasta:
 Error when monitoring directories.
 Erro ao monitorizar os directórios.
-Error writing file attributes:
-Erro na escrita dos atributos do ficheiro:
 Error writing file:
 Erro de escrita no ficheiro:
 Error writing to synchronization database:
@@ -598,6 +592,8 @@ Initial synchronization:
 Sincronização inicial:
 Integrate external applications into context menu. The following macros are available:
 Integrar aplicações externas no menu de contexto. As seguintes macros estão disponíveis:
+Invalid FreeFileSync config file!
+
 Leave as unresolved conflict
 Deixar como conflito
 Left
@@ -678,7 +674,7 @@ Planned directory deletion is in conflict with its subdirectories and -files!
 
 Please run a Compare first before synchronizing!
 Use Comparar antes da primeira sincronização!
-Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI mode.
 
 Processing folder pair:
 A processar o par do directorio:
@@ -794,7 +790,7 @@ Stop
 Parar
 Swap sides
 Trocar lados
-Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI mode...
 
 Symbolic Link handling
 
@@ -844,6 +840,8 @@ Total required free disk space:
 Espaço livre necessário:
 Total time:
 Tempo total:
+Transfer file and directory permissions\n(Requires Administrator rights)
+
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 Tratar ficheiros com exactamente +/- 1 hora como iguais, e menos de 1 hora como conflito, para salvaguardar a alteração da Hora de Verão
 Unable to connect to sourceforge.net!

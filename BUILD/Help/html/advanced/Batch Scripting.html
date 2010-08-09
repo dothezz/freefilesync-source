@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20100418;14135000">
+	<META NAME="CHANGED" CONTENT="20100807;21103000">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -17,6 +17,7 @@
 		H3 { margin-bottom: 0.21cm }
 		H3.western { font-family: "Arial", sans-serif }
 		H3.cjk { font-family: "MS Mincho" }
+		H3.ctl { font-family: "Mangal" }
 		A:link { so-language: zxx }
 	-->
 	</STYLE>
@@ -34,8 +35,9 @@ some general hints for custom *.cmd and *.bat files.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B>
-(A simple locking facility when sync'ing with multiple computers in
-parallel)</FONT></P>
+A simple locking facility &ndash; (<SPAN STYLE="font-style: normal"><B>Note:</B></SPAN><I>
+FreeFileSync already has a more powerful directory locking mechanism
+implemented that allows multiple writers in parallel</I>)</FONT></P>
 <UL>
 	<P><SPAN ID="Rahmen5" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
 		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
@@ -68,7 +70,7 @@ parallel)</FONT></P>
 		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
 		<FONT FACE="Courier New, monospace">wscript C:\Program
 		files\FreeFileSync\Invisible.vbs C:\MyBatchFile.cmd</FONT></P>
-	</SPAN><BR CLEAR=LEFT><FONT COLOR="#808080">&nbsp;</FONT>
+	</SPAN><BR CLEAR=LEFT><FONT COLOR="#808080">&nbsp;</FONT> 
 	</P>
 </OL>
 <OL START=3>
@@ -80,8 +82,8 @@ parallel)</FONT></P>
 		Files\FreeFileSync\FreeFileSync.exe&quot;
 		&quot;H:\Silent_Config.ffs_batch&quot;<BR>if not errorlevel 0
 		(<BR>&nbsp;&nbsp;</FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B>::if
-		something went wrong, add special treatment here<BR></B></I></FONT></FONT><FONT COLOR="#000000"><FONT FACE="Courier New, monospace"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">&nbsp;&nbsp;echo
-		Errors occurred during synchronization...</SPAN></SPAN></FONT></FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B><BR></B></I></FONT></FONT><FONT FACE="Courier New, monospace">&nbsp;&nbsp;pause<BR>)</FONT></P>
+		something went wrong, add special treatment here<BR></B></I></FONT></FONT><FONT COLOR="#000000">&nbsp;&nbsp;</FONT><FONT COLOR="#000000"><FONT FACE="Courier New, monospace"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">echo
+		Errors occurred during synchronization...</SPAN></SPAN></FONT></FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B><BR></B></I></FONT></FONT>&nbsp;&nbsp;<FONT FACE="Courier New, monospace">pause<BR>)</FONT></P>
 	</SPAN><BR CLEAR=LEFT>
 	</P>
 </OL>

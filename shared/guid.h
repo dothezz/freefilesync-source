@@ -10,7 +10,7 @@
 #include <wx/stream.h>
 #include <boost/shared_ptr.hpp>
 
-namespace Utility
+namespace util
 {
 class UniqueId
 {
@@ -27,7 +27,6 @@ private:
     struct IntData;
     boost::shared_ptr<IntData> pData;
 };
-
 }
 
 

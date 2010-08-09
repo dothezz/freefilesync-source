@@ -5,35 +5,36 @@
 // **************************************************************************
 //
 #include "application.h"
-#include "ui/mainDialog.h"
+#include "ui/main_dlg.h"
 #include <wx/msgdlg.h>
 #include "comparison.h"
 #include "algorithm.h"
 #include "synchronization.h"
 #include <memory>
-#include "ui/batchStatusHandler.h"
-#include "ui/checkVersion.h"
+#include "ui/batch_status_handler.h"
+#include "ui/check_version.h"
 #include "library/filter.h"
 #include <wx/file.h>
-#include "shared/xmlBase.h"
+#include "shared/xml_base.h"
 #include "library/resources.h"
-#include "ui/switchToGui.h"
-#include "shared/standardPaths.h"
+#include "ui/switch_to_gui.h"
+#include "shared/standard_paths.h"
 #include "shared/localization.h"
-#include "shared/appMain.h"
+#include "shared/app_main.h"
 #include <wx/sound.h>
-#include "shared/fileHandling.h"
-#include "shared/stringConv.h"
+#include "shared/file_handling.h"
+#include "shared/string_conv.h"
 
 #ifdef FFS_LINUX
 #include <gtk/gtk.h>
 #endif
 
-using FreeFileSync::CustomLocale;
-using FreeFileSync::SwitchToGui;
+using ffs3::CustomLocale;
+using ffs3::SwitchToGui;
 
 
 IMPLEMENT_APP(Application)
+
 
 bool Application::OnInit()
 {
@@ -50,7 +51,7 @@ bool Application::OnInit()
 
 void Application::OnStartApplication(wxIdleEvent&)
 {
-    using namespace FreeFileSync;
+    using namespace ffs3;
 
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), NULL, this);
 
@@ -63,7 +64,7 @@ void Application::OnStartApplication(wxIdleEvent&)
 
         ~HandleAppExit()
         {
-            if (!FreeFileSync::AppMainWindow::mainWindowWasSet())
+            if (!ffs3::AppMainWindow::mainWindowWasSet())
                 wxTheApp->ExitMainLoop(); //quit application, if no main window was set (batch silent mode)
         }
 
@@ -74,7 +75,7 @@ void Application::OnStartApplication(wxIdleEvent&)
     SetAppName(wxT("FreeFileSync"));
 
 #ifdef FFS_LINUX
-    ::gtk_rc_parse(FreeFileSync::wxToZ(FreeFileSync::getResourceDir()) + "styles.rc"); //remove inner border from bitmap buttons
+    ::gtk_rc_parse(ffs3::wxToZ(ffs3::getResourceDir()) + "styles.rc"); //remove inner border from bitmap buttons
 #endif
 
 
@@ -104,16 +105,16 @@ void Application::OnStartApplication(wxIdleEvent&)
     try //load global settings from XML
     {
         if (fileExists(wxToZ(xmlAccess::getGlobalConfigFile())))
-            xmlAccess::readGlobalSettings(globalSettings);
+            xmlAccess::readConfig(globalSettings);
         //else: globalSettings already has default values
     }
     catch (const xmlAccess::XmlError& error)
     {
         //show messagebox and continue
         if (error.getSeverity() == xmlAccess::XmlError::WARNING)
-            ; //wxMessageBox(error.show(), _("Warning"), wxOK | wxICON_WARNING); -> ignore parsing errors: should be migration problems only *cross-fingers*
+            ; //wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING); -> ignore parsing errors: should be migration problems only *cross-fingers*
         else
-            wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
     }
 
     //set program language
@@ -161,10 +162,10 @@ int Application::OnRun()
     catch (const std::exception& e) //catch all STL exceptions
     {
         //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
-        wxFile safeOutput(FreeFileSync::getConfigDir() + wxT("LastError.txt"), wxFile::write);
+        wxFile safeOutput(ffs3::getConfigDir() + wxT("LastError.txt"), wxFile::write);
         safeOutput.Write(wxString::FromAscii(e.what()));
 
-        wxMessageBox(wxString::FromAscii(e.what()), _("An exception occured!"), wxOK | wxICON_ERROR);
+        wxMessageBox(wxString::FromAscii(e.what()), _("An exception occurred!"), wxOK | wxICON_ERROR);
         return -9;
     }
 
@@ -179,11 +180,11 @@ int Application::OnExit()
 
     try //save global settings to XML
     {
-        xmlAccess::writeGlobalSettings(globalSettings);
+        xmlAccess::writeConfig(globalSettings);
     }
     catch (const xmlAccess::XmlError& error)
     {
-        wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
     }
 
     return 0;
@@ -205,18 +206,18 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
     xmlAccess::XmlBatchConfig batchCfg;  //structure to receive gui settings
     try
     {
-        xmlAccess::readBatchConfig(filename, batchCfg);
+        xmlAccess::readConfig(filename, batchCfg);
     }
     catch (const xmlAccess::XmlError& error)
     {
-        wxMessageBox(error.show(), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
         return;
     }
     //all settings have been read successfully...
 
     //regular check for program updates -> disabled for batch
     //if (!batchCfg.silent)
-    //    FreeFileSync::checkForUpdatePeriodically(globSettings.lastUpdateCheck);
+    //    ffs3::checkForUpdatePeriodically(globSettings.lastUpdateCheck);
 
     try //begin of synchronization process (all in one try-catch block)
     {
@@ -230,14 +231,14 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
             statusHandler.reset(new BatchStatusHandler(false, filename, NULL, batchCfg.handleError, switchBatchToGui, returnValue));
 
         //COMPARE DIRECTORIES
-        FreeFileSync::FolderComparison folderCmp;
-        FreeFileSync::CompareProcess comparison(batchCfg.mainCfg.handleSymlinks,
-                                                batchCfg.mainCfg.hidden.fileTimeTolerance,
+        ffs3::FolderComparison folderCmp;
+        ffs3::CompareProcess comparison(batchCfg.mainCfg.handleSymlinks,
+                                                globSettings.fileTimeTolerance,
                                                 globSettings.ignoreOneHourDiff,
                                                 globSettings.optDialogs,
                                                 statusHandler.get());
 
-        comparison.startCompareProcess(FreeFileSync::extractCompareCfg(batchCfg.mainCfg),
+        comparison.startCompareProcess(ffs3::extractCompareCfg(batchCfg.mainCfg),
                                        batchCfg.mainCfg.compareVar,
                                        folderCmp);
 
@@ -249,23 +250,24 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         }
 
         //START SYNCHRONIZATION
-        FreeFileSync::SyncProcess synchronization(
+        ffs3::SyncProcess synchronization(
             globSettings.optDialogs,
-            batchCfg.mainCfg.hidden.verifyFileCopy,
+            globSettings.verifyFileCopy,
             globSettings.copyLockedFiles,
+            globSettings.copyFilePermissions,
             *statusHandler);
 
-        const std::vector<FreeFileSync::FolderPairSyncCfg> syncProcessCfg = FreeFileSync::extractSyncCfg(batchCfg.mainCfg);
+        const std::vector<ffs3::FolderPairSyncCfg> syncProcessCfg = ffs3::extractSyncCfg(batchCfg.mainCfg);
         assert(syncProcessCfg.size() == folderCmp.size());
 
         synchronization.startSynchronizationProcess(syncProcessCfg, folderCmp);
 
         //play (optional) sound notification after sync has completed (GUI and batch mode)
-        const wxString soundFile = FreeFileSync::getResourceDir() + wxT("Sync_Complete.wav");
-        if (FreeFileSync::fileExists(FreeFileSync::wxToZ(soundFile)))
+        const wxString soundFile = ffs3::getResourceDir() + wxT("Sync_Complete.wav");
+        if (ffs3::fileExists(ffs3::wxToZ(soundFile)))
             wxSound::Play(soundFile, wxSOUND_ASYNC);
     }
-    catch (FreeFileSync::AbortThisProcess&)  //exit used by statusHandler
+    catch (ffs3::AbortThisProcess&)  //exit used by statusHandler
     {
         if (returnValue >= 0)
             returnValue = -12;

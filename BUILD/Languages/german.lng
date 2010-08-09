@@ -1,13 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE
- day(s)
- Tag(e)
- hour(s)
- Stunde(n)
- min
- Min.
- sec
- Sek.
 %x / %y objects deleted successfully
 %x von %y Objekten erfolgreich gelöscht
 %x Byte
@@ -20,18 +12,24 @@
 %x PB
 %x TB
 %x TB
+%x day(s)
+%x Tag(e)
 %x directories
 %x Verzeichnisse
 %x files
 %x Dateien
-%x is not a valid FreeFileSync batch file!
-%x ist keine gültige FreeFileSync-Batchdatei!
+%x hour(s)
+%x Stunde(n)
 %x kB
 %x kB
+%x min
+%x Min.
 %x of %y rows in view
 %x von %y Zeilen zur Ansicht
 %x of 1 row in view
 %x von 1 Zeile zur Ansicht
+%x sec
+%x Sek.
 %x%
 %x%
 &Abort
@@ -174,7 +172,7 @@ Add folder pair
 Verzeichnispaar hinzufügen
 All directories in sync!
 Alle Verzeichnisse sind synchron!
-An exception occured!
+An exception occurred!
 Eine Ausnahme ist aufgetreten!
 As a result the files are separated into the following categories:
 Das Ergebnis ist eine Aufteilung in folgende Kategorien:
@@ -258,6 +256,8 @@ Continue
 Fortfahren
 Conversion error:
 Fehler bei Konvertierung:
+Copy filesystem permissions
+Dateisystemberechtigungen kopieren
 Copy from left to right
 Von links nach rechts kopieren
 Copy from left to right overwriting
@@ -270,8 +270,8 @@ Copy locked files
 Gesperrte Dateien kopieren
 Copy new or updated files to right folder.
 Neue oder aktualisierte Dateien vom linken in das rechte Verzeichnis kopieren.
-Copy shared or locked files using Volume Shadow Copy Service
-Gesperrte oder gemeinsam verwendete Dateien mit Hilfe des Volume Shadow Copy Service kopieren
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+Kopiere gesperrte Dateien mit Hilfe des Volume Shadow Copy Service\n(Benötigt Administratorrechte)
 Copy to clipboard\tCTRL+C
 In die Zwischenablage kopieren\tCTRL+C
 Copying Symbolic Link %x overwriting %y
@@ -376,6 +376,8 @@ Error
 Fehler
 Error changing modification time:
 Fehler beim Setzen der Dateiänderungszeit:
+Error copying file permissions:
+Fehler beim Kopieren der Dateiberechtigungen:
 Error copying file:
 Fehler beim Kopieren der Datei:
 Error copying locked file %x!
@@ -410,14 +412,14 @@ Error reading from synchronization database:
 Fehler beim Lesen der Synchronisationsdatenbank:
 Error resolving symbolic link:
 Fehler beim Auflösen des Symbolischen Links:
+Error setting privilege:
+Fehler beim Setzen des Privilegs:
 Error starting Volume Shadow Copy Service!
 Fehler beim Starten des Volume Shadow Copy Service!
 Error traversing directory:
 Fehler beim Durchsuchen des Verzeichnisses:
 Error when monitoring directories.
 Fehler beim Überwachen der Verzeichnisse.
-Error writing file attributes:
-Fehler beim Schreiben der Dateiattribute:
 Error writing file:
 Fehler beim Schreiben der Datei:
 Error writing to synchronization database:
@@ -590,6 +592,8 @@ Initial synchronization:
 Erstmalige Synchronisation:
 Integrate external applications into context menu. The following macros are available:
 Integriert externe Anwendungen in das Kontextmenu. Die folgenden Makros stehen zur Verfügung:
+Invalid FreeFileSync config file!
+Ungültige FreeFileSync Konfigurationsdatei!
 Leave as unresolved conflict
 Als unbehandelten Konflikt belassen
 Left
@@ -670,7 +674,7 @@ Planned directory deletion is in conflict with its subdirectories and -files!
 Das geplante Löschen des Verzeichnisses steht in Konflikt mit seinen Unterverzeichnissen und -dateien
 Please run a Compare first before synchronizing!
 Vor der Synchronisation bitte zuerst einen Vergleich ausführen!
-Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI mode.
 \"Wechseln\" öffnet FreeFileSync in der graphischen Ansicht.
 Processing folder pair:
 Bearbeite Verzeichnispaar:
@@ -786,7 +790,7 @@ Stop
 Stop
 Swap sides
 Seiten vertauschen
-Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI mode...
 Wechsle in die graphische Ansicht...
 Symbolic Link handling
 Verwendung Symbolischer Links
@@ -836,6 +840,8 @@ Total required free disk space:
 Insgesamt benötigter freier Speicherplatz:
 Total time:
 Gesamtzeit:
+Transfer file and directory permissions\n(Requires Administrator rights)
+Übertrage Datei- und Verzeichnisberechtigungen\n(Benötigt Administratorrechte)
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 Betrachte Dateizeiten mit einer Differenz von genau +/- einer Stunde als gleich, mit weniger als einer Stunde als Konflikt, um Zeitumstellungen richtig zu behandeln
 Unable to connect to sourceforge.net!

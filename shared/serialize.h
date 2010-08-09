@@ -9,11 +9,11 @@
 
 #include "zstring.h"
 #include <wx/stream.h>
-#include "fileError.h"
+#include "file_error.h"
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
 
-namespace Utility
+namespace util
 {
 template <class T>
 T readNumber(wxInputStream& stream);

@@ -1,21 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
- Byte
- Byte
- GB
- GB
- MB
- MB
- day(s)
- dia(s)
- hour(s)
- hora(s)
- kB
- kB
- min
- min
- sec
- seg
 %x / %y objects deleted successfully
 %x / %y objetos apagados com sucesso
 %x Byte
@@ -28,18 +12,24 @@
 %x PB
 %x TB
 %x TB
+%x day(s)
+%x dia(s)
 %x directories
 %x diretórios
 %x files
 %x arquivos
-%x is not a valid FreeFileSync batch file!
-%x não é um arquivo batch válido do FreeFileSync!
+%x hour(s)
+%x hora(s)
 %x kB
 %x kB
+%x min
+%x min
 %x of %y rows in view
 %x de %y arquivos
 %x of 1 row in view
 %x de 1 linha
+%x sec
+%x seg
 %x%
 %x%
 &Abort
@@ -182,7 +172,7 @@ Add folder pair
 Adicionar par de pastas
 All directories in sync!
 Todos os diretórios em sincronismo!
-An exception occured!
+An exception occurred!
 Ocorreu uma exceção!
 As a result the files are separated into the following categories:
 Como resultado, os arquivos são separados nas seguintes categorias:
@@ -266,6 +256,8 @@ Continue
 Continuar
 Conversion error:
 Erro de conversão:
+Copy filesystem permissions
+Copiar permissões de arquivos e diretórios
 Copy from left to right
 Copiar da esquerda para a direita
 Copy from left to right overwriting
@@ -278,8 +270,8 @@ Copy locked files
 Copiar arquivos bloqueados (em uso)
 Copy new or updated files to right folder.
 Copiar arquivos novos ou atualizados para a pasta da direita
-Copy shared or locked files using Volume Shadow Copy Service
-Copiar arquivos compartilhados ou bloqueados usando o Serviço de Cópias de Sombra de Volume
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+Copiar arquivos compartilhados ou bloqueados (em uso) usando o Serviço de Cópias de Sombra de Volume\n(Requer direitos de Administrador)
 Copy to clipboard\tCTRL+C
 Copiar para a Área de transferência\tCTRL+C
 Copying Symbolic Link %x overwriting %y
@@ -384,6 +376,8 @@ Error
 Erro
 Error changing modification time:
 Erro ao mudar a hora de modificação:
+Error copying file permissions:
+Erro ao copiar permissões do arquivo:
 Error copying file:
 Erro ao copiar arquivo:
 Error copying locked file %x!
@@ -418,14 +412,16 @@ Error reading from synchronization database:
 Erro ao ler do banco de dados de sincronização:
 Error resolving symbolic link:
 Erro na resolução de link simbólico:
+Error setting directory lock:
+
+Error setting privilege:
+Erro ao definir privilégio:
 Error starting Volume Shadow Copy Service!
 Erro ao inicializar o Serviço de Cópias de Sombra de Volume!
 Error traversing directory:
 Erro ao percorrer diretório:
 Error when monitoring directories.
 Erro monitorando diretórios.
-Error writing file attributes:
-Erro ao escrever atributos do arquivo:
 Error writing file:
 Erro ao escrever arquivo:
 Error writing to synchronization database:
@@ -598,6 +594,8 @@ Initial synchronization:
 Sincronização inicial:
 Integrate external applications into context menu. The following macros are available:
 Integrar aplicações externas no menu de contexto. As seguintes macros estão disponíveis:
+Invalid FreeFileSync config file!
+Arquivo de configuração do FreeFileSync inválido!
 Leave as unresolved conflict
 Deixar como conflito não resolvido
 Left
@@ -678,7 +676,7 @@ Planned directory deletion is in conflict with its subdirectories and -files!
 O diretório a ser apagado está em conflito com seus subdiretórios e -arquivos! 
 Please run a Compare first before synchronizing!
 Por favor execute primeiro a Comparação antes de sincronizar!
-Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI mode.
 Pressione \"Alterar\" para abrir o modo GUI do FreeFileSync.
 Processing folder pair:
 Processando par de pastas:
@@ -704,6 +702,8 @@ Remove folder
 Remover pasta
 Remove folder pair
 Remover par de pastas
+Removing abandoned directory lock (%x)...
+
 Report translation error
 Reportar erro de tradução
 Reset
@@ -794,7 +794,7 @@ Stop
 Parar
 Swap sides
 Inverter lados
-Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI mode...
 Alterando para o modo GUI do FreeFileSync...
 Symbolic Link handling
 Tratamento de Links Simbólicos
@@ -844,8 +844,10 @@ Total required free disk space:
 Espaço livre total requerido:
 Total time:
 Tempo total:
+Transfer file and directory permissions\n(Requires Administrator rights)
+Transferir permissões de arquivos e diretórios\n(Requer direitos de Administrador)
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-Tratar tempo dos arquivos que diferem exatamente por +/- 1 hora como igual, menor que 1 hora como conflito para lidar com mudanças de Horário de Verão
+Tratar tempo dos arquivos que diferem exatamente por mais ou menos 1 hora como igual e menor que 1 hora como conflito para lidar com mudanças de Horário de Verão
 Unable to connect to sourceforge.net!
 Não foi possível conectar a sourceforge.net!
 Unable to create logfile!
@@ -872,6 +874,8 @@ Volume name %x not part of filename %y!
 Nome do volume %x não é parte do arquivo %y!
 Waiting for all directories to become available...
 Esperando que todos os diretóricos fiquem disponíveis...
+Waiting while directory is locked (%x)...
+
 Warning
 Atenção
 Warning: Synchronization failed for %x item(s):

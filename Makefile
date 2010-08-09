@@ -5,8 +5,8 @@ BINDIR = $(DESTDIR)$(prefix)/bin
 SHAREDIR = $(DESTDIR)$(prefix)/share
 APPSHAREDIR = $(SHAREDIR)/$(APPNAME)
 
-FFS_CPPFLAGS=-Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -DZSTRING_CHAR -O3 -pthread -c -Ishared/boost_1_x
-LINKFLAGS=`wx-config --libs --debug=no --unicode=yes` -O3 -pthread
+FFS_CPPFLAGS=-Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -DZSTRING_CHAR -O3 -pthread -c
+LINKFLAGS=`wx-config --libs --debug=no --unicode=yes` -lboost_thread -O3 -pthread
 
 #support for GTKMM
 FFS_CPPFLAGS+=`pkg-config --cflags gtkmm-2.4`
@@ -17,58 +17,58 @@ FILE_LIST+=structures.cpp
 FILE_LIST+=algorithm.cpp
 FILE_LIST+=comparison.cpp
 FILE_LIST+=synchronization.cpp
-FILE_LIST+=fileHierarchy.cpp
+FILE_LIST+=file_hierarchy.cpp
 FILE_LIST+=application.cpp
-FILE_LIST+=ui/guiGenerated.cpp
+FILE_LIST+=ui/gui_generated.cpp
 FILE_LIST+=shared/util.cpp
-FILE_LIST+=ui/gridView.cpp
-FILE_LIST+=ui/mainDialog.cpp
-FILE_LIST+=ui/batchConfig.cpp
-FILE_LIST+=ui/syncConfig.cpp
-FILE_LIST+=ui/checkVersion.cpp
-FILE_LIST+=ui/batchStatusHandler.cpp
-FILE_LIST+=ui/guiStatusHandler.cpp
-FILE_LIST+=ui/trayIcon.cpp
+FILE_LIST+=ui/grid_view.cpp
+FILE_LIST+=ui/main_dlg.cpp
+FILE_LIST+=ui/batch_config.cpp
+FILE_LIST+=ui/sync_cfg.cpp
+FILE_LIST+=ui/check_version.cpp
+FILE_LIST+=ui/batch_status_handler.cpp
+FILE_LIST+=ui/gui_status_handler.cpp
+FILE_LIST+=ui/tray_icon.cpp
 FILE_LIST+=ui/search.cpp
-FILE_LIST+=ui/switchToGui.cpp
-FILE_LIST+=ui/messagePopup.cpp
-FILE_LIST+=ui/progressIndicator.cpp
-FILE_LIST+=library/customGrid.cpp
-FILE_LIST+=library/errorLogging.cpp
-FILE_LIST+=library/statusHandler.cpp
+FILE_LIST+=ui/switch_to_gui.cpp
+FILE_LIST+=ui/msg_popup.cpp
+FILE_LIST+=ui/progress_indicator.cpp
+FILE_LIST+=library/custom_grid.cpp
+FILE_LIST+=library/error_log.cpp
+FILE_LIST+=library/status_handler.cpp
 FILE_LIST+=library/resources.cpp
-FILE_LIST+=ui/smallDialogs.cpp
-FILE_LIST+=library/processXml.cpp
-FILE_LIST+=library/iconBuffer.cpp
+FILE_LIST+=ui/small_dlgs.cpp
+FILE_LIST+=library/process_xml.cpp
+FILE_LIST+=library/icon_buffer.cpp
 FILE_LIST+=library/statistics.cpp
 FILE_LIST+=library/filter.cpp
 FILE_LIST+=library/binary.cpp
-FILE_LIST+=library/dbFile.cpp
+FILE_LIST+=library/db_file.cpp
+FILE_LIST+=library/dir_lock.cpp
 FILE_LIST+=shared/localization_no_BOM.cpp
-FILE_LIST+=shared/fileIO.cpp
-FILE_LIST+=shared/dragAndDrop.cpp
+FILE_LIST+=shared/file_io.cpp
+FILE_LIST+=shared/drag_n_drop.cpp
 FILE_LIST+=shared/guid.cpp
-FILE_LIST+=shared/checkExist.cpp
-FILE_LIST+=shared/parallelCall.cpp
+FILE_LIST+=shared/check_exist.cpp
 FILE_LIST+=shared/tinyxml/tinyxml.cpp
 FILE_LIST+=shared/tinyxml/tinyxmlerror.cpp
 FILE_LIST+=shared/tinyxml/tinyxmlparser.cpp
-FILE_LIST+=shared/globalFunctions.cpp
-FILE_LIST+=shared/systemFunctions.cpp
-FILE_LIST+=shared/customTooltip.cpp
-FILE_LIST+=shared/fileHandling.cpp
-FILE_LIST+=shared/fileTraverser.cpp
-FILE_LIST+=shared/standardPaths.cpp
+FILE_LIST+=shared/global_func.cpp
+FILE_LIST+=shared/system_func.cpp
+FILE_LIST+=shared/custom_tooltip.cpp
+FILE_LIST+=shared/file_handling.cpp
+FILE_LIST+=shared/file_traverser.cpp
+FILE_LIST+=shared/standard_paths.cpp
 FILE_LIST+=shared/zstring.cpp
-FILE_LIST+=shared/xmlBase.cpp
-FILE_LIST+=shared/appMain.cpp
-FILE_LIST+=shared/customButton.cpp
-FILE_LIST+=shared/toggleButton.cpp
-FILE_LIST+=shared/customComboBox.cpp
+FILE_LIST+=shared/xml_base.cpp
+FILE_LIST+=shared/app_main.cpp
+FILE_LIST+=shared/custom_button.cpp
+FILE_LIST+=shared/toggle_button.cpp
+FILE_LIST+=shared/custom_combo_box.cpp
 FILE_LIST+=shared/serialize.cpp
-FILE_LIST+=shared/fileID.cpp
+FILE_LIST+=shared/file_id.cpp
 FILE_LIST+=shared/recycler.cpp
-FILE_LIST+=shared/helpProvider.cpp
+FILE_LIST+=shared/help_provider.cpp
 
 #list of all *.o files
 OBJECT_LIST=$(foreach file, $(FILE_LIST), OBJ/$(subst .cpp,.o,$(notdir $(file))))
@@ -83,8 +83,8 @@ init:
 	if [ ! -d OBJ ]; then mkdir OBJ; fi
 
 #remove byte ordering mark: needed by Visual C++ but an error with GCC
-removeBOM: tools/removeBOM.cpp
-	g++ -o OBJ/removeBOM tools/removeBOM.cpp 
+removeBOM: tools/remove_BOM.cpp
+	g++ -o OBJ/removeBOM tools/remove_BOM.cpp 
 	./OBJ/removeBOM shared/localization.cpp shared/localization_no_BOM.cpp
 
 %.dep : %.cpp 

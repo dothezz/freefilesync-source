@@ -7,10 +7,10 @@
 #ifndef RECYCLER_H_INCLUDED
 #define RECYCLER_H_INCLUDED
 
-#include "fileError.h"
+#include "file_error.h"
 #include "zstring.h"
 
-namespace FreeFileSync
+namespace ffs3
 {
 /*
 --------------------

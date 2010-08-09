@@ -10,14 +10,14 @@
 #include <set>
 #include <stdexcept>
 #include <vector>
-#include "../shared/systemConstants.h"
+#include "../shared/system_constants.h"
 #include "../structures.h"
 #include <boost/bind.hpp>
 #include "../shared/loki/LokiTypeInfo.h"
 #include "../shared/serialize.h"
 
-using FreeFileSync::BaseFilter;
-using FreeFileSync::NameFilter;
+using ffs3::BaseFilter;
+using ffs3::NameFilter;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ bool BaseFilter::operator<(const BaseFilter& other) const
 void BaseFilter::saveFilter(wxOutputStream& stream) const //serialize derived object
 {
     //save type information
-    Utility::writeString(stream, uniqueClassIdentifier());
+    util::writeString(stream, uniqueClassIdentifier());
 
     //save actual object
     save(stream);
@@ -56,7 +56,7 @@ void BaseFilter::saveFilter(wxOutputStream& stream) const //serialize derived ob
 BaseFilter::FilterRef BaseFilter::loadFilter(wxInputStream& stream)
 {
     //read type information
-    const Zstring uniqueClassId = Utility::readString(stream);
+    const Zstring uniqueClassId = util::readString(stream);
 
     //read actual object
     if (uniqueClassId == DefaultStr("NullFilter"))
@@ -83,17 +83,17 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
     //Linux DOES distinguish between upper/lower-case: nothing to do here
 #endif
 
-    static const Zstring sepAsterisk     = Zstring() + globalFunctions::FILE_NAME_SEPARATOR + DefaultChar('*');
-    static const Zstring sepQuestionMark = Zstring() + globalFunctions::FILE_NAME_SEPARATOR + DefaultChar('?');
-    static const Zstring asteriskSep     = Zstring(DefaultStr("*")) + globalFunctions::FILE_NAME_SEPARATOR;
-    static const Zstring questionMarkSep = Zstring(DefaultStr("?")) + globalFunctions::FILE_NAME_SEPARATOR;
+    static const Zstring sepAsterisk     = Zstring() + common::FILE_NAME_SEPARATOR + DefaultChar('*');
+    static const Zstring sepQuestionMark = Zstring() + common::FILE_NAME_SEPARATOR + DefaultChar('?');
+    static const Zstring asteriskSep     = Zstring(DefaultStr("*")) + common::FILE_NAME_SEPARATOR;
+    static const Zstring questionMarkSep = Zstring(DefaultStr("?")) + common::FILE_NAME_SEPARATOR;
 
 //--------------------------------------------------------------------------------------------------
     //add some syntactic sugar: handle beginning of filtername
-    if (filterFormatted.StartsWith(globalFunctions::FILE_NAME_SEPARATOR))
+    if (filterFormatted.StartsWith(common::FILE_NAME_SEPARATOR))
     {
         //remove leading separators (keep BEFORE test for Zstring::empty()!)
-        filterFormatted = filterFormatted.AfterFirst(globalFunctions::FILE_NAME_SEPARATOR);
+        filterFormatted = filterFormatted.AfterFirst(common::FILE_NAME_SEPARATOR);
     }
     else if (filterFormatted.StartsWith(asteriskSep) ||   // *\abc
              filterFormatted.StartsWith(questionMarkSep)) // ?\abc
@@ -103,9 +103,9 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
 
 //--------------------------------------------------------------------------------------------------
     //even more syntactic sugar: handle end of filtername
-    if (filterFormatted.EndsWith(globalFunctions::FILE_NAME_SEPARATOR))
+    if (filterFormatted.EndsWith(common::FILE_NAME_SEPARATOR))
     {
-        const Zstring candidate = filterFormatted.BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);
+        const Zstring candidate = filterFormatted.BeforeLast(common::FILE_NAME_SEPARATOR);
         if (!candidate.empty())
             directoryFilter.insert(candidate); //only relevant for directory filtering
     }
@@ -115,7 +115,7 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
         fileFilter.insert(     filterFormatted);
         directoryFilter.insert(filterFormatted);
 
-        const Zstring candidate = filterFormatted.BeforeLast(globalFunctions::FILE_NAME_SEPARATOR);
+        const Zstring candidate = filterFormatted.BeforeLast(common::FILE_NAME_SEPARATOR);
         if (!candidate.empty())
             directoryFilter.insert(candidate); //only relevant for directory filtering
     }
@@ -251,7 +251,7 @@ bool NameFilter::passDirFilter(const Zstring& relDirname, bool* subObjMightMatch
     {
         if (subObjMightMatch)
         {
-            const Zstring& subNameBegin = relDirname + globalFunctions::FILE_NAME_SEPARATOR; //const-ref optimization
+            const Zstring& subNameBegin = relDirname + common::FILE_NAME_SEPARATOR; //const-ref optimization
 
             *subObjMightMatch = matchesFilterBegin(subNameBegin, filterFileIn) || //might match a file in subdirectory
                                 matchesFilterBegin(subNameBegin, filterFolderIn); //or another subdirectory
@@ -300,15 +300,15 @@ Zstring NameFilter::uniqueClassIdentifier() const
 
 void NameFilter::save(wxOutputStream& stream) const
 {
-    Utility::writeString(stream, includeFilterTmp);
-    Utility::writeString(stream, excludeFilterTmp);
+    util::writeString(stream, includeFilterTmp);
+    util::writeString(stream, excludeFilterTmp);
 }
 
 
 BaseFilter::FilterRef NameFilter::load(wxInputStream& stream) //"constructor"
 {
-    const Zstring include = Utility::readString(stream);
-    const Zstring exclude = Utility::readString(stream);
+    const Zstring include = util::readString(stream);
+    const Zstring exclude = util::readString(stream);
 
     return FilterRef(new NameFilter(include, exclude));
 }

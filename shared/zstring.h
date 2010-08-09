@@ -13,8 +13,9 @@
 #include <vector>
 #include <sstream>
 #include <algorithm> //specialize std::swap
+#include <functional>
 
-#ifdef __WXDEBUG__
+#ifndef NDEBUG
 #include <set>
 #include <wx/thread.h>
 #endif
@@ -39,10 +40,6 @@ public:
     ~Zstring();
 
     operator const DefaultChar*() const;               //implicit conversion to C string
-
-    //Compare filenames: Windows does NOT distinguish between upper/lower-case, while Linux DOES
-    int cmpFileName(const Zstring& other) const;
-    int cmpFileName(const DefaultChar* other) const;
 
     //wxWidgets-like functions
     bool StartsWith(const DefaultChar* begin) const;
@@ -146,6 +143,17 @@ const Zstring operator+(const Zstring&     lhs, DefaultChar        rhs);
 template <class T>
 Zstring numberToZstring(const T& number); //convert number to Zstring
 
+//Compare filenames: Windows does NOT distinguish between upper/lower-case, while Linux DOES
+int cmpFileName(const Zstring&     lhs, const Zstring&     rhs);
+int cmpFileName(const Zstring&     lhs, const DefaultChar* rhs);
+int cmpFileName(const DefaultChar* lhs, const Zstring&     rhs);
+int cmpFileName(const DefaultChar* lhs, const DefaultChar* rhs);
+
+struct LessFilename : public std::binary_function<Zstring, Zstring, bool>//case-insensitive on Windows, case-sensitive on Linux
+{
+    bool operator()(const Zstring& a, const Zstring& b) const;
+};
+
 namespace std
 {
 template<>
@@ -155,6 +163,15 @@ void swap(Zstring& rhs, Zstring& lhs)
     rhs.swap(lhs);
 }
 }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -255,8 +272,7 @@ const DefaultChar* Zstring::defaultStrFind(const DefaultChar* str1, const Defaul
 }
 //--------------------------------------------------------------------------------------------------
 
-
-#ifdef __WXDEBUG__
+#ifndef NDEBUG
 class AllocationCount //small test for memory leaks in Zstring
 {
 public:
@@ -282,7 +298,7 @@ private:
     wxCriticalSection lockActStrings;
     std::set<const DefaultChar*> activeStrings;
 };
-#endif
+#endif //NDEBUG
 
 
 inline
@@ -307,7 +323,7 @@ Zstring::StringDescriptor* Zstring::allocate(const size_t newLength)
     newDescr->length   = newLength;
     newDescr->capacity = newCapacity;
 
-#ifdef __WXDEBUG__
+#ifndef NDEBUG
     AllocationCount::getInstance().inc(reinterpret_cast<DefaultChar*>(newDescr + 1)); //test Zstring for memory leaks
 #endif
     return newDescr;
@@ -383,7 +399,7 @@ void Zstring::decRef()
     assert(descr && descr->refCount >= 1); //descr points to the begin of the allocated memory block
     if (--descr->refCount == 0)
     {
-#ifdef __WXDEBUG__
+#ifndef NDEBUG
         AllocationCount::getInstance().dec(c_str()); //test Zstring for memory leaks
 #endif
         ::free(descr); //beginning of whole memory block
@@ -763,6 +779,25 @@ Zstring numberToZstring(const T& number) //convert number to string the C++ way
     std::basic_ostringstream<DefaultChar> ss;
     ss << number;
     return Zstring(ss.str().c_str());
+}
+
+
+inline
+int cmpFileName(const DefaultChar* lhs, const Zstring& rhs)
+{
+    return cmpFileName(rhs, lhs);
+}
+
+
+inline
+bool LessFilename::operator()(const Zstring& a, const Zstring& b) const
+{
+//        //quick check based on string length
+//        const size_t aLength = a.data.shortName.length();
+//        const size_t bLength = b.data.shortName.length();
+//        if (aLength != bLength)
+//            return aLength < bLength;
+    return cmpFileName(a, b) < 0;
 }
 
 #endif // ZSTRING_H_INCLUDED

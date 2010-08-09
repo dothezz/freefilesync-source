@@ -13,7 +13,7 @@ class wxTextCtrl;
 class wxDirPickerCtrl;
 
 
-namespace RealtimeSync
+namespace rts
 {
 void setDirectoryName(const wxString& dirname, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker);
 }

@@ -1,6 +1,6 @@
 #include <wx/string.h>
 
-namespace FreeFileSync
+namespace ffs3
 {
-    const wxString currentVersion = wxT("3.8"); //internal linkage!
+    const wxString currentVersion = wxT("3.9"); //internal linkage!
 }

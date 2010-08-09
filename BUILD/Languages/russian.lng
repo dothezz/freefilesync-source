@@ -1,47 +1,37 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE
- Byte
- Байт
- GB
- ГБ
- MB
- МБ
- day(s)
- день(ей)
- hour(s)
- час(ов)
- kB
- кБ
- min
- мин.
- sec
- сек.
 %x / %y objects deleted successfully
 %x / %y объектов удалено удачно
 %x Byte
-
+%x Байт
 %x GB
-
+%x ГБ
 %x MB
-
+%x МБ
 %x PB
-
+%x ПБ
 %x TB
+%x ТБ
+%x day(s)
 
 %x directories
 %x папки
 %x files
 %x файл(ов)
-%x is not a valid FreeFileSync batch file!
-%x не корректный файл пакетного задания FreeFileSync!
+%x hour(s)
+
 %x kB
+%x кБ
+%x min
 
 %x of %y rows in view
 %x из %y строк(и) показано
 %x of 1 row in view
 %x из 1 строка показана
-%x%
+%x sec
 
+%x%
+%x%
 &Abort
 &Отмена
 &About...
@@ -95,11 +85,11 @@
 &Save
 &Сохранить
 &Switch
-
+&Переключить
 &Yes
 &Да
 (Build: %x)
-
+(Сборка %x)
 (Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Помните, что только диски FAT/FAT32 страдают от этой проблемы!\nВо всех остальных случаях вы можете отключить параметр \"игнорировать 1-часовую разницу\".)
 (Requires an Internet connection!)
@@ -161,7 +151,7 @@
 <Last session>
 <Последняя сессия>
 <Symlink>
-
+<Символьная ссылка>
 <multiple selection>
 <групповое выделение>
 A newer version of FreeFileSync is available:
@@ -182,7 +172,7 @@ Add folder pair
 Добавить пару папок
 All directories in sync!
 Все папки синхронизированы!
-An exception occured!
+An exception occurred!
 Исключение произошло!
 As a result the files are separated into the following categories:
 Как результат файлы разделяются на следующие категории:
@@ -207,7 +197,7 @@ Both sides have changed since last synchronization!
 Browse
 Обзор
 Browse directory
-
+Обзор папок
 Cannot determine sync-direction:
 Невозможно определить направление синхронизации:
 Cannot find %x
@@ -215,7 +205,7 @@ Cannot find %x
 Category
 Категория
 Clear filter settings
-
+Очистить настройки фильтра
 Comma separated list
 Список, разделяемый запятыми
 Command line
@@ -266,6 +256,8 @@ Continue
 Продолжить
 Conversion error:
 Ошибка преобразования:
+Copy filesystem permissions
+
 Copy from left to right
 Скопировать слева направо
 Copy from left to right overwriting
@@ -278,16 +270,16 @@ Copy locked files
 Копировать заблокированные файлы
 Copy new or updated files to right folder.
 Копировать новые или обновлять файлы на правой стороне.
-Copy shared or locked files using Volume Shadow Copy Service
-Копировать общие или заблокированные файлы с помощью Службы Теневого Копирования Тома
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+
 Copy to clipboard\tCTRL+C
 Копировать в буфер обмена\tCTRL+C
 Copying Symbolic Link %x overwriting %y
-
+Копирование символьной ссылки %x с перезаписью %y
 Copying Symbolic Link %x to %y
-
+Копирование симовльной ссылки %x в %y
 Copying file %x overwriting %y
-
+Копирование файла %x с перезаписью %y
 Copying file %x to %y
 Копирование файла %x в %y
 Could not determine volume name for file:
@@ -335,7 +327,7 @@ Delete or overwrite files permanently
 Delete permanently
 Удалять, не помещая в "Корзину"
 Deleting Symbolic Link %x
-
+Удаление символьной ссылки %x
 Deleting file %x
 Удаление файла %x
 Deleting folder %x
@@ -345,7 +337,7 @@ Deletion handling
 Description
 Описание
 Direct
-
+Прямое
 Directories are dependent! Be careful when setting up synchronization rules:
 Зависимые папки! Будьте внимательны при настройке правил синхронизации:
 Directories to watch
@@ -371,11 +363,11 @@ Download now?
 Drag && drop
 Drag && drop
 Elements found:
-
+Элементов найдено:
 Elements processed:
-
+Элементов обработано:
 Elements remaining:
-
+Элементов осталось:
 Email
 Почта
 Endless loop when traversing directory:
@@ -384,6 +376,8 @@ Error
 Ошибка
 Error changing modification time:
 Ошибка при изменении времени модификации файла:
+Error copying file permissions:
+
 Error copying file:
 Ошибка при копировании файла:
 Error copying locked file %x!
@@ -418,14 +412,14 @@ Error reading from synchronization database:
 Ошибка при чтении из базы данных синхронизации:
 Error resolving symbolic link:
 Ошибка при решении символической ссылки:
+Error setting privilege:
+
 Error starting Volume Shadow Copy Service!
 Ошибка при запуске Службы Теневого Копирования Тома!
 Error traversing directory:
 Ошибка при пересечении папок:
 Error when monitoring directories.
 Ошибка при мониторинге папок.
-Error writing file attributes:
-Ошибка при записи параметров файла:
 Error writing file:
 Ошибка при записи файла:
 Error writing to synchronization database:
@@ -479,7 +473,7 @@ Files that exist on both sides, left one is newer
 Files that exist on both sides, right one is newer
 Файлы, существующие на обоих сторонах, правый новее
 Files that have different content
-
+Файлы, имеющие различное содержание
 Files/folders that exist on left side only
 Файлы/папки, существующие только на левой стороне
 Files/folders that exist on right side only
@@ -487,15 +481,15 @@ Files/folders that exist on right side only
 Filter files
 Фильтр файлов
 Filter is active
-
+Фильтр активен
 Filter settings have changed!
 Настройки фильтра были изменены!
 Filter view
 Вид фильтра
 Filter: All pairs
-
+Фильтр: Все пары
 Filter: Single pair
-
+Фильтр: Одна пара
 Find
 Найти
 Find what:
@@ -503,7 +497,7 @@ Find what:
 Folder Comparison and Synchronization
 Сравнение и синхронизация
 Follow
-
+Последовательное
 Free disk space available:
 Доступно свободного места на диске:
 FreeFileSync Batch Job
@@ -573,7 +567,7 @@ Identify and propagate changes on both sides using a database. Deletions and con
 If you like FFS
 Если Вам понравился FFS
 Ignore
-
+Игнорировать
 Ignore 1-hour file time difference
 Игнорировать 1-часовую разницу во времени
 Ignore errors
@@ -598,6 +592,8 @@ Initial synchronization:
 Первоначальная синхронизация:
 Integrate external applications into context menu. The following macros are available:
 Интегрирует внешние приложения в контекстное меню.\nСледующие команды доступны:
+Invalid FreeFileSync config file!
+
 Leave as unresolved conflict
 Оставить как нерешенный конфликт
 Left
@@ -633,7 +629,7 @@ Move files into a time-stamped subdirectory
 Moving %x to Recycle Bin
 Отправка %x в "Корзину"
 Moving Symbolic Link %x to user-defined directory %y
-
+Перемещение символьной ссылки %x в заданную пользователем папку %y
 Moving file %x to user-defined directory %y
 Перемещение файла %x в заданную пользователем папку %y
 Moving folder %x to user-defined directory %y
@@ -663,7 +659,7 @@ Only files/directories that pass filtering will be selected for synchronization.
 Open with Explorer
 Открыть путь в Проводнике
 Open with default application
-
+Открыть с помощью приложения по-умолчанию
 Operation aborted!
 Операция отменена!
 Operation:
@@ -675,11 +671,11 @@ Pause
 Paused
 Пауза
 Planned directory deletion is in conflict with its subdirectories and -files!
-
+При удалении папки возник конфликт с вложенными подпапками или файлами!
 Please run a Compare first before synchronizing!
 Пожалуйста, запустите сравнение перед синхронизацией!
-Press \"Switch\" to open FreeFileSync GUI modus.
-
+Press \"Switch\" to open FreeFileSync GUI mode.
+Нажмите \"Переключить\" для открытия пользовательского графического интерфейса FreeFileSync.
 Processing folder pair:
 Обработка пары папок:
 Published under the GNU General Public License:
@@ -695,7 +691,7 @@ RealtimeSync - Автоматическая синхронизация
 RealtimeSync configuration
 Настройка RealtimeSync
 Recycle Bin not yet supported for this system!
-
+Корзина пока не поддерживается для этой системы!
 Relative path
 Относительный путь
 Remove alternate settings
@@ -789,17 +785,17 @@ Start synchronization
 Statistics
 Статистика
 Status feedback
-
+Статус обратной связи
 Stop
 Стоп
 Swap sides
 Поменять направление
-Switching to FreeFileSync GUI modus...
-
+Switching to FreeFileSync GUI mode...
+Переключение на пользовательский графический интерфейс FreeFileSync...
 Symbolic Link handling
-
+Обращение к символьной ссылке
 Symlinks %x have the same date but a different target!
-
+Символьная ссылка %x имеет ту же дату, но различное содержание!
 Synchronization Preview
 Предпросмотр синхронизации
 Synchronization aborted!
@@ -825,11 +821,11 @@ Target directory already existing!
 Target file already existing!
 Конечный файл уже существует!
 The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-
+Командная строка выполняется каждый раз, когда:\n- все папки становятся доступны (например, подключение переносного носителя)\n- файлы в папках или подпапках изменены
 The file does not contain a valid configuration:
 Файл не содержит действительную конфигурацию:
 The file was not processed by last synchronization!
-
+Файл не был обработан при последней синхронизации!
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Этот вариант сравнивает два файла с одинаковыми именами и считает их равными, если они имеют одинаковый размер файла и одинаковую дату и время последнего изменения.
 Time
@@ -844,6 +840,8 @@ Total required free disk space:
 Общее требуемое свободное дисковое пространство:
 Total time:
 Общее время:
+Transfer file and directory permissions\n(Requires Administrator rights)
+
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 Учитывать файлы, которые отличаются по времени на 1 час, как равные, менее чем на 1 час, как конфликтные, чтобы учесть переход на летнее время
 Unable to connect to sourceforge.net!
@@ -871,7 +869,7 @@ Verifying file %x
 Volume name %x not part of filename %y!
 Имя тома %x не является частью имени файла %y!
 Waiting for all directories to become available...
-
+Ожидание, пока все папки станут доступными...
 Warning
 Внимание
 Warning: Synchronization failed for %x item(s):

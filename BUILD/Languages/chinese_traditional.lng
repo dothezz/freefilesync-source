@@ -1,21 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
- Byte
- 位元組
- GB
- GB
- MB
- MB
- day(s)
- 日
- hour(s)
- 時
- kB
- kB
- min
- 分
- sec
- 秒
 %x / %y objects deleted successfully
 %x / %y 個物件已删除成功
 %x Byte
@@ -28,18 +12,24 @@
 %x PB
 %x TB
 %x TB
+%x day(s)
+%x 天
 %x directories
 %x 目錄
 %x files
 %x 檔案
-%x is not a valid FreeFileSync batch file!
-%x 不是一個有效的 FreeFileSync 批次檔！
+%x hour(s)
+%x 小時 
 %x kB
 %x kB
+%x min
+%x 分
 %x of %y rows in view
 顯示 %y 之 %x 行
 %x of 1 row in view
 顯示 1 之 %x 行
+%x sec
+%x 秒
 %x%
 %x%
 &Abort
@@ -182,7 +172,7 @@ Add folder pair
 新增一對資料夾
 All directories in sync!
 同步所有目錄！
-An exception occured!
+An exception occurred!
 發生異常！
 As a result the files are separated into the following categories:
 結果是檔案分為以下幾類：
@@ -266,6 +256,8 @@ Continue
 繼續
 Conversion error:
 轉換錯誤：
+Copy filesystem permissions
+複製檔案系統權限
 Copy from left to right
 從左邊複製到右邊
 Copy from left to right overwriting
@@ -278,8 +270,8 @@ Copy locked files
 複製被鎖定的檔案
 Copy new or updated files to right folder.
 將新的或更新過的檔案複製到右邊的資料夾中。
-Copy shared or locked files using Volume Shadow Copy Service
-使用卷影複製服務來複製共享或鎖定的檔案
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+複製共用或鎖定檔案使用使用卷影複製服務\n(需要管理員權限)
 Copy to clipboard\tCTRL+C
 複製到剪貼簿\tCTRL+C
 Copying Symbolic Link %x overwriting %y
@@ -384,6 +376,8 @@ Error
 錯誤
 Error changing modification time:
 變更修改時間錯誤：
+Error copying file permissions:
+複製檔案權限錯誤：
 Error copying file:
 複製檔案錯誤：
 Error copying locked file %x!
@@ -418,14 +412,16 @@ Error reading from synchronization database:
 讀取同步資料庫錯誤：
 Error resolving symbolic link:
 解决符號連結錯誤：
+Error setting directory lock:
+
+Error setting privilege:
+設定權限錯誤：
 Error starting Volume Shadow Copy Service!
 啟動卷影複製服務錯誤！
 Error traversing directory:
 遍歷目錄錯誤：
 Error when monitoring directories.
 監測目錄錯誤。
-Error writing file attributes:
-寫入檔案屬性錯誤：
 Error writing file:
 寫入檔案錯誤：
 Error writing to synchronization database:
@@ -598,6 +594,8 @@ Initial synchronization:
 初始化同步：
 Integrate external applications into context menu. The following macros are available:
 整合上下文功能表中的外部應用程式。可以使用下面的巨集：
+Invalid FreeFileSync config file!
+無效的 FreeFileSync 配置檔案！
 Leave as unresolved conflict
 保留給未解決的衝突
 Left
@@ -655,7 +653,7 @@ Number of files and directories that will be deleted
 Number of files that will be overwritten
 一些檔案和目錄將被覆蓋
 One of the FreeFileSync database entries within the following file is not yet existing:
-以下數據庫條目的其中一個 FreeFileSync 檔案不存在：
+以下資料庫條目的其中一個 FreeFileSync 檔案不存在：
 One of the FreeFileSync database files is not yet existing:
 其中一個 FreeFileSync 資料庫檔案不存在：
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
@@ -678,7 +676,7 @@ Planned directory deletion is in conflict with its subdirectories and -files!
 計劃要刪除的目錄與其子目錄和檔案是衝突的！
 Please run a Compare first before synchronizing!
 請執行同步前先比對！
-Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI mode.
 按下 \"切換\" 開啟 FreeFileSync 圖形介面操作方式。
 Processing folder pair:
 處理一對資料夾：
@@ -704,6 +702,8 @@ Remove folder
 移除資料夾
 Remove folder pair
 移除一對資料夾
+Removing abandoned directory lock (%x)...
+
 Report translation error
 回報翻譯錯誤
 Reset
@@ -794,7 +794,7 @@ Stop
 停止
 Swap sides
 兩邊交換
-Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI mode...
 切換 FreeFileSync 圖形介面操作方式...
 Symbolic Link handling
 符號連結處理
@@ -825,7 +825,7 @@ Target directory already existing!
 Target file already existing!
 目標檔案已存在！
 The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-命令列每次執行：\n- 可用的目錄（例如插入USB隨身碟）\n- 檔案在這些目錄或子目錄會被修改
+命令列每次執行：\n- 可用的目錄(例如插入USB隨身碟)\n- 檔案在這些目錄或子目錄會被修改
 The file does not contain a valid configuration:
 該檔案不包含有效的配置：
 The file was not processed by last synchronization!
@@ -844,6 +844,8 @@ Total required free disk space:
 全部所需要的可用磁碟空間：
 Total time:
 全部時間：
+Transfer file and directory permissions\n(Requires Administrator rights)
+傳輸檔案和目錄權限\n(需要管理員權限)
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 對檔案時差在精確的+/-1小時的檔案判斷視為相同的，以小於1小時作為衝突，是為了處理日光節約時間的變化
 Unable to connect to sourceforge.net!
@@ -872,6 +874,8 @@ Volume name %x not part of filename %y!
 卷名 %x 並非檔名 %y 的一部份！
 Waiting for all directories to become available...
 等待所有目錄變為可用...
+Waiting while directory is locked (%x)...
+
 Warning
 警告
 Warning: Synchronization failed for %x item(s):

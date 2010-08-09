@@ -6,12 +6,12 @@
 //
 #include "taskbar.h"
 #include "Taskbar_Seven/taskbar.h"
-#include "dllLoader.h"
-#include "buildInfo.h"
-#include "staticAssert.h"
+#include "dll_loader.h"
+#include "build_info.h"
+#include "assert_static.h"
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 
-using namespace Utility;
+using namespace util;
 
 
 namespace
@@ -33,14 +33,14 @@ bool windows7TaskbarAvailable()
 }
 
 
-const wxString& getTaskBarDllName()
+const std::wstring& getTaskBarDllName()
 {
-    static const wxString filename(
-        Utility::is64BitBuild ?
-        wxT("Taskbar7_x64.dll") :
-        wxT("Taskbar7_Win32.dll"));
+    assert_static(util::is32BitBuild || util::is64BitBuild);
 
-    assert_static(Utility::is32BitBuild || Utility::is64BitBuild);
+    static const std::wstring filename(
+        util::is64BitBuild ?
+        L"Taskbar7_x64.dll" :
+        L"Taskbar7_Win32.dll");
 
     return filename;
 }
@@ -71,10 +71,10 @@ TaskbarProgress::TaskbarProgress(const wxTopLevelWindow& window) : pimpl_(new Pi
     if (!windows7TaskbarAvailable())
         throw TaskbarNotAvailable();
 
-    pimpl_->init_         = Utility::loadDllFunction<TaskbarSeven::initFct>(       getTaskBarDllName().c_str(), TaskbarSeven::initFctName);
-    pimpl_->release_      = Utility::loadDllFunction<TaskbarSeven::releaseFct>(    getTaskBarDllName().c_str(), TaskbarSeven::releaseFctName);
-    pimpl_->setProgress_  = Utility::loadDllFunction<TaskbarSeven::setProgressFct>(getTaskBarDllName().c_str(), TaskbarSeven::setProgressFctName);
-    pimpl_->setStatus_    = Utility::loadDllFunction<TaskbarSeven::setStatusFct>(  getTaskBarDllName().c_str(), TaskbarSeven::setStatusFctName);
+    pimpl_->init_         = util::loadDllFunction<TaskbarSeven::initFct>(       getTaskBarDllName(), TaskbarSeven::initFctName);
+    pimpl_->release_      = util::loadDllFunction<TaskbarSeven::releaseFct>(    getTaskBarDllName(), TaskbarSeven::releaseFctName);
+    pimpl_->setProgress_  = util::loadDllFunction<TaskbarSeven::setProgressFct>(getTaskBarDllName(), TaskbarSeven::setProgressFctName);
+    pimpl_->setStatus_    = util::loadDllFunction<TaskbarSeven::setStatusFct>(  getTaskBarDllName(), TaskbarSeven::setStatusFctName);
 
     if (    !pimpl_->init_        ||
             !pimpl_->release_     ||

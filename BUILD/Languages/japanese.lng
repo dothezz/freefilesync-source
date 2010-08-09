@@ -1,21 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
- Byte
- バイト
- GB
- GB
- MB
- MB
- day(s)
- 日(間)
- hour(s)
- 時(間)
- kB
- kB
- min
- 分
- sec
- 秒
 %x / %y objects deleted successfully
 %x / %y のオブジェクトを削除しました
 %x Byte
@@ -28,18 +12,24 @@
 %x PB
 %x TB
 %x TB
+%x day(s)
+%x 日
 %x directories
 %x ディレクトリ
 %x files
 %x 個のファイル
-%x is not a valid FreeFileSync batch file!
-%x は有効なバッチファイルではありません!
+%x hour(s)
+%x 時間
 %x kB
 %x kB
+%x min
+%x 分
 %x of %y rows in view
 %x / %y 行を表示
 %x of 1 row in view
 %x / 1 行を表示
+%x sec
+%x 秒
 %x%
 %x%
 &Abort
@@ -182,7 +172,7 @@ Add folder pair
 フォルダのペアを追加
 All directories in sync!
 すべてのディレクトリを同期!
-An exception occured!
+An exception occurred!
 例外が発生しました!
 As a result the files are separated into the following categories:
 ファイルは以下のカテゴリに分類されます:
@@ -266,6 +256,8 @@ Continue
 続行
 Conversion error:
 変換エラー:
+Copy filesystem permissions
+ファイルシステム・パーミッションをコピー
 Copy from left to right
 左から右にコピー
 Copy from left to right overwriting
@@ -278,8 +270,8 @@ Copy locked files
 ロックされたファイルをコピー
 Copy new or updated files to right folder.
 新しい(更新)ファイルを右フォルダにコピー
-Copy shared or locked files using Volume Shadow Copy Service
-共有、またはボリュームシャドウコピーでロックされたファイルをコピー
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+ボリュームシャドーコピーを使用して共有/ロックされたファイルをコピー\n(管理者権限が必要)
 Copy to clipboard\tCTRL+C
 クリップボードにコピー\tCTRL+C
 Copying Symbolic Link %x overwriting %y
@@ -384,6 +376,8 @@ Error
 エラー
 Error changing modification time:
 時間の修正中のエラー:
+Error copying file permissions:
+パーミッションコピー中のエラー
 Error copying file:
 ファイルのコピーに失敗:
 Error copying locked file %x!
@@ -418,14 +412,14 @@ Error reading from synchronization database:
 同期データベースからの読み込みエラー:
 Error resolving symbolic link:
 シンボリックリンクの解決に失敗:
+Error setting privilege:
+特権の設定エラー:
 Error starting Volume Shadow Copy Service!
 ボリュームシャドウコピーの開始に失敗!
 Error traversing directory:
 ディレクトリの移動エラー:
 Error when monitoring directories.
 ディレクトリの監視エラー
-Error writing file attributes:
-ファイル属性の書き込みエラー:
 Error writing file:
 ファイル書き込みエラー:
 Error writing to synchronization database:
@@ -598,6 +592,8 @@ Initial synchronization:
 同期処理の初期化:
 Integrate external applications into context menu. The following macros are available:
 外部のアプリケーションをコンテキストメニューに統合、以下のマクロが利用できます:
+Invalid FreeFileSync config file!
+無効な FreeFileSync 構成ファイルです!
 Leave as unresolved conflict
 未解決の競合はそのまま残す
 Left
@@ -678,7 +674,7 @@ Planned directory deletion is in conflict with its subdirectories and -files!
 ディレクトリを削除すると、サブディレクトリ、ファイルの競合が起こる可能姓があります!
 Please run a Compare first before synchronizing!
 同期処理を実行する前に比較を行ってください!
-Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI mode.
  \"切り替え\" を押すと FreeFileSync GUI モードで開きます
 Processing folder pair:
 フォルダペアを処理中:
@@ -794,7 +790,7 @@ Stop
 停止
 Swap sides
 パネルを入れ替え
-Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI mode...
 FreeFileSync GUI モードの切り替え中...
 Symbolic Link handling
 シンボリックリンク・リンクの取り扱い
@@ -844,6 +840,8 @@ Total required free disk space:
 必要な合計ディスク空き容量:
 Total time:
 合計時間:
+Transfer file and directory permissions\n(Requires Administrator rights)
+ファイルとディレクトリのパーミッション転送\n(管理者権限が必要)
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 ファイルの時間の +/- を正確に 1 時間以上の差異は不一致、1 時間未満の差異は同様ファイルとして取り扱います(夏時間は変換されます)
 Unable to connect to sourceforge.net!

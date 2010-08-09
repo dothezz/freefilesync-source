@@ -1,21 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port od GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI ogrodje\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
- Byte
- Bajt
- GB
- GB
- MB
- MB
- day(s)
- dni
- hour(s)
- ur
- kB
- kB
- min
- min
- sec
- sek
 %x / %y objects deleted successfully
 %x / %y objektov uspešno izbrisanih
 %x Byte
@@ -28,18 +12,24 @@
 %x PB
 %x TB
 %x TB
+%x day(s)
+%x dan/dni
 %x directories
 %x imeniki
 %x files
 %x datoteke
-%x is not a valid FreeFileSync batch file!
-%x ni veljavna FreeFileSync batch datoteka!
+%x hour(s)
+%x ura/ur
 %x kB
 %x kB
+%x min
+%x min
 %x of %y rows in view
 %x od %y vrstic prikazanih
 %x of 1 row in view
 %x od 1 vrstice prikazane
+%x sec
+%x sek
 %x%
 %x%
 &Abort
@@ -182,7 +172,7 @@ Add folder pair
 Dodaj par imenikov
 All directories in sync!
 Vsi imeniki so sinhronizirani!
-An exception occured!
+An exception occurred!
 Zgodila se je napaka!
 As a result the files are separated into the following categories:
 Kot rezultat so datoteke razdeljene v naslednje kategorije:
@@ -266,6 +256,8 @@ Continue
 Nadaljuj
 Conversion error:
 Napaka pri pretvorbi:
+Copy filesystem permissions
+Kopiraj dovoljenja datotečnega sistema
 Copy from left to right
 Kopiraj iz leve na desno
 Copy from left to right overwriting
@@ -278,8 +270,8 @@ Copy locked files
 Kopiraj zaklenjene datoteke
 Copy new or updated files to right folder.
 Kopiraj nove ali posodobljene datoteke v desno mapo.
-Copy shared or locked files using Volume Shadow Copy Service
-Kopiraj deljene ali zaklenjene datoteke z uporabo servisa Volume Shadow Copy
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+Kopiraj deljene ali zaklenjene datoteke z uporabo servisa Shadow Copy\n(Zahteva pravice skrbnika)
 Copy to clipboard\tCTRL+C
 Kopiraj v odložišče\tCTRL+C
 Copying Symbolic Link %x overwriting %y
@@ -384,6 +376,8 @@ Error
 Napaka
 Error changing modification time:
 Napaka pri spreminjanju časa modifikacije:
+Error copying file permissions:
+Napaka pri kopiranju datotečnih dovoljenj:
 Error copying file:
 Napaka pri kopiranju datoteke:
 Error copying locked file %x!
@@ -418,14 +412,16 @@ Error reading from synchronization database:
 Napaka pri branju iz sinhronizacijske podatkovne baze:
 Error resolving symbolic link:
 Napaka pri razreševanju simbolične povezave:
+Error setting directory lock:
+
+Error setting privilege:
+Napaka pri nastavljanju privilegija:
 Error starting Volume Shadow Copy Service!
 Napaka pri zagonu servisa Volume Shadow Copy!
 Error traversing directory:
 Napaka pri prehajanju imenika:
 Error when monitoring directories.
 Napaka pri nadzorovanju imenikov.
-Error writing file attributes:
-Napaka pri pisanju atributov datoteke:
 Error writing file:
 Napaka pri pisanju datoteke:
 Error writing to synchronization database:
@@ -598,6 +594,8 @@ Initial synchronization:
 Začetna sinhronizacija:
 Integrate external applications into context menu. The following macros are available:
 Integriraj zunanje aplikacije v kontekstni menu. Na voljo so naslednji makri:
+Invalid FreeFileSync config file!
+Neveljavna FreeFileSync nastavitvena datoteka!
 Leave as unresolved conflict
 Pusti kot nerešeni spor
 Left
@@ -678,7 +676,7 @@ Planned directory deletion is in conflict with its subdirectories and -files!
 Načrtovano brisanje imenika je v sporu z njegovimi podimeniki in -datotekami!
 Please run a Compare first before synchronizing!
 Prosim najprej zaženite Primerjaj preden sinhronizirate!
-Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI mode.
 Pritisnite \"Zamenjaj\", da odprete FreeFileSync GUI način.
 Processing folder pair:
 Obdelujem par map:
@@ -704,6 +702,8 @@ Remove folder
 Odstrani v mapo
 Remove folder pair
 Odstrani par imenikov
+Removing abandoned directory lock (%x)...
+
 Report translation error
 Poročaj o napaki prevoda
 Reset
@@ -794,7 +794,7 @@ Stop
 Ustavi
 Swap sides
 Zamenjaj strani
-Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI mode...
 Preklapljam v FreeFileSync GUI način...
 Symbolic Link handling
 Rokovanje s simboličnimi povezavami
@@ -844,6 +844,8 @@ Total required free disk space:
 Skupno zahtevani prosti prostor na disku:
 Total time:
 Celoten čas:
+Transfer file and directory permissions\n(Requires Administrator rights)
+Prenesi dovoljenja datotek in imenikov\n(Zahteva pravice skrbnika)
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 Obravnavaj čas spremembe datoteke, ki se razlikuje za točno +/- 1 uro kot enak, če pa je manjši kot 1 ura, pa kot spor, da lahko obravnavamo spremembe Poletnega časa
 Unable to connect to sourceforge.net!
@@ -872,6 +874,8 @@ Volume name %x not part of filename %y!
 Ime volumna %x ni del imena datoteke %y!
 Waiting for all directories to become available...
 Čakam, da bodo vsi imeniki na voljo...
+Waiting while directory is locked (%x)...
+
 Warning
 Pozor
 Warning: Synchronization failed for %x item(s):

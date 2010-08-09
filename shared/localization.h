@@ -14,7 +14,7 @@
 class Translation;
 
 
-namespace FreeFileSync
+namespace ffs3
 {
 //language independent global variables: just use operating system's default setting!
 wxString getThousandsSeparator();

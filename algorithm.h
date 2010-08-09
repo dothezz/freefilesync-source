@@ -7,10 +7,10 @@
 #ifndef ALGORITHM_H_INCLUDED
 #define ALGORITHM_H_INCLUDED
 
-#include "fileHierarchy.h"
+#include "file_hierarchy.h"
 
 
-namespace FreeFileSync
+namespace ffs3
 {
 class BaseFilter;
 

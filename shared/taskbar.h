@@ -15,7 +15,7 @@ use in windows build only!
 #include <memory>
 
 
-namespace Utility
+namespace util
 {
 class TaskbarNotAvailable {};
 

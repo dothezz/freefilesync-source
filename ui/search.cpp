@@ -5,7 +5,7 @@
 // **************************************************************************
 //
 #include "search.h"
-#include "guiGenerated.h"
+#include "gui_generated.h"
 #include <wx/msgdlg.h>
 #include <wx/utils.h>
 #include <utility>
@@ -259,13 +259,13 @@ void executeSearch(bool forceShowDialog,
 //###########################################################################################
 
 
-void FreeFileSync::startFind(wxWindow& parentWindow, wxGrid& leftGrid, wxGrid& rightGrid, bool& respectCase) //Strg + F
+void ffs3::startFind(wxWindow& parentWindow, wxGrid& leftGrid, wxGrid& rightGrid, bool& respectCase) //Strg + F
 {
     executeSearch(true, respectCase, parentWindow, leftGrid, rightGrid);
 }
 
 
-void FreeFileSync::findNext(wxWindow& parentWindow, wxGrid& leftGrid, wxGrid& rightGrid, bool& respectCase)  //F3
+void ffs3::findNext(wxWindow& parentWindow, wxGrid& leftGrid, wxGrid& rightGrid, bool& respectCase)  //F3
 {
     executeSearch(false, respectCase, parentWindow, leftGrid, rightGrid);
 }

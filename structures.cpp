@@ -6,12 +6,12 @@
 //
 #include "structures.h"
 #include <wx/intl.h>
-#include <stdexcept>
+//#include <stdexcept>
 
-using namespace FreeFileSync;
+using namespace ffs3;
 
 
-Zstring FreeFileSync::standardExcludeFilter()
+Zstring ffs3::standardExcludeFilter()
 {
 #ifdef FFS_WIN
     static Zstring exclude(wxT("\
@@ -26,7 +26,7 @@ Zstring FreeFileSync::standardExcludeFilter()
 }
 
 
-wxString FreeFileSync::getVariantName(CompareVariant var)
+wxString ffs3::getVariantName(CompareVariant var)
 {
     switch (var)
     {
@@ -41,7 +41,7 @@ wxString FreeFileSync::getVariantName(CompareVariant var)
 }
 
 
-wxString FreeFileSync::getVariantName(const SyncConfiguration& syncCfg)
+wxString ffs3::getVariantName(const SyncConfiguration& syncCfg)
 {
     switch (getVariant(syncCfg))
     {
@@ -58,7 +58,7 @@ wxString FreeFileSync::getVariantName(const SyncConfiguration& syncCfg)
 }
 
 
-void FreeFileSync::setTwoWay(SyncConfiguration& syncCfg) //helper method used by <Automatic> mode fallback to overwrite old with newer files
+void ffs3::setTwoWay(SyncConfiguration& syncCfg) //helper method used by <Automatic> mode fallback to overwrite old with newer files
 {
     syncCfg.automatic = false;
     syncCfg.exLeftSideOnly  = SYNC_DIR_RIGHT;
@@ -70,7 +70,7 @@ void FreeFileSync::setTwoWay(SyncConfiguration& syncCfg) //helper method used by
 }
 
 
-SyncConfiguration::Variant FreeFileSync::getVariant(const SyncConfiguration& syncCfg)
+SyncConfiguration::Variant ffs3::getVariant(const SyncConfiguration& syncCfg)
 {
     if (syncCfg.automatic == true)
         return SyncConfiguration::AUTOMATIC;  //automatic mode
@@ -95,7 +95,7 @@ SyncConfiguration::Variant FreeFileSync::getVariant(const SyncConfiguration& syn
 }
 
 
-void FreeFileSync::setVariant(SyncConfiguration& syncCfg, const SyncConfiguration::Variant var)
+void ffs3::setVariant(SyncConfiguration& syncCfg, const SyncConfiguration::Variant var)
 {
     switch (var)
     {
@@ -154,7 +154,7 @@ wxString MainConfiguration::getSyncVariantName()
 }
 
 
-wxString FreeFileSync::getDescription(CompareFilesResult cmpRes)
+wxString ffs3::getDescription(CompareFilesResult cmpRes)
 {
     switch (cmpRes)
     {
@@ -179,7 +179,7 @@ wxString FreeFileSync::getDescription(CompareFilesResult cmpRes)
 }
 
 
-wxString FreeFileSync::getSymbol(CompareFilesResult cmpRes)
+wxString ffs3::getSymbol(CompareFilesResult cmpRes)
 {
     switch (cmpRes)
     {
@@ -204,7 +204,7 @@ wxString FreeFileSync::getSymbol(CompareFilesResult cmpRes)
 }
 
 
-wxString FreeFileSync::getDescription(SyncOperation op)
+wxString ffs3::getDescription(SyncOperation op)
 {
     switch (op)
     {
@@ -233,7 +233,7 @@ wxString FreeFileSync::getDescription(SyncOperation op)
 }
 
 
-wxString FreeFileSync::getSymbol(SyncOperation op)
+wxString ffs3::getSymbol(SyncOperation op)
 {
     switch (op)
     {
@@ -259,4 +259,52 @@ wxString FreeFileSync::getSymbol(SyncOperation op)
 
     assert(false);
     return wxEmptyString;
+}
+
+
+ffs3::MainConfiguration ffs3::merge(const std::vector<MainConfiguration>& mainCfgs)
+{
+    assert(!mainCfgs.empty());
+    if (mainCfgs.empty())
+        return ffs3::MainConfiguration();
+
+    if (mainCfgs.size() == 1) //mergeConfigFilesImpl relies on this!
+        return mainCfgs[0];
+
+    //merge folder pair config
+    std::vector<FolderPairEnh> fpMerged;
+    for (std::vector<MainConfiguration>::const_iterator i = mainCfgs.begin(); i != mainCfgs.end(); ++i)
+    {
+        std::vector<FolderPairEnh> fpTmp;
+        fpTmp.push_back(i->firstPair);
+        fpTmp.insert(fpTmp.end(), i->additionalPairs.begin(), i->additionalPairs.end());
+
+        //move all configuration to item level
+        for (std::vector<FolderPairEnh>::iterator fp = fpTmp.begin(); fp != fpTmp.end(); ++fp)
+        {
+            if (!fp->altSyncConfig.get())
+                fp->altSyncConfig.reset(
+                    new AlternateSyncConfig(i->syncConfiguration,
+                                            i->handleDeletion,
+                                            i->customDeletionDirectory));
+
+            //pragmatism: if both global and local include filter contain data, only local filter is preserved
+            if (fp->localFilter.includeFilter == FilterConfig().includeFilter)
+                fp->localFilter.includeFilter = i->globalFilter.includeFilter;
+
+            fp->localFilter.excludeFilter.Trim(false);
+            fp->localFilter.excludeFilter = i->globalFilter.excludeFilter + DefaultStr("\n") + fp->localFilter.excludeFilter;
+            fp->localFilter.excludeFilter.Trim(false);
+        }
+
+        fpMerged.insert(fpMerged.end(), fpTmp.begin(), fpTmp.end());
+    }
+
+    //final assembly
+    ffs3::MainConfiguration cfgOut = mainCfgs[0];
+    cfgOut.globalFilter            = FilterConfig(); //all filtering was moved to item level!
+    cfgOut.firstPair               = fpMerged[0];
+    cfgOut.additionalPairs.assign(fpMerged.begin() + 1, fpMerged.end());
+
+    return cfgOut;
 }

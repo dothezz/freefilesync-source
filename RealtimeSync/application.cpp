@@ -5,15 +5,15 @@
 // **************************************************************************
 //
 #include "application.h"
-#include "mainDialog.h"
+#include "main_dlg.h"
 #include <wx/event.h>
 #include "resources.h"
 #include <wx/msgdlg.h>
 #include "../shared/localization.h"
-#include "xmlFreeFileSync.h"
-#include "../shared/standardPaths.h"
+#include "xml_ffs.h"
+#include "../shared/standard_paths.h"
 #include <wx/file.h>
-#include "../shared/stringConv.h"
+#include "../shared/string_conv.h"
 
 #ifdef FFS_LINUX
 #include <gtk/gtk.h>
@@ -41,11 +41,11 @@ void Application::OnStartApplication(wxIdleEvent& event)
     SetAppName(wxT("FreeFileSync")); //use a different app name, to have "GetUserDataDir()" return the same directory as for FreeFileSync
 
 #ifdef FFS_LINUX
-    ::gtk_rc_parse(FreeFileSync::wxToZ(FreeFileSync::getResourceDir()) + "styles.rc"); //remove inner border from bitmap buttons
+    ::gtk_rc_parse(ffs3::wxToZ(ffs3::getResourceDir()) + "styles.rc"); //remove inner border from bitmap buttons
 #endif
 
     //set program language
-    FreeFileSync::CustomLocale::getInstance().setLanguage(RealtimeSync::getProgramLanguage());
+    ffs3::CustomLocale::getInstance().setLanguage(rts::getProgramLanguage());
 
     //try to set config/batch-filename set by %1 parameter
     wxString cfgFilename;
@@ -89,10 +89,10 @@ int Application::OnRun()
     catch (const std::exception& e) //catch all STL exceptions
     {
         //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
-        wxFile safeOutput(FreeFileSync::getConfigDir() + wxT("LastError.txt"), wxFile::write);
+        wxFile safeOutput(ffs3::getConfigDir() + wxT("LastError.txt"), wxFile::write);
         safeOutput.Write(wxString::FromAscii(e.what()));
 
-        wxMessageBox(wxString::FromAscii(e.what()), _("An exception occured!"), wxOK | wxICON_ERROR);
+        wxMessageBox(wxString::FromAscii(e.what()), _("An exception occurred!"), wxOK | wxICON_ERROR);
         return -9;
     }
 

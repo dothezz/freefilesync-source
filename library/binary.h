@@ -9,9 +9,9 @@
 
 #include "../shared/zstring.h"
 #include <wx/longlong.h>
-#include "../shared/fileError.h"
+#include "../shared/file_error.h"
 
-namespace FreeFileSync
+namespace ffs3
 {
 
 //callback functionality for status updates while comparing

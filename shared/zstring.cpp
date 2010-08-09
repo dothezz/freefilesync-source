@@ -9,16 +9,16 @@
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
-#include "dllLoader.h"
+#include "dll_loader.h"
 #include <boost/scoped_array.hpp>
 #endif  //FFS_WIN
 
-#ifdef __WXDEBUG__
+#ifndef NDEBUG
 #include <wx/string.h>
 #endif
 
 
-#ifdef __WXDEBUG__
+#ifndef NDEBUG
 AllocationCount::~AllocationCount()
 {
     if (activeStrings.size() > 0)
@@ -50,7 +50,7 @@ AllocationCount& AllocationCount::getInstance()
     static AllocationCount global;
     return global;
 }
-#endif
+#endif //NDEBUG
 
 #ifdef FFS_WIN
 namespace
@@ -91,7 +91,7 @@ int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size
         LPCWSTR lpString2,
         int     cchCount2,
         BOOL    bIgnoreCase);
-    static const CompareStringOrdinalFunc ordinalCompare = Utility::loadDllFunction<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal");
+    static const CompareStringOrdinalFunc ordinalCompare = util::loadDllFunction<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal");
 
     if (ordinalCompare != NULL) //this additional test has no noticeable performance impact
     {
@@ -173,22 +173,32 @@ int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size
 #endif
 
 
-int Zstring::cmpFileName(const Zstring& other) const
+int cmpFileName(const Zstring& lhs, const Zstring& rhs)
 {
 #ifdef FFS_WIN
-    return ::compareFilenamesWin32(c_str(), other.c_str(), length(), other.length()); //way faster than wxString::CmpNoCase()
+    return ::compareFilenamesWin32(lhs.c_str(), rhs.c_str(), lhs.length(), rhs.length()); //way faster than wxString::CmpNoCase()
 #elif defined FFS_LINUX
-    return defaultCompare(c_str(), other.c_str());
+    return ::strcmp(lhs.c_str(), rhs.c_str());
 #endif
 }
 
 
-int Zstring::cmpFileName(const DefaultChar* other) const
+int cmpFileName(const Zstring& lhs, const DefaultChar* rhs)
 {
 #ifdef FFS_WIN
-    return ::compareFilenamesWin32(c_str(), other, length(), ::wcslen(other)); //way faster than wxString::CmpNoCase()
+    return ::compareFilenamesWin32(lhs.c_str(), rhs, lhs.length(), ::wcslen(rhs)); //way faster than wxString::CmpNoCase()
 #elif defined FFS_LINUX
-    return defaultCompare(c_str(), other);
+return ::strcmp(lhs.c_str(), rhs);
+#endif
+}
+
+
+int cmpFileName(const DefaultChar* lhs, const DefaultChar* rhs)
+{
+#ifdef FFS_WIN
+    return ::compareFilenamesWin32(lhs, rhs, ::wcslen(lhs), ::wcslen(rhs)); //way faster than wxString::CmpNoCase()
+#elif defined FFS_LINUX
+    return ::strcmp(lhs, rhs);
 #endif
 }
 
@@ -569,7 +579,7 @@ void Zstring::reserve(size_t capacityNeeded) //make unshared and check capacity
         //try to resize the current string (allocate anew if necessary)
         const size_t newCapacity = getCapacityToAllocate(capacityNeeded);
 
-#ifdef __WXDEBUG__
+#ifndef NDEBUG
         AllocationCount::getInstance().dec(c_str()); //test Zstring for memory leaks
 #endif
 
@@ -577,7 +587,7 @@ void Zstring::reserve(size_t capacityNeeded) //make unshared and check capacity
         if (descr == NULL)
             throw std::bad_alloc();
 
-#ifdef __WXDEBUG__
+#ifndef NDEBUG
         AllocationCount::getInstance().inc(c_str()); //test Zstring for memory leaks
 #endif
 

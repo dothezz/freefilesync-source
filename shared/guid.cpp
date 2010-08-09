@@ -8,17 +8,17 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <cassert>
-#include <algorithm> 
-#include <vector> 
+#include <algorithm>
+#include <vector>
 
-using namespace Utility;
- 
-   
+using namespace util;
+
+
 struct UniqueId::IntData
-{  
-    boost::uuids::uuid nativeRep;  
+{
+    boost::uuids::uuid nativeRep;
 };
-  
+
 
 UniqueId::UniqueId() : pData(new IntData)
 {
@@ -35,7 +35,7 @@ bool UniqueId::operator==(const UniqueId rhs) const
 bool UniqueId::operator<(const UniqueId rhs) const
 {
     return pData->nativeRep < rhs.pData->nativeRep;
-} 
+}
 
 
 UniqueId::UniqueId(wxInputStream& stream) : //read

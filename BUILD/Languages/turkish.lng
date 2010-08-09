@@ -1,21 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE
- Byte
- Bit
- GB
- GB
- MB
- MB
- day(s)
- gün(ler)
- hour(s)
- saat(ler)
- kB
- kB
- min
- dak
- sec
- san
 %x / %y objects deleted successfully
 %x / %y obje başarıyla silindi
 %x Byte
@@ -28,18 +12,24 @@
 
 %x TB
 
+%x day(s)
+
 %x directories
 %x dizin
 %x files
 %x dosya
-%x is not a valid FreeFileSync batch file!
-%x geçerli bir FreeFileSync komut (batch) dosyası değildir!
+%x hour(s)
+
 %x kB
+
+%x min
 
 %x of %y rows in view
 %y satırdan %x'i görüntüleniyor
 %x of 1 row in view
 1 satırdan %x'i görüntüleniyor
+%x sec
+
 %x%
 
 &Abort
@@ -182,7 +172,7 @@ Add folder pair
 Klasör çifti ekle
 All directories in sync!
 
-An exception occured!
+An exception occurred!
 Olağan dışı bir durum oluştu!
 As a result the files are separated into the following categories:
 Sonuç olarak dosyalar takibeden katagorilere göre ayrıldı:
@@ -266,6 +256,8 @@ Continue
 Devam et
 Conversion error:
 Dönüştürme hatası:
+Copy filesystem permissions
+
 Copy from left to right
 Soldan sağa kopyala
 Copy from left to right overwriting
@@ -278,7 +270,7 @@ Copy locked files
 
 Copy new or updated files to right folder.
 Yeni veya güncellenmiş dosyaları sağdaki klasöre kopyala.
-Copy shared or locked files using Volume Shadow Copy Service
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
 
 Copy to clipboard\tCTRL+C
 Hafızaya kopyala\tCTRL+C
@@ -384,6 +376,8 @@ Error
 Hata
 Error changing modification time:
 Değişiklik tarihini değiştirirken hata:
+Error copying file permissions:
+
 Error copying file:
 Dosya kopyalarken hata:
 Error copying locked file %x!
@@ -418,14 +412,14 @@ Error reading from synchronization database:
 Senkronizasyon veri tabanýndan okuma hatasý:
 Error resolving symbolic link:
 Sembolik bağlantıyı çözümlerken hata:
+Error setting privilege:
+
 Error starting Volume Shadow Copy Service!
 'Volume shadow copy' servisini başlatırken hata!
 Error traversing directory:
 Dizini okurken hata:
 Error when monitoring directories.
 Dizinler izlenirken hata.
-Error writing file attributes:
-Dosya özniteliklerini yazarken hata:
 Error writing file:
 Dosya yazarken hata:
 Error writing to synchronization database:
@@ -598,6 +592,8 @@ Initial synchronization:
 Baþlangýç senkronizasyonu:
 Integrate external applications into context menu. The following macros are available:
 Harici uygulamaları içerik menüsüne ekle. Şu makro’lar temin edilebilir:
+Invalid FreeFileSync config file!
+
 Leave as unresolved conflict
 Çözülmemiş tutarsızlık olarak bırak
 Left
@@ -678,7 +674,7 @@ Planned directory deletion is in conflict with its subdirectories and -files!
 
 Please run a Compare first before synchronizing!
 
-Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI mode.
 
 Processing folder pair:
 
@@ -794,7 +790,7 @@ Stop
 Durdur
 Swap sides
 Tarafları ters çevir
-Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI mode...
 
 Symbolic Link handling
 
@@ -844,6 +840,8 @@ Total required free disk space:
 Toplam gerekli boş disk alanı:
 Total time:
 Toplam zaman:
+Transfer file and directory permissions\n(Requires Administrator rights)
+
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 Dosya tarihleri tam olarak +/- 1 saat farklı olduğunda dosyaları eşit olarak algıla. 1 saatten az tarih farklılıklarını ise tutarsızlık olarak belirt (Gün ışığından yararlanma durumu)
 Unable to connect to sourceforge.net!

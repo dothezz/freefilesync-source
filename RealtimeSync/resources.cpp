@@ -10,10 +10,10 @@
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <memory>
-#include "../shared/standardPaths.h"
-#include "../shared/systemConstants.h"
+#include "../shared/standard_paths.h"
+#include "../shared/system_constants.h"
 
-using namespace FreeFileSync;
+using namespace ffs3;
 
 
 const GlobalResources& GlobalResources::getInstance()
@@ -42,7 +42,7 @@ GlobalResources::~GlobalResources()
 
 void GlobalResources::load() const
 {
-    wxFFileInputStream input(FreeFileSync::getResourceDir() + wxT("Resources.dat"));
+    wxFFileInputStream input(ffs3::getResourceDir() + wxT("Resources.dat"));
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files

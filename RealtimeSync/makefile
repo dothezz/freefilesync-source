@@ -3,39 +3,38 @@ APPNAME = RealtimeSync
 prefix = /usr
 BINDIR = $(DESTDIR)$(prefix)/bin
 
-FFS_CPPFLAGS=-Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -DZSTRING_CHAR -O3 -pthread -c -I../shared/boost_1_x
-LINKFLAGS=`wx-config --libs --debug=no --unicode=yes` -O3 -pthread
+FFS_CPPFLAGS=-Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -DZSTRING_CHAR -O3 -pthread -c
+LINKFLAGS=`wx-config --libs --debug=no --unicode=yes` -lboost_thread -O3 -pthread
 
 FILE_LIST=              #internal list of all *.cpp files needed for compilation
 FILE_LIST+=application.cpp
 FILE_LIST+=functions.cpp
-FILE_LIST+=guiGenerated.cpp
-FILE_LIST+=mainDialog.cpp
+FILE_LIST+=gui_generated.cpp
+FILE_LIST+=main_dlg.cpp
 FILE_LIST+=resources.cpp
-FILE_LIST+=trayMenu.cpp
+FILE_LIST+=tray_menu.cpp
 FILE_LIST+=watcher.cpp
-FILE_LIST+=xmlProcessing.cpp
-FILE_LIST+=xmlFreeFileSync.cpp
-FILE_LIST+=../library/processXml.cpp
+FILE_LIST+=xml_proc.cpp
+FILE_LIST+=xml_ffs.cpp
+FILE_LIST+=../library/process_xml.cpp
 FILE_LIST+=../structures.cpp
-FILE_LIST+=../shared/checkExist.cpp
-FILE_LIST+=../shared/parallelCall.cpp
+FILE_LIST+=../shared/check_exist.cpp
 FILE_LIST+=../shared/localization_no_BOM.cpp
 FILE_LIST+=../shared/inotify/inotify-cxx.cpp
 FILE_LIST+=../shared/tinyxml/tinyxml.cpp
 FILE_LIST+=../shared/tinyxml/tinyxmlerror.cpp
 FILE_LIST+=../shared/tinyxml/tinyxmlparser.cpp
-FILE_LIST+=../shared/globalFunctions.cpp
-FILE_LIST+=../shared/systemFunctions.cpp
-FILE_LIST+=../shared/dragAndDrop.cpp
+FILE_LIST+=../shared/global_func.cpp
+FILE_LIST+=../shared/system_func.cpp
+FILE_LIST+=../shared/drag_n_drop.cpp
 FILE_LIST+=../shared/zstring.cpp
-FILE_LIST+=../shared/xmlBase.cpp
-FILE_LIST+=../shared/customButton.cpp
-FILE_LIST+=../shared/fileHandling.cpp
-FILE_LIST+=../shared/fileTraverser.cpp
-FILE_LIST+=../shared/standardPaths.cpp
-FILE_LIST+=../shared/helpProvider.cpp
-FILE_LIST+=../shared/fileIO.cpp
+FILE_LIST+=../shared/xml_base.cpp
+FILE_LIST+=../shared/custom_button.cpp
+FILE_LIST+=../shared/file_handling.cpp
+FILE_LIST+=../shared/file_traverser.cpp
+FILE_LIST+=../shared/standard_paths.cpp
+FILE_LIST+=../shared/help_provider.cpp
+FILE_LIST+=../shared/file_io.cpp
 
 #list of all *.o files
 OBJECT_LIST=$(foreach file, $(FILE_LIST), OBJ/$(subst .cpp,.o,$(notdir $(file))))
@@ -50,8 +49,8 @@ init:
 	if [ ! -d OBJ ]; then mkdir OBJ; fi
 
 #remove byte ordering mark: needed by Visual C++ but an error with GCC
-removeBOM: ../tools/removeBOM.cpp
-	g++ -o OBJ/removeBOM ../tools/removeBOM.cpp 
+removeBOM: ../tools/remove_BOM.cpp
+	g++ -o OBJ/removeBOM ../tools/remove_BOM.cpp 
 	./OBJ/removeBOM ../shared/localization.cpp ../shared/localization_no_BOM.cpp
 
 %.dep : %.cpp 

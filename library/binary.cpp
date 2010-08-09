@@ -5,7 +5,7 @@
 // **************************************************************************
 //
 #include "binary.h"
-#include "../shared/fileIO.h"
+#include "../shared/file_io.h"
 #include <vector>
 #include <wx/stopwatch.h>
 
@@ -13,7 +13,7 @@
 inline
 void setMinSize(std::vector<char>& buffer, size_t minSize)
 {
-    if (buffer.size() < minSize) //this is similar to reserve(), but be need a "properly initialized" array here
+    if (buffer.size() < minSize) //this is similar to reserve(), but we need a "properly initialized" array here
         buffer.resize(minSize);
 }
 
@@ -66,7 +66,7 @@ private:
 }
 
 
-bool FreeFileSync::filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback& callback)
+bool ffs3::filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback& callback)
 {
     FileInput file1(filename1); //throw FileError()
     FileInput file2(filename2); //throw FileError()
@@ -124,7 +124,7 @@ bool FreeFileSync::filesHaveSameContent(const Zstring& filename1, const Zstring&
     }
     while (!file1.eof());
 
-    if (!file1.eof()) //highly unlikely, but theoretically possible! (but then again, not in this context where both files have same size...)
+    if (!file2.eof()) //highly unlikely, but theoretically possible! (but then again, not in this context where both files have same size...)
         return false;
 
     return true;

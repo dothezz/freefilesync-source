@@ -29,9 +29,11 @@ del BUILD\RealtimeSync*.lib
 del BUILD\RealtimeSync*.exp
 
 del BUILD\FreeFileSync.exe
+del BUILD\FreeFileSync_Debug.exe
 del BUILD\FreeFileSync_Win32.exe
 del BUILD\FreeFileSync_x64.exe
 del BUILD\RealtimeSync.exe
+del BUILD\RealtimeSync_Debug.exe
 del BUILD\RealtimeSync_Win32.exe
 del BUILD\RealtimeSync_x64.exe
 del BUILD\gmon.out

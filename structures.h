@@ -10,11 +10,12 @@
 #include <wx/string.h>
 #include <vector>
 #include "shared/zstring.h"
-#include "shared/systemConstants.h"
-#include "shared/staticAssert.h"
+#include "shared/system_constants.h"
+#include "shared/assert_static.h"
 #include <boost/shared_ptr.hpp>
 
-namespace FreeFileSync
+
+namespace ffs3
 {
 enum CompareVariant
 {
@@ -43,7 +44,7 @@ enum CompareFilesResult
     FILE_EQUAL,
     FILE_CONFLICT
 };
-//attention make sure these /|\  \|/ two enums match!!!
+//attention make sure these /|\  \|/ three enums match!!!
 enum CompareDirResult
 {
     DIR_LEFT_SIDE_ONLY  = FILE_LEFT_SIDE_ONLY,
@@ -51,13 +52,13 @@ enum CompareDirResult
     DIR_EQUAL           = FILE_EQUAL
 };
 
-//attention make sure these /|\  \|/ two enums match!!!
 enum CompareSymlinkResult
 {
     SYMLINK_LEFT_SIDE_ONLY  = FILE_LEFT_SIDE_ONLY,
     SYMLINK_RIGHT_SIDE_ONLY = FILE_RIGHT_SIDE_ONLY,
     SYMLINK_LEFT_NEWER      = FILE_LEFT_NEWER,
     SYMLINK_RIGHT_NEWER     = FILE_RIGHT_NEWER,
+    SYMLINK_DIFFERENT       = FILE_DIFFERENT,
     SYMLINK_EQUAL           = FILE_EQUAL,
     SYMLINK_CONFLICT        = FILE_CONFLICT
 };
@@ -175,23 +176,6 @@ enum DeletionPolicy
 };
 
 
-struct HiddenSettings
-{
-    HiddenSettings() :
-        fileTimeTolerance(2),  //default 2s: FAT vs NTFS
-        verifyFileCopy(false) {}
-
-    size_t fileTimeTolerance; //max. allowed file time deviation
-    bool verifyFileCopy;   //verify copied files
-
-    bool operator==(const HiddenSettings& other) const
-    {
-        return fileTimeTolerance == other.fileTimeTolerance &&
-               verifyFileCopy    == other.verifyFileCopy;
-    }
-};
-
-
 struct AlternateSyncConfig
 {
     AlternateSyncConfig(const SyncConfiguration& syncCfg,
@@ -300,15 +284,11 @@ struct MainConfiguration
 
     SymLinkHandling handleSymlinks;
 
-    //Synchronisation settings
-    SyncConfiguration syncConfiguration;
-
     //GLOBAL filter settings
     FilterConfig globalFilter;
 
-    //misc options
-    HiddenSettings hidden; //settings not visible on GUI
-
+    //Synchronisation settings
+    SyncConfiguration syncConfiguration;
     DeletionPolicy handleDeletion; //use Recycle, delete permanently or move to user-defined location
     wxString customDeletionDirectory;
 
@@ -322,11 +302,13 @@ struct MainConfiguration
                handleSymlinks    == other.handleSymlinks    &&
                syncConfiguration == other.syncConfiguration &&
                globalFilter      == other.globalFilter      &&
-               hidden            == other.hidden            &&
                handleDeletion    == other.handleDeletion    &&
                customDeletionDirectory == other.customDeletionDirectory;
     }
 };
+
+//facilitate drag & drop config merge:
+MainConfiguration merge(const std::vector<MainConfiguration>& mainCfgs);
 }
 
 #endif // FREEFILESYNC_H_INCLUDED

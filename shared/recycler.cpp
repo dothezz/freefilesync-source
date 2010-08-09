@@ -5,21 +5,21 @@
 // **************************************************************************
 //
 #include "recycler.h"
-#include "stringConv.h"
+#include "string_conv.h"
 #include <wx/intl.h>
 #include <stdexcept>
 #include <iterator>
 
 #ifdef FFS_WIN
-#include "dllLoader.h"
+#include "dll_loader.h"
 #include <wx/msw/wrapwin.h> //includes "windows.h"
-#include "buildInfo.h"
-#include "staticAssert.h"
+#include "build_info.h"
+#include "assert_static.h"
 #include <algorithm>
 #include <functional>
 #include <vector>
-#include "longPathPrefix.h"
-#include "IFileOperation/fileOp.h"
+#include "long_path_prefix.h"
+#include "IFileOperation/file_op.h"
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
@@ -33,11 +33,11 @@ namespace
 const std::wstring& getRecyclerDllName()
 {
     static const std::wstring filename(
-        Utility::is64BitBuild ?
+        util::is64BitBuild ?
         L"FileOperation_x64.dll":
         L"FileOperation_Win32.dll");
 
-    assert_static(Utility::is32BitBuild || Utility::is64BitBuild);
+    assert_static(util::is32BitBuild || util::is64BitBuild);
 
     return filename;
 }
@@ -73,7 +73,7 @@ Nevertheless, let's use IFileOperation for better error reporting!
 
 void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (FileError)
 {
-    using FreeFileSync::FileError;
+    using ffs3::FileError;
 
     if (filesToDelete.empty())
         return;
@@ -82,25 +82,26 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
 
     if (useIFileOperation) //new recycle bin usage: available since Vista
     {
+                std::vector<const wchar_t*> fileNames;
+        std::transform(filesToDelete.begin(), filesToDelete.end(),
+                       std::back_inserter(fileNames), std::mem_fun_ref(&Zstring::c_str));
+
         using namespace FileOp;
 
         static const MoveToRecycleBinFct moveToRecycler =
-            Utility::loadDllFunction<MoveToRecycleBinFct>(getRecyclerDllName().c_str(), moveToRecycleBinFctName);
+            util::loadDllFunction<MoveToRecycleBinFct>(getRecyclerDllName().c_str(), moveToRecycleBinFctName);
 
         static const GetLastErrorFct getLastError =
-            Utility::loadDllFunction<GetLastErrorFct>(getRecyclerDllName().c_str(), getLastErrorFctName);
+            util::loadDllFunction<GetLastErrorFct>(getRecyclerDllName().c_str(), getLastErrorFctName);
 
         if (moveToRecycler == NULL || getLastError == NULL)
-            throw FileError(wxString(_("Could not load a required DLL:")) + wxT(" \"") + getRecyclerDllName().c_str() + wxT("\""));
+            throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + fileNames[0] + wxT("\"\n\n") + //report first file only... better than nothing
+                            wxString(_("Could not load a required DLL:")) + wxT(" \"") + getRecyclerDllName().c_str() + wxT("\""));
 
         //#warning moving long file paths to recycler does not work! clarify!
 //        std::vector<Zstring> temp;
 //        std::transform(filesToDelete.begin(), filesToDelete.end(),
-//                       std::back_inserter(temp), std::ptr_fun(FreeFileSync::removeLongPathPrefix)); //::IFileOperation() can't handle \\?\-prefix!
-
-        std::vector<const wchar_t*> fileNames;
-        std::transform(filesToDelete.begin(), filesToDelete.end(),
-                       std::back_inserter(fileNames), std::mem_fun_ref(&Zstring::c_str));
+//                       std::back_inserter(temp), std::ptr_fun(ffs3::removeLongPathPrefix)); //::IFileOperation() can't handle \\?\-prefix!
 
         if (!(*moveToRecycler)(&fileNames[0], //array must not be empty
                                fileNames.size()))
@@ -143,7 +144,7 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
 }
 
 
-void FreeFileSync::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileError)
+void ffs3::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileError)
 {
 #ifdef FFS_WIN
     const Zstring filenameFmt = applyLongPathPrefix(fileToDelete);
@@ -165,7 +166,8 @@ void FreeFileSync::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileE
     try
     {
         if (!fileObj->trash())
-            throw std::runtime_error("Recycle Bin failed but did not provide error information!");
+        throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + zToWx(fileToDelete) + wxT("\"\n\n") +
+                        wxT("(") + wxT("unknown error") + wxT(")"));
     }
     catch (const Glib::Error& errorObj)
     {
@@ -180,7 +182,7 @@ void FreeFileSync::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileE
 }
 
 
-bool FreeFileSync::recycleBinExists()
+bool ffs3::recycleBinExists()
 {
 #ifdef FFS_WIN
     return true;

@@ -1,21 +1,5 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE
- Byte
- tavua
- GB
- GB
- MB
- MB
- day(s)
- päivää(e)
- hour(s)
- tunti(n)
- kB
- kB
- min
- Min.
- sec
- Sek.
 %x / %y objects deleted successfully
 %x / %y Kohteiden poisto onnistui
 %x Byte
@@ -28,18 +12,24 @@
 %x PB
 %x TB
 %x TB
+%x day(s)
+
 %x directories
 %x hakemistoa
 %x files
 %x tiedostoista
-%x is not a valid FreeFileSync batch file!
-%x ei kelvollinen FreeFileSync eräajotiedosto!
+%x hour(s)
+
 %x kB
 %x kB
+%x min
+
 %x of %y rows in view
 %x riviä %y rivistä näytössä
 %x of 1 row in view
 %x 1 rivistä näytössä
+%x sec
+
 %x%
 %x%
 &Abort
@@ -182,7 +172,7 @@ Add folder pair
 Lisää hakemistopari
 All directories in sync!
 Kaikki hakemistot täsmäävät!
-An exception occured!
+An exception occurred!
 Virhe havaittu!
 As a result the files are separated into the following categories:
 Tiedoston on avattu seuraaviin luokkiin:
@@ -266,6 +256,8 @@ Continue
 Jatka
 Conversion error:
 Konversio virhe:
+Copy filesystem permissions
+
 Copy from left to right
 Kopioidaan vasen -> oikea 
 Copy from left to right overwriting
@@ -278,8 +270,8 @@ Copy locked files
 Kopioi lukitut tiedostot
 Copy new or updated files to right folder.
 Kopioidaan uudet tai muuttuneet tiedostot oikeaan hakemistoon.
-Copy shared or locked files using Volume Shadow Copy Service
-Kopioi jaetut ja lukitut tiedostot käyttäen Volume Shadow Copy Service
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+
 Copy to clipboard\tCTRL+C
 Kopioi Leikepöydälle\tCTRL+C
 Copying Symbolic Link %x overwriting %y
@@ -384,6 +376,8 @@ Error
 Virhe
 Error changing modification time:
 Virhe muuttaessa tiedoston aikaa:
+Error copying file permissions:
+
 Error copying file:
 Virhe kopioitaessa tiedostoa:
 Error copying locked file %x!
@@ -418,14 +412,14 @@ Error reading from synchronization database:
 Virhe lukiessa täsmäytyksen tietokantaa:
 Error resolving symbolic link:
 Virhe selvittäessä symbolista linkkiä:
+Error setting privilege:
+
 Error starting Volume Shadow Copy Service!
 Virhe käynnistäessä Volume Shadow Copy Service!
 Error traversing directory:
 Virhe hakemistoa läpikäydessä:
 Error when monitoring directories.
 Virhe seuratessa hakemistoa.
-Error writing file attributes:
-Virhe kirjottaessa tiedosto ominaisuuksia:
 Error writing file:
 Virhe kirjottaessa tiedosto:
 Error writing to synchronization database:
@@ -598,6 +592,8 @@ Initial synchronization:
 Ensi täsmäytys:
 Integrate external applications into context menu. The following macros are available:
 Liitä ulkoinen sovellus viitekehysvalikkoon. Seuraavat makrot ovat valittavissa:
+Invalid FreeFileSync config file!
+
 Leave as unresolved conflict
 Jätä ratkaisemattomana virheenä
 Left
@@ -678,7 +674,7 @@ Planned directory deletion is in conflict with its subdirectories and -files!
 Suunniteltu hakemiston poistaminen on ristiriidassa alihakemiston ja tiedostojen kanssa!
 Please run a Compare first before synchronizing!
 Aja tarkistus ennen täsmäytystä. 
-Press \"Switch\" to open FreeFileSync GUI modus.
+Press \"Switch\" to open FreeFileSync GUI mode.
 Paina \"Vaihda\" Avaa FreeFileSync GUI toimintoa.
 Processing folder pair:
 Käsitellään hakemistoparia:
@@ -794,7 +790,7 @@ Stop
 Stop
 Swap sides
 Puolten vaihto
-Switching to FreeFileSync GUI modus...
+Switching to FreeFileSync GUI mode...
 Siirtyminen FreeFileSync GUI toimintoon...
 Symbolic Link handling
 Symlinkkien hallinta
@@ -844,6 +840,8 @@ Total required free disk space:
 Vaadittu vapaa levytila:
 Total time:
 Kokonaisaika:
+Transfer file and directory permissions\n(Requires Administrator rights)
+
 Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 Kohtele tiedostoja jolla aikaleima on tasan +/- tunti samoina, korjaa kesäajan siirtoa
 Unable to connect to sourceforge.net!

@@ -8,7 +8,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Release">
-				<Option output="BUILD\FreeFileSync" prefix_auto="1" extension_auto="1" />
+				<Option output="BUILD\FreeFileSync_Win32" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="BUILD\" />
 				<Option object_output="OBJ\Release_FFS_GCC\" />
 				<Option type="0" />
@@ -21,12 +21,14 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-static" />
 					<Add library="libwxmsw28u_adv.a" />
 					<Add library="libwxmsw28u_core.a" />
 					<Add library="libwxbase28u.a" />
 					<Add library="libwxpng.a" />
 					<Add library="libwxzlib.a" />
 					<Add library="libwxbase28u_net.a" />
+					<Add library="libboost_thread-mgw45-mt-s-1_43.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 				</Linker>
 			</Target>
@@ -52,11 +54,12 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
+					<Add library="libboost_thread-mgw45-mt-sd-1_43.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
 			<Target title="Debug-DLL">
-				<Option output="BUILD\FreeFileSync" prefix_auto="1" extension_auto="1" />
+				<Option output="BUILD\FreeFileSync_Debug" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="BUILD" />
 				<Option object_output="OBJ\Debug_FFS_GCC\" />
 				<Option type="0" />
@@ -74,6 +77,7 @@
 					<Add library="libwxmsw28ud_core.a" />
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxbase28ud_net.a" />
+					<Add library="libboost_thread-mgw45-mt-sd-1_43.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
@@ -96,7 +100,7 @@
 			<Add option="-DwxUSE_UNICODE" />
 			<Add option="-DZSTRING_WIDE_CHAR" />
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
-			<Add directory="shared\boost_1_x" />
+			<Add directory="C:\Program Files\C++\Boost" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
@@ -112,9 +116,10 @@
 			<Add library="liboleaut32.a" />
 			<Add library="libgdi32.a" />
 			<Add library="libcomdlg32.a" />
-			<Add library="libwinmm.a" />
 			<Add library="libws2_32.a" />
-			<Add library="libwinspool" />
+			<Add library="libwinspool.a" />
+			<Add library="libwinmm.a" />
+			<Add directory="C:\Program Files\C++\Boost\stage\lib" />
 		</Linker>
 		<Unit filename="WxWizFrame.fbp">
 			<Option target="&lt;{~None~}&gt;" />
@@ -134,29 +139,30 @@
 		<Unit filename="comparison.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="fileHierarchy.cpp" />
-		<Unit filename="fileHierarchy.h" />
+		<Unit filename="file_hierarchy.cpp" />
+		<Unit filename="file_hierarchy.h" />
 		<Unit filename="library\binary.cpp" />
 		<Unit filename="library\binary.h" />
-		<Unit filename="library\checkExist.h" />
-		<Unit filename="library\customGrid.cpp">
+		<Unit filename="library\custom_grid.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="library\customGrid.h">
+		<Unit filename="library\custom_grid.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="library\dbFile.cpp" />
-		<Unit filename="library\dbFile.h">
+		<Unit filename="library\db_file.cpp" />
+		<Unit filename="library\db_file.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="library\detectRenaming.h" />
-		<Unit filename="library\errorLogging.cpp">
+		<Unit filename="library\detect_renaming.h" />
+		<Unit filename="library\dir_lock.cpp" />
+		<Unit filename="library\dir_lock.h" />
+		<Unit filename="library\error_log.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="library\errorLogging.h">
+		<Unit filename="library\error_log.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
@@ -185,11 +191,11 @@
 		<Unit filename="library\gtest\unittest3.cpp">
 			<Option target="Unit Test" />
 		</Unit>
-		<Unit filename="library\iconBuffer.cpp">
+		<Unit filename="library\icon_buffer.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="library\iconBuffer.h">
+		<Unit filename="library\icon_buffer.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
@@ -199,16 +205,16 @@
 			<Option target="Unit Test" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="library\processXml.cpp" />
-		<Unit filename="library\processXml.h">
+		<Unit filename="library\process_xml.cpp" />
+		<Unit filename="library\process_xml.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="library\resources.cpp" />
 		<Unit filename="library\resources.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="library\softFilter.cpp" />
-		<Unit filename="library\softFilter.h" />
+		<Unit filename="library\soft_filter.cpp" />
+		<Unit filename="library\soft_filter.h" />
 		<Unit filename="library\statistics.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
@@ -216,8 +222,8 @@
 		<Unit filename="library\statistics.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="library\statusHandler.cpp" />
-		<Unit filename="library\statusHandler.h">
+		<Unit filename="library\status_handler.cpp" />
+		<Unit filename="library\status_handler.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="resource.rc">
@@ -226,64 +232,64 @@
 			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="shared\Recycler.h" />
-		<Unit filename="shared\appMain.cpp">
+		<Unit filename="shared\app_main.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="shared\appMain.h">
+		<Unit filename="shared\app_main.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="shared\buildInfo.h" />
-		<Unit filename="shared\checkExist.cpp" />
-		<Unit filename="shared\checkExist.h" />
-		<Unit filename="shared\customButton.cpp">
+		<Unit filename="shared\build_info.h" />
+		<Unit filename="shared\check_exist.cpp" />
+		<Unit filename="shared\check_exist.h" />
+		<Unit filename="shared\custom_button.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="shared\customButton.h">
+		<Unit filename="shared\custom_button.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="shared\customComboBox.cpp" />
-		<Unit filename="shared\customComboBox.h" />
-		<Unit filename="shared\customTooltip.cpp">
+		<Unit filename="shared\custom_combo_box.cpp" />
+		<Unit filename="shared\custom_combo_box.h" />
+		<Unit filename="shared\custom_tooltip.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="shared\customTooltip.h">
+		<Unit filename="shared\custom_tooltip.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="shared\debugNew.h" />
-		<Unit filename="shared\dllLoader.cpp" />
-		<Unit filename="shared\dllLoader.h" />
-		<Unit filename="shared\dragAndDrop.cpp">
+		<Unit filename="shared\debug_new.h" />
+		<Unit filename="shared\dll_loader.cpp" />
+		<Unit filename="shared\dll_loader.h" />
+		<Unit filename="shared\drag_n_drop.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="shared\dragAndDrop.h">
+		<Unit filename="shared\drag_n_drop.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="shared\fileError.h" />
-		<Unit filename="shared\fileHandling.cpp" />
-		<Unit filename="shared\fileHandling.h" />
-		<Unit filename="shared\fileID.cpp" />
-		<Unit filename="shared\fileID.h" />
-		<Unit filename="shared\fileIO.cpp" />
-		<Unit filename="shared\fileIO.h" />
-		<Unit filename="shared\fileTraverser.cpp" />
-		<Unit filename="shared\fileTraverser.h" />
-		<Unit filename="shared\globalFunctions.cpp" />
-		<Unit filename="shared\globalFunctions.h" />
+		<Unit filename="shared\file_error.h" />
+		<Unit filename="shared\file_handling.cpp" />
+		<Unit filename="shared\file_handling.h" />
+		<Unit filename="shared\file_id.cpp" />
+		<Unit filename="shared\file_id.h" />
+		<Unit filename="shared\file_io.cpp" />
+		<Unit filename="shared\file_io.h" />
+		<Unit filename="shared\file_traverser.cpp" />
+		<Unit filename="shared\file_traverser.h" />
+		<Unit filename="shared\global_func.cpp" />
+		<Unit filename="shared\global_func.h" />
 		<Unit filename="shared\guid.cpp" />
 		<Unit filename="shared\guid.h" />
-		<Unit filename="shared\helpProvider.cpp">
+		<Unit filename="shared\help_provider.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="shared\helpProvider.h">
+		<Unit filename="shared\help_provider.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
@@ -291,23 +297,20 @@
 		<Unit filename="shared\localization.h" />
 		<Unit filename="shared\lock.cpp" />
 		<Unit filename="shared\lock.h" />
-		<Unit filename="shared\longPathPrefix.cpp" />
-		<Unit filename="shared\longPathPrefix.h" />
-		<Unit filename="shared\parallelCall.cpp" />
-		<Unit filename="shared\parallelCall.h" />
+		<Unit filename="shared\long_path_prefix.cpp" />
+		<Unit filename="shared\long_path_prefix.h" />
 		<Unit filename="shared\recycler.cpp" />
 		<Unit filename="shared\recycler.h" />
 		<Unit filename="shared\serialize.cpp" />
 		<Unit filename="shared\serialize.h" />
 		<Unit filename="shared\shadow.cpp" />
 		<Unit filename="shared\shadow.h" />
-		<Unit filename="shared\standardPaths.cpp" />
-		<Unit filename="shared\standardPaths.h" />
-		<Unit filename="shared\staticAssert.h" />
-		<Unit filename="shared\stringConv.h" />
-		<Unit filename="shared\systemConstants.h" />
-		<Unit filename="shared\systemFunctions.cpp" />
-		<Unit filename="shared\systemFunctions.h" />
+		<Unit filename="shared\standard_paths.cpp" />
+		<Unit filename="shared\standard_paths.h" />
+		<Unit filename="shared\string_conv.h" />
+		<Unit filename="shared\system_constants.h" />
+		<Unit filename="shared\system_func.cpp" />
+		<Unit filename="shared\system_func.h" />
 		<Unit filename="shared\taskbar.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
@@ -320,19 +323,19 @@
 		<Unit filename="shared\tinyxml\tinyxml.cpp" />
 		<Unit filename="shared\tinyxml\tinyxmlerror.cpp" />
 		<Unit filename="shared\tinyxml\tinyxmlparser.cpp" />
-		<Unit filename="shared\toggleButton.cpp">
+		<Unit filename="shared\toggle_button.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="shared\toggleButton.h">
+		<Unit filename="shared\toggle_button.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="shared\util.cpp" />
 		<Unit filename="shared\util.h" />
-		<Unit filename="shared\xmlBase.cpp" />
-		<Unit filename="shared\xmlBase.h" />
-		<Unit filename="shared\xmlError.h" />
+		<Unit filename="shared\xml_base.cpp" />
+		<Unit filename="shared\xml_base.h" />
+		<Unit filename="shared\xml_error.h" />
 		<Unit filename="shared\zstring.cpp" />
 		<Unit filename="shared\zstring.h" />
 		<Unit filename="structures.cpp" />
@@ -343,110 +346,119 @@
 		<Unit filename="synchronization.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="ui\batchConfig.cpp">
+		<Unit filename="ui\batch_config.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\batchConfig.h">
+		<Unit filename="ui\batch_config.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\batchStatusHandler.cpp">
+		<Unit filename="ui\batch_status_handler.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\batchStatusHandler.h" />
-		<Unit filename="ui\checkVersion.cpp">
+		<Unit filename="ui\batch_status_handler.h" />
+		<Unit filename="ui\check_version.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\checkVersion.h">
+		<Unit filename="ui\check_version.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="ui\folderPair.h">
+		<Unit filename="ui\folder_pair.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\gridView.cpp">
+		<Unit filename="ui\grid_view.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\gridView.h">
+		<Unit filename="ui\grid_view.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="ui\guiGenerated.cpp">
+		<Unit filename="ui\gui_generated.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\guiGenerated.h">
+		<Unit filename="ui\gui_generated.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="ui\guiStatusHandler.cpp">
+		<Unit filename="ui\gui_status_handler.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\guiStatusHandler.h">
+		<Unit filename="ui\gui_status_handler.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="ui\mainDialog.cpp">
+		<Unit filename="ui\main_dlg.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\mainDialog.h">
+		<Unit filename="ui\main_dlg.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="ui\messagePopup.cpp">
+		<Unit filename="ui\mouse_move_dlg.cpp" />
+		<Unit filename="ui\mouse_move_dlg.h" />
+		<Unit filename="ui\msg_popup.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\messagePopup.h" />
-		<Unit filename="ui\mouseMoveWindow.cpp" />
-		<Unit filename="ui\mouseMoveWindow.h" />
-		<Unit filename="ui\progressIndicator.cpp">
+		<Unit filename="ui\msg_popup.h" />
+		<Unit filename="ui\progress_indicator.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\progressIndicator.h" />
+		<Unit filename="ui\progress_indicator.h" />
 		<Unit filename="ui\search.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="ui\search.h" />
-		<Unit filename="ui\smallDialogs.cpp">
+		<Unit filename="ui\small_dlgs.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\smallDialogs.h">
+		<Unit filename="ui\small_dlgs.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="ui\sorting.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="ui\switchToGui.cpp">
+		<Unit filename="ui\switch_to_gui.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\switchToGui.h">
+		<Unit filename="ui\switch_to_gui.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\syncConfig.cpp">
+		<Unit filename="ui\sync_cfg.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\syncConfig.h">
+		<Unit filename="ui\sync_cfg.h">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\trayIcon.cpp">
+		<Unit filename="ui\tray_icon.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="ui\trayIcon.h" />
+		<Unit filename="ui\tray_icon.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
 			<debugger />
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>
