@@ -193,13 +193,13 @@ const Zstring& ffs3::getSyncDBFilename()
     //make sure they end with ".ffs_db". These files will not be included into comparison when located in base sync directories
 #ifdef FFS_WIN
     static Zstring output = Zstring(util::is64BitBuild ?
-                          DefaultStr("sync.x64.") :
-                          DefaultStr("sync.")) + SYNC_DB_FILE_ENDING;
+                          Zstr("sync.x64.") :
+                          Zstr("sync.")) + SYNC_DB_FILE_ENDING;
 #elif defined FFS_LINUX
     //files beginning with dots are hidden e.g. in Nautilus
     static Zstring output = Zstring(util::is64BitBuild ?
-                          DefaultStr(".sync.x64.") :
-                          DefaultStr(".sync.")) + SYNC_DB_FILE_ENDING;
+                          Zstr(".sync.x64.") :
+                          Zstr(".sync.")) + SYNC_DB_FILE_ENDING;
 #endif
     return output;
 }

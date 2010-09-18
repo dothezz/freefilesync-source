@@ -3,9 +3,9 @@
 <HEAD>
 	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
 	<TITLE></TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Win32)">
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20091209;21185800">
+	<META NAME="CHANGED" CONTENT="20100902;19144900">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -17,27 +17,30 @@
 		H3 { margin-bottom: 0.21cm }
 		H3.western { font-family: "Arial", sans-serif }
 		H3.cjk { font-family: "MS Mincho" }
+		H3.ctl { font-family: "Mangal" }
 		A:link { so-language: zxx }
 	-->
 	</STYLE>
 </HEAD>
-<BODY LANG="de-DE" DIR="LTR">
-<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Compare by
-filesize</FONT></H3>
+<BODY LANG="en-US" DIR="LTR">
+<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Compare by file
+size</FONT></H3>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Sometimes
-you might want to compare both sides by filesize only, ignoring last
+you might want to compare both sides by file size only, ignoring last
 modification timestamps.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Instructions:</B></FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Open
-your *.ffs_gui configuration file and change the value of XML node
+file &quot;</FONT><FONT FACE="Courier New, monospace">GlobalSettings.xml</FONT><FONT FACE="Tahoma, sans-serif">&quot;
+located either in &quot;</FONT><FONT FACE="Courier New, monospace">%appdata%\FreeFileSync</FONT><FONT FACE="Tahoma, sans-serif">&quot;
+or the installation folder and change the value of XML node
 </FONT><FONT FACE="Courier New, monospace">&lt;FileTimeTolerance&gt;</FONT>
 <FONT FACE="Tahoma, sans-serif">to some sufficiently large number of
-seconds. Changed files will now be detected as a conflict (same date,
-different filesize) and the default synchronization direction for
-conflics can be used.</FONT></P>
+seconds, for example 2.000.000.000. Changed files will now be
+detected as a conflict (same date, different file size) and the
+default synchronization direction for conflicts can be used.</FONT></P>
 </BODY>
 </HTML>

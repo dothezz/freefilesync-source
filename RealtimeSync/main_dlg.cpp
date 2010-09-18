@@ -8,7 +8,7 @@
 #include "resources.h"
 #include "../shared/custom_button.h"
 #include "../shared/standard_paths.h"
-#include "functions.h"
+//#include "functions.h"
 #include <wx/msgdlg.h>
 #include <wx/wupdlock.h>
 #include "watcher.h"
@@ -43,7 +43,7 @@ MainDialog::MainDialog(wxDialog *dlg,
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), NULL, this);
 
     //prepare drag & drop
-    dragDropOnFolder.reset(new ffs3::DragDropOnDlg(m_panelMainFolder, m_dirPickerMain, m_txtCtrlDirectoryMain));
+    dirNameFirst.reset(new ffs3::DirectoryName(m_panelMainFolder, m_dirPickerMain, m_txtCtrlDirectoryMain));
 
     //load config values
     xmlAccess::XmlRealConfig newConfig;
@@ -141,7 +141,7 @@ void MainDialog::OnShowHelp(wxCommandEvent& event)
 
 void MainDialog::OnMenuAbout(wxCommandEvent& event)
 {
-        //build information
+    //build information
     wxString build = __TDATE__;
 #if wxUSE_UNICODE
     build += wxT(" - Unicode");
@@ -156,8 +156,8 @@ void MainDialog::OnMenuAbout(wxCommandEvent& event)
         build += wxT(" x86");
     assert_static(util::is32BitBuild || util::is64BitBuild);
 
-wxString buildFormatted = _("(Build: %x)");
-buildFormatted.Replace(wxT("%x"), build);
+    wxString buildFormatted = _("(Build: %x)");
+    buildFormatted.Replace(wxT("%x"), build);
 
     wxMessageDialog* aboutDlg = new wxMessageDialog(this, wxString(wxT("RealtimeSync")) + wxT("\n\n") + buildFormatted, _("About"), wxOK);
     aboutDlg->ShowModal();
@@ -270,19 +270,14 @@ void MainDialog::OnLoadConfig(wxCommandEvent& event)
 void MainDialog::setConfiguration(const xmlAccess::XmlRealConfig& cfg)
 {
     //clear existing folders
-    m_txtCtrlDirectoryMain->ChangeValue(wxEmptyString);
-    m_dirPickerMain->SetPath(wxEmptyString);
+    dirNameFirst->setName(Zstring());
 
     clearAddFolders();
 
     if (!cfg.directories.empty())
     {
         //fill top folder
-        m_txtCtrlDirectoryMain->SetValue(*cfg.directories.begin());
-
-        const Zstring dirFormatted = ffs3::getFormattedDirectoryName(wxToZ(*cfg.directories.begin()));
-        if (dirExists(dirFormatted))
-            m_dirPickerMain->SetPath(zToWx(dirFormatted));
+        dirNameFirst->setName(wxToZ(*cfg.directories.begin()));
 
         //fill additional folders
         addFolder(std::vector<wxString>(cfg.directories.begin() + 1, cfg.directories.end()));
@@ -300,9 +295,9 @@ xmlAccess::XmlRealConfig MainDialog::getConfiguration()
 {
     xmlAccess::XmlRealConfig output;
 
-    output.directories.push_back(m_txtCtrlDirectoryMain->GetValue());
-    for (std::vector<FolderPanel*>::const_iterator i = additionalFolders.begin(); i != additionalFolders.end(); ++i)
-        output.directories.push_back((*i)->m_txtCtrlDirectory->GetValue());
+    output.directories.push_back(zToWx(dirNameFirst->getName()));
+    for (std::vector<DirectoryPanel*>::const_iterator i = dirNamesExtra.begin(); i != dirNamesExtra.end(); ++i)
+        output.directories.push_back(zToWx((*i)->getName()));
 
     output.commandline = m_textCtrlCommand->GetValue();
     output.delay       = m_spinCtrlDelay->GetValue();;
@@ -313,13 +308,13 @@ xmlAccess::XmlRealConfig MainDialog::getConfiguration()
 
 void MainDialog::OnAddFolder(wxCommandEvent& event)
 {
-    const wxString topFolder = m_txtCtrlDirectoryMain->GetValue();
+    const wxString topFolder = zToWx(dirNameFirst->getName());
 
     //clear existing top folder first
-    rts::setDirectoryName(wxEmptyString, m_txtCtrlDirectoryMain, m_dirPickerMain);
+    dirNameFirst->setName(Zstring());
 
     std::vector<wxString> newFolders;
-    newFolders.push_back(topFolder.c_str());
+    newFolders.push_back(topFolder);
 
     addFolder(newFolders, true); //add pair in front of additonal pairs
 }
@@ -329,11 +324,11 @@ void MainDialog::OnRemoveFolder(wxCommandEvent& event)
 {
     //find folder pair originating the event
     const wxObject* const eventObj = event.GetEventObject();
-    for (std::vector<FolderPanel*>::const_iterator i = additionalFolders.begin(); i != additionalFolders.end(); ++i)
+    for (std::vector<DirectoryPanel*>::const_iterator i = dirNamesExtra.begin(); i != dirNamesExtra.end(); ++i)
     {
         if (eventObj == static_cast<wxObject*>((*i)->m_bpButtonRemoveFolder))
         {
-            removeAddFolder(i - additionalFolders.begin());
+            removeAddFolder(i - dirNamesExtra.begin());
             return;
         }
     }
@@ -342,10 +337,11 @@ void MainDialog::OnRemoveFolder(wxCommandEvent& event)
 
 void MainDialog::OnRemoveTopFolder(wxCommandEvent& event)
 {
-    if (additionalFolders.size() > 0)
+    if (dirNamesExtra.size() > 0)
     {
-        const wxString topDir = (*additionalFolders.begin())->m_txtCtrlDirectory->GetValue().c_str();
-        rts::setDirectoryName(topDir, m_txtCtrlDirectoryMain, m_dirPickerMain);
+        const wxString topDir = (*dirNamesExtra.begin())->getName().c_str();
+
+        dirNameFirst->setName(wxToZ(topDir));
 
         removeAddFolder(0); //remove first of additional folders
     }
@@ -370,7 +366,7 @@ void MainDialog::addFolder(const std::vector<wxString>& newFolders, bool addFron
     for (std::vector<wxString>::const_iterator i = newFolders.begin(); i != newFolders.end(); ++i)
     {
         //add new folder pair
-        FolderPanel* newFolder = new FolderPanel(m_scrolledWinFolders);
+        DirectoryPanel* newFolder = new DirectoryPanel(m_scrolledWinFolders);
         newFolder->m_bpButtonRemoveFolder->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("removeFolderPair")));
 
         //get size of scrolled window
@@ -379,23 +375,23 @@ void MainDialog::addFolder(const std::vector<wxString>& newFolders, bool addFron
         if (addFront)
         {
             bSizerFolders->Insert(0, newFolder, 0, wxEXPAND, 5);
-            additionalFolders.insert(additionalFolders.begin(), newFolder);
+            dirNamesExtra.insert(dirNamesExtra.begin(), newFolder);
         }
         else
         {
             bSizerFolders->Add(newFolder, 0, wxEXPAND, 5);
-            additionalFolders.push_back(newFolder);
+            dirNamesExtra.push_back(newFolder);
         }
 
         //register events
         newFolder->m_bpButtonRemoveFolder->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainDialog::OnRemoveFolder), NULL, this );
 
         //insert directory name
-        rts::setDirectoryName(*i, newFolder->m_txtCtrlDirectory, newFolder->m_dirPicker);
+        newFolder->setName(wxToZ(*i));
     }
 
     //set size of scrolled window
-    const size_t additionalRows = std::min(additionalFolders.size(), MAX_ADD_FOLDERS); //up to MAX_ADD_FOLDERS additional folders shall be shown
+    const size_t additionalRows = std::min(dirNamesExtra.size(), MAX_ADD_FOLDERS); //up to MAX_ADD_FOLDERS additional folders shall be shown
     m_scrolledWinFolders->SetMinSize(wxSize( -1, folderHeight * static_cast<int>(additionalRows)));
 
     //adapt delete top folder pair button
@@ -414,23 +410,23 @@ void MainDialog::removeAddFolder(const int pos)
 {
     wxWindowUpdateLocker dummy(this); //avoid display distortion
 
-    if (0 <= pos && pos < int(additionalFolders.size()))
+    if (0 <= pos && pos < int(dirNamesExtra.size()))
     {
         //remove folder pairs from window
-        FolderPanel* dirToDelete = additionalFolders[pos];
+        DirectoryPanel* dirToDelete = dirNamesExtra[pos];
         const int folderHeight = dirToDelete->GetSize().GetHeight();
 
         bSizerFolders->Detach(dirToDelete); //Remove() does not work on Window*, so do it manually
         dirToDelete->Destroy();                 //
-        additionalFolders.erase(additionalFolders.begin() + pos); //remove last element in vector
+        dirNamesExtra.erase(dirNamesExtra.begin() + pos); //remove last element in vector
 
 
         //set size of scrolled window
-        const size_t additionalRows = std::min(additionalFolders.size(), MAX_ADD_FOLDERS); //up to MAX_ADD_FOLDERS additional folders shall be shown
+        const size_t additionalRows = std::min(dirNamesExtra.size(), MAX_ADD_FOLDERS); //up to MAX_ADD_FOLDERS additional folders shall be shown
         m_scrolledWinFolders->SetMinSize(wxSize( -1, folderHeight * static_cast<int>(additionalRows)));
 
         //adapt delete top folder pair button
-        if (additionalFolders.size() == 0)
+        if (dirNamesExtra.size() == 0)
         {
             m_bpButtonRemoveTopFolder->Hide();
             m_panelMainFolder->Layout();
@@ -448,7 +444,7 @@ void MainDialog::clearAddFolders()
 {
     wxWindowUpdateLocker dummy(this); //avoid display distortion
 
-    additionalFolders.clear();
+    dirNamesExtra.clear();
     bSizerFolders->Clear(true);
 
     m_bpButtonRemoveTopFolder->Hide();

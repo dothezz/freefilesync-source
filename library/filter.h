@@ -183,7 +183,7 @@ bool NullFilter::cmpLessSameType(const BaseFilter& other) const
 inline
 Zstring NullFilter::uniqueClassIdentifier() const
 {
-    return DefaultStr("NullFilter");
+    return Zstr("NullFilter");
 }
 
 
@@ -227,7 +227,7 @@ bool CombinedFilter::cmpLessSameType(const BaseFilter& other) const
 inline
 Zstring CombinedFilter::uniqueClassIdentifier() const
 {
-    return DefaultStr("CombinedFilter");
+    return Zstr("CombinedFilter");
 }
 
 

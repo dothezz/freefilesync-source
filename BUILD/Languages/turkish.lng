@@ -90,8 +90,6 @@ Ge&ri yükle
 &Evet
 (Build: %x)
 
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Not: Sadece FAT/FAT32 olarak biçimlendirilmiş sürücüler bu problemden etkilenir!\nDiğer durumlarda, \"1-saat'lik zaman farkını yoksay\" ayarı devre dışı bırakılabilir.)
 (Requires an Internet connection!)
 
 - Other side's counterpart to %dir
@@ -274,14 +272,10 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 
 Copy to clipboard\tCTRL+C
 Hafızaya kopyala\tCTRL+C
-Copying Symbolic Link %x overwriting %y
+Copying new Symbolic Link %x to %y
 
-Copying Symbolic Link %x to %y
+Copying new file %x to %y
 
-Copying file %x overwriting %y
-
-Copying file %x to %y
-%x'den %y'e dosya kopyalanıyor
 Could not determine volume name for file:
 Belirtilen dosya için birim adı belirlenemedi:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 Veri doğrulama hatası: Kaynak ve hedef dosyası içeriği farklı!
 Date
 Tarih
-Delay
-Gecikme
-Delay between detection of changes and execution of command line in seconds
-Saniye olarak, değişikliklerin tespiti ile komut satırının çalıştırılması arasındaki boşluk süresi
 Delete files/folders existing on left side only
 Sadece sol tarafta olan dosyaları/klasörleri sil
 Delete files/folders existing on right side only
@@ -412,6 +402,8 @@ Error reading from synchronization database:
 Senkronizasyon veri tabanýndan okuma hatasý:
 Error resolving symbolic link:
 Sembolik bağlantıyı çözümlerken hata:
+Error setting directory lock:
+
 Error setting privilege:
 
 Error starting Volume Shadow Copy Service!
@@ -458,8 +450,6 @@ File size and date
 Dosya ebatı ve tarihi
 Filename
 Dosya adı
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-%X dosyaları 1 saat'ten daha az tarih farkına sahip!\n\Gün ışığından yararlanma ayarına bağlı olarak hangisinin daha yeni olduğuna karar vermek güvenli değil.
 Files %x have the same date but a different size!
 %x dosyalarının tarihleri aynı fakat ebatları farklı!
 Files are found equal if\n     - file content\nis the same
@@ -564,12 +554,12 @@ Homepage
 Ana sayfa
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 
+Idle time between detection of last change and execution of command line in seconds
+
 If you like FFS
 Eğer FFS’i sevdiyseniz
 Ignore
 
-Ignore 1-hour file time difference
-1 saatlik dosya tarihi farklılaşmasını yoksay
 Ignore errors
 Hataları yoksay
 Ignore subsequent errors
@@ -611,6 +601,8 @@ Kayıt tutma
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 
 Match case
+
+Minimum Idle Time
 
 Mirror ->>
 Yedekleme ->>
@@ -666,6 +658,10 @@ Operation:
 İşlem:
 Overview
 Değerlendirme
+Overwriting Symbolic Link %x in %y
+
+Overwriting file %x in %y
+
 Pause
 Duraklat
 Paused
@@ -842,8 +838,6 @@ Total time:
 Toplam zaman:
 Transfer file and directory permissions\n(Requires Administrator rights)
 
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-Dosya tarihleri tam olarak +/- 1 saat farklı olduğunda dosyaları eşit olarak algıla. 1 saatten az tarih farklılıklarını ise tutarsızlık olarak belirt (Gün ışığından yararlanma durumu)
 Unable to connect to sourceforge.net!
 sourceforge.net’e bağlanılamıyor!
 Unable to create logfile!
@@ -869,6 +863,8 @@ Verifying file %x
 Volume name %x not part of filename %y!
 %x birim adı, %y dosya adının bölümü değil!
 Waiting for all directories to become available...
+
+Waiting while directory is locked (%x)...
 
 Warning
 Uyarı

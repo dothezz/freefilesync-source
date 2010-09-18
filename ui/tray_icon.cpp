@@ -24,7 +24,7 @@ int roundNum(double d) //little rounding function
 
 wxIcon generateIcon(size_t percent) //generate icon with progress indicator
 {
-    percent = std::min(percent, static_cast<size_t>(100u)); //handle invalid input
+    percent = std::min(percent, static_cast<size_t>(100)); //handle invalid input
 
 #ifdef FFS_WIN
     static const wxBitmap trayIcon = GlobalResources::getInstance().getImageByName(wxT("FFS_tray_win.png"));
@@ -39,25 +39,26 @@ wxIcon generateIcon(size_t percent) //generate icon with progress indicator
     if (buffer.first == indicatorHeight)
         return buffer.second;
 
-    if (    trayIcon.GetWidth()  > 0 &&
-            trayIcon.GetHeight() > 0)
-    {
-        static const int indicatorWidth = trayIcon.GetWidth() * .25;
-        const int indicatorXBegin = ceil((trayIcon.GetWidth() - indicatorWidth) / 2.0);
-        const int indicatorYBegin = trayIcon.GetHeight() - indicatorHeight;
-
         wxImage genImage(trayIcon.ConvertToImage());
+
+    if (    genImage.GetWidth()  > 0 &&
+            genImage.GetHeight() > 0)
+    {
+        const int indicatorWidth  = genImage.GetWidth() * .4;
+        const int indicatorXBegin = std::ceil((genImage.GetWidth() - indicatorWidth) / 2.0);
+        const int indicatorYBegin = genImage.GetHeight() - indicatorHeight;
 
         //draw progress indicator: do NOT use wxDC::DrawRectangle! Doesn't respect alpha in Windows, but does in Linux!
         //We need a simple, working solution:
         unsigned char* const data = genImage.GetData();
+
         for (int row = indicatorYBegin;  row < genImage.GetHeight(); ++row)
         {
             for (int col = indicatorXBegin;  col < indicatorXBegin + indicatorWidth; ++col)
             {
                 unsigned char* const pixelBegin = data + (row * genImage.GetWidth() + col) * 3;
-                pixelBegin[0] = 255; //red
-                pixelBegin[1] = 255; //green
+                pixelBegin[0] = 240; //red
+                pixelBegin[1] = 200; //green
                 pixelBegin[2] = 0;   //blue
             }
         }

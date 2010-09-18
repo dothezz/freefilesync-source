@@ -16,33 +16,6 @@ size_t common::getDigitCount(size_t number) //count number of digits
     return number == 0 ? 1 : static_cast<size_t>(::log10(static_cast<double>(number))) + 1;
 }
 
-
-//############################################################################
-Performance::Performance() :
-    resultWasShown(false),
-    timer(new wxStopWatch)
-{
-    timer->Start();
-}
-
-
-Performance::~Performance()
-{
-    //keep non-inline destructor for std::auto_ptr to work with forward declaration
-
-    if (!resultWasShown)
-        showResult();
-}
-
-
-void Performance::showResult()
-{
-    resultWasShown = true;
-    wxMessageBox(wxLongLong(timer->Time()).ToString() + wxT(" ms"));
-    timer->Start(); //reset timer
-}
-
-
 //############################################################################
 DebugLog::DebugLog() :
     lineCount(0),

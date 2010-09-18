@@ -90,8 +90,6 @@
 是
 (Build: %x)
 (建立：%x)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(請注意只有 FAT/FAT32 磁碟機會受到此問題的影響！\n在所有其他狀況下，可以關閉這個設定\"忽略1小時的誤差\"。)
 (Requires an Internet connection!)
 (需要連接到網際網路！)
 - Other side's counterpart to %dir
@@ -274,14 +272,10 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 複製共用或鎖定檔案使用使用卷影複製服務\n(需要管理員權限)
 Copy to clipboard\tCTRL+C
 複製到剪貼簿\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-正在複製符號連結 %x 覆蓋到 %y
-Copying Symbolic Link %x to %y
-正在複製符號連結 %x 到 %y
-Copying file %x overwriting %y
-正在複製檔案 %x 覆蓋到 %y
-Copying file %x to %y
-正在複製檔案 %x 到 %y
+Copying new Symbolic Link %x to %y
+
+Copying new file %x to %y
+
 Could not determine volume name for file:
 無法判斷此檔案的卷標名稱：
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 資料驗證錯誤：來源和目的檔案內容不同！
 Date
 日期
-Delay
-延遲
-Delay between detection of changes and execution of command line in seconds
-檢測更改和執行命令列的延遲時間，以秒為單位。
 Delete files/folders existing on left side only
 刪除只存在於左邊的檔案/資料夾
 Delete files/folders existing on right side only
@@ -460,8 +450,6 @@ File size and date
 檔案大小和日期
 Filename
 檔案名稱
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-檔案 %x 有一個檔案時差在1小時內！\n\n這不是安全的決定，其中之一是由於新的日光節約時間的問題。
 Files %x have the same date but a different size!
 檔案 %x 日期相同但大小不同！
 Files are found equal if\n     - file content\nis the same
@@ -566,12 +554,12 @@ Homepage
 首頁
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 對兩邊使用同一個資料庫的識別和傳送更改。自動檢測刪除和衝突部份。
+Idle time between detection of last change and execution of command line in seconds
+
 If you like FFS
 如果你喜歡 FFS
 Ignore
 忽略
-Ignore 1-hour file time difference
-忽略1小時的檔案時差
 Ignore errors
 忽略錯誤
 Ignore subsequent errors
@@ -614,6 +602,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 不支援製作 WOW64 上的卷影副本。請使用 FreeFileSync 64位元版本。
 Match case
 區分大小寫
+Minimum Idle Time
+
 Mirror ->>
 鏡像 ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -668,6 +658,10 @@ Operation:
 操作：
 Overview
 摘要
+Overwriting Symbolic Link %x in %y
+
+Overwriting file %x in %y
+
 Pause
 暫停
 Paused
@@ -702,8 +696,6 @@ Remove folder
 移除資料夾
 Remove folder pair
 移除一對資料夾
-Removing abandoned directory lock (%x)...
-
 Report translation error
 回報翻譯錯誤
 Reset
@@ -846,8 +838,6 @@ Total time:
 全部時間：
 Transfer file and directory permissions\n(Requires Administrator rights)
 傳輸檔案和目錄權限\n(需要管理員權限)
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-對檔案時差在精確的+/-1小時的檔案判斷視為相同的，以小於1小時作為衝突，是為了處理日光節約時間的變化
 Unable to connect to sourceforge.net!
 無法連接到 sourceforge.net！
 Unable to create logfile!

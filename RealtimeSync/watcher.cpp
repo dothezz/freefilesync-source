@@ -59,9 +59,9 @@ class DirsOnlyTraverser : public ffs3::TraverseCallback
 public:
     DirsOnlyTraverser(std::vector<std::string>& dirs) : m_dirs(dirs) {}
 
-    virtual void onFile(const DefaultChar* shortName, const Zstring& fullName, const FileInfo& details) {}
-    virtual void onSymlink(const DefaultChar* shortName, const Zstring& fullName, const SymlinkInfo& details) {}
-    virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName)
+    virtual void onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details) {}
+    virtual void onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) {}
+    virtual ReturnValDir onDir(const Zchar* shortName, const Zstring& fullName)
     {
         m_dirs.push_back(fullName.c_str());
         return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), this);

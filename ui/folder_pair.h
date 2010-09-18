@@ -8,7 +8,7 @@
 #define FOLDERPAIR_H_INCLUDED
 
 #include "../structures.h"
-#include "../shared/drag_n_drop.h"
+#include "../shared/dir_name.h"
 #include "../library/resources.h"
 #include "small_dlgs.h"
 #include "sync_cfg.h"
@@ -27,17 +27,6 @@ class FolderPairPanelBasic : private wxEvtHandler
 public:
     typedef boost::shared_ptr<const ffs3::AlternateSyncConfig> AltSyncCfgPtr;
 
-
-    Zstring getLeftDir() const
-    {
-        return wxToZ(basicPanel_.m_directoryLeft->GetValue());
-    }
-
-    Zstring getRightDir() const
-    {
-        return wxToZ(basicPanel_.m_directoryRight->GetValue());
-    }
-
     AltSyncCfgPtr getAltSyncConfig() const
     {
         return altSyncConfig;
@@ -48,18 +37,10 @@ public:
         return localFilter;
     }
 
-    void setValues(const Zstring& leftDir,
-                   const Zstring& rightDir,
-                   AltSyncCfgPtr syncCfg,
-                   const FilterConfig& filter)
+    void setConfig(AltSyncCfgPtr syncCfg, const FilterConfig& filter)
     {
         altSyncConfig = syncCfg;
         localFilter   = filter;
-
-        //insert directory names
-        ffs3::setDirectoryName(zToWx(leftDir),  basicPanel_.m_directoryLeft,  basicPanel_.m_dirPickerLeft);
-        ffs3::setDirectoryName(zToWx(rightDir), basicPanel_.m_directoryRight, basicPanel_.m_dirPickerRight);
-
         refreshButtons();
     }
 
@@ -145,7 +126,7 @@ private:
         basicPanel_.PopupMenu(contextMenu.get()); //show context menu
     }
 
-    virtual MainConfiguration getMainConfig()   const = 0;
+    virtual MainConfiguration getMainConfig() const = 0;
     virtual wxWindow* getParentWindow() = 0;
 
     virtual void OnAltSyncCfgChange() {};

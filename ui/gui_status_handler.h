@@ -25,9 +25,9 @@ public:
     CompareStatusHandler(MainDialog* dlg);
     ~CompareStatusHandler();
 
-    virtual void updateStatusText(const Zstring& text);
     virtual void initNewProcess(int objectsTotal, wxLongLong dataTotal, Process processID);
     virtual void updateProcessedData(int objectsProcessed, wxLongLong dataProcessed);
+    virtual void reportInfo(const Zstring& text);
     virtual void forceUiRefresh();
 
     virtual ErrorHandler::Response reportError(const wxString& text);
@@ -51,15 +51,15 @@ public:
     SyncStatusHandler(wxTopLevelWindow* parentDlg, bool ignoreAllErrors);
     ~SyncStatusHandler();
 
-    virtual void updateStatusText(const Zstring& text);
     virtual void initNewProcess(int objectsTotal, wxLongLong dataTotal, Process processID);
     virtual void updateProcessedData(int objectsProcessed, wxLongLong dataProcessed);
+    virtual void reportInfo(const Zstring& text);
     virtual void forceUiRefresh();
 
     virtual ErrorHandler::Response reportError(const wxString& text);
     virtual void reportFatalError(const wxString& errorMessage);
     virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
-    void reportInfo(const wxString& infoMessage);
+    void logInfo(const wxString& infoMessage);
 
 private:
     virtual void abortThisProcess();

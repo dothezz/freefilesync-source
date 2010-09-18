@@ -292,9 +292,9 @@ ffs3::MainConfiguration ffs3::merge(const std::vector<MainConfiguration>& mainCf
             if (fp->localFilter.includeFilter == FilterConfig().includeFilter)
                 fp->localFilter.includeFilter = i->globalFilter.includeFilter;
 
-            fp->localFilter.excludeFilter.Trim(false);
-            fp->localFilter.excludeFilter = i->globalFilter.excludeFilter + DefaultStr("\n") + fp->localFilter.excludeFilter;
-            fp->localFilter.excludeFilter.Trim(false);
+            fp->localFilter.excludeFilter.Trim(true, false);
+            fp->localFilter.excludeFilter = i->globalFilter.excludeFilter + Zstr("\n") + fp->localFilter.excludeFilter;
+            fp->localFilter.excludeFilter.Trim(true, false);
         }
 
         fpMerged.insert(fpMerged.end(), fpTmp.begin(), fpTmp.end());

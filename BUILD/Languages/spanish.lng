@@ -13,23 +13,23 @@
 %x TB
 %x TB
 %x day(s)
-
+%x dia(s)
 %x directories
 %x directorios
 %x files
 %x archivos
 %x hour(s)
-
+%x hora(s)
 %x kB
 %x kB
 %x min
-
+%x min
 %x of %y rows in view
 %x de %y filas en vista
 %x of 1 row in view
 %x de 1 fila en vista
 %x sec
-
+%x seg
 %x%
 %x%
 &Abort
@@ -90,8 +90,6 @@
 &Si
 (Build: %x)
 (Completado: %x)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Tenga en cuenta que sólo las unidades FAT/FAT32 se ven afectadas por este problema!\nEn los demás casos puede deshabilitar la opción \"ignorar 1-hora de diferencia\".)
 (Requires an Internet connection!)
 (¡Conexión a Internet necesaria!)
 - Other side's counterpart to %dir
@@ -257,7 +255,7 @@ Continuar
 Conversion error:
 Error de conversión:
 Copy filesystem permissions
-
+Permisos de copia del sistema de ficheros
 Copy from left to right
 Copiar de izquierda a derecha
 Copy from left to right overwriting
@@ -271,17 +269,13 @@ Copiar archivos bloqueados
 Copy new or updated files to right folder.
 Copiar archivos nuevos o actualizados a la carpeta de la derecha.
 Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
-
+Copiar archivos compartidos o bloqueados usando el servicio "Volume Shadow Copy"\n(Requiere derechos de administrador)
 Copy to clipboard\tCTRL+C
 Copiar al Portapapeles\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-Copiando enlace simbólico %x y sobreescribiendo %y
-Copying Symbolic Link %x to %y
-Copiando enlace simbólico %x a %y
-Copying file %x overwriting %y
-Copiando archivo %x y sobreescribiendo %y
-Copying file %x to %y
-Copiar archivo %x a %y
+Copying new Symbolic Link %x to %y
+Copiando enlace simbólico nuevo de %x a %y
+Copying new file %x to %y
+Copiando archivo nuevo de %x a %y
 Could not determine volume name for file:
 No se ha podido determinar el nombre del volumen para el archivo:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 Error de verificación de datos: ¡Los archivos de origen y destino tienen un contenido diferente!
 Date
 Fecha
-Delay
-Retardo
-Delay between detection of changes and execution of command line in seconds
-Retardo entre la detección de cambios y la ejecución de la línea de comandos en segundos
 Delete files/folders existing on left side only
 Borrar sólo archivos/carpetas existentes en el lado izquierdo
 Delete files/folders existing on right side only
@@ -377,7 +367,7 @@ Error
 Error changing modification time:
 Error al cambiar hora de modificación:
 Error copying file permissions:
-
+Error al copiar permisos del fichero:
 Error copying file:
 Error al copiar archivo:
 Error copying locked file %x!
@@ -412,8 +402,10 @@ Error reading from synchronization database:
 Error al leer de la base de datos de sincronización:
 Error resolving symbolic link:
 Error al resolver enlace simbólico:
+Error setting directory lock:
+Error al establecer bloqueo del directorio:
 Error setting privilege:
-
+Error al establecer privilegios:
 Error starting Volume Shadow Copy Service!
 ¡Error al iniciar el servicio "Volume Shadow Copy"!
 Error traversing directory:
@@ -458,8 +450,6 @@ File size and date
 Fecha y tamaño del archivo
 Filename
 Nombre del archivo
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-Los archivos %x tienen un archivo de tiempo diferente o menor que una hora!\n\nNo es seguro decidir cual de ellos es más reciente por cuestiones referentes al horario de verano.
 Files %x have the same date but a different size!
 ¡Los archivos %x tienen la misma fecha pero un tamaño diferente!
 Files are found equal if\n     - file content\nis the same
@@ -564,12 +554,12 @@ Homepage
 Página de inicio
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Identificar y aplicar cambios en ambos lados usando una base de datos. Las eliminaciones y los conflictos se detectan automáticamente.
+Idle time between detection of last change and execution of command line in seconds
+Tiempo de inactividad entre la detección del último cambio y la ejecución de la línea de comandos en segundos
 If you like FFS
 Si te gusta FFS
 Ignore
 Ignorar
-Ignore 1-hour file time difference
-Ignorar el archivo de 1-hora de tiempo de diferencia
 Ignore errors
 Ignorar errores
 Ignore subsequent errors
@@ -593,7 +583,7 @@ Sincronización inicial:
 Integrate external applications into context menu. The following macros are available:
 Integrar aplicaciones externas en el menú de contexto. Los siguientes macros están disponibles:
 Invalid FreeFileSync config file!
-
+¡Archivo de configuración de FreeFileSync inválido!
 Leave as unresolved conflict
 Dejar como conflicto sin resolver
 Left
@@ -612,6 +602,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 La realización de copias shadow en WOW64 no está soportado. Por favor, use la versión 64-bit de FreeFileSync. 
 Match case
 Distinción entre mayúsculas y minúsculas
+Minimum Idle Time
+Tiempo de inactividad mínimo
 Mirror ->>
 Espejo ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -666,6 +658,10 @@ Operation:
 Operación:
 Overview
 Visión global
+Overwriting Symbolic Link %x in %y
+Sobreescribiendo enlace simbólico %x en %y
+Overwriting file %x in %y
+Sobreescribiendo archivo %x en %y
 Pause
 Pausa
 Paused
@@ -841,9 +837,7 @@ Espacio total de disco necesario:
 Total time:
 Tiempo total:
 Transfer file and directory permissions\n(Requires Administrator rights)
-
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-El archivo en cuestión tiene una diferencia de tiempo de +/- 1 hora, menos de una hora entra en conflicto para gestionar los cambios referentes al horario de verano
+Transferir permisos de archivo y directorio\n(Requiere derechos de administrador)
 Unable to connect to sourceforge.net!
 ¡Incapaz de conectar con sourceforge.net!
 Unable to create logfile!
@@ -870,6 +864,8 @@ Volume name %x not part of filename %y!
 El nombre del volumen %x no es una parte del nombre de archivo %y
 Waiting for all directories to become available...
 Esperando a que todos los directorios esten disponibles...
+Waiting while directory is locked (%x)...
+Esperando mientras el directorio se encuentre bloqueado (%x)...
 Warning
 Atención
 Warning: Synchronization failed for %x item(s):

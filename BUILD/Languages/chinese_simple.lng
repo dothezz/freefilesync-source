@@ -15,7 +15,7 @@
 %x day(s)
 %x 天
 %x directories
-%x 目录
+%x 个目录
 %x files
 %x 个文件
 %x hour(s)
@@ -27,7 +27,7 @@
 %x of %y rows in view
 %y 行中的 %x 行可见
 %x of 1 row in view
-%x of 1 行可见
+1 行中的 %x 行可见
 %x sec
 %x 秒
 %x%
@@ -90,8 +90,6 @@
 是(&Y)
 (Build: %x)
 (Build: %x)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(请注意只有FAT/FAT32分区受此问题影响!\n在所有其他情况下你可禁用\"忽略一小时差异\"这一选项.)
 (Requires an Internet connection!)
 (需要因特网连接!)
 - Other side's counterpart to %dir
@@ -274,14 +272,10 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 通过卷影复制服务复制共享或锁定的文件\n(需要管理员权限)
 Copy to clipboard\tCTRL+C
 复制到剪贴板\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-正在复制符号连接 %x 覆盖 %y
-Copying Symbolic Link %x to %y
-正在复制符号连接 %x 到 %y
-Copying file %x overwriting %y
-正在复制文件 %x 覆盖 %y
-Copying file %x to %y
-正复制文件 %x 到 %y
+Copying new Symbolic Link %x to %y
+复制新符号连接 %x 到 %y
+Copying new file %x to %y
+复制新文件 %x 到 %y
 Could not determine volume name for file:
 不能确定此文件的卷名称:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 数据校验错误:源文件和目标文件内容不同!
 Date
 日期
-Delay
-延时
-Delay between detection of changes and execution of command line in seconds
-在检测和执行命令行之间的延时秒数
 Delete files/folders existing on left side only
 删除仅在左侧存在的文件/文件夹
 Delete files/folders existing on right side only
@@ -412,6 +402,8 @@ Error reading from synchronization database:
 从同步数据库中读取时出错:
 Error resolving symbolic link:
 解决符号链接出错:
+Error setting directory lock:
+设置目录锁定时出错:
 Error setting privilege:
 设置权限时出错:
 Error starting Volume Shadow Copy Service!
@@ -458,8 +450,6 @@ File size and date
 文件大小和日期
 Filename
 文件名
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-文件 %x 的时间差异小于1小时！\n\n由于夏令时的问题因此不能安全地判断哪一个比较新.
 Files %x have the same date but a different size!
 文件 %x 日期相同但大小不同!
 Files are found equal if\n     - file content\nis the same
@@ -564,12 +554,12 @@ Homepage
 主页
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 使用数据库来识别和传送两边的改变. 自动检测删除和冲突状态.
+Idle time between detection of last change and execution of command line in seconds
+以秒计的最后变更和执行命令行之间的空闲时间
 If you like FFS
 如果你喜欢 FFS
 Ignore
 忽略
-Ignore 1-hour file time difference
-忽略1小时文件时间差异
 Ignore errors
 忽略错误
 Ignore subsequent errors
@@ -612,6 +602,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 不支持在WOW64上使用卷影复制. 请使用 FreeFileSync 64位版本.
 Match case
 匹配大小写
+Minimum Idle Time
+最小空闲时间
 Mirror ->>
 镜像 ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -666,6 +658,10 @@ Operation:
 操作:
 Overview
 摘要
+Overwriting Symbolic Link %x in %y
+正在 %y 上覆盖符号连接 %x
+Overwriting file %x in %y
+正在 %y 上覆盖文件 %x
 Pause
 暂停
 Paused
@@ -793,7 +789,7 @@ Swap sides
 Switching to FreeFileSync GUI mode...
 切换至FreeFileSync图形用户界面模块...
 Symbolic Link handling
-正在处理符号连接
+符号连接处理方式
 Symlinks %x have the same date but a different target!
 符号连接 %x 有相同的日期但目标不同!
 Synchronization Preview
@@ -842,8 +838,6 @@ Total time:
 总共时间:
 Transfer file and directory permissions\n(Requires Administrator rights)
 转移文件和目录的权限\n(需要管理员权限)
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-对文件时间差异在精确的+/-1小时的文件认为是相同的,小于1小时的认为是冲突以此来处理夏令时的变化
 Unable to connect to sourceforge.net!
 无法链接到 Sourceforge.net!
 Unable to create logfile!
@@ -870,6 +864,8 @@ Volume name %x not part of filename %y!
 卷名 %x 并非文件名 %y 的一部分!
 Waiting for all directories to become available...
 等待所有目录转为可用状态...
+Waiting while directory is locked (%x)...
+由于目录已锁定而正在等待(%x)...
 Warning
 警告
 Warning: Synchronization failed for %x item(s):

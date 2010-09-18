@@ -28,7 +28,7 @@
 					<Add library="libwxpng.a" />
 					<Add library="libwxzlib.a" />
 					<Add library="libwxbase28u_net.a" />
-					<Add library="libboost_thread-mgw45-mt-s-1_43.a" />
+					<Add library="libboost_thread-mgw45-mt-s-1_44.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 				</Linker>
 			</Target>
@@ -54,7 +54,7 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
-					<Add library="libboost_thread-mgw45-mt-sd-1_43.a" />
+					<Add library="libboost_thread-mgw45-mt-sd-1_44.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
@@ -77,7 +77,7 @@
 					<Add library="libwxmsw28ud_core.a" />
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxbase28ud_net.a" />
-					<Add library="libboost_thread-mgw45-mt-sd-1_43.a" />
+					<Add library="libboost_thread-mgw45-mt-sd-1_44.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
@@ -98,7 +98,7 @@
 			<Add option="-DFFS_WIN" />
 			<Add option="-DTIXML_USE_STL" />
 			<Add option="-DwxUSE_UNICODE" />
-			<Add option="-DZSTRING_WIDE_CHAR" />
+			<Add option="-DBOOST_THREAD_USE_LIB" />
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
 			<Add directory="C:\Program Files\C++\Boost" />
 		</Compiler>
@@ -240,6 +240,7 @@
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
+		<Unit filename="shared\boost_thread_wrap.h" />
 		<Unit filename="shared\build_info.h" />
 		<Unit filename="shared\check_exist.cpp" />
 		<Unit filename="shared\check_exist.h" />
@@ -261,17 +262,12 @@
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="shared\debug_new.h" />
+		<Unit filename="shared\dir_name.cpp" />
+		<Unit filename="shared\dir_name.h" />
 		<Unit filename="shared\dll_loader.cpp" />
 		<Unit filename="shared\dll_loader.h" />
-		<Unit filename="shared\drag_n_drop.cpp">
-			<Option target="Release" />
-			<Option target="Debug-DLL" />
-		</Unit>
-		<Unit filename="shared\drag_n_drop.h">
-			<Option target="Release" />
-			<Option target="Debug-DLL" />
-		</Unit>
+		<Unit filename="shared\dst_hack.cpp" />
+		<Unit filename="shared\dst_hack.h" />
 		<Unit filename="shared\file_error.h" />
 		<Unit filename="shared\file_handling.cpp" />
 		<Unit filename="shared\file_handling.h" />
@@ -295,8 +291,6 @@
 		</Unit>
 		<Unit filename="shared\localization.cpp" />
 		<Unit filename="shared\localization.h" />
-		<Unit filename="shared\lock.cpp" />
-		<Unit filename="shared\lock.h" />
 		<Unit filename="shared\long_path_prefix.cpp" />
 		<Unit filename="shared\long_path_prefix.h" />
 		<Unit filename="shared\recycler.cpp" />
@@ -336,6 +330,7 @@
 		<Unit filename="shared\xml_base.cpp" />
 		<Unit filename="shared\xml_base.h" />
 		<Unit filename="shared\xml_error.h" />
+		<Unit filename="shared\zbase.h" />
 		<Unit filename="shared\zstring.cpp" />
 		<Unit filename="shared\zstring.h" />
 		<Unit filename="structures.cpp" />

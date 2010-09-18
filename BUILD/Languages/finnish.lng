@@ -13,23 +13,23 @@
 %x TB
 %x TB
 %x day(s)
-
+%x päiviä
 %x directories
 %x hakemistoa
 %x files
 %x tiedostoista
 %x hour(s)
-
+% tunteja
 %x kB
 %x kB
 %x min
-
+%x min
 %x of %y rows in view
 %x riviä %y rivistä näytössä
 %x of 1 row in view
 %x 1 rivistä näytössä
 %x sec
-
+%x s
 %x%
 %x%
 &Abort
@@ -45,7 +45,7 @@ Etsi &uusi versio
 &Content
 &Sisältö
 &Create batch job...
-&Tee eräajo...
+&Luo eräajo...
 &Default
 &Vakio
 &Exit
@@ -90,8 +90,6 @@ Asetusten &lataus...
 &Kyllä
 (Build: %x)
 (Versio: %x)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(HUOM: Tämä ongelma vaikuttaa vain FAT/FAT32 ohjaimiin!\nOptio voidaan poistaa kaikissa muissa tapauksissa \"jätetään 1. tunnin ero huomiotta\".)
 (Requires an Internet connection!)
 (Vaatii Internet-yhteyden!)
 - Other side's counterpart to %dir
@@ -179,13 +177,13 @@ Tiedoston on avattu seuraaviin luokkiin:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
 Nimensä mukaisesti, tiedostot joilla on sama nimi, merkitään samoiksi vain jos niiden sisältö täsmää. Ominaisuus soveltuu paremmin yhdenpitävyyden tarkistukseen kuin varmistukseen. Siksi tiedostojen aikaleimaa ohitetaan.\n\nPäätöksentekopuu on tästä syystä pienempi:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
-Luo automaattiseen täsmäytykseen eräajon komentotiedosto. Käynnistä eräajo liittämällä FreeFileSyn ohjelmalle komentotiedosto: FreeFileSync.exe <eräajotiedosto>. Tehtävän suoritusta voit ajoittaa käyttöjärjestelmän toimilla.
+Luo komentotiedosto täsmäytyksen automaattiseen eräajoon. Käynnistä eräajo liittämällä FreeFileSync ohjelmalle komentotiedosto: FreeFileSync.exe <eräajotiedosto>. Tehtävän suoritusta voit ajoittaa käyttöjärjestelmän toimilla.
 At least one directory input field is empty.
 Vähintäin yksi hakemiston syöttökenttä on tyhjä.
 Auto-adjust columns
 Säädä sarakeleveys automaattisesti
 Batch execution
-Eräajo
+Eräajon suoritus
 Batch file created successfully!
 Eräajotiedosto luotu onnistuneesti!
 Batch job
@@ -257,7 +255,7 @@ Jatka
 Conversion error:
 Konversio virhe:
 Copy filesystem permissions
-
+Monista tiedosto-oikeudet
 Copy from left to right
 Kopioidaan vasen -> oikea 
 Copy from left to right overwriting
@@ -271,17 +269,13 @@ Kopioi lukitut tiedostot
 Copy new or updated files to right folder.
 Kopioidaan uudet tai muuttuneet tiedostot oikeaan hakemistoon.
 Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
-
+Kopioi jaetut/lukitut tiedostot Volume Shadow Copy prosessilla\n(Vaatii Järjestelmävalvojan oikeuksia)
 Copy to clipboard\tCTRL+C
 Kopioi Leikepöydälle\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-Kopioin Symlinkki %x ylikirjoittamalla %y
-Copying Symbolic Link %x to %y
-Kopioin Symlinkki %x -> %y
-Copying file %x overwriting %y
-Kopioin tiedostoa %x ylikirjoittaen %y
-Copying file %x to %y
-Kopioin tiedostoa %x -> %y
+Copying new Symbolic Link %x to %y
+Kopioi uusi Symlinkki %x -> %y
+Copying new file %x to %y
+Kopioi uusi tiedosto %x -> %y
 Could not determine volume name for file:
 Levyasemaa ei tunnistettu tiedostolle:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 Tiedon varmennusvirhe: Lähteellä ja kohteella on eri sisältö!
 Date
 Päiväys
-Delay
-Viive
-Delay between detection of changes and execution of command line in seconds
-Viive sekunneissa havaitun muutoksen ja komentokehotteen suorittamisen välillä
 Delete files/folders existing on left side only
 Poista vain tiedostoja/hakemistoja vasemmalta
 Delete files/folders existing on right side only
@@ -377,7 +367,7 @@ Virhe
 Error changing modification time:
 Virhe muuttaessa tiedoston aikaa:
 Error copying file permissions:
-
+Virhe kopioitaessa tiedoston oikeuksia:
 Error copying file:
 Virhe kopioitaessa tiedostoa:
 Error copying locked file %x!
@@ -412,8 +402,10 @@ Error reading from synchronization database:
 Virhe lukiessa täsmäytyksen tietokantaa:
 Error resolving symbolic link:
 Virhe selvittäessä symbolista linkkiä:
+Error setting directory lock:
+Virhe asettaessa hakemiston lukkoa:
 Error setting privilege:
-
+Virte oikeuksia asettaessa:
 Error starting Volume Shadow Copy Service!
 Virhe käynnistäessä Volume Shadow Copy Service!
 Error traversing directory:
@@ -458,8 +450,6 @@ File size and date
 Tiedoston koko ja päiväys
 Filename
 Tiedostonimi
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-Tiedostojen %x aikaleima poikkeaa alle tunnin!\n\nEi voida päättää turvallisesti, kesäajan takia, kumpi on uudempi.
 Files %x have the same date but a different size!
 Tiedostot %x samalta päivältä mutta koko poikkeaa!
 Files are found equal if\n     - file content\nis the same
@@ -564,12 +554,12 @@ Homepage
 Kotisivu
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Tunnista ja monista muutokset molemmilla puolilla tietokannalla. Poistot ja ristiriidat hoidetaan automaattisesti.
+Idle time between detection of last change and execution of command line in seconds
+Joutoaika viimeisen muutos havainnon ja käskyn suorittamisen välillä, sekunneissa
 If you like FFS
 Jos pidät FFS:tä
 Ignore
 Sivuta
-Ignore 1-hour file time difference
-Älä huomioi 1. tunnin poikkeamaa
 Ignore errors
 Älä huomioi virheitä
 Ignore subsequent errors
@@ -593,7 +583,7 @@ Ensi täsmäytys:
 Integrate external applications into context menu. The following macros are available:
 Liitä ulkoinen sovellus viitekehysvalikkoon. Seuraavat makrot ovat valittavissa:
 Invalid FreeFileSync config file!
-
+Virheellinen FreeFileSync asetustiedosto!
 Leave as unresolved conflict
 Jätä ratkaisemattomana virheenä
 Left
@@ -612,6 +602,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 WOW64 varjokopiointia ei tueta. Käytä FreeFileSync 64-bittistä versiota.
 Match case
 Täsmää kirjainkoko
+Minimum Idle Time
+Min. joutoaika
 Mirror ->>
 Peilaava ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -666,6 +658,10 @@ Operation:
 Toiminto:
 Overview
 Yleiskatsaus
+Overwriting Symbolic Link %x in %y
+Ylikirjoita Symlinkki %x kohdassa %y
+Overwriting file %x in %y
+Ylikirjoita tiedosto %x kohdassa %y
 Pause
 Tauko
 Paused
@@ -827,7 +823,7 @@ Asetustiedosto ei ole kelvollinen:
 The file was not processed by last synchronization!
 Tiedostoa ei käsitelty viime täsmäytyksessä!
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
-Tämä vaihtoehto todennetaan kaksi samannimistä tiedostoa samaksi, jos koko JA viimeinen tallennusaika on sama.
+Tämä vaihtoehto todentaan kaksi samannimistä tiedostoa samaksi, jos koko JA viimeinen tallennusaika on sama.
 Time
 Aika
 Time elapsed:
@@ -841,9 +837,7 @@ Vaadittu vapaa levytila:
 Total time:
 Kokonaisaika:
 Transfer file and directory permissions\n(Requires Administrator rights)
-
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-Kohtele tiedostoja jolla aikaleima on tasan +/- tunti samoina, korjaa kesäajan siirtoa
+Siirrä tiedosto ja hekimisto-oikeuksia\n(Vaatii Järjestelmävalvojan oikeuksia)
 Unable to connect to sourceforge.net!
 Kytkeytyminen ei onnistu kohteeseen sourceforge.net!
 Unable to create logfile!
@@ -870,6 +864,8 @@ Volume name %x not part of filename %y!
 Osan nimi %x ei esiinny tiedostonimessä %y!
 Waiting for all directories to become available...
 Odotan että kaikki hakemistot ovat saatavilla ...
+Waiting while directory is locked (%x)...
+Odotan hakemiston lukitusta (%x)...
 Warning
 Varoitus
 Warning: Synchronization failed for %x item(s):

@@ -2,6 +2,28 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.10
+---------------
+Automatically solve daylight saving time and time zone shift issues on FAT/FAT32 (finally)
+Instantly resolve abandoned directory locks associated with local computer
+Show expanded directory name as tooltip and label text (resolves macros and relative paths)
+Do not copy relative file attributes for base target directories that are created implicitly
+Move dialogs by clicking (almost) anywhere
+RealtimeSync: ignore request for device removal on Samba shares
+Added UTF-8 BOM for CSV export
+Correctly handle window position on multi-screen desktop
+Disabled warning "database not yet existing"
+RealtimeSync: replaced delay by minimum idle time
+Maximum number of folder pairs configurable via GlobalSettings.xml (XML node <FolderPairsMax>)
+Added tooltips to display long filenames on main grid
+Keep application responsive when deleting large directories
+Vista/Windows 7: harmonize modification times shown on main grid with Windows Explorer
+Changed background color to avoid unreadable texts in combination with certain color themes
+Toggle middle grid comparison result/sync preview with right mouse button click
+Further GUI enhancements/polishment/standard conformance
+Updated translation files
+
+
 Changelog v3.9
 --------------
 Advanced locking strategy to allow multiple processes synchronize the same directories (e.g. via network share)
@@ -31,7 +53,7 @@ Run folder existence checks in separate thread (faster network share access)
 Write <Automatic> mode database file even if both sides are already in sync
 Don't raise status dialog to the top after synchronisation
 Embedded version information into executable (Windows)
-Migrated Compiler to Visual C++ 2010 (Windows)
+Migrated compiler to Visual C++ 2010 (Windows)
 Avoid losing manual changes when excluding via context menu
 Adjusted auto-updater web-address
 Updated translation files

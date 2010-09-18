@@ -27,6 +27,7 @@
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "long_path_prefix.h"
 #include <Aclapi.h>
+#include "dst_hack.h"
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
@@ -45,7 +46,7 @@ namespace
 #ifdef FFS_WIN
 Zstring resolveRelativePath(const Zstring& relativeName, DWORD proposedBufferSize = 1000)
 {
-    boost::scoped_array<DefaultChar> fullPath(new DefaultChar[proposedBufferSize]);
+    boost::scoped_array<Zchar> fullPath(new Zchar[proposedBufferSize]);
     const DWORD rv = ::GetFullPathName(
                          relativeName.c_str(), //__in   LPCTSTR lpFileName,
                          proposedBufferSize,   //__in   DWORD nBufferLength,
@@ -125,7 +126,6 @@ bool replaceMacro(wxString& macro) //macro without %-characters, return true if 
                 macro.EndsWith(wxT("\"")) &&
                 macro.length() >= 2)
             macro = wxString(macro.c_str() + 1, macro.length() - 2);
-
         return true;
     }
 
@@ -153,7 +153,7 @@ void expandMacros(wxString& text)
             }
             else
             {
-                rest = wxString() + SEPARATOR + rest;
+                rest = SEPARATOR + rest;
                 expandMacros(rest);
                 text = prefix + SEPARATOR + potentialMacro + rest;
             }
@@ -166,17 +166,17 @@ void expandMacros(wxString& text)
 Zstring ffs3::getFormattedDirectoryName(const Zstring& dirname)
 {
     //Formatting is needed since functions expect the directory to end with '\' to be able to split the relative names.
-    //note: don't do directory formatting with wxFileName, as it doesn't respect //?/ - prefix!
+    //note: don't combine directory formatting with wxFileName, as it doesn't respect //?/ - prefix!
 
     wxString dirnameTmp = zToWx(dirname);
-    dirnameTmp.Trim(true);  //remove whitespace characters from right
-    dirnameTmp.Trim(false); //remove whitespace characters from left
-
-    if (dirnameTmp.empty()) //an empty string will later be returned as "\"; this is not desired
-        return Zstring();
-
-    //replace macros
     expandMacros(dirnameTmp);
+
+    Zstring output = wxToZ(dirnameTmp);
+
+    output.Trim();
+
+    if (output.empty()) //an empty string will later be returned as "\"; this is not desired
+        return Zstring();
 
     /*
     resolve relative names; required by:
@@ -188,12 +188,12 @@ Zstring ffs3::getFormattedDirectoryName(const Zstring& dirname)
     WINDOWS/LINUX:
      - detection of dependent directories, e.g. "\" and "C:\test"
      */
-    dirnameTmp = zToWx(resolveRelativePath(wxToZ(dirnameTmp)));
+    output = resolveRelativePath(output);
 
-    if (!dirnameTmp.EndsWith(zToWx(common::FILE_NAME_SEPARATOR)))
-        dirnameTmp += zToWx(common::FILE_NAME_SEPARATOR);
+    if (!output.EndsWith(common::FILE_NAME_SEPARATOR))
+        output += common::FILE_NAME_SEPARATOR;
 
-    return wxToZ(dirnameTmp);
+    return output;
 }
 
 
@@ -546,17 +546,17 @@ Zstring getFilenameFmt(const Zstring& filename, Function fun) //throw(); returns
 
 Zstring createTemp8Dot3Name(const Zstring& fileName) //find a unique 8.3 short name
 {
-    const Zstring pathPrefix = fileName.Find(common::FILE_NAME_SEPARATOR) != Zstring::npos ?
+    const Zstring pathPrefix = fileName.find(common::FILE_NAME_SEPARATOR) != Zstring::npos ?
                                (fileName.BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR) : Zstring();
 
-    Zstring extension = fileName.AfterLast(common::FILE_NAME_SEPARATOR).AfterLast(DefaultChar('.')); //extension needn't contain reasonable data
+    Zstring extension = fileName.AfterLast(common::FILE_NAME_SEPARATOR).AfterLast(Zchar('.')); //extension needn't contain reasonable data
     if (extension.empty())
-        extension = DefaultStr("FFS");
+        extension = Zstr("FFS");
     extension.Truncate(3);
 
     for (int index = 0; index < 100000000; ++index) //filename must be representable by <= 8 characters
     {
-        const Zstring output = pathPrefix + numberToZstring(index) + DefaultChar('.') + extension;
+        const Zstring output = pathPrefix + Zstring::fromNumber(index) + Zchar('.') + extension;
         if (!ffs3::somethingExists(output)) //ensure uniqueness
             return output;
     }
@@ -570,7 +570,7 @@ bool fix8Dot3NameClash(const Zstring& oldName, const Zstring& newName)  //throw 
 {
     using namespace ffs3;
 
-    if (newName.Find(common::FILE_NAME_SEPARATOR) == Zstring::npos)
+    if (newName.find(common::FILE_NAME_SEPARATOR) == Zstring::npos)
         return false;
 
     if (ffs3::somethingExists(newName)) //name OR directory!
@@ -581,8 +581,8 @@ bool fix8Dot3NameClash(const Zstring& oldName, const Zstring& newName)  //throw 
 
         if (    !fileNameShort.empty() &&
                 !fileNameLong.empty()  &&
-                cmpFileName(fileNameOrig,  fileNameShort) == 0 &&
-                cmpFileName(fileNameShort, fileNameLong) != 0)
+                EqualFilename()(fileNameOrig,  fileNameShort) &&
+                !EqualFilename()(fileNameShort, fileNameLong))
         {
             //we detected an event where newName is in shortname format (although it is intended to be a long name) and
             //writing target file failed because another unrelated file happens to have the same short name
@@ -634,11 +634,11 @@ using ffs3::MoveFileCallback;
 class CopyCallbackImpl : public ffs3::CopyFileCallback //callback functionality
 {
 public:
-    CopyCallbackImpl(MoveFileCallback* callback) : moveCallback(callback) {}
+    CopyCallbackImpl(const Zstring& sourceFile, MoveFileCallback& callback) : sourceFile_(sourceFile), moveCallback(callback) {}
 
     virtual Response updateCopyStatus(const wxULongLong& totalBytesTransferred)
     {
-        switch (moveCallback->requestUiRefresh())
+        switch (moveCallback.requestUiRefresh(sourceFile_))
         {
         case MoveFileCallback::CONTINUE:
             return CopyFileCallback::CONTINUE;
@@ -650,17 +650,27 @@ public:
     }
 
 private:
-    MoveFileCallback* moveCallback;
+    const Zstring sourceFile_;
+    MoveFileCallback& moveCallback;
 };
 
 
 void ffs3::moveFile(const Zstring& sourceFile, const Zstring& targetFile, MoveFileCallback* callback)   //throw (FileError);
 {
+    //call back once per file (moveFile() is called by moveDirectory())
+    if (callback)
+        switch (callback->requestUiRefresh(sourceFile))
+        {
+        case MoveFileCallback::CONTINUE:
+            break;
+        case MoveFileCallback::CANCEL: //a user aborted operation IS an error condition!
+            throw FileError(wxString(_("Error moving file:")) + wxT("\n\"") + zToWx(sourceFile) +  wxT("\" ->\n\"") + zToWx(targetFile) + wxT("\"") +
+                            wxT("\n\n") + _("Operation aborted!"));
+        }
+
     if (somethingExists(targetFile)) //test file existence: e.g. Linux might silently overwrite existing symlinks
-    {
-        const wxString errorMessage = wxString(_("Error moving file:")) + wxT("\n\"") + zToWx(sourceFile) +  wxT("\" ->\n\"") + zToWx(targetFile) + wxT("\"");
-        throw FileError(errorMessage + wxT("\n\n") + _("Target file already existing!"));
-    }
+        throw FileError(wxString(_("Error moving file:")) + wxT("\n\"") + zToWx(sourceFile) +  wxT("\" ->\n\"") + zToWx(targetFile) + wxT("\"") +
+                        wxT("\n\n") + _("Target file already existing!"));
 
     //moving of symbolic links should work correctly:
 
@@ -675,7 +685,7 @@ void ffs3::moveFile(const Zstring& sourceFile, const Zstring& targetFile, MoveFi
 
 
     //file is on a different volume: let's copy it
-    std::auto_ptr<CopyCallbackImpl> copyCallback(callback != NULL ? new CopyCallbackImpl(callback) : NULL);
+    std::auto_ptr<CopyCallbackImpl> copyCallback(callback != NULL ? new CopyCallbackImpl(sourceFile, *callback) : NULL);
 
     copyFile(sourceFile,
              targetFile,
@@ -691,7 +701,8 @@ void ffs3::moveFile(const Zstring& sourceFile, const Zstring& targetFile, MoveFi
     removeFile(sourceFile);
 }
 
-
+namespace
+{
 class TraverseOneLevel : public ffs3::TraverseCallback
 {
 public:
@@ -701,11 +712,11 @@ public:
         m_files(filesShort),
         m_dirs(dirsShort) {}
 
-    virtual void onFile(const DefaultChar* shortName, const Zstring& fullName, const FileInfo& details)
+    virtual void onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details)
     {
         m_files.push_back(std::make_pair(Zstring(shortName), fullName));
     }
-    virtual void onSymlink(const DefaultChar* shortName, const Zstring& fullName, const SymlinkInfo& details)
+    virtual void onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details)
     {
         if (details.dirLink)
             m_dirs.push_back(std::make_pair(Zstring(shortName), fullName));
@@ -713,7 +724,7 @@ public:
             m_files.push_back(std::make_pair(Zstring(shortName), fullName));
     }
 
-    virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName)
+    virtual ReturnValDir onDir(const Zchar* shortName, const Zstring& fullName)
     {
         m_dirs.push_back(std::make_pair(Zstring(shortName), fullName));
         return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //DON'T traverse into subdirs; moveDirectory works recursively!
@@ -729,25 +740,63 @@ private:
 };
 
 
+struct RemoveCallbackImpl : public ffs3::RemoveDirCallback
+{
+    RemoveCallbackImpl(const Zstring& sourceDir,
+                       const Zstring& targetDir,
+                       MoveFileCallback& moveCallback) :
+        sourceDir_(sourceDir),
+        targetDir_(targetDir),
+        moveCallback_(moveCallback) {}
+
+    virtual void requestUiRefresh(const Zstring& currentObject)
+    {
+        switch (moveCallback_.requestUiRefresh(sourceDir_))
+        {
+        case MoveFileCallback::CONTINUE:
+            break;
+        case MoveFileCallback::CANCEL: //a user aborted operation IS an error condition!
+            throw ffs3::FileError(wxString(_("Error moving directory:")) + wxT("\n\"") + ffs3::zToWx(sourceDir_) +  wxT("\" ->\n\"") +
+                                  ffs3::zToWx(targetDir_) + wxT("\"") + wxT("\n\n") + _("Operation aborted!"));
+        }
+    }
+
+private:
+    const Zstring sourceDir_;
+    const Zstring targetDir_;
+    MoveFileCallback& moveCallback_;
+};
+}
+
+
 void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, bool ignoreExistingDirs, MoveFileCallback* callback)   //throw (FileError);
 {
     using namespace ffs3;
+
+    //call back once per folder
+    if (callback)
+        switch (callback->requestUiRefresh(sourceDir))
+        {
+        case MoveFileCallback::CONTINUE:
+            break;
+        case MoveFileCallback::CANCEL: //a user aborted operation IS an error condition!
+            throw FileError(wxString(_("Error moving directory:")) + wxT("\n\"") + zToWx(sourceDir) +  wxT("\" ->\n\"") +
+                            zToWx(targetDir) + wxT("\"") + wxT("\n\n") + _("Operation aborted!"));
+        }
 
     //handle symbolic links
     if (symlinkExists(sourceDir))
     {
         createDirectory(targetDir, sourceDir, true, false); //copy symbolic link, don't copy permissions
-        removeDirectory(sourceDir);           //if target is already another symlink or directory, sourceDir-symlink is silently deleted
+        removeDirectory(sourceDir, NULL);           //if target is already another symlink or directory, sourceDir-symlink is silently deleted
         return;
     }
 
     if (somethingExists(targetDir))
     {
         if (!ignoreExistingDirs) //directory or symlink exists (or even a file... this error will be caught later)
-        {
-            const wxString errorMessage = wxString(_("Error moving directory:")) + wxT("\n\"") + zToWx(sourceDir) +  wxT("\" ->\n\"") + zToWx(targetDir) + wxT("\"");
-            throw FileError(errorMessage + wxT("\n\n") + _("Target directory already existing!"));
-        }
+            throw FileError(wxString(_("Error moving directory:")) + wxT("\n\"") + zToWx(sourceDir) +  wxT("\" ->\n\"") + zToWx(targetDir) + wxT("\"") +
+                            wxT("\n\n") + _("Target directory already existing!"));
     }
     else
     {
@@ -764,25 +813,13 @@ void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, bool 
         createDirectory(targetDir, sourceDir, false, false); //throw (FileError); don't copy permissions
     }
 
-    //call back once per folder
-    if (callback)
-        switch (callback->requestUiRefresh())
-        {
-        case MoveFileCallback::CONTINUE:
-            break;
-        case MoveFileCallback::CANCEL:
-            //an user aborted operation IS an error condition!
-            throw FileError(wxString(_("Error moving directory:")) + wxT("\n\"") + zToWx(sourceDir) +  wxT("\" ->\n\"") +
-                            zToWx(targetDir) + wxT("\"") + wxT("\n\n") + _("Operation aborted!"));
-        }
-
     //move files/folders recursively
     TraverseOneLevel::NamePair fileList; //list of names: 1. short 2.long
     TraverseOneLevel::NamePair dirList;  //
 
     //traverse source directory one level
     TraverseOneLevel traverseCallback(fileList, dirList);
-    traverseFolder(sourceDir, false, &traverseCallback); //traverse one level, don't follow symlinks
+    traverseFolder(sourceDir, false, traverseCallback); //traverse one level, don't follow symlinks
 
     const Zstring targetDirFormatted = targetDir.EndsWith(common::FILE_NAME_SEPARATOR) ? //ends with path separator
                                        targetDir :
@@ -799,7 +836,8 @@ void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, bool 
     //attention: if move-operation was cancelled an exception is thrown => sourceDir is not deleted, as we wish!
 
     //delete source
-    removeDirectory(sourceDir); //throw (FileError);
+    std::auto_ptr<RemoveCallbackImpl> removeCallback(callback != NULL ? new RemoveCallbackImpl(sourceDir, targetDir, *callback) : NULL);
+    removeDirectory(sourceDir, removeCallback.get()); //throw (FileError);
 }
 
 
@@ -831,18 +869,18 @@ public:
         m_files(files),
         m_dirs(dirs) {}
 
-    virtual void onFile(const DefaultChar* shortName, const Zstring& fullName, const FileInfo& details)
+    virtual void onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details)
     {
         m_files.push_back(fullName);
     }
-    virtual void onSymlink(const DefaultChar* shortName, const Zstring& fullName, const SymlinkInfo& details)
+    virtual void onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details)
     {
         if (details.dirLink)
             m_dirs.push_back(fullName);
         else
             m_files.push_back(fullName);
     }
-    virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName)
+    virtual ReturnValDir onDir(const Zchar* shortName, const Zstring& fullName)
     {
         m_dirs.push_back(fullName);
         return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //DON'T traverse into subdirs; removeDirectory works recursively!
@@ -858,7 +896,7 @@ private:
 };
 
 
-void ffs3::removeDirectory(const Zstring& directory)
+void ffs3::removeDirectory(const Zstring& directory, RemoveDirCallback* callback)
 {
     //no error situation if directory is not existing! manual deletion relies on it!
     if (!somethingExists(directory))
@@ -898,13 +936,23 @@ void ffs3::removeDirectory(const Zstring& directory)
 
     //get all files and directories from current directory (WITHOUT subdirectories!)
     FilesDirsOnlyTraverser traverser(fileList, dirList);
-    ffs3::traverseFolder(directory, false, &traverser); //don't follow symlinks
+    ffs3::traverseFolder(directory, false, traverser); //don't follow symlinks
+
 
     //delete files
-    std::for_each(fileList.begin(), fileList.end(), removeFile);
+    for (std::vector<Zstring>::const_iterator i = fileList.begin(); i != fileList.end(); ++i)
+    {
+        if (callback) callback->requestUiRefresh(*i); //call once per file
+        removeFile(*i);
+    }
 
     //delete directories recursively
-    std::for_each(dirList.begin(), dirList.end(), removeDirectory); //call recursively to correctly handle symbolic links
+    for (std::vector<Zstring>::const_iterator i = dirList.begin(); i != dirList.end(); ++i)
+    {
+        if (callback) callback->requestUiRefresh(*i); //and once per folder
+        removeDirectory(*i, callback); //call recursively to correctly handle symbolic links
+    }
+
 
     //parent directory is deleted last
 #ifdef FFS_WIN
@@ -919,16 +967,15 @@ void ffs3::removeDirectory(const Zstring& directory)
 }
 
 
-//optionally: copy directory last change date, DO NOTHING if something fails
 void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, bool deRefSymlinks) //throw (FileError)
 {
 #ifdef FFS_WIN
-    FILETIME creationTime   = {0};
-    FILETIME lastAccessTime = {0};
-    FILETIME lastWriteTime  = {0};
+    FILETIME creationTime   = {};
+    FILETIME lastAccessTime = {};
+    FILETIME lastWriteTime  = {};
 
     {
-        WIN32_FILE_ATTRIBUTE_DATA sourceAttr;
+        WIN32_FILE_ATTRIBUTE_DATA sourceAttr = {};
         if (!::GetFileAttributesEx(applyLongPathPrefix(sourceObj).c_str(), //__in   LPCTSTR lpFileName,
                                    GetFileExInfoStandard,                  //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
                                    &sourceAttr))                           //__out  LPVOID lpFileInformation
@@ -969,7 +1016,30 @@ void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, boo
             lastAccessTime = sourceAttr.ftLastAccessTime;
             lastWriteTime  = sourceAttr.ftLastWriteTime;
         }
+
+//####################################### DST hack ###########################################
+        if ((sourceAttr.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) //dst hack not (yet) required for directories (symlinks implicitly checked by isFatDrive())
+        {
+            if (dst::isFatDrive(sourceObj)) //throw()
+            {
+                const dst::RawTime rawTime(creationTime, lastWriteTime);
+                if (dst::fatHasUtcEncoded(rawTime)) //throw (std::runtime_error)
+                {
+                    lastWriteTime = dst::fatDecodeUtcTime(rawTime); //return last write time in real UTC, throw (std::runtime_error)
+                    ::GetSystemTimeAsFileTime(&creationTime); //real creation time information is not available...
+                }
+            }
+
+            if (dst::isFatDrive(targetObj)) //throw()
+            {
+                const dst::RawTime encodedTime = dst::fatEncodeUtcTime(lastWriteTime); //throw (std::runtime_error)
+                creationTime  = encodedTime.createTimeRaw;
+                lastWriteTime = encodedTime.writeTimeRaw;
+            }
+        }
+//####################################### DST hack ###########################################
     }
+
 
     HANDLE hTarget = ::CreateFile(applyLongPathPrefix(targetObj).c_str(),
                                   FILE_WRITE_ATTRIBUTES,
@@ -984,17 +1054,30 @@ void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, boo
         wxString errorMessage = wxString(_("Error changing modification time:")) + wxT("\n\"") + zToWx(targetObj) + wxT("\"");
         throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
     }
-
     boost::shared_ptr<void> dummy(hTarget, ::CloseHandle);
 
     if (!::SetFileTime(hTarget,
                        &creationTime,
                        &lastAccessTime,
-                       &lastWriteTime)) //return value not evalutated!
+                       &lastWriteTime))
     {
         wxString errorMessage = wxString(_("Error changing modification time:")) + wxT("\n\"") + zToWx(targetObj) + wxT("\"");
         throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
     }
+
+#ifndef NDEBUG //dst hack: verify data written
+    if (dst::isFatDrive(targetObj)) //throw()
+    {
+        WIN32_FILE_ATTRIBUTE_DATA debugeAttr = {};
+        assert(::GetFileAttributesEx(applyLongPathPrefix(targetObj).c_str(), //__in   LPCTSTR lpFileName,
+                                     GetFileExInfoStandard,                  //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
+                                     &debugeAttr));                          //__out  LPVOID lpFileInformation
+
+        assert(::CompareFileTime(&debugeAttr.ftCreationTime,  &creationTime)  == 0);
+        assert(::CompareFileTime(&debugeAttr.ftLastWriteTime, &lastWriteTime) == 0);
+    }
+#endif
+
 
 #elif defined FFS_LINUX
     if (deRefSymlinks)
@@ -1071,7 +1154,7 @@ Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target pa
         DWORD cchFilePath,
         DWORD dwFlags);
     static const GetFinalPathNameByHandleWFunc getFinalPathNameByHandle =
-        util::loadDllFunction<GetFinalPathNameByHandleWFunc>(L"kernel32.dll", "GetFinalPathNameByHandleW");
+        util::getDllFun<GetFinalPathNameByHandleWFunc>(L"kernel32.dll", "GetFinalPathNameByHandleW");
 
     if (getFinalPathNameByHandle == NULL)
         throw FileError(wxString(_("Error loading library function:")) + wxT("\n\"") + wxT("GetFinalPathNameByHandleW") + wxT("\""));
@@ -1406,11 +1489,11 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
 
     struct TryCleanUp
     {
-        static void tryDeleteDir(const Zstring& linkname) //throw ()
+        static void tryDeleteDir(const Zstring& dirname) //throw ()
         {
             try
             {
-                removeDirectory(linkname);
+                removeDirectory(dirname, NULL);
             }
             catch (...) {}
         }
@@ -1483,6 +1566,7 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
 
         guardNewDir.Dismiss(); //target has been created successfully!
     }
+
 #elif defined FFS_LINUX
     //symbolic link handling
     if (    copyDirectorySymLinks &&
@@ -1537,13 +1621,9 @@ Zstring createTempName(const Zstring& filename)
 {
     Zstring output = filename + ffs3::TEMP_FILE_ENDING;
 
-#ifndef _MSC_VER
-#warning TEMP_FILE_ENDING -> harmonize with other "endings" remove trailing dot
-#endif
-
     //ensure uniqueness
     for (int i = 1; ffs3::somethingExists(output); ++i)
-        output = filename + DefaultChar('_') + numberToZstring(i) + ffs3::TEMP_FILE_ENDING;
+        output = filename + Zchar('_') + Zstring::fromNumber(i) + ffs3::TEMP_FILE_ENDING;
 
     return output;
 }
@@ -1607,13 +1687,12 @@ DWORD CALLBACK copyCallbackInternal(
 
 bool supportForSymbolicLinks()
 {
-    OSVERSIONINFO osvi;
-    ::ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+    OSVERSIONINFO osvi = {};
     osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
     //symbolic links are supported starting with Vista
-    if (GetVersionEx(&osvi))
-        return osvi.dwMajorVersion > 5; //XP has majorVersion == 5, minorVersion == 1, Vista majorVersion == 6
+    if (::GetVersionEx(&osvi))
+        return osvi.dwMajorVersion > 5; //XP has majorVersion == 5, minorVersion == 1; Vista majorVersion == 6, dwMinorVersion == 0
     //overview: http://msdn.microsoft.com/en-us/library/ms724834(VS.85).aspx
     return false;
 }
@@ -1697,7 +1776,7 @@ void ffs3::copyFile(const Zstring& sourceFile,
         {
             //shadowFilename already contains prefix: E.g. "\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Program Files\FFS\sample.dat"
 
-                Zstring shadowFilename;
+            Zstring shadowFilename;
             try
             {
                 shadowFilename = shadowCopyHandler->makeShadowCopy(sourceFile); //throw (FileError)

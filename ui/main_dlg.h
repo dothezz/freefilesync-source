@@ -15,14 +15,14 @@
 #include <set>
 
 class CompareStatusHandler;
-class MainFolderDragDrop;
+class DirectoryNameMainImpl;
 class CustomGrid;
 class FFSCheckRowsEvent;
 class FFSSyncDirectionEvent;
 class IconUpdater;
 class ManualDeletionHandler;
-class FolderPairPanel;
-class FirstFolderPairCfg;
+class DirectoryPair;
+class DirectoryPairFirst;
 class CompareStatus;
 
 
@@ -30,7 +30,6 @@ namespace ffs3
 {
 class CustomLocale;
 class GridView;
-class MouseMoveWindow;
 }
 
 
@@ -49,7 +48,8 @@ public:
 private:
     friend class CompareStatusHandler;
     friend class ManualDeletionHandler;
-    friend class MainFolderDragDrop;
+    friend class DirectoryPairFirst;
+    friend class DirectoryNameMainImpl;
     template <class GuiPanel>
     friend class FolderPairCallback;
 
@@ -275,8 +275,8 @@ private:
     xmlAccess::XmlGuiConfig currentCfg;
 
     //folder pairs:
-    std::auto_ptr<FirstFolderPairCfg> firstFolderPair; //always bound!!!
-    std::vector<FolderPairPanel*> additionalFolderPairs; //additional pairs to the first pair
+    std::auto_ptr<DirectoryPairFirst> firstFolderPair; //always bound!!!
+    std::vector<DirectoryPair*> additionalFolderPairs; //additional pairs to the first pair
 
     //gui settings
     int widthNotMaximized;
@@ -308,11 +308,6 @@ private:
 
     //update icons periodically: one updater instance for both left and right grids
     std::auto_ptr<IconUpdater> updateFileIcons;
-
-#ifdef FFS_WIN
-    //enable moving window by clicking on sub-windows instead of header line
-    std::auto_ptr<ffs3::MouseMoveWindow> moveWholeWindow;
-#endif
 
     //encapsulation of handling of sync preview
     class SyncPreview //encapsulates MainDialog functionality for synchronization preview (friend class)

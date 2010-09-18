@@ -15,6 +15,7 @@
 #include <stdexcept>
 #include "system_func.h"
 #include "check_exist.h"
+#include "assert_static.h"
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -99,32 +100,6 @@ wxString ffs_Impl::includeNumberSeparator(const wxString& number)
 }
 
 
-template <class T>
-void setDirectoryNameImpl(const wxString& dirname, T* txtCtrl, wxDirPickerCtrl* dirPicker)
-{
-    using namespace ffs3;
-
-    txtCtrl->SetValue(dirname);
-    const Zstring dirFormatted = ffs3::getFormattedDirectoryName(wxToZ(dirname));
-
-    if (util::dirExists(dirFormatted, 200) == util::EXISTING_TRUE) //potentially slow network access: wait 200ms at most
-        dirPicker->SetPath(zToWx(dirFormatted));
-}
-
-
-void ffs3::setDirectoryName(const wxString& dirname, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker)
-{
-    setDirectoryNameImpl(dirname, txtCtrl, dirPicker);
-}
-
-
-void ffs3::setDirectoryName(const wxString& dirname, wxComboBox* txtCtrl, wxDirPickerCtrl* dirPicker)
-{
-    txtCtrl->SetSelection(wxNOT_FOUND);
-    setDirectoryNameImpl(dirname, txtCtrl, dirPicker);
-}
-
-
 void ffs3::scrollToBottom(wxScrolledWindow* scrWindow)
 {
     int height = 0;
@@ -147,94 +122,128 @@ void ffs3::scrollToBottom(wxScrolledWindow* scrWindow)
 
 namespace
 {
-inline
-void writeTwoDigitNumber(size_t number, wxString& string)
+#ifdef FFS_WIN
+bool isVistaOrLater()
 {
-    assert (number < 100);
+    OSVERSIONINFO osvi = {};
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
-    string += wxChar('0' + number / 10);
-    string += wxChar('0' + number % 10);
+    //symbolic links are supported starting with Vista
+    if (::GetVersionEx(&osvi))
+        return osvi.dwMajorVersion > 5; //XP has majorVersion == 5, minorVersion == 1; Vista majorVersion == 6, dwMinorVersion == 0
+    //overview: http://msdn.microsoft.com/en-us/library/ms724834(VS.85).aspx
+    return false;
+}
+#endif
 }
 
-
-inline
-void writeFourDigitNumber(size_t number, wxString& string)
-{
-    assert (number < 10000);
-
-    string += wxChar('0' + number / 1000);
-    number %= 1000;
-    string += wxChar('0' + number / 100);
-    number %= 100;
-    string += wxChar('0' + number / 10);
-    number %= 10;
-    string += wxChar('0' + number);
-}
-}
 
 wxString ffs3::utcTimeToLocalString(const wxLongLong& utcTime)
 {
 #ifdef FFS_WIN
     //convert ansi C time to FILETIME
     wxLongLong fileTimeLong(utcTime);
-
     fileTimeLong += wxLongLong(2, 3054539008UL); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
     fileTimeLong *= 10000000;
 
     FILETIME lastWriteTimeUtc;
     lastWriteTimeUtc.dwLowDateTime  = fileTimeLong.GetLo();             //GetLo() returns unsigned
-    lastWriteTimeUtc.dwHighDateTime = unsigned(fileTimeLong.GetHi());   //GetHi() returns signed
+    lastWriteTimeUtc.dwHighDateTime = static_cast<DWORD>(fileTimeLong.GetHi());   //GetHi() returns signed
 
+    assert(fileTimeLong.GetHi() >= 0);
+    assert_static(sizeof(DWORD) == sizeof(long));
+    assert_static(sizeof(long) == 4);
 
-    FILETIME localFileTime;
-    if (::FileTimeToLocalFileTime( //convert to local time
-                &lastWriteTimeUtc, //pointer to UTC file time to convert
-                &localFileTime 	   //pointer to converted file time
-            ) == 0)
-        throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" FILETIME -> local FILETIME: ") +
-                                              wxT("(") + wxULongLong(lastWriteTimeUtc.dwHighDateTime, lastWriteTimeUtc.dwLowDateTime).ToString() + wxT(") ") +
-                                              wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
+    SYSTEMTIME systemTimeLocal = {};
 
-    if (localFileTime.dwHighDateTime > 0x7fffffff)
-        return _("Error");  //this actually CAN happen if UTC time is just below this border and ::FileTimeToLocalFileTime() adds 2 hours due to DST or whatever!
-    //Testcase (UTC): dateHigh = 2147483647 (=0x7fffffff) -> year 30000
-    //                dateLow  = 4294967295
+    static const bool useNewLocalTimeCalculation = isVistaOrLater();
+    if (useNewLocalTimeCalculation) //use DST setting from source date (like in Windows 7, see http://msdn.microsoft.com/en-us/library/ms724277(VS.85).aspx)
+    {
+        if (lastWriteTimeUtc.dwHighDateTime > 0x7FFFFFFF)
+            return _("Error");
 
-    SYSTEMTIME time;
-    if (::FileTimeToSystemTime(
-                &localFileTime, //pointer to file time to convert
-                &time 	        //pointer to structure to receive system time
-            ) == 0)
-        throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" local FILETIME -> SYSTEMTIME: ") +
-                                              wxT("(") + wxULongLong(localFileTime.dwHighDateTime, localFileTime.dwLowDateTime).ToString() + wxT(") ") +
-                                              wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
+        SYSTEMTIME systemTimeUtc = {};
+        if (!::FileTimeToSystemTime(
+                    &lastWriteTimeUtc, //__in   const FILETIME *lpFileTime,
+                    &systemTimeUtc))   //__out  LPSYSTEMTIME lpSystemTime
+            throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" FILETIME -> SYSTEMTIME: ") +
+                                                  wxT("(") + wxULongLong(lastWriteTimeUtc.dwHighDateTime, lastWriteTimeUtc.dwLowDateTime).ToString() + wxT(") ") +
+                                                  wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
 
-    //assemble time string (performance optimized) -> note: performance argument may not be valid any more
-    wxString formattedTime;
-    formattedTime.reserve(20);
+        if (!::SystemTimeToTzSpecificLocalTime(
+                    NULL,              //__in_opt  LPTIME_ZONE_INFORMATION lpTimeZone,
+                    &systemTimeUtc,    //__in      LPSYSTEMTIME lpUniversalTime,
+                    &systemTimeLocal)) //__out     LPSYSTEMTIME lpLocalTime
+            throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" SYSTEMTIME -> local SYSTEMTIME: ") +
+                                                  wxT("(") + wxULongLong(lastWriteTimeUtc.dwHighDateTime, lastWriteTimeUtc.dwLowDateTime).ToString() + wxT(") ") +
+                                                  wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
+    }
+    else //use current DST setting (like in Windows 2000 and XP)
+    {
+        FILETIME fileTimeLocal = {};
+        if (!::FileTimeToLocalFileTime( //convert to local time
+                    &lastWriteTimeUtc,  //pointer to UTC file time to convert
+                    &fileTimeLocal))    //pointer to converted file time
+            throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" FILETIME -> local FILETIME: ") +
+                                                  wxT("(") + wxULongLong(lastWriteTimeUtc.dwHighDateTime, lastWriteTimeUtc.dwLowDateTime).ToString() + wxT(") ") +
+                                                  wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
 
-    writeFourDigitNumber(time.wYear, formattedTime);
-    formattedTime += wxChar('-');
-    writeTwoDigitNumber(time.wMonth, formattedTime);
-    formattedTime += wxChar('-');
-    writeTwoDigitNumber(time.wDay, formattedTime);
-    formattedTime += wxChar(' ');
-    formattedTime += wxChar(' ');
-    writeTwoDigitNumber(time.wHour, formattedTime);
-    formattedTime += wxChar(':');
-    writeTwoDigitNumber(time.wMinute, formattedTime);
-    formattedTime += wxChar(':');
-    writeTwoDigitNumber(time.wSecond, formattedTime);
+        if (fileTimeLocal.dwHighDateTime > 0x7FFFFFFF)
+            return _("Error");  //this actually CAN happen if UTC time is just below this border and ::FileTimeToLocalFileTime() adds 2 hours due to DST or whatever!
+        //Testcase (UTC): dateHigh = 2147483647 (=0x7fffffff) -> year 30000
+        //                dateLow  = 4294967295
 
-    return formattedTime;
+        if (!::FileTimeToSystemTime(
+                    &fileTimeLocal,  //pointer to file time to convert
+                    &systemTimeLocal)) //pointer to structure to receive system time
+            throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" local FILETIME -> local SYSTEMTIME: ") +
+                                                  wxT("(") + wxULongLong(fileTimeLocal.dwHighDateTime, fileTimeLocal.dwLowDateTime).ToString() + wxT(") ") +
+                                                  wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
+    }
+
+    /*
+         //assemble time string (performance optimized) -> note: performance argument is not valid anymore
+
+         wxString formattedTime;
+         formattedTime.reserve(20);
+
+         writeFourDigitNumber(time.wYear, formattedTime);
+         formattedTime += wxChar('-');
+         writeTwoDigitNumber(time.wMonth, formattedTime);
+         formattedTime += wxChar('-');
+         writeTwoDigitNumber(time.wDay, formattedTime);
+         formattedTime += wxChar(' ');
+         formattedTime += wxChar(' ');
+         writeTwoDigitNumber(time.wHour, formattedTime);
+         formattedTime += wxChar(':');
+         writeTwoDigitNumber(time.wMinute, formattedTime);
+         formattedTime += wxChar(':');
+         writeTwoDigitNumber(time.wSecond, formattedTime);
+     */
+    const wxDateTime localTime(systemTimeLocal.wDay,
+                               wxDateTime::Month(systemTimeLocal.wMonth - 1),
+                               systemTimeLocal.wYear,
+                               systemTimeLocal.wHour,
+                               systemTimeLocal.wMinute,
+                               systemTimeLocal.wSecond);
 
 #elif defined FFS_LINUX
     tm* timeinfo;
     const time_t fileTime = utcTime.ToLong();
     timeinfo = localtime(&fileTime); //convert to local time
-    char buffer[50];
-    strftime(buffer, 50, "%Y-%m-%d  %H:%M:%S", timeinfo);
 
-    return zToWx(buffer);
+    /*
+        char buffer[50];
+        ::strftime(buffer, 50, "%Y-%m-%d  %H:%M:%S", timeinfo);
+        return zToWx(buffer);
+    */
+    const wxDateTime localTime(timeinfo->tm_mday,
+                               wxDateTime::Month(timeinfo->tm_mon),
+                               1900 + timeinfo->tm_year,
+                               timeinfo->tm_hour,
+                               timeinfo->tm_min,
+                               timeinfo->tm_sec);
 #endif
+
+    return localTime.FormatDate() + wxT("  ") + localTime.FormatTime();
 }

@@ -20,7 +20,13 @@ struct DirInformation
 };
 typedef boost::shared_ptr<const DirInformation> DirInfoPtr;
 
-std::pair<DirInfoPtr, DirInfoPtr> loadFromDisk(const BaseDirMapping& baseMapping); //throw (FileError) -> return value always bound!
+class FileErrorDatabaseNotExisting : public FileError
+{
+public:
+    FileErrorDatabaseNotExisting(const wxString& message) : FileError(message) {}
+};
+
+std::pair<DirInfoPtr, DirInfoPtr> loadFromDisk(const BaseDirMapping& baseMapping); //throw (FileError, FileErrorDatabaseNotExisting) -> return value always bound!
 }
 
 #endif // DBFILE_H_INCLUDED

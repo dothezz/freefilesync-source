@@ -9,30 +9,33 @@
 
 #include <wx/event.h>
 #include <vector>
+#include <wx/sizer.h>
+#include <wx/filepicker.h>
+#include <wx/combobox.h>
+#include "zstring.h"
 
-class wxWindow;
-class wxDirPickerCtrl;
-class wxComboBox;
-class wxTextCtrl;
-class wxString;
+
 class FFSFileDropEvent;
 class wxCommandEvent;
 class wxFileDirPickerEvent;
 
-
 namespace ffs3
 {
-//add drag and drop functionality, coordinating a wxWindow, wxDirPickerCtrl, and wxComboBox/wxTextCtrl
+//handle drag and drop, tooltip, label and manual input, coordinating a wxWindow, wxDirPickerCtrl, and wxComboBox/wxTextCtrl
 
-class DragDropOnMainDlg : private wxEvtHandler
+class DirectoryNameMainDlg : private wxEvtHandler
 {
 public:
-    DragDropOnMainDlg(wxWindow*        dropWindow1,
-                      wxWindow*        dropWindow2,
-                      wxDirPickerCtrl* dirPicker,
-                      wxComboBox*      dirName);
+    DirectoryNameMainDlg(wxWindow*         dropWindow1,
+                         wxWindow*         dropWindow2,
+                         wxDirPickerCtrl*  dirPicker,
+                         wxComboBox*       dirName,
+                         wxStaticBoxSizer* staticBox);
 
-    virtual ~DragDropOnMainDlg() {}
+    virtual ~DirectoryNameMainDlg() {}
+
+    Zstring getName() const;
+    void setName(const Zstring& dirname);
 
     virtual bool AcceptDrop(const std::vector<wxString>& droppedFiles) = 0; //return true if drop should be processed
 
@@ -41,19 +44,23 @@ private:
     void OnWriteDirManually(wxCommandEvent& event);
     void OnDirSelected(wxFileDirPickerEvent& event);
 
-    const wxWindow*  dropWindow1_;
-    const wxWindow*  dropWindow2_;
-    wxDirPickerCtrl* dirPicker_;
-    wxComboBox*      dirName_;
+    const wxWindow*   dropWindow1_;
+    const wxWindow*   dropWindow2_;
+    wxDirPickerCtrl*  dirPicker_;
+    wxComboBox*       dirName_;
+    wxStaticBoxSizer* staticBox_;
 };
 
 
-class DragDropOnDlg: private wxEvtHandler
+class DirectoryName: private wxEvtHandler
 {
 public:
-    DragDropOnDlg(wxWindow*        dropWindow,
+    DirectoryName(wxWindow*        dropWindow,
                   wxDirPickerCtrl* dirPicker,
                   wxTextCtrl*      dirName);
+
+    Zstring getName() const;
+    void setName(const Zstring& dirname);
 
 private:
     void OnFilesDropped(FFSFileDropEvent& event);

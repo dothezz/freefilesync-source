@@ -12,17 +12,17 @@
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 
 using namespace util;
+using namespace tbseven;
 
 
 namespace
 {
 bool windows7TaskbarAvailable()
 {
-    OSVERSIONINFO osvi;
-    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+    OSVERSIONINFO osvi = {};
     osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
-    if (GetVersionEx(&osvi))
+    if (::GetVersionEx(&osvi))
         return osvi.dwMajorVersion > 6 ||
                (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion >= 1); //task bar progress available with Windows 7
     //XP          has majorVersion == 5, minorVersion == 1
@@ -45,86 +45,77 @@ const std::wstring& getTaskBarDllName()
     return filename;
 }
 }
+//########################################################################################################
 
 
-struct TaskbarProgress::Pimpl
+class TaskbarProgress::Pimpl //throw (TaskbarNotAvailable)
 {
-    Pimpl() : tbHandle(0),
-        assocWindow(NULL),
-        init_(NULL),
-        release_(NULL),
-        setStatus_(NULL),
-        setProgress_(NULL) {}
+public:
+    Pimpl(const wxTopLevelWindow& window) :
+        assocWindow(window.GetHWND()),
+        setStatus_(util::getDllFun<SetStatusFct>(  getTaskBarDllName(), setStatusFctName)),
+        setProgress_(util::getDllFun<SetProgressFct>(getTaskBarDllName(), setProgressFctName))
+    {
+        if (!assocWindow || !setProgress_ || !setStatus_)
+            throw TaskbarNotAvailable();
 
-    TaskbarSeven::TBHandle tbHandle;
+        if (!windows7TaskbarAvailable())
+            throw TaskbarNotAvailable();
+    }
+
+    ~Pimpl()
+    {
+        setStatus(STATUS_NOPROGRESS);
+    }
+
+    void setStatus(Status status)
+    {
+        TaskBarStatus tbSevenStatus = tbseven::STATUS_NORMAL;
+        switch (status)
+        {
+        case TaskbarProgress::STATUS_NOPROGRESS:
+            tbSevenStatus = tbseven::STATUS_NOPROGRESS;
+            break;
+        case TaskbarProgress::STATUS_INDETERMINATE:
+            tbSevenStatus = tbseven::STATUS_INDETERMINATE;
+            break;
+        case TaskbarProgress::STATUS_NORMAL:
+            tbSevenStatus = tbseven::STATUS_NORMAL;
+            break;
+        case TaskbarProgress::STATUS_ERROR:
+            tbSevenStatus = tbseven::STATUS_ERROR;
+            break;
+        case TaskbarProgress::STATUS_PAUSED:
+            tbSevenStatus = tbseven::STATUS_PAUSED;
+            break;
+        }
+
+        setStatus_(assocWindow, tbSevenStatus);
+    }
+
+    void setProgress(size_t current, size_t total)
+    {
+        setProgress_(assocWindow, current, total);
+    }
+
+private:
     void* assocWindow;
-
-    TaskbarSeven::initFct init_;
-    TaskbarSeven::releaseFct release_;
-    TaskbarSeven::setStatusFct setStatus_;
-    TaskbarSeven::setProgressFct setProgress_;
+    const SetStatusFct setStatus_;
+    const SetProgressFct setProgress_;
 };
+//########################################################################################################
 
 
-TaskbarProgress::TaskbarProgress(const wxTopLevelWindow& window) : pimpl_(new Pimpl)
-{
-    if (!windows7TaskbarAvailable())
-        throw TaskbarNotAvailable();
+TaskbarProgress::TaskbarProgress(const wxTopLevelWindow& window) : pimpl_(new Pimpl(window)) {}
 
-    pimpl_->init_         = util::loadDllFunction<TaskbarSeven::initFct>(       getTaskBarDllName(), TaskbarSeven::initFctName);
-    pimpl_->release_      = util::loadDllFunction<TaskbarSeven::releaseFct>(    getTaskBarDllName(), TaskbarSeven::releaseFctName);
-    pimpl_->setProgress_  = util::loadDllFunction<TaskbarSeven::setProgressFct>(getTaskBarDllName(), TaskbarSeven::setProgressFctName);
-    pimpl_->setStatus_    = util::loadDllFunction<TaskbarSeven::setStatusFct>(  getTaskBarDllName(), TaskbarSeven::setStatusFctName);
-
-    if (    !pimpl_->init_        ||
-            !pimpl_->release_     ||
-            !pimpl_->setProgress_ ||
-            !pimpl_->setStatus_)
-        throw TaskbarNotAvailable();
-
-    pimpl_->tbHandle = pimpl_->init_();
-    if (pimpl_->tbHandle == 0)
-        throw TaskbarNotAvailable();
-
-    pimpl_->assocWindow = window.GetHWND();
-}
-
-
-TaskbarProgress::~TaskbarProgress()
-{
-    setStatus(STATUS_NOPROGRESS);
-
-    pimpl_->release_(pimpl_->tbHandle);
-}
-
+TaskbarProgress::~TaskbarProgress() {} //std::auto_ptr ...
 
 void TaskbarProgress::setStatus(Status status)
 {
-    TaskbarSeven::TaskBarStatus tbSevenStatus = TaskbarSeven::STATUS_NORMAL;
-    switch (status)
-    {
-    case TaskbarProgress::STATUS_NOPROGRESS:
-        tbSevenStatus = TaskbarSeven::STATUS_NOPROGRESS;
-        break;
-    case TaskbarProgress::STATUS_INDETERMINATE:
-        tbSevenStatus = TaskbarSeven::STATUS_INDETERMINATE;
-        break;
-    case TaskbarProgress::STATUS_NORMAL:
-        tbSevenStatus = TaskbarSeven::STATUS_NORMAL;
-        break;
-    case TaskbarProgress::STATUS_ERROR:
-        tbSevenStatus = TaskbarSeven::STATUS_ERROR;
-        break;
-    case TaskbarProgress::STATUS_PAUSED:
-        tbSevenStatus = TaskbarSeven::STATUS_PAUSED;
-        break;
-    }
-
-    pimpl_->setStatus_(pimpl_->tbHandle, pimpl_->assocWindow, tbSevenStatus);
+    pimpl_->setStatus(status);
 }
-
 
 void TaskbarProgress::setProgress(size_t current, size_t total)
 {
-    pimpl_->setProgress_(pimpl_->tbHandle, pimpl_->assocWindow, current, total);
+    pimpl_->setProgress(current, total);
 }

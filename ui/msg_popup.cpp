@@ -6,12 +6,18 @@
 //
 #include "msg_popup.h"
 #include "../library/resources.h"
+#include "mouse_move_dlg.h"
 
 
 ErrorDlg::ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxString messageText, bool& ignoreNextErrors) :
     ErrorDlgGenerated(parentWindow),
     ignoreErrors(ignoreNextErrors)
 {
+#ifdef FFS_WIN
+    new ffs3::MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                        this, m_bitmap10); //ownership passed to "this"
+#endif
+
     m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("error")));
     m_textCtrl8->SetValue(messageText);
     m_checkBoxIgnoreErrors->SetValue(ignoreNextErrors);
@@ -71,6 +77,11 @@ WarningDlg::WarningDlg(wxWindow* parentWindow,  int activeButtons, const wxStrin
     WarningDlgGenerated(parentWindow),
     dontShowAgain(dontShowDlgAgain)
 {
+#ifdef FFS_WIN
+    new ffs3::MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                        this, m_bitmap10); //ownership passed to "this"
+#endif
+
     m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("warning")));
     m_textCtrl8->SetValue(messageText);
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
@@ -128,6 +139,11 @@ QuestionDlg::QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxStri
     QuestionDlgGenerated(parentWindow),
     dontShowAgain(dontShowDlgAgain)
 {
+#ifdef FFS_WIN
+    new ffs3::MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                        this, m_bitmap10); //ownership passed to "this"
+#endif
+
     m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("question")));
     m_textCtrl8->SetValue(messageText);
     if (dontShowAgain)

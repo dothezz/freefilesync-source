@@ -90,8 +90,6 @@
 &Yes
 (Build: %x)
 (Build: %x)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
 (Requires an Internet connection!)
 (Requires an Internet connection!)
 - Other side's counterpart to %dir
@@ -274,14 +272,10 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
 Copy to clipboard\tCTRL+C
 Copy to clipboard\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-Copying Symbolic Link %x overwriting %y
-Copying Symbolic Link %x to %y
-Copying Symbolic Link %x to %y
-Copying file %x overwriting %y
-Copying file %x overwriting %y
-Copying file %x to %y
-Copying file %x to %y
+Copying new Symbolic Link %x to %y
+Copying new Symbolic Link %x to %y
+Copying new file %x to %y
+Copying new file %x to %y
 Could not determine volume name for file:
 Could not determine volume name for file:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 Data verification error: Source and target file have different content!
 Date
 Date
-Delay
-Delay
-Delay between detection of changes and execution of command line in seconds
-Delay between detection of changes and execution of command line in seconds
 Delete files/folders existing on left side only
 Delete files/folders existing on left side only
 Delete files/folders existing on right side only
@@ -412,6 +402,8 @@ Error reading from synchronization database:
 Error reading from synchronisation database:
 Error resolving symbolic link:
 Error resolving symbolic link:
+Error setting directory lock:
+Error setting directory lock:
 Error setting privilege:
 Error setting privilege:
 Error starting Volume Shadow Copy Service!
@@ -458,8 +450,6 @@ File size and date
 File size and date
 Filename
 Filename
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
 Files %x have the same date but a different size!
 Files %x have the same date but a different size!
 Files are found equal if\n     - file content\nis the same
@@ -564,12 +554,12 @@ Homepage
 Homepage
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+Idle time between detection of last change and execution of command line in seconds
+Idle time between detection of last change and execution of command line in seconds
 If you like FFS
 If you like FFS
 Ignore
 Ignore
-Ignore 1-hour file time difference
-Ignore 1-hour file time difference
 Ignore errors
 Ignore errors
 Ignore subsequent errors
@@ -612,6 +602,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Match case
 Match case
+Minimum Idle Time
+Minimum Idle Time
 Mirror ->>
 Mirror ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -666,6 +658,10 @@ Operation:
 Operation:
 Overview
 Overview
+Overwriting Symbolic Link %x in %y
+Overwriting Symbolic Link %x in %y
+Overwriting file %x in %y
+Overwriting file %x in %y
 Pause
 Pause
 Paused
@@ -842,8 +838,6 @@ Total time:
 Total time:
 Transfer file and directory permissions\n(Requires Administrator rights)
 Transfer file and directory permissions\n(Requires Administrator rights)
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
 Unable to connect to sourceforge.net!
 Unable to connect to sourceforge.net!
 Unable to create logfile!
@@ -870,6 +864,8 @@ Volume name %x not part of filename %y!
 Volume name %x not part of filename %y!
 Waiting for all directories to become available...
 Waiting for all directories to become available...
+Waiting while directory is locked (%x)...
+Waiting while directory is locked (%x)...
 Warning
 Warning
 Warning: Synchronization failed for %x item(s):

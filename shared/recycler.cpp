@@ -82,17 +82,17 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
 
     if (useIFileOperation) //new recycle bin usage: available since Vista
     {
-                std::vector<const wchar_t*> fileNames;
+        std::vector<const wchar_t*> fileNames;
         std::transform(filesToDelete.begin(), filesToDelete.end(),
                        std::back_inserter(fileNames), std::mem_fun_ref(&Zstring::c_str));
 
-        using namespace FileOp;
+        using namespace fileop;
 
         static const MoveToRecycleBinFct moveToRecycler =
-            util::loadDllFunction<MoveToRecycleBinFct>(getRecyclerDllName().c_str(), moveToRecycleBinFctName);
+            util::getDllFun<MoveToRecycleBinFct>(getRecyclerDllName().c_str(), moveToRecycleBinFctName);
 
         static const GetLastErrorFct getLastError =
-            util::loadDllFunction<GetLastErrorFct>(getRecyclerDllName().c_str(), getLastErrorFctName);
+            util::getDllFun<GetLastErrorFct>(getRecyclerDllName().c_str(), getLastErrorFctName);
 
         if (moveToRecycler == NULL || getLastError == NULL)
             throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + fileNames[0] + wxT("\"\n\n") + //report first file only... better than nothing
@@ -103,11 +103,11 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
 //        std::transform(filesToDelete.begin(), filesToDelete.end(),
 //                       std::back_inserter(temp), std::ptr_fun(ffs3::removeLongPathPrefix)); //::IFileOperation() can't handle \\?\-prefix!
 
-        if (!(*moveToRecycler)(&fileNames[0], //array must not be empty
-                               fileNames.size()))
+        if (!moveToRecycler(&fileNames[0], //array must not be empty
+                            fileNames.size()))
         {
             wchar_t errorMessage[2000];
-            (*getLastError)(errorMessage, 2000);
+            getLastError(errorMessage, 2000);
             throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + fileNames[0] + wxT("\"\n\n") + //report first file only... better than nothing
                             wxT("(") + errorMessage + wxT(")"));
         }
@@ -121,7 +121,7 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
             //filenameDoubleNull += removeLongPathPrefix(*i); //::SHFileOperation() can't handle \\?\-prefix!
             //You should use fully-qualified path names with this function. Using it with relative path names is not thread safe.
             filenameDoubleNull += *i; //::SHFileOperation() can't handle \\?\-prefix!
-            filenameDoubleNull += DefaultChar(0);
+            filenameDoubleNull += Zchar(0);
         }
 
         SHFILEOPSTRUCT fileOp;
@@ -166,8 +166,8 @@ void ffs3::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileError)
     try
     {
         if (!fileObj->trash())
-        throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + zToWx(fileToDelete) + wxT("\"\n\n") +
-                        wxT("(") + wxT("unknown error") + wxT(")"));
+            throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + zToWx(fileToDelete) + wxT("\"\n\n") +
+                            wxT("(") + wxT("unknown error") + wxT(")"));
     }
     catch (const Glib::Error& errorObj)
     {

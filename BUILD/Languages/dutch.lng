@@ -90,8 +90,6 @@
 &Ja
 (Build: %x)
 
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Alleen FAT/FAT32 schijven hebben last van dit probleem!\nIn alle andere gevallen kunt u deze instelling uitschakelen \"negeer 1-uur tijdsverschil\".)
 (Requires an Internet connection!)
 (Vereist een internetverbinding)
 - Other side's counterpart to %dir
@@ -274,14 +272,10 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 
 Copy to clipboard\tCTRL+C
 Kopieer naar het klembord\tCTRL+C
-Copying Symbolic Link %x overwriting %y
+Copying new Symbolic Link %x to %y
 
-Copying Symbolic Link %x to %y
+Copying new file %x to %y
 
-Copying file %x overwriting %y
-
-Copying file %x to %y
-Bestand %x wordt gekopieerd naar %y
 Could not determine volume name for file:
 Kon de schijfnaam niet vaststellen van bestand:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 Dataverificatie-fout: Bron en doelbestand hebben verschillende inhoud!
 Date
 Datum
-Delay
-Vertraging
-Delay between detection of changes and execution of command line in seconds
-Vertraging tussen detecteren van veranderingen en uitvoering van de opdrachtregel in seconden
 Delete files/folders existing on left side only
 Verwijder bestanden/folders die alleen links bestaan
 Delete files/folders existing on right side only
@@ -412,6 +402,8 @@ Error reading from synchronization database:
 Er is een fout opgetreden bij het lezen van de synchronisatie-database:
 Error resolving symbolic link:
 Er is een fout opgetreden bij het ophalen van een symbolische koppeling:
+Error setting directory lock:
+
 Error setting privilege:
 
 Error starting Volume Shadow Copy Service!
@@ -458,8 +450,6 @@ File size and date
 Bestandsgrootte en -datum
 Filename
 Bestandsnaam
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-De bestanden %x hebben een bestandstijd verschil van minder dan één uur!\n\nHet is niet veilig te bepalen welke nieuwer is vanwege zomertijd instellingen
 Files %x have the same date but a different size!
 De bestanden %x hebben dezelfde data maar een afwijkende grootte!
 Files are found equal if\n     - file content\nis the same
@@ -564,12 +554,12 @@ Homepage
 Homepage
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Identificeer en verwerk verandereringen aan beide kanten dmv een database. Verschillen en conflicten worden automatisch gedecteerd.
+Idle time between detection of last change and execution of command line in seconds
+
 If you like FFS
 Als het programma u bevalt
 Ignore
 
-Ignore 1-hour file time difference
-Negeer 1-uur bestandstijd verschillen
 Ignore errors
 Negeer foutmeldingen
 Ignore subsequent errors
@@ -611,6 +601,8 @@ Loggen
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Schaduw kopieen op WOW64 worden niet ondersteund. Gebruik alstublieft de 64-bit versie van FreeFileSync.
 Match case
+
+Minimum Idle Time
 
 Mirror ->>
 Spiegelen ->>
@@ -666,6 +658,10 @@ Operation:
 Voortgang:
 Overview
 Overzicht
+Overwriting Symbolic Link %x in %y
+
+Overwriting file %x in %y
+
 Pause
 Pause
 Paused
@@ -842,8 +838,6 @@ Total time:
 Totale tijd:
 Transfer file and directory permissions\n(Requires Administrator rights)
 
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-Behandel bestandstijden die verschillen met precies +/- 1 uur als gelijk en minder als 1 uur als conflict om zomertijd veranderingen te verwerken
 Unable to connect to sourceforge.net!
 Niet in staat verbinding te maken met sourceforge.net!
 Unable to create logfile!
@@ -869,6 +863,8 @@ Verifiëren bestand %x
 Volume name %x not part of filename %y!
 Volume naam %x maakt niet deel uit van bestandsnaam %y!
 Waiting for all directories to become available...
+
+Waiting while directory is locked (%x)...
 
 Warning
 Attentie

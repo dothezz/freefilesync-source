@@ -9,8 +9,8 @@
 
 
 //there are two flavors of long path prefix: one for UNC paths, one for regular paths
-const Zstring LONG_PATH_PREFIX = DefaultStr("\\\\?\\");
-const Zstring LONG_PATH_PREFIX_UNC = DefaultStr("\\\\?\\UNC");
+const Zstring LONG_PATH_PREFIX = Zstr("\\\\?\\");
+const Zstring LONG_PATH_PREFIX_UNC = Zstr("\\\\?\\UNC");
 
 template <size_t max_path>
 inline
@@ -19,8 +19,8 @@ Zstring applyLongPathPrefixImpl(const Zstring& path)
     if (    path.length() >= max_path &&    //maximum allowed path length without prefix is (MAX_PATH - 1)
             !path.StartsWith(LONG_PATH_PREFIX))
     {
-        if (path.StartsWith(DefaultStr("\\\\"))) //UNC-name, e.g. \\zenju-pc\Users
-            return LONG_PATH_PREFIX_UNC + path.AfterFirst(DefaultChar('\\')); //convert to \\?\UNC\zenju-pc\Users
+        if (path.StartsWith(Zstr("\\\\"))) //UNC-name, e.g. \\zenju-pc\Users
+            return LONG_PATH_PREFIX_UNC + path.AfterFirst(Zchar('\\')); //convert to \\?\UNC\zenju-pc\Users
         else
             return LONG_PATH_PREFIX + path; //prepend \\?\ prefix
     }
@@ -49,9 +49,9 @@ Zstring ffs3::removeLongPathPrefix(const Zstring& path) //throw()
     {
         Zstring finalPath = path;
         if (path.StartsWith(LONG_PATH_PREFIX_UNC)) //UNC-name
-            finalPath.Replace(LONG_PATH_PREFIX_UNC, DefaultStr("\\"), false);
+            finalPath.Replace(LONG_PATH_PREFIX_UNC, Zstr("\\"), false);
         else
-            finalPath.Replace(LONG_PATH_PREFIX, DefaultStr(""), false);
+            finalPath.Replace(LONG_PATH_PREFIX, Zstr(""), false);
         return finalPath;
     }
 

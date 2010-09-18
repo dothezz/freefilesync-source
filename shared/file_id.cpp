@@ -13,7 +13,6 @@
 #include <boost/shared_ptr.hpp>
 
 #elif defined FFS_LINUX
-
 #endif
 
 

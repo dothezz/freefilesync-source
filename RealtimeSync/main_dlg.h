@@ -10,7 +10,7 @@
 #include "gui_generated.h"
 #include <vector>
 #include <memory>
-#include "../shared/drag_n_drop.h"
+#include "../shared/dir_name.h"
 
 namespace xmlAccess
 {
@@ -18,16 +18,25 @@ struct XmlRealConfig;
 }
 
 
-class FolderPanel : public FolderGenerated
+class DirectoryPanel : public FolderGenerated
 {
 public:
-    FolderPanel(wxWindow* parent) :
+    DirectoryPanel(wxWindow* parent) :
         FolderGenerated(parent),
-        dragDropOnFolder(new ffs3::DragDropOnDlg(this, m_dirPicker, m_txtCtrlDirectory)) {}
+        dirName(this, m_dirPicker, m_txtCtrlDirectory) {}
+
+    void setName(const Zstring& dirname)
+    {
+        dirName.setName(dirname);
+    }
+
+    Zstring getName() const
+    {
+        return dirName.getName();
+    }
 
 private:
-    //support for drag and drop
-    std::auto_ptr<ffs3::DragDropOnDlg> dragDropOnFolder;
+    ffs3::DirectoryName dirName;
 };
 
 
@@ -65,11 +74,8 @@ private:
 
     static const wxString& lastConfigFileName();
 
-    //additional folders
-    std::vector<FolderPanel*> additionalFolders; //additional pairs to the standard pair
-
-    //support for drag and drop on main folder
-    std::auto_ptr<ffs3::DragDropOnDlg> dragDropOnFolder;
+    std::auto_ptr<ffs3::DirectoryName> dirNameFirst;
+    std::vector<DirectoryPanel*> dirNamesExtra; //additional pairs to the standard pair
 };
 
 #endif // REALTIMESYNCMAIN_H

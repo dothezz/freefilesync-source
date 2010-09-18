@@ -16,7 +16,7 @@ namespace xmlAccess
 {
 struct XmlRealConfig
 {
-    XmlRealConfig() : delay(5) {}
+    XmlRealConfig() : delay(10) {}
     std::vector<wxString> directories;
     wxString commandline;
     size_t delay;

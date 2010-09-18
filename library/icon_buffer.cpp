@@ -9,7 +9,6 @@
 #include <map>
 #include <queue>
 #include <set>
-#include <boost/thread.hpp>
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -24,43 +23,38 @@
 using ffs3::IconBuffer;
 
 
-namespace
-{
 #ifdef FFS_WIN
-Zstring getFileExtension(const Zstring& filename)
+IconBuffer::BasicString IconBuffer::getFileExtension(const BasicString& filename)
 {
-    const Zstring shortName = filename.AfterLast(DefaultChar('\\')); //warning: using windows file name separator!
-    const size_t pos = shortName.Find(DefaultChar('.'), true);
-    return pos == Zstring::npos ?
-           Zstring() :
-           Zstring(shortName.c_str() + pos + 1);
+    const BasicString shortName = filename.AfterLast(Zchar('\\')); //warning: using windows file name separator!
+
+    return shortName.find(Zchar('.')) != BasicString::npos ?
+           filename.AfterLast(Zchar('.')) :
+           BasicString();
 }
 
 
 //test for extension for icons that physically have to be retrieved from disc
-bool isPriceyExtension(const Zstring& extension)
+bool IconBuffer::isPriceyExtension(const IconBuffer::BasicString& extension)
 {
-    static std::set<Zstring, LessFilename> exceptions;
-    static bool isInitalized = false;
-    if (!isInitalized)
+    static std::set<BasicString, LessFilename> exceptions;
+    if (exceptions.empty())
     {
-        isInitalized = true;
-        exceptions.insert(DefaultStr("exe"));
-        exceptions.insert(DefaultStr("lnk"));
-        exceptions.insert(DefaultStr("ico"));
-        exceptions.insert(DefaultStr("ani"));
-        exceptions.insert(DefaultStr("cur"));
-        exceptions.insert(DefaultStr("url"));
-        exceptions.insert(DefaultStr("msc"));
-        exceptions.insert(DefaultStr("scr"));
+        exceptions.insert(Zstr("exe"));
+        exceptions.insert(Zstr("lnk"));
+        exceptions.insert(Zstr("ico"));
+        exceptions.insert(Zstr("ani"));
+        exceptions.insert(Zstr("cur"));
+        exceptions.insert(Zstr("url"));
+        exceptions.insert(Zstr("msc"));
+        exceptions.insert(Zstr("scr"));
     }
     return exceptions.find(extension) != exceptions.end();
 }
 #endif
-}
+
+
 //################################################################################################################################################
-
-
 class IconBuffer::IconHolder //handle HICON/GdkPixbuf ownership WITHOUT ref-counting to allow thread-safe usage (in contrast to wxIcon)
 {
 public:
@@ -139,7 +133,7 @@ const wxIcon& IconBuffer::getDirectoryIcon() //one folder icon should be suffici
         fileInfo.hIcon = 0; //initialize hIcon
 
         //NOTE: CoInitializeEx()/CoUninitialize() implicitly called by wxWidgets on program startup!
-        if (::SHGetFileInfo(DefaultStr("dummy"), //Windows Seven doesn't like this parameter to be an empty string
+        if (::SHGetFileInfo(Zstr("dummy"), //Windows Seven doesn't like this parameter to be an empty string
                             FILE_ATTRIBUTE_DIRECTORY,
                             &fileInfo,
                             sizeof(fileInfo),
@@ -152,14 +146,14 @@ const wxIcon& IconBuffer::getDirectoryIcon() //one folder icon should be suffici
         }
 
 #elif defined FFS_LINUX
-        folderIcon = getAssociatedIcon(DefaultStr("/usr/")).toWxIcon(); //all directories will look like "/usr/"
+        folderIcon = getAssociatedIcon(Zstr("/usr/")).toWxIcon(); //all directories will look like "/usr/"
 #endif
     }
     return folderIcon;
 }
 
 
-IconBuffer::IconHolder IconBuffer::getAssociatedIcon(const Zstring& filename)
+IconBuffer::IconHolder IconBuffer::getAssociatedIcon(const BasicString& filename)
 {
 #ifdef FFS_WIN
     //despite what docu says about SHGetFileInfo() it can't handle all relative filenames, e.g. "\DirName"
@@ -231,15 +225,14 @@ IconBuffer::IconHolder IconBuffer::getAssociatedIcon(const Zstring& filename)
 #endif
 }
 
-
 #ifdef FFS_WIN
-IconBuffer::IconHolder IconBuffer::getAssociatedIconByExt(const Zstring& extension)
+IconBuffer::IconHolder IconBuffer::getAssociatedIconByExt(const BasicString& extension)
 {
     SHFILEINFO fileInfo;
     fileInfo.hIcon = 0; //initialize hIcon -> fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
 
     //no read-access to disk! determine icon by extension
-    ::SHGetFileInfo((Zstring(DefaultStr("dummy.")) + extension).c_str(),  //Windows Seven doesn't like this parameter to be without short name
+    ::SHGetFileInfo((Zstr("dummy.") + extension).c_str(),  //Windows Seven doesn't like this parameter to be without short name
                     FILE_ATTRIBUTE_NORMAL,
                     &fileInfo,
                     sizeof(fileInfo),
@@ -248,12 +241,6 @@ IconBuffer::IconHolder IconBuffer::getAssociatedIconByExt(const Zstring& extensi
     return IconHolder(fileInfo.hIcon); //pass icon ownership (may be 0)
 }
 #endif
-
-
-//---------------------------------------------------------------------------------------------------
-typedef std::vector<DefaultChar> BasicString; //simple thread safe string class: std::vector is guaranteed to not use reference counting, Effective STL, item 13
-//avoid reference-counted objects as shared data: NOT THREADSAFE!!! (implicitly shared variables: ref-count + c-string)
-//---------------------------------------------------------------------------------------------------
 
 
 class IconBuffer::WorkerThread
@@ -308,7 +295,7 @@ void IconBuffer::WorkerThread::setWorkload(const std::vector<Zstring>& load) //(
 
         shared.workload.clear();
         for (std::vector<Zstring>::const_iterator i = load.begin(); i != load.end(); ++i)
-            shared.workload.push_back(FileName(i->c_str(), i->c_str() + i->length() + 1)); //make DEEP COPY from Zstring (include null-termination)!
+            shared.workload.push_back(FileName(i->c_str())); //make DEEP COPY from Zstring
     }
 
     shared.condition.notify_one();
@@ -344,20 +331,20 @@ void IconBuffer::WorkerThread::doWork()
     //do work: get the file icon.
     while (true)
     {
-        Zstring fileName;
+        BasicString fileName;
         {
             boost::lock_guard<boost::mutex> dummy(shared.mutex);
             if (shared.workload.empty())
                 break; //enter waiting state
-            fileName = &shared.workload.back()[0]; //deep copy (includes NULL-termination)
+            fileName = shared.workload.back(); //deep copy
             shared.workload.pop_back();
         }
 
-        if (iconBuffer.requestFileIcon(fileName)) //thread safety: Zstring okay, won't be reference-counted in requestIcon()
+        if (iconBuffer.requestFileIcon(fileName.c_str())) //thread safety: Zstring okay, won't be reference-counted in requestIcon()
             continue; //icon already in buffer: skip
 
 #ifdef FFS_WIN
-        const Zstring extension = getFileExtension(fileName); //thread-safe: no sharing!
+        const BasicString extension = getFileExtension(fileName); //thread-safe: no sharing!
         if (isPriceyExtension(extension)) //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
         {
             const IconHolder newIcon = IconBuffer::getAssociatedIcon(fileName);
@@ -377,8 +364,8 @@ void IconBuffer::WorkerThread::doWork()
 
 
 //---------------------------------------------------------------------------------------------------
-class IconBuffer::IconDB : public std::map<Zstring, IconBuffer::IconHolder> {}; //entryName/icon -> ATTENTION: avoid ref-counting for this shared data structure!!! (== don't copy instances between threads)
-class IconBuffer::IconDbSequence : public std::queue<Zstring> {}; //entryName
+class IconBuffer::IconDB : public std::map<BasicString, IconBuffer::IconHolder> {}; //entryName/icon -> ATTENTION: avoid ref-counting for this shared data structure!
+class IconBuffer::IconDbSequence : public std::queue<BasicString> {}; //entryName
 //---------------------------------------------------------------------------------------------------
 
 
@@ -405,10 +392,11 @@ bool IconBuffer::requestFileIcon(const Zstring& fileName, wxIcon* icon)
 
 #ifdef FFS_WIN
     //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
-    const Zstring extension = getFileExtension(fileName);
-    IconDB::const_iterator i = buffer->find(isPriceyExtension(extension) ? fileName : extension);
+    const BasicString extension = getFileExtension(fileName.c_str());
+    const BasicString searchString = isPriceyExtension(extension) ? fileName.c_str() : extension.c_str();
+    IconDB::const_iterator i = buffer->find(searchString);
 #elif defined FFS_LINUX
-    IconDB::const_iterator i = buffer->find(fileName);
+    IconDB::const_iterator i = buffer->find(fileName.c_str());
 #endif
 
     if (i == buffer->end())
@@ -427,17 +415,14 @@ void IconBuffer::setWorkload(const std::vector<Zstring>& load)
 }
 
 
-void IconBuffer::insertIntoBuffer(const DefaultChar* entryName, const IconHolder& icon) //called by worker thread
+void IconBuffer::insertIntoBuffer(const BasicString& entryName, const IconHolder& icon) //called by worker thread
 {
     boost::lock_guard<boost::mutex> dummy(lockIconDB);
 
-    //thread safety, ref-counting: (implicitly) make deep copy!
-    const Zstring fileNameZ = entryName;
-
-    const std::pair<IconDB::iterator, bool> rc = buffer->insert(std::make_pair(fileNameZ, icon)); //thread saftey: icon uses ref-counting! But is NOT shared with main thread!
-
+    //thread saftey: icon uses ref-counting! But is NOT shared with main thread!
+    const std::pair<IconDB::iterator, bool> rc = buffer->insert(std::make_pair(entryName, icon));
     if (rc.second) //if insertion took place
-        bufSequence->push(fileNameZ); //note: sharing Zstring with IconDB!!!
+        bufSequence->push(entryName); //note: sharing Zstring with IconDB!!!
 
     assert(buffer->size() == bufSequence->size());
 

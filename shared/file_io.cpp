@@ -60,7 +60,8 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError()
     {
         const DWORD lastError = ::GetLastError();
         const wxString& errorMessage = wxString(_("Error opening file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"") + wxT("\n\n") + ffs3::getLastErrorFormatted(lastError);
-        if (lastError == ERROR_FILE_NOT_FOUND)
+        if (lastError == ERROR_FILE_NOT_FOUND ||
+            lastError == ERROR_PATH_NOT_FOUND)
             throw ErrorNotExisting(errorMessage);
         else
             throw FileError(errorMessage);

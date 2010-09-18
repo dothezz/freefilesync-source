@@ -14,7 +14,7 @@
 
 namespace ffs3
 {
-class DragDropOnDlg;
+class DirectoryName;
 }
 
 
@@ -93,7 +93,7 @@ private:
     wxString& refCustomDeletionDirectory;
     bool* refIgnoreErrors;
 
-    std::auto_ptr<ffs3::DragDropOnDlg> dragDropCustomDelFolder;
+    std::auto_ptr<ffs3::DirectoryName> customDelFolder;
 };
 
 #endif // SYNCCONFIG_H_INCLUDED

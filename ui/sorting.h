@@ -92,12 +92,12 @@ bool sortByRelativeName(const FileSystemObject& a, const FileSystemObject& b)
         return true;  //empty rows always last
 
     const bool isDirectoryA = isDirectoryMapping(a);
-    const Zstring relDirNameA = isDirectoryA ?
+    const Zstring& relDirNameA = isDirectoryA ?
                                 a.getRelativeName<side>() : //directory
                                 a.getParentRelativeName();  //file or symlink
 
     const bool isDirectoryB = isDirectoryMapping(b);
-    const Zstring relDirNameB = isDirectoryB ?
+    const Zstring& relDirNameB = isDirectoryB ?
                                 b.getRelativeName<side>() : //directory
                                 b.getParentRelativeName();  //file or symlink
 

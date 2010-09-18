@@ -90,14 +90,12 @@ Na&loži konfiguracijo...
 &Da
 (Build: %x)
 (Izgradnja: %x)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Vedite, da samo na pogonih s FAT/FAT32 lahko pride do teh težav!\nV vseh drugih primerih lahko onemogočite nastavitev \"prezri 1-urno razliko\".)
 (Requires an Internet connection!)
 (Zahteva povezavo z Internetom!)
 - Other side's counterpart to %dir
-Duplikat z druge strani od %dir
+- Duplikat z druge strani od %dir
 - Other side's counterpart to %name
-Duplikat z druge strani od %name
+- Duplikat z druge strani od %name
 - conflict
 - spor
 - conflict (same date, different size)
@@ -274,14 +272,10 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 Kopiraj deljene ali zaklenjene datoteke z uporabo servisa Shadow Copy\n(Zahteva pravice skrbnika)
 Copy to clipboard\tCTRL+C
 Kopiraj v odložišče\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-Kopiram simbolično povezavo %x s prepisovanjem %y
-Copying Symbolic Link %x to %y
-Kopiram simbolično povezavo %x v %y
-Copying file %x overwriting %y
-Kopiram datoteko %x s prepisovanjem %y
-Copying file %x to %y
-Kopiram datoteko %x v %y
+Copying new Symbolic Link %x to %y
+Kopiram novo Simbolično povezavo %x v %y
+Copying new file %x to %y
+Kopiram novo datoteko %x v %y
 Could not determine volume name for file:
 Ne morem določiti imena volumna za datoteko:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 Napaka pri preverjanju podatkov: izvorna in ciljna datoteka imata različno vsebino!
 Date
 Datum
-Delay
-Zakasnitev
-Delay between detection of changes and execution of command line in seconds
-Zakasnitev med zaznavo sprememb in izvršitvijo ukazov v sekundah
 Delete files/folders existing on left side only
 Izbriši datoteke/mape, ki obstajajo samo na levi strani
 Delete files/folders existing on right side only
@@ -413,7 +403,7 @@ Napaka pri branju iz sinhronizacijske podatkovne baze:
 Error resolving symbolic link:
 Napaka pri razreševanju simbolične povezave:
 Error setting directory lock:
-
+Napaka pri nastavljanju zaklepanja imenika:
 Error setting privilege:
 Napaka pri nastavljanju privilegija:
 Error starting Volume Shadow Copy Service!
@@ -460,8 +450,6 @@ File size and date
 Velikosti in datumu datoteke
 Filename
 Ime datoteke
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-Datoteki %x imata razliko v času spremembe manj kot 1 uro!\n\nNi se varno odločiti katera je novejša zaradi vprašanj v zvezi s Poletnim časom.
 Files %x have the same date but a different size!
 Datoteki %x imata enak datum ampak različno velikost!
 Files are found equal if\n     - file content\nis the same
@@ -566,12 +554,12 @@ Homepage
 Domača stran
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Prepoznaj in širi spremembe na obeh straneh z uporabo podatkovne baze. Izbrisi in spori so zaznani samodejno.
+Idle time between detection of last change and execution of command line in seconds
+Čas nedejavnosti med zaznavanjem zadnje spremembe in izvršitvijo ukazne vrstice v sekundah
 If you like FFS
 Če vam je FFS všeč
 Ignore
 Ignoriraj
-Ignore 1-hour file time difference
-Ignoriraj 1-urno časovno razliko
 Ignore errors
 Ignoriraj napake
 Ignore subsequent errors
@@ -614,6 +602,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Ustvarjanje senčnih kopij na WOW63 ni podprto. Prosimo uporabite 64-bitno FreeFileSync različico.
 Match case
 Ujemaj se s primerom
+Minimum Idle Time
+Minimalni čas nedejavnosti
 Mirror ->>
 Zrcalno ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -668,6 +658,10 @@ Operation:
 Operacija:
 Overview
 Pregled
+Overwriting Symbolic Link %x in %y
+Prepisujem Simbolično povezavo %x v %y
+Overwriting file %x in %y
+Prepisujem datoteko %x v %y
 Pause
 Premor
 Paused
@@ -702,8 +696,6 @@ Remove folder
 Odstrani v mapo
 Remove folder pair
 Odstrani par imenikov
-Removing abandoned directory lock (%x)...
-
 Report translation error
 Poročaj o napaki prevoda
 Reset
@@ -846,8 +838,6 @@ Total time:
 Celoten čas:
 Transfer file and directory permissions\n(Requires Administrator rights)
 Prenesi dovoljenja datotek in imenikov\n(Zahteva pravice skrbnika)
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-Obravnavaj čas spremembe datoteke, ki se razlikuje za točno +/- 1 uro kot enak, če pa je manjši kot 1 ura, pa kot spor, da lahko obravnavamo spremembe Poletnega časa
 Unable to connect to sourceforge.net!
 Ne morem se povezati na sourceforge.net!
 Unable to create logfile!
@@ -875,7 +865,7 @@ Ime volumna %x ni del imena datoteke %y!
 Waiting for all directories to become available...
 Čakam, da bodo vsi imeniki na voljo...
 Waiting while directory is locked (%x)...
-
+Čakam, medtem ko se zaklepa imenik (%x)...
 Warning
 Pozor
 Warning: Synchronization failed for %x item(s):

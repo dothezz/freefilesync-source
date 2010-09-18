@@ -90,8 +90,6 @@ C&riar um arquivo batch...
 &Sim
 (Build: %x)
 (Versão: %x)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Note que apenas discos FAT/FAT32 são afetados por este problema!\nEm todos os outros casos pode-se desabilitar esta opção \"ignorar diferença de 1 hora\".)
 (Requires an Internet connection!)
 (Requer conexão com a Internet!)
 - Other side's counterpart to %dir
@@ -274,14 +272,10 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 Copiar arquivos compartilhados ou bloqueados (em uso) usando o Serviço de Cópias de Sombra de Volume\n(Requer direitos de Administrador)
 Copy to clipboard\tCTRL+C
 Copiar para a Área de transferência\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-Copiando Link Simbólico %x substituindo %y
-Copying Symbolic Link %x to %y
-Copiando Link Simbólico %x para %y
-Copying file %x overwriting %y
-Copiando arquivo %x substituindo %y
-Copying file %x to %y
-Copiando arquivo %x para %y
+Copying new Symbolic Link %x to %y
+Copiando novo Link Simbólico %x para %y
+Copying new file %x to %y
+Copiando novo arquivo %x para %y
 Could not determine volume name for file:
 Não foi possível determinar o nome do volume para o arquivo:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 Erro de verificação de dados: Arquivo de origem e destino têm o mesmo conteúdo!
 Date
 Data
-Delay
-Atraso
-Delay between detection of changes and execution of command line in seconds
-Atraso entre detecção de mudanças e execução de linha de comando em segundos
 Delete files/folders existing on left side only
 Apagar arquivos/pastas existentes apenas no lado esquerdo
 Delete files/folders existing on right side only
@@ -413,7 +403,7 @@ Erro ao ler do banco de dados de sincronização:
 Error resolving symbolic link:
 Erro na resolução de link simbólico:
 Error setting directory lock:
-
+Erro ao definir bloqueio no diretório:
 Error setting privilege:
 Erro ao definir privilégio:
 Error starting Volume Shadow Copy Service!
@@ -460,8 +450,6 @@ File size and date
 Data e tamanho do arquivo
 Filename
 Nome do arquivo
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-Arquivos %x têm diferença no horário de criação menor do que 1 hora!\n\nNão é seguro decidir qual é o mais novo devido a problemas relacionados com o Horário de Verão.
 Files %x have the same date but a different size!
 Arquivos %x têm a mesma data mas tamanhos diferentes!
 Files are found equal if\n     - file content\nis the same
@@ -566,12 +554,12 @@ Homepage
 Homepage
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Identificar e propagar mudanças em ambos os lados utilizando um banco de dados. Exclusões e conflitos serão detectados automaticamente.
+Idle time between detection of last change and execution of command line in seconds
+Tempo ocioso entre detecção da última mudança e da execução da linha de comando em segundos
 If you like FFS
 Se gosta do FFS
 Ignore
 Ignorar
-Ignore 1-hour file time difference
-Ignorar diferenças de 1 hora nos arquivos
 Ignore errors
 Ignorar erros
 Ignore subsequent errors
@@ -614,6 +602,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Cópias de sombra no WOW64 não são suportadas. Por favor use a versão 64-bits do FreeFileSync.
 Match case
 Diferenciar maiúsculas e minúsculas
+Minimum Idle Time
+Tempo Ocioso Mínimo
 Mirror ->>
 Espelhar ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -668,6 +658,10 @@ Operation:
 Operação:
 Overview
 Parâmetros
+Overwriting Symbolic Link %x in %y
+Substituíndo Link Simbólico %x em %y
+Overwriting file %x in %y
+Substituíndo arquivo %x em %y
 Pause
 Pausa
 Paused
@@ -702,8 +696,6 @@ Remove folder
 Remover pasta
 Remove folder pair
 Remover par de pastas
-Removing abandoned directory lock (%x)...
-
 Report translation error
 Reportar erro de tradução
 Reset
@@ -846,8 +838,6 @@ Total time:
 Tempo total:
 Transfer file and directory permissions\n(Requires Administrator rights)
 Transferir permissões de arquivos e diretórios\n(Requer direitos de Administrador)
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-Tratar tempo dos arquivos que diferem exatamente por mais ou menos 1 hora como igual e menor que 1 hora como conflito para lidar com mudanças de Horário de Verão
 Unable to connect to sourceforge.net!
 Não foi possível conectar a sourceforge.net!
 Unable to create logfile!
@@ -875,7 +865,7 @@ Nome do volume %x não é parte do arquivo %y!
 Waiting for all directories to become available...
 Esperando que todos os diretóricos fiquem disponíveis...
 Waiting while directory is locked (%x)...
-
+Esperando enquanto o diretório é travado (%x)...
 Warning
 Atenção
 Warning: Synchronization failed for %x item(s):

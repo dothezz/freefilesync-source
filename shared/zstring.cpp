@@ -9,56 +9,79 @@
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
+#undef min
+#undef max
 #include "dll_loader.h"
 #include <boost/scoped_array.hpp>
 #endif  //FFS_WIN
 
 #ifndef NDEBUG
 #include <wx/string.h>
+#include <iostream>
+#include <cstdlib>
 #endif
 
 
 #ifndef NDEBUG
-AllocationCount::~AllocationCount()
+LeakChecker::~LeakChecker()
 {
     if (activeStrings.size() > 0)
-#ifdef FFS_WIN
     {
         int rowCount = 0;
-        wxString leakingStrings;
-        for (std::set<const DefaultChar*>::const_iterator i = activeStrings.begin();
-                i != activeStrings.end() && ++rowCount <= 10;
-                ++i)
-        {
-            leakingStrings += wxT("\"");
-            leakingStrings += *i;
-            leakingStrings += wxT("\"\n");
-        }
+        std::string leakingStrings;
 
-        MessageBox(NULL, wxString(wxT("Memory leak detected!")) + wxT("\n\n")
-                   + wxT("Candidates:\n") + leakingStrings,
-                   wxString::Format(wxT("%u"), activeStrings.size()), 0);
-    }
+        for (VoidPtrSizeMap::const_iterator i = activeStrings.begin();
+                i != activeStrings.end() && ++rowCount <= 20;
+                ++i)
+            leakingStrings += "\"" + rawMemToString(i->first, i->second) + "\"\n";
+
+        const std::string message = std::string("Memory leak detected!") + "\n\n"
+                                    + "Candidates:\n" + leakingStrings;
+#ifdef FFS_WIN
+        MessageBoxA(NULL, message.c_str(), "Error", 0);
 #else
-        throw std::logic_error("Memory leak!");
+        std::cerr << message;
+        std::abort();
 #endif
+    }
 }
 
 
-AllocationCount& AllocationCount::getInstance()
+LeakChecker& LeakChecker::instance()
 {
-    static AllocationCount global;
-    return global;
+    static LeakChecker inst;
+    return inst;
+}
+
+
+std::string LeakChecker::rawMemToString(const void* ptr, size_t size)
+{
+    std::string output = std::string(reinterpret_cast<const char*>(ptr), size);
+    output.erase(std::remove(output.begin(), output.end(), 0), output.end()); //remove intermediate 0-termination
+    if (output.size() > 100)
+        output.resize(100);
+    return output;
+}
+
+
+void LeakChecker::reportProblem(const std::string& message) //throw (std::logic_error)
+{
+#ifdef FFS_WIN
+    ::MessageBoxA(NULL, message.c_str(), "Error", 0);
+#else
+    std::cerr << message;
+#endif
+    throw std::logic_error("Memory leak! " + message);
 }
 #endif //NDEBUG
+
 
 #ifdef FFS_WIN
 namespace
 {
 bool hasInvariantLocale()
 {
-    OSVERSIONINFO osvi;
-    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
+    OSVERSIONINFO osvi = {};
     osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
     //invariant locale has been introduced with XP
@@ -75,13 +98,13 @@ bool hasInvariantLocale()
 
 
 //warning: LOCALE_INVARIANT is NOT available with Windows 2000, so we have to make yet another distinction...
-const LCID invariantLocale = hasInvariantLocale() ?
-                             LOCALE_INVARIANT :
-                             MAKELCID(MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), SORT_DEFAULT); //see: http://msdn.microsoft.com/en-us/goglobal/bb688122.aspx
+const LCID ZSTRING_INVARIANT_LOCALE = hasInvariantLocale() ?
+                                      LOCALE_INVARIANT :
+                                      MAKELCID(MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), SORT_DEFAULT); //see: http://msdn.microsoft.com/en-us/goglobal/bb688122.aspx
+}
 
 
-inline
-int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size_t sizeB)
+int z_impl::compareFilenamesWin(const wchar_t* a, const wchar_t* b, size_t sizeA, size_t sizeB)
 {
     //try to call "CompareStringOrdinal" for low-level string comparison: unfortunately available not before Windows Vista!
     //by a factor ~3 faster than old string comparison using "LCMapString"
@@ -91,16 +114,15 @@ int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size
         LPCWSTR lpString2,
         int     cchCount2,
         BOOL    bIgnoreCase);
-    static const CompareStringOrdinalFunc ordinalCompare = util::loadDllFunction<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal");
+    static const CompareStringOrdinalFunc ordinalCompare = util::getDllFun<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal");
 
     if (ordinalCompare != NULL) //this additional test has no noticeable performance impact
     {
-        const int rv = (*ordinalCompare)(
-                           a,  	      //pointer to first string
-                           static_cast<int>(sizeA),	  //size, in bytes or characters, of first string
-                           b,	      //pointer to second string
-                           static_cast<int>(sizeB),     //size, in bytes or characters, of second string
-                           true); 	  //ignore case
+        const int rv = ordinalCompare(a,  	      //pointer to first string
+                                      static_cast<int>(sizeA),	  //size, in bytes or characters, of first string
+                                      b,	      //pointer to second string
+                                      static_cast<int>(sizeB),     //size, in bytes or characters, of second string
+                                      true); 	  //ignore case
         if (rv == 0)
             throw std::runtime_error("Error comparing strings (ordinal)!");
         else
@@ -114,7 +136,7 @@ int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size
         const size_t minSize = std::min(sizeA, sizeB);
 
         if (minSize == 0) //LCMapString does not allow input sizes of 0!
-            return static_cast<int>(sizeA - sizeB);
+            return static_cast<int>(sizeA) - static_cast<int>(sizeB);
 
         int rv = 0; //always initialize...
         if (minSize <= 5000) //performance optimization: stack
@@ -123,7 +145,7 @@ int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size
             wchar_t bufferB[5000];
 
             if (::LCMapString(   //faster than CharUpperBuff + wmemcpy or CharUpper + wmemcpy and same speed like ::CompareString()
-                        invariantLocale,  //__in   LCID Locale,
+                        ZSTRING_INVARIANT_LOCALE, //__in   LCID Locale,
                         LCMAP_UPPERCASE,  //__in   DWORD dwMapFlags,
                         a,                //__in   LPCTSTR lpSrcStr,
                         static_cast<int>(minSize), //__in   int cchSrc,
@@ -132,7 +154,7 @@ int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size
                     ) == 0)
                 throw std::runtime_error("Error comparing strings! (LCMapString)");
 
-            if (::LCMapString(invariantLocale, LCMAP_UPPERCASE, b, static_cast<int>(minSize), bufferB, 5000) == 0)
+            if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, b, static_cast<int>(minSize), bufferB, 5000) == 0)
                 throw std::runtime_error("Error comparing strings! (LCMapString)");
 
             rv = ::wmemcmp(bufferA, bufferB, minSize);
@@ -142,17 +164,17 @@ int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size
             boost::scoped_array<wchar_t> bufferA(new wchar_t[minSize]);
             boost::scoped_array<wchar_t> bufferB(new wchar_t[minSize]);
 
-            if (::LCMapString(invariantLocale, LCMAP_UPPERCASE, a, static_cast<int>(minSize), bufferA.get(), static_cast<int>(minSize)) == 0)
+            if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, a, static_cast<int>(minSize), bufferA.get(), static_cast<int>(minSize)) == 0)
                 throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
 
-            if (::LCMapString(invariantLocale, LCMAP_UPPERCASE, b, static_cast<int>(minSize), bufferB.get(), static_cast<int>(minSize)) == 0)
+            if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, b, static_cast<int>(minSize), bufferB.get(), static_cast<int>(minSize)) == 0)
                 throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
 
             rv = ::wmemcmp(bufferA.get(), bufferB.get(), minSize);
         }
 
         return rv == 0 ?
-               static_cast<int>(sizeA - sizeB) :
+               static_cast<int>(sizeA) - static_cast<int>(sizeB) :
                rv;
     }
 
@@ -169,429 +191,50 @@ int compareFilenamesWin32(const wchar_t* a, const wchar_t* b, size_t sizeA, size
 //        else
 //            return rv - 2; //convert to C-style string compare result
 }
-}
-#endif
 
 
-int cmpFileName(const Zstring& lhs, const Zstring& rhs)
+void z_impl::makeUpperCaseWin(wchar_t* str, size_t size)
 {
-#ifdef FFS_WIN
-    return ::compareFilenamesWin32(lhs.c_str(), rhs.c_str(), lhs.length(), rhs.length()); //way faster than wxString::CmpNoCase()
-#elif defined FFS_LINUX
-    return ::strcmp(lhs.c_str(), rhs.c_str());
-#endif
-}
-
-
-int cmpFileName(const Zstring& lhs, const DefaultChar* rhs)
-{
-#ifdef FFS_WIN
-    return ::compareFilenamesWin32(lhs.c_str(), rhs, lhs.length(), ::wcslen(rhs)); //way faster than wxString::CmpNoCase()
-#elif defined FFS_LINUX
-return ::strcmp(lhs.c_str(), rhs);
-#endif
-}
-
-
-int cmpFileName(const DefaultChar* lhs, const DefaultChar* rhs)
-{
-#ifdef FFS_WIN
-    return ::compareFilenamesWin32(lhs, rhs, ::wcslen(lhs), ::wcslen(rhs)); //way faster than wxString::CmpNoCase()
-#elif defined FFS_LINUX
-    return ::strcmp(lhs, rhs);
-#endif
-}
-
-
-Zstring& Zstring::Replace(const DefaultChar* old, const DefaultChar* replacement, bool replaceAll)
-{
-    const size_t oldLen         = defaultLength(old);
-    const size_t replacementLen = defaultLength(replacement);
-
-    size_t pos = 0;
-    for (;;)
-    {
-        pos = find(old, pos);
-        if (pos == npos)
-            break;
-
-        replace(pos, oldLen, replacement, replacementLen);
-        pos += replacementLen; //move past the string that was replaced
-
-        // stop now?
-        if (!replaceAll)
-            break;
-    }
-    return *this;
-}
-
-
-bool Zstring::matchesHelper(const DefaultChar* string, const DefaultChar* mask)
-{
-    for (DefaultChar ch; (ch = *mask) != 0; ++mask, ++string)
-    {
-        switch (ch)
-        {
-        case DefaultChar('?'):
-            if (*string == 0)
-                return false;
-            break;
-
-        case DefaultChar('*'):
-            //advance to next non-*/? char
-            do
-            {
-                ++mask;
-                ch = *mask;
-            }
-            while (ch == DefaultChar('*') || ch == DefaultChar('?'));
-            //if match ends with '*':
-            if (ch == 0)
-                return true;
-
-            ++mask;
-            while ((string = defaultStrFind(string, ch)) != NULL)
-            {
-                ++string;
-                if (matchesHelper(string, mask))
-                    return true;
-            }
-            return false;
-
-        default:
-            if (*string != ch)
-                return false;
-        }
-    }
-    return *string == 0;
-}
-
-
-bool Zstring::Matches(const DefaultChar* mask) const
-{
-    return matchesHelper(c_str(), mask);
-}
-
-
-bool Zstring::Matches(const DefaultChar* name, const DefaultChar* mask)
-{
-    return matchesHelper(name, mask);
-}
-
-
-namespace
-{
-#ifdef ZSTRING_CHAR
-inline
-bool defaultIsWhiteSpace(char ch)
-{
-    // some compilers (e.g. VC++ 6.0) return true for a call to isspace('\xEA') => exclude char(128) to char(255)
-    return (static_cast<unsigned char>(ch) < 128) && isspace(static_cast<unsigned char>(ch)) != 0;
-}
-
-#elif defined ZSTRING_WIDE_CHAR
-inline
-bool defaultIsWhiteSpace(wchar_t ch)
-{
-    // some compilers (e.g. VC++ 6.0) return true for a call to isspace('\xEA') => exclude char(128) to char(255)
-    return (ch < 128 || ch > 255) && iswspace(ch) != 0;
-}
-#endif
-}
-
-
-Zstring& Zstring::Trim(bool fromRight)
-{
-    const size_t thisLen = length();
-    if (thisLen == 0)
-        return *this;
-
-    DefaultChar* const strBegin = data();
-
-    if (fromRight)
-    {
-        const DefaultChar* cursor = strBegin + thisLen - 1;
-        while (cursor != strBegin - 1 && defaultIsWhiteSpace(*cursor)) //break when pointing one char further than last skipped element
-            --cursor;
-        ++cursor;
-
-        const size_t newLength = cursor - strBegin;
-        if (newLength != thisLen)
-        {
-            if (descr->refCount > 1) //allocate new string
-                *this = Zstring(strBegin, newLength);
-            else //overwrite this string
-            {
-                descr->length     = newLength;
-                strBegin[newLength] = 0;
-            }
-        }
-    }
-    else
-    {
-        const DefaultChar* cursor = strBegin;
-        const DefaultChar* const strEnd = strBegin + thisLen;
-        while (cursor != strEnd && defaultIsWhiteSpace(*cursor))
-            ++cursor;
-
-        const size_t diff = cursor - strBegin;
-        if (diff)
-        {
-            if (descr->refCount > 1) //allocate new string
-                *this = Zstring(cursor, thisLen - diff);
-            else
-            {
-                //overwrite this string
-                ::memmove(strBegin, cursor, (thisLen - diff + 1) * sizeof(DefaultChar)); //note: do not simply let data point to different location: this corrupts reserve()!
-                descr->length -= diff;
-            }
-        }
-    }
-
-    return *this;
-}
-
-
-std::vector<Zstring> Zstring::Tokenize(const DefaultChar delimiter) const
-{
-    std::vector<Zstring> output;
-
-    const size_t thisLen = length();
-    size_t indexStart = 0;
-    for (;;)
-    {
-        size_t indexEnd = find(delimiter, indexStart);
-        if (indexEnd == Zstring::npos)
-            indexEnd = thisLen;
-
-        if (indexStart != indexEnd) //do not add empty strings
-        {
-            Zstring newEntry = substr(indexStart, indexEnd - indexStart);
-            newEntry.Trim(true);  //remove whitespace characters from right
-            newEntry.Trim(false); //remove whitespace characters from left
-
-            if (!newEntry.empty())
-                output.push_back(newEntry);
-        }
-        if (indexEnd == thisLen)
-            break;
-
-        indexStart = indexEnd + 1; //delimiter is a single character
-    }
-
-    return output;
-}
-
-
-#ifdef FFS_WIN
-Zstring& Zstring::MakeUpper()
-{
-    const size_t thisLen = length();
-    if (thisLen == 0)
-        return *this;
-
-    reserve(thisLen);    //make unshared
+    if (size == 0) //LCMapString does not allow input sizes of 0!
+        return;
 
     //use Windows' upper case conversion: faster than ::CharUpper()
-    if (::LCMapString(invariantLocale, LCMAP_UPPERCASE, data(), static_cast<int>(thisLen), data(), static_cast<int>(thisLen)) == 0)
+    if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, str, static_cast<int>(size), str, static_cast<int>(size)) == 0)
         throw std::runtime_error("Error converting to upper case! (LCMapString)");
-
-    return *this;
-}
-#endif
-
-
-//###############################################################
-//std::string functions
-Zstring Zstring::substr(size_t pos, size_t len) const
-{
-    if (len == npos)
-    {
-        assert(pos <= length());
-        return Zstring(c_str() + pos, length() - pos); //reference counting not used: different length
-    }
-    else
-    {
-        assert(length() - pos >= len);
-        return Zstring(c_str() + pos, len);
-    }
 }
 
 
-size_t Zstring::rfind(DefaultChar ch, size_t pos) const
-{
-    const size_t thisLen = length();
-    if (thisLen == 0)
-        return npos;
+/*
+#include <fstream>
+ extern std::wofstream statShared;
+extern std::wofstream statLowCapacity;
+extern std::wofstream statOverwrite;
 
-    if (pos == npos)
-        pos = thisLen - 1;
-    else
-        assert(pos <= length());
+std::wstring p(ptr);
+p.erase(std::remove(p.begin(), p.end(), L'\n'), p.end());
+p.erase(std::remove(p.begin(), p.end(), L','), p.end());
 
-    do //pos points to last char of the string
-    {
-        if (c_str()[pos] == ch)
-            return pos;
-    }
-    while (--pos != static_cast<size_t>(-1));
+ if (descr(ptr)->refCount > 1)
+    statShared <<
+               minCapacity          << L"," <<
+               descr(ptr)->refCount << L"," <<
+               descr(ptr)->length   << L"," <<
+               descr(ptr)->capacity << L"," <<
+               p << L"\n";
+else if (minCapacity > descr(ptr)->capacity)
+    statLowCapacity <<
+                    minCapacity          << L"," <<
+                    descr(ptr)->refCount << L"," <<
+                    descr(ptr)->length   << L"," <<
+                    descr(ptr)->capacity << L"," <<
+                    p << L"\n";
+else
+    statOverwrite <<
+                  minCapacity          << L"," <<
+                  descr(ptr)->refCount << L"," <<
+                  descr(ptr)->length   << L"," <<
+                  descr(ptr)->capacity << L"," <<
+                  p << L"\n";
+*/
 
-    return npos;
-}
-
-
-Zstring& Zstring::replace(size_t pos1, size_t n1, const DefaultChar* str, size_t n2)
-{
-    assert(str < c_str() || c_str() + length() < str); //str mustn't point to data in this string
-    assert(n1 <= length() - pos1);
-
-    const size_t oldLen = length();
-    if (oldLen == 0)
-    {
-        assert(pos1 == 0 && n1 == 0);
-        return *this = Zstring(str, n2);
-    }
-
-    const size_t newLen = oldLen - n1 + n2;
-    if (newLen > oldLen || descr->refCount > 1)
-    {
-        //allocate a new string
-        StringDescriptor* newDescr = allocate(newLen);
-
-        //assemble new string with replacement
-        DefaultChar* const newData = reinterpret_cast<DefaultChar*>(newDescr + 1);
-        ::memcpy(newData, c_str(), pos1 * sizeof(DefaultChar));
-        ::memcpy(newData + pos1, str, n2 * sizeof(DefaultChar));
-        ::memcpy(newData + pos1 + n2, c_str() + pos1 + n1, (oldLen - pos1 - n1) * sizeof(DefaultChar));
-        newData[newLen] = 0;
-
-        decRef();
-        descr = newDescr;
-    }
-    else  //overwrite current string: case "n2 == 0" is handled implicitly
-    {
-        ::memcpy(data() + pos1, str, n2 * sizeof(DefaultChar));
-        if (newLen < oldLen)
-        {
-            ::memmove(data() + pos1 + n2, data() + pos1 + n1, (oldLen - pos1 - n1) * sizeof(DefaultChar));
-            data()[newLen]  = 0;
-            descr->length = newLen;
-        }
-    }
-
-    return *this;
-}
-
-
-Zstring& Zstring::operator=(const DefaultChar* source)
-{
-    const size_t sourceLen = defaultLength(source);
-
-    if (descr->refCount > 1 || descr->capacity < sourceLen) //allocate new string
-        *this = Zstring(source, sourceLen);
-    else
-    {
-        //overwrite this string
-        ::memcpy(data(), source, (sourceLen + 1) * sizeof(DefaultChar)); //include null-termination
-        descr->length = sourceLen;
-    }
-    return *this;
-}
-
-
-Zstring& Zstring::assign(const DefaultChar* source, size_t len)
-{
-    if (descr->refCount > 1 || descr->capacity < len) //allocate new string
-        *this = Zstring(source, len);
-    else
-    {
-        //overwrite this string
-        ::memcpy(data(), source, len * sizeof(DefaultChar)); //don't know if source is null-terminated
-        data()[len] = 0; //include null-termination
-        descr->length = len;
-    }
-    return *this;
-}
-
-
-Zstring& Zstring::operator+=(const Zstring& other)
-{
-    const size_t otherLen = other.length();
-    if (otherLen != 0)
-    {
-        const size_t thisLen = length();
-        const size_t newLen = thisLen + otherLen;
-        reserve(newLen); //make unshared and check capacity
-
-        ::memcpy(data() + thisLen, other.c_str(), (otherLen + 1) * sizeof(DefaultChar)); //include null-termination
-        descr->length = newLen;
-    }
-    return *this;
-}
-
-
-Zstring& Zstring::operator+=(const DefaultChar* other)
-{
-    const size_t otherLen = defaultLength(other);
-    if (otherLen != 0)
-    {
-        const size_t thisLen = length();
-        const size_t newLen = thisLen + otherLen;
-        reserve(newLen); //make unshared and check capacity
-
-        ::memcpy(data() + thisLen, other, (otherLen + 1) * sizeof(DefaultChar)); //include NULL-termination
-        descr->length = newLen;
-    }
-    return *this;
-}
-
-
-Zstring& Zstring::operator+=(DefaultChar ch)
-{
-    const size_t oldLen = length();
-    reserve(oldLen + 1); //make unshared and check capacity
-    data()[oldLen] = ch;
-    data()[oldLen + 1] = 0;
-    ++descr->length;
-    return *this;
-}
-
-
-void Zstring::reserve(size_t capacityNeeded) //make unshared and check capacity
-{
-    assert(capacityNeeded != 0);
-
-    if (descr->refCount > 1)
-    {
-        //allocate a new string
-        const size_t oldLength = length();
-
-        StringDescriptor* newDescr = allocate(std::max(capacityNeeded, oldLength)); //reserve() must NEVER shrink the string
-        newDescr->length = oldLength;
-
-        ::memcpy(reinterpret_cast<DefaultChar*>(newDescr + 1), c_str(), (oldLength + 1) * sizeof(DefaultChar)); //include NULL-termination
-
-        decRef();
-        descr = newDescr;
-    }
-    else if (descr->capacity < capacityNeeded)
-    {
-        //try to resize the current string (allocate anew if necessary)
-        const size_t newCapacity = getCapacityToAllocate(capacityNeeded);
-
-#ifndef NDEBUG
-        AllocationCount::getInstance().dec(c_str()); //test Zstring for memory leaks
-#endif
-
-        descr = static_cast<StringDescriptor*>(::realloc(descr, sizeof(StringDescriptor) + (newCapacity + 1) * sizeof(DefaultChar)));
-        if (descr == NULL)
-            throw std::bad_alloc();
-
-#ifndef NDEBUG
-        AllocationCount::getInstance().inc(c_str()); //test Zstring for memory leaks
-#endif
-
-        descr->capacity = newCapacity;
-    }
-}
-
+#endif //FFS_WIN

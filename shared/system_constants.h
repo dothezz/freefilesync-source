@@ -16,12 +16,14 @@ namespace common
 //      GLOBALS
 //------------------------------------------------
 #ifdef FFS_WIN
-const DefaultChar FILE_NAME_SEPARATOR = '\\';
-static const wxChar* const LINE_BREAK = wxT("\r\n"); //internal linkage
+const Zchar FILE_NAME_SEPARATOR = '\\';
+const wxChar LINE_BREAK[] = wxT("\r\n"); //internal linkage
 #elif defined FFS_LINUX
-const DefaultChar FILE_NAME_SEPARATOR = '/';
-static const wxChar* const LINE_BREAK = wxT("\n");
+const Zchar FILE_NAME_SEPARATOR = '/';
+const wxChar LINE_BREAK[] = wxT("\n");
 #endif
+
+const char BYTE_ORDER_MARK_UTF8[] = "\xEF\xBB\xBF";
 }
 
 

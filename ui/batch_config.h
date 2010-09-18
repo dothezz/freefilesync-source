@@ -13,11 +13,11 @@
 
 namespace ffs3
 {
-class DragDropOnDlg;
+class DirectoryName;
 }
 
-class BatchFolderPairPanel;
-class FirstBatchFolderPairCfg;
+class DirectoryPairBatch;
+class DirectoryPairBatchFirst;
 
 
 class BatchDialog: public BatchDlgGenerated
@@ -79,8 +79,8 @@ private:
 
     xmlAccess::XmlBatchConfig getCurrentConfiguration() const;
 
-    boost::shared_ptr<FirstBatchFolderPairCfg> firstFolderPair; //always bound!!!
-    std::vector<BatchFolderPairPanel*> additionalFolderPairs;
+    boost::shared_ptr<DirectoryPairBatchFirst> firstFolderPair; //always bound!!!
+    std::vector<DirectoryPairBatch*> additionalFolderPairs;
 
     //used when saving batch file
     wxString proposedBatchFileName;
@@ -89,8 +89,7 @@ private:
 
     std::auto_ptr<wxMenu> contextMenu;
 
-    //add drag & drop support when selecting logfile directory
-    std::auto_ptr<ffs3::DragDropOnDlg> dragDropOnLogfileDir;
+    std::auto_ptr<ffs3::DirectoryName> logfileDir;
 };
 
 #endif // BATCHCONFIG_H_INCLUDED

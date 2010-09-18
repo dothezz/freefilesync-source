@@ -90,8 +90,6 @@
 &Si
 (Build: %x)
 (Build: %x)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Solo volumi con file-system FAT/FAT32 risentono di questo problema!\nIn tutti gli altri casi puoi disabilitare l'impostazione \"ignora differenze di 1 ora\".)
 (Requires an Internet connection!)
 (Richiede una connessione Internet!)
 - Other side's counterpart to %dir
@@ -274,14 +272,10 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 Copia file condivisi o bloccati usando il Servizio Volume Shadow Copy\n(Richiede diritti di Administrator)
 Copy to clipboard\tCTRL+C
 Copia nella clipboard\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-Copia Link Simbolico %x sovrascrivendo %y
-Copying Symbolic Link %x to %y
-Copia Link Simbolico %x su %y
-Copying file %x overwriting %y
-Copia file %x sovrascrivendo %y
-Copying file %x to %y
-Copia di file da %x a %y
+Copying new Symbolic Link %x to %y
+Copia di nuovo Link Simbolico %x su %y in corso
+Copying new file %x to %y
+Copia di nuovo file %x su %y in corso
 Could not determine volume name for file:
 Impossibile determinare il nome volume per il file:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 Errore in verifica data: I file sorgente e destinazione hanno differente contenuto!
 Date
 Data
-Delay
-Ritardo
-Delay between detection of changes and execution of command line in seconds
-Ritardo in secondi tra rilevazione cambiamenti ed esecuzione della command line
 Delete files/folders existing on left side only
 Elimina files/cartelle esistenti solo a sinistra
 Delete files/folders existing on right side only
@@ -370,6 +360,8 @@ Elements remaining:
 Elementi rimanenti:
 Email
 Email
+Encode extended time information: %x
+
 Endless loop when traversing directory:
 Loop senza fine attraverso le directory:
 Error
@@ -413,9 +405,9 @@ Errore in lettura dal database di sincronizzione:
 Error resolving symbolic link:
 Errore nella risoluzione di collegamento simbolico:
 Error setting directory lock:
-
+Errore nell'impostazione del blocco directory:
 Error setting privilege:
-Errore nel settaggio dei privilegi:
+Errore nell'impostazione dei privilegi:
 Error starting Volume Shadow Copy Service!
 Errore in avvio del Servizio Volume Shadow Copy!
 Error traversing directory:
@@ -460,8 +452,6 @@ File size and date
 Dimensione e data del file
 Filename
 Nome del file
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-La data dei file %x differisce per meno di 1 ora!\n\nNon è sicuro decidere quale dei due è il più recente con la funzione Daylight Saving Time.
 Files %x have the same date but a different size!
 I file %x hanno la stessa data ma dimensione diversa!
 Files are found equal if\n     - file content\nis the same
@@ -566,12 +556,12 @@ Homepage
 Homepage
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Identifica e propaga cambiamenti su entrambi i lati usando un database. Cancellazioni e conflitti sono riconosciuti automaticamente.
+Idle time between detection of last change and execution of command line in seconds
+Tempo di attesa in secondi fra il rilevamento dell'ultima modifica e l'esecuzione della linea di comando
 If you like FFS
 Se ti piace FFS
 Ignore
 Ignora
-Ignore 1-hour file time difference
-Ignora la differenza di file time di 1 ora
 Ignore errors
 Ignora gli errori
 Ignore subsequent errors
@@ -614,6 +604,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 La creazione di copie shadow su WOW64 non e' supportata. Utilizzare FreeFileSync in versione 64-bit.
 Match case
 Corrispondenza
+Minimum Idle Time
+Tempo di Attesa Minimo
 Mirror ->>
 Mirror ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -668,6 +660,10 @@ Operation:
 Operazione:
 Overview
 Controllo generale
+Overwriting Symbolic Link %x in %y
+Sovrascrittura di Link Simbolico %x in %y in corso
+Overwriting file %x in %y
+Sovrascrittura di file %x in %y in corso
 Pause
 Pausa
 Paused
@@ -702,8 +698,6 @@ Remove folder
 Rimuovi cartella
 Remove folder pair
 Elimina la coppia di cartelle
-Removing abandoned directory lock (%x)...
-
 Report translation error
 Segnala errori di traduzione
 Reset
@@ -810,8 +804,6 @@ Synchronization completed with errors!
 Sincronizzazione terminata con errori!
 Synchronization settings
 Parametri di sincronizzazione
-Synchronization status
-Stato della sincronizzazione 
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Sincronizza tutti i file .doc, .zip e .exe eccetto tutti quelli nella cartella \"temp\".
 Synchronize...
@@ -846,8 +838,6 @@ Total time:
 Tempo totale:
 Transfer file and directory permissions\n(Requires Administrator rights)
 Trasferisci file e permessi sulle cartelle\n(Richiede diritti di Administrator)
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-Tratta file time che differiscono di esattamente +/- 1 ora come uguali, meno di 1 ora come conflitto per gestire i cambiamenti di Daylight Saving Time
 Unable to connect to sourceforge.net!
 Impossibile collegarsi a sourceforge.net!
 Unable to create logfile!
@@ -875,7 +865,7 @@ Il nome volume %x non è parte del nome file %y!
 Waiting for all directories to become available...
 In attesa che tutte le directory siano disponibili...
 Waiting while directory is locked (%x)...
-
+Attendi mentre la directory è bloccata (%x)...
 Warning
 Attenzione
 Warning: Synchronization failed for %x item(s):

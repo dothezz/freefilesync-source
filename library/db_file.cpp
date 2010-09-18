@@ -189,7 +189,7 @@ public:
 DbStreamData loadFile(const Zstring& filename) //throw (FileError)
 {
     if (!ffs3::fileExists(filename))
-        throw FileError(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
+        throw FileErrorDatabaseNotExisting(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
                         _("One of the FreeFileSync database files is not yet existing:") + wxT(" \n") +
                         wxT("\"") + zToWx(filename) + wxT("\""));
 
@@ -217,14 +217,15 @@ std::pair<DirInfoPtr, DirInfoPtr> ffs3::loadFromDisk(const BaseDirMapping& baseM
 
         //find associated DirInfo-streams
         DirectoryTOC::const_iterator dbLeft = dbEntriesLeft.second.find(dbEntriesRight.first); //find left db-entry that corresponds to right database
+        DirectoryTOC::const_iterator dbRight = dbEntriesRight.second.find(dbEntriesLeft.first); //find left db-entry that corresponds to right database
+
         if (dbLeft == dbEntriesLeft.second.end())
-            throw FileError(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
+            throw FileErrorDatabaseNotExisting(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
                             _("One of the FreeFileSync database entries within the following file is not yet existing:") + wxT(" \n") +
                             wxT("\"") + zToWx(fileNameLeft) + wxT("\""));
 
-        DirectoryTOC::const_iterator dbRight = dbEntriesRight.second.find(dbEntriesLeft.first); //find left db-entry that corresponds to right database
         if (dbRight == dbEntriesRight.second.end())
-            throw FileError(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
+            throw FileErrorDatabaseNotExisting(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
                             _("One of the FreeFileSync database entries within the following file is not yet existing:") + wxT(" \n") +
                             wxT("\"") + zToWx(fileNameRight) + wxT("\""));
 
@@ -397,8 +398,8 @@ bool entryExisting(const DirectoryTOC& table, const util::UniqueId& newKey, cons
 void ffs3::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
 {
     //transactional behaviour! write to tmp files first
-    const Zstring fileNameLeftTmp  = baseMapping.getDBFilename<LEFT_SIDE>()  + DefaultStr(".tmp");
-    const Zstring fileNameRightTmp = baseMapping.getDBFilename<RIGHT_SIDE>() + DefaultStr(".tmp");;
+    const Zstring fileNameLeftTmp  = baseMapping.getDBFilename<LEFT_SIDE>()  + Zstr(".tmp");
+    const Zstring fileNameRightTmp = baseMapping.getDBFilename<RIGHT_SIDE>() + Zstr(".tmp");;
 
     //delete old tmp file, if necessary -> throws if deletion fails!
     removeFile(fileNameLeftTmp);  //

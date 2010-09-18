@@ -33,7 +33,7 @@ public:
         //write header
         wxString headerLine = wxString(wxT("FreeFileSync - "))  +
                               _("Batch execution") + wxT(" (") +
-                              _("Date") + wxT(": ") + wxDateTime::Now().FormatDate() + wxT(" ") + //"Date" is used at other places too
+                              _("Date") + wxT(": ") + wxDateTime::Now().FormatDate() + wxT(" ") + //"Date" is used at other places, too
                               _("Time") + wxT(":") + wxT(" ") +  wxDateTime::Now().FormatTime() + wxT(")");
         logFile.Write(headerLine + wxChar('\n'));
         logFile.Write(wxString().Pad(headerLine.Len(), wxChar('-')) + wxChar('\n') + wxChar('\n'));
@@ -213,7 +213,7 @@ BatchStatusHandler::~BatchStatusHandler()
 
 
 inline
-void BatchStatusHandler::updateStatusText(const Zstring& text)
+void BatchStatusHandler::reportInfo(const Zstring& text)
 {
     if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING && logFile.get()) //write file transfer information to log
         errorLog.logInfo(zToWx(text));
@@ -266,7 +266,7 @@ void BatchStatusHandler::updateProcessedData(int objectsProcessed, wxLongLong da
 }
 
 
-void BatchStatusHandler::reportInfo(const wxString& infoMessage)
+void BatchStatusHandler::logInfo(const wxString& infoMessage)
 {
     errorLog.logInfo(infoMessage);
 }

@@ -90,8 +90,6 @@
 &Igen
 (Build: %x)
 (Build: %x)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Megjegyzés: Csak a FAT/FAT32 meghajtókat érinti ez a probléma!\nMinden más esetben ki lehet kapcsolni az \"1 órás különbség figyelmen kívül hagyása\" beállítást.)
 (Requires an Internet connection!)
 (Internetkapcsolat szükséges!)
 - Other side's counterpart to %dir
@@ -274,14 +272,10 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 A megosztott vagy zárolt fájlok másolása a Volume Shadow Copy szolgáltatással\n(Adminisztrátori jogok szükségesek)
 Copy to clipboard\tCTRL+C
 Másolás a vágólapra\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-A(z) %x symlink másolása fölülírva a következőt: %y
-Copying Symbolic Link %x to %y
-A(z) %x symlink másolása ide: %y
-Copying file %x overwriting %y
-A(z) %x fájl másolása fölülírva a következőt: %y
-Copying file %x to %y
-%x fájl másolása a(z) %y fájlba
+Copying new Symbolic Link %x to %y
+
+Copying new file %x to %y
+
 Could not determine volume name for file:
 A következő fájlnak nem lehet meghatározni a kötetnevét:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 Adatellenőrzési hiba: A forrás és cél fájl tartalma különbözik!
 Date
 Dátum
-Delay
-Várakozás
-Delay between detection of changes and execution of command line in seconds
-A változások észlelése és a parancssor meghívása közötti várakozás másodpercben
 Delete files/folders existing on left side only
 Csak a bal oldalon létező fájlok/mappák törlése
 Delete files/folders existing on right side only
@@ -460,8 +450,6 @@ File size and date
 fájlméret és dátum alapján
 Filename
 Fájlnév
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-A(z) %x fájlok dátuma kevesebb mint 1 órával eltér!\n\nA nyári időszámítás miatt nem biztonságos annak eldöntése, hogy melyik az újabb közülük.
 Files %x have the same date but a different size!
 A(z) %x fájlok dátuma megegyezik, de a mérete nem!
 Files are found equal if\n     - file content\nis the same
@@ -566,12 +554,12 @@ Homepage
 Honlap
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Mindkét oldal változásainak azonosítása és tárolása adatbázis segítségével. A törlések és ütközések automatikusan észlelődnek.
+Idle time between detection of last change and execution of command line in seconds
+
 If you like FFS
 FFS támogatása
 Ignore
 Figyelmen kívül hagy
-Ignore 1-hour file time difference
-1 órás fájl dátum különbségek figyelmen kívül hagyása
 Ignore errors
 Hibák figyelmen kívül hagyása
 Ignore subsequent errors
@@ -614,6 +602,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 A Shadow Copy a WOW64-en nem támogatott. Kérjük, használja a 64-bites FreeFileSync-et.
 Match case
 Kis-/nagybetű egyezés
+Minimum Idle Time
+
 Mirror ->>
 Tükrözés ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -668,6 +658,10 @@ Operation:
 Művelet:
 Overview
 Összefoglaló
+Overwriting Symbolic Link %x in %y
+
+Overwriting file %x in %y
+
 Pause
 Szünet
 Paused
@@ -702,8 +696,6 @@ Remove folder
 Mappa eltávolítása
 Remove folder pair
 Mappa párok eltávolítása
-Removing abandoned directory lock (%x)...
-
 Report translation error
 Fordítói hiba bejelentése
 Reset
@@ -846,8 +838,6 @@ Total time:
 Becsült idő:
 Transfer file and directory permissions\n(Requires Administrator rights)
 Fájlok és mappák jogosultságainak átvitele\n(Adminisztrátori jogok szükségesek)
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-A fájlok dátumának pontosan +/- 1 órával való eltérése esetén a fájlok egyeznek, a kevesebb mint 1 órával való eltérés esetén pedig ütköznek, a Nyári Időszámítás kezeléséhez
 Unable to connect to sourceforge.net!
 A csatlakozás a sourceforge.net-hez sikertelen!
 Unable to create logfile!

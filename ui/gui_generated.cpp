@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Apr 16 2008)
+// C++ code generated with wxFormBuilder (version Sep  8 2010)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -26,12 +26,14 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 	m_menuItem11 = new wxMenuItem( m_menuFile, wxID_ANY, wxString( _("2. &Synchronize...") ) + wxT('\t') + wxT("ALT-S"), wxEmptyString, wxITEM_NORMAL );
 	m_menuFile->Append( m_menuItem11 );
 	
-	m_menuFile->AppendSeparator();
+	wxMenuItem* m_separator1;
+	m_separator1 = m_menuFile->AppendSeparator();
 	
 	m_menuItemSwitchView = new wxMenuItem( m_menuFile, wxID_ANY, wxString( _("S&witch view") ) + wxT('\t') + wxT("ALT-W"), wxEmptyString, wxITEM_NORMAL );
 	m_menuFile->Append( m_menuItemSwitchView );
 	
-	m_menuFile->AppendSeparator();
+	wxMenuItem* m_separator2;
+	m_separator2 = m_menuFile->AppendSeparator();
 	
 	m_menuItemNew = new wxMenuItem( m_menuFile, wxID_ANY, wxString( _("&New") ) + wxT('\t') + wxT("CTRL-N"), wxEmptyString, wxITEM_NORMAL );
 	m_menuFile->Append( m_menuItemNew );
@@ -42,19 +44,21 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 	m_menuItemLoad = new wxMenuItem( m_menuFile, wxID_ANY, wxString( _("&Load configuration...") ) + wxT('\t') + wxT("CTRL-L"), wxEmptyString, wxITEM_NORMAL );
 	m_menuFile->Append( m_menuItemLoad );
 	
-	m_menuFile->AppendSeparator();
+	wxMenuItem* m_separator3;
+	m_separator3 = m_menuFile->AppendSeparator();
 	
 	wxMenuItem* m_menuItem4;
 	m_menuItem4 = new wxMenuItem( m_menuFile, wxID_EXIT, wxString( _("&Quit") ) + wxT('\t') + wxT("CTRL-Q"), wxEmptyString, wxITEM_NORMAL );
 	m_menuFile->Append( m_menuItem4 );
 	
-	m_menubar1->Append( m_menuFile, _("&File") );
+	m_menubar1->Append( m_menuFile, _("&File") ); 
 	
 	m_menuAdvanced = new wxMenu();
 	m_menuLanguages = new wxMenu();
 	m_menuAdvanced->Append( -1, _("&Language"), m_menuLanguages );
 	
-	m_menuAdvanced->AppendSeparator();
+	wxMenuItem* m_separator4;
+	m_separator4 = m_menuAdvanced->AppendSeparator();
 	
 	m_menuItemGlobSett = new wxMenuItem( m_menuAdvanced, wxID_ANY, wxString( _("&Global settings...") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuAdvanced->Append( m_menuItemGlobSett );
@@ -66,7 +70,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 	m_menuItem5 = new wxMenuItem( m_menuAdvanced, wxID_ANY, wxString( _("&Export file list...") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuAdvanced->Append( m_menuItem5 );
 	
-	m_menubar1->Append( m_menuAdvanced, _("&Advanced") );
+	m_menubar1->Append( m_menuAdvanced, _("&Advanced") ); 
 	
 	m_menuHelp = new wxMenu();
 	wxMenuItem* m_menuItemReadme;
@@ -76,12 +80,13 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 	m_menuItemCheckVer = new wxMenuItem( m_menuHelp, wxID_ANY, wxString( _("&Check for new version") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menuHelp->Append( m_menuItemCheckVer );
 	
-	m_menuHelp->AppendSeparator();
+	wxMenuItem* m_separator5;
+	m_separator5 = m_menuHelp->AppendSeparator();
 	
 	m_menuItemAbout = new wxMenuItem( m_menuHelp, wxID_ABOUT, wxString( _("&About...") ) + wxT('\t') + wxT("SHIFT-F1"), wxEmptyString, wxITEM_NORMAL );
 	m_menuHelp->Append( m_menuItemAbout );
 	
-	m_menubar1->Append( m_menuHelp, _("&Help") );
+	m_menubar1->Append( m_menuHelp, _("&Help") ); 
 	
 	this->SetMenuBar( m_menubar1 );
 	
@@ -186,17 +191,17 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 	wxBoxSizer* bSizer92;
 	bSizer92 = new wxBoxSizer( wxVERTICAL );
 	
-	sbSizer2 = new wxStaticBoxSizer( new wxStaticBox( m_panelTopLeft, wxID_ANY, _("Drag && drop") ), wxHORIZONTAL );
+	sbSizerDirLeft = new wxStaticBoxSizer( new wxStaticBox( m_panelTopLeft, wxID_ANY, _("Drag && drop") ), wxHORIZONTAL );
 	
 	m_directoryLeft = new CustomComboBox( m_panelTopLeft, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
-	sbSizer2->Add( m_directoryLeft, 1, wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerDirLeft->Add( m_directoryLeft, 1, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_dirPickerLeft = new wxDirPickerCtrl( m_panelTopLeft, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_dirPickerLeft->SetToolTip( _("Select a folder") );
 	
-	sbSizer2->Add( m_dirPickerLeft, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerDirLeft->Add( m_dirPickerLeft, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	bSizer92->Add( sbSizer2, 0, wxEXPAND|wxRIGHT|wxLEFT, 5 );
+	bSizer92->Add( sbSizerDirLeft, 0, wxEXPAND|wxRIGHT|wxLEFT, 5 );
 	
 	m_panelTopLeft->SetSizer( bSizer92 );
 	m_panelTopLeft->Layout();
@@ -255,32 +260,31 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 	wxBoxSizer* bSizer77;
 	bSizer77 = new wxBoxSizer( wxHORIZONTAL );
 	
-	wxStaticBoxSizer* sbSizer3;
-	sbSizer3 = new wxStaticBoxSizer( new wxStaticBox( m_panelTopRight, wxID_ANY, _("Drag && drop") ), wxHORIZONTAL );
+	sbSizerDirRight = new wxStaticBoxSizer( new wxStaticBox( m_panelTopRight, wxID_ANY, _("Drag && drop") ), wxHORIZONTAL );
 	
 	m_bpButtonAddPair = new wxBitmapButton( m_panelTopRight, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 19,21 ), wxBU_AUTODRAW );
 	m_bpButtonAddPair->SetToolTip( _("Add folder pair") );
 	
 	m_bpButtonAddPair->SetToolTip( _("Add folder pair") );
 	
-	sbSizer3->Add( m_bpButtonAddPair, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3 );
+	sbSizerDirRight->Add( m_bpButtonAddPair, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3 );
 	
 	m_bpButtonRemovePair = new wxBitmapButton( m_panelTopRight, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 19,21 ), wxBU_AUTODRAW );
 	m_bpButtonRemovePair->SetToolTip( _("Remove folder pair") );
 	
 	m_bpButtonRemovePair->SetToolTip( _("Remove folder pair") );
 	
-	sbSizer3->Add( m_bpButtonRemovePair, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerDirRight->Add( m_bpButtonRemovePair, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_directoryRight = new CustomComboBox( m_panelTopRight, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
-	sbSizer3->Add( m_directoryRight, 1, wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerDirRight->Add( m_directoryRight, 1, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_dirPickerRight = new wxDirPickerCtrl( m_panelTopRight, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_dirPickerRight->SetToolTip( _("Select a folder") );
 	
-	sbSizer3->Add( m_dirPickerRight, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	sbSizerDirRight->Add( m_dirPickerRight, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
-	bSizer77->Add( sbSizer3, 1, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 3 );
+	bSizer77->Add( sbSizerDirRight, 1, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 3 );
 	
 	bSizer94->Add( bSizer77, 0, wxEXPAND|wxLEFT, 3 );
 	
@@ -464,7 +468,6 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 	bSizer23 = new wxBoxSizer( wxVERTICAL );
 	
 	m_checkBoxHideFilt = new wxCheckBox( m_panelFilter, wxID_ANY, _("Hide excluded items"), wxDefaultPosition, wxDefaultSize, 0 );
-	
 	m_checkBoxHideFilt->SetToolTip( _("Hide filtered or temporarily excluded files") );
 	
 	bSizer23->Add( m_checkBoxHideFilt, 0, wxEXPAND, 5 );
@@ -781,13 +784,13 @@ MainDialogGenerated::~MainDialogGenerated()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnNewConfig ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnSaveConfig ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnLoadConfig ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuQuit ) );
+	this->Disconnect( wxID_EXIT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuQuit ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuGlobalSettings ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuBatchJob ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuExportFileList ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnShowHelp ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuCheckVersion ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuAbout ) );
+	this->Disconnect( wxID_ABOUT, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainDialogGenerated::OnMenuAbout ) );
 	m_buttonCompare->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnCompare ), NULL, this );
 	m_bpButtonCmpConfig->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnCmpSettings ), NULL, this );
 	m_bpButtonSyncConfig->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnSyncSettings ), NULL, this );
@@ -829,6 +832,7 @@ MainDialogGenerated::~MainDialogGenerated()
 	m_bpButtonSyncCreateRight->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnSyncCreateRight ), NULL, this );
 	m_bpButtonConflict->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnConflictFiles ), NULL, this );
 	m_bpButton10->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( MainDialogGenerated::OnQuit ), NULL, this );
+	
 }
 
 FolderPairGenerated::FolderPairGenerated( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
@@ -1313,7 +1317,6 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	sbSizer24->Add( 0, 0, 1, wxEXPAND, 5 );
 	
 	m_checkBoxSilent = new wxCheckBox( m_panelOverview, wxID_ANY, _("Silent mode"), wxDefaultPosition, wxDefaultSize, 0 );
-	
 	m_checkBoxSilent->SetToolTip( _("Run minimized and write status information to a logfile") );
 	
 	sbSizer24->Add( m_checkBoxSilent, 0, wxALIGN_CENTER_HORIZONTAL|wxRIGHT|wxLEFT, 14 );
@@ -1433,6 +1436,7 @@ BatchDlgGenerated::~BatchDlgGenerated()
 	m_buttonSave->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnSaveBatchJob ), NULL, this );
 	m_buttonLoad->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnLoadBatchJob ), NULL, this );
 	m_button6->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnCancel ), NULL, this );
+	
 }
 
 CompareStatusGenerated::CompareStatusGenerated( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
@@ -1572,7 +1576,7 @@ CompareStatusGenerated::CompareStatusGenerated( wxWindow* parent, wxWindowID id,
 	bSizer48->Add( m_staticText30, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrlStatus = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
-	m_textCtrlStatus->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
+	m_textCtrlStatus->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
 	
 	bSizer48->Add( m_textCtrlStatus, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -1936,6 +1940,7 @@ SyncCfgDlgGenerated::~SyncCfgDlgGenerated()
 	m_bpButtonRightNewer->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncCfgDlgGenerated::OnRightNewer ), NULL, this );
 	m_bpButtonDifferent->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncCfgDlgGenerated::OnDifferent ), NULL, this );
 	m_bpButtonConflict->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncCfgDlgGenerated::OnConflict ), NULL, this );
+	
 }
 
 CmpCfgDlgGenerated::CmpCfgDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -2062,6 +2067,7 @@ CmpCfgDlgGenerated::~CmpCfgDlgGenerated()
 	m_choiceHandleSymlinks->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( CmpCfgDlgGenerated::OnChangeErrorHandling ), NULL, this );
 	m_button10->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CmpCfgDlgGenerated::OnOkay ), NULL, this );
 	m_button6->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CmpCfgDlgGenerated::OnCancel ), NULL, this );
+	
 }
 
 SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -2078,26 +2084,6 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 	wxBoxSizer* bSizer37;
 	bSizer37 = new wxBoxSizer( wxHORIZONTAL );
 	
-	m_animationControl1 = new wxAnimationCtrl(this, wxID_ANY, wxNullAnimation, wxDefaultPosition, wxSize( 45,45 ));
-	bSizer37->Add( m_animationControl1, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-	
-	m_panel8 = new wxPanel( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER|wxTAB_TRAVERSAL );
-	m_panel8->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_3DLIGHT ) );
-	
-	wxBoxSizer* bSizer72;
-	bSizer72 = new wxBoxSizer( wxVERTICAL );
-	
-	m_staticText56 = new wxStaticText( m_panel8, wxID_ANY, _("Synchronization status"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText56->Wrap( -1 );
-	m_staticText56->SetFont( wxFont( 16, 70, 90, 92, false, wxEmptyString ) );
-	
-	bSizer72->Add( m_staticText56, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5 );
-	
-	m_panel8->SetSizer( bSizer72 );
-	m_panel8->Layout();
-	bSizer72->Fit( m_panel8 );
-	bSizer37->Add( m_panel8, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-	
 	bSizer27->Add( bSizer37, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	wxBoxSizer* bSizer42;
@@ -2111,9 +2097,12 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 	
 	m_staticTextStatus = new wxStaticText( this, wxID_ANY, _("Synchronizing..."), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextStatus->Wrap( -1 );
-	m_staticTextStatus->SetFont( wxFont( 14, 70, 93, 90, false, wxEmptyString ) );
+	m_staticTextStatus->SetFont( wxFont( 14, 70, 90, 92, false, wxEmptyString ) );
 	
 	bSizer42->Add( m_staticTextStatus, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 5 );
+	
+	m_animationControl1 = new wxAnimationCtrl(this, wxID_ANY, wxNullAnimation, wxDefaultPosition, wxSize( 45,45 ));
+	bSizer42->Add( m_animationControl1, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
 	
 	bSizer42->Add( 0, 0, 1, wxEXPAND, 5 );
@@ -2218,7 +2207,7 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 	bSizer27->Add( bSizer31, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
 	m_textCtrlInfo = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
-	m_textCtrlInfo->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
+	m_textCtrlInfo->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
 	
 	bSizer27->Add( m_textCtrlInfo, 3, wxEXPAND|wxALL, 5 );
 	
@@ -2308,6 +2297,7 @@ SyncStatusDlgGenerated::~SyncStatusDlgGenerated()
 	m_buttonOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncStatusDlgGenerated::OnOkay ), NULL, this );
 	m_buttonPause->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncStatusDlgGenerated::OnPause ), NULL, this );
 	m_buttonAbort->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncStatusDlgGenerated::OnAbort ), NULL, this );
+	
 }
 
 HelpDlgGenerated::HelpDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -2482,6 +2472,7 @@ HelpDlgGenerated::~HelpDlgGenerated()
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( HelpDlgGenerated::OnClose ) );
 	m_button8->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( HelpDlgGenerated::OnOK ), NULL, this );
+	
 }
 
 AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -2522,7 +2513,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	
 	m_scrolledWindowCodeInfo = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDOUBLE_BORDER|wxHSCROLL|wxVSCROLL );
 	m_scrolledWindowCodeInfo->SetScrollRate( 5, 5 );
-	m_scrolledWindowCodeInfo->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
+	m_scrolledWindowCodeInfo->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
 	m_scrolledWindowCodeInfo->SetMinSize( wxSize( -1,120 ) );
 	
 	bSizerCodeInfo = new wxBoxSizer( wxVERTICAL );
@@ -2539,6 +2530,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	
 	m_hyperlink21 = new wxHyperlinkCtrl( m_scrolledWindowCodeInfo, wxID_ANY, _("- ZenJu -"), wxT("mailto:zhnmju123@gmx.de"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
 	m_hyperlink21->SetFont( wxFont( 10, 74, 93, 92, false, wxT("Segoe Print") ) );
+	m_hyperlink21->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
 	m_hyperlink21->SetToolTip( _("zhnmju123@gmx.de") );
 	
 	bSizerCodeInfo->Add( m_hyperlink21, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
@@ -2550,7 +2542,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	
 	m_scrolledWindowTranslators = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxDOUBLE_BORDER|wxHSCROLL|wxVSCROLL );
 	m_scrolledWindowTranslators->SetScrollRate( 5, 5 );
-	m_scrolledWindowTranslators->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
+	m_scrolledWindowTranslators->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
 	m_scrolledWindowTranslators->SetMinSize( wxSize( -1,140 ) );
 	m_scrolledWindowTranslators->SetMaxSize( wxSize( -1,145 ) );
 	
@@ -2692,6 +2684,7 @@ AboutDlgGenerated::~AboutDlgGenerated()
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( AboutDlgGenerated::OnClose ) );
 	m_buttonOkay->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AboutDlgGenerated::OnOK ), NULL, this );
+	
 }
 
 ErrorDlgGenerated::ErrorDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -2711,14 +2704,13 @@ ErrorDlgGenerated::ErrorDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	bSizer26->Add( m_bitmap10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY );
-	m_textCtrl8->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
+	m_textCtrl8->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
 	
 	bSizer26->Add( m_textCtrl8, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxRIGHT|wxLEFT, 5 );
 	
 	bSizer24->Add( bSizer26, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
 	m_checkBoxIgnoreErrors = new wxCheckBox( this, wxID_ANY, _("Ignore subsequent errors"), wxDefaultPosition, wxDefaultSize, 0 );
-	
 	m_checkBoxIgnoreErrors->SetToolTip( _("Hide further error messages during the current process") );
 	
 	bSizer24->Add( m_checkBoxIgnoreErrors, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 10 );
@@ -2767,6 +2759,7 @@ ErrorDlgGenerated::~ErrorDlgGenerated()
 	m_buttonIgnore->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnIgnore ), NULL, this );
 	m_buttonRetry->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnRetry ), NULL, this );
 	m_buttonAbort->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ErrorDlgGenerated::OnAbort ), NULL, this );
+	
 }
 
 WarningDlgGenerated::WarningDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -2786,14 +2779,13 @@ WarningDlgGenerated::WarningDlgGenerated( wxWindow* parent, wxWindowID id, const
 	bSizer26->Add( m_bitmap10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY );
-	m_textCtrl8->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
+	m_textCtrl8->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
 	
 	bSizer26->Add( m_textCtrl8, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxRIGHT|wxLEFT, 5 );
 	
 	bSizer24->Add( bSizer26, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
 	m_checkBoxDontShowAgain = new wxCheckBox( this, wxID_ANY, _("Do not show this dialog again"), wxDefaultPosition, wxDefaultSize, 0 );
-	
 	bSizer24->Add( m_checkBoxDontShowAgain, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 10 );
 	
 	
@@ -2840,6 +2832,7 @@ WarningDlgGenerated::~WarningDlgGenerated()
 	m_buttonIgnore->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WarningDlgGenerated::OnIgnore ), NULL, this );
 	m_buttonSwitch->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WarningDlgGenerated::OnSwitch ), NULL, this );
 	m_buttonAbort->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WarningDlgGenerated::OnAbort ), NULL, this );
+	
 }
 
 QuestionDlgGenerated::QuestionDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -2859,14 +2852,13 @@ QuestionDlgGenerated::QuestionDlgGenerated( wxWindow* parent, wxWindowID id, con
 	bSizer26->Add( m_bitmap10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY );
-	m_textCtrl8->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
+	m_textCtrl8->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
 	
 	bSizer26->Add( m_textCtrl8, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxRIGHT|wxLEFT, 5 );
 	
 	bSizer24->Add( bSizer26, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
 	m_checkBoxDontAskAgain = new wxCheckBox( this, wxID_ANY, _("Do not show this dialog again"), wxDefaultPosition, wxDefaultSize, 0 );
-	
 	bSizer24->Add( m_checkBoxDontAskAgain, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 10 );
 	
 	
@@ -2913,6 +2905,7 @@ QuestionDlgGenerated::~QuestionDlgGenerated()
 	m_buttonYes->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( QuestionDlgGenerated::OnYes ), NULL, this );
 	m_buttonNo->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( QuestionDlgGenerated::OnNo ), NULL, this );
 	m_buttonCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( QuestionDlgGenerated::OnCancel ), NULL, this );
+	
 }
 
 DeleteDlgGenerated::DeleteDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -2949,7 +2942,6 @@ DeleteDlgGenerated::DeleteDlgGenerated( wxWindow* parent, wxWindowID id, const w
 	bSizer99 = new wxBoxSizer( wxHORIZONTAL );
 	
 	m_checkBoxDeleteBothSides = new wxCheckBox( this, wxID_ANY, _("Delete on both sides"), wxDefaultPosition, wxDefaultSize, 0 );
-	
 	m_checkBoxDeleteBothSides->SetToolTip( _("Delete on both sides even if the file is selected on one side only") );
 	
 	bSizer99->Add( m_checkBoxDeleteBothSides, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
@@ -2958,14 +2950,13 @@ DeleteDlgGenerated::DeleteDlgGenerated( wxWindow* parent, wxWindowID id, const w
 	bSizer99->Add( 0, 0, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_checkBoxUseRecycler = new wxCheckBox( this, wxID_ANY, _("Use Recycle Bin"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_checkBoxUseRecycler->SetValue(true);
-	
+	m_checkBoxUseRecycler->SetValue(true); 
 	bSizer99->Add( m_checkBoxUseRecycler, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	bSizer24->Add( bSizer99, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxRIGHT|wxLEFT, 10 );
 	
 	m_textCtrlMessage = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY );
-	m_textCtrlMessage->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVEBORDER ) );
+	m_textCtrlMessage->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
 	
 	bSizer24->Add( m_textCtrlMessage, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
@@ -3004,6 +2995,7 @@ DeleteDlgGenerated::~DeleteDlgGenerated()
 	m_checkBoxUseRecycler->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( DeleteDlgGenerated::OnUseRecycler ), NULL, this );
 	m_buttonOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DeleteDlgGenerated::OnOK ), NULL, this );
 	m_buttonCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( DeleteDlgGenerated::OnCancel ), NULL, this );
+	
 }
 
 FilterDlgGenerated::FilterDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -3217,6 +3209,7 @@ FilterDlgGenerated::~FilterDlgGenerated()
 	m_button9->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlgGenerated::OnDefault ), NULL, this );
 	m_button10->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlgGenerated::OnApply ), NULL, this );
 	m_button17->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlgGenerated::OnCancel ), NULL, this );
+	
 }
 
 CustomizeColsDlgGenerated::CustomizeColsDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -3300,6 +3293,7 @@ CustomizeColsDlgGenerated::~CustomizeColsDlgGenerated()
 	m_button9->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CustomizeColsDlgGenerated::OnDefault ), NULL, this );
 	m_button28->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CustomizeColsDlgGenerated::OnOkay ), NULL, this );
 	m_button29->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CustomizeColsDlgGenerated::OnCancel ), NULL, this );
+	
 }
 
 GlobalSettingsDlgGenerated::GlobalSettingsDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -3343,20 +3337,12 @@ GlobalSettingsDlgGenerated::GlobalSettingsDlgGenerated( wxWindow* parent, wxWind
 	wxStaticBoxSizer* sbSizer23;
 	sbSizer23 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxEmptyString ), wxVERTICAL );
 	
-	m_checkBoxIgnoreOneHour = new wxCheckBox( this, wxID_ANY, _("Ignore 1-hour file time difference"), wxDefaultPosition, wxDefaultSize, 0 );
-	
-	m_checkBoxIgnoreOneHour->SetToolTip( _("Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes") );
-	
-	sbSizer23->Add( m_checkBoxIgnoreOneHour, 0, wxALL|wxEXPAND, 5 );
-	
 	m_checkBoxCopyLocked = new wxCheckBox( this, wxID_ANY, _("Copy locked files"), wxDefaultPosition, wxDefaultSize, 0 );
-	
 	m_checkBoxCopyLocked->SetToolTip( _("Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)") );
 	
 	sbSizer23->Add( m_checkBoxCopyLocked, 0, wxALL|wxEXPAND, 5 );
 	
 	m_checkBoxCopyPermissions = new wxCheckBox( this, wxID_ANY, _("Copy filesystem permissions"), wxDefaultPosition, wxDefaultSize, 0 );
-	
 	m_checkBoxCopyPermissions->SetToolTip( _("Transfer file and directory permissions\n(Requires Administrator rights)") );
 	
 	sbSizer23->Add( m_checkBoxCopyPermissions, 0, wxALL|wxEXPAND, 5 );
@@ -3487,6 +3473,7 @@ GlobalSettingsDlgGenerated::~GlobalSettingsDlgGenerated()
 	m_button9->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GlobalSettingsDlgGenerated::OnDefault ), NULL, this );
 	m_buttonOkay->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GlobalSettingsDlgGenerated::OnOkay ), NULL, this );
 	m_button29->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( GlobalSettingsDlgGenerated::OnCancel ), NULL, this );
+	
 }
 
 SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -3659,7 +3646,6 @@ SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID i
 	bSizer142 = new wxBoxSizer( wxHORIZONTAL );
 	
 	m_checkBoxDontShowAgain = new wxCheckBox( this, wxID_ANY, _("Do not show this dialog again"), wxDefaultPosition, wxDefaultSize, 0 );
-	
 	bSizer142->Add( m_checkBoxDontShowAgain, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
@@ -3688,6 +3674,7 @@ SyncPreviewDlgGenerated::~SyncPreviewDlgGenerated()
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SyncPreviewDlgGenerated::OnClose ) );
 	m_buttonStartSync->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncPreviewDlgGenerated::OnStartSync ), NULL, this );
 	m_button16->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncPreviewDlgGenerated::OnCancel ), NULL, this );
+	
 }
 
 PopupFrameGenerated1::PopupFrameGenerated1( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
@@ -3740,8 +3727,7 @@ SearchDialogGenerated::SearchDialogGenerated( wxWindow* parent, wxWindowID id, c
 	bSizer166->Add( 0, 10, 0, 0, 5 );
 	
 	m_checkBoxMatchCase = new wxCheckBox( this, wxID_ANY, _("Match case"), wxDefaultPosition, wxDefaultSize, 0 );
-	
-	bSizer166->Add( m_checkBoxMatchCase, 0, wxALL|wxEXPAND, 5 );
+	bSizer166->Add( m_checkBoxMatchCase, 0, wxALL, 5 );
 	
 	bSizer161->Add( bSizer166, 1, wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -3779,4 +3765,5 @@ SearchDialogGenerated::~SearchDialogGenerated()
 	m_textCtrlSearchTxt->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( SearchDialogGenerated::OnText ), NULL, this );
 	m_buttonFindNext->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SearchDialogGenerated::OnFindNext ), NULL, this );
 	m_button29->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SearchDialogGenerated::OnCancel ), NULL, this );
+	
 }

@@ -8,8 +8,7 @@
 #define STATUSHANDLER_H_INCLUDED
 
 #include <wx/longlong.h>
-
-class Zstring;
+#include "../shared/zstring.h"
 
 
 const int UI_UPDATE_INTERVAL = 100; //perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
@@ -53,8 +52,9 @@ public:
 
     //these methods have to be implemented in the derived classes to handle error and status information
     virtual void initNewProcess(int objectsTotal, wxLongLong dataTotal, Process processID) = 0; //informs about the total amount of data that will be processed from now on
-    virtual void updateStatusText(const Zstring& text) = 0;
     virtual void updateProcessedData(int objectsProcessed, wxLongLong dataProcessed) = 0;  //called periodically after data was processed
+
+    virtual void reportInfo(const Zstring& text) = 0;
 
     //this method is triggered repeatedly by requestUiRefresh() and can be used to refresh the ui by dispatching pending events
     virtual void forceUiRefresh() = 0;

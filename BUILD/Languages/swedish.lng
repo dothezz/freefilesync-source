@@ -89,9 +89,7 @@
 &Yes
 &Ja
 (Build: %x)
-(Bygg: %x)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Notera att endast FAT/FAT32-formaterade diskar berörs av detta problem!\nI alla andra fall kan du inaktivera alternativet \"Ignorera sommartid\".)
+(Bygge: %x)
 (Requires an Internet connection!)
 (Kräver Internetuppkoppling!)
 - Other side's counterpart to %dir
@@ -274,14 +272,10 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 Kopiera delade eller låsta filer med hjälp av Volume Shadow Copy Service\n(Kräver administratörsrättighet)
 Copy to clipboard\tCTRL+C
 Kopiera till urklipp\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-Kopierar symbolisk länk %x skriver över %y
-Copying Symbolic Link %x to %y
-Kopierar symbolisk länk %x till %y
-Copying file %x overwriting %y
-Kopierar fil %x skriver över %y
-Copying file %x to %y
-Kopierar fil %x till %y
+Copying new Symbolic Link %x to %y
+Kopierar ny symbolisk länk %x to %y
+Copying new file %x to %y
+Kopierar ny fil %x till %y
 Could not determine volume name for file:
 Kan inte bestämma volym för fil:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 Verifikationsfel: Källfil och målfil har olika innehåll!
 Date
 Datum
-Delay
-Fördröjning
-Delay between detection of changes and execution of command line in seconds
-Fördröjning mellan ändringars upptäckt och åtgärd i sekunder
 Delete files/folders existing on left side only
 Ta bort filer/kataloger som endast finns på vänster sida
 Delete files/folders existing on right side only
@@ -412,6 +402,8 @@ Error reading from synchronization database:
 Kan inte läsa från databasen:
 Error resolving symbolic link:
 Kan inte tyda symbolisk länk:
+Error setting directory lock:
+Kan inte låsa katalogen:
 Error setting privilege:
 Kan inte ange privilegie:
 Error starting Volume Shadow Copy Service!
@@ -458,8 +450,6 @@ File size and date
 Filstorlek och datum
 Filename
 Filnamn
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-Filerna %x har en tidsstämpling som skiljer mindre än en timme!\n\nDet är inte helt säkert att avgöra vilken som är nyast, p.g.a sommartids-problem.
 Files %x have the same date but a different size!
 Filerna %x har samma datum men olika storlek!
 Files are found equal if\n     - file content\nis the same
@@ -564,12 +554,12 @@ Homepage
 Hemsida
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Identifiera och visa förändringar på båda sidor via databas. Borttagningar och konflikter upptäcks automatiskt.
+Idle time between detection of last change and execution of command line in seconds
+Väntetid mellan upptäckt av senaste ändring och verkställande av kommando, i sekunder
 If you like FFS
 Om du gillar FFS
 Ignore
 Ignorera
-Ignore 1-hour file time difference
-Ignorera sommartid
 Ignore errors
 Ignorera fel
 Ignore subsequent errors
@@ -612,6 +602,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Skuggkopior av wow64 stöds ej. Använd FreeFileSync x64 istället!
 Match case
 Matcha gemener/VERSALER
+Minimum Idle Time
+Minsta väntetid
 Mirror ->>
 Spegla ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -666,6 +658,10 @@ Operation:
 Arbetsuppgift:
 Overview
 Översikt
+Overwriting Symbolic Link %x in %y
+Skriver över symbolisk länk %x i %y
+Overwriting file %x in %y
+Skriver över fil %x i %y
 Pause
 Paus
 Paused
@@ -725,7 +721,7 @@ Markera en katalog
 Select alternate synchronization settings
 Välj alternativa synkroniseringsinställningar
 Select logfile directory:
-Välj loggfilsdestination:
+Välj loggfilskatalog:
 Select variant:
 Välj variant:
 Set direction:
@@ -842,8 +838,6 @@ Total time:
 Total tid:
 Transfer file and directory permissions\n(Requires Administrator rights)
 Överför fil- och katalogrättigheter\n(Kräver administratörsrättigheter)
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-Betrakta tidsstämplar som skiljer exakt +/- 1 timme som lika, och mindre än 1 timme som konflikt, för att hantera sommartid
 Unable to connect to sourceforge.net!
 Kan inte ansluta sourceforge.net!
 Unable to create logfile!
@@ -870,6 +864,8 @@ Volume name %x not part of filename %y!
 Volymnamn %x saknas i filnamn %y!
 Waiting for all directories to become available...
 Väntar på att alla sökvägar skall bli åtkommliga...
+Waiting while directory is locked (%x)...
+Väntar medan katalogen låses (%x)...
 Warning
 Varning
 Warning: Synchronization failed for %x item(s):

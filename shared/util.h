@@ -11,11 +11,10 @@
 #include <wx/string.h>
 #include <wx/longlong.h>
 #include "../shared/global_func.h"
-
-class wxComboBox;
-class wxTextCtrl;
-class wxDirPickerCtrl;
-class wxScrolledWindow;
+#include <wx/textctrl.h>
+#include <wx/filepicker.h>
+#include <wx/combobox.h>
+#include <wx/scrolwin.h>
 
 
 namespace ffs3
@@ -29,8 +28,6 @@ wxString formatPercentage(const wxLongLong& dividend, const wxLongLong& divisor)
 template <class NumberType>
 wxString numberToStringSep(NumberType number); //convert number to wxString including thousands separator
 
-void setDirectoryName(const wxString& dirname, wxTextCtrl* txtCtrl, wxDirPickerCtrl* dirPicker);
-void setDirectoryName(const wxString& dirname, wxComboBox* txtCtrl, wxDirPickerCtrl* dirPicker);
 void scrollToBottom(wxScrolledWindow* scrWindow);
 
 wxString utcTimeToLocalString(const wxLongLong& utcTime); //throw std::runtime_error

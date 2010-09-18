@@ -11,7 +11,7 @@
 using namespace ffs3;
 
 
-bool AppMainWindow::mainWndAct = false;
+bool AppMainWindow::mainWndActive = false;
 
 
 void ffs3::AppMainWindow::setMainWindow(wxWindow* window)
@@ -19,11 +19,11 @@ void ffs3::AppMainWindow::setMainWindow(wxWindow* window)
     wxTheApp->SetTopWindow(window);
     wxTheApp->SetExitOnFrameDelete(true);
 
-    mainWndAct = true;
+    mainWndActive = true;
 }
 
 
 bool AppMainWindow::mainWindowWasSet()
 {
-    return mainWndAct;
+    return mainWndActive;
 }

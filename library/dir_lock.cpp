@@ -6,21 +6,25 @@
 #include <wx/timer.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
-#include <boost/thread.hpp>
+#include "../shared/boost_thread_wrap.h" //include <boost/thread.hpp>
 #include "../shared/loki/ScopeGuard.h"
 #include <wx/msgdlg.h>
 #include "../shared/system_constants.h"
 #include "../shared/guid.h"
 #include "../shared/file_io.h"
 #include <utility>
+#include "../shared/serialize.h"
 
 #ifdef FFS_WIN
+#include <tlhelp32.h>
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "../shared/long_path_prefix.h"
 
 #elif defined FFS_LINUX
+#include "../shared/file_handling.h"
 #include <sys/stat.h>
 #include <cerrno>
+#include <unistd.h>
 #endif
 
 using namespace ffs3;
@@ -32,13 +36,15 @@ namespace
 const size_t EMIT_LIFE_SIGN_INTERVAL =  5000; //show life sign;        unit [ms]
 const size_t POLL_LIFE_SIGN_INTERVAL =  6000; //poll for life sign;    unit [ms]
 const size_t DETECT_EXITUS_INTERVAL  = 30000; //assume abandoned lock; unit [ms]
+
+typedef Zbase<Zchar, StorageDeepCopy> BasicString; //thread safe string class
 }
 
 class LifeSigns
 {
 public:
-    LifeSigns(const Zstring& lockfilename) : //throw()!!! siehe SharedDirLock()
-        lockfilename_(lockfilename.c_str()) //ref-counting structure is used by thread: make deep copy!
+    LifeSigns(const BasicString& lockfilename) : //throw()!!! siehe SharedDirLock()
+        lockfilename_(lockfilename) //thread safety: make deep copy!
     {
         threadObj = boost::thread(boost::cref(*this)); //localize all thread logic to this class!
     }
@@ -72,7 +78,7 @@ public:
         const char buffer[1] = {' '};
 
 #ifdef FFS_WIN
-        const HANDLE fileHandle = ::CreateFile(applyLongPathPrefix(lockfilename_).c_str(),
+        const HANDLE fileHandle = ::CreateFile(applyLongPathPrefix(lockfilename_.c_str()).c_str(),
                                                FILE_APPEND_DATA,
                                                FILE_SHARE_READ,
                                                NULL,
@@ -115,7 +121,7 @@ private:
     LifeSigns& operator=(const LifeSigns&); //
 
     boost::thread threadObj;
-    const Zstring lockfilename_; //used by worker thread only! Not ref-counted!
+    const BasicString lockfilename_; //used by worker thread only! Not ref-counted!
 };
 
 
@@ -157,7 +163,8 @@ wxULongLong getLockFileSize(const Zstring& filename) //throw (FileError, ErrorNo
         const DWORD lastError = ::GetLastError();
         const wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(filename) + wxT("\"")  +
                                       wxT("\n\n") + getLastErrorFormatted(lastError);
-        if (lastError == ERROR_FILE_NOT_FOUND)
+        if (    lastError == ERROR_FILE_NOT_FOUND ||
+                lastError == ERROR_PATH_NOT_FOUND)
             throw ErrorNotExisting(errorMessage);
         else
             throw FileError(errorMessage);
@@ -187,29 +194,138 @@ wxULongLong getLockFileSize(const Zstring& filename) //throw (FileError, ErrorNo
 
 Zstring deleteAbandonedLockName(const Zstring& lockfilename)
 {
-    const size_t pos = lockfilename.Find(common::FILE_NAME_SEPARATOR, true); //search from end
-
-    return pos == Zstring::npos ? DefaultStr("Del.") + lockfilename :
-
+    const size_t pos = lockfilename.rfind(common::FILE_NAME_SEPARATOR); //search from end
+    return pos == Zstring::npos ? Zstr("Del.") + lockfilename :
            Zstring(lockfilename.c_str(), pos + 1) + //include path separator
-           DefaultStr("Del.") +
+           Zstr("Del.") +
            lockfilename.AfterLast(common::FILE_NAME_SEPARATOR); //returns the whole string if ch not found
 }
 
 
-void writeLockId(const Zstring& lockfilename) //throw (FileError)
+namespace
+{
+inline
+wxString readString(wxInputStream& stream)  //read string from file stream
+{
+    const size_t strLength = util::readNumber<size_t>(stream);
+    boost::scoped_array<wxChar> buffer(new wxChar[strLength]);
+    stream.Read(buffer.get(), sizeof(wxChar) * strLength);
+    return wxString(buffer.get(), strLength);
+}
+
+
+inline
+void writeString(wxOutputStream& stream, const wxString& str)  //write string to filestream
+{
+    util::writeNumber<size_t>(stream, str.length());
+    stream.Write(str.c_str(), sizeof(wxChar) * str.length());
+}
+
+
+struct LockInformation
+{
+    LockInformation()
+    {
+#ifdef FFS_WIN
+        processId = ::GetCurrentProcessId();
+#elif defined FFS_LINUX
+        processId = ::getpid();
+#endif
+        computerId = ::wxGetFullHostName();
+    }
+
+    LockInformation(wxInputStream& stream) : //read
+        lockId(util::UniqueId(stream))
+    {
+        processId  = util::readNumber<ProcessId>(stream);
+        computerId = readString(stream);
+    }
+
+    void toStream(wxOutputStream& stream) const //write
+    {
+        lockId.toStream(stream);
+        util::writeNumber<ProcessId>(stream, processId);
+        writeString(stream, computerId);
+    }
+
+#ifdef FFS_WIN
+    typedef DWORD ProcessId;
+#elif defined FFS_LINUX
+    typedef pid_t ProcessId;
+#endif
+
+    util::UniqueId lockId;
+    ProcessId processId;
+    wxString computerId;
+};
+
+
+//true: process not available, false: cannot say anything
+enum ProcessStatus
+{
+    PROC_STATUS_NOT_RUNNING,
+    PROC_STATUS_RUNNING,
+    PROC_STATUS_NO_IDEA
+};
+ProcessStatus getProcessStatus(LockInformation::ProcessId procId, const wxString& computerId)
+{
+    if (::wxGetFullHostName() != computerId || computerId.empty())
+        return PROC_STATUS_NO_IDEA; //lock owned by different computer
+
+#ifdef FFS_WIN
+    //note: ::OpenProcess() is no option as it may successfully return for crashed processes!
+    HANDLE snapshot = ::CreateToolhelp32Snapshot(
+                          TH32CS_SNAPPROCESS, //__in  DWORD dwFlags,
+                          procId);            //__in  DWORD th32ProcessID
+    if (snapshot == INVALID_HANDLE_VALUE)
+        return PROC_STATUS_NO_IDEA;
+    boost::shared_ptr<void> dummy(snapshot, ::CloseHandle);
+
+    PROCESSENTRY32 processEntry = {};
+    processEntry.dwSize = sizeof(processEntry);
+
+    if (!::Process32First(snapshot,       //__in     HANDLE hSnapshot,
+                          &processEntry)) //__inout  LPPROCESSENTRY32 lppe
+        return PROC_STATUS_NO_IDEA;
+
+    do
+    {
+        if (processEntry.th32ProcessID == procId)
+            return PROC_STATUS_RUNNING; //process still running
+    }
+    while(::Process32Next(snapshot, &processEntry));
+
+    return PROC_STATUS_NOT_RUNNING;
+
+#elif defined FFS_LINUX
+    if (procId <= 0 || procId >= 65536)
+        return PROC_STATUS_NO_IDEA; //invalid process id
+
+    return ffs3::dirExists(Zstr("/proc/") + Zstring::fromNumber(procId)) ? PROC_STATUS_RUNNING : PROC_STATUS_NOT_RUNNING;
+#endif
+}
+
+
+void writeLockInfo(const Zstring& lockfilename) //throw (FileError)
 {
     //write GUID at the beginning of the file: this ID is a universal identifier for this lock (no matter what the path is, considering symlinks ,etc.)
     FileOutputStream lockFile(lockfilename); //throw FileError()
-    util::UniqueId().toStream(lockFile);     //
+    LockInformation().toStream(lockFile);
+}
+
+
+LockInformation retrieveLockInfo(const Zstring& lockfilename) //throw (FileError, ErrorNotExisting)
+{
+    //read GUID from beginning of file
+    FileInputStream lockFile(lockfilename); //throw (FileError, ErrorNotExisting)
+    return LockInformation(lockFile);
 }
 
 
 util::UniqueId retrieveLockId(const Zstring& lockfilename) //throw (FileError, ErrorNotExisting)
 {
-    //read GUID from beginning of file
-    FileInputStream lockFile(lockfilename); //throw (FileError, ErrorNotExisting)
-    return util::UniqueId(lockFile);        //
+    return retrieveLockInfo(lockfilename).lockId;
+}
 }
 
 
@@ -217,12 +333,13 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
 {
     Zstring infoMsg;
     infoMsg = wxToZ(_("Waiting while directory is locked (%x)..."));
-    infoMsg.Replace(DefaultStr("%x"), DefaultStr("\"") + lockfilename + DefaultStr("\""));
-    if (callback) callback->updateStatusText(infoMsg);
+    infoMsg.Replace(Zstr("%x"), Zstr("\"") + lockfilename + Zstr("\""));
+    if (callback) callback->reportInfo(infoMsg);
     //---------------------------------------------------------------
     try
     {
-        const util::UniqueId lockId = retrieveLockId(lockfilename); //throw (FileError, ErrorNotExisting)
+        const LockInformation lockInfo = retrieveLockInfo(lockfilename); //throw (FileError, ErrorNotExisting)
+        const bool lockOwnderDead = getProcessStatus(lockInfo.processId, lockInfo.computerId) == PROC_STATUS_NOT_RUNNING; //convenience optimization: if we know the owning process crashed, we needn't wait DETECT_EXITUS_INTERVAL sec
 
         wxULongLong fileSizeOld;
         wxLongLong lockSilentStart = wxGetLocalTimeMillis();
@@ -238,23 +355,19 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
                 fileSizeOld     = fileSizeNew;
                 lockSilentStart = currentTime;
             }
-            else if (currentTime - lockSilentStart > DETECT_EXITUS_INTERVAL)
+
+            if (    lockOwnderDead || //no need to wait any longer...
+                    currentTime - lockSilentStart > DETECT_EXITUS_INTERVAL)
             {
                 DirLock dummy(deleteAbandonedLockName(lockfilename), callback); //throw (FileError)
 
                 //now that the lock is in place check existence again: meanwhile another process may have deleted and created a new lock!
 
-                if (retrieveLockId(lockfilename) != lockId) //throw (FileError, ErrorNotExisting)
+                if (retrieveLockId(lockfilename) != lockInfo.lockId) //throw (FileError, ErrorNotExisting)
                     return; //another process has placed a new lock, leave scope: the wait for the old lock is technically over...
 
                 if (getLockFileSize(lockfilename) != fileSizeOld) //throw (FileError, ErrorNotExisting)
                     continue; //belated lifesign
-
-                //---------------------------------------------------------------
-                Zstring infoMsg2 = wxToZ(_("Removing abandoned directory lock (%x)..."));
-                infoMsg2.Replace(DefaultStr("%x"), DefaultStr("\"") + lockfilename + DefaultStr("\""));
-                if (callback) callback->updateStatusText(infoMsg2);
-                //---------------------------------------------------------------
 
                 ::deleteLockFile(lockfilename); //throw (FileError)
                 return;
@@ -276,11 +389,11 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
                         remainingSeconds =  std::max(0L, remainingSeconds);
 
                         Zstring remSecMsg = wxToZ(_("%x sec"));
-                        remSecMsg.Replace(DefaultStr("%x"), numberToZstring(remainingSeconds));
-                        callback->updateStatusText(infoMsg + DefaultStr(" ") + remSecMsg);
+                        remSecMsg.Replace(Zstr("%x"), Zstring::fromNumber(remainingSeconds));
+                        callback->reportInfo(infoMsg + Zstr(" ") + remSecMsg);
                     }
                     else
-                        callback->updateStatusText(infoMsg); //emit a message in any case (might clear other one)
+                        callback->reportInfo(infoMsg); //emit a message in any case (might clear other one)
                 }
             }
         }
@@ -341,7 +454,7 @@ bool tryLock(const Zstring& lockfilename) //throw (FileError)
     Loki::ScopeGuard guardLockFile = Loki::MakeGuard(::releaseLock, lockfilename);
 
     //write UUID at the beginning of the file: this ID is a universal identifier for this lock (no matter what the path is, considering symlinks ,etc.)
-    writeLockId(lockfilename); //throw (FileError)
+    writeLockInfo(lockfilename); //throw (FileError)
 
     guardLockFile.Dismiss(); //lockfile created successfully
     return true;
@@ -358,7 +471,7 @@ public:
         while (!::tryLock(lockfilename))             //throw (FileError)
             ::waitOnDirLock(lockfilename, callback); //
 
-        emitLifeSigns.reset(new LifeSigns(lockfilename)); //throw()! ownership of lockfile not yet managed!
+        emitLifeSigns.reset(new LifeSigns(lockfilename.c_str())); //throw()! ownership of lockfile not yet managed!
     }
 
     ~SharedDirLock()
@@ -378,7 +491,7 @@ private:
 };
 
 
-class DirLock::LockAdmin //administrate all locks of this process to avoid deadlock by recursion
+class DirLock::LockAdmin //administrate all locks held by this process to avoid deadlock by recursion
 {
 public:
     static LockAdmin& instance()

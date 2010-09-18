@@ -19,7 +19,7 @@ public:
     static bool mainWindowWasSet();
 
 private:
-    static bool mainWndAct;
+    static bool mainWndActive;
 };
 }
 

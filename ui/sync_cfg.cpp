@@ -7,8 +7,10 @@
 #include "sync_cfg.h"
 
 #include "../library/resources.h"
-#include "../shared/drag_n_drop.h"
+#include "../shared/dir_name.h"
 #include <wx/wupdlock.h>
+#include "mouse_move_dlg.h"
+#include "../shared/string_conv.h"
 
 using namespace ffs3;
 
@@ -26,10 +28,15 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* window,
     refHandleDeletion(handleDeletion),
     refCustomDeletionDirectory(customDeletionDirectory),
     refIgnoreErrors(ignoreErrors),
-    dragDropCustomDelFolder(new DragDropOnDlg(m_panelCustomDeletionDir, m_dirPickerCustomDelFolder, m_textCtrlCustomDelFolder))
+    customDelFolder(new DirectoryName(m_panelCustomDeletionDir, m_dirPickerCustomDelFolder, m_textCtrlCustomDelFolder))
 {
+#ifdef FFS_WIN
+    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                        this, m_staticText81, m_staticText8, m_staticText101, m_staticText9); //ownership passed to "this"
+#endif
+
     setDeletionHandling(handleDeletion);
-    m_textCtrlCustomDelFolder->SetValue(customDeletionDirectory);
+    customDelFolder->setName(wxToZ(customDeletionDirectory));
 
     //error handling
     if (ignoreErrors)
@@ -280,7 +287,7 @@ void SyncCfgDialog::OnApply(wxCommandEvent& event)
     //write configuration to main dialog
     refSyncConfiguration = currentSyncConfig;
     refHandleDeletion    = getDeletionHandling();
-    refCustomDeletionDirectory = m_textCtrlCustomDelFolder->GetValue();
+    refCustomDeletionDirectory = zToWx(customDelFolder->getName());
     if (refIgnoreErrors)
         *refIgnoreErrors = getErrorHandling();
 

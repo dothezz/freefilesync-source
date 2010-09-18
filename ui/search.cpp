@@ -9,6 +9,7 @@
 #include <wx/msgdlg.h>
 #include <wx/utils.h>
 #include <utility>
+#include "mouse_move_dlg.h"
 
 
 class SearchDlg : public SearchDialogGenerated
@@ -37,6 +38,11 @@ SearchDlg::SearchDlg(wxWindow& parentWindow, wxString& searchText, bool& respect
     searchText_(searchText),
     respectCase_(respectCase)
 {
+#ifdef FFS_WIN
+    new ffs3::MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                        this); //ownership passed to "this"
+#endif
+
     m_checkBoxMatchCase->SetValue(respectCase_);
     m_textCtrlSearchTxt->SetValue(searchText_);
 

@@ -152,18 +152,18 @@ MainDlgGenerated::MainDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	
 	bSizer1->Add( sbSizer3, 0, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
 	
-	m_staticline1 = new wxStaticLine( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-	bSizer1->Add( m_staticline1, 0, wxEXPAND|wxTOP|wxBOTTOM, 10 );
-	
 	wxStaticBoxSizer* sbSizer4;
-	sbSizer4 = new wxStaticBoxSizer( new wxStaticBox( m_panelMain, wxID_ANY, _("Delay") ), wxVERTICAL );
+	sbSizer4 = new wxStaticBoxSizer( new wxStaticBox( m_panelMain, wxID_ANY, _("Minimum Idle Time") ), wxVERTICAL );
 	
 	m_spinCtrlDelay = new wxSpinCtrl( m_panelMain, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 2000000000, 0 );
-	m_spinCtrlDelay->SetToolTip( _("Delay between detection of changes and execution of command line in seconds") );
+	m_spinCtrlDelay->SetToolTip( _("Idle time between detection of last change and execution of command line in seconds") );
 	
 	sbSizer4->Add( m_spinCtrlDelay, 0, wxBOTTOM|wxRIGHT|wxLEFT|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	bSizer1->Add( sbSizer4, 0, wxEXPAND|wxRIGHT|wxLEFT, 5 );
+	
+	m_staticline1 = new wxStaticLine( m_panelMain, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
+	bSizer1->Add( m_staticline1, 0, wxEXPAND|wxTOP|wxBOTTOM, 10 );
 	
 	m_buttonStart = new wxButtonWithImage( m_panelMain, wxID_ANY, _("Start"), wxDefaultPosition, wxSize( -1,40 ), 0 );
 	m_buttonStart->SetDefault(); 

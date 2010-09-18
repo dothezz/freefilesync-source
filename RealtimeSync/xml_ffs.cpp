@@ -8,7 +8,7 @@
 #include "../shared/standard_paths.h"
 #include "../shared/global_func.h"
 #include "../shared/zstring.h"
-#include "functions.h"
+//#include "functions.h"
 #include "../shared/xml_base.h"
 #include "../shared/string_conv.h"
 

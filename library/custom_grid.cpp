@@ -18,6 +18,7 @@
 #include <wx/dcclient.h>
 #include "icon_buffer.h"
 #include <wx/icon.h>
+#include <wx/tooltip.h>
 
 #ifdef FFS_WIN
 #include <wx/timer.h>
@@ -380,12 +381,12 @@ protected:
                 virtual void visit(const SymLinkMapping& linkObj)
                 {
                     iconName = linkObj.getLinkType<side>() == LinkDescriptor::TYPE_DIR ?
-                               DefaultStr("folder") :
+                               Zstr("folder") :
                                linkObj.getFullName<side>();
                 }
                 virtual void visit(const DirMapping& dirObj)
                 {
-                    iconName = DefaultStr("folder");
+                    iconName = Zstr("folder");
                 }
 
                 Zstring iconName;
@@ -580,10 +581,9 @@ CustomGrid::CustomGrid(wxWindow *parent,
     isLeading(false),
     m_marker(-1, ASCENDING)
 {
-    //set color of selections
-    wxColour darkBlue(40, 35, 140);
-    SetSelectionBackground(darkBlue);
-    SetSelectionForeground(*wxWHITE);
+    //wxColour darkBlue(40, 35, 140); -> user default colors instead!
+    //SetSelectionBackground(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    //SetSelectionForeground(*wxWHITE);
 }
 
 
@@ -975,6 +975,22 @@ void CustomGrid::DrawColLabel(wxDC& dc, int col)
 }
 
 
+std::pair<int, int> CustomGrid::mousePosToCell(wxPoint pos)
+{
+    int x = -1;
+    int y = -1;
+    CalcUnscrolledPosition(pos.x, pos.y, &x, &y);
+
+    std::pair<int, int> output(-1, -1);
+    if (x >= 0 && y >= 0)
+    {
+        output.first  = YToRow(y);
+        output.second = XToCol(x);
+    }
+    return output;
+}
+
+
 std::set<size_t> CustomGrid::getAllSelectedRows() const
 {
     std::set<size_t> output;
@@ -1075,7 +1091,7 @@ public:
                 if (!fileName.empty())
                 {
                     //first check if it is a directory icon:
-                    if (fileName == DefaultStr("folder"))
+                    if (fileName == Zstr("folder"))
                     {
                         dc.DrawIcon(IconBuffer::getDirectoryIcon(), rectShrinked.GetX() + LEFT_BORDER, rectShrinked.GetY());
                         m_loadIconSuccess[row] = true; //save status of last icon load -> used for async. icon loading
@@ -1159,8 +1175,57 @@ CustomGridRim::CustomGridRim(wxWindow *parent,
                              const wxSize& size,
                              long style,
                              const wxString& name) :
-    CustomGrid(parent, id, pos, size, style, name), fileIconsAreEnabled(false)
-{}
+    CustomGrid(parent, id, pos, size, style, name), fileIconsAreEnabled(false) {}
+
+
+template <SelectedSide side>
+void CustomGridRim::setTooltip(const wxMouseEvent& event)
+{
+    const int hoveredRow = mousePosToCell(event.GetPosition()).first;
+
+    wxString toolTip;
+    if (hoveredRow >= 0 && getGridDataTable() != NULL)
+    {
+        const FileSystemObject* const fsObj = getGridDataTable()->getRawData(hoveredRow);
+        if (fsObj && !fsObj->isEmpty<side>())
+        {
+            struct AssembleTooltip : public FSObjectVisitor
+            {
+                AssembleTooltip(wxString& tipMsg) : tipMsg_(tipMsg) {}
+
+                virtual void visit(const FileMapping& fileObj)
+                {
+                    tipMsg_ = zToWx(fileObj.getShortName<side>()) + wxT("\n") +
+                              _("Size") + wxT(": ") + ffs3::formatFilesizeToShortString(fileObj.getFileSize<side>()) + wxT("\n") +
+                              _("Date") + wxT(": ") + ffs3::utcTimeToLocalString(fileObj.getLastWriteTime<side>());
+                }
+
+                virtual void visit(const SymLinkMapping& linkObj)
+                {
+                    tipMsg_ = zToWx(linkObj.getShortName<side>()) + wxT("\n") +
+                              _("Date") + wxT(": ") + ffs3::utcTimeToLocalString(linkObj.getLastWriteTime<side>());
+                }
+
+                virtual void visit(const DirMapping& dirObj)
+                {
+                    tipMsg_ = zToWx(dirObj.getShortName<side>());
+                }
+
+                wxString& tipMsg_;
+            } assembler(toolTip);
+            fsObj->accept(assembler);
+        }
+    }
+
+    wxToolTip* tt = GetGridWindow()->GetToolTip();
+    if (!tt)
+        //wxWidgets bug: tooltip multiline property is defined by first tooltip text containing newlines or not (same is true for maximum width)
+        GetGridWindow()->SetToolTip(new wxToolTip(wxT("a                                                                b\n\
+                                                           a                                                                b"))); //ugly, but is working (on Windows)
+    tt = GetGridWindow()->GetToolTip(); //should be bound by now
+    if (tt && tt->GetTip() != toolTip)
+        tt->SetTip(toolTip);
+}
 
 
 void CustomGridRim::updateGridSizes()
@@ -1425,12 +1490,9 @@ CustomGridRim::VisibleRowRange CustomGridRim::getVisibleRows()
 
     if (height >= 0)
     {
-        int topRowY = -1;
-        CalcUnscrolledPosition(0, 0, &dummy, &topRowY);
-
-        if (topRowY >= 0)
+        const int topRow = mousePosToCell(wxPoint(0, 0)).first;
+        if (topRow >= 0)
         {
-            const int topRow    = YToRow(topRowY);
             const int rowCount  = static_cast<int>(ceil(height / static_cast<double>(GetDefaultRowSize()))); // = height / rowHeight rounded up
             const int bottomRow = topRow + rowCount - 1;
 
@@ -1535,7 +1597,17 @@ CustomGridLeft::CustomGridLeft(wxWindow *parent,
                                long style,
                                const wxString& name) :
     CustomGridRim(parent, id, pos, size, style, name),
-    gridDataTable(NULL) {}
+    gridDataTable(NULL)
+{
+    GetGridWindow()->Connect(wxEVT_MOTION, wxMouseEventHandler(CustomGridLeft::OnMouseMovement), NULL, this); //row-based tooltip
+}
+
+
+void CustomGridLeft::OnMouseMovement(wxMouseEvent& event)
+{
+    CustomGridRim::setTooltip<LEFT_SIDE>(event);
+    event.Skip();
+}
 
 
 bool CustomGridLeft::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
@@ -1583,7 +1655,17 @@ CustomGridRight::CustomGridRight(wxWindow *parent,
                                  long style,
                                  const wxString& name) :
     CustomGridRim(parent, id, pos, size, style, name),
-    gridDataTable(NULL) {}
+    gridDataTable(NULL)
+{
+    GetGridWindow()->Connect(wxEVT_MOTION, wxMouseEventHandler(CustomGridRight::OnMouseMovement), NULL, this); //row-based tooltip
+}
+
+
+void CustomGridRight::OnMouseMovement(wxMouseEvent& event)
+{
+    CustomGridRim::setTooltip<RIGHT_SIDE>(event);
+    event.Skip();
+}
 
 
 bool CustomGridRight::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
@@ -1717,16 +1799,21 @@ void CustomGridMiddle::setGridDataTable(const GridView* gridDataView) //called o
 
 void CustomGridMiddle::OnMouseMovement(wxMouseEvent& event)
 {
-    const int highlightedRowOld = highlightedRow;
+    const int rowOld = highlightedRow;
+    const BlockPosition posOld = highlightedPos;
+
 
     if (selectionRowBegin == -1) //change highlightning only if currently not dragging mouse
     {
         highlightedRow = mousePosToRow(event.GetPosition(), &highlightedPos);
-        if (highlightedRow >= 0)
+
+        if (rowOld != highlightedRow)
+        {
             RefreshCell(highlightedRow, 0);
-        if (    highlightedRowOld >= 0 &&
-                highlightedRow != highlightedRowOld)
-            RefreshCell(highlightedRowOld, 0);
+            RefreshCell(rowOld, 0);
+        }
+        else if (posOld != highlightedPos)
+            RefreshCell(highlightedRow, 0);
 
         //handle tooltip
         showToolTip(highlightedRow, GetGridWindow()->ClientToScreen(event.GetPosition()));
@@ -1830,7 +1917,7 @@ void CustomGridMiddle::OnLeftMouseDown(wxMouseEvent& event)
 
 void CustomGridMiddle::OnLeftMouseUp(wxMouseEvent& event)
 {
-    const int rowEndFiltering = mousePosToRow(event.GetPosition());
+    const int rowEndFiltering = mousePosToCell(event.GetPosition()).first;
 
     if (0 <= selectionRowBegin && 0 <= rowEndFiltering)
     {
@@ -1874,7 +1961,7 @@ void CustomGridMiddle::OnLeftMouseUp(wxMouseEvent& event)
 }
 
 
-int CustomGridMiddle::mousePosToRow(const wxPoint pos, BlockPosition* block)
+int CustomGridMiddle::mousePosToRow(wxPoint pos, BlockPosition* block)
 {
     int row = -1;
     int x = -1;

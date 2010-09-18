@@ -59,11 +59,11 @@ BaseFilter::FilterRef BaseFilter::loadFilter(wxInputStream& stream)
     const Zstring uniqueClassId = util::readString(stream);
 
     //read actual object
-    if (uniqueClassId == DefaultStr("NullFilter"))
+    if (uniqueClassId == Zstr("NullFilter"))
         return NullFilter::load(stream);
-    else if (uniqueClassId == DefaultStr("NameFilter"))
+    else if (uniqueClassId == Zstr("NameFilter"))
         return NameFilter::load(stream);
-    else if (uniqueClassId == DefaultStr("CombinedFilter"))
+    else if (uniqueClassId == Zstr("CombinedFilter"))
         return CombinedFilter::load(stream);
     else
         throw std::logic_error("Programming Error: Unknown filter!");
@@ -78,15 +78,15 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
 
 #ifdef FFS_WIN
     //Windows does NOT distinguish between upper/lower-case
-    filterFormatted.MakeUpper();
+    MakeUpper(filterFormatted);
 #elif defined FFS_LINUX
     //Linux DOES distinguish between upper/lower-case: nothing to do here
 #endif
 
-    static const Zstring sepAsterisk     = Zstring() + common::FILE_NAME_SEPARATOR + DefaultChar('*');
-    static const Zstring sepQuestionMark = Zstring() + common::FILE_NAME_SEPARATOR + DefaultChar('?');
-    static const Zstring asteriskSep     = Zstring(DefaultStr("*")) + common::FILE_NAME_SEPARATOR;
-    static const Zstring questionMarkSep = Zstring(DefaultStr("?")) + common::FILE_NAME_SEPARATOR;
+    static const Zstring sepAsterisk     = Zstring(common::FILE_NAME_SEPARATOR) + Zchar('*');
+    static const Zstring sepQuestionMark = Zstring(common::FILE_NAME_SEPARATOR) + Zchar('?');
+    static const Zstring asteriskSep     = Zstring(Zchar('*')) + common::FILE_NAME_SEPARATOR;
+    static const Zstring questionMarkSep = Zstring(Zchar('?')) + common::FILE_NAME_SEPARATOR;
 
 //--------------------------------------------------------------------------------------------------
     //add some syntactic sugar: handle beginning of filtername
@@ -127,50 +127,53 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
 }
 
 
-class MatchFound : public std::unary_function<Zstring, bool>
+namespace
 {
-public:
-    MatchFound(const Zstring& name) : name_(name) {}
-
-    bool operator()(const Zstring& mask) const
-    {
-        return Zstring::Matches(name_.c_str(), mask.c_str());
-    }
-private:
-    const Zstring& name_;
-};
-
-
+template <class T>
 inline
-bool matchesFilter(const Zstring& name, const std::set<Zstring>& filter)
+const T* cStringFind(const T* str1, T ch) //strchr()
 {
-#ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
-    Zstring nameFormatted = name;
-    nameFormatted.MakeUpper();
-#elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
-    const Zstring& nameFormatted = name; //nothing to do here
-#endif
-
-    return std::find_if(filter.begin(), filter.end(), MatchFound(nameFormatted)) != filter.end();
+    while (*str1 != ch) //ch is allowed to be 0 by contract! must return end of string in this case
+    {
+        if (*str1 == 0)
+            return NULL;
+        ++str1;
+    }
+    return str1;
 }
 
 
-//returns true if string matches at least the beginning of mask
-inline
-bool matchesMaskBegin(const DefaultChar* string, const DefaultChar* mask)
+bool matchesMask(const Zchar* string, const Zchar* mask)
 {
-    for (DefaultChar ch; (ch = *mask) != 0; ++mask, ++string)
+    for (Zchar ch; (ch = *mask) != 0; ++mask, ++string)
     {
-        if (*string == 0)
-            return true;
-
         switch (ch)
         {
-        case DefaultChar('?'):
+        case Zchar('?'):
+            if (*string == 0)
+                return false;
             break;
 
-        case DefaultChar('*'):
-            return true;
+        case Zchar('*'):
+            //advance to next non-*/? char
+            do
+            {
+                ++mask;
+                ch = *mask;
+            }
+            while (ch == Zchar('*') || ch == Zchar('?'));
+            //if match ends with '*':
+            if (ch == 0)
+                return true;
+
+            ++mask;
+            while ((string = cStringFind(string, ch)) != NULL)
+            {
+                ++string;
+                if (matchesMask(string, mask))
+                    return true;
+            }
+            return false;
 
         default:
             if (*string != ch)
@@ -180,17 +183,57 @@ bool matchesMaskBegin(const DefaultChar* string, const DefaultChar* mask)
     return *string == 0;
 }
 
+//returns true if string matches at least the beginning of mask
+inline
+bool matchesMaskBegin(const Zchar* string, const Zchar* mask)
+{
+    for (Zchar ch; (ch = *mask) != 0; ++mask, ++string)
+    {
+        if (*string == 0)
+            return true;
+
+        switch (ch)
+        {
+        case Zchar('?'):
+            break;
+
+        case Zchar('*'):
+            return true;
+
+        default:
+            if (*string != ch)
+                return false;
+        }
+    }
+    return *string == 0;
+}
+}
+
+
+class MatchFound : public std::unary_function<Zstring, bool>
+{
+public:
+    MatchFound(const Zstring& name) : name_(name) {}
+
+    bool operator()(const Zstring& mask) const
+    {
+        return matchesMask(name_, mask);
+    }
+private:
+    const Zstring& name_;
+};
+
 
 inline
-bool matchesFilterBegin(const Zstring& name, const std::set<Zstring>& filter)
+bool matchesFilter(const Zstring& nameFormatted, const std::set<Zstring>& filter)
 {
-#ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
-    Zstring nameFormatted = name;
-    nameFormatted.MakeUpper();
-#elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
-    const Zstring& nameFormatted = name; //nothing to do here
-#endif
+    return std::find_if(filter.begin(), filter.end(), MatchFound(nameFormatted)) != filter.end();
+}
 
+
+inline
+bool matchesFilterBegin(const Zstring& nameFormatted, const std::set<Zstring>& filter)
+{
     return std::find_if(filter.begin(), filter.end(),
                         boost::bind(matchesMaskBegin, nameFormatted.c_str(), _1)) != filter.end();
 }
@@ -201,10 +244,10 @@ std::vector<Zstring> compoundStringToFilter(const Zstring& filterString)
     //delimiters may be ';' or '\n'
     std::vector<Zstring> output;
 
-    const std::vector<Zstring> filterPreProcessing = filterString.Tokenize(wxT(';'));
+    const std::vector<Zstring> filterPreProcessing = filterString.Split(Zchar(';'));
     for (std::vector<Zstring>::const_iterator i = filterPreProcessing.begin(); i != filterPreProcessing.end(); ++i)
     {
-        const std::vector<Zstring> newEntries = i->Tokenize(wxT('\n'));
+        const std::vector<Zstring> newEntries = i->Split(Zchar('\n'));
         output.insert(output.end(), newEntries.begin(), newEntries.end());
     }
 
@@ -231,8 +274,15 @@ NameFilter::NameFilter(const Zstring& includeFilter, const Zstring& excludeFilte
 
 bool NameFilter::passFileFilter(const Zstring& relFilename) const
 {
-    return  matchesFilter(relFilename, filterFileIn) && //process include filters
-            !matchesFilter(relFilename, filterFileEx);  //process exclude filters
+#ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
+    Zstring nameFormatted = relFilename;
+    MakeUpper(nameFormatted);
+#elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
+    const Zstring& nameFormatted = relFilename; //nothing to do here
+#endif
+
+    return  matchesFilter(nameFormatted, filterFileIn) && //process include filters
+            !matchesFilter(nameFormatted, filterFileEx);  //process exclude filters
 }
 
 
@@ -240,18 +290,25 @@ bool NameFilter::passDirFilter(const Zstring& relDirname, bool* subObjMightMatch
 {
     assert(subObjMightMatch == NULL || *subObjMightMatch == true); //check correct usage
 
-    if (matchesFilter(relDirname, filterFolderEx)) //process exclude filters
+#ifdef FFS_WIN //Windows does NOT distinguish between upper/lower-case
+    Zstring nameFormatted = relDirname;
+    MakeUpper(nameFormatted);
+#elif defined FFS_LINUX //Linux DOES distinguish between upper/lower-case
+    const Zstring& nameFormatted = relDirname; //nothing to do here
+#endif
+
+    if (matchesFilter(nameFormatted, filterFolderEx)) //process exclude filters
     {
         if (subObjMightMatch)
             *subObjMightMatch = false; //exclude subfolders/subfiles as well
         return false;
     }
 
-    if (!matchesFilter(relDirname, filterFolderIn)) //process include filters
+    if (!matchesFilter(nameFormatted, filterFolderIn)) //process include filters
     {
         if (subObjMightMatch)
         {
-            const Zstring& subNameBegin = relDirname + common::FILE_NAME_SEPARATOR; //const-ref optimization
+            const Zstring& subNameBegin = nameFormatted + common::FILE_NAME_SEPARATOR; //const-ref optimization
 
             *subObjMightMatch = matchesFilterBegin(subNameBegin, filterFileIn) || //might match a file in subdirectory
                                 matchesFilterBegin(subNameBegin, filterFolderIn); //or another subdirectory
@@ -265,7 +322,7 @@ bool NameFilter::passDirFilter(const Zstring& relDirname, bool* subObjMightMatch
 
 bool NameFilter::isNull() const
 {
-    static NameFilter output(DefaultStr("*"), Zstring());
+    static NameFilter output(Zstr("*"), Zstring());
     return *this == output;
 }
 
@@ -294,7 +351,7 @@ bool NameFilter::cmpLessSameType(const BaseFilter& other) const
 
 Zstring NameFilter::uniqueClassIdentifier() const
 {
-    return DefaultStr("NameFilter");
+    return Zstr("NameFilter");
 }
 
 

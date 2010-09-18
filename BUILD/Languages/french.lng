@@ -90,8 +90,6 @@
 &Oui
 (Build: %x)
 (Généré : %x)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Notez que seuls les lecteurs FAT/FAT32 sont concernés par ce problème !\nDans tous les autres cas, vous pouvez désactiver le paramètre \"ignorer la différence d'une heure\".)
 (Requires an Internet connection!)
 (Nécessite une connexion Internet)
 - Other side's counterpart to %dir
@@ -274,14 +272,10 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 La copie des fichiers partagés ou verrouillés nécessite le Service Volume Shadow Copy\n(avec les droits administrateur)
 Copy to clipboard\tCTRL+C
 Copier dans le presse-papiers\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-Copie du Lien Symbolique %x remplaçant %y
-Copying Symbolic Link %x to %y
-Copie du Lien Symbolique %x vers %y
-Copying file %x overwriting %y
-Copie du fichier %x remplaçant %y
-Copying file %x to %y
-Copie le fichier %x vers %y
+Copying new Symbolic Link %x to %y
+Copie le nouveau Lien Symbolique %x vers %y
+Copying new file %x to %y
+Copie le nouveau fichier %x vers %y
 Could not determine volume name for file:
 Impossible de trouver le nom de volume pour le fichier :
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 Erreur lors du contrôle des données : Les fichiers source et destination ont des contenus différents !
 Date
 Date
-Delay
-Délai
-Delay between detection of changes and execution of command line in seconds
-Intervalle entre la détection des changements et l'exécution de la ligne de commande en secondes
 Delete files/folders existing on left side only
 Suppression des fichiers/dossiers n'existant que sur le côté gauche
 Delete files/folders existing on right side only
@@ -412,6 +402,8 @@ Error reading from synchronization database:
 Erreur lors de la lecture de la base de données de synchro :
 Error resolving symbolic link:
 Erreur lors de la résolution du lien symbolique :
+Error setting directory lock:
+Erreur lors du verrouillage du répertoire :
 Error setting privilege:
 Erreur de paramétrage de privilège
 Error starting Volume Shadow Copy Service!
@@ -458,8 +450,6 @@ File size and date
 Taille et date du fichier
 Filename
 Nom du fichier
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-Les fichiers %x ont une différence de date inférieure à 1 heure !\n\nIl est dangereux de décider quel est le plus récent à cause de l'heure d'été.
 Files %x have the same date but a different size!
 Les fichiers %x ont la même date mais une taille différente !
 Files are found equal if\n     - file content\nis the same
@@ -564,12 +554,12 @@ Homepage
 Accueil
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Identifier et propager les modifications des deux côtés en utilisant une base de données. Les suppressions et les conflits sont détectés automatiquement.
+Idle time between detection of last change and execution of command line in seconds
+Temps mort entre la détection de la dernière modification et l'éxécution de la ligne de commande en secondes
 If you like FFS
 Si vous aimez FFS
 Ignore
 Ignorer
-Ignore 1-hour file time difference
-Ignorer les diférences d'une heure
 Ignore errors
 Ignorer les erreurs
 Ignore subsequent errors
@@ -612,6 +602,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 La copie en tâche de fond sur WOW64 n'est pas possible. Utilisez pour cela la version 64 bits de FreeFileSync.
 Match case
 Respecter la casse
+Minimum Idle Time
+Temps mort minimum
 Mirror ->>
 Miroir ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -666,6 +658,10 @@ Operation:
 Opération :
 Overview
 Présentation
+Overwriting Symbolic Link %x in %y
+Remplacement du Lien Symbolique %x par %y
+Overwriting file %x in %y
+Remplacement du fichier %x par %y
 Pause
 Pause
 Paused
@@ -842,8 +838,6 @@ Total time:
 Durée totale :
 Transfer file and directory permissions\n(Requires Administrator rights)
 Transfert des attributs système des fichiers et des répertoires\n(avec les droits administrateur)
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-Traiter les heures qui diffèrent exactement de +/- 1 heure comme égales, et celles qui diffèrent de moins d'une heure comme conflit sur la gestion de l'heure d'été
 Unable to connect to sourceforge.net!
 Impossible de se connecter à sourceforge.net !
 Unable to create logfile!
@@ -870,6 +864,8 @@ Volume name %x not part of filename %y!
 Le nom de volume %x ne fait pas partie du nom de fichier %y !
 Waiting for all directories to become available...
 En attente de la disponibilité de tous les répertoires...
+Waiting while directory is locked (%x)...
+En attente tant que le répertoire est verrouillé (%x)...
 Warning
 Attention
 Warning: Synchronization failed for %x item(s):

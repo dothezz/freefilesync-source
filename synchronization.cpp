@@ -25,6 +25,7 @@
 #ifdef FFS_WIN
 #include "shared/long_path_prefix.h"
 #include <boost/scoped_ptr.hpp>
+#include "shared/perf.h"
 #endif
 
 using namespace ffs3;
@@ -502,7 +503,7 @@ Zstring getSessionDeletionDir(const Zstring& deletionDirectory, const Zstring& p
 
     //ensure uniqueness
     for (int i = 1; ffs3::somethingExists(output); ++i)
-        output = formattedDir + DefaultChar('_') + numberToZstring(i);
+        output = formattedDir + Zchar('_') + Zstring::fromNumber(i);
 
     output += common::FILE_NAME_SEPARATOR;
     return output;
@@ -524,12 +525,14 @@ SyncProcess::SyncProcess(xmlAccess::OptionalDialogs& warnings,
 
 namespace
 {
-void ensureExists(const Zstring& dirname, const Zstring& templateDir = Zstring(), bool copyFilePermissions = false) //throw (FileError)
+void ensureExists(const Zstring& dirname, const Zstring& templateDir, bool copyFilePermissions) //throw (FileError)
 {
     if (!dirname.empty()) //kind of pathological ?
         if (!ffs3::dirExists(dirname))
+        {
             //lazy creation of alternate deletion directory (including super-directories of targetFile)
             ffs3::createDirectory(dirname, templateDir, false, copyFilePermissions);
+        }
     /*symbolic link handling:
     if "not traversing symlinks": fullName == c:\syncdir<symlinks>\some\dirs\leaf<symlink>
     => setting irrelevant
@@ -593,24 +596,24 @@ DeletionHandling::DeletionHandling(const DeletionPolicy handleDel,
     switch (handleDel)
     {
     case DELETE_PERMANENTLY:
-        txtRemovingFile      = wxToZ(_("Deleting file %x")).Replace(DefaultStr("%x"), DefaultStr("\n\"%x\""), false);
-        txtRemovingSymlink   = wxToZ(_("Deleting Symbolic Link %x")).Replace(DefaultStr("%x"), DefaultStr("\n\"%x\""), false);
-        txtRemovingDirectory = wxToZ(_("Deleting folder %x")).Replace( DefaultStr("%x"), DefaultStr("\n\"%x\""), false);
+        txtRemovingFile      = wxToZ(_("Deleting file %x")).Replace(Zstr("%x"), Zstr("\n\"%x\""), false);
+        txtRemovingSymlink   = wxToZ(_("Deleting Symbolic Link %x")).Replace(Zstr("%x"), Zstr("\n\"%x\""), false);
+        txtRemovingDirectory = wxToZ(_("Deleting folder %x")).Replace( Zstr("%x"), Zstr("\n\"%x\""), false);
         break;
 
     case MOVE_TO_RECYCLE_BIN:
-        sessionDelDirLeft  = getSessionDeletionDir(baseDirLeft,  DefaultStr("FFS "));
-        sessionDelDirRight = getSessionDeletionDir(baseDirRight, DefaultStr("FFS "));
+        sessionDelDirLeft  = getSessionDeletionDir(baseDirLeft,  Zstr("FFS "));
+        sessionDelDirRight = getSessionDeletionDir(baseDirRight, Zstr("FFS "));
 
-        txtRemovingFile = txtRemovingSymlink = txtRemovingDirectory = wxToZ(_("Moving %x to Recycle Bin")).Replace(DefaultStr("%x"), DefaultStr("\"%x\""), false);
+        txtRemovingFile = txtRemovingSymlink = txtRemovingDirectory = wxToZ(_("Moving %x to Recycle Bin")).Replace(Zstr("%x"), Zstr("\"%x\""), false);
         break;
 
     case MOVE_TO_CUSTOM_DIRECTORY:
         sessionDelDirLeft = sessionDelDirRight = getSessionDeletionDir(custDelFolder);
 
-        txtRemovingFile      = wxToZ(_("Moving file %x to user-defined directory %y")).         Replace(DefaultStr("%x"), DefaultStr("\"%x\"\n"), false).Replace(DefaultStr("%y"), Zstring(DefaultStr("\"")) + custDelFolder + DefaultStr("\""), false);
-        txtRemovingDirectory = wxToZ(_("Moving folder %x to user-defined directory %y")).       Replace(DefaultStr("%x"), DefaultStr("\"%x\"\n"), false).Replace(DefaultStr("%y"), Zstring(DefaultStr("\"")) + custDelFolder + DefaultStr("\""), false);
-        txtRemovingSymlink   = wxToZ(_("Moving Symbolic Link %x to user-defined directory %y")).Replace(DefaultStr("%x"), DefaultStr("\"%x\"\n"), false).Replace(DefaultStr("%y"), Zstring(DefaultStr("\"")) + custDelFolder + DefaultStr("\""), false);
+        txtRemovingFile      = wxToZ(_("Moving file %x to user-defined directory %y")).         Replace(Zstr("%x"), Zstr("\"%x\"\n"), false).Replace(Zstr("%y"), Zstring(Zstr("\"")) + custDelFolder + Zstr("\""), false);
+        txtRemovingDirectory = wxToZ(_("Moving folder %x to user-defined directory %y")).       Replace(Zstr("%x"), Zstr("\"%x\"\n"), false).Replace(Zstr("%y"), Zstring(Zstr("\"")) + custDelFolder + Zstr("\""), false);
+        txtRemovingSymlink   = wxToZ(_("Moving Symbolic Link %x to user-defined directory %y")).Replace(Zstr("%x"), Zstr("\"%x\"\n"), false).Replace(Zstr("%y"), Zstring(Zstr("\"")) + custDelFolder + Zstr("\""), false);
         break;
     }
 }
@@ -689,12 +692,14 @@ const Zstring& DeletionHandling::getSessionDir<RIGHT_SIDE>() const
 }
 
 
+namespace
+{
 class MoveFileCallbackImpl : public MoveFileCallback //callback functionality
 {
 public:
     MoveFileCallbackImpl(StatusHandler& handler) : statusHandler_(handler) {}
 
-    virtual Response requestUiRefresh()  //DON'T throw exceptions here, at least in Windows build!
+    virtual Response requestUiRefresh(const Zstring& currentObject)  //DON'T throw exceptions here, at least in Windows build!
     {
 #ifdef FFS_WIN
         statusHandler_.requestUiRefresh(false); //don't allow throwing exception within this call: windows copying callback can't handle this
@@ -711,47 +716,66 @@ private:
 };
 
 
+struct RemoveDirCallbackImpl : public RemoveDirCallback
+{
+    RemoveDirCallbackImpl(StatusHandler& handler) : statusHandler_(handler) {}
+
+    virtual void requestUiRefresh(const Zstring& currentObject)
+    {
+        statusHandler_.requestUiRefresh(); //exceptions may be thrown here!
+    }
+
+private:
+    StatusHandler& statusHandler_;
+};
+}
+
+
 template <ffs3::SelectedSide side>
 void DeletionHandling::removeFile(const FileSystemObject& fileObj) const
 {
+    using namespace ffs3;
+
     switch (deletionType)
     {
-    case ffs3::DELETE_PERMANENTLY:
+    case DELETE_PERMANENTLY:
         ffs3::removeFile(fileObj.getFullName<side>());
         break;
 
-    case ffs3::MOVE_TO_RECYCLE_BIN:
-        if (ffs3::fileExists(fileObj.getFullName<side>()))
+    case MOVE_TO_RECYCLE_BIN:
+        if (fileExists(fileObj.getFullName<side>()))
         {
             const Zstring targetFile = getSessionDir<side>() + fileObj.getRelativeName<side>(); //altDeletionDir ends with path separator
             const Zstring targetDir  = targetFile.BeforeLast(common::FILE_NAME_SEPARATOR);
 
-            ensureExists(targetDir); //throw (FileError)
+            if (!dirExists(targetDir))
+                createDirectory(targetDir); //throw (FileError)
 
             try //rename file: no copying!!!
             {
                 //performance optimization!! Instead of moving each object into recycle bin separately, we rename them ony by one into a
                 //temporary directory and delete this directory only ONCE!
-                ffs3::renameFile(fileObj.getFullName<side>(), targetFile); //throw (FileError);
+                renameFile(fileObj.getFullName<side>(), targetFile); //throw (FileError);
             }
             catch (...)
             {
                 //if anything went wrong, move to recycle bin the standard way (single file processing: slow)
-                ffs3::moveToRecycleBin(fileObj.getFullName<side>());  //throw (FileError)
+                moveToRecycleBin(fileObj.getFullName<side>());  //throw (FileError)
             }
         }
         break;
 
-    case ffs3::MOVE_TO_CUSTOM_DIRECTORY:
-        if (ffs3::fileExists(fileObj.getFullName<side>()))
+    case MOVE_TO_CUSTOM_DIRECTORY:
+        if (fileExists(fileObj.getFullName<side>()))
         {
             const Zstring targetFile = getSessionDir<side>() + fileObj.getRelativeName<side>(); //altDeletionDir ends with path separator
             const Zstring targetDir  = targetFile.BeforeLast(common::FILE_NAME_SEPARATOR);
 
-            ensureExists(targetDir); //throw (FileError)
+            if (!dirExists(targetDir))
+                createDirectory(targetDir); //throw (FileError)
 
             MoveFileCallbackImpl callBack(statusUpdater_); //if file needs to be copied we need callback functionality to update screen and offer abort
-            ffs3::moveFile(fileObj.getFullName<side>(), targetFile, &callBack);
+            moveFile(fileObj.getFullName<side>(), targetFile, &callBack);
         }
         break;
     }
@@ -761,45 +785,52 @@ void DeletionHandling::removeFile(const FileSystemObject& fileObj) const
 template <ffs3::SelectedSide side>
 void DeletionHandling::removeFolder(const FileSystemObject& dirObj) const
 {
+    using namespace ffs3;
+
     switch (deletionType)
     {
-    case ffs3::DELETE_PERMANENTLY:
-        ffs3::removeDirectory(dirObj.getFullName<side>());
-        break;
+    case DELETE_PERMANENTLY:
+    {
+        RemoveDirCallbackImpl remDirCallback(statusUpdater_);
+        removeDirectory(dirObj.getFullName<side>(), &remDirCallback);
+    }
+    break;
 
-    case ffs3::MOVE_TO_RECYCLE_BIN:
-        if (ffs3::dirExists(dirObj.getFullName<side>()))
+    case MOVE_TO_RECYCLE_BIN:
+        if (dirExists(dirObj.getFullName<side>()))
         {
             const Zstring targetDir      = getSessionDir<side>() + dirObj.getRelativeName<side>();
             const Zstring targetSuperDir = targetDir.BeforeLast(common::FILE_NAME_SEPARATOR);
 
-            ensureExists(targetSuperDir); //throw (FileError)
+            if (!dirExists(targetSuperDir))
+                createDirectory(targetSuperDir); //throw (FileError)
 
             try //rename directory: no copying!!!
             {
                 //performance optimization!! Instead of moving each object into recycle bin separately, we rename them ony by one into a
                 //temporary directory and delete this directory only ONCE!
-                ffs3::renameFile(dirObj.getFullName<side>(), targetDir); //throw (FileError);
+                renameFile(dirObj.getFullName<side>(), targetDir); //throw (FileError);
             }
             catch (...)
             {
                 //if anything went wrong, move to recycle bin the standard way (single file processing: slow)
-                ffs3::moveToRecycleBin(dirObj.getFullName<side>());  //throw (FileError)
+                moveToRecycleBin(dirObj.getFullName<side>());  //throw (FileError)
 
             }
         }
         break;
 
-    case ffs3::MOVE_TO_CUSTOM_DIRECTORY:
-        if (ffs3::dirExists(dirObj.getFullName<side>()))
+    case MOVE_TO_CUSTOM_DIRECTORY:
+        if (dirExists(dirObj.getFullName<side>()))
         {
             const Zstring targetDir      = getSessionDir<side>() + dirObj.getRelativeName<side>();
             const Zstring targetSuperDir = targetDir.BeforeLast(common::FILE_NAME_SEPARATOR);
 
-            ensureExists(targetSuperDir); //throw (FileError)
+            if (!dirExists(targetSuperDir))
+                createDirectory(targetSuperDir); //throw (FileError)
 
             MoveFileCallbackImpl callBack(statusUpdater_); //if files need to be copied, we need callback functionality to update screen and offer abort
-            ffs3::moveDirectory(dirObj.getFullName<side>(), targetDir, true, &callBack);
+            moveDirectory(dirObj.getFullName<side>(), targetDir, true, &callBack);
         }
         break;
     }
@@ -872,12 +903,12 @@ public:
         delHandling_(delHandling),
         verifyCopiedFiles_(syncProc.verifyCopiedFiles_),
         copyFilePermissions_(syncProc.copyFilePermissions_),
-        txtCopyingFile    (wxToZ(_("Copying file %x to %y")).         Replace(DefaultStr("%x"), DefaultStr("\"%x\""), false).Replace(DefaultStr("%y"), DefaultStr("\n\"%y\""), false)),
-        txtCopyingLink    (wxToZ(_("Copying Symbolic Link %x to %y")).Replace(DefaultStr("%x"), DefaultStr("\"%x\""), false).Replace(DefaultStr("%y"), DefaultStr("\n\"%y\""), false)),
-        txtOverwritingFile(wxToZ(_("Copying file %x overwriting %y")).         Replace(DefaultStr("%x"), DefaultStr("\"%x\""), false).Replace(DefaultStr("%y"), DefaultStr("\n\"%y\""), false)),
-        txtOverwritingLink(wxToZ(_("Copying Symbolic Link %x overwriting %y")).Replace(DefaultStr("%x"), DefaultStr("\"%x\""), false).Replace(DefaultStr("%y"), DefaultStr("\n\"%y\""), false)),
-        txtCreatingFolder (wxToZ(_("Creating folder %x")).Replace(DefaultStr("%x"), DefaultStr("\n\"%x\""), false)),
-        txtVerifying      (wxToZ(_("Verifying file %x")). Replace(DefaultStr("%x"), DefaultStr("\n\"%x\""), false)) {}
+        txtCopyingFile    (wxToZ(_("Copying new file %x to %y")).     Replace(Zstr("%x"), Zstr("\"%x\""), false).Replace(Zstr("%y"), Zstr("\n\"%y\""), false)),
+        txtCopyingLink    (wxToZ(_("Copying new Symbolic Link %x to %y")).Replace(Zstr("%x"), Zstr("\"%x\""), false).Replace(Zstr("%y"), Zstr("\n\"%y\""), false)),
+        txtOverwritingFile(wxToZ(_("Overwriting file %x in %y")).       Replace(Zstr("%x"), Zstr("\"%x\""), false).Replace(Zstr("%y"), Zstr("\n\"%y\""), false)),
+        txtOverwritingLink(wxToZ(_("Overwriting Symbolic Link %x in %y")).Replace(Zstr("%x"), Zstr("\"%x\""), false).Replace(Zstr("%y"), Zstr("\n\"%y\""), false)),
+        txtCreatingFolder (wxToZ(_("Creating folder %x")).Replace(Zstr("%x"), Zstr("\n\"%x\""), false)),
+        txtVerifying      (wxToZ(_("Verifying file %x")). Replace(Zstr("%x"), Zstr("\n\"%x\""), false)) {}
 
 
     template <bool reduceDiskSpace> //"true" if files deletion shall happen only
@@ -986,9 +1017,9 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
         target = fileObj.getBaseDirPf<LEFT_SIDE>() + fileObj.getRelativeName<RIGHT_SIDE>();
 
         statusText = txtCopyingFile;
-        statusText.Replace(DefaultStr("%x"), fileObj.getShortName<RIGHT_SIDE>(), false);
-        statusText.Replace(DefaultStr("%y"), target.BeforeLast(common::FILE_NAME_SEPARATOR), false);
-        statusUpdater_.updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), fileObj.getShortName<RIGHT_SIDE>(), false);
+        statusText.Replace(Zstr("%y"), target.BeforeLast(common::FILE_NAME_SEPARATOR), false);
+        statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         copyFileUpdating(fileObj.getFullName<RIGHT_SIDE>(), target, fileObj.getFileSize<RIGHT_SIDE>());
@@ -998,9 +1029,9 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
         target = fileObj.getBaseDirPf<RIGHT_SIDE>() + fileObj.getRelativeName<LEFT_SIDE>();
 
         statusText = txtCopyingFile;
-        statusText.Replace(DefaultStr("%x"), fileObj.getShortName<LEFT_SIDE>(), false);
-        statusText.Replace(DefaultStr("%y"), target.BeforeLast(common::FILE_NAME_SEPARATOR), false);
-        statusUpdater_.updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), fileObj.getShortName<LEFT_SIDE>(), false);
+        statusText.Replace(Zstr("%y"), target.BeforeLast(common::FILE_NAME_SEPARATOR), false);
+        statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         copyFileUpdating(fileObj.getFullName<LEFT_SIDE>(), target, fileObj.getFileSize<LEFT_SIDE>());
@@ -1008,8 +1039,8 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
 
     case SO_DELETE_LEFT:
         statusText = delHandling_.getTxtRemovingFile();
-        statusText.Replace(DefaultStr("%x"), fileObj.getFullName<LEFT_SIDE>(), false);
-        statusUpdater_.updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), fileObj.getFullName<LEFT_SIDE>(), false);
+        statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         delHandling_.removeFile<LEFT_SIDE>(fileObj); //throw FileError()
@@ -1017,8 +1048,8 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
 
     case SO_DELETE_RIGHT:
         statusText = delHandling_.getTxtRemovingFile();
-        statusText.Replace(DefaultStr("%x"), fileObj.getFullName<RIGHT_SIDE>(), false);
-        statusUpdater_.updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), fileObj.getFullName<RIGHT_SIDE>(), false);
+        statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         delHandling_.removeFile<RIGHT_SIDE>(fileObj); //throw FileError()
@@ -1028,9 +1059,9 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
         target = fileObj.getBaseDirPf<RIGHT_SIDE>() + fileObj.getRelativeName<LEFT_SIDE>();
 
         statusText = txtOverwritingFile;
-        statusText.Replace(DefaultStr("%x"), fileObj.getShortName<LEFT_SIDE>(), false);
-        statusText.Replace(DefaultStr("%y"), fileObj.getFullName<RIGHT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR), false);
-        statusUpdater_.updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), fileObj.getShortName<LEFT_SIDE>(), false);
+        statusText.Replace(Zstr("%y"), fileObj.getFullName<RIGHT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR), false);
+        statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         delHandling_.removeFile<RIGHT_SIDE>(fileObj); //throw FileError()
@@ -1043,9 +1074,9 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
         target = fileObj.getBaseDirPf<LEFT_SIDE>() + fileObj.getRelativeName<RIGHT_SIDE>();
 
         statusText = txtOverwritingFile;
-        statusText.Replace(DefaultStr("%x"), fileObj.getShortName<RIGHT_SIDE>(), false);
-        statusText.Replace(DefaultStr("%y"), fileObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR), false);
-        statusUpdater_.updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), fileObj.getShortName<RIGHT_SIDE>(), false);
+        statusText.Replace(Zstr("%y"), fileObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR), false);
+        statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         delHandling_.removeFile<LEFT_SIDE>(fileObj); //throw FileError()
@@ -1080,9 +1111,9 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
         target = linkObj.getBaseDirPf<LEFT_SIDE>() + linkObj.getRelativeName<RIGHT_SIDE>();
 
         statusText = txtCopyingLink;
-        statusText.Replace(DefaultStr("%x"), linkObj.getShortName<RIGHT_SIDE>(), false);
-        statusText.Replace(DefaultStr("%y"), target.BeforeLast(common::FILE_NAME_SEPARATOR), false);
-        statusUpdater_.updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), linkObj.getShortName<RIGHT_SIDE>(), false);
+        statusText.Replace(Zstr("%y"), target.BeforeLast(common::FILE_NAME_SEPARATOR), false);
+        statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         copySymlink(linkObj.getFullName<RIGHT_SIDE>(), target, linkObj.getLinkType<RIGHT_SIDE>());
@@ -1092,9 +1123,9 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
         target = linkObj.getBaseDirPf<RIGHT_SIDE>() + linkObj.getRelativeName<LEFT_SIDE>();
 
         statusText = txtCopyingLink;
-        statusText.Replace(DefaultStr("%x"), linkObj.getShortName<LEFT_SIDE>(), false);
-        statusText.Replace(DefaultStr("%y"), target.BeforeLast(common::FILE_NAME_SEPARATOR), false);
-        statusUpdater_.updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), linkObj.getShortName<LEFT_SIDE>(), false);
+        statusText.Replace(Zstr("%y"), target.BeforeLast(common::FILE_NAME_SEPARATOR), false);
+        statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         copySymlink(linkObj.getFullName<LEFT_SIDE>(), target, linkObj.getLinkType<LEFT_SIDE>());
@@ -1102,8 +1133,8 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
 
     case SO_DELETE_LEFT:
         statusText = delHandling_.getTxtRemovingSymLink();
-        statusText.Replace(DefaultStr("%x"), linkObj.getFullName<LEFT_SIDE>(), false);
-        statusUpdater_.updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), linkObj.getFullName<LEFT_SIDE>(), false);
+        statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         deleteSymlink<LEFT_SIDE>(linkObj); //throw FileError()
@@ -1111,8 +1142,8 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
 
     case SO_DELETE_RIGHT:
         statusText = delHandling_.getTxtRemovingSymLink();
-        statusText.Replace(DefaultStr("%x"), linkObj.getFullName<RIGHT_SIDE>(), false);
-        statusUpdater_.updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), linkObj.getFullName<RIGHT_SIDE>(), false);
+        statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         deleteSymlink<RIGHT_SIDE>(linkObj); //throw FileError()
@@ -1122,9 +1153,9 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
         target = linkObj.getBaseDirPf<RIGHT_SIDE>() + linkObj.getRelativeName<LEFT_SIDE>();
 
         statusText = txtOverwritingLink;
-        statusText.Replace(DefaultStr("%x"), linkObj.getShortName<LEFT_SIDE>(), false);
-        statusText.Replace(DefaultStr("%y"), linkObj.getFullName<RIGHT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR), false);
-        statusUpdater_.updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), linkObj.getShortName<LEFT_SIDE>(), false);
+        statusText.Replace(Zstr("%y"), linkObj.getFullName<RIGHT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR), false);
+        statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         deleteSymlink<RIGHT_SIDE>(linkObj); //throw FileError()
@@ -1137,9 +1168,9 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
         target = linkObj.getBaseDirPf<LEFT_SIDE>() + linkObj.getRelativeName<RIGHT_SIDE>();
 
         statusText = txtOverwritingLink;
-        statusText.Replace(DefaultStr("%x"), linkObj.getShortName<RIGHT_SIDE>(), false);
-        statusText.Replace(DefaultStr("%y"), linkObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR), false);
-        statusUpdater_.updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), linkObj.getShortName<RIGHT_SIDE>(), false);
+        statusText.Replace(Zstr("%y"), linkObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR), false);
+        statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         deleteSymlink<LEFT_SIDE>(linkObj); //throw FileError()
@@ -1175,8 +1206,8 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
         target = dirObj.getBaseDirPf<LEFT_SIDE>() + dirObj.getRelativeName<RIGHT_SIDE>();
 
         statusText = txtCreatingFolder;
-        statusText.Replace(DefaultStr("%x"), target, false);
-        statusUpdater_.updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), target, false);
+        statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         //some check to catch the error that directory on source has been deleted externally after "compare"...
@@ -1189,8 +1220,8 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
         target = dirObj.getBaseDirPf<RIGHT_SIDE>() + dirObj.getRelativeName<LEFT_SIDE>();
 
         statusText = txtCreatingFolder;
-        statusText.Replace(DefaultStr("%x"), target, false);
-        statusUpdater_.updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), target, false);
+        statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         //some check to catch the error that directory on source has been deleted externally after "compare"...
@@ -1202,8 +1233,8 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
     case SO_DELETE_LEFT:
         //status information
         statusText = delHandling_.getTxtRemovingDir();
-        statusText.Replace(DefaultStr("%x"), dirObj.getFullName<LEFT_SIDE>(), false);
-        statusUpdater_.updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), dirObj.getFullName<LEFT_SIDE>(), false);
+        statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         delHandling_.removeFolder<LEFT_SIDE>(dirObj); //throw FileError()
@@ -1221,8 +1252,8 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
     case SO_DELETE_RIGHT:
         //status information
         statusText = delHandling_.getTxtRemovingDir();
-        statusText.Replace(DefaultStr("%x"), dirObj.getFullName<RIGHT_SIDE>(), false);
-        statusUpdater_.updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), dirObj.getFullName<RIGHT_SIDE>(), false);
+        statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
         delHandling_.removeFolder<RIGHT_SIDE>(dirObj); //throw FileError()
@@ -1297,10 +1328,16 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
     if (syncConfig.size() != folderCmp.size())
         throw std::logic_error("Programming Error: Contract violation!");
 
+    std::vector<std::pair<bool, bool> > baseDirNeeded;
+
     for (FolderComparison::const_iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
     {
-        const SyncStatistics statisticsFolderPair(*j);
         const FolderPairSyncCfg& folderPairCfg = syncConfig[j - folderCmp.begin()];
+        const SyncStatistics statisticsFolderPair(*j);
+
+        //save information whether base directories need to be created (if not yet existing)
+        baseDirNeeded.push_back(std::make_pair(statisticsFolderPair.getCreate(true, false) > 0,
+                                               statisticsFolderPair.getCreate(false, true) > 0));
 
         if (statisticsFolderPair.getOverwrite() + statisticsFolderPair.getDelete() > 0)
         {
@@ -1409,9 +1446,9 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         {
             statusUpdater_.requestUiRefresh();
         }
-        virtual void updateStatusText(const Zstring& text)
+        virtual void reportInfo(const Zstring& text)
         {
-            statusUpdater_.updateStatusText(text);
+            statusUpdater_.reportInfo(text);
         }
     private:
         StatusHandler& statusUpdater_;
@@ -1430,7 +1467,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             const FolderPairSyncCfg& folderPairCfg = syncConfig[j - folderCmp.begin()];
 
             //exclude some pathological case (leftdir, rightdir are empty)
-            if (j->getBaseDir<LEFT_SIDE>() == j->getBaseDir<RIGHT_SIDE>())
+            if (EqualFilename()(j->getBaseDir<LEFT_SIDE>(), j->getBaseDir<RIGHT_SIDE>()))
                 continue;
 
 //------------------------------------------------------------------------------------------
@@ -1441,7 +1478,22 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             const wxString statusTxt = wxString(_("Processing folder pair:")) + wxT(" \n") +
                                        wxT("\t") + left  + wxT("\"") + zToWx(j->getBaseDir<LEFT_SIDE>())  + wxT("\"")+ wxT(" \n") +
                                        wxT("\t") + right + wxT("\"") + zToWx(j->getBaseDir<RIGHT_SIDE>()) + wxT("\"");
-            statusUpdater.updateStatusText(wxToZ(statusTxt));
+            statusUpdater.reportInfo(wxToZ(statusTxt));
+//------------------------------------------------------------------------------------------
+            //(try to) create base dir first -> no symlink or attribute copying!
+            if (baseDirNeeded[j - folderCmp.begin()].first)
+                try
+                {
+                    ffs3::createDirectory(j->getBaseDir<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR));
+                }
+                catch (...) {}
+
+            if (baseDirNeeded[j - folderCmp.begin()].second)
+                try //create base dir first -> no symlink or attribute copying!
+                {
+                    ffs3::createDirectory(j->getBaseDir<RIGHT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR));
+                }
+                catch (...) {}
 //------------------------------------------------------------------------------------------
 
             //generate name of alternate deletion directory (unique for session AND folder pair)
@@ -1485,7 +1537,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             //update synchronization database (automatic sync only)
             if (folderPairCfg.inAutomaticMode)
             {
-                statusUpdater.updateStatusText(wxToZ(_("Generating database...")));
+                statusUpdater.reportInfo(wxToZ(_("Generating database...")));
                 statusUpdater.forceUiRefresh();
                 tryReportingError(statusUpdater, boost::bind(ffs3::saveToDisk, boost::cref(*j))); //these call may throw in error-callback!
             }
@@ -1694,8 +1746,8 @@ private:
 void SynchronizeFolderPair::verifyFileCopy(const Zstring& source, const Zstring& target) const
 {
     Zstring statusText = txtVerifying;
-    statusText.Replace(DefaultStr("%x"), target, false);
-    statusUpdater_.updateStatusText(statusText);
+    statusText.Replace(Zstr("%x"), target, false);
+    statusUpdater_.reportInfo(statusText);
     statusUpdater_.requestUiRefresh(); //trigger display refresh
 
     VerifyStatusUpdater callback(statusUpdater_);

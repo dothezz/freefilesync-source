@@ -3,35 +3,35 @@
 %x / %y objects deleted successfully
 %x / %y objectos eliminados com sucesso
 %x Byte
-
+%x Byte
 %x GB
-
+%x GB
 %x MB
-
+%x MB
 %x PB
-
+%x PB
 %x TB
-
+%x TB
 %x day(s)
-
+%x dia(s)
 %x directories
 %x pastas
 %x files
 %x ficheiros
 %x hour(s)
-
+%x hora(s)
 %x kB
-
+%x kB
 %x min
-
+%x min(s)
 %x of %y rows in view
 %x de %y ficheiros
 %x of 1 row in view
 %x de 1 linha
 %x sec
-
+%x seg(s)
 %x%
-
+%x%
 &Abort
 &Abortar
 &About...
@@ -85,13 +85,11 @@
 &Save
 &Guardar
 &Switch
-
+&Trocar
 &Yes
 &Sim
 (Build: %x)
-
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Apenas as drives FAT/FAT32 são afectadas por este problema! \nPara todas as outras situações pode desactivar a opção \"ignorar diferença de 1 hora\".)
+(Build: %x)
 (Requires an Internet connection!)
 (Necessita acesso à Internet!)
 - Other side's counterpart to %dir
@@ -151,7 +149,7 @@
 <Last session>
 <Última Sessão>
 <Symlink>
-
+<Link Simbólico>
 <multiple selection>
 <Selecção Múltipla>
 A newer version of FreeFileSync is available:
@@ -197,7 +195,7 @@ Ambos os lados tiveram alterações desde a última sincronização!
 Browse
 Procurar
 Browse directory
-
+Procurar directório
 Cannot determine sync-direction:
 Não é possível saber a direcção de sincronização:
 Cannot find %x
@@ -205,7 +203,7 @@ Não é possível descobrir %x
 Category
 Categoria
 Clear filter settings
-
+Limpar opções do filtro
 Comma separated list
 Lista de itens separados por virgula
 Command line
@@ -257,7 +255,7 @@ Continuar
 Conversion error:
 Erro de conversão:
 Copy filesystem permissions
-
+Copiar permissões do sistema de ficheiros
 Copy from left to right
 Copiar da esquerda para a direita
 Copy from left to right overwriting
@@ -271,17 +269,13 @@ Copiar ficheiros bloqueados
 Copy new or updated files to right folder.
 Copiar ficheiros novos ou actualizados para a direita
 Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
-
+Copiar ficheiros partilhados ou bloqueados usando o serviço Volume Shadow Copy\n (Requer direitos de administrador)
 Copy to clipboard\tCTRL+C
 Copiar para a Área de transferência\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-
-Copying Symbolic Link %x to %y
-
-Copying file %x overwriting %y
-
-Copying file %x to %y
-Copiar ficheiro %x para %y
+Copying new Symbolic Link %x to %y
+Copiar novo link simbólico %x para %y
+Copying new file %x to %y
+Copiar novo ficheiro %x para %y
 Could not determine volume name for file:
 Não é possível determinar o nome do volume para o ficheiro:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 Erro na verificação de dados: ficheiro fonte e de destino têm conteúdo diferente!
 Date
 Data
-Delay
-Atraso
-Delay between detection of changes and execution of command line in seconds
-Atraso entre a detecção de diferenças e a execuçao dos comandos em segundos
 Delete files/folders existing on left side only
 Eliminar itens existentes apenas no lado esquerdo
 Delete files/folders existing on right side only
@@ -327,7 +317,7 @@ Apagar ou substituir ficheiros permanentemente
 Delete permanently
 Apagar permanentemente
 Deleting Symbolic Link %x
-
+Apagar link simbólico %x
 Deleting file %x
 Apagar ficheiro %x
 Deleting folder %x
@@ -337,7 +327,7 @@ Controlo eliminação
 Description
 Descrição
 Direct
-
+Direto
 Directories are dependent! Be careful when setting up synchronization rules:
 Directórios são dependentes! Cuidado ao definir as regras de sincronização:
 Directories to watch
@@ -363,11 +353,11 @@ Fazer download agora?
 Drag && drop
 Pegar && largar
 Elements found:
-
+ELementos encontrados:
 Elements processed:
-
+Elementos processados:
 Elements remaining:
-
+Elementos restantes:
 Email
 Email
 Endless loop when traversing directory:
@@ -377,7 +367,7 @@ Erro
 Error changing modification time:
 Erro ao mudar a hora de modificação:
 Error copying file permissions:
-
+Erro ao copiar permissões dos ficheiros:
 Error copying file:
 Erro ao copiar ficheiro:
 Error copying locked file %x!
@@ -412,8 +402,10 @@ Error reading from synchronization database:
 Erro ao ler a base de dados de sincronização:
 Error resolving symbolic link:
 Erro na resolução do link simbólico:
+Error setting directory lock:
+Erro ao bloquear directório:
 Error setting privilege:
-
+Erro ao estabelecer privilégios:
 Error starting Volume Shadow Copy Service!
 Erro ao iniciar o serviço Volume Shadow Copy!
 Error traversing directory:
@@ -458,8 +450,6 @@ File size and date
 Data e tamanho do ficheiro
 Filename
 Nome do ficheiro
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-Os ficheiros %x têm uma diferença de tempo inferior a 1 hora!\n\nNão é seguro decidir qual o mais novo devido às mudanças de Hora de Verão.
 Files %x have the same date but a different size!
 Os ficheiros %x têm a mesma data, mas tamanho diferente!
 Files are found equal if\n     - file content\nis the same
@@ -473,7 +463,7 @@ Ficheiros existentes dos dois lados, à esquerda é mais recente
 Files that exist on both sides, right one is newer
 Ficheiros existentes dos dois lados, à direita é mais recente
 Files that have different content
-
+Ficheiros com conteúdo diferente
 Files/folders that exist on left side only
 Ficheiros/pastas existentes somente à esquerda
 Files/folders that exist on right side only
@@ -481,15 +471,15 @@ Ficheiros/pastas existentes somente à direita
 Filter files
 Filtrar ficheiros
 Filter is active
-
+Filtro activo
 Filter settings have changed!
 Opções de filtro alteradas!
 Filter view
 Filtrar vista
 Filter: All pairs
-
+Filtro: Todos os pares
 Filter: Single pair
-
+Filtro: Par simples
 Find
 Procurar
 Find what:
@@ -497,7 +487,7 @@ Procurar:
 Folder Comparison and Synchronization
 Comparação e Sincronização de pastas
 Follow
-
+Seguir
 Free disk space available:
 Espaço livre em disco:
 FreeFileSync Batch Job
@@ -564,12 +554,12 @@ Homepage
 Site
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Identificar e propagar as mudanças usando base de dados. Eliminações e conflitos serão detectados automaticamente.
+Idle time between detection of last change and execution of command line in seconds
+Tempo de espera entre a última alteração e a execução do comando em segundos
 If you like FFS
 Se gosta do FreeFileSync
 Ignore
-
-Ignore 1-hour file time difference
-Ignorar diferenças de 1 hora entre ficheiros
+Ignorar
 Ignore errors
 Ignorar erros
 Ignore subsequent errors
@@ -593,7 +583,7 @@ Sincronização inicial:
 Integrate external applications into context menu. The following macros are available:
 Integrar aplicações externas no menu de contexto. As seguintes macros estão disponíveis:
 Invalid FreeFileSync config file!
-
+Ficheiro de configuração do FreeFileSync inválido!
 Leave as unresolved conflict
 Deixar como conflito
 Left
@@ -611,7 +601,9 @@ A escrever em log
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Fazer cópias fantasma em WOW64 não é suportado. Por favor usar a versão 64-bit.
 Match case
-
+Correspondência
+Minimum Idle Time
+Tempo de espera mínimo
 Mirror ->>
 Espelhar ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -629,7 +621,7 @@ Mover ficheiros para uma pasta com a data
 Moving %x to Recycle Bin
 A mover %x para a Reciclagem
 Moving Symbolic Link %x to user-defined directory %y
-
+A mover link simbólico %x para o directório %y
 Moving file %x to user-defined directory %y
 A mover ficheiro %x para o directório &y
 Moving folder %x to user-defined directory %y
@@ -659,23 +651,27 @@ Apenas ficheiros/directórios que passem o filtro serão seleccionados para sinc
 Open with Explorer
 Abrir com o Explorer
 Open with default application
-
+Abrir com a aplicação associada
 Operation aborted!
 Operação abortada!
 Operation:
 Operação:
 Overview
 Vista
+Overwriting Symbolic Link %x in %y
+Sobrepor link simbólico %x em %y
+Overwriting file %x in %y
+Sobrepor ficheiro %x em %y
 Pause
 Pausa
 Paused
 Em pausa
 Planned directory deletion is in conflict with its subdirectories and -files!
-
+Eliminação de directorio planeada está em conflito com subdirectorios e/ou ficheiros!
 Please run a Compare first before synchronizing!
 Use Comparar antes da primeira sincronização!
 Press \"Switch\" to open FreeFileSync GUI mode.
-
+Clique \"Trocar\" para abrir o GUI do FreeFileSync.
 Processing folder pair:
 A processar o par do directorio:
 Published under the GNU General Public License:
@@ -785,17 +781,17 @@ Iniciar a sincronização
 Statistics
 Estatísticas
 Status feedback
-
+Retorno de estado
 Stop
 Parar
 Swap sides
 Trocar lados
 Switching to FreeFileSync GUI mode...
-
+A abrir o GUI do FreeFileSync...
 Symbolic Link handling
-
+Tratamento de links simbólicos
 Symlinks %x have the same date but a different target!
-
+Links simbólicos %x tem a mesma data mas diferente destino!
 Synchronization Preview
 Previsualizar sincronização
 Synchronization aborted!
@@ -806,8 +802,6 @@ Synchronization completed with errors!
 Sincronização completa com erros!
 Synchronization settings
 Parâmetros de sincronização
-Synchronization status
-Estado da sincronização
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Sincronizar todos os ficheiros .doc, .zip e .exe excepto os da pasta \"temp\".
 Synchronize...
@@ -821,11 +815,11 @@ Directório de destino já existe!
 Target file already existing!
 Ficheiro de destino já existe!
 The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-
+A linha de comandos é executada cada vez que:\n- os directórios ficam disponíveis (i.e. pen USB)\n- ficheiros nos directórios ou subdirectórios são modificados
 The file does not contain a valid configuration:
 O ficheiro não contém uma configuração válida:
 The file was not processed by last synchronization!
-
+O ficheiro não foi processado na última sincronização!
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Esta variante avalia dois ficheiros de nome igual como iguais quando têm o mesmo tamanho e a mesma data e hora de modificação.
 Time
@@ -841,9 +835,7 @@ Espaço livre necessário:
 Total time:
 Tempo total:
 Transfer file and directory permissions\n(Requires Administrator rights)
-
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-Tratar ficheiros com exactamente +/- 1 hora como iguais, e menos de 1 hora como conflito, para salvaguardar a alteração da Hora de Verão
+Transferir ficheiro e permissões\n(Requer direitos de administrador)
 Unable to connect to sourceforge.net!
 Não é possível ligar a sourceforge.net!
 Unable to create logfile!
@@ -869,7 +861,9 @@ A verificar ficheiro %x
 Volume name %x not part of filename %y!
 Nome do volume %x não faz parte do ficheiro %y!
 Waiting for all directories to become available...
-
+Aguardando que todos os directorios fiquem disponíveis...
+Waiting while directory is locked (%x)...
+Aguardando enquanto o directório é bloqueado (%x)...
 Warning
 Atenção
 Warning: Synchronization failed for %x item(s):

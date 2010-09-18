@@ -25,9 +25,13 @@
 #include "library/binary.h"
 #include "library/dir_lock.h"
 
+#ifdef FFS_WIN
+#include "shared/perf.h"
+#endif
+
 using namespace ffs3;
 
-const Zstring LOCK_FILE_ENDING = DefaultStr("ffs_lock");
+const Zstring LOCK_FILE_ENDING = Zstr("ffs_lock");
 
 
 std::vector<ffs3::FolderPairCfg> ffs3::extractCompareCfg(const MainConfiguration& mainCfg)
@@ -76,9 +80,9 @@ public:
 
     virtual ~DirCallback() {}
 
-    virtual void onFile(const DefaultChar* shortName, const Zstring& fullName, const FileInfo& details);
-    virtual void onSymlink(const DefaultChar* shortName, const Zstring& fullName, const SymlinkInfo& details);
-    virtual ReturnValDir onDir(const DefaultChar* shortName, const Zstring& fullName);
+    virtual void onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details);
+    virtual void onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details);
+    virtual ReturnValDir onDir(const Zchar* shortName, const Zstring& fullName);
     virtual void onError(const wxString& errorText);
 
 private:
@@ -103,7 +107,7 @@ public:
         textScanning(wxToZ(wxString(_("Scanning:")) + wxT(" \n"))),
         filterInstance(filter) {}
 
-    virtual void onFile(const DefaultChar* shortName, const Zstring& fullName, const TraverseCallback::FileInfo& details);
+    virtual void onFile(const Zchar* shortName, const Zstring& fullName, const TraverseCallback::FileInfo& details);
 
 private:
     typedef boost::shared_ptr<const DirCallback> CallbackPointer;
@@ -116,17 +120,17 @@ private:
 };
 
 
-void DirCallback::onFile(const DefaultChar* shortName, const Zstring& fullName, const FileInfo& details)
+void DirCallback::onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details)
 {
     //assemble status message (performance optimized)  = textScanning + wxT("\"") + fullName + wxT("\"")
     Zstring statusText = baseCallback_->textScanning;
     statusText.reserve(statusText.length() + fullName.length() + 2);
-    statusText += DefaultChar('\"');
+    statusText += Zchar('\"');
     statusText += fullName;
-    statusText += DefaultChar('\"');
+    statusText += Zchar('\"');
 
     //update UI/commandline status information
-    statusHandler->updateStatusText(statusText);
+    statusHandler->reportInfo(statusText);
 
 //------------------------------------------------------------------------------------
     //apply filter before processing (use relative name!)
@@ -155,7 +159,7 @@ void DirCallback::onFile(const DefaultChar* shortName, const Zstring& fullName, 
 }
 
 
-void DirCallback::onSymlink(const DefaultChar* shortName, const Zstring& fullName, const SymlinkInfo& details)
+void DirCallback::onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details)
 {
     if (baseCallback_->handleSymlinks_ == SYMLINK_IGNORE)
         return;
@@ -163,12 +167,12 @@ void DirCallback::onSymlink(const DefaultChar* shortName, const Zstring& fullNam
     //assemble status message (performance optimized)  = textScanning + wxT("\"") + fullName + wxT("\"")
     Zstring statusText = baseCallback_->textScanning;
     statusText.reserve(statusText.length() + fullName.length() + 2);
-    statusText += DefaultChar('\"');
+    statusText += Zchar('\"');
     statusText += fullName;
-    statusText += DefaultChar('\"');
+    statusText += Zchar('\"');
 
     //update UI/commandline status information
-    statusHandler->updateStatusText(statusText);
+    statusHandler->reportInfo(statusText);
 
 //------------------------------------------------------------------------------------
     const Zstring& relName = relNameParentPf_ + shortName;
@@ -189,19 +193,19 @@ void DirCallback::onSymlink(const DefaultChar* shortName, const Zstring& fullNam
 }
 
 
-TraverseCallback::ReturnValDir DirCallback::onDir(const DefaultChar* shortName, const Zstring& fullName)
+TraverseCallback::ReturnValDir DirCallback::onDir(const Zchar* shortName, const Zstring& fullName)
 {
     using common::FILE_NAME_SEPARATOR;
 
     //assemble status message (performance optimized)  = textScanning + wxT("\"") + fullName + wxT("\"")
     Zstring statusText = baseCallback_->textScanning;
     statusText.reserve(statusText.length() + fullName.length() + 2);
-    statusText += DefaultChar('\"');
+    statusText += Zchar('\"');
     statusText += fullName;
-    statusText += DefaultChar('\"');
+    statusText += Zchar('\"');
 
     //update UI/commandline status information
-    statusHandler->updateStatusText(statusText);
+    statusHandler->reportInfo(statusText);
 
 //------------------------------------------------------------------------------------
     const Zstring& relName = relNameParentPf_ + shortName;
@@ -226,7 +230,7 @@ TraverseCallback::ReturnValDir DirCallback::onDir(const DefaultChar* shortName, 
     DirCallback* subDirCallback = new DirCallback(baseCallback_, relName + FILE_NAME_SEPARATOR, subDir, statusHandler);
     baseCallback_->callBackBox.push_back(BaseDirCallback::CallbackPointer(subDirCallback)); //handle ownership
     //attention: ensure directory filtering is applied later to exclude actually filtered directories
-    return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), subDirCallback);
+    return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), *subDirCallback);
 }
 
 
@@ -245,14 +249,18 @@ void DirCallback::onError(const wxString& errorText)
 }
 
 
-void BaseDirCallback::onFile(const DefaultChar* shortName, const Zstring& fullName, const TraverseCallback::FileInfo& details)
+void BaseDirCallback::onFile(const Zchar* shortName, const Zstring& fullName, const TraverseCallback::FileInfo& details)
 {
     //do not list the database file(s) sync.ffs_db, sync.x64.ffs_db, etc. or lock files
-    const Zstring& ending = Zstring(shortName).AfterLast(DefaultChar('.')); //(returns the whole string if ch not found)
-
-    if (    cmpFileName(ending, SYNC_DB_FILE_ENDING) == 0 ||
-            cmpFileName(ending, LOCK_FILE_ENDING)    == 0)
-        return;
+    const Zstring fileName(shortName);
+    const size_t pos = fileName.rfind(Zchar('.'));
+    if (pos != Zstring::npos)
+    {
+        const Zstring ending(shortName + pos + 1); //(returns the whole string if ch not found)
+        if (    EqualFilename()(ending, SYNC_DB_FILE_ENDING) ||
+                EqualFilename()(ending, LOCK_FILE_ENDING))
+            return;
+    }
 
     DirCallback::onFile(shortName, fullName, details);
 }
@@ -273,9 +281,8 @@ struct DirBufferKey
 
     bool operator<(const DirBufferKey& b) const
     {
-        const int rv = cmpFileName(directoryName, b.directoryName);
-        if (rv != 0)
-            return rv < 0;
+        if (!EqualFilename()(directoryName, b.directoryName))
+            return LessFilename()(directoryName, b.directoryName);
 
         return *filter < *b.filter;
     }
@@ -306,6 +313,30 @@ private:
 };
 //------------------------------------------------------------------------------------------
 
+
+#ifdef FFS_WIN
+class DstHackCallbackImpl : public DstHackCallback
+{
+public:
+    DstHackCallbackImpl(StatusHandler& statusUpdater) :
+        textApplyingDstHack(wxToZ(_("Encode extended time information: %x")).Replace(Zstr("%x"), Zstr("\n\"%x\""))),
+        statusUpdater_(statusUpdater) {}
+
+private:
+    virtual void requestUiRefresh(const Zstring& filename) //applying DST hack imposes significant one-time performance drawback => callback to inform user
+    {
+        Zstring statusText = textApplyingDstHack;
+        statusText.Replace(Zstr("%x"), filename);
+        statusUpdater_.reportInfo(statusText);
+        statusUpdater_.requestUiRefresh();
+    }
+
+    const Zstring textApplyingDstHack;
+    StatusHandler& statusUpdater_;
+};
+#endif
+
+
 DirContainer& CompareProcess::DirectoryBuffer::insertIntoBuffer(const DirBufferKey& newKey)
 {
     DirBufferValue baseContainer(new DirContainer);
@@ -332,8 +363,13 @@ DirContainer& CompareProcess::DirectoryBuffer::insertIntoBuffer(const DirBufferK
             break;
         }
 
+        std::auto_ptr<ffs3::DstHackCallback> dstCallback;
+#ifdef FFS_WIN
+        dstCallback.reset(new DstHackCallbackImpl(*statusUpdater_));
+#endif
+
         //get all files and folders from directoryPostfixed (and subdirectories)
-        traverseFolder(newKey.directoryName, followSymlinks, &traverser); //exceptions may be thrown!
+        traverseFolder(newKey.directoryName, followSymlinks, traverser, dstCallback.get()); //exceptions may be thrown!
     }
     return *baseContainer.get();
 }
@@ -420,7 +456,7 @@ bool dependencyExists(const std::set<Zstring>& folders, const Zstring& newFolder
     for (std::set<Zstring>::const_iterator i = folders.begin(); i != folders.end(); ++i)
     {
         const size_t commonLen = std::min(newFolder.length(), i->length());
-        if (cmpFileName(Zstring(newFolder.c_str(), commonLen), Zstring(i->c_str(), commonLen)) == 0) //test wheter i begins with newFolder or the other way round
+        if (EqualFilename()(Zstring(newFolder.c_str(), commonLen), Zstring(i->c_str(), commonLen))) //test wheter i begins with newFolder or the other way round
         {
             warningMessage = wxString(_("Directories are dependent! Be careful when setting up synchronization rules:")) + wxT("\n") +
                              wxT("\"") + zToWx(*i) + wxT("\"\n") +
@@ -529,6 +565,7 @@ std::set<Zstring> getFolders(const std::vector<FolderPairCfg>& directoryPairsFor
         output.insert(i->leftDirectory);
         output.insert(i->rightDirectory);
     }
+    output.erase(Zstring()); //remove empty directory strings
     return output;
 }
 
@@ -574,19 +611,16 @@ void formatPair(FolderPairCfg& input)
 }
 }
 
-
 //#############################################################################################################################
 
 CompareProcess::CompareProcess(SymLinkHandling handleSymlinks,
                                size_t fileTimeTol,
-                               bool ignoreOneHourDiff,
                                xmlAccess::OptionalDialogs& warnings,
                                StatusHandler* handler) :
     fileTimeTolerance(fileTimeTol),
-    ignoreOneHourDifference(ignoreOneHourDiff),
     m_warnings(warnings),
     statusUpdater(handler),
-    txtComparingContentOfFiles(wxToZ(_("Comparing content of files %x")).Replace(DefaultStr("%x"), DefaultStr("\n\"%x\""), false))
+    txtComparingContentOfFiles(wxToZ(_("Comparing content of files %x")).Replace(Zstr("%x"), Zstr("\n\"%x\""), false))
 {
     directoryBuffer.reset(new DirectoryBuffer(handleSymlinks, handler));
 }
@@ -600,7 +634,9 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& direc
     wxLogNull noWxLogs; //hide wxWidgets log messages in release build
 #endif
 
-    //PERF_START;
+//    #ifdef FFS_WIN
+//        PERF_START;
+//    #endif
 
     //init process: keep at beginning so that all gui elements are initialized properly
     statusUpdater->initNewProcess(-1, 0, StatusHandler::PROCESS_SCANNING); //it's not known how many files will be scanned => -1 objects
@@ -628,35 +664,36 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& direc
     {
         //place a lock on all directories before traversing (sync.ffs_lock)
         std::map<Zstring, DirLock> lockHolder;
-
-        const std::set<Zstring> folderList = getFolders(directoryPairsFormatted);
-        for (std::set<Zstring>::const_iterator i = folderList.begin(); i != folderList.end(); ++i)
         {
-            class WaitOnLockHandler : public DirLockCallback
+            const std::set<Zstring> folderList = getFolders(directoryPairsFormatted);
+            for (std::set<Zstring>::const_iterator i = folderList.begin(); i != folderList.end(); ++i)
             {
-            public:
-                WaitOnLockHandler(StatusHandler& statusUpdater) : waitHandler(statusUpdater) {}
-
-                virtual void requestUiRefresh()  //allowed to throw exceptions
+                class WaitOnLockHandler : public DirLockCallback
                 {
-                    waitHandler.requestUiRefresh();
-                }
-                virtual void updateStatusText(const Zstring& text)
-                {
-                    waitHandler.updateStatusText(text);
-                }
-            private:
-                StatusHandler& waitHandler;
-            } callback(*statusUpdater);
+                public:
+                    WaitOnLockHandler(StatusHandler& statusUpdater) : waitHandler(statusUpdater) {}
 
-            try
-            {
-                lockHolder.insert(std::make_pair(*i, DirLock(*i + DefaultStr("Sync.") + LOCK_FILE_ENDING, &callback)));
-            }
-            catch (const FileError& e)
-            {
-                bool dummy = false; //this warning shall not be shown but logged only
-                statusUpdater->reportWarning(e.msg(), dummy);
+                    virtual void requestUiRefresh()  //allowed to throw exceptions
+                    {
+                        waitHandler.requestUiRefresh();
+                    }
+                    virtual void reportInfo(const Zstring& text)
+                    {
+                        waitHandler.reportInfo(text);
+                    }
+                private:
+                    StatusHandler& waitHandler;
+                } callback(*statusUpdater);
+
+                try
+                {
+                    lockHolder.insert(std::make_pair(*i, DirLock(*i + Zstr("sync.") + LOCK_FILE_ENDING, &callback)));
+                }
+                catch (const FileError& e)
+                {
+                    bool dummy = false; //this warning shall not be shown but logged only
+                    statusUpdater->reportWarning(e.msg(), dummy);
+                }
             }
         }
 
@@ -767,30 +804,11 @@ wxString getConflictSameDateDiffSize(const FileMapping& fileObj)
 }
 
 
-//check for files that have a difference in file modification date below 1 hour when DST check is active
-template <class FileOrLinkMapping>
-wxString getConflictChangeWithinHour(const FileOrLinkMapping& fileObj)
-{
-    //some beautification...
-    wxString left = wxString(_("Left")) + wxT(": ");
-    wxString right = wxString(_("Right")) + wxT(": ");
-    makeSameLength(left, right);
-
-    wxString msg = _("Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.");
-    msg += wxString(wxT("\n")) + _("(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)");
-    msg.Replace(wxT("%x"), wxString(wxT("\"")) + zToWx(fileObj.template getRelativeName<LEFT_SIDE>()) + wxT("\""));
-    msg += wxT("\n\n");
-    msg += left + wxT("\t") + _("Date") + wxT(": ") + utcTimeToLocalString(fileObj.template getLastWriteTime<LEFT_SIDE>()) + wxT("\n");
-    msg += right + wxT("\t") + _("Date") + wxT(": ") + utcTimeToLocalString(fileObj.template getLastWriteTime<RIGHT_SIDE>());
-    return wxString(_("Conflict detected:")) + wxT("\n") + msg;
-}
-
 //-----------------------------------------------------------------------------
 class CmpFileTime
 {
 public:
-    CmpFileTime(bool ignoreOneHourDifference, size_t tolerance) :
-        ignoreOneHourDifference_(ignoreOneHourDifference),
+    CmpFileTime(size_t tolerance) :
         tolerance_(tolerance) {}
 
     enum Result
@@ -799,8 +817,7 @@ public:
         TIME_LEFT_NEWER,
         TIME_RIGHT_NEWER,
         TIME_LEFT_INVALID,
-        TIME_RIGHT_INVALID,
-        TIME_DST_CHANGE_WITHIN_HOUR
+        TIME_RIGHT_INVALID
     };
 
     Result getResult(const wxLongLong& lhs, const wxLongLong& rhs) const
@@ -821,16 +838,6 @@ public:
         if (sameFileTime(lhs, rhs, tolerance_)) //last write time may differ by up to 2 seconds (NTFS vs FAT32)
             return TIME_EQUAL;
 
-        //DST +/- 1-hour check: test if time diff is exactly +/- 1-hour (respecting 2 second FAT precision)
-        if (ignoreOneHourDifference_ && sameFileTime(lhs, rhs, 3600 + 2))
-        {
-            //date diff < 1 hour is a conflict: it's not safe to determine which file is newer
-            if (sameFileTime(lhs, rhs, 3600 - 2 - 1))
-                return TIME_DST_CHANGE_WITHIN_HOUR;
-            else //exact +/- 1-hour detected: treat as equal
-                return TIME_EQUAL;
-        }
-
         //regular time comparison
         if (lhs < rhs)
             return TIME_RIGHT_NEWER;
@@ -847,7 +854,6 @@ private:
             return a <= b + tolerance;
     }
 
-    const bool ignoreOneHourDifference_;
     const size_t tolerance_;
 };
 
@@ -866,7 +872,7 @@ void CompareProcess::categorizeSymlinkByTime(SymLinkMapping* linkObj) const
         return;
     }
 
-    switch (CmpFileTime(ignoreOneHourDifference, fileTimeTolerance).getResult(linkObj->getLastWriteTime<LEFT_SIDE>(), linkObj->getLastWriteTime<RIGHT_SIDE>()))
+    switch (CmpFileTime(fileTimeTolerance).getResult(linkObj->getLastWriteTime<LEFT_SIDE>(), linkObj->getLastWriteTime<RIGHT_SIDE>()))
     {
     case CmpFileTime::TIME_EQUAL:
         if (
@@ -898,10 +904,6 @@ void CompareProcess::categorizeSymlinkByTime(SymLinkMapping* linkObj) const
     case CmpFileTime::TIME_RIGHT_INVALID:
         linkObj->setCategoryConflict(getConflictInvalidDate(linkObj->getFullName<RIGHT_SIDE>(), linkObj->getLastWriteTime<RIGHT_SIDE>()));
         break;
-
-    case CmpFileTime::TIME_DST_CHANGE_WITHIN_HOUR:
-        linkObj->setCategoryConflict(getConflictChangeWithinHour(*linkObj));
-        break;
     }
 }
 
@@ -927,7 +929,7 @@ void CompareProcess::compareByTimeSize(const std::vector<FolderPairCfg>& directo
         std::for_each(uncategorizedLinks.begin(), uncategorizedLinks.end(), boost::bind(&CompareProcess::categorizeSymlinkByTime, this, _1));
 
         //categorize files that exist on both sides
-        const CmpFileTime timeCmp(ignoreOneHourDifference, fileTimeTolerance);
+        const CmpFileTime timeCmp(fileTimeTolerance);
 
         for (std::vector<FileMapping*>::iterator i = uncategorizedFiles.begin(); i != uncategorizedFiles.end(); ++i)
         {
@@ -956,10 +958,6 @@ void CompareProcess::compareByTimeSize(const std::vector<FolderPairCfg>& directo
 
             case CmpFileTime::TIME_RIGHT_INVALID:
                 line->setCategoryConflict(getConflictInvalidDate(line->getFullName<RIGHT_SIDE>(), line->getLastWriteTime<RIGHT_SIDE>()));
-                break;
-
-            case CmpFileTime::TIME_DST_CHANGE_WITHIN_HOUR:
-                line->setCategoryConflict(getConflictChangeWithinHour(*line));
                 break;
             }
         }
@@ -1046,8 +1044,8 @@ void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& director
         FileMapping* const gridline = *j;
 
         Zstring statusText = txtComparingContentOfFiles;
-        statusText.Replace(DefaultStr("%x"), gridline->getRelativeName<LEFT_SIDE>(), false);
-        statusUpdater->updateStatusText(statusText);
+        statusText.Replace(Zstr("%x"), gridline->getRelativeName<LEFT_SIDE>(), false);
+        statusUpdater->reportInfo(statusText);
 
         //check files that exist in left and right model but have different content
         while (true)
@@ -1269,7 +1267,7 @@ void CompareProcess::performBaseComparison(BaseDirMapping& output, std::vector<F
             output.getFilter());
 
 
-    statusUpdater->updateStatusText(wxToZ(_("Generating file list...")));
+    statusUpdater->reportInfo(wxToZ(_("Generating file list...")));
     statusUpdater->forceUiRefresh(); //keep total number of scanned files up to date
 
     //PERF_STOP;

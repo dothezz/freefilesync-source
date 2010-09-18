@@ -196,9 +196,13 @@ public:
                                               &filter,                              //__in  LPVOID NotificationFilter,
                                               DEVICE_NOTIFY_WINDOW_HANDLE);         //__in  DWORD Flags
                 if (hNotfication == NULL)
-                    throw ffs3::FileError(wxString(wxT("Could not register device removal notifications:")) + wxT("\n\n") + ffs3::getLastErrorFormatted());
-
-                notifications.insert(hNotfication);
+                {
+                    const DWORD lastError = ::GetLastError();
+                    if (lastError != ERROR_CALL_NOT_IMPLEMENTED) //fail on SAMBA share: this shouldn't be a showstopper!
+                        throw ffs3::FileError(wxString(wxT("Could not register device removal notifications:")) + wxT("\n\n") + ffs3::getLastErrorFormatted(lastError));
+                }
+                else
+                    notifications.insert(hNotfication);
             }
         }
         catch (...)

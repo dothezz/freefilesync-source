@@ -12,15 +12,21 @@
 #include <cstdlib> //malloc(), free()
 
 
-/*all this header does is to globally overwrite "operator new" to give some more detailed error messages and write memory dumps
+#ifndef _MSC_VER
+#error currently for use with MSC only
+#endif
+
+/*overwrite "operator new" to get more detailed error messages on bad_alloc, detect memory leaks and write memory dumps
 Usage:
-	 - Include everywhere before any other file: $(ProjectDir)\shared\debug_new.h
-	 For Minidumps:
-	 - Compile "debug_new.cpp"
-	 - Include library "Dbghelp.lib"
-	 - Compile in Debug build (need Symbols and less restrictive Optimization)
+- Include everywhere before any other file: $(ProjectDir)\shared\debug_new.h
+For Minidumps:
+- Compile "debug_new.cpp"
+- Include library "Dbghelp.lib"
+- Compile in Debug build (need Symbols and less restrictive Optimization)
 */
 
+namespace mem_check
+{
 class BadAllocDetailed : public std::bad_alloc
 {
 public:
@@ -41,7 +47,7 @@ private:
     template <class T>
     static std::string numberToString(const T& number) //convert number to string the C++ way
     {
-        std::stringstream ss;
+        std::ostringstream ss;
         ss << number;
         return ss.str();
     }
@@ -50,46 +56,43 @@ private:
 };
 
 #ifdef _MSC_VER
-namespace MemoryDump
-{
 void writeMinidump();
-}
 #endif
+}
 
 inline
-void* operator new(size_t allocSize)
+void* operator new(size_t size)
 {
-    void* newMem = ::malloc(allocSize);
+    void* newMem = ::malloc(size);
     if (!newMem)
     {
 #ifdef _MSC_VER
-        MemoryDump::writeMinidump();
+        mem_check::writeMinidump();
 #endif
-        throw BadAllocDetailed(allocSize);
+        throw mem_check::BadAllocDetailed(size);
     }
     return newMem;
 }
 
 
 inline
-void* operator new[](size_t allocSize)
+void operator delete(void* ptr)
 {
-    return operator new(allocSize);
+    ::free(ptr);
 }
 
 
 inline
-void operator delete(void* memory)
+void* operator new[](size_t size)
 {
-    ::free(memory);
+    return operator new(size);
 }
 
 
 inline
-void operator delete[](void* memory)
+void operator delete[](void* ptr)
 {
-    operator delete(memory);
+    operator delete(ptr);
 }
 
 #endif // DEBUGNEW_H_INCLUDED
-

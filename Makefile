@@ -5,8 +5,8 @@ BINDIR = $(DESTDIR)$(prefix)/bin
 SHAREDIR = $(DESTDIR)$(prefix)/share
 APPSHAREDIR = $(SHAREDIR)/$(APPNAME)
 
-FFS_CPPFLAGS=-Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -DZSTRING_CHAR -O3 -pthread -c
-LINKFLAGS=`wx-config --libs --debug=no --unicode=yes` -lboost_thread -O3 -pthread
+FFS_CPPFLAGS=-Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes --static=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -O3 -pthread
+LINKFLAGS=`wx-config --libs --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a -O3 -pthread
 
 #support for GTKMM
 FFS_CPPFLAGS+=`pkg-config --cflags gtkmm-2.4`
@@ -47,7 +47,7 @@ FILE_LIST+=library/db_file.cpp
 FILE_LIST+=library/dir_lock.cpp
 FILE_LIST+=shared/localization_no_BOM.cpp
 FILE_LIST+=shared/file_io.cpp
-FILE_LIST+=shared/drag_n_drop.cpp
+FILE_LIST+=shared/dir_name.cpp
 FILE_LIST+=shared/guid.cpp
 FILE_LIST+=shared/check_exist.cpp
 FILE_LIST+=shared/tinyxml/tinyxml.cpp
@@ -89,10 +89,11 @@ removeBOM: tools/remove_BOM.cpp
 
 %.dep : %.cpp 
 #strip path information
-	g++ $(FFS_CPPFLAGS) $< -o OBJ/$(subst .cpp,.o,$(notdir $<))
+	g++ $(FFS_CPPFLAGS) -c $< -o OBJ/$(subst .cpp,.o,$(notdir $<))
 
 FreeFileSync: init removeBOM $(DEP_LIST)
-	g++ -o BUILD/$(APPNAME) $(OBJECT_LIST) $(LINKFLAGS)
+#respect linker order: wxWidgets libraries last
+	g++ -o ./BUILD/$(APPNAME) $(OBJECT_LIST) $(LINKFLAGS)
 
 clean:
 	rm -rf OBJ

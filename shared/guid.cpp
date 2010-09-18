@@ -6,7 +6,17 @@
 //
 #include "guid.h"
 #include <boost/uuid/uuid.hpp>
+
+//boost really should clean a bit up...
+#ifdef __MINGW32__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+#endif
 #include <boost/uuid/uuid_generators.hpp>
+#ifdef __MINGW32__
+#pragma GCC diagnostic pop
+#endif
+
 #include <cassert>
 #include <algorithm>
 #include <vector>

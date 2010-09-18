@@ -117,14 +117,12 @@ struct XmlGlobalSettings
     //Shared (GUI/BATCH) settings
     XmlGlobalSettings() :
         programLanguage(retrieveSystemLanguage()),
-        ignoreOneHourDiff(false),
         copyLockedFiles(true),
         copyFilePermissions(false),
         fileTimeTolerance(2),  //default 2s: FAT vs NTFS
         verifyFileCopy(false) {}
 
     int programLanguage;
-    bool ignoreOneHourDiff;        //ignore +/- 1 hour due to DST change
     bool copyLockedFiles;          //VSS usage
     bool copyFilePermissions;
 
@@ -157,6 +155,7 @@ struct XmlGlobalSettings
 #endif
             showFileIconsLeft(true),
             showFileIconsRight(true),
+            addFolderPairCountMax(5),
             lastUpdateCheck(0)
         {
             //default external apps will be translated "on the fly"!!!
@@ -204,6 +203,7 @@ struct XmlGlobalSettings
         bool showFileIconsLeft;
         bool showFileIconsRight;
 
+        size_t addFolderPairCountMax;
         long lastUpdateCheck;          //time of last update check
     } gui;
 

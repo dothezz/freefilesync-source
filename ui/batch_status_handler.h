@@ -28,12 +28,12 @@ public:
                        int& returnVal);
     ~BatchStatusHandler();
 
-    virtual void updateStatusText(const Zstring& text);
     virtual void initNewProcess(int objectsTotal, wxLongLong dataTotal, Process processID);
     virtual void updateProcessedData(int objectsProcessed, wxLongLong dataProcessed);
+    virtual void reportInfo(const Zstring& text);
     virtual void forceUiRefresh();
 
-    void reportInfo(const wxString& infoMessage);
+    void logInfo(const wxString& infoMessage);
     virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
     virtual ErrorHandler::Response reportError(const wxString& errorMessage);
     virtual void reportFatalError(const wxString& errorMessage);

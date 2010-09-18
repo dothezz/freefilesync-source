@@ -11,7 +11,7 @@
 #include "../shared/zstring.h"
 #include <memory>
 #include <wx/icon.h>
-#include <boost/thread/mutex.hpp>
+#include "../shared/boost_thread_wrap.h" //include <boost/thread.hpp>
 
 
 namespace ffs3
@@ -42,16 +42,26 @@ private:
     class IconHolder;
     class IconDbSequence;
 
-    //methods used by worker thread
-    void insertIntoBuffer(const DefaultChar* entryName, const IconHolder& icon);
+//---------------------------------------------------------------------------------------------------
+typedef Zbase<Zchar, StorageDeepCopy> BasicString; //thread safe string class
+//avoid reference-counted objects for shared data: NOT THREADSAFE!!! (implicitly shared variable: ref-count)
+//---------------------------------------------------------------------------------------------------
 
-    static IconHolder getAssociatedIcon(const Zstring& filename);
-    static IconHolder getAssociatedIconByExt(const Zstring& extension);
+    //methods used by worker thread
+    void insertIntoBuffer(const BasicString& entryName, const IconHolder& icon);
+
+    static IconHolder getAssociatedIcon(const BasicString& filename);
+    static IconHolder getAssociatedIconByExt(const BasicString& extension);
+
+#ifdef FFS_WIN
+static BasicString getFileExtension(const BasicString& filename);
+static bool isPriceyExtension(const BasicString& extension);
+#endif
 
 //---------------------- Shared Data -------------------------
     boost::mutex lockIconDB;
     std::auto_ptr<IconDB> buffer;  //use synchronisation when accessing this!
-    std::auto_ptr<IconDbSequence> bufSequence; //save sequence of buffer entry to delete oldest elements (implicitly shared by sharing Zstring with IconDB!!!)
+    std::auto_ptr<IconDbSequence> bufSequence; //save sequence of buffer entry to delete oldest elements
 //------------------------------------------------------------
 
     class WorkerThread;

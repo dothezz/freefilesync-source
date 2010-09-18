@@ -56,7 +56,7 @@ public:
     virtual Response reportError(const wxString& errorMessage) = 0;
 
     //virtual void totalFilesToDelete(int objectsTotal) = 0; //informs about the total number of files to be deleted
-    virtual void deletionSuccessful() = 0;  //called for each file/folder that has been deleted
+    virtual void deletionSuccessful(size_t deletedItems) = 0;  //called for each file/folder that has been deleted
 
 };
 void deleteFromGridAndHD(FolderComparison& folderCmp,                        //attention: rows will be physically deleted!
@@ -65,7 +65,7 @@ void deleteFromGridAndHD(FolderComparison& folderCmp,                        //a
                          const bool deleteOnBothSides,
                          const bool useRecycleBin,
                          const MainConfiguration& mainConfig,
-                         DeleteFilesHandler* statusHandler);
+                         DeleteFilesHandler& statusHandler);
 }
 
 #endif // ALGORITHM_H_INCLUDED

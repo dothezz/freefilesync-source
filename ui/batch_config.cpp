@@ -14,6 +14,7 @@
 #include "msg_popup.h"
 #include <wx/dnd.h>
 #include <wx/msgdlg.h>
+#include "mouse_move_dlg.h"
 
 using namespace ffs3;
 
@@ -91,7 +92,7 @@ private:
                     /|\                        /|\
             _________|______________    ________|
            |                        |  |
-  FirstBatchFolderPairCfg    BatchFolderPairPanel
+  DirectoryPairBatchFirst    DirectoryPairBatch
 */
 
 template <class GuiPanel>
@@ -117,42 +118,72 @@ private:
 };
 
 
-class BatchFolderPairPanel :
-    public BatchFolderPairGenerated, //BatchFolderPairPanel "owns" BatchFolderPairGenerated!
+class DirectoryPairBatch:
+    public BatchFolderPairGenerated, //DirectoryPairBatch "owns" BatchFolderPairGenerated!
     public FolderPairCallback<BatchFolderPairGenerated>
 {
 public:
-    BatchFolderPairPanel(wxWindow* parent, BatchDialog& batchDialog) :
+    DirectoryPairBatch(wxWindow* parent, BatchDialog& batchDialog) :
         BatchFolderPairGenerated(parent),
         FolderPairCallback<BatchFolderPairGenerated>(static_cast<BatchFolderPairGenerated&>(*this), batchDialog), //pass BatchFolderPairGenerated part...
-        dragDropOnLeft( m_panelLeft,  m_dirPickerLeft,  m_directoryLeft),
-        dragDropOnRight(m_panelRight, m_dirPickerRight, m_directoryRight) {}
+        dirNameLeft( m_panelLeft,  m_dirPickerLeft,  m_directoryLeft),
+        dirNameRight(m_panelRight, m_dirPickerRight, m_directoryRight) {}
+
+    void setValues(const Zstring& leftDir, const Zstring& rightDir, AltSyncCfgPtr syncCfg, const FilterConfig& filter)
+    {
+        setConfig(syncCfg, filter);
+        dirNameLeft.setName(leftDir);
+        dirNameRight.setName(rightDir);
+    }
+    Zstring getLeftDir() const
+    {
+        return dirNameLeft.getName();
+    }
+    Zstring getRightDir() const
+    {
+        return dirNameRight.getName();
+    }
 
 private:
     //support for drag and drop
-    DragDropOnDlg dragDropOnLeft;
-    DragDropOnDlg dragDropOnRight;
+    DirectoryName dirNameLeft;
+    DirectoryName dirNameRight;
 };
 
 
-class FirstBatchFolderPairCfg : public FolderPairCallback<BatchDlgGenerated>
+class DirectoryPairBatchFirst : public FolderPairCallback<BatchDlgGenerated>
 {
 public:
-    FirstBatchFolderPairCfg(BatchDialog& batchDialog) :
+    DirectoryPairBatchFirst(BatchDialog& batchDialog) :
         FolderPairCallback<BatchDlgGenerated>(batchDialog, batchDialog),
 
         //prepare drag & drop
-        dragDropOnLeft(batchDialog.m_panelLeft,
+        dirNameLeft(batchDialog.m_panelLeft,
                        batchDialog.m_dirPickerLeft,
                        batchDialog.m_directoryLeft),
-        dragDropOnRight(batchDialog.m_panelRight,
+        dirNameRight(batchDialog.m_panelRight,
                         batchDialog.m_dirPickerRight,
                         batchDialog.m_directoryRight) {}
 
+    void setValues(const Zstring& leftDir, const Zstring& rightDir, AltSyncCfgPtr syncCfg, const FilterConfig& filter)
+    {
+        setConfig(syncCfg, filter);
+        dirNameLeft.setName(leftDir);
+        dirNameRight.setName(rightDir);
+    }
+    Zstring getLeftDir() const
+    {
+        return dirNameLeft.getName();
+    }
+    Zstring getRightDir() const
+    {
+        return dirNameRight.getName();
+    }
+
 private:
     //support for drag and drop
-    DragDropOnDlg dragDropOnLeft;
-    DragDropOnDlg dragDropOnRight;
+    DirectoryName dirNameLeft;
+    DirectoryName dirNameRight;
 };
 
 
@@ -178,6 +209,16 @@ BatchDialog::~BatchDialog() {} //non-inline destructor for std::auto_ptr to work
 
 void BatchDialog::init()
 {
+#ifdef FFS_WIN
+    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                        this,
+                        m_panelOverview,
+                       m_panelLogging,
+                       m_staticText56,
+                       m_staticText44,
+                       m_bitmap27); //ownership passed to "this"
+#endif
+
     wxWindowUpdateLocker dummy(this); //avoid display distortion
 
     m_bpButtonCmpConfig->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("cmpConfig")));
@@ -186,13 +227,13 @@ void BatchDialog::init()
     m_bpButtonHelp->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("help")));
 
     //init handling of first folder pair
-    firstFolderPair.reset(new FirstBatchFolderPairCfg(*this));
+    firstFolderPair.reset(new DirectoryPairBatchFirst(*this));
 
     m_bpButtonFilter->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(BatchDialog::OnGlobalFilterOpenContext), NULL, this);
 
     //prepare drag & drop for loading of *.ffs_batch files
     SetDropTarget(new BatchFileDropEvent(*this));
-    dragDropOnLogfileDir.reset(new DragDropOnDlg(m_panelLogging, m_dirPickerLogfileDir, m_textCtrlLogfileDir));
+    logfileDir.reset(new DirectoryName(m_panelLogging, m_dirPickerLogfileDir, m_textCtrlLogfileDir));
 
     //set icons for this dialog
     m_bpButtonAddPair->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("addFolderPair")));
@@ -469,7 +510,7 @@ void BatchDialog::OnLoadBatchJob(wxCommandEvent& event)
 
 
 inline
-FolderPairEnh getEnahncedPair(const BatchFolderPairPanel* panel)
+FolderPairEnh getEnahncedPair(const DirectoryPairBatch* panel)
 {
     return FolderPairEnh(panel->getLeftDir(),
                          panel->getRightDir(),
@@ -498,7 +539,7 @@ xmlAccess::XmlBatchConfig BatchDialog::getCurrentConfiguration() const
 
     //load structure with batch settings "batchCfg"
     batchCfg.silent           = m_checkBoxSilent->GetValue();
-    batchCfg.logFileDirectory = m_textCtrlLogfileDir->GetValue();
+    batchCfg.logFileDirectory = zToWx(logfileDir->getName());
     batchCfg.handleError      = getSelectionHandleError();
 
     return batchCfg;
@@ -566,7 +607,7 @@ void BatchDialog::loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg)
     localBatchCfg = batchCfg;
 
     m_checkBoxSilent->SetValue(batchCfg.silent);
-    m_textCtrlLogfileDir->SetValue(batchCfg.logFileDirectory);
+    logfileDir->setName(wxToZ(batchCfg.logFileDirectory));
     //error handling is dependent from m_checkBoxSilent! /|\   \|/
     setSelectionHandleError(batchCfg.handleError);
 
@@ -614,7 +655,7 @@ void BatchDialog::OnRemoveFolderPair(wxCommandEvent& event)
 {
     //find folder pair originating the event
     const wxObject* const eventObj = event.GetEventObject();
-    for (std::vector<BatchFolderPairPanel*>::const_iterator i = additionalFolderPairs.begin(); i != additionalFolderPairs.end(); ++i)
+    for (std::vector<DirectoryPairBatch*>::const_iterator i = additionalFolderPairs.begin(); i != additionalFolderPairs.end(); ++i)
     {
         if (eventObj == static_cast<wxObject*>((*i)->m_bpButtonRemovePair))
         {
@@ -684,7 +725,7 @@ void BatchDialog::addFolderPair(const std::vector<ffs3::FolderPairEnh>& newPairs
         int pairHeight = 0;
         for (std::vector<ffs3::FolderPairEnh>::const_iterator i = newPairs.begin(); i != newPairs.end(); ++i)
         {
-            BatchFolderPairPanel* newPair = new BatchFolderPairPanel(m_scrolledWindow6, *this);
+            DirectoryPairBatch* newPair = new DirectoryPairBatch(m_scrolledWindow6, *this);
 
             if (addFront)
             {
@@ -733,7 +774,7 @@ void BatchDialog::removeAddFolderPair(const int pos)
     if (0 <= pos && pos < static_cast<int>(additionalFolderPairs.size()))
     {
         //remove folder pairs from window
-        BatchFolderPairPanel* pairToDelete = additionalFolderPairs[pos];
+        DirectoryPairBatch* pairToDelete = additionalFolderPairs[pos];
         const int pairHeight = pairToDelete->GetSize().GetHeight();
 
         bSizerAddFolderPairs->Detach(pairToDelete); //Remove() does not work on Window*, so do it manually

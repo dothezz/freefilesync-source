@@ -1,24 +1,26 @@
 #define IDR_VERSION1 1
 
+#include "Winver.h"
 #include "wx/msw/wx.rc"
 #include "../version/version.rc"
 
 A_PROGRAM_ICON ICON DISCARDABLE "RealtimeSync.ico"
 
-IDR_VERSION1 VERSIONINFO
-FILEVERSION VER_FREEFILESYNC
+IDR_VERSION1   VERSIONINFO
+FILEVERSION    VER_FREEFILESYNC
 PRODUCTVERSION VER_FREEFILESYNC
-FILEOS 0x00000004
-FILETYPE 0x00000001
+FILEOS         VOS__WINDOWS32
+FILETYPE       VFT_APP
 BEGIN
   BLOCK "StringFileInfo"
   BEGIN
     BLOCK "FFFF04B0"
     BEGIN
-      VALUE "ProductVersion", VER_FREEFILESYNC_STR
       VALUE "FileDescription", "Realtime Application Launcher\0"
-      VALUE "LegalCopyright", "(c) 2008 - 2010 ZenJu\0"
-      VALUE "ProductName", "RealtimeSync\0"
+      VALUE "FileVersion",     VER_FREEFILESYNC_STR
+      VALUE "ProductName",     "RealtimeSync\0"
+      VALUE "ProductVersion",  VER_FREEFILESYNC_STR
+      VALUE "LegalCopyright",  "(c) 2008 - 2010 ZenJu\0"
     END
   END
   BLOCK "VarFileInfo"

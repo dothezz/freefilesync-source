@@ -14,8 +14,8 @@ namespace ffs3
 {
 //conversion from Zstring to wxString
 wxString zToWx(const Zstring& str);
-wxString zToWx(const DefaultChar* str);
-wxString zToWx(DefaultChar ch);
+wxString zToWx(const Zchar* str);
+wxString zToWx(Zchar ch);
 //conversion from wxString to Zstring
 Zstring wxToZ(const wxString& str);
 Zstring wxToZ(const wxChar* str);
@@ -52,39 +52,39 @@ Zstring wxToZ(wxChar ch);
 inline
 wxString zToWx(const Zstring& str)
 {
-#ifdef ZSTRING_CHAR
-    return wxString::FromUTF8(str.c_str(), str.length());
-#elif defined ZSTRING_WIDE_CHAR
+#ifdef FFS_WIN
     return wxString(str.c_str(), str.length());
+#elif defined FFS_LINUX
+    return wxString::FromUTF8(str.c_str(), str.length());
 #endif
 }
 
 
 inline
-wxString zToWx(const DefaultChar* str)
+wxString zToWx(const Zchar* str)
 {
-#ifdef ZSTRING_CHAR
-    return wxString::FromUTF8(str);
-#elif defined ZSTRING_WIDE_CHAR
+#ifdef FFS_WIN
     return str;
+#elif defined FFS_LINUX
+    return wxString::FromUTF8(str);
 #endif
 }
 
 
 inline
-wxString zToWx(DefaultChar ch)
+wxString zToWx(Zchar ch)
 {
-    return zToWx(Zstring() + ch);
+    return zToWx(Zstring(ch));
 }
 
 //-----------------------------------------------------------------
 inline
 Zstring wxToZ(const wxString& str)
 {
-#ifdef ZSTRING_CHAR
-    return Zstring(str.ToUTF8());
-#elif defined ZSTRING_WIDE_CHAR
+#ifdef FFS_WIN
     return Zstring(str.c_str(), str.length());
+#elif defined FFS_LINUX
+    return Zstring(str.ToUTF8());
 #endif
 }
 
@@ -92,10 +92,10 @@ Zstring wxToZ(const wxString& str)
 inline
 Zstring wxToZ(const wxChar* str)
 {
-#ifdef ZSTRING_CHAR
-    return Zstring(wxString(str).ToUTF8());
-#elif defined ZSTRING_WIDE_CHAR
+#ifdef FFS_WIN
     return str;
+#elif defined FFS_LINUX
+    return Zstring(wxString(str).ToUTF8());
 #endif
 }
 

@@ -173,7 +173,7 @@ private:
 //------------------------------------------------------------------
 //save/load full directory information
 const Zstring& getSyncDBFilename(); //get short filename of database file
-const Zstring SYNC_DB_FILE_ENDING = DefaultStr("ffs_db");
+const Zstring SYNC_DB_FILE_ENDING = Zstr("ffs_db");
 
 //------------------------------------------------------------------
 /*    class hierarchy:
@@ -234,8 +234,8 @@ public:
 protected:
     //constructor used by DirMapping
     HierarchyObject(const HierarchyObject& parent, const Zstring& shortName) :
-        relNamePf(parent.getRelativeNamePf() + shortName + common::FILE_NAME_SEPARATOR),
-        baseDirLeft(parent.baseDirLeft),
+        relNamePf(   parent.getRelativeNamePf() + shortName + common::FILE_NAME_SEPARATOR),
+        baseDirLeft( parent.baseDirLeft),
         baseDirRight(parent.baseDirRight) {}
 
     //constructor used by BaseDirMapping
@@ -1333,7 +1333,7 @@ const Zstring FileMapping::getExtension() const
     //attention: Zstring::AfterLast() returns whole string if char not found! -> don't use
     const Zstring& shortName = getShortName<side>();
 
-    const size_t pos = shortName.Find(DefaultChar('.'), true);
+    const size_t pos = shortName.rfind(Zchar('.'));
     return pos == Zstring::npos ?
            Zstring() :
            Zstring(shortName.c_str() + pos + 1);

@@ -13,6 +13,8 @@
 #include <map>
 #include <memory>
 #include <set>
+#include "../file_hierarchy.h"
+
 
 class CustomGridTableRim;
 class CustomGridTableLeft;
@@ -85,8 +87,8 @@ public:
 
 protected:
     void RefreshCell(int row, int col);
-
     virtual void DrawColLabel(wxDC& dc, int col);
+    std::pair<int, int> mousePosToCell(wxPoint pos); //returns (row/column) pair
 
 private:
     virtual void setGridDataTable(const ffs3::GridView* gridDataView) = 0;
@@ -161,6 +163,10 @@ public:
 
     void enableFileIcons(const bool value);
 
+protected:
+    template <ffs3::SelectedSide side>
+    void setTooltip(const wxMouseEvent& event);
+
 private:
     CustomGridTableRim* getGridDataTable();
     virtual const CustomGridTableRim* getGridDataTable() const = 0;
@@ -198,6 +204,7 @@ public:
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
 
 private:
+    void OnMouseMovement(wxMouseEvent& event);
     virtual void setGridDataTable(const ffs3::GridView* gridDataView);
     virtual const CustomGridTableRim* getGridDataTable() const;
 
@@ -221,6 +228,7 @@ public:
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
 
 private:
+    void OnMouseMovement(wxMouseEvent& event);
     virtual void setGridDataTable(const ffs3::GridView* gridDataView);
     virtual const CustomGridTableRim* getGridDataTable() const;
 

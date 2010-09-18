@@ -21,18 +21,18 @@
 #include "../shared/build_info.h"
 #include <wx/icon.h> //Linux needs this
 #include <wx/timer.h>
+#include <limits>
 
 using namespace rts;
 
 
-class WaitCallbackImpl : private wxEvtHandler, public rts::WaitCallback //keep this order: else VC++ generates wrong code
+class TrayIconHolder : private wxEvtHandler
 {
 public:
-    WaitCallbackImpl();
-    ~WaitCallbackImpl();
+    TrayIconHolder();
+    ~TrayIconHolder();
 
-    virtual void requestUiRefresh();
-
+    void doUiRefreshNow();
     void showIconActive();
     void showIconWaiting();
 
@@ -65,10 +65,10 @@ private:
 
 
 //RtsTrayIcon shall be a dumb class whose sole purpose is to enable wxWidgets deferred deletion
-class WaitCallbackImpl::RtsTrayIcon : public wxTaskBarIcon
+class TrayIconHolder::RtsTrayIcon : public wxTaskBarIcon
 {
 public:
-    RtsTrayIcon(WaitCallbackImpl* parent) : parent_(parent) {}
+    RtsTrayIcon(TrayIconHolder* parent) : parent_(parent) {}
 
     void parentHasDied() //call before tray icon is marked for deferred deletion
     {
@@ -87,12 +87,12 @@ private:
         contextMenu->AppendSeparator();
         contextMenu->Append(CONTEXT_ABORT, _("&Exit"));
         //event handling
-        contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(WaitCallbackImpl::OnContextMenuSelection), NULL, parent_);
+        contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TrayIconHolder::OnContextMenuSelection), NULL, parent_);
 
         return contextMenu; //ownership transferred to caller
     }
 
-    WaitCallbackImpl* parent_;
+    TrayIconHolder* parent_;
 };
 //##############################################################################################################
 
@@ -113,7 +113,7 @@ private:
 //##############################################################################################################
 
 
-WaitCallbackImpl::WaitCallbackImpl() :
+TrayIconHolder::TrayIconHolder() :
     m_abortRequested(false),
     m_resumeRequested(false)
 {
@@ -122,13 +122,13 @@ WaitCallbackImpl::WaitCallbackImpl() :
     showIconActive();
 
     //register double-click
-    trayMenu->Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(WaitCallbackImpl::OnRequestResume), NULL, this);
+    trayMenu->Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(TrayIconHolder::OnRequestResume), NULL, this);
 }
 
 
-WaitCallbackImpl::~WaitCallbackImpl()
+TrayIconHolder::~TrayIconHolder()
 {
-    trayMenu->Disconnect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(WaitCallbackImpl::OnRequestResume), NULL, this);
+    trayMenu->Disconnect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(TrayIconHolder::OnRequestResume), NULL, this);
     trayMenu->RemoveIcon(); //(try to) hide icon until final deletion takes place
     trayMenu->parentHasDied();
 
@@ -138,7 +138,7 @@ WaitCallbackImpl::~WaitCallbackImpl()
 }
 
 
-void WaitCallbackImpl::showIconActive()
+void TrayIconHolder::showIconActive()
 {
     wxIcon realtimeIcon;
 #ifdef FFS_WIN
@@ -150,7 +150,7 @@ void WaitCallbackImpl::showIconActive()
 }
 
 
-void WaitCallbackImpl::showIconWaiting()
+void TrayIconHolder::showIconWaiting()
 {
     wxIcon realtimeIcon;
 #ifdef FFS_WIN
@@ -162,7 +162,7 @@ void WaitCallbackImpl::showIconWaiting()
 }
 
 
-void WaitCallbackImpl::OnContextMenuSelection(wxCommandEvent& event)
+void TrayIconHolder::OnContextMenuSelection(wxCommandEvent& event)
 {
     const int eventId = event.GetId();
     switch (static_cast<Selection>(eventId))
@@ -201,10 +201,9 @@ void WaitCallbackImpl::OnContextMenuSelection(wxCommandEvent& event)
 }
 
 
-void WaitCallbackImpl::requestUiRefresh()
+void TrayIconHolder::doUiRefreshNow()
 {
-    if (updateUiIsAllowed())
-        wxTheApp->Yield();
+    wxTheApp->Yield();
 
     if (m_abortRequested)
         throw ::AbortThisProcess(QUIT);
@@ -226,6 +225,60 @@ std::vector<Zstring> convert(const std::vector<wxString>& dirList)
 }
 
 
+class StartSyncNowException {};
+
+
+class WaitCallbackImpl : public rts::WaitCallback
+{
+public:
+    WaitCallbackImpl() : nextSyncStart_(std::numeric_limits<long>::max()) {}
+
+    void notifyAllDirectoriesExist()
+    {
+        trayIcon.showIconActive();
+    }
+
+    void notifyDirectoryMissing()
+    {
+        trayIcon.showIconWaiting();
+    }
+
+    virtual void requestUiRefresh() //throw StartSyncNowException()
+    {
+        if (nextSyncStart_ <= wxGetLocalTime())
+            throw StartSyncNowException(); //abort wait and start sync
+
+        if (updateUiIsAllowed())
+            trayIcon.doUiRefreshNow();
+    }
+
+    void scheduleNextSync(long nextSyncStart)
+    {
+        nextSyncStart_ = nextSyncStart;
+    }
+
+private:
+    TrayIconHolder trayIcon;
+    long nextSyncStart_;
+};
+
+/*
+Data Flow:
+----------
+
+TrayIconHolder (GUI output)
+  /|\
+   |
+WaitCallbackImpl (higher level "interface")
+  /|\
+   |
+startDirectoryMonitor() (wire dir-changes and execution of commandline)
+  /|\
+   |
+watcher.h (low level wait for directory changes)
+*/
+
+
 rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& config)
 {
     const std::vector<Zstring> dirList = convert(config.directories);
@@ -237,35 +290,38 @@ rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& 
         if (config.commandline.empty())
             throw ffs3::FileError(_("Command line is empty!"));
 
+        callback.notifyDirectoryMissing();
+        waitForMissingDirs(dirList, &callback);
+        callback.notifyAllDirectoriesExist();
+
         while (true)
         {
-            //execute commandline
-            callback.showIconWaiting();
-            waitForMissingDirs(dirList, &callback);
-            callback.showIconActive();
-
             wxExecute(config.commandline, wxEXEC_SYNC); //execute command
             wxLog::FlushActive(); //show wxWidgets error messages (if any)
 
-            //wait for changes (and for all directories to become available)
-            switch (waitForChanges(dirList, &callback))
-            {
-            case CHANGE_DIR_MISSING: //don't execute the commandline before all directories are available!
-                callback.showIconWaiting();
-                waitForMissingDirs(dirList, &callback);
-                callback.showIconActive();
-                break;
-            case CHANGE_DETECTED:
-                break;
-            }
+            callback.scheduleNextSync(std::numeric_limits<long>::max()); //next sync not scheduled (yet)
 
-            //some delay
-            const long nextExec = wxGetLocalTime() + static_cast<long>(config.delay);
-            while (wxGetLocalTime() < nextExec)
+            try
             {
-                callback.requestUiRefresh();
-                wxMilliSleep(rts::UI_UPDATE_INTERVAL);
+                while (true)
+                {
+                    //wait for changes (and for all directories to become available)
+                    switch (waitForChanges(dirList, &callback))
+                    {
+                    case CHANGE_DIR_MISSING: //don't execute the commandline before all directories are available!
+                        callback.scheduleNextSync(std::numeric_limits<long>::max()); //next sync not scheduled (yet)
+                        callback.notifyDirectoryMissing();
+                        waitForMissingDirs(dirList, &callback);
+                        callback.notifyAllDirectoriesExist();
+                        break;
+                    case CHANGE_DETECTED:
+                        break;
+                    }
+
+                    callback.scheduleNextSync(wxGetLocalTime() + static_cast<long>(config.delay));
+                }
             }
+            catch (StartSyncNowException) {}
         }
     }
     catch (const ::AbortThisProcess& ab)

@@ -19,6 +19,7 @@
 #include "../shared/build_info.h"
 #include <wx/wupdlock.h>
 #include <wx/msgdlg.h>
+#include "mouse_move_dlg.h"
 
 using namespace ffs3;
 
@@ -36,6 +37,12 @@ private:
 
 AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
 {
+#ifdef FFS_WIN
+    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                        this,
+                        m_bitmap11); //ownership passed to "this"
+#endif
+
     m_bitmap9->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("website")));
     m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("email")));
     m_bitmap11->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("logo")));
@@ -124,6 +131,11 @@ private:
 
 HelpDlg::HelpDlg(wxWindow* window) : HelpDlgGenerated(window)
 {
+#ifdef FFS_WIN
+    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                        this, m_bitmap25, m_staticText56, m_scrolledWindow1, m_scrolledWindow5); //ownership passed to "this"
+#endif
+
     m_notebook1->SetFocus();
 
     m_bitmap25->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("help")));
@@ -217,6 +229,11 @@ FilterDlg::FilterDlg(wxWindow* window,
     includeFilter(filterIncl),
     excludeFilter(filterExcl)
 {
+#ifdef FFS_WIN
+    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                        this, m_bitmap26, m_staticTexHeader, m_bitmap8, m_bitmap9); //ownership passed to "this"
+#endif
+
     m_bitmap8->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("include")));
     m_bitmap9->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("exclude")));
     m_bitmap26->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("filterOn")));
@@ -358,6 +375,11 @@ DeleteDialog::DeleteDialog(wxWindow* main,
     m_useRecycleBin(useRecycleBin),
     totalDelCount(totalDeleteCount)
 {
+#ifdef FFS_WIN
+    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                        this, m_bitmap12, m_staticTextHeader); //ownership passed to "this"
+#endif
+
     m_checkBoxDeleteBothSides->SetValue(deleteOnBothSides);
     m_checkBoxUseRecycler->SetValue(useRecycleBin);
     updateTexts();
@@ -471,6 +493,11 @@ CustomizeColsDlg::CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes
     CustomizeColsDlgGenerated(window),
     output(attr)
 {
+#ifdef FFS_WIN
+    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                        this); //ownership passed to "this"
+#endif
+
     m_bpButton29->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("moveUp")));
     m_bpButton30->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("moveDown")));
 
@@ -612,6 +639,11 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
     SyncPreviewDlgGenerated(parentWindow),
     m_dontShowAgain(dontShowAgain)
 {
+#ifdef FFS_WIN
+    new ffs3::MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                        this, m_staticTextVariant); //ownership passed to "this"
+#endif
+
     using ffs3::numberToStringSep;
 
     m_buttonStartSync->setBitmapFront(GlobalResources::getInstance().getImageByName(wxT("startSync")));
@@ -759,6 +791,11 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parentWindow,
     cmpVarOut(cmpVar),
     handleSymlinksOut(handleSymlinks)
 {
+#ifdef FFS_WIN
+    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                        this); //ownership passed to "this"
+#endif
+
     //move dialog up so that compare-config button and first config-variant are on same level
     Move(wxPoint(position.x, std::max(0, position.y - (m_buttonTimeSize->GetScreenPosition() - GetScreenPosition()).y)));
 
@@ -879,12 +916,16 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSetti
     GlobalSettingsDlgGenerated(window),
     settings(globalSettings)
 {
+#ifdef FFS_WIN
+    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                        this, m_bitmapSettings, m_staticText56); //ownership passed to "this"
+#endif
+
     m_bitmapSettings->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("settings")));
     m_buttonResetDialogs->setBitmapFront(GlobalResources::getInstance().getImageByName(wxT("warningSmall")), 5);
     m_bpButtonAddRow->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("addFolderPair")));
     m_bpButtonRemoveRow->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("removeFolderPair")));
 
-    m_checkBoxIgnoreOneHour->SetValue(globalSettings.ignoreOneHourDiff);
     m_checkBoxCopyLocked->SetValue(globalSettings.copyLockedFiles);
     m_checkBoxCopyPermissions->SetValue(globalSettings.copyFilePermissions);
 
@@ -912,7 +953,6 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSetti
 void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 {
     //write global settings only when okay-button is pressed!
-    settings.ignoreOneHourDiff   = m_checkBoxIgnoreOneHour->GetValue();
     settings.copyLockedFiles     = m_checkBoxCopyLocked->GetValue();
     settings.copyFilePermissions = m_checkBoxCopyPermissions->GetValue();
     settings.gui.externelApplications = getExtApp();
@@ -936,7 +976,6 @@ void GlobalSettingsDlg::OnDefault(wxCommandEvent& event)
 {
     xmlAccess::XmlGlobalSettings defaultCfg;
 
-    m_checkBoxIgnoreOneHour->  SetValue(defaultCfg.ignoreOneHourDiff);
     m_checkBoxCopyLocked->     SetValue(defaultCfg.copyLockedFiles);
     m_checkBoxCopyPermissions->SetValue(defaultCfg.copyFilePermissions);
     set(defaultCfg.gui.externelApplications);

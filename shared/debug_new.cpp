@@ -5,15 +5,14 @@
 // **************************************************************************
 //
 #include "debug_new.h"
-#include <wx/msw/wrapwin.h> //includes "windows.h"
-#include "DbgHelp.h"
 
-#pragma message("Warning! Include this header for error analysis builds only!")
-#ifndef _MSC_VER
-use in Visual C++ only!
+#ifdef _MSC_VER
+#include <wx/msw/wrapwin.h> //includes "windows.h"
+#include "DbgHelp.h" //available for MSC only
 #endif
 
 
+#ifdef _MSC_VER
 namespace
 {
 LONG WINAPI writeDumpOnException(EXCEPTION_POINTERS* pExceptionInfo)
@@ -28,8 +27,8 @@ LONG WINAPI writeDumpOnException(EXCEPTION_POINTERS* pExceptionInfo)
     MINIDUMP_EXCEPTION_INFORMATION* exceptParam = pExceptionInfo ? &exInfo : NULL;
 
     ::MiniDumpWriteDump(
-        GetCurrentProcess(),    //__in  HANDLE hProcess,
-        GetCurrentProcessId(),  //__in  DWORD ProcessId,
+        ::GetCurrentProcess(),    //__in  HANDLE hProcess,
+        ::GetCurrentProcessId(),  //__in  DWORD ProcessId,
         hFile,                  //__in  HANDLE hFile,
         MiniDumpWithDataSegs,   //__in  MINIDUMP_TYPE DumpType,  ->Standard: MiniDumpNormal, Medium: MiniDumpWithDataSegs, Full: MiniDumpWithFullMemory
         exceptParam,            //__in  PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
@@ -49,11 +48,13 @@ struct WriteDumpOnUnhandledException
     {
         ::SetUnhandledExceptionFilter(writeDumpOnException);
     }
-} dummy; //ensure that a Dump is written for uncaught exceptions
+} dummy; //ensure that a dump-file is written for uncaught exceptions
 }
 
 
-void MemoryDump::writeMinidump()
+void mem_check::writeMinidump()
 {
     writeDumpOnException(NULL);
 }
+
+#endif //_MSC_VER

@@ -5,8 +5,8 @@
 // PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __guiGenerated__
-#define __guiGenerated__
+#ifndef __gui_generated__
+#define __gui_generated__
 
 #include <wx/intl.h>
 
@@ -65,8 +65,8 @@ class MainDlgGenerated : public wxFrame
 		wxScrolledWindow* m_scrolledWinFolders;
 		wxBoxSizer* bSizerFolders;
 		wxTextCtrl* m_textCtrlCommand;
-		wxStaticLine* m_staticline1;
 		wxSpinCtrl* m_spinCtrlDelay;
+		wxStaticLine* m_staticline1;
 		wxButtonWithImage* m_buttonStart;
 		wxButton* m_buttonCancel;
 		
@@ -107,4 +107,4 @@ class FolderGenerated : public wxPanel
 	
 };
 
-#endif //__guiGenerated__
+#endif //__gui_generated__

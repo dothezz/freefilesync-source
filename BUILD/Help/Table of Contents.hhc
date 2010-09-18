@@ -29,11 +29,15 @@
 		</OBJECT>
 	<UL>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Backup Strategies">
+			<param name="Local" value="html\advanced\BackupStrategy.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Batch Scripting">
 			<param name="Local" value="html\advanced\Batch Scripting.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Compare by filesize">
+			<param name="Name" value="Compare by file size">
 			<param name="Local" value="html\advanced\CompareFileSize.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
@@ -79,10 +83,6 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Synchronize with FTP">
 			<param name="Local" value="html\advanced\Ftp.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Time-stamped directories">
-			<param name="Local" value="html\advanced\TimeStamped.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Variable drive letters">

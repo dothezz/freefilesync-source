@@ -214,7 +214,7 @@ struct FilterConfig
         excludeFilter(exclude) {}
 
     FilterConfig() : //construct with default values
-        includeFilter(DefaultStr("*")) {}
+        includeFilter(Zstr("*")) {}
 
     Zstring includeFilter;
     Zstring excludeFilter;
@@ -273,7 +273,7 @@ struct MainConfiguration
     MainConfiguration() :
         compareVar(CMP_BY_TIME_SIZE),
         handleSymlinks(SYMLINK_IGNORE),
-        globalFilter(DefaultStr("*"), standardExcludeFilter()),
+        globalFilter(Zstr("*"), standardExcludeFilter()),
         handleDeletion(MOVE_TO_RECYCLE_BIN) {}
 
     FolderPairEnh firstPair; //there needs to be at least one pair!

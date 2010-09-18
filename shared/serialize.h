@@ -131,14 +131,14 @@ Zstring readString(wxInputStream& stream)  //read string from file stream
     const size_t strLength = readNumber<size_t>(stream);
     if (strLength <= 1000)
     {
-        DefaultChar buffer[1000];
-        stream.Read(buffer, sizeof(DefaultChar) * strLength);
+        Zchar buffer[1000];
+        stream.Read(buffer, sizeof(Zchar) * strLength);
         return Zstring(buffer, strLength);
     }
     else
     {
-        boost::scoped_array<DefaultChar> buffer(new DefaultChar[strLength]);
-        stream.Read(buffer.get(), sizeof(DefaultChar) * strLength);
+        boost::scoped_array<Zchar> buffer(new Zchar[strLength]);
+        stream.Read(buffer.get(), sizeof(Zchar) * strLength);
         return Zstring(buffer.get(), strLength);
     }
 }
@@ -148,7 +148,7 @@ inline
 void writeString(wxOutputStream& stream, const Zstring& str)  //write string to filestream
 {
     writeNumber<size_t>(stream, str.length());
-    stream.Write(str.c_str(), sizeof(DefaultChar) * str.length());
+    stream.Write(str.c_str(), sizeof(Zchar) * str.length());
 }
 
 

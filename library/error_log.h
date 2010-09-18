@@ -9,8 +9,8 @@
 
 #include <wx/string.h>
 #include <vector>
+#include "../shared/zstring.h"
 
-class Zstring;
 
 namespace ffs3
 {

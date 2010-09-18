@@ -415,9 +415,6 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
     //try to read program language setting
     readXmlElementLogging("Language", global, outputCfg.programLanguage);
 
-    //ignore +/- 1 hour due to DST change
-    readXmlElementLogging("IgnoreOneHourDifference", global, outputCfg.ignoreOneHourDiff);
-
     //copy locked files using VSS
     readXmlElementLogging("CopyLockedFiles", global, outputCfg.copyLockedFiles);
 
@@ -464,6 +461,11 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
     readXmlElementLogging("ManualDeletionUseRecycler", mainWindow, outputCfg.gui.useRecyclerForManualDeletion);
 
     readXmlElementLogging("RespectCaseOnSearch", mainWindow, outputCfg.gui.textSearchRespectCase);
+
+    size_t folderPairMax = 0;
+    readXmlElementLogging("FolderPairsMax", mainWindow, folderPairMax);
+    outputCfg.gui.addFolderPairCountMax = std::max(static_cast<size_t>(2), folderPairMax) - 1; //map folderPairMax to additionalFolderPairMax
+
 
 //###########################################################
     //read column attributes
@@ -824,9 +826,6 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
     //program language
     addXmlElement("Language", inputCfg.programLanguage, global);
 
-    //ignore +/- 1 hour due to DST change
-    addXmlElement("IgnoreOneHourDifference", inputCfg.ignoreOneHourDiff, global);
-
     //copy locked files using VSS
     addXmlElement("CopyLockedFiles", inputCfg.copyLockedFiles, global);
 
@@ -887,6 +886,9 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
     addXmlElement("ManualDeletionUseRecycler", inputCfg.gui.useRecyclerForManualDeletion, mainWindow);
 
     addXmlElement("RespectCaseOnSearch", inputCfg.gui.textSearchRespectCase, mainWindow);
+
+    addXmlElement("FolderPairsMax", inputCfg.gui.addFolderPairCountMax + 1 /*add main pair*/, mainWindow);
+
 
     //write column attributes
     TiXmlElement* leftColumn = new TiXmlElement("LeftColumns");

@@ -16,6 +16,7 @@
 #include "../shared/global_func.h"
 #include "tray_icon.h"
 #include <boost/shared_ptr.hpp>
+#include "mouse_move_dlg.h"
 
 #ifdef FFS_WIN
 #include "../shared/taskbar.h"
@@ -512,7 +513,7 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(StatusHandler& updater, wxTopLevelWin
     SyncStatusDlgGenerated(parentWindow,
                            wxID_ANY,
                            parentWindow ? wxString(wxEmptyString) : (wxString(wxT("FreeFileSync - ")) + _("Folder Comparison and Synchronization")),
-                           wxDefaultPosition, wxSize(638, 376),
+                           wxDefaultPosition, wxSize(638, 350),
                            parentWindow ?
                            wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL | wxFRAME_NO_TASKBAR | wxFRAME_FLOAT_ON_PARENT : //wxTAB_TRAVERSAL is needed for standard button handling: wxID_OK/wxID_CANCEL
                            wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL),
@@ -529,6 +530,11 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(StatusHandler& updater, wxTopLevelWin
     lastStatCallSpeed(-1000000), //some big number
     lastStatCallRemTime(-1000000)
 {
+#ifdef FFS_WIN
+    new ffs3::MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                              this, m_bitmapStatus, m_staticTextStatus); //ownership passed to "this"
+#endif
+
     if (mainDialog) //save old title (will be used as progress indicator)
         titelTextBackup = mainDialog->GetTitle();
 

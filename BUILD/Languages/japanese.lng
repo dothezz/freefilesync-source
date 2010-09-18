@@ -90,8 +90,6 @@
 はい(&Y)
 (Build: %x)
 (ビルド: %x)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(注意: FAT/FAT32 ドライブのみこの影響を受けます! \n その他のケースでは設定を無効にすることができます。"1 時間の差異は無視" )
 (Requires an Internet connection!)
 (インターネット接続を必要とします!)
 - Other side's counterpart to %dir
@@ -274,13 +272,9 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 ボリュームシャドーコピーを使用して共有/ロックされたファイルをコピー\n(管理者権限が必要)
 Copy to clipboard\tCTRL+C
 クリップボードにコピー\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-シンボリックリンク %x をコピー.. %y に上書き中
-Copying Symbolic Link %x to %y
-シンボリックリンク %x から %y にコピー中
-Copying file %x overwriting %y
-ファイル %x をコピー.. %y に上書き中
-Copying file %x to %y
+Copying new Symbolic Link %x to %y
+シンボリックリンク %x を %y にコピー中
+Copying new file %x to %y
 ファイル %x を %y にコピー中
 Could not determine volume name for file:
 ファイルのボリューム名が決定されていません:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 データ検証エラー: ソースと対象ファイルに異なる内容が含まれています!
 Date
 データ
-Delay
-遅延時間
-Delay between detection of changes and execution of command line in seconds
-変更の検出とコマンドライン実行間の遅延(秒)
 Delete files/folders existing on left side only
 左側のみに存在するファイル/フォルダを削除
 Delete files/folders existing on right side only
@@ -412,6 +402,8 @@ Error reading from synchronization database:
 同期データベースからの読み込みエラー:
 Error resolving symbolic link:
 シンボリックリンクの解決に失敗:
+Error setting directory lock:
+ディレクトリ設定に失敗(ロック):
 Error setting privilege:
 特権の設定エラー:
 Error starting Volume Shadow Copy Service!
@@ -458,8 +450,6 @@ File size and date
 ファイルサイズと日付
 Filename
 ファイル名
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-ファイル %x の時間には、一時間未満の誤差があります!\n\n夏時間の問題により、より新しい方を時間で決定するのは安全ではありません。
 Files %x have the same date but a different size!
 ファイル %x は、同じ時間ですがサイズが異なっています!
 Files are found equal if\n     - file content\nis the same
@@ -564,12 +554,12 @@ Homepage
 ホームページ
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 データベースを使用して、両側アイテムの変更を特定します。 削除、競合は自動的に検出することができます。
+Idle time between detection of last change and execution of command line in seconds
+最後の変更の検出から、次にコマンドラインを実行するまでの待機時間(秒)
 If you like FFS
 FFS が気に入った場合
 Ignore
 無視
-Ignore 1-hour file time difference
-1 時間のファイル時間の差異は無視
 Ignore errors
 エラーを無視
 Ignore subsequent errors
@@ -612,6 +602,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 WOW64 では、ボリュームシャドウコピーに対応していません、FreeFileSync 64-bit 版をお試しください。
 Match case
 文字種を区別
+Minimum Idle Time
+最小待機時間
 Mirror ->>
 ミラー >>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -666,6 +658,10 @@ Operation:
 操作:
 Overview
 概要
+Overwriting Symbolic Link %x in %y
+シンボリックリンク %x を %y に上書き中
+Overwriting file %x in %y
+ファイル %x を %y に上書き中
 Pause
 一時停止
 Paused
@@ -842,8 +838,6 @@ Total time:
 合計時間:
 Transfer file and directory permissions\n(Requires Administrator rights)
 ファイルとディレクトリのパーミッション転送\n(管理者権限が必要)
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-ファイルの時間の +/- を正確に 1 時間以上の差異は不一致、1 時間未満の差異は同様ファイルとして取り扱います(夏時間は変換されます)
 Unable to connect to sourceforge.net!
 Sourceforge.net に接続できません!
 Unable to create logfile!
@@ -870,6 +864,8 @@ Volume name %x not part of filename %y!
 ボリューム名 %x にファイル名 %y はありません!
 Waiting for all directories to become available...
 すべてのディレクトリが利用可能になるまで待機中...
+Waiting while directory is locked (%x)...
+待機時間中ディレクトリはロックされます(%x)...
 Warning
 警告
 Warning: Synchronization failed for %x item(s):

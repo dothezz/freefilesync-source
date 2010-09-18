@@ -27,7 +27,7 @@
 					<Add library="libwxbase28u.a" />
 					<Add library="libwxpng.a" />
 					<Add library="libwxzlib.a" />
-					<Add library="libboost_thread-mgw45-mt-s-1_43.a" />
+					<Add library="libboost_thread-mgw45-mt-s-1_44.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 				</Linker>
 			</Target>
@@ -51,7 +51,7 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
-					<Add library="libboost_thread-mgw45-mt-sd-1_43.a" />
+					<Add library="libboost_thread-mgw45-mt-sd-1_44.a" />
 					<Add directory="C:\Program Files\C++\wxWidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
@@ -68,8 +68,9 @@
 			<Add option="-D__WXMSW__" />
 			<Add option="-DwxUSE_UNICODE" />
 			<Add option="-DFFS_WIN" />
-			<Add option="-DZSTRING_WIDE_CHAR" />
 			<Add option="-DTIXML_USE_STL" />
+			<Add option="-DBOOST_THREAD_NO_LIB" />
+			<Add option="-DBOOST_THREAD_USE_LIB" />
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
 			<Add directory="C:\Program Files\C++\Boost" />
 		</Compiler>
@@ -94,7 +95,6 @@
 		<Unit filename="WxWizDialog.fbp" />
 		<Unit filename="application.cpp" />
 		<Unit filename="application.h" />
-		<Unit filename="functions.cpp" />
 		<Unit filename="functions.h" />
 		<Unit filename="gui_generated.cpp" />
 		<Unit filename="gui_generated.h" />
@@ -122,14 +122,16 @@
 		<Unit filename="xml_proc.h" />
 		<Unit filename="..\Shared\custom_button.cpp" />
 		<Unit filename="..\Shared\custom_button.h" />
-		<Unit filename="..\Shared\drag_n_drop.cpp" />
-		<Unit filename="..\Shared\drag_n_drop.h" />
+		<Unit filename="..\Shared\dir_name.cpp" />
+		<Unit filename="..\Shared\dir_name.h" />
 		<Unit filename="..\Shared\zstring.cpp" />
 		<Unit filename="..\Shared\zstring.h" />
 		<Unit filename="..\library\process_xml.cpp" />
 		<Unit filename="..\shared\check_exist.cpp" />
 		<Unit filename="..\shared\dll_loader.cpp" />
 		<Unit filename="..\shared\dll_loader.h" />
+		<Unit filename="..\shared\dst_hack.cpp" />
+		<Unit filename="..\shared\dst_hack.h" />
 		<Unit filename="..\shared\file_error.h" />
 		<Unit filename="..\shared\file_handling.cpp" />
 		<Unit filename="..\shared\file_handling.h" />

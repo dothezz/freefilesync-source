@@ -74,24 +74,6 @@ ForwardIterator custom_binary_search(ForwardIterator first, ForwardIterator last
 
 
 //############################################################################
-class Performance
-{
-public:
-    wxDEPRECATED(Performance()); //generate compiler warnings as a reminder to remove code after measurements
-    ~Performance();
-    void showResult();
-
-private:
-    bool resultWasShown;
-    std::auto_ptr<wxStopWatch> timer;
-};
-
-//two macros for quick performance measurements
-#define PERF_START Performance a;
-#define PERF_STOP  a.showResult();
-
-
-//############################################################################
 class wxFile;
 class DebugLog
 {

@@ -90,8 +90,6 @@
 &Da
 (Build: %x)
 (Compilarea: %x)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Doar dispozitivele FAT/FAT32 sînt afectate de această problemă!\nÎn celelalte cazuri, poți dezactiva setarea \"ignoră diferența de 1-oră\".)
 (Requires an Internet connection!)
 (Necesită o conexiune la internet!)
 - Other side's counterpart to %dir
@@ -274,14 +272,10 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 Copiază filele partajate sau zăvorîte folosind Serviciul de Salvgardare a Volumelor [Volume Shadow Copy]\n(Necesită drepturi de Administrator)
 Copy to clipboard\tCTRL+C
 Copiază în Cliplanșetă\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-Copiez legătura simbolică %x și suprascriu %y
-Copying Symbolic Link %x to %y
-Copiez legătura simbolică %x în %y
-Copying file %x overwriting %y
-Copiez fila %x și suprascriu %y
-Copying file %x to %y
-Copiez fila %x în %y
+Copying new Symbolic Link %x to %y
+Copiez noua Legătură Simbolică %x în %y
+Copying new file %x to %y
+Copiez noua filă %x în %y
 Could not determine volume name for file:
 Nu pot determina numele volumului pentru fila:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 Eroare la verificarea datelor: Filele sursă și țintă au conținut diferit!
 Date
 Dată
-Delay
-Întîrziere
-Delay between detection of changes and execution of command line in seconds
-Întîrziere în secunde între detectarea modificărilor și executarea liniei de comandă
 Delete files/folders existing on left side only
 Șterge Itemul din Stînga
 Delete files/folders existing on right side only
@@ -413,7 +403,7 @@ Eroare la citirea din baza de date a sincronizării:
 Error resolving symbolic link:
 Eroare la rezolvarea legăturii simbolice:
 Error setting directory lock:
-
+Eroare la efectuarea zăvorîrii dosarului:
 Error setting privilege:
 Eroare la setarea privilegiului:
 Error starting Volume Shadow Copy Service!
@@ -460,8 +450,6 @@ File size and date
 Mărimea și Data Filei
 Filename
 Numele Filei
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-Filele %x au o diferență de dată mai mică de 1 oră!\n\nNu este clar care e mai nouă, din cauza problemelor cauzate de ora de vară.
 Files %x have the same date but a different size!
 Filele %x au aceeași dată, dar mărime diferită!
 Files are found equal if\n     - file content\nis the same
@@ -566,12 +554,12 @@ Homepage
 Sit
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Identifică și propagă modificările în ambele părți folosind o bază de date. Ștergerile și conflictele sînt detectate automat.
+Idle time between detection of last change and execution of command line in seconds
+Timp de inactivitate (în secunde) între detectarea ulimei modificări și executarea liniei de comandă
 If you like FFS
 Donare pentru FFS
 Ignore
 Ignoră
-Ignore 1-hour file time difference
-Ignoră diferențele de 1 oră ale timpurilor filelor
 Ignore errors
 Ignoră erorile
 Ignore subsequent errors
@@ -614,6 +602,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Realizarea de copii de rezervă prin sistemul WOW64 nu este suportată. Folosește versiunea pe 64-biți a FreeFileSync.
 Match case
 Potrivește MAJ/min
+Minimum Idle Time
+Timp Minim de Inactivitate
 Mirror ->>
 Clonare =>>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -668,6 +658,10 @@ Operation:
 Operațiune:
 Overview
 Panoramă
+Overwriting Symbolic Link %x in %y
+Suprascriu Legătura Simbolică %x în %y
+Overwriting file %x in %y
+Suprascriu fila %x în %y
 Pause
 Pauză
 Paused
@@ -702,8 +696,6 @@ Remove folder
 Înlătură Dosarul
 Remove folder pair
 Înlătură Perechea de Dosare
-Removing abandoned directory lock (%x)...
-
 Report translation error
 Raportarea erorilor de traducere
 Reset
@@ -846,8 +838,6 @@ Total time:
 Timp Total:
 Transfer file and directory permissions\n(Requires Administrator rights)
 Transferă permisiunile filelor și dosarelor\n(Necesită drepturi de Administrator)
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-Tratează ca egale timpurile filelor care diferă exact cu +/- 1 oră, iar cele care diferă cu mai puțin de 1 oră, ca niște conflicte generate de gestionarea orei de vară
 Unable to connect to sourceforge.net!
 Conectarea la situl sourceforge.net nu poate fi realizată!
 Unable to create logfile!
@@ -875,7 +865,7 @@ Numele volumului %x nu face parte din numele filei %y !
 Waiting for all directories to become available...
 Aștept ca toate dosarele să devină disponibile...
 Waiting while directory is locked (%x)...
-
+Aștept ca dosarul să fie zăvorît (%x)...
 Warning
 Avertisment
 Warning: Synchronization failed for %x item(s):

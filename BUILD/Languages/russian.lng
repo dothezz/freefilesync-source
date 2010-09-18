@@ -13,23 +13,23 @@
 %x TB
 %x ТБ
 %x day(s)
-
+%x дн.
 %x directories
 %x папки
 %x files
 %x файл(ов)
 %x hour(s)
-
+%x ч
 %x kB
 %x кБ
 %x min
-
+%x мин
 %x of %y rows in view
 %x из %y строк(и) показано
 %x of 1 row in view
 %x из 1 строка показана
 %x sec
-
+%x с
 %x%
 %x%
 &Abort
@@ -89,11 +89,9 @@
 &Yes
 &Да
 (Build: %x)
-(Сборка %x)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Помните, что только диски FAT/FAT32 страдают от этой проблемы!\nВо всех остальных случаях вы можете отключить параметр \"игнорировать 1-часовую разницу\".)
+(сборка %x)
 (Requires an Internet connection!)
-(Требуется подключение к Интернету!)
+(требуется подключение к Интернету!)
 - Other side's counterpart to %dir
 - аналогичная папка с другой стороны
 - Other side's counterpart to %name
@@ -257,31 +255,27 @@ Continue
 Conversion error:
 Ошибка преобразования:
 Copy filesystem permissions
-
+Копировать права доступа файловой системы
 Copy from left to right
-Скопировать слева направо
+Копировать слева направо
 Copy from left to right overwriting
-Скопировать слева направо с перезаписью
+Копировать слева направо с перезаписью
 Copy from right to left
-Скопировать справа налево
+Копировать справа налево
 Copy from right to left overwriting
-Скопировать справа налево с перезаписью
+Копировать справа налево с перезаписью
 Copy locked files
 Копировать заблокированные файлы
 Copy new or updated files to right folder.
 Копировать новые или обновлять файлы на правой стороне.
 Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
-
+Копирование общих или заблокированных файлов\nс использованием службы Теневого Копирования Тома\n(требуются права Администратора)
 Copy to clipboard\tCTRL+C
 Копировать в буфер обмена\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-Копирование символьной ссылки %x с перезаписью %y
-Copying Symbolic Link %x to %y
-Копирование симовльной ссылки %x в %y
-Copying file %x overwriting %y
-Копирование файла %x с перезаписью %y
-Copying file %x to %y
-Копирование файла %x в %y
+Copying new Symbolic Link %x to %y
+Копирование новой символьной ссылки %x в %y
+Copying new file %x to %y
+Копирование нового файла %x в %y
 Could not determine volume name for file:
 Не удалось определить название тома для файла:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 Ошибка проверки данных: исходный и конечный файлы имеют разное содержание!
 Date
 Дата
-Delay
-Задержка
-Delay between detection of changes and execution of command line in seconds
-Задержка между обнаружением изменений и выполнением командной строки в секундах
 Delete files/folders existing on left side only
 Удалять файлы/папки, существующие только на левой стороне
 Delete files/folders existing on right side only
@@ -370,6 +360,8 @@ Elements remaining:
 Элементов осталось:
 Email
 Почта
+Encode extended time information: %x
+
 Endless loop when traversing directory:
 Зацикливание при встрече пересекающихся путей:
 Error
@@ -377,7 +369,7 @@ Error
 Error changing modification time:
 Ошибка при изменении времени модификации файла:
 Error copying file permissions:
-
+Ошибка при копировании прав доступа:
 Error copying file:
 Ошибка при копировании файла:
 Error copying locked file %x!
@@ -412,10 +404,12 @@ Error reading from synchronization database:
 Ошибка при чтении из базы данных синхронизации:
 Error resolving symbolic link:
 Ошибка при решении символической ссылки:
+Error setting directory lock:
+Ошибка блокировки папки:
 Error setting privilege:
-
+Ошибка установки привилегий:
 Error starting Volume Shadow Copy Service!
-Ошибка при запуске Службы Теневого Копирования Тома!
+Ошибка при запуске службы Теневого Копирования Тома!
 Error traversing directory:
 Ошибка при пересечении папок:
 Error when monitoring directories.
@@ -458,8 +452,6 @@ File size and date
 Размер и дата файла
 Filename
 Имя файла
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-Файлы %x имеют время отличающееся менее чем на 1 час!\n\nРешать какой новее небезопасно ввиду перехода на летнее время.
 Files %x have the same date but a different size!
 Файлы %x имеют одинаковую дату, но различаются по размеру!
 Files are found equal if\n     - file content\nis the same
@@ -564,12 +556,12 @@ Homepage
 Оф.сайт
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Выявление и распространение изменений на обеих сторонах с использованием базы данных. Удаленные файлы и конфликты определяются автоматически.
+Idle time between detection of last change and execution of command line in seconds
+Время простоя между обнаружением последнего изменения и выполнением командной строки в секундах
 If you like FFS
 Если Вам понравился FFS
 Ignore
 Игнорировать
-Ignore 1-hour file time difference
-Игнорировать 1-часовую разницу во времени
 Ignore errors
 Игнорировать ошибки
 Ignore subsequent errors
@@ -593,7 +585,7 @@ Initial synchronization:
 Integrate external applications into context menu. The following macros are available:
 Интегрирует внешние приложения в контекстное меню.\nСледующие команды доступны:
 Invalid FreeFileSync config file!
-
+Неверный файл конфигурации FreeFileSync!
 Leave as unresolved conflict
 Оставить как нерешенный конфликт
 Left
@@ -612,6 +604,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Создание теневых копий на WOW64 не поддерживается. Пожалуйста, используйте FreeFileSync 64-разрядной версии.
 Match case
 Учитывать регистр
+Minimum Idle Time
+Минимальное время простоя
 Mirror ->>
 Зеркало ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -666,6 +660,10 @@ Operation:
 Операция:
 Overview
 Главная
+Overwriting Symbolic Link %x in %y
+Перезапись символьной ссылки %x в %y
+Overwriting file %x in %y
+Перезапись файла %x в %y
 Pause
 Пауза
 Paused
@@ -806,8 +804,6 @@ Synchronization completed with errors!
 Синхронизация закончена с ошибками!
 Synchronization settings
 Настройки синхронизации
-Synchronization status
-Статус синхронизации
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Синхронизировать все .doc, .zip и .exe файлы, за исключением всех файлов из подпапки \"temp\"
 Synchronize...
@@ -841,9 +837,7 @@ Total required free disk space:
 Total time:
 Общее время:
 Transfer file and directory permissions\n(Requires Administrator rights)
-
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-Учитывать файлы, которые отличаются по времени на 1 час, как равные, менее чем на 1 час, как конфликтные, чтобы учесть переход на летнее время
+Передача прав доступа файла/папки\n(требуются права Администратора)
 Unable to connect to sourceforge.net!
 Невозможно соединиться с sourceforge.net!
 Unable to create logfile!
@@ -870,6 +864,8 @@ Volume name %x not part of filename %y!
 Имя тома %x не является частью имени файла %y!
 Waiting for all directories to become available...
 Ожидание, пока все папки станут доступными...
+Waiting while directory is locked (%x)...
+Ожидание снятия блокировки с папки (%x)...
 Warning
 Внимание
 Warning: Synchronization failed for %x item(s):

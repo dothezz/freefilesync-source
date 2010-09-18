@@ -100,7 +100,7 @@ private:
             break;
         case SYMLINK_CONFLICT:
             linkObj.setSyncDir(config.conflict);
-           break;
+            break;
         case SYMLINK_DIFFERENT:
             linkObj.setSyncDir(config.different);
             break;
@@ -572,6 +572,7 @@ private:
         {
             return loadFromDisk(baseDirectory);
         }
+        catch (FileErrorDatabaseNotExisting&) {} //let's ignore these errors for now...
         catch (FileError& error) //e.g. incompatible database version
         {
             if (handler_) handler_->reportWarning(error.msg() + wxT(" \n\n") +
@@ -948,7 +949,7 @@ void ffs3::setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsO
         {
             SetNewDirection(newDirection_).execute(const_cast<DirMapping&>(dirObj)); //phyiscal object is not const in this method anyway
         }
-private:
+    private:
         const SyncDirection newDirection_;
     } recurse(newDirection);
     fsObj.accept(recurse);
@@ -1022,7 +1023,7 @@ void ffs3::setActiveStatus(bool newStatus, ffs3::FileSystemObject& fsObj)
             else
                 InOrExcludeAllRows<false>().execute(const_cast<DirMapping&>(dirObj)); //
         }
-private:
+    private:
         const bool newStatus_;
     } recurse(newStatus);
     fsObj.accept(recurse);
@@ -1110,7 +1111,7 @@ bool FilterData<STRATEGY_ACTIVE_ONLY>::processObject(ffs3::FileSystemObject& fsO
 void ffs3::addExcludeFiltering(const Zstring& excludeFilter, FolderComparison& folderCmp)
 {
     for (std::vector<BaseDirMapping>::iterator i = folderCmp.begin(); i != folderCmp.end(); ++i)
-        FilterData<STRATEGY_ACTIVE_ONLY>(*BaseFilter::FilterRef(new NameFilter(DefaultStr("*"), excludeFilter))).execute(*i);
+        FilterData<STRATEGY_ACTIVE_ONLY>(*BaseFilter::FilterRef(new NameFilter(Zstr("*"), excludeFilter))).execute(*i);
 }
 
 
@@ -1207,10 +1208,26 @@ std::pair<wxString, int> ffs3::deleteFromGridAndHDPreview( //assemble message co
 }
 
 
+namespace
+{
+struct RemoveCallbackImpl : public ffs3::RemoveDirCallback
+{
+    RemoveCallbackImpl(DeleteFilesHandler& deleteCallback) : deleteCallback_(deleteCallback) {}
+
+    virtual void requestUiRefresh(const Zstring& currentObject)
+    {
+        deleteCallback_.deletionSuccessful(0);
+    }
+
+private:
+    DeleteFilesHandler& deleteCallback_;
+};
+}
+
 template <SelectedSide side>
 void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDeleteOneSide,
                                 const bool useRecycleBin,
-                                DeleteFilesHandler* statusHandler)
+                                DeleteFilesHandler& statusHandler)
 {
     for (std::vector<FileSystemObject*>::const_iterator i = rowsToDeleteOneSide.begin(); i != rowsToDeleteOneSide.end(); ++i)
     {
@@ -1225,9 +1242,13 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDeleteOneS
                         ffs3::moveToRecycleBin(fsObj->getFullName<side>());  //throw (FileError)
                     else
                     {
+                        RemoveCallbackImpl removeCallback(statusHandler);
+
                         //del directories and symlinks
                         struct DeletePermanently : public FSObjectVisitor
                         {
+                            DeletePermanently(RemoveCallbackImpl* remCallback) : remCallback_(remCallback) {}
+
                             virtual void visit(const FileMapping& fileObj)
                             {
                                 ffs3::removeFile(fileObj.getFullName<side>());
@@ -1238,7 +1259,7 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDeleteOneS
                                 switch (linkObj.getLinkType<side>())
                                 {
                                 case LinkDescriptor::TYPE_DIR:
-                                    ffs3::removeDirectory(linkObj.getFullName<side>());
+                                    ffs3::removeDirectory(linkObj.getFullName<side>(), NULL);
                                     break;
                                 case LinkDescriptor::TYPE_FILE:
                                     ffs3::removeFile(linkObj.getFullName<side>());
@@ -1248,21 +1269,24 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDeleteOneS
 
                             virtual void visit(const DirMapping& dirObj)
                             {
-                                ffs3::removeDirectory(dirObj.getFullName<side>());
+                                ffs3::removeDirectory(dirObj.getFullName<side>(), remCallback_);
                             }
-                        } delPerm;
+
+                        private:
+                            RemoveCallbackImpl* remCallback_;
+                        } delPerm(&removeCallback);
                         fsObj->accept(delPerm);
                     }
 
                     fsObj->removeObject<side>(); //if directory: removes recursively!
                 }
-                statusHandler->deletionSuccessful(); //notify successful file/folder deletion
+                statusHandler.deletionSuccessful(1); //notify successful file/folder deletion
 
                 break;
             }
             catch (const FileError& error)
             {
-                DeleteFilesHandler::Response rv = statusHandler->reportError(error.msg());
+                DeleteFilesHandler::Response rv = statusHandler.reportError(error.msg());
 
                 if (rv == DeleteFilesHandler::IGNORE_ERROR)
                     break;
@@ -1297,12 +1321,12 @@ private:
 
 
 void ffs3::deleteFromGridAndHD(FolderComparison& folderCmp,                         //attention: rows will be physically deleted!
-                                       std::vector<FileSystemObject*>& rowsToDeleteOnLeft,  //refresh GUI grid after deletion to remove invalid rows
-                                       std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
-                                       const bool deleteOnBothSides,
-                                       const bool useRecycleBin,
-                                       const MainConfiguration& mainConfig,
-                                       DeleteFilesHandler* statusHandler)
+                               std::vector<FileSystemObject*>& rowsToDeleteOnLeft,  //refresh GUI grid after deletion to remove invalid rows
+                               std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
+                               const bool deleteOnBothSides,
+                               const bool useRecycleBin,
+                               const MainConfiguration& mainConfig,
+                               DeleteFilesHandler& statusHandler)
 {
     if (folderCmp.size() == 0)
         return;

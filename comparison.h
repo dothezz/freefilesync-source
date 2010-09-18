@@ -43,7 +43,6 @@ class CompareProcess
 public:
     CompareProcess(SymLinkHandling handleSymlinks,
                    size_t fileTimeTol,
-                   bool ignoreOneHourDiff,
                    xmlAccess::OptionalDialogs& warnings,
                    StatusHandler* handler);
 
@@ -66,7 +65,6 @@ private:
     boost::shared_ptr<DirectoryBuffer> directoryBuffer; //std::auto_ptr does not work with forward declarations (Or we need a non-inline ~CompareProcess())!
 
     const size_t fileTimeTolerance; //max allowed file time deviation
-    const bool ignoreOneHourDifference;
 
     xmlAccess::OptionalDialogs& m_warnings;
 

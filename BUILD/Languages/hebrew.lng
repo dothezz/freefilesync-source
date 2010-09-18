@@ -90,8 +90,6 @@
 &כן
 (Build: %x)
 
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(שים לב: רק כוננים קשיחים מסוג פאט-פאט32 מושפעום מבעיה זאת \מ )
 (Requires an Internet connection!)
 (מחייב קישור אינטרנטי פעיל!)
 - Other side's counterpart to %dir
@@ -274,14 +272,10 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 
 Copy to clipboard\tCTRL+C
 העתק למכתבה \tCTRL+C
-Copying Symbolic Link %x overwriting %y
+Copying new Symbolic Link %x to %y
 
-Copying Symbolic Link %x to %y
+Copying new file %x to %y
 
-Copying file %x overwriting %y
-
-Copying file %x to %y
-העתק קובץ %x nach %y
 Could not determine volume name for file:
 לא יכול לקבוע שם כונן לקובץ:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 !טעות של אימות נתונים קובץ מקור ומטרה בעלי תכולת נתונים שונה
 Date
 תארין
-Delay
-השהייה
-Delay between detection of changes and execution of command line in seconds
-השהייה בין גילוי של שינוי לבין הפעלה של שורת פקודות בשניות
 Delete files/folders existing on left side only
 מחק קבצים -תיקיות הקימים אך ורק בצד שמאל
 Delete files/folders existing on right side only
@@ -412,6 +402,8 @@ Error reading from synchronization database:
 טעות בקריאה מבסיס הנתונים של הסנכרון:
 Error resolving symbolic link:
 טעות בפענוח מראה מקום סימלי (Symbolic Link)
+Error setting directory lock:
+
 Error setting privilege:
 
 Error starting Volume Shadow Copy Service!
@@ -458,8 +450,6 @@ File size and date
 גודל קובץ ותאריך
 Filename
 שם קובץ
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-קובץ %x נשמר בשעה הבדל!\n\n אין אפשרות להחליט מי מהקבצים חדש יותר בגלל אפשרות שעון קייץ
 Files %x have the same date but a different size!
 קובץ %x בעל תאריך זהה אך גודל שונה
 Files are found equal if\n     - file content\nis the same
@@ -564,12 +554,12 @@ Homepage
 :אתר-הבית
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 זהה והפץ שינויים בשניי הצדדים בעזרת בסיס נתונים מחיקות וקונפליקטים מזוהים באופן אוטומטי
+Idle time between detection of last change and execution of command line in seconds
+
 If you like FFS
 :תרומה תתקבל בברכה
 Ignore
 
-Ignore 1-hour file time difference
-התעלם מ-1 שעה הבדל בזמן השמירה של הקובץ -בעית שעון קיץ
 Ignore errors
 התעלם מטעויות
 Ignore subsequent errors
@@ -612,6 +602,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 לא נתמכת בגרסה זאת אנא התקן גרסה 64 WOW64 העתקת צל ב
 Match case
 אותיות התאם 
+Minimum Idle Time
+
 Mirror ->>
 מראה ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -666,6 +658,10 @@ Operation:
 פעולה:
 Overview
 מבט כללי
+Overwriting Symbolic Link %x in %y
+
+Overwriting file %x in %y
+
 Pause
 עצור
 Paused
@@ -842,8 +838,6 @@ Total time:
 זמן מקומי:
 Transfer file and directory permissions\n(Requires Administrator rights)
 
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-התיחס לזמני הקובץ כאשר הם שונים בדיוק ב +/- שעה כשווים לצורך פתרון  בעית שעון קיץ
 Unable to connect to sourceforge.net!
 אין תקשורת ל sourceforge.net!
 Unable to create logfile!
@@ -870,6 +864,8 @@ Volume name %x not part of filename %y!
 כנונן %x לא בנתיב של קובץ %y!
 Waiting for all directories to become available...
 מחכה להתפנות כל המחיצות...
+Waiting while directory is locked (%x)...
+
 Warning
 אזהרה
 Warning: Synchronization failed for %x item(s):

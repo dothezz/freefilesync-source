@@ -3,9 +3,9 @@
 <HEAD>
 	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
 	<TITLE></TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Win32)">
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20091209;21053000">
+	<META NAME="CHANGED" CONTENT="20100902;19174600">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -17,22 +17,25 @@
 		H3 { margin-bottom: 0.21cm }
 		H3.western { font-family: "Arial", sans-serif }
 		H3.cjk { font-family: "MS Mincho" }
+		H3.ctl { font-family: "Mangal" }
 		A:link { so-language: zxx }
 	-->
 	</STYLE>
 </HEAD>
-<BODY LANG="de-DE" DIR="LTR">
+<BODY LANG="en-US" DIR="LTR">
 <H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Synchronize with
-FTP</FONT></H3>
+FTP/WebDAV <SPAN STYLE="font-weight: normal">(Windows)</SPAN></FONT></H3>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">FreeFileSync
-does not support FTP directly. But the FTP functionality can be
-easily integrated by mapping the FTP webspace to a drive letter:</FONT></P>
+does not support accessing FTP volumes directly. But this
+functionality can be integrated by mapping the FTP web space to a
+drive letter:</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT><FONT FACE="Tahoma, sans-serif">
-Use the free utility NetDrive (<A HREF="http://www.netdrive.net/">http://www.netdrive.net</A>)</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT>
+<FONT FACE="Tahoma, sans-serif">Use the free utility NetDrive
+(<A HREF="http://www.netdrive.net/">http://www.netdrive.net</A>)</FONT></P>
 <UL>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Add
 	a &quot;<I>New Site</I>&quot; and specify site name, site URL, drive
@@ -43,10 +46,37 @@ Use the free utility NetDrive (<A HREF="http://www.netdrive.net/">http://www.net
 <P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
 	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
 	<FONT FACE="Tahoma, sans-serif"><B>Note:</B><BR>Most FTP drives set
-	a file's timestamp to the current time when synchronizing ignoring
+	a file's time stamp to the current time when synchronizing ignoring
 	the source file's time and date. As a workaround you can do a
 	&quot;<I>compare by filesize</I>&quot;; see corresponding section.</FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Synchronize with
+SFTP <SPAN STYLE="font-weight: normal">(Linux)</SPAN></FONT></H3>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">An SFTP
+share can be easily mapped onto a local folder for use with
+FreeFileSync:</FONT></P>
+<UL>
+	<P><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+		<UL>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Install:</FONT><FONT FACE="Courier New, monospace"><BR>sudo
+			apt-get install sshfs</FONT></P>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Mount
+			SFTP share:</FONT><FONT FACE="Courier New, monospace"><BR>sshfs
+			ssh-account@ssh-server:[path] mountpoint</FONT></P>
+			<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Unmount:</FONT><FONT FACE="Courier New, monospace"><BR>fusermount
+			-u mountpoint</FONT></P>
+		</UL>
+	</SPAN><BR CLEAR=LEFT>
+	</P>
+</UL>
+<P><BR><BR>
 </P>
 </BODY>
 </HTML>

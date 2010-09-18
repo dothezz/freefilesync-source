@@ -102,6 +102,15 @@ void Application::OnStartApplication(wxIdleEvent&)
 
     GlobalResources::getInstance().load(); //loads bitmap resources on program startup
 
+#ifndef _MSC_VER
+#warning wxWidgets 2.9
+#endif
+    /*
+        wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping
+        wxToolTip::SetAutoPop(7000); //tooltip visibilty in ms, 5s seems to be default for Windows
+    */
+
+
     try //load global settings from XML
     {
         if (fileExists(wxToZ(xmlAccess::getGlobalConfigFile())))
@@ -182,9 +191,10 @@ int Application::OnExit()
     {
         xmlAccess::writeConfig(globalSettings);
     }
-    catch (const xmlAccess::XmlError& error)
+    catch (const xmlAccess::XmlError&)
     {
-        wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
+        //wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR); -> not that important/might be tedious in silent batch?
+        assert(false); //get info in debug build
     }
 
     return 0;
@@ -233,10 +243,9 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         //COMPARE DIRECTORIES
         ffs3::FolderComparison folderCmp;
         ffs3::CompareProcess comparison(batchCfg.mainCfg.handleSymlinks,
-                                                globSettings.fileTimeTolerance,
-                                                globSettings.ignoreOneHourDiff,
-                                                globSettings.optDialogs,
-                                                statusHandler.get());
+                                        globSettings.fileTimeTolerance,
+                                        globSettings.optDialogs,
+                                        statusHandler.get());
 
         comparison.startCompareProcess(ffs3::extractCompareCfg(batchCfg.mainCfg),
                                        batchCfg.mainCfg.compareVar,
@@ -245,7 +254,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         //check if there are files/folders to be sync'ed at all
         if (!synchronizationNeeded(folderCmp))
         {
-            statusHandler->reportInfo(_("Nothing to synchronize according to configuration!")); //inform about this special case
+            statusHandler->logInfo(_("Nothing to synchronize according to configuration!")); //inform about this special case
             //return; -> disabled: <automatic> mode requires database to be written in any case
         }
 

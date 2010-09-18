@@ -39,7 +39,7 @@ public:
     void setProgress(size_t current, size_t total);
 
 private:
-    struct Pimpl;
+    class Pimpl;
     std::auto_ptr<Pimpl> pimpl_;
 };
 

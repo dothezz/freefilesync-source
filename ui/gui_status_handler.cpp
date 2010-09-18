@@ -79,7 +79,7 @@ void CompareStatusHandler::OnKeyPressed(wxKeyEvent& event)
 }
 
 
-void CompareStatusHandler::updateStatusText(const Zstring& text)
+void CompareStatusHandler::reportInfo(const Zstring& text)
 {
     mainDialog->compareStatus->setStatusText_NoUpdate(text);
 }
@@ -267,7 +267,7 @@ SyncStatusHandler::~SyncStatusHandler()
 
 
 inline
-void SyncStatusHandler::updateStatusText(const Zstring& text)
+void SyncStatusHandler::reportInfo(const Zstring& text)
 {
     syncStatusFrame.setStatusText_NoUpdate(text);
 }
@@ -378,7 +378,7 @@ void SyncStatusHandler::reportWarning(const wxString& warningMessage, bool& warn
 }
 
 
-void SyncStatusHandler::reportInfo(const wxString& infoMessage)
+void SyncStatusHandler::logInfo(const wxString& infoMessage)
 {
     errorLog.logInfo(infoMessage);
 }

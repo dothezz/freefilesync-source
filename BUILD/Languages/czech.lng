@@ -90,8 +90,6 @@ U&končit
 &Ano
 (Build: %x)
 (Build: %x)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Platí pouze pro souborové systémy FAT/FAT32. V ostatních případech můžete nastavení \"Ignorovat 1 hodinu rozdílu v čase mezi soubory\" nechat vypnuté.)
 (Requires an Internet connection!)
 (Vyžaduje připojení k internetu!)
 - Other side's counterpart to %dir
@@ -274,14 +272,10 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 Kopírovat sdílené nebo zamčené soubory pomocí Volume Shadow Copy Service\n(Vyžaduje administrátorské oprávnění)
 Copy to clipboard\tCTRL+C
 Vložit do schránky\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-Kopírování symbolického odkazu %x přes %y
-Copying Symbolic Link %x to %y
+Copying new Symbolic Link %x to %y
 Kopírování symbolického odkazu %x do %y
-Copying file %x overwriting %y
-Kopírování soubor %x přes %y
-Copying file %x to %y
-Kopírování souboru %x do %y
+Copying new file %x to %y
+Kopírování nového souboru %x do %y
 Could not determine volume name for file:
 Není možné zjistit jméno jednotky souboru:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 Chyba verifikace dat: Zdrojový a cílový soubor mají rozdílný obsah!
 Date
 Datum
-Delay
-Zpoždění
-Delay between detection of changes and execution of command line in seconds
-Zpoždění detekce změn a spuštění příkazu v sekundách
 Delete files/folders existing on left side only
 Smazat soubory/adresáře existující pouze na levé straně
 Delete files/folders existing on right side only
@@ -370,6 +360,8 @@ Elements remaining:
 Zbývá položek:
 Email
 Email
+Encode extended time information: %x
+
 Endless loop when traversing directory:
 Zacyklení při procházení adresáře:
 Error
@@ -413,7 +405,7 @@ Chyba čtení synchronizační databáze:
 Error resolving symbolic link:
 Chyba odkazu zástupce:
 Error setting directory lock:
-
+Chyba nastavení zámku adresáře:
 Error setting privilege:
 Chyba nastavení práv:
 Error starting Volume Shadow Copy Service!
@@ -460,8 +452,6 @@ File size and date
 Podle velikosti a data souboru
 Filename
 Jméno
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-Soubory %x se liší o méně než 1 hodinu.\n\nnení možné bezpečně rozhodnout, který z nich je novější kvůli používání Letního času.
 Files %x have the same date but a different size!
 Soubory %x mají stejné datum a čas ale rozdílnou velikost!
 Files are found equal if\n     - file content\nis the same
@@ -566,12 +556,12 @@ Homepage
 Homepage
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Rozpoznat a provést změny na obou stranách pomocí databáze. Odstraněné soubory a konflikty budou detekovány automaticky.
+Idle time between detection of last change and execution of command line in seconds
+Prodleva mezi detekcí poslední změny a spuštěním příkazu (v sekundách)
 If you like FFS
 Pokud se Vám FSS líbí
 Ignore
 Přeskočit
-Ignore 1-hour file time difference
-Ignorovat 1 hodinu rozdílu v čase mezi soubory
 Ignore errors
 Ignorovat chyby
 Ignore subsequent errors
@@ -614,6 +604,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Vytváření stínových kopií na WOW64 není podporováno. Prosím použijte 64 bitovou verzi FreeFileSync.
 Match case
 Rozlišovat malá a velká písmena
+Minimum Idle Time
+Minimální čas prodlevy
 Mirror ->>
 Zrcadlení ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -668,6 +660,10 @@ Operation:
 Operace:
 Overview
 Přehled
+Overwriting Symbolic Link %x in %y
+Přepis symbolického odkazu %x v %y
+Overwriting file %x in %y
+Přepis souboru %x v %y
 Pause
 Pauza
 Paused
@@ -702,8 +698,6 @@ Remove folder
 Odstranit adresář
 Remove folder pair
 Odstranit dvojici adresářů
-Removing abandoned directory lock (%x)...
-
 Report translation error
 Hlásit chyby překladu
 Reset
@@ -810,8 +804,6 @@ Synchronization completed with errors!
 Synchronizace dokončena s chybami.
 Synchronization settings
 Nastavení synchronizace
-Synchronization status
-Stav synchronizace
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Synchronizovat všechny soubory .doc, .zip a .exe s výjimkou všeho v podadresáři \"temp\"
 Synchronize...
@@ -846,8 +838,6 @@ Total time:
 Celkový čas:
 Transfer file and directory permissions\n(Requires Administrator rights)
 Přenést přístupová oprávnění souborů a adresářů\n(Vyžaduje administrátorké oprávnění)
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-Považovat čas souboru lišící se přesně o +/- 1 hodinu jako shodný, méně než 1 hodinu jako konflikt, kvůli zpracování a přechodům na Letní čas
 Unable to connect to sourceforge.net!
 Není možné se připojit k sourceforge.net!
 Unable to create logfile!
@@ -875,7 +865,7 @@ Disk %x není součástí jména souboru %y!
 Waiting for all directories to become available...
 Čekání na zpřístupnění všech adresářů...
 Waiting while directory is locked (%x)...
-
+Čekání na uzamčení adresáře (%x)
 Warning
 Varování
 Warning: Synchronization failed for %x item(s):

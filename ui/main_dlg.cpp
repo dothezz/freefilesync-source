@@ -30,7 +30,7 @@
 #include "mouse_move_dlg.h"
 #include "progress_indicator.h"
 #include "msg_popup.h"
-#include "../shared/drag_n_drop.h"
+#include "../shared/dir_name.h"
 #include "../library/filter.h"
 #include "../structures.h"
 #include <wx/imaglist.h>
@@ -56,16 +56,16 @@ using namespace ffs3;
 using ffs3::CustomLocale;
 
 
-class MainFolderDragDrop : public DragDropOnMainDlg
+class DirectoryNameMainImpl : public DirectoryNameMainDlg
 {
 public:
-    MainFolderDragDrop(MainDialog&      mainDlg,
-                       wxWindow*        dropWindow1,
-                       wxWindow*        dropWindow2,
-                       wxDirPickerCtrl* dirPicker,
-                       wxComboBox*      dirName) :
-
-        DragDropOnMainDlg(dropWindow1, dropWindow2, dirPicker, dirName),
+    DirectoryNameMainImpl(MainDialog&      mainDlg,
+                          wxWindow*        dropWindow1,
+                          wxWindow*        dropWindow2,
+                          wxDirPickerCtrl* dirPicker,
+                          wxComboBox*      dirName,
+                          wxStaticBoxSizer* staticBox) :
+        DirectoryNameMainDlg(dropWindow1, dropWindow2, dirPicker, dirName, staticBox),
         mainDlg_(mainDlg) {}
 
     virtual bool AcceptDrop(const std::vector<wxString>& droppedFiles)
@@ -114,7 +114,7 @@ public:
             }
 
         case xmlAccess::MERGE_OTHER:
-        //=> return true: change directory selection via drag and drop
+            //=> return true: change directory selection via drag and drop
             break;
         }
 
@@ -130,7 +130,8 @@ public:
     }
 
 private:
-    MainFolderDragDrop(const MainFolderDragDrop&);
+    DirectoryNameMainImpl(const DirectoryNameMainImpl&);
+    DirectoryNameMainImpl& operator=(const DirectoryNameMainImpl&);
 
     MainDialog& mainDlg_;
 };
@@ -147,7 +148,7 @@ private:
                     /|\                  /|\
             _________|________    ________|
            |                  |  |
-  FirstFolderPairCfg    FolderPairPanel
+  DirectoryPairFirst      DirectoryPair
 */
 
 template <class GuiPanel>
@@ -195,46 +196,78 @@ private:
 };
 
 
-class FolderPairPanel :
-    public FolderPairGenerated, //FolderPairPanel "owns" FolderPairGenerated!
+class DirectoryPair :
+    public FolderPairGenerated, //DirectoryPair "owns" FolderPairGenerated!
     public FolderPairCallback<FolderPairGenerated>
 {
 public:
-    FolderPairPanel(wxWindow* parent, MainDialog& mainDialog) :
+    DirectoryPair(wxWindow* parent, MainDialog& mainDialog) :
         FolderPairGenerated(parent),
         FolderPairCallback<FolderPairGenerated>(static_cast<FolderPairGenerated&>(*this), mainDialog), //pass FolderPairGenerated part...
-        dragDropOnLeft( m_panelLeft,  m_dirPickerLeft,  m_directoryLeft),
-        dragDropOnRight(m_panelRight, m_dirPickerRight, m_directoryRight) {}
+        dirNameLeft( m_panelLeft,  m_dirPickerLeft,  m_directoryLeft),
+        dirNameRight(m_panelRight, m_dirPickerRight, m_directoryRight) {}
+
+    void setValues(const Zstring& leftDir, const Zstring& rightDir, AltSyncCfgPtr syncCfg, const FilterConfig& filter)
+    {
+        setConfig(syncCfg, filter);
+        dirNameLeft.setName(leftDir);
+        dirNameRight.setName(rightDir);
+    }
+    Zstring getLeftDir() const
+    {
+        return dirNameLeft.getName();
+    }
+    Zstring getRightDir() const
+    {
+        return dirNameRight.getName();
+    }
 
 private:
     //support for drag and drop
-    DragDropOnDlg dragDropOnLeft;
-    DragDropOnDlg dragDropOnRight;
+    DirectoryName dirNameLeft;
+    DirectoryName dirNameRight;
 };
 
 
-class FirstFolderPairCfg : public FolderPairCallback<MainDialogGenerated>
+class DirectoryPairFirst : public FolderPairCallback<MainDialogGenerated>
 {
 public:
-    FirstFolderPairCfg(MainDialog& mainDialog) :
+    DirectoryPairFirst(MainDialog& mainDialog) :
         FolderPairCallback<MainDialogGenerated>(mainDialog, mainDialog),
 
         //prepare drag & drop
-        dragDropOnLeft(mainDialog,
-                       mainDialog.m_panelLeft,
-                       mainDialog.m_panelTopLeft,
-                       mainDialog.m_dirPickerLeft,
-                       mainDialog.m_directoryLeft),
-        dragDropOnRight(mainDialog,
-                        mainDialog.m_panelRight,
-                        mainDialog.m_panelTopRight,
-                        mainDialog.m_dirPickerRight,
-                        mainDialog.m_directoryRight) {}
+        dirNameLeft(mainDialog,
+                    mainDialog.m_panelLeft,
+                    mainDialog.m_panelTopLeft,
+                    mainDialog.m_dirPickerLeft,
+                    mainDialog.m_directoryLeft,
+                    mainDialog.sbSizerDirLeft),
+        dirNameRight(mainDialog,
+                     mainDialog.m_panelRight,
+                     mainDialog.m_panelTopRight,
+                     mainDialog.m_dirPickerRight,
+                     mainDialog.m_directoryRight,
+                     mainDialog.sbSizerDirRight) {}
+
+    void setValues(const Zstring& leftDir, const Zstring& rightDir, AltSyncCfgPtr syncCfg, const FilterConfig& filter)
+    {
+        setConfig(syncCfg, filter);
+        dirNameLeft.setName(leftDir);
+        dirNameRight.setName(rightDir);
+    }
+    Zstring getLeftDir() const
+    {
+        return dirNameLeft.getName();
+    }
+    Zstring getRightDir() const
+    {
+        return dirNameRight.getName();
+    }
 
 private:
     //support for drag and drop
-    MainFolderDragDrop dragDropOnLeft;
-    MainFolderDragDrop dragDropOnRight;
+    DirectoryNameMainImpl dirNameLeft;
+    DirectoryNameMainImpl dirNameRight;
 };
 
 
@@ -378,8 +411,12 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
     updateFileIcons.reset(new IconUpdater(m_gridLeft, m_gridRight));
 
 #ifdef FFS_WIN
-    moveWholeWindow.reset(new MouseMoveWindow(this));
+    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                        m_panel71,
+                        m_panelBottom,
+                        m_panelStatusBar); //ownership passed to "this"
 #endif
+
     syncPreview.reset(new SyncPreview(this));
 
     SetTitle(wxString(wxT("FreeFileSync - ")) + _("Folder Comparison and Synchronization"));
@@ -391,7 +428,7 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
     ffs3::AppMainWindow::setMainWindow(this);
 
     //init handling of first folder pair
-    firstFolderPair.reset(new FirstFolderPairCfg(*this));
+    firstFolderPair.reset(new DirectoryPairFirst(*this));
 
     initViewFilterButtons();
 
@@ -430,13 +467,6 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
 
     MenuItemUpdater updateMenuHelp(m_menuHelp);
     updateMenuHelp.addForUpdate(m_menuItemAbout, GlobalResources::getInstance().getImageByName(wxT("aboutSmall")));
-
-#ifdef FFS_WIN
-    //allow moving main dialog by clicking (nearly) anywhere...
-    moveWholeWindow->connectSourceWindow(m_panel71);
-    moveWholeWindow->connectSourceWindow(m_panelBottom);
-    moveWholeWindow->connectSourceWindow(m_panelStatusBar);
-#endif
 
 #ifdef FFS_LINUX
     if (!ffs3::isPortableVersion()) //disable update check for Linux installer-based version -> handled by .deb
@@ -799,9 +829,9 @@ public:
         return DeleteFilesHandler::IGNORE_ERROR; //dummy return value
     }
 
-    virtual void deletionSuccessful()  //called for each file/folder that has been deleted
+    virtual void deletionSuccessful(size_t deletedItems)  //called for each file/folder that has been deleted
     {
-        ++deletionCount;
+        deletionCount += deletedItems;
 
         if (updateUiIsAllowed())  //test if specific time span between ui updates is over
         {
@@ -875,7 +905,7 @@ void MainDialog::deleteSelectedFiles()
                                           globalSettings->gui.deleteOnBothSides,
                                           globalSettings->gui.useRecyclerForManualDeletion,
                                           getCurrentConfiguration().mainCfg,
-                                          &statusHandler);
+                                          statusHandler);
             }
             catch (ffs3::AbortThisProcess&) {}
 
@@ -1100,10 +1130,11 @@ void MainDialog::OnResize(wxSizeEvent& event)
         GetSize(&width, &height);
         GetPosition(&x, &y);
 
-        if (width > 0 && height > 0 && x >= -200 && y >= -200) //test ALL parameters at once, since width/height are invalid if
+        //test ALL parameters at once, since width/height are invalid if the window is minimized (eg x,y == -32000; height = 28, width = 160)
+        //note: negative values for x and y are possible when using multiple monitors!
+        if (width > 0 && height > 0 && x >= -3360 && y >= -200)
         {
-            //the window is minimized (eg x,y == -32000; height = 28, width = 160)
-            widthNotMaximized  = width;                        //however visible(!) x < 0 and y < 0 are possible with dual monitors
+            widthNotMaximized  = width;                        //visible coordinates x < 0 and y < 0 are possible with dual monitors!
             heightNotMaximized = height;
 
             posXNotMaximized = x;
@@ -1122,7 +1153,7 @@ void MainDialog::OnResizeFolderPairs(wxSizeEvent& event)
     {
         const int width = m_panelTopLeft->GetSize().GetWidth();
 
-        for (std::vector<FolderPairPanel*>::iterator i = additionalFolderPairs.begin(); i != additionalFolderPairs.end(); ++i)
+        for (std::vector<DirectoryPair*>::iterator i = additionalFolderPairs.begin(); i != additionalFolderPairs.end(); ++i)
             (*i)->m_panelLeft->SetMinSize(wxSize(width, -1));
     }
 
@@ -1477,9 +1508,9 @@ void MainDialog::OnContextRim(wxGridEvent& event)
     if (exFilterCandidateObj.size() > 0 && !exFilterCandidateObj[0].isDir)
     {
         const Zstring filename = exFilterCandidateObj[0].relativeName.AfterLast(common::FILE_NAME_SEPARATOR);
-        if (filename.Find(wxChar('.'), false) !=  Zstring::npos) //be careful: AfterLast would return the whole string if '.' were not found!
+        if (filename.find(Zchar('.')) !=  Zstring::npos) //be careful: AfterLast would return the whole string if '.' were not found!
         {
-            const Zstring extension = filename.AfterLast(DefaultChar('.'));
+            const Zstring extension = filename.AfterLast(Zchar('.'));
 
             //add context menu item
             wxMenuItem* menuItemExclExt = new wxMenuItem(contextMenu.get(), CONTEXT_EXCLUDE_EXT, wxString(_("Exclude via filter:")) + wxT(" ") + wxT("*.") + zToWx(extension));
@@ -1597,13 +1628,13 @@ void MainDialog::OnContextExcludeExtension(wxCommandEvent& event)
     SelectedExtension* selExtension = dynamic_cast<SelectedExtension*>(event.m_callbackUserData);
     if (selExtension)
     {
-        const Zstring newExclude = Zstring(DefaultStr("*.")) + selExtension->extension;
+        const Zstring newExclude = Zstring(Zstr("*.")) + selExtension->extension;
 
         //add to filter config
         Zstring& excludeFilter = currentCfg.mainCfg.globalFilter.excludeFilter;
-        if (!excludeFilter.empty() && !excludeFilter.EndsWith(DefaultStr(";")))
-            excludeFilter += DefaultStr("\n");
-        excludeFilter += newExclude + DefaultStr(";"); //';' is appended to 'mark' that next exclude extension entry won't write to new line
+        if (!excludeFilter.empty() && !excludeFilter.EndsWith(Zstr(";")))
+            excludeFilter += Zstr("\n");
+        excludeFilter += newExclude + Zstr(";"); //';' is appended to 'mark' that next exclude extension entry won't write to new line
 
         updateFilterButtons();
 
@@ -1633,7 +1664,7 @@ void MainDialog::OnContextExcludeObject(wxCommandEvent& event)
             for (std::vector<FilterObject>::const_iterator i = objCont->selectedObjects.begin(); i != objCont->selectedObjects.end(); ++i)
             {
                 if (i != objCont->selectedObjects.begin())
-                    newExclude += DefaultStr("\n");
+                    newExclude += Zstr("\n");
 
                 newExclude += common::FILE_NAME_SEPARATOR + i->relativeName;
                 if (i->isDir)
@@ -1642,8 +1673,8 @@ void MainDialog::OnContextExcludeObject(wxCommandEvent& event)
 
             //add to filter config
             Zstring& excludeFilter = currentCfg.mainCfg.globalFilter.excludeFilter;
-            if (!excludeFilter.empty() && !excludeFilter.EndsWith(DefaultStr("\n")))
-                excludeFilter += DefaultStr("\n");
+            if (!excludeFilter.empty() && !excludeFilter.EndsWith(Zstr("\n")))
+                excludeFilter += Zstr("\n");
             excludeFilter += newExclude;
 
             updateFilterButtons();
@@ -2276,7 +2307,7 @@ void MainDialog::setCurrentConfiguration(const xmlAccess::XmlGuiConfig& newGuiCf
 
 
 inline
-FolderPairEnh getEnahncedPair(const FolderPairPanel* panel)
+FolderPairEnh getEnahncedPair(const DirectoryPair* panel)
 {
     return FolderPairEnh(panel->getLeftDir(),
                          panel->getRightDir(),
@@ -2319,10 +2350,12 @@ const wxString& MainDialog::lastConfigFileName()
 void MainDialog::refreshGridAfterFilterChange(const int delay)
 {
     //signal UI that grids need to be refreshed on next Update()
-    m_gridLeft->ForceRefresh();
+    m_gridLeft  ->ForceRefresh();
     m_gridMiddle->ForceRefresh();
-    m_gridRight->ForceRefresh();
-    Update();   //show changes resulting from ForceRefresh()
+    m_gridRight ->ForceRefresh();
+    m_gridLeft  ->Update();   //
+    m_gridMiddle->Update();   //show changes resulting from ForceRefresh()
+    m_gridRight ->Update();   //
 
     if (currentCfg.hideFilteredElements)
     {
@@ -2614,9 +2647,9 @@ void MainDialog::updateFilterButtons()
     firstFolderPair->refreshButtons();
 
     //update folder pairs
-    for (std::vector<FolderPairPanel*>::const_iterator i = additionalFolderPairs.begin(); i != additionalFolderPairs.end(); ++i)
+    for (std::vector<DirectoryPair*>::const_iterator i = additionalFolderPairs.begin(); i != additionalFolderPairs.end(); ++i)
     {
-        FolderPairPanel* dirPair = *i;
+        DirectoryPair* dirPair = *i;
         dirPair->refreshButtons();
     }
 }
@@ -2642,7 +2675,6 @@ void MainDialog::OnCompare(wxCommandEvent &event)
         //begin comparison
         ffs3::CompareProcess comparison(currentCfg.mainCfg.handleSymlinks,
                                         globalSettings->fileTimeTolerance,
-                                        globalSettings->ignoreOneHourDiff,
                                         globalSettings->optDialogs,
                                         &statusHandler);
 
@@ -2710,6 +2742,8 @@ void MainDialog::OnCompare(wxCommandEvent &event)
 
 void MainDialog::updateGuiGrid()
 {
+    wxWindowUpdateLocker dummy(m_panelStatusBar); //avoid display distortion
+
     updateGridViewData(); //update gridDataView and write status information
 
     //all three grids retrieve their data directly via gridDataView
@@ -2789,9 +2823,15 @@ void MainDialog::OnCmpSettings(wxCommandEvent& event)
     wxPoint windowPos = m_bpButtonCmpConfig->GetScreenPosition();
     windowPos.x += m_bpButtonCmpConfig->GetSize().GetWidth() + 5;
 
+    const CompareVariant  compareVarOld     = currentCfg.mainCfg.compareVar;
+    const SymLinkHandling handleSymlinksOld = currentCfg.mainCfg.handleSymlinks;
+
     if (ffs3::showCompareCfgDialog(windowPos,
                                    currentCfg.mainCfg.compareVar,
-                                   currentCfg.mainCfg.handleSymlinks) == DefaultReturnCode::BUTTON_OKAY)
+                                   currentCfg.mainCfg.handleSymlinks) == DefaultReturnCode::BUTTON_OKAY &&
+            //check if settings were changed at all
+            (compareVarOld     != currentCfg.mainCfg.compareVar ||
+             handleSymlinksOld != currentCfg.mainCfg.handleSymlinks))
     {
         //update compare variant name
         m_staticTextCmpVariant->SetLabel(wxString(wxT("(")) + getVariantName(currentCfg.mainCfg.compareVar) + wxT(")"));
@@ -2854,7 +2894,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
 
         //check if there are files/folders to be sync'ed at all
         if (!synchronizationNeeded(gridDataView->getDataTentative()))
-            statusHandler.reportInfo(_("Nothing to synchronize according to configuration!")); //inform about this special case
+            statusHandler.logInfo(_("Nothing to synchronize according to configuration!")); //inform about this special case
 
         //start synchronization and mark all elements processed
         ffs3::SyncProcess synchronization(
@@ -2971,27 +3011,30 @@ void MainDialog::OnSortLeftGrid(wxGridEvent& event)
 
 void MainDialog::OnSortMiddleGrid(wxGridEvent& event)
 {
-    //determine direction for std::sort()
-    static bool sortDefault = true;
-    if (lastSortColumn != 0 || lastSortGrid != m_gridMiddle)
-        sortDefault = true;
-    else
-        sortDefault = !sortDefault;
-    lastSortColumn = 0;
-    lastSortGrid   = m_gridMiddle;
+    //sorting middle grid is more or less useless: therefore let's toggle view instead!
+    syncPreview->enablePreview(!syncPreview->previewIsEnabled()); //toggle view
 
-    //start sort
-    if (syncPreview->previewIsEnabled())
-        gridDataView->sortView(GridView::SORT_BY_SYNC_DIRECTION, true, sortDefault);
-    else
-        gridDataView->sortView(GridView::SORT_BY_CMP_RESULT, true, sortDefault);
-
-    updateGuiGrid(); //refresh gridDataView
-
-    //set sort direction indicator on UI
-    m_gridLeft->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
-    m_gridRight->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
-    m_gridMiddle->setSortMarker(CustomGrid::SortMarker(0, sortDefault ? CustomGrid::ASCENDING : CustomGrid::DESCENDING));
+//    //determine direction for std::sort()
+//    static bool sortDefault = true;
+//    if (lastSortColumn != 0 || lastSortGrid != m_gridMiddle)
+//        sortDefault = true;
+//    else
+//        sortDefault = !sortDefault;
+//    lastSortColumn = 0;
+//    lastSortGrid   = m_gridMiddle;
+//
+//    //start sort
+//    if (syncPreview->previewIsEnabled())
+//        gridDataView->sortView(GridView::SORT_BY_SYNC_DIRECTION, true, sortDefault);
+//    else
+//        gridDataView->sortView(GridView::SORT_BY_CMP_RESULT, true, sortDefault);
+//
+//    updateGuiGrid(); //refresh gridDataView
+//
+//    //set sort direction indicator on UI
+//    m_gridLeft->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
+//    m_gridRight->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
+//    m_gridMiddle->setSortMarker(CustomGrid::SortMarker(0, sortDefault ? CustomGrid::ASCENDING : CustomGrid::DESCENDING));
 }
 
 
@@ -3063,9 +3106,9 @@ void MainDialog::OnSwapSides(wxCommandEvent& event)
                                firstFolderPair->getAltFilterConfig());
 
     //additional pairs
-    for (std::vector<FolderPairPanel*>::const_iterator i = additionalFolderPairs.begin(); i != additionalFolderPairs.end(); ++i)
+    for (std::vector<DirectoryPair*>::const_iterator i = additionalFolderPairs.begin(); i != additionalFolderPairs.end(); ++i)
     {
-        FolderPairPanel* dirPair = *i;
+        DirectoryPair* dirPair = *i;
         dirPair->setValues(dirPair->getRightDir(), // swap directories
                            dirPair->getLeftDir(),  //
                            dirPair->getAltSyncConfig(),
@@ -3428,7 +3471,7 @@ void MainDialog::OnRemoveTopFolderPair(wxCommandEvent& event)
 void MainDialog::OnRemoveFolderPair(wxCommandEvent& event)
 {
     const wxObject* const eventObj = event.GetEventObject(); //find folder pair originating the event
-    for (std::vector<FolderPairPanel*>::const_iterator i = additionalFolderPairs.begin(); i != additionalFolderPairs.end(); ++i)
+    for (std::vector<DirectoryPair*>::const_iterator i = additionalFolderPairs.begin(); i != additionalFolderPairs.end(); ++i)
         if (eventObj == (*i)->m_bpButtonRemovePair)
         {
             removeAddFolderPair(i - additionalFolderPairs.begin());
@@ -3443,9 +3486,6 @@ void MainDialog::OnRemoveFolderPair(wxCommandEvent& event)
             return;
         }
 }
-
-
-const size_t MAX_ADD_FOLDER_PAIRS = 5;
 
 
 void MainDialog::updateGuiForFolderPair()
@@ -3491,7 +3531,7 @@ void MainDialog::addFolderPair(const std::vector<FolderPairEnh>& newPairs, bool 
         for (std::vector<FolderPairEnh>::const_iterator i = newPairs.begin(); i != newPairs.end(); ++i)
         {
             //add new folder pair
-            FolderPairPanel* newPair = new FolderPairPanel(m_scrolledWindowFolderPairs, *this);
+            DirectoryPair* newPair = new DirectoryPair(m_scrolledWindowFolderPairs, *this);
 
             //correct width of middle block
             newPair->m_panel21->SetMinSize(wxSize(m_gridMiddle->GetSize().GetWidth(), -1));
@@ -3526,7 +3566,7 @@ void MainDialog::addFolderPair(const std::vector<FolderPairEnh>& newPairs, bool 
         }
 
         //set size of scrolled window
-        const size_t visiblePairs = std::min(additionalFolderPairs.size(), MAX_ADD_FOLDER_PAIRS); //up to MAX_ADD_FOLDER_PAIRS additional pairs shall be shown
+        const size_t visiblePairs = std::min(additionalFolderPairs.size(), globalSettings->gui.addFolderPairCountMax); //up to "addFolderPairCountMax" additional pairs shall be shown
         m_scrolledWindowFolderPairs->SetMinSize(wxSize( -1, pairHeight * static_cast<int>(visiblePairs)));
 
         //update controls
@@ -3546,7 +3586,7 @@ void MainDialog::removeAddFolderPair(size_t pos)
     if (pos < additionalFolderPairs.size())
     {
         //remove folder pairs from window
-        FolderPairPanel* pairToDelete = additionalFolderPairs[pos];
+        DirectoryPair* pairToDelete = additionalFolderPairs[pos];
         const int pairHeight = pairToDelete->GetSize().GetHeight();
 
         bSizerAddFolderPairs->Detach(pairToDelete); //Remove() does not work on Window*, so do it manually
@@ -3555,7 +3595,7 @@ void MainDialog::removeAddFolderPair(size_t pos)
 
         //set size of scrolled window
         const size_t additionalRows = additionalFolderPairs.size();
-        if (additionalRows <= MAX_ADD_FOLDER_PAIRS) //up to MAX_ADD_FOLDER_PAIRS additional pairs shall be shown
+        if (additionalRows <= globalSettings->gui.addFolderPairCountMax) //up to "addFolderPairCountMax" additional pairs shall be shown
             m_scrolledWindowFolderPairs->SetMinSize(wxSize(-1, pairHeight * static_cast<int>(additionalRows)));
 
         //update controls
@@ -3688,6 +3728,7 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
         wxFFile output(newFileName.c_str(), wxT("w")); //don't write in binary mode
         if (output.IsOpened())
         {
+            output.Write(common::BYTE_ORDER_MARK_UTF8, sizeof(common::BYTE_ORDER_MARK_UTF8) - 1);
             output.Write(exportString);
             pushStatusInformation(_("File list exported!"));
         }

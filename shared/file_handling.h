@@ -18,6 +18,11 @@
 
 namespace ffs3
 {
+struct RemoveDirCallback;
+struct MoveFileCallback;
+struct CopyFileCallback;
+
+
 Zstring getFormattedDirectoryName(const Zstring& dirname);
 
 bool fileExists(     const Zstring& filename); //throw()       replaces wxFileExists()!
@@ -47,20 +52,8 @@ wxULongLong getFilesize(const Zstring& filename); //throw (FileError)
 
 //file handling
 void removeFile(const Zstring& filename);       //throw (FileError)
-void removeDirectory(const Zstring& directory); //throw (FileError)
+void removeDirectory(const Zstring& directory, RemoveDirCallback* callback = NULL); //throw (FileError)
 
-
-struct MoveFileCallback //callback functionality
-{
-    virtual ~MoveFileCallback() {}
-
-    enum Response
-    {
-        CONTINUE,
-        CANCEL
-    };
-    virtual Response requestUiRefresh() = 0;  //DON'T throw exceptions here, at least in Windows build!
-};
 
 //rename file or directory: no copying!!!
 void renameFile(const Zstring& oldName, const Zstring& newName); //throw (FileError);
@@ -76,17 +69,6 @@ void moveDirectory(const Zstring& sourceDir, const Zstring& targetDir, bool igno
 void createDirectory(const Zstring& directory, const Zstring& templateDir, bool copyDirectorySymLinks, bool copyFilePermissions); //throw (FileError);
 void createDirectory(const Zstring& directory); //throw (FileError); -> function overload avoids default parameter ambiguity issues!
 
-struct CopyFileCallback //callback functionality
-{
-    virtual ~CopyFileCallback() {}
-
-    enum Response
-    {
-        CONTINUE,
-        CANCEL
-    };
-    virtual Response updateCopyStatus(const wxULongLong& totalBytesTransferred) = 0; //DON'T throw exceptions here, at least in Windows build!
-};
 
 void copyFile(const Zstring& sourceFile, //throw (FileError);
               const Zstring& targetFile,
@@ -98,8 +80,45 @@ void copyFile(const Zstring& sourceFile, //throw (FileError);
               CopyFileCallback* callback);  //may be NULL
 //Note: it MAY happen that copyFile() leaves temp files behind, e.g. temporary network drop.
 // => clean them up at an appropriate time (automatically set sync directions to delete them). They have the following ending:
-const Zstring TEMP_FILE_ENDING = DefaultStr(".ffs_tmp");
-}
+const Zstring TEMP_FILE_ENDING = Zstr(".ffs_tmp");
 
+
+
+
+
+
+//----------- callbacks ---------------
+struct RemoveDirCallback
+{
+    virtual ~RemoveDirCallback() {}
+    virtual void requestUiRefresh(const Zstring& currentObject) = 0;
+};
+
+
+struct MoveFileCallback //callback functionality
+{
+    virtual ~MoveFileCallback() {}
+
+    enum Response
+    {
+        CONTINUE,
+        CANCEL
+    };
+    virtual Response requestUiRefresh(const Zstring& currentObject) = 0;  //DON'T throw exceptions here, at least in Windows build!
+};
+
+
+struct CopyFileCallback //callback functionality
+{
+    virtual ~CopyFileCallback() {}
+
+    enum Response
+    {
+        CONTINUE,
+        CANCEL
+    };
+    virtual Response updateCopyStatus(const wxULongLong& totalBytesTransferred) = 0; //DON'T throw exceptions here, at least in Windows build!
+};
+}
 
 #endif //FILE_HANDLING_H_INCLUDED

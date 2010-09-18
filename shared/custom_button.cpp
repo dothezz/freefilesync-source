@@ -7,6 +7,8 @@
 #include "custom_button.h"
 #include <wx/dcmemory.h>
 #include <wx/image.h>
+#include <algorithm>
+
 
 wxButtonWithImage::wxButtonWithImage(wxWindow *parent,
                                      wxWindowID id,

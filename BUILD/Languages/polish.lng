@@ -90,8 +90,6 @@
 &Tak
 (Build: %x)
 (Buduję: %x)
-(Note that only FAT/FAT32 drives are affected by this problem!\nIn all other cases you can disable the setting \"ignore 1-hour difference\".)
-(Pamiętaj, że ten problem dotyczy tylko FAT/FAT32!\nW każdym innym przypadku możesz wyłączyć opcję \"Ignoruj 1-godzinną różnicę\".)
 (Requires an Internet connection!)
 (Wymaga połączenia z Internetem!)
 - Other side's counterpart to %dir
@@ -274,14 +272,10 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 Kopiuj pliki udostępnione i zablokowane używając usługi Volume Shadow Copy\n (Wymaga uprawnień administratora)
 Copy to clipboard\tCTRL+C
 Kopiuj do pamięci\tCTRL+C
-Copying Symbolic Link %x overwriting %y
-Kopiowanie dowiązania symbolicznego %x nadpisując %y
-Copying Symbolic Link %x to %y
-Kopiowanie dowiązania symbolicznego %x do %y
-Copying file %x overwriting %y
-Kopiowanie pliku %x nadpisując %y
-Copying file %x to %y
-Kopiowanie pliku %x do %y
+Copying new Symbolic Link %x to %y
+Kopiowanie nowego dowiązania symbolicznego %x
+Copying new file %x to %y
+Kopiowanie nowego pliku %x do %y
 Could not determine volume name for file:
 Nie można określić nazwy dysku dla pliku:
 Could not initialize directory monitoring:
@@ -308,10 +302,6 @@ Data verification error: Source and target file have different content!
 Błąd weryfikacji danych: Plik źródłowy i docelowy różnią się zawartością!
 Date
 Data
-Delay
-Opóźnienie
-Delay between detection of changes and execution of command line in seconds
-Opóźnienie pomiędzy wykryciem zmian, a wykonaniem komendy w sekundach
 Delete files/folders existing on left side only
 Usuń pliki/foldery istniejące tylko po lewej stronie
 Delete files/folders existing on right side only
@@ -413,7 +403,7 @@ Błąd odczytu z bazy danych synchronizacji:
 Error resolving symbolic link:
 Błąd odczytu dowiązania symbolicznego:
 Error setting directory lock:
-
+Błąd ustawiania blokady katalogu:
 Error setting privilege:
 Błąd ustawiania uprawnień:
 Error starting Volume Shadow Copy Service!
@@ -460,8 +450,6 @@ File size and date
 Rozmiar i data pliku
 Filename
 Nazwa pliku
-Files %x have a file time difference of less than 1 hour!\n\nIt's not safe to decide which one is newer due to Daylight Saving Time issues.
-Pliki %x różnią się mniej niż 1 godzinę.\n\nNie można bezpiecznie określić, który plik jest nowszy zgodnie z przesunięciem czasu letniego.
 Files %x have the same date but a different size!
 Pliki %x mają tą samą datę lecz różne rozmiary!
 Files are found equal if\n     - file content\nis the same
@@ -566,12 +554,12 @@ Homepage
 Strona domowa
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Wykryj i zastosuj zmiany po obu stronach używając bazy danych. Usunięcia i konflikty są wykrywane automatycznie.
+Idle time between detection of last change and execution of command line in seconds
+Odstęp czasu w sekundach pomiędzy pomiędzy ostatnią wykrytą zmianą, a wykonaniem komendy
 If you like FFS
 Jeżeli Ci się podoba
 Ignore
 Ignoruj
-Ignore 1-hour file time difference
-Ignoruj 1-godzinną różnicę między plikami
 Ignore errors
 Ignoruj błędy
 Ignore subsequent errors
@@ -614,6 +602,8 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Tworzenie Shadow Copies dla WOW64 nie jest obsługiwane. Zainstaluj 64 bitową wersję FreeFileSync.
 Match case
 Uwzględnij wielkość liter
+Minimum Idle Time
+Minimalny czas bezczynności
 Mirror ->>
 Lustrzana ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -668,6 +658,10 @@ Operation:
 Operacja:
 Overview
 Przegląd
+Overwriting Symbolic Link %x in %y
+Nadpisywanie dowiązania symbolicznego %x, %y
+Overwriting file %x in %y
+Nadpisywanie pliku %x plikiem %y
 Pause
 Pauza
 Paused
@@ -702,8 +696,6 @@ Remove folder
 Usuń folder
 Remove folder pair
 Usuń parę folderów
-Removing abandoned directory lock (%x)...
-
 Report translation error
 Zgłoś błąd w tłumaczeniu
 Reset
@@ -846,8 +838,6 @@ Total time:
 Całkowity czas:
 Transfer file and directory permissions\n(Requires Administrator rights)
 Transfer uprawnień plików i katalogów\n(Wymaga uprawnień Administratora)
-Treat file times that differ by exactly +/- 1 hour as equal, less than 1 hour as conflict in order to handle Daylight Saving Time changes
-Traktuj pliki różniące się dokładnie +/- 1 godzinę jako równe, mniej niż 1 godzinę jako konflikt by uwzględnić zmiane czasu letniego
 Unable to connect to sourceforge.net!
 Nie można się połączyć z sourceforge.net!
 Unable to create logfile!
@@ -875,7 +865,7 @@ Dysk %x nie jest częścią pliku %y!
 Waiting for all directories to become available...
 Oczekiwanie aż katalogi staną się dostępne...
 Waiting while directory is locked (%x)...
-
+Blokada katalogu (%x), oczekiwanie...
 Warning
 Uwaga
 Warning: Synchronization failed for %x item(s):
