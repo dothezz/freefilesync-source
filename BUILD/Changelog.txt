@@ -2,6 +2,12 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.11
+---------------
+Fixed migration issue: reasonable default value for number of folder pairs
+Better message box background color
+
+
 Changelog v3.10
 ---------------
 Automatically solve daylight saving time and time zone shift issues on FAT/FAT32 (finally)

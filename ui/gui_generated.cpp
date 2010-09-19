@@ -570,7 +570,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 	
 	m_textCtrlCreate = new wxTextCtrl( m_panelSyncPreview, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
 	m_textCtrlCreate->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
-	m_textCtrlCreate->SetBackgroundColour( wxColour( 222, 222, 236 ) );
+	m_textCtrlCreate->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	m_textCtrlCreate->SetToolTip( _("Number of files and directories that will be created") );
 	
 	fgSizer5->Add( m_textCtrlCreate, 0, wxALIGN_CENTER_VERTICAL, 5 );
@@ -582,7 +582,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 	
 	m_textCtrlDelete = new wxTextCtrl( m_panelSyncPreview, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
 	m_textCtrlDelete->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
-	m_textCtrlDelete->SetBackgroundColour( wxColour( 222, 222, 236 ) );
+	m_textCtrlDelete->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	m_textCtrlDelete->SetToolTip( _("Number of files and directories that will be deleted") );
 	
 	fgSizer5->Add( m_textCtrlDelete, 0, wxALIGN_CENTER_VERTICAL, 5 );
@@ -601,7 +601,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 	
 	m_textCtrlUpdate = new wxTextCtrl( m_panelSyncPreview, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
 	m_textCtrlUpdate->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
-	m_textCtrlUpdate->SetBackgroundColour( wxColour( 222, 222, 236 ) );
+	m_textCtrlUpdate->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	m_textCtrlUpdate->SetToolTip( _("Number of files that will be overwritten") );
 	
 	fgSizer6->Add( m_textCtrlUpdate, 0, wxALIGN_CENTER_VERTICAL, 5 );
@@ -613,7 +613,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 	
 	m_textCtrlData = new wxTextCtrl( m_panelSyncPreview, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
 	m_textCtrlData->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
-	m_textCtrlData->SetBackgroundColour( wxColour( 222, 222, 236 ) );
+	m_textCtrlData->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	m_textCtrlData->SetToolTip( _("Total amount of data that will be transferred") );
 	
 	fgSizer6->Add( m_textCtrlData, 0, wxALIGN_CENTER_VERTICAL, 5 );
@@ -1576,7 +1576,7 @@ CompareStatusGenerated::CompareStatusGenerated( wxWindow* parent, wxWindowID id,
 	bSizer48->Add( m_staticText30, 0, wxRIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrlStatus = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
-	m_textCtrlStatus->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
+	m_textCtrlStatus->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	
 	bSizer48->Add( m_textCtrlStatus, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 	
@@ -2207,7 +2207,7 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 	bSizer27->Add( bSizer31, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
 	
 	m_textCtrlInfo = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
-	m_textCtrlInfo->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
+	m_textCtrlInfo->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	
 	bSizer27->Add( m_textCtrlInfo, 3, wxEXPAND|wxALL, 5 );
 	
@@ -2367,7 +2367,7 @@ HelpDlgGenerated::HelpDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	bSizer70->Add( m_staticText61, 0, wxALL, 5 );
 	
 	m_treeCtrl1 = new wxTreeCtrl( m_scrolledWindow1, wxID_ANY, wxDefaultPosition, wxSize( -1,175 ), wxTR_DEFAULT_STYLE );
-	m_treeCtrl1->SetBackgroundColour( wxColour( 237, 236, 235 ) );
+	m_treeCtrl1->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	
 	bSizer70->Add( m_treeCtrl1, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
 	
@@ -2421,7 +2421,7 @@ HelpDlgGenerated::HelpDlgGenerated( wxWindow* parent, wxWindowID id, const wxStr
 	bSizer74->Add( m_staticText66, 0, wxALL, 5 );
 	
 	m_treeCtrl2 = new wxTreeCtrl( m_scrolledWindow5, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTR_DEFAULT_STYLE );
-	m_treeCtrl2->SetBackgroundColour( wxColour( 237, 236, 235 ) );
+	m_treeCtrl2->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	m_treeCtrl2->SetMinSize( wxSize( -1,130 ) );
 	
 	bSizer74->Add( m_treeCtrl2, 0, wxALL|wxEXPAND, 5 );
@@ -2513,7 +2513,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	
 	m_scrolledWindowCodeInfo = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDOUBLE_BORDER|wxHSCROLL|wxVSCROLL );
 	m_scrolledWindowCodeInfo->SetScrollRate( 5, 5 );
-	m_scrolledWindowCodeInfo->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
+	m_scrolledWindowCodeInfo->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	m_scrolledWindowCodeInfo->SetMinSize( wxSize( -1,120 ) );
 	
 	bSizerCodeInfo = new wxBoxSizer( wxVERTICAL );
@@ -2530,7 +2530,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	
 	m_hyperlink21 = new wxHyperlinkCtrl( m_scrolledWindowCodeInfo, wxID_ANY, _("- ZenJu -"), wxT("mailto:zhnmju123@gmx.de"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
 	m_hyperlink21->SetFont( wxFont( 10, 74, 93, 92, false, wxT("Segoe Print") ) );
-	m_hyperlink21->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
+	m_hyperlink21->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	m_hyperlink21->SetToolTip( _("zhnmju123@gmx.de") );
 	
 	bSizerCodeInfo->Add( m_hyperlink21, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
@@ -2542,7 +2542,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	
 	m_scrolledWindowTranslators = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxDOUBLE_BORDER|wxHSCROLL|wxVSCROLL );
 	m_scrolledWindowTranslators->SetScrollRate( 5, 5 );
-	m_scrolledWindowTranslators->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
+	m_scrolledWindowTranslators->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	m_scrolledWindowTranslators->SetMinSize( wxSize( -1,140 ) );
 	m_scrolledWindowTranslators->SetMaxSize( wxSize( -1,145 ) );
 	
@@ -2704,7 +2704,7 @@ ErrorDlgGenerated::ErrorDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	bSizer26->Add( m_bitmap10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY );
-	m_textCtrl8->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
+	m_textCtrl8->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	
 	bSizer26->Add( m_textCtrl8, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxRIGHT|wxLEFT, 5 );
 	
@@ -2779,7 +2779,7 @@ WarningDlgGenerated::WarningDlgGenerated( wxWindow* parent, wxWindowID id, const
 	bSizer26->Add( m_bitmap10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY );
-	m_textCtrl8->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
+	m_textCtrl8->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	
 	bSizer26->Add( m_textCtrl8, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxRIGHT|wxLEFT, 5 );
 	
@@ -2852,7 +2852,7 @@ QuestionDlgGenerated::QuestionDlgGenerated( wxWindow* parent, wxWindowID id, con
 	bSizer26->Add( m_bitmap10, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrl8 = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY );
-	m_textCtrl8->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
+	m_textCtrl8->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	
 	bSizer26->Add( m_textCtrl8, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxRIGHT|wxLEFT, 5 );
 	
@@ -2956,7 +2956,7 @@ DeleteDlgGenerated::DeleteDlgGenerated( wxWindow* parent, wxWindowID id, const w
 	bSizer24->Add( bSizer99, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxRIGHT|wxLEFT, 10 );
 	
 	m_textCtrlMessage = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY );
-	m_textCtrlMessage->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_APPWORKSPACE ) );
+	m_textCtrlMessage->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	
 	bSizer24->Add( m_textCtrlMessage, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 	
@@ -3542,7 +3542,7 @@ SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID i
 	
 	m_textCtrlCreateL = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
 	m_textCtrlCreateL->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
-	m_textCtrlCreateL->SetBackgroundColour( wxColour( 222, 222, 236 ) );
+	m_textCtrlCreateL->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	m_textCtrlCreateL->SetToolTip( _("Number of files and directories that will be created") );
 	
 	fgSizer5->Add( m_textCtrlCreateL, 0, wxALIGN_CENTER_VERTICAL, 5 );
@@ -3554,7 +3554,7 @@ SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID i
 	
 	m_textCtrlUpdateL = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
 	m_textCtrlUpdateL->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
-	m_textCtrlUpdateL->SetBackgroundColour( wxColour( 222, 222, 236 ) );
+	m_textCtrlUpdateL->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	m_textCtrlUpdateL->SetToolTip( _("Number of files that will be overwritten") );
 	
 	fgSizer5->Add( m_textCtrlUpdateL, 0, wxALIGN_CENTER_VERTICAL, 5 );
@@ -3566,7 +3566,7 @@ SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID i
 	
 	m_textCtrlDeleteL = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
 	m_textCtrlDeleteL->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
-	m_textCtrlDeleteL->SetBackgroundColour( wxColour( 222, 222, 236 ) );
+	m_textCtrlDeleteL->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	m_textCtrlDeleteL->SetToolTip( _("Number of files and directories that will be deleted") );
 	
 	fgSizer5->Add( m_textCtrlDeleteL, 0, wxALIGN_CENTER_VERTICAL, 5 );
@@ -3586,21 +3586,21 @@ SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID i
 	
 	m_textCtrlCreateR = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
 	m_textCtrlCreateR->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
-	m_textCtrlCreateR->SetBackgroundColour( wxColour( 222, 222, 236 ) );
+	m_textCtrlCreateR->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	m_textCtrlCreateR->SetToolTip( _("Number of files and directories that will be created") );
 	
 	fgSizer51->Add( m_textCtrlCreateR, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrlUpdateR = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
 	m_textCtrlUpdateR->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
-	m_textCtrlUpdateR->SetBackgroundColour( wxColour( 222, 222, 236 ) );
+	m_textCtrlUpdateR->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	m_textCtrlUpdateR->SetToolTip( _("Number of files that will be overwritten") );
 	
 	fgSizer51->Add( m_textCtrlUpdateR, 0, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	m_textCtrlDeleteR = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
 	m_textCtrlDeleteR->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
-	m_textCtrlDeleteR->SetBackgroundColour( wxColour( 222, 222, 236 ) );
+	m_textCtrlDeleteR->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	m_textCtrlDeleteR->SetToolTip( _("Number of files and directories that will be deleted") );
 	
 	fgSizer51->Add( m_textCtrlDeleteR, 0, wxALIGN_CENTER_VERTICAL, 5 );
@@ -3625,7 +3625,7 @@ SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID i
 	
 	m_textCtrlData = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
 	m_textCtrlData->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
-	m_textCtrlData->SetBackgroundColour( wxColour( 222, 222, 236 ) );
+	m_textCtrlData->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 	m_textCtrlData->SetToolTip( _("Total amount of data that will be transferred") );
 	
 	bSizer156->Add( m_textCtrlData, 0, wxALIGN_CENTER_VERTICAL, 5 );

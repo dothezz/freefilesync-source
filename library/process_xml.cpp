@@ -464,8 +464,8 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
 
     size_t folderPairMax = 0;
     readXmlElementLogging("FolderPairsMax", mainWindow, folderPairMax);
-    outputCfg.gui.addFolderPairCountMax = std::max(static_cast<size_t>(2), folderPairMax) - 1; //map folderPairMax to additionalFolderPairMax
-
+    if (folderPairMax != 0) //if reading fails, leave at default
+        outputCfg.gui.addFolderPairCountMax = std::max(static_cast<size_t>(2), folderPairMax) - 1; //map folderPairMax to additionalFolderPairMax
 
 //###########################################################
     //read column attributes

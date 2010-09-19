@@ -8,7 +8,7 @@
 #include <wx/stattext.h>
 #include <wx/sizer.h>
 #include <wx/statbmp.h>
-
+#include <wx/settings.h>
 
 class CustomTooltip::PopupFrameGenerated : public wxFrame
 {
@@ -34,7 +34,7 @@ CustomTooltip::PopupFrameGenerated::PopupFrameGenerated(
     long style ) : wxFrame(parent, id, title, pos, size, style)
 {
     this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-    this->SetBackgroundColour( wxColour( 255, 255, 255 ) );
+    this->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
 
     wxBoxSizer* bSizer158;
     bSizer158 = new wxBoxSizer( wxHORIZONTAL );

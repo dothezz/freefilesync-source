@@ -339,7 +339,7 @@ void MainDialog::OnRemoveTopFolder(wxCommandEvent& event)
 {
     if (dirNamesExtra.size() > 0)
     {
-        const wxString topDir = (*dirNamesExtra.begin())->getName().c_str();
+        const wxString topDir = zToWx((*dirNamesExtra.begin())->getName());
 
         dirNameFirst->setName(wxToZ(topDir));
 

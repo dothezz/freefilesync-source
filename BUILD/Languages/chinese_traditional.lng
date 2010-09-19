@@ -273,9 +273,9 @@ Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administ
 Copy to clipboard\tCTRL+C
 複製到剪貼簿\tCTRL+C
 Copying new Symbolic Link %x to %y
-
+複製符號連結 %x 到 %y
 Copying new file %x to %y
-
+複製新檔案 %x 到 %y
 Could not determine volume name for file:
 無法判斷此檔案的卷標名稱：
 Could not initialize directory monitoring:
@@ -360,6 +360,8 @@ Elements remaining:
 剩餘要素：
 Email
 信箱
+Encode extended time information: %x
+
 Endless loop when traversing directory:
 當遍歷目錄時無限循環：
 Error
@@ -403,7 +405,7 @@ Error reading from synchronization database:
 Error resolving symbolic link:
 解决符號連結錯誤：
 Error setting directory lock:
-
+設定目錄鎖錯誤：
 Error setting privilege:
 設定權限錯誤：
 Error starting Volume Shadow Copy Service!
@@ -493,7 +495,7 @@ Free disk space available:
 FreeFileSync Batch Job
 FreeFileSync 批次處理作業
 FreeFileSync at Sourceforge
-FreeFileSync at Sourceforge
+FreeFileSync 在 Sourceforge
 FreeFileSync batch file
 FreeFileSync 批次檔
 FreeFileSync configuration
@@ -555,7 +557,7 @@ Homepage
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 對兩邊使用同一個資料庫的識別和傳送更改。自動檢測刪除和衝突部份。
 Idle time between detection of last change and execution of command line in seconds
-
+上次更改的檢測和執行命令列之間以秒為單位的閒置時間
 If you like FFS
 如果你喜歡 FFS
 Ignore
@@ -603,7 +605,7 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Match case
 區分大小寫
 Minimum Idle Time
-
+最小閒置時間
 Mirror ->>
 鏡像 ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -659,9 +661,9 @@ Operation:
 Overview
 摘要
 Overwriting Symbolic Link %x in %y
-
+覆蓋符號連結 %x 在 %y
 Overwriting file %x in %y
-
+覆蓋檔案 %x 在 %y
 Pause
 暫停
 Paused
@@ -802,8 +804,6 @@ Synchronization completed with errors!
 同步完成但有錯誤！
 Synchronization settings
 同步設定
-Synchronization status
-同步狀態
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 同步所有 .doc, .zip 和 .exe 檔案，除了\"temp\"中的一切。
 Synchronize...
@@ -865,7 +865,7 @@ Volume name %x not part of filename %y!
 Waiting for all directories to become available...
 等待所有目錄變為可用...
 Waiting while directory is locked (%x)...
-
+等待目錄被鎖定(%x)...
 Warning
 警告
 Warning: Synchronization failed for %x item(s):

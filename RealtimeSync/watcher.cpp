@@ -64,7 +64,7 @@ public:
     virtual ReturnValDir onDir(const Zchar* shortName, const Zstring& fullName)
     {
         m_dirs.push_back(fullName.c_str());
-        return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), this);
+        return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), *this);
     }
     virtual void onError(const wxString& errorText)
     {
@@ -247,7 +247,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
         try //get all subdirectories
         {
             DirsOnlyTraverser traverser(fullDirList);
-            ffs3::traverseFolder(formattedDir, false, &traverser); //don't traverse into symlinks (analog to windows build)
+            ffs3::traverseFolder(formattedDir, false, traverser); //don't traverse into symlinks (analog to windows build)
         }
         catch (const ffs3::FileError&)
         {
