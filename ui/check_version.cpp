@@ -95,15 +95,8 @@ bool newerVersionExists(const wxString& onlineVersion)
     if (online.empty() || online[0] == 0) //onlineVersion may be "This website has been moved..." In this case better check for an update
         return true;
 
-    current.resize(std::max(current.size(), online.size()));
-    online. resize(std::max(current.size(), online.size()));
-
-    typedef std::vector<size_t>::const_iterator VerIter;
-    const std::pair<VerIter, VerIter> mm = std::mismatch (current.begin(), current.end(),
-                                           online.begin());
-
-    return mm.first == current.end() ? false : //both versions match
-           *mm.first < *mm.second;
+    return std::lexicographical_compare(current.begin(), current.end(),
+                                        online.begin(), online.end());
 }
 
 
@@ -120,7 +113,7 @@ void ffs3::checkForUpdateNow()
     {
         const int rv = wxMessageBox(wxString(_("A newer version of FreeFileSync is available:"))  + wxT(" v") + onlineVersion + wxT(". ") + _("Download now?"), _("Information"), wxYES_NO | wxICON_QUESTION);
         if (rv == wxYES)
-            wxLaunchDefaultBrowser(wxT("http://sourceforge.net/project/showfiles.php?group_id=234430"));
+            wxLaunchDefaultBrowser(wxT("http://sourceforge.net/projects/freefilesync/files/"));
     }
     else
         wxMessageBox(_("FreeFileSync is up to date!"), _("Information"), wxICON_INFORMATION);
@@ -139,7 +132,7 @@ void ffs3::checkForUpdatePeriodically(long& lastUpdateCheck)
         if (lastUpdateCheck == 0)
         {
             QuestionDlg* const messageDlg = new QuestionDlg(NULL,
-                    QuestionDlg::BUTTON_YES | QuestionDlg::BUTTON_CANCEL,
+                    QuestionDlg::BUTTON_YES | QuestionDlg::BUTTON_NO,
                     wxString(_("Do you want FreeFileSync to automatically check for updates every week?")) + wxT("\n") +
                     _("(Requires an Internet connection!)"));
 
@@ -166,7 +159,7 @@ void ffs3::checkForUpdatePeriodically(long& lastUpdateCheck)
             {
                 const int rv = wxMessageBox(wxString(_("A newer version of FreeFileSync is available:"))  + wxT(" v") + onlineVersion + wxT(". ") + _("Download now?"), _("Information"), wxYES_NO | wxICON_QUESTION);
                 if (rv == wxYES)
-                    wxLaunchDefaultBrowser(wxT("http://sourceforge.net/project/showfiles.php?group_id=234430"));
+                    wxLaunchDefaultBrowser(wxT("http://sourceforge.net/projects/freefilesync/files/"));
             }
         }
     }

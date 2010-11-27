@@ -76,6 +76,8 @@
 &OK
 &Pause
 &Пауза
+&Program
+&Программа
 &Quit
 &Выход
 &Restore
@@ -360,8 +362,8 @@ Elements remaining:
 Элементов осталось:
 Email
 Почта
-Encode extended time information: %x
-
+Encoding extended time information: %x
+Кодирование расширенной информации о времени: %x
 Endless loop when traversing directory:
 Зацикливание при встрече пересекающихся путей:
 Error
@@ -402,6 +404,8 @@ Error reading file:
 Ошибка при чтении файла:
 Error reading from synchronization database:
 Ошибка при чтении из базы данных синхронизации:
+Error reading security context:
+Ошибка при чтении контекста безобасности:
 Error resolving symbolic link:
 Ошибка при решении символической ссылки:
 Error setting directory lock:
@@ -416,6 +420,8 @@ Error when monitoring directories.
 Ошибка при мониторинге папок.
 Error writing file:
 Ошибка при записи файла:
+Error writing security context:
+Ошибка при записи контекста безобасности:
 Error writing to synchronization database:
 Ошибка при записи в базу данных синхронизации:
 Example
@@ -677,7 +683,7 @@ Press \"Switch\" to open FreeFileSync GUI mode.
 Processing folder pair:
 Обработка пары папок:
 Published under the GNU General Public License:
-Издается под GNU General Public License:
+Издается под лицензией GNU General Public License:
 Question
 Вопрос
 Quit
@@ -704,8 +710,6 @@ Reset
 Сбросить
 Right
 Справа
-Run minimized and write status information to a logfile
-Запустить свернутым и писать информацию по статусу в лог-файл
 S&ave configuration...
 Сохранить конфигурацию...
 S&witch view
@@ -778,6 +782,8 @@ Speed:
 Скорость:
 Start
 Старт
+Start minimized and write status information to a logfile
+Запускать свернутым и писать информацию о состоянии в лог-файл
 Start synchronization
 Начать синхронизацию
 Statistics
@@ -841,7 +847,7 @@ Transfer file and directory permissions\n(Requires Administrator rights)
 Unable to connect to sourceforge.net!
 Невозможно соединиться с sourceforge.net!
 Unable to create logfile!
-Невозможно создать лог!
+Невозможно создать лог-файл!
 Unresolved conflicts existing!
 Существуют нерешенные конфликты
 Update ->

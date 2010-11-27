@@ -28,7 +28,7 @@
 					<Add library="libwxpng.a" />
 					<Add library="libwxzlib.a" />
 					<Add library="libwxbase28u_net.a" />
-					<Add library="libboost_thread-mgw45-mt-s-1_44.a" />
+					<Add library="libboost_thread-mgw45-mt-s-1_45.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 				</Linker>
 			</Target>
@@ -54,7 +54,7 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
-					<Add library="libboost_thread-mgw45-mt-sd-1_44.a" />
+					<Add library="libboost_thread-mgw45-mt-sd-1_45.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
@@ -77,7 +77,7 @@
 					<Add library="libwxmsw28ud_core.a" />
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxbase28ud_net.a" />
-					<Add library="libboost_thread-mgw45-mt-sd-1_44.a" />
+					<Add library="libboost_thread-mgw45-mt-sd-1_45.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
@@ -302,6 +302,7 @@
 		<Unit filename="shared\standard_paths.cpp" />
 		<Unit filename="shared\standard_paths.h" />
 		<Unit filename="shared\string_conv.h" />
+		<Unit filename="shared\symlink_target.h" />
 		<Unit filename="shared\system_constants.h" />
 		<Unit filename="shared\system_func.cpp" />
 		<Unit filename="shared\system_func.h" />

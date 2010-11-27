@@ -1421,15 +1421,13 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         for (SyncStatistics::ConflictTexts::const_iterator i = firstConflicts.begin(); i != firstConflicts.end(); ++i)
         {
             wxString conflictDescription = i->second;
-            conflictDescription.Replace(wxT("\n"), wxT(" ")); //remove line-breaks
+            //conflictDescription.Replace(wxT("\n"), wxT(" ")); //remove line-breaks
 
-            warningMessage += wxString(wxT("\"")) + zToWx(i->first) + wxT("\": ") + conflictDescription + wxT("\n");
+            warningMessage += wxString(wxT("\"")) + zToWx(i->first) + wxT("\": ") + conflictDescription + wxT("\n\n");
         }
 
         if (statisticsTotal.getConflict() > static_cast<int>(firstConflicts.size()))
-            warningMessage += wxT("[...]\n");
-        else
-            warningMessage += wxT("\n");
+            warningMessage += wxT("[...]\n\n");
 
         warningMessage += _("You can ignore conflicts and continue synchronization.");
 
@@ -1475,6 +1473,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             wxString left  = wxString(_("Left"))  + wxT(": ");
             wxString right = wxString(_("Right")) + wxT(": ");
             makeSameLength(left, right);
+
             const wxString statusTxt = wxString(_("Processing folder pair:")) + wxT(" \n") +
                                        wxT("\t") + left  + wxT("\"") + zToWx(j->getBaseDir<LEFT_SIDE>())  + wxT("\"")+ wxT(" \n") +
                                        wxT("\t") + right + wxT("\"") + zToWx(j->getBaseDir<RIGHT_SIDE>()) + wxT("\"");

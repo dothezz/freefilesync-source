@@ -3,35 +3,35 @@
 %x / %y objects deleted successfully
 %x / %y objecten succesvol verwijderd
 %x Byte
-
+%x Byte
 %x GB
-
+%x GB
 %x MB
-
+%x MB
 %x PB
-
+%x PB
 %x TB
-
+%x TB
 %x day(s)
-
+%x dag(en)
 %x directories
 %x paden
 %x files
 %x bestanden
 %x hour(s)
-
+%x uur/uren
 %x kB
-
+%x kB
 %x min
-
+%x min
 %x of %y rows in view
 %x van de %y rijen in zicht
 %x of 1 row in view
 %x van 1 rij in zicht
 %x sec
-
+%x sec
 %x%
-
+%x%
 &Abort
 &Afbreken
 &About...
@@ -55,7 +55,7 @@
 &File
 &Bestand
 &Find next
-
+&Vind volgende
 &Global settings...
 &Algemene instellingen...
 &Help
@@ -76,6 +76,8 @@
 &OK
 &Pause
 &Pause
+&Program
+&Programma
 &Quit
 &Afsluiten
 &Restore
@@ -85,11 +87,11 @@
 &Save
 &Opslaan
 &Switch
-
+&Verander
 &Yes
 &Ja
 (Build: %x)
-
+(Build: %x)
 (Requires an Internet connection!)
 (Vereist een internetverbinding)
 - Other side's counterpart to %dir
@@ -149,7 +151,7 @@
 <Last session>
 <Laatste sessie>
 <Symlink>
-
+<Symlink>
 <multiple selection>
 <veelvoudige selectie>
 A newer version of FreeFileSync is available:
@@ -157,7 +159,7 @@ Een nieuwe versie van FreeFileSync is beschikbaar:
 Abort requested: Waiting for current operation to finish...
 Bezig met afbreken: wachten op beëindigen huidige handeling...
 Abort synchronization immediately
-
+Stop synchronistatie onmiddelijk
 Aborted
 Afgebroken
 About
@@ -195,15 +197,15 @@ Beide zijden zijn veranderd sinds de laatste synchronisatie!
 Browse
 Map opzoeken
 Browse directory
-
+Doorzoek map
 Cannot determine sync-direction:
 Kan de synchronisatie-richting niet bepalen:
 Cannot find %x
-
+Kan %x niet vinden
 Category
 Categorie
 Clear filter settings
-
+Leeg filter instellingen
 Comma separated list
 Komma gescheiden lijst
 Command line
@@ -255,7 +257,7 @@ Doorgaan
 Conversion error:
 Fout bij het converteren:
 Copy filesystem permissions
-
+Kopieer bestandsmachtigingen
 Copy from left to right
 Kopieer van links naar rechts
 Copy from left to right overwriting
@@ -269,13 +271,13 @@ Kopieer 'alleen lezen' bestanden
 Copy new or updated files to right folder.
 Kopieer nieuwe of geupdate bestanden naar de rechter map.
 Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
-
+Kopieer gedeelde of beveiligde bestanden met Volume Shadow Copy Service\n(Heeft administrator rechten nodig)
 Copy to clipboard\tCTRL+C
 Kopieer naar het klembord\tCTRL+C
 Copying new Symbolic Link %x to %y
-
+Kopieer nieuw symbolische link van %x naar %y
 Copying new file %x to %y
-
+Kopieer nieuw bestand van %x naar %y
 Could not determine volume name for file:
 Kon de schijfnaam niet vaststellen van bestand:
 Could not initialize directory monitoring:
@@ -317,7 +319,7 @@ Verwijder of overschrijf bestanden onomkeerbaar
 Delete permanently
 Verwijder onomkeerbaar
 Deleting Symbolic Link %x
-
+Verwijderen symbolische link %x
 Deleting file %x
 Bestand %x wordt verwijderd
 Deleting folder %x
@@ -327,7 +329,7 @@ Verwijder-afhandeling
 Description
 Beschrijving
 Direct
-
+Direct
 Directories are dependent! Be careful when setting up synchronization rules:
 Mappen zijn afhankelijk van elkaar! Wees voorzichtig met het maken van synchronisatieregels:
 Directories to watch
@@ -353,13 +355,15 @@ Nu downloaden?
 Drag && drop
 Drag en drop
 Elements found:
-
+Elementen gevonden:
 Elements processed:
-
+Elementen verwerkt:
 Elements remaining:
-
+Elementen te gaaan:
 Email
 E-mail
+Encoding extended time information: %x
+Coderen uitgebreide tijd informatie: %x
 Endless loop when traversing directory:
 Oneindige lus bij het nalopen van locatie:
 Error
@@ -367,13 +371,13 @@ Fout
 Error changing modification time:
 Er is een fout opgetreden bij het aanpassen van de bestandstijd:
 Error copying file permissions:
-
+Error kopieren van bestandspremissies:
 Error copying file:
 Er is een fout opgetreden bij het kopiëren van bestand:
 Error copying locked file %x!
 Er is een fout opgetreden bij het kopiëren van %x omdat het bestand in gebruik is!
 Error copying symbolic link:
-
+Error kopieren symbolische link:
 Error creating directory:
 Er is een fout opgetreden bij het aanmaken van pad:
 Error deleting directory:
@@ -400,12 +404,14 @@ Error reading file:
 Er is een fout opgetreden bij het lezen van het bestand:
 Error reading from synchronization database:
 Er is een fout opgetreden bij het lezen van de synchronisatie-database:
+Error reading security context:
+Error bij lezen van de beveiliging:
 Error resolving symbolic link:
 Er is een fout opgetreden bij het ophalen van een symbolische koppeling:
 Error setting directory lock:
-
+Error instelling van map slot:
 Error setting privilege:
-
+Error instelling van premissies:
 Error starting Volume Shadow Copy Service!
 Er is een fout opgetreden bij het starten van de Volume Schadow Copy Service! 
 Error traversing directory:
@@ -414,6 +420,8 @@ Error when monitoring directories.
 Er is een fout opgetreden bij het observeren van locaties.
 Error writing file:
 Er is een fout opgetreden bij het schrijven naar bestand:
+Error writing security context:
+Error met het schrijven van de beveiliging:
 Error writing to synchronization database:
 Er is een fout opgetreden bij het schrijven naar de synchronisatie-database:
 Example
@@ -427,9 +435,9 @@ Tijdelijk uitsluiten
 Exclude via filter:
 Uitsluiten door filter:
 Exit instantly
-
+Sluit gelijk af
 Extension
-
+Extensie
 External applications
 Externe applicaties
 Fatal Error
@@ -463,7 +471,7 @@ Bestanden die aan beide kanten bestaan, maar waarvan de linkerkant nieuwer is
 Files that exist on both sides, right one is newer
 Bestanden die aan beide kanten bestaan, maar waarvan de rechterkant nieuwer is
 Files that have different content
-
+Bestanden dat andere inhoud hebben
 Files/folders that exist on left side only
 Bestanden/mappen die alleen aan de linkerkant bestaan
 Files/folders that exist on right side only
@@ -471,23 +479,23 @@ Bestanden/mappen die alleen aan de rechterkant bestaan
 Filter files
 Filter bestanden
 Filter is active
-
+Filer is actief
 Filter settings have changed!
 Filter instellingen opgeslagen!
 Filter view
 Bekijk het filter
 Filter: All pairs
-
+Filter: Alle paren
 Filter: Single pair
-
+Filter: Enkel paar
 Find
-
+Vind
 Find what:
-
+Vind wat:
 Folder Comparison and Synchronization
 Mappen vergelijken en synchroniseren
 Follow
-
+Volg
 Free disk space available:
 Beschikbare vrije schijfruimte :
 FreeFileSync Batch Job
@@ -555,11 +563,11 @@ Homepage
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Identificeer en verwerk verandereringen aan beide kanten dmv een database. Verschillen en conflicten worden automatisch gedecteerd.
 Idle time between detection of last change and execution of command line in seconds
-
+Inactieve tijd tussen de detectie van de laatste verandering en het uitvoeren van een command in seconden
 If you like FFS
-Als het programma u bevalt
+Als het programma FreeFileSync u bevalt
 Ignore
-
+Negeer
 Ignore errors
 Negeer foutmeldingen
 Ignore subsequent errors
@@ -583,7 +591,7 @@ Initiële  synchronisatie:
 Integrate external applications into context menu. The following macros are available:
 Integreer externe applicaties in het context menu. De volgende macros zijn beschikbaar:
 Invalid FreeFileSync config file!
-
+FreeFileSync config bestand klopt niet!
 Leave as unresolved conflict
 Beschouwen als onopgelost conflict
 Left
@@ -601,9 +609,9 @@ Loggen
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Schaduw kopieen op WOW64 worden niet ondersteund. Gebruik alstublieft de 64-bit versie van FreeFileSync.
 Match case
-
+Hoofdlettergevoelig
 Minimum Idle Time
-
+Minimale Inactieve Tijd
 Mirror ->>
 Spiegelen ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -621,7 +629,7 @@ Verplaats de bestanden in een tijd-gemarkeerde sublocatie
 Moving %x to Recycle Bin
 %x aan het verplaatsen naar de Prullenbak
 Moving Symbolic Link %x to user-defined directory %y
-
+Verplaatsen symbolische link %x naar map %y
 Moving file %x to user-defined directory %y
 Verplaatsen bestand %x naar een door de gebruiker gedefinieerde locatie %y
 Moving folder %x to user-defined directory %y
@@ -643,15 +651,15 @@ Aantal mappen en bestanden die zullen worden verwijderd
 Number of files that will be overwritten
 Aantal bestanden dat zal worden overschreven
 One of the FreeFileSync database entries within the following file is not yet existing:
-
+Een van de FreeFileSync databasegegevens met dit bestand bestaat nog niet:
 One of the FreeFileSync database files is not yet existing:
-
+Een van de FreeFileSync database bestanden bestaat nog niet:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
 Alleen bestanden /locatie die niet worden gefilterd zullen worden gesynchroniseerd. Het filter word toegepast op de relatieve(!) naam van de basislocatie van de synchronisatie.
 Open with Explorer
 Openen met Explorer
 Open with default application
-
+Open met standaardapplicatie
 Operation aborted!
 Operatie afgebroken!
 Operation:
@@ -659,19 +667,19 @@ Voortgang:
 Overview
 Overzicht
 Overwriting Symbolic Link %x in %y
-
+Overschrijven van symbolische link %x over %y
 Overwriting file %x in %y
-
+Overschrijven bestand %x over %y
 Pause
 Pause
 Paused
 Gepauseerd
 Planned directory deletion is in conflict with its subdirectories and -files!
-
+Geplande map verwijdering heeft een conflict veroorzaakt met de bestanden en submappen
 Please run a Compare first before synchronizing!
 Voer eerst een Vergelijking uit voordat u synchroniseerd.
 Press \"Switch\" to open FreeFileSync GUI mode.
-
+Druk op \"Switch\" om FreeFilySync GUI mode te gebruiken.
 Processing folder pair:
 Verwerken van gekoppelde folder:
 Published under the GNU General Public License:
@@ -687,7 +695,7 @@ RealtimeSync - Automatische Synchronisatie
 RealtimeSync configuration
 RealtimeSync configuratie
 Recycle Bin not yet supported for this system!
-
+Prullenbak werkt (nog) niet op dit systeem!
 Relative path
 Relatieve pad
 Remove alternate settings
@@ -702,8 +710,6 @@ Reset
 Reset
 Right
 Rechts
-Run minimized and write status information to a logfile
-Tijdens het synchroniseren het venster minimaliseren en alle informatie opslaan in een log-bestand
 S&ave configuration...
 S&la de instellingen op...
 S&witch view
@@ -725,9 +731,9 @@ Selecteer een map voor het logbestand:
 Select variant:
 Selecteer een variant:
 Set direction:
-
+Selecteer map:
 Setting default synchronization directions: Old files will be overwritten with newer files.
-
+Instellingen worden veranderd naar standaard instellingen: Oude bestanden worden overschreven naar nieuwere bestanden.
 Show conflicts
 Geef conflicten weer
 Show files that are different
@@ -776,22 +782,24 @@ Speed:
 Snelheid:
 Start
 Start
+Start minimized and write status information to a logfile
+Start geminimaliseerd en schrijf status informatie in een logbestand
 Start synchronization
 Start synchroniseren
 Statistics
 Statistieken
 Status feedback
-
+Status feedback
 Stop
 Stop
 Swap sides
 Wissel zijdes
 Switching to FreeFileSync GUI mode...
-
+Veranderen naar FreeFileSync GUI mode...
 Symbolic Link handling
-
+Symbolische Link handeling
 Symlinks %x have the same date but a different target!
-
+Symbolische links %x heeft dezelfde datum maar een ander doel!
 Synchronization Preview
 Synchronisatie voorbeeldweergave
 Synchronization aborted!
@@ -802,8 +810,6 @@ Synchronization completed with errors!
 Synchronisatie afgerond. Er zijn fouten opgetreden.
 Synchronization settings
 Synchronisatie instellingen
-Synchronization status
-Synchronisatie: status
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Synchroniseer alle .doc, .zip en .exe bestanden uitgezonderd alles in submap \"temp\"
 Synchronize...
@@ -817,11 +823,11 @@ Doellocatie bestaal al!
 Target file already existing!
 Doelbestand bestaat al!
 The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-
+De command lijn is uitgevoerd elke tijd:\n- alle mappen worden beschikbaar (bijvoorbeeld via een USB stick)\n- bestanden binnen deze mappen of submappen zijn bewerkt.
 The file does not contain a valid configuration:
 Het bestand bevat geen geldige configuratie:
 The file was not processed by last synchronization!
-
+Het bestand werd niet verwerkt door de laatste synchronisatie!
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Deze variant ziet twee gelijknamige bestanden als gelijk wanneer ze dezelfde bestandsgrootte EN tijdstempel hebben.
 Time
@@ -837,7 +843,7 @@ Benodigde hoeveelheid vrije schijfruimte:
 Total time:
 Totale tijd:
 Transfer file and directory permissions\n(Requires Administrator rights)
-
+Overdracht van bestanden en mappen permissies\n (Vereist Administrator rechten)
 Unable to connect to sourceforge.net!
 Niet in staat verbinding te maken met sourceforge.net!
 Unable to create logfile!
@@ -863,9 +869,9 @@ Verifiëren bestand %x
 Volume name %x not part of filename %y!
 Volume naam %x maakt niet deel uit van bestandsnaam %y!
 Waiting for all directories to become available...
-
+Wachten op alle mappen....
 Waiting while directory is locked (%x)...
-
+Wachten totdat map is beveiligd (%x)...
 Warning
 Attentie
 Warning: Synchronization failed for %x item(s):

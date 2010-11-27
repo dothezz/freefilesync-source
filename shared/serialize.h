@@ -12,6 +12,7 @@
 #include "file_error.h"
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/cstdint.hpp>
 
 namespace util
 {
@@ -126,7 +127,7 @@ void writeNumber(wxOutputStream& stream, T number)
 
 
 inline
-Zstring readString(wxInputStream& stream)  //read string from file stream
+Zstring readString(wxInputStream& stream)
 {
     const size_t strLength = readNumber<size_t>(stream);
     if (strLength <= 1000)
@@ -145,7 +146,7 @@ Zstring readString(wxInputStream& stream)  //read string from file stream
 
 
 inline
-void writeString(wxOutputStream& stream, const Zstring& str)  //write string to filestream
+void writeString(wxOutputStream& stream, const Zstring& str)
 {
     writeNumber<size_t>(stream, str.length());
     stream.Write(str.c_str(), sizeof(Zchar) * str.length());

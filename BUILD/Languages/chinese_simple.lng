@@ -76,6 +76,8 @@
 确定(&O)
 &Pause
 暂停(&P)
+&Program
+程序(&P)
 &Quit
 退出(&Q)
 &Restore
@@ -360,6 +362,8 @@ Elements remaining:
 剩余的元素:
 Email
 邮箱
+Encoding extended time information: %x
+正在编码扩展时间信息:%x
 Endless loop when traversing directory:
 遍历目录时出现无限循环:
 Error
@@ -400,6 +404,8 @@ Error reading file:
 读取文件出错:
 Error reading from synchronization database:
 从同步数据库中读取时出错:
+Error reading security context:
+读取安全上下文时出错:
 Error resolving symbolic link:
 解决符号链接出错:
 Error setting directory lock:
@@ -414,6 +420,8 @@ Error when monitoring directories.
 监视目录时出错.
 Error writing file:
 写入文件出错:
+Error writing security context:
+写入安全上下文时出错:
 Error writing to synchronization database:
 向同步数据库中写入时出错:
 Example
@@ -702,8 +710,6 @@ Reset
 重置
 Right
 右侧
-Run minimized and write status information to a logfile
-最小化运行并将状态信息写到一个记录文件中
 S&ave configuration...
 保存配置(&A)...
 S&witch view
@@ -776,6 +782,8 @@ Speed:
 速度:
 Start
 开始
+Start minimized and write status information to a logfile
+以最小化开始运行并将信息写到日志文件
 Start synchronization
 开始同步
 Statistics
@@ -802,8 +810,6 @@ Synchronization completed with errors!
 同步已完成但有错误.
 Synchronization settings
 同步设置
-Synchronization status
-同步状态
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 同步所有 .doc, .zip和 .exe 文件, 除了\"temp\"中的一切.
 Synchronize...

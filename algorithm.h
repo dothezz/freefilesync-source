@@ -14,6 +14,8 @@ namespace ffs3
 {
 class BaseFilter;
 
+    wxString extractJobName(const wxString& configFilename);
+
 void swapGrids(const MainConfiguration& config, FolderComparison& folderCmp);
 
 struct DeterminationProblem //callback
@@ -64,7 +66,6 @@ void deleteFromGridAndHD(FolderComparison& folderCmp,                        //a
                          std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
                          const bool deleteOnBothSides,
                          const bool useRecycleBin,
-                         const MainConfiguration& mainConfig,
                          DeleteFilesHandler& statusHandler);
 }
 

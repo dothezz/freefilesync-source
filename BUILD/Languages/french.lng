@@ -76,6 +76,8 @@
 &OK
 &Pause
 &Pause
+&Program
+&Actions
 &Quit
 &Quitter
 &Restore
@@ -360,6 +362,8 @@ Elements remaining:
 Elements restants :
 Email
 Email
+Encoding extended time information: %x
+Codage de l'heure au format étendu : %x
 Endless loop when traversing directory:
 Boucle sans fin lors du parcours du répertoire : 
 Error
@@ -400,6 +404,8 @@ Error reading file:
 Erreur lors de la lecture du fichier :
 Error reading from synchronization database:
 Erreur lors de la lecture de la base de données de synchro :
+Error reading security context:
+Erreur de lecture du contexte de sécurité:
 Error resolving symbolic link:
 Erreur lors de la résolution du lien symbolique :
 Error setting directory lock:
@@ -414,6 +420,8 @@ Error when monitoring directories.
 Erreur lors de la surveillance des répertoires.
 Error writing file:
 Erreur lors de l'écriture du fichier :
+Error writing security context:
+Erreur d'écriture du contexte de sécurité:
 Error writing to synchronization database:
 Erreur lors de l'écriture de la base de données de synchro :
 Example
@@ -702,8 +710,6 @@ Reset
 Réinitialiser
 Right
 Droite
-Run minimized and write status information to a logfile
-Exécution en mode réduit. Les informations d'état sont enregistrées dans un fichier .log
 S&ave configuration...
 S&auvegarder la configuration...
 S&witch view
@@ -776,6 +782,8 @@ Speed:
 Vitesse :
 Start
 Démarrer
+Start minimized and write status information to a logfile
+Démarrage en mode réduit et écriture des informations d'état dans un fichier log
 Start synchronization
 Démarrer la synchronisation
 Statistics
@@ -802,8 +810,6 @@ Synchronization completed with errors!
 Synchronisation terminée avec des erreurs !
 Synchronization settings
 Paramétrage de la synchronisation
-Synchronization status
-Etat de la synchronisation
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Synchroniser tous les fichiers .doc, .zip et .exe sauf ceux du dossier \"temp\".
 Synchronize...

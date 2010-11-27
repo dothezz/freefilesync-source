@@ -49,7 +49,7 @@ class CustomLocale : public wxLocale
 public:
     static CustomLocale& getInstance();
 
-    void setLanguage(const int language);
+    void setLanguage(int language);
 
     int getLanguage() const
     {

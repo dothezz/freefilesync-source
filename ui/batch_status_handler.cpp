@@ -22,9 +22,9 @@ using namespace ffs3;
 class LogFile
 {
 public:
-    LogFile(const wxString& logfileDirectory, const wxString& batchFilename) //throw (FileError&)
+    LogFile(const wxString& logfileDirectory, const wxString& jobName) //throw (FileError&)
     {
-        const wxString logfileName = findUniqueLogname(logfileDirectory, batchFilename);
+        const wxString logfileName = findUniqueLogname(logfileDirectory, jobName);
 
         logFile.Open(logfileName, wxT("w"));
         if (!logFile.IsOpened())
@@ -66,17 +66,7 @@ public:
     }
 
 private:
-    static wxString extractJobName(const wxString& batchFilename)
-    {
-        using namespace common;
-
-        const wxString shortName = batchFilename.AfterLast(FILE_NAME_SEPARATOR); //returns the whole string if seperator not found
-        const wxString jobName = shortName.BeforeLast(wxChar('.')); //returns empty string if seperator not found
-        return jobName.IsEmpty() ? shortName : jobName;
-    }
-
-
-    static wxString findUniqueLogname(const wxString& logfileDirectory, const wxString& batchFilename)
+    static wxString findUniqueLogname(const wxString& logfileDirectory, const wxString& jobName)
     {
         using namespace common;
 
@@ -95,7 +85,7 @@ private:
         wxString logfileName = zToWx(logfileDir);
 
         //add prefix
-        logfileName += extractJobName(batchFilename) + wxT(" ");
+        logfileName += jobName + wxT(" ");
 
         //add timestamp
         wxString timeNow = wxDateTime::Now().FormatISOTime();
@@ -118,7 +108,7 @@ private:
 
 //##############################################################################################################################
 BatchStatusHandler::BatchStatusHandler(bool runSilent,
-                                       const wxString& batchFilename,
+                                       const wxString& jobName,
                                        const wxString* logfileDirectory,
                                        const xmlAccess::OnError handleError,
                                        const SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
@@ -129,13 +119,13 @@ BatchStatusHandler::BatchStatusHandler(bool runSilent,
     handleError_(handleError),
     currentProcess(StatusHandler::PROCESS_NONE),
     returnValue(returnVal),
-    syncStatusFrame(*this, NULL, runSilent)
+    syncStatusFrame(*this, NULL, runSilent, jobName)
 {
     if (logfileDirectory)
     {
         try
         {
-            logFile.reset(new LogFile(*logfileDirectory, batchFilename));
+            logFile.reset(new LogFile(*logfileDirectory, jobName));
         }
         catch (ffs3::FileError& error)
         {
@@ -216,7 +206,7 @@ inline
 void BatchStatusHandler::reportInfo(const Zstring& text)
 {
     if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING && logFile.get()) //write file transfer information to log
-        errorLog.logInfo(zToWx(text));
+        errorLog.logInfo(zToWx(text)); //avoid spamming with file copy info: visually identifying warning messages has priority! however when saving to a log file wee need this info
 
     syncStatusFrame.setStatusText_NoUpdate(text);
 }

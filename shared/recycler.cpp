@@ -88,11 +88,13 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
 
         using namespace fileop;
 
-        static const MoveToRecycleBinFct moveToRecycler =
-            util::getDllFun<MoveToRecycleBinFct>(getRecyclerDllName().c_str(), moveToRecycleBinFctName);
+        static MoveToRecycleBinFct moveToRecycler = NULL;
+        if (!moveToRecycler)
+            moveToRecycler = util::getDllFun<MoveToRecycleBinFct>(getRecyclerDllName().c_str(), moveToRecycleBinFctName);
 
-        static const GetLastErrorFct getLastError =
-            util::getDllFun<GetLastErrorFct>(getRecyclerDllName().c_str(), getLastErrorFctName);
+        static GetLastErrorFct getLastError = NULL;
+        if (!getLastError)
+            getLastError = util::getDllFun<GetLastErrorFct>(getRecyclerDllName().c_str(), getLastErrorFctName);
 
         if (moveToRecycler == NULL || getLastError == NULL)
             throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + fileNames[0] + wxT("\"\n\n") + //report first file only... better than nothing

@@ -2,6 +2,29 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.12
+---------------
+Allow empty folder pairs without complaining
+Automatically exclude database and lock files from all (sub-)directories (not only from base)
+Resize grid columns on both sides in parallel
+Fixed tooltip foreground text color (Linux)
+Search via CTRL + F and F3 now as global hotkeys
+Fully portable use of directory locking (Windows/Linux, 32/64 bit)
+RealtimeSync: Treat missing network path the same as missing local path
+Show current job name during synchronization (batch/gui)
+Allow copying dereferenced (=followed) directory Symlinks over network share
+Fail to copy Symlinks (=direct) over network share instead of silently creating empty folder (Windows XP)
+Copy NTFS junctions as Symlinks (avoiding permission checks)
+RealtimeSync: ignore request for device removal on network mapped drives
+Support for copying SELinux security contexts
+Fixed moving buttons in synchronization dialog
+Allow deleting currently selected item from list of last used folders (not before wxWidgets 2.9.1)
+Avoid losing focus after manually deleting a file
+Preserve custom changes to sync directions after manually deleting a file
+Handle empty tooltips correctly (Linux)
+Updated translation files
+
+
 Changelog v3.11
 ---------------
 Fixed migration issue: reasonable default value for number of folder pairs

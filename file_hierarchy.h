@@ -333,10 +333,10 @@ public:
     void setActive(bool active);
 
     void synchronizeSides();          //copy one side to the other (NOT recursive!!!)
-    template <SelectedSide side> void removeObject();    //removes file or directory (recursively!): used by manual deletion
+    template <SelectedSide side> void removeObject();    //removes file or directory (recursively!) without physically removing the element: used by manual deletion
     bool isEmpty() const; //true, if both sides are empty
-    static void removeEmpty(BaseDirMapping& baseDir);        //remove all invalid entries (where both sides are empty) recursively
-    static void removeEmptyNonRec(HierarchyObject& hierObj); //remove all invalid entries (where both sides are empty) non-recursively
+    static void removeEmpty(BaseDirMapping& baseDir);        //physically remove all invalid entries (where both sides are empty) recursively
+    static void removeEmptyNonRec(HierarchyObject& hierObj); //physically remove all invalid entries (where both sides are empty) non-recursively
 
 protected:
     FileSystemObject(bool existsLeft, bool existsRight, const Zstring& shortName, const HierarchyObject& parent) :

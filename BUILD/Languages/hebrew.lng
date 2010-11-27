@@ -76,6 +76,8 @@
 &אשר
 &Pause
 &עצור
+&Program
+
 &Quit
 &יציאה
 &Restore
@@ -360,6 +362,8 @@ Elements remaining:
 אלמנתים נותרו:
 Email
 :דוא"ל
+Encoding extended time information: %x
+
 Endless loop when traversing directory:
 נוצרת לולאה אינסופית בחצית מחיצות
 Error
@@ -400,6 +404,8 @@ Error reading file:
 טעות בקריאת קובץ:
 Error reading from synchronization database:
 טעות בקריאה מבסיס הנתונים של הסנכרון:
+Error reading security context:
+
 Error resolving symbolic link:
 טעות בפענוח מראה מקום סימלי (Symbolic Link)
 Error setting directory lock:
@@ -414,6 +420,8 @@ Error when monitoring directories.
 טעות בניתור מחיצות.
 Error writing file:
 טעות בכתיבת קובת:
+Error writing security context:
+
 Error writing to synchronization database:
 טעות ברישום לבסיס נתוני סנכרון:
 Example
@@ -702,8 +710,6 @@ Reset
 אפס
 Right
 ימין
-Run minimized and write status information to a logfile
-הפעל ניסתר ורשום ליומן פעילות
 S&ave configuration...
 שמ&ןר תצורה...
 S&witch view
@@ -776,6 +782,8 @@ Speed:
 מהירות:
 Start
 התחל
+Start minimized and write status information to a logfile
+
 Start synchronization
 התחל סנכרון
 Statistics
@@ -802,8 +810,6 @@ Synchronization completed with errors!
 סנכרון הושלם עם שגיאות!
 Synchronization settings
 משתני סנכרון
-Synchronization status
-סטטוס סנכרון
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 סנכרן .doc, .zip und .exe כל הקבצים בתיקית משנה \"temp\".
 Synchronize...

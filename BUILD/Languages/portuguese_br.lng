@@ -76,6 +76,8 @@ C&riar um arquivo batch...
 &OK
 &Pause
 &Pausa
+&Program
+&Programa
 &Quit
 &Sair
 &Restore
@@ -360,6 +362,8 @@ Elements remaining:
 Elementos faltantes:
 Email
 Email
+Encoding extended time information: %x
+Codificando informações adicionais de tempo: %x
 Endless loop when traversing directory:
 Loop infinito quando percorrendo diretório:
 Error
@@ -400,6 +404,8 @@ Error reading file:
 Erro ao ler arquivo:
 Error reading from synchronization database:
 Erro ao ler do banco de dados de sincronização:
+Error reading security context:
+Erro ao ler contexto de segurança:
 Error resolving symbolic link:
 Erro na resolução de link simbólico:
 Error setting directory lock:
@@ -414,6 +420,8 @@ Error when monitoring directories.
 Erro monitorando diretórios.
 Error writing file:
 Erro ao escrever arquivo:
+Error writing security context:
+Erro ao escrever contexto de segurança:
 Error writing to synchronization database:
 Erro ao escrever no banco de dados de sincronização:
 Example
@@ -702,8 +710,6 @@ Reset
 Reiniciar
 Right
 Direita
-Run minimized and write status information to a logfile
-Executar minimizado e escrever informações de status em um arquivo log
 S&ave configuration...
 S&alvar configuração...
 S&witch view
@@ -776,6 +782,8 @@ Speed:
 Velocidade:
 Start
 Iniciar
+Start minimized and write status information to a logfile
+Iniciar minimizado e escrever informação de status em um arquivo de log
 Start synchronization
 Iniciar sincronização
 Statistics
@@ -802,8 +810,6 @@ Synchronization completed with errors!
 Sincronização finalizada com erros!
 Synchronization settings
 Parâmetros de sincronização
-Synchronization status
-Estado da sincronização
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Sincronizar todos arquivos .doc, .zip e .exe exceto tudo que estiver na subpasta \"temp\".
 Synchronize...

@@ -34,7 +34,8 @@ CustomTooltip::PopupFrameGenerated::PopupFrameGenerated(
     long style ) : wxFrame(parent, id, title, pos, size, style)
 {
     this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-    this->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
+    this->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));   //both required: on Ubuntu background is black, foreground white!
+    this->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOTEXT)); //
 
     wxBoxSizer* bSizer158;
     bSizer158 = new wxBoxSizer( wxHORIZONTAL );

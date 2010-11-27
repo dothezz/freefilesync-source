@@ -451,16 +451,14 @@ DefaultReturnCode::Response ffs3::showDeleteDialog(const std::vector<ffs3::FileS
 {
     DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
 
-    DeleteDialog* confirmDeletion = new DeleteDialog(NULL,
+    DeleteDialog confirmDeletion(NULL,
             rowsOnLeft,
             rowsOnRight,
             deleteOnBothSides,
             useRecycleBin,
             totalDeleteCount);
-    if (confirmDeletion->ShowModal() == DeleteDialog::BUTTON_OKAY)
+    if (confirmDeletion.ShowModal() == DeleteDialog::BUTTON_OKAY)
         rv = DefaultReturnCode::BUTTON_OKAY;
-
-    confirmDeletion->Destroy();
     return rv;
 }
 //########################################################################################

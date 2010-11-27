@@ -76,6 +76,8 @@
 確定(&O)
 &Pause
 暫停(&P)
+&Program
+程式(&P)
 &Quit
 離開(&Q)
 &Restore
@@ -360,8 +362,8 @@ Elements remaining:
 剩餘要素：
 Email
 信箱
-Encode extended time information: %x
-
+Encoding extended time information: %x
+編碼延長時間資訊：%x
 Endless loop when traversing directory:
 當遍歷目錄時無限循環：
 Error
@@ -402,6 +404,8 @@ Error reading file:
 讀取檔案錯誤：
 Error reading from synchronization database:
 讀取同步資料庫錯誤：
+Error reading security context:
+讀取安全內文錯誤：
 Error resolving symbolic link:
 解决符號連結錯誤：
 Error setting directory lock:
@@ -416,6 +420,8 @@ Error when monitoring directories.
 監測目錄錯誤。
 Error writing file:
 寫入檔案錯誤：
+Error writing security context:
+寫入安全上內文錯誤：
 Error writing to synchronization database:
 寫入同步資料庫錯誤：
 Example
@@ -704,8 +710,6 @@ Reset
 重置
 Right
 右邊
-Run minimized and write status information to a logfile
-執行最小化和狀態資訊寫入到日誌檔
 S&ave configuration...
 儲存配置(&A)...
 S&witch view
@@ -778,6 +782,8 @@ Speed:
 速度：
 Start
 開始
+Start minimized and write status information to a logfile
+啟動最小化和寫入狀態資訊到日誌檔
 Start synchronization
 開始同步
 Statistics

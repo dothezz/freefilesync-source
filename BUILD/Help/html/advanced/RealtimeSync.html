@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20100902;19164200">
+	<META NAME="CHANGED" CONTENT="20101016;14325500">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -48,7 +48,7 @@ Instead of doing this manually you can simply import a </FONT><FONT FACE="Courie
 -&gt; File -&gt; Load configuration</I></FONT><FONT FACE="Tahoma, sans-serif">.
 This not only extracts all directories relevant for synchronization
 but also sets up the command-line to execute the </FONT><FONT FACE="Courier New, monospace">*.ffs_batch</FONT>
-<FONT FACE="Tahoma, sans-serif">file every time changes are detected.
+<FONT FACE="Tahoma, sans-serif">file each time changes are detected.
 Now press &quot;</FONT><FONT FACE="Tahoma, sans-serif"><I>Start</I></FONT><FONT FACE="Tahoma, sans-serif">&quot;
 to begin monitoring.</FONT></P>
 <UL>
@@ -61,17 +61,16 @@ to begin monitoring.</FONT></P>
 		<UL>
 			<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note:</B></FONT></P>
 			<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm">
+			<FONT FACE="Tahoma, sans-serif">The settings dialog can be skipped
+			by passing a RealtimeSync configuration file (<FONT FACE="Courier New, monospace">*.ffs_real</FONT>)
+			OR a FreeFileSync Batch file (<FONT FACE="Courier New, monospace">*.ffs_batch</FONT>)
+			as first command-line argument. This enables integration with your
+			operating system's auto start facility:</FONT></P>
+			<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm">
 			<FONT FACE="Tahoma, sans-serif">Using RealtimeSync is not
 			restricted to starting FreeFileSync. It can also be used in other
 			scenarios, like sending an email whenever a certain directory is
 			modified.</FONT></P>
-			<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm">
-			<FONT FACE="Tahoma, sans-serif">Starting the tool can be automated
-			by passing a RealtimeSync configuration file (<FONT FACE="Courier New, monospace">*.ffs_real</FONT>)
-			OR a FreeFileSync Batch file (<FONT FACE="Courier New, monospace">*.ffs_batch</FONT>)
-			as first command-line argument. Latter is implicitly converted to
-			a *.ffs_real file with default settings. This allows for
-			integration with your operating system's auto start facility:</FONT></P>
 		</UL>
 	</SPAN><BR CLEAR=LEFT>
 	</P>

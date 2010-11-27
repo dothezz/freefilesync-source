@@ -21,6 +21,7 @@
 #include "loki/TypeManip.h"
 #include "loki/ScopeGuard.h"
 #include <map>
+#include "symlink_target.h"
 
 #ifdef FFS_WIN
 #include "dll_loader.h"
@@ -36,6 +37,10 @@
 #include <utime.h>
 #include <cerrno>
 #include <sys/time.h>
+
+#ifdef HAVE_SELINUX
+#include <selinux/selinux.h>
+#endif
 #endif
 
 using ffs3::FileError;
@@ -1129,7 +1134,7 @@ void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, boo
 namespace
 {
 #ifdef FFS_WIN
-Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target path of symbolic link to a directory
+Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target path of symbolic link to a directory; throw (FileError)
 {
     //open handle to target of symbolic link
     const HANDLE hDir = ::CreateFile(ffs3::applyLongPathPrefix(dirLinkName).c_str(),
@@ -1140,7 +1145,10 @@ Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target pa
                                      FILE_FLAG_BACKUP_SEMANTICS,  //needed to open a directory
                                      NULL);
     if (hDir == INVALID_HANDLE_VALUE)
-        return Zstring();
+    {
+        wxString errorMessage = wxString(_("Error resolving symbolic link:")) + wxT("\n\"") + ffs3::zToWx(dirLinkName) + wxT("\"");
+        throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+    }
 
     boost::shared_ptr<void> dummy(hDir, ::CloseHandle);
 
@@ -1159,13 +1167,17 @@ Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target pa
     if (getFinalPathNameByHandle == NULL)
         throw FileError(wxString(_("Error loading library function:")) + wxT("\n\"") + wxT("GetFinalPathNameByHandleW") + wxT("\""));
 
-    const DWORD rv = (*getFinalPathNameByHandle)(
+    const DWORD rv = getFinalPathNameByHandle(
                          hDir,       //__in   HANDLE hFile,
                          targetPath, //__out  LPTSTR lpszFilePath,
                          BUFFER_SIZE,//__in   DWORD cchFilePath,
                          0);         //__in   DWORD dwFlags
     if (rv >= BUFFER_SIZE || rv == 0)
-        return Zstring();
+    {
+        wxString errorMessage = wxString(_("Error resolving symbolic link:")) + wxT("\n\"") + ffs3::zToWx(dirLinkName) + wxT("\"");
+        if (rv == 0) errorMessage += wxT("\n\n") + ffs3::getLastErrorFormatted();
+        throw FileError(errorMessage);
+    }
 
     return targetPath;
 }
@@ -1351,6 +1363,58 @@ void Privileges::setPrivilege(LPCTSTR privilege, bool enable) //throw FileError(
 }
 
 
+#ifdef HAVE_SELINUX
+//copy SELinux security context
+void copySecurityContext(const Zstring& source, const Zstring& target, bool derefSymlinks) //throw FileError()
+{
+    using ffs3::zToWx;
+
+    security_context_t contextSource = NULL;
+    const int rv = derefSymlinks ?
+                   ::getfilecon (source.c_str(), &contextSource) :
+                   ::lgetfilecon(source.c_str(), &contextSource);
+    if (rv < 0)
+    {
+        if (    errno == ENODATA ||  //no security context (allegedly) is not an error condition on SELinux
+                errno == EOPNOTSUPP) //extended attributes are not supported by the filesystem
+            return;
+
+        wxString errorMessage = wxString(_("Error reading security context:")) + wxT("\n\"") + zToWx(source) + wxT("\"");
+        throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+    }
+    boost::shared_ptr<char> dummy1(contextSource, ::freecon);
+
+    {
+        security_context_t contextTarget = NULL;
+        const int rv2 = derefSymlinks ?
+                        ::getfilecon (target.c_str(), &contextTarget) :
+                        ::lgetfilecon(target.c_str(), &contextTarget);
+        if (rv2 < 0)
+        {
+            if (errno == EOPNOTSUPP)
+                return;
+            //else: still try to set security context
+        }
+        else
+        {
+            boost::shared_ptr<char> dummy2(contextTarget, ::freecon);
+            if (::strcmp(contextSource, contextTarget) == 0) //nothing to do
+                return;
+        }
+    }
+
+    const int rv3 = derefSymlinks ?
+                    ::setfilecon (target.c_str(), contextSource) :
+                    ::lsetfilecon(target.c_str(), contextSource);
+    if (rv3 < 0)
+    {
+        wxString errorMessage = wxString(_("Error writing security context:")) + wxT("\n\"") + zToWx(target) + wxT("\"");
+        throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+    }
+}
+#endif //HAVE_SELINUX
+
+
 //copy permissions for files, directories or symbolic links
 void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, bool derefSymlinks) //throw FileError(); probably requires admin rights
 {
@@ -1379,8 +1443,10 @@ void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, b
                                         FILE_FLAG_BACKUP_SEMANTICS | (derefSymlinks ? 0 : FILE_FLAG_OPEN_REPARSE_POINT), //FILE_FLAG_BACKUP_SEMANTICS needed to open a directory
                                         NULL);
     if (hSource == INVALID_HANDLE_VALUE)
-        throw FileError(wxString(_("Error opening file:")) + wxT("\n\"") + zToWx(source) + wxT("\"") +
-                        wxT("\n\n") + ffs3::getLastErrorFormatted());
+    {
+        const wxString errorMessage = wxString(_("Error copying file permissions:")) + wxT("\n\"") + zToWx(source) +  wxT("\" ->\n\"") + zToWx(target) + wxT("\"") + wxT("\n\n");
+        throw FileError(errorMessage + ffs3::getLastErrorFormatted() + wxT(" (OR)"));
+    }
     boost::shared_ptr<void> dummy(hSource, ::CloseHandle);
 
 //  DWORD rc = ::GetNamedSecurityInfo(const_cast<WCHAR*>(applyLongPathPrefix(source).c_str()), -> does NOT dereference symlinks!
@@ -1396,7 +1462,7 @@ void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, b
     if (rc != ERROR_SUCCESS)
     {
         const wxString errorMessage = wxString(_("Error copying file permissions:")) + wxT("\n\"") + zToWx(source) +  wxT("\" ->\n\"") + zToWx(target) + wxT("\"") + wxT("\n\n");
-        throw FileError(errorMessage + ffs3::getLastErrorFormatted(rc));
+        throw FileError(errorMessage + ffs3::getLastErrorFormatted(rc) + wxT(" (R)"));
     }
     boost::shared_ptr<void> dummy2(buffer, ::LocalFree);
 
@@ -1413,7 +1479,7 @@ void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, b
         resetAttributes.Dismiss();
 
 
-    HANDLE hTarget = ::CreateFile( targetFmt.c_str(),                                                     // lpFileName
+    const HANDLE hTarget = ::CreateFile( targetFmt.c_str(),                                                     // lpFileName
                                    FILE_GENERIC_WRITE | WRITE_OWNER | WRITE_DAC | ACCESS_SYSTEM_SECURITY, // dwDesiredAccess: all four seem to be required!!!
                                    FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,                // dwShareMode
                                    NULL,                       // lpSecurityAttributes
@@ -1421,8 +1487,10 @@ void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, b
                                    FILE_FLAG_BACKUP_SEMANTICS | (derefSymlinks ? 0 : FILE_FLAG_OPEN_REPARSE_POINT), // dwFlagsAndAttributes
                                    NULL);                        // hTemplateFile
     if (hTarget == INVALID_HANDLE_VALUE)
-        throw FileError(wxString(_("Error opening file:")) + wxT("\n\"") + zToWx(target) + wxT("\"") +
-                        wxT("\n\n") + ffs3::getLastErrorFormatted());
+    {
+        const wxString errorMessage = wxString(_("Error copying file permissions:")) + wxT("\n\"") + zToWx(source) +  wxT("\" ->\n\"") + zToWx(target) + wxT("\"") + wxT("\n\n");
+        throw FileError(errorMessage + ffs3::getLastErrorFormatted() + wxT(" (OW)"));
+    }
     boost::shared_ptr<void> dummy3(hTarget, ::CloseHandle);
 
 //  rc = ::SetNamedSecurityInfo(const_cast<WCHAR*>(applyLongPathPrefix(target).c_str()), //__in      LPTSTR pObjectName, -> does NOT dereference symlinks!
@@ -1438,10 +1506,15 @@ void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, b
     if (rc != ERROR_SUCCESS)
     {
         const wxString errorMessage = wxString(_("Error copying file permissions:")) + wxT("\n\"") + zToWx(source) +  wxT("\" ->\n\"") + zToWx(target) + wxT("\"") + wxT("\n\n");
-        throw FileError(errorMessage + ffs3::getLastErrorFormatted(rc));
+        throw FileError(errorMessage + ffs3::getLastErrorFormatted(rc) + wxT(" (W)"));
     }
 
 #elif defined FFS_LINUX
+
+#ifdef HAVE_SELINUX  //copy SELinux security context
+    copySecurityContext(source, target, derefSymlinks); //throw FileError()
+#endif
+
     if (derefSymlinks)
     {
         struct stat fileInfo;
@@ -1450,7 +1523,7 @@ void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, b
                 ::chmod(target.c_str(), fileInfo.st_mode) != 0)
         {
             const wxString errorMessage = wxString(_("Error copying file permissions:")) + wxT("\n\"") + zToWx(source) +  wxT("\" ->\n\"") + zToWx(target) + wxT("\"") + wxT("\n\n");
-            throw FileError(errorMessage + ffs3::getLastErrorFormatted());
+            throw FileError(errorMessage + ffs3::getLastErrorFormatted() + wxT(" (R)"));
         }
     }
     else
@@ -1461,7 +1534,7 @@ void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, b
                 (!symlinkExists(target) && ::chmod(target.c_str(), fileInfo.st_mode) != 0)) //setting access permissions doesn't make sense for symlinks on Linux: there is no lchmod()
         {
             const wxString errorMessage = wxString(_("Error copying file permissions:")) + wxT("\n\"") + zToWx(source) +  wxT("\" ->\n\"") + zToWx(target) + wxT("\"") + wxT("\n\n");
-            throw FileError(errorMessage + ffs3::getLastErrorFormatted());
+            throw FileError(errorMessage + ffs3::getLastErrorFormatted() + wxT(" (W)"));
         }
     }
 #endif
@@ -1518,39 +1591,74 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
         const bool isSymlink = (templateAttr & FILE_ATTRIBUTE_REPARSE_POINT) != 0; //syntax required to shut MSVC up
 
         //symbolic link handling
-        if (!copyDirectorySymLinks && isSymlink) //create directory based on target of symbolic link
+        if (isSymlink)
         {
-            //get target directory of symbolic link
-            const Zstring linkPath = resolveDirectorySymlink(templateDir);
-            if (linkPath.empty())
+            if (!copyDirectorySymLinks) //create directory based on target of symbolic link
             {
-                if (level != 0) return;
-                throw FileError(wxString(_("Error resolving symbolic link:")) + wxT("\n\"") + templateDir.c_str() + wxT("\""));
-            }
+                //get target directory of symbolic link
+                Zstring linkPath;
+                try
+                {
+                    linkPath = resolveDirectorySymlink(templateDir); //throw (FileError)
+                }
+                catch (FileError&)
+                {
+                    //dereferencing a symbolic link usually fails if it is located on network drive or client is XP: NOT really an error...
+                    if (!::CreateDirectory(applyLongPathPrefixCreateDir(directory).c_str(), // pointer to a directory path string
+                                           NULL))
+                    {
+                        if (level != 0) return;
+                        const wxString errorMessage = wxString(_("Error creating directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"");
+                        throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+                    }
+                    return;
+                }
 
-            if (!::CreateDirectoryEx(      // this function automatically copies symbolic links if encountered
-                        applyLongPathPrefix(linkPath).c_str(),           // pointer to path string of template directory
-                        applyLongPathPrefixCreateDir(directory).c_str(), // pointer to a directory path string
-                        NULL))
+                if (!::CreateDirectoryEx(      // this function automatically copies symbolic links if encountered
+                            applyLongPathPrefix(linkPath).c_str(),           // pointer to path string of template directory
+                            applyLongPathPrefixCreateDir(directory).c_str(), // pointer to a directory path string
+                            NULL))
+                {
+                    if (level != 0) return;
+                    const wxString errorMessage = wxString(_("Error creating directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"");
+                    throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+                }
+            }
+            else //copy symbolic link
             {
-                if (level != 0) return;
-                const wxString errorMessage = wxString(_("Error creating directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"");
-                throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+                const Zstring linkPath = getSymlinkRawTargetString(templateDir); //accept broken symlinks; throw (FileError)
+
+                //dynamically load windows API function
+                typedef BOOLEAN (WINAPI *CreateSymbolicLinkFunc)(
+                    LPCTSTR lpSymlinkFileName,
+                    LPCTSTR lpTargetFileName,
+                    DWORD dwFlags);
+                static const CreateSymbolicLinkFunc createSymbolicLink = util::getDllFun<CreateSymbolicLinkFunc>(L"kernel32.dll", "CreateSymbolicLinkW");
+                if (createSymbolicLink == NULL)
+                    throw FileError(wxString(_("Error loading library function:")) + wxT("\n\"") + wxT("CreateSymbolicLinkW") + wxT("\""));
+
+                if (!createSymbolicLink( //seems no long path prefix is required...
+                            directory.c_str(),             //__in  LPTSTR lpSymlinkFileName,
+                            linkPath.c_str(),              //__in  LPTSTR lpTargetFileName,
+                            SYMBOLIC_LINK_FLAG_DIRECTORY)) //__in  DWORD dwFlags
+                {
+                    //if (level != 0) return;
+                    const wxString errorMessage = wxString(_("Error copying symbolic link:")) + wxT("\n\"") + templateDir.c_str() +  wxT("\" ->\n\"") + directory.c_str() + wxT("\"");
+                    throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+                }
             }
         }
-        else //in all other cases
+        else //no symbolic link
         {
-            if (!::CreateDirectoryEx( // this function automatically copies symbolic links if encountered
+            //automatically copies symbolic links if encountered: unfortunately it doesn't copy symlinks over network shares but silently creates empty folders instead (on XP)!
+            //also it isn't able to copy most junctions because of missing permissions (although target path can be retrieved!)
+            if (!::CreateDirectoryEx(
                         applyLongPathPrefix(templateDir).c_str(),          // pointer to path string of template directory
                         applyLongPathPrefixCreateDir(directory).c_str(),   // pointer to a directory path string
                         NULL))
             {
                 if (level != 0) return;
-                const wxString errorMessage = isSymlink ?
-                                              //give a more meaningful errormessage if copying a symbolic link failed, e.g. "C:\Users\ZenJu\Application Data"
-                                              (wxString(_("Error copying symbolic link:")) + wxT("\n\"") + templateDir.c_str() +  wxT("\" ->\n\"") + directory.c_str() + wxT("\"")) :
-
-                                              (wxString(_("Error creating directory:")) + wxT("\n\"") + directory.c_str() + wxT("\""));
+                const wxString errorMessage = wxString(_("Error creating directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"");
                 throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
             }
         }
@@ -1868,7 +1976,6 @@ void ffs3::copyFile(const Zstring& sourceFile,
 
         //invoke callback method to update progress indicators
         if (callback != NULL)
-        {
             switch (callback->updateCopyStatus(totalBytesTransferred))
             {
             case CopyFileCallback::CONTINUE:
@@ -1878,7 +1985,6 @@ void ffs3::copyFile(const Zstring& sourceFile,
                 throw FileError(wxString(_("Error copying file:")) + wxT("\n\"") + zToWx(sourceFile) +  wxT("\" ->\n\"") +
                                 zToWx(targetFile) + wxT("\"\n\n") + _("Operation aborted!"));
             }
-        }
     }
     while (!fileIn.eof());
 

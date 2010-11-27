@@ -102,13 +102,10 @@ void Application::OnStartApplication(wxIdleEvent&)
 
     GlobalResources::getInstance().load(); //loads bitmap resources on program startup
 
-#ifndef _MSC_VER
-#warning wxWidgets 2.9
+#if wxCHECK_VERSION(2, 9, 1)
+    wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping
+    wxToolTip::SetAutoPop(7000); //tooltip visibilty in ms, 5s seems to be default for Windows
 #endif
-    /*
-        wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping
-        wxToolTip::SetAutoPop(7000); //tooltip visibilty in ms, 5s seems to be default for Windows
-    */
 
 
     try //load global settings from XML
@@ -236,9 +233,9 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         //class handling status updates and error messages
         std::auto_ptr<BatchStatusHandler> statusHandler;  //delete object automatically
         if (batchCfg.silent)
-            statusHandler.reset(new BatchStatusHandler(true, filename, &batchCfg.logFileDirectory, batchCfg.handleError, switchBatchToGui, returnValue));
+            statusHandler.reset(new BatchStatusHandler(true, ffs3::extractJobName(filename), &batchCfg.logFileDirectory, batchCfg.handleError, switchBatchToGui, returnValue));
         else
-            statusHandler.reset(new BatchStatusHandler(false, filename, NULL, batchCfg.handleError, switchBatchToGui, returnValue));
+            statusHandler.reset(new BatchStatusHandler(false, ffs3::extractJobName(filename), NULL, batchCfg.handleError, switchBatchToGui, returnValue));
 
         //COMPARE DIRECTORIES
         ffs3::FolderComparison folderCmp;
@@ -250,13 +247,6 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         comparison.startCompareProcess(ffs3::extractCompareCfg(batchCfg.mainCfg),
                                        batchCfg.mainCfg.compareVar,
                                        folderCmp);
-
-        //check if there are files/folders to be sync'ed at all
-        if (!synchronizationNeeded(folderCmp))
-        {
-            statusHandler->logInfo(_("Nothing to synchronize according to configuration!")); //inform about this special case
-            //return; -> disabled: <automatic> mode requires database to be written in any case
-        }
 
         //START SYNCHRONIZATION
         ffs3::SyncProcess synchronization(
@@ -271,10 +261,20 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
         synchronization.startSynchronizationProcess(syncProcessCfg, folderCmp);
 
-        //play (optional) sound notification after sync has completed (GUI and batch mode)
-        const wxString soundFile = ffs3::getResourceDir() + wxT("Sync_Complete.wav");
-        if (ffs3::fileExists(ffs3::wxToZ(soundFile)))
-            wxSound::Play(soundFile, wxSOUND_ASYNC);
+        //check if there are files/folders to be sync'ed at all
+        if (!synchronizationNeeded(folderCmp))
+        {
+            statusHandler->logInfo(_("Nothing to synchronize according to configuration!")); //inform about this special case
+            //return; -> disabled: <automatic> mode requires database to be written in any case
+        }
+
+        //play (optional) sound notification after sync has completed
+        if (!batchCfg.silent)
+        {
+            const wxString soundFile = ffs3::getResourceDir() + wxT("Sync_Complete.wav");
+            if (ffs3::fileExists(ffs3::wxToZ(soundFile)))
+                wxSound::Play(soundFile, wxSOUND_ASYNC);
+        }
     }
     catch (ffs3::AbortThisProcess&)  //exit used by statusHandler
     {

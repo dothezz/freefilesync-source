@@ -76,6 +76,8 @@
 &OK
 &Pause
 &Pause
+&Program
+&Program
 &Quit
 &Quit
 &Restore
@@ -360,6 +362,8 @@ Elements remaining:
 Elements remaining:
 Email
 E-mail
+Encoding extended time information: %x
+Encoding extended time information: %x
 Endless loop when traversing directory:
 Endless loop when traversing directory:
 Error
@@ -400,6 +404,8 @@ Error reading file:
 Error reading file:
 Error reading from synchronization database:
 Error reading from synchronisation database:
+Error reading security context:
+Error reading security context:
 Error resolving symbolic link:
 Error resolving symbolic link:
 Error setting directory lock:
@@ -414,6 +420,8 @@ Error when monitoring directories.
 Error when monitoring directories.
 Error writing file:
 Error writing file:
+Error writing security context:
+Error writing security context:
 Error writing to synchronization database:
 Error writing to synchronisation database:
 Example
@@ -702,8 +710,6 @@ Reset
 Reset
 Right
 Right
-Run minimized and write status information to a logfile
-Run minimised and write status information to a logfile
 S&ave configuration...
 S&ave configuration...
 S&witch view
@@ -776,6 +782,8 @@ Speed:
 Speed:
 Start
 Start
+Start minimized and write status information to a logfile
+Start minimized and write status information to a logfile
 Start synchronization
 Start synchronisation
 Statistics
@@ -802,8 +810,6 @@ Synchronization completed with errors!
 Synchronisation completed with errors!
 Synchronization settings
 Synchronisation settings
-Synchronization status
-Synchronisation status
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Synchronise all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Synchronize...

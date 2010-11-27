@@ -76,6 +76,8 @@
 &OK
 &Pause
 &Pauza
+&Program
+
 &Quit
 &Zamknij
 &Restore
@@ -360,6 +362,8 @@ Elements remaining:
 Pozostałe elementy:
 Email
 Poczta
+Encoding extended time information: %x
+
 Endless loop when traversing directory:
 Zapętlenie podczas przeglądania katalogu:
 Error
@@ -400,6 +404,8 @@ Error reading file:
 Błąd odczytu pliku:
 Error reading from synchronization database:
 Błąd odczytu z bazy danych synchronizacji:
+Error reading security context:
+
 Error resolving symbolic link:
 Błąd odczytu dowiązania symbolicznego:
 Error setting directory lock:
@@ -414,6 +420,8 @@ Error when monitoring directories.
 Błąd podczas monitorowania katalogów.
 Error writing file:
 Błąd zapisu pliku:
+Error writing security context:
+
 Error writing to synchronization database:
 Błąd zapisu do bazy danych synchronizacji:
 Example
@@ -702,8 +710,6 @@ Reset
 Resetuj
 Right
 Prawy
-Run minimized and write status information to a logfile
-Uruchom w trybie ukrytym i zapisz informacje w logu
 S&ave configuration...
 Z&apisz konfigurację...
 S&witch view
@@ -776,6 +782,8 @@ Speed:
 Prędkość:
 Start
 Rozpocznij
+Start minimized and write status information to a logfile
+
 Start synchronization
 Rozpocznij synchronizację
 Statistics
@@ -802,8 +810,6 @@ Synchronization completed with errors!
 Synchronizacja zakończona z błędami.
 Synchronization settings
 Ustawienia synchronizacji
-Synchronization status
-Status synchronizacji
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Synchronizuj wszystkie pliki .doc, .zip i exe z wyjątkiem folderu \"temp\"
 Synchronize...

@@ -76,6 +76,8 @@
 &OK
 &Pause
 一時停止(&P)
+&Program
+プログラム(&P)
 &Quit
 終了(&Q)
 &Restore
@@ -360,6 +362,8 @@ Elements remaining:
 残りの要素:
 Email
 E-メール
+Encoding extended time information: %x
+拡張された時間情報のエンコーディング: %x
 Endless loop when traversing directory:
 ディレクトリ移動中に無限ループが発生:
 Error
@@ -400,6 +404,8 @@ Error reading file:
 ファイル読み込みエラー:
 Error reading from synchronization database:
 同期データベースからの読み込みエラー:
+Error reading security context:
+セキュリティ・コンテキストの読み取りエラー:
 Error resolving symbolic link:
 シンボリックリンクの解決に失敗:
 Error setting directory lock:
@@ -414,6 +420,8 @@ Error when monitoring directories.
 ディレクトリの監視エラー
 Error writing file:
 ファイル書き込みエラー:
+Error writing security context:
+セキュリティ・コンテキストの書き込みエラー:
 Error writing to synchronization database:
 同期データベースへの書き込みエラー:
 Example
@@ -702,8 +710,6 @@ Reset
 リセット
 Right
 右側
-Run minimized and write status information to a logfile
-最小化で起動して、ステータス情報をログに書き込む
 S&ave configuration...
 構成設定を保存(&A)...
 S&witch view
@@ -776,6 +782,8 @@ Speed:
 速度:
 Start
 開始
+Start minimized and write status information to a logfile
+最小化状態で起動して、ステータス情報をログファイルに書き出す
 Start synchronization
 同期の開始
 Statistics
@@ -802,8 +810,6 @@ Synchronization completed with errors!
 同期処理は、エラーで終了しています!
 Synchronization settings
 同期処理設定
-Synchronization status
-同期処理: ステータス
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 \"temp\" のサブフォルダを除いて、すべての.doc、.zip、および.exeファイルを同期
 Synchronize...

@@ -48,7 +48,7 @@ const std::vector<ffs3::LocInfoLine>& LocalizationInfo::getMapping()
 
 namespace
 {
-struct CompareByName
+	struct CompareByName : public std::binary_function<ffs3::LocInfoLine, ffs3::LocInfoLine, bool>
 {
     bool operator()(const ffs3::LocInfoLine& lhs, const ffs3::LocInfoLine& rhs) const
     {
@@ -121,7 +121,7 @@ LocalizationInfo::LocalizationInfo()
     newEntry.languageID     = wxLANGUAGE_DUTCH;
     newEntry.languageName   = wxT("Nederlands");
     newEntry.languageFile   = wxT("dutch.lng");
-    newEntry.translatorName = wxT("Mikhail Frolov");
+    newEntry.translatorName = wxT("Dion van Lieshout");
     newEntry.languageFlag   = wxT("holland.png");
     locMapping.push_back(newEntry);
 
@@ -184,7 +184,7 @@ LocalizationInfo::LocalizationInfo()
     newEntry.languageID     = wxLANGUAGE_TURKISH;
     newEntry.languageName   = wxT("Türkçe");
     newEntry.languageFile   = wxT("turkish.lng");
-    newEntry.translatorName = wxT("H.Barbaros BIÇAKCI");
+    newEntry.translatorName = wxT("Kaya Zeren");
     newEntry.languageFlag   = wxT("turkey.png");
     locMapping.push_back(newEntry);
 
@@ -481,7 +481,7 @@ private:
 };
 
 
-void CustomLocale::setLanguage(const int language)
+void CustomLocale::setLanguage(int language)
 {
     currentLanguage = language;
 
@@ -544,3 +544,24 @@ const wxChar* CustomLocale::GetString(const wxChar* szOrigString, const wxChar* 
     //fallback
     return szOrigString;
 }
+
+
+
+/*
+
+wxWidgets 2.9.1:
+
+class CustomTranslation : public wxTranslations
+{
+    virtual const wxString& GetString(const wxString& origString,
+                                      const wxString& domain = wxEmptyString) const
+    {
+          static const wxString blah = "map origString to translation by some arbitrary means";
+		  return blah;
+    }
+
+		wxTranslations::Set(new CustomTranslation);
+
+};
+
+*/

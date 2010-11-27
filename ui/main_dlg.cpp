@@ -51,6 +51,9 @@
 #include "batch_config.h"
 #include "../shared/check_exist.h"
 #include <wx/display.h>
+#include <wx/app.h>
+#include <boost/bind.hpp>
+
 
 using namespace ffs3;
 using ffs3::CustomLocale;
@@ -492,6 +495,9 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
     m_gridRight->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onGridRightButtonEvent), NULL, this);
     m_gridMiddle->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onGridMiddleButtonEvent), NULL, this);
 
+    //register global hotkeys (without explicit menu entry)
+    wxTheApp->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::OnGlobalKeyEvent), NULL, this);
+
     Connect(wxEVT_IDLE, wxEventHandler(MainDialog::OnIdleEvent), NULL, this);
     Connect(wxEVT_SIZE, wxSizeEventHandler(MainDialog::OnResize), NULL, this);
     Connect(wxEVT_MOVE, wxSizeEventHandler(MainDialog::OnResize), NULL, this);
@@ -598,20 +604,17 @@ void MainDialog::readGlobalSettings()
     m_gridRight->setColumnAttributes(globalSettings->gui.columnAttribRight);
 
     //load list of last used configuration files (in reverse order)
-    for (std::vector<wxString>::reverse_iterator i = globalSettings->gui.cfgFileHistory.rbegin();
-            i != globalSettings->gui.cfgFileHistory.rend();
-            ++i)
-        addFileToCfgHistory(*i);
+    std::for_each(globalSettings->gui.cfgFileHistory.rbegin(), globalSettings->gui.cfgFileHistory.rend(),
+                  boost::bind(&MainDialog::addFileToCfgHistory, this, _1));
 
     //load list of last used folders
-    for (std::vector<wxString>::reverse_iterator i = globalSettings->gui.folderHistoryLeft.rbegin();
-            i != globalSettings->gui.folderHistoryLeft.rend();
-            ++i)
-        addLeftFolderToHistory(*i);
-    for (std::vector<wxString>::reverse_iterator i = globalSettings->gui.folderHistoryRight.rbegin();
-            i != globalSettings->gui.folderHistoryRight.rend();
-            ++i)
-        addRightFolderToHistory(*i);
+    std::for_each(globalSettings->gui.folderHistoryLeft.rbegin(),
+                  globalSettings->gui.folderHistoryLeft.rend(),
+                  boost::bind(&MainDialog::addLeftFolderToHistory, this, _1));
+
+    std::for_each(globalSettings->gui.folderHistoryRight.rbegin(),
+                  globalSettings->gui.folderHistoryRight.rend(),
+                  boost::bind(&MainDialog::addRightFolderToHistory, this, _1));
 
     //show/hide file icons
     m_gridLeft->enableFileIcons(globalSettings->gui.showFileIconsLeft);
@@ -856,6 +859,7 @@ private:
     }
 
     MainDialog* const mainDlg;
+
     const size_t totalObjToDelete;
 
     bool abortRequested;
@@ -881,6 +885,7 @@ void MainDialog::deleteSelectedFiles()
 
 
         int totalDeleteCount = 0;
+    wxWindow* oldFocus = wxWindow::FindFocus();
 
         if (ffs3::showDeleteDialog(compRefLeft,
                                    compRefRight,
@@ -904,12 +909,11 @@ void MainDialog::deleteSelectedFiles()
                                           compRefRight,
                                           globalSettings->gui.deleteOnBothSides,
                                           globalSettings->gui.useRecyclerForManualDeletion,
-                                          getCurrentConfiguration().mainCfg,
                                           statusHandler);
             }
             catch (ffs3::AbortThisProcess&) {}
 
-            //remove rows that empty: just a beautification, invalid rows shouldn't cause issues
+            //remove rows that are empty: just a beautification, invalid rows shouldn't cause issues
             gridDataView->removeInvalidRows();
 
             //redraw grid neccessary to update new dimensions and for UI-Backend data linkage
@@ -919,6 +923,9 @@ void MainDialog::deleteSelectedFiles()
             m_gridMiddle->ClearSelection();
             m_gridRight-> ClearSelection();
         }
+
+                if (oldFocus)
+            oldFocus->SetFocus(); //restore focus before deletion
     }
 }
 
@@ -1171,19 +1178,15 @@ void MainDialog::onGridLeftButtonEvent(wxKeyEvent& event)
         case 'C':
         case WXK_INSERT: //CTRL + C || CTRL + INS
             copySelectionToClipboard(m_gridLeft);
-            break;
+            return; // -> swallow event! don't allow default grid commands!
 
         case 'A': //CTRL + A
             m_gridLeft->SelectAll();
-            break;
-
-        case 'F': //CTRL + F
-            ffs3::startFind(*this, *m_gridLeft, *m_gridRight, globalSettings->gui.textSearchRespectCase);
-            break;
+            return;
 
         case WXK_NUMPAD_ADD: //CTRL + '+'
             m_gridLeft->autoSizeColumns();
-            break;
+            return;
         }
 
     else if (event.AltDown())
@@ -1194,14 +1197,14 @@ void MainDialog::onGridLeftButtonEvent(wxKeyEvent& event)
             wxCommandEvent dummy;
             OnContextSyncDirLeft(dummy);
         }
-        break;
+        return;
 
         case WXK_RIGHT: //ALT + ->
         {
             wxCommandEvent dummy;
             OnContextSyncDirRight(dummy);
         }
-        break;
+        return;
 
         case WXK_UP:   /* ALT + /|\   */
         case WXK_DOWN: /* ALT + \|/   */
@@ -1209,7 +1212,7 @@ void MainDialog::onGridLeftButtonEvent(wxKeyEvent& event)
             wxCommandEvent dummy;
             OnContextSyncDirNone(dummy);
         }
-        break;
+        return;
         }
 
     else
@@ -1218,14 +1221,14 @@ void MainDialog::onGridLeftButtonEvent(wxKeyEvent& event)
         case WXK_DELETE:
         case WXK_NUMPAD_DELETE:
             deleteSelectedFiles();
-            break;
+            return;
 
         case WXK_SPACE:
         {
             wxCommandEvent dummy;
             OnContextFilterTemp(dummy);
         }
-        break;
+        return;
 
         case WXK_RETURN:
         case WXK_NUMPAD_ENTER:
@@ -1233,15 +1236,10 @@ void MainDialog::onGridLeftButtonEvent(wxKeyEvent& event)
             wxCommandEvent dummy(wxEVT_NULL, externalAppIDFirst); //open with first external application
             OnContextOpenWith(dummy);
         }
-        break;
-
-        case WXK_F3:        //F3
-        case WXK_NUMPAD_F3: //
-            ffs3::findNext(*this, *m_gridLeft, *m_gridRight, globalSettings->gui.textSearchRespectCase);
-            break;
+        return;
         }
 
-    //event.Skip(); -> swallow event! don't allow default grid commands!
+    event.Skip(); //unknown keypress: propagate
 }
 
 
@@ -1250,12 +1248,15 @@ void MainDialog::onGridMiddleButtonEvent(wxKeyEvent& event)
     const int keyCode = event.GetKeyCode();
 
     if (event.ControlDown())
-    {
-        if (keyCode == 67 || keyCode == WXK_INSERT) //CTRL + C || CTRL + INS
+        switch (keyCode)
+        {
+        case 'C':
+        case WXK_INSERT: //CTRL + C || CTRL + INS
             copySelectionToClipboard(m_gridMiddle);
-    }
+            return;
+        }
 
-    //event.Skip(); -> swallow event! don't allow default grid commands!
+    event.Skip(); //unknown keypress: propagate
 }
 
 
@@ -1269,19 +1270,15 @@ void MainDialog::onGridRightButtonEvent(wxKeyEvent& event)
         case 'C':
         case WXK_INSERT: //CTRL + C || CTRL + INS
             copySelectionToClipboard(m_gridRight);
-            break;
+            return;
 
         case 'A': //CTRL + A
             m_gridRight->SelectAll();
-            break;
-
-        case 'F': //CTRL + F
-            ffs3::startFind(*this, *m_gridLeft, *m_gridRight, globalSettings->gui.textSearchRespectCase);
-            break;
+            return;
 
         case WXK_NUMPAD_ADD: //CTRL + '+'
             m_gridRight->autoSizeColumns();
-            break;
+            return;
         }
 
     else if (event.AltDown())
@@ -1292,14 +1289,14 @@ void MainDialog::onGridRightButtonEvent(wxKeyEvent& event)
             wxCommandEvent dummy;
             OnContextSyncDirLeft(dummy);
         }
-        break;
+        return;
 
         case WXK_RIGHT: //ALT + ->
         {
             wxCommandEvent dummy;
             OnContextSyncDirRight(dummy);
         }
-        break;
+        return;
 
         case WXK_UP:   /* ALT + /|\   */
         case WXK_DOWN: /* ALT + \|/   */
@@ -1307,7 +1304,7 @@ void MainDialog::onGridRightButtonEvent(wxKeyEvent& event)
             wxCommandEvent dummy;
             OnContextSyncDirNone(dummy);
         }
-        break;
+        return;
         }
 
     else
@@ -1316,14 +1313,14 @@ void MainDialog::onGridRightButtonEvent(wxKeyEvent& event)
         case WXK_DELETE:
         case WXK_NUMPAD_DELETE:
             deleteSelectedFiles();
-            break;
+            return;
 
         case WXK_SPACE:
         {
             wxCommandEvent dummy;
             OnContextFilterTemp(dummy);
         }
-        break;
+        return;
 
         case WXK_RETURN:
         case WXK_NUMPAD_ENTER:
@@ -1331,17 +1328,37 @@ void MainDialog::onGridRightButtonEvent(wxKeyEvent& event)
             wxCommandEvent dummy(wxEVT_NULL, externalAppIDFirst); //open with first external application
             OnContextOpenWith(dummy);
         }
-        break;
+        return;
+        }
 
+    event.Skip(); //unknown keypress: propagate
+}
+
+
+void MainDialog::OnGlobalKeyEvent(wxKeyEvent& event) //process key events without explicit menu entry :)
+{
+    const int keyCode = event.GetKeyCode();
+
+    if (event.ControlDown())
+        switch (keyCode)
+        {
+        case 'F': //CTRL + F
+            ffs3::startFind(*this, *m_gridLeft, *m_gridRight, globalSettings->gui.textSearchRespectCase);
+            return; //-> swallow event!
+        }
+    else if (event.AltDown())
+        ;
+    else
+        switch (keyCode)
+        {
         case WXK_F3:        //F3
         case WXK_NUMPAD_F3: //
             ffs3::findNext(*this, *m_gridLeft, *m_gridRight, globalSettings->gui.textSearchRespectCase);
-            break;
+            return; //-> swallow event!
         }
 
-    //event.Skip(); -> swallow event! don't allow default grid commands!
+    event.Skip();
 }
-
 
 
 //------------------------------------------------------------
@@ -2890,7 +2907,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
         //PERF_START;
 
         //class handling status updates and error messages
-        SyncStatusHandler statusHandler(this, currentCfg.ignoreErrors);
+        SyncStatusHandler statusHandler(this, currentCfg.ignoreErrors, ffs3::extractJobName(currentConfigFileName));
 
         //check if there are files/folders to be sync'ed at all
         if (!synchronizationNeeded(gridDataView->getDataTentative()))
@@ -3891,3 +3908,4 @@ bool MainDialog::SyncPreview::synchronizationIsEnabled() const
 {
     return synchronizationEnabled;
 }
+

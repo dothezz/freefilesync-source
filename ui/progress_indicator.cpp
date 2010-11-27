@@ -384,7 +384,7 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
 class SyncStatus::SyncStatusImpl : public SyncStatusDlgGenerated
 {
 public:
-    SyncStatusImpl(StatusHandler& updater, wxTopLevelWindow* parentWindow);
+    SyncStatusImpl(StatusHandler& updater, wxTopLevelWindow* parentWindow, const wxString& jobName);
     ~SyncStatusImpl();
 
     void resetGauge(int totalObjectsToProcess, wxLongLong totalDataToProcess);
@@ -410,6 +410,7 @@ private:
     bool currentProcessIsRunning();
     void showProgressExternally(const wxString& progressText, float percent = 0); //percent may already be included in progressText
 
+    const wxString jobName_;
     wxStopWatch timeElapsed;
 
     StatusHandler* processStatusHandler;
@@ -445,8 +446,8 @@ private:
 
 
 //redirect to implementation
-SyncStatus::SyncStatus(StatusHandler& updater, wxTopLevelWindow* parentWindow, bool startSilent) :
-    pimpl(new SyncStatusImpl(updater, parentWindow))
+SyncStatus::SyncStatus(StatusHandler& updater, wxTopLevelWindow* parentWindow, bool startSilent, const wxString& jobName) :
+    pimpl(new SyncStatusImpl(updater, parentWindow, jobName))
 {
     if (startSilent)
         pimpl->minimizeToTray();
@@ -509,7 +510,7 @@ void SyncStatus::processHasFinished(SyncStatusID id, const wxString& finalMessag
 //########################################################################################
 
 
-SyncStatus::SyncStatusImpl::SyncStatusImpl(StatusHandler& updater, wxTopLevelWindow* parentWindow) :
+SyncStatus::SyncStatusImpl::SyncStatusImpl(StatusHandler& updater, wxTopLevelWindow* parentWindow, const wxString& jobName) :
     SyncStatusDlgGenerated(parentWindow,
                            wxID_ANY,
                            parentWindow ? wxString(wxEmptyString) : (wxString(wxT("FreeFileSync - ")) + _("Folder Comparison and Synchronization")),
@@ -517,6 +518,7 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(StatusHandler& updater, wxTopLevelWin
                            parentWindow ?
                            wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL | wxFRAME_NO_TASKBAR | wxFRAME_FLOAT_ON_PARENT : //wxTAB_TRAVERSAL is needed for standard button handling: wxID_OK/wxID_CANCEL
                            wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL),
+    jobName_(jobName),
     processStatusHandler(&updater),
     mainDialog(parentWindow),
     totalObjects(0),
@@ -702,26 +704,28 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
     const float percent = totalData == 0 ? 0 : currentData.ToDouble() * 100 / totalData.ToDouble();
 
     //write status information to systray, taskbar, parent title ect.
+
+    const wxString postFix = jobName_.empty() ? wxString() : (wxT(" - \"") + jobName_ + wxT("\""));
     switch (currentStatus)
     {
     case SyncStatus::SCANNING:
-        showProgressExternally(numberToStringSep(scannedObjects) + wxT(" - ") + _("Scanning..."));
+        showProgressExternally(numberToStringSep(scannedObjects) + wxT(" - ") + _("Scanning...") + postFix);
         break;
     case SyncStatus::COMPARING_CONTENT:
-        showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Comparing content..."), percent);
+        showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Comparing content...") + postFix, percent);
         break;
     case SyncStatus::SYNCHRONIZING:
-        showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Synchronizing..."), percent);
+        showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Synchronizing...") + postFix, percent);
         break;
     case SyncStatus::PAUSE:
-        showProgressExternally((totalData != 0 ? formatPercentage(currentData, totalData) + wxT(" - ") : wxString()) + _("Paused"), percent);
+        showProgressExternally((totalData != 0 ? formatPercentage(currentData, totalData) + wxT(" - ") : wxString()) + _("Paused") + postFix, percent);
         break;
     case SyncStatus::ABORTED:
-        showProgressExternally(_("Aborted"), percent);
+        showProgressExternally(_("Aborted") + postFix, percent);
         break;
     case SyncStatus::FINISHED_WITH_SUCCESS:
     case SyncStatus::FINISHED_WITH_ERROR:
-        showProgressExternally(_("Completed"), percent);
+        showProgressExternally(_("Completed") + postFix, percent);
         break;
     }
 

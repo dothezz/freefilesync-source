@@ -1,16 +1,32 @@
-APPNAME = FreeFileSync
-
-prefix = /usr
-BINDIR = $(DESTDIR)$(prefix)/bin
-SHAREDIR = $(DESTDIR)$(prefix)/share
+APPNAME     = FreeFileSync
+prefix      = /usr
+BINDIR      = $(DESTDIR)$(prefix)/bin
+SHAREDIR    = $(DESTDIR)$(prefix)/share
 APPSHAREDIR = $(SHAREDIR)/$(APPNAME)
 
-FFS_CPPFLAGS=-Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes --static=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -O3 -pthread
-LINKFLAGS=`wx-config --libs --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a -O3 -pthread
+#default build
+FFS_CPPFLAGS = -Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -O3 -pthread
+LINKFLAGS    = `wx-config --libs --debug=no --unicode=yes` -lboost_thread -O3 -pthread
+
+#static build used for precompiled release
+ifeq ($(BUILD),release)
+FFS_CPPFLAGS = -Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes --static=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -O3 -pthread
+LINKFLAGS    = `wx-config --libs --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a -O3 -pthread
+endif
+#####################################################################################################
+
 
 #support for GTKMM
 FFS_CPPFLAGS+=`pkg-config --cflags gtkmm-2.4`
 LINKFLAGS+=`pkg-config --libs gtkmm-2.4`
+
+#support for SELinux (optional)
+ifeq ($(BUILD),release)
+SELINUX_EXISTING=$(shell pkg-config --exists libselinux && echo YES)
+ifeq ($(SELINUX_EXISTING),YES)
+FFS_CPPFLAGS += -DHAVE_SELINUX
+endif
+endif
 
 FILE_LIST=              #internal list of all *.cpp files needed for compilation
 FILE_LIST+=structures.cpp
@@ -81,9 +97,7 @@ all: FreeFileSync
 
 init: 
 	if [ ! -d OBJ ]; then mkdir OBJ; fi
-
 #remove byte ordering mark: needed by Visual C++ but an error with GCC
-removeBOM: tools/remove_BOM.cpp
 	g++ -o OBJ/removeBOM tools/remove_BOM.cpp 
 	./OBJ/removeBOM shared/localization.cpp shared/localization_no_BOM.cpp
 
@@ -91,7 +105,7 @@ removeBOM: tools/remove_BOM.cpp
 #strip path information
 	g++ $(FFS_CPPFLAGS) -c $< -o OBJ/$(subst .cpp,.o,$(notdir $<))
 
-FreeFileSync: init removeBOM $(DEP_LIST)
+FreeFileSync: init $(DEP_LIST)
 #respect linker order: wxWidgets libraries last
 	g++ -o ./BUILD/$(APPNAME) $(OBJECT_LIST) $(LINKFLAGS)
 

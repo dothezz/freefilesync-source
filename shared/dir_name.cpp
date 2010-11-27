@@ -52,7 +52,7 @@ void setDirectoryNameImpl(const wxString& dirname, wxDirPickerCtrl* dirPicker, w
 
     const wxString dirFormatted = zToWx(getFormattedDirectoryName(wxToZ(dirname)));
 
-    tooltipWnd.SetToolTip(dirFormatted);
+    tooltipWnd.SetToolTip(dirFormatted); //wxComboBox bug: the edit control is not updated... hope this will be fixed: http://trac.wxwidgets.org/ticket/12659
 
     if (staticBox)
     {

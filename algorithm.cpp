@@ -23,6 +23,16 @@
 using namespace ffs3;
 
 
+wxString ffs3::extractJobName(const wxString& configFilename)
+{
+    using namespace common;
+
+    const wxString shortName = configFilename.AfterLast(FILE_NAME_SEPARATOR); //returns the whole string if seperator not found
+    const wxString jobName = shortName.BeforeLast(wxChar('.')); //returns empty string if seperator not found
+    return jobName.IsEmpty() ? shortName : jobName;
+}
+
+
 void ffs3::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp)
 {
     std::for_each(folderCmp.begin(), folderCmp.end(), boost::bind(&BaseDirMapping::swap, _1));
@@ -42,8 +52,39 @@ public:
 
         std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //process files
         std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //process links
-        std::for_each(hierObj.useSubDirs().begin(),  hierObj.useSubDirs().end(),  prx); //process directories
+        std::for_each(hierObj.useSubDirs(). begin(), hierObj.useSubDirs(). end(), prx); //process directories
     }
+
+    /*
+        void execute2(FileSystemObject& fsObj) const
+        {
+            struct RedetermineObject : public FSObjectVisitor
+            {
+                RedetermineObject(const Redetermine& parent,
+                                  FileSystemObject& fsObject) : parent_(parent), fsObj_(fsObject) {}
+
+                virtual void visit(const FileMapping& fileObj)
+                {
+                    parent_(static_cast<FileMapping&>(fsObj_));
+                }
+
+                virtual void visit(const SymLinkMapping& linkObj)
+                {
+                    parent_(static_cast<SymLinkMapping&>(fsObj_));
+                }
+
+                virtual void visit(const DirMapping& dirObj)
+                {
+                    parent_(static_cast<DirMapping&>(fsObj_));
+                }
+
+            private:
+                const Redetermine& parent_;
+                FileSystemObject& fsObj_; //hack
+            } redetObj(*this, fsObj);
+            fsObj.accept(redetObj);
+        }
+    */
 
 private:
     friend class util::ProxyForEach<const Redetermine>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
@@ -896,20 +937,7 @@ void ffs3::redetermineSyncDirection(const MainConfiguration& currentMainCfg, Fol
 class SetNewDirection
 {
 public:
-    SetNewDirection(SyncDirection newDirection) :
-        newDirection_(newDirection) {}
-
-    void execute(HierarchyObject& hierObj) const
-    {
-        util::ProxyForEach<const SetNewDirection> prx(*this); //grant std::for_each access to private parts of this class
-
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //process files
-        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //process links
-        std::for_each(hierObj.useSubDirs().begin(),  hierObj.useSubDirs().end(),  prx); //process directories
-    }
-
-private:
-    friend class util::ProxyForEach<const SetNewDirection>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
+    SetNewDirection(SyncDirection newDirection) : newDirection_(newDirection) {}
 
     void operator()(FileMapping& fileObj) const
     {
@@ -930,28 +958,45 @@ private:
         execute(dirObj); //recursion
     }
 
+private:
+    friend class util::ProxyForEach<const SetNewDirection>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
+
+    void execute(HierarchyObject& hierObj) const
+    {
+        util::ProxyForEach<const SetNewDirection> prx(*this); //grant std::for_each access to private parts of this class
+
+        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //process files
+        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //process links
+        std::for_each(hierObj.useSubDirs().begin(),  hierObj.useSubDirs().end(),  prx); //process directories
+    }
+
     const SyncDirection newDirection_;
 };
 
 
 void ffs3::setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsObj)
 {
-    if (fsObj.getCategory() != FILE_EQUAL)
-        fsObj.setSyncDir(newDirection);
+    SetNewDirection dirSetter(newDirection);
 
     //process subdirectories also!
     struct Recurse: public FSObjectVisitor
     {
-        Recurse(SyncDirection newDirect) : newDirection_(newDirect) {}
-        virtual void visit(const FileMapping& fileObj) {}
-        virtual void visit(const SymLinkMapping& linkObj) {}
+        Recurse(const SetNewDirection& ds) : dirSetter_(ds) {}
+        virtual void visit(const FileMapping& fileObj)
+        {
+            dirSetter_(const_cast<FileMapping&>(fileObj)); //phyiscal object is not const in this method anyway
+        }
+        virtual void visit(const SymLinkMapping& linkObj)
+        {
+            dirSetter_(const_cast<SymLinkMapping&>(linkObj)); //phyiscal object is not const in this method anyway
+        }
         virtual void visit(const DirMapping& dirObj)
         {
-            SetNewDirection(newDirection_).execute(const_cast<DirMapping&>(dirObj)); //phyiscal object is not const in this method anyway
+            dirSetter_(const_cast<DirMapping&>(dirObj)); //phyiscal object is not const in this method anyway
         }
     private:
-        const SyncDirection newDirection_;
-    } recurse(newDirection);
+        const SetNewDirection& dirSetter_;
+    } recurse(dirSetter);
     fsObj.accept(recurse);
 }
 
@@ -1224,6 +1269,7 @@ private:
 };
 }
 
+
 template <SelectedSide side>
 void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDeleteOneSide,
                                 const bool useRecycleBin,
@@ -1279,6 +1325,12 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDeleteOneS
                     }
 
                     fsObj->removeObject<side>(); //if directory: removes recursively!
+
+                    //update sync direction: as this is a synchronization tool, the user most likely wants to delete the other side, too!
+                    if (side == LEFT_SIDE)
+                        setSyncDirectionRec(SYNC_DIR_RIGHT, *fsObj); //set new direction (recursively)
+                    else
+                        setSyncDirectionRec(SYNC_DIR_LEFT, *fsObj);
                 }
                 statusHandler.deletionSuccessful(1); //notify successful file/folder deletion
 
@@ -1304,19 +1356,17 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDeleteOneS
 class FinalizeDeletion
 {
 public:
-    FinalizeDeletion(FolderComparison& folderCmp, const MainConfiguration& mainConfig) :
-        folderCmp_(folderCmp),
-        mainConfig_(mainConfig) {}
+    FinalizeDeletion(FolderComparison& folderCmp) : folderCmp_(folderCmp) {}
 
     ~FinalizeDeletion()
     {
         std::for_each(folderCmp_.begin(), folderCmp_.end(), FileSystemObject::removeEmpty);
-        redetermineSyncDirection(mainConfig_, folderCmp_, NULL);
+
+        //redetermineSyncDirection(mainConfig_, folderCmp_, NULL);
     }
 
 private:
     FolderComparison& folderCmp_;
-    const MainConfiguration& mainConfig_;
 };
 
 
@@ -1325,15 +1375,9 @@ void ffs3::deleteFromGridAndHD(FolderComparison& folderCmp,                     
                                std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
                                const bool deleteOnBothSides,
                                const bool useRecycleBin,
-                               const MainConfiguration& mainConfig,
                                DeleteFilesHandler& statusHandler)
 {
-    if (folderCmp.size() == 0)
-        return;
-    else if (folderCmp.size() != mainConfig.additionalPairs.size() + 1)
-        throw std::logic_error("Programming Error: Contract violation!");
-
-    FinalizeDeletion dummy(folderCmp, mainConfig); //ensure cleanup: redetermination of sync-directions and removal of invalid rows
+    FinalizeDeletion dummy(folderCmp); //ensure cleanup: redetermination of sync-directions and removal of invalid rows
 
 
     if (deleteOnBothSides)

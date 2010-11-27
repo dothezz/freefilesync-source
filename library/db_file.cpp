@@ -33,8 +33,6 @@ const int FILE_FORMAT_VER = 4;
 //-------------------------------------------------------------------------------------------------------------------------------
 
 
-//yet another layer of indirection: Since 32/64 bit builds are binary incompatible, we want them to write into "distinct parts" of the db-file
-//just like we were actually accessing different files
 class FileInputStreamDB : public FileInputStream
 {
 public:

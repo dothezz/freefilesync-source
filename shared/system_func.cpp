@@ -25,11 +25,20 @@ wxString ffs3::getLastErrorFormatted(unsigned long lastError) //try to get addit
 
     wxString output = wxString(wxT("Windows Error Code ")) + wxString::Format(wxT("%u"), lastError);
 
-    WCHAR buffer[1001];
-    if (::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_MAX_WIDTH_MASK, 0, lastError, 0, buffer, 1001, NULL) != 0)
-        output += wxString(wxT(": ")) + buffer;
+    LPWSTR buffer = NULL;
+    if (::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM    |
+                        FORMAT_MESSAGE_MAX_WIDTH_MASK |
+                        FORMAT_MESSAGE_IGNORE_INSERTS | //important: without this flag ::FormatMessage() will fail if message contains placeholders
+                        FORMAT_MESSAGE_ALLOCATE_BUFFER, NULL, lastError, 0, reinterpret_cast<LPWSTR>(&buffer), 0, NULL) != 0)
+    {
+        if (buffer) //just to be sure
+        {
+            output += wxString(wxT(": ")) + buffer;
+            ::LocalFree(buffer);
+        }
+    }
+    ::SetLastError(lastError); //restore last error
 
-        ::SetLastError(lastError); //restore last error
     return output;
 }
 

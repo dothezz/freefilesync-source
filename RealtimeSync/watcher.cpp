@@ -96,18 +96,13 @@ public:
         if (newExec - lastExec >= UPDATE_INTERVAL)
         {
             lastExec = newExec;
-            allExisting_ = std::find_if(dirList.begin(), dirList.end(), notExisting) == dirList.end();
+            allExisting_ = std::find_if(dirList.begin(), dirList.end(), std::not1(std::ptr_fun(&ffs3::dirExists))) == dirList.end();
         }
 
         return allExisting_;
     }
 
 private:
-    static bool notExisting(const Zstring& dirname)
-    {
-        return !ffs3::dirExists(dirname);
-    }
-
     mutable wxLongLong lastExec;
     mutable bool allExisting_;
 
@@ -146,7 +141,9 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
 
         if (rv == INVALID_HANDLE_VALUE)
         {
-            if (::GetLastError() == ERROR_FILE_NOT_FOUND) //no need to check this condition any earlier!
+            const DWORD lastError = ::GetLastError();
+            if (    lastError == ERROR_FILE_NOT_FOUND || //no need to check this condition any earlier!
+                    lastError == ERROR_BAD_NETPATH)      //
                 return CHANGE_DIR_MISSING;
 
             const wxString errorMessage = wxString(_("Could not initialize directory monitoring:")) + wxT("\n\"") + zToWx(*i) + wxT("\"");

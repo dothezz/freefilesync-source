@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Sep  8 2010)
+// C++ code generated with wxFormBuilder (version Nov 17 2010)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -228,6 +228,7 @@ class MainDialogGenerated : public wxFrame
 		wxPanel* m_panelRight;
 		
 		MainDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 933,612 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		
 		~MainDialogGenerated();
 	
 };
@@ -257,7 +258,7 @@ class FolderPairGenerated : public wxPanel
 		wxTextCtrl* m_directoryRight;
 		wxDirPickerCtrl* m_dirPickerRight;
 		
-		FolderPairGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
+		FolderPairGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
 		~FolderPairGenerated();
 	
 };
@@ -286,7 +287,7 @@ class BatchFolderPairGenerated : public wxPanel
 		wxDirPickerCtrl* m_dirPickerRight;
 		wxBitmapButton* m_bpButtonAltSyncCfg;
 		
-		BatchFolderPairGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
+		BatchFolderPairGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
 		~BatchFolderPairGenerated();
 	
 };
@@ -368,7 +369,7 @@ class BatchDlgGenerated : public wxDialog
 		wxDirPickerCtrl* m_dirPickerRight;
 		wxBitmapButton* m_bpButtonAltSyncCfg;
 		
-		BatchDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Create a batch job"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		BatchDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Create a batch job"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~BatchDlgGenerated();
 	
 };
@@ -408,7 +409,7 @@ class CompareStatusGenerated : public wxPanel
 	
 	public:
 		
-		CompareStatusGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
+		CompareStatusGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
 		~CompareStatusGenerated();
 	
 };
@@ -492,7 +493,7 @@ class SyncCfgDlgGenerated : public wxDialog
 	
 	public:
 		
-		SyncCfgDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Synchronization settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
+		SyncCfgDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Synchronization settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~SyncCfgDlgGenerated();
 	
 };
@@ -530,7 +531,7 @@ class CmpCfgDlgGenerated : public wxDialog
 	
 	public:
 		
-		CmpCfgDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Comparison settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		CmpCfgDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Comparison settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~CmpCfgDlgGenerated();
 	
 };
@@ -571,11 +572,13 @@ class SyncStatusDlgGenerated : public wxFrame
 		wxStaticText* m_staticText108;
 		wxStaticText* m_staticTextSpeed;
 		
+		
 		wxButton* m_buttonOK;
 		wxButton* m_buttonPause;
 		wxButton* m_buttonAbort;
 		
 		wxBoxSizer* bSizerRemTime;
+		
 		wxStaticText* m_staticText21;
 		wxStaticText* m_staticTextTimeRemaining;
 		
@@ -592,6 +595,7 @@ class SyncStatusDlgGenerated : public wxFrame
 		wxGauge* m_gauge1;
 		
 		SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 638,350 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		
 		~SyncStatusDlgGenerated();
 	
 };
@@ -642,7 +646,7 @@ class HelpDlgGenerated : public wxDialog
 	
 	public:
 		
-		HelpDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 579,543 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		HelpDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 579,543 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~HelpDlgGenerated();
 	
 };
@@ -696,7 +700,7 @@ class AboutDlgGenerated : public wxDialog
 	
 	public:
 		
-		AboutDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
+		AboutDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("About"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~AboutDlgGenerated();
 	
 };
@@ -728,7 +732,7 @@ class ErrorDlgGenerated : public wxDialog
 	
 	public:
 		
-		ErrorDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Error"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 421,228 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		ErrorDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Error"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 460,250 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER ); 
 		~ErrorDlgGenerated();
 	
 };
@@ -760,7 +764,7 @@ class WarningDlgGenerated : public wxDialog
 	public:
 		wxStaticBitmap* m_bitmap10;
 		
-		WarningDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Warning"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 421,231 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		WarningDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Warning"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 460,250 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER ); 
 		~WarningDlgGenerated();
 	
 };
@@ -792,7 +796,7 @@ class QuestionDlgGenerated : public wxDialog
 	
 	public:
 		
-		QuestionDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Question"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,198 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		QuestionDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Question"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 420,198 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER ); 
 		~QuestionDlgGenerated();
 	
 };
@@ -827,7 +831,7 @@ class DeleteDlgGenerated : public wxDialog
 	
 	public:
 		
-		DeleteDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Confirm"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 553,336 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		DeleteDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Confirm"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 553,336 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER ); 
 		~DeleteDlgGenerated();
 	
 };
@@ -879,7 +883,7 @@ class FilterDlgGenerated : public wxDialog
 	
 	public:
 		
-		FilterDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configure filter"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		FilterDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configure filter"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~FilterDlgGenerated();
 	
 };
@@ -911,7 +915,7 @@ class CustomizeColsDlgGenerated : public wxDialog
 	
 	public:
 		
-		CustomizeColsDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Customize columns"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		CustomizeColsDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Customize columns"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~CustomizeColsDlgGenerated();
 	
 };
@@ -958,7 +962,7 @@ class GlobalSettingsDlgGenerated : public wxDialog
 	
 	public:
 		
-		GlobalSettingsDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Global settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER );
+		GlobalSettingsDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Global settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~GlobalSettingsDlgGenerated();
 	
 };
@@ -1005,7 +1009,7 @@ class SyncPreviewDlgGenerated : public wxDialog
 	
 	public:
 		
-		SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Synchronization Preview"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE );
+		SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Synchronization Preview"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~SyncPreviewDlgGenerated();
 	
 };
@@ -1024,6 +1028,7 @@ class PopupFrameGenerated1 : public wxFrame
 		wxStaticText* m_staticTextMain;
 		
 		PopupFrameGenerated1( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxFRAME_NO_TASKBAR|wxSTAY_ON_TOP|wxSTATIC_BORDER );
+		
 		~PopupFrameGenerated1();
 	
 };
@@ -1052,7 +1057,7 @@ class SearchDialogGenerated : public wxDialog
 	
 	public:
 		
-		SearchDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Find"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
+		SearchDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Find"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~SearchDialogGenerated();
 	
 };

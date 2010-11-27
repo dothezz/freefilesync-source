@@ -51,5 +51,3 @@ void WriteOutputStream::writeArrayC(const std::vector<char>& buffer) const
             throwWriteError();
     }
 }
-
-

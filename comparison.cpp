@@ -122,6 +122,20 @@ private:
 
 void DirCallback::onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details)
 {
+    //do not list the database file(s) sync.ffs_db, sync.x64.ffs_db, etc. or lock files
+    const Zstring fileNameShort(shortName);
+    const size_t pos = fileNameShort.rfind(Zchar('.'));
+    if (pos != Zstring::npos)
+    {
+        const Zchar* ending = shortName + pos + 1; //(returns the whole string if ch not found)
+        // if (       EqualFilename()(ending, SYNC_DB_FILE_ENDING) ||
+        //            EqualFilename()(ending, LOCK_FILE_ENDING))    //let's hope this premature performance optimization doesn't bite back!
+        if (    ending == SYNC_DB_FILE_ENDING ||                    //
+                ending == LOCK_FILE_ENDING)
+            return;
+    }
+
+
     //assemble status message (performance optimized)  = textScanning + wxT("\"") + fullName + wxT("\"")
     Zstring statusText = baseCallback_->textScanning;
     statusText.reserve(statusText.length() + fullName.length() + 2);
@@ -134,7 +148,7 @@ void DirCallback::onFile(const Zchar* shortName, const Zstring& fullName, const 
 
 //------------------------------------------------------------------------------------
     //apply filter before processing (use relative name!)
-    if (!baseCallback_->filterInstance->passFileFilter(relNameParentPf_ + shortName))
+    if (!baseCallback_->filterInstance->passFileFilter(relNameParentPf_ + fileNameShort))
     {
         statusHandler->requestUiRefresh();
         return;
@@ -150,7 +164,7 @@ void DirCallback::onFile(const Zchar* shortName, const Zstring& fullName, const 
 //                                           util::retrieveFileID(fullName) :
 //                                           util::FileID();
 
-    output_.addSubFile(shortName, FileDescriptor(details.lastWriteTimeRaw, details.fileSize));
+    output_.addSubFile(fileNameShort, FileDescriptor(details.lastWriteTimeRaw, details.fileSize));
 
     //add 1 element to the progress indicator
     statusHandler->updateProcessedData(1, 0); //NO performance issue at all
@@ -251,17 +265,6 @@ void DirCallback::onError(const wxString& errorText)
 
 void BaseDirCallback::onFile(const Zchar* shortName, const Zstring& fullName, const TraverseCallback::FileInfo& details)
 {
-    //do not list the database file(s) sync.ffs_db, sync.x64.ffs_db, etc. or lock files
-    const Zstring fileName(shortName);
-    const size_t pos = fileName.rfind(Zchar('.'));
-    if (pos != Zstring::npos)
-    {
-        const Zstring ending(shortName + pos + 1); //(returns the whole string if ch not found)
-        if (    EqualFilename()(ending, SYNC_DB_FILE_ENDING) ||
-                EqualFilename()(ending, LOCK_FILE_ENDING))
-            return;
-    }
-
     DirCallback::onFile(shortName, fullName, details);
 }
 
@@ -319,7 +322,7 @@ class DstHackCallbackImpl : public DstHackCallback
 {
 public:
     DstHackCallbackImpl(StatusHandler& statusUpdater) :
-        textApplyingDstHack(wxToZ(_("Encode extended time information: %x")).Replace(Zstr("%x"), Zstr("\n\"%x\""))),
+        textApplyingDstHack(wxToZ(_("Encoding extended time information: %x")).Replace(Zstr("%x"), Zstr("\n\"%x\""))),
         statusUpdater_(statusUpdater) {}
 
 private:
@@ -394,30 +397,19 @@ namespace
 {
 void foldersAreValidForComparison(const std::vector<FolderPairCfg>& folderPairsForm, StatusHandler* statusUpdater)
 {
-    bool checkEmptyDirnameActive = true; //check for empty dirs just once
+    bool nonEmptyPairFound = false; //check if user entered at least one folder pair
+    bool partiallyFilledPairFound = false;
+
     const wxString additionalInfo = _("You can ignore the error to consider not existing directories as empty.");
 
     for (std::vector<FolderPairCfg>::const_iterator i = folderPairsForm.begin(); i != folderPairsForm.end(); ++i)
     {
-        //check if folder name is empty
-        if (i->leftDirectory.empty() || i->rightDirectory.empty())
-        {
-            if (checkEmptyDirnameActive)
-            {
-                checkEmptyDirnameActive = false;
-                while (true)
-                {
-                    const ErrorHandler::Response rv = statusUpdater->reportError(wxString(_("At least one directory input field is empty.")) + wxT(" \n\n") +
-                                                      + wxT("(") + additionalInfo + wxT(")"));
-                    if (rv == ErrorHandler::IGNORE_ERROR)
-                        break;
-                    else if (rv == ErrorHandler::RETRY)
-                        ;  //continue with loop
-                    else
-                        throw std::logic_error("Programming Error: Unknown return value! (1)");
-                }
-            }
-        }
+        if (!i->leftDirectory.empty() || !i->rightDirectory.empty()) //may be partially filled though
+            nonEmptyPairFound = true;
+
+        if (    (i->leftDirectory.empty() && !i->rightDirectory.empty()) ||
+                (!i->leftDirectory.empty() && i->rightDirectory.empty()))
+            partiallyFilledPairFound = true;
 
         //check if folders exist
         if (!i->leftDirectory.empty())
@@ -447,6 +439,22 @@ void foldersAreValidForComparison(const std::vector<FolderPairCfg>& folderPairsF
                 else
                     throw std::logic_error("Programming Error: Unknown return value! (3)");
             }
+    }
+
+    //check for empty entries
+    if (!nonEmptyPairFound || partiallyFilledPairFound)
+    {
+        while (true)
+        {
+            const ErrorHandler::Response rv = statusUpdater->reportError(wxString(_("At least one directory input field is empty.")) + wxT(" \n\n") +
+                                              + wxT("(") + additionalInfo + wxT(")"));
+            if (rv == ErrorHandler::IGNORE_ERROR)
+                break;
+            else if (rv == ErrorHandler::RETRY)
+                ;  //continue with loop
+            else
+                throw std::logic_error("Programming Error: Unknown return value! (1)");
+        }
     }
 }
 
@@ -635,7 +643,7 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& direc
 #endif
 
 //    #ifdef FFS_WIN
-//        PERF_START;
+    //PERF_START;
 //    #endif
 
     //init process: keep at beginning so that all gui elements are initialized properly
@@ -789,9 +797,12 @@ void makeSameLength(wxString& first, wxString& second)
 wxString getConflictSameDateDiffSize(const FileMapping& fileObj)
 {
     //some beautification...
-    wxString left = wxString(_("Left")) + wxT(": ");
-    wxString right = wxString(_("Right")) + wxT(": ");
-    makeSameLength(left, right);
+//    wxString left = wxString(_("Left")) + wxT(": ");
+//    wxString right = wxString(_("Right")) + wxT(": ");
+//    makeSameLength(left, right);
+
+    const wxString left  = wxT("<-- ");
+    const wxString right = wxT("--> ");
 
     wxString msg = _("Files %x have the same date but a different size!");
     msg.Replace(wxT("%x"), wxString(wxT("\"")) + zToWx(fileObj.getRelativeName<LEFT_SIDE>()) + wxT("\""));

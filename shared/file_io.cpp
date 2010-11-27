@@ -12,7 +12,7 @@
 #ifdef FFS_WIN
 #include "long_path_prefix.h"
 #elif defined FFS_LINUX
-#include <errno.h>
+#include <cerrno>
 #endif
 
 using namespace ffs3;

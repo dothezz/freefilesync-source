@@ -76,6 +76,8 @@ Na&loži konfiguracijo...
 &V redu
 &Pause
 &Premor
+&Program
+&Program
 &Quit
 &Zapri
 &Restore
@@ -360,6 +362,8 @@ Elements remaining:
 Preostalih elementov:
 Email
 Email
+Encoding extended time information: %x
+Podrobne informacije o času enkodiranja: %x
 Endless loop when traversing directory:
 Neskončna zanka pri prehodu imenika:
 Error
@@ -400,6 +404,8 @@ Error reading file:
 Napaka pri branju datoteke:
 Error reading from synchronization database:
 Napaka pri branju iz sinhronizacijske podatkovne baze:
+Error reading security context:
+Napaka pri branju varnostne skladnosti:
 Error resolving symbolic link:
 Napaka pri razreševanju simbolične povezave:
 Error setting directory lock:
@@ -414,6 +420,8 @@ Error when monitoring directories.
 Napaka pri nadzorovanju imenikov.
 Error writing file:
 Napaka pri pisanju datoteke:
+Error writing security context:
+Napaka pri pisanju varnostne skladnosti:
 Error writing to synchronization database:
 Napaka pri pisanju v sinhronizacijsko podatkovno bazo:
 Example
@@ -702,8 +710,6 @@ Reset
 Ponastavi
 Right
 Desno
-Run minimized and write status information to a logfile
-Poženi minimizirano in zapisuj statusne informacije v dnevniško datoteko
 S&ave configuration...
 Shr&ani konfiguracijo...
 S&witch view
@@ -776,6 +782,8 @@ Speed:
 Hitrost:
 Start
 Začni
+Start minimized and write status information to a logfile
+Zaženi pomanjšano in piši statusne informacije v datoteko za beleženje
 Start synchronization
 Začni sinhronizacijo
 Statistics
@@ -802,8 +810,6 @@ Synchronization completed with errors!
 Sinhronizacija se je končala z napakami!
 Synchronization settings
 Nastavitve sinhronizacije
-Synchronization status
-Status sinhronizacije
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Sinhroniziraj vse .doc, .zip in .exe datoteke, razen iz podmape \"temp\".
 Synchronize...

@@ -5,18 +5,16 @@
 // **************************************************************************
 //
 #include "file_traverser.h"
+#include <limits>
 #include "system_constants.h"
 #include "system_func.h"
 #include <wx/intl.h>
 #include "string_conv.h"
-#include <boost/shared_ptr.hpp>
-#include <boost/scoped_array.hpp>
 #include "assert_static.h"
-#include <limits>
+#include "symlink_target.h"
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
-#include "WinIoCtl.h"
 #include "long_path_prefix.h"
 #include "dst_hack.h"
 
@@ -25,130 +23,6 @@
 #include <dirent.h>
 #include <cerrno>
 #endif
-
-
-//Note: this class is superfluous for 64 bit applications!
-//class DisableWow64Redirection
-//{
-//public:
-//    DisableWow64Redirection() :
-//        wow64DisableWow64FsRedirection(util::getDllFun<Wow64DisableWow64FsRedirectionFunc>(L"kernel32.dll", "Wow64DisableWow64FsRedirection")),
-//        wow64RevertWow64FsRedirection(util::getDllFun<Wow64RevertWow64FsRedirectionFunc>(L"kernel32.dll", "Wow64RevertWow64FsRedirection")),
-//        oldValue(NULL)
-//    {
-//        if (    wow64DisableWow64FsRedirection &&
-//                wow64RevertWow64FsRedirection)
-//            (*wow64DisableWow64FsRedirection)(&oldValue); //__out  PVOID *OldValue
-//    }
-//
-//    ~DisableWow64Redirection()
-//    {
-//        if (    wow64DisableWow64FsRedirection &&
-//                wow64RevertWow64FsRedirection)
-//            (*wow64RevertWow64FsRedirection)(oldValue); //__in  PVOID OldValue
-//    }
-//
-//private:
-//    typedef BOOL (WINAPI *Wow64DisableWow64FsRedirectionFunc)(PVOID* OldValue);
-//    typedef BOOL (WINAPI *Wow64RevertWow64FsRedirectionFunc)(PVOID OldValue);
-//
-//    const Wow64DisableWow64FsRedirectionFunc wow64DisableWow64FsRedirection;
-//    const Wow64RevertWow64FsRedirectionFunc  wow64RevertWow64FsRedirection;
-//
-//    PVOID oldValue;
-//};
-
-#ifdef _MSC_VER //I don't have Windows Driver Kit at hands right now, so unfortunately we need to redefine this structures and cross fingers...
-typedef struct _REPARSE_DATA_BUFFER
-{
-    ULONG  ReparseTag;
-    USHORT ReparseDataLength;
-    USHORT Reserved;
-    union
-    {
-        struct
-        {
-            USHORT SubstituteNameOffset;
-            USHORT SubstituteNameLength;
-            USHORT PrintNameOffset;
-            USHORT PrintNameLength;
-            ULONG  Flags;
-            WCHAR  PathBuffer[1];
-        } SymbolicLinkReparseBuffer;
-        struct
-        {
-            USHORT SubstituteNameOffset;
-            USHORT SubstituteNameLength;
-            USHORT PrintNameOffset;
-            USHORT PrintNameLength;
-            WCHAR  PathBuffer[1];
-        } MountPointReparseBuffer;
-        struct
-        {
-            UCHAR DataBuffer[1];
-        } GenericReparseBuffer;
-    };
-} REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
-#define REPARSE_DATA_BUFFER_HEADER_SIZE   FIELD_OFFSET(REPARSE_DATA_BUFFER, GenericReparseBuffer)
-#endif
-
-
-Zstring getSymlinkTarget(const Zstring& linkPath) //throw(); returns empty string on error
-{
-#ifdef FFS_WIN
-//FSCTL_GET_REPARSE_POINT: http://msdn.microsoft.com/en-us/library/aa364571(VS.85).aspx
-
-    const HANDLE hLink = ::CreateFile(linkPath.c_str(),
-                                      GENERIC_READ,
-                                      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                      NULL,
-                                      OPEN_EXISTING,
-                                      FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
-                                      NULL);
-    if (hLink == INVALID_HANDLE_VALUE)
-        return Zstring();
-
-    boost::shared_ptr<void> dummy(hLink, ::CloseHandle);
-
-    //respect alignment issues...
-    const size_t bufferSize = REPARSE_DATA_BUFFER_HEADER_SIZE + MAXIMUM_REPARSE_DATA_BUFFER_SIZE;
-    boost::scoped_array<char> buffer(new char[bufferSize]);
-
-    DWORD bytesReturned; //dummy value required by FSCTL_GET_REPARSE_POINT!
-    if (!::DeviceIoControl(hLink,                   //__in         HANDLE hDevice,
-                           FSCTL_GET_REPARSE_POINT, //__in         DWORD dwIoControlCode,
-                           NULL,                    //__in_opt     LPVOID lpInBuffer,
-                           0,                       //__in         DWORD nInBufferSize,
-                           buffer.get(),            //__out_opt    LPVOID lpOutBuffer,
-                           bufferSize,              //__in         DWORD nOutBufferSize,
-                           &bytesReturned,          //__out_opt    LPDWORD lpBytesReturned,
-                           NULL))                   //__inout_opt  LPOVERLAPPED lpOverlapped
-        return Zstring();
-
-    REPARSE_DATA_BUFFER& reparseData = *reinterpret_cast<REPARSE_DATA_BUFFER*>(buffer.get()); //REPARSE_DATA_BUFFER needs to be artificially enlarged!
-
-    if (reparseData.ReparseTag == IO_REPARSE_TAG_SYMLINK)
-        return Zstring(reparseData.SymbolicLinkReparseBuffer.PathBuffer + reparseData.SymbolicLinkReparseBuffer.SubstituteNameOffset / sizeof(WCHAR),
-                       reparseData.SymbolicLinkReparseBuffer.SubstituteNameLength / sizeof(WCHAR));
-    else if (reparseData.ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
-        return Zstring(reparseData.MountPointReparseBuffer.PathBuffer + reparseData.MountPointReparseBuffer.SubstituteNameOffset / sizeof(WCHAR),
-                       reparseData.MountPointReparseBuffer.SubstituteNameLength / sizeof(WCHAR));
-    else
-        return Zstring(); //unknown reparse point
-
-#elif defined FFS_LINUX
-    const int BUFFER_SIZE = 10000;
-    char buffer[BUFFER_SIZE];
-
-    const int bytesWritten = ::readlink(linkPath.c_str(), buffer, BUFFER_SIZE);
-    if (bytesWritten < 0 || bytesWritten >= BUFFER_SIZE)
-        return Zstring(); //error
-
-    buffer[bytesWritten] = 0; //set null-terminating char
-
-    return buffer;
-#endif
-}
 
 
 #ifdef FFS_WIN
@@ -292,8 +166,13 @@ private:
             if (isSymbolicLink && !followSymlinks) //evaluate symlink directly
             {
                 TraverseCallback::SymlinkInfo details;
+                try
+                {
+                    details.targetPath = getSymlinkRawTargetString(fullName); //throw (FileError)
+                }
+                catch (FileError&) {}
+
                 details.lastWriteTimeRaw = getWin32TimeInformation(fileMetaData.ftLastWriteTime);
-                details.targetPath       = getSymlinkTarget(fullName); //throw(); returns empty string on error
                 details.dirLink          = (fileMetaData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0; //directory symlinks have this flag on Windows
                 sink.onSymlink(shortName, fullName, details);
             }
@@ -418,8 +297,13 @@ private:
                 else //evaluate symlink directly
                 {
                     TraverseCallback::SymlinkInfo details;
+                    try
+                    {
+                        details.targetPath = getSymlinkRawTargetString(fullName); //throw (FileError)
+                    }
+                    catch (FileError&) {}
+
                     details.lastWriteTimeRaw = fileInfo.st_mtime; //UTC time(ANSI C format); unit: 1 second
-                    details.targetPath       = getSymlinkTarget(fullName); //throw(); returns empty string on error
                     details.dirLink          = ::stat(fullName.c_str(), &fileInfo) == 0 && S_ISDIR(fileInfo.st_mode); //S_ISDIR and S_ISLNK are mutually exclusive on Linux => need to follow link
                     sink.onSymlink(shortName, fullName, details);
                     continue;

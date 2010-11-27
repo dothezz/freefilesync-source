@@ -40,7 +40,8 @@ class SyncStatus
 public:
     SyncStatus(StatusHandler& updater,
                wxTopLevelWindow* parentWindow, //may be NULL
-               bool startSilent);
+               bool startSilent,
+               const wxString& jobName);
     ~SyncStatus();
 
     wxWindow* getAsWindow(); //convenience! don't abuse!

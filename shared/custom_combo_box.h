@@ -29,6 +29,13 @@ public:
 
 private:
     void OnKeyEvent(wxKeyEvent& event);
+
+#if wxCHECK_VERSION(2, 9, 1)
+	void OnShowDropDown(wxCommandEvent& event);
+	void OnHideDropDown(wxCommandEvent& event);
+
+	bool dropDownShown;
+#endif
 };
 
 

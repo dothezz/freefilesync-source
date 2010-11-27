@@ -12,8 +12,11 @@
 #include "../shared/system_constants.h"
 #include "../shared/guid.h"
 #include "../shared/file_io.h"
+#include "../shared/assert_static.h"
 #include <utility>
 #include "../shared/serialize.h"
+#include <boost/cstdint.hpp>
+#include "../shared/build_info.h"
 
 #ifdef FFS_WIN
 #include <tlhelp32.h>
@@ -205,20 +208,37 @@ Zstring deleteAbandonedLockName(const Zstring& lockfilename)
 namespace
 {
 inline
-wxString readString(wxInputStream& stream)  //read string from file stream
+std::string readString(wxInputStream& stream)  //read string from file stream
 {
-    const size_t strLength = util::readNumber<size_t>(stream);
-    boost::scoped_array<wxChar> buffer(new wxChar[strLength]);
-    stream.Read(buffer.get(), sizeof(wxChar) * strLength);
-    return wxString(buffer.get(), strLength);
+    const boost::uint32_t strLength = util::readNumber<boost::uint32_t>(stream);
+    std::string output;
+	if (strLength > 0)
+	{
+    output.resize(strLength);
+    stream.Read(&output[0], strLength);
+	}
+    return output;
 }
 
 
 inline
-void writeString(wxOutputStream& stream, const wxString& str)  //write string to filestream
+void writeString(wxOutputStream& stream, const std::string& str)  //write string to filestream
+{ 
+	const boost::uint32_t strLength = static_cast<boost::uint32_t>(str.length());
+    util::writeNumber<boost::uint32_t>(stream, strLength);
+    stream.Write(str.c_str(), strLength);
+}
+
+
+std::string getComputerId() //returns empty string on error
 {
-    util::writeNumber<size_t>(stream, str.length());
-    stream.Write(str.c_str(), sizeof(wxChar) * str.length());
+    const wxString fhn = ::wxGetFullHostName();
+    if (fhn.empty()) return std::string();
+#ifdef FFS_WIN
+    return "Windows " + std::string(fhn.ToUTF8());
+#elif defined FFS_LINUX
+    return "Linux " + std::string(fhn.ToUTF8());
+#endif
 }
 
 
@@ -227,36 +247,42 @@ struct LockInformation
     LockInformation()
     {
 #ifdef FFS_WIN
-        processId = ::GetCurrentProcessId();
+        procDescr.processId = ::GetCurrentProcessId();
 #elif defined FFS_LINUX
-        processId = ::getpid();
+        procDescr.processId = ::getpid();
 #endif
-        computerId = ::wxGetFullHostName();
+        procDescr.computerId = getComputerId();
     }
 
     LockInformation(wxInputStream& stream) : //read
         lockId(util::UniqueId(stream))
     {
-        processId  = util::readNumber<ProcessId>(stream);
-        computerId = readString(stream);
+        procDescr.processId  = static_cast<ProcessId>(util::readNumber<boost::uint64_t>(stream)); //possible loss of precision (32/64 bit process) covered by buildId
+        procDescr.computerId = readString(stream);
     }
 
     void toStream(wxOutputStream& stream) const //write
     {
+        assert_static(sizeof(ProcessId) <= sizeof(boost::uint64_t)); //ensure portability
+
         lockId.toStream(stream);
-        util::writeNumber<ProcessId>(stream, processId);
-        writeString(stream, computerId);
+        util::writeNumber<boost::uint64_t>(stream, procDescr.processId);
+        writeString(stream, procDescr.computerId);
     }
 
 #ifdef FFS_WIN
-    typedef DWORD ProcessId;
+    typedef DWORD ProcessId; //same size on 32 and 64 bit windows!
 #elif defined FFS_LINUX
     typedef pid_t ProcessId;
 #endif
 
-    util::UniqueId lockId;
-    ProcessId processId;
-    wxString computerId;
+    util::UniqueId lockId; //16 byte portable construct
+
+    struct ProcessDescription
+    {
+        ProcessId processId;
+        std::string computerId;
+    } procDescr;
 };
 
 
@@ -267,16 +293,17 @@ enum ProcessStatus
     PROC_STATUS_RUNNING,
     PROC_STATUS_NO_IDEA
 };
-ProcessStatus getProcessStatus(LockInformation::ProcessId procId, const wxString& computerId)
+ProcessStatus getProcessStatus(const LockInformation::ProcessDescription& procDescr)
 {
-    if (::wxGetFullHostName() != computerId || computerId.empty())
+    if (    procDescr.computerId != getComputerId() ||
+            procDescr.computerId.empty()) //both names are empty
         return PROC_STATUS_NO_IDEA; //lock owned by different computer
 
 #ifdef FFS_WIN
     //note: ::OpenProcess() is no option as it may successfully return for crashed processes!
     HANDLE snapshot = ::CreateToolhelp32Snapshot(
                           TH32CS_SNAPPROCESS, //__in  DWORD dwFlags,
-                          procId);            //__in  DWORD th32ProcessID
+                          0);                 //__in  DWORD th32ProcessID
     if (snapshot == INVALID_HANDLE_VALUE)
         return PROC_STATUS_NO_IDEA;
     boost::shared_ptr<void> dummy(snapshot, ::CloseHandle);
@@ -290,7 +317,7 @@ ProcessStatus getProcessStatus(LockInformation::ProcessId procId, const wxString
 
     do
     {
-        if (processEntry.th32ProcessID == procId)
+        if (processEntry.th32ProcessID == procDescr.processId)
             return PROC_STATUS_RUNNING; //process still running
     }
     while(::Process32Next(snapshot, &processEntry));
@@ -298,10 +325,10 @@ ProcessStatus getProcessStatus(LockInformation::ProcessId procId, const wxString
     return PROC_STATUS_NOT_RUNNING;
 
 #elif defined FFS_LINUX
-    if (procId <= 0 || procId >= 65536)
+    if (procDescr.processId <= 0 || procDescr.processId >= 65536)
         return PROC_STATUS_NO_IDEA; //invalid process id
 
-    return ffs3::dirExists(Zstr("/proc/") + Zstring::fromNumber(procId)) ? PROC_STATUS_RUNNING : PROC_STATUS_NOT_RUNNING;
+    return ffs3::dirExists(Zstr("/proc/") + Zstring::fromNumber(procDescr.processId)) ? PROC_STATUS_RUNNING : PROC_STATUS_NOT_RUNNING;
 #endif
 }
 
@@ -339,7 +366,7 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
     try
     {
         const LockInformation lockInfo = retrieveLockInfo(lockfilename); //throw (FileError, ErrorNotExisting)
-        const bool lockOwnderDead = getProcessStatus(lockInfo.processId, lockInfo.computerId) == PROC_STATUS_NOT_RUNNING; //convenience optimization: if we know the owning process crashed, we needn't wait DETECT_EXITUS_INTERVAL sec
+        const bool lockOwnderDead = getProcessStatus(lockInfo.procDescr) == PROC_STATUS_NOT_RUNNING; //convenience optimization: if we know the owning process crashed, we needn't wait DETECT_EXITUS_INTERVAL sec
 
         wxULongLong fileSizeOld;
         wxLongLong lockSilentStart = wxGetLocalTimeMillis();

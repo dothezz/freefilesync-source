@@ -599,9 +599,6 @@ void CustomGrid::initSettings(CustomGridLeft*   gridLeft,
     m_gridRight  = gridRight;
     m_gridMiddle = gridMiddle;
 
-    //set underlying grid data
-    setGridDataTable(gridDataView);
-
     //enhance grid functionality; identify leading grid by keyboard input or scroll action
     Connect(wxEVT_KEY_DOWN,                      wxEventHandler(CustomGrid::onGridAccess), NULL, this);
     Connect(wxEVT_SCROLLWIN_TOP,                 wxEventHandler(CustomGrid::onGridAccess), NULL, this);
@@ -626,7 +623,8 @@ void CustomGrid::initSettings(CustomGridLeft*   gridLeft,
 
 void CustomGrid::release() //release connection to ffs3::GridView
 {
-    setGridDataTable(NULL);
+    assert(getGridDataTable());
+    getGridDataTable()->setGridDataTable(NULL); //kind of "disable" griddatatable; don't delete it with SetTable(NULL)! May be used by wxGridCellStringRenderer
 }
 
 
@@ -955,6 +953,13 @@ void CustomGrid::adjustGridHeights(wxEvent& event)
 }
 
 
+void CustomGrid::updateGridSizes()
+{
+    if(getGridDataTable())
+        getGridDataTable()->updateGridSizes();
+}
+
+
 void CustomGrid::setSortMarker(SortMarker marker)
 {
     m_marker = marker;
@@ -1175,7 +1180,48 @@ CustomGridRim::CustomGridRim(wxWindow *parent,
                              const wxSize& size,
                              long style,
                              const wxString& name) :
-    CustomGrid(parent, id, pos, size, style, name), fileIconsAreEnabled(false) {}
+    CustomGrid(parent, id, pos, size, style, name), fileIconsAreEnabled(false), otherGrid(NULL)
+{
+    Connect(wxEVT_GRID_COL_SIZE, wxGridSizeEventHandler(CustomGridRim::OnResizeColumn), NULL, this); //row-based tooltip
+}
+
+
+void CustomGridRim::setOtherGrid(CustomGridRim* other) //call during initialization!
+{
+    otherGrid = other;
+}
+
+
+void CustomGridRim::OnResizeColumn(wxGridSizeEvent& event)
+{
+    //Resize columns on both sides in parallel
+    const int thisCol = event.GetRowOrCol();
+
+    if (!otherGrid || thisCol < 0 || thisCol >= GetNumberCols()) return;
+
+    const xmlAccess::ColumnTypes thisColType = getTypeAtPos(thisCol);
+
+    for (int i = 0; i < otherGrid->GetNumberCols(); ++i)
+        if (otherGrid->getTypeAtPos(i) == thisColType)
+        {
+            otherGrid->SetColSize(i, GetColSize(thisCol));
+            otherGrid->ForceRefresh();
+            break;
+        }
+}
+
+
+//this method is called when grid view changes: useful for parallel updating of multiple grids
+void CustomGridRim::alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight)
+{
+    if (!otherGrid) return;
+
+    int x = 0;
+    int y = 0;
+    GetViewStart(&x, &y);
+    gridMiddle->Scroll(-1, y);
+    otherGrid->Scroll(x, y);
+}
 
 
 template <SelectedSide side>
@@ -1217,21 +1263,25 @@ void CustomGridRim::setTooltip(const wxMouseEvent& event)
         }
     }
 
+
     wxToolTip* tt = GetGridWindow()->GetToolTip();
-    if (!tt)
-        //wxWidgets bug: tooltip multiline property is defined by first tooltip text containing newlines or not (same is true for maximum width)
-        GetGridWindow()->SetToolTip(new wxToolTip(wxT("a                                                                b\n\
+
+    const wxString currentTip = tt ? tt->GetTip() : wxString();
+    if (toolTip != currentTip)
+    {
+        if (toolTip.IsEmpty())
+            GetGridWindow()->SetToolTip(NULL); //wxGTK doesn't allow wxToolTip with empty text!
+        else
+        {
+            //wxWidgets bug: tooltip multiline property is defined by first tooltip text containing newlines or not (same is true for maximum width)
+            if (!tt)
+                GetGridWindow()->SetToolTip(new wxToolTip(wxT("a                                                                b\n\
                                                            a                                                                b"))); //ugly, but is working (on Windows)
-    tt = GetGridWindow()->GetToolTip(); //should be bound by now
-    if (tt && tt->GetTip() != toolTip)
-        tt->SetTip(toolTip);
-}
-
-
-void CustomGridRim::updateGridSizes()
-{
-    assert(getGridDataTable());
-    getGridDataTable()->updateGridSizes();
+            tt = GetGridWindow()->GetToolTip(); //should be bound by now
+            if (tt)
+                tt->SetTip(toolTip);
+        }
+    }
 }
 
 
@@ -1353,8 +1403,8 @@ void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
         newPositions.push_back(columnSettings[i].type);
 
     //set column positions
-    assert(getGridDataTable());
-    getGridDataTable()->setupColumns(newPositions);
+    if (getGridDataTableRim())
+        getGridDataTableRim()->setupColumns(newPositions);
 
     //set column width (set them after setupColumns!)
     for (size_t i = 0; i < newPositions.size(); ++i)
@@ -1379,8 +1429,10 @@ void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
 
 xmlAccess::ColumnTypes CustomGridRim::getTypeAtPos(size_t pos) const
 {
-    assert(getGridDataTable());
-    return getGridDataTable()->getTypeAtPos(pos);
+    if (getGridDataTableRim())
+        return getGridDataTableRim()->getTypeAtPos(pos);
+    else
+        return xmlAccess::DIRECTORY;
 }
 
 
@@ -1405,13 +1457,6 @@ wxString CustomGridRim::getTypeName(xmlAccess::ColumnTypes colType)
     }
 
     return wxEmptyString; //dummy
-}
-
-
-CustomGridTableRim* CustomGridRim::getGridDataTable()
-{
-    //let the non-const call the const version: see Meyers Effective C++
-    return const_cast<CustomGridTableRim*>(static_cast<const CustomGridRim*>(this)->getGridDataTable());
 }
 
 
@@ -1474,9 +1519,9 @@ void CustomGridRim::enableFileIcons(const bool value)
     fileIconsAreEnabled = value;
 
     if (value)
-        SetDefaultRenderer(new GridCellRenderer<true>(loadIconSuccess, getGridDataTable())); //SetDefaultRenderer takes ownership!
+        SetDefaultRenderer(new GridCellRenderer<true>(loadIconSuccess, getGridDataTableRim())); //SetDefaultRenderer takes ownership!
     else
-        SetDefaultRenderer(new GridCellRenderer<false>(loadIconSuccess, getGridDataTable()));
+        SetDefaultRenderer(new GridCellRenderer<false>(loadIconSuccess, getGridDataTableRim()));
 
     Refresh();
 }
@@ -1504,13 +1549,22 @@ CustomGridRim::VisibleRowRange CustomGridRim::getVisibleRows()
 }
 
 
+inline
+CustomGridTableRim* CustomGridRim::getGridDataTableRim() const
+{
+    return dynamic_cast<CustomGridTableRim*>(getGridDataTable()); //I'm tempted to use a static cast here...
+}
+
+
 void CustomGridRim::getIconsToBeLoaded(std::vector<Zstring>& newLoad) //loads all (not yet) drawn icons
 {
     newLoad.clear();
 
     if (fileIconsAreEnabled) //don't check too often! give worker thread some time to fetch data
     {
-        const CustomGridTableRim* gridDataTable = getGridDataTable();
+        const CustomGridTableRim* gridDataTable = getGridDataTableRim();
+        if (!gridDataTable) return;
+
         const VisibleRowRange rowsOnScreen = getVisibleRows();
         const int totalCols = const_cast<CustomGridTableRim*>(gridDataTable)->GetNumberCols();
         const int totalRows = const_cast<CustomGridTableRim*>(gridDataTable)->GetNumberRows();
@@ -1596,10 +1650,33 @@ CustomGridLeft::CustomGridLeft(wxWindow *parent,
                                const wxSize& size,
                                long style,
                                const wxString& name) :
-    CustomGridRim(parent, id, pos, size, style, name),
-    gridDataTable(NULL)
+    CustomGridRim(parent, id, pos, size, style, name)
 {
     GetGridWindow()->Connect(wxEVT_MOTION, wxMouseEventHandler(CustomGridLeft::OnMouseMovement), NULL, this); //row-based tooltip
+}
+
+
+bool CustomGridLeft::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
+{
+    //use custom wxGridTableBase class for management of large sets of formatted data.
+    //This is done in CreateGrid instead of SetTable method since source code is generated and wxFormbuilder invokes CreatedGrid by default.
+    SetTable(new CustomGridTableLeft, true, wxGrid::wxGridSelectRows);  //give ownership to wxGrid: gridDataTable is deleted automatically in wxGrid destructor
+    return true;
+}
+
+
+void CustomGridLeft::initSettings(CustomGridLeft*   gridLeft,  //create connection with ffs3::GridView
+                                  CustomGridMiddle* gridMiddle,
+                                  CustomGridRight*  gridRight,
+                                  const ffs3::GridView* gridDataView)
+{
+    //set underlying grid data
+    assert(getGridDataTable());
+    getGridDataTable()->setGridDataTable(gridDataView);
+
+    CustomGridRim::setOtherGrid(gridRight);
+
+    CustomGridRim::initSettings(gridLeft, gridMiddle, gridRight, gridDataView);
 }
 
 
@@ -1610,40 +1687,9 @@ void CustomGridLeft::OnMouseMovement(wxMouseEvent& event)
 }
 
 
-bool CustomGridLeft::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
+CustomGridTable* CustomGridLeft::getGridDataTable() const
 {
-    //use custom wxGridTableBase class for management of large sets of formatted data.
-    //This is done in CreateGrid instead of SetTable method since source code is generated and wxFormbuilder invokes CreatedGrid by default.
-    gridDataTable = new CustomGridTableLeft;
-    SetTable(gridDataTable, true, wxGrid::wxGridSelectRows);  //give ownership to wxGrid: gridDataTable is deleted automatically in wxGrid destructor
-
-    return true;
-}
-
-
-void CustomGridLeft::setGridDataTable(const GridView* gridDataView)
-{
-    //set underlying grid data
-    assert(gridDataTable);
-    gridDataTable->setGridDataTable(gridDataView);
-}
-
-
-const CustomGridTableRim* CustomGridLeft::getGridDataTable() const
-{
-    return gridDataTable;
-}
-
-
-//this method is called when grid view changes: useful for parallel updating of multiple grids
-void CustomGridLeft::alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight)
-{
-    int x = 0;
-    int y = 0;
-    GetViewStart(&x, &y);
-
-    gridMiddle->Scroll(-1, y); //scroll in y-direction only
-    gridRight->Scroll(x, y);
+    return static_cast<CustomGridTable*>(GetTable()); //one of the few cases where no dynamic_cast is required!
 }
 
 
@@ -1654,10 +1700,31 @@ CustomGridRight::CustomGridRight(wxWindow *parent,
                                  const wxSize& size,
                                  long style,
                                  const wxString& name) :
-    CustomGridRim(parent, id, pos, size, style, name),
-    gridDataTable(NULL)
+    CustomGridRim(parent, id, pos, size, style, name)
 {
     GetGridWindow()->Connect(wxEVT_MOTION, wxMouseEventHandler(CustomGridRight::OnMouseMovement), NULL, this); //row-based tooltip
+}
+
+
+bool CustomGridRight::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
+{
+    SetTable(new CustomGridTableRight, true, wxGrid::wxGridSelectRows);  //give ownership to wxGrid: gridDataTable is deleted automatically in wxGrid destructor
+    return true;
+}
+
+
+void CustomGridRight::initSettings(CustomGridLeft*   gridLeft,  //create connection with ffs3::GridView
+                                   CustomGridMiddle* gridMiddle,
+                                   CustomGridRight*  gridRight,
+                                   const ffs3::GridView* gridDataView)
+{
+    //set underlying grid data
+    assert(getGridDataTable());
+    getGridDataTable()->setGridDataTable(gridDataView);
+
+    CustomGridRim::setOtherGrid(gridLeft);
+
+    CustomGridRim::initSettings(gridLeft, gridMiddle, gridRight, gridDataView);
 }
 
 
@@ -1668,37 +1735,9 @@ void CustomGridRight::OnMouseMovement(wxMouseEvent& event)
 }
 
 
-bool CustomGridRight::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
+CustomGridTable* CustomGridRight::getGridDataTable() const
 {
-    gridDataTable = new CustomGridTableRight;
-    SetTable(gridDataTable, true, wxGrid::wxGridSelectRows);  //give ownership to wxGrid: gridDataTable is deleted automatically in wxGrid destructor
-
-    return true;
-}
-
-
-void CustomGridRight::setGridDataTable(const GridView* gridDataView)
-{
-    //set underlying grid data
-    assert(gridDataTable);
-    gridDataTable->setGridDataTable(gridDataView);
-}
-
-
-const CustomGridTableRim* CustomGridRight::getGridDataTable() const
-{
-    return gridDataTable;
-}
-
-
-//this method is called when grid view changes: useful for parallel updating of multiple grids
-void CustomGridRight::alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight)
-{
-    int x = 0;
-    int y = 0;
-    GetViewStart(&x, &y);
-    gridLeft->Scroll(x, y);
-    gridMiddle->Scroll(-1, y);
+    return static_cast<CustomGridTable*>(GetTable()); //one of the few cases where no dynamic_cast is required!
 }
 
 
@@ -1706,7 +1745,7 @@ void CustomGridRight::alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMidd
 class GridCellRendererMiddle : public wxGridCellStringRenderer
 {
 public:
-    GridCellRendererMiddle(const CustomGridMiddle* middleGrid) : m_gridMiddle(middleGrid) {};
+    GridCellRendererMiddle(const CustomGridMiddle& middleGrid) : m_gridMiddle(middleGrid) {};
 
     virtual void Draw(wxGrid& grid,
                       wxGridCellAttr& attr,
@@ -1716,7 +1755,7 @@ public:
                       bool isSelected);
 
 private:
-    const CustomGridMiddle* const m_gridMiddle;
+    const CustomGridMiddle& m_gridMiddle;
 };
 
 
@@ -1744,7 +1783,6 @@ CustomGridMiddle::CustomGridMiddle(wxWindow *parent,
     selectionPos(BLOCKPOS_CHECK_BOX),
     highlightedRow(-1),
     highlightedPos(BLOCKPOS_CHECK_BOX),
-    gridDataTable(NULL),
     toolTip(new CustomTooltip)
 {
     SetLayoutDirection(wxLayout_LeftToRight);                          //
@@ -1765,13 +1803,44 @@ CustomGridMiddle::~CustomGridMiddle() {} //non-inline destructor for std::auto_p
 
 bool CustomGridMiddle::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode)
 {
-    gridDataTable = new CustomGridTableMiddle;
-    SetTable(gridDataTable, true, wxGrid::wxGridSelectRows);  //give ownership to wxGrid: gridDataTable is deleted automatically in wxGrid destructor
+    SetTable(new CustomGridTableMiddle, true, wxGrid::wxGridSelectRows);  //give ownership to wxGrid: gridDataTable is deleted automatically in wxGrid destructor
 
     //display checkboxes (representing bool values) if row is enabled for synchronization
-    SetDefaultRenderer(new GridCellRendererMiddle(this)); //SetDefaultRenderer takes ownership!
+    SetDefaultRenderer(new GridCellRendererMiddle(*this)); //SetDefaultRenderer takes ownership!
 
     return true;
+}
+
+
+void CustomGridMiddle::initSettings(CustomGridLeft*   gridLeft,  //create connection with ffs3::GridView
+                                    CustomGridMiddle* gridMiddle,
+                                    CustomGridRight*  gridRight,
+                                    const ffs3::GridView* gridDataView)
+{
+    //set underlying grid data
+    assert(getGridDataTable());
+    getGridDataTable()->setGridDataTable(gridDataView);
+
+#ifdef FFS_LINUX //get rid of scrollbars; Linux: change policy for GtkScrolledWindow
+    GtkWidget* gridWidget = wxWindow::m_widget;
+    GtkScrolledWindow* scrolledWindow = GTK_SCROLLED_WINDOW(gridWidget);
+    gtk_scrolled_window_set_policy(scrolledWindow, GTK_POLICY_NEVER, GTK_POLICY_NEVER);
+#endif
+
+    CustomGrid::initSettings(gridLeft, gridMiddle, gridRight, gridDataView);
+}
+
+
+CustomGridTable* CustomGridMiddle::getGridDataTable() const
+{
+    return static_cast<CustomGridTable*>(GetTable()); //one of the few cases where no dynamic_cast is required!
+}
+
+
+inline
+CustomGridTableMiddle* CustomGridMiddle::getGridDataTableMiddle() const
+{
+    return static_cast<CustomGridTableMiddle*>(getGridDataTable());
 }
 
 
@@ -1781,20 +1850,6 @@ void CustomGridMiddle::SetScrollbar(int orientation, int position, int thumbSize
     wxWindow::SetScrollbar(orientation, 0, 0, 0, refresh);
 }
 #endif
-
-
-void CustomGridMiddle::setGridDataTable(const GridView* gridDataView) //called once on startup
-{
-    //set underlying grid data
-    assert(gridDataTable);
-    gridDataTable->setGridDataTable(gridDataView);
-
-#ifdef FFS_LINUX //get rid of scrollbars; Linux: change policy for GtkScrolledWindow
-    GtkWidget* gridWidget = wxWindow::m_widget;
-    GtkScrolledWindow* scrolledWindow = GTK_SCROLLED_WINDOW(gridWidget);
-    gtk_scrolled_window_set_policy(scrolledWindow, GTK_POLICY_NEVER, GTK_POLICY_NEVER);
-#endif
-}
 
 
 void CustomGridMiddle::OnMouseMovement(wxMouseEvent& event)
@@ -1836,14 +1891,17 @@ void CustomGridMiddle::OnLeaveWindow(wxMouseEvent& event)
 
 void CustomGridMiddle::showToolTip(int rowNumber, wxPoint pos)
 {
-    const FileSystemObject* const fsObj = gridDataTable->getRawData(rowNumber);
+    if (!getGridDataTableMiddle())
+        return;
+
+    const FileSystemObject* const fsObj = getGridDataTableMiddle()->getRawData(rowNumber);
     if (fsObj == NULL) //if invalid row...
     {
         toolTip->hide();
         return;
     }
 
-    if (gridDataTable->syncPreviewIsActive()) //synchronization preview
+    if (getGridDataTableMiddle()->syncPreviewIsActive()) //synchronization preview
     {
         const SyncOperation syncOp = fsObj->getSyncOperation();
         switch (syncOp)
@@ -1963,6 +2021,9 @@ void CustomGridMiddle::OnLeftMouseUp(wxMouseEvent& event)
 
 int CustomGridMiddle::mousePosToRow(wxPoint pos, BlockPosition* block)
 {
+    if (!getGridDataTableMiddle())
+        return 0;
+
     int row = -1;
     int x = -1;
     int y = -1;
@@ -1978,9 +2039,9 @@ int CustomGridMiddle::mousePosToRow(wxPoint pos, BlockPosition* block)
 
             if (row >= 0)
             {
-                const FileSystemObject* const fsObj = gridDataTable->getRawData(row);
+                const FileSystemObject* const fsObj = getGridDataTableMiddle()->getRawData(row);
                 if (    fsObj != NULL && //if valid row...
-                        gridDataTable->syncPreviewIsActive() &&
+                        getGridDataTableMiddle()->syncPreviewIsActive() &&
                         fsObj->getSyncOperation() != SO_EQUAL) //in sync-preview equal files shall be treated as in cmp result, i.e. as full checkbox
                 {
                     // cell:
@@ -2012,20 +2073,13 @@ int CustomGridMiddle::mousePosToRow(wxPoint pos, BlockPosition* block)
 
 void CustomGridMiddle::enableSyncPreview(bool value)
 {
-    assert(gridDataTable);
-    gridDataTable->enableSyncPreview(value);
+    assert(getGridDataTableMiddle());
+    getGridDataTableMiddle()->enableSyncPreview(value);
 
     if (value)
         GetGridColLabelWindow()->SetToolTip(_("Synchronization Preview"));
     else
         GetGridColLabelWindow()->SetToolTip(_("Comparison Result"));
-}
-
-
-void CustomGridMiddle::updateGridSizes()
-{
-    assert(gridDataTable);
-    gridDataTable->updateGridSizes();
 }
 
 
@@ -2037,12 +2091,12 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
                                   bool isSelected)
 {
     //retrieve grid data
-    const FileSystemObject* const fsObj = m_gridMiddle->gridDataTable->getRawData(row);
+    const FileSystemObject* const fsObj = m_gridMiddle.getGridDataTableMiddle() ? m_gridMiddle.getGridDataTableMiddle()->getRawData(row) :  NULL;
     if (fsObj != NULL) //if valid row...
     {
         if (rect.GetWidth() > CHECK_BOX_WIDTH)
         {
-            const bool rowIsHighlighted = row == m_gridMiddle->highlightedRow;
+            const bool rowIsHighlighted = row == m_gridMiddle.highlightedRow;
 
             wxRect rectShrinked(rect);
 
@@ -2055,7 +2109,7 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
 
             //HIGHLIGHTNING (checkbox):
             if (    rowIsHighlighted &&
-                    m_gridMiddle->highlightedPos == CustomGridMiddle::BLOCKPOS_CHECK_BOX)
+                    m_gridMiddle.highlightedPos == CustomGridMiddle::BLOCKPOS_CHECK_BOX)
             {
                 if (fsObj->isActive())
                     dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("checkboxTrueFocus")), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
@@ -2074,14 +2128,14 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
             wxGridCellRenderer::Draw(grid, attr, dc, rectShrinked, row, col, isSelected);
 
             //print remaining block
-            if (m_gridMiddle->gridDataTable->syncPreviewIsActive()) //synchronization preview
+            if (m_gridMiddle.getGridDataTableMiddle()->syncPreviewIsActive()) //synchronization preview
             {
                 //print sync direction into second block
 
                 //HIGHLIGHTNING (sync direction):
                 if (    rowIsHighlighted &&
-                        m_gridMiddle->highlightedPos != CustomGridMiddle::BLOCKPOS_CHECK_BOX) //don't allow changing direction for "=="-files
-                    switch (m_gridMiddle->highlightedPos)
+                        m_gridMiddle.highlightedPos != CustomGridMiddle::BLOCKPOS_CHECK_BOX) //don't allow changing direction for "=="-files
+                    switch (m_gridMiddle.highlightedPos)
                     {
                     case CustomGridMiddle::BLOCKPOS_CHECK_BOX:
                         break;
@@ -2153,9 +2207,12 @@ void CustomGridMiddle::DrawColLabel(wxDC& dc, int col)
 {
     CustomGrid::DrawColLabel(dc, col);
 
+    if (!getGridDataTableMiddle())
+        return;
+
     const wxRect rect(GetColLeft(col), 0, GetColWidth(col), GetColLabelSize());
 
-    if (gridDataTable->syncPreviewIsActive())
+    if (getGridDataTableMiddle()->syncPreviewIsActive())
         dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("syncViewSmall")), rect, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL);
     else
         dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("cmpViewSmall")), rect, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL);

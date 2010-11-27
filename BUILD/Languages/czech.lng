@@ -76,6 +76,8 @@ Zkontrolovat &aktualizace
 &OK
 &Pause
 &Pauza
+&Program
+&Nástroje
 &Quit
 U&končit
 &Restore
@@ -360,8 +362,8 @@ Elements remaining:
 Zbývá položek:
 Email
 Email
-Encode extended time information: %x
-
+Encoding extended time information: %x
+Zpracování rozšířené informace o čase: %x
 Endless loop when traversing directory:
 Zacyklení při procházení adresáře:
 Error
@@ -402,6 +404,8 @@ Error reading file:
 Chyba čtení souboru:
 Error reading from synchronization database:
 Chyba čtení synchronizační databáze:
+Error reading security context:
+Chyba při čtení přístupových práv:
 Error resolving symbolic link:
 Chyba odkazu zástupce:
 Error setting directory lock:
@@ -416,6 +420,8 @@ Error when monitoring directories.
 Chyba při sledování adresářů.
 Error writing file:
 Chyba zápisu souboru:
+Error writing security context:
+Chyba při zápisu přístupových práv:
 Error writing to synchronization database:
 Chyba zápisu synchronizační databáze:
 Example
@@ -704,8 +710,6 @@ Reset
 Resetovat
 Right
 Pravý
-Run minimized and write status information to a logfile
-Spustit minimalizovaný a zapisovat informace do souboru
 S&ave configuration...
 &Uložení konfigurace...
 S&witch view
@@ -778,6 +782,8 @@ Speed:
 Rychlost:
 Start
 Start
+Start minimized and write status information to a logfile
+Spustit minimalizovaný a zapisovat informace do souboru
 Start synchronization
 Start synchronizace
 Statistics

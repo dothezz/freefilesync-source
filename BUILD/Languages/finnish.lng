@@ -19,7 +19,7 @@
 %x files
 %x tiedostoista
 %x hour(s)
-% tunteja
+%x tunti(a)
 %x kB
 %x kB
 %x min
@@ -76,6 +76,8 @@ Asetusten &lataus...
 &OK
 &Pause
 &Keskeytä
+&Program
+&Ohjelma
 &Quit
 &Lopeta
 &Restore
@@ -153,9 +155,9 @@ Asetusten &lataus...
 <multiple selection>
 <monivalinta>
 A newer version of FreeFileSync is available:
-FreeFileSync:n uusi versio on olemassa:
+FreeFileSync:n uusi versio on saatavilla:
 Abort requested: Waiting for current operation to finish...
-Ohjelma on lopetettava: Odotetaan toiminnon lopettamista...
+Ohjelma on lopetettava: Odotetaan toiminnon loppumista...
 Abort synchronization immediately
 Lopeta täsmäytys välittömästi
 Aborted
@@ -360,6 +362,8 @@ Elements remaining:
 Osia jäljellä:
 Email
 S-posti
+Encoding extended time information: %x
+Tulkitaan laajennettua aikatietoa: %x
 Endless loop when traversing directory:
 Suorita hakemiston läpikulku jatkuvana:
 Error
@@ -400,6 +404,8 @@ Error reading file:
 Virhe lukiessa tiedostoa:
 Error reading from synchronization database:
 Virhe lukiessa täsmäytyksen tietokantaa:
+Error reading security context:
+Virhe lukiessa tuvatietoja:
 Error resolving symbolic link:
 Virhe selvittäessä symbolista linkkiä:
 Error setting directory lock:
@@ -414,6 +420,8 @@ Error when monitoring directories.
 Virhe seuratessa hakemistoa.
 Error writing file:
 Virhe kirjottaessa tiedosto:
+Error writing security context:
+Virhe kirjottaessa tuvatietoja:
 Error writing to synchronization database:
 Virhe kirjottaessa täsmäytyksen tietokantaa:
 Example
@@ -702,8 +710,6 @@ Reset
 Palauta
 Right
 Oikea
-Run minimized and write status information to a logfile
-Suorita pienenettynä vie status tiedot lokiin
 S&ave configuration...
 Asetukset t&allennetaan...
 S&witch view
@@ -776,6 +782,8 @@ Speed:
 Nopeus:
 Start
 Käynnistä
+Start minimized and write status information to a logfile
+Käynnistä minimoituna ja kirjoita statukset lokiin
 Start synchronization
 Käynnistä täsmäytys
 Statistics
@@ -802,8 +810,6 @@ Synchronization completed with errors!
 Täsmäytys päättyi virheisiin!
 Synchronization settings
 Täsmäytyksen asetukset
-Synchronization status
-Täsmäytyksen status
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Täsmäytä kaikki .doc, .zip und .exe tiedostot paitsi hakemistossa \"temp\" oleva.
 Synchronize...

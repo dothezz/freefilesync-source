@@ -106,16 +106,6 @@ bool ffs3::filesHaveSameContent(const Zstring& filename1, const Zstring& filenam
         }
         //------------------------------------------------------------------------------------------------
 
-//#warning
-//        static wxLongLong blorg = wxGetLocalTimeMillis();
-//        if (wxGetLocalTimeMillis() - blorg > 5000)
-//        {
-//            blorg = wxGetLocalTimeMillis();
-//            wxMessageBox(numberToZstring<size_t>(bufferSize).c_str());
-//        }
-
-
-
         if (length1 != length2 || ::memcmp(&memory1[0], &memory2[0], length1) != 0)
             return false;
 

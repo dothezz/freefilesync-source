@@ -289,22 +289,22 @@ private:
 };
 
 template <class T, template <class, class> class SP, class AP> bool operator==(const Zbase<T, SP, AP>& lhs, const Zbase<T, SP, AP>& rhs);
-template <class T, template <class, class> class SP, class AP> bool operator==(const Zbase<T, SP, AP>& lhs, const T*            rhs);
-template <class T, template <class, class> class SP, class AP> bool operator==(const T*            lhs, const Zbase<T, SP, AP>& rhs);
+template <class T, template <class, class> class SP, class AP> bool operator==(const Zbase<T, SP, AP>& lhs, const T*                rhs);
+template <class T, template <class, class> class SP, class AP> bool operator==(const T*                lhs, const Zbase<T, SP, AP>& rhs);
 
 template <class T, template <class, class> class SP, class AP> bool operator!=(const Zbase<T, SP, AP>& lhs, const Zbase<T, SP, AP>& rhs);
-template <class T, template <class, class> class SP, class AP> bool operator!=(const Zbase<T, SP, AP>& lhs, const T*            rhs);
-template <class T, template <class, class> class SP, class AP> bool operator!=(const T*            lhs, const Zbase<T, SP, AP>& rhs);
+template <class T, template <class, class> class SP, class AP> bool operator!=(const Zbase<T, SP, AP>& lhs, const T*                rhs);
+template <class T, template <class, class> class SP, class AP> bool operator!=(const T*                lhs, const Zbase<T, SP, AP>& rhs);
 
 template <class T, template <class, class> class SP, class AP> bool operator< (const Zbase<T, SP, AP>& lhs, const Zbase<T, SP, AP>& rhs);
-template <class T, template <class, class> class SP, class AP> bool operator< (const Zbase<T, SP, AP>& lhs, const T*            rhs);
-template <class T, template <class, class> class SP, class AP> bool operator< (const T*            lhs, const Zbase<T, SP, AP>& rhs);
+template <class T, template <class, class> class SP, class AP> bool operator< (const Zbase<T, SP, AP>& lhs, const T*                rhs);
+template <class T, template <class, class> class SP, class AP> bool operator< (const T*                lhs, const Zbase<T, SP, AP>& rhs);
 
 template <class T, template <class, class> class SP, class AP> const Zbase<T, SP, AP> operator+(const Zbase<T, SP, AP>& lhs, const Zbase<T, SP, AP>& rhs);
-template <class T, template <class, class> class SP, class AP> const Zbase<T, SP, AP> operator+(const Zbase<T, SP, AP>& lhs, const T*            rhs);
-template <class T, template <class, class> class SP, class AP> const Zbase<T, SP, AP> operator+(const T*            lhs, const Zbase<T, SP, AP>& rhs);
-template <class T, template <class, class> class SP, class AP> const Zbase<T, SP, AP> operator+(      T             lhs, const Zbase<T, SP, AP>& rhs);
-template <class T, template <class, class> class SP, class AP> const Zbase<T, SP, AP> operator+(const Zbase<T, SP, AP>& lhs,       T             rhs);
+template <class T, template <class, class> class SP, class AP> const Zbase<T, SP, AP> operator+(const Zbase<T, SP, AP>& lhs, const T*                rhs);
+template <class T, template <class, class> class SP, class AP> const Zbase<T, SP, AP> operator+(const T*                lhs, const Zbase<T, SP, AP>& rhs);
+template <class T, template <class, class> class SP, class AP> const Zbase<T, SP, AP> operator+(      T                 lhs, const Zbase<T, SP, AP>& rhs);
+template <class T, template <class, class> class SP, class AP> const Zbase<T, SP, AP> operator+(const Zbase<T, SP, AP>& lhs,       T                 rhs);
 
 
 

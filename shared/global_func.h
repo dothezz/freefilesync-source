@@ -192,7 +192,7 @@ template <class ForwardIterator, class T, typename Compare>
 inline
 ForwardIterator common::custom_binary_search(ForwardIterator first, ForwardIterator last, const T& value, Compare comp)
 {
-    first = lower_bound(first, last, value, comp);
+    first = std::lower_bound(first, last, value, comp);
     if (first != last && !comp(value, *first))
         return first;
     else

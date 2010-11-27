@@ -41,7 +41,7 @@
 &Cancel
 &Anulează
 &Check for new version
-&Caută Versiune Nouă
+&Caută Versiune Nouă a Softului
 &Content
 &Conținut
 &Create batch job...
@@ -69,13 +69,15 @@
 &Load configuration...
 &Deschide Configurația...
 &New
-&Nouă
+Configurație &Nouă
 &No
 &Nu
 &OK
 &OK
 &Pause
 &Pauzează
+&Program
+&Program
 &Quit
 &Ieși
 &Restore
@@ -101,11 +103,11 @@
 - conflict (same date, different size)
 - conflict (aceeași dată, mărime diferită)
 - different
-- diferit
+- diferite
 - directory part only
 - doar dosarele
 - equal
-- identic
+- identice
 - exists left only
 - există doar în stînga
 - exists right only
@@ -115,11 +117,11 @@
 - left
 - stînga
 - left newer
-- cel mai nou e în stînga
+- cea mai nouă e în stînga
 - right
 - dreapta
 - right newer
-- cel mai nou e în dreapta
+- cea mai nouă e în dreapta
 /sec
 /sec
 1 directory
@@ -147,7 +149,7 @@
 <Directory>
 <Dosar>
 <Last session>
-<Ultima sesiune>
+<Ultima Sesiune>
 <Symlink>
 <Simlegătură>
 <multiple selection>
@@ -275,7 +277,7 @@ Copiază în Cliplanșetă\tCTRL+C
 Copying new Symbolic Link %x to %y
 Copiez noua Legătură Simbolică %x în %y
 Copying new file %x to %y
-Copiez noua filă %x în %y
+Copiez fila nouă %x în %y
 Could not determine volume name for file:
 Nu pot determina numele volumului pentru fila:
 Could not initialize directory monitoring:
@@ -360,6 +362,8 @@ Elements remaining:
 Elemente Rămase:
 Email
 E-mail
+Encoding extended time information: %x
+Codarea informațiilor timpului extins: %x
 Endless loop when traversing directory:
 Buclă infinită la parcurgerea dosarului:
 Error
@@ -400,6 +404,8 @@ Error reading file:
 Eroare la citirea filei:
 Error reading from synchronization database:
 Eroare la citirea din baza de date a sincronizării:
+Error reading security context:
+Eroare la citirea contextului de securitate:
 Error resolving symbolic link:
 Eroare la rezolvarea legăturii simbolice:
 Error setting directory lock:
@@ -414,6 +420,8 @@ Error when monitoring directories.
 Eroare la monitorizarea dosarelor.
 Error writing file:
 Eroare la scrierea filei:
+Error writing security context:
+Eroare la scrierea contextului de securitate:
 Error writing to synchronization database:
 Eroare la scrierea în baza de date a sincronizării:
 Example
@@ -441,13 +449,13 @@ Fila %x are o dată nevalidă !
 File already exists. Overwrite?
 Fila există deja. Dorești s-o suprascrii?
 File content
-Conținutul Filei
+Conținutul Filelor
 File does not exist:
 Fila nu există:
 File list exported!
 Lista de file a fost exportată!
 File size and date
-Mărimea și Data Filei
+Mărimea și Data Filelor
 Filename
 Numele Filei
 Files %x have the same date but a different size!
@@ -575,7 +583,7 @@ Incluse: *.doc;*.zip;*.exe\nExcluse: \\chestii\\temp\\*
 Incompatible synchronization database format:
 Format incompatibil al bazei de date a sincronizării:
 Info
-Info
+Informații
 Information
 Informații
 Initial synchronization:
@@ -702,8 +710,6 @@ Reset
 Resetează
 Right
 Dreapta
-Run minimized and write status information to a logfile
-Rulează minimizat și scrie informațiile de stare într-un jurnal
 S&ave configuration...
 S&alvează Configurația...
 S&witch view
@@ -776,6 +782,8 @@ Speed:
 Viteză:
 Start
 Pornește
+Start minimized and write status information to a logfile
+Pornește minimizat și scrie informațiile de stare într-un jurnal
 Start synchronization
 Pornește Sincronizarea
 Statistics
@@ -802,8 +810,6 @@ Synchronization completed with errors!
 Sincronizare terminată cu erori!
 Synchronization settings
 Setările Sincronizării
-Synchronization status
-Starea Sincronizării
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Sincronizează filele .doc, .zip și .exe, cu excepția celor din dosarul \"temp\".
 Synchronize...

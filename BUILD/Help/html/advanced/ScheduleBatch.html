@@ -3,9 +3,9 @@
 <HEAD>
 	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
 	<TITLE></TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Win32)">
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20100323;21404100">
+	<META NAME="CHANGED" CONTENT="20101128;12534500">
 	<STYLE TYPE="text/css">
 	<!--
 		@page { margin: 2cm }
@@ -13,6 +13,7 @@
 		H3 { margin-bottom: 0.21cm }
 		H3.western { font-family: "Arial", sans-serif }
 		H3.cjk { font-family: "MS Mincho" }
+		H3.ctl { font-family: "Mangal" }
 		A:link { so-language: zxx }
 	-->
 	</STYLE>
@@ -27,8 +28,7 @@ XP)</SPAN></FONT></H3>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Create
 	a new batch job via FreeFileSync's main
 	dialog:<BR><I>Menu-&gt;Advanced-&gt;Create batch job</I> and save
-	it, for example, as &quot;<FONT FACE="Courier New, monospace">C:\SyncJob.ffs_
-	batch</FONT>&quot;.</FONT></P>
+	it, for example, as &quot;<FONT FACE="Courier New, monospace">C:\SyncJob.ffs_batch</FONT>&quot;.</FONT></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Make
 	sure you enable checkbox &quot;<I>Silent mode</I>&quot; to prevent
 	showing a status dialog at the end of the process.</FONT></P>
@@ -42,21 +42,34 @@ XP)</SPAN></FONT></H3>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Follow
 	the wizard and choose &quot;<FONT FACE="Courier New, monospace">C:\SyncJob.ffs_batch</FONT>&quot;
 	as program to run.</FONT></P>
-	<P STYLE="margin-bottom: 0cm"></P>
 	<UL>
 		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If
 		you are using the locally installed version of FreeFileSync,
 		</FONT><FONT FACE="Courier New, monospace">*.ffs_batch</FONT> <FONT FACE="Tahoma, sans-serif">files
 		are automatically associated with the tool and field &quot;</FONT><FONT FACE="Tahoma, sans-serif"><I>Run:</I></FONT><FONT FACE="Tahoma, sans-serif">&quot;
 		can be directly filled with the filename:<BR>&quot;</FONT><FONT FACE="Courier New, monospace">C:\SyncJob.ffs_batch</FONT><FONT FACE="Tahoma, sans-serif">&quot;<BR><IMG SRC="ScheduleBatch_html_372f0f3.gif" NAME="Grafik1" ALIGN=BOTTOM WIDTH=406 HEIGHT=455 BORDER=0></FONT></P>
-		<P STYLE="margin-bottom: 0cm"></P>
 		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If
 		file associations have not been set (portable installation),</FONT>
 		&quot;<FONT FACE="Tahoma, sans-serif"><I>Run:</I></FONT><FONT FACE="Tahoma, sans-serif">&quot;
 		has to be prefixed with the
-		executable:<BR>&quot;D</FONT><FONT FACE="Courier New, monospace">:\FreeFileSync\FreeFileSync.exe&quot;
+		executable:<BR>&quot;</FONT><FONT FACE="Courier New, monospace">D:\FreeFileSync\FreeFileSync.exe&quot;
 		&quot;C:\SyncJob.ffs_batch</FONT><FONT FACE="Tahoma, sans-serif">&quot;<BR><IMG SRC="ScheduleBatch_html_m10bf0d36.gif" NAME="Grafik2" ALIGN=BOTTOM WIDTH=406 HEIGHT=455 BORDER=0></FONT></P>
 	</UL>
 </OL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+	<FONT FACE="Tahoma, sans-serif"><B>Note:</B></FONT><FONT FACE="Tahoma, sans-serif"><BR>Beginning
+	with Windows Vista, the command always needs to be prefixed with the
+	executable even if file associations are set:<BR></FONT>&rarr;
+	<FONT FACE="Tahoma, sans-serif">&quot;</FONT><FONT FACE="Courier New, monospace">D:\FreeFileSync\FreeFileSync.exe&quot;
+	&quot;C:\SyncJob.ffs_batch<BR></FONT><FONT FACE="Tahoma, sans-serif">Else
+	the task will return with error code 0xC1, &quot;%1 is not a valid
+	Win32 application&quot;.</FONT></P>
+</SPAN><BR CLEAR=LEFT><BR>
+</P>
 </BODY>
 </HTML>

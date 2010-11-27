@@ -76,6 +76,8 @@
 &OK
 &Pause
 &Pausa
+&Program
+&Programa
 &Quit
 &Sair
 &Restore
@@ -360,6 +362,8 @@ Elements remaining:
 Elementos restantes:
 Email
 Email
+Encoding extended time information: %x
+A codificar dados temporais extendidos: %x
 Endless loop when traversing directory:
 Loop infinito ao percorrer directório:
 Error
@@ -400,6 +404,8 @@ Error reading file:
 Erro de leitura de ficheiro:
 Error reading from synchronization database:
 Erro ao ler a base de dados de sincronização:
+Error reading security context:
+Erro ao ler contexto de segurança:
 Error resolving symbolic link:
 Erro na resolução do link simbólico:
 Error setting directory lock:
@@ -414,6 +420,8 @@ Error when monitoring directories.
 Erro ao monitorizar os directórios.
 Error writing file:
 Erro de escrita no ficheiro:
+Error writing security context:
+Erro de escrita no contexto de segurança:
 Error writing to synchronization database:
 Erro na escrita da base de dados de sincronização:
 Example
@@ -702,8 +710,6 @@ Reset
 Reiniciar
 Right
 Direita
-Run minimized and write status information to a logfile
-Minimizar o programa e enviar status para um ficheiro log
 S&ave configuration...
 G&uardar a configuração...
 S&witch view
@@ -776,6 +782,8 @@ Speed:
 Velocidade:
 Start
 Iniciar
+Start minimized and write status information to a logfile
+Iniciar minimizado e escrever info de estado para o log
 Start synchronization
 Iniciar a sincronização
 Statistics

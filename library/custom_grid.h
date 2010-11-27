@@ -16,6 +16,7 @@
 #include "../file_hierarchy.h"
 
 
+class CustomGridTable;
 class CustomGridTableRim;
 class CustomGridTableLeft;
 class CustomGridTableRight;
@@ -62,10 +63,10 @@ public:
 
     virtual ~CustomGrid() {}
 
-    void initSettings(CustomGridLeft*   gridLeft,  //create connection with ffs3::GridView
-                      CustomGridMiddle* gridMiddle,
-                      CustomGridRight*  gridRight,
-                      const ffs3::GridView* gridDataView);
+    virtual void initSettings(CustomGridLeft*   gridLeft,  //create connection with ffs3::GridView
+                              CustomGridMiddle* gridMiddle,
+                              CustomGridRight*  gridRight,
+                              const ffs3::GridView* gridDataView);
 
     void release(); //release connection to ffs3::GridView
 
@@ -80,6 +81,9 @@ public:
         DESCENDING
     };
 
+    //notify wxGrid that underlying table size has changed
+    void updateGridSizes();
+
     typedef std::pair<SortColumn, SortDirection> SortMarker;
     void setSortMarker(SortMarker marker);
 
@@ -90,9 +94,9 @@ protected:
     virtual void DrawColLabel(wxDC& dc, int col);
     std::pair<int, int> mousePosToCell(wxPoint pos); //returns (row/column) pair
 
-private:
-    virtual void setGridDataTable(const ffs3::GridView* gridDataView) = 0;
+    virtual CustomGridTable* getGridDataTable() const = 0;
 
+private:
     //this method is called when grid view changes: useful for parallel updating of multiple grids
     void OnPaintGrid(wxEvent& event);
 
@@ -147,9 +151,6 @@ public:
                   long style,
                   const wxString& name);
 
-    //notify wxGrid that underlying table size has changed
-    void updateGridSizes();
-
     //set visibility, position and width of columns
     static xmlAccess::ColumnAttributes getDefaultColumnAttributes();
     xmlAccess::ColumnAttributes getColumnAttributes();
@@ -159,7 +160,6 @@ public:
     static wxString getTypeName(xmlAccess::ColumnTypes colType);
 
     void autoSizeColumns();        //performance optimized column resizer
-    void autoSizeColumns(int col, bool doRefresh = true); //
 
     void enableFileIcons(const bool value);
 
@@ -167,9 +167,15 @@ protected:
     template <ffs3::SelectedSide side>
     void setTooltip(const wxMouseEvent& event);
 
+void setOtherGrid(CustomGridRim* other); //call during initialization!
+
 private:
-    CustomGridTableRim* getGridDataTable();
-    virtual const CustomGridTableRim* getGridDataTable() const = 0;
+    CustomGridTableRim* getGridDataTableRim() const;
+
+void OnResizeColumn(wxGridSizeEvent& event);
+
+    //this method is called when grid view changes: useful for parallel updating of multiple grids
+    virtual void alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight);
 
     //asynchronous icon loading
     void getIconsToBeLoaded(std::vector<Zstring>& newLoad); //loads all (not yet) drawn icons
@@ -188,6 +194,7 @@ private:
     bool fileIconsAreEnabled;
 
     xmlAccess::ColumnAttributes columnSettings; //set visibility, position and width of columns
+    CustomGridRim* otherGrid; //sibling grid on other side
 };
 
 
@@ -203,15 +210,14 @@ public:
 
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
 
+    virtual void initSettings(CustomGridLeft*   gridLeft,  //create connection with ffs3::GridView
+                              CustomGridMiddle* gridMiddle,
+                              CustomGridRight*  gridRight,
+                              const ffs3::GridView* gridDataView);
+
 private:
     void OnMouseMovement(wxMouseEvent& event);
-    virtual void setGridDataTable(const ffs3::GridView* gridDataView);
-    virtual const CustomGridTableRim* getGridDataTable() const;
-
-    //this method is called when grid view changes: useful for parallel updating of multiple grids
-    virtual void alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight);
-
-    CustomGridTableLeft* gridDataTable;
+    virtual CustomGridTable* getGridDataTable() const;
 };
 
 
@@ -227,15 +233,14 @@ public:
 
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
 
+    virtual void initSettings(CustomGridLeft*   gridLeft,  //create connection with ffs3::GridView
+                              CustomGridMiddle* gridMiddle,
+                              CustomGridRight*  gridRight,
+                              const ffs3::GridView* gridDataView);
+
 private:
     void OnMouseMovement(wxMouseEvent& event);
-    virtual void setGridDataTable(const ffs3::GridView* gridDataView);
-    virtual const CustomGridTableRim* getGridDataTable() const;
-
-    //this method is called when grid view changes: useful for parallel updating of multiple grids
-    virtual void alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight);
-
-    CustomGridTableRight* gridDataTable;
+    virtual CustomGridTable* getGridDataTable() const;
 };
 
 
@@ -255,17 +260,20 @@ public:
 
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
 
+    virtual void initSettings(CustomGridLeft*   gridLeft,  //create connection with ffs3::GridView
+                              CustomGridMiddle* gridMiddle,
+                              CustomGridRight*  gridRight,
+                              const ffs3::GridView* gridDataView);
+
     void enableSyncPreview(bool value);
 
-    //notify wxGrid that underlying table size has changed
-    void updateGridSizes();
-
 private:
+    virtual CustomGridTable* getGridDataTable() const;
+    CustomGridTableMiddle* getGridDataTableMiddle() const;
+
 #ifdef FFS_WIN //get rid of scrollbars; Windows: overwrite virtual method
     virtual void SetScrollbar(int orientation, int position, int thumbSize, int range, bool refresh = true);
 #endif
-
-    virtual void setGridDataTable(const ffs3::GridView* gridDataView);
 
     //this method is called when grid view changes: useful for parallel updating of multiple grids
     virtual void alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight);
@@ -296,8 +304,6 @@ private:
     //variables for highlightning on mouse-over
     int highlightedRow;
     BlockPosition highlightedPos;
-
-    CustomGridTableMiddle* gridDataTable;
 
     std::auto_ptr<CustomTooltip> toolTip;
 };

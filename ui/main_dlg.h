@@ -14,13 +14,10 @@
 #include <map>
 #include <set>
 
-class CompareStatusHandler;
-class DirectoryNameMainImpl;
 class CustomGrid;
 class FFSCheckRowsEvent;
 class FFSSyncDirectionEvent;
 class IconUpdater;
-class ManualDeletionHandler;
 class DirectoryPair;
 class DirectoryPairFirst;
 class CompareStatus;
@@ -159,6 +156,7 @@ private:
     void OnContextRimLabelRight(       wxGridEvent& event);
     void OnContextMiddle(              wxGridEvent& event);
     void OnContextMiddleLabel(         wxGridEvent& event);
+    void OnGlobalKeyEvent(             wxKeyEvent& event);
 
     //context menu handler methods
     void OnContextFilterTemp(wxCommandEvent& event);

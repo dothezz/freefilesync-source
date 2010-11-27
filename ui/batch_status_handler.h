@@ -21,7 +21,7 @@ class BatchStatusHandler : public StatusHandler
 {
 public:
     BatchStatusHandler(bool runSilent, //defines: -start minimized and -quit immediately when finished
-                       const wxString& batchFilename,
+                       const wxString& jobName,
                        const wxString* logfileDirectory, //optional: enable logging if available
                        const xmlAccess::OnError handleError,
                        const ffs3::SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode

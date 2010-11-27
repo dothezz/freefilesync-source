@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Sep  8 2010)
+// C++ code generated with wxFormBuilder (version Nov 17 2010)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -51,7 +51,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 	m_menuItem4 = new wxMenuItem( m_menuFile, wxID_EXIT, wxString( _("&Quit") ) + wxT('\t') + wxT("CTRL-Q"), wxEmptyString, wxITEM_NORMAL );
 	m_menuFile->Append( m_menuItem4 );
 	
-	m_menubar1->Append( m_menuFile, _("&File") ); 
+	m_menubar1->Append( m_menuFile, _("&Program") ); 
 	
 	m_menuAdvanced = new wxMenu();
 	m_menuLanguages = new wxMenu();
@@ -1317,7 +1317,7 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	sbSizer24->Add( 0, 0, 1, wxEXPAND, 5 );
 	
 	m_checkBoxSilent = new wxCheckBox( m_panelOverview, wxID_ANY, _("Silent mode"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_checkBoxSilent->SetToolTip( _("Run minimized and write status information to a logfile") );
+	m_checkBoxSilent->SetToolTip( _("Start minimized and write status information to a logfile") );
 	
 	sbSizer24->Add( m_checkBoxSilent, 0, wxALIGN_CENTER_HORIZONTAL|wxRIGHT|wxLEFT, 14 );
 	
@@ -2101,7 +2101,9 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 	
 	bSizer42->Add( m_staticTextStatus, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxRIGHT|wxLEFT, 5 );
 	
-	m_animationControl1 = new wxAnimationCtrl(this, wxID_ANY, wxNullAnimation, wxDefaultPosition, wxSize( 45,45 ));
+	m_animationControl1 = new wxAnimationCtrl( this, wxID_ANY, wxNullAnimation, wxDefaultPosition, wxDefaultSize, wxAC_DEFAULT_STYLE ); 
+	m_animationControl1->SetMinSize( wxSize( 45,45 ) );
+	
 	bSizer42->Add( m_animationControl1, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 	
 	
@@ -2230,7 +2232,10 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 	
 	bSizerSpeed->Add( m_staticTextSpeed, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
 	
-	bSizer28->Add( bSizerSpeed, 0, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	bSizerSpeed->Add( 0, 0, 1, wxALIGN_CENTER_VERTICAL, 5 );
+	
+	bSizer28->Add( bSizerSpeed, 1, wxALIGN_CENTER_VERTICAL, 5 );
 	
 	
 	bSizer28->Add( 0, 0, 1, 0, 5 );
@@ -2257,6 +2262,9 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 	
 	bSizerRemTime = new wxBoxSizer( wxHORIZONTAL );
 	
+	
+	bSizerRemTime->Add( 0, 0, 1, wxALIGN_CENTER_VERTICAL, 5 );
+	
 	m_staticText21 = new wxStaticText( this, wxID_ANY, _("Time remaining:"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText21->Wrap( -1 );
 	m_staticText21->SetFont( wxFont( 10, 70, 90, 90, false, wxEmptyString ) );
@@ -2269,7 +2277,7 @@ SyncStatusDlgGenerated::SyncStatusDlgGenerated( wxWindow* parent, wxWindowID id,
 	
 	bSizerRemTime->Add( m_staticTextTimeRemaining, 0, wxLEFT|wxALIGN_BOTTOM, 5 );
 	
-	bSizer28->Add( bSizerRemTime, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
+	bSizer28->Add( bSizerRemTime, 1, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	bSizer27->Add( bSizer28, 0, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxALL, 5 );
 	
@@ -2627,8 +2635,9 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 	
 	bSizer108->Add( 30, 0, 1, wxEXPAND, 5 );
 	
-	m_animationControl1 = new wxAnimationCtrl(this, wxID_ANY, wxNullAnimation);
+	m_animationControl1 = new wxAnimationCtrl( this, wxID_ANY, wxNullAnimation, wxDefaultPosition, wxSize( -1,-1 ), wxAC_DEFAULT_STYLE ); 
 	m_animationControl1->SetToolTip( _("Donate with PayPal") );
+	m_animationControl1->SetMinSize( wxSize( 48,48 ) );
 	
 	bSizer108->Add( m_animationControl1, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 	

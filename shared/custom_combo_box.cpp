@@ -18,10 +18,34 @@ CustomComboBox::CustomComboBox(wxWindow* parent,
                                const wxValidator& validator,
                                const wxString& name) :
     wxComboBox(parent, id, value, pos, size, n, choices, style, validator, name)
+#if wxCHECK_VERSION(2, 9, 1)
+    , dropDownShown(false)
+#endif
 {
     //register key event to enable item deletion
     this->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(CustomComboBox::OnKeyEvent), NULL, this );
+
+#if wxCHECK_VERSION(2, 9, 1)
+    this->Connect(wxEVT_COMMAND_COMBOBOX_DROPDOWN, wxCommandEventHandler(CustomComboBox::OnShowDropDown), NULL, this );
+    this->Connect(wxEVT_COMMAND_COMBOBOX_CLOSEUP, wxCommandEventHandler(CustomComboBox::OnHideDropDown), NULL, this );
+#endif
 }
+
+
+#if wxCHECK_VERSION(2, 9, 1)
+void CustomComboBox::OnShowDropDown(wxCommandEvent& event)
+{
+    dropDownShown = true;
+    event.Skip();
+}
+
+
+void CustomComboBox::OnHideDropDown(wxCommandEvent& event)
+{
+    dropDownShown = false;
+    event.Skip();
+}
+#endif
 
 
 void CustomComboBox::OnKeyEvent(wxKeyEvent& event)
@@ -32,11 +56,16 @@ void CustomComboBox::OnKeyEvent(wxKeyEvent& event)
         //try to delete the currently selected config history item
         const int selectedItem = this->GetCurrentSelection();
         if (0 <= selectedItem && selectedItem < static_cast<int>(this->GetCount()) &&
-                (GetValue() != GetString(selectedItem) || //avoid problems when a character shall be deleted instead of list item
-                 GetValue() == wxEmptyString)) //exception: always allow removing empty entry
-        {
-            //save old (selected) value: deletion seems to have influence on this
-            const wxString currentVal = this->GetValue();
+#if wxCHECK_VERSION(2, 9, 1)
+                    dropDownShown)
+#else
+                    //what a mess...:
+                    (GetValue() != GetString(selectedItem) || //avoid problems when a character shall be deleted instead of list item
+                    GetValue() == wxEmptyString)) //exception: always allow removing empty entry
+#endif
+    {
+        //save old (selected) value: deletion seems to have influence on this
+        const wxString currentVal = this->GetValue();
             this->SetSelection(wxNOT_FOUND);
 
             //delete selected row

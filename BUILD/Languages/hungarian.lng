@@ -76,6 +76,8 @@
 &OK
 &Pause
 &Szünet
+&Program
+&Program
 &Quit
 &Kilépés
 &Restore
@@ -273,9 +275,9 @@ A megosztott vagy zárolt fájlok másolása a Volume Shadow Copy szolgáltatás
 Copy to clipboard\tCTRL+C
 Másolás a vágólapra\tCTRL+C
 Copying new Symbolic Link %x to %y
-
+A(z) %x új symlink másolása a(z) %y symlinkbe
 Copying new file %x to %y
-
+A(z) %x új fájl másolása a(z) %y fájlba
 Could not determine volume name for file:
 A következő fájlnak nem lehet meghatározni a kötetnevét:
 Could not initialize directory monitoring:
@@ -360,6 +362,8 @@ Elements remaining:
 Hátralévő elemek száma:
 Email
 E-mail
+Encoding extended time information: %x
+Kibővített időinformációk kódolása: %x
 Endless loop when traversing directory:
 Végtelen hurok a mappák bejárásakor:
 Error
@@ -400,10 +404,12 @@ Error reading file:
 A fájl olvasása sikertelen:
 Error reading from synchronization database:
 Hiba történt a szinkronizációs adatbázis olvasása közben:
+Error reading security context:
+A biztonsági címke olvasása sikertelen:
 Error resolving symbolic link:
 A szimbolikus link feloldása sikertelen:
 Error setting directory lock:
-
+Hiba történt a mappa zárolása közben:
 Error setting privilege:
 Hiba történt a jogok beállítása közben:
 Error starting Volume Shadow Copy Service!
@@ -414,6 +420,8 @@ Error when monitoring directories.
 Hiba történt a mappák figyelése közben.
 Error writing file:
 A fájl írása sikertelen:
+Error writing security context:
+A biztonsági címke írása sikertelen:
 Error writing to synchronization database:
 Hiba történt a szinkronizációs adatbázis írása közben:
 Example
@@ -555,7 +563,7 @@ Honlap
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
 Mindkét oldal változásainak azonosítása és tárolása adatbázis segítségével. A törlések és ütközések automatikusan észlelődnek.
 Idle time between detection of last change and execution of command line in seconds
-
+A tétlenség hossza másodpercekben az utolsó változás észlelése és a parancssor végrehajtása között.
 If you like FFS
 FFS támogatása
 Ignore
@@ -603,7 +611,7 @@ A Shadow Copy a WOW64-en nem támogatott. Kérjük, használja a 64-bites FreeFi
 Match case
 Kis-/nagybetű egyezés
 Minimum Idle Time
-
+Minimális tétleségi idő
 Mirror ->>
 Tükrözés ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -659,9 +667,9 @@ Művelet:
 Overview
 Összefoglaló
 Overwriting Symbolic Link %x in %y
-
+A(z) %x symlink fölülírása a(z) %y mappában
 Overwriting file %x in %y
-
+A(z) %x fájl fölülírása a(z) %y mappában
 Pause
 Szünet
 Paused
@@ -702,8 +710,6 @@ Reset
 Helyreállítás
 Right
 Jobb oldal
-Run minimized and write status information to a logfile
-Futtatás lekicsinyítve és a státuszinformációk mentése naplófájlba
 S&ave configuration...
 Beállítások mentés&e...
 S&witch view
@@ -776,6 +782,8 @@ Speed:
 Sebesség:
 Start
 Indítás
+Start minimized and write status information to a logfile
+Indítás lekicsinyítve és a státuszinformációk mentése naplófájlba
 Start synchronization
 Szinkronizáció indítása
 Statistics
@@ -802,8 +810,6 @@ Synchronization completed with errors!
 A szinkronizáció befejeződött, de akadtak hibák!
 Synchronization settings
 Szinkronizáció beállításai
-Synchronization status
-Szinkronizáció állapota
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Minden .doc, .zip és .exe fájl szinkronizálása a \"temp\" almappában találhatók kivételével.
 Synchronize...
@@ -865,7 +871,7 @@ A(z) %x kötetnevet nem tartalmazza a(z) %y fájlnév!
 Waiting for all directories to become available...
 Várakozás az összes mappa elérhetővé válására...
 Waiting while directory is locked (%x)...
-
+Várakozás a mappa zárolásának a feloldására (%x)...
 Warning
 Figyelem
 Warning: Synchronization failed for %x item(s):

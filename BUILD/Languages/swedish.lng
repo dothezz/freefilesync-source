@@ -76,8 +76,10 @@
 &OK
 &Pause
 &Paus
+&Program
+&Program
 &Quit
-&Sluta
+&Avsluta
 &Restore
 &Återställ
 &Retry
@@ -231,7 +233,7 @@ Jämförelseresultat
 Comparison settings
 Jämförelseinställningar
 Completed
-Klar
+Slutförd
 Configuration
 Inställningar
 Configuration loaded!
@@ -360,6 +362,8 @@ Elements remaining:
 Återstående poster:
 Email
 e-post
+Encoding extended time information: %x
+Kodar utökad tidsinformation: %x
 Endless loop when traversing directory:
 Oändlig loop vid accessförsök på katalog:
 Error
@@ -400,6 +404,8 @@ Error reading file:
 Kan inte läsa fil:
 Error reading from synchronization database:
 Kan inte läsa från databasen:
+Error reading security context:
+Kan inte läsa säkerhetskontext:
 Error resolving symbolic link:
 Kan inte tyda symbolisk länk:
 Error setting directory lock:
@@ -414,6 +420,8 @@ Error when monitoring directories.
 Fel vid övervakning av kataloger.
 Error writing file:
 Kan inte skriva fil:
+Error writing security context:
+Kan inte skriva säkerhetskontext:
 Error writing to synchronization database:
 Kan inte skriva till databas:
 Example
@@ -702,8 +710,6 @@ Reset
 Återställ
 Right
 Höger
-Run minimized and write status information to a logfile
-Kör minimerad och skriv statusinformation till loggfil
 S&ave configuration...
 S&para inställningar...
 S&witch view
@@ -776,6 +782,8 @@ Speed:
 Hastighet:
 Start
 Start
+Start minimized and write status information to a logfile
+Starta minimerad och skriv statusinformation till en loggfil
 Start synchronization
 Starta synkronisering
 Statistics
@@ -802,8 +810,6 @@ Synchronization completed with errors!
 Synkronisering slutförd med fel!
 Synchronization settings
 Synkroniseringsinställningar
-Synchronization status
-Synkroniseringsstatus
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Synkronisera alla filer, .doc, .zip och .exe men inga undermappar \"temp\".
 Synchronize...

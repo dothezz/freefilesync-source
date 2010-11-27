@@ -76,6 +76,8 @@ Konfiguration &laden...
 &OK
 &Pause
 &Pause
+&Program
+&Programm
 &Quit
 &Beenden
 &Restore
@@ -360,6 +362,8 @@ Elements remaining:
 Verbleibende Elemente:
 Email
 Email
+Encoding extended time information: %x
+Speichere erweiterte Zeitinformation: %x
 Endless loop when traversing directory:
 Endlosschleife beim Lesen des Verzeichnisses:
 Error
@@ -400,6 +404,8 @@ Error reading file:
 Fehler beim Lesen der Datei:
 Error reading from synchronization database:
 Fehler beim Lesen der Synchronisationsdatenbank:
+Error reading security context:
+Fehler beim Lesen des Sicherheitskontextes:
 Error resolving symbolic link:
 Fehler beim Auflösen des Symbolischen Links:
 Error setting directory lock:
@@ -414,6 +420,8 @@ Error when monitoring directories.
 Fehler beim Überwachen der Verzeichnisse.
 Error writing file:
 Fehler beim Schreiben der Datei:
+Error writing security context:
+Fehler beim Schreiben des Sicherheitskontextes:
 Error writing to synchronization database:
 Fehler beim Schreiben der Synchronisationsdatenbank:
 Example
@@ -451,7 +459,7 @@ Dateigröße und -datum
 Filename
 Dateiname
 Files %x have the same date but a different size!
-Die Dateien %x haben dasselbe Datum, aber eine unterschiedliche Größe!
+Die Dateien %x haben dasselbe Datum, aber unterschiedliche Größen!
 Files are found equal if\n     - file content\nis the same
 Dateien gelten als gleich, wenn\n     - der Inhalt\ngleich ist
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
@@ -702,8 +710,6 @@ Reset
 Zurücksetzen
 Right
 Rechts
-Run minimized and write status information to a logfile
-Minimiert ausführen und Statusinformationen in eine Logdatei schreiben
 S&ave configuration...
 Konfiguration s&peichern...
 S&witch view
@@ -776,6 +782,8 @@ Speed:
 Geschwindigkeit:
 Start
 Start
+Start minimized and write status information to a logfile
+Minimiert starten und Statusinformationen in eine Logdatei schreiben
 Start synchronization
 Synchronisation starten
 Statistics
@@ -789,7 +797,7 @@ Seiten vertauschen
 Switching to FreeFileSync GUI mode...
 Wechsle in die graphische Ansicht...
 Symbolic Link handling
-Verwendung Symbolischer Links
+Behandlung Symbolischer Links
 Symlinks %x have the same date but a different target!
 Die Symbolischen Links %x haben dasselbe Datum, aber ein unterschiedliches Ziel!
 Synchronization Preview
@@ -802,8 +810,6 @@ Synchronization completed with errors!
 Synchronisation mit Fehlern abgeschlossen!
 Synchronization settings
 Synchronisationseinstellungen
-Synchronization status
-Synchronisationsstatus
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
 Alle .doc, .zip und .exe Dateien mit Ausnahme des Verzeichnisses \"temp\" werden synchronisiert.
 Synchronize...

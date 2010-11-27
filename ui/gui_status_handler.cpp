@@ -222,8 +222,8 @@ void CompareStatusHandler::abortThisProcess()
 //########################################################################################################
 
 
-SyncStatusHandler::SyncStatusHandler(wxTopLevelWindow* parentDlg, bool ignoreAllErrors) :
-    syncStatusFrame(*this, parentDlg, false),
+SyncStatusHandler::SyncStatusHandler(wxTopLevelWindow* parentDlg, bool ignoreAllErrors, const wxString& jobName) :
+    syncStatusFrame(*this, parentDlg, false, jobName),
     ignoreErrors(ignoreAllErrors) {}
 
 
@@ -269,6 +269,9 @@ SyncStatusHandler::~SyncStatusHandler()
 inline
 void SyncStatusHandler::reportInfo(const Zstring& text)
 {
+        //if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING)
+        //errorLog.logInfo(zToWx(text)); -> don't spam with file copy info: visually identifying warning messages has priority!
+
     syncStatusFrame.setStatusText_NoUpdate(text);
 }
 

@@ -48,7 +48,7 @@ private:
 class SyncStatusHandler : public StatusHandler
 {
 public:
-    SyncStatusHandler(wxTopLevelWindow* parentDlg, bool ignoreAllErrors);
+    SyncStatusHandler(wxTopLevelWindow* parentDlg, bool ignoreAllErrors, const wxString& jobName);
     ~SyncStatusHandler();
 
     virtual void initNewProcess(int objectsTotal, wxLongLong dataTotal, Process processID);
