@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "gui_status_handler.h"
@@ -26,17 +26,14 @@ CompareStatusHandler::CompareStatusHandler(MainDialog* dlg) :
 
     //prevent user input during "compare", do not disable maindialog since abort-button would also be disabled
     mainDialog->disableAllElements();
+    mainDialog->compareStatus->init(); //clear old values
 
     //display status panel during compare
-    mainDialog->compareStatus->init(); //clear old values and make visible
-
-    mainDialog->bSizer1->Layout(); //both sizers need to recalculate!
-    mainDialog->bSizer6->Layout(); //adapt layout for wxBitmapWithImage
-    mainDialog->Refresh();
+    mainDialog->auiMgr.GetPane(mainDialog->compareStatus->getAsWindow()).Show();
+    mainDialog->auiMgr.Update();
 
     //register abort button
-    mainDialog->m_buttonAbort->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CompareStatusHandler::OnAbortCompare ), NULL, this);
-
+    mainDialog->m_buttonAbort->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CompareStatusHandler::OnAbortCompare), NULL, this);
     //register key event
     mainDialog->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CompareStatusHandler::OnKeyPressed), NULL, this);
 }
@@ -48,21 +45,17 @@ CompareStatusHandler::~CompareStatusHandler()
 
     //reenable complete main dialog
     mainDialog->enableAllElements();
+    mainDialog->compareStatus->finalize();
+
+    mainDialog->auiMgr.GetPane(mainDialog->compareStatus->getAsWindow()).Hide();
+    mainDialog->auiMgr.Update();
 
     if (abortIsRequested())
         mainDialog->pushStatusInformation(_("Operation aborted!"));
 
-    //hide status panel from main window
-    mainDialog->compareStatus->finalize();
-
-    mainDialog->bSizer6->Layout(); //adapt layout for wxBitmapWithImage
-    mainDialog->Layout();
-    mainDialog->Refresh();
-
-    //register key event
+    //de-register keys
     mainDialog->Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(CompareStatusHandler::OnKeyPressed), NULL, this);
-    //de-register abort button
-    mainDialog->m_buttonAbort->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CompareStatusHandler::OnAbortCompare ), NULL, this);
+    mainDialog->m_buttonAbort->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CompareStatusHandler::OnAbortCompare), NULL, this);
 }
 
 
@@ -269,8 +262,8 @@ SyncStatusHandler::~SyncStatusHandler()
 inline
 void SyncStatusHandler::reportInfo(const Zstring& text)
 {
-        //if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING)
-        //errorLog.logInfo(zToWx(text)); -> don't spam with file copy info: visually identifying warning messages has priority!
+    //if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING)
+    //errorLog.logInfo(zToWx(text)); -> don't spam with file copy info: visually identifying warning messages has priority!
 
     syncStatusFrame.setStatusText_NoUpdate(text);
 }

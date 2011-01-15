@@ -2,7 +2,7 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %x / %y объектов удалено удачно
-%x Byte
+%x Bytes
 %x Байт
 %x GB
 %x ГБ
@@ -67,7 +67,7 @@
 &Load
 &Загрузить
 &Load configuration...
-&Загрузить конфигурацию...
+&Загрузить настройки синхронизации...
 &New
 &Новая
 &No
@@ -154,6 +154,8 @@
 <Символьная ссылка>
 <multiple selection>
 <групповое выделение>
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+
 A newer version of FreeFileSync is available:
 Доступна новая версия FreeFileSync:
 Abort requested: Waiting for current operation to finish...
@@ -235,15 +237,15 @@ Comparison settings
 Completed
 Завершено
 Configuration
-Настройка
+Настройки синхронизации
 Configuration loaded!
-Настройка загружена!
+Настройки синхронизации загружены!
 Configuration overview:
-Конфигурация:
+Настройки синхронизации:
 Configuration saved!
-Настройка сохранена!
+Настройки синхронизации сохранены!
 Configure filter
-Настройка фильтра
+Настройки фильтра
 Configure your own synchronization rules.
 Настроить свои собственные правила синхронизации.
 Confirm
@@ -256,6 +258,10 @@ Continue
 Продолжить
 Conversion error:
 Ошибка преобразования:
+Copy attributes only from left to right
+Копировать только атрибуты слева направо
+Copy attributes only from right to left
+Копировать только атрибуты справа налево
 Copy filesystem permissions
 Копировать права доступа файловой системы
 Copy from left to right
@@ -397,7 +403,7 @@ Error moving to Recycle Bin:
 Error opening file:
 Ошибка при открытии файла:
 Error parsing configuration file:
-Ошибка при анализе файла конфигурации:
+Ошибка при анализе файла настроек синхронизации:
 Error reading file attributes:
 Ошибка при чтении параметров файла:
 Error reading file:
@@ -472,6 +478,8 @@ Files that exist on both sides, right one is newer
 Файлы, существующие на обоих сторонах, правый новее
 Files that have different content
 Файлы, имеющие различное содержание
+Files/folders that differ in attributes only
+Файлы/папки, которые отличаются только атрибутами
 Files/folders that exist on left side only
 Файлы/папки, существующие только на левой стороне
 Files/folders that exist on right side only
@@ -494,6 +502,8 @@ Find what:
 Найти:
 Folder Comparison and Synchronization
 Сравнение и синхронизация
+Folder pairs
+Пары папок для синхронизации
 Follow
 Последовательное
 Free disk space available:
@@ -599,19 +609,21 @@ Left
 Legend
 Легенда
 Load configuration from file
-Загрузить конфигурацию из файла
+Загрузить настройки синхронизации из файла
 Load configuration history (press DEL to delete items)
-Выбрать конфигурацию из списка (нажмите DEL для удаления пунктов)
+Выбрать настройки синхронизации из списка\n(нажмите DEL для удаления пунктов)
 Log-messages:
 Лог-сообщения:
 Logging
 Лог-файлы
+Main bar
+Главная панель
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Создание теневых копий на WOW64 не поддерживается. Пожалуйста, используйте FreeFileSync 64-разрядной версии.
 Match case
 Учитывать регистр
-Minimum Idle Time
-Минимальное время простоя
+Minimum Idle Time [seconds]
+Минимальное время простоя [секунд]
 Mirror ->>
 Зеркало ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -643,7 +655,7 @@ No filter selected
 Not enough free disk space available in:
 Не достаточно свободного места в:
 Nothing to synchronize according to configuration!
-Ничего нет для синхронизации в соответствии с конфигурацией!
+Ничего нет для синхронизации в соответствии с настройками синхронизации!
 Number of files and directories that will be created
 Число файлов и папок, которые будут созданы
 Number of files and directories that will be deleted
@@ -686,8 +698,6 @@ Published under the GNU General Public License:
 Издается под лицензией GNU General Public License:
 Question
 Вопрос
-Quit
-Выход
 Re-enable all hidden dialogs?
 Показать все скрытые диалоги?
 RealtimeSync - Automated Synchronization
@@ -708,16 +718,18 @@ Report translation error
 Сообщить об ошибке перевода
 Reset
 Сбросить
+Reset view
+Сброс настроек вида
 Right
 Справа
 S&ave configuration...
-Сохранить конфигурацию...
+Сохранить настройки синхронизации...
 S&witch view
 Переключить вид
 Save changes to current configuration?
-Сохранить изменения в текущей конфигурации?
+Сохранить изменения в текущих настройках синхронизации?
 Save current configuration to file
-Сохранить текущую конфигурацию в файл
+Сохранить текущие настройки синхронизации в файл
 Scanning...
 Сканирование...
 Scanning:
@@ -734,6 +746,8 @@ Set direction:
 Выберите направление:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Настройка направления синхронизации по умолчанию:\nСтарые файлы будут заменены более новыми файлами.
+Show \"%x\"
+Показать \"%x\"
 Show conflicts
 Показать конфликтующие файлы
 Show files that are different
@@ -825,7 +839,7 @@ Target file already existing!
 The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
 Командная строка выполняется каждый раз, когда:\n- все папки становятся доступны (например, подключение переносного носителя)\n- файлы в папках или подпапках изменены
 The file does not contain a valid configuration:
-Файл не содержит действительную конфигурацию:
+Файл не содержит действительных настроек синхронизации:
 The file was not processed by last synchronization!
 Файл не был обработан при последней синхронизации!
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
@@ -852,6 +866,8 @@ Unresolved conflicts existing!
 Существуют нерешенные конфликты
 Update ->
 Обновить ->
+Updating attributes of %x
+Обновление атрибутов %x
 Usage:
 Инструкция:
 Use Recycle Bin
@@ -868,8 +884,8 @@ Verifying file %x
 Проверка файла %x
 Volume name %x not part of filename %y!
 Имя тома %x не является частью имени файла %y!
-Waiting for all directories to become available...
-Ожидание, пока все папки станут доступными...
+Waiting for missing directories...
+Ожидание пропущенных папок...
 Waiting while directory is locked (%x)...
 Ожидание снятия блокировки с папки (%x)...
 Warning

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "file_hierarchy.h"
@@ -110,9 +110,10 @@ void FileSystemObject::removeEmpty(BaseDirMapping& baseDir)
 }
 
 
-SyncOperation FileSystemObject::getSyncOperation(const CompareFilesResult cmpResult,
-        const bool selectedForSynchronization,
-        const SyncDirectionIntern syncDir)
+SyncOperation FileSystemObject::getSyncOperation(
+    CompareFilesResult cmpResult,
+    bool selectedForSynchronization,
+    SyncDirectionIntern syncDir)
 {
     if (!selectedForSynchronization)
         return cmpResult == FILE_EQUAL ?
@@ -178,6 +179,20 @@ SyncOperation FileSystemObject::getSyncOperation(const CompareFilesResult cmpRes
         }
         break;
 
+    case FILE_DIFFERENT_METADATA:
+        switch (syncDir)
+        {
+        case SYNC_DIR_INT_LEFT:
+            return SO_COPY_METADATA_TO_LEFT;
+        case SYNC_DIR_INT_RIGHT:
+            return SO_COPY_METADATA_TO_RIGHT;
+        case SYNC_DIR_INT_NONE:
+            return SO_DO_NOTHING;
+        case SYNC_DIR_INT_CONFLICT:
+            return SO_UNRESOLVED_CONFLICT;
+        }
+        break;
+
     case FILE_EQUAL:
         assert(syncDir == SYNC_DIR_INT_NONE);
         return SO_EQUAL;
@@ -189,17 +204,15 @@ SyncOperation FileSystemObject::getSyncOperation(const CompareFilesResult cmpRes
 
 const Zstring& ffs3::getSyncDBFilename()
 {
-    //32 and 64 bit for Linux and Windows builds are binary incompatible! So give them different names
+    //Linux and Windows builds are binary incompatible: char/wchar_t case, sensitive/insensitive
+    //32 and 64 bit db files ARE designed to be binary compatible!
+    //Give db files different names.
     //make sure they end with ".ffs_db". These files will not be included into comparison when located in base sync directories
 #ifdef FFS_WIN
-    static Zstring output = Zstring(util::is64BitBuild ?
-                          Zstr("sync.x64.") :
-                          Zstr("sync.")) + SYNC_DB_FILE_ENDING;
+    static Zstring output = Zstring(Zstr("sync.")) + SYNC_DB_FILE_ENDING;
 #elif defined FFS_LINUX
     //files beginning with dots are hidden e.g. in Nautilus
-    static Zstring output = Zstring(util::is64BitBuild ?
-                          Zstr(".sync.x64.") :
-                          Zstr(".sync.")) + SYNC_DB_FILE_ENDING;
+    static Zstring output = Zstring(Zstr(".sync.")) + SYNC_DB_FILE_ENDING;
 #endif
     return output;
 }

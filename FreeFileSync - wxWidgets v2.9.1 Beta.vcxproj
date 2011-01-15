@@ -271,6 +271,7 @@
     <ClCompile Include="shared\help_provider.cpp" />
     <ClCompile Include="shared\localization.cpp" />
     <ClCompile Include="shared\long_path_prefix.cpp" />
+    <ClCompile Include="shared\privilege.cpp" />
     <ClCompile Include="shared\recycler.cpp" />
     <ClCompile Include="shared\serialize.cpp" />
     <ClCompile Include="shared\shadow.cpp" />

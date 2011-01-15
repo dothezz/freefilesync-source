@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef FREEFILESYNC_H_INCLUDED
@@ -42,6 +42,7 @@ enum CompareFilesResult
     FILE_RIGHT_NEWER,
     FILE_DIFFERENT,
     FILE_EQUAL,
+    FILE_DIFFERENT_METADATA, //both sides equal, but different metadata only
     FILE_CONFLICT
 };
 //attention make sure these /|\  \|/ three enums match!!!
@@ -49,7 +50,8 @@ enum CompareDirResult
 {
     DIR_LEFT_SIDE_ONLY  = FILE_LEFT_SIDE_ONLY,
     DIR_RIGHT_SIDE_ONLY = FILE_RIGHT_SIDE_ONLY,
-    DIR_EQUAL           = FILE_EQUAL
+    DIR_EQUAL           = FILE_EQUAL,
+    DIR_DIFFERENT_METADATA = FILE_DIFFERENT_METADATA //both sides equal, but different metadata only
 };
 
 enum CompareSymlinkResult
@@ -60,6 +62,7 @@ enum CompareSymlinkResult
     SYMLINK_RIGHT_NEWER     = FILE_RIGHT_NEWER,
     SYMLINK_DIFFERENT       = FILE_DIFFERENT,
     SYMLINK_EQUAL           = FILE_EQUAL,
+    SYMLINK_DIFFERENT_METADATA = FILE_DIFFERENT_METADATA, //files are considered "equal" but different only in metadata
     SYMLINK_CONFLICT        = FILE_CONFLICT
 };
 
@@ -90,6 +93,8 @@ enum SyncOperation
     SO_DELETE_RIGHT,
     SO_OVERWRITE_LEFT,
     SO_OVERWRITE_RIGHT,
+    SO_COPY_METADATA_TO_LEFT, //objects are already equal: transfer metadata only
+    SO_COPY_METADATA_TO_RIGHT, //
     SO_DO_NOTHING, //= both sides differ, but nothing will be synced
     SO_EQUAL,      //= both sides are equal, so nothing will be synced
     SO_UNRESOLVED_CONFLICT
@@ -101,25 +106,6 @@ wxString getSymbol(SyncOperation op);
 
 //Exception class used to abort the "compare" and "sync" process
 class AbortThisProcess {};
-
-
-struct SyncConfigCustom //save last used custom config settings
-{
-    SyncConfigCustom() :
-        exLeftSideOnly( SYNC_DIR_NONE),
-        exRightSideOnly(SYNC_DIR_NONE),
-        leftNewer(      SYNC_DIR_NONE),
-        rightNewer(     SYNC_DIR_NONE),
-        different(      SYNC_DIR_NONE),
-        conflict(       SYNC_DIR_NONE) {}
-
-    SyncDirection exLeftSideOnly;
-    SyncDirection exRightSideOnly;
-    SyncDirection leftNewer;
-    SyncDirection rightNewer;
-    SyncDirection different;
-    SyncDirection conflict;
-};
 
 
 struct SyncConfiguration //technical representation of sync-config: not to be edited by GUI directly!
@@ -144,12 +130,13 @@ struct SyncConfiguration //technical representation of sync-config: not to be ed
     bool operator==(const SyncConfiguration& other) const
     {
         return automatic       == other.automatic       &&
-               exLeftSideOnly  == other.exLeftSideOnly  &&
-               exRightSideOnly == other.exRightSideOnly &&
-               leftNewer       == other.leftNewer       &&
-               rightNewer      == other.rightNewer      &&
-               different       == other.different       &&
-               conflict        == other.conflict;
+               (automatic || //if automatic is on, other settings are not relevant
+                (exLeftSideOnly  == other.exLeftSideOnly  &&
+                 exRightSideOnly == other.exRightSideOnly &&
+                 leftNewer       == other.leftNewer       &&
+                 rightNewer      == other.rightNewer      &&
+                 different       == other.different       &&
+                 conflict        == other.conflict));
     }
 
     bool automatic; //use sync-database

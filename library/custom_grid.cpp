@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "custom_grid.h"
@@ -197,8 +197,11 @@ protected:
     static const wxColour COLOR_CMP_BLUE;
     static const wxColour COLOR_CMP_GREEN;
     static const wxColour COLOR_SYNC_BLUE;
+    static const wxColour COLOR_SYNC_BLUE_LIGHT;
     static const wxColour COLOR_SYNC_GREEN;
+    static const wxColour COLOR_SYNC_GREEN_LIGHT;
     static const wxColour COLOR_YELLOW;
+    static const wxColour COLOR_YELLOW_LIGHT;
 
     const GridView* gridDataView; //(very fast) access to underlying grid data :)
 
@@ -217,8 +220,11 @@ const wxColour CustomGridTable::COLOR_CMP_RED(   249, 163, 165);
 const wxColour CustomGridTable::COLOR_CMP_BLUE(  144, 232, 246);
 const wxColour CustomGridTable::COLOR_CMP_GREEN( 147, 253, 159);
 const wxColour CustomGridTable::COLOR_SYNC_BLUE( 201, 203, 247);
+const wxColour CustomGridTable::COLOR_SYNC_BLUE_LIGHT(201, 225, 247);
 const wxColour CustomGridTable::COLOR_SYNC_GREEN(197, 248, 190);
+const wxColour CustomGridTable::COLOR_SYNC_GREEN_LIGHT(226, 248, 190);
 const wxColour CustomGridTable::COLOR_YELLOW(    247, 252,  62);
+const wxColour CustomGridTable::COLOR_YELLOW_LIGHT(253, 252, 169);
 
 
 class CustomGridTableRim : public CustomGridTable
@@ -331,10 +337,10 @@ protected:
                             value = zToWx(dirObj.getFullName<side>());
                             break;
                         case xmlAccess::FILENAME:
-                            value = wxEmptyString;
+                            value = zToWx(dirObj.getShortName<side>());
                             break;
                         case xmlAccess::REL_PATH:
-                            value = zToWx(dirObj.getRelativeName<side>());
+                            value = zToWx(dirObj.getParentRelativeName());
                             break;
                         case xmlAccess::DIRECTORY:
                             value = zToWx(dirObj.getBaseDirPf<side>());
@@ -527,10 +533,14 @@ private:
                 case SO_DELETE_LEFT:
                 case SO_OVERWRITE_LEFT:
                     return COLOR_SYNC_BLUE;
+                case SO_COPY_METADATA_TO_LEFT:
+                    return COLOR_SYNC_BLUE_LIGHT;
                 case SO_CREATE_NEW_RIGHT:
                 case SO_DELETE_RIGHT:
                 case SO_OVERWRITE_RIGHT:
                     return COLOR_SYNC_GREEN;
+                case SO_COPY_METADATA_TO_RIGHT:
+                    return COLOR_SYNC_GREEN_LIGHT;
                 case SO_UNRESOLVED_CONFLICT:
                     return COLOR_YELLOW;
                 case SO_DO_NOTHING:
@@ -554,6 +564,8 @@ private:
                     return *wxWHITE;
                 case FILE_CONFLICT:
                     return COLOR_YELLOW;
+                case FILE_DIFFERENT_METADATA:
+                    return COLOR_YELLOW_LIGHT;
                 }
             }
         }
@@ -1919,9 +1931,11 @@ void CustomGridMiddle::showToolTip(int rowNumber, wxPoint pos)
             toolTip->show(getDescription(syncOp), pos, &GlobalResources::getInstance().getImageByName(wxT("syncDeleteRightAct")));
             break;
         case SO_OVERWRITE_LEFT:
+        case SO_COPY_METADATA_TO_LEFT:
             toolTip->show(getDescription(syncOp), pos, &GlobalResources::getInstance().getImageByName(wxT("syncDirLeftAct")));
             break;
         case SO_OVERWRITE_RIGHT:
+        case SO_COPY_METADATA_TO_RIGHT:
             toolTip->show(getDescription(syncOp), pos, &GlobalResources::getInstance().getImageByName(wxT("syncDirRightAct")));
             break;
         case SO_DO_NOTHING:
@@ -1957,6 +1971,9 @@ void CustomGridMiddle::showToolTip(int rowNumber, wxPoint pos)
             break;
         case FILE_EQUAL:
             toolTip->show(getDescription(cmpRes), pos, &GlobalResources::getInstance().getImageByName(wxT("equalAct")));
+            break;
+        case FILE_DIFFERENT_METADATA:
+            toolTip->show(getDescription(cmpRes), pos, &GlobalResources::getInstance().getImageByName(wxT("conflictAct")));
             break;
         case FILE_CONFLICT:
             toolTip->show(fsObj->getCatConflict(), pos, &GlobalResources::getInstance().getImageByName(wxT("conflictAct")));
@@ -2178,6 +2195,7 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
                     dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("equalSmall")), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
                     break;
                 case FILE_CONFLICT:
+                case FILE_DIFFERENT_METADATA:
                     dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("conflictSmall")), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
                     break;
                 }
@@ -2232,8 +2250,10 @@ const wxBitmap& ffs3::getSyncOpImage(SyncOperation syncOp)
     case SO_DELETE_RIGHT:
         return GlobalResources::getInstance().getImageByName(wxT("deleteRightSmall"));
     case SO_OVERWRITE_RIGHT:
+    case SO_COPY_METADATA_TO_RIGHT:
         return GlobalResources::getInstance().getImageByName(wxT("syncDirRightSmall"));
     case SO_OVERWRITE_LEFT:
+    case SO_COPY_METADATA_TO_LEFT:
         return GlobalResources::getInstance().getImageByName(wxT("syncDirLeftSmall"));
     case SO_DO_NOTHING:
         return GlobalResources::getInstance().getImageByName(wxT("syncDirNoneSmall"));

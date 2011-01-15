@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "structures.h"
@@ -170,6 +170,8 @@ wxString ffs3::getDescription(CompareFilesResult cmpRes)
         return _("Files that have different content");
     case FILE_EQUAL:
         return _("Files that are equal on both sides");
+    case FILE_DIFFERENT_METADATA:
+        return _("Files/folders that differ in attributes only");
     case FILE_CONFLICT:
         return _("Conflicts/files that cannot be categorized");
     }
@@ -196,6 +198,7 @@ wxString ffs3::getSymbol(CompareFilesResult cmpRes)
     case FILE_EQUAL:
         return wxT("'=="); //added quotation mark to avoid error in Excel cell when exporting to *.cvs
     case FILE_CONFLICT:
+    case FILE_DIFFERENT_METADATA:
         return wxT("\\/\\->");
     }
 
@@ -224,6 +227,10 @@ wxString ffs3::getDescription(SyncOperation op)
         return _("Do nothing");
     case SO_EQUAL:
         return _("Files that are equal on both sides");
+    case SO_COPY_METADATA_TO_LEFT:
+        return _("Copy attributes only from right to left");
+    case SO_COPY_METADATA_TO_RIGHT:
+        return _("Copy attributes only from left to right");
     case SO_UNRESOLVED_CONFLICT:
         return _("Conflicts/files that cannot be categorized");
     };
@@ -246,8 +253,10 @@ wxString ffs3::getSymbol(SyncOperation op)
     case SO_DELETE_RIGHT:
         return wxT("-D");
     case SO_OVERWRITE_LEFT:
+    case SO_COPY_METADATA_TO_LEFT:
         return wxT("<-");
     case SO_OVERWRITE_RIGHT:
+    case SO_COPY_METADATA_TO_RIGHT:
         return wxT("->");
     case SO_DO_NOTHING:
         return wxT(" -");
@@ -262,6 +271,22 @@ wxString ffs3::getSymbol(SyncOperation op)
 }
 
 
+namespace
+{
+bool sameFilterConfig(const std::vector<FolderPairEnh>& folderPairs)
+{
+    if (folderPairs.empty())
+        return true;
+
+    for (std::vector<FolderPairEnh>::const_iterator fp = folderPairs.begin(); fp != folderPairs.end(); ++fp)
+        if (!(fp->localFilter == folderPairs[0].localFilter))
+            return false;
+
+    return true;
+}
+}
+
+
 ffs3::MainConfiguration ffs3::merge(const std::vector<MainConfiguration>& mainCfgs)
 {
     assert(!mainCfgs.empty());
@@ -269,7 +294,7 @@ ffs3::MainConfiguration ffs3::merge(const std::vector<MainConfiguration>& mainCf
         return ffs3::MainConfiguration();
 
     if (mainCfgs.size() == 1) //mergeConfigFilesImpl relies on this!
-        return mainCfgs[0];
+        return mainCfgs[0];   //
 
     //merge folder pair config
     std::vector<FolderPairEnh> fpMerged;
@@ -300,9 +325,31 @@ ffs3::MainConfiguration ffs3::merge(const std::vector<MainConfiguration>& mainCf
         fpMerged.insert(fpMerged.end(), fpTmp.begin(), fpTmp.end());
     }
 
+    //optimization: remove redundant configuration
+    FilterConfig newGlobalFilter;
+
+    const bool sameLocalFilter = sameFilterConfig(fpMerged);
+    if (sameLocalFilter)
+        newGlobalFilter = fpMerged[0].localFilter;
+
+    for (std::vector<FolderPairEnh>::iterator fp = fpMerged.begin(); fp != fpMerged.end(); ++fp)
+    {
+        //if local config matches output global config we don't need local one
+        if (    fp->altSyncConfig &&
+                *fp->altSyncConfig ==
+                AlternateSyncConfig(mainCfgs[0].syncConfiguration,
+                                    mainCfgs[0].handleDeletion,
+                                    mainCfgs[0].customDeletionDirectory))
+            fp->altSyncConfig.reset();
+
+        if (sameLocalFilter) //use global filter in this case
+            fp->localFilter = FilterConfig();
+    }
+
+
     //final assembly
     ffs3::MainConfiguration cfgOut = mainCfgs[0];
-    cfgOut.globalFilter            = FilterConfig(); //all filtering was moved to item level!
+    cfgOut.globalFilter            = newGlobalFilter;
     cfgOut.firstPair               = fpMerged[0];
     cfgOut.additionalPairs.assign(fpMerged.begin() + 1, fpMerged.end());
 

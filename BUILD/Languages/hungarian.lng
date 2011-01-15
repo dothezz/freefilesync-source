@@ -2,8 +2,8 @@
   MinGW \t- A GNU fordítócsomag Windows portja\n  wxWidgets \t- Nyílt forráskódú GUI keretrendszer\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Nyílt forráskódú IDE
 %x / %y objects deleted successfully
 %X / %Y objektum sikeresen törölve
-%x Byte
-%x bájt
+%x Bytes
+
 %x GB
 %x GB
 %x MB
@@ -256,6 +256,10 @@ Continue
 Folytatás
 Conversion error:
 Konverziós hiba:
+Copy attributes only from left to right
+
+Copy attributes only from right to left
+
 Copy filesystem permissions
 Fájlrendszer jogosultságok másolása
 Copy from left to right
@@ -472,6 +476,8 @@ Files that exist on both sides, right one is newer
 Mindkét oldalon létező fájlok, de a jobb oldali újabb
 Files that have different content
 Fájlok, amelyeknek különböző a tartalmuk:
+Files/folders that differ in attributes only
+
 Files/folders that exist on left side only
 Csak a bal oldalon létező fájlok/mappák
 Files/folders that exist on right side only
@@ -494,6 +500,8 @@ Find what:
 Mit keresünk:
 Folder Comparison and Synchronization
 Mappa összehasonlítás és szinkronizáció
+Folder pairs
+
 Follow
 Követés
 Free disk space available:
@@ -606,12 +614,14 @@ Log-messages:
 Naplóbejegyzések:
 Logging
 Naplózás
+Main bar
+
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 A Shadow Copy a WOW64-en nem támogatott. Kérjük, használja a 64-bites FreeFileSync-et.
 Match case
 Kis-/nagybetű egyezés
-Minimum Idle Time
-Minimális tétleségi idő
+Minimum Idle Time [seconds]
+
 Mirror ->>
 Tükrözés ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 Kiadva a GNU General Public License alatt:
 Question
 Kérdés
-Quit
-Kilépés
 Re-enable all hidden dialogs?
 Engedélyezzük újra az összes rejtett párbeszédablakot?
 RealtimeSync - Automated Synchronization
@@ -708,6 +716,8 @@ Report translation error
 Fordítói hiba bejelentése
 Reset
 Helyreállítás
+Reset view
+
 Right
 Jobb oldal
 S&ave configuration...
@@ -734,6 +744,8 @@ Set direction:
 Irány
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Alapértelmezett szinkronizációs irányok beállítása: a régebbi fájlok felülíródnak az újabbakkal.
+Show \"%x\"
+
 Show conflicts
 Ütközések mutatása
 Show files that are different
@@ -852,6 +864,8 @@ Unresolved conflicts existing!
 Feloldatlan ütközések vannak!
 Update ->
 Frissítés ->
+Updating attributes of %x
+
 Usage:
 Használat:
 Use Recycle Bin
@@ -868,8 +882,8 @@ Verifying file %x
 %x fájl ellenőrzése
 Volume name %x not part of filename %y!
 A(z) %x kötetnevet nem tartalmazza a(z) %y fájlnév!
-Waiting for all directories to become available...
-Várakozás az összes mappa elérhetővé válására...
+Waiting for missing directories...
+
 Waiting while directory is locked (%x)...
 Várakozás a mappa zárolásának a feloldására (%x)...
 Warning

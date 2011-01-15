@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "help_provider.h"
@@ -21,8 +21,6 @@ public:
                               wxT("FreeFileSync.chm"));
 #elif defined FFS_LINUX
                               wxT("Help/FreeFileSync.hhp"));
-
-        wxImage::AddHandler(new wxJPEGHandler); //ownership passed; display .jpg files correctly in Linux
 #endif
     }
 

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "batch_config.h"
@@ -159,11 +159,11 @@ public:
 
         //prepare drag & drop
         dirNameLeft(batchDialog.m_panelLeft,
-                       batchDialog.m_dirPickerLeft,
-                       batchDialog.m_directoryLeft),
+                    batchDialog.m_dirPickerLeft,
+                    batchDialog.m_directoryLeft),
         dirNameRight(batchDialog.m_panelRight,
-                        batchDialog.m_dirPickerRight,
-                        batchDialog.m_directoryRight) {}
+                     batchDialog.m_dirPickerRight,
+                     batchDialog.m_directoryRight) {}
 
     void setValues(const Zstring& leftDir, const Zstring& rightDir, AltSyncCfgPtr syncCfg, const FilterConfig& filter)
     {
@@ -213,10 +213,10 @@ void BatchDialog::init()
     new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
                         this,
                         m_panelOverview,
-                       m_panelLogging,
-                       m_staticText56,
-                       m_staticText44,
-                       m_bitmap27); //ownership passed to "this"
+                        m_panelLogging,
+                        m_staticText56,
+                        m_staticText44,
+                        m_bitmap27); //ownership passed to "this"
 #endif
 
     wxWindowUpdateLocker dummy(this); //avoid display distortion

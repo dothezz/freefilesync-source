@@ -1,0 +1,906 @@
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
+%x / %y objects deleted successfully
+%x / %y objets supprimés avec succès
+%x Bytes
+%x Bytes
+%x GB
+%x GB
+%x MB
+%x MB
+%x PB
+%x PB
+%x TB
+%x TB
+%x day(s)
+%x ημέρα/ημέρες
+%x directories
+%x υποκατάλογοι
+%x files
+%x αρχεία
+%x hour(s)
+%x ώρα/ώρες
+%x kB
+%x kB
+%x min
+%x λεπτό/λεπτά
+%x of %y rows in view
+%x από τις %y φανερές γραμμές
+%x of 1 row in view
+%x από τη 1 φανερή γραμμή
+%x sec
+%x δ/λεπτα
+%x%
+%x%
+&Abort
+&Άκυρο
+&About...
+&Σχετικά...
+&Advanced
+&Για προχωρημένους
+&Cancel
+&Άκυρο
+&Check for new version
+&Έλεγχος για νέα έκδοση
+&Content
+&Περιεχόμενα
+&Create batch job...
+&Δημιουργία μιας δέσμης ενεργειών...
+&Default
+&Προεπιλογή
+&Exit
+&Έξοδος
+&Export file list...
+&Εξαγωγή καταλόγου αρχείων...
+&File
+&Αρχείο
+&Find next
+&Εύρεση επομένου
+&Global settings...
+&Γενικές ρυθμίσεις...
+&Help
+&Βοήθεια
+&Ignore
+&Παράβλεψη
+&Language
+&Γλώσσα
+&Load
+&Άνοιγμα
+&Load configuration...
+&Άνοιγμα διάταξης...
+&New
+&Δημιουργία
+&No
+&Όχι
+&OK
+&OK
+&Pause
+&Παύση
+&Program
+&Πρόγραμμα
+&Quit
+&Έξοδος
+&Restore
+&Επαναφορά
+&Retry
+&Επανάληψη
+&Save
+&Αποθήκευση
+&Switch
+&Εναλλαγή
+&Yes
+&Ναι
+(Build: %x)
+(Δημιουργήθηκε : %x)
+(Requires an Internet connection!)
+(Απαιτεί σύνδεση με το Internet)
+- Other side's counterpart to %dir
+- Ο αντίστοιχος %dir της άλλης πλευράς
+- Other side's counterpart to %name
+- Το αντίστοιχο %name της άλλης πλευράς
+- conflict
+- διένεξη
+- conflict (same date, different size)
+- διένεξη (ίδια ημερομηνία, διαφορετικό μέγεθος)
+- different
+- διαφορετικά
+- directory part only
+- μόνο τους υποκαταλόγους
+- equal
+- ίδια
+- exists left only
+- υπάρχει μόνο στα αριστερά
+- exists right only
+- υπάρχει μόνο στα δεξιά
+- full file or directory name
+- πλήρες όνομα του αρχείου ή υποκαταλόγου
+- left
+- αριστερά
+- left newer
+- αριστερά πιο πρόσφατο
+- right
+- δεξιά
+- right newer
+- δεξιά πιο πρόσφατο
+/sec
+/δευτερόλεπτο
+1 directory
+1 υποκατάλογος
+1 file
+1 αρχείο
+1. &Compare
+1. &Σύγκριση
+1. Enter relative file or directory names separated by ';' or a new line.
+1. Εισάγετε τα σχετικά ονόματα των αρχείων ή των υποκαταλόγων χωρισμένα με ';' ή με αλλαγή γραμμής.
+1. Select directories to monitor.
+1. Επιλέξτε τους υποκαταλόγους που θα παρακολουθούνται.
+2. &Synchronize...
+2. &Συγχρονισμός...
+2. Enter a command line.
+2. Εισάγετε μια γραμμή εντολών.
+2. Use wildcard characters '*' and '?'.
+2. Μπορείτε να χρησιμοποιήσετε τους χαρακτήρες-μπαλαντέρ '*' και '?'.
+3. Exclude files directly on main grid via context menu.
+3. Μπορείτε να εξαιρέσετε αρχεία στη βασική οθόνη κάνοντας δεξί κλικ.
+3. Press 'Start'.
+3. Πατήστε το 'Έναρξη'.
+<Automatic>
+<Αυτόματα>
+<Directory>
+<Υποκατάλογος>
+<Last session>
+<Τελευταία χρήση>
+<Symlink>
+<Συμβολικός δεσμός>
+<multiple selection>
+<πολλαπλή επιλογή>
+A newer version of FreeFileSync is available:
+Μια νεότερη έκδοση του FreeFileSync είναι διαθέσιμη:
+Abort requested: Waiting for current operation to finish...
+Ζητήθηκε ματαίωση: Αναμονή για την λήξη της τρέχουσας εργασίας...
+Abort synchronization immediately
+Άμεση ματαίωση του συγχρονισμού
+Aborted
+Ματαιώθηκε
+About
+Σχετικά με
+Action
+Ενέργεια
+Add folder
+Προσθήκη υποκαταλόγου
+Add folder pair
+Προσθήκη ζεύγους υποκαταλόγων
+All directories in sync!
+Όλοι οι υποκατάλογοι είναι συγχρονισμένοι!
+An exception occurred!
+Παρουσιάστηκε σφάλμα!
+As a result the files are separated into the following categories:
+Ως αποτέλεσμα, τα αρχεία χωρίζονται στις εξής κατηγορίες:
+As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
+Όπως λέει και ο τίτλος, δύο αρχεία που έχουν το ίδιο όνομα θεωρούνται ίδια μόνο και μόνον εάν έχουν το ίδιο περιεχόμενο. Αυτή η επιλογή είναι χρήσιμη για έλεγχο αξιοπιστίας παρά για αντίγραφα ασφαλείας. Επομένως οι ημερομηνίες των αρχείων δε λαμβάνονται υπόψη καθόλου.\n\nΜε αυτήν την επιλογή το δένδρο απόφασης είναι μικρότερο:
+Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
+Δημιουργία ενός αρχείου δέσμης ενεργειών για αυτόματο συγχρονισμό. Για την έναρξη σε λειτουργία δέσμης, δώστε το όνομα του αρχείου στο εκτελέσιμο του FreeFileSync: FreeFileSync.exe <αρχείο δέσμης>. Αυτή η λειτουργία μπορεί να προγραμματιστεί και στο χρονοδιάγραμμα εργασιών του λειτουργικού σας συστήματος.
+At least one directory input field is empty.
+Τουλάχιστον ένα από πεδία εισόδου είναι κενό.
+Auto-adjust columns
+Αυτόματη προσαρμογή των στηλών
+Batch execution
+Εκτέλεση δέσμης ενεργειών
+Batch file created successfully!
+Το αρχείο δέσμης ενεργειών δημιουργήθηκε επιτυχώς!
+Batch job
+Δέσμη ενεργειών
+Big thanks for localizing FreeFileSync goes out to:
+Για τις μεταφράσεις του FreeFileSync, ευχαριστούμε τους:
+Both sides have changed since last synchronization!
+Και οι δυο πλευρές έχουν αλλάξει από τον τελευταίο συγχρονισμό!
+Browse
+Αναζήτηση
+Browse directory
+Αναζήτηση υποκαταλόγου
+Cannot determine sync-direction:
+Δεν μπορεί να προσδιοριστεί η κατεύθυνση συγχρονισμού:
+Cannot find %x
+Δεν μπορεί να βρεθεί το %x
+Category
+Κατηγορία
+Clear filter settings
+Διαγραφή όλων των επιλογών φίλτρου
+Comma separated list
+Κατάλογος οριοθετημένος με κόμματα
+Command line
+Γραμμή εντολών
+Command line is empty!
+Η γραμμή εντολών είναι κενή!
+Compare
+Σύγκριση
+Compare both sides
+Σύγκριση των δύο πλευρών
+Compare by \"File content\"
+Σύγκριση με βάση το \"Περιεχόμενο αρχείων\"
+Compare by \"File size and date\"
+Σύγκριση με βάση το \"Μέγεθος και Ημερομηνία αρχείων\"
+Compare by...
+Σύγκριση με βάση το...
+Comparing content of files %x
+Σύγκριση του περιεχομένου των αρχείων %x
+Comparing content...
+Σύγκριση του περιεχομένου...
+Comparing files by content failed.
+Η σύγκριση του περιεχομένου των αρχείων απέτυχε.
+Comparison Result
+Αποτέλεσμα της σύγκρισης
+Comparison settings
+Ρυθμίσεις σύγκρισης
+Completed
+Ολοκληρώθηκε
+Configuration
+Διάταξη
+Configuration loaded!
+Η διάταξη έχει ανοιχθεί!
+Configuration overview:
+Σύνοψη της διάταξης:
+Configuration saved!
+Η διάταξη αποθηκεύτηκε!
+Configure filter
+Ρύθμιση του φίλτρου
+Configure your own synchronization rules.
+Ορίστε τους δικούς σας κανόνες συγχρονισμού.
+Confirm
+Επιβεβαίωση
+Conflict detected:
+Ανιχνεύθηκε διένεξη:
+Conflicts/files that cannot be categorized
+Διενέξεις/αρχεία που δεν μπορούν να κατηγοριοποιηθούν
+Continue
+Συνέχεια
+Conversion error:
+Σφάλμα μετατροπής:
+Copy attributes only from left to right
+Αντιγραφή των χαρακτηριστικών αρχείου μόνο από τα αριστερά προς τα δεξιά
+Copy attributes only from right to left
+Αντιγραφή των χαρακτηριστικών αρχείου μόνο από τα δεξιά προς τα αριστερά
+Copy filesystem permissions
+Αντιγραφή των αδειών των αρχείων
+Copy from left to right
+Αντιγραφή από τα αριστερά προς τα δεξιά
+Copy from left to right overwriting
+Αντιγραφή από τα αριστερά προς τα δεξιά με αντικατάσταση
+Copy from right to left
+Αντιγραφή από τα δεξιά προς τα αριστερά
+Copy from right to left overwriting
+Αντιγραφή από τα δεξιά προς τα αριστερά με αντικατάσταση
+Copy locked files
+Αντιγραφή κλειδωμένων αρχείων
+Copy new or updated files to right folder.
+Αντιγραφή των νέων ή πιο πρόσφατων αρχείων στον υποκατάλογο δεξιά.
+Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
+Αντιγραφή κλειδωμένων ή διαμοιρασμένων αρχείων με την υπηρεσία Volume Shadow Copy\n(απαιτεί δικαιώματα Administrator)
+Copy to clipboard\tCTRL+C
+Αντιγραφή στο πρόχειρο\tCTRL+C
+Copying new Symbolic Link %x to %y
+Αντιγραφή του νέου Συμβολικού Δεσμού %x στο %y
+Copying new file %x to %y
+Αντιγραφή του νέου αρχείου %x στο %y
+Could not determine volume name for file:
+Δεν ήταν δυνατό να προσδιοριστεί το όνομα τόμου για το αρχείο:
+Could not initialize directory monitoring:
+Δεν ήταν δυνατό να γίνει έναρξη παρακολούθησης του υποκαταλόγου:
+Could not load a required DLL:
+Δεν φορτώθηκε μια απαιτούμενη βιβλιοθήκη DLL:
+Could not read values for the following XML nodes:
+Δεν αναγνώστηκαν τιμές για τους ακόλουθους κόμβους XML:
+Create a batch job
+Δημιουργία μιας δέσμης ενεργειών
+Creating folder %x
+Δημιουργία του υποκαταλόγου %x
+Custom
+Εξατομίκευση
+Customize columns
+Εξατομίκευση στηλών
+Customize...
+Εξατομίκευση...
+D-Click
+Διπλό κλικ
+DECISION TREE
+ΔΕΝΔΡΟ ΑΠΟΦΑΣΗΣ
+Data verification error: Source and target file have different content!
+Σφάλμα επικύρωσης δεδομένων: Τα αρχεία προέλευσης και προορισμού έχουν διαφορετικό περιεχόμενο!
+Date
+Ημερομηνία
+Delete files/folders existing on left side only
+Διαγραφή των αρχείων/υποκαταλόγων που υπάρχουν μόνο στα αριστερά
+Delete files/folders existing on right side only
+Διαγραφή των αρχείων/υποκαταλόγων που υπάρχουν μόνο στα δεξιά
+Delete files\tDEL
+Διαγραφή αρχείων\tDEL
+Delete on both sides
+Διαγραφή και στις δυο πλευρές
+Delete on both sides even if the file is selected on one side only
+Διαγραφή και στις δυο πλευρές, ακόμα κι αν το αρχείο έχει επιλεχθεί μόνο στη μια πλευρά
+Delete or overwrite files permanently
+Μόνιμη διαγραφή ή αντικατάσταση των αρχείων
+Delete permanently
+Μόνιμη διαγραφή
+Deleting Symbolic Link %x
+Διαγραφή του Συμβολικού Δεσμού %x
+Deleting file %x
+Διαγραφή του αρχείου %x
+Deleting folder %x
+Διαγραφή του υποκαταλόγου %x
+Deletion handling
+Διαχείριση των διαγραφών
+Description
+Περιγραφή
+Direct
+Ως δεσμό
+Directories are dependent! Be careful when setting up synchronization rules:
+Οι υποκατάλογοι είναι εξαρτώμενοι. Προσοχή κατά την εισαγωγή των κανόνων συγχρονισμού:
+Directories to watch
+Υποκατάλογοι για παρακολούθηση
+Directory
+Υποκατάλογος
+Directory does not exist:
+Ο υποκατάλογος δεν υπάρχει:
+Do not show this dialog again
+Να μην εμφανιστεί ξανά αυτό το μήνυμα
+Do nothing
+Καμία ενέργεια
+Do you really want to delete the following object(s)?
+Είστε σίγουροι ότι θέλετε να διαγράψετε τα ακόλουθα στοιχεία;
+Do you really want to move the following object(s) to the Recycle Bin?
+Είστε σίγουροι ότι θέλετε να μεταφέρετε τα ακόλουθα στοιχεία στον Κάδο Ανακύκλωσης;
+Do you want FreeFileSync to automatically check for updates every week?
+Θέλετε το FreeFileSync να ελέγχει αυτόματα για ενημερώσεις κάθε εβδομάδα;
+Donate with PayPal
+Κάντε μια δωρεά μέσω PayPal
+Download now?
+Λήψη τώρα;
+Drag && drop
+Μεταφορά && Απόθεση
+Elements found:
+Βρέθηκαν στοιχεία:
+Elements processed:
+Επεξεργάστηκαν στοιχεία:
+Elements remaining:
+Περισσεύουν στοιχεία:
+Email
+Email
+Encoding extended time information: %x
+Κωδικοποίηση εκτεταμένων πληροφοριών για την ώρα: %x
+Endless loop when traversing directory:
+Ατέρμονος βρόχος κατά την την ανάλυση του υποκαταλόγου: 
+Error
+Σφάλμα
+Error changing modification time:
+Σφάλμα κατά την αλλαγή της ώρας τροποποίησης:
+Error copying file permissions:
+Σφάλμα κατά την αντιγραφή των αδειών των αρχείων:
+Error copying file:
+Σφάλμα κατά την αντιγραφή του αρχείου:
+Error copying locked file %x!
+Σφάλμα κατά την αντιγραφή του κλειδωμένου αρχείου %x !
+Error copying symbolic link:
+Σφάλμα κατά την αντιγραφή του συμβολικού δεσμού:
+Error creating directory:
+Σφάλμα κατά τη δημιουργία του υποκαταλόγου:
+Error deleting directory:
+Σφάλμα κατά τη διαγραφή του υποκαταλόγου:
+Error deleting file:
+Σφάλμα κατά τη διαγραφή του αρχείου:
+Error handling
+Διαχείριση σφαλμάτων
+Error loading library function:
+Σφάλμα κατά τη φόρτωση της συνάρτησης βιβλιοθήκης:
+Error moving directory:
+Σφάλμα κατά τη μεταφορά του υποκαταλόγου:
+Error moving file:
+Σφάλμα κατά τη μεταφορά του αρχείου:
+Error moving to Recycle Bin:
+Σφάλμα κατά τη μεταφορά στον Κάδο Ανακύκλωσης:
+Error opening file:
+Σφάλμα κατά το άνοιγμα του αρχείου:
+Error parsing configuration file:
+Σφάλμα κατά την ανάλυση του αρχείου διάταξης:
+Error reading file attributes:
+Σφάλμα κατά την ανάγνωση των χαρακτηριστικών του αρχείου:
+Error reading file:
+Σφάλμα κατά την ανάγνωση του αρχείου:
+Error reading from synchronization database:
+Σφάλμα κατά την ανάγνωση από τη βάση δεδομένων συγχρονισμού:
+Error reading security context:
+Σφάλμα κατά την ανάγνωση του πλαισίου ασφαλείας:
+Error resolving symbolic link:
+Σφάλμα κατά την επίλυση του συμβολικού δεσμού:
+Error setting directory lock:
+Σφάλμα κατά το κλείδωμα του υποκαταλόγου:
+Error setting privilege:
+Σφάλμα κατά τον ορισμό δικαιωμάτων:
+Error starting Volume Shadow Copy Service!
+Σφάλμα κατά την έναρξη της υπηρεσίας Volume Shadow Copy!
+Error traversing directory:
+Σφάλμα κατά την ανάλυση του υποκαταλόγου:
+Error when monitoring directories.
+Σφάλμα κατά την παρακολούθηση υποκαταλόγων.
+Error writing file:
+Σφάλμα κατά την εγγραφή του αρχείου:
+Error writing security context:
+Σφάλμα κατά την εγγραφή του πλαισίου ασφάλειας:
+Error writing to synchronization database:
+Σφάλμα κατά την εγγραφή στη βάση δεδομένων συγχρονισμού:
+Example
+Παράδειγμα
+Exclude
+Εξαίρεση
+Exclude all rows
+Εξαίρεση όλων των γραμμών
+Exclude temporarily
+Προσωρινή εξαίρεση
+Exclude via filter:
+Εξαίρεση με βάση το φίλτρο:
+Exit instantly
+Άμεση έξοδος
+Extension
+Επέκταση
+External applications
+Εξωτερικές εφαρμογές
+Fatal Error
+Σημαντικό Σφάλμα
+Feedback and suggestions are welcome at:
+Σχόλια και προτάσεις είναι ευπρόσδεκτα στα:
+File %x has an invalid date!
+Το αρχείο %x δεν έχει έγκυρη ημερομηνία!
+File already exists. Overwrite?
+Το αρχείο υπάρχει ήδη. Να αντικατασταθεί;
+File content
+Περιεχόμενο αρχείων
+File does not exist:
+Το αρχείο δεν υπάρχει:
+File list exported!
+Ο κατάλογος των αρχείων έχει εξαχθεί!
+File size and date
+Μέγεθος και ημερομηνία αρχείων
+Filename
+Όνομα αρχείου
+Files %x have the same date but a different size!
+Τα αρχεία %x έχουν την ίδια ημερομηνία αλλά διαφορετικό μέγεθος!
+Files are found equal if\n     - file content\nis the same
+Τα αρχεία θεωρούνται ίδια, εάν\n     - το περιεχόμενό τους\nείναι ίδιο.
+Files are found equal if\n     - filesize\n     - last write time and date\nare the same
+Τα αρχεία θεωρούνται ίδια, εάν\n     - το μέγεθός τους\n     - η ημερομηνία και ώρα τελευταίας τροποποίησης\nείναι ίδια.
+Files that are equal on both sides
+Αρχεία ίδια και στις δυο πλευρές
+Files that exist on both sides, left one is newer
+Αρχεία που υπάρχουν και στις δυο πλευρές, αριστερά είναι πιο πρόσφατα
+Files that exist on both sides, right one is newer
+Αρχεία που υπάρχουν και στις δυο πλευρές, δεξιά είναι πιο πρόσφατα
+Files that have different content
+Αρχεία που έχουν διαφορετικό περιεχόμενο
+Files/folders that differ in attributes only
+Αρχεία/υποκατάλογοι που διαφέρουν μόνο στα χαρακτηριστικά αρχείου
+Files/folders that exist on left side only
+Αρχεία/υποκατάλογοι που υπάρχουν μόνο στα αριστερά
+Files/folders that exist on right side only
+Αρχεία/υποκατάλογοι που υπάρχουν μόνο στα δεξιά
+Filter files
+Φιλτράρισμα
+Filter is active
+Το φίλτρο είναι ενεργό
+Filter settings have changed!
+Οι ρυθμίσεις φίλτρου έχουν αλλάξει!
+Filter view
+Επιλογή εμφάνισης
+Filter: All pairs
+Φίλτρο: Όλα τα ζεύγη
+Filter: Single pair
+Φίλτρο: Ένα ζεύγος
+Find
+Αναζήτηση
+Find what:
+Αναζήτηση του:
+Folder Comparison and Synchronization
+Σύγκριση υποκαταλόγων και Συγχρονισμός
+Folder pairs
+Ζεύγη υποκαταλόγων
+Follow
+Ως περιεχόμενο
+Free disk space available:
+Espace disque disponible :
+FreeFileSync Batch Job
+FreeFileSync Δέσμη Ενεργειών
+FreeFileSync at Sourceforge
+Το FreeFileSync στο Sourceforge
+FreeFileSync batch file
+FreeFileSync αρχείο δέσμης
+FreeFileSync configuration
+Αρχείο διάταξης FreeFileSync 
+FreeFileSync is up to date!
+Το FreeFileSync είναι ενημερωμένο!
+Full path
+Πλήρης διαδρομή
+Generating database...
+Δημιουργία βάσης δεδομένων...
+Generating file list...
+Δημιουργία καταλόγου αρχείων...
+Global settings
+Γενικές ρυθμίσεις
+Help
+Βοήθεια
+Hidden dialogs:
+Κρυμμένα παράθυρα διαλόγου:
+Hide all error and warning messages
+Απόκρυψη όλων των σφαλμάτων και προειδοποιήσεων
+Hide conflicts
+Απόκρυψη διενέξεων
+Hide excluded items
+Απόκρυψη των εξαιρεθέντων στοιχείων
+Hide files that are different
+Απόκρυψη των αρχείων που είναι διαφορετικά
+Hide files that are equal
+Απόκρυψη των αρχείων που είναι ίδια
+Hide files that are newer on left
+Απόκρυψη των αρχείων που είναι πιο πρόσφατα στα αριστερά
+Hide files that are newer on right
+Απόκρυψη των αρχείων που είναι πιο πρόσφατα στα δεξιά
+Hide files that exist on left side only
+Απόκρυψη των αρχείων που υπάρχουν μόνο στα αριστερά
+Hide files that exist on right side only
+Απόκρυψη των αρχείων που υπάρχουν μόνο στα δεξιά
+Hide files that will be created on the left side
+Απόκρυψη των αρχείων που θα δημιουργηθούν στα αριστερά
+Hide files that will be created on the right side
+Απόκρυψη των αρχείων που θα δημιουργηθούν στα δεξιά
+Hide files that will be deleted on the left side
+Απόκρυψη των αρχείων που θα διαγραφούν στα αριστερά
+Hide files that will be deleted on the right side
+Απόκρυψη των αρχείων που θα διαγραφούν στα δεξιά
+Hide files that will be overwritten on left side
+Απόκρυψη των αρχείων που θα αντικατασταθούν στα αριστερά
+Hide files that will be overwritten on right side
+Απόκρυψη των αρχείων που θα αντικατασταθούν στα δεξιά
+Hide files that won't be copied
+Απόκρυψη των αρχείων που δε θα αντιγραφούν
+Hide filtered or temporarily excluded files
+Απόκρυψη των αρχείων που φιλτραρίστηκαν ή εξαιρέθηκαν προσωρινά
+Hide further error messages during the current process
+Απόκρυψη επόμενων μηνυμάτων σφάλματος στην τρέχουσα διαδικασία
+Hints:
+Συμβουλές:
+Homepage
+Ιστοσελίδα
+Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
+Ανίχνευση και εφαρμογή των αλλαγών και στις δυο πλευρές με τη χρήση βάσης δεδομένων. Διαγραφές και διενέξεις ανιχνεύονται αυτόματα.
+Idle time between detection of last change and execution of command line in seconds
+Χρόνος αναμονής μεταξύ της ανίχνευσης της τελευταίας αλλαγής και της εκτέλεσης της γραμμής εντολών [δευτερόλεπτα]
+If you like FFS
+Αν σας αρέσει το FFS
+Ignore
+Παράβλεψη
+Ignore errors
+Παράβλεψη των σφαλμάτων
+Ignore subsequent errors
+Παράβλεψη των επόμενων σφαλμάτων
+Include
+Συμπερίληψη
+Include all rows
+Συμπερίληψη όλων των γραμμών
+Include temporarily
+Προσωρινή συμπερίληψη
+Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
+Συμπερίληψη: *.doc;*.zip;*.exe\nΕξαίρεση: \\temp\\*
+Incompatible synchronization database format:
+Η μορφή της βάσης δεδομένων συγχρονισμού δεν είναι συμβατή:
+Info
+Πληροφορία
+Information
+Πληροφορία
+Initial synchronization:
+Αρχικός συγχρονισμός:
+Integrate external applications into context menu. The following macros are available:
+Ένταξη εξωτερικών εφαρμογών στο μενού περιβάλλοντος. Οι ακόλουθες μακροεντολές είναι διαθέσιμες:
+Invalid FreeFileSync config file!
+Μη έγκυρο αρχείο διάταξης του FreeFileSync!
+Leave as unresolved conflict
+Παράβλεψη ως ανεπίλυτη διένεξη
+Left
+Αριστερά
+Legend
+Εξήγηση των συμβόλων για κάθε κατηγορία
+Load configuration from file
+Άνοιγμα διάταξης από αρχείο
+Load configuration history (press DEL to delete items)
+Άνοιγμα του ιστορικού των διατάξεων (πατήστε DEL για να σβήσετε καταχωρήσεις)
+Log-messages:
+Αποθηκευμένα μηνύματα:
+Logging
+Καταγραφή μηνυμάτων
+Main bar
+Γραμμή εργαλείων
+Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
+Δεν είναι δυνατή η δημιουργία σκιώδους αντίγραφου σε WOW64. Χρησιμοποιείστε την 64-bit έκδοση του FreeFileSync.
+Match case
+Αντιστοίχιση πεζών-κεφαλαίων
+Minimum Idle Time [seconds]
+Ελάχιστος Χρόνος Αναμονής [δευτερόλεπτα]
+Mirror ->>
+Κατοπτρισμός ->>
+Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
+Κατοπτρικό αντίγραφο του αριστερού υποκαταλόγου: Ο υποκατάλογος δεξιά θα αντικατασταθεί και θα αντιστοιχεί εξολοκλήρου στον αριστερό μετά το συγχρονισμό.
+Monitoring active...
+Ενεργή παρακολούθηση...
+More than 50% of the total number of files will be copied or deleted!
+Περισσότερα από το 50% των αρχείων θα αντιγραφούν ή διαγραφούν!
+Move column down
+Μετακίνηση της στήλης κάτω
+Move column up
+Μετακίνηση της στήλης πάνω
+Move files into a time-stamped subdirectory
+Μεταφορά των αρχείων σε έναν υποκατάλογο με ένδειξη ώρας
+Moving %x to Recycle Bin
+Μεταφορά του %x στον Κάδο Ανακύκλωσης
+Moving Symbolic Link %x to user-defined directory %y
+Μεταφορά του Συμβολικού Δεσμού %x στον υποκατάλογο %y που ορίστηκε από το χρήστη
+Moving file %x to user-defined directory %y
+Μεταφορά του αρχείου %x στον υποκατάλογο %y που ορίστηκε από το χρήστη
+Moving folder %x to user-defined directory %y
+Μεταφορά του υποκαταλόγου %x στον υποκατάλογο %y που ορίστηκε από το χρήστη
+Multiple...
+Πολλαπλές ρυθμίσεις...
+No change since last synchronization!
+Καμία αλλαγή από τον προηγούμενο συγχρονισμό!
+No filter selected
+Δεν έχει επιλεχθεί φίλτρο
+Not enough free disk space available in:
+Δεν υπάρχει αρκετός διαθέσιμος χώρος στο δίσκο:
+Nothing to synchronize according to configuration!
+Τίποτα προς συγχρονισμό με βάση τη διάταξη!
+Number of files and directories that will be created
+Αριθμός αρχείων και υποκαταλόγων που θα δημιουργηθούν
+Number of files and directories that will be deleted
+Αριθμός αρχείων και υποκαταλόγων που θα διαγραφούν
+Number of files that will be overwritten
+Αριθμός αρχείων και υποκαταλόγων που θα αντικατασταθούν
+One of the FreeFileSync database entries within the following file is not yet existing:
+Μια από τις εγγραφές στη βάση δεδομένων του FreeFileSync σχετικά με το ακόλουθο αρχείο δεν υπάρχει ακόμη:
+One of the FreeFileSync database files is not yet existing:
+Μια από τις βάσεις δεδομένων του FreeFileSync δεν υπάρχει ακόμα:
+Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
+Μόνο όσα αρχεία/υποκατάλογοι έχουν περάσει το φίλτρο θα επιλεχθούν για συγχρονισμό. Το φίλτρο θα εφαρμοστεί στο όνομα, πάντα σε σχέση(!) με τους βασικούς υποκαταλόγους συγχρονισμού.
+Open with Explorer
+Άνοιγμα με την Εξερεύνηση
+Open with default application
+Άνοιγμα με την προεπιλεγμένη εφαρμογή
+Operation aborted!
+Η λειτουργία ματαιώθηκε!
+Operation:
+Λειτουργία:
+Overview
+Σύνοψη
+Overwriting Symbolic Link %x in %y
+Αντικατάσταση του Συμβολικού Δεσμού %x στο %y
+Overwriting file %x in %y
+Αντικατάσταση του αρχείου %x στο %y
+Pause
+Παύση
+Paused
+Σε παύση
+Planned directory deletion is in conflict with its subdirectories and -files!
+Η διαγραφή του επιλεγμένου καταλόγου είναι σε διένεξη με τους υποκαταλόγους και τα -αρχεία του!
+Please run a Compare first before synchronizing!
+Παρακαλώ εκτελέστε πρώτα Σύγκριση πριν το Συγχρονισμό!
+Press \"Switch\" to open FreeFileSync GUI mode.
+Πατήστε \"Εναλλαγή\" για να ανοίξετε το γραφικό περιβάλλον του FreeFileSync
+Processing folder pair:
+Σύγκριση του ζεύγους υποκαταλόγων:
+Published under the GNU General Public License:
+Διανέμεται υπό την Γενική Άδεια Δημόσιας Χρήσης GNU:
+Question
+Ερώτηση
+Re-enable all hidden dialogs?
+Επανεμφάνιση όλων των κρυμμένων παραθύρων διαλόγου;
+RealtimeSync - Automated Synchronization
+RealtimeSync - Αυτοματοποιημένος Συγχρονισμός
+RealtimeSync configuration
+Διαμόρφωση του RealtimeSync
+Recycle Bin not yet supported for this system!
+Ο Κάδος Ανακύκλωσης δεν υποστηρίζεται σε αυτό το σύστημα!
+Relative path
+Σχετική διαδρομή
+Remove alternate settings
+Απομάκρυνση των διαφοροποιημένων ρυθμίσεων
+Remove folder
+Διαγραφή του υποκαταλόγου
+Remove folder pair
+Διαγραφή του ζεύγους υποκαταλόγων
+Report translation error
+Αναφέρετε λάθη μετάφρασης
+Reset
+Επανεμφάνιση
+Reset view
+Επαναφορά αρχικής εμφάνισης
+Right
+Δεξιά
+S&ave configuration...
+Α&ποθήκευση διάταξης...
+S&witch view
+Α&λλαγή εμφάνισης
+Save changes to current configuration?
+Να αποθηκευτούν οι αλλαγές στην τρέχουσα διάταξη;
+Save current configuration to file
+Αποθήκευση της τρέχουσας διάταξης
+Scanning...
+Ανίχνευση...
+Scanning:
+Ανίχνευση:
+Select a folder
+Επιλογή υποκαταλόγου
+Select alternate synchronization settings
+Επιλογή διαφοροποιημένων ρυθμίσεων συγχρονισμού
+Select logfile directory:
+Επιλέξτε έναν κατάλογο για το αρχείο καταγραφής:
+Select variant:
+Επιλέξτε μια μέθοδο:
+Set direction:
+Επιλογή κατεύθυνσης:
+Setting default synchronization directions: Old files will be overwritten with newer files.
+Ρύθμιση προεπιλεγμένης κατεύθυνσης συγχρονισμού: Τα νεότερα αρχεία θα αντικαταστήσουν τα παλιότερα.
+Show \"%x\"
+Εμφάνιση της γραμμής \"%x\"
+Show conflicts
+Εμφάνιση διενέξεων
+Show files that are different
+Εμφάνιση των αρχείων που είναι διαφορετικά
+Show files that are equal
+Εμφάνιση των αρχείων που είναι ίδια
+Show files that are newer on left
+Εμφάνιση των αρχείων που είναι πιο πρόσφατα στα αριστερά
+Show files that are newer on right
+Εμφάνιση των αρχείων που είναι πιο πρόσφατα στα δεξιά
+Show files that exist on left side only
+Εμφάνιση των αρχείων που υπάρχουν μόνο στα αριστερά
+Show files that exist on right side only
+Εμφάνιση των αρχείων που υπάρχουν μόνο στα δεξιά
+Show files that will be created on the left side
+Εμφάνιση των αρχείων που θα δημιουργηθούν στα αριστερά
+Show files that will be created on the right side
+Εμφάνιση των αρχείων που θα δημιουργηθούν στα δεξιά
+Show files that will be deleted on the left side
+Εμφάνιση των αρχείων που θα διαγραφούν στα αριστερά
+Show files that will be deleted on the right side
+Εμφάνιση των αρχείων που θα διαγραφούν στα δεξιά
+Show files that will be overwritten on left side
+Εμφάνιση των αρχείων που θα αντικατασταθούν στα αριστερά
+Show files that will be overwritten on right side
+Εμφάνιση των αρχείων που θα αντικατασταθούν στα αριστερά
+Show files that won't be copied
+Εμφάνιση των αρχείων που δε θα αντιγραφούν
+Show hidden dialogs
+Επανεμφάνιση των κρυμμένων παραθύρων διαλόγου
+Show popup
+Εμφάνιση αναδυόμενου παράθυρου
+Show popup on errors or warnings
+Εμφάνιση αναδυόμενου παράθυρου σε σφάλματα ή προειδοποιήσεις
+Significant difference detected:
+Ανιχνεύθηκαν σημαντικές διαφορές:
+Silent mode
+Σιωπηλή λειτουργία
+Size
+Μέγεθος
+Source code written completely in C++ utilizing:
+Ο πηγαίος κώδικας γράφτηκε σε C++ με τη χρήση:
+Source directory does not exist anymore:
+Ο υποκατάλογος προέλευσης δεν υπάρχει πλέον:
+Speed:
+Ταχύτητα:
+Start
+Έναρξη
+Start minimized and write status information to a logfile
+Έναρξη σε ελαχιστοποίηση και εγγραφή πληροφοριών κατάστασης σε αρχείο καταγραφής.
+Start synchronization
+Έναρξη του συγχρονισμού
+Statistics
+Στατιστικά
+Status feedback
+Αναφορά κατάστασης
+Stop
+Λήξη
+Swap sides
+Ανταλλαγή πλευρών
+Switching to FreeFileSync GUI mode...
+Εναλλαγή στο γραφικό περιβάλλον του FreeFileSync...
+Symbolic Link handling
+Τρόπος διαχείρισης των συμβολικών δεσμών
+Symlinks %x have the same date but a different target!
+Οι συμβολικοί δεσμοί %x έχουν την ίδια ημερομηνία αλλά διαφορετικό προορισμό!
+Synchronization Preview
+Προεπισκόπηση του συγχρονισμού
+Synchronization aborted!
+Ο συγχρονισμός ματαιώθηκε!
+Synchronization completed successfully!
+Ο συγχρονισμός ολοκληρώθηκε επιτυχώς!
+Synchronization completed with errors!
+Ο συγχρονισμός ολοκληρώθηκε με σφάλματα!
+Synchronization settings
+Ρυθμίσεις συγχρονισμού
+Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
+Συγχρονισμός όλων των αρχείων .doc, .zip και .exe εκτός αυτών στον υποκατάλογο \"temp\".
+Synchronize...
+Συγχρονισμός...
+Synchronizing...
+Γίνεται συγχρονισμός...
+System out of memory!
+Ανεπαρκής μνήμη συστήματος!
+Target directory already existing!
+Ο υποκατάλογος προορισμού υπάρχει ήδη!
+Target file already existing!
+Το αρχείο προορισμού υπάρχει ήδη!
+The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
+Η γραμμή ενεργειών εκτελείται κάθε φορά που:\n- όλοι οι υποκατάλογοι γίνονται διαθέσιμοι (π.χ. εισαγωγή ενός USB stick)\n- κάποια αρχεία σε αυτούς τους καταλόγους ή υποκαταλόγους τους έχουν τροποποιηθεί
+The file does not contain a valid configuration:
+Το αρχείο δεν περιέχει μια έγκυρη διάταξη:
+The file was not processed by last synchronization!
+Το αρχείο δεν συμμετείχε στον τελευταίο συγχρονισμό!
+This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
+Με βάση αυτήν την επιλογή, δύο αρχεία που έχουν το ίδιο όνομα θεωρούνται ίδια, όταν έχουν το ίδιο μέγεθος ΚΑΙ ίδια ημέρα και ώρα τελευταίας τροποποίησης.
+Time
+Ώρα
+Time elapsed:
+Χρόνος που πέρασε:
+Time remaining:
+Χρόνος που απομένει:
+Total amount of data that will be transferred
+Συνολικός όγκος δεδομένων που θα μεταφερθούν
+Total required free disk space:
+Συνολικός απαιτούμενος χώρος στο δίσκο:
+Total time:
+Συνολική διάρκεια:
+Transfer file and directory permissions\n(Requires Administrator rights)
+Μεταφορά των αδειών για τα αρχεία και τους υποκαταλόγους\n(Απαιτεί δικαιώματα Aministrator)
+Unable to connect to sourceforge.net!
+Δεν είναι δυνατή η σύνδεση με το sourceforge.net!
+Unable to create logfile!
+Δεν είναι δυνατή η δημιουργία ενός αρχείου καταγραφής!
+Unresolved conflicts existing!
+Υπάρχουν ανεπίλυτες διενέξεις!
+Update ->
+Ενημέρωση ->
+Updating attributes of %x
+Ενημέρωση των χαρακτηριστικών αρχείου του %x
+Usage:
+Χρήση:
+Use Recycle Bin
+Χρήση του Κάδου Ανακύκλωσης
+Use Recycle Bin when deleting or overwriting files
+Χρήση του Κάδου Ανακύκλωσης κατά τη διαγραφή ή αντικατάσταση αρχείων
+User-defined directory
+Υποκατάλογος που ορίζεται από το χρήστη
+User-defined directory for deletion was not specified!
+Δεν ορίστηκε από τον χρήστη υποκατάλογος για τα αρχεία προς διαγραφή!
+Variant
+Μέθοδος
+Verifying file %x
+Επικύρωση του αρχείου %x
+Volume name %x not part of filename %y!
+Το όνομα τόμου %x δεν είναι μέρος του ονόματος του αρχείου %y!
+Waiting for missing directories...
+Αναμονή για τους υποκαταλόγους που απουσιάζουν...
+Waiting while directory is locked (%x)...
+Αναμονή μέχρι να κλειδωθεί ο υποκατάλογος (%x)...
+Warning
+Προσοχή
+Warning: Synchronization failed for %x item(s):
+Προσοχή: Ο συγχρονισμός απέτυχε σε %x στοιχείο/στοιχεία:
+When the comparison is started with this option set the following decision tree is processed:
+Εάν γίνει σύγκριση με αυτήν την επιλογή, ακολουθείται το παρακάτω δένδρο απόφασης:
+You can ignore conflicts and continue synchronization.
+Μπορείτε να αγνοήσετε τις διενέξεις και να συνεχίσετε το συγχρονισμό.
+You can ignore the error to consider not existing directories as empty.
+Μπορείτε να αγνοήσετε το σφάλμα, θεωρώντας ότι ο υποκατάλογος που δεν υπάρχει είναι κενός.
+You may try to synchronize remaining items again (WITHOUT having to re-compare)!
+Μπορείτε να προσπαθήσετε να συγχρονίσετε τα υπόλοιπα στοιχεία (ΧΩΡΙΣ να χρειάζεται να τα ξανασυγκρίνετε)!
+different
+διαφορετικά
+file exists on both sides
+Το αρχείο υπάρχει και στις δυο πλευρές
+on one side only
+το αρχείο υπάρχει μόνο στη μια πλευρά

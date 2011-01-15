@@ -1,14 +1,14 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef STATISTICS_H_INCLUDED
 #define STATISTICS_H_INCLUDED
 
 #include <vector>
-#include <list>
+#include <map>
 #include <memory>
 #include <wx/defs.h>
 
@@ -27,14 +27,14 @@ public:
     void writeEntry(const double value, const int objects);
 
 private:
-    struct statEntry
+    struct StatEntry
     {
         long time;
         int objects;
         double value;
     };
 
-    std::vector<statEntry> data;
+    std::vector<StatEntry> data;
     std::auto_ptr<wxStopWatch> timer;
 };
 
@@ -42,14 +42,14 @@ private:
 class Statistics
 {
 public:
-    Statistics(const int totalObjectCount,
-               const double totalDataAmount,
-               const unsigned windowSizeRemainingTime,   //time in ms
-               const unsigned windowSizeBytesPerSecond); //time in ms
+    Statistics(int totalObjectCount,
+               double totalDataAmount,
+               unsigned windowSizeRemainingTime,   //time in ms
+               unsigned windowSizeBytesPerSecond); //time in ms
 
     ~Statistics();
 
-    void addMeasurement(const int objectsCurrent, const double dataCurrent);
+    void addMeasurement(int objectsCurrent, double dataCurrent);
     wxString getRemainingTime() const; //returns the remaining time in milliseconds
     wxString getBytesPerSecond() const;
 
@@ -57,7 +57,7 @@ public:
     void resumeTimer();
 
 private:
-    wxString formatRemainingTime(const double timeInMs) const;
+    wxString formatRemainingTime(double timeInMs) const;
 
     const int      objectsTotal;
     const double   dataTotal;
@@ -68,14 +68,15 @@ private:
 
     mutable int remainingTimeLast; //used for "smoothening" remaining time
 
-    struct record
+    struct Record
     {
-        int    objects;
+        int objects; //object count
         double data; //unit: bytes
-        long   time; //unit: milliseconds
     };
 
-    std::list<record> measurements;
+    typedef std::multimap<long, Record> TimeRecordMap; //time, unit: milliseconds
+    TimeRecordMap measurements; //
+
     wxStopWatch* timer;
 };
 

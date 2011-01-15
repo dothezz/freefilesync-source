@@ -2,8 +2,8 @@
   MinGW \t- Windows port od GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI ogrodje\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %x / %y objektov uspešno izbrisanih
-%x Byte
-%x Bajt
+%x Bytes
+%x Bajtov
 %x GB
 %x GB
 %x MB
@@ -256,6 +256,10 @@ Continue
 Nadaljuj
 Conversion error:
 Napaka pri pretvorbi:
+Copy attributes only from left to right
+Kopiraj atribute samo iz leve na desno
+Copy attributes only from right to left
+Kopiraj atribute samo iz desne na levo
 Copy filesystem permissions
 Kopiraj dovoljenja datotečnega sistema
 Copy from left to right
@@ -472,6 +476,8 @@ Files that exist on both sides, right one is newer
 Datoteke, ki obstajajo na obeh straneh, desna je novejša
 Files that have different content
 Datoteke, ki imajo različno vsebino
+Files/folders that differ in attributes only
+Datoteke/mape, ki se razlikujejo samo v atributih
 Files/folders that exist on left side only
 Datoteke/mape, ki obstajajo samo na levi strani
 Files/folders that exist on right side only
@@ -494,6 +500,8 @@ Find what:
 Najdi kaj
 Folder Comparison and Synchronization
 Primerjava in sinhronizacija imenika
+Folder pairs
+Pari map
 Follow
 Sledi
 Free disk space available:
@@ -606,12 +614,14 @@ Log-messages:
 Sporočila beleženja:
 Logging
 Beležim
+Main bar
+Glavna vrstica
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Ustvarjanje senčnih kopij na WOW63 ni podprto. Prosimo uporabite 64-bitno FreeFileSync različico.
 Match case
 Ujemaj se s primerom
-Minimum Idle Time
-Minimalni čas nedejavnosti
+Minimum Idle Time [seconds]
+Minimalen čas nedejavnosti [sekunde]
 Mirror ->>
 Zrcalno ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 Objavljeno pod licenco GNU General Public:
 Question
 Vprašanje
-Quit
-Zapusti
 Re-enable all hidden dialogs?
 Ponovno omogočim skrite pogovore?
 RealtimeSync - Automated Synchronization
@@ -708,6 +716,8 @@ Report translation error
 Poročaj o napaki prevoda
 Reset
 Ponastavi
+Reset view
+Ponastavi pogled
 Right
 Desno
 S&ave configuration...
@@ -734,6 +744,8 @@ Set direction:
 Nastavi smer:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Nastavljanje privzetih smeri sinhronizacije: Stare datoteke bodo prepisane z novimi datotekami.
+Show \"%x\"
+Prikaži \"%x\"
 Show conflicts
 Prikaži spore
 Show files that are different
@@ -852,6 +864,8 @@ Unresolved conflicts existing!
 Obstajajo nerešeni spori!
 Update ->
 Posodobi ->
+Updating attributes of %x
+Posodabljam atribute od %x
 Usage:
 Uporaba:
 Use Recycle Bin
@@ -868,8 +882,8 @@ Verifying file %x
 Preverjam datoteko %x
 Volume name %x not part of filename %y!
 Ime volumna %x ni del imena datoteke %y!
-Waiting for all directories to become available...
-Čakam, da bodo vsi imeniki na voljo...
+Waiting for missing directories...
+Čakam na manjkajoče imenike...
 Waiting while directory is locked (%x)...
 Čakam, medtem ko se zaklepa imenik (%x)...
 Warning

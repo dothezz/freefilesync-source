@@ -2,7 +2,7 @@
   MinGW \t- Windows port din GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %x / %y obiecte șterse cu succes
-%x Byte
+%x Bytes
 %x Baiți
 %x GB
 %x GB
@@ -233,7 +233,7 @@ Rezultatul Comparării
 Comparison settings
 Setările Comparării
 Completed
-Terminată
+Sincronizare Terminată
 Configuration
 Configurație
 Configuration loaded!
@@ -256,6 +256,10 @@ Continue
 Continuă
 Conversion error:
 Eroare de convertire:
+Copy attributes only from left to right
+Copiază doar atributele de la stînga la dreapta
+Copy attributes only from right to left
+Copiază doar atributele de la dreapta la stînga
 Copy filesystem permissions
 Copiază permisiunile sistemului de file
 Copy from left to right
@@ -472,6 +476,8 @@ Files that exist on both sides, right one is newer
 File care există în ambele părți, cea din dreapta fiind mai nouă
 Files that have different content
 File care au conținut diferit
+Files/folders that differ in attributes only
+File sau dosare care diferă doar la atribute
 Files/folders that exist on left side only
 File sau dosare care există doar în partea stîngă
 Files/folders that exist on right side only
@@ -494,6 +500,8 @@ Find what:
 Găsește Asta:
 Folder Comparison and Synchronization
 Comparare și Sincronizare de Dosare
+Folder pairs
+Perechi de Dosare
 Follow
 Urmărește
 Free disk space available:
@@ -606,12 +614,14 @@ Log-messages:
 Mesaje de jurnalizare:
 Logging
 Jurnalizez
+Main bar
+Bara Principală
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Realizarea de copii de rezervă prin sistemul WOW64 nu este suportată. Folosește versiunea pe 64-biți a FreeFileSync.
 Match case
 Potrivește MAJ/min
-Minimum Idle Time
-Timp Minim de Inactivitate
+Minimum Idle Time [seconds]
+Timp Minim de Inactivitate [secunde]
 Mirror ->>
 Clonare =>>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 Publicat sub licența GNU GPL:
 Question
 Întrebare
-Quit
-Ieși
 Re-enable all hidden dialogs?
 Reactivezi casetele de dialog ascunse?
 RealtimeSync - Automated Synchronization
@@ -708,6 +716,8 @@ Report translation error
 Raportarea erorilor de traducere
 Reset
 Resetează
+Reset view
+Resetează Vederea
 Right
 Dreapta
 S&ave configuration...
@@ -734,6 +744,8 @@ Set direction:
 Setează Acțiunea ca în Icoana Alăturată:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Va fi setat sensul implicit de sincronizare: Filele vechi vor fi suprascrise de cele noi.
+Show \"%x\"
+Arată \"%x\"
 Show conflicts
 Arată conflictele
 Show files that are different
@@ -852,6 +864,8 @@ Unresolved conflicts existing!
 Există conflicte nerezolvate!
 Update ->
 Actualizare =>
+Updating attributes of %x
+Actualizez atributele lui %x
 Usage:
 Utilizare:
 Use Recycle Bin
@@ -868,8 +882,8 @@ Verifying file %x
 Verific fila %x
 Volume name %x not part of filename %y!
 Numele volumului %x nu face parte din numele filei %y !
-Waiting for all directories to become available...
-Aștept ca toate dosarele să devină disponibile...
+Waiting for missing directories...
+Aștept ca dosarele lipsă să devină disponibile...
 Waiting while directory is locked (%x)...
 Aștept ca dosarul să fie zăvorît (%x)...
 Warning

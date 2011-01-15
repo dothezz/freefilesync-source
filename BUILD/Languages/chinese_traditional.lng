@@ -2,8 +2,8 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %x / %y 個物件已删除成功
-%x Byte
-%x Byte
+%x Bytes
+%x 位元組
 %x GB
 %x GB
 %x MB
@@ -256,6 +256,10 @@ Continue
 繼續
 Conversion error:
 轉換錯誤：
+Copy attributes only from left to right
+複製只有從左邊到右邊的屬性
+Copy attributes only from right to left
+複製只有從右邊到左邊的屬性
 Copy filesystem permissions
 複製檔案系統權限
 Copy from left to right
@@ -472,6 +476,8 @@ Files that exist on both sides, right one is newer
 檔案存在於兩邊，右邊檔案較新
 Files that have different content
 具有不同內容的檔案
+Files/folders that differ in attributes only
+檔案/資料夾只有屬性不同
 Files/folders that exist on left side only
 只存在於左邊的檔案/資料夾
 Files/folders that exist on right side only
@@ -494,6 +500,8 @@ Find what:
 尋找內容：
 Folder Comparison and Synchronization
 資料夾比對和同步
+Folder pairs
+資料夾對
 Follow
 跟隨
 Free disk space available:
@@ -507,7 +515,7 @@ FreeFileSync 批次檔
 FreeFileSync configuration
 FreeFileSync 配置
 FreeFileSync is up to date!
-FreeFileSync 已是最新版本！
+FreeFileSync 已經是最新版本！
 Full path
 完整路徑
 Generating database...
@@ -606,12 +614,14 @@ Log-messages:
 日誌訊息：
 Logging
 日誌記錄
+Main bar
+主欄位
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 不支援製作 WOW64 上的卷影副本。請使用 FreeFileSync 64位元版本。
 Match case
 區分大小寫
-Minimum Idle Time
-最小閒置時間
+Minimum Idle Time [seconds]
+最小閒置時間 [秒]
 Mirror ->>
 鏡像 ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 在GNU通用公共許可證下發佈：
 Question
 問題
-Quit
-離開
 Re-enable all hidden dialogs?
 重新啟用所有隱藏的對話框嗎？
 RealtimeSync - Automated Synchronization
@@ -708,6 +716,8 @@ Report translation error
 回報翻譯錯誤
 Reset
 重置
+Reset view
+重置檢視
 Right
 右邊
 S&ave configuration...
@@ -734,6 +744,8 @@ Set direction:
 設定方向：
 Setting default synchronization directions: Old files will be overwritten with newer files.
 設定預設同步方向：舊檔案會被較新的檔案覆蓋。
+Show \"%x\"
+顯示 \"%x\"
 Show conflicts
 顯示衝突
 Show files that are different
@@ -852,6 +864,8 @@ Unresolved conflicts existing!
 存在未解決的衝突！
 Update ->
 更新 ->
+Updating attributes of %x
+更新 %x 個的屬性
 Usage:
 使用量：
 Use Recycle Bin
@@ -868,8 +882,8 @@ Verifying file %x
 驗證檔 %x
 Volume name %x not part of filename %y!
 卷名 %x 並非檔名 %y 的一部份！
-Waiting for all directories to become available...
-等待所有目錄變為可用...
+Waiting for missing directories...
+等待缺少的目錄...
 Waiting while directory is locked (%x)...
 等待目錄被鎖定(%x)...
 Warning

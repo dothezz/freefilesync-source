@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "db_file.h"
@@ -29,7 +29,7 @@ namespace
 {
 //-------------------------------------------------------------------------------------------------------------------------------
 const char FILE_FORMAT_DESCR[] = "FreeFileSync";
-const int FILE_FORMAT_VER = 4;
+const int FILE_FORMAT_VER = 5;
 //-------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -40,11 +40,10 @@ public:
         FileInputStream(filename)
     {
         //read FreeFileSync file identifier
-        char formatDescr[sizeof(FILE_FORMAT_DESCR)];
+        char formatDescr[sizeof(FILE_FORMAT_DESCR)] = {};
         Read(formatDescr, sizeof(formatDescr)); //throw (FileError)
-        formatDescr[sizeof(formatDescr) - 1] = 0;
 
-        if (std::string(formatDescr) != FILE_FORMAT_DESCR)
+        if (!std::equal(FILE_FORMAT_DESCR, FILE_FORMAT_DESCR + sizeof(FILE_FORMAT_DESCR), formatDescr))
             throw FileError(wxString(_("Incompatible synchronization database format:")) + wxT(" \n") + wxT("\"") + zToWx(filename) + wxT("\""));
     }
 
@@ -75,6 +74,10 @@ class ReadDirInfo : public util::ReadInputStream
 public:
     ReadDirInfo(wxInputStream& stream, const wxString& errorObjName, DirInformation& dirInfo) : ReadInputStream(stream, errorObjName)
     {
+        //|-------------------------------------------------------------------------------------
+        //| ensure 32/64 bit portability: used fixed size data types only e.g. boost::uint32_t |
+        //|-------------------------------------------------------------------------------------
+
         //read filter settings
         dirInfo.filter = BaseFilter::loadFilter(getStream());
         check();
@@ -86,15 +89,15 @@ public:
 private:
     void execute(DirContainer& dirCont) const
     {
-        size_t fileCount = readNumberC<size_t>();
+        boost::uint32_t fileCount = readNumberC<boost::uint32_t>();
         while (fileCount-- != 0)
             readSubFile(dirCont);
 
-        size_t symlinkCount = readNumberC<size_t>();
+        boost::uint32_t symlinkCount = readNumberC<boost::uint32_t>();
         while (symlinkCount-- != 0)
             readSubLink(dirCont);
 
-        size_t dirCount = readNumberC<size_t>();
+        boost::uint32_t dirCount = readNumberC<boost::uint32_t>();
         while (dirCount-- != 0)
             readSubDirectory(dirCont);
     }
@@ -104,11 +107,11 @@ private:
         //attention: order of function argument evaluation is undefined! So do it one after the other...
         const Zstring shortName = readStringC(); //file name
 
-        const long          modHigh = readNumberC<long>();
-        const unsigned long modLow  = readNumberC<unsigned long>();
+        const boost::int32_t  modHigh = readNumberC<boost::int32_t>();
+        const boost::uint32_t modLow  = readNumberC<boost::uint32_t>();
 
-        const unsigned long sizeHigh = readNumberC<unsigned long>();
-        const unsigned long sizeLow  = readNumberC<unsigned long>();
+        const boost::uint32_t sizeHigh = readNumberC<boost::uint32_t>();
+        const boost::uint32_t sizeLow  = readNumberC<boost::uint32_t>();
 
         //const util::FileID fileIdentifier(stream_);
         //check();
@@ -122,11 +125,11 @@ private:
     void readSubLink(DirContainer& dirCont) const
     {
         //attention: order of function argument evaluation is undefined! So do it one after the other...
-        const Zstring        shortName  = readStringC(); //file name
-        const long           modHigh    = readNumberC<long>();
-        const unsigned long  modLow     = readNumberC<unsigned long>();
-        const Zstring        targetPath = readStringC(); //file name
-        const LinkDescriptor::LinkType linkType  = static_cast<LinkDescriptor::LinkType>(readNumberC<int>());
+        const Zstring         shortName  = readStringC(); //file name
+        const boost::int32_t  modHigh    = readNumberC<boost::int32_t>();
+        const boost::uint32_t modLow     = readNumberC<boost::uint32_t>();
+        const Zstring         targetPath = readStringC(); //file name
+        const LinkDescriptor::LinkType linkType  = static_cast<LinkDescriptor::LinkType>(readNumberC<boost::int32_t>());
 
         dirCont.addSubLink(shortName,
                            LinkDescriptor(wxLongLong(modHigh, modLow), targetPath, linkType));
@@ -141,10 +144,13 @@ private:
     }
 };
 
-
-typedef boost::shared_ptr<std::vector<char> > MemoryStreamPtr;  //byte stream representing DirInformation
-typedef std::map<util::UniqueId, MemoryStreamPtr> DirectoryTOC; //list of streams ordered by a UUID pointing to their partner database
-typedef std::pair<util::UniqueId, DirectoryTOC> DbStreamData;   //header data: UUID representing this database, item data: list of dir-streams
+namespace
+{
+typedef std::string UniqueId;
+typedef boost::shared_ptr<std::vector<char> > MemoryStreamPtr; //byte stream representing DirInformation
+typedef std::map<UniqueId, MemoryStreamPtr>   DirectoryTOC;    //list of streams ordered by a UUID pointing to their partner database
+typedef std::pair<UniqueId, DirectoryTOC>     DbStreamData;    //header data: UUID representing this database, item data: list of dir-streams
+}
 /* Example
 left side              right side
 ---------              ----------
@@ -160,21 +166,26 @@ class ReadFileStream : public util::ReadInputStream
 public:
     ReadFileStream(wxInputStream& stream, const wxString& filename, DbStreamData& output) : ReadInputStream(stream, filename)
     {
-        if (readNumberC<int>() != FILE_FORMAT_VER) //read file format version
+        //|-------------------------------------------------------------------------------------
+        //| ensure 32/64 bit portability: used fixed size data types only e.g. boost::uint32_t |
+        //|-------------------------------------------------------------------------------------
+
+        if (readNumberC<boost::int32_t>() != FILE_FORMAT_VER) //read file format version
             throw FileError(wxString(_("Incompatible synchronization database format:")) + wxT(" \n") + wxT("\"") + filename + wxT("\""));
 
         //read DB id
-        output.first = util::UniqueId(getStream());
-        check();
+        const CharArray tmp = readArrayC();
+        output.first.assign(tmp->begin(), tmp->end());
 
         DirectoryTOC& dbList = output.second;
         dbList.clear();
 
-        size_t dbCount = readNumberC<size_t>(); //number of databases: one for each sync-pair
+        boost::uint32_t dbCount = readNumberC<boost::uint32_t>(); //number of databases: one for each sync-pair
         while (dbCount-- != 0)
         {
-            const util::UniqueId partnerID(getStream()); //DB id of partner databases
-            check();
+            //DB id of partner databases
+            const CharArray tmp2 = readArrayC();
+            const std::string partnerID(tmp2->begin(), tmp2->end());
 
             CharArray buffer = readArrayC(); //read db-entry stream (containing DirInformation)
 
@@ -188,8 +199,8 @@ DbStreamData loadFile(const Zstring& filename) //throw (FileError)
 {
     if (!ffs3::fileExists(filename))
         throw FileErrorDatabaseNotExisting(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
-                        _("One of the FreeFileSync database files is not yet existing:") + wxT(" \n") +
-                        wxT("\"") + zToWx(filename) + wxT("\""));
+                                           _("One of the FreeFileSync database files is not yet existing:") + wxT(" \n") +
+                                           wxT("\"") + zToWx(filename) + wxT("\""));
 
     //read format description (uncompressed)
     FileInputStreamDB uncompressed(filename); //throw (FileError)
@@ -219,13 +230,13 @@ std::pair<DirInfoPtr, DirInfoPtr> ffs3::loadFromDisk(const BaseDirMapping& baseM
 
         if (dbLeft == dbEntriesLeft.second.end())
             throw FileErrorDatabaseNotExisting(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
-                            _("One of the FreeFileSync database entries within the following file is not yet existing:") + wxT(" \n") +
-                            wxT("\"") + zToWx(fileNameLeft) + wxT("\""));
+                                               _("One of the FreeFileSync database entries within the following file is not yet existing:") + wxT(" \n") +
+                                               wxT("\"") + zToWx(fileNameLeft) + wxT("\""));
 
         if (dbRight == dbEntriesRight.second.end())
             throw FileErrorDatabaseNotExisting(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
-                            _("One of the FreeFileSync database entries within the following file is not yet existing:") + wxT(" \n") +
-                            wxT("\"") + zToWx(fileNameRight) + wxT("\""));
+                                               _("One of the FreeFileSync database entries within the following file is not yet existing:") + wxT(" \n") +
+                                               wxT("\"") + zToWx(fileNameRight) + wxT("\""));
 
         //read streams into DirInfo
         boost::shared_ptr<DirInformation> dirInfoLeft(new DirInformation);
@@ -278,13 +289,13 @@ private:
     {
         util::ProxyForEach<SaveDirInfo<side> > prx(*this); //grant std::for_each access to private parts of this class
 
-        writeNumberC<size_t>(std::count_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), IsNonEmpty<side>())); //number of (existing) files
+        writeNumberC<boost::uint32_t>(std::count_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), IsNonEmpty<side>())); //number of (existing) files
         std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx);
 
-        writeNumberC<size_t>(std::count_if(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), IsNonEmpty<side>())); //number of (existing) files
+        writeNumberC<boost::uint32_t>(std::count_if(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), IsNonEmpty<side>())); //number of (existing) files
         std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx);
 
-        writeNumberC<size_t>(std::count_if(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), IsNonEmpty<side>())); //number of (existing) directories
+        writeNumberC<boost::uint32_t>(std::count_if(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), IsNonEmpty<side>())); //number of (existing) directories
         std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), prx);
     }
 
@@ -292,11 +303,11 @@ private:
     {
         if (!fileMap.isEmpty<side>())
         {
-            writeStringC(fileMap.getObjShortName()); //file name
-            writeNumberC<long>(         fileMap.getLastWriteTime<side>().GetHi()); //last modification time
-            writeNumberC<unsigned long>(fileMap.getLastWriteTime<side>().GetLo()); //
-            writeNumberC<unsigned long>(fileMap.getFileSize<side>().GetHi()); //filesize
-            writeNumberC<unsigned long>(fileMap.getFileSize<side>().GetLo()); //
+            writeStringC(fileMap.getShortName<side>()); //file name
+            writeNumberC<boost::int32_t> (fileMap.getLastWriteTime<side>().GetHi()); //last modification time
+            writeNumberC<boost::uint32_t>(fileMap.getLastWriteTime<side>().GetLo()); //
+            writeNumberC<boost::uint32_t>(fileMap.getFileSize<side>().GetHi()); //filesize
+            writeNumberC<boost::uint32_t>(fileMap.getFileSize<side>().GetLo()); //
 
             //fileMap.getFileID<side>().toStream(stream_); //unique file identifier
             //check();
@@ -307,11 +318,11 @@ private:
     {
         if (!linkObj.isEmpty<side>())
         {
-            writeStringC(linkObj.getObjShortName());
-            writeNumberC<long>(         linkObj.getLastWriteTime<side>().GetHi()); //last modification time
-            writeNumberC<unsigned long>(linkObj.getLastWriteTime<side>().GetLo()); //
+            writeStringC(linkObj.getShortName<side>());
+            writeNumberC<boost::int32_t> (linkObj.getLastWriteTime<side>().GetHi()); //last modification time
+            writeNumberC<boost::uint32_t>(linkObj.getLastWriteTime<side>().GetLo()); //
             writeStringC(linkObj.getTargetPath<side>());
-            writeNumberC<int>(linkObj.getLinkType<side>());
+            writeNumberC<boost::int32_t>(linkObj.getLinkType<side>());
         }
     }
 
@@ -319,7 +330,7 @@ private:
     {
         if (!dirMap.isEmpty<side>())
         {
-            writeStringC(dirMap.getObjShortName()); //directory name
+            writeStringC(dirMap.getShortName<side>()); //directory name
             execute(dirMap); //recurse
         }
     }
@@ -332,22 +343,22 @@ public:
     WriteFileStream(const DbStreamData& input, const wxString& filename, wxOutputStream& stream) : WriteOutputStream(filename, stream)
     {
         //save file format version
-        writeNumberC<int>(FILE_FORMAT_VER);
+        writeNumberC<boost::int32_t>(FILE_FORMAT_VER);
 
         //write DB id
-        input.first.toStream(getStream());
-        check();
+        writeArrayC(std::vector<char>(input.first.begin(), input.first.end()));
 
         const DirectoryTOC& dbList = input.second;
 
-        writeNumberC<size_t>(dbList.size()); //number of database records: one for each sync-pair
+        writeNumberC<boost::uint32_t>(static_cast<boost::uint32_t>(dbList.size())); //number of database records: one for each sync-pair
 
         for (DirectoryTOC::const_iterator i = dbList.begin(); i != dbList.end(); ++i)
         {
-            i->first.toStream(getStream()); //DB id of partner database
-            check();
+            //DB id of partner database
+            writeArrayC(std::vector<char>(i->first.begin(), i->first.end()));
 
-            writeArrayC(*(i->second)); //write DirInformation stream
+            //write DirInformation stream
+            writeArrayC(*(i->second));
         }
     }
 };
@@ -377,19 +388,16 @@ void saveFile(const DbStreamData& dbStream, const Zstring& filename) //throw (Fi
 }
 
 
-bool entryExisting(const DirectoryTOC& table, const util::UniqueId& newKey, const MemoryStreamPtr& newValue)
+bool entryExisting(const DirectoryTOC& table, const UniqueId& newKey, const MemoryStreamPtr& newValue)
 {
     DirectoryTOC::const_iterator iter = table.find(newKey);
     if (iter == table.end())
         return false;
 
-    if (!iter->second.get())
-        return !newValue.get();
+    if (!newValue.get() || !iter->second.get())
+        return !newValue.get() && !iter->second.get();
 
-    if (!newValue.get())
-        return false;
-
-    return newValue->size() == iter->second->size() && std::equal(newValue->begin(), newValue->end(), iter->second->begin());
+    return *newValue == *iter->second;
 }
 
 
@@ -407,22 +415,27 @@ void ffs3::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
 
     //read file data: db ID + mapping of partner-ID/DirInfo-stream: may throw!
     DbStreamData dbEntriesLeft;
-    if (ffs3::fileExists(baseMapping.getDBFilename<LEFT_SIDE>()))
-        try
-        {
-            dbEntriesLeft = ::loadFile(baseMapping.getDBFilename<LEFT_SIDE>());
-        }
-        catch(FileError&) {} //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
-    //else -> dbEntriesLeft has empty mapping, but already a DB-ID!
+    try
+    {
+        dbEntriesLeft = ::loadFile(baseMapping.getDBFilename<LEFT_SIDE>());
+    }
+    catch(FileError&)
+    {
+        //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
+        //dbEntriesLeft has empty mapping, but already a DB-ID!
+        dbEntriesLeft.first = util::generateGUID();
+    }
 
     //read file data: db ID + mapping of partner-ID/DirInfo-stream: may throw!
     DbStreamData dbEntriesRight;
-    if (ffs3::fileExists(baseMapping.getDBFilename<RIGHT_SIDE>()))
-        try
-        {
-            dbEntriesRight = ::loadFile(baseMapping.getDBFilename<RIGHT_SIDE>());
-        }
-        catch(FileError&) {} //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
+    try
+    {
+        dbEntriesRight = ::loadFile(baseMapping.getDBFilename<RIGHT_SIDE>());
+    }
+    catch(FileError&)
+    {
+        dbEntriesRight.first = util::generateGUID();
+    }
 
     //create new database entries
     MemoryStreamPtr dbEntryLeft(new std::vector<char>);

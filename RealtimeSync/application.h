@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef REALTIMESYNCAPP_H
@@ -20,10 +20,10 @@ public:
 private:
     void OnStartApplication(wxIdleEvent& event);
 
-	virtual wxLayoutDirection GetLayoutDirection() const //disable RTL languages for now...
-{
- return wxLayout_LeftToRight;
-}
+    virtual wxLayoutDirection GetLayoutDirection() const //disable RTL languages for now...
+    {
+        return wxLayout_LeftToRight;
+    }
 
 };
 

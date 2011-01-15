@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "util.h"
@@ -16,10 +16,21 @@
 #include "system_func.h"
 #include "check_exist.h"
 #include "assert_static.h"
+#include "system_constants.h"
+
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #endif
+
+wxString ffs3::extractJobName(const wxString& configFilename)
+{
+    using namespace common;
+
+    const wxString shortName = configFilename.AfterLast(FILE_NAME_SEPARATOR); //returns the whole string if seperator not found
+    const wxString jobName = shortName.BeforeLast(wxChar('.')); //returns empty string if seperator not found
+    return jobName.IsEmpty() ? shortName : jobName;
+}
 
 
 wxString ffs3::formatFilesizeToShortString(const wxLongLong& filesize)
@@ -39,7 +50,7 @@ wxString ffs3::formatFilesizeToShortString(double filesize)
     if (filesize < 0)
         return _("Error");
 
-    wxString output = _("%x Byte");
+    wxString output = _("%x Bytes");
 
     if (filesize > 999)
     {

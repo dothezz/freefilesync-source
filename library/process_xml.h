@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef PROCESSXML_H_INCLUDED
@@ -100,6 +100,7 @@ struct OptionalDialogs
     void resetDialogs();
 
     bool warningDependentFolders;
+    bool warningMultiFolderWriteAccess;
     bool warningSignificantDifference;
     bool warningNotEnoughDiskSpace;
     bool warningUnresolvedConflicts;
@@ -142,10 +143,8 @@ struct XmlGlobalSettings
             isMaximized(false),
             autoAdjustColumnsLeft(false),
             autoAdjustColumnsRight(false),
-            cfgHistoryMax(10),
             folderHistLeftMax(12),
             folderHistRightMax(12),
-            selectedTabBottomLeft(0),
             deleteOnBothSides(false),
             useRecyclerForManualDeletion(true), //enable if OS supports it; else user will have to activate first and then get an error message
 #ifdef FFS_WIN
@@ -187,15 +186,12 @@ struct XmlGlobalSettings
         ExternalApps externelApplications;
 
         std::vector<wxString> cfgFileHistory;
-        unsigned int cfgHistoryMax;
 
         std::vector<wxString> folderHistoryLeft;
         unsigned int folderHistLeftMax;
 
         std::vector<wxString> folderHistoryRight;
         unsigned int folderHistRightMax;
-
-        int selectedTabBottomLeft;
 
         bool deleteOnBothSides;
         bool useRecyclerForManualDeletion;
@@ -205,6 +201,8 @@ struct XmlGlobalSettings
 
         size_t addFolderPairCountMax;
         long lastUpdateCheck;          //time of last update check
+
+        wxString guiPerspectiveLast; //used by wxAuiManager
     } gui;
 
 //---------------------------------------------------------------------

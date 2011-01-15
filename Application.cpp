@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "application.h"
@@ -24,6 +24,8 @@
 #include <wx/sound.h>
 #include "shared/file_handling.h"
 #include "shared/string_conv.h"
+#include "shared/util.h"
+#include <wx/log.h>
 
 #ifdef FFS_LINUX
 #include <gtk/gtk.h>
@@ -41,7 +43,7 @@ bool Application::OnInit()
     returnValue = 0;
     //do not call wxApp::OnInit() to avoid using default commandline parser
 
-//Note: initialization is done in the FIRST idle event instead of OnInit. Reason: Commandline mode requires the wxApp eventhandler to be established
+//Note: initialization is done in the FIRST idle event instead of OnInit. Reason: batch mode requires the wxApp eventhandler to be established
 //for UI update events. This is not the case at the time of OnInit().
     Connect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), NULL, this);
 
@@ -171,7 +173,8 @@ int Application::OnRun()
         wxFile safeOutput(ffs3::getConfigDir() + wxT("LastError.txt"), wxFile::write);
         safeOutput.Write(wxString::FromAscii(e.what()));
 
-        wxMessageBox(wxString::FromAscii(e.what()), _("An exception occurred!"), wxOK | wxICON_ERROR);
+        wxSafeShowMessage(_("An exception occurred!"), wxString::FromAscii(e.what()));
+
         return -9;
     }
 
@@ -238,15 +241,17 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
             statusHandler.reset(new BatchStatusHandler(false, ffs3::extractJobName(filename), NULL, batchCfg.handleError, switchBatchToGui, returnValue));
 
         //COMPARE DIRECTORIES
-        ffs3::FolderComparison folderCmp;
         ffs3::CompareProcess comparison(batchCfg.mainCfg.handleSymlinks,
                                         globSettings.fileTimeTolerance,
                                         globSettings.optDialogs,
                                         statusHandler.get());
 
+        ffs3::FolderComparison folderCmp;
         comparison.startCompareProcess(ffs3::extractCompareCfg(batchCfg.mainCfg),
                                        batchCfg.mainCfg.compareVar,
                                        folderCmp);
+
+        const bool syncNeeded = synchronizationNeeded(folderCmp);
 
         //START SYNCHRONIZATION
         ffs3::SyncProcess synchronization(
@@ -262,7 +267,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         synchronization.startSynchronizationProcess(syncProcessCfg, folderCmp);
 
         //check if there are files/folders to be sync'ed at all
-        if (!synchronizationNeeded(folderCmp))
+        if (!syncNeeded)
         {
             statusHandler->logInfo(_("Nothing to synchronize according to configuration!")); //inform about this special case
             //return; -> disabled: <automatic> mode requires database to be written in any case
@@ -273,7 +278,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         {
             const wxString soundFile = ffs3::getResourceDir() + wxT("Sync_Complete.wav");
             if (ffs3::fileExists(ffs3::wxToZ(soundFile)))
-                wxSound::Play(soundFile, wxSOUND_ASYNC);
+                wxSound::Play(soundFile, wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message!
         }
     }
     catch (ffs3::AbortThisProcess&)  //exit used by statusHandler

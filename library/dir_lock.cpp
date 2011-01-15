@@ -17,6 +17,7 @@
 #include "../shared/serialize.h"
 #include <boost/cstdint.hpp>
 #include "../shared/build_info.h"
+#include <wx/log.h>
 
 #ifdef FFS_WIN
 #include <tlhelp32.h>
@@ -39,6 +40,9 @@ namespace
 const size_t EMIT_LIFE_SIGN_INTERVAL =  5000; //show life sign;        unit [ms]
 const size_t POLL_LIFE_SIGN_INTERVAL =  6000; //poll for life sign;    unit [ms]
 const size_t DETECT_EXITUS_INTERVAL  = 30000; //assume abandoned lock; unit [ms]
+
+const char LOCK_FORMAT_DESCR[] = "FreeFileSync";
+const int LOCK_FORMAT_VER = 1; //lock file format version
 
 typedef Zbase<Zchar, StorageDeepCopy> BasicString; //thread safe string class
 }
@@ -72,7 +76,7 @@ public:
         }
         catch (const std::exception& e) //exceptions must be catched per thread
         {
-            wxMessageBox(wxString::FromAscii(e.what()), wxString(_("An exception occurred!")) + wxT("(Dirlock)"), wxOK | wxICON_ERROR);
+            wxSafeShowMessage(wxString(_("An exception occurred!")) + wxT("(Dirlock)"), wxString::FromAscii(e.what())); //simple wxMessageBox won't do for threads
         }
     }
 
@@ -130,18 +134,6 @@ private:
 
 namespace
 {
-bool somethingExists(const Zstring& objname) //throw()       check whether any object with this name exists
-{
-#ifdef FFS_WIN
-    return ::GetFileAttributes(applyLongPathPrefix(objname).c_str()) != INVALID_FILE_ATTRIBUTES;
-
-#elif defined FFS_LINUX
-    struct stat fileInfo;
-    return ::lstat(objname.c_str(), &fileInfo) == 0;
-#endif
-}
-
-
 void deleteLockFile(const Zstring& filename) //throw (FileError)
 {
 #ifdef FFS_WIN
@@ -207,24 +199,25 @@ Zstring deleteAbandonedLockName(const Zstring& lockfilename)
 
 namespace
 {
+//read string from file stream
 inline
-std::string readString(wxInputStream& stream)  //read string from file stream
+std::string readString(wxInputStream& stream)  //throw (std::exception)
 {
     const boost::uint32_t strLength = util::readNumber<boost::uint32_t>(stream);
     std::string output;
-	if (strLength > 0)
-	{
-    output.resize(strLength);
-    stream.Read(&output[0], strLength);
-	}
+    if (strLength > 0)
+    {
+        output.resize(strLength); //may throw for corrupted data
+        stream.Read(&output[0], strLength);
+    }
     return output;
 }
 
 
 inline
 void writeString(wxOutputStream& stream, const std::string& str)  //write string to filestream
-{ 
-	const boost::uint32_t strLength = static_cast<boost::uint32_t>(str.length());
+{
+    const boost::uint32_t strLength = static_cast<boost::uint32_t>(str.length());
     util::writeNumber<boost::uint32_t>(stream, strLength);
     stream.Write(str.c_str(), strLength);
 }
@@ -246,6 +239,7 @@ struct LockInformation
 {
     LockInformation()
     {
+        lockId = util::generateGUID();
 #ifdef FFS_WIN
         procDescr.processId = ::GetCurrentProcessId();
 #elif defined FFS_LINUX
@@ -254,9 +248,16 @@ struct LockInformation
         procDescr.computerId = getComputerId();
     }
 
-    LockInformation(wxInputStream& stream) : //read
-        lockId(util::UniqueId(stream))
+    LockInformation(wxInputStream& stream) //read
     {
+        char formatDescr[sizeof(LOCK_FORMAT_DESCR)] = {};
+        stream.Read(formatDescr, sizeof(LOCK_FORMAT_DESCR));                  //file format header
+        const int lockFileVersion = util::readNumber<boost::int32_t>(stream); //
+		(void)lockFileVersion;
+
+		//some format checking here?
+
+        lockId = readString(stream);
         procDescr.processId  = static_cast<ProcessId>(util::readNumber<boost::uint64_t>(stream)); //possible loss of precision (32/64 bit process) covered by buildId
         procDescr.computerId = readString(stream);
     }
@@ -265,7 +266,10 @@ struct LockInformation
     {
         assert_static(sizeof(ProcessId) <= sizeof(boost::uint64_t)); //ensure portability
 
-        lockId.toStream(stream);
+        stream.Write(LOCK_FORMAT_DESCR, sizeof(LOCK_FORMAT_DESCR));
+        util::writeNumber<boost::int32_t>(stream, LOCK_FORMAT_VER);
+
+        writeString(stream, lockId);
         util::writeNumber<boost::uint64_t>(stream, procDescr.processId);
         writeString(stream, procDescr.computerId);
     }
@@ -276,7 +280,7 @@ struct LockInformation
     typedef pid_t ProcessId;
 #endif
 
-    util::UniqueId lockId; //16 byte portable construct
+    std::string lockId; //16 byte UUID
 
     struct ProcessDescription
     {
@@ -314,7 +318,6 @@ ProcessStatus getProcessStatus(const LockInformation::ProcessDescription& procDe
     if (!::Process32First(snapshot,       //__in     HANDLE hSnapshot,
                           &processEntry)) //__inout  LPPROCESSENTRY32 lppe
         return PROC_STATUS_NO_IDEA;
-
     do
     {
         if (processEntry.th32ProcessID == procDescr.processId)
@@ -335,7 +338,7 @@ ProcessStatus getProcessStatus(const LockInformation::ProcessDescription& procDe
 
 void writeLockInfo(const Zstring& lockfilename) //throw (FileError)
 {
-    //write GUID at the beginning of the file: this ID is a universal identifier for this lock (no matter what the path is, considering symlinks ,etc.)
+    //write GUID at the beginning of the file: this ID is a universal identifier for this lock (no matter what the path is, considering symlinks, distributed network, etc.)
     FileOutputStream lockFile(lockfilename); //throw FileError()
     LockInformation().toStream(lockFile);
 }
@@ -349,7 +352,7 @@ LockInformation retrieveLockInfo(const Zstring& lockfilename) //throw (FileError
 }
 
 
-util::UniqueId retrieveLockId(const Zstring& lockfilename) //throw (FileError, ErrorNotExisting)
+std::string retrieveLockId(const Zstring& lockfilename) //throw (FileError, ErrorNotExisting)
 {
     return retrieveLockInfo(lockfilename).lockId;
 }
@@ -541,7 +544,7 @@ public:
 
         try //actual check based on lock UUID, deadlock prevention: "lockfilename" may be an alternative name for an already active lock
         {
-            const util::UniqueId lockId = retrieveLockId(lockfilename); //throw (FileError, ErrorNotExisting)
+            const std::string lockId = retrieveLockId(lockfilename); //throw (FileError, ErrorNotExisting)
 
             const boost::shared_ptr<SharedDirLock>& activeLock = findActive(lockId); //returns null-lock if not found
             if (activeLock)
@@ -554,7 +557,7 @@ public:
 
         //not yet in buffer, so create a new directory lock
         boost::shared_ptr<SharedDirLock> newLock(new SharedDirLock(lockfilename, callback)); //throw (FileError)
-        const util::UniqueId newLockId = retrieveLockId(lockfilename); //throw (FileError, ErrorNotExisting)
+        const std::string newLockId = retrieveLockId(lockfilename); //throw (FileError, ErrorNotExisting)
 
         //update registry
         fileToUuid[lockfilename] = newLockId; //throw()
@@ -566,7 +569,7 @@ public:
 private:
     LockAdmin() {}
 
-    boost::shared_ptr<SharedDirLock> findActive(const util::UniqueId& lockId) //returns null-lock if not found
+    boost::shared_ptr<SharedDirLock> findActive(const std::string& lockId) //returns null-lock if not found
     {
         UuidToLockMap::const_iterator iterLock = uuidToLock.find(lockId);
         return iterLock != uuidToLock.end() ?
@@ -576,8 +579,9 @@ private:
 
     typedef boost::weak_ptr<SharedDirLock> SharedLock;
 
-    typedef std::map<Zstring, util::UniqueId, LessFilename> FileToUuidMap; //n:1 handle uppper/lower case correctly
-    typedef std::map<util::UniqueId, SharedLock>            UuidToLockMap; //1:1
+    typedef std::string UniqueId;
+    typedef std::map<Zstring, UniqueId, LessFilename> FileToUuidMap; //n:1 handle uppper/lower case correctly
+    typedef std::map<UniqueId, SharedLock>            UuidToLockMap; //1:1
 
     FileToUuidMap fileToUuid; //lockname |-> UUID; locks can be referenced by a lockfilename or alternatively a UUID
     UuidToLockMap uuidToLock; //UUID |-> "shared lock ownership"

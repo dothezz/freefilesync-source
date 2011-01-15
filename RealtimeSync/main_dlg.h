@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef REALTIMESYNCMAIN_H
@@ -44,7 +44,7 @@ private:
 class MainDialog: public MainDlgGenerated
 {
 public:
-    MainDialog(wxDialog *dlg, const wxString& cfgFilename);
+    MainDialog(wxDialog *dlg, const wxString& cfgFileName);
     ~MainDialog();
 
     void loadConfig(const wxString& filename);
@@ -64,6 +64,7 @@ private:
 
     void setConfiguration(const xmlAccess::XmlRealConfig& cfg);
     xmlAccess::XmlRealConfig getConfiguration();
+    void setLastUsedConfig(const wxString& filename);
 
     void layoutAsync(); //call Layout() asynchronously
 
@@ -76,6 +77,8 @@ private:
 
     std::auto_ptr<ffs3::DirectoryName> dirNameFirst;
     std::vector<DirectoryPanel*> dirNamesExtra; //additional pairs to the standard pair
+
+    wxString currentConfigFileName;
 };
 
 #endif // REALTIMESYNCMAIN_H

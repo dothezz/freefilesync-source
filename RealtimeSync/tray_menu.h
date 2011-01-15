@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef TRAYMENU_H_INCLUDED
@@ -19,7 +19,7 @@ enum MonitorResponse
     QUIT
 };
 
-MonitorResponse startDirectoryMonitor(const xmlAccess::XmlRealConfig& config);
+MonitorResponse startDirectoryMonitor(const xmlAccess::XmlRealConfig& config, const wxString& jobname); //jobname may be empty
 }
 
 

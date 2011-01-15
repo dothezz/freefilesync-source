@@ -2,8 +2,8 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %x / %y objecten succesvol verwijderd
-%x Byte
-%x Byte
+%x Bytes
+%x Bytes
 %x GB
 %x GB
 %x MB
@@ -256,6 +256,10 @@ Continue
 Doorgaan
 Conversion error:
 Fout bij het converteren:
+Copy attributes only from left to right
+Kopieer attributen alleen van links naar rechts
+Copy attributes only from right to left
+Kopieer attributen alleen van rechts naar links
 Copy filesystem permissions
 Kopieer bestandsmachtigingen
 Copy from left to right
@@ -472,6 +476,8 @@ Files that exist on both sides, right one is newer
 Bestanden die aan beide kanten bestaan, maar waarvan de rechterkant nieuwer is
 Files that have different content
 Bestanden dat andere inhoud hebben
+Files/folders that differ in attributes only
+Alleen bestanden/mappen die anders zijn dan attributen
 Files/folders that exist on left side only
 Bestanden/mappen die alleen aan de linkerkant bestaan
 Files/folders that exist on right side only
@@ -494,6 +500,8 @@ Find what:
 Vind wat:
 Folder Comparison and Synchronization
 Mappen vergelijken en synchroniseren
+Folder pairs
+Paren mappen
 Follow
 Volg
 Free disk space available:
@@ -606,12 +614,14 @@ Log-messages:
 Logberichten:
 Logging
 Loggen
+Main bar
+Hoofdbalk
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Schaduw kopieen op WOW64 worden niet ondersteund. Gebruik alstublieft de 64-bit versie van FreeFileSync.
 Match case
 Hoofdlettergevoelig
-Minimum Idle Time
-Minimale Inactieve Tijd
+Minimum Idle Time [seconds]
+Minimale inactieve tijd [seconden]
 Mirror ->>
 Spiegelen ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 Gepubliceerd onder de GNU General Public License:
 Question
 Vraag
-Quit
-Afsluiten
 Re-enable all hidden dialogs?
 Herstellen van alle verborgen dialogen?
 RealtimeSync - Automated Synchronization
@@ -708,6 +716,8 @@ Report translation error
 Rapporteer een fout in de vertaling
 Reset
 Reset
+Reset view
+Scherm resetten
 Right
 Rechts
 S&ave configuration...
@@ -734,6 +744,8 @@ Set direction:
 Selecteer map:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Instellingen worden veranderd naar standaard instellingen: Oude bestanden worden overschreven naar nieuwere bestanden.
+Show \"%x\"
+Laat \"%x\" zien
 Show conflicts
 Geef conflicten weer
 Show files that are different
@@ -852,6 +864,8 @@ Unresolved conflicts existing!
 Er bestaan onopgeloste conflicten!
 Update ->
 Overschrijven ->
+Updating attributes of %x
+Attributen updaten van %x
 Usage:
 Gebruik:
 Use Recycle Bin
@@ -868,8 +882,8 @@ Verifying file %x
 Verifiëren bestand %x
 Volume name %x not part of filename %y!
 Volume naam %x maakt niet deel uit van bestandsnaam %y!
-Waiting for all directories to become available...
-Wachten op alle mappen....
+Waiting for missing directories...
+Wachten op de missende mappen...
 Waiting while directory is locked (%x)...
 Wachten totdat map is beveiligd (%x)...
 Warning

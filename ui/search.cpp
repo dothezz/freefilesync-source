@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "search.h"
@@ -40,7 +40,7 @@ SearchDlg::SearchDlg(wxWindow& parentWindow, wxString& searchText, bool& respect
 {
 #ifdef FFS_WIN
     new ffs3::MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                        this); //ownership passed to "this"
+                              this); //ownership passed to "this"
 #endif
 
     m_checkBoxMatchCase->SetValue(respectCase_);

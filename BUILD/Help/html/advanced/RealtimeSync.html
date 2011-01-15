@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20101016;14325500">
+	<META NAME="CHANGED" CONTENT="20110102;20030700">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -63,14 +63,18 @@ to begin monitoring.</FONT></P>
 			<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm">
 			<FONT FACE="Tahoma, sans-serif">The settings dialog can be skipped
 			by passing a RealtimeSync configuration file (<FONT FACE="Courier New, monospace">*.ffs_real</FONT>)
-			OR a FreeFileSync Batch file (<FONT FACE="Courier New, monospace">*.ffs_batch</FONT>)
-			as first command-line argument. This enables integration with your
-			operating system's auto start facility:</FONT></P>
+			OR a FreeFileSync batch file (<FONT FACE="Courier New, monospace">*.ffs_batch</FONT>)
+			as first command-line argument. This allows for integration with
+			the operating system's auto start facility.</FONT></P>
 			<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm">
 			<FONT FACE="Tahoma, sans-serif">Using RealtimeSync is not
 			restricted to starting FreeFileSync. It can also be used in other
 			scenarios, like sending an email whenever a certain directory is
 			modified.</FONT></P>
+			<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm">
+			<FONT FACE="Tahoma, sans-serif">The command-line must not block
+			the progress. If a FreeFileSync batch file is to be called make
+			sure it is operating in &quot;silent-mode&quot;.</FONT></P>
 		</UL>
 	</SPAN><BR CLEAR=LEFT>
 	</P>
@@ -92,19 +96,14 @@ to begin monitoring.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT>
-<FONT FACE="Tahoma, sans-serif">(Smart synchronization when USB
-sticks are inserted into your PC - in combination with FreeFileSync)</FONT></P>
+<FONT FACE="Tahoma, sans-serif">(Automatic synchronization when USB
+stick is inserted)</FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Assume
-you have multiple(!) USB sticks that contain data you want to
-automatically synchronize in two-way mode whenever you insert one of
-the sticks into the PC. In order to be on the safe side, you decide
-to setup FreeFileSync batch jobs (</FONT><FONT FACE="Courier New, monospace">*.ffs_batch</FONT><FONT FACE="Tahoma, sans-serif">)
-using </FONT><FONT FACE="Tahoma, sans-serif"><I>&lt;Automatic&gt;</I></FONT>
-<FONT FACE="Tahoma, sans-serif">mode so that conflicts, for example
-files modified on both sides, are detected avoiding data loss. Save
-the relevant configuration on each USB stick's root directory to have
-it called when the stick is mounted. Then configure RealtimeSync
-analog to the following:</FONT></P>
+you have multiple USB sticks that contain data you want to
+automatically synchronize whenever you insert one of the sticks into
+the PC. Save the relevant configuration on each USB stick's root
+directory to have it called when the stick is mounted. Then configure
+RealtimeSync analog to the following:</FONT></P>
 <UL>
 	<P><IMG SRC="rts.png" NAME="Grafik2" ALIGN=BOTTOM WIDTH=462 HEIGHT=411 BORDER=0></P>
 </UL>
@@ -114,14 +113,16 @@ analog to the following:</FONT></P>
 directory &quot;</FONT><FONT FACE="Courier New, monospace">H:\Data</FONT><FONT FACE="Tahoma, sans-serif">&quot;
 becomes available, the command-line executes and starts the batch job
 whose configuration is located on the stick. Furthermore it also
-starts the batch job each time files are modified within &quot;</FONT><FONT FACE="Courier New, monospace">H:\Data</FONT><FONT FACE="Tahoma, sans-serif">&quot;.
+starts the batch job each time files are modified in &quot;</FONT><FONT FACE="Courier New, monospace">H:\Data</FONT><FONT FACE="Tahoma, sans-serif">&quot;.
 </FONT>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT>
+<FONT FACE="Tahoma, sans-serif">(Calling a custom .cmd or .bat file)</FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">For
-additional convenience it might be nice if the batch job remains
-silent if synchronization completes successfully, otherwise shows
+additional convenience it may be nice if the batch job remains silent
+if synchronization completes successfully, otherwise shows
 FreeFileSync's GUI dialog when errors occurred. Therefore create two
 configurations, one silent-mode batch to be called by default and one
 <FONT FACE="Courier New, monospace">*.ffs_gui</FONT> to be called

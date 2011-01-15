@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef SYNCHRONIZATION_H_INCLUDED
@@ -22,10 +22,16 @@ public:
     SyncStatistics(const HierarchyObject&  hierObj);
     SyncStatistics(const FolderComparison& folderCmp);
 
-    int         getCreate(   bool inclLeft = true, bool inclRight = true) const;
-    int         getOverwrite(bool inclLeft = true, bool inclRight = true) const;
-    int         getDelete(   bool inclLeft = true, bool inclRight = true) const;
-    int         getConflict() const;
+    int getCreate() const;
+    template <SelectedSide side> int getCreate() const;
+
+    int getOverwrite() const;
+    template <SelectedSide side> int getOverwrite() const;
+
+    int getDelete() const;
+    template <SelectedSide side> int getDelete() const;
+
+    int getConflict() const;
 
     typedef std::vector<std::pair<Zstring, wxString> > ConflictTexts; // Pair(filename/conflict text)
     const ConflictTexts& getFirstConflicts() const; //get first few sync conflicts
@@ -94,6 +100,92 @@ private:
     StatusHandler& statusUpdater;
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// inline implementation
+template <>
+inline
+int SyncStatistics::getCreate<LEFT_SIDE>() const
+{
+    return createLeft;
+}
+
+template <>
+inline
+int SyncStatistics::getCreate<RIGHT_SIDE>() const
+{
+    return createRight;
+}
+
+inline
+int SyncStatistics::getCreate() const
+{
+    return getCreate<LEFT_SIDE>() + getCreate<RIGHT_SIDE>();
+}
+
+template <>
+inline
+int SyncStatistics::getOverwrite<LEFT_SIDE>() const
+{
+    return overwriteLeft;
+}
+
+template <>
+inline
+int SyncStatistics::getOverwrite<RIGHT_SIDE>() const
+{
+    return overwriteRight;
+}
+
+inline
+int SyncStatistics::getOverwrite() const
+{
+    return getOverwrite<LEFT_SIDE>() + getOverwrite<RIGHT_SIDE>();
+}
+
+
+template <>
+inline
+int SyncStatistics::getDelete<LEFT_SIDE>() const
+{
+    return deleteLeft;
+}
+
+template <>
+inline
+int SyncStatistics::getDelete<RIGHT_SIDE>() const
+{
+    return deleteRight;
+}
+
+inline
+int SyncStatistics::getDelete() const
+{
+    return getDelete<LEFT_SIDE>() + getDelete<RIGHT_SIDE>();
+}
 }
 
 #endif // SYNCHRONIZATION_H_INCLUDED

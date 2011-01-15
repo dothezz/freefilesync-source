@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "notify.h"
@@ -199,7 +199,7 @@ public:
                 {
                     const DWORD lastError = ::GetLastError();
                     if (lastError != ERROR_CALL_NOT_IMPLEMENTED && //fail on SAMBA share: this shouldn't be a showstopper!
-                        lastError != ERROR_SERVICE_SPECIFIC_ERROR) //neither should be fail for "Pogoplug" mapped network drives
+                            lastError != ERROR_SERVICE_SPECIFIC_ERROR) //neither should be fail for "Pogoplug" mapped network drives
                         throw ffs3::FileError(wxString(wxT("Could not register device removal notifications:")) + wxT("\n\n") + ffs3::getLastErrorFormatted(lastError));
                 }
                 else

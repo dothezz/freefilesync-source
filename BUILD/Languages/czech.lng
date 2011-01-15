@@ -2,8 +2,8 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %x / %y objektů úspěšně smazáno
-%x Byte
-%x Byte
+%x Bytes
+%x B
 %x GB
 %x GB
 %x MB
@@ -256,6 +256,10 @@ Continue
 Pokračovat
 Conversion error:
 Chyba konverze:
+Copy attributes only from left to right
+Kopírovat vlastnosti jen z leva do prava
+Copy attributes only from right to left
+Kopírovat vlastnosti jen z prava do leva
 Copy filesystem permissions
 Kopírovat oprávnění k souborům
 Copy from left to right
@@ -472,6 +476,8 @@ Files that exist on both sides, right one is newer
 Soubory, které existují na obou stranách, z nichž vpravo je novější
 Files that have different content
 Soubory, které mají rozdílný obsah
+Files/folders that differ in attributes only
+Soubory, ketré se liší pouze ve vlastnostech
 Files/folders that exist on left side only
 Soubory/adresáře, které existují pouze vlevo
 Files/folders that exist on right side only
@@ -494,6 +500,8 @@ Find what:
 Najít:
 Folder Comparison and Synchronization
 Porovnání a Synchronizace adresářů
+Folder pairs
+Adresářové páry
 Follow
 Použít cíl
 Free disk space available:
@@ -606,12 +614,14 @@ Log-messages:
 Záznamy:
 Logging
 Zaznamenávání
+Main bar
+Hlavní lišta
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Vytváření stínových kopií na WOW64 není podporováno. Prosím použijte 64 bitovou verzi FreeFileSync.
 Match case
 Rozlišovat malá a velká písmena
-Minimum Idle Time
-Minimální čas prodlevy
+Minimum Idle Time [seconds]
+Minimální čas prodlevy [v sekundách]
 Mirror ->>
 Zrcadlení ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 Vydáno podle GNU General Public License (GPL):
 Question
 Otázky
-Quit
-Konec
 Re-enable all hidden dialogs?
 Znovu povolit skryté dialogy?
 RealtimeSync - Automated Synchronization
@@ -708,6 +716,8 @@ Report translation error
 Hlásit chyby překladu
 Reset
 Resetovat
+Reset view
+Výchozí zobrazení
 Right
 Pravý
 S&ave configuration...
@@ -734,6 +744,8 @@ Set direction:
 Nastavit adresář:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Nastaven výchozí způsob synchronizace: Staré soubory budou nahrazeny novými.
+Show \"%x\"
+Zobrazit \"%x\"
 Show conflicts
 Zobrazit konflikty
 Show files that are different
@@ -852,6 +864,8 @@ Unresolved conflicts existing!
 Nevyřešené konflikty!
 Update ->
 Aktualizuj ->
+Updating attributes of %x
+Aktualizace atributů souboru %x
 Usage:
 Použití:
 Use Recycle Bin
@@ -868,8 +882,8 @@ Verifying file %x
 Kontroluji soubor %x
 Volume name %x not part of filename %y!
 Disk %x není součástí jména souboru %y!
-Waiting for all directories to become available...
-Čekání na zpřístupnění všech adresářů...
+Waiting for missing directories...
+Čekání na nedostupné adresáře...
 Waiting while directory is locked (%x)...
 Čekání na uzamčení adresáře (%x)
 Warning

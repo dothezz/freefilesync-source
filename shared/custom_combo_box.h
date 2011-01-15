@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef CUSTOMCOMBOBOX_H_INCLUDED
@@ -31,10 +31,10 @@ private:
     void OnKeyEvent(wxKeyEvent& event);
 
 #if wxCHECK_VERSION(2, 9, 1)
-	void OnShowDropDown(wxCommandEvent& event);
-	void OnHideDropDown(wxCommandEvent& event);
+    void OnShowDropDown(wxCommandEvent& event);
+    void OnHideDropDown(wxCommandEvent& event);
 
-	bool dropDownShown;
+    bool dropDownShown;
 #endif
 };
 

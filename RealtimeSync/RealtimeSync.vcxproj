@@ -238,12 +238,14 @@
     <ClCompile Include="..\shared\help_provider.cpp" />
     <ClCompile Include="..\shared\localization.cpp" />
     <ClCompile Include="..\shared\long_path_prefix.cpp" />
+    <ClCompile Include="..\shared\privilege.cpp" />
     <ClCompile Include="..\shared\shadow.cpp" />
     <ClCompile Include="..\shared\standard_paths.cpp" />
     <ClCompile Include="..\shared\system_func.cpp" />
     <ClCompile Include="..\shared\tinyxml\tinyxml.cpp" />
     <ClCompile Include="..\shared\tinyxml\tinyxmlerror.cpp" />
     <ClCompile Include="..\shared\tinyxml\tinyxmlparser.cpp" />
+    <ClCompile Include="..\shared\util.cpp" />
     <ClCompile Include="..\shared\xml_base.cpp" />
     <ClCompile Include="..\shared\zstring.cpp" />
     <ClCompile Include="..\structures.cpp" />

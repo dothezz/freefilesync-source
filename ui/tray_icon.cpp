@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "tray_icon.h"
@@ -39,7 +39,7 @@ wxIcon generateIcon(size_t percent) //generate icon with progress indicator
     if (buffer.first == indicatorHeight)
         return buffer.second;
 
-        wxImage genImage(trayIcon.ConvertToImage());
+    wxImage genImage(trayIcon.ConvertToImage());
 
     if (    genImage.GetWidth()  > 0 &&
             genImage.GetHeight() > 0)

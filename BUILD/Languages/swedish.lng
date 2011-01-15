@@ -2,7 +2,7 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %x / %y objekt borttagna
-%x Byte
+%x Bytes
 %x Byte
 %x GB
 %x GB
@@ -256,6 +256,10 @@ Continue
 Fortsätt
 Conversion error:
 Konversionsfel:
+Copy attributes only from left to right
+Kopiera attribut endast från vänster till höger
+Copy attributes only from right to left
+Kopiera attribut endast från höger till vänster
 Copy filesystem permissions
 Kopiera filsystembehörigheter
 Copy from left to right
@@ -472,6 +476,8 @@ Files that exist on both sides, right one is newer
 Filer som finns på båda sidor, höger är nyare
 Files that have different content
 Filer som har olika innehåll
+Files/folders that differ in attributes only
+Filer/Kataloger som endast skiljer i attribut
 Files/folders that exist on left side only
 Filer/kataloger som finns på vänster sida enbart
 Files/folders that exist on right side only
@@ -494,6 +500,8 @@ Find what:
 Sök efter:
 Folder Comparison and Synchronization
 Katalogjämförelse och synkronisering
+Folder pairs
+Katalogpar
 Follow
 Följ
 Free disk space available:
@@ -606,12 +614,14 @@ Log-messages:
 Log-meddelanden:
 Logging
 Loggar
+Main bar
+Huvudfält
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Skuggkopior av wow64 stöds ej. Använd FreeFileSync x64 istället!
 Match case
 Matcha gemener/VERSALER
-Minimum Idle Time
-Minsta väntetid
+Minimum Idle Time [seconds]
+Minsta ledig tid [sekunder]
 Mirror ->>
 Spegla ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 Publiserad under GNU General Public License:
 Question
 Fråga
-Quit
-Avsluta
 Re-enable all hidden dialogs?
 Återaktivera alla dolda meddelanden?
 RealtimeSync - Automated Synchronization
@@ -708,6 +716,8 @@ Report translation error
 Rapportera översättningsfel
 Reset
 Återställ
+Reset view
+Återställ vy
 Right
 Höger
 S&ave configuration...
@@ -734,6 +744,8 @@ Set direction:
 Ange riktning:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Standardsynkronisering: Gamla filer kommer att skrivas över av nyare versioner.
+Show \"%x\"
+Visa \"%x\"
 Show conflicts
 Visa konflikter
 Show files that are different
@@ -852,6 +864,8 @@ Unresolved conflicts existing!
 Obehandlad konflikt upptäckt!
 Update ->
 Uppdatera ->
+Updating attributes of %x
+Uppdaterar attribut för %x
 Usage:
 Användning:
 Use Recycle Bin
@@ -868,8 +882,8 @@ Verifying file %x
 Verifierar %x
 Volume name %x not part of filename %y!
 Volymnamn %x saknas i filnamn %y!
-Waiting for all directories to become available...
-Väntar på att alla sökvägar skall bli åtkommliga...
+Waiting for missing directories...
+Väntar på saknade destinationer...
 Waiting while directory is locked (%x)...
 Väntar medan katalogen låses (%x)...
 Warning

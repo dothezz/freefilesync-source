@@ -36,13 +36,14 @@ class wxButtonWithImage;
 #include <wx/statbox.h>
 #include <wx/scrolwin.h>
 #include <wx/grid.h>
-#include <wx/choice.h>
+#include <wx/listbox.h>
 #include <wx/checkbox.h>
-#include <wx/notebook.h>
 #include <wx/statbmp.h>
 #include <wx/textctrl.h>
 #include <wx/statline.h>
 #include <wx/frame.h>
+#include <wx/choice.h>
+#include <wx/notebook.h>
 #include <wx/dialog.h>
 #include <wx/gauge.h>
 #include <wx/radiobut.h>
@@ -77,9 +78,9 @@ class MainDialogGenerated : public wxFrame
 		wxMenu* m_menuHelp;
 		wxMenuItem* m_menuItemCheckVer;
 		wxMenuItem* m_menuItemAbout;
-		wxBoxSizer* bSizer1;
-		wxPanel* m_panel71;
-		wxBoxSizer* bSizer6;
+		wxBoxSizer* bSizerPanelHolder;
+		wxPanel* m_panelTopButtons;
+		wxBoxSizer* bSizerTopButtons;
 		
 		wxStaticText* m_staticTextCmpVariant;
 		
@@ -92,10 +93,10 @@ class MainDialogGenerated : public wxFrame
 		wxBitmapButton* m_bpButtonSyncConfig;
 		wxButtonWithImage* m_buttonStartSync;
 		
+		wxPanel* m_panelDirectoryPairs;
 		wxStaticBoxSizer* sbSizerDirLeft;
 		wxPanel* m_panelTopMiddle;
 		
-		wxBoxSizer* bSizerMiddle;
 		wxBitmapButton* m_bpButtonSwapSides;
 		
 		
@@ -104,22 +105,36 @@ class MainDialogGenerated : public wxFrame
 		wxBitmapButton* m_bpButtonAddPair;
 		wxScrolledWindow* m_scrolledWindowFolderPairs;
 		wxBoxSizer* bSizerAddFolderPairs;
+		wxPanel* m_panelGrids;
 		wxBoxSizer* bSizerGridHolder;
 		CustomGridLeft* m_gridLeft;
 		wxPanel* m_panelMiddle;
 		CustomGridMiddle* m_gridMiddle;
 		CustomGridRight* m_gridRight;
-		wxPanel* m_panelBottom;
-		wxBoxSizer* bSizer3;
-		wxNotebook* m_notebookBottomLeft;
-		wxPanel* m_panel30;
+		wxPanel* m_panelConfig;
+		wxBoxSizer* bSizerConfig;
+		
 		wxBitmapButton* m_bpButtonSave;
 		wxBitmapButton* m_bpButtonLoad;
-		wxChoice* m_choiceHistory;
+		wxListBox* m_listBoxHistory;
 		wxPanel* m_panelFilter;
+		
 		wxBitmapButton* m_bpButtonFilter;
 		wxCheckBox* m_checkBoxHideFilt;
+		wxPanel* m_panelStatistics;
+		wxBoxSizer* bSizerStatistics;
+		
+		wxStaticBitmap* m_bitmapCreate;
+		wxTextCtrl* m_textCtrlCreate;
+		wxStaticBitmap* m_bitmapDelete;
+		wxTextCtrl* m_textCtrlDelete;
+		wxStaticBitmap* m_bitmapUpdate;
+		wxTextCtrl* m_textCtrlUpdate;
+		wxStaticBitmap* m_bitmapData;
+		wxTextCtrl* m_textCtrlData;
+		
 		wxPanel* m_panelViewFilter;
+		wxBoxSizer* bSizerViewFilter;
 		
 		ToggleButton* m_bpButtonSyncCreateLeft;
 		ToggleButton* m_bpButtonSyncDirOverwLeft;
@@ -136,18 +151,6 @@ class MainDialogGenerated : public wxFrame
 		ToggleButton* m_bpButtonSyncCreateRight;
 		ToggleButton* m_bpButtonConflict;
 		
-		wxBoxSizer* bSizerBottomRight;
-		
-		wxPanel* m_panelSyncPreview;
-		wxStaticBitmap* m_bitmapCreate;
-		wxTextCtrl* m_textCtrlCreate;
-		wxStaticBitmap* m_bitmapDelete;
-		wxTextCtrl* m_textCtrlDelete;
-		wxStaticBitmap* m_bitmapUpdate;
-		wxTextCtrl* m_textCtrlUpdate;
-		wxStaticBitmap* m_bitmapData;
-		wxTextCtrl* m_textCtrlData;
-		wxBitmapButton* m_bpButton10;
 		wxPanel* m_panelStatusBar;
 		
 		wxStaticText* m_staticTextStatusLeft;
@@ -211,7 +214,6 @@ class MainDialogGenerated : public wxFrame
 		virtual void OnSyncDirRight( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSyncCreateRight( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnConflictFiles( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnQuit( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -227,7 +229,7 @@ class MainDialogGenerated : public wxFrame
 		wxPanel* m_panelLeft;
 		wxPanel* m_panelRight;
 		
-		MainDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 933,612 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		MainDialogGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
 		
 		~MainDialogGenerated();
 	
@@ -241,7 +243,6 @@ class FolderPairGenerated : public wxPanel
 	private:
 	
 	protected:
-		wxPanel* m_panel20;
 		
 		
 		
@@ -250,7 +251,7 @@ class FolderPairGenerated : public wxPanel
 		wxPanel* m_panelLeft;
 		wxTextCtrl* m_directoryLeft;
 		wxDirPickerCtrl* m_dirPickerLeft;
-		wxPanel* m_panel21;
+		wxPanel* m_panel20;
 		wxBitmapButton* m_bpButtonLocalFilter;
 		wxBitmapButton* m_bpButtonAltSyncCfg;
 		wxPanel* m_panelRight;
@@ -382,6 +383,7 @@ class CompareStatusGenerated : public wxPanel
 	private:
 	
 	protected:
+		
 		wxBoxSizer* bSizer42;
 		wxBoxSizer* bSizerFilesFound;
 		wxStaticText* m_staticText321;
@@ -406,10 +408,11 @@ class CompareStatusGenerated : public wxPanel
 		wxStaticText* m_staticText30;
 		wxTextCtrl* m_textCtrlStatus;
 		wxGauge* m_gauge2;
+		
 	
 	public:
 		
-		CompareStatusGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
+		CompareStatusGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxRAISED_BORDER|wxTAB_TRAVERSAL ); 
 		~CompareStatusGenerated();
 	
 };

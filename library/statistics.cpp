@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "statistics.h"
@@ -29,7 +29,7 @@ RetrieveStatistics::~RetrieveStatistics()
 
     outputFile.Write(wxT("Time(ms);Objects;Data\n"));
 
-    for (std::vector<statEntry>::const_iterator i = data.begin(); i != data.end(); ++i)
+    for (std::vector<StatEntry>::const_iterator i = data.begin(); i != data.end(); ++i)
     {
         using common::numberToString;
         outputFile.Write(numberToString(i->time));
@@ -44,7 +44,7 @@ RetrieveStatistics::~RetrieveStatistics()
 
 void RetrieveStatistics::writeEntry(const double value, const int objects)
 {
-    statEntry newEntry;
+    StatEntry newEntry;
     newEntry.value   = value;
     newEntry.objects = objects;
     newEntry.time    = timer->Time();
@@ -104,7 +104,7 @@ wxString Statistics::formatRemainingTime(double timeInMs) const
             formattedTime -= formattedTime % 5; //"floor"
         }
         else
-            formattedTime = int(remainingTime); //"floor"
+            formattedTime = static_cast<int>(remainingTime); //"floor"
     }
     remainingTimeLast = formattedTime;
 
@@ -115,10 +115,10 @@ wxString Statistics::formatRemainingTime(double timeInMs) const
 }
 
 
-Statistics::Statistics(const int totalObjectCount,
-                       const double totalDataAmount,
-                       const unsigned windowSizeRemainingTime,
-                       const unsigned windowSizeBytesPerSecond) :
+Statistics::Statistics(int totalObjectCount,
+                       double totalDataAmount,
+                       unsigned windowSizeRemainingTime,
+                       unsigned windowSizeBytesPerSecond) :
     objectsTotal(totalObjectCount),
     dataTotal(totalDataAmount),
     windowSizeRemTime(windowSizeRemainingTime),
@@ -132,20 +132,27 @@ Statistics::~Statistics()
     delete timer;
 }
 
-void Statistics::addMeasurement(const int objectsCurrent, const double dataCurrent)
+void Statistics::addMeasurement(int objectsCurrent, double dataCurrent)
 {
-    record newEntry;
-    newEntry.objects = objectsCurrent;
-    newEntry.data    = dataCurrent;
-    newEntry.time    = timer->Time();
+    Record newRecord;
+    newRecord.objects = objectsCurrent;
+    newRecord.data    = dataCurrent;
+
+    const long currentTime = timer->Time();
+
+    const TimeRecordMap::value_type newEntry(currentTime, newRecord);
 
     //insert new record
-    measurements.push_back(newEntry);
+    if (!measurements.empty())
+        measurements.insert(--measurements.end(), newEntry); //use fact that time is monotonously ascending
+    else
+        measurements.insert(newEntry);
 
     //remove all records earlier than "currentTime - windowSize"
-    const long newBegin = newEntry.time - windowMax;
-    while (!measurements.empty() && measurements.front().time < newBegin)
-        measurements.pop_front();
+    const long newBegin = currentTime - windowMax;
+    TimeRecordMap::iterator windowBegin = measurements.upper_bound(newBegin);
+    if (windowBegin != measurements.begin())
+        measurements.erase(measurements.begin(), --windowBegin); //retain one point before newBegin in order to handle "measurement holes"
 }
 
 
@@ -153,20 +160,19 @@ wxString Statistics::getRemainingTime() const
 {
     if (!measurements.empty())
     {
+        const TimeRecordMap::value_type& backRecord = *measurements.rbegin();
         //find start of records "window"
-        const record backElement = measurements.back();
-        const long frontTime = backElement.time - windowSizeRemTime;
-        std::list<record>::const_iterator frontElement = measurements.end();
-        do
-        {
-            --frontElement;
-        }
-        while (frontElement != measurements.begin() && frontElement->time > frontTime);
+        const long frontTime = backRecord.first - windowSizeRemTime;
+        TimeRecordMap::const_iterator windowBegin = measurements.upper_bound(frontTime);
+        if (windowBegin != measurements.begin())
+            --windowBegin; //one point before window begin in order to handle "measurement holes"
 
-        const double timeDelta = backElement.time - frontElement->time;
-        const double dataDelta = backElement.data - frontElement->data;
+        const TimeRecordMap::value_type& frontRecord = *windowBegin;
+//-----------------------------------------------------------------------------------------------
+        const double timeDelta = backRecord.first       - frontRecord.first;
+        const double dataDelta = backRecord.second.data - frontRecord.second.data;
 
-        const double dataRemaining = dataTotal    - backElement.data;
+        const double dataRemaining = dataTotal - backRecord.second.data;
 
         if (!isNull(dataDelta))
             return formatRemainingTime(dataRemaining * timeDelta / dataDelta);
@@ -180,17 +186,17 @@ wxString Statistics::getBytesPerSecond() const
 {
     if (!measurements.empty())
     {
+        const TimeRecordMap::value_type& backRecord = *measurements.rbegin();
         //find start of records "window"
-        const long frontTime = measurements.back().time - windowSizeBPS;
-        std::list<record>::const_iterator frontElement = measurements.end();
-        do
-        {
-            --frontElement;
-        }
-        while (frontElement != measurements.begin() && frontElement->time > frontTime);
+        const long frontTime = backRecord.first - windowSizeBPS;
+        TimeRecordMap::const_iterator windowBegin = measurements.upper_bound(frontTime);
+        if (windowBegin != measurements.begin())
+            --windowBegin; //one point before window begin in order to handle "measurement holes"
 
-        const double timeDelta = measurements.back().time - frontElement->time;
-        const double dataDelta = measurements.back().data - frontElement->data;
+        const TimeRecordMap::value_type& frontRecord = *windowBegin;
+//-----------------------------------------------------------------------------------------------
+        const double timeDelta = backRecord.first       - frontRecord.first;
+        const double dataDelta = backRecord.second.data - frontRecord.second.data;
 
         if (!isNull(timeDelta))
             return ffs3::formatFilesizeToShortString(dataDelta * 1000 / timeDelta) + _("/sec");

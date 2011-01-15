@@ -21,11 +21,9 @@ FFS_CPPFLAGS+=`pkg-config --cflags gtkmm-2.4`
 LINKFLAGS+=`pkg-config --libs gtkmm-2.4`
 
 #support for SELinux (optional)
-ifeq ($(BUILD),release)
 SELINUX_EXISTING=$(shell pkg-config --exists libselinux && echo YES)
 ifeq ($(SELINUX_EXISTING),YES)
 FFS_CPPFLAGS += -DHAVE_SELINUX
-endif
 endif
 
 FILE_LIST=              #internal list of all *.cpp files needed for compilation

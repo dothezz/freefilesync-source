@@ -2,7 +2,7 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %x / %y usuniętych obiektów
-%x Byte
+%x Bytes
 %x Bajtów
 %x GB
 %x GB
@@ -77,7 +77,7 @@
 &Pause
 &Pauza
 &Program
-
+&Program
 &Quit
 &Zamknij
 &Restore
@@ -256,6 +256,10 @@ Continue
 Kontynuuj
 Conversion error:
 Błąd konwersji:
+Copy attributes only from left to right
+Kopiuj atrybuty tylko z lewej strony
+Copy attributes only from right to left
+Kopiuj atrybuty tylko z prawej strony
 Copy filesystem permissions
 Kopiuj uprawnienia plików
 Copy from left to right
@@ -363,7 +367,7 @@ Pozostałe elementy:
 Email
 Poczta
 Encoding extended time information: %x
-
+Odkodowywanie rozszerzonych informacji o czasie: %x
 Endless loop when traversing directory:
 Zapętlenie podczas przeglądania katalogu:
 Error
@@ -405,7 +409,7 @@ Błąd odczytu pliku:
 Error reading from synchronization database:
 Błąd odczytu z bazy danych synchronizacji:
 Error reading security context:
-
+Błąd odczytu kontekstu bezpieczeństwa:
 Error resolving symbolic link:
 Błąd odczytu dowiązania symbolicznego:
 Error setting directory lock:
@@ -421,7 +425,7 @@ Błąd podczas monitorowania katalogów.
 Error writing file:
 Błąd zapisu pliku:
 Error writing security context:
-
+Błąd zapisu kontekstu bezpieczeństwa:
 Error writing to synchronization database:
 Błąd zapisu do bazy danych synchronizacji:
 Example
@@ -472,6 +476,8 @@ Files that exist on both sides, right one is newer
 Pliki, które istnieją po obu stronach, prawa strona jest nowsza
 Files that have different content
 Pliki, które mają różną zawartość
+Files/folders that differ in attributes only
+Pliki/foldery różniące się wyłącznie atrybutami
 Files/folders that exist on left side only
 Pliki/katalogi istniejące tylko po lewej stronie
 Files/folders that exist on right side only
@@ -494,6 +500,8 @@ Find what:
 Co:
 Folder Comparison and Synchronization
 Porównywanie i Synchronizacja folderów
+Folder pairs
+Pary folderów
 Follow
 Podąrzaj
 Free disk space available:
@@ -606,12 +614,14 @@ Log-messages:
 Logi:
 Logging
 Tworzenie logów
+Main bar
+Główny pasek
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Tworzenie Shadow Copies dla WOW64 nie jest obsługiwane. Zainstaluj 64 bitową wersję FreeFileSync.
 Match case
 Uwzględnij wielkość liter
-Minimum Idle Time
-Minimalny czas bezczynności
+Minimum Idle Time [seconds]
+Minimalny czas bezczynności [sekundy]
 Mirror ->>
 Lustrzana ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 Udostępnione na zasadach licencji GNU General Public License:
 Question
 Pytanie
-Quit
-Zakończ
 Re-enable all hidden dialogs?
 Odblokować wszystkie ukryte dialogi?
 RealtimeSync - Automated Synchronization
@@ -708,6 +716,8 @@ Report translation error
 Zgłoś błąd w tłumaczeniu
 Reset
 Resetuj
+Reset view
+Resetuj widok
 Right
 Prawy
 S&ave configuration...
@@ -734,6 +744,8 @@ Set direction:
 Kierunek  synchronizacji: 
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Ustawianie domyślnego kierunku synchronizacji: Stare pliki zostaną nadpisane nowszymi.
+Show \"%x\"
+Pokaż \"%x\"
 Show conflicts
 Pokaż konflikty
 Show files that are different
@@ -783,7 +795,7 @@ Prędkość:
 Start
 Rozpocznij
 Start minimized and write status information to a logfile
-
+Uruchom zminimalizowane i zapisuj informacje do pliku logów
 Start synchronization
 Rozpocznij synchronizację
 Statistics
@@ -852,6 +864,8 @@ Unresolved conflicts existing!
 Istnieją nierozwiązane konflikty!
 Update ->
 Uaktualnij ->
+Updating attributes of %x
+Aktualizowanie atrybutów %x
 Usage:
 Użycie:
 Use Recycle Bin
@@ -868,8 +882,8 @@ Verifying file %x
 Weryfikowanie pliku %x
 Volume name %x not part of filename %y!
 Dysk %x nie jest częścią pliku %y!
-Waiting for all directories to become available...
-Oczekiwanie aż katalogi staną się dostępne...
+Waiting for missing directories...
+Oczekiwanie na brakujące katalogi...
 Waiting while directory is locked (%x)...
 Blokada katalogu (%x), oczekiwanie...
 Warning
@@ -879,7 +893,7 @@ Uwaga: Błąd synchronizacji dla \"%x\" elementów:
 When the comparison is started with this option set the following decision tree is processed:
 Gdy porównywanie z zaznaczoną opcją jest w toku, podejmowane są następujące dezyje:
 You can ignore conflicts and continue synchronization.
-Możesz je zignorować i kontynułować synchronizację.
+Możesz je zignorować i kontynuować synchronizację.
 You can ignore the error to consider not existing directories as empty.
 Możesz zignorować ten błąd i uznać nieistniejący katalog za pusty.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!

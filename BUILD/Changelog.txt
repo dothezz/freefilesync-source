@@ -2,6 +2,31 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.13
+---------------
+Implemented Advanced User Interface to allow user specified layout customizations
+Process case sensitive file/directory/symlink names
+Synchronize name/attributes only avoiding full copy if appropriate
+Prevent hibernation/sleep mode during comparison and synchronization (Windows)
+New database format: single file for FreeFileSync 32 and 64 bit versions
+	- full sync suggested before migrating to v3.13
+	- old sync.x64.ffs_db files may be deleted
+Improved algorithm to calculate remaining time
+Allow resizing window containing multiple folder pairs
+Show folder short names in column file name
+Correctly report message "nothing to sync" in batch mode
+Removed libjpg-8 dependency (Linux)
+Fixed loading correct maximized position on multi-screen desktop
+RealtimeSync: Removed blank icons in ALT-TAB list during execution of commandline
+Show RealtimeSync job name as systray tooltip
+Last used configurations as sorted list without size limitation
+Remove redundant configuration when merging multiple ffs_gui/ffs_batch files
+Warning if folder is modified that is part of multiple folder pairs
+Aggregated warning messages for all folder pairs instead of one per pair
+Added privilege to access restricted symlink content
+Added Greek translation
+
+
 Changelog v3.12
 ---------------
 Allow empty folder pairs without complaining

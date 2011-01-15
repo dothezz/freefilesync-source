@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "synchronization.h"
@@ -21,6 +21,8 @@
 #include <boost/scoped_array.hpp>
 #include <memory>
 #include "library/db_file.h"
+#include "shared/disable_standby.h"
+#include "library/cmp_filetime.h"
 
 #ifdef FFS_WIN
 #include "shared/long_path_prefix.h"
@@ -55,27 +57,6 @@ SyncStatistics::SyncStatistics(const FolderComparison& folderCmp)
 {
     init();
     std::for_each(folderCmp.begin(), folderCmp.end(), boost::bind(&SyncStatistics::getNumbersRecursively, this, _1));
-}
-
-
-int SyncStatistics::getCreate(bool inclLeft, bool inclRight) const
-{
-    return (inclLeft  ? createLeft  : 0) +
-           (inclRight ? createRight : 0);
-}
-
-
-int SyncStatistics::getOverwrite(bool inclLeft, bool inclRight) const
-{
-    return (inclLeft  ? overwriteLeft  : 0) +
-           (inclRight ? overwriteRight : 0);
-}
-
-
-int SyncStatistics::getDelete(bool inclLeft, bool inclRight) const
-{
-    return (inclLeft  ? deleteLeft  : 0) +
-           (inclRight ? deleteRight : 0);
 }
 
 
@@ -161,6 +142,14 @@ void SyncStatistics::getFileNumbers(const FileMapping& fileObj)
             firstConflicts.push_back(std::make_pair(fileObj.getObjRelativeName(), fileObj.getSyncOpConflict()));
         break;
 
+    case SO_COPY_METADATA_TO_LEFT:
+        ++overwriteLeft;
+        break;
+
+    case SO_COPY_METADATA_TO_RIGHT:
+        ++overwriteRight;
+        break;
+
     case SO_DO_NOTHING:
     case SO_EQUAL:
         break;
@@ -190,10 +179,12 @@ void SyncStatistics::getLinkNumbers(const SymLinkMapping& linkObj)
         break;
 
     case SO_OVERWRITE_LEFT:
+    case SO_COPY_METADATA_TO_LEFT:
         ++overwriteLeft;
         break;
 
     case SO_OVERWRITE_RIGHT:
+    case SO_COPY_METADATA_TO_RIGHT:
         ++overwriteRight;
         break;
 
@@ -240,6 +231,14 @@ void SyncStatistics::getDirNumbers(const DirMapping& dirObj)
         ++conflict;
         if (firstConflicts.size() < 3) //save the first 3 conflict texts
             firstConflicts.push_back(std::make_pair(dirObj.getObjRelativeName(), dirObj.getSyncOpConflict()));
+        break;
+
+    case SO_COPY_METADATA_TO_LEFT:
+        ++overwriteLeft;
+        break;
+
+    case SO_COPY_METADATA_TO_RIGHT:
+        ++overwriteRight;
         break;
 
     case SO_DO_NOTHING:
@@ -339,6 +338,8 @@ private:
             case SO_DO_NOTHING:
             case SO_EQUAL:
             case SO_UNRESOLVED_CONFLICT:
+            case SO_COPY_METADATA_TO_LEFT:
+            case SO_COPY_METADATA_TO_RIGHT:
                 break;
             }
 
@@ -421,11 +422,11 @@ bool ffs3::synchronizationNeeded(const FolderComparison& folderCmp)
 bool significantDifferenceDetected(const SyncStatistics& folderPairStat)
 {
     //initial file copying shall not be detected as major difference
-    if (    folderPairStat.getCreate(true, false) == 0 &&
+    if (    folderPairStat.getCreate<LEFT_SIDE>() == 0 &&
             folderPairStat.getOverwrite()         == 0 &&
             folderPairStat.getDelete()            == 0 &&
             folderPairStat.getConflict()          == 0) return false;
-    if (    folderPairStat.getCreate(false, true) == 0 &&
+    if (    folderPairStat.getCreate<RIGHT_SIDE>() == 0 &&
             folderPairStat.getOverwrite()         == 0 &&
             folderPairStat.getDelete()            == 0 &&
             folderPairStat.getConflict()          == 0) return false;
@@ -859,6 +860,8 @@ bool diskSpaceIsReduced(const FileMapping& fileObj)
     case SO_DO_NOTHING:
     case SO_EQUAL:
     case SO_UNRESOLVED_CONFLICT:
+    case SO_COPY_METADATA_TO_LEFT:
+    case SO_COPY_METADATA_TO_RIGHT:
         return false;
     }
     return false; //dummy
@@ -881,11 +884,13 @@ bool diskSpaceIsReduced(const DirMapping& dirObj)
     case SO_CREATE_NEW_RIGHT:
     case SO_DO_NOTHING:
     case SO_EQUAL:
+    case SO_COPY_METADATA_TO_LEFT:
+    case SO_COPY_METADATA_TO_RIGHT:
         return false;
     }
     return false; //dummy
 }
-//----------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------
 
 
 class ffs3::SynchronizeFolderPair
@@ -903,12 +908,13 @@ public:
         delHandling_(delHandling),
         verifyCopiedFiles_(syncProc.verifyCopiedFiles_),
         copyFilePermissions_(syncProc.copyFilePermissions_),
-        txtCopyingFile    (wxToZ(_("Copying new file %x to %y")).     Replace(Zstr("%x"), Zstr("\"%x\""), false).Replace(Zstr("%y"), Zstr("\n\"%y\""), false)),
+        txtCopyingFile    (wxToZ(_("Copying new file %x to %y")).         Replace(Zstr("%x"), Zstr("\"%x\""), false).Replace(Zstr("%y"), Zstr("\n\"%y\""), false)),
         txtCopyingLink    (wxToZ(_("Copying new Symbolic Link %x to %y")).Replace(Zstr("%x"), Zstr("\"%x\""), false).Replace(Zstr("%y"), Zstr("\n\"%y\""), false)),
-        txtOverwritingFile(wxToZ(_("Overwriting file %x in %y")).       Replace(Zstr("%x"), Zstr("\"%x\""), false).Replace(Zstr("%y"), Zstr("\n\"%y\""), false)),
+        txtOverwritingFile(wxToZ(_("Overwriting file %x in %y")).         Replace(Zstr("%x"), Zstr("\"%x\""), false).Replace(Zstr("%y"), Zstr("\n\"%y\""), false)),
         txtOverwritingLink(wxToZ(_("Overwriting Symbolic Link %x in %y")).Replace(Zstr("%x"), Zstr("\"%x\""), false).Replace(Zstr("%y"), Zstr("\n\"%y\""), false)),
         txtCreatingFolder (wxToZ(_("Creating folder %x")).Replace(Zstr("%x"), Zstr("\n\"%x\""), false)),
-        txtVerifying      (wxToZ(_("Verifying file %x")). Replace(Zstr("%x"), Zstr("\n\"%x\""), false)) {}
+        txtVerifying      (wxToZ(_("Verifying file %x")). Replace(Zstr("%x"), Zstr("\n\"%x\""), false)),
+        txtWritingAttributes(wxToZ(_("Updating attributes of %x")).Replace(Zstr("%x"), Zstr("\n\"%x\""), false)) {}
 
 
     template <bool reduceDiskSpace> //"true" if files deletion shall happen only
@@ -948,6 +954,7 @@ private:
     const Zstring txtOverwritingLink;
     const Zstring txtCreatingFolder;
     const Zstring txtVerifying;
+    const Zstring txtWritingAttributes;
 };
 
 
@@ -985,10 +992,12 @@ void SynchronizeFolderPair::execute(HierarchyObject& hierObj)
             switch (syncOp)
             {
             case SO_CREATE_NEW_LEFT:
-                copyFileTimes(i->getFullName<RIGHT_SIDE>(), i->getFullName<LEFT_SIDE>(), true); //throw (FileError)
+            case SO_COPY_METADATA_TO_LEFT:
+                copyFileTimes(i->getFullName<RIGHT_SIDE>(), i->getFullName<LEFT_SIDE>(), true); //deref symlinks; throw (FileError)
                 break;
             case SO_CREATE_NEW_RIGHT:
-                copyFileTimes(i->getFullName<LEFT_SIDE>(), i->getFullName<RIGHT_SIDE>(), true); //throw (FileError)
+            case SO_COPY_METADATA_TO_RIGHT:
+                copyFileTimes(i->getFullName<LEFT_SIDE>(), i->getFullName<RIGHT_SIDE>(), true); //deref symlinks; throw (FileError)
                 break;
             case SO_OVERWRITE_RIGHT:
             case SO_OVERWRITE_LEFT:
@@ -1014,7 +1023,7 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
     switch (fileObj.getSyncOperation()) //evaluate comparison result and sync direction
     {
     case SO_CREATE_NEW_LEFT:
-        target = fileObj.getBaseDirPf<LEFT_SIDE>() + fileObj.getRelativeName<RIGHT_SIDE>();
+        target = fileObj.getBaseDirPf<LEFT_SIDE>() + fileObj.getRelativeName<RIGHT_SIDE>(); //can't use "getFullName" as target is not yet existing
 
         statusText = txtCopyingFile;
         statusText.Replace(Zstr("%x"), fileObj.getShortName<RIGHT_SIDE>(), false);
@@ -1055,8 +1064,23 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
         delHandling_.removeFile<RIGHT_SIDE>(fileObj); //throw FileError()
         break;
 
+    case SO_OVERWRITE_LEFT:
+        target = fileObj.getBaseDirPf<LEFT_SIDE>() + fileObj.getRelativeName<RIGHT_SIDE>(); //respect differences in case of source object
+
+        statusText = txtOverwritingFile;
+        statusText.Replace(Zstr("%x"), fileObj.getShortName<RIGHT_SIDE>(), false);
+        statusText.Replace(Zstr("%y"), fileObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR), false);
+        statusUpdater_.reportInfo(statusText);
+        statusUpdater_.requestUiRefresh(); //trigger display refresh
+
+        delHandling_.removeFile<LEFT_SIDE>(fileObj); //throw FileError()
+        fileObj.removeObject<LEFT_SIDE>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
+
+        copyFileUpdating(fileObj.getFullName<RIGHT_SIDE>(), target, fileObj.getFileSize<RIGHT_SIDE>());
+        break;
+
     case SO_OVERWRITE_RIGHT:
-        target = fileObj.getBaseDirPf<RIGHT_SIDE>() + fileObj.getRelativeName<LEFT_SIDE>();
+        target = fileObj.getBaseDirPf<RIGHT_SIDE>() + fileObj.getRelativeName<LEFT_SIDE>(); //respect differences in case of source object
 
         statusText = txtOverwritingFile;
         statusText.Replace(Zstr("%x"), fileObj.getShortName<LEFT_SIDE>(), false);
@@ -1070,19 +1094,32 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
         copyFileUpdating(fileObj.getFullName<LEFT_SIDE>(), target, fileObj.getFileSize<LEFT_SIDE>());
         break;
 
-    case SO_OVERWRITE_LEFT:
-        target = fileObj.getBaseDirPf<LEFT_SIDE>() + fileObj.getRelativeName<RIGHT_SIDE>();
-
-        statusText = txtOverwritingFile;
-        statusText.Replace(Zstr("%x"), fileObj.getShortName<RIGHT_SIDE>(), false);
-        statusText.Replace(Zstr("%y"), fileObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR), false);
+    case SO_COPY_METADATA_TO_LEFT:
+        statusText = txtWritingAttributes;
+        statusText.Replace(Zstr("%x"), fileObj.getFullName<LEFT_SIDE>(), false);
         statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
-        delHandling_.removeFile<LEFT_SIDE>(fileObj); //throw FileError()
-        fileObj.removeObject<LEFT_SIDE>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
+        if (fileObj.getShortName<LEFT_SIDE>() != fileObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
+            moveFile(fileObj.getFullName<LEFT_SIDE>(),
+                     fileObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + fileObj.getShortName<RIGHT_SIDE>()); //throw (FileError);
 
-        copyFileUpdating(fileObj.getFullName<RIGHT_SIDE>(), target, fileObj.getFileSize<RIGHT_SIDE>());
+        if (!sameFileTime(fileObj.getLastWriteTime<LEFT_SIDE>(), fileObj.getLastWriteTime<RIGHT_SIDE>(), 2)) ////respect 2 second FAT/FAT32 precision
+            copyFileTimes(fileObj.getFullName<RIGHT_SIDE>(), fileObj.getFullName<LEFT_SIDE>(), true); //deref symlinks; throw (FileError)
+        break;
+
+    case SO_COPY_METADATA_TO_RIGHT:
+        statusText = txtWritingAttributes;
+        statusText.Replace(Zstr("%x"), fileObj.getFullName<RIGHT_SIDE>(), false);
+        statusUpdater_.reportInfo(statusText);
+        statusUpdater_.requestUiRefresh(); //trigger display refresh
+
+        if (fileObj.getShortName<LEFT_SIDE>() != fileObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
+            moveFile(fileObj.getFullName<RIGHT_SIDE>(),
+                     fileObj.getFullName<RIGHT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + fileObj.getShortName<LEFT_SIDE>()); //throw (FileError);
+
+        if (!sameFileTime(fileObj.getLastWriteTime<LEFT_SIDE>(), fileObj.getLastWriteTime<RIGHT_SIDE>(), 2)) ////respect 2 second FAT/FAT32 precision
+            copyFileTimes(fileObj.getFullName<LEFT_SIDE>(), fileObj.getFullName<RIGHT_SIDE>(), true); //deref symlinks; throw (FileError)
         break;
 
     case SO_DO_NOTHING:
@@ -1149,8 +1186,23 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
         deleteSymlink<RIGHT_SIDE>(linkObj); //throw FileError()
         break;
 
+    case SO_OVERWRITE_LEFT:
+        target = linkObj.getBaseDirPf<LEFT_SIDE>() + linkObj.getRelativeName<RIGHT_SIDE>(); //respect differences in case of source object
+
+        statusText = txtOverwritingLink;
+        statusText.Replace(Zstr("%x"), linkObj.getShortName<RIGHT_SIDE>(), false);
+        statusText.Replace(Zstr("%y"), linkObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR), false);
+        statusUpdater_.reportInfo(statusText);
+        statusUpdater_.requestUiRefresh(); //trigger display refresh
+
+        deleteSymlink<LEFT_SIDE>(linkObj); //throw FileError()
+        linkObj.removeObject<LEFT_SIDE>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
+
+        copySymlink(linkObj.getFullName<RIGHT_SIDE>(), target, linkObj.getLinkType<RIGHT_SIDE>());
+        break;
+
     case SO_OVERWRITE_RIGHT:
-        target = linkObj.getBaseDirPf<RIGHT_SIDE>() + linkObj.getRelativeName<LEFT_SIDE>();
+        target = linkObj.getBaseDirPf<RIGHT_SIDE>() + linkObj.getRelativeName<LEFT_SIDE>(); //respect differences in case of source object
 
         statusText = txtOverwritingLink;
         statusText.Replace(Zstr("%x"), linkObj.getShortName<LEFT_SIDE>(), false);
@@ -1164,19 +1216,32 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
         copySymlink(linkObj.getFullName<LEFT_SIDE>(), target, linkObj.getLinkType<LEFT_SIDE>());
         break;
 
-    case SO_OVERWRITE_LEFT:
-        target = linkObj.getBaseDirPf<LEFT_SIDE>() + linkObj.getRelativeName<RIGHT_SIDE>();
-
-        statusText = txtOverwritingLink;
-        statusText.Replace(Zstr("%x"), linkObj.getShortName<RIGHT_SIDE>(), false);
-        statusText.Replace(Zstr("%y"), linkObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR), false);
+    case SO_COPY_METADATA_TO_LEFT:
+        statusText = txtWritingAttributes;
+        statusText.Replace(Zstr("%x"), linkObj.getFullName<LEFT_SIDE>(), false);
         statusUpdater_.reportInfo(statusText);
         statusUpdater_.requestUiRefresh(); //trigger display refresh
 
-        deleteSymlink<LEFT_SIDE>(linkObj); //throw FileError()
-        linkObj.removeObject<LEFT_SIDE>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
+        if (linkObj.getShortName<LEFT_SIDE>() != linkObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
+            moveFile(linkObj.getFullName<LEFT_SIDE>(),
+                     linkObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + linkObj.getShortName<RIGHT_SIDE>()); //throw (FileError);
 
-        copySymlink(linkObj.getFullName<RIGHT_SIDE>(), target, linkObj.getLinkType<RIGHT_SIDE>());
+        if (!sameFileTime(linkObj.getLastWriteTime<LEFT_SIDE>(), linkObj.getLastWriteTime<RIGHT_SIDE>(), 2)) ////respect 2 second FAT/FAT32 precision
+            copyFileTimes(linkObj.getFullName<RIGHT_SIDE>(), linkObj.getFullName<LEFT_SIDE>(), false); //don't deref symlinks; throw (FileError)
+        break;
+
+    case SO_COPY_METADATA_TO_RIGHT:
+        statusText = txtWritingAttributes;
+        statusText.Replace(Zstr("%x"), linkObj.getFullName<RIGHT_SIDE>(), false);
+        statusUpdater_.reportInfo(statusText);
+        statusUpdater_.requestUiRefresh(); //trigger display refresh
+
+        if (linkObj.getShortName<LEFT_SIDE>() != linkObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
+            moveFile(linkObj.getFullName<RIGHT_SIDE>(),
+                     linkObj.getFullName<RIGHT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + linkObj.getShortName<LEFT_SIDE>()); //throw (FileError);
+
+        if (!sameFileTime(linkObj.getLastWriteTime<LEFT_SIDE>(), linkObj.getLastWriteTime<RIGHT_SIDE>(), 2)) ////respect 2 second FAT/FAT32 precision
+            copyFileTimes(linkObj.getFullName<LEFT_SIDE>(), linkObj.getFullName<RIGHT_SIDE>(), false); //don't deref symlinks; throw (FileError)
         break;
 
     case SO_DO_NOTHING:
@@ -1268,6 +1333,30 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
         }
         break;
 
+    case SO_COPY_METADATA_TO_LEFT:
+        statusText = txtWritingAttributes;
+        statusText.Replace(Zstr("%x"), dirObj.getFullName<LEFT_SIDE>(), false);
+        statusUpdater_.reportInfo(statusText);
+        statusUpdater_.requestUiRefresh(); //trigger display refresh
+
+        if (dirObj.getShortName<LEFT_SIDE>() != dirObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
+            moveFile(dirObj.getFullName<LEFT_SIDE>(),
+                     dirObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + dirObj.getShortName<RIGHT_SIDE>()); //throw (FileError);
+        //copyFileTimes(dirObj.getFullName<RIGHT_SIDE>(), dirObj.getFullName<LEFT_SIDE>(), true); //throw (FileError) -> is executed after sub-objects have finished synchronization
+        break;
+
+    case SO_COPY_METADATA_TO_RIGHT:
+        statusText = txtWritingAttributes;
+        statusText.Replace(Zstr("%x"), dirObj.getFullName<RIGHT_SIDE>(), false);
+        statusUpdater_.reportInfo(statusText);
+        statusUpdater_.requestUiRefresh(); //trigger display refresh
+
+        if (dirObj.getShortName<LEFT_SIDE>() != dirObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
+            moveFile(dirObj.getFullName<RIGHT_SIDE>(),
+                     dirObj.getFullName<RIGHT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + dirObj.getShortName<LEFT_SIDE>()); //throw (FileError);
+        //copyFileTimes(dirObj.getFullName<LEFT_SIDE>(), dirObj.getFullName<RIGHT_SIDE>(), true); //throw (FileError) -> is executed after sub-objects have finished synchronization
+        break;
+
     case SO_OVERWRITE_RIGHT:
     case SO_OVERWRITE_LEFT:
         assert(false);
@@ -1303,6 +1392,24 @@ void makeSameLength(wxString& first, wxString& second)
     first.Pad(maxPref - first.length(), wxT(' '), true);
     second.Pad(maxPref - second.length(), wxT(' '), true);
 }
+
+struct LessDependentDirectory : public std::binary_function<Zstring, Zstring, bool>
+{
+    bool operator()(const Zstring& lhs, const Zstring& rhs) const
+    {
+        return LessFilename()(Zstring(lhs.c_str(), std::min(lhs.length(), rhs.length())),
+                              Zstring(rhs.c_str(), std::min(lhs.length(), rhs.length())));
+    }
+};
+
+struct EqualDependentDirectory : public std::binary_function<Zstring, Zstring, bool>
+{
+    bool operator()(const Zstring& lhs, const Zstring& rhs) const
+    {
+        return EqualFilename()(Zstring(lhs.c_str(), std::min(lhs.length(), rhs.length())),
+                               Zstring(rhs.c_str(), std::min(lhs.length(), rhs.length())));
+    }
+};
 }
 
 
@@ -1328,16 +1435,58 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
     if (syncConfig.size() != folderCmp.size())
         throw std::logic_error("Programming Error: Contract violation!");
 
-    std::vector<std::pair<bool, bool> > baseDirNeeded;
+    //aggregate information
+    typedef std::set<Zstring,         LessDependentDirectory> DirReadSet;  //count (at least one) read access
+    typedef std::map<Zstring, size_t, LessDependentDirectory> DirWriteMap; //count (read+)write accesses
+    DirReadSet  dirReadCount;
+    DirWriteMap dirWriteCount;
 
+    typedef std::vector<std::pair<Zstring, Zstring> > DirPairList;
+    DirPairList significantDiff;
+
+    typedef std::vector<std::pair<Zstring, std::pair<wxLongLong, wxLongLong> > > DirSpaceRequAvailList; //dirname / space required / space available
+    DirSpaceRequAvailList diskSpaceMissing;
+
+
+    //start checking folder pairs
     for (FolderComparison::const_iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
     {
+        //exclude some pathological case (leftdir, rightdir are empty)
+        if (EqualFilename()(j->getBaseDir<LEFT_SIDE>(), j->getBaseDir<RIGHT_SIDE>()))
+            continue;
+
         const FolderPairSyncCfg& folderPairCfg = syncConfig[j - folderCmp.begin()];
         const SyncStatistics statisticsFolderPair(*j);
 
-        //save information whether base directories need to be created (if not yet existing)
-        baseDirNeeded.push_back(std::make_pair(statisticsFolderPair.getCreate(true, false) > 0,
-                                               statisticsFolderPair.getCreate(false, true) > 0));
+        //aggregate information of folders used by multiple pairs in read/write access
+        const bool writeLeft = statisticsFolderPair.getCreate   <LEFT_SIDE>() +
+                               statisticsFolderPair.getOverwrite<LEFT_SIDE>() +
+                               statisticsFolderPair.getDelete   <LEFT_SIDE>() > 0;
+
+        const bool writeRight = statisticsFolderPair.getCreate   <RIGHT_SIDE>() +
+                                statisticsFolderPair.getOverwrite<RIGHT_SIDE>() +
+                                statisticsFolderPair.getDelete   <RIGHT_SIDE>() > 0;
+        if (!EqualDependentDirectory()(j->getBaseDir<LEFT_SIDE>(), j->getBaseDir<RIGHT_SIDE>())) //true in general
+        {
+            if (writeLeft)
+            {
+                ++dirWriteCount[j->getBaseDir<LEFT_SIDE>()];
+                if (writeRight)
+                    ++dirWriteCount[j->getBaseDir<RIGHT_SIDE>()];
+                else
+                    dirReadCount.insert(j->getBaseDir<RIGHT_SIDE>());
+            }
+            else if (writeRight)
+            {
+                dirReadCount.insert(j->getBaseDir<LEFT_SIDE>());
+                ++dirWriteCount[j->getBaseDir<RIGHT_SIDE>()];
+            }
+        }
+        else //if folder pair contains two dependent folders, a warning was already issued after comparison; in this context treat as one write access at most
+        {
+            if (writeLeft || writeRight)
+                ++dirWriteCount[j->getBaseDir<LEFT_SIDE>()];
+        }
 
         if (statisticsFolderPair.getOverwrite() + statisticsFolderPair.getDelete() > 0)
         {
@@ -1373,13 +1522,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
 
         //check if more than 50% of total number of files/dirs are to be created/overwritten/deleted
         if (significantDifferenceDetected(statisticsFolderPair))
-        {
-            statusUpdater.reportWarning(wxString(_("Significant difference detected:")) + wxT("\n") +
-                                        zToWx(j->getBaseDir<LEFT_SIDE>()) + wxT(" <-> ") + wxT("\n") +
-                                        zToWx(j->getBaseDir<RIGHT_SIDE>()) + wxT("\n\n") +
-                                        _("More than 50% of the total number of files will be copied or deleted!"),
-                                        m_warnings.warningSignificantDifference);
-        }
+            significantDiff.push_back(std::make_pair(j->getBaseDir<LEFT_SIDE>(), j->getBaseDir<RIGHT_SIDE>()));
 
         //check for sufficient free diskspace in left directory
         const std::pair<wxLongLong, wxLongLong> spaceNeeded = freeDiskSpaceNeeded(*j, folderPairCfg.handleDeletion, folderPairCfg.custDelFolder);
@@ -1389,11 +1532,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         {
             if (0 < freeDiskSpaceLeft && //zero disk space is either an error or not: in both cases this warning message is obsolete (WebDav seems to report 0)
                     freeDiskSpaceLeft < spaceNeeded.first)
-                statusUpdater.reportWarning(wxString(_("Not enough free disk space available in:")) + wxT("\n") +
-                                            wxT("\"") + zToWx(j->getBaseDir<LEFT_SIDE>()) + wxT("\"\n\n") +
-                                            _("Total required free disk space:") + wxT(" ") + formatFilesizeToShortString(spaceNeeded.first) + wxT("\n") +
-                                            _("Free disk space available:") + wxT(" ") + formatFilesizeToShortString(freeDiskSpaceLeft),
-                                            m_warnings.warningNotEnoughDiskSpace);
+                diskSpaceMissing.push_back(std::make_pair(j->getBaseDir<LEFT_SIDE>(), std::make_pair(spaceNeeded.first, freeDiskSpaceLeft)));
         }
 
         //check for sufficient free diskspace in right directory
@@ -1402,11 +1541,7 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         {
             if (0 < freeDiskSpaceRight && //zero disk space is either an error or not: in both cases this warning message is obsolete (WebDav seems to report 0)
                     freeDiskSpaceRight < spaceNeeded.second)
-                statusUpdater.reportWarning(wxString(_("Not enough free disk space available in:")) + wxT("\n") +
-                                            wxT("\"") + zToWx(j->getBaseDir<RIGHT_SIDE>()) + wxT("\"\n\n") +
-                                            _("Total required free disk space:") + wxT(" ") + formatFilesizeToShortString(spaceNeeded.second) + wxT("\n") +
-                                            _("Free disk space available:") + wxT(" ") + formatFilesizeToShortString(freeDiskSpaceRight),
-                                            m_warnings.warningNotEnoughDiskSpace);
+                diskSpaceMissing.push_back(std::make_pair(j->getBaseDir<RIGHT_SIDE>(), std::make_pair(spaceNeeded.second, freeDiskSpaceRight)));
         }
     }
 
@@ -1434,6 +1569,53 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         statusUpdater.reportWarning(warningMessage, m_warnings.warningUnresolvedConflicts);
     }
 
+
+    //check if more than 50% of total number of files/dirs are to be created/overwritten/deleted
+    if (!significantDiff.empty())
+    {
+        wxString warningMessage = _("Significant difference detected:");
+
+        for (DirPairList::const_iterator i = significantDiff.begin(); i != significantDiff.end(); ++i)
+            warningMessage += wxString(wxT("\n\n")) +
+                              zToWx(i->first) + wxT(" <-> ") + wxT("\n") +
+                              zToWx(i->second);
+        warningMessage += wxString(wxT("\n\n")) +_("More than 50% of the total number of files will be copied or deleted!");
+
+        statusUpdater.reportWarning(warningMessage, m_warnings.warningSignificantDifference);
+    }
+
+
+    //check for sufficient free diskspace
+    if (!diskSpaceMissing.empty())
+    {
+        wxString warningMessage = _("Not enough free disk space available in:");
+
+        for (DirSpaceRequAvailList::const_iterator i = diskSpaceMissing.begin(); i != diskSpaceMissing.end(); ++i)
+            warningMessage += wxString(wxT("\n\n")) +
+                              wxT("\"") + zToWx(i->first) + wxT("\"\n") +
+                              _("Total required free disk space:") + wxT(" ") + formatFilesizeToShortString(i->second.first)  + wxT("\n") +
+                              _("Free disk space available:")      + wxT(" ") + formatFilesizeToShortString(i->second.second);
+
+        statusUpdater.reportWarning(warningMessage, m_warnings.warningNotEnoughDiskSpace);
+    }
+
+
+    //check if folders are used by multiple pairs in read/write access
+    std::vector<Zstring> conflictDirs;
+    for (DirWriteMap::const_iterator i = dirWriteCount.begin(); i != dirWriteCount.end(); ++i)
+        if (    i->second >= 2 ||                                  //multiple write accesses
+                (i->second == 1 && dirReadCount.find(i->first) != dirReadCount.end())) //read/write access
+            conflictDirs.push_back(i->first);
+
+    if (!conflictDirs.empty())
+    {
+        wxString warningMessage = wxString(_("A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!")) + wxT("\n");
+        for (std::vector<Zstring>::const_iterator i = conflictDirs.begin(); i != conflictDirs.end(); ++i)
+            warningMessage += wxString(wxT("\n")) +
+                              wxT("\"") + zToWx(*i) + wxT("\"");
+        statusUpdater.reportWarning(warningMessage, m_warnings.warningMultiFolderWriteAccess);
+    }
+
     //-------------------end of basic checks------------------------------------------
 
 #ifdef FFS_WIN
@@ -1458,6 +1640,9 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
 
     try
     {
+        //prevent shutdown while synchronization is in progress
+        util::DisableStandby dummy;
+
         //loop through all directory pairs
         assert(syncConfig.size() == folderCmp.size());
         for (FolderComparison::iterator j = folderCmp.begin(); j != folderCmp.end(); ++j)
@@ -1479,20 +1664,17 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
                                        wxT("\t") + right + wxT("\"") + zToWx(j->getBaseDir<RIGHT_SIDE>()) + wxT("\"");
             statusUpdater.reportInfo(wxToZ(statusTxt));
 //------------------------------------------------------------------------------------------
-            //(try to) create base dir first -> no symlink or attribute copying!
-            if (baseDirNeeded[j - folderCmp.begin()].first)
-                try
-                {
-                    ffs3::createDirectory(j->getBaseDir<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR));
-                }
-                catch (...) {}
-
-            if (baseDirNeeded[j - folderCmp.begin()].second)
-                try //create base dir first -> no symlink or attribute copying!
-                {
-                    ffs3::createDirectory(j->getBaseDir<RIGHT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR));
-                }
-                catch (...) {}
+            //(try to) create base dir first (if not yet existing) -> no symlink or attribute copying!
+            try
+            {
+                ffs3::createDirectory(j->getBaseDir<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR));
+            }
+            catch (...) {}
+            try //create base dir first -> no symlink or attribute copying!
+            {
+                ffs3::createDirectory(j->getBaseDir<RIGHT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR));
+            }
+            catch (...) {}
 //------------------------------------------------------------------------------------------
 
             //generate name of alternate deletion directory (unique for session AND folder pair)

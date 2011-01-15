@@ -7,7 +7,7 @@ FFS_CPPFLAGS = -Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debu
 LINKFLAGS    = `wx-config --libs --debug=no --unicode=yes` -lboost_thread -O3 -pthread
 
 #static build used for precompiled release
-ifeq ($(BUILD),static)
+ifeq ($(BUILD),release)
 FFS_CPPFLAGS = -Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes --static=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -O3 -pthread
 LINKFLAGS    = `wx-config --libs --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a -O3 -pthread
 endif
@@ -23,6 +23,7 @@ FILE_LIST+=xml_proc.cpp
 FILE_LIST+=xml_ffs.cpp
 FILE_LIST+=../library/process_xml.cpp
 FILE_LIST+=../structures.cpp
+FILE_LIST+=../shared/util.cpp
 FILE_LIST+=../shared/check_exist.cpp
 FILE_LIST+=../shared/localization_no_BOM.cpp
 FILE_LIST+=../shared/inotify/inotify-cxx.cpp

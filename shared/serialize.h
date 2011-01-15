@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef SERIALIZE_H_INCLUDED
@@ -37,7 +37,7 @@ protected:
 
     Zstring readStringC() const; //throw FileError(), checked read operation
 
-    typedef boost::shared_ptr<std::vector<char> > CharArray;
+    typedef boost::shared_ptr<std::vector<char> > CharArray; //there's no guarantee std::string has a ref-counted implementation... so use this "thing"
     CharArray readArrayC() const; //throw FileError()
 
     void check() const;
@@ -129,7 +129,7 @@ void writeNumber(wxOutputStream& stream, T number)
 inline
 Zstring readString(wxInputStream& stream)
 {
-    const size_t strLength = readNumber<size_t>(stream);
+    const boost::uint32_t strLength = readNumber<boost::uint32_t>(stream);
     if (strLength <= 1000)
     {
         Zchar buffer[1000];
@@ -148,7 +148,7 @@ Zstring readString(wxInputStream& stream)
 inline
 void writeString(wxOutputStream& stream, const Zstring& str)
 {
-    writeNumber<size_t>(stream, str.length());
+    writeNumber<boost::uint32_t>(stream, static_cast<boost::uint32_t>(str.length()));
     stream.Write(str.c_str(), sizeof(Zchar) * str.length());
 }
 

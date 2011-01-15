@@ -1,30 +1,44 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "file_id.h"
 
 #ifdef FFS_WIN
-#include "assert_static.h"
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "long_path_prefix.h"
 #include <boost/shared_ptr.hpp>
 
 #elif defined FFS_LINUX
+#include <sys/stat.h>
 #endif
 
 
+namespace
+{
+template <class T>
+inline
+std::string numberToString(T number)
+{
+    const char* rawBegin = reinterpret_cast<const char*>(&number);
+    return std::string(rawBegin, rawBegin + sizeof(number));
+}
+}
+
+
+std::string util::retrieveFileID(const Zstring& filename)
+{
+    std::string fileID;
 
 #ifdef FFS_WIN
-util::FileID util::retrieveFileID(const Zstring& filename)
-{
-    //ensure our DWORD_FFS really is the same as DWORD
-    assert_static(sizeof(util::FileID::DWORD_FFS) == sizeof(DWORD));
-
-//WARNING: CreateFile() is SLOW, while GetFileInformationByHandle() is quite cheap!
+//WARNING: CreateFile() is SLOW, while GetFileInformationByHandle() is cheap!
 //http://msdn.microsoft.com/en-us/library/aa363788(VS.85).aspx
+
+
+	//privilege SE_BACKUP_NAME doesn't seem to be required here at all
+	//note: setting privileges requires admin rights!
 
     const HANDLE hFile = ::CreateFile(ffs3::applyLongPathPrefix(filename).c_str(),
                                       0,
@@ -37,37 +51,35 @@ util::FileID util::retrieveFileID(const Zstring& filename)
     {
         boost::shared_ptr<void> dummy(hFile, ::CloseHandle);
 
-        BY_HANDLE_FILE_INFORMATION info;
-        if (::GetFileInformationByHandle(hFile, &info))
+        BY_HANDLE_FILE_INFORMATION fileInfo = {};
+        if (::GetFileInformationByHandle(hFile, &fileInfo))
         {
-            return util::FileID(info.dwVolumeSerialNumber,
-                                   info.nFileIndexHigh,
-                                   info.nFileIndexLow);
+            fileID += numberToString(fileInfo.dwVolumeSerialNumber);
+            fileID += numberToString(fileInfo.nFileIndexHigh);
+            fileID += numberToString(fileInfo.nFileIndexLow);
         }
     }
-    return util::FileID(); //empty ID
-}
-
 
 #elif defined FFS_LINUX
-util::FileID util::retrieveFileID(const Zstring& filename)
-{
-    struct stat fileInfo;
-    if (::lstat(filename.c_str(), &fileInfo) == 0) //lstat() does not resolve symlinks
-        return util::FileID(fileInfo.st_dev, fileInfo.st_ino);
-
-    return util::FileID(); //empty ID
-}
+    struct stat fileInfo = {};
+    if (::lstat(filename.c_str(), &fileInfo) == 0) //lstat() does not follow symlinks
+    {
+        fileID += numberToString(fileInfo.st_dev);
+        fileID += numberToString(fileInfo.st_ino);
+    }
 #endif
+
+    return fileID;
+}
 
 
 bool util::sameFileSpecified(const Zstring& file1, const Zstring& file2)
 {
-    const util::FileID id1 = retrieveFileID(file1);
-    const util::FileID id2 = retrieveFileID(file2);
+    const std::string id1 = retrieveFileID(file1);
+    const std::string id2 = retrieveFileID(file2);
 
-    if (id1 != FileID() && id2 != FileID())
-        return id1 == id2;
+    if (id1.empty() || id2.empty())
+        return false;
 
-    return false;
+    return id1 == id2;
 }

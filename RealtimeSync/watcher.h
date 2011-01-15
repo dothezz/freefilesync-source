@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef WATCHER_H_INCLUDED
@@ -30,9 +30,9 @@ public:
 //wait until changes are detected or if a directory is not available (anymore)
 enum WaitResult
 {
-	CHANGE_DETECTED,
-	CHANGE_DIR_MISSING
- };
+    CHANGE_DETECTED,
+    CHANGE_DIR_MISSING
+};
 WaitResult waitForChanges(const std::vector<Zstring>& dirNames, WaitCallback* statusHandler); //throw(FileError)
 
 //wait until all directories become available (again)

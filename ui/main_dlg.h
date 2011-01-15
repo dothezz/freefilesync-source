@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef MAINDIALOG_H
@@ -13,6 +13,8 @@
 #include <memory>
 #include <map>
 #include <set>
+#include <wx/aui/aui.h>
+
 
 class CustomGrid;
 class FFSCheckRowsEvent;
@@ -21,6 +23,7 @@ class IconUpdater;
 class DirectoryPair;
 class DirectoryPairFirst;
 class CompareStatus;
+class PanelMoveWindow;
 
 
 namespace ffs3
@@ -49,40 +52,7 @@ private:
     friend class DirectoryNameMainImpl;
     template <class GuiPanel>
     friend class FolderPairCallback;
-
-//IDs for context menu items
-    enum ContextIDRim //context menu for left and right grids
-    {
-        CONTEXT_FILTER_TEMP = 10,
-        CONTEXT_EXCLUDE_EXT,
-        CONTEXT_EXCLUDE_OBJ,
-        CONTEXT_CLIPBOARD,
-        CONTEXT_EXTERNAL_APP,
-        CONTEXT_DELETE_FILES,
-        CONTEXT_SYNC_DIR_LEFT,
-        CONTEXT_SYNC_DIR_NONE,
-        CONTEXT_SYNC_DIR_RIGHT
-    };
-
-    enum ContextIDRimLabel//context menu for column settings
-    {
-        CONTEXT_CUSTOMIZE_COLUMN_LEFT,
-        CONTEXT_CUSTOMIZE_COLUMN_RIGHT,
-        CONTEXT_AUTO_ADJUST_COLUMN_LEFT,
-        CONTEXT_AUTO_ADJUST_COLUMN_RIGHT
-    };
-
-    enum ContextIDMiddle//context menu for middle grid
-    {
-        CONTEXT_CHECK_ALL = 20,
-        CONTEXT_UNCHECK_ALL
-    };
-
-    enum ContextIDMiddleLabel
-    {
-        CONTEXT_COMPARISON_RESULT = 30,
-        CONTEXT_SYNC_PREVIEW
-    };
+    friend class PanelMoveWindow;
 
     MainDialog();
 
@@ -134,8 +104,8 @@ private:
     void copySelectionToClipboard(const CustomGrid* selectedGrid);
     void deleteSelectedFiles();
 
+    void openExternalApplication(const wxString& commandline);
     void openExternalApplication(size_t rowNumber, bool leftSide, const wxString& commandline);
-    static const int externalAppIDFirst = 1000; //id of first external app item
 
     //work to be done in idle time
     void OnIdleEvent(wxEvent& event);
@@ -156,26 +126,29 @@ private:
     void OnContextRimLabelRight(       wxGridEvent& event);
     void OnContextMiddle(              wxGridEvent& event);
     void OnContextMiddleLabel(         wxGridEvent& event);
+    void OnContextSetLayout(           wxMouseEvent& event);
     void OnGlobalKeyEvent(             wxKeyEvent& event);
 
     //context menu handler methods
-    void OnContextFilterTemp(wxCommandEvent& event);
-    void OnContextExcludeExtension(wxCommandEvent& event);
-    void OnContextExcludeObject(wxCommandEvent& event);
-    void OnContextCopyClipboard(wxCommandEvent& event);
-    void OnContextOpenWith(wxCommandEvent& event);
-    void OnContextDeleteFiles(wxCommandEvent& event);
-    void OnContextSyncDirLeft(wxCommandEvent& event);
-    void OnContextSyncDirNone(wxCommandEvent& event);
-    void OnContextSyncDirRight(wxCommandEvent& event);
-    void OnContextCustColumnLeft(wxCommandEvent& event);
-    void OnContextCustColumnRight(wxCommandEvent& event);
-    void OnContextAutoAdjustLeft(wxCommandEvent& event);
-    void OnContextAutoAdjustRight(wxCommandEvent& event);
-    void OnContextIncludeAll(wxCommandEvent& event);
-    void OnContextExcludeAll(wxCommandEvent& event);
-    void OnContextComparisonView(wxCommandEvent& event);
-    void OnContextSyncView(wxCommandEvent& event);
+    void OnContextFilterTemp        (wxCommandEvent& event);
+    void OnContextExcludeExtension  (wxCommandEvent& event);
+    void OnContextExcludeObject     (wxCommandEvent& event);
+    void OnContextCopyClipboard     (wxCommandEvent& event);
+    void OnContextOpenWith          (wxCommandEvent& event);
+    void OnContextDeleteFiles       (wxCommandEvent& event);
+    void OnContextSyncDirLeft       (wxCommandEvent& event);
+    void OnContextSyncDirNone       (wxCommandEvent& event);
+    void OnContextSyncDirRight      (wxCommandEvent& event);
+    void OnContextCustColumnLeft    (wxCommandEvent& event);
+    void OnContextCustColumnRight   (wxCommandEvent& event);
+    void OnContextAutoAdjustLeft    (wxCommandEvent& event);
+    void OnContextAutoAdjustRight   (wxCommandEvent& event);
+    void OnContextIncludeAll        (wxCommandEvent& event);
+    void OnContextExcludeAll        (wxCommandEvent& event);
+    void OnContextComparisonView    (wxCommandEvent& event);
+    void OnContextSyncView          (wxCommandEvent& event);
+    void OnContextSetLayoutReset    (wxCommandEvent& event);
+    void OnContextSetLayoutShowPanel(wxCommandEvent& event);
 
     void OnDirSelected(wxFileDirPickerEvent& event);
 
@@ -219,7 +192,10 @@ private:
     void refreshGridAfterFilterChange(const int delay);
 
     void OnResize(              wxSizeEvent& event);
-    void OnResizeFolderPairs(   wxSizeEvent& event);
+    void OnResizeFolderPairs(   wxEvent& event);
+    void OnResizeConfigPanel(   wxEvent& event);
+    void OnResizeViewPanel(     wxEvent& event);
+    void OnResizeStatisticsPanel(wxEvent& event);
     void OnHideFilteredButton(  wxCommandEvent& event);
     void OnConfigureFilter(     wxCommandEvent& event);
     void OnSwapSides(           wxCommandEvent& event);
@@ -296,10 +272,6 @@ private:
 
     bool cleanedUp;
 
-    //save the last used config filename history
-    std::vector<wxString> cfgFileNames;
-
-
     //remember last sort executed (for determination of sort order)
     int lastSortColumn;
     const wxGrid* lastSortGrid;
@@ -325,6 +297,10 @@ private:
         bool synchronizationEnabled; //determines whether synchronization should be allowed
     };
     std::auto_ptr<SyncPreview> syncPreview; //always bound
+
+    wxAuiManager auiMgr; //implement dockable GUI design
+
+    wxString defaultPerspective;
 };
 
 #endif // MAINDIALOG_H

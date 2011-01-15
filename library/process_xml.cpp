@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "process_xml.h"
@@ -432,6 +432,10 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
 
     //folder dependency check
     readXmlElementLogging("CheckForDependentFolders", optionalDialogs, outputCfg.optDialogs.warningDependentFolders);
+
+    //check for multi write access for directory as part of multiple pairs
+    readXmlElementLogging("CheckForMultipleWriteAccess", optionalDialogs, outputCfg.optDialogs.warningMultiFolderWriteAccess);
+
     //significant difference check
     readXmlElementLogging("CheckForSignificantDifference", optionalDialogs, outputCfg.optDialogs.warningSignificantDifference);
     //check free disk space
@@ -517,9 +521,7 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
     //load config history elements
     readXmlElementLogging("Folder", historyRight, outputCfg.gui.folderHistoryRight);
 
-
-    readXmlElementLogging("SelectedTabBottomLeft", mainWindow, outputCfg.gui.selectedTabBottomLeft);
-
+    readXmlElementLogging("Perspective", mainWindow, outputCfg.gui.guiPerspectiveLast);
 
     //external applications
     const TiXmlElement* extApps = TiXmlHandleConst(gui).FirstChild("ExternalApplications").FirstChild("Commandline").ToElement();
@@ -541,9 +543,6 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
     }
     //load config file history
     const TiXmlElement* cfgHistory = TiXmlHandleConst(gui).FirstChild("ConfigHistory").ToElement();
-
-    //load max. history size
-    readXmlAttributeLogging("MaximumSize", cfgHistory, outputCfg.gui.cfgHistoryMax);
 
     //load config history elements
     readXmlElementLogging("File", cfgHistory, outputCfg.gui.cfgFileHistory);
@@ -846,6 +845,9 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
     //warning: dependent folders
     addXmlElement("CheckForDependentFolders", inputCfg.optDialogs.warningDependentFolders, optionalDialogs);
 
+    //check for multi write access for directory as part of multiple pairs
+    addXmlElement("CheckForMultipleWriteAccess", inputCfg.optDialogs.warningMultiFolderWriteAccess, optionalDialogs);
+
     //significant difference check
     addXmlElement("CheckForSignificantDifference", inputCfg.optDialogs.warningSignificantDifference, optionalDialogs);
 
@@ -941,7 +943,7 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
     addXmlElement("Folder", inputCfg.gui.folderHistoryLeft, historyLeft);
     addXmlElement("Folder", inputCfg.gui.folderHistoryRight, historyRight);
 
-    addXmlElement("SelectedTabBottomLeft", inputCfg.gui.selectedTabBottomLeft, mainWindow);
+    addXmlElement("Perspective", inputCfg.gui.guiPerspectiveLast, mainWindow);
 
     //external applications
     TiXmlElement* extApp = new TiXmlElement("ExternalApplications");
@@ -960,7 +962,6 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
     TiXmlElement* cfgHistory = new TiXmlElement("ConfigHistory");
     gui->LinkEndChild(cfgHistory);
 
-    addXmlAttribute("MaximumSize", inputCfg.gui.cfgHistoryMax, cfgHistory);
     addXmlElement("File", inputCfg.gui.cfgFileHistory, cfgHistory);
 
 
@@ -992,6 +993,7 @@ wxString xmlAccess::getGlobalConfigFile()
 void xmlAccess::OptionalDialogs::resetDialogs()
 {
     warningDependentFolders        = true;
+    warningMultiFolderWriteAccess  = true;
     warningSignificantDifference   = true;
     warningNotEnoughDiskSpace      = true;
     warningUnresolvedConflicts     = true;

@@ -1,7 +1,7 @@
 ﻿// **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "localization.h"
@@ -48,7 +48,7 @@ const std::vector<ffs3::LocInfoLine>& LocalizationInfo::getMapping()
 
 namespace
 {
-	struct CompareByName : public std::binary_function<ffs3::LocInfoLine, ffs3::LocInfoLine, bool>
+struct CompareByName : public std::binary_function<ffs3::LocInfoLine, ffs3::LocInfoLine, bool>
 {
     bool operator()(const ffs3::LocInfoLine& lhs, const ffs3::LocInfoLine& rhs) const
     {
@@ -95,6 +95,13 @@ LocalizationInfo::LocalizationInfo()
     newEntry.languageFile   = wxT("spanish.lng");
     newEntry.translatorName = wxT("Alexis Martínez");
     newEntry.languageFlag   = wxT("spain.png");
+    locMapping.push_back(newEntry);
+
+    newEntry.languageID     = wxLANGUAGE_GREEK;
+    newEntry.languageName   = wxT("Ελληνικά");
+    newEntry.languageFile   = wxT("greek.lng");
+    newEntry.translatorName = wxT("Γιώργος Γιαγλής");
+    newEntry.languageFlag   = wxT("greece.png");
     locMapping.push_back(newEntry);
 
     newEntry.languageID     = wxLANGUAGE_FRENCH;
@@ -299,6 +306,7 @@ int mapLanguageDialect(const int language)
 
         //case wxLANGUAGE_CZECH:
         //case wxLANGUAGE_FINNISH:
+        //case wxLANGUAGE_GREEK:
         //case wxLANGUAGE_JAPANESE:
         //case wxLANGUAGE_POLISH:
         //case wxLANGUAGE_SLOVENIAN:

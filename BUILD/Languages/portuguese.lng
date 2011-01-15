@@ -2,8 +2,8 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %x / %y objectos eliminados com sucesso
-%x Byte
-%x Byte
+%x Bytes
+
 %x GB
 %x GB
 %x MB
@@ -256,6 +256,10 @@ Continue
 Continuar
 Conversion error:
 Erro de conversão:
+Copy attributes only from left to right
+
+Copy attributes only from right to left
+
 Copy filesystem permissions
 Copiar permissões do sistema de ficheiros
 Copy from left to right
@@ -472,6 +476,8 @@ Files that exist on both sides, right one is newer
 Ficheiros existentes dos dois lados, à direita é mais recente
 Files that have different content
 Ficheiros com conteúdo diferente
+Files/folders that differ in attributes only
+
 Files/folders that exist on left side only
 Ficheiros/pastas existentes somente à esquerda
 Files/folders that exist on right side only
@@ -494,6 +500,8 @@ Find what:
 Procurar:
 Folder Comparison and Synchronization
 Comparação e Sincronização de pastas
+Folder pairs
+
 Follow
 Seguir
 Free disk space available:
@@ -606,12 +614,14 @@ Log-messages:
 Log de mensagens:
 Logging
 A escrever em log
+Main bar
+
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Fazer cópias fantasma em WOW64 não é suportado. Por favor usar a versão 64-bit.
 Match case
 Correspondência
-Minimum Idle Time
-Tempo de espera mínimo
+Minimum Idle Time [seconds]
+
 Mirror ->>
 Espelhar ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 Publicado sobre GNU General Public License:
 Question
 Questão
-Quit
-Sair
 Re-enable all hidden dialogs?
 Reactivar todos os diálogos ocultos?
 RealtimeSync - Automated Synchronization
@@ -708,6 +716,8 @@ Report translation error
 Informar um erro de tradução
 Reset
 Reiniciar
+Reset view
+
 Right
 Direita
 S&ave configuration...
@@ -734,6 +744,8 @@ Set direction:
 Escolher direcção:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Escolher direcção de sincronização por defeito: Os ficheiros antigos serão substituídos pelos novos.
+Show \"%x\"
+
 Show conflicts
 Mostrar conflitos
 Show files that are different
@@ -852,6 +864,8 @@ Unresolved conflicts existing!
 Existem conflitos por resolver!
 Update ->
 Actualizar ->
+Updating attributes of %x
+
 Usage:
 Uso:
 Use Recycle Bin
@@ -868,8 +882,8 @@ Verifying file %x
 A verificar ficheiro %x
 Volume name %x not part of filename %y!
 Nome do volume %x não faz parte do ficheiro %y!
-Waiting for all directories to become available...
-Aguardando que todos os directorios fiquem disponíveis...
+Waiting for missing directories...
+
 Waiting while directory is locked (%x)...
 Aguardando enquanto o directório é bloqueado (%x)...
 Warning

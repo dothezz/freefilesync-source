@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "file_io.h"
@@ -61,7 +61,7 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError()
         const DWORD lastError = ::GetLastError();
         const wxString& errorMessage = wxString(_("Error opening file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"") + wxT("\n\n") + ffs3::getLastErrorFormatted(lastError);
         if (lastError == ERROR_FILE_NOT_FOUND ||
-            lastError == ERROR_PATH_NOT_FOUND)
+                lastError == ERROR_PATH_NOT_FOUND)
             throw ErrorNotExisting(errorMessage);
         else
             throw FileError(errorMessage);

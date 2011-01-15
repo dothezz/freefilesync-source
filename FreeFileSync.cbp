@@ -22,6 +22,7 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-static" />
+					<Add library="libwxmsw28u_aui.a" />
 					<Add library="libwxmsw28u_adv.a" />
 					<Add library="libwxmsw28u_core.a" />
 					<Add library="libwxbase28u.a" />
@@ -77,6 +78,7 @@
 					<Add library="libwxmsw28ud_core.a" />
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxbase28ud_net.a" />
+					<Add library="libwxmsw28ud_aui.a" />
 					<Add library="libboost_thread-mgw45-mt-sd-1_45.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_dll" />
 				</Linker>
@@ -107,7 +109,6 @@
 		</ResourceCompiler>
 		<Linker>
 			<Add option="-mthreads" />
-			<Add option="-Wl,--enable-auto-import" />
 			<Add library="libkernel32.a" />
 			<Add library="libuser32.a" />
 			<Add library="libuuid.a" />
@@ -264,6 +265,7 @@
 		</Unit>
 		<Unit filename="shared\dir_name.cpp" />
 		<Unit filename="shared\dir_name.h" />
+		<Unit filename="shared\disable_standby.h" />
 		<Unit filename="shared\dll_loader.cpp" />
 		<Unit filename="shared\dll_loader.h" />
 		<Unit filename="shared\dst_hack.cpp" />
@@ -293,6 +295,8 @@
 		<Unit filename="shared\localization.h" />
 		<Unit filename="shared\long_path_prefix.cpp" />
 		<Unit filename="shared\long_path_prefix.h" />
+		<Unit filename="shared\privilege.cpp" />
+		<Unit filename="shared\privilege.h" />
 		<Unit filename="shared\recycler.cpp" />
 		<Unit filename="shared\recycler.h" />
 		<Unit filename="shared\serialize.cpp" />

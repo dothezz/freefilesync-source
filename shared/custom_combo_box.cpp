@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "custom_combo_box.h"
@@ -57,15 +57,15 @@ void CustomComboBox::OnKeyEvent(wxKeyEvent& event)
         const int selectedItem = this->GetCurrentSelection();
         if (0 <= selectedItem && selectedItem < static_cast<int>(this->GetCount()) &&
 #if wxCHECK_VERSION(2, 9, 1)
-                    dropDownShown)
+                dropDownShown)
 #else
-                    //what a mess...:
-                    (GetValue() != GetString(selectedItem) || //avoid problems when a character shall be deleted instead of list item
-                    GetValue() == wxEmptyString)) //exception: always allow removing empty entry
+                //what a mess...:
+                (GetValue() != GetString(selectedItem) || //avoid problems when a character shall be deleted instead of list item
+                 GetValue() == wxEmptyString)) //exception: always allow removing empty entry
 #endif
-    {
-        //save old (selected) value: deletion seems to have influence on this
-        const wxString currentVal = this->GetValue();
+        {
+            //save old (selected) value: deletion seems to have influence on this
+            const wxString currentVal = this->GetValue();
             this->SetSelection(wxNOT_FOUND);
 
             //delete selected row

@@ -2,7 +2,7 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %y ögeden %x tanesi sorunsuz silindi
-%x Byte
+%x Bytes
 %x Bayt
 %x GB
 %x GB
@@ -77,7 +77,7 @@ Ye&ni
 &Pause
 &Duraklat
 &Program
-
+&Program
 &Quit
 Çı&k
 &Restore
@@ -151,7 +151,7 @@ Ge&ri yükle
 <Last session>
 <Önceki oturum>
 <Symlink>
-<Symlink>
+<Smblkbağlantı>
 <multiple selection>
 <çoklu seçim>
 A newer version of FreeFileSync is available:
@@ -221,7 +221,7 @@ Compare by \"File content\"
 Compare by \"File size and date\"
 \"Dosya boyutu ve tarihi\"ne göre karşılaştırma
 Compare by...
-Karşılaştırmayı yaparken şunu kullan:
+Karşılaştırma ölçütünü seçin:
 Comparing content of files %x
 %x dosyalarının içeriği karşılaştırılıyor
 Comparing content...
@@ -256,6 +256,10 @@ Continue
 Devam et
 Conversion error:
 Dönüştürme hatası:
+Copy attributes only from left to right
+Öznitelikleri yalnızca soldan sağa kopyala
+Copy attributes only from right to left
+Öznitelikleri yalnızca sağdan sola kopyala
 Copy filesystem permissions
 Dosya sistemi izinlerini de kopyala
 Copy from left to right
@@ -269,7 +273,7 @@ Sağdan sola üzerine yazarak kopyala
 Copy locked files
 Kilitli dosyaları da kopyala
 Copy new or updated files to right folder.
-Soldan sağa yalnız yeni ya da güncellenmiş dosyalar kopyalanır.
+Yalnız yeni ya da güncellenmiş dosyalar soldan sağa kopyalanır.
 Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
 Paylaşılmış ya da kilitli dosyaları Birim Gölge Kopya Hizmetini\n kullanarak kopyala (Yönetici izinlerine gerek duyar)
 Copy to clipboard\tCTRL+C
@@ -315,7 +319,7 @@ Her iki yandakini de sil
 Delete on both sides even if the file is selected on one side only
 Dosya yalnız bir tarafta seçili olsa bile her iki yandakini de sil
 Delete or overwrite files permanently
-Kalıcı olarak üzerine yaz ya da sil
+Dosyaları kalıcı olarak siler ya da üzerine yazar
 Delete permanently
 Kalıcı olarak sil
 Deleting Symbolic Link %x
@@ -353,7 +357,7 @@ PayPal ile bağış yapın
 Download now?
 Şimdi indir?
 Drag && drop
-Klasör ya da dosyaları sürükleyip buraya bırakabilirsiniz
+Klasör ya da dosyaları buraya sürükleyip bırakabilirsiniz
 Elements found:
 Bulunan bileşenler:
 Elements processed:
@@ -363,7 +367,7 @@ Kalan bileşenler:
 Email
 E-posta
 Encoding extended time information: %x
-
+Uzatılmış zaman bilgisi kodlanıyor: %x
 Endless loop when traversing directory:
 Klasörlerde dolaşırken sonsuz döngü:
 Error
@@ -405,7 +409,7 @@ Dosya okunurken hata:
 Error reading from synchronization database:
 Eşleştirme veri tabanı okunurken hata:
 Error reading security context:
-
+Güüvenlik bağlamı okunurken hata:
 Error resolving symbolic link:
 Sembolik bağlantı çözümlenirken hata:
 Error setting directory lock:
@@ -421,7 +425,7 @@ Klasörler izlenirken hata.
 Error writing file:
 Dosya yazılırken hata:
 Error writing security context:
-
+Güvenlik bağlamı yazılırken hata:
 Error writing to synchronization database:
 Eşleştirme veri tabanına yazılırken hata:
 Example
@@ -461,21 +465,23 @@ Dosya adı
 Files %x have the same date but a different size!
 %x dosyalarının tarihleri aynı fakat boyutları farklı!
 Files are found equal if\n     - file content\nis the same
-Eşit dosyaları bulurken\n     - dosya içeriği\naynı olanlara bakılır
+Eşit dosyalar aranırken\n     - dosya içeriği\naynı olanlara bakılır
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
-Eşit dosyaları bulurken\n     - dosya boyutu\n     - son yazma zamanı ve tarihi\naynı olanlara bakılır 
+Eşit dosyalar aranırken\n     - dosya boyutu\n     - son kayıt zamanı ve tarihi\naynı olanlara bakılır 
 Files that are equal on both sides
 Her iki yanda da eşit olan dosyalar
 Files that exist on both sides, left one is newer
-Her iki yanda da varolup, solda daha yeni olan dosyalar
+Her iki yanda da bulunup, solda daha yeni olan dosyalar
 Files that exist on both sides, right one is newer
-Her iki yanda da varolup, sağda daha yeni olan dosyalar
+Her iki yanda da bulunup, sağda daha yeni olan dosyalar
 Files that have different content
 Farklı içeriğe sahip dosyalar
+Files/folders that differ in attributes only
+Yalnız öznitelikleri farklı dosya ve klasörler
 Files/folders that exist on left side only
-Yalnız sol yanda bulunan dosyalar/klasörler
+Yalnız sol yanda bulunan dosya ve klasörler
 Files/folders that exist on right side only
-Yalnız sağ yanda bulunan dosyalar/klasörler
+Yalnız sağ yanda bulunan dosya ve klasörler
 Filter files
 Dosya süzgeci
 Filter is active
@@ -494,6 +500,8 @@ Find what:
 Aranacak:
 Folder Comparison and Synchronization
 Klasör Karşılaştırma ve Eşleştirme
+Folder pairs
+Klasör çiftleri
 Follow
 İzle
 Free disk space available:
@@ -589,7 +597,7 @@ Bilgi
 Initial synchronization:
 Başlangıç eşleştirmesi:
 Integrate external applications into context menu. The following macros are available:
-Dış uygulamaları sağ tuş menüsüne ekle. Şu makrolar kullanılabilir:
+Dış uygulamaları sağ tuş menüsüne ekler. Şu makrolar kullanılabilir:
 Invalid FreeFileSync config file!
 Geçersiz FreeFileSync yapılandırma dosyası!
 Leave as unresolved conflict
@@ -599,19 +607,21 @@ Sol
 Legend
 Gösterge
 Load configuration from file
-Yapılandırmayı dosyadan yükle
+Dosyadan yapılandırmayı yükle
 Load configuration history (press DEL to delete items)
 Geçmişteki yapılandırmalardan yükle (Listedeki öğeleri silmek için DEL’e basın)
 Log-messages:
 Günlük iletileri:
 Logging
 Günlükleme
+Main bar
+Ana çubuk
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 WOW64 üzerinde gölge kopyalama desteklenmiyor. FreeFileSync 64-bit sürümünü kullanın
 Match case
 Büyük/küçük harf uydur
-Minimum Idle Time
-En Az Boşluk Süresi
+Minimum Idle Time [seconds]
+En az boşta bekleme süresi [saniye]
 Mirror ->>
 Yansı ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -625,7 +635,7 @@ Sütunu aşağı taşı
 Move column up
 Sütunu yukarı taşı
 Move files into a time-stamped subdirectory
-Dosyaları zaman damgalı bir alt klasöre taşı
+Dosyaları zaman damgasıyla bir alt klasöre taşır
 Moving %x to Recycle Bin
 %x Geri Dönüşüm Kutusu'na atılıyor
 Moving Symbolic Link %x to user-defined directory %y
@@ -655,7 +665,7 @@ One of the FreeFileSync database entries within the following file is not yet ex
 One of the FreeFileSync database files is not yet existing:
 FreeFileSync veritabanı dosyalarından biri henüz yok:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
-Yalnız süzgeçten geçen dosyalar/klasörler eşleştirme için seçilir. Süzgeç, temel eşleştirme klasörlerine, adlara göre uygulanır.
+Eşleştirme için yalnız süzgeçten geçen dosya ve klasörler seçilir. Süzgeç, temel eşleştirme klasörlerine adlarla ilişkili olarak uygulanır.
 Open with Explorer
 Gezgin ile aç
 Open with default application
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 GNU Genel Kamu Lisansına şartları altında yayınlanmıştır:
 Question
 Soru
-Quit
-Çık
 Re-enable all hidden dialogs?
 Tüm gizlenmiş iletiler yeniden görünür olsun mu?
 RealtimeSync - Automated Synchronization
@@ -708,6 +716,8 @@ Report translation error
 Çeviri hatasını bildir
 Reset
 Sıfırla
+Reset view
+Görünümü sıfırla
 Right
 Sağ
 S&ave configuration...
@@ -717,7 +727,7 @@ Orta görünümü &değiştir
 Save changes to current configuration?
 Değişiklikleri şu anki yapılandırmaya kaydetmek ister misiniz?
 Save current configuration to file
-Kullanımdaki yapılandırmayı dosyaya kaydet
+Geçerli yapılandırmayı dosyaya kaydet
 Scanning...
 Taranıyor...
 Scanning:
@@ -734,6 +744,8 @@ Set direction:
 Yönü seçin:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Varsayılan eşleştirme yönleri ayarlanıyor: Yeni dosyalar eski dosyaların üzerine yazılacak.
+Show \"%x\"
+\"%x\" panelini göster
 Show conflicts
 Çelişkileri göster
 Show files that are different
@@ -767,7 +779,7 @@ Gizlenmiş iletileri göster
 Show popup
 Açılır pencerede göster
 Show popup on errors or warnings
-Hata ve uyarılarda açılır bir pencere gösterir
+Hata ve uyarıları açılır bir pencerede gösterir
 Significant difference detected:
 Önemli fark saptandı:
 Silent mode
@@ -783,7 +795,7 @@ Hız:
 Start
 Başla
 Start minimized and write status information to a logfile
-
+Simge durumuna küçültülmüş olarak başlat ve durum bilgisini günlük dosyasına yaz
 Start synchronization
 Eşleştirmeyi başlat
 Statistics
@@ -852,12 +864,14 @@ Unresolved conflicts existing!
 Çözülmemiş tutarsızlıklar var!
 Update ->
 Güncelle ->
+Updating attributes of %x
+%x öznitelikleri güncelleniyor
 Usage:
 Kullanım:
 Use Recycle Bin
 Geri Dönüşüm Kutusu'nu kullan
 Use Recycle Bin when deleting or overwriting files
-Dosyaları silerken ve üzerine yazarken Geri Dönüşüm Kutusu'nu kullan
+Dosya silme ve üzerine yazma sırasında Geri Dönüşüm Kutusu'nu kullanır
 User-defined directory
 Kullanıcının belirttiği klasöre taşı
 User-defined directory for deletion was not specified!
@@ -868,8 +882,8 @@ Verifying file %x
 %x dosyası doğrulanıyor
 Volume name %x not part of filename %y!
 %x birim adı, %y dosya adının parçası değil!
-Waiting for all directories to become available...
-Tüm klasörlerlerin hazır olması bekleniyor...
+Waiting for missing directories...
+Kayıp klasörler için bekleniyor...
 Waiting while directory is locked (%x)...
 Klasör kilitli olduğundan bekleniyor (%x)...
 Warning

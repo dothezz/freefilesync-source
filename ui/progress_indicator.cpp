@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "progress_indicator.h"
@@ -27,6 +27,11 @@ using namespace ffs3;
 
 namespace
 {
+//window size used for statistics in milliseconds
+const int windowSizeRemainingTime = 60000; //some usecases have dropouts of 40 seconds -> 60 sec. window size handles them well
+const int windowSizeBytesPerSec   =  5000; //
+
+
 void setNewText(const wxString& newText, wxTextCtrl& control, bool& updateLayout)
 {
     if (control.GetValue().length() != newText.length())
@@ -208,7 +213,7 @@ void CompareStatus::CompareStatusImpl::init()
 
     updateStatusPanelNow();
 
-    Show(); //make visible
+    Layout();
 }
 
 
@@ -218,7 +223,6 @@ void CompareStatus::CompareStatusImpl::finalize() //hide again
     taskbar_.reset();
 #endif
 
-    Hide();
     parentWindow_.SetTitle(titleTextBackup);
 }
 
@@ -239,7 +243,7 @@ void CompareStatus::CompareStatusImpl::switchToCompareBytewise(int totalObjectsT
         scalingFactor = 0;
 
     //set new statistics handler: 10 seconds "window" for remaining time, 5 seconds for speed
-    statistics.reset(new Statistics(totalObjectsToProcess, totalDataToProcess.ToDouble(), 10000, 5000));
+    statistics.reset(new Statistics(totalObjectsToProcess, totalDataToProcess.ToDouble(), windowSizeRemainingTime, windowSizeBytesPerSec));
     lastStatCallSpeed   = -1000000; //some big number
     lastStatCallRemTime = -1000000;
 
@@ -251,6 +255,7 @@ void CompareStatus::CompareStatusImpl::switchToCompareBytewise(int totalObjectsT
 
     m_gauge2->Show();
     bSizer42->Layout();
+    Layout();
 }
 
 
@@ -304,7 +309,7 @@ void CompareStatus::CompareStatusImpl::showProgressExternally(const wxString& pr
 void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
 {
     //static RetrieveStatistics statistic;
-    //statistic.writeEntry(currentData, currentObjects);
+    //statistic.writeEntry(currentData.ToDouble(), currentObjects);
     {
         //wxWindowUpdateLocker dummy(this) -> not needed
 
@@ -441,6 +446,10 @@ private:
 
     wxString titelTextBackup;
 
+    //save last used systray icon description
+    wxString progressTextLast;
+    float progressPercentLast;
+
     boost::shared_ptr<MinimizeToTray> minimizedToSysTray; //optional: if filled, hides all visible windows, shows again if destroyed
 };
 
@@ -530,7 +539,8 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(StatusHandler& updater, wxTopLevelWin
     processPaused(false),
     currentStatus(SyncStatus::ABORTED),
     lastStatCallSpeed(-1000000), //some big number
-    lastStatCallRemTime(-1000000)
+    lastStatCallRemTime(-1000000),
+    progressPercentLast(0)
 {
 #ifdef FFS_WIN
     new ffs3::MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
@@ -618,7 +628,8 @@ void SyncStatus::SyncStatusImpl::resetGauge(int totalObjectsToProcess, wxLongLon
         scalingFactor = 0;
 
     //set new statistics handler: 10 seconds "window" for remaining time, 5 seconds for speed
-    statistics.reset(new Statistics(totalObjectsToProcess, totalDataToProcess.ToDouble(), 10000, 5000));
+    statistics.reset(new Statistics(totalObjectsToProcess, totalDataToProcess.ToDouble(), windowSizeRemainingTime, windowSizeBytesPerSec));
+
     lastStatCallSpeed   = -1000000; //some big number
     lastStatCallRemTime = -1000000;
 }
@@ -649,6 +660,11 @@ void SyncStatus::SyncStatusImpl::showProgressExternally(const wxString& progress
     if (minimizedToSysTray.get())
         minimizedToSysTray->setToolTip(progressText, percent);
     //minimizedToSysTray may be a zombie... so set title text anyway
+
+    //save progress text for later use (e.g. set systray icon tooltip in paused mode)
+    progressTextLast    = progressText;
+    progressPercentLast = percent;
+
 
     if (mainDialog) //show percentage in maindialog title (and thereby in taskbar)
     {
@@ -699,13 +715,13 @@ void SyncStatus::SyncStatusImpl::showProgressExternally(const wxString& progress
 void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
 {
     //static RetrieveStatistics statistic;
-    //statistic.writeEntry(currentData, currentObjects);
+    //statistic.writeEntry(currentData.ToDouble(), currentObjects);
 
     const float percent = totalData == 0 ? 0 : currentData.ToDouble() * 100 / totalData.ToDouble();
 
     //write status information to systray, taskbar, parent title ect.
 
-    const wxString postFix = jobName_.empty() ? wxString() : (wxT(" - \"") + jobName_ + wxT("\""));
+    const wxString postFix = jobName_.empty() ? wxString() : (wxT("\n\"") + jobName_ + wxT("\""));
     switch (currentStatus)
     {
     case SyncStatus::SCANNING:
@@ -786,13 +802,26 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
         }
     }
 
+
     //support for pause button
-    while (processPaused && currentProcessIsRunning())
+    if(processPaused)
     {
-        wxMilliSleep(UI_UPDATE_INTERVAL);
-        updateUiNow();
+        if (statistics.get()) statistics->pauseTimer();
+
+        while (processPaused && currentProcessIsRunning())
+        {
+            wxMilliSleep(UI_UPDATE_INTERVAL);
+            updateUiNow();
+        }
+
+        if (statistics.get()) statistics->resumeTimer();
     }
 
+    /*
+        /|\
+         |   keep this order to ensure one full statistics update before entering pause mode
+        \|/
+    */
     updateUiNow();
 }
 
@@ -904,45 +933,6 @@ void SyncStatus::SyncStatusImpl::OnOkay(wxCommandEvent& event)
 
 void SyncStatus::SyncStatusImpl::OnAbort(wxCommandEvent& event)
 {
-    Close(); //generate close event: do NOT destroy window unconditionally!
-}
-
-
-void SyncStatus::SyncStatusImpl::OnPause(wxCommandEvent& event)
-{
-    static SyncStatus::SyncStatusID previousStatus = SyncStatus::ABORTED;
-
-    if (processPaused)
-    {
-        setCurrentStatus(previousStatus);
-        processPaused = false;
-        m_buttonPause->SetLabel(_("Pause"));
-        m_animationControl1->Play();
-
-        //resume timers
-        timeElapsed.Resume();
-        if (statistics.get())
-            statistics->resumeTimer();
-    }
-    else
-    {
-        previousStatus = currentStatus; //save current status
-
-        setCurrentStatus(SyncStatus::PAUSE);
-        processPaused = true;
-        m_buttonPause->SetLabel(_("Continue"));
-        m_animationControl1->Stop();
-
-        //pause timers
-        timeElapsed.Pause();
-        if (statistics.get())
-            statistics->pauseTimer();
-    }
-}
-
-
-void SyncStatus::SyncStatusImpl::OnClose(wxCloseEvent& event)
-{
     processPaused = false;
     if (currentProcessIsRunning())
     {
@@ -955,6 +945,49 @@ void SyncStatus::SyncStatusImpl::OnClose(wxCloseEvent& event)
         //no Layout() or UI-update here to avoid cascaded Yield()-call
 
         processStatusHandler->requestAbortion();
+    }
+}
+
+
+void SyncStatus::SyncStatusImpl::OnPause(wxCommandEvent& event)
+{
+    static SyncStatus::SyncStatusID previousStatus = SyncStatus::ABORTED;
+
+    processPaused = !processPaused;
+
+    if (processPaused)
+    {
+        previousStatus = currentStatus; //save current status
+        setCurrentStatus(SyncStatus::PAUSE);
+
+        m_buttonPause->SetLabel(_("Continue"));
+        m_animationControl1->Stop();
+
+        //pause timers
+        timeElapsed.Pause();
+    }
+    else
+    {
+        setCurrentStatus(previousStatus);
+
+        m_buttonPause->SetLabel(_("Pause"));
+        m_animationControl1->Play();
+
+        //resume timers
+        timeElapsed.Resume();
+    }
+}
+
+
+void SyncStatus::SyncStatusImpl::OnClose(wxCloseEvent& event)
+{
+    if (m_buttonAbort->IsShown()) //delegate to "abort" button if available
+    {
+        wxCommandEvent dummy(wxEVT_COMMAND_BUTTON_CLICKED);
+        m_buttonAbort->ProcessEvent(dummy);
+
+        if (event.CanVeto()) event.Veto(); //that's what we want here
+        else Destroy();                    //shouldn't be necessary
     }
     else
         Destroy();
@@ -971,6 +1004,7 @@ void SyncStatus::SyncStatusImpl::OnIconize(wxIconizeEvent& event)
 void SyncStatus::SyncStatusImpl::minimizeToTray()
 {
     minimizedToSysTray.reset(new MinimizeToTray(this, mainDialog));
+    minimizedToSysTray->setToolTip(progressTextLast, progressPercentLast); //set tooltip: in pause mode there is no statistics update, so this is the only chance
 }
 
 

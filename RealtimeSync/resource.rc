@@ -20,7 +20,7 @@ BEGIN
       VALUE "FileVersion",     VER_FREEFILESYNC_STR
       VALUE "ProductName",     "RealtimeSync\0"
       VALUE "ProductVersion",  VER_FREEFILESYNC_STR
-      VALUE "LegalCopyright",  "(c) 2008 - 2010 ZenJu\0"
+      VALUE "LegalCopyright",  "(c) 2008 - 2011 ZenJu\0"
     END
   END
   BLOCK "VarFileInfo"

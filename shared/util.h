@@ -1,24 +1,26 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef UTIL_H_INCLUDED
 #define UTIL_H_INCLUDED
 
-#include "../shared/zstring.h"
 #include <wx/string.h>
 #include <wx/longlong.h>
-#include "../shared/global_func.h"
 #include <wx/textctrl.h>
 #include <wx/filepicker.h>
 #include <wx/combobox.h>
 #include <wx/scrolwin.h>
+#include "zstring.h"
+#include "global_func.h"
 
 
 namespace ffs3
 {
+wxString extractJobName(const wxString& configFilename);
+
 wxString formatFilesizeToShortString(const wxLongLong& filesize);
 wxString formatFilesizeToShortString(const wxULongLong& filesize);
 wxString formatFilesizeToShortString(double filesize);

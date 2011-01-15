@@ -2,8 +2,8 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %x / %y objects deleted successfully
-%x Byte
-%x Byte
+%x Bytes
+%x Bytes
 %x GB
 %x GB
 %x MB
@@ -256,6 +256,10 @@ Continue
 Continue
 Conversion error:
 Conversion error:
+Copy attributes only from left to right
+Copy attributes only from left to right
+Copy attributes only from right to left
+Copy attributes only from right to left
 Copy filesystem permissions
 Copy filesystem permissions
 Copy from left to right
@@ -472,6 +476,8 @@ Files that exist on both sides, right one is newer
 Files that exist on both sides, right one is newer
 Files that have different content
 Files that have different content
+Files/folders that differ in attributes only
+Files/folders that differ in attributes only
 Files/folders that exist on left side only
 Files/folders that exist on left side only
 Files/folders that exist on right side only
@@ -494,6 +500,8 @@ Find what:
 Find what:
 Folder Comparison and Synchronization
 Folder Comparison and Synchronisation
+Folder pairs
+Folder pairs
 Follow
 Follow
 Free disk space available:
@@ -606,12 +614,14 @@ Log-messages:
 Log-messages:
 Logging
 Logging
+Main bar
+Main bar
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Match case
 Match case
-Minimum Idle Time
-Minimum Idle Time
+Minimum Idle Time [seconds]
+Minimum Idle Time [seconds]
 Mirror ->>
 Mirror ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 Published under the GNU General Public Licence:
 Question
 Question
-Quit
-Quit
 Re-enable all hidden dialogs?
 Re-enable all hidden dialogues?
 RealtimeSync - Automated Synchronization
@@ -708,6 +716,8 @@ Report translation error
 Report translation error
 Reset
 Reset
+Reset view
+Reset view
 Right
 Right
 S&ave configuration...
@@ -734,6 +744,8 @@ Set direction:
 Set direction:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Setting default synchronisation directions: Old files will be overwritten with newer files.
+Show \"%x\"
+Show \"%x\"
 Show conflicts
 Show conflicts
 Show files that are different
@@ -852,6 +864,8 @@ Unresolved conflicts existing!
 Unresolved conflicts existing!
 Update ->
 Update ->
+Updating attributes of %x
+Updating attributes of %x
 Usage:
 Usage:
 Use Recycle Bin
@@ -868,8 +882,8 @@ Verifying file %x
 Verifying file %x
 Volume name %x not part of filename %y!
 Volume name %x not part of filename %y!
-Waiting for all directories to become available...
-Waiting for all directories to become available...
+Waiting for missing directories...
+Waiting for missing directories...
 Waiting while directory is locked (%x)...
 Waiting while directory is locked (%x)...
 Warning

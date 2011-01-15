@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef SORTING_H_INCLUDED
@@ -93,13 +93,13 @@ bool sortByRelativeName(const FileSystemObject& a, const FileSystemObject& b)
 
     const bool isDirectoryA = isDirectoryMapping(a);
     const Zstring& relDirNameA = isDirectoryA ?
-                                a.getRelativeName<side>() : //directory
-                                a.getParentRelativeName();  //file or symlink
+                                 a.getRelativeName<side>() : //directory
+                                 a.getParentRelativeName();  //file or symlink
 
     const bool isDirectoryB = isDirectoryMapping(b);
     const Zstring& relDirNameB = isDirectoryB ?
-                                b.getRelativeName<side>() : //directory
-                                b.getParentRelativeName();  //file or symlink
+                                 b.getRelativeName<side>() : //directory
+                                 b.getParentRelativeName();  //file or symlink
 
 
     //compare relative names without filenames first

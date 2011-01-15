@@ -2,7 +2,7 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %x / %y のオブジェクトを削除しました
-%x Byte
+%x Bytes
 %x バイト
 %x GB
 %x GB
@@ -256,6 +256,10 @@ Continue
 続行
 Conversion error:
 変換エラー:
+Copy attributes only from left to right
+属性のみ左から右にコピー
+Copy attributes only from right to left
+属性のみ右から左にコピー
 Copy filesystem permissions
 ファイルシステム・パーミッションをコピー
 Copy from left to right
@@ -472,6 +476,8 @@ Files that exist on both sides, right one is newer
 両側に存在するが、右側の方がより新しい
 Files that have different content
 内容が異なるファイル
+Files/folders that differ in attributes only
+属性のみ異なるファイル/フォルダ
 Files/folders that exist on left side only
 左側のみに存在するファイル/フォルダ
 Files/folders that exist on right side only
@@ -494,6 +500,8 @@ Find what:
 検索語:
 Folder Comparison and Synchronization
 フォルダの比較と同期
+Folder pairs
+フォルダ・ペア
 Follow
 フォロー
 Free disk space available:
@@ -606,12 +614,14 @@ Log-messages:
 ログメッセージ:
 Logging
 ログ
+Main bar
+メインバー
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 WOW64 では、ボリュームシャドウコピーに対応していません、FreeFileSync 64-bit 版をお試しください。
 Match case
 文字種を区別
-Minimum Idle Time
-最小待機時間
+Minimum Idle Time [seconds]
+最小待機時間[秒]
 Mirror ->>
 ミラー >>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 Published under the GNU General Public License:
 Question
 質問
-Quit
-終了
 Re-enable all hidden dialogs?
 すべての非表示ダイアログを有効にしますか?
 RealtimeSync - Automated Synchronization
@@ -708,6 +716,8 @@ Report translation error
 翻訳エラーの詳細
 Reset
 リセット
+Reset view
+表示リセット
 Right
 右側
 S&ave configuration...
@@ -734,6 +744,8 @@ Set direction:
 方向の設定:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 同期方向のデフォルト設定: 古いファイルに新しいファイルを上書き
+Show \"%x\"
+\"%x\" を表示
 Show conflicts
 不一致を表示
 Show files that are different
@@ -852,6 +864,8 @@ Unresolved conflicts existing!
 未解決の不一致があります!
 Update ->
 更新 ->
+Updating attributes of %x
+%x の属性を更新
 Usage:
 使用方法:
 Use Recycle Bin
@@ -868,8 +882,8 @@ Verifying file %x
 ファイル %x の検証中
 Volume name %x not part of filename %y!
 ボリューム名 %x にファイル名 %y はありません!
-Waiting for all directories to become available...
-すべてのディレクトリが利用可能になるまで待機中...
+Waiting for missing directories...
+見失ったディレクトリの待機中
 Waiting while directory is locked (%x)...
 待機時間中ディレクトリはロックされます(%x)...
 Warning

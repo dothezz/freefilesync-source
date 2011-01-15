@@ -2,8 +2,8 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %x / %y objetos apagados com sucesso
-%x Byte
-%x Byte
+%x Bytes
+%x Bytes
 %x GB
 %x GB
 %x MB
@@ -256,6 +256,10 @@ Continue
 Continuar
 Conversion error:
 Erro de conversão:
+Copy attributes only from left to right
+Copiar atributos somente da esquerda para a direita
+Copy attributes only from right to left
+Copiar atributos somente da direita para a esquerda
 Copy filesystem permissions
 Copiar permissões de arquivos e diretórios
 Copy from left to right
@@ -472,6 +476,8 @@ Files that exist on both sides, right one is newer
 Arquivos que existem nos dois lados, sendo à direita mais recentes
 Files that have different content
 Arquivos que possuem conteúdo diferente
+Files/folders that differ in attributes only
+Arquivos/pastas que diferem somente em atributos
 Files/folders that exist on left side only
 Arquivos/pastas que existem somente à esquerda
 Files/folders that exist on right side only
@@ -483,7 +489,7 @@ Filtro está ativo
 Filter settings have changed!
 As configurações do filtro foram alteradas!
 Filter view
-Filtrar vista
+Filtrar visualização
 Filter: All pairs
 Filtro: Todos os pares
 Filter: Single pair
@@ -494,6 +500,8 @@ Find what:
 Localizar o que:
 Folder Comparison and Synchronization
 Comparação e Sincronização de Pastas
+Folder pairs
+Pares de pastas
 Follow
 Seguir
 Free disk space available:
@@ -606,12 +614,14 @@ Log-messages:
 Log de mensagens:
 Logging
 Gravando log
+Main bar
+Barra principal
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Cópias de sombra no WOW64 não são suportadas. Por favor use a versão 64-bits do FreeFileSync.
 Match case
 Diferenciar maiúsculas e minúsculas
-Minimum Idle Time
-Tempo Ocioso Mínimo
+Minimum Idle Time [seconds]
+Mínimo Tempo Ocioso [segundos]
 Mirror ->>
 Espelhar ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 Publicado sobre a GNU General Public License:
 Question
 Questão
-Quit
-Sair
 Re-enable all hidden dialogs?
 Reabilitar todos os diálogos ocultos?
 RealtimeSync - Automated Synchronization
@@ -707,7 +715,9 @@ Remover par de pastas
 Report translation error
 Reportar erro de tradução
 Reset
-Reiniciar
+Restaurar
+Reset view
+Restaurar visualização
 Right
 Direita
 S&ave configuration...
@@ -734,6 +744,8 @@ Set direction:
 Configurar direção
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Configurando direções padrões de sincronização: Arquivos antigos serão substituídos por arquivos mais novos.
+Show \"%x\"
+Mostrar \"%x\"
 Show conflicts
 Mostrar conflitos
 Show files that are different
@@ -852,6 +864,8 @@ Unresolved conflicts existing!
 Conflitos não resolvidos existentes!
 Update ->
 Atualizar ->
+Updating attributes of %x
+Atualizando atributos de %x
 Usage:
 Uso:
 Use Recycle Bin
@@ -868,8 +882,8 @@ Verifying file %x
 Verificando arquivo %x
 Volume name %x not part of filename %y!
 Nome do volume %x não é parte do arquivo %y!
-Waiting for all directories to become available...
-Esperando que todos os diretóricos fiquem disponíveis...
+Waiting for missing directories...
+Esperando por diretórios faltantes...
 Waiting while directory is locked (%x)...
 Esperando enquanto o diretório é travado (%x)...
 Warning

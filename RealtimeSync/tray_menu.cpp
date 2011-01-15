@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "tray_menu.h"
@@ -29,7 +29,7 @@ using namespace rts;
 class TrayIconHolder : private wxEvtHandler
 {
 public:
-    TrayIconHolder();
+    TrayIconHolder(const wxString& jobname);
     ~TrayIconHolder();
 
     void doUiRefreshNow();
@@ -61,6 +61,8 @@ private:
 
     bool m_abortRequested;
     bool m_resumeRequested;
+
+    const wxString jobName_; //RTS job name, may be empty
 };
 
 
@@ -113,9 +115,10 @@ private:
 //##############################################################################################################
 
 
-TrayIconHolder::TrayIconHolder() :
+TrayIconHolder::TrayIconHolder(const wxString& jobname) :
     m_abortRequested(false),
-    m_resumeRequested(false)
+    m_resumeRequested(false),
+    jobName_(jobname)
 {
     trayMenu = new RtsTrayIcon(this); //not in initialization list: give it a valid parent object!
 
@@ -146,7 +149,8 @@ void TrayIconHolder::showIconActive()
 #elif defined FFS_LINUX
     realtimeIcon.CopyFromBitmap(GlobalResources::getInstance().getImageByName(wxT("RTS_tray_linux.png"))); //use a 22x22 bitmap for perfect fit
 #endif
-    trayMenu->SetIcon(realtimeIcon, wxString(wxT("RealtimeSync")) + wxT(" - ") + _("Monitoring active..."));
+    const wxString postFix = jobName_.empty() ? wxString() : (wxT("\n\"") + jobName_ + wxT("\""));
+    trayMenu->SetIcon(realtimeIcon, _("Monitoring active...") + postFix);
 }
 
 
@@ -158,7 +162,8 @@ void TrayIconHolder::showIconWaiting()
 #elif defined FFS_LINUX
     realtimeIcon.CopyFromBitmap(GlobalResources::getInstance().getImageByName(wxT("RTS_tray_waiting_linux.png"))); //use a 22x22 bitmap for perfect fit
 #endif
-    trayMenu->SetIcon(realtimeIcon, wxString(wxT("RealtimeSync")) + wxT(" - ") + _("Waiting for all directories to become available..."));
+    const wxString postFix = jobName_.empty() ? wxString() : (wxT("\n\"") + jobName_ + wxT("\""));
+    trayMenu->SetIcon(realtimeIcon, _("Waiting for missing directories...") + postFix);
 }
 
 
@@ -231,7 +236,9 @@ class StartSyncNowException {};
 class WaitCallbackImpl : public rts::WaitCallback
 {
 public:
-    WaitCallbackImpl() : nextSyncStart_(std::numeric_limits<long>::max()) {}
+    WaitCallbackImpl(const wxString& jobname) :
+        trayIcon(jobname),
+        nextSyncStart_(std::numeric_limits<long>::max()) {}
 
     void notifyAllDirectoriesExist()
     {
@@ -279,13 +286,13 @@ watcher.h (low level wait for directory changes)
 */
 
 
-rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& config)
+rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& config, const wxString& jobname)
 {
     const std::vector<Zstring> dirList = convert(config.directories);
 
     try
     {
-        WaitCallbackImpl callback;
+        WaitCallbackImpl callback(jobname);
 
         if (config.commandline.empty())
             throw ffs3::FileError(_("Command line is empty!"));
@@ -296,7 +303,14 @@ rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& 
 
         while (true)
         {
-            wxExecute(config.commandline, wxEXEC_SYNC); //execute command
+            //execute command
+            {
+                //by default wxExecute uses a zero sized dummy window as a hack to keep focus which leaves a useless empty icon in ALT-TAB list
+                //=> use wxEXEC_NODISABLE and roll our own window disabler!                   (see comment in  app.cpp: void *wxGUIAppTraits::BeforeChildWaitLoop())
+                wxWindowDisabler dummy; //disables all top level windows
+                wxExecute(config.commandline, wxEXEC_SYNC | wxEXEC_NODISABLE);
+            }
+
             wxLog::FlushActive(); //show wxWidgets error messages (if any)
 
             callback.scheduleNextSync(std::numeric_limits<long>::max()); //next sync not scheduled (yet)

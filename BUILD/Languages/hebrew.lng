@@ -2,8 +2,8 @@
   MinGW \t- מהדר גנו של חלונות\n  wxWidgets \t- ממשק גרפי של תוכנת קוד פתוח\n  wxFormBuilder\t- wxWidgets מנוע ממשג גרפי\n  CodeBlocks \t- IDE תוכנת קוד פתוח
 %x / %y objects deleted successfully
 אוביקטים נמחקו בהצלחה %y מ %x
-%x Byte
-%x בייט
+%x Bytes
+
 %x GB
 %x גיגה ביט
 %x MB
@@ -256,6 +256,10 @@ Continue
 המשך
 Conversion error:
 טעות בהסבה:
+Copy attributes only from left to right
+
+Copy attributes only from right to left
+
 Copy filesystem permissions
 
 Copy from left to right
@@ -472,6 +476,8 @@ Files that exist on both sides, right one is newer
 קבצים הנמצאים בשני הצדדים -הימני חדש יותר
 Files that have different content
 קבצים בעלי תוכן שונה
+Files/folders that differ in attributes only
+
 Files/folders that exist on left side only
 קבצים ותיקיות הנמצאים בעמודה השמאלית בלבד
 Files/folders that exist on right side only
@@ -494,6 +500,8 @@ Find what:
 חפש מה:
 Folder Comparison and Synchronization
 סנכרון קבצים ומחיצות
+Folder pairs
+
 Follow
 
 Free disk space available:
@@ -606,11 +614,13 @@ Log-messages:
 הודעת יומן:
 Logging
 רישום ביומן
+Main bar
+
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 לא נתמכת בגרסה זאת אנא התקן גרסה 64 WOW64 העתקת צל ב
 Match case
 אותיות התאם 
-Minimum Idle Time
+Minimum Idle Time [seconds]
 
 Mirror ->>
 מראה ->>
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 GNU מפורסם במסגרת:
 Question
 שאלה
-Quit
-יציאה
 Re-enable all hidden dialogs?
 הפעל מחדש דיאלוגים נסתרים?
 RealtimeSync - Automated Synchronization
@@ -708,6 +716,8 @@ Report translation error
 :דווח שגיאת תרגום
 Reset
 אפס
+Reset view
+
 Right
 ימין
 S&ave configuration...
@@ -734,6 +744,8 @@ Set direction:
 בחר כוון:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 בחר בררת מחדל של סנכרון קבצים ישנים ידרסו ע"י קבצים חדשים יותר.
+Show \"%x\"
+
 Show conflicts
 הראה קונפליקטים
 Show files that are different
@@ -852,6 +864,8 @@ Unresolved conflicts existing!
 קיים קונפליקט לא פתור!
 Update ->
 שדרג->
+Updating attributes of %x
+
 Usage:
 שימוש:
 Use Recycle Bin
@@ -868,8 +882,8 @@ Verifying file %x
 מאמת קובץ %x
 Volume name %x not part of filename %y!
 כנונן %x לא בנתיב של קובץ %y!
-Waiting for all directories to become available...
-מחכה להתפנות כל המחיצות...
+Waiting for missing directories...
+
 Waiting while directory is locked (%x)...
 
 Warning

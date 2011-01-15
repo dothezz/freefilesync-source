@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef FFS_FILTER_H_INCLUDED
@@ -55,8 +55,8 @@ public:
     static FilterRef loadFilter(wxInputStream& stream); //CAVEAT!!! adapt this method for each new derivation!!!
 
 private:
-    virtual Zstring uniqueClassIdentifier() const = 0;   //get identifier, used for serialization
     virtual void save(wxOutputStream& stream) const = 0; //serialization
+    virtual Zstring uniqueClassIdentifier() const = 0;   //get identifier, used for serialization
     virtual bool cmpLessSameType(const BaseFilter& other) const = 0; //typeid(*this) == typeid(other) in this context!
 };
 
@@ -64,14 +64,15 @@ private:
 class NullFilter : public BaseFilter  //no filtering at all
 {
 public:
-    static FilterRef load(wxInputStream& stream); //"serial constructor"
     virtual bool passFileFilter(const Zstring& relFilename) const;
     virtual bool passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const;
     virtual bool isNull() const;
 
 private:
-    virtual Zstring uniqueClassIdentifier() const;
+    friend class BaseFilter;
     virtual void save(wxOutputStream& stream) const {}
+    virtual Zstring uniqueClassIdentifier() const;
+    static FilterRef load(wxInputStream& stream); //"serial constructor"
     virtual bool cmpLessSameType(const BaseFilter& other) const;
 };
 
@@ -80,15 +81,16 @@ class NameFilter : public BaseFilter  //standard filter by filename
 {
 public:
     NameFilter(const Zstring& includeFilter, const Zstring& excludeFilter);
-    static FilterRef load(wxInputStream& stream); //"serial constructor"
 
     virtual bool passFileFilter(const Zstring& relFilename) const;
     virtual bool passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const;
     virtual bool isNull() const;
 
 private:
-    virtual Zstring uniqueClassIdentifier() const;
+    friend class BaseFilter;
     virtual void save(wxOutputStream& stream) const;
+    virtual Zstring uniqueClassIdentifier() const;
+    static FilterRef load(wxInputStream& stream); //"serial constructor"
     virtual bool cmpLessSameType(const BaseFilter& other) const;
 
     std::set<Zstring> filterFileIn;   //upper case (windows)
@@ -105,15 +107,16 @@ class CombinedFilter : public BaseFilter  //combine two filters to match if and 
 {
 public:
     CombinedFilter(const FilterRef& first, const FilterRef& second) : first_(first), second_(second) {}
-    static FilterRef load(wxInputStream& stream); //"serial constructor"
 
     virtual bool passFileFilter(const Zstring& relFilename) const;
     virtual bool passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const;
     virtual bool isNull() const;
 
 private:
-    virtual Zstring uniqueClassIdentifier() const;
+    friend class BaseFilter;
     virtual void save(wxOutputStream& stream) const;
+    virtual Zstring uniqueClassIdentifier() const;
+    static FilterRef load(wxInputStream& stream); //"serial constructor"
     virtual bool cmpLessSameType(const BaseFilter& other) const;
 
     const FilterRef first_;

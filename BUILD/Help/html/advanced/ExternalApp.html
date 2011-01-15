@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20100902;19180200">
+	<META NAME="CHANGED" CONTENT="20101229;20324200">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -27,16 +27,18 @@
 application via double-click</FONT></H3>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">FreeFileSync
-opens the operating system's standard file browser per default on
-each double-click e. g. by invoking &quot;<FONT FACE="Courier New, monospace">explorer
-/select, %name</FONT>&quot; on Windows.</FONT></P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If some
-other application shall be started instead, just navigate to &quot;</FONT><FONT FACE="Tahoma, sans-serif"><I>Menu
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">By
+default FreeFileSync opens the operating system's standard file
+browser on each double-click by invoking &quot;<FONT FACE="Courier New, monospace">explorer
+/select, %name</FONT>&quot; on Windows and &quot;<FONT FACE="Courier New, monospace">xdg-open
+%dir</FONT>&quot; on Linux.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">However
+the user is free to integrate other external applications into
+FreeFileSync: navigate to &quot;</FONT><FONT FACE="Tahoma, sans-serif"><I>Menu
 -&gt; Advanced -&gt; Global settings: External Applications</I></FONT><FONT FACE="Tahoma, sans-serif">&quot;
-and add or replace a command string. The first one is used when
-double-clicking while all subsequent entries are still available in
-right-click context menu on main dialog. The following macros are
+and add or replace a command string. The first entry is used when
+double-clicking a row while all subsequent entries are only available
+in right-click context menu on main dialog. The following macros are
 available:</FONT></P>
 <UL>
 	<P><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
@@ -59,6 +61,8 @@ available:</FONT></P>
 		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Start
 		visual difference tool: <FONT FACE="Courier New, monospace">C:\Program
 		Files\WinMerge\WinMergeU.exe &quot;%name&quot; &quot;%nameCo&quot;</FONT></FONT></P>
+		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Open
+		Console: <FONT FACE="Courier New, monospace">cmd /k cd /D &quot;%dir&quot;</FONT></FONT></P>
 	</UL>
 </UL>
 <P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">

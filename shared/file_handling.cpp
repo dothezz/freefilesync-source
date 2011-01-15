@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "file_handling.h"
@@ -24,6 +24,7 @@
 #include "symlink_target.h"
 
 #ifdef FFS_WIN
+#include "privilege.h"
 #include "dll_loader.h"
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "long_path_prefix.h"
@@ -209,16 +210,16 @@ bool ffs3::fileExists(const Zstring& filename)
     // we must use GetFileAttributes() instead of the ANSI C functions because
     // it can cope with network (UNC) paths unlike them
     const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(filename).c_str());
-    return (ret != INVALID_FILE_ATTRIBUTES) && !(ret & FILE_ATTRIBUTE_DIRECTORY); //returns true for (file-)symlinks also
+    return ret != INVALID_FILE_ATTRIBUTES && !(ret & FILE_ATTRIBUTE_DIRECTORY); //returns true for (file-)symlinks also
 
 #elif defined FFS_LINUX
     struct stat fileInfo;
-    return (::lstat(filename.c_str(), &fileInfo) == 0 &&
-            (S_ISLNK(fileInfo.st_mode) || S_ISREG(fileInfo.st_mode))); //in Linux a symbolic link is neither file nor directory
+    return ::lstat(filename.c_str(), &fileInfo) == 0 &&
+           (S_ISLNK(fileInfo.st_mode) || S_ISREG(fileInfo.st_mode)); //in Linux a symbolic link is neither file nor directory
 #endif
 }
 
-
+#include <wx/msgdlg.h>
 bool ffs3::dirExists(const Zstring& dirname)
 {
     //symbolic links (broken or not) are also treated as existing directories!
@@ -226,13 +227,12 @@ bool ffs3::dirExists(const Zstring& dirname)
     // we must use GetFileAttributes() instead of the ANSI C functions because
     // it can cope with network (UNC) paths unlike them
     const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(dirname).c_str());
-
     return (ret != INVALID_FILE_ATTRIBUTES) && (ret & FILE_ATTRIBUTE_DIRECTORY); //returns true for (dir-)symlinks also
 
 #elif defined FFS_LINUX
     struct stat dirInfo;
-    return (::lstat(dirname.c_str(), &dirInfo) == 0 &&
-            (S_ISLNK(dirInfo.st_mode) || S_ISDIR(dirInfo.st_mode))); //in Linux a symbolic link is neither file nor directory
+    return ::lstat(dirname.c_str(), &dirInfo) == 0 &&
+           (S_ISLNK(dirInfo.st_mode) || S_ISDIR(dirInfo.st_mode)); //in Linux a symbolic link is neither file nor directory
 #endif
 }
 
@@ -241,12 +241,12 @@ bool ffs3::symlinkExists(const Zstring& objname)
 {
 #ifdef FFS_WIN
     const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(objname).c_str());
-    return (ret != INVALID_FILE_ATTRIBUTES) && (ret & FILE_ATTRIBUTE_REPARSE_POINT);
+    return ret != INVALID_FILE_ATTRIBUTES && (ret & FILE_ATTRIBUTE_REPARSE_POINT);
 
 #elif defined FFS_LINUX
     struct stat fileInfo;
-    return (::lstat(objname.c_str(), &fileInfo) == 0 &&
-            S_ISLNK(fileInfo.st_mode)); //symbolic link
+    return ::lstat(objname.c_str(), &fileInfo) == 0 &&
+           S_ISLNK(fileInfo.st_mode); //symbolic link
 #endif
 }
 
@@ -592,18 +592,18 @@ bool fix8Dot3NameClash(const Zstring& oldName, const Zstring& newName)  //throw 
             //we detected an event where newName is in shortname format (although it is intended to be a long name) and
             //writing target file failed because another unrelated file happens to have the same short name
 
-            const Zstring newNameFullPathLong = newName.BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR +
-                                                fileNameLong;
+            const Zstring unrelatedPathLong = newName.BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR +
+                                              fileNameLong;
 
             //find another name in short format: this ensures the actual short name WILL be renamed as well!
             const Zstring parkedTarget = createTemp8Dot3Name(newName);
 
             //move already existing short name out of the way for now
-            renameFileInternal(newNameFullPathLong, parkedTarget); //throw (FileError, ErrorDifferentVolume);
+            renameFileInternal(unrelatedPathLong, parkedTarget); //throw (FileError, ErrorDifferentVolume);
             //DON'T call ffs3::renameFile() to avoid reentrance!
 
             //schedule cleanup; the file system should assign this unrelated file a new (unique) short name
-            Loki::ScopeGuard guard = Loki::MakeGuard(renameFileInternalNoThrow, parkedTarget, newNameFullPathLong);//equivalent to Boost.ScopeExit in this case
+            Loki::ScopeGuard guard = Loki::MakeGuard(renameFileInternalNoThrow, parkedTarget, unrelatedPathLong);//equivalent to Boost.ScopeExit in this case
             (void)guard; //silence warning "unused variable"
 
             renameFileInternal(oldName, newName); //the short filename name clash is solved, this should work now
@@ -672,6 +672,10 @@ void ffs3::moveFile(const Zstring& sourceFile, const Zstring& targetFile, MoveFi
             throw FileError(wxString(_("Error moving file:")) + wxT("\n\"") + zToWx(sourceFile) +  wxT("\" ->\n\"") + zToWx(targetFile) + wxT("\"") +
                             wxT("\n\n") + _("Operation aborted!"));
         }
+
+    //support case-sensitive renaming
+    if (EqualFilename()(sourceFile, targetFile)) //difference in case only
+        return renameFile(sourceFile, targetFile); //throw (FileError, ErrorDifferentVolume);
 
     if (somethingExists(targetFile)) //test file existence: e.g. Linux might silently overwrite existing symlinks
         throw FileError(wxString(_("Error moving file:")) + wxT("\n\"") + zToWx(sourceFile) +  wxT("\" ->\n\"") + zToWx(targetFile) + wxT("\"") +
@@ -989,7 +993,10 @@ void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, boo
             throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
         }
 
-        if ((sourceAttr.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) && deRefSymlinks) //we have a symlink AND need to dereference...
+        const bool isReparsePoint = (sourceAttr.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
+        const bool isDirectory    = (sourceAttr.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)     != 0;
+
+        if (isReparsePoint && deRefSymlinks) //we have a symlink AND need to dereference...
         {
             HANDLE hSource = ::CreateFile(applyLongPathPrefix(sourceObj).c_str(),
                                           FILE_READ_ATTRIBUTES,
@@ -1003,7 +1010,6 @@ void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, boo
                 const wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(sourceObj) + wxT("\"");
                 throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
             }
-
             boost::shared_ptr<void> dummy(hSource, ::CloseHandle);
 
             if (!::GetFileTime(hSource,        //__in       HANDLE hFile,
@@ -1023,7 +1029,7 @@ void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, boo
         }
 
 //####################################### DST hack ###########################################
-        if ((sourceAttr.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0) //dst hack not (yet) required for directories (symlinks implicitly checked by isFatDrive())
+        if (!isDirectory) //dst hack not (yet) required for directories (symlinks implicitly checked by isFatDrive())
         {
             if (dst::isFatDrive(sourceObj)) //throw()
             {
@@ -1045,6 +1051,9 @@ void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, boo
 //####################################### DST hack ###########################################
     }
 
+
+    //privilege SE_BACKUP_NAME doesn't seem to be required here for symbolic links
+    //note: setting privileges requires admin rights!
 
     HANDLE hTarget = ::CreateFile(applyLongPathPrefix(targetObj).c_str(),
                                   FILE_WRITE_ATTRIBUTES,
@@ -1071,7 +1080,7 @@ void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, boo
     }
 
 #ifndef NDEBUG //dst hack: verify data written
-    if (dst::isFatDrive(targetObj)) //throw()
+    if (dst::isFatDrive(targetObj) && !ffs3::dirExists(targetObj)) //throw()
     {
         WIN32_FILE_ATTRIBUTE_DATA debugeAttr = {};
         assert(::GetFileAttributesEx(applyLongPathPrefix(targetObj).c_str(), //__in   LPCTSTR lpFileName,
@@ -1082,7 +1091,6 @@ void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, boo
         assert(::CompareFileTime(&debugeAttr.ftLastWriteTime, &lastWriteTime) == 0);
     }
 #endif
-
 
 #elif defined FFS_LINUX
     if (deRefSymlinks)
@@ -1099,7 +1107,7 @@ void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, boo
         newTimes.modtime = objInfo.st_mtime;
 
         //(try to) set new "last write time"
-        if (::utime(targetObj.c_str(), &newTimes) != 0) //return value not evalutated!
+        if (::utime(targetObj.c_str(), &newTimes) != 0) //return value not evaluated!
         {
             wxString errorMessage = wxString(_("Error changing modification time:")) + wxT("\n\"") + zToWx(targetObj) + wxT("\"");
             throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
@@ -1121,7 +1129,7 @@ void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, boo
         newTimes[1].tv_sec  = objInfo.st_mtime;	/* seconds */
         newTimes[1].tv_usec = 0;            	/* microseconds */
 
-        if (::lutimes(targetObj.c_str(), newTimes) != 0) //return value not evalutated!
+        if (::lutimes(targetObj.c_str(), newTimes) != 0) //return value not evaluated!
         {
             wxString errorMessage = wxString(_("Error changing modification time:")) + wxT("\n\"") + zToWx(targetObj) + wxT("\"");
             throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
@@ -1221,148 +1229,6 @@ void copySymlinkInternal(const Zstring& sourceLink, const Zstring& targetLink, b
 }
 
 
-namespace ffs3
-{
-#ifdef FFS_WIN
-class Privileges
-{
-public:
-    static Privileges& getInstance()
-    {
-        static Privileges instance;
-        return instance;
-    }
-
-    void ensureActive(LPCTSTR privilege) //throw FileError()
-    {
-        if (activePrivileges.find(privilege) != activePrivileges.end())
-            return; //privilege already active
-
-        if (privilegeIsActive(privilege)) //privilege was already active before starting this tool
-            activePrivileges.insert(std::make_pair(privilege, false));
-        else
-        {
-            setPrivilege(privilege, true);
-            activePrivileges.insert(std::make_pair(privilege, true));
-        }
-    }
-
-private:
-    Privileges() {}
-    Privileges(Privileges&);
-    void operator=(Privileges&);
-
-    ~Privileges() //clean up: deactivate all privileges that have been activated by this application
-    {
-        for (PrivBuffType::const_iterator i = activePrivileges.begin(); i != activePrivileges.end(); ++i)
-            try
-            {
-                if (i->second)
-                    Privileges::setPrivilege(i->first, false);
-            }
-            catch(...) {}
-    }
-
-    static bool privilegeIsActive(LPCTSTR privilege); //throw FileError()
-    static void setPrivilege(LPCTSTR privilege, bool enable); //throw FileError()
-
-    typedef std::map<Zstring, bool> PrivBuffType; //bool: enabled by this application
-
-    PrivBuffType activePrivileges;
-};
-
-
-bool Privileges::privilegeIsActive(LPCTSTR privilege) //throw FileError()
-{
-    HANDLE hToken = NULL;
-    if (!::OpenProcessToken(::GetCurrentProcess(), //__in   HANDLE ProcessHandle,
-                            TOKEN_QUERY,           //__in   DWORD DesiredAccess,
-                            &hToken))              //__out  PHANDLE TokenHandle
-    {
-        const wxString errorMessage = wxString(_("Error setting privilege:")) + wxT(" \"") + privilege +  wxT("\"") + wxT("\n\n");
-        throw FileError(errorMessage + ffs3::getLastErrorFormatted());
-    }
-    boost::shared_ptr<void> dummy(hToken, ::CloseHandle);
-
-    LUID luid = {0};
-    if (!::LookupPrivilegeValue(
-                NULL,      //__in_opt  LPCTSTR lpSystemName,
-                privilege, //__in      LPCTSTR lpName,
-                &luid ))   //__out     PLUID lpLuid
-    {
-        const wxString errorMessage = wxString(_("Error setting privilege:")) + wxT(" \"") + privilege +  wxT("\"") + wxT("\n\n");
-        throw FileError(errorMessage + ffs3::getLastErrorFormatted());
-    }
-
-    PRIVILEGE_SET priv  = {0};
-    priv.PrivilegeCount = 1;
-    priv.Control        = PRIVILEGE_SET_ALL_NECESSARY;
-    priv.Privilege[0].Luid = luid;
-    priv.Privilege[0].Attributes = SE_PRIVILEGE_ENABLED;
-
-    BOOL alreadyGranted = FALSE;
-    if (!::PrivilegeCheck(
-                hToken,           //__in     HANDLE ClientToken,
-                &priv,            //__inout  PPRIVILEGE_SET RequiredPrivileges,
-                &alreadyGranted)) //__out    LPBOOL pfResult
-    {
-        const wxString errorMessage = wxString(_("Error setting privilege:")) + wxT(" \"") + privilege +  wxT("\"") + wxT("\n\n");
-        throw FileError(errorMessage + ffs3::getLastErrorFormatted());
-    }
-
-    return alreadyGranted == TRUE;
-}
-
-
-void Privileges::setPrivilege(LPCTSTR privilege, bool enable) //throw FileError()
-{
-    HANDLE hToken = NULL;
-    if (!::OpenProcessToken(::GetCurrentProcess(),   //__in   HANDLE ProcessHandle,
-                            TOKEN_ADJUST_PRIVILEGES, //__in   DWORD DesiredAccess,
-                            &hToken))                //__out  PHANDLE TokenHandle
-    {
-        const wxString errorMessage = wxString(_("Error setting privilege:")) + wxT(" \"") + privilege +  wxT("\"") + wxT("\n\n");
-        throw FileError(errorMessage + ffs3::getLastErrorFormatted());
-    }
-    boost::shared_ptr<void> dummy(hToken, ::CloseHandle);
-
-    LUID luid = {0};
-    if (!::LookupPrivilegeValue(
-                NULL,      //__in_opt  LPCTSTR lpSystemName,
-                privilege, //__in      LPCTSTR lpName,
-                &luid ))   //__out     PLUID lpLuid
-    {
-        const wxString errorMessage = wxString(_("Error setting privilege:")) + wxT(" \"") + privilege +  wxT("\"") + wxT("\n\n");
-        throw FileError(errorMessage + ffs3::getLastErrorFormatted());
-    }
-
-    TOKEN_PRIVILEGES tp = {0};
-    tp.PrivilegeCount   = 1;
-    tp.Privileges[0].Luid = luid;
-    tp.Privileges[0].Attributes = enable ? SE_PRIVILEGE_ENABLED : 0;
-
-    if (!::AdjustTokenPrivileges(
-                hToken, //__in       HANDLE TokenHandle,
-                false,  //__in       BOOL DisableAllPrivileges,
-                &tp,    //__in_opt   PTOKEN_PRIVILEGES NewState,
-                0,      //__in       DWORD BufferLength,
-                NULL,   //__out_opt  PTOKEN_PRIVILEGES PreviousState,
-                NULL))  //__out_opt  PDWORD ReturnLength
-    {
-        const wxString errorMessage = wxString(_("Error setting privilege:")) + wxT(" \"") + privilege +  wxT("\"") + wxT("\n\n");
-        throw FileError(errorMessage + ffs3::getLastErrorFormatted());
-    }
-
-    if (::GetLastError() == ERROR_NOT_ALL_ASSIGNED) //check although previous function returned with success!
-    {
-        const wxString errorMessage = wxString(_("Error setting privilege:")) + wxT(" \"") + privilege +  wxT("\"") + wxT("\n\n");
-        throw FileError(errorMessage + ffs3::getLastErrorFormatted());
-    }
-}
-#endif
-}
-
-
 #ifdef HAVE_SELINUX
 //copy SELinux security context
 void copySecurityContext(const Zstring& source, const Zstring& target, bool derefSymlinks) //throw FileError()
@@ -1415,10 +1281,12 @@ void copySecurityContext(const Zstring& source, const Zstring& target, bool dere
 #endif //HAVE_SELINUX
 
 
-//copy permissions for files, directories or symbolic links
+//copy permissions for files, directories or symbolic links:
 void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, bool derefSymlinks) //throw FileError(); probably requires admin rights
 {
 #ifdef FFS_WIN
+    //setting privileges requires admin rights!
+
     //enable privilege: required to read/write SACL information
     Privileges::getInstance().ensureActive(SE_SECURITY_NAME); //polling allowed...
 
@@ -1480,12 +1348,12 @@ void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, b
 
 
     const HANDLE hTarget = ::CreateFile( targetFmt.c_str(),                                                     // lpFileName
-                                   FILE_GENERIC_WRITE | WRITE_OWNER | WRITE_DAC | ACCESS_SYSTEM_SECURITY, // dwDesiredAccess: all four seem to be required!!!
-                                   FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,                // dwShareMode
-                                   NULL,                       // lpSecurityAttributes
-                                   OPEN_EXISTING,              // dwCreationDisposition
-                                   FILE_FLAG_BACKUP_SEMANTICS | (derefSymlinks ? 0 : FILE_FLAG_OPEN_REPARSE_POINT), // dwFlagsAndAttributes
-                                   NULL);                        // hTemplateFile
+                                         FILE_GENERIC_WRITE | WRITE_OWNER | WRITE_DAC | ACCESS_SYSTEM_SECURITY, // dwDesiredAccess: all four seem to be required!!!
+                                         FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,                // dwShareMode
+                                         NULL,                       // lpSecurityAttributes
+                                         OPEN_EXISTING,              // dwCreationDisposition
+                                         FILE_FLAG_BACKUP_SEMANTICS | (derefSymlinks ? 0 : FILE_FLAG_OPEN_REPARSE_POINT), // dwFlagsAndAttributes
+                                         NULL);                        // hTemplateFile
     if (hTarget == INVALID_HANDLE_VALUE)
     {
         const wxString errorMessage = wxString(_("Error copying file permissions:")) + wxT("\n\"") + zToWx(source) +  wxT("\" ->\n\"") + zToWx(target) + wxT("\"") + wxT("\n\n");
@@ -2008,33 +1876,3 @@ void ffs3::copyFile(const Zstring& sourceFile,
     guardTargetFile.Dismiss(); //target has been created successfully!
 }
 #endif
-
-
-
-/*
-#ifdef FFS_WIN
-inline
-Zstring getDriveName(const Zstring& directoryName) //GetVolume() doesn't work under Linux!
-{
-    const Zstring volumeName = wxFileName(directoryName.c_str()).GetVolume().c_str();
-    if (volumeName.empty())
-        return Zstring();
-
-    return volumeName + wxFileName::GetVolumeSeparator().c_str() + common::FILE_NAME_SEPARATOR;
-}
-
-
-bool ffs3::isFatDrive(const Zstring& directoryName)
-{
-    const Zstring driveName = getDriveName(directoryName);
-    if (driveName.empty())
-        return false;
-
-    wxChar fileSystem[32];
-    if (!GetVolumeInformation(driveName.c_str(), NULL, 0, NULL, NULL, NULL, fileSystem, 32))
-        return false;
-
-    return Zstring(fileSystem).StartsWith(wxT("FAT"));
-}
-#endif  //FFS_WIN
-*/

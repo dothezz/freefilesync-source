@@ -2,7 +2,7 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %x / %y objetos borrados satisfactoriamente
-%x Byte
+%x Bytes
 %x Bytes
 %x GB
 %x GB
@@ -256,6 +256,10 @@ Continue
 Continuar
 Conversion error:
 Error de conversión:
+Copy attributes only from left to right
+Copiar sólo atributos de izquierda a derecha
+Copy attributes only from right to left
+Copiar sólo atributos de izquierda a derecha
 Copy filesystem permissions
 Permisos de copia del sistema de ficheros
 Copy from left to right
@@ -472,6 +476,8 @@ Files that exist on both sides, right one is newer
 Archivos que existen en ambos lados, el de la derecha es más reciente
 Files that have different content
 Archivos que tienen un contenido diferente
+Files/folders that differ in attributes only
+Archivos/carpetas que se diferencian sólo en atributos
 Files/folders that exist on left side only
 Archivos/carpetas que existen sólo en el lado izquierdo
 Files/folders that exist on right side only
@@ -494,6 +500,8 @@ Find what:
 Buscar:
 Folder Comparison and Synchronization
 Comparación y Sincronización de Carpetas
+Folder pairs
+Pares de carpetas
 Follow
 Seguir
 Free disk space available:
@@ -606,12 +614,14 @@ Log-messages:
 Registro de mensajes:
 Logging
 Iniciando sesión
+Main bar
+Barra principal
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 La realización de copias shadow en WOW64 no está soportado. Por favor, use la versión 64-bit de FreeFileSync. 
 Match case
 Distinción entre mayúsculas y minúsculas
-Minimum Idle Time
-Tiempo de inactividad mínimo
+Minimum Idle Time [seconds]
+Tiempo mínimo de espera [segundos]
 Mirror ->>
 Espejo ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 Publicado bajo "GNU General Public License":
 Question
 Pregunta
-Quit
-Salir
 Re-enable all hidden dialogs?
 ¿Reactivar todos los diálogos ocultos?
 RealtimeSync - Automated Synchronization
@@ -708,6 +716,8 @@ Report translation error
 Informar de errores de traducción
 Reset
 Reiniciar
+Reset view
+Reiniciar vista
 Right
 Derecha
 S&ave configuration...
@@ -734,6 +744,8 @@ Set direction:
 Indicar dirección:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Fijando direcciones de sincronización por defecto: Los archivos viejos serán sobreescritos por los archivos nuevos.
+Show \"%x\"
+Mostrar \"%x\"
 Show conflicts
 Mostrar conflictos
 Show files that are different
@@ -852,6 +864,8 @@ Unresolved conflicts existing!
 ¡Existen conflictos sin resolver!
 Update ->
 Actualizar ->
+Updating attributes of %x
+Actualizar atributos de %x
 Usage:
 Uso:
 Use Recycle Bin
@@ -868,8 +882,8 @@ Verifying file %x
 Verificación del archivo %x
 Volume name %x not part of filename %y!
 El nombre del volumen %x no es una parte del nombre de archivo %y
-Waiting for all directories to become available...
-Esperando a que todos los directorios esten disponibles...
+Waiting for missing directories...
+Esperando directorios faltantes...
 Waiting while directory is locked (%x)...
 Esperando mientras el directorio se encuentre bloqueado (%x)...
 Warning

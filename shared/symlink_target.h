@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef SYMLINK_WIN_H_INCLUDED
@@ -17,6 +17,7 @@
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "WinIoCtl.h"
+#include "privilege.h"
 #include "long_path_prefix.h"
 
 #elif defined FFS_LINUX
@@ -60,13 +61,20 @@ typedef struct _REPARSE_DATA_BUFFER
 
 namespace
 {
-    //retrieve raw target data of symlink or junction
+//retrieve raw target data of symlink or junction
 Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw (FileError)
 {
     using ffs3::zToWx;
     using ffs3::FileError;
 #ifdef FFS_WIN
 //FSCTL_GET_REPARSE_POINT: http://msdn.microsoft.com/en-us/library/aa364571(VS.85).aspx
+
+    try //setting privileges requires admin rights! This shall not cause an error in user mode!
+    {
+        //allow access to certain symbolic links/junctions
+        ffs3::Privileges::getInstance().ensureActive(SE_BACKUP_NAME); //throw FileError()
+    }
+    catch (...) {}
 
     const HANDLE hLink = ::CreateFile(ffs3::applyLongPathPrefix(linkPath).c_str(),
                                       GENERIC_READ,
@@ -111,7 +119,7 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw (FileError)
     else if (reparseData.ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
     {
         output = Zstring(reparseData.MountPointReparseBuffer.PathBuffer + reparseData.MountPointReparseBuffer.SubstituteNameOffset / sizeof(WCHAR),
-                       reparseData.MountPointReparseBuffer.SubstituteNameLength / sizeof(WCHAR));
+                         reparseData.MountPointReparseBuffer.SubstituteNameLength / sizeof(WCHAR));
     }
     else
     {

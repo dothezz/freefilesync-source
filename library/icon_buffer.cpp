@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "icon_buffer.h"
@@ -9,6 +9,7 @@
 #include <map>
 #include <queue>
 #include <set>
+#include <wx/log.h>
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -321,7 +322,7 @@ void IconBuffer::WorkerThread::operator()() //thread entry
     }
     catch (const std::exception& e) //exceptions must be catched per thread
     {
-        wxMessageBox(wxString::FromAscii(e.what()), wxString(_("An exception occurred!")) + wxT("(Icon buffer)"), wxOK | wxICON_ERROR);
+        wxSafeShowMessage(wxString(_("An exception occurred!")) + wxT("(Icon buffer)"), wxString::FromAscii(e.what())); //simple wxMessageBox won't do for threads
     }
 }
 
@@ -364,7 +365,7 @@ void IconBuffer::WorkerThread::doWork()
 
 
 //---------------------------------------------------------------------------------------------------
-class IconBuffer::IconDB : public std::map<BasicString, IconBuffer::IconHolder> {}; //entryName/icon -> ATTENTION: avoid ref-counting for this shared data structure!
+class IconBuffer::IconDB : public std::map<BasicString, IconBuffer::IconHolder, LessFilename> {}; //entryName/icon -> ATTENTION: avoid ref-counting for this shared data structure!
 class IconBuffer::IconDbSequence : public std::queue<BasicString> {}; //entryName
 //---------------------------------------------------------------------------------------------------
 
@@ -427,7 +428,7 @@ void IconBuffer::insertIntoBuffer(const BasicString& entryName, const IconHolder
     assert(buffer->size() == bufSequence->size());
 
     //remove elements if buffer becomes too big:
-    if (buffer->size() > BUFFER_SIZE) //limit buffer size: critical because GDI resources are limited (e.g. 10000 on XP per process)
+    if (buffer->size() > BUFFER_SIZE_MAX) //limit buffer size: critical because GDI resources are limited (e.g. 10000 on XP per process)
     {
         //remove oldest element
         buffer->erase(bufSequence->front());

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "algorithm.h"
@@ -18,19 +18,10 @@
 #include "shared/global_func.h"
 #include "shared/loki/TypeManip.h"
 #include "library/db_file.h"
+#include "library/cmp_filetime.h"
 //#include "shared/loki/NullType.h"
 
 using namespace ffs3;
-
-
-wxString ffs3::extractJobName(const wxString& configFilename)
-{
-    using namespace common;
-
-    const wxString shortName = configFilename.AfterLast(FILE_NAME_SEPARATOR); //returns the whole string if seperator not found
-    const wxString jobName = shortName.BeforeLast(wxChar('.')); //returns empty string if seperator not found
-    return jobName.IsEmpty() ? shortName : jobName;
-}
 
 
 void ffs3::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp)
@@ -120,6 +111,9 @@ private:
         case FILE_EQUAL:
             fileObj.setSyncDir(SYNC_DIR_NONE);
             break;
+        case FILE_DIFFERENT_METADATA:
+            fileObj.setSyncDir(config.conflict); //use setting from "conflict/cannot categorize"
+            break;
         }
     }
 
@@ -148,6 +142,10 @@ private:
         case SYMLINK_EQUAL:
             linkObj.setSyncDir(SYNC_DIR_NONE);
             break;
+        case SYMLINK_DIFFERENT_METADATA:
+            linkObj.setSyncDir(config.conflict); //use setting from "conflict/cannot categorize"
+            break;
+
         }
     }
 
@@ -163,6 +161,9 @@ private:
             break;
         case DIR_EQUAL:
             dirObj.setSyncDir(SYNC_DIR_NONE);
+            break;
+        case DIR_DIFFERENT_METADATA:
+            dirObj.setSyncDir(config.conflict); //use setting from "conflict/cannot categorize"
             break;
         }
 
@@ -219,61 +220,44 @@ bool ffs3::allElementsEqual(const FolderComparison& folderCmp)
 {
     return std::find_if(folderCmp.begin(), folderCmp.end(), std::not1(AllElementsEqual())) == folderCmp.end();
 }
-
-//---------------------------------------------------------------------------------------------------------------
-inline
-bool sameFileTime(const wxLongLong& a, const wxLongLong& b, size_t tolerance)
-{
-    if (a < b)
-        return b <= a + tolerance;
-    else
-        return a <= b + tolerance;
-}
 //---------------------------------------------------------------------------------------------------------------
 
 class DataSetFile
 {
 public:
-    DataSetFile(const FileMapping& fileObj, Loki::Int2Type<LEFT_SIDE>) :
-        lastWriteTime_(NULL),
-        fileSize_(NULL)
+    DataSetFile() {}
+
+    DataSetFile(const Zstring& name, const FileDescriptor& fileDescr)
+    {
+        shortName     = name;
+        lastWriteTime = fileDescr.lastWriteTimeRaw;
+        fileSize      = fileDescr.fileSize;
+    }
+
+    DataSetFile(const FileMapping& fileObj, Loki::Int2Type<LEFT_SIDE>)
     {
         init<LEFT_SIDE>(fileObj);
     }
 
-    DataSetFile(const FileMapping& fileObj, Loki::Int2Type<RIGHT_SIDE>) :
-        lastWriteTime_(NULL),
-        fileSize_(NULL)
+    DataSetFile(const FileMapping& fileObj, Loki::Int2Type<RIGHT_SIDE>)
     {
         init<RIGHT_SIDE>(fileObj);
     }
 
-
-    DataSetFile(const FileContainer* fileCont) :
-        lastWriteTime_(NULL),
-        fileSize_(NULL)
-    {
-        if (fileCont)
-        {
-            const FileDescriptor& dbData = fileCont->getData();
-            lastWriteTime_ = &dbData.lastWriteTimeRaw;
-            fileSize_      = &dbData.fileSize;
-        }
-    }
-
     bool operator==(const DataSetFile& other) const
     {
-        if (lastWriteTime_ == NULL)
-            return other.lastWriteTime_ == NULL;
+        if (shortName.empty())
+            return other.shortName.empty();
         else
         {
-            if (other.lastWriteTime_ == NULL)
+            if (other.shortName.empty())
                 return false;
             else
             {
-                //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
-                return ::sameFileTime(*lastWriteTime_, *other.lastWriteTime_, 2) &&
-                       *fileSize_ == *other.fileSize_;
+                return shortName == other.shortName && //detect changes in case (windows)
+                       //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
+                       sameFileTime(lastWriteTime, other.lastWriteTime, 2) &&
+                       fileSize == other.fileSize;
             }
         }
     }
@@ -290,13 +274,15 @@ private:
     {
         if (!fileObj.isEmpty<side>())
         {
-            lastWriteTime_ = &fileObj.getLastWriteTime<side>();
-            fileSize_      = &fileObj.getFileSize<side>();
+            shortName     = fileObj.getShortName<side>();
+            lastWriteTime = fileObj.getLastWriteTime<side>();
+            fileSize      = fileObj.getFileSize<side>();
         }
     }
 
-    const wxLongLong*  lastWriteTime_; //optional
-    const wxULongLong* fileSize_;      //optional
+    Zstring     shortName;     //empty if object not existing
+    wxLongLong  lastWriteTime;
+    wxULongLong fileSize;
 };
 
 
@@ -304,6 +290,22 @@ private:
 class DataSetSymlink
 {
 public:
+    DataSetSymlink()
+#ifdef FFS_WIN
+        : type(LinkDescriptor::TYPE_FILE) //dummy value
+#endif
+    {}
+
+    DataSetSymlink(const Zstring& name, const LinkDescriptor& linkDescr)
+    {
+        shortName     = name;
+        lastWriteTime = linkDescr.lastWriteTimeRaw;
+        targetPath    = linkDescr.targetPath;
+#ifdef FFS_WIN //type of symbolic link is relevant for Windows only
+        type          = linkDescr.type;
+#endif
+    }
+
     DataSetSymlink(const SymLinkMapping& linkObj, Loki::Int2Type<LEFT_SIDE>)
     {
         init<LEFT_SIDE>(linkObj);
@@ -314,35 +316,23 @@ public:
         init<RIGHT_SIDE>(linkObj);
     }
 
-    DataSetSymlink(const SymLinkContainer* linkCont)
-    {
-        if (linkCont)
-        {
-            const LinkDescriptor& dbData = linkCont->getData();
-            data.lastWriteTime = &dbData.lastWriteTimeRaw;
-            data.targetPath    = &dbData.targetPath;
-#ifdef FFS_WIN //type of symbolic link is relevant for Windows only
-            data.type = dbData.type;
-#endif
-        }
-    }
-
     bool operator==(const DataSetSymlink& other) const
     {
-        if (data.lastWriteTime == NULL) //implicit test if object is existing at all
-            return other.data.lastWriteTime == NULL;
+        if (shortName.empty()) //test if object is existing at all
+            return other.shortName.empty();
         else
         {
-            if (other.data.lastWriteTime == NULL)
+            if (other.shortName.empty())
                 return false;
             else
             {
-                //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
-                return *data.targetPath == *other.data.targetPath &&
+                return shortName == other.shortName &&
+                       //respect 2 second FAT/FAT32 precision! copying a file to a FAT32 drive changes it's modification date by up to 2 seconds
+                       sameFileTime(lastWriteTime, other.lastWriteTime, 2) &&
 #ifdef FFS_WIN //comparison of symbolic link type is relevant for Windows only
-                       data.type == other.data.type &&
+                       type == other.type &&
 #endif
-                       (!data.targetPath->empty() || ::sameFileTime(*data.lastWriteTime, *other.data.lastWriteTime, 2)); //date may be ignored, if targetPaths can actually be considered
+                       targetPath == other.targetPath;
             }
         }
     }
@@ -357,30 +347,27 @@ private:
     template <SelectedSide side>
     void init(const SymLinkMapping& linkObj)
     {
+#ifdef FFS_WIN
+        type = LinkDescriptor::TYPE_FILE; //always initialize
+#endif
+
         if (!linkObj.isEmpty<side>())
         {
-            data.lastWriteTime = &linkObj.getLastWriteTime<side>();
-            data.targetPath    = &linkObj.getTargetPath<side>();
+            shortName     = linkObj.getShortName<side>();
+            lastWriteTime = linkObj.getLastWriteTime<side>();
+            targetPath    = linkObj.getTargetPath<side>();
 #ifdef FFS_WIN //type of symbolic link is relevant for Windows only
-            data.type = linkObj.getLinkType<side>();
+            type          = linkObj.getLinkType<side>();
 #endif
         }
     }
 
-    struct DataReferences
-    {
-        DataReferences() :
-#ifdef FFS_WIN //type of symbolic link is relevant for Windows only
-            type(LinkDescriptor::TYPE_FILE),
-#endif
-            lastWriteTime(NULL), targetPath(NULL) {}
-
+    Zstring    shortName;     //empty if object not existing
+    wxLongLong lastWriteTime;
+    Zstring    targetPath;
 #ifdef FFS_WIN
-        LinkDescriptor::LinkType type;
+    LinkDescriptor::LinkType type;
 #endif
-        const wxLongLong* lastWriteTime; //use to test for overall object existence!
-        const Zstring* targetPath;
-    } data;
 };
 
 
@@ -388,18 +375,20 @@ private:
 class DataSetDir
 {
 public:
+    DataSetDir() {}
+
+    DataSetDir(const Zstring& name) :
+        shortName(name) {}
+
     DataSetDir(const DirMapping& dirObj, Loki::Int2Type<LEFT_SIDE>) :
-        existing(!dirObj.isEmpty<LEFT_SIDE>()) {}
+        shortName(dirObj.getShortName<LEFT_SIDE>()) {}
 
     DataSetDir(const DirMapping& dirObj, Loki::Int2Type<RIGHT_SIDE>) :
-        existing(!dirObj.isEmpty<RIGHT_SIDE>()) {}
-
-    DataSetDir(bool isExising) :
-        existing(isExising) {}
+        shortName(dirObj.getShortName<RIGHT_SIDE>()) {}
 
     bool operator==(const DataSetDir& other) const
     {
-        return existing == other.existing;
+        return shortName == other.shortName;
     }
 
     template <class T>
@@ -409,7 +398,7 @@ public:
     }
 
 private:
-    bool existing;
+    Zstring shortName; //empty if object not existing
 };
 
 
@@ -417,19 +406,25 @@ private:
 DataSetFile retrieveDataSetFile(const Zstring& objShortName, const DirContainer* dbDirectory)
 {
     if (dbDirectory)
-        return dbDirectory->findFile(objShortName); //return value may be NULL
+    {
+        DirContainer::FileList::const_iterator iter = dbDirectory->files.find(objShortName);
+        if (iter != dbDirectory->files.end())
+            return DataSetFile(iter->first, iter->second);
+    }
 
-    //object not found
-    return DataSetFile(NULL);
+    return DataSetFile(); //object not found
 }
 
 DataSetSymlink retrieveDataSetSymlink(const Zstring& objShortName, const DirContainer* dbDirectory)
 {
     if (dbDirectory)
-        return dbDirectory->findLink(objShortName); //return value may be NULL
+    {
+        DirContainer::LinkList::const_iterator iter = dbDirectory->links.find(objShortName);
+        if (iter != dbDirectory->links.end())
+            return DataSetSymlink(iter->first, iter->second);
+    }
 
-    //object not found
-    return DataSetSymlink(NULL);
+    return DataSetSymlink(); //object not found
 }
 
 
@@ -437,17 +432,17 @@ std::pair<DataSetDir, const DirContainer*> retrieveDataSetDir(const Zstring& obj
 {
     if (dbDirectory)
     {
-        const DirContainer* dbDir = dbDirectory->findDir(objShortName);
-        if (dbDir)
-            return std::make_pair(DataSetDir(true), dbDir);
+        DirContainer::DirList::const_iterator iter = dbDirectory->dirs.find(objShortName);
+        if (iter != dbDirectory->dirs.end())
+            return std::make_pair(DataSetDir(iter->first), &iter->second);
     }
 
-    //object not found
-    return std::make_pair(DataSetDir(false), static_cast<const DirContainer*>(NULL));
+    return std::make_pair(DataSetDir(), static_cast<const DirContainer*>(NULL)); //object not found
 }
 
 
 //--------------------------------------------------------------------------------------------------------
+/*
 class SetDirChangedFilter
 {
 public:
@@ -515,7 +510,7 @@ private:
 
     const wxString txtFilterChanged;
 };
-
+*/
 
 //test whether planned deletion of a directory is in conflict with (direct!) sub-elements that are not categorized for deletion (e.g. shall be copied or are in conflict themselves)
 class FindDeleteDirConflictNonRec
@@ -544,6 +539,8 @@ public:
         case SO_OVERWRITE_RIGHT:
         case SO_DO_NOTHING:
         case SO_EQUAL:
+        case SO_COPY_METADATA_TO_LEFT:
+        case SO_COPY_METADATA_TO_RIGHT:
             ;
         }
         return false;
@@ -622,22 +619,22 @@ private:
         return std::pair<DirInfoPtr, DirInfoPtr>(); //NULL
     }
 
+    /*
+        bool filterFileConflictFound(const Zstring& relativeName) const
+        {
+            //if filtering would have excluded file during database creation, then we can't say anything about its former state
+            return (dbFilterLeft  && !dbFilterLeft ->passFileFilter(relativeName)) ||
+                   (dbFilterRight && !dbFilterRight->passFileFilter(relativeName));
+        }
 
-    bool filterFileConflictFound(const Zstring& shortname) const
-    {
-        //if filtering would have excluded file during database creation, then we can't say anything about its former state
-        return (dbFilterLeft  && !dbFilterLeft ->passFileFilter(shortname)) ||
-               (dbFilterRight && !dbFilterRight->passFileFilter(shortname));
-    }
 
-
-    bool filterDirConflictFound(const Zstring& shortname) const
-    {
-        //if filtering would have excluded directory during database creation, then we can't say anything about its former state
-        return (dbFilterLeft  && !dbFilterLeft ->passDirFilter(shortname, NULL)) ||
-               (dbFilterRight && !dbFilterRight->passDirFilter(shortname, NULL));
-    }
-
+        bool filterDirConflictFound(const Zstring& relativeName) const
+        {
+            //if filtering would have excluded directory during database creation, then we can't say anything about its former state
+            return (dbFilterLeft  && !dbFilterLeft ->passDirFilter(relativeName, NULL)) ||
+                   (dbFilterRight && !dbFilterRight->passDirFilter(relativeName, NULL));
+        }
+    */
 
     template<typename Iterator, typename Function>
     friend Function std::for_each(Iterator, Iterator, Function);
@@ -681,17 +678,18 @@ private:
         }
         //#####################################################################################################
 
-
-        if (filterFileConflictFound(fileObj.getObjShortName()))
-        {
-            if (cat == FILE_LEFT_SIDE_ONLY)
-                fileObj.setSyncDir(SYNC_DIR_RIGHT);
-            else if (cat == FILE_RIGHT_SIDE_ONLY)
-                fileObj.setSyncDir(SYNC_DIR_LEFT);
-            else
-                fileObj.setSyncDirConflict(txtFilterChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
-            return;
-        }
+        /*
+                if (filterFileConflictFound(fileObj.getObjRelativeName()))
+                {
+                    if (cat == FILE_LEFT_SIDE_ONLY)
+                        fileObj.setSyncDir(SYNC_DIR_RIGHT);
+                    else if (cat == FILE_RIGHT_SIDE_ONLY)
+                        fileObj.setSyncDir(SYNC_DIR_LEFT);
+                    else
+                        fileObj.setSyncDirConflict(txtFilterChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                    return;
+                }
+                */
 
         //determine datasets for change detection
         const DataSetFile dataDbLeft  = retrieveDataSetFile(fileObj.getObjShortName(), dbDirectoryLeft);
@@ -746,16 +744,18 @@ private:
         if (cat == SYMLINK_EQUAL)
             return;
 
-        if (filterFileConflictFound(linkObj.getObjShortName())) //always use file filter: Link type may not be "stable" on Linux!
-        {
-            if (cat == SYMLINK_LEFT_SIDE_ONLY)
-                linkObj.setSyncDir(SYNC_DIR_RIGHT);
-            else if (cat == SYMLINK_RIGHT_SIDE_ONLY)
-                linkObj.setSyncDir(SYNC_DIR_LEFT);
-            else
-                linkObj.setSyncDirConflict(txtFilterChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
-            return;
-        }
+        /*
+                if (filterFileConflictFound(linkObj.getObjRelativeName())) //always use file filter: Link type may not be "stable" on Linux!
+                {
+                    if (cat == SYMLINK_LEFT_SIDE_ONLY)
+                        linkObj.setSyncDir(SYNC_DIR_RIGHT);
+                    else if (cat == SYMLINK_RIGHT_SIDE_ONLY)
+                        linkObj.setSyncDir(SYNC_DIR_LEFT);
+                    else
+                        linkObj.setSyncDirConflict(txtFilterChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
+                    return;
+                }
+                */
 
         //determine datasets for change detection
         const DataSetSymlink dataDbLeft  = retrieveDataSetSymlink(linkObj.getObjShortName(), dbDirectoryLeft);
@@ -801,24 +801,25 @@ private:
     {
         const CompareDirResult cat = dirObj.getDirCategory();
 
-        if (filterDirConflictFound(dirObj.getObjShortName()))
-        {
-            switch (cat)
-            {
-            case DIR_LEFT_SIDE_ONLY:
-                dirObj.setSyncDir(SYNC_DIR_RIGHT);
-                break;
-            case DIR_RIGHT_SIDE_ONLY:
-                dirObj.setSyncDir(SYNC_DIR_LEFT);
-                break;
-            case DIR_EQUAL:
-                ;
-            }
+        /*
+                if (filterDirConflictFound(dirObj.getObjRelativeName()))
+                {
+                    switch (cat)
+                    {
+                    case DIR_LEFT_SIDE_ONLY:
+                        dirObj.setSyncDir(SYNC_DIR_RIGHT);
+                        break;
+                    case DIR_RIGHT_SIDE_ONLY:
+                        dirObj.setSyncDir(SYNC_DIR_LEFT);
+                        break;
+                    case DIR_EQUAL:
+                        ;
+                    }
 
-            SetDirChangedFilter().execute(dirObj); //filter issue for this directory => treat subfiles/-dirs the same
-            return;
-        }
-
+                    SetDirChangedFilter().execute(dirObj); //filter issue for this directory => treat subfiles/-dirs the same
+                    return;
+                }
+        */
         //determine datasets for change detection
         const std::pair<DataSetDir, const DirContainer*> dataDbLeftStuff  = retrieveDataSetDir(dirObj.getObjShortName(), dbDirectoryLeft);
         const std::pair<DataSetDir, const DirContainer*> dataDbRightStuff = retrieveDataSetDir(dirObj.getObjShortName(), dbDirectoryRight);

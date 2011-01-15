@@ -2,8 +2,8 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %x von %y Objekten erfolgreich gelöscht
-%x Byte
-%x Byte
+%x Bytes
+%x Bytes
 %x GB
 %x GB
 %x MB
@@ -154,6 +154,8 @@ Konfiguration &laden...
 <Symlink>
 <multiple selection>
 <Mehrfachauswahl>
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+Es wird ein Verzeichnis verändert werden, das Teil mehrerer Verzeichnispaare ist! Bitte die Synchronisationseinstellungen prüfen!
 A newer version of FreeFileSync is available:
 Eine neuere Version von FreeFileSync ist verfügbar:
 Abort requested: Waiting for current operation to finish...
@@ -256,6 +258,10 @@ Continue
 Fortfahren
 Conversion error:
 Fehler bei Konvertierung:
+Copy attributes only from left to right
+Nur Attribute von links nach rechts kopieren
+Copy attributes only from right to left
+Nur Attribute von rechts nach links kopieren
 Copy filesystem permissions
 Dateisystemberechtigungen kopieren
 Copy from left to right
@@ -472,6 +478,8 @@ Files that exist on both sides, right one is newer
 Auf beiden Seiten existierende Dateien; rechte Datei ist neuer
 Files that have different content
 Dateien mit verschiedenem Inhalt
+Files/folders that differ in attributes only
+Dateien/Verzeichnisse mit unterschiedlichen Attributen
 Files/folders that exist on left side only
 Nur links exisitierende Dateien/Verzeichnisse
 Files/folders that exist on right side only
@@ -494,6 +502,8 @@ Find what:
 Suchen nach:
 Folder Comparison and Synchronization
 Verzeichnisvergleich und Synchronisation
+Folder pairs
+Verzeichnispaare
 Follow
 Folgen
 Free disk space available:
@@ -606,12 +616,14 @@ Log-messages:
 Meldungen:
 Logging
 Protokoll
+Main bar
+Hauptleiste
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Das Erstellen von Schattenkopien unter WOW64 wird nicht unterstützt. Bitte benutzen Sie die FreeFileSync 64-Bit Version.
 Match case
 Groß-/Kleinschreibung
-Minimum Idle Time
-Minimale Ruhezeit
+Minimum Idle Time [seconds]
+Minimale Ruhezeit [Sekunden]
 Mirror ->>
 Spiegeln ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -686,8 +698,6 @@ Published under the GNU General Public License:
 Veröffentlicht unter der GNU General Public License:
 Question
 Frage
-Quit
-Beenden
 Re-enable all hidden dialogs?
 Alle versteckten Dialoge wieder anzeigen?
 RealtimeSync - Automated Synchronization
@@ -708,6 +718,8 @@ Report translation error
 Übersetzungsfehler melden
 Reset
 Zurücksetzen
+Reset view
+Ansicht zurücksetzen
 Right
 Rechts
 S&ave configuration...
@@ -734,6 +746,8 @@ Set direction:
 Setze Richtung:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Setze Standardwerte für Synchronisationsrichtungen: Alte Dateien werden durch neuere überschrieben.
+Show \"%x\"
+Zeige \"%x\"
 Show conflicts
 Konflikte zeigen
 Show files that are different
@@ -801,7 +815,7 @@ Behandlung Symbolischer Links
 Symlinks %x have the same date but a different target!
 Die Symbolischen Links %x haben dasselbe Datum, aber ein unterschiedliches Ziel!
 Synchronization Preview
-Vorschau auf Synchronisation
+Synchronisationsvorschau
 Synchronization aborted!
 Synchronisation abgebrochen!
 Synchronization completed successfully!
@@ -852,6 +866,8 @@ Unresolved conflicts existing!
 Es existieren ungelöste Konflikte!
 Update ->
 Aktualisieren ->
+Updating attributes of %x
+Aktualisiere Attribute von %x
 Usage:
 Verwendung:
 Use Recycle Bin
@@ -868,8 +884,8 @@ Verifying file %x
 Verifiziere Datei %x
 Volume name %x not part of filename %y!
 Laufwerksname %x ist kein Teil des Dateinamens %y!
-Waiting for all directories to become available...
-Warte, bis alle Verzeichnisse verfügbar sind...
+Waiting for missing directories...
+Warte auf fehlende Verzeichnisse...
 Waiting while directory is locked (%x)...
 Warte während Verzeichnis gesperrt ist (%x)...
 Warning

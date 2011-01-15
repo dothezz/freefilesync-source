@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "application.h"
@@ -14,6 +14,7 @@
 #include "../shared/standard_paths.h"
 #include <wx/file.h>
 #include "../shared/string_conv.h"
+#include <wx/log.h>
 
 #ifdef FFS_LINUX
 #include <gtk/gtk.h>
@@ -92,7 +93,7 @@ int Application::OnRun()
         wxFile safeOutput(ffs3::getConfigDir() + wxT("LastError.txt"), wxFile::write);
         safeOutput.Write(wxString::FromAscii(e.what()));
 
-        wxMessageBox(wxString::FromAscii(e.what()), _("An exception occurred!"), wxOK | wxICON_ERROR);
+        wxSafeShowMessage(_("An exception occurred!"), wxString::FromAscii(e.what()));
         return -9;
     }
 

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "grid_view.h"
@@ -120,6 +120,7 @@ GridView::StatusCmpResult GridView::updateCmpResult(bool hideFiltered, //maps so
                 if (!equalFilesActive) continue;
                 break;
             case FILE_CONFLICT:
+            case FILE_DIFFERENT_METADATA: //no extra button on screen
                 output.existsConflict = true;
                 if (!conflictFilesActive) continue;
                 break;
@@ -177,7 +178,6 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
             if (hideFiltered && !fsObj->isActive())
                 continue;
 
-
             switch (fsObj->getSyncOperation()) //evaluate comparison result and sync direction
             {
             case SO_CREATE_NEW_LEFT:
@@ -197,10 +197,12 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
                 if (!syncDeleteRightActive) continue;
                 break;
             case SO_OVERWRITE_RIGHT:
+            case SO_COPY_METADATA_TO_RIGHT: //no extra button on screen
                 output.existsSyncDirRight = true;
                 if (!syncDirOverwRightActive) continue;
                 break;
             case SO_OVERWRITE_LEFT:
+            case SO_COPY_METADATA_TO_LEFT: //no extra button on screen
                 output.existsSyncDirLeft = true;
                 if (!syncDirOverwLeftActive) continue;
                 break;

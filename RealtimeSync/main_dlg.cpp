@@ -1,14 +1,13 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "main_dlg.h"
 #include "resources.h"
 #include "../shared/custom_button.h"
 #include "../shared/standard_paths.h"
-//#include "functions.h"
 #include <wx/msgdlg.h>
 #include <wx/wupdlock.h>
 #include "watcher.h"
@@ -22,12 +21,12 @@
 #include "../shared/assert_static.h"
 #include "../shared/build_info.h"
 #include "../shared/help_provider.h"
+#include "../shared/util.h"
 
 using namespace ffs3;
 
 
-MainDialog::MainDialog(wxDialog *dlg,
-                       const wxString& cfgFilename)
+MainDialog::MainDialog(wxDialog *dlg, const wxString& cfgFileName)
     : MainDlgGenerated(dlg)
 {
     wxWindowUpdateLocker dummy(this); //avoid display distortion
@@ -45,31 +44,17 @@ MainDialog::MainDialog(wxDialog *dlg,
     //prepare drag & drop
     dirNameFirst.reset(new ffs3::DirectoryName(m_panelMainFolder, m_dirPickerMain, m_txtCtrlDirectoryMain));
 
-    //load config values
+    //--------------------------- load config values ------------------------------------
     xmlAccess::XmlRealConfig newConfig;
-    bool startWatchingImmediately = false;
 
+    const wxString currentConfigFile = cfgFileName.empty() ? lastConfigFileName() : cfgFileName;
 
-    if (cfgFilename.empty())
+    bool loadCfgSuccess = false;
+    if (!cfgFileName.empty() || wxFileExists(lastConfigFileName()))
         try
         {
-            rts::readRealOrBatchConfig(lastConfigFileName(), newConfig);
-        }
-        catch (const xmlAccess::XmlError& error)
-        {
-            if (wxFileExists(lastConfigFileName())) //show error only if it's a parsing problem
-            {
-                if (error.getSeverity() == xmlAccess::XmlError::WARNING)
-                    wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING);
-                else
-                    wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
-            }
-        }
-    else
-        try
-        {
-            rts::readRealOrBatchConfig(cfgFilename, newConfig);
-            startWatchingImmediately = true;
+            rts::readRealOrBatchConfig(currentConfigFile, newConfig);
+            loadCfgSuccess = true;
         }
         catch (const xmlAccess::XmlError& error)
         {
@@ -79,7 +64,11 @@ MainDialog::MainDialog(wxDialog *dlg,
                 wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
         }
 
+    const bool startWatchingImmediately = loadCfgSuccess && !cfgFileName.empty();
+
     setConfiguration(newConfig);
+    setLastUsedConfig(currentConfigFile);
+    //-----------------------------------------------------------------------------------------
 
     Fit();
     Center();
@@ -181,9 +170,7 @@ void MainDialog::OnStart(wxCommandEvent& event)
 
     Hide();
 
-    wxWindowDisabler dummy; //avoid unwanted re-entrance in the following process
-
-    switch (rts::startDirectoryMonitor(currentCfg))
+    switch (rts::startDirectoryMonitor(currentCfg, ffs3::extractJobName(currentConfigFileName)))
     {
     case rts::QUIT:
     {
@@ -202,7 +189,11 @@ void MainDialog::OnStart(wxCommandEvent& event)
 
 void MainDialog::OnSaveConfig(wxCommandEvent& event)
 {
-    const wxString defaultFileName = wxT("Realtime.ffs_real");
+    wxString defaultFileName = currentConfigFileName.empty() ? wxT("Realtime.ffs_real") : currentConfigFileName;
+    //attention: currentConfigFileName may be an imported *.ffs_batch file! We don't want to overwrite it with a GUI config!
+    if (defaultFileName.EndsWith(wxT(".ffs_batch")))
+        defaultFileName.Replace(wxT(".ffs_batch"), wxT(".ffs_real"), false);
+
 
     wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, defaultFileName, wxString(_("RealtimeSync configuration")) + wxT(" (*.ffs_real)|*.ffs_real"), wxFD_SAVE);
     if (filePicker->ShowModal() == wxID_OK)
@@ -212,19 +203,16 @@ void MainDialog::OnSaveConfig(wxCommandEvent& event)
         if (wxFileExists(newFileName))
         {
             wxMessageDialog* messageDlg = new wxMessageDialog(this, wxString(_("File already exists. Overwrite?")) + wxT(" \"") + newFileName + wxT("\""), _("Warning") , wxOK | wxCANCEL);
-
             if (messageDlg->ShowModal() != wxID_OK)
-            {
-                OnSaveConfig(event); //retry
-                return;
-            }
+                return OnSaveConfig(event); //retry
         }
 
+        //write config to XML
         const xmlAccess::XmlRealConfig currentCfg = getConfiguration();
-
-        try //write config to XML
+        try
         {
             writeRealConfig(currentCfg, newFileName);
+            setLastUsedConfig(newFileName);
         }
         catch (const ffs3::FileError& error)
         {
@@ -254,6 +242,23 @@ void MainDialog::loadConfig(const wxString& filename)
     }
 
     setConfiguration(newConfig);
+    setLastUsedConfig(filename);
+}
+
+
+void MainDialog::setLastUsedConfig(const wxString& filename)
+{
+    //set title
+    if (filename == lastConfigFileName())
+    {
+        SetTitle(_("RealtimeSync - Automated Synchronization"));
+        currentConfigFileName.clear();
+    }
+    else
+    {
+        SetTitle(wxString(wxT("RealtimeSync - ")) + filename);
+        currentConfigFileName = filename;
+    }
 }
 
 

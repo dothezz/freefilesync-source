@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "gui_generated.h"
@@ -452,11 +452,11 @@ DefaultReturnCode::Response ffs3::showDeleteDialog(const std::vector<ffs3::FileS
     DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
 
     DeleteDialog confirmDeletion(NULL,
-            rowsOnLeft,
-            rowsOnRight,
-            deleteOnBothSides,
-            useRecycleBin,
-            totalDeleteCount);
+                                 rowsOnLeft,
+                                 rowsOnRight,
+                                 deleteOnBothSides,
+                                 useRecycleBin,
+                                 totalDeleteCount);
     if (confirmDeletion.ShowModal() == DeleteDialog::BUTTON_OKAY)
         rv = DefaultReturnCode::BUTTON_OKAY;
     return rv;
@@ -639,7 +639,7 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
 {
 #ifdef FFS_WIN
     new ffs3::MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                        this, m_staticTextVariant); //ownership passed to "this"
+                              this, m_staticTextVariant); //ownership passed to "this"
 #endif
 
     using ffs3::numberToStringSep;
@@ -653,13 +653,13 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
     m_staticTextVariant->SetLabel(variantName);
     m_textCtrlData->SetValue(ffs3::formatFilesizeToShortString(statistics.getDataToProcess()));
 
-    m_textCtrlCreateL->SetValue(numberToStringSep(statistics.getCreate(   true, false)));
-    m_textCtrlUpdateL->SetValue(numberToStringSep(statistics.getOverwrite(true, false)));
-    m_textCtrlDeleteL->SetValue(numberToStringSep(statistics.getDelete(   true, false)));
+    m_textCtrlCreateL->SetValue(numberToStringSep(statistics.getCreate   <LEFT_SIDE>()));
+    m_textCtrlUpdateL->SetValue(numberToStringSep(statistics.getOverwrite<LEFT_SIDE>()));
+    m_textCtrlDeleteL->SetValue(numberToStringSep(statistics.getDelete   <LEFT_SIDE>()));
 
-    m_textCtrlCreateR->SetValue(numberToStringSep(statistics.getCreate(   false, true)));
-    m_textCtrlUpdateR->SetValue(numberToStringSep(statistics.getOverwrite(false, true)));
-    m_textCtrlDeleteR->SetValue(numberToStringSep(statistics.getDelete(   false, true)));
+    m_textCtrlCreateR->SetValue(numberToStringSep(statistics.getCreate   <RIGHT_SIDE>()));
+    m_textCtrlUpdateR->SetValue(numberToStringSep(statistics.getOverwrite<RIGHT_SIDE>()));
+    m_textCtrlDeleteR->SetValue(numberToStringSep(statistics.getDelete   <RIGHT_SIDE>()));
 
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
 

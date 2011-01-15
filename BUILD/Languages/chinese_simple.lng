@@ -2,7 +2,7 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %x / %y 个对象被成功删除
-%x Byte
+%x Bytes
 %x 字节
 %x GB
 %x GB
@@ -256,6 +256,10 @@ Continue
 继续
 Conversion error:
 转换错误:
+Copy attributes only from left to right
+从左边到右边只复制文件属性
+Copy attributes only from right to left
+从右边到左边只复制文件属性
 Copy filesystem permissions
 复制文件系统的权限
 Copy from left to right
@@ -353,7 +357,7 @@ Donate with PayPal
 Download now?
 立即下载?
 Drag && drop
-拖拽
+拖放
 Elements found:
 已找到的元素:
 Elements processed:
@@ -472,6 +476,8 @@ Files that exist on both sides, right one is newer
 两侧都有,右侧较新的文件
 Files that have different content
 有不同内容的文件
+Files/folders that differ in attributes only
+文件/文件夹仅属性不同
 Files/folders that exist on left side only
 仅在左侧存在的文件/文件夹
 Files/folders that exist on right side only
@@ -494,6 +500,8 @@ Find what:
 要查找什么:
 Folder Comparison and Synchronization
 文件夹比较与同步
+Folder pairs
+文件夹对
 Follow
 跟随
 Free disk space available:
@@ -606,12 +614,14 @@ Log-messages:
 日志信息:
 Logging
 记录
+Main bar
+主工具条
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 不支持在WOW64上使用卷影复制. 请使用 FreeFileSync 64位版本.
 Match case
 匹配大小写
-Minimum Idle Time
-最小空闲时间
+Minimum Idle Time [seconds]
+最小空闲时间[秒]
 Mirror ->>
 镜像 ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 在GNU通用公共许可下发布:
 Question
 问题
-Quit
-退出
 Re-enable all hidden dialogs?
 重新启用所有隐藏的对话框?
 RealtimeSync - Automated Synchronization
@@ -708,6 +716,8 @@ Report translation error
 报告翻译错误
 Reset
 重置
+Reset view
+重置视图
 Right
 右侧
 S&ave configuration...
@@ -734,6 +744,8 @@ Set direction:
 设置方向:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 设置默认的同步方向:旧文件会被新文件覆盖.
+Show \"%x\"
+显示 \"%x\"
 Show conflicts
 显示冲突
 Show files that are different
@@ -852,6 +864,8 @@ Unresolved conflicts existing!
 存在不可解决的冲突!
 Update ->
 升级 ->
+Updating attributes of %x
+更新 %x 的属性
 Usage:
 用法:
 Use Recycle Bin
@@ -868,8 +882,8 @@ Verifying file %x
 校验文件 %x
 Volume name %x not part of filename %y!
 卷名 %x 并非文件名 %y 的一部分!
-Waiting for all directories to become available...
-等待所有目录转为可用状态...
+Waiting for missing directories...
+正在等待丢失的目录...
 Waiting while directory is locked (%x)...
 由于目录已锁定而正在等待(%x)...
 Warning

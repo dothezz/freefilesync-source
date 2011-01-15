@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "msg_popup.h"
@@ -15,7 +15,7 @@ ErrorDlg::ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxStri
 {
 #ifdef FFS_WIN
     new ffs3::MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                        this, m_bitmap10); //ownership passed to "this"
+                              this, m_bitmap10); //ownership passed to "this"
 #endif
 
     m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("error")));
@@ -79,7 +79,7 @@ WarningDlg::WarningDlg(wxWindow* parentWindow,  int activeButtons, const wxStrin
 {
 #ifdef FFS_WIN
     new ffs3::MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                        this, m_bitmap10); //ownership passed to "this"
+                              this, m_bitmap10); //ownership passed to "this"
 #endif
 
     m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("warning")));
@@ -141,7 +141,7 @@ QuestionDlg::QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxStri
 {
 #ifdef FFS_WIN
     new ffs3::MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                        this, m_bitmap10); //ownership passed to "this"
+                              this, m_bitmap10); //ownership passed to "this"
 #endif
 
     m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("question")));

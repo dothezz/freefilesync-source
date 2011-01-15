@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef ICONBUFFER_H_INCLUDED
@@ -36,14 +36,14 @@ private:
     IconBuffer();
     ~IconBuffer();
 
-    static const size_t BUFFER_SIZE = 800; //maximum number of icons to buffer
+    static const size_t BUFFER_SIZE_MAX = 800; //maximum number of icons to buffer
 
     class IconDB;
     class IconHolder;
     class IconDbSequence;
 
 //---------------------------------------------------------------------------------------------------
-typedef Zbase<Zchar, StorageDeepCopy> BasicString; //thread safe string class
+    typedef Zbase<Zchar, StorageDeepCopy> BasicString; //thread safe string class
 //avoid reference-counted objects for shared data: NOT THREADSAFE!!! (implicitly shared variable: ref-count)
 //---------------------------------------------------------------------------------------------------
 
@@ -54,8 +54,8 @@ typedef Zbase<Zchar, StorageDeepCopy> BasicString; //thread safe string class
     static IconHolder getAssociatedIconByExt(const BasicString& extension);
 
 #ifdef FFS_WIN
-static BasicString getFileExtension(const BasicString& filename);
-static bool isPriceyExtension(const BasicString& extension);
+    static BasicString getFileExtension(const BasicString& filename);
+    static bool isPriceyExtension(const BasicString& extension);
 #endif
 
 //---------------------- Shared Data -------------------------

@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #ifndef CUSTOMGRID_H_INCLUDED
@@ -167,12 +167,12 @@ protected:
     template <ffs3::SelectedSide side>
     void setTooltip(const wxMouseEvent& event);
 
-void setOtherGrid(CustomGridRim* other); //call during initialization!
+    void setOtherGrid(CustomGridRim* other); //call during initialization!
 
 private:
     CustomGridTableRim* getGridDataTableRim() const;
 
-void OnResizeColumn(wxGridSizeEvent& event);
+    void OnResizeColumn(wxGridSizeEvent& event);
 
     //this method is called when grid view changes: useful for parallel updating of multiple grids
     virtual void alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight);

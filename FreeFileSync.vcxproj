@@ -116,7 +116,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>wxmsw28ud_adv.lib;wxmsw28ud_core.lib;wxbase28ud.lib;wxpngd.lib;wxzlibd.lib;wxbase28ud_net.lib;comctl32.lib;ws2_32.lib;Rpcrt4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw28ud_aui.lib;wxmsw28ud_adv.lib;wxmsw28ud_core.lib;wxbase28ud.lib;wxpngd.lib;wxzlibd.lib;wxbase28ud_net.lib;comctl32.lib;ws2_32.lib;Rpcrt4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Programme\C++\wxWidgets\lib\vc_lib;C:\Program Files\C++\Boost\stage\lib</AdditionalLibraryDirectories>
       <LinkStatus>
       </LinkStatus>
@@ -151,7 +151,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>wxmsw28ud_adv.lib;wxmsw28ud_core.lib;wxbase28ud.lib;wxpngd.lib;wxzlibd.lib;wxbase28ud_net.lib;comctl32.lib;ws2_32.lib;Rpcrt4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw28ud_aui.lib;wxmsw28ud_adv.lib;wxmsw28ud_core.lib;wxbase28ud.lib;wxpngd.lib;wxzlibd.lib;wxbase28ud_net.lib;comctl32.lib;ws2_32.lib;Rpcrt4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Programme\C++\wxWidgets-x64\lib\vc_lib;C:\Program Files\C++\Boost\stage64\lib</AdditionalLibraryDirectories>
       <LinkStatus>
       </LinkStatus>
@@ -187,7 +187,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalDependencies>wxmsw28u_adv.lib;wxmsw28u_core.lib;wxbase28u.lib;wxpng.lib;wxzlib.lib;wxbase28u_net.lib;comctl32.lib;ws2_32.lib;winmm.lib;Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw28u_aui.lib;wxmsw28u_adv.lib;wxmsw28u_core.lib;wxbase28u.lib;wxpng.lib;wxzlib.lib;wxbase28u_net.lib;comctl32.lib;ws2_32.lib;winmm.lib;Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Programme\C++\wxWidgets\lib\vc_lib;C:\Program Files\C++\Boost\stage\lib</AdditionalLibraryDirectories>
       <LinkStatus>
@@ -218,11 +218,11 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalDependencies>wxmsw28u_adv.lib;wxmsw28u_core.lib;wxbase28u.lib;wxpng.lib;wxzlib.lib;wxbase28u_net.lib;comctl32.lib;ws2_32.lib;winmm.lib;Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw28u_aui.lib;wxmsw28u_adv.lib;wxmsw28u_core.lib;wxbase28u.lib;wxpng.lib;wxzlib.lib;wxbase28u_net.lib;comctl32.lib;ws2_32.lib;winmm.lib;Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Programme\C++\wxWidgets-x64\lib\vc_lib;C:\Program Files\C++\Boost\stage64\lib</AdditionalLibraryDirectories>
       <LinkStatus>
@@ -273,6 +273,7 @@
     <ClCompile Include="shared\help_provider.cpp" />
     <ClCompile Include="shared\localization.cpp" />
     <ClCompile Include="shared\long_path_prefix.cpp" />
+    <ClCompile Include="shared\privilege.cpp" />
     <ClCompile Include="shared\recycler.cpp" />
     <ClCompile Include="shared\serialize.cpp" />
     <ClCompile Include="shared\shadow.cpp" />

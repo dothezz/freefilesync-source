@@ -1,7 +1,7 @@
 // **************************************************************************
 // * This file is part of the FreeFileSync project. It is distributed under *
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
-// * Copyright (C) 2008-2010 ZenJu (zhnmju123 AT gmx.de)                    *
+// * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
 #include "file_traverser.h"
@@ -170,7 +170,13 @@ private:
                 {
                     details.targetPath = getSymlinkRawTargetString(fullName); //throw (FileError)
                 }
-                catch (FileError&) {}
+                catch (FileError& e)
+                {
+					(void)e;
+#ifndef NDEBUG       //show broken symlink / access errors in debug build!
+                    sink.onError(e.msg());
+#endif
+                }
 
                 details.lastWriteTimeRaw = getWin32TimeInformation(fileMetaData.ftLastWriteTime);
                 details.dirLink          = (fileMetaData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0; //directory symlinks have this flag on Windows
@@ -225,13 +231,12 @@ private:
                               &fileMetaData)); // pointer to structure for data on found file
 
         const DWORD lastError = ::GetLastError();
-        if (lastError == ERROR_NO_MORE_FILES)
-            return; //everything okay
-
-        //else: we have a problem... report it:
-        const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") ;
-        sink.onError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted(lastError));
-        return;
+        if (lastError != ERROR_NO_MORE_FILES) //this is fine
+        {
+            //else we have a problem... report it:
+            const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") ;
+            sink.onError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted(lastError));
+        }
 
 #elif defined FFS_LINUX
         DIR* dirObj = ::opendir(directory.c_str()); //directory must NOT end with path separator, except "/"
@@ -301,7 +306,12 @@ private:
                     {
                         details.targetPath = getSymlinkRawTargetString(fullName); //throw (FileError)
                     }
-                    catch (FileError&) {}
+                    catch (FileError& e)
+                    {
+#ifndef NDEBUG       //show broken symlink / access errors in debug build!
+                        sink.onError(e.msg());
+#endif
+                    }
 
                     details.lastWriteTimeRaw = fileInfo.st_mtime; //UTC time(ANSI C format); unit: 1 second
                     details.dirLink          = ::stat(fullName.c_str(), &fileInfo) == 0 && S_ISDIR(fileInfo.st_mode); //S_ISDIR and S_ISLNK are mutually exclusive on Linux => need to follow link

@@ -2,8 +2,8 @@
   MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI Framework\n  wxFormBuilder\t- wxWidgets GUI-Builder\n  CodeBlocks \t- Open-Source IDE
 %x / %y objects deleted successfully
 %x / %y Kohteiden poisto onnistui
-%x Byte
-%x Tavua
+%x Bytes
+%x tavua
 %x GB
 %x GB
 %x MB
@@ -17,7 +17,7 @@
 %x directories
 %x hakemistoa
 %x files
-%x tiedostoista
+%x tiedostoa
 %x hour(s)
 %x tunti(a)
 %x kB
@@ -27,7 +27,7 @@
 %x of %y rows in view
 %x riviä %y rivistä näytössä
 %x of 1 row in view
-%x 1 rivistä näytössä
+%x 1:tä rivistä näytössä
 %x sec
 %x s
 %x%
@@ -256,6 +256,10 @@ Continue
 Jatka
 Conversion error:
 Konversio virhe:
+Copy attributes only from left to right
+Monista vain ominaisuudet vasen -> oikea
+Copy attributes only from right to left
+Monista vain ominaisuudet oikea -> vasen 
 Copy filesystem permissions
 Monista tiedosto-oikeudet
 Copy from left to right
@@ -472,6 +476,8 @@ Files that exist on both sides, right one is newer
 Tiedosto löytyy molemmilla puolilla, oikea on uudempi
 Files that have different content
 Tiedostoja joissa eri sisältö
+Files/folders that differ in attributes only
+Tiedostoja/hakemistoja poikkeama vain ominaisuuksissa
 Files/folders that exist on left side only
 Tiedostoja/hakemistoja vain vasemmalla
 Files/folders that exist on right side only
@@ -494,6 +500,8 @@ Find what:
 Etsi:
 Folder Comparison and Synchronization
 Hakemistojen vertailu ja täsmäytys
+Folder pairs
+Hakemistoparit
 Follow
 Seuraa
 Free disk space available:
@@ -606,12 +614,14 @@ Log-messages:
 Lokin viestit:
 Logging
 Kirjaa
+Main bar
+Päävalikko
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 WOW64 varjokopiointia ei tueta. Käytä FreeFileSync 64-bittistä versiota.
 Match case
 Täsmää kirjainkoko
-Minimum Idle Time
-Min. joutoaika
+Minimum Idle Time [seconds]
+Minimi joutoaika [sekuntteja]
 Mirror ->>
 Peilaava ->>
 Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
@@ -686,8 +696,6 @@ Published under the GNU General Public License:
 Julkaistu lisenssillä GNU General Public License:
 Question
 Kysymys
-Quit
-Lopeta
 Re-enable all hidden dialogs?
 Ota uudestaan käyttöön piilotetut?
 RealtimeSync - Automated Synchronization
@@ -708,6 +716,8 @@ Report translation error
 Ilmoita käännösvirheestä
 Reset
 Palauta
+Reset view
+Palauta näkymä
 Right
 Oikea
 S&ave configuration...
@@ -734,6 +744,8 @@ Set direction:
 Aseta suunta:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Aseta oletu suunta täsmäytykselle: Vanhat tiedostot ylikirjoitetaan uudemilla tiedostoilla.
+Show \"%x\"
+Näytä \"%x\"
 Show conflicts
 Näytä ristiriidat
 Show files that are different
@@ -852,6 +864,8 @@ Unresolved conflicts existing!
 Ratkaisemattomia poikkeamia!
 Update ->
 Päivittävä ->
+Updating attributes of %x
+Päivita %x:n ominaisuudet
 Usage:
 Käyttöaste:
 Use Recycle Bin
@@ -868,8 +882,8 @@ Verifying file %x
 Tarkistan tiedosto %x
 Volume name %x not part of filename %y!
 Osan nimi %x ei esiinny tiedostonimessä %y!
-Waiting for all directories to become available...
-Odotan että kaikki hakemistot ovat saatavilla ...
+Waiting for missing directories...
+Odottaa puuttuvia hakemistoja...
 Waiting while directory is locked (%x)...
 Odotan hakemiston lukitusta (%x)...
 Warning
