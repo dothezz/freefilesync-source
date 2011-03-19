@@ -73,21 +73,21 @@ public:
         TaskBarStatus tbSevenStatus = tbseven::STATUS_NORMAL;
         switch (status)
         {
-        case TaskbarProgress::STATUS_NOPROGRESS:
-            tbSevenStatus = tbseven::STATUS_NOPROGRESS;
-            break;
-        case TaskbarProgress::STATUS_INDETERMINATE:
-            tbSevenStatus = tbseven::STATUS_INDETERMINATE;
-            break;
-        case TaskbarProgress::STATUS_NORMAL:
-            tbSevenStatus = tbseven::STATUS_NORMAL;
-            break;
-        case TaskbarProgress::STATUS_ERROR:
-            tbSevenStatus = tbseven::STATUS_ERROR;
-            break;
-        case TaskbarProgress::STATUS_PAUSED:
-            tbSevenStatus = tbseven::STATUS_PAUSED;
-            break;
+            case TaskbarProgress::STATUS_NOPROGRESS:
+                tbSevenStatus = tbseven::STATUS_NOPROGRESS;
+                break;
+            case TaskbarProgress::STATUS_INDETERMINATE:
+                tbSevenStatus = tbseven::STATUS_INDETERMINATE;
+                break;
+            case TaskbarProgress::STATUS_NORMAL:
+                tbSevenStatus = tbseven::STATUS_NORMAL;
+                break;
+            case TaskbarProgress::STATUS_ERROR:
+                tbSevenStatus = tbseven::STATUS_ERROR;
+                break;
+            case TaskbarProgress::STATUS_PAUSED:
+                tbSevenStatus = tbseven::STATUS_PAUSED;
+                break;
         }
 
         setStatus_(assocWindow, tbSevenStatus);

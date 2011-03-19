@@ -154,6 +154,10 @@
 <Enlace simbólico>
 <multiple selection>
 <selección múltiple>
+A directory input field is empty.
+Un campo de directorio está vacío.
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+Un directorio será modificado, el cual es parte de mútiples pares de carpetas. ¡Por favor, revise la configuración de la sincronización!
 A newer version of FreeFileSync is available:
 Una nueva versión de FreeFileSync está disponible:
 Abort requested: Waiting for current operation to finish...
@@ -177,7 +181,7 @@ An exception occurred!
 As a result the files are separated into the following categories:
 Como resultado, los archivos están separados en las siguientes categorías:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
-Como el título sugiere, dos archivos que comparten el mismo nombre son marcados como iguales sólo si tienen el mismo contenido. Esta opción es útil para las comprobaciones de consistencia más que en operaciones de backup. Por lo tanto, las fechas de los archivos no se tienen en cuenta.\n\nCon esta opción habilitada el árbol de decisiones se reduce a:
+Como el título sugiere, dos archivos que comparten el mismo nombre son marcados como iguales sólo si tienen el mismo contenido. Esta opción es útil para las comprobaciones de consistencia más que en operaciones de copia de seguridad. Por lo tanto, las fechas de los archivos no se tienen en cuenta.\n\nCon esta opción habilitada el árbol de decisiones se reduce a:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
 Crear un archivo batch para una sincronización automática. Para empezar en modo batch simplemente pasar el nombre del archivo por el ejecutable FreeFileSync en la ventana de comandos (CMD): FreeFileSync.exe <archivo batch>. También se puede planificar en el administrador de tareas de su sistema operativo.
 At least one directory input field is empty.
@@ -370,6 +374,8 @@ Encoding extended time information: %x
 Información temporal extendida de la codificación: %x
 Endless loop when traversing directory:
 Bucle infinito al buscar en el directorio:
+Equal files/folders that differ in attributes only
+Archivos/Carpetas iguales que sólo difieren en los atributos
 Error
 Error
 Error changing modification time:
@@ -476,8 +482,6 @@ Files that exist on both sides, right one is newer
 Archivos que existen en ambos lados, el de la derecha es más reciente
 Files that have different content
 Archivos que tienen un contenido diferente
-Files/folders that differ in attributes only
-Archivos/carpetas que se diferencian sólo en atributos
 Files/folders that exist on left side only
 Archivos/carpetas que existen sólo en el lado izquierdo
 Files/folders that exist on right side only
@@ -488,8 +492,6 @@ Filter is active
 Filtro activo
 Filter settings have changed!
 ¡Las opciones de filtrado han cambiado!
-Filter view
-Vista del filtro
 Filter: All pairs
 Filtro: Todos los pares
 Filter: Single pair
@@ -506,6 +508,8 @@ Follow
 Seguir
 Free disk space available:
 Espacio de disco disponible:
+Free disk space required:
+Espacio de disco necesario:
 FreeFileSync Batch Job
 Tarea batch de FreeFileSync 
 FreeFileSync at Sourceforge
@@ -600,6 +604,8 @@ Integrate external applications into context menu. The following macros are avai
 Integrar aplicaciones externas en el menú de contexto. Los siguientes macros están disponibles:
 Invalid FreeFileSync config file!
 ¡Archivo de configuración de FreeFileSync inválido!
+Last used configurations (press DEL to remove from list)
+Últimas configuraciones usadas (Pulsar DEL para quitar de la lista)
 Leave as unresolved conflict
 Dejar como conflicto sin resolver
 Left
@@ -608,8 +614,6 @@ Legend
 Leyenda
 Load configuration from file
 Cargar configuración desde archivo
-Load configuration history (press DEL to delete items)
-Cargar historial de configuración (presionar DEL para borrar elementos)
 Log-messages:
 Registro de mensajes:
 Logging
@@ -620,12 +624,16 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 La realización de copias shadow en WOW64 no está soportado. Por favor, use la versión 64-bit de FreeFileSync. 
 Match case
 Distinción entre mayúsculas y minúsculas
+Maximum number of logfiles:
+Número máximo de archivos de registro:
+Memory allocation failed!
+¡La asignación de memoria ha fallado!
 Minimum Idle Time [seconds]
 Tiempo mínimo de espera [segundos]
 Mirror ->>
 Espejo ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Copia de seguridad de la carpeta de la izquierda: La carpeta de la derecha será sustituída y coincidirá exactamente con la carpeta de la izquierda después de la sincronización.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+Copia de seguridad en espejo de la carpeta izquierda. La carpeta derecha es modificada exactamente como la carpeta izquierda después de la sincronización.
 Monitoring active...
 Visualización activa...
 More than 50% of the total number of files will be copied or deleted!
@@ -696,8 +704,6 @@ Published under the GNU General Public License:
 Publicado bajo "GNU General Public License":
 Question
 Pregunta
-Re-enable all hidden dialogs?
-¿Reactivar todos los diálogos ocultos?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Sincronización Automática
 RealtimeSync configuration
@@ -718,6 +724,8 @@ Reset
 Reiniciar
 Reset view
 Reiniciar vista
+Restore all hidden dialogs?
+¿Restaurar diálogos ocultos?
 Right
 Derecha
 S&ave configuration...
@@ -740,6 +748,8 @@ Select logfile directory:
 Seleccione directorio para el archivo de registro:
 Select variant:
 Seleccione un tipo:
+Select view
+Sellecione vista
 Set direction:
 Indicar dirección:
 Setting default synchronization directions: Old files will be overwritten with newer files.
@@ -828,8 +838,6 @@ Synchronize...
 Sincronizar...
 Synchronizing...
 Sincronizando...
-System out of memory!
-¡Sistema sin memoria!
 Target directory already existing!
 ¡El directorio de destino ya existe!
 Target file already existing!
@@ -850,8 +858,6 @@ Time remaining:
 Tiempo restante:
 Total amount of data that will be transferred
 Cantidad total de datos que serán transferidos
-Total required free disk space:
-Espacio total de disco necesario:
 Total time:
 Tiempo total:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -872,14 +878,14 @@ Use Recycle Bin
 Utilizar Papelera de Reciclaje
 Use Recycle Bin when deleting or overwriting files
 Utilitzar Papelera de Reciclaje al eliminar o sobreescribir archivos
-User-defined directory
-Directorio definido por el usuario
 User-defined directory for deletion was not specified!
 ¡No se ha indicado el directorio definido por el usuario para el borrado!
 Variant
 Tipo
 Verifying file %x
 Verificación del archivo %x
+Versioning
+Control de versiones
 Volume name %x not part of filename %y!
 El nombre del volumen %x no es una parte del nombre de archivo %y
 Waiting for missing directories...
@@ -888,14 +894,12 @@ Waiting while directory is locked (%x)...
 Esperando mientras el directorio se encuentre bloqueado (%x)...
 Warning
 Atención
-Warning: Synchronization failed for %x item(s):
-Atención: La sincronización falló para %x elemento(s):
 When the comparison is started with this option set the following decision tree is processed:
 Cuando la comparación se inicia con este conjunto de opciones se procesa el siguiente árbol de decisiones:
 You can ignore conflicts and continue synchronization.
 Puede ignorar conflictos y continuar con la sincronización.
-You can ignore the error to consider not existing directories as empty.
-Puede ignorar el error al considerar que no existen directorios vacíos.
+You can ignore this error to consider the directory as empty.
+Puede ignorar este error al considerar el directorio como vacío.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 ¡Puede intentar sincronizar los elementos restantes otra vez (SIN tener que volver a comparar)!
 different

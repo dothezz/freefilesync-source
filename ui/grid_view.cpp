@@ -72,13 +72,13 @@ void getNumbers(const FileSystemObject& fsObj, StatusResult& result)
 
 
 GridView::StatusCmpResult GridView::updateCmpResult(bool hideFiltered, //maps sortedRef to viewRef
-        bool leftOnlyFilesActive,
-        bool rightOnlyFilesActive,
-        bool leftNewerFilesActive,
-        bool rightNewerFilesActive,
-        bool differentFilesActive,
-        bool equalFilesActive,
-        bool conflictFilesActive)
+                                                    bool leftOnlyFilesActive,
+                                                    bool rightOnlyFilesActive,
+                                                    bool leftNewerFilesActive,
+                                                    bool rightNewerFilesActive,
+                                                    bool differentFilesActive,
+                                                    bool equalFilesActive,
+                                                    bool conflictFilesActive)
 {
     StatusCmpResult output;
 
@@ -95,35 +95,35 @@ GridView::StatusCmpResult GridView::updateCmpResult(bool hideFiltered, //maps so
 
             switch (fsObj->getCategory())
             {
-            case FILE_LEFT_SIDE_ONLY:
-                output.existsLeftOnly = true;
-                if (!leftOnlyFilesActive) continue;
-                break;
-            case FILE_RIGHT_SIDE_ONLY:
-                output.existsRightOnly = true;
-                if (!rightOnlyFilesActive) continue;
-                break;
-            case FILE_LEFT_NEWER:
-                output.existsLeftNewer = true;
-                if (!leftNewerFilesActive) continue;
-                break;
-            case FILE_RIGHT_NEWER:
-                output.existsRightNewer = true;
-                if (!rightNewerFilesActive) continue;
-                break;
-            case FILE_DIFFERENT:
-                output.existsDifferent = true;
-                if (!differentFilesActive) continue;
-                break;
-            case FILE_EQUAL:
-                output.existsEqual = true;
-                if (!equalFilesActive) continue;
-                break;
-            case FILE_CONFLICT:
-            case FILE_DIFFERENT_METADATA: //no extra button on screen
-                output.existsConflict = true;
-                if (!conflictFilesActive) continue;
-                break;
+                case FILE_LEFT_SIDE_ONLY:
+                    output.existsLeftOnly = true;
+                    if (!leftOnlyFilesActive) continue;
+                    break;
+                case FILE_RIGHT_SIDE_ONLY:
+                    output.existsRightOnly = true;
+                    if (!rightOnlyFilesActive) continue;
+                    break;
+                case FILE_LEFT_NEWER:
+                    output.existsLeftNewer = true;
+                    if (!leftNewerFilesActive) continue;
+                    break;
+                case FILE_RIGHT_NEWER:
+                    output.existsRightNewer = true;
+                    if (!rightNewerFilesActive) continue;
+                    break;
+                case FILE_DIFFERENT:
+                    output.existsDifferent = true;
+                    if (!differentFilesActive) continue;
+                    break;
+                case FILE_EQUAL:
+                    output.existsEqual = true;
+                    if (!equalFilesActive) continue;
+                    break;
+                case FILE_CONFLICT:
+                case FILE_DIFFERENT_METADATA: //no extra button on screen
+                    output.existsConflict = true;
+                    if (!conflictFilesActive) continue;
+                    break;
             }
 
             //calculate total number of bytes for each side
@@ -155,15 +155,15 @@ GridView::StatusSyncPreview::StatusSyncPreview() :
 
 
 GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //maps sortedRef to viewRef
-        bool syncCreateLeftActive,
-        bool syncCreateRightActive,
-        bool syncDeleteLeftActive,
-        bool syncDeleteRightActive,
-        bool syncDirOverwLeftActive,
-        bool syncDirOverwRightActive,
-        bool syncDirNoneActive,
-        bool syncEqualActive,
-        bool conflictFilesActive)
+                                                        bool syncCreateLeftActive,
+                                                        bool syncCreateRightActive,
+                                                        bool syncDeleteLeftActive,
+                                                        bool syncDeleteRightActive,
+                                                        bool syncDirOverwLeftActive,
+                                                        bool syncDirOverwRightActive,
+                                                        bool syncDirNoneActive,
+                                                        bool syncEqualActive,
+                                                        bool conflictFilesActive)
 {
     StatusSyncPreview output;
 
@@ -180,44 +180,44 @@ GridView::StatusSyncPreview GridView::updateSyncPreview(bool hideFiltered, //map
 
             switch (fsObj->getSyncOperation()) //evaluate comparison result and sync direction
             {
-            case SO_CREATE_NEW_LEFT:
-                output.existsSyncCreateLeft = true;
-                if (!syncCreateLeftActive) continue;
-                break;
-            case SO_CREATE_NEW_RIGHT:
-                output.existsSyncCreateRight = true;
-                if (!syncCreateRightActive) continue;
-                break;
-            case SO_DELETE_LEFT:
-                output.existsSyncDeleteLeft = true;
-                if (!syncDeleteLeftActive) continue;
-                break;
-            case SO_DELETE_RIGHT:
-                output.existsSyncDeleteRight = true;
-                if (!syncDeleteRightActive) continue;
-                break;
-            case SO_OVERWRITE_RIGHT:
-            case SO_COPY_METADATA_TO_RIGHT: //no extra button on screen
-                output.existsSyncDirRight = true;
-                if (!syncDirOverwRightActive) continue;
-                break;
-            case SO_OVERWRITE_LEFT:
-            case SO_COPY_METADATA_TO_LEFT: //no extra button on screen
-                output.existsSyncDirLeft = true;
-                if (!syncDirOverwLeftActive) continue;
-                break;
-            case SO_DO_NOTHING:
-                output.existsSyncDirNone = true;
-                if (!syncDirNoneActive) continue;
-                break;
-            case SO_EQUAL:
-                output.existsSyncEqual = true;
-                if (!syncEqualActive) continue;
-                break;
-            case SO_UNRESOLVED_CONFLICT:
-                output.existsConflict = true;
-                if (!conflictFilesActive) continue;
-                break;
+                case SO_CREATE_NEW_LEFT:
+                    output.existsSyncCreateLeft = true;
+                    if (!syncCreateLeftActive) continue;
+                    break;
+                case SO_CREATE_NEW_RIGHT:
+                    output.existsSyncCreateRight = true;
+                    if (!syncCreateRightActive) continue;
+                    break;
+                case SO_DELETE_LEFT:
+                    output.existsSyncDeleteLeft = true;
+                    if (!syncDeleteLeftActive) continue;
+                    break;
+                case SO_DELETE_RIGHT:
+                    output.existsSyncDeleteRight = true;
+                    if (!syncDeleteRightActive) continue;
+                    break;
+                case SO_OVERWRITE_RIGHT:
+                case SO_COPY_METADATA_TO_RIGHT: //no extra button on screen
+                    output.existsSyncDirRight = true;
+                    if (!syncDirOverwRightActive) continue;
+                    break;
+                case SO_OVERWRITE_LEFT:
+                case SO_COPY_METADATA_TO_LEFT: //no extra button on screen
+                    output.existsSyncDirLeft = true;
+                    if (!syncDirOverwLeftActive) continue;
+                    break;
+                case SO_DO_NOTHING:
+                    output.existsSyncDirNone = true;
+                    if (!syncDirNoneActive) continue;
+                    break;
+                case SO_EQUAL:
+                    output.existsSyncEqual = true;
+                    if (!syncEqualActive) continue;
+                    break;
+                case SO_UNRESOLVED_CONFLICT:
+                    output.existsConflict = true;
+                    if (!conflictFilesActive) continue;
+                    break;
             }
 
             //calculate total number of bytes for each side
@@ -502,17 +502,17 @@ bool GridView::getDefaultDirection(SortType type) //true: ascending; false: desc
 {
     switch (type)
     {
-    case SORT_BY_FILESIZE:
-    case SORT_BY_DATE:
-        return false;
+        case SORT_BY_FILESIZE:
+        case SORT_BY_DATE:
+            return false;
 
-    case SORT_BY_REL_NAME:
-    case SORT_BY_FILENAME:
-    case SORT_BY_EXTENSION:
-    case SORT_BY_CMP_RESULT:
-    case SORT_BY_DIRECTORY:
-    case SORT_BY_SYNC_DIRECTION:
-        return true;
+        case SORT_BY_REL_NAME:
+        case SORT_BY_FILENAME:
+        case SORT_BY_EXTENSION:
+        case SORT_BY_CMP_RESULT:
+        case SORT_BY_DIRECTORY:
+        case SORT_BY_SYNC_DIRECTION:
+            return true;
     }
     assert(false);
     return true;
@@ -525,48 +525,48 @@ void GridView::sortView(SortType type, bool onLeft, bool ascending)
 
     switch (type)
     {
-    case SORT_BY_REL_NAME:
-        if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByRelName<true,  LEFT_SIDE>(*this));
-        else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByRelName<true,  RIGHT_SIDE>(*this));
-        else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByRelName<false, LEFT_SIDE >(*this));
-        else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByRelName<false, RIGHT_SIDE>(*this));
-        break;
-    case SORT_BY_FILENAME:
-        if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileName<true,  LEFT_SIDE >(*this));
-        else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileName<true,  RIGHT_SIDE>(*this));
-        else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileName<false, LEFT_SIDE >(*this));
-        else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileName<false, RIGHT_SIDE>(*this));
-        break;
-    case SORT_BY_FILESIZE:
-        if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileSize<true,  LEFT_SIDE >(*this));
-        else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileSize<true,  RIGHT_SIDE>(*this));
-        else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileSize<false, LEFT_SIDE >(*this));
-        else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileSize<false, RIGHT_SIDE>(*this));
-        break;
-    case SORT_BY_DATE:
-        if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByDate<true,  LEFT_SIDE >(*this));
-        else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByDate<true,  RIGHT_SIDE>(*this));
-        else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByDate<false, LEFT_SIDE >(*this));
-        else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByDate<false, RIGHT_SIDE>(*this));
-        break;
-    case SORT_BY_EXTENSION:
-        if      ( ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByExtension<true,  LEFT_SIDE >(*this));
-        else if ( ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByExtension<true,  RIGHT_SIDE>(*this));
-        else if (!ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByExtension<false, LEFT_SIDE >(*this));
-        else if (!ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByExtension<false, RIGHT_SIDE>(*this));
-        break;
-    case SORT_BY_CMP_RESULT:
-        if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByCmpResult<true >(*this));
-        else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByCmpResult<false>(*this));
-        break;
-    case SORT_BY_SYNC_DIRECTION:
-        if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortBySyncDirection<true >(*this));
-        else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortBySyncDirection<false>(*this));
-        break;
-    case SORT_BY_DIRECTORY:
-        if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByDirectory<true>());
-        else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByDirectory<false>());
-        break;
+        case SORT_BY_REL_NAME:
+            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByRelName<true,  LEFT_SIDE>(*this));
+            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByRelName<true,  RIGHT_SIDE>(*this));
+            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByRelName<false, LEFT_SIDE >(*this));
+            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByRelName<false, RIGHT_SIDE>(*this));
+            break;
+        case SORT_BY_FILENAME:
+            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileName<true,  LEFT_SIDE >(*this));
+            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileName<true,  RIGHT_SIDE>(*this));
+            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileName<false, LEFT_SIDE >(*this));
+            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileName<false, RIGHT_SIDE>(*this));
+            break;
+        case SORT_BY_FILESIZE:
+            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileSize<true,  LEFT_SIDE >(*this));
+            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileSize<true,  RIGHT_SIDE>(*this));
+            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileSize<false, LEFT_SIDE >(*this));
+            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileSize<false, RIGHT_SIDE>(*this));
+            break;
+        case SORT_BY_DATE:
+            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByDate<true,  LEFT_SIDE >(*this));
+            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByDate<true,  RIGHT_SIDE>(*this));
+            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByDate<false, LEFT_SIDE >(*this));
+            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByDate<false, RIGHT_SIDE>(*this));
+            break;
+        case SORT_BY_EXTENSION:
+            if      ( ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByExtension<true,  LEFT_SIDE >(*this));
+            else if ( ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByExtension<true,  RIGHT_SIDE>(*this));
+            else if (!ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByExtension<false, LEFT_SIDE >(*this));
+            else if (!ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByExtension<false, RIGHT_SIDE>(*this));
+            break;
+        case SORT_BY_CMP_RESULT:
+            if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByCmpResult<true >(*this));
+            else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByCmpResult<false>(*this));
+            break;
+        case SORT_BY_SYNC_DIRECTION:
+            if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortBySyncDirection<true >(*this));
+            else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortBySyncDirection<false>(*this));
+            break;
+        case SORT_BY_DIRECTORY:
+            if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByDirectory<true>());
+            else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByDirectory<false>());
+            break;
     }
 }
 

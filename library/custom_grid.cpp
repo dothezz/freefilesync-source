@@ -68,8 +68,8 @@ public:
     }
 
 
-//###########################################################################
-//grid standard input output methods, redirected directly to gridData to improve performance
+    //###########################################################################
+    //grid standard input output methods, redirected directly to gridData to improve performance
 
     virtual int GetNumberRows()
     {
@@ -150,7 +150,7 @@ public:
         }
         lastNrCols = currentNrCols;
     }
-//###########################################################################
+    //###########################################################################
 
 
     virtual wxGridCellAttr* GetAttr(int row, int col, wxGridCellAttr::wxAttrKind  kind)
@@ -277,27 +277,27 @@ protected:
                     {
                         switch (colType_)
                         {
-                        case xmlAccess::FULL_PATH:
-                            value = zToWx(fileObj.getFullName<side>().BeforeLast(common::FILE_NAME_SEPARATOR));
-                            break;
-                        case xmlAccess::FILENAME: //filename
-                            value = zToWx(fileObj.getShortName<side>());
-                            break;
-                        case xmlAccess::REL_PATH: //relative path
-                            value = zToWx(fileObj.getParentRelativeName());
-                            break;
-                        case xmlAccess::DIRECTORY:
-                            value = zToWx(fileObj.getBaseDirPf<side>());
-                            break;
-                        case xmlAccess::SIZE: //file size
-                            value = ffs3::numberToStringSep(fileObj.getFileSize<side>());
-                            break;
-                        case xmlAccess::DATE: //date
-                            value = ffs3::utcTimeToLocalString(fileObj.getLastWriteTime<side>());
-                            break;
-                        case xmlAccess::EXTENSION: //file extension
-                            value = zToWx(fileObj.getExtension<side>());
-                            break;
+                            case xmlAccess::FULL_PATH:
+                                value = zToWx(fileObj.getFullName<side>().BeforeLast(common::FILE_NAME_SEPARATOR));
+                                break;
+                            case xmlAccess::FILENAME: //filename
+                                value = zToWx(fileObj.getShortName<side>());
+                                break;
+                            case xmlAccess::REL_PATH: //relative path
+                                value = zToWx(fileObj.getParentRelativeName());
+                                break;
+                            case xmlAccess::DIRECTORY:
+                                value = zToWx(fileObj.getBaseDirPf<side>());
+                                break;
+                            case xmlAccess::SIZE: //file size
+                                value = ffs3::numberToStringSep(fileObj.getFileSize<side>());
+                                break;
+                            case xmlAccess::DATE: //date
+                                value = ffs3::utcTimeToLocalString(fileObj.getLastWriteTime<side>());
+                                break;
+                            case xmlAccess::EXTENSION: //file extension
+                                value = zToWx(fileObj.getExtension<side>());
+                                break;
                         }
                     }
 
@@ -305,27 +305,27 @@ protected:
                     {
                         switch (colType_)
                         {
-                        case xmlAccess::FULL_PATH:
-                            value = zToWx(linkObj.getFullName<side>().BeforeLast(common::FILE_NAME_SEPARATOR));
-                            break;
-                        case xmlAccess::FILENAME: //filename
-                            value = zToWx(linkObj.getShortName<side>());
-                            break;
-                        case xmlAccess::REL_PATH: //relative path
-                            value = zToWx(linkObj.getParentRelativeName());
-                            break;
-                        case xmlAccess::DIRECTORY:
-                            value = zToWx(linkObj.getBaseDirPf<side>());
-                            break;
-                        case xmlAccess::SIZE: //file size
-                            value = _("<Symlink>");
-                            break;
-                        case xmlAccess::DATE: //date
-                            value = ffs3::utcTimeToLocalString(linkObj.getLastWriteTime<side>());
-                            break;
-                        case xmlAccess::EXTENSION: //file extension
-                            value = wxEmptyString;
-                            break;
+                            case xmlAccess::FULL_PATH:
+                                value = zToWx(linkObj.getFullName<side>().BeforeLast(common::FILE_NAME_SEPARATOR));
+                                break;
+                            case xmlAccess::FILENAME: //filename
+                                value = zToWx(linkObj.getShortName<side>());
+                                break;
+                            case xmlAccess::REL_PATH: //relative path
+                                value = zToWx(linkObj.getParentRelativeName());
+                                break;
+                            case xmlAccess::DIRECTORY:
+                                value = zToWx(linkObj.getBaseDirPf<side>());
+                                break;
+                            case xmlAccess::SIZE: //file size
+                                value = _("<Symlink>");
+                                break;
+                            case xmlAccess::DATE: //date
+                                value = ffs3::utcTimeToLocalString(linkObj.getLastWriteTime<side>());
+                                break;
+                            case xmlAccess::EXTENSION: //file extension
+                                value = wxEmptyString;
+                                break;
                         }
                     }
 
@@ -333,27 +333,27 @@ protected:
                     {
                         switch (colType_)
                         {
-                        case xmlAccess::FULL_PATH:
-                            value = zToWx(dirObj.getFullName<side>());
-                            break;
-                        case xmlAccess::FILENAME:
-                            value = zToWx(dirObj.getShortName<side>());
-                            break;
-                        case xmlAccess::REL_PATH:
-                            value = zToWx(dirObj.getParentRelativeName());
-                            break;
-                        case xmlAccess::DIRECTORY:
-                            value = zToWx(dirObj.getBaseDirPf<side>());
-                            break;
-                        case xmlAccess::SIZE: //file size
-                            value = _("<Directory>");
-                            break;
-                        case xmlAccess::DATE: //date
-                            value = wxEmptyString;
-                            break;
-                        case xmlAccess::EXTENSION: //file extension
-                            value = wxEmptyString;
-                            break;
+                            case xmlAccess::FULL_PATH:
+                                value = zToWx(dirObj.getFullName<side>());
+                                break;
+                            case xmlAccess::FILENAME:
+                                value = zToWx(dirObj.getShortName<side>());
+                                break;
+                            case xmlAccess::REL_PATH:
+                                value = zToWx(dirObj.getParentRelativeName());
+                                break;
+                            case xmlAccess::DIRECTORY:
+                                value = zToWx(dirObj.getBaseDirPf<side>());
+                                break;
+                            case xmlAccess::SIZE: //file size
+                                value = _("<Directory>");
+                                break;
+                            case xmlAccess::DATE: //date
+                                value = wxEmptyString;
+                                break;
+                            case xmlAccess::EXTENSION: //file extension
+                                value = wxEmptyString;
+                                break;
                         }
                     }
                     xmlAccess::ColumnTypes colType_;
@@ -477,7 +477,7 @@ public:
 class CustomGridTableMiddle : public CustomGridTable
 {
 public:
-//middle grid is created (first wxWidgets internal call to GetNumberCols()) with one column
+    //middle grid is created (first wxWidgets internal call to GetNumberCols()) with one column
     CustomGridTableMiddle() :
         CustomGridTable(0, GetNumberCols()), //attention: static binding to virtual GetNumberCols() in a Constructor!
         syncPreviewActive(false) {}
@@ -529,43 +529,43 @@ private:
             {
                 switch (fsObj->getSyncOperation()) //evaluate comparison result and sync direction
                 {
-                case SO_CREATE_NEW_LEFT:
-                case SO_DELETE_LEFT:
-                case SO_OVERWRITE_LEFT:
-                    return COLOR_SYNC_BLUE;
-                case SO_COPY_METADATA_TO_LEFT:
-                    return COLOR_SYNC_BLUE_LIGHT;
-                case SO_CREATE_NEW_RIGHT:
-                case SO_DELETE_RIGHT:
-                case SO_OVERWRITE_RIGHT:
-                    return COLOR_SYNC_GREEN;
-                case SO_COPY_METADATA_TO_RIGHT:
-                    return COLOR_SYNC_GREEN_LIGHT;
-                case SO_UNRESOLVED_CONFLICT:
-                    return COLOR_YELLOW;
-                case SO_DO_NOTHING:
-                case SO_EQUAL:
-                    return *wxWHITE;
+                    case SO_CREATE_NEW_LEFT:
+                    case SO_DELETE_LEFT:
+                    case SO_OVERWRITE_LEFT:
+                        return COLOR_SYNC_BLUE;
+                    case SO_COPY_METADATA_TO_LEFT:
+                        return COLOR_SYNC_BLUE_LIGHT;
+                    case SO_CREATE_NEW_RIGHT:
+                    case SO_DELETE_RIGHT:
+                    case SO_OVERWRITE_RIGHT:
+                        return COLOR_SYNC_GREEN;
+                    case SO_COPY_METADATA_TO_RIGHT:
+                        return COLOR_SYNC_GREEN_LIGHT;
+                    case SO_UNRESOLVED_CONFLICT:
+                        return COLOR_YELLOW;
+                    case SO_DO_NOTHING:
+                    case SO_EQUAL:
+                        return *wxWHITE;
                 }
             }
             else //comparison results view
             {
                 switch (fsObj->getCategory())
                 {
-                case FILE_LEFT_SIDE_ONLY:
-                case FILE_RIGHT_SIDE_ONLY:
-                    return COLOR_CMP_GREEN;
-                case FILE_LEFT_NEWER:
-                case FILE_RIGHT_NEWER:
-                    return COLOR_CMP_BLUE;
-                case FILE_DIFFERENT:
-                    return COLOR_CMP_RED;
-                case FILE_EQUAL:
-                    return *wxWHITE;
-                case FILE_CONFLICT:
-                    return COLOR_YELLOW;
-                case FILE_DIFFERENT_METADATA:
-                    return COLOR_YELLOW_LIGHT;
+                    case FILE_LEFT_SIDE_ONLY:
+                    case FILE_RIGHT_SIDE_ONLY:
+                        return COLOR_CMP_GREEN;
+                    case FILE_LEFT_NEWER:
+                    case FILE_RIGHT_NEWER:
+                        return COLOR_CMP_BLUE;
+                    case FILE_DIFFERENT:
+                        return COLOR_CMP_RED;
+                    case FILE_EQUAL:
+                        return *wxWHITE;
+                    case FILE_CONFLICT:
+                        return COLOR_YELLOW;
+                    case FILE_DIFFERENT_METADATA:
+                        return COLOR_YELLOW_LIGHT;
                 }
             }
         }
@@ -580,11 +580,11 @@ private:
 //########################################################################################################
 
 
-CustomGrid::CustomGrid(wxWindow *parent,
-                       wxWindowID id,
-                       const wxPoint& pos,
-                       const wxSize& size,
-                       long style,
+CustomGrid::CustomGrid(wxWindow*       parent,
+                       wxWindowID      id,
+                       const wxPoint&  pos,
+                       const wxSize&   size,
+                       long            style,
                        const wxString& name) :
     wxGrid(parent, id, pos, size, style, name),
     m_gridLeft(NULL),
@@ -664,7 +664,7 @@ void CustomGrid::OnPaintGrid(wxEvent& event)
 }
 
 
-void moveCursorWhileSelecting(const int anchor, const int oldPos, const int newPos, wxGrid* grid)
+void moveCursorWhileSelecting(int anchor, int oldPos, int newPos, wxGrid* grid)
 {
     //note: all positions are valid in this context!
 
@@ -693,8 +693,8 @@ void moveCursorWhileSelecting(const int anchor, const int oldPos, const int newP
 void execGridCommands(wxEvent& event, wxGrid* grid)
 {
     static int anchorRow = 0;
-    if (    grid->GetNumberRows() == 0 ||
-            grid->GetNumberCols() == 0)
+    if (grid->GetNumberRows() == 0 ||
+        grid->GetNumberCols() == 0)
         return;
 
     const wxKeyEvent* keyEvent = dynamic_cast<const wxKeyEvent*> (&event);
@@ -705,139 +705,184 @@ void execGridCommands(wxEvent& event, wxGrid* grid)
         const int cursorOldColumn = std::max(std::min(grid->GetGridCursorCol(), grid->GetNumberCols() - 1), 0);
 
         const bool shiftPressed  = keyEvent->ShiftDown();
-        const bool altPressed    = keyEvent->AltDown();
         const bool ctrlPressed   = keyEvent->ControlDown();
-        const bool noModPressed  = !shiftPressed && !altPressed && !ctrlPressed;
         const int keyCode        = keyEvent->GetKeyCode();
 
-
         //SHIFT + X
-        if (shiftPressed && keyCode == WXK_UP)
-        {
-            const int cursorNewPos = std::max(cursorOldPos - 1, 0);
-            moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
-            return; //no event.Skip()
-        }
-        else if (shiftPressed && keyCode == WXK_DOWN)
-        {
-            const int cursorNewPos = std::min(cursorOldPos + 1, grid->GetNumberRows() - 1);
-            moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
-            return; //no event.Skip()
-        }
-        else if (shiftPressed && keyCode == WXK_LEFT)
-        {
-            const int cursorColumn = std::max(cursorOldColumn - 1, 0);
-            grid->SetGridCursor(cursorOldPos, cursorColumn);
-            grid->MakeCellVisible(cursorOldPos, cursorColumn);
-            return; //no event.Skip()
-        }
-        else if (shiftPressed && keyCode == WXK_RIGHT)
-        {
-            const int cursorColumn = std::min(cursorOldColumn + 1, grid->GetNumberCols() - 1);
-            grid->SetGridCursor(cursorOldPos, cursorColumn);
-            grid->MakeCellVisible(cursorOldPos, cursorColumn);
-            return; //no event.Skip()
-        }
-        else if (shiftPressed && (keyCode == WXK_PAGEUP || keyCode == WXK_NUMPAD_PAGEUP))
-        {
-            const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
-            const int cursorNewPos = std::max(cursorOldPos - rowsPerPage, 0);
-            moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
-            return; //no event.Skip()
-        }
-        else if (shiftPressed && (keyCode == WXK_PAGEDOWN || keyCode == WXK_NUMPAD_PAGEDOWN))
-        {
-            const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
-            const int cursorNewPos = std::min(cursorOldPos + rowsPerPage, grid->GetNumberRows() - 1);
-            moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
-            return; //no event.Skip()
-        }
-        else if (shiftPressed && (keyCode == WXK_HOME || keyCode == WXK_NUMPAD_HOME))
-        {
-            const int cursorNewPos = 0;
-            moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
-            return; //no event.Skip()
-        }
-        else if (shiftPressed && (keyCode == WXK_END || keyCode == WXK_NUMPAD_END))
-        {
-            const int cursorNewPos = grid->GetNumberRows() - 1;
-            moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
-            return; //no event.Skip()
-        }
+        if (shiftPressed)
+            switch (keyCode)
+            {
+                case WXK_UP:
+                case WXK_NUMPAD_UP:
+                {
+                    const int cursorNewPos = std::max(cursorOldPos - 1, 0);
+                    moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
+                    return; //no event.Skip()
+                }
+                case WXK_DOWN:
+                case WXK_NUMPAD_DOWN:
+                {
+                    const int cursorNewPos = std::min(cursorOldPos + 1, grid->GetNumberRows() - 1);
+                    moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
+                    return; //no event.Skip()
+                }
+                case WXK_LEFT:
+                case WXK_NUMPAD_LEFT:
+                {
+                    const int cursorColumn = std::max(cursorOldColumn - 1, 0);
+                    grid->SetGridCursor(cursorOldPos, cursorColumn);
+                    grid->MakeCellVisible(cursorOldPos, cursorColumn);
+                    return; //no event.Skip()
+                }
+                case WXK_RIGHT:
+                case WXK_NUMPAD_RIGHT:
+                {
+                    const int cursorColumn = std::min(cursorOldColumn + 1, grid->GetNumberCols() - 1);
+                    grid->SetGridCursor(cursorOldPos, cursorColumn);
+                    grid->MakeCellVisible(cursorOldPos, cursorColumn);
+                    return; //no event.Skip()
+                }
+                case WXK_PAGEUP:
+                case WXK_NUMPAD_PAGEUP:
+                {
+                    const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
+                    const int cursorNewPos = std::max(cursorOldPos - rowsPerPage, 0);
+                    moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
+                    return; //no event.Skip()
+                }
+                case WXK_PAGEDOWN:
+                case WXK_NUMPAD_PAGEDOWN:
+                {
+                    const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
+                    const int cursorNewPos = std::min(cursorOldPos + rowsPerPage, grid->GetNumberRows() - 1);
+                    moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
+                    return; //no event.Skip()
+                }
+                case WXK_HOME:
+                case WXK_NUMPAD_HOME:
+                {
+                    const int cursorNewPos = 0;
+                    moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
+                    return; //no event.Skip()
+                }
+                case WXK_END:
+                case WXK_NUMPAD_END:
+                {
+                    const int cursorNewPos = grid->GetNumberRows() - 1;
+                    moveCursorWhileSelecting(anchorRow, cursorOldPos, cursorNewPos, grid);
+                    return; //no event.Skip()
+                }
+            }
 
         //CTRL + X
-        else if (ctrlPressed && keyCode == WXK_LEFT)
+        if (ctrlPressed)
+            switch (keyCode)
+            {
+                case WXK_UP:
+                case WXK_NUMPAD_UP:
+                {
+                    grid->SetGridCursor(0, grid->GetGridCursorCol());
+                    grid->MakeCellVisible(0, grid->GetGridCursorCol());
+                    return; //no event.Skip()
+                }
+                case WXK_DOWN:
+                case WXK_NUMPAD_DOWN:
+                {
+                    grid->SetGridCursor(grid->GetNumberRows() - 1, grid->GetGridCursorCol());
+                    grid->MakeCellVisible(grid->GetNumberRows() - 1, grid->GetGridCursorCol());
+                    return; //no event.Skip()
+                }
+                case WXK_LEFT:
+                case WXK_NUMPAD_LEFT:
+                {
+                    grid->SetGridCursor(grid->GetGridCursorRow(), 0);
+                    grid->MakeCellVisible(grid->GetGridCursorRow(), 0);
+                    return; //no event.Skip()
+                }
+                case WXK_RIGHT:
+                case WXK_NUMPAD_RIGHT:
+                {
+                    grid->SetGridCursor(grid->GetGridCursorRow(), grid->GetNumberCols() - 1);
+                    grid->MakeCellVisible(grid->GetGridCursorRow(), grid->GetNumberCols() - 1);
+                    return; //no event.Skip()
+                }
+            }
+
+        //button with or without control keys pressed
+        switch (keyCode)
         {
-            grid->SetGridCursor(grid->GetGridCursorRow(), 0);
-            grid->MakeCellVisible(grid->GetGridCursorRow(), 0);
-            return; //no event.Skip()
-        }
-        else if (ctrlPressed && keyCode == WXK_RIGHT)
-        {
-            grid->SetGridCursor(grid->GetGridCursorRow(), grid->GetNumberCols() - 1);
-            grid->MakeCellVisible(grid->GetGridCursorRow(), grid->GetNumberCols() - 1);
-            return; //no event.Skip()
-        }
-        else if ((ctrlPressed && keyCode == WXK_UP) ||
-                 ((noModPressed || ctrlPressed) && (keyCode == WXK_HOME || keyCode == WXK_NUMPAD_HOME)))
-        {
-            grid->SetGridCursor(0, grid->GetGridCursorCol());
-            grid->MakeCellVisible(0, grid->GetGridCursorCol());
-            return; //no event.Skip()
-        }
-        else if ((ctrlPressed && keyCode == WXK_DOWN) ||
-                 ((noModPressed || ctrlPressed) && (keyCode == WXK_END || keyCode == WXK_NUMPAD_END)))
-        {
-            grid->SetGridCursor(grid->GetNumberRows() - 1, grid->GetGridCursorCol());
-            grid->MakeCellVisible(grid->GetNumberRows() - 1, grid->GetGridCursorCol());
-            return; //no event.Skip()
+            case WXK_HOME:
+            case WXK_NUMPAD_HOME:
+            {
+                grid->SetGridCursor(0, grid->GetGridCursorCol());
+                grid->MakeCellVisible(0, grid->GetGridCursorCol());
+                return; //no event.Skip()
+            }
+            case WXK_END:
+            case WXK_NUMPAD_END:
+            {
+                grid->SetGridCursor(grid->GetNumberRows() - 1, grid->GetGridCursorCol());
+                grid->MakeCellVisible(grid->GetNumberRows() - 1, grid->GetGridCursorCol());
+                return; //no event.Skip()
+            }
+
+            case WXK_PAGEUP:
+            case WXK_NUMPAD_PAGEUP:
+            {
+                const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
+                const int cursorNewPos = std::max(cursorOldPos - rowsPerPage, 0);
+                grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
+                grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
+                return; //no event.Skip()
+            }
+            case WXK_PAGEDOWN:
+            case WXK_NUMPAD_PAGEDOWN:
+            {
+                const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
+                const int cursorNewPos = std::min(cursorOldPos + rowsPerPage, grid->GetNumberRows() - 1);
+                grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
+                grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
+                return; //no event.Skip()
+            }
         }
 
         //button without additonal control keys pressed
-        else if (noModPressed && keyCode == WXK_UP)
-        {
-            const int cursorNewPos = std::max(cursorOldPos - 1, 0);
-            grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
-            grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
-            return; //no event.Skip()
-        }
-        else if (noModPressed && keyCode == WXK_DOWN)
-        {
-            const int cursorNewPos = std::min(cursorOldPos + 1, grid->GetNumberRows() - 1);
-            grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
-            grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
-            return; //no event.Skip()
-        }
-        else if (noModPressed && keyCode == WXK_LEFT)
-        {
-            const int cursorColumn = std::max(cursorOldColumn - 1, 0);
-            grid->SetGridCursor(cursorOldPos, cursorColumn);
-            grid->MakeCellVisible(cursorOldPos, cursorColumn);
-            return; //no event.Skip()
-        }
-        else if (noModPressed && keyCode == WXK_RIGHT)
-        {
-            const int cursorColumn = std::min(cursorOldColumn + 1, grid->GetNumberCols() - 1);
-            grid->SetGridCursor(cursorOldPos, cursorColumn);
-            grid->MakeCellVisible(cursorOldPos, cursorColumn);
-            return; //no event.Skip()
-        }
-        else if ((noModPressed || ctrlPressed) && (keyCode == WXK_PAGEUP || keyCode == WXK_NUMPAD_PAGEUP))
-        {
-            const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
-            const int cursorNewPos = std::max(cursorOldPos - rowsPerPage, 0);
-            grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
-            grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
-            return; //no event.Skip()
-        }
-        else if ((noModPressed || ctrlPressed) && (keyCode == WXK_PAGEDOWN || keyCode == WXK_NUMPAD_PAGEDOWN))
-        {
-            const int rowsPerPage  = grid->GetGridWindow()->GetSize().GetHeight() / grid->GetDefaultRowSize();
-            const int cursorNewPos = std::min(cursorOldPos + rowsPerPage, grid->GetNumberRows() - 1);
-            grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
-            grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
-            return; //no event.Skip()
-        }
+        if (keyEvent->GetModifiers() == wxMOD_NONE)
+            switch (keyCode)
+            {
+                case WXK_UP:
+                case WXK_NUMPAD_UP:
+                {
+                    const int cursorNewPos = std::max(cursorOldPos - 1, 0);
+                    grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
+                    grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
+                    return; //no event.Skip()
+                }
+                case WXK_DOWN:
+                case WXK_NUMPAD_DOWN:
+                {
+                    const int cursorNewPos = std::min(cursorOldPos + 1, grid->GetNumberRows() - 1);
+                    grid->SetGridCursor(cursorNewPos, grid->GetGridCursorCol());
+                    grid->MakeCellVisible(cursorNewPos, grid->GetGridCursorCol());
+                    return; //no event.Skip()
+                }
+                case WXK_LEFT:
+                case WXK_NUMPAD_LEFT:
+                {
+                    const int cursorColumn = std::max(cursorOldColumn - 1, 0);
+                    grid->SetGridCursor(cursorOldPos, cursorColumn);
+                    grid->MakeCellVisible(cursorOldPos, cursorColumn);
+                    return; //no event.Skip()
+                }
+                case WXK_RIGHT:
+                case WXK_NUMPAD_RIGHT:
+                {
+                    const int cursorColumn = std::min(cursorOldColumn + 1, grid->GetNumberCols() - 1);
+                    grid->SetGridCursor(cursorOldPos, cursorColumn);
+                    grid->MakeCellVisible(cursorOldPos, cursorColumn);
+                    return; //no event.Skip()
+                }
+            }
     }
 
     anchorRow = grid->GetGridCursorRow();
@@ -869,23 +914,29 @@ bool gridsShouldBeCleared(const wxEvent& event)
 
             switch (keyEvent->GetKeyCode())
             {
-            case WXK_TAB:
-            case WXK_RETURN:
-            case WXK_ESCAPE:
-            case WXK_NUMPAD_ENTER:
-            case WXK_LEFT:
-            case WXK_UP:
-            case WXK_RIGHT:
-            case WXK_DOWN:
-            case WXK_PAGEUP:
-            case WXK_PAGEDOWN:
-            case WXK_NUMPAD_PAGEUP:
-            case WXK_NUMPAD_PAGEDOWN:
-            case WXK_HOME:
-            case WXK_END:
-            case WXK_NUMPAD_HOME:
-            case WXK_NUMPAD_END:
-                return true;
+                    //default navigation keys
+                case WXK_UP:
+                case WXK_DOWN:
+                case WXK_LEFT:
+                case WXK_RIGHT:
+                case WXK_PAGEUP:
+                case WXK_PAGEDOWN:
+                case WXK_HOME:
+                case WXK_END:
+                case WXK_NUMPAD_UP:
+                case WXK_NUMPAD_DOWN:
+                case WXK_NUMPAD_LEFT:
+                case WXK_NUMPAD_RIGHT:
+                case WXK_NUMPAD_PAGEUP:
+                case WXK_NUMPAD_PAGEDOWN:
+                case WXK_NUMPAD_HOME:
+                case WXK_NUMPAD_END:
+                    //other keys
+                case WXK_TAB:
+                case WXK_RETURN:
+                case WXK_NUMPAD_ENTER:
+                case WXK_ESCAPE:
+                    return true;
             }
 
             return false;
@@ -901,9 +952,9 @@ void CustomGrid::onGridAccess(wxEvent& event)
     if (!isLeading)
     {
         //notify other grids of new user focus
-        m_gridLeft->isLeading   = m_gridLeft   == this;
+        m_gridLeft  ->isLeading = m_gridLeft   == this;
         m_gridMiddle->isLeading = m_gridMiddle == this;
-        m_gridRight->isLeading  = m_gridRight  == this;
+        m_gridRight ->isLeading = m_gridRight  == this;
 
         wxGrid::SetFocus();
     }
@@ -911,13 +962,13 @@ void CustomGrid::onGridAccess(wxEvent& event)
     //clear grids
     if (gridsShouldBeCleared(event))
     {
-        m_gridLeft->ClearSelection();
+        m_gridLeft  ->ClearSelection();
         m_gridMiddle->ClearSelection();
-        m_gridRight->ClearSelection();
+        m_gridRight ->ClearSelection();
     }
 
     //update row labels NOW (needed when scrolling if buttons keep being pressed)
-    m_gridLeft->GetGridRowLabelWindow()->Update();
+    m_gridLeft ->GetGridRowLabelWindow()->Update();
     m_gridRight->GetGridRowLabelWindow()->Update();
 
     //support for custom short-cuts (overwriting wxWidgets functionality!)
@@ -935,8 +986,8 @@ void CustomGrid::adjustGridHeights(wxEvent& event)
     int y3 = 0;
     int dummy = 0;
 
-    m_gridLeft->GetViewStart(&dummy, &y1);
-    m_gridRight->GetViewStart(&dummy, &y2);
+    m_gridLeft  ->GetViewStart(&dummy, &y1);
+    m_gridRight ->GetViewStart(&dummy, &y2);
     m_gridMiddle->GetViewStart(&dummy, &y3);
 
     if (y1 != y2 || y2 != y3)
@@ -958,8 +1009,8 @@ void CustomGrid::adjustGridHeights(wxEvent& event)
         else if (y3 < yMax)
             m_gridMiddle->SetMargins(0, 30);
 
-        m_gridLeft->ForceRefresh();
-        m_gridRight->ForceRefresh();
+        m_gridLeft  ->ForceRefresh();
+        m_gridRight ->ForceRefresh();
         m_gridMiddle->ForceRefresh();
     }
 }
@@ -985,9 +1036,9 @@ void CustomGrid::DrawColLabel(wxDC& dc, int col)
     if (col == m_marker.first)
     {
         if (m_marker.second == ASCENDING)
-            dc.DrawBitmap(GlobalResources::getInstance().getImageByName(wxT("smallUp")), GetColRight(col) - 16 - 2, 2, true); //respect 2-pixel border
+            dc.DrawBitmap(GlobalResources::instance().getImage(wxT("smallUp")), GetColRight(col) - 16 - 2, 2, true); //respect 2-pixel border
         else
-            dc.DrawBitmap(GlobalResources::getInstance().getImageByName(wxT("smallDown")), GetColRight(col) - 16 - 2, 2, true); //respect 2-pixel border
+            dc.DrawBitmap(GlobalResources::instance().getImage(wxT("smallDown")), GetColRight(col) - 16 - 2, 2, true); //respect 2-pixel border
     }
 }
 
@@ -1081,8 +1132,8 @@ public:
     {
         //############## show windows explorer file icons ######################
 
-        if (    showFileIcons && //evaluate at compile time
-                m_gridDataTable->getTypeAtPos(col) == xmlAccess::FILENAME)
+        if (showFileIcons && //evaluate at compile time
+            m_gridDataTable->getTypeAtPos(col) == xmlAccess::FILENAME)
         {
             if (rect.GetWidth() >= IconBuffer::ICON_SIZE)
             {
@@ -1117,37 +1168,42 @@ public:
                     {
                         wxIcon icon;
                         bool iconDrawnFully = false;
-                        const bool iconLoaded = IconBuffer::getInstance().requestFileIcon(fileName, &icon); //returns false if icon is not in buffer
-                        if (iconLoaded)
                         {
-                            dc.DrawIcon(icon, rectShrinked.GetX() + LEFT_BORDER, rectShrinked.GetY());
-
-                            //-----------------------------------------------------------------------------------------------
-                            //only mark as successful if icon was drawn fully!
-                            //(attention: when scrolling, rows get partially updated, which can result in the upper half being blank!)
-
-                            //rect where icon was placed
-                            wxRect iconRect(rect); //unscrolled
-                            iconRect.x += LEFT_BORDER;
-                            iconRect.SetWidth(IconBuffer::ICON_SIZE);
-
-                            //convert to scrolled coordinates
-                            grid.CalcScrolledPosition(iconRect.x, iconRect.y, &iconRect.x, &iconRect.y);
-
-                            wxRegionIterator regionsInv(grid.GetGridWindow()->GetUpdateRegion());
-                            while (regionsInv)
+                            const bool loadSuccess = IconBuffer::getInstance().requestFileIcon(fileName, &icon); //returns false if icon is not in buffer
+                            if (loadSuccess)
                             {
-                                if (regionsInv.GetRect().Contains(iconRect))
+                                //-----------------------------------------------------------------------------------------------
+                                //only mark as successful if icon was drawn fully!
+                                //(attention: when scrolling, rows get partially updated, which can result in the upper half being blank!)
+
+                                //rect where icon was placed
+                                wxRect iconRect(rect); //unscrolled
+                                iconRect.x += LEFT_BORDER;
+                                iconRect.SetWidth(IconBuffer::ICON_SIZE);
+
+                                //convert to scrolled coordinates
+                                grid.CalcScrolledPosition(iconRect.x, iconRect.y, &iconRect.x, &iconRect.y);
+
+                                wxRegionIterator regionsInv(grid.GetGridWindow()->GetUpdateRegion());
+                                while (regionsInv)
                                 {
-                                    iconDrawnFully = true;
-                                    break;
+                                    if (regionsInv.GetRect().Contains(iconRect))
+                                    {
+                                        iconDrawnFully = true;
+                                        break;
+                                    }
+                                    ++regionsInv;
                                 }
-                                ++regionsInv;
                             }
+                            else
+                                icon = IconBuffer::getFileIcon(); //better than nothing
                         }
+
+                        dc.DrawIcon(icon, rectShrinked.GetX() + LEFT_BORDER, rectShrinked.GetY());
+
                         //-----------------------------------------------------------------------------------------------
                         //save status of last icon load -> used for async. icon loading
-                        m_loadIconSuccess[row] = iconLoaded && iconDrawnFully;
+                        m_loadIconSuccess[row] = iconDrawnFully;
                     }
                 }
                 return;
@@ -1164,8 +1220,8 @@ public:
                                wxDC& dc,
                                int row, int col)
     {
-        if (    showFileIcons && //evaluate at compile time
-                m_gridDataTable->getTypeAtPos(col) == xmlAccess::FILENAME)
+        if (showFileIcons && //evaluate at compile time
+            m_gridDataTable->getTypeAtPos(col) == xmlAccess::FILENAME)
         {
             wxSize rv = wxGridCellStringRenderer::GetBestSize(grid, attr, dc, row, col);
             rv.SetWidth(rv.GetWidth() + LEFT_BORDER + IconBuffer::ICON_SIZE);
@@ -1186,7 +1242,7 @@ private:
 
 //----------------------------------------------------------------------------------------
 
-CustomGridRim::CustomGridRim(wxWindow *parent,
+CustomGridRim::CustomGridRim(wxWindow* parent,
                              wxWindowID id,
                              const wxPoint& pos,
                              const wxSize& size,
@@ -1374,7 +1430,7 @@ void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
                 SetColAttr(i, cellAttributes);
                 break;
             }
-//----------------------------------------------------------------------------------
+    //----------------------------------------------------------------------------------
 
     columnSettings.clear();
     if (attr.size() == 0)
@@ -1422,7 +1478,7 @@ void CustomGridRim::setColumnAttributes(const xmlAccess::ColumnAttributes& attr)
     for (size_t i = 0; i < newPositions.size(); ++i)
         SetColSize(static_cast<int>(i), columnSettings[i].width);
 
-//--------------------------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------------------------
     //set special alignment for column "size"
     if (GetLayoutDirection() != wxLayout_RightToLeft) //don't change for RTL languages
         for (int i = 0; i < GetNumberCols(); ++i)
@@ -1452,20 +1508,20 @@ wxString CustomGridRim::getTypeName(xmlAccess::ColumnTypes colType)
 {
     switch (colType)
     {
-    case xmlAccess::FULL_PATH:
-        return _("Full path");
-    case xmlAccess::FILENAME:
-        return _("Filename");
-    case xmlAccess::REL_PATH:
-        return _("Relative path");
-    case xmlAccess::DIRECTORY:
-        return _("Directory");
-    case xmlAccess::SIZE:
-        return _("Size");
-    case xmlAccess::DATE:
-        return _("Date");
-    case xmlAccess::EXTENSION:
-        return _("Extension");
+        case xmlAccess::FULL_PATH:
+            return _("Full path");
+        case xmlAccess::FILENAME:
+            return _("Filename");
+        case xmlAccess::REL_PATH:
+            return _("Relative path");
+        case xmlAccess::DIRECTORY:
+            return _("Directory");
+        case xmlAccess::SIZE:
+            return _("Size");
+        case xmlAccess::DATE:
+            return _("Date");
+        case xmlAccess::EXTENSION:
+            return _("Extension");
     }
 
     return wxEmptyString; //dummy
@@ -1648,7 +1704,7 @@ void IconUpdater::loadIconsAsynchronously(wxEvent& event) //loads all (not yet) 
     //merge vectors
     newLoad.insert(newLoad.end(), iconsLeft.begin(), iconsLeft.end());
 
-    ffs3::IconBuffer::getInstance().setWorkload(newLoad); //attention: newLoad is invalidated after this call!!!
+    ffs3::IconBuffer::getInstance().setWorkload(newLoad);
 
     //event.Skip();
 }
@@ -1656,7 +1712,7 @@ void IconUpdater::loadIconsAsynchronously(wxEvent& event) //loads all (not yet) 
 //----------------------------------------------------------------------------------------
 
 
-CustomGridLeft::CustomGridLeft(wxWindow *parent,
+CustomGridLeft::CustomGridLeft(wxWindow* parent,
                                wxWindowID id,
                                const wxPoint& pos,
                                const wxSize& size,
@@ -1706,7 +1762,7 @@ CustomGridTable* CustomGridLeft::getGridDataTable() const
 
 
 //----------------------------------------------------------------------------------------
-CustomGridRight::CustomGridRight(wxWindow *parent,
+CustomGridRight::CustomGridRight(wxWindow* parent,
                                  wxWindowID id,
                                  const wxPoint& pos,
                                  const wxSize& size,
@@ -1784,7 +1840,7 @@ const int CHECK_BOX_WIDTH = CHECK_BOX_IMAGE + 3; //width of first block
 //  ----------------------------------
 
 
-CustomGridMiddle::CustomGridMiddle(wxWindow *parent,
+CustomGridMiddle::CustomGridMiddle(wxWindow* parent,
                                    wxWindowID id,
                                    const wxPoint& pos,
                                    const wxSize& size,
@@ -1918,35 +1974,35 @@ void CustomGridMiddle::showToolTip(int rowNumber, wxPoint pos)
         const SyncOperation syncOp = fsObj->getSyncOperation();
         switch (syncOp)
         {
-        case SO_CREATE_NEW_LEFT:
-            toolTip->show(getDescription(syncOp), pos, &GlobalResources::getInstance().getImageByName(wxT("syncCreateLeftAct")));
-            break;
-        case SO_CREATE_NEW_RIGHT:
-            toolTip->show(getDescription(syncOp), pos, &GlobalResources::getInstance().getImageByName(wxT("syncCreateRightAct")));
-            break;
-        case SO_DELETE_LEFT:
-            toolTip->show(getDescription(syncOp), pos, &GlobalResources::getInstance().getImageByName(wxT("syncDeleteLeftAct")));
-            break;
-        case SO_DELETE_RIGHT:
-            toolTip->show(getDescription(syncOp), pos, &GlobalResources::getInstance().getImageByName(wxT("syncDeleteRightAct")));
-            break;
-        case SO_OVERWRITE_LEFT:
-        case SO_COPY_METADATA_TO_LEFT:
-            toolTip->show(getDescription(syncOp), pos, &GlobalResources::getInstance().getImageByName(wxT("syncDirLeftAct")));
-            break;
-        case SO_OVERWRITE_RIGHT:
-        case SO_COPY_METADATA_TO_RIGHT:
-            toolTip->show(getDescription(syncOp), pos, &GlobalResources::getInstance().getImageByName(wxT("syncDirRightAct")));
-            break;
-        case SO_DO_NOTHING:
-            toolTip->show(getDescription(syncOp), pos, &GlobalResources::getInstance().getImageByName(wxT("syncDirNoneAct")));
-            break;
-        case SO_EQUAL:
-            toolTip->show(getDescription(syncOp), pos, &GlobalResources::getInstance().getImageByName(wxT("equalAct")));
-            break;
-        case SO_UNRESOLVED_CONFLICT:
-            toolTip->show(fsObj->getSyncOpConflict(), pos, &GlobalResources::getInstance().getImageByName(wxT("conflictAct")));
-            break;
+            case SO_CREATE_NEW_LEFT:
+                toolTip->show(getDescription(syncOp), pos, &GlobalResources::instance().getImage(wxT("syncCreateLeftAct")));
+                break;
+            case SO_CREATE_NEW_RIGHT:
+                toolTip->show(getDescription(syncOp), pos, &GlobalResources::instance().getImage(wxT("syncCreateRightAct")));
+                break;
+            case SO_DELETE_LEFT:
+                toolTip->show(getDescription(syncOp), pos, &GlobalResources::instance().getImage(wxT("syncDeleteLeftAct")));
+                break;
+            case SO_DELETE_RIGHT:
+                toolTip->show(getDescription(syncOp), pos, &GlobalResources::instance().getImage(wxT("syncDeleteRightAct")));
+                break;
+            case SO_OVERWRITE_LEFT:
+            case SO_COPY_METADATA_TO_LEFT:
+                toolTip->show(getDescription(syncOp), pos, &GlobalResources::instance().getImage(wxT("syncDirLeftAct")));
+                break;
+            case SO_OVERWRITE_RIGHT:
+            case SO_COPY_METADATA_TO_RIGHT:
+                toolTip->show(getDescription(syncOp), pos, &GlobalResources::instance().getImage(wxT("syncDirRightAct")));
+                break;
+            case SO_DO_NOTHING:
+                toolTip->show(getDescription(syncOp), pos, &GlobalResources::instance().getImage(wxT("syncDirNoneAct")));
+                break;
+            case SO_EQUAL:
+                toolTip->show(getDescription(syncOp), pos, &GlobalResources::instance().getImage(wxT("equalAct")));
+                break;
+            case SO_UNRESOLVED_CONFLICT:
+                toolTip->show(fsObj->getSyncOpConflict(), pos, &GlobalResources::instance().getImage(wxT("conflictAct")));
+                break;
         };
     }
     else
@@ -1954,30 +2010,30 @@ void CustomGridMiddle::showToolTip(int rowNumber, wxPoint pos)
         const CompareFilesResult cmpRes = fsObj->getCategory();
         switch (cmpRes)
         {
-        case FILE_LEFT_SIDE_ONLY:
-            toolTip->show(getDescription(cmpRes), pos, &GlobalResources::getInstance().getImageByName(wxT("leftOnlyAct")));
-            break;
-        case FILE_RIGHT_SIDE_ONLY:
-            toolTip->show(getDescription(cmpRes), pos, &GlobalResources::getInstance().getImageByName(wxT("rightOnlyAct")));
-            break;
-        case FILE_LEFT_NEWER:
-            toolTip->show(getDescription(cmpRes), pos, &GlobalResources::getInstance().getImageByName(wxT("leftNewerAct")));
-            break;
-        case FILE_RIGHT_NEWER:
-            toolTip->show(getDescription(cmpRes), pos, &GlobalResources::getInstance().getImageByName(wxT("rightNewerAct")));
-            break;
-        case FILE_DIFFERENT:
-            toolTip->show(getDescription(cmpRes), pos, &GlobalResources::getInstance().getImageByName(wxT("differentAct")));
-            break;
-        case FILE_EQUAL:
-            toolTip->show(getDescription(cmpRes), pos, &GlobalResources::getInstance().getImageByName(wxT("equalAct")));
-            break;
-        case FILE_DIFFERENT_METADATA:
-            toolTip->show(getDescription(cmpRes), pos, &GlobalResources::getInstance().getImageByName(wxT("conflictAct")));
-            break;
-        case FILE_CONFLICT:
-            toolTip->show(fsObj->getCatConflict(), pos, &GlobalResources::getInstance().getImageByName(wxT("conflictAct")));
-            break;
+            case FILE_LEFT_SIDE_ONLY:
+                toolTip->show(getDescription(cmpRes), pos, &GlobalResources::instance().getImage(wxT("leftOnlyAct")));
+                break;
+            case FILE_RIGHT_SIDE_ONLY:
+                toolTip->show(getDescription(cmpRes), pos, &GlobalResources::instance().getImage(wxT("rightOnlyAct")));
+                break;
+            case FILE_LEFT_NEWER:
+                toolTip->show(getDescription(cmpRes), pos, &GlobalResources::instance().getImage(wxT("leftNewerAct")));
+                break;
+            case FILE_RIGHT_NEWER:
+                toolTip->show(getDescription(cmpRes), pos, &GlobalResources::instance().getImage(wxT("rightNewerAct")));
+                break;
+            case FILE_DIFFERENT:
+                toolTip->show(getDescription(cmpRes), pos, &GlobalResources::instance().getImage(wxT("differentAct")));
+                break;
+            case FILE_EQUAL:
+                toolTip->show(getDescription(cmpRes), pos, &GlobalResources::instance().getImage(wxT("equalAct")));
+                break;
+            case FILE_DIFFERENT_METADATA:
+                toolTip->show(getDescription(cmpRes), pos, &GlobalResources::instance().getImage(wxT("conflictAct")));
+                break;
+            case FILE_CONFLICT:
+                toolTip->show(fsObj->getCatConflict(), pos, &GlobalResources::instance().getImage(wxT("conflictAct")));
+                break;
         }
     }
 }
@@ -1998,34 +2054,34 @@ void CustomGridMiddle::OnLeftMouseUp(wxMouseEvent& event)
     {
         switch (selectionPos)
         {
-        case BLOCKPOS_CHECK_BOX:
-        {
-            //create a custom event
-            FFSCheckRowsEvent evt(selectionRowBegin, rowEndFiltering);
-            AddPendingEvent(evt);
-        }
-        break;
-        case BLOCKPOS_LEFT:
-        {
-            //create a custom event
-            FFSSyncDirectionEvent evt(selectionRowBegin, rowEndFiltering, SYNC_DIR_LEFT);
-            AddPendingEvent(evt);
-        }
-        break;
-        case BLOCKPOS_MIDDLE:
-        {
-            //create a custom event
-            FFSSyncDirectionEvent evt(selectionRowBegin, rowEndFiltering, SYNC_DIR_NONE);
-            AddPendingEvent(evt);
-        }
-        break;
-        case BLOCKPOS_RIGHT:
-        {
-            //create a custom event
-            FFSSyncDirectionEvent evt(selectionRowBegin, rowEndFiltering, SYNC_DIR_RIGHT);
-            AddPendingEvent(evt);
-        }
-        break;
+            case BLOCKPOS_CHECK_BOX:
+            {
+                //create a custom event
+                FFSCheckRowsEvent evt(selectionRowBegin, rowEndFiltering);
+                AddPendingEvent(evt);
+            }
+            break;
+            case BLOCKPOS_LEFT:
+            {
+                //create a custom event
+                FFSSyncDirectionEvent evt(selectionRowBegin, rowEndFiltering, SYNC_DIR_LEFT);
+                AddPendingEvent(evt);
+            }
+            break;
+            case BLOCKPOS_MIDDLE:
+            {
+                //create a custom event
+                FFSSyncDirectionEvent evt(selectionRowBegin, rowEndFiltering, SYNC_DIR_NONE);
+                AddPendingEvent(evt);
+            }
+            break;
+            case BLOCKPOS_RIGHT:
+            {
+                //create a custom event
+                FFSSyncDirectionEvent evt(selectionRowBegin, rowEndFiltering, SYNC_DIR_RIGHT);
+                AddPendingEvent(evt);
+            }
+            break;
         }
     }
     selectionRowBegin = -1;
@@ -2057,9 +2113,9 @@ int CustomGridMiddle::mousePosToRow(wxPoint pos, BlockPosition* block)
             if (row >= 0)
             {
                 const FileSystemObject* const fsObj = getGridDataTableMiddle()->getRawData(row);
-                if (    fsObj != NULL && //if valid row...
-                        getGridDataTableMiddle()->syncPreviewIsActive() &&
-                        fsObj->getSyncOperation() != SO_EQUAL) //in sync-preview equal files shall be treated as in cmp result, i.e. as full checkbox
+                if (fsObj != NULL && //if valid row...
+                    getGridDataTableMiddle()->syncPreviewIsActive() &&
+                    fsObj->getSyncOperation() != SO_EQUAL) //in sync-preview equal files shall be treated as in cmp result, i.e. as full checkbox
                 {
                     // cell:
                     //  ----------------------------------
@@ -2125,19 +2181,19 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
             rectShrinked.SetX(rect.GetX() + 1);
 
             //HIGHLIGHTNING (checkbox):
-            if (    rowIsHighlighted &&
-                    m_gridMiddle.highlightedPos == CustomGridMiddle::BLOCKPOS_CHECK_BOX)
+            if (rowIsHighlighted &&
+                m_gridMiddle.highlightedPos == CustomGridMiddle::BLOCKPOS_CHECK_BOX)
             {
                 if (fsObj->isActive())
-                    dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("checkboxTrueFocus")), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+                    dc.DrawLabel(wxEmptyString, GlobalResources::instance().getImage(wxT("checkboxTrueFocus")), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
                 else
-                    dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("checkboxFalseFocus")), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+                    dc.DrawLabel(wxEmptyString, GlobalResources::instance().getImage(wxT("checkboxFalseFocus")), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
             }
             //default
             else if (fsObj->isActive())
-                dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("checkboxTrue")), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+                dc.DrawLabel(wxEmptyString, GlobalResources::instance().getImage(wxT("checkboxTrue")), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
             else
-                dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("checkboxFalse")), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+                dc.DrawLabel(wxEmptyString, GlobalResources::instance().getImage(wxT("checkboxFalse")), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
 
             //clean remaining block of rect that will receive image of checkbox/directions
             rectShrinked.SetWidth(rect.GetWidth() - CHECK_BOX_WIDTH);
@@ -2150,21 +2206,21 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
                 //print sync direction into second block
 
                 //HIGHLIGHTNING (sync direction):
-                if (    rowIsHighlighted &&
-                        m_gridMiddle.highlightedPos != CustomGridMiddle::BLOCKPOS_CHECK_BOX) //don't allow changing direction for "=="-files
+                if (rowIsHighlighted &&
+                    m_gridMiddle.highlightedPos != CustomGridMiddle::BLOCKPOS_CHECK_BOX) //don't allow changing direction for "=="-files
                     switch (m_gridMiddle.highlightedPos)
                     {
-                    case CustomGridMiddle::BLOCKPOS_CHECK_BOX:
-                        break;
-                    case CustomGridMiddle::BLOCKPOS_LEFT:
-                        dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->testSyncOperation(true, SYNC_DIR_LEFT)), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
-                        break;
-                    case CustomGridMiddle::BLOCKPOS_MIDDLE:
-                        dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->testSyncOperation(true, SYNC_DIR_NONE)), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
-                        break;
-                    case CustomGridMiddle::BLOCKPOS_RIGHT:
-                        dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->testSyncOperation(true, SYNC_DIR_RIGHT)), rectShrinked, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
-                        break;
+                        case CustomGridMiddle::BLOCKPOS_CHECK_BOX:
+                            break;
+                        case CustomGridMiddle::BLOCKPOS_LEFT:
+                            dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->testSyncOperation(true, SYNC_DIR_LEFT)), rectShrinked, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL);
+                            break;
+                        case CustomGridMiddle::BLOCKPOS_MIDDLE:
+                            dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->testSyncOperation(true, SYNC_DIR_NONE)), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                            break;
+                        case CustomGridMiddle::BLOCKPOS_RIGHT:
+                            dc.DrawLabel(wxEmptyString, getSyncOpImage(fsObj->testSyncOperation(true, SYNC_DIR_RIGHT)), rectShrinked, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL);
+                            break;
                     }
                 else //default
                 {
@@ -2176,28 +2232,28 @@ void GridCellRendererMiddle::Draw(wxGrid& grid,
             {
                 switch (fsObj->getCategory())
                 {
-                case FILE_LEFT_SIDE_ONLY:
-                    dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("leftOnlySmall")), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
-                    break;
-                case FILE_RIGHT_SIDE_ONLY:
-                    dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("rightOnlySmall")), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
-                    break;
-                case FILE_LEFT_NEWER:
-                    dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("leftNewerSmall")), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
-                    break;
-                case FILE_RIGHT_NEWER:
-                    dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("rightNewerSmall")), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
-                    break;
-                case FILE_DIFFERENT:
-                    dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("differentSmall")), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
-                    break;
-                case FILE_EQUAL:
-                    dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("equalSmall")), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
-                    break;
-                case FILE_CONFLICT:
-                case FILE_DIFFERENT_METADATA:
-                    dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("conflictSmall")), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
-                    break;
+                    case FILE_LEFT_SIDE_ONLY:
+                        dc.DrawLabel(wxEmptyString, GlobalResources::instance().getImage(wxT("leftOnlySmall")), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                        break;
+                    case FILE_RIGHT_SIDE_ONLY:
+                        dc.DrawLabel(wxEmptyString, GlobalResources::instance().getImage(wxT("rightOnlySmall")), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                        break;
+                    case FILE_LEFT_NEWER:
+                        dc.DrawLabel(wxEmptyString, GlobalResources::instance().getImage(wxT("leftNewerSmall")), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                        break;
+                    case FILE_RIGHT_NEWER:
+                        dc.DrawLabel(wxEmptyString, GlobalResources::instance().getImage(wxT("rightNewerSmall")), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                        break;
+                    case FILE_DIFFERENT:
+                        dc.DrawLabel(wxEmptyString, GlobalResources::instance().getImage(wxT("differentSmall")), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                        break;
+                    case FILE_EQUAL:
+                        dc.DrawLabel(wxEmptyString, GlobalResources::instance().getImage(wxT("equalSmall")), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                        break;
+                    case FILE_CONFLICT:
+                    case FILE_DIFFERENT_METADATA:
+                        dc.DrawLabel(wxEmptyString, GlobalResources::instance().getImage(wxT("conflictSmall")), rectShrinked, wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL);
+                        break;
                 }
             }
 
@@ -2231,9 +2287,9 @@ void CustomGridMiddle::DrawColLabel(wxDC& dc, int col)
     const wxRect rect(GetColLeft(col), 0, GetColWidth(col), GetColLabelSize());
 
     if (getGridDataTableMiddle()->syncPreviewIsActive())
-        dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("syncViewSmall")), rect, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL);
+        dc.DrawLabel(wxEmptyString, GlobalResources::instance().getImage(wxT("syncViewSmall")), rect, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL);
     else
-        dc.DrawLabel(wxEmptyString, GlobalResources::getInstance().getImageByName(wxT("cmpViewSmall")), rect, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL);
+        dc.DrawLabel(wxEmptyString, GlobalResources::instance().getImage(wxT("cmpViewSmall")), rect, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL);
 }
 
 
@@ -2241,26 +2297,26 @@ const wxBitmap& ffs3::getSyncOpImage(SyncOperation syncOp)
 {
     switch (syncOp) //evaluate comparison result and sync direction
     {
-    case SO_CREATE_NEW_LEFT:
-        return GlobalResources::getInstance().getImageByName(wxT("createLeftSmall"));
-    case SO_CREATE_NEW_RIGHT:
-        return GlobalResources::getInstance().getImageByName(wxT("createRightSmall"));
-    case SO_DELETE_LEFT:
-        return GlobalResources::getInstance().getImageByName(wxT("deleteLeftSmall"));
-    case SO_DELETE_RIGHT:
-        return GlobalResources::getInstance().getImageByName(wxT("deleteRightSmall"));
-    case SO_OVERWRITE_RIGHT:
-    case SO_COPY_METADATA_TO_RIGHT:
-        return GlobalResources::getInstance().getImageByName(wxT("syncDirRightSmall"));
-    case SO_OVERWRITE_LEFT:
-    case SO_COPY_METADATA_TO_LEFT:
-        return GlobalResources::getInstance().getImageByName(wxT("syncDirLeftSmall"));
-    case SO_DO_NOTHING:
-        return GlobalResources::getInstance().getImageByName(wxT("syncDirNoneSmall"));
-    case SO_EQUAL:
-        return GlobalResources::getInstance().getImageByName(wxT("equalSmall"));
-    case SO_UNRESOLVED_CONFLICT:
-        return GlobalResources::getInstance().getImageByName(wxT("conflictSmall"));
+        case SO_CREATE_NEW_LEFT:
+            return GlobalResources::instance().getImage(wxT("createLeftSmall"));
+        case SO_CREATE_NEW_RIGHT:
+            return GlobalResources::instance().getImage(wxT("createRightSmall"));
+        case SO_DELETE_LEFT:
+            return GlobalResources::instance().getImage(wxT("deleteLeftSmall"));
+        case SO_DELETE_RIGHT:
+            return GlobalResources::instance().getImage(wxT("deleteRightSmall"));
+        case SO_OVERWRITE_RIGHT:
+        case SO_COPY_METADATA_TO_RIGHT:
+            return GlobalResources::instance().getImage(wxT("syncDirRightSmall"));
+        case SO_OVERWRITE_LEFT:
+        case SO_COPY_METADATA_TO_LEFT:
+            return GlobalResources::instance().getImage(wxT("syncDirLeftSmall"));
+        case SO_DO_NOTHING:
+            return GlobalResources::instance().getImage(wxT("syncDirNoneSmall"));
+        case SO_EQUAL:
+            return GlobalResources::instance().getImage(wxT("equalSmall"));
+        case SO_UNRESOLVED_CONFLICT:
+            return GlobalResources::instance().getImage(wxT("conflictSmall"));
     }
 
     return wxNullBitmap; //dummy

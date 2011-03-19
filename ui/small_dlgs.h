@@ -29,8 +29,8 @@ void showAboutDialog();
 void showHelpDialog();
 
 DefaultReturnCode::Response showFilterDialog(bool isGlobalFilter,
-        Zstring& filterIncl,
-        Zstring& filterExcl);
+                                             Zstring& filterIncl,
+                                             Zstring& filterExcl);
 
 DefaultReturnCode::Response showDeleteDialog(
     const std::vector<FileSystemObject*>& rowsOnLeft,

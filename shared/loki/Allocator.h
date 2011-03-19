@@ -2,12 +2,12 @@
 // The Loki Library
 // Copyright (c) 2008 by Rich Sposato
 //
-// Permission to use, copy, modify, distribute and sell this software for any 
-//     purpose is hereby granted without fee, provided that the above copyright 
-//     notice appear in all copies and that both that copyright notice and this 
+// Permission to use, copy, modify, distribute and sell this software for any
+//     purpose is hereby granted without fee, provided that the above copyright
+//     notice appear in all copies and that both that copyright notice and this
 //     permission notice appear in supporting documentation.
-// The author makes no representations about the 
-//     suitability of this software for any purpose. It is provided "as is" 
+// The author makes no representations about the
+//     suitability of this software for any purpose. It is provided "as is"
 //     without express or implied warranty.
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -35,26 +35,26 @@ namespace Loki
  */
 template
 <
-    typename Type,
-    typename AllocT = Loki::AllocatorSingleton<>
->
+typename Type,
+         typename AllocT = Loki::AllocatorSingleton<>
+         >
 class LokiAllocator
 {
 public:
 
     typedef ::std::size_t size_type;
     typedef ::std::ptrdiff_t difference_type;
-    typedef Type * pointer;
-    typedef const Type * const_pointer;
-    typedef Type & reference;
-    typedef const Type & const_reference;
+    typedef Type* pointer;
+    typedef const Type* const_pointer;
+    typedef Type& reference;
+    typedef const Type& const_reference;
     typedef Type value_type;
 
     /// Default constructor does nothing.
     inline LokiAllocator( void ) throw() { }
 
     /// Copy constructor does nothing.
-    inline LokiAllocator( const LokiAllocator & ) throw() { }
+    inline LokiAllocator( const LokiAllocator& ) throw() { }
 
     /// Type converting allocator constructor does nothing.
     template < typename Type1 >
@@ -84,10 +84,10 @@ public:
      @param hint Place where caller thinks allocation should occur.
      @return Pointer to block of memory.
      */
-    pointer allocate( size_type count, const void * hint = 0 )
+    pointer allocate( size_type count, const void* hint = 0 )
     {
         (void)hint;  // Ignore the hint.
-        void * p = AllocT::Instance().Allocate( count * sizeof( Type ), true );
+        void* p = AllocT::Instance().Allocate( count * sizeof( Type ), true );
         return reinterpret_cast< pointer >( p );
     }
 
@@ -108,7 +108,7 @@ public:
     }
 
     /// Construct an element at the pointer.
-    void construct( pointer p, const Type & value )
+    void construct( pointer p, const Type& value )
     {
         // A call to global placement new forces a call to copy constructor.
         ::new( p ) Type( value );

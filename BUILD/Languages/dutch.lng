@@ -154,6 +154,10 @@
 <Symlink>
 <multiple selection>
 <veelvoudige selectie>
+A directory input field is empty.
+Een tekstveld over de map is leeg.
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+Een map wordt bewerkt die deel is van meerdere mappen! Controleer de synchronisatie instellingen!
 A newer version of FreeFileSync is available:
 Een nieuwe versie van FreeFileSync is beschikbaar:
 Abort requested: Waiting for current operation to finish...
@@ -370,6 +374,8 @@ Encoding extended time information: %x
 Coderen uitgebreide tijd informatie: %x
 Endless loop when traversing directory:
 Oneindige lus bij het nalopen van locatie:
+Equal files/folders that differ in attributes only
+Alleen gelijke bestanden/mappen die verschillen van attributen
 Error
 Fout
 Error changing modification time:
@@ -476,8 +482,6 @@ Files that exist on both sides, right one is newer
 Bestanden die aan beide kanten bestaan, maar waarvan de rechterkant nieuwer is
 Files that have different content
 Bestanden dat andere inhoud hebben
-Files/folders that differ in attributes only
-Alleen bestanden/mappen die anders zijn dan attributen
 Files/folders that exist on left side only
 Bestanden/mappen die alleen aan de linkerkant bestaan
 Files/folders that exist on right side only
@@ -488,8 +492,6 @@ Filter is active
 Filer is actief
 Filter settings have changed!
 Filter instellingen opgeslagen!
-Filter view
-Bekijk het filter
 Filter: All pairs
 Filter: Alle paren
 Filter: Single pair
@@ -506,6 +508,8 @@ Follow
 Volg
 Free disk space available:
 Beschikbare vrije schijfruimte :
+Free disk space required:
+Vrije ruimte op harde schrijf nodig:
 FreeFileSync Batch Job
 FreeFileSync batchjob
 FreeFileSync at Sourceforge
@@ -573,7 +577,7 @@ Identificeer en verwerk verandereringen aan beide kanten dmv een database. Versc
 Idle time between detection of last change and execution of command line in seconds
 Inactieve tijd tussen de detectie van de laatste verandering en het uitvoeren van een command in seconden
 If you like FFS
-Als het programma FreeFileSync u bevalt
+Als het FreeFileSync u bevalt
 Ignore
 Negeer
 Ignore errors
@@ -600,6 +604,8 @@ Integrate external applications into context menu. The following macros are avai
 Integreer externe applicaties in het context menu. De volgende macros zijn beschikbaar:
 Invalid FreeFileSync config file!
 FreeFileSync config bestand klopt niet!
+Last used configurations (press DEL to remove from list)
+Laatst gebruikte instellingen (druk op DEL om iets te verwijderen)
 Leave as unresolved conflict
 Beschouwen als onopgelost conflict
 Left
@@ -608,8 +614,6 @@ Legend
 Legenda
 Load configuration from file
 Laad configuratie uit bestand
-Load configuration history (press DEL to delete items)
-Laad configuratiegeschiedenis (druk op DEL om items te verwijderen)
 Log-messages:
 Logberichten:
 Logging
@@ -620,12 +624,16 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Schaduw kopieen op WOW64 worden niet ondersteund. Gebruik alstublieft de 64-bit versie van FreeFileSync.
 Match case
 Hoofdlettergevoelig
+Maximum number of logfiles:
+Maximale aantal van logbestanden:
+Memory allocation failed!
+RAM geheugen error!
 Minimum Idle Time [seconds]
 Minimale inactieve tijd [seconden]
 Mirror ->>
 Spiegelen ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Spiegel backup van de linkerkant: de rechterkant wordt overschreven en komt na synchronisatie exact overeen met de linkerkant.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+Spiegel backup van linker map. Rechter map is bewerk om precies hetzelfde te hebben na synchronisatie.
 Monitoring active...
 Observeren actief...
 More than 50% of the total number of files will be copied or deleted!
@@ -696,8 +704,6 @@ Published under the GNU General Public License:
 Gepubliceerd onder de GNU General Public License:
 Question
 Vraag
-Re-enable all hidden dialogs?
-Herstellen van alle verborgen dialogen?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Automatische Synchronisatie
 RealtimeSync configuration
@@ -718,6 +724,8 @@ Reset
 Reset
 Reset view
 Scherm resetten
+Restore all hidden dialogs?
+Alle verborgen dialogen herstellen?
 Right
 Rechts
 S&ave configuration...
@@ -740,6 +748,8 @@ Select logfile directory:
 Selecteer een map voor het logbestand:
 Select variant:
 Selecteer een variant:
+Select view
+Kies kijk
 Set direction:
 Selecteer map:
 Setting default synchronization directions: Old files will be overwritten with newer files.
@@ -828,8 +838,6 @@ Synchronize...
 Synchroniseer...
 Synchronizing...
 Aan het synchroniseren...
-System out of memory!
-Systeem heeft te weinig geheugen
 Target directory already existing!
 Doellocatie bestaal al!
 Target file already existing!
@@ -850,8 +858,6 @@ Time remaining:
 Benodigde tijd:
 Total amount of data that will be transferred
 Hoeveelheid data die verplaatst word
-Total required free disk space:
-Benodigde hoeveelheid vrije schijfruimte:
 Total time:
 Totale tijd:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -872,14 +878,14 @@ Use Recycle Bin
 Gebruik de prullenbak
 Use Recycle Bin when deleting or overwriting files
 Gebruik de prullenbak bij verwijderen of overschrijven van bestanden
-User-defined directory
-Door de gebruiker te definiëren locatie
 User-defined directory for deletion was not specified!
 Door de gebruiker te definiëren locatie voor verwijderen was niet opgegeven!
 Variant
 Variant
 Verifying file %x
 Verifiëren bestand %x
+Versioning
+Versieën
 Volume name %x not part of filename %y!
 Volume naam %x maakt niet deel uit van bestandsnaam %y!
 Waiting for missing directories...
@@ -888,14 +894,12 @@ Waiting while directory is locked (%x)...
 Wachten totdat map is beveiligd (%x)...
 Warning
 Attentie
-Warning: Synchronization failed for %x item(s):
-Let op: %x item(s) konden niet worden gesynchroniseerd: 
 When the comparison is started with this option set the following decision tree is processed:
 Wanneer met deze optie aan de vergelijking wordt gestart zal de volgende vergelijkingsboom worden gebruikt:
 You can ignore conflicts and continue synchronization.
 U kunt de conflicten negeren en doorgaan met synchroniseren.
-You can ignore the error to consider not existing directories as empty.
-U kunt de fout negeren om niet bestaande locaties als leeg te beschouwen.
+You can ignore this error to consider the directory as empty.
+Je kan deze error negeren als de map leeg is.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 U kunt proberen om de resterende bestanden opnieuw te synchroniseren (ZONDER opnieuw te hoeven vergelijken)!
 different

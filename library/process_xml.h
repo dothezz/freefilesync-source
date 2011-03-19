@@ -77,12 +77,16 @@ struct XmlGuiConfig
 
 struct XmlBatchConfig
 {
-    XmlBatchConfig() : silent(false), handleError(ON_ERROR_POPUP) {}
+    XmlBatchConfig() :
+        silent(false),
+        logFileCountMax(200),
+        handleError(ON_ERROR_POPUP) {}
 
     ffs3::MainConfiguration mainCfg;
 
     bool silent;
     wxString logFileDirectory;
+    size_t logFileCountMax;
     OnError handleError;       //reaction on error situation during synchronization
 };
 
@@ -114,7 +118,7 @@ wxString getGlobalConfigFile();
 
 struct XmlGlobalSettings
 {
-//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     //Shared (GUI/BATCH) settings
     XmlGlobalSettings() :
         programLanguage(retrieveSystemLanguage()),
@@ -132,7 +136,7 @@ struct XmlGlobalSettings
 
     OptionalDialogs optDialogs;
 
-//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     struct _Gui
     {
         _Gui() :
@@ -160,14 +164,14 @@ struct XmlGlobalSettings
             //default external apps will be translated "on the fly"!!!
 #ifdef FFS_WIN
             externelApplications.push_back(std::make_pair(wxT("Open with Explorer"), //mark for extraction: _("Open with Explorer")
-                                           wxT("explorer /select, \"%name\"")));
+                                                          wxT("explorer /select, \"%name\"")));
             externelApplications.push_back(std::make_pair(wxT("Open with default application"), //mark for extraction: _("Open with default application")
-                                           wxT("cmd /c start \"\" \"%name\"")));
+                                                          wxT("cmd /c start \"\" \"%name\"")));
 #elif defined FFS_LINUX
             externelApplications.push_back(std::make_pair(wxT("Browse directory"), //mark for extraction: _("Browse directory")
-                                           wxT("xdg-open \"%dir\"")));
+                                                          wxT("xdg-open \"%dir\"")));
             externelApplications.push_back(std::make_pair(wxT("Open with default application"), //mark for extraction: _("Open with default application")
-                                           wxT("xdg-open \"%name\"")));
+                                                          wxT("xdg-open \"%name\"")));
 #endif
         }
 
@@ -186,6 +190,7 @@ struct XmlGlobalSettings
         ExternalApps externelApplications;
 
         std::vector<wxString> cfgFileHistory;
+        wxString lastUsedConfigFile;
 
         std::vector<wxString> folderHistoryLeft;
         unsigned int folderHistLeftMax;
@@ -205,7 +210,7 @@ struct XmlGlobalSettings
         wxString guiPerspectiveLast; //used by wxAuiManager
     } gui;
 
-//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
     //struct _Batch
 };
 

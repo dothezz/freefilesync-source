@@ -168,7 +168,7 @@ wxString Statistics::getRemainingTime() const
             --windowBegin; //one point before window begin in order to handle "measurement holes"
 
         const TimeRecordMap::value_type& frontRecord = *windowBegin;
-//-----------------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------------
         const double timeDelta = backRecord.first       - frontRecord.first;
         const double dataDelta = backRecord.second.data - frontRecord.second.data;
 
@@ -194,7 +194,7 @@ wxString Statistics::getBytesPerSecond() const
             --windowBegin; //one point before window begin in order to handle "measurement holes"
 
         const TimeRecordMap::value_type& frontRecord = *windowBegin;
-//-----------------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------------
         const double timeDelta = backRecord.first       - frontRecord.first;
         const double dataDelta = backRecord.second.data - frontRecord.second.data;
 

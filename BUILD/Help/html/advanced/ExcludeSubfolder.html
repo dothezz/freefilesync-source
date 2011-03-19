@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20101114;14355300">
+	<META NAME="CHANGED" CONTENT="20110319;19021800">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -23,15 +23,29 @@
 	</STYLE>
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
-<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Exclude via
-filter</FONT></H3>
+<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Exclude files</FONT></H3>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Excluding
-files and directories woks by specifying a phrase that is compared
-against a file or directory path. Only if the file/directory matches
-at least one entry in the include list and none of the entries in the
-exclude list it passes filtering. The phrase is also a file or
-directory name, but it must be relative to the base sync-directory
-and may additionally include wildcards like '*' or '?'.</FONT></P>
+files and directories works by specifying a phrase that is compared
+against a file or directory path. Only if the file or directory
+matches at least one entry in the include list and none of the
+entries in the exclude list it passes filtering. The phrase is also a
+file or directory name, but it must be relative to the base
+sync-directory and may additionally include wild cards like '*' or
+'?'.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B>
+<SPAN STYLE="font-weight: normal">(Exclude all sub directories</SPAN><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">)</SPAN></FONT></FONT></P>
+<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+	<FONT FACE="Tahoma, sans-serif">Include: <FONT FACE="Courier New, monospace">*</FONT><BR>Exclude:
+	<FONT FACE="Courier New, monospace">*\</FONT></FONT></P>
+</SPAN><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">This
+will exclude all objects within the two directories that end with a
+'</FONT><FONT FACE="Courier New, monospace">\</FONT><FONT FACE="Tahoma, sans-serif">'
+character, which is interpreted as the end of a directory name.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B>
@@ -47,7 +61,7 @@ and may additionally include wildcards like '*' or '?'.</FONT></P>
 	<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Exclude
 	all </SPAN></FONT><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">*.tmp</SPAN></FONT>
 	<FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">files
-	beyond </SPAN></FONT><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">subfolder</SPAN></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">:<BR></SPAN></FONT>&nbsp;&nbsp;&nbsp;&nbsp;<FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Filter:
+	within </SPAN></FONT><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">subfolder</SPAN></FONT><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">:<BR></SPAN></FONT>&nbsp;&nbsp;&nbsp;&nbsp;<FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Filter:
 	</SPAN></FONT><FONT FACE="Courier New, monospace">\sample\subfolder\*.tmp</FONT></P>
 	<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Exclude
 	all files and folders named </SPAN></FONT><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">CVS</SPAN></FONT>
@@ -59,6 +73,10 @@ and may additionally include wildcards like '*' or '?'.</FONT></P>
 	<FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">as
 	part of their name:<BR></SPAN></FONT>&nbsp;&nbsp;&nbsp;&nbsp;<FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Filter:
 	</SPAN></FONT><FONT FACE="Courier New, monospace">*test*</FONT></P>
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Exclude
+	multiple entries; separate by semicolon or newlines:<BR></SPAN></FONT>&nbsp;&nbsp;&nbsp;&nbsp;<FONT FACE="Tahoma, sans-serif"><SPAN STYLE="font-weight: normal">Filter:
+	</SPAN></FONT><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">*.tmp;
+	*.doc; *.bak</SPAN></FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
@@ -77,26 +95,12 @@ and may additionally include wildcards like '*' or '?'.</FONT></P>
 </P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B>
-<SPAN STYLE="font-weight: normal">(Exclude all sub folders</SPAN><FONT FACE="Courier New, monospace"><SPAN STYLE="font-weight: normal">)</SPAN></FONT></FONT></P>
-<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
-	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
-	<FONT FACE="Tahoma, sans-serif">Include: <FONT FACE="Courier New, monospace">*</FONT><BR>Exclude:
-	<FONT FACE="Courier New, monospace">*\</FONT></FONT></P>
-</SPAN><BR CLEAR=LEFT><BR>
-</P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">This
-will exclude all objects within the two directories that end with a
-'</FONT><FONT FACE="Courier New, monospace">\</FONT><FONT FACE="Tahoma, sans-serif">'
-character, which is interpreted as the end of a directory name.</FONT></P>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
 <P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen4" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
 	<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
 	<FONT FACE="Tahoma, sans-serif"><B>Note:</B><BR>In most cases
 	manually specifying a filter phrase is not necessary! You can
-	exclude files, directories and even whole lists of both directly on
-	main grid via context menu.</FONT></P>
+	exclude files, directories and even complete lists of both directly
+	on main grid via context menu.</FONT></P>
 </SPAN><BR CLEAR=LEFT><BR>
 </P>
 </BODY>

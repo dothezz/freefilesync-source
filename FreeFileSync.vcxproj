@@ -273,6 +273,7 @@
     <ClCompile Include="shared\help_provider.cpp" />
     <ClCompile Include="shared\localization.cpp" />
     <ClCompile Include="shared\long_path_prefix.cpp" />
+    <ClCompile Include="shared\mouse_move_dlg.cpp" />
     <ClCompile Include="shared\privilege.cpp" />
     <ClCompile Include="shared\recycler.cpp" />
     <ClCompile Include="shared\serialize.cpp" />
@@ -297,7 +298,6 @@
     <ClCompile Include="ui\gui_status_handler.cpp" />
     <ClCompile Include="ui\main_dlg.cpp" />
     <ClCompile Include="ui\msg_popup.cpp" />
-    <ClCompile Include="ui\mouse_move_dlg.cpp" />
     <ClCompile Include="ui\progress_indicator.cpp" />
     <ClCompile Include="ui\search.cpp" />
     <ClCompile Include="ui\small_dlgs.cpp" />

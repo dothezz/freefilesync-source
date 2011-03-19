@@ -3,7 +3,7 @@
 %x / %y objects deleted successfully
 %X / %Y objektum sikeresen törölve
 %x Bytes
-
+%x bájt
 %x GB
 %x GB
 %x MB
@@ -154,6 +154,10 @@
 <Symlink>
 <multiple selection>
 <többszörös kijelölés>
+A directory input field is empty.
+Valamelyik mappa megadására szolgáló mező üres.
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+Egy olyan mappa kerül módosításra, amely tagja több mappa párosnak! Kérjük, nézd át a szinkronizációs beállításokat!
 A newer version of FreeFileSync is available:
 Elérhető a FreeFileSync egy újabb verziója:
 Abort requested: Waiting for current operation to finish...
@@ -257,9 +261,9 @@ Folytatás
 Conversion error:
 Konverziós hiba:
 Copy attributes only from left to right
-
+Attribútumok másolása kizárólag balról jobbra
 Copy attributes only from right to left
-
+Attribútumok másolása kizárólag jobbról balra
 Copy filesystem permissions
 Fájlrendszer jogosultságok másolása
 Copy from left to right
@@ -370,6 +374,8 @@ Encoding extended time information: %x
 Kibővített időinformációk kódolása: %x
 Endless loop when traversing directory:
 Végtelen hurok a mappák bejárásakor:
+Equal files/folders that differ in attributes only
+Egyforma fájlok/mappák, melyek csak attribútumaikban különböznek
 Error
 Hiba
 Error changing modification time:
@@ -476,8 +482,6 @@ Files that exist on both sides, right one is newer
 Mindkét oldalon létező fájlok, de a jobb oldali újabb
 Files that have different content
 Fájlok, amelyeknek különböző a tartalmuk:
-Files/folders that differ in attributes only
-
 Files/folders that exist on left side only
 Csak a bal oldalon létező fájlok/mappák
 Files/folders that exist on right side only
@@ -488,8 +492,6 @@ Filter is active
 A szűrő aktív
 Filter settings have changed!
 A szűrőbeállítások megváltoztak!
-Filter view
-Szűrő nézet
 Filter: All pairs
 Szűrő: Minden pár
 Filter: Single pair
@@ -501,11 +503,13 @@ Mit keresünk:
 Folder Comparison and Synchronization
 Mappa összehasonlítás és szinkronizáció
 Folder pairs
-
+Mappa párok
 Follow
 Követés
 Free disk space available:
 Szabad lemezterület:
+Free disk space required:
+Szükséges szabad lemezterület:
 FreeFileSync Batch Job
 FreeFileSync kötegelt feladat
 FreeFileSync at Sourceforge
@@ -600,6 +604,8 @@ Integrate external applications into context menu. The following macros are avai
 Külső alkalmazás integrálása a helyi menübe. Az elérhető makrók a következők:
 Invalid FreeFileSync config file!
 Érvénytelen a FreeFileSync beállításait tartalmazó fájl!
+Last used configurations (press DEL to remove from list)
+Utoljára használt beállítások (DEL billentyűvel törölhető a listából)
 Leave as unresolved conflict
 Feloldatlan ütközésként hagyni
 Left
@@ -608,24 +614,26 @@ Legend
 Előzmény
 Load configuration from file
 Beállítások betöltése fájlból
-Load configuration history (press DEL to delete items)
-Beállítások előzményeinek a betöltése (Nyomja meg a DEL gombot a törléshez)
 Log-messages:
 Naplóbejegyzések:
 Logging
 Naplózás
 Main bar
-
+Fő panel
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 A Shadow Copy a WOW64-en nem támogatott. Kérjük, használja a 64-bites FreeFileSync-et.
 Match case
 Kis-/nagybetű egyezés
+Maximum number of logfiles:
+Naplófájlok maximális száma:
+Memory allocation failed!
+Sikertelen memóriafoglalás!
 Minimum Idle Time [seconds]
-
+Minimális tétlenségi idő (másodpercek)
 Mirror ->>
 Tükrözés ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-A bal oldali mappa tükrözött másolata: A jobb oldali mappa felülíródik és pontosan megegyezik majd a bal oldalival a szinkronizálás után.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+A bal oldali mappa tükrözött másolata. A jobb oldali mappa úgy lesz megváltoztatva, hogy a szinkronizáció után pontosan megegyezzen a bal oldalival.
 Monitoring active...
 Figyelés aktív...
 More than 50% of the total number of files will be copied or deleted!
@@ -696,8 +704,6 @@ Published under the GNU General Public License:
 Kiadva a GNU General Public License alatt:
 Question
 Kérdés
-Re-enable all hidden dialogs?
-Engedélyezzük újra az összes rejtett párbeszédablakot?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Automatikus szinkronizálás
 RealtimeSync configuration
@@ -717,7 +723,9 @@ Fordítói hiba bejelentése
 Reset
 Helyreállítás
 Reset view
-
+Nézet visszaállítása
+Restore all hidden dialogs?
+Az összes rejtett párbeszédablakot visszaállítsuk?
 Right
 Jobb oldal
 S&ave configuration...
@@ -740,12 +748,14 @@ Select logfile directory:
 Naplófájl mappájának kiválasztása:
 Select variant:
 Változat kiválasztása:
+Select view
+Nézet kiválasztása
 Set direction:
 Irány
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Alapértelmezett szinkronizációs irányok beállítása: a régebbi fájlok felülíródnak az újabbakkal.
 Show \"%x\"
-
+\"%x\" mutatása
 Show conflicts
 Ütközések mutatása
 Show files that are different
@@ -828,8 +838,6 @@ Synchronize...
 Szinkronizálás
 Synchronizing...
 Szinkronizálás folyamatban...
-System out of memory!
-Nincs elég rendszermemória!
 Target directory already existing!
 A célmappa már létezik!
 Target file already existing!
@@ -850,8 +858,6 @@ Time remaining:
 Hátralévő idő:
 Total amount of data that will be transferred
 A mozgatandó adatok összmérete
-Total required free disk space:
-Összes igényelt szabad lemezterület:
 Total time:
 Becsült idő:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -865,37 +871,35 @@ Feloldatlan ütközések vannak!
 Update ->
 Frissítés ->
 Updating attributes of %x
-
+A(z) %x attribútumainak frissítése
 Usage:
 Használat:
 Use Recycle Bin
 Lomtár (Recycle Bin) használata
 Use Recycle Bin when deleting or overwriting files
 A Lomtár (Recycle Bin) használata fájlok törlésénél vagy felülírásánál
-User-defined directory
-Felhasználó által megadott mappa
 User-defined directory for deletion was not specified!
 A törléshez nem lett mappa megadva a felhasználó által!
 Variant
 Variáns
 Verifying file %x
 %x fájl ellenőrzése
+Versioning
+Verziókövetés
 Volume name %x not part of filename %y!
 A(z) %x kötetnevet nem tartalmazza a(z) %y fájlnév!
 Waiting for missing directories...
-
+Várakozás a hiányzó mappákra...
 Waiting while directory is locked (%x)...
 Várakozás a mappa zárolásának a feloldására (%x)...
 Warning
 Figyelem
-Warning: Synchronization failed for %x item(s):
-Figyelem: A következő %x elem szinkronizálása sikertelen:
 When the comparison is started with this option set the following decision tree is processed:
 Ha az összehasonlítás ezekkel a beállításokkal lesz elindítva, akkor a következő döntési fa érvényesül:
 You can ignore conflicts and continue synchronization.
 Figyelmen kívül hagyhatod az ütközéseket és folytathatod a szinkronizálást.
-You can ignore the error to consider not existing directories as empty.
-Figyelmen kívül hagyhatja a hibákat a nem létező mappákat üresnek tekintve.
+You can ignore this error to consider the directory as empty.
+Figyelmen kívül hagyhatod ezt a hibát, üresnek tekintve a mappát.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Meg lehet próbálni újra a megmaradt elemek szinkronizálását (az összehasonlítás újbóli elvégzése NÉLKÜL)!
 different

@@ -22,7 +22,8 @@ class BatchStatusHandler : public StatusHandler
 public:
     BatchStatusHandler(bool runSilent, //defines: -start minimized and -quit immediately when finished
                        const wxString& jobName,
-                       const wxString* logfileDirectory, //optional: enable logging if available
+                       const wxString* logfileDirectory, //non-empty if logging shall be active
+                       size_t logFileMaxCount,
                        const xmlAccess::OnError handleError,
                        const ffs3::SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
                        int& returnVal);
@@ -33,7 +34,6 @@ public:
     virtual void reportInfo(const Zstring& text);
     virtual void forceUiRefresh();
 
-    void logInfo(const wxString& infoMessage);
     virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
     virtual ErrorHandler::Response reportError(const wxString& errorMessage);
     virtual void reportFatalError(const wxString& errorMessage);

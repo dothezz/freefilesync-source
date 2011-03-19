@@ -18,22 +18,43 @@ bool dst::isFatDrive(const Zstring& fileName) //throw()
     const size_t BUFFER_SIZE = MAX_PATH + 1;
     wchar_t buffer[BUFFER_SIZE];
 
-//this call is expensive: ~1.5 ms!
-//    if (!::GetVolumePathName(applyLongPathPrefix(fileName).c_str(), //__in   LPCTSTR lpszFileName,
-//                             buffer,                                     //__out  LPTSTR lpszVolumePathName,
-//                             BUFFER_SIZE))                               //__in   DWORD cchBufferLength
-// ...
-//    Zstring volumePath = buffer;
-//    if (!volumePath.EndsWith(common::FILE_NAME_SEPARATOR)) //a trailing backslash is required
-//        volumePath += common::FILE_NAME_SEPARATOR;
+    //this call is expensive: ~1.5 ms!
+    //    if (!::GetVolumePathName(applyLongPathPrefix(fileName).c_str(), //__in   LPCTSTR lpszFileName,
+    //                             buffer,                                     //__out  LPTSTR lpszVolumePathName,
+    //                             BUFFER_SIZE))                               //__in   DWORD cchBufferLength
+    // ...
+    //    Zstring volumePath = buffer;
+    //    if (!volumePath.EndsWith(common::FILE_NAME_SEPARATOR)) //a trailing backslash is required
+    //        volumePath += common::FILE_NAME_SEPARATOR;
 
     //fast ::GetVolumePathName() clone: let's hope it's not too simple (doesn't honor mount points)
-    const Zstring nameFmt = removeLongPathPrefix(fileName); //throw()
-    const size_t pos = nameFmt.find(Zstr(":\\"));
-    if (pos != 1) //expect single letter volume
-        return false;
-    const Zstring volumePath(nameFmt.c_str(), 3);
+    Zstring volumePath;
+    {
+        Zstring nameFmt = removeLongPathPrefix(fileName); //throw()
+        if (!nameFmt.EndsWith(Zstr("\\")))
+            nameFmt += Zstr("\\"); //GetVolumeInformation expects trailing backslash
 
+        if (nameFmt.StartsWith(Zstr("\\\\"))) //UNC path: "\\ComputerName\SharedFolder\"
+        {
+            size_t nameSize = nameFmt.size();
+            const size_t posFirstSlash = nameFmt.find(Zstr("\\"), 2);
+            if (posFirstSlash != Zstring::npos)
+            {
+                nameSize = posFirstSlash + 1;
+                const size_t posSecondSlash = nameFmt.find(Zstr("\\"), posFirstSlash + 1);
+                if (posSecondSlash != Zstring::npos)
+                    nameSize = posSecondSlash + 1;
+            }
+            volumePath = Zstring(nameFmt.c_str(), nameSize); //include trailing backslash!
+        }
+        else //local path: "C:\Folder\"
+        {
+            const size_t pos = nameFmt.find(Zstr(":\\"));
+            if (pos != 1) //expect single letter volume
+                return false;
+            volumePath = Zstring(nameFmt.c_str(), 3);
+        }
+    }
     //suprisingly fast: ca. 0.03 ms per call!
     if (!::GetVolumeInformation(volumePath.c_str(), //__in_opt   LPCTSTR lpRootPathName,
                                 NULL,               //__out      LPTSTR lpVolumeNameBuffer,
@@ -62,8 +83,8 @@ FILETIME utcToLocal(const FILETIME& utcTime) //throw (std::runtime_error)
     //treat binary local time representation (which is invariant under DST time zone shift) as logical UTC:
     FILETIME localTime = {};
     if (!::FileTimeToLocalFileTime(
-                &utcTime,    //__in   const FILETIME *lpFileTime,
-                &localTime)) //__out  LPFILETIME lpLocalFileTime
+            &utcTime,    //__in   const FILETIME *lpFileTime,
+            &localTime)) //__out  LPFILETIME lpLocalFileTime
     {
         const wxString errorMessage = wxString(_("Conversion error:")) + wxT(" FILETIME -> local FILETIME: ") +
                                       wxT("(") + wxULongLong(utcTime.dwHighDateTime, utcTime.dwLowDateTime).ToString() + wxT(") ") + wxT("\n\n") + ffs3::getLastErrorFormatted();
@@ -78,8 +99,8 @@ FILETIME localToUtc(const FILETIME& localTime) //throw (std::runtime_error)
     //treat binary local time representation (which is invariant under DST time zone shift) as logical UTC:
     FILETIME utcTime = {};
     if (!::LocalFileTimeToFileTime(
-                &localTime, //__in   const FILETIME *lpLocalFileTime,
-                &utcTime))  //__out  LPFILETIME lpFileTime
+            &localTime, //__in   const FILETIME *lpLocalFileTime,
+            &utcTime))  //__out  LPFILETIME lpFileTime
     {
         const wxString errorMessage = wxString(_("Conversion error:")) + wxT(" local FILETIME -> FILETIME: ") +
                                       wxT("(") + wxULongLong(localTime.dwHighDateTime, localTime.dwLowDateTime).ToString() + wxT(") ") + wxT("\n\n") + ffs3::getLastErrorFormatted();
@@ -224,7 +245,7 @@ std::bitset<UTC_LOCAL_OFFSET_BITS> getUtcLocalShift()
     const int absValue = common::abs(timeShiftQuarter); //MSVC C++0x bug: std::bitset<>(unsigned long) is ambiguous
 
     if (std::bitset<UTC_LOCAL_OFFSET_BITS - 1>(absValue).to_ulong() != static_cast<unsigned long>(absValue) || //time shifts that big shouldn't be possible!
-            timeShiftSec % (60 * 15) != 0) //all known time shift have at least 15 minute granularity!
+        timeShiftSec % (60 * 15) != 0) //all known time shift have at least 15 minute granularity!
     {
         const wxString errorMessage = wxString(_("Conversion error:")) + wxT(" Unexpected UTC <-> local time shift: ") +
                                       wxT("(") + wxLongLong(timeShiftSec).ToString() + wxT(") ") + wxT("\n\n") + ffs3::getLastErrorFormatted();
@@ -254,8 +275,8 @@ int convertUtcLocalShift(std::bitset<UTC_LOCAL_OFFSET_BITS> rawShift)
 
 bool dst::fatHasUtcEncoded(const RawTime& rawTime) //"createTimeRaw" as retrieved by ::FindFirstFile() and ::GetFileAttributesEx(); throw (std::runtime_error)
 {
-    if (    cmpFileTime(rawTime.createTimeRaw, FAT_MIN_TIME) < 0 ||
-            cmpFileTime(FAT_MAX_TIME, rawTime.createTimeRaw) < 0)
+    if (cmpFileTime(rawTime.createTimeRaw, FAT_MIN_TIME) < 0 ||
+        cmpFileTime(FAT_MAX_TIME, rawTime.createTimeRaw) < 0)
     {
         assert(false); //shouldn't be possible according to FAT specification
         return false;

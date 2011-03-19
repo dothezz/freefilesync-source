@@ -225,7 +225,7 @@ public:
     Zbase(const Zbase& source);
     ~Zbase();
 
-    operator const T*() const; //implicit conversion to C-string
+    operator const T* () const; //implicit conversion to C-string
 
     //STL accessors
     const T* begin() const;
@@ -417,7 +417,7 @@ Zbase<T, SP, AP>::~Zbase()
 
 template <class T, template <class, class> class SP, class AP>
 inline
-Zbase<T, SP, AP>::operator const T*() const
+Zbase<T, SP, AP>::operator const T* () const
 {
     return rawStr;
 }

@@ -23,7 +23,7 @@ wxString getDecimalPoint();
 
 struct LocInfoLine
 {
-    int languageID;
+    wxLanguage languageID;
     wxString languageName;
     wxString languageFile;
     wxString translatorName;
@@ -63,7 +63,7 @@ private:
     ~CustomLocale(); //non-inline destructor for std::auto_ptr to work with forward declaration -> superfluous in this case: singleton pattern!
 
     std::auto_ptr<Translation> translationDB; //careful with forward-declarations and auto_ptr! save in this case, 'cause full class info available
-    int currentLanguage;
+    wxLanguage currentLanguage;
 };
 }
 

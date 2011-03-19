@@ -172,36 +172,36 @@ void TrayIconHolder::OnContextMenuSelection(wxCommandEvent& event)
     const int eventId = event.GetId();
     switch (static_cast<Selection>(eventId))
     {
-    case CONTEXT_ABORT:
-        requestAbort();
-        break;
-    case CONTEXT_RESTORE:
-        OnRequestResume(event); //just remember: never throw exceptions through a C-Layer (GUI) ;)
-        break;
-    case CONTEXT_ABOUT:
-    {
-        //build information
-        wxString build = __TDATE__;
+        case CONTEXT_ABORT:
+            requestAbort();
+            break;
+        case CONTEXT_RESTORE:
+            OnRequestResume(event); //just remember: never throw exceptions through a C-Layer (GUI) ;)
+            break;
+        case CONTEXT_ABOUT:
+        {
+            //build information
+            wxString build = __TDATE__;
 #if wxUSE_UNICODE
-        build += wxT(" - Unicode");
+            build += wxT(" - Unicode");
 #else
-        build += wxT(" - ANSI");
+            build += wxT(" - ANSI");
 #endif //wxUSE_UNICODE
 
-        //compile time info about 32/64-bit build
-        if (util::is64BitBuild)
-            build += wxT(" x64");
-        else
-            build += wxT(" x86");
-        assert_static(util::is32BitBuild || util::is64BitBuild);
+            //compile time info about 32/64-bit build
+            if (util::is64BitBuild)
+                build += wxT(" x64");
+            else
+                build += wxT(" x86");
+            assert_static(util::is32BitBuild || util::is64BitBuild);
 
-        wxString buildFormatted = _("(Build: %x)");
-        buildFormatted.Replace(wxT("%x"), build);
+            wxString buildFormatted = _("(Build: %x)");
+            buildFormatted.Replace(wxT("%x"), build);
 
-        wxMessageDialog aboutDlg(NULL, wxString(wxT("RealtimeSync")) + wxT("\n\n") + buildFormatted, _("About"), wxOK);
-        aboutDlg.ShowModal();
-    }
-    break;
+            wxMessageDialog aboutDlg(NULL, wxString(wxT("RealtimeSync")) + wxT("\n\n") + buildFormatted, _("About"), wxOK);
+            aboutDlg.ShowModal();
+        }
+        break;
     }
 }
 
@@ -322,14 +322,14 @@ rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& 
                     //wait for changes (and for all directories to become available)
                     switch (waitForChanges(dirList, &callback))
                     {
-                    case CHANGE_DIR_MISSING: //don't execute the commandline before all directories are available!
-                        callback.scheduleNextSync(std::numeric_limits<long>::max()); //next sync not scheduled (yet)
-                        callback.notifyDirectoryMissing();
-                        waitForMissingDirs(dirList, &callback);
-                        callback.notifyAllDirectoriesExist();
-                        break;
-                    case CHANGE_DETECTED:
-                        break;
+                        case CHANGE_DIR_MISSING: //don't execute the commandline before all directories are available!
+                            callback.scheduleNextSync(std::numeric_limits<long>::max()); //next sync not scheduled (yet)
+                            callback.notifyDirectoryMissing();
+                            waitForMissingDirs(dirList, &callback);
+                            callback.notifyAllDirectoriesExist();
+                            break;
+                        case CHANGE_DETECTED:
+                            break;
                     }
 
                     callback.scheduleNextSync(wxGetLocalTime() + static_cast<long>(config.delay));

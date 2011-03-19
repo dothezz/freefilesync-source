@@ -2,6 +2,26 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.14
+---------------
+New keyboard shortcuts: F5: compare F6: synchronize
+Skip to next folder pair if fatal error occured (instead of abort)
+Reload last selected configuration on startup
+Abort with error when copying to empty directory field
+Full log information after comparison (including file transfer)
+Check read access for source file before overwriting target
+Fixed possible application crash after comparison
+Fixed possible network freeze when comparing
+Maximum number of logfiles can be specified
+Don't condense whitespace when loading XML configuration
+RealtimeSync: Put executable name in quotes when parsing *.ffs_batch file
+Large program icons - 256 x 256
+Handle daylight saving time(DST) on FAT network shares
+Skip DST handling if drive does not support accurate file times
+Many small GUI/usability fixes
+Added Korean translation
+
+
 Changelog v3.13
 ---------------
 Implemented Advanced User Interface to allow user specified layout customizations

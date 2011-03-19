@@ -3,7 +3,7 @@
 %x / %y objects deleted successfully
 %x / %y oggetti cancellati con successo
 %x Bytes
-
+%x Bytes
 %x GB
 %x GB
 %x MB
@@ -154,6 +154,10 @@
 <Symlink>
 <multiple selection>
 <selezione multipla>
+A directory input field is empty.
+Un campo directory di input è vuoto.
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+Una directory che fa parte di più coppie di cartelle sarà modificata! Ricontrolla le impostazioni di sincronizzazione!
 A newer version of FreeFileSync is available:
 E' disponibile una nuova versione di FreeFileSync:
 Abort requested: Waiting for current operation to finish...
@@ -257,9 +261,9 @@ Continua
 Conversion error:
 Errore di conversione:
 Copy attributes only from left to right
-
+Copia attributi solo da sinistra a destra
 Copy attributes only from right to left
-
+Copia attributi solo da destra a sinistra
 Copy filesystem permissions
 Copia permessi del filesystem
 Copy from left to right
@@ -370,6 +374,8 @@ Encoding extended time information: %x
 Codifica estesa informazioni orario: %x
 Endless loop when traversing directory:
 Loop senza fine attraverso le directory:
+Equal files/folders that differ in attributes only
+Considera uguali file/cartelle che differiscono solo per gli attributi
 Error
 Errore
 Error changing modification time:
@@ -476,8 +482,6 @@ Files that exist on both sides, right one is newer
 Files esistenti su entrambi i lati, più recenti a destra
 Files that have different content
 Files con contenuto differente
-Files/folders that differ in attributes only
-
 Files/folders that exist on left side only
 Files/cartelle esistenti solo a sinistra
 Files/folders that exist on right side only
@@ -488,8 +492,6 @@ Filter is active
 Il filtro e' attivo
 Filter settings have changed!
 Le impostazioni del filtro sono cambiate!
-Filter view
-Filtro della vista
 Filter: All pairs
 Filtro: Tutte le coppie
 Filter: Single pair
@@ -501,11 +503,13 @@ Trova cosa:
 Folder Comparison and Synchronization
 Comparazione di Cartelle e Sincronizzazione
 Folder pairs
-
+Coppia di cartelle
 Follow
 Segui
 Free disk space available:
 Spazio libero su disco disponibile:
+Free disk space required:
+Spazio libero su disco richiesto:
 FreeFileSync Batch Job
 FreeFileSync Batch Job
 FreeFileSync at Sourceforge
@@ -600,6 +604,8 @@ Integrate external applications into context menu. The following macros are avai
 Integra applicazioni esterne nel menu contestuale. Sono disponibili le seguenti macro:
 Invalid FreeFileSync config file!
 File di configurazione FreeFileSync non valido!
+Last used configurations (press DEL to remove from list)
+Ultima configurazione utilizzata (premi DEL per rimuovere dalla lista)
 Leave as unresolved conflict
 Lascia come conflitti irrisolti
 Left
@@ -608,24 +614,26 @@ Legend
 Legenda
 Load configuration from file
 Carica configurazione da file
-Load configuration history (press DEL to delete items)
-Carica la cronologia delle configurazioni (premi DEL per eliminare elementi)
 Log-messages:
 Log-messages:
 Logging
 Logging
 Main bar
-
+Barra principale
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 La creazione di copie shadow su WOW64 non e' supportata. Utilizzare FreeFileSync in versione 64-bit.
 Match case
 Corrispondenza
+Maximum number of logfiles:
+Numero massimo di logfiles:
+Memory allocation failed!
+Allocazione di memoria fallita!
 Minimum Idle Time [seconds]
-
+Tempo minimo di attesa [seconds]
 Mirror ->>
 Mirror ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Mirror backup della cartella di sinistra: La cartella di destra sarà sovrascritta e resa identica alla cartella di sinistra dopo la sincronizzazione.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+Mirror backup della cartella di sinistra. La cartella destra verrà modificata per corrispondere esattamente alla cartella di sinistra dopo la sincronizzazione.
 Monitoring active...
 Monitoraggio attivo...
 More than 50% of the total number of files will be copied or deleted!
@@ -696,8 +704,6 @@ Published under the GNU General Public License:
 Pubblicato sotto licenza GNU General Public:
 Question
 Domanda
-Re-enable all hidden dialogs?
-Ripristinare tutti i messaggi nascosti?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Sincronizzazione Automatizzata
 RealtimeSync configuration
@@ -717,7 +723,9 @@ Segnala errori di traduzione
 Reset
 Reset
 Reset view
-
+Resetta vista
+Restore all hidden dialogs?
+Ripristinare tutti i dialoghi nascosti?
 Right
 Destra
 S&ave configuration...
@@ -740,12 +748,14 @@ Select logfile directory:
 Seleziona cartella per il file di log:
 Select variant:
 Selezionare una variante:
+Select view
+Seleziona vista
 Set direction:
 Imposta direzione:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Imposta direzioni di sincronizzazione di default: I vecchi file saranno sovrascritti dai nuovi.
 Show \"%x\"
-
+Mostra \"%x\"
 Show conflicts
 Mostra conflitti
 Show files that are different
@@ -828,8 +838,6 @@ Synchronize...
 Sincronizza...
 Synchronizing...
 Sincronizzazione in corso...
-System out of memory!
-Memoria di sistema esaurita!
 Target directory already existing!
 Directory di destinazione già esistente!
 Target file already existing!
@@ -850,8 +858,6 @@ Time remaining:
 Tempo rimanente:
 Total amount of data that will be transferred
 Volume dei dati che verranno trasferiti
-Total required free disk space:
-Spazio libero su disco richiesto:
 Total time:
 Tempo totale:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -865,37 +871,35 @@ Sono presenti conflitti irrisolti!
 Update ->
 Aggiorna ->
 Updating attributes of %x
-
+Aggiornamento attributi di %x
 Usage:
 Uso:
 Use Recycle Bin
 Usa il Cestino
 Use Recycle Bin when deleting or overwriting files
 Usa il Cestino quando si cancella o sovrascrive un file
-User-defined directory
-Directory personalizzata
 User-defined directory for deletion was not specified!
 Directory personalizzata per la cancellazione non specificata!
 Variant
 Variante
 Verifying file %x
 Verifica di file %x
+Versioning
+Versioning
 Volume name %x not part of filename %y!
 Il nome volume %x non è parte del nome file %y!
 Waiting for missing directories...
-
+In attesa delle directory mancanti...
 Waiting while directory is locked (%x)...
 Attendi mentre la directory è bloccata (%x)...
 Warning
 Attenzione
-Warning: Synchronization failed for %x item(s):
-Attenzione: Sincronizzazione fallita per %x elementi:
 When the comparison is started with this option set the following decision tree is processed:
 Quando questo set di opzioni viene selezionato per la comparazione viene processato il seguente albero di decisioni:
 You can ignore conflicts and continue synchronization.
 Puoi ignorare i conflitti e continuare la sincronizzazione.
-You can ignore the error to consider not existing directories as empty.
-Puoi ignorare l'errore per considerare directory inesistenti come vuote.
+You can ignore this error to consider the directory as empty.
+Puoi ignorare questo errore per considerare la directory come vuota.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Puoi provare a sincronizzare di nuovo gli elementi restanti (SENZA doverli ri-comparare) !
 different

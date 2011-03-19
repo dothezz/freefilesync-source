@@ -57,7 +57,6 @@ private:
     size_t rowsTotal;
 };
 
-bool synchronizationNeeded(const FolderComparison& folderCmp);
 
 class SynchronizeFolderPair;
 

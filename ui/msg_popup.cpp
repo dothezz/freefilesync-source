@@ -6,7 +6,7 @@
 //
 #include "msg_popup.h"
 #include "../library/resources.h"
-#include "mouse_move_dlg.h"
+#include "../shared/mouse_move_dlg.h"
 
 
 ErrorDlg::ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxString messageText, bool& ignoreNextErrors) :
@@ -18,7 +18,7 @@ ErrorDlg::ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxStri
                               this, m_bitmap10); //ownership passed to "this"
 #endif
 
-    m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("error")));
+    m_bitmap10->SetBitmap(GlobalResources::instance().getImage(wxT("error")));
     m_textCtrl8->SetValue(messageText);
     m_checkBoxIgnoreErrors->SetValue(ignoreNextErrors);
 
@@ -82,7 +82,7 @@ WarningDlg::WarningDlg(wxWindow* parentWindow,  int activeButtons, const wxStrin
                               this, m_bitmap10); //ownership passed to "this"
 #endif
 
-    m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("warning")));
+    m_bitmap10->SetBitmap(GlobalResources::instance().getImage(wxT("warning")));
     m_textCtrl8->SetValue(messageText);
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
 
@@ -144,7 +144,7 @@ QuestionDlg::QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxStri
                               this, m_bitmap10); //ownership passed to "this"
 #endif
 
-    m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("question")));
+    m_bitmap10->SetBitmap(GlobalResources::instance().getImage(wxT("question")));
     m_textCtrl8->SetValue(messageText);
     if (dontShowAgain)
         m_checkBoxDontAskAgain->SetValue(*dontShowAgain);

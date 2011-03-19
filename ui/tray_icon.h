@@ -14,7 +14,7 @@
 class MinimizeToTray : private wxEvtHandler
 {
 public:
-    MinimizeToTray(wxTopLevelWindow* callerWnd, wxWindow* secondWnd = NULL); //ensure callerWind has longer lifetime!
+    MinimizeToTray(wxTopLevelWindow* callerWnd, wxTopLevelWindow* secondWnd = NULL); //ensure both windows have longer lifetime than this instance!
     ~MinimizeToTray(); //show windows again
 
     void setToolTip(const wxString& toolTipText, size_t percent = 0); //percent (optional), number between [0, 100], for small progress indicator
@@ -26,7 +26,7 @@ private:
     void resumeFromTray();
 
     wxTopLevelWindow* callerWnd_;
-    wxWindow* secondWnd_;
+    wxTopLevelWindow* secondWnd_;
     class TaskBarImpl;
     TaskBarImpl* trayIcon; //actual tray icon (don't use inheritance to enable delayed deletion)
 };

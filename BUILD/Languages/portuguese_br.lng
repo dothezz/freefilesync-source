@@ -154,6 +154,10 @@ C&riar um arquivo batch...
 <Link Simbólico>
 <multiple selection>
 <seleção múltipla>
+A directory input field is empty.
+Um campo de entrada de diretório está vazio.
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+Um diretório será modificado o qual é parte de múltiplos pares de pastas! Por favor revise suas configurações de sincronização!
 A newer version of FreeFileSync is available:
 Uma nova versão do FreeFileSync foi encontrada:
 Abort requested: Waiting for current operation to finish...
@@ -202,6 +206,8 @@ Cannot determine sync-direction:
 Não foi possível determinar a direção de sincronização:
 Cannot find %x
 Não foi possível encontrar %x
+Cannot write to empty directory path!
+
 Category
 Categoria
 Clear filter settings
@@ -370,6 +376,8 @@ Encoding extended time information: %x
 Codificando informações adicionais de tempo: %x
 Endless loop when traversing directory:
 Loop infinito quando percorrendo diretório:
+Equal files/folders that differ in attributes only
+Arquivos/pastas iguais que diferem apenas nos atributos
 Error
 Erro
 Error changing modification time:
@@ -476,8 +484,6 @@ Files that exist on both sides, right one is newer
 Arquivos que existem nos dois lados, sendo à direita mais recentes
 Files that have different content
 Arquivos que possuem conteúdo diferente
-Files/folders that differ in attributes only
-Arquivos/pastas que diferem somente em atributos
 Files/folders that exist on left side only
 Arquivos/pastas que existem somente à esquerda
 Files/folders that exist on right side only
@@ -488,8 +494,6 @@ Filter is active
 Filtro está ativo
 Filter settings have changed!
 As configurações do filtro foram alteradas!
-Filter view
-Filtrar visualização
 Filter: All pairs
 Filtro: Todos os pares
 Filter: Single pair
@@ -506,6 +510,8 @@ Follow
 Seguir
 Free disk space available:
 Espaço livre em disco:
+Free disk space required:
+Espaço livre em disco requerido:
 FreeFileSync Batch Job
 FreeFileSync Arquivo batch
 FreeFileSync at Sourceforge
@@ -600,6 +606,8 @@ Integrate external applications into context menu. The following macros are avai
 Integrar aplicações externas no menu de contexto. As seguintes macros estão disponíveis:
 Invalid FreeFileSync config file!
 Arquivo de configuração do FreeFileSync inválido!
+Last used configurations (press DEL to remove from list)
+Últimas configurações usadas (pressione DEL para remover da lista)
 Leave as unresolved conflict
 Deixar como conflito não resolvido
 Left
@@ -608,8 +616,6 @@ Legend
 Legenda
 Load configuration from file
 Carregar configuração do arquivo
-Load configuration history (press DEL to delete items)
-Carregar histórico de configuração (pressione DEL para apagar itens)
 Log-messages:
 Log de mensagens:
 Logging
@@ -620,12 +626,16 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Cópias de sombra no WOW64 não são suportadas. Por favor use a versão 64-bits do FreeFileSync.
 Match case
 Diferenciar maiúsculas e minúsculas
+Maximum number of logfiles:
+Número máximo de arquivos de log:
+Memory allocation failed!
+Alocação de memória falhou!
 Minimum Idle Time [seconds]
 Mínimo Tempo Ocioso [segundos]
 Mirror ->>
 Espelhar ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Espelhar pasta da esquerda: A pasta da direita vai ser substituída por uma cópia exata da pasta da esquerda após a sincronização.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+Backup espelho da pasta da esquerda. A pasta da direita será modificada para ficar exatamente igual à pasta da esquerda após a sincronização.
 Monitoring active...
 Monitoramento ativo...
 More than 50% of the total number of files will be copied or deleted!
@@ -696,8 +706,6 @@ Published under the GNU General Public License:
 Publicado sobre a GNU General Public License:
 Question
 Questão
-Re-enable all hidden dialogs?
-Reabilitar todos os diálogos ocultos?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Sincronização Automátizada
 RealtimeSync configuration
@@ -718,6 +726,8 @@ Reset
 Restaurar
 Reset view
 Restaurar visualização
+Restore all hidden dialogs?
+Restaurar todos os diálogos ocultados?
 Right
 Direita
 S&ave configuration...
@@ -740,6 +750,8 @@ Select logfile directory:
 Escolha um diretório para salvar o arquivo log:
 Select variant:
 Selecione um modo:
+Select view
+Selecionar visualização
 Set direction:
 Configurar direção
 Setting default synchronization directions: Old files will be overwritten with newer files.
@@ -828,8 +840,6 @@ Synchronize...
 Sincronizar...
 Synchronizing...
 Sincronizando...
-System out of memory!
-Sistema sem memória!
 Target directory already existing!
 Diretório de destino já existe!
 Target file already existing!
@@ -850,8 +860,6 @@ Time remaining:
 Tempo restante:
 Total amount of data that will be transferred
 Volume de dados que será transferido
-Total required free disk space:
-Espaço livre total requerido:
 Total time:
 Tempo total:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -872,14 +880,14 @@ Use Recycle Bin
 Utilizar Lixeira
 Use Recycle Bin when deleting or overwriting files
 Usar a Lixeira quando apagar ou substituir arquivos
-User-defined directory
-Diretório especificado
 User-defined directory for deletion was not specified!
 Diretório especificado para arquivos apagados não foi definido!
 Variant
 Modo
 Verifying file %x
 Verificando arquivo %x
+Versioning
+Controle de versões
 Volume name %x not part of filename %y!
 Nome do volume %x não é parte do arquivo %y!
 Waiting for missing directories...
@@ -888,14 +896,12 @@ Waiting while directory is locked (%x)...
 Esperando enquanto o diretório é travado (%x)...
 Warning
 Atenção
-Warning: Synchronization failed for %x item(s):
-Atenção: A sincronização falhou para %x item(s):
 When the comparison is started with this option set the following decision tree is processed:
 Quando a comparação é iniciada com esta opção, a seguinte árvore de decisão é processada:
 You can ignore conflicts and continue synchronization.
 Você pode ignorar os conflitos e continuar a sincronização.
-You can ignore the error to consider not existing directories as empty.
-Você pode ignorar o erro para considerar diretórios não existente como vazios.
+You can ignore this error to consider the directory as empty.
+Você pode ignorar esse erro para considerar o diretório como vazio.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Você pode tentar sincronizar os elementos restantes outra vez (SEM ter que comparar novamente)!
 different

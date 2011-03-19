@@ -154,8 +154,12 @@ soubor: 1
 <Symlink>
 <multiple selection>
 <vícenásobný výběr>
+A directory input field is empty.
+Není zadán vstupní adresář.
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+Bude změně adresář, který je součástí adresářového páru vícenásobného porovnání! Prosím zkontrolujte si nastavení synchronizace!
 A newer version of FreeFileSync is available:
-je dostupná novější verze FreeFileSync:
+Je dostupná novější verze FreeFileSync:
 Abort requested: Waiting for current operation to finish...
 Požadavek na přerušení: Čekání na ukončení aktuální operace...
 Abort synchronization immediately
@@ -370,6 +374,8 @@ Encoding extended time information: %x
 Zpracování rozšířené informace o čase: %x
 Endless loop when traversing directory:
 Zacyklení při procházení adresáře:
+Equal files/folders that differ in attributes only
+Stejné soubory/adresáře, které se liší pouze ve vlastnostech
 Error
 Chyba
 Error changing modification time:
@@ -476,8 +482,6 @@ Files that exist on both sides, right one is newer
 Soubory, které existují na obou stranách, z nichž vpravo je novější
 Files that have different content
 Soubory, které mají rozdílný obsah
-Files/folders that differ in attributes only
-Soubory, ketré se liší pouze ve vlastnostech
 Files/folders that exist on left side only
 Soubory/adresáře, které existují pouze vlevo
 Files/folders that exist on right side only
@@ -488,8 +492,6 @@ Filter is active
 Filtr je zapnutý
 Filter settings have changed!
 Nastavení filtru bylo změněno!
-Filter view
-Filtrovat seznam
 Filter: All pairs
 Filtr: Všechny páry
 Filter: Single pair
@@ -506,6 +508,8 @@ Follow
 Použít cíl
 Free disk space available:
 Volné místo k dispozici:
+Free disk space required:
+Požadované volné místo na disku:
 FreeFileSync Batch Job
 FreeFileSync Dávkové zpracování
 FreeFileSync at Sourceforge
@@ -600,6 +604,8 @@ Integrate external applications into context menu. The following macros are avai
 Integrace externí aplikace do kontextového menu. K dispozici jsou následující makra:
 Invalid FreeFileSync config file!
 Chybný konfigurační soubor FreeFileSync!
+Last used configurations (press DEL to remove from list)
+Posledně použité konfigurace (pomocí DEL můžete položku smazat)
 Leave as unresolved conflict
 Ponechat jako nevyřešený konflikt
 Left
@@ -608,8 +614,6 @@ Legend
 Legenda
 Load configuration from file
 Načíst konfiguraci ze souboru
-Load configuration history (press DEL to delete items)
-Načíst historii konfigurace (pomocí DEL můžete položku smazat)
 Log-messages:
 Záznamy:
 Logging
@@ -620,12 +624,16 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Vytváření stínových kopií na WOW64 není podporováno. Prosím použijte 64 bitovou verzi FreeFileSync.
 Match case
 Rozlišovat malá a velká písmena
+Maximum number of logfiles:
+Maximální počet záznamových soubor
+Memory allocation failed!
+Chyba přidělení paměti!
 Minimum Idle Time [seconds]
 Minimální čas prodlevy [v sekundách]
 Mirror ->>
 Zrcadlení ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Zrcadlení levého adresáře: Pravý adresář bude přepsán a po synchronizaci bude totožný s levým.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+Zrcadlení levého adresáře. Pravý adresář bude změněn tak, aby po synchronizaci byl totožný s levým.
 Monitoring active...
 Sledování zapnuto...
 More than 50% of the total number of files will be copied or deleted!
@@ -696,8 +704,6 @@ Published under the GNU General Public License:
 Vydáno podle GNU General Public License (GPL):
 Question
 Otázky
-Re-enable all hidden dialogs?
-Znovu povolit skryté dialogy?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Automatická synchronizace
 RealtimeSync configuration
@@ -718,6 +724,8 @@ Reset
 Resetovat
 Reset view
 Výchozí zobrazení
+Restore all hidden dialogs?
+Obnovit všechny skryté dialogy?
 Right
 Pravý
 S&ave configuration...
@@ -737,9 +745,11 @@ Vyberte adresář
 Select alternate synchronization settings
 Vyberte alternativní nastavení synchronizace
 Select logfile directory:
-Vyberte adresář pro záznamy:
+Vyberte adresář pro záznamové soubory:
 Select variant:
 Vyberte variantu:
+Select view
+Vyberte zobrazení
 Set direction:
 Nastavit adresář:
 Setting default synchronization directions: Old files will be overwritten with newer files.
@@ -795,7 +805,7 @@ Rychlost:
 Start
 Start
 Start minimized and write status information to a logfile
-Spustit minimalizovaný a zapisovat informace do souboru
+Spustit minimalizovaný a zapisovat informace do záznamového souboru
 Start synchronization
 Start synchronizace
 Statistics
@@ -828,8 +838,6 @@ Synchronize...
 Synchronizace
 Synchronizing...
 Synchronizuji...
-System out of memory!
-Nedostatek paměti!
 Target directory already existing!
 Cílový adresář již existuje!
 Target file already existing!
@@ -850,8 +858,6 @@ Time remaining:
 Zbývající čas:
 Total amount of data that will be transferred
 Celkový objem dat, který bude přenesen
-Total required free disk space:
-Požadované volné místo na disku:
 Total time:
 Celkový čas:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -872,14 +878,14 @@ Use Recycle Bin
 Použít Koš
 Use Recycle Bin when deleting or overwriting files
 Použít Koš při mazání nebo přepisu souborů
-User-defined directory
-Uživatelsky definovaný adresář
 User-defined directory for deletion was not specified!
 Uživatelsky definovaný adresář pro mazání nebyl zadán!
 Variant
 Varianta
 Verifying file %x
 Kontroluji soubor %x
+Versioning
+Verzování
 Volume name %x not part of filename %y!
 Disk %x není součástí jména souboru %y!
 Waiting for missing directories...
@@ -888,14 +894,12 @@ Waiting while directory is locked (%x)...
 Čekání na uzamčení adresáře (%x)
 Warning
 Varování
-Warning: Synchronization failed for %x item(s):
-Varování: Synchronizace se nepovedla pro \"%x\" položek:
 When the comparison is started with this option set the following decision tree is processed:
 Když je zahájeno porovnávání s tímto nastavením, je použito následující schéma rozhodování:
 You can ignore conflicts and continue synchronization.
 Je možné konflikt ignorovat a pokračovat v synchronizaci.
-You can ignore the error to consider not existing directories as empty.
-Pro považování neexistujících adresářů jako prázdných můžete chybu ignorovat.
+You can ignore this error to consider the directory as empty.
+Tuto chybu můžete ignorovat a považovat neexistující adresář jako prázdný.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Můžete se pokusit synchronizovat zbývající položky (BEZ nutnosti znovuporovnávání)!
 different

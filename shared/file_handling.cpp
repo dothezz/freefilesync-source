@@ -16,7 +16,6 @@
 #include "string_conv.h"
 #include <wx/utils.h>
 #include <boost/scoped_array.hpp>
-#include <boost/shared_ptr.hpp>
 #include <stdexcept>
 #include "loki/TypeManip.h"
 #include "loki/ScopeGuard.h"
@@ -128,9 +127,9 @@ bool replaceMacro(wxString& macro) //macro without %-characters, return true if 
         macro.Trim(false); //
 
         //remove leading, trailing double-quotes
-        if (    macro.StartsWith(wxT("\"")) &&
-                macro.EndsWith(wxT("\"")) &&
-                macro.length() >= 2)
+        if (macro.StartsWith(wxT("\"")) &&
+            macro.EndsWith(wxT("\"")) &&
+            macro.length() >= 2)
             macro = wxString(macro.c_str() + 1, macro.length() - 2);
         return true;
     }
@@ -219,7 +218,7 @@ bool ffs3::fileExists(const Zstring& filename)
 #endif
 }
 
-#include <wx/msgdlg.h>
+
 bool ffs3::dirExists(const Zstring& dirname)
 {
     //symbolic links (broken or not) are also treated as existing directories!
@@ -278,7 +277,8 @@ wxULongLong getFileSizeSymlink(const Zstring& linkName) //throw (FileError)
                                       NULL);
     if (hFile != INVALID_HANDLE_VALUE)
     {
-        boost::shared_ptr<void> dummy(hFile, ::CloseHandle);
+        Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hFile);
+        (void)dummy; //silence warning "unused variable"
 
         BY_HANDLE_FILE_INFORMATION fileInfoByHandle;
         if (::GetFileInformationByHandle(hFile, &fileInfoByHandle))
@@ -480,12 +480,12 @@ void renameFileInternal(const Zstring& oldName, const Zstring& newName) //throw 
                     }
                     else
                     {
-                        const DWORD errorCode = ::GetLastError();
+                        Loki::ScopeGuard dummy = Loki::MakeGuard(::SetLastError, ::GetLastError()); //use error code from ::MoveFileEx()
+                        (void)dummy;
+
                         //cleanup: (try to) restore file attributes: assume oldName is still existing
                         ::SetFileAttributes(oldNameFmt.c_str(),
                                             oldNameAttrib);
-
-                        ::SetLastError(errorCode); //set error code from ::MoveFileEx()
                     }
                 }
             }
@@ -511,16 +511,6 @@ void renameFileInternal(const Zstring& oldName, const Zstring& newName) //throw 
             throw FileError(errorMessage);
     }
 #endif
-}
-
-
-void renameFileInternalNoThrow(const Zstring& oldName, const Zstring& newName) //throw ()
-{
-    try
-    {
-        ::renameFileInternal(oldName, newName);
-    }
-    catch (...) {}
 }
 
 
@@ -584,10 +574,10 @@ bool fix8Dot3NameClash(const Zstring& oldName, const Zstring& newName)  //throw 
         const Zstring fileNameShort = getFilenameFmt(newName, ::GetShortPathName).AfterLast(common::FILE_NAME_SEPARATOR); //throw() returns empty string on error
         const Zstring fileNameLong  = getFilenameFmt(newName, ::GetLongPathName).AfterLast(common::FILE_NAME_SEPARATOR);  //throw() returns empty string on error
 
-        if (    !fileNameShort.empty() &&
-                !fileNameLong.empty()  &&
-                EqualFilename()(fileNameOrig,  fileNameShort) &&
-                !EqualFilename()(fileNameShort, fileNameLong))
+        if (!fileNameShort.empty() &&
+            !fileNameLong.empty()  &&
+            EqualFilename()(fileNameOrig,  fileNameShort) &&
+            !EqualFilename()(fileNameShort, fileNameLong))
         {
             //we detected an event where newName is in shortname format (although it is intended to be a long name) and
             //writing target file failed because another unrelated file happens to have the same short name
@@ -603,7 +593,7 @@ bool fix8Dot3NameClash(const Zstring& oldName, const Zstring& newName)  //throw 
             //DON'T call ffs3::renameFile() to avoid reentrance!
 
             //schedule cleanup; the file system should assign this unrelated file a new (unique) short name
-            Loki::ScopeGuard guard = Loki::MakeGuard(renameFileInternalNoThrow, parkedTarget, unrelatedPathLong);//equivalent to Boost.ScopeExit in this case
+            Loki::ScopeGuard guard = Loki::MakeGuard(renameFileInternal, parkedTarget, unrelatedPathLong);//equivalent to Boost.ScopeExit in this case
             (void)guard; //silence warning "unused variable"
 
             renameFileInternal(oldName, newName); //the short filename name clash is solved, this should work now
@@ -645,11 +635,11 @@ public:
     {
         switch (moveCallback.requestUiRefresh(sourceFile_))
         {
-        case MoveFileCallback::CONTINUE:
-            return CopyFileCallback::CONTINUE;
+            case MoveFileCallback::CONTINUE:
+                return CopyFileCallback::CONTINUE;
 
-        case MoveFileCallback::CANCEL:
-            return CopyFileCallback::CANCEL;
+            case MoveFileCallback::CANCEL:
+                return CopyFileCallback::CANCEL;
         }
         return CopyFileCallback::CONTINUE; //dummy return value
     }
@@ -666,11 +656,11 @@ void ffs3::moveFile(const Zstring& sourceFile, const Zstring& targetFile, MoveFi
     if (callback)
         switch (callback->requestUiRefresh(sourceFile))
         {
-        case MoveFileCallback::CONTINUE:
-            break;
-        case MoveFileCallback::CANCEL: //a user aborted operation IS an error condition!
-            throw FileError(wxString(_("Error moving file:")) + wxT("\n\"") + zToWx(sourceFile) +  wxT("\" ->\n\"") + zToWx(targetFile) + wxT("\"") +
-                            wxT("\n\n") + _("Operation aborted!"));
+            case MoveFileCallback::CONTINUE:
+                break;
+            case MoveFileCallback::CANCEL: //a user aborted operation IS an error condition!
+                throw FileError(wxString(_("Error moving file:")) + wxT("\n\"") + zToWx(sourceFile) +  wxT("\" ->\n\"") + zToWx(targetFile) + wxT("\"") +
+                                wxT("\n\n") + _("Operation aborted!"));
         }
 
     //support case-sensitive renaming
@@ -762,11 +752,11 @@ struct RemoveCallbackImpl : public ffs3::RemoveDirCallback
     {
         switch (moveCallback_.requestUiRefresh(sourceDir_))
         {
-        case MoveFileCallback::CONTINUE:
-            break;
-        case MoveFileCallback::CANCEL: //a user aborted operation IS an error condition!
-            throw ffs3::FileError(wxString(_("Error moving directory:")) + wxT("\n\"") + ffs3::zToWx(sourceDir_) +  wxT("\" ->\n\"") +
-                                  ffs3::zToWx(targetDir_) + wxT("\"") + wxT("\n\n") + _("Operation aborted!"));
+            case MoveFileCallback::CONTINUE:
+                break;
+            case MoveFileCallback::CANCEL: //a user aborted operation IS an error condition!
+                throw ffs3::FileError(wxString(_("Error moving directory:")) + wxT("\n\"") + ffs3::zToWx(sourceDir_) +  wxT("\" ->\n\"") +
+                                      ffs3::zToWx(targetDir_) + wxT("\"") + wxT("\n\n") + _("Operation aborted!"));
         }
     }
 
@@ -786,11 +776,11 @@ void moveDirectoryImpl(const Zstring& sourceDir, const Zstring& targetDir, bool 
     if (callback)
         switch (callback->requestUiRefresh(sourceDir))
         {
-        case MoveFileCallback::CONTINUE:
-            break;
-        case MoveFileCallback::CANCEL: //a user aborted operation IS an error condition!
-            throw FileError(wxString(_("Error moving directory:")) + wxT("\n\"") + zToWx(sourceDir) +  wxT("\" ->\n\"") +
-                            zToWx(targetDir) + wxT("\"") + wxT("\n\n") + _("Operation aborted!"));
+            case MoveFileCallback::CONTINUE:
+                break;
+            case MoveFileCallback::CANCEL: //a user aborted operation IS an error condition!
+                throw FileError(wxString(_("Error moving directory:")) + wxT("\n\"") + zToWx(sourceDir) +  wxT("\" ->\n\"") +
+                                zToWx(targetDir) + wxT("\"") + wxT("\n\n") + _("Operation aborted!"));
         }
 
     //handle symbolic links
@@ -915,9 +905,9 @@ void ffs3::removeDirectory(const Zstring& directory, RemoveDirCallback* callback
     const Zstring directoryFmt = applyLongPathPrefix(directory); //support for \\?\-prefix
 
     //initialize file attributes
-    if (!::SetFileAttributes(           // initialize file attributes: actually NEEDED for symbolic links also!
-                directoryFmt.c_str(),   // address of directory name
-                FILE_ATTRIBUTE_NORMAL)) // attributes to set
+    if (!::SetFileAttributes(       // initialize file attributes: actually NEEDED for symbolic links also!
+            directoryFmt.c_str(),   // address of directory name
+            FILE_ATTRIBUTE_NORMAL)) // attributes to set
     {
         wxString errorMessage = wxString(_("Error deleting directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"");
         throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
@@ -1010,7 +1000,9 @@ void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, boo
                 const wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(sourceObj) + wxT("\"");
                 throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
             }
-            boost::shared_ptr<void> dummy(hSource, ::CloseHandle);
+
+            Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hSource);
+            (void)dummy; //silence warning "unused variable"
 
             if (!::GetFileTime(hSource,        //__in       HANDLE hFile,
                                &creationTime,   //__out_opt  LPFILETIME lpCreationTime,
@@ -1028,7 +1020,7 @@ void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, boo
             lastWriteTime  = sourceAttr.ftLastWriteTime;
         }
 
-//####################################### DST hack ###########################################
+        //####################################### DST hack ###########################################
         if (!isDirectory) //dst hack not (yet) required for directories (symlinks implicitly checked by isFatDrive())
         {
             if (dst::isFatDrive(sourceObj)) //throw()
@@ -1048,7 +1040,7 @@ void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, boo
                 lastWriteTime = encodedTime.writeTimeRaw;
             }
         }
-//####################################### DST hack ###########################################
+        //####################################### DST hack ###########################################
     }
 
 
@@ -1068,7 +1060,8 @@ void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, boo
         wxString errorMessage = wxString(_("Error changing modification time:")) + wxT("\n\"") + zToWx(targetObj) + wxT("\"");
         throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
     }
-    boost::shared_ptr<void> dummy(hTarget, ::CloseHandle);
+    Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hTarget);
+    (void)dummy; //silence warning "unused variable"
 
     if (!::SetFileTime(hTarget,
                        &creationTime,
@@ -1141,6 +1134,28 @@ void ffs3::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, boo
 
 namespace
 {
+struct TryCleanUp
+{
+    static void tryDeleteDir(const Zstring& dirname) //throw ()
+    {
+        try
+        {
+            ffs3::removeDirectory(dirname, NULL);
+        }
+        catch (...) {}
+    }
+
+    static void tryDeleteFile(const Zstring& filename) //throw ()
+    {
+        try
+        {
+            ffs3::removeFile(filename);
+        }
+        catch (...) {}
+    }
+};
+
+
 #ifdef FFS_WIN
 Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target path of symbolic link to a directory; throw (FileError)
 {
@@ -1158,7 +1173,8 @@ Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target pa
         throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
     }
 
-    boost::shared_ptr<void> dummy(hDir, ::CloseHandle);
+    Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hDir);
+    (void)dummy; //silence warning "unused variable"
 
     const size_t BUFFER_SIZE = 10000;
     TCHAR targetPath[BUFFER_SIZE];
@@ -1189,13 +1205,39 @@ Zstring resolveDirectorySymlink(const Zstring& dirLinkName) //get full target pa
 
     return targetPath;
 }
+#endif
 
-
-#elif defined FFS_LINUX
-void copySymlinkInternal(const Zstring& sourceLink, const Zstring& targetLink, bool copyFilePermissions) //throw (FileError)
+enum SymlinkType
+{
+    SYMLINK_TYPE_FILE,
+    SYMLINK_TYPE_DIR
+};
+void copySymlinkInternal(const Zstring& sourceLink, const Zstring& targetLink, SymlinkType type, bool copyFilePermissions) //throw (FileError)
 {
     using namespace ffs3;
 
+#ifdef FFS_WIN
+    const Zstring linkPath = getSymlinkRawTargetString(sourceLink); //accept broken symlinks; throw (FileError)
+
+    //dynamically load windows API function
+    typedef BOOLEAN (WINAPI *CreateSymbolicLinkFunc)(
+        LPCTSTR lpSymlinkFileName,
+        LPCTSTR lpTargetFileName,
+        DWORD dwFlags);
+    static const CreateSymbolicLinkFunc createSymbolicLink = util::getDllFun<CreateSymbolicLinkFunc>(L"kernel32.dll", "CreateSymbolicLinkW");
+    if (createSymbolicLink == NULL)
+        throw FileError(wxString(_("Error loading library function:")) + wxT("\n\"") + wxT("CreateSymbolicLinkW") + wxT("\""));
+
+    if (!createSymbolicLink( //seems no long path prefix is required...
+            targetLink.c_str(),             //__in  LPTSTR lpSymlinkFileName,
+            linkPath.c_str(),              //__in  LPTSTR lpTargetFileName,
+            (type == SYMLINK_TYPE_DIR ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0))) //__in  DWORD dwFlags
+    {
+        const wxString errorMessage = wxString(_("Error copying symbolic link:")) + wxT("\n\"") + zToWx(sourceLink) +  wxT("\" ->\n\"") + zToWx(targetLink) + wxT("\"");
+        throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+    }
+
+#elif defined FFS_LINUX
     //copy symbolic link
     const int BUFFER_SIZE = 10000;
     char buffer[BUFFER_SIZE];
@@ -1214,18 +1256,20 @@ void copySymlinkInternal(const Zstring& sourceLink, const Zstring& targetLink, b
         const wxString errorMessage = wxString(_("Error copying symbolic link:")) + wxT("\n\"") + zToWx(sourceLink) +  wxT("\" ->\n\"") + zToWx(targetLink) + wxT("\"");
         throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
     }
+#endif
 
     //allow only consistent objects to be created -> don't place before ::symlink, targetLink may already exist
-    Loki::ScopeGuard guardTargetLink = Loki::MakeGuard(::unlink, targetLink);
+    Loki::ScopeGuard guardNewDir = type == SYMLINK_TYPE_DIR ?
+                                   Loki::MakeGuard(&TryCleanUp::tryDeleteDir, targetLink) :
+                                   Loki::MakeGuard(&TryCleanUp::tryDeleteFile, targetLink);
 
     copyFileTimes(sourceLink, targetLink, false); //throw (FileError)
 
     if (copyFilePermissions)
         copyObjectPermissions(sourceLink, targetLink, false); //throw FileError()
 
-    guardTargetLink.Dismiss();
+    guardNewDir.Dismiss(); //target has been created successfully!
 }
-#endif
 }
 
 
@@ -1241,14 +1285,15 @@ void copySecurityContext(const Zstring& source, const Zstring& target, bool dere
                    ::lgetfilecon(source.c_str(), &contextSource);
     if (rv < 0)
     {
-        if (    errno == ENODATA ||  //no security context (allegedly) is not an error condition on SELinux
-                errno == EOPNOTSUPP) //extended attributes are not supported by the filesystem
+        if (errno == ENODATA ||  //no security context (allegedly) is not an error condition on SELinux
+            errno == EOPNOTSUPP) //extended attributes are not supported by the filesystem
             return;
 
         wxString errorMessage = wxString(_("Error reading security context:")) + wxT("\n\"") + zToWx(source) + wxT("\"");
         throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
     }
-    boost::shared_ptr<char> dummy1(contextSource, ::freecon);
+    Loki::ScopeGuard dummy1 = Loki::MakeGuard(::freecon, contextSource);
+    (void)dummy1; //silence warning "unused variable"
 
     {
         security_context_t contextTarget = NULL;
@@ -1263,7 +1308,9 @@ void copySecurityContext(const Zstring& source, const Zstring& target, bool dere
         }
         else
         {
-            boost::shared_ptr<char> dummy2(contextTarget, ::freecon);
+            Loki::ScopeGuard dummy2 = Loki::MakeGuard(::freecon, contextTarget);
+            (void)dummy2; //silence warning "unused variable"
+
             if (::strcmp(contextSource, contextTarget) == 0) //nothing to do
                 return;
         }
@@ -1281,8 +1328,8 @@ void copySecurityContext(const Zstring& source, const Zstring& target, bool dere
 #endif //HAVE_SELINUX
 
 
-//copy permissions for files, directories or symbolic links:
-void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, bool derefSymlinks) //throw FileError(); probably requires admin rights
+//copy permissions for files, directories or symbolic links: requires admin rights
+void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, bool derefSymlinks) //throw FileError();
 {
 #ifdef FFS_WIN
     //setting privileges requires admin rights!
@@ -1315,9 +1362,10 @@ void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, b
         const wxString errorMessage = wxString(_("Error copying file permissions:")) + wxT("\n\"") + zToWx(source) +  wxT("\" ->\n\"") + zToWx(target) + wxT("\"") + wxT("\n\n");
         throw FileError(errorMessage + ffs3::getLastErrorFormatted() + wxT(" (OR)"));
     }
-    boost::shared_ptr<void> dummy(hSource, ::CloseHandle);
+    Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hSource);
+    (void)dummy; //silence warning "unused variable"
 
-//  DWORD rc = ::GetNamedSecurityInfo(const_cast<WCHAR*>(applyLongPathPrefix(source).c_str()), -> does NOT dereference symlinks!
+    //  DWORD rc = ::GetNamedSecurityInfo(const_cast<WCHAR*>(applyLongPathPrefix(source).c_str()), -> does NOT dereference symlinks!
     DWORD rc = ::GetSecurityInfo(
                    hSource,        //__in       LPTSTR pObjectName,
                    SE_FILE_OBJECT, //__in       SE_OBJECT_TYPE ObjectType,
@@ -1332,7 +1380,9 @@ void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, b
         const wxString errorMessage = wxString(_("Error copying file permissions:")) + wxT("\n\"") + zToWx(source) +  wxT("\" ->\n\"") + zToWx(target) + wxT("\"") + wxT("\n\n");
         throw FileError(errorMessage + ffs3::getLastErrorFormatted(rc) + wxT(" (R)"));
     }
-    boost::shared_ptr<void> dummy2(buffer, ::LocalFree);
+
+    Loki::ScopeGuard dummy4 = Loki::MakeGuard(::LocalFree, buffer);
+    (void)dummy4; //silence warning "unused variable"
 
 
     const Zstring targetFmt = ffs3::applyLongPathPrefix(target);
@@ -1340,8 +1390,8 @@ void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, b
     //read-only file attribute may cause trouble: temporarily reset it
     const DWORD targetAttr = ::GetFileAttributes(targetFmt.c_str());
     Loki::ScopeGuard resetAttributes = Loki::MakeGuard(::SetFileAttributes, targetFmt, targetAttr);
-    if (    targetAttr != INVALID_FILE_ATTRIBUTES &&
-            (targetAttr & FILE_ATTRIBUTE_READONLY))
+    if (targetAttr != INVALID_FILE_ATTRIBUTES &&
+        (targetAttr & FILE_ATTRIBUTE_READONLY))
         ::SetFileAttributes(targetFmt.c_str(), targetAttr & (~FILE_ATTRIBUTE_READONLY)); //try to...
     else
         resetAttributes.Dismiss();
@@ -1359,9 +1409,10 @@ void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, b
         const wxString errorMessage = wxString(_("Error copying file permissions:")) + wxT("\n\"") + zToWx(source) +  wxT("\" ->\n\"") + zToWx(target) + wxT("\"") + wxT("\n\n");
         throw FileError(errorMessage + ffs3::getLastErrorFormatted() + wxT(" (OW)"));
     }
-    boost::shared_ptr<void> dummy3(hTarget, ::CloseHandle);
+    Loki::ScopeGuard dummy2 = Loki::MakeGuard(::CloseHandle, hTarget);
+    (void)dummy2; //silence warning "unused variable"
 
-//  rc = ::SetNamedSecurityInfo(const_cast<WCHAR*>(applyLongPathPrefix(target).c_str()), //__in      LPTSTR pObjectName, -> does NOT dereference symlinks!
+    //  rc = ::SetNamedSecurityInfo(const_cast<WCHAR*>(applyLongPathPrefix(target).c_str()), //__in      LPTSTR pObjectName, -> does NOT dereference symlinks!
     rc = ::SetSecurityInfo(
              hTarget,        //__in      LPTSTR pObjectName,
              SE_FILE_OBJECT, //__in      SE_OBJECT_TYPE ObjectType,
@@ -1386,9 +1437,9 @@ void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, b
     if (derefSymlinks)
     {
         struct stat fileInfo;
-        if (    ::stat(source.c_str(), &fileInfo) != 0                        ||
-                ::chown(target.c_str(), fileInfo.st_uid, fileInfo.st_gid) != 0 || // may require admin rights!
-                ::chmod(target.c_str(), fileInfo.st_mode) != 0)
+        if (::stat(source.c_str(), &fileInfo) != 0                        ||
+            ::chown(target.c_str(), fileInfo.st_uid, fileInfo.st_gid) != 0 || // may require admin rights!
+            ::chmod(target.c_str(), fileInfo.st_mode) != 0)
         {
             const wxString errorMessage = wxString(_("Error copying file permissions:")) + wxT("\n\"") + zToWx(source) +  wxT("\" ->\n\"") + zToWx(target) + wxT("\"") + wxT("\n\n");
             throw FileError(errorMessage + ffs3::getLastErrorFormatted() + wxT(" (R)"));
@@ -1397,9 +1448,9 @@ void ffs3::copyObjectPermissions(const Zstring& source, const Zstring& target, b
     else
     {
         struct stat fileInfo;
-        if (    ::lstat(source.c_str(), &fileInfo) != 0                        ||
-                ::lchown(target.c_str(), fileInfo.st_uid, fileInfo.st_gid) != 0 || // may require admin rights!
-                (!symlinkExists(target) && ::chmod(target.c_str(), fileInfo.st_mode) != 0)) //setting access permissions doesn't make sense for symlinks on Linux: there is no lchmod()
+        if (::lstat(source.c_str(), &fileInfo) != 0                        ||
+            ::lchown(target.c_str(), fileInfo.st_uid, fileInfo.st_gid) != 0 || // may require admin rights!
+            (!symlinkExists(target) && ::chmod(target.c_str(), fileInfo.st_mode) != 0)) //setting access permissions doesn't make sense for symlinks on Linux: there is no lchmod()
         {
             const wxString errorMessage = wxString(_("Error copying file permissions:")) + wxT("\n\"") + zToWx(source) +  wxT("\" ->\n\"") + zToWx(target) + wxT("\"") + wxT("\n\n");
             throw FileError(errorMessage + ffs3::getLastErrorFormatted() + wxT(" (W)"));
@@ -1428,40 +1479,31 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
         createDirectoryRecursively(dirParent, templateParent, false, copyFilePermissions, level + 1); //don't create symbolic links in recursion!
     }
 
-    struct TryCleanUp
-    {
-        static void tryDeleteDir(const Zstring& dirname) //throw ()
-        {
-            try
-            {
-                removeDirectory(dirname, NULL);
-            }
-            catch (...) {}
-        }
-    };
-
     //now creation should be possible
-#ifdef FFS_WIN
-    const DWORD templateAttr = templateDir.empty() ? INVALID_FILE_ATTRIBUTES :
-                               ::GetFileAttributes(applyLongPathPrefix(templateDir).c_str()); //returns successful for broken symlinks
-    if (templateAttr == INVALID_FILE_ATTRIBUTES) //fallback
+
+    if (templateDir.empty() || !somethingExists(templateDir))
     {
-        if (!::CreateDirectory(applyLongPathPrefixCreateDir(directory).c_str(), // pointer to a directory path string
-                               NULL))
+        //default directory creation
+#ifdef FFS_WIN
+        if (!::CreateDirectory(applyLongPathPrefixCreateDir(directory).c_str(), NULL))// pointer to a directory path string
+#elif defined FFS_LINUX
+        if (::mkdir(directory.c_str(), 0755) != 0)
+#endif
         {
             if (level != 0) return;
-            const wxString errorMessage = wxString(_("Error creating directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"");
+            wxString errorMessage = wxString(_("Error creating directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"");
             throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
         }
     }
     else
     {
-        const bool isSymlink = (templateAttr & FILE_ATTRIBUTE_REPARSE_POINT) != 0; //syntax required to shut MSVC up
-
+#ifdef FFS_WIN
         //symbolic link handling
-        if (isSymlink)
+        if (symlinkExists(templateDir))
         {
-            if (!copyDirectorySymLinks) //create directory based on target of symbolic link
+            if (copyDirectorySymLinks)
+                return copySymlinkInternal(templateDir, directory, SYMLINK_TYPE_DIR, copyFilePermissions); //throw (FileError)
+            else //create directory based on target of symbolic link
             {
                 //get target directory of symbolic link
                 Zstring linkPath;
@@ -1482,36 +1524,13 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
                     return;
                 }
 
-                if (!::CreateDirectoryEx(      // this function automatically copies symbolic links if encountered
-                            applyLongPathPrefix(linkPath).c_str(),           // pointer to path string of template directory
-                            applyLongPathPrefixCreateDir(directory).c_str(), // pointer to a directory path string
-                            NULL))
+                if (!::CreateDirectoryEx(                                    // this function automatically copies symbolic links if encountered
+                        applyLongPathPrefix(linkPath).c_str(),           // pointer to path string of template directory
+                        applyLongPathPrefixCreateDir(directory).c_str(), // pointer to a directory path string
+                        NULL))
                 {
                     if (level != 0) return;
                     const wxString errorMessage = wxString(_("Error creating directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"");
-                    throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
-                }
-            }
-            else //copy symbolic link
-            {
-                const Zstring linkPath = getSymlinkRawTargetString(templateDir); //accept broken symlinks; throw (FileError)
-
-                //dynamically load windows API function
-                typedef BOOLEAN (WINAPI *CreateSymbolicLinkFunc)(
-                    LPCTSTR lpSymlinkFileName,
-                    LPCTSTR lpTargetFileName,
-                    DWORD dwFlags);
-                static const CreateSymbolicLinkFunc createSymbolicLink = util::getDllFun<CreateSymbolicLinkFunc>(L"kernel32.dll", "CreateSymbolicLinkW");
-                if (createSymbolicLink == NULL)
-                    throw FileError(wxString(_("Error loading library function:")) + wxT("\n\"") + wxT("CreateSymbolicLinkW") + wxT("\""));
-
-                if (!createSymbolicLink( //seems no long path prefix is required...
-                            directory.c_str(),             //__in  LPTSTR lpSymlinkFileName,
-                            linkPath.c_str(),              //__in  LPTSTR lpTargetFileName,
-                            SYMBOLIC_LINK_FLAG_DIRECTORY)) //__in  DWORD dwFlags
-                {
-                    //if (level != 0) return;
-                    const wxString errorMessage = wxString(_("Error copying symbolic link:")) + wxT("\n\"") + templateDir.c_str() +  wxT("\" ->\n\"") + directory.c_str() + wxT("\"");
                     throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
                 }
             }
@@ -1521,9 +1540,9 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
             //automatically copies symbolic links if encountered: unfortunately it doesn't copy symlinks over network shares but silently creates empty folders instead (on XP)!
             //also it isn't able to copy most junctions because of missing permissions (although target path can be retrieved!)
             if (!::CreateDirectoryEx(
-                        applyLongPathPrefix(templateDir).c_str(),          // pointer to path string of template directory
-                        applyLongPathPrefixCreateDir(directory).c_str(),   // pointer to a directory path string
-                        NULL))
+                    applyLongPathPrefix(templateDir).c_str(),          // pointer to path string of template directory
+                    applyLongPathPrefixCreateDir(directory).c_str(),   // pointer to a directory path string
+                    NULL))
             {
                 if (level != 0) return;
                 const wxString errorMessage = wxString(_("Error creating directory:")) + wxT("\n\"") + directory.c_str() + wxT("\"");
@@ -1531,42 +1550,30 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
             }
         }
 
-        //ensure cleanup:
-        Loki::ScopeGuard guardNewDir = Loki::MakeGuard(&TryCleanUp::tryDeleteDir, directory);
+#elif defined FFS_LINUX
+        //symbolic link handling
+        if (copyDirectorySymLinks &&
+            symlinkExists(templateDir))
+            //there is no directory-type symlink in Linux! => just copy as file
+            return copySymlinkInternal(templateDir, directory, SYMLINK_TYPE_DIR, copyFilePermissions); //throw (FileError)
 
-        if (copyDirectorySymLinks && isSymlink) //we need to copy the Symbolic Link's change date manually
-            copyFileTimes(templateDir, directory, false); //throw (FileError)
+        //default directory creation
+        if (::mkdir(directory.c_str(), 0755) != 0)
+        {
+            if (level != 0) return;
+            wxString errorMessage = wxString(_("Error creating directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"");
+            throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+        }
+#endif
+        Loki::ScopeGuard guardNewDir = Loki::MakeGuard(&TryCleanUp::tryDeleteDir, directory); //ensure cleanup:
+
+        copyFileTimes(templateDir, directory, !copyDirectorySymLinks); //throw (FileError)
 
         if (copyFilePermissions)
             copyObjectPermissions(templateDir, directory, !copyDirectorySymLinks); //throw FileError()
 
         guardNewDir.Dismiss(); //target has been created successfully!
     }
-
-#elif defined FFS_LINUX
-    //symbolic link handling
-    if (    copyDirectorySymLinks &&
-            !templateDir.empty()  &&
-            symlinkExists(templateDir))
-        //there is no directory-type symlink in Linux! => just copy as file
-        return copySymlinkInternal(templateDir, directory, copyFilePermissions); //throw (FileError)
-
-    //default directory creation
-    if (::mkdir(directory.c_str(), 0755) != 0)
-    {
-        if (level != 0) return;
-        wxString errorMessage = wxString(_("Error creating directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"");
-        throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
-    }
-
-    //ensure cleanup:
-    Loki::ScopeGuard guardNewDir = Loki::MakeGuard(&TryCleanUp::tryDeleteDir, directory);
-
-    if (!templateDir.empty() && copyFilePermissions)
-        copyObjectPermissions(templateDir, directory, true); //throw FileError()
-
-    guardNewDir.Dismiss(); //target has been created successfully!
-#endif
 }
 
 
@@ -1644,10 +1651,10 @@ DWORD CALLBACK copyCallbackInternal(
             {
                 switch (callback->updateCopyStatus(wxULongLong(totalBytesTransferred.HighPart, totalBytesTransferred.LowPart)))
                 {
-                case CopyFileCallback::CONTINUE:
-                    break;
-                case CopyFileCallback::CANCEL:
-                    return PROGRESS_CANCEL;
+                    case CopyFileCallback::CONTINUE:
+                        break;
+                    case CopyFileCallback::CANCEL:
+                        return PROGRESS_CANCEL;
                 }
             }
             catch (...)
@@ -1719,27 +1726,16 @@ void ffs3::copyFile(const Zstring& sourceFile,
 
     const Zstring temporary = createTempName(targetFile); //use temporary file until a correct date has been set
 
-    struct TryCleanUp //ensure cleanup if working with temporary failed!
-    {
-        static void tryDeleteFile(const Zstring& filename) //throw ()
-        {
-            try
-            {
-                removeFile(filename);
-            }
-            catch (...) {}
-        }
-    };
-    Loki::ScopeGuard guardTempFile = Loki::MakeGuard(&TryCleanUp::tryDeleteFile, temporary);
+    Loki::ScopeGuard guardTempFile = Loki::MakeGuard(&ffs3::removeFile, temporary);
 
 
     if (!::CopyFileEx( //same performance as CopyFile()
-                applyLongPathPrefix(sourceFile).c_str(),
-                applyLongPathPrefix(temporary).c_str(),
-                callback != NULL ? copyCallbackInternal : NULL,
-                callback,
-                NULL,
-                copyFlags))
+            applyLongPathPrefix(sourceFile).c_str(),
+            applyLongPathPrefix(temporary).c_str(),
+            callback != NULL ? copyCallbackInternal : NULL,
+            callback,
+            NULL,
+            copyFlags))
     {
         const DWORD lastError = ::GetLastError();
 
@@ -1747,8 +1743,8 @@ void ffs3::copyFile(const Zstring& sourceFile,
 
         //if file is locked (try to) use Windows Volume Shadow Copy Service
         if (shadowCopyHandler != NULL &&
-                (lastError == ERROR_SHARING_VIOLATION ||
-                 lastError == ERROR_LOCK_VIOLATION))
+            (lastError == ERROR_SHARING_VIOLATION ||
+             lastError == ERROR_LOCK_VIOLATION))
         {
             //shadowFilename already contains prefix: E.g. "\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Program Files\FFS\sample.dat"
 
@@ -1772,9 +1768,22 @@ void ffs3::copyFile(const Zstring& sourceFile,
                             NULL,
                             callback);
         }
+
         //assemble error message...
-        const wxString errorMessage = wxString(_("Error copying file:")) + wxT("\n\"") + sourceFile.c_str() +  wxT("\" ->\n\"") + targetFile.c_str() + wxT("\"") + wxT("\n\n");
-        throw FileError(errorMessage + ffs3::getLastErrorFormatted(lastError));
+        wxString errorMessage = wxString(_("Error copying file:")) + wxT("\n\"") + sourceFile.c_str() +  wxT("\" ->\n\"") + targetFile.c_str() + wxT("\"") +
+                                wxT("\n\n") + ffs3::getLastErrorFormatted(lastError);
+
+        try //add more meaningful message
+        {
+            //trying to copy > 4GB file to FAT/FAT32 volume gives obscure ERROR_INVALID_PARAMETER (FAT can indeed handle files up to 4 Gig, tested!)
+            if (lastError == ERROR_INVALID_PARAMETER &&
+                dst::isFatDrive(targetFile) &&
+                getFilesize(sourceFile) >= (wxULongLong(1024 * 1024 * 1024)*=4)) //throw (FileError)
+                errorMessage += wxT("\nFAT volume cannot store file larger than 4 gigabyte!");
+        }
+        catch(...) {}
+
+        throw FileError(errorMessage);
     }
 
     //rename temporary file: do not add anything else here (note specific error handing)
@@ -1782,13 +1791,13 @@ void ffs3::copyFile(const Zstring& sourceFile,
 
     guardTempFile.Dismiss(); //no need to delete temp file anymore
 
-    Loki::ScopeGuard guardTargetFile = Loki::MakeGuard(&TryCleanUp::tryDeleteFile, targetFile);
-
-    if (copyFilePermissions)
-        copyObjectPermissions(sourceFile, targetFile, !copyFileSymLinks); //throw FileError()
+    Loki::ScopeGuard guardTargetFile = Loki::MakeGuard(&ffs3::removeFile, targetFile);
 
     //copy creation date (last modification date is REDUNDANTLY written, too, even for symlinks)
     copyFileTimes(sourceFile, targetFile, !copyFileSymLinks); //throw (FileError)
+
+    if (copyFilePermissions)
+        copyObjectPermissions(sourceFile, targetFile, !copyFileSymLinks); //throw FileError()
 
     guardTargetFile.Dismiss();
 }
@@ -1804,10 +1813,10 @@ void ffs3::copyFile(const Zstring& sourceFile,
     using ffs3::CopyFileCallback;
 
     //symbolic link handling
-    if (    copyFileSymLinks &&
-            symlinkExists(sourceFile))
+    if (copyFileSymLinks &&
+        symlinkExists(sourceFile))
     {
-        return copySymlinkInternal(sourceFile, targetFile, copyFilePermissions); //throw (FileError)
+        return copySymlinkInternal(sourceFile, targetFile, SYMLINK_TYPE_FILE, copyFilePermissions); //throw (FileError)
     }
 
     //begin of regular file copy
@@ -1825,7 +1834,8 @@ void ffs3::copyFile(const Zstring& sourceFile,
     const Zstring temporary = createTempName(targetFile); //use temporary file until a correct date has been set
 
     //ensure cleanup (e.g. network drop): call BEFORE creating fileOut object!
-    Loki::ScopeGuard guardTempFile = Loki::MakeGuard(::unlink, temporary);
+    Loki::ScopeGuard guardTempFile = Loki::MakeGuard(&ffs3::removeFile, temporary);
+
 
     FileOutput fileOut(temporary); //throw FileError()
 
@@ -1846,12 +1856,12 @@ void ffs3::copyFile(const Zstring& sourceFile,
         if (callback != NULL)
             switch (callback->updateCopyStatus(totalBytesTransferred))
             {
-            case CopyFileCallback::CONTINUE:
-                break;
+                case CopyFileCallback::CONTINUE:
+                    break;
 
-            case CopyFileCallback::CANCEL: //a user aborted operation IS an error condition!
-                throw FileError(wxString(_("Error copying file:")) + wxT("\n\"") + zToWx(sourceFile) +  wxT("\" ->\n\"") +
-                                zToWx(targetFile) + wxT("\"\n\n") + _("Operation aborted!"));
+                case CopyFileCallback::CANCEL: //a user aborted operation IS an error condition!
+                    throw FileError(wxString(_("Error copying file:")) + wxT("\n\"") + zToWx(sourceFile) +  wxT("\" ->\n\"") +
+                                    zToWx(targetFile) + wxT("\"\n\n") + _("Operation aborted!"));
             }
     }
     while (!fileIn.eof());
@@ -1864,7 +1874,7 @@ void ffs3::copyFile(const Zstring& sourceFile,
     guardTempFile.Dismiss();
 
     //ensure cleanup:
-    Loki::ScopeGuard guardTargetFile = Loki::MakeGuard(::unlink, targetFile.c_str());
+    Loki::ScopeGuard guardTargetFile = Loki::MakeGuard(&ffs3::removeFile, targetFile);
 
     //adapt file modification time:
     copyFileTimes(sourceFile, targetFile, true); //throw (FileError)

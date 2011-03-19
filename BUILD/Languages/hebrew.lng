@@ -154,6 +154,10 @@
 
 <multiple selection>
 <בחירה מרובה>
+A directory input field is empty.
+
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+
 A newer version of FreeFileSync is available:
 יותר קיימת גרסא חדשה:
 Abort requested: Waiting for current operation to finish...
@@ -370,6 +374,8 @@ Encoding extended time information: %x
 
 Endless loop when traversing directory:
 נוצרת לולאה אינסופית בחצית מחיצות
+Equal files/folders that differ in attributes only
+
 Error
 טעות
 Error changing modification time:
@@ -476,8 +482,6 @@ Files that exist on both sides, right one is newer
 קבצים הנמצאים בשני הצדדים -הימני חדש יותר
 Files that have different content
 קבצים בעלי תוכן שונה
-Files/folders that differ in attributes only
-
 Files/folders that exist on left side only
 קבצים ותיקיות הנמצאים בעמודה השמאלית בלבד
 Files/folders that exist on right side only
@@ -488,8 +492,6 @@ Filter is active
 מסנן פעיל
 Filter settings have changed!
 קביעת המסנן שונו!
-Filter view
-תצוגה מסוננת
 Filter: All pairs
 כל הזוגות :מסונן
 Filter: Single pair
@@ -506,6 +508,8 @@ Follow
 
 Free disk space available:
 מקום פנוי בדיסק:
+Free disk space required:
+
 FreeFileSync Batch Job
 FreeFileSync עבודת אצווה
 FreeFileSync at Sourceforge
@@ -600,6 +604,8 @@ Integrate external applications into context menu. The following macros are avai
 :הטמע תוכנות חיצוניות  לתפריט המקרו הבאים מוכנים
 Invalid FreeFileSync config file!
 
+Last used configurations (press DEL to remove from list)
+
 Leave as unresolved conflict
 השאר כקונפליקט לא מטופל
 Left
@@ -608,8 +614,6 @@ Legend
 מקרא
 Load configuration from file
 טען קונפיגורציה מקובץ
-Load configuration history (press DEL to delete items)
-טען היסטורית קונפיגורציות לחץ DEL 
 Log-messages:
 הודעת יומן:
 Logging
@@ -620,12 +624,16 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 לא נתמכת בגרסה זאת אנא התקן גרסה 64 WOW64 העתקת צל ב
 Match case
 אותיות התאם 
+Maximum number of logfiles:
+
+Memory allocation failed!
+
 Minimum Idle Time [seconds]
 
 Mirror ->>
 מראה ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-גיבוי מראה של העמודה השמאלית העמודה הימנית תדרס ותהיה העתק מדויק של העמודה השמאלית לאחר סנכרון
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+
 Monitoring active...
 נטר ארכיב...
 More than 50% of the total number of files will be copied or deleted!
@@ -696,8 +704,6 @@ Published under the GNU General Public License:
 GNU מפורסם במסגרת:
 Question
 שאלה
-Re-enable all hidden dialogs?
-הפעל מחדש דיאלוגים נסתרים?
 RealtimeSync - Automated Synchronization
 RealtimeSync - סינכרון  אוטומטי
 RealtimeSync configuration
@@ -717,6 +723,8 @@ Report translation error
 Reset
 אפס
 Reset view
+
+Restore all hidden dialogs?
 
 Right
 ימין
@@ -740,6 +748,8 @@ Select logfile directory:
 בחר מחיצה לתיקית-יומן
 Select variant:
 בחר משתנה:
+Select view
+
 Set direction:
 בחר כוון:
 Setting default synchronization directions: Old files will be overwritten with newer files.
@@ -828,8 +838,6 @@ Synchronize...
 ...סנכרן
 Synchronizing...
 מסנכרן...
-System out of memory!
-מחסור בזכרון מערכת!
 Target directory already existing!
 מחיצת מטרה כבר קיימת!
 Target file already existing!
@@ -850,8 +858,6 @@ Time remaining:
 זמן נותר:
 Total amount of data that will be transferred
 סך הכל נתונים להעברה
-Total required free disk space:
-זכרון פנוי כללי נדרש
 Total time:
 זמן מקומי:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -872,14 +878,14 @@ Use Recycle Bin
 השתמש בסל המיחזור
 Use Recycle Bin when deleting or overwriting files
 השתמש בסל המיחזור כאשר מוחק או דורס קבצים
-User-defined directory
-מחיצה מותאמת אישית
 User-defined directory for deletion was not specified!
 מחיצה מותאמת אישית למחיקה לא מוגדרת!
 Variant
 משתנה
 Verifying file %x
 מאמת קובץ %x
+Versioning
+
 Volume name %x not part of filename %y!
 כנונן %x לא בנתיב של קובץ %y!
 Waiting for missing directories...
@@ -888,14 +894,12 @@ Waiting while directory is locked (%x)...
 
 Warning
 אזהרה
-Warning: Synchronization failed for %x item(s):
-עצמים %x אזהרה סנכרון  נכשל לגבי
 When the comparison is started with this option set the following decision tree is processed:
 :כאשר ההשוואה מתחילה בעזרת הבחירות הנבחרות עץ ההחלטות הבא  מתבצע
 You can ignore conflicts and continue synchronization.
 באפשרותך להתעלם מהקונפליקטים ולהמשיך בסנכרון
-You can ignore the error to consider not existing directories as empty.
-!באפשרותך להתעלם מהשגיאה ולהחשיב את המחיצות החסרות כריקות
+You can ignore this error to consider the directory as empty.
+
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 !באפשרותך לנסות לסנכרן את העצמים הנותרים מבלי להשוות מחדש
 different

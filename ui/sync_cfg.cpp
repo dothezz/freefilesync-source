@@ -9,7 +9,7 @@
 #include "../library/resources.h"
 #include "../shared/dir_name.h"
 #include <wx/wupdlock.h>
-#include "mouse_move_dlg.h"
+#include "../shared/mouse_move_dlg.h"
 #include "../shared/string_conv.h"
 
 using namespace ffs3;
@@ -51,12 +51,12 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* window,
     updateConfigIcons(cmpVariant, currentSyncConfig);
 
     //set icons for this dialog
-    m_bitmapLeftOnly->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("leftOnly")));
-    m_bitmapRightOnly->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("rightOnly")));
-    m_bitmapLeftNewer->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("leftNewer")));
-    m_bitmapRightNewer->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("rightNewer")));
-    m_bitmapDifferent->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("different")));
-    m_bitmapConflict->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("conflictGrey")));
+    m_bitmapLeftOnly->SetBitmap(GlobalResources::instance().getImage(wxT("leftOnly")));
+    m_bitmapRightOnly->SetBitmap(GlobalResources::instance().getImage(wxT("rightOnly")));
+    m_bitmapLeftNewer->SetBitmap(GlobalResources::instance().getImage(wxT("leftNewer")));
+    m_bitmapRightNewer->SetBitmap(GlobalResources::instance().getImage(wxT("rightNewer")));
+    m_bitmapDifferent->SetBitmap(GlobalResources::instance().getImage(wxT("different")));
+    m_bitmapConflict->SetBitmap(GlobalResources::instance().getImage(wxT("conflictGrey")));
 
     bSizer201->Layout(); //wxButtonWithImage size might have changed
 
@@ -101,18 +101,18 @@ void SyncCfgDialog::updateConfigIcons(const ffs3::CompareVariant cmpVar, const f
     //set radiobuttons -> have no parameter-ownership at all!
     switch (ffs3::getVariant(currentSyncConfig))
     {
-    case SyncConfiguration::AUTOMATIC:
-        m_radioBtnAutomatic->SetValue(true); //automatic mode
-        break;
-    case SyncConfiguration::MIRROR:
-        m_radioBtnMirror->SetValue(true);    //one way ->
-        break;
-    case SyncConfiguration::UPDATE:
-        m_radioBtnUpdate->SetValue(true);    //Update ->
-        break;
-    case SyncConfiguration::CUSTOM:
-        m_radioBtnCustom->SetValue(true);    //custom
-        break;
+        case SyncConfiguration::AUTOMATIC:
+            m_radioBtnAutomatic->SetValue(true); //automatic mode
+            break;
+        case SyncConfiguration::MIRROR:
+            m_radioBtnMirror->SetValue(true);    //one way ->
+            break;
+        case SyncConfiguration::UPDATE:
+            m_radioBtnUpdate->SetValue(true);    //Update ->
+            break;
+        case SyncConfiguration::CUSTOM:
+            m_radioBtnCustom->SetValue(true);    //custom
+            break;
     }
 
     GetSizer()->SetSizeHints(this); //this works like a charm for GTK2 with window resizing problems!!! (includes call to Fit())
@@ -154,19 +154,19 @@ void SyncCfgDialog::updateConfigIcons(const CompareVariant compareVar,
 
     switch (compareVar)
     {
-    case CMP_BY_TIME_SIZE:
-        buttonDifferent ->Hide();
+        case CMP_BY_TIME_SIZE:
+            buttonDifferent ->Hide();
 
-        bitmapDifferent ->Hide();
-        break;
+            bitmapDifferent ->Hide();
+            break;
 
-    case CMP_BY_CONTENT:
-        buttonLeftNewer ->Hide();
-        buttonRightNewer->Hide();
+        case CMP_BY_CONTENT:
+            buttonLeftNewer ->Hide();
+            buttonRightNewer->Hide();
 
-        bitmapLeftNewer ->Hide();
-        bitmapRightNewer->Hide();
-        break;
+            bitmapLeftNewer ->Hide();
+            bitmapRightNewer->Hide();
+            break;
     }
 
     if (syncConfig.automatic) //automatic mode needs no sync-directions
@@ -174,98 +174,98 @@ void SyncCfgDialog::updateConfigIcons(const CompareVariant compareVar,
 
     switch (syncConfig.exLeftSideOnly)
     {
-    case SYNC_DIR_RIGHT:
-        buttonLeftOnly->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowRightCr")));
-        buttonLeftOnly->SetToolTip(getDescription(SO_CREATE_NEW_RIGHT));
-        break;
-    case SYNC_DIR_LEFT:
-        buttonLeftOnly->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("deleteLeft")));
-        buttonLeftOnly->SetToolTip(getDescription(SO_DELETE_LEFT));
-        break;
-    case SYNC_DIR_NONE:
-        buttonLeftOnly->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowNone")));
-        buttonLeftOnly->SetToolTip(getDescription(SO_DO_NOTHING));
-        break;
+        case SYNC_DIR_RIGHT:
+            buttonLeftOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowRightCr")));
+            buttonLeftOnly->SetToolTip(getDescription(SO_CREATE_NEW_RIGHT));
+            break;
+        case SYNC_DIR_LEFT:
+            buttonLeftOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("deleteLeft")));
+            buttonLeftOnly->SetToolTip(getDescription(SO_DELETE_LEFT));
+            break;
+        case SYNC_DIR_NONE:
+            buttonLeftOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowNone")));
+            buttonLeftOnly->SetToolTip(getDescription(SO_DO_NOTHING));
+            break;
     }
 
     switch (syncConfig.exRightSideOnly)
     {
-    case SYNC_DIR_RIGHT:
-        buttonRightOnly->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("deleteRight")));
-        buttonRightOnly->SetToolTip(getDescription(SO_DELETE_RIGHT));
-        break;
-    case SYNC_DIR_LEFT:
-        buttonRightOnly->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowLeftCr")));
-        buttonRightOnly->SetToolTip(getDescription(SO_CREATE_NEW_LEFT));
-        break;
-    case SYNC_DIR_NONE:
-        buttonRightOnly->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowNone")));
-        buttonRightOnly->SetToolTip(getDescription(SO_DO_NOTHING));
-        break;
+        case SYNC_DIR_RIGHT:
+            buttonRightOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("deleteRight")));
+            buttonRightOnly->SetToolTip(getDescription(SO_DELETE_RIGHT));
+            break;
+        case SYNC_DIR_LEFT:
+            buttonRightOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowLeftCr")));
+            buttonRightOnly->SetToolTip(getDescription(SO_CREATE_NEW_LEFT));
+            break;
+        case SYNC_DIR_NONE:
+            buttonRightOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowNone")));
+            buttonRightOnly->SetToolTip(getDescription(SO_DO_NOTHING));
+            break;
     }
 
     switch (syncConfig.leftNewer)
     {
-    case SYNC_DIR_RIGHT:
-        buttonLeftNewer->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowRight")));
-        buttonLeftNewer->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
-        break;
-    case SYNC_DIR_LEFT:
-        buttonLeftNewer->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowLeft")));
-        buttonLeftNewer->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
-        break;
-    case SYNC_DIR_NONE:
-        buttonLeftNewer->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowNone")));
-        buttonLeftNewer->SetToolTip(getDescription(SO_DO_NOTHING));
-        break;
+        case SYNC_DIR_RIGHT:
+            buttonLeftNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowRight")));
+            buttonLeftNewer->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
+            break;
+        case SYNC_DIR_LEFT:
+            buttonLeftNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowLeft")));
+            buttonLeftNewer->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
+            break;
+        case SYNC_DIR_NONE:
+            buttonLeftNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowNone")));
+            buttonLeftNewer->SetToolTip(getDescription(SO_DO_NOTHING));
+            break;
     }
 
     switch (syncConfig.rightNewer)
     {
-    case SYNC_DIR_RIGHT:
-        buttonRightNewer->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowRight")));
-        buttonRightNewer->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
-        break;
-    case SYNC_DIR_LEFT:
-        buttonRightNewer->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowLeft")));
-        buttonRightNewer->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
-        break;
-    case SYNC_DIR_NONE:
-        buttonRightNewer->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowNone")));
-        buttonRightNewer->SetToolTip(getDescription(SO_DO_NOTHING));
-        break;
+        case SYNC_DIR_RIGHT:
+            buttonRightNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowRight")));
+            buttonRightNewer->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
+            break;
+        case SYNC_DIR_LEFT:
+            buttonRightNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowLeft")));
+            buttonRightNewer->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
+            break;
+        case SYNC_DIR_NONE:
+            buttonRightNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowNone")));
+            buttonRightNewer->SetToolTip(getDescription(SO_DO_NOTHING));
+            break;
     }
 
     switch (syncConfig.different)
     {
-    case SYNC_DIR_RIGHT:
-        buttonDifferent->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowRight")));
-        buttonDifferent->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
-        break;
-    case SYNC_DIR_LEFT:
-        buttonDifferent->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowLeft")));
-        buttonDifferent->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
-        break;
-    case SYNC_DIR_NONE:
-        buttonDifferent->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowNone")));
-        buttonDifferent->SetToolTip(getDescription(SO_DO_NOTHING));
-        break;
+        case SYNC_DIR_RIGHT:
+            buttonDifferent->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowRight")));
+            buttonDifferent->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
+            break;
+        case SYNC_DIR_LEFT:
+            buttonDifferent->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowLeft")));
+            buttonDifferent->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
+            break;
+        case SYNC_DIR_NONE:
+            buttonDifferent->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowNone")));
+            buttonDifferent->SetToolTip(getDescription(SO_DO_NOTHING));
+            break;
     }
 
     switch (syncConfig.conflict)
     {
-    case SYNC_DIR_RIGHT:
-        buttonConflict->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowRight")));
-        buttonConflict->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
-        break;
-    case SYNC_DIR_LEFT:
-        buttonConflict->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("arrowLeft")));
-        buttonConflict->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
-        break;
-    case SYNC_DIR_NONE:
-        buttonConflict->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("conflict")));
-        buttonConflict->SetToolTip(_("Leave as unresolved conflict"));
-        break;
+        case SYNC_DIR_RIGHT:
+            buttonConflict->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowRight")));
+            buttonConflict->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
+            break;
+        case SYNC_DIR_LEFT:
+            buttonConflict->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowLeft")));
+            buttonConflict->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
+            break;
+        case SYNC_DIR_NONE:
+            buttonConflict->SetBitmapLabel(GlobalResources::instance().getImage(wxT("conflict")));
+            buttonConflict->SetToolTip(_("Leave as unresolved conflict"));
+            break;
     }
 }
 
@@ -341,18 +341,18 @@ void updateToolTipDeletionHandling(wxChoice* choiceHandleError, wxPanel* customD
 
     switch (value)
     {
-    case ffs3::DELETE_PERMANENTLY:
-        choiceHandleError->SetToolTip(_("Delete or overwrite files permanently"));
-        break;
+        case ffs3::DELETE_PERMANENTLY:
+            choiceHandleError->SetToolTip(_("Delete or overwrite files permanently"));
+            break;
 
-    case ffs3::MOVE_TO_RECYCLE_BIN:
-        choiceHandleError->SetToolTip(_("Use Recycle Bin when deleting or overwriting files"));
-        break;
+        case ffs3::MOVE_TO_RECYCLE_BIN:
+            choiceHandleError->SetToolTip(_("Use Recycle Bin when deleting or overwriting files"));
+            break;
 
-    case ffs3::MOVE_TO_CUSTOM_DIRECTORY:
-        choiceHandleError->SetToolTip(_("Move files into a time-stamped subdirectory"));
-        customDir->Enable();
-        break;
+        case ffs3::MOVE_TO_CUSTOM_DIRECTORY:
+            choiceHandleError->SetToolTip(_("Move files into a time-stamped subdirectory"));
+            customDir->Enable();
+            break;
     }
 }
 
@@ -361,15 +361,15 @@ ffs3::DeletionPolicy SyncCfgDialog::getDeletionHandling()
 {
     switch (m_choiceHandleDeletion->GetSelection())
     {
-    case 0:
-        return ffs3::DELETE_PERMANENTLY;
-    case 1:
-        return ffs3::MOVE_TO_RECYCLE_BIN;
-    case 2:
-        return ffs3::MOVE_TO_CUSTOM_DIRECTORY;
-    default:
-        assert(false);
-        return ffs3::MOVE_TO_RECYCLE_BIN;
+        case 0:
+            return ffs3::DELETE_PERMANENTLY;
+        case 1:
+            return ffs3::MOVE_TO_RECYCLE_BIN;
+        case 2:
+            return ffs3::MOVE_TO_CUSTOM_DIRECTORY;
+        default:
+            assert(false);
+            return ffs3::MOVE_TO_RECYCLE_BIN;
     }
 }
 
@@ -379,19 +379,19 @@ void SyncCfgDialog::setDeletionHandling(ffs3::DeletionPolicy newValue)
     m_choiceHandleDeletion->Clear();
     m_choiceHandleDeletion->Append(_("Delete permanently"));
     m_choiceHandleDeletion->Append(_("Use Recycle Bin"));
-    m_choiceHandleDeletion->Append(_("User-defined directory"));
+    m_choiceHandleDeletion->Append(_("Versioning"));
 
     switch (newValue)
     {
-    case ffs3::DELETE_PERMANENTLY:
-        m_choiceHandleDeletion->SetSelection(0);
-        break;
-    case ffs3::MOVE_TO_RECYCLE_BIN:
-        m_choiceHandleDeletion->SetSelection(1);
-        break;
-    case ffs3::MOVE_TO_CUSTOM_DIRECTORY:
-        m_choiceHandleDeletion->SetSelection(2);
-        break;
+        case ffs3::DELETE_PERMANENTLY:
+            m_choiceHandleDeletion->SetSelection(0);
+            break;
+        case ffs3::MOVE_TO_RECYCLE_BIN:
+            m_choiceHandleDeletion->SetSelection(1);
+            break;
+        case ffs3::MOVE_TO_CUSTOM_DIRECTORY:
+            m_choiceHandleDeletion->SetSelection(2);
+            break;
     }
 
     updateToolTipDeletionHandling(m_choiceHandleDeletion, m_panelCustomDeletionDir, newValue);
@@ -429,15 +429,15 @@ void toggleSyncDirection(SyncDirection& current)
 {
     switch (current)
     {
-    case SYNC_DIR_RIGHT:
-        current = SYNC_DIR_LEFT;
-        break;
-    case SYNC_DIR_LEFT:
-        current = SYNC_DIR_NONE;
-        break;
-    case SYNC_DIR_NONE:
-        current = SYNC_DIR_RIGHT;
-        break;
+        case SYNC_DIR_RIGHT:
+            current = SYNC_DIR_LEFT;
+            break;
+        case SYNC_DIR_LEFT:
+            current = SYNC_DIR_NONE;
+            break;
+        case SYNC_DIR_NONE:
+            current = SYNC_DIR_RIGHT;
+            break;
     }
 }
 

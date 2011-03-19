@@ -38,14 +38,14 @@ T abs(const T& d) //absolute value
 }
 
 
-//number conversion C++ ANSI/wide char versions
+//formatted number conversion C++ ANSI/wide char versions
 template <class CharType, class T>
 std::basic_string<CharType> numberToString(const T& number); //convert number to string the C++ way
 
 template <class T, class CharType>
 T stringToNumber(const std::basic_string<CharType>& input); //convert number to string the C++ way
 
-//number conversion wxWidgets
+//formatted number conversion wxWidgets
 template <class T> wxString numberToString(const T& number);
 template <class T> T stringToNumber(const wxString& input);
 
@@ -78,13 +78,15 @@ class wxFile;
 class DebugLog
 {
 public:
-    wxDEPRECATED(DebugLog());
+    wxDEPRECATED(DebugLog(const wxString& filePrefix = wxString()));
     ~DebugLog();
     void write(const wxString& logText);
 
 private:
     wxString assembleFileName();
+
     wxString logfileName;
+    wxString prefix;
     int lineCount;
     wxFile* logFile; //logFile.close(); <- not needed
 };
@@ -130,9 +132,8 @@ template <class T, class CharType>
 inline
 T common::stringToNumber(const std::basic_string<CharType>& input) //convert number to string the C++ way
 {
-    std::basic_istringstream<CharType> ss(input);
-    T number;
-    ss >> number;
+    T number = 0;
+    std::basic_istringstream<CharType>(input) >> number;
     return number;
 }
 

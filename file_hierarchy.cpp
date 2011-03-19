@@ -122,80 +122,80 @@ SyncOperation FileSystemObject::getSyncOperation(
 
     switch (cmpResult)
     {
-    case FILE_LEFT_SIDE_ONLY:
-        switch (syncDir)
-        {
-        case SYNC_DIR_INT_LEFT:
-            return SO_DELETE_LEFT; //delete files on left
-        case SYNC_DIR_INT_RIGHT:
-            return SO_CREATE_NEW_RIGHT; //copy files to right
-        case SYNC_DIR_INT_NONE:
-            return SO_DO_NOTHING;
-        case SYNC_DIR_INT_CONFLICT:
-            return SO_UNRESOLVED_CONFLICT;
-        }
-        break;
+        case FILE_LEFT_SIDE_ONLY:
+            switch (syncDir)
+            {
+                case SYNC_DIR_INT_LEFT:
+                    return SO_DELETE_LEFT; //delete files on left
+                case SYNC_DIR_INT_RIGHT:
+                    return SO_CREATE_NEW_RIGHT; //copy files to right
+                case SYNC_DIR_INT_NONE:
+                    return SO_DO_NOTHING;
+                case SYNC_DIR_INT_CONFLICT:
+                    return SO_UNRESOLVED_CONFLICT;
+            }
+            break;
 
-    case FILE_RIGHT_SIDE_ONLY:
-        switch (syncDir)
-        {
-        case SYNC_DIR_INT_LEFT:
-            return SO_CREATE_NEW_LEFT; //copy files to left
-        case SYNC_DIR_INT_RIGHT:
-            return SO_DELETE_RIGHT; //delete files on right
-        case SYNC_DIR_INT_NONE:
-            return SO_DO_NOTHING;
-        case SYNC_DIR_INT_CONFLICT:
-            return SO_UNRESOLVED_CONFLICT;
-        }
-        break;
+        case FILE_RIGHT_SIDE_ONLY:
+            switch (syncDir)
+            {
+                case SYNC_DIR_INT_LEFT:
+                    return SO_CREATE_NEW_LEFT; //copy files to left
+                case SYNC_DIR_INT_RIGHT:
+                    return SO_DELETE_RIGHT; //delete files on right
+                case SYNC_DIR_INT_NONE:
+                    return SO_DO_NOTHING;
+                case SYNC_DIR_INT_CONFLICT:
+                    return SO_UNRESOLVED_CONFLICT;
+            }
+            break;
 
-    case FILE_LEFT_NEWER:
-    case FILE_RIGHT_NEWER:
-    case FILE_DIFFERENT:
-        switch (syncDir)
-        {
-        case SYNC_DIR_INT_LEFT:
-            return SO_OVERWRITE_LEFT; //copy from right to left
-        case SYNC_DIR_INT_RIGHT:
-            return SO_OVERWRITE_RIGHT; //copy from left to right
-        case SYNC_DIR_INT_NONE:
-            return SO_DO_NOTHING;
-        case SYNC_DIR_INT_CONFLICT:
-            return SO_UNRESOLVED_CONFLICT;
-        }
-        break;
+        case FILE_LEFT_NEWER:
+        case FILE_RIGHT_NEWER:
+        case FILE_DIFFERENT:
+            switch (syncDir)
+            {
+                case SYNC_DIR_INT_LEFT:
+                    return SO_OVERWRITE_LEFT; //copy from right to left
+                case SYNC_DIR_INT_RIGHT:
+                    return SO_OVERWRITE_RIGHT; //copy from left to right
+                case SYNC_DIR_INT_NONE:
+                    return SO_DO_NOTHING;
+                case SYNC_DIR_INT_CONFLICT:
+                    return SO_UNRESOLVED_CONFLICT;
+            }
+            break;
 
-    case FILE_CONFLICT:
-        switch (syncDir)
-        {
-        case SYNC_DIR_INT_LEFT:
-            return SO_OVERWRITE_LEFT; //copy from right to left
-        case SYNC_DIR_INT_RIGHT:
-            return SO_OVERWRITE_RIGHT; //copy from left to right
-        case SYNC_DIR_INT_NONE:
-        case SYNC_DIR_INT_CONFLICT:
-            return SO_UNRESOLVED_CONFLICT;
-        }
-        break;
+        case FILE_CONFLICT:
+            switch (syncDir)
+            {
+                case SYNC_DIR_INT_LEFT:
+                    return SO_OVERWRITE_LEFT; //copy from right to left
+                case SYNC_DIR_INT_RIGHT:
+                    return SO_OVERWRITE_RIGHT; //copy from left to right
+                case SYNC_DIR_INT_NONE:
+                case SYNC_DIR_INT_CONFLICT:
+                    return SO_UNRESOLVED_CONFLICT;
+            }
+            break;
 
-    case FILE_DIFFERENT_METADATA:
-        switch (syncDir)
-        {
-        case SYNC_DIR_INT_LEFT:
-            return SO_COPY_METADATA_TO_LEFT;
-        case SYNC_DIR_INT_RIGHT:
-            return SO_COPY_METADATA_TO_RIGHT;
-        case SYNC_DIR_INT_NONE:
-            return SO_DO_NOTHING;
-        case SYNC_DIR_INT_CONFLICT:
-            return SO_UNRESOLVED_CONFLICT;
-        }
-        break;
+        case FILE_DIFFERENT_METADATA:
+            switch (syncDir)
+            {
+                case SYNC_DIR_INT_LEFT:
+                    return SO_COPY_METADATA_TO_LEFT;
+                case SYNC_DIR_INT_RIGHT:
+                    return SO_COPY_METADATA_TO_RIGHT;
+                case SYNC_DIR_INT_NONE:
+                    return SO_DO_NOTHING;
+                case SYNC_DIR_INT_CONFLICT:
+                    return SO_UNRESOLVED_CONFLICT;
+            }
+            break;
 
-    case FILE_EQUAL:
-        assert(syncDir == SYNC_DIR_INT_NONE);
-        return SO_EQUAL;
+        case FILE_EQUAL:
+            assert(syncDir == SYNC_DIR_INT_NONE);
+            return SO_EQUAL;
     }
 
     return SO_DO_NOTHING; //dummy

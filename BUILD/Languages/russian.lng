@@ -154,8 +154,10 @@
 <Символьная ссылка>
 <multiple selection>
 <групповое выделение>
+A directory input field is empty.
+Поле ввода пути папки пустое.
 A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
-
+Папка, входящая в несколько пар папок, будет изменена. Пожалуйста, проверьте настройки синхронизации!
 A newer version of FreeFileSync is available:
 Доступна новая версия FreeFileSync:
 Abort requested: Waiting for current operation to finish...
@@ -204,6 +206,8 @@ Cannot determine sync-direction:
 Невозможно определить направление синхронизации:
 Cannot find %x
 Невозможно найти %x
+Cannot write to empty directory path!
+
 Category
 Категория
 Clear filter settings
@@ -237,7 +241,7 @@ Comparison settings
 Completed
 Завершено
 Configuration
-Настройки синхронизации
+Настройки
 Configuration loaded!
 Настройки синхронизации загружены!
 Configuration overview:
@@ -372,6 +376,8 @@ Encoding extended time information: %x
 Кодирование расширенной информации о времени: %x
 Endless loop when traversing directory:
 Зацикливание при встрече пересекающихся путей:
+Equal files/folders that differ in attributes only
+Одинаковые файлы/папки, которые отличаются только атрибутами
 Error
 Ошибка
 Error changing modification time:
@@ -478,8 +484,6 @@ Files that exist on both sides, right one is newer
 Файлы, существующие на обоих сторонах, правый новее
 Files that have different content
 Файлы, имеющие различное содержание
-Files/folders that differ in attributes only
-Файлы/папки, которые отличаются только атрибутами
 Files/folders that exist on left side only
 Файлы/папки, существующие только на левой стороне
 Files/folders that exist on right side only
@@ -490,8 +494,6 @@ Filter is active
 Фильтр активен
 Filter settings have changed!
 Настройки фильтра были изменены!
-Filter view
-Вид фильтра
 Filter: All pairs
 Фильтр: Все пары
 Filter: Single pair
@@ -508,6 +510,8 @@ Follow
 Последовательное
 Free disk space available:
 Доступно свободного места на диске:
+Free disk space required:
+Требуемое свободное место на диске:
 FreeFileSync Batch Job
 Пакетное задание FreeFileSync
 FreeFileSync at Sourceforge
@@ -602,6 +606,8 @@ Integrate external applications into context menu. The following macros are avai
 Интегрирует внешние приложения в контекстное меню.\nСледующие команды доступны:
 Invalid FreeFileSync config file!
 Неверный файл конфигурации FreeFileSync!
+Last used configurations (press DEL to remove from list)
+Последние использованные настройки синхронизации\n(нажмите DEL для удаления из списка)
 Leave as unresolved conflict
 Оставить как нерешенный конфликт
 Left
@@ -610,8 +616,6 @@ Legend
 Легенда
 Load configuration from file
 Загрузить настройки синхронизации из файла
-Load configuration history (press DEL to delete items)
-Выбрать настройки синхронизации из списка\n(нажмите DEL для удаления пунктов)
 Log-messages:
 Лог-сообщения:
 Logging
@@ -622,12 +626,16 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Создание теневых копий на WOW64 не поддерживается. Пожалуйста, используйте FreeFileSync 64-разрядной версии.
 Match case
 Учитывать регистр
+Maximum number of logfiles:
+Максимальное количество лог-файлов:
+Memory allocation failed!
+Ошибка выделения памяти! (Не хватает памяти)
 Minimum Idle Time [seconds]
 Минимальное время простоя [секунд]
 Mirror ->>
 Зеркало ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Резервная копия левой папки: правая папка будет перезаписана и после синхронизации будет точно соответствовать левой папке.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+Зеркальная (резервная) копия левой части. В результате синхронизации правая папка будет изменена до полного соответствия левой.
 Monitoring active...
 Мониторинг включен...
 More than 50% of the total number of files will be copied or deleted!
@@ -637,7 +645,7 @@ Move column down
 Move column up
 Переместить вверх
 Move files into a time-stamped subdirectory
-Переместить файлы во временно-отмеченную подпапку
+Перемещать файлы в заданную папку (можно создавать архивные версии удаленных файлов)
 Moving %x to Recycle Bin
 Отправка %x в "Корзину"
 Moving Symbolic Link %x to user-defined directory %y
@@ -698,8 +706,6 @@ Published under the GNU General Public License:
 Издается под лицензией GNU General Public License:
 Question
 Вопрос
-Re-enable all hidden dialogs?
-Показать все скрытые диалоги?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Автоматическая синхронизация
 RealtimeSync configuration
@@ -720,6 +726,8 @@ Reset
 Сбросить
 Reset view
 Сброс настроек вида
+Restore all hidden dialogs?
+Отображать все скрытые диалоговые окна?
 Right
 Справа
 S&ave configuration...
@@ -742,6 +750,8 @@ Select logfile directory:
 Выберите папку для лог-файлов:
 Select variant:
 Выберите вариант:
+Select view
+Список файлов
 Set direction:
 Выберите направление:
 Setting default synchronization directions: Old files will be overwritten with newer files.
@@ -830,8 +840,6 @@ Synchronize...
 Синхронизировать
 Synchronizing...
 Синхронизация...
-System out of memory!
-Нехватка памяти!
 Target directory already existing!
 Конечная папка уже существует!
 Target file already existing!
@@ -852,8 +860,6 @@ Time remaining:
 Времени осталось:
 Total amount of data that will be transferred
 Общий объем данных, который будет передаваться
-Total required free disk space:
-Общее требуемое свободное дисковое пространство:
 Total time:
 Общее время:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -874,14 +880,14 @@ Use Recycle Bin
 Использовать "Корзину"
 Use Recycle Bin when deleting or overwriting files
 Использовать "Корзину" при удалении или перезаписи файлов
-User-defined directory
-Использовать заданную пользователем папку
 User-defined directory for deletion was not specified!
 Пользовательская папка для удаления не была указана!
 Variant
 Вариант
 Verifying file %x
 Проверка файла %x
+Versioning
+Перемещать удаляемые файлы в заданную папку
 Volume name %x not part of filename %y!
 Имя тома %x не является частью имени файла %y!
 Waiting for missing directories...
@@ -890,14 +896,12 @@ Waiting while directory is locked (%x)...
 Ожидание снятия блокировки с папки (%x)...
 Warning
 Внимание
-Warning: Synchronization failed for %x item(s):
-Внимание: Синхронизация провалена для %x 
 When the comparison is started with this option set the following decision tree is processed:
 Когда сравнение запущено с этими критериями, алгоритм следующий:
 You can ignore conflicts and continue synchronization.
 Вы можете проигнорировать их и продолжить синхронизацию.
-You can ignore the error to consider not existing directories as empty.
-Вы можете проигнорировать ошибку, приняв несуществующие папки за пустые.
+You can ignore this error to consider the directory as empty.
+Вы можете проигнорировать ошибку, приняв папку за пустую.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Вы можете попытаться синхронизировать оставшиеся пункты снова (без повторного сравнения)!
 different

@@ -19,16 +19,16 @@ std::string getTypeName(xmlAccess::XmlType type)
 {
     switch (type)
     {
-    case xmlAccess::XML_GUI_CONFIG:
-        return "GUI";
-    case xmlAccess::XML_BATCH_CONFIG:
-        return "BATCH";
-    case xmlAccess::XML_GLOBAL_SETTINGS:
-        return "GLOBAL";
-    case xmlAccess::XML_REAL_CONFIG:
-        return "REAL";
-    case xmlAccess::XML_OTHER:
-        break;
+        case xmlAccess::XML_GUI_CONFIG:
+            return "GUI";
+        case xmlAccess::XML_BATCH_CONFIG:
+            return "BATCH";
+        case xmlAccess::XML_GLOBAL_SETTINGS:
+            return "GLOBAL";
+        case xmlAccess::XML_REAL_CONFIG:
+            return "REAL";
+        case xmlAccess::XML_OTHER:
+            break;
     }
     assert(false);
     return "OTHER";
@@ -44,13 +44,13 @@ void normalize(std::vector<char>& stream)
     for (std::vector<char>::const_iterator i = stream.begin(); i != stream.end(); ++i)
         switch (*i)
         {
-        case 0xD:
-            tmp.push_back(0xA);
-            if (i + 1 != stream.end() && *(i + 1) == 0xA)
-                ++i;
-            break;
-        default:
-            tmp.push_back(*i);
+            case 0xD:
+                tmp.push_back(0xA);
+                if (i + 1 != stream.end() && *(i + 1) == 0xA)
+                    ++i;
+                break;
+            default:
+                tmp.push_back(*i);
         }
 
     stream.swap(tmp);
@@ -131,6 +131,8 @@ xmlAccess::XmlType xmlAccess::getXmlType(const wxString& filename) //throw()
 
 void xmlAccess::loadXmlDocument(const wxString& filename, const xmlAccess::XmlType type, TiXmlDocument& document) //throw XmlError()
 {
+    TiXmlBase::SetCondenseWhiteSpace(false); //do not condense whitespace characters
+
     ::loadRawXmlDocument(filename, document); //throw XmlError()
 
     TiXmlElement* root = document.RootElement();

@@ -154,6 +154,10 @@
 <Dowiązanie symboliczne>
 <multiple selection>
 <zaznaczone elementy>
+A directory input field is empty.
+Pole ze ścieżką katalogu jest puste.
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+Katalog zostanie zmodyfikowany w efekcie synchronizacji wielu par folderów! Zweryfikuj ustawienia synchronizacji!
 A newer version of FreeFileSync is available:
 Dostępna jest nowa wersja FreeFileSync:
 Abort requested: Waiting for current operation to finish...
@@ -370,6 +374,8 @@ Encoding extended time information: %x
 Odkodowywanie rozszerzonych informacji o czasie: %x
 Endless loop when traversing directory:
 Zapętlenie podczas przeglądania katalogu:
+Equal files/folders that differ in attributes only
+Pliki/foldery różniące się tylko atrybutami
 Error
 Błąd
 Error changing modification time:
@@ -476,8 +482,6 @@ Files that exist on both sides, right one is newer
 Pliki, które istnieją po obu stronach, prawa strona jest nowsza
 Files that have different content
 Pliki, które mają różną zawartość
-Files/folders that differ in attributes only
-Pliki/foldery różniące się wyłącznie atrybutami
 Files/folders that exist on left side only
 Pliki/katalogi istniejące tylko po lewej stronie
 Files/folders that exist on right side only
@@ -488,8 +492,6 @@ Filter is active
 Filtr jest aktywny
 Filter settings have changed!
 Ustawienia filtra uległy zmianie!
-Filter view
-Filtr podglądu
 Filter: All pairs
 Filtr: Wszystkie pary
 Filter: Single pair
@@ -506,6 +508,8 @@ Follow
 Podąrzaj
 Free disk space available:
 Wolne miejsce:
+Free disk space required:
+Wymagane wolne miejsce:
 FreeFileSync Batch Job
 FreeFileSync plik wsadowy
 FreeFileSync at Sourceforge
@@ -600,6 +604,8 @@ Integrate external applications into context menu. The following macros are avai
 Dołącz zewnętrzną aplikację do menu kontekstowego. Dostępne macra:
 Invalid FreeFileSync config file!
 Nieprawidłowy plik konfiguracyjny!
+Last used configurations (press DEL to remove from list)
+Ostatnio użyta konfiguracja (naciśnij DEL żeby usunąć z listy)
 Leave as unresolved conflict
 Zostaw jako nierozwiązany konflikt
 Left
@@ -608,8 +614,6 @@ Legend
 Legenda
 Load configuration from file
 Wczytaj konfigurację z pliku
-Load configuration history (press DEL to delete items)
-Wczytaj historie konfiguracji (naciśnij Del aby usunąć element)
 Log-messages:
 Logi:
 Logging
@@ -620,12 +624,16 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Tworzenie Shadow Copies dla WOW64 nie jest obsługiwane. Zainstaluj 64 bitową wersję FreeFileSync.
 Match case
 Uwzględnij wielkość liter
+Maximum number of logfiles:
+Maksymalna liczba plików z logami:
+Memory allocation failed!
+Błąd alokacji zasobów!
 Minimum Idle Time [seconds]
 Minimalny czas bezczynności [sekundy]
 Mirror ->>
 Lustrzana ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Kopia lustrzana lewego folderu: Prawy folder będzie nadpisany zawartością lewego folderu.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+Lustrzana kopia lewego folderu. Prawy folder po synchronizacji jest lustrzaną kopią lewego folderu.
 Monitoring active...
 Monitorowanie aktywne...
 More than 50% of the total number of files will be copied or deleted!
@@ -696,8 +704,6 @@ Published under the GNU General Public License:
 Udostępnione na zasadach licencji GNU General Public License:
 Question
 Pytanie
-Re-enable all hidden dialogs?
-Odblokować wszystkie ukryte dialogi?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Automatyczna Synchronizacja
 RealtimeSync configuration
@@ -718,6 +724,8 @@ Reset
 Resetuj
 Reset view
 Resetuj widok
+Restore all hidden dialogs?
+Przywrócić wszystkie ukryte dialogi?
 Right
 Prawy
 S&ave configuration...
@@ -740,6 +748,8 @@ Select logfile directory:
 Wybierz katalog z logami:
 Select variant:
 Wybierz wariant:
+Select view
+Określ widok
 Set direction:
 Kierunek  synchronizacji: 
 Setting default synchronization directions: Old files will be overwritten with newer files.
@@ -828,8 +838,6 @@ Synchronize...
 Synchronizuj...
 Synchronizing...
 Synchronizuję...
-System out of memory!
-Brak pamięci!
 Target directory already existing!
 Katalog docelowy już istnieje!
 Target file already existing!
@@ -850,8 +858,6 @@ Time remaining:
 Pozostały czas:
 Total amount of data that will be transferred
 Liczba danych do przekopiowania
-Total required free disk space:
-Całkowita wymagana przestrzeń dyskowa:
 Total time:
 Całkowity czas:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -872,14 +878,14 @@ Use Recycle Bin
 Użyj kosza
 Use Recycle Bin when deleting or overwriting files
 Używaj Kosza podczas usuwania lub nadpisywania plików
-User-defined directory
-Katalog użytkownika
 User-defined directory for deletion was not specified!
 Katalog użytkownika dla elementów usuniętych nie został określony!
 Variant
 Wariant
 Verifying file %x
 Weryfikowanie pliku %x
+Versioning
+Wersjonowanie
 Volume name %x not part of filename %y!
 Dysk %x nie jest częścią pliku %y!
 Waiting for missing directories...
@@ -888,14 +894,12 @@ Waiting while directory is locked (%x)...
 Blokada katalogu (%x), oczekiwanie...
 Warning
 Uwaga
-Warning: Synchronization failed for %x item(s):
-Uwaga: Błąd synchronizacji dla \"%x\" elementów:
 When the comparison is started with this option set the following decision tree is processed:
 Gdy porównywanie z zaznaczoną opcją jest w toku, podejmowane są następujące dezyje:
 You can ignore conflicts and continue synchronization.
 Możesz je zignorować i kontynuować synchronizację.
-You can ignore the error to consider not existing directories as empty.
-Możesz zignorować ten błąd i uznać nieistniejący katalog za pusty.
+You can ignore this error to consider the directory as empty.
+Możesz zignorować ten błąd uznająć jeden z katalogów jako pusty.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Możesz spróbować synchronizować pozostałe elementy ponownie (bez konieczności ponownego porównywania)!
 different

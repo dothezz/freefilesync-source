@@ -4,9 +4,9 @@
 // Copyright (c) 2008 Richard Sposato
 // The copyright on this file is protected under the terms of the MIT license.
 //
-// Permission to use, copy, modify, distribute and sell this software for any 
-// purpose is hereby granted without fee, provided that the above copyright 
-// notice appear in all copies and that both that copyright notice and this 
+// Permission to use, copy, modify, distribute and sell this software for any
+// purpose is hereby granted without fee, provided that the above copyright
+// notice appear in all copies and that both that copyright notice and this
 // permission notice appear in supporting documentation.
 //
 // The author makes no representations about the suitability of this software
@@ -29,13 +29,13 @@
 #include <time.h>
 
 #if defined( _MSC_VER )
-    #include <Windows.h>
+#include <Windows.h>
 #else
-    #include <pthread.h>
+#include <pthread.h>
 #endif
 
 #if !defined(_WIN32) && !defined(_WIN64)
-    #include <unistd.h> // declares sleep under Linux
+#include <unistd.h> // declares sleep under Linux
 #endif
 
 /** @par thread_local Keyword
@@ -49,26 +49,26 @@
  you can't use LevelMutex.
  */
 #ifndef LOKI_THREAD_LOCAL
-    #if defined( _MSC_VER )
-        #if ( _MSC_VER >= 1300 )
-            #define LOKI_THREAD_LOCAL __declspec( thread )
-        #else
-            #error "Only Visual Studio versions 7.0 and after supported."
-        #endif
+#if defined( _MSC_VER )
+#if ( _MSC_VER >= 1300 )
+#define LOKI_THREAD_LOCAL __declspec( thread )
+#else
+#error "Only Visual Studio versions 7.0 and after supported."
+#endif
 
-    #elif ( __GNUC__ )
-        #define LOKI_THREAD_LOCAL __thread
+#elif ( __GNUC__ )
+#define LOKI_THREAD_LOCAL __thread
 
-    #else
-        #warning "Check if your compiler provides thread local storage."
-        #define LOKI_THREAD_LOCAL thread_local
-    #endif
+#else
+#warning "Check if your compiler provides thread local storage."
+#define LOKI_THREAD_LOCAL thread_local
+#endif
 #endif
 
 #if defined( DEBUG ) || defined( _DEBUG )
-    #define LOKI_MUTEX_DEBUG_CODE( x ) x
+#define LOKI_MUTEX_DEBUG_CODE( x ) x
 #else
-    #define LOKI_MUTEX_DEBUG_CODE( x )
+#define LOKI_MUTEX_DEBUG_CODE( x )
 #endif
 
 
@@ -154,7 +154,7 @@ public:
     static const unsigned int UnlockedLevel = 0xFFFFFFFF;
 
     /// Container for locking multiple mutexes at once.
-    typedef ::std::vector< volatile LevelMutexInfo * > MutexContainer;
+    typedef ::std::vector< volatile LevelMutexInfo* > MutexContainer;
     typedef MutexContainer::iterator LevelMutexContainerIter;
     typedef MutexContainer::const_iterator LevelMutexContainerCIter;
     typedef MutexContainer::reverse_iterator LevelMutexContainerRIter;
@@ -170,7 +170,7 @@ public:
       by address order.
      @return Enum value indicating success or error.
      */
-    static MutexErrors::Type MultiLock( MutexContainer & mutexes );
+    static MutexErrors::Type MultiLock( MutexContainer& mutexes );
 
     /** Locks several mutexes at once.  Requires O(m + n*n + n*t) actions where m is
      the number of mutexes currently locked by the thread, n is the number of mutexes
@@ -184,8 +184,8 @@ public:
      @param milliSeconds Amount of time to wait for each mutex.
      @return Enum value indicating success or error.
      */
-    static MutexErrors::Type MultiLock( MutexContainer & mutexes,
-        unsigned int milliSeconds );
+    static MutexErrors::Type MultiLock( MutexContainer& mutexes,
+                                        unsigned int milliSeconds );
 
     /** Unlocks several mutexes at once.  Requires O(m) actions where m is the number of
      mutexes in the container. This provides strong exception safety. If an exception
@@ -195,14 +195,14 @@ public:
       be locked by the current thread.  This sorts the container dby address order.
      @return Enum value indicating success or error.
      */
-    static MutexErrors::Type MultiUnlock( MutexContainer & mutexes );
+    static MutexErrors::Type MultiUnlock( MutexContainer& mutexes );
 
     /** Gives pointer to most recently locked mutex, or NULL if nothing locked.
      The pointer is for a const mutex so the mutex can't be modified inappropriately.
      The pointer is for a volatile mutex so callers can call volatile member
      functions to get info about the mutex.
      */
-    static const volatile LevelMutexInfo * GetCurrentMutex( void );
+    static const volatile LevelMutexInfo* GetCurrentMutex( void );
 
     /// Returns the level of this mutex.
     inline unsigned int GetLevel( void ) const volatile { return m_level; }
@@ -214,7 +214,7 @@ public:
     inline unsigned int GetLockCount( void ) const volatile { return m_count; }
 
     /// Returns pointer to mutex previously locked by the thread which locked this.
-    inline const volatile LevelMutexInfo * GetPrevious( void ) const volatile
+    inline const volatile LevelMutexInfo* GetPrevious( void ) const volatile
     {
         return m_previous;
     }
@@ -279,14 +279,14 @@ protected:
     class Checker
     {
     public:
-        inline explicit Checker( const volatile LevelMutexInfo * mutex ) :
+        inline explicit Checker( const volatile LevelMutexInfo* mutex ) :
             m_mutex( mutex ) {}
         inline ~Checker( void ) { m_mutex->IsValid(); }
     private:
         Checker( void );
-        Checker( const Checker & );
-        Checker & operator = ( const Checker & );
-        const volatile LevelMutexInfo * m_mutex;
+        Checker( const Checker& );
+        Checker& operator = ( const Checker& );
+        const volatile LevelMutexInfo* m_mutex;
     };
 
     /** @class MutexUndoer
@@ -299,18 +299,18 @@ protected:
     {
     public:
 
-        explicit MutexUndoer( MutexContainer & mutexes );
+        explicit MutexUndoer( MutexContainer& mutexes );
         ~MutexUndoer( void );
-        void SetPlace( LevelMutexContainerIter & here );
+        void SetPlace( LevelMutexContainerIter& here );
         void Cancel( void );
 
     private:
 
         MutexUndoer( void );
-        MutexUndoer( const MutexUndoer & );
-        MutexUndoer & operator = ( const MutexUndoer & );
+        MutexUndoer( const MutexUndoer& );
+        MutexUndoer& operator = ( const MutexUndoer& );
 
-        MutexContainer & m_mutexes;
+        MutexContainer& m_mutexes;
         LevelMutexContainerIter m_here;
     };
 
@@ -354,9 +354,9 @@ protected:
 private:
 
     /// Copy constructor is not implemented.
-    LevelMutexInfo( const LevelMutexInfo & );
+    LevelMutexInfo( const LevelMutexInfo& );
     /// Copy-assignment operator is not implemented.
-    LevelMutexInfo & operator = ( const LevelMutexInfo & );
+    LevelMutexInfo& operator = ( const LevelMutexInfo& );
 
     /** Called only by MultiLock & MultiUnlock to pass a result through an
      error checking policy.
@@ -373,11 +373,11 @@ private:
      */
     virtual MutexErrors::Type LockThis( unsigned int milliSeconds ) volatile = 0;
 
-    /// Called only by MultiUnlock to unlock each particular mutex within a container. 
+    /// Called only by MultiUnlock to unlock each particular mutex within a container.
     virtual MutexErrors::Type UnlockThis( void ) volatile = 0;
 
     /// Pointer to singly-linked list of mutexes locked by the current thread.
-    static LOKI_THREAD_LOCAL volatile LevelMutexInfo * s_currentMutex;
+    static LOKI_THREAD_LOCAL volatile LevelMutexInfo* s_currentMutex;
 
     /// Level of this mutex.
     const unsigned int m_level;
@@ -386,7 +386,7 @@ private:
     unsigned int m_count;
 
     /// Pointer to mutex locked before this one.
-    volatile LevelMutexInfo * m_previous;
+    volatile LevelMutexInfo* m_previous;
 
 };
 
@@ -401,7 +401,7 @@ class ThrowOnAnyMutexError
 {
 public:
     static MutexErrors::Type CheckError( MutexErrors::Type error,
-        unsigned int level );
+                                         unsigned int level );
 };
 
 // ----------------------------------------------------------------------------
@@ -415,7 +415,7 @@ class ThrowOnBadDesignMutexError
 {
 public:
     static MutexErrors::Type CheckError( MutexErrors::Type error,
-        unsigned int level );
+                                         unsigned int level );
 };
 
 // ----------------------------------------------------------------------------
@@ -429,11 +429,11 @@ class AssertAnyMutexError
 {
 public:
     static inline MutexErrors::Type CheckError( MutexErrors::Type error,
-        unsigned int level )
+                                                unsigned int level )
     {
         (void)level;
         assert( ( error == MutexErrors::Success )
-             || ( error == MutexErrors::NoProblem ) );
+                || ( error == MutexErrors::NoProblem ) );
         return error;
     }
 };
@@ -449,11 +449,11 @@ class AssertBadDesignMutexError
 {
 public:
     static inline MutexErrors::Type CheckError( MutexErrors::Type error,
-        unsigned int level )
+                                                unsigned int level )
     {
         (void)level;
         assert( ( error != MutexErrors::LevelTooHigh )
-             && ( error != MutexErrors::LevelTooLow  ) );
+                && ( error != MutexErrors::LevelTooLow  ) );
         return error;
     }
 };
@@ -469,7 +469,7 @@ class JustReturnMutexError
 {
 public:
     static inline MutexErrors::Type CheckError( MutexErrors::Type error,
-        unsigned int level )
+                                                unsigned int level )
     {
         (void)level;
         return error;
@@ -533,24 +533,24 @@ public:
 private:
 
     /// Copy constructor is not implemented.
-    SpinLevelMutex( const SpinLevelMutex & );
+    SpinLevelMutex( const SpinLevelMutex& );
     /// Copy-assignment operator is not implemented.
-    SpinLevelMutex & operator = ( const SpinLevelMutex & );
+    SpinLevelMutex& operator = ( const SpinLevelMutex& );
 
 #if defined( _MSC_VER )
-    #if ( _MSC_VER >= 1300 )
-        /// The actual mutex.
-        CRITICAL_SECTION m_mutex;
-    #else
-        #error "Only Visual Studio versions 7.0 and after supported."
-    #endif
+#if ( _MSC_VER >= 1300 )
+    /// The actual mutex.
+    CRITICAL_SECTION m_mutex;
+#else
+#error "Only Visual Studio versions 7.0 and after supported."
+#endif
 
 #elif ( __GNUC__ )
     /// The actual mutex.
     pthread_mutex_t m_mutex;
 
 #else
-    #error "Check if any mutex libraries are compatible with your compiler."
+#error "Check if any mutex libraries are compatible with your compiler."
 #endif
 
     /// Keep a copy of the mutex level around for error reporting.
@@ -564,7 +564,7 @@ private:
  Implements a sleeping loop to wait for the mutex to unlock.
 
  @par Purpose
- Since this class puts the thread to sleep for short intervals, you can use this 
+ Since this class puts the thread to sleep for short intervals, you can use this
  class for most of your mutexes. Especially for locking any high level resources
  where any one operation on the resouce consumes many CPU cycles.  The purpose of
  this mutex is to reduce the number of CPU cycles spent in idle loops.  All
@@ -613,17 +613,17 @@ private:
     /// Default constructor is not implemented.
     SleepLevelMutex( void );
     /// Copy constructor is not implemented.
-    SleepLevelMutex( const SleepLevelMutex & );
+    SleepLevelMutex( const SleepLevelMutex& );
     /// Copy-assignment operator is not implemented.
-    SleepLevelMutex & operator = ( const SleepLevelMutex & );
+    SleepLevelMutex& operator = ( const SleepLevelMutex& );
 
 #if defined( _MSC_VER )
-    #if ( _MSC_VER >= 1300 )
-        /// True if operating system may wake thread to respond to events.
-        bool m_wakable;
-    #else
-        #error "Only Visual Studio versions 7.0 and after supported."
-    #endif
+#if ( _MSC_VER >= 1300 )
+    /// True if operating system may wake thread to respond to events.
+    bool m_wakable;
+#else
+#error "Only Visual Studio versions 7.0 and after supported."
+#endif
 #endif
 
     /// How many milli-seconds to sleep before trying to lock mutex again.
@@ -738,11 +738,11 @@ private:
 
 template
 <
-    class MutexPolicy,
-    unsigned int DefaultLevel,
-    class ErrorPolicy = ::Loki::ThrowOnBadDesignMutexError,
-    class WaitPolicy  = ::Loki::NoMutexWait
->
+class MutexPolicy,
+      unsigned int DefaultLevel,
+      class ErrorPolicy = ::Loki::ThrowOnBadDesignMutexError,
+      class WaitPolicy  = ::Loki::NoMutexWait
+      >
 class LevelMutex : public LevelMutexInfo
 {
 public:
@@ -775,10 +775,10 @@ public:
      const and volatile qualifiers so callers get a reference to a MutexPolicy
      with the proper qualifiers.
      */
-    inline const volatile MutexPolicy & GetMutexPolicy( void ) const volatile { return m_mutex; }
-    inline       volatile MutexPolicy & GetMutexPolicy( void )       volatile { return m_mutex; }
-    inline const          MutexPolicy & GetMutexPolicy( void ) const          { return m_mutex; }
-    inline                MutexPolicy & GetMutexPolicy( void )                { return m_mutex; }
+    inline const volatile MutexPolicy& GetMutexPolicy( void ) const volatile { return m_mutex; }
+    inline       volatile MutexPolicy& GetMutexPolicy( void )       volatile { return m_mutex; }
+    inline const          MutexPolicy& GetMutexPolicy( void ) const          { return m_mutex; }
+    inline                MutexPolicy& GetMutexPolicy( void )                { return m_mutex; }
 
     virtual MutexErrors::Type TryLock( void ) volatile
     {
@@ -889,9 +889,9 @@ public:
 private:
 
     /// Copy constructor is not implemented since mutexes don't get copied.
-    LevelMutex( const LevelMutex & );
+    LevelMutex( const LevelMutex& );
     /// Copy-assignment operator is not implemented since mutexes don't get copied.
-    LevelMutex & operator = ( const LevelMutex & );
+    LevelMutex& operator = ( const LevelMutex& );
 
     virtual MutexErrors::Type DoErrorCheck( MutexErrors::Type result ) const volatile
     {
@@ -1002,7 +1002,7 @@ unsigned int CountMutexesAtCurrentLevel( void );
 /** Determines if container of mutexes matches the recently locked mutexes.
  If they do match, it returns success, otherwise an error condition.
  */
-MutexErrors::Type DoMutexesMatchContainer( const LevelMutexInfo::MutexContainer & mutexes );
+MutexErrors::Type DoMutexesMatchContainer( const LevelMutexInfo::MutexContainer& mutexes );
 
 // ----------------------------------------------------------------------------
 
@@ -1018,19 +1018,19 @@ public:
     /** Constructs an exception which stores information about a mutex and the
      reason an attempt to use a mutex failed.
      */
-    MutexException( const char * message, unsigned int level, MutexErrors::Type reason );
+    MutexException( const char* message, unsigned int level, MutexErrors::Type reason );
 
     /// Copy constructor performs a member-by-member copy of an exception.
-    MutexException( const MutexException & that ) throw ();
+    MutexException( const MutexException& that ) throw ();
 
     /// Copy-assignment operator performs a member-by-member copy of an exception.
-    MutexException & operator = ( const MutexException & that ) throw ();
+    MutexException& operator = ( const MutexException& that ) throw ();
 
     /// Destroys the exception.
     virtual ~MutexException( void ) throw();
 
     /// Returns a simple message about which operation failed.
-    virtual const char * what( void ) const throw();
+    virtual const char* what( void ) const throw();
 
     /// Returns level of mutex(es) used when problem occurred.
     unsigned int GetLevel( void ) const { return m_level; }
@@ -1044,7 +1044,7 @@ private:
     MutexException( void ) throw ();
 
     /// Simple message about operation that failed.
-    const char * m_message;
+    const char* m_message;
     /// Level of mutex(es) used when problem occurred.
     unsigned int m_level;
     /// Error status for why operation failed.
@@ -1071,7 +1071,7 @@ public:
      @param lock True if function wants to lock the mutex as this gets
       constructed.
      */
-    explicit MutexLocker( volatile LevelMutexInfo & mutex, bool lock = true );
+    explicit MutexLocker( volatile LevelMutexInfo& mutex, bool lock = true );
 
     /** Creates an object to lock an unlock a mutex for a function.  This waits
      a specified amount of time for another thread to unlock the mutex if it is
@@ -1082,8 +1082,8 @@ public:
      @param lock True if function wants to lock the mutex as this gets
       constructed.
      */
-    MutexLocker( volatile LevelMutexInfo & mutex, unsigned int milliSeconds,
-        bool lock = true );
+    MutexLocker( volatile LevelMutexInfo& mutex, unsigned int milliSeconds,
+                 bool lock = true );
 
     /// Destructs the locker, and determines if it needs to unlock the mutex.
     ~MutexLocker( void );
@@ -1107,23 +1107,23 @@ public:
     /// Returns true if the mutex is locked by this object.
     inline bool IsLocked( void ) const { return m_locked; }
 
-    /// Provides access to mutex controlled by this. 
-    const volatile LevelMutexInfo & GetMutex( void ) const { return m_mutex; }
+    /// Provides access to mutex controlled by this.
+    const volatile LevelMutexInfo& GetMutex( void ) const { return m_mutex; }
 
 private:
 
     /// Default constructor is not implemented.
     MutexLocker( void );
     /// Copy constructor is not implemented.
-    MutexLocker( const MutexLocker & );
+    MutexLocker( const MutexLocker& );
     /// Copy-assignment operator is not implemented.
-    MutexLocker & operator = ( const MutexLocker & );
+    MutexLocker& operator = ( const MutexLocker& );
 
     /// True if mutex got locked.
     bool m_locked;
 
     /// Reference to mutex.
-    volatile LevelMutexInfo & m_mutex;
+    volatile LevelMutexInfo& m_mutex;
 };
 
 // ----------------------------------------------------------------------------
@@ -1147,8 +1147,8 @@ public:
      @param lock True if function wants to lock the mutex as this gets
       constructed.
      */
-    explicit MultiMutexLocker( LevelMutexInfo::MutexContainer & mutexes,
-        bool lock = true );
+    explicit MultiMutexLocker( LevelMutexInfo::MutexContainer& mutexes,
+                               bool lock = true );
 
     /** Creates an object to lock and unlock a collection of mutexes for a function.
      This waits a specified amount of time for other threads to unlock each mutex
@@ -1160,8 +1160,8 @@ public:
      @param lock True if function wants to lock the mutexes as this gets
       constructed.
      */
-    MultiMutexLocker( LevelMutexInfo::MutexContainer & mutexes,
-        unsigned int milliSeconds, bool lock = true );
+    MultiMutexLocker( LevelMutexInfo::MutexContainer& mutexes,
+                      unsigned int milliSeconds, bool lock = true );
 
     /// Destructs the locker, and determines if it needs to unlock the mutexes.
     ~MultiMutexLocker( void );
@@ -1185,23 +1185,23 @@ public:
     /// Returns true if the mutexes are locked by this object.
     inline bool IsLocked( void ) const { return m_locked; }
 
-    /// Provides access to the collection of mutexes controlled by this. 
-    const LevelMutexInfo::MutexContainer & GetMutexes( void ) const { return m_mutexes; }
+    /// Provides access to the collection of mutexes controlled by this.
+    const LevelMutexInfo::MutexContainer& GetMutexes( void ) const { return m_mutexes; }
 
 private:
 
     /// Default constructor is not implemented.
     MultiMutexLocker( void );
     /// Copy constructor is not implemented.
-    MultiMutexLocker( const MultiMutexLocker & );
+    MultiMutexLocker( const MultiMutexLocker& );
     /// Copy-assignment operator is not implemented.
-    MultiMutexLocker & operator = ( const MultiMutexLocker & );
+    MultiMutexLocker& operator = ( const MultiMutexLocker& );
 
     /// True if mutexes got locked.
     bool m_locked;
 
     /// Reference to external container of mutexes;
-    LevelMutexInfo::MutexContainer & m_mutexes;
+    LevelMutexInfo::MutexContainer& m_mutexes;
 };
 
 // ----------------------------------------------------------------------------

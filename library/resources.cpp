@@ -18,7 +18,7 @@
 using namespace ffs3;
 
 
-const GlobalResources& GlobalResources::getInstance()
+const GlobalResources& GlobalResources::instance()
 {
     static GlobalResources instance;
     return instance;
@@ -31,6 +31,8 @@ GlobalResources::GlobalResources()
     animationMoney = new wxAnimation(wxNullAnimation);
     animationSync  = new wxAnimation(wxNullAnimation);
     programIcon    = new wxIcon(wxNullIcon);
+
+    load();
 }
 
 
@@ -65,7 +67,7 @@ void loadAnimFromZip(wxZipInputStream& zipInput, wxAnimation* animation)
 }
 
 
-void GlobalResources::load() const
+void GlobalResources::load()
 {
     wxFFileInputStream input(ffs3::getResourceDir() + wxT("Resources.dat"));
     if (input.IsOk()) //if not... we don't want to react too harsh here
@@ -104,16 +106,16 @@ void GlobalResources::load() const
     //*programIcon = wxIcon(FreeFileSync_xpm);
 
     //use big logo bitmap for better quality
-    programIcon->CopyFromBitmap(getImageByName(wxT("FreeFileSync.png")));
+    programIcon->CopyFromBitmap(getImage(wxT("FreeFileSync.png")));
 #endif
 }
 
 
-const wxBitmap& GlobalResources::getImageByName(const wxString& imageName) const
+const wxBitmap& GlobalResources::getImage(const wxString& imageName) const
 {
     const std::map<wxString, wxBitmap*>::const_iterator bmp = imageName.Find(wxChar('.')) == wxNOT_FOUND ? //assume .png ending if nothing else specified
-            bitmapResource.find(imageName + wxT(".png")) :
-            bitmapResource.find(imageName);
+                                                              bitmapResource.find(imageName + wxT(".png")) :
+                                                              bitmapResource.find(imageName);
 
     if (bmp != bitmapResource.end())
         return *bmp->second;

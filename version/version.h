@@ -2,5 +2,5 @@
 
 namespace ffs3
 {
-    const wxString currentVersion = wxT("3.13"); //internal linkage!
+const wxString currentVersion = wxT("3.14"); //internal linkage!
 }

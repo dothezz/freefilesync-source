@@ -199,7 +199,7 @@ public:
                 {
                     const DWORD lastError = ::GetLastError();
                     if (lastError != ERROR_CALL_NOT_IMPLEMENTED && //fail on SAMBA share: this shouldn't be a showstopper!
-                            lastError != ERROR_SERVICE_SPECIFIC_ERROR) //neither should be fail for "Pogoplug" mapped network drives
+                        lastError != ERROR_SERVICE_SPECIFIC_ERROR) //neither should be fail for "Pogoplug" mapped network drives
                         throw ffs3::FileError(wxString(wxT("Could not register device removal notifications:")) + wxT("\n\n") + ffs3::getLastErrorFormatted(lastError));
                 }
                 else
@@ -243,15 +243,15 @@ private:
                     if (notifications.find(requestNotification) != notifications.end()) //is it for one of our notifications we registered?
                         switch (wParam)
                         {
-                        case DBT_DEVICEQUERYREMOVE:
-                            parent_.onRequestRemoval(body->dbch_handle);
-                            break;
-                        case DBT_DEVICEQUERYREMOVEFAILED:
-                            parent_.onRemovalFinished(body->dbch_handle, false);
-                            break;
-                        case DBT_DEVICEREMOVECOMPLETE:
-                            parent_.onRemovalFinished(body->dbch_handle, true);
-                            break;
+                            case DBT_DEVICEQUERYREMOVE:
+                                parent_.onRequestRemoval(body->dbch_handle);
+                                break;
+                            case DBT_DEVICEQUERYREMOVEFAILED:
+                                parent_.onRemovalFinished(body->dbch_handle, false);
+                                break;
+                            case DBT_DEVICEREMOVECOMPLETE:
+                                parent_.onRemovalFinished(body->dbch_handle, true);
+                                break;
                         }
                 }
             }

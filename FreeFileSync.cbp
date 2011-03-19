@@ -29,7 +29,7 @@
 					<Add library="libwxpng.a" />
 					<Add library="libwxzlib.a" />
 					<Add library="libwxbase28u_net.a" />
-					<Add library="libboost_thread-mgw45-mt-s-1_45.a" />
+					<Add library="libboost_thread-mgw45-mt-s-1_46_1.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 				</Linker>
 			</Target>
@@ -55,7 +55,7 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
-					<Add library="libboost_thread-mgw45-mt-sd-1_45.a" />
+					<Add library="libboost_thread-mgw45-mt-sd-1_46_1.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
@@ -79,7 +79,7 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxbase28ud_net.a" />
 					<Add library="libwxmsw28ud_aui.a" />
-					<Add library="libboost_thread-mgw45-mt-sd-1_45.a" />
+					<Add library="libboost_thread-mgw45-mt-sd-1_46_1.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
@@ -295,6 +295,10 @@
 		<Unit filename="shared\localization.h" />
 		<Unit filename="shared\long_path_prefix.cpp" />
 		<Unit filename="shared\long_path_prefix.h" />
+		<Unit filename="shared\mouse_move_dlg.cpp">
+			<Option target="Release" />
+			<Option target="Debug-DLL" />
+		</Unit>
 		<Unit filename="shared\privilege.cpp" />
 		<Unit filename="shared\privilege.h" />
 		<Unit filename="shared\recycler.cpp" />
@@ -398,8 +402,6 @@
 		<Unit filename="ui\main_dlg.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="ui\mouse_move_dlg.cpp" />
-		<Unit filename="ui\mouse_move_dlg.h" />
 		<Unit filename="ui\msg_popup.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />

@@ -45,21 +45,23 @@ xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& bat
 
     //additional folders
     for (std::vector<ffs3::FolderPairEnh>::const_iterator i = batchCfg.mainCfg.additionalPairs.begin();
-            i != batchCfg.mainCfg.additionalPairs.end(); ++i)
+         i != batchCfg.mainCfg.additionalPairs.end(); ++i)
     {
         uniqueFolders.insert(zToWx(i->leftDirectory));
         uniqueFolders.insert(zToWx(i->rightDirectory));
     }
 
+    uniqueFolders.erase(wxString());
+
     output.directories.insert(output.directories.end(), uniqueFolders.begin(), uniqueFolders.end());
 
-    output.commandline = ffs3::getBinaryDir() +
+    output.commandline = wxT("\"") + ffs3::getBinaryDir() +
 #ifdef FFS_WIN
                          wxT("FreeFileSync.exe") +
 #elif defined FFS_LINUX
                          wxT("FreeFileSync") +
 #endif
-                         wxT(" \"") + filename + wxT("\"");
+                         wxT("\" \"") + filename + wxT("\"");
 
     return output;
 }

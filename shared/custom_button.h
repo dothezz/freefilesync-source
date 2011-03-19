@@ -14,7 +14,7 @@
 class wxButtonWithImage : public wxBitmapButton
 {
 public:
-    wxButtonWithImage(wxWindow *parent,
+    wxButtonWithImage(wxWindow* parent,
                       wxWindowID id,
                       const wxString& label,
                       const wxPoint& pos           = wxDefaultPosition,

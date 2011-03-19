@@ -271,7 +271,7 @@ void FfsXmlParser::readXmlLocalConfig(const TiXmlElement& folderPair, FolderPair
     readXmlElementLogging("Right", &folderPair, enhPair.rightDirectory);
 
 
-//###########################################################
+    //###########################################################
     //alternate sync configuration
     const TiXmlElement* altSyncConfig = TiXmlHandleConst(&folderPair).FirstChild("AlternateSyncConfig").ToElement();
     if (altSyncConfig)
@@ -296,7 +296,7 @@ void FfsXmlParser::readXmlLocalConfig(const TiXmlElement& folderPair, FolderPair
         readXmlElementLogging("CustomDeletionFolder", miscSettings, altSyncCfg->customDeletionDirectory);
     }
 
-//###########################################################
+    //###########################################################
     //alternate filter configuration
     const TiXmlElement* filterCfg = TiXmlHandleConst(&folderPair).FirstChild("LocalFilter").ToElement();
     if (filterCfg)
@@ -312,7 +312,7 @@ void FfsXmlParser::readXmlMainConfig(MainConfiguration& mainCfg)
 {
     TiXmlHandleConst hRoot(getRoot()); //custom const handle: TiXml API seems broken in this regard
 
-//###########################################################
+    //###########################################################
     const TiXmlElement* cmpSettings  = hRoot.FirstChild("MainConfig").FirstChild("Comparison").ToElement();
 
     //read compare variant
@@ -321,7 +321,7 @@ void FfsXmlParser::readXmlMainConfig(MainConfiguration& mainCfg)
     //include symbolic links at all?
     readXmlElementLogging("HandleSymlinks", cmpSettings, mainCfg.handleSymlinks);
 
-//###########################################################
+    //###########################################################
     const TiXmlElement* syncCfg = hRoot.FirstChild("MainConfig").FirstChild("Synchronization").ToElement();
     const TiXmlElement* syncDirections = TiXmlHandleConst(syncCfg).FirstChild("Directions").ToElement();
 
@@ -334,13 +334,13 @@ void FfsXmlParser::readXmlMainConfig(MainConfiguration& mainCfg)
     readXmlElementLogging("Different",  syncDirections, mainCfg.syncConfiguration.different);
     readXmlElementLogging("Conflict",   syncDirections, mainCfg.syncConfiguration.conflict);
 
-//###########################################################
+    //###########################################################
     const TiXmlElement* miscSettings = hRoot.FirstChild("MainConfig").FirstChild("Miscellaneous").ToElement();
 
     //misc
     readXmlElementLogging("DeletionPolicy", miscSettings, mainCfg.handleDeletion);
     readXmlElementLogging("CustomDeletionFolder", miscSettings, mainCfg.customDeletionDirectory);
-//###########################################################
+    //###########################################################
     const TiXmlElement* filter = TiXmlHandleConst(miscSettings).FirstChild("Filter").ToElement();
 
     //read filter settings
@@ -351,7 +351,7 @@ void FfsXmlParser::readXmlMainConfig(MainConfiguration& mainCfg)
 
     mainCfg.globalFilter = FilterConfig(includeFilter, excludeFilter);
 
-//###########################################################
+    //###########################################################
     const TiXmlElement* pairs = hRoot.FirstChild("MainConfig").FirstChild("FolderPairs").FirstChild("Pair").ToElement();
 
     //read all folder pairs
@@ -403,6 +403,7 @@ void FfsXmlParser::readXmlBatchConfig(xmlAccess::XmlBatchConfig& outputCfg)
 
     readXmlElementLogging("Silent", batchConfig, outputCfg.silent);
     readXmlElementLogging("LogfileDirectory", batchConfig, outputCfg.logFileDirectory);
+    readXmlElementLogging("LogfileCountMax", batchConfig, outputCfg.logFileCountMax);
     readXmlElementLogging("HandleError", batchConfig, outputCfg.handleError);
 }
 
@@ -471,7 +472,7 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
     if (folderPairMax != 0) //if reading fails, leave at default
         outputCfg.gui.addFolderPairCountMax = std::max(static_cast<size_t>(2), folderPairMax) - 1; //map folderPairMax to additionalFolderPairMax
 
-//###########################################################
+    //###########################################################
     //read column attributes
     readXmlAttributeLogging("AutoAdjust", TiXmlHandleConst(mainWindow).FirstChild("LeftColumns").ToElement(), outputCfg.gui.autoAdjustColumnsLeft);
     readXmlAttributeLogging("ShowFileIcons", TiXmlHandleConst(mainWindow).FirstChild("LeftColumns").ToElement(), outputCfg.gui.showFileIconsLeft);
@@ -545,6 +546,7 @@ void FfsXmlParser::readXmlGlobalSettings(xmlAccess::XmlGlobalSettings& outputCfg
     const TiXmlElement* cfgHistory = TiXmlHandleConst(gui).FirstChild("ConfigHistory").ToElement();
 
     //load config history elements
+    readXmlAttributeLogging("LastUsed", cfgHistory, outputCfg.gui.lastUsedConfigFile);
     readXmlElementLogging("File", cfgHistory, outputCfg.gui.cfgFileHistory);
 
     //last update check
@@ -560,12 +562,12 @@ void addXmlElement(const std::string& name, const CompareVariant variant, TiXmlE
 {
     switch (variant)
     {
-    case ffs3::CMP_BY_TIME_SIZE:
-        xmlAccess::addXmlElement(name, std::string("ByTimeAndSize"), parent);
-        break;
-    case ffs3::CMP_BY_CONTENT:
-        xmlAccess::addXmlElement(name, std::string("ByContent"), parent);
-        break;
+        case ffs3::CMP_BY_TIME_SIZE:
+            xmlAccess::addXmlElement(name, std::string("ByTimeAndSize"), parent);
+            break;
+        case ffs3::CMP_BY_CONTENT:
+            xmlAccess::addXmlElement(name, std::string("ByContent"), parent);
+            break;
     }
 }
 
@@ -574,15 +576,15 @@ void addXmlElement(const std::string& name, const SyncDirection value, TiXmlElem
 {
     switch (value)
     {
-    case SYNC_DIR_LEFT:
-        xmlAccess::addXmlElement(name, std::string("left"), parent);
-        break;
-    case SYNC_DIR_RIGHT:
-        xmlAccess::addXmlElement(name, std::string("right"), parent);
-        break;
-    case SYNC_DIR_NONE:
-        xmlAccess::addXmlElement(name, std::string("none"), parent);
-        break;
+        case SYNC_DIR_LEFT:
+            xmlAccess::addXmlElement(name, std::string("left"), parent);
+            break;
+        case SYNC_DIR_RIGHT:
+            xmlAccess::addXmlElement(name, std::string("right"), parent);
+            break;
+        case SYNC_DIR_NONE:
+            xmlAccess::addXmlElement(name, std::string("none"), parent);
+            break;
     }
 }
 
@@ -591,15 +593,15 @@ void addXmlElement(const std::string& name, const xmlAccess::OnError value, TiXm
 {
     switch (value)
     {
-    case xmlAccess::ON_ERROR_IGNORE:
-        xmlAccess::addXmlElement(name, std::string("Ignore"), parent);
-        break;
-    case xmlAccess::ON_ERROR_EXIT:
-        xmlAccess::addXmlElement(name, std::string("Exit"), parent);
-        break;
-    case xmlAccess::ON_ERROR_POPUP:
-        xmlAccess::addXmlElement(name, std::string("Popup"), parent);
-        break;
+        case xmlAccess::ON_ERROR_IGNORE:
+            xmlAccess::addXmlElement(name, std::string("Ignore"), parent);
+            break;
+        case xmlAccess::ON_ERROR_EXIT:
+            xmlAccess::addXmlElement(name, std::string("Exit"), parent);
+            break;
+        case xmlAccess::ON_ERROR_POPUP:
+            xmlAccess::addXmlElement(name, std::string("Popup"), parent);
+            break;
     }
 }
 
@@ -608,15 +610,15 @@ void addXmlElement(const std::string& name, const ffs3::DeletionPolicy value, Ti
 {
     switch (value)
     {
-    case ffs3::DELETE_PERMANENTLY:
-        xmlAccess::addXmlElement(name, std::string("DeletePermanently"), parent);
-        break;
-    case ffs3::MOVE_TO_RECYCLE_BIN:
-        xmlAccess::addXmlElement(name, std::string("MoveToRecycleBin"), parent);
-        break;
-    case ffs3::MOVE_TO_CUSTOM_DIRECTORY:
-        xmlAccess::addXmlElement(name, std::string("MoveToCustomDirectory"), parent);
-        break;
+        case ffs3::DELETE_PERMANENTLY:
+            xmlAccess::addXmlElement(name, std::string("DeletePermanently"), parent);
+            break;
+        case ffs3::MOVE_TO_RECYCLE_BIN:
+            xmlAccess::addXmlElement(name, std::string("MoveToRecycleBin"), parent);
+            break;
+        case ffs3::MOVE_TO_CUSTOM_DIRECTORY:
+            xmlAccess::addXmlElement(name, std::string("MoveToCustomDirectory"), parent);
+            break;
     }
 }
 
@@ -625,15 +627,15 @@ void addXmlElement(const std::string& name, const ffs3::SymLinkHandling value, T
 {
     switch (value)
     {
-    case ffs3::SYMLINK_IGNORE:
-        xmlAccess::addXmlElement(name, std::string("Ignore"), parent);
-        break;
-    case ffs3::SYMLINK_USE_DIRECTLY:
-        xmlAccess::addXmlElement(name, std::string("UseDirectly"), parent);
-        break;
-    case ffs3::SYMLINK_FOLLOW_LINK:
-        xmlAccess::addXmlElement(name, std::string("FollowLink"), parent);
-        break;
+        case ffs3::SYMLINK_IGNORE:
+            xmlAccess::addXmlElement(name, std::string("Ignore"), parent);
+            break;
+        case ffs3::SYMLINK_USE_DIRECTLY:
+            xmlAccess::addXmlElement(name, std::string("UseDirectly"), parent);
+            break;
+        case ffs3::SYMLINK_FOLLOW_LINK:
+            xmlAccess::addXmlElement(name, std::string("FollowLink"), parent);
+            break;
     }
 }
 
@@ -692,7 +694,7 @@ void writeXmlLocalConfig(const FolderPairEnh& enhPair, TiXmlElement& parent)
         addXmlElement("CustomDeletionFolder", altSyncConfig->customDeletionDirectory, miscSettings);
     }
 
-//###########################################################
+    //###########################################################
     //alternate filter configuration
     TiXmlElement* filterCfg = new TiXmlElement("LocalFilter");
     newfolderPair->LinkEndChild(filterCfg);
@@ -711,7 +713,7 @@ bool writeXmlMainConfig(const MainConfiguration& mainCfg, TiXmlDocument& doc)
     TiXmlElement* settings = new TiXmlElement("MainConfig");
     root->LinkEndChild(settings);
 
-//###########################################################
+    //###########################################################
     TiXmlElement* cmpSettings = new TiXmlElement("Comparison");
     settings->LinkEndChild(cmpSettings);
 
@@ -721,7 +723,7 @@ bool writeXmlMainConfig(const MainConfiguration& mainCfg, TiXmlDocument& doc)
     //include symbolic links at all?
     addXmlElement("HandleSymlinks", mainCfg.handleSymlinks, cmpSettings);
 
-//###########################################################
+    //###########################################################
     TiXmlElement* syncSettings = new TiXmlElement("Synchronization");
     settings->LinkEndChild(syncSettings);
 
@@ -738,7 +740,7 @@ bool writeXmlMainConfig(const MainConfiguration& mainCfg, TiXmlDocument& doc)
     addXmlElement("Different",  mainCfg.syncConfiguration.different,       syncDirections);
     addXmlElement("Conflict",   mainCfg.syncConfiguration.conflict,        syncDirections);
 
-//###########################################################
+    //###########################################################
     TiXmlElement* miscSettings = new TiXmlElement("Miscellaneous");
     settings->LinkEndChild(miscSettings);
 
@@ -753,7 +755,7 @@ bool writeXmlMainConfig(const MainConfiguration& mainCfg, TiXmlDocument& doc)
     addXmlElement("DeletionPolicy", mainCfg.handleDeletion, miscSettings);
     addXmlElement("CustomDeletionFolder", mainCfg.customDeletionDirectory, miscSettings);
 
-//###########################################################
+    //###########################################################
     TiXmlElement* pairs = new TiXmlElement("FolderPairs");
     settings->LinkEndChild(pairs);
 
@@ -806,6 +808,7 @@ bool writeXmlBatchConfig(const xmlAccess::XmlBatchConfig& inputCfg, TiXmlDocumen
 
     addXmlElement("Silent", inputCfg.silent, batchConfig);
     addXmlElement("LogfileDirectory", inputCfg.logFileDirectory, batchConfig);
+    addXmlElement("LogfileCountMax", inputCfg.logFileCountMax, batchConfig);
     addXmlElement("HandleError", inputCfg.handleError, batchConfig);
 
     return true;
@@ -962,8 +965,8 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
     TiXmlElement* cfgHistory = new TiXmlElement("ConfigHistory");
     gui->LinkEndChild(cfgHistory);
 
+    addXmlAttribute("LastUsed", inputCfg.gui.lastUsedConfigFile, cfgHistory);
     addXmlElement("File", inputCfg.gui.cfgFileHistory, cfgHistory);
-
 
     //last update check
     addXmlElement("LastUpdateCheck", inputCfg.gui.lastUpdateCheck, gui);
@@ -1034,18 +1037,18 @@ xmlAccess::MergeType xmlAccess::getMergeType(const std::vector<wxString>& filena
     {
         switch (xmlAccess::getXmlType(*i)) //throw()
         {
-        case XML_GUI_CONFIG:
-            guiCfgExists = true;
-            break;
+            case XML_GUI_CONFIG:
+                guiCfgExists = true;
+                break;
 
-        case XML_BATCH_CONFIG:
-            batchCfgExists = true;
-            break;
+            case XML_BATCH_CONFIG:
+                batchCfgExists = true;
+                break;
 
-        case XML_GLOBAL_SETTINGS:
-        case XML_REAL_CONFIG:
-        case XML_OTHER:
-            return MERGE_OTHER;
+            case XML_GLOBAL_SETTINGS:
+            case XML_REAL_CONFIG:
+            case XML_OTHER:
+                return MERGE_OTHER;
         }
     }
 
@@ -1097,18 +1100,18 @@ void mergeConfigFilesImpl(const std::vector<wxString>& filenames, XmlCfg& config
     {
         switch (getXmlType(*i))
         {
-        case XML_GUI_CONFIG:
-            mainCfgs.push_back(loadCfgImpl<XmlGuiConfig>(*i, savedException).mainCfg); //throw (xmlAccess::XmlError)
-            break;
+            case XML_GUI_CONFIG:
+                mainCfgs.push_back(loadCfgImpl<XmlGuiConfig>(*i, savedException).mainCfg); //throw (xmlAccess::XmlError)
+                break;
 
-        case XML_BATCH_CONFIG:
-            mainCfgs.push_back(loadCfgImpl<XmlBatchConfig>(*i, savedException).mainCfg); //throw (xmlAccess::XmlError)
-            break;
+            case XML_BATCH_CONFIG:
+                mainCfgs.push_back(loadCfgImpl<XmlBatchConfig>(*i, savedException).mainCfg); //throw (xmlAccess::XmlError)
+                break;
 
-        case XML_GLOBAL_SETTINGS:
-        case XML_REAL_CONFIG:
-        case XML_OTHER:
-            break;
+            case XML_GLOBAL_SETTINGS:
+            case XML_REAL_CONFIG:
+            case XML_OTHER:
+                break;
         }
     }
 
@@ -1124,7 +1127,7 @@ void mergeConfigFilesImpl(const std::vector<wxString>& filenames, XmlCfg& config
     config.mainCfg = merge(mainCfgs);
 
     if (savedException.get()) //"re-throw" exception
-        throw *savedException;
+        throw* savedException;
 }
 }
 

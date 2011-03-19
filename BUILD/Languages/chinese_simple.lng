@@ -154,6 +154,10 @@
 <符号连接>
 <multiple selection>
 <多选>
+A directory input field is empty.
+有一个目录输入字段是空的.
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+有一个目录将被修改,而它是多个文件夹对的一部分!请重新检查同步设置!
 A newer version of FreeFileSync is available:
 FreeFileSync 有新版可用:
 Abort requested: Waiting for current operation to finish...
@@ -370,6 +374,8 @@ Encoding extended time information: %x
 正在编码扩展时间信息:%x
 Endless loop when traversing directory:
 遍历目录时出现无限循环:
+Equal files/folders that differ in attributes only
+相等的文件/文件夹仅仅文件属性不同
 Error
 错误
 Error changing modification time:
@@ -476,8 +482,6 @@ Files that exist on both sides, right one is newer
 两侧都有,右侧较新的文件
 Files that have different content
 有不同内容的文件
-Files/folders that differ in attributes only
-文件/文件夹仅属性不同
 Files/folders that exist on left side only
 仅在左侧存在的文件/文件夹
 Files/folders that exist on right side only
@@ -488,8 +492,6 @@ Filter is active
 过滤器已激活
 Filter settings have changed!
 过滤设置已改变!
-Filter view
-过滤查看
 Filter: All pairs
 过滤器:所有的配对
 Filter: Single pair
@@ -506,6 +508,8 @@ Follow
 跟随
 Free disk space available:
 可用磁盘空间:
+Free disk space required:
+需要可用的磁盘空间:
 FreeFileSync Batch Job
 FreeFileSync 批处理作业
 FreeFileSync at Sourceforge
@@ -600,6 +604,8 @@ Integrate external applications into context menu. The following macros are avai
 集成外部应用程序到右键菜单. 如下宏可用:
 Invalid FreeFileSync config file!
 无效的 FreeFileSync 配置文件!
+Last used configurations (press DEL to remove from list)
+最后使用的配置(按DEL键将其从列表中移除)
 Leave as unresolved conflict
 遗留为未解决的冲突
 Left
@@ -608,8 +614,6 @@ Legend
 图例
 Load configuration from file
 从文件加载配置
-Load configuration history (press DEL to delete items)
-加载配置历史记录(按DEL键删除项目)
 Log-messages:
 日志信息:
 Logging
@@ -620,12 +624,16 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 不支持在WOW64上使用卷影复制. 请使用 FreeFileSync 64位版本.
 Match case
 匹配大小写
+Maximum number of logfiles:
+最大的日志文件数:
+Memory allocation failed!
+内存分配失败!
 Minimum Idle Time [seconds]
 最小空闲时间[秒]
 Mirror ->>
 镜像 ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-左侧文件夹镜像备份: 同步后右侧文件夹将被覆盖并且完全匹配左边的文件夹.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+镜像备份左边的文件夹.同步后右边的文件夹被修改为和左边文件夹精确匹配.
 Monitoring active...
 监视激活...
 More than 50% of the total number of files will be copied or deleted!
@@ -645,7 +653,7 @@ Moving file %x to user-defined directory %y
 Moving folder %x to user-defined directory %y
 移动文件夹 %x 到用户定义目录 %y
 Multiple...
-倍数...
+并联...
 No change since last synchronization!
 自从最后一次同步以来没有变动!
 No filter selected
@@ -696,8 +704,6 @@ Published under the GNU General Public License:
 在GNU通用公共许可下发布:
 Question
 问题
-Re-enable all hidden dialogs?
-重新启用所有隐藏的对话框?
 RealtimeSync - Automated Synchronization
 实时同步 - 自动同步
 RealtimeSync configuration
@@ -718,6 +724,8 @@ Reset
 重置
 Reset view
 重置视图
+Restore all hidden dialogs?
+恢复所有被隐藏的对话框?
 Right
 右侧
 S&ave configuration...
@@ -740,6 +748,8 @@ Select logfile directory:
 选择日志保存位置:
 Select variant:
 选择变化的:
+Select view
+选择视图
 Set direction:
 设置方向:
 Setting default synchronization directions: Old files will be overwritten with newer files.
@@ -828,8 +838,6 @@ Synchronize...
 同步...
 Synchronizing...
 同步中...
-System out of memory!
-系统内存溢出!
 Target directory already existing!
 目标目录已经存在!
 Target file already existing!
@@ -850,8 +858,6 @@ Time remaining:
 剩余时间:
 Total amount of data that will be transferred
 将被转移的总数据
-Total required free disk space:
-所需可用磁盘空间总量:
 Total time:
 总共时间:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -872,14 +878,14 @@ Use Recycle Bin
 使用回收站
 Use Recycle Bin when deleting or overwriting files
 当删除或覆盖文件时使用回收站
-User-defined directory
-用户定义目录
 User-defined directory for deletion was not specified!
 用于删除的用户定义目录没有指定!
 Variant
 变化
 Verifying file %x
 校验文件 %x
+Versioning
+保留历史版本
 Volume name %x not part of filename %y!
 卷名 %x 并非文件名 %y 的一部分!
 Waiting for missing directories...
@@ -888,14 +894,12 @@ Waiting while directory is locked (%x)...
 由于目录已锁定而正在等待(%x)...
 Warning
 警告
-Warning: Synchronization failed for %x item(s):
-警告:同步失败 %x (某些)项目:
 When the comparison is started with this option set the following decision tree is processed:
 当以此选项开始比较时以下决定树被处理:
 You can ignore conflicts and continue synchronization.
 你可忽略冲突并继续同步.
-You can ignore the error to consider not existing directories as empty.
-您可忽略此错误而将不存在的目录视为空.
+You can ignore this error to consider the directory as empty.
+你可以忽略这个错误而认为目录是空的.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 您可能会尝试再次同步剩余的项目(而不必重新比较)!
 different

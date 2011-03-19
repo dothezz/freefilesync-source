@@ -19,6 +19,8 @@
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "../shared/long_path_prefix.h"
 #include <boost/shared_ptr.hpp>
+#include "../shared/loki/ScopeGuard.h"
+#include <boost/scoped_array.hpp>
 
 #elif defined FFS_LINUX
 #include "../shared/inotify/inotify-cxx.h"
@@ -110,8 +112,73 @@ private:
 };
 
 
+
 rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCallback* statusHandler) //throw(FileError)
 {
+    /*
+    #warning cleanup
+    {
+    const Zstring formattedDir = ffs3::getFormattedDirectoryName(dirNames.front());
+
+        //SE_BACKUP_NAME and SE_RESTORE_NAME <- required by FILE_FLAG_BACKUP_SEMANTICS???
+
+        //open the directory to watch....
+        HANDLE hDir = ::CreateFile(ffs3::applyLongPathPrefix(formattedDir).c_str(),
+                                   FILE_LIST_DIRECTORY,
+                                   FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //leaving out last flag may prevent files to be deleted WITHIN monitored dir (http://qualapps.blogspot.com/2010/05/understanding-readdirectorychangesw_19.html)
+                                   NULL,
+                                   OPEN_EXISTING,
+                                   FILE_FLAG_BACKUP_SEMANTICS,
+                                   NULL);
+        if (hDir == INVALID_HANDLE_VALUE)
+        {
+            const DWORD lastError = ::GetLastError();
+            if (    lastError == ERROR_FILE_NOT_FOUND || //no need to check this condition any earlier!
+                    lastError == ERROR_BAD_NETPATH)      //
+                return CHANGE_DIR_MISSING;
+
+            const wxString errorMessage = wxString(_("Could not initialize directory monitoring:")) + wxT("\n\"") + zToWx(formattedDir) + wxT("\"");
+            throw ffs3::FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+        }
+
+        Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hDir);
+        (void)dummy; //silence warning "unused variable"
+
+
+        const size_t bufferSize = sizeof(FILE_NOTIFY_INFORMATION);
+        boost::scoped_array<char> tmp(new char[bufferSize]);
+        FILE_NOTIFY_INFORMATION& notifyInfo = reinterpret_cast<FILE_NOTIFY_INFORMATION&>(*tmp.get());
+
+        DWORD bytesWritten = 0;
+
+        if (!::ReadDirectoryChangesW(
+                hDir,        //__in         HANDLE hDirectory,
+                &notifyInfo, //__out        LPVOID lpBuffer,
+                bufferSize,  //__in         DWORD nBufferLength,
+                true,        //__in         BOOL bWatchSubtree,
+                FILE_NOTIFY_CHANGE_FILE_NAME  | //__in         DWORD dwNotifyFilter,
+                FILE_NOTIFY_CHANGE_DIR_NAME   |
+                FILE_NOTIFY_CHANGE_SIZE       |
+                FILE_NOTIFY_CHANGE_LAST_WRITE,
+                &bytesWritten, //__out_opt    LPDWORD lpBytesReturned,
+                NULL,          //__inout_opt  LPOVERLAPPED lpOverlapped,
+                NULL))         //__in_opt     LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
+        {
+            const wxString errorMessage = wxString(_("Could not initialize directory monitoring:")) + wxT("\n\"") + zToWx(formattedDir) + wxT("\"");
+            throw ffs3::FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+        }
+        return CHANGE_DETECTED;
+    }
+    */
+
+
+
+
+
+
+
+
+
     if (dirNames.empty()) //pathological case, but check is needed nevertheless
         throw ffs3::FileError(_("At least one directory input field is empty."));
 
@@ -146,7 +213,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
                     lastError == ERROR_BAD_NETPATH)      //
                 return CHANGE_DIR_MISSING;
 
-            const wxString errorMessage = wxString(_("Could not initialize directory monitoring:")) + wxT("\n\"") + zToWx(*i) + wxT("\"");
+            const wxString errorMessage = wxString(_("Could not initialize directory monitoring:")) + wxT("\n\"") + zToWx(formattedDir) + wxT("\"");
             throw ffs3::FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
         }
 

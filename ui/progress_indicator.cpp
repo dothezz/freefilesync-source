@@ -16,7 +16,9 @@
 #include "../shared/global_func.h"
 #include "tray_icon.h"
 #include <boost/shared_ptr.hpp>
-#include "mouse_move_dlg.h"
+#include "../shared/mouse_move_dlg.h"
+#include "../library/error_log.h"
+#include "../shared/toggle_button.h"
 
 #ifdef FFS_WIN
 #include "../shared/taskbar.h"
@@ -293,13 +295,13 @@ void CompareStatus::CompareStatusImpl::showProgressExternally(const wxString& pr
         const size_t total   = 100000;
         switch (status)
         {
-        case SCANNING:
-            taskbar_->setStatus(TaskbarProgress::STATUS_INDETERMINATE);
-            break;
-        case COMPARING_CONTENT:
-            taskbar_->setStatus(TaskbarProgress::STATUS_NORMAL);
-            taskbar_->setProgress(current, total);
-            break;
+            case SCANNING:
+                taskbar_->setStatus(TaskbarProgress::STATUS_INDETERMINATE);
+                break;
+            case COMPARING_CONTENT:
+                taskbar_->setStatus(TaskbarProgress::STATUS_NORMAL);
+                taskbar_->setProgress(current, total);
+                break;
         }
     }
 #endif
@@ -318,12 +320,12 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
         //write status information to taskbar, parent title ect.
         switch (status)
         {
-        case SCANNING:
-            showProgressExternally(numberToStringSep(scannedObjects) + wxT(" - ") + _("Scanning..."));
-            break;
-        case COMPARING_CONTENT:
-            showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Comparing content..."), percent);
-            break;
+            case SCANNING:
+                showProgressExternally(numberToStringSep(scannedObjects) + wxT(" - ") + _("Scanning..."));
+                break;
+            case COMPARING_CONTENT:
+                showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Comparing content..."), percent);
+                break;
         }
 
 
@@ -386,6 +388,98 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
 //########################################################################################
 
 
+class LogControl : public LogControlGenerated
+{
+public:
+    LogControl(wxWindow* parent, const ErrorLogging& log) : LogControlGenerated(parent), log_(log)
+    {
+        const int errorCount   = log_.typeCount(TYPE_ERROR) + log_.typeCount(TYPE_FATAL_ERROR);
+        const int warningCount = log_.typeCount(TYPE_WARNING);
+        const int infoCount    = log_.typeCount(TYPE_INFO);
+
+        m_bpButtonErrors->init(GlobalResources::instance().getImage(wxT("log error")),          _("Error") + wxString::Format(wxT(" (%d)"), errorCount),
+                               GlobalResources::instance().getImage(wxT("log error inactive")), _("Error") + wxString::Format(wxT(" (%d)"), errorCount));
+
+        m_bpButtonWarnings->init(GlobalResources::instance().getImage(wxT("log warning")),          _("Warning") + wxString::Format(wxT(" (%d)"), warningCount),
+                                 GlobalResources::instance().getImage(wxT("log warning inactive")), _("Warning") + wxString::Format(wxT(" (%d)"), warningCount));
+
+        m_bpButtonInfo->init(GlobalResources::instance().getImage(wxT("log info")),          _("Info") + wxString::Format(wxT(" (%d)"), infoCount),
+                             GlobalResources::instance().getImage(wxT("log info inactive")), _("Info") + wxString::Format(wxT(" (%d)"), infoCount));
+
+        m_bpButtonErrors  ->setActive(true);
+        m_bpButtonWarnings->setActive(true);
+        m_bpButtonInfo    ->setActive(false);
+
+        m_bpButtonErrors  ->Show(errorCount   != 0);
+        m_bpButtonWarnings->Show(warningCount != 0);
+        m_bpButtonInfo    ->Show(infoCount    != 0);
+
+        updateLogText();
+    }
+
+    virtual void OnErrors(wxCommandEvent& event)
+    {
+        m_bpButtonErrors->toggle();
+        updateLogText();
+    }
+
+    virtual void OnWarnings(wxCommandEvent& event)
+    {
+        m_bpButtonWarnings->toggle();
+        updateLogText();
+    }
+
+    virtual void OnInfo(wxCommandEvent& event)
+    {
+        m_bpButtonInfo->toggle();
+        updateLogText();
+    }
+
+private:
+    void updateLogText()
+    {
+        int includedTypes = 0;
+        if (m_bpButtonErrors->isActive())
+            includedTypes |= TYPE_ERROR | TYPE_FATAL_ERROR;
+
+        if (m_bpButtonWarnings->isActive())
+            includedTypes |= TYPE_WARNING;
+
+        if (m_bpButtonInfo->isActive())
+            includedTypes |= TYPE_INFO;
+
+        const std::vector<wxString>& messages = log_.getFormattedMessages(includedTypes);
+
+        wxString newLogText;
+
+        if (!messages.empty())
+            for (std::vector<wxString>::const_iterator i = messages.begin(); i != messages.end(); ++i)
+            {
+                newLogText += *i;
+                newLogText += wxT("\n\n");
+            }
+        else //if no messages match selected view filter, show final status message at least
+        {
+            const std::vector<wxString>& allMessages = log_.getFormattedMessages();
+            if (!allMessages.empty())
+                newLogText = allMessages.back();
+        }
+
+#ifndef _MSC_VER
+#warning design okay?
+#endif
+
+        wxWindowUpdateLocker dummy(m_textCtrlInfo);
+        m_textCtrlInfo->ChangeValue(newLogText);
+        m_textCtrlInfo->ShowPosition(m_textCtrlInfo->GetLastPosition());
+    }
+
+    const ErrorLogging log_;
+};
+
+
+//########################################################################################
+
 class SyncStatus::SyncStatusImpl : public SyncStatusDlgGenerated
 {
 public:
@@ -399,7 +493,7 @@ public:
     void updateStatusDialogNow();
 
     void setCurrentStatus(SyncStatus::SyncStatusID id);
-    void processHasFinished(SyncStatus::SyncStatusID id, const wxString& finalMessage);  //essential to call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater
+    void processHasFinished(SyncStatus::SyncStatusID id, const ErrorLogging& log);  //essential to call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater
 
     void minimizeToTray();
 
@@ -512,9 +606,9 @@ void SyncStatus::setCurrentStatus(SyncStatusID id)
     pimpl->setCurrentStatus(id);
 }
 
-void SyncStatus::processHasFinished(SyncStatusID id, const wxString& finalMessage)
+void SyncStatus::processHasFinished(SyncStatusID id, const ErrorLogging& log)
 {
-    pimpl->processHasFinished(id, finalMessage);
+    pimpl->processHasFinished(id, log);
 }
 //########################################################################################
 
@@ -550,7 +644,7 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(StatusHandler& updater, wxTopLevelWin
     if (mainDialog) //save old title (will be used as progress indicator)
         titelTextBackup = mainDialog->GetTitle();
 
-    m_animationControl1->SetAnimation(*GlobalResources::getInstance().animationSync);
+    m_animationControl1->SetAnimation(*GlobalResources::instance().animationSync);
     m_animationControl1->Play();
 
     m_staticTextSpeed->SetLabel(wxT("-"));
@@ -563,7 +657,7 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(StatusHandler& updater, wxTopLevelWin
     if (IsShown()) //don't steal focus when starting in sys-tray!
         m_buttonAbort->SetFocus();
 
-    if (mainDialog)    //disable (main) window while this status dialog is shown
+    if (mainDialog)
         mainDialog->Disable();
 
     timeElapsed.Start(); //measure total time
@@ -580,7 +674,7 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(StatusHandler& updater, wxTopLevelWin
     bSizerObjectsProcessed->Show(false);
     //bSizerDataProcessed->Show(false);
 
-    SetIcon(*GlobalResources::getInstance().programIcon); //set application icon
+    SetIcon(*GlobalResources::instance().programIcon); //set application icon
 
     //register key event
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(SyncStatusImpl::OnKeyPressed), NULL, this);
@@ -665,16 +759,18 @@ void SyncStatus::SyncStatusImpl::showProgressExternally(const wxString& progress
     progressTextLast    = progressText;
     progressPercentLast = percent;
 
+    wxString progressTextFmt = progressText;
+    progressTextFmt.Replace(wxT("\n"), wxT(" - "));
 
     if (mainDialog) //show percentage in maindialog title (and thereby in taskbar)
     {
-        if (mainDialog->GetTitle() != progressText)
-            mainDialog->SetTitle(progressText);
+        if (mainDialog->GetTitle() != progressTextFmt)
+            mainDialog->SetTitle(progressTextFmt);
     }
     else //show percentage in this dialog's title (and thereby in taskbar)
     {
-        if (this->GetTitle() != progressText)
-            this->SetTitle(progressText);
+        if (this->GetTitle() != progressTextFmt)
+            this->SetTitle(progressTextFmt);
     }
 
 #ifdef FFS_WIN
@@ -688,24 +784,24 @@ void SyncStatus::SyncStatusImpl::showProgressExternally(const wxString& progress
 
         switch (currentStatus)
         {
-        case SyncStatus::SCANNING:
-            taskbar_->setStatus(TaskbarProgress::STATUS_INDETERMINATE);
-            break;
-        case SyncStatus::FINISHED_WITH_SUCCESS:
-        case SyncStatus::COMPARING_CONTENT:
-        case SyncStatus::SYNCHRONIZING:
-            taskbar_->setStatus(TaskbarProgress::STATUS_NORMAL);
-            taskbar_->setProgress(current, total);
-            break;
-        case SyncStatus::PAUSE:
-            taskbar_->setStatus(TaskbarProgress::STATUS_PAUSED);
-            taskbar_->setProgress(current, total);
-            break;
-        case SyncStatus::ABORTED:
-        case SyncStatus::FINISHED_WITH_ERROR:
-            taskbar_->setStatus(TaskbarProgress::STATUS_ERROR);
-            taskbar_->setProgress(current, total);
-            break;
+            case SyncStatus::SCANNING:
+                taskbar_->setStatus(TaskbarProgress::STATUS_INDETERMINATE);
+                break;
+            case SyncStatus::FINISHED_WITH_SUCCESS:
+            case SyncStatus::COMPARING_CONTENT:
+            case SyncStatus::SYNCHRONIZING:
+                taskbar_->setStatus(TaskbarProgress::STATUS_NORMAL);
+                taskbar_->setProgress(current, total);
+                break;
+            case SyncStatus::PAUSE:
+                taskbar_->setStatus(TaskbarProgress::STATUS_PAUSED);
+                taskbar_->setProgress(current, total);
+                break;
+            case SyncStatus::ABORTED:
+            case SyncStatus::FINISHED_WITH_ERROR:
+                taskbar_->setStatus(TaskbarProgress::STATUS_ERROR);
+                taskbar_->setProgress(current, total);
+                break;
         }
     }
 #endif
@@ -724,25 +820,25 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
     const wxString postFix = jobName_.empty() ? wxString() : (wxT("\n\"") + jobName_ + wxT("\""));
     switch (currentStatus)
     {
-    case SyncStatus::SCANNING:
-        showProgressExternally(numberToStringSep(scannedObjects) + wxT(" - ") + _("Scanning...") + postFix);
-        break;
-    case SyncStatus::COMPARING_CONTENT:
-        showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Comparing content...") + postFix, percent);
-        break;
-    case SyncStatus::SYNCHRONIZING:
-        showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Synchronizing...") + postFix, percent);
-        break;
-    case SyncStatus::PAUSE:
-        showProgressExternally((totalData != 0 ? formatPercentage(currentData, totalData) + wxT(" - ") : wxString()) + _("Paused") + postFix, percent);
-        break;
-    case SyncStatus::ABORTED:
-        showProgressExternally(_("Aborted") + postFix, percent);
-        break;
-    case SyncStatus::FINISHED_WITH_SUCCESS:
-    case SyncStatus::FINISHED_WITH_ERROR:
-        showProgressExternally(_("Completed") + postFix, percent);
-        break;
+        case SyncStatus::SCANNING:
+            showProgressExternally(numberToStringSep(scannedObjects) + wxT(" - ") + _("Scanning...") + postFix);
+            break;
+        case SyncStatus::COMPARING_CONTENT:
+            showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Comparing content...") + postFix, percent);
+            break;
+        case SyncStatus::SYNCHRONIZING:
+            showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Synchronizing...") + postFix, percent);
+            break;
+        case SyncStatus::PAUSE:
+            showProgressExternally((totalData != 0 ? formatPercentage(currentData, totalData) + wxT(" - ") : wxString()) + _("Paused") + postFix, percent);
+            break;
+        case SyncStatus::ABORTED:
+            showProgressExternally(_("Aborted") + postFix, percent);
+            break;
+        case SyncStatus::FINISHED_WITH_SUCCESS:
+        case SyncStatus::FINISHED_WITH_ERROR:
+            showProgressExternally(_("Completed") + postFix, percent);
+            break;
     }
 
     //write regular status information (whether dialog is visible or not)
@@ -836,40 +932,40 @@ void SyncStatus::SyncStatusImpl::setCurrentStatus(SyncStatus::SyncStatusID id)
 {
     switch (id)
     {
-    case SyncStatus::ABORTED:
-        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusError")));
-        m_staticTextStatus->SetLabel(_("Aborted"));
-        break;
+        case SyncStatus::ABORTED:
+            m_bitmapStatus->SetBitmap(GlobalResources::instance().getImage(wxT("statusError")));
+            m_staticTextStatus->SetLabel(_("Aborted"));
+            break;
 
-    case SyncStatus::FINISHED_WITH_SUCCESS:
-        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusSuccess")));
-        m_staticTextStatus->SetLabel(_("Completed"));
-        break;
+        case SyncStatus::FINISHED_WITH_SUCCESS:
+            m_bitmapStatus->SetBitmap(GlobalResources::instance().getImage(wxT("statusSuccess")));
+            m_staticTextStatus->SetLabel(_("Completed"));
+            break;
 
-    case SyncStatus::FINISHED_WITH_ERROR:
-        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusWarning")));
-        m_staticTextStatus->SetLabel(_("Completed"));
-        break;
+        case SyncStatus::FINISHED_WITH_ERROR:
+            m_bitmapStatus->SetBitmap(GlobalResources::instance().getImage(wxT("statusWarning")));
+            m_staticTextStatus->SetLabel(_("Completed"));
+            break;
 
-    case SyncStatus::PAUSE:
-        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusPause")));
-        m_staticTextStatus->SetLabel(_("Paused"));
-        break;
+        case SyncStatus::PAUSE:
+            m_bitmapStatus->SetBitmap(GlobalResources::instance().getImage(wxT("statusPause")));
+            m_staticTextStatus->SetLabel(_("Paused"));
+            break;
 
-    case SyncStatus::SCANNING:
-        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusScanning")));
-        m_staticTextStatus->SetLabel(_("Scanning..."));
-        break;
+        case SyncStatus::SCANNING:
+            m_bitmapStatus->SetBitmap(GlobalResources::instance().getImage(wxT("statusScanning")));
+            m_staticTextStatus->SetLabel(_("Scanning..."));
+            break;
 
-    case SyncStatus::COMPARING_CONTENT:
-        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusBinaryCompare")));
-        m_staticTextStatus->SetLabel(_("Comparing content..."));
-        break;
+        case SyncStatus::COMPARING_CONTENT:
+            m_bitmapStatus->SetBitmap(GlobalResources::instance().getImage(wxT("statusBinaryCompare")));
+            m_staticTextStatus->SetLabel(_("Comparing content..."));
+            break;
 
-    case SyncStatus::SYNCHRONIZING:
-        m_bitmapStatus->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("statusSyncing")));
-        m_staticTextStatus->SetLabel(_("Synchronizing..."));
-        break;
+        case SyncStatus::SYNCHRONIZING:
+            m_bitmapStatus->SetBitmap(GlobalResources::instance().getImage(wxT("statusSyncing")));
+            m_staticTextStatus->SetLabel(_("Synchronizing..."));
+            break;
     }
 
     currentStatus = id;
@@ -877,7 +973,7 @@ void SyncStatus::SyncStatusImpl::setCurrentStatus(SyncStatus::SyncStatusID id)
 }
 
 
-void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id, const wxString& finalMessage) //essential to call this in StatusHandler derived class destructor
+void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id, const ErrorLogging& log) //essential to call this in StatusHandler derived class destructor
 {
     //at the LATEST(!) to prevent access to currentStatusHandler
     //enable okay and close events; may be set in this method ONLY
@@ -906,8 +1002,8 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id,
     bSizerRemTime->Show(false);
 
     //if everything was processed successfully, hide remaining statistics (is 0 anyway)
-    if (    totalObjects == currentObjects &&
-            totalData    == currentData)
+    if (totalObjects == currentObjects &&
+        totalData    == currentData)
     {
         bSizerObjectsRemaining->Show(false);
 
@@ -918,7 +1014,12 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id,
     }
 
     updateStatusDialogNow(); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
-    m_textCtrlInfo->SetValue(finalMessage); //
+
+    //hide progress text control and show log control instead
+    m_textCtrlInfo->Hide();
+    LogControl* logControl = new LogControl(this, log);
+    bSizerProgressText->Add(logControl, 3, wxEXPAND | wxALL, 5);
+
     Layout();                               //
 
     //Raise(); -> don't! user may be watching a movie in the meantime ;)
@@ -984,13 +1085,16 @@ void SyncStatus::SyncStatusImpl::OnClose(wxCloseEvent& event)
     if (m_buttonAbort->IsShown()) //delegate to "abort" button if available
     {
         wxCommandEvent dummy(wxEVT_COMMAND_BUTTON_CLICKED);
-        m_buttonAbort->ProcessEvent(dummy);
+        m_buttonAbort->GetEventHandler()->ProcessEvent(dummy);
 
-        if (event.CanVeto()) event.Veto(); //that's what we want here
-        else Destroy();                    //shouldn't be necessary
+        if (event.CanVeto())
+        {
+            event.Veto(); //that's what we want here
+            return;
+        }
     }
-    else
-        Destroy();
+
+    Destroy();
 }
 
 

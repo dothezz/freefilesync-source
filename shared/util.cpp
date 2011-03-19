@@ -175,16 +175,16 @@ wxString ffs3::utcTimeToLocalString(const wxLongLong& utcTime)
 
         SYSTEMTIME systemTimeUtc = {};
         if (!::FileTimeToSystemTime(
-                    &lastWriteTimeUtc, //__in   const FILETIME *lpFileTime,
-                    &systemTimeUtc))   //__out  LPSYSTEMTIME lpSystemTime
+                &lastWriteTimeUtc, //__in   const FILETIME *lpFileTime,
+                &systemTimeUtc))   //__out  LPSYSTEMTIME lpSystemTime
             throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" FILETIME -> SYSTEMTIME: ") +
                                                   wxT("(") + wxULongLong(lastWriteTimeUtc.dwHighDateTime, lastWriteTimeUtc.dwLowDateTime).ToString() + wxT(") ") +
                                                   wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
 
         if (!::SystemTimeToTzSpecificLocalTime(
-                    NULL,              //__in_opt  LPTIME_ZONE_INFORMATION lpTimeZone,
-                    &systemTimeUtc,    //__in      LPSYSTEMTIME lpUniversalTime,
-                    &systemTimeLocal)) //__out     LPSYSTEMTIME lpLocalTime
+                NULL,              //__in_opt  LPTIME_ZONE_INFORMATION lpTimeZone,
+                &systemTimeUtc,    //__in      LPSYSTEMTIME lpUniversalTime,
+                &systemTimeLocal)) //__out     LPSYSTEMTIME lpLocalTime
             throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" SYSTEMTIME -> local SYSTEMTIME: ") +
                                                   wxT("(") + wxULongLong(lastWriteTimeUtc.dwHighDateTime, lastWriteTimeUtc.dwLowDateTime).ToString() + wxT(") ") +
                                                   wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
@@ -193,8 +193,8 @@ wxString ffs3::utcTimeToLocalString(const wxLongLong& utcTime)
     {
         FILETIME fileTimeLocal = {};
         if (!::FileTimeToLocalFileTime( //convert to local time
-                    &lastWriteTimeUtc,  //pointer to UTC file time to convert
-                    &fileTimeLocal))    //pointer to converted file time
+                &lastWriteTimeUtc,  //pointer to UTC file time to convert
+                &fileTimeLocal))    //pointer to converted file time
             throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" FILETIME -> local FILETIME: ") +
                                                   wxT("(") + wxULongLong(lastWriteTimeUtc.dwHighDateTime, lastWriteTimeUtc.dwLowDateTime).ToString() + wxT(") ") +
                                                   wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
@@ -205,8 +205,8 @@ wxString ffs3::utcTimeToLocalString(const wxLongLong& utcTime)
         //                dateLow  = 4294967295
 
         if (!::FileTimeToSystemTime(
-                    &fileTimeLocal,  //pointer to file time to convert
-                    &systemTimeLocal)) //pointer to structure to receive system time
+                &fileTimeLocal,  //pointer to file time to convert
+                &systemTimeLocal)) //pointer to structure to receive system time
             throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" local FILETIME -> local SYSTEMTIME: ") +
                                                   wxT("(") + wxULongLong(fileTimeLocal.dwHighDateTime, fileTimeLocal.dwLowDateTime).ToString() + wxT(") ") +
                                                   wxT("\n\n") + getLastErrorFormatted()).ToAscii()));

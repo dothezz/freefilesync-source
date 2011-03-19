@@ -17,7 +17,8 @@ size_t common::getDigitCount(size_t number) //count number of digits
 }
 
 //############################################################################
-DebugLog::DebugLog() :
+DebugLog::DebugLog(const wxString& filePrefix) :
+    prefix(filePrefix),
     lineCount(0),
     logFile(NULL)
 {
@@ -37,7 +38,7 @@ wxString DebugLog::assembleFileName()
 {
     wxString tmp = wxDateTime::Now().FormatISOTime();
     tmp.Replace(wxT(":"), wxEmptyString);
-    return wxString(wxT("DEBUG_")) + wxDateTime::Now().FormatISODate() + wxChar('_') + tmp + wxT(".log");
+    return prefix + wxString(wxT("DEBUG_")) + wxDateTime::Now().FormatISODate() + wxChar('_') + tmp + wxT(".log");
 }
 
 

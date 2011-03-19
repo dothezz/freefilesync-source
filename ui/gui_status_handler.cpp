@@ -84,20 +84,20 @@ void CompareStatusHandler::initNewProcess(int objectsTotal, wxLongLong dataTotal
 
     switch (currentProcess)
     {
-    case StatusHandler::PROCESS_SCANNING:
+        case StatusHandler::PROCESS_SCANNING:
+            break;
+        case StatusHandler::PROCESS_COMPARING_CONTENT:
+        {
+            wxWindowUpdateLocker dummy(mainDialog);
+            mainDialog->compareStatus->switchToCompareBytewise(objectsTotal, dataTotal);
+            mainDialog->Layout();  //show progress bar...
+            mainDialog->Refresh(); //remove distortion...
+        }
         break;
-    case StatusHandler::PROCESS_COMPARING_CONTENT:
-    {
-        wxWindowUpdateLocker dummy(mainDialog);
-        mainDialog->compareStatus->switchToCompareBytewise(objectsTotal, dataTotal);
-        mainDialog->Layout();  //show progress bar...
-        mainDialog->Refresh(); //remove distortion...
-    }
-    break;
-    case StatusHandler::PROCESS_SYNCHRONIZING:
-    case StatusHandler::PROCESS_NONE:
-        assert(false);
-        break;
+        case StatusHandler::PROCESS_SYNCHRONIZING:
+        case StatusHandler::PROCESS_NONE:
+            assert(false);
+            break;
     }
 }
 
@@ -107,16 +107,16 @@ void CompareStatusHandler::updateProcessedData(int objectsProcessed, wxLongLong 
 {
     switch (currentProcess)
     {
-    case StatusHandler::PROCESS_SCANNING:
-        mainDialog->compareStatus->incScannedObjects_NoUpdate(objectsProcessed);
-        break;
-    case StatusHandler::PROCESS_COMPARING_CONTENT:
-        mainDialog->compareStatus->incProcessedCmpData_NoUpdate(objectsProcessed, dataProcessed);
-        break;
-    case StatusHandler::PROCESS_SYNCHRONIZING:
-    case StatusHandler::PROCESS_NONE:
-        assert(false);
-        break;
+        case StatusHandler::PROCESS_SCANNING:
+            mainDialog->compareStatus->incScannedObjects_NoUpdate(objectsProcessed);
+            break;
+        case StatusHandler::PROCESS_COMPARING_CONTENT:
+            mainDialog->compareStatus->incProcessedCmpData_NoUpdate(objectsProcessed, dataProcessed);
+            break;
+        case StatusHandler::PROCESS_SYNCHRONIZING:
+        case StatusHandler::PROCESS_NONE:
+            assert(false);
+            break;
     }
 }
 
@@ -135,15 +135,15 @@ ErrorHandler::Response CompareStatusHandler::reportError(const wxString& message
     errorDlg.Raise();
     switch (static_cast<ErrorDlg::ReturnCodes>(errorDlg.ShowModal()))
     {
-    case ErrorDlg::BUTTON_IGNORE:
-        ignoreErrors = ignoreNextErrors;
-        return ErrorHandler::IGNORE_ERROR;
+        case ErrorDlg::BUTTON_IGNORE:
+            ignoreErrors = ignoreNextErrors;
+            return ErrorHandler::IGNORE_ERROR;
 
-    case ErrorDlg::BUTTON_RETRY:
-        return ErrorHandler::RETRY;
+        case ErrorDlg::BUTTON_RETRY:
+            return ErrorHandler::RETRY;
 
-    case ErrorDlg::BUTTON_ABORT:
-        abortThisProcess();
+        case ErrorDlg::BUTTON_ABORT:
+            abortThisProcess();
     }
 
     assert(false);
@@ -155,6 +155,7 @@ void CompareStatusHandler::reportFatalError(const wxString& errorMessage)
 {
     mainDialog->compareStatus->updateStatusPanelNow();
 
+    //show message and abort: currently there are no fatal errors during comparison that can be ignored
     bool dummy = false;
     ErrorDlg errorDlg(NULL,
                       ErrorDlg::BUTTON_ABORT,
@@ -181,15 +182,15 @@ void CompareStatusHandler::reportWarning(const wxString& warningMessage, bool& w
     warningDlg.Raise();
     switch (static_cast<WarningDlg::Response>(warningDlg.ShowModal()))
     {
-    case WarningDlg::BUTTON_IGNORE:
-        warningActive = !dontWarnAgain;
-        break;
+        case WarningDlg::BUTTON_IGNORE:
+            warningActive = !dontWarnAgain;
+            break;
 
-    case WarningDlg::BUTTON_SWITCH:
-        assert(false);
-    case WarningDlg::BUTTON_ABORT:
-        abortThisProcess();
-        break;
+        case WarningDlg::BUTTON_SWITCH:
+            assert(false);
+        case WarningDlg::BUTTON_ABORT:
+            abortThisProcess();
+            break;
     }
 }
 
@@ -215,47 +216,33 @@ void CompareStatusHandler::abortThisProcess()
 //########################################################################################################
 
 
-SyncStatusHandler::SyncStatusHandler(wxTopLevelWindow* parentDlg, bool ignoreAllErrors, const wxString& jobName) :
+SyncStatusHandler::SyncStatusHandler(MainDialog* parentDlg, bool ignoreAllErrors, const wxString& jobName) :
+    mainDialog(parentDlg),
     syncStatusFrame(*this, parentDlg, false, jobName),
-    ignoreErrors(ignoreAllErrors) {}
+    ignoreErrors(ignoreAllErrors)
+{
+}
 
 
 SyncStatusHandler::~SyncStatusHandler()
 {
-    const int totalErrors = errorLog.errorsTotal(); //evaluate before finalizing log
+    const int totalErrors = errorLog.typeCount(TYPE_ERROR | TYPE_FATAL_ERROR); //evaluate before finalizing log
 
     //finalize error log
     if (abortIsRequested())
-        errorLog.logError(wxString(_("Synchronization aborted!")) + wxT(" \n") + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!"));
-    else if (totalErrors)
-        errorLog.logWarning(wxString(_("Synchronization completed with errors!")) + wxT(" \n") + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!"));
+        errorLog.logMsg(wxString(_("Synchronization aborted!")) + wxT(" \n") + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!"), TYPE_ERROR);
+    else if (totalErrors > 0)
+        errorLog.logMsg(wxString(_("Synchronization completed with errors!")) + wxT(" \n") + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!"), TYPE_WARNING);
     else
-        errorLog.logInfo(_("Synchronization completed successfully!"));
-
-
-    //print the results list
-    wxString finalMessage;
-    if (totalErrors > 0)
-    {
-        wxString header(_("Warning: Synchronization failed for %x item(s):"));
-        header.Replace(wxT("%x"), ffs3::numberToStringSep(totalErrors), false);
-        finalMessage += header + wxT("\n\n");
-    }
-
-    const ErrorLogging::MessageEntry& messages = errorLog.getFormattedMessages();
-    for (ErrorLogging::MessageEntry::const_iterator i = messages.begin(); i != messages.end(); ++i)
-    {
-        finalMessage += *i;
-        finalMessage += wxT("\n\n");
-    }
+        errorLog.logMsg(_("Synchronization completed successfully!"), TYPE_INFO);
 
     //notify to syncStatusFrame that current process has ended
     if (abortIsRequested())
-        syncStatusFrame.processHasFinished(SyncStatus::ABORTED, finalMessage);  //enable okay and close events
+        syncStatusFrame.processHasFinished(SyncStatus::ABORTED, errorLog);  //enable okay and close events
     else if (totalErrors > 0)
-        syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_ERROR, finalMessage);
+        syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_ERROR, errorLog);
     else
-        syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS, finalMessage);
+        syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS, errorLog);
 }
 
 
@@ -263,7 +250,7 @@ inline
 void SyncStatusHandler::reportInfo(const Zstring& text)
 {
     //if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING)
-    //errorLog.logInfo(zToWx(text)); -> don't spam with file copy info: visually identifying warning messages has priority!
+    errorLog.logMsg(zToWx(text), TYPE_INFO);
 
     syncStatusFrame.setStatusText_NoUpdate(text);
 }
@@ -273,15 +260,15 @@ void SyncStatusHandler::initNewProcess(int objectsTotal, wxLongLong dataTotal, P
 {
     switch (processID)
     {
-    case StatusHandler::PROCESS_SYNCHRONIZING:
-        syncStatusFrame.resetGauge(objectsTotal, dataTotal);
-        syncStatusFrame.setCurrentStatus(SyncStatus::SYNCHRONIZING);
-        break;
-    case StatusHandler::PROCESS_SCANNING:
-    case StatusHandler::PROCESS_COMPARING_CONTENT:
-    case StatusHandler::PROCESS_NONE:
-        assert(false);
-        break;
+        case StatusHandler::PROCESS_SYNCHRONIZING:
+            syncStatusFrame.resetGauge(objectsTotal, dataTotal);
+            syncStatusFrame.setCurrentStatus(SyncStatus::SYNCHRONIZING);
+            break;
+        case StatusHandler::PROCESS_SCANNING:
+        case StatusHandler::PROCESS_COMPARING_CONTENT:
+        case StatusHandler::PROCESS_NONE:
+            assert(false);
+            break;
     }
 }
 
@@ -297,7 +284,7 @@ ErrorHandler::Response SyncStatusHandler::reportError(const wxString& errorMessa
 {
     if (ignoreErrors)
     {
-        errorLog.logError(errorMessage);
+        errorLog.logMsg(errorMessage, TYPE_ERROR);
         return ErrorHandler::IGNORE_ERROR;
     }
 
@@ -312,35 +299,34 @@ ErrorHandler::Response SyncStatusHandler::reportError(const wxString& errorMessa
     const ErrorDlg::ReturnCodes rv = static_cast<ErrorDlg::ReturnCodes>(errorDlg.ShowModal());
     switch (rv)
     {
-    case ErrorDlg::BUTTON_IGNORE:
-        ignoreErrors = ignoreNextErrors;
-        errorLog.logError(errorMessage);
-        return ErrorHandler::IGNORE_ERROR;
+        case ErrorDlg::BUTTON_IGNORE:
+            ignoreErrors = ignoreNextErrors;
+            errorLog.logMsg(errorMessage, TYPE_ERROR);
+            return ErrorHandler::IGNORE_ERROR;
 
-    case ErrorDlg::BUTTON_RETRY:
-        return ErrorHandler::RETRY;
+        case ErrorDlg::BUTTON_RETRY:
+            return ErrorHandler::RETRY;
 
-    case ErrorDlg::BUTTON_ABORT:
-        errorLog.logError(errorMessage);
-        abortThisProcess();
+        case ErrorDlg::BUTTON_ABORT:
+            errorLog.logMsg(errorMessage, TYPE_ERROR);
+            abortThisProcess();
     }
 
     assert (false);
-    errorLog.logError(errorMessage);
+    errorLog.logMsg(errorMessage, TYPE_ERROR);
     return ErrorHandler::IGNORE_ERROR;
 }
 
 
 void SyncStatusHandler::reportFatalError(const wxString& errorMessage)
 {
-    errorLog.logFatalError(errorMessage);
-    abortThisProcess();
+    errorLog.logMsg(errorMessage, TYPE_FATAL_ERROR);
 }
 
 
 void SyncStatusHandler::reportWarning(const wxString& warningMessage, bool& warningActive)
 {
-    errorLog.logWarning(warningMessage);
+    errorLog.logMsg(warningMessage, TYPE_WARNING);
 
     if (ignoreErrors || !warningActive) //if errors are ignored, then warnings should also
         return;
@@ -358,25 +344,19 @@ void SyncStatusHandler::reportWarning(const wxString& warningMessage, bool& warn
         const WarningDlg::Response rv = static_cast<WarningDlg::Response>(warningDlg.ShowModal());
         switch (rv)
         {
-        case WarningDlg::BUTTON_IGNORE: //no unhandled error situation!
-            warningActive = !dontWarnAgain;
-            return;
+            case WarningDlg::BUTTON_IGNORE: //no unhandled error situation!
+                warningActive = !dontWarnAgain;
+                return;
 
-        case WarningDlg::BUTTON_SWITCH:
-            assert(false);
-        case WarningDlg::BUTTON_ABORT:
-            abortThisProcess();
-            return;
+            case WarningDlg::BUTTON_SWITCH:
+                assert(false);
+            case WarningDlg::BUTTON_ABORT:
+                abortThisProcess();
+                return;
         }
 
         assert(false);
     }
-}
-
-
-void SyncStatusHandler::logInfo(const wxString& infoMessage)
-{
-    errorLog.logInfo(infoMessage);
 }
 
 

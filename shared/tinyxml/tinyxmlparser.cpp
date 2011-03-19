@@ -110,21 +110,21 @@ void TiXmlBase::ConvertUTF32ToUTF8( unsigned long input, char* output, int* leng
     // Scary scary fall throughs.
     switch (*length)
     {
-    case 4:
-        --output;
-        *output = (char)((input | BYTE_MARK) & BYTE_MASK);
-        input >>= 6;
-    case 3:
-        --output;
-        *output = (char)((input | BYTE_MARK) & BYTE_MASK);
-        input >>= 6;
-    case 2:
-        --output;
-        *output = (char)((input | BYTE_MARK) & BYTE_MASK);
-        input >>= 6;
-    case 1:
-        --output;
-        *output = (char)(input | FIRST_BYTE_MARK[*length]);
+        case 4:
+            --output;
+            *output = (char)((input | BYTE_MARK) & BYTE_MASK);
+            input >>= 6;
+        case 3:
+            --output;
+            *output = (char)((input | BYTE_MARK) & BYTE_MASK);
+            input >>= 6;
+        case 2:
+            --output;
+            *output = (char)((input | BYTE_MARK) & BYTE_MASK);
+            input >>= 6;
+        case 1:
+            --output;
+            *output = (char)(input | FIRST_BYTE_MARK[*length]);
     }
 }
 
@@ -136,17 +136,17 @@ void TiXmlBase::ConvertUTF32ToUTF8( unsigned long input, char* output, int* leng
     // to figure out alhabetical vs. not across encoding. So take a very
     // conservative approach.
 
-//	if ( encoding == TIXML_ENCODING_UTF8 )
-//	{
+    //	if ( encoding == TIXML_ENCODING_UTF8 )
+    //	{
     if ( anyByte < 127 )
         return isalpha( anyByte );
     else
         return 1;	// What else to do? The unicode set is huge...get the english ones right.
-//	}
-//	else
-//	{
-//		return isalpha( anyByte );
-//	}
+    //	}
+    //	else
+    //	{
+    //		return isalpha( anyByte );
+    //	}
 }
 
 
@@ -157,17 +157,17 @@ void TiXmlBase::ConvertUTF32ToUTF8( unsigned long input, char* output, int* leng
     // to figure out alhabetical vs. not across encoding. So take a very
     // conservative approach.
 
-//	if ( encoding == TIXML_ENCODING_UTF8 )
-//	{
+    //	if ( encoding == TIXML_ENCODING_UTF8 )
+    //	{
     if ( anyByte < 127 )
         return isalnum( anyByte );
     else
         return 1;	// What else to do? The unicode set is huge...get the english ones right.
-//	}
-//	else
-//	{
-//		return isalnum( anyByte );
-//	}
+    //	}
+    //	else
+    //	{
+    //		return isalnum( anyByte );
+    //	}
 }
 
 
@@ -223,95 +223,95 @@ void TiXmlParsingData::Stamp( const char* now, TiXmlEncoding encoding )
         // Code contributed by Fletcher Dunn: (modified by lee)
         switch (*pU)
         {
-        case 0:
-            // We *should* never get here, but in case we do, don't
-            // advance past the terminating null character, ever
-            return;
+            case 0:
+                // We *should* never get here, but in case we do, don't
+                // advance past the terminating null character, ever
+                return;
 
-        case '\r':
-            // bump down to the next line
-            ++row;
-            col = 0;
-            // Eat the character
-            ++p;
-
-            // Check for \r\n sequence, and treat this as a single character
-            if (*p == '\n')
-            {
+            case '\r':
+                // bump down to the next line
+                ++row;
+                col = 0;
+                // Eat the character
                 ++p;
-            }
-            break;
 
-        case '\n':
-            // bump down to the next line
-            ++row;
-            col = 0;
-
-            // Eat the character
-            ++p;
-
-            // Check for \n\r sequence, and treat this as a single
-            // character.  (Yes, this bizarre thing does occur still
-            // on some arcane platforms...)
-            if (*p == '\r')
-            {
-                ++p;
-            }
-            break;
-
-        case '\t':
-            // Eat the character
-            ++p;
-
-            // Skip to next tab stop
-            col = (col / tabsize + 1) * tabsize;
-            break;
-
-        case TIXML_UTF_LEAD_0:
-            if ( encoding == TIXML_ENCODING_UTF8 )
-            {
-                if ( *(p+1) && *(p+2) )
+                // Check for \r\n sequence, and treat this as a single character
+                if (*p == '\n')
                 {
-                    // In these cases, don't advance the column. These are
-                    // 0-width spaces.
-                    if ( *(pU+1)==TIXML_UTF_LEAD_1 && *(pU+2)==TIXML_UTF_LEAD_2 )
-                        p += 3;
-                    else if ( *(pU+1)==0xbfU && *(pU+2)==0xbeU )
-                        p += 3;
-                    else if ( *(pU+1)==0xbfU && *(pU+2)==0xbfU )
-                        p += 3;
-                    else
+                    ++p;
+                }
+                break;
+
+            case '\n':
+                // bump down to the next line
+                ++row;
+                col = 0;
+
+                // Eat the character
+                ++p;
+
+                // Check for \n\r sequence, and treat this as a single
+                // character.  (Yes, this bizarre thing does occur still
+                // on some arcane platforms...)
+                if (*p == '\r')
+                {
+                    ++p;
+                }
+                break;
+
+            case '\t':
+                // Eat the character
+                ++p;
+
+                // Skip to next tab stop
+                col = (col / tabsize + 1) * tabsize;
+                break;
+
+            case TIXML_UTF_LEAD_0:
+                if ( encoding == TIXML_ENCODING_UTF8 )
+                {
+                    if ( *(p+1) && *(p+2) )
                     {
-                        p +=3;    // A normal character.
-                        ++col;
+                        // In these cases, don't advance the column. These are
+                        // 0-width spaces.
+                        if ( *(pU+1)==TIXML_UTF_LEAD_1 && *(pU+2)==TIXML_UTF_LEAD_2 )
+                            p += 3;
+                        else if ( *(pU+1)==0xbfU && *(pU+2)==0xbeU )
+                            p += 3;
+                        else if ( *(pU+1)==0xbfU && *(pU+2)==0xbfU )
+                            p += 3;
+                        else
+                        {
+                            p +=3;    // A normal character.
+                            ++col;
+                        }
                     }
                 }
-            }
-            else
-            {
-                ++p;
-                ++col;
-            }
-            break;
+                else
+                {
+                    ++p;
+                    ++col;
+                }
+                break;
 
-        default:
-            if ( encoding == TIXML_ENCODING_UTF8 )
-            {
-                // Eat the 1 to 4 byte utf8 character.
-                int step = TiXmlBase::utf8ByteTable[*((const unsigned char*)p)];
-                if ( step == 0 )
-                    step = 1;		// Error case from bad encoding, but handle gracefully.
-                p += step;
+            default:
+                if ( encoding == TIXML_ENCODING_UTF8 )
+                {
+                    // Eat the 1 to 4 byte utf8 character.
+                    int step = TiXmlBase::utf8ByteTable[*((const unsigned char*)p)];
+                    if ( step == 0 )
+                        step = 1;		// Error case from bad encoding, but handle gracefully.
+                    p += step;
 
-                // Just advance one column, of course.
-                ++col;
-            }
-            else
-            {
-                ++p;
-                ++col;
-            }
-            break;
+                    // Just advance one column, of course.
+                    ++col;
+                }
+                else
+                {
+                    ++p;
+                    ++col;
+                }
+                break;
         }
     }
     cursor.row = row;
@@ -374,7 +374,7 @@ const char* TiXmlBase::SkipWhiteSpace( const char* p, TiXmlEncoding encoding )
 }
 
 #ifdef TIXML_USE_STL
-/*static*/ bool TiXmlBase::StreamWhiteSpace( std::istream * in, TIXML_STRING * tag )
+/*static*/ bool TiXmlBase::StreamWhiteSpace( std::istream* in, TIXML_STRING* tag )
 {
     for( ;; )
     {
@@ -389,7 +389,7 @@ const char* TiXmlBase::SkipWhiteSpace( const char* p, TiXmlEncoding encoding )
     }
 }
 
-/*static*/ bool TiXmlBase::StreamTo( std::istream * in, int character, TIXML_STRING * tag )
+/*static*/ bool TiXmlBase::StreamTo( std::istream* in, int character, TIXML_STRING* tag )
 {
     //assert( character > 0 && character < 128 );	// else it won't work in utf-8
     while ( in->good() )
@@ -410,7 +410,7 @@ const char* TiXmlBase::SkipWhiteSpace( const char* p, TiXmlEncoding encoding )
 // One of TinyXML's more performance demanding functions. Try to keep the memory overhead down. The
 // "assign" optimization removes over 10% of the execution time.
 //
-const char* TiXmlBase::ReadName( const char* p, TIXML_STRING * name, TiXmlEncoding encoding )
+const char* TiXmlBase::ReadName( const char* p, TIXML_STRING* name, TiXmlEncoding encoding )
 {
     // Oddly, not supported on some comilers,
     //name->clear();
@@ -425,8 +425,8 @@ const char* TiXmlBase::ReadName( const char* p, TIXML_STRING * name, TiXmlEncodi
     // After that, they can be letters, underscores, numbers,
     // hyphens, or colons. (Colons are valid ony for namespaces,
     // but tinyxml can't tell namespaces from names.)
-    if (    p && *p
-            && ( IsAlpha( (unsigned char) *p, encoding ) || *p == '_' ) )
+    if (p && *p
+        && ( IsAlpha( (unsigned char) *p, encoding ) || *p == '_' ) )
     {
         const char* start = p;
         while(		p && *p
@@ -585,15 +585,15 @@ bool TiXmlBase::StringEqual( const char* p,
 }
 
 const char* TiXmlBase::ReadText(	const char* p,
-                                    TIXML_STRING * text,
+                                    TIXML_STRING* text,
                                     bool trimWhiteSpace,
                                     const char* endTag,
                                     bool caseInsensitive,
                                     TiXmlEncoding encoding )
 {
     *text = "";
-    if (    !trimWhiteSpace			// certain tags always keep whitespace
-            || !condenseWhiteSpace )	// if true, whitespace is always kept
+    if (!trimWhiteSpace			// certain tags always keep whitespace
+        || !condenseWhiteSpace )	// if true, whitespace is always kept
     {
         // Keep all the white space.
         while (	   p && *p
@@ -651,7 +651,7 @@ const char* TiXmlBase::ReadText(	const char* p,
 
 #ifdef TIXML_USE_STL
 
-void TiXmlDocument::StreamIn( std::istream * in, TIXML_STRING * tag )
+void TiXmlDocument::StreamIn( std::istream* in, TIXML_STRING* tag )
 {
     // The basic issue with a document is that we don't know what we're
     // streaming. Read something presumed to be a tag (and hope), then
@@ -778,8 +778,8 @@ const char* TiXmlDocument::Parse( const char* p, TiXmlParsingData* prevData, TiX
         }
 
         // Did we get encoding info?
-        if (    encoding == TIXML_ENCODING_UNKNOWN
-                && node->ToDeclaration() )
+        if (encoding == TIXML_ENCODING_UNKNOWN
+            && node->ToDeclaration() )
         {
             TiXmlDeclaration* dec = node->ToDeclaration();
             const char* enc = dec->Encoding();
@@ -888,8 +888,8 @@ TiXmlNode* TiXmlNode::Identify( const char* p, TiXmlEncoding encoding )
 #endif
         returnNode = new TiXmlUnknown();
     }
-    else if (    IsAlpha( *(p+1), encoding )
-                 || *(p+1) == '_' )
+    else if (IsAlpha( *(p+1), encoding )
+             || *(p+1) == '_' )
     {
 #ifdef DEBUG_PARSER
         TIXML_LOG( "XML parsing Element\n" );
@@ -914,7 +914,7 @@ TiXmlNode* TiXmlNode::Identify( const char* p, TiXmlEncoding encoding )
 
 #ifdef TIXML_USE_STL
 
-void TiXmlElement::StreamIn (std::istream * in, TIXML_STRING * tag)
+void TiXmlElement::StreamIn (std::istream* in, TIXML_STRING* tag)
 {
     // We're called with some amount of pre-parsing. That is, some of "this"
     // element is in "tag". Go ahead and stream to the closing ">"
@@ -939,8 +939,8 @@ void TiXmlElement::StreamIn (std::istream * in, TIXML_STRING * tag)
     // Okay...if we are a "/>" tag, then we're done. We've read a complete tag.
     // If not, identify and stream.
 
-    if (    tag->at( tag->length() - 1 ) == '>'
-            && tag->at( tag->length() - 2 ) == '/' )
+    if (tag->at( tag->length() - 1 ) == '>'
+        && tag->at( tag->length() - 2 ) == '/' )
     {
         // All good!
         return;
@@ -1265,7 +1265,7 @@ const char* TiXmlElement::ReadValue( const char* p, TiXmlParsingData* data, TiXm
 
 
 #ifdef TIXML_USE_STL
-void TiXmlUnknown::StreamIn( std::istream * in, TIXML_STRING * tag )
+void TiXmlUnknown::StreamIn( std::istream* in, TIXML_STRING* tag )
 {
     while ( in->good() )
     {
@@ -1323,7 +1323,7 @@ const char* TiXmlUnknown::Parse( const char* p, TiXmlParsingData* data, TiXmlEnc
 }
 
 #ifdef TIXML_USE_STL
-void TiXmlComment::StreamIn( std::istream * in, TIXML_STRING * tag )
+void TiXmlComment::StreamIn( std::istream* in, TIXML_STRING* tag )
 {
     while ( in->good() )
     {
@@ -1339,8 +1339,8 @@ void TiXmlComment::StreamIn( std::istream * in, TIXML_STRING * tag )
         (*tag) += (char) c;
 
         if ( c == '>'
-                && tag->at( tag->length() - 2 ) == '-'
-                && tag->at( tag->length() - 3 ) == '-' )
+             && tag->at( tag->length() - 2 ) == '-'
+             && tag->at( tag->length() - 3 ) == '-' )
         {
             // All is well.
             return;
@@ -1479,7 +1479,7 @@ const char* TiXmlAttribute::Parse( const char* p, TiXmlParsingData* data, TiXmlE
 }
 
 #ifdef TIXML_USE_STL
-void TiXmlText::StreamIn( std::istream * in, TIXML_STRING * tag )
+void TiXmlText::StreamIn( std::istream* in, TIXML_STRING* tag )
 {
     while ( in->good() )
     {
@@ -1563,7 +1563,7 @@ const char* TiXmlText::Parse( const char* p, TiXmlParsingData* data, TiXmlEncodi
 }
 
 #ifdef TIXML_USE_STL
-void TiXmlDeclaration::StreamIn( std::istream * in, TIXML_STRING * tag )
+void TiXmlDeclaration::StreamIn( std::istream* in, TIXML_STRING* tag )
 {
     while ( in->good() )
     {

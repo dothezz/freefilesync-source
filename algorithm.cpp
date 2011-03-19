@@ -84,36 +84,36 @@ private:
     {
         switch (fileObj.getCategory())
         {
-        case FILE_LEFT_SIDE_ONLY:
-            if (fileObj.getFullName<LEFT_SIDE>().EndsWith(ffs3::TEMP_FILE_ENDING))
-                fileObj.setSyncDir(SYNC_DIR_LEFT); //schedule potentially existing temporary files for deletion
-            else
-                fileObj.setSyncDir(config.exLeftSideOnly);
-            break;
-        case FILE_RIGHT_SIDE_ONLY:
-            if (fileObj.getFullName<RIGHT_SIDE>().EndsWith(ffs3::TEMP_FILE_ENDING))
-                fileObj.setSyncDir(SYNC_DIR_RIGHT); //schedule potentially existing temporary files for deletion
-            else
-                fileObj.setSyncDir(config.exRightSideOnly);
-            break;
-        case FILE_RIGHT_NEWER:
-            fileObj.setSyncDir(config.rightNewer);
-            break;
-        case FILE_LEFT_NEWER:
-            fileObj.setSyncDir(config.leftNewer);
-            break;
-        case FILE_DIFFERENT:
-            fileObj.setSyncDir(config.different);
-            break;
-        case FILE_CONFLICT:
-            fileObj.setSyncDir(config.conflict);
-            break;
-        case FILE_EQUAL:
-            fileObj.setSyncDir(SYNC_DIR_NONE);
-            break;
-        case FILE_DIFFERENT_METADATA:
-            fileObj.setSyncDir(config.conflict); //use setting from "conflict/cannot categorize"
-            break;
+            case FILE_LEFT_SIDE_ONLY:
+                if (fileObj.getFullName<LEFT_SIDE>().EndsWith(ffs3::TEMP_FILE_ENDING))
+                    fileObj.setSyncDir(SYNC_DIR_LEFT); //schedule potentially existing temporary files for deletion
+                else
+                    fileObj.setSyncDir(config.exLeftSideOnly);
+                break;
+            case FILE_RIGHT_SIDE_ONLY:
+                if (fileObj.getFullName<RIGHT_SIDE>().EndsWith(ffs3::TEMP_FILE_ENDING))
+                    fileObj.setSyncDir(SYNC_DIR_RIGHT); //schedule potentially existing temporary files for deletion
+                else
+                    fileObj.setSyncDir(config.exRightSideOnly);
+                break;
+            case FILE_RIGHT_NEWER:
+                fileObj.setSyncDir(config.rightNewer);
+                break;
+            case FILE_LEFT_NEWER:
+                fileObj.setSyncDir(config.leftNewer);
+                break;
+            case FILE_DIFFERENT:
+                fileObj.setSyncDir(config.different);
+                break;
+            case FILE_CONFLICT:
+                fileObj.setSyncDir(config.conflict);
+                break;
+            case FILE_EQUAL:
+                fileObj.setSyncDir(SYNC_DIR_NONE);
+                break;
+            case FILE_DIFFERENT_METADATA:
+                fileObj.setSyncDir(config.conflict); //use setting from "conflict/cannot categorize"
+                break;
         }
     }
 
@@ -121,30 +121,30 @@ private:
     {
         switch (linkObj.getLinkCategory())
         {
-        case SYMLINK_LEFT_SIDE_ONLY:
-            linkObj.setSyncDir(config.exLeftSideOnly);
-            break;
-        case SYMLINK_RIGHT_SIDE_ONLY:
-            linkObj.setSyncDir(config.exRightSideOnly);
-            break;
-        case SYMLINK_LEFT_NEWER:
-            linkObj.setSyncDir(config.leftNewer);
-            break;
-        case SYMLINK_RIGHT_NEWER:
-            linkObj.setSyncDir(config.rightNewer);
-            break;
-        case SYMLINK_CONFLICT:
-            linkObj.setSyncDir(config.conflict);
-            break;
-        case SYMLINK_DIFFERENT:
-            linkObj.setSyncDir(config.different);
-            break;
-        case SYMLINK_EQUAL:
-            linkObj.setSyncDir(SYNC_DIR_NONE);
-            break;
-        case SYMLINK_DIFFERENT_METADATA:
-            linkObj.setSyncDir(config.conflict); //use setting from "conflict/cannot categorize"
-            break;
+            case SYMLINK_LEFT_SIDE_ONLY:
+                linkObj.setSyncDir(config.exLeftSideOnly);
+                break;
+            case SYMLINK_RIGHT_SIDE_ONLY:
+                linkObj.setSyncDir(config.exRightSideOnly);
+                break;
+            case SYMLINK_LEFT_NEWER:
+                linkObj.setSyncDir(config.leftNewer);
+                break;
+            case SYMLINK_RIGHT_NEWER:
+                linkObj.setSyncDir(config.rightNewer);
+                break;
+            case SYMLINK_CONFLICT:
+                linkObj.setSyncDir(config.conflict);
+                break;
+            case SYMLINK_DIFFERENT:
+                linkObj.setSyncDir(config.different);
+                break;
+            case SYMLINK_EQUAL:
+                linkObj.setSyncDir(SYNC_DIR_NONE);
+                break;
+            case SYMLINK_DIFFERENT_METADATA:
+                linkObj.setSyncDir(config.conflict); //use setting from "conflict/cannot categorize"
+                break;
 
         }
     }
@@ -153,18 +153,18 @@ private:
     {
         switch (dirObj.getDirCategory())
         {
-        case DIR_LEFT_SIDE_ONLY:
-            dirObj.setSyncDir(config.exLeftSideOnly);
-            break;
-        case DIR_RIGHT_SIDE_ONLY:
-            dirObj.setSyncDir(config.exRightSideOnly);
-            break;
-        case DIR_EQUAL:
-            dirObj.setSyncDir(SYNC_DIR_NONE);
-            break;
-        case DIR_DIFFERENT_METADATA:
-            dirObj.setSyncDir(config.conflict); //use setting from "conflict/cannot categorize"
-            break;
+            case DIR_LEFT_SIDE_ONLY:
+                dirObj.setSyncDir(config.exLeftSideOnly);
+                break;
+            case DIR_RIGHT_SIDE_ONLY:
+                dirObj.setSyncDir(config.exRightSideOnly);
+                break;
+            case DIR_EQUAL:
+                dirObj.setSyncDir(SYNC_DIR_NONE);
+                break;
+            case DIR_DIFFERENT_METADATA:
+                dirObj.setSyncDir(config.conflict); //use setting from "conflict/cannot categorize"
+                break;
         }
 
         //recursion
@@ -528,20 +528,20 @@ public:
     {
         switch (fsObj.getSyncOperation())
         {
-        case SO_CREATE_NEW_LEFT:
-        case SO_CREATE_NEW_RIGHT:
-        case SO_UNRESOLVED_CONFLICT:
-            return true;
+            case SO_CREATE_NEW_LEFT:
+            case SO_CREATE_NEW_RIGHT:
+            case SO_UNRESOLVED_CONFLICT:
+                return true;
 
-        case SO_DELETE_LEFT:
-        case SO_DELETE_RIGHT:
-        case SO_OVERWRITE_LEFT:
-        case SO_OVERWRITE_RIGHT:
-        case SO_DO_NOTHING:
-        case SO_EQUAL:
-        case SO_COPY_METADATA_TO_LEFT:
-        case SO_COPY_METADATA_TO_RIGHT:
-            ;
+            case SO_DELETE_LEFT:
+            case SO_DELETE_RIGHT:
+            case SO_OVERWRITE_LEFT:
+            case SO_OVERWRITE_RIGHT:
+            case SO_DO_NOTHING:
+            case SO_EQUAL:
+            case SO_COPY_METADATA_TO_LEFT:
+            case SO_COPY_METADATA_TO_RIGHT:
+                ;
         }
         return false;
     }
@@ -568,8 +568,8 @@ public:
 
         //try to load sync-database files
         std::pair<DirInfoPtr, DirInfoPtr> dirInfo = loadDBFile(baseDirectory);
-        if (    dirInfo.first.get()  == NULL ||
-                dirInfo.second.get() == NULL)
+        if (dirInfo.first.get()  == NULL ||
+            dirInfo.second.get() == NULL)
         {
             //use standard settings:
             SyncConfiguration defaultSync;
@@ -725,11 +725,11 @@ private:
                 fileObj.setSyncDirConflict(txtBothSidesChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
             else
             {
-//                if (cat == FILE_LEFT_SIDE_ONLY)
-//                    fileObj.setSyncDir(SYNC_DIR_RIGHT);
-//                else if (cat == FILE_RIGHT_SIDE_ONLY)
-//                    fileObj.setSyncDir(SYNC_DIR_LEFT);
-//                else
+                //                if (cat == FILE_LEFT_SIDE_ONLY)
+                //                    fileObj.setSyncDir(SYNC_DIR_RIGHT);
+                //                else if (cat == FILE_RIGHT_SIDE_ONLY)
+                //                    fileObj.setSyncDir(SYNC_DIR_LEFT);
+                //                else
                 fileObj.setSyncDirConflict(txtLastSyncFail);   //set syncDir = SYNC_DIR_INT_CONFLICT
             }
         }
@@ -859,17 +859,17 @@ private:
                     dirObj.setSyncDirConflict(txtBothSidesChanged);   //set syncDir = SYNC_DIR_INT_CONFLICT
                 else
                 {
-//                    switch (cat)
-//                    {
-//                    case DIR_LEFT_SIDE_ONLY:
-//                        dirObj.setSyncDir(SYNC_DIR_RIGHT);
-//                        break;
-//                    case DIR_RIGHT_SIDE_ONLY:
-//                        dirObj.setSyncDir(SYNC_DIR_LEFT);
-//                        break;
-//                    case DIR_EQUAL:
-//                        assert(false);
-//                    }
+                    //                    switch (cat)
+                    //                    {
+                    //                    case DIR_LEFT_SIDE_ONLY:
+                    //                        dirObj.setSyncDir(SYNC_DIR_RIGHT);
+                    //                        break;
+                    //                    case DIR_RIGHT_SIDE_ONLY:
+                    //                        dirObj.setSyncDir(SYNC_DIR_LEFT);
+                    //                        break;
+                    //                    case DIR_EQUAL:
+                    //                        assert(false);
+                    //                    }
 
                     dirObj.setSyncDirConflict(txtLastSyncFail);   //set syncDir = SYNC_DIR_INT_CONFLICT
                 }
@@ -881,8 +881,8 @@ private:
 
         //if a directory is to be deleted on one side, ensure that directions of sub-elements are "d’accord"
         const SyncOperation syncOp = dirObj.getSyncOperation();
-        if (    syncOp == SO_DELETE_LEFT ||
-                syncOp == SO_DELETE_RIGHT)
+        if (syncOp == SO_DELETE_LEFT ||
+            syncOp == SO_DELETE_RIGHT)
         {
             if (FindDeleteDirConflictNonRec().conflictFound(dirObj))
                 dirObj.setSyncDirConflict(txtDirDeleteConflict);
@@ -1055,24 +1055,25 @@ void ffs3::setActiveStatus(bool newStatus, ffs3::FolderComparison& folderCmp)
 void ffs3::setActiveStatus(bool newStatus, ffs3::FileSystemObject& fsObj)
 {
     fsObj.setActive(newStatus);
-
-//process subdirectories also!
-    struct Recurse: public FSObjectVisitor
-    {
-        Recurse(bool newStat) : newStatus_(newStat) {}
-        virtual void visit(const FileMapping& fileObj) {}
-        virtual void visit(const SymLinkMapping& linkObj) {}
-        virtual void visit(const DirMapping& dirObj)
+    /*
+    //process subdirectories also!
+        struct Recurse: public FSObjectVisitor
         {
-            if (newStatus_)
-                InOrExcludeAllRows<true>().execute(const_cast<DirMapping&>(dirObj)); //object is not physically const here anyway
-            else
-                InOrExcludeAllRows<false>().execute(const_cast<DirMapping&>(dirObj)); //
-        }
-    private:
-        const bool newStatus_;
-    } recurse(newStatus);
-    fsObj.accept(recurse);
+            Recurse(bool newStat) : newStatus_(newStat) {}
+            virtual void visit(const FileMapping& fileObj) {}
+            virtual void visit(const SymLinkMapping& linkObj) {}
+            virtual void visit(const DirMapping& dirObj)
+            {
+                if (newStatus_)
+                    InOrExcludeAllRows<true>().execute(const_cast<DirMapping&>(dirObj)); //object is not physically const here anyway
+                else
+                    InOrExcludeAllRows<false>().execute(const_cast<DirMapping&>(dirObj)); //
+            }
+        private:
+            const bool newStatus_;
+        } recurse(newStatus);
+        fsObj.accept(recurse);
+    */
 }
 
 namespace
@@ -1184,9 +1185,9 @@ void ffs3::applyFiltering(const MainConfiguration& currentMainCfg, FolderCompari
         BaseDirMapping& baseDirectory = folderCmp[i - allPairs.begin()];
 
         FilterData<STRATEGY_ALL>(*combineFilters(globalFilter,
-                                 BaseFilter::FilterRef(new NameFilter(
-                                             i->localFilter.includeFilter,
-                                             i->localFilter.excludeFilter)))).execute(baseDirectory);
+                                                 BaseFilter::FilterRef(new NameFilter(
+                                                                           i->localFilter.includeFilter,
+                                                                           i->localFilter.excludeFilter)))).execute(baseDirectory);
     }
 }
 
@@ -1305,12 +1306,12 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDeleteOneS
                             {
                                 switch (linkObj.getLinkType<side>())
                                 {
-                                case LinkDescriptor::TYPE_DIR:
-                                    ffs3::removeDirectory(linkObj.getFullName<side>(), NULL);
-                                    break;
-                                case LinkDescriptor::TYPE_FILE:
-                                    ffs3::removeFile(linkObj.getFullName<side>());
-                                    break;
+                                    case LinkDescriptor::TYPE_DIR:
+                                        ffs3::removeDirectory(linkObj.getFullName<side>(), NULL);
+                                        break;
+                                    case LinkDescriptor::TYPE_FILE:
+                                        ffs3::removeFile(linkObj.getFullName<side>());
+                                        break;
                                 }
                             }
 
@@ -1493,7 +1494,7 @@ void ffs3::checkForDSTChange(const FileCompareResult& gridData,
                 const FileDescrLine& leftFile  = j->fileDescrLeft;
                 const FileDescrLine& rightFile = j->fileDescrRight;
 
-                if (    leftFile.objType == FileDescrLine::TYPE_FILE && rightFile.objType == FileDescrLine::TYPE_FILE &&
+                if (leftFile.objType == FileDescrLine::TYPE_FILE && rightFile.objType == FileDescrLine::TYPE_FILE &&
                         leftFile.fileSize == rightFile.fileSize &&
                         leftFile.directory.CmpNoCase(i->leftDirectory.c_str()) == 0 && //Windows does NOT distinguish between upper/lower-case
                         rightFile.directory.CmpNoCase(i->rightDirectory.c_str()) == 0) //

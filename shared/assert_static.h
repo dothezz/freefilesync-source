@@ -27,10 +27,10 @@ struct CompileTimeError<true> {};
 #define LOKI_CONCAT_SUB( X, Y ) X##Y
 
 #define assert_static(expr)  \
-       enum { LOKI_CONCAT(loki_enum_dummy_value, __LINE__) = sizeof(StaticCheckImpl::CompileTimeError<static_cast<bool>(expr) >) }
+    enum { LOKI_CONCAT(loki_enum_dummy_value, __LINE__) = sizeof(StaticCheckImpl::CompileTimeError<static_cast<bool>(expr) >) }
 
 /*#define assert_static(expr) \
- 	{ Loki::CompileTimeError<((expr) != 0)> Static_Assert_Has_Failed; (void)Static_Assert_Has_Failed; } */
+{ Loki::CompileTimeError<((expr) != 0)> Static_Assert_Has_Failed; (void)Static_Assert_Has_Failed; } */
 
 #endif
 

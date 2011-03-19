@@ -38,7 +38,7 @@ IconBuffer::BasicString IconBuffer::getFileExtension(const BasicString& filename
 //test for extension for icons that physically have to be retrieved from disc
 bool IconBuffer::isPriceyExtension(const IconBuffer::BasicString& extension)
 {
-    static std::set<BasicString, LessFilename> exceptions;
+    static std::set<BasicString, LessFilename> exceptions; //not thread-safe, but called from worker thread only!
     if (exceptions.empty())
     {
         exceptions.insert(Zstr("exe"));
@@ -70,9 +70,9 @@ public:
     //icon holder has value semantics!
     IconHolder(const IconHolder& other) : handle_(other.handle_ == 0 ? 0 :
 #ifdef FFS_WIN
-                ::CopyIcon(other.handle_)
+                                                      ::CopyIcon(other.handle_)
 #elif defined FFS_LINUX
-                gdk_pixbuf_copy(other.handle_) //create new Pix buf with reference count 1 or return 0 on error
+                                                      gdk_pixbuf_copy(other.handle_) //create new Pix buf with reference count 1 or return 0 on error
 #endif
                                                      ) {}
 
@@ -99,20 +99,20 @@ public:
 
     wxIcon toWxIcon() const //copy HandleType, caller needs to take ownership!
     {
+        if (handle_ == 0)
+            return wxNullIcon;
+
         IconHolder clone(*this);
-        if (clone.handle_ != 0)
-        {
-            wxIcon newIcon; //attention: wxIcon uses reference counting!
+
+        wxIcon newIcon; //attention: wxIcon uses reference counting!
 #ifdef FFS_WIN
-            newIcon.SetHICON(clone.handle_);  //
-            newIcon.SetSize(IconBuffer::ICON_SIZE, IconBuffer::ICON_SIZE); //icon is actually scaled to this size (just in case referenced HICON differs)
-#elif defined FFS_LINUX                       //
-            newIcon.SetPixbuf(clone.handle_); // transfer ownership!!
-#endif                                        //
-            clone.handle_ = 0;                //
-            return newIcon;
-        }
-        return wxNullIcon;
+        newIcon.SetHICON(clone.handle_);  //
+        newIcon.SetSize(IconBuffer::ICON_SIZE, IconBuffer::ICON_SIZE); //icon is actually scaled to this size (just in case referenced HICON differs)
+#elif defined FFS_LINUX                   //
+        newIcon.SetPixbuf(clone.handle_); // transfer ownership!!
+#endif                                    //
+        clone.handle_ = 0;                //
+        return newIcon;
     }
 
 private:
@@ -124,23 +124,22 @@ const wxIcon& IconBuffer::getDirectoryIcon() //one folder icon should be suffici
 {
     static wxIcon folderIcon;
 
-    static bool isInitalized = false;
+    static bool isInitalized = false; //not thread-safe, but called from GUI thread only!
     if (!isInitalized)
     {
         isInitalized = true;
 
 #ifdef FFS_WIN
-        SHFILEINFO fileInfo;
-        fileInfo.hIcon = 0; //initialize hIcon
+        SHFILEINFO fileInfo = {}; //initialize hIcon
 
-        //NOTE: CoInitializeEx()/CoUninitialize() implicitly called by wxWidgets on program startup!
+        //NOTE: CoInitializeEx()/CoUninitialize() needs to be called for THIS thread!
         if (::SHGetFileInfo(Zstr("dummy"), //Windows Seven doesn't like this parameter to be an empty string
                             FILE_ATTRIBUTE_DIRECTORY,
                             &fileInfo,
                             sizeof(fileInfo),
                             SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES) &&
 
-                fileInfo.hIcon != 0) //fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
+            fileInfo.hIcon != 0) //fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
         {
             folderIcon.SetHICON(fileInfo.hIcon); //transfer ownership!
             folderIcon.SetSize(IconBuffer::ICON_SIZE, IconBuffer::ICON_SIZE);
@@ -154,17 +153,61 @@ const wxIcon& IconBuffer::getDirectoryIcon() //one folder icon should be suffici
 }
 
 
+const wxIcon& IconBuffer::getFileIcon()      //in case one folder icon is sufficient...
+{
+    static wxIcon fileIcon;
+
+    static bool isInitalized = false; //not thread-safe, but called from GUI thread only!
+    if (!isInitalized)
+    {
+        isInitalized = true;
+
+#ifdef FFS_WIN
+        SHFILEINFO fileInfo = {};  //initialize hIcon
+
+        //NOTE: CoInitializeEx()/CoUninitialize() needs to be called for THIS thread!
+        if (::SHGetFileInfo(Zstr("dummy"), //Windows Seven doesn't like this parameter to be an empty string
+                            FILE_ATTRIBUTE_NORMAL,
+                            &fileInfo,
+                            sizeof(fileInfo),
+                            SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES) &&
+
+            fileInfo.hIcon != 0) //fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
+        {
+            fileIcon.SetHICON(fileInfo.hIcon); //transfer ownership!
+            fileIcon.SetSize(IconBuffer::ICON_SIZE, IconBuffer::ICON_SIZE);
+        }
+
+#elif defined FFS_LINUX
+        try
+        {
+            Glib::RefPtr<Gtk::IconTheme> iconTheme = Gtk::IconTheme::get_default();
+            if (iconTheme)
+            {
+                Glib::RefPtr<Gdk::Pixbuf> iconPixbuf = iconTheme->load_icon("misc", ICON_SIZE, Gtk::ICON_LOOKUP_USE_BUILTIN);
+                if (!iconPixbuf)
+                    iconPixbuf = iconTheme->load_icon("text-x-generic", ICON_SIZE, Gtk::ICON_LOOKUP_USE_BUILTIN);
+                if (iconPixbuf)
+                    fileIcon.SetPixbuf(iconPixbuf->gobj_copy()); // transfer ownership!!
+            }
+        }
+        catch (const Glib::Error&) {}
+#endif
+    }
+    return fileIcon;
+}
+
+
 IconBuffer::IconHolder IconBuffer::getAssociatedIcon(const BasicString& filename)
 {
 #ifdef FFS_WIN
     //despite what docu says about SHGetFileInfo() it can't handle all relative filenames, e.g. "\DirName"
     //but no problem, directory formatting takes care that filenames are always absolute!
 
-    SHFILEINFO fileInfo;
-    fileInfo.hIcon = 0; //initialize hIcon -> fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
+    SHFILEINFO fileInfo = {}; //initialize hIcon -> fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
     //bug report: https://sourceforge.net/tracker/?func=detail&aid=2768004&group_id=234430&atid=1093080
 
-    //NOTE: CoInitializeEx()/CoUninitialize() implicitly called by wxWidgets on program startup!
+    //NOTE: CoInitializeEx()/CoUninitialize() needs to be called for THIS thread!
     ::SHGetFileInfo(filename.c_str(), //ffs3::removeLongPathPrefix(fileName), //::SHGetFileInfo() can't handle \\?\-prefix!
                     0,
                     &fileInfo,
@@ -174,14 +217,7 @@ IconBuffer::IconHolder IconBuffer::getAssociatedIcon(const BasicString& filename
     return IconHolder(fileInfo.hIcon); //pass icon ownership (may be 0)
 
 #elif defined FFS_LINUX
-    static struct RunOnce
-    {
-        RunOnce()
-        {
-            Gtk::Main::init_gtkmm_internals();
-        }
-    } dummy;
-
+    //call Gtk::Main::init_gtkmm_internals() on application startup!!
     try
     {
         Glib::RefPtr<Gio::File> fileObj = Gio::File::create_for_path(filename.c_str()); //never fails
@@ -229,8 +265,7 @@ IconBuffer::IconHolder IconBuffer::getAssociatedIcon(const BasicString& filename
 #ifdef FFS_WIN
 IconBuffer::IconHolder IconBuffer::getAssociatedIconByExt(const BasicString& extension)
 {
-    SHFILEINFO fileInfo;
-    fileInfo.hIcon = 0; //initialize hIcon -> fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
+    SHFILEINFO fileInfo = {}; //initialize hIcon -> fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
 
     //no read-access to disk! determine icon by extension
     ::SHGetFileInfo((Zstr("dummy.") + extension).c_str(),  //Windows Seven doesn't like this parameter to be without short name
@@ -242,6 +277,28 @@ IconBuffer::IconHolder IconBuffer::getAssociatedIconByExt(const BasicString& ext
     return IconHolder(fileInfo.hIcon); //pass icon ownership (may be 0)
 }
 #endif
+
+
+namespace
+{
+//failure to initialize COM for each thread is a source of hard to reproduce bugs: https://sourceforge.net/tracker/?func=detail&aid=3160472&group_id=234430&atid=1093080
+struct ThreadInitializer
+{
+    ThreadInitializer()
+    {
+#ifdef FFS_WIN
+        ::CoInitializeEx(NULL, COINIT_MULTITHREADED);
+#endif
+    }
+
+    ~ThreadInitializer()
+    {
+#ifdef FFS_WIN
+        ::CoUninitialize();
+#endif
+    }
+};
+}
 
 
 class IconBuffer::WorkerThread
@@ -257,7 +314,7 @@ public:
 private:
     void doWork();
 
-//---------------------- Shared Data -------------------------
+    //---------------------- Shared Data -------------------------
     typedef BasicString FileName;
 
     struct SharedData
@@ -266,7 +323,7 @@ private:
         boost::mutex              mutex;
         boost::condition_variable condition; //signal event: data for processing available
     } shared;
-//------------------------------------------------------------
+    //------------------------------------------------------------
 
     IconBuffer& iconBuffer;
 
@@ -296,7 +353,7 @@ void IconBuffer::WorkerThread::setWorkload(const std::vector<Zstring>& load) //(
 
         shared.workload.clear();
         for (std::vector<Zstring>::const_iterator i = load.begin(); i != load.end(); ++i)
-            shared.workload.push_back(FileName(i->c_str())); //make DEEP COPY from Zstring
+            shared.workload.push_back(FileName(i->c_str(), i->size())); //make DEEP COPY from Zstring
     }
 
     shared.condition.notify_one();
@@ -306,6 +363,8 @@ void IconBuffer::WorkerThread::setWorkload(const std::vector<Zstring>& load) //(
 
 void IconBuffer::WorkerThread::operator()() //thread entry
 {
+    ThreadInitializer dummy1;
+
     try
     {
         while (true)
@@ -320,9 +379,17 @@ void IconBuffer::WorkerThread::operator()() //thread entry
             doWork(); //no need to lock the complete method!
         }
     }
+    catch (boost::thread_interrupted&)
+    {
+        throw; //this is the only reasonable exception!
+    }
     catch (const std::exception& e) //exceptions must be catched per thread
     {
         wxSafeShowMessage(wxString(_("An exception occurred!")) + wxT("(Icon buffer)"), wxString::FromAscii(e.what())); //simple wxMessageBox won't do for threads
+    }
+    catch (...) //exceptions must be catched per thread
+    {
+        wxSafeShowMessage(wxString(_("An exception occurred!")) + wxT("(Icon buffer2)"), wxT("Unknown exception in icon thread!")); //simple wxMessageBox won't do for threads
     }
 }
 

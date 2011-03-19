@@ -154,6 +154,8 @@ Konfiguration &laden...
 <Symlink>
 <multiple selection>
 <Mehrfachauswahl>
+A directory input field is empty.
+Ein Verzeichniseingabefeld ist leer.
 A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
 Es wird ein Verzeichnis verändert werden, das Teil mehrerer Verzeichnispaare ist! Bitte die Synchronisationseinstellungen prüfen!
 A newer version of FreeFileSync is available:
@@ -372,6 +374,8 @@ Encoding extended time information: %x
 Speichere erweiterte Zeitinformation: %x
 Endless loop when traversing directory:
 Endlosschleife beim Lesen des Verzeichnisses:
+Equal files/folders that differ in attributes only
+Gleiche Dateien/Verzeichnisse mit unterschiedlichen Attributen
 Error
 Fehler
 Error changing modification time:
@@ -478,8 +482,6 @@ Files that exist on both sides, right one is newer
 Auf beiden Seiten existierende Dateien; rechte Datei ist neuer
 Files that have different content
 Dateien mit verschiedenem Inhalt
-Files/folders that differ in attributes only
-Dateien/Verzeichnisse mit unterschiedlichen Attributen
 Files/folders that exist on left side only
 Nur links exisitierende Dateien/Verzeichnisse
 Files/folders that exist on right side only
@@ -490,8 +492,6 @@ Filter is active
 Filter ist aktiv
 Filter settings have changed!
 Die Filtereinstellungen wurden geändert!
-Filter view
-Ansicht filtern
 Filter: All pairs
 Filter: Alle Verzeichnispaare
 Filter: Single pair
@@ -508,6 +508,8 @@ Follow
 Folgen
 Free disk space available:
 Verfügbarer freier Speicherplatz:
+Free disk space required:
+Benötigter freier Speicherplatz:
 FreeFileSync Batch Job
 FreeFileSync Batch-Job
 FreeFileSync at Sourceforge
@@ -602,6 +604,8 @@ Integrate external applications into context menu. The following macros are avai
 Integriert externe Anwendungen in das Kontextmenu. Die folgenden Makros stehen zur Verfügung:
 Invalid FreeFileSync config file!
 Ungültige FreeFileSync Konfigurationsdatei!
+Last used configurations (press DEL to remove from list)
+Zuletzt benutzte Konfigurationen (DEL-Taste löscht Einträge)
 Leave as unresolved conflict
 Als unbehandelten Konflikt belassen
 Left
@@ -610,8 +614,6 @@ Legend
 Legende
 Load configuration from file
 Konfiguration aus Datei laden
-Load configuration history (press DEL to delete items)
-Lade Konfigurationshistorie (DEL-Taste löscht Einträge)
 Log-messages:
 Meldungen:
 Logging
@@ -622,12 +624,16 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Das Erstellen von Schattenkopien unter WOW64 wird nicht unterstützt. Bitte benutzen Sie die FreeFileSync 64-Bit Version.
 Match case
 Groß-/Kleinschreibung
+Maximum number of logfiles:
+Maximale Anzahl an Logdateien:
+Memory allocation failed!
+Speicherallokation fehlgeschlagen!
 Minimum Idle Time [seconds]
 Minimale Ruhezeit [Sekunden]
 Mirror ->>
 Spiegeln ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Spiegelkopie des linken Verzeichnisses erstellen: Das rechte Verzeichnis wird dabei überschrieben und nach der Synchronisation dem linken exakt entsprechen.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+Spiegelkopie des linken Verzeichnisses erstellen. Das rechte Verzeichnis wird dem linken exakt angeglichen.
 Monitoring active...
 Überwachung aktiv...
 More than 50% of the total number of files will be copied or deleted!
@@ -698,8 +704,6 @@ Published under the GNU General Public License:
 Veröffentlicht unter der GNU General Public License:
 Question
 Frage
-Re-enable all hidden dialogs?
-Alle versteckten Dialoge wieder anzeigen?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Automatisierte Synchronisation
 RealtimeSync configuration
@@ -720,6 +724,8 @@ Reset
 Zurücksetzen
 Reset view
 Ansicht zurücksetzen
+Restore all hidden dialogs?
+Alle versteckten Dialoge wieder anzeigen?
 Right
 Rechts
 S&ave configuration...
@@ -742,6 +748,8 @@ Select logfile directory:
 Verzeichnis für Logdatei wählen:
 Select variant:
 Variante auswählen:
+Select view
+Ansicht auswählen
 Set direction:
 Setze Richtung:
 Setting default synchronization directions: Old files will be overwritten with newer files.
@@ -830,8 +838,6 @@ Synchronize...
 Synchronisieren
 Synchronizing...
 Synchronisiere...
-System out of memory!
-Zu wenig freier Arbeitsspeicher!
 Target directory already existing!
 Zielverzeichnis existiert bereits!
 Target file already existing!
@@ -852,8 +858,6 @@ Time remaining:
 Verbleibende Zeit:
 Total amount of data that will be transferred
 Gesamtmenge der zu übertragenden Daten
-Total required free disk space:
-Insgesamt benötigter freier Speicherplatz:
 Total time:
 Gesamtzeit:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -874,14 +878,14 @@ Use Recycle Bin
 Papierkorb verwenden
 Use Recycle Bin when deleting or overwriting files
 Papierkorb für zu löschende oder zu überschreibende Dateien nutzen
-User-defined directory
-Benutzerdefiniertes Verzeichnis
 User-defined directory for deletion was not specified!
 Kein benutzerdefiniertes Verzeichnis zum Löschen angegeben!
 Variant
 Variante
 Verifying file %x
 Verifiziere Datei %x
+Versioning
+Versionierung
 Volume name %x not part of filename %y!
 Laufwerksname %x ist kein Teil des Dateinamens %y!
 Waiting for missing directories...
@@ -890,14 +894,12 @@ Waiting while directory is locked (%x)...
 Warte während Verzeichnis gesperrt ist (%x)...
 Warning
 Warnung
-Warning: Synchronization failed for %x item(s):
-Warnung: Synchronisation fehlgeschlagen für %x Element(e):
 When the comparison is started with this option set the following decision tree is processed:
 Wenn der Vergleich mit dieser Option gestartet wurde, wird folgender Entscheidungsbaum abgearbeitet:
 You can ignore conflicts and continue synchronization.
 Die Konflikte können ignoriert und die Synchronisation fortgesetzt werden.
-You can ignore the error to consider not existing directories as empty.
-Dieser Fehler kann ignoriert werden, um nicht existierende Verzeichnisse als leer anzusehen.
+You can ignore this error to consider the directory as empty.
+Dieser Fehler kann ignoriert werden, um das Verzeichnis als leer anzusehen.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Verbliebene Elemente können nochmals synchronisiert werden (OHNE dass ein erneuter Vergleich notwendig ist)!
 different

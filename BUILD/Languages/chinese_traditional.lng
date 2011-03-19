@@ -154,6 +154,10 @@
 <符號連結>
 <multiple selection>
 <多重選擇>
+A directory input field is empty.
+目錄輸入的欄位為空
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+一個目錄將被修改，這是多對資料夾的一部份！請檢閱同步設置！
 A newer version of FreeFileSync is available:
 有較新版本的 FreeFileSync 可用：
 Abort requested: Waiting for current operation to finish...
@@ -202,6 +206,8 @@ Cannot determine sync-direction:
 無法判斷同步方向：
 Cannot find %x
 找不到 %x
+Cannot write to empty directory path!
+
 Category
 分類
 Clear filter settings
@@ -370,6 +376,8 @@ Encoding extended time information: %x
 編碼延長時間資訊：%x
 Endless loop when traversing directory:
 當遍歷目錄時無限循環：
+Equal files/folders that differ in attributes only
+同等檔案/資料夾只在於屬性不同 
 Error
 錯誤
 Error changing modification time:
@@ -425,7 +433,7 @@ Error when monitoring directories.
 Error writing file:
 寫入檔案錯誤：
 Error writing security context:
-寫入安全上內文錯誤：
+寫入安全性內容錯誤：
 Error writing to synchronization database:
 寫入同步資料庫錯誤：
 Example
@@ -476,8 +484,6 @@ Files that exist on both sides, right one is newer
 檔案存在於兩邊，右邊檔案較新
 Files that have different content
 具有不同內容的檔案
-Files/folders that differ in attributes only
-檔案/資料夾只有屬性不同
 Files/folders that exist on left side only
 只存在於左邊的檔案/資料夾
 Files/folders that exist on right side only
@@ -488,8 +494,6 @@ Filter is active
 篩選器為啟動
 Filter settings have changed!
 篩選器設定已更改！
-Filter view
-篩選檢視
 Filter: All pairs
 篩選器：所有對
 Filter: Single pair
@@ -505,7 +509,9 @@ Folder pairs
 Follow
 跟隨
 Free disk space available:
-可用的磁碟空間：
+可用磁碟空間：
+Free disk space required:
+所需要的可用磁碟空間：
 FreeFileSync Batch Job
 FreeFileSync 批次處理作業
 FreeFileSync at Sourceforge
@@ -600,6 +606,8 @@ Integrate external applications into context menu. The following macros are avai
 整合上下文功能表中的外部應用程式。可以使用下面的巨集：
 Invalid FreeFileSync config file!
 無效的 FreeFileSync 配置檔案！
+Last used configurations (press DEL to remove from list)
+上次使用的配置(按DEL鍵，從清單中移除) 
 Leave as unresolved conflict
 保留給未解決的衝突
 Left
@@ -608,8 +616,6 @@ Legend
 圖例
 Load configuration from file
 從檔案載入配置
-Load configuration history (press DEL to delete items)
-載入配置的歷史記錄(按DEL鍵刪除項目)
 Log-messages:
 日誌訊息：
 Logging
@@ -620,12 +626,16 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 不支援製作 WOW64 上的卷影副本。請使用 FreeFileSync 64位元版本。
 Match case
 區分大小寫
+Maximum number of logfiles:
+日誌檔的最大數目：
+Memory allocation failed!
+記憶體分配失敗！
 Minimum Idle Time [seconds]
 最小閒置時間 [秒]
 Mirror ->>
 鏡像 ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-左邊資料夾的鏡像備份：同步之後，右邊資料夾將被覆蓋，完全和左邊資料夾一模一樣。
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+鏡像備份的左邊的資料夾。同步後，右邊的資料夾進行修改以完全相配左邊的資料夾。
 Monitoring active...
 監測活動...
 More than 50% of the total number of files will be copied or deleted!
@@ -696,8 +706,6 @@ Published under the GNU General Public License:
 在GNU通用公共許可證下發佈：
 Question
 問題
-Re-enable all hidden dialogs?
-重新啟用所有隱藏的對話框嗎？
 RealtimeSync - Automated Synchronization
 即時同步 - 自動同步
 RealtimeSync configuration
@@ -718,6 +726,8 @@ Reset
 重置
 Reset view
 重置檢視
+Restore all hidden dialogs?
+要還原全部隱藏的對話框嗎？
 Right
 右邊
 S&ave configuration...
@@ -740,6 +750,8 @@ Select logfile directory:
 選擇日誌檔目錄：
 Select variant:
 選擇變數：
+Select view
+選擇檢視
 Set direction:
 設定方向：
 Setting default synchronization directions: Old files will be overwritten with newer files.
@@ -828,8 +840,6 @@ Synchronize...
 同步...
 Synchronizing...
 正在同步...
-System out of memory!
-系統記憶體不足！
 Target directory already existing!
 目標目錄已存在！
 Target file already existing!
@@ -850,8 +860,6 @@ Time remaining:
 剩餘時間：
 Total amount of data that will be transferred
 將要傳輸的全部資料量
-Total required free disk space:
-全部所需要的可用磁碟空間：
 Total time:
 全部時間：
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -872,14 +880,14 @@ Use Recycle Bin
 使用資源回收筒
 Use Recycle Bin when deleting or overwriting files
 當刪除或覆蓋檔案時使用資源回收筒
-User-defined directory
-自定義目錄
 User-defined directory for deletion was not specified!
 未指定要刪除的自定義目錄！
 Variant
 變數
 Verifying file %x
 驗證檔 %x
+Versioning
+版本控制
 Volume name %x not part of filename %y!
 卷名 %x 並非檔名 %y 的一部份！
 Waiting for missing directories...
@@ -888,14 +896,12 @@ Waiting while directory is locked (%x)...
 等待目錄被鎖定(%x)...
 Warning
 警告
-Warning: Synchronization failed for %x item(s):
-警告：同步失敗的名稱為 %x 項目：
 When the comparison is started with this option set the following decision tree is processed:
 當比對開始，使用此選項設定時，以下決策樹將被處理：
 You can ignore conflicts and continue synchronization.
 你可以忽略衝突，並繼續同步。
-You can ignore the error to consider not existing directories as empty.
-你可以忽略該錯誤而將不存在的目錄視為空目錄。
+You can ignore this error to consider the directory as empty.
+您可以忽略此錯誤，考慮該目錄為空。
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 您可能會嘗試再次同步剩餘項目(不用重新比對)！
 different

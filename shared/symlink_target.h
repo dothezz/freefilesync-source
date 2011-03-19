@@ -7,7 +7,7 @@
 #ifndef SYMLINK_WIN_H_INCLUDED
 #define SYMLINK_WIN_H_INCLUDED
 
-#include <boost/shared_ptr.hpp>
+#include "loki/ScopeGuard.h"
 #include <boost/scoped_array.hpp>
 #include "system_func.h"
 #include <wx/intl.h>
@@ -67,9 +67,9 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw (FileError)
     using ffs3::zToWx;
     using ffs3::FileError;
 #ifdef FFS_WIN
-//FSCTL_GET_REPARSE_POINT: http://msdn.microsoft.com/en-us/library/aa364571(VS.85).aspx
+    //FSCTL_GET_REPARSE_POINT: http://msdn.microsoft.com/en-us/library/aa364571(VS.85).aspx
 
-    try //setting privileges requires admin rights! This shall not cause an error in user mode!
+    try //reading certain symlinks requires admin rights! This shall not cause an error in user mode!
     {
         //allow access to certain symbolic links/junctions
         ffs3::Privileges::getInstance().ensureActive(SE_BACKUP_NAME); //throw FileError()
@@ -88,7 +88,8 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw (FileError)
         wxString errorMessage = wxString(_("Error resolving symbolic link:")) + wxT("\n\"") + ffs3::zToWx(linkPath) + wxT("\"");
         throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
     }
-    boost::shared_ptr<void> dummy(hLink, ::CloseHandle);
+    Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hLink);
+    (void)dummy; //silence warning "unused variable"
 
     //respect alignment issues...
     const size_t bufferSize = REPARSE_DATA_BUFFER_HEADER_SIZE + MAXIMUM_REPARSE_DATA_BUFFER_SIZE;

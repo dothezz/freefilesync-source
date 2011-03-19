@@ -48,6 +48,7 @@ private:
     void OnGlobalFilterOpenContext(wxCommandEvent& event);
     void OnGlobalFilterRemConfirm(wxCommandEvent& event);
     virtual void OnCheckSilent(        wxCommandEvent& event);
+    virtual void OnChangeMaxLogCountTxt(wxCommandEvent& event);
     virtual void OnClose(              wxCloseEvent&   event);
     virtual void OnCancel(             wxCommandEvent& event);
     virtual void OnSaveBatchJob(       wxCommandEvent& event);
@@ -64,7 +65,6 @@ private:
 
     void updateGui(); //re-evaluate gui after config changes
 
-    void updateVisibleTabs();
     void showNotebookpage(wxWindow* page, const wxString& pageName, bool show);
 
     //error handling

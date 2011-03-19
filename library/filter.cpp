@@ -88,7 +88,7 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
     static const Zstring asteriskSep     = Zstring(Zchar('*')) + common::FILE_NAME_SEPARATOR;
     static const Zstring questionMarkSep = Zstring(Zchar('?')) + common::FILE_NAME_SEPARATOR;
 
-//--------------------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------------------
     //add some syntactic sugar: handle beginning of filtername
     if (filterFormatted.StartsWith(common::FILE_NAME_SEPARATOR))
     {
@@ -101,7 +101,7 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
         addFilterEntry(Zstring(filterFormatted.c_str() + 1), fileFilter, directoryFilter); //prevent further recursion by prefix
     }
 
-//--------------------------------------------------------------------------------------------------
+    //--------------------------------------------------------------------------------------------------
     //even more syntactic sugar: handle end of filtername
     if (filterFormatted.EndsWith(common::FILE_NAME_SEPARATOR))
     {
@@ -149,35 +149,35 @@ bool matchesMask(const Zchar* string, const Zchar* mask)
     {
         switch (ch)
         {
-        case Zchar('?'):
-            if (*string == 0)
-                return false;
-            break;
+            case Zchar('?'):
+                if (*string == 0)
+                    return false;
+                break;
 
-        case Zchar('*'):
-            //advance to next non-*/? char
-            do
-            {
-                ++mask;
-                ch = *mask;
-            }
-            while (ch == Zchar('*') || ch == Zchar('?'));
-            //if match ends with '*':
-            if (ch == 0)
-                return true;
-
-            ++mask;
-            while ((string = cStringFind(string, ch)) != NULL)
-            {
-                ++string;
-                if (matchesMask(string, mask))
+            case Zchar('*'):
+                //advance to next non-*/? char
+                do
+                {
+                    ++mask;
+                    ch = *mask;
+                }
+                while (ch == Zchar('*') || ch == Zchar('?'));
+                //if match ends with '*':
+                if (ch == 0)
                     return true;
-            }
-            return false;
 
-        default:
-            if (*string != ch)
+                ++mask;
+                while ((string = cStringFind(string, ch)) != NULL)
+                {
+                    ++string;
+                    if (matchesMask(string, mask))
+                        return true;
+                }
                 return false;
+
+            default:
+                if (*string != ch)
+                    return false;
         }
     }
     return *string == 0;
@@ -194,15 +194,15 @@ bool matchesMaskBegin(const Zchar* string, const Zchar* mask)
 
         switch (ch)
         {
-        case Zchar('?'):
-            break;
+            case Zchar('?'):
+                break;
 
-        case Zchar('*'):
-            return true;
+            case Zchar('*'):
+                return true;
 
-        default:
-            if (*string != ch)
-                return false;
+            default:
+                if (*string != ch)
+                    return false;
         }
     }
     return *string == 0;

@@ -154,6 +154,10 @@
 <Symboliska länkar>
 <multiple selection>
 <flerval>
+A directory input field is empty.
+Ett katalogfält är tomt
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+En katalog som är en del av flera katalogpar kommer att ändras! Kontrollera synkroniseringsinställningarna
 A newer version of FreeFileSync is available:
 En nyare version av FreeFileSync finns tillgänglig:
 Abort requested: Waiting for current operation to finish...
@@ -370,6 +374,8 @@ Encoding extended time information: %x
 Kodar utökad tidsinformation: %x
 Endless loop when traversing directory:
 Oändlig loop vid accessförsök på katalog:
+Equal files/folders that differ in attributes only
+Lika filer/kataloger som endast skiljer sig i attribut
 Error
 Fel
 Error changing modification time:
@@ -476,8 +482,6 @@ Files that exist on both sides, right one is newer
 Filer som finns på båda sidor, höger är nyare
 Files that have different content
 Filer som har olika innehåll
-Files/folders that differ in attributes only
-Filer/Kataloger som endast skiljer i attribut
 Files/folders that exist on left side only
 Filer/kataloger som finns på vänster sida enbart
 Files/folders that exist on right side only
@@ -488,8 +492,6 @@ Filter is active
 Filter är aktiverat
 Filter settings have changed!
 Filterinställningar har ändrats!
-Filter view
-Filtervy
 Filter: All pairs
 Filter: Generella undantag
 Filter: Single pair
@@ -506,6 +508,8 @@ Follow
 Följ
 Free disk space available:
 Ledigt diskutrymme:
+Free disk space required:
+Krav på ledigt diskutrymme:
 FreeFileSync Batch Job
 FreeFileSync Batch-jobb
 FreeFileSync at Sourceforge
@@ -600,6 +604,8 @@ Integrate external applications into context menu. The following macros are avai
 Integrera externa program i högerklicksmeny. Följande variabler finns tillgängliga:
 Invalid FreeFileSync config file!
 Felaktig FreeFileSync konfigurationsfil!
+Last used configurations (press DEL to remove from list)
+Senast använda konfigurationer (Tryck DEL för att ta bort)
 Leave as unresolved conflict
 Ignorera konflikt
 Left
@@ -608,8 +614,6 @@ Legend
 Förklaring
 Load configuration from file
 Hämta inställningar från fil 
-Load configuration history (press DEL to delete items)
-Konfigurationshistoria (Tryck DEL för att ta bort objekt)
 Log-messages:
 Log-meddelanden:
 Logging
@@ -620,12 +624,16 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Skuggkopior av wow64 stöds ej. Använd FreeFileSync x64 istället!
 Match case
 Matcha gemener/VERSALER
+Maximum number of logfiles:
+Max antal loggfiler:
+Memory allocation failed!
+Minnesallokering misslyckades!
 Minimum Idle Time [seconds]
 Minsta ledig tid [sekunder]
 Mirror ->>
 Spegla ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Speglad kopia av vänster sida: Höger sida kommer att skrivas över med en exakt kopia av vänster sida.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+Speglar säkerhetskopia av vänster katalog. Höger katalog ändras för att exakt matcha vänster efter synkroniseringen.
 Monitoring active...
 Övervakning aktiverad...
 More than 50% of the total number of files will be copied or deleted!
@@ -696,8 +704,6 @@ Published under the GNU General Public License:
 Publiserad under GNU General Public License:
 Question
 Fråga
-Re-enable all hidden dialogs?
-Återaktivera alla dolda meddelanden?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Automatiserad synkronisering
 RealtimeSync configuration
@@ -718,6 +724,8 @@ Reset
 Återställ
 Reset view
 Återställ vy
+Restore all hidden dialogs?
+Vill du återställa alla dolda dialoger?
 Right
 Höger
 S&ave configuration...
@@ -740,6 +748,8 @@ Select logfile directory:
 Välj loggfilskatalog:
 Select variant:
 Välj variant:
+Select view
+Välj vy
 Set direction:
 Ange riktning:
 Setting default synchronization directions: Old files will be overwritten with newer files.
@@ -828,8 +838,6 @@ Synchronize...
 Synkronisera
 Synchronizing...
 Synkroniserar...
-System out of memory!
-Systemminnet är fullt!
 Target directory already existing!
 Målkatalogen finns redan!
 Target file already existing!
@@ -850,8 +858,6 @@ Time remaining:
 Kvarvarande tid:
 Total amount of data that will be transferred
 Total mängd data som kommer att överföras
-Total required free disk space:
-Ledigt diskutrymme som krävs:
 Total time:
 Total tid:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -872,14 +878,14 @@ Use Recycle Bin
 Använd papperskorgen
 Use Recycle Bin when deleting or overwriting files
 Use Volume Shadow Copy Service to copy locked or shared files
-User-defined directory
-Användardefinierad katalog
 User-defined directory for deletion was not specified!
 Katalog för borttagning ej specifiserad!
 Variant
 Variant
 Verifying file %x
 Verifierar %x
+Versioning
+Versionshantering
 Volume name %x not part of filename %y!
 Volymnamn %x saknas i filnamn %y!
 Waiting for missing directories...
@@ -888,14 +894,12 @@ Waiting while directory is locked (%x)...
 Väntar medan katalogen låses (%x)...
 Warning
 Varning
-Warning: Synchronization failed for %x item(s):
-Varning: Synkronisering misslyckades för %x objekt:
 When the comparison is started with this option set the following decision tree is processed:
 När jämförelse startas med detta alternativ aktiverat, processas följande beslutsträd:
 You can ignore conflicts and continue synchronization.
 Du kan ignorera konflikter och fortsätta synkroniseringen.
-You can ignore the error to consider not existing directories as empty.
-Du kan ignorera felet att inte betrakta befintliga kataloger som tomma.
+You can ignore this error to consider the directory as empty.
+Du kan bortse från det här felet och utgå ifrån att katalogen är tom
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Du kan försöka synkronisera återstående objekt igen (utan att trycka \"Jämför\")!
 different

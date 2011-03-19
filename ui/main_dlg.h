@@ -23,6 +23,7 @@ class IconUpdater;
 class DirectoryPair;
 class DirectoryPairFirst;
 class CompareStatus;
+class SyncStatusHandler;
 class PanelMoveWindow;
 
 
@@ -47,6 +48,7 @@ public:
 
 private:
     friend class CompareStatusHandler;
+    friend class SyncStatusHandler;
     friend class ManualDeletionHandler;
     friend class DirectoryPairFirst;
     friend class DirectoryNameMainImpl;
@@ -205,19 +207,18 @@ private:
     void OnCmpSettings(         wxCommandEvent& event);
     void OnStartSync(           wxCommandEvent& event);
     void OnClose(               wxCloseEvent&   event);
-    void OnQuit(                wxCommandEvent& event);
 
     void OnGlobalFilterOpenContext(wxCommandEvent& event);
     void OnGlobalFilterRemConfirm(wxCommandEvent& event);
 
-    void calculatePreview();
+    void updateStatistics();
 
     void OnAddFolderPair(       wxCommandEvent& event);
     void OnRemoveFolderPair(    wxCommandEvent& event);
     void OnRemoveTopFolderPair( wxCommandEvent& event);
 
     void updateFilterConfig();
-    void updateSyncConfig();
+    void applySyncConfig();
 
     //menu events
     void OnMenuGlobalSettings(  wxCommandEvent& event);
@@ -235,7 +236,7 @@ private:
     typedef int LanguageID;
     std::map<MenuItemID, LanguageID> languageMenuItemMap; //needed to attach menu item events
 
-//***********************************************
+    //***********************************************
     //application variables are stored here:
 
     //global settings used by GUI and batch mode
@@ -244,7 +245,7 @@ private:
     //UI view of FolderComparison structure
     std::auto_ptr<ffs3::GridView> gridDataView;
 
-//-------------------------------------
+    //-------------------------------------
     //functional configuration
     xmlAccess::XmlGuiConfig currentCfg;
 
@@ -257,10 +258,10 @@ private:
     int heightNotMaximized;
     int posXNotMaximized;
     int posYNotMaximized;
-//-------------------------------------
+    //-------------------------------------
 
 
-//***********************************************
+    //***********************************************
     std::auto_ptr<wxMenu> contextMenu;
 
     //status information
@@ -278,6 +279,8 @@ private:
 
     //update icons periodically: one updater instance for both left and right grids
     std::auto_ptr<IconUpdater> updateFileIcons;
+
+    bool processingGlobalKeyEvent; //indicator to notify recursion in OnGlobalKeyEvent()
 
     //encapsulation of handling of sync preview
     class SyncPreview //encapsulates MainDialog functionality for synchronization preview (friend class)

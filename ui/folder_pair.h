@@ -49,25 +49,25 @@ public:
     {
         if (altSyncConfig.get())
         {
-            basicPanel_.m_bpButtonAltSyncCfg->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("syncConfigSmall")));
+            basicPanel_.m_bpButtonAltSyncCfg->SetBitmapLabel(GlobalResources::instance().getImage(wxT("syncConfigSmall")));
             basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(wxString(_("Select alternate synchronization settings")) +  wxT(" ") + common::LINE_BREAK +
-                    wxT("(") + getVariantName(altSyncConfig->syncConfiguration) + wxT(")"));
+                                                         wxT("(") + getVariantName(altSyncConfig->syncConfiguration) + wxT(")"));
         }
         else
         {
-            basicPanel_.m_bpButtonAltSyncCfg->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("syncConfigSmallGrey")));
+            basicPanel_.m_bpButtonAltSyncCfg->SetBitmapLabel(GlobalResources::instance().getImage(wxT("syncConfigSmallGrey")));
             basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Select alternate synchronization settings"));
         }
 
         //test for Null-filter
         if (isNullFilter(localFilter))
         {
-            basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("filterSmallGrey")));
+            basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(GlobalResources::instance().getImage(wxT("filterSmallGrey")));
             basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("No filter selected"));
         }
         else
         {
-            basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("filterSmall")));
+            basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(GlobalResources::instance().getImage(wxT("filterSmall")));
             basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("Filter is active"));
         }
     }
@@ -83,7 +83,7 @@ protected:
         basicPanel_.m_bpButtonAltSyncCfg-> Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfg), NULL, this);
         basicPanel_.m_bpButtonLocalFilter->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfg), NULL, this);
 
-        basicPanel_.m_bpButtonRemovePair->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("removeFolderPair")));
+        basicPanel_.m_bpButtonRemovePair->SetBitmapLabel(GlobalResources::instance().getImage(wxT("removeFolderPair")));
     }
 
     virtual void OnLocalFilterCfgRemoveConfirm(wxCommandEvent& event)
@@ -135,17 +135,17 @@ private:
     {
         const MainConfiguration mainCfg = getMainConfig();
         const AlternateSyncConfig syncConfigMain(mainCfg.syncConfiguration,
-                mainCfg.handleDeletion,
-                mainCfg.customDeletionDirectory);
+                                                 mainCfg.handleDeletion,
+                                                 mainCfg.customDeletionDirectory);
 
         AlternateSyncConfig altSyncCfg = altSyncConfig.get() ? *altSyncConfig : syncConfigMain;
-        SyncCfgDialog* syncDlg = new SyncCfgDialog(getParentWindow(),
-                mainCfg.compareVar,
-                altSyncCfg.syncConfiguration,
-                altSyncCfg.handleDeletion,
-                altSyncCfg.customDeletionDirectory,
-                NULL);
-        if (syncDlg->ShowModal() == SyncCfgDialog::BUTTON_APPLY)
+        SyncCfgDialog syncDlg(getParentWindow(),
+                              mainCfg.compareVar,
+                              altSyncCfg.syncConfiguration,
+                              altSyncCfg.handleDeletion,
+                              altSyncCfg.customDeletionDirectory,
+                              NULL);
+        if (syncDlg.ShowModal() == SyncCfgDialog::BUTTON_APPLY)
         {
             altSyncConfig.reset(new AlternateSyncConfig(altSyncCfg));
             refreshButtons();

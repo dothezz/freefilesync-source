@@ -238,6 +238,7 @@
     <ClCompile Include="..\shared\help_provider.cpp" />
     <ClCompile Include="..\shared\localization.cpp" />
     <ClCompile Include="..\shared\long_path_prefix.cpp" />
+    <ClCompile Include="..\shared\mouse_move_dlg.cpp" />
     <ClCompile Include="..\shared\privilege.cpp" />
     <ClCompile Include="..\shared\shadow.cpp" />
     <ClCompile Include="..\shared\standard_paths.cpp" />

@@ -80,8 +80,8 @@ void GlobalResources::load() const
 const wxBitmap& GlobalResources::getImageByName(const wxString& imageName) const
 {
     const std::map<wxString, wxBitmap*>::const_iterator bmp = imageName.Find(wxChar('.')) == wxNOT_FOUND ? //assume .png ending if nothing else specified
-            bitmapResource.find(imageName + wxT(".png")) :
-            bitmapResource.find(imageName);
+                                                              bitmapResource.find(imageName + wxT(".png")) :
+                                                              bitmapResource.find(imageName);
 
     if (bmp != bitmapResource.end())
         return *bmp->second;

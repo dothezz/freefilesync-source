@@ -85,8 +85,11 @@ public:
         const char buffer[1] = {' '};
 
 #ifdef FFS_WIN
+        //ATTENTION: setting file pointer IS required! => use CreateFile/FILE_GENERIC_WRITE + SetFilePointerEx!
+        //although CreateFile/FILE_APPEND_DATA without SetFilePointerEx works locally, it MAY NOT work on some network shares creating a 4 gig file!!!
+
         const HANDLE fileHandle = ::CreateFile(applyLongPathPrefix(lockfilename_.c_str()).c_str(),
-                                               FILE_APPEND_DATA,
+                                               FILE_GENERIC_WRITE,
                                                FILE_SHARE_READ,
                                                NULL,
                                                OPEN_EXISTING,
@@ -98,8 +101,11 @@ public:
         Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, fileHandle);
         (void)dummy; //silence warning "unused variable"
 
-        const DWORD fpLow = ::SetFilePointer(fileHandle, 0, NULL, FILE_END);
-        if (fpLow == INVALID_SET_FILE_POINTER)
+        const LARGE_INTEGER moveDist = {};
+        if (!::SetFilePointerEx(fileHandle, //__in       HANDLE hFile,
+                                moveDist,   //__in       LARGE_INTEGER liDistanceToMove,
+                                NULL,       //__out_opt  PLARGE_INTEGER lpNewFilePointer,
+                                FILE_END))  //__in       DWORD dwMoveMethod
             return;
 
         DWORD bytesWritten = 0;
@@ -158,8 +164,8 @@ wxULongLong getLockFileSize(const Zstring& filename) //throw (FileError, ErrorNo
         const DWORD lastError = ::GetLastError();
         const wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(filename) + wxT("\"")  +
                                       wxT("\n\n") + getLastErrorFormatted(lastError);
-        if (    lastError == ERROR_FILE_NOT_FOUND ||
-                lastError == ERROR_PATH_NOT_FOUND)
+        if (lastError == ERROR_FILE_NOT_FOUND ||
+            lastError == ERROR_PATH_NOT_FOUND)
             throw ErrorNotExisting(errorMessage);
         else
             throw FileError(errorMessage);
@@ -253,9 +259,9 @@ struct LockInformation
         char formatDescr[sizeof(LOCK_FORMAT_DESCR)] = {};
         stream.Read(formatDescr, sizeof(LOCK_FORMAT_DESCR));                  //file format header
         const int lockFileVersion = util::readNumber<boost::int32_t>(stream); //
-		(void)lockFileVersion;
+        (void)lockFileVersion;
 
-		//some format checking here?
+        //some format checking here?
 
         lockId = readString(stream);
         procDescr.processId  = static_cast<ProcessId>(util::readNumber<boost::uint64_t>(stream)); //possible loss of precision (32/64 bit process) covered by buildId
@@ -299,8 +305,8 @@ enum ProcessStatus
 };
 ProcessStatus getProcessStatus(const LockInformation::ProcessDescription& procDescr)
 {
-    if (    procDescr.computerId != getComputerId() ||
-            procDescr.computerId.empty()) //both names are empty
+    if (procDescr.computerId != getComputerId() ||
+        procDescr.computerId.empty()) //both names are empty
         return PROC_STATUS_NO_IDEA; //lock owned by different computer
 
 #ifdef FFS_WIN
@@ -310,7 +316,8 @@ ProcessStatus getProcessStatus(const LockInformation::ProcessDescription& procDe
                           0);                 //__in  DWORD th32ProcessID
     if (snapshot == INVALID_HANDLE_VALUE)
         return PROC_STATUS_NO_IDEA;
-    boost::shared_ptr<void> dummy(snapshot, ::CloseHandle);
+    Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, snapshot);
+    (void)dummy; //silence warning "unused variable"
 
     PROCESSENTRY32 processEntry = {};
     processEntry.dwSize = sizeof(processEntry);
@@ -386,8 +393,8 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
                 lockSilentStart = currentTime;
             }
 
-            if (    lockOwnderDead || //no need to wait any longer...
-                    currentTime - lockSilentStart > DETECT_EXITUS_INTERVAL)
+            if (lockOwnderDead || //no need to wait any longer...
+                currentTime - lockSilentStart > DETECT_EXITUS_INTERVAL)
             {
                 DirLock dummy(deleteAbandonedLockName(lockfilename), callback); //throw (FileError)
 

@@ -10,7 +10,7 @@
 #include <algorithm>
 
 
-wxButtonWithImage::wxButtonWithImage(wxWindow *parent,
+wxButtonWithImage::wxButtonWithImage(wxWindow* parent,
                                      wxWindowID id,
                                      const wxString& label,
                                      const wxPoint& pos,

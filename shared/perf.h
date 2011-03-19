@@ -7,22 +7,34 @@
 #ifndef DEBUG_PERF_HEADER
 #define DEBUG_PERF_HEADER
 
-//#define WIN32_LEAN_AND_MEAN -> not in a header
-#include <wx/msw/wrapwin.h> //includes "windows.h"
 #include <sstream>
+//#define WIN32_LEAN_AND_MEAN -> not in a header
+/*
+#include <windows.h>
+#undef max
+#undef min
+*/
+#include <wx/msw/wrapwin.h> //includes "windows.h"
+
 
 #ifdef __MINGW32__
-    #define DEPRECATED(x) x __attribute__ ((deprecated))
+#define DEPRECATED(x) x __attribute__ ((deprecated))
 #elif defined _MSC_VER
-    #define DEPRECATED(x) __declspec(deprecated) x
+#define DEPRECATED(x) __declspec(deprecated) x
 #endif
 
-class Performance
+class CpuTimer
 {
 public:
-    DEPRECATED(Performance()) : resultWasShown(false), startTime(::GetTickCount()) {}
+    class TimerError {};
 
-    ~Performance()
+    DEPRECATED(CpuTimer()) : resultWasShown(false), startTime(), frequency()
+    {
+        if (!::QueryPerformanceFrequency(&frequency)) throw TimerError();
+        if (!::QueryPerformanceCounter  (&startTime)) throw TimerError();
+    }
+
+    ~CpuTimer()
     {
         if (!resultWasShown)
             showResult();
@@ -30,23 +42,27 @@ public:
 
     void showResult()
     {
-        const DWORD delta = ::GetTickCount() - startTime;
+        LARGE_INTEGER currentTime = {};
+        if (!::QueryPerformanceCounter(&currentTime)) throw TimerError();
+
+        const long delta = 1000.0 * (currentTime.QuadPart - startTime.QuadPart) / frequency.QuadPart;
         std::ostringstream ss;
         ss << delta << " ms";
- 
+
         ::MessageBoxA(NULL, ss.str().c_str(), "Timer", 0);
         resultWasShown = true;
 
-        startTime = ::GetTickCount(); //don't include call to MessageBox()!
+        if (!::QueryPerformanceCounter(&startTime)) throw TimerError(); //don't include call to MessageBox()!
     }
-	
+
 private:
     bool resultWasShown;
-    DWORD startTime;
+    LARGE_INTEGER startTime;
+    LARGE_INTEGER frequency;
 };
 
 //two macros for quick performance measurements
-#define PERF_START Performance a;
-#define PERF_STOP  a.showResult();
+#define PERF_START CpuTimer perfTest;
+#define PERF_STOP  perfTest.showResult();
 
 #endif //DEBUG_PERF_HEADER

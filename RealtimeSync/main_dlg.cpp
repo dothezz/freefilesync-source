@@ -22,11 +22,12 @@
 #include "../shared/build_info.h"
 #include "../shared/help_provider.h"
 #include "../shared/util.h"
+#include "../shared/mouse_move_dlg.h"
 
 using namespace ffs3;
 
 
-MainDialog::MainDialog(wxDialog *dlg, const wxString& cfgFileName)
+MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     : MainDlgGenerated(dlg)
 {
     wxWindowUpdateLocker dummy(this); //avoid display distortion
@@ -43,6 +44,13 @@ MainDialog::MainDialog(wxDialog *dlg, const wxString& cfgFileName)
 
     //prepare drag & drop
     dirNameFirst.reset(new ffs3::DirectoryName(m_panelMainFolder, m_dirPickerMain, m_txtCtrlDirectoryMain));
+
+
+#ifdef FFS_WIN
+    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
+                        m_panelMain); //ownership passed to "this"
+#endif
+
 
     //--------------------------- load config values ------------------------------------
     xmlAccess::XmlRealConfig newConfig;
@@ -99,13 +107,13 @@ MainDialog::~MainDialog()
 }
 
 
-void MainDialog::OnClose(wxCloseEvent &event)
+void MainDialog::OnClose(wxCloseEvent& event)
 {
     Destroy();
 }
 
 
-void MainDialog::OnQuit(wxCommandEvent &event)
+void MainDialog::OnQuit(wxCommandEvent& event)
 {
     Destroy();
 }
@@ -172,15 +180,15 @@ void MainDialog::OnStart(wxCommandEvent& event)
 
     switch (rts::startDirectoryMonitor(currentCfg, ffs3::extractJobName(currentConfigFileName)))
     {
-    case rts::QUIT:
-    {
-        Destroy();
-        return;
-    }
-    break;
-
-    case rts::RESUME:
+        case rts::QUIT:
+        {
+            Destroy();
+            return;
+        }
         break;
+
+        case rts::RESUME:
+            break;
     }
 
     Show();
@@ -256,7 +264,7 @@ void MainDialog::setLastUsedConfig(const wxString& filename)
     }
     else
     {
-        SetTitle(wxString(wxT("RealtimeSync - ")) + filename);
+        SetTitle(filename);
         currentConfigFileName = filename;
     }
 }
@@ -265,8 +273,8 @@ void MainDialog::setLastUsedConfig(const wxString& filename)
 void MainDialog::OnLoadConfig(wxCommandEvent& event)
 {
     wxFileDialog* filePicker = new wxFileDialog(this, wxEmptyString, wxEmptyString, wxEmptyString,
-            wxString(_("RealtimeSync configuration")) + wxT(" (*.ffs_real;*.ffs_batch)|*.ffs_real;*.ffs_batch"),
-            wxFD_OPEN);
+                                                wxString(_("RealtimeSync configuration")) + wxT(" (*.ffs_real;*.ffs_batch)|*.ffs_real;*.ffs_batch"),
+                                                wxFD_OPEN);
     if (filePicker->ShowModal() == wxID_OK)
         loadConfig(filePicker->GetPath());
 }

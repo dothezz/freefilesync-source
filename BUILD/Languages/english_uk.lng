@@ -154,6 +154,10 @@
 <Symlink>
 <multiple selection>
 <multiple selection>
+A directory input field is empty.
+A directory input field is empty.
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+A directory will be modified which is part of multiple folder pairs! Please review synchronisation settings!
 A newer version of FreeFileSync is available:
 A newer version of FreeFileSync is available:
 Abort requested: Waiting for current operation to finish...
@@ -370,6 +374,8 @@ Encoding extended time information: %x
 Encoding extended time information: %x
 Endless loop when traversing directory:
 Endless loop when traversing directory:
+Equal files/folders that differ in attributes only
+Equal files/folders that differ in attributes only
 Error
 Error
 Error changing modification time:
@@ -476,8 +482,6 @@ Files that exist on both sides, right one is newer
 Files that exist on both sides, right one is newer
 Files that have different content
 Files that have different content
-Files/folders that differ in attributes only
-Files/folders that differ in attributes only
 Files/folders that exist on left side only
 Files/folders that exist on left side only
 Files/folders that exist on right side only
@@ -488,8 +492,6 @@ Filter is active
 Filter is active
 Filter settings have changed!
 Filter settings have changed!
-Filter view
-Filter view
 Filter: All pairs
 Filter: All pairs
 Filter: Single pair
@@ -506,6 +508,8 @@ Follow
 Follow
 Free disk space available:
 Free disk space available:
+Free disk space required:
+Free disk space required:
 FreeFileSync Batch Job
 FreeFileSync Batch Job
 FreeFileSync at Sourceforge
@@ -600,6 +604,8 @@ Integrate external applications into context menu. The following macros are avai
 Integrate external applications into context menu. The following macros are available:
 Invalid FreeFileSync config file!
 Invalid FreeFileSync config file!
+Last used configurations (press DEL to remove from list)
+Last used configurations (press DEL to remove from list)
 Leave as unresolved conflict
 Leave as unresolved conflict
 Left
@@ -608,8 +614,6 @@ Legend
 Legend
 Load configuration from file
 Load configuration from file
-Load configuration history (press DEL to delete items)
-Load configuration history (press DEL to delete items)
 Log-messages:
 Log-messages:
 Logging
@@ -620,12 +624,16 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Match case
 Match case
+Maximum number of logfiles:
+Maximum number of logfiles:
+Memory allocation failed!
+Memory allocation failed!
 Minimum Idle Time [seconds]
 Minimum Idle Time [seconds]
 Mirror ->>
 Mirror ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronisation.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronisation.
 Monitoring active...
 Monitoring active...
 More than 50% of the total number of files will be copied or deleted!
@@ -696,8 +704,6 @@ Published under the GNU General Public License:
 Published under the GNU General Public Licence:
 Question
 Question
-Re-enable all hidden dialogs?
-Re-enable all hidden dialogues?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Automated Synchronisation
 RealtimeSync configuration
@@ -718,6 +724,8 @@ Reset
 Reset
 Reset view
 Reset view
+Restore all hidden dialogs?
+Restore all hidden dialogs?
 Right
 Right
 S&ave configuration...
@@ -740,6 +748,8 @@ Select logfile directory:
 Select logfile directory:
 Select variant:
 Select variant:
+Select view
+Select view
 Set direction:
 Set direction:
 Setting default synchronization directions: Old files will be overwritten with newer files.
@@ -828,8 +838,6 @@ Synchronize...
 Synchronise...
 Synchronizing...
 Synchronising...
-System out of memory!
-System out of memory!
 Target directory already existing!
 Target directory already existing!
 Target file already existing!
@@ -850,8 +858,6 @@ Time remaining:
 Time remaining:
 Total amount of data that will be transferred
 Total amount of data that will be transferred
-Total required free disk space:
-Total required free disk space:
 Total time:
 Total time:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -872,14 +878,14 @@ Use Recycle Bin
 Use Recycle Bin
 Use Recycle Bin when deleting or overwriting files
 Use Recycle Bin when deleting or overwriting files
-User-defined directory
-User-defined directory
 User-defined directory for deletion was not specified!
 User-defined directory for deletion was not specified!
 Variant
 Variant
 Verifying file %x
 Verifying file %x
+Versioning
+Versioning
 Volume name %x not part of filename %y!
 Volume name %x not part of filename %y!
 Waiting for missing directories...
@@ -888,14 +894,12 @@ Waiting while directory is locked (%x)...
 Waiting while directory is locked (%x)...
 Warning
 Warning
-Warning: Synchronization failed for %x item(s):
-Warning: Synchronisation failed for %x item(s):
 When the comparison is started with this option set the following decision tree is processed:
 When the comparison is started with this option set the following decision tree is processed:
 You can ignore conflicts and continue synchronization.
 You can ignore conflicts and continue synchronisation.
-You can ignore the error to consider not existing directories as empty.
-You can ignore the error to consider not existing directories as empty.
+You can ignore this error to consider the directory as empty.
+You can ignore this error to consider the directory as empty.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 You may try to synchronise remaining items again (WITHOUT having to re-compare)!
 different

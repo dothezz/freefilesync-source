@@ -19,7 +19,7 @@
 
 #include <loki/SmartPtr.h>
 #if defined (LOKI_OBJECT_LEVEL_THREADING) || defined (LOKI_CLASS_LEVEL_THREADING)
-    #include <loki/Threads.h>
+#include <loki/Threads.h>
 #endif
 
 
@@ -127,7 +127,7 @@ template < class P >
 class DeleteUsingFree
 {
 public:
-    inline void static Delete( const P * p )
+    inline void static Delete( const P* p )
     {
         if ( 0 != p )
         {
@@ -137,12 +137,12 @@ public:
     }
 
     /// Provides default value to initialize the pointer
-    inline static P * Default( void )
+    inline static P* Default( void )
     {
         return 0;
     }
 
-    inline void Swap( DeleteUsingFree & ) {}
+    inline void Swap( DeleteUsingFree& ) {}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -158,17 +158,17 @@ template < class P >
 class DeleteNothing
 {
 public:
-    inline static void Delete( const P * )
+    inline static void Delete( const P* )
     {
         // Do nothing at all!
     }
 
-    inline static P * Default( void )
+    inline static P* Default( void )
     {
         return 0;
     }
 
-    inline void Swap( DeleteNothing & ) {}
+    inline void Swap( DeleteNothing& ) {}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -183,7 +183,7 @@ template < class P >
 class DeleteSingle
 {
 public:
-    inline static void Delete( const P * p )
+    inline static void Delete( const P* p )
     {
         /** @note If you see an error message about a negative subscript, that
          means your are attempting to use Loki to delete an incomplete type.
@@ -194,12 +194,12 @@ public:
         delete p;
     }
 
-    inline static P * Default( void )
+    inline static P* Default( void )
     {
         return 0;
     }
 
-    inline void Swap( DeleteSingle & ) {}
+    inline void Swap( DeleteSingle& ) {}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -214,7 +214,7 @@ template < class P >
 class DeleteArray
 {
 public:
-    inline static void Delete( const P * p )
+    inline static void Delete( const P* p )
     {
         /** @note If you see an error message about a negative subscript, that
          means your are attempting to use Loki to delete an incomplete type.
@@ -225,12 +225,12 @@ public:
         delete [] p;
     }
 
-    inline static P * Default( void )
+    inline static P* Default( void )
     {
         return 0;
     }
 
-    inline void Swap( DeleteArray & ) {}
+    inline void Swap( DeleteArray& ) {}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -326,7 +326,7 @@ public:
     {
     }
 
-    inline TwoRefCountInfo( void * p, bool strong )
+    inline TwoRefCountInfo( void* p, bool strong )
         : m_pointer( p )
         , m_strongCount( strong ? 1 : 0 )
         , m_weakCount( strong ? 0 : 1 )
@@ -378,28 +378,28 @@ public:
         m_pointer = 0;
     }
 
-    void SetPointer( void * p )
+    void SetPointer( void* p )
     {
         m_pointer = p;
     }
 
-    inline void * GetPointer( void ) const
+    inline void* GetPointer( void ) const
     {
         return m_pointer;
     }
 
-    inline void * & GetPointerRef( void ) const
+    inline void*& GetPointerRef( void ) const
     {
-        return const_cast< void * & >( m_pointer );
+        return const_cast< void *& >( m_pointer );
     }
 
 private:
     /// Copy-constructor not implemented.
-    TwoRefCountInfo( const TwoRefCountInfo & );
+    TwoRefCountInfo( const TwoRefCountInfo& );
     /// Copy-assignment operator not implemented.
-    TwoRefCountInfo & operator = ( const TwoRefCountInfo & );
+    TwoRefCountInfo& operator = ( const TwoRefCountInfo& );
 
-    void * m_pointer;
+    void* m_pointer;
     unsigned int m_strongCount;
     unsigned int m_weakCount;
 };
@@ -435,7 +435,7 @@ public:
     {
     }
 
-    LockableTwoRefCountInfo( void * p, bool strong )
+    LockableTwoRefCountInfo( void* p, bool strong )
         : TwoRefCountInfo( p, strong )
         , m_Mutex()
     {
@@ -507,19 +507,19 @@ public:
         m_Mutex.Unlock();
     }
 
-    void SetPointer( void * p )
+    void SetPointer( void* p )
     {
         m_Mutex.Lock();
         TwoRefCountInfo::SetPointer( p );
         m_Mutex.Unlock();
     }
 
-    inline void * GetPointer( void ) const
+    inline void* GetPointer( void ) const
     {
         return TwoRefCountInfo::GetPointer();
     }
 
-    inline void * & GetPointerRef( void ) const
+    inline void*& GetPointerRef( void ) const
     {
         return TwoRefCountInfo::GetPointerRef();
     }
@@ -528,9 +528,9 @@ private:
     /// Default constructor is not available.
     LockableTwoRefCountInfo( void );
     /// Copy constructor is not available.
-    LockableTwoRefCountInfo( const LockableTwoRefCountInfo & );
+    LockableTwoRefCountInfo( const LockableTwoRefCountInfo& );
     /// Copy-assignment operator is not available.
-    LockableTwoRefCountInfo & operator = ( const LockableTwoRefCountInfo & );
+    LockableTwoRefCountInfo& operator = ( const LockableTwoRefCountInfo& );
 
     mutable LOKI_DEFAULT_MUTEX m_Mutex;
 };
@@ -556,9 +556,9 @@ protected:
 
     explicit TwoRefCounts( bool strong );
 
-    TwoRefCounts( const void * p, bool strong );
+    TwoRefCounts( const void* p, bool strong );
 
-    TwoRefCounts( const TwoRefCounts & rhs, bool strong ) :
+    TwoRefCounts( const TwoRefCounts& rhs, bool strong ) :
         m_counts( rhs.m_counts )
     {
         Increment( strong );
@@ -580,35 +580,35 @@ protected:
         return m_counts->HasStrongPointer();
     }
 
-    void Swap( TwoRefCounts & rhs );
+    void Swap( TwoRefCounts& rhs );
 
-    void SetPointer( void * p )
+    void SetPointer( void* p )
     {
         m_counts->SetPointer( p );
     }
 
     void ZapPointer( void );
 
-    inline void * & GetPointerRef( void ) const
+    inline void*& GetPointerRef( void ) const
     {
         return m_counts->GetPointerRef();
     }
 
-    inline void * GetPointer( void ) const
+    inline void* GetPointer( void ) const
     {
         return m_counts->GetPointer();
     }
 
 private:
     TwoRefCounts( void );
-    TwoRefCounts & operator = ( const TwoRefCounts & );
+    TwoRefCounts& operator = ( const TwoRefCounts& );
 
     void Increment( bool strong );
 
     bool Decrement( bool strong );
 
     /// Pointer to all shared data.
-    Loki::Private::TwoRefCountInfo * m_counts;
+    Loki::Private::TwoRefCountInfo* m_counts;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -637,28 +637,28 @@ protected:
     explicit LockableTwoRefCounts( bool strong )
         : m_counts( NULL )
     {
-        void * temp = ThreadSafePointerAllocator::operator new(
-            sizeof(Loki::Private::LockableTwoRefCountInfo) );
+        void* temp = ThreadSafePointerAllocator::operator new(
+                         sizeof(Loki::Private::LockableTwoRefCountInfo) );
 #ifdef DO_EXTRA_LOKI_TESTS
         assert( temp != 0 );
 #endif
         m_counts = new ( temp ) Loki::Private::LockableTwoRefCountInfo( strong );
     }
 
-    LockableTwoRefCounts( const void * p, bool strong )
+    LockableTwoRefCounts( const void* p, bool strong )
         : m_counts( NULL )
     {
-        void * temp = ThreadSafePointerAllocator::operator new(
-            sizeof(Loki::Private::LockableTwoRefCountInfo) );
+        void* temp = ThreadSafePointerAllocator::operator new(
+                         sizeof(Loki::Private::LockableTwoRefCountInfo) );
 #ifdef DO_EXTRA_LOKI_TESTS
         assert( temp != 0 );
 #endif
-        void * p2 = const_cast< void * >( p );
+        void* p2 = const_cast< void* >( p );
         m_counts = new ( temp )
-            Loki::Private::LockableTwoRefCountInfo( p2, strong );
+        Loki::Private::LockableTwoRefCountInfo( p2, strong );
     }
 
-    LockableTwoRefCounts( const LockableTwoRefCounts & rhs, bool strong ) :
+    LockableTwoRefCounts( const LockableTwoRefCounts& rhs, bool strong ) :
         m_counts( rhs.m_counts )
     {
         Increment( strong );
@@ -717,12 +717,12 @@ protected:
         return m_counts->HasStrongPointer();
     }
 
-    void Swap( LockableTwoRefCounts & rhs )
+    void Swap( LockableTwoRefCounts& rhs )
     {
         std::swap( m_counts, rhs.m_counts );
     }
 
-    void SetPointer( void * p )
+    void SetPointer( void* p )
     {
         m_counts->SetPointer( p );
     }
@@ -739,27 +739,27 @@ protected:
         else
         {
             ThreadSafePointerAllocator::operator delete ( m_counts,
-                sizeof(Loki::Private::LockableTwoRefCountInfo) );
+                                                          sizeof(Loki::Private::LockableTwoRefCountInfo) );
             m_counts = NULL;
         }
     }
 
-    inline void * GetPointer( void ) const
+    inline void* GetPointer( void ) const
     {
         return m_counts->GetPointer();
     }
 
-    inline void * & GetPointerRef( void ) const
+    inline void*& GetPointerRef( void ) const
     {
         return m_counts->GetPointerRef();
     }
 
 private:
     LockableTwoRefCounts( void );
-    LockableTwoRefCounts & operator = ( const LockableTwoRefCounts & );
+    LockableTwoRefCounts& operator = ( const LockableTwoRefCounts& );
 
     /// Pointer to all shared data.
-    Loki::Private::LockableTwoRefCountInfo * m_counts;
+    Loki::Private::LockableTwoRefCountInfo* m_counts;
 };
 
 #endif // if object-level-locking or class-level-locking
@@ -785,15 +785,15 @@ protected:
         m_prev = m_next = this;
     }
 
-    TwoRefLinks( const void * p, bool strong );
+    TwoRefLinks( const void* p, bool strong );
 
-    TwoRefLinks( const TwoRefLinks & rhs, bool strong );
+    TwoRefLinks( const TwoRefLinks& rhs, bool strong );
 
     bool Release( bool strong );
 
-    void Swap( TwoRefLinks & rhs );
+    void Swap( TwoRefLinks& rhs );
 
-    bool Merge( TwoRefLinks & rhs );
+    bool Merge( TwoRefLinks& rhs );
 
     bool HasStrongPointer( void ) const;
 
@@ -802,35 +802,35 @@ protected:
         ZapAllNodes();
     }
 
-    void SetPointer( void * p );
+    void SetPointer( void* p );
 
-    inline void * GetPointer( void ) const
+    inline void* GetPointer( void ) const
     {
         return m_pointer;
     }
 
-    inline void * & GetPointerRef( void ) const
+    inline void*& GetPointerRef( void ) const
     {
-        return const_cast< void * & >( m_pointer );
+        return const_cast< void *& >( m_pointer );
     }
 
 private:
-    static unsigned int CountPrevCycle( const TwoRefLinks * pThis );
-    static unsigned int CountNextCycle( const TwoRefLinks * pThis );
+    static unsigned int CountPrevCycle( const TwoRefLinks* pThis );
+    static unsigned int CountNextCycle( const TwoRefLinks* pThis );
 
     /// Not implemented.
     TwoRefLinks( void );
     /// Not implemented.
-    TwoRefLinks & operator = ( const TwoRefLinks & );
+    TwoRefLinks& operator = ( const TwoRefLinks& );
 
-    bool HasPrevNode( const TwoRefLinks * p ) const;
-    bool HasNextNode( const TwoRefLinks * p ) const;
+    bool HasPrevNode( const TwoRefLinks* p ) const;
+    bool HasNextNode( const TwoRefLinks* p ) const;
     bool AllNodesHaveSamePointer( void ) const;
     void ZapAllNodes( void );
 
-    void * m_pointer;
-    mutable TwoRefLinks * m_prev;
-    mutable TwoRefLinks * m_next;
+    void* m_pointer;
+    mutable TwoRefLinks* m_prev;
+    mutable TwoRefLinks* m_next;
     const bool m_strong;
 };
 
@@ -850,24 +850,24 @@ private:
 
 template
 <
-    typename T,
-    bool Strong = true,
-    class OwnershipPolicy = Loki::TwoRefCounts,
-    class ConversionPolicy = Loki::DisallowConversion,
-    template < class > class CheckingPolicy = Loki::AssertCheck,
-    template < class > class ResetPolicy = Loki::CantResetWithStrong,
-    template < class > class DeletePolicy = Loki::DeleteSingle,
-    template < class > class ConstnessPolicy = LOKI_DEFAULT_CONSTNESS
->
+typename T,
+         bool Strong = true,
+         class OwnershipPolicy = Loki::TwoRefCounts,
+         class ConversionPolicy = Loki::DisallowConversion,
+         template < class > class CheckingPolicy = Loki::AssertCheck,
+         template < class > class ResetPolicy = Loki::CantResetWithStrong,
+         template < class > class DeletePolicy = Loki::DeleteSingle,
+         template < class > class ConstnessPolicy = LOKI_DEFAULT_CONSTNESS
+         >
 class StrongPtr
     : public OwnershipPolicy
     , public ConversionPolicy
-    , public CheckingPolicy< T * >
+    , public CheckingPolicy< T* >
     , public ResetPolicy< T >
     , public DeletePolicy< T >
 {
     typedef ConversionPolicy CP;
-    typedef CheckingPolicy< T * > KP;
+    typedef CheckingPolicy< T* > KP;
     typedef ResetPolicy< T > RP;
     typedef DeletePolicy< T > DP;
 
@@ -875,12 +875,12 @@ public:
 
     typedef OwnershipPolicy OP;
 
-    typedef T * StoredType;    // the type of the pointer
-    typedef T * PointerType;   // type returned by operator->
-    typedef T & ReferenceType; // type returned by operator*
+    typedef T* StoredType;     // the type of the pointer
+    typedef T* PointerType;    // type returned by operator->
+    typedef T& ReferenceType;  // type returned by operator*
 
-    typedef typename ConstnessPolicy< T >::Type * ConstPointerType;
-    typedef typename ConstnessPolicy< T >::Type & ConstReferenceType;
+    typedef typename ConstnessPolicy< T >::Type* ConstPointerType;
+    typedef typename ConstnessPolicy< T >::Type& ConstReferenceType;
 
 private:
     struct NeverMatched {};
@@ -910,22 +910,22 @@ public:
         KP::OnInit( GetPointer() );
     }
 
-    StrongPtr( const StrongPtr & rhs )
+    StrongPtr( const StrongPtr& rhs )
         : OP( rhs, Strong ), CP( rhs ), KP( rhs ), DP( rhs )
     {
     }
 
     template
     <
-        typename T1,
-        bool S1,
-        class OP1,
-        class CP1,
-        template < class > class KP1,
-        template < class > class RP1,
-        template < class > class DP1,
-        template < class > class CNP1
-    >
+    typename T1,
+             bool S1,
+             class OP1,
+             class CP1,
+             template < class > class KP1,
+             template < class > class RP1,
+             template < class > class DP1,
+             template < class > class CNP1
+             >
     StrongPtr(
         const StrongPtr< T1, S1, OP1, CP1, KP1, RP1, DP1, CNP1 > & rhs )
         : OP( rhs, Strong )
@@ -934,15 +934,15 @@ public:
 
     template
     <
-        typename T1,
-        bool S1,
-        class OP1,
-        class CP1,
-        template < class > class KP1,
-        template < class > class RP1,
-        template < class > class DP1,
-        template < class > class CNP1
-    >
+    typename T1,
+             bool S1,
+             class OP1,
+             class CP1,
+             template < class > class KP1,
+             template < class > class RP1,
+             template < class > class DP1,
+             template < class > class CNP1
+             >
     StrongPtr(
         StrongPtr< T1, S1, OP1, CP1, KP1, RP1, DP1, CNP1 > & rhs )
         : OP( rhs, Strong )
@@ -959,7 +959,7 @@ public:
         return RefToValue< StrongPtr >( *this );
     }
 
-    StrongPtr & operator = ( const StrongPtr & rhs )
+    StrongPtr& operator = ( const StrongPtr& rhs )
     {
         if ( GetPointer() != rhs.GetPointer() )
         {
@@ -969,7 +969,7 @@ public:
         return *this;
     }
 
-    StrongPtr & operator = ( T * p )
+    StrongPtr& operator = ( T* p )
     {
         if ( GetPointer() != p )
         {
@@ -981,16 +981,16 @@ public:
 
     template
     <
-        typename T1,
-        bool S1,
-        class OP1,
-        class CP1,
-        template < class > class KP1,
-        template < class > class RP1,
-        template < class > class DP1,
-        template < class > class CNP1
-    >
-    StrongPtr & operator = (
+    typename T1,
+             bool S1,
+             class OP1,
+             class CP1,
+             template < class > class KP1,
+             template < class > class RP1,
+             template < class > class DP1,
+             template < class > class CNP1
+             >
+    StrongPtr& operator = (
         const StrongPtr< T1, S1, OP1, CP1, KP1, RP1, DP1, CNP1 > & rhs )
     {
         if ( !rhs.Equals( GetPointer() ) )
@@ -1006,7 +1006,7 @@ public:
         return Strong;
     }
 
-    void Swap( StrongPtr & rhs )
+    void Swap( StrongPtr& rhs )
     {
         OP::Swap( rhs );
         CP::Swap( rhs );
@@ -1023,7 +1023,7 @@ public:
             // to deleting the shared object multiple times, which leads to
             // undefined behavior.  Therefore, this must get pointer before
             // zapping it, and then delete the temp pointer.
-            T * p = GetPointer();
+            T* p = GetPointer();
             OP::ZapPointer();
             if ( p != 0 )
             {
@@ -1035,8 +1035,8 @@ public:
 #ifdef LOKI_ENABLE_FRIEND_TEMPLATE_TEMPLATE_PARAMETER_WORKAROUND
 
     // old non standard in class definition of friends
-    friend bool ReleaseAll( StrongPtr & sp,
-        typename StrongPtr::StoredType & p )
+    friend bool ReleaseAll( StrongPtr& sp,
+                            typename StrongPtr::StoredType& p )
     {
         if ( !sp.RP::OnReleaseAll( sp.IsStrong() || sp.OP::HasStrongPointer() ) )
         {
@@ -1047,8 +1047,8 @@ public:
         return true;
     }
 
-    friend bool ResetAll( StrongPtr & sp,
-        typename StrongPtr::StoredType p )
+    friend bool ResetAll( StrongPtr& sp,
+                          typename StrongPtr::StoredType p )
     {
         if ( sp.OP::GetPointer() == p )
         {
@@ -1067,32 +1067,32 @@ public:
 
     template
     <
-        typename T1,
-        bool S1,
-        class OP1,
-        class CP1,
-        template < class > class KP1,
-        template < class > class RP1,
-        template < class > class DP1,
-        template < class > class CNP1
-    >
+    typename T1,
+             bool S1,
+             class OP1,
+             class CP1,
+             template < class > class KP1,
+             template < class > class RP1,
+             template < class > class DP1,
+             template < class > class CNP1
+             >
     friend bool ReleaseAll( StrongPtr< T1, S1, OP1, CP1, KP1, RP1, DP1, CNP1 > & sp,
-        typename StrongPtr< T1, S1, OP1, CP1, KP1, RP1, DP1, CNP1 >::StoredType & p );
+                            typename StrongPtr< T1, S1, OP1, CP1, KP1, RP1, DP1, CNP1 >::StoredType& p );
 
 
     template
     <
-        typename T1,
-        bool S1,
-        class OP1,
-        class CP1,
-        template < class > class KP1,
-        template < class > class RP1,
-        template < class > class DP1,
-        template < class > class CNP1
-    >
+    typename T1,
+             bool S1,
+             class OP1,
+             class CP1,
+             template < class > class KP1,
+             template < class > class RP1,
+             template < class > class DP1,
+             template < class > class CNP1
+             >
     friend bool ResetAll( StrongPtr< T1, S1, OP1, CP1, KP1, RP1, DP1, CNP1 > & sp,
-        typename StrongPtr< T1, S1, OP1, CP1, KP1, RP1, DP1, CNP1 >::StoredType p );
+                          typename StrongPtr< T1, S1, OP1, CP1, KP1, RP1, DP1, CNP1 >::StoredType p );
 
 #endif
 
@@ -1103,15 +1103,15 @@ public:
      */
     template
     <
-        typename T1,
-        bool S1,
-        class OP1,
-        class CP1,
-        template < class > class KP1,
-        template < class > class RP1,
-        template < class > class DP1,
-        template < class > class CNP1
-    >
+    typename T1,
+             bool S1,
+             class OP1,
+             class CP1,
+             template < class > class KP1,
+             template < class > class RP1,
+             template < class > class DP1,
+             template < class > class CNP1
+             >
     bool Merge( StrongPtr< T1, S1, OP1, CP1, KP1, RP1, DP1, CNP1 > & rhs )
     {
         if ( OP::GetPointer() != rhs.OP::GetPointer() )
@@ -1163,21 +1163,21 @@ public:
 
     /// Helper function which can be called to avoid exposing GetPointer function.
     template < class T1 >
-    bool Equals( const T1 * p ) const
+    bool Equals( const T1* p ) const
     {
         return ( GetPointer() == p );
     }
 
     /// Helper function which can be called to avoid exposing GetPointer function.
     template < class T1 >
-    bool LessThan( const T1 * p ) const
+    bool LessThan( const T1* p ) const
     {
         return ( GetPointer() < p );
     }
 
     /// Helper function which can be called to avoid exposing GetPointer function.
     template < class T1 >
-    bool GreaterThan( const T1 * p ) const
+    bool GreaterThan( const T1* p ) const
     {
         return ( GetPointer() > p );
     }
@@ -1185,15 +1185,15 @@ public:
     /// Equality comparison operator is templated to handle ambiguity.
     template
     <
-        typename T1,
-        bool S1,
-        class OP1,
-        class CP1,
-        template < class > class KP1,
-        template < class > class RP1,
-        template < class > class DP1,
-        template < class > class CNP1
-    >
+    typename T1,
+             bool S1,
+             class OP1,
+             class CP1,
+             template < class > class KP1,
+             template < class > class RP1,
+             template < class > class DP1,
+             template < class > class CNP1
+             >
     bool operator == (
         const StrongPtr< T1, S1, OP1, CP1, KP1, RP1, DP1, CNP1 > & rhs ) const
     {
@@ -1203,15 +1203,15 @@ public:
     /// Inequality comparison operator is templated to handle ambiguity.
     template
     <
-        typename T1,
-        bool S1,
-        class OP1,
-        class CP1,
-        template < class > class KP1,
-        template < class > class RP1,
-        template < class > class DP1,
-        template < class > class CNP1
-    >
+    typename T1,
+             bool S1,
+             class OP1,
+             class CP1,
+             template < class > class KP1,
+             template < class > class RP1,
+             template < class > class DP1,
+             template < class > class CNP1
+             >
     bool operator != (
         const StrongPtr< T1, S1, OP1, CP1, KP1, RP1, DP1, CNP1 > & rhs ) const
     {
@@ -1221,15 +1221,15 @@ public:
     /// Less-than comparison operator is templated to handle ambiguity.
     template
     <
-        typename T1,
-        bool S1,
-        class OP1,
-        class CP1,
-        template < class > class KP1,
-        template < class > class RP1,
-        template < class > class DP1,
-        template < class > class CNP1
-    >
+    typename T1,
+             bool S1,
+             class OP1,
+             class CP1,
+             template < class > class KP1,
+             template < class > class RP1,
+             template < class > class DP1,
+             template < class > class CNP1
+             >
     bool operator < (
         const StrongPtr< T1, S1, OP1, CP1, KP1, RP1, DP1, CNP1 > & rhs ) const
     {
@@ -1239,15 +1239,15 @@ public:
     /// Greater-than comparison operator is templated to handle ambiguity.
     template
     <
-        typename T1,
-        bool S1,
-        class OP1,
-        class CP1,
-        template < class > class KP1,
-        template < class > class RP1,
-        template < class > class DP1,
-        template < class > class CNP1
-    >
+    typename T1,
+             bool S1,
+             class OP1,
+             class CP1,
+             template < class > class KP1,
+             template < class > class RP1,
+             template < class > class DP1,
+             template < class > class CNP1
+             >
     inline bool operator > (
         const StrongPtr< T1, S1, OP1, CP1, KP1, RP1, DP1, CNP1 > & rhs ) const
     {
@@ -1257,15 +1257,15 @@ public:
     /// Less-than-or-equal-to operator is templated to handle ambiguity.
     template
     <
-        typename T1,
-        bool S1,
-        class OP1,
-        class CP1,
-        template < class > class KP1,
-        template < class > class RP1,
-        template < class > class DP1,
-        template < class > class CNP1
-    >
+    typename T1,
+             bool S1,
+             class OP1,
+             class CP1,
+             template < class > class KP1,
+             template < class > class RP1,
+             template < class > class DP1,
+             template < class > class CNP1
+             >
     inline bool operator <= (
         const StrongPtr< T1, S1, OP1, CP1, KP1, RP1, DP1, CNP1 > & rhs ) const
     {
@@ -1275,15 +1275,15 @@ public:
     /// Greater-than-or-equal-to operator is templated to handle ambiguity.
     template
     <
-        typename T1,
-        bool S1,
-        class OP1,
-        class CP1,
-        template < class > class KP1,
-        template < class > class RP1,
-        template < class > class DP1,
-        template < class > class CNP1
-    >
+    typename T1,
+             bool S1,
+             class OP1,
+             class CP1,
+             template < class > class KP1,
+             template < class > class RP1,
+             template < class > class DP1,
+             template < class > class CNP1
+             >
     inline bool operator >= (
         const StrongPtr< T1, S1, OP1, CP1, KP1, RP1, DP1, CNP1 > & rhs ) const
     {
@@ -1329,7 +1329,7 @@ private:
     typedef void (Tester::*unspecified_boolean_type_)();
 
     typedef typename Select< CP::allow, Tester, unspecified_boolean_type_ >::Result
-        unspecified_boolean_type;
+    unspecified_boolean_type;
 
 public:
     // enable 'if (sp)'
@@ -1346,7 +1346,7 @@ private:
     };
 
     typedef typename Select< CP::allow, PointerType, Insipid >::Result
-        AutomaticConversionResult;
+    AutomaticConversionResult;
 
 public:
     operator AutomaticConversionResult() const
@@ -1364,54 +1364,54 @@ public:
 
 template
 <
-    typename U,
-    typename T,
-    bool S,
-    class OP,
-    class CP,
-    template < class > class KP,
-    template < class > class RP,
-    template < class > class DP,
-    template < class > class CNP
->
+typename U,
+         typename T,
+         bool S,
+         class OP,
+         class CP,
+         template < class > class KP,
+         template < class > class RP,
+         template < class > class DP,
+         template < class > class CNP
+         >
 bool ReleaseAll( StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & sp,
-                 typename StrongPtr< T, S, OP, CP, KP, RP, DP, CNP >::StoredType & p )
+                 typename StrongPtr< T, S, OP, CP, KP, RP, DP, CNP >::StoredType& p )
 {
-  if ( !sp.RP<T>::OnReleaseAll( sp.IsStrong() || sp.OP::HasStrongPointer() ) )
-  {
-    return false;
-  }
-  p = sp.GetPointer();
-  sp.OP::SetPointer( sp.DP<T>::Default() );
-  return true;
+    if ( !sp.RP<T>::OnReleaseAll( sp.IsStrong() || sp.OP::HasStrongPointer() ) )
+    {
+        return false;
+    }
+    p = sp.GetPointer();
+    sp.OP::SetPointer( sp.DP<T>::Default() );
+    return true;
 }
 
 template
 <
-    typename U,
-    typename T,
-    bool S,
-    class OP,
-    class CP,
-    template < class > class KP,
-    template < class > class RP,
-    template < class > class DP,
-    template < class > class CNP
->
+typename U,
+         typename T,
+         bool S,
+         class OP,
+         class CP,
+         template < class > class KP,
+         template < class > class RP,
+         template < class > class DP,
+         template < class > class CNP
+         >
 bool ResetAll( StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & sp,
                typename StrongPtr< T, S, OP, CP, KP, RP, DP, CNP >::StoredType p )
 {
-  if ( sp.OP::GetPointer() == p )
-  {
+    if ( sp.OP::GetPointer() == p )
+    {
+        return true;
+    }
+    if ( !sp.RP<T>::OnResetAll( sp.IsStrong() || sp.OP::HasStrongPointer() ) )
+    {
+        return false;
+    }
+    sp.DP<T>::Delete( sp.GetPointer() );
+    sp.OP::SetPointer( p );
     return true;
-  }
-  if ( !sp.RP<T>::OnResetAll( sp.IsStrong() || sp.OP::HasStrongPointer() ) )
-  {
-    return false;
-  }
-  sp.DP<T>::Delete( sp.GetPointer() );
-  sp.OP::SetPointer( p );
-  return true;
 }
 #endif
 
@@ -1422,18 +1422,18 @@ bool ResetAll( StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & sp,
 ///  \ingroup SmartPointerGroup
 template
 <
-    typename U,
-    typename T,
-    bool S,
-    class OP,
-    class CP,
-    template < class > class KP,
-    template < class > class RP,
-    template < class > class DP,
-    template < class > class CNP
->
+typename U,
+         typename T,
+         bool S,
+         class OP,
+         class CP,
+         template < class > class KP,
+         template < class > class RP,
+         template < class > class DP,
+         template < class > class CNP
+         >
 inline bool operator == (
-    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & lhs, U * rhs )
+    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & lhs, U* rhs )
 {
     return ( lhs.Equals( rhs ) );
 }
@@ -1442,18 +1442,18 @@ inline bool operator == (
 ///  \ingroup SmartPointerGroup
 template
 <
-    typename U,
-    typename T,
-    bool S,
-    class OP,
-    class CP,
-    template < class > class KP,
-    template < class > class RP,
-    template < class > class DP,
-    template < class > class CNP
->
-inline bool operator == ( U * lhs,
-    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & rhs )
+typename U,
+         typename T,
+         bool S,
+         class OP,
+         class CP,
+         template < class > class KP,
+         template < class > class RP,
+         template < class > class DP,
+         template < class > class CNP
+         >
+inline bool operator == ( U* lhs,
+                          const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & rhs )
 {
     return ( rhs.Equals( lhs ) );
 }
@@ -1462,18 +1462,18 @@ inline bool operator == ( U * lhs,
 ///  \ingroup SmartPointerGroup
 template
 <
-    typename U,
-    typename T,
-    bool S,
-    class OP,
-    class CP,
-    template < class > class KP,
-    template < class > class RP,
-    template < class > class DP,
-    template < class > class CNP
->
+typename U,
+         typename T,
+         bool S,
+         class OP,
+         class CP,
+         template < class > class KP,
+         template < class > class RP,
+         template < class > class DP,
+         template < class > class CNP
+         >
 inline bool operator != (
-    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & lhs, U * rhs )
+    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & lhs, U* rhs )
 {
     return !( lhs.Equals( rhs ) );
 }
@@ -1482,18 +1482,18 @@ inline bool operator != (
 ///  \ingroup SmartPointerGroup
 template
 <
-    typename U,
-    typename T,
-    bool S,
-    class OP,
-    class CP,
-    template < class > class KP,
-    template < class > class RP,
-    template < class > class DP,
-    template < class > class CNP
->
-inline bool operator != ( U * lhs,
-    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & rhs )
+typename U,
+         typename T,
+         bool S,
+         class OP,
+         class CP,
+         template < class > class KP,
+         template < class > class RP,
+         template < class > class DP,
+         template < class > class CNP
+         >
+inline bool operator != ( U* lhs,
+                          const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & rhs )
 {
     return !( rhs.Equals( lhs ) );
 }
@@ -1502,18 +1502,18 @@ inline bool operator != ( U * lhs,
 ///  \ingroup SmartPointerGroup
 template
 <
-    typename U,
-    typename T,
-    bool S,
-    class OP,
-    class CP,
-    template < class > class KP,
-    template < class > class RP,
-    template < class > class DP,
-    template < class > class CNP
->
+typename U,
+         typename T,
+         bool S,
+         class OP,
+         class CP,
+         template < class > class KP,
+         template < class > class RP,
+         template < class > class DP,
+         template < class > class CNP
+         >
 inline bool operator < (
-    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & lhs, U * rhs )
+    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & lhs, U* rhs )
 {
     return ( lhs.LessThan( rhs ) );
 }
@@ -1522,18 +1522,18 @@ inline bool operator < (
 ///  \ingroup SmartPointerGroup
 template
 <
-    typename U,
-    typename T,
-    bool S,
-    class OP,
-    class CP,
-    template < class > class KP,
-    template < class > class RP,
-    template < class > class DP,
-    template < class > class CNP
->
-inline bool operator < ( U * lhs,
-    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & rhs )
+typename U,
+         typename T,
+         bool S,
+         class OP,
+         class CP,
+         template < class > class KP,
+         template < class > class RP,
+         template < class > class DP,
+         template < class > class CNP
+         >
+inline bool operator < ( U* lhs,
+                         const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & rhs )
 {
     return ( rhs.GreaterThan( lhs ) );
 }
@@ -1542,18 +1542,18 @@ inline bool operator < ( U * lhs,
 ///  \ingroup SmartPointerGroup
 template
 <
-    typename U,
-    typename T,
-    bool S,
-    class OP,
-    class CP,
-    template < class > class KP,
-    template < class > class RP,
-    template < class > class DP,
-    template < class > class CNP
->
+typename U,
+         typename T,
+         bool S,
+         class OP,
+         class CP,
+         template < class > class KP,
+         template < class > class RP,
+         template < class > class DP,
+         template < class > class CNP
+         >
 inline bool operator > (
-    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & lhs, U * rhs )
+    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & lhs, U* rhs )
 {
     return ( lhs.GreaterThan( rhs ) );
 }
@@ -1562,18 +1562,18 @@ inline bool operator > (
 ///  \ingroup SmartPointerGroup
 template
 <
-    typename U,
-    typename T,
-    bool S,
-    class OP,
-    class CP,
-    template < class > class KP,
-    template < class > class RP,
-    template < class > class DP,
-    template < class > class CNP
->
-inline bool operator > ( U * lhs,
-    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & rhs )
+typename U,
+         typename T,
+         bool S,
+         class OP,
+         class CP,
+         template < class > class KP,
+         template < class > class RP,
+         template < class > class DP,
+         template < class > class CNP
+         >
+inline bool operator > ( U* lhs,
+                         const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & rhs )
 {
     return ( rhs.LessThan( lhs ) );
 }
@@ -1582,18 +1582,18 @@ inline bool operator > ( U * lhs,
 ///  \ingroup SmartPointerGroup
 template
 <
-    typename U,
-    typename T,
-    bool S,
-    class OP,
-    class CP,
-    template < class > class KP,
-    template < class > class RP,
-    template < class > class DP,
-    template < class > class CNP
->
+typename U,
+         typename T,
+         bool S,
+         class OP,
+         class CP,
+         template < class > class KP,
+         template < class > class RP,
+         template < class > class DP,
+         template < class > class CNP
+         >
 inline bool operator <= (
-    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & lhs, U * rhs )
+    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & lhs, U* rhs )
 {
     return !( lhs.GreaterThan( rhs ) );
 }
@@ -1602,18 +1602,18 @@ inline bool operator <= (
 ///  \ingroup SmartPointerGroup
 template
 <
-    typename U,
-    typename T,
-    bool S,
-    class OP,
-    class CP,
-    template < class > class KP,
-    template < class > class RP,
-    template < class > class DP,
-    template < class > class CNP
->
-inline bool operator <= ( U * lhs,
-    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & rhs )
+typename U,
+         typename T,
+         bool S,
+         class OP,
+         class CP,
+         template < class > class KP,
+         template < class > class RP,
+         template < class > class DP,
+         template < class > class CNP
+         >
+inline bool operator <= ( U* lhs,
+                          const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & rhs )
 {
     return !( rhs.LessThan( lhs ) );
 }
@@ -1622,18 +1622,18 @@ inline bool operator <= ( U * lhs,
 ///  \ingroup SmartPointerGroup
 template
 <
-    typename U,
-    typename T,
-    bool S,
-    class OP,
-    class CP,
-    template < class > class KP,
-    template < class > class RP,
-    template < class > class DP,
-    template < class > class CNP
->
+typename U,
+         typename T,
+         bool S,
+         class OP,
+         class CP,
+         template < class > class KP,
+         template < class > class RP,
+         template < class > class DP,
+         template < class > class CNP
+         >
 inline bool operator >= (
-    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & lhs, U * rhs )
+    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & lhs, U* rhs )
 {
     return !( lhs.LessThan( rhs ) );
 }
@@ -1642,18 +1642,18 @@ inline bool operator >= (
 ///  \ingroup SmartPointerGroup
 template
 <
-    typename U,
-    typename T,
-    bool S,
-    class OP,
-    class CP,
-    template < class > class KP,
-    template < class > class RP,
-    template < class > class DP,
-    template < class > class CNP
->
-inline bool operator >= ( U * lhs,
-    const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & rhs )
+typename U,
+         typename T,
+         bool S,
+         class OP,
+         class CP,
+         template < class > class KP,
+         template < class > class RP,
+         template < class > class DP,
+         template < class > class CNP
+         >
+inline bool operator >= ( U* lhs,
+                          const StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & rhs )
 {
     return !( rhs.GreaterThan( lhs ) );
 }
@@ -1662,33 +1662,33 @@ inline bool operator >= ( U * lhs,
 
 namespace std
 {
-    ////////////////////////////////////////////////////////////////////////////////
-    ///  specialization of std::less for StrongPtr
-    ///  \ingroup SmartPointerGroup
-    ////////////////////////////////////////////////////////////////////////////////
-    template
-    <
-        typename T,
-        bool S,
-        class OP,
-        class CP,
-        template < class > class KP,
-        template < class > class RP,
-        template < class > class DP,
-        template < class > class CNP
-    >
-    struct less< Loki::StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > >
+////////////////////////////////////////////////////////////////////////////////
+///  specialization of std::less for StrongPtr
+///  \ingroup SmartPointerGroup
+////////////////////////////////////////////////////////////////////////////////
+template
+<
+typename T,
+         bool S,
+         class OP,
+         class CP,
+         template < class > class KP,
+         template < class > class RP,
+         template < class > class DP,
+         template < class > class CNP
+         >
+struct less< Loki::StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > >
         : public binary_function<
-            Loki::StrongPtr< T, S, OP, CP, KP, RP, DP, CNP >,
-            Loki::StrongPtr< T, S, OP, CP, KP, RP, DP, CNP >, bool >
+        Loki::StrongPtr< T, S, OP, CP, KP, RP, DP, CNP >,
+        Loki::StrongPtr< T, S, OP, CP, KP, RP, DP, CNP >, bool >
+{
+    bool operator () (
+        const Loki::StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & lhs,
+        const Loki::StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & rhs ) const
     {
-        bool operator () (
-            const Loki::StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & lhs,
-            const Loki::StrongPtr< T, S, OP, CP, KP, RP, DP, CNP > & rhs ) const
-        {
-            return ( lhs < rhs );
-        }
-    };
+        return ( lhs < rhs );
+    }
+};
 }
 
 ////////////////////////////////////////////////////////////////////////////////

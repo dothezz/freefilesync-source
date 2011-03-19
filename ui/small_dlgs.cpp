@@ -19,7 +19,7 @@
 #include "../shared/build_info.h"
 #include <wx/wupdlock.h>
 #include <wx/msgdlg.h>
-#include "mouse_move_dlg.h"
+#include "../shared/mouse_move_dlg.h"
 
 using namespace ffs3;
 
@@ -43,16 +43,17 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
                         m_bitmap11); //ownership passed to "this"
 #endif
 
-    m_bitmap9->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("website")));
-    m_bitmap10->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("email")));
-    m_bitmap11->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("logo")));
-    m_bitmap13->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("gpl")));
+    m_bitmap9->SetBitmap(GlobalResources::instance().getImage(wxT("website")));
+    m_bitmap10->SetBitmap(GlobalResources::instance().getImage(wxT("email")));
+    m_bitmap11->SetBitmap(GlobalResources::instance().getImage(wxT("logo")));
+    m_bitmap13->SetBitmap(GlobalResources::instance().getImage(wxT("gpl")));
+    m_bitmapTransl->SetBitmap(GlobalResources::instance().getImage(wxT("translation")));
 
     //create language credits
     for (std::vector<LocInfoLine>::const_iterator i = LocalizationInfo::getMapping().begin(); i != LocalizationInfo::getMapping().end(); ++i)
     {
         //flag
-        wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, GlobalResources::getInstance().getImageByName(i->languageFlag), wxDefaultPosition, wxSize(-1,11), 0 );
+        wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, GlobalResources::instance().getImage(i->languageFlag), wxDefaultPosition, wxSize(-1,11), 0 );
         fgSizerTranslators->Add(staticBitmapFlag, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
         //language name
@@ -89,7 +90,7 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
 
     m_build->SetLabel(buildFormatted);
 
-    m_animationControl1->SetAnimation(*GlobalResources::getInstance().animationMoney);
+    m_animationControl1->SetAnimation(*GlobalResources::instance().animationMoney);
     m_animationControl1->Play();
 
     m_buttonOkay->SetFocus();
@@ -111,9 +112,8 @@ void AboutDlg::OnOK(wxCommandEvent& event)
 
 void ffs3::showAboutDialog()
 {
-    AboutDlg* aboutDlg = new AboutDlg(NULL);
-    aboutDlg->ShowModal();
-    aboutDlg->Destroy();
+    AboutDlg aboutDlg(NULL);
+    aboutDlg.ShowModal();
 }
 //########################################################################################
 
@@ -138,7 +138,7 @@ HelpDlg::HelpDlg(wxWindow* window) : HelpDlgGenerated(window)
 
     m_notebook1->SetFocus();
 
-    m_bitmap25->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("help")));
+    m_bitmap25->SetBitmap(GlobalResources::instance().getImage(wxT("help")));
 
     //populate decision trees: "compare by date"
     wxTreeItemId treeRoot      = m_treeCtrl1->AddRoot(_("DECISION TREE"));
@@ -186,9 +186,8 @@ void HelpDlg::OnOK(wxCommandEvent& event)
 
 void ffs3::showHelpDialog()
 {
-    HelpDlg* helpDlg = new HelpDlg(NULL);
-    helpDlg->ShowModal();
-    helpDlg->Destroy();
+    HelpDlg helpDlg(NULL);
+    helpDlg.ShowModal();
 }
 //########################################################################################
 
@@ -234,10 +233,10 @@ FilterDlg::FilterDlg(wxWindow* window,
                         this, m_bitmap26, m_staticTexHeader, m_bitmap8, m_bitmap9); //ownership passed to "this"
 #endif
 
-    m_bitmap8->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("include")));
-    m_bitmap9->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("exclude")));
-    m_bitmap26->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("filterOn")));
-    m_bpButtonHelp->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("help")));
+    m_bitmap8->SetBitmap(GlobalResources::instance().getImage(wxT("include")));
+    m_bitmap9->SetBitmap(GlobalResources::instance().getImage(wxT("exclude")));
+    m_bitmap26->SetBitmap(GlobalResources::instance().getImage(wxT("filterOn")));
+    m_bpButtonHelp->SetBitmapLabel(GlobalResources::instance().getImage(wxT("help")));
 
     m_textCtrlInclude->SetValue(zToWx(includeFilter));
     m_textCtrlExclude->SetValue(zToWx(excludeFilter));
@@ -312,18 +311,17 @@ void FilterDlg::OnClose(wxCloseEvent& event)
 
 
 DefaultReturnCode::Response ffs3::showFilterDialog(bool isGlobalFilter,
-        Zstring& filterIncl,
-        Zstring& filterExcl)
+                                                   Zstring& filterIncl,
+                                                   Zstring& filterExcl)
 {
     DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
-    FilterDlg* filterDlg = new FilterDlg(NULL,
-                                         isGlobalFilter, //is main filter dialog
-                                         filterIncl,
-                                         filterExcl);
-    if (filterDlg->ShowModal() == FilterDlg::BUTTON_APPLY)
+    FilterDlg filterDlg(NULL,
+                        isGlobalFilter, //is main filter dialog
+                        filterIncl,
+                        filterExcl);
+    if (filterDlg.ShowModal() == FilterDlg::BUTTON_APPLY)
         rv = DefaultReturnCode::BUTTON_OKAY;
 
-    filterDlg->Destroy();
     return rv;
 }
 //########################################################################################
@@ -393,18 +391,18 @@ void DeleteDialog::updateTexts()
     if (m_checkBoxUseRecycler->GetValue())
     {
         m_staticTextHeader->SetLabel(_("Do you really want to move the following object(s) to the Recycle Bin?"));
-        m_bitmap12->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("recycler")));
+        m_bitmap12->SetBitmap(GlobalResources::instance().getImage(wxT("recycler")));
     }
     else
     {
         m_staticTextHeader->SetLabel(_("Do you really want to delete the following object(s)?"));
-        m_bitmap12->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("deleteFile")));
+        m_bitmap12->SetBitmap(GlobalResources::instance().getImage(wxT("deleteFile")));
     }
 
     const std::pair<wxString, int> delInfo = ffs3::deleteFromGridAndHDPreview(
-                rowsToDeleteOnLeft,
-                rowsToDeleteOnRight,
-                m_checkBoxDeleteBothSides->GetValue());
+                                                 rowsToDeleteOnLeft,
+                                                 rowsToDeleteOnRight,
+                                                 m_checkBoxDeleteBothSides->GetValue());
 
     const wxString filesToDelete = delInfo.first;
     totalDelCount = delInfo.second;
@@ -444,10 +442,10 @@ void DeleteDialog::OnUseRecycler(wxCommandEvent& event)
 
 
 DefaultReturnCode::Response ffs3::showDeleteDialog(const std::vector<ffs3::FileSystemObject*>& rowsOnLeft,
-        const std::vector<ffs3::FileSystemObject*>& rowsOnRight,
-        bool& deleteOnBothSides,
-        bool& useRecycleBin,
-        int& totalDeleteCount)
+                                                   const std::vector<ffs3::FileSystemObject*>& rowsOnRight,
+                                                   bool& deleteOnBothSides,
+                                                   bool& useRecycleBin,
+                                                   int& totalDeleteCount)
 {
     DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
 
@@ -496,8 +494,8 @@ CustomizeColsDlg::CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes
                         this); //ownership passed to "this"
 #endif
 
-    m_bpButton29->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("moveUp")));
-    m_bpButton30->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("moveDown")));
+    m_bpButton29->SetBitmapLabel(GlobalResources::instance().getImage(wxT("moveUp")));
+    m_bpButton30->SetBitmapLabel(GlobalResources::instance().getImage(wxT("moveDown")));
 
     xmlAccess::ColumnAttributes columnSettings = attr;
 
@@ -597,10 +595,9 @@ DefaultReturnCode::Response ffs3::showCustomizeColsDlg(xmlAccess::ColumnAttribut
 {
     DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
 
-    CustomizeColsDlg* customizeDlg = new CustomizeColsDlg(NULL, attr);
-    if (customizeDlg->ShowModal() == CustomizeColsDlg::BUTTON_OKAY)
+    CustomizeColsDlg customizeDlg(NULL, attr);
+    if (customizeDlg.ShowModal() == CustomizeColsDlg::BUTTON_OKAY)
         rv = DefaultReturnCode::BUTTON_OKAY;
-    customizeDlg->Destroy();
 
     return rv;
 }
@@ -644,11 +641,11 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
 
     using ffs3::numberToStringSep;
 
-    m_buttonStartSync->setBitmapFront(GlobalResources::getInstance().getImageByName(wxT("startSync")));
-    m_bitmapCreate->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("create")));
-    m_bitmapUpdate->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("update")));
-    m_bitmapDelete->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("delete")));
-    m_bitmapData->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("data")));
+    m_buttonStartSync->setBitmapFront(GlobalResources::instance().getImage(wxT("startSync")));
+    m_bitmapCreate->SetBitmap(GlobalResources::instance().getImage(wxT("create")));
+    m_bitmapUpdate->SetBitmap(GlobalResources::instance().getImage(wxT("update")));
+    m_bitmapDelete->SetBitmap(GlobalResources::instance().getImage(wxT("delete")));
+    m_bitmapData->SetBitmap(GlobalResources::instance().getImage(wxT("data")));
 
     m_staticTextVariant->SetLabel(variantName);
     m_textCtrlData->SetValue(ffs3::formatFilesizeToShortString(statistics.getDataToProcess()));
@@ -694,15 +691,13 @@ DefaultReturnCode::Response ffs3::showSyncPreviewDlg(
 {
     DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
 
-    SyncPreviewDlg* preview = new SyncPreviewDlg(NULL,
-            variantName,
-            statistics,
-            dontShowAgain);
+    SyncPreviewDlg preview(NULL,
+                           variantName,
+                           statistics,
+                           dontShowAgain);
 
-    if (preview->ShowModal() == SyncPreviewDlg::BUTTON_START)
+    if (preview.ShowModal() == SyncPreviewDlg::BUTTON_START)
         rv = DefaultReturnCode::BUTTON_OKAY;
-
-    preview->Destroy();
 
     return rv;
 }
@@ -751,15 +746,15 @@ void setValue(wxChoice& choiceCtrl, ffs3::SymLinkHandling value)
 
     switch (value)
     {
-    case ffs3::SYMLINK_IGNORE:
-        choiceCtrl.SetSelection(0);
-        break;
-    case ffs3::SYMLINK_USE_DIRECTLY:
-        choiceCtrl.SetSelection(1);
-        break;
-    case ffs3::SYMLINK_FOLLOW_LINK:
-        choiceCtrl.SetSelection(2);
-        break;
+        case ffs3::SYMLINK_IGNORE:
+            choiceCtrl.SetSelection(0);
+            break;
+        case ffs3::SYMLINK_USE_DIRECTLY:
+            choiceCtrl.SetSelection(1);
+            break;
+        case ffs3::SYMLINK_FOLLOW_LINK:
+            choiceCtrl.SetSelection(2);
+            break;
     }
 }
 
@@ -768,15 +763,15 @@ ffs3::SymLinkHandling getValue(const wxChoice& choiceCtrl)
 {
     switch (choiceCtrl.GetSelection())
     {
-    case 0:
-        return ffs3::SYMLINK_IGNORE;
-    case 1:
-        return ffs3::SYMLINK_USE_DIRECTLY;
-    case 2:
-        return ffs3::SYMLINK_FOLLOW_LINK;
-    default:
-        assert(false);
-        return ffs3::SYMLINK_IGNORE;
+        case 0:
+            return ffs3::SYMLINK_IGNORE;
+        case 1:
+            return ffs3::SYMLINK_USE_DIRECTLY;
+        case 2:
+            return ffs3::SYMLINK_FOLLOW_LINK;
+        default:
+            assert(false);
+            return ffs3::SYMLINK_IGNORE;
     }
 }
 }
@@ -797,20 +792,20 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parentWindow,
     //move dialog up so that compare-config button and first config-variant are on same level
     Move(wxPoint(position.x, std::max(0, position.y - (m_buttonTimeSize->GetScreenPosition() - GetScreenPosition()).y)));
 
-    m_bpButtonHelp->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("help")));
-    m_bitmapByTime->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("cmpByTime")));
-    m_bitmapByContent->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("cmpByContent")));
+    m_bpButtonHelp->SetBitmapLabel(GlobalResources::instance().getImage(wxT("help")));
+    m_bitmapByTime->SetBitmap(GlobalResources::instance().getImage(wxT("cmpByTime")));
+    m_bitmapByContent->SetBitmap(GlobalResources::instance().getImage(wxT("cmpByContent")));
 
     switch (cmpVar)
     {
-    case CMP_BY_TIME_SIZE:
-        m_radioBtnSizeDate->SetValue(true);
-        m_buttonContent->SetFocus(); //set focus on the other button
-        break;
-    case CMP_BY_CONTENT:
-        m_radioBtnContent->SetValue(true);
-        m_buttonTimeSize->SetFocus(); //set focus on the other button
-        break;
+        case CMP_BY_TIME_SIZE:
+            m_radioBtnSizeDate->SetValue(true);
+            m_buttonContent->SetFocus(); //set focus on the other button
+            break;
+        case CMP_BY_CONTENT:
+            m_radioBtnContent->SetValue(true);
+            m_buttonTimeSize->SetFocus(); //set focus on the other button
+            break;
     }
 
 
@@ -865,8 +860,8 @@ void CompareCfgDialog::OnContent(wxCommandEvent& event)
 
 void CompareCfgDialog::OnShowHelp(wxCommandEvent& event)
 {
-    HelpDlg* helpDlg = new HelpDlg(this);
-    helpDlg->ShowModal();
+    HelpDlg helpDlg(this);
+    helpDlg.ShowModal();
 }
 
 
@@ -919,10 +914,10 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSetti
                         this, m_bitmapSettings, m_staticText56); //ownership passed to "this"
 #endif
 
-    m_bitmapSettings->SetBitmap(GlobalResources::getInstance().getImageByName(wxT("settings")));
-    m_buttonResetDialogs->setBitmapFront(GlobalResources::getInstance().getImageByName(wxT("warningSmall")), 5);
-    m_bpButtonAddRow->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("addFolderPair")));
-    m_bpButtonRemoveRow->SetBitmapLabel(GlobalResources::getInstance().getImageByName(wxT("removeFolderPair")));
+    m_bitmapSettings->SetBitmap(GlobalResources::instance().getImage(wxT("settings")));
+    m_buttonResetDialogs->setBitmapFront(GlobalResources::instance().getImage(wxT("warningSmall")), 5);
+    m_bpButtonAddRow->SetBitmapLabel(GlobalResources::instance().getImage(wxT("addFolderPair")));
+    m_bpButtonRemoveRow->SetBitmapLabel(GlobalResources::instance().getImage(wxT("removeFolderPair")));
 
     m_checkBoxCopyLocked->SetValue(globalSettings.copyLockedFiles);
     m_checkBoxCopyPermissions->SetValue(globalSettings.copyFilePermissions);
@@ -961,11 +956,11 @@ void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 
 void GlobalSettingsDlg::OnResetDialogs(wxCommandEvent& event)
 {
-    QuestionDlg* messageDlg = new QuestionDlg(this,
-            QuestionDlg::BUTTON_YES | QuestionDlg::BUTTON_CANCEL,
-            _("Re-enable all hidden dialogs?"));
+    QuestionDlg messageDlg(this,
+                           QuestionDlg::BUTTON_YES | QuestionDlg::BUTTON_CANCEL,
+                           _("Restore all hidden dialogs?"));
 
-    if (messageDlg->ShowModal() == QuestionDlg::BUTTON_YES)
+    if (messageDlg.ShowModal() == QuestionDlg::BUTTON_YES)
         settings.optDialogs.resetDialogs();
 }
 
@@ -1055,11 +1050,9 @@ DefaultReturnCode::Response ffs3::showGlobalSettingsDlg(xmlAccess::XmlGlobalSett
 {
     DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
 
-    wxDialog* settingsDlg = new GlobalSettingsDlg(NULL, globalSettings);
-    if (settingsDlg->ShowModal() == GlobalSettingsDlg::BUTTON_OKAY)
+    GlobalSettingsDlg settingsDlg(NULL, globalSettings);
+    if (settingsDlg.ShowModal() == GlobalSettingsDlg::BUTTON_OKAY)
         rv = DefaultReturnCode::BUTTON_OKAY;
-
-    settingsDlg->Destroy();
 
     return rv;
 }

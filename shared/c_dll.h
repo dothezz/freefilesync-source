@@ -29,11 +29,11 @@ public:
     T& retrieve(S handle); //return default-constructed object if not found
 
 private:
-	HandleProvider() {}
+    HandleProvider() {}
     HandleProvider(const HandleProvider&);
     HandleProvider& operator=(const HandleProvider&);
     S generate();
-	
+
     std::map<S, T> handleMap;
 };
 /*

@@ -9,37 +9,42 @@
 
 #include <wx/string.h>
 #include <vector>
+#include <map>
 #include "../shared/zstring.h"
 
 
 namespace ffs3
 {
+enum MessageType
+{
+    TYPE_INFO        = 1,
+    TYPE_WARNING     = 2,
+    TYPE_ERROR       = 4,
+    TYPE_FATAL_ERROR = 8,
+};
+
 class ErrorLogging
 {
 public:
-    ErrorLogging() : errorCount(0) {}
+    void logMsg(const wxString& message, MessageType type);
 
-    void logInfo(      const wxString& infoMessage);
-    void logWarning(   const wxString& warningMessage);
-    void logError(     const wxString& errorMessage);
-    void logFatalError(const wxString& errorMessage);
+    int typeCount(int types = TYPE_INFO | TYPE_WARNING | TYPE_ERROR | TYPE_FATAL_ERROR) const;
 
-    int errorsTotal()
-    {
-        return errorCount;
-    }
-
-    typedef std::vector<wxString> MessageEntry;
-    const MessageEntry& getFormattedMessages() const
-    {
-        return formattedMessages;
-    }
+    std::vector<wxString> getFormattedMessages(int types = TYPE_INFO | TYPE_WARNING | TYPE_ERROR | TYPE_FATAL_ERROR) const;
 
 private:
-    wxString assembleMessage(const wxString& prefix, const wxString& message);
+    struct Entry
+    {
+        MessageType type;
+        time_t      time;
+        wxString    message;
+    };
 
-    MessageEntry formattedMessages; //list of non-resolved errors and warnings
-    int errorCount;
+    static wxString formatMessage(const Entry& msg);
+
+    std::vector<Entry> messages; //list of non-resolved errors and warnings
+
+    mutable std::map<MessageType, int> statistics;
 };
 }
 

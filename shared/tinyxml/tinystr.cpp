@@ -83,7 +83,7 @@ TiXmlString& TiXmlString::append(const char* str, size_type len)
 }
 
 
-TiXmlString operator + (const TiXmlString & a, const TiXmlString & b)
+TiXmlString operator + (const TiXmlString& a, const TiXmlString& b)
 {
     TiXmlString tmp;
     tmp.reserve(a.length() + b.length());
@@ -92,7 +92,7 @@ TiXmlString operator + (const TiXmlString & a, const TiXmlString & b)
     return tmp;
 }
 
-TiXmlString operator + (const TiXmlString & a, const char* b)
+TiXmlString operator + (const TiXmlString& a, const char* b)
 {
     TiXmlString tmp;
     TiXmlString::size_type b_len = static_cast<TiXmlString::size_type>( strlen(b) );
@@ -102,7 +102,7 @@ TiXmlString operator + (const TiXmlString & a, const char* b)
     return tmp;
 }
 
-TiXmlString operator + (const char* a, const TiXmlString & b)
+TiXmlString operator + (const char* a, const TiXmlString& b)
 {
     TiXmlString tmp;
     TiXmlString::size_type a_len = static_cast<TiXmlString::size_type>( strlen(a) );

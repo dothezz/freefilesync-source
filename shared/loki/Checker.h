@@ -86,9 +86,9 @@ class CheckForNoThrow
 {
 public:
 
-    inline explicit CheckForNoThrow( const Host * ) {}
+    inline explicit CheckForNoThrow( const Host* ) {}
 
-    inline bool Check( const Host * ) const
+    inline bool Check( const Host* ) const
     {
         const bool okay = ( !::std::uncaught_exception() );
         assert( okay );
@@ -117,13 +117,13 @@ class CheckForNoChange
 {
 public:
 
-    inline explicit CheckForNoChange( const Host * host ) :
+    inline explicit CheckForNoChange( const Host* host ) :
         m_compare( *host ) {}
 
-    inline bool Check( const Host * host ) const
+    inline bool Check( const Host* host ) const
     {
         const bool okay = ( !::std::uncaught_exception() )
-            || ( m_compare == *host );
+                          || ( m_compare == *host );
         assert( okay );
         return okay;
     }
@@ -152,10 +152,10 @@ class CheckForNoChangeOrThrow
 {
 public:
 
-    inline explicit CheckForNoChangeOrThrow( const Host * host ) :
+    inline explicit CheckForNoChangeOrThrow( const Host* host ) :
         m_compare( *host ) {}
 
-    inline bool Check( const Host * host ) const
+    inline bool Check( const Host* host ) const
     {
         bool okay = ( !::std::uncaught_exception() );
         assert( okay );
@@ -187,10 +187,10 @@ class CheckForEquality
 {
 public:
 
-    inline explicit CheckForEquality( const Host * host ) :
+    inline explicit CheckForEquality( const Host* host ) :
         m_compare( *host ) {}
 
-    inline bool Check( const Host * host ) const
+    inline bool Check( const Host* host ) const
     {
         const bool okay = ( m_compare == *host );
         assert( okay );
@@ -219,8 +219,8 @@ template < class Host >
 class CheckForNothing
 {
 public:
-    inline explicit CheckForNothing( const Host * ) {}
-    inline bool Check( const Host * ) const { return true; }
+    inline explicit CheckForNothing( const Host* ) {}
+    inline bool Check( const Host* ) const { return true; }
 };
 
 // ----------------------------------------------------------------------------
@@ -271,9 +271,9 @@ public:
 
 template
 <
-    class Host,
-    template < class > class ExceptionPolicy
->
+class Host,
+      template < class > class ExceptionPolicy
+      >
 class ContractChecker : public ExceptionPolicy< Host >
 {
     /// Shorthand for the ExceptionPolicy class.
@@ -291,8 +291,8 @@ public:
      @par pre Optional pointer to function that checks pre-conditions.
      @par post Optional pointer to function that checks post-conditions.
      */
-    inline ContractChecker( const Host * host, Validator validator,
-        Validator pre = 0, Validator post = 0 ) :
+    inline ContractChecker( const Host* host, Validator validator,
+                            Validator pre = 0, Validator post = 0 ) :
         Ep( host ),
         m_host( host ),
         m_validator( validator ),
@@ -342,12 +342,12 @@ private:
     /// Default constructor is not implemented.
     ContractChecker( void );
     /// Copy constructor is not implemented.
-    ContractChecker( const ContractChecker & );
+    ContractChecker( const ContractChecker& );
     /// Copy-assignment operator is not implemented.
-    ContractChecker & operator = ( const ContractChecker & );
+    ContractChecker& operator = ( const ContractChecker& );
 
     /// Pointer to the host object.
-    const Host * m_host;
+    const Host* m_host;
 
     /// Pointer to member function that checks Host object's invariants.
     Validator m_validator;
@@ -428,7 +428,7 @@ public:
 
 template
 <
-    class ExceptionPolicy
+class ExceptionPolicy
 >
 class StaticChecker : public ExceptionPolicy
 {
@@ -447,7 +447,7 @@ public:
      @par post Optional pointer to function that checks post-conditions.
      */
     inline explicit StaticChecker( Validator validator,
-        Validator pre = 0, Validator post = 0 ) :
+                                   Validator pre = 0, Validator post = 0 ) :
         Ep(),
         m_validator( validator ),
         m_pre( pre ),
@@ -494,9 +494,9 @@ private:
     /// Default constructor is not implemented.
     StaticChecker( void );
     /// Copy constructor is not implemented.
-    StaticChecker( const StaticChecker & );
+    StaticChecker( const StaticChecker& );
     /// Copy-assignment operator is not implemented.
-    StaticChecker & operator = ( const StaticChecker & );
+    StaticChecker& operator = ( const StaticChecker& );
 
     /// Pointer to member function that checks Host object's invariants.
     Validator m_validator;

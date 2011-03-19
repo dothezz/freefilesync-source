@@ -12,46 +12,74 @@
 using ffs3::ErrorLogging;
 
 
-void ErrorLogging::logInfo(const wxString& infoMessage)
+void ErrorLogging::logMsg(const wxString& message, ffs3::MessageType type)
 {
-    const wxString prefix = wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + _("Info") + wxT(": ");
-    formattedMessages.push_back(assembleMessage(prefix, infoMessage));
+    Entry newEntry;
+    newEntry.type    = type;
+    newEntry.time    = wxDateTime::GetTimeNow();
+    newEntry.message = message;
+
+    messages.push_back(newEntry);
+
+    ++statistics[type];
 }
 
 
-void ErrorLogging::logWarning(const wxString& warningMessage)
+int ErrorLogging::typeCount(int types) const
 {
-    const wxString prefix = wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + _("Warning") + wxT(": ");
-    formattedMessages.push_back(assembleMessage(prefix, warningMessage));
+    int count = 0;
+
+    if (types & TYPE_INFO)
+        count += statistics[TYPE_INFO];
+    if (types & TYPE_WARNING)
+        count += statistics[TYPE_WARNING];
+    if (types & TYPE_ERROR)
+        count += statistics[TYPE_ERROR];
+    if (types & TYPE_FATAL_ERROR)
+        count += statistics[TYPE_FATAL_ERROR];
+
+    return count;
 }
 
 
-void ErrorLogging::logError(const wxString& errorMessage)
+std::vector<wxString> ErrorLogging::getFormattedMessages(int types) const
 {
-    ++errorCount;
+    std::vector<wxString> output;
 
-    const wxString prefix = wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + _("Error") + wxT(": ");
-    formattedMessages.push_back(assembleMessage(prefix, errorMessage));
+    for (std::vector<Entry>::const_iterator i = messages.begin(); i != messages.end(); ++i)
+        if (i->type & types)
+            output.push_back(formatMessage(*i));
+
+    return output;
 }
 
 
-void ErrorLogging::logFatalError(const wxString& errorMessage)
+wxString ErrorLogging::formatMessage(const Entry& msg)
 {
-    ++errorCount;
+    wxString typeName;
+    switch (msg.type)
+    {
+        case TYPE_INFO:
+            typeName = _("Info");
+            break;
+        case TYPE_WARNING:
+            typeName = _("Warning");
+            break;
+        case TYPE_ERROR:
+            typeName = _("Error");
+            break;
+        case TYPE_FATAL_ERROR:
+            typeName = _("Fatal Error");
+            break;
+    }
 
-    const wxString prefix = wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + _("Fatal Error") + wxT(": ");
-    formattedMessages.push_back(assembleMessage(prefix, errorMessage));
-}
+    const wxString prefix = wxString(wxT("[")) + wxDateTime(msg.time).FormatTime() + wxT("] ") + typeName + wxT(": ");
 
-
-wxString ErrorLogging::assembleMessage(const wxString& prefix, const wxString& message)
-{
-    const size_t prefixLength = prefix.size();
     wxString formattedText = prefix;
-    for (wxString::const_iterator i = message.begin(); i != message.end(); ++i)
+    for (wxString::const_iterator i = msg.message.begin(); i != msg.message.end(); ++i)
         if (*i == wxChar('\n'))
         {
-            formattedText += wxString(wxChar('\n')).Pad(prefixLength, wxChar(' '), true);
+            formattedText += wxString(wxChar('\n')).Pad(prefix.size(), wxChar(' '), true);
             while (*++i == wxChar('\n')) //remove duplicate newlines
                 ;
             --i;

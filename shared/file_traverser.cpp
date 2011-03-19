@@ -66,7 +66,8 @@ bool setWin32FileInformationFromSymlink(const Zstring& linkName, ffs3::TraverseC
     if (hFile == INVALID_HANDLE_VALUE)
         return false;
 
-    boost::shared_ptr<void> dummy(hFile, ::CloseHandle);
+    Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hFile);
+    (void)dummy; //silence warning "unused variable"
 
     BY_HANDLE_FILE_INFORMATION fileInfoByHandle;
     if (!::GetFileInformationByHandle(hFile, &fileInfoByHandle))
@@ -129,7 +130,7 @@ private:
                                             directory :
                                             directory + common::FILE_NAME_SEPARATOR;
 
-        WIN32_FIND_DATA fileMetaData;
+        WIN32_FIND_DATA fileMetaData = {};
         HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(directoryFormatted + Zchar('*')).c_str(), //__in   LPCTSTR lpFileName
                                               &fileMetaData);                                                     //__out  LPWIN32_FIND_DATA lpFindFileData
         //no noticable performance difference compared to FindFirstFileEx with FindExInfoBasic, FIND_FIRST_EX_CASE_SENSITIVE and/or FIND_FIRST_EX_LARGE_FETCH
@@ -148,15 +149,16 @@ private:
             return;
         }
 
-        boost::shared_ptr<void> dummy(searchHandle, ::FindClose);
+        Loki::ScopeGuard dummy = Loki::MakeGuard(::FindClose, searchHandle);
+        (void)dummy; //silence warning "unused variable"
 
         do
         {
             //don't return "." and ".."
             const Zchar* const shortName = fileMetaData.cFileName;
-            if (     shortName[0] == Zstr('.') &&
-                     ((shortName[1] == Zstr('.') && shortName[2] == Zstr('\0')) ||
-                      shortName[1] == Zstr('\0')))
+            if ( shortName[0] == Zstr('.') &&
+                 ((shortName[1] == Zstr('.') && shortName[2] == Zstr('\0')) ||
+                  shortName[1] == Zstr('\0')))
                 continue;
 
             const Zstring& fullName = directoryFormatted + shortName;
@@ -172,7 +174,7 @@ private:
                 }
                 catch (FileError& e)
                 {
-					(void)e;
+                    (void)e;
 #ifndef NDEBUG       //show broken symlink / access errors in debug build!
                     sink.onError(e.msg());
 #endif
@@ -187,12 +189,12 @@ private:
                 const TraverseCallback::ReturnValDir rv = sink.onDir(shortName, fullName);
                 switch (rv.returnCode)
                 {
-                case TraverseCallback::ReturnValDir::TRAVERSING_DIR_IGNORE:
-                    break;
+                    case TraverseCallback::ReturnValDir::TRAVERSING_DIR_IGNORE:
+                        break;
 
-                case TraverseCallback::ReturnValDir::TRAVERSING_DIR_CONTINUE:
-                    traverse<followSymlinks>(fullName, *rv.subDirCb, level + 1);
-                    break;
+                    case TraverseCallback::ReturnValDir::TRAVERSING_DIR_CONTINUE:
+                        traverse<followSymlinks>(fullName, *rv.subDirCb, level + 1);
+                        break;
                 }
             }
             else //a file or symlink that is followed...
@@ -210,7 +212,7 @@ private:
                 }
                 else
                 {
-//####################################### DST hack ###########################################
+                    //####################################### DST hack ###########################################
                     if (isFatFileSystem)
                     {
                         const dst::RawTime rawTime(fileMetaData.ftCreationTime, fileMetaData.ftLastWriteTime);
@@ -220,7 +222,7 @@ private:
                         else
                             markForDstHack.push_back(std::make_pair(fullName, fileMetaData.ftLastWriteTime));
                     }
-//####################################### DST hack ###########################################
+                    //####################################### DST hack ###########################################
                     setWin32FileInformation(fileMetaData.ftLastWriteTime, fileMetaData.nFileSizeHigh, fileMetaData.nFileSizeLow, details);
                 }
 
@@ -247,7 +249,8 @@ private:
             return;
         }
 
-        boost::shared_ptr<DIR> dummy(dirObj, &::closedir); //never close NULL handles! -> crash
+        Loki::ScopeGuard dummy = Loki::MakeGuard(::closedir, dirObj); //never close NULL handles! -> crash
+        (void)dummy; //silence warning "unused variable"
 
         while (true)
         {
@@ -266,9 +269,9 @@ private:
 
             //don't return "." and ".."
             const Zchar* const shortName = dirEntry->d_name;
-            if (      shortName[0] == Zstr('.') &&
-                      ((shortName[1] == Zstr('.') && shortName[2] == Zstr('\0')) ||
-                       shortName[1] == Zstr('\0')))
+            if (  shortName[0] == Zstr('.') &&
+                  ((shortName[1] == Zstr('.') && shortName[2] == Zstr('\0')) ||
+                   shortName[1] == Zstr('\0')))
                 continue;
 
             const Zstring& fullName = directory.EndsWith(common::FILE_NAME_SEPARATOR) ? //e.g. "/"
@@ -327,12 +330,12 @@ private:
                 const TraverseCallback::ReturnValDir rv = sink.onDir(shortName, fullName);
                 switch (rv.returnCode)
                 {
-                case TraverseCallback::ReturnValDir::TRAVERSING_DIR_IGNORE:
-                    break;
+                    case TraverseCallback::ReturnValDir::TRAVERSING_DIR_IGNORE:
+                        break;
 
-                case TraverseCallback::ReturnValDir::TRAVERSING_DIR_CONTINUE:
-                    traverse<followSymlinks>(fullName, *rv.subDirCb, level + 1);
-                    break;
+                    case TraverseCallback::ReturnValDir::TRAVERSING_DIR_CONTINUE:
+                        traverse<followSymlinks>(fullName, *rv.subDirCb, level + 1);
+                        break;
                 }
             }
             else //a file... (or symlink; pathological!)
@@ -349,43 +352,66 @@ private:
 
 
 #ifdef FFS_WIN
-//####################################### DST hack ###########################################
+    //####################################### DST hack ###########################################
     void applyDstHack(ffs3::DstHackCallback& dstCallback)
     {
+        int failedAttempts  = 0;
+        int filesToValidate = 50; //don't let data verification become a performance issue
+
         for (FilenameTimeList::const_iterator i = markForDstHack.begin(); i != markForDstHack.end(); ++i)
         {
+            if (failedAttempts >= 10) //some cloud storages don't support changing creation/modification times => don't waste (a lot of) time trying to
+                return;
+
             dstCallback.requestUiRefresh(i->first);
 
-            HANDLE hTarget = ::CreateFile(ffs3::applyLongPathPrefix(i->first).c_str(),
-                                          FILE_WRITE_ATTRIBUTES,
-                                          FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                          NULL,
-                                          OPEN_EXISTING,
-                                          FILE_FLAG_BACKUP_SEMANTICS,
-                                          NULL);
-            if (hTarget == INVALID_HANDLE_VALUE)
-                assert(false); //don't throw exceptions due to dst hack here
-            else
+            const dst::RawTime encodedTime = dst::fatEncodeUtcTime(i->second); //throw (std::runtime_error)
             {
-                boost::shared_ptr<void> dummy2(hTarget, ::CloseHandle);
-
-                const dst::RawTime encodedTime = dst::fatEncodeUtcTime(i->second); //throw (std::runtime_error)
+                HANDLE hTarget = ::CreateFile(ffs3::applyLongPathPrefix(i->first).c_str(),
+                                              FILE_WRITE_ATTRIBUTES,
+                                              FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                              NULL,
+                                              OPEN_EXISTING,
+                                              FILE_FLAG_BACKUP_SEMANTICS,
+                                              NULL);
+                if (hTarget == INVALID_HANDLE_VALUE)
+                {
+                    ++failedAttempts;
+                    assert(false); //don't throw exceptions due to dst hack here
+                    continue;
+                }
+                Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hTarget);
+                (void)dummy; //silence warning "unused variable"
 
                 if (!::SetFileTime(hTarget,
                                    &encodedTime.createTimeRaw,
                                    NULL,
                                    &encodedTime.writeTimeRaw))
+                {
+                    ++failedAttempts;
                     assert(false); //don't throw exceptions due to dst hack here
+                    continue;
+                }
+            }
 
-#ifndef NDEBUG //dst hack: verify data written; attention: this check may fail for "sync.ffs_lock"
+            //even at this point it's not sure whether data was written correctly, again cloud storages tend to lie about success status
+            if (filesToValidate > 0)
+            {
+                --filesToValidate; //don't change during check!
+
+                //dst hack: verify data written; attention: this check may fail for "sync.ffs_lock"
                 WIN32_FILE_ATTRIBUTE_DATA debugeAttr = {};
-                assert(::GetFileAttributesEx(ffs3::applyLongPathPrefix(i->first).c_str(), //__in   LPCTSTR lpFileName,
-                                             GetFileExInfoStandard,                 //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
-                                             &debugeAttr));                         //__out  LPVOID lpFileInformation
+                ::GetFileAttributesEx(ffs3::applyLongPathPrefix(i->first).c_str(), //__in   LPCTSTR lpFileName,
+                                      GetFileExInfoStandard,                //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
+                                      &debugeAttr);                         //__out  LPVOID lpFileInformation
 
-                assert(::CompareFileTime(&debugeAttr.ftCreationTime,  &encodedTime.createTimeRaw) == 0);
-                assert(::CompareFileTime(&debugeAttr.ftLastWriteTime, &encodedTime.writeTimeRaw)  == 0);
-#endif
+                if (::CompareFileTime(&debugeAttr.ftCreationTime,  &encodedTime.createTimeRaw) != 0 ||
+                    ::CompareFileTime(&debugeAttr.ftLastWriteTime, &encodedTime.writeTimeRaw)  != 0)
+                {
+                    ++failedAttempts;
+                    assert(false); //don't throw exceptions due to dst hack here
+                    continue;
+                }
             }
         }
     }
@@ -393,7 +419,7 @@ private:
     const bool isFatFileSystem;
     typedef std::vector<std::pair<Zstring, FILETIME> > FilenameTimeList;
     FilenameTimeList markForDstHack;
-//####################################### DST hack ###########################################
+    //####################################### DST hack ###########################################
 #endif
 };
 

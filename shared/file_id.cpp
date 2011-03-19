@@ -9,7 +9,7 @@
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "long_path_prefix.h"
-#include <boost/shared_ptr.hpp>
+#include "loki/ScopeGuard.h"
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
@@ -33,12 +33,12 @@ std::string util::retrieveFileID(const Zstring& filename)
     std::string fileID;
 
 #ifdef FFS_WIN
-//WARNING: CreateFile() is SLOW, while GetFileInformationByHandle() is cheap!
-//http://msdn.microsoft.com/en-us/library/aa363788(VS.85).aspx
+    //WARNING: CreateFile() is SLOW, while GetFileInformationByHandle() is cheap!
+    //http://msdn.microsoft.com/en-us/library/aa363788(VS.85).aspx
 
 
-	//privilege SE_BACKUP_NAME doesn't seem to be required here at all
-	//note: setting privileges requires admin rights!
+    //privilege SE_BACKUP_NAME doesn't seem to be required here at all
+    //note: setting privileges requires admin rights!
 
     const HANDLE hFile = ::CreateFile(ffs3::applyLongPathPrefix(filename).c_str(),
                                       0,
@@ -49,7 +49,8 @@ std::string util::retrieveFileID(const Zstring& filename)
                                       NULL);
     if (hFile != INVALID_HANDLE_VALUE)
     {
-        boost::shared_ptr<void> dummy(hFile, ::CloseHandle);
+        Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hFile);
+        (void)dummy; //silence warning "unused variable"
 
         BY_HANDLE_FILE_INFORMATION fileInfo = {};
         if (::GetFileInformationByHandle(hFile, &fileInfo))

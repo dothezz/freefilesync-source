@@ -11,6 +11,11 @@
 #include <wx/toplevel.h>
 #include "../library/status_handler.h"
 
+namespace ffs3
+{
+class ErrorLogging;
+}
+
 
 class CompareStatus
 {
@@ -67,7 +72,7 @@ public:
 
     //essential to call one of these two methods in StatusUpdater derived class destructor at the LATEST(!)
     //to prevent access to callback to updater (e.g. request abort)
-    void processHasFinished(SyncStatusID id, const wxString& finalMessage);
+    void processHasFinished(SyncStatusID id, const ffs3::ErrorLogging& log);
     void closeWindowDirectly(); //don't wait for user
 
 private:

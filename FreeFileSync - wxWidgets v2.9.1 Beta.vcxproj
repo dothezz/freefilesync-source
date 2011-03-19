@@ -116,7 +116,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>wxmsw29ud_adv.lib;wxmsw29ud_core.lib;wxbase29ud.lib;wxpngd.lib;wxzlibd.lib;wxbase29ud_net.lib;comctl32.lib;ws2_32.lib;Rpcrt4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw29ud_aui.lib;wxmsw29ud_adv.lib;wxmsw29ud_core.lib;wxbase29ud.lib;wxpngd.lib;wxzlibd.lib;wxbase29ud_net.lib;comctl32.lib;ws2_32.lib;Rpcrt4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Programme\C++\wxWidgets-2.9.1\lib\vc_lib;C:\Program Files\C++\Boost\stage\lib</AdditionalLibraryDirectories>
       <LinkStatus>
       </LinkStatus>
@@ -186,7 +186,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalDependencies>wxmsw29u_adv.lib;wxmsw29u_core.lib;wxbase29u.lib;wxpng.lib;wxzlib.lib;wxbase29u_net.lib;comctl32.lib;ws2_32.lib;winmm.lib;Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wxmsw29u_aui.lib;wxmsw29u_adv.lib;wxmsw29u_core.lib;wxbase29u.lib;wxpng.lib;wxzlib.lib;wxbase29u_net.lib;comctl32.lib;ws2_32.lib;winmm.lib;Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Programme\C++\wxWidgets-2.9.1\lib\vc_lib;C:\Program Files\C++\Boost\stage\lib</AdditionalLibraryDirectories>
       <LinkStatus>
@@ -271,6 +271,7 @@
     <ClCompile Include="shared\help_provider.cpp" />
     <ClCompile Include="shared\localization.cpp" />
     <ClCompile Include="shared\long_path_prefix.cpp" />
+    <ClCompile Include="shared\mouse_move_dlg.cpp" />
     <ClCompile Include="shared\privilege.cpp" />
     <ClCompile Include="shared\recycler.cpp" />
     <ClCompile Include="shared\serialize.cpp" />
@@ -295,7 +296,6 @@
     <ClCompile Include="ui\gui_status_handler.cpp" />
     <ClCompile Include="ui\main_dlg.cpp" />
     <ClCompile Include="ui\msg_popup.cpp" />
-    <ClCompile Include="ui\mouse_move_dlg.cpp" />
     <ClCompile Include="ui\progress_indicator.cpp" />
     <ClCompile Include="ui\search.cpp" />
     <ClCompile Include="ui\small_dlgs.cpp" />

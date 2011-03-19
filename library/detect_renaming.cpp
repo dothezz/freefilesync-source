@@ -126,7 +126,7 @@ void FindDBAssoc::recurse(const DirContainer& leftSide, const DirContainer& righ
         }
     }
 
-//-----------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------
     for (DirContainer::SubDirList::const_iterator i = leftSide.getSubDirs().begin(); i != leftSide.getSubDirs().end(); ++i)
     {
         const DirContainer::SubDirList::const_iterator j = rightSide.getSubDirs().find(i->first);
@@ -172,35 +172,35 @@ private:
     {
         switch (fileObj.getSyncOperation()) //evaluate comparison result and sync direction
         {
-        case SO_CREATE_NEW_LEFT:
-            if (!fileObj.getFileID<RIGHT_SIDE>().isNull())  //fileIdentifier may be NULL
-                createLeft[FindDBAssoc::AssocKey(fileObj.getFileID<RIGHT_SIDE>(),
-                                                 fileObj.getLastWriteTime<RIGHT_SIDE>(),
-                                                 fileObj.getFileSize<RIGHT_SIDE>())] = &fileObj;
-            break;
+            case SO_CREATE_NEW_LEFT:
+                if (!fileObj.getFileID<RIGHT_SIDE>().isNull())  //fileIdentifier may be NULL
+                    createLeft[FindDBAssoc::AssocKey(fileObj.getFileID<RIGHT_SIDE>(),
+                                                     fileObj.getLastWriteTime<RIGHT_SIDE>(),
+                                                     fileObj.getFileSize<RIGHT_SIDE>())] = &fileObj;
+                break;
 
-        case SO_CREATE_NEW_RIGHT:
-            if (!fileObj.getFileID<LEFT_SIDE>().isNull())  //fileIdentifier may be NULL
-                createRight.push_back(&fileObj);
-            break;
+            case SO_CREATE_NEW_RIGHT:
+                if (!fileObj.getFileID<LEFT_SIDE>().isNull())  //fileIdentifier may be NULL
+                    createRight.push_back(&fileObj);
+                break;
 
-        case SO_DELETE_LEFT:
-            if (!fileObj.getFileID<LEFT_SIDE>().isNull())  //fileIdentifier may be NULL
-                deleteLeft.push_back(&fileObj);
-            break;
+            case SO_DELETE_LEFT:
+                if (!fileObj.getFileID<LEFT_SIDE>().isNull())  //fileIdentifier may be NULL
+                    deleteLeft.push_back(&fileObj);
+                break;
 
-        case SO_DELETE_RIGHT:
-            if (!fileObj.getFileID<RIGHT_SIDE>().isNull())  //fileIdentifier may be NULL
-                deleteRight[FindDBAssoc::AssocKey(fileObj.getFileID<RIGHT_SIDE>(),
-                                                  fileObj.getLastWriteTime<RIGHT_SIDE>(),
-                                                  fileObj.getFileSize<RIGHT_SIDE>())] = &fileObj;
-            break;
+            case SO_DELETE_RIGHT:
+                if (!fileObj.getFileID<RIGHT_SIDE>().isNull())  //fileIdentifier may be NULL
+                    deleteRight[FindDBAssoc::AssocKey(fileObj.getFileID<RIGHT_SIDE>(),
+                                                      fileObj.getLastWriteTime<RIGHT_SIDE>(),
+                                                      fileObj.getFileSize<RIGHT_SIDE>())] = &fileObj;
+                break;
 
-        case SO_OVERWRITE_RIGHT:
-        case SO_OVERWRITE_LEFT:
-        case SO_DO_NOTHING:
-        case SO_UNRESOLVED_CONFLICT:
-            break;
+            case SO_OVERWRITE_RIGHT:
+            case SO_OVERWRITE_LEFT:
+            case SO_DO_NOTHING:
+            case SO_UNRESOLVED_CONFLICT:
+                break;
         }
 
     }
@@ -208,11 +208,11 @@ private:
 
     std::vector<FileMapping*> createRight; //pointer always bound!
     std::vector<FileMapping*> deleteLeft;  //
-//         |
-//        \|/
+    //         |
+    //        \|/
     std::map<FindDBAssoc::AssocKey, Utility::FileID> assocDBLeftToRight;
-//         |
-//        \|/
+    //         |
+    //        \|/
     std::map<FindDBAssoc::AssocKey, FileMapping*> deleteRight; //pointer always bound!
     std::map<FindDBAssoc::AssocKey, FileMapping*> createLeft;  //
 
@@ -225,8 +225,8 @@ void FindRenameCandidates::getRenameCandidates(
     std::vector<std::pair<FileMapping*, FileMapping*> >& renameOnRight)
 {
     for (std::vector<FileMapping*>::const_iterator crRightIter = createRight.begin();
-            crRightIter != createRight.end();
-            ++crRightIter)
+         crRightIter != createRight.end();
+         ++crRightIter)
     {
         const FindDBAssoc::AssocKey assocDbKey((*crRightIter)->getFileID<LEFT_SIDE>(),
                                                (*crRightIter)->getLastWriteTime<LEFT_SIDE>(),
@@ -239,8 +239,8 @@ void FindRenameCandidates::getRenameCandidates(
         {
             std::map<FindDBAssoc::AssocKey, FileMapping*>::const_iterator delRightIter =
                 deleteRight.find(FindDBAssoc::AssocKey(assocDBIter->second, //FileID of right side
-                                 assocDbKey.lastWriteTimeRaw_,
-                                 assocDbKey.fileSize_));
+                                                       assocDbKey.lastWriteTimeRaw_,
+                                                       assocDbKey.fileSize_));
 
             if (delRightIter != deleteRight.end())
             {
@@ -250,8 +250,8 @@ void FindRenameCandidates::getRenameCandidates(
     }
     //------------------------------------------------------------------------------------------------
     for (std::vector<FileMapping*>::const_iterator delLeftIter = deleteLeft.begin();
-            delLeftIter != deleteLeft.end();
-            ++delLeftIter)
+         delLeftIter != deleteLeft.end();
+         ++delLeftIter)
     {
         const FindDBAssoc::AssocKey assocDbKey((*delLeftIter)->getFileID<LEFT_SIDE>(),
                                                (*delLeftIter)->getLastWriteTime<LEFT_SIDE>(),
@@ -264,8 +264,8 @@ void FindRenameCandidates::getRenameCandidates(
         {
             std::map<FindDBAssoc::AssocKey, FileMapping*>::const_iterator createLeftIter =
                 createLeft.find(FindDBAssoc::AssocKey(assocDBIter->second, //FileID of right side
-                                assocDbKey.lastWriteTimeRaw_,
-                                assocDbKey.fileSize_));
+                                                      assocDbKey.lastWriteTimeRaw_,
+                                                      assocDbKey.fileSize_));
 
             if (createLeftIter != createLeft.end())
             {

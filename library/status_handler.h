@@ -41,7 +41,7 @@ public:
     StatusHandler() : abortRequested(false) {}
     virtual ~StatusHandler() {}
 
-    //identifiers of different processes
+    //identifiers of different phases
     enum Process
     {
         PROCESS_NONE = 10,
@@ -100,6 +100,5 @@ bool StatusHandler::abortIsRequested()
 {
     return abortRequested;
 }
-
 
 #endif // STATUSHANDLER_H_INCLUDED

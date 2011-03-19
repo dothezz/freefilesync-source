@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20100807;21103000">
+	<META NAME="CHANGED" CONTENT="20110203;19261600">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -35,32 +35,44 @@ some general hints for custom *.cmd and *.bat files.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B>
-A simple locking facility &ndash; (<SPAN STYLE="font-style: normal"><B>Note:</B></SPAN><I>
-FreeFileSync already has a more powerful directory locking mechanism
-implemented that allows multiple writers in parallel</I>)</FONT></P>
+Shutdown PC after synchronization</FONT></P>
 <UL>
-	<P><SPAN ID="Rahmen5" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+	<P><SPAN ID="Rahmen2" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
+		&nbsp;&nbsp;<FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B>::start
+		FreeFileSync Batch
+		Job<BR></B></I></FONT></FONT><FONT FACE="Courier New, monospace">&quot;C:\Users\ZenJu\Desktop\SyncJob.ffs_batch&quot;<BR>&nbsp;&nbsp;</FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B>::schedule
+		shutdown after 10 seconds<BR></B></I></FONT></FONT><FONT FACE="Courier New, monospace">shutdown
+		/s /t 10</FONT></P>
+	</SPAN><BR CLEAR=LEFT>
+	</P>
+</UL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B>
+A simple locking facility &ndash; (<SPAN STYLE="font-style: normal"><B>Note:</B></SPAN>
+<I>FreeFileSync already has a more powerful directory locking
+mechanism implemented that allows multiple writers in parallel</I>)</FONT></P>
+<OL>
+	<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><SPAN ID="Rahmen5" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
 		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
 		<FONT FACE="Courier New, monospace">:tryAgain<BR>if not exist
 		\\share\folder\lock (<BR>&nbsp;&nbsp;</FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B>::create
-		the lock<BR></B></I></FONT></FONT><FONT COLOR="#808080">&nbsp;&nbsp;</FONT><FONT FACE="Courier New, monospace">echo
+		the lock<BR>&nbsp;&nbsp;</B></I></FONT></FONT><FONT FACE="Courier New, monospace">echo
 		This is a lock file &gt; \\share\folder\lock<BR>&nbsp;&nbsp;</FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B>::execute
 		the synchronization batch job synchronously<BR>&nbsp;&nbsp;</B></I></FONT></FONT><FONT FACE="Courier New, monospace">&quot;C:\Program
 		Files\FreeFileSync\FreeFileSync.exe&quot;
 		&quot;C:\MySyncJob.ffs_batch&quot;<BR>&nbsp;&nbsp;del
 		\\share\folder\lock<BR>) else (<BR>&nbsp;&nbsp;</FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B>::wait
-		5 seconds then try starting sync again:<BR></B></I></FONT></FONT><FONT COLOR="#808080">&nbsp;&nbsp;</FONT><FONT FACE="Courier New, monospace">choice
+		5 seconds then try starting sync again:<BR>&nbsp;&nbsp;</B></I></FONT></FONT><FONT FACE="Courier New, monospace">choice
 		/C:AB /T:5 /D:A &gt; NUL<BR>&nbsp;&nbsp;goto tryAgain<BR>)</FONT></P>
-	</SPAN><BR CLEAR=LEFT>
+	</SPAN><BR CLEAR=LEFT><FONT COLOR="#808080">&nbsp;</FONT> 
 	</P>
-</UL>
-<OL>
-	<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT COLOR="#808080">&nbsp;</FONT></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">When
 	starting a batch file from RealtimeSync be sure to make synchronous
 	calls to FreeFileSync only. This will prevent RealtimeSync from
 	detecting changes while synchronization is still in progress.</FONT></P>
-	<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT COLOR="#808080">&nbsp;</FONT></P>
+	<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"></P>
 	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">During
 	execution of a Batch file a black console window is shown. You can
 	hide this window by using the Visual Basic script &quot;Invisible.vbs&quot;
@@ -70,7 +82,7 @@ implemented that allows multiple writers in parallel</I>)</FONT></P>
 		<P ALIGN=LEFT STYLE="margin-left: 0.79cm; margin-right: 0.98cm; margin-bottom: 0cm">
 		<FONT FACE="Courier New, monospace">wscript C:\Program
 		files\FreeFileSync\Invisible.vbs C:\MyBatchFile.cmd</FONT></P>
-	</SPAN><BR CLEAR=LEFT><FONT COLOR="#808080">&nbsp;</FONT> 
+	</SPAN><BR CLEAR=LEFT>
 	</P>
 </OL>
 <OL START=3>
@@ -82,8 +94,8 @@ implemented that allows multiple writers in parallel</I>)</FONT></P>
 		Files\FreeFileSync\FreeFileSync.exe&quot;
 		&quot;H:\Silent_Config.ffs_batch&quot;<BR>if not errorlevel 0
 		(<BR>&nbsp;&nbsp;</FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B>::if
-		something went wrong, add special treatment here<BR></B></I></FONT></FONT><FONT COLOR="#000000">&nbsp;&nbsp;</FONT><FONT COLOR="#000000"><FONT FACE="Courier New, monospace"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">echo
-		Errors occurred during synchronization...</SPAN></SPAN></FONT></FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B><BR></B></I></FONT></FONT>&nbsp;&nbsp;<FONT FACE="Courier New, monospace">pause<BR>)</FONT></P>
+		something went wrong, add special treatment here<BR>&nbsp;&nbsp;</B></I></FONT></FONT><FONT COLOR="#000000"><FONT FACE="Courier New, monospace"><SPAN STYLE="font-style: normal"><SPAN STYLE="font-weight: normal">echo
+		Errors occurred during synchronization...</SPAN></SPAN></FONT></FONT><FONT COLOR="#808080"><FONT FACE="Courier New, monospace"><I><B><BR>&nbsp;&nbsp;</B></I></FONT></FONT><FONT FACE="Courier New, monospace">pause<BR>)</FONT></P>
 	</SPAN><BR CLEAR=LEFT>
 	</P>
 </OL>

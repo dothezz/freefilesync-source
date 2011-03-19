@@ -16,7 +16,7 @@ namespace ffs3
 inline
 bool isNullFilter(const FilterConfig& filterCfg)
 {
-     return NameFilter(filterCfg.includeFilter, filterCfg.excludeFilter).isNull();
+    return NameFilter(filterCfg.includeFilter, filterCfg.excludeFilter).isNull();
 }
 
 }

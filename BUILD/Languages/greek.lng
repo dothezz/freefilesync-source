@@ -13,17 +13,17 @@
 %x TB
 %x TB
 %x day(s)
-%x ημέρα/ημέρες
+%x ημέρα/ες
 %x directories
 %x υποκατάλογοι
 %x files
 %x αρχεία
 %x hour(s)
-%x ώρα/ώρες
+%x ώρα/ες
 %x kB
 %x kB
 %x min
-%x λεπτό/λεπτά
+%x λεπτό/ά
 %x of %y rows in view
 %x από τις %y φανερές γραμμές
 %x of 1 row in view
@@ -154,6 +154,10 @@
 <Συμβολικός δεσμός>
 <multiple selection>
 <πολλαπλή επιλογή>
+A directory input field is empty.
+Ένα πεδίο εισόδου είναι κενό.
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+Θα τροποποιηθεί ένας υποκατάλογος που ανήκει σε πολλαπλά ζεύγη υποκαταλόγων! Παρακαλώ αναθεωρείστε τις ρυθμίσεις συγχρονισμού.
 A newer version of FreeFileSync is available:
 Μια νεότερη έκδοση του FreeFileSync είναι διαθέσιμη:
 Abort requested: Waiting for current operation to finish...
@@ -370,6 +374,8 @@ Encoding extended time information: %x
 Κωδικοποίηση εκτεταμένων πληροφοριών για την ώρα: %x
 Endless loop when traversing directory:
 Ατέρμονος βρόχος κατά την την ανάλυση του υποκαταλόγου: 
+Equal files/folders that differ in attributes only
+Ίδια αρχεία/υποκατάλογοι που διαφέρουν μόνο στα χαρακτηριστικά αρχείου
 Error
 Σφάλμα
 Error changing modification time:
@@ -476,8 +482,6 @@ Files that exist on both sides, right one is newer
 Αρχεία που υπάρχουν και στις δυο πλευρές, δεξιά είναι πιο πρόσφατα
 Files that have different content
 Αρχεία που έχουν διαφορετικό περιεχόμενο
-Files/folders that differ in attributes only
-Αρχεία/υποκατάλογοι που διαφέρουν μόνο στα χαρακτηριστικά αρχείου
 Files/folders that exist on left side only
 Αρχεία/υποκατάλογοι που υπάρχουν μόνο στα αριστερά
 Files/folders that exist on right side only
@@ -488,8 +492,6 @@ Filter is active
 Το φίλτρο είναι ενεργό
 Filter settings have changed!
 Οι ρυθμίσεις φίλτρου έχουν αλλάξει!
-Filter view
-Επιλογή εμφάνισης
 Filter: All pairs
 Φίλτρο: Όλα τα ζεύγη
 Filter: Single pair
@@ -505,7 +507,9 @@ Folder pairs
 Follow
 Ως περιεχόμενο
 Free disk space available:
-Espace disque disponible :
+Διαθέσιμος ελεύθερος χώρος δίσκου:
+Free disk space required:
+Απαιτούμενος ελεύθερος χώρος δίσκου:
 FreeFileSync Batch Job
 FreeFileSync Δέσμη Ενεργειών
 FreeFileSync at Sourceforge
@@ -600,6 +604,8 @@ Integrate external applications into context menu. The following macros are avai
 Ένταξη εξωτερικών εφαρμογών στο μενού περιβάλλοντος. Οι ακόλουθες μακροεντολές είναι διαθέσιμες:
 Invalid FreeFileSync config file!
 Μη έγκυρο αρχείο διάταξης του FreeFileSync!
+Last used configurations (press DEL to remove from list)
+Διατάξεις που χρησιμοποιήθηκαν τελευταία (πατήστε DEL για διαγραφή από τη λίστα)
 Leave as unresolved conflict
 Παράβλεψη ως ανεπίλυτη διένεξη
 Left
@@ -608,8 +614,6 @@ Legend
 Εξήγηση των συμβόλων για κάθε κατηγορία
 Load configuration from file
 Άνοιγμα διάταξης από αρχείο
-Load configuration history (press DEL to delete items)
-Άνοιγμα του ιστορικού των διατάξεων (πατήστε DEL για να σβήσετε καταχωρήσεις)
 Log-messages:
 Αποθηκευμένα μηνύματα:
 Logging
@@ -620,12 +624,16 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Δεν είναι δυνατή η δημιουργία σκιώδους αντίγραφου σε WOW64. Χρησιμοποιείστε την 64-bit έκδοση του FreeFileSync.
 Match case
 Αντιστοίχιση πεζών-κεφαλαίων
+Maximum number of logfiles:
+Μέγιστος αριθμός αρχείων καταγραφής:
+Memory allocation failed!
+Η δέσμευση χώρου μνήμης απέτυχε!
 Minimum Idle Time [seconds]
 Ελάχιστος Χρόνος Αναμονής [δευτερόλεπτα]
 Mirror ->>
 Κατοπτρισμός ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Κατοπτρικό αντίγραφο του αριστερού υποκαταλόγου: Ο υποκατάλογος δεξιά θα αντικατασταθεί και θα αντιστοιχεί εξολοκλήρου στον αριστερό μετά το συγχρονισμό.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+Κατοπτρικό αντίγραφο του αριστερού υποκαταλόγου. Ο υποκατάλογος δεξιά θα τροποποιηθεί και θα αντιστοιχεί εξολοκλήρου στον αριστερό μετά το συγχρονισμό
 Monitoring active...
 Ενεργή παρακολούθηση...
 More than 50% of the total number of files will be copied or deleted!
@@ -696,8 +704,6 @@ Published under the GNU General Public License:
 Διανέμεται υπό την Γενική Άδεια Δημόσιας Χρήσης GNU:
 Question
 Ερώτηση
-Re-enable all hidden dialogs?
-Επανεμφάνιση όλων των κρυμμένων παραθύρων διαλόγου;
 RealtimeSync - Automated Synchronization
 RealtimeSync - Αυτοματοποιημένος Συγχρονισμός
 RealtimeSync configuration
@@ -718,6 +724,8 @@ Reset
 Επανεμφάνιση
 Reset view
 Επαναφορά αρχικής εμφάνισης
+Restore all hidden dialogs?
+Επανεμφάνιση των κρυμμένων παραθύρων διαλόγου;
 Right
 Δεξιά
 S&ave configuration...
@@ -740,6 +748,8 @@ Select logfile directory:
 Επιλέξτε έναν κατάλογο για το αρχείο καταγραφής:
 Select variant:
 Επιλέξτε μια μέθοδο:
+Select view
+Επιλογή εμφάνισης
 Set direction:
 Επιλογή κατεύθυνσης:
 Setting default synchronization directions: Old files will be overwritten with newer files.
@@ -828,8 +838,6 @@ Synchronize...
 Συγχρονισμός...
 Synchronizing...
 Γίνεται συγχρονισμός...
-System out of memory!
-Ανεπαρκής μνήμη συστήματος!
 Target directory already existing!
 Ο υποκατάλογος προορισμού υπάρχει ήδη!
 Target file already existing!
@@ -845,13 +853,11 @@ This variant evaluates two equally named files as being equal when they have the
 Time
 Ώρα
 Time elapsed:
-Χρόνος που πέρασε:
+Πέρασε χρόνος:
 Time remaining:
-Χρόνος που απομένει:
+Απομένει χρόνος:
 Total amount of data that will be transferred
 Συνολικός όγκος δεδομένων που θα μεταφερθούν
-Total required free disk space:
-Συνολικός απαιτούμενος χώρος στο δίσκο:
 Total time:
 Συνολική διάρκεια:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -872,14 +878,14 @@ Use Recycle Bin
 Χρήση του Κάδου Ανακύκλωσης
 Use Recycle Bin when deleting or overwriting files
 Χρήση του Κάδου Ανακύκλωσης κατά τη διαγραφή ή αντικατάσταση αρχείων
-User-defined directory
-Υποκατάλογος που ορίζεται από το χρήστη
 User-defined directory for deletion was not specified!
 Δεν ορίστηκε από τον χρήστη υποκατάλογος για τα αρχεία προς διαγραφή!
 Variant
 Μέθοδος
 Verifying file %x
 Επικύρωση του αρχείου %x
+Versioning
+Διατήρηση παλιών εκδόσεων
 Volume name %x not part of filename %y!
 Το όνομα τόμου %x δεν είναι μέρος του ονόματος του αρχείου %y!
 Waiting for missing directories...
@@ -888,14 +894,12 @@ Waiting while directory is locked (%x)...
 Αναμονή μέχρι να κλειδωθεί ο υποκατάλογος (%x)...
 Warning
 Προσοχή
-Warning: Synchronization failed for %x item(s):
-Προσοχή: Ο συγχρονισμός απέτυχε σε %x στοιχείο/στοιχεία:
 When the comparison is started with this option set the following decision tree is processed:
 Εάν γίνει σύγκριση με αυτήν την επιλογή, ακολουθείται το παρακάτω δένδρο απόφασης:
 You can ignore conflicts and continue synchronization.
 Μπορείτε να αγνοήσετε τις διενέξεις και να συνεχίσετε το συγχρονισμό.
-You can ignore the error to consider not existing directories as empty.
-Μπορείτε να αγνοήσετε το σφάλμα, θεωρώντας ότι ο υποκατάλογος που δεν υπάρχει είναι κενός.
+You can ignore this error to consider the directory as empty.
+Μπορείτε να αγνοήσετε αυτό το σφάλμα και να θεωρήσετε τον υποκατάλογο κενό.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Μπορείτε να προσπαθήσετε να συγχρονίσετε τα υπόλοιπα στοιχεία (ΧΩΡΙΣ να χρειάζεται να τα ξανασυγκρίνετε)!
 different

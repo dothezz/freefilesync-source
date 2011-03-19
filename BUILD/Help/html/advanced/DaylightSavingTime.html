@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091208;20054200">
-	<META NAME="CHANGED" CONTENT="20101219;15552100">
+	<META NAME="CHANGED" CONTENT="20110301;19000400">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -61,6 +61,20 @@ creation date that enables a correct file time calculation. This not
 only solves all DST issues but also time shifts that occur due to
 travel between different time zones.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-left: 1.46cm; margin-bottom: 0cm"><SPAN ID="Rahmen3" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: 1px solid #000080; padding: 0.05cm; background: #ccccff">
+	<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Note:</B></FONT></P>
+	<UL>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">In
+		order for FreeFileSync to start handling DST and timezone
+		differences, an initial full synchronization is required.
+		Subsequent syncs will never show a time difference again.</FONT></P>
+		<LI><P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">If
+		a FAT volume is scanned the first time by FreeFileSync this will
+		take longer than usual since additional meta data is written for
+		each file.</FONT></P>
+	</UL>
+</SPAN><BR CLEAR=LEFT><BR>
 </P>
 </BODY>
 </HTML>

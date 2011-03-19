@@ -27,9 +27,9 @@ wxIcon generateIcon(size_t percent) //generate icon with progress indicator
     percent = std::min(percent, static_cast<size_t>(100)); //handle invalid input
 
 #ifdef FFS_WIN
-    static const wxBitmap trayIcon = GlobalResources::getInstance().getImageByName(wxT("FFS_tray_win.png"));
+    static const wxBitmap trayIcon = GlobalResources::instance().getImage(wxT("FFS_tray_win.png"));
 #elif defined FFS_LINUX
-    static const wxBitmap trayIcon = GlobalResources::getInstance().getImageByName(wxT("FFS_tray_linux.png"));
+    static const wxBitmap trayIcon = GlobalResources::instance().getImage(wxT("FFS_tray_linux.png"));
 #endif
 
     const int indicatorHeight = roundNum((trayIcon.GetHeight() * percent) / 100.0);
@@ -41,8 +41,8 @@ wxIcon generateIcon(size_t percent) //generate icon with progress indicator
 
     wxImage genImage(trayIcon.ConvertToImage());
 
-    if (    genImage.GetWidth()  > 0 &&
-            genImage.GetHeight() > 0)
+    if (genImage.GetWidth()  > 0 &&
+        genImage.GetHeight() > 0)
     {
         const int indicatorWidth  = genImage.GetWidth() * .4;
         const int indicatorXBegin = std::ceil((genImage.GetWidth() - indicatorWidth) / 2.0);
@@ -131,7 +131,7 @@ private:
 };
 
 
-MinimizeToTray::MinimizeToTray(wxTopLevelWindow* callerWnd, wxWindow* secondWnd) :
+MinimizeToTray::MinimizeToTray(wxTopLevelWindow* callerWnd, wxTopLevelWindow* secondWnd) :
     callerWnd_(callerWnd),
     secondWnd_(secondWnd),
     trayIcon(new TaskBarImpl(this))
@@ -157,7 +157,10 @@ void MinimizeToTray::resumeFromTray() //remove trayIcon and restore windows:  Mi
     if (trayIcon)
     {
         if (secondWnd_)
+        {
+            secondWnd_->Iconize(false);
             secondWnd_->Show();
+        }
 
         if (callerWnd_) //usecase: avoid dialog flashing in batch silent mode
         {
@@ -198,11 +201,11 @@ void MinimizeToTray::OnContextMenuSelection(wxCommandEvent& event)
     const Selection eventId = static_cast<Selection>(event.GetId());
     switch (eventId)
     {
-    case CONTEXT_ABOUT:
-        ffs3::showAboutDialog();
-        break;
-    case CONTEXT_RESTORE:
-        resumeFromTray();
+        case CONTEXT_ABOUT:
+            ffs3::showAboutDialog();
+            break;
+        case CONTEXT_RESTORE:
+            resumeFromTray();
     }
 }
 

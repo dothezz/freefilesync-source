@@ -154,6 +154,10 @@ Na&loži konfiguracijo...
 <Simbolična povezava>
 <multiple selection>
 <mnogokratna izbira>
+A directory input field is empty.
+Vpisno polje za imenik je prazno.
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+Imenik bo spremenjen, kar je del večkratnih parov map! Prosimo preglejte nastavitve sinhronizacije!
 A newer version of FreeFileSync is available:
 Na voljo je nova različica FreeFileSync:
 Abort requested: Waiting for current operation to finish...
@@ -370,6 +374,8 @@ Encoding extended time information: %x
 Podrobne informacije o času enkodiranja: %x
 Endless loop when traversing directory:
 Neskončna zanka pri prehodu imenika:
+Equal files/folders that differ in attributes only
+Enake datoteke/mape, ki se razlikujejo samo v atributih
 Error
 Napaka
 Error changing modification time:
@@ -476,8 +482,6 @@ Files that exist on both sides, right one is newer
 Datoteke, ki obstajajo na obeh straneh, desna je novejša
 Files that have different content
 Datoteke, ki imajo različno vsebino
-Files/folders that differ in attributes only
-Datoteke/mape, ki se razlikujejo samo v atributih
 Files/folders that exist on left side only
 Datoteke/mape, ki obstajajo samo na levi strani
 Files/folders that exist on right side only
@@ -488,8 +492,6 @@ Filter is active
 Filterj je aktiven
 Filter settings have changed!
 Nastavitve filtra so bile spremenjene!
-Filter view
-Filtriran pogled
 Filter: All pairs
 Filtriraj: Vse pare
 Filter: Single pair
@@ -506,6 +508,8 @@ Follow
 Sledi
 Free disk space available:
 Prosti disk, ki je na voljo:
+Free disk space required:
+Potreben prostor na disku:
 FreeFileSync Batch Job
 FreeFileSync Batch opravilo
 FreeFileSync at Sourceforge
@@ -600,6 +604,8 @@ Integrate external applications into context menu. The following macros are avai
 Integriraj zunanje aplikacije v kontekstni menu. Na voljo so naslednji makri:
 Invalid FreeFileSync config file!
 Neveljavna FreeFileSync nastavitvena datoteka!
+Last used configurations (press DEL to remove from list)
+Zadnje uporabljene konfiguracije (pritisite DEL za odstranitev s seznama)
 Leave as unresolved conflict
 Pusti kot nerešeni spor
 Left
@@ -608,8 +614,6 @@ Legend
 Legenda
 Load configuration from file
 Naloži konfiguracijo iz datoteke
-Load configuration history (press DEL to delete items)
-Naloži zgodovino konfiguracije (pritisnite DEL za brisanje predmetov)
 Log-messages:
 Sporočila beleženja:
 Logging
@@ -620,12 +624,16 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Ustvarjanje senčnih kopij na WOW63 ni podprto. Prosimo uporabite 64-bitno FreeFileSync različico.
 Match case
 Ujemaj se s primerom
+Maximum number of logfiles:
+Maksimalno število datotek beleženja:
+Memory allocation failed!
+Neuspešno dodeljevanje pomnilnika!
 Minimum Idle Time [seconds]
 Minimalen čas nedejavnosti [sekunde]
 Mirror ->>
 Zrcalno ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Zrcalna kopija leve mape: Desna mapa bo prepisana in se bo natančno ujemala z levo mapo po sinhronizaciji.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+Zrcalna varnostna kopija leve mape. Desna mapa bo spremenjena, da se bo natančno ujemala z levo mapo po sinhronizaciji.
 Monitoring active...
 Nadziranje aktivno...
 More than 50% of the total number of files will be copied or deleted!
@@ -696,8 +704,6 @@ Published under the GNU General Public License:
 Objavljeno pod licenco GNU General Public:
 Question
 Vprašanje
-Re-enable all hidden dialogs?
-Ponovno omogočim skrite pogovore?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Avtomatizirana sinhronizacija
 RealtimeSync configuration
@@ -718,6 +724,8 @@ Reset
 Ponastavi
 Reset view
 Ponastavi pogled
+Restore all hidden dialogs?
+Obnovim vse skrite pogovore?
 Right
 Desno
 S&ave configuration...
@@ -740,6 +748,8 @@ Select logfile directory:
 Izberite imenik za datoteko beleženja:
 Select variant:
 Izberite varianto:
+Select view
+Izberite pogled
 Set direction:
 Nastavi smer:
 Setting default synchronization directions: Old files will be overwritten with newer files.
@@ -828,8 +838,6 @@ Synchronize...
 Sinhroniziraj...
 Synchronizing...
 Sinhroniziram...
-System out of memory!
-Sistemu je zmanjkalo pomnilnika!
 Target directory already existing!
 Ciljni imenik že obstaja!
 Target file already existing!
@@ -850,8 +858,6 @@ Time remaining:
 Preostali čas:
 Total amount of data that will be transferred
 Količina podatkov, ki bo prenešena
-Total required free disk space:
-Skupno zahtevani prosti prostor na disku:
 Total time:
 Celoten čas:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -872,14 +878,14 @@ Use Recycle Bin
 Uporabi Koš
 Use Recycle Bin when deleting or overwriting files
 Uporabi Koš pri brisanju ali prepisovanju datotek
-User-defined directory
-Uporabniško-določen imenik
 User-defined directory for deletion was not specified!
 Uporabniško-določen imenik za brisanje ni bil naveden!
 Variant
 Različica
 Verifying file %x
 Preverjam datoteko %x
+Versioning
+Ustvarjanje različič
 Volume name %x not part of filename %y!
 Ime volumna %x ni del imena datoteke %y!
 Waiting for missing directories...
@@ -888,14 +894,12 @@ Waiting while directory is locked (%x)...
 Čakam, medtem ko se zaklepa imenik (%x)...
 Warning
 Pozor
-Warning: Synchronization failed for %x item(s):
-Pozor: Sinhronizacija ni uspela za %x predmetov:
 When the comparison is started with this option set the following decision tree is processed:
 Ko se primerjava zažene s tem setom možnosti, se obdela naslednje drevo odločitev:
 You can ignore conflicts and continue synchronization.
 Lahko ignorirate spore in nadaljujete s sinhronizacijo.
-You can ignore the error to consider not existing directories as empty.
-Ignoriraj napako za smatranje neobstoječih imenikov kot praznih.
+You can ignore this error to consider the directory as empty.
+To napako z obravnavanjem imenika kot praznega lahko ignorirate.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Naslednje predmete lahko ponovno poskusite sinhronizirati (BREZ ponovne primerjave) !
 different

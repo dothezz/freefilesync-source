@@ -7,12 +7,12 @@
 //     for You" by Alexandrescu, Andrei.
 //     Published in the February 2001 issue of the C/C++ Users Journal.
 //     http://www.cuj.com/documents/s=7998/cujcexp1902alexandr/
-// Permission to use, copy, modify, distribute and sell this software for any 
-//     purpose is hereby granted without fee, provided that the above copyright 
-//     notice appear in all copies and that both that copyright notice and this 
+// Permission to use, copy, modify, distribute and sell this software for any
+//     purpose is hereby granted without fee, provided that the above copyright
+//     notice appear in all copies and that both that copyright notice and this
 //     permission notice appear in supporting documentation.
-// The author makes no representations about the 
-//     suitability of this software for any purpose. It is provided "as is" 
+// The author makes no representations about the
+//     suitability of this software for any purpose. It is provided "as is"
 //     without express or implied warranty.
 // Prepared for Loki library by Richard Sposato
 ////////////////////////////////////////////////////////////////////////////////
@@ -28,81 +28,81 @@
 
 namespace Loki
 {
-    /** @class LockingPtr
-     Locks a volatile object and casts away volatility so that the object
-     can be safely used in a single-threaded region of code.
-     Original version of LockingPtr had only one template - for the shared
-     object, but not the mutex type.  This version allows users to specify a
-     the mutex type as a LockingPolicy class.  The only requirements for a
-     LockingPolicy class are to provide Lock and Unlock methods.
+/** @class LockingPtr
+ Locks a volatile object and casts away volatility so that the object
+ can be safely used in a single-threaded region of code.
+ Original version of LockingPtr had only one template - for the shared
+ object, but not the mutex type.  This version allows users to specify a
+ the mutex type as a LockingPolicy class.  The only requirements for a
+ LockingPolicy class are to provide Lock and Unlock methods.
+ */
+template < typename SharedObject, typename LockingPolicy = LOKI_DEFAULT_MUTEX,
+         template<class> class ConstPolicy = LOKI_DEFAULT_CONSTNESS >
+class LockingPtr
+{
+public:
+
+    typedef typename ConstPolicy<SharedObject>::Type ConstOrNotType;
+
+    /** Constructor locks mutex associated with an object.
+     @param object Reference to object.
+     @param mutex Mutex used to control thread access to object.
      */
-    template < typename SharedObject, typename LockingPolicy = LOKI_DEFAULT_MUTEX, 
-               template<class> class ConstPolicy = LOKI_DEFAULT_CONSTNESS >
-    class LockingPtr
+    LockingPtr( volatile ConstOrNotType& object, LockingPolicy& mutex )
+        : pObject_( const_cast< SharedObject* >( &object ) ),
+          pMutex_( &mutex )
     {
-    public:
+        mutex.Lock();
+    }
 
-        typedef typename ConstPolicy<SharedObject>::Type ConstOrNotType;
+    typedef typename std::pair<volatile ConstOrNotType*, LockingPolicy*> Pair;
 
-        /** Constructor locks mutex associated with an object.
-         @param object Reference to object.
-         @param mutex Mutex used to control thread access to object.
-         */
-        LockingPtr( volatile ConstOrNotType & object, LockingPolicy & mutex )
-           : pObject_( const_cast< SharedObject * >( &object ) ),
-            pMutex_( &mutex )
-        {
-            mutex.Lock();
-        }
+    /** Constructor locks mutex associated with an object.
+     @param lockpair a std::pair of pointers to the object and the mutex
+     */
+    LockingPtr( Pair lockpair )
+        : pObject_( const_cast< SharedObject* >( lockpair.first ) ),
+          pMutex_( lockpair.second )
+    {
+        lockpair.second->Lock();
+    }
 
-        typedef typename std::pair<volatile ConstOrNotType *, LockingPolicy *> Pair;
+    /// Destructor unlocks the mutex.
+    ~LockingPtr()
+    {
+        pMutex_->Unlock();
+    }
 
-        /** Constructor locks mutex associated with an object.
-         @param lockpair a std::pair of pointers to the object and the mutex
-         */
-        LockingPtr( Pair lockpair )
-           : pObject_( const_cast< SharedObject * >( lockpair.first ) ),
-            pMutex_( lockpair.second )
-        {
-            lockpair.second->Lock();
-        }
+    /// Star-operator dereferences pointer.
+    ConstOrNotType& operator * ()
+    {
+        return *pObject_;
+    }
 
-        /// Destructor unlocks the mutex.
-        ~LockingPtr()
-        {
-            pMutex_->Unlock();
-        }
+    /// Point-operator returns pointer to object.
+    ConstOrNotType* operator -> ()
+    {
+        return pObject_;
+    }
 
-        /// Star-operator dereferences pointer.
-        ConstOrNotType & operator * ()
-        {
-            return *pObject_;
-        }
+private:
 
-        /// Point-operator returns pointer to object.
-        ConstOrNotType * operator -> ()
-        {
-            return pObject_;
-        }
+    /// Default constructor is not implemented.
+    LockingPtr();
 
-    private:
+    /// Copy-constructor is not implemented.
+    LockingPtr( const LockingPtr& );
 
-        /// Default constructor is not implemented.
-        LockingPtr();
+    /// Copy-assignment-operator is not implemented.
+    LockingPtr& operator = ( const LockingPtr& );
 
-        /// Copy-constructor is not implemented.
-        LockingPtr( const LockingPtr & );
+    /// Pointer to the shared object.
+    ConstOrNotType* pObject_;
 
-        /// Copy-assignment-operator is not implemented.
-        LockingPtr & operator = ( const LockingPtr & );
+    /// Pointer to the mutex.
+    LockingPolicy* pMutex_;
 
-        /// Pointer to the shared object.
-        ConstOrNotType * pObject_;
-
-        /// Pointer to the mutex.
-        LockingPolicy * pMutex_;
-
-    }; // end class LockingPtr
+}; // end class LockingPtr
 
 } // namespace Loki
 

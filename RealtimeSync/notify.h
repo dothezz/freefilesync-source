@@ -8,7 +8,7 @@
 #define NOTIFY_H_INCLUDED
 
 #ifndef FFS_WIN
-use in windows build only
+#error use in windows build only
 #endif
 
 #include <wx/msw/wrapwin.h> //includes "windows.h"

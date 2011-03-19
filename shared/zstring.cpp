@@ -31,8 +31,8 @@ LeakChecker::~LeakChecker()
         std::string leakingStrings;
 
         for (VoidPtrSizeMap::const_iterator i = activeStrings.begin();
-                i != activeStrings.end() && ++rowCount <= 20;
-                ++i)
+             i != activeStrings.end() && ++rowCount <= 20;
+             ++i)
             leakingStrings += "\"" + rawMemToString(i->first, i->second) + "\"\n";
 
         const std::string message = std::string("Memory leak detected!") + "\n\n"
@@ -130,8 +130,8 @@ int z_impl::compareFilenamesWin(const wchar_t* a, const wchar_t* b, size_t sizeA
     }
     else //fallback
     {
-//do NOT use "CompareString"; this function is NOT accurate (even with LOCALE_INVARIANT and SORT_STRINGSORT): for example "weiß" == "weiss"!!!
-//the only reliable way to compare filenames (with XP) is to call "CharUpper" or "LCMapString":
+        //do NOT use "CompareString"; this function is NOT accurate (even with LOCALE_INVARIANT and SORT_STRINGSORT): for example "weiß" == "weiss"!!!
+        //the only reliable way to compare filenames (with XP) is to call "CharUpper" or "LCMapString":
 
         const size_t minSize = std::min(sizeA, sizeB);
 
@@ -145,13 +145,13 @@ int z_impl::compareFilenamesWin(const wchar_t* a, const wchar_t* b, size_t sizeA
             wchar_t bufferB[5000];
 
             if (::LCMapString(   //faster than CharUpperBuff + wmemcpy or CharUpper + wmemcpy and same speed like ::CompareString()
-                        ZSTRING_INVARIANT_LOCALE, //__in   LCID Locale,
-                        LCMAP_UPPERCASE,  //__in   DWORD dwMapFlags,
-                        a,                //__in   LPCTSTR lpSrcStr,
-                        static_cast<int>(minSize), //__in   int cchSrc,
-                        bufferA,          //__out  LPTSTR lpDestStr,
-                        5000              //__in   int cchDest
-                    ) == 0)
+                    ZSTRING_INVARIANT_LOCALE, //__in   LCID Locale,
+                    LCMAP_UPPERCASE,  //__in   DWORD dwMapFlags,
+                    a,                //__in   LPCTSTR lpSrcStr,
+                    static_cast<int>(minSize), //__in   int cchSrc,
+                    bufferA,          //__out  LPTSTR lpDestStr,
+                    5000              //__in   int cchDest
+                ) == 0)
                 throw std::runtime_error("Error comparing strings! (LCMapString)");
 
             if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, b, static_cast<int>(minSize), bufferB, 5000) == 0)
@@ -178,18 +178,18 @@ int z_impl::compareFilenamesWin(const wchar_t* a, const wchar_t* b, size_t sizeA
                rv;
     }
 
-//        const int rv = CompareString(
-//                           invariantLocale,    //locale independent
-//                           NORM_IGNORECASE | SORT_STRINGSORT, //comparison-style options
-//                           a,  	                //pointer to first string
-//                           aCount,	            //size, in bytes or characters, of first string
-//                           b,	                //pointer to second string
-//                           bCount); 	        //size, in bytes or characters, of second string
-//
-//        if (rv == 0)
-//            throw std::runtime_error("Error comparing strings!");
-//        else
-//            return rv - 2; //convert to C-style string compare result
+    //        const int rv = CompareString(
+    //                           invariantLocale,    //locale independent
+    //                           NORM_IGNORECASE | SORT_STRINGSORT, //comparison-style options
+    //                           a,  	                //pointer to first string
+    //                           aCount,	            //size, in bytes or characters, of first string
+    //                           b,	                //pointer to second string
+    //                           bCount); 	        //size, in bytes or characters, of second string
+    //
+    //        if (rv == 0)
+    //            throw std::runtime_error("Error comparing strings!");
+    //        else
+    //            return rv - 2; //convert to C-style string compare result
 }
 
 

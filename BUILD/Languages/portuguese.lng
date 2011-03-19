@@ -3,7 +3,7 @@
 %x / %y objects deleted successfully
 %x / %y objectos eliminados com sucesso
 %x Bytes
-
+%x Bytes
 %x GB
 %x GB
 %x MB
@@ -154,6 +154,10 @@
 <Link Simbólico>
 <multiple selection>
 <Selecção Múltipla>
+A directory input field is empty.
+Um campo de directório está vazio.
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+Um directório que pertencente a conjunto de vários directórios vai ser alterado! Por favor, verifique as opções de sincronização!
 A newer version of FreeFileSync is available:
 Mais recente versão do FreeFileSync disponível:
 Abort requested: Waiting for current operation to finish...
@@ -257,9 +261,9 @@ Continuar
 Conversion error:
 Erro de conversão:
 Copy attributes only from left to right
-
+Copiar atributos apenas da esquerda para a direita
 Copy attributes only from right to left
-
+Copiar atributos apenas da direita para a esquerda
 Copy filesystem permissions
 Copiar permissões do sistema de ficheiros
 Copy from left to right
@@ -359,7 +363,7 @@ Fazer download agora?
 Drag && drop
 Pegar && largar
 Elements found:
-ELementos encontrados:
+Elementos encontrados:
 Elements processed:
 Elementos processados:
 Elements remaining:
@@ -370,6 +374,8 @@ Encoding extended time information: %x
 A codificar dados temporais extendidos: %x
 Endless loop when traversing directory:
 Loop infinito ao percorrer directório:
+Equal files/folders that differ in attributes only
+Ficheiros/Pastas iguais que diferem apenas nos atributos
 Error
 Erro
 Error changing modification time:
@@ -476,8 +482,6 @@ Files that exist on both sides, right one is newer
 Ficheiros existentes dos dois lados, à direita é mais recente
 Files that have different content
 Ficheiros com conteúdo diferente
-Files/folders that differ in attributes only
-
 Files/folders that exist on left side only
 Ficheiros/pastas existentes somente à esquerda
 Files/folders that exist on right side only
@@ -488,8 +492,6 @@ Filter is active
 Filtro activo
 Filter settings have changed!
 Opções de filtro alteradas!
-Filter view
-Filtrar vista
 Filter: All pairs
 Filtro: Todos os pares
 Filter: Single pair
@@ -501,11 +503,13 @@ Procurar:
 Folder Comparison and Synchronization
 Comparação e Sincronização de pastas
 Folder pairs
-
+Par de directório
 Follow
 Seguir
 Free disk space available:
 Espaço livre em disco:
+Free disk space required:
+Espaço livre necessário em disco:
 FreeFileSync Batch Job
 FreeFileSync Ficheiro batch
 FreeFileSync at Sourceforge
@@ -600,6 +604,8 @@ Integrate external applications into context menu. The following macros are avai
 Integrar aplicações externas no menu de contexto. As seguintes macros estão disponíveis:
 Invalid FreeFileSync config file!
 Ficheiro de configuração do FreeFileSync inválido!
+Last used configurations (press DEL to remove from list)
+Última configuração utilizada (pressione DEL para remover da lista)
 Leave as unresolved conflict
 Deixar como conflito
 Left
@@ -608,24 +614,26 @@ Legend
 Legenda
 Load configuration from file
 Carregar configuração do ficheiro
-Load configuration history (press DEL to delete items)
-Carregar histórico de configuração (pressione DEL para apagar itens)
 Log-messages:
 Log de mensagens:
 Logging
 A escrever em log
 Main bar
-
+Barra principal
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
 Fazer cópias fantasma em WOW64 não é suportado. Por favor usar a versão 64-bit.
 Match case
 Correspondência
+Maximum number of logfiles:
+Número máximo de ficheiros log:
+Memory allocation failed!
+Alocação de memória falhou!
 Minimum Idle Time [seconds]
-
+Tempo de espera [segundos]
 Mirror ->>
 Espelhar ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Espelhar pasta da esquerda: A pasta da direita vai ser sobreposta e uma cópia exacta da pasta esquerda após sincronização.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+Cópia de segurança do directório à esquerda. O directório da direita é alterado para ficar igual ao da esquerda após sincronização.
 Monitoring active...
 Monitorizar activo...
 More than 50% of the total number of files will be copied or deleted!
@@ -696,8 +704,6 @@ Published under the GNU General Public License:
 Publicado sobre GNU General Public License:
 Question
 Questão
-Re-enable all hidden dialogs?
-Reactivar todos os diálogos ocultos?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Sincronização Automática
 RealtimeSync configuration
@@ -717,7 +723,9 @@ Informar um erro de tradução
 Reset
 Reiniciar
 Reset view
-
+Restaurar vista
+Restore all hidden dialogs?
+Restaurar os diálogos escondidos?
 Right
 Direita
 S&ave configuration...
@@ -740,12 +748,14 @@ Select logfile directory:
 Seleccione directório para ficheiro log:
 Select variant:
 Seleccione uma variante:
+Select view
+Seleccionar vista
 Set direction:
 Escolher direcção:
 Setting default synchronization directions: Old files will be overwritten with newer files.
 Escolher direcção de sincronização por defeito: Os ficheiros antigos serão substituídos pelos novos.
 Show \"%x\"
-
+Mostrar \"%x\"
 Show conflicts
 Mostrar conflitos
 Show files that are different
@@ -828,8 +838,6 @@ Synchronize...
 Sincronizar...
 Synchronizing...
 A sincronizar...
-System out of memory!
-Sistema sem memória!
 Target directory already existing!
 Directório de destino já existe!
 Target file already existing!
@@ -850,8 +858,6 @@ Time remaining:
 Tempo restante:
 Total amount of data that will be transferred
 Volume de dados a ser transferido
-Total required free disk space:
-Espaço livre necessário:
 Total time:
 Tempo total:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -865,37 +871,35 @@ Existem conflitos por resolver!
 Update ->
 Actualizar ->
 Updating attributes of %x
-
+Actualizar atributos de %x
 Usage:
 Uso:
 Use Recycle Bin
 Utilizar Reciclagem
 Use Recycle Bin when deleting or overwriting files
 Utilizar Reciclagem ao apagar ou substituir ficheiros
-User-defined directory
-Directório definido pelo utilizador
 User-defined directory for deletion was not specified!
 Directório para eliminação não foi especificado!
 Variant
 Variável
 Verifying file %x
 A verificar ficheiro %x
+Versioning
+
 Volume name %x not part of filename %y!
 Nome do volume %x não faz parte do ficheiro %y!
 Waiting for missing directories...
-
+Aguardar pelos directórios em falta...
 Waiting while directory is locked (%x)...
-Aguardando enquanto o directório é bloqueado (%x)...
+Aguardar enquanto o directório é bloqueado (%x)...
 Warning
 Atenção
-Warning: Synchronization failed for %x item(s):
-Atenção: A sincronização falhou para %x item(s):
 When the comparison is started with this option set the following decision tree is processed:
 Usar a seguinte árvore de decisão quando inicia com estas opções de comparação:
 You can ignore conflicts and continue synchronization.
 Pode ignorar os conflitos e continuar a sincronização.
-You can ignore the error to consider not existing directories as empty.
-Pode ignorar o erro para considerar directórios não existentes como vazios.
+You can ignore this error to consider the directory as empty.
+Pode ignorar este erro para considerar o directório como vazio.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Pode tentar sincronizar os restantes elementos outra vez (SEM TER QUE comparar de novo) !
 different

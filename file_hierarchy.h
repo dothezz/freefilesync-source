@@ -794,18 +794,18 @@ void FileSystemObject::synchronizeSides()
 {
     switch (syncDir)
     {
-    case SYNC_DIR_INT_LEFT:
-        shortNameLeft_ = shortNameRight_;
-        copyToL();
-        break;
-    case SYNC_DIR_INT_RIGHT:
-        shortNameRight_ = shortNameLeft_;
-        copyToR();
-        break;
-    case SYNC_DIR_INT_NONE:
-    case SYNC_DIR_INT_CONFLICT:
-        assert(!"if nothing's todo then why arrive here?");
-        break;
+        case SYNC_DIR_INT_LEFT:
+            shortNameLeft_ = shortNameRight_;
+            copyToL();
+            break;
+        case SYNC_DIR_INT_RIGHT:
+            shortNameRight_ = shortNameLeft_;
+            copyToR();
+            break;
+        case SYNC_DIR_INT_NONE:
+        case SYNC_DIR_INT_CONFLICT:
+            assert(!"if nothing's todo then why arrive here?");
+            break;
     }
 
     syncDir = SYNC_DIR_INT_NONE;
@@ -968,15 +968,15 @@ void DirMapping::swap()
     //swap compare result
     switch (cmpResult)
     {
-    case DIR_LEFT_SIDE_ONLY:
-        cmpResult = DIR_RIGHT_SIDE_ONLY;
-        break;
-    case DIR_RIGHT_SIDE_ONLY:
-        cmpResult = DIR_LEFT_SIDE_ONLY;
-        break;
-    case DIR_EQUAL:
-    case DIR_DIFFERENT_METADATA:
-        break;
+        case DIR_LEFT_SIDE_ONLY:
+            cmpResult = DIR_RIGHT_SIDE_ONLY;
+            break;
+        case DIR_RIGHT_SIDE_ONLY:
+            cmpResult = DIR_LEFT_SIDE_ONLY;
+            break;
+        case DIR_EQUAL:
+        case DIR_DIFFERENT_METADATA:
+            break;
     }
 }
 
@@ -1055,23 +1055,23 @@ void FileMapping::swap()
     //swap compare result
     switch (cmpResult)
     {
-    case FILE_LEFT_SIDE_ONLY:
-        cmpResult = FILE_RIGHT_SIDE_ONLY;
-        break;
-    case FILE_RIGHT_SIDE_ONLY:
-        cmpResult = FILE_LEFT_SIDE_ONLY;
-        break;
-    case FILE_LEFT_NEWER:
-        cmpResult = FILE_RIGHT_NEWER;
-        break;
-    case FILE_RIGHT_NEWER:
-        cmpResult = FILE_LEFT_NEWER;
-        break;
-    case FILE_DIFFERENT:
-    case FILE_EQUAL:
-    case FILE_DIFFERENT_METADATA:
-    case FILE_CONFLICT:
-        break;
+        case FILE_LEFT_SIDE_ONLY:
+            cmpResult = FILE_RIGHT_SIDE_ONLY;
+            break;
+        case FILE_RIGHT_SIDE_ONLY:
+            cmpResult = FILE_LEFT_SIDE_ONLY;
+            break;
+        case FILE_LEFT_NEWER:
+            cmpResult = FILE_RIGHT_NEWER;
+            break;
+        case FILE_RIGHT_NEWER:
+            cmpResult = FILE_LEFT_NEWER;
+            break;
+        case FILE_DIFFERENT:
+        case FILE_EQUAL:
+        case FILE_DIFFERENT_METADATA:
+        case FILE_CONFLICT:
+            break;
     }
 
     std::swap(dataLeft, dataRight);
@@ -1257,23 +1257,23 @@ void SymLinkMapping::swap()
     //swap compare result
     switch (cmpResult)
     {
-    case SYMLINK_LEFT_SIDE_ONLY:
-        cmpResult = SYMLINK_RIGHT_SIDE_ONLY;
-        break;
-    case SYMLINK_RIGHT_SIDE_ONLY:
-        cmpResult = SYMLINK_LEFT_SIDE_ONLY;
-        break;
-    case SYMLINK_LEFT_NEWER:
-        cmpResult = SYMLINK_RIGHT_NEWER;
-        break;
-    case SYMLINK_RIGHT_NEWER:
-        cmpResult = SYMLINK_LEFT_NEWER;
-        break;
-    case SYMLINK_EQUAL:
-    case SYMLINK_DIFFERENT_METADATA:
-    case SYMLINK_DIFFERENT:
-    case SYMLINK_CONFLICT:
-        break;
+        case SYMLINK_LEFT_SIDE_ONLY:
+            cmpResult = SYMLINK_RIGHT_SIDE_ONLY;
+            break;
+        case SYMLINK_RIGHT_SIDE_ONLY:
+            cmpResult = SYMLINK_LEFT_SIDE_ONLY;
+            break;
+        case SYMLINK_LEFT_NEWER:
+            cmpResult = SYMLINK_RIGHT_NEWER;
+            break;
+        case SYMLINK_RIGHT_NEWER:
+            cmpResult = SYMLINK_LEFT_NEWER;
+            break;
+        case SYMLINK_EQUAL:
+        case SYMLINK_DIFFERENT_METADATA:
+        case SYMLINK_DIFFERENT:
+        case SYMLINK_CONFLICT:
+            break;
     }
 
     std::swap(dataLeft, dataRight);

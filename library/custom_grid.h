@@ -54,7 +54,7 @@ CustomGridLeft  CustomGridRight  CustomGridMiddle
 class CustomGrid : public wxGrid
 {
 public:
-    CustomGrid(wxWindow *parent,
+    CustomGrid(wxWindow* parent,
                wxWindowID id,
                const wxPoint& pos   = wxDefaultPosition,
                const wxSize& size   = wxDefaultSize,
@@ -97,12 +97,13 @@ protected:
     virtual CustomGridTable* getGridDataTable() const = 0;
 
 private:
+    void onGridAccess(wxEvent& event);
+
     //this method is called when grid view changes: useful for parallel updating of multiple grids
     void OnPaintGrid(wxEvent& event);
 
     virtual void alignOtherGrids(CustomGrid* gridLeft, CustomGrid* gridMiddle, CustomGrid* gridRight) = 0;
 
-    void onGridAccess(wxEvent& event);
     void adjustGridHeights(wxEvent& event);
 
     CustomGrid* m_gridLeft;
@@ -144,7 +145,7 @@ class CustomGridRim : public CustomGrid
     friend class GridCellRenderer;
 
 public:
-    CustomGridRim(wxWindow *parent,
+    CustomGridRim(wxWindow* parent,
                   wxWindowID id,
                   const wxPoint& pos,
                   const wxSize& size,
@@ -201,7 +202,7 @@ private:
 class CustomGridLeft : public CustomGridRim
 {
 public:
-    CustomGridLeft(wxWindow *parent,
+    CustomGridLeft(wxWindow* parent,
                    wxWindowID id,
                    const wxPoint& pos   = wxDefaultPosition,
                    const wxSize& size   = wxDefaultSize,
@@ -224,7 +225,7 @@ private:
 class CustomGridRight : public CustomGridRim
 {
 public:
-    CustomGridRight(wxWindow *parent,
+    CustomGridRight(wxWindow* parent,
                     wxWindowID id,
                     const wxPoint& pos   = wxDefaultPosition,
                     const wxSize& size   = wxDefaultSize,
@@ -249,7 +250,7 @@ class CustomGridMiddle : public CustomGrid
     friend class GridCellRendererMiddle;
 
 public:
-    CustomGridMiddle(wxWindow *parent,
+    CustomGridMiddle(wxWindow* parent,
                      wxWindowID id,
                      const wxPoint& pos   = wxDefaultPosition,
                      const wxSize& size   = wxDefaultSize,

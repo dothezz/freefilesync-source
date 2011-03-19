@@ -5,18 +5,23 @@
 ::clean codeblocks garbage
 del FreeFileSync.layout
 del FreeFileSync.depend
+del FreeFileSync-Linux.layout
+del FreeFileSync-Linux.depend
 del RealtimeSync\RealtimeSync.layout
 del RealtimeSync\RealtimeSync.depend
 
 ::clean Visual C++ garbage
+del FreeFileSync.vcxproj.user
 del FreeFileSync.ncb
 del RealtimeSync\RealtimeSync.ncb
+del "FreeFileSync - wxWidgets v2.9.1 Beta.vcxproj.user"
 attrib FreeFileSync.suo -h
 del FreeFileSync.suo
 attrib RealtimeSync\RealtimeSync.suo -h
 del RealtimeSync\RealtimeSync.suo
 del FreeFileSync.sdf
 del RealtimeSync\RealtimeSync.sdf
+del RealtimeSync\RealtimeSync.vcxproj.user
 
 del BUILD\FreeFileSync*.pdb
 del BUILD\FreeFileSync*.ilk

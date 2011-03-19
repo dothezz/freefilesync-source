@@ -164,8 +164,8 @@ void DirectoryNameMainDlg::OnFilesDropped(FFSFileDropEvent& event)
     if (event.filesDropped_.empty())
         return;
 
-    if (    this->dropWindow1_ == event.dropWindow_ || //file may be dropped on window 1 or 2
-            this->dropWindow2_ == event.dropWindow_)
+    if (this->dropWindow1_ == event.dropWindow_ || //file may be dropped on window 1 or 2
+        this->dropWindow2_ == event.dropWindow_)
     {
         if (AcceptDrop(event.filesDropped_))
         {

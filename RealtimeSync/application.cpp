@@ -24,10 +24,10 @@ IMPLEMENT_APP(Application);
 
 bool Application::OnInit()
 {
-//do not call wxApp::OnInit() to avoid using default commandline parser
+    //do not call wxApp::OnInit() to avoid using default commandline parser
 
-//Note: initialization is done in the FIRST idle event instead of OnInit. Reason: Commandline mode requires the wxApp eventhandler to be established
-//for UI update events. This is not the case at the time of OnInit().
+    //Note: initialization is done in the FIRST idle event instead of OnInit. Reason: Commandline mode requires the wxApp eventhandler to be established
+    //for UI update events. This is not the case at the time of OnInit().
     Connect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), NULL, this);
 
     return true;

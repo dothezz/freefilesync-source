@@ -16,23 +16,23 @@
 class GlobalResources
 {
 public:
-    static const GlobalResources& getInstance();
+    static const GlobalResources& instance();
 
-    const wxBitmap& getImageByName(const wxString& imageName) const;
+    const wxBitmap& getImage(const wxString& imageName) const;
 
     //global image resource objects
     wxAnimation* animationMoney;
     wxAnimation* animationSync;
     wxIcon* programIcon;
 
-    void load() const; //loads bitmap resources on program startup: logical const!
-
 private:
+    void load(); //loads bitmap resources on program startup
+
     GlobalResources();
     ~GlobalResources();
 
     //resource mapping
-    mutable std::map<wxString, wxBitmap*> bitmapResource;
+    std::map<wxString, wxBitmap*> bitmapResource;
 };
 
 #endif // RESOURCES_H_INCLUDED

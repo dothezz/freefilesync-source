@@ -61,7 +61,7 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError()
         const DWORD lastError = ::GetLastError();
         const wxString& errorMessage = wxString(_("Error opening file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"") + wxT("\n\n") + ffs3::getLastErrorFormatted(lastError);
         if (lastError == ERROR_FILE_NOT_FOUND ||
-                lastError == ERROR_PATH_NOT_FOUND)
+            lastError == ERROR_PATH_NOT_FOUND)
             throw ErrorNotExisting(errorMessage);
         else
             throw FileError(errorMessage);
@@ -97,12 +97,12 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
     DWORD bytesRead = 0;
 
     if (!::ReadFile(
-                fileHandle,    //__in         HANDLE hFile,
-                buffer,        //__out        LPVOID lpBuffer,
-                static_cast<DWORD>(bytesToRead), //__in         DWORD nNumberOfBytesToRead,
-                &bytesRead,    //__out_opt    LPDWORD lpNumberOfBytesRead,
-                NULL)          //__inout_opt  LPOVERLAPPED lpOverlapped
-            || bytesRead > bytesToRead) //must be fulfilled
+            fileHandle,    //__in         HANDLE hFile,
+            buffer,        //__out        LPVOID lpBuffer,
+            static_cast<DWORD>(bytesToRead), //__in         DWORD nNumberOfBytesToRead,
+            &bytesRead,    //__out_opt    LPDWORD lpNumberOfBytesRead,
+            NULL)          //__inout_opt  LPOVERLAPPED lpOverlapped
+        || bytesRead > bytesToRead) //must be fulfilled
         throw FileError(wxString(_("Error reading file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"") +
                         wxT("\n\n") + ffs3::getLastErrorFormatted());
 
@@ -165,12 +165,12 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileErro
     DWORD bytesWritten = 0;
 
     if (!::WriteFile(
-                fileHandle,    //__in         HANDLE hFile,
-                buffer,        //__out        LPVOID lpBuffer,
-                static_cast<DWORD>(bytesToWrite),  //__in         DWORD nNumberOfBytesToRead,
-                &bytesWritten, //__out_opt    LPDWORD lpNumberOfBytesWritten,
-                NULL)          //__inout_opt  LPOVERLAPPED lpOverlapped
-            || bytesWritten != bytesToWrite) //must be fulfilled for synchronous writes!
+            fileHandle,    //__in         HANDLE hFile,
+            buffer,        //__out        LPVOID lpBuffer,
+            static_cast<DWORD>(bytesToWrite),  //__in         DWORD nNumberOfBytesToRead,
+            &bytesWritten, //__out_opt    LPDWORD lpNumberOfBytesWritten,
+            NULL)          //__inout_opt  LPOVERLAPPED lpOverlapped
+        || bytesWritten != bytesToWrite) //must be fulfilled for synchronous writes!
         throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"") +
                         wxT("\n\n") + ffs3::getLastErrorFormatted() + wxT(" (w)")); //w -> distinguish from fopen error message!
 #elif defined FFS_LINUX

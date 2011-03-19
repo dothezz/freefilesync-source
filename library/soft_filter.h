@@ -28,7 +28,7 @@ public:
         timeWindow_(timeWindow),
         currentTime(wxGetUTCTime()) {}
 
-//    typedef boost::shared_ptr<const SoftFilter> FilterRef; //always bound by design!
+    //    typedef boost::shared_ptr<const SoftFilter> FilterRef; //always bound by design!
 
     bool passFilter(const FileMapping& fileMap) const;
     bool passFilter(const DirMapping& dirMap) const;

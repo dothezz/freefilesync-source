@@ -9,7 +9,7 @@
 #include <wx/msgdlg.h>
 #include <wx/utils.h>
 #include <utility>
-#include "mouse_move_dlg.h"
+#include "../shared/mouse_move_dlg.h"
 
 
 class SearchDlg : public SearchDialogGenerated
@@ -143,10 +143,10 @@ std::pair<int, int> searchGrid(const wxGrid& grid,
     int cursorRow    = const_cast<wxGrid&>(grid).GetGridCursorRow();
     int cursorColumn = const_cast<wxGrid&>(grid).GetGridCursorCol();
 
-    if (    cursorRow    < 0         ||
-            cursorRow    >= rowCount ||
-            cursorColumn < 0         ||
-            cursorColumn >= columnCount)
+    if (cursorRow    < 0         ||
+        cursorRow    >= rowCount ||
+        cursorColumn < 0         ||
+        cursorColumn >= columnCount)
     {
         //cursor not on valid position...
         cursorRow    = 0;
@@ -210,8 +210,8 @@ void executeSearch(bool forceShowDialog,
 
     if (forceShowDialog || lastSearchString.IsEmpty())
     {
-        SearchDlg* searchDlg = new SearchDlg(parentWindow, lastSearchString, respectCase); //wxWidgets deletion handling -> deleted by parentWindow
-        if (static_cast<SearchDlg::ReturnCodes>(searchDlg->ShowModal()) != SearchDlg::BUTTON_OKAY)
+        SearchDlg searchDlg(parentWindow, lastSearchString, respectCase); //wxWidgets deletion handling -> deleted by parentWindow
+        if (static_cast<SearchDlg::ReturnCodes>(searchDlg.ShowModal()) != SearchDlg::BUTTON_OKAY)
             return;
 
         searchDialogWasShown = true;

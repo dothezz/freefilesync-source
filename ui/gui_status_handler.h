@@ -48,7 +48,7 @@ private:
 class SyncStatusHandler : public StatusHandler
 {
 public:
-    SyncStatusHandler(wxTopLevelWindow* parentDlg, bool ignoreAllErrors, const wxString& jobName);
+    SyncStatusHandler(MainDialog* parentDlg, bool ignoreAllErrors, const wxString& jobName);
     ~SyncStatusHandler();
 
     virtual void initNewProcess(int objectsTotal, wxLongLong dataTotal, Process processID);
@@ -59,11 +59,11 @@ public:
     virtual ErrorHandler::Response reportError(const wxString& text);
     virtual void reportFatalError(const wxString& errorMessage);
     virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
-    void logInfo(const wxString& infoMessage);
 
 private:
     virtual void abortThisProcess();
 
+    MainDialog* mainDialog; //optional
     SyncStatus syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!
     bool ignoreErrors;
     ffs3::ErrorLogging errorLog;

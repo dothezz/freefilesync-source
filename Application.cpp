@@ -28,8 +28,10 @@
 #include <wx/log.h>
 
 #ifdef FFS_LINUX
+#include <gtkmm/main.h>
 #include <gtk/gtk.h>
 #endif
+
 
 using ffs3::CustomLocale;
 using ffs3::SwitchToGui;
@@ -43,8 +45,8 @@ bool Application::OnInit()
     returnValue = 0;
     //do not call wxApp::OnInit() to avoid using default commandline parser
 
-//Note: initialization is done in the FIRST idle event instead of OnInit. Reason: batch mode requires the wxApp eventhandler to be established
-//for UI update events. This is not the case at the time of OnInit().
+    //Note: initialization is done in the FIRST idle event instead of OnInit. Reason: batch mode requires the wxApp eventhandler to be established
+    //for UI update events. This is not the case at the time of OnInit().
     Connect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), NULL, this);
 
     return true;
@@ -77,6 +79,8 @@ void Application::OnStartApplication(wxIdleEvent&)
     SetAppName(wxT("FreeFileSync"));
 
 #ifdef FFS_LINUX
+    Gtk::Main::init_gtkmm_internals();
+
     ::gtk_rc_parse(ffs3::wxToZ(ffs3::getResourceDir()) + "styles.rc"); //remove inner border from bitmap buttons
 #endif
 
@@ -87,22 +91,20 @@ void Application::OnStartApplication(wxIdleEvent&)
     wxString cfgFilename;
     if (argc > 1)
     {
-        const wxString filename(argv[1]);
+        const wxString arg1(argv[1]);
 
-        if (fileExists(wxToZ(filename)))  //load file specified by %1 parameter:
-            cfgFilename = filename;
-        else if (fileExists(wxToZ(filename + wxT(".ffs_batch"))))
-            cfgFilename = filename + wxT(".ffs_batch");
-        else if (fileExists(wxToZ(filename + wxT(".ffs_gui"))))
-            cfgFilename = filename + wxT(".ffs_gui");
+        if (fileExists(wxToZ(arg1)))  //load file specified by %1 parameter:
+            cfgFilename = arg1;
+        else if (fileExists(wxToZ(arg1 + wxT(".ffs_batch"))))
+            cfgFilename = arg1 + wxT(".ffs_batch");
+        else if (fileExists(wxToZ(arg1 + wxT(".ffs_gui"))))
+            cfgFilename = arg1 + wxT(".ffs_gui");
         else
         {
-            wxMessageBox(wxString(_("File does not exist:")) + wxT(" \"") + filename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+            wxMessageBox(wxString(_("File does not exist:")) + wxT(" \"") + arg1 + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
             return;
         }
     }
-
-    GlobalResources::getInstance().load(); //loads bitmap resources on program startup
 
 #if wxCHECK_VERSION(2, 9, 1)
     wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping
@@ -135,19 +137,19 @@ void Application::OnStartApplication(wxIdleEvent&)
         const xmlAccess::XmlType xmlConfigType = xmlAccess::getXmlType(cfgFilename);
         switch (xmlConfigType)
         {
-        case xmlAccess::XML_GUI_CONFIG: //start in GUI mode (configuration file specified)
-            runGuiMode(cfgFilename, globalSettings);
-            break;
+            case xmlAccess::XML_GUI_CONFIG: //start in GUI mode (configuration file specified)
+                runGuiMode(cfgFilename, globalSettings);
+                break;
 
-        case xmlAccess::XML_BATCH_CONFIG: //start in commandline mode
-            runBatchMode(cfgFilename, globalSettings);
-            break;
+            case xmlAccess::XML_BATCH_CONFIG: //start in commandline mode
+                runBatchMode(cfgFilename, globalSettings);
+                break;
 
-        case xmlAccess::XML_GLOBAL_SETTINGS:
-        case xmlAccess::XML_REAL_CONFIG:
-        case xmlAccess::XML_OTHER:
-            wxMessageBox(wxString(_("The file does not contain a valid configuration:")) + wxT(" \"") + cfgFilename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
-            break;
+            case xmlAccess::XML_GLOBAL_SETTINGS:
+            case xmlAccess::XML_REAL_CONFIG:
+            case xmlAccess::XML_OTHER:
+                wxMessageBox(wxString(_("The file does not contain a valid configuration:")) + wxT(" \"") + cfgFilename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+                break;
         }
     }
     else //start in GUI mode (standard)
@@ -234,24 +236,24 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         const SwitchToGui switchBatchToGui(batchCfg, globSettings); //prepare potential operational switch
 
         //class handling status updates and error messages
-        std::auto_ptr<BatchStatusHandler> statusHandler;  //delete object automatically
-        if (batchCfg.silent)
-            statusHandler.reset(new BatchStatusHandler(true, ffs3::extractJobName(filename), &batchCfg.logFileDirectory, batchCfg.handleError, switchBatchToGui, returnValue));
-        else
-            statusHandler.reset(new BatchStatusHandler(false, ffs3::extractJobName(filename), NULL, batchCfg.handleError, switchBatchToGui, returnValue));
+        BatchStatusHandler statusHandler(batchCfg.silent,
+                                         ffs3::extractJobName(filename),
+                                         batchCfg.silent ? &batchCfg.logFileDirectory : NULL,
+                                         batchCfg.logFileCountMax,
+                                         batchCfg.handleError,
+                                         switchBatchToGui,
+                                         returnValue);
 
         //COMPARE DIRECTORIES
         ffs3::CompareProcess comparison(batchCfg.mainCfg.handleSymlinks,
                                         globSettings.fileTimeTolerance,
                                         globSettings.optDialogs,
-                                        statusHandler.get());
+                                        &statusHandler);
 
         ffs3::FolderComparison folderCmp;
         comparison.startCompareProcess(ffs3::extractCompareCfg(batchCfg.mainCfg),
                                        batchCfg.mainCfg.compareVar,
                                        folderCmp);
-
-        const bool syncNeeded = synchronizationNeeded(folderCmp);
 
         //START SYNCHRONIZATION
         ffs3::SyncProcess synchronization(
@@ -259,19 +261,12 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
             globSettings.verifyFileCopy,
             globSettings.copyLockedFiles,
             globSettings.copyFilePermissions,
-            *statusHandler);
+            statusHandler);
 
         const std::vector<ffs3::FolderPairSyncCfg> syncProcessCfg = ffs3::extractSyncCfg(batchCfg.mainCfg);
         assert(syncProcessCfg.size() == folderCmp.size());
 
         synchronization.startSynchronizationProcess(syncProcessCfg, folderCmp);
-
-        //check if there are files/folders to be sync'ed at all
-        if (!syncNeeded)
-        {
-            statusHandler->logInfo(_("Nothing to synchronize according to configuration!")); //inform about this special case
-            //return; -> disabled: <automatic> mode requires database to be written in any case
-        }
 
         //play (optional) sound notification after sync has completed
         if (!batchCfg.silent)

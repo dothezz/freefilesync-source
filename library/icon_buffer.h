@@ -21,6 +21,7 @@ class IconBuffer
 {
 public:
     static const wxIcon& getDirectoryIcon(); //one folder icon should be sufficient...
+    static const wxIcon& getFileIcon();      //in case one folder icon is sufficient...
 
     static IconBuffer& getInstance();
     bool requestFileIcon(const Zstring& fileName, wxIcon* icon = NULL); //returns false if icon is not in buffer
@@ -42,10 +43,10 @@ private:
     class IconHolder;
     class IconDbSequence;
 
-//---------------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------------
     typedef Zbase<Zchar, StorageDeepCopy> BasicString; //thread safe string class
-//avoid reference-counted objects for shared data: NOT THREADSAFE!!! (implicitly shared variable: ref-count)
-//---------------------------------------------------------------------------------------------------
+    //avoid reference-counted objects for shared data: NOT THREADSAFE!!! (implicitly shared variable: ref-count)
+    //---------------------------------------------------------------------------------------------------
 
     //methods used by worker thread
     void insertIntoBuffer(const BasicString& entryName, const IconHolder& icon);
@@ -58,11 +59,11 @@ private:
     static bool isPriceyExtension(const BasicString& extension);
 #endif
 
-//---------------------- Shared Data -------------------------
+    //---------------------- Shared Data -------------------------
     boost::mutex lockIconDB;
     std::auto_ptr<IconDB> buffer;  //use synchronisation when accessing this!
     std::auto_ptr<IconDbSequence> bufSequence; //save sequence of buffer entry to delete oldest elements
-//------------------------------------------------------------
+    //------------------------------------------------------------
 
     class WorkerThread;
     std::auto_ptr<WorkerThread> worker;

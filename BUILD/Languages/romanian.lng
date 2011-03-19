@@ -154,6 +154,10 @@ Configurație &Nouă
 <Simlegătură>
 <multiple selection>
 <selectare multiplă>
+A directory input field is empty.
+Un cîmp de introducere a dosarului este gol.
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+Va fi modificat un dosar care face parte din mai multe perechi de dosare! Reverifică setările de sincronizare!
 A newer version of FreeFileSync is available:
 Este disponibilă o versiune nouă de FreeFileSync:
 Abort requested: Waiting for current operation to finish...
@@ -202,6 +206,8 @@ Cannot determine sync-direction:
 Nu se poate determina sensul de sincronizare:
 Cannot find %x
 Nu pot găsi %x
+Cannot write to empty directory path!
+
 Category
 Categorie
 Clear filter settings
@@ -370,6 +376,8 @@ Encoding extended time information: %x
 Codarea informațiilor timpului extins: %x
 Endless loop when traversing directory:
 Buclă infinită la parcurgerea dosarului:
+Equal files/folders that differ in attributes only
+File/Dosare identice care diferă doar prin atributele lor
 Error
 Eroare
 Error changing modification time:
@@ -476,8 +484,6 @@ Files that exist on both sides, right one is newer
 File care există în ambele părți, cea din dreapta fiind mai nouă
 Files that have different content
 File care au conținut diferit
-Files/folders that differ in attributes only
-File sau dosare care diferă doar la atribute
 Files/folders that exist on left side only
 File sau dosare care există doar în partea stîngă
 Files/folders that exist on right side only
@@ -488,8 +494,6 @@ Filter is active
 Filtrul este activ
 Filter settings have changed!
 Setările filtrului au fost schimbate!
-Filter view
-Filtru de Vedere
 Filter: All pairs
 Filtru: Toate perechile
 Filter: Single pair
@@ -506,6 +510,8 @@ Follow
 Urmărește
 Free disk space available:
 Spațiu de stocare disponibil:
+Free disk space required:
+Spațiu liber de stocare necesar:
 FreeFileSync Batch Job
 Sarcină cu lot de comenzi FreeFileSync
 FreeFileSync at Sourceforge
@@ -600,6 +606,8 @@ Integrate external applications into context menu. The following macros are avai
 Include aplicațiile externe în meniul contextual. Sînt disponibile următoarele macrocomenzi:
 Invalid FreeFileSync config file!
 Filă de configurare FreeFileSync nevalidă!
+Last used configurations (press DEL to remove from list)
+Ultimele configurații utilizate (apasă tasta DEL pentru a înlătura din listă)
 Leave as unresolved conflict
 Lasă ca Conflict Nerezolvat
 Left
@@ -608,8 +616,6 @@ Legend
 Legendă
 Load configuration from file
 Încarcă configurația dintr-o filă
-Load configuration history (press DEL to delete items)
-Încarcă istoricul configurației (apasă tasta DEL pentru a șterge itemuri)
 Log-messages:
 Mesaje de jurnalizare:
 Logging
@@ -620,12 +626,16 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 Realizarea de copii de rezervă prin sistemul WOW64 nu este suportată. Folosește versiunea pe 64-biți a FreeFileSync.
 Match case
 Potrivește MAJ/min
+Maximum number of logfiles:
+Numărul maxim de file jurnal:
+Memory allocation failed!
+Alocarea memoriei a eșuat!
 Minimum Idle Time [seconds]
 Timp Minim de Inactivitate [secunde]
 Mirror ->>
 Clonare =>>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Salvgardează [backup] prin clonare dosarul stîng: dosarul din dreapta va fi suprascris și va fi identic după sincronizare cu dosarul din stînga.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+Salvgardare în oglindă a dosarului stîng. Dosarul drept este modificat pentru a fi identic cu cel stîng după sincronizare.
 Monitoring active...
 Monitorizare activă...
 More than 50% of the total number of files will be copied or deleted!
@@ -696,8 +706,6 @@ Published under the GNU General Public License:
 Publicat sub licența GNU GPL:
 Question
 Întrebare
-Re-enable all hidden dialogs?
-Reactivezi casetele de dialog ascunse?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Sincronizare Inteligentă
 RealtimeSync configuration
@@ -718,6 +726,8 @@ Reset
 Resetează
 Reset view
 Resetează Vederea
+Restore all hidden dialogs?
+Restaurezi toate casetele de dialog ascunse?
 Right
 Dreapta
 S&ave configuration...
@@ -740,6 +750,8 @@ Select logfile directory:
 Selectează un dosar pentru fila .log:
 Select variant:
 Selectează Varianta de Sincronizare:
+Select view
+Selectează Vederea
 Set direction:
 Setează Acțiunea ca în Icoana Alăturată:
 Setting default synchronization directions: Old files will be overwritten with newer files.
@@ -828,8 +840,6 @@ Synchronize...
 Sincronizează
 Synchronizing...
 Sincronizare aflată în curs...
-System out of memory!
-Memoria sistemului a fost epuizată!
 Target directory already existing!
 Dosarul țintă există deja!
 Target file already existing!
@@ -850,8 +860,6 @@ Time remaining:
 Timp Rămas:
 Total amount of data that will be transferred
 Volumul total de date care va fi transferat
-Total required free disk space:
-Spațiu de stocare necesar:
 Total time:
 Timp Total:
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -872,14 +880,14 @@ Use Recycle Bin
 Mută în reciclator
 Use Recycle Bin when deleting or overwriting files
 Se folosește Reciclatorul [Recycle Bin] cu ocazia ștergerii sau suprascrierii unei file
-User-defined directory
-Mută într-un dosar personalizat
 User-defined directory for deletion was not specified!
 Dosarul ales de utilizator pentru ștergere nu a fost specificat !
 Variant
 Varianta Sincronizării
 Verifying file %x
 Verific fila %x
+Versioning
+Versionare
 Volume name %x not part of filename %y!
 Numele volumului %x nu face parte din numele filei %y !
 Waiting for missing directories...
@@ -888,14 +896,12 @@ Waiting while directory is locked (%x)...
 Aștept ca dosarul să fie zăvorît (%x)...
 Warning
 Avertisment
-Warning: Synchronization failed for %x item(s):
-Atenție: Sincronizarea a eșuat pentru %x itemuri:
 When the comparison is started with this option set the following decision tree is processed:
 Cînd compararea este pornită cu acest set de opțiuni, este executat următorul arbore de decizie:
 You can ignore conflicts and continue synchronization.
 Poți ignora conflictele pentru a continua cu sincronizarea.
-You can ignore the error to consider not existing directories as empty.
-Poți ignora eroarea care consideră că un dosar inexistent este gol.
+You can ignore this error to consider the directory as empty.
+Poți ignora această eroare pentru ca dosarul să fie considerat gol.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Poți încerca să sincronizezi din nou itemurile rămase (FĂRĂ a le recompara) !
 different

@@ -154,6 +154,10 @@
 <Lien symbolique>
 <multiple selection>
 <sélection multiple>
+A directory input field is empty.
+Un champ répertoire est vide
+A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
+Un répertoire faisant partie de paires multiples doit être modifié ! Vérifiez les paramètres de la synchronisation !
 A newer version of FreeFileSync is available:
 Une version plus récente de FreeFileSync est disponible :
 Abort requested: Waiting for current operation to finish...
@@ -261,7 +265,7 @@ Copier uniquement les attributs de gauche à droite
 Copy attributes only from right to left
 Copier uniquement les attributs de droite à gauche
 Copy filesystem permissions
-Copie des attributs de fichiers
+Copie des droits d'accès
 Copy from left to right
 Copie de gauche à droite
 Copy from left to right overwriting
@@ -370,6 +374,8 @@ Encoding extended time information: %x
 Codage de l'heure au format étendu : %x
 Endless loop when traversing directory:
 Boucle sans fin lors du parcours du répertoire : 
+Equal files/folders that differ in attributes only
+Fichiers/Dossiers identiques dont seuls les attributs diffèrent
 Error
 Erreur
 Error changing modification time:
@@ -476,8 +482,6 @@ Files that exist on both sides, right one is newer
 Fichiers existants des deux côtés, celui de droite est plus récent
 Files that have different content
 Fichiers ayant un contenu différent
-Files/folders that differ in attributes only
-Fichiers/Dossiers dont seuls les attributs diffèrent
 Files/folders that exist on left side only
 Fichiers/répertoires existant seulement à gauche
 Files/folders that exist on right side only
@@ -488,8 +492,6 @@ Filter is active
 Le filtre est actif
 Filter settings have changed!
 La configuration du filtre a changé !
-Filter view
-Filtrage de la vue
 Filter: All pairs
 Filtre : Toutes les paires
 Filter: Single pair
@@ -506,6 +508,8 @@ Follow
 Suivre
 Free disk space available:
 Espace disque disponible :
+Free disk space required:
+Espace disque nécessaire :
 FreeFileSync Batch Job
 FreeFileSync Fichier de commandes
 FreeFileSync at Sourceforge
@@ -600,6 +604,8 @@ Integrate external applications into context menu. The following macros are avai
 Inclure les applications externes dans le menu contextuel. Les macros suivantes sont disponibles :
 Invalid FreeFileSync config file!
 Fichier de configuration FreeFileSync invalide !
+Last used configurations (press DEL to remove from list)
+Dernière configuration utilisée (Appuyez sur SUPPR pour l'enlever de la liste)
 Leave as unresolved conflict
 Abandonner en tant que conflit non résolu
 Left
@@ -608,8 +614,6 @@ Legend
 Légende
 Load configuration from file
 Charger la configuration à partir du fichier
-Load configuration history (press DEL to delete items)
-Charger l'historique des configurations (appuyez sur Suppr pour supprimer des éléments)
 Log-messages:
 Messages log :
 Logging
@@ -620,12 +624,16 @@ Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit v
 La copie en tâche de fond sur WOW64 n'est pas possible. Utilisez pour cela la version 64 bits de FreeFileSync.
 Match case
 Respecter la casse
+Maximum number of logfiles:
+Nombre maximum de fichiers Log
+Memory allocation failed!
+Erreur d'allocation de mémoire!
 Minimum Idle Time [seconds]
 Délai minimum (secondes)
 Mirror ->>
 Miroir ->>
-Mirror backup of left folder: Right folder will be overwritten and exactly match left folder after synchronization.
-Sauvegarde miroir du répertoire de gauche : Le répertoire de droite sera écrasé et totalement identique au répertoire de gauche après la synchronisation.
+Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
+Copie miroir du dossier de gauche. Le dossier de droite est modifié pour être strictement identique après la synchronisation.
 Monitoring active...
 Surveillance en cours...
 More than 50% of the total number of files will be copied or deleted!
@@ -696,8 +704,6 @@ Published under the GNU General Public License:
 Publié sous licence GNU General Public License :
 Question
 Question
-Re-enable all hidden dialogs?
-Réactiver les boîtes de dialogues masquées ?
 RealtimeSync - Automated Synchronization
 RealtimeSync - Synchronisation Automatisée
 RealtimeSync configuration
@@ -718,6 +724,8 @@ Reset
 Réinitialiser
 Reset view
 Réinitialiser la vue
+Restore all hidden dialogs?
+Restaurer toutes les boîtes de dialogue cachées ?
 Right
 Droite
 S&ave configuration...
@@ -740,6 +748,8 @@ Select logfile directory:
 Choisissez un dossier pour le fichier .log :
 Select variant:
 Choisissez une variante :
+Select view
+Choisissez une vue
 Set direction:
 Choix de la direction :
 Setting default synchronization directions: Old files will be overwritten with newer files.
@@ -828,8 +838,6 @@ Synchronize...
 Synchroniser...
 Synchronizing...
 Synchronisation en cours...
-System out of memory!
-Plus de mémoire disponible dans le système !
 Target directory already existing!
 Le répertoire de destination existe déjà !
 Target file already existing!
@@ -850,8 +858,6 @@ Time remaining:
 Temps restant :
 Total amount of data that will be transferred
 Volume de données à transférer
-Total required free disk space:
-Espace disque nécessaire :
 Total time:
 Durée totale :
 Transfer file and directory permissions\n(Requires Administrator rights)
@@ -872,14 +878,14 @@ Use Recycle Bin
 Utiliser la Corbeille
 Use Recycle Bin when deleting or overwriting files
 Utiliser la Corbeille lors de la suppression ou du remplacement d'un fichier
-User-defined directory
-Répertoire défini par l'utilisateur
 User-defined directory for deletion was not specified!
 Le répertoire défini par l'utilisateur pour la suppression n'a pas été indiqué !
 Variant
 Variante
 Verifying file %x
 Contrôle du fichier %x
+Versioning
+Choisir un dossier
 Volume name %x not part of filename %y!
 Le nom de volume %x ne fait pas partie du nom de fichier %y !
 Waiting for missing directories...
@@ -888,14 +894,12 @@ Waiting while directory is locked (%x)...
 En attente tant que le répertoire est verrouillé (%x)...
 Warning
 Attention
-Warning: Synchronization failed for %x item(s):
-Attention : La synchronisation a échoué pour %x élément(s) :
 When the comparison is started with this option set the following decision tree is processed:
 Lorsque la comparaison démarre avec cette option, l'arbre de décision suivant est exécuté :
 You can ignore conflicts and continue synchronization.
 Vous pouvez ignorer ces conflits et continuer la synchronisation.
-You can ignore the error to consider not existing directories as empty.
-Vous pouvez ignorer l'erreur considérant qu'un dossier inexistant est vide.
+You can ignore this error to consider the directory as empty.
+Vous pouvez ignorer cette erreur en considérant le répertoire comme vide.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
 Vous pouvez essayer de synchroniser à nouveau les éléments restants (SANS avoir à les comparer à nouveau) !
 different

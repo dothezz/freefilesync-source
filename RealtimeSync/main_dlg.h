@@ -44,7 +44,7 @@ private:
 class MainDialog: public MainDlgGenerated
 {
 public:
-    MainDialog(wxDialog *dlg, const wxString& cfgFileName);
+    MainDialog(wxDialog* dlg, const wxString& cfgFileName);
     ~MainDialog();
 
     void loadConfig(const wxString& filename);

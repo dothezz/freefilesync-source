@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 // The Loki Library
 // Copyright (c) 2006 Peter Kümmel
-// Permission to use, copy, modify, distribute and sell this software for any 
-//     purpose is hereby granted without fee, provided that the above copyright 
-//     notice appear in all copies and that both that copyright notice and this 
+// Permission to use, copy, modify, distribute and sell this software for any
+//     purpose is hereby granted without fee, provided that the above copyright
+//     notice appear in all copies and that both that copyright notice and this
 //     permission notice appear in supporting documentation.
-// The author makes no representations about the 
-//     suitability of this software for any purpose. It is provided "as is" 
+// The author makes no representations about the
+//     suitability of this software for any purpose. It is provided "as is"
 //     without express or implied warranty.
 ////////////////////////////////////////////////////////////////////////////////
 #ifndef LOKI_REGISTER_INC_
@@ -18,98 +18,98 @@
 #include "TypeManip.h"
 #include "HierarchyGenerators.h"
 
-///  \defgroup RegisterGroup Register 
+///  \defgroup RegisterGroup Register
 
 namespace Loki
 {
 
-    ////////////////////////////////////////////////////////////////////////////////
-    //
-    //  Helper classes/functions for RegisterByCreateSet
-    //
-    ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//
+//  Helper classes/functions for RegisterByCreateSet
+//
+////////////////////////////////////////////////////////////////////////////////
 
-    ////////////////////////////////////////////////////////////////////////////////
-    ///  \ingroup RegisterGroup
-    ///  Must be specialized be the user
-    ////////////////////////////////////////////////////////////////////////////////
-    template<class t> bool RegisterFunction();
+////////////////////////////////////////////////////////////////////////////////
+///  \ingroup RegisterGroup
+///  Must be specialized be the user
+////////////////////////////////////////////////////////////////////////////////
+template<class t> bool RegisterFunction();
 
-    ////////////////////////////////////////////////////////////////////////////////
-    ///  \ingroup RegisterGroup
-    ///  Must be specialized be the user
-    ////////////////////////////////////////////////////////////////////////////////
-    template<class t> bool UnRegisterFunction();
+////////////////////////////////////////////////////////////////////////////////
+///  \ingroup RegisterGroup
+///  Must be specialized be the user
+////////////////////////////////////////////////////////////////////////////////
+template<class t> bool UnRegisterFunction();
 
-    namespace Private
-    {
-        template<class T> 
-        struct RegisterOnCreate
-        {
-            RegisterOnCreate()  { RegisterFunction<T>(); }
-        };
+namespace Private
+{
+template<class T>
+struct RegisterOnCreate
+{
+    RegisterOnCreate()  { RegisterFunction<T>(); }
+};
 
-        template<class T> 
-        struct UnRegisterOnDelete
-        {
-            ~UnRegisterOnDelete() { UnRegisterFunction<T>(); }
-        };    
+template<class T>
+struct UnRegisterOnDelete
+{
+    ~UnRegisterOnDelete() { UnRegisterFunction<T>(); }
+};
 
-        template<class T>
-        struct RegisterOnCreateElement
-        {
-            RegisterOnCreate<T> registerObj;
-        };
+template<class T>
+struct RegisterOnCreateElement
+{
+    RegisterOnCreate<T> registerObj;
+};
 
-        template<class T>
-        struct UnRegisterOnDeleteElement
-        {
-            UnRegisterOnDelete<T> unregisterObj;
-        };
-    }
+template<class T>
+struct UnRegisterOnDeleteElement
+{
+    UnRegisterOnDelete<T> unregisterObj;
+};
+}
 
-    ////////////////////////////////////////////////////////////////////////////////
-    ///  \class RegisterOnCreateSet
-    ///
-    ///  \ingroup RegisterGroup
-    ///  Implements a generic register class which registers classes of a typelist
-    ///
-    ///  \par Usage
-    ///  see test/Register
-    ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+///  \class RegisterOnCreateSet
+///
+///  \ingroup RegisterGroup
+///  Implements a generic register class which registers classes of a typelist
+///
+///  \par Usage
+///  see test/Register
+////////////////////////////////////////////////////////////////////////////////
 
-    template<typename ElementList>
-    struct RegisterOnCreateSet 
+template<typename ElementList>
+struct RegisterOnCreateSet
         : GenScatterHierarchy<ElementList, Private::RegisterOnCreateElement>
     {};
 
-    ////////////////////////////////////////////////////////////////////////////////
-    ///  \class UnRegisterOnDeleteSet
-    ///
-    ///  \ingroup RegisterGroup
-    ///  Implements a generic register class which unregisters classes of a typelist
-    ///
-    ///  \par Usage
-    ///  see test/Register
-    ////////////////////////////////////////////////////////////////////////////////
-    template<typename ElementList>
-    struct UnRegisterOnDeleteSet 
+////////////////////////////////////////////////////////////////////////////////
+///  \class UnRegisterOnDeleteSet
+///
+///  \ingroup RegisterGroup
+///  Implements a generic register class which unregisters classes of a typelist
+///
+///  \par Usage
+///  see test/Register
+////////////////////////////////////////////////////////////////////////////////
+template<typename ElementList>
+struct UnRegisterOnDeleteSet
         : GenScatterHierarchy<ElementList, Private::UnRegisterOnDeleteElement>
     {};
 
 
-    ////////////////////////////////////////////////////////////////////////////////
-    ///  \def  LOKI_CHECK_CLASS_IN_LIST( CLASS , LIST )
-    ///
-    ///  \ingroup RegisterGroup
-    ///  Check if CLASS is in the typelist LIST.
-    ///
-    ///  \par Usage
-    ///  see test/Register
-    ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+///  \def  LOKI_CHECK_CLASS_IN_LIST( CLASS , LIST )
+///
+///  \ingroup RegisterGroup
+///  Check if CLASS is in the typelist LIST.
+///
+///  \par Usage
+///  see test/Register
+////////////////////////////////////////////////////////////////////////////////
 
-    
-#define LOKI_CONCATE(a,b,c,d) a ## b ## c ## d 
+
+#define LOKI_CONCATE(a,b,c,d) a ## b ## c ## d
 #define LOKI_CONCAT(a,b,c,d) LOKI_CONCATE(a,b,c,d)
 
 #define LOKI_CHECK_CLASS_IN_LIST( CLASS , LIST )                                \

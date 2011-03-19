@@ -101,9 +101,9 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
                             wxString(_("Could not load a required DLL:")) + wxT(" \"") + getRecyclerDllName().c_str() + wxT("\""));
 
         //#warning moving long file paths to recycler does not work! clarify!
-//        std::vector<Zstring> temp;
-//        std::transform(filesToDelete.begin(), filesToDelete.end(),
-//                       std::back_inserter(temp), std::ptr_fun(ffs3::removeLongPathPrefix)); //::IFileOperation() can't handle \\?\-prefix!
+        //        std::vector<Zstring> temp;
+        //        std::transform(filesToDelete.begin(), filesToDelete.end(),
+        //                       std::back_inserter(temp), std::ptr_fun(ffs3::removeLongPathPrefix)); //::IFileOperation() can't handle \\?\-prefix!
 
         if (!moveToRecycler(&fileNames[0], //array must not be empty
                             fileNames.size()))
@@ -126,7 +126,7 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
             filenameDoubleNull += Zchar(0);
         }
 
-        SHFILEOPSTRUCT fileOp;
+        SHFILEOPSTRUCT fileOp = {};
         fileOp.hwnd   = NULL;
         fileOp.wFunc  = FO_DELETE;
         fileOp.pFrom  = filenameDoubleNull.c_str();

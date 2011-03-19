@@ -131,13 +131,12 @@ void ffs3::checkForUpdatePeriodically(long& lastUpdateCheck)
     {
         if (lastUpdateCheck == 0)
         {
-            QuestionDlg* const messageDlg = new QuestionDlg(NULL,
-                    QuestionDlg::BUTTON_YES | QuestionDlg::BUTTON_NO,
-                    wxString(_("Do you want FreeFileSync to automatically check for updates every week?")) + wxT("\n") +
-                    _("(Requires an Internet connection!)"));
+            QuestionDlg messageDlg(NULL,
+                                   QuestionDlg::BUTTON_YES | QuestionDlg::BUTTON_NO,
+                                   wxString(_("Do you want FreeFileSync to automatically check for updates every week?")) + wxT("\n") +
+                                   _("(Requires an Internet connection!)"));
 
-            const bool checkRegularly = messageDlg->ShowModal() == QuestionDlg::BUTTON_YES;
-            messageDlg->Destroy();
+            const bool checkRegularly = messageDlg.ShowModal() == QuestionDlg::BUTTON_YES;
             if (checkRegularly)
             {
                 lastUpdateCheck = 123; //some old date (few seconds after 1970)

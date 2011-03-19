@@ -33,7 +33,7 @@ void applyFiltering(const MainConfiguration& currentMainCfg, FolderComparison& f
 void addExcludeFiltering(const Zstring& excludeFilter, FolderComparison& folderCmp); //exclude additional entries only
 
 void setActiveStatus(bool newStatus, FolderComparison& folderCmp); //activate or deactivate all rows
-void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or deactivate row: works recursively!
+void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or deactivate row: (not recursively anymore)
 
 
 //manual deletion of files on main grid

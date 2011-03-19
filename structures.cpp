@@ -30,10 +30,10 @@ wxString ffs3::getVariantName(CompareVariant var)
 {
     switch (var)
     {
-    case CMP_BY_CONTENT:
-        return _("File content");
-    case CMP_BY_TIME_SIZE:
-        return _("File size and date");
+        case CMP_BY_CONTENT:
+            return _("File content");
+        case CMP_BY_TIME_SIZE:
+            return _("File size and date");
     }
 
     assert(false);
@@ -45,14 +45,14 @@ wxString ffs3::getVariantName(const SyncConfiguration& syncCfg)
 {
     switch (getVariant(syncCfg))
     {
-    case SyncConfiguration::AUTOMATIC:
-        return _("<Automatic>");
-    case SyncConfiguration::MIRROR:
-        return _("Mirror ->>");
-    case SyncConfiguration::UPDATE:
-        return _("Update ->");
-    case SyncConfiguration::CUSTOM:
-        return _("Custom");
+        case SyncConfiguration::AUTOMATIC:
+            return _("<Automatic>");
+        case SyncConfiguration::MIRROR:
+            return _("Mirror ->>");
+        case SyncConfiguration::UPDATE:
+            return _("Update ->");
+        case SyncConfiguration::CUSTOM:
+            return _("Custom");
     }
     return _("Error");
 }
@@ -75,12 +75,12 @@ SyncConfiguration::Variant ffs3::getVariant(const SyncConfiguration& syncCfg)
     if (syncCfg.automatic == true)
         return SyncConfiguration::AUTOMATIC;  //automatic mode
 
-    if (    syncCfg.exLeftSideOnly  == SYNC_DIR_RIGHT &&
-            syncCfg.exRightSideOnly == SYNC_DIR_RIGHT &&
-            syncCfg.leftNewer       == SYNC_DIR_RIGHT &&
-            syncCfg.rightNewer      == SYNC_DIR_RIGHT &&
-            syncCfg.different       == SYNC_DIR_RIGHT &&
-            syncCfg.conflict        == SYNC_DIR_RIGHT)
+    if (syncCfg.exLeftSideOnly  == SYNC_DIR_RIGHT &&
+        syncCfg.exRightSideOnly == SYNC_DIR_RIGHT &&
+        syncCfg.leftNewer       == SYNC_DIR_RIGHT &&
+        syncCfg.rightNewer      == SYNC_DIR_RIGHT &&
+        syncCfg.different       == SYNC_DIR_RIGHT &&
+        syncCfg.conflict        == SYNC_DIR_RIGHT)
         return SyncConfiguration::MIRROR;    //one way ->
 
     else if (syncCfg.exLeftSideOnly  == SYNC_DIR_RIGHT &&
@@ -99,30 +99,30 @@ void ffs3::setVariant(SyncConfiguration& syncCfg, const SyncConfiguration::Varia
 {
     switch (var)
     {
-    case SyncConfiguration::AUTOMATIC:
-        syncCfg.automatic = true;
-        break;
-    case SyncConfiguration::MIRROR:
-        syncCfg.automatic = false;
-        syncCfg.exLeftSideOnly  = SYNC_DIR_RIGHT;
-        syncCfg.exRightSideOnly = SYNC_DIR_RIGHT;
-        syncCfg.leftNewer       = SYNC_DIR_RIGHT;
-        syncCfg.rightNewer      = SYNC_DIR_RIGHT;
-        syncCfg.different       = SYNC_DIR_RIGHT;
-        syncCfg.conflict        = SYNC_DIR_RIGHT;
-        break;
-    case SyncConfiguration::UPDATE:
-        syncCfg.automatic = false;
-        syncCfg.exLeftSideOnly  = SYNC_DIR_RIGHT;
-        syncCfg.exRightSideOnly = SYNC_DIR_NONE;
-        syncCfg.leftNewer       = SYNC_DIR_RIGHT;
-        syncCfg.rightNewer      = SYNC_DIR_NONE;
-        syncCfg.different       = SYNC_DIR_RIGHT;
-        syncCfg.conflict        = SYNC_DIR_NONE;
-        break;
-    case SyncConfiguration::CUSTOM:
-        assert(false);
-        break;
+        case SyncConfiguration::AUTOMATIC:
+            syncCfg.automatic = true;
+            break;
+        case SyncConfiguration::MIRROR:
+            syncCfg.automatic = false;
+            syncCfg.exLeftSideOnly  = SYNC_DIR_RIGHT;
+            syncCfg.exRightSideOnly = SYNC_DIR_RIGHT;
+            syncCfg.leftNewer       = SYNC_DIR_RIGHT;
+            syncCfg.rightNewer      = SYNC_DIR_RIGHT;
+            syncCfg.different       = SYNC_DIR_RIGHT;
+            syncCfg.conflict        = SYNC_DIR_RIGHT;
+            break;
+        case SyncConfiguration::UPDATE:
+            syncCfg.automatic = false;
+            syncCfg.exLeftSideOnly  = SYNC_DIR_RIGHT;
+            syncCfg.exRightSideOnly = SYNC_DIR_NONE;
+            syncCfg.leftNewer       = SYNC_DIR_RIGHT;
+            syncCfg.rightNewer      = SYNC_DIR_NONE;
+            syncCfg.different       = SYNC_DIR_RIGHT;
+            syncCfg.conflict        = SYNC_DIR_NONE;
+            break;
+        case SyncConfiguration::CUSTOM:
+            assert(false);
+            break;
     }
 }
 
@@ -158,22 +158,22 @@ wxString ffs3::getDescription(CompareFilesResult cmpRes)
 {
     switch (cmpRes)
     {
-    case FILE_LEFT_SIDE_ONLY:
-        return _("Files/folders that exist on left side only");
-    case FILE_RIGHT_SIDE_ONLY:
-        return _("Files/folders that exist on right side only");
-    case FILE_LEFT_NEWER:
-        return _("Files that exist on both sides, left one is newer");
-    case FILE_RIGHT_NEWER:
-        return _("Files that exist on both sides, right one is newer");
-    case FILE_DIFFERENT:
-        return _("Files that have different content");
-    case FILE_EQUAL:
-        return _("Files that are equal on both sides");
-    case FILE_DIFFERENT_METADATA:
-        return _("Files/folders that differ in attributes only");
-    case FILE_CONFLICT:
-        return _("Conflicts/files that cannot be categorized");
+        case FILE_LEFT_SIDE_ONLY:
+            return _("Files/folders that exist on left side only");
+        case FILE_RIGHT_SIDE_ONLY:
+            return _("Files/folders that exist on right side only");
+        case FILE_LEFT_NEWER:
+            return _("Files that exist on both sides, left one is newer");
+        case FILE_RIGHT_NEWER:
+            return _("Files that exist on both sides, right one is newer");
+        case FILE_DIFFERENT:
+            return _("Files that have different content");
+        case FILE_EQUAL:
+            return _("Files that are equal on both sides");
+        case FILE_DIFFERENT_METADATA:
+            return _("Equal files/folders that differ in attributes only");
+        case FILE_CONFLICT:
+            return _("Conflicts/files that cannot be categorized");
     }
 
     assert(false);
@@ -185,21 +185,21 @@ wxString ffs3::getSymbol(CompareFilesResult cmpRes)
 {
     switch (cmpRes)
     {
-    case FILE_LEFT_SIDE_ONLY:
-        return wxT("<|");
-    case FILE_RIGHT_SIDE_ONLY:
-        return wxT("|>");
-    case FILE_LEFT_NEWER:
-        return wxT("<<");
-    case FILE_RIGHT_NEWER:
-        return wxT(">>");
-    case FILE_DIFFERENT:
-        return wxT("!=");
-    case FILE_EQUAL:
-        return wxT("'=="); //added quotation mark to avoid error in Excel cell when exporting to *.cvs
-    case FILE_CONFLICT:
-    case FILE_DIFFERENT_METADATA:
-        return wxT("\\/\\->");
+        case FILE_LEFT_SIDE_ONLY:
+            return wxT("<|");
+        case FILE_RIGHT_SIDE_ONLY:
+            return wxT("|>");
+        case FILE_LEFT_NEWER:
+            return wxT("<<");
+        case FILE_RIGHT_NEWER:
+            return wxT(">>");
+        case FILE_DIFFERENT:
+            return wxT("!=");
+        case FILE_EQUAL:
+            return wxT("'=="); //added quotation mark to avoid error in Excel cell when exporting to *.cvs
+        case FILE_CONFLICT:
+        case FILE_DIFFERENT_METADATA:
+            return wxT("\\/\\->");
     }
 
     assert(false);
@@ -211,28 +211,28 @@ wxString ffs3::getDescription(SyncOperation op)
 {
     switch (op)
     {
-    case SO_CREATE_NEW_LEFT:
-        return _("Copy from right to left");
-    case SO_CREATE_NEW_RIGHT:
-        return _("Copy from left to right");
-    case SO_DELETE_LEFT:
-        return _("Delete files/folders existing on left side only");
-    case SO_DELETE_RIGHT:
-        return _("Delete files/folders existing on right side only");
-    case SO_OVERWRITE_LEFT:
-        return _("Copy from right to left overwriting");
-    case SO_OVERWRITE_RIGHT:
-        return _("Copy from left to right overwriting");
-    case SO_DO_NOTHING:
-        return _("Do nothing");
-    case SO_EQUAL:
-        return _("Files that are equal on both sides");
-    case SO_COPY_METADATA_TO_LEFT:
-        return _("Copy attributes only from right to left");
-    case SO_COPY_METADATA_TO_RIGHT:
-        return _("Copy attributes only from left to right");
-    case SO_UNRESOLVED_CONFLICT:
-        return _("Conflicts/files that cannot be categorized");
+        case SO_CREATE_NEW_LEFT:
+            return _("Copy from right to left");
+        case SO_CREATE_NEW_RIGHT:
+            return _("Copy from left to right");
+        case SO_DELETE_LEFT:
+            return _("Delete files/folders existing on left side only");
+        case SO_DELETE_RIGHT:
+            return _("Delete files/folders existing on right side only");
+        case SO_OVERWRITE_LEFT:
+            return _("Copy from right to left overwriting");
+        case SO_OVERWRITE_RIGHT:
+            return _("Copy from left to right overwriting");
+        case SO_DO_NOTHING:
+            return _("Do nothing");
+        case SO_EQUAL:
+            return _("Files that are equal on both sides");
+        case SO_COPY_METADATA_TO_LEFT:
+            return _("Copy attributes only from right to left");
+        case SO_COPY_METADATA_TO_RIGHT:
+            return _("Copy attributes only from left to right");
+        case SO_UNRESOLVED_CONFLICT:
+            return _("Conflicts/files that cannot be categorized");
     };
 
     assert(false);
@@ -244,26 +244,26 @@ wxString ffs3::getSymbol(SyncOperation op)
 {
     switch (op)
     {
-    case SO_CREATE_NEW_LEFT:
-        return wxT("*-");
-    case SO_CREATE_NEW_RIGHT:
-        return wxT("-*");
-    case SO_DELETE_LEFT:
-        return wxT("D-");
-    case SO_DELETE_RIGHT:
-        return wxT("-D");
-    case SO_OVERWRITE_LEFT:
-    case SO_COPY_METADATA_TO_LEFT:
-        return wxT("<-");
-    case SO_OVERWRITE_RIGHT:
-    case SO_COPY_METADATA_TO_RIGHT:
-        return wxT("->");
-    case SO_DO_NOTHING:
-        return wxT(" -");
-    case SO_EQUAL:
-        return wxT("'=="); //added quotation mark to avoid error in Excel cell when exporting to *.cvs
-    case SO_UNRESOLVED_CONFLICT:
-        return wxT("\\/\\->");
+        case SO_CREATE_NEW_LEFT:
+            return wxT("*-");
+        case SO_CREATE_NEW_RIGHT:
+            return wxT("-*");
+        case SO_DELETE_LEFT:
+            return wxT("D-");
+        case SO_DELETE_RIGHT:
+            return wxT("-D");
+        case SO_OVERWRITE_LEFT:
+        case SO_COPY_METADATA_TO_LEFT:
+            return wxT("<-");
+        case SO_OVERWRITE_RIGHT:
+        case SO_COPY_METADATA_TO_RIGHT:
+            return wxT("->");
+        case SO_DO_NOTHING:
+            return wxT(" -");
+        case SO_EQUAL:
+            return wxT("'=="); //added quotation mark to avoid error in Excel cell when exporting to *.cvs
+        case SO_UNRESOLVED_CONFLICT:
+            return wxT("\\/\\->");
     };
 
     assert(false);
@@ -335,11 +335,11 @@ ffs3::MainConfiguration ffs3::merge(const std::vector<MainConfiguration>& mainCf
     for (std::vector<FolderPairEnh>::iterator fp = fpMerged.begin(); fp != fpMerged.end(); ++fp)
     {
         //if local config matches output global config we don't need local one
-        if (    fp->altSyncConfig &&
-                *fp->altSyncConfig ==
-                AlternateSyncConfig(mainCfgs[0].syncConfiguration,
-                                    mainCfgs[0].handleDeletion,
-                                    mainCfgs[0].customDeletionDirectory))
+        if (fp->altSyncConfig &&
+            *fp->altSyncConfig ==
+            AlternateSyncConfig(mainCfgs[0].syncConfiguration,
+                                mainCfgs[0].handleDeletion,
+                                mainCfgs[0].customDeletionDirectory))
             fp->altSyncConfig.reset();
 
         if (sameLocalFilter) //use global filter in this case
