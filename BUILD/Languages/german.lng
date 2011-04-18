@@ -206,6 +206,8 @@ Cannot determine sync-direction:
 Die Synchronisationsrichtung konnte nicht bestimmt werden:
 Cannot find %x
 %x wurde nicht gefunden.
+Cannot write to empty directory path!
+
 Category
 Kategorie
 Clear filter settings
@@ -850,8 +852,6 @@ The file was not processed by last synchronization!
 Die Datei wurde in der letzten Synchronisation nicht verarbeitet!
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
 Diese Variante identifiziert zwei gleichnamige Dateien als gleich, wenn sie die gleiche Dateigröße haben UND der Zeitpunkt der letzten Änderung derselbe ist.
-Time
-Uhrzeit
 Time elapsed:
 Vergangene Zeit:
 Time remaining:

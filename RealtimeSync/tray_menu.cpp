@@ -5,23 +5,24 @@
 // **************************************************************************
 //
 #include "tray_menu.h"
+#include <algorithm>
+#include <iterator>
+#include <limits>
 #include <wx/msgdlg.h>
 #include <wx/taskbar.h>
 #include <wx/app.h>
-#include "resources.h"
-#include <algorithm>
-#include <iterator>
-#include "../shared/string_conv.h"
 #include <wx/utils.h>
 #include <wx/menu.h>
 #include "watcher.h"
 #include <wx/utils.h>
 #include <wx/log.h>
-#include "../shared/assert_static.h"
-#include "../shared/build_info.h"
 #include <wx/icon.h> //Linux needs this
 #include <wx/timer.h>
-#include <limits>
+#include "resources.h"
+#include "../shared/string_conv.h"
+#include "../shared/i18n.h"
+#include "../shared/assert_static.h"
+#include "../shared/build_info.h"
 
 using namespace rts;
 

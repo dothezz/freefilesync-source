@@ -22,8 +22,8 @@ Zstring wxToZ(const wxChar* str);
 Zstring wxToZ(wxChar ch);
 
 
-
-
+wxString zxToWx(const zxString& str);
+zxString wxToZx(const wxString& str);
 
 
 
@@ -104,6 +104,20 @@ inline
 Zstring wxToZ(wxChar ch)
 {
     return wxToZ(wxString(ch));
+}
+
+
+inline
+wxString zxToWx(const zxString& str)
+{
+    return wxString(str.c_str(), str.length());
+}
+
+
+inline
+zxString wxToZx(const wxString& str)
+{
+    return zxString(str.c_str(), str.length());
 }
 }
 

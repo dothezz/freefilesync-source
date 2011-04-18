@@ -5,9 +5,9 @@
 // **************************************************************************
 //
 #include "file_io.h"
-#include <wx/intl.h>
 #include "string_conv.h"
 #include "system_func.h"
+#include "i18n.h"
 
 #ifdef FFS_WIN
 #include "long_path_prefix.h"
@@ -18,7 +18,15 @@
 using namespace ffs3;
 
 
-FileInput::FileInput(const Zstring& filename)  : //throw FileError()
+FileInput::FileInput(FileHandle handle, const Zstring& filename) :
+#ifdef FFS_WIN
+    eofReached(false),
+#endif
+    fileHandle(handle),
+    filename_(filename) {}
+
+
+FileInput::FileInput(const Zstring& filename)  : //throw (FileError, ErrorNotExisting)
 #ifdef FFS_WIN
     eofReached(false),
 #endif
@@ -63,19 +71,19 @@ FileInput::FileInput(const Zstring& filename)  : //throw FileError()
         if (lastError == ERROR_FILE_NOT_FOUND ||
             lastError == ERROR_PATH_NOT_FOUND)
             throw ErrorNotExisting(errorMessage);
-        else
-            throw FileError(errorMessage);
+
+        throw FileError(errorMessage);
     }
 #elif defined FFS_LINUX
-    fileHandle = ::fopen(filename.c_str(), "rb,type=record,noseek"); //utilize UTF-8 filename
+    fileHandle = ::fopen(filename.c_str(), "r,type=record,noseek"); //utilize UTF-8 filename
     if (fileHandle == NULL)
     {
         const int lastError = errno;
         const wxString& errorMessage = wxString(_("Error opening file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"") + wxT("\n\n") + ffs3::getLastErrorFormatted(lastError);
         if (lastError == ENOENT)
             throw ErrorNotExisting(errorMessage);
-        else
-            throw FileError(errorMessage);
+
+        throw FileError(errorMessage);
     }
 #endif
 }
@@ -91,25 +99,28 @@ FileInput::~FileInput()
 }
 
 
-size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number of bytes read; throw FileError()
+size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number of bytes read; throw (FileError)
 {
 #ifdef FFS_WIN
     DWORD bytesRead = 0;
 
-    if (!::ReadFile(
-            fileHandle,    //__in         HANDLE hFile,
-            buffer,        //__out        LPVOID lpBuffer,
-            static_cast<DWORD>(bytesToRead), //__in         DWORD nNumberOfBytesToRead,
-            &bytesRead,    //__out_opt    LPDWORD lpNumberOfBytesRead,
-            NULL)          //__inout_opt  LPOVERLAPPED lpOverlapped
-        || bytesRead > bytesToRead) //must be fulfilled
+    if (!::ReadFile(fileHandle,    //__in         HANDLE hFile,
+                    buffer,        //__out        LPVOID lpBuffer,
+                    static_cast<DWORD>(bytesToRead), //__in         DWORD nNumberOfBytesToRead,
+                    &bytesRead,    //__out_opt    LPDWORD lpNumberOfBytesRead,
+                    NULL))          //__inout_opt  LPOVERLAPPED lpOverlapped
         throw FileError(wxString(_("Error reading file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"") +
                         wxT("\n\n") + ffs3::getLastErrorFormatted());
 
+    if (bytesRead > bytesToRead)
+        throw FileError(wxString(_("Error reading file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"") +
+                        wxT("\n\n") + wxT("buffer overflow"));
+
     if (bytesRead < bytesToRead)
-        eofReached = true;
+        eofReached = bytesRead < bytesToRead;
 
     return bytesRead;
+
 #elif defined FFS_LINUX
     const size_t bytesRead = ::fread(buffer, 1, bytesToRead, fileHandle);
     if (::ferror(fileHandle) != 0)
@@ -130,67 +141,87 @@ bool FileInput::eof() //end of file reached
 }
 
 
-FileOutput::FileOutput(const Zstring& filename) : //throw FileError()
+FileOutput::FileOutput(FileHandle handle, const Zstring& filename) : fileHandle(handle), filename_(filename) {}
+
+
+FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw (FileError, ErrorTargetPathMissing, ErrorTargetExisting)
     filename_(filename)
 {
 #ifdef FFS_WIN
     fileHandle = ::CreateFile(ffs3::applyLongPathPrefix(filename).c_str(),
                               GENERIC_WRITE,
-                              FILE_SHARE_READ,
+                              FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //note: FILE_SHARE_DELETE is required to rename file while handle is open!
                               NULL,
-                              CREATE_ALWAYS,
+                              access == ACC_OVERWRITE ? CREATE_ALWAYS : CREATE_NEW,
                               FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN,
                               NULL);
     if (fileHandle == INVALID_HANDLE_VALUE)
-        throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"") +
-                        wxT("\n\n") + ffs3::getLastErrorFormatted());
+    {
+        const DWORD lastError = ::GetLastError();
+        const wxString& errorMessage = wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"") +
+                                       wxT("\n\n") + ffs3::getLastErrorFormatted(lastError);
+
+        if (lastError == ERROR_FILE_EXISTS)
+            throw ErrorTargetExisting(errorMessage);
+
+        if (lastError == ERROR_PATH_NOT_FOUND)
+            throw ErrorTargetPathMissing(errorMessage);
+
+        throw FileError(errorMessage);
+    }
+
 #elif defined FFS_LINUX
-    fileHandle = ::fopen(filename.c_str(), "wb,type=record,noseek"); //utilize UTF-8 filename
-    if (!fileHandle)
-        throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"") +
-                        wxT("\n\n") + ffs3::getLastErrorFormatted());
+    fileHandle = ::fopen(filename.c_str(),
+                         //GNU extension: https://www.securecoding.cert.org/confluence/display/cplusplus/FIO03-CPP.+Do+not+make+assumptions+about+fopen()+and+file+creation
+                         access == ACC_OVERWRITE ? "w,type=record,noseek" : "wx,type=record,noseek");
+    if (fileHandle == NULL)
+    {
+        const int lastError = errno;
+        const wxString& errorMessage = wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"") +
+                                       wxT("\n\n") + ffs3::getLastErrorFormatted(lastError);
+        if (lastError == EEXIST)
+            throw ErrorTargetExisting(errorMessage);
+
+        if (lastError == ENOENT)
+            throw ErrorTargetPathMissing(errorMessage);
+
+        throw FileError(errorMessage);
+    }
 #endif
 }
 
 
 FileOutput::~FileOutput()
 {
-    close(); //may be called more than once
+#ifdef FFS_WIN
+    ::CloseHandle(fileHandle);
+#elif defined FFS_LINUX
+    ::fclose(fileHandle); //NEVER allow passing NULL to fclose! -> crash!
+#endif
 }
 
 
-void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw FileError()
+void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw (FileError)
 {
 #ifdef FFS_WIN
     DWORD bytesWritten = 0;
 
-    if (!::WriteFile(
-            fileHandle,    //__in         HANDLE hFile,
-            buffer,        //__out        LPVOID lpBuffer,
-            static_cast<DWORD>(bytesToWrite),  //__in         DWORD nNumberOfBytesToRead,
-            &bytesWritten, //__out_opt    LPDWORD lpNumberOfBytesWritten,
-            NULL)          //__inout_opt  LPOVERLAPPED lpOverlapped
-        || bytesWritten != bytesToWrite) //must be fulfilled for synchronous writes!
+    if (!::WriteFile(fileHandle,    //__in         HANDLE hFile,
+                     buffer,        //__out        LPVOID lpBuffer,
+                     static_cast<DWORD>(bytesToWrite),  //__in         DWORD nNumberOfBytesToWrite,
+                     &bytesWritten, //__out_opt    LPDWORD lpNumberOfBytesWritten,
+                     NULL))          //__inout_opt  LPOVERLAPPED lpOverlapped
         throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"") +
                         wxT("\n\n") + ffs3::getLastErrorFormatted() + wxT(" (w)")); //w -> distinguish from fopen error message!
+
+    if (bytesWritten != bytesToWrite) //must be fulfilled for synchronous writes!
+        throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"") +
+                        wxT("\n\n") + wxT("incomplete write"));
+
 #elif defined FFS_LINUX
     const size_t bytesWritten = ::fwrite(buffer, 1, bytesToWrite, fileHandle);
     if (::ferror(fileHandle) != 0 || bytesWritten != bytesToWrite)
         throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"") +
                         wxT("\n\n") + ffs3::getLastErrorFormatted() + wxT(" (w)")); //w -> distinguish from fopen error message!
 #endif
-}
-
-
-void FileOutput::close() //close file stream
-{
-    if (fileHandle != NULL) //NEVER allow passing NULL to fclose! -> crash!
-    {
-#ifdef FFS_WIN
-        ::CloseHandle(fileHandle);
-#elif defined FFS_LINUX
-        ::fclose(fileHandle);
-#endif
-        fileHandle = NULL;
-    }
 }

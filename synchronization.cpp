@@ -6,7 +6,6 @@
 //
 #include "synchronization.h"
 #include <stdexcept>
-#include <wx/intl.h>
 #include <wx/msgdlg.h>
 #include <wx/log.h>
 #include "shared/string_conv.h"
@@ -14,7 +13,9 @@
 #include "shared/system_constants.h"
 #include "library/status_handler.h"
 #include "shared/file_handling.h"
+#include "shared/resolve_path.h"
 #include "shared/recycler.h"
+#include "shared/i18n.h"
 #include <wx/file.h>
 #include <boost/bind.hpp>
 #include "shared/global_func.h"
@@ -30,6 +31,7 @@
 #include "shared/long_path_prefix.h"
 #include <boost/scoped_ptr.hpp>
 #include "shared/perf.h"
+#include "shared/shadow.h"
 #endif
 
 using namespace ffs3;
@@ -519,25 +521,6 @@ SyncProcess::SyncProcess(xmlAccess::OptionalDialogs& warnings,
 //--------------------------------------------------------------------------------------------------------------
 
 
-namespace
-{
-void ensureExists(const Zstring& dirname, const Zstring& templateDir, bool copyFilePermissions) //throw (FileError)
-{
-    if (!dirname.empty()) //kind of pathological ?
-        if (!ffs3::dirExists(dirname))
-        {
-            //lazy creation of alternate deletion directory (including super-directories of targetFile)
-            ffs3::createDirectory(dirname, templateDir, false, copyFilePermissions);
-        }
-    /*symbolic link handling:
-    if "not traversing symlinks": fullName == c:\syncdir<symlinks>\some\dirs\leaf<symlink>
-    => setting irrelevant
-    if "traversing symlinks":     fullName == c:\syncdir<symlinks>\some\dirs<symlinks>\leaf<symlink>
-    => setting NEEDS to be false: We want to move leaf, therefore symlinks in "some\dirs" must not interfere */
-}
-}
-
-
 class DeletionHandling
 {
 public:
@@ -690,21 +673,21 @@ const Zstring& DeletionHandling::getSessionDir<RIGHT_SIDE>() const
 
 namespace
 {
-class MoveFileCallbackImpl : public MoveFileCallback //callback functionality
+class CallbackMoveFileImpl : public CallbackMoveFile //callback functionality
 {
 public:
-    MoveFileCallbackImpl(StatusHandler& handler) : statusHandler_(handler) {}
+    CallbackMoveFileImpl(StatusHandler& handler) : statusHandler_(handler) {}
 
     virtual Response requestUiRefresh(const Zstring& currentObject)  //DON'T throw exceptions here, at least in Windows build!
     {
 #ifdef FFS_WIN
         statusHandler_.requestUiRefresh(false); //don't allow throwing exception within this call: windows copying callback can't handle this
         if (statusHandler_.abortIsRequested())
-            return MoveFileCallback::CANCEL;
+            return CallbackMoveFile::CANCEL;
 #elif defined FFS_LINUX
         statusHandler_.requestUiRefresh(); //exceptions may be thrown here!
 #endif
-        return MoveFileCallback::CONTINUE;
+        return CallbackMoveFile::CONTINUE;
     }
 
 private:
@@ -712,9 +695,9 @@ private:
 };
 
 
-struct RemoveDirCallbackImpl : public RemoveDirCallback
+struct CallbackRemoveDirImpl : public CallbackRemoveDir
 {
-    RemoveDirCallbackImpl(StatusHandler& handler) : statusHandler_(handler) {}
+    CallbackRemoveDirImpl(StatusHandler& handler) : statusHandler_(handler) {}
 
     virtual void requestUiRefresh(const Zstring& currentObject)
     {
@@ -770,8 +753,8 @@ void DeletionHandling::removeFile(const FileSystemObject& fileObj) const
                 if (!dirExists(targetDir))
                     createDirectory(targetDir); //throw (FileError)
 
-                MoveFileCallbackImpl callBack(statusUpdater_); //if file needs to be copied we need callback functionality to update screen and offer abort
-                moveFile(fileObj.getFullName<side>(), targetFile, &callBack);
+                CallbackMoveFileImpl callBack(statusUpdater_); //if file needs to be copied we need callback functionality to update screen and offer abort
+                moveFile(fileObj.getFullName<side>(), targetFile, true, &callBack);
             }
             break;
     }
@@ -787,7 +770,7 @@ void DeletionHandling::removeFolder(const FileSystemObject& dirObj) const
     {
         case DELETE_PERMANENTLY:
         {
-            RemoveDirCallbackImpl remDirCallback(statusUpdater_);
+            CallbackRemoveDirImpl remDirCallback(statusUpdater_);
             removeDirectory(dirObj.getFullName<side>(), &remDirCallback);
         }
         break;
@@ -825,7 +808,7 @@ void DeletionHandling::removeFolder(const FileSystemObject& dirObj) const
                 if (!dirExists(targetSuperDir))
                     createDirectory(targetSuperDir); //throw (FileError)
 
-                MoveFileCallbackImpl callBack(statusUpdater_); //if files need to be copied, we need callback functionality to update screen and offer abort
+                CallbackMoveFileImpl callBack(statusUpdater_); //if files need to be copied, we need callback functionality to update screen and offer abort
                 moveDirectory(dirObj.getFullName<side>(), targetDir, true, &callBack);
             }
             break;
@@ -929,8 +912,9 @@ private:
     //more low level helper
     template <ffs3::SelectedSide side>
     void deleteSymlink(const SymLinkMapping& linkObj) const;
-    void copySymlink(const Zstring& source, const Zstring& target, LinkDescriptor::LinkType type) const;
-    void copyFileUpdating(const Zstring& source, const Zstring& target, const wxULongLong& sourceFileSize) const;
+    void copySymlink(const Zstring& source, const Zstring& target, LinkDescriptor::LinkType type, bool inRecursion = false) const;
+    template <class DelTargetCommand>
+    void copyFileUpdating(const Zstring& source, const Zstring& target, const DelTargetCommand& cmd, const wxULongLong& sourceFileSize, int recursionLvl = 0) const;
     void verifyFileCopy(const Zstring& source, const Zstring& target) const;
 
     StatusHandler& statusUpdater_;
@@ -1009,17 +993,34 @@ void SynchronizeFolderPair::execute(HierarchyObject& hierObj)
     }
 }
 
+
 namespace
 {
-//runtime impact per file: SSD: 0s, HDD: 43 µs, USB stick: 1 ms
-inline
-void checkFileReadable(const Zstring& filename) //throw (FileError)
+struct NullCommand
 {
-    ffs3::FileInput file(filename); //throw (FileError)
-    char buffer[1];
-    file.read(buffer, 1);           //
+    void operator()() const {}
+};
+
+
+template <SelectedSide side>
+class DelTargetCommand
+{
+public:
+    DelTargetCommand(FileMapping& fileObj, const DeletionHandling& delHandling) : fileObj_(fileObj), delHandling_(delHandling) {}
+
+    void operator()() const
+    {
+        //delete target and copy source
+        delHandling_.removeFile<side>(fileObj_); //throw (FileError)
+        fileObj_.removeObject<side>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
+    }
+
+private:
+    FileMapping& fileObj_;
+    const DeletionHandling& delHandling_;
+};
 }
-}
+
 
 void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
 {
@@ -1037,7 +1038,9 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
             statusUpdater_.reportInfo(statusText);
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
-            copyFileUpdating(fileObj.getFullName<RIGHT_SIDE>(), target, fileObj.getFileSize<RIGHT_SIDE>());
+            copyFileUpdating(fileObj.getFullName<RIGHT_SIDE>(), target,
+                             NullCommand(), //no target to delete
+                             fileObj.getFileSize<RIGHT_SIDE>());
             break;
 
         case SO_CREATE_NEW_RIGHT:
@@ -1049,7 +1052,9 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
             statusUpdater_.reportInfo(statusText);
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
-            copyFileUpdating(fileObj.getFullName<LEFT_SIDE>(), target, fileObj.getFileSize<LEFT_SIDE>());
+            copyFileUpdating(fileObj.getFullName<LEFT_SIDE>(), target,
+                             NullCommand(), //no target to delete
+                             fileObj.getFileSize<LEFT_SIDE>());
             break;
 
         case SO_DELETE_LEFT:
@@ -1058,7 +1063,7 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
             statusUpdater_.reportInfo(statusText);
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
-            delHandling_.removeFile<LEFT_SIDE>(fileObj); //throw FileError()
+            delHandling_.removeFile<LEFT_SIDE>(fileObj); //throw (FileError)
             break;
 
         case SO_DELETE_RIGHT:
@@ -1067,7 +1072,7 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
             statusUpdater_.reportInfo(statusText);
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
-            delHandling_.removeFile<RIGHT_SIDE>(fileObj); //throw FileError()
+            delHandling_.removeFile<RIGHT_SIDE>(fileObj); //throw (FileError)
             break;
 
         case SO_OVERWRITE_LEFT:
@@ -1079,14 +1084,9 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
             statusUpdater_.reportInfo(statusText);
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
-            //1. check read access: don't delete target file if source cannot be read (e.g. is locked)
-            checkFileReadable(fileObj.getFullName<RIGHT_SIDE>()); //throw (FileError)
-
-            //2. delete target and copy source
-            delHandling_.removeFile<LEFT_SIDE>(fileObj); //throw FileError()
-            fileObj.removeObject<LEFT_SIDE>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
-
-            copyFileUpdating(fileObj.getFullName<RIGHT_SIDE>(), target, fileObj.getFileSize<RIGHT_SIDE>());
+            copyFileUpdating(fileObj.getFullName<RIGHT_SIDE>(), target,
+                             DelTargetCommand<LEFT_SIDE>(fileObj, delHandling_), //delete target at appropriate time
+                             fileObj.getFileSize<RIGHT_SIDE>());
             break;
 
         case SO_OVERWRITE_RIGHT:
@@ -1098,14 +1098,9 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
             statusUpdater_.reportInfo(statusText);
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
-            //1. check read access: don't delete target file if source cannot be read (e.g. is locked)
-            checkFileReadable(fileObj.getFullName<LEFT_SIDE>()); //throw (FileError)
-
-            //2. delete target and copy source
-            delHandling_.removeFile<RIGHT_SIDE>(fileObj); //throw FileError()
-            fileObj.removeObject<RIGHT_SIDE>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
-
-            copyFileUpdating(fileObj.getFullName<LEFT_SIDE>(), target, fileObj.getFileSize<LEFT_SIDE>());
+            copyFileUpdating(fileObj.getFullName<LEFT_SIDE>(), target,
+                             DelTargetCommand<RIGHT_SIDE>(fileObj, delHandling_), //delete target at appropriate time
+                             fileObj.getFileSize<LEFT_SIDE>());
             break;
 
         case SO_COPY_METADATA_TO_LEFT:
@@ -1115,8 +1110,8 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
             if (fileObj.getShortName<LEFT_SIDE>() != fileObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
-                moveFile(fileObj.getFullName<LEFT_SIDE>(),
-                         fileObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + fileObj.getShortName<RIGHT_SIDE>()); //throw (FileError);
+                renameFile(fileObj.getFullName<LEFT_SIDE>(),
+                           fileObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + fileObj.getShortName<RIGHT_SIDE>()); //throw (FileError);
 
             if (!sameFileTime(fileObj.getLastWriteTime<LEFT_SIDE>(), fileObj.getLastWriteTime<RIGHT_SIDE>(), 2)) ////respect 2 second FAT/FAT32 precision
                 copyFileTimes(fileObj.getFullName<RIGHT_SIDE>(), fileObj.getFullName<LEFT_SIDE>(), true); //deref symlinks; throw (FileError)
@@ -1129,8 +1124,8 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
             if (fileObj.getShortName<LEFT_SIDE>() != fileObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
-                moveFile(fileObj.getFullName<RIGHT_SIDE>(),
-                         fileObj.getFullName<RIGHT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + fileObj.getShortName<LEFT_SIDE>()); //throw (FileError);
+                renameFile(fileObj.getFullName<RIGHT_SIDE>(),
+                           fileObj.getFullName<RIGHT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + fileObj.getShortName<LEFT_SIDE>()); //throw (FileError);
 
             if (!sameFileTime(fileObj.getLastWriteTime<LEFT_SIDE>(), fileObj.getLastWriteTime<RIGHT_SIDE>(), 2)) ////respect 2 second FAT/FAT32 precision
                 copyFileTimes(fileObj.getFullName<LEFT_SIDE>(), fileObj.getFullName<RIGHT_SIDE>(), true); //deref symlinks; throw (FileError)
@@ -1188,7 +1183,7 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
             statusUpdater_.reportInfo(statusText);
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
-            deleteSymlink<LEFT_SIDE>(linkObj); //throw FileError()
+            deleteSymlink<LEFT_SIDE>(linkObj); //throw (FileError)
             break;
 
         case SO_DELETE_RIGHT:
@@ -1197,7 +1192,7 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
             statusUpdater_.reportInfo(statusText);
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
-            deleteSymlink<RIGHT_SIDE>(linkObj); //throw FileError()
+            deleteSymlink<RIGHT_SIDE>(linkObj); //throw (FileError)
             break;
 
         case SO_OVERWRITE_LEFT:
@@ -1209,7 +1204,7 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
             statusUpdater_.reportInfo(statusText);
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
-            deleteSymlink<LEFT_SIDE>(linkObj); //throw FileError()
+            deleteSymlink<LEFT_SIDE>(linkObj); //throw (FileError)
             linkObj.removeObject<LEFT_SIDE>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
 
             copySymlink(linkObj.getFullName<RIGHT_SIDE>(), target, linkObj.getLinkType<RIGHT_SIDE>());
@@ -1224,7 +1219,7 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
             statusUpdater_.reportInfo(statusText);
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
-            deleteSymlink<RIGHT_SIDE>(linkObj); //throw FileError()
+            deleteSymlink<RIGHT_SIDE>(linkObj); //throw (FileError)
             linkObj.removeObject<RIGHT_SIDE>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
 
             copySymlink(linkObj.getFullName<LEFT_SIDE>(), target, linkObj.getLinkType<LEFT_SIDE>());
@@ -1237,8 +1232,8 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
             if (linkObj.getShortName<LEFT_SIDE>() != linkObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
-                moveFile(linkObj.getFullName<LEFT_SIDE>(),
-                         linkObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + linkObj.getShortName<RIGHT_SIDE>()); //throw (FileError);
+                renameFile(linkObj.getFullName<LEFT_SIDE>(),
+                           linkObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + linkObj.getShortName<RIGHT_SIDE>()); //throw (FileError);
 
             if (!sameFileTime(linkObj.getLastWriteTime<LEFT_SIDE>(), linkObj.getLastWriteTime<RIGHT_SIDE>(), 2)) ////respect 2 second FAT/FAT32 precision
                 copyFileTimes(linkObj.getFullName<RIGHT_SIDE>(), linkObj.getFullName<LEFT_SIDE>(), false); //don't deref symlinks; throw (FileError)
@@ -1251,8 +1246,8 @@ void SynchronizeFolderPair::synchronizeLink(SymLinkMapping& linkObj) const
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
             if (linkObj.getShortName<LEFT_SIDE>() != linkObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
-                moveFile(linkObj.getFullName<RIGHT_SIDE>(),
-                         linkObj.getFullName<RIGHT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + linkObj.getShortName<LEFT_SIDE>()); //throw (FileError);
+                renameFile(linkObj.getFullName<RIGHT_SIDE>(),
+                           linkObj.getFullName<RIGHT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + linkObj.getShortName<LEFT_SIDE>()); //throw (FileError);
 
             if (!sameFileTime(linkObj.getLastWriteTime<LEFT_SIDE>(), linkObj.getLastWriteTime<RIGHT_SIDE>(), 2)) ////respect 2 second FAT/FAT32 precision
                 copyFileTimes(linkObj.getFullName<LEFT_SIDE>(), linkObj.getFullName<RIGHT_SIDE>(), false); //don't deref symlinks; throw (FileError)
@@ -1292,7 +1287,7 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
             //some check to catch the error that directory on source has been deleted externally after "compare"...
             if (!ffs3::dirExists(dirObj.getFullName<RIGHT_SIDE>()))
                 throw FileError(wxString(_("Source directory does not exist anymore:")) + wxT("\n\"") + zToWx(dirObj.getFullName<RIGHT_SIDE>()) + wxT("\""));
-            createDirectory(target, dirObj.getFullName<RIGHT_SIDE>(), false, copyFilePermissions_); //no symlink copying!
+            createDirectory(target, dirObj.getFullName<RIGHT_SIDE>(), copyFilePermissions_); //no symlink copying!
             break;
 
         case SO_CREATE_NEW_RIGHT:
@@ -1306,7 +1301,7 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
             //some check to catch the error that directory on source has been deleted externally after "compare"...
             if (!ffs3::dirExists(dirObj.getFullName<LEFT_SIDE>()))
                 throw FileError(wxString(_("Source directory does not exist anymore:")) + wxT("\n\"") + zToWx(dirObj.getFullName<LEFT_SIDE>()) + wxT("\""));
-            createDirectory(target, dirObj.getFullName<LEFT_SIDE>(), false, copyFilePermissions_); //no symlink copying!
+            createDirectory(target, dirObj.getFullName<LEFT_SIDE>(), copyFilePermissions_); //no symlink copying!
             break;
 
         case SO_DELETE_LEFT:
@@ -1316,7 +1311,7 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
             statusUpdater_.reportInfo(statusText);
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
-            delHandling_.removeFolder<LEFT_SIDE>(dirObj); //throw FileError()
+            delHandling_.removeFolder<LEFT_SIDE>(dirObj); //throw (FileError)
             {
                 //progress indicator update: DON'T forget to notify about implicitly deleted objects!
                 const SyncStatistics subObjects(dirObj);
@@ -1335,7 +1330,7 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
             statusUpdater_.reportInfo(statusText);
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
-            delHandling_.removeFolder<RIGHT_SIDE>(dirObj); //throw FileError()
+            delHandling_.removeFolder<RIGHT_SIDE>(dirObj); //throw (FileError)
             {
                 //progress indicator update: DON'T forget to notify about implicitly deleted objects!
                 const SyncStatistics subObjects(dirObj);
@@ -1354,8 +1349,8 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
             if (dirObj.getShortName<LEFT_SIDE>() != dirObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
-                moveFile(dirObj.getFullName<LEFT_SIDE>(),
-                         dirObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + dirObj.getShortName<RIGHT_SIDE>()); //throw (FileError);
+                renameFile(dirObj.getFullName<LEFT_SIDE>(),
+                           dirObj.getFullName<LEFT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + dirObj.getShortName<RIGHT_SIDE>()); //throw (FileError);
             //copyFileTimes(dirObj.getFullName<RIGHT_SIDE>(), dirObj.getFullName<LEFT_SIDE>(), true); //throw (FileError) -> is executed after sub-objects have finished synchronization
             break;
 
@@ -1366,8 +1361,8 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
             statusUpdater_.requestUiRefresh(); //trigger display refresh
 
             if (dirObj.getShortName<LEFT_SIDE>() != dirObj.getShortName<RIGHT_SIDE>()) //adapt difference in case (windows only)
-                moveFile(dirObj.getFullName<RIGHT_SIDE>(),
-                         dirObj.getFullName<RIGHT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + dirObj.getShortName<LEFT_SIDE>()); //throw (FileError);
+                renameFile(dirObj.getFullName<RIGHT_SIDE>(),
+                           dirObj.getFullName<RIGHT_SIDE>().BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR + dirObj.getShortName<LEFT_SIDE>()); //throw (FileError);
             //copyFileTimes(dirObj.getFullName<LEFT_SIDE>(), dirObj.getFullName<RIGHT_SIDE>(), true); //throw (FileError) -> is executed after sub-objects have finished synchronization
             break;
 
@@ -1642,8 +1637,8 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         for (DirSpaceRequAvailList::const_iterator i = diskSpaceMissing.begin(); i != diskSpaceMissing.end(); ++i)
             warningMessage += wxString(wxT("\n\n")) +
                               wxT("\"") + zToWx(i->first) + wxT("\"\n") +
-                              _("Free disk space required:") + wxT(" ") + formatFilesizeToShortString(i->second.first)  + wxT("\n") +
-                              _("Free disk space available:")      + wxT(" ") + formatFilesizeToShortString(i->second.second);
+                              _("Free disk space required:")  + wxT(" ") + formatFilesizeToShortString(i->second.first)  + wxT("\n") +
+                              _("Free disk space available:") + wxT(" ") + formatFilesizeToShortString(i->second.second);
 
         statusUpdater.reportWarning(warningMessage, m_warnings.warningNotEnoughDiskSpace);
     }
@@ -1792,13 +1787,18 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
 //###########################################################################################
 //callback functionality for smooth progress indicators
 
-class WhileCopying : public ffs3::CopyFileCallback //callback functionality
+template <class DelTargetCommand>
+class WhileCopying : public ffs3::CallbackCopyFile //callback functionality
 {
 public:
+    WhileCopying(wxLongLong& bytesTransferredLast,
+                 StatusHandler& statusHandler,
+                 const DelTargetCommand& cmd) :
+        bytesTransferredLast_(bytesTransferredLast),
+        statusHandler_(statusHandler),
+        cmd_(cmd) {}
 
-    WhileCopying(wxLongLong& bytesTransferredLast, StatusHandler& statusHandler) :
-        m_bytesTransferredLast(bytesTransferredLast),
-        m_statusHandler(statusHandler) {}
+    virtual void deleteTargetFile(const Zstring& targetFile) { cmd_(); }
 
     virtual Response updateCopyStatus(const wxULongLong& totalBytesTransferred)
     {
@@ -1806,88 +1806,165 @@ public:
         const wxLongLong totalBytes = common::convertToSigned(totalBytesTransferred);
 
         //inform about the (differential) processed amount of data
-        m_statusHandler.updateProcessedData(0, totalBytes - m_bytesTransferredLast);
-        m_bytesTransferredLast = totalBytes;
+        statusHandler_.updateProcessedData(0, totalBytes - bytesTransferredLast_);
+        bytesTransferredLast_ = totalBytes;
 
 #ifdef FFS_WIN
-        m_statusHandler.requestUiRefresh(false); //don't allow throwing exception within this call: windows copying callback can't handle this
-        if (m_statusHandler.abortIsRequested())
-            return CopyFileCallback::CANCEL;
+        statusHandler_.requestUiRefresh(false); //don't allow throwing exception within this call: windows copying callback can't handle this
+        if (statusHandler_.abortIsRequested())
+            return CallbackCopyFile::CANCEL;
 #elif defined FFS_LINUX
-        m_statusHandler.requestUiRefresh(); //exceptions may be thrown here!
+        statusHandler_.requestUiRefresh(); //exceptions may be thrown here!
 #endif
-        return CopyFileCallback::CONTINUE;
+        return CallbackCopyFile::CONTINUE;
     }
 
 private:
-    wxLongLong& m_bytesTransferredLast;
-    StatusHandler& m_statusHandler;
+    wxLongLong&      bytesTransferredLast_;
+    StatusHandler&   statusHandler_;
+    DelTargetCommand cmd_;
+};
+
+
+class CleanUpStats //lambdas coming soon... unfortunately Loki::ScopeGuard is no option because of lazy function argument evaluation (-1 * ...)
+{
+    bool dismissed;
+    StatusHandler& statusUpdater_;
+    const wxLongLong& bytesTransferred_;
+
+public:
+    CleanUpStats(StatusHandler& statusUpdater, const wxLongLong& bytesTransferred) : dismissed(false), statusUpdater_(statusUpdater), bytesTransferred_(bytesTransferred) {}
+    ~CleanUpStats()
+    {
+        if (!dismissed)
+            try
+            {
+                statusUpdater_.updateProcessedData(0, bytesTransferred_ * -1); //throw ?
+            }
+            catch (...) {}
+    }
+    void dismiss() { dismissed = true; }
 };
 
 
 //copy file while executing statusUpdater->requestUiRefresh() calls
-void SynchronizeFolderPair::copyFileUpdating(const Zstring& source, const Zstring& target, const wxULongLong& totalBytesToCpy) const
+template <class DelTargetCommand>
+void SynchronizeFolderPair::copyFileUpdating(const Zstring& source, const Zstring& target, const DelTargetCommand& cmd, const wxULongLong& totalBytesToCpy, int recursionLvl) const
 {
-    //create folders first (see http://sourceforge.net/tracker/index.php?func=detail&aid=2628943&group_id=234430&atid=1093080)
-    const Zstring targetDir   = target.BeforeLast(common::FILE_NAME_SEPARATOR);
-    const Zstring templateDir = source.BeforeLast(common::FILE_NAME_SEPARATOR);
-
-    ensureExists(targetDir, templateDir, copyFilePermissions_); //throw (FileError)
-
-
-    //start of (possibly) long-running copy process: ensure status updates are performed regularly
-    wxLongLong totalBytesTransferred;
-    WhileCopying callback(totalBytesTransferred, statusUpdater_);
+    const int exceptionPaths = 2;
 
     try
     {
-        ffs3::copyFile(source,
-                       target,
-                       false, //type File implicitly means symlinks need to be dereferenced!
-                       copyFilePermissions_,
-#ifdef FFS_WIN
-                       shadowCopyHandler_,
-#endif
-                       &callback);
+        //start of (possibly) long-running copy process: ensure status updates are performed regularly
+        wxLongLong totalBytesTransferred;
+        CleanUpStats dummy(statusUpdater_, totalBytesTransferred); //error situation: undo communication of processed amount of data
 
-        if (verifyCopiedFiles_) //verify if data was copied correctly
-            verifyFileCopy(source, target);
+        WhileCopying<DelTargetCommand> callback(totalBytesTransferred, statusUpdater_, cmd);
+
+        ffs3::copyFile(source, //type File implicitly means symlinks need to be dereferenced!
+                       target,
+                       copyFilePermissions_,
+                       &callback); //throw (FileError, ErrorFileLocked);
+
+        //inform about the (remaining) processed amount of data
+        dummy.dismiss();
+        statusUpdater_.updateProcessedData(0, common::convertToSigned(totalBytesToCpy) - totalBytesTransferred);
     }
-    catch (...)
+#ifdef FFS_WIN
+    catch (ErrorFileLocked&)
     {
-        //error situation: undo communication of processed amount of data
-        statusUpdater_.updateProcessedData(0, totalBytesTransferred * -1 );
+        if (recursionLvl >= exceptionPaths) throw;
+
+        //if file is locked (try to) use Windows Volume Shadow Copy Service
+        if (shadowCopyHandler_ == NULL) throw;
+
+        Zstring shadowFilename;
+        try
+        {
+            //contains prefix: E.g. "\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Program Files\FFS\sample.dat"
+            shadowFilename = shadowCopyHandler_->makeShadowCopy(source); //throw (FileError)
+        }
+        catch (const FileError& e)
+        {
+            wxString errorMsg = _("Error copying locked file %x!");
+            errorMsg.Replace(wxT("%x"), wxString(wxT("\"")) + zToWx(source) + wxT("\""));
+            errorMsg += wxT("\n\n") + e.msg();
+            throw FileError(errorMsg);
+        }
+
+        //now try again
+        return copyFileUpdating(shadowFilename, target, cmd, totalBytesToCpy, recursionLvl + 1);
+    }
+#endif
+    catch (ErrorTargetPathMissing&)
+    {
+        if (recursionLvl >= exceptionPaths) throw;
+
+        //create folders "first" (see http://sourceforge.net/tracker/index.php?func=detail&aid=2628943&group_id=234430&atid=1093080)
+        //using optimistic strategy: assume everything goes well, but cover up on error -> minimize file accesses
+        const Zstring targetDir   = target.BeforeLast(common::FILE_NAME_SEPARATOR);
+        const Zstring templateDir = source.BeforeLast(common::FILE_NAME_SEPARATOR);
+
+        if (!targetDir.empty() && !ffs3::dirExists(targetDir))
+        {
+            ffs3::createDirectory(targetDir, templateDir, copyFilePermissions_); //throw (FileError)
+            /*symbolic link handling:
+            if "not traversing symlinks": fullName == c:\syncdir<symlinks>\some\dirs\leaf<symlink>
+            => setting irrelevant
+            if "traversing symlinks":     fullName == c:\syncdir<symlinks>\some\dirs<symlinks>\leaf<symlink>
+            => setting NEEDS to be false: We want to move leaf, therefore symlinks in "some\dirs" must not interfere */
+
+            //now try again
+            return copyFileUpdating(source, target, cmd, totalBytesToCpy, recursionLvl + 1);
+        }
         throw;
     }
 
-    //inform about the (remaining) processed amount of data
-    statusUpdater_.updateProcessedData(0, common::convertToSigned(totalBytesToCpy) - totalBytesTransferred);
+    //todo: transactional behavior: delete target if verification fails?
+
+    if (verifyCopiedFiles_) //verify if data was copied correctly
+        verifyFileCopy(source, target); //throw (FileError)
 }
 
 
-void SynchronizeFolderPair::copySymlink(const Zstring& source, const Zstring& target, LinkDescriptor::LinkType type) const
+void SynchronizeFolderPair::copySymlink(const Zstring& source, const Zstring& target, LinkDescriptor::LinkType type, bool inRecursion) const
 {
-    //create folders first (see http://sourceforge.net/tracker/index.php?func=detail&aid=2628943&group_id=234430&atid=1093080)
-
-    const Zstring targetDir   = target.BeforeLast(common::FILE_NAME_SEPARATOR);
-    const Zstring templateDir = source.BeforeLast(common::FILE_NAME_SEPARATOR);
-
-    ensureExists(targetDir, templateDir, copyFilePermissions_); //throw (FileError)
-
-    switch (type)
+    try
     {
-        case LinkDescriptor::TYPE_DIR:
-            ffs3::createDirectory(target, source, true, copyFilePermissions_); //copy symlink
-            break;
+        switch (type)
+        {
+            case LinkDescriptor::TYPE_DIR:
+                ffs3::copySymlink(source, target, SYMLINK_TYPE_DIR, copyFilePermissions_); //throw (FileError)
+                break;
 
-        case LinkDescriptor::TYPE_FILE: //Windows: true file symlink; Linux: file-link or broken link
-            ffs3::copyFile(source, target, true, //copy symlink
-                           copyFilePermissions_,
-#ifdef FFS_WIN
-                           shadowCopyHandler_,
-#endif
-                           NULL);
-            break;
+            case LinkDescriptor::TYPE_FILE: //Windows: true file symlink; Linux: file-link or broken link
+                ffs3::copySymlink(source, target, SYMLINK_TYPE_FILE, copyFilePermissions_); //throw (FileError)
+                break;
+        }
+    }
+    catch (FileError&)
+    {
+        if (inRecursion) throw;
+
+        //create folders "first" (see http://sourceforge.net/tracker/index.php?func=detail&aid=2628943&group_id=234430&atid=1093080)
+        //using optimistic strategy: assume everything goes well, but cover up on error -> minimize file accesses
+        const Zstring targetDir   = target.BeforeLast(common::FILE_NAME_SEPARATOR);
+        const Zstring templateDir = source.BeforeLast(common::FILE_NAME_SEPARATOR);
+
+        if (!targetDir.empty() && !ffs3::dirExists(targetDir))
+        {
+            ffs3::createDirectory(targetDir, templateDir, copyFilePermissions_); //throw (FileError)
+            /*symbolic link handling:
+            if "not traversing symlinks": fullName == c:\syncdir<symlinks>\some\dirs\leaf<symlink>
+            => setting irrelevant
+            if "traversing symlinks":     fullName == c:\syncdir<symlinks>\some\dirs<symlinks>\leaf<symlink>
+            => setting NEEDS to be false: We want to move leaf, therefore symlinks in "some\dirs" must not interfere */
+
+            //now try again
+            return copySymlink(source, target, type, true);
+        }
+
+        throw;
     }
 }
 

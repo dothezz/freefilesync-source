@@ -10,6 +10,7 @@
 #include <queue>
 #include <set>
 #include <wx/log.h>
+#include "../shared/i18n.h"
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"

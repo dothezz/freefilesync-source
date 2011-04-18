@@ -4,13 +4,12 @@
 	<Project>
 		<Option title="FreeFileSync" />
 		<Option makefile="makefile" />
-		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Release">
 				<Option output="BUILD\FreeFileSync_Win32" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="BUILD\" />
-				<Option object_output="OBJ\Release_FFS_GCC\" />
+				<Option object_output="OBJ\FFS_Release_32_MinGW\" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -34,16 +33,16 @@
 				</Linker>
 			</Target>
 			<Target title="Unit Test">
-				<Option output="OBJ\Unit Test\Unit Test" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="OBJ\Unit Test\" />
-				<Option object_output="OBJ\Unit Test\" />
+				<Option output="OBJ\Unit_Test_MinGW\Unit Test" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="OBJ\Unit_Test_MinGW\" />
+				<Option object_output="OBJ\Unit_Test_MinGW\" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-Winvalid-pch" />
-					<Add option='-include &quot;library/pch.h&quot;' />
+					<Add option='-include &quot;shared/pch.h&quot;' />
 					<Add option="-D__WXDEBUG__" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_dll\mswud" />
 					<Add directory="library\gtest" />
@@ -62,14 +61,14 @@
 			<Target title="Debug-DLL">
 				<Option output="BUILD\FreeFileSync_Debug" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="BUILD" />
-				<Option object_output="OBJ\Debug_FFS_GCC\" />
+				<Option object_output="OBJ\FFS_Debug_32_MinGW\" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-Winvalid-pch" />
-					<Add option='-include &quot;library/pch.h&quot;' />
+					<Add option='-include &quot;shared/pch.h&quot;' />
 					<Add option="-D__WXDEBUG__" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_dll\mswud" />
 				</Compiler>
@@ -101,6 +100,7 @@
 			<Add option="-DTIXML_USE_STL" />
 			<Add option="-DwxUSE_UNICODE" />
 			<Add option="-DBOOST_THREAD_USE_LIB" />
+			<Add option="-DWXINTL_NO_GETTEXT_MACRO" />
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
 			<Add directory="C:\Program Files\C++\Boost" />
 		</Compiler>
@@ -200,12 +200,6 @@
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="library\pch.h">
-			<Option compile="1" />
-			<Option weight="0" />
-			<Option target="Unit Test" />
-			<Option target="Debug-DLL" />
-		</Unit>
 		<Unit filename="library\process_xml.cpp" />
 		<Unit filename="library\process_xml.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -265,6 +259,7 @@
 		</Unit>
 		<Unit filename="shared\dir_name.cpp" />
 		<Unit filename="shared\dir_name.h" />
+		<Unit filename="shared\dir_picker_i18n.h" />
 		<Unit filename="shared\disable_standby.h" />
 		<Unit filename="shared\dll_loader.cpp" />
 		<Unit filename="shared\dll_loader.h" />
@@ -291,18 +286,26 @@
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="shared\localization.cpp" />
-		<Unit filename="shared\localization.h" />
+		<Unit filename="shared\i18n.cpp" />
+		<Unit filename="shared\i18n.h" />
 		<Unit filename="shared\long_path_prefix.cpp" />
 		<Unit filename="shared\long_path_prefix.h" />
 		<Unit filename="shared\mouse_move_dlg.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
+		<Unit filename="shared\pch.h">
+			<Option compile="1" />
+			<Option weight="0" />
+			<Option target="Unit Test" />
+			<Option target="Debug-DLL" />
+		</Unit>
 		<Unit filename="shared\privilege.cpp" />
 		<Unit filename="shared\privilege.h" />
 		<Unit filename="shared\recycler.cpp" />
 		<Unit filename="shared\recycler.h" />
+		<Unit filename="shared\resolve_path.cpp" />
+		<Unit filename="shared\resolve_path.h" />
 		<Unit filename="shared\serialize.cpp" />
 		<Unit filename="shared\serialize.h" />
 		<Unit filename="shared\shadow.cpp" />

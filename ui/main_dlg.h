@@ -72,7 +72,7 @@ private:
     xmlAccess::XmlGuiConfig getCurrentConfiguration() const;
     void setCurrentConfiguration(const xmlAccess::XmlGuiConfig& newGuiCfg);
 
-    static const wxString& lastConfigFileName();
+    static const wxString& lastRunConfigName();
 
     xmlAccess::XmlGuiConfig lastConfigurationSaved; //support for: "Save changed configuration?" dialog
     //used when saving configuration
@@ -103,7 +103,7 @@ private:
     std::set<size_t> getSelectedRows() const;
     void setSyncDirManually(const std::set<size_t>& rowsToSetOnUiTable, const ffs3::SyncDirection dir);
     void filterRangeManually(const std::set<size_t>& rowsToFilterOnUiTable, int leadingRow);
-    void copySelectionToClipboard(const CustomGrid* selectedGrid);
+    void copySelectionToClipboard(CustomGrid& selectedGrid);
     void deleteSelectedFiles();
 
     void openExternalApplication(const wxString& commandline);

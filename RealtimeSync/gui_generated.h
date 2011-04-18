@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Nov 17 2010)
+// C++ code generated with wxFormBuilder (version Mar 22 2011)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -10,6 +10,7 @@
 
 #include <wx/intl.h>
 
+class FfsDirPickerCtrl;
 class wxButtonWithImage;
 
 #include <wx/string.h>
@@ -34,107 +35,83 @@ class wxButtonWithImage;
 #include <wx/spinctrl.h>
 #include <wx/frame.h>
 
+#include "../shared/i18n.h"
+
 ///////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class MainDlgGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class MainDlgGenerated : public wxFrame
+class MainDlgGenerated : public wxFrame 
 {
-private:
-
-protected:
-    wxMenuBar* m_menubar1;
-    wxMenu* m_menuFile;
-    wxMenu* m_menuHelp;
-    wxMenuItem* m_menuItemAbout;
-    wxBoxSizer* bSizerMain;
-    wxPanel* m_panelMain;
-
-    wxStaticText* m_staticText2;
-    wxStaticText* m_staticText3;
-    wxStaticText* m_staticText4;
-    wxStaticText* m_staticText5;
-    wxStaticLine* m_staticline3;
-    wxStaticText* m_staticText21;
-    wxStaticLine* m_staticline2;
-    wxPanel* m_panelMainFolder;
-    wxBitmapButton* m_bpButtonAddFolder;
-    wxBitmapButton* m_bpButtonRemoveTopFolder;
-    wxTextCtrl* m_txtCtrlDirectoryMain;
-    wxScrolledWindow* m_scrolledWinFolders;
-    wxBoxSizer* bSizerFolders;
-    wxTextCtrl* m_textCtrlCommand;
-    wxSpinCtrl* m_spinCtrlDelay;
-    wxStaticLine* m_staticline1;
-    wxButtonWithImage* m_buttonStart;
-    wxButton* m_buttonCancel;
-
-    // Virtual event handlers, overide them in your derived class
-    virtual void OnClose( wxCloseEvent& event )
-    {
-        event.Skip();
-    }
-    virtual void OnSaveConfig( wxCommandEvent& event )
-    {
-        event.Skip();
-    }
-    virtual void OnLoadConfig( wxCommandEvent& event )
-    {
-        event.Skip();
-    }
-    virtual void OnQuit( wxCommandEvent& event )
-    {
-        event.Skip();
-    }
-    virtual void OnShowHelp( wxCommandEvent& event )
-    {
-        event.Skip();
-    }
-    virtual void OnMenuAbout( wxCommandEvent& event )
-    {
-        event.Skip();
-    }
-    virtual void OnAddFolder( wxCommandEvent& event )
-    {
-        event.Skip();
-    }
-    virtual void OnRemoveTopFolder( wxCommandEvent& event )
-    {
-        event.Skip();
-    }
-    virtual void OnStart( wxCommandEvent& event )
-    {
-        event.Skip();
-    }
-
-
-public:
-    wxDirPickerCtrl* m_dirPickerMain;
-
-    MainDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("RealtimeSync - Automated Synchronization"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
-
-    ~MainDlgGenerated();
-
+	private:
+	
+	protected:
+		wxMenuBar* m_menubar1;
+		wxMenu* m_menuFile;
+		wxMenu* m_menuHelp;
+		wxMenuItem* m_menuItemAbout;
+		wxBoxSizer* bSizerMain;
+		wxPanel* m_panelMain;
+		
+		wxStaticText* m_staticText2;
+		wxStaticText* m_staticText3;
+		wxStaticText* m_staticText4;
+		wxStaticText* m_staticText5;
+		wxStaticLine* m_staticline3;
+		wxStaticText* m_staticText21;
+		wxStaticLine* m_staticline2;
+		wxStaticBoxSizer* sbSizerDirToWatch;
+		wxPanel* m_panelMainFolder;
+		wxBitmapButton* m_bpButtonAddFolder;
+		wxBitmapButton* m_bpButtonRemoveTopFolder;
+		wxTextCtrl* m_txtCtrlDirectoryMain;
+		wxScrolledWindow* m_scrolledWinFolders;
+		wxBoxSizer* bSizerFolders;
+		wxTextCtrl* m_textCtrlCommand;
+		wxSpinCtrl* m_spinCtrlDelay;
+		wxStaticLine* m_staticline1;
+		wxButtonWithImage* m_buttonStart;
+		wxButton* m_buttonCancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnSaveConfig( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnLoadConfig( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnQuit( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnShowHelp( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMenuAbout( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddFolder( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemoveTopFolder( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnStart( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		FfsDirPickerCtrl* m_dirPickerMain;
+		
+		MainDlgGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("RealtimeSync - Automated Synchronization"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		
+		~MainDlgGenerated();
+	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Class FolderGenerated
 ///////////////////////////////////////////////////////////////////////////////
-class FolderGenerated : public wxPanel
+class FolderGenerated : public wxPanel 
 {
-private:
-
-protected:
-
-public:
-    wxBitmapButton* m_bpButtonRemoveFolder;
-    wxTextCtrl* m_txtCtrlDirectory;
-    wxDirPickerCtrl* m_dirPicker;
-
-    FolderGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL );
-    ~FolderGenerated();
-
+	private:
+	
+	protected:
+	
+	public:
+		wxBitmapButton* m_bpButtonRemoveFolder;
+		wxTextCtrl* m_txtCtrlDirectory;
+		FfsDirPickerCtrl* m_dirPicker;
+		
+		FolderGenerated( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxTAB_TRAVERSAL ); 
+		~FolderGenerated();
+	
 };
 
 #endif //__gui_generated__

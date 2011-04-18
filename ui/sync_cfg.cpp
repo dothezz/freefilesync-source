@@ -11,6 +11,7 @@
 #include <wx/wupdlock.h>
 #include "../shared/mouse_move_dlg.h"
 #include "../shared/string_conv.h"
+#include "../shared/dir_picker_i18n.h"
 
 using namespace ffs3;
 
@@ -28,7 +29,7 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* window,
     refHandleDeletion(handleDeletion),
     refCustomDeletionDirectory(customDeletionDirectory),
     refIgnoreErrors(ignoreErrors),
-    customDelFolder(new DirectoryName(m_panelCustomDeletionDir, m_dirPickerCustomDelFolder, m_textCtrlCustomDelFolder))
+    customDelFolder(new DirectoryName(*m_panelCustomDeletionDir, *m_dirPickerCustomDelFolder, *m_textCtrlCustomDelFolder))
 {
 #ifdef FFS_WIN
     new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...

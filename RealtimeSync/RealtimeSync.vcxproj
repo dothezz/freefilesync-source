@@ -69,28 +69,28 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\BUILD\</OutDir>
-    <IntDir>OBJ\$(ProjectName)_$(Configuration)_$(PlatformName)_VCPP\</IntDir>
+    <IntDir>..\OBJ\$(ProjectName)_$(Configuration)_$(PlatformName)_VCPP\</IntDir>
     <TargetName>$(ProjectName)_$(PlatformName)</TargetName>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\BUILD\</OutDir>
-    <IntDir>OBJ\$(ProjectName)_$(Configuration)_$(PlatformName)_VCPP\</IntDir>
+    <IntDir>..\OBJ\$(ProjectName)_$(Configuration)_$(PlatformName)_VCPP\</IntDir>
     <TargetName>$(ProjectName)_$(PlatformName)</TargetName>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\BUILD\</OutDir>
-    <IntDir>OBJ\$(ProjectName)_$(Configuration)_$(PlatformName)_VCPP\</IntDir>
+    <IntDir>..\OBJ\$(ProjectName)_$(Configuration)_$(PlatformName)_VCPP\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <TargetName>$(ProjectName)_$(PlatformName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>..\BUILD\</OutDir>
-    <IntDir>OBJ\$(ProjectName)_$(Configuration)_$(PlatformName)_VCPP\</IntDir>
+    <IntDir>..\OBJ\$(ProjectName)_$(Configuration)_$(PlatformName)_VCPP\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <TargetName>$(ProjectName)_$(PlatformName)</TargetName>
   </PropertyGroup>
@@ -99,14 +99,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>wxUSE_UNICODE;__WXMSW__;FFS_WIN;__WXDEBUG__;TIXML_USE_STL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;__WXDEBUG__;TIXML_USE_STL</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Programme\C++\wxWidgets\include;C:\Programme\C++\wxWidgets\lib\vc_lib\mswud;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>$(ProjectDir)/pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>$(ProjectDir)/../shared/pch.h</PrecompiledHeaderFile>
       <DisableSpecificWarnings>4100;4996</DisableSpecificWarnings>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.obj</PrecompiledHeaderOutputFile>
-      <ForcedIncludeFiles>$(ProjectDir)/pch.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>$(ProjectDir)/../shared/pch.h</ForcedIncludeFiles>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
@@ -129,14 +129,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>wxUSE_UNICODE;__WXMSW__;FFS_WIN;__WXDEBUG__;TIXML_USE_STL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;__WXDEBUG__;TIXML_USE_STL</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Programme\C++\wxWidgets-x64\include;C:\Programme\C++\wxWidgets-x64\lib\vc_lib\mswud;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
-      <PrecompiledHeaderFile>$(ProjectDir)/pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>$(ProjectDir)/../shared/pch.h</PrecompiledHeaderFile>
       <DisableSpecificWarnings>4100;4996</DisableSpecificWarnings>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.obj</PrecompiledHeaderOutputFile>
-      <ForcedIncludeFiles>$(ProjectDir)/pch.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>$(ProjectDir)/../shared/pch.h</ForcedIncludeFiles>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
@@ -162,7 +162,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>wxUSE_UNICODE;__WXMSW__;FFS_WIN;NDEBUG;TIXML_USE_STL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;NDEBUG;TIXML_USE_STL</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Programme\C++\wxWidgets\include;C:\Programme\C++\wxWidgets\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <DisableSpecificWarnings>4100;4996</DisableSpecificWarnings>
@@ -196,7 +196,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>wxUSE_UNICODE;__WXMSW__;FFS_WIN;NDEBUG;TIXML_USE_STL</PreprocessorDefinitions>
+      <PreprocessorDefinitions>wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;NDEBUG;TIXML_USE_STL</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Programme\C++\wxWidgets-x64\include;C:\Programme\C++\wxWidgets-x64\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <DisableSpecificWarnings>4100;4996</DisableSpecificWarnings>
@@ -236,11 +236,11 @@
     <ClCompile Include="..\shared\file_traverser.cpp" />
     <ClCompile Include="..\shared\global_func.cpp" />
     <ClCompile Include="..\shared\help_provider.cpp" />
-    <ClCompile Include="..\shared\localization.cpp" />
+    <ClCompile Include="..\shared\i18n.cpp" />
     <ClCompile Include="..\shared\long_path_prefix.cpp" />
     <ClCompile Include="..\shared\mouse_move_dlg.cpp" />
     <ClCompile Include="..\shared\privilege.cpp" />
-    <ClCompile Include="..\shared\shadow.cpp" />
+    <ClCompile Include="..\shared\resolve_path.cpp" />
     <ClCompile Include="..\shared\standard_paths.cpp" />
     <ClCompile Include="..\shared\system_func.cpp" />
     <ClCompile Include="..\shared\tinyxml\tinyxml.cpp" />
@@ -253,7 +253,7 @@
     <ClCompile Include="application.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)/../shared/pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="gui_generated.cpp" />
     <ClCompile Include="main_dlg.cpp" />
@@ -271,7 +271,7 @@
     <None Include="WxWizDialog.fbp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pch.h" />
+    <ClInclude Include="../shared/pch.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

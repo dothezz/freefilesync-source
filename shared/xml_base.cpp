@@ -5,8 +5,8 @@
 // **************************************************************************
 //
 #include "xml_base.h"
-#include <wx/intl.h>
 #include "file_io.h"
+#include "i18n.h"
 #include "string_conv.h"
 #include "system_constants.h"
 #include <boost/scoped_array.hpp>
@@ -68,8 +68,8 @@ void loadRawXmlDocument(const wxString& filename, TiXmlDocument& document) //thr
 
     try
     {
-        FileInput inputFile(wxToZ(filename)); //throw FileError();
-        const size_t bytesRead = inputFile.read(&inputBuffer[0], inputBuffer.size()); //throw FileError()
+        FileInput inputFile(wxToZ(filename)); //throw (FileError);
+        const size_t bytesRead = inputFile.read(&inputBuffer[0], inputBuffer.size()); //throw (FileError)
 
         if (bytesRead == 0 || bytesRead >= inputBuffer.size()) //treat XML files larger than 2 MB as erroneous: loading larger files just wastes CPU + memory
             throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\""));
@@ -165,14 +165,14 @@ bool saveNecessary(const Zstring& filename, const std::string& dataToWrite) //th
 {
     try
     {
-        if (ffs3::getFilesize(filename) != static_cast<unsigned long>(dataToWrite.size())) //throw FileError();
+        if (ffs3::getFilesize(filename) != static_cast<unsigned long>(dataToWrite.size())) //throw (FileError);
             return true;
 
         boost::scoped_array<char> inputBuffer(new char[dataToWrite.size() + 1]); //+ 1 in order to test for end of file!
 
-        FileInput inputFile(filename); //throw FileError();
+        FileInput inputFile(filename); //throw (FileError);
 
-        const size_t bytesRead = inputFile.read(inputBuffer.get(), dataToWrite.size() + 1); //throw FileError()
+        const size_t bytesRead = inputFile.read(inputBuffer.get(), dataToWrite.size() + 1); //throw (FileError)
         if (bytesRead != dataToWrite.size()) //implicit test for eof!
             return true;
 
@@ -200,7 +200,7 @@ void xmlAccess::saveXmlDocument(const wxString& filename, const TiXmlDocument& d
     {
         try
         {
-            FileOutput outputFile(wxToZ(filename));            //throw FileError()
+            FileOutput outputFile(wxToZ(filename), FileOutput::ACC_OVERWRITE);            //throw (FileError)
             outputFile.write(buffer.c_str(), buffer.length()); //
         }
         catch (const FileError& error) //more detailed error messages than with wxWidgets

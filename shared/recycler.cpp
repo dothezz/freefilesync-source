@@ -5,10 +5,10 @@
 // **************************************************************************
 //
 #include "recycler.h"
-#include "string_conv.h"
-#include <wx/intl.h>
 #include <stdexcept>
 #include <iterator>
+#include "i18n.h"
+#include "string_conv.h"
 
 #ifdef FFS_WIN
 #include "dll_loader.h"

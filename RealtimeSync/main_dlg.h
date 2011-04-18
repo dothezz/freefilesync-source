@@ -11,6 +11,7 @@
 #include <vector>
 #include <memory>
 #include "../shared/dir_name.h"
+#include "../shared/dir_picker_i18n.h"
 
 namespace xmlAccess
 {
@@ -23,7 +24,7 @@ class DirectoryPanel : public FolderGenerated
 public:
     DirectoryPanel(wxWindow* parent) :
         FolderGenerated(parent),
-        dirName(this, m_dirPicker, m_txtCtrlDirectory) {}
+        dirName(*this, *m_dirPicker, *m_txtCtrlDirectory) {}
 
     void setName(const Zstring& dirname)
     {

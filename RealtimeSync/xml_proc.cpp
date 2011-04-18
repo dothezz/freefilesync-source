@@ -6,7 +6,7 @@
 //
 #include "xml_proc.h"
 #include <wx/filefn.h>
-#include <wx/intl.h>
+#include "../shared/i18n.h"
 
 
 class RtsXmlParser : public xmlAccess::XmlParser

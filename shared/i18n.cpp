@@ -4,25 +4,20 @@
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
-#include "localization.h"
+#include "i18n.h"
+#include <fstream>
+#include <map>
+#include <wx/ffile.h>
+#include <wx/intl.h>
 #include <wx/msgdlg.h>
 #include "../shared/standard_paths.h"
 #include "../shared/string_conv.h"
 #include "system_constants.h"
-#include <fstream>
-#include <map>
-#include <wx/ffile.h>
+#include <boost/any.hpp>
+#include <boost/shared_ptr.hpp>
+#include <list>
 
-#if wxCHECK_VERSION(2, 9, 1)
-#include <boost/cstdint.hpp>
-#include <wx/translation.h>
-#include <cstdlib>
-#endif
-
-using ffs3::CustomLocale;
 using ffs3::LocalizationInfo;
-
-//_("Browse") <- dummy string for wxDirPickerCtrl to be recognized by automatic text extraction!
 
 
 namespace
@@ -30,6 +25,11 @@ namespace
 //will receive their proper value in CustomLocale::CustomLocale()
 wxString THOUSANDS_SEPARATOR = wxT(",");
 wxString DECIMAL_POINT       = wxT(".");
+
+typedef std::map<wxString, wxString> Translation;
+Translation activeTranslation; //map original text |-> translation
+
+int activeLanguage = wxLANGUAGE_ENGLISH;
 }
 
 
@@ -45,22 +45,10 @@ wxString ffs3::getDecimalPoint()
 }
 
 
-const std::vector<ffs3::LocInfoLine>& LocalizationInfo::getMapping()
+const std::vector<ffs3::LocInfoLine>& LocalizationInfo::get()
 {
     static LocalizationInfo instance;
     return instance.locMapping;
-}
-
-
-namespace
-{
-struct CompareByName : public std::binary_function<ffs3::LocInfoLine, ffs3::LocInfoLine, bool>
-{
-    bool operator()(const ffs3::LocInfoLine& lhs, const ffs3::LocInfoLine& rhs) const
-    {
-        return lhs.languageName < rhs.languageName;
-    }
-};
 }
 
 
@@ -242,8 +230,6 @@ LocalizationInfo::LocalizationInfo()
     newEntry.translatorName = wxT("Simon Park");
     newEntry.languageFlag   = wxT("south_korea.png");
     locMapping.push_back(newEntry);
-
-    //std::sort(locMapping.begin(), locMapping.end(), CompareByName());
 }
 
 
@@ -330,7 +316,7 @@ int mapLanguageDialect(int language)
             //case wxLANGUAGE_PORTUGUESE_BRAZILIAN:
             //case wxLANGUAGE_KOREAN:
 
-            //variants of wxLANGUAGE_ARABIC (also needed to detect RTL languages)
+            //variants of wxLANGUAGE_ARABIC
         case wxLANGUAGE_ARABIC_ALGERIA:
         case wxLANGUAGE_ARABIC_BAHRAIN:
         case wxLANGUAGE_ARABIC_EGYPT:
@@ -472,18 +458,13 @@ private:
 };
 
 
-typedef std::map<wxString, wxString> TranslationMap; //map original text |-> translation
-
-void loadTranslation(const wxString& filename, TranslationMap& trans) //empty translation on error
+void loadTranslation(const wxString& filename, Translation& trans) //empty translation on error
 {
     trans.clear();
 
     UnicodeFileReader langFile(ffs3::getResourceDir() +  wxT("Languages") + ffs3::zToWx(common::FILE_NAME_SEPARATOR) + filename);
     if (langFile.isOkay())
     {
-        //save encoding info: required by mo file generator
-        trans.insert(std::make_pair(wxEmptyString, wxT("Content-Type: text/plain; charset=UTF-8\n")));
-
         int rowNumber = 0;
         wxString original;
         wxString tmpString;
@@ -506,155 +487,36 @@ void loadTranslation(const wxString& filename, TranslationMap& trans) //empty tr
 }
 
 
-#if wxCHECK_VERSION(2, 9, 1)
-//this whole abomination is required to support language formats other than "mo" in wxWidgets v2.9
-class FFSTranslationLoader : public wxTranslationsLoader
+void ffs3::setLanguage(int language)
 {
-public:
-    static const wxString domainName()
+    static class StaticInit
     {
-        return wxT("FFS");
-    }
-
-    FFSTranslationLoader(const TranslationMap& trans, wxLanguage langId) : langId_(langId)
-    {
-        //generate mo file: http://www.gnu.org/software/hello/manual/gettext/MO-Files.html
-
-        std::string binaryStream;
-
-        const size_t offsetTableOrig   = sizeof(wxMsgCatalogHeader);
-        const size_t offsetTableTrans  = offsetTableOrig  + trans.size() * sizeof(wxMsgTableEntry);
-        const size_t offsetTableString = offsetTableTrans + trans.size() * sizeof(wxMsgTableEntry);
-
-        wxMsgCatalogHeader header =
+    public:
+        StaticInit() : loc(wxLANGUAGE_DEFAULT)  //wxLocale: we need deferred initialization, sigh...
         {
-            0x950412de,       //magic number (save in this machine's byte order)
-            0,                //revision
-            trans.size(),     //numStrings
-            offsetTableOrig,  //ofsOrigTable
-            offsetTableTrans, //ofsTransTable
-            0,                //nHashSize
-            0,                //ofsHashTable
-        };
-        writeCobject(binaryStream, header);
+            //::setlocale (LC_ALL, ""); -> implicitly called by wxLocale
+            const lconv* localInfo = ::localeconv();
 
-        std::string tableOrig;
-        std::string tableTrans;
-        std::string stringsList;
-        for (TranslationMap::const_iterator i = trans.begin(); i != trans.end(); ++i)
-        {
+            //actually these two parameters are language dependent, but we take system setting to handle all kinds of language derivations
+            THOUSANDS_SEPARATOR = wxString::FromUTF8(localInfo->thousands_sep);
+            DECIMAL_POINT       = wxString::FromUTF8(localInfo->decimal_point);
 
-#ifndef _MSC_VER
-#warning redundant UTF8 conversion!!!
-#endif
-            std::string origString = i->first.ToUTF8();
-            const wxMsgTableEntry origEntry = {origString.length(), offsetTableString + stringsList.size()};
-            writeCobject(tableOrig, origEntry);
-            stringsList.append(origString.c_str(), origString.length() + 1); //include NULL-termination
-
-#ifndef _MSC_VER
-#warning redundant UTF8 conversion!!!
-#endif
-            std::string transString = i->second.ToUTF8();
-            const wxMsgTableEntry transEntry = {transString.length(), offsetTableString + stringsList.size()};
-            writeCobject(tableTrans, transEntry);
-            stringsList.append(transString.c_str(), transString.length() + 1); //include NULL-termination
+            // why not working?
+            // THOUSANDS_SEPARATOR = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).thousands_sep();
+            // DECIMAL_POINT       = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).decimal_point();
         }
-        binaryStream += tableOrig;
-        binaryStream += tableTrans;
-        binaryStream += stringsList;
+    private:
+        wxLocale loc; //required for RTL language support (and nothing else)
+    } dummy;
 
-        buffer = wxScopedCharBuffer::CreateOwned(static_cast<char*>(::malloc(binaryStream.size())), binaryStream.size()); //takes buffer ownership, calls ::free()
-        std::copy(binaryStream.begin(), binaryStream.end(), buffer.data());
-    }
-
-    virtual wxMsgCatalog* LoadCatalog(const wxString& domain, const wxString& lang)
-    {
-        if (domain != domainName() || lang != wxLocale::GetLanguageCanonicalName(langId_)) //avoid superfluous calls by wxWidgets framework
-            return NULL;
-
-        return wxMsgCatalog::CreateFromData(buffer, domain);
-    }
-
-    virtual wxArrayString GetAvailableTranslations(const wxString& domain) const
-    {
-        wxArrayString output;
-        if (domain == domainName())
-            output.Add(wxLocale::GetLanguageCanonicalName(langId_));
-        return output;
-    }
-
-private:
-    struct wxMsgTableEntry
-    {
-        boost::uint32_t nLen,           // length of the string
-              ofsString;      // pointer to the string
-    };
-
-    // header of a .mo file
-    struct wxMsgCatalogHeader
-    {
-        boost::uint32_t magic,          // offset +00:  magic id
-              revision,       //        +04:  revision
-              numStrings,     //        +08:  number of strings in the file
-              ofsOrigTable,   //        +0C:  start of original string table
-              ofsTransTable,  //        +10:  start of translated string table
-              nHashSize,      //        +14:  hash table size
-              ofsHashTable;   //        +18:  offset of hash table start
-    };
-
-    template <class T>
-    void writeCobject(std::string& str, T obj)
-    {
-        str.append(reinterpret_cast<const char*>(&obj), sizeof(obj));
-    }
-
-    wxScopedCharBuffer buffer; //raw data in mo file format
-    const wxLanguage langId_;
-};
-#endif
-
-
-CustomLocale& CustomLocale::getInstance()
-{
-    static CustomLocale instance;
-    return instance;
-}
-
-
-class Translation : public TranslationMap {};
-
-
-CustomLocale::CustomLocale() :
-    translationDB(new Translation),
-    currentLanguage(wxLANGUAGE_ENGLISH)
-{
-    Init(wxLANGUAGE_DEFAULT); //setting a different language needn't be supported on all systems!
-
-    //actually these two parameters are language dependent, but we take system setting to handle all kinds of language derivations
-    const lconv* localInfo = localeconv();
-    THOUSANDS_SEPARATOR = wxString::FromUTF8(localInfo->thousands_sep);
-    DECIMAL_POINT       = wxString::FromUTF8(localInfo->decimal_point);
-
-    // why not working?
-    // THOUSANDS_SEPARATOR = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).thousands_sep();
-    // DECIMAL_POINT       = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).decimal_point();
-}
-
-
-CustomLocale::~CustomLocale() {} //non-inline destructor for std::auto_ptr to work with forward declaration
-
-
-void CustomLocale::setLanguage(int language)
-{
-    currentLanguage = static_cast<wxLanguage>(language);
+    activeLanguage = language;
 
     //default: english
     wxString languageFile;
 
     //(try to) retrieve language filename
     const int mappedLanguage = mapLanguageDialect(language);
-    for (std::vector<LocInfoLine>::const_iterator i = LocalizationInfo::getMapping().begin(); i != LocalizationInfo::getMapping().end(); ++i)
+    for (std::vector<LocInfoLine>::const_iterator i = LocalizationInfo::get().begin(); i != LocalizationInfo::get().end(); ++i)
         if (i->languageID == mappedLanguage)
         {
             languageFile = i->languageFile;
@@ -662,39 +524,228 @@ void CustomLocale::setLanguage(int language)
         }
 
     //load language file into buffer
-    translationDB->clear();
+    activeTranslation.clear();
     if (!languageFile.empty())
     {
-        loadTranslation(languageFile, *translationDB); //empty translation on error
-        if (translationDB->empty())
+        loadTranslation(languageFile, activeTranslation); //empty translation on error
+        if (activeTranslation.empty())
         {
             wxMessageBox(wxString(_("Error reading file:")) + wxT(" \"") + languageFile + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
-            currentLanguage = wxLANGUAGE_ENGLISH; //reset to english language to show this error just once
+            activeLanguage = wxLANGUAGE_ENGLISH; //reset to english language to show this error just once
         }
     }
     else
         ;   //if languageFile is empty texts will be english per default
-
-
-
-#if wxCHECK_VERSION(2, 9, 1)
-    wxTranslations::Set(new wxTranslations);
-    wxTranslations::Get()->SetLoader(new FFSTranslationLoader(*translationDB, currentLanguage)); //ownership passed
-    wxTranslations::Get()->SetLanguage(currentLanguage);
-    wxTranslations::Get()->AddCatalog(FFSTranslationLoader::domainName(), wxLANGUAGE_ENGLISH_US);
-    //... a little over design going on?!?
-#endif
 }
 
 
-const wxChar* CustomLocale::GetString(const wxChar* szOrigString, const wxChar* szDomain) const
+int ffs3::getLanguage()
+{
+    return activeLanguage;
+}
+
+
+int ffs3::retrieveSystemLanguage()
+{
+    return wxLocale::GetSystemLanguage();
+}
+
+
+
+
+/*
+typedef Zbase<wchar_t> Wstring;
+
+const Wstring TK_TERNARY_QUEST = L"?";
+const Wstring TK_TERNARY_COLON = L":";
+const Wstring TK_OR            = L"||";
+const Wstring TK_AND           = L"&&";
+const Wstring TK_EQUAL         = L"==";
+const Wstring TK_NOT_EQUAL     = L"!=";
+const Wstring TK_LESS          = L"<";
+const Wstring TK_LESS_EQUAL    = L"<=";
+const Wstring TK_GREATER       = L">";
+const Wstring TK_GREATER_EQUAL = L">=";
+const Wstring TK_MODULUS       = L"%";
+const Wstring TK_N             = L"n";
+const Wstring TK_BRACKET_LEFT  = L"(";
+const Wstring TK_BRACKET_RIGHT = L")";
+const Wstring TK_FORM_COUNT    = L"nplurals=";
+const Wstring TK_PHRASE_BEGIN  = L"plural=";
+
+
+template <class T>
+struct Expr
+{
+    typedef T ValueType;
+    virtual ValueType eval() const = 0;
+};
+
+
+template <class In, class Out, class BiOp>
+struct GenericBiExp : public Out
+{
+    GenericBiExp(const In& lhs, const In& rhs, BiOp biop) : lhs_(lhs), rhs_(rhs), biop_(biop) {}
+    virtual typename Out::ValueType eval() const { return biop_(lhs_.eval(), rhs_.eval()); }
+    const In& lhs_;
+    const In& rhs_;
+    BiOp biop_;
+};
+
+template <class Out, class In, class BiOp>
+inline
+GenericBiExp<In, Out, BiOp> makeBiExp(const In& lhs, const In& rhs, BiOp biop)
+{
+    return GenericBiExp<In, Out, BiOp>(lhs, rhs, biop);
+}
+
+template <class Out>
+struct TernaryExp : public Out
+{
+    TernaryExp(const Expr<bool>& ifExp, const Out& thenExp, const Out& elseExp) : ifExp_(ifExp), thenExp_(thenExp), elseExp_(elseExp) {}
+    virtual typename Out::ValueType eval() const { return ifExp_.eval() ? thenExp_.eval() : elseExp_.eval(); }
+    const Expr<bool>& ifExp_;
+    const Out& thenExp_;
+    const Out& elseExp_;
+};
+
+struct LiteralNumberEx : public Expr<int>
+{
+    LiteralNumberEx(int n) : n_(n) {}
+    virtual ValueType eval() const { return n_; }
+    int n_;
+};
+
+struct NumberN : public Expr<int>
+{
+    NumberN(int& n) : n_(n) {}
+    virtual ValueType eval() const { return n_; }
+    int& n_;
+};
+
+
+class PluralForm
+{
+public:
+    struct ParserError {};
+
+    PluralForm(const Wstring& phrase) //.po format,e.g.: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)
+    {
+        Wstring tmp;
+        std::remove_copy_if(phrase.begin(), phrase.end(), std::back_inserter(tmp), std::iswspace);
+
+        size_t pos = tmp.find(TK_FORM_COUNT);
+        if (pos == Wstring::npos)
+            throw ParserError();
+
+        count = tmp.substr(pos + TK_FORM_COUNT.size()).toNumber<int>();
+
+        pos = tmp.find(TK_PHRASE_BEGIN);
+        if (pos == Wstring::npos)
+            throw ParserError();
+
+        expr = &parseNumber(tmp.substr(pos + TK_PHRASE_BEGIN.size()));
+    }
+
+    int formCount() const { return count; }
+
+    int getForm(int n) const { n_ = n ; return expr->eval(); }
+
+private:
+    const Expr<bool>& parseBool(const Wstring& phrase)
+    {
+        Wstring part1, part2;
+        if (trySplit(phrase, TK_OR, part1, part2))
+            return manageObj(makeBiExp<Expr<bool> >(parseBool(part1), parseBool(part2), std::logical_or<bool>()));
+        else if (trySplit(phrase, TK_AND, part1, part2))
+            return manageObj(makeBiExp<Expr<bool> >(parseBool(part1), parseBool(part2), std::logical_and<bool>()));
+        else if (trySplit(phrase, TK_EQUAL, part1, part2))
+            return manageObj(makeBiExp<Expr<bool> >(parseNumber(part1), parseNumber(part2), std::equal_to<int>()));
+        else if (trySplit(phrase, TK_NOT_EQUAL, part1, part2))
+            return manageObj(makeBiExp<Expr<bool> >(parseNumber(part1), parseNumber(part2), std::not_equal_to<int>()));
+        else if (trySplit(phrase, TK_LESS, part1, part2))
+            return manageObj(makeBiExp<Expr<bool> >(parseNumber(part1), parseNumber(part2), std::less<int>()));
+        else if (trySplit(phrase, TK_LESS_EQUAL, part1, part2))
+            return manageObj(makeBiExp<Expr<bool> >(parseNumber(part1), parseNumber(part2), std::less_equal<int>()));
+        else if (trySplit(phrase, TK_GREATER, part1, part2))
+            return manageObj(makeBiExp<Expr<bool> >(parseNumber(part1), parseNumber(part2), std::greater<int>()));
+        else if (trySplit(phrase, TK_GREATER_EQUAL, part1, part2))
+            return manageObj(makeBiExp<Expr<bool> >(parseNumber(part1), parseNumber(part2), std::greater_equal<int>()));
+        else
+            throw ParserError();
+    }
+
+    const Expr<int>& parseNumber(const Wstring& phrase)
+    {
+        Wstring part1, part2;
+
+
+        if (trySplit(phrase, TK_TERNARY_QUEST, part1, part2, TO_LEFT))
+        {
+            Wstring part3;
+            if (!trySplit(Wstring(part2), TK_TERNARY_COLON, part2, part3, TO_LEFT))
+                throw ParserError();
+            return manageObj(TernaryExp<Expr<int> >(parseBool(part1), parseNumber(part2), parseNumber(part3)));
+        }
+        else if (trySplit(phrase, TK_MODULUS, part1, part2))
+            return manageObj(makeBiExp<Expr<int> >(parseNumber(part1), parseNumber(part2), std::modulus<int>()));
+        else if (phrase == TK_N)
+            return manageObj(NumberN(n_));
+        else //expect literal number
+        {
+            if (std::find_if(phrase.begin(), phrase.end(), std::not1(std::ptr_fun(std::iswdigit))) != phrase.end())
+                throw ParserError();
+            return manageObj(LiteralNumberEx(phrase.toNumber<int>()));
+        }
+    }
+
+    enum Associativity
+    {
+        TO_LEFT,
+        TO_RIGHT
+    };
+    static bool trySplit(const Wstring& phrase, const Wstring& delimiter, Wstring& part1, Wstring& part2, Associativity assoc = TO_RIGHT)
+    {
+        size_t pos = assoc == TO_LEFT ?
+                     phrase.find(delimiter) : //reverse [!]
+                     phrase.rfind(delimiter);
+        if (pos == Wstring::npos)
+            return false;
+
+        part1 = phrase.substr(0, pos);
+        part2 = phrase.substr(pos + delimiter.size());
+        return true;
+    }
+
+    template <class T>
+    const T& manageObj(const T& obj)
+    {
+        dump.push_back(obj);
+        return *boost::any_cast<T>(&dump.back());
+    }
+
+    int count;
+    const Expr<int>* expr;
+    mutable int n_;
+
+    std::list<boost::any> dump; //manage polymorphc object lifetimes
+};
+
+
+    PluralForm dummy(L"nplurals=3; plural=n == 1 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 > 20) ? 1 : 2");
+    int ddf = dummy.formCount();
+    int kddf = dummy.getForm(0);
+*/
+
+
+
+wxString ffs3::translate(const wxString& original) //translate into currently selected language
 {
     //look for translation in buffer table
-    const Translation::const_iterator i = translationDB->find(szOrigString);
-    if (i != translationDB->end())
+    const Translation::const_iterator i = activeTranslation.find(original);
+    if (i != activeTranslation.end())
         return i->second.c_str();
 
     //fallback
-    return szOrigString;
+    return original;
 }
-

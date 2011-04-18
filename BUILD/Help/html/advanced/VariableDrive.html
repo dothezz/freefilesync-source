@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20100228;21090900">
+	<META NAME="CHANGED" CONTENT="20110417;19142800">
 	<STYLE TYPE="text/css">
 	<!--
 		@page { margin: 2cm }
@@ -13,6 +13,7 @@
 		H3 { margin-bottom: 0.21cm }
 		H3.western { font-family: "Arial", sans-serif }
 		H3.cjk { font-family: "MS Mincho" }
+		H3.ctl { font-family: "Mangal" }
 		A:link { so-language: zxx }
 	-->
 	</STYLE>
@@ -23,32 +24,39 @@ sticks with variable drive letters</FONT></H3>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">USB
-sticks often have different volume names assigned to them when
-plugged into two distinct computers. In order to handle this
-flexibility FreeFileSync is able to process directory names relative
-to the current working directory.</FONT></P>
+sticks often get different volume names assigned when plugged into
+distinct computers. FreeFileSync offers two solutions to handle this
+issue:</FONT></P>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Thus
-the following workflow is possible:</FONT></P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Specify
+	a directory via volume name: Syntax: [&lt;volume name&gt;]\&lt;path&gt;</FONT></P>
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Example:
+	Use &quot;</FONT><FONT FACE="Courier New, monospace">[ZenJu-USB]\directory</FONT><FONT FACE="Tahoma, sans-serif">&quot;
+	instead of &quot;</FONT><FONT FACE="Courier New, monospace">E:\directory</FONT><FONT FACE="Tahoma, sans-serif">&quot;
+	where &quot;</FONT><FONT FACE="Courier New, monospace">ZenJu-USB</FONT><FONT FACE="Tahoma, sans-serif">&quot;
+	is the name of the USB stick.</FONT></P>
+</OL>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<OL START=2>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Use
+	a relative directory name:</FONT></P>
+</OL>
 <UL>
-	<OL>
-		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Replace
-		the absolute USB directory name in your configuration by a relative
-		one:<BR>E.g. &quot;<FONT FACE="Courier New, monospace">E:\SyncDir</FONT>&quot;
-		-&gt; &quot;<FONT FACE="Courier New, monospace">\SyncDir</FONT>&quot;</FONT></P>
-		<P STYLE="margin-bottom: 0cm"></P>
-		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Save
-		and copy synchronization settings to the USB stick:
-		&quot;</FONT><FONT COLOR="#000000"><FONT FACE="Courier New, monospace"><FONT SIZE=3>E:\settings.ffs_gui&quot;</FONT></FONT></FONT></P>
-		<P STYLE="margin-bottom: 0cm"></P>
-		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">&quot;Start
-		FreeFileSync by double-clicking on &quot;</FONT><FONT FACE="Courier New, monospace">E:\settings.ffs_gui</FONT><FONT FACE="Tahoma, sans-serif">&quot;<BR>=&gt;
-		Working directory automatically is set to &quot;</FONT><FONT FACE="Courier New, monospace">E:\</FONT><FONT FACE="Tahoma, sans-serif">&quot;
-		by the operating system so that &quot;</FONT><FONT FACE="Courier New, monospace">\SyncDir</FONT><FONT FACE="Tahoma, sans-serif">&quot;
-		is interpreted as &quot;</FONT><FONT FACE="Courier New, monospace">E:\SyncDir</FONT><FONT FACE="Tahoma, sans-serif">&quot;
-		during synchronization.</FONT></P>
-	</OL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Example:
+	Use &quot;</FONT><FONT FACE="Courier New, monospace">\directory</FONT><FONT FACE="Tahoma, sans-serif">&quot;
+	instead of &quot;</FONT><FONT FACE="Courier New, monospace">E:\directory</FONT><FONT FACE="Tahoma, sans-serif">&quot;</FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Save
+	and copy synchronization settings to the USB stick:
+	&quot;</FONT><FONT COLOR="#000000"><FONT FACE="Courier New, monospace"><FONT SIZE=3>E:\settings.ffs_gui&quot;</FONT></FONT></FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Start
+	FreeFileSync by double-clicking on &quot;</FONT><FONT FACE="Courier New, monospace">E:\settings.ffs_gui</FONT><FONT FACE="Tahoma, sans-serif">&quot;<BR>=&gt;
+	Working directory is automatically set to &quot;</FONT><FONT FACE="Courier New, monospace">E:\</FONT><FONT FACE="Tahoma, sans-serif">&quot;
+	by the operating system so that &quot;</FONT><FONT FACE="Courier New, monospace">\directory</FONT><FONT FACE="Tahoma, sans-serif">&quot;
+	is resolved  as &quot;</FONT><FONT FACE="Courier New, monospace">E:\directory</FONT><FONT FACE="Tahoma, sans-serif">&quot;
+	during synchronization.</FONT></P>
 </UL>
 </BODY>
 </HTML>

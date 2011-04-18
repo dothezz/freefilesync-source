@@ -1,23 +1,23 @@
 #include "dir_lock.h"
-#include <wx/intl.h>
-#include "../shared/string_conv.h"
-#include "../shared/system_func.h"
+#include <utility>
 #include <wx/utils.h>
 #include <wx/timer.h>
+#include <wx/log.h>
+#include <wx/msgdlg.h>
+#include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
+#include "../shared/string_conv.h"
+#include "../shared/i18n.h"
+#include "../shared/system_func.h"
 #include "../shared/boost_thread_wrap.h" //include <boost/thread.hpp>
 #include "../shared/loki/ScopeGuard.h"
-#include <wx/msgdlg.h>
 #include "../shared/system_constants.h"
 #include "../shared/guid.h"
 #include "../shared/file_io.h"
 #include "../shared/assert_static.h"
-#include <utility>
 #include "../shared/serialize.h"
-#include <boost/cstdint.hpp>
 #include "../shared/build_info.h"
-#include <wx/log.h>
 
 #ifdef FFS_WIN
 #include <tlhelp32.h>
@@ -109,12 +109,11 @@ public:
             return;
 
         DWORD bytesWritten = 0;
-        ::WriteFile(
-            fileHandle,    //__in         HANDLE hFile,
-            buffer,        //__out        LPVOID lpBuffer,
-            1,             //__in         DWORD nNumberOfBytesToRead,
-            &bytesWritten, //__out_opt    LPDWORD lpNumberOfBytesWritten,
-            NULL);         //__inout_opt  LPOVERLAPPED lpOverlapped
+        ::WriteFile(fileHandle,    //__in         HANDLE hFile,
+                    buffer,        //__out        LPVOID lpBuffer,
+                    1,             //__in         DWORD nNumberOfBytesToRead,
+                    &bytesWritten, //__out_opt    LPDWORD lpNumberOfBytesWritten,
+                    NULL);         //__inout_opt  LPOVERLAPPED lpOverlapped
 
 #elif defined FFS_LINUX
         const int fileHandle = ::open(lockfilename_.c_str(), O_WRONLY | O_APPEND); //O_EXCL contains a race condition on NFS file systems: http://linux.die.net/man/2/open
@@ -346,7 +345,7 @@ ProcessStatus getProcessStatus(const LockInformation::ProcessDescription& procDe
 void writeLockInfo(const Zstring& lockfilename) //throw (FileError)
 {
     //write GUID at the beginning of the file: this ID is a universal identifier for this lock (no matter what the path is, considering symlinks, distributed network, etc.)
-    FileOutputStream lockFile(lockfilename); //throw FileError()
+    FileOutputStream lockFile(lockfilename); //throw (FileError)
     LockInformation().toStream(lockFile);
 }
 

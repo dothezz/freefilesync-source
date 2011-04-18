@@ -7,6 +7,7 @@
 #include "tray_icon.h"
 #include "../library/resources.h"
 #include "small_dlgs.h"
+#include "../shared/i18n.h"
 #include <wx/taskbar.h>
 #include <cmath>
 #include <wx/image.h>

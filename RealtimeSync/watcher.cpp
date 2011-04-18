@@ -6,13 +6,14 @@
 //
 #include "watcher.h"
 #include "../shared/system_func.h"
-#include <wx/intl.h>
 #include "../shared/string_conv.h"
 #include "../shared/file_handling.h"
+#include "../shared/i18n.h"
 #include <stdexcept>
 #include <set>
 #include <wx/timer.h>
 #include <algorithm>
+#include "../shared/resolve_path.h"
 
 #ifdef FFS_WIN
 #include "notify.h"
@@ -94,10 +95,10 @@ public:
     {
         const int UPDATE_INTERVAL = 1000; //1 second interval
 
-        const wxLongLong newExec = wxGetLocalTimeMillis();
-        if (newExec - lastExec >= UPDATE_INTERVAL)
+        const wxLongLong current = wxGetLocalTimeMillis();
+        if (current - lastCheck >= UPDATE_INTERVAL)
         {
-            lastExec = newExec;
+            lastCheck = current;
             allExisting_ = std::find_if(dirList.begin(), dirList.end(), std::not1(std::ptr_fun(&ffs3::dirExists))) == dirList.end();
         }
 
@@ -105,7 +106,7 @@ public:
     }
 
 private:
-    mutable wxLongLong lastExec;
+    mutable wxLongLong lastCheck;
     mutable bool allExisting_;
 
     std::set<Zstring, LessFilename> dirList; //save avail. directories, avoid double-entries
@@ -387,22 +388,35 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
 void rts::waitForMissingDirs(const std::vector<Zstring>& dirNames, WaitCallback* statusHandler) //throw(FileError)
 {
     //new: support for monitoring newly connected directories volumes (e.g.: USB-sticks)
-    WatchDirectories dirWatcher;
 
-    for (std::vector<Zstring>::const_iterator i = dirNames.begin(); i != dirNames.end(); ++i)
-    {
-        const Zstring formattedDir = ffs3::getFormattedDirectoryName(*i);
-
-        if (formattedDir.empty())
-            throw ffs3::FileError(_("At least one directory input field is empty."));
-
-        dirWatcher.addForMonitoring(formattedDir);
-    }
+    wxLongLong lastCheck;
 
     while (true)
     {
-        if (dirWatcher.allExisting()) //check for newly arrived devices:
-            return;
+        const int UPDATE_INTERVAL = 1000; //1 second interval
+        const wxLongLong current = wxGetLocalTimeMillis();
+        if (current - lastCheck >= UPDATE_INTERVAL)
+        {
+            lastCheck = current;
+
+            bool allExisting = true;
+            for (std::vector<Zstring>::const_iterator i = dirNames.begin(); i != dirNames.end(); ++i)
+            {
+    //support specifying volume by name => call getFormattedDirectoryName() repeatedly
+                const Zstring formattedDir = ffs3::getFormattedDirectoryName(*i);
+
+                if (formattedDir.empty())
+                    throw ffs3::FileError(_("At least one directory input field is empty."));
+
+                if (!ffs3::dirExists(formattedDir))
+                {
+                    allExisting = false;
+                    break;
+                }
+            }
+            if (allExisting) //check for newly arrived devices:
+                return;
+        }
 
         wxMilliSleep(rts::UI_UPDATE_INTERVAL);
         statusHandler->requestUiRefresh();

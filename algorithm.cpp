@@ -5,7 +5,7 @@
 // **************************************************************************
 //
 #include "algorithm.h"
-#include <wx/intl.h>
+#include <iterator>
 #include <stdexcept>
 #include <wx/log.h>
 #include "library/resources.h"
@@ -16,10 +16,10 @@
 #include <boost/bind.hpp>
 #include "shared/string_conv.h"
 #include "shared/global_func.h"
+#include "shared/i18n.h"
 #include "shared/loki/TypeManip.h"
 #include "library/db_file.h"
 #include "library/cmp_filetime.h"
-//#include "shared/loki/NullType.h"
 
 using namespace ffs3;
 
@@ -1055,7 +1055,7 @@ void ffs3::setActiveStatus(bool newStatus, ffs3::FolderComparison& folderCmp)
 void ffs3::setActiveStatus(bool newStatus, ffs3::FileSystemObject& fsObj)
 {
     fsObj.setActive(newStatus);
-    /*
+
     //process subdirectories also!
         struct Recurse: public FSObjectVisitor
         {
@@ -1073,7 +1073,6 @@ void ffs3::setActiveStatus(bool newStatus, ffs3::FileSystemObject& fsObj)
             const bool newStatus_;
         } recurse(newStatus);
         fsObj.accept(recurse);
-    */
 }
 
 namespace
@@ -1257,7 +1256,7 @@ std::pair<wxString, int> ffs3::deleteFromGridAndHDPreview( //assemble message co
 
 namespace
 {
-struct RemoveCallbackImpl : public ffs3::RemoveDirCallback
+struct RemoveCallbackImpl : public ffs3::CallbackRemoveDir
 {
     RemoveCallbackImpl(DeleteFilesHandler& deleteCallback) : deleteCallback_(deleteCallback) {}
 
@@ -1272,19 +1271,19 @@ private:
 }
 
 
-template <SelectedSide side>
-void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDeleteOneSide,
+template <SelectedSide side, class InputIterator>
+void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
                                 const bool useRecycleBin,
                                 DeleteFilesHandler& statusHandler)
 {
-    for (std::vector<FileSystemObject*>::const_iterator i = rowsToDeleteOneSide.begin(); i != rowsToDeleteOneSide.end(); ++i)
+    for (InputIterator i = first; i != last; ++i)
     {
         while (true)
         {
             try
             {
                 FileSystemObject* const fsObj = *i; //all pointers are required(!) to be bound
-                if (!fsObj->isEmpty<side>())
+                if (!fsObj->isEmpty<side>()) //element may become implicitly delted, e.g. if parent folder was deleted first
                 {
                     if (useRecycleBin)
                         ffs3::moveToRecycleBin(fsObj->getFullName<side>());  //throw (FileError)
@@ -1334,8 +1333,9 @@ void deleteFromGridAndHDOneSide(std::vector<FileSystemObject*>& rowsToDeleteOneS
                     else
                         setSyncDirectionRec(SYNC_DIR_LEFT, *fsObj);
                 }
-                statusHandler.deletionSuccessful(1); //notify successful file/folder deletion
 
+                //notify successful file/folder deletion: make sure [first, last) contains to be deleted entries only, to avoid miscalculation
+                statusHandler.deletionSuccessful(1);
                 break;
             }
             catch (const FileError& error)
@@ -1381,33 +1381,37 @@ void ffs3::deleteFromGridAndHD(FolderComparison& folderCmp,                     
 {
     FinalizeDeletion dummy(folderCmp); //ensure cleanup: redetermination of sync-directions and removal of invalid rows
 
+    std::set<FileSystemObject*> deleteLeft;
+    std::set<FileSystemObject*> deleteRight;
 
     if (deleteOnBothSides)
     {
         //mix selected rows from left and right (and remove duplicates)
-        std::set<FileSystemObject*> temp(rowsToDeleteOnLeft.begin(), rowsToDeleteOnLeft.end());
-        temp.insert(rowsToDeleteOnRight.begin(), rowsToDeleteOnRight.end());
+        std::set<FileSystemObject*> tmp(rowsToDeleteOnLeft.begin(), rowsToDeleteOnLeft.end());
+        tmp.insert(rowsToDeleteOnRight.begin(), rowsToDeleteOnRight.end());
 
-        std::vector<FileSystemObject*> rowsToDeleteBothSides(temp.begin(), temp.end());
+        std::remove_copy_if(tmp.begin(), tmp.end(),
+                            std::inserter(deleteLeft, deleteLeft.begin()), std::mem_fun(&FileSystemObject::isEmpty<LEFT_SIDE>)); //remove empty rows to ensure correct statistics
 
-        deleteFromGridAndHDOneSide<LEFT_SIDE>(rowsToDeleteBothSides,
-                                              useRecycleBin,
-                                              statusHandler);
-
-        deleteFromGridAndHDOneSide<RIGHT_SIDE>(rowsToDeleteBothSides,
-                                               useRecycleBin,
-                                               statusHandler);
+        std::remove_copy_if(tmp.begin(), tmp.end(),
+                            std::inserter(deleteRight, deleteRight.begin()), std::mem_fun(&FileSystemObject::isEmpty<RIGHT_SIDE>));
     }
     else
     {
-        deleteFromGridAndHDOneSide<LEFT_SIDE>(rowsToDeleteOnLeft,
-                                              useRecycleBin,
-                                              statusHandler);
+        std::remove_copy_if(rowsToDeleteOnLeft.begin(), rowsToDeleteOnLeft.end(),
+                            std::inserter(deleteLeft, deleteLeft.begin()), std::mem_fun(&FileSystemObject::isEmpty<LEFT_SIDE>)); //remove empty rows to ensure correct statistics
 
-        deleteFromGridAndHDOneSide<RIGHT_SIDE>(rowsToDeleteOnRight,
-                                               useRecycleBin,
-                                               statusHandler);
+        std::remove_copy_if(rowsToDeleteOnRight.begin(), rowsToDeleteOnRight.end(),
+                            std::inserter(deleteRight, deleteRight.begin()), std::mem_fun(&FileSystemObject::isEmpty<RIGHT_SIDE>));
     }
+
+    deleteFromGridAndHDOneSide<LEFT_SIDE>(deleteLeft.begin(), deleteLeft.end(),
+                                          useRecycleBin,
+                                          statusHandler);
+
+    deleteFromGridAndHDOneSide<RIGHT_SIDE>(deleteRight.begin(), deleteRight.end(),
+                                           useRecycleBin,
+                                           statusHandler);
 }
 
 

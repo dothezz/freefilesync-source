@@ -5,12 +5,12 @@
 // **************************************************************************
 //
 #include "serialize.h"
-#include <wx/intl.h>
+#include "i18n.h"
 
 using namespace util;
 
 
-void ReadInputStream::throwReadError() const  //throw FileError()
+void ReadInputStream::throwReadError() const  //throw (FileError)
 {
     throw ffs3::FileError(wxString(_("Error reading from synchronization database:")) + wxT(" \n") +
                           wxT("\"") +  errorObjName_ + wxT("\""));
@@ -33,7 +33,7 @@ ReadInputStream::CharArray ReadInputStream::readArrayC() const
 
 
 //--------------------------------------------------------------------------------------------------------
-void WriteOutputStream::throwWriteError() const //throw FileError()
+void WriteOutputStream::throwWriteError() const //throw (FileError)
 {
     throw ffs3::FileError(wxString(_("Error writing to synchronization database:")) + wxT(" \n") +
                           wxT("\"") + errorObjName_ + wxT("\""));

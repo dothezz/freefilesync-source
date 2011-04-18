@@ -8,7 +8,6 @@
 #include <limits>
 #include "system_constants.h"
 #include "system_func.h"
-#include <wx/intl.h>
 #include "string_conv.h"
 #include "assert_static.h"
 #include "symlink_target.h"

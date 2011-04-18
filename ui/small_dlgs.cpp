@@ -14,7 +14,7 @@
 #include "../synchronization.h"
 #include "../library/custom_grid.h"
 #include "../shared/custom_button.h"
-#include "../shared/localization.h"
+#include "../shared/i18n.h"
 #include "../shared/global_func.h"
 #include "../shared/build_info.h"
 #include <wx/wupdlock.h>
@@ -50,7 +50,7 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
     m_bitmapTransl->SetBitmap(GlobalResources::instance().getImage(wxT("translation")));
 
     //create language credits
-    for (std::vector<LocInfoLine>::const_iterator i = LocalizationInfo::getMapping().begin(); i != LocalizationInfo::getMapping().end(); ++i)
+    for (std::vector<LocInfoLine>::const_iterator i = LocalizationInfo::get().begin(); i != LocalizationInfo::get().end(); ++i)
     {
         //flag
         wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, GlobalResources::instance().getImage(i->languageFlag), wxDefaultPosition, wxSize(-1,11), 0 );

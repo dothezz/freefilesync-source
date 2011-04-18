@@ -49,10 +49,6 @@
 			<param name="Local" value="html\advanced\DragDrop.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
-			<param name="Name" value="Environment Variables">
-			<param name="Local" value="html\advanced\EnvironmentVariables.html">
-			</OBJECT>
-		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="Error notification">
 			<param name="Local" value="html\advanced\SendMail.html">
 			</OBJECT>
@@ -63,6 +59,10 @@
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="External applications">
 			<param name="Local" value="html\advanced\ExternalApp.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Macros">
+			<param name="Local" value="html\advanced\Macros.html">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="RealtimeSync">

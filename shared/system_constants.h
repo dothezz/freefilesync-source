@@ -16,7 +16,7 @@ namespace common
 //      GLOBALS
 //------------------------------------------------
 #ifdef FFS_WIN
-const Zchar FILE_NAME_SEPARATOR = '\\';
+const Zchar FILE_NAME_SEPARATOR = '\\';  //
 const wxChar LINE_BREAK[] = wxT("\r\n"); //internal linkage
 #elif defined FFS_LINUX
 const Zchar FILE_NAME_SEPARATOR = '/';
@@ -25,6 +25,5 @@ const wxChar LINE_BREAK[] = wxT("\n");
 
 const char BYTE_ORDER_MARK_UTF8[] = "\xEF\xBB\xBF";
 }
-
 
 #endif // SYSTEMCONSTANTS_H_INCLUDED

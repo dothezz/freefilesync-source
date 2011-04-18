@@ -15,10 +15,12 @@
 #include "../ui/grid_view.h"
 #include "../synchronization.h"
 #include "../shared/custom_tooltip.h"
+#include "../shared/i18n.h"
 #include <wx/dcclient.h>
 #include "icon_buffer.h"
 #include <wx/icon.h>
 #include <wx/tooltip.h>
+#include <wx/settings.h>
 
 #ifdef FFS_WIN
 #include <wx/timer.h>
@@ -155,13 +157,14 @@ public:
 
     virtual wxGridCellAttr* GetAttr(int row, int col, wxGridCellAttr::wxAttrKind  kind)
     {
-        const wxColour color = getRowColor(row);
+        const std::pair<wxColour, wxColour> color = getRowColor(row);
 
         //add color to some rows
         wxGridCellAttr* result = wxGridTableBase::GetAttr(row, col, kind);
         if (result)
         {
-            if (result->GetBackgroundColour() == color)
+            if (result->GetTextColour()       == color.first &&
+                result->GetBackgroundColour() == color.second)
             {
                 return result;
             }
@@ -175,7 +178,8 @@ public:
         else
             result = new wxGridCellAttr; //created with ref-count 1
 
-        result->SetBackgroundColour(color);
+        result->SetTextColour      (color.first);
+        result->SetBackgroundColour(color.second);
 
         return result;
     }
@@ -206,7 +210,7 @@ protected:
     const GridView* gridDataView; //(very fast) access to underlying grid data :)
 
 private:
-    virtual const wxColour getRowColor(int row) = 0; //rows that are filtered out are shown in different color
+    virtual const std::pair<wxColour, wxColour> getRowColor(int row) = 0; //rows that are filtered out are shown in different color: <foreground, background>
 
     int lastNrRows;
     int lastNrCols;
@@ -406,37 +410,48 @@ protected:
 
 
 private:
-    virtual const wxColour getRowColor(int row) //rows that are filtered out are shown in different color
+    virtual const std::pair<wxColour, wxColour> getRowColor(int row) //rows that are filtered out are shown in different color: <foreground, background>
     {
+        std::pair<wxColour, wxColour> result(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT),
+                                             wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
+
         const FileSystemObject* fsObj = getRawData(row);
         if (fsObj)
         {
             //mark filtered rows
             if (!fsObj->isActive())
-                return COLOR_BLUE;
-
-            //mark directories and symlinks
-            struct GetRowColor : public FSObjectVisitor
             {
-                virtual void visit(const FileMapping& fileObj)
+                result.first = *wxBLACK;
+                result.second = COLOR_BLUE;
+            }
+            else
+            {
+                //mark directories and symlinks
+                struct GetRowColor : public FSObjectVisitor
                 {
-                    rowColor = *wxWHITE;
-                }
-                virtual void visit(const SymLinkMapping& linkObj)
-                {
-                    rowColor = COLOR_ORANGE;
-                }
-                virtual void visit(const DirMapping& dirObj)
-                {
-                    rowColor = COLOR_GREY;
-                }
+                    GetRowColor(wxColour& foreground, wxColour& background) : foreground_(foreground), background_(background) {}
 
-                wxColour rowColor;
-            } getCol;
-            fsObj->accept(getCol);
-            return getCol.rowColor;
+                    virtual void visit(const FileMapping& fileObj) {}
+                    virtual void visit(const SymLinkMapping& linkObj)
+                    {
+                        foreground_ = *wxBLACK;
+                        background_ = COLOR_ORANGE;
+                    }
+                    virtual void visit(const DirMapping& dirObj)
+                    {
+                        foreground_ = *wxBLACK;
+                        background_ = COLOR_GREY;
+                    }
+
+                private:
+                    wxColour& foreground_;
+                    wxColour& background_;
+                } getCol(result.first, result.second);
+                fsObj->accept(getCol);
+            }
         }
-        return *wxWHITE;
+
+        return result;
     }
 
     std::vector<xmlAccess::ColumnTypes> columnPositions;
@@ -516,62 +531,89 @@ public:
     }
 
 private:
-    virtual const wxColour getRowColor(int row) //rows that are filtered out are shown in different color
+    virtual const std::pair<wxColour, wxColour> getRowColor(int row) //rows that are filtered out are shown in different color: <foreground, background>
     {
+        std::pair<wxColour, wxColour> result(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT),
+                                             wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
+
         const FileSystemObject* fsObj = getRawData(row);
         if (fsObj)
         {
             //mark filtered rows
             if (!fsObj->isActive())
-                return COLOR_BLUE;
-
-            if (syncPreviewActive) //synchronization preview
             {
-                switch (fsObj->getSyncOperation()) //evaluate comparison result and sync direction
-                {
-                    case SO_CREATE_NEW_LEFT:
-                    case SO_DELETE_LEFT:
-                    case SO_OVERWRITE_LEFT:
-                        return COLOR_SYNC_BLUE;
-                    case SO_COPY_METADATA_TO_LEFT:
-                        return COLOR_SYNC_BLUE_LIGHT;
-                    case SO_CREATE_NEW_RIGHT:
-                    case SO_DELETE_RIGHT:
-                    case SO_OVERWRITE_RIGHT:
-                        return COLOR_SYNC_GREEN;
-                    case SO_COPY_METADATA_TO_RIGHT:
-                        return COLOR_SYNC_GREEN_LIGHT;
-                    case SO_UNRESOLVED_CONFLICT:
-                        return COLOR_YELLOW;
-                    case SO_DO_NOTHING:
-                    case SO_EQUAL:
-                        return *wxWHITE;
-                }
+                result.first  = *wxBLACK;;
+                result.second = COLOR_BLUE;
             }
-            else //comparison results view
+            else
             {
-                switch (fsObj->getCategory())
+                if (syncPreviewActive) //synchronization preview
                 {
-                    case FILE_LEFT_SIDE_ONLY:
-                    case FILE_RIGHT_SIDE_ONLY:
-                        return COLOR_CMP_GREEN;
-                    case FILE_LEFT_NEWER:
-                    case FILE_RIGHT_NEWER:
-                        return COLOR_CMP_BLUE;
-                    case FILE_DIFFERENT:
-                        return COLOR_CMP_RED;
-                    case FILE_EQUAL:
-                        return *wxWHITE;
-                    case FILE_CONFLICT:
-                        return COLOR_YELLOW;
-                    case FILE_DIFFERENT_METADATA:
-                        return COLOR_YELLOW_LIGHT;
+                    switch (fsObj->getSyncOperation()) //evaluate comparison result and sync direction
+                    {
+                        case SO_DO_NOTHING:
+                        case SO_EQUAL:
+                            break;//usually white
+                        case SO_CREATE_NEW_LEFT:
+                        case SO_OVERWRITE_LEFT:
+                        case SO_DELETE_LEFT:
+                            result.first  = *wxBLACK;
+                            result.second = COLOR_SYNC_BLUE;
+                            break;
+                        case SO_COPY_METADATA_TO_LEFT:
+                            result.first  = *wxBLACK;
+                            result.second = COLOR_SYNC_BLUE_LIGHT;
+                            break;
+                        case SO_CREATE_NEW_RIGHT:
+                        case SO_OVERWRITE_RIGHT:
+                        case SO_DELETE_RIGHT:
+                            result.first  = *wxBLACK;
+                            result.second = COLOR_SYNC_GREEN;
+                            break;
+                        case SO_COPY_METADATA_TO_RIGHT:
+                            result.first  = *wxBLACK;
+                            result.second = COLOR_SYNC_GREEN_LIGHT;
+                            break;
+                        case SO_UNRESOLVED_CONFLICT:
+                            result.first  = *wxBLACK;
+                            result.second = COLOR_YELLOW;
+                            break;
+                    }
+                }
+                else //comparison results view
+                {
+                    switch (fsObj->getCategory())
+                    {
+                        case FILE_LEFT_SIDE_ONLY:
+                        case FILE_RIGHT_SIDE_ONLY:
+                            result.first  = *wxBLACK;
+                            result.second = COLOR_CMP_GREEN;
+                            break;
+                        case FILE_LEFT_NEWER:
+                        case FILE_RIGHT_NEWER:
+                            result.first  = *wxBLACK;
+                            result.second = COLOR_CMP_BLUE;
+                            break;
+                        case FILE_DIFFERENT:
+                            result.first  = *wxBLACK;
+                            result.second = COLOR_CMP_RED;
+                            break;
+                        case FILE_EQUAL:
+                            break;//usually white
+                        case FILE_CONFLICT:
+                            result.first  = *wxBLACK;
+                            result.second = COLOR_YELLOW;
+                            break;
+                        case FILE_DIFFERENT_METADATA:
+                            result.first  = *wxBLACK;
+                            result.second = COLOR_YELLOW_LIGHT;
+                            break;
+                    }
                 }
             }
         }
 
-        //fallback
-        return *wxWHITE;
+        return result;
     }
 
     bool syncPreviewActive; //determines wheter grid shall show compare result or sync preview
@@ -1309,20 +1351,20 @@ void CustomGridRim::setTooltip(const wxMouseEvent& event)
 
                 virtual void visit(const FileMapping& fileObj)
                 {
-                    tipMsg_ = zToWx(fileObj.getShortName<side>()) + wxT("\n") +
+                    tipMsg_ = zToWx(fileObj.getRelativeName<side>()) + wxT("\n") +
                               _("Size") + wxT(": ") + ffs3::formatFilesizeToShortString(fileObj.getFileSize<side>()) + wxT("\n") +
                               _("Date") + wxT(": ") + ffs3::utcTimeToLocalString(fileObj.getLastWriteTime<side>());
                 }
 
                 virtual void visit(const SymLinkMapping& linkObj)
                 {
-                    tipMsg_ = zToWx(linkObj.getShortName<side>()) + wxT("\n") +
+                    tipMsg_ = zToWx(linkObj.getRelativeName<side>()) + wxT("\n") +
                               _("Date") + wxT(": ") + ffs3::utcTimeToLocalString(linkObj.getLastWriteTime<side>());
                 }
 
                 virtual void visit(const DirMapping& dirObj)
                 {
-                    tipMsg_ = zToWx(dirObj.getShortName<side>());
+                    tipMsg_ = zToWx(dirObj.getRelativeName<side>());
                 }
 
                 wxString& tipMsg_;
@@ -1857,7 +1899,6 @@ CustomGridMiddle::CustomGridMiddle(wxWindow* parent,
     GetGridWindow()->SetLayoutDirection(wxLayout_LeftToRight);         //avoid mirroring this dialog in RTL languages like Hebrew or Arabic
     GetGridColLabelWindow()->SetLayoutDirection(wxLayout_LeftToRight); //
 
-
     //connect events for dynamic selection of sync direction
     GetGridWindow()->Connect(wxEVT_MOTION,       wxMouseEventHandler(CustomGridMiddle::OnMouseMovement), NULL, this);
     GetGridWindow()->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CustomGridMiddle::OnLeaveWindow),   NULL, this);
@@ -2048,37 +2089,48 @@ void CustomGridMiddle::OnLeftMouseDown(wxMouseEvent& event)
 
 void CustomGridMiddle::OnLeftMouseUp(wxMouseEvent& event)
 {
-    const int rowEndFiltering = mousePosToCell(event.GetPosition()).first;
+    //int selRowEnd = mousePosToCell(event.GetPosition()).first;
+    //-> use visibly marked rows instead! with wxWidgets 2.8.12 there is no other way than IsInSelection()
+    int selRowEnd = -1;
+    if (0 <= selectionRowBegin && selectionRowBegin < GetNumberRows())
+    {
+        for (int i = selectionRowBegin; i < GetNumberRows() && IsInSelection(i, 0); ++i)
+            selRowEnd = i;
 
-    if (0 <= selectionRowBegin && 0 <= rowEndFiltering)
+        if (selRowEnd == selectionRowBegin)
+            for (int i = selectionRowBegin; i >= 0 && IsInSelection(i, 0); --i)
+                selRowEnd = i;
+    }
+
+    if (0 <= selectionRowBegin && 0 <= selRowEnd)
     {
         switch (selectionPos)
         {
             case BLOCKPOS_CHECK_BOX:
             {
                 //create a custom event
-                FFSCheckRowsEvent evt(selectionRowBegin, rowEndFiltering);
+                FFSCheckRowsEvent evt(selectionRowBegin, selRowEnd);
                 AddPendingEvent(evt);
             }
             break;
             case BLOCKPOS_LEFT:
             {
                 //create a custom event
-                FFSSyncDirectionEvent evt(selectionRowBegin, rowEndFiltering, SYNC_DIR_LEFT);
+                FFSSyncDirectionEvent evt(selectionRowBegin, selRowEnd, SYNC_DIR_LEFT);
                 AddPendingEvent(evt);
             }
             break;
             case BLOCKPOS_MIDDLE:
             {
                 //create a custom event
-                FFSSyncDirectionEvent evt(selectionRowBegin, rowEndFiltering, SYNC_DIR_NONE);
+                FFSSyncDirectionEvent evt(selectionRowBegin, selRowEnd, SYNC_DIR_NONE);
                 AddPendingEvent(evt);
             }
             break;
             case BLOCKPOS_RIGHT:
             {
                 //create a custom event
-                FFSSyncDirectionEvent evt(selectionRowBegin, rowEndFiltering, SYNC_DIR_RIGHT);
+                FFSSyncDirectionEvent evt(selectionRowBegin, selRowEnd, SYNC_DIR_RIGHT);
                 AddPendingEvent(evt);
             }
             break;

@@ -10,7 +10,7 @@
 #include "../shared/global_func.h"
 #include "status_handler.h"
 #include "../shared/util.h"
-#include <wx/intl.h>
+#include "../shared/i18n.h"
 #include <limits>
 #include <wx/stopwatch.h>
 #include "../shared/assert_static.h"

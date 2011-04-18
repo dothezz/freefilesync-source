@@ -6,6 +6,7 @@
 //
 #include "batch_config.h"
 #include "../shared/xml_base.h"
+#include "../shared/dir_picker_i18n.h"
 #include "folder_pair.h"
 #include <iterator>
 #include <wx/wupdlock.h>
@@ -140,8 +141,8 @@ public:
     DirectoryPairBatch(wxWindow* parent, BatchDialog& batchDialog) :
         BatchFolderPairGenerated(parent),
         FolderPairCallback<BatchFolderPairGenerated>(static_cast<BatchFolderPairGenerated&>(*this), batchDialog), //pass BatchFolderPairGenerated part...
-        dirNameLeft( m_panelLeft,  m_dirPickerLeft,  m_directoryLeft),
-        dirNameRight(m_panelRight, m_dirPickerRight, m_directoryRight) {}
+        dirNameLeft (*m_panelLeft,  *m_dirPickerLeft,  *m_directoryLeft),
+        dirNameRight(*m_panelRight, *m_dirPickerRight, *m_directoryRight) {}
 
     void setValues(const Zstring& leftDir, const Zstring& rightDir, AltSyncCfgPtr syncCfg, const FilterConfig& filter)
     {
@@ -172,12 +173,12 @@ public:
         FolderPairCallback<BatchDlgGenerated>(batchDialog, batchDialog),
 
         //prepare drag & drop
-        dirNameLeft(batchDialog.m_panelLeft,
-                    batchDialog.m_dirPickerLeft,
-                    batchDialog.m_directoryLeft),
-        dirNameRight(batchDialog.m_panelRight,
-                     batchDialog.m_dirPickerRight,
-                     batchDialog.m_directoryRight) {}
+        dirNameLeft(*batchDialog.m_panelLeft,
+                    *batchDialog.m_dirPickerLeft,
+                    *batchDialog.m_directoryLeft),
+        dirNameRight(*batchDialog.m_panelRight,
+                     *batchDialog.m_dirPickerRight,
+                     *batchDialog.m_directoryRight) {}
 
     void setValues(const Zstring& leftDir, const Zstring& rightDir, AltSyncCfgPtr syncCfg, const FilterConfig& filter)
     {
@@ -247,7 +248,7 @@ void BatchDialog::init()
 
     //prepare drag & drop for loading of *.ffs_batch files
     SetDropTarget(new BatchFileDropEvent(*this));
-    logfileDir.reset(new DirectoryName(m_panelLogging, m_dirPickerLogfileDir, m_textCtrlLogfileDir));
+    logfileDir.reset(new DirectoryName(*m_panelLogging, *m_dirPickerLogfileDir, *m_textCtrlLogfileDir, sbSizerLogfileDir));
 
     //set icons for this dialog
     m_bpButtonAddPair->SetBitmapLabel(GlobalResources::instance().getImage(wxT("addFolderPair")));
@@ -628,12 +629,12 @@ void BatchDialog::loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg)
     //make working copy
     localBatchCfg = batchCfg;
 
-    logfileDir->setName(wxToZ(batchCfg.logFileDirectory));
-    m_spinCtrlLogCountMax->SetValue(static_cast<int>(batchCfg.logFileCountMax));
-
     m_checkBoxSilent->SetValue(batchCfg.silent);
     //error handling is dependent from m_checkBoxSilent! /|\   \|/
     setSelectionHandleError(batchCfg.handleError);
+
+    logfileDir->setName(wxToZ(batchCfg.logFileDirectory));
+    m_spinCtrlLogCountMax->SetValue(static_cast<int>(batchCfg.logFileCountMax)); //attention: this one emits a "change value" event!! => updateGui() called implicitly!
 
     //set first folder pair
     firstFolderPair->setValues(batchCfg.mainCfg.firstPair.leftDirectory,

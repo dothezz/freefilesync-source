@@ -10,9 +10,9 @@
 #include "loki/ScopeGuard.h"
 #include <boost/scoped_array.hpp>
 #include "system_func.h"
-#include <wx/intl.h>
 #include "string_conv.h"
 #include "file_error.h"
+#include "i18n.h"
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -72,7 +72,7 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw (FileError)
     try //reading certain symlinks requires admin rights! This shall not cause an error in user mode!
     {
         //allow access to certain symbolic links/junctions
-        ffs3::Privileges::getInstance().ensureActive(SE_BACKUP_NAME); //throw FileError()
+        ffs3::Privileges::getInstance().ensureActive(SE_BACKUP_NAME); //throw (FileError)
     }
     catch (...) {}
 

@@ -8,6 +8,8 @@
 #include <wx/dcmemory.h>
 #include <wx/image.h>
 #include <algorithm>
+#include <limits>
+#include <cmath>
 
 
 wxButtonWithImage::wxButtonWithImage(wxWindow* parent,
@@ -50,23 +52,29 @@ void wxButtonWithImage::setBitmapBack(const wxBitmap& bitmap, unsigned spaceBefo
 }
 
 
-void makeWhiteTransparent(const wxColor exceptColor, wxImage& image)
+void makeWhiteTransparent(wxImage& image) //assume black text on white background
 {
-    unsigned char* alphaData = image.GetAlpha();
-    if (alphaData)
+    unsigned char* alphaFirst = image.GetAlpha();
+    if (alphaFirst)
     {
-        assert(exceptColor.Red() != 255);
+        unsigned char* alphaLast = alphaFirst + image.GetWidth() * image.GetHeight();
 
-        unsigned char exCol = exceptColor.Red(); //alpha value can be extracted from any one of (red/green/blue)
-        unsigned char* imageStart = image.GetData();
+        //dist(black, white)
+        double distBlackWhite = std::sqrt(3.0 * 255 * 255);
 
-        unsigned char* j = alphaData;
-        const unsigned char* const rowEnd = j + image.GetWidth() * image.GetHeight();
-        while (j != rowEnd)
+        const unsigned char* bytePos = image.GetData();
+
+        for (unsigned char* j = alphaFirst; j != alphaLast; ++j)
         {
-            const unsigned char* imagePixel = imageStart + (j - alphaData) * 3; //each pixel consists of three chars
-            //exceptColor(red,green,blue) becomes fully opaque(255), while white(255,255,255) becomes transparent(0)
-            *(j++) = ((255 - imagePixel[0]) * wxIMAGE_ALPHA_OPAQUE) / (255 - exCol);
+            unsigned char r = *bytePos++; //
+            unsigned char g = *bytePos++; //each pixel consists of three chars
+            unsigned char b = *bytePos++; //
+
+            //dist((r,g,b), white)
+            double distColWhite = std::sqrt((255.0 - r) * (255.0 - r) + (255.0 - g) * (255.0 - g) + (255.0 - b) * (255.0 - b));
+
+            //black(0,0,0) becomes fully opaque(255), while white(255,255,255) becomes transparent(0)
+            *j = distColWhite / distBlackWhite * wxIMAGE_ALPHA_OPAQUE;
         }
     }
 }
@@ -132,8 +140,11 @@ void linearInterpolation(wxImage& img)
 }
 */
 
+
 wxBitmap wxButtonWithImage::createBitmapFromText(const wxString& text)
 {
+    //wxDC::DrawLabel() doesn't respect alpha channel at all => apply workaround to calculate alpha values manually:
+
     if (text.empty())
         return wxBitmap();
 
@@ -143,29 +154,32 @@ wxBitmap wxButtonWithImage::createBitmapFromText(const wxString& text)
     wxSize sizeNeeded = getSizeNeeded(text, currentFont);
     wxBitmap newBitmap(sizeNeeded.GetWidth(), sizeNeeded.GetHeight());
 
-    wxMemoryDC dc;
-    dc.SelectObject(newBitmap);
-
-    //set up white background
-    dc.SetBackground(*wxWHITE_BRUSH);
-    dc.Clear();
-
-    //find position of accelerator
-    int indexAccel = -1;
-    size_t accelPos;
-    wxString textLabelFormatted = text;
-    if ((accelPos = text.find(wxT("&"))) != wxString::npos)
     {
-        textLabelFormatted.Replace(wxT("&"), wxT(""), false); //remove accelerator
-        indexAccel = static_cast<int>(accelPos);
+        wxMemoryDC dc;
+        dc.SelectObject(newBitmap);
+
+        //set up white background
+        dc.SetBackground(*wxWHITE_BRUSH);
+        dc.Clear();
+
+        //find position of accelerator
+        int indexAccel = -1;
+        size_t accelPos;
+        wxString textLabelFormatted = text;
+        if ((accelPos = text.find(wxT("&"))) != wxString::npos)
+        {
+            textLabelFormatted.Replace(wxT("&"), wxT(""), false); //remove accelerator
+            indexAccel = static_cast<int>(accelPos);
+        }
+
+        dc.SetTextForeground(*wxBLACK); //for use in makeWhiteTransparent
+        dc.SetTextBackground(*wxWHITE); //
+        dc.SetFont(currentFont);
+
+        dc.DrawLabel(textLabelFormatted, wxNullBitmap, wxRect(0, 0, newBitmap.GetWidth(), newBitmap.GetHeight()), wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, indexAccel);
+
+        dc.SelectObject(wxNullBitmap);
     }
-
-    dc.SetTextForeground(textColor);
-    dc.SetTextBackground(*wxWHITE);
-    dc.SetFont(currentFont);
-    dc.DrawLabel(textLabelFormatted, wxNullBitmap, wxRect(0, 0, newBitmap.GetWidth(), newBitmap.GetHeight()), wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, indexAccel);
-
-    dc.SelectObject(wxNullBitmap);
 
     //add alpha channel to image
     wxImage finalImage(newBitmap.ConvertToImage());
@@ -173,8 +187,18 @@ wxBitmap wxButtonWithImage::createBitmapFromText(const wxString& text)
 
     //linearInterpolation(finalImage);
 
-    //make white background transparent
-    makeWhiteTransparent(textColor, finalImage);
+    //calculate values for alpha channel
+    makeWhiteTransparent(finalImage);
+
+    //now apply real text color
+    unsigned char* bytePos = finalImage.GetData();
+    const int pixelCount = finalImage.GetWidth() * finalImage.GetHeight();
+    for (int i = 0; i < pixelCount; ++ i)
+    {
+        *bytePos++ = textColor.Red();
+        *bytePos++ = textColor.Green();
+        *bytePos++ = textColor.Blue();
+    }
 
     return wxBitmap(finalImage);
 }

@@ -5,7 +5,7 @@
 // **************************************************************************
 //
 #include "structures.h"
-#include <wx/intl.h>
+#include "shared/i18n.h"
 //#include <stdexcept>
 
 using namespace ffs3;

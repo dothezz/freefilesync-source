@@ -1,6 +1,6 @@
 #include "dst_hack.h"
 #include "system_constants.h"
-#include <wx/intl.h>
+#include "i18n.h"
 #include "long_path_prefix.h"
 #include "string_conv.h"
 #include "system_func.h"
@@ -10,51 +10,63 @@
 #include "global_func.h"
 #include <limits>
 
+using namespace ffs3;
+
+
+namespace
+{
+//fast ::GetVolumePathName() clone: let's hope it's not too simple (doesn't honor mount points)
+Zstring getVolumeName(const Zstring& filename)
+{
+    //this call is expensive: ~1.5 ms!
+    //    if (!::GetVolumePathName(applyLongPathPrefix(filename).c_str(), //__in   LPCTSTR lpszFileName,
+    //                             fsName,                                     //__out  LPTSTR lpszVolumePathName,
+    //                             BUFFER_SIZE))                               //__in   DWORD cchBufferLength
+    // ...
+    //    Zstring volumePath = fsName;
+    //    if (!volumePath.EndsWith(common::FILE_NAME_SEPARATOR)) //a trailing backslash is required
+    //        volumePath += common::FILE_NAME_SEPARATOR;
+
+    Zstring nameFmt = removeLongPathPrefix(filename); //throw()
+    if (!nameFmt.EndsWith(Zstr("\\")))
+        nameFmt += Zstr("\\"); //GetVolumeInformation expects trailing backslash
+
+    if (nameFmt.StartsWith(Zstr("\\\\"))) //UNC path: "\\ComputerName\SharedFolder\"
+    {
+        size_t nameSize = nameFmt.size();
+        const size_t posFirstSlash = nameFmt.find(Zstr("\\"), 2);
+        if (posFirstSlash != Zstring::npos)
+        {
+            nameSize = posFirstSlash + 1;
+            const size_t posSecondSlash = nameFmt.find(Zstr("\\"), posFirstSlash + 1);
+            if (posSecondSlash != Zstring::npos)
+                nameSize = posSecondSlash + 1;
+        }
+        return Zstring(nameFmt.c_str(), nameSize); //include trailing backslash!
+    }
+    else //local path: "C:\Folder\"
+    {
+        const size_t pos = nameFmt.find(Zstr(":\\"));
+        if (pos == 1) //expect single letter volume
+            return Zstring(nameFmt.c_str(), 3);
+    }
+
+    return Zstring();
+}
+}
+
 
 bool dst::isFatDrive(const Zstring& fileName) //throw()
 {
     using namespace ffs3;
 
     const size_t BUFFER_SIZE = MAX_PATH + 1;
-    wchar_t buffer[BUFFER_SIZE];
+    wchar_t fsName[BUFFER_SIZE];
 
-    //this call is expensive: ~1.5 ms!
-    //    if (!::GetVolumePathName(applyLongPathPrefix(fileName).c_str(), //__in   LPCTSTR lpszFileName,
-    //                             buffer,                                     //__out  LPTSTR lpszVolumePathName,
-    //                             BUFFER_SIZE))                               //__in   DWORD cchBufferLength
-    // ...
-    //    Zstring volumePath = buffer;
-    //    if (!volumePath.EndsWith(common::FILE_NAME_SEPARATOR)) //a trailing backslash is required
-    //        volumePath += common::FILE_NAME_SEPARATOR;
+    const Zstring volumePath = getVolumeName(fileName);
+    if (volumePath.empty())
+        return false;
 
-    //fast ::GetVolumePathName() clone: let's hope it's not too simple (doesn't honor mount points)
-    Zstring volumePath;
-    {
-        Zstring nameFmt = removeLongPathPrefix(fileName); //throw()
-        if (!nameFmt.EndsWith(Zstr("\\")))
-            nameFmt += Zstr("\\"); //GetVolumeInformation expects trailing backslash
-
-        if (nameFmt.StartsWith(Zstr("\\\\"))) //UNC path: "\\ComputerName\SharedFolder\"
-        {
-            size_t nameSize = nameFmt.size();
-            const size_t posFirstSlash = nameFmt.find(Zstr("\\"), 2);
-            if (posFirstSlash != Zstring::npos)
-            {
-                nameSize = posFirstSlash + 1;
-                const size_t posSecondSlash = nameFmt.find(Zstr("\\"), posFirstSlash + 1);
-                if (posSecondSlash != Zstring::npos)
-                    nameSize = posSecondSlash + 1;
-            }
-            volumePath = Zstring(nameFmt.c_str(), nameSize); //include trailing backslash!
-        }
-        else //local path: "C:\Folder\"
-        {
-            const size_t pos = nameFmt.find(Zstr(":\\"));
-            if (pos != 1) //expect single letter volume
-                return false;
-            volumePath = Zstring(nameFmt.c_str(), 3);
-        }
-    }
     //suprisingly fast: ca. 0.03 ms per call!
     if (!::GetVolumeInformation(volumePath.c_str(), //__in_opt   LPCTSTR lpRootPathName,
                                 NULL,               //__out      LPTSTR lpVolumeNameBuffer,
@@ -62,13 +74,13 @@ bool dst::isFatDrive(const Zstring& fileName) //throw()
                                 NULL,               //__out_opt  LPDWORD lpVolumeSerialNumber,
                                 NULL,               //__out_opt  LPDWORD lpMaximumComponentLength,
                                 NULL,               //__out_opt  LPDWORD lpFileSystemFlags,
-                                buffer,             //__out      LPTSTR lpFileSystemNameBuffer,
+                                fsName,             //__out      LPTSTR lpFileSystemNameBuffer,
                                 BUFFER_SIZE))       //__in       DWORD nFileSystemNameSize
     {
         assert(false); //shouldn't happen
         return false;
     }
-    const Zstring fileSystem = buffer;
+    const Zstring fileSystem = fsName;
 
     //DST hack seems to be working equally well for FAT and FAT32 (in particular creation time has 10^-2 s precision as advertised)
     return fileSystem == Zstr("FAT") ||

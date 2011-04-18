@@ -7,8 +7,7 @@
 #include "comparison.h"
 #include <stdexcept>
 #include "shared/global_func.h"
-#include <wx/intl.h>
-//#include <wx/timer.h>
+#include "shared/i18n.h"
 #include <wx/msgdlg.h>
 #include <wx/log.h>
 #include "algorithm.h"
@@ -16,6 +15,7 @@
 #include <memory>
 #include "shared/string_conv.h"
 #include "shared/file_handling.h"
+#include "shared/resolve_path.h"
 #include "shared/system_func.h"
 #include "shared/file_traverser.h"
 #include "library/filter.h"
@@ -639,9 +639,7 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& direc
     wxLogNull noWxLogs; //hide wxWidgets log messages in release build
 #endif
 
-    //    #ifdef FFS_WIN
     //PERF_START;
-    //    #endif
 
 
     //init process: keep at beginning so that all gui elements are initialized properly

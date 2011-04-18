@@ -15,7 +15,7 @@
 %x day(s)
 %x dag(en)
 %x directories
-%x paden
+%x mappen
 %x files
 %x bestanden
 %x hour(s)
@@ -25,9 +25,9 @@
 %x min
 %x min
 %x of %y rows in view
-%x van de %y rijen in zicht
+%x van de %y zichtbare rijen
 %x of 1 row in view
-%x van 1 rij in zicht
+%x van 1 zichtbare rij
 %x sec
 %x sec
 %x%
@@ -43,9 +43,9 @@
 &Check for new version
 &Controleer op nieuwe versie
 &Content
-&Help artikelen
+&Inhoud
 &Create batch job...
-&Creëer batchjob...
+&Creëer taaklijst...
 &Default
 &Standaard
 &Exit
@@ -67,7 +67,7 @@
 &Load
 &Laden
 &Load configuration...
-&Laad de configuratie...
+&Laad configuratie...
 &New
 &Nieuw
 &No
@@ -75,7 +75,7 @@
 &OK
 &OK
 &Pause
-&Pause
+&Pauze
 &Program
 &Programma
 &Quit
@@ -93,11 +93,11 @@
 (Build: %x)
 (Build: %x)
 (Requires an Internet connection!)
-(Vereist een internetverbinding)
+(Vereist een internetverbinding!)
 - Other side's counterpart to %dir
-- Tegenhander andere kant naar %dir
+- Tegenhanger andere zijde naar %dir
 - Other side's counterpart to %name
-- Tegenhanger andere kant naar %naam
+- Tegenhanger andere zijde naar %naam
 - conflict
 - conflict
 - conflict (same date, different size)
@@ -113,7 +113,7 @@
 - exists right only
 - bestaat alleen rechts
 - full file or directory name
-- volledige map of bestandsnaam
+- volledig bestand of mapnaam
 - left
 - links
 - left newer
@@ -125,13 +125,13 @@
 /sec
 /sec
 1 directory
-1 pad
+1 map
 1 file
 1 bestand
 1. &Compare
 1. &Vergelijk
 1. Enter relative file or directory names separated by ';' or a new line.
-1. Vul de relatieve bestandsnaam of map in, gescheiden bij ';' of een nieuwe regel.
+1. Vul de relatieve bestands- of mapnaam in, gescheiden door ';' of een nieuwe regel.
 1. Select directories to monitor.
 1. Selecteer mappen om te observeren.
 2. &Synchronize...
@@ -139,21 +139,21 @@
 2. Enter a command line.
 2. Geef een opdrachtregel in.
 2. Use wildcard characters '*' and '?'.
-2. U kunt gebruik maken van wildcard karakters zoals '*' en '?'.
+2. Gebruik wildcard karakters zoals '*' en '?'.
 3. Exclude files directly on main grid via context menu.
-3. Sluit bestanden direct uit in het hoofscherm via een contextmenu
+3. Sluit bestanden in het hoofdscherm direct uit via het contextmenu
 3. Press 'Start'.
 3. Klik op 'Start'.
 <Automatic>
 <Automatisch>
 <Directory>
-<Pad>
+<Map>
 <Last session>
 <Laatste sessie>
 <Symlink>
 <Symlink>
 <multiple selection>
-<veelvoudige selectie>
+<meervoudige selectie>
 A directory input field is empty.
 Een tekstveld over de map is leeg.
 A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
@@ -161,9 +161,9 @@ Een map wordt bewerkt die deel is van meerdere mappen! Controleer de synchronisa
 A newer version of FreeFileSync is available:
 Een nieuwe versie van FreeFileSync is beschikbaar:
 Abort requested: Waiting for current operation to finish...
-Bezig met afbreken: wachten op beëindigen huidige handeling...
+Bezig met afbreken: Wacht op beëindiging huidige bewerking...
 Abort synchronization immediately
-Stop synchronistatie onmiddelijk
+Stop synchronisatie onmiddelijk
 Aborted
 Afgebroken
 About
@@ -173,43 +173,45 @@ Actie
 Add folder
 Map toevoegen
 Add folder pair
-Voeg 1 paar gekoppelde mappen toe
+Voeg gekoppelde mappen toe
 All directories in sync!
-Alle paden zijn gesynchroniseerd!
+Alle mappen zijn gesynchroniseerd!
 An exception occurred!
 Er heeft een uitzondering plaatsgevonden!
 As a result the files are separated into the following categories:
-Hierdoor worden de bestanden gescheiden in de volgende categorieën:
+Als resultaat worden de bestanden in de volgende categorieën gescheiden:
 As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
-Zoals de naam suggereert, worden twee bestanden met dezelfde naam alleen gemarkeerd als gelijk, als ze precies dezelfde inhoud hebben. Deze optie is handig voor een consistentiecontrole in plaats van back-up handelingen. Daarom worden de tijdstempels niet bekeken.\n\n Met deze optie aan is de beslissingsboom korter:
+Zoals de naam suggereert worden twee bestanden met dezelfde naam alleen als gelijk bestempeld als ze precies dezelfde inhoud hebben. Deze optie is handig voor een consistentiecontrole in plaats van back-up handelingen. Daarom worden de tijdstempels niet bekeken.\n\n Met deze optie geselecteerd is de beslissingsboom korter:
 Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
-Assembleer een batchbestand voor automatische synchronisatie. Om te starten in batchmodus is het voldoende om de bestandsnaam achter de FreeFileSync toepassing te zetten: FreeFileSync.exe <batchbestand>. Het is mogelijk dit in te plannen in de systeemplanner.
+Creëer een taakbestand voor automatische synchronisatie. Om in taakmodus te starten is het voldoende om de bestandsnaam achter de FreeFileSync toepassing te zetten: FreeFileSync.exe <taakbestand>. Het is ook mogelijk dit in de systeemtaakplanner in te plannen.
 At least one directory input field is empty.
-Er is minimaal één locatie-veld leeg.
+Er is minimaal één map invoer-veld leeg.
 Auto-adjust columns
 Kolommen automatisch aanpassen
 Batch execution
-Batch taak uitvoeren
+Taak uitvoeren
 Batch file created successfully!
-Batchbestand is succesvol aangemaakt!
+Taakbestand is succesvol aangemaakt!
 Batch job
-Batch taak
+Taaklijst
 Big thanks for localizing FreeFileSync goes out to:
 Extra dank voor het vertalen van FreeFileSync gaat naar:
 Both sides have changed since last synchronization!
-Beide zijden zijn veranderd sinds de laatste synchronisatie!
+Beide zijdes zijn veranderd sinds de laatste synchronisatie!
 Browse
-Map opzoeken
+Verkennen
 Browse directory
-Doorzoek map
+Verken map
 Cannot determine sync-direction:
 Kan de synchronisatie-richting niet bepalen:
 Cannot find %x
 Kan %x niet vinden
+Cannot write to empty directory path!
+
 Category
 Categorie
 Clear filter settings
-Leeg filter instellingen
+Verwijder filter instellingen
 Comma separated list
 Komma gescheiden lijst
 Command line
@@ -219,7 +221,7 @@ Opdrachtregel is leeg!
 Compare
 Vergelijk
 Compare both sides
-Beide zijden vergelijken
+Vergelijk beide zijdes
 Compare by \"File content\"
 Vergelijk met \"bestandsinhoud\"
 Compare by \"File size and date\"
@@ -231,7 +233,7 @@ De inhoud van %x bestanden wordt vergeleken
 Comparing content...
 Inhoud vergelijken...
 Comparing files by content failed.
-Vergelijken van bestanden met de inhoud is mislukt.
+Bestand-inhoudvergelijking mislukt.
 Comparison Result
 Resultaat vergelijken
 Comparison settings
@@ -247,7 +249,7 @@ Configuratie overzicht:
 Configuration saved!
 Configuratie opgeslagen!
 Configure filter
-Configuratie filter
+Filter configuratie
 Configure your own synchronization rules.
 Configureer uw eigen synchronisatieregels.
 Confirm
@@ -259,13 +261,13 @@ Conflicten/bestanden die niet kunnen worden gecategoriseerd
 Continue
 Doorgaan
 Conversion error:
-Fout bij het converteren:
+Converteer fout:
 Copy attributes only from left to right
 Kopieer attributen alleen van links naar rechts
 Copy attributes only from right to left
 Kopieer attributen alleen van rechts naar links
 Copy filesystem permissions
-Kopieer bestandsmachtigingen
+Kopieer bestandssysteem toegangsrechten
 Copy from left to right
 Kopieer van links naar rechts
 Copy from left to right overwriting
@@ -275,31 +277,31 @@ Kopieer van rechts naar links
 Copy from right to left overwriting
 Kopieer en overschrijf van rechts naar links
 Copy locked files
-Kopieer 'alleen lezen' bestanden
+Kopieer vergrendelde bestanden
 Copy new or updated files to right folder.
 Kopieer nieuwe of geupdate bestanden naar de rechter map.
 Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
-Kopieer gedeelde of beveiligde bestanden met Volume Shadow Copy Service\n(Heeft administrator rechten nodig)
+Kopieer gedeelde of vergrendelde bestanden met Volume Shadow Copy Service\n(Vereist Administrator rechten)
 Copy to clipboard\tCTRL+C
 Kopieer naar het klembord\tCTRL+C
 Copying new Symbolic Link %x to %y
-Kopieer nieuw symbolische link van %x naar %y
+Kopieer nieuwe Symbolische Link van %x naar %y
 Copying new file %x to %y
-Kopieer nieuw bestand van %x naar %y
+Kopieert nieuw bestand van %x naar %y
 Could not determine volume name for file:
 Kon de schijfnaam niet vaststellen van bestand:
 Could not initialize directory monitoring:
-Initaliseren van locatie-observatie niet mogelijk:
+Initaliseren van map-observatie niet mogelijk:
 Could not load a required DLL:
 Kon een benodigde DLL niet laden:
 Could not read values for the following XML nodes:
 Kon geen waarden inlezen voor de volgende XML punten:
 Create a batch job
-Creëer batchjob
+Creëer een taaklijst
 Creating folder %x
 Map %x wordt aangemaakt
 Custom
-Eigen regels
+Aangepast
 Customize columns
 Aanpassen kolommen
 Customize...
@@ -313,49 +315,49 @@ Dataverificatie-fout: Bron en doelbestand hebben verschillende inhoud!
 Date
 Datum
 Delete files/folders existing on left side only
-Verwijder bestanden/folders die alleen links bestaan
+Verwijder bestanden/mappen die alleen aan de linkerzijde voorkomen
 Delete files/folders existing on right side only
-Verwijder bestanden/folders die alleen rechts bestaan
+Verwijder bestanden/mappen die alleen aan de rechterzijde voorkomen
 Delete files\tDEL
 Verwijder bestanden\tDEL
 Delete on both sides
-Verwijder aan beide kanten
+Verwijder aan beide zijdes
 Delete on both sides even if the file is selected on one side only
-Verwijder aan beide kanten ookal is het bestand maar aan één kant geselecteerd
+Verwijder aan beide zijdes ook al is het bestand maar aan één zijde geselecteerd
 Delete or overwrite files permanently
 Verwijder of overschrijf bestanden onomkeerbaar
 Delete permanently
 Verwijder onomkeerbaar
 Deleting Symbolic Link %x
-Verwijderen symbolische link %x
+Verwijderen van Symbolische Link %x
 Deleting file %x
-Bestand %x wordt verwijderd
+Verwijderen van bestand %x
 Deleting folder %x
-Map %x wordt verwijderd
+Verwijderen van map %x
 Deletion handling
 Verwijder-afhandeling
 Description
-Beschrijving
+Omschrijving
 Direct
 Direct
 Directories are dependent! Be careful when setting up synchronization rules:
 Mappen zijn afhankelijk van elkaar! Wees voorzichtig met het maken van synchronisatieregels:
 Directories to watch
-Paden om te controleren
+Mappen om te bekijken
 Directory
-Pad
+Map
 Directory does not exist:
-Pad bestaat niet:
+Map bestaat niet:
 Do not show this dialog again
-Deze melding niet meer weergeven
+Toon deze melding niet meer
 Do nothing
 Geen actie ondernemen
 Do you really want to delete the following object(s)?
-Weet u zeker dat u de volgende bestanden wilt verwijderen?
+Weet u zeker dat u het/de volgende bestand(en) wilt verwijderen?
 Do you really want to move the following object(s) to the Recycle Bin?
-Weet u zeker dat u de/het volgende bestand(en) wilt verplaatsen naar de prullenbak?
+Weet u zeker dat u het/de volgende bestand(en) naar de prullenbak wilt verplaatsen?
 Do you want FreeFileSync to automatically check for updates every week?
-Wilt u FreeFileSync automatisch elke week laten controleren of er een nieuwe versie is?
+Wilt u FreeFileSync elke week automatisch laten controleren of er een nieuwe versie is?
 Donate with PayPal
 Doneer met PayPal
 Download now?
@@ -363,89 +365,89 @@ Nu downloaden?
 Drag && drop
 Drag en drop
 Elements found:
-Elementen gevonden:
+Onderdelen gevonden:
 Elements processed:
-Elementen verwerkt:
+Onderdelen verwerkt:
 Elements remaining:
-Elementen te gaaan:
+Onderdelen te gaan:
 Email
 E-mail
 Encoding extended time information: %x
 Coderen uitgebreide tijd informatie: %x
 Endless loop when traversing directory:
-Oneindige lus bij het nalopen van locatie:
+Oneindige lus bij het doorlopen van map:
 Equal files/folders that differ in attributes only
 Alleen gelijke bestanden/mappen die verschillen van attributen
 Error
 Fout
 Error changing modification time:
-Er is een fout opgetreden bij het aanpassen van de bestandstijd:
+Fout tijdens aanpassing van de wijzigingstijd:
 Error copying file permissions:
-Error kopieren van bestandspremissies:
+Fout tijdens kopiëren van bestandspermissies:
 Error copying file:
-Er is een fout opgetreden bij het kopiëren van bestand:
+Fout tijdens kopiëren van bestand:
 Error copying locked file %x!
-Er is een fout opgetreden bij het kopiëren van %x omdat het bestand in gebruik is!
+Fout tijdens kopiëren van vergrendeld bestand %x!
 Error copying symbolic link:
-Error kopieren symbolische link:
+Fout tijdens kopiëren van symbolische koppeling:
 Error creating directory:
-Er is een fout opgetreden bij het aanmaken van pad:
+Fout tijdens het aanmaken van map:
 Error deleting directory:
-Er is een fout opgetreden bij het verwijderen van pad:
+Fout tijdens het verwijderen van map:
 Error deleting file:
-Er is een fout opgetreden bij het verwijderen van bestand:
+Fout tijdens verwijderen van bestand:
 Error handling
 Fout afhandeling
 Error loading library function:
-Er is een fout opgetreden bij het laden van de 'library function':
+Fout tijdens laden van bibliotheek functie:
 Error moving directory:
-Er is een fout opgetreden bij het verplaatsen van locatie:
+Fout tijdens verplaatsen van map:
 Error moving file:
-Er is een fout opgetreden bij het verplaatsen van bestand:
+Fout tijdens verplaatsen van bestand:
 Error moving to Recycle Bin:
-Er is een fout opgetreden bij het verplaatsen naar de prullenbak:
+Fout tijdens verplaatsen naar prullenbak:
 Error opening file:
-Er is een fout opgetreden bij het openen van het bestand:
+Fout tijdens openen van bestand:
 Error parsing configuration file:
-Er is een fout opgetreden bij het aanmaken van configuratiebestand:
+Fout tijdens verwerking configuratiebestand:
 Error reading file attributes:
-Er is een fout opgetreden bij het lezen van de bestands-eigenschappen
+Fout tijdens lezen van bestandsattributen
 Error reading file:
-Er is een fout opgetreden bij het lezen van het bestand:
+Fout tijdens lezen van bestand:
 Error reading from synchronization database:
-Er is een fout opgetreden bij het lezen van de synchronisatie-database:
+Fout tijdens uitlezen van synchronisatie-database:
 Error reading security context:
-Error bij lezen van de beveiliging:
+Fout tijdens lezen van beveiligingscontext:
 Error resolving symbolic link:
-Er is een fout opgetreden bij het ophalen van een symbolische koppeling:
+Fout tijdens opzoeken van symbolische koppeling:
 Error setting directory lock:
-Error instelling van map slot:
+Fout tijdens mapvergrendeling:
 Error setting privilege:
-Error instelling van premissies:
+Fout tijdens instellen van privileges:
 Error starting Volume Shadow Copy Service!
-Er is een fout opgetreden bij het starten van de Volume Schadow Copy Service! 
+Fout tijdens het opstarten van de Volume Shadow Copy Service! 
 Error traversing directory:
-Er is een fout opgetreden bij het doorzoeken van map:
+Fout tijdens doorzoeken van map:
 Error when monitoring directories.
-Er is een fout opgetreden bij het observeren van locaties.
+Fout tijdens observeren van mappen.
 Error writing file:
-Er is een fout opgetreden bij het schrijven naar bestand:
+Fout tijdens schrijven van bestand:
 Error writing security context:
-Error met het schrijven van de beveiliging:
+Fout tijdens schrijven van beveiligingscontext:
 Error writing to synchronization database:
-Er is een fout opgetreden bij het schrijven naar de synchronisatie-database:
+Fout tijdens schrijven naar synchronisatie-database:
 Example
 Voorbeeld
 Exclude
 Uitsluiten
 Exclude all rows
-Alle rijen uitsluiten
+Sluit alle rijen uit
 Exclude temporarily
-Tijdelijk uitsluiten
+Sluit tijdelijk uit
 Exclude via filter:
-Uitsluiten door filter:
+Sluit via filter uit:
 Exit instantly
-Sluit gelijk af
+Sluit meteen af
 Extension
 Extensie
 External applications
@@ -457,11 +459,11 @@ Tips en suggesties zijn welkom op:
 File %x has an invalid date!
 Bestand %x heeft een ongeldige datum!
 File already exists. Overwrite?
-Het bestand bestaat al. Overschrijven?
+Bestand bestaat al. Overschrijven?
 File content
 Bestandsinhoud
 File does not exist:
-Het bestand bestaat niet:
+Bestand bestaat niet:
 File list exported!
 Bestandslijst geëxporteerd!
 File size and date
@@ -469,29 +471,29 @@ Bestandsgrootte en -datum
 Filename
 Bestandsnaam
 Files %x have the same date but a different size!
-De bestanden %x hebben dezelfde data maar een afwijkende grootte!
+Bestanden %x hebben dezelfde datums maar een afwijkende grootte!
 Files are found equal if\n     - file content\nis the same
-Bestanden worden gelijk beschouwd als,\n     - de inhoud\novereenkomt
+Bestanden worden als gelijk beschouwd indien,\n     - de bestandsinhoud\novereenkomt
 Files are found equal if\n     - filesize\n     - last write time and date\nare the same
-Bestanden worden gelijk beschouwd als,\n     - de grootte\n     - datum en tijdstip van de laatste wijziging\novereenkomt
+Bestanden worden als gelijk beschouwd indien,\n     - de bestandsgrootte\n     - laatste wijzigingstijd en datum\novereenkomt
 Files that are equal on both sides
-Bestanden die aan beide kanten gelijk zijn
+Bestanden die aan beide zijdes gelijk zijn
 Files that exist on both sides, left one is newer
-Bestanden die aan beide kanten bestaan, maar waarvan de linkerkant nieuwer is
+Bestanden die aan beide zijdes bestaan, maar waarvan de linkerzijde nieuwer is
 Files that exist on both sides, right one is newer
-Bestanden die aan beide kanten bestaan, maar waarvan de rechterkant nieuwer is
+Bestanden die aan beide zijdes bestaan, maar waarvan de rechterzijde nieuwer is
 Files that have different content
-Bestanden dat andere inhoud hebben
+Bestanden die andere inhoud hebben
 Files/folders that exist on left side only
-Bestanden/mappen die alleen aan de linkerkant bestaan
+Bestanden/mappen die alleen aan de linkerzijde bestaan
 Files/folders that exist on right side only
-Bestanden/mappen die alleen aan de rechterkant bestaan
+Bestanden/mappen die alleen aan de rechterzijde bestaan
 Filter files
 Filter bestanden
 Filter is active
-Filer is actief
+Filter is actief
 Filter settings have changed!
-Filter instellingen opgeslagen!
+Filter instellingen zijn veranderd!
 Filter: All pairs
 Filter: Alle paren
 Filter: Single pair
@@ -503,7 +505,7 @@ Vind wat:
 Folder Comparison and Synchronization
 Mappen vergelijken en synchroniseren
 Folder pairs
-Paren mappen
+Map paren
 Follow
 Volg
 Free disk space available:
@@ -511,21 +513,21 @@ Beschikbare vrije schijfruimte :
 Free disk space required:
 Vrije ruimte op harde schrijf nodig:
 FreeFileSync Batch Job
-FreeFileSync batchjob
+FreeFileSync Taaklijst
 FreeFileSync at Sourceforge
 FreeFileSync op Sourceforge
 FreeFileSync batch file
-FreeFileSync batchbestand
+FreeFileSync taakbestand
 FreeFileSync configuration
 FreeFileSync configuratie
 FreeFileSync is up to date!
 U gebruikt de nieuwste versie van FreeFileSync!
 Full path
-Volledige bestandslocatie
+Volledig pad
 Generating database...
-Database genereren...
+Genereren van database...
 Generating file list...
-Bestandslijst genereren...
+Genereren van bestandslijst...
 Global settings
 Algemene instellingen
 Help
@@ -533,65 +535,65 @@ Help
 Hidden dialogs:
 Verborgen dialogen:
 Hide all error and warning messages
-Verberg alle foutmeldingen en waarschuwingen
+Verberg alle fout- en waarschuwingsberichten
 Hide conflicts
 Verberg conflicten
 Hide excluded items
 Verberg uitgesloten items
 Hide files that are different
-Verberg bestanden die verschillend zijn
+Verberg bestanden die verschillen
 Hide files that are equal
 Verberg bestanden die gelijk zijn
 Hide files that are newer on left
-Verberg bestanden die aan de linkerkant nieuwer zijn
+Verberg bestanden die aan de linkerzijde nieuwer zijn
 Hide files that are newer on right
-Verberg bestanden die aan de rechterkant nieuwer zijn
+Verberg bestanden die aan de rechterzijde nieuwer zijn
 Hide files that exist on left side only
-Verberg bestanden die alleen aan de linkerkant bestaan
+Verberg bestanden die alleen aan de linkerzijde bestaan
 Hide files that exist on right side only
-Verberg bestanden die alleen aan de rechterkant bestaan
+Verberg bestanden die alleen aan de rechterzijde bestaan
 Hide files that will be created on the left side
-Verberg bestanden die zullen worden aangemaakt aan de linkerkant
+Verberg bestanden die aan de linkerzijde zullen worden aangemaakt
 Hide files that will be created on the right side
-Verberg bestanden die zullen worden aangemaakt aan de rechterkant
+Verberg bestanden die aan de rechterzijde zullen worden aangemaakt
 Hide files that will be deleted on the left side
-Verberg bestanden die zullen worden verwijderd aan de linkerkant
+Verberg bestanden die aan de linkerzijde zullen worden verwijderd
 Hide files that will be deleted on the right side
-Verberg bestanden die zullen worden verwijderd aan de rechterkant
+Verberg bestanden die aan de rechterzijde zullen worden verwijderd
 Hide files that will be overwritten on left side
-Verberg bestanden die zullen worden overschreven aan de linkerkant
+Verberg bestanden die aan de linkerzijde zullen worden overschreven
 Hide files that will be overwritten on right side
-Verberg bestanden die zullen worden overschreven aan de rechterkant
+Verberg bestanden die aan de rechterzijde zullen worden overschreven
 Hide files that won't be copied
 Verberg bestanden die niet zullen worden gekopieerd
 Hide filtered or temporarily excluded files
 Verberg gefilterde of tijdelijk uitgesloten bestanden
 Hide further error messages during the current process
-Volgende foutmeldingen niet meer weergeven tijdens de huidige handeling
+Verberg eventuele foutmeldingen gedurende de huidige bewerking
 Hints:
 Tips:
 Homepage
 Homepage
 Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
-Identificeer en verwerk verandereringen aan beide kanten dmv een database. Verschillen en conflicten worden automatisch gedecteerd.
+Identificeer en verwerk veranderingen aan beide zijdes dmv een database. Verwijderingen en conflicten worden automatisch gedetecteerd.
 Idle time between detection of last change and execution of command line in seconds
-Inactieve tijd tussen de detectie van de laatste verandering en het uitvoeren van een command in seconden
+Aantal inactieve seconden tussen detectie van de laatste verandering en uitvoering van een commando
 If you like FFS
-Als het FreeFileSync u bevalt
+Indien FreeFileSync u bevalt
 Ignore
 Negeer
 Ignore errors
 Negeer foutmeldingen
 Ignore subsequent errors
-Negeer verdere foutmeldingen
+Negeer erop volgende foutmeldingen
 Include
-Gebruiken
+Opnemen
 Include all rows
-Alle rijen gebruiken
+Alle rijen opnemen
 Include temporarily
-Tijdelijk bijsluiten
+Tijdelijk opnemen
 Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
-Bijsluiten: *.doc;*.zip;*.exe\nUitsluiten: \\stuff\\temp\\*
+Opnemen: *.doc;*.zip;*.exe\nUitsluiten: \\stuff\\temp\\*
 Incompatible synchronization database format:
 Opmaak van synchronisatie-database komt niet overeen:
 Info
@@ -603,11 +605,11 @@ Initiële  synchronisatie:
 Integrate external applications into context menu. The following macros are available:
 Integreer externe applicaties in het context menu. De volgende macros zijn beschikbaar:
 Invalid FreeFileSync config file!
-FreeFileSync config bestand klopt niet!
+Foutief FreeFileSync configuratiebestand!
 Last used configurations (press DEL to remove from list)
 Laatst gebruikte instellingen (druk op DEL om iets te verwijderen)
 Leave as unresolved conflict
-Beschouwen als onopgelost conflict
+Beschouw als onopgelost conflict
 Left
 Links
 Legend
@@ -621,7 +623,7 @@ Loggen
 Main bar
 Hoofdbalk
 Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
-Schaduw kopieen op WOW64 worden niet ondersteund. Gebruik alstublieft de 64-bit versie van FreeFileSync.
+Het aanmaken van schaduwkopieën op WOW64 wordt niet ondersteund. Gebruik alstublieft de 64-bit versie van FreeFileSync.
 Match case
 Hoofdlettergevoelig
 Maximum number of logfiles:
@@ -637,21 +639,21 @@ Spiegel backup van linker map. Rechter map is bewerk om precies hetzelfde te heb
 Monitoring active...
 Observeren actief...
 More than 50% of the total number of files will be copied or deleted!
-Meer dan 50% van alle bestanden zal worden gekopieerd of verwijderd!
+Meer dan 50% van alle bestanden zal gekopieerd of verwijderd worden!
 Move column down
 Verplaats kolom naar beneden
 Move column up
 Verplaats kolom naar boven
 Move files into a time-stamped subdirectory
-Verplaats de bestanden in een tijd-gemarkeerde sublocatie
+Verplaats de bestanden naar een tijd-gemarkeerde submap
 Moving %x to Recycle Bin
-%x aan het verplaatsen naar de Prullenbak
+Verplaatst %x naar de Prullenbak
 Moving Symbolic Link %x to user-defined directory %y
-Verplaatsen symbolische link %x naar map %y
+Verplaatst Symbolische Koppeling %x naar een door de gebruiker gedefinieerde map %y
 Moving file %x to user-defined directory %y
-Verplaatsen bestand %x naar een door de gebruiker gedefinieerde locatie %y
+Verplaatst bestand %x naar een door de gebruiker gedefinieerde map %y
 Moving folder %x to user-defined directory %y
-Verplaatsen map %x naar een door de gebruiker gedefinieerde locatie %y
+Verplaatst map %x naar een door de gebruiker gedefinieerde map %y
 Multiple...
 Meerdere...
 No change since last synchronization!
@@ -659,87 +661,87 @@ Geen veranderingen sinds de laatste synchronisatie!
 No filter selected
 Geen filter geselecteerd
 Not enough free disk space available in:
-Niet genoeg schijfruimte beschikbaar op:
+Niet genoeg vrije schijfruimte beschikbaar op:
 Nothing to synchronize according to configuration!
-Volgens de gebruikte configuratie hoeft er niks gesynchroniseerd te worden!
+Volgens de configuratie hoeft er niets gesynchroniseerd te worden!
 Number of files and directories that will be created
-Aantal mappen en bestanden die zullen worden aangemaakt
+Aantal bestanden en mappen die aangemaakt zullen worden
 Number of files and directories that will be deleted
-Aantal mappen en bestanden die zullen worden verwijderd
+Aantal bestanden en mappen die verwijderd zullen worden
 Number of files that will be overwritten
-Aantal bestanden dat zal worden overschreven
+Aantal bestanden die overschreven zullen worden
 One of the FreeFileSync database entries within the following file is not yet existing:
-Een van de FreeFileSync databasegegevens met dit bestand bestaat nog niet:
+Eén van de FreeFileSync database ingangen van het volgende bestand bestaat nog niet:
 One of the FreeFileSync database files is not yet existing:
-Een van de FreeFileSync database bestanden bestaat nog niet:
+Eén van de FreeFileSync database bestanden bestaat nog niet:
 Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
-Alleen bestanden /locatie die niet worden gefilterd zullen worden gesynchroniseerd. Het filter word toegepast op de relatieve(!) naam van de basislocatie van de synchronisatie.
+Alleen bestanden/mappen die het filter doorlaat zullen voor synchronisatie geselecteerd worden. Het filter wordt op de naam relatief(!) aan de basis synchronisatiemappen toegepast.
 Open with Explorer
-Openen met Explorer
+Open met Explorer
 Open with default application
 Open met standaardapplicatie
 Operation aborted!
-Operatie afgebroken!
+Bewerking afgebroken!
 Operation:
-Voortgang:
+Bewerking:
 Overview
 Overzicht
 Overwriting Symbolic Link %x in %y
-Overschrijven van symbolische link %x over %y
+Overschrijft Symbolische Koppeling %x over %y
 Overwriting file %x in %y
-Overschrijven bestand %x over %y
+Overschrijft bestand %x over %y
 Pause
-Pause
+Pauze
 Paused
-Gepauseerd
+Gepauzeerd
 Planned directory deletion is in conflict with its subdirectories and -files!
-Geplande map verwijdering heeft een conflict veroorzaakt met de bestanden en submappen
+Geplande map verwijdering veroorzaakt een conflict met onderliggende submappen en bestanden!
 Please run a Compare first before synchronizing!
-Voer eerst een Vergelijking uit voordat u synchroniseerd.
+Voer alstublieft eerst een Vergelijking uit voordat u synchroniseert.
 Press \"Switch\" to open FreeFileSync GUI mode.
-Druk op \"Switch\" om FreeFilySync GUI mode te gebruiken.
+Toets \"Switch\" om FreeFileSync GUI mode te openen.
 Processing folder pair:
-Verwerken van gekoppelde folder:
+Verwerking van gekoppelde mappen:
 Published under the GNU General Public License:
 Gepubliceerd onder de GNU General Public License:
 Question
 Vraag
 RealtimeSync - Automated Synchronization
-RealtimeSync - Automatische Synchronisatie
+RealtimeSync - Geautomatiseerde Synchronisatie
 RealtimeSync configuration
 RealtimeSync configuratie
 Recycle Bin not yet supported for this system!
-Prullenbak werkt (nog) niet op dit systeem!
+Prullenbak is op dit systeem nog niet ondersteund!
 Relative path
-Relatieve pad
+Relatief pad
 Remove alternate settings
 Verwijder alternatieve instellingen
 Remove folder
 Verwijder map
 Remove folder pair
-Verwijder 1 paar gekoppelde mappen
+Verwijder gekoppelde mappen
 Report translation error
-Rapporteer een fout in de vertaling
+Rapporteer een vertaalfout
 Reset
-Reset
+Opnieuw instellen
 Reset view
-Scherm resetten
+Stel weergave opnieuw in
 Restore all hidden dialogs?
 Alle verborgen dialogen herstellen?
 Right
 Rechts
 S&ave configuration...
-S&la de instellingen op...
+S&la configuratie op...
 S&witch view
 &Wijzig weergave
 Save changes to current configuration?
-Sla veranderingen op in de huidige configuratie?
+Veranderingen opslaan in de huidige configuratie?
 Save current configuration to file
-Sla de huidige instellingen op in een bestand
+Sla de huidige configuratie op in een bestand
 Scanning...
-Data wordt doorlopen...
+Doorzoekt...
 Scanning:
-Scannen:
+Doorzoekt:
 Select a folder
 Selecteer een map
 Select alternate synchronization settings
@@ -751,45 +753,45 @@ Selecteer een variant:
 Select view
 Kies kijk
 Set direction:
-Selecteer map:
+Stel richting in:
 Setting default synchronization directions: Old files will be overwritten with newer files.
-Instellingen worden veranderd naar standaard instellingen: Oude bestanden worden overschreven naar nieuwere bestanden.
+Stel standaard synchronisatie richtingen in: Oude bestanden worden door nieuwere bestanden overschreven.
 Show \"%x\"
-Laat \"%x\" zien
+Toon \"%x\"
 Show conflicts
-Geef conflicten weer
+Toon conflicten
 Show files that are different
-Geef bestanden die verschillend zijn weer
+Toon bestanden die verschillend zijn
 Show files that are equal
-Geef bestanden die gelijk zijn weer
+Toon bestanden die gelijk zijn
 Show files that are newer on left
-Geef bestanden weer die nieuwer zijn aan de linkerkant
+Toon bestanden die aan de linkerzijde nieuwer zijn
 Show files that are newer on right
-Geef bestanden weer die nieuwer zijn aan de rechterkant
+Toon bestanden die aan de rechterzijde nieuwer zijn
 Show files that exist on left side only
-Geef bestanden weer die alleen bestaan aan de linkerkant
+Toon bestanden die alleen aan de linkerzijde bestaan
 Show files that exist on right side only
-Geef bestanden weer die alleen bestaan aan de rechterkant
+Toon bestanden die alleen aan de rechterzijde bestaan
 Show files that will be created on the left side
-Geef bestanden weer die zullen worden aangemaakt aan de linkerkant
+Toon bestanden die aan de linkerzijde aangemaakt zullen worden
 Show files that will be created on the right side
-Geef bestanden weer die zullen worden aangemaakt aan de rechterkant
+Toon bestanden die aan de rechterzijde aangemaakt zullen worden
 Show files that will be deleted on the left side
-Geef bestanden weer die zullen worden verwijderd aan de linkerkant
+Toon bestanden die van de linkerzijde verwijderd zullen worden
 Show files that will be deleted on the right side
-Geef bestanden weer die zullen worden verwijderd aan de rechterkant
+Toon bestanden die van de rechterzijde verwijderd zullen worden
 Show files that will be overwritten on left side
-Geef bestanden weer die zullen worden overschreven aan de linkerkant
+Toon bestanden die aan de linkerzijde overschreven zullen worden
 Show files that will be overwritten on right side
-Geef bestanden weer die zullen worden overschreven aan de rechterkant
+Toon bestanden die aan de rechterzijde overschreven zullen worden
 Show files that won't be copied
-Geef bestanden weer die niet zullen worden gekopieerd
+Toon bestanden die niet gekopieerd zullen worden
 Show hidden dialogs
-Geef verborgen dialogen weer
+Toon verborgen dialogen
 Show popup
-Pop-up weergeven
+Toon opspringvenster
 Show popup on errors or warnings
-Pop-up weergeven bij foutmeldingen of waarschuwingen
+Toon opspringvenster bij fouten of waarschuwingen
 Significant difference detected:
 Significant verschil gedetecteerd:
 Silent mode
@@ -799,29 +801,29 @@ Grootte
 Source code written completely in C++ utilizing:
 Broncode compleet geschreven in C++ met behulp van:
 Source directory does not exist anymore:
-De oorspronkelijke map bestaat niet meer:
+Bronmap bestaat niet meer:
 Speed:
 Snelheid:
 Start
 Start
 Start minimized and write status information to a logfile
-Start geminimaliseerd en schrijf status informatie in een logbestand
+Start geminimaliseerd en schrijf status informatie naar een logbestand
 Start synchronization
-Start synchroniseren
+Start synchronisatie
 Statistics
 Statistieken
 Status feedback
-Status feedback
+Status terugkoppeling
 Stop
 Stop
 Swap sides
 Wissel zijdes
 Switching to FreeFileSync GUI mode...
-Veranderen naar FreeFileSync GUI mode...
+Schakelt over naar FreeFileSync GUI mode...
 Symbolic Link handling
-Symbolische Link handeling
+Symbolische Koppeling afhandeling
 Symlinks %x have the same date but a different target!
-Symbolische links %x heeft dezelfde datum maar een ander doel!
+Symbolische koppeling %x heeft dezelfde datum maar een ander doel!
 Synchronization Preview
 Synchronisatie voorbeeldweergave
 Synchronization aborted!
@@ -829,27 +831,27 @@ Synchronisatie afgebroken!
 Synchronization completed successfully!
 Synchronisatie succesvol afgerond!
 Synchronization completed with errors!
-Synchronisatie afgerond. Er zijn fouten opgetreden.
+Synchronisatie is met fouten afgerond!
 Synchronization settings
 Synchronisatie instellingen
 Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
-Synchroniseer alle .doc, .zip en .exe bestanden uitgezonderd alles in submap \"temp\"
+Synchroniseer alle .doc, .zip en .exe bestanden behalve wat in submap \"temp\" staat.
 Synchronize...
 Synchroniseer...
 Synchronizing...
-Aan het synchroniseren...
+Synchroniseert...
 Target directory already existing!
-Doellocatie bestaal al!
+Doelmap bestaat al!
 Target file already existing!
 Doelbestand bestaat al!
 The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-De command lijn is uitgevoerd elke tijd:\n- alle mappen worden beschikbaar (bijvoorbeeld via een USB stick)\n- bestanden binnen deze mappen of submappen zijn bewerkt.
+De opdrachtregel wordt telkens uitgevoerd indien:\n- alle mappen beschikbaar worden (bijv. invoegen van USB stick)\n- bestanden binnen deze mappen of submappen veranderd zijn
 The file does not contain a valid configuration:
 Het bestand bevat geen geldige configuratie:
 The file was not processed by last synchronization!
-Het bestand werd niet verwerkt door de laatste synchronisatie!
+Het bestand werd niet verwerkt tijdens de laatste synchronisatie!
 This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
-Deze variant ziet twee gelijknamige bestanden als gelijk wanneer ze dezelfde bestandsgrootte EN tijdstempel hebben.
+Deze variant beschouwt twee gelijknamige bestanden als gelijk wanneer ze dezelfde bestandsgrootte EN dezelfde datum en tijdstempel hebben.
 Time
 Tijd
 Time elapsed:
@@ -857,21 +859,21 @@ Verstreken tijd:
 Time remaining:
 Benodigde tijd:
 Total amount of data that will be transferred
-Hoeveelheid data die verplaatst word
+Totale hoeveelheid data die verplaatst wordt
 Total time:
 Totale tijd:
 Transfer file and directory permissions\n(Requires Administrator rights)
-Overdracht van bestanden en mappen permissies\n (Vereist Administrator rechten)
+Zet bestand en map permissies over\n(Vereist Administrator rechten)
 Unable to connect to sourceforge.net!
 Niet in staat verbinding te maken met sourceforge.net!
 Unable to create logfile!
-Niet mogelijk om een logbestand aan te maken!
+Niet in staat om een logbestand aan te maken!
 Unresolved conflicts existing!
 Er bestaan onopgeloste conflicten!
 Update ->
-Overschrijven ->
+Bijwerken ->
 Updating attributes of %x
-Attributen updaten van %x
+Attributen bijwerken van %x
 Usage:
 Gebruik:
 Use Recycle Bin
@@ -879,32 +881,32 @@ Gebruik de prullenbak
 Use Recycle Bin when deleting or overwriting files
 Gebruik de prullenbak bij verwijderen of overschrijven van bestanden
 User-defined directory for deletion was not specified!
-Door de gebruiker te definiëren locatie voor verwijderen was niet opgegeven!
+De door de gebruiker gedefinieerde map ter verwijdering was niet opgegeven!
 Variant
 Variant
 Verifying file %x
-Verifiëren bestand %x
+Verifieert bestand %x
 Versioning
 Versieën
 Volume name %x not part of filename %y!
-Volume naam %x maakt niet deel uit van bestandsnaam %y!
+Schijfnaam %x maakt geen deel uit van bestandsnaam %y!
 Waiting for missing directories...
-Wachten op de missende mappen...
+Wacht op missende mappen...
 Waiting while directory is locked (%x)...
-Wachten totdat map is beveiligd (%x)...
+Wacht totdat map is vergrendeld (%x)...
 Warning
-Attentie
+Waarschuwing
 When the comparison is started with this option set the following decision tree is processed:
-Wanneer met deze optie aan de vergelijking wordt gestart zal de volgende vergelijkingsboom worden gebruikt:
+Wanneer de vergelijking met deze optie aan gestart wordt zal de volgende besluitboom gehanteerd worden:
 You can ignore conflicts and continue synchronization.
-U kunt de conflicten negeren en doorgaan met synchroniseren.
+U kunt de conflicten negeren en doorgaan met synchronisatie.
 You can ignore this error to consider the directory as empty.
 Je kan deze error negeren als de map leeg is.
 You may try to synchronize remaining items again (WITHOUT having to re-compare)!
-U kunt proberen om de resterende bestanden opnieuw te synchroniseren (ZONDER opnieuw te hoeven vergelijken)!
+U kunt proberen om de resterende items opnieuw te synchroniseren (ZONDER opnieuw te hoeven vergelijken)!
 different
 verschillend
 file exists on both sides
-Bestand bestaat aan beide zijde
+bestand bestaat aan beide zijdes
 on one side only
-alleen aan één kant
+alleen aan één zijde

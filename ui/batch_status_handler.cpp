@@ -11,6 +11,7 @@
 #include <wx/msgdlg.h>
 #include "../shared/standard_paths.h"
 #include "../shared/file_handling.h"
+#include "../shared/resolve_path.h"
 #include "../shared/string_conv.h"
 #include "../shared/global_func.h"
 #include "../shared/app_main.h"
@@ -71,32 +72,34 @@ public:
             throw FileError(wxString(_("Unable to create logfile!")) + wxT("\"") + logfileName + wxT("\""));
 
         //write header
-        wxString headerLine = wxString(wxT("FreeFileSync - "))  +
-                              _("Batch execution") + wxT(" (") +
-                              _("Date") + wxT(": ") + wxDateTime::Now().FormatDate() + wxT(" ") + //"Date" is used at other places, too
-                              _("Time") + wxT(":") + wxT(" ") +  wxDateTime::Now().FormatTime() + wxT(")");
+        wxString headerLine = wxString(wxT("FreeFileSync - ")) + _("Batch execution") +
+                              wxT(" (") + _("Date") + wxT(": ") + wxDateTime::Now().FormatDate() +  wxT(")"); //"Date" is used at other places, too
+
         logFile.Write(headerLine + wxChar('\n'));
         logFile.Write(wxString().Pad(headerLine.Len(), wxChar('-')) + wxChar('\n') + wxChar('\n'));
 
+        /*
         wxString caption = _("Log-messages:");
         logFile.Write(caption + wxChar('\n'));
         logFile.Write(wxString().Pad(caption.Len(), wxChar('-')) + wxChar('\n'));
+        */
 
-        logFile.Write(wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + _("Start") + wxChar('\n') + wxChar('\n'));
+        logItemStart = wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] ") + _("Start");
 
         totalTime.Start(); //measure total time
     }
 
-    void writeLog(const ErrorLogging& log)
+    void writeLog(const ErrorLogging& log, const wxString& finalStatus)
     {
+        logFile.Write(finalStatus + wxChar('\n') + wxChar('\n')); //highlight result by placing at beginning of file
+
+        logFile.Write(logItemStart + wxChar('\n') + wxChar('\n'));
+
         //write actual logfile
         const std::vector<wxString>& messages = log.getFormattedMessages();
         for (std::vector<wxString>::const_iterator i = messages.begin(); i != messages.end(); ++i)
             logFile.Write(*i + wxChar('\n'));
-    }
 
-    ~LogFile()
-    {
         //write ending
         logFile.Write(wxChar('\n'));
 
@@ -111,7 +114,7 @@ public:
         FindLogfiles traverseCallback(wxToZ(jobName_), logFiles);
 
         traverseFolder(wxToZ(logfileName).BeforeLast(common::FILE_NAME_SEPARATOR), //throw();
-                       false, //follow Symlinks
+                       false, //don't follow symlinks
                        traverseCallback);
 
         if (logFiles.size() <= maxCount)
@@ -162,6 +165,7 @@ private:
     wxString logfileName;
     wxFFile logFile;
     wxStopWatch totalTime;
+    wxString logItemStart;
 };
 
 
@@ -205,23 +209,28 @@ BatchStatusHandler::~BatchStatusHandler()
     const int totalErrors = errorLog.typeCount(TYPE_ERROR | TYPE_FATAL_ERROR); //evaluate before finalizing log
 
     //finalize error log
+    wxString finalStatus;
     if (abortIsRequested())
     {
         returnValue = -4;
-        errorLog.logMsg(_("Synchronization aborted!"), TYPE_ERROR);
+        finalStatus = _("Synchronization aborted!");
+        errorLog.logMsg(finalStatus, TYPE_ERROR);
     }
     else if (totalErrors > 0)
     {
         returnValue = -5;
-        errorLog.logMsg(_("Synchronization completed with errors!"), TYPE_WARNING);
+        finalStatus = _("Synchronization completed with errors!");
+        errorLog.logMsg(finalStatus, TYPE_WARNING);
     }
     else
-        errorLog.logMsg(_("Synchronization completed successfully!"), TYPE_INFO);
-
+    {
+        finalStatus = _("Synchronization completed successfully!");
+        errorLog.logMsg(finalStatus, TYPE_INFO);
+    }
 
     //print the results list: logfile
     if (logFile.get())
-        logFile->writeLog(errorLog);
+        logFile->writeLog(errorLog, finalStatus);
 
     //decide whether to stay on status screen or exit immediately...
     if (switchToGuiRequested) //-> avoid recursive yield() calls, thous switch not before ending batch mode

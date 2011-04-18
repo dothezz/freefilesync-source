@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20100825;18572300">
+	<META NAME="CHANGED" CONTENT="20110417;18595700">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -23,27 +23,28 @@
 	</STYLE>
 </HEAD>
 <BODY LANG="de-DE" DIR="LTR">
-<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Environment
-Variables</FONT></H3>
+<H3 CLASS="western"><FONT FACE="Tahoma, sans-serif">Macros</FONT></H3>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">All
 directory names may contain macros that are expanded during
 synchronization. Begin and end of each macro is marked by a '%'
-character. Besides special macros handling time and date (see &quot;Backup
-Strategies&quot;), the operating system's environment variables can
-also be used.</FONT></P>
-<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT></P>
+character. Besides special macros handling time and date, the
+<U>operating system's environment variables</U> can also be used.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Internal
+macros:</B></FONT></P>
 <UL>
-	<P><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+	<P><SPAN ID="Rahmen4" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
 		<UL>
-			<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm">
-			<FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">C:\Backup\%USERNAME%_Config&nbsp;</FONT>expands
-			to<FONT FACE="Courier New, monospace"><BR>C:\Backup\ZenJu_Config</FONT></FONT></P>
-			<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm">
-			<FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">%APPDATA%\FreeFileSync&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>expands
-			to<FONT FACE="Courier New, monospace"><BR>C:\Documents and
-			Settings\ZenJu\Application Data\FreeFileSync</FONT></FONT></P>
+			<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">%time%&nbsp;&nbsp;&nbsp;&nbsp;-
+			</FONT>current time, format [hhmmss], e. g. &quot;<FONT FACE="Courier New, monospace">201340</FONT>&quot;<BR><FONT FACE="Courier New, monospace">%weekday%&nbsp;-
+			</FONT>day of the week, e. g. &quot;<FONT FACE="Courier New, monospace">Monday</FONT>&quot;<BR><FONT FACE="Courier New, monospace">%date%&nbsp;&nbsp;&nbsp;&nbsp;-
+			</FONT>current date, e. g. &quot;<FONT FACE="Courier New, monospace">2010-07-13</FONT>&quot;<BR><FONT FACE="Courier New, monospace">%week%&nbsp;&nbsp;&nbsp;&nbsp;-
+			</FONT>calendar week, e. g. &quot;<FONT FACE="Courier New, monospace">28</FONT>&quot;<BR><FONT FACE="Courier New, monospace">%month%&nbsp;&nbsp;&nbsp;-
+			</FONT>current month, e. g. &quot;<FONT FACE="Courier New, monospace">July</FONT>&quot;<BR><FONT FACE="Courier New, monospace">%year%&nbsp;&nbsp;&nbsp;&nbsp;-
+			</FONT>current year, e. g. &quot;<FONT FACE="Courier New, monospace">2010</FONT>&quot;</FONT></P>
 		</UL>
 	</SPAN><BR CLEAR=LEFT>
 	</P>
@@ -55,6 +56,24 @@ also be used.</FONT></P>
 add a great amount of flexibility to Batch Synchronization
 (*.ffs_batch) by creating new temporary environment variables in a
 *.bat/*.cmd file that are evaluated by FreeFileSync at runtime!</FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT></P>
+<UL>
+	<P><SPAN ID="Rahmen1" DIR="LTR" STYLE="float: left; width: 80%; height: 0.14cm; border: none; padding: 0cm; background: #e6e6e6">
+		<UL>
+			<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm">
+			<FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">C:\Backup\%username%_Config&nbsp;</FONT>expands
+			to<FONT FACE="Courier New, monospace"><BR>C:\Backup\ZenJu_Config</FONT></FONT></P>
+			<P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm"></P>
+			<LI><P ALIGN=LEFT STYLE="margin-right: 0.98cm; margin-bottom: 0cm">
+			<FONT FACE="Tahoma, sans-serif"><FONT FACE="Courier New, monospace">%appdata%\FreeFileSync&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT>expands
+			to<FONT FACE="Courier New, monospace"><BR>C:\Documents and
+			Settings\ZenJu\Application Data\FreeFileSync</FONT></FONT></P>
+		</UL>
+	</SPAN><BR CLEAR=LEFT>
+	</P>
+</UL>
 <P STYLE="margin-bottom: 0cm"><BR>
 </P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif"><B>Example:</B></FONT></P>

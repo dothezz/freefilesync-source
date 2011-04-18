@@ -125,7 +125,7 @@ private:
 
     static size_t calcCapacity(size_t length)
     {
-        return (length + (19 - length % 16)); //allocate some additional length to speed up concatenation
+        return std::max<size_t>(16, length + length / 2); //exponential growth + min size
     }
 };
 
@@ -207,7 +207,7 @@ private:
 
     static size_t calcCapacity(size_t length)
     {
-        return (length + (19 - length % 16)); //allocate some additional length to speed up concatenation
+        return std::max<size_t>(16, length + length / 2); //exponential growth + min size
     }
 };
 
@@ -228,6 +228,11 @@ public:
     operator const T* () const; //implicit conversion to C-string
 
     //STL accessors
+    typedef       T*       iterator;
+    typedef const T* const_iterator;
+    typedef       T&       reference;
+    typedef const T& const_reference;
+    typedef       T value_type;
     const T* begin() const;
     const T* end()   const;
     T*       begin();
@@ -262,11 +267,13 @@ public:
     size_t find(const T* str,     size_t pos = 0)    const; //returns "npos" if not found
     size_t find(T ch,             size_t pos = 0)    const; //
     size_t rfind(T ch,            size_t pos = npos) const; //
+    size_t rfind(const T* str,    size_t pos = npos) const; //
     Zbase& replace(size_t pos1, size_t n1, const T* str, size_t n2);
     void reserve(size_t minCapacity);
     Zbase& assign(const T* source, size_t len);
     void resize(size_t newSize, T fillChar = 0);
     void swap(Zbase& other);
+    void push_back(T val); //STL access
 
     //number conversion
     template <class N> static Zbase fromNumber(N number);
@@ -620,6 +627,21 @@ size_t Zbase<T, SP, AP>::rfind(T ch, size_t pos) const
 
 
 template <class T, template <class, class> class SP, class AP>
+inline
+size_t Zbase<T, SP, AP>::rfind(const T* str, size_t pos) const
+{
+    assert(pos == npos || pos <= length());
+
+    const size_t strLen = z_impl::cStringLength(str);
+    const T* currEnd = pos == npos ? end() : begin() + std::min(pos + strLen, length());
+
+    const T* iter = std::find_end(begin(), currEnd,
+                                  str, str + strLen);
+    return iter == currEnd ? npos : iter - begin();
+}
+
+
+template <class T, template <class, class> class SP, class AP>
 Zbase<T, SP, AP>& Zbase<T, SP, AP>::replace(size_t pos1, size_t n1, const T* str, size_t n2)
 {
     assert(str < rawStr || rawStr + length() < str); //str mustn't point to data in this string
@@ -863,6 +885,14 @@ T* Zbase<T, SP, AP>::end()
 
 template <class T, template <class, class> class SP, class AP>
 inline
+void Zbase<T, SP, AP>::push_back(T val)
+{
+    operator+=(val);
+}
+
+
+template <class T, template <class, class> class SP, class AP>
+inline
 bool Zbase<T, SP, AP>::empty() const
 {
     return length() == 0;
@@ -1067,8 +1097,8 @@ template <class N>
 inline
 N Zbase<T, SP, AP>::toNumber() const
 {
-    std::basic_istringstream<T> ss(std::basic_string<T>(rawStr));
-    T number = 0;
+    std::basic_istringstream<T> ss((std::basic_string<T>(rawStr)));
+    N number = 0;
     ss >> number;
     return number;
 }

@@ -6,7 +6,7 @@
 //
 #include "error_log.h"
 #include <wx/datetime.h>
-#include <wx/intl.h>
+#include "../shared/i18n.h"
 
 
 using ffs3::ErrorLogging;

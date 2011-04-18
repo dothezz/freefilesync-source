@@ -9,13 +9,13 @@
 #include <wx/zstream.h>
 #include "../shared/global_func.h"
 #include "../shared/file_error.h"
-#include <wx/intl.h>
 #include "../shared/string_conv.h"
 #include "../shared/file_handling.h"
 #include <wx/mstream.h>
 #include "../shared/serialize.h"
 #include "../shared/file_io.h"
 #include "../shared/loki/ScopeGuard.h"
+#include "../shared/i18n.h"
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -36,7 +36,7 @@ const int FILE_FORMAT_VER = 5;
 class FileInputStreamDB : public FileInputStream
 {
 public:
-    FileInputStreamDB(const Zstring& filename) : //throw FileError()
+    FileInputStreamDB(const Zstring& filename) : //throw (FileError)
         FileInputStream(filename)
     {
         //read FreeFileSync file identifier
@@ -54,7 +54,7 @@ private:
 class FileOutputStreamDB : public FileOutputStream
 {
 public:
-    FileOutputStreamDB(const Zstring& filename) : //throw FileError()
+    FileOutputStreamDB(const Zstring& filename) : //throw (FileError)
         FileOutputStream(filename)
     {
         //write FreeFileSync file identifier
@@ -466,24 +466,11 @@ void ffs3::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
     dbEntriesLeft.second[dbEntriesRight.first] = dbEntryLeft;
     dbEntriesRight.second[dbEntriesLeft.first] = dbEntryRight;
 
-
-    struct TryCleanUp //ensure cleanup if working with temporary failed!
-    {
-        static void tryDeleteFile(const Zstring& filename) //throw ()
-        {
-            try
-            {
-                removeFile(filename);
-            }
-            catch (...) {}
-        }
-    };
-
     //write (temp-) files...
-    Loki::ScopeGuard guardTempFileLeft = Loki::MakeGuard(&TryCleanUp::tryDeleteFile, fileNameLeftTmp);
+    Loki::ScopeGuard guardTempFileLeft = Loki::MakeGuard(&ffs3::removeFile, fileNameLeftTmp);
     saveFile(dbEntriesLeft, fileNameLeftTmp);  //throw (FileError)
 
-    Loki::ScopeGuard guardTempFileRight = Loki::MakeGuard(&TryCleanUp::tryDeleteFile, fileNameRightTmp);
+    Loki::ScopeGuard guardTempFileRight = Loki::MakeGuard(&ffs3::removeFile, fileNameRightTmp);
     saveFile(dbEntriesRight, fileNameRightTmp); //throw (FileError)
 
     //operation finished: rename temp files -> this should work transactionally:

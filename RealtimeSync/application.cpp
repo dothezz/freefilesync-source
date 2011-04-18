@@ -9,7 +9,7 @@
 #include <wx/event.h>
 #include "resources.h"
 #include <wx/msgdlg.h>
-#include "../shared/localization.h"
+#include "../shared/i18n.h"
 #include "xml_ffs.h"
 #include "../shared/standard_paths.h"
 #include <wx/file.h>
@@ -46,7 +46,7 @@ void Application::OnStartApplication(wxIdleEvent& event)
 #endif
 
     //set program language
-    ffs3::CustomLocale::getInstance().setLanguage(rts::getProgramLanguage());
+    ffs3::setLanguage(rts::getProgramLanguage());
 
     //try to set config/batch-filename set by %1 parameter
     wxString cfgFilename;

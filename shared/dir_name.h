@@ -15,7 +15,7 @@
 #include "zstring.h"
 
 
-class FFSFileDropEvent;
+struct FFSFileDropEvent;
 class wxCommandEvent;
 class wxFileDirPickerEvent;
 
@@ -26,11 +26,11 @@ namespace ffs3
 class DirectoryNameMainDlg : private wxEvtHandler
 {
 public:
-    DirectoryNameMainDlg(wxWindow*         dropWindow1,
-                         wxWindow*         dropWindow2,
-                         wxDirPickerCtrl*  dirPicker,
-                         wxComboBox*       dirName,
-                         wxStaticBoxSizer* staticBox);
+    DirectoryNameMainDlg(wxWindow&         dropWindow1,
+                         wxWindow&         dropWindow2,
+                         wxDirPickerCtrl&  dirPicker,
+                         wxComboBox&       dirName,
+                         wxStaticBoxSizer& staticBox);
 
     virtual ~DirectoryNameMainDlg() {}
 
@@ -44,20 +44,21 @@ private:
     void OnWriteDirManually(wxCommandEvent& event);
     void OnDirSelected(wxFileDirPickerEvent& event);
 
-    const wxWindow*   dropWindow1_;
-    const wxWindow*   dropWindow2_;
-    wxDirPickerCtrl*  dirPicker_;
-    wxComboBox*       dirName_;
-    wxStaticBoxSizer* staticBox_;
+    const wxWindow&   dropWindow1_;
+    const wxWindow&   dropWindow2_;
+    wxDirPickerCtrl&  dirPicker_;
+    wxComboBox&       dirName_;
+    wxStaticBoxSizer& staticBox_;
 };
 
 
 class DirectoryName: private wxEvtHandler
 {
 public:
-    DirectoryName(wxWindow*        dropWindow,
-                  wxDirPickerCtrl* dirPicker,
-                  wxTextCtrl*      dirName);
+    DirectoryName(wxWindow&        dropWindow,
+                  wxDirPickerCtrl& dirPicker,
+                  wxTextCtrl&      dirName,
+                  wxStaticBoxSizer* staticBox = NULL); //optional
 
     Zstring getName() const;
     void setName(const Zstring& dirname);
@@ -67,9 +68,10 @@ private:
     void OnWriteDirManually(wxCommandEvent& event);
     void OnDirSelected(wxFileDirPickerEvent& event);
 
-    const wxWindow*  dropWindow_;
-    wxDirPickerCtrl* dirPicker_;
-    wxTextCtrl*      dirName_;
+    const wxWindow&  dropWindow_;
+    wxDirPickerCtrl& dirPicker_;
+    wxTextCtrl&      dirName_;
+    wxStaticBoxSizer* staticBox_; //optional
 };
 }
 

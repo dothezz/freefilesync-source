@@ -6,11 +6,11 @@
 //
 #include "standard_paths.h"
 #include <wx/stdpaths.h>
-#include <wx/filename.h>
 #include "system_constants.h"
 #include "string_conv.h"
 
 using namespace ffs3;
+
 
 bool ffs3::isPortableVersion()
 {
@@ -25,7 +25,7 @@ bool ffs3::isPortableVersion()
 
 const wxString& ffs3::getBinaryDir()
 {
-    static wxString instance = wxFileName(wxStandardPaths::Get().GetExecutablePath()).GetPath() + zToWx(common::FILE_NAME_SEPARATOR);
+    static wxString instance = zToWx(wxToZ(wxStandardPaths::Get().GetExecutablePath()).BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR);
     return instance;
 }
 

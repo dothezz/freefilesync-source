@@ -27,18 +27,18 @@ Zstring readString(wxInputStream& stream);
 void writeString(wxOutputStream& stream, const Zstring& str);
 
 
-class ReadInputStream //throw FileError()
+class ReadInputStream //throw (FileError)
 {
 protected:
     ReadInputStream(wxInputStream& stream, const wxString& errorObjName) : stream_(stream), errorObjName_(errorObjName) {}
 
     template <class T>
-    T readNumberC() const; //throw FileError(), checked read operation
+    T readNumberC() const; //throw (FileError), checked read operation
 
-    Zstring readStringC() const; //throw FileError(), checked read operation
+    Zstring readStringC() const; //throw (FileError), checked read operation
 
     typedef boost::shared_ptr<std::vector<char> > CharArray; //there's no guarantee std::string has a ref-counted implementation... so use this "thing"
-    CharArray readArrayC() const; //throw FileError()
+    CharArray readArrayC() const; //throw (FileError)
 
     void check() const;
 
@@ -49,22 +49,22 @@ protected:
 
 private:
     wxInputStream& stream_;
-    void throwReadError() const;  //throw FileError()
+    void throwReadError() const;  //throw (FileError)
     const wxString& errorObjName_; //used for error text only
 };
 
 
-class WriteOutputStream //throw FileError()
+class WriteOutputStream //throw (FileError)
 {
 protected:
     WriteOutputStream(const wxString& errorObjName, wxOutputStream& stream) : stream_(stream), errorObjName_(errorObjName) {}
 
     template <class T>
-    void writeNumberC(T number) const; //throw FileError(), checked write operation
+    void writeNumberC(T number) const; //throw (FileError), checked write operation
 
-    void writeStringC(const Zstring& str) const; //throw FileError(), checked write operation
+    void writeStringC(const Zstring& str) const; //throw (FileError), checked write operation
 
-    void writeArrayC(const std::vector<char>& buffer) const; //throw FileError()
+    void writeArrayC(const std::vector<char>& buffer) const; //throw (FileError)
 
     void check() const;
 
@@ -75,7 +75,7 @@ protected:
 
 private:
     wxOutputStream& stream_;
-    void throwWriteError() const;  //throw FileError()
+    void throwWriteError() const;  //throw (FileError)
     const wxString& errorObjName_; //used for error text only!
 };
 

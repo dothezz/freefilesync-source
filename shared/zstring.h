@@ -115,10 +115,10 @@ typedef char Zchar;
 #endif
 
 //"The reason for all the fuss above" (Loki/SmartPtr)
-typedef Zbase<Zchar, StorageRefCount, AllocatorFreeStoreChecked> Zstring;
+typedef Zbase<Zchar, StorageRefCount, AllocatorFreeStoreChecked> Zstring; //for use with file names
 
-
-
+//fast replacement for wxString modelling exponential growth
+typedef Zbase<wchar_t, StorageRefCount, AllocatorFreeStoreChecked> zxString; //general unicode string
 
 
 

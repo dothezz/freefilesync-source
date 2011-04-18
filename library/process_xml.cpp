@@ -6,11 +6,11 @@
 //
 #include "process_xml.h"
 #include "../shared/xml_base.h"
-#include <wx/intl.h>
-#include <wx/filefn.h>
+#include "../shared/i18n.h"
 #include "../shared/global_func.h"
 #include "../shared/standard_paths.h"
 #include "../shared/string_conv.h"
+#include "../shared/file_handling.h"
 
 using namespace ffs3;
 using namespace xmlAccess; //functionally needed!!!
@@ -52,7 +52,7 @@ bool writeXmlMainConfig(const MainConfiguration& mainCfg, TiXmlDocument& doc);
 void xmlAccess::readConfig(const wxString& filename, xmlAccess::XmlGuiConfig& config)
 {
     //load XML
-    if (!wxFileExists(filename))
+    if (!fileExists(wxToZ(filename)))
         throw XmlError(wxString(_("File does not exist:")) + wxT("\n\"") + filename + wxT("\""));
 
     TiXmlDocument doc;
@@ -70,7 +70,7 @@ void xmlAccess::readConfig(const wxString& filename, xmlAccess::XmlGuiConfig& co
 void xmlAccess::readConfig(const wxString& filename, xmlAccess::XmlBatchConfig& config)
 {
     //load XML
-    if (!wxFileExists(filename))
+    if (!fileExists(wxToZ(filename)))
         throw XmlError(wxString(_("File does not exist:")) + wxT("\n\"") + filename + wxT("\""));
 
     TiXmlDocument doc;
@@ -88,7 +88,7 @@ void xmlAccess::readConfig(const wxString& filename, xmlAccess::XmlBatchConfig& 
 void xmlAccess::readConfig(xmlAccess::XmlGlobalSettings& config)
 {
     //load XML
-    if (!wxFileExists(getGlobalConfigFile()))
+    if (!fileExists(wxToZ(getGlobalConfigFile())))
         throw XmlError(wxString(_("File does not exist:")) + wxT("\n\"") + getGlobalConfigFile() + wxT("\""));
 
     TiXmlDocument doc;
@@ -978,12 +978,6 @@ bool writeXmlGlobalSettings(const xmlAccess::XmlGlobalSettings& inputCfg, TiXmlD
     root->LinkEndChild(batch);
 
     return true;
-}
-
-
-int xmlAccess::retrieveSystemLanguage()
-{
-    return wxLocale::GetSystemLanguage();
 }
 
 

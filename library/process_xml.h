@@ -9,6 +9,7 @@
 
 #include "../structures.h"
 #include "../shared/xml_error.h"
+#include "../shared/i18n.h"
 
 
 namespace xmlAccess
@@ -91,9 +92,6 @@ struct XmlBatchConfig
 };
 
 
-int retrieveSystemLanguage();
-
-
 struct OptionalDialogs
 {
     OptionalDialogs()
@@ -121,7 +119,7 @@ struct XmlGlobalSettings
     //---------------------------------------------------------------------
     //Shared (GUI/BATCH) settings
     XmlGlobalSettings() :
-        programLanguage(retrieveSystemLanguage()),
+        programLanguage(ffs3::retrieveSystemLanguage()),
         copyLockedFiles(true),
         copyFilePermissions(false),
         fileTimeTolerance(2),  //default 2s: FAT vs NTFS

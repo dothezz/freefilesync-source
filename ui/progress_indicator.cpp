@@ -450,27 +450,24 @@ private:
 
         const std::vector<wxString>& messages = log_.getFormattedMessages(includedTypes);
 
-        wxString newLogText;
+
+        zxString newLogText; //perf: wxString doesn't model exponential growth and so is out
 
         if (!messages.empty())
             for (std::vector<wxString>::const_iterator i = messages.begin(); i != messages.end(); ++i)
             {
-                newLogText += *i;
+                newLogText += wxToZx(*i);
                 newLogText += wxT("\n\n");
             }
         else //if no messages match selected view filter, show final status message at least
         {
             const std::vector<wxString>& allMessages = log_.getFormattedMessages();
             if (!allMessages.empty())
-                newLogText = allMessages.back();
+                newLogText = wxToZx(allMessages.back());
         }
 
-#ifndef _MSC_VER
-#warning design okay?
-#endif
-
         wxWindowUpdateLocker dummy(m_textCtrlInfo);
-        m_textCtrlInfo->ChangeValue(newLogText);
+        m_textCtrlInfo->ChangeValue(zxToWx(newLogText));
         m_textCtrlInfo->ShowPosition(m_textCtrlInfo->GetLastPosition());
     }
 

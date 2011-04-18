@@ -4,14 +4,17 @@ BINDIR      = $(DESTDIR)$(prefix)/bin
 SHAREDIR    = $(DESTDIR)$(prefix)/share
 APPSHAREDIR = $(SHAREDIR)/$(APPNAME)
 
+COMMON_COMPILE_FLAGS = -Wall -pipe `pkg-config --cflags gtk+-2.0` -O3 -pthread -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DTIXML_USE_STL -DWXINTL_NO_GETTEXT_MACRO
+COMMON_LINK_FLAGS  = -O3 -pthread
+
 #default build
-FFS_CPPFLAGS = -Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -O3 -pthread
-LINKFLAGS    = `wx-config --libs --debug=no --unicode=yes` -lboost_thread -O3 -pthread
+FFS_CPPFLAGS = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes`
+LINKFLAGS    = $(COMMON_LINK_FLAGS) `wx-config --libs --debug=no --unicode=yes` -lboost_thread
 
 #static build used for precompiled release
 ifeq ($(BUILD),release)
-FFS_CPPFLAGS = -Wall -pipe -DNDEBUG -DwxUSE_UNICODE `wx-config --cxxflags --debug=no --unicode=yes --static=yes` `pkg-config --cflags gtk+-2.0` -DFFS_LINUX -DTIXML_USE_STL -O3 -pthread
-LINKFLAGS    = `wx-config --libs --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a -O3 -pthread
+FFS_CPPFLAGS = $(COMMON_COMPILE_FLAGS) `wx-config --cxxflags --debug=no --unicode=yes --static=yes`
+LINKFLAGS    = $(COMMON_LINK_FLAGS) `wx-config --libs --debug=no --unicode=yes --static=yes` /usr/local/lib/libboost_thread.a
 endif
 #####################################################################################################
 
@@ -59,7 +62,7 @@ FILE_LIST+=library/filter.cpp
 FILE_LIST+=library/binary.cpp
 FILE_LIST+=library/db_file.cpp
 FILE_LIST+=library/dir_lock.cpp
-FILE_LIST+=shared/localization_no_BOM.cpp
+FILE_LIST+=shared/i18n_no_BOM.cpp
 FILE_LIST+=shared/file_io.cpp
 FILE_LIST+=shared/dir_name.cpp
 FILE_LIST+=shared/guid.cpp
@@ -71,6 +74,7 @@ FILE_LIST+=shared/global_func.cpp
 FILE_LIST+=shared/system_func.cpp
 FILE_LIST+=shared/custom_tooltip.cpp
 FILE_LIST+=shared/file_handling.cpp
+FILE_LIST+=shared/resolve_path.cpp
 FILE_LIST+=shared/file_traverser.cpp
 FILE_LIST+=shared/standard_paths.cpp
 FILE_LIST+=shared/zstring.cpp
@@ -85,7 +89,7 @@ FILE_LIST+=shared/recycler.cpp
 FILE_LIST+=shared/help_provider.cpp
 
 #list of all *.o files
-OBJECT_LIST=$(foreach file, $(FILE_LIST), OBJ/$(subst .cpp,.o,$(notdir $(file))))
+OBJECT_LIST=$(foreach file, $(FILE_LIST), OBJ/FFS_Release_GCC_Make/$(subst .cpp,.o,$(notdir $(file))))
 
 #build list of all dependencies
 DEP_LIST=$(foreach file, $(FILE_LIST), $(subst .cpp,.dep,$(file)))
@@ -95,26 +99,27 @@ all: FreeFileSync
 
 init: 
 	if [ ! -d OBJ ]; then mkdir OBJ; fi
+	if [ ! -d OBJ/FFS_Release_GCC_Make ]; then mkdir OBJ/FFS_Release_GCC_Make; fi
 #remove byte ordering mark: needed by Visual C++ but an error with GCC
-	g++ -o OBJ/removeBOM tools/remove_BOM.cpp 
-	./OBJ/removeBOM shared/localization.cpp shared/localization_no_BOM.cpp
+	g++ -o OBJ/FFS_Release_GCC_Make/removeBOM tools/remove_BOM.cpp 
+	./OBJ/FFS_Release_GCC_Make/removeBOM shared/i18n.cpp shared/i18n_no_BOM.cpp
 
 %.dep : %.cpp 
 #strip path information
-	g++ $(FFS_CPPFLAGS) -c $< -o OBJ/$(subst .cpp,.o,$(notdir $<))
+	g++ $(FFS_CPPFLAGS) -c $< -o OBJ/FFS_Release_GCC_Make/$(subst .cpp,.o,$(notdir $<))
 
 FreeFileSync: init $(DEP_LIST)
 #respect linker order: wxWidgets libraries last
 	g++ -o ./BUILD/$(APPNAME) $(OBJECT_LIST) $(LINKFLAGS)
 
 clean:
-	rm -rf OBJ
+	rm -rf OBJ/FFS_Release_GCC_Make
 	rm -f BUILD/$(APPNAME)
-	rm -f shared/localization_no_BOM.cpp
+	rm -f shared/i18n_no_BOM.cpp
 
 install:
-	if [ ! -d $(BINDIR) ] ; then mkdir -p $(BINDIR); fi
-	if [ ! -d $(APPSHAREDIR) ] ; then mkdir -p $(APPSHAREDIR); fi
+	if [ ! -d $(BINDIR) ]; then mkdir -p $(BINDIR); fi
+	if [ ! -d $(APPSHAREDIR) ]; then mkdir -p $(APPSHAREDIR); fi
 
 	cp BUILD/$(APPNAME) $(BINDIR)
 	cp -R BUILD/Languages/ \

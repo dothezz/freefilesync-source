@@ -2,6 +2,26 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.15
+---------------
+Overwriting a file as fully transactional operation
+Optimized synchronization speed (non-cached volumes, e.g. memory sticks in particular)
+Volumes can be specified by name: [<volume-name>]\<path> (usecase: variable drive letters, RealtimeSync)
+Copy NTFS compressed, encrypted and sparse file attributes
+Copy NTFS compressed and encrypted directory attributes
+Copy NTFS alternate data stream
+Improved performance: CSV export, copy to clipboard, sync log display
+Improved color theme support
+Fixed crash on certain system text colors settings
+Fixed progress numbers for manual deletion
+Allow aborting manual deletion via escape key
+Use relative name for file tooltip
+Automatically redirect arrow keys to main grid
+More tolerant directory creation (operation not supported/wrong parameter)
+More tolerant file move: ignore existing files (user-defined deletion directory)
+Added macro %weekday%
+
+
 Changelog v3.14
 ---------------
 New keyboard shortcuts: F5: compare F6: synchronize

@@ -68,8 +68,8 @@ private:
 
 bool ffs3::filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback& callback)
 {
-    FileInput file1(filename1); //throw FileError()
-    FileInput file2(filename2); //throw FileError()
+    FileInput file1(filename1); //throw (FileError)
+    FileInput file2(filename2); //throw (FileError)
 
     BufferSize bufferSize;
 

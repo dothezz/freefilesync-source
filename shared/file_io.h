@@ -22,22 +22,27 @@ namespace ffs3
 {
 //file IO optimized for sequential read/write accesses + better error reporting + long path support (following symlinks)
 
+#ifdef FFS_WIN
+typedef HANDLE FileHandle;
+#elif defined FFS_LINUX
+typedef FILE* FileHandle;
+#endif
+
 class FileInput
 {
 public:
-    FileInput(const Zstring& filename); //throw (FileError, ErrorNotExisting)
+    FileInput(const Zstring& filename);                    //throw (FileError: ErrorNotExisting)
+    FileInput(FileHandle handle, const Zstring& filename); //takes ownership!
     ~FileInput();
 
-    size_t read(void* buffer, size_t bytesToRead); //throw FileError(); returns actual number of bytes read
+    size_t read(void* buffer, size_t bytesToRead); //throw (FileError); returns actual number of bytes read
     bool eof(); //end of file reached
 
 private:
 #ifdef FFS_WIN
-    HANDLE fileHandle;
     bool eofReached;
-#elif defined FFS_LINUX
-    FILE* fileHandle;
 #endif
+    FileHandle fileHandle;
     const Zstring filename_;
 };
 
@@ -45,17 +50,19 @@ private:
 class  FileOutput
 {
 public:
-    FileOutput(const Zstring& filename); //throw FileError()
+    enum AccessFlag
+    {
+        ACC_OVERWRITE,
+        ACC_CREATE_NEW
+    };
+    FileOutput(const Zstring& filename, AccessFlag access); //throw (FileError: ErrorTargetPathMissing, ErrorTargetExisting)
+    FileOutput(FileHandle handle, const Zstring& filename); //takes ownership!
     ~FileOutput();
 
-    void write(const void* buffer, size_t bytesToWrite); //throw FileError()
-    void close(); //close file stream
+    void write(const void* buffer, size_t bytesToWrite); //throw (FileError)
+
 private:
-#ifdef FFS_WIN
-    HANDLE fileHandle;
-#elif defined FFS_LINUX
-    FILE* fileHandle;
-#endif
+    FileHandle fileHandle;
     const Zstring filename_;
 };
 
@@ -65,11 +72,11 @@ private:
 class FileInputStream : public wxInputStream
 {
 public:
-    FileInputStream(const Zstring& filename) : //throw FileError()
+    FileInputStream(const Zstring& filename) : //throw (FileError)
         fileObj(filename) {}
 
 private:
-    virtual size_t OnSysRead(void* buffer, size_t bufsize) //throw FileError()
+    virtual size_t OnSysRead(void* buffer, size_t bufsize) //throw (FileError)
     {
         return fileObj.read(buffer, bufsize);
     }
@@ -81,11 +88,11 @@ private:
 class FileOutputStream : public wxOutputStream
 {
 public:
-    FileOutputStream(const Zstring& filename) : //throw FileError()
-        fileObj(filename) {}
+    FileOutputStream(const Zstring& filename) : //throw (FileError)
+        fileObj(filename, FileOutput::ACC_OVERWRITE) {}
 
 private:
-    virtual size_t OnSysWrite(const void* buffer, size_t bufsize) //throw FileError()
+    virtual size_t OnSysWrite(const void* buffer, size_t bufsize) //throw (FileError)
     {
         fileObj.write(buffer, bufsize);
         return bufsize;

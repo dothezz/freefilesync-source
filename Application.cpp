@@ -19,7 +19,7 @@
 #include "library/resources.h"
 #include "ui/switch_to_gui.h"
 #include "shared/standard_paths.h"
-#include "shared/localization.h"
+#include "shared/i18n.h"
 #include "shared/app_main.h"
 #include <wx/sound.h>
 #include "shared/file_handling.h"
@@ -128,7 +128,7 @@ void Application::OnStartApplication(wxIdleEvent&)
     }
 
     //set program language
-    CustomLocale::getInstance().setLanguage(globalSettings.programLanguage);
+    ffs3::setLanguage(globalSettings.programLanguage);
 
 
     if (!cfgFilename.empty())
@@ -187,7 +187,7 @@ int Application::OnRun()
 int Application::OnExit()
 {
     //get program language
-    globalSettings.programLanguage = CustomLocale::getInstance().getLanguage();
+    globalSettings.programLanguage = ffs3::getLanguage();
 
     try //save global settings to XML
     {
@@ -208,7 +208,6 @@ void Application::runGuiMode(const wxString& cfgFileName, xmlAccess::XmlGlobalSe
     MainDialog* frame = new MainDialog(cfgFileName, settings);
     frame->Show();
 }
-
 
 void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSettings& globSettings)
 {

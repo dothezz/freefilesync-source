@@ -15,9 +15,7 @@ namespace ffs3
 class FileError //Exception base class used to notify file/directory copy/delete errors
 {
 public:
-    FileError(const wxString& message) :
-        errorMessage(message) {}
-
+    FileError(const wxString& message) : errorMessage(message) {}
     virtual ~FileError() {}
 
     const wxString& msg() const
@@ -29,12 +27,12 @@ private:
     const wxString errorMessage;
 };
 
+#define DEFINE_NEW_FILE_ERROR(X) struct X : public FileError { X(const wxString& message) : FileError(message) {} };
 
-class ErrorNotExisting : public FileError
-{
-public:
-    ErrorNotExisting(const wxString& message) : FileError(message) {}
-};
+DEFINE_NEW_FILE_ERROR(ErrorNotExisting);
+DEFINE_NEW_FILE_ERROR(ErrorTargetExisting);
+DEFINE_NEW_FILE_ERROR(ErrorTargetPathMissing);
+DEFINE_NEW_FILE_ERROR(ErrorFileLocked);
 }
 
 #endif // FILEERROR_H_INCLUDED

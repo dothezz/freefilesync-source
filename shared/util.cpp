@@ -9,7 +9,7 @@
 #include <wx/textctrl.h>
 #include <wx/combobox.h>
 #include <wx/filepicker.h>
-#include "localization.h"
+#include "i18n.h"
 #include "file_handling.h"
 #include "string_conv.h"
 #include <stdexcept>
@@ -157,7 +157,7 @@ wxString ffs3::utcTimeToLocalString(const wxLongLong& utcTime)
     fileTimeLong += wxLongLong(2, 3054539008UL); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
     fileTimeLong *= 10000000;
 
-    FILETIME lastWriteTimeUtc;
+    FILETIME lastWriteTimeUtc = {};
     lastWriteTimeUtc.dwLowDateTime  = fileTimeLong.GetLo();             //GetLo() returns unsigned
     lastWriteTimeUtc.dwHighDateTime = static_cast<DWORD>(fileTimeLong.GetHi());   //GetHi() returns signed
 
@@ -212,25 +212,6 @@ wxString ffs3::utcTimeToLocalString(const wxLongLong& utcTime)
                                                   wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
     }
 
-    /*
-         //assemble time string (performance optimized) -> note: performance argument is not valid anymore
-
-         wxString formattedTime;
-         formattedTime.reserve(20);
-
-         writeFourDigitNumber(time.wYear, formattedTime);
-         formattedTime += wxChar('-');
-         writeTwoDigitNumber(time.wMonth, formattedTime);
-         formattedTime += wxChar('-');
-         writeTwoDigitNumber(time.wDay, formattedTime);
-         formattedTime += wxChar(' ');
-         formattedTime += wxChar(' ');
-         writeTwoDigitNumber(time.wHour, formattedTime);
-         formattedTime += wxChar(':');
-         writeTwoDigitNumber(time.wMinute, formattedTime);
-         formattedTime += wxChar(':');
-         writeTwoDigitNumber(time.wSecond, formattedTime);
-     */
     const wxDateTime localTime(systemTimeLocal.wDay,
                                wxDateTime::Month(systemTimeLocal.wMonth - 1),
                                systemTimeLocal.wYear,

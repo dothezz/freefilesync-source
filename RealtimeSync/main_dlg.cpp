@@ -43,7 +43,7 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), NULL, this);
 
     //prepare drag & drop
-    dirNameFirst.reset(new ffs3::DirectoryName(m_panelMainFolder, m_dirPickerMain, m_txtCtrlDirectoryMain));
+    dirNameFirst.reset(new ffs3::DirectoryName(*m_panelMainFolder, *m_dirPickerMain, *m_txtCtrlDirectoryMain, sbSizerDirToWatch));
 
 
 #ifdef FFS_WIN

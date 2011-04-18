@@ -7,26 +7,20 @@
 #ifndef FILE_HANDLING_H_INCLUDED
 #define FILE_HANDLING_H_INCLUDED
 
+#include <wx/longlong.h>
 #include "zstring.h"
 #include "file_error.h"
-#include <wx/longlong.h>
-
-#ifdef FFS_WIN
-#include "shadow.h"
-#endif
 
 
 namespace ffs3
 {
-struct RemoveDirCallback;
-struct MoveFileCallback;
-struct CopyFileCallback;
+struct CallbackRemoveDir;
+struct CallbackMoveFile;
+struct CallbackCopyFile;
 
 
-Zstring getFormattedDirectoryName(const Zstring& dirname);
-
-bool fileExists(     const Zstring& filename); //throw()       replaces wxFileExists()!
-bool dirExists(      const Zstring& dirname);  //throw()       replaces wxDirExists(): optional 'cause wxDirExists treats symlinks correctly
+bool fileExists(     const Zstring& filename); //throw()       replaces wxFileExists()
+bool dirExists(      const Zstring& dirname);  //throw()       replaces wxDirExists()
 bool symlinkExists(  const Zstring& objname);  //throw()       check whether a symbolic link exists
 bool somethingExists(const Zstring& objname);  //throw()       check whether any object with this name exists
 
@@ -43,61 +37,61 @@ ResponseSameVol onSameVolume(const Zstring& folderLeft, const Zstring& folderRig
 //copy file or directory create/last change date,
 void copyFileTimes(const Zstring& sourceDir, const Zstring& targetDir, bool derefSymlinks); //throw (FileError)
 
-//copy filesystem permissions: probably requires admin rights
-void copyObjectPermissions(const Zstring& source, const Zstring& target, bool derefSymlinks); //throw FileError();
-
 //symlink handling: always evaluate target
 wxULongLong getFilesize(const Zstring& filename); //throw (FileError)
 
 
 //file handling
 void removeFile(const Zstring& filename);       //throw (FileError)
-void removeDirectory(const Zstring& directory, RemoveDirCallback* callback = NULL); //throw (FileError)
+void removeDirectory(const Zstring& directory, CallbackRemoveDir* callback = NULL); //throw (FileError)
 
 
 //rename file or directory: no copying!!!
 void renameFile(const Zstring& oldName, const Zstring& newName); //throw (FileError);
 
-//move source to target; expectations: target not existing, all super-directories of target exist
-void moveFile(const Zstring& sourceFile, const Zstring& targetFile, MoveFileCallback* callback = NULL); //throw (FileError);
+//move source to target; expectations: all super-directories of target exist
+//"ignoreExisting": if target already exists, source is deleted
+void moveFile(const Zstring& sourceFile, const Zstring& targetFile, bool ignoreExisting, CallbackMoveFile* callback); //throw (FileError);
 
 //move source to target including subdirectories
-//"ignoreExistingDirs": existing directories will be enhanced as long as this is possible without overwriting files
-void moveDirectory(const Zstring& sourceDir, const Zstring& targetDir, bool ignoreExistingDirs, MoveFileCallback* callback = NULL); //throw (FileError);
+//"ignoreExisting": existing directories and files will be enriched
+void moveDirectory(const Zstring& sourceDir, const Zstring& targetDir, bool ignoreExisting, CallbackMoveFile* callback); //throw (FileError);
 
 //creates superdirectories automatically:
-void createDirectory(const Zstring& directory, const Zstring& templateDir, bool copyDirectorySymLinks, bool copyFilePermissions); //throw (FileError);
+void createDirectory(const Zstring& directory, const Zstring& templateDir, bool copyFilePermissions); //throw (FileError);
 void createDirectory(const Zstring& directory); //throw (FileError); -> function overload avoids default parameter ambiguity issues!
 
 
-void copyFile(const Zstring& sourceFile, //throw (FileError);
+void copyFile(const Zstring& sourceFile, //throw (FileError: ErrorTargetPathMissing, ErrorFileLocked (Windows-only));
               const Zstring& targetFile,
-              bool copyFileSymLinks,
               bool copyFilePermissions,
-#ifdef FFS_WIN
-              shadow::ShadowCopy* shadowCopyHandler, //supply handler for making shadow copies, may be NULL
-#endif
-              CopyFileCallback* callback);  //may be NULL
+              CallbackCopyFile* callback);  //may be NULL
 //Note: it MAY happen that copyFile() leaves temp files behind, e.g. temporary network drop.
 // => clean them up at an appropriate time (automatically set sync directions to delete them). They have the following ending:
 const Zstring TEMP_FILE_ENDING = Zstr(".ffs_tmp");
 
+enum SymlinkType
+{
+    SYMLINK_TYPE_FILE,
+    SYMLINK_TYPE_DIR
+};
+void copySymlink(const Zstring& sourceLink, const Zstring& targetLink, SymlinkType type, bool copyFilePermissions); //throw (FileError)
 
 
 
 
 
 //----------- callbacks ---------------
-struct RemoveDirCallback
+struct CallbackRemoveDir
 {
-    virtual ~RemoveDirCallback() {}
+    virtual ~CallbackRemoveDir() {}
     virtual void requestUiRefresh(const Zstring& currentObject) = 0;
 };
 
 
-struct MoveFileCallback //callback functionality
+struct CallbackMoveFile //callback functionality
 {
-    virtual ~MoveFileCallback() {}
+    virtual ~CallbackMoveFile() {}
 
     enum Response
     {
@@ -108,9 +102,13 @@ struct MoveFileCallback //callback functionality
 };
 
 
-struct CopyFileCallback //callback functionality
+struct CallbackCopyFile //callback functionality
 {
-    virtual ~CopyFileCallback() {}
+    virtual ~CallbackCopyFile() {}
+
+    //if target is existing user needs to implement deletion: copyFile() NEVER deletes target if already existing!
+    //at this point full read access on source had been proven, so it's safe to delete it.
+    virtual void deleteTargetFile(const Zstring& targetFile) = 0; //may throw exceptions
 
     enum Response
     {

@@ -9,6 +9,8 @@ del FreeFileSync-Linux.layout
 del FreeFileSync-Linux.depend
 del RealtimeSync\RealtimeSync.layout
 del RealtimeSync\RealtimeSync.depend
+del RealtimeSync\Realt-Linux.layout
+del RealtimeSync\Realt-Linux.depend
 
 ::clean Visual C++ garbage
 del FreeFileSync.vcxproj.user

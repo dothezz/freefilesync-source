@@ -199,7 +199,8 @@ public:
                 {
                     const DWORD lastError = ::GetLastError();
                     if (lastError != ERROR_CALL_NOT_IMPLEMENTED && //fail on SAMBA share: this shouldn't be a showstopper!
-                        lastError != ERROR_SERVICE_SPECIFIC_ERROR) //neither should be fail for "Pogoplug" mapped network drives
+                        lastError != ERROR_SERVICE_SPECIFIC_ERROR && //neither should be fail for "Pogoplug" mapped network drives
+                        lastError != ERROR_INVALID_DATA)             //this seems to happen for a NetDrive-mapped FTP server
                         throw ffs3::FileError(wxString(wxT("Could not register device removal notifications:")) + wxT("\n\n") + ffs3::getLastErrorFormatted(lastError));
                 }
                 else

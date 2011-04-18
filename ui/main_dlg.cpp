@@ -5,17 +5,23 @@
 // **************************************************************************
 //
 #include "main_dlg.h"
-#include <wx/filename.h>
+#include <iterator>
 #include <stdexcept>
-#include "../shared/system_constants.h"
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
-#include <iterator>
 #include <wx/ffile.h>
+#include <wx/imaglist.h>
+#include <wx/wupdlock.h>
+#include <wx/msgdlg.h>
+#include <wx/sound.h>
+#include <wx/display.h>
+#include <wx/app.h>
+#include <boost/bind.hpp>
+#include "../shared/system_constants.h"
 #include "../library/custom_grid.h"
 #include "../shared/custom_button.h"
 #include "../shared/custom_combo_box.h"
-#include <wx/msgdlg.h>
+#include "../shared/dir_picker_i18n.h"
 #include "../comparison.h"
 #include "../synchronization.h"
 #include "../algorithm.h"
@@ -24,7 +30,7 @@
 #include "check_version.h"
 #include "gui_status_handler.h"
 #include "sync_cfg.h"
-#include "../shared/localization.h"
+#include "../shared/i18n.h"
 #include "../shared/string_conv.h"
 #include "small_dlgs.h"
 #include "../shared/mouse_move_dlg.h"
@@ -33,26 +39,21 @@
 #include "../shared/dir_name.h"
 #include "../library/filter.h"
 #include "../structures.h"
-#include <wx/imaglist.h>
-#include <wx/wupdlock.h>
 #include "grid_view.h"
 #include "../library/resources.h"
 #include "../shared/file_handling.h"
+#include "../shared/resolve_path.h"
 #include "../shared/recycler.h"
 #include "../shared/xml_base.h"
 #include "../shared/standard_paths.h"
 #include "../shared/toggle_button.h"
 #include "folder_pair.h"
 #include "../shared/global_func.h"
-#include <wx/sound.h>
 #include "search.h"
 #include "../shared/help_provider.h"
 #include "is_null_filter.h"
 #include "batch_config.h"
 #include "../shared/check_exist.h"
-#include <wx/display.h>
-#include <wx/app.h>
-#include <boost/bind.hpp>
 
 using namespace ffs3;
 using ffs3::CustomLocale;
@@ -73,11 +74,11 @@ class DirectoryNameMainImpl : public DirectoryNameMainDlg
 {
 public:
     DirectoryNameMainImpl(MainDialog&      mainDlg,
-                          wxWindow*        dropWindow1,
-                          wxWindow*        dropWindow2,
-                          wxDirPickerCtrl* dirPicker,
-                          wxComboBox*      dirName,
-                          wxStaticBoxSizer* staticBox) :
+                          wxWindow&        dropWindow1,
+                          wxWindow&        dropWindow2,
+                          wxDirPickerCtrl& dirPicker,
+                          wxComboBox&      dirName,
+                          wxStaticBoxSizer& staticBox) :
         DirectoryNameMainDlg(dropWindow1, dropWindow2, dirPicker, dirName, staticBox),
         mainDlg_(mainDlg) {}
 
@@ -217,8 +218,8 @@ public:
     DirectoryPair(wxWindow* parent, MainDialog& mainDialog) :
         FolderPairGenerated(parent),
         FolderPairCallback<FolderPairGenerated>(static_cast<FolderPairGenerated&>(*this), mainDialog), //pass FolderPairGenerated part...
-        dirNameLeft( m_panelLeft,  m_dirPickerLeft,  m_directoryLeft),
-        dirNameRight(m_panelRight, m_dirPickerRight, m_directoryRight) {}
+        dirNameLeft (*m_panelLeft,  *m_dirPickerLeft,  *m_directoryLeft),
+        dirNameRight(*m_panelRight, *m_dirPickerRight, *m_directoryRight) {}
 
     void setValues(const Zstring& leftDir, const Zstring& rightDir, AltSyncCfgPtr syncCfg, const FilterConfig& filter)
     {
@@ -250,17 +251,17 @@ public:
 
         //prepare drag & drop
         dirNameLeft(mainDialog,
-                    mainDialog.m_panelLeft,
-                    mainDialog.m_panelTopLeft,
-                    mainDialog.m_dirPickerLeft,
-                    mainDialog.m_directoryLeft,
-                    mainDialog.sbSizerDirLeft),
+                    *mainDialog.m_panelLeft,
+                    *mainDialog.m_panelTopLeft,
+                    *mainDialog.m_dirPickerLeft,
+                    *mainDialog.m_directoryLeft,
+                    *mainDialog.sbSizerDirLeft),
         dirNameRight(mainDialog,
-                     mainDialog.m_panelRight,
-                     mainDialog.m_panelTopRight,
-                     mainDialog.m_dirPickerRight,
-                     mainDialog.m_directoryRight,
-                     mainDialog.sbSizerDirRight) {}
+                     *mainDialog.m_panelRight,
+                     *mainDialog.m_panelTopRight,
+                     *mainDialog.m_dirPickerRight,
+                     *mainDialog.m_directoryRight,
+                     *mainDialog.sbSizerDirRight) {}
 
     void setValues(const Zstring& leftDir, const Zstring& rightDir, AltSyncCfgPtr syncCfg, const FilterConfig& filter)
     {
@@ -380,7 +381,7 @@ MainDialog::MainDialog(const wxString& cfgFileName, xmlAccess::XmlGlobalSettings
 
     wxString currentConfigFile = cfgFileName; //this one has priority
     if (currentConfigFile.empty()) currentConfigFile = settings.gui.lastUsedConfigFile; //next: suggest name of last used selection
-    if (currentConfigFile.empty() || !fileExists(wxToZ(currentConfigFile))) currentConfigFile = lastConfigFileName(); //if above fails...
+    if (currentConfigFile.empty() || !fileExists(wxToZ(currentConfigFile))) currentConfigFile = lastRunConfigName(); //if above fails...
 
     bool loadCfgSuccess = false;
     if (!cfgFileName.empty() || fileExists(wxToZ(currentConfigFile)))
@@ -439,8 +440,10 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
     wxWindowUpdateLocker dummy(this); //avoid display distortion
 
     //--------- avoid mirroring this dialog in RTL languages like Hebrew or Arabic --------------------
-    m_panelViewFilter->SetLayoutDirection(wxLayout_LeftToRight);
-    m_panelStatusBar->SetLayoutDirection(wxLayout_LeftToRight);
+    m_panelViewFilter    ->SetLayoutDirection(wxLayout_LeftToRight);
+    m_panelStatusBar     ->SetLayoutDirection(wxLayout_LeftToRight);
+    m_panelGrids         ->SetLayoutDirection(wxLayout_LeftToRight);
+    m_panelDirectoryPairs->SetLayoutDirection(wxLayout_LeftToRight);
     //------------------------------------------------------------------------------------------------------
 
     //---------------- support for dockable gui style --------------------------------
@@ -458,7 +461,7 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
 
     //caption required for all panes that can be manipulated by the users => used by context menu
     auiMgr.AddPane(m_panelTopButtons,
-                   wxAuiPaneInfo().Name(wxT("Panel1")).Top().Caption(_("Main bar")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(-1, m_buttonCompare->GetSize().GetHeight() - 5));
+                   wxAuiPaneInfo().Name(wxT("Panel1")).Top().Caption(_("Main bar")).CaptionVisible(false).PaneBorder(false).Gripper().MinSize(-1, m_panelTopButtons->GetSize().GetHeight() - 5));
     //note: min height is calculated incorrectly by wxAuiManager if panes with and without caption are in the same row => use smaller min-size
 
     compareStatus.reset(new CompareStatus(*this)); //integrate the compare status panel (in hidden state)
@@ -568,7 +571,7 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
 #endif
 
     //create language selection menu
-    for (std::vector<LocInfoLine>::const_iterator i = LocalizationInfo::getMapping().begin(); i != LocalizationInfo::getMapping().end(); ++i)
+    for (std::vector<LocInfoLine>::const_iterator i = LocalizationInfo::get().begin(); i != LocalizationInfo::get().end(); ++i)
     {
         wxMenuItem* newItem = new wxMenuItem(m_menuLanguages, wxID_ANY, i->languageName, wxEmptyString, wxITEM_NORMAL );
         newItem->SetBitmap(GlobalResources::instance().getImage(i->languageFlag));
@@ -588,6 +591,7 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
 
     //register global hotkeys (without explicit menu entry)
     wxTheApp->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::OnGlobalKeyEvent), NULL, this);
+    wxTheApp->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnGlobalKeyEvent), NULL, this); //capture direction keys
 
 
     Connect(wxEVT_IDLE, wxEventHandler(MainDialog::OnIdleEvent), NULL, this);
@@ -646,7 +650,7 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
     }
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    addFileToCfgHistory(lastConfigFileName()); //make sure <Last session> is always part of history list
+    addFileToCfgHistory(lastRunConfigName()); //make sure <Last session> is always part of history list
 }
 
 
@@ -657,7 +661,9 @@ void MainDialog::cleanUp(bool saveLastUsedConfig)
         cleanedUp = true;
 
         //important! event source wxTheApp is NOT dependent on this instance -> disconnect!
-        wxTheApp->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::OnGlobalKeyEvent), NULL, this);
+        wxTheApp->Disconnect(wxEVT_KEY_DOWN,  wxKeyEventHandler(MainDialog::OnGlobalKeyEvent), NULL, this);
+        wxTheApp->Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnGlobalKeyEvent), NULL, this);
+
 
         //no need for wxEventHandler::Disconnect() here; event sources are components of this window and are destroyed, too
 
@@ -669,7 +675,7 @@ void MainDialog::cleanUp(bool saveLastUsedConfig)
 
         //save configuration
         if (saveLastUsedConfig)
-            writeConfigurationToXml(lastConfigFileName());   //don't throw exceptions in destructors
+            writeConfigurationToXml(lastRunConfigName());   //don't throw exceptions in destructors
     }
 }
 
@@ -791,12 +797,13 @@ void MainDialog::setSyncDirManually(const std::set<size_t>& rowsToSetOnUiTable, 
 
 void MainDialog::filterRangeManually(const std::set<size_t>& rowsToFilterOnUiTable, int leadingRow)
 {
-    if (rowsToFilterOnUiTable.size() > 0)
+    if (!rowsToFilterOnUiTable.empty())
     {
         bool newSelection = false; //default: deselect range
 
         //leadingRow determines de-/selection of all other rows
         const FileSystemObject* fsObj = gridDataView->getObject(leadingRow);
+        if (!fsObj) fsObj = gridDataView->getObject(*rowsToFilterOnUiTable.begin()); //some fallback (usecase: reverse selection, starting with empty rows)
         if (fsObj)
             newSelection = !fsObj->isActive();
 
@@ -829,7 +836,7 @@ void MainDialog::OnIdleEvent(wxEvent& event)
             stackObjects.pop();
 
             if (stackObjects.empty())
-                m_staticTextStatusMiddle->SetForegroundColour(*wxBLACK); //reset color
+                m_staticTextStatusMiddle->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //reset color
 
             m_panelStatusBar->Layout();
         }
@@ -839,31 +846,33 @@ void MainDialog::OnIdleEvent(wxEvent& event)
 }
 
 
-void MainDialog::copySelectionToClipboard(const CustomGrid* selectedGrid)
+void MainDialog::copySelectionToClipboard(CustomGrid& selectedGrid)
 {
-    const std::set<size_t> selectedRows = getSelectedRows(selectedGrid);
+    const std::set<size_t> selectedRows = getSelectedRows(&selectedGrid);
     if (selectedRows.size() > 0)
     {
-        wxString clipboardString;
+        zxString clipboardString; //perf: wxString doesn't model exponential growth and so is out
+
+        const int colCount = selectedGrid.GetNumberCols();
 
         for (std::set<size_t>::const_iterator i = selectedRows.begin(); i != selectedRows.end(); ++i)
         {
-            for (int k = 0; k < const_cast<CustomGrid*>(selectedGrid)->GetNumberCols(); ++k)
+            for (int k = 0; k < colCount; ++k)
             {
-                clipboardString+= const_cast<CustomGrid*>(selectedGrid)->GetCellValue(static_cast<int>(*i), k);
-                if (k != const_cast<CustomGrid*>(selectedGrid)->GetNumberCols() - 1)
-                    clipboardString+= '\t';
+                clipboardString += wxToZx(selectedGrid.GetCellValue(static_cast<int>(*i), k));
+                if (k != colCount - 1)
+                    clipboardString += wxT('\t');
             }
-            clipboardString+= '\n';
+            clipboardString += wxT('\n');
         }
 
-        if (!clipboardString.IsEmpty())
+        if (!clipboardString.empty())
             // Write text to the clipboard
             if (wxTheClipboard->Open())
             {
                 // these data objects are held by the clipboard,
                 // so do not delete them in the app.
-                wxTheClipboard->SetData( new wxTextDataObject(clipboardString) );
+                wxTheClipboard->SetData(new wxTextDataObject(zxToWx(clipboardString)));
                 wxTheClipboard->Close();
             }
     }
@@ -906,11 +915,13 @@ public:
 
         //register abort button
         mainDlg->m_buttonAbort->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ManualDeletionHandler::OnAbortCompare ), NULL, this );
+        mainDlg->Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(ManualDeletionHandler::OnKeyPressed), NULL, this);
     }
 
     ~ManualDeletionHandler()
     {
         //de-register abort button
+        mainDlg->Disconnect(wxEVT_CHAR_HOOK, wxKeyEventHandler(ManualDeletionHandler::OnKeyPressed), NULL, this);
         mainDlg->m_buttonAbort->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ManualDeletionHandler::OnAbortCompare ), NULL, this );
 
         mainDlg->enableAllElements();
@@ -954,9 +965,11 @@ public:
             statusMessage.Replace(wxT("%x"), ffs3::numberToStringSep(deletionCount), false);
             statusMessage.Replace(wxT("%y"), ffs3::numberToStringSep(totalObjToDelete), false);
 
-            mainDlg->m_staticTextStatusMiddle->SetLabel(statusMessage);
-            mainDlg->m_panelStatusBar->Layout();
-
+            if (mainDlg->m_staticTextStatusMiddle->GetLabel() != statusMessage)
+            {
+                mainDlg->m_staticTextStatusMiddle->SetLabel(statusMessage);
+                mainDlg->m_panelStatusBar->Layout();
+            }
             updateUiNow();
         }
 
@@ -969,6 +982,16 @@ private:
     {
         abortRequested = true; //don't throw exceptions in a GUI-Callback!!! (throw ffs3::AbortThisProcess())
     }
+
+    void OnKeyPressed(wxKeyEvent& event)
+    {
+        const int keyCode = event.GetKeyCode();
+        if (keyCode == WXK_ESCAPE)
+            abortRequested = true; //don't throw exceptions in a GUI-Callback!!! (throw ffs3::AbortThisProcess())
+
+        event.Skip();
+    }
+
 
     MainDialog* const mainDlg;
 
@@ -1169,23 +1192,23 @@ void MainDialog::clearStatusBar()
     while (stackObjects.size() > 0)
         stackObjects.pop();
 
-    m_staticTextStatusMiddle->SetForegroundColour(*wxBLACK); //reset color
-    m_staticTextStatusLeft->SetLabel(wxEmptyString);
+    m_staticTextStatusMiddle->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //reset color
+    m_staticTextStatusLeft  ->SetLabel(wxEmptyString);
     m_staticTextStatusMiddle->SetLabel(wxEmptyString);
-    m_staticTextStatusRight->SetLabel(wxEmptyString);
+    m_staticTextStatusRight ->SetLabel(wxEmptyString);
 }
 
 
 void MainDialog::disableAllElements()
 {
     //disenables all elements (except abort button) that might receive user input during long-running processes: comparison, deletion
-    m_panelViewFilter   ->Disable();
-    m_bpButtonCmpConfig ->Disable();
-    m_panelFilter       ->Disable();
-    m_panelConfig       ->Disable();
-    m_bpButtonSyncConfig->Disable();
-    m_buttonStartSync   ->Disable();
-    m_panelGrids        ->Disable();
+    m_panelViewFilter    ->Disable();
+    m_bpButtonCmpConfig  ->Disable();
+    m_panelFilter        ->Disable();
+    m_panelConfig        ->Disable();
+    m_bpButtonSyncConfig ->Disable();
+    m_buttonStartSync    ->Disable();
+    m_panelGrids         ->Disable();
     m_panelDirectoryPairs->Disable();
     m_menubar1->EnableTop(0, false);
     m_menubar1->EnableTop(1, false);
@@ -1207,13 +1230,13 @@ void MainDialog::disableAllElements()
 
 void MainDialog::enableAllElements()
 {
-    m_panelViewFilter   ->Enable();
-    m_bpButtonCmpConfig ->Enable();
-    m_panelFilter       ->Enable();
-    m_panelConfig       ->Enable();
-    m_bpButtonSyncConfig->Enable();
-    m_buttonStartSync   ->Enable();
-    m_panelGrids        ->Enable();
+    m_panelViewFilter    ->Enable();
+    m_bpButtonCmpConfig  ->Enable();
+    m_panelFilter        ->Enable();
+    m_panelConfig        ->Enable();
+    m_bpButtonSyncConfig ->Enable();
+    m_buttonStartSync    ->Enable();
+    m_panelGrids         ->Enable();
     m_panelDirectoryPairs->Enable();
     m_menubar1->EnableTop(0, true);
     m_menubar1->EnableTop(1, true);
@@ -1326,7 +1349,7 @@ void MainDialog::onGridLeftButtonEvent(wxKeyEvent& event)
         {
             case 'C':
             case WXK_INSERT: //CTRL + C || CTRL + INS
-                copySelectionToClipboard(m_gridLeft);
+                copySelectionToClipboard(*m_gridLeft);
                 return; // -> swallow event! don't allow default grid commands!
 
             case 'A': //CTRL + A
@@ -1402,7 +1425,7 @@ void MainDialog::onGridMiddleButtonEvent(wxKeyEvent& event)
         {
             case 'C':
             case WXK_INSERT: //CTRL + C || CTRL + INS
-                copySelectionToClipboard(m_gridMiddle);
+                copySelectionToClipboard(*m_gridMiddle);
                 return;
         }
 
@@ -1419,7 +1442,7 @@ void MainDialog::onGridRightButtonEvent(wxKeyEvent& event)
         {
             case 'C':
             case WXK_INSERT: //CTRL + C || CTRL + INS
-                copySelectionToClipboard(m_gridRight);
+                copySelectionToClipboard(*m_gridRight);
                 return;
 
             case 'A': //CTRL + A
@@ -1486,12 +1509,24 @@ void MainDialog::onGridRightButtonEvent(wxKeyEvent& event)
 }
 
 
+bool isPartOf(const wxWindow* child, const wxWindow* top)
+{
+    for (const wxWindow* i = child; i != NULL; i = i->GetParent())
+        if (i == top)
+            return true;
+    return false;
+}
+
+
 void MainDialog::OnGlobalKeyEvent(wxKeyEvent& event) //process key events without explicit menu entry :)
 {
     //avoid recursion!!! -> this ugly construct seems to be the only (portable) way to avoid re-entrancy
     //recursion may happen in multiple situations: e.g. modal dialogs, wxGrid::ProcessEvent()!
     if (processingGlobalKeyEvent ||
-        !IsEnabled() || !m_gridLeft->IsEnabled()) //only handle if main window is in use
+        !IsShown()               ||
+        !IsActive()              ||
+        !IsEnabled()             || //only handle if main window is in use
+        !m_gridLeft->IsEnabled())   //
     {
         event.Skip();
         return;
@@ -1499,19 +1534,12 @@ void MainDialog::OnGlobalKeyEvent(wxKeyEvent& event) //process key events withou
     class PreventRecursion
     {
     public:
-        PreventRecursion(bool& active) : active_(active)
-        {
-            active_ = true;
-        }
-        ~PreventRecursion()
-        {
-            active_ = false;
-        }
+        PreventRecursion(bool& active) : active_(active) { active_ = true; }
+        ~PreventRecursion() { active_ = false; }
     private:
         bool& active_;
     } dummy(processingGlobalKeyEvent);
     //----------------------------------------------------
-
 
     const int keyCode = event.GetKeyCode();
 
@@ -1520,45 +1548,52 @@ void MainDialog::OnGlobalKeyEvent(wxKeyEvent& event) //process key events withou
         switch (keyCode)
         {
             case 'F': //CTRL + F
-            {
                 ffs3::startFind(*this, *m_gridLeft, *m_gridRight, globalSettings->gui.textSearchRespectCase);
                 return; //-> swallow event!
-            }
-            break;
         }
 
     switch (keyCode)
     {
         case WXK_F3:        //F3
         case WXK_NUMPAD_F3: //
-        {
             ffs3::findNext(*this, *m_gridLeft, *m_gridRight, globalSettings->gui.textSearchRespectCase);
             return; //-> swallow event!
-        }
-        break;
 
-        //redirect certain (unhandled) keys directly to grid!
-        case WXK_PAGEUP:
-        case WXK_PAGEDOWN:
-        case WXK_HOME:
-        case WXK_END:
+            //redirect certain (unhandled) keys directly to grid!
+        case WXK_UP:
+        case WXK_DOWN:
+        case WXK_LEFT:
+        case WXK_RIGHT:
         case WXK_NUMPAD_UP:
         case WXK_NUMPAD_DOWN:
         case WXK_NUMPAD_LEFT:
         case WXK_NUMPAD_RIGHT:
+
+        case WXK_PAGEUP:
+        case WXK_PAGEDOWN:
+        case WXK_HOME:
+        case WXK_END:
         case WXK_NUMPAD_PAGEUP:
         case WXK_NUMPAD_PAGEDOWN:
         case WXK_NUMPAD_HOME:
         case WXK_NUMPAD_END:
-            if (wxWindow::FindFocus() != m_directoryLeft && //don't propagate keyboard commands if currently changing directory field
-                wxWindow::FindFocus() != m_directoryRight)
+        {
+            const wxWindow* focus = wxWindow::FindFocus();
+            if (!isPartOf(focus, m_gridLeft)       && //don't propagate keyboard commands if grid is already in focus
+                !isPartOf(focus, m_gridMiddle)     &&
+                !isPartOf(focus, m_gridRight)      &&
+                !isPartOf(focus, m_listBoxHistory) && //don't propagate if selecting config
+                !isPartOf(focus, m_directoryLeft)  && //don't propagate if changing directory field
+                !isPartOf(focus, m_directoryRight) &&
+                !isPartOf(focus, m_scrolledWindowFolderPairs))
             {
                 m_gridLeft->SetFocus();
                 m_gridLeft->GetEventHandler()->ProcessEvent(event); //propagating event catched at wxTheApp to child leads to recursion, but we prevented it...
                 event.Skip(false); //definitively handled now!
                 return;
             }
-            break;
+        }
+        break;
     }
 
     event.Skip();
@@ -1916,9 +1951,9 @@ void MainDialog::OnContextExcludeObject(wxCommandEvent& event)
 void MainDialog::OnContextCopyClipboard(wxCommandEvent& event)
 {
     if (m_gridLeft->isLeadGrid())
-        copySelectionToClipboard(m_gridLeft);
+        copySelectionToClipboard(*m_gridLeft);
     else if (m_gridRight->isLeadGrid())
-        copySelectionToClipboard(m_gridRight);
+        copySelectionToClipboard(*m_gridRight);
 }
 
 
@@ -2188,10 +2223,10 @@ void MainDialog::OnDirSelected(wxFileDirPickerEvent& event)
 
 wxString getFormattedHistoryElement(const wxString& filename)
 {
-    wxString output = wxFileName(filename).GetFullName();
-    if (output.EndsWith(wxT(".ffs_gui")))
-        output = output.BeforeLast('.');
-    return output;
+    Zstring output = wxToZ(filename).AfterLast(common::FILE_NAME_SEPARATOR);
+    if (output.EndsWith(Zstr(".ffs_gui")))
+        output = output.BeforeLast(Zstr('.'));
+    return zToWx(output);
 }
 
 
@@ -2225,7 +2260,7 @@ void MainDialog::addFileToCfgHistory(const wxString& filename)
     {
         int newPos = -1;
         //the default config file should receive another name on GUI
-        if (util::sameFileSpecified(wxToZ(lastConfigFileName()), wxToZ(filename)))
+        if (util::sameFileSpecified(wxToZ(lastRunConfigName()), wxToZ(filename)))
             newPos = m_listBoxHistory->Append(_("<Last session>"), new wxClientDataString(filename));  //insert at beginning of list
         else
             newPos = m_listBoxHistory->Append(getFormattedHistoryElement(filename), new wxClientDataString(filename));  //insert at beginning of list
@@ -2509,7 +2544,7 @@ void MainDialog::setLastUsedConfig(const wxString& filename, const xmlAccess::Xm
     addFileToCfgHistory(filename); //put filename on list of last used config files
 
     //set title
-    if (filename == lastConfigFileName())
+    if (filename == lastRunConfigName())
     {
         SetTitle(wxString(wxT("FreeFileSync - ")) + _("Folder Comparison and Synchronization"));
         currentConfigFileName.clear();
@@ -2626,7 +2661,7 @@ xmlAccess::XmlGuiConfig MainDialog::getCurrentConfiguration() const
 }
 
 
-const wxString& MainDialog::lastConfigFileName()
+const wxString& MainDialog::lastRunConfigName()
 {
     static wxString instance = ffs3::getConfigDir() + wxT("LastRun.ffs_gui");
     return instance;
@@ -3925,56 +3960,57 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
             }
         }
 
-        wxString exportString;
+        zxString exportString; //perf: wxString doesn't model exponential growth and so is out
+
         //write legend
-        exportString +=  wxString(_("Legend")) + wxT('\n');
+        exportString +=  wxToZx(_("Legend")) + wxT('\n');
         if (syncPreview->previewIsEnabled())
         {
-            exportString += wxString(wxT("\"")) + getDescription(SO_CREATE_NEW_LEFT)     + wxT("\";") + getSymbol(SO_CREATE_NEW_LEFT)     + wxT('\n');
-            exportString += wxString(wxT("\"")) + getDescription(SO_CREATE_NEW_RIGHT)    + wxT("\";") + getSymbol(SO_CREATE_NEW_RIGHT)    + wxT('\n');
-            exportString += wxString(wxT("\"")) + getDescription(SO_DELETE_LEFT)         + wxT("\";") + getSymbol(SO_DELETE_LEFT)         + wxT('\n');
-            exportString += wxString(wxT("\"")) + getDescription(SO_DELETE_RIGHT)        + wxT("\";") + getSymbol(SO_DELETE_RIGHT)        + wxT('\n');
-            exportString += wxString(wxT("\"")) + getDescription(SO_OVERWRITE_LEFT)      + wxT("\";") + getSymbol(SO_OVERWRITE_LEFT)      + wxT('\n');
-            exportString += wxString(wxT("\"")) + getDescription(SO_OVERWRITE_RIGHT)     + wxT("\";") + getSymbol(SO_OVERWRITE_RIGHT)     + wxT('\n');
-            exportString += wxString(wxT("\"")) + getDescription(SO_DO_NOTHING)          + wxT("\";") + getSymbol(SO_DO_NOTHING)          + wxT('\n');
-            exportString += wxString(wxT("\"")) + getDescription(SO_EQUAL)               + wxT("\";") + getSymbol(SO_EQUAL)               + wxT('\n');
-            exportString += wxString(wxT("\"")) + getDescription(SO_UNRESOLVED_CONFLICT) + wxT("\";") + getSymbol(SO_UNRESOLVED_CONFLICT) + wxT('\n');
+            exportString += wxT("\"") + wxToZx(getDescription(SO_CREATE_NEW_LEFT))     + wxT("\";") + wxToZx(getSymbol(SO_CREATE_NEW_LEFT))     + wxT('\n');
+            exportString += wxT("\"") + wxToZx(getDescription(SO_CREATE_NEW_RIGHT))    + wxT("\";") + wxToZx(getSymbol(SO_CREATE_NEW_RIGHT))    + wxT('\n');
+            exportString += wxT("\"") + wxToZx(getDescription(SO_DELETE_LEFT))         + wxT("\";") + wxToZx(getSymbol(SO_DELETE_LEFT))         + wxT('\n');
+            exportString += wxT("\"") + wxToZx(getDescription(SO_DELETE_RIGHT))        + wxT("\";") + wxToZx(getSymbol(SO_DELETE_RIGHT))        + wxT('\n');
+            exportString += wxT("\"") + wxToZx(getDescription(SO_OVERWRITE_LEFT))      + wxT("\";") + wxToZx(getSymbol(SO_OVERWRITE_LEFT))      + wxT('\n');
+            exportString += wxT("\"") + wxToZx(getDescription(SO_OVERWRITE_RIGHT))     + wxT("\";") + wxToZx(getSymbol(SO_OVERWRITE_RIGHT))     + wxT('\n');
+            exportString += wxT("\"") + wxToZx(getDescription(SO_DO_NOTHING))          + wxT("\";") + wxToZx(getSymbol(SO_DO_NOTHING))          + wxT('\n');
+            exportString += wxT("\"") + wxToZx(getDescription(SO_EQUAL))               + wxT("\";") + wxToZx(getSymbol(SO_EQUAL))               + wxT('\n');
+            exportString += wxT("\"") + wxToZx(getDescription(SO_UNRESOLVED_CONFLICT)) + wxT("\";") + wxToZx(getSymbol(SO_UNRESOLVED_CONFLICT)) + wxT('\n');
         }
         else
         {
-            exportString += wxString(wxT("\"")) + getDescription(FILE_LEFT_SIDE_ONLY)  + wxT("\";") + getSymbol(FILE_LEFT_SIDE_ONLY)  + wxT('\n');
-            exportString += wxString(wxT("\"")) + getDescription(FILE_RIGHT_SIDE_ONLY) + wxT("\";") + getSymbol(FILE_RIGHT_SIDE_ONLY) + wxT('\n');
-            exportString += wxString(wxT("\"")) + getDescription(FILE_LEFT_NEWER)      + wxT("\";") + getSymbol(FILE_LEFT_NEWER)      + wxT('\n');
-            exportString += wxString(wxT("\"")) + getDescription(FILE_RIGHT_NEWER)     + wxT("\";") + getSymbol(FILE_RIGHT_NEWER)     + wxT('\n');
-            exportString += wxString(wxT("\"")) + getDescription(FILE_DIFFERENT)       + wxT("\";") + getSymbol(FILE_DIFFERENT)       + wxT('\n');
-            exportString += wxString(wxT("\"")) + getDescription(FILE_EQUAL)           + wxT("\";") + getSymbol(FILE_EQUAL)           + wxT('\n');
-            exportString += wxString(wxT("\"")) + getDescription(FILE_CONFLICT)        + wxT("\";") + getSymbol(FILE_CONFLICT)        + wxT('\n');
+            exportString += wxT("\"") + wxToZx(getDescription(FILE_LEFT_SIDE_ONLY))  + wxT("\";") + wxToZx(getSymbol(FILE_LEFT_SIDE_ONLY))  + wxT('\n');
+            exportString += wxT("\"") + wxToZx(getDescription(FILE_RIGHT_SIDE_ONLY)) + wxT("\";") + wxToZx(getSymbol(FILE_RIGHT_SIDE_ONLY)) + wxT('\n');
+            exportString += wxT("\"") + wxToZx(getDescription(FILE_LEFT_NEWER))      + wxT("\";") + wxToZx(getSymbol(FILE_LEFT_NEWER))      + wxT('\n');
+            exportString += wxT("\"") + wxToZx(getDescription(FILE_RIGHT_NEWER))     + wxT("\";") + wxToZx(getSymbol(FILE_RIGHT_NEWER))     + wxT('\n');
+            exportString += wxT("\"") + wxToZx(getDescription(FILE_DIFFERENT))       + wxT("\";") + wxToZx(getSymbol(FILE_DIFFERENT))       + wxT('\n');
+            exportString += wxT("\"") + wxToZx(getDescription(FILE_EQUAL))           + wxT("\";") + wxToZx(getSymbol(FILE_EQUAL))           + wxT('\n');
+            exportString += wxT("\"") + wxToZx(getDescription(FILE_CONFLICT))        + wxT("\";") + wxToZx(getSymbol(FILE_CONFLICT))        + wxT('\n');
         }
-        exportString += '\n';
+        exportString += wxT('\n');
 
         //write header
         const int colsLeft = m_gridLeft->GetNumberCols();
         for (int k = 0; k < colsLeft; ++k)
         {
-            exportString += m_gridLeft->GetColLabelValue(k);
-            exportString += ';';
+            exportString += wxToZx(m_gridLeft->GetColLabelValue(k));
+            exportString += wxT(';');
         }
 
         const int colsMiddle = m_gridMiddle->GetNumberCols();
         for (int k = 0; k < colsMiddle; ++k)
         {
-            exportString += m_gridMiddle->GetColLabelValue(k);
-            exportString += ';';
+            exportString += wxToZx(m_gridMiddle->GetColLabelValue(k));
+            exportString += wxT(';');
         }
 
         const int colsRight = m_gridRight->GetNumberCols();
         for (int k = 0; k < colsRight; ++k)
         {
-            exportString += m_gridRight->GetColLabelValue(k);
+            exportString += wxToZx(m_gridRight->GetColLabelValue(k));
             if (k != m_gridRight->GetNumberCols() - 1)
-                exportString += ';';
+                exportString += wxT(';');
         }
-        exportString += '\n';
+        exportString += wxT('\n');
 
         //begin work
         const int rowsTotal = m_gridLeft->GetNumberRows();
@@ -3982,23 +4018,23 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
         {
             for (int k = 0; k < colsLeft; ++k)
             {
-                exportString += m_gridLeft->GetCellValue(i, k);
-                exportString += ';';
+                exportString += wxToZx(m_gridLeft->GetCellValue(i, k));
+                exportString += wxT(';');
             }
 
             for (int k = 0; k < colsMiddle; ++k)
             {
-                exportString += m_gridMiddle->GetCellValue(i, k);
-                exportString += ';';
+                exportString += wxToZx(m_gridMiddle->GetCellValue(i, k));
+                exportString += wxT(';');
             }
 
             for (int k = 0; k < colsRight; ++k)
             {
-                exportString += m_gridRight->GetCellValue(i, k);
+                exportString += wxToZx(m_gridRight->GetCellValue(i, k));
                 if (k != colsRight - 1)
-                    exportString += ';';
+                    exportString += wxT(';');
             }
-            exportString += '\n';
+            exportString += wxT('\n');
         }
 
         //write export file
@@ -4006,7 +4042,7 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
         if (output.IsOpened())
         {
             output.Write(common::BYTE_ORDER_MARK_UTF8, sizeof(common::BYTE_ORDER_MARK_UTF8) - 1);
-            output.Write(exportString);
+            output.Write(exportString.c_str(), exportString.size() * sizeof(zxString::value_type));
             pushStatusInformation(_("File list exported!"));
         }
         else
@@ -4085,7 +4121,7 @@ void MainDialog::OnMenuQuit(wxCommandEvent& event)
 void MainDialog::switchProgramLanguage(const int langID)
 {
     //create new dialog with respect to new language
-    CustomLocale::getInstance().setLanguage(langID); //language is a global attribute
+    ffs3::setLanguage(langID); //language is a global attribute
 
     const xmlAccess::XmlGuiConfig currentGuiCfg = getCurrentConfiguration();
 
@@ -4151,7 +4187,7 @@ void MainDialog::SyncPreview::enableSynchronization(bool value)
     if (value)
     {
         synchronizationEnabled = true;
-        mainDlg_->m_buttonStartSync->SetForegroundColour(*wxBLACK);
+        mainDlg_->m_buttonStartSync->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
         mainDlg_->m_buttonStartSync->setBitmapFront(GlobalResources::instance().getImage(wxT("sync")));
     }
     else
