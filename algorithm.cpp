@@ -1057,22 +1057,22 @@ void ffs3::setActiveStatus(bool newStatus, ffs3::FileSystemObject& fsObj)
     fsObj.setActive(newStatus);
 
     //process subdirectories also!
-        struct Recurse: public FSObjectVisitor
+    struct Recurse: public FSObjectVisitor
+    {
+        Recurse(bool newStat) : newStatus_(newStat) {}
+        virtual void visit(const FileMapping& fileObj) {}
+        virtual void visit(const SymLinkMapping& linkObj) {}
+        virtual void visit(const DirMapping& dirObj)
         {
-            Recurse(bool newStat) : newStatus_(newStat) {}
-            virtual void visit(const FileMapping& fileObj) {}
-            virtual void visit(const SymLinkMapping& linkObj) {}
-            virtual void visit(const DirMapping& dirObj)
-            {
-                if (newStatus_)
-                    InOrExcludeAllRows<true>().execute(const_cast<DirMapping&>(dirObj)); //object is not physically const here anyway
-                else
-                    InOrExcludeAllRows<false>().execute(const_cast<DirMapping&>(dirObj)); //
-            }
-        private:
-            const bool newStatus_;
-        } recurse(newStatus);
-        fsObj.accept(recurse);
+            if (newStatus_)
+                InOrExcludeAllRows<true>().execute(const_cast<DirMapping&>(dirObj)); //object is not physically const here anyway
+            else
+                InOrExcludeAllRows<false>().execute(const_cast<DirMapping&>(dirObj)); //
+        }
+    private:
+        const bool newStatus_;
+    } recurse(newStatus);
+    fsObj.accept(recurse);
 }
 
 namespace
@@ -1260,9 +1260,9 @@ struct RemoveCallbackImpl : public ffs3::CallbackRemoveDir
 {
     RemoveCallbackImpl(DeleteFilesHandler& deleteCallback) : deleteCallback_(deleteCallback) {}
 
-    virtual void requestUiRefresh(const Zstring& currentObject)
+    virtual void notifyDeletion(const Zstring& currentObject)
     {
-        deleteCallback_.deletionSuccessful(0);
+        deleteCallback_.notifyDeletion(currentObject);
     }
 
 private:
@@ -1286,7 +1286,10 @@ void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
                 if (!fsObj->isEmpty<side>()) //element may become implicitly delted, e.g. if parent folder was deleted first
                 {
                     if (useRecycleBin)
-                        ffs3::moveToRecycleBin(fsObj->getFullName<side>());  //throw (FileError)
+                    {
+                        if (ffs3::moveToRecycleBin(fsObj->getFullName<side>()))  //throw (FileError)
+                            statusHandler.notifyDeletion(fsObj->getFullName<side>());
+                    }
                     else
                     {
                         RemoveCallbackImpl removeCallback(statusHandler);
@@ -1294,11 +1297,12 @@ void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
                         //del directories and symlinks
                         struct DeletePermanently : public FSObjectVisitor
                         {
-                            DeletePermanently(RemoveCallbackImpl* remCallback) : remCallback_(remCallback) {}
+                            DeletePermanently(RemoveCallbackImpl& remCallback) : remCallback_(remCallback) {}
 
                             virtual void visit(const FileMapping& fileObj)
                             {
-                                ffs3::removeFile(fileObj.getFullName<side>());
+                                if (ffs3::removeFile(fileObj.getFullName<side>()))
+                                    remCallback_.notifyDeletion(fileObj.getFullName<side>());
                             }
 
                             virtual void visit(const SymLinkMapping& linkObj)
@@ -1306,22 +1310,23 @@ void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
                                 switch (linkObj.getLinkType<side>())
                                 {
                                     case LinkDescriptor::TYPE_DIR:
-                                        ffs3::removeDirectory(linkObj.getFullName<side>(), NULL);
+                                        ffs3::removeDirectory(linkObj.getFullName<side>(), &remCallback_);
                                         break;
                                     case LinkDescriptor::TYPE_FILE:
-                                        ffs3::removeFile(linkObj.getFullName<side>());
+                                        if (ffs3::removeFile(linkObj.getFullName<side>()))
+                                            remCallback_.notifyDeletion(linkObj.getFullName<side>());
                                         break;
                                 }
                             }
 
                             virtual void visit(const DirMapping& dirObj)
                             {
-                                ffs3::removeDirectory(dirObj.getFullName<side>(), remCallback_);
+                                ffs3::removeDirectory(dirObj.getFullName<side>(), &remCallback_);
                             }
 
                         private:
-                            RemoveCallbackImpl* remCallback_;
-                        } delPerm(&removeCallback);
+                            RemoveCallbackImpl& remCallback_;
+                        } delPerm(removeCallback);
                         fsObj->accept(delPerm);
                     }
 
@@ -1333,9 +1338,6 @@ void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
                     else
                         setSyncDirectionRec(SYNC_DIR_LEFT, *fsObj);
                 }
-
-                //notify successful file/folder deletion: make sure [first, last) contains to be deleted entries only, to avoid miscalculation
-                statusHandler.deletionSuccessful(1);
                 break;
             }
             catch (const FileError& error)

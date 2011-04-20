@@ -2,6 +2,12 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.16
+---------------
+Fixed file copy issues on SAMBA shares
+Small GUI fixes
+
+
 Changelog v3.15
 ---------------
 Overwriting a file as fully transactional operation
@@ -12,7 +18,7 @@ Copy NTFS compressed and encrypted directory attributes
 Copy NTFS alternate data stream
 Improved performance: CSV export, copy to clipboard, sync log display
 Improved color theme support
-Fixed crash on certain system text colors settings
+Fixed crash on certain system text color settings
 Fixed progress numbers for manual deletion
 Allow aborting manual deletion via escape key
 Use relative name for file tooltip

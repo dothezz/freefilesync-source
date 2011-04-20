@@ -334,8 +334,7 @@ public:
                  const std::vector<ffs3::FileSystemObject*>& rowsOnLeft,
                  const std::vector<ffs3::FileSystemObject*>& rowsOnRight,
                  bool& deleteOnBothSides,
-                 bool& useRecycleBin,
-                 int& totalDeleteCount);
+                 bool& useRecycleBin);
 
     enum
     {
@@ -356,7 +355,6 @@ private:
     const std::vector<ffs3::FileSystemObject*>& rowsToDeleteOnRight;
     bool& m_deleteOnBothSides;
     bool& m_useRecycleBin;
-    int&  totalDelCount;
 };
 
 
@@ -364,14 +362,12 @@ DeleteDialog::DeleteDialog(wxWindow* main,
                            const std::vector<FileSystemObject*>& rowsOnLeft,
                            const std::vector<FileSystemObject*>& rowsOnRight,
                            bool& deleteOnBothSides,
-                           bool& useRecycleBin,
-                           int& totalDeleteCount) :
+                           bool& useRecycleBin) :
     DeleteDlgGenerated(main),
     rowsToDeleteOnLeft(rowsOnLeft),
     rowsToDeleteOnRight(rowsOnRight),
     m_deleteOnBothSides(deleteOnBothSides),
-    m_useRecycleBin(useRecycleBin),
-    totalDelCount(totalDeleteCount)
+    m_useRecycleBin(useRecycleBin)
 {
 #ifdef FFS_WIN
     new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
@@ -405,7 +401,11 @@ void DeleteDialog::updateTexts()
                                                  m_checkBoxDeleteBothSides->GetValue());
 
     const wxString filesToDelete = delInfo.first;
-    totalDelCount = delInfo.second;
+
+    #ifndef _MSC_VER
+    #warning do something with this number: ("Do you really want to delete the following %x object(s)?"));
+    //totalDelCount = delInfo.second;
+    #endif
 
     m_textCtrlMessage->SetValue(filesToDelete);
 
@@ -444,8 +444,7 @@ void DeleteDialog::OnUseRecycler(wxCommandEvent& event)
 DefaultReturnCode::Response ffs3::showDeleteDialog(const std::vector<ffs3::FileSystemObject*>& rowsOnLeft,
                                                    const std::vector<ffs3::FileSystemObject*>& rowsOnRight,
                                                    bool& deleteOnBothSides,
-                                                   bool& useRecycleBin,
-                                                   int& totalDeleteCount)
+                                                   bool& useRecycleBin)
 {
     DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
 
@@ -453,8 +452,7 @@ DefaultReturnCode::Response ffs3::showDeleteDialog(const std::vector<ffs3::FileS
                                  rowsOnLeft,
                                  rowsOnRight,
                                  deleteOnBothSides,
-                                 useRecycleBin,
-                                 totalDeleteCount);
+                                 useRecycleBin);
     if (confirmDeletion.ShowModal() == DeleteDialog::BUTTON_OKAY)
         rv = DefaultReturnCode::BUTTON_OKAY;
     return rv;

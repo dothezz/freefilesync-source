@@ -134,10 +134,10 @@ private:
 using ffs3::DirectoryNameMainDlg;
 
 DirectoryNameMainDlg::DirectoryNameMainDlg(wxWindow&         dropWindow1,
-    wxWindow&         dropWindow2,
-    wxDirPickerCtrl&  dirPicker,
-    wxComboBox&       dirName,
-    wxStaticBoxSizer& staticBox) :
+                                           wxWindow&         dropWindow2,
+                                           wxDirPickerCtrl&  dirPicker,
+                                           wxComboBox&       dirName,
+                                           wxStaticBoxSizer& staticBox) :
     dropWindow1_(dropWindow1),
     dropWindow2_(dropWindow2),
     dirPicker_(dirPicker),
@@ -216,7 +216,7 @@ using ffs3::DirectoryName;
 DirectoryName::DirectoryName(wxWindow&        dropWindow,
                              wxDirPickerCtrl& dirPicker,
                              wxTextCtrl&      dirName,
-                  wxStaticBoxSizer* staticBox) :
+                             wxStaticBoxSizer* staticBox) :
     dropWindow_(dropWindow),
     dirPicker_(dirPicker),
     dirName_(dirName),

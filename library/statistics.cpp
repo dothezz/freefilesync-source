@@ -144,7 +144,10 @@ void Statistics::addMeasurement(int objectsCurrent, double dataCurrent)
 
     //insert new record
     if (!measurements.empty())
-        measurements.insert(--measurements.end(), newEntry); //use fact that time is monotonously ascending
+        {
+			//assert(dataCurrent >= (--measurements.end())->second.data);
+			measurements.insert(--measurements.end(), newEntry); //use fact that time is monotonously ascending
+	}
     else
         measurements.insert(newEntry);
 

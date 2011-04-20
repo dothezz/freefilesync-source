@@ -33,7 +33,7 @@ Linker flag:
 bool recycleBinExists(); //test existence of Recycle Bin API on current system
 
 //move a file or folder to Recycle Bin
-void moveToRecycleBin(const Zstring& fileToDelete);  //throw (FileError)
+bool moveToRecycleBin(const Zstring& fileToDelete); //return "true" if file/dir was actually deleted; throw (FileError)
 }
 
 #endif // RECYCLER_H_INCLUDED

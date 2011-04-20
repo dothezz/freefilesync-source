@@ -146,12 +146,12 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
 }
 
 
-void ffs3::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileError)
+bool ffs3::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileError)
 {
 #ifdef FFS_WIN
     const Zstring filenameFmt = applyLongPathPrefix(fileToDelete);
     if (::GetFileAttributes(filenameFmt.c_str()) == INVALID_FILE_ATTRIBUTES)
-        return; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
+        return false; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
 
     std::vector<Zstring> fileNames;
     fileNames.push_back(fileToDelete);
@@ -160,7 +160,7 @@ void ffs3::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileError)
 #elif defined FFS_LINUX
     struct stat fileInfo;
     if (::lstat(fileToDelete.c_str(), &fileInfo) != 0)
-        return; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
+        return false; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
 
 
     Glib::RefPtr<Gio::File> fileObj = Gio::File::create_for_path(fileToDelete.c_str()); //never fails
@@ -181,6 +181,7 @@ void ffs3::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileError)
                         wxT("(") + errorMessage + wxT(")"));
     }
 #endif
+return true;
 }
 
 

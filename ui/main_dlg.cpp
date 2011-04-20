@@ -903,9 +903,8 @@ std::set<size_t> MainDialog::getSelectedRows() const
 class ManualDeletionHandler : private wxEvtHandler, public DeleteFilesHandler
 {
 public:
-    ManualDeletionHandler(MainDialog* main, size_t totalObjToDel) :
+    ManualDeletionHandler(MainDialog* main) :
         mainDlg(main),
-        totalObjToDelete(totalObjToDel),
         abortRequested(false),
         ignoreErrors(false),
         deletionCount(0)
@@ -955,15 +954,14 @@ public:
         return DeleteFilesHandler::IGNORE_ERROR; //dummy return value
     }
 
-    virtual void deletionSuccessful(size_t deletedItems)  //called for each file/folder that has been deleted
+    virtual void notifyDeletion(const Zstring& currentObject)  //called for each file/folder that has been deleted
     {
-        deletionCount += deletedItems;
+        ++deletionCount;
 
         if (updateUiIsAllowed())  //test if specific time span between ui updates is over
         {
-            wxString statusMessage = _("%x / %y objects deleted successfully");
+            wxString statusMessage = _("%x objects deleted successfully");
             statusMessage.Replace(wxT("%x"), ffs3::numberToStringSep(deletionCount), false);
-            statusMessage.Replace(wxT("%y"), ffs3::numberToStringSep(totalObjToDelete), false);
 
             if (mainDlg->m_staticTextStatusMiddle->GetLabel() != statusMessage)
             {
@@ -995,8 +993,6 @@ private:
 
     MainDialog* const mainDlg;
 
-    const size_t totalObjToDelete;
-
     bool abortRequested;
     bool ignoreErrors;
     size_t deletionCount;
@@ -1019,14 +1015,12 @@ void MainDialog::deleteSelectedFiles()
         gridDataView->getAllFileRef(viewSelectionRight, compRefRight);
 
 
-        int totalDeleteCount = 0;
         wxWindow* oldFocus = wxWindow::FindFocus();
 
         if (ffs3::showDeleteDialog(compRefLeft,
                                    compRefRight,
                                    globalSettings->gui.deleteOnBothSides,
-                                   globalSettings->gui.useRecyclerForManualDeletion,
-                                   totalDeleteCount) == DefaultReturnCode::BUTTON_OKAY)
+                                   globalSettings->gui.useRecyclerForManualDeletion) == DefaultReturnCode::BUTTON_OKAY)
         {
             if (globalSettings->gui.useRecyclerForManualDeletion && !ffs3::recycleBinExists())
             {
@@ -1037,7 +1031,7 @@ void MainDialog::deleteSelectedFiles()
             try
             {
                 //handle errors when deleting files/folders
-                ManualDeletionHandler statusHandler(this, totalDeleteCount);
+                ManualDeletionHandler statusHandler(this);
 
                 ffs3::deleteFromGridAndHD(gridDataView->getDataTentative(),
                                           compRefLeft,

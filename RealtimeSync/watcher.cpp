@@ -181,7 +181,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
 
 
     if (dirNames.empty()) //pathological case, but check is needed nevertheless
-        throw ffs3::FileError(_("At least one directory input field is empty."));
+        throw ffs3::FileError(_("A directory input field is empty."));
 
     //detect when volumes are removed/are not available anymore
     WatchDirectories dirWatcher;
@@ -195,7 +195,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
         const Zstring formattedDir = ffs3::getFormattedDirectoryName(*i);
 
         if (formattedDir.empty())
-            throw ffs3::FileError(_("At least one directory input field is empty."));
+            throw ffs3::FileError(_("A directory input field is empty."));
 
         dirWatcher.addForMonitoring(formattedDir);
 
@@ -222,7 +222,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
     }
 
     if (changeNotifications->size() == 0)
-        throw ffs3::FileError(_("At least one directory input field is empty."));
+        throw ffs3::FileError(_("A directory input field is empty."));
 
 
     //detect user request for device removal (e.g. usb stick)
@@ -302,7 +302,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
         const Zstring formattedDir = ffs3::getFormattedDirectoryName(*i);
 
         if (formattedDir.empty())
-            throw ffs3::FileError(_("At least one directory input field is empty."));
+            throw ffs3::FileError(_("A directory input field is empty."));
 
         dirWatcher.addForMonitoring(formattedDir);
 
@@ -357,7 +357,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
 
 
         if (notifications.GetWatchCount() == 0)
-            throw ffs3::FileError(_("At least one directory input field is empty."));
+            throw ffs3::FileError(_("A directory input field is empty."));
 
         while (true)
         {
@@ -402,11 +402,11 @@ void rts::waitForMissingDirs(const std::vector<Zstring>& dirNames, WaitCallback*
             bool allExisting = true;
             for (std::vector<Zstring>::const_iterator i = dirNames.begin(); i != dirNames.end(); ++i)
             {
-    //support specifying volume by name => call getFormattedDirectoryName() repeatedly
+                //support specifying volume by name => call getFormattedDirectoryName() repeatedly
                 const Zstring formattedDir = ffs3::getFormattedDirectoryName(*i);
 
                 if (formattedDir.empty())
-                    throw ffs3::FileError(_("At least one directory input field is empty."));
+                    throw ffs3::FileError(_("A directory input field is empty."));
 
                 if (!ffs3::dirExists(formattedDir))
                 {

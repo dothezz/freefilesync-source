@@ -241,7 +241,7 @@ ffs3::ResponseSameVol ffs3::onSameVolume(const Zstring& folderLeft, const Zstrin
 }
 
 
-void ffs3::removeFile(const Zstring& filename) //throw (FileError);
+bool ffs3::removeFile(const Zstring& filename) //throw (FileError);
 {
 #ifdef FFS_WIN
     //remove file, support for \\?\-prefix
@@ -260,7 +260,7 @@ void ffs3::removeFile(const Zstring& filename) //throw (FileError);
 
             //now try again...
             if (::DeleteFile(filenameFmt.c_str()))
-                return;
+                return true;
         }
 #endif
         //eval error code before next call
@@ -270,10 +270,11 @@ void ffs3::removeFile(const Zstring& filename) //throw (FileError);
         //perf: place check in error handling block
         //warning: this call changes error code!!
         if (!somethingExists(filename))
-            return; //neither file nor any other object (e.g. broken symlink) with that name existing
+            return false; //neither file nor any other object (e.g. broken symlink) with that name existing
 
         throw FileError(errorMessage);
     }
+    return true;
 }
 
 
@@ -593,7 +594,7 @@ struct RemoveCallbackImpl : public ffs3::CallbackRemoveDir
         targetDir_(targetDir),
         moveCallback_(moveCallback) {}
 
-    virtual void requestUiRefresh(const Zstring& currentObject)
+    virtual void notifyDeletion(const Zstring& currentObject)
     {
         switch (moveCallback_.requestUiRefresh(sourceDir_))
         {
@@ -765,6 +766,7 @@ void ffs3::removeDirectory(const Zstring& directory, CallbackRemoveDir* callback
             wxString errorMessage = wxString(_("Error deleting directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"");
             throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
         }
+        if (callback) callback->notifyDeletion(directory); //once per symlink
         return;
     }
 
@@ -775,21 +777,16 @@ void ffs3::removeDirectory(const Zstring& directory, CallbackRemoveDir* callback
     FilesDirsOnlyTraverser traverser(fileList, dirList);
     ffs3::traverseFolder(directory, false, traverser); //don't follow symlinks
 
-
     //delete files
     for (std::vector<Zstring>::const_iterator i = fileList.begin(); i != fileList.end(); ++i)
     {
-        if (callback) callback->requestUiRefresh(*i); //call once per file
-        removeFile(*i);
+        const bool workDone = removeFile(*i);
+        if (callback && workDone) callback->notifyDeletion(*i); //call once per file
     }
 
     //delete directories recursively
     for (std::vector<Zstring>::const_iterator i = dirList.begin(); i != dirList.end(); ++i)
-    {
-        if (callback) callback->requestUiRefresh(*i); //and once per folder
         removeDirectory(*i, callback); //call recursively to correctly handle symbolic links
-    }
-
 
     //parent directory is deleted last
 #ifdef FFS_WIN
@@ -801,6 +798,7 @@ void ffs3::removeDirectory(const Zstring& directory, CallbackRemoveDir* callback
         wxString errorMessage = wxString(_("Error deleting directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"");
         throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
     }
+    if (callback) callback->notifyDeletion(directory); //and once per folder
 }
 
 
@@ -1557,7 +1555,10 @@ void rawCopyWinApi(const Zstring& sourceFile,
         }
 
         if (lastError == ERROR_PATH_NOT_FOUND)
+        {
+            guardTarget.Dismiss(); //not relevant
             throw ErrorTargetPathMissing(errorMessage);
+        }
 
         try //add more meaningful message
         {
@@ -1579,360 +1580,343 @@ void rawCopyWinApi(const Zstring& sourceFile,
 }
 
 
-void rawCopyWinOptimized(const Zstring& sourceFile,
-                         const Zstring& targetFile,
-                         CallbackCopyFile* callback) //throw (FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked)
-{
-    /*
-                BackupRead()	FileRead()		CopyFileEx()
-    			--------------------------------------------
-    Attributes  NO			    NO              YES
-    create time NO              NO              NO
-    ADS			YES				NO				YES
-    Encrypted	NO(silent fail)	NO				YES
-    Compressed	NO				NO				NO
-    Sparse		YES				NO				NO
-    PERF		    6% faster		            -
-
-    Mark stream as compressed: FSCTL_SET_COMPRESSION
-        compatible with: BackupRead() FileRead()
-    */
-
-    //open sourceFile for reading
-    HANDLE hFileIn = ::CreateFile(ffs3::applyLongPathPrefix(sourceFile).c_str(),
-                                  GENERIC_READ,
-                                  FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //all shared modes are required to read files that are open in other applications
-                                  NULL,
-                                  OPEN_EXISTING,
-                                  FILE_FLAG_SEQUENTIAL_SCAN,
-                                  NULL);
-    if (hFileIn == INVALID_HANDLE_VALUE)
-    {
-        const DWORD lastError = ::GetLastError();
-        const wxString& errorMessage = wxString(_("Error opening file:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\"") + wxT("\n\n") + ffs3::getLastErrorFormatted(lastError);
-
-        //if file is locked (try to) use Windows Volume Shadow Copy Service
-        if (lastError == ERROR_SHARING_VIOLATION ||
-            lastError == ERROR_LOCK_VIOLATION)
-            throw ErrorFileLocked(errorMessage);
-
-        throw FileError(errorMessage);
-    }
-    Loki::ScopeGuard dummy1 = Loki::MakeGuard(::CloseHandle, hFileIn);
-    (void)dummy1; //silence warning "unused variable"
-
-
-    BY_HANDLE_FILE_INFORMATION infoFileIn = {};
-    if (!::GetFileInformationByHandle(hFileIn, &infoFileIn))
-    {
-        const wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\"");
-        throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
-    }
-
-    const bool sourceIsCompressed = (infoFileIn.dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED)  != 0;
-    const bool sourceIsSparse     = (infoFileIn.dwFileAttributes & FILE_ATTRIBUTE_SPARSE_FILE) != 0;
-    const bool sourceIsEncrypted  = (infoFileIn.dwFileAttributes & FILE_ATTRIBUTE_ENCRYPTED)   != 0;
-
-    bool targetSupportSparse     = false;
-    bool targetSupportCompressed = false;
-    bool targetSupportEncryption = false;
-
-    if (sourceIsCompressed || sourceIsSparse || sourceIsEncrypted)
-    {
-        DWORD fsFlags = 0;
-
-        {
-            const size_t bufferSize = std::max(targetFile.size(), static_cast<size_t>(10000));
-            boost::scoped_array<wchar_t> buffer(new wchar_t[bufferSize]);
-
-            //suprisingly slow: ca. 1.5 ms per call!
-            if (!::GetVolumePathName(targetFile.c_str(), //__in   LPCTSTR lpszFileName, -> seems to be no need for path prefix (check passed)
-                                     buffer.get(),       //__out  LPTSTR lpszVolumePathName,
-                                     static_cast<DWORD>(bufferSize))) //__in   DWORD cchBufferLength
-                throw FileError(wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"") +
-                                wxT("\n\n") + ffs3::getLastErrorFormatted() +
-                                wxT("\nFailed to determine volume name!"));
-
-            Zstring volumePath = buffer.get();
-            if (!volumePath.EndsWith(common::FILE_NAME_SEPARATOR))
-                volumePath += common::FILE_NAME_SEPARATOR;
-
-            //suprisingly fast: ca. 0.03 ms per call!
-            if (!::GetVolumeInformation(volumePath.c_str(), //__in_opt   LPCTSTR lpRootPathName,
-                                        NULL,               //__out      LPTSTR lpVolumeNameBuffer,
-                                        0,                  //__in       DWORD nVolumeNameSize,
-                                        NULL,               //__out_opt  LPDWORD lpVolumeSerialNumber,
-                                        NULL,               //__out_opt  LPDWORD lpMaximumComponentLength,
-                                        &fsFlags,           //__out_opt  LPDWORD lpFileSystemFlags,
-                                        NULL,               //__out      LPTSTR lpFileSystemNameBuffer,
-                                        0))                 //__in       DWORD nFileSystemNameSize
-                throw FileError(wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(volumePath) + wxT("\"") +
-                                wxT("\n\n") + ffs3::getLastErrorFormatted() +
-                                wxT("\nFailed to determine volume information!"));
-        }
-
-        targetSupportSparse     = (fsFlags & FILE_SUPPORTS_SPARSE_FILES) != 0;
-        targetSupportCompressed = (fsFlags & FILE_FILE_COMPRESSION     ) != 0;
-        targetSupportEncryption = (fsFlags & FILE_SUPPORTS_ENCRYPTION  ) != 0;
-    }
-
-    //####################################### DST hack ###########################################
-    if (dst::isFatDrive(sourceFile)) //throw()
-    {
-        const dst::RawTime rawTime(infoFileIn.ftCreationTime, infoFileIn.ftLastWriteTime);
-        if (dst::fatHasUtcEncoded(rawTime)) //throw (std::runtime_error)
-        {
-            infoFileIn.ftLastWriteTime = dst::fatDecodeUtcTime(rawTime); //return last write time in real UTC, throw (std::runtime_error)
-            ::GetSystemTimeAsFileTime(&infoFileIn.ftCreationTime);       //real creation time information is not available...
-        }
-    }
-
-    if (dst::isFatDrive(targetFile)) //throw()
-    {
-        const dst::RawTime encodedTime = dst::fatEncodeUtcTime(infoFileIn.ftLastWriteTime); //throw (std::runtime_error)
-        infoFileIn.ftCreationTime  = encodedTime.createTimeRaw;
-        infoFileIn.ftLastWriteTime = encodedTime.writeTimeRaw;
-    }
-    //####################################### DST hack ###########################################
-
-    const DWORD validAttribs = FILE_ATTRIBUTE_READONLY |
-                               FILE_ATTRIBUTE_HIDDEN   |
-                               FILE_ATTRIBUTE_SYSTEM   |
-                               FILE_ATTRIBUTE_ARCHIVE  |            //those two are not set properly (not worse than ::CopyFileEx())
-                               FILE_ATTRIBUTE_NOT_CONTENT_INDEXED | //
-                               (targetSupportEncryption ? FILE_ATTRIBUTE_ENCRYPTED : 0);
-
-    //create targetFile and open it for writing
-    HANDLE hFileOut = ::CreateFile(ffs3::applyLongPathPrefix(targetFile).c_str(),
-                                   GENERIC_READ | GENERIC_WRITE, //read access required for FSCTL_SET_COMPRESSION
-                                   FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                   NULL,
-                                   CREATE_NEW,
-                                   (infoFileIn.dwFileAttributes & validAttribs) | FILE_FLAG_SEQUENTIAL_SCAN,
-                                   NULL);
-    if (hFileOut == INVALID_HANDLE_VALUE)
-    {
-        const DWORD lastError = ::GetLastError();
-        const wxString& errorMessage = wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"") +
-                                       wxT("\n\n") + ffs3::getLastErrorFormatted(lastError);
-
-        if (lastError == ERROR_FILE_EXISTS)
-            throw ErrorTargetExisting(errorMessage);
-
-        if (lastError == ERROR_PATH_NOT_FOUND)
-            throw ErrorTargetPathMissing(errorMessage);
-
-        throw FileError(errorMessage);
-    }
-    Loki::ScopeGuard guardTarget = Loki::MakeGuard(&removeFile, targetFile); //transactional behavior: guard just after opening target and before managing hFileOut
-
-    Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hFileOut);
-    (void)dummy; //silence warning "unused variable"
-
-
-    const bool useBackupFun = !sourceIsEncrypted; //http://msdn.microsoft.com/en-us/library/aa362509(v=VS.85).aspx
-
-    if (sourceIsCompressed && targetSupportCompressed)
-    {
-        USHORT cmpState = COMPRESSION_FORMAT_DEFAULT;
-
-        DWORD bytesReturned = 0;
-        if (!DeviceIoControl(hFileOut,              //handle to file or directory
-                             FSCTL_SET_COMPRESSION, //dwIoControlCode
-                             &cmpState,             //input buffer
-                             sizeof(cmpState),      //size of input buffer
-                             NULL,                  //lpOutBuffer
-                             0,                     //OutBufferSize
-                             &bytesReturned,        //number of bytes returned
-                             NULL))                 //OVERLAPPED structure
-            throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"") +
-                            wxT("\n\n") + ffs3::getLastErrorFormatted() +
-                            wxT("\nFailed to write NTFS compressed attribute!"));
-    }
-
-    //although it seems the sparse attribute is set automatically by BackupWrite, we are required to do this manually: http://support.microsoft.com/kb/271398/en-us
-    if (sourceIsSparse && targetSupportSparse)
-    {
-        if (useBackupFun)
-        {
-            DWORD bytesReturned = 0;
-            if (!DeviceIoControl(hFileOut,         //handle to file
-                                 FSCTL_SET_SPARSE, //dwIoControlCode
-                                 NULL,             //input buffer
-                                 0,                //size of input buffer
-                                 NULL,             //lpOutBuffer
-                                 0,                //OutBufferSize
-                                 &bytesReturned,   //number of bytes returned
-                                 NULL))            //OVERLAPPED structure
-                throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"") +
-                                wxT("\n\n") + ffs3::getLastErrorFormatted() +
-                                wxT("\nFailed to write NTFS sparse attribute!"));
-        }
-    }
-
-
-    const DWORD BUFFER_SIZE = 512 * 1024; //512 kb seems to be a reasonable buffer size
-    static const boost::scoped_array<BYTE> memory(new BYTE[BUFFER_SIZE]);
-
-    struct ManageCtxt //manage context for BackupRead()/BackupWrite()
-    {
-        ManageCtxt() : read(NULL), write(NULL) {}
-        ~ManageCtxt()
-        {
-            if (read != NULL)
-                ::BackupRead (0, NULL, 0, NULL, true, false, &read);
-            if (write != NULL)
-                ::BackupWrite(0, NULL, 0, NULL, true, false, &write);
-        }
-
-        LPVOID read;
-        LPVOID write;
-    } context;
-
-    //copy contents of sourceFile to targetFile
-    wxULongLong totalBytesTransferred;
-
-    bool eof = false;
-    do
-    {
-        DWORD bytesRead = 0;
-
-        if (useBackupFun)
-        {
-            if (!::BackupRead(hFileIn,        //__in   HANDLE hFile,
-                              memory.get(),   //__out  LPBYTE lpBuffer,
-                              BUFFER_SIZE,    //__in   DWORD nNumberOfBytesToRead,
-                              &bytesRead,     //__out  LPDWORD lpNumberOfBytesRead,
-                              false,          //__in   BOOL bAbort,
-                              false,          //__in   BOOL bProcessSecurity,
-                              &context.read)) //__out  LPVOID *lpContext
-                throw FileError(wxString(_("Error reading file:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\"") +
-                                wxT("\n\n") + ffs3::getLastErrorFormatted());
-        }
-        else if (!::ReadFile(hFileIn,      //__in         HANDLE hFile,
-                             memory.get(), //__out        LPVOID lpBuffer,
-                             BUFFER_SIZE,  //__in         DWORD nNumberOfBytesToRead,
-                             &bytesRead,   //__out_opt    LPDWORD lpNumberOfBytesRead,
-                             NULL))        //__inout_opt  LPOVERLAPPED lpOverlapped
-            throw FileError(wxString(_("Error reading file:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\"") +
-                            wxT("\n\n") + ffs3::getLastErrorFormatted());
-
-        if (bytesRead > BUFFER_SIZE)
-            throw FileError(wxString(_("Error reading file:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\"") +
-                            wxT("\n\n") + wxT("buffer overflow"));
-
-        if (bytesRead < BUFFER_SIZE)
-            eof = true;
-
-        DWORD bytesWritten = 0;
-
-        if (useBackupFun)
-        {
-            if (!::BackupWrite(hFileOut,        //__in   HANDLE hFile,
-                               memory.get(),    //__in   LPBYTE lpBuffer,
-                               bytesRead,       //__in   DWORD nNumberOfBytesToWrite,
-                               &bytesWritten,   //__out  LPDWORD lpNumberOfBytesWritten,
-                               false,           //__in   BOOL bAbort,
-                               false,           //__in   BOOL bProcessSecurity,
-                               &context.write)) //__out  LPVOID *lpContext
-                throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"") +
-                                wxT("\n\n") + ffs3::getLastErrorFormatted() + wxT(" (w)")); //w -> distinguish from fopen error message!
-        }
-        else if (!::WriteFile(hFileOut,      //__in         HANDLE hFile,
-                              memory.get(),  //__out        LPVOID lpBuffer,
-                              bytesRead,     //__in         DWORD nNumberOfBytesToWrite,
-                              &bytesWritten, //__out_opt    LPDWORD lpNumberOfBytesWritten,
-                              NULL))         //__inout_opt  LPOVERLAPPED lpOverlapped
-            throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"") +
-                            wxT("\n\n") + ffs3::getLastErrorFormatted() + wxT(" (w)")); //w -> distinguish from fopen error message!
-
-        if (bytesWritten != bytesRead)
-            throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"") +
-                            wxT("\n\n") + wxT("incomplete write"));
-
-        totalBytesTransferred += bytesRead;
-
-        //invoke callback method to update progress indicators
-        if (callback != NULL)
-            switch (callback->updateCopyStatus(totalBytesTransferred))
-            {
-                case CallbackCopyFile::CONTINUE:
-                    break;
-
-                case CallbackCopyFile::CANCEL: //a user aborted operation IS an error condition!
-                    throw FileError(wxString(_("Error copying file:")) + wxT("\n\"") + zToWx(sourceFile) +  wxT("\" ->\n\"") +
-                                    zToWx(targetFile) + wxT("\"\n\n") + _("Operation aborted!"));
-            }
-    }
-    while (!eof);
-
-
-    if (totalBytesTransferred == 0) //BackupRead silently fails reading encrypted files -> double check!
-    {
-        LARGE_INTEGER inputSize = {};
-        if (!::GetFileSizeEx(hFileIn, &inputSize))
-            throw FileError(wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\"") +
-                            wxT("\n\n") + ffs3::getLastErrorFormatted());
-
-        if (inputSize.QuadPart != 0)
-            throw FileError(wxString(_("Error reading file:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\"") +
-                            wxT("\n\n") + wxT("unknown error"));
-    }
-
-    //time needs to be set at the end: BackupWrite() changes file time
-    if (!::SetFileTime(hFileOut,
-                       &infoFileIn.ftCreationTime,
-                       NULL,
-                       &infoFileIn.ftLastWriteTime))
-        throw FileError(wxString(_("Error changing modification time:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"") +
-                        wxT("\n\n") + ffs3::getLastErrorFormatted());
-
-
-#ifndef NDEBUG //dst hack: verify data written
-    if (dst::isFatDrive(targetFile)) //throw()
-    {
-        WIN32_FILE_ATTRIBUTE_DATA debugeAttr = {};
-        assert(::GetFileAttributesEx(applyLongPathPrefix(targetFile).c_str(), //__in   LPCTSTR lpFileName,
-                                     GetFileExInfoStandard,                   //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
-                                     &debugeAttr));                           //__out  LPVOID lpFileInformation
-
-        assert(::CompareFileTime(&debugeAttr.ftCreationTime,  &infoFileIn.ftCreationTime)  == 0);
-        assert(::CompareFileTime(&debugeAttr.ftLastWriteTime, &infoFileIn.ftLastWriteTime) == 0);
-    }
-#endif
-
-    guardTarget.Dismiss();
-
-    /*
-        //create test sparse file
-        size_t sparseSize = 50 * 1024 * 1024;
-        HANDLE hSparse = ::CreateFile(L"C:\\sparse.file",
-                                      GENERIC_READ | GENERIC_WRITE, //read access required for FSCTL_SET_COMPRESSION
-                                      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                      NULL,
-                                      CREATE_NEW,
-                                      FILE_FLAG_SEQUENTIAL_SCAN,
-                                      NULL);
-        DWORD br = 0;
-        if (!::DeviceIoControl(hSparse, FSCTL_SET_SPARSE, NULL, 0, NULL, 0, &br,NULL))
-            throw 1;
-
-        LARGE_INTEGER liDistanceToMove =  {};
-        liDistanceToMove.QuadPart = sparseSize;
-        if (!::SetFilePointerEx(hSparse, liDistanceToMove, NULL, FILE_BEGIN))
-            throw 1;
-
-        if (!SetEndOfFile(hSparse))
-            throw 1;
-
-        FILE_ZERO_DATA_INFORMATION zeroInfo = {};
-        zeroInfo.BeyondFinalZero.QuadPart = sparseSize;
-        if (!::DeviceIoControl(hSparse, FSCTL_SET_ZERO_DATA, &zeroInfo, sizeof(zeroInfo), NULL, 0, &br, NULL))
-            throw 1;
-
-        ::CloseHandle(hSparse);
-        */
-}
+//void rawCopyWinOptimized(const Zstring& sourceFile,
+//                         const Zstring& targetFile,
+//                         CallbackCopyFile* callback) //throw (FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked)
+//{
+//    /*
+//                BackupRead()	FileRead()		CopyFileEx()
+//    			--------------------------------------------
+//    Attributes  NO			    NO              YES
+//    create time NO              NO              NO
+//    ADS			YES				NO				YES
+//    Encrypted	NO(silent fail)	NO				YES
+//    Compressed	NO				NO				NO
+//    Sparse		YES				NO				NO
+//    PERF		    6% faster		            -
+//
+//    Mark stream as compressed: FSCTL_SET_COMPRESSION
+//        compatible with: BackupRead() FileRead()
+//    */
+//
+//    //open sourceFile for reading
+//    HANDLE hFileIn = ::CreateFile(ffs3::applyLongPathPrefix(sourceFile).c_str(),
+//                                  GENERIC_READ,
+//                                  FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //all shared modes are required to read files that are open in other applications
+//                                  NULL,
+//                                  OPEN_EXISTING,
+//                                  FILE_FLAG_SEQUENTIAL_SCAN,
+//                                  NULL);
+//    if (hFileIn == INVALID_HANDLE_VALUE)
+//    {
+//        const DWORD lastError = ::GetLastError();
+//        const wxString& errorMessage = wxString(_("Error opening file:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\"") + wxT("\n\n") + ffs3::getLastErrorFormatted(lastError);
+//
+//        //if file is locked (try to) use Windows Volume Shadow Copy Service
+//        if (lastError == ERROR_SHARING_VIOLATION ||
+//            lastError == ERROR_LOCK_VIOLATION)
+//            throw ErrorFileLocked(errorMessage);
+//
+//        throw FileError(errorMessage);
+//    }
+//    Loki::ScopeGuard dummy1 = Loki::MakeGuard(::CloseHandle, hFileIn);
+//    (void)dummy1; //silence warning "unused variable"
+//
+//
+//    BY_HANDLE_FILE_INFORMATION infoFileIn = {};
+//    if (!::GetFileInformationByHandle(hFileIn, &infoFileIn))
+//    {
+//        const wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\"");
+//        throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+//    }
+//
+//    //####################################### DST hack ###########################################
+//    if (dst::isFatDrive(sourceFile)) //throw()
+//    {
+//        const dst::RawTime rawTime(infoFileIn.ftCreationTime, infoFileIn.ftLastWriteTime);
+//        if (dst::fatHasUtcEncoded(rawTime)) //throw (std::runtime_error)
+//        {
+//            infoFileIn.ftLastWriteTime = dst::fatDecodeUtcTime(rawTime); //return last write time in real UTC, throw (std::runtime_error)
+//            ::GetSystemTimeAsFileTime(&infoFileIn.ftCreationTime);       //real creation time information is not available...
+//        }
+//    }
+//
+//    if (dst::isFatDrive(targetFile)) //throw()
+//    {
+//        const dst::RawTime encodedTime = dst::fatEncodeUtcTime(infoFileIn.ftLastWriteTime); //throw (std::runtime_error)
+//        infoFileIn.ftCreationTime  = encodedTime.createTimeRaw;
+//        infoFileIn.ftLastWriteTime = encodedTime.writeTimeRaw;
+//    }
+//    //####################################### DST hack ###########################################
+//
+//    const DWORD validAttribs = FILE_ATTRIBUTE_READONLY |
+//                               FILE_ATTRIBUTE_HIDDEN   |
+//                               FILE_ATTRIBUTE_SYSTEM   |
+//                               FILE_ATTRIBUTE_ARCHIVE  |            //those two are not set properly (not worse than ::CopyFileEx())
+//                               FILE_ATTRIBUTE_NOT_CONTENT_INDEXED | //
+//                               FILE_ATTRIBUTE_ENCRYPTED;
+//
+//    //create targetFile and open it for writing
+//    HANDLE hFileOut = ::CreateFile(ffs3::applyLongPathPrefix(targetFile).c_str(),
+//                                   GENERIC_READ | GENERIC_WRITE, //read access required for FSCTL_SET_COMPRESSION
+//                                   FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+//                                   NULL,
+//                                   CREATE_NEW,
+//                                   (infoFileIn.dwFileAttributes & validAttribs) | FILE_FLAG_SEQUENTIAL_SCAN,
+//                                   NULL);
+//    if (hFileOut == INVALID_HANDLE_VALUE)
+//    {
+//        const DWORD lastError = ::GetLastError();
+//        const wxString& errorMessage = wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"") +
+//                                       wxT("\n\n") + ffs3::getLastErrorFormatted(lastError);
+//
+//        if (lastError == ERROR_FILE_EXISTS)
+//            throw ErrorTargetExisting(errorMessage);
+//
+//        if (lastError == ERROR_PATH_NOT_FOUND)
+//            throw ErrorTargetPathMissing(errorMessage);
+//
+//        throw FileError(errorMessage);
+//    }
+//    Loki::ScopeGuard guardTarget = Loki::MakeGuard(&removeFile, targetFile); //transactional behavior: guard just after opening target and before managing hFileOut
+//
+//    Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hFileOut);
+//    (void)dummy; //silence warning "unused variable"
+//
+//
+//#ifndef _MSC_VER
+//#warning teste perf von GetVolumeInformationByHandleW
+//#endif
+//    DWORD fsFlags = 0;
+//    if (!GetVolumeInformationByHandleW(hFileOut, //__in       HANDLE hFile,
+//            NULL,     //__out_opt  LPTSTR lpVolumeNameBuffer,
+//            0,        //__in       DWORD nVolumeNameSize,
+//            NULL,     //__out_opt  LPDWORD lpVolumeSerialNumber,
+//            NULL,     //__out_opt  LPDWORD lpMaximumComponentLength,
+//            &fsFlags, //__out_opt  LPDWORD lpFileSystemFlags,
+//            NULL,     //__out      LPTSTR lpFileSystemNameBuffer,
+//            0))       //__in       DWORD nFileSystemNameSize
+//    {
+//        const wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\"");
+//        throw FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+//    }
+//
+//	const bool sourceIsEncrypted  = (infoFileIn.dwFileAttributes & FILE_ATTRIBUTE_ENCRYPTED)   != 0;
+//	const bool sourceIsCompressed = (infoFileIn.dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED)  != 0;
+//    const bool sourceIsSparse     = (infoFileIn.dwFileAttributes & FILE_ATTRIBUTE_SPARSE_FILE) != 0;
+//
+//    bool targetSupportSparse     = (fsFlags & FILE_SUPPORTS_SPARSE_FILES) != 0;
+//    bool targetSupportCompressed = (fsFlags & FILE_FILE_COMPRESSION     ) != 0;
+//	bool targetSupportStreams    = (fsFlags & FILE_NAMED_STREAMS        ) != 0;
+//
+//
+//    const bool useBackupFun = !sourceIsEncrypted; //http://msdn.microsoft.com/en-us/library/aa362509(v=VS.85).aspx
+//
+//    if (sourceIsCompressed && targetSupportCompressed)
+//    {
+//        USHORT cmpState = COMPRESSION_FORMAT_DEFAULT;
+//
+//        DWORD bytesReturned = 0;
+//        if (!DeviceIoControl(hFileOut,              //handle to file or directory
+//                             FSCTL_SET_COMPRESSION, //dwIoControlCode
+//                             &cmpState,             //input buffer
+//                             sizeof(cmpState),      //size of input buffer
+//                             NULL,                  //lpOutBuffer
+//                             0,                     //OutBufferSize
+//                             &bytesReturned,        //number of bytes returned
+//                             NULL))                 //OVERLAPPED structure
+//            throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"") +
+//                            wxT("\n\n") + ffs3::getLastErrorFormatted() +
+//                            wxT("\nFailed to write NTFS compressed attribute!"));
+//    }
+//
+//    //although it seems the sparse attribute is set automatically by BackupWrite, we are required to do this manually: http://support.microsoft.com/kb/271398/en-us
+//    if (sourceIsSparse && targetSupportSparse)
+//    {
+//        if (useBackupFun)
+//        {
+//            DWORD bytesReturned = 0;
+//            if (!DeviceIoControl(hFileOut,         //handle to file
+//                                 FSCTL_SET_SPARSE, //dwIoControlCode
+//                                 NULL,             //input buffer
+//                                 0,                //size of input buffer
+//                                 NULL,             //lpOutBuffer
+//                                 0,                //OutBufferSize
+//                                 &bytesReturned,   //number of bytes returned
+//                                 NULL))            //OVERLAPPED structure
+//                throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"") +
+//                                wxT("\n\n") + ffs3::getLastErrorFormatted() +
+//                                wxT("\nFailed to write NTFS sparse attribute!"));
+//        }
+//    }
+//
+//
+//    const DWORD BUFFER_SIZE = 512 * 1024; //512 kb seems to be a reasonable buffer size
+//    static const boost::scoped_array<BYTE> memory(new BYTE[BUFFER_SIZE]);
+//
+//    struct ManageCtxt //manage context for BackupRead()/BackupWrite()
+//    {
+//        ManageCtxt() : read(NULL), write(NULL) {}
+//        ~ManageCtxt()
+//        {
+//            if (read != NULL)
+//                ::BackupRead (0, NULL, 0, NULL, true, false, &read);
+//            if (write != NULL)
+//                ::BackupWrite(0, NULL, 0, NULL, true, false, &write);
+//        }
+//
+//        LPVOID read;
+//        LPVOID write;
+//    } context;
+//
+//    //copy contents of sourceFile to targetFile
+//    wxULongLong totalBytesTransferred;
+//
+//    bool eof = false;
+//    do
+//    {
+//        DWORD bytesRead = 0;
+//
+//        if (useBackupFun)
+//        {
+//            if (!::BackupRead(hFileIn,        //__in   HANDLE hFile,
+//                              memory.get(),   //__out  LPBYTE lpBuffer,
+//                              BUFFER_SIZE,    //__in   DWORD nNumberOfBytesToRead,
+//                              &bytesRead,     //__out  LPDWORD lpNumberOfBytesRead,
+//                              false,          //__in   BOOL bAbort,
+//                              false,          //__in   BOOL bProcessSecurity,
+//                              &context.read)) //__out  LPVOID *lpContext
+//                throw FileError(wxString(_("Error reading file:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\"") +
+//                                wxT("\n\n") + ffs3::getLastErrorFormatted());
+//        }
+//        else if (!::ReadFile(hFileIn,      //__in         HANDLE hFile,
+//                             memory.get(), //__out        LPVOID lpBuffer,
+//                             BUFFER_SIZE,  //__in         DWORD nNumberOfBytesToRead,
+//                             &bytesRead,   //__out_opt    LPDWORD lpNumberOfBytesRead,
+//                             NULL))        //__inout_opt  LPOVERLAPPED lpOverlapped
+//            throw FileError(wxString(_("Error reading file:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\"") +
+//                            wxT("\n\n") + ffs3::getLastErrorFormatted());
+//
+//        if (bytesRead > BUFFER_SIZE)
+//            throw FileError(wxString(_("Error reading file:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\"") +
+//                            wxT("\n\n") + wxT("buffer overflow"));
+//
+//        if (bytesRead < BUFFER_SIZE)
+//            eof = true;
+//
+//        DWORD bytesWritten = 0;
+//
+//        if (useBackupFun)
+//        {
+//            if (!::BackupWrite(hFileOut,        //__in   HANDLE hFile,
+//                               memory.get(),    //__in   LPBYTE lpBuffer,
+//                               bytesRead,       //__in   DWORD nNumberOfBytesToWrite,
+//                               &bytesWritten,   //__out  LPDWORD lpNumberOfBytesWritten,
+//                               false,           //__in   BOOL bAbort,
+//                               false,           //__in   BOOL bProcessSecurity,
+//                               &context.write)) //__out  LPVOID *lpContext
+//                throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"") +
+//                                wxT("\n\n") + ffs3::getLastErrorFormatted() + wxT(" (w)")); //w -> distinguish from fopen error message!
+//        }
+//        else if (!::WriteFile(hFileOut,      //__in         HANDLE hFile,
+//                              memory.get(),  //__out        LPVOID lpBuffer,
+//                              bytesRead,     //__in         DWORD nNumberOfBytesToWrite,
+//                              &bytesWritten, //__out_opt    LPDWORD lpNumberOfBytesWritten,
+//                              NULL))         //__inout_opt  LPOVERLAPPED lpOverlapped
+//            throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"") +
+//                            wxT("\n\n") + ffs3::getLastErrorFormatted() + wxT(" (w)")); //w -> distinguish from fopen error message!
+//
+//        if (bytesWritten != bytesRead)
+//            throw FileError(wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"") +
+//                            wxT("\n\n") + wxT("incomplete write"));
+//
+//        totalBytesTransferred += bytesRead;
+//
+//#ifndef _MSC_VER
+//#warning totalBytesTransferred  kann größer als filesize sein!!
+//#endif
+//
+//        //invoke callback method to update progress indicators
+//        if (callback != NULL)
+//            switch (callback->updateCopyStatus(totalBytesTransferred))
+//            {
+//                case CallbackCopyFile::CONTINUE:
+//                    break;
+//
+//                case CallbackCopyFile::CANCEL: //a user aborted operation IS an error condition!
+//                    throw FileError(wxString(_("Error copying file:")) + wxT("\n\"") + zToWx(sourceFile) +  wxT("\" ->\n\"") +
+//                                    zToWx(targetFile) + wxT("\"\n\n") + _("Operation aborted!"));
+//            }
+//    }
+//    while (!eof);
+//
+//
+//    if (totalBytesTransferred == 0) //BackupRead silently fails reading encrypted files -> double check!
+//    {
+//        LARGE_INTEGER inputSize = {};
+//        if (!::GetFileSizeEx(hFileIn, &inputSize))
+//            throw FileError(wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\"") +
+//                            wxT("\n\n") + ffs3::getLastErrorFormatted());
+//
+//        if (inputSize.QuadPart != 0)
+//            throw FileError(wxString(_("Error reading file:")) + wxT("\n\"") + zToWx(sourceFile) + wxT("\"") +
+//                            wxT("\n\n") + wxT("unknown error"));
+//    }
+//
+//    //time needs to be set at the end: BackupWrite() changes file time
+//    if (!::SetFileTime(hFileOut,
+//                       &infoFileIn.ftCreationTime,
+//                       NULL,
+//                       &infoFileIn.ftLastWriteTime))
+//        throw FileError(wxString(_("Error changing modification time:")) + wxT("\n\"") + zToWx(targetFile) + wxT("\"") +
+//                        wxT("\n\n") + ffs3::getLastErrorFormatted());
+//
+//
+//#ifndef NDEBUG //dst hack: verify data written
+//    if (dst::isFatDrive(targetFile)) //throw()
+//    {
+//        WIN32_FILE_ATTRIBUTE_DATA debugeAttr = {};
+//        assert(::GetFileAttributesEx(applyLongPathPrefix(targetFile).c_str(), //__in   LPCTSTR lpFileName,
+//                                     GetFileExInfoStandard,                   //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
+//                                     &debugeAttr));                           //__out  LPVOID lpFileInformation
+//
+//        assert(::CompareFileTime(&debugeAttr.ftCreationTime,  &infoFileIn.ftCreationTime)  == 0);
+//        assert(::CompareFileTime(&debugeAttr.ftLastWriteTime, &infoFileIn.ftLastWriteTime) == 0);
+//    }
+//#endif
+//
+//    guardTarget.Dismiss();
+//
+//    /*
+//        //create test sparse file
+//        size_t sparseSize = 50 * 1024 * 1024;
+//        HANDLE hSparse = ::CreateFile(L"C:\\sparse.file",
+//                                      GENERIC_READ | GENERIC_WRITE, //read access required for FSCTL_SET_COMPRESSION
+//                                      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+//                                      NULL,
+//                                      CREATE_NEW,
+//                                      FILE_FLAG_SEQUENTIAL_SCAN,
+//                                      NULL);
+//        DWORD br = 0;
+//        if (!::DeviceIoControl(hSparse, FSCTL_SET_SPARSE, NULL, 0, NULL, 0, &br,NULL))
+//            throw 1;
+//
+//        LARGE_INTEGER liDistanceToMove =  {};
+//        liDistanceToMove.QuadPart = sparseSize;
+//        if (!::SetFilePointerEx(hSparse, liDistanceToMove, NULL, FILE_BEGIN))
+//            throw 1;
+//
+//        if (!SetEndOfFile(hSparse))
+//            throw 1;
+//
+//        FILE_ZERO_DATA_INFORMATION zeroInfo = {};
+//        zeroInfo.BeyondFinalZero.QuadPart = sparseSize;
+//        if (!::DeviceIoControl(hSparse, FSCTL_SET_ZERO_DATA, &zeroInfo, sizeof(zeroInfo), NULL, 0, &br, NULL))
+//            throw 1;
+//
+//        ::CloseHandle(hSparse);
+//        */
+//}
 #endif
 
 
@@ -2005,10 +1989,11 @@ void copyFileImpl(const Zstring& sourceFile,
         Compressed	NO              YES
         Sparse		NO              YES
         PERF		-               6% faster
+        SAMBA, ect. YES            UNKNOWN!
     */
 
-    //rawCopyWinApi(sourceFile, targetFile, callback);     //throw (FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked)
-    rawCopyWinOptimized(sourceFile, targetFile, callback); //throw (FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked) ->about 8% faster
+    rawCopyWinApi(sourceFile, targetFile, callback);     //throw (FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked)
+    //rawCopyWinOptimized(sourceFile, targetFile, callback); //throw (FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked) ->about 8% faster
 
 #elif defined FFS_LINUX
     rawCopyStream(sourceFile, targetFile, callback); //throw (FileError: ErrorTargetPathMissing, ErrorTargetExisting)

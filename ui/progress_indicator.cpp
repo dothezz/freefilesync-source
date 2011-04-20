@@ -728,6 +728,8 @@ void SyncStatus::SyncStatusImpl::resetGauge(int totalObjectsToProcess, wxLongLon
 
 void SyncStatus::SyncStatusImpl::incProgressIndicator_NoUpdate(int objectsProcessed, wxLongLong dataProcessed)
 {
+    //assert(dataProcessed >= 0);
+
     currentData    +=    dataProcessed;
     currentObjects += objectsProcessed;
 }

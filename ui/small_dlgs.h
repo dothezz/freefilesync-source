@@ -36,8 +36,7 @@ DefaultReturnCode::Response showDeleteDialog(
     const std::vector<FileSystemObject*>& rowsOnLeft,
     const std::vector<FileSystemObject*>& rowsOnRight,
     bool& deleteOnBothSides,
-    bool& useRecycleBin,
-    int& totalDeleteCount);
+    bool& useRecycleBin);
 
 DefaultReturnCode::Response showCustomizeColsDlg(xmlAccess::ColumnAttributes& attr);
 

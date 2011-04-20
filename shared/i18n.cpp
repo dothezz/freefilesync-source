@@ -16,6 +16,7 @@
 #include <boost/any.hpp>
 #include <boost/shared_ptr.hpp>
 #include <list>
+#include <iterator>
 
 using ffs3::LocalizationInfo;
 
@@ -552,51 +553,79 @@ int ffs3::retrieveSystemLanguage()
 
 
 
-
+//http://www.gnu.org/software/hello/manual/gettext/Plural-forms.html
+//http://translate.sourceforge.net/wiki/l10n/pluralforms
 /*
-typedef Zbase<wchar_t> Wstring;
+Plural forms parser: Grammar
+----------------------------
+expression:
+    conditional-expression
 
-const Wstring TK_TERNARY_QUEST = L"?";
-const Wstring TK_TERNARY_COLON = L":";
-const Wstring TK_OR            = L"||";
-const Wstring TK_AND           = L"&&";
-const Wstring TK_EQUAL         = L"==";
-const Wstring TK_NOT_EQUAL     = L"!=";
-const Wstring TK_LESS          = L"<";
-const Wstring TK_LESS_EQUAL    = L"<=";
-const Wstring TK_GREATER       = L">";
-const Wstring TK_GREATER_EQUAL = L">=";
-const Wstring TK_MODULUS       = L"%";
-const Wstring TK_N             = L"n";
-const Wstring TK_BRACKET_LEFT  = L"(";
-const Wstring TK_BRACKET_RIGHT = L")";
-const Wstring TK_FORM_COUNT    = L"nplurals=";
-const Wstring TK_PHRASE_BEGIN  = L"plural=";
+conditional-expression:
+    logical-or-expression
+    logical-or-expression ? expression : expression
 
+logical-or-expression:
+    logical-and-expression
+    logical-or-expression || logical-and-expression
+
+logical-and-expression:
+    equality-expression
+    logical-and-expression && equality-expression
+
+equality-expression:
+    relational-expression
+    relational-expression == relational-expression
+    relational-expression != relational-expression
+
+relational-expression:
+    multiplicative-expression
+    multiplicative-expression >  multiplicative-expression
+    multiplicative-expression <  multiplicative-expression
+    multiplicative-expression >= multiplicative-expression
+    multiplicative-expression <= multiplicative-expression
+
+multiplicative-expression:
+    pm-expression
+    multiplicative-expression % pm-expression
+
+pm-expression:
+    N
+    Number
+    ( Expression )
+*/
+
+
+
+//expression interface
+struct Expression { virtual ~Expression() {} };
 
 template <class T>
-struct Expr
+struct Expr : public Expression
 {
     typedef T ValueType;
     virtual ValueType eval() const = 0;
 };
 
-
-template <class In, class Out, class BiOp>
-struct GenericBiExp : public Out
+//specific binary expression based on STL function objects
+template <class StlOp>
+struct BinaryExp : public Expr<typename StlOp::result_type>
 {
-    GenericBiExp(const In& lhs, const In& rhs, BiOp biop) : lhs_(lhs), rhs_(rhs), biop_(biop) {}
-    virtual typename Out::ValueType eval() const { return biop_(lhs_.eval(), rhs_.eval()); }
-    const In& lhs_;
-    const In& rhs_;
-    BiOp biop_;
+    typedef const Expr<typename StlOp::first_argument_type> SourceExp;
+
+    BinaryExp(const SourceExp& lhs, const SourceExp& rhs, StlOp biop) : lhs_(lhs), rhs_(rhs), biop_(biop) {}
+    virtual typename StlOp::result_type eval() const { return biop_(lhs_.eval(), rhs_.eval()); }
+    const SourceExp& lhs_;
+    const SourceExp& rhs_;
+    StlOp biop_;
 };
 
-template <class Out, class In, class BiOp>
+template <class StlOp>
 inline
-GenericBiExp<In, Out, BiOp> makeBiExp(const In& lhs, const In& rhs, BiOp biop)
+BinaryExp<StlOp> makeBiExp(const Expression& lhs, const Expression& rhs, StlOp biop) //throw (std::bad_cast)
 {
-    return GenericBiExp<In, Out, BiOp>(lhs, rhs, biop);
+    return BinaryExp<StlOp>(dynamic_cast<const Expr<typename StlOp::first_argument_type >&>(lhs),
+                            dynamic_cast<const Expr<typename StlOp::second_argument_type>&>(rhs), biop);
 }
 
 template <class Out>
@@ -612,39 +641,33 @@ struct TernaryExp : public Out
 struct LiteralNumberEx : public Expr<int>
 {
     LiteralNumberEx(int n) : n_(n) {}
-    virtual ValueType eval() const { return n_; }
+    virtual int eval() const { return n_; }
     int n_;
 };
 
 struct NumberN : public Expr<int>
 {
     NumberN(int& n) : n_(n) {}
-    virtual ValueType eval() const { return n_; }
+    virtual int eval() const { return n_; }
     int& n_;
 };
+
+
+typedef Zbase<wchar_t> Wstring;
 
 
 class PluralForm
 {
 public:
-    struct ParserError {};
+    struct ParsingError {};
 
-    PluralForm(const Wstring& phrase) //.po format,e.g.: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)
+    PluralForm(const Wstring& phrase) : n_(0) //.po format,e.g.: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)
     {
-        Wstring tmp;
-        std::remove_copy_if(phrase.begin(), phrase.end(), std::back_inserter(tmp), std::iswspace);
-
-        size_t pos = tmp.find(TK_FORM_COUNT);
-        if (pos == Wstring::npos)
-            throw ParserError();
-
-        count = tmp.substr(pos + TK_FORM_COUNT.size()).toNumber<int>();
-
-        pos = tmp.find(TK_PHRASE_BEGIN);
-        if (pos == Wstring::npos)
-            throw ParserError();
-
-        expr = &parseNumber(tmp.substr(pos + TK_PHRASE_BEGIN.size()));
+        Parser(phrase, //in
+               expr,   //out
+               n_,     //
+               count,  //
+               dump);  //
     }
 
     int formCount() const { return count; }
@@ -652,95 +675,397 @@ public:
     int getForm(int n) const { n_ = n ; return expr->eval(); }
 
 private:
-    const Expr<bool>& parseBool(const Wstring& phrase)
+    typedef std::list<boost::shared_ptr<Expression> > DumpList;
+
+    struct Token
     {
-        Wstring part1, part2;
-        if (trySplit(phrase, TK_OR, part1, part2))
-            return manageObj(makeBiExp<Expr<bool> >(parseBool(part1), parseBool(part2), std::logical_or<bool>()));
-        else if (trySplit(phrase, TK_AND, part1, part2))
-            return manageObj(makeBiExp<Expr<bool> >(parseBool(part1), parseBool(part2), std::logical_and<bool>()));
-        else if (trySplit(phrase, TK_EQUAL, part1, part2))
-            return manageObj(makeBiExp<Expr<bool> >(parseNumber(part1), parseNumber(part2), std::equal_to<int>()));
-        else if (trySplit(phrase, TK_NOT_EQUAL, part1, part2))
-            return manageObj(makeBiExp<Expr<bool> >(parseNumber(part1), parseNumber(part2), std::not_equal_to<int>()));
-        else if (trySplit(phrase, TK_LESS, part1, part2))
-            return manageObj(makeBiExp<Expr<bool> >(parseNumber(part1), parseNumber(part2), std::less<int>()));
-        else if (trySplit(phrase, TK_LESS_EQUAL, part1, part2))
-            return manageObj(makeBiExp<Expr<bool> >(parseNumber(part1), parseNumber(part2), std::less_equal<int>()));
-        else if (trySplit(phrase, TK_GREATER, part1, part2))
-            return manageObj(makeBiExp<Expr<bool> >(parseNumber(part1), parseNumber(part2), std::greater<int>()));
-        else if (trySplit(phrase, TK_GREATER_EQUAL, part1, part2))
-            return manageObj(makeBiExp<Expr<bool> >(parseNumber(part1), parseNumber(part2), std::greater_equal<int>()));
-        else
-            throw ParserError();
-    }
-
-    const Expr<int>& parseNumber(const Wstring& phrase)
-    {
-        Wstring part1, part2;
-
-
-        if (trySplit(phrase, TK_TERNARY_QUEST, part1, part2, TO_LEFT))
+        enum Type
         {
-            Wstring part3;
-            if (!trySplit(Wstring(part2), TK_TERNARY_COLON, part2, part3, TO_LEFT))
-                throw ParserError();
-            return manageObj(TernaryExp<Expr<int> >(parseBool(part1), parseNumber(part2), parseNumber(part3)));
-        }
-        else if (trySplit(phrase, TK_MODULUS, part1, part2))
-            return manageObj(makeBiExp<Expr<int> >(parseNumber(part1), parseNumber(part2), std::modulus<int>()));
-        else if (phrase == TK_N)
-            return manageObj(NumberN(n_));
-        else //expect literal number
-        {
-            if (std::find_if(phrase.begin(), phrase.end(), std::not1(std::ptr_fun(std::iswdigit))) != phrase.end())
-                throw ParserError();
-            return manageObj(LiteralNumberEx(phrase.toNumber<int>()));
-        }
-    }
+            TK_FORM_COUNT,
+            TK_PHRASE_BEGIN,
+            TK_ASSIGN,
+            TK_SEMICOLON,
+            TK_TERNARY_QUEST,
+            TK_TERNARY_COLON,
+            TK_OR,
+            TK_AND,
+            TK_EQUAL,
+            TK_NOT_EQUAL,
+            TK_LESS,
+            TK_LESS_EQUAL,
+            TK_GREATER,
+            TK_GREATER_EQUAL,
+            TK_MODULUS,
+            TK_N,
+            TK_NUMBER,
+            TK_BRACKET_LEFT,
+            TK_BRACKET_RIGHT,
+            TK_END
+        };
 
-    enum Associativity
-    {
-        TO_LEFT,
-        TO_RIGHT
+        Token(Type t) : type(t), number(0) {}
+
+        Type type;
+        int number; //if type == TK_NUMBER
     };
-    static bool trySplit(const Wstring& phrase, const Wstring& delimiter, Wstring& part1, Wstring& part2, Associativity assoc = TO_RIGHT)
+
+    class Scanner
     {
-        size_t pos = assoc == TO_LEFT ?
-                     phrase.find(delimiter) : //reverse [!]
-                     phrase.rfind(delimiter);
-        if (pos == Wstring::npos)
-            return false;
+    public:
+        Scanner(const Wstring& phrase) : phrase_(phrase)
+        {
+            tokens.push_back(std::make_pair(L"nplurals", Token::TK_FORM_COUNT));
+            tokens.push_back(std::make_pair(L"plural"  , Token::TK_PHRASE_BEGIN));
+            tokens.push_back(std::make_pair(L";" , Token::TK_SEMICOLON    ));
+            tokens.push_back(std::make_pair(L"?" , Token::TK_TERNARY_QUEST));
+            tokens.push_back(std::make_pair(L":" , Token::TK_TERNARY_COLON));
+            tokens.push_back(std::make_pair(L"||", Token::TK_OR           ));
+            tokens.push_back(std::make_pair(L"&&", Token::TK_AND          ));
+            tokens.push_back(std::make_pair(L"==", Token::TK_EQUAL        ));
+            tokens.push_back(std::make_pair(L"=" , Token::TK_ASSIGN       ));
+            tokens.push_back(std::make_pair(L"!=", Token::TK_NOT_EQUAL    ));
+            tokens.push_back(std::make_pair(L"<=", Token::TK_LESS_EQUAL   ));
+            tokens.push_back(std::make_pair(L"<" , Token::TK_LESS         ));
+            tokens.push_back(std::make_pair(L">=", Token::TK_GREATER_EQUAL));
+            tokens.push_back(std::make_pair(L">" , Token::TK_GREATER      ));
+            tokens.push_back(std::make_pair(L"%" , Token::TK_MODULUS      ));
+            tokens.push_back(std::make_pair(L"n" , Token::TK_N            ));
+            tokens.push_back(std::make_pair(L"N" , Token::TK_N            ));
+            tokens.push_back(std::make_pair(L"(" , Token::TK_BRACKET_LEFT ));
+            tokens.push_back(std::make_pair(L")" , Token::TK_BRACKET_RIGHT));
+        }
 
-        part1 = phrase.substr(0, pos);
-        part2 = phrase.substr(pos + delimiter.size());
-        return true;
-    }
+        Token nextToken()
+        {
+            phrase_.Trim(true, false); //remove whitespace
 
-    template <class T>
-    const T& manageObj(const T& obj)
+            if (phrase_.empty()) return Token(Token::TK_END);
+
+            for (TokenList::const_iterator i = tokens.begin(); i != tokens.end(); ++i)
+                if (phrase_.StartsWith(i->first))
+                {
+                    phrase_ = phrase_.substr(i->first.size());
+                    return Token(i->second);
+                }
+
+            Wstring::iterator digitEnd = std::find_if(phrase_.begin(), phrase_.end(), std::not1(std::ptr_fun(std::iswdigit)));
+            int digitCount = digitEnd - phrase_.begin();
+            if (digitCount != 0)
+            {
+                Token out(Token::TK_NUMBER);
+                out.number = Wstring(phrase_.c_str(), digitCount).toNumber<int>();
+                phrase_ = phrase_.substr(digitCount);
+                return out;
+            }
+
+            throw ParsingError(); //unknown token
+        }
+
+    private:
+        typedef std::vector<std::pair<Wstring, Token::Type> > TokenList;
+        TokenList tokens;
+        Wstring phrase_;
+    };
+
+
+    class Parser
     {
-        dump.push_back(obj);
-        return *boost::any_cast<T>(&dump.back());
-    }
+    public:
+        Parser(const Wstring& phrase, //in
+               const Expr<int>*& expr, int& n, int& count, PluralForm::DumpList& dump) ://out
+            scn(phrase),
+            tk(scn.nextToken()),
+            n_(n),
+            dump_(dump)
+        {
+            consumeToken(Token::TK_FORM_COUNT);
+            consumeToken(Token::TK_ASSIGN);
 
-    int count;
+            count = token().number;
+            consumeToken(Token::TK_NUMBER);
+
+            consumeToken(Token::TK_SEMICOLON);
+            consumeToken(Token::TK_PHRASE_BEGIN);
+            consumeToken(Token::TK_ASSIGN);
+
+            try
+            {
+                const Expression& e = parse();
+                expr = &dynamic_cast<const Expr<int>&>(e);
+            }
+            catch(std::bad_cast&) { throw ParsingError(); }
+
+            consumeToken(Token::TK_END);
+        }
+
+    private:
+        void nextToken() { tk = scn.nextToken(); }
+        const Token& token() const { return tk; }
+
+        void consumeToken(Token::Type t)
+        {
+            if (token().type != t)
+                throw ParsingError();
+            nextToken();
+        }
+
+        const Expression& parse() { return parseConditional(); };
+
+        const Expression& parseConditional()
+        {
+            const Expression& e = parseLogicalOr();
+
+            if (token().type == Token::TK_TERNARY_QUEST)
+            {
+                nextToken();
+                const Expression& thenEx = parse(); //associativity: <-
+                consumeToken(Token::TK_TERNARY_COLON);
+                const Expression& elseEx = parse(); //
+
+                return manageObj(TernaryExp<Expr<int> >(dynamic_cast<const Expr<bool>&>(e),
+                                                        dynamic_cast<const Expr<int>&>(thenEx),
+                                                        dynamic_cast<const Expr<int>&>(elseEx)));
+            }
+            return e;
+        }
+
+        const Expression& parseLogicalOr()
+        {
+            const Expression* e = &parseLogicalAnd();
+            for (;;) //associativity: ->
+                if (token().type == Token::TK_OR)
+                {
+                    nextToken();
+                    const Expression& rhs = parseLogicalAnd();
+                    e = &manageObj(makeBiExp(*e, rhs, std::logical_or<bool>()));
+                }
+                else break;
+            return *e;
+        }
+
+        const Expression& parseLogicalAnd()
+        {
+            const Expression* e = &parseEquality();
+            for (;;) //associativity: ->
+                if (token().type == Token::TK_AND)
+                {
+                    nextToken();
+                    const Expression& rhs = parseEquality();
+
+                    e = &manageObj(makeBiExp(*e, rhs, std::logical_and<bool>()));
+                }
+                else break;
+            return *e;
+        }
+
+        const Expression& parseEquality()
+        {
+            const Expression& e = parseRelational();
+
+            Token::Type t = token().type;
+            if (t == Token::TK_EQUAL || t == Token::TK_NOT_EQUAL) //associativity: n/a
+            {
+                nextToken();
+                const Expression& rhs = parseRelational();
+
+                if (t == Token::TK_EQUAL)
+                    return manageObj(makeBiExp(e, rhs, std::equal_to<int>()));
+                else
+                    return manageObj(makeBiExp(e, rhs, std::not_equal_to<int>()));
+            }
+            return e;
+        }
+
+        const Expression& parseRelational()
+        {
+            const Expression& e = parseMultiplicative();
+
+            Token::Type t = token().type;
+            if (t == Token::TK_LESS      || //associativity: n/a
+                t == Token::TK_LESS_EQUAL||
+                t == Token::TK_GREATER   ||
+                t == Token::TK_GREATER_EQUAL)
+            {
+                nextToken();
+                const Expression& rhs = parseMultiplicative();
+
+                if (t == Token::TK_LESS)          return manageObj(makeBiExp(e, rhs, std::less         <int>()));
+                if (t == Token::TK_LESS_EQUAL)    return manageObj(makeBiExp(e, rhs, std::less_equal   <int>()));
+                if (t == Token::TK_GREATER)       return manageObj(makeBiExp(e, rhs, std::greater      <int>()));
+                if (t == Token::TK_GREATER_EQUAL) return manageObj(makeBiExp(e, rhs, std::greater_equal<int>()));
+            }
+            return e;
+        }
+
+        const Expression& parseMultiplicative()
+        {
+            const Expression* e = &parsePrimary();
+
+            for (;;) //associativity: ->
+                if (token().type == Token::TK_MODULUS)
+                {
+                    nextToken();
+                    const Expression& rhs = parsePrimary();
+
+                    //"compile-time" check: n % 0
+                    const LiteralNumberEx* literal = dynamic_cast<const LiteralNumberEx*>(&rhs);
+                    if (literal && literal->eval() == 0)
+                        throw ParsingError();
+
+                    e = &manageObj(makeBiExp(*e, rhs, std::modulus<int>()));
+                }
+                else break;
+            return *e;
+        }
+
+        const Expression& parsePrimary()
+        {
+            if (token().type == Token::TK_N)
+            {
+                nextToken();
+                return manageObj(NumberN(n_));
+            }
+            else if (token().type == Token::TK_NUMBER)
+            {
+                const int number = token().number;
+                nextToken();
+                return manageObj(LiteralNumberEx(number));
+            }
+            else if (token().type == Token::TK_BRACKET_LEFT)
+            {
+                nextToken();
+                const Expression& e = parse();
+
+                consumeToken(Token::TK_BRACKET_RIGHT);
+                return e;
+            }
+            else
+                throw ParsingError();
+        }
+
+        template <class T>
+        const T& manageObj(const T& obj)
+        {
+            boost::shared_ptr<Expression> newEntry(new T(obj));
+            dump_.push_back(newEntry);
+            return static_cast<T&>(*dump_.back());
+        }
+
+        Scanner scn;
+        Token tk;
+
+        int& n_;
+        DumpList& dump_; //manage polymorphc object lifetimes
+    };
+
     const Expr<int>* expr;
     mutable int n_;
+    int count;
 
-    std::list<boost::any> dump; //manage polymorphc object lifetimes
+    PluralForm::DumpList dump; //manage polymorphc object lifetimes
 };
 
 
-    PluralForm dummy(L"nplurals=3; plural=n == 1 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 > 20) ? 1 : 2");
-    int ddf = dummy.formCount();
-    int kddf = dummy.getForm(0);
-*/
+const wchar_t formPol[] = L"nplurals=3; plural=n == 1 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 > 20) ? 1 : 2";
+int tstPol(int n)
+{
+    return n == 1 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 > 20) ? 1 : 2;
+}
 
+const wchar_t formRu[] = L"nplurals= 3; plural=n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 > 20) ? 1 : 2";
+int tstRu(int n)
+{
+    return n % 10 == 1 && n % 100 != 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 > 20) ? 1 : 2 ;
+}
+
+const wchar_t formLit[] = L"nplurals =3; plural=n% 10 == 1&& n % 100 != 11 ? 0 : n % 100 != 12&& n % 10 == 2 ? 1 : 0";
+int tstLit(int n)
+{
+    return n % 10 == 1&& n % 100 != 11 ? 0 : n % 100 != 12&& n % 10 == 2 ? 1 : 0;
+}
+
+const wchar_t formArab[] = L"nplurals = 6; plural = n == 0 ? 0 : n == 1 ? 1 : n == 2 ? 2 : (n % 100 >= 3 && n % 100 <= 10) ? 3 : (n % 100 >= 11 && n % 100 <= 99) || (n % 100 == 1) || (n % 100 ==2) ? 4 : 5";
+int tstArab(int n)
+{
+    return n == 0 ? 0 : n == 1 ? 1 : n == 2 ? 2 : (n % 100 >= 3 && n % 100 <= 10) ? 3 : (n % 100 >= 11 && n % 100 <= 99) || (n % 100 == 1) || (n % 100 ==2) ? 4 : 5;
+}
+
+const wchar_t formGerm[] = L"nplurals=2; plural= n == 1 ? 0 : 1";
+int tstGerm(int n)
+{
+    return n == 1 ? 0 : 1;
+}
+
+const wchar_t formFren[] = L"nplurals=2; plural= n <= 1 ? 0 : 1";
+int tstFren(int n)
+{
+    return n <= 1 ? 0 : 1;
+}
+
+const wchar_t formJap[] = L"nplurals=1; plural=0";
+int tstJap(int n)
+{
+    return 0;
+}
+
+const wchar_t formRom[] = L"nplurals=3; plural= n == 1 ? 0 : n == 0 || (n % 100 >= 1 && n % 100 <= 20) ? 1 : 2	";
+int tstRom(int n)
+{
+    return n == 1 ? 0 : n == 0 || (n % 100 >= 1 && n % 100 <= 20) ? 1 : 2	;
+}
+
+const wchar_t formCze[] = L" nplurals=3; plural= n % 100 == 1 ? 0 : n % 100 >= 2 && n % 100 <= 4 ? 1 : 2";
+int tstCze(int n)
+{
+    return n % 100 == 1 ? 0 : n % 100 >= 2 && n % 100 <= 4 ? 1 : 2;
+}
+
+const wchar_t formSlov[] = L" nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3 ";
+int tstSlov(int n)
+{
+    return n % 100 == 1 ? 0 : n % 100 == 2 ? 1 : n % 100 == 3 || n % 100 == 4 ? 2 : 3;
+}
+
+void unitTest()
+{
+    typedef int (*TestFun)(int);
+    typedef std::vector<std::pair<const wchar_t*, TestFun> > PhraseFunList;
+    PhraseFunList phrases;
+    phrases.push_back(std::make_pair(formPol,  &tstPol));
+    phrases.push_back(std::make_pair(formRu,   &tstRu));
+    phrases.push_back(std::make_pair(formLit,  &tstLit));
+    phrases.push_back(std::make_pair(formArab, &tstArab));
+    phrases.push_back(std::make_pair(formGerm, &tstGerm));
+    phrases.push_back(std::make_pair(formFren, &tstFren));
+    phrases.push_back(std::make_pair(formJap,  &tstJap));
+    phrases.push_back(std::make_pair(formRom,  &tstRom));
+    phrases.push_back(std::make_pair(formCze,  &tstCze));
+    phrases.push_back(std::make_pair(formSlov, &tstSlov));
+
+    for (PhraseFunList::const_iterator i = phrases.begin(); i != phrases.end(); ++i)
+    {
+        PluralForm pf(i->first);
+        for (int j = 0; j < 10000000; ++j)
+            assert((i->second)(j) == pf.getForm(j));
+    }
+}
 
 
 wxString ffs3::translate(const wxString& original) //translate into currently selected language
 {
+	/*
+    int ba = 3;
+
+    unitTest();
+
+#ifndef _MSC_VER
+#warning 3434
+#endif
+
+	*/
+
+
+
     //look for translation in buffer table
     const Translation::const_iterator i = activeTranslation.find(original);
     if (i != activeTranslation.end())

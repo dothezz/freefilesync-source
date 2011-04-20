@@ -699,7 +699,7 @@ struct CallbackRemoveDirImpl : public CallbackRemoveDir
 {
     CallbackRemoveDirImpl(StatusHandler& handler) : statusHandler_(handler) {}
 
-    virtual void requestUiRefresh(const Zstring& currentObject)
+    virtual void notifyDeletion(const Zstring& currentObject)
     {
         statusHandler_.requestUiRefresh(); //exceptions may be thrown here!
     }
@@ -943,8 +943,8 @@ void SynchronizeFolderPair::execute(HierarchyObject& hierObj)
     //synchronize files:
     for (HierarchyObject::SubFileMapping::iterator i = hierObj.useSubFiles().begin(); i != hierObj.useSubFiles().end(); ++i)
     {
-        if (( reduceDiskSpace &&  diskSpaceIsReduced(*i)) ||
-            (!reduceDiskSpace && !diskSpaceIsReduced(*i)))
+		const bool letsDoThis = reduceDiskSpace == diskSpaceIsReduced(*i);
+        if (letsDoThis)
             tryReportingError(statusUpdater_, boost::bind(&SynchronizeFolderPair::synchronizeFile, this, boost::ref(*i)));
     }
 
@@ -958,14 +958,17 @@ void SynchronizeFolderPair::execute(HierarchyObject& hierObj)
     {
         const SyncOperation syncOp = i->getSyncOperation();
 
-        if (( reduceDiskSpace &&  diskSpaceIsReduced(*i)) || //ensure folder creation happens in second pass, to enable time adaption below
-            (!reduceDiskSpace && !diskSpaceIsReduced(*i)))   //
+		 //ensure folder creation happens in second pass, to enable time adaption below
+		const bool letsDoThis = reduceDiskSpace == diskSpaceIsReduced(*i);
+
+        if (letsDoThis)
             tryReportingError(statusUpdater_, boost::bind(&SynchronizeFolderPair::synchronizeFolder, this, boost::ref(*i)));
 
         //recursive synchronization:
         execute<reduceDiskSpace>(*i);
 
         //adapt folder modification dates: apply AFTER all subobjects have been synced to preserve folder modification date!
+		if (letsDoThis)
         try
         {
             switch (syncOp)
@@ -1905,7 +1908,7 @@ void SynchronizeFolderPair::copyFileUpdating(const Zstring& source, const Zstrin
         const Zstring targetDir   = target.BeforeLast(common::FILE_NAME_SEPARATOR);
         const Zstring templateDir = source.BeforeLast(common::FILE_NAME_SEPARATOR);
 
-        if (!targetDir.empty() && !ffs3::dirExists(targetDir))
+        if (!targetDir.empty())
         {
             ffs3::createDirectory(targetDir, templateDir, copyFilePermissions_); //throw (FileError)
             /*symbolic link handling:

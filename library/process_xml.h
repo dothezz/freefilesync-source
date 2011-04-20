@@ -161,7 +161,7 @@ struct XmlGlobalSettings
         {
             //default external apps will be translated "on the fly"!!!
 #ifdef FFS_WIN
-            externelApplications.push_back(std::make_pair(wxT("Open with Explorer"), //mark for extraction: _("Open with Explorer")
+            externelApplications.push_back(std::make_pair(wxT("Show in Explorer"), //mark for extraction: _("Show in Explorer")
                                                           wxT("explorer /select, \"%name\"")));
             externelApplications.push_back(std::make_pair(wxT("Open with default application"), //mark for extraction: _("Open with default application")
                                                           wxT("cmd /c start \"\" \"%name\"")));

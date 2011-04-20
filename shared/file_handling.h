@@ -19,9 +19,9 @@ struct CallbackMoveFile;
 struct CallbackCopyFile;
 
 
-bool fileExists(     const Zstring& filename); //throw()       replaces wxFileExists()
-bool dirExists(      const Zstring& dirname);  //throw()       replaces wxDirExists()
-bool symlinkExists(  const Zstring& objname);  //throw()       check whether a symbolic link exists
+bool fileExists     (const Zstring& filename); //throw()       replaces wxFileExists()
+bool dirExists      (const Zstring& dirname);  //throw()       replaces wxDirExists()
+bool symlinkExists  (const Zstring& objname);  //throw()       check whether a symbolic link exists
 bool somethingExists(const Zstring& objname);  //throw()       check whether any object with this name exists
 
 //check whether two folders are located on the same (logical) volume
@@ -42,7 +42,7 @@ wxULongLong getFilesize(const Zstring& filename); //throw (FileError)
 
 
 //file handling
-void removeFile(const Zstring& filename);       //throw (FileError)
+bool removeFile(const Zstring& filename); //return "true" if file was actually deleted; throw (FileError)
 void removeDirectory(const Zstring& directory, CallbackRemoveDir* callback = NULL); //throw (FileError)
 
 
@@ -85,7 +85,7 @@ void copySymlink(const Zstring& sourceLink, const Zstring& targetLink, SymlinkTy
 struct CallbackRemoveDir
 {
     virtual ~CallbackRemoveDir() {}
-    virtual void requestUiRefresh(const Zstring& currentObject) = 0;
+    virtual void notifyDeletion(const Zstring& currentObject) = 0;
 };
 
 
