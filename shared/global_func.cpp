@@ -5,10 +5,14 @@
 // **************************************************************************
 //
 #include "global_func.h"
+#include "string_tools.h"
 #include <wx/msgdlg.h>
 #include <wx/file.h>
 #include <wx/stopwatch.h>
 #include "system_constants.h"
+
+using namespace common;
+using namespace zen;
 
 
 size_t common::getDigitCount(size_t number) //count number of digits
@@ -55,13 +59,13 @@ void DebugLog::write(const wxString& logText)
     }
 
     logFile->Write(wxString(wxT("[")) + wxDateTime::Now().FormatTime() + wxT("] "));
-    logFile->Write(logText + common::LINE_BREAK);
+    logFile->Write(logText + LINE_BREAK);
 }
 
 //DebugLog logDebugInfo;
 
 
-wxString getCodeLocation(const wxString file, const int line)
+wxString getCodeLocation(const wxString& file, int line)
 {
-    return wxString(file).AfterLast(common::FILE_NAME_SEPARATOR) + wxT(", LINE ") + wxLongLong(line).ToString() + wxT(" | ");
+    return wxString(file).AfterLast(FILE_NAME_SEPARATOR) + wxT(", LINE ") + toString<wxString>(line) + wxT(" | ");
 }

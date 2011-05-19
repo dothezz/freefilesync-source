@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iterator>
 #include <limits>
+#include <set>
 #include <wx/msgdlg.h>
 #include <wx/taskbar.h>
 #include <wx/app.h>
@@ -23,6 +24,7 @@
 #include "../shared/i18n.h"
 #include "../shared/assert_static.h"
 #include "../shared/build_info.h"
+#include "../shared/shell_execute.h"
 
 using namespace rts;
 
@@ -225,7 +227,7 @@ std::vector<Zstring> convert(const std::vector<wxString>& dirList)
 {
     std::set<Zstring, LessFilename> output;
     std::transform(dirList.begin(), dirList.end(),
-                   std::inserter(output, output.end()), static_cast<Zstring (*)(const wxString&)>(ffs3::wxToZ));
+                   std::inserter(output, output.end()), static_cast<Zstring (*)(const wxString&)>(zen::wxToZ));
     return std::vector<Zstring>(output.begin(), output.end());
 }
 }
@@ -296,7 +298,11 @@ rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& 
         WaitCallbackImpl callback(jobname);
 
         if (config.commandline.empty())
-            throw ffs3::FileError(_("Command line is empty!"));
+        {
+            wxString errorMsg = _("Invalid commandline: \"%x\"");
+            errorMsg.Replace(L"%x", config.commandline);
+            throw zen::FileError(errorMsg);
+        }
 
         callback.notifyDirectoryMissing();
         waitForMissingDirs(dirList, &callback);
@@ -305,12 +311,7 @@ rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& 
         while (true)
         {
             //execute command
-            {
-                //by default wxExecute uses a zero sized dummy window as a hack to keep focus which leaves a useless empty icon in ALT-TAB list
-                //=> use wxEXEC_NODISABLE and roll our own window disabler!                   (see comment in  app.cpp: void *wxGUIAppTraits::BeforeChildWaitLoop())
-                wxWindowDisabler dummy; //disables all top level windows
-                wxExecute(config.commandline, wxEXEC_SYNC | wxEXEC_NODISABLE);
-            }
+            zen::shellExecute(config.commandline, zen::EXEC_TYPE_SYNC);
 
             wxLog::FlushActive(); //show wxWidgets error messages (if any)
 
@@ -343,7 +344,7 @@ rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& 
     {
         return ab.getCommand();
     }
-    catch (const ffs3::FileError& error)
+    catch (const zen::FileError& error)
     {
         wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
         return RESUME;

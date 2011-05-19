@@ -7,7 +7,7 @@
 #include "file_hierarchy.h"
 #include "shared/build_info.h"
 
-using namespace ffs3;
+using namespace zen;
 
 namespace
 {
@@ -202,7 +202,7 @@ SyncOperation FileSystemObject::getSyncOperation(
 }
 
 
-const Zstring& ffs3::getSyncDBFilename()
+const Zstring& zen::getSyncDBFilename()
 {
     //Linux and Windows builds are binary incompatible: char/wchar_t case, sensitive/insensitive
     //32 and 64 bit db files ARE designed to be binary compatible!

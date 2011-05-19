@@ -5,37 +5,34 @@
 // **************************************************************************
 //
 #include "comparison.h"
+#include <map>
 #include <stdexcept>
+#include <memory>
 #include "shared/global_func.h"
 #include "shared/i18n.h"
 #include <wx/msgdlg.h>
 #include <wx/log.h>
+#include <boost/bind.hpp>
 #include "algorithm.h"
 #include "shared/util.h"
-#include <memory>
 #include "shared/string_conv.h"
 #include "shared/file_handling.h"
 #include "shared/resolve_path.h"
-#include "shared/system_func.h"
+#include "shared/last_error.h"
 #include "shared/file_traverser.h"
-#include "library/filter.h"
-#include <map>
 #include "file_hierarchy.h"
-#include <boost/bind.hpp>
 #include "library/binary.h"
-#include "library/dir_lock.h"
 #include "library/cmp_filetime.h"
+#include "library/lock_holder.h"
 
 #ifdef FFS_WIN
 #include "shared/perf.h"
 #endif
 
-using namespace ffs3;
-
-const Zstring LOCK_FILE_ENDING = Zstr("ffs_lock");
+using namespace zen;
 
 
-std::vector<ffs3::FolderPairCfg> ffs3::extractCompareCfg(const MainConfiguration& mainCfg)
+std::vector<zen::FolderPairCfg> zen::extractCompareCfg(const MainConfiguration& mainCfg)
 {
     //merge first and additional pairs
     std::vector<FolderPairEnh> allPairs;
@@ -44,22 +41,13 @@ std::vector<ffs3::FolderPairCfg> ffs3::extractCompareCfg(const MainConfiguration
                     mainCfg.additionalPairs.begin(), //add additional pairs
                     mainCfg.additionalPairs.end());
 
-    const BaseFilter::FilterRef globalFilter(new NameFilter(mainCfg.globalFilter.includeFilter, mainCfg.globalFilter.excludeFilter));
-
     std::vector<FolderPairCfg> output;
     for (std::vector<FolderPairEnh>::const_iterator i = allPairs.begin(); i != allPairs.end(); ++i)
         output.push_back(
-            FolderPairCfg(i->leftDirectory,
-                          i->rightDirectory,
-
-                          combineFilters(globalFilter,
-                                         BaseFilter::FilterRef(
-                                             new NameFilter(
-                                                 i->localFilter.includeFilter,
-                                                 i->localFilter.excludeFilter))),
-
+            FolderPairCfg(getFormattedDirectoryName(i->leftDirectory),  //ensure they end with common::FILE_NAME_SEPARATOR and replace macros
+                          getFormattedDirectoryName(i->rightDirectory),
+                          normalizeFilters(mainCfg.globalFilter, i->localFilter),
                           i->altSyncConfig.get() ? i->altSyncConfig->syncConfiguration : mainCfg.syncConfiguration));
-
     return output;
 }
 
@@ -67,13 +55,13 @@ std::vector<ffs3::FolderPairCfg> ffs3::extractCompareCfg(const MainConfiguration
 
 class BaseDirCallback;
 
-class DirCallback : public ffs3::TraverseCallback
+class DirCallback : public zen::TraverseCallback
 {
 public:
     DirCallback(BaseDirCallback* baseCallback,
                 const Zstring& relNameParentPf, //postfixed with FILE_NAME_SEPARATOR!
                 DirContainer& output,
-                StatusHandler* handler) :
+                ProcessCallback* handler) :
         baseCallback_(baseCallback),
         relNameParentPf_(relNameParentPf),
         output_(output),
@@ -90,7 +78,7 @@ private:
     BaseDirCallback* const baseCallback_;
     const Zstring relNameParentPf_;
     DirContainer& output_;
-    StatusHandler* const statusHandler;
+    ProcessCallback* const statusHandler;
 };
 
 
@@ -101,8 +89,8 @@ class BaseDirCallback : public DirCallback
 public:
     BaseDirCallback(DirContainer& output,
                     SymLinkHandling handleSymlinks,
-                    const BaseFilter::FilterRef& filter,
-                    StatusHandler* handler) :
+                    const HardFilter::FilterRef& filter,
+                    ProcessCallback* handler) :
         DirCallback(this, Zstring(), output, handler),
         handleSymlinks_(handleSymlinks),
         textScanning(wxToZ(wxString(_("Scanning:")) + wxT(" \n"))),
@@ -117,7 +105,7 @@ private:
     const Zstring textScanning;
     std::vector<CallbackPointer> callBackBox;  //collection of callback pointers to handle ownership
 
-    const BaseFilter::FilterRef filterInstance; //always bound!
+    const HardFilter::FilterRef filterInstance; //always bound!
 };
 
 
@@ -128,14 +116,13 @@ void DirCallback::onFile(const Zchar* shortName, const Zstring& fullName, const 
     const size_t pos = fileNameShort.rfind(Zchar('.'));
     if (pos != Zstring::npos)
     {
-        const Zchar* ending = shortName + pos + 1; //(returns the whole string if ch not found)
+        const Zchar* ending = shortName + pos + 1;
         // if (EqualFilename()(ending, SYNC_DB_FILE_ENDING) ||
         //            EqualFilename()(ending, LOCK_FILE_ENDING))    //let's hope this premature performance optimization doesn't bite back!
         if (ending == SYNC_DB_FILE_ENDING ||                    //
             ending == LOCK_FILE_ENDING)
             return;
     }
-
 
     //assemble status message (performance optimized)  = textScanning + wxT("\"") + fullName + wxT("\"")
     Zstring statusText = baseCallback_->textScanning;
@@ -274,14 +261,14 @@ void BaseDirCallback::onFile(const Zchar* shortName, const Zstring& fullName, co
 struct DirBufferKey
 {
     DirBufferKey(const Zstring& dirname,
-                 const BaseFilter::FilterRef& filterIn) : //filter interface: always bound by design!
+                 const HardFilter::FilterRef& filterIn) : //filter interface: always bound by design!
         directoryName(dirname),
         filter(filterIn->isNull() ? //some optimization for "Null" filter
-               BaseFilter::FilterRef(new NullFilter) :
+               HardFilter::FilterRef(new NullFilter) :
                filterIn) {}
 
     const Zstring directoryName;
-    const BaseFilter::FilterRef filter;  //buffering has to consider filtering!
+    const HardFilter::FilterRef filter;  //buffering has to consider filtering!
 
     bool operator<(const DirBufferKey& b) const
     {
@@ -298,11 +285,11 @@ class CompareProcess::DirectoryBuffer  //buffer multiple scans of the same direc
 {
 public:
     DirectoryBuffer(SymLinkHandling handleSymlinks,
-                    StatusHandler* statusUpdater) :
+                    ProcessCallback& procCallback) :
         handleSymlinks_(handleSymlinks),
-        statusUpdater_(statusUpdater) {}
+        procCallback_(procCallback) {}
 
-    const DirContainer& getDirectoryDescription(const Zstring& directoryPostfixed, const BaseFilter::FilterRef& filter);
+    const DirContainer& getDirectoryDescription(const Zstring& directoryPostfixed, const HardFilter::FilterRef& filter);
 
 private:
     typedef boost::shared_ptr<DirContainer> DirBufferValue; //exception safety: avoid memory leak
@@ -313,7 +300,7 @@ private:
     BufferType buffer;
 
     const SymLinkHandling handleSymlinks_;
-    StatusHandler* statusUpdater_;
+    ProcessCallback& procCallback_;
 };
 //------------------------------------------------------------------------------------------
 
@@ -322,21 +309,21 @@ private:
 class DstHackCallbackImpl : public DstHackCallback
 {
 public:
-    DstHackCallbackImpl(StatusHandler& statusUpdater) :
+    DstHackCallbackImpl(ProcessCallback& procCallback) :
         textApplyingDstHack(wxToZ(_("Encoding extended time information: %x")).Replace(Zstr("%x"), Zstr("\n\"%x\""))),
-        statusUpdater_(statusUpdater) {}
+        procCallback_(procCallback) {}
 
 private:
     virtual void requestUiRefresh(const Zstring& filename) //applying DST hack imposes significant one-time performance drawback => callback to inform user
     {
         Zstring statusText = textApplyingDstHack;
         statusText.Replace(Zstr("%x"), filename);
-        statusUpdater_.reportInfo(statusText);
-        statusUpdater_.requestUiRefresh();
+        procCallback_.reportInfo(statusText);
+        procCallback_.requestUiRefresh();
     }
 
     const Zstring textApplyingDstHack;
-    StatusHandler& statusUpdater_;
+    ProcessCallback& procCallback_;
 };
 #endif
 
@@ -346,12 +333,13 @@ DirContainer& CompareProcess::DirectoryBuffer::insertIntoBuffer(const DirBufferK
     DirBufferValue baseContainer(new DirContainer);
     buffer.insert(std::make_pair(newKey, baseContainer));
 
-    if (ffs3::dirExists(newKey.directoryName)) //folder existence already checked in startCompareProcess(): do not treat as error when arriving here!
+    if (!newKey.directoryName.empty() &&
+        zen::dirExists(newKey.directoryName)) //folder existence already checked in startCompareProcess(): do not treat as error when arriving here!
     {
         BaseDirCallback traverser(*baseContainer,
                                   handleSymlinks_,
                                   newKey.filter,
-                                  statusUpdater_);
+                                  &procCallback_);
 
         bool followSymlinks = false;
         switch (handleSymlinks_)
@@ -367,9 +355,9 @@ DirContainer& CompareProcess::DirectoryBuffer::insertIntoBuffer(const DirBufferK
                 break;
         }
 
-        std::auto_ptr<ffs3::DstHackCallback> dstCallback;
+        std::auto_ptr<zen::DstHackCallback> dstCallback;
 #ifdef FFS_WIN
-        dstCallback.reset(new DstHackCallbackImpl(*statusUpdater_));
+        dstCallback.reset(new DstHackCallbackImpl(procCallback_));
 #endif
 
         //get all files and folders from directoryPostfixed (and subdirectories)
@@ -381,7 +369,7 @@ DirContainer& CompareProcess::DirectoryBuffer::insertIntoBuffer(const DirBufferK
 
 const DirContainer& CompareProcess::DirectoryBuffer::getDirectoryDescription(
     const Zstring& directoryPostfixed,
-    const BaseFilter::FilterRef& filter)
+    const HardFilter::FilterRef& filter)
 {
     const DirBufferKey searchKey(directoryPostfixed, filter);
 
@@ -396,7 +384,7 @@ const DirContainer& CompareProcess::DirectoryBuffer::getDirectoryDescription(
 //------------------------------------------------------------------------------------------
 namespace
 {
-void foldersAreValidForComparison(const std::vector<FolderPairCfg>& folderPairsForm, StatusHandler* statusUpdater)
+void foldersAreValidForComparison(const std::vector<FolderPairCfg>& folderPairsForm, ProcessCallback& procCallback)
 {
     bool nonEmptyPairFound = false; //check if user entered at least one folder pair
     bool partiallyFilledPairFound = false;
@@ -405,20 +393,20 @@ void foldersAreValidForComparison(const std::vector<FolderPairCfg>& folderPairsF
 
     for (std::vector<FolderPairCfg>::const_iterator i = folderPairsForm.begin(); i != folderPairsForm.end(); ++i)
     {
-        if (!i->leftDirectory.empty() || !i->rightDirectory.empty()) //may be partially filled though
+        if (!i->leftDirectoryFmt.empty() || !i->rightDirectoryFmt.empty()) //may be partially filled though
             nonEmptyPairFound = true;
 
-        if ((i->leftDirectory.empty() && !i->rightDirectory.empty()) ||
-            (!i->leftDirectory.empty() && i->rightDirectory.empty()))
+        if ((i->leftDirectoryFmt.empty() && !i->rightDirectoryFmt.empty()) ||
+            (!i->leftDirectoryFmt.empty() && i->rightDirectoryFmt.empty()))
             partiallyFilledPairFound = true;
 
         //check if folders exist
-        if (!i->leftDirectory.empty())
-            while (!ffs3::dirExists(i->leftDirectory))
+        if (!i->leftDirectoryFmt.empty())
+            while (!zen::dirExists(i->leftDirectoryFmt))
             {
-                ErrorHandler::Response rv = statusUpdater->reportError(wxString(_("Directory does not exist:")) + wxT(" \n") +
-                                                                       wxT("\"") + zToWx(i->leftDirectory) + wxT("\"") + wxT("\n\n") +
-                                                                       additionalInfo + wxT(" ") + ffs3::getLastErrorFormatted());
+                wxString errorMessage = wxString(_("Directory does not exist:")) + wxT("\n") + wxT("\"") + zToWx(i->leftDirectoryFmt) + wxT("\"");
+                ErrorHandler::Response rv = procCallback.reportError(errorMessage + wxT("\n\n") + additionalInfo + wxT(" ") + zen::getLastErrorFormatted());
+
                 if (rv == ErrorHandler::IGNORE_ERROR)
                     break;
                 else if (rv == ErrorHandler::RETRY)
@@ -427,12 +415,11 @@ void foldersAreValidForComparison(const std::vector<FolderPairCfg>& folderPairsF
                     throw std::logic_error("Programming Error: Unknown return value! (2)");
             }
 
-        if (!i->rightDirectory.empty())
-            while (!ffs3::dirExists(i->rightDirectory))
+        if (!i->rightDirectoryFmt.empty())
+            while (!zen::dirExists(i->rightDirectoryFmt))
             {
-                ErrorHandler::Response rv = statusUpdater->reportError(wxString(_("Directory does not exist:")) + wxT("\n") +
-                                                                       wxT("\"") + zToWx(i->rightDirectory) + wxT("\"") + wxT("\n\n") +
-                                                                       additionalInfo + wxT(" ") + ffs3::getLastErrorFormatted());
+                wxString errorMessage = wxString(_("Directory does not exist:")) + wxT("\n") + wxT("\"") + zToWx(i->rightDirectoryFmt) + wxT("\"");
+                ErrorHandler::Response rv = procCallback.reportError(errorMessage + wxT("\n\n") + additionalInfo + wxT(" ") + zen::getLastErrorFormatted());
                 if (rv == ErrorHandler::IGNORE_ERROR)
                     break;
                 else if (rv == ErrorHandler::RETRY)
@@ -447,8 +434,8 @@ void foldersAreValidForComparison(const std::vector<FolderPairCfg>& folderPairsF
     {
         while (true)
         {
-            const ErrorHandler::Response rv = statusUpdater->reportError(wxString(_("A directory input field is empty.")) + wxT(" \n\n") +
-                                                                         + wxT("(") + additionalInfo + wxT(")"));
+            const ErrorHandler::Response rv = procCallback.reportError(wxString(_("A directory input field is empty.")) + wxT(" \n\n") +
+                                                                       + wxT("(") + additionalInfo + wxT(")"));
             if (rv == ErrorHandler::IGNORE_ERROR)
                 break;
             else if (rv == ErrorHandler::RETRY)
@@ -480,10 +467,10 @@ wxString checkFolderDependency(const std::vector<FolderPairCfg>& folderPairsForm
     DirDirList dependentDirs;
 
     for (std::vector<FolderPairCfg>::const_iterator i = folderPairsForm.begin(); i != folderPairsForm.end(); ++i)
-        if (!i->leftDirectory.empty() && !i->rightDirectory.empty()) //empty folders names may be accepted by user
+        if (!i->leftDirectoryFmt.empty() && !i->rightDirectoryFmt.empty()) //empty folders names may be accepted by user
         {
-            if (EqualDependentDirectory()(i->leftDirectory, i->rightDirectory)) //test wheter leftDirectory begins with rightDirectory or the other way round
-                dependentDirs.push_back(std::make_pair(zToWx(i->leftDirectory), zToWx(i->rightDirectory)));
+            if (EqualDependentDirectory()(i->leftDirectoryFmt, i->rightDirectoryFmt)) //test wheter leftDirectory begins with rightDirectory or the other way round
+                dependentDirs.push_back(std::make_pair(zToWx(i->leftDirectoryFmt), zToWx(i->rightDirectoryFmt)));
         }
 
     wxString warnignMsg;
@@ -504,32 +491,32 @@ wxString checkFolderDependency(const std::vector<FolderPairCfg>& folderPairsForm
 class CmpCallbackImpl : public CompareCallback
 {
 public:
-    CmpCallbackImpl(StatusHandler* handler, wxLongLong& bytesComparedLast) :
-        m_handler(handler),
+    CmpCallbackImpl(ProcessCallback& pc, zen::UInt64& bytesComparedLast) :
+        pc_(pc),
         m_bytesComparedLast(bytesComparedLast) {}
 
-    virtual void updateCompareStatus(const wxLongLong& totalBytesTransferred)
+    virtual void updateCompareStatus(zen::UInt64 totalBytesTransferred)
     {
         //called every 512 kB
 
         //inform about the (differential) processed amount of data
-        m_handler->updateProcessedData(0, totalBytesTransferred - m_bytesComparedLast);
+        pc_.updateProcessedData(0, to<zen::Int64>(totalBytesTransferred) - to<zen::Int64>(m_bytesComparedLast));
         m_bytesComparedLast = totalBytesTransferred;
 
-        m_handler->requestUiRefresh(); //exceptions may be thrown here!
+        pc_.requestUiRefresh(); //exceptions may be thrown here!
     }
 
 private:
-    StatusHandler* m_handler;
-    wxLongLong& m_bytesComparedLast;
+    ProcessCallback& pc_;
+    zen::UInt64& m_bytesComparedLast;
 };
 
 
-bool filesHaveSameContentUpdating(const Zstring& filename1, const Zstring& filename2, const wxULongLong& totalBytesToCmp, StatusHandler* handler)
+bool filesHaveSameContentUpdating(const Zstring& filename1, const Zstring& filename2, zen::UInt64 totalBytesToCmp, ProcessCallback& pc)
 {
-    wxLongLong bytesComparedLast; //amount of bytes that have been compared and communicated to status handler
+    zen::UInt64 bytesComparedLast; //amount of bytes that have been compared and communicated to status handler
 
-    CmpCallbackImpl callback(handler, bytesComparedLast);
+    CmpCallbackImpl callback(pc, bytesComparedLast);
 
     bool sameContent = true;
     try
@@ -539,12 +526,12 @@ bool filesHaveSameContentUpdating(const Zstring& filename1, const Zstring& filen
     catch (...)
     {
         //error situation: undo communication of processed amount of data
-        handler->updateProcessedData(0, bytesComparedLast * -1);
+        pc.updateProcessedData(0, -1 * to<zen::Int64>(bytesComparedLast));
         throw;
     }
 
     //inform about the (remaining) processed amount of data
-    handler->updateProcessedData(0, common::convertToSigned(totalBytesToCmp) - bytesComparedLast);
+    pc.updateProcessedData(0, to<zen::Int64>(totalBytesToCmp) - to<zen::Int64>(bytesComparedLast));
 
     return sameContent;
 }
@@ -555,30 +542,17 @@ struct ToBeRemoved
     bool operator()(const DirMapping& dirObj) const
     {
         return !dirObj.isActive() &&
-               dirObj.useSubDirs(). size() == 0 &&
-               dirObj.useSubLinks().size() == 0 &&
-               dirObj.useSubFiles().size() == 0;
+               dirObj.useSubDirs ().empty() &&
+               dirObj.useSubLinks().empty() &&
+               dirObj.useSubFiles().empty();
     }
 };
-
-
-std::set<Zstring> getFolders(const std::vector<FolderPairCfg>& directoryPairsFormatted)
-{
-    std::set<Zstring> output;
-    for (std::vector<FolderPairCfg>::const_iterator i = directoryPairsFormatted.begin(); i != directoryPairsFormatted.end(); ++i)
-    {
-        output.insert(i->leftDirectory);
-        output.insert(i->rightDirectory);
-    }
-    output.erase(Zstring()); //remove empty directory strings
-    return output;
-}
 
 
 class RemoveFilteredDirs
 {
 public:
-    RemoveFilteredDirs(const BaseFilter& filterProc) :
+    RemoveFilteredDirs(const HardFilter& filterProc) :
         filterProc_(filterProc) {}
 
     void execute(HierarchyObject& hierObj)
@@ -604,16 +578,8 @@ private:
         execute(dirObj);
     }
 
-    const BaseFilter& filterProc_;
+    const HardFilter& filterProc_;
 };
-
-
-void formatPair(FolderPairCfg& input)
-{
-    //ensure they end with common::FILE_NAME_SEPARATOR and replace macros
-    input.leftDirectory  = ffs3::getFormattedDirectoryName(input.leftDirectory);
-    input.rightDirectory = ffs3::getFormattedDirectoryName(input.rightDirectory);
-}
 }
 
 //#############################################################################################################################
@@ -621,10 +587,10 @@ void formatPair(FolderPairCfg& input)
 CompareProcess::CompareProcess(SymLinkHandling handleSymlinks,
                                size_t fileTimeTol,
                                xmlAccess::OptionalDialogs& warnings,
-                               StatusHandler* handler) :
+                               ProcessCallback& handler) :
     fileTimeTolerance(fileTimeTol),
     m_warnings(warnings),
-    statusUpdater(handler),
+    procCallback(handler),
     txtComparingContentOfFiles(wxToZ(_("Comparing content of files %x")).Replace(Zstr("%x"), Zstr("\n\"%x\""), false))
 {
     directoryBuffer.reset(new DirectoryBuffer(handleSymlinks, handler));
@@ -643,22 +609,18 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& direc
 
 
     //init process: keep at beginning so that all gui elements are initialized properly
-    statusUpdater->initNewProcess(-1, 0, StatusHandler::PROCESS_SCANNING); //it's not known how many files will be scanned => -1 objects
-
-    //format directory pairs: ensure they end with common::FILE_NAME_SEPARATOR and replace macros!
-    std::vector<FolderPairCfg> directoryPairsFormatted = directoryPairs;
-    std::for_each(directoryPairsFormatted.begin(), directoryPairsFormatted.end(), formatPair);
+    procCallback.initNewProcess(-1, 0, ProcessCallback::PROCESS_SCANNING); //it's not known how many files will be scanned => -1 objects
 
     //-------------------some basic checks:------------------------------------------
 
     //ensure that folders are valid
-    foldersAreValidForComparison(directoryPairsFormatted, statusUpdater);
+    foldersAreValidForComparison(directoryPairs, procCallback);
 
     {
         //check if folders have dependencies
-        wxString warningMessage = checkFolderDependency(directoryPairsFormatted);
+        wxString warningMessage = checkFolderDependency(directoryPairs);
         if (!warningMessage.empty())
-            statusUpdater->reportWarning(warningMessage.c_str(), m_warnings.warningDependentFolders);
+            procCallback.reportWarning(warningMessage.c_str(), m_warnings.warningDependentFolders);
     }
 
     //-------------------end of basic checks------------------------------------------
@@ -668,90 +630,52 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& direc
     {
         //prevent shutdown while (binary) comparison is in progress
         util::DisableStandby dummy2;
-
-        //place a lock on all directories before traversing (sync.ffs_lock)
-        std::map<Zstring, DirLock> lockHolder;
-        {
-            const std::set<Zstring> folderList = getFolders(directoryPairsFormatted);
-            for (std::set<Zstring>::const_iterator i = folderList.begin(); i != folderList.end(); ++i)
-            {
-                class WaitOnLockHandler : public DirLockCallback
-                {
-                public:
-                    WaitOnLockHandler(StatusHandler& statusUpdater) : waitHandler(statusUpdater) {}
-
-                    virtual void requestUiRefresh()  //allowed to throw exceptions
-                    {
-                        waitHandler.requestUiRefresh();
-                    }
-                    virtual void reportInfo(const Zstring& text)
-                    {
-                        waitHandler.reportInfo(text);
-                    }
-                private:
-                    StatusHandler& waitHandler;
-                } callback(*statusUpdater);
-
-                try
-                {
-                    lockHolder.insert(std::make_pair(*i, DirLock(*i + Zstr("sync.") + LOCK_FILE_ENDING, &callback)));
-                }
-                catch (const FileError& e)
-                {
-                    bool dummy = false; //this warning shall not be shown but logged only
-                    statusUpdater->reportWarning(e.msg(), dummy);
-                }
-            }
-        }
+        (void)dummy2;
 
         //traverse/process folders
         FolderComparison output_tmp; //write to output not before END of process!
         switch (cmpVar)
         {
             case CMP_BY_TIME_SIZE:
-                compareByTimeSize(directoryPairsFormatted, output_tmp);
+                compareByTimeSize(directoryPairs, output_tmp);
                 break;
             case CMP_BY_CONTENT:
-                compareByContent(directoryPairsFormatted, output_tmp);
+                compareByContent(directoryPairs, output_tmp);
                 break;
         }
 
 
-        assert (output_tmp.size() == directoryPairsFormatted.size());
+        assert (output_tmp.size() == directoryPairs.size());
 
         for (FolderComparison::iterator j = output_tmp.begin(); j != output_tmp.end(); ++j)
         {
-            const FolderPairCfg& fpCfg = directoryPairsFormatted[j - output_tmp.begin()];
+            const FolderPairCfg& fpCfg = directoryPairs[j - output_tmp.begin()];
 
             //attention: some filtered directories are still in the comparison result! (see include filter handling!)
-            if (!fpCfg.filter->isNull())
-                RemoveFilteredDirs(*fpCfg.filter).execute(*j); //remove all excluded directories (but keeps those serving as parent folders for not excl. elements)
+            if (!fpCfg.filter.nameFilter->isNull())
+                RemoveFilteredDirs(*fpCfg.filter.nameFilter).execute(*j); //remove all excluded directories (but keeps those serving as parent folders for not excl. elements)
+
+            //apply soft filtering / hard filter already applied
+            addSoftFiltering(*j, fpCfg.filter.timeSizeFilter);
 
             //set initial sync-direction
             class RedetermineCallback : public DeterminationProblem
             {
             public:
-                RedetermineCallback(bool& warningSyncDatabase, StatusHandler& statusUpdater) :
+                RedetermineCallback(bool& warningSyncDatabase, ProcessCallback& procCallback) :
                     warningSyncDatabase_(warningSyncDatabase),
-                    statusUpdater_(statusUpdater) {}
+                    procCallback_(procCallback) {}
 
                 virtual void reportWarning(const wxString& text)
                 {
-                    statusUpdater_.reportWarning(text, warningSyncDatabase_);
+                    procCallback_.reportWarning(text, warningSyncDatabase_);
                 }
             private:
                 bool& warningSyncDatabase_;
-                StatusHandler& statusUpdater_;
-            } redetCallback(m_warnings.warningSyncDatabase, *statusUpdater);
+                ProcessCallback& procCallback_;
+            } redetCallback(m_warnings.warningSyncDatabase, procCallback);
 
-            ffs3::redetermineSyncDirection(fpCfg.syncConfiguration, *j, &redetCallback);
-
-
-            //pass locks to directory structure
-            std::map<Zstring, DirLock>::const_iterator iter = lockHolder.find(j->getBaseDir<LEFT_SIDE>());
-            if (iter != lockHolder.end()) j->holdLock<LEFT_SIDE>(iter->second);
-            iter = lockHolder.find(j->getBaseDir<RIGHT_SIDE>());
-            if (iter != lockHolder.end()) j->holdLock<RIGHT_SIDE>(iter->second);
+            zen::redetermineSyncDirection(fpCfg.syncConfiguration, *j, &redetCallback);
         }
 
         //only if everything was processed correctly output is written to!
@@ -760,18 +684,18 @@ void CompareProcess::startCompareProcess(const std::vector<FolderPairCfg>& direc
     }
     catch (const std::bad_alloc& e)
     {
-        statusUpdater->reportFatalError(wxString(_("Memory allocation failed!")) + wxT(" ") + wxString::FromAscii(e.what()));
+        procCallback.reportFatalError(wxString(_("Memory allocation failed!")) + wxT(" ") + wxString::FromAscii(e.what()));
     }
     catch (const std::exception& e)
     {
-        statusUpdater->reportFatalError(wxString::FromAscii(e.what()));
+        procCallback.reportFatalError(wxString::FromAscii(e.what()));
     }
 }
 
 //--------------------assemble conflict descriptions---------------------------
 
 //check for very old dates or dates in the future
-wxString getConflictInvalidDate(const Zstring& fileNameFull, const wxLongLong& utcTime)
+wxString getConflictInvalidDate(const Zstring& fileNameFull, zen::Int64 utcTime)
 {
     wxString msg = _("File %x has an invalid date!");
     msg.Replace(wxT("%x"), wxString(wxT("\"")) + zToWx(fileNameFull) + wxT("\""));
@@ -807,9 +731,9 @@ wxString getConflictSameDateDiffSize(const FileMapping& fileObj)
     msg.Replace(wxT("%x"), wxString(wxT("\"")) + zToWx(fileObj.getRelativeName<LEFT_SIDE>()) + wxT("\""));
     msg += wxT("\n\n");
     msg += left + wxT("\t") + _("Date") + wxT(": ") + utcTimeToLocalString(fileObj.getLastWriteTime<LEFT_SIDE>()) +
-           wxT(" \t") + _("Size") + wxT(": ") + fileObj.getFileSize<LEFT_SIDE>().ToString() + wxT("\n");
+           wxT(" \t") + _("Size") + wxT(": ") + toStringSep(fileObj.getFileSize<LEFT_SIDE>()) + wxT("\n");
     msg += right + wxT("\t") + _("Date") + wxT(": ") + utcTimeToLocalString(fileObj.getLastWriteTime<RIGHT_SIDE>()) +
-           wxT(" \t") + _("Size") + wxT(": ") + fileObj.getFileSize<RIGHT_SIDE>().ToString();
+           wxT(" \t") + _("Size") + wxT(": ") + toStringSep(fileObj.getFileSize<RIGHT_SIDE>());
     return wxString(_("Conflict detected:")) + wxT("\n") + msg;
 }
 
@@ -879,16 +803,16 @@ void CompareProcess::categorizeSymlinkByTime(SymLinkMapping* linkObj) const
 }
 
 
-void CompareProcess::compareByTimeSize(const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output) const
+void CompareProcess::compareByTimeSize(const std::vector<FolderPairCfg>& directoryPairs, FolderComparison& output) const
 {
-    output.reserve(output.size() + directoryPairsFormatted.size());
+    output.reserve(output.size() + directoryPairs.size());
 
     //process one folder pair after each other
-    for (std::vector<FolderPairCfg>::const_iterator pair = directoryPairsFormatted.begin(); pair != directoryPairsFormatted.end(); ++pair)
+    for (std::vector<FolderPairCfg>::const_iterator pair = directoryPairs.begin(); pair != directoryPairs.end(); ++pair)
     {
-        BaseDirMapping newEntry(pair->leftDirectory,
-                                pair->rightDirectory,
-                                pair->filter);
+        BaseDirMapping newEntry(pair->leftDirectoryFmt,
+                                pair->rightDirectoryFmt,
+                                pair->filter.nameFilter);
         output.push_back(newEntry); //attention: push_back() copies by value!!! performance: append BEFORE writing values into fileCmp!
 
         //do basis scan and retrieve files existing on both sides as "compareCandidates"
@@ -942,14 +866,14 @@ void CompareProcess::compareByTimeSize(const std::vector<FolderPairCfg>& directo
 }
 
 
-wxULongLong getBytesToCompare(const std::vector<FileMapping*>& rowsToCompare)
+zen::UInt64 getBytesToCompare(const std::vector<FileMapping*>& rowsToCompare)
 {
-    wxULongLong dataTotal;
+    zen::UInt64 dataTotal;
 
     for (std::vector<FileMapping*>::const_iterator j = rowsToCompare.begin(); j != rowsToCompare.end(); ++j)
         dataTotal += (*j)->getFileSize<LEFT_SIDE>();  //left and right filesizes should be the same
 
-    return dataTotal * 2;
+    return dataTotal * 2U;
 }
 
 
@@ -977,20 +901,20 @@ void CompareProcess::categorizeSymlinkByContent(SymLinkMapping* linkObj) const
 }
 
 
-void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output) const
+void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& directoryPairs, FolderComparison& output) const
 {
     //PERF_START;
     std::vector<FileMapping*> compareCandidates;
 
     //attention: make sure pointers in "compareCandidates" remain valid!!!
-    output.reserve(output.size() + directoryPairsFormatted.size());
+    output.reserve(output.size() + directoryPairs.size());
 
     //process one folder pair after each other
-    for (std::vector<FolderPairCfg>::const_iterator pair = directoryPairsFormatted.begin(); pair != directoryPairsFormatted.end(); ++pair)
+    for (std::vector<FolderPairCfg>::const_iterator pair = directoryPairs.begin(); pair != directoryPairs.end(); ++pair)
     {
-        BaseDirMapping newEntry(pair->leftDirectory,
-                                pair->rightDirectory,
-                                pair->filter);
+        BaseDirMapping newEntry(pair->leftDirectoryFmt,
+                                pair->rightDirectoryFmt,
+                                pair->filter.nameFilter);
         output.push_back(newEntry); //attention: push_back() copies by value!!! performance: append BEFORE writing values into fileCmp!
 
         std::vector<SymLinkMapping*> uncategorizedLinks;
@@ -1019,11 +943,11 @@ void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& director
 
 
     const size_t objectsTotal    = filesToCompareBytewise.size() * 2;
-    const wxULongLong bytesTotal = getBytesToCompare(filesToCompareBytewise);
+    const zen::UInt64 bytesTotal = getBytesToCompare(filesToCompareBytewise);
 
-    statusUpdater->initNewProcess(static_cast<int>(objectsTotal),
-                                  common::convertToSigned(bytesTotal),
-                                  StatusHandler::PROCESS_COMPARING_CONTENT);
+    procCallback.initNewProcess(static_cast<int>(objectsTotal),
+                                to<zen::Int64>(bytesTotal),
+                                ProcessCallback::PROCESS_COMPARING_CONTENT);
 
     const CmpFileTime timeCmp(fileTimeTolerance);
 
@@ -1034,20 +958,20 @@ void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& director
 
         Zstring statusText = txtComparingContentOfFiles;
         statusText.Replace(Zstr("%x"), line->getRelativeName<LEFT_SIDE>(), false);
-        statusUpdater->reportInfo(statusText);
+        procCallback.reportInfo(statusText);
 
         //check files that exist in left and right model but have different content
         while (true)
         {
             //trigger display refresh
-            statusUpdater->requestUiRefresh();
+            procCallback.requestUiRefresh();
 
             try
             {
                 if (filesHaveSameContentUpdating(line->getFullName<LEFT_SIDE>(),
                                                  line->getFullName<RIGHT_SIDE>(),
-                                                 line->getFileSize<LEFT_SIDE>() * 2,
-                                                 statusUpdater))
+                                                 line->getFileSize<LEFT_SIDE>() * 2U,
+                                                 procCallback))
                 {
                     if (line->getShortName<LEFT_SIDE>() == line->getShortName<RIGHT_SIDE>() &&
                         timeCmp.getResult(line->getLastWriteTime<LEFT_SIDE>(),
@@ -1059,12 +983,12 @@ void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& director
                 else
                     line->setCategory<FILE_DIFFERENT>();
 
-                statusUpdater->updateProcessedData(2, 0); //processed data is communicated in subfunctions!
+                procCallback.updateProcessedData(2, 0); //processed data is communicated in subfunctions!
                 break;
             }
             catch (FileError& error)
             {
-                ErrorHandler::Response rv = statusUpdater->reportError(error.msg());
+                ErrorHandler::Response rv = procCallback.reportError(error.msg());
                 if (rv == ErrorHandler::IGNORE_ERROR)
                 {
                     line->setCategoryConflict(wxString(_("Conflict detected:")) + wxT("\n") + _("Comparing files by content failed."));
@@ -1265,8 +1189,8 @@ void CompareProcess::performBaseComparison(BaseDirMapping& output, std::vector<F
                                              output.getFilter());
 
 
-    statusUpdater->reportInfo(wxToZ(_("Generating file list...")));
-    statusUpdater->forceUiRefresh(); //keep total number of scanned files up to date
+    procCallback.reportInfo(wxToZ(_("Generating file list...")));
+    procCallback.forceUiRefresh(); //keep total number of scanned files up to date
 
     //PERF_STOP;
 

@@ -7,72 +7,46 @@
 #ifndef MESSAGEPOPUP_H_INCLUDED
 #define MESSAGEPOPUP_H_INCLUDED
 
-#include "gui_generated.h"
+#include <wx/string.h>
 
 
-class ErrorDlg : public ErrorDlgGenerated
+namespace zen
 {
-public:
-    ErrorDlg(wxWindow* parentWindow, const int activeButtons, const wxString messageText, bool& ignoreNextErrors);
-
-    enum ReturnCodes
+struct ReturnErrorDlg
+{
+    enum ButtonPressed
     {
         BUTTON_IGNORE = 1,
         BUTTON_RETRY  = 2,
         BUTTON_ABORT  = 4
     };
-
-private:
-    void OnClose(wxCloseEvent& event);
-    void OnIgnore(wxCommandEvent& event);
-    void OnRetry(wxCommandEvent& event);
-    void OnAbort(wxCommandEvent& event);
-
-    bool& ignoreErrors;
 };
+ReturnErrorDlg::ButtonPressed showErrorDlg(int activeButtons, const wxString& messageText, bool& ignoreNextErrors);
 
 
-class WarningDlg : public WarningDlgGenerated
+struct ReturnWarningDlg
 {
-public:
-    WarningDlg(wxWindow* parentWindow, int activeButtons, const wxString messageText, bool& dontShowAgain);
-
-    enum Response
+    enum ButtonPressed
     {
         BUTTON_IGNORE  = 1,
         BUTTON_SWITCH  = 2,
         BUTTON_ABORT   = 4
     };
-
-private:
-    void OnClose(wxCloseEvent& event);
-    void OnIgnore(wxCommandEvent& event);
-    void OnSwitch(wxCommandEvent& event);
-    void OnAbort(wxCommandEvent& event);
-    bool& dontShowAgain;
 };
+ReturnWarningDlg::ButtonPressed showWarningDlg(int activeButtons, const wxString& messageText, bool& dontShowAgain);
 
 
-class QuestionDlg : public QuestionDlgGenerated
+struct ReturnQuestionDlg
 {
-public:
-    QuestionDlg(wxWindow* parentWindow, int activeButtons, const wxString messageText, bool* dontShowAgain = NULL);
-
-    enum
+    enum ButtonPressed
     {
         BUTTON_YES    = 1,
         BUTTON_NO     = 2,
         BUTTON_CANCEL = 4
     };
-
-private:
-    void OnClose(wxCloseEvent& event);
-    void OnCancel(wxCommandEvent& event);
-    void OnYes(wxCommandEvent& event);
-    void OnNo(wxCommandEvent& event);
-
-    bool* dontShowAgain; //optional
 };
+ReturnQuestionDlg::ButtonPressed showQuestionDlg(int activeButtons, const wxString& messageText, bool* dontShowAgain = NULL);
+}
 
 
 #endif // MESSAGEPOPUP_H_INCLUDED

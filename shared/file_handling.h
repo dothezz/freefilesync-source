@@ -7,12 +7,11 @@
 #ifndef FILE_HANDLING_H_INCLUDED
 #define FILE_HANDLING_H_INCLUDED
 
-#include <wx/longlong.h>
 #include "zstring.h"
 #include "file_error.h"
+#include "int64.h"
 
-
-namespace ffs3
+namespace zen
 {
 struct CallbackRemoveDir;
 struct CallbackMoveFile;
@@ -38,7 +37,7 @@ ResponseSameVol onSameVolume(const Zstring& folderLeft, const Zstring& folderRig
 void copyFileTimes(const Zstring& sourceDir, const Zstring& targetDir, bool derefSymlinks); //throw (FileError)
 
 //symlink handling: always evaluate target
-wxULongLong getFilesize(const Zstring& filename); //throw (FileError)
+zen::UInt64 getFilesize(const Zstring& filename); //throw (FileError)
 
 
 //file handling
@@ -115,7 +114,7 @@ struct CallbackCopyFile //callback functionality
         CONTINUE,
         CANCEL
     };
-    virtual Response updateCopyStatus(const wxULongLong& totalBytesTransferred) = 0; //DON'T throw exceptions here, at least in Windows build!
+    virtual Response updateCopyStatus(zen::UInt64 totalBytesTransferred) = 0; //DON'T throw exceptions here, at least in Windows build!
 };
 }
 

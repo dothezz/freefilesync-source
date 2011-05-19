@@ -9,30 +9,10 @@
 #include "i18n.h"
 #include "string_conv.h"
 #include "system_constants.h"
-#include <boost/scoped_array.hpp>
 #include "file_handling.h"
 
-using namespace ffs3;
-
-
-std::string getTypeName(xmlAccess::XmlType type)
-{
-    switch (type)
-    {
-        case xmlAccess::XML_GUI_CONFIG:
-            return "GUI";
-        case xmlAccess::XML_BATCH_CONFIG:
-            return "BATCH";
-        case xmlAccess::XML_GLOBAL_SETTINGS:
-            return "GLOBAL";
-        case xmlAccess::XML_REAL_CONFIG:
-            return "REAL";
-        case xmlAccess::XML_OTHER:
-            break;
-    }
-    assert(false);
-    return "OTHER";
-}
+using namespace zen;
+using namespace xmlAccess;
 
 
 namespace
@@ -44,9 +24,9 @@ void normalize(std::vector<char>& stream)
     for (std::vector<char>::const_iterator i = stream.begin(); i != stream.end(); ++i)
         switch (*i)
         {
-            case 0xD:
-                tmp.push_back(0xA);
-                if (i + 1 != stream.end() && *(i + 1) == 0xA)
+            case '\xD':
+                tmp.push_back('\xA');
+                if (i + 1 != stream.end() && *(i + 1) == '\xA')
                     ++i;
                 break;
             default:
@@ -57,105 +37,55 @@ void normalize(std::vector<char>& stream)
 }
 
 
-void loadRawXmlDocument(const wxString& filename, TiXmlDocument& document) //throw XmlError()
+void parseRawXmlDocument(const wxString& filename, TiXmlDocument& document) //throw XmlError()
 {
-    using xmlAccess::XmlError;
-
-    const size_t BUFFER_SIZE = 2 * 1024 * 1024; //maximum size of a valid FreeFileSync XML file!
-
-    std::vector<char> inputBuffer;
-    inputBuffer.resize(BUFFER_SIZE);
+    const zen::UInt64 fs = zen::getFilesize(wxToZ(filename));
 
     try
     {
+        {
+            //quick test whether input is an XML: avoid loading large binary files up front!
+            std::string xmlBegin = "<?xml version=";
+            std::vector<char> buffer(xmlBegin.size());
+
+            FileInput inputFile(wxToZ(filename)); //throw (FileError);
+            const size_t bytesRead = inputFile.read(&buffer[0], buffer.size()); //throw (FileError)
+            if (bytesRead < xmlBegin.size() || !std::equal(buffer.begin(), buffer.end(), xmlBegin.begin()))
+                throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\""));
+        }
+
+        std::vector<char> buffer(to<size_t>(fs) + 1); //inc. null-termination (already set!)
+
         FileInput inputFile(wxToZ(filename)); //throw (FileError);
-        const size_t bytesRead = inputFile.read(&inputBuffer[0], inputBuffer.size()); //throw (FileError)
+        const size_t bytesRead = inputFile.read(&buffer[0], to<size_t>(fs)); //throw (FileError)
+        if (bytesRead < to<size_t>(fs))
+        {
+            wxString errorMessage = wxString(_("Error reading file:")) + wxT("\n\"") + filename + wxT("\"");
+            throw XmlError(errorMessage + wxT("\n\n"));
+        }
 
-        if (bytesRead == 0 || bytesRead >= inputBuffer.size()) //treat XML files larger than 2 MB as erroneous: loading larger files just wastes CPU + memory
-            throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\""));
+        //convert (0xD, 0xA) and (0xD) to (0xA): just like in TiXmlDocument::LoadFile(); not sure if actually needed
+        normalize(buffer);
 
-        inputBuffer.resize(bytesRead + 1);
-        inputBuffer[bytesRead] = 0; //set null-termination!!!!
+        document.Parse(&buffer[0], 0, TIXML_ENCODING_UTF8); //respect null-termination!
     }
     catch (const FileError& error) //more detailed error messages than with wxWidgets
     {
         throw XmlError(error.msg());
     }
-
-    //convert (0xD, 0xA) and (0xD) to (0xA): just like in TiXmlDocument::LoadFile(); not sure if actually needed
-    normalize(inputBuffer);
-
-    document.Parse(&inputBuffer[0], 0, TIXML_DEFAULT_ENCODING); //respect null-termination!
-
-    TiXmlElement* root = document.RootElement();
-
-    if (root && (root->ValueStr() == std::string("FreeFileSync"))) //check for FFS configuration xml
-        return; //finally... success!
-
-    throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\""));
 }
 }
 
 
-xmlAccess::XmlType xmlAccess::getXmlType(const wxString& filename) //throw()
-{
-    try
-    {
-        TiXmlDocument doc;
-        ::loadRawXmlDocument(filename, doc); //throw XmlError()
-
-        TiXmlElement* root = doc.RootElement();
-        if (root)
-        {
-            const char* cfgType = root->Attribute("XmlType");
-            if (cfgType)
-            {
-                const std::string type(cfgType);
-
-                if (type == getTypeName(XML_GUI_CONFIG))
-                    return XML_GUI_CONFIG;
-                else if (type == getTypeName(XML_BATCH_CONFIG))
-                    return XML_BATCH_CONFIG;
-                else if (type == getTypeName(XML_GLOBAL_SETTINGS))
-                    return XML_GLOBAL_SETTINGS;
-                else if (type == getTypeName(XML_REAL_CONFIG))
-                    return XML_REAL_CONFIG;
-            }
-        }
-    }
-    catch (const XmlError&) {}
-
-    return XML_OTHER;
-}
-
-
-void xmlAccess::loadXmlDocument(const wxString& filename, const xmlAccess::XmlType type, TiXmlDocument& document) //throw XmlError()
+void xmlAccess::loadXmlDocument(const wxString& filename, TiXmlDocument& document) //throw XmlError()
 {
     TiXmlBase::SetCondenseWhiteSpace(false); //do not condense whitespace characters
 
-    ::loadRawXmlDocument(filename, document); //throw XmlError()
+    ::parseRawXmlDocument(filename, document); //throw XmlError()
 
     TiXmlElement* root = document.RootElement();
-    if (root)
-    {
-        const char* cfgType = root->Attribute("XmlType");
-        if (cfgType && std::string(cfgType) == getTypeName(type))
-            return; //finally... success!
-    }
-
-    throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\""));
-}
-
-
-void xmlAccess::getDefaultXmlDocument(const XmlType type, TiXmlDocument& document)
-{
-    TiXmlDeclaration* decl = new TiXmlDeclaration("1.0", "UTF-8", ""); //delete won't be necessary later; ownership passed to TiXmlDocument!
-    document.LinkEndChild(decl);
-
-    TiXmlElement* root = new TiXmlElement("FreeFileSync");
-    root->SetAttribute("XmlType", getTypeName(type)); //xml configuration type
-
-    document.LinkEndChild(root);
+    if (!root)
+        throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\""));
 }
 
 
@@ -165,18 +95,18 @@ bool saveNecessary(const Zstring& filename, const std::string& dataToWrite) //th
 {
     try
     {
-        if (ffs3::getFilesize(filename) != static_cast<unsigned long>(dataToWrite.size())) //throw (FileError);
+        if (zen::getFilesize(filename) != static_cast<unsigned long>(dataToWrite.size())) //throw (FileError);
             return true;
 
-        boost::scoped_array<char> inputBuffer(new char[dataToWrite.size() + 1]); //+ 1 in order to test for end of file!
+        std::vector<char> inputBuffer(dataToWrite.size() + 1); //+ 1 in order to test for end of file!
 
         FileInput inputFile(filename); //throw (FileError);
 
-        const size_t bytesRead = inputFile.read(inputBuffer.get(), dataToWrite.size() + 1); //throw (FileError)
+        const size_t bytesRead = inputFile.read(&inputBuffer[0], inputBuffer.size()); //throw (FileError)
         if (bytesRead != dataToWrite.size()) //implicit test for eof!
             return true;
 
-        return ::memcmp(inputBuffer.get(), dataToWrite.c_str(), dataToWrite.size()) != 0;
+        return ::memcmp(&inputBuffer[0], dataToWrite.c_str(), dataToWrite.size()) != 0;
     }
     catch (const FileError&)
     {
@@ -260,21 +190,21 @@ bool xmlAccess::readXmlElement(const std::string& name, const TiXmlElement* pare
 {
     if (parent)
     {
-        output.clear();
-
         //load elements
-        const TiXmlElement* element = parent->FirstChildElement(name);
-        while (element)
+        const TiXmlElement* xmlList = parent->FirstChildElement(name);
+        if (xmlList)
         {
-            const char* text = element->GetText();
-            if (text) //may be NULL!!
-                output.push_back(wxString::FromUTF8(text));
-            else
-                output.push_back(wxEmptyString);
-
-            element = element->NextSiblingElement();
+            output.clear();
+            for (const TiXmlElement* item = xmlList->FirstChildElement("Item"); item != NULL; item = item->NextSiblingElement())
+            {
+                const char* text = item->GetText();
+                if (text) //may be NULL!!
+                    output.push_back(wxString::FromUTF8(text));
+                else
+                    output.push_back(wxEmptyString);
+            }
+            return true;
         }
-        return true;
     }
 
     return false;
@@ -351,8 +281,14 @@ void xmlAccess::addXmlElement(const std::string& name, const bool value, TiXmlEl
 
 void xmlAccess::addXmlElement(const std::string& name, const std::vector<wxString>& value, TiXmlElement* parent)
 {
-    for (std::vector<wxString>::const_iterator i = value.begin(); i != value.end(); ++i)
-        addXmlElement(name, std::string(i->ToUTF8()), parent);
+    if (parent)
+    {
+        TiXmlElement* xmlList= new TiXmlElement(name);
+        parent->LinkEndChild(xmlList);
+
+        for (std::vector<wxString>::const_iterator i = value.begin(); i != value.end(); ++i)
+            addXmlElement("Item", std::string(i->ToUTF8()), xmlList);
+    }
 }
 
 
@@ -378,21 +314,15 @@ void xmlAccess::addXmlAttribute(const std::string& name, const bool value, TiXml
 }
 
 
-using xmlAccess::XmlParser;
+using xmlAccess::XmlErrorLogger;
 
-void XmlParser::logError(const std::string& nodeName)
+void XmlErrorLogger::logError(const std::string& nodeName)
 {
     failedNodes.push_back(wxString::FromUTF8(nodeName.c_str()));
 }
 
 
-bool XmlParser::errorsOccurred() const
-{
-    return !failedNodes.empty();
-}
-
-
-const wxString XmlParser::getErrorMessageFormatted() const
+const wxString XmlErrorLogger::getErrorMessageFormatted() const
 {
     wxString errorMessage = wxString(_("Could not read values for the following XML nodes:")) + wxT("\n");
     for (std::vector<wxString>::const_iterator i = failedNodes.begin(); i != failedNodes.end(); ++i)

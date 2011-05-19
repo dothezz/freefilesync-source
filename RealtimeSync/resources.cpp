@@ -13,7 +13,7 @@
 #include "../shared/standard_paths.h"
 #include "../shared/system_constants.h"
 
-using namespace ffs3;
+using namespace zen;
 
 
 const GlobalResources& GlobalResources::getInstance()
@@ -42,7 +42,7 @@ GlobalResources::~GlobalResources()
 
 void GlobalResources::load() const
 {
-    wxFFileInputStream input(ffs3::getResourceDir() + wxT("Resources.dat"));
+    wxFFileInputStream input(zen::getResourceDir() + wxT("Resources.dat"));
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files

@@ -7,18 +7,38 @@
 #ifndef PROCESSXML_H_INCLUDED
 #define PROCESSXML_H_INCLUDED
 
+#include "../shared/xml_base.h"
 #include "../structures.h"
 #include "../shared/xml_error.h"
-#include "../shared/i18n.h"
+#include "../shared/localization.h"
 
 
 namespace xmlAccess
 {
+enum XmlType
+{
+    XML_TYPE_GUI,
+    XML_TYPE_BATCH,
+    XML_TYPE_GLOBAL,
+    XML_TYPE_OTHER
+};
+
+XmlType getXmlType(const TiXmlDocument& doc); //throw()
+XmlType getXmlType(const wxString& filename); //throw()
+void initXmlDocument(TiXmlDocument& doc, XmlType type); //throw()
+
+
 enum OnError
 {
     ON_ERROR_POPUP,
     ON_ERROR_IGNORE,
     ON_ERROR_EXIT
+};
+
+enum OnGuiError
+{
+    ON_GUIERROR_POPUP,
+    ON_GUIERROR_IGNORE
 };
 
 enum ColumnTypes
@@ -52,20 +72,21 @@ struct XmlGuiConfig
 {
     XmlGuiConfig() :
         hideFilteredElements(false),
-        ignoreErrors(false),
+        handleError(ON_GUIERROR_POPUP),
         syncPreviewEnabled(true) {} //initialize values
 
-    ffs3::MainConfiguration mainCfg;
+    zen::MainConfiguration mainCfg;
 
     bool hideFilteredElements;
-    bool ignoreErrors; //reaction on error situation during synchronization
+
+    OnGuiError handleError; //reaction on error situation during synchronization
     bool syncPreviewEnabled;
 
     bool operator==(const XmlGuiConfig& other) const
     {
         return mainCfg                == other.mainCfg               &&
                hideFilteredElements   == other.hideFilteredElements  &&
-               ignoreErrors           == other.ignoreErrors          &&
+               handleError            == other.handleError           &&
                syncPreviewEnabled     == other.syncPreviewEnabled;
     }
 
@@ -83,7 +104,7 @@ struct XmlBatchConfig
         logFileCountMax(200),
         handleError(ON_ERROR_POPUP) {}
 
-    ffs3::MainConfiguration mainCfg;
+    zen::MainConfiguration mainCfg;
 
     bool silent;
     wxString logFileDirectory;
@@ -119,7 +140,7 @@ struct XmlGlobalSettings
     //---------------------------------------------------------------------
     //Shared (GUI/BATCH) settings
     XmlGlobalSettings() :
-        programLanguage(ffs3::retrieveSystemLanguage()),
+        programLanguage(zen::retrieveSystemLanguage()),
         copyLockedFiles(true),
         copyFilePermissions(false),
         fileTimeTolerance(2),  //default 2s: FAT vs NTFS
@@ -145,8 +166,7 @@ struct XmlGlobalSettings
             isMaximized(false),
             autoAdjustColumnsLeft(false),
             autoAdjustColumnsRight(false),
-            folderHistLeftMax(12),
-            folderHistRightMax(12),
+            folderHistMax(12),
             deleteOnBothSides(false),
             useRecyclerForManualDeletion(true), //enable if OS supports it; else user will have to activate first and then get an error message
 #ifdef FFS_WIN
@@ -164,7 +184,7 @@ struct XmlGlobalSettings
             externelApplications.push_back(std::make_pair(wxT("Show in Explorer"), //mark for extraction: _("Show in Explorer")
                                                           wxT("explorer /select, \"%name\"")));
             externelApplications.push_back(std::make_pair(wxT("Open with default application"), //mark for extraction: _("Open with default application")
-                                                          wxT("cmd /c start \"\" \"%name\"")));
+                                                          wxT("\"%name\"")));
 #elif defined FFS_LINUX
             externelApplications.push_back(std::make_pair(wxT("Browse directory"), //mark for extraction: _("Browse directory")
                                                           wxT("xdg-open \"%dir\"")));
@@ -191,10 +211,8 @@ struct XmlGlobalSettings
         wxString lastUsedConfigFile;
 
         std::vector<wxString> folderHistoryLeft;
-        unsigned int folderHistLeftMax;
-
         std::vector<wxString> folderHistoryRight;
-        unsigned int folderHistRightMax;
+        unsigned int folderHistMax;
 
         bool deleteOnBothSides;
         bool useRecyclerForManualDeletion;

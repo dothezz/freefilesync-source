@@ -7,7 +7,7 @@
 #include "file_traverser.h"
 #include <limits>
 #include "system_constants.h"
-#include "system_func.h"
+#include "last_error.h"
 #include "string_conv.h"
 #include "assert_static.h"
 #include "symlink_target.h"
@@ -26,36 +26,20 @@
 
 #ifdef FFS_WIN
 inline
-wxLongLong getWin32TimeInformation(const FILETIME& lastWriteTime)
+zen::Int64 filetimeToTimeT(const FILETIME& lastWriteTime)
 {
     //convert UTC FILETIME to ANSI C format (number of seconds since Jan. 1st 1970 UTC)
-    wxLongLong writeTimeLong(lastWriteTime.dwHighDateTime, lastWriteTime.dwLowDateTime);
-    writeTimeLong /= 10000000;                    //reduce precision to 1 second (FILETIME has unit 10^-7 s)
-    writeTimeLong -= wxLongLong(2, 3054539008UL); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
-
-    assert(lastWriteTime.dwHighDateTime <= static_cast<unsigned long>(std::numeric_limits<long>::max()));
-    assert_static(sizeof(DWORD) == sizeof(long));
-    assert_static(sizeof(long) == 4);
+    zen::Int64 writeTimeLong = zen::to<zen::Int64>(zen::UInt64(lastWriteTime.dwLowDateTime, lastWriteTime.dwHighDateTime) / 10000000U); //reduce precision to 1 second (FILETIME has unit 10^-7 s)
+    writeTimeLong -= zen::Int64(3054539008UL, 2); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
     return writeTimeLong;
 }
 
 
 inline
-void setWin32FileInformation(const FILETIME& lastWriteTime,
-                             const DWORD fileSizeHigh,
-                             const DWORD fileSizeLow,
-                             ffs3::TraverseCallback::FileInfo& output)
-{
-    output.lastWriteTimeRaw = getWin32TimeInformation(lastWriteTime);
-    output.fileSize = wxULongLong(fileSizeHigh, fileSizeLow);
-}
-
-
-inline
-bool setWin32FileInformationFromSymlink(const Zstring& linkName, ffs3::TraverseCallback::FileInfo& output)
+bool setWin32FileInformationFromSymlink(const Zstring& linkName, zen::TraverseCallback::FileInfo& output)
 {
     //open handle to target of symbolic link
-    HANDLE hFile = ::CreateFile(ffs3::applyLongPathPrefix(linkName).c_str(),
+    HANDLE hFile = ::CreateFile(zen::applyLongPathPrefix(linkName).c_str(),
                                 0,
                                 FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                                 NULL,
@@ -68,12 +52,13 @@ bool setWin32FileInformationFromSymlink(const Zstring& linkName, ffs3::TraverseC
     Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hFile);
     (void)dummy; //silence warning "unused variable"
 
-    BY_HANDLE_FILE_INFORMATION fileInfoByHandle;
+    BY_HANDLE_FILE_INFORMATION fileInfoByHandle = {};
     if (!::GetFileInformationByHandle(hFile, &fileInfoByHandle))
         return false;
 
     //write output
-    setWin32FileInformation(fileInfoByHandle.ftLastWriteTime, fileInfoByHandle.nFileSizeHigh, fileInfoByHandle.nFileSizeLow, output);
+    output.lastWriteTimeRaw = filetimeToTimeT(fileInfoByHandle.ftLastWriteTime);
+    output.fileSize         = zen::UInt64(fileInfoByHandle.nFileSizeLow, fileInfoByHandle.nFileSizeHigh);
     return true;
 }
 #endif
@@ -82,7 +67,7 @@ bool setWin32FileInformationFromSymlink(const Zstring& linkName, ffs3::TraverseC
 class DirTraverser
 {
 public:
-    DirTraverser(const Zstring& baseDirectory, bool followSymlinks, ffs3::TraverseCallback& sink, ffs3::DstHackCallback* dstCallback)
+    DirTraverser(const Zstring& baseDirectory, bool followSymlinks, zen::TraverseCallback& sink, zen::DstHackCallback* dstCallback)
 #ifdef FFS_WIN
         : isFatFileSystem(dst::isFatDrive(baseDirectory))
 #endif
@@ -113,9 +98,9 @@ public:
 
 private:
     template <bool followSymlinks>
-    void traverse(const Zstring& directory, ffs3::TraverseCallback& sink, int level)
+    void traverse(const Zstring& directory, zen::TraverseCallback& sink, int level)
     {
-        using namespace ffs3;
+        using namespace zen;
 
         if (level == 100) //catch endless recursion
         {
@@ -129,9 +114,9 @@ private:
                                             directory :
                                             directory + common::FILE_NAME_SEPARATOR;
 
-        WIN32_FIND_DATA fileMetaData = {};
+        WIN32_FIND_DATA fileInfo = {};
         HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(directoryFormatted + Zchar('*')).c_str(), //__in   LPCTSTR lpFileName
-                                              &fileMetaData);                                                     //__out  LPWIN32_FIND_DATA lpFindFileData
+                                              &fileInfo);                                                     //__out  LPWIN32_FIND_DATA lpFindFileData
         //no noticable performance difference compared to FindFirstFileEx with FindExInfoBasic, FIND_FIRST_EX_CASE_SENSITIVE and/or FIND_FIRST_EX_LARGE_FETCH
 
         if (searchHandle == INVALID_HANDLE_VALUE)
@@ -141,10 +126,9 @@ private:
                 return;
 
             //else: we have a problem... report it:
-            const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") + wxT("\n\n") +
-                                          ffs3::getLastErrorFormatted(lastError);
+            const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"");
 
-            sink.onError(errorMessage);
+            sink.onError(errorMessage + wxT("\n\n") +zen::getLastErrorFormatted(lastError));
             return;
         }
 
@@ -154,7 +138,7 @@ private:
         do
         {
             //don't return "." and ".."
-            const Zchar* const shortName = fileMetaData.cFileName;
+            const Zchar* const shortName = fileInfo.cFileName;
             if ( shortName[0] == Zstr('.') &&
                  ((shortName[1] == Zstr('.') && shortName[2] == Zstr('\0')) ||
                   shortName[1] == Zstr('\0')))
@@ -162,7 +146,7 @@ private:
 
             const Zstring& fullName = directoryFormatted + shortName;
 
-            const bool isSymbolicLink = (fileMetaData.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
+            const bool isSymbolicLink = (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
 
             if (isSymbolicLink && !followSymlinks) //evaluate symlink directly
             {
@@ -179,11 +163,11 @@ private:
 #endif
                 }
 
-                details.lastWriteTimeRaw = getWin32TimeInformation(fileMetaData.ftLastWriteTime);
-                details.dirLink          = (fileMetaData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0; //directory symlinks have this flag on Windows
+                details.lastWriteTimeRaw = filetimeToTimeT(fileInfo.ftLastWriteTime);
+                details.dirLink          = (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0; //directory symlinks have this flag on Windows
                 sink.onSymlink(shortName, fullName, details);
             }
-            else if (fileMetaData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) //a directory... or symlink that needs to be followed (for directory symlinks this flag is set too!)
+            else if (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) //a directory... or symlink that needs to be followed (for directory symlinks this flag is set too!)
             {
                 const TraverseCallback::ReturnValDir rv = sink.onDir(shortName, fullName);
                 switch (rv.returnCode)
@@ -206,7 +190,7 @@ private:
                     {
                         //broken symlink...
                         details.lastWriteTimeRaw = 0; //we are not interested in the modification time of the link
-                        details.fileSize         = 0;
+                        details.fileSize         = 0U;
                     }
                 }
                 else
@@ -214,29 +198,30 @@ private:
                     //####################################### DST hack ###########################################
                     if (isFatFileSystem)
                     {
-                        const dst::RawTime rawTime(fileMetaData.ftCreationTime, fileMetaData.ftLastWriteTime);
+                        const dst::RawTime rawTime(fileInfo.ftCreationTime, fileInfo.ftLastWriteTime);
 
                         if (dst::fatHasUtcEncoded(rawTime)) //throw (std::runtime_error)
-                            fileMetaData.ftLastWriteTime = dst::fatDecodeUtcTime(rawTime); //return real UTC time; throw (std::runtime_error)
+                            fileInfo.ftLastWriteTime = dst::fatDecodeUtcTime(rawTime); //return real UTC time; throw (std::runtime_error)
                         else
-                            markForDstHack.push_back(std::make_pair(fullName, fileMetaData.ftLastWriteTime));
+                            markForDstHack.push_back(std::make_pair(fullName, fileInfo.ftLastWriteTime));
                     }
                     //####################################### DST hack ###########################################
-                    setWin32FileInformation(fileMetaData.ftLastWriteTime, fileMetaData.nFileSizeHigh, fileMetaData.nFileSizeLow, details);
+                    details.lastWriteTimeRaw = filetimeToTimeT(fileInfo.ftLastWriteTime);
+                    details.fileSize         = zen::UInt64(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
                 }
 
                 sink.onFile(shortName, fullName, details);
             }
         }
         while (::FindNextFile(searchHandle,	   // handle to search
-                              &fileMetaData)); // pointer to structure for data on found file
+                              &fileInfo)); // pointer to structure for data on found file
 
         const DWORD lastError = ::GetLastError();
         if (lastError != ERROR_NO_MORE_FILES) //this is fine
         {
             //else we have a problem... report it:
             const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") ;
-            sink.onError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted(lastError));
+            sink.onError(errorMessage + wxT("\n\n") + zen::getLastErrorFormatted(lastError));
         }
 
 #elif defined FFS_LINUX
@@ -244,7 +229,7 @@ private:
         if (dirObj == NULL)
         {
             const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") ;
-            sink.onError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+            sink.onError(errorMessage + wxT("\n\n") + zen::getLastErrorFormatted());
             return;
         }
 
@@ -262,7 +247,7 @@ private:
 
                 //else: we have a problem... report it:
                 const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") ;
-                sink.onError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+                sink.onError(errorMessage + wxT("\n\n") + zen::getLastErrorFormatted());
                 return;
             }
 
@@ -281,7 +266,7 @@ private:
             if (::lstat(fullName.c_str(), &fileInfo) != 0) //lstat() does not resolve symlinks
             {
                 const wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(fullName) + wxT("\"");
-                sink.onError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+                sink.onError(errorMessage + wxT("\n\n") + zen::getLastErrorFormatted());
                 continue;
             }
 
@@ -296,7 +281,7 @@ private:
                         //a broken symbolic link
                         TraverseCallback::FileInfo details;
                         details.lastWriteTimeRaw = 0; //we are not interested in the modifiation time of the link
-                        details.fileSize         = 0;
+                        details.fileSize         = 0U;
                         sink.onFile(shortName, fullName, details); //report broken symlink as file!
                         continue;
                     }
@@ -341,7 +326,7 @@ private:
             {
                 TraverseCallback::FileInfo details;
                 details.lastWriteTimeRaw = fileInfo.st_mtime; //UTC time(ANSI C format); unit: 1 second
-                details.fileSize         = fileInfo.st_size;
+                details.fileSize         = zen::UInt64(fileInfo.st_size);
 
                 sink.onFile(shortName, fullName, details);
             }
@@ -352,7 +337,7 @@ private:
 
 #ifdef FFS_WIN
     //####################################### DST hack ###########################################
-    void applyDstHack(ffs3::DstHackCallback& dstCallback)
+    void applyDstHack(zen::DstHackCallback& dstCallback)
     {
         int failedAttempts  = 0;
         int filesToValidate = 50; //don't let data verification become a performance issue
@@ -366,7 +351,7 @@ private:
 
             const dst::RawTime encodedTime = dst::fatEncodeUtcTime(i->second); //throw (std::runtime_error)
             {
-                HANDLE hTarget = ::CreateFile(ffs3::applyLongPathPrefix(i->first).c_str(),
+                HANDLE hTarget = ::CreateFile(zen::applyLongPathPrefix(i->first).c_str(),
                                               FILE_WRITE_ATTRIBUTES,
                                               FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                                               NULL,
@@ -400,7 +385,7 @@ private:
 
                 //dst hack: verify data written; attention: this check may fail for "sync.ffs_lock"
                 WIN32_FILE_ATTRIBUTE_DATA debugeAttr = {};
-                ::GetFileAttributesEx(ffs3::applyLongPathPrefix(i->first).c_str(), //__in   LPCTSTR lpFileName,
+                ::GetFileAttributesEx(zen::applyLongPathPrefix(i->first).c_str(), //__in   LPCTSTR lpFileName,
                                       GetFileExInfoStandard,                //__in   GET_FILEEX_INFO_LEVELS fInfoLevelId,
                                       &debugeAttr);                         //__out  LPVOID lpFileInformation
 
@@ -423,7 +408,7 @@ private:
 };
 
 
-void ffs3::traverseFolder(const Zstring& directory, bool followSymlinks, TraverseCallback& sink, DstHackCallback* dstCallback)
+void zen::traverseFolder(const Zstring& directory, bool followSymlinks, TraverseCallback& sink, DstHackCallback* dstCallback)
 {
     DirTraverser(directory, followSymlinks, sink, dstCallback);
 }

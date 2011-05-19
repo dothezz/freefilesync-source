@@ -13,7 +13,7 @@
 #include "../shared/zstring.h"
 
 
-namespace ffs3
+namespace zen
 {
 enum MessageType
 {

@@ -210,7 +210,7 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6> >
     virtual ~FactoryImpl() {}
     virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                              Parm6 )
-    = 0;
+        = 0;
 };
 
 template<typename AP, typename Id,
@@ -229,7 +229,7 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7> >
     virtual ~FactoryImpl() {}
     virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                              Parm6, Parm7 )
-    = 0;
+        = 0;
 };
 
 template<typename AP, typename Id,
@@ -249,7 +249,7 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8> >
     virtual ~FactoryImpl() {}
     virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                              Parm6, Parm7, Parm8)
-    = 0;
+        = 0;
 };
 
 template<typename AP, typename Id,
@@ -270,7 +270,7 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9> >
     virtual ~FactoryImpl() {}
     virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                              Parm6, Parm7, Parm8, Parm9)
-    = 0;
+        = 0;
 };
 
 template<typename AP, typename Id,
@@ -292,7 +292,7 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10> >
     virtual ~FactoryImpl() {}
     virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                              Parm6, Parm7, Parm8, Parm9,Parm10)
-    = 0;
+        = 0;
 };
 
 template<typename AP, typename Id,
@@ -317,7 +317,7 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11> >
     virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                              Parm6, Parm7, Parm8, Parm9,Parm10,
                              Parm11)
-    = 0;
+        = 0;
 };
 
 template<typename AP, typename Id,
@@ -343,7 +343,7 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12
     virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                              Parm6, Parm7, Parm8, Parm9,Parm10,
                              Parm11,Parm12)
-    = 0;
+        = 0;
 };
 
 template<typename AP, typename Id,
@@ -370,7 +370,7 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12
     virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                              Parm6, Parm7, Parm8, Parm9,Parm10,
                              Parm11,Parm12,Parm13)
-    = 0;
+        = 0;
 };
 
 template<typename AP, typename Id,
@@ -398,7 +398,7 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12
     virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                              Parm6, Parm7, Parm8, Parm8,Parm10,
                              Parm11,Parm12,Parm13,Parm14)
-    = 0;
+        = 0;
 };
 
 template<typename AP, typename Id,
@@ -427,7 +427,7 @@ struct FactoryImpl<AP, Id, Seq<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12
     virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                              Parm6, Parm7, Parm8, Parm9,Parm10,
                              Parm11,Parm12,Parm13,Parm14,Parm15 )
-    = 0;
+        = 0;
 };
 
 #ifndef LOKI_DISABLE_TYPELIST_MACROS
@@ -503,7 +503,7 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_6( P1, P2, P3, P4, P5, P6 )>
 virtual ~FactoryImpl() {}
 virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                          Parm6 )
-= 0;
+    = 0;
 };
 
 template<typename AP, typename Id,
@@ -522,7 +522,7 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_7( P1, P2, P3, P4, P5, P6, P7 )>
 virtual ~FactoryImpl() {}
 virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                          Parm6, Parm7 )
-= 0;
+    = 0;
 };
 
 template<typename AP, typename Id,
@@ -542,7 +542,7 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_8( P1, P2, P3, P4, P5, P6, P7, P8 )>
 virtual ~FactoryImpl() {}
 virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                          Parm6, Parm7, Parm8)
-= 0;
+    = 0;
 };
 
 template<typename AP, typename Id,
@@ -563,7 +563,7 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_9( P1, P2, P3, P4, P5, P6, P7, P8, P9 )
 virtual ~FactoryImpl() {}
 virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                          Parm6, Parm7, Parm8, Parm9)
-= 0;
+    = 0;
 };
 
 template<typename AP, typename Id,
@@ -585,7 +585,7 @@ struct FactoryImpl<AP, Id, LOKI_TYPELIST_10( P1, P2, P3, P4, P5, P6, P7, P8, P9,
 virtual ~FactoryImpl() {}
 virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                          Parm6, Parm7, Parm8, Parm9,Parm10)
-= 0;
+    = 0;
 };
 
 template<typename AP, typename Id,
@@ -610,7 +610,7 @@ virtual ~FactoryImpl() {}
 virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                          Parm6, Parm7, Parm8, Parm9,Parm10,
                          Parm11)
-= 0;
+    = 0;
 };
 
 template<typename AP, typename Id,
@@ -636,7 +636,7 @@ virtual ~FactoryImpl() {}
 virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                          Parm6, Parm7, Parm8, Parm9,Parm10,
                          Parm11,Parm12)
-= 0;
+    = 0;
 };
 
 template<typename AP, typename Id,
@@ -663,7 +663,7 @@ virtual ~FactoryImpl() {}
 virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                          Parm6, Parm7, Parm8, Parm9,Parm10,
                          Parm11,Parm12,Parm13)
-= 0;
+    = 0;
 };
 
 template<typename AP, typename Id,
@@ -691,7 +691,7 @@ virtual ~FactoryImpl() {}
 virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                          Parm6, Parm7, Parm8, Parm8,Parm10,
                          Parm11,Parm12,Parm13,Parm14)
-= 0;
+    = 0;
 };
 
 template<typename AP, typename Id,
@@ -720,7 +720,7 @@ virtual ~FactoryImpl() {}
 virtual AP* CreateObject(const Id& id,Parm1, Parm2, Parm3, Parm4, Parm5,
                          Parm6, Parm7, Parm8, Parm9,Parm10,
                          Parm11,Parm12,Parm13,Parm14,Parm15 )
-= 0;
+    = 0;
 };
 
 #endif //LOKI_DISABLE_TYPELIST_MACROS

@@ -10,7 +10,7 @@
 #include <wx/string.h>
 
 
-namespace ffs3
+namespace zen
 {
 class FileError //Exception base class used to notify file/directory copy/delete errors
 {

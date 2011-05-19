@@ -30,7 +30,7 @@ class CustomGridMiddle;
 class CustomGridRight;
 
 
-namespace ffs3
+namespace zen
 {
 class GridView;
 
@@ -63,12 +63,12 @@ public:
 
     virtual ~CustomGrid() {}
 
-    virtual void initSettings(CustomGridLeft*   gridLeft,  //create connection with ffs3::GridView
+    virtual void initSettings(CustomGridLeft*   gridLeft,  //create connection with zen::GridView
                               CustomGridMiddle* gridMiddle,
                               CustomGridRight*  gridRight,
-                              const ffs3::GridView* gridDataView);
+                              const zen::GridView* gridDataView);
 
-    void release(); //release connection to ffs3::GridView
+    void release(); //release connection to zen::GridView
 
     std::set<size_t> getAllSelectedRows() const;
 
@@ -165,7 +165,7 @@ public:
     void enableFileIcons(const bool value);
 
 protected:
-    template <ffs3::SelectedSide side>
+    template <zen::SelectedSide side>
     void setTooltip(const wxMouseEvent& event);
 
     void setOtherGrid(CustomGridRim* other); //call during initialization!
@@ -211,10 +211,10 @@ public:
 
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
 
-    virtual void initSettings(CustomGridLeft*   gridLeft,  //create connection with ffs3::GridView
+    virtual void initSettings(CustomGridLeft*   gridLeft,  //create connection with zen::GridView
                               CustomGridMiddle* gridMiddle,
                               CustomGridRight*  gridRight,
-                              const ffs3::GridView* gridDataView);
+                              const zen::GridView* gridDataView);
 
 private:
     void OnMouseMovement(wxMouseEvent& event);
@@ -234,10 +234,10 @@ public:
 
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
 
-    virtual void initSettings(CustomGridLeft*   gridLeft,  //create connection with ffs3::GridView
+    virtual void initSettings(CustomGridLeft*   gridLeft,  //create connection with zen::GridView
                               CustomGridMiddle* gridMiddle,
                               CustomGridRight*  gridRight,
-                              const ffs3::GridView* gridDataView);
+                              const zen::GridView* gridDataView);
 
 private:
     void OnMouseMovement(wxMouseEvent& event);
@@ -261,10 +261,10 @@ public:
 
     virtual bool CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectionModes selmode = wxGrid::wxGridSelectCells);
 
-    virtual void initSettings(CustomGridLeft*   gridLeft,  //create connection with ffs3::GridView
+    virtual void initSettings(CustomGridLeft*   gridLeft,  //create connection with zen::GridView
                               CustomGridMiddle* gridMiddle,
                               CustomGridRight*  gridRight,
-                              const ffs3::GridView* gridDataView);
+                              const zen::GridView* gridDataView);
 
     void enableSyncPreview(bool value);
 
@@ -346,7 +346,7 @@ extern const wxEventType FFS_SYNC_DIRECTION_EVENT; //define new event type
 class FFSSyncDirectionEvent : public wxCommandEvent
 {
 public:
-    FFSSyncDirectionEvent(const int from, const int to, const ffs3::SyncDirection dir) :
+    FFSSyncDirectionEvent(const int from, const int to, const zen::SyncDirection dir) :
         wxCommandEvent(FFS_SYNC_DIRECTION_EVENT),
         rowFrom(from),
         rowTo(to),
@@ -359,7 +359,7 @@ public:
 
     const int rowFrom;
     const int rowTo;
-    const ffs3::SyncDirection direction;
+    const zen::SyncDirection direction;
 };
 
 typedef void (wxEvtHandler::*FFSSyncDirectionEventFunction)(FFSSyncDirectionEvent&);

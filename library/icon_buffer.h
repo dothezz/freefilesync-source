@@ -7,21 +7,18 @@
 #ifndef ICONBUFFER_H_INCLUDED
 #define ICONBUFFER_H_INCLUDED
 
-#include <vector>
 #include "../shared/zstring.h"
 #include <memory>
 #include <wx/icon.h>
-#include "../shared/boost_thread_wrap.h" //include <boost/thread.hpp>
 
 
-namespace ffs3
+namespace zen
 {
-
 class IconBuffer
 {
 public:
-    static const wxIcon& getDirectoryIcon(); //one folder icon should be sufficient...
-    static const wxIcon& getFileIcon();      //in case one folder icon is sufficient...
+    static const wxIcon& getDirectoryIcon(); //one icon should be sufficient...
+    static const wxIcon& getFileIcon();      //
 
     static IconBuffer& getInstance();
     bool requestFileIcon(const Zstring& fileName, wxIcon* icon = NULL); //returns false if icon is not in buffer
@@ -37,36 +34,8 @@ private:
     IconBuffer();
     ~IconBuffer();
 
-    static const size_t BUFFER_SIZE_MAX = 800; //maximum number of icons to buffer
-
-    class IconDB;
-    class IconHolder;
-    class IconDbSequence;
-
-    //---------------------------------------------------------------------------------------------------
-    typedef Zbase<Zchar, StorageDeepCopy> BasicString; //thread safe string class
-    //avoid reference-counted objects for shared data: NOT THREADSAFE!!! (implicitly shared variable: ref-count)
-    //---------------------------------------------------------------------------------------------------
-
-    //methods used by worker thread
-    void insertIntoBuffer(const BasicString& entryName, const IconHolder& icon);
-
-    static IconHolder getAssociatedIcon(const BasicString& filename);
-    static IconHolder getAssociatedIconByExt(const BasicString& extension);
-
-#ifdef FFS_WIN
-    static BasicString getFileExtension(const BasicString& filename);
-    static bool isPriceyExtension(const BasicString& extension);
-#endif
-
-    //---------------------- Shared Data -------------------------
-    boost::mutex lockIconDB;
-    std::auto_ptr<IconDB> buffer;  //use synchronisation when accessing this!
-    std::auto_ptr<IconDbSequence> bufSequence; //save sequence of buffer entry to delete oldest elements
-    //------------------------------------------------------------
-
-    class WorkerThread;
-    std::auto_ptr<WorkerThread> worker;
+    struct Pimpl;
+    std::auto_ptr<Pimpl> pimpl;
 };
 }
 

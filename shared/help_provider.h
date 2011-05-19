@@ -9,7 +9,7 @@
 
 #include <wx/string.h>
 
-namespace ffs3
+namespace zen
 {
 void displayHelpEntry(const wxString& section = wxEmptyString);
 }

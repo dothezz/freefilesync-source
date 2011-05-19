@@ -5,7 +5,7 @@
 	<TITLE></TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
 	<META NAME="CREATED" CONTENT="20091206;16574000">
-	<META NAME="CHANGED" CONTENT="20110414;19310800">
+	<META NAME="CHANGED" CONTENT="20110519;13094300">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -30,8 +30,8 @@ application via double-click</FONT></H3>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">By
 default FreeFileSync opens the operating system's standard file
 browser on each double-click by invoking &quot;<FONT FACE="Courier New, monospace">explorer
-/select, %name</FONT>&quot; on Windows and &quot;<FONT FACE="Courier New, monospace">xdg-open
-%dir</FONT>&quot; on Linux.</FONT></P>
+/select, &quot;%name&quot;</FONT>&quot; on Windows and &quot;<FONT FACE="Courier New, monospace">xdg-open
+&quot;%dir&quot;</FONT>&quot; on Linux.</FONT></P>
 <P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">However
 the user is free to integrate other external applications into
 FreeFileSync: navigate to &quot;</FONT><FONT FACE="Tahoma, sans-serif"><I>Menu
@@ -56,14 +56,16 @@ available:</FONT></P>
 <UL>
 	<UL>
 		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Start
-		visual difference tool:<BR><FONT FACE="Courier New, monospace">C:\Program
-		Files\WinMerge\WinMergeU.exe &quot;%name&quot; &quot;%nameCo&quot;</FONT></FONT></P>
+		visual difference tool:<BR><FONT FACE="Courier New, monospace">&quot;C:\Program
+		Files\WinMerge\WinMergeU.exe&quot; &quot;%name&quot; &quot;%nameCo&quot;</FONT></FONT></P>
 		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Show
 		file in Windows Explorer:<BR><FONT FACE="Courier New, monospace">explorer
 		/select, &quot;%name&quot;</FONT></FONT></P>
 		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Open
-		file in associated application:<BR><FONT FACE="Courier New, monospace">cmd
-		/c start &quot;&quot; &quot;%name&quot;</FONT></FONT></P>
+		file in associated application:</FONT><BR><FONT FACE="Courier New, monospace">cmd
+		/c start &quot;&quot; &quot;%name&quot; </FONT><FONT FACE="Tahoma, sans-serif">or
+		simply</FONT><FONT FACE="Courier New, monospace"> &quot;%name&quot;
+		</FONT><FONT FACE="Tahoma, sans-serif">(since v3.17)</FONT></P>
 		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Tahoma, sans-serif">Open
 		console dialog:<BR><FONT FACE="Courier New, monospace">cmd /k cd /D
 		&quot;%dir&quot;</FONT></FONT></P>

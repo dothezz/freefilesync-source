@@ -8,7 +8,14 @@
 #define DLLLOADER_H_INCLUDED
 
 #include <string>
+
+#ifdef __WXMSW__ //we have wxWidgets
 #include <wx/msw/wrapwin.h> //includes "windows.h"
+#else
+#include <windows.h>
+#undef max
+#undef min
+#endif
 
 
 namespace util

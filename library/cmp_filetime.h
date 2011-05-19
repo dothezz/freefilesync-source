@@ -1,28 +1,26 @@
 #ifndef CMP_FILETIME_H_INCLUDED
 #define CMP_FILETIME_H_INCLUDED
 
-#include <wx/longlong.h>
 #include <wx/stopwatch.h>
+#include "../shared/int64.h"
 
-
-namespace ffs3
+namespace zen
 {
 //---------------------------------------------------------------------------------------------------------------
 inline
-bool sameFileTime(const wxLongLong& a, const wxLongLong& b, size_t tolerance)
+bool sameFileTime(const Int64& a, const Int64& b, size_t tolerance)
 {
     if (a < b)
-        return b <= a + tolerance;
+        return b <= a + static_cast<int>(tolerance);
     else
-        return a <= b + tolerance;
+        return a <= b + static_cast<int>(tolerance);
 }
 //---------------------------------------------------------------------------------------------------------------
 
 class CmpFileTime
 {
 public:
-    CmpFileTime(size_t tolerance) :
-        tolerance_(tolerance) {}
+    CmpFileTime(size_t tolerance) : tolerance_(tolerance) {}
 
     enum Result
     {
@@ -33,7 +31,7 @@ public:
         TIME_RIGHT_INVALID
     };
 
-    Result getResult(const wxLongLong& lhs, const wxLongLong& rhs) const
+    Result getResult(const Int64& lhs, const Int64& rhs) const
     {
         if (lhs == rhs)
             return TIME_EQUAL;

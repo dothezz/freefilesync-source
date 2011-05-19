@@ -16,6 +16,8 @@
 #include "../shared/assert_static.h"
 
 
+using namespace zen;
+
 RetrieveStatistics::RetrieveStatistics() :
     timer(new wxStopWatch) {}
 
@@ -31,12 +33,11 @@ RetrieveStatistics::~RetrieveStatistics()
 
     for (std::vector<StatEntry>::const_iterator i = data.begin(); i != data.end(); ++i)
     {
-        using common::numberToString;
-        outputFile.Write(numberToString(i->time));
+        outputFile.Write(toString<wxString>(i->time));
         outputFile.Write(wxT(";"));
-        outputFile.Write(numberToString(i->objects));
+        outputFile.Write(toString<wxString>(i->objects));
         outputFile.Write(wxT(";"));
-        outputFile.Write(numberToString(i->value));
+        outputFile.Write(toString<wxString>(i->value));
         outputFile.Write(wxT("\n"));
     }
 }
@@ -64,26 +65,34 @@ bool isNull(T number)
 }
 
 
+enum UnitRemTime
+{
+    URT_SEC,
+    URT_MIN,
+    URT_HOUR,
+    URT_DAY
+};
+
+
 inline
 wxString Statistics::formatRemainingTime(double timeInMs) const
 {
-    bool unitSec = true;
     double remainingTime = timeInMs / 1000;
 
-    wxString output = _("%x sec");
+    //determine preferred unit
+    UnitRemTime unit = URT_SEC;
     if (remainingTime > 55)
     {
-        unitSec = false;
+        unit = URT_MIN;
         remainingTime /= 60;
-        output = _("%x min");
         if (remainingTime > 59)
         {
+            unit = URT_HOUR;
             remainingTime /= 60;
-            output = _("%x hour(s)");
             if (remainingTime > 23)
             {
+                unit = URT_DAY;
                 remainingTime /= 24;
-                output = _("%x day(s)");
             }
         }
     }
@@ -91,14 +100,14 @@ wxString Statistics::formatRemainingTime(double timeInMs) const
     int formattedTime = common::round(remainingTime);
 
     //reduce precision to 5 seconds
-    if (unitSec && formattedTime % 5 != 0)
+    if (unit == URT_SEC && formattedTime % 5 != 0)
         formattedTime += 5 - formattedTime % 5; //"ceiling"
 
 
     //avoid "jumping back and forth" when fluctuating around .5
     if (remainingTimeLast < formattedTime)
     {
-        if (unitSec)
+        if (unit == URT_SEC)
         {
             formattedTime = common::round(remainingTime);
             formattedTime -= formattedTime % 5; //"floor"
@@ -108,8 +117,24 @@ wxString Statistics::formatRemainingTime(double timeInMs) const
     }
     remainingTimeLast = formattedTime;
 
-    output.Replace(wxT("%x"), common::numberToString(formattedTime));
-
+    //generate output message
+    wxString output;
+    switch (unit)
+    {
+        case URT_SEC:
+            output = _P("1 sec", "%x sec", formattedTime);
+            break;
+        case URT_MIN:
+            output = _P("1 min", "%x min", formattedTime);
+            break;
+        case URT_HOUR:
+            output = _P("1 hour", "%x hours", formattedTime);
+            break;
+        case URT_DAY:
+            output = _P("1 day", "%x days", formattedTime);
+            break;
+    }
+    output.Replace(wxT("%x"), zen::toStringSep(formattedTime));
     return output;
     //+ wxT("(") + common::numberToWxString(common::round(timeInMs / 1000)) + wxT(")");
 }
@@ -144,10 +169,10 @@ void Statistics::addMeasurement(int objectsCurrent, double dataCurrent)
 
     //insert new record
     if (!measurements.empty())
-        {
-			//assert(dataCurrent >= (--measurements.end())->second.data);
-			measurements.insert(--measurements.end(), newEntry); //use fact that time is monotonously ascending
-	}
+    {
+        //assert(dataCurrent >= (--measurements.end())->second.data);
+        measurements.insert(--measurements.end(), newEntry); //use fact that time is monotonously ascending
+    }
     else
         measurements.insert(newEntry);
 
@@ -202,7 +227,7 @@ wxString Statistics::getBytesPerSecond() const
         const double dataDelta = backRecord.second.data - frontRecord.second.data;
 
         if (!isNull(timeDelta))
-            return ffs3::formatFilesizeToShortString(dataDelta * 1000 / timeDelta) + _("/sec");
+            return zen::formatFilesizeToShortString(zen::UInt64(dataDelta * 1000 / timeDelta)) + _("/sec");
     }
 
     return wxT("-"); //fallback
@@ -273,7 +298,7 @@ wxString Statistics::getRemainingTime(const int objectsCurrent, const double dat
         const double X = dataCurrent - dataLast;
         dataLast = dataCurrent;
 
-        const wxLongLong timeCurrent = wxGetLocalTimeMillis();
+        const zen::Int64 timeCurrent = wxGetLocalTimeMillis();
         const double F = (timeCurrent - timeLast).ToDouble();
         timeLast = timeCurrent;
 
@@ -298,7 +323,7 @@ wxString Statistics::getRemainingTime(const int objectsCurrent, const double dat
         const double X = dataCurrent - dataLast; //do not set dataLast, timeLast variables here, but write dummy record instead
         if (!isNull(X))
         {
-            const wxLongLong timeCurrent = wxGetLocalTimeMillis();
+            const zen::Int64 timeCurrent = wxGetLocalTimeMillis();
             const double F = (timeCurrent - timeLast).ToDouble();
 
             record modifyEntry;

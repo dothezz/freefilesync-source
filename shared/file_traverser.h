@@ -7,13 +7,14 @@
 #ifndef FILETRAVERSER_H_INCLUDED
 #define FILETRAVERSER_H_INCLUDED
 
+#include <wx/string.h>
 #include "zstring.h"
-#include <wx/longlong.h>
 #include "loki/TypeManip.h"
+#include "int64.h"
 
 //advanced file traverser returning metadata and hierarchical information on files and directories
 
-namespace ffs3
+namespace zen
 {
 class TraverseCallback
 {
@@ -22,13 +23,13 @@ public:
 
     struct FileInfo
     {
-        wxULongLong fileSize;        //unit: bytes!
-        wxLongLong lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
+        zen::UInt64 fileSize;        //unit: bytes!
+        zen::Int64 lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
     };
 
     struct SymlinkInfo
     {
-        wxLongLong lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
+        zen::Int64 lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
         Zstring    targetPath;       //may be empty if something goes wrong
         bool dirLink;                //"true": point to dir; "false": point to file (or broken Link on Linux)
     };

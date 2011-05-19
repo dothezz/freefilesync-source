@@ -10,7 +10,7 @@
 #include <wx/string.h>
 #include "zstring.h"
 
-namespace ffs3
+namespace zen
 {
 //conversion from Zstring to wxString
 wxString zToWx(const Zstring& str);
@@ -74,7 +74,7 @@ wxString zToWx(const Zchar* str)
 inline
 wxString zToWx(Zchar ch)
 {
-    return zToWx(Zstring(ch));
+    return zToWx(Zstring() + ch);
 }
 
 //-----------------------------------------------------------------

@@ -9,7 +9,7 @@
 
 class wxWindow;
 
-namespace ffs3
+namespace zen
 {
 //just some wrapper around a global variable representing the (logical) main application window
 class AppMainWindow

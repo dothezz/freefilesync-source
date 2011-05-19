@@ -9,78 +9,87 @@
 #include "system_constants.h"
 #include "string_conv.h"
 
-using namespace ffs3;
+using namespace zen;
 
 
-bool ffs3::isPortableVersion()
+namespace
 {
-#ifdef FFS_WIN
-    static const bool isPortable = !wxFileExists(ffs3::getBinaryDir() + wxT("uninstall.exe")); //this check is a bit lame...
-#elif defined FFS_LINUX
-    static const bool isPortable = !ffs3::getBinaryDir().EndsWith(wxT("/bin/")); //this check is a bit lame...
-#endif
-    return isPortable;
-}
-
-
-const wxString& ffs3::getBinaryDir()
+const wxString& getBinaryDir() //directory containing executable WITH path separator at end
 {
     static wxString instance = zToWx(wxToZ(wxStandardPaths::Get().GetExecutablePath()).BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR);
     return instance;
 }
 
-
-const wxString& ffs3::getResourceDir()
-{
 #ifdef FFS_WIN
-    return getBinaryDir();
-#elif defined FFS_LINUX
-    static wxString resourceDir;
-
-    static bool isInitalized = false; //poor man's singleton...
-    if (!isInitalized)
-    {
-        isInitalized = true;
-
-        if (isPortableVersion())
-            resourceDir = getBinaryDir();
-        else //use OS' standard paths
-        {
-            resourceDir = wxStandardPathsBase::Get().GetResourcesDir();
-
-            if (!resourceDir.EndsWith(zToWx(common::FILE_NAME_SEPARATOR)))
-                resourceDir += zToWx(common::FILE_NAME_SEPARATOR);
-        }
-    }
-
-    return resourceDir;
+wxString getInstallDir() //root install directory WITH path separator at end
+{
+    return getBinaryDir().BeforeLast(common::FILE_NAME_SEPARATOR).BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR;
+}
 #endif
 }
 
 
-const wxString& ffs3::getConfigDir()
+bool zen::isPortableVersion()
 {
-    static wxString userDirectory;
+#ifdef FFS_WIN
+    static const bool isPortable = !wxFileExists(getInstallDir() + wxT("uninstall.exe")); //this check is a bit lame...
+#elif defined FFS_LINUX
+    static const bool isPortable = !::getBinaryDir().EndsWith(wxT("/bin/")); //this check is a bit lame...
+#endif
+    return isPortable;
+}
 
-    static bool isInitalized = false; //poor man's singleton...
-    if (!isInitalized)
+
+wxString zen::getResourceDir()
+{
+#ifdef FFS_WIN
+    return getInstallDir();
+#elif defined FFS_LINUX
+    if (isPortableVersion())
+        return getBinaryDir();
+    else //use OS' standard paths
     {
-        isInitalized = true;
+        wxString resourceDir = wxStandardPathsBase::Get().GetResourcesDir();
 
-        if (isPortableVersion())
-            //userDirectory = wxString(wxT(".")) + zToWx(common::FILE_NAME_SEPARATOR); //use current working directory
-            userDirectory = getBinaryDir(); //avoid surprises with GlobalSettings.xml being newly created in each working directory
-        else //use OS' standard paths
-        {
-            userDirectory = wxStandardPathsBase::Get().GetUserDataDir();
+        if (!resourceDir.EndsWith(zToWx(common::FILE_NAME_SEPARATOR)))
+            resourceDir += zToWx(common::FILE_NAME_SEPARATOR);
 
-            if (!wxDirExists(userDirectory))
-                ::wxMkdir(userDirectory); //only top directory needs to be created: no recursion necessary
-
-            if (!userDirectory.EndsWith(zToWx(common::FILE_NAME_SEPARATOR)))
-                userDirectory += zToWx(common::FILE_NAME_SEPARATOR);
-        }
+        return resourceDir;
     }
+#endif
+}
 
-    return userDirectory;
+
+wxString zen::getConfigDir()
+{
+    if (isPortableVersion())
+#ifdef FFS_WIN
+        return getInstallDir();
+#elif defined FFS_LINUX
+        //wxString(wxT(".")) + zToWx(common::FILE_NAME_SEPARATOR) -> don't use current working directory
+        //avoid surprises with GlobalSettings.xml being newly created in each working directory
+        return getBinaryDir();
+#endif
+    else //use OS' standard paths
+    {
+        wxString userDirectory = wxStandardPathsBase::Get().GetUserDataDir();
+
+        if (!wxDirExists(userDirectory))
+            ::wxMkdir(userDirectory); //only top directory needs to be created: no recursion necessary
+
+        if (!userDirectory.EndsWith(zToWx(common::FILE_NAME_SEPARATOR)))
+            userDirectory += zToWx(common::FILE_NAME_SEPARATOR);
+
+        return userDirectory;
+    }
+}
+
+
+wxString zen::getLauncher()
+{
+#ifdef FFS_WIN
+    return getInstallDir() + wxT("FreeFileSync.exe");
+#elif defined FFS_LINUX
+    return getBinaryDir() + wxT("FreeFileSync");
+#endif
 }

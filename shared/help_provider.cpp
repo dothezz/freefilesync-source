@@ -16,7 +16,7 @@ class HelpProvider
 public:
     HelpProvider()
     {
-        controller.Initialize(ffs3::getResourceDir() +
+        controller.Initialize(zen::getResourceDir() +
 #ifdef FFS_WIN
                               wxT("FreeFileSync.chm"));
 #elif defined FFS_LINUX
@@ -37,7 +37,7 @@ private:
 };
 }
 
-void ffs3::displayHelpEntry(const wxString& section)
+void zen::displayHelpEntry(const wxString& section)
 {
     static HelpProvider provider;
     provider.showHelp(section);

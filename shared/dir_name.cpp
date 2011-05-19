@@ -17,39 +17,13 @@
 #include "i18n.h"
 #include "system_constants.h"
 
-
-//define new event type
-const wxEventType FFS_DROP_FILE_EVENT = wxNewEventType();
-
-typedef void (wxEvtHandler::*FFSFileDropEventFunction)(FFSFileDropEvent&);
-
-#define FFSFileDropEventHandler(func) \
-    (wxObjectEventFunction)(wxEventFunction)wxStaticCastEvent(FFSFileDropEventFunction, &func)
-
-struct FFSFileDropEvent : public wxCommandEvent
-{
-    FFSFileDropEvent(const std::vector<wxString>& filesDropped, const wxWindow& dropWindow) :
-        wxCommandEvent(FFS_DROP_FILE_EVENT),
-        filesDropped_(filesDropped),
-        dropWindow_(dropWindow) {}
-
-    virtual wxEvent* Clone() const
-    {
-        return new FFSFileDropEvent(filesDropped_, dropWindow_);
-    }
-
-    const std::vector<wxString> filesDropped_;
-    const wxWindow& dropWindow_;
-};
+using namespace zen;
 
 
-//##############################################################################################################
 namespace
 {
 void setDirectoryNameImpl(const wxString& dirname, wxDirPickerCtrl* dirPicker, wxWindow& tooltipWnd, wxStaticBoxSizer* staticBox, size_t timeout)
 {
-    using namespace ffs3;
-
     const wxString dirFormatted = zToWx(getFormattedDirectoryName(wxToZ(dirname)));
 
     tooltipWnd.SetToolTip(dirFormatted); //wxComboBox bug: the edit control is not updated... hope this will be fixed: http://trac.wxwidgets.org/ticket/12659
@@ -68,7 +42,7 @@ void setDirectoryNameImpl(const wxString& dirname, wxDirPickerCtrl* dirPicker, w
 
     if (dirPicker)
     {
-        if (util::dirExists(wxToZ(dirFormatted), timeout) == util::EXISTING_TRUE) //potentially slow network access: wait 200ms at most
+        if (!dirFormatted.empty() && util::dirExists(wxToZ(dirFormatted), timeout) == util::EXISTING_TRUE) //potentially slow network access: wait 200ms at most
             dirPicker->SetPath(dirFormatted);
     }
 }
@@ -105,33 +79,7 @@ void setDirectoryName(const wxString&   dirname,
 
 
 //##############################################################################################################
-class WindowDropTarget : public wxFileDropTarget
-{
-public:
-    WindowDropTarget(wxWindow& dropWindow) : dropWindow_(dropWindow) {}
-
-    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& fileArray)
-    {
-        std::vector<wxString> filenames;
-        for (size_t i = 0; i < fileArray.GetCount(); ++i)
-            filenames.push_back(fileArray[i]);
-
-        if (!filenames.empty())
-        {
-            //create a custom event on drop window: execute event after file dropping is completed! (e.g. after mouse is released)
-            FFSFileDropEvent evt(filenames, dropWindow_);
-            dropWindow_.GetEventHandler()->AddPendingEvent(evt);
-        }
-        return false;
-    }
-
-private:
-    wxWindow& dropWindow_;
-};
-
-
-//##############################################################################################################
-using ffs3::DirectoryNameMainDlg;
+using zen::DirectoryNameMainDlg;
 
 DirectoryNameMainDlg::DirectoryNameMainDlg(wxWindow&         dropWindow1,
                                            wxWindow&         dropWindow2,
@@ -145,8 +93,8 @@ DirectoryNameMainDlg::DirectoryNameMainDlg(wxWindow&         dropWindow1,
     staticBox_(staticBox)
 {
     //prepare drag & drop
-    dropWindow1.SetDropTarget(new WindowDropTarget(dropWindow1)); //takes ownership
-    dropWindow2.SetDropTarget(new WindowDropTarget(dropWindow2)); //takes ownership
+    setupFileDrop(dropWindow1);
+    setupFileDrop(dropWindow2);
 
     //redirect drag & drop event back to this class
     dropWindow1.Connect(FFS_DROP_FILE_EVENT, FFSFileDropEventHandler(DirectoryNameMainDlg::OnFilesDropped), NULL, this);
@@ -160,23 +108,19 @@ DirectoryNameMainDlg::DirectoryNameMainDlg(wxWindow&         dropWindow1,
 
 void DirectoryNameMainDlg::OnFilesDropped(FFSFileDropEvent& event)
 {
-    if (event.filesDropped_.empty())
+    if (event.getFiles().empty())
         return;
 
-    if (&dropWindow1_ == &event.dropWindow_ || //file may be dropped on window 1 or 2
-        &dropWindow2_ == &event.dropWindow_)
+    if (AcceptDrop(event.getFiles()))
     {
-        if (AcceptDrop(event.filesDropped_))
+        Zstring fileName = wxToZ(event.getFiles()[0]);
+        if (dirExists(fileName))
+            setDirectoryName(zToWx(fileName), &dirName_, &dirPicker_, dirName_, staticBox_);
+        else
         {
-            Zstring fileName = wxToZ(event.filesDropped_[0]);
+            fileName = fileName.BeforeLast(common::FILE_NAME_SEPARATOR);
             if (dirExists(fileName))
                 setDirectoryName(zToWx(fileName), &dirName_, &dirPicker_, dirName_, staticBox_);
-            else
-            {
-                fileName = fileName.BeforeLast(common::FILE_NAME_SEPARATOR);
-                if (dirExists(fileName))
-                    setDirectoryName(zToWx(fileName), &dirName_, &dirPicker_, dirName_, staticBox_);
-            }
         }
     }
 }
@@ -198,20 +142,20 @@ void DirectoryNameMainDlg::OnDirSelected(wxFileDirPickerEvent& event)
 }
 
 
-Zstring DirectoryNameMainDlg::getName() const
+wxString DirectoryNameMainDlg::getName() const
 {
-    return wxToZ(dirName_.GetValue());
+    return dirName_.GetValue();
 }
 
 
-void DirectoryNameMainDlg::setName(const Zstring& dirname)
+void DirectoryNameMainDlg::setName(const wxString& dirname)
 {
-    setDirectoryName(zToWx(dirname), &dirName_, &dirPicker_, dirName_, staticBox_);
+    setDirectoryName(dirname, &dirName_, &dirPicker_, dirName_, staticBox_);
 }
 
 
 //##############################################################################################################
-using ffs3::DirectoryName;
+using zen::DirectoryName;
 
 DirectoryName::DirectoryName(wxWindow&        dropWindow,
                              wxDirPickerCtrl& dirPicker,
@@ -223,7 +167,7 @@ DirectoryName::DirectoryName(wxWindow&        dropWindow,
     staticBox_(staticBox)
 {
     //prepare drag & drop
-    dropWindow.SetDropTarget(new WindowDropTarget(dropWindow)); //takes ownership
+    setupFileDrop(dropWindow);
 
     //redirect drag & drop event back to this class
     dropWindow.Connect(FFS_DROP_FILE_EVENT, FFSFileDropEventHandler(DirectoryName::OnFilesDropped), NULL, this);
@@ -236,20 +180,17 @@ DirectoryName::DirectoryName(wxWindow&        dropWindow,
 
 void DirectoryName::OnFilesDropped(FFSFileDropEvent& event)
 {
-    if (event.filesDropped_.empty())
+    if (event.getFiles().empty())
         return;
 
-    if (&dropWindow_ == &event.dropWindow_)
+    Zstring fileName = wxToZ(event.getFiles()[0]);
+    if (dirExists(fileName))
+        setDirectoryName(zToWx(fileName), &dirName_, &dirPicker_, dirName_, staticBox_);
+    else
     {
-        Zstring fileName = wxToZ(event.filesDropped_[0]);
+        fileName = fileName.BeforeLast(common::FILE_NAME_SEPARATOR);
         if (dirExists(fileName))
             setDirectoryName(zToWx(fileName), &dirName_, &dirPicker_, dirName_, staticBox_);
-        else
-        {
-            fileName = fileName.BeforeLast(common::FILE_NAME_SEPARATOR);
-            if (dirExists(fileName))
-                setDirectoryName(zToWx(fileName), &dirName_, &dirPicker_, dirName_, staticBox_);
-        }
     }
 }
 
@@ -270,13 +211,13 @@ void DirectoryName::OnDirSelected(wxFileDirPickerEvent& event)
 }
 
 
-Zstring DirectoryName::getName() const
+wxString DirectoryName::getName() const
 {
-    return wxToZ(dirName_.GetValue());
+    return dirName_.GetValue();
 }
 
 
-void DirectoryName::setName(const Zstring& dirname)
+void DirectoryName::setName(const wxString& dirname)
 {
-    setDirectoryName(zToWx(dirname), &dirName_, &dirPicker_, dirName_, staticBox_);
+    setDirectoryName(dirname, &dirName_, &dirPicker_, dirName_, staticBox_);
 }

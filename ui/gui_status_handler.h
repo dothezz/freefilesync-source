@@ -11,10 +11,10 @@
 #include <wx/event.h>
 #include "../library/error_log.h"
 #include "progress_indicator.h"
+#include "../library/process_xml.h"
+#include "main_dlg.h"
 
 class SyncStatus;
-class MainDialog;
-class wxWindow;
 class wxCommandEvent;
 
 
@@ -22,11 +22,11 @@ class wxCommandEvent;
 class CompareStatusHandler : private wxEvtHandler, public StatusHandler
 {
 public:
-    CompareStatusHandler(MainDialog* dlg);
+    CompareStatusHandler(MainDialog& dlg);
     ~CompareStatusHandler();
 
-    virtual void initNewProcess(int objectsTotal, wxLongLong dataTotal, Process processID);
-    virtual void updateProcessedData(int objectsProcessed, wxLongLong dataProcessed);
+    virtual void initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID);
+    virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed);
     virtual void reportInfo(const Zstring& text);
     virtual void forceUiRefresh();
 
@@ -39,7 +39,7 @@ private:
     void OnAbortCompare(wxCommandEvent& event); //handle abort button click
     virtual void abortThisProcess();
 
-    MainDialog* mainDialog;
+    MainDialog& mainDlg;
     bool ignoreErrors;
     Process currentProcess;
 };
@@ -48,11 +48,11 @@ private:
 class SyncStatusHandler : public StatusHandler
 {
 public:
-    SyncStatusHandler(MainDialog* parentDlg, bool ignoreAllErrors, const wxString& jobName);
+    SyncStatusHandler(MainDialog* parentDlg, xmlAccess::OnGuiError handleError, const wxString& jobName);
     ~SyncStatusHandler();
 
-    virtual void initNewProcess(int objectsTotal, wxLongLong dataTotal, Process processID);
-    virtual void updateProcessedData(int objectsProcessed, wxLongLong dataProcessed);
+    virtual void initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID);
+    virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed);
     virtual void reportInfo(const Zstring& text);
     virtual void forceUiRefresh();
 
@@ -63,10 +63,10 @@ public:
 private:
     virtual void abortThisProcess();
 
-    MainDialog* mainDialog; //optional
+    MainDialog* parentDlg_;
     SyncStatus syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!
-    bool ignoreErrors;
-    ffs3::ErrorLogging errorLog;
+    xmlAccess::OnGuiError handleError_;
+    zen::ErrorLogging errorLog;
 };
 
 

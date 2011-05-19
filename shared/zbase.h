@@ -7,14 +7,11 @@
 #ifndef Z_BASE_H_INCLUDED
 #define Z_BASE_H_INCLUDED
 
-#include <cstddef> //size_t
-#include <cctype>  //isspace
-#include <cwctype> //iswspace
 #include <cassert>
 #include <vector>
 #include <sstream>
 #include <algorithm>
-
+#include "string_tools.h"
 
 /*
 Allocator Policy:
@@ -25,15 +22,8 @@ Allocator Policy:
 class AllocatorFreeStore //same performance characterisics like malloc()/free()
 {
 public:
-    static void* allocate(size_t size) //throw (std::bad_alloc)
-    {
-        return ::operator new(size);
-    }
-
-    static void deallocate(void* ptr)
-    {
-        ::operator delete(ptr);
-    }
+    static void* allocate(size_t size) { return ::operator new(size); } //throw (std::bad_alloc)
+    static void  deallocate(void* ptr) { ::operator delete(ptr); }
 };
 
 
@@ -219,10 +209,12 @@ class Zbase : public SP<T, AP>
 {
 public:
     Zbase();
-    Zbase(T source);
     Zbase(const T* source);
     Zbase(const T* source, size_t length);
     Zbase(const Zbase& source);
+    explicit Zbase(T source); //dangerous if implicit: T buffer[]; Zbase name = buffer; ups...
+    //allow explicit construction from different string type, prevent ambiguity via SFINAE
+    template <class S> explicit Zbase(const S& other, typename S::value_type = 0);
     ~Zbase();
 
     operator const T* () const; //implicit conversion to C-string
@@ -239,20 +231,25 @@ public:
     T*       end();
 
     //wxString-like functions
-    bool StartsWith(const Zbase& prefix) const;
-    bool StartsWith(const T* prefix) const;
-    bool StartsWith(T prefix) const;
-    bool EndsWith(const Zbase& postfix) const;
-    bool EndsWith(const T* postfix) const;
-    bool EndsWith(T postfix) const;
-    Zbase& Truncate(size_t newLen);
-    Zbase& Replace(const T* old, const T* replacement, bool replaceAll = true);
-    Zbase AfterLast(  T ch) const;  //returns the whole string if "ch" not found
-    Zbase BeforeLast( T ch) const;  //returns empty string if "ch" not found
-    Zbase AfterFirst( T ch) const;  //returns empty string if "ch" not found
-    Zbase BeforeFirst(T ch) const;  //returns the whole string if "ch" not found
-    Zbase& Trim(bool fromLeft = true, bool fromRight = true);
-    std::vector<Zbase> Split(T delimiter) const;
+    bool StartsWith(const Zbase& prefix ) const { return zen::startsWith(*this, prefix ); }
+    bool StartsWith(const T*     prefix ) const { return zen::startsWith(*this, prefix ); }
+    bool StartsWith(      T      prefix ) const { return zen::startsWith(*this, prefix ); }
+    bool EndsWith  (const Zbase& postfix) const { return zen::endsWith  (*this, postfix); }
+    bool EndsWith  (const T*     postfix) const { return zen::endsWith  (*this, postfix); }
+    bool EndsWith  (      T      postfix) const { return zen::endsWith  (*this, postfix); }
+    void Truncate(size_t newLen) { return zen::truncate(*this, newLen); }
+    Zbase& Replace(const T* old, const T* replacement, bool replaceAll = true) { zen::replace(*this, old, replacement, replaceAll); return *this; }
+    Zbase AfterLast(  T ch) const { return zen::afterLast  (*this, ch); } //returns the whole string if "ch" not found
+    Zbase BeforeLast( T ch) const { return zen::beforeLast (*this, ch); } //returns empty string if "ch" not found
+    Zbase AfterFirst( T ch) const { return zen::afterFirst (*this, ch); } //returns empty string if "ch" not found
+    Zbase BeforeFirst(T ch) const { return zen::beforeFirst(*this, ch); } //returns the whole string if "ch" not found
+    void Trim(bool fromLeft = true, bool fromRight = true) { zen::trim(*this, fromLeft, fromRight); }
+    std::vector<Zbase> Split(T delimiter) const { return zen::split(*this, delimiter); }
+    std::vector<Zbase> Split(const Zbase& delimiter) const { return zen::split(*this, delimiter); }
+
+    //number conversion
+    template <class N> static Zbase fromNumber(N number) { return zen::toString<Zbase>(number); }
+    template <class N> N            toNumber() const     { return zen::toNumber<N>(*this); }
 
     //std::string functions
     size_t length() const;
@@ -274,10 +271,6 @@ public:
     void resize(size_t newSize, T fillChar = 0);
     void swap(Zbase& other);
     void push_back(T val); //STL access
-
-    //number conversion
-    template <class N> static Zbase fromNumber(N number);
-    template <class N> N toNumber() const;
 
     Zbase& operator=(const Zbase& source);
     Zbase& operator=(const T* source);
@@ -350,22 +343,6 @@ template <class T, template <class, class> class SP, class AP> const Zbase<T, SP
 
 
 //################################# inline implementation ########################################
-namespace z_impl
-{
-//-------------C-string helper functions ---------------------------------------------------------
-template <class T>
-inline
-size_t cStringLength(const T* input) //strlen()
-{
-    const T* iter = input;
-    while (*iter != 0)
-        ++iter;
-    return iter - input;
-}
-}
-
-
-//--------------------------------------------------------------------------------------------------
 template <class T, template <class, class> class SP, class AP>
 inline
 Zbase<T, SP, AP>::Zbase()
@@ -390,7 +367,7 @@ template <class T, template <class, class> class SP, class AP>
 inline
 Zbase<T, SP, AP>::Zbase(const T* source)
 {
-    const size_t sourceLen = z_impl::cStringLength(source);
+    const size_t sourceLen = zen::cStringLength(source);
     rawStr = this->create(sourceLen);
     std::copy(source, source + sourceLen + 1, rawStr); //include null-termination
 }
@@ -415,6 +392,18 @@ Zbase<T, SP, AP>::Zbase(const Zbase<T, SP, AP>& source)
 
 
 template <class T, template <class, class> class SP, class AP>
+template <class S>
+inline
+Zbase<T, SP, AP>::Zbase(const S& other, typename S::value_type)
+{
+    const size_t sourceLen = other.size();
+    rawStr = this->create(sourceLen);
+    std::copy(other.c_str(), other.c_str() + sourceLen, rawStr);
+    rawStr[sourceLen] = 0;
+}
+
+
+template <class T, template <class, class> class SP, class AP>
 inline
 Zbase<T, SP, AP>::~Zbase()
 {
@@ -427,147 +416,6 @@ inline
 Zbase<T, SP, AP>::operator const T* () const
 {
     return rawStr;
-}
-
-
-// get all characters after the last occurence of ch
-// (returns the whole string if ch not found)
-template <class T, template <class, class> class SP, class AP>
-inline
-Zbase<T, SP, AP> Zbase<T, SP, AP>::AfterLast(T ch) const
-{
-    const size_t pos = rfind(ch, npos);
-    if (pos != npos )
-        return Zbase(rawStr + pos + 1, length() - pos - 1);
-    else
-        return *this;
-}
-
-
-// get all characters before the last occurence of ch
-// (returns empty string if ch not found)
-template <class T, template <class, class> class SP, class AP>
-inline
-Zbase<T, SP, AP> Zbase<T, SP, AP>::BeforeLast(T ch) const
-{
-    const size_t pos = rfind(ch, npos);
-    if (pos != npos)
-        return Zbase(rawStr, pos); //data is non-empty string in this context: else ch would not have been found!
-    else
-        return Zbase();
-}
-
-
-//returns empty string if ch not found
-template <class T, template <class, class> class SP, class AP>
-inline
-Zbase<T, SP, AP> Zbase<T, SP, AP>::AfterFirst(T ch) const
-{
-    const size_t pos = find(ch, 0);
-    if (pos != npos)
-        return Zbase(rawStr + pos + 1, length() - pos - 1);
-    else
-        return Zbase();
-
-}
-
-//returns the whole string if ch not found
-template <class T, template <class, class> class SP, class AP>
-inline
-Zbase<T, SP, AP> Zbase<T, SP, AP>::BeforeFirst(T ch) const
-{
-    const size_t pos = find(ch, 0);
-    if (pos != npos)
-        return Zbase(rawStr, pos); //data is non-empty string in this context: else ch would not have been found!
-    else
-        return *this;
-}
-
-
-template <class T, template <class, class> class SP, class AP>
-inline
-bool Zbase<T, SP, AP>::StartsWith(const T* prefix) const
-{
-    const size_t pfLength = z_impl::cStringLength(prefix);
-    if (length() < pfLength)
-        return false;
-
-    return std::equal(rawStr, rawStr + pfLength,
-                      prefix);
-}
-
-
-template <class T, template <class, class> class SP, class AP>
-inline
-bool Zbase<T, SP, AP>::StartsWith(T prefix) const
-{
-    return length() != 0 && operator[](0) == prefix;
-}
-
-
-template <class T, template <class, class> class SP, class AP>
-inline
-bool Zbase<T, SP, AP>::StartsWith(const Zbase<T, SP, AP>& prefix) const
-{
-    if (length() < prefix.length())
-        return false;
-
-    return std::equal(rawStr, rawStr + prefix.length(),
-                      prefix.rawStr);
-}
-
-
-template <class T, template <class, class> class SP, class AP>
-inline
-bool Zbase<T, SP, AP>::EndsWith(const T* postfix) const
-{
-    const size_t pfLength  = z_impl::cStringLength(postfix);
-    if (length() < pfLength)
-        return false;
-
-    const T* cmpBegin = rawStr + length() - pfLength;
-    return std::equal(cmpBegin, cmpBegin + pfLength,
-                      postfix);
-}
-
-
-template <class T, template <class, class> class SP, class AP>
-inline
-bool Zbase<T, SP, AP>::EndsWith(T postfix) const
-{
-    const size_t len = length();
-    return len != 0 && operator[](len - 1) == postfix;
-}
-
-
-template <class T, template <class, class> class SP, class AP>
-inline
-bool Zbase<T, SP, AP>::EndsWith(const Zbase<T, SP, AP>& postfix) const
-{
-    if (length() < postfix.length())
-        return false;
-
-    const T* cmpBegin = rawStr + length() - postfix.length();
-    return std::equal(cmpBegin, cmpBegin + postfix.length(),
-                      postfix.rawStr);
-}
-
-
-template <class T, template <class, class> class SP, class AP>
-inline
-Zbase<T, SP, AP>& Zbase<T, SP, AP>::Truncate(size_t newLen)
-{
-    if (newLen < length())
-    {
-        if (canWrite(rawStr, newLen))
-        {
-            rawStr[newLen] = 0;
-            setLength(rawStr, newLen);
-        }
-        else
-            *this = Zbase(rawStr, newLen);
-    }
-    return *this;
 }
 
 
@@ -590,7 +438,7 @@ size_t Zbase<T, SP, AP>::find(const T* str, size_t pos) const
     assert(pos <= length());
     const T* thisEnd = end(); //respect embedded 0
     const T* iter = std::search(begin() + pos, thisEnd,
-                                str, str + z_impl::cStringLength(str));
+                                str, str + zen::cStringLength(str));
     return iter == thisEnd ? npos : iter - begin();
 }
 
@@ -632,7 +480,7 @@ size_t Zbase<T, SP, AP>::rfind(const T* str, size_t pos) const
 {
     assert(pos == npos || pos <= length());
 
-    const size_t strLen = z_impl::cStringLength(str);
+    const size_t strLen = zen::cStringLength(str);
     const T* currEnd = pos == npos ? end() : begin() + std::min(pos + strLen, length());
 
     const T* iter = std::find_end(begin(), currEnd,
@@ -686,26 +534,6 @@ Zbase<T, SP, AP>& Zbase<T, SP, AP>::replace(size_t pos1, size_t n1, const T* str
 
 template <class T, template <class, class> class SP, class AP>
 inline
-Zbase<T, SP, AP>& Zbase<T, SP, AP>::Replace(const T* old, const T* replacement, bool replaceAll)
-{
-    const size_t oldLen         = z_impl::cStringLength(old);
-    const size_t replacementLen = z_impl::cStringLength(replacement);
-
-    size_t pos = 0;
-    while ((pos = find(old, pos)) != npos)
-    {
-        replace(pos, oldLen, replacement, replacementLen);
-        pos += replacementLen; //move past the string that was replaced
-
-        if (!replaceAll)
-            break;
-    }
-    return *this;
-}
-
-
-template <class T, template <class, class> class SP, class AP>
-inline
 void Zbase<T, SP, AP>::resize(size_t newSize, T fillChar)
 {
     if (canWrite(rawStr, newSize))
@@ -746,7 +574,7 @@ template <class T, template <class, class> class SP, class AP>
 inline
 bool operator==(const Zbase<T, SP, AP>& lhs, const T* rhs)
 {
-    return lhs.length() == z_impl::cStringLength(rhs) && std::equal(lhs.begin(), lhs.end(), rhs); //respect embedded 0
+    return lhs.length() == zen::cStringLength(rhs) && std::equal(lhs.begin(), lhs.end(), rhs); //respect embedded 0
 }
 
 
@@ -796,7 +624,7 @@ inline
 bool operator<(const Zbase<T, SP, AP>& lhs, const T* rhs)
 {
     return std::lexicographical_compare(lhs.begin(), lhs.end(), //respect embedded 0
-                                        rhs, rhs + z_impl::cStringLength(rhs));
+                                        rhs, rhs + zen::cStringLength(rhs));
 }
 
 
@@ -804,7 +632,7 @@ template <class T, template <class, class> class SP, class AP>
 inline
 bool operator<(const T* lhs, const Zbase<T, SP, AP>& rhs)
 {
-    return std::lexicographical_compare(lhs, lhs + z_impl::cStringLength(lhs), //respect embedded 0
+    return std::lexicographical_compare(lhs, lhs + zen::cStringLength(lhs), //respect embedded 0
                                         rhs.begin(), rhs.end());
 }
 
@@ -944,7 +772,7 @@ template <class T, template <class, class> class SP, class AP>
 inline
 const Zbase<T, SP, AP> operator+(T lhs, const Zbase<T, SP, AP>& rhs)
 {
-    return Zbase<T, SP, AP>(lhs) += rhs;
+    return (Zbase<T, SP, AP>() += lhs) += rhs;
 }
 
 
@@ -1019,7 +847,7 @@ template <class T, template <class, class> class SP, class AP>
 inline
 Zbase<T, SP, AP>& Zbase<T, SP, AP>::operator=(const T* source)
 {
-    return assign(source, z_impl::cStringLength(source));
+    return assign(source, zen::cStringLength(source));
 }
 
 
@@ -1059,7 +887,7 @@ inline
 Zbase<T, SP, AP>& Zbase<T, SP, AP>::operator+=(const T* other)
 {
     const size_t thisLen  = length();
-    const size_t otherLen = z_impl::cStringLength(other);
+    const size_t otherLen = zen::cStringLength(other);
     reserve(thisLen + otherLen); //make unshared and check capacity
 
     std::copy(other, other + otherLen + 1, rawStr + thisLen); //include null-termination
@@ -1079,114 +907,5 @@ Zbase<T, SP, AP>& Zbase<T, SP, AP>::operator+=(T ch)
     setLength(rawStr, thisLen + 1);
     return *this;
 }
-
-
-template <class T, template <class, class> class SP, class AP>
-template <class N>
-inline
-Zbase<T, SP, AP> Zbase<T, SP, AP>::fromNumber(N number)
-{
-    std::basic_ostringstream<T> ss;
-    ss << number;
-    return Zbase<T, SP, AP>(ss.str().c_str());
-}
-
-
-template <class T, template <class, class> class SP, class AP>
-template <class N>
-inline
-N Zbase<T, SP, AP>::toNumber() const
-{
-    std::basic_istringstream<T> ss((std::basic_string<T>(rawStr)));
-    N number = 0;
-    ss >> number;
-    return number;
-}
-
-
-namespace z_impl
-{
-template <class T>
-bool cStringWhiteSpace(T ch);
-
-template <>
-inline
-bool cStringWhiteSpace(char ch)
-{
-    return std::isspace(static_cast<unsigned char>(ch)) != 0; //some compilers (e.g. VC++ 6.0) return true for a call to isspace('\xEA'); but no issue with newer versions of MSVC
-}
-
-
-template <>
-inline
-bool cStringWhiteSpace(wchar_t ch)
-{
-    return std::iswspace(ch) != 0; //some compilers (e.g. VC++ 6.0) return true for a call to isspace('\xEA'); but no issue with newer versions of MSVC
-}
-}
-
-
-template <class T, template <class, class> class SP, class AP>
-Zbase<T, SP, AP>& Zbase<T, SP, AP>::Trim(bool fromLeft, bool fromRight)
-{
-    assert(fromLeft || fromRight);
-
-    const T* newBegin = rawStr;
-    const T* newEnd   = rawStr + length();
-
-    if (fromRight)
-        while (newBegin != newEnd && z_impl::cStringWhiteSpace(newEnd[-1]))
-            --newEnd;
-
-    if (fromLeft)
-        while (newBegin != newEnd && z_impl::cStringWhiteSpace(*newBegin))
-            ++newBegin;
-
-    const size_t newLength = newEnd - newBegin;
-    if (newLength != length())
-    {
-        if (canWrite(rawStr, newLength))
-        {
-            std::copy(newBegin, newBegin + newLength, rawStr); //shift left => std::copy, shift right std::copy_backward
-            rawStr[newLength] = 0;
-            setLength(rawStr, newLength);
-        }
-        else
-            *this = Zbase(newBegin, newLength);
-    }
-    return *this;
-}
-
-
-template <class T, template <class, class> class SP, class AP>
-std::vector<Zbase<T, SP, AP> > Zbase<T, SP, AP>::Split(T delimiter) const
-{
-    std::vector<Zbase> output;
-
-    const size_t thisLen = length();
-    size_t startPos = 0;
-    for (;;) //make MSVC happy
-    {
-        size_t endPos = find(delimiter, startPos);
-        if (endPos == npos)
-            endPos = thisLen;
-
-        if (startPos != endPos) //do not add empty strings
-        {
-            Zbase newEntry = substr(startPos, endPos - startPos);
-            newEntry.Trim();  //remove whitespace characters
-
-            if (!newEntry.empty())
-                output.push_back(newEntry);
-        }
-        if (endPos == thisLen)
-            break;
-
-        startPos = endPos + 1; //skip delimiter
-    }
-
-    return output;
-}
-
 
 #endif //Z_BASE_H_INCLUDED

@@ -5,7 +5,6 @@
 // **************************************************************************
 //
 #include "batch_status_handler.h"
-//#include "small_dlgs.h"
 #include "msg_popup.h"
 #include <wx/ffile.h>
 #include <wx/msgdlg.h>
@@ -18,12 +17,12 @@
 #include "../shared/util.h"
 #include "../shared/file_traverser.h"
 
-using namespace ffs3;
+using namespace zen;
 
 
 namespace
 {
-class FindLogfiles : public ffs3::TraverseCallback
+class FindLogfiles : public zen::TraverseCallback
 {
 public:
     FindLogfiles(const Zstring& prefix, std::vector<Zstring>& logfiles) : prefix_(prefix), logfiles_(logfiles) {}
@@ -53,7 +52,7 @@ void removeFileNoThrow(const Zstring& filename)
 {
     try
     {
-        ffs3::removeFile(filename);
+        zen::removeFile(filename);
     }
     catch(...) {}
 }
@@ -132,11 +131,11 @@ private:
 
         //create logfile directory
         Zstring logfileDir = logfileDirectory.empty() ?
-                             wxToZ(ffs3::getConfigDir() + wxT("Logs")) :
-                             ffs3::getFormattedDirectoryName(wxToZ(logfileDirectory));
+                             wxToZ(zen::getConfigDir() + wxT("Logs")) :
+                             zen::getFormattedDirectoryName(wxToZ(logfileDirectory));
 
-        if (!ffs3::dirExists(logfileDir))
-            ffs3::createDirectory(logfileDir); //create recursively if necessary: may throw (FileError&)
+        if (!zen::dirExists(logfileDir))
+            zen::createDirectory(logfileDir); //create recursively if necessary: may throw (FileError&)
 
         //assemble logfile name
         if (!logfileDir.EndsWith(FILE_NAME_SEPARATOR))
@@ -155,8 +154,8 @@ private:
         wxString output = logfileName + wxT(".log");
 
         //ensure uniqueness
-        for (int i = 1; ffs3::somethingExists(wxToZ(output)); ++i)
-            output = logfileName + wxChar('_') + common::numberToString(i) + wxT(".log");
+        for (int i = 1; zen::somethingExists(wxToZ(output)); ++i)
+            output = logfileName + wxChar('_') + zen::toString<wxString>(i) + wxT(".log");
 
         return output;
     }
@@ -192,11 +191,11 @@ BatchStatusHandler::BatchStatusHandler(bool runSilent,
             logFile.reset(new LogFile(*logfileDirectory, jobName));
             logFile->limitLogfileCount(logFileMaxCount);
         }
-        catch (ffs3::FileError& error)
+        catch (zen::FileError& error)
         {
             wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
             returnValue = -7;
-            throw ffs3::AbortThisProcess();
+            throw zen::AbortThisProcess();
         }
     }
 
@@ -241,7 +240,7 @@ BatchStatusHandler::~BatchStatusHandler()
     else if (!exitWhenFinished || syncStatusFrame.getAsWindow()->IsShown()) //warning: wxWindow::Show() is called within processHasFinished()!
     {
         //notify about (logical) application main window => program won't quit, but stay on this dialog
-        ffs3::AppMainWindow::setMainWindow(syncStatusFrame.getAsWindow());
+        zen::AppMainWindow::setMainWindow(syncStatusFrame.getAsWindow());
 
         //notify to syncStatusFrame that current process has ended
         if (abortIsRequested())
@@ -266,7 +265,7 @@ void BatchStatusHandler::reportInfo(const Zstring& text)
 }
 
 
-void BatchStatusHandler::initNewProcess(int objectsTotal, wxLongLong dataTotal, StatusHandler::Process processID)
+void BatchStatusHandler::initNewProcess(int objectsTotal, zen::Int64 dataTotal, StatusHandler::Process processID)
 {
     currentProcess = processID;
 
@@ -292,7 +291,7 @@ void BatchStatusHandler::initNewProcess(int objectsTotal, wxLongLong dataTotal, 
 
 
 inline
-void BatchStatusHandler::updateProcessedData(int objectsProcessed, wxLongLong dataProcessed)
+void BatchStatusHandler::updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed)
 {
     switch (currentProcess)
     {
@@ -323,25 +322,21 @@ void BatchStatusHandler::reportWarning(const wxString& warningMessage, bool& war
         {
             //show popup and ask user how to handle warning
             bool dontWarnAgain = false;
-            WarningDlg warningDlg(NULL,
-                                  WarningDlg::BUTTON_IGNORE | WarningDlg::BUTTON_SWITCH | WarningDlg::BUTTON_ABORT,
-                                  warningMessage + wxT("\n\n") + _("Press \"Switch\" to open FreeFileSync GUI mode."),
-                                  dontWarnAgain);
-            warningDlg.Raise();
-            const WarningDlg::Response rv = static_cast<WarningDlg::Response>(warningDlg.ShowModal());
-            switch (rv)
+            switch (showWarningDlg(ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_SWITCH | ReturnWarningDlg::BUTTON_ABORT,
+                                   warningMessage + wxT("\n\n") + _("Press \"Switch\" to open FreeFileSync GUI mode."),
+                                   dontWarnAgain))
             {
-                case WarningDlg::BUTTON_ABORT:
+                case ReturnWarningDlg::BUTTON_ABORT:
                     abortThisProcess();
                     break;
 
-                case WarningDlg::BUTTON_SWITCH:
+                case ReturnWarningDlg::BUTTON_SWITCH:
                     errorLog.logMsg(_("Switching to FreeFileSync GUI mode..."), TYPE_WARNING);
                     switchToGuiRequested = true;
                     abortThisProcess();
                     break;
 
-                case WarningDlg::BUTTON_IGNORE: //no unhandled error situation!
+                case ReturnWarningDlg::BUTTON_IGNORE: //no unhandled error situation!
                     warningActive = !dontWarnAgain;
                     break;
             }
@@ -365,24 +360,21 @@ ErrorHandler::Response BatchStatusHandler::reportError(const wxString& errorMess
         case xmlAccess::ON_ERROR_POPUP:
         {
             bool ignoreNextErrors = false;
-            ErrorDlg errorDlg(NULL,
-                              ErrorDlg::BUTTON_IGNORE |  ErrorDlg::BUTTON_RETRY | ErrorDlg::BUTTON_ABORT,
-                              errorMessage,
-                              ignoreNextErrors);
-            errorDlg.Raise();
-            const ErrorDlg::ReturnCodes rv = static_cast<ErrorDlg::ReturnCodes>(errorDlg.ShowModal());
-            switch (rv)
+
+            switch (showErrorDlg(ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
+                                 errorMessage,
+                                 ignoreNextErrors))
             {
-                case ErrorDlg::BUTTON_IGNORE:
+                case ReturnErrorDlg::BUTTON_IGNORE:
                     if (ignoreNextErrors) //falsify only
                         handleError_ = xmlAccess::ON_ERROR_IGNORE;
                     errorLog.logMsg(errorMessage, TYPE_ERROR);
                     return ErrorHandler::IGNORE_ERROR;
 
-                case ErrorDlg::BUTTON_RETRY:
+                case ReturnErrorDlg::BUTTON_RETRY:
                     return ErrorHandler::RETRY;
 
-                case ErrorDlg::BUTTON_ABORT:
+                case ReturnErrorDlg::BUTTON_ABORT:
                     errorLog.logMsg(errorMessage, TYPE_ERROR);
                     abortThisProcess();
             }
@@ -423,5 +415,5 @@ void BatchStatusHandler::forceUiRefresh()
 void BatchStatusHandler::abortThisProcess()
 {
     requestAbortion();
-    throw ffs3::AbortThisProcess();  //abort can be triggered by syncStatusFrame
+    throw zen::AbortThisProcess();  //abort can be triggered by syncStatusFrame
 }

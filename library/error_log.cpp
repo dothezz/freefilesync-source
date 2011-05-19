@@ -9,10 +9,10 @@
 #include "../shared/i18n.h"
 
 
-using ffs3::ErrorLogging;
+using zen::ErrorLogging;
 
 
-void ErrorLogging::logMsg(const wxString& message, ffs3::MessageType type)
+void ErrorLogging::logMsg(const wxString& message, zen::MessageType type)
 {
     Entry newEntry;
     newEntry.type    = type;

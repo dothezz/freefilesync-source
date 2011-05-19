@@ -5,136 +5,91 @@
 // **************************************************************************
 //
 #include "sync_cfg.h"
-
 #include "../library/resources.h"
 #include "../shared/dir_name.h"
 #include <wx/wupdlock.h>
 #include "../shared/mouse_move_dlg.h"
 #include "../shared/string_conv.h"
 #include "../shared/dir_picker_i18n.h"
+#include "gui_generated.h"
+#include <memory>
+#include "../shared/util.h"
+#include "../shared/dir_name.h"
 
-using namespace ffs3;
+using namespace zen;
+using namespace xmlAccess;
 
 
-SyncCfgDialog::SyncCfgDialog(wxWindow* window,
-                             const CompareVariant compareVar,
-                             SyncConfiguration& syncConfiguration,
-                             DeletionPolicy&    handleDeletion,
-                             wxString&          customDeletionDirectory,
-                             bool*              ignoreErrors) :
-    SyncCfgDlgGenerated(window),
-    cmpVariant(compareVar),
-    currentSyncConfig(syncConfiguration),  //make working copy of syncConfiguration
-    refSyncConfiguration(syncConfiguration),
-    refHandleDeletion(handleDeletion),
-    refCustomDeletionDirectory(customDeletionDirectory),
-    refIgnoreErrors(ignoreErrors),
-    customDelFolder(new DirectoryName(*m_panelCustomDeletionDir, *m_dirPickerCustomDelFolder, *m_textCtrlCustomDelFolder))
+
+
+class SyncCfgDialog : public SyncCfgDlgGenerated
 {
-#ifdef FFS_WIN
-    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                        this, m_staticText81, m_staticText8, m_staticText101, m_staticText9); //ownership passed to "this"
-#endif
+public:
+    SyncCfgDialog(wxWindow* window,
+                  zen::CompareVariant   compareVar,
+                  zen::SyncConfig&      syncConfiguration,
+                  zen::DeletionPolicy&  handleDeletion,
+                  wxString&              customDeletionDirectory,
+                  xmlAccess::OnGuiError* handleError); //optional input parameter
 
-    setDeletionHandling(handleDeletion);
-    customDelFolder->setName(wxToZ(customDeletionDirectory));
+    ~SyncCfgDialog();
 
-    //error handling
-    if (ignoreErrors)
-        setErrorHandling(*ignoreErrors);
-    else
-    {
-        sbSizerErrorHandling->Show(false);
-        Layout();
-    }
+private:
+    virtual void OnSyncAutomatic(   wxCommandEvent& event);
+    virtual void OnSyncMirror(      wxCommandEvent& event);
+    virtual void OnSyncUpdate(      wxCommandEvent& event);
+    virtual void OnSyncCustom(      wxCommandEvent& event);
 
-    //set sync config icons
-    updateConfigIcons(cmpVariant, currentSyncConfig);
+    virtual void OnExLeftSideOnly(  wxCommandEvent& event);
+    virtual void OnExRightSideOnly( wxCommandEvent& event);
+    virtual void OnLeftNewer(       wxCommandEvent& event);
+    virtual void OnRightNewer(      wxCommandEvent& event);
+    virtual void OnDifferent(       wxCommandEvent& event);
+    virtual void OnConflict(        wxCommandEvent& event);
 
-    //set icons for this dialog
-    m_bitmapLeftOnly->SetBitmap(GlobalResources::instance().getImage(wxT("leftOnly")));
-    m_bitmapRightOnly->SetBitmap(GlobalResources::instance().getImage(wxT("rightOnly")));
-    m_bitmapLeftNewer->SetBitmap(GlobalResources::instance().getImage(wxT("leftNewer")));
-    m_bitmapRightNewer->SetBitmap(GlobalResources::instance().getImage(wxT("rightNewer")));
-    m_bitmapDifferent->SetBitmap(GlobalResources::instance().getImage(wxT("different")));
-    m_bitmapConflict->SetBitmap(GlobalResources::instance().getImage(wxT("conflictGrey")));
+    virtual void OnClose(           wxCloseEvent&   event);
+    virtual void OnCancel(          wxCommandEvent& event);
+    virtual void OnApply(           wxCommandEvent& event);
 
-    bSizer201->Layout(); //wxButtonWithImage size might have changed
+    void updateGui();
 
-    m_buttonOK->SetFocus();
+    void OnChangeErrorHandling(wxCommandEvent& event);
+    void OnChangeDeletionHandling(wxCommandEvent& event);
 
-    Fit();
-}
+    const zen::CompareVariant cmpVariant;
 
-//#################################################################################################################
+    //temporal copy of maindialog.cfg.syncConfiguration -> ownership NOT within GUI controls!
+    zen::SyncConfig currentSyncConfig;
 
-SyncCfgDialog::~SyncCfgDialog() {} //non-inline destructor for std::auto_ptr to work with forward declaration
+    //changing data
+    zen::SyncConfig&        refSyncConfiguration;
+    zen::DeletionPolicy&    refHandleDeletion;
+    wxString&                refCustomDeletionDirectory;
+    xmlAccess::OnGuiError*   refHandleError;
 
+    zen::DirectoryName customDelFolder;
 
-void SyncCfgDialog::updateConfigIcons(const ffs3::CompareVariant cmpVar, const ffs3::SyncConfiguration& syncConfig)
-{
-    //wxWindowUpdateLocker dummy(this); //avoid display distortion
-    wxWindowUpdateLocker dummy2(m_panelCustomDeletionDir); //avoid display distortion
-    wxWindowUpdateLocker dummy3(m_bpButtonLeftOnly);
-    wxWindowUpdateLocker dummy4(m_bpButtonRightOnly);
-    wxWindowUpdateLocker dummy5(m_bpButtonLeftNewer);
-    wxWindowUpdateLocker dummy6(m_bpButtonRightNewer);
-    wxWindowUpdateLocker dummy7(m_bpButtonDifferent);
-    wxWindowUpdateLocker dummy8(m_bpButtonConflict);
+    zen::EnumDescrList<zen::DeletionPolicy>  enumDelhandDescr;
+    zen::EnumDescrList<xmlAccess::OnGuiError> enumErrhandDescr;
+};
 
 
-    updateConfigIcons(cmpVar,
-                      syncConfig,
-                      m_bpButtonLeftOnly,
-                      m_bpButtonRightOnly,
-                      m_bpButtonLeftNewer,
-                      m_bpButtonRightNewer,
-                      m_bpButtonDifferent,
-                      m_bpButtonConflict,
-                      m_bitmapLeftOnly,
-                      m_bitmapRightOnly,
-                      m_bitmapLeftNewer,
-                      m_bitmapRightNewer,
-                      m_bitmapDifferent,
-                      m_bitmapConflict,
-                      sbSizerSyncDirections);
 
-    //set radiobuttons -> have no parameter-ownership at all!
-    switch (ffs3::getVariant(currentSyncConfig))
-    {
-        case SyncConfiguration::AUTOMATIC:
-            m_radioBtnAutomatic->SetValue(true); //automatic mode
-            break;
-        case SyncConfiguration::MIRROR:
-            m_radioBtnMirror->SetValue(true);    //one way ->
-            break;
-        case SyncConfiguration::UPDATE:
-            m_radioBtnUpdate->SetValue(true);    //Update ->
-            break;
-        case SyncConfiguration::CUSTOM:
-            m_radioBtnCustom->SetValue(true);    //custom
-            break;
-    }
-
-    GetSizer()->SetSizeHints(this); //this works like a charm for GTK2 with window resizing problems!!! (includes call to Fit())
-}
-
-
-void SyncCfgDialog::updateConfigIcons(const CompareVariant compareVar,
-                                      const SyncConfiguration& syncConfig,
-                                      wxBitmapButton* buttonLeftOnly,
-                                      wxBitmapButton* buttonRightOnly,
-                                      wxBitmapButton* buttonLeftNewer,
-                                      wxBitmapButton* buttonRightNewer,
-                                      wxBitmapButton* buttonDifferent,
-                                      wxBitmapButton* buttonConflict,
-                                      wxStaticBitmap* bitmapLeftOnly,
-                                      wxStaticBitmap* bitmapRightOnly,
-                                      wxStaticBitmap* bitmapLeftNewer,
-                                      wxStaticBitmap* bitmapRightNewer,
-                                      wxStaticBitmap* bitmapDifferent,
-                                      wxStaticBitmap* bitmapConflict,
-                                      wxSizer*        syncDirections) //sizer containing all sync-directions
+void updateConfigIcons(const CompareVariant compareVar,
+                       const SyncConfig& syncConfig,
+                       wxBitmapButton* buttonLeftOnly,
+                       wxBitmapButton* buttonRightOnly,
+                       wxBitmapButton* buttonLeftNewer,
+                       wxBitmapButton* buttonRightNewer,
+                       wxBitmapButton* buttonDifferent,
+                       wxBitmapButton* buttonConflict,
+                       wxStaticBitmap* bitmapLeftOnly,
+                       wxStaticBitmap* bitmapRightOnly,
+                       wxStaticBitmap* bitmapLeftNewer,
+                       wxStaticBitmap* bitmapRightNewer,
+                       wxStaticBitmap* bitmapDifferent,
+                       wxStaticBitmap* bitmapConflict,
+                       wxSizer*        syncDirections) //sizer containing all sync-directions
 {
     //display only relevant sync options
     syncDirections->Show(true);
@@ -170,104 +125,224 @@ void SyncCfgDialog::updateConfigIcons(const CompareVariant compareVar,
             break;
     }
 
-    if (syncConfig.automatic) //automatic mode needs no sync-directions
+    if (syncConfig.var == SyncConfig::AUTOMATIC) //automatic mode needs no sync-directions
         syncDirections->Show(false);
-
-    switch (syncConfig.exLeftSideOnly)
+    else
     {
-        case SYNC_DIR_RIGHT:
-            buttonLeftOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowRightCr")));
-            buttonLeftOnly->SetToolTip(getDescription(SO_CREATE_NEW_RIGHT));
+        const DirectionSet dirCfg = extractDirections(syncConfig);
+
+        switch (dirCfg.exLeftSideOnly)
+        {
+            case SYNC_DIR_RIGHT:
+                buttonLeftOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowRightCr")));
+                buttonLeftOnly->SetToolTip(getDescription(SO_CREATE_NEW_RIGHT));
+                break;
+            case SYNC_DIR_LEFT:
+                buttonLeftOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("deleteLeft")));
+                buttonLeftOnly->SetToolTip(getDescription(SO_DELETE_LEFT));
+                break;
+            case SYNC_DIR_NONE:
+                buttonLeftOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowNone")));
+                buttonLeftOnly->SetToolTip(getDescription(SO_DO_NOTHING));
+                break;
+        }
+
+        switch (dirCfg.exRightSideOnly)
+        {
+            case SYNC_DIR_RIGHT:
+                buttonRightOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("deleteRight")));
+                buttonRightOnly->SetToolTip(getDescription(SO_DELETE_RIGHT));
+                break;
+            case SYNC_DIR_LEFT:
+                buttonRightOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowLeftCr")));
+                buttonRightOnly->SetToolTip(getDescription(SO_CREATE_NEW_LEFT));
+                break;
+            case SYNC_DIR_NONE:
+                buttonRightOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowNone")));
+                buttonRightOnly->SetToolTip(getDescription(SO_DO_NOTHING));
+                break;
+        }
+
+        switch (dirCfg.leftNewer)
+        {
+            case SYNC_DIR_RIGHT:
+                buttonLeftNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowRight")));
+                buttonLeftNewer->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
+                break;
+            case SYNC_DIR_LEFT:
+                buttonLeftNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowLeft")));
+                buttonLeftNewer->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
+                break;
+            case SYNC_DIR_NONE:
+                buttonLeftNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowNone")));
+                buttonLeftNewer->SetToolTip(getDescription(SO_DO_NOTHING));
+                break;
+        }
+
+        switch (dirCfg.rightNewer)
+        {
+            case SYNC_DIR_RIGHT:
+                buttonRightNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowRight")));
+                buttonRightNewer->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
+                break;
+            case SYNC_DIR_LEFT:
+                buttonRightNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowLeft")));
+                buttonRightNewer->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
+                break;
+            case SYNC_DIR_NONE:
+                buttonRightNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowNone")));
+                buttonRightNewer->SetToolTip(getDescription(SO_DO_NOTHING));
+                break;
+        }
+
+        switch (dirCfg.different)
+        {
+            case SYNC_DIR_RIGHT:
+                buttonDifferent->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowRight")));
+                buttonDifferent->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
+                break;
+            case SYNC_DIR_LEFT:
+                buttonDifferent->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowLeft")));
+                buttonDifferent->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
+                break;
+            case SYNC_DIR_NONE:
+                buttonDifferent->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowNone")));
+                buttonDifferent->SetToolTip(getDescription(SO_DO_NOTHING));
+                break;
+        }
+
+        switch (dirCfg.conflict)
+        {
+            case SYNC_DIR_RIGHT:
+                buttonConflict->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowRight")));
+                buttonConflict->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
+                break;
+            case SYNC_DIR_LEFT:
+                buttonConflict->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowLeft")));
+                buttonConflict->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
+                break;
+            case SYNC_DIR_NONE:
+                buttonConflict->SetBitmapLabel(GlobalResources::instance().getImage(wxT("conflict")));
+                buttonConflict->SetToolTip(_("Leave as unresolved conflict"));
+                break;
+        }
+    }
+}
+
+
+SyncCfgDialog::SyncCfgDialog(wxWindow* window,
+                             CompareVariant  compareVar,
+                             SyncConfig&     syncConfiguration,
+                             DeletionPolicy& handleDeletion,
+                             wxString&       customDeletionDirectory,
+                             OnGuiError*     handleError) :
+    SyncCfgDlgGenerated(window),
+    cmpVariant(compareVar),
+    currentSyncConfig(syncConfiguration),  //make working copy of syncConfiguration
+    refSyncConfiguration(syncConfiguration),
+    refHandleDeletion(handleDeletion),
+    refCustomDeletionDirectory(customDeletionDirectory),
+    refHandleError(handleError),
+    customDelFolder(*m_panelCustomDeletionDir, *m_dirPickerCustomDelFolder, *m_textCtrlCustomDelFolder)
+{
+#ifdef FFS_WIN
+    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
+#endif
+
+    enumDelhandDescr.
+    add(DELETE_PERMANENTLY,       _("Delete permanently"), _("Delete or overwrite files permanently")).
+    add(MOVE_TO_RECYCLE_BIN,      _("Use Recycle Bin"),    _("Use Recycle Bin when deleting or overwriting files")).
+    add(MOVE_TO_CUSTOM_DIRECTORY, _("Versioning"),         _("Move files into a time-stamped subdirectory"));
+
+    enumErrhandDescr.
+    add(ON_GUIERROR_POPUP,  _("Show popup"),    _("Show popup on errors or warnings")).
+    add(ON_GUIERROR_IGNORE, _("Ignore errors"), _("Hide all error and warning messages"));
+
+
+    //a proper set-method may be in order some time...
+    setEnumVal(enumDelhandDescr, *m_choiceHandleDeletion, handleDeletion);
+    customDelFolder.setName(customDeletionDirectory);
+    updateGui();
+
+    //error handling
+    if (handleError)
+        setEnumVal(enumErrhandDescr, *m_choiceHandleError, *handleError);
+    else
+    {
+        sbSizerErrorHandling->Show(false);
+        Layout();
+    }
+
+    //set sync config icons
+    updateGui();
+
+    //set icons for this dialog
+    m_bitmapLeftOnly  ->SetBitmap(GlobalResources::instance().getImage(wxT("leftOnly")));
+    m_bitmapRightOnly ->SetBitmap(GlobalResources::instance().getImage(wxT("rightOnly")));
+    m_bitmapLeftNewer ->SetBitmap(GlobalResources::instance().getImage(wxT("leftNewer")));
+    m_bitmapRightNewer->SetBitmap(GlobalResources::instance().getImage(wxT("rightNewer")));
+    m_bitmapDifferent ->SetBitmap(GlobalResources::instance().getImage(wxT("different")));
+    m_bitmapConflict  ->SetBitmap(GlobalResources::instance().getImage(wxT("conflictGrey")));
+
+    bSizer201->Layout(); //wxButtonWithImage size might have changed
+
+    m_buttonOK->SetFocus();
+
+    Fit();
+}
+
+//#################################################################################################################
+
+SyncCfgDialog::~SyncCfgDialog() {} //non-inline destructor for std::auto_ptr to work with forward declaration
+
+
+void SyncCfgDialog::updateGui()
+{
+    //wxWindowUpdateLocker dummy(this); //avoid display distortion
+    wxWindowUpdateLocker dummy2(m_panelCustomDeletionDir); //avoid display distortion
+    wxWindowUpdateLocker dummy3(m_bpButtonLeftOnly);
+    wxWindowUpdateLocker dummy4(m_bpButtonRightOnly);
+    wxWindowUpdateLocker dummy5(m_bpButtonLeftNewer);
+    wxWindowUpdateLocker dummy6(m_bpButtonRightNewer);
+    wxWindowUpdateLocker dummy7(m_bpButtonDifferent);
+    wxWindowUpdateLocker dummy8(m_bpButtonConflict);
+
+    updateConfigIcons(cmpVariant,
+                      currentSyncConfig,
+                      m_bpButtonLeftOnly,
+                      m_bpButtonRightOnly,
+                      m_bpButtonLeftNewer,
+                      m_bpButtonRightNewer,
+                      m_bpButtonDifferent,
+                      m_bpButtonConflict,
+                      m_bitmapLeftOnly,
+                      m_bitmapRightOnly,
+                      m_bitmapLeftNewer,
+                      m_bitmapRightNewer,
+                      m_bitmapDifferent,
+                      m_bitmapConflict,
+                      sbSizerSyncDirections);
+
+    //set radiobuttons -> have no parameter-ownership at all!
+    switch (currentSyncConfig.var)
+    {
+        case SyncConfig::AUTOMATIC:
+            m_radioBtnAutomatic->SetValue(true); //automatic mode
             break;
-        case SYNC_DIR_LEFT:
-            buttonLeftOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("deleteLeft")));
-            buttonLeftOnly->SetToolTip(getDescription(SO_DELETE_LEFT));
+        case SyncConfig::MIRROR:
+            m_radioBtnMirror->SetValue(true);    //one way ->
             break;
-        case SYNC_DIR_NONE:
-            buttonLeftOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowNone")));
-            buttonLeftOnly->SetToolTip(getDescription(SO_DO_NOTHING));
+        case SyncConfig::UPDATE:
+            m_radioBtnUpdate->SetValue(true);    //Update ->
+            break;
+        case SyncConfig::CUSTOM:
+            m_radioBtnCustom->SetValue(true);    //custom
             break;
     }
 
-    switch (syncConfig.exRightSideOnly)
-    {
-        case SYNC_DIR_RIGHT:
-            buttonRightOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("deleteRight")));
-            buttonRightOnly->SetToolTip(getDescription(SO_DELETE_RIGHT));
-            break;
-        case SYNC_DIR_LEFT:
-            buttonRightOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowLeftCr")));
-            buttonRightOnly->SetToolTip(getDescription(SO_CREATE_NEW_LEFT));
-            break;
-        case SYNC_DIR_NONE:
-            buttonRightOnly->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowNone")));
-            buttonRightOnly->SetToolTip(getDescription(SO_DO_NOTHING));
-            break;
-    }
+    GetSizer()->SetSizeHints(this); //this works like a charm for GTK2 with window resizing problems!!! (includes call to Fit())
 
-    switch (syncConfig.leftNewer)
-    {
-        case SYNC_DIR_RIGHT:
-            buttonLeftNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowRight")));
-            buttonLeftNewer->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
-            break;
-        case SYNC_DIR_LEFT:
-            buttonLeftNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowLeft")));
-            buttonLeftNewer->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
-            break;
-        case SYNC_DIR_NONE:
-            buttonLeftNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowNone")));
-            buttonLeftNewer->SetToolTip(getDescription(SO_DO_NOTHING));
-            break;
-    }
-
-    switch (syncConfig.rightNewer)
-    {
-        case SYNC_DIR_RIGHT:
-            buttonRightNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowRight")));
-            buttonRightNewer->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
-            break;
-        case SYNC_DIR_LEFT:
-            buttonRightNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowLeft")));
-            buttonRightNewer->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
-            break;
-        case SYNC_DIR_NONE:
-            buttonRightNewer->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowNone")));
-            buttonRightNewer->SetToolTip(getDescription(SO_DO_NOTHING));
-            break;
-    }
-
-    switch (syncConfig.different)
-    {
-        case SYNC_DIR_RIGHT:
-            buttonDifferent->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowRight")));
-            buttonDifferent->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
-            break;
-        case SYNC_DIR_LEFT:
-            buttonDifferent->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowLeft")));
-            buttonDifferent->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
-            break;
-        case SYNC_DIR_NONE:
-            buttonDifferent->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowNone")));
-            buttonDifferent->SetToolTip(getDescription(SO_DO_NOTHING));
-            break;
-    }
-
-    switch (syncConfig.conflict)
-    {
-        case SYNC_DIR_RIGHT:
-            buttonConflict->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowRight")));
-            buttonConflict->SetToolTip(getDescription(SO_OVERWRITE_RIGHT));
-            break;
-        case SYNC_DIR_LEFT:
-            buttonConflict->SetBitmapLabel(GlobalResources::instance().getImage(wxT("arrowLeft")));
-            buttonConflict->SetToolTip(getDescription(SO_OVERWRITE_LEFT));
-            break;
-        case SYNC_DIR_NONE:
-            buttonConflict->SetBitmapLabel(GlobalResources::instance().getImage(wxT("conflict")));
-            buttonConflict->SetToolTip(_("Leave as unresolved conflict"));
-            break;
-    }
+    m_panelCustomDeletionDir->Enable(getEnumVal(enumDelhandDescr, *m_choiceHandleDeletion) == zen::MOVE_TO_CUSTOM_DIRECTORY);
 }
 
 
@@ -287,142 +362,54 @@ void SyncCfgDialog::OnApply(wxCommandEvent& event)
 {
     //write configuration to main dialog
     refSyncConfiguration = currentSyncConfig;
-    refHandleDeletion    = getDeletionHandling();
-    refCustomDeletionDirectory = zToWx(customDelFolder->getName());
-    if (refIgnoreErrors)
-        *refIgnoreErrors = getErrorHandling();
+    refHandleDeletion    = getEnumVal(enumDelhandDescr, *m_choiceHandleDeletion);
 
-    EndModal(BUTTON_APPLY);
-}
+    refCustomDeletionDirectory = customDelFolder.getName();
+    if (refHandleError)
+        *refHandleError = getEnumVal(enumErrhandDescr, *m_choiceHandleError);
 
-
-void SyncCfgDialog::updateToolTipErrorHandling(bool ignoreErrors)
-{
-    if (ignoreErrors)
-        m_choiceHandleError->SetToolTip(_("Hide all error and warning messages"));
-    else
-        m_choiceHandleError->SetToolTip(_("Show popup on errors or warnings"));
-}
-
-
-bool SyncCfgDialog::getErrorHandling()
-{
-    if (m_choiceHandleError->GetSelection() == 1) //Ignore errors
-        return true;
-    else
-        return false; // Show popup
-}
-
-
-void SyncCfgDialog::setErrorHandling(bool ignoreErrors)
-{
-    m_choiceHandleError->Clear();
-    m_choiceHandleError->Append(_("Show popup"));
-    m_choiceHandleError->Append(_("Ignore errors"));
-
-    if (ignoreErrors)
-        m_choiceHandleError->SetSelection(1);
-    else
-        m_choiceHandleError->SetSelection(0);
-
-    updateToolTipErrorHandling(ignoreErrors);
+    EndModal(ReturnSyncConfig::BUTTON_OKAY);
 }
 
 
 void SyncCfgDialog::OnChangeErrorHandling(wxCommandEvent& event)
 {
-    updateToolTipErrorHandling(getErrorHandling());
-}
-
-//-------------------
-
-void updateToolTipDeletionHandling(wxChoice* choiceHandleError, wxPanel* customDir, const ffs3::DeletionPolicy value)
-{
-    customDir->Disable();
-
-    switch (value)
-    {
-        case ffs3::DELETE_PERMANENTLY:
-            choiceHandleError->SetToolTip(_("Delete or overwrite files permanently"));
-            break;
-
-        case ffs3::MOVE_TO_RECYCLE_BIN:
-            choiceHandleError->SetToolTip(_("Use Recycle Bin when deleting or overwriting files"));
-            break;
-
-        case ffs3::MOVE_TO_CUSTOM_DIRECTORY:
-            choiceHandleError->SetToolTip(_("Move files into a time-stamped subdirectory"));
-            customDir->Enable();
-            break;
-    }
-}
-
-
-ffs3::DeletionPolicy SyncCfgDialog::getDeletionHandling()
-{
-    switch (m_choiceHandleDeletion->GetSelection())
-    {
-        case 0:
-            return ffs3::DELETE_PERMANENTLY;
-        case 1:
-            return ffs3::MOVE_TO_RECYCLE_BIN;
-        case 2:
-            return ffs3::MOVE_TO_CUSTOM_DIRECTORY;
-        default:
-            assert(false);
-            return ffs3::MOVE_TO_RECYCLE_BIN;
-    }
-}
-
-
-void SyncCfgDialog::setDeletionHandling(ffs3::DeletionPolicy newValue)
-{
-    m_choiceHandleDeletion->Clear();
-    m_choiceHandleDeletion->Append(_("Delete permanently"));
-    m_choiceHandleDeletion->Append(_("Use Recycle Bin"));
-    m_choiceHandleDeletion->Append(_("Versioning"));
-
-    switch (newValue)
-    {
-        case ffs3::DELETE_PERMANENTLY:
-            m_choiceHandleDeletion->SetSelection(0);
-            break;
-        case ffs3::MOVE_TO_RECYCLE_BIN:
-            m_choiceHandleDeletion->SetSelection(1);
-            break;
-        case ffs3::MOVE_TO_CUSTOM_DIRECTORY:
-            m_choiceHandleDeletion->SetSelection(2);
-            break;
-    }
-
-    updateToolTipDeletionHandling(m_choiceHandleDeletion, m_panelCustomDeletionDir, newValue);
+    updateTooltipEnumVal(enumErrhandDescr, *m_choiceHandleError);
 }
 
 
 void SyncCfgDialog::OnChangeDeletionHandling(wxCommandEvent& event)
 {
-    updateToolTipDeletionHandling(m_choiceHandleDeletion, m_panelCustomDeletionDir, getDeletionHandling());
+    updateTooltipEnumVal(enumDelhandDescr, *m_choiceHandleDeletion);
+    updateGui();
 }
 
 
 void SyncCfgDialog::OnSyncAutomatic(wxCommandEvent& event)
 {
-    ffs3::setVariant(currentSyncConfig, SyncConfiguration::AUTOMATIC);
-    updateConfigIcons(cmpVariant, currentSyncConfig);
+    currentSyncConfig.var = SyncConfig::AUTOMATIC;
+    updateGui();
 }
 
 
-void SyncCfgDialog::OnSyncLeftToRight(wxCommandEvent& event)
+void SyncCfgDialog::OnSyncMirror(wxCommandEvent& event)
 {
-    ffs3::setVariant(currentSyncConfig, SyncConfiguration::MIRROR);
-    updateConfigIcons(cmpVariant, currentSyncConfig);
+    currentSyncConfig.var = SyncConfig::MIRROR;
+    updateGui();
 }
 
 
 void SyncCfgDialog::OnSyncUpdate(wxCommandEvent& event)
 {
-    ffs3::setVariant(currentSyncConfig, SyncConfiguration::UPDATE);
-    updateConfigIcons(cmpVariant, currentSyncConfig);
+    currentSyncConfig.var = SyncConfig::UPDATE;
+    updateGui();
+}
+
+
+void SyncCfgDialog::OnSyncCustom(wxCommandEvent& event)
+{
+    currentSyncConfig.var = SyncConfig::CUSTOM;
+    updateGui();
 }
 
 
@@ -443,43 +430,104 @@ void toggleSyncDirection(SyncDirection& current)
 }
 
 
+void pressCustomDir(SyncConfig& syncCfg, SyncDirection& syncdir)
+{
+    switch (syncCfg.var)
+    {
+        case SyncConfig::AUTOMATIC:
+            assert(false);
+            break;
+        case SyncConfig::MIRROR:
+        case SyncConfig::UPDATE:
+            syncCfg.custom = extractDirections(syncCfg);
+            syncCfg.var = SyncConfig::CUSTOM;
+            toggleSyncDirection(syncdir);
+            break;
+        case SyncConfig::CUSTOM:
+            toggleSyncDirection(syncdir);
+
+            //some config optimization: if custom settings happen to match "mirror" or "update", just switch variant
+            DirectionSet currentSet = extractDirections(syncCfg);
+            DirectionSet setMirror;
+            DirectionSet setUpdate;
+            {
+                SyncConfig mirrorCfg;
+                mirrorCfg.var = SyncConfig::MIRROR;
+                setMirror = extractDirections(mirrorCfg);
+            }
+            {
+                SyncConfig updateCfg;
+                updateCfg.var = SyncConfig::UPDATE;
+                setUpdate = extractDirections(updateCfg);
+            }
+
+            if (currentSet == setMirror)
+                syncCfg.var = SyncConfig::MIRROR;
+            else if (currentSet == setUpdate)
+                syncCfg.var = SyncConfig::UPDATE;
+            break;
+    }
+}
+
+
 void SyncCfgDialog::OnExLeftSideOnly(wxCommandEvent& event )
 {
-    toggleSyncDirection(currentSyncConfig.exLeftSideOnly);
-    updateConfigIcons(cmpVariant, currentSyncConfig);
+    pressCustomDir(currentSyncConfig, currentSyncConfig.custom.exLeftSideOnly);
+    updateGui();
 }
 
 
 void SyncCfgDialog::OnExRightSideOnly(wxCommandEvent& event )
 {
-    toggleSyncDirection(currentSyncConfig.exRightSideOnly);
-    updateConfigIcons(cmpVariant, currentSyncConfig);
+    pressCustomDir(currentSyncConfig, currentSyncConfig.custom.exRightSideOnly);
+    updateGui();
 }
 
 
 void SyncCfgDialog::OnLeftNewer(wxCommandEvent& event )
 {
-    toggleSyncDirection(currentSyncConfig.leftNewer);
-    updateConfigIcons(cmpVariant, currentSyncConfig);
+    pressCustomDir(currentSyncConfig, currentSyncConfig.custom.leftNewer);
+    updateGui();
 }
 
 
 void SyncCfgDialog::OnRightNewer(wxCommandEvent& event )
 {
-    toggleSyncDirection(currentSyncConfig.rightNewer);
-    updateConfigIcons(cmpVariant, currentSyncConfig);
+    pressCustomDir(currentSyncConfig, currentSyncConfig.custom.rightNewer);
+    updateGui();
 }
 
 
 void SyncCfgDialog::OnDifferent(wxCommandEvent& event )
 {
-    toggleSyncDirection(currentSyncConfig.different);
-    updateConfigIcons(cmpVariant, currentSyncConfig);
+    pressCustomDir(currentSyncConfig, currentSyncConfig.custom.different);
+    updateGui();
 }
 
 
 void SyncCfgDialog::OnConflict(wxCommandEvent& event)
 {
-    toggleSyncDirection(currentSyncConfig.conflict);
-    updateConfigIcons(cmpVariant, currentSyncConfig);
+    pressCustomDir(currentSyncConfig, currentSyncConfig.custom.conflict);
+    updateGui();
 }
+
+
+
+
+
+ReturnSyncConfig::ButtonPressed zen::showSyncConfigDlg(zen::CompareVariant   compareVar,
+                                                       zen::SyncConfig&      syncConfiguration,
+                                                       zen::DeletionPolicy&  handleDeletion,
+                                                       wxString&              customDeletionDirectory,
+                                                       xmlAccess::OnGuiError* handleError) //optional input parameter
+{
+    SyncCfgDialog syncDlg(NULL,
+                          compareVar,
+                          syncConfiguration,
+                          handleDeletion,
+                          customDeletionDirectory,
+                          handleError);
+
+    return static_cast<ReturnSyncConfig::ButtonPressed>(syncDlg.ShowModal());
+}
+

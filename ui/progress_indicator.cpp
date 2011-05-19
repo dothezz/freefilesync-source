@@ -24,11 +24,13 @@
 #include "../shared/taskbar.h"
 #endif
 
-using namespace ffs3;
+using namespace zen;
 
 
 namespace
 {
+const int GAUGE_FULL_RANGE = 50000;
+
 //window size used for statistics in milliseconds
 const int windowSizeRemainingTime = 60000; //some usecases have dropouts of 40 seconds -> 60 sec. window size handles them well
 const int windowSizeBytesPerSec   =  5000; //
@@ -62,9 +64,9 @@ public:
     void init(); //make visible, initialize all status values
     void finalize(); //hide again
 
-    void switchToCompareBytewise(int totalObjectsToProcess, wxLongLong totalDataToProcess);
+    void switchToCompareBytewise(int totalObjectsToProcess, zen::Int64 totalDataToProcess);
     void incScannedObjects_NoUpdate(int number);
-    void incProcessedCmpData_NoUpdate(int objectsProcessed, wxLongLong dataProcessed);
+    void incProcessedCmpData_NoUpdate(int objectsProcessed, zen::Int64 dataProcessed);
     void setStatusText_NoUpdate(const Zstring& text);
     void updateStatusPanelNow();
 
@@ -79,11 +81,11 @@ private:
     wxStopWatch timeElapsed;
 
     //gauge variables
-    int        totalObjects;
-    wxLongLong totalData;      //each data element represents one byte for proper progress indicator scaling
-    int        currentObjects; //each object represents a file or directory processed
-    wxLongLong currentData;
-    double     scalingFactor;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
+    int            totalObjects;
+    zen::Int64 totalData;      //each data element represents one byte for proper progress indicator scaling
+    int            currentObjects; //each object represents a file or directory processed
+    zen::Int64 currentData;
+    double         scalingFactor;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
 
     void showProgressExternally(const wxString& progressText, float percent = 0);
 
@@ -129,7 +131,7 @@ void CompareStatus::finalize()
     pimpl->finalize();
 }
 
-void CompareStatus::switchToCompareBytewise(int totalObjectsToProcess, wxLongLong totalDataToProcess)
+void CompareStatus::switchToCompareBytewise(int totalObjectsToProcess, zen::Int64 totalDataToProcess)
 {
     pimpl->switchToCompareBytewise(totalObjectsToProcess, totalDataToProcess);
 }
@@ -139,7 +141,7 @@ void CompareStatus::incScannedObjects_NoUpdate(int number)
     pimpl->incScannedObjects_NoUpdate(number);
 }
 
-void CompareStatus::incProcessedCmpData_NoUpdate(int objectsProcessed, wxLongLong dataProcessed)
+void CompareStatus::incProcessedCmpData_NoUpdate(int objectsProcessed, zen::Int64 dataProcessed)
 {
     pimpl->incProcessedCmpData_NoUpdate(objectsProcessed, dataProcessed);
 }
@@ -188,7 +190,7 @@ void CompareStatus::CompareStatusImpl::init()
     status = SCANNING;
 
     //initialize gauge
-    m_gauge2->SetRange(50000);
+    m_gauge2->SetRange(GAUGE_FULL_RANGE);
     m_gauge2->SetValue(0);
 
     //initially hide status that's relevant for comparing bytewise only
@@ -229,7 +231,7 @@ void CompareStatus::CompareStatusImpl::finalize() //hide again
 }
 
 
-void CompareStatus::CompareStatusImpl::switchToCompareBytewise(int totalObjectsToProcess, wxLongLong totalDataToProcess)
+void CompareStatus::CompareStatusImpl::switchToCompareBytewise(int totalObjectsToProcess, zen::Int64 totalDataToProcess)
 {
     status = COMPARING_CONTENT;
 
@@ -240,12 +242,12 @@ void CompareStatus::CompareStatusImpl::switchToCompareBytewise(int totalObjectsT
     totalObjects   = totalObjectsToProcess;
 
     if (totalData != 0)
-        scalingFactor = 50000 / totalData.ToDouble(); //let's normalize to 50000
+        scalingFactor = GAUGE_FULL_RANGE / to<double>(totalData); //let's normalize to 50000
     else
         scalingFactor = 0;
 
     //set new statistics handler: 10 seconds "window" for remaining time, 5 seconds for speed
-    statistics.reset(new Statistics(totalObjectsToProcess, totalDataToProcess.ToDouble(), windowSizeRemainingTime, windowSizeBytesPerSec));
+    statistics.reset(new Statistics(totalObjectsToProcess, to<double>(totalDataToProcess), windowSizeRemainingTime, windowSizeBytesPerSec));
     lastStatCallSpeed   = -1000000; //some big number
     lastStatCallRemTime = -1000000;
 
@@ -267,7 +269,7 @@ void CompareStatus::CompareStatusImpl::incScannedObjects_NoUpdate(int number)
 }
 
 
-void CompareStatus::CompareStatusImpl::incProcessedCmpData_NoUpdate(int objectsProcessed, wxLongLong dataProcessed)
+void CompareStatus::CompareStatusImpl::incProcessedCmpData_NoUpdate(int objectsProcessed, zen::Int64 dataProcessed)
 {
     currentData    +=    dataProcessed;
     currentObjects += objectsProcessed;
@@ -315,13 +317,13 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
     {
         //wxWindowUpdateLocker dummy(this) -> not needed
 
-        const float percent = totalData == 0 ? 0 : currentData.ToDouble() * 100 / totalData.ToDouble();
+        const float percent = totalData == 0 ? 0 : to<double>(currentData) * 100.0 / to<double>(totalData);
 
         //write status information to taskbar, parent title ect.
         switch (status)
         {
             case SCANNING:
-                showProgressExternally(numberToStringSep(scannedObjects) + wxT(" - ") + _("Scanning..."));
+                showProgressExternally(toStringSep(scannedObjects) + wxT(" - ") + _("Scanning..."));
                 break;
             case COMPARING_CONTENT:
                 showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Comparing content..."), percent);
@@ -342,17 +344,17 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
             m_textCtrlStatus->ChangeValue(formattedStatusText);
 
         //nr of scanned objects
-        setNewText(numberToStringSep(scannedObjects), *m_staticTextScanned, updateLayout);
+        setNewText(toStringSep(scannedObjects), *m_staticTextScanned, updateLayout);
 
         //progress indicator for "compare file content"
-        m_gauge2->SetValue(int(currentData.ToDouble() * scalingFactor));
+        m_gauge2->SetValue(to<double>(currentData) * scalingFactor);
 
         //remaining files left for file comparison
-        const wxString filesToCompareTmp = numberToStringSep(totalObjects - currentObjects);
+        const wxString filesToCompareTmp = toStringSep(totalObjects - currentObjects);
         setNewText(filesToCompareTmp, *m_staticTextFilesRemaining, updateLayout);
 
         //remaining bytes left for file comparison
-        const wxString remainingBytesTmp = ffs3::formatFilesizeToShortString(totalData - currentData);
+        const wxString remainingBytesTmp = zen::formatFilesizeToShortString(to<zen::UInt64>(totalData - currentData));
         setNewText(remainingBytesTmp, *m_staticTextDataRemaining, updateLayout);
 
         if (statistics.get())
@@ -361,7 +363,7 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
             {
                 lastStatCallSpeed = timeElapsed.Time();
 
-                statistics->addMeasurement(currentObjects, currentData.ToDouble());
+                statistics->addMeasurement(currentObjects, to<double>(currentData));
 
                 //current speed
                 setNewText(statistics->getBytesPerSecond(), *m_staticTextSpeed, updateLayout);
@@ -480,11 +482,11 @@ private:
 class SyncStatus::SyncStatusImpl : public SyncStatusDlgGenerated
 {
 public:
-    SyncStatusImpl(StatusHandler& updater, wxTopLevelWindow* parentWindow, const wxString& jobName);
+    SyncStatusImpl(AbortCallback& abortCb, MainDialog* parentWindow, const wxString& jobName);
     ~SyncStatusImpl();
 
-    void resetGauge(int totalObjectsToProcess, wxLongLong totalDataToProcess);
-    void incProgressIndicator_NoUpdate(int objectsProcessed, wxLongLong dataProcessed);
+    void resetGauge(int totalObjectsToProcess, zen::Int64 totalDataToProcess);
+    void incProgressIndicator_NoUpdate(int objectsProcessed, zen::Int64 dataProcessed);
     void incScannedObjects_NoUpdate(int number);
     void setStatusText_NoUpdate(const Zstring& text);
     void updateStatusDialogNow();
@@ -509,14 +511,14 @@ private:
     const wxString jobName_;
     wxStopWatch timeElapsed;
 
-    StatusHandler* processStatusHandler;
-    wxTopLevelWindow* mainDialog;
+    AbortCallback* abortCb_; //temporarily bound
+    MainDialog* mainDialog; //optional
 
     //gauge variables
     int        totalObjects;
-    wxLongLong totalData;
+    zen::Int64 totalData;
     int        currentObjects; //each object represents a file or directory processed
-    wxLongLong currentData;    //each data element represents one byte for proper progress indicator scaling
+    zen::Int64 currentData;    //each data element represents one byte for proper progress indicator scaling
     double     scalingFactor;  //nr of elements has to be normalized to smaller nr. because of range of int limitation
 
     //status variables
@@ -546,8 +548,8 @@ private:
 
 
 //redirect to implementation
-SyncStatus::SyncStatus(StatusHandler& updater, wxTopLevelWindow* parentWindow, bool startSilent, const wxString& jobName) :
-    pimpl(new SyncStatusImpl(updater, parentWindow, jobName))
+SyncStatus::SyncStatus(AbortCallback& abortCb, MainDialog* parentWindow, bool startSilent, const wxString& jobName) :
+    pimpl(new SyncStatusImpl(abortCb, parentWindow, jobName))
 {
     if (startSilent)
         pimpl->minimizeToTray();
@@ -573,7 +575,7 @@ void SyncStatus::closeWindowDirectly() //don't wait for user (silent mode)
     pimpl->Destroy();
 }
 
-void SyncStatus::resetGauge(int totalObjectsToProcess, wxLongLong totalDataToProcess)
+void SyncStatus::resetGauge(int totalObjectsToProcess, zen::Int64 totalDataToProcess)
 {
     pimpl->resetGauge(totalObjectsToProcess, totalDataToProcess);
 }
@@ -583,7 +585,7 @@ void SyncStatus::incScannedObjects_NoUpdate(int number)
     pimpl->incScannedObjects_NoUpdate(number);
 }
 
-void SyncStatus::incProgressIndicator_NoUpdate(int objectsProcessed, wxLongLong dataProcessed)
+void SyncStatus::incProgressIndicator_NoUpdate(int objectsProcessed, zen::Int64 dataProcessed)
 {
     pimpl->incProgressIndicator_NoUpdate(objectsProcessed, dataProcessed);
 }
@@ -610,7 +612,7 @@ void SyncStatus::processHasFinished(SyncStatusID id, const ErrorLogging& log)
 //########################################################################################
 
 
-SyncStatus::SyncStatusImpl::SyncStatusImpl(StatusHandler& updater, wxTopLevelWindow* parentWindow, const wxString& jobName) :
+SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb, MainDialog* parentWindow, const wxString& jobName) :
     SyncStatusDlgGenerated(parentWindow,
                            wxID_ANY,
                            parentWindow ? wxString(wxEmptyString) : (wxString(wxT("FreeFileSync - ")) + _("Folder Comparison and Synchronization")),
@@ -619,7 +621,7 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(StatusHandler& updater, wxTopLevelWin
                            wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL | wxFRAME_NO_TASKBAR | wxFRAME_FLOAT_ON_PARENT : //wxTAB_TRAVERSAL is needed for standard button handling: wxID_OK/wxID_CANCEL
                            wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL),
     jobName_(jobName),
-    processStatusHandler(&updater),
+    abortCb_(&abortCb),
     mainDialog(parentWindow),
     totalObjects(0),
     totalData(0),
@@ -634,8 +636,7 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(StatusHandler& updater, wxTopLevelWin
     progressPercentLast(0)
 {
 #ifdef FFS_WIN
-    new ffs3::MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                              this, m_bitmapStatus, m_staticTextStatus); //ownership passed to "this"
+    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
     if (mainDialog) //save old title (will be used as progress indicator)
@@ -648,21 +649,24 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(StatusHandler& updater, wxTopLevelWin
     m_staticTextTimeRemaining->SetLabel(wxT("-"));
 
     //initialize gauge
-    m_gauge1->SetRange(50000);
+    m_gauge1->SetRange(GAUGE_FULL_RANGE);
     m_gauge1->SetValue(0);
 
     if (IsShown()) //don't steal focus when starting in sys-tray!
         m_buttonAbort->SetFocus();
 
     if (mainDialog)
-        mainDialog->Disable();
+    {
+        mainDialog->EnableCloseButton(false);
+        mainDialog->disableAllElements(false); //disable all child elements
+    }
 
     timeElapsed.Start(); //measure total time
 
 #ifdef FFS_WIN
     try //try to get access to Windows 7 Taskbar
     {
-        taskbar_.reset(new util::TaskbarProgress(mainDialog != NULL ? *mainDialog : *this));
+        taskbar_.reset(new util::TaskbarProgress(mainDialog != NULL ? *static_cast<wxTopLevelWindow*>(mainDialog) : *this));
     }
     catch (const util::TaskbarNotAvailable&) {}
 #endif
@@ -682,10 +686,12 @@ SyncStatus::SyncStatusImpl::~SyncStatusImpl()
 {
     if (mainDialog)
     {
+        mainDialog->EnableCloseButton(true);
+        mainDialog->enableAllElements();
+
         //restore title text
         mainDialog->SetTitle(titelTextBackup);
 
-        mainDialog->Enable();
         mainDialog->Raise();
         mainDialog->SetFocus();
     }
@@ -705,7 +711,7 @@ void SyncStatus::SyncStatusImpl::OnKeyPressed(wxKeyEvent& event)
 }
 
 
-void SyncStatus::SyncStatusImpl::resetGauge(int totalObjectsToProcess, wxLongLong totalDataToProcess)
+void SyncStatus::SyncStatusImpl::resetGauge(int totalObjectsToProcess, zen::Int64 totalDataToProcess)
 {
     currentData = 0;
     totalData = totalDataToProcess;
@@ -714,19 +720,21 @@ void SyncStatus::SyncStatusImpl::resetGauge(int totalObjectsToProcess, wxLongLon
     totalObjects   = totalObjectsToProcess;
 
     if (totalData != 0)
-        scalingFactor = 50000 / totalData.ToDouble(); //let's normalize to 50000
+        scalingFactor = GAUGE_FULL_RANGE / to<double>(totalData); //let's normalize to 50000
     else
         scalingFactor = 0;
 
     //set new statistics handler: 10 seconds "window" for remaining time, 5 seconds for speed
-    statistics.reset(new Statistics(totalObjectsToProcess, totalDataToProcess.ToDouble(), windowSizeRemainingTime, windowSizeBytesPerSec));
+    statistics.reset(new Statistics(totalObjectsToProcess, to<double>(totalDataToProcess), windowSizeRemainingTime, windowSizeBytesPerSec));
 
     lastStatCallSpeed   = -1000000; //some big number
     lastStatCallRemTime = -1000000;
+
+    m_gauge1->SetValue(totalDataToProcess == 0 ? GAUGE_FULL_RANGE : 0); //explicitly reset and end "pending" state (if not data will be synced)
 }
 
 
-void SyncStatus::SyncStatusImpl::incProgressIndicator_NoUpdate(int objectsProcessed, wxLongLong dataProcessed)
+void SyncStatus::SyncStatusImpl::incProgressIndicator_NoUpdate(int objectsProcessed, zen::Int64 dataProcessed)
 {
     //assert(dataProcessed >= 0);
 
@@ -812,7 +820,7 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
     //static RetrieveStatistics statistic;
     //statistic.writeEntry(currentData.ToDouble(), currentObjects);
 
-    const float percent = totalData == 0 ? 0 : currentData.ToDouble() * 100 / totalData.ToDouble();
+    const float percent = totalData == 0 ? 0 : to<double>(currentData) * 100.0 / to<double>(totalData);
 
     //write status information to systray, taskbar, parent title ect.
 
@@ -820,7 +828,7 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
     switch (currentStatus)
     {
         case SyncStatus::SCANNING:
-            showProgressExternally(numberToStringSep(scannedObjects) + wxT(" - ") + _("Scanning...") + postFix);
+            showProgressExternally(toStringSep(scannedObjects) + wxT(" - ") + _("Scanning...") + postFix);
             break;
         case SyncStatus::COMPARING_CONTENT:
             showProgressExternally(formatPercentage(currentData, totalData) + wxT(" - ") + _("Comparing content...") + postFix, percent);
@@ -850,7 +858,7 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
         if (currentStatus == SyncStatus::SCANNING)
             m_gauge1->Pulse();
         else
-            m_gauge1->SetValue(common::round(currentData.ToDouble() * scalingFactor));
+            m_gauge1->SetValue(common::round(to<double>(currentData) * scalingFactor));
 
         //status text
         const wxString statusTxt = zToWx(currentStatusText);
@@ -858,11 +866,11 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
             m_textCtrlInfo->ChangeValue(statusTxt);
 
         //remaining objects
-        const wxString remainingObjTmp = numberToStringSep(totalObjects - currentObjects);
+        const wxString remainingObjTmp = toStringSep(totalObjects - currentObjects);
         setNewText(remainingObjTmp, *m_staticTextRemainingObj, updateLayout);
 
         //remaining bytes left for copy
-        const wxString remainingBytesTmp = ffs3::formatFilesizeToShortString(totalData - currentData);
+        const wxString remainingBytesTmp = zen::formatFilesizeToShortString(to<zen::UInt64>(totalData - currentData));
         setNewText(remainingBytesTmp, *m_staticTextDataRemaining, updateLayout);
 
         if (statistics.get())
@@ -871,7 +879,7 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
             {
                 lastStatCallSpeed = timeElapsed.Time();
 
-                statistics->addMeasurement(currentObjects, currentData.ToDouble());
+                statistics->addMeasurement(currentObjects, to<double>(currentData));
 
                 //current speed
                 setNewText(statistics->getBytesPerSecond(), *m_staticTextSpeed, updateLayout);
@@ -923,7 +931,7 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
 
 bool SyncStatus::SyncStatusImpl::currentProcessIsRunning()
 {
-    return processStatusHandler != NULL;
+    return abortCb_ != NULL;
 }
 
 
@@ -977,7 +985,7 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id,
     //at the LATEST(!) to prevent access to currentStatusHandler
     //enable okay and close events; may be set in this method ONLY
 
-    processStatusHandler = NULL; //avoid callback to (maybe) deleted parent process
+    abortCb_ = NULL; //avoid callback to (maybe) deleted parent process
 
     setCurrentStatus(id);
 
@@ -1008,8 +1016,8 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id,
 
         bSizerObjectsProcessed->Show(true);
 
-        m_staticTextProcessedObj->SetLabel(numberToStringSep(currentObjects));
-        m_staticTextDataProcessed->SetLabel(ffs3::formatFilesizeToShortString(currentData));
+        m_staticTextProcessedObj->SetLabel(toStringSep(currentObjects));
+        m_staticTextDataProcessed->SetLabel(zen::formatFilesizeToShortString(to<zen::UInt64>(currentData)));
     }
 
     updateStatusDialogNow(); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
@@ -1044,7 +1052,7 @@ void SyncStatus::SyncStatusImpl::OnAbort(wxCommandEvent& event)
         setStatusText_NoUpdate(wxToZ(_("Abort requested: Waiting for current operation to finish...")));
         //no Layout() or UI-update here to avoid cascaded Yield()-call
 
-        processStatusHandler->requestAbortion();
+        abortCb_->requestAbortion();
     }
 }
 

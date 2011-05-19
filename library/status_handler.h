@@ -7,9 +7,9 @@
 #ifndef STATUSHANDLER_H_INCLUDED
 #define STATUSHANDLER_H_INCLUDED
 
-#include <wx/longlong.h>
+#include <wx/string.h>
 #include "../shared/zstring.h"
-
+#include "../shared/int64.h"
 
 const int UI_UPDATE_INTERVAL = 100; //perform ui updates not more often than necessary, 100 seems to be a good value with only a minimal performance loss
 
@@ -35,11 +35,10 @@ public:
 };
 
 
-class StatusHandler
+//report status during comparison and synchronization
+struct ProcessCallback
 {
-public:
-    StatusHandler() : abortRequested(false) {}
-    virtual ~StatusHandler() {}
+    virtual ~ProcessCallback() {}
 
     //identifiers of different phases
     enum Process
@@ -51,54 +50,56 @@ public:
     };
 
     //these methods have to be implemented in the derived classes to handle error and status information
-    virtual void initNewProcess(int objectsTotal, wxLongLong dataTotal, Process processID) = 0; //informs about the total amount of data that will be processed from now on
-    virtual void updateProcessedData(int objectsProcessed, wxLongLong dataProcessed) = 0;  //called periodically after data was processed
+    virtual void initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID) = 0; //informs about the total amount of data that will be processed from now on
+    virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed) = 0;  //called periodically after data was processed
 
     virtual void reportInfo(const Zstring& text) = 0;
 
     //this method is triggered repeatedly by requestUiRefresh() and can be used to refresh the ui by dispatching pending events
     virtual void forceUiRefresh() = 0;
 
-    void requestUiRefresh(bool allowAbort = true); //opportunity to abort must be implemented in a frequently executed method like requestUiRefresh()
-    void requestAbortion();  //this does NOT call abortThisProcess immediately, but when appropriate (e.g. async. processes finished)
-    bool abortIsRequested();
+    virtual void requestUiRefresh(bool allowExceptions = true) = 0; //opportunity to abort must be implemented in a frequently executed method like requestUiRefresh()
+
+    virtual bool abortIsRequested() = 0; //thanks to Windows C-Api not supporting exceptions we need this one...
 
     //error handling:
     virtual ErrorHandler::Response reportError(const wxString& errorMessage) = 0; //recoverable error situation
     virtual void reportFatalError(const wxString& errorMessage) = 0;              //non-recoverable error situation, implement abort!
-    virtual void reportWarning(const wxString& warningMessage, bool& warningActive) = 0;
+    virtual void reportWarning   (const wxString& warningMessage, bool& warningActive) = 0;
+};
 
-private:
+
+//gui may want to abort process
+struct AbortCallback
+{
+    virtual ~AbortCallback() {}
+    virtual void requestAbortion() = 0;
+};
+
+
+//actual callback implementation will have to satisfy "process" and "gui"
+class StatusHandler : public ProcessCallback, public AbortCallback
+{
+public:
+    StatusHandler() : abortRequested(false) {}
+
+    virtual void requestUiRefresh(bool allowExceptions)
+    {
+        if (updateUiIsAllowed())  //test if specific time span between ui updates is over
+            forceUiRefresh();
+
+        if (abortRequested && allowExceptions)
+            abortThisProcess();  //abort can be triggered by requestAbortion()
+    }
+
+    virtual void requestAbortion() { abortRequested = true; } //this does NOT call abortThisProcess immediately, but when appropriate (e.g. async. processes finished)
+    virtual bool abortIsRequested() { return abortRequested; }
     virtual void abortThisProcess() = 0;
 
+private:
     bool abortRequested;
 };
 
 
-
-//##############################################################################
-inline
-void StatusHandler::requestUiRefresh(bool allowAbort)
-{
-    if (updateUiIsAllowed())  //test if specific time span between ui updates is over
-        forceUiRefresh();
-
-    if (abortRequested && allowAbort)
-        abortThisProcess();  //abort can be triggered by requestAbortion()
-}
-
-
-inline
-void StatusHandler::requestAbortion()
-{
-    abortRequested = true;
-}
-
-
-inline
-bool StatusHandler::abortIsRequested()
-{
-    return abortRequested;
-}
 
 #endif // STATUSHANDLER_H_INCLUDED

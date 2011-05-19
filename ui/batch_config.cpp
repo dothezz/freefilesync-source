@@ -13,70 +13,85 @@
 #include "../shared/help_provider.h"
 #include "../shared/file_handling.h"
 #include "msg_popup.h"
+#include "gui_generated.h"
 #include <wx/dnd.h>
 #include <wx/msgdlg.h>
+#include "../shared/util.h"
 #include "../shared/mouse_move_dlg.h"
 
-using namespace ffs3;
+using namespace zen;
+
+class DirectoryPairBatchFirst;
+class DirectoryPairBatch;
 
 
-class BatchFileDropEvent : public wxFileDropTarget
+class BatchDialog: public BatchDlgGenerated
 {
+    friend class BatchFileDropEvent;
+    template <class GuiPanel>
+    friend class FolderPairCallback;
+
 public:
-    BatchFileDropEvent(BatchDialog& dlg) :
-        batchDlg(dlg) {}
-
-    virtual bool OnDropFiles(wxCoord x, wxCoord y, const wxArrayString& fileArray)
-    {
-        if (fileArray.IsEmpty())
-            return false;
-
-        std::vector<wxString> filenames;
-        for (size_t i = 0; i < fileArray.GetCount(); ++i)
-            filenames.push_back(fileArray[i]);
-
-
-        switch (xmlAccess::getMergeType(filenames))   //throw ()
-        {
-            case xmlAccess::MERGE_BATCH:
-            case xmlAccess::MERGE_GUI:
-            case xmlAccess::MERGE_GUI_BATCH:
-                if (filenames.size() == 1)
-                {
-                    batchDlg.loadBatchFile(filenames[0]);
-                    return false;
-                }
-                else
-                {
-                    xmlAccess::XmlBatchConfig batchCfg;
-                    try
-                    {
-                        convertConfig(filenames, batchCfg); //throw (xmlAccess::XmlError)
-                    }
-                    catch (const xmlAccess::XmlError& error)
-                    {
-                        if (error.getSeverity() == xmlAccess::XmlError::WARNING)
-                            wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING);
-                        else
-                        {
-                            wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
-                            return false;
-                        }
-                    }
-                    batchDlg.loadBatchCfg(batchCfg);
-                }
-                break;
-
-            case xmlAccess::MERGE_OTHER:
-                wxMessageBox(_("Invalid FreeFileSync config file!"), _("Error"), wxOK | wxICON_ERROR);
-                break;
-        }
-
-        return false;
-    }
+    BatchDialog(wxWindow* window, const xmlAccess::XmlBatchConfig& batchCfg);
+    BatchDialog(wxWindow* window, const wxString& filename);
+    ~BatchDialog();
 
 private:
-    BatchDialog& batchDlg;
+    void init();
+
+    virtual void OnCmpSettings(        wxCommandEvent& event);
+    virtual void OnSyncSettings(       wxCommandEvent& event);
+    virtual void OnConfigureFilter(    wxCommandEvent& event);
+
+    virtual void OnHelp(               wxCommandEvent& event);
+
+    void OnGlobalFilterOpenContext(wxCommandEvent& event);
+    void OnGlobalFilterRemConfirm(wxCommandEvent& event);
+    virtual void OnCheckSilent(        wxCommandEvent& event);
+    virtual void OnChangeMaxLogCountTxt(wxCommandEvent& event);
+    virtual void OnClose(              wxCloseEvent&   event);
+    virtual void OnCancel(             wxCommandEvent& event);
+    virtual void OnSaveBatchJob(       wxCommandEvent& event);
+    virtual void OnLoadBatchJob(       wxCommandEvent& event);
+    virtual void OnAddFolderPair(      wxCommandEvent& event);
+    virtual void OnRemoveFolderPair(   wxCommandEvent& event);
+    virtual void OnRemoveTopFolderPair(wxCommandEvent& event);
+    void OnFilesDropped(FFSFileDropEvent& event);
+
+    void addFolderPair(const std::vector<zen::FolderPairEnh>& newPairs, bool addFront = false);
+    void removeAddFolderPair(const int pos);
+    void clearAddFolderPairs();
+
+    void updateGuiForFolderPair();
+
+    void updateGui(); //re-evaluate gui after config changes
+
+    void showNotebookpage(wxWindow* page, const wxString& pageName, bool show);
+
+    //error handling
+    //xmlAccess::OnError getSelectionHandleError() const; -> obsolete, use getEnumVal()
+    void setSelectionHandleError(const xmlAccess::OnError value);
+    void OnChangeErrorHandling(wxCommandEvent& event);
+
+    bool saveBatchFile(const wxString& filename);
+    void loadBatchFile(const wxString& filename);
+    void loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg);
+
+    xmlAccess::XmlBatchConfig getCurrentConfiguration() const;
+
+    boost::shared_ptr<DirectoryPairBatchFirst> firstFolderPair; //always bound!!!
+    std::vector<DirectoryPairBatch*> additionalFolderPairs;
+
+    //used when saving batch file
+    wxString proposedBatchFileName;
+
+    xmlAccess::XmlBatchConfig localBatchCfg;
+
+    std::auto_ptr<wxMenu> contextMenu;
+
+    std::auto_ptr<zen::DirectoryName> logfileDir;
+
+    zen::EnumDescrList<xmlAccess::OnError> enumDescrMap;
 };
 
 //###################################################################################################################################
@@ -144,20 +159,14 @@ public:
         dirNameLeft (*m_panelLeft,  *m_dirPickerLeft,  *m_directoryLeft),
         dirNameRight(*m_panelRight, *m_dirPickerRight, *m_directoryRight) {}
 
-    void setValues(const Zstring& leftDir, const Zstring& rightDir, AltSyncCfgPtr syncCfg, const FilterConfig& filter)
+    void setValues(const wxString& leftDir, const wxString& rightDir, AltSyncCfgPtr syncCfg, const FilterConfig& filter)
     {
         setConfig(syncCfg, filter);
         dirNameLeft.setName(leftDir);
         dirNameRight.setName(rightDir);
     }
-    Zstring getLeftDir() const
-    {
-        return dirNameLeft.getName();
-    }
-    Zstring getRightDir() const
-    {
-        return dirNameRight.getName();
-    }
+    wxString getLeftDir () const { return dirNameLeft .getName(); }
+    wxString getRightDir() const { return dirNameRight.getName(); }
 
 private:
     //support for drag and drop
@@ -180,20 +189,14 @@ public:
                      *batchDialog.m_dirPickerRight,
                      *batchDialog.m_directoryRight) {}
 
-    void setValues(const Zstring& leftDir, const Zstring& rightDir, AltSyncCfgPtr syncCfg, const FilterConfig& filter)
+    void setValues(const wxString& leftDir, const wxString& rightDir, AltSyncCfgPtr syncCfg, const FilterConfig& filter)
     {
         setConfig(syncCfg, filter);
         dirNameLeft.setName(leftDir);
         dirNameRight.setName(rightDir);
     }
-    Zstring getLeftDir() const
-    {
-        return dirNameLeft.getName();
-    }
-    Zstring getRightDir() const
-    {
-        return dirNameRight.getName();
-    }
+    wxString getLeftDir () const { return dirNameLeft .getName(); }
+    wxString getRightDir() const { return dirNameRight.getName(); }
 
 private:
     //support for drag and drop
@@ -225,16 +228,16 @@ BatchDialog::~BatchDialog() {} //non-inline destructor for std::auto_ptr to work
 void BatchDialog::init()
 {
 #ifdef FFS_WIN
-    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                        this,
-                        m_panelOverview,
-                        m_panelLogging,
-                        m_staticText56,
-                        m_staticText44,
-                        m_bitmap27); //ownership passed to "this"
+    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
     wxWindowUpdateLocker dummy(this); //avoid display distortion
+
+    enumDescrMap.
+    add(xmlAccess::ON_ERROR_POPUP , _("Show popup")    , _("Show popup on errors or warnings")).
+    add(xmlAccess::ON_ERROR_IGNORE, _("Ignore errors") , _("Hide all error and warning messages")).
+    add(xmlAccess::ON_ERROR_EXIT  , _("Exit instantly"), _("Abort synchronization immediately"));
+
 
     m_bpButtonCmpConfig->SetBitmapLabel(GlobalResources::instance().getImage(wxT("cmpConfig")));
     m_bpButtonSyncConfig->SetBitmapLabel(GlobalResources::instance().getImage(wxT("syncConfig")));
@@ -247,7 +250,9 @@ void BatchDialog::init()
     m_bpButtonFilter->Connect(wxEVT_RIGHT_DOWN, wxCommandEventHandler(BatchDialog::OnGlobalFilterOpenContext), NULL, this);
 
     //prepare drag & drop for loading of *.ffs_batch files
-    SetDropTarget(new BatchFileDropEvent(*this));
+    setupFileDrop(*this);
+    Connect(FFS_DROP_FILE_EVENT, FFSFileDropEventHandler(BatchDialog::OnFilesDropped), NULL, this);
+
     logfileDir.reset(new DirectoryName(*m_panelLogging, *m_dirPickerLogfileDir, *m_textCtrlLogfileDir, sbSizerLogfileDir));
 
     //set icons for this dialog
@@ -259,72 +264,21 @@ void BatchDialog::init()
 
 //------------------- error handling --------------------------
 
-xmlAccess::OnError BatchDialog::getSelectionHandleError() const
-{
-    switch (m_choiceHandleError->GetSelection())
-    {
-        case 0:
-            return xmlAccess::ON_ERROR_POPUP;
-        case 1:
-            return xmlAccess::ON_ERROR_IGNORE;
-        case 2:
-            return xmlAccess::ON_ERROR_EXIT;
-        default:
-            assert(false);
-            return xmlAccess::ON_ERROR_POPUP;
-    }
-}
-
-
-void BatchDialog::updateToolTipErrorHandling(const xmlAccess::OnError value)
-{
-    switch (value)
-    {
-        case xmlAccess::ON_ERROR_POPUP:
-            m_choiceHandleError->SetToolTip(_("Show popup on errors or warnings"));
-            break;
-        case xmlAccess::ON_ERROR_IGNORE:
-            m_choiceHandleError->SetToolTip(_("Hide all error and warning messages"));
-            break;
-        case xmlAccess::ON_ERROR_EXIT:
-            m_choiceHandleError->SetToolTip(_("Abort synchronization immediately"));
-            break;
-    }
-}
-
-
 void BatchDialog::setSelectionHandleError(const xmlAccess::OnError value)
 {
-    m_choiceHandleError->Clear();
-    m_choiceHandleError->Append(_("Show popup"));
-    m_choiceHandleError->Append(_("Ignore errors"));
-    if (m_checkBoxSilent->GetValue()) //this option shall be available for silent mode only!
-        m_choiceHandleError->Append(_("Exit instantly"));
-
-    //default
-    m_choiceHandleError->SetSelection(0);
-
-    switch (value)
+    if (m_checkBoxSilent->GetValue())
+        setEnumVal(enumDescrMap, *m_choiceHandleError, value);
+    else
     {
-        case xmlAccess::ON_ERROR_POPUP:
-            m_choiceHandleError->SetSelection(0);
-            break;
-        case xmlAccess::ON_ERROR_IGNORE:
-            m_choiceHandleError->SetSelection(1);
-            break;
-        case xmlAccess::ON_ERROR_EXIT:
-            if (m_checkBoxSilent->GetValue()) //this option shall be available for silent mode only!
-                m_choiceHandleError->SetSelection(2);
-            break;
+        EnumDescrList<xmlAccess::OnError> tmp(enumDescrMap);
+        tmp.descrList.pop_back(); //remove "Exit instantly" -> this option shall be available for silent mode only!
+        setEnumVal(tmp, *m_choiceHandleError, value);
     }
-
-    updateToolTipErrorHandling(getSelectionHandleError());
 }
-
 
 void BatchDialog::OnChangeErrorHandling(wxCommandEvent& event)
 {
-    updateToolTipErrorHandling(getSelectionHandleError());
+    updateTooltipEnumVal(enumDescrMap, *m_choiceHandleError);
 }
 
 
@@ -335,9 +289,9 @@ void BatchDialog::OnCmpSettings(wxCommandEvent& event)
     wxPoint windowPos = m_bpButtonCmpConfig->GetScreenPosition();
     windowPos.x += m_bpButtonCmpConfig->GetSize().GetWidth() + 5;
 
-    if (ffs3::showCompareCfgDialog(windowPos,
-                                   localBatchCfg.mainCfg.compareVar,
-                                   localBatchCfg.mainCfg.handleSymlinks) == DefaultReturnCode::BUTTON_OKAY)
+    if (zen::showCompareCfgDialog(windowPos,
+                                  localBatchCfg.mainCfg.compareVar,
+                                  localBatchCfg.mainCfg.handleSymlinks) == ReturnSmallDlg::BUTTON_OKAY)
     {
         updateGui();
     }
@@ -346,13 +300,11 @@ void BatchDialog::OnCmpSettings(wxCommandEvent& event)
 
 void BatchDialog::OnSyncSettings(wxCommandEvent& event)
 {
-    SyncCfgDialog syncDlg(this,
-                          localBatchCfg.mainCfg.compareVar,
+    if (showSyncConfigDlg(localBatchCfg.mainCfg.compareVar,
                           localBatchCfg.mainCfg.syncConfiguration,
                           localBatchCfg.mainCfg.handleDeletion,
                           localBatchCfg.mainCfg.customDeletionDirectory,
-                          NULL);
-    if (syncDlg.ShowModal() == SyncCfgDialog::BUTTON_APPLY)
+                          NULL) == ReturnSyncConfig::BUTTON_OKAY) //optional input parameter
     {
         updateGui();
     }
@@ -362,8 +314,7 @@ void BatchDialog::OnSyncSettings(wxCommandEvent& event)
 void BatchDialog::OnConfigureFilter(wxCommandEvent& event)
 {
     if (showFilterDialog(true, //is main filter dialog
-                         localBatchCfg.mainCfg.globalFilter.includeFilter,
-                         localBatchCfg.mainCfg.globalFilter.excludeFilter) == DefaultReturnCode::BUTTON_OKAY)
+                         localBatchCfg.mainCfg.globalFilter) == ReturnSmallDlg::BUTTON_OKAY)
     {
         updateGui();
     }
@@ -427,7 +378,7 @@ void BatchDialog::OnCheckSilent(wxCommandEvent& event)
     updateGui();
 
     //reset error handling depending on "m_checkBoxSilent"
-    setSelectionHandleError(getSelectionHandleError());
+    setSelectionHandleError(getEnumVal(enumDescrMap, *m_choiceHandleError));
 }
 
 
@@ -437,12 +388,57 @@ void BatchDialog::OnChangeMaxLogCountTxt(wxCommandEvent& event)
 }
 
 
+void BatchDialog::OnFilesDropped(FFSFileDropEvent& event)
+{
+    if (event.getFiles().empty())
+        return;
+
+    std::vector<wxString> fileList = event.getFiles();
+
+    switch (xmlAccess::getMergeType(fileList))   //throw ()
+    {
+        case xmlAccess::MERGE_BATCH:
+        case xmlAccess::MERGE_GUI:
+        case xmlAccess::MERGE_GUI_BATCH:
+            if (fileList.size() == 1)
+            {
+                loadBatchFile(fileList[0]);
+                return;
+            }
+            else
+            {
+                xmlAccess::XmlBatchConfig batchCfg;
+                try
+                {
+                    convertConfig(fileList, batchCfg); //throw (xmlAccess::XmlError)
+                }
+                catch (const xmlAccess::XmlError& error)
+                {
+                    if (error.getSeverity() == xmlAccess::XmlError::WARNING)
+                        wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING);
+                    else
+                    {
+                        wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
+                        return;
+                    }
+                }
+                loadBatchCfg(batchCfg);
+            }
+            break;
+
+        case xmlAccess::MERGE_OTHER:
+            wxMessageBox(_("Invalid FreeFileSync config file!"), _("Error"), wxOK | wxICON_ERROR);
+            break;
+    }
+}
+
+
 void BatchDialog::OnHelp(wxCommandEvent& event)
 {
 #ifdef FFS_WIN
-    ffs3::displayHelpEntry(wxT("html\\advanced\\ScheduleBatch.html"));
+    zen::displayHelpEntry(wxT("html\\advanced\\ScheduleBatch.html"));
 #elif defined FFS_LINUX
-    ffs3::displayHelpEntry(wxT("html/advanced/ScheduleBatch.html"));
+    zen::displayHelpEntry(wxT("html/advanced/ScheduleBatch.html"));
 #endif
 }
 
@@ -478,13 +474,13 @@ void BatchDialog::showNotebookpage(wxWindow* page, const wxString& pageName, boo
 
 void BatchDialog::OnClose(wxCloseEvent&   event)
 {
-    EndModal(0);
+    EndModal(ReturnBatchConfig::BUTTON_CANCEL);
 }
 
 
 void BatchDialog::OnCancel(wxCommandEvent& event)
 {
-    EndModal(0);
+    EndModal(ReturnBatchConfig::BUTTON_CANCEL);
 }
 
 
@@ -502,13 +498,10 @@ void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
     if (filePicker.ShowModal() == wxID_OK)
     {
         const wxString newFileName = filePicker.GetPath();
-        if (ffs3::fileExists(wxToZ(newFileName)))
+        if (zen::fileExists(wxToZ(newFileName)))
         {
-            QuestionDlg messageDlg(this,
-                                   QuestionDlg::BUTTON_YES | QuestionDlg::BUTTON_CANCEL,
-                                   wxString(_("File already exists. Overwrite?")) + wxT(" \"") + newFileName + wxT("\""));
-
-            if (messageDlg.ShowModal() != QuestionDlg::BUTTON_YES)
+            if (showQuestionDlg(ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
+                                wxString(_("File already exists. Overwrite?")) + wxT(" \"") + newFileName + wxT("\"")) != ReturnQuestionDlg::BUTTON_YES)
             {
                 OnSaveBatchJob(event); //retry
                 return;
@@ -517,7 +510,7 @@ void BatchDialog::OnSaveBatchJob(wxCommandEvent& event)
 
         //create batch file
         if (saveBatchFile(newFileName))
-            EndModal(BATCH_FILE_SAVED);
+            EndModal(ReturnBatchConfig::BATCH_FILE_SAVED);
     }
 }
 
@@ -532,10 +525,10 @@ void BatchDialog::OnLoadBatchJob(wxCommandEvent& event)
 
 
 inline
-FolderPairEnh getEnahncedPair(const DirectoryPairBatch* panel)
+FolderPairEnh getEnhancedPair(const DirectoryPairBatch* panel)
 {
-    return FolderPairEnh(panel->getLeftDir(),
-                         panel->getRightDir(),
+    return FolderPairEnh(wxToZ(panel->getLeftDir()),
+                         wxToZ(panel->getRightDir()),
                          panel->getAltSyncConfig(),
                          panel->getAltFilterConfig());
 }
@@ -548,22 +541,22 @@ xmlAccess::XmlBatchConfig BatchDialog::getCurrentConfiguration() const
     //load parameter with ownership within wxWidgets controls...
 
     //first folder pair
-    batchCfg.mainCfg.firstPair = FolderPairEnh(firstFolderPair->getLeftDir(),
-                                               firstFolderPair->getRightDir(),
+    batchCfg.mainCfg.firstPair = FolderPairEnh(wxToZ(firstFolderPair->getLeftDir()),
+                                               wxToZ(firstFolderPair->getRightDir()),
                                                firstFolderPair->getAltSyncConfig(),
                                                firstFolderPair->getAltFilterConfig());
 
     //add additional pairs
     batchCfg.mainCfg.additionalPairs.clear();
     std::transform(additionalFolderPairs.begin(), additionalFolderPairs.end(),
-                   std::back_inserter(batchCfg.mainCfg.additionalPairs), getEnahncedPair);
+                   std::back_inserter(batchCfg.mainCfg.additionalPairs), getEnhancedPair);
 
 
     //load structure with batch settings "batchCfg"
     batchCfg.silent           = m_checkBoxSilent->GetValue();
-    batchCfg.logFileDirectory = zToWx(logfileDir->getName());
+    batchCfg.logFileDirectory = logfileDir->getName();
     batchCfg.logFileCountMax  = m_spinCtrlLogCountMax->GetValue();
-    batchCfg.handleError      = getSelectionHandleError();
+    batchCfg.handleError      = getEnumVal(enumDescrMap, *m_choiceHandleError);
 
     return batchCfg;
 }
@@ -633,12 +626,12 @@ void BatchDialog::loadBatchCfg(const xmlAccess::XmlBatchConfig& batchCfg)
     //error handling is dependent from m_checkBoxSilent! /|\   \|/
     setSelectionHandleError(batchCfg.handleError);
 
-    logfileDir->setName(wxToZ(batchCfg.logFileDirectory));
+    logfileDir->setName(batchCfg.logFileDirectory);
     m_spinCtrlLogCountMax->SetValue(static_cast<int>(batchCfg.logFileCountMax)); //attention: this one emits a "change value" event!! => updateGui() called implicitly!
 
     //set first folder pair
-    firstFolderPair->setValues(batchCfg.mainCfg.firstPair.leftDirectory,
-                               batchCfg.mainCfg.firstPair.rightDirectory,
+    firstFolderPair->setValues(zToWx(batchCfg.mainCfg.firstPair.leftDirectory),
+                               zToWx(batchCfg.mainCfg.firstPair.rightDirectory),
                                batchCfg.mainCfg.firstPair.altSyncConfig,
                                batchCfg.mainCfg.firstPair.localFilter);
 
@@ -667,8 +660,8 @@ void BatchDialog::OnAddFolderPair(wxCommandEvent& event)
 
     //clear first pair
     const FolderPairEnh cfgEmpty;
-    firstFolderPair->setValues(cfgEmpty.leftDirectory,
-                               cfgEmpty.rightDirectory,
+    firstFolderPair->setValues(zToWx(cfgEmpty.leftDirectory),
+                               zToWx(cfgEmpty.rightDirectory),
                                cfgEmpty.altSyncConfig,
                                cfgEmpty.localFilter);
 }
@@ -694,11 +687,11 @@ void BatchDialog::OnRemoveTopFolderPair(wxCommandEvent& event)
     if (additionalFolderPairs.size() > 0)
     {
         //get settings from second folder pair
-        const FolderPairEnh cfgSecond = getEnahncedPair(additionalFolderPairs[0]);
+        const FolderPairEnh cfgSecond = getEnhancedPair(additionalFolderPairs[0]);
 
         //reset first pair
-        firstFolderPair->setValues(cfgSecond.leftDirectory,
-                                   cfgSecond.rightDirectory,
+        firstFolderPair->setValues(zToWx(cfgSecond.leftDirectory),
+                                   zToWx(cfgSecond.rightDirectory),
                                    cfgSecond.altSyncConfig,
                                    cfgSecond.localFilter);
 
@@ -718,8 +711,7 @@ void BatchDialog::updateGuiForFolderPair()
     //adapt local filter and sync cfg for first folder pair
     if (additionalFolderPairs.size() == 0 &&
         firstFolderPair->getAltSyncConfig().get() == NULL &&
-        NameFilter(firstFolderPair->getAltFilterConfig().includeFilter,
-                   firstFolderPair->getAltFilterConfig().excludeFilter).isNull())
+        isNullFilter(firstFolderPair->getAltFilterConfig()))
     {
         m_bpButtonLocalFilter->Hide();
         m_bpButtonAltSyncCfg->Hide();
@@ -753,14 +745,14 @@ void BatchDialog::updateGuiForFolderPair()
 }
 
 
-void BatchDialog::addFolderPair(const std::vector<ffs3::FolderPairEnh>& newPairs, bool addFront)
+void BatchDialog::addFolderPair(const std::vector<zen::FolderPairEnh>& newPairs, bool addFront)
 {
     wxWindowUpdateLocker dummy(m_panelOverview); //avoid display distortion
 
     if (!newPairs.empty())
     {
         //add folder pairs
-        for (std::vector<ffs3::FolderPairEnh>::const_iterator i = newPairs.begin(); i != newPairs.end(); ++i)
+        for (std::vector<zen::FolderPairEnh>::const_iterator i = newPairs.begin(); i != newPairs.end(); ++i)
         {
             DirectoryPairBatch* newPair = new DirectoryPairBatch(m_scrolledWindow6, *this);
 
@@ -779,8 +771,8 @@ void BatchDialog::addFolderPair(const std::vector<ffs3::FolderPairEnh>& newPairs
             newPair->m_bpButtonRemovePair->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BatchDialog::OnRemoveFolderPair), NULL, this );
 
             //set alternate configuration
-            newPair->setValues(i->leftDirectory,
-                               i->rightDirectory,
+            newPair->setValues(zToWx(i->leftDirectory),
+                               zToWx(i->rightDirectory),
                                i->altSyncConfig,
                                i->localFilter);
         }
@@ -893,3 +885,18 @@ bool BatchDialog::createBatchFile(const wxString& filename)
     return true;
 }
 */
+
+
+
+ReturnBatchConfig::ButtonPressed zen::showSyncBatchDlg(const wxString& filename)
+{
+    BatchDialog batchDlg(NULL, filename);
+    return static_cast<ReturnBatchConfig::ButtonPressed>(batchDlg.ShowModal());
+}
+
+
+ReturnBatchConfig::ButtonPressed zen::showSyncBatchDlg(const xmlAccess::XmlBatchConfig& batchCfg)
+{
+    BatchDialog batchDlg(NULL, batchCfg);
+    return static_cast<ReturnBatchConfig::ButtonPressed>(batchDlg.ShowModal());
+}

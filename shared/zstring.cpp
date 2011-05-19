@@ -12,7 +12,6 @@
 #undef min
 #undef max
 #include "dll_loader.h"
-#include <boost/scoped_array.hpp>
 #endif  //FFS_WIN
 
 #ifndef NDEBUG
@@ -161,16 +160,16 @@ int z_impl::compareFilenamesWin(const wchar_t* a, const wchar_t* b, size_t sizeA
         }
         else //use freestore
         {
-            boost::scoped_array<wchar_t> bufferA(new wchar_t[minSize]);
-            boost::scoped_array<wchar_t> bufferB(new wchar_t[minSize]);
+            std::vector<wchar_t> bufferA(minSize);
+            std::vector<wchar_t> bufferB(minSize);
 
-            if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, a, static_cast<int>(minSize), bufferA.get(), static_cast<int>(minSize)) == 0)
+            if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, a, static_cast<int>(minSize), &bufferA[0], static_cast<int>(minSize)) == 0)
                 throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
 
-            if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, b, static_cast<int>(minSize), bufferB.get(), static_cast<int>(minSize)) == 0)
+            if (::LCMapString(ZSTRING_INVARIANT_LOCALE, LCMAP_UPPERCASE, b, static_cast<int>(minSize), &bufferB[0], static_cast<int>(minSize)) == 0)
                 throw std::runtime_error("Error comparing strings! (LCMapString: FS)");
 
-            rv = ::wmemcmp(bufferA.get(), bufferB.get(), minSize);
+            rv = ::wmemcmp(&bufferA[0], &bufferB[0], minSize);
         }
 
         return rv == 0 ?

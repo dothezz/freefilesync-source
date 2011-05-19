@@ -4,10 +4,11 @@
 	<Project>
 		<Option title="FreeFileSync" />
 		<Option makefile="makefile" />
+		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Release">
-				<Option output="BUILD\FreeFileSync_Win32" prefix_auto="1" extension_auto="1" />
+				<Option output="BUILD\Bin\FreeFileSync_Win32" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="BUILD\" />
 				<Option object_output="OBJ\FFS_Release_32_MinGW\" />
 				<Option type="0" />
@@ -59,7 +60,7 @@
 				</Linker>
 			</Target>
 			<Target title="Debug-DLL">
-				<Option output="BUILD\FreeFileSync_Debug" prefix_auto="1" extension_auto="1" />
+				<Option output="BUILD\Bin\FreeFileSync_Debug" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="BUILD" />
 				<Option object_output="OBJ\FFS_Debug_32_MinGW\" />
 				<Option type="0" />
@@ -167,10 +168,6 @@
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="library\filter.cpp" />
-		<Unit filename="library\filter.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
 		<Unit filename="library\gtest\main.cpp">
 			<Option target="Unit Test" />
 		</Unit>
@@ -192,6 +189,8 @@
 		<Unit filename="library\gtest\unittest3.cpp">
 			<Option target="Unit Test" />
 		</Unit>
+		<Unit filename="library\hard_filter.cpp" />
+		<Unit filename="library\hard_filter.h" />
 		<Unit filename="library\icon_buffer.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
@@ -200,6 +199,8 @@
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
+		<Unit filename="library\lock_holder.h" />
+		<Unit filename="library\norm_filter.h" />
 		<Unit filename="library\process_xml.cpp" />
 		<Unit filename="library\process_xml.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -208,7 +209,6 @@
 		<Unit filename="library\resources.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="library\soft_filter.cpp" />
 		<Unit filename="library\soft_filter.h" />
 		<Unit filename="library\statistics.cpp">
 			<Option target="Release" />
@@ -265,6 +265,7 @@
 		<Unit filename="shared\dll_loader.h" />
 		<Unit filename="shared\dst_hack.cpp" />
 		<Unit filename="shared\dst_hack.h" />
+		<Unit filename="shared\file_drop.h" />
 		<Unit filename="shared\file_error.h" />
 		<Unit filename="shared\file_handling.cpp" />
 		<Unit filename="shared\file_handling.h" />
@@ -288,12 +289,18 @@
 		</Unit>
 		<Unit filename="shared\i18n.cpp" />
 		<Unit filename="shared\i18n.h" />
-		<Unit filename="shared\long_path_prefix.cpp" />
+		<Unit filename="shared\int64.h" />
+		<Unit filename="shared\last_error.cpp" />
+		<Unit filename="shared\last_error.h" />
+		<Unit filename="shared\localization.cpp" />
+		<Unit filename="shared\localization.h" />
 		<Unit filename="shared\long_path_prefix.h" />
 		<Unit filename="shared\mouse_move_dlg.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
+		<Unit filename="shared\parse_plural.h" />
+		<Unit filename="shared\parse_txt.h" />
 		<Unit filename="shared\pch.h">
 			<Option compile="1" />
 			<Option weight="0" />
@@ -313,10 +320,9 @@
 		<Unit filename="shared\standard_paths.cpp" />
 		<Unit filename="shared\standard_paths.h" />
 		<Unit filename="shared\string_conv.h" />
+		<Unit filename="shared\string_tools.h" />
 		<Unit filename="shared\symlink_target.h" />
 		<Unit filename="shared\system_constants.h" />
-		<Unit filename="shared\system_func.cpp" />
-		<Unit filename="shared\system_func.h" />
 		<Unit filename="shared\taskbar.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />

@@ -28,13 +28,14 @@ FILE_LIST+=../library/process_xml.cpp
 FILE_LIST+=../structures.cpp
 FILE_LIST+=../shared/util.cpp
 FILE_LIST+=../shared/check_exist.cpp
-FILE_LIST+=../shared/i18n_no_BOM.cpp
+FILE_LIST+=../shared/i18n.cpp
+FILE_LIST+=../shared/localization.cpp
 FILE_LIST+=../shared/inotify/inotify-cxx.cpp
 FILE_LIST+=../shared/tinyxml/tinyxml.cpp
 FILE_LIST+=../shared/tinyxml/tinyxmlerror.cpp
 FILE_LIST+=../shared/tinyxml/tinyxmlparser.cpp
 FILE_LIST+=../shared/global_func.cpp
-FILE_LIST+=../shared/system_func.cpp
+FILE_LIST+=../shared/last_error.cpp
 FILE_LIST+=../shared/dir_name.cpp
 FILE_LIST+=../shared/zstring.cpp
 FILE_LIST+=../shared/xml_base.cpp
@@ -58,9 +59,6 @@ all: RealtimeSync
 init: 
 	if [ ! -d ../OBJ ]; then mkdir ../OBJ; fi
 	if [ ! -d ../OBJ/RTS_Release_GCC_Make ]; then mkdir ../OBJ/RTS_Release_GCC_Make; fi
-#remove byte ordering mark: needed by Visual C++ but an error with GCC
-	g++ -o ../OBJ/RTS_Release_GCC_Make/removeBOM ../tools/remove_BOM.cpp 
-	../OBJ/RTS_Release_GCC_Make/removeBOM ../shared/i18n.cpp ../shared/i18n_no_BOM.cpp
 
 %.dep : %.cpp 
  #strip path information
@@ -73,7 +71,6 @@ RealtimeSync: init $(DEP_LIST)
 clean:
 	rm -rf ../OBJ/RTS_Release_GCC_Make
 	rm -f ../BUILD/$(APPNAME)
-	rm -f ../shared/i18n_no_BOM.cpp
 
 install:
 	if [ ! -d $(BINDIR) ] ; then mkdir -p $(BINDIR); fi

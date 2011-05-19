@@ -14,7 +14,7 @@
 #include <map>
 #include <set>
 #include <wx/aui/aui.h>
-
+#include "../shared/int64.h"
 
 class CustomGrid;
 class FFSCheckRowsEvent;
@@ -27,7 +27,7 @@ class SyncStatusHandler;
 class PanelMoveWindow;
 
 
-namespace ffs3
+namespace zen
 {
 class CustomLocale;
 class GridView;
@@ -45,6 +45,9 @@ public:
                bool startComparison);
 
     ~MainDialog();
+
+    void disableAllElements(bool enableAbort); //dis-/enables all elements (except abort button) that might receive user input during long-running processes: comparison, deletion
+    void enableAllElements();  //
 
 private:
     friend class CompareStatusHandler;
@@ -88,7 +91,7 @@ private:
     void addLeftFolderToHistory(const wxString& leftFolder);
     void addRightFolderToHistory(const wxString& rightFolder);
 
-    void addFolderPair(const std::vector<ffs3::FolderPairEnh>& newPairs, bool addFront = false);
+    void addFolderPair(const std::vector<zen::FolderPairEnh>& newPairs, bool addFront = false);
     void removeAddFolderPair(size_t pos);
     void clearAddFolderPairs();
 
@@ -101,10 +104,10 @@ private:
     //context menu functions
     std::set<size_t> getSelectedRows(const CustomGrid* grid) const;
     std::set<size_t> getSelectedRows() const;
-    void setSyncDirManually(const std::set<size_t>& rowsToSetOnUiTable, const ffs3::SyncDirection dir);
+    void setSyncDirManually(const std::set<size_t>& rowsToSetOnUiTable, const zen::SyncDirection dir);
     void filterRangeManually(const std::set<size_t>& rowsToFilterOnUiTable, int leadingRow);
     void copySelectionToClipboard(CustomGrid& selectedGrid);
-    void deleteSelectedFiles();
+    void deleteSelectedFiles(const std::set<size_t>& viewSelectionLeft, const std::set<size_t>& viewSelectionRight);
 
     void openExternalApplication(const wxString& commandline);
     void openExternalApplication(size_t rowNumber, bool leftSide, const wxString& commandline);
@@ -115,9 +118,6 @@ private:
     //delayed status information restore
     void pushStatusInformation(const wxString& text);
     void clearStatusBar();
-
-    void disableAllElements(); //dis-/enables all elements (except abort button) that might receive user input during long-running processes: comparison, deletion
-    void enableAllElements();  //
 
     //events
     void onGridLeftButtonEvent(        wxKeyEvent& event);
@@ -135,7 +135,6 @@ private:
     void OnContextFilterTemp        (wxCommandEvent& event);
     void OnContextExcludeExtension  (wxCommandEvent& event);
     void OnContextExcludeObject     (wxCommandEvent& event);
-    void OnContextCopyClipboard     (wxCommandEvent& event);
     void OnContextOpenWith          (wxCommandEvent& event);
     void OnContextDeleteFiles       (wxCommandEvent& event);
     void OnContextSyncDirLeft       (wxCommandEvent& event);
@@ -194,6 +193,7 @@ private:
     void refreshGridAfterFilterChange(const int delay);
 
     void OnResize(              wxSizeEvent& event);
+    //void OnResizeTopButtons(    wxEvent& event);
     void OnResizeFolderPairs(   wxEvent& event);
     void OnResizeConfigPanel(   wxEvent& event);
     void OnResizeViewPanel(     wxEvent& event);
@@ -243,7 +243,7 @@ private:
     xmlAccess::XmlGlobalSettings* globalSettings; //always bound
 
     //UI view of FolderComparison structure
-    std::auto_ptr<ffs3::GridView> gridDataView;
+    std::auto_ptr<zen::GridView> gridDataView;
 
     //-------------------------------------
     //functional configuration

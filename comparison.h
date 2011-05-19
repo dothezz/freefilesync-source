@@ -12,30 +12,29 @@
 #include "library/status_handler.h"
 #include "structures.h"
 #include "shared/disable_standby.h"
+#include "library/norm_filter.h"
 
 
-namespace ffs3
+namespace zen
 {
-
 struct FolderPairCfg
 {
-    FolderPairCfg(const Zstring& leftDir,
+    FolderPairCfg(const Zstring& leftDir, //must be formatted folder pairs!
                   const Zstring& rightDir,
-                  const BaseFilter::FilterRef& filterIn,
-                  const SyncConfiguration& syncCfg) :
-        leftDirectory(leftDir),
-        rightDirectory(rightDir),
+                  const NormalizedFilter& filterIn,
+                  const SyncConfig& syncCfg) :
+        leftDirectoryFmt(leftDir),
+        rightDirectoryFmt(rightDir),
         filter(filterIn),
         syncConfiguration(syncCfg) {}
 
-    Zstring leftDirectory;
-    Zstring rightDirectory;
-
-    BaseFilter::FilterRef filter; //filter interface: always bound by design!
-    SyncConfiguration syncConfiguration;
+    Zstring leftDirectoryFmt;  //resolved folder pairs!!!
+    Zstring rightDirectoryFmt; //
+    NormalizedFilter filter;
+    SyncConfig syncConfiguration;
 };
 
-std::vector<FolderPairCfg> extractCompareCfg(const MainConfiguration& mainCfg);
+std::vector<FolderPairCfg> extractCompareCfg(const MainConfiguration& mainCfg); //fill FolderPairCfg and resolve folder pairs
 
 
 //class handling comparison process
@@ -45,7 +44,7 @@ public:
     CompareProcess(SymLinkHandling handleSymlinks,
                    size_t fileTimeTol,
                    xmlAccess::OptionalDialogs& warnings,
-                   StatusHandler* handler);
+                   ProcessCallback& handler);
 
     void startCompareProcess(const std::vector<FolderPairCfg>& directoryPairs,
                              const CompareVariant cmpVar,
@@ -69,7 +68,7 @@ private:
 
     xmlAccess::OptionalDialogs& m_warnings;
 
-    StatusHandler* const statusUpdater;
+    ProcessCallback& procCallback;
     const Zstring txtComparingContentOfFiles;
 };
 }

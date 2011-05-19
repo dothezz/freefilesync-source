@@ -26,18 +26,11 @@ public:
         FolderGenerated(parent),
         dirName(*this, *m_dirPicker, *m_txtCtrlDirectory) {}
 
-    void setName(const Zstring& dirname)
-    {
-        dirName.setName(dirname);
-    }
-
-    Zstring getName() const
-    {
-        return dirName.getName();
-    }
+    void setName(const wxString& dirname) { dirName.setName(dirname); }
+    wxString getName() const { return dirName.getName(); }
 
 private:
-    ffs3::DirectoryName dirName;
+    zen::DirectoryName dirName;
 };
 
 
@@ -76,7 +69,7 @@ private:
 
     static const wxString& lastConfigFileName();
 
-    std::auto_ptr<ffs3::DirectoryName> dirNameFirst;
+    std::auto_ptr<zen::DirectoryName> dirNameFirst;
     std::vector<DirectoryPanel*> dirNamesExtra; //additional pairs to the standard pair
 
     wxString currentConfigFileName;

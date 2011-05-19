@@ -73,7 +73,7 @@ Nevertheless, let's use IFileOperation for better error reporting!
 
 void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (FileError)
 {
-    using ffs3::FileError;
+    using zen::FileError;
 
     if (filesToDelete.empty())
         return;
@@ -97,21 +97,21 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
             getLastError = util::getDllFun<GetLastErrorFct>(getRecyclerDllName().c_str(), getLastErrorFctName);
 
         if (moveToRecycler == NULL || getLastError == NULL)
-            throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + fileNames[0] + wxT("\"\n\n") + //report first file only... better than nothing
-                            wxString(_("Could not load a required DLL:")) + wxT(" \"") + getRecyclerDllName().c_str() + wxT("\""));
+            throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + fileNames[0] + wxT("\"") + //report first file only... better than nothing
+                            wxT("\n\n") + wxString(_("Could not load a required DLL:")) + wxT(" \"") + getRecyclerDllName().c_str() + wxT("\""));
 
         //#warning moving long file paths to recycler does not work! clarify!
         //        std::vector<Zstring> temp;
         //        std::transform(filesToDelete.begin(), filesToDelete.end(),
-        //                       std::back_inserter(temp), std::ptr_fun(ffs3::removeLongPathPrefix)); //::IFileOperation() can't handle \\?\-prefix!
+        //                       std::back_inserter(temp), std::ptr_fun(zen::removeLongPathPrefix)); //::IFileOperation() can't handle \\?\-prefix!
 
         if (!moveToRecycler(&fileNames[0], //array must not be empty
                             fileNames.size()))
         {
             wchar_t errorMessage[2000];
             getLastError(errorMessage, 2000);
-            throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + fileNames[0] + wxT("\"\n\n") + //report first file only... better than nothing
-                            wxT("(") + errorMessage + wxT(")"));
+            throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + fileNames[0] + wxT("\"") + //report first file only... better than nothing
+                            wxT("\n\n") + wxT("(") + errorMessage + wxT(")"));
         }
     }
     else //regular recycle bin usage: available since XP
@@ -146,19 +146,24 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
 }
 
 
-bool ffs3::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileError)
+bool zen::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileError)
 {
 #ifdef FFS_WIN
     const Zstring filenameFmt = applyLongPathPrefix(fileToDelete);
-    if (::GetFileAttributes(filenameFmt.c_str()) == INVALID_FILE_ATTRIBUTES)
+
+    const DWORD attr = ::GetFileAttributes(filenameFmt.c_str());
+    if (attr == INVALID_FILE_ATTRIBUTES)
         return false; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
+    //::SetFileAttributes(filenameFmt.c_str(), FILE_ATTRIBUTE_NORMAL);
+
+    //both SHFileOperation and useIFileOperation are not able to delete a folder named "System Volume Information" with normal attributes but shamelessly report success
 
     std::vector<Zstring> fileNames;
     fileNames.push_back(fileToDelete);
     ::moveToWindowsRecycler(fileNames);  //throw (FileError)
 
 #elif defined FFS_LINUX
-    struct stat fileInfo;
+    struct stat fileInfo = {};
     if (::lstat(fileToDelete.c_str(), &fileInfo) != 0)
         return false; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
 
@@ -168,8 +173,8 @@ bool ffs3::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileError)
     try
     {
         if (!fileObj->trash())
-            throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + zToWx(fileToDelete) + wxT("\"\n\n") +
-                            wxT("(") + wxT("unknown error") + wxT(")"));
+            throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + zToWx(fileToDelete) + wxT("\"") +
+                            wxT("\n\n") + wxT("(") + wxT("unknown error") + wxT(")"));
     }
     catch (const Glib::Error& errorObj)
     {
@@ -177,15 +182,15 @@ bool ffs3::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileError)
         const wxString errorMessage = wxString(wxT("Glib Error Code ")) + wxString::Format(wxT("%i"), errorObj.code()) + wxT(", ") +
                                       wxString::FromUTF8(g_quark_to_string(errorObj.domain())) + wxT(": ") + wxString::FromUTF8(errorObj.what().c_str());
 
-        throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + zToWx(fileToDelete) + wxT("\"\n\n") +
-                        wxT("(") + errorMessage + wxT(")"));
+        throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + zToWx(fileToDelete) + wxT("\"") +
+                        wxT("\n\n") + wxT("(") + errorMessage + wxT(")"));
     }
 #endif
-return true;
+    return true;
 }
 
 
-bool ffs3::recycleBinExists()
+bool zen::recycleBinExists()
 {
 #ifdef FFS_WIN
     return true;

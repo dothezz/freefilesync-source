@@ -9,18 +9,71 @@
 #include "../shared/i18n.h"
 
 
-class RtsXmlParser : public xmlAccess::XmlParser
+using namespace xmlAccess;
+
+class RtsXmlErrorLogger : public xmlAccess::XmlErrorLogger
 {
 public:
-    RtsXmlParser(const TiXmlElement* rootElement) : xmlAccess::XmlParser(rootElement) {}
-
-    void readXmlRealConfig(xmlAccess::XmlRealConfig& outputCfg);
+    void readConfig(const TiXmlElement* root, xmlAccess::XmlRealConfig& outputCfg);
 };
 
 
+//--------------------------------------------------------------------------------
 
-void readXmlRealConfig(const TiXmlDocument& doc, xmlAccess::XmlRealConfig& outputCfg);
-bool writeXmRealSettings(const xmlAccess::XmlRealConfig& outputCfg, TiXmlDocument& doc);
+
+void RtsXmlErrorLogger::readConfig(const TiXmlElement* root, xmlAccess::XmlRealConfig& outputCfg)
+{
+    //read directories for monitoring
+    const TiXmlElement* directoriesToWatch = TiXmlHandleConst(root).FirstChild("Directories").ToElement();
+
+    readXmlElementLogging("Folder", directoriesToWatch, outputCfg.directories);
+
+    //commandline to execute
+    readXmlElementLogging("Commandline", root, outputCfg.commandline);
+
+    //delay
+    readXmlElementLogging("Delay", root, outputCfg.delay);
+}
+
+
+void writeConfig(const xmlAccess::XmlRealConfig& outputCfg, TiXmlElement& root)
+{
+    //directories to monitor
+    TiXmlElement* directoriesToWatch = new TiXmlElement("Directories");
+    root.LinkEndChild(directoriesToWatch);
+    xmlAccess::addXmlElement("Folder", outputCfg.directories, directoriesToWatch);
+
+    //commandline to execute
+    xmlAccess::addXmlElement("Commandline", outputCfg.commandline, &root);
+
+    //delay
+    xmlAccess::addXmlElement("Delay", outputCfg.delay, &root);
+}
+
+
+bool isXmlTypeRTS(const TiXmlDocument& doc) //throw()
+{
+    const TiXmlElement* root = doc.RootElement();
+    if (root && root->ValueStr() == std::string("RealtimeSync"))
+    {
+        const char* cfgType = root->Attribute("XmlType");
+        if (cfgType)
+            return std::string(cfgType) == "REAL";
+    }
+    return false;
+}
+
+
+void initXmlDocument(TiXmlDocument& doc) //throw()
+{
+    TiXmlDeclaration* decl = new TiXmlDeclaration("1.0", "UTF-8", ""); //delete won't be necessary later; ownership passed to TiXmlDocument!
+    doc.LinkEndChild(decl);
+
+    TiXmlElement* root = new TiXmlElement("RealtimeSync");
+    doc.LinkEndChild(root);
+
+    addXmlAttribute("XmlType", "REAL", doc.RootElement());
+}
 
 
 void xmlAccess::readRealConfig(const wxString& filename, XmlRealConfig& config)
@@ -30,10 +83,13 @@ void xmlAccess::readRealConfig(const wxString& filename, XmlRealConfig& config)
         throw XmlError(wxString(_("File does not exist:")) + wxT("\n\"") + filename + wxT("\""));
 
     TiXmlDocument doc;
-    loadXmlDocument(filename, XML_REAL_CONFIG, doc); //throw (XmlError)
+    loadXmlDocument(filename, doc); //throw (XmlError)
 
-    RtsXmlParser parser(doc.RootElement());
-    parser.readXmlRealConfig(config); //read GUI layout configuration
+    if (!isXmlTypeRTS(doc))
+        throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\""));
+
+    RtsXmlErrorLogger parser;
+    parser.readConfig(doc.RootElement(), config); //read GUI layout configuration
 
     if (parser.errorsOccurred())
         throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\"\n\n") +
@@ -44,48 +100,12 @@ void xmlAccess::readRealConfig(const wxString& filename, XmlRealConfig& config)
 void xmlAccess::writeRealConfig(const XmlRealConfig& outputCfg, const wxString& filename)
 {
     TiXmlDocument doc;
-    getDefaultXmlDocument(XML_REAL_CONFIG, doc);
+    initXmlDocument(doc); //throw()
 
-    //populate and write XML tree
-    if (!writeXmRealSettings(outputCfg, doc)) //add GUI layout configuration settings
+    if (!doc.RootElement())
         throw XmlError(wxString(_("Error writing file:")) + wxT("\n\"") + filename + wxT("\""));
 
+    writeConfig(outputCfg, *doc.RootElement()); //add GUI layout configuration settings
+
     saveXmlDocument(filename, doc); //throw (XmlError)
-}
-
-//--------------------------------------------------------------------------------
-
-
-void RtsXmlParser::readXmlRealConfig(xmlAccess::XmlRealConfig& outputCfg)
-{
-    //read directories for monitoring
-    const TiXmlElement* directoriesToWatch = TiXmlHandleConst(getRoot()).FirstChild("Directories").ToElement();
-
-    readXmlElementLogging("Folder", directoriesToWatch, outputCfg.directories);
-
-    //commandline to execute
-    readXmlElementLogging("Commandline", getRoot(), outputCfg.commandline);
-
-    //delay
-    readXmlElementLogging("Delay", getRoot(), outputCfg.delay);
-}
-
-
-bool writeXmRealSettings(const xmlAccess::XmlRealConfig& outputCfg, TiXmlDocument& doc)
-{
-    TiXmlElement* root = doc.RootElement();
-    if (!root) return false;
-
-    //directories to monitor
-    TiXmlElement* directoriesToWatch = new TiXmlElement("Directories");
-    root->LinkEndChild(directoriesToWatch);
-    xmlAccess::addXmlElement("Folder", outputCfg.directories, directoriesToWatch);
-
-    //commandline to execute
-    xmlAccess::addXmlElement("Commandline", outputCfg.commandline, root);
-
-    //delay
-    xmlAccess::addXmlElement("Delay", outputCfg.delay, root);
-
-    return true;
 }

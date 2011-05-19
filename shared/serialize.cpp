@@ -7,13 +7,13 @@
 #include "serialize.h"
 #include "i18n.h"
 
-using namespace util;
+using namespace zen;
 
 
 void ReadInputStream::throwReadError() const  //throw (FileError)
 {
-    throw ffs3::FileError(wxString(_("Error reading from synchronization database:")) + wxT(" \n") +
-                          wxT("\"") +  errorObjName_ + wxT("\""));
+    throw zen::FileError(wxString(_("Error reading from synchronization database:")) + wxT(" \n") +
+                         wxT("\"") +  errorObjName_ + wxT("\""));
 }
 
 
@@ -35,8 +35,8 @@ ReadInputStream::CharArray ReadInputStream::readArrayC() const
 //--------------------------------------------------------------------------------------------------------
 void WriteOutputStream::throwWriteError() const //throw (FileError)
 {
-    throw ffs3::FileError(wxString(_("Error writing to synchronization database:")) + wxT(" \n") +
-                          wxT("\"") + errorObjName_ + wxT("\""));
+    throw zen::FileError(wxString(_("Error writing to synchronization database:")) + wxT(" \n") +
+                         wxT("\"") + errorObjName_ + wxT("\""));
 }
 
 

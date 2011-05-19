@@ -567,21 +567,21 @@ public:
 ///  \brief  Longest possible SingletonWithLongevity lifetime: 0xFFFFFFFF
 template <class T>
 struct DieLast  : SingletonFixedLongevity<0xFFFFFFFF ,T>
-    {};
+{};
 
 ///  \struct DieDirectlyBeforeLast
 ///  \ingroup LongevityLifetimeGroup
 ///  \brief  Lifetime is a one less than DieLast: 0xFFFFFFFF-1
 template <class T>
 struct DieDirectlyBeforeLast  : SingletonFixedLongevity<0xFFFFFFFF-1 ,T>
-    {};
+{};
 
 ///  \struct DieFirst
 ///  \ingroup LongevityLifetimeGroup
 ///  \brief  Shortest possible SingletonWithLongevity lifetime: 0
 template <class T>
 struct DieFirst : SingletonFixedLongevity<0,T>
-    {};
+{};
 
 }//namespace LongevityLifetime
 

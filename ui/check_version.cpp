@@ -11,10 +11,11 @@
 #include "../version/version.h"
 #include <wx/utils.h>
 #include <wx/timer.h>
-#include "../shared/global_func.h"
+#include "../shared/string_tools.h"
 #include "msg_popup.h"
 #include "../shared/standard_paths.h"
 #include <wx/tokenzr.h>
+#include "../shared/i18n.h"
 
 
 class CloseConnectionOnExit
@@ -81,7 +82,7 @@ std::vector<size_t> parseVersion(const wxString& version)
     while (tkz.HasMoreTokens())
     {
         const wxString& token = tkz.GetNextToken();
-        output.push_back(common::stringToNumber<size_t>(token));
+        output.push_back(zen::toNumber<size_t>(token));
     }
     return output;
 }
@@ -89,7 +90,7 @@ std::vector<size_t> parseVersion(const wxString& version)
 
 bool newerVersionExists(const wxString& onlineVersion)
 {
-    std::vector<size_t> current = parseVersion(ffs3::currentVersion);
+    std::vector<size_t> current = parseVersion(zen::currentVersion);
     std::vector<size_t> online  = parseVersion(onlineVersion);
 
     if (online.empty() || online[0] == 0) //onlineVersion may be "This website has been moved..." In this case better check for an update
@@ -100,7 +101,7 @@ bool newerVersionExists(const wxString& onlineVersion)
 }
 
 
-void ffs3::checkForUpdateNow()
+void zen::checkForUpdateNow()
 {
     wxString onlineVersion;
     if (!getOnlineVersion(onlineVersion))
@@ -120,10 +121,10 @@ void ffs3::checkForUpdateNow()
 }
 
 
-void ffs3::checkForUpdatePeriodically(long& lastUpdateCheck)
+void zen::checkForUpdatePeriodically(long& lastUpdateCheck)
 {
 #ifdef FFS_LINUX
-    if (!ffs3::isPortableVersion()) //don't check for updates in installer version -> else: handled by .deb
+    if (!zen::isPortableVersion()) //don't check for updates in installer version -> else: handled by .deb
         return;
 #endif
 
@@ -131,12 +132,9 @@ void ffs3::checkForUpdatePeriodically(long& lastUpdateCheck)
     {
         if (lastUpdateCheck == 0)
         {
-            QuestionDlg messageDlg(NULL,
-                                   QuestionDlg::BUTTON_YES | QuestionDlg::BUTTON_NO,
-                                   wxString(_("Do you want FreeFileSync to automatically check for updates every week?")) + wxT("\n") +
-                                   _("(Requires an Internet connection!)"));
-
-            const bool checkRegularly = messageDlg.ShowModal() == QuestionDlg::BUTTON_YES;
+            const bool checkRegularly = showQuestionDlg(ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_NO,
+                                                        wxString(_("Do you want FreeFileSync to automatically check for updates every week?")) + wxT("\n") +
+                                                        _("(Requires an Internet connection!)")) == ReturnQuestionDlg::BUTTON_YES;
             if (checkRegularly)
             {
                 lastUpdateCheck = 123; //some old date (few seconds after 1970)

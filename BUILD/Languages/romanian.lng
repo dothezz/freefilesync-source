@@ -1,912 +1,1066 @@
-  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
-  MinGW \t- Windows port din GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
-%x / %y objects deleted successfully
-%x / %y obiecte șterse cu succes
-%x Bytes
-%x Baiți
-%x GB
-%x GB
-%x MB
-%x MB
-%x PB
-%x PB
-%x TB
-%x TB
-%x day(s)
-%x zile
-%x directories
-%x dosare
-%x files
-%x file
-%x hour(s)
-%x ore
-%x kB
-%x KB
-%x min
-%x min
-%x of %y rows in view
-%x din %y rînduri afișate
-%x of 1 row in view
-%x din 1 rînd afișat
-%x sec
-%x sec
-%x%
-%x%
-&Abort
-&Anulează
-&About...
-&Despre...
-&Advanced
-&Avansate
-&Cancel
-&Anulează
-&Check for new version
-&Caută Versiune Nouă a Softului
-&Content
-&Conținut
-&Create batch job...
-&Creează o Sarcină Lot...
-&Default
-&Implicite
-&Exit
-&Ieși
-&Export file list...
-&Exportă Lista de File...
-&File
-&Filă
-&Find next
-&Găsește Următorul
-&Global settings...
-&Setări Globale...
-&Help
-&Ajutor
-&Ignore
-&OK
-&Language
-&Limbă
-&Load
-&Deschide
-&Load configuration...
-&Deschide Configurația...
-&New
-Configurație &Nouă
-&No
-&Nu
-&OK
-&OK
-&Pause
-&Pauzează
-&Program
-&Program
-&Quit
-&Ieși
-&Restore
-&Restaurează
-&Retry
-&Reîncearcă
-&Save
-&Salvează
-&Switch
-&Comută
-&Yes
-&Da
-(Build: %x)
-(Compilarea: %x)
-(Requires an Internet connection!)
-(Necesită o conexiune la internet!)
-- Other side's counterpart to %dir
-- corespondentul din partea opusă al lui %dir
-- Other side's counterpart to %name
-- corespondentul din partea opusă al lui %name
-- conflict
-- conflict
-- conflict (same date, different size)
-- conflict (aceeași dată, mărime diferită)
-- different
-- diferite
-- directory part only
-- doar dosarele
-- equal
-- identice
-- exists left only
-- există doar în stînga
-- exists right only
-- există doar în dreapta
-- full file or directory name
-- numele complet al filei sau dosarului
-- left
-- stînga
-- left newer
-- cea mai nouă e în stînga
-- right
-- dreapta
-- right newer
-- cea mai nouă e în dreapta
-/sec
-/sec
-1 directory
-1 dosar
-1 file
-1 filă
-1. &Compare
-1. &Compară
-1. Enter relative file or directory names separated by ';' or a new line.
-1. Scrie numele relative ale filelor sau dosarelor, separate de semnul ';' sau de un rînd nou.
-1. Select directories to monitor.
-1. Selectează dosarele de monitorizat.
-2. &Synchronize...
-2. &Sincronizează...
-2. Enter a command line.
-2. Scrie calea.
-2. Use wildcard characters '*' and '?'.
-2. Folosește metacaracterele '*' și '?' (asterisc și semn de întrebare).
-3. Exclude files directly on main grid via context menu.
-3. Exclude filele și dosarele direct de pe grila principală, cu ajutorul meniului contextual.
-3. Press 'Start'.
-3. Apasă 'Pornește'.
-<Automatic>
-<Sincronizare Inteligentă>
-<Directory>
-<Dosar>
-<Last session>
-<Ultima Sesiune>
-<Symlink>
-<Simlegătură>
-<multiple selection>
-<selectare multiplă>
-A directory input field is empty.
-Un cîmp de introducere a dosarului este gol.
-A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
-Va fi modificat un dosar care face parte din mai multe perechi de dosare! Reverifică setările de sincronizare!
-A newer version of FreeFileSync is available:
-Este disponibilă o versiune nouă de FreeFileSync:
-Abort requested: Waiting for current operation to finish...
-Abandonare solicitată: Se așteaptă terminarea operațiunii în curs...
-Abort synchronization immediately
-Abandonează imediat sincronizarea
-Aborted
-Abandonată
-About
-Despre
-Action
-Acțiune
-Add folder
-Adaugă Dosar
-Add folder pair
-Adaugă Pereche Nouă de Dosare
-All directories in sync!
-Toate dosarele au fost sincronizate!
-An exception occurred!
-A apărut o excepție !
-As a result the files are separated into the following categories:
-În concluzie, filele sînt repartizate în categoriile următoare:
-As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
-Așa cum sugerează și numele, două file cu același nume sînt considerate identice dacă și numai dacă este identic și conținutul lor. Această opțiune este utilă mai degrabă pentru verificările de consecvență decît pentru operațiunile de salvgardare [backup]. Așa că timpurile filelor (data și ora) nu sînt luate deloc în considerare.\n\nCu această opțiune activată, arborele de decizie e mai simplu:
-Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
-Se poate crea o filă cu un lot de comenzi [batch file] pentru sincronizarea inteligentă. Pentru a porni în modul lot, precizează astfel numele filei lot pentru prelucrarea sa de către executabilul FreeFileSync: freefilesync.exe <filă lot>. Această operațiune poate fi programată în planificatorul de sarcini al sistemului de operare [task scheduler].
-At least one directory input field is empty.
-Cel puțin un cîmp de introducere a dosarului este gol.
-Auto-adjust columns
-Autoajustează Coloanele
-Batch execution
-Execută Fila Lot
-Batch file created successfully!
-Fila cu lotul de comenzi a fost creată cu succces !
-Batch job
-Sarcină Lot
-Big thanks for localizing FreeFileSync goes out to:
-Mulțumiri pentru traducerea FreeFileSync:
-Both sides have changed since last synchronization!
-Ambele părți s-au modificat de la ultima sincronizare!
-Browse
-Explorează
-Browse directory
-Explorează Dosarul
-Cannot determine sync-direction:
-Nu se poate determina sensul de sincronizare:
-Cannot find %x
-Nu pot găsi %x
-Cannot write to empty directory path!
+<header>
+	<language name>Română</language name>
+	<translator>Alexandru Bogdan Munteanu</translator>
+	<locale>ro_RO</locale>
+	<flag file>romania.png</flag file>
+	<plural forms>3</plural forms>
+	<plural definition>n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2</plural definition>
+</header>
 
-Category
-Categorie
-Clear filter settings
-Curăță Setările Filtrului
-Comma separated list
-Listă de elemente separate prin virgulă
-Command line
-Linie de comandă
-Command line is empty!
-Linia de comandă este goală!
-Compare
-Compară
-Compare both sides
-Compară Părțile Stîngă și Dreaptă
-Compare by \"File content\"
-Compară după \"Conținutul Filelor\"
-Compare by \"File size and date\"
-Compară după \"Data și Mărimea Filelor\"
-Compare by...
-Compară după:
-Comparing content of files %x
-Compar conținutul filelor %x
-Comparing content...
-Compar conținutul...
-Comparing files by content failed.
-Compararea filelor după conținut a eșuat.
-Comparison Result
-Rezultatul Comparării
-Comparison settings
-Setările Comparării
-Completed
-Sincronizare Terminată
-Configuration
-Configurație
-Configuration loaded!
-Configurație încărcată !
-Configuration overview:
-Panorama Configurației:
-Configuration saved!
-Configurație salvată !
-Configure filter
-Configurează Filtrul
-Configure your own synchronization rules.
-Reguli de sincronizare definite de utilizator pentru fiecare situație.
-Confirm
-Confirmare
-Conflict detected:
-Conflict detectat:
-Conflicts/files that cannot be categorized
-Situații care nu pot fi incluse într-o anumită categorie
-Continue
-Continuă
-Conversion error:
-Eroare de convertire:
-Copy attributes only from left to right
-Copiază doar atributele de la stînga la dreapta
-Copy attributes only from right to left
-Copiază doar atributele de la dreapta la stînga
-Copy filesystem permissions
-Copiază permisiunile sistemului de file
-Copy from left to right
-Copiază de la Stînga la Dreapta
-Copy from left to right overwriting
-Copiază de la Stînga la Dreapta cu Suprascriere
-Copy from right to left
-Copiază de la Dreapta la Stînga
-Copy from right to left overwriting
-Copiază de la Dreapta la Stînga cu Suprascriere
-Copy locked files
-Copiază filele zăvorîte [locked]
-Copy new or updated files to right folder.
-Copiază în dosarul din dreapta filele actualizate sau noi.
-Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
-Copiază filele partajate sau zăvorîte folosind Serviciul de Salvgardare a Volumelor [Volume Shadow Copy]\n(Necesită drepturi de Administrator)
-Copy to clipboard\tCTRL+C
-Copiază în Cliplanșetă\tCTRL+C
-Copying new Symbolic Link %x to %y
-Copiez noua Legătură Simbolică %x în %y
-Copying new file %x to %y
-Copiez fila nouă %x în %y
-Could not determine volume name for file:
-Nu pot determina numele volumului pentru fila:
-Could not initialize directory monitoring:
-Nu pot inițializa monitorizarea dosarelor:
-Could not load a required DLL:
-Nu pot încărca o filă DLL necesară:
-Could not read values for the following XML nodes:
-Nu pot citi valorile pentru următoarele noduri XML:
-Create a batch job
-Creează o Sarcină Lot
-Creating folder %x
-Creez dosarul %x
-Custom
-Sincronizare Personalizată
-Customize columns
-Personalizează coloanele
-Customize...
-Personalizează...
-D-Click
-Clic-Dreapta
-DECISION TREE
-ARBORE DECIZIONAL
-Data verification error: Source and target file have different content!
-Eroare la verificarea datelor: Filele sursă și țintă au conținut diferit!
-Date
-Dată
-Delete files/folders existing on left side only
-Șterge Itemul din Stînga
-Delete files/folders existing on right side only
-Șterge Itemul din Dreapta
-Delete files\tDEL
-Șterge Filele\tDEL
-Delete on both sides
-Șterge din ambele părți
-Delete on both sides even if the file is selected on one side only
-Șterge din ambele părți, chiar dacă fila e selecționată într-o singură parte
-Delete or overwrite files permanently
-Filele sînt șterse sau suprascrise în mod definitiv
-Delete permanently
-Șterge definitiv
-Deleting Symbolic Link %x
-Șterg legătura simbolică %x
-Deleting file %x
-Șterg fila %x
-Deleting folder %x
-Șterg dosarul %x
-Deletion handling
-Gestionarea Ștergerii
-Description
-Descriere
-Direct
-Direcționează
-Directories are dependent! Be careful when setting up synchronization rules:
-Dosarele sînt interdependente! Atenție la setarea regulilor de sincronizare:
-Directories to watch
-Dosare de monitorizat
-Directory
-Dosar
-Directory does not exist:
-Dosarul nu există:
-Do not show this dialog again
-Nu afișa acest dialog din nou
-Do nothing
-Nici o Acțiune
-Do you really want to delete the following object(s)?
-Sigur dorești să ștergi elementele următoare ?
-Do you really want to move the following object(s) to the Recycle Bin?
-Sigur dorești să muți în Reciclator elementele următoare ?
-Do you want FreeFileSync to automatically check for updates every week?
-Dorești ca FreeFileSync să caute automat actualizări în fiecare săptămînă ?
-Donate with PayPal
-Donează prin PayPal
-Download now?
-Descarc acum ?
-Drag && drop
-Trage un dosar peste compartiment sau folosește butonul Explorează
-Elements found:
-Elemente Găsite:
-Elements processed:
-Elemente Procesate:
-Elements remaining:
-Elemente Rămase:
-Email
-E-mail
-Encoding extended time information: %x
-Codarea informațiilor timpului extins: %x
-Endless loop when traversing directory:
-Buclă infinită la parcurgerea dosarului:
-Equal files/folders that differ in attributes only
-File/Dosare identice care diferă doar prin atributele lor
-Error
-Eroare
-Error changing modification time:
-Eroare la schimbarea datei de modificare:
-Error copying file permissions:
-Eroare la copierea permisiunilor filei:
-Error copying file:
-Eroare la copierea filei:
-Error copying locked file %x!
-Eroare la copierea filei zăvorîte %x!
-Error copying symbolic link:
-Eroare la copierea legăturii simbolice:
-Error creating directory:
-Eroare la crearea dosarului:
-Error deleting directory:
-Eroare la ștergerea dosarului:
-Error deleting file:
-Eroare la ștergerea filei:
-Error handling
-Gestionarea Erorilor
-Error loading library function:
-Eroare la încărcarea bibliotecii de funcții:
-Error moving directory:
-Eroare la mutarea dosarului:
-Error moving file:
-Eroare la mutarea filei:
-Error moving to Recycle Bin:
-Eroare la mutarea în Reciclator:
-Error opening file:
-Eroare la deschiderea filei:
-Error parsing configuration file:
-Eroare la parsarea filei de configurare:
-Error reading file attributes:
-Eroare la citirea atributelor filei:
-Error reading file:
-Eroare la citirea filei:
-Error reading from synchronization database:
-Eroare la citirea din baza de date a sincronizării:
-Error reading security context:
-Eroare la citirea contextului de securitate:
-Error resolving symbolic link:
-Eroare la rezolvarea legăturii simbolice:
-Error setting directory lock:
-Eroare la efectuarea zăvorîrii dosarului:
-Error setting privilege:
-Eroare la setarea privilegiului:
-Error starting Volume Shadow Copy Service!
-Eroare la pornirea serviciului Volume Shadow Copy!
-Error traversing directory:
-Eroare la parcurgerea dosarului:
-Error when monitoring directories.
-Eroare la monitorizarea dosarelor.
-Error writing file:
-Eroare la scrierea filei:
-Error writing security context:
-Eroare la scrierea contextului de securitate:
-Error writing to synchronization database:
-Eroare la scrierea în baza de date a sincronizării:
-Example
-Exemplu
-Exclude
-Excluse
-Exclude all rows
-Exclude Toate Rîndurile
-Exclude temporarily
-Exclude Temporar
-Exclude via filter:
-Exclude prin Filtru:
-Exit instantly
-Ieși imediat
-Extension
-Extensie
-External applications
-Aplicații Externe
-Fatal Error
-Eroare Fatală
-Feedback and suggestions are welcome at:
-Opiniile și sugestiile sînt binevenite:
-File %x has an invalid date!
-Fila %x are o dată nevalidă !
-File already exists. Overwrite?
-Fila există deja. Dorești s-o suprascrii?
-File content
-Conținutul Filelor
-File does not exist:
-Fila nu există:
-File list exported!
-Lista de file a fost exportată!
-File size and date
-Mărimea și Data Filelor
-Filename
-Numele Filei
-Files %x have the same date but a different size!
-Filele %x au aceeași dată, dar mărime diferită!
-Files are found equal if\n     - file content\nis the same
-Filele sînt considerate identice dacă\n     - conținutul\neste identic
-Files are found equal if\n     - filesize\n     - last write time and date\nare the same
-Filele sînt considerate identice dacă\n     - mărimea\n     - și data ultimei modificări\nsînt identice
-Files that are equal on both sides
-File identice în ambele părți
-Files that exist on both sides, left one is newer
-File care există în ambele părți, cea din stînga fiind mai nouă
-Files that exist on both sides, right one is newer
-File care există în ambele părți, cea din dreapta fiind mai nouă
-Files that have different content
-File care au conținut diferit
-Files/folders that exist on left side only
-File sau dosare care există doar în partea stîngă
-Files/folders that exist on right side only
-File sau dosare care există doar în partea dreaptă
-Filter files
-Filtru de File
-Filter is active
-Filtrul este activ
-Filter settings have changed!
-Setările filtrului au fost schimbate!
-Filter: All pairs
-Filtru: Toate perechile
-Filter: Single pair
-Filtru: O singură pereche
-Find
-Găsește
-Find what:
-Găsește Asta:
-Folder Comparison and Synchronization
-Comparare și Sincronizare de Dosare
-Folder pairs
-Perechi de Dosare
-Follow
-Urmărește
-Free disk space available:
-Spațiu de stocare disponibil:
-Free disk space required:
-Spațiu liber de stocare necesar:
-FreeFileSync Batch Job
-Sarcină cu lot de comenzi FreeFileSync
-FreeFileSync at Sourceforge
-FreeFileSync la Sourceforge
-FreeFileSync batch file
-Filă cu lot de comenzi FreeFileSync
-FreeFileSync configuration
-Configurație FreeFileSync
-FreeFileSync is up to date!
-Ai deja ultima versiune a softului!
-Full path
-Cale completă
-Generating database...
-Generez baza de date...
-Generating file list...
-Generez lista de file...
-Global settings
-Setări Globale
-Help
-Ajutor
-Hidden dialogs:
-Casete de dialog ascunse:
-Hide all error and warning messages
-Se ascund toate mesajele de eroare și de avertizare
-Hide conflicts
-Ascunde conflictele
-Hide excluded items
-Ascunde itemurile excluse
-Hide files that are different
-Ascunde filele care sînt diferite
-Hide files that are equal
-Ascunde filele care sînt identice
-Hide files that are newer on left
-Ascunde filele care sînt mai noi în stînga
-Hide files that are newer on right
-Ascunde filele care sînt mai noi în dreapta
-Hide files that exist on left side only
-Ascunde filele care există doar în stînga
-Hide files that exist on right side only
-Ascunde filele care există doar în dreapta
-Hide files that will be created on the left side
-Ascunde filele care vor fi create în stînga
-Hide files that will be created on the right side
-Ascunde filele care vor fi create în dreapta
-Hide files that will be deleted on the left side
-Ascunde filele care vor fi șterse în stînga
-Hide files that will be deleted on the right side
-Ascunde filele care vor fi șterse în dreapta
-Hide files that will be overwritten on left side
-Ascunde filele care vor fi suprascrise în stînga
-Hide files that will be overwritten on right side
-Ascunde filele care vor fi suprascrise în dreapta
-Hide files that won't be copied
-Ascunde filele care nu vor fi copiate
-Hide filtered or temporarily excluded files
-Ascunde filele filtrate sau excluse temporar
-Hide further error messages during the current process
-Ascunde mesajele de eroare apărute ulterior în timpul acestui proces
-Hints:
-Sfaturi:
-Homepage
-Sit
-Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
-Identifică și propagă modificările în ambele părți folosind o bază de date. Ștergerile și conflictele sînt detectate automat.
-Idle time between detection of last change and execution of command line in seconds
-Timp de inactivitate (în secunde) între detectarea ulimei modificări și executarea liniei de comandă
-If you like FFS
-Donare pentru FFS
-Ignore
-Ignoră
-Ignore errors
-Ignoră erorile
-Ignore subsequent errors
-Ignoră (nu lua în seamă) erorile ulterioare
-Include
-Incluse
-Include all rows
-Include Toate Rîndurile
-Include temporarily
-Include Temporar
-Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
-Incluse: *.doc;*.zip;*.exe\nExcluse: \\chestii\\temp\\*
-Incompatible synchronization database format:
-Format incompatibil al bazei de date a sincronizării:
-Info
-Informații
-Information
-Informații
-Initial synchronization:
-Sincronizare inițială:
-Integrate external applications into context menu. The following macros are available:
-Include aplicațiile externe în meniul contextual. Sînt disponibile următoarele macrocomenzi:
-Invalid FreeFileSync config file!
-Filă de configurare FreeFileSync nevalidă!
-Last used configurations (press DEL to remove from list)
-Ultimele configurații utilizate (apasă tasta DEL pentru a înlătura din listă)
-Leave as unresolved conflict
-Lasă ca Conflict Nerezolvat
-Left
-Stînga
-Legend
-Legendă
-Load configuration from file
-Încarcă configurația dintr-o filă
-Log-messages:
-Mesaje de jurnalizare:
-Logging
-Jurnalizez
-Main bar
-Bara Principală
-Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
-Realizarea de copii de rezervă prin sistemul WOW64 nu este suportată. Folosește versiunea pe 64-biți a FreeFileSync.
-Match case
-Potrivește MAJ/min
-Maximum number of logfiles:
-Numărul maxim de file jurnal:
-Memory allocation failed!
-Alocarea memoriei a eșuat!
-Minimum Idle Time [seconds]
-Timp Minim de Inactivitate [secunde]
-Mirror ->>
-Clonare =>>
-Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
-Salvgardare în oglindă a dosarului stîng. Dosarul drept este modificat pentru a fi identic cu cel stîng după sincronizare.
-Monitoring active...
-Monitorizare activă...
-More than 50% of the total number of files will be copied or deleted!
-Peste 50% din numărul total de file vor fi copiate sau distruse!
-Move column down
-Mută coloana în jos
-Move column up
-Mută coloana în sus
-Move files into a time-stamped subdirectory
-Mută filele într-un subdosar cu marcaj de timp
-Moving %x to Recycle Bin
-Mut %x în Reciclator
-Moving Symbolic Link %x to user-defined directory %y
-Mut legătura simbolică %x în dosarul ales de utilizator %y
-Moving file %x to user-defined directory %y
-Mut fila %x în dosarul %y ales de utilizator
-Moving folder %x to user-defined directory %y
-Mut dosarul %x în dosarul %y ales de utilizator
-Multiple...
-Multiplu...
-No change since last synchronization!
-Nu sînt schimbări de la ultima sincronizare!
-No filter selected
-Nu a fost selectat nici un filtru
-Not enough free disk space available in:
-Spațiu de stocare insuficient pe:
-Nothing to synchronize according to configuration!
-Nu este nimic de sincronizat conform configurației!
-Number of files and directories that will be created
-Numărul de file și dosare care vor fi create
-Number of files and directories that will be deleted
-Numărul de file și dosare care vor fi șterse
-Number of files that will be overwritten
-Numărul de file care vor fi suprascrise
-One of the FreeFileSync database entries within the following file is not yet existing:
-Una dintre intrările în baza de date FreeFileSync din fila următoare nu există:
-One of the FreeFileSync database files is not yet existing:
-Una dintre părți nu are o filă de tip bază de date FreeFileSync:
-Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
-Doar filele sau dosarele care trec de filtru vor fi selecționate pentru sincronizare. Filtrul va fi aplicat la numele elementelor aflate ierarhic sub dosarul de sincronizat.
-Open with Explorer
-Deschide în Windows Explorer
-Open with default application
-Deschide cu Aplicația Implicită
-Operation aborted!
-Operațiune abandonată!
-Operation:
-Operațiune:
-Overview
-Panoramă
-Overwriting Symbolic Link %x in %y
-Suprascriu Legătura Simbolică %x în %y
-Overwriting file %x in %y
-Suprascriu fila %x în %y
-Pause
-Pauză
-Paused
-Pauzat
-Planned directory deletion is in conflict with its subdirectories and -files!
-Ștergerea plănuită a dosarului intră în conflict cu subdosarele și filele sale!
-Please run a Compare first before synchronizing!
-Rulează compararea înainte de a sincroniza!
-Press \"Switch\" to open FreeFileSync GUI mode.
-Apasă \"Comută\" pentru a deschide modul grafic al FreeFileSync
-Processing folder pair:
-Procesez perechea de dosare:
-Published under the GNU General Public License:
-Publicat sub licența GNU GPL:
-Question
-Întrebare
-RealtimeSync - Automated Synchronization
-RealtimeSync - Sincronizare Inteligentă
-RealtimeSync configuration
-RealtimeSync configurație
-Recycle Bin not yet supported for this system!
-Reciclatorul nu este încă suportat pentru acest sistem de operare!
-Relative path
-Calea Relativă
-Remove alternate settings
-Înlătură setările alternative
-Remove folder
-Înlătură Dosarul
-Remove folder pair
-Înlătură Perechea de Dosare
-Report translation error
-Raportarea erorilor de traducere
-Reset
-Resetează
-Reset view
-Resetează Vederea
-Restore all hidden dialogs?
-Restaurezi toate casetele de dialog ascunse?
-Right
-Dreapta
-S&ave configuration...
-S&alvează Configurația...
-S&witch view
-Schimbă &Vederea
-Save changes to current configuration?
-Dorești să salvezi modificările configurației curente?
-Save current configuration to file
-Salvează într-o filă modificările configurației curente
-Scanning...
-Scanez...
-Scanning:
-Scanez:
-Select a folder
-Selectează un dosar
-Select alternate synchronization settings
-Selectează o altă configurație a sincronizării
-Select logfile directory:
-Selectează un dosar pentru fila .log:
-Select variant:
-Selectează Varianta de Sincronizare:
-Select view
-Selectează Vederea
-Set direction:
-Setează Acțiunea ca în Icoana Alăturată:
-Setting default synchronization directions: Old files will be overwritten with newer files.
-Va fi setat sensul implicit de sincronizare: Filele vechi vor fi suprascrise de cele noi.
-Show \"%x\"
-Arată \"%x\"
-Show conflicts
-Arată conflictele
-Show files that are different
-Arată filele diferite
-Show files that are equal
-Arată filele identice
-Show files that are newer on left
-Arată filele din stînga mai noi decît cele din dreapta
-Show files that are newer on right
-Arată filele din dreapta mai noi decît cele din stînga
-Show files that exist on left side only
-Arată filele care există doar în stînga
-Show files that exist on right side only
-Arată filele care există doar în dreapta
-Show files that will be created on the left side
-Arată filele care vor fi create în stînga
-Show files that will be created on the right side
-Arată filele care vor fi create în dreapta
-Show files that will be deleted on the left side
-Arată filele care vor fi șterse în stînga
-Show files that will be deleted on the right side
-Arată filele care vor fi șterse în dreapta
-Show files that will be overwritten on left side
-Arată filele care vor fi suprascrise în stînga
-Show files that will be overwritten on right side
-Arată filele care vor fi suprascrise în dreapta
-Show files that won't be copied
-Arată filele care nu vor fi copiate
-Show hidden dialogs
-Arată casetele de dialog ascunse
-Show popup
-Arată caseta de dialog
-Show popup on errors or warnings
-Se arată o casetă de dialog pentru fiecare eroare sau avertisment
-Significant difference detected:
-Diferență semnificativă detectată:
-Silent mode
-Mod silențios
-Size
-Mărime
-Source code written completely in C++ utilizing:
-Cod sursă scris complet în C++ folosind:
-Source directory does not exist anymore:
-Dosarul sursă nu mai există:
-Speed:
-Viteză:
-Start
-Pornește
-Start minimized and write status information to a logfile
-Pornește minimizat și scrie informațiile de stare într-un jurnal
-Start synchronization
-Pornește Sincronizarea
-Statistics
-Statistici
-Status feedback
-Evoluția stării
-Stop
-Oprește
-Swap sides
-Schimbă părțile între ele
-Switching to FreeFileSync GUI mode...
-Comut la modul grafic al FreeFileSync...
-Symbolic Link handling
-Prelucrarea Legăturilor Simbolice (Simlegături)
-Symlinks %x have the same date but a different target!
-Simlegăturile %x au aceeași dată, dar ținte diferite!
-Synchronization Preview
-Previzionarea Sincronizării
-Synchronization aborted!
-Sincronizare abandonată!
-Synchronization completed successfully!
-Sincronizare terminată cu succes!
-Synchronization completed with errors!
-Sincronizare terminată cu erori!
-Synchronization settings
-Setările Sincronizării
-Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
-Sincronizează filele .doc, .zip și .exe, cu excepția celor din dosarul \"temp\".
-Synchronize...
-Sincronizează
-Synchronizing...
-Sincronizare aflată în curs...
-Target directory already existing!
-Dosarul țintă există deja!
-Target file already existing!
-Fila țintă există deja!
-The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-Linia de comandă este executată de fiecare dată cînd:\n- toate dosarele devin disponibile (de ex. se introduce un dispozitiv USB)\n- filele conținute în aceste dosare sau subdosare sînt modificate
-The file does not contain a valid configuration:
-Fila nu conține o configurație validă:
-The file was not processed by last synchronization!
-Fila nu a fost procesată la ultima sincronizare!
-This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
-Această variantă definește două file cu același nume ca fiind identice atunci cînd au aceeași mărime ȘI aceeași dată și oră a ultimei modificări.
-Time
-Oră
-Time elapsed:
-Timp Scurs:
-Time remaining:
-Timp Rămas:
-Total amount of data that will be transferred
-Volumul total de date care va fi transferat
-Total time:
-Timp Total:
-Transfer file and directory permissions\n(Requires Administrator rights)
-Transferă permisiunile filelor și dosarelor\n(Necesită drepturi de Administrator)
-Unable to connect to sourceforge.net!
-Conectarea la situl sourceforge.net nu poate fi realizată!
-Unable to create logfile!
-Fila jurnal nu poate fi creată!
-Unresolved conflicts existing!
-Există conflicte nerezolvate!
-Update ->
-Actualizare =>
-Updating attributes of %x
-Actualizez atributele lui %x
-Usage:
-Utilizare:
-Use Recycle Bin
-Mută în reciclator
-Use Recycle Bin when deleting or overwriting files
-Se folosește Reciclatorul [Recycle Bin] cu ocazia ștergerii sau suprascrierii unei file
-User-defined directory for deletion was not specified!
-Dosarul ales de utilizator pentru ștergere nu a fost specificat !
-Variant
-Varianta Sincronizării
-Verifying file %x
-Verific fila %x
-Versioning
-Versionare
-Volume name %x not part of filename %y!
-Numele volumului %x nu face parte din numele filei %y !
-Waiting for missing directories...
-Aștept ca dosarele lipsă să devină disponibile...
-Waiting while directory is locked (%x)...
-Aștept ca dosarul să fie zăvorît (%x)...
-Warning
-Avertisment
-When the comparison is started with this option set the following decision tree is processed:
-Cînd compararea este pornită cu acest set de opțiuni, este executat următorul arbore de decizie:
-You can ignore conflicts and continue synchronization.
-Poți ignora conflictele pentru a continua cu sincronizarea.
-You can ignore this error to consider the directory as empty.
-Poți ignora această eroare pentru ca dosarul să fie considerat gol.
-You may try to synchronize remaining items again (WITHOUT having to re-compare)!
-Poți încerca să sincronizezi din nou itemurile rămase (FĂRĂ a le recompara) !
-different
-file diferite
-file exists on both sides
-fila există în ambele părți
-on one side only
-fila există doar într-o parte
+<source>Show in Explorer</source>
+<target>Arată în Explorator</target>
+<source>Open with default application</source>
+<target>Deschide cu Aplicația Implicită</target>
+<source>Browse directory</source>
+<target>Explorează Dosarul</target>
+<source>RealtimeSync - Automated Synchronization</source>
+<target>RealtimeSync - Sincronizare Inteligentă</target>
+<source>Browse</source>
+<target>Explorează</target>
+<source>Error resolving symbolic link:</source>
+<target>Eroare la rezolvarea legăturii simbolice:</target>
+<source>Select alternate synchronization settings</source>
+<target>Selectează o altă configurație a sincronizării</target>
+<source>No filter selected</source>
+<target>Nu a fost selectat nici un filtru</target>
+<source>Filter is active</source>
+<target>Filtrul este activ</target>
+<source>Clear filter settings</source>
+<target>Curăță Setările Filtrului</target>
+<source>Remove alternate settings</source>
+<target>Înlătură setările alternative</target>
+<source>Create a batch job</source>
+<target>Creează o Sarcină Lot</target>
+<source>Synchronization settings</source>
+<target>Setările Sincronizării</target>
+<source>Comparison settings</source>
+<target>Setările Comparării</target>
+<source>About</source>
+<target>Despre</target>
+<source>Error</source>
+<target>Eroare</target>
+<source>Warning</source>
+<target>Atenție</target>
+<source>Question</source>
+<target>Întrebare</target>
+<source>Confirm</source>
+<target>Confirmare</target>
+<source>Configure filter</source>
+<target>Configurează Filtrul</target>
+<source>Customize columns</source>
+<target>Personalizează coloanele</target>
+<source>Global settings</source>
+<target>Setări Globale</target>
+<source>Synchronization Preview</source>
+<target>Previzionarea Sincronizării</target>
+<source>Find</source>
+<target>Găsește</target>
+<source>%x MB</source>
+<target>%x MB</target>
+<source>%x KB</source>
+<target>%x KB</target>
+<source>%x GB</source>
+<target>%x GB</target>
+<source>
+<pluralform>1 Byte</pluralform>
+<pluralform>%x Bytes</pluralform>
+</source>
+<target>
+<pluralform>1 Bait</pluralform>
+<pluralform>%x Baiți</pluralform>
+<pluralform>%x de Baiți</pluralform>
+</target>
+<source><Symlink></source>
+<target><Simlegătură></target>
+<source><Directory></source>
+<target><Dosar></target>
+<source>Size</source>
+<target>Mărime</target>
+<source>Date</source>
+<target>Dată</target>
+<source>Full path</source>
+<target>Cale completă</target>
+<source>Filename</source>
+<target>Numele Filei</target>
+<source>Relative path</source>
+<target>Calea Relativă</target>
+<source>Directory</source>
+<target>Dosar</target>
+<source>Extension</source>
+<target>Extensie</target>
+<source>Comparison Result</source>
+<target>Rezultatul Comparării</target>
+<source>Incompatible synchronization database format:</source>
+<target>Format al bazei de date necompatibil cu versiunea softului:</target>
+<source>Initial synchronization:</source>
+<target>Sincronizare inițială:</target>
+<source>One of the FreeFileSync database files is not yet existing:</source>
+<target>Una dintre părți nu are o filă de tip bază de date FreeFileSync:</target>
+<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
+<target>Una dintre intrările în baza de date FreeFileSync din fila următoare nu există:</target>
+<source>Error reading from synchronization database:</source>
+<target>Eroare la citirea din baza de date a sincronizării:</target>
+<source>An exception occurred!</source>
+<target>A apărut o excepție !</target>
+<source>Error deleting file:</source>
+<target>Eroare la ștergerea filei:</target>
+<source>Error reading file attributes:</source>
+<target>Eroare la citirea atributelor filei:</target>
+<source>Waiting while directory is locked (%x)...</source>
+<target>Aștept ca dosarul să fie zăvorît (%x)...</target>
+<source>Error setting directory lock:</source>
+<target>Eroare la efectuarea zăvorîrii dosarului:</target>
+<source>
+<pluralform>1 sec</pluralform>
+<pluralform>%x sec</pluralform>
+</source>
+<target>
+<pluralform>1 sec</pluralform>
+<pluralform>%x sec</pluralform>
+<pluralform>%x de sec</pluralform>
+</target>
+<source>Info</source>
+<target>Informații</target>
+<source>Fatal Error</source>
+<target>Eroare Fatală</target>
+<source>File does not exist:</source>
+<target>Fila nu există:</target>
+<source>Error parsing configuration file:</source>
+<target>Eroare la parsarea filei de configurare:</target>
+<source>Error writing file:</source>
+<target>Eroare la scrierea filei:</target>
+<source>Invalid FreeFileSync config file!</source>
+<target>Filă de configurare FreeFileSync nevalidă!</target>
+<source>/sec</source>
+<target>/sec</target>
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+<pluralform>%x de min</pluralform>
+</target>
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 oră</pluralform>
+<pluralform>%x ore</pluralform>
+<pluralform>%x de ore</pluralform>
+</target>
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 zi</pluralform>
+<pluralform>%x zile</pluralform>
+<pluralform>%x de zile</pluralform>
+</target>
+<source>S&ave configuration...</source>
+<target>S&alvează Configurația...</target>
+<source>&Load configuration...</source>
+<target>&Deschide Configurația...</target>
+<source>&Quit</source>
+<target>&Ieși</target>
+<source>&File</source>
+<target>&Filă</target>
+<source>&Content</source>
+<target>&Conținut</target>
+<source>&About...</source>
+<target>&Despre...</target>
+<source>&Help</source>
+<target>&Ajutor</target>
+<source>Usage:</source>
+<target>Utilizare:</target>
+<source>1. Select directories to monitor.</source>
+<target>1. Selectează dosarele de monitorizat.</target>
+<source>2. Enter a command line.</source>
+<target>2. Scrie calea.</target>
+<source>3. Press 'Start'.</source>
+<target>3. Apasă 'Pornește'.</target>
+<source>
+The command line is executed each time:
+- all directories become available (e.g. USB stick insert)
+- files within these directories or subdirectories are modified
+</source>
+<target>
+Linia de comandă este executată de fiecare dată cînd:
+- toate dosarele devin disponibile (de ex. se introduce un dispozitiv USB)
+- filele conținute în aceste dosare sau subdosare sînt modificate
+</target>
+<source>Directories to watch</source>
+<target>Dosare de monitorizat</target>
+<source>Add folder</source>
+<target>Adaugă Dosar</target>
+<source>Remove folder</source>
+<target>Înlătură Dosarul</target>
+<source>Select a folder</source>
+<target>Selectează un dosar</target>
+<source>Command line</source>
+<target>Linie de comandă</target>
+<source>Minimum Idle Time [seconds]</source>
+<target>Timp Minim de Inactivitate [secunde]</target>
+<source>Idle time between detection of last change and execution of command line in seconds</source>
+<target>Timp de inactivitate (în secunde) între detectarea ultimei modificări și executarea liniei de comandă</target>
+<source>Start</source>
+<target>Pornește</target>
+<source>(Build: %x)</source>
+<target>(Compilația: %x)</target>
+<source>RealtimeSync configuration</source>
+<target>Configurația RealtimeSync</target>
+<source>File already exists. Overwrite?</source>
+<target>Fila există deja. Vrei s-o suprascrii?</target>
+<source>&Restore</source>
+<target>&Restaurează</target>
+<source>&Exit</source>
+<target>&Ieși</target>
+<source>Monitoring active...</source>
+<target>Monitorizare activă...</target>
+<source>Waiting for missing directories...</source>
+<target>Aștept ca dosarele lipsă să devină disponibile...</target>
+<source>Command line is empty!</source>
+<target>Linia de comandă este goală!</target>
+<source>Could not initialize directory monitoring:</source>
+<target>Nu pot inițializa monitorizarea dosarelor:</target>
+<source>A directory input field is empty.</source>
+<target>Cel puțin unul din dosarele de comparat este nespecificat.</target>
+<source>Error when monitoring directories.</source>
+<target>Eroare la monitorizarea dosarelor.</target>
+<source>Drag && drop</source>
+<target>Trage un dosar peste compartiment sau folosește butonul Explorează</target>
+<source>Conversion error:</source>
+<target>Eroare de convertire:</target>
+<source>Error moving file:</source>
+<target>Eroare la mutarea filei:</target>
+<source>Operation aborted!</source>
+<target>Operație abandonată!</target>
+<source>Target file already existing!</source>
+<target>Fila țintă există deja!</target>
+<source>Error moving directory:</source>
+<target>Eroare la mutarea dosarului:</target>
+<source>Target directory already existing!</source>
+<target>Dosarul țintă există deja!</target>
+<source>Error deleting directory:</source>
+<target>Eroare la ștergerea dosarului:</target>
+<source>Error changing modification time:</source>
+<target>Eroare la schimbarea datei de modificare:</target>
+<source>Error loading library function:</source>
+<target>Eroare la încărcarea bibliotecii de funcții:</target>
+<source>Error reading security context:</source>
+<target>Eroare la citirea contextului de securitate:</target>
+<source>Error writing security context:</source>
+<target>Eroare la scrierea contextului de securitate:</target>
+<source>Error copying file permissions:</source>
+<target>Eroare la copierea permisiunilor filei:</target>
+<source>Error creating directory:</source>
+<target>Eroare la crearea dosarului:</target>
+<source>Error copying symbolic link:</source>
+<target>Eroare la copierea legăturii simbolice:</target>
+<source>Error copying file:</source>
+<target>Eroare la copierea filei:</target>
+<source>Error opening file:</source>
+<target>Eroare la deschiderea filei:</target>
+<source>Error reading file:</source>
+<target>Eroare la citirea filei:</target>
+<source>Endless loop when traversing directory:</source>
+<target>Buclă infinită la parcurgerea dosarului:</target>
+<source>Error traversing directory:</source>
+<target>Eroare la parcurgerea dosarului:</target>
+<source>Error setting privilege:</source>
+<target>Eroare la setarea privilegiului:</target>
+<source>Error moving to Recycle Bin:</source>
+<target>Eroare la mutarea în Reciclator:</target>
+<source>Could not load a required DLL:</source>
+<target>Nu pot încărca o filă DLL necesară:</target>
+<source>Error writing to synchronization database:</source>
+<target>Eroare la scrierea în baza de date a sincronizării:</target>
+<source>Error starting Volume Shadow Copy Service!</source>
+<target>Eroare la pornirea serviciului Volume Shadow Copy!</target>
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>Realizarea de copii de rezervă prin sistemul WOW64 nu este suportată. Folosește versiunea pe 64-biți a FreeFileSync.</target>
+<source>Could not determine volume name for file:</source>
+<target>Nu pot determina numele volumului pentru fila:</target>
+<source>Volume name %x not part of filename %y!</source>
+<target>Numele volumului %x nu face parte din numele filei %y !</target>
+<source>%x TB</source>
+<target>%x TB</target>
+<source>%x PB</source>
+<target>%x PB</target>
+<source>%x%</source>
+<target>%x%</target>
+<source>Could not read values for the following XML nodes:</source>
+<target>Nu pot citi valorile pentru următoarele noduri XML:</target>
+<source>Show popup</source>
+<target>Arată casete de dialog</target>
+<source>Show popup on errors or warnings</source>
+<target>Este arătată o casetă de dialog pentru fiecare eroare sau avertisment</target>
+<source>Ignore errors</source>
+<target>Ignoră erorile</target>
+<source>Hide all error and warning messages</source>
+<target>Sînt ascunse toate mesajele de eroare și de avertizare</target>
+<source>Exit instantly</source>
+<target>Ieși imediat</target>
+<source>Abort synchronization immediately</source>
+<target>Abandonează imediat sincronizarea</target>
+<source>Logging</source>
+<target>Jurnalizez</target>
+<source>FreeFileSync batch file</source>
+<target>Filă cu lot de comenzi FreeFileSync</target>
+<source>FreeFileSync configuration</source>
+<target>Configurație FreeFileSync</target>
+<source>FreeFileSync Batch Job</source>
+<target>Sarcină cu lot de comenzi FreeFileSync</target>
+<source>Unable to create logfile!</source>
+<target>Fila jurnal nu poate fi creată!</target>
+<source>Batch execution</source>
+<target>Execută Fila Lot</target>
+<source>Log-messages:</source>
+<target>Mesaje de jurnalizare:</target>
+<source>Stop</source>
+<target>Oprește</target>
+<source>Total time:</source>
+<target>Timp Total:</target>
+<source>Synchronization aborted!</source>
+<target>Sincronizare abandonată!</target>
+<source>Synchronization completed with errors!</source>
+<target>Sincronizare terminată cu erori!</target>
+<source>Synchronization completed successfully!</source>
+<target>Sincronizare terminată cu succes!</target>
+<source>Press "Switch" to open FreeFileSync GUI mode.</source>
+<target>Apasă "Comută" pentru a deschide modul grafic al FreeFileSync</target>
+<source>Switching to FreeFileSync GUI mode...</source>
+<target>Comut la modul grafic al FreeFileSync...</target>
+<source>Unable to connect to sourceforge.net!</source>
+<target>Conectarea la situl sourceforge.net nu poate fi realizată!</target>
+<source>A newer version of FreeFileSync is available:</source>
+<target>Este disponibilă o versiune nouă a softului:</target>
+<source>Download now?</source>
+<target>Vrei s-o descarci acum ?</target>
+<source>Information</source>
+<target>Informații</target>
+<source>FreeFileSync is up to date!</source>
+<target>Ai deja ultima versiune a softului!</target>
+<source>Do you want FreeFileSync to automatically check for updates every week?</source>
+<target>Vrei ca FreeFileSync să caute automat actualizări în fiecare săptămînă ?</target>
+<source>(Requires an Internet connection!)</source>
+<target>(Necesită o conexiune la internet!)</target>
+<source>1. &Compare</source>
+<target>1. &Compară</target>
+<source>2. &Synchronize...</source>
+<target>2. &Sincronizează...</target>
+<source>S&witch view</source>
+<target>Schimbă &Vederea</target>
+<source>&New</source>
+<target>Configurație &Nouă</target>
+<source>&Program</source>
+<target>&Program</target>
+<source>&Language</source>
+<target>&Limbă</target>
+<source>&Global settings...</source>
+<target>&Setări Globale...</target>
+<source>&Create batch job...</source>
+<target>&Creează o Sarcină Lot...</target>
+<source>&Export file list...</source>
+<target>&Exportă Lista de File...</target>
+<source>&Advanced</source>
+<target>&Avansate</target>
+<source>&Check for new version</source>
+<target>&Caută Versiune Nouă a Softului</target>
+<source>Compare</source>
+<target>Compară</target>
+<source>Compare both sides</source>
+<target>Compară Părțile Stîngă și Dreaptă</target>
+<source>&Abort</source>
+<target>&Anulează</target>
+<source>Synchronize...</source>
+<target>Sincronizează</target>
+<source>Start synchronization</source>
+<target>Pornește Sincronizarea</target>
+<source>Swap sides</source>
+<target>Schimbă compartimentele stîng și drept între ele</target>
+<source>Add folder pair</source>
+<target>Adaugă Pereche Nouă de Dosare</target>
+<source>Remove folder pair</source>
+<target>Înlătură Perechea de Dosare</target>
+<source>Save current configuration to file</source>
+<target>Salvează într-o filă modificările configurației curente</target>
+<source>Load configuration from file</source>
+<target>Încarcă configurația dintr-o filă</target>
+<source>Last used configurations (press DEL to remove from list)</source>
+<target>Ultimele configurații utilizate (apasă tasta DEL pentru a înlătura din listă)</target>
+<source>Hide excluded items</source>
+<target>Ascunde itemurile excluse</target>
+<source>Hide filtered or temporarily excluded files</source>
+<target>Ascunde filele filtrate sau excluse temporar</target>
+<source>Number of files and directories that will be created</source>
+<target>Numărul de file și dosare care vor fi create</target>
+<source>Number of files that will be overwritten</source>
+<target>Numărul de file care vor fi suprascrise</target>
+<source>Number of files and directories that will be deleted</source>
+<target>Numărul de file și dosare care vor fi șterse</target>
+<source>Total amount of data that will be transferred</source>
+<target>Volumul total de date care va fi transferat</target>
+<source>Left</source>
+<target>Stînga</target>
+<source>Right</source>
+<target>Dreapta</target>
+<source>Batch job</source>
+<target>Sarcină Lot</target>
+<source>Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
+<target>Se poate crea o filă cu un lot de comenzi [batch file] pentru sincronizarea inteligentă. Pentru a porni în modul lot, precizează astfel numele filei lot pentru prelucrarea sa de către executabilul FreeFileSync: freefilesync.exe <filă lot>. Această operație poate fi programată în planificatorul de sarcini al sistemului de operare [task scheduler].</target>
+<source>Help</source>
+<target>Ajutor</target>
+<source>Configuration overview:</source>
+<target>Panorama Configurației:</target>
+<source>Filter files</source>
+<target>Filtru de File</target>
+<source>Status feedback</source>
+<target>Afișarea Stării</target>
+<source>Silent mode</source>
+<target>Mod silențios</target>
+<source>Start minimized and write status information to a logfile</source>
+<target>Pornește minimizat și scrie informațiile de stare într-un jurnal</target>
+<source>Error handling</source>
+<target>Gestionarea Erorilor</target>
+<source>Overview</source>
+<target>Panoramă</target>
+<source>Select logfile directory:</source>
+<target>Selectează un dosar pentru fila .log:</target>
+<source>Maximum number of logfiles:</source>
+<target>Numărul maxim de file jurnal:</target>
+<source>&Save</source>
+<target>&Salvează</target>
+<source>&Load</source>
+<target>&Deschide</target>
+<source>&Cancel</source>
+<target>&Anulează</target>
+<source>Elements found:</source>
+<target>Elemente Găsite:</target>
+<source>Elements remaining:</source>
+<target>Elemente Rămase:</target>
+<source>Speed:</source>
+<target>Viteză:</target>
+<source>Time remaining:</source>
+<target>Timp Rămas:</target>
+<source>Time elapsed:</source>
+<target>Timp Scurs:</target>
+<source>Operation:</source>
+<target>Operație:</target>
+<source>Select variant:</source>
+<target>Selectează Varianta de Sincronizare:</target>
+<source><Automatic></source>
+<target><Sincronizare Inteligentă></target>
+<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
+<target>Identifică și propagă modificările în ambele părți folosind o bază de date. Ștergerile și conflictele sînt detectate automat.</target>
+<source>Mirror ->></source>
+<target>Clonare =>></target>
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>Conservare [backup] în oglindă a dosarului stîng. Dosarul drept e modificat pentru a fi identic după sincronizare cu cel stîng.</target>
+<source>Update -></source>
+<target>Actualizare =></target>
+<source>Copy new or updated files to right folder.</source>
+<target>Copiază în dosarul din dreapta filele actualizate sau noi.</target>
+<source>Custom</source>
+<target>Sincronizare Personalizată</target>
+<source>Configure your own synchronization rules.</source>
+<target>Reguli de sincronizare definite de utilizator pentru fiecare situație.</target>
+<source>Deletion handling</source>
+<target>Gestionarea Ștergerii</target>
+<source>&OK</source>
+<target>&OK</target>
+<source>Configuration</source>
+<target>Configurație</target>
+<source>Category</source>
+<target>Categorie</target>
+<source>Action</source>
+<target>Acțiune</target>
+<source>Files/folders that exist on left side only</source>
+<target>File sau dosare care există doar în partea stîngă</target>
+<source>Files/folders that exist on right side only</source>
+<target>File sau dosare care există doar în partea dreaptă</target>
+<source>Files that exist on both sides, left one is newer</source>
+<target>File care există în ambele părți, cea din stînga fiind mai nouă</target>
+<source>Files that exist on both sides, right one is newer</source>
+<target>File care există în ambele părți, cea din dreapta fiind mai nouă</target>
+<source>Files that have different content</source>
+<target>File care au conținut diferit</target>
+<source>Conflicts/files that cannot be categorized</source>
+<target>Situații care nu pot fi incluse într-o anumită categorie</target>
+<source>Compare by...</source>
+<target>Compară după:</target>
+<source>
+Files are found equal if
+     - file size
+     - last write time and date
+are the same
+</source>
+<target>
+Filele sînt considerate identice dacă
+     - mărimea
+     - și data ultimei modificări
+sînt identice
+</target>
+<source>File size and date</source>
+<target>Mărimea și Data Filelor</target>
+<source>
+Files are found equal if
+     - file content
+is the same
+</source>
+<target>
+Filele sînt considerate identice dacă
+     - conținutul
+este identic
+</target>
+<source>File content</source>
+<target>Conținutul Filelor</target>
+<source>Symbolic Link handling</source>
+<target>Prelucrarea Legăturilor Simbolice (Simlegături)</target>
+<source>Synchronizing...</source>
+<target>Sincronizare Aflată în Curs...</target>
+<source>Elements processed:</source>
+<target>Elemente Procesate:</target>
+<source>&Pause</source>
+<target>&Pauzează</target>
+<source>Compare by "File size and date"</source>
+<target>Compară după "Data și Mărimea Filelor"</target>
+<source>This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.</source>
+<target>Această variantă definește două file cu același nume ca fiind identice atunci cînd au aceeași mărime ȘI aceeași dată și oră a ultimei modificări.</target>
+<source>When the comparison is started with this option set the following decision tree is processed:</source>
+<target>Cînd compararea este pornită cu acest set de opțiuni, este executat următorul arbore de decizie:</target>
+<source>As a result the files are separated into the following categories:</source>
+<target>În concluzie, filele sînt repartizate în categoriile următoare:</target>
+<source>- equal</source>
+<target>- identice</target>
+<source>- left newer</source>
+<target>- cea mai nouă e în stînga</target>
+<source>- right newer</source>
+<target>- cea mai nouă e în dreapta</target>
+<source>- exists left only</source>
+<target>- există doar în stînga</target>
+<source>- exists right only</source>
+<target>- există doar în dreapta</target>
+<source>- conflict</source>
+<target>- conflict</target>
+<source>Compare by "File content"</source>
+<target>Compară după "Conținutul Filelor"</target>
+<source>
+As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.
+
+With this option enabled the decision tree is smaller:
+</source>
+<target>
+Așa cum sugerează și numele, două file cu același nume sînt considerate identice dacă și numai dacă este identic și conținutul lor. Această opțiune este utilă mai degrabă pentru verificările de consecvență decît pentru operațiunile de conservare [backup]. Așa că timpurile filelor (data și ora) nu sînt luate deloc în considerare.
+
+Cu această opțiune activată, arborele de decizie e mai simplu:
+</target>
+<source>- different</source>
+<target>- diferite</target>
+<source>Source code written in C++ utilizing:</source>
+<target>Cod sursă scris în C++ folosind:</target>
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Mulțumiri pentru traducerea FreeFileSync:</target>
+<source>Feedback and suggestions are welcome at:</source>
+<target>Opiniile și sugestiile sînt binevenite:</target>
+<source>FreeFileSync at Sourceforge</source>
+<target>FreeFileSync la Sourceforge</target>
+<source>Homepage</source>
+<target>Sit</target>
+<source>If you like FFS</source>
+<target>Donează pentru FFS</target>
+<source>Donate with PayPal</source>
+<target>Donează prin PayPal</target>
+<source>Email</source>
+<target>Adresă</target>
+<source>Report translation error</source>
+<target>Raportează erori de trad.</target>
+<source>Published under the GNU General Public License:</source>
+<target>Publicat sub licența GNU GPL:</target>
+<source>Ignore subsequent errors</source>
+<target>Ignoră (nu lua în seamă) erorile ulterioare</target>
+<source>Hide further error messages during the current process</source>
+<target>Ascunde mesajele de eroare apărute ulterior în timpul acestui proces</target>
+<source>&Ignore</source>
+<target>&OK</target>
+<source>&Retry</source>
+<target>&Reîncearcă</target>
+<source>Do not show this dialog again</source>
+<target>Nu afișa acest dialog din nou</target>
+<source>&Switch</source>
+<target>&Comută</target>
+<source>&Yes</source>
+<target>&Da</target>
+<source>&No</source>
+<target>&Nu</target>
+<source>Delete on both sides</source>
+<target>Șterge din ambele părți</target>
+<source>Delete on both sides even if the file is selected on one side only</source>
+<target>Șterge din ambele părți, chiar dacă fila e selecționată într-o singură parte</target>
+<source>Use Recycle Bin</source>
+<target>Mută în Reciclator</target>
+<source>
+Only files/directories that match all filter settings will be selected for synchronization.
+Note: The name filter must be specified relative(!) to main synchronization directories.
+</source>
+<target>
+Doar filele/dosarele care îndeplinesc toate condițiile filtrului vor fi selectate pentru sincronizare.
+Notă: Filtrul de nume este relaționat la calea dosarelor principale sincronizate (itemurile filtrate au specificată o cale relativă).
+</target>
+<source>Hints:</source>
+<target>Sfaturi:</target>
+<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
+<target>1. Scrie numele relative ale filelor sau dosarelor, separate de semnul ';' sau de un rînd nou.</target>
+<source>2. Use wildcard characters '*' and '?'.</source>
+<target>2. Folosește metacaracterele '*' și '?' (asterisc și semn de întrebare).</target>
+<source>3. Exclude files directly on main grid via context menu.</source>
+<target>3. Exclude filele și dosarele direct de pe grila principală, cu ajutorul meniului contextual.</target>
+<source>Example</source>
+<target>Exemplu</target>
+<source>
+Include: *.doc;*.zip;*.exe
+Exclude: \stuff\temp\*
+</source>
+<target>
+Incluse: *.doc;*.zip;*.exe
+Excluse: \stuff\temp\*
+</target>
+<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
+<target>Sincronizează filele .doc, .zip și .exe, cu excepția celor din dosarul "temp".</target>
+<source>Include</source>
+<target>Incluse</target>
+<source>Exclude</source>
+<target>Excluse</target>
+<source>Select time span:</source>
+<target>Intervalul de timp:</target>
+<source>Minimum file size:</source>
+<target>Mărimea minimă a filelor:</target>
+<source>Maximum file size:</source>
+<target>Mărimea maximă a filelor:</target>
+<source>&Default</source>
+<target>&Implicite</target>
+<source>Move column up</source>
+<target>Mută coloana în sus</target>
+<source>Move column down</source>
+<target>Mută coloana în jos</target>
+<source>Copy locked files</source>
+<target>Copiază filele zăvorîte [locked]</target>
+<source>
+Copy shared or locked files using Volume Shadow Copy Service
+(Requires Administrator rights)
+</source>
+<target>
+Copiază filele partajate sau zăvorîte folosind Serviciul de Conservare a Volumelor [Volume Shadow Copy]
+(Necesită drepturi de Administrator)
+</target>
+<source>Copy filesystem permissions</source>
+<target>Copiază permisiunile sistemului de file</target>
+<source>
+Transfer file and directory permissions
+(Requires Administrator rights)
+</source>
+<target>
+Transferă permisiunile filelor și dosarelor
+(Necesită drepturi de Administrator)
+</target>
+<source>Hidden dialogs:</source>
+<target>Casete de dialog ascunse:</target>
+<source>Reset</source>
+<target>Resetează</target>
+<source>Show hidden dialogs</source>
+<target>Arată casetele de dialog ascunse</target>
+<source>External applications</source>
+<target>Aplicații Externe</target>
+<source>Description</source>
+<target>Descriere</target>
+<source>Variant</source>
+<target>Varianta Sincronizării</target>
+<source>Statistics</source>
+<target>Statistici</target>
+<source>Find what:</source>
+<target>Găsește Asta:</target>
+<source>Match case</source>
+<target>Potrivește MAJ/min</target>
+<source>&Find next</source>
+<target>&Găsește Următorul</target>
+<source>You may try to synchronize remaining items again (WITHOUT having to re-compare)!</source>
+<target>Poți încerca să sincronizezi din nou itemurile rămase (FĂRĂ recomparare) !</target>
+<source>Batch file created successfully!</source>
+<target>Fila cu lotul de comenzi a fost creată cu succces !</target>
+<source>Main bar</source>
+<target>Bara Principală</target>
+<source>Folder pairs</source>
+<target>Perechi de Dosare</target>
+<source>Select view</source>
+<target>Selectează Vederea</target>
+<source>Folder Comparison and Synchronization</source>
+<target>Comparare și Sincronizare de Dosare</target>
+<source>Recycle Bin not yet supported for this system!</source>
+<target>Reciclatorul nu este încă suportat pentru acest sistem de operare!</target>
+<source>Set direction:</source>
+<target>Setează Acțiunea ca în Icoana Alăturată:</target>
+<source>Exclude temporarily</source>
+<target>Exclude Temporar</target>
+<source>Include temporarily</source>
+<target>Include Temporar</target>
+<source>Exclude via filter:</source>
+<target>Exclude prin Filtru:</target>
+<source><multiple selection></source>
+<target><selectare multiplă></target>
+<source>D-Click</source>
+<target>Clic-Dreapta</target>
+<source>Copy to clipboard	CTRL+C</source>
+<target>Copiază în Cliplanșetă	CTRL+C</target>
+<source>Delete files	DEL</source>
+<target>Șterge Filele	DEL</target>
+<source>Customize...</source>
+<target>Personalizează...</target>
+<source>Auto-adjust columns</source>
+<target>Autoajustează Coloanele</target>
+<source>Include all rows</source>
+<target>Include Toate Rîndurile</target>
+<source>Exclude all rows</source>
+<target>Exclude Toate Rîndurile</target>
+<source>Reset view</source>
+<target>Resetează Vederea</target>
+<source>Show "%x"</source>
+<target>Arată "%x"</target>
+<source><Last session></source>
+<target><Ultima Sesiune></target>
+<source>Configuration saved!</source>
+<target>Configurație salvată !</target>
+<source>Save changes to current configuration?</source>
+<target>Vrei să salvezi modificările configurației curente?</target>
+<source>Configuration loaded!</source>
+<target>Configurație încărcată !</target>
+<source>Hide files that exist on left side only</source>
+<target>Ascunde filele care există doar în stînga</target>
+<source>Show files that exist on left side only</source>
+<target>Arată filele care există doar în stînga</target>
+<source>Hide files that exist on right side only</source>
+<target>Ascunde filele care există doar în dreapta</target>
+<source>Show files that exist on right side only</source>
+<target>Arată filele care există doar în dreapta</target>
+<source>Hide files that are newer on left</source>
+<target>Ascunde filele care sînt mai noi în stînga</target>
+<source>Show files that are newer on left</source>
+<target>Arată filele din stînga mai noi decît cele din dreapta</target>
+<source>Hide files that are newer on right</source>
+<target>Ascunde filele care sînt mai noi în dreapta</target>
+<source>Show files that are newer on right</source>
+<target>Arată filele din dreapta mai noi decît cele din stînga</target>
+<source>Hide files that are equal</source>
+<target>Ascunde filele care sînt identice</target>
+<source>Show files that are equal</source>
+<target>Arată filele identice</target>
+<source>Hide files that are different</source>
+<target>Ascunde filele care sînt diferite</target>
+<source>Show files that are different</source>
+<target>Arată filele diferite</target>
+<source>Hide conflicts</source>
+<target>Ascunde conflictele</target>
+<source>Show conflicts</source>
+<target>Arată conflictele</target>
+<source>Hide files that will be created on the left side</source>
+<target>Ascunde filele care vor fi create în stînga</target>
+<source>Show files that will be created on the left side</source>
+<target>Arată filele care vor fi create în stînga</target>
+<source>Hide files that will be created on the right side</source>
+<target>Ascunde filele care vor fi create în dreapta</target>
+<source>Show files that will be created on the right side</source>
+<target>Arată filele care vor fi create în dreapta</target>
+<source>Hide files that will be deleted on the left side</source>
+<target>Ascunde filele care vor fi șterse în stînga</target>
+<source>Show files that will be deleted on the left side</source>
+<target>Arată filele care vor fi șterse în stînga</target>
+<source>Hide files that will be deleted on the right side</source>
+<target>Ascunde filele care vor fi șterse în dreapta</target>
+<source>Show files that will be deleted on the right side</source>
+<target>Arată filele care vor fi șterse în dreapta</target>
+<source>Hide files that will be overwritten on left side</source>
+<target>Ascunde filele care vor fi suprascrise în stînga</target>
+<source>Show files that will be overwritten on left side</source>
+<target>Arată filele care vor fi suprascrise în stînga</target>
+<source>Hide files that will be overwritten on right side</source>
+<target>Ascunde filele care vor fi suprascrise în dreapta</target>
+<source>Show files that will be overwritten on right side</source>
+<target>Arată filele care vor fi suprascrise în dreapta</target>
+<source>Hide files that won't be copied</source>
+<target>Ascunde filele care nu vor fi copiate</target>
+<source>Show files that won't be copied</source>
+<target>Arată filele care nu vor fi copiate</target>
+<source>All directories in sync!</source>
+<target>Toate dosarele au fost sincronizate!</target>
+<source>Please run a Compare first before synchronizing!</source>
+<target>Rulează compararea înainte de a sincroniza!</target>
+<source>Comma separated list</source>
+<target>Listă de elemente separate prin virgulă</target>
+<source>Legend</source>
+<target>Legendă</target>
+<source>File list exported!</source>
+<target>Lista de file a fost exportată!</target>
+<source>
+<pluralform>Object deleted successfully!</pluralform>
+<pluralform>%x objects deleted successfully!</pluralform>
+</source>
+<target>
+<pluralform>Item șters cu succes!</pluralform>
+<pluralform>%x itemuri șterse cu succes!</pluralform>
+<pluralform>%x de itemuri șterse cu succes!</pluralform>
+</target>
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>1 dosar</pluralform>
+<pluralform>%x dosare</pluralform>
+<pluralform>%x de dosare</pluralform>
+</target>
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>1 filă</pluralform>
+<pluralform>%x file</pluralform>
+<pluralform>%x de file</pluralform>
+</target>
+<source>
+<pluralform>%x of 1 row in view</pluralform>
+<pluralform>%x of %y rows in view</pluralform>
+</source>
+<target>
+<pluralform>%x din 1 rînduri afișate</pluralform>
+<pluralform>%x din %y rînduri afișate</pluralform>
+<pluralform>%x din %y de rînduri afișate</pluralform>
+</target>
+<source>Scanning...</source>
+<target>Scanez...</target>
+<source>Comparing content...</source>
+<target>Compar conținutul...</target>
+<source>Paused</source>
+<target>Sincronizare Pauzată</target>
+<source>Aborted</source>
+<target>Sincronizare Abandonată</target>
+<source>Completed</source>
+<target>Sincronizare Terminată</target>
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Abandonare solicitată: Se așteaptă terminarea operațiunii în curs...</target>
+<source>Continue</source>
+<target>Continuă</target>
+<source>Pause</source>
+<target>Pauzează</target>
+<source>Cannot find %x</source>
+<target>Nu pot găsi %x</target>
+<source>DECISION TREE</source>
+<target>ARBORE DECIZIONAL</target>
+<source>file exists on both sides</source>
+<target>fila există în ambele părți</target>
+<source>on one side only</source>
+<target>fila există doar într-o parte</target>
+<source>- left</source>
+<target>- stînga</target>
+<source>- right</source>
+<target>- dreapta</target>
+<source>different</source>
+<target>file diferite</target>
+<source>- conflict (same date, different size)</source>
+<target>- conflict (aceeași dată, mărime diferită)</target>
+<source>Inactive</source>
+<target>Dezactivat</target>
+<source>Second</source>
+<target>Secunde</target>
+<source>Minute</source>
+<target>Minute</target>
+<source>Hour</source>
+<target>Ore</target>
+<source>Day</source>
+<target>Zile</target>
+<source>Byte</source>
+<target>Baiți</target>
+<source>KB</source>
+<target>KB</target>
+<source>MB</source>
+<target>MB</target>
+<source>Filter: All pairs</source>
+<target>Filtru: Toate perechile</target>
+<source>Filter: Single pair</source>
+<target>Filtru: O singură pereche</target>
+<source>Ignore</source>
+<target>Ignoră</target>
+<source>Direct</source>
+<target>Direcționează</target>
+<source>Follow</source>
+<target>Urmărește</target>
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Include aplicațiile externe în meniul contextual. Sînt disponibile următoarele macrocomenzi:</target>
+<source>- full file or directory name</source>
+<target>- numele complet al filei sau dosarului</target>
+<source>- directory part only</source>
+<target>- doar dosarele</target>
+<source>- Other side's counterpart to %name</source>
+<target>- corespondentul din partea opusă al lui %name</target>
+<source>- Other side's counterpart to %dir</source>
+<target>- corespondentul din partea opusă al lui %dir</target>
+<source>Restore all hidden dialogs?</source>
+<target>Restaurezi toate casetele de dialog ascunse?</target>
+<source>
+<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+</source>
+<target>
+<pluralform>Sigur vrei să muți în Reciclator itemul următor?</pluralform>
+<pluralform>Sigur vrei să muți în Reciclator următoarele %x itemuri?</pluralform>
+<pluralform>Sigur vrei să muți în Reciclator următoarele %x de itemuri?</pluralform>
+</target>
+<source>
+<pluralform>Do you really want to delete the following object?</pluralform>
+<pluralform>Do you really want to delete the following %x objects?</pluralform>
+</source>
+<target>
+<pluralform>Sigur vrei să ștergi definitiv itemul următor?</pluralform>
+<pluralform>Sigur vrei să ștergi definitiv următoarele %x itemuri?</pluralform>
+<pluralform>Sigur vrei să ștergi definitiv următoarele %x de itemuri?</pluralform>
+</target>
+<source>Leave as unresolved conflict</source>
+<target>Lasă ca Conflict Nerezolvat</target>
+<source>Delete permanently</source>
+<target>Șterge definitiv</target>
+<source>Delete or overwrite files permanently</source>
+<target>Filele sînt șterse sau suprascrise în mod definitiv</target>
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>Se folosește Reciclatorul [Recycle Bin] cu ocazia ștergerii sau suprascrierii unei file</target>
+<source>Versioning</source>
+<target>Versionare</target>
+<source>Move files into a time-stamped subdirectory</source>
+<target>Mută filele într-un subdosar cu marcaj de timp</target>
+<source>Cannot determine sync-direction:</source>
+<target>Nu se poate determina sensul de sincronizare:</target>
+<source>Filter settings have changed!</source>
+<target>Setările filtrului au fost schimbate!</target>
+<source>Both sides have changed since last synchronization!</source>
+<target>Ambele părți s-au modificat de la ultima sincronizare!</target>
+<source>No change since last synchronization!</source>
+<target>Nu sînt schimbări de la ultima sincronizare!</target>
+<source>The file was not processed by last synchronization!</source>
+<target>Fila nu a fost procesată la ultima sincronizare!</target>
+<source>Planned directory deletion is in conflict with its subdirectories and -files!</source>
+<target>Ștergerea plănuită a dosarului intră în conflict cu subdosarele și filele sale!</target>
+<source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
+<target>Baza de date existentă va fi făcută compatibilă cu versiunea softului și apoi va fi setat sensul implicit de sincronizare: Filele vechi vor fi suprascrise de cele noi.</target>
+<source>The file does not contain a valid configuration:</source>
+<target>Fila nu conține o configurație validă:</target>
+<source>Scanning:</source>
+<target>Scanez:</target>
+<source>Encoding extended time information: %x</source>
+<target>Codarea informațiilor timpului extins: %x</target>
+<source>You can ignore this error to consider the directory as empty.</source>
+<target>Poți ignora această eroare dacă vrei ca dosarul să fie considerat gol.</target>
+<source>Directory does not exist:</source>
+<target>Dosarul nu există:</target>
+<source>Directories are dependent! Be careful when setting up synchronization rules:</source>
+<target>Dosarele sînt interdependente! Atenție la setarea regulilor de sincronizare:</target>
+<source>Comparing content of files %x</source>
+<target>Compar conținutul filelor %x</target>
+<source>Memory allocation failed!</source>
+<target>Alocarea memoriei a eșuat!</target>
+<source>File %x has an invalid date!</source>
+<target>Fila %x are o dată nevalidă !</target>
+<source>Conflict detected:</source>
+<target>Conflict detectat:</target>
+<source>Files %x have the same date but a different size!</source>
+<target>Filele %x au aceeași dată, dar mărime diferită!</target>
+<source>Symlinks %x have the same date but a different target!</source>
+<target>Simlegăturile %x au aceeași dată, dar ținte diferite!</target>
+<source>Comparing files by content failed.</source>
+<target>Compararea filelor după conținut a eșuat.</target>
+<source>Generating file list...</source>
+<target>Generez lista de file...</target>
+<source>Multiple...</source>
+<target>Multiplu...</target>
+<source>Files that are equal on both sides</source>
+<target>File identice în ambele părți</target>
+<source>Equal files/folders that differ in attributes only</source>
+<target>File/Dosare identice care diferă doar prin atributele lor</target>
+<source>Copy from right to left</source>
+<target>Copiază de la Dreapta la Stînga</target>
+<source>Copy from left to right</source>
+<target>Copiază de la Stînga la Dreapta</target>
+<source>Delete files/folders existing on left side only</source>
+<target>Șterge Itemul din Stînga</target>
+<source>Delete files/folders existing on right side only</source>
+<target>Șterge Itemul din Dreapta</target>
+<source>Copy from right to left overwriting</source>
+<target>Copiază de la Dreapta la Stînga cu Suprascriere</target>
+<source>Copy from left to right overwriting</source>
+<target>Copiază de la Stînga la Dreapta cu Suprascriere</target>
+<source>Do nothing</source>
+<target>Nici o Acțiune</target>
+<source>Copy attributes only from right to left</source>
+<target>Copiază doar atributele de la dreapta la stînga</target>
+<source>Copy attributes only from left to right</source>
+<target>Copiază doar atributele de la stînga la dreapta</target>
+<source>Deleting file %x</source>
+<target>Șterg fila %x</target>
+<source>Deleting Symbolic Link %x</source>
+<target>Șterg legătura simbolică %x</target>
+<source>Deleting folder %x</source>
+<target>Șterg dosarul %x</target>
+<source>Moving %x to Recycle Bin</source>
+<target>Mut %x în Reciclator</target>
+<source>Moving file %x to user-defined directory %y</source>
+<target>Mut fila %x în dosarul %y ales de utilizator</target>
+<source>Moving folder %x to user-defined directory %y</source>
+<target>Mut dosarul %x în dosarul %y ales de utilizator</target>
+<source>Moving Symbolic Link %x to user-defined directory %y</source>
+<target>Mut legătura simbolică %x în dosarul ales de utilizator %y</target>
+<source>Copying new file %x to %y</source>
+<target>Copiez fila nouă %x în %y</target>
+<source>Copying new Symbolic Link %x to %y</source>
+<target>Copiez noua Legătură Simbolică %x în %y</target>
+<source>Overwriting file %x in %y</source>
+<target>Suprascriu fila %x în %y</target>
+<source>Overwriting Symbolic Link %x in %y</source>
+<target>Suprascriu Legătura Simbolică %x în %y</target>
+<source>Creating folder %x</source>
+<target>Creez dosarul %x</target>
+<source>Verifying file %x</source>
+<target>Verific fila %x</target>
+<source>Updating attributes of %x</source>
+<target>Actualizez atributele lui %x</target>
+<source>Source directory does not exist anymore:</source>
+<target>Dosarul sursă nu mai există:</target>
+<source>Nothing to synchronize according to configuration!</source>
+<target>Nu este nimic de sincronizat conform configurației!</target>
+<source>Target directory name must not be empty!</source>
+<target>Numele dosarului țintă nu poate să lipsească!</target>
+<source>User-defined directory for deletion was not specified!</source>
+<target>Dosarul ales de utilizator pentru ștergere nu a fost specificat !</target>
+<source>Unresolved conflicts existing!</source>
+<target>Există conflicte nerezolvate!</target>
+<source>You can ignore conflicts and continue synchronization.</source>
+<target>Poți ignora conflictele pentru a continua cu sincronizarea.</target>
+<source>Significant difference detected:</source>
+<target>Diferență semnificativă detectată:</target>
+<source>More than 50% of the total number of files will be copied or deleted!</source>
+<target>Peste 50% din numărul total de file vor fi copiate sau distruse!</target>
+<source>Not enough free disk space available in:</source>
+<target>Spațiu de stocare insuficient pe:</target>
+<source>Free disk space required:</source>
+<target>Spațiu liber necesar:</target>
+<source>Free disk space available:</source>
+<target>Spațiu liber disponibil:</target>
+<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
+<target>Va fi modificat un dosar care face parte din mai multe perechi de dosare! Reverifică setările de sincronizare!</target>
+<source>Processing folder pair:</source>
+<target>Procesez perechea de dosare:</target>
+<source>Generating database...</source>
+<target>Generez baza de date...</target>
+<source>Error copying locked file %x!</source>
+<target>Eroare la copierea filei zăvorîte %x!</target>
+<source>Data verification error: Source and target file have different content!</source>
+<target>Eroare la verificarea datelor: Filele sursă și țintă au conținut diferit!</target>

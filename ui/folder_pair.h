@@ -13,11 +13,12 @@
 #include "small_dlgs.h"
 #include "sync_cfg.h"
 #include <wx/event.h>
-#include "is_null_filter.h"
+#include <wx/menu.h>
 #include "../shared/util.h"
 #include "../shared/string_conv.h"
+#include "../library/norm_filter.h"
 
-namespace ffs3
+namespace zen
 {
 //basic functionality for handling alternate folder pair configuration: change sync-cfg/filter cfg, right-click context menu, button icons...
 
@@ -25,7 +26,7 @@ template <class GuiPanel>
 class FolderPairPanelBasic : private wxEvtHandler
 {
 public:
-    typedef boost::shared_ptr<const ffs3::AlternateSyncConfig> AltSyncCfgPtr;
+    typedef boost::shared_ptr<const zen::AlternateSyncConfig> AltSyncCfgPtr;
 
     AltSyncCfgPtr getAltSyncConfig() const
     {
@@ -51,7 +52,7 @@ public:
         {
             basicPanel_.m_bpButtonAltSyncCfg->SetBitmapLabel(GlobalResources::instance().getImage(wxT("syncConfigSmall")));
             basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(wxString(_("Select alternate synchronization settings")) +  wxT(" ") + common::LINE_BREAK +
-                                                         wxT("(") + getVariantName(altSyncConfig->syncConfiguration) + wxT(")"));
+                                                         wxT("(") + getVariantName(altSyncConfig->syncConfiguration.var) + wxT(")"));
         }
         else
         {
@@ -107,7 +108,7 @@ private:
         contextMenu->Append(menuId, _("Clear filter settings"));
         contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfgRemoveConfirm), NULL, this);
 
-        if (NameFilter(localFilter.includeFilter, localFilter.excludeFilter).isNull())
+        if (isNullFilter(localFilter))
             contextMenu->Enable(menuId, false); //disable menu item, if clicking wouldn't make sense anyway
 
         basicPanel_.PopupMenu(contextMenu.get()); //show context menu
@@ -139,13 +140,13 @@ private:
                                                  mainCfg.customDeletionDirectory);
 
         AlternateSyncConfig altSyncCfg = altSyncConfig.get() ? *altSyncConfig : syncConfigMain;
-        SyncCfgDialog syncDlg(getParentWindow(),
-                              mainCfg.compareVar,
+
+
+        if (showSyncConfigDlg(mainCfg.compareVar,
                               altSyncCfg.syncConfiguration,
                               altSyncCfg.handleDeletion,
                               altSyncCfg.customDeletionDirectory,
-                              NULL);
-        if (syncDlg.ShowModal() == SyncCfgDialog::BUTTON_APPLY)
+                              NULL) == ReturnSyncConfig::BUTTON_OKAY) //optional input parameter
         {
             altSyncConfig.reset(new AlternateSyncConfig(altSyncCfg));
             refreshButtons();
@@ -161,8 +162,7 @@ private:
         FilterConfig localFiltTmp = localFilter;
 
         if (showFilterDialog(false, //is local filter dialog
-                             localFiltTmp.includeFilter,
-                             localFiltTmp.excludeFilter) == DefaultReturnCode::BUTTON_OKAY)
+                             localFiltTmp) == ReturnSmallDlg::BUTTON_OKAY)
         {
             localFilter = localFiltTmp;
             refreshButtons();

@@ -1,6 +1,6 @@
 #include <wx/string.h>
 
-namespace ffs3
+namespace zen
 {
-const wxString currentVersion = wxT("3.16"); //internal linkage!
+const wxString currentVersion = wxT("3.17"); //internal linkage!
 }

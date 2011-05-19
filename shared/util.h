@@ -8,31 +8,45 @@
 #define UTIL_H_INCLUDED
 
 #include <wx/string.h>
-#include <wx/longlong.h>
 #include <wx/textctrl.h>
 #include <wx/filepicker.h>
 #include <wx/combobox.h>
 #include <wx/scrolwin.h>
+#include <wx/choice.h>
 #include "zstring.h"
-#include "global_func.h"
+#include "string_tools.h"
+#include "int64.h"
 
-
-namespace ffs3
+namespace zen
 {
 wxString extractJobName(const wxString& configFilename);
 
-wxString formatFilesizeToShortString(const wxLongLong& filesize);
-wxString formatFilesizeToShortString(const wxULongLong& filesize);
-wxString formatFilesizeToShortString(double filesize);
-
-wxString formatPercentage(const wxLongLong& dividend, const wxLongLong& divisor);
+wxString formatFilesizeToShortString(zen::UInt64 filesize);
+wxString formatPercentage(zen::Int64 dividend, zen::Int64 divisor);
 
 template <class NumberType>
-wxString numberToStringSep(NumberType number); //convert number to wxString including thousands separator
+wxString toStringSep(NumberType number); //convert number to wxString including thousands separator
 
 void scrollToBottom(wxScrolledWindow* scrWindow);
 
-wxString utcTimeToLocalString(const wxLongLong& utcTime); //throw std::runtime_error
+wxString utcTimeToLocalString(zen::Int64 utcTime); //throw std::runtime_error
+
+
+//handle mapping of enum values to wxChoice controls
+template <class Enum>
+struct EnumDescrList
+{
+    EnumDescrList& add(Enum value, const wxString& text, const wxString& tooltip = wxEmptyString)
+    {
+        descrList.push_back(std::make_pair(value, std::make_pair(text, tooltip)));
+        return *this;
+    }
+    typedef std::vector<std::pair<Enum, std::pair<wxString, wxString> > > DescrList;
+    DescrList descrList;
+};
+template <class Enum> void setEnumVal(const EnumDescrList<Enum>& mapping, wxChoice& ctrl, Enum value);
+template <class Enum> Enum getEnumVal(const EnumDescrList<Enum>& mapping, const wxChoice& ctrl);
+template <class Enum> void updateTooltipEnumVal(const EnumDescrList<Enum>& mapping, wxChoice& ctrl);
 }
 
 
@@ -69,23 +83,59 @@ wxString includeNumberSeparator(const wxString& number);
 }
 
 
-namespace ffs3
+namespace zen
 {
-//wxULongLongNative doesn't support operator<<(std::ostream&, wxULongLongNative)
-template <>
-inline
-wxString numberToStringSep(wxULongLongNative number)
-{
-    return ffs_Impl::includeNumberSeparator(number.ToString());
-}
-
-
 template <class NumberType>
 inline
-wxString numberToStringSep(NumberType number)
+wxString toStringSep(NumberType number)
 {
-    return ffs_Impl::includeNumberSeparator(common::numberToString(number));
+    return ffs_Impl::includeNumberSeparator(zen::toString<wxString>(number));
 }
+
+template <class Enum>
+void setEnumVal(const EnumDescrList<Enum>& mapping, wxChoice& ctrl, Enum value)
+{
+    ctrl.Clear();
+
+    int selectedPos = 0;
+    for (typename EnumDescrList<Enum>::DescrList::const_iterator i = mapping.descrList.begin(); i != mapping.descrList.end(); ++i)
+    {
+        ctrl.Append(i->second.first);
+        if (i->first == value)
+        {
+            selectedPos = i - mapping.descrList.begin();
+
+            if (!i->second.second.empty())
+                ctrl.SetToolTip(i->second.second);
+        }
+    }
+
+    ctrl.SetSelection(selectedPos);
+}
+
+template <class Enum>
+Enum getEnumVal(const EnumDescrList<Enum>& mapping, const wxChoice& ctrl)
+{
+    const int selectedPos = ctrl.GetSelection();
+
+    if (0 <= selectedPos && selectedPos < static_cast<int>(mapping.descrList.size()))
+        return mapping.descrList[selectedPos].first;
+    else
+    {
+        assert(false);
+        return Enum(0);
+    }
+}
+
+template <class Enum> void updateTooltipEnumVal(const EnumDescrList<Enum>& mapping, wxChoice& ctrl)
+{
+    const Enum value = getEnumVal(mapping, ctrl);
+
+    for (typename EnumDescrList<Enum>::DescrList::const_iterator i = mapping.descrList.begin(); i != mapping.descrList.end(); ++i)
+        if (i->first == value)
+            ctrl.SetToolTip(i->second.second);
+}
+
 }
 
 

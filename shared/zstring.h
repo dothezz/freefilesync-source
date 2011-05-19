@@ -112,6 +112,9 @@ typedef wchar_t Zchar;
 #elif defined FFS_LINUX //Linux uses UTF-8
 typedef char Zchar;
 #define Zstr(x) x
+
+#else
+#error define platform you are in: FFS_WIN or FFS_LINUX
 #endif
 
 //"The reason for all the fuss above" (Loki/SmartPtr)

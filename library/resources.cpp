@@ -15,7 +15,7 @@
 #include <memory>
 #include "../shared/standard_paths.h"
 
-using namespace ffs3;
+using namespace zen;
 
 
 const GlobalResources& GlobalResources::instance()
@@ -69,7 +69,7 @@ void loadAnimFromZip(wxZipInputStream& zipInput, wxAnimation* animation)
 
 void GlobalResources::load()
 {
-    wxFFileInputStream input(ffs3::getResourceDir() + wxT("Resources.dat"));
+    wxFFileInputStream input(zen::getResourceDir() + wxT("Resources.dat"));
     if (input.IsOk()) //if not... we don't want to react too harsh here
     {
         //activate support for .png files

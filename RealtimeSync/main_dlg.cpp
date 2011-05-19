@@ -24,7 +24,7 @@
 #include "../shared/util.h"
 #include "../shared/mouse_move_dlg.h"
 
-using namespace ffs3;
+using namespace zen;
 
 
 MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
@@ -43,12 +43,11 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainDialog::OnKeyPressed), NULL, this);
 
     //prepare drag & drop
-    dirNameFirst.reset(new ffs3::DirectoryName(*m_panelMainFolder, *m_dirPickerMain, *m_txtCtrlDirectoryMain, sbSizerDirToWatch));
+    dirNameFirst.reset(new zen::DirectoryName(*m_panelMainFolder, *m_dirPickerMain, *m_txtCtrlDirectoryMain, sbSizerDirToWatch));
 
 
 #ifdef FFS_WIN
-    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                        m_panelMain); //ownership passed to "this"
+    new MouseMoveWindow(*this); //ownership passed to "this"
 #endif
 
 
@@ -121,7 +120,7 @@ void MainDialog::OnQuit(wxCommandEvent& event)
 
 const wxString& MainDialog::lastConfigFileName()
 {
-    static wxString instance = ffs3::getConfigDir() + wxT("LastRun.ffs_real");
+    static wxString instance = zen::getConfigDir() + wxT("LastRun.ffs_real");
     return instance;
 }
 
@@ -129,9 +128,9 @@ const wxString& MainDialog::lastConfigFileName()
 void MainDialog::OnShowHelp(wxCommandEvent& event)
 {
 #ifdef FFS_WIN
-    ffs3::displayHelpEntry(wxT("html\\advanced\\RealtimeSync.html"));
+    zen::displayHelpEntry(wxT("html\\advanced\\RealtimeSync.html"));
 #elif defined FFS_LINUX
-    ffs3::displayHelpEntry(wxT("html/advanced/RealtimeSync.html"));
+    zen::displayHelpEntry(wxT("html/advanced/RealtimeSync.html"));
 #endif
 }
 
@@ -178,7 +177,7 @@ void MainDialog::OnStart(wxCommandEvent& event)
 
     Hide();
 
-    switch (rts::startDirectoryMonitor(currentCfg, ffs3::extractJobName(currentConfigFileName)))
+    switch (rts::startDirectoryMonitor(currentCfg, zen::extractJobName(currentConfigFileName)))
     {
         case rts::QUIT:
         {
@@ -222,7 +221,7 @@ void MainDialog::OnSaveConfig(wxCommandEvent& event)
             writeRealConfig(currentCfg, newFileName);
             setLastUsedConfig(newFileName);
         }
-        catch (const ffs3::FileError& error)
+        catch (const zen::FileError& error)
         {
             wxMessageBox(error.msg().c_str(), _("Error"), wxOK | wxICON_ERROR);
         }
@@ -283,14 +282,14 @@ void MainDialog::OnLoadConfig(wxCommandEvent& event)
 void MainDialog::setConfiguration(const xmlAccess::XmlRealConfig& cfg)
 {
     //clear existing folders
-    dirNameFirst->setName(Zstring());
+    dirNameFirst->setName(wxString());
 
     clearAddFolders();
 
     if (!cfg.directories.empty())
     {
         //fill top folder
-        dirNameFirst->setName(wxToZ(*cfg.directories.begin()));
+        dirNameFirst->setName(*cfg.directories.begin());
 
         //fill additional folders
         addFolder(std::vector<wxString>(cfg.directories.begin() + 1, cfg.directories.end()));
@@ -308,9 +307,9 @@ xmlAccess::XmlRealConfig MainDialog::getConfiguration()
 {
     xmlAccess::XmlRealConfig output;
 
-    output.directories.push_back(zToWx(dirNameFirst->getName()));
+    output.directories.push_back(dirNameFirst->getName());
     for (std::vector<DirectoryPanel*>::const_iterator i = dirNamesExtra.begin(); i != dirNamesExtra.end(); ++i)
-        output.directories.push_back(zToWx((*i)->getName()));
+        output.directories.push_back((*i)->getName());
 
     output.commandline = m_textCtrlCommand->GetValue();
     output.delay       = m_spinCtrlDelay->GetValue();;
@@ -321,10 +320,10 @@ xmlAccess::XmlRealConfig MainDialog::getConfiguration()
 
 void MainDialog::OnAddFolder(wxCommandEvent& event)
 {
-    const wxString topFolder = zToWx(dirNameFirst->getName());
+    const wxString topFolder = dirNameFirst->getName();
 
     //clear existing top folder first
-    dirNameFirst->setName(Zstring());
+    dirNameFirst->setName(wxString());
 
     std::vector<wxString> newFolders;
     newFolders.push_back(topFolder);
@@ -352,9 +351,9 @@ void MainDialog::OnRemoveTopFolder(wxCommandEvent& event)
 {
     if (dirNamesExtra.size() > 0)
     {
-        const wxString topDir = zToWx((*dirNamesExtra.begin())->getName());
+        const wxString topDir = (*dirNamesExtra.begin())->getName();
 
-        dirNameFirst->setName(wxToZ(topDir));
+        dirNameFirst->setName(topDir);
 
         removeAddFolder(0); //remove first of additional folders
     }
@@ -400,7 +399,7 @@ void MainDialog::addFolder(const std::vector<wxString>& newFolders, bool addFron
         newFolder->m_bpButtonRemoveFolder->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainDialog::OnRemoveFolder), NULL, this );
 
         //insert directory name
-        newFolder->setName(wxToZ(*i));
+        newFolder->setName(*i);
     }
 
     //set size of scrolled window

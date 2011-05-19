@@ -8,7 +8,7 @@
 #define UPDATEVERSION_H_INCLUDED
 
 
-namespace ffs3
+namespace zen
 {
 void checkForUpdateNow();
 

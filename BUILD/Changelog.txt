@@ -2,6 +2,32 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.17
+---------------
+Filter files by size
+Filter latest files by time span
+Launcher automatically selecting 32/64 bit executable on startup
+More detailed systray progress indicator
+New database format for <Automatic> mode: a full sync is suggested before upgrading
+Update database at individual file level (support for partial and aborted syncs)
+New translation file format
+Dynamically load existing translation files
+Correct translation plural forms
+Improved directory locking strategy
+Restructured installation package
+One button-click synchronization
+Fixed CSV character encoding
+Put CSV values in quotes if they contain semicolons
+Explicit button and settings for "Custom" sync variant -> old configurations need to be migrated
+Keyboard shortcuts also on middle grid
+Minimize progress dialog by clicking on taskbar
+Render invalid file dates correctly on GUI
+Process user-defined commands via shell execution (FFS and RTS)
+Allow base directory names having trailing whitespace
+Addded Ukrainian language
+Updated translation files
+
+
 Changelog v3.16
 ---------------
 Fixed file copy issues on SAMBA shares

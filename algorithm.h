@@ -10,9 +10,9 @@
 #include "file_hierarchy.h"
 
 
-namespace ffs3
+namespace zen
 {
-class BaseFilter;
+class SoftFilter;
 
 void swapGrids(const MainConfiguration& config, FolderComparison& folderCmp);
 
@@ -21,16 +21,17 @@ struct DeterminationProblem //callback
     virtual ~DeterminationProblem() {}
     virtual void reportWarning(const wxString& text) = 0;
 };
-void redetermineSyncDirection(const SyncConfiguration& config, BaseDirMapping& baseDirectory, DeterminationProblem* handler); //handler may be NULL
-void redetermineSyncDirection(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp, DeterminationProblem* handler);
+void redetermineSyncDirection(const SyncConfig& config, BaseDirMapping& baseDirectory, DeterminationProblem* handler); //handler may be NULL
+void redetermineSyncDirection(const MainConfiguration& mainCfg, FolderComparison& folderCmp, DeterminationProblem* handler);
 
 void setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsObj); //set new direction (recursively)
 
 bool allElementsEqual(const FolderComparison& folderCmp);
 
 //filtering
-void applyFiltering(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp); //full filter apply
-void addExcludeFiltering(const Zstring& excludeFilter, FolderComparison& folderCmp); //exclude additional entries only
+void applyFiltering     (FolderComparison& folderCmp, const MainConfiguration& mainCfg); //full filter apply
+void addExcludeFiltering(FolderComparison& folderCmp, const Zstring& excludeFilter);     //exclude additional entries only
+void addSoftFiltering   (BaseDirMapping& baseMap,     const SoftFilter& timeSizeFilter); //exclude additional entries only
 
 void setActiveStatus(bool newStatus, FolderComparison& folderCmp); //activate or deactivate all rows
 void setActiveStatus(bool newStatus, FileSystemObject& fsObj);     //activate or deactivate row: (not recursively anymore)

@@ -9,15 +9,10 @@
 
 //boost really should clean a bit up...
 #ifdef __MINGW32__
-#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
 #endif
 
 #include <boost/uuid/uuid_generators.hpp>
-
-#ifdef __MINGW32__
-#pragma GCC diagnostic pop
-#endif
 
 
 std::string util::generateGUID() //creates a 16 byte GUID

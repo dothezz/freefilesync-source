@@ -7,10 +7,12 @@
 #include "icon_buffer.h"
 #include <wx/msgdlg.h>
 #include <map>
+#include <vector>
 #include <queue>
 #include <set>
 #include <wx/log.h>
 #include "../shared/i18n.h"
+#include "../shared/boost_thread_wrap.h" //include <boost/thread.hpp>
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -22,11 +24,20 @@
 #endif
 
 
-using ffs3::IconBuffer;
+using namespace zen;
+
+
+
+const size_t BUFFER_SIZE_MAX = 800; //maximum number of icons to buffer
+
+//---------------------------------------------------------------------------------------------------
+typedef Zbase<Zchar, StorageDeepCopy> BasicString; //thread safe string class
+//avoid reference-counted objects for shared data: NOT THREADSAFE!!! (implicitly shared variable: ref-count)
+//---------------------------------------------------------------------------------------------------
 
 
 #ifdef FFS_WIN
-IconBuffer::BasicString IconBuffer::getFileExtension(const BasicString& filename)
+BasicString getFileExtension(const BasicString& filename)
 {
     const BasicString shortName = filename.AfterLast(Zchar('\\')); //warning: using windows file name separator!
 
@@ -37,7 +48,7 @@ IconBuffer::BasicString IconBuffer::getFileExtension(const BasicString& filename
 
 
 //test for extension for icons that physically have to be retrieved from disc
-bool IconBuffer::isPriceyExtension(const IconBuffer::BasicString& extension)
+bool isPriceyExtension(const BasicString& extension)
 {
     static std::set<BasicString, LessFilename> exceptions; //not thread-safe, but called from worker thread only!
     if (exceptions.empty())
@@ -57,7 +68,7 @@ bool IconBuffer::isPriceyExtension(const IconBuffer::BasicString& extension)
 
 
 //################################################################################################################################################
-class IconBuffer::IconHolder //handle HICON/GdkPixbuf ownership WITHOUT ref-counting to allow thread-safe usage (in contrast to wxIcon)
+class IconHolder //handle HICON/GdkPixbuf ownership WITHOUT ref-counting to allow thread-safe usage (in contrast to wxIcon)
 {
 public:
 #ifdef FFS_WIN
@@ -121,7 +132,88 @@ private:
 };
 
 
-const wxIcon& IconBuffer::getDirectoryIcon() //one folder icon should be sufficient...
+IconHolder getAssociatedIcon(const BasicString& filename)
+{
+#ifdef FFS_WIN
+    //despite what docu says about SHGetFileInfo() it can't handle all relative filenames, e.g. "\DirName"
+    //but no problem, directory formatting takes care that filenames are always absolute!
+
+    SHFILEINFO fileInfo = {}; //initialize hIcon -> fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
+    //bug report: https://sourceforge.net/tracker/?func=detail&aid=2768004&group_id=234430&atid=1093080
+
+    //NOTE: CoInitializeEx()/CoUninitialize() needs to be called for THIS thread!
+    ::SHGetFileInfo(filename.c_str(), //zen::removeLongPathPrefix(fileName), //::SHGetFileInfo() can't handle \\?\-prefix!
+                    0,
+                    &fileInfo,
+                    sizeof(fileInfo),
+                    SHGFI_ICON | SHGFI_SMALLICON);
+
+    return IconHolder(fileInfo.hIcon); //pass icon ownership (may be 0)
+
+#elif defined FFS_LINUX
+    //call Gtk::Main::init_gtkmm_internals() on application startup!!
+    try
+    {
+        Glib::RefPtr<Gio::File> fileObj = Gio::File::create_for_path(filename.c_str()); //never fails
+        Glib::RefPtr<Gio::FileInfo> fileInfo = fileObj->query_info(G_FILE_ATTRIBUTE_STANDARD_ICON);
+        if (fileInfo)
+        {
+            Glib::RefPtr<Gio::Icon> gicon = fileInfo->get_icon();
+            if (gicon)
+            {
+                Glib::RefPtr<Gtk::IconTheme> iconTheme = Gtk::IconTheme::get_default();
+                if (iconTheme)
+                {
+                    Gtk::IconInfo iconInfo = iconTheme->lookup_icon(gicon, IconBuffer::ICON_SIZE, Gtk::ICON_LOOKUP_USE_BUILTIN); //this may fail if icon is not installed on system
+                    if (iconInfo)
+                    {
+                        Glib::RefPtr<Gdk::Pixbuf> iconPixbuf = iconInfo.load_icon(); //render icon into Pixbuf
+                        if (iconPixbuf)
+                            return IconHolder(iconPixbuf->gobj_copy()); //copy and pass icon ownership (may be 0)
+                    }
+                }
+            }
+        }
+    }
+    catch (const Glib::Error&) {}
+
+    try //fallback: icon lookup may fail because some icons are currently not present on system
+    {
+        Glib::RefPtr<Gtk::IconTheme> iconTheme = Gtk::IconTheme::get_default();
+        if (iconTheme)
+        {
+            Glib::RefPtr<Gdk::Pixbuf> iconPixbuf = iconTheme->load_icon("misc", IconBuffer::ICON_SIZE, Gtk::ICON_LOOKUP_USE_BUILTIN);
+            if (!iconPixbuf)
+                iconPixbuf = iconTheme->load_icon("text-x-generic", IconBuffer::ICON_SIZE, Gtk::ICON_LOOKUP_USE_BUILTIN);
+            if (iconPixbuf)
+                return IconHolder(iconPixbuf->gobj_copy()); //copy and pass icon ownership (may be 0)
+        }
+    }
+    catch (const Glib::Error&) {}
+
+    //fallback fallback
+    return IconHolder();
+#endif
+}
+
+#ifdef FFS_WIN
+IconHolder getAssociatedIconByExt(const BasicString& extension)
+{
+    SHFILEINFO fileInfo = {}; //initialize hIcon -> fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
+
+    //no read-access to disk! determine icon by extension
+    ::SHGetFileInfo((Zstr("dummy.") + extension).c_str(),  //Windows Seven doesn't like this parameter to be without short name
+                    FILE_ATTRIBUTE_NORMAL,
+                    &fileInfo,
+                    sizeof(fileInfo),
+                    SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES);
+
+    return IconHolder(fileInfo.hIcon); //pass icon ownership (may be 0)
+}
+#endif
+
+
+const wxIcon& getDirectoryIcon() //one folder icon should be sufficient...
 {
     static wxIcon folderIcon;
 
@@ -147,14 +239,14 @@ const wxIcon& IconBuffer::getDirectoryIcon() //one folder icon should be suffici
         }
 
 #elif defined FFS_LINUX
-        folderIcon = getAssociatedIcon(Zstr("/usr/")).toWxIcon(); //all directories will look like "/usr/"
+        folderIcon = ::getAssociatedIcon(Zstr("/usr/")).toWxIcon(); //all directories will look like "/usr/"
 #endif
     }
     return folderIcon;
 }
 
 
-const wxIcon& IconBuffer::getFileIcon()      //in case one folder icon is sufficient...
+const wxIcon& getFileIcon()      //in case one folder icon is sufficient...
 {
     static wxIcon fileIcon;
 
@@ -185,9 +277,9 @@ const wxIcon& IconBuffer::getFileIcon()      //in case one folder icon is suffic
             Glib::RefPtr<Gtk::IconTheme> iconTheme = Gtk::IconTheme::get_default();
             if (iconTheme)
             {
-                Glib::RefPtr<Gdk::Pixbuf> iconPixbuf = iconTheme->load_icon("misc", ICON_SIZE, Gtk::ICON_LOOKUP_USE_BUILTIN);
+                Glib::RefPtr<Gdk::Pixbuf> iconPixbuf = iconTheme->load_icon("misc", IconBuffer::ICON_SIZE, Gtk::ICON_LOOKUP_USE_BUILTIN);
                 if (!iconPixbuf)
-                    iconPixbuf = iconTheme->load_icon("text-x-generic", ICON_SIZE, Gtk::ICON_LOOKUP_USE_BUILTIN);
+                    iconPixbuf = iconTheme->load_icon("text-x-generic", IconBuffer::ICON_SIZE, Gtk::ICON_LOOKUP_USE_BUILTIN);
                 if (iconPixbuf)
                     fileIcon.SetPixbuf(iconPixbuf->gobj_copy()); // transfer ownership!!
             }
@@ -199,114 +291,89 @@ const wxIcon& IconBuffer::getFileIcon()      //in case one folder icon is suffic
 }
 
 
-IconBuffer::IconHolder IconBuffer::getAssociatedIcon(const BasicString& filename)
-{
-#ifdef FFS_WIN
-    //despite what docu says about SHGetFileInfo() it can't handle all relative filenames, e.g. "\DirName"
-    //but no problem, directory formatting takes care that filenames are always absolute!
-
-    SHFILEINFO fileInfo = {}; //initialize hIcon -> fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
-    //bug report: https://sourceforge.net/tracker/?func=detail&aid=2768004&group_id=234430&atid=1093080
-
-    //NOTE: CoInitializeEx()/CoUninitialize() needs to be called for THIS thread!
-    ::SHGetFileInfo(filename.c_str(), //ffs3::removeLongPathPrefix(fileName), //::SHGetFileInfo() can't handle \\?\-prefix!
-                    0,
-                    &fileInfo,
-                    sizeof(fileInfo),
-                    SHGFI_ICON | SHGFI_SMALLICON);
-
-    return IconHolder(fileInfo.hIcon); //pass icon ownership (may be 0)
-
-#elif defined FFS_LINUX
-    //call Gtk::Main::init_gtkmm_internals() on application startup!!
-    try
-    {
-        Glib::RefPtr<Gio::File> fileObj = Gio::File::create_for_path(filename.c_str()); //never fails
-        Glib::RefPtr<Gio::FileInfo> fileInfo = fileObj->query_info(G_FILE_ATTRIBUTE_STANDARD_ICON);
-        if (fileInfo)
-        {
-            Glib::RefPtr<Gio::Icon> gicon = fileInfo->get_icon();
-            if (gicon)
-            {
-                Glib::RefPtr<Gtk::IconTheme> iconTheme = Gtk::IconTheme::get_default();
-                if (iconTheme)
-                {
-                    Gtk::IconInfo iconInfo = iconTheme->lookup_icon(gicon, ICON_SIZE, Gtk::ICON_LOOKUP_USE_BUILTIN); //this may fail if icon is not installed on system
-                    if (iconInfo)
-                    {
-                        Glib::RefPtr<Gdk::Pixbuf> iconPixbuf = iconInfo.load_icon(); //render icon into Pixbuf
-                        if (iconPixbuf)
-                            return IconHolder(iconPixbuf->gobj_copy()); //copy and pass icon ownership (may be 0)
-                    }
-                }
-            }
-        }
-    }
-    catch (const Glib::Error&) {}
-
-    try //fallback: icon lookup may fail because some icons are currently not present on system
-    {
-        Glib::RefPtr<Gtk::IconTheme> iconTheme = Gtk::IconTheme::get_default();
-        if (iconTheme)
-        {
-            Glib::RefPtr<Gdk::Pixbuf> iconPixbuf = iconTheme->load_icon("misc", ICON_SIZE, Gtk::ICON_LOOKUP_USE_BUILTIN);
-            if (!iconPixbuf)
-                iconPixbuf = iconTheme->load_icon("text-x-generic", ICON_SIZE, Gtk::ICON_LOOKUP_USE_BUILTIN);
-            if (iconPixbuf)
-                return IconHolder(iconPixbuf->gobj_copy()); //copy and pass icon ownership (may be 0)
-        }
-    }
-    catch (const Glib::Error&) {}
-
-    //fallback fallback
-    return IconHolder();
-#endif
-}
-
-#ifdef FFS_WIN
-IconBuffer::IconHolder IconBuffer::getAssociatedIconByExt(const BasicString& extension)
-{
-    SHFILEINFO fileInfo = {}; //initialize hIcon -> fix for weird error: SHGetFileInfo() might return successfully WITHOUT filling fileInfo.hIcon!!
-
-    //no read-access to disk! determine icon by extension
-    ::SHGetFileInfo((Zstr("dummy.") + extension).c_str(),  //Windows Seven doesn't like this parameter to be without short name
-                    FILE_ATTRIBUTE_NORMAL,
-                    &fileInfo,
-                    sizeof(fileInfo),
-                    SHGFI_ICON | SHGFI_SMALLICON | SHGFI_USEFILEATTRIBUTES);
-
-    return IconHolder(fileInfo.hIcon); //pass icon ownership (may be 0)
-}
-#endif
-
-
-namespace
-{
-//failure to initialize COM for each thread is a source of hard to reproduce bugs: https://sourceforge.net/tracker/?func=detail&aid=3160472&group_id=234430&atid=1093080
-struct ThreadInitializer
-{
-    ThreadInitializer()
-    {
-#ifdef FFS_WIN
-        ::CoInitializeEx(NULL, COINIT_MULTITHREADED);
-#endif
-    }
-
-    ~ThreadInitializer()
-    {
-#ifdef FFS_WIN
-        ::CoUninitialize();
-#endif
-    }
-};
-}
-
-
-class IconBuffer::WorkerThread
+//################################################################################################################################################
+class Buffer
 {
 public:
-    WorkerThread(IconBuffer& iconBuff);
-    ~WorkerThread();
+    //methods used by gui and worker thread
+    bool requestFileIcon(const Zstring& fileName, wxIcon* icon = NULL);
+
+    //methods used by worker thread
+    void insertIntoBuffer(const BasicString& entryName, const IconHolder& icon);
+
+private:
+    //---------------------------------------------------------------------------------------------------
+    typedef std::map<BasicString, IconHolder, LessFilename> IconDB; //entryName/icon -> ATTENTION: avoid ref-counting for this shared data structure!
+    typedef std::queue<BasicString> IconDbSequence; //entryName
+    //---------------------------------------------------------------------------------------------------
+
+    //---------------------- Shared Data -------------------------
+    boost::mutex lockIconDB;
+    IconDB         iconBuffer;      //use synchronisation when accessing this!
+    IconDbSequence iconSequence; //save sequence of buffer entry to delete oldest elements
+    //------------------------------------------------------------
+};
+
+
+bool Buffer::requestFileIcon(const Zstring& fileName, wxIcon* icon)
+{
+    boost::lock_guard<boost::mutex> dummy(lockIconDB);
+
+#ifdef FFS_WIN
+    //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
+    const BasicString extension    = getFileExtension(fileName.c_str());
+    const BasicString searchString = isPriceyExtension(extension) ? fileName.c_str() : extension.c_str();
+    IconDB::const_iterator i = iconBuffer.find(searchString);
+#elif defined FFS_LINUX
+    IconDB::const_iterator i = iconBuffer.find(fileName.c_str());
+#endif
+
+    if (i == iconBuffer.end())
+        return false;
+
+    if (icon != NULL)
+        *icon = i->second.toWxIcon();
+
+    return true;
+}
+
+
+void Buffer::insertIntoBuffer(const BasicString& entryName, const IconHolder& icon) //called by worker thread
+{
+    boost::lock_guard<boost::mutex> dummy(lockIconDB);
+
+    //thread saftey: icon uses ref-counting! But is NOT shared with main thread!
+    const std::pair<IconDB::iterator, bool> rc = iconBuffer.insert(std::make_pair(entryName, icon));
+    if (rc.second) //if insertion took place
+        iconSequence.push(entryName); //note: sharing Zstring with IconDB!!!
+
+    assert(iconBuffer.size() == iconSequence.size());
+
+    //remove elements if buffer becomes too big:
+    if (iconBuffer.size() > BUFFER_SIZE_MAX) //limit buffer size: critical because GDI resources are limited (e.g. 10000 on XP per process)
+    {
+        //remove oldest element
+        iconBuffer.erase(iconSequence.front());
+        iconSequence.pop();
+    }
+}
+
+
+//################################################################################################################################################
+class WorkerThread
+{
+public:
+    WorkerThread(Buffer& iconBuff) : iconBuffer(iconBuff)
+    {
+        threadObj = boost::thread(boost::ref(*this)); //localize all thread logic to this class!
+    }
+
+    ~WorkerThread()
+    {
+        setWorkload(std::vector<Zstring>()); //make sure interruption point is always reached!
+        threadObj.interrupt();
+        threadObj.join();
+    }
 
     void setWorkload(const std::vector<Zstring>& load); //(re-)set new workload of icons to be retrieved
 
@@ -326,28 +393,13 @@ private:
     } shared;
     //------------------------------------------------------------
 
-    IconBuffer& iconBuffer;
+    Buffer& iconBuffer;
 
     boost::thread threadObj;
 };
 
 
-IconBuffer::WorkerThread::WorkerThread(IconBuffer& iconBuff) :
-    iconBuffer(iconBuff)
-{
-    threadObj = boost::thread(boost::ref(*this)); //localize all thread logic to this class!
-}
-
-
-IconBuffer::WorkerThread::~WorkerThread()
-{
-    setWorkload(std::vector<Zstring>()); //make sure interruption point is always reached!
-    threadObj.interrupt();
-    threadObj.join();
-}
-
-
-void IconBuffer::WorkerThread::setWorkload(const std::vector<Zstring>& load) //(re-)set new workload of icons to be retrieved
+void WorkerThread::setWorkload(const std::vector<Zstring>& load) //(re-)set new workload of icons to be retrieved
 {
     {
         boost::lock_guard<boost::mutex> dummy(shared.mutex);
@@ -362,9 +414,16 @@ void IconBuffer::WorkerThread::setWorkload(const std::vector<Zstring>& load) //(
 }
 
 
-void IconBuffer::WorkerThread::operator()() //thread entry
+void WorkerThread::operator()() //thread entry
 {
-    ThreadInitializer dummy1;
+    //failure to initialize COM for each thread is a source of hard to reproduce bugs: https://sourceforge.net/tracker/?func=detail&aid=3160472&group_id=234430&atid=1093080
+#ifdef FFS_WIN
+    struct ThreadInitializer
+    {
+        ThreadInitializer () { ::CoInitializeEx(NULL, COINIT_MULTITHREADED); }
+        ~ThreadInitializer() { ::CoUninitialize(); }
+    } dummy1;
+#endif
 
     try
     {
@@ -395,7 +454,7 @@ void IconBuffer::WorkerThread::operator()() //thread entry
 }
 
 
-void IconBuffer::WorkerThread::doWork()
+void WorkerThread::doWork()
 {
     //do work: get the file icon.
     while (true)
@@ -416,27 +475,40 @@ void IconBuffer::WorkerThread::doWork()
         const BasicString extension = getFileExtension(fileName); //thread-safe: no sharing!
         if (isPriceyExtension(extension)) //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
         {
-            const IconHolder newIcon = IconBuffer::getAssociatedIcon(fileName);
+            const IconHolder newIcon = getAssociatedIcon(fileName);
             iconBuffer.insertIntoBuffer(fileName, newIcon);
         }
         else //no read-access to disk! determine icon by extension
         {
-            const IconHolder newIcon = IconBuffer::getAssociatedIconByExt(extension);
+            const IconHolder newIcon = getAssociatedIconByExt(extension);
             iconBuffer.insertIntoBuffer(extension, newIcon);
         }
 #elif defined FFS_LINUX
-        const IconHolder newIcon = IconBuffer::getAssociatedIcon(fileName);
+        const IconHolder newIcon = getAssociatedIcon(fileName);
         iconBuffer.insertIntoBuffer(fileName, newIcon);
 #endif
     }
 }
 
 
-//---------------------------------------------------------------------------------------------------
-class IconBuffer::IconDB : public std::map<BasicString, IconBuffer::IconHolder, LessFilename> {}; //entryName/icon -> ATTENTION: avoid ref-counting for this shared data structure!
-class IconBuffer::IconDbSequence : public std::queue<BasicString> {}; //entryName
-//---------------------------------------------------------------------------------------------------
+//#########################  redirect to impl  #####################################################
 
+struct IconBuffer::Pimpl
+{
+    Pimpl() : buffer(), worker(buffer) {} //might throw exceptions!
+
+    Buffer buffer;
+    WorkerThread worker;
+};
+
+
+IconBuffer::IconBuffer() : pimpl(new Pimpl) {}
+
+IconBuffer::~IconBuffer() {} //auto_ptr<>: keep destructor non-inline
+
+const wxIcon& IconBuffer::getDirectoryIcon() { return ::getDirectoryIcon(); }
+
+const wxIcon& IconBuffer::getFileIcon() { return ::getFileIcon(); }
 
 IconBuffer& IconBuffer::getInstance()
 {
@@ -444,62 +516,6 @@ IconBuffer& IconBuffer::getInstance()
     return instance;
 }
 
+bool IconBuffer::requestFileIcon(const Zstring& fileName, wxIcon* icon) { return pimpl->buffer.requestFileIcon(fileName, icon); }
 
-IconBuffer::IconBuffer() :
-    buffer(     new IconDB),
-    bufSequence(new IconDbSequence),
-    worker(     new WorkerThread(*this)) //might throw exceptions!
-{}
-
-
-IconBuffer::~IconBuffer() {} //auto_ptr<>: keep destructor non-inline
-
-
-bool IconBuffer::requestFileIcon(const Zstring& fileName, wxIcon* icon)
-{
-    boost::lock_guard<boost::mutex> dummy(lockIconDB);
-
-#ifdef FFS_WIN
-    //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
-    const BasicString extension = getFileExtension(fileName.c_str());
-    const BasicString searchString = isPriceyExtension(extension) ? fileName.c_str() : extension.c_str();
-    IconDB::const_iterator i = buffer->find(searchString);
-#elif defined FFS_LINUX
-    IconDB::const_iterator i = buffer->find(fileName.c_str());
-#endif
-
-    if (i == buffer->end())
-        return false;
-
-    if (icon != NULL)
-        *icon = i->second.toWxIcon();
-
-    return true;
-}
-
-
-void IconBuffer::setWorkload(const std::vector<Zstring>& load)
-{
-    worker->setWorkload(load);
-}
-
-
-void IconBuffer::insertIntoBuffer(const BasicString& entryName, const IconHolder& icon) //called by worker thread
-{
-    boost::lock_guard<boost::mutex> dummy(lockIconDB);
-
-    //thread saftey: icon uses ref-counting! But is NOT shared with main thread!
-    const std::pair<IconDB::iterator, bool> rc = buffer->insert(std::make_pair(entryName, icon));
-    if (rc.second) //if insertion took place
-        bufSequence->push(entryName); //note: sharing Zstring with IconDB!!!
-
-    assert(buffer->size() == bufSequence->size());
-
-    //remove elements if buffer becomes too big:
-    if (buffer->size() > BUFFER_SIZE_MAX) //limit buffer size: critical because GDI resources are limited (e.g. 10000 on XP per process)
-    {
-        //remove oldest element
-        buffer->erase(bufSequence->front());
-        bufSequence->pop();
-    }
-}
+void IconBuffer::setWorkload(const std::vector<Zstring>& load) { return pimpl->worker.setWorkload(load); }

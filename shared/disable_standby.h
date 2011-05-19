@@ -10,20 +10,17 @@ namespace util
 class DisableStandby
 {
 public:
+#ifdef FFS_WIN
     DisableStandby()
     {
-#ifdef FFS_WIN
         ::SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED /* | ES_AWAYMODE_REQUIRED*/ );
-#endif
     }
 
     ~DisableStandby()
     {
-#ifdef FFS_WIN
         ::SetThreadExecutionState(ES_CONTINUOUS);
-#endif
     }
-
+#endif
 };
 }
 

@@ -5,7 +5,7 @@
 // **************************************************************************
 //
 #include "watcher.h"
-#include "../shared/system_func.h"
+#include "../shared/last_error.h"
 #include "../shared/string_conv.h"
 #include "../shared/file_handling.h"
 #include "../shared/i18n.h"
@@ -28,7 +28,7 @@
 #include "../shared/file_traverser.h"
 #endif
 
-using namespace ffs3;
+using namespace zen;
 
 
 bool rts::updateUiIsAllowed()
@@ -57,7 +57,7 @@ void cleanUpChangeNotifications(const std::vector<HANDLE>* handles)
 }
 
 #elif defined FFS_LINUX
-class DirsOnlyTraverser : public ffs3::TraverseCallback
+class DirsOnlyTraverser : public zen::TraverseCallback
 {
 public:
     DirsOnlyTraverser(std::vector<std::string>& dirs) : m_dirs(dirs) {}
@@ -71,7 +71,7 @@ public:
     }
     virtual void onError(const wxString& errorText)
     {
-        throw ffs3::FileError(errorText);
+        throw zen::FileError(errorText);
     }
 
 private:
@@ -99,7 +99,7 @@ public:
         if (current - lastCheck >= UPDATE_INTERVAL)
         {
             lastCheck = current;
-            allExisting_ = std::find_if(dirList.begin(), dirList.end(), std::not1(std::ptr_fun(&ffs3::dirExists))) == dirList.end();
+            allExisting_ = std::find_if(dirList.begin(), dirList.end(), std::not1(std::ptr_fun(&zen::dirExists))) == dirList.end();
         }
 
         return allExisting_;
@@ -119,12 +119,12 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
     /*
     #warning cleanup
     {
-    const Zstring formattedDir = ffs3::getFormattedDirectoryName(dirNames.front());
+    const Zstring formattedDir = zen::getFormattedDirectoryName(dirNames.front());
 
         //SE_BACKUP_NAME and SE_RESTORE_NAME <- required by FILE_FLAG_BACKUP_SEMANTICS???
 
         //open the directory to watch....
-        HANDLE hDir = ::CreateFile(ffs3::applyLongPathPrefix(formattedDir).c_str(),
+        HANDLE hDir = ::CreateFile(zen::applyLongPathPrefix(formattedDir).c_str(),
                                    FILE_LIST_DIRECTORY,
                                    FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //leaving out last flag may prevent files to be deleted WITHIN monitored dir (http://qualapps.blogspot.com/2010/05/understanding-readdirectorychangesw_19.html)
                                    NULL,
@@ -139,7 +139,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
                 return CHANGE_DIR_MISSING;
 
             const wxString errorMessage = wxString(_("Could not initialize directory monitoring:")) + wxT("\n\"") + zToWx(formattedDir) + wxT("\"");
-            throw ffs3::FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+            throw zen::FileError(errorMessage + wxT("\n\n") + zen::getLastErrorFormatted());
         }
 
         Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hDir);
@@ -166,7 +166,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
                 NULL))         //__in_opt     LPOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine
         {
             const wxString errorMessage = wxString(_("Could not initialize directory monitoring:")) + wxT("\n\"") + zToWx(formattedDir) + wxT("\"");
-            throw ffs3::FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+            throw zen::FileError(errorMessage + wxT("\n\n") + zen::getLastErrorFormatted());
         }
         return CHANGE_DETECTED;
     }
@@ -181,7 +181,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
 
 
     if (dirNames.empty()) //pathological case, but check is needed nevertheless
-        throw ffs3::FileError(_("A directory input field is empty."));
+        throw zen::FileError(_("A directory input field is empty."));
 
     //detect when volumes are removed/are not available anymore
     WatchDirectories dirWatcher;
@@ -192,15 +192,15 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
 
     for (std::vector<Zstring>::const_iterator i = dirNames.begin(); i != dirNames.end(); ++i)
     {
-        const Zstring formattedDir = ffs3::getFormattedDirectoryName(*i);
+        const Zstring formattedDir = zen::getFormattedDirectoryName(*i);
 
         if (formattedDir.empty())
-            throw ffs3::FileError(_("A directory input field is empty."));
+            throw zen::FileError(_("A directory input field is empty."));
 
         dirWatcher.addForMonitoring(formattedDir);
 
         const HANDLE rv = ::FindFirstChangeNotification(
-                              ffs3::applyLongPathPrefix(formattedDir).c_str(), //__in  LPCTSTR lpPathName,
+                              zen::applyLongPathPrefix(formattedDir).c_str(), //__in  LPCTSTR lpPathName,
                               true,                           //__in  BOOL bWatchSubtree,
                               FILE_NOTIFY_CHANGE_FILE_NAME |
                               FILE_NOTIFY_CHANGE_DIR_NAME  |
@@ -215,14 +215,14 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
                 return CHANGE_DIR_MISSING;
 
             const wxString errorMessage = wxString(_("Could not initialize directory monitoring:")) + wxT("\n\"") + zToWx(formattedDir) + wxT("\"");
-            throw ffs3::FileError(errorMessage + wxT("\n\n") + ffs3::getLastErrorFormatted());
+            throw zen::FileError(errorMessage + wxT("\n\n") + zen::getLastErrorFormatted());
         }
 
         changeNotifications->push_back(rv);
     }
 
     if (changeNotifications->size() == 0)
-        throw ffs3::FileError(_("A directory input field is empty."));
+        throw zen::FileError(_("A directory input field is empty."));
 
 
     //detect user request for device removal (e.g. usb stick)
@@ -272,7 +272,7 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
         if (WAIT_OBJECT_0 <= rv && rv < WAIT_OBJECT_0 + changeNotifications->size())
             return CHANGE_DETECTED; //directory change detected
         else if (rv == WAIT_FAILED)
-            throw ffs3::FileError(wxString(_("Error when monitoring directories.")) + wxT("\n\n") + ffs3::getLastErrorFormatted());
+            throw zen::FileError(wxString(_("Error when monitoring directories.")) + wxT("\n\n") + zen::getLastErrorFormatted());
         //else if (rv == WAIT_TIMEOUT)
 
         if (!dirWatcher.allExisting()) //check for removed devices:
@@ -299,10 +299,10 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
     //add all subdirectories
     for (std::vector<Zstring>::const_iterator i = dirNames.begin(); i != dirNames.end(); ++i)
     {
-        const Zstring formattedDir = ffs3::getFormattedDirectoryName(*i);
+        const Zstring formattedDir = zen::getFormattedDirectoryName(*i);
 
         if (formattedDir.empty())
-            throw ffs3::FileError(_("A directory input field is empty."));
+            throw zen::FileError(_("A directory input field is empty."));
 
         dirWatcher.addForMonitoring(formattedDir);
 
@@ -312,11 +312,11 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
         try //get all subdirectories
         {
             DirsOnlyTraverser traverser(fullDirList);
-            ffs3::traverseFolder(formattedDir, false, traverser); //don't traverse into symlinks (analog to windows build)
+            zen::traverseFolder(formattedDir, false, traverser); //don't traverse into symlinks (analog to windows build)
         }
-        catch (const ffs3::FileError&)
+        catch (const zen::FileError&)
         {
-            if (!ffs3::dirExists(formattedDir)) //that's no good locking behavior, but better than nothing
+            if (!zen::dirExists(formattedDir)) //that's no good locking behavior, but better than nothing
                 return CHANGE_DIR_MISSING;
 
             throw;
@@ -347,17 +347,17 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
             }
             catch (const InotifyException& e)
             {
-                if (!ffs3::dirExists(i->c_str())) //that's no good locking behavior, but better than nothing
+                if (!zen::dirExists(i->c_str())) //that's no good locking behavior, but better than nothing
                     return CHANGE_DIR_MISSING;
 
                 const wxString errorMessage = wxString(_("Could not initialize directory monitoring:")) + wxT("\n\"") + zToWx(i->c_str()) + wxT("\"");
-                throw ffs3::FileError(errorMessage + wxT("\n\n") + zToWx(e.GetMessage().c_str()));
+                throw zen::FileError(errorMessage + wxT("\n\n") + zToWx(e.GetMessage().c_str()));
             }
         }
 
 
         if (notifications.GetWatchCount() == 0)
-            throw ffs3::FileError(_("A directory input field is empty."));
+            throw zen::FileError(_("A directory input field is empty."));
 
         while (true)
         {
@@ -375,11 +375,11 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
     }
     catch (const InotifyException& e)
     {
-        throw ffs3::FileError(wxString(_("Error when monitoring directories.")) + wxT("\n\n") + zToWx(e.GetMessage().c_str()));
+        throw zen::FileError(wxString(_("Error when monitoring directories.")) + wxT("\n\n") + zToWx(e.GetMessage().c_str()));
     }
     catch (const std::exception& e)
     {
-        throw ffs3::FileError(wxString(_("Error when monitoring directories.")) + wxT("\n\n") + zToWx(e.what()));
+        throw zen::FileError(wxString(_("Error when monitoring directories.")) + wxT("\n\n") + zToWx(e.what()));
     }
 #endif
 }
@@ -403,12 +403,12 @@ void rts::waitForMissingDirs(const std::vector<Zstring>& dirNames, WaitCallback*
             for (std::vector<Zstring>::const_iterator i = dirNames.begin(); i != dirNames.end(); ++i)
             {
                 //support specifying volume by name => call getFormattedDirectoryName() repeatedly
-                const Zstring formattedDir = ffs3::getFormattedDirectoryName(*i);
+                const Zstring formattedDir = zen::getFormattedDirectoryName(*i);
 
                 if (formattedDir.empty())
-                    throw ffs3::FileError(_("A directory input field is empty."));
+                    throw zen::FileError(_("A directory input field is empty."));
 
-                if (!ffs3::dirExists(formattedDir))
+                if (!zen::dirExists(formattedDir))
                 {
                     allExisting = false;
                     break;

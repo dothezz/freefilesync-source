@@ -4,47 +4,48 @@
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
-#ifndef SOFTFILTER_H_INCLUDED
-#define SOFTFILTER_H_INCLUDED
+#ifndef SOFT_FILTER_H_INCLUDED
+#define SOFT_FILTER_H_INCLUDED
 
-#include "../file_hierarchy.h"
-#include <wx/timer.h>
+#include <algorithm>
+#include <limits>
+#include "../structures.h"
+#include <wx/stopwatch.h>
+
+namespace zen
+{
 /*
 Semantics of SoftFilter:
 1. It potentially may match only one side => it MUST NOT be applied while traversing a single folder to avoid mismatches
 2. => it is applied after traversing and just marks rows, (NO deletions after comparison are allowed)
-3. => not relevant for <Automatic>-mode! ;)
-
--> SoftFilter is equivalent to a user temporarily (de-)selecting rows
+3. => equivalent to a user temporarily (de-)selecting rows -> not relevant for <Automatic>-mode! ;)
 */
-
-namespace ffs3
-{
 
 class SoftFilter
 {
 public:
-    SoftFilter(size_t timeWindow) :
-        timeWindow_(timeWindow),
-        currentTime(wxGetUTCTime()) {}
+    SoftFilter(size_t timeSpan, UnitTime unitTimeSpan,
+               size_t sizeMin,  UnitSize unitSizeMin,
+               size_t sizeMax,  UnitSize unitSizeMax);
 
-    //    typedef boost::shared_ptr<const SoftFilter> FilterRef; //always bound by design!
+    bool matchTime(zen::Int64 writeTime) const { return currentTime - writeTime <= timeSpan_; }
+    bool matchSize(zen::UInt64 fileSize) const { return sizeMin_ <= fileSize && fileSize <= sizeMax_; }
+    bool isNull() const; //filter is equivalent to NullFilter, but may be technically slower
 
-    bool passFilter(const FileMapping& fileMap) const;
-    bool passFilter(const DirMapping& dirMap) const;
+    //small helper method: merge two soft filters
+    friend SoftFilter combineFilters(const SoftFilter& first, const SoftFilter& second);
 
 private:
-    const size_t timeWindow_; //point in time from "now" (in seconds) for oldest modification date to be allowed
-    const long currentTime;   //number of seconds since GMT 00:00:00 Jan 1st 1970.
+    SoftFilter(zen::Int64  timeSpan,
+               zen::UInt64 sizeMin,
+               zen::UInt64 sizeMax);
+
+    zen::Int64  timeSpan_; //unit: seconds
+    zen::UInt64 sizeMin_;  //unit: bytes
+    zen::UInt64 sizeMax_;  //unit: bytes
+    zen::Int64  currentTime;
 };
-
-
-//SoftFilter::FilterRef combineFilters(const SoftFilter& first,
-//                                     const SoftFilter& second);
-//
-//
-//
-//
+}
 
 
 
@@ -62,22 +63,59 @@ private:
 
 
 
-//---------------Inline Implementation---------------------------------------------------
-inline
-bool SoftFilter::passFilter(const FileMapping& fileMap) const
+
+
+
+
+
+
+
+
+
+
+
+
+// ----------------------- implementation -----------------------
+namespace zen
 {
-    return (!fileMap.isEmpty<LEFT_SIDE>() &&
-            currentTime <= fileMap.getLastWriteTime<LEFT_SIDE>()  + timeWindow_) ||
-           (!fileMap.isEmpty<RIGHT_SIDE>() &&
-            currentTime <= fileMap.getLastWriteTime<RIGHT_SIDE>() + timeWindow_);
+inline
+SoftFilter::SoftFilter(size_t timeSpan, UnitTime unitTimeSpan,
+                       size_t sizeMin,  UnitSize unitSizeMin,
+                       size_t sizeMax,  UnitSize unitSizeMax) :
+    currentTime(wxGetUTCTime())
+{
+    zen::resolveUnits(timeSpan, unitTimeSpan,
+                      sizeMin, unitSizeMin,
+                      sizeMax, unitSizeMax,
+                      timeSpan_, //unit: seconds
+                      sizeMin_,   //unit: bytes
+                      sizeMax_);  //unit: bytes
 }
-
 
 inline
-bool SoftFilter::passFilter(const DirMapping& dirMap) const
+SoftFilter::SoftFilter(zen::Int64  timeSpan,
+                       zen::UInt64 sizeMin,
+                       zen::UInt64 sizeMax) :
+    timeSpan_(timeSpan),
+    sizeMin_ (sizeMin),
+    sizeMax_ (sizeMax),
+    currentTime(wxGetUTCTime()) {}
+
+inline
+SoftFilter combineFilters(const SoftFilter& first, const SoftFilter& second)
 {
-    return false;
+    return SoftFilter(std::min(first.timeSpan_, second.timeSpan_),
+                      std::max(first.sizeMin_,  second.sizeMin_),
+                      std::min(first.sizeMax_,  second.sizeMax_));
+}
+
+inline
+bool SoftFilter::isNull() const //filter is equivalent to NullFilter, but may be technically slower
+{
+    return timeSpan_ == std::numeric_limits<zen::Int64>::max() &&
+           sizeMin_  == 0U &&
+           sizeMax_  == std::numeric_limits<zen::UInt64>::max();
 }
 }
 
-#endif // SOFTFILTER_H_INCLUDED
+#endif // SOFT_FILTER_H_INCLUDED

@@ -9,7 +9,7 @@
 #include "../synchronization.h"
 #include <boost/bind.hpp>
 
-using namespace ffs3;
+using namespace zen;
 
 
 GridView::StatusCmpResult::StatusCmpResult() :
@@ -338,7 +338,7 @@ public:
 };
 
 
-template <bool ascending, ffs3::SelectedSide side>
+template <bool ascending, zen::SelectedSide side>
 class GridView::SortByRelName : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
@@ -366,7 +366,7 @@ private:
 };
 
 
-template <bool ascending, ffs3::SelectedSide side>
+template <bool ascending, zen::SelectedSide side>
 class GridView::SortByFileName : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
@@ -388,7 +388,7 @@ private:
 };
 
 
-template <bool ascending, ffs3::SelectedSide side>
+template <bool ascending, zen::SelectedSide side>
 class GridView::SortByFileSize : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
@@ -410,7 +410,7 @@ private:
 };
 
 
-template <bool ascending, ffs3::SelectedSide side>
+template <bool ascending, zen::SelectedSide side>
 class GridView::SortByDate : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
@@ -432,7 +432,7 @@ private:
 };
 
 
-template <bool ascending, ffs3::SelectedSide side>
+template <bool ascending, zen::SelectedSide side>
 class GridView::SortByExtension : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:

@@ -7,8 +7,6 @@
 #ifndef FILEIO_H_INCLUDED
 #define FILEIO_H_INCLUDED
 
-#include <wx/stream.h>
-
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #elif defined FFS_LINUX
@@ -18,7 +16,7 @@
 #include "zstring.h"
 #include "file_error.h"
 
-namespace ffs3
+namespace zen
 {
 //file IO optimized for sequential read/write accesses + better error reporting + long path support (following symlinks)
 
@@ -39,9 +37,7 @@ public:
     bool eof(); //end of file reached
 
 private:
-#ifdef FFS_WIN
     bool eofReached;
-#endif
     FileHandle fileHandle;
     const Zstring filename_;
 };
@@ -66,40 +62,6 @@ private:
     const Zstring filename_;
 };
 
-
-//############# wxWidgets stream adapter #############
-// can be used as base classes (have virtual destructors)
-class FileInputStream : public wxInputStream
-{
-public:
-    FileInputStream(const Zstring& filename) : //throw (FileError)
-        fileObj(filename) {}
-
-private:
-    virtual size_t OnSysRead(void* buffer, size_t bufsize) //throw (FileError)
-    {
-        return fileObj.read(buffer, bufsize);
-    }
-
-    FileInput fileObj;
-};
-
-
-class FileOutputStream : public wxOutputStream
-{
-public:
-    FileOutputStream(const Zstring& filename) : //throw (FileError)
-        fileObj(filename, FileOutput::ACC_OVERWRITE) {}
-
-private:
-    virtual size_t OnSysWrite(const void* buffer, size_t bufsize) //throw (FileError)
-    {
-        fileObj.write(buffer, bufsize);
-        return bufsize;
-    }
-
-    FileOutput fileObj;
-};
 }
 
 #endif // FILEIO_H_INCLUDED

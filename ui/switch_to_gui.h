@@ -10,7 +10,7 @@
 #include "../library/process_xml.h"
 
 
-namespace ffs3
+namespace zen
 {
 
 //switch from FreeFileSync Batch to GUI modus: opens a new FreeFileSync GUI session asynchronously

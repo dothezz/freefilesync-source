@@ -8,13 +8,13 @@
 #include <wx/window.h>
 #include <wx/app.h>
 
-using namespace ffs3;
+using namespace zen;
 
 
 bool AppMainWindow::mainWndActive = false;
 
 
-void ffs3::AppMainWindow::setMainWindow(wxWindow* window)
+void zen::AppMainWindow::setMainWindow(wxWindow* window)
 {
     wxTheApp->SetTopWindow(window);
     wxTheApp->SetExitOnFrameDelete(true);

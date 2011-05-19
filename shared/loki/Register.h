@@ -81,7 +81,7 @@ struct UnRegisterOnDeleteElement
 template<typename ElementList>
 struct RegisterOnCreateSet
         : GenScatterHierarchy<ElementList, Private::RegisterOnCreateElement>
-    {};
+{};
 
 ////////////////////////////////////////////////////////////////////////////////
 ///  \class UnRegisterOnDeleteSet
@@ -95,7 +95,7 @@ struct RegisterOnCreateSet
 template<typename ElementList>
 struct UnRegisterOnDeleteSet
         : GenScatterHierarchy<ElementList, Private::UnRegisterOnDeleteElement>
-    {};
+{};
 
 
 ////////////////////////////////////////////////////////////////////////////////

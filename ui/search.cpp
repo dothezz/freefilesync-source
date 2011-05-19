@@ -39,8 +39,7 @@ SearchDlg::SearchDlg(wxWindow& parentWindow, wxString& searchText, bool& respect
     respectCase_(respectCase)
 {
 #ifdef FFS_WIN
-    new ffs3::MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                              this); //ownership passed to "this"
+    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
     m_checkBoxMatchCase->SetValue(respectCase_);
@@ -265,13 +264,13 @@ void executeSearch(bool forceShowDialog,
 //###########################################################################################
 
 
-void ffs3::startFind(wxWindow& parentWindow, wxGrid& leftGrid, wxGrid& rightGrid, bool& respectCase) //Strg + F
+void zen::startFind(wxWindow& parentWindow, wxGrid& leftGrid, wxGrid& rightGrid, bool& respectCase) //Strg + F
 {
     executeSearch(true, respectCase, parentWindow, leftGrid, rightGrid);
 }
 
 
-void ffs3::findNext(wxWindow& parentWindow, wxGrid& leftGrid, wxGrid& rightGrid, bool& respectCase)  //F3
+void zen::findNext(wxWindow& parentWindow, wxGrid& leftGrid, wxGrid& rightGrid, bool& respectCase)  //F3
 {
     executeSearch(false, respectCase, parentWindow, leftGrid, rightGrid);
 }

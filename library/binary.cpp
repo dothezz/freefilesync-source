@@ -8,7 +8,7 @@
 #include "../shared/file_io.h"
 #include <vector>
 #include <wx/stopwatch.h>
-
+#include "../shared/int64.h"
 
 inline
 void setMinSize(std::vector<char>& buffer, size_t minSize)
@@ -66,7 +66,7 @@ private:
 }
 
 
-bool ffs3::filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback& callback)
+bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback& callback)
 {
     FileInput file1(filename1); //throw (FileError)
     FileInput file2(filename2); //throw (FileError)
@@ -76,7 +76,7 @@ bool ffs3::filesHaveSameContent(const Zstring& filename1, const Zstring& filenam
     static std::vector<char> memory1;
     static std::vector<char> memory2;
 
-    wxLongLong bytesCompared;
+    zen::UInt64 bytesCompared;
 
     wxLongLong lastDelayViolation = wxGetLocalTimeMillis();
 

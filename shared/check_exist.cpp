@@ -81,11 +81,13 @@ util::ResultExist checkExistence(const Zstring& objName, size_t timeout) //timeo
 
 util::ResultExist util::fileExists(const Zstring& filename, size_t timeout) //timeout in ms
 {
-    return ::checkExistence<ffs3::fileExists>(filename, timeout);
+    assert(!filename.empty());
+    return ::checkExistence<zen::fileExists>(filename, timeout);
 }
 
 
 util::ResultExist util::dirExists(const Zstring& dirname, size_t timeout) //timeout in ms
 {
-    return ::checkExistence<ffs3::dirExists>(dirname, timeout);
+    assert(!dirname.empty());
+    return ::checkExistence<zen::dirExists>(dirname, timeout);
 }

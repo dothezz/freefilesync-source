@@ -58,11 +58,12 @@ FILE_LIST+=ui/small_dlgs.cpp
 FILE_LIST+=library/process_xml.cpp
 FILE_LIST+=library/icon_buffer.cpp
 FILE_LIST+=library/statistics.cpp
-FILE_LIST+=library/filter.cpp
+FILE_LIST+=library/hard_filter.cpp
 FILE_LIST+=library/binary.cpp
 FILE_LIST+=library/db_file.cpp
 FILE_LIST+=library/dir_lock.cpp
-FILE_LIST+=shared/i18n_no_BOM.cpp
+FILE_LIST+=shared/i18n.cpp
+FILE_LIST+=shared/localization.cpp
 FILE_LIST+=shared/file_io.cpp
 FILE_LIST+=shared/dir_name.cpp
 FILE_LIST+=shared/guid.cpp
@@ -71,7 +72,7 @@ FILE_LIST+=shared/tinyxml/tinyxml.cpp
 FILE_LIST+=shared/tinyxml/tinyxmlerror.cpp
 FILE_LIST+=shared/tinyxml/tinyxmlparser.cpp
 FILE_LIST+=shared/global_func.cpp
-FILE_LIST+=shared/system_func.cpp
+FILE_LIST+=shared/last_error.cpp
 FILE_LIST+=shared/custom_tooltip.cpp
 FILE_LIST+=shared/file_handling.cpp
 FILE_LIST+=shared/resolve_path.cpp
@@ -98,11 +99,8 @@ DEP_LIST=$(foreach file, $(FILE_LIST), $(subst .cpp,.dep,$(file)))
 all: FreeFileSync
 
 init: 
-	if [ ! -d OBJ ]; then mkdir OBJ; fi
-	if [ ! -d OBJ/FFS_Release_GCC_Make ]; then mkdir OBJ/FFS_Release_GCC_Make; fi
-#remove byte ordering mark: needed by Visual C++ but an error with GCC
-	g++ -o OBJ/FFS_Release_GCC_Make/removeBOM tools/remove_BOM.cpp 
-	./OBJ/FFS_Release_GCC_Make/removeBOM shared/i18n.cpp shared/i18n_no_BOM.cpp
+	if [ ! -d ./OBJ ]; then mkdir OBJ; fi
+	if [ ! -d ./OBJ/FFS_Release_GCC_Make ]; then mkdir OBJ/FFS_Release_GCC_Make; fi
 
 %.dep : %.cpp 
 #strip path information
@@ -115,7 +113,6 @@ FreeFileSync: init $(DEP_LIST)
 clean:
 	rm -rf OBJ/FFS_Release_GCC_Make
 	rm -f BUILD/$(APPNAME)
-	rm -f shared/i18n_no_BOM.cpp
 
 install:
 	if [ ! -d $(BINDIR) ]; then mkdir -p $(BINDIR); fi

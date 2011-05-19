@@ -12,13 +12,13 @@
 
 //identify a file "create and delete"-operation as a file renaming!
 
-namespace ffs3
+namespace zen
 {
 typedef FileMapping* CreateOnLeft;
 typedef FileMapping* DeleteOnLeft;
 typedef FileMapping* CreateOnRight;
 typedef FileMapping* DeleteOnRight;
-void getRenameCandidates(ffs3::BaseDirMapping& baseMapping,                             //in
+void getRenameCandidates(zen::BaseDirMapping& baseMapping,                             //in
                          std::vector<std::pair<CreateOnLeft, DeleteOnLeft> >&   renameOnLeft,   //out
                          std::vector<std::pair<CreateOnRight, DeleteOnRight> >& renameOnRight); //out        throw()!
 }

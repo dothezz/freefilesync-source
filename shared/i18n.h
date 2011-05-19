@@ -4,55 +4,49 @@
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
-#ifndef MISC_H_INCLUDED
-#define MISC_H_INCLUDED
+#ifndef I18_N_HEADER_3843489325045
+#define I18_N_HEADER_3843489325045
 
 #include <wx/string.h>
 #include <vector>
 
-namespace ffs3
+namespace zen
 {
-struct LocInfoLine
+//implement handler to enable program wide localizations
+struct TranslationHandler
 {
-    int languageID;
-    wxString languageName;
-    wxString languageFile;
-    wxString translatorName;
-    wxString languageFlag;
+    virtual ~TranslationHandler() {}
+
+    virtual wxString thousandsSeparator() = 0;
+    virtual wxString translate(const wxString& text) = 0; //simple translation
+    virtual wxString translate(const wxString& singular, const wxString& plural, int n) = 0;
 };
 
-class LocalizationInfo
-{
-public:
-    static const std::vector<LocInfoLine>& get();
-
-private:
-    LocalizationInfo();
-    LocalizationInfo(const LocalizationInfo&);
-    LocalizationInfo& operator=(const LocalizationInfo&);
-
-    std::vector<LocInfoLine> locMapping;
-};
+void setTranslator(TranslationHandler* newHandler = NULL); //takes ownership
+TranslationHandler* getTranslator();
 
 
-//language independent global variables: just use operating system's default setting!
-wxString getThousandsSeparator();
-wxString getDecimalPoint();
 
-void setLanguage(int language);
-int getLanguage();
+inline wxString getThousandsSeparator() { return getTranslator() ? getTranslator()->thousandsSeparator() : wxT(","); };
 
-int retrieveSystemLanguage();
+inline wxString translate(const wxString& text) { return getTranslator() ? getTranslator()->translate(text) : text; }
 
-wxString translate(const wxString& original); //translate into currently selected language
-
-//translate plural forms: "%x day|%x days"
+//translate plural forms: "%x day" "%x days"
 //returns "%x day" if n == 1; "%x days" else for english language
-wxString translate(const wxString& original, int n);
+inline wxString translate(const wxString& singular, const wxString& plural, int n) { return getTranslator() ? getTranslator()->translate(singular, plural, n) : n == 1 ? singular : plural; }
+
+template <class T> inline
+wxString translate(const wxString& singular, const wxString& plural, T n)
+{
+    return translate(singular, plural, static_cast<int>(n % 1000000));
+}
 }
 
-//WXINTL_NO_GETTEXT_MACRO must be defined to deactivate wxWidgets underscore macro
-#define _(s) ffs3::translate(wxT(s))
-#define _P(s, n) ffs3::translate(wxT(s), n)
+#ifndef WXINTL_NO_GETTEXT_MACRO
+#error WXINTL_NO_GETTEXT_MACRO must be defined to deactivate wxWidgets underscore macro
+#endif
 
-#endif // MISC_H_INCLUDED
+#define _(s) zen::translate(wxT(s))
+#define _P(s, p, n) zen::translate(wxT(s), wxT(p), n)
+
+#endif //I18_N_HEADER_3843489325045

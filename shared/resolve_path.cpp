@@ -1,5 +1,4 @@
 #include "resolve_path.h"
-#include <boost/scoped_array.hpp>
 #include <wx/utils.h>
 #include <wx/datetime.h>
 #include "string_conv.h"
@@ -17,7 +16,7 @@
 #include "stdlib.h"
 #endif
 
-using namespace ffs3;
+using namespace zen;
 using namespace common;
 
 
@@ -26,11 +25,12 @@ namespace
 #ifdef FFS_WIN
 Zstring resolveRelativePath(const Zstring& relativeName, DWORD proposedBufferSize = 1000)
 {
-    boost::scoped_array<Zchar> fullPath(new Zchar[proposedBufferSize]);
+    std::vector<Zchar> fullPath(proposedBufferSize);
+
     const DWORD rv = ::GetFullPathName(
                          applyLongPathPrefix(relativeName).c_str(), //__in   LPCTSTR lpFileName,
                          proposedBufferSize, //__in   DWORD nBufferLength,
-                         fullPath.get(),     //__out  LPTSTR lpBuffer,
+                         &fullPath[0],       //__out  LPTSTR lpBuffer,
                          NULL);              //__out  LPTSTR *lpFilePart
     if (rv == 0 || rv == proposedBufferSize)
         //ERROR! Don't do anything
@@ -38,7 +38,7 @@ Zstring resolveRelativePath(const Zstring& relativeName, DWORD proposedBufferSiz
     if (rv > proposedBufferSize)
         return resolveRelativePath(relativeName, rv);
 
-    return fullPath.get();
+    return &fullPath[0];
 }
 
 #elif defined FFS_LINUX
@@ -149,7 +149,7 @@ void expandMacros(wxString& text)
 
 
 #ifdef FFS_LINUX
-class TraverseMedia : public ffs3::TraverseCallback
+class TraverseMedia : public zen::TraverseCallback
 {
 public:
     typedef std::map<Zstring, Zstring> DeviceList; //device name -> device path mapping
@@ -174,10 +174,9 @@ private:
 Zstring getVolumePath(const Zstring& volumeName) //empty string on error
 {
 #ifdef FFS_WIN
-    const size_t volGuidSize = 10000;
-    boost::scoped_array<wchar_t> volGuid(new wchar_t[volGuidSize]);
+    std::vector<wchar_t> volGuid(10000);
 
-    HANDLE hVol = ::FindFirstVolume(volGuid.get(), volGuidSize);
+    HANDLE hVol = ::FindFirstVolume(&volGuid[0], static_cast<DWORD>(volGuid.size()));
     if (hVol != INVALID_HANDLE_VALUE)
     {
         Loki::ScopeGuard dummy = Loki::MakeGuard(::FindVolumeClose, hVol);
@@ -185,19 +184,18 @@ Zstring getVolumePath(const Zstring& volumeName) //empty string on error
 
         do
         {
-            const size_t volNameSize = MAX_PATH + 1;
-            boost::scoped_array<wchar_t> volName(new wchar_t[volNameSize]);
+            std::vector<wchar_t> volName(MAX_PATH + 1);
 
-            if (::GetVolumeInformation(volGuid.get(), //__in_opt   LPCTSTR lpRootPathName,
-                                       volName.get(), //__out      LPTSTR lpVolumeNameBuffer,
-                                       volNameSize,   //__in       DWORD nVolumeNameSize,
-                                       NULL,          //__out_opt  LPDWORD lpVolumeSerialNumber,
-                                       NULL,          //__out_opt  LPDWORD lpMaximumComponentLength,
-                                       NULL,          //__out_opt  LPDWORD lpFileSystemFlags,
-                                       NULL,          //__out      LPTSTR lpFileSystemNameBuffer,
-                                       0))            //__in       DWORD nFileSystemNameSize
+            if (::GetVolumeInformation(&volGuid[0],    //__in_opt   LPCTSTR lpRootPathName,
+                                       &volName[0],    //__out      LPTSTR lpVolumeNameBuffer,
+                                       static_cast<DWORD>(volName.size()), //__in       DWORD nVolumeNameSize,
+                                       NULL,           //__out_opt  LPDWORD lpVolumeSerialNumber,
+                                       NULL,           //__out_opt  LPDWORD lpMaximumComponentLength,
+                                       NULL,           //__out_opt  LPDWORD lpFileSystemFlags,
+                                       NULL,           //__out      LPTSTR lpFileSystemNameBuffer,
+                                       0))             //__in       DWORD nFileSystemNameSize
             {
-                if (EqualFilename()(volumeName, Zstring(volName.get())))
+                if (EqualFilename()(volumeName, Zstring(&volName[0])))
                 {
                     //GetVolumePathNamesForVolumeName is not available for Windows 2000!
                     typedef	BOOL (WINAPI *GetVolumePathNamesForVolumeNameWFunc)(LPCWSTR lpszVolumeName,
@@ -210,23 +208,22 @@ Zstring getVolumePath(const Zstring& volumeName) //empty string on error
 
                     if (getVolumePathNamesForVolumeName != NULL)
                     {
-                        const DWORD volPathSize = 10000;
-                        boost::scoped_array<wchar_t> volPath(new wchar_t[volPathSize]);
+                        std::vector<wchar_t> volPath(10000);
 
                         DWORD returnedLen = 0;
-                        if (getVolumePathNamesForVolumeName(volGuid.get(), //__in   LPCTSTR lpszVolumeName,
-                                                            volPath.get(), //__out  LPTSTR lpszVolumePathNames,
-                                                            volPathSize,   //__in   DWORD cchBufferLength,
-                                                            &returnedLen)) //__out  PDWORD lpcchReturnLength
+                        if (getVolumePathNamesForVolumeName(&volGuid[0],    //__in   LPCTSTR lpszVolumeName,
+                                                            &volPath[0],     //__out  LPTSTR lpszVolumePathNames,
+                                                            static_cast<DWORD>(volPath.size()), //__in   DWORD cchBufferLength,
+                                                            &returnedLen))  //__out  PDWORD lpcchReturnLength
                         {
-                            return volPath.get(); //return first path name in double-null terminated list!
+                            return &volPath[0]; //return first path name in double-null terminated list!
                         }
                     }
-                    return volGuid.get(); //GUID looks ugly, but should be working correctly
+                    return &volGuid[0]; //GUID looks ugly, but should be working correctly
                 }
             }
         }
-        while (::FindNextVolume(hVol, volGuid.get(), volGuidSize));
+        while (::FindNextVolume(hVol, &volGuid[0], static_cast<DWORD>(volGuid.size())));
     }
 
 #elif defined FFS_LINUX
@@ -283,7 +280,7 @@ void expandVolumeName(Zstring& text)  // [volname]:\folder       [volname]\folde
 }
 
 
-Zstring ffs3::getFormattedDirectoryName(const Zstring& dirname)
+Zstring zen::getFormattedDirectoryName(const Zstring& dirname)
 {
     //Formatting is needed since functions expect the directory to end with '\' to be able to split the relative names.
     //note: don't combine directory formatting with wxFileName, as it doesn't respect //?/ - prefix!
@@ -295,7 +292,10 @@ Zstring ffs3::getFormattedDirectoryName(const Zstring& dirname)
 
     expandVolumeName(output);
 
-    output.Trim();
+    //remove leading/trailing whitespace
+    trim(output, true, false);
+    while (endsWith(output, Zstr(" "))) //don't remove all whitespace from right, e.g. 0xa0 may be used as part of dir name
+        output.resize(output.size() - 1);
 
     if (output.empty()) //an empty string will later be returned as "\"; this is not desired
         return Zstring();

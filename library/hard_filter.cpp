@@ -4,7 +4,7 @@
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
-#include "filter.h"
+#include "hard_filter.h"
 #include "../shared/zstring.h"
 #include <wx/string.h>
 #include <set>
@@ -16,47 +16,34 @@
 #include "../shared/loki/LokiTypeInfo.h"
 #include "../shared/serialize.h"
 
-using ffs3::BaseFilter;
-using ffs3::NameFilter;
+using namespace zen;
 
 
 //--------------------------------------------------------------------------------------------------
-bool BaseFilter::operator==(const BaseFilter& other) const
+bool zen::operator<(const HardFilter& lhs, const HardFilter& rhs)
 {
-    return !(*this < other) && !(other < *this);
-}
-
-
-bool BaseFilter::operator!=(const BaseFilter& other) const
-{
-    return !(*this == other);
-}
-
-
-bool BaseFilter::operator<(const BaseFilter& other) const
-{
-    if (Loki::TypeInfo(typeid(*this)) != typeid(other))
-        return Loki::TypeInfo(typeid(*this)) < typeid(other);
+    if (Loki::TypeInfo(typeid(lhs)) != typeid(rhs))
+        return Loki::TypeInfo(typeid(lhs)) < typeid(rhs);
 
     //this and other are same type:
-    return cmpLessSameType(other);
+    return lhs.cmpLessSameType(rhs);
 }
 
 
-void BaseFilter::saveFilter(wxOutputStream& stream) const //serialize derived object
+void HardFilter::saveFilter(wxOutputStream& stream) const //serialize derived object
 {
     //save type information
-    util::writeString(stream, uniqueClassIdentifier());
+    writeString(stream, uniqueClassIdentifier());
 
     //save actual object
     save(stream);
 }
 
 
-BaseFilter::FilterRef BaseFilter::loadFilter(wxInputStream& stream)
+HardFilter::FilterRef HardFilter::loadFilter(wxInputStream& stream)
 {
     //read type information
-    const Zstring uniqueClassId = util::readString(stream);
+    const Zstring uniqueClassId = readString<Zstring>(stream);
 
     //read actual object
     if (uniqueClassId == Zstr("NullFilter"))
@@ -83,10 +70,10 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
     //Linux DOES distinguish between upper/lower-case: nothing to do here
 #endif
 
-    static const Zstring sepAsterisk     = Zstring(common::FILE_NAME_SEPARATOR) + Zchar('*');
-    static const Zstring sepQuestionMark = Zstring(common::FILE_NAME_SEPARATOR) + Zchar('?');
-    static const Zstring asteriskSep     = Zstring(Zchar('*')) + common::FILE_NAME_SEPARATOR;
-    static const Zstring questionMarkSep = Zstring(Zchar('?')) + common::FILE_NAME_SEPARATOR;
+    const Zstring sepAsterisk     = Zstring(common::FILE_NAME_SEPARATOR) + Zchar('*');
+    const Zstring sepQuestionMark = Zstring(common::FILE_NAME_SEPARATOR) + Zchar('?');
+    const Zstring asteriskSep     = Zstring(Zstr('*')) + common::FILE_NAME_SEPARATOR;
+    const Zstring questionMarkSep = Zstring(Zstr('?')) + common::FILE_NAME_SEPARATOR;
 
     //--------------------------------------------------------------------------------------------------
     //add some syntactic sugar: handle beginning of filtername
@@ -143,14 +130,14 @@ const T* cStringFind(const T* str1, T ch) //strchr()
 }
 
 
-bool matchesMask(const Zchar* string, const Zchar* mask)
+bool matchesMask(const Zchar* str, const Zchar* mask)
 {
-    for (Zchar ch; (ch = *mask) != 0; ++mask, ++string)
+    for (Zchar ch; (ch = *mask) != 0; ++mask, ++str)
     {
         switch (ch)
         {
             case Zchar('?'):
-                if (*string == 0)
+                if (*str == 0)
                     return false;
                 break;
 
@@ -162,34 +149,34 @@ bool matchesMask(const Zchar* string, const Zchar* mask)
                     ch = *mask;
                 }
                 while (ch == Zchar('*') || ch == Zchar('?'));
-                //if match ends with '*':
+                //if mask ends with '*':
                 if (ch == 0)
                     return true;
 
                 ++mask;
-                while ((string = cStringFind(string, ch)) != NULL)
+                while ((str = cStringFind(str, ch)) != NULL)
                 {
-                    ++string;
-                    if (matchesMask(string, mask))
+                    ++str;
+                    if (matchesMask(str, mask))
                         return true;
                 }
                 return false;
 
             default:
-                if (*string != ch)
+                if (*str != ch)
                     return false;
         }
     }
-    return *string == 0;
+    return *str == 0;
 }
 
 //returns true if string matches at least the beginning of mask
 inline
-bool matchesMaskBegin(const Zchar* string, const Zchar* mask)
+bool matchesMaskBegin(const Zchar* str, const Zchar* mask)
 {
-    for (Zchar ch; (ch = *mask) != 0; ++mask, ++string)
+    for (Zchar ch; (ch = *mask) != 0; ++mask, ++str)
     {
-        if (*string == 0)
+        if (*str == 0)
             return true;
 
         switch (ch)
@@ -201,11 +188,11 @@ bool matchesMaskBegin(const Zchar* string, const Zchar* mask)
                 return true;
 
             default:
-                if (*string != ch)
+                if (*str != ch)
                     return false;
         }
     }
-    return *string == 0;
+    return *str == 0;
 }
 }
 
@@ -244,11 +231,18 @@ std::vector<Zstring> compoundStringToFilter(const Zstring& filterString)
     //delimiters may be ';' or '\n'
     std::vector<Zstring> output;
 
-    const std::vector<Zstring> filterPreProcessing = filterString.Split(Zchar(';'));
-    for (std::vector<Zstring>::const_iterator i = filterPreProcessing.begin(); i != filterPreProcessing.end(); ++i)
+    const std::vector<Zstring> blocks = filterString.Split(Zchar(';'));
+    for (std::vector<Zstring>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
     {
-        const std::vector<Zstring> newEntries = i->Split(Zchar('\n'));
-        output.insert(output.end(), newEntries.begin(), newEntries.end());
+        const std::vector<Zstring> blocks2 = i->Split(Zchar('\n'));
+
+        for (std::vector<Zstring>::const_iterator j = blocks2.begin(); j != blocks2.end(); ++j)
+        {
+            Zstring entry = *j;
+            entry.Trim();
+            if (!entry.empty())
+                output.push_back(entry);
+        }
     }
 
     return output;
@@ -327,7 +321,7 @@ bool NameFilter::isNull() const
 }
 
 
-bool NameFilter::cmpLessSameType(const BaseFilter& other) const
+bool NameFilter::cmpLessSameType(const HardFilter& other) const
 {
     assert(typeid(*this) == typeid(other)); //always given in this context!
 
@@ -357,15 +351,15 @@ Zstring NameFilter::uniqueClassIdentifier() const
 
 void NameFilter::save(wxOutputStream& stream) const
 {
-    util::writeString(stream, includeFilterTmp);
-    util::writeString(stream, excludeFilterTmp);
+    writeString(stream, includeFilterTmp);
+    writeString(stream, excludeFilterTmp);
 }
 
 
-BaseFilter::FilterRef NameFilter::load(wxInputStream& stream) //"constructor"
+HardFilter::FilterRef NameFilter::load(wxInputStream& stream) //"constructor"
 {
-    const Zstring include = util::readString(stream);
-    const Zstring exclude = util::readString(stream);
+    const Zstring include = readString<Zstring>(stream);
+    const Zstring exclude = readString<Zstring>(stream);
 
     return FilterRef(new NameFilter(include, exclude));
 }

@@ -5,9 +5,7 @@
 // **************************************************************************
 //
 #include "dll_loader.h"
-#include <wx/msw/wrapwin.h> //includes "windows.h"
 #include <map>
-#include <cassert>
 
 namespace
 {

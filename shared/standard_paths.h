@@ -10,16 +10,16 @@
 #include <wx/string.h>
 
 
-namespace ffs3
+namespace zen
 {
 //------------------------------------------------------------------------------
 //global program directories
 //------------------------------------------------------------------------------
-const wxString& getBinaryDir();   //directory containing executable WITH path separator at end
-const wxString& getResourceDir(); //resource directory WITH path separator at end
-const wxString& getConfigDir();   //config directory WITH path separator at end
+wxString getResourceDir(); //resource directory WITH path separator at end
+wxString getConfigDir();   //config directory WITH path separator at end
 //------------------------------------------------------------------------------
 
+wxString getLauncher();    //full path to application launcher C:\...\FreeFileSync.exe
 bool isPortableVersion();
 }
 

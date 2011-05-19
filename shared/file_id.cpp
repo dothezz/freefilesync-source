@@ -20,7 +20,7 @@ namespace
 {
 template <class T>
 inline
-std::string numberToString(T number)
+std::string numberToBytes(T number)
 {
     const char* rawBegin = reinterpret_cast<const char*>(&number);
     return std::string(rawBegin, rawBegin + sizeof(number));
@@ -38,9 +38,8 @@ std::string util::retrieveFileID(const Zstring& filename)
 
 
     //privilege SE_BACKUP_NAME doesn't seem to be required here at all
-    //note: setting privileges requires admin rights!
 
-    const HANDLE hFile = ::CreateFile(ffs3::applyLongPathPrefix(filename).c_str(),
+    const HANDLE hFile = ::CreateFile(zen::applyLongPathPrefix(filename).c_str(),
                                       0,
                                       FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                                       NULL,
@@ -55,9 +54,9 @@ std::string util::retrieveFileID(const Zstring& filename)
         BY_HANDLE_FILE_INFORMATION fileInfo = {};
         if (::GetFileInformationByHandle(hFile, &fileInfo))
         {
-            fileID += numberToString(fileInfo.dwVolumeSerialNumber);
-            fileID += numberToString(fileInfo.nFileIndexHigh);
-            fileID += numberToString(fileInfo.nFileIndexLow);
+            fileID += numberToBytes(fileInfo.dwVolumeSerialNumber);
+            fileID += numberToBytes(fileInfo.nFileIndexHigh);
+            fileID += numberToBytes(fileInfo.nFileIndexLow);
         }
     }
 
@@ -65,8 +64,8 @@ std::string util::retrieveFileID(const Zstring& filename)
     struct stat fileInfo = {};
     if (::lstat(filename.c_str(), &fileInfo) == 0) //lstat() does not follow symlinks
     {
-        fileID += numberToString(fileInfo.st_dev);
-        fileID += numberToString(fileInfo.st_ino);
+        fileID += numberToBytes(fileInfo.st_dev);
+        fileID += numberToBytes(fileInfo.st_ino);
     }
 #endif
 

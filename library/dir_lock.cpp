@@ -4,12 +4,11 @@
 #include <wx/timer.h>
 #include <wx/log.h>
 #include <wx/msgdlg.h>
-#include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 #include "../shared/string_conv.h"
 #include "../shared/i18n.h"
-#include "../shared/system_func.h"
+#include "../shared/last_error.h"
 #include "../shared/boost_thread_wrap.h" //include <boost/thread.hpp>
 #include "../shared/loki/ScopeGuard.h"
 #include "../shared/system_constants.h"
@@ -18,6 +17,7 @@
 #include "../shared/assert_static.h"
 #include "../shared/serialize.h"
 #include "../shared/build_info.h"
+#include "../shared/int64.h"
 
 #ifdef FFS_WIN
 #include <tlhelp32.h>
@@ -31,7 +31,7 @@
 #include <unistd.h>
 #endif
 
-using namespace ffs3;
+using namespace zen;
 using namespace std::rel_ops;
 
 
@@ -153,16 +153,18 @@ void deleteLockFile(const Zstring& filename) //throw (FileError)
 }
 
 
-wxULongLong getLockFileSize(const Zstring& filename) //throw (FileError, ErrorNotExisting)
+zen::UInt64 getLockFileSize(const Zstring& filename) //throw (FileError, ErrorNotExisting)
 {
 #ifdef FFS_WIN
-    WIN32_FIND_DATA fileMetaData;
-    const HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(filename).c_str(), &fileMetaData);
+    WIN32_FIND_DATA fileInfo = {};
+    const HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(filename).c_str(), &fileInfo);
     if (searchHandle == INVALID_HANDLE_VALUE)
     {
         const DWORD lastError = ::GetLastError();
-        const wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(filename) + wxT("\"")  +
-                                      wxT("\n\n") + getLastErrorFormatted(lastError);
+
+        wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(filename) + wxT("\"");
+        errorMessage += wxT("\n\n") + getLastErrorFormatted(lastError);
+
         if (lastError == ERROR_FILE_NOT_FOUND ||
             lastError == ERROR_PATH_NOT_FOUND)
             throw ErrorNotExisting(errorMessage);
@@ -172,22 +174,24 @@ wxULongLong getLockFileSize(const Zstring& filename) //throw (FileError, ErrorNo
 
     ::FindClose(searchHandle);
 
-    return wxULongLong(fileMetaData.nFileSizeHigh, fileMetaData.nFileSizeLow);
+    return zen::UInt64(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
 
 #elif defined FFS_LINUX
-    struct stat fileInfo;
+    struct stat fileInfo = {};
     if (::stat(filename.c_str(), &fileInfo) != 0) //follow symbolic links
     {
         const int lastError = errno;
-        const wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(filename) + wxT("\"") +
-                                      wxT("\n\n") + getLastErrorFormatted(lastError);
+
+        wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(filename) + wxT("\"");
+        errorMessage += wxT("\n\n") + getLastErrorFormatted(lastError);
+
         if (lastError == ENOENT)
             throw ErrorNotExisting(errorMessage);
         else
             throw FileError(errorMessage);
     }
 
-    return fileInfo.st_size;
+    return zen::UInt64(fileInfo.st_size);
 #endif
 }
 
@@ -208,7 +212,7 @@ namespace
 inline
 std::string readString(wxInputStream& stream)  //throw (std::exception)
 {
-    const boost::uint32_t strLength = util::readNumber<boost::uint32_t>(stream);
+    const boost::uint32_t strLength = readPOD<boost::uint32_t>(stream);
     std::string output;
     if (strLength > 0)
     {
@@ -223,7 +227,7 @@ inline
 void writeString(wxOutputStream& stream, const std::string& str)  //write string to filestream
 {
     const boost::uint32_t strLength = static_cast<boost::uint32_t>(str.length());
-    util::writeNumber<boost::uint32_t>(stream, strLength);
+    writePOD<boost::uint32_t>(stream, strLength);
     stream.Write(str.c_str(), strLength);
 }
 
@@ -257,13 +261,13 @@ struct LockInformation
     {
         char formatDescr[sizeof(LOCK_FORMAT_DESCR)] = {};
         stream.Read(formatDescr, sizeof(LOCK_FORMAT_DESCR));                  //file format header
-        const int lockFileVersion = util::readNumber<boost::int32_t>(stream); //
+        const int lockFileVersion = readPOD<boost::int32_t>(stream); //
         (void)lockFileVersion;
 
         //some format checking here?
 
         lockId = readString(stream);
-        procDescr.processId  = static_cast<ProcessId>(util::readNumber<boost::uint64_t>(stream)); //possible loss of precision (32/64 bit process) covered by buildId
+        procDescr.processId  = static_cast<ProcessId>(readPOD<boost::uint64_t>(stream)); //possible loss of precision (32/64 bit process) covered by buildId
         procDescr.computerId = readString(stream);
     }
 
@@ -272,10 +276,10 @@ struct LockInformation
         assert_static(sizeof(ProcessId) <= sizeof(boost::uint64_t)); //ensure portability
 
         stream.Write(LOCK_FORMAT_DESCR, sizeof(LOCK_FORMAT_DESCR));
-        util::writeNumber<boost::int32_t>(stream, LOCK_FORMAT_VER);
+        writePOD<boost::int32_t>(stream, LOCK_FORMAT_VER);
 
         writeString(stream, lockId);
-        util::writeNumber<boost::uint64_t>(stream, procDescr.processId);
+        writePOD<boost::uint64_t>(stream, procDescr.processId);
         writeString(stream, procDescr.computerId);
     }
 
@@ -337,7 +341,7 @@ ProcessStatus getProcessStatus(const LockInformation::ProcessDescription& procDe
     if (procDescr.processId <= 0 || procDescr.processId >= 65536)
         return PROC_STATUS_NO_IDEA; //invalid process id
 
-    return ffs3::dirExists(Zstr("/proc/") + Zstring::fromNumber(procDescr.processId)) ? PROC_STATUS_RUNNING : PROC_STATUS_NOT_RUNNING;
+    return zen::dirExists(Zstr("/proc/") + Zstring::fromNumber(procDescr.processId)) ? PROC_STATUS_RUNNING : PROC_STATUS_NOT_RUNNING;
 #endif
 }
 
@@ -377,13 +381,13 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
         const LockInformation lockInfo = retrieveLockInfo(lockfilename); //throw (FileError, ErrorNotExisting)
         const bool lockOwnderDead = getProcessStatus(lockInfo.procDescr) == PROC_STATUS_NOT_RUNNING; //convenience optimization: if we know the owning process crashed, we needn't wait DETECT_EXITUS_INTERVAL sec
 
-        wxULongLong fileSizeOld;
+        zen::UInt64 fileSizeOld;
         wxLongLong lockSilentStart = wxGetLocalTimeMillis();
 
         while (true)
         {
-            const wxULongLong fileSizeNew = ::getLockFileSize(lockfilename); //throw (FileError, ErrorNotExisting)
-            const wxLongLong  currentTime  = wxGetLocalTimeMillis();
+            const zen::UInt64 fileSizeNew = ::getLockFileSize(lockfilename); //throw (FileError, ErrorNotExisting)
+            wxLongLong currentTime = wxGetLocalTimeMillis();
 
             if (fileSizeNew != fileSizeOld)
             {
@@ -421,10 +425,10 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
                 {
                     if (currentTime - lockSilentStart > EMIT_LIFE_SIGN_INTERVAL) //one signal missed: it's likely this is an abandoned lock:
                     {
-                        long remainingSeconds = ((DETECT_EXITUS_INTERVAL - (wxGetLocalTimeMillis() - lockSilentStart)) / 1000).GetLo();
-                        remainingSeconds =  std::max(0L, remainingSeconds);
+                        long remainingSeconds = ((DETECT_EXITUS_INTERVAL - (wxGetLocalTimeMillis() - lockSilentStart)) / 1000).ToLong();
+                        remainingSeconds = std::max(0L, remainingSeconds);
 
-                        Zstring remSecMsg = wxToZ(_("%x sec"));
+                        Zstring remSecMsg = wxToZ(_P("1 sec", "%x sec", remainingSeconds));
                         remSecMsg.Replace(Zstr("%x"), Zstring::fromNumber(remainingSeconds));
                         callback->reportInfo(infoMsg + Zstr(" ") + remSecMsg);
                     }
@@ -467,8 +471,10 @@ bool tryLock(const Zstring& lockfilename) //throw (FileError)
         if (::GetLastError() == ERROR_FILE_EXISTS)
             return false;
         else
-            throw FileError(wxString(_("Error setting directory lock:")) + wxT("\n\"") + zToWx(lockfilename) + wxT("\"") +
-                            wxT("\n\n") + getLastErrorFormatted());
+        {
+            wxString errorMessage = wxString(_("Error setting directory lock:")) + wxT("\n\"") + zToWx(lockfilename) + wxT("\"");
+            throw FileError(errorMessage + wxT("\n\n") + getLastErrorFormatted());
+        }
     }
     ::CloseHandle(fileHandle);
 
@@ -481,8 +487,11 @@ bool tryLock(const Zstring& lockfilename) //throw (FileError)
         if (errno == EEXIST)
             return false;
         else
-            throw FileError(wxString(_("Error setting directory lock:")) + wxT("\n\"") + zToWx(lockfilename) + wxT("\"") +
-                            wxT("\n\n") + getLastErrorFormatted());
+        {
+            wxString errorMessage = wxString(_("Error setting directory lock:")) + wxT("\n\"") + zToWx(lockfilename) + wxT("\"");
+            throw FileError(errorMessage + wxT("\n\n") + getLastErrorFormatted());
+        }
+
     }
     ::close(fileHandle);
 #endif

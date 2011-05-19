@@ -7,24 +7,58 @@
 #ifndef SERIALIZE_H_INCLUDED
 #define SERIALIZE_H_INCLUDED
 
-#include "zstring.h"
-#include <wx/stream.h>
+#include <vector>
 #include "file_error.h"
-#include <boost/scoped_array.hpp>
+#include <wx/stream.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/cstdint.hpp>
+#include "file_io.h"
 
-namespace util
+
+namespace zen
 {
-template <class T>
-T readNumber(wxInputStream& stream);
+//unchecked, unformatted serialization
+template <class T> T    readPOD (wxInputStream&  stream);
+template <class T> void writePOD(wxOutputStream& stream, const T& pod);
 
-template <class T>
-void writeNumber(wxOutputStream& stream, T number);
+template <class S> S    readString (wxInputStream&  stream);
+template <class S> void writeString(wxOutputStream& stream, const S& str);
 
 
-Zstring readString(wxInputStream& stream);
-void writeString(wxOutputStream& stream, const Zstring& str);
+//############# wxWidgets stream adapter #############
+// can be used as base classes (have virtual destructors)
+class FileInputStream : public wxInputStream
+{
+public:
+    FileInputStream(const Zstring& filename) : //throw (FileError)
+        fileObj(filename) {}
+
+private:
+    virtual size_t OnSysRead(void* buffer, size_t bufsize)
+    {
+        return fileObj.read(buffer, bufsize); //throw (FileError)
+    }
+
+    zen::FileInput fileObj;
+};
+
+
+class FileOutputStream : public wxOutputStream
+{
+public:
+    FileOutputStream(const Zstring& filename) : //throw (FileError)
+        fileObj(filename, zen::FileOutput::ACC_OVERWRITE) {}
+
+private:
+    virtual size_t OnSysWrite(const void* buffer, size_t bufsize)
+    {
+        fileObj.write(buffer, bufsize); //throw (FileError)
+        return bufsize;
+    }
+
+    zen::FileOutput fileObj;
+};
+
 
 
 class ReadInputStream //throw (FileError)
@@ -35,7 +69,8 @@ protected:
     template <class T>
     T readNumberC() const; //throw (FileError), checked read operation
 
-    Zstring readStringC() const; //throw (FileError), checked read operation
+    template <class S>
+    S readStringC() const; //throw (FileError), checked read operation
 
     typedef boost::shared_ptr<std::vector<char> > CharArray; //there's no guarantee std::string has a ref-counted implementation... so use this "thing"
     CharArray readArrayC() const; //throw (FileError)
@@ -62,7 +97,8 @@ protected:
     template <class T>
     void writeNumberC(T number) const; //throw (FileError), checked write operation
 
-    void writeStringC(const Zstring& str) const; //throw (FileError), checked write operation
+    template <class S>
+    void writeStringC(const S& str) const; //throw (FileError), checked write operation
 
     void writeArrayC(const std::vector<char>& buffer) const; //throw (FileError)
 
@@ -110,46 +146,50 @@ private:
 //---------------Inline Implementation---------------------------------------------------
 template <class T>
 inline
-T readNumber(wxInputStream& stream)
+T readPOD(wxInputStream& stream)
 {
-    T result = 0;
-    stream.Read(&result, sizeof(T));
-    return result;
+    T pod = 0;
+    stream.Read(reinterpret_cast<char*>(&pod), sizeof(T));
+    return pod;
 }
 
 
 template <class T>
 inline
-void writeNumber(wxOutputStream& stream, T number)
+void writePOD(wxOutputStream& stream, const T& pod)
 {
-    stream.Write(&number, sizeof(T));
+    stream.Write(reinterpret_cast<const char*>(&pod), sizeof(T));
 }
 
 
+template <class S>
 inline
-Zstring readString(wxInputStream& stream)
+S readString(wxInputStream& stream)
 {
-    const boost::uint32_t strLength = readNumber<boost::uint32_t>(stream);
+    typedef typename S::value_type CharType;
+
+    const boost::uint32_t strLength = readPOD<boost::uint32_t>(stream);
     if (strLength <= 1000)
     {
-        Zchar buffer[1000];
-        stream.Read(buffer, sizeof(Zchar) * strLength);
-        return Zstring(buffer, strLength);
+        CharType buffer[1000];
+        stream.Read(buffer, sizeof(CharType) * strLength);
+        return S(buffer, strLength);
     }
     else
     {
-        boost::scoped_array<Zchar> buffer(new Zchar[strLength]);
-        stream.Read(buffer.get(), sizeof(Zchar) * strLength);
-        return Zstring(buffer.get(), strLength);
+        std::vector<CharType> buffer(strLength); //throw (std::bad_alloc)
+        stream.Read(&buffer[0], sizeof(CharType) * strLength);
+        return S(&buffer[0], strLength);
     }
 }
 
 
+template <class S>
 inline
-void writeString(wxOutputStream& stream, const Zstring& str)
+void writeString(wxOutputStream& stream, const S& str)
 {
-    writeNumber<boost::uint32_t>(stream, static_cast<boost::uint32_t>(str.length()));
-    stream.Write(str.c_str(), sizeof(Zchar) * str.length());
+    writePOD(stream, static_cast<boost::uint32_t>(str.length()));
+    stream.Write(str.c_str(), sizeof(typename S::value_type) * str.length());
 }
 
 
@@ -165,17 +205,26 @@ template <class T>
 inline
 T ReadInputStream::readNumberC() const //checked read operation
 {
-    T output = readNumber<T>(stream_);
+    T output = readPOD<T>(stream_);
     check();
     return output;
 }
 
 
+template <class S>
 inline
-Zstring ReadInputStream::readStringC() const //checked read operation
+S ReadInputStream::readStringC() const //checked read operation
 {
-    Zstring output = readString(stream_);
-    check();
+    S output;
+    try
+    {
+        output = readString<S>(stream_); //throw (std::bad_alloc)
+        check();
+    }
+    catch (std::exception&)
+    {
+        throwReadError();
+    }
     return output;
 }
 
@@ -184,13 +233,14 @@ template <class T>
 inline
 void WriteOutputStream::writeNumberC(T number) const //checked write operation
 {
-    writeNumber<T>(stream_, number);
+    writePOD<T>(stream_, number);
     check();
 }
 
 
+template <class S>
 inline
-void WriteOutputStream::writeStringC(const Zstring& str) const //checked write operation
+void WriteOutputStream::writeStringC(const S& str) const //checked write operation
 {
     writeString(stream_, str);
     check();
@@ -205,7 +255,6 @@ void WriteOutputStream::check() const
         throwWriteError();
 }
 
-
 }
 
-#endif // SERIALIZE_H_INCLUDED
+#endif //SERIALIZE_H_INCLUDED

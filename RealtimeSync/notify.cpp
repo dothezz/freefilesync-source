@@ -6,13 +6,13 @@
 //
 #include "notify.h"
 #include <set>
-#include "../shared/system_func.h"
+#include "../shared/last_error.h"
 #include "../shared/Loki/ScopeGuard.h"
 #include <algorithm>
 #include <boost/bind.hpp>
 #include <dbt.h>
 
-using namespace ffs3;
+using namespace zen;
 
 
 /*
@@ -99,8 +99,8 @@ MessageProvider::MessageProvider() :
     windowHandle(NULL)
 {
     if (process == NULL)
-        throw ffs3::FileError(wxString(wxT("Could not start monitoring window notifications:")) + wxT("\n\n") +
-                              ffs3::getLastErrorFormatted() + wxT(" (GetModuleHandle)"));
+        throw zen::FileError(wxString(wxT("Could not start monitoring window notifications:")) + wxT("\n\n") +
+                             zen::getLastErrorFormatted() + wxT(" (GetModuleHandle)"));
 
     //register the main window class
     WNDCLASS wc = {};
@@ -109,8 +109,8 @@ MessageProvider::MessageProvider() :
     wc.lpszClassName = WINDOW_NAME;
 
     if (::RegisterClass(&wc) == 0)
-        throw ffs3::FileError(wxString(wxT("Could not start monitoring window notifications:")) + wxT("\n\n") +
-                              ffs3::getLastErrorFormatted() + wxT(" (RegisterClass)"));
+        throw zen::FileError(wxString(wxT("Could not start monitoring window notifications:")) + wxT("\n\n") +
+                             zen::getLastErrorFormatted() + wxT(" (RegisterClass)"));
 
     Loki::ScopeGuard guardClass = Loki::MakeGuard(::UnregisterClass, WINDOW_NAME, process);
 
@@ -128,8 +128,8 @@ MessageProvider::MessageProvider() :
                        process, //HINSTANCE hInstance,
                        NULL);   //LPVOID lpParam
     if (windowHandle == NULL)
-        throw ffs3::FileError(wxString(wxT("Could not start monitoring window notifications:")) + wxT("\n\n") +
-                              ffs3::getLastErrorFormatted() + wxT(" (CreateWindow)"));
+        throw zen::FileError(wxString(wxT("Could not start monitoring window notifications:")) + wxT("\n\n") +
+                             zen::getLastErrorFormatted() + wxT(" (CreateWindow)"));
 
     guardClass.Dismiss();
 }
@@ -201,7 +201,7 @@ public:
                     if (lastError != ERROR_CALL_NOT_IMPLEMENTED   && //fail on SAMBA share: this shouldn't be a showstopper!
                         lastError != ERROR_SERVICE_SPECIFIC_ERROR && //neither should be fail for "Pogoplug" mapped network drives
                         lastError != ERROR_INVALID_DATA)             //this seems to happen for a NetDrive-mapped FTP server
-                        throw ffs3::FileError(wxString(wxT("Could not register device removal notifications:")) + wxT("\n\n") + ffs3::getLastErrorFormatted(lastError));
+                        throw zen::FileError(wxString(wxT("Could not register device removal notifications:")) + wxT("\n\n") + zen::getLastErrorFormatted(lastError));
                 }
                 else
                     notifications.insert(hNotfication);

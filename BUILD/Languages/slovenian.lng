@@ -1,910 +1,1071 @@
-  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
-  MinGW \t- Windows port od GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI ogrodje\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
-%x / %y objects deleted successfully
-%x / %y objektov uspešno izbrisanih
-%x Bytes
-%x Bajtov
-%x GB
-%x GB
-%x MB
-%x MB
-%x PB
-%x PB
-%x TB
-%x TB
-%x day(s)
-%x dan/dni
-%x directories
-%x imeniki
-%x files
-%x datoteke
-%x hour(s)
-%x ura/ur
-%x kB
-%x kB
-%x min
-%x min
-%x of %y rows in view
-%x od %y vrstic prikazanih
-%x of 1 row in view
-%x od 1 vrstice prikazane
-%x sec
-%x sek
-%x%
-%x%
-&Abort
-&Prekini
-&About...
-&O programu...
-&Advanced
-&Napredno
-&Cancel
-&Prekliči
-&Check for new version
-&Preveri za novo različico
-&Content
-&Vsebina
-&Create batch job...
-&Ustvari batch opravilo...
-&Default
-&Privzeto
-&Exit
-&Izhod
-&Export file list...
-&Izvozi seznam datotek...
-&File
-&Datoteka
-&Find next
-&Najdi naslednje
-&Global settings...
-&Globalne nastavitve...
-&Help
-&Pomoč
-&Ignore
-&Ignoriraj
-&Language
-&Jezik
-&Load
-&Naloži
-&Load configuration...
-Na&loži konfiguracijo...
-&New
-&Novo
-&No
-&Ne
-&OK
-&V redu
-&Pause
-&Premor
-&Program
-&Program
-&Quit
-&Zapri
-&Restore
-&Obnovi
-&Retry
-&Ponovi
-&Save
-&Shrani
-&Switch
-&Zamenjaj
-&Yes
-&Da
-(Build: %x)
-(Izgradnja: %x)
-(Requires an Internet connection!)
-(Zahteva povezavo z Internetom!)
-- Other side's counterpart to %dir
-- Duplikat z druge strani od %dir
-- Other side's counterpart to %name
-- Duplikat z druge strani od %name
-- conflict
-- spor
-- conflict (same date, different size)
-- spor (isti datum, različna velikost)
-- different
-- različni
-- directory part only
-- del, ki zajema samo imenike
-- equal
-- enaki
-- exists left only
-- obstaja samo na levi
-- exists right only
-- obstaja samo na desni
-- full file or directory name
-- polno ime datoteke ali imenika
-- left
-- levo
-- left newer
-- leva novejša
-- right
-- desno
-- right newer
-- desna novejša
-/sec
-/sek
-1 directory
-1 imenik
-1 file
-1 datoteka
-1. &Compare
-1. &Primerjaj
-1. Enter relative file or directory names separated by ';' or a new line.
-1. Vnesite relativna imena datotek ali imenikov ločenih s ';' ali novo vrstico.
-1. Select directories to monitor.
-1. Izberite imenike za nadziranje
-2. &Synchronize...
-2. &Sinhroniziraj...
-2. Enter a command line.
-2. Vnesite ukazno-vrstico.
-2. Use wildcard characters '*' and '?'.
-2. Uporabite lahko tudi znake '*' in '?'.
-3. Exclude files directly on main grid via context menu.
-3. Izključite datoteke neposredno na glavni mreži s kontekstnim menujem.
-3. Press 'Start'.
-3. Pritisnite 'Začni'.
-<Automatic>
-<Samodejno>
-<Directory>
-<Imenik>
-<Last session>
-<Zadnja seja>
-<Symlink>
-<Simbolična povezava>
-<multiple selection>
-<mnogokratna izbira>
-A directory input field is empty.
-Vpisno polje za imenik je prazno.
-A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
-Imenik bo spremenjen, kar je del večkratnih parov map! Prosimo preglejte nastavitve sinhronizacije!
-A newer version of FreeFileSync is available:
-Na voljo je nova različica FreeFileSync:
-Abort requested: Waiting for current operation to finish...
-Zahtevana je bila prekinitev: čakam, da se zaključi trenutna operacija...
-Abort synchronization immediately
-Takoj prekini sinhronizacijo
-Aborted
-Prekinitev uspela
-About
-O programu(1)
-Action
-Ukrep
-Add folder
-Dodaj mapo
-Add folder pair
-Dodaj par imenikov
-All directories in sync!
-Vsi imeniki so sinhronizirani!
-An exception occurred!
-Zgodila se je napaka!
-As a result the files are separated into the following categories:
-Kot rezultat so datoteke razdeljene v naslednje kategorije:
-As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
-Kot že samo ime pove, sta dve datoteki označeni kot enaki samo takrat, ko imata enako vsebino. Ta možnost je bolj uporabna za preverjanje doslednosti kot za operacije varnostnega shranjevanja. Zaradi tega se časi datotek ne upoštevajo.\n\nZ omogočeno to možnostjo je drevo odločanja manjše:
-Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
-Sestavi batch datoteko za samodejno sinhronizacijo. Da začnete v batch načinu, preprosto podajte ime batch datoteke k FreeFileSync izvršilni datoteki: FreeFileSync.exe <imedatotekebatch>. To se lahko nastavi tudi v urniku opravil vašega operacijskega sistema.
-At least one directory input field is empty.
-Vsaj eno vnosno polje za vpis imenika je prazno.
-Auto-adjust columns
-Samo-prilagodi stolpce
-Batch execution
-Batch izvajanje
-Batch file created successfully!
-Datoteka batch je bila uspešno ustvarjena!
-Batch job
-Batch opravilo
-Big thanks for localizing FreeFileSync goes out to:
-Zahvale za prevod FreeFileSync gredo:
-Both sides have changed since last synchronization!
-Obe strani sta se spremenili od zadnje sinhronizacije!
-Browse
-Brskaj
-Browse directory
-Brskaj po imeniku
-Cannot determine sync-direction:
-Ne morem določiti sinhronizacijske smeri.
-Cannot find %x
-Ne najdem %x
-Category
-Kategorija
-Clear filter settings
-Počisti nastavitve filtra
-Comma separated list
-Seznam ločen z vejico
-Command line
-Ukazna vrstica
-Command line is empty!
-Ukazna vrstica je prazna!
-Compare
-Primerjaj
-Compare both sides
-Primerjaj obe strani
-Compare by \"File content\"
-Primerjaj po \"Vsebini datotek\"
-Compare by \"File size and date\"
-Primerjaj po \"Datumu in velikosti\"
-Compare by...
-Primerjaj po...
-Comparing content of files %x
-Primerjam vsebino datotek %x
-Comparing content...
-Primerjam vsebino...
-Comparing files by content failed.
-Primerjava datotek po vsebini ni uspela.
-Comparison Result
-Rezultati primerjave
-Comparison settings
-Nastavitve primerjanja
-Completed
-Zaključeno
-Configuration
-Konfiguracija
-Configuration loaded!
-Konfiguracija naložena!
-Configuration overview:
-Pregled konfiguracije:
-Configuration saved!
-Konfiguracija shranjena!
-Configure filter
-Konfiguriraj filter
-Configure your own synchronization rules.
-Konfigurirajte vaša lastna sinhronizacijska pravila.
-Confirm
-Potrdi
-Conflict detected:
-Zaznan spor:
-Conflicts/files that cannot be categorized
-Prisotni so spori/datoteke, ki ne morejo biti kategorizirani
-Continue
-Nadaljuj
-Conversion error:
-Napaka pri pretvorbi:
-Copy attributes only from left to right
-Kopiraj atribute samo iz leve na desno
-Copy attributes only from right to left
-Kopiraj atribute samo iz desne na levo
-Copy filesystem permissions
-Kopiraj dovoljenja datotečnega sistema
-Copy from left to right
-Kopiraj iz leve na desno
-Copy from left to right overwriting
-Kopiraj iz leve na desno s prepisovanjem
-Copy from right to left
-Kopiraj iz desne na levo
-Copy from right to left overwriting
-Kopiraj iz desne na levo s prepisovanjem
-Copy locked files
-Kopiraj zaklenjene datoteke
-Copy new or updated files to right folder.
-Kopiraj nove ali posodobljene datoteke v desno mapo.
-Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
-Kopiraj deljene ali zaklenjene datoteke z uporabo servisa Shadow Copy\n(Zahteva pravice skrbnika)
-Copy to clipboard\tCTRL+C
-Kopiraj v odložišče\tCTRL+C
-Copying new Symbolic Link %x to %y
-Kopiram novo Simbolično povezavo %x v %y
-Copying new file %x to %y
-Kopiram novo datoteko %x v %y
-Could not determine volume name for file:
-Ne morem določiti imena volumna za datoteko:
-Could not initialize directory monitoring:
-Ne morem začeti nadzorovanja imenikov:
-Could not load a required DLL:
-Ne morem naložiti zahtevano DLL:
-Could not read values for the following XML nodes:
-Ne morem brati vrednosti za naslednja XML vozlišča:
-Create a batch job
-Ustvari batch opravilo
-Creating folder %x
-Ustvarjam mapo %x
-Custom
-Po meri
-Customize columns
-Stolpce prikroji po meri
-Customize...
-Prilagodi...
-D-Click
-D-Klik
-DECISION TREE
-DREVO ODLOČITEV
-Data verification error: Source and target file have different content!
-Napaka pri preverjanju podatkov: izvorna in ciljna datoteka imata različno vsebino!
-Date
-Datum
-Delete files/folders existing on left side only
-Izbriši datoteke/mape, ki obstajajo samo na levi strani
-Delete files/folders existing on right side only
-Izbriši datoteke/mape, ki obstajajo samo na desni strani
-Delete files\tDEL
-Izbriši datoteke\tDEL
-Delete on both sides
-Izbriši na obeh straneh
-Delete on both sides even if the file is selected on one side only
-Izbriši na obeh straneh, četudi je datoteka izbrana na samo eni strani
-Delete or overwrite files permanently
-Trajno izbriši ali prepiši datoteke
-Delete permanently
-Trajno izbriši
-Deleting Symbolic Link %x
-Brisanje simbolične povezave %x
-Deleting file %x
-Brisanje datoteke %x
-Deleting folder %x
-Brisanje mape %x
-Deletion handling
-Ravnanje pri brisanju
-Description
-Opis
-Direct
-Neposredno
-Directories are dependent! Be careful when setting up synchronization rules:
-Imeniki so v odvisnosti! Bodite pozorni, ko nastavljate sinhronizacijska pravila:
-Directories to watch
-Imenika za nadzorovanje
-Directory
-Imenik
-Directory does not exist:
-Imenik ne obstaja:
-Do not show this dialog again
-Ne prikaži več tega pogovornega okna
-Do nothing
-Ne naredi ničesar
-Do you really want to delete the following object(s)?
-Ali resnično želite izbrisati naslednje objekte?
-Do you really want to move the following object(s) to the Recycle Bin?
-Ali resnično želite premakniti naslednje objekte v Koš?
-Do you want FreeFileSync to automatically check for updates every week?
-Ali želite, da FreeFileSync samodejno preverja za posodobitve vsak teden?
-Donate with PayPal
-Doniraj s PayPal
-Download now?
-Prenesem sedaj?
-Drag && drop
-Povleci && spusti
-Elements found:
-Najdenih elementov:
-Elements processed:
-Obdelanih elementov:
-Elements remaining:
-Preostalih elementov:
-Email
-Email
-Encoding extended time information: %x
-Podrobne informacije o času enkodiranja: %x
-Endless loop when traversing directory:
-Neskončna zanka pri prehodu imenika:
-Equal files/folders that differ in attributes only
-Enake datoteke/mape, ki se razlikujejo samo v atributih
-Error
-Napaka
-Error changing modification time:
-Napaka pri spreminjanju časa modifikacije:
-Error copying file permissions:
-Napaka pri kopiranju datotečnih dovoljenj:
-Error copying file:
-Napaka pri kopiranju datoteke:
-Error copying locked file %x!
-Napaka pri kopiranju zaklenjene datoteke %x!
-Error copying symbolic link:
-Napaka pri kopiranju simboličnih povezav:
-Error creating directory:
-Napaka pri ustvarjanju imenika:
-Error deleting directory:
-Napaka pri brisanju imenika:
-Error deleting file:
-Napaka pri brisanju datoteke:
-Error handling
-Napaka pri obravnavanju
-Error loading library function:
-Napaka pri nalaganju funkcije iz knjižnice:
-Error moving directory:
-Napaka pri premikanju imenika:
-Error moving file:
-Napaka pri premikanju datoteke:
-Error moving to Recycle Bin:
-Napaka pri premikanju v Koš:
-Error opening file:
-Napaka pri odpiranju datoteke:
-Error parsing configuration file:
-Napaka pri preverjanju konfiguracijske datoteke:
-Error reading file attributes:
-Napaka pri branju atributov datoteke:
-Error reading file:
-Napaka pri branju datoteke:
-Error reading from synchronization database:
-Napaka pri branju iz sinhronizacijske podatkovne baze:
-Error reading security context:
-Napaka pri branju varnostne skladnosti:
-Error resolving symbolic link:
-Napaka pri razreševanju simbolične povezave:
-Error setting directory lock:
-Napaka pri nastavljanju zaklepanja imenika:
-Error setting privilege:
-Napaka pri nastavljanju privilegija:
-Error starting Volume Shadow Copy Service!
-Napaka pri zagonu servisa Volume Shadow Copy!
-Error traversing directory:
-Napaka pri prehajanju imenika:
-Error when monitoring directories.
-Napaka pri nadzorovanju imenikov.
-Error writing file:
-Napaka pri pisanju datoteke:
-Error writing security context:
-Napaka pri pisanju varnostne skladnosti:
-Error writing to synchronization database:
-Napaka pri pisanju v sinhronizacijsko podatkovno bazo:
-Example
-Primer
-Exclude
-Izključi
-Exclude all rows
-Izključi vse vrstice
-Exclude temporarily
-Začasno izključi
-Exclude via filter:
-Izključi preko filtra:
-Exit instantly
-Zapusti v trenutku
-Extension
-Razširitev
-External applications
-Zunanje aplikacije
-Fatal Error
-Usodna napaka
-Feedback and suggestions are welcome at:
-Povratne informacije in predlogi so dobrodošli na:
-File %x has an invalid date!
-Datoteka %x ima neveljaven datum!
-File already exists. Overwrite?
-Datoteka že obstaja. Prepišem?
-File content
-Vsebini datoteke
-File does not exist:
-Datoteka ne obstaja:
-File list exported!
-Seznam datotek je bil izvožen!
-File size and date
-Velikosti in datumu datoteke
-Filename
-Ime datoteke
-Files %x have the same date but a different size!
-Datoteki %x imata enak datum ampak različno velikost!
-Files are found equal if\n     - file content\nis the same
-Datoteki sta enaki, če\n     - je vsebina datoteke\nenaka
-Files are found equal if\n     - filesize\n     - last write time and date\nare the same
-Datoteki sta enaki, če so\n     - velikost datoteke\n     - zadnji čas spremembe in datum\nenaki
-Files that are equal on both sides
-Datoteki, ki sta enaki na obeh straneh
-Files that exist on both sides, left one is newer
-Datoteke, ki obstajajo na obeh straneh, leva je novejša
-Files that exist on both sides, right one is newer
-Datoteke, ki obstajajo na obeh straneh, desna je novejša
-Files that have different content
-Datoteke, ki imajo različno vsebino
-Files/folders that exist on left side only
-Datoteke/mape, ki obstajajo samo na levi strani
-Files/folders that exist on right side only
-Datoteke/mape, ki obstajajo samo na desni strani
-Filter files
-Filtriraj datoteke
-Filter is active
-Filterj je aktiven
-Filter settings have changed!
-Nastavitve filtra so bile spremenjene!
-Filter: All pairs
-Filtriraj: Vse pare
-Filter: Single pair
-Filtriraj: En sam par
-Find
-Najdi
-Find what:
-Najdi kaj
-Folder Comparison and Synchronization
-Primerjava in sinhronizacija imenika
-Folder pairs
-Pari map
-Follow
-Sledi
-Free disk space available:
-Prosti disk, ki je na voljo:
-Free disk space required:
-Potreben prostor na disku:
-FreeFileSync Batch Job
-FreeFileSync Batch opravilo
-FreeFileSync at Sourceforge
-FreeFileSync na Sourceforge
-FreeFileSync batch file
-FreeFileSync batch datoteka
-FreeFileSync configuration
-FreeFileSync konfiguracija
-FreeFileSync is up to date!
-FreeFileSync je posodobljen!
-Full path
-Polna pot
-Generating database...
-Ustvarjam podatkovno bazo...
-Generating file list...
-Ustvarjam seznam datotek...
-Global settings
-Globalne nastavitve
-Help
-Pomoč
-Hidden dialogs:
-Skriti pogovori:
-Hide all error and warning messages
-Skrij vsa obvestila o napakah in opozorilih
-Hide conflicts
-Skrij spore
-Hide excluded items
-Skrij izključene predmete
-Hide files that are different
-Skrij datoteke ki so različne
-Hide files that are equal
-Skrij enake datoteke
-Hide files that are newer on left
-Skrij najnovejše datoteke na levi
-Hide files that are newer on right
-Skrij najnovejše datoteke na desni
-Hide files that exist on left side only
-Skrij datoteke, ki obstajajo samo na levi strani
-Hide files that exist on right side only
-Skrij datoteke, ki obstajajo samo na desni strani
-Hide files that will be created on the left side
-Skrij datoteke, ki bodo ustvarjene na levi strani
-Hide files that will be created on the right side
-Skrij datoteke, ki bodo ustvarjene na desni strani
-Hide files that will be deleted on the left side
-Skrij datoteke, ki bodo izbrisane na levi strani
-Hide files that will be deleted on the right side
-Skrij datoteke, ki bodo izbrisane na desni strani
-Hide files that will be overwritten on left side
-Skrij datoteke, ki bodo prepisane na levi strani
-Hide files that will be overwritten on right side
-Skrij datoteke, ki bodo prepisane na desni strani
-Hide files that won't be copied
-Skrij datoteke, ki ne bodo kopirane
-Hide filtered or temporarily excluded files
-Skrij filtrirane ali začasno izključene datoteke
-Hide further error messages during the current process
-Skrijte nadaljnja obvestila o napakah med trenutnim procesom
-Hints:
-Namigi:
-Homepage
-Domača stran
-Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
-Prepoznaj in širi spremembe na obeh straneh z uporabo podatkovne baze. Izbrisi in spori so zaznani samodejno.
-Idle time between detection of last change and execution of command line in seconds
-Čas nedejavnosti med zaznavanjem zadnje spremembe in izvršitvijo ukazne vrstice v sekundah
-If you like FFS
-Če vam je FFS všeč
-Ignore
-Ignoriraj
-Ignore errors
-Ignoriraj napake
-Ignore subsequent errors
-Ignoriraj vse nadaljnje napake
-Include
-Vključi
-Include all rows
-Vključi se vrstice
-Include temporarily
-Trenutno vključi
-Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
-Vključi: *.doc;*.zip;*.exe\nIzključi: \\stuff\\temp\\*
-Incompatible synchronization database format:
-Nekompatibilen format sinhronizacijske podatkovne baze:
-Info
-Info
-Information
-Informacije
-Initial synchronization:
-Začetna sinhronizacija:
-Integrate external applications into context menu. The following macros are available:
-Integriraj zunanje aplikacije v kontekstni menu. Na voljo so naslednji makri:
-Invalid FreeFileSync config file!
-Neveljavna FreeFileSync nastavitvena datoteka!
-Last used configurations (press DEL to remove from list)
-Zadnje uporabljene konfiguracije (pritisite DEL za odstranitev s seznama)
-Leave as unresolved conflict
-Pusti kot nerešeni spor
-Left
-Levo
-Legend
-Legenda
-Load configuration from file
-Naloži konfiguracijo iz datoteke
-Log-messages:
-Sporočila beleženja:
-Logging
-Beležim
-Main bar
-Glavna vrstica
-Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
-Ustvarjanje senčnih kopij na WOW63 ni podprto. Prosimo uporabite 64-bitno FreeFileSync različico.
-Match case
-Ujemaj se s primerom
-Maximum number of logfiles:
-Maksimalno število datotek beleženja:
-Memory allocation failed!
-Neuspešno dodeljevanje pomnilnika!
-Minimum Idle Time [seconds]
-Minimalen čas nedejavnosti [sekunde]
-Mirror ->>
-Zrcalno ->>
-Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
-Zrcalna varnostna kopija leve mape. Desna mapa bo spremenjena, da se bo natančno ujemala z levo mapo po sinhronizaciji.
-Monitoring active...
-Nadziranje aktivno...
-More than 50% of the total number of files will be copied or deleted!
-Več kot 50% od celotnega števila datotek bo kopiranih ali izbrisanih!
-Move column down
-Premakni stolpec dol
-Move column up
-Premakni stolpec gor
-Move files into a time-stamped subdirectory
-Premakni datoteke v časovno-označen podimenik
-Moving %x to Recycle Bin
-Premikam %x v Koš
-Moving Symbolic Link %x to user-defined directory %y
-Premikam simbolično povezavo %x v uporabniško določen imenik %y
-Moving file %x to user-defined directory %y
-Premikam datoteko %x v uporabniško-določen imenik %y
-Moving folder %x to user-defined directory %y
-Premikam mapo %x v uporabniško-določen imenik %y
-Multiple...
-Večkratno...
-No change since last synchronization!
-Ni sprememb od zadnje sinhronizacije!
-No filter selected
-Noben filter ni izbran
-Not enough free disk space available in:
-Na voljo ni dovolj prostega prostora na disku v:
-Nothing to synchronize according to configuration!
-Po trenutni konfiguraciji ni nič za sinhronizirati!
-Number of files and directories that will be created
-Število datotek in imenikov, ki bodo ustvarjeni
-Number of files and directories that will be deleted
-Število datotek in imenikov, ki bodo izbrisani
-Number of files that will be overwritten
-Število datotek, ki bodo prepisane
-One of the FreeFileSync database entries within the following file is not yet existing:
-Eden od FreeFileSync vnosov v podatkovni bazi znotraj naslednje datoteke še ne obstaja:
-One of the FreeFileSync database files is not yet existing:
-Ena od FreeFileSync datotek podatkovne baze še en obstaja:
-Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
-Samo datoteke/imeniki, ki preidejo filtriranje bodo izbrani za sinhronizacijo. Filter bo uveljavljnen k imenu relativno(!) na bazo sinhroniziranih imenikov.
-Open with Explorer
-Odpri z Raziskovalcem
-Open with default application
-Odpri s privzeto aplikacijo
-Operation aborted!
-Operacija prekinjena!
-Operation:
-Operacija:
-Overview
-Pregled
-Overwriting Symbolic Link %x in %y
-Prepisujem Simbolično povezavo %x v %y
-Overwriting file %x in %y
-Prepisujem datoteko %x v %y
-Pause
-Premor
-Paused
-Na premoru
-Planned directory deletion is in conflict with its subdirectories and -files!
-Načrtovano brisanje imenika je v sporu z njegovimi podimeniki in -datotekami!
-Please run a Compare first before synchronizing!
-Prosim najprej zaženite Primerjaj preden sinhronizirate!
-Press \"Switch\" to open FreeFileSync GUI mode.
-Pritisnite \"Zamenjaj\", da odprete FreeFileSync GUI način.
-Processing folder pair:
-Obdelujem par map:
-Published under the GNU General Public License:
-Objavljeno pod licenco GNU General Public:
-Question
-Vprašanje
-RealtimeSync - Automated Synchronization
-RealtimeSync - Avtomatizirana sinhronizacija
-RealtimeSync configuration
-RealtimeSync nastavitve
-Recycle Bin not yet supported for this system!
-Koš še ni podprt za ta sistem!
-Relative path
-Relativna pot
-Remove alternate settings
-Odstrani nadomestne nastavitve
-Remove folder
-Odstrani v mapo
-Remove folder pair
-Odstrani par imenikov
-Report translation error
-Poročaj o napaki prevoda
-Reset
-Ponastavi
-Reset view
-Ponastavi pogled
-Restore all hidden dialogs?
-Obnovim vse skrite pogovore?
-Right
-Desno
-S&ave configuration...
-Shr&ani konfiguracijo...
-S&witch view
-Sp&remeni pogled
-Save changes to current configuration?
-Shranim spremembe trenutne konfiguracije?
-Save current configuration to file
-Shrani trenutno konfiguracijo v datoteko
-Scanning...
-Pregledujem...
-Scanning:
-Pregledujem:
-Select a folder
-Izberite mapo
-Select alternate synchronization settings
-Izberite nadomestne nastavitve sinhronizacije
-Select logfile directory:
-Izberite imenik za datoteko beleženja:
-Select variant:
-Izberite varianto:
-Select view
-Izberite pogled
-Set direction:
-Nastavi smer:
-Setting default synchronization directions: Old files will be overwritten with newer files.
-Nastavljanje privzetih smeri sinhronizacije: Stare datoteke bodo prepisane z novimi datotekami.
-Show \"%x\"
-Prikaži \"%x\"
-Show conflicts
-Prikaži spore
-Show files that are different
-Prikaži datoteke, ki so različne
-Show files that are equal
-Prikaži datoteke, ki so enake
-Show files that are newer on left
-Prikaži datoteke, ki so novejše na levi
-Show files that are newer on right
-Prikaži datoteke, ki so novejše na desni
-Show files that exist on left side only
-Prikaži datoteke, ki obstajajo samo na levi
-Show files that exist on right side only
-Prikaži datoteke, ki obstajajo samo na desni
-Show files that will be created on the left side
-Prikaži datoteke, ki bodo ustvarjene na levi strani
-Show files that will be created on the right side
-Prikaži datoteke, ki bodo ustvarjene na desni strani
-Show files that will be deleted on the left side
-Prikaži datoteke, ki bodo izbrisane na levi strani
-Show files that will be deleted on the right side
-Prikaži datoteke, ki bodo izbrisane na desni strani
-Show files that will be overwritten on left side
-Prikaži datoteke, ki bodo prepisane na levi strani
-Show files that will be overwritten on right side
-Prikaži datoteke, ki bodo prepisane na desni strani
-Show files that won't be copied
-Prikaži datoteke, ki ne bodo kopirane
-Show hidden dialogs
-Prikaži skrite pogovore
-Show popup
-Prikaži pojavno okno
-Show popup on errors or warnings
-Prikaži pojavno okno pri napakah in opozorilih
-Significant difference detected:
-Zaznana je važna razlika:
-Silent mode
-Tihi način
-Size
-Velikost
-Source code written completely in C++ utilizing:
-Izvorna koda napisana celotno v C++ z uporabo:
-Source directory does not exist anymore:
-Izvorni imenik ne obstaja več:
-Speed:
-Hitrost:
-Start
-Začni
-Start minimized and write status information to a logfile
-Zaženi pomanjšano in piši statusne informacije v datoteko za beleženje
-Start synchronization
-Začni sinhronizacijo
-Statistics
-Statistika
-Status feedback
-Povratne informacije statusa
-Stop
-Ustavi
-Swap sides
-Zamenjaj strani
-Switching to FreeFileSync GUI mode...
-Preklapljam v FreeFileSync GUI način...
-Symbolic Link handling
-Rokovanje s simboličnimi povezavami
-Symlinks %x have the same date but a different target!
-Simbolične povezave %x imajo isti datum, vendar različni cilj!
-Synchronization Preview
-Predogled sinhronizacije
-Synchronization aborted!
-Sinhronizacija prekinjena!
-Synchronization completed successfully!
-Sinhronizacija uspešno zaključena!
-Synchronization completed with errors!
-Sinhronizacija se je končala z napakami!
-Synchronization settings
-Nastavitve sinhronizacije
-Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
-Sinhroniziraj vse .doc, .zip in .exe datoteke, razen iz podmape \"temp\".
-Synchronize...
-Sinhroniziraj...
-Synchronizing...
-Sinhroniziram...
-Target directory already existing!
-Ciljni imenik že obstaja!
-Target file already existing!
-Ciljna datoteka že obstaja!
-The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-Ukazna vrstica se izvrši vsakič ko:\n- vsi imeniki postanejo dostopni (npr. ob vstavitvi USB ključa)\n- so datoteke znotraj teh imenikov in podimenikov spremenjene
-The file does not contain a valid configuration:
-Datoteka ne vsebuje veljavne konfiguracije:
-The file was not processed by last synchronization!
-Datoteka ni bila obdelana z zadnjo sinhronizacijo!
-This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
-Ta varianta oceni dve datoteki z enakim imenom kot enaki, ko imata enako velikost IN enak datum ter čas zadnjega spreminjanja.
-Time
-Čas
-Time elapsed:
-Pretečen čas:
-Time remaining:
-Preostali čas:
-Total amount of data that will be transferred
-Količina podatkov, ki bo prenešena
-Total time:
-Celoten čas:
-Transfer file and directory permissions\n(Requires Administrator rights)
-Prenesi dovoljenja datotek in imenikov\n(Zahteva pravice skrbnika)
-Unable to connect to sourceforge.net!
-Ne morem se povezati na sourceforge.net!
-Unable to create logfile!
-Ne morem ustvariti datoteko za beleženje!
-Unresolved conflicts existing!
-Obstajajo nerešeni spori!
-Update ->
-Posodobi ->
-Updating attributes of %x
-Posodabljam atribute od %x
-Usage:
-Uporaba:
-Use Recycle Bin
-Uporabi Koš
-Use Recycle Bin when deleting or overwriting files
-Uporabi Koš pri brisanju ali prepisovanju datotek
-User-defined directory for deletion was not specified!
-Uporabniško-določen imenik za brisanje ni bil naveden!
-Variant
-Različica
-Verifying file %x
-Preverjam datoteko %x
-Versioning
-Ustvarjanje različič
-Volume name %x not part of filename %y!
-Ime volumna %x ni del imena datoteke %y!
-Waiting for missing directories...
-Čakam na manjkajoče imenike...
-Waiting while directory is locked (%x)...
-Čakam, medtem ko se zaklepa imenik (%x)...
-Warning
-Pozor
-When the comparison is started with this option set the following decision tree is processed:
-Ko se primerjava zažene s tem setom možnosti, se obdela naslednje drevo odločitev:
-You can ignore conflicts and continue synchronization.
-Lahko ignorirate spore in nadaljujete s sinhronizacijo.
-You can ignore this error to consider the directory as empty.
-To napako z obravnavanjem imenika kot praznega lahko ignorirate.
-You may try to synchronize remaining items again (WITHOUT having to re-compare)!
-Naslednje predmete lahko ponovno poskusite sinhronizirati (BREZ ponovne primerjave) !
-different
-različni
-file exists on both sides
-datoteka obstaja na obeh straneh
-on one side only
-samo na eni strani
+<header>
+	<language name>Slovenščina</language name>
+	<translator>Matej Badalič</translator>
+	<locale>sl_SI</locale>
+	<flag file>slovenia.png</flag file>
+	<plural forms>4</plural forms>
+	<plural definition>n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3</plural definition>
+</header>
+
+<source>Show in Explorer</source>
+<target>Prikaži v Raziskovalcu</target>
+<source>Open with default application</source>
+<target>Odpri s privzeto aplikacijo</target>
+<source>Browse directory</source>
+<target>Brskaj po imeniku</target>
+<source>RealtimeSync - Automated Synchronization</source>
+<target>RealtimeSync - Avtomatizirana sinhronizacija</target>
+<source>Browse</source>
+<target>Brskaj</target>
+<source>Error resolving symbolic link:</source>
+<target>Napaka pri razreševanju simbolične povezave:</target>
+<source>Select alternate synchronization settings</source>
+<target>Izberite nadomestne nastavitve sinhronizacije</target>
+<source>No filter selected</source>
+<target>Noben filter ni izbran</target>
+<source>Filter is active</source>
+<target>Filterj je aktiven</target>
+<source>Clear filter settings</source>
+<target>Počisti nastavitve filtra</target>
+<source>Remove alternate settings</source>
+<target>Odstrani nadomestne nastavitve</target>
+<source>Create a batch job</source>
+<target>Ustvari batch opravilo</target>
+<source>Synchronization settings</source>
+<target>Nastavitve sinhronizacije</target>
+<source>Comparison settings</source>
+<target>Nastavitve primerjanja</target>
+<source>About</source>
+<target>O programu(1)</target>
+<source>Error</source>
+<target>Napaka</target>
+<source>Warning</source>
+<target>Pozor</target>
+<source>Question</source>
+<target>Vprašanje</target>
+<source>Confirm</source>
+<target>Potrdi</target>
+<source>Configure filter</source>
+<target>Konfiguriraj filter</target>
+<source>Customize columns</source>
+<target>Stolpce prikroji po meri</target>
+<source>Global settings</source>
+<target>Globalne nastavitve</target>
+<source>Synchronization Preview</source>
+<target>Predogled sinhronizacije</target>
+<source>Find</source>
+<target>Najdi</target>
+<source>%x MB</source>
+<target>%x MB</target>
+<source>%x KB</source>
+<target>%x KB</target>
+<source>%x GB</source>
+<target>%x GB</target>
+<source>
+<pluralform>1 Byte</pluralform>
+<pluralform>%x Bytes</pluralform>
+</source>
+<target>
+<pluralform>1 Bajt</pluralform>
+<pluralform>%x Bajta</pluralform>
+<pluralform>%x Bajti</pluralform>
+<pluralform>%x Bajtov</pluralform>
+</target>
+<source><Symlink></source>
+<target><Simbolična povezava></target>
+<source><Directory></source>
+<target><Imenik></target>
+<source>Size</source>
+<target>Velikost</target>
+<source>Date</source>
+<target>Datum</target>
+<source>Full path</source>
+<target>Polna pot</target>
+<source>Filename</source>
+<target>Ime datoteke</target>
+<source>Relative path</source>
+<target>Relativna pot</target>
+<source>Directory</source>
+<target>Imenik</target>
+<source>Extension</source>
+<target>Razširitev</target>
+<source>Comparison Result</source>
+<target>Rezultati primerjave</target>
+<source>Incompatible synchronization database format:</source>
+<target>Nekompatibilen format sinhronizacijske podatkovne baze:</target>
+<source>Initial synchronization:</source>
+<target>Začetna sinhronizacija:</target>
+<source>One of the FreeFileSync database files is not yet existing:</source>
+<target>Ena od FreeFileSync datotek podatkovne baze še en obstaja:</target>
+<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
+<target>Eden od FreeFileSync vnosov v podatkovni bazi znotraj naslednje datoteke še ne obstaja:</target>
+<source>Error reading from synchronization database:</source>
+<target>Napaka pri branju iz sinhronizacijske podatkovne baze:</target>
+<source>An exception occurred!</source>
+<target>Zgodila se je napaka!</target>
+<source>Error deleting file:</source>
+<target>Napaka pri brisanju datoteke:</target>
+<source>Error reading file attributes:</source>
+<target>Napaka pri branju atributov datoteke:</target>
+<source>Waiting while directory is locked (%x)...</source>
+<target>Čakam, medtem ko se zaklepa imenik (%x)...</target>
+<source>Error setting directory lock:</source>
+<target>Napaka pri nastavljanju zaklepanja imenika:</target>
+<source>
+<pluralform>1 sec</pluralform>
+<pluralform>%x sec</pluralform>
+</source>
+<target>
+<pluralform>1 sek</pluralform>
+<pluralform>%x sek</pluralform>
+<pluralform>%x sek</pluralform>
+<pluralform>%x sek</pluralform>
+</target>
+<source>Info</source>
+<target>Info</target>
+<source>Fatal Error</source>
+<target>Usodna napaka</target>
+<source>File does not exist:</source>
+<target>Datoteka ne obstaja:</target>
+<source>Error parsing configuration file:</source>
+<target>Napaka pri preverjanju konfiguracijske datoteke:</target>
+<source>Error writing file:</source>
+<target>Napaka pri pisanju datoteke:</target>
+<source>Invalid FreeFileSync config file!</source>
+<target>Neveljavna FreeFileSync nastavitvena datoteka!</target>
+<source>/sec</source>
+<target>/sek</target>
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+<pluralform>%x min</pluralform>
+<pluralform>%x min</pluralform>
+</target>
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 ura</pluralform>
+<pluralform>%x uri</pluralform>
+<pluralform>%x ure</pluralform>
+<pluralform>%x ur</pluralform>
+</target>
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 dan</pluralform>
+<pluralform>%x dni</pluralform>
+<pluralform>%x dni</pluralform>
+<pluralform>%x dni</pluralform>
+</target>
+<source>S&ave configuration...</source>
+<target>Shr&ani konfiguracijo...</target>
+<source>&Load configuration...</source>
+<target>Na&loži konfiguracijo...</target>
+<source>&Quit</source>
+<target>&Zapri</target>
+<source>&File</source>
+<target>&Datoteka</target>
+<source>&Content</source>
+<target>&Vsebina</target>
+<source>&About...</source>
+<target>&O programu...</target>
+<source>&Help</source>
+<target>&Pomoč</target>
+<source>Usage:</source>
+<target>Uporaba:</target>
+<source>1. Select directories to monitor.</source>
+<target>1. Izberite imenike za nadziranje</target>
+<source>2. Enter a command line.</source>
+<target>2. Vnesite ukazno-vrstico.</target>
+<source>3. Press 'Start'.</source>
+<target>3. Pritisnite 'Začni'.</target>
+<source>
+The command line is executed each time:
+- all directories become available (e.g. USB stick insert)
+- files within these directories or subdirectories are modified
+</source>
+<target>
+Ukazna vrstica se izvrši vsakič ko:
+- vsi imeniki postanejo dostopni (npr. ob vstavitvi USB ključa)
+- so datoteke znotraj teh imenikov in podimenikov spremenjene
+</target>
+<source>Directories to watch</source>
+<target>Imenika za nadzorovanje</target>
+<source>Add folder</source>
+<target>Dodaj mapo</target>
+<source>Remove folder</source>
+<target>Odstrani v mapo</target>
+<source>Select a folder</source>
+<target>Izberite mapo</target>
+<source>Command line</source>
+<target>Ukazna vrstica</target>
+<source>Minimum Idle Time [seconds]</source>
+<target>Minimalen čas nedejavnosti [sekunde]</target>
+<source>Idle time between detection of last change and execution of command line in seconds</source>
+<target>Čas nedejavnosti med zaznavanjem zadnje spremembe in izvršitvijo ukazne vrstice v sekundah</target>
+<source>Start</source>
+<target>Začni</target>
+<source>(Build: %x)</source>
+<target>(Izgradnja: %x)</target>
+<source>RealtimeSync configuration</source>
+<target>RealtimeSync nastavitve</target>
+<source>File already exists. Overwrite?</source>
+<target>Datoteka že obstaja. Prepišem?</target>
+<source>&Restore</source>
+<target>&Obnovi</target>
+<source>&Exit</source>
+<target>&Izhod</target>
+<source>Monitoring active...</source>
+<target>Nadziranje aktivno...</target>
+<source>Waiting for missing directories...</source>
+<target>Čakam na manjkajoče imenike...</target>
+<source>Command line is empty!</source>
+<target>Ukazna vrstica je prazna!</target>
+<source>Could not initialize directory monitoring:</source>
+<target>Ne morem začeti nadzorovanja imenikov:</target>
+<source>A directory input field is empty.</source>
+<target>Vpisno polje za imenik je prazno.</target>
+<source>Error when monitoring directories.</source>
+<target>Napaka pri nadzorovanju imenikov.</target>
+<source>Drag && drop</source>
+<target>Povleci && spusti</target>
+<source>Conversion error:</source>
+<target>Napaka pri pretvorbi:</target>
+<source>Error moving file:</source>
+<target>Napaka pri premikanju datoteke:</target>
+<source>Operation aborted!</source>
+<target>Operacija prekinjena!</target>
+<source>Target file already existing!</source>
+<target>Ciljna datoteka že obstaja!</target>
+<source>Error moving directory:</source>
+<target>Napaka pri premikanju imenika:</target>
+<source>Target directory already existing!</source>
+<target>Ciljni imenik že obstaja!</target>
+<source>Error deleting directory:</source>
+<target>Napaka pri brisanju imenika:</target>
+<source>Error changing modification time:</source>
+<target>Napaka pri spreminjanju časa modifikacije:</target>
+<source>Error loading library function:</source>
+<target>Napaka pri nalaganju funkcije iz knjižnice:</target>
+<source>Error reading security context:</source>
+<target>Napaka pri branju varnostne skladnosti:</target>
+<source>Error writing security context:</source>
+<target>Napaka pri pisanju varnostne skladnosti:</target>
+<source>Error copying file permissions:</source>
+<target>Napaka pri kopiranju datotečnih dovoljenj:</target>
+<source>Error creating directory:</source>
+<target>Napaka pri ustvarjanju imenika:</target>
+<source>Error copying symbolic link:</source>
+<target>Napaka pri kopiranju simboličnih povezav:</target>
+<source>Error copying file:</source>
+<target>Napaka pri kopiranju datoteke:</target>
+<source>Error opening file:</source>
+<target>Napaka pri odpiranju datoteke:</target>
+<source>Error reading file:</source>
+<target>Napaka pri branju datoteke:</target>
+<source>Endless loop when traversing directory:</source>
+<target>Neskončna zanka pri prehodu imenika:</target>
+<source>Error traversing directory:</source>
+<target>Napaka pri prehajanju imenika:</target>
+<source>Error setting privilege:</source>
+<target>Napaka pri nastavljanju privilegija:</target>
+<source>Error moving to Recycle Bin:</source>
+<target>Napaka pri premikanju v Koš:</target>
+<source>Could not load a required DLL:</source>
+<target>Ne morem naložiti zahtevano DLL:</target>
+<source>Error writing to synchronization database:</source>
+<target>Napaka pri pisanju v sinhronizacijsko podatkovno bazo:</target>
+<source>Error starting Volume Shadow Copy Service!</source>
+<target>Napaka pri zagonu servisa Volume Shadow Copy!</target>
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>Ustvarjanje senčnih kopij na WOW63 ni podprto. Prosimo uporabite 64-bitno FreeFileSync različico.</target>
+<source>Could not determine volume name for file:</source>
+<target>Ne morem določiti imena volumna za datoteko:</target>
+<source>Volume name %x not part of filename %y!</source>
+<target>Ime volumna %x ni del imena datoteke %y!</target>
+<source>%x TB</source>
+<target>%x TB</target>
+<source>%x PB</source>
+<target>%x PB</target>
+<source>%x%</source>
+<target>%x%</target>
+<source>Could not read values for the following XML nodes:</source>
+<target>Ne morem brati vrednosti za naslednja XML vozlišča:</target>
+<source>Show popup</source>
+<target>Prikaži pojavno okno</target>
+<source>Show popup on errors or warnings</source>
+<target>Prikaži pojavno okno pri napakah in opozorilih</target>
+<source>Ignore errors</source>
+<target>Ignoriraj napake</target>
+<source>Hide all error and warning messages</source>
+<target>Skrij vsa obvestila o napakah in opozorilih</target>
+<source>Exit instantly</source>
+<target>Zapusti v trenutku</target>
+<source>Abort synchronization immediately</source>
+<target>Takoj prekini sinhronizacijo</target>
+<source>Logging</source>
+<target>Beležim</target>
+<source>FreeFileSync batch file</source>
+<target>FreeFileSync batch datoteka</target>
+<source>FreeFileSync configuration</source>
+<target>FreeFileSync konfiguracija</target>
+<source>FreeFileSync Batch Job</source>
+<target>FreeFileSync Batch opravilo</target>
+<source>Unable to create logfile!</source>
+<target>Ne morem ustvariti datoteko za beleženje!</target>
+<source>Batch execution</source>
+<target>Batch izvajanje</target>
+<source>Log-messages:</source>
+<target>Sporočila beleženja:</target>
+<source>Stop</source>
+<target>Ustavi</target>
+<source>Total time:</source>
+<target>Celoten čas:</target>
+<source>Synchronization aborted!</source>
+<target>Sinhronizacija prekinjena!</target>
+<source>Synchronization completed with errors!</source>
+<target>Sinhronizacija se je končala z napakami!</target>
+<source>Synchronization completed successfully!</source>
+<target>Sinhronizacija uspešno zaključena!</target>
+<source>Press "Switch" to open FreeFileSync GUI mode.</source>
+<target>Pritisnite "Zamenjaj", da odprete FreeFileSync GUI način.</target>
+<source>Switching to FreeFileSync GUI mode...</source>
+<target>Preklapljam v FreeFileSync GUI način...</target>
+<source>Unable to connect to sourceforge.net!</source>
+<target>Ne morem se povezati na sourceforge.net!</target>
+<source>A newer version of FreeFileSync is available:</source>
+<target>Na voljo je nova različica FreeFileSync:</target>
+<source>Download now?</source>
+<target>Prenesem sedaj?</target>
+<source>Information</source>
+<target>Informacije</target>
+<source>FreeFileSync is up to date!</source>
+<target>FreeFileSync je posodobljen!</target>
+<source>Do you want FreeFileSync to automatically check for updates every week?</source>
+<target>Ali želite, da FreeFileSync samodejno preverja za posodobitve vsak teden?</target>
+<source>(Requires an Internet connection!)</source>
+<target>(Zahteva povezavo z Internetom!)</target>
+<source>1. &Compare</source>
+<target>1. &Primerjaj</target>
+<source>2. &Synchronize...</source>
+<target>2. &Sinhroniziraj...</target>
+<source>S&witch view</source>
+<target>Sp&remeni pogled</target>
+<source>&New</source>
+<target>&Novo</target>
+<source>&Program</source>
+<target>&Program</target>
+<source>&Language</source>
+<target>&Jezik</target>
+<source>&Global settings...</source>
+<target>&Globalne nastavitve...</target>
+<source>&Create batch job...</source>
+<target>&Ustvari batch opravilo...</target>
+<source>&Export file list...</source>
+<target>&Izvozi seznam datotek...</target>
+<source>&Advanced</source>
+<target>&Napredno</target>
+<source>&Check for new version</source>
+<target>&Preveri za novo različico</target>
+<source>Compare</source>
+<target>Primerjaj</target>
+<source>Compare both sides</source>
+<target>Primerjaj obe strani</target>
+<source>&Abort</source>
+<target>&Prekini</target>
+<source>Synchronize...</source>
+<target>Sinhroniziraj...</target>
+<source>Start synchronization</source>
+<target>Začni sinhronizacijo</target>
+<source>Swap sides</source>
+<target>Zamenjaj strani</target>
+<source>Add folder pair</source>
+<target>Dodaj par imenikov</target>
+<source>Remove folder pair</source>
+<target>Odstrani par imenikov</target>
+<source>Save current configuration to file</source>
+<target>Shrani trenutno konfiguracijo v datoteko</target>
+<source>Load configuration from file</source>
+<target>Naloži konfiguracijo iz datoteke</target>
+<source>Last used configurations (press DEL to remove from list)</source>
+<target>Zadnje uporabljene konfiguracije (pritisite DEL za odstranitev s seznama)</target>
+<source>Hide excluded items</source>
+<target>Skrij izključene predmete</target>
+<source>Hide filtered or temporarily excluded files</source>
+<target>Skrij filtrirane ali začasno izključene datoteke</target>
+<source>Number of files and directories that will be created</source>
+<target>Število datotek in imenikov, ki bodo ustvarjeni</target>
+<source>Number of files that will be overwritten</source>
+<target>Število datotek, ki bodo prepisane</target>
+<source>Number of files and directories that will be deleted</source>
+<target>Število datotek in imenikov, ki bodo izbrisani</target>
+<source>Total amount of data that will be transferred</source>
+<target>Količina podatkov, ki bo prenešena</target>
+<source>Left</source>
+<target>Levo</target>
+<source>Right</source>
+<target>Desno</target>
+<source>Batch job</source>
+<target>Batch opravilo</target>
+<source>Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
+<target>Sestavi batch datoteko za samodejno sinhronizacijo. Da začnete v batch načinu, preprosto podajte ime batch datoteke k FreeFileSync izvršilni datoteki: FreeFileSync.exe <imedatotekebatch>. To se lahko nastavi tudi v urniku opravil vašega operacijskega sistema.</target>
+<source>Help</source>
+<target>Pomoč</target>
+<source>Configuration overview:</source>
+<target>Pregled konfiguracije:</target>
+<source>Filter files</source>
+<target>Filtriraj datoteke</target>
+<source>Status feedback</source>
+<target>Povratne informacije statusa</target>
+<source>Silent mode</source>
+<target>Tihi način</target>
+<source>Start minimized and write status information to a logfile</source>
+<target>Zaženi pomanjšano in piši statusne informacije v datoteko za beleženje</target>
+<source>Error handling</source>
+<target>Napaka pri obravnavanju</target>
+<source>Overview</source>
+<target>Pregled</target>
+<source>Select logfile directory:</source>
+<target>Izberite imenik za datoteko beleženja:</target>
+<source>Maximum number of logfiles:</source>
+<target>Maksimalno število datotek beleženja:</target>
+<source>&Save</source>
+<target>&Shrani</target>
+<source>&Load</source>
+<target>&Naloži</target>
+<source>&Cancel</source>
+<target>&Prekliči</target>
+<source>Elements found:</source>
+<target>Najdenih elementov:</target>
+<source>Elements remaining:</source>
+<target>Preostalih elementov:</target>
+<source>Speed:</source>
+<target>Hitrost:</target>
+<source>Time remaining:</source>
+<target>Preostali čas:</target>
+<source>Time elapsed:</source>
+<target>Pretečen čas:</target>
+<source>Operation:</source>
+<target>Operacija:</target>
+<source>Select variant:</source>
+<target>Izberite varianto:</target>
+<source><Automatic></source>
+<target><Samodejno></target>
+<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
+<target>Prepoznaj in širi spremembe na obeh straneh z uporabo podatkovne baze. Izbrisi in spori so zaznani samodejno.</target>
+<source>Mirror ->></source>
+<target>Zrcalno ->></target>
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>Zrcalna varnostna kopija leve mape. Desna mapa bo spremenjena, da se bo natančno ujemala z levo mapo po sinhronizaciji.</target>
+<source>Update -></source>
+<target>Posodobi -></target>
+<source>Copy new or updated files to right folder.</source>
+<target>Kopiraj nove ali posodobljene datoteke v desno mapo.</target>
+<source>Custom</source>
+<target>Po meri</target>
+<source>Configure your own synchronization rules.</source>
+<target>Konfigurirajte vaša lastna sinhronizacijska pravila.</target>
+<source>Deletion handling</source>
+<target>Ravnanje pri brisanju</target>
+<source>&OK</source>
+<target>&V redu</target>
+<source>Configuration</source>
+<target>Konfiguracija</target>
+<source>Category</source>
+<target>Kategorija</target>
+<source>Action</source>
+<target>Ukrep</target>
+<source>Files/folders that exist on left side only</source>
+<target>Datoteke/mape, ki obstajajo samo na levi strani</target>
+<source>Files/folders that exist on right side only</source>
+<target>Datoteke/mape, ki obstajajo samo na desni strani</target>
+<source>Files that exist on both sides, left one is newer</source>
+<target>Datoteke, ki obstajajo na obeh straneh, leva je novejša</target>
+<source>Files that exist on both sides, right one is newer</source>
+<target>Datoteke, ki obstajajo na obeh straneh, desna je novejša</target>
+<source>Files that have different content</source>
+<target>Datoteke, ki imajo različno vsebino</target>
+<source>Conflicts/files that cannot be categorized</source>
+<target>Prisotni so spori/datoteke, ki ne morejo biti kategorizirani</target>
+<source>Compare by...</source>
+<target>Primerjaj po...</target>
+<source>
+Files are found equal if
+     - file size
+     - last write time and date
+are the same
+</source>
+<target>
+Datoteki sta enaki, če so
+     - velikost datoteke
+     - zadnji čas spremembe in datum
+enaki
+</target>
+<source>File size and date</source>
+<target>Velikosti in datumu datoteke</target>
+<source>
+Files are found equal if
+     - file content
+is the same
+</source>
+<target>
+Datoteki sta enaki, če
+     - je vsebina datoteke
+enaka
+</target>
+<source>File content</source>
+<target>Vsebini datoteke</target>
+<source>Symbolic Link handling</source>
+<target>Rokovanje s simboličnimi povezavami</target>
+<source>Synchronizing...</source>
+<target>Sinhroniziram...</target>
+<source>Elements processed:</source>
+<target>Obdelanih elementov:</target>
+<source>&Pause</source>
+<target>&Premor</target>
+<source>Compare by "File size and date"</source>
+<target>Primerjaj po "Datumu in velikosti"</target>
+<source>This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.</source>
+<target>Ta varianta oceni dve datoteki z enakim imenom kot enaki, ko imata enako velikost IN enak datum ter čas zadnjega spreminjanja.</target>
+<source>When the comparison is started with this option set the following decision tree is processed:</source>
+<target>Ko se primerjava zažene s tem setom možnosti, se obdela naslednje drevo odločitev:</target>
+<source>As a result the files are separated into the following categories:</source>
+<target>Kot rezultat so datoteke razdeljene v naslednje kategorije:</target>
+<source>- equal</source>
+<target>- enaki</target>
+<source>- left newer</source>
+<target>- leva novejša</target>
+<source>- right newer</source>
+<target>- desna novejša</target>
+<source>- exists left only</source>
+<target>- obstaja samo na levi</target>
+<source>- exists right only</source>
+<target>- obstaja samo na desni</target>
+<source>- conflict (same date, different size)</source>
+<target>- spor (isti datum, različna velikost)</target>
+<source>Compare by "File content"</source>
+<target>Primerjaj po "Vsebini datotek"</target>
+<source>
+As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.
+
+With this option enabled the decision tree is smaller:
+</source>
+<target>
+Kot že samo ime pove, sta dve datoteki označeni kot enaki samo takrat, ko imata enako vsebino. Ta možnost je bolj uporabna za preverjanje doslednosti kot za operacije varnostnega shranjevanja. Zaradi tega se časi datotek ne upoštevajo.
+
+Z omogočeno to možnostjo je drevo odločanja manjše:
+</target>
+<source>- different</source>
+<target>- različni</target>
+<source>Source code written in C++ utilizing:</source>
+<target>Izvorna koda napisana v C++ z uporabo:</target>
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Zahvale za prevod FreeFileSync gredo:</target>
+<source>Feedback and suggestions are welcome at:</source>
+<target>Povratne informacije in predlogi so dobrodošli na:</target>
+<source>FreeFileSync at Sourceforge</source>
+<target>FreeFileSync na Sourceforge</target>
+<source>Homepage</source>
+<target>Domača stran</target>
+<source>If you like FFS</source>
+<target>Če vam je FFS všeč</target>
+<source>Donate with PayPal</source>
+<target>Doniraj s PayPal</target>
+<source>Email</source>
+<target>Email</target>
+<source>Report translation error</source>
+<target>Poročaj o napaki prevoda</target>
+<source>Published under the GNU General Public License:</source>
+<target>Objavljeno pod licenco GNU General Public:</target>
+<source>Ignore subsequent errors</source>
+<target>Ignoriraj vse nadaljnje napake</target>
+<source>Hide further error messages during the current process</source>
+<target>Skrijte nadaljnja obvestila o napakah med trenutnim procesom</target>
+<source>&Ignore</source>
+<target>&Ignoriraj</target>
+<source>&Retry</source>
+<target>&Ponovi</target>
+<source>Do not show this dialog again</source>
+<target>Ne prikaži več tega pogovornega okna</target>
+<source>&Switch</source>
+<target>&Zamenjaj</target>
+<source>&Yes</source>
+<target>&Da</target>
+<source>&No</source>
+<target>&Ne</target>
+<source>Delete on both sides</source>
+<target>Izbriši na obeh straneh</target>
+<source>Delete on both sides even if the file is selected on one side only</source>
+<target>Izbriši na obeh straneh, četudi je datoteka izbrana na samo eni strani</target>
+<source>Use Recycle Bin</source>
+<target>Uporabi Koš</target>
+<source>
+Only files/directories that match all filter settings will be selected for synchronization.
+Note: The name filter must be specified relative(!) to main synchronization directories.
+</source>
+<target>
+Samo datoteke/imeniki, ki ustrezajo vsem nastavitvam filtra bodo izbrani za sinhronizacjo.
+Opomba: Ime filtra mora biti določen relativno(!) glede na glavne sinhronizacijske imenike.
+</target>
+<source>Hints:</source>
+<target>Namigi:</target>
+<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
+<target>1. Vnesite relativna imena datotek ali imenikov ločenih s ';' ali novo vrstico.</target>
+<source>2. Use wildcard characters '*' and '?'.</source>
+<target>2. Uporabite lahko tudi znake '*' in '?'.</target>
+<source>3. Exclude files directly on main grid via context menu.</source>
+<target>3. Izključite datoteke neposredno na glavni mreži s kontekstnim menujem.</target>
+<source>Example</source>
+<target>Primer</target>
+<source>
+Include: *.doc;*.zip;*.exe
+Exclude: \stuff\temp\*
+</source>
+<target>
+Vključi: *.doc;*.zip;*.exe
+Izključi: \stuff\temp\*
+</target>
+<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
+<target>Sinhroniziraj vse .doc, .zip in .exe datoteke, razen iz podmape "temp".</target>
+<source>Include</source>
+<target>Vključi</target>
+<source>Exclude</source>
+<target>Izključi</target>
+<source>Select time span:</source>
+<target>Izberite časovno obdobje:</target>
+<source>Minimum file size:</source>
+<target>Minimalna velikost datoteke:</target>
+<source>Maximum file size:</source>
+<target>Maksimalna velikost datoteke:</target>
+<source>&Default</source>
+<target>&Privzeto</target>
+<source>Move column up</source>
+<target>Premakni stolpec gor</target>
+<source>Move column down</source>
+<target>Premakni stolpec dol</target>
+<source>Copy locked files</source>
+<target>Kopiraj zaklenjene datoteke</target>
+<source>
+Copy shared or locked files using Volume Shadow Copy Service
+(Requires Administrator rights)
+</source>
+<target>
+Kopiraj deljene ali zaklenjene datoteke z uporabo servisa Shadow Copy
+(Zahteva pravice skrbnika)
+</target>
+<source>Copy filesystem permissions</source>
+<target>Kopiraj dovoljenja datotečnega sistema</target>
+<source>
+Transfer file and directory permissions
+(Requires Administrator rights)
+</source>
+<target>
+Prenesi dovoljenja datotek in imenikov
+(Zahteva pravice skrbnika)
+</target>
+<source>Hidden dialogs:</source>
+<target>Skriti pogovori:</target>
+<source>Reset</source>
+<target>Ponastavi</target>
+<source>Show hidden dialogs</source>
+<target>Prikaži skrite pogovore</target>
+<source>External applications</source>
+<target>Zunanje aplikacije</target>
+<source>Description</source>
+<target>Opis</target>
+<source>Variant</source>
+<target>Različica</target>
+<source>Statistics</source>
+<target>Statistika</target>
+<source>Find what:</source>
+<target>Najdi kaj</target>
+<source>Match case</source>
+<target>Ujemaj se s primerom</target>
+<source>&Find next</source>
+<target>&Najdi naslednje</target>
+<source>You may try to synchronize remaining items again (WITHOUT having to re-compare)!</source>
+<target>Naslednje predmete lahko ponovno poskusite sinhronizirati (BREZ ponovne primerjave) !</target>
+<source>Batch file created successfully!</source>
+<target>Datoteka batch je bila uspešno ustvarjena!</target>
+<source>Main bar</source>
+<target>Glavna vrstica</target>
+<source>Folder pairs</source>
+<target>Pari map</target>
+<source>Select view</source>
+<target>Izberite pogled</target>
+<source>Folder Comparison and Synchronization</source>
+<target>Primerjava in sinhronizacija imenika</target>
+<source>Recycle Bin not yet supported for this system!</source>
+<target>Koš še ni podprt za ta sistem!</target>
+<source>Set direction:</source>
+<target>Nastavi smer:</target>
+<source>Exclude temporarily</source>
+<target>Začasno izključi</target>
+<source>Include temporarily</source>
+<target>Trenutno vključi</target>
+<source>Exclude via filter:</source>
+<target>Izključi preko filtra:</target>
+<source><multiple selection></source>
+<target><mnogokratna izbira></target>
+<source>D-Click</source>
+<target>D-Klik</target>
+<source>Copy to clipboard	CTRL+C</source>
+<target>Kopiraj v odložišče	CTRL+C</target>
+<source>Delete files	DEL</source>
+<target>Izbriši datoteke	DEL</target>
+<source>Customize...</source>
+<target>Prilagodi...</target>
+<source>Auto-adjust columns</source>
+<target>Samo-prilagodi stolpce</target>
+<source>Include all rows</source>
+<target>Vključi se vrstice</target>
+<source>Exclude all rows</source>
+<target>Izključi vse vrstice</target>
+<source>Reset view</source>
+<target>Ponastavi pogled</target>
+<source>Show "%x"</source>
+<target>Prikaži "%x"</target>
+<source><Last session></source>
+<target><Zadnja seja></target>
+<source>Configuration saved!</source>
+<target>Konfiguracija shranjena!</target>
+<source>Save changes to current configuration?</source>
+<target>Shranim spremembe trenutne konfiguracije?</target>
+<source>Configuration loaded!</source>
+<target>Konfiguracija naložena!</target>
+<source>Hide files that exist on left side only</source>
+<target>Skrij datoteke, ki obstajajo samo na levi strani</target>
+<source>Show files that exist on left side only</source>
+<target>Prikaži datoteke, ki obstajajo samo na levi</target>
+<source>Hide files that exist on right side only</source>
+<target>Skrij datoteke, ki obstajajo samo na desni strani</target>
+<source>Show files that exist on right side only</source>
+<target>Prikaži datoteke, ki obstajajo samo na desni</target>
+<source>Hide files that are newer on left</source>
+<target>Skrij najnovejše datoteke na levi</target>
+<source>Show files that are newer on left</source>
+<target>Prikaži datoteke, ki so novejše na levi</target>
+<source>Hide files that are newer on right</source>
+<target>Skrij najnovejše datoteke na desni</target>
+<source>Show files that are newer on right</source>
+<target>Prikaži datoteke, ki so novejše na desni</target>
+<source>Hide files that are equal</source>
+<target>Skrij enake datoteke</target>
+<source>Show files that are equal</source>
+<target>Prikaži datoteke, ki so enake</target>
+<source>Hide files that are different</source>
+<target>Skrij datoteke ki so različne</target>
+<source>Show files that are different</source>
+<target>Prikaži datoteke, ki so različne</target>
+<source>Hide conflicts</source>
+<target>Skrij spore</target>
+<source>Show conflicts</source>
+<target>Prikaži spore</target>
+<source>Hide files that will be created on the left side</source>
+<target>Skrij datoteke, ki bodo ustvarjene na levi strani</target>
+<source>Show files that will be created on the left side</source>
+<target>Prikaži datoteke, ki bodo ustvarjene na levi strani</target>
+<source>Hide files that will be created on the right side</source>
+<target>Skrij datoteke, ki bodo ustvarjene na desni strani</target>
+<source>Show files that will be created on the right side</source>
+<target>Prikaži datoteke, ki bodo ustvarjene na desni strani</target>
+<source>Hide files that will be deleted on the left side</source>
+<target>Skrij datoteke, ki bodo izbrisane na levi strani</target>
+<source>Show files that will be deleted on the left side</source>
+<target>Prikaži datoteke, ki bodo izbrisane na levi strani</target>
+<source>Hide files that will be deleted on the right side</source>
+<target>Skrij datoteke, ki bodo izbrisane na desni strani</target>
+<source>Show files that will be deleted on the right side</source>
+<target>Prikaži datoteke, ki bodo izbrisane na desni strani</target>
+<source>Hide files that will be overwritten on left side</source>
+<target>Skrij datoteke, ki bodo prepisane na levi strani</target>
+<source>Show files that will be overwritten on left side</source>
+<target>Prikaži datoteke, ki bodo prepisane na levi strani</target>
+<source>Hide files that will be overwritten on right side</source>
+<target>Skrij datoteke, ki bodo prepisane na desni strani</target>
+<source>Show files that will be overwritten on right side</source>
+<target>Prikaži datoteke, ki bodo prepisane na desni strani</target>
+<source>Hide files that won't be copied</source>
+<target>Skrij datoteke, ki ne bodo kopirane</target>
+<source>Show files that won't be copied</source>
+<target>Prikaži datoteke, ki ne bodo kopirane</target>
+<source>All directories in sync!</source>
+<target>Vsi imeniki so sinhronizirani!</target>
+<source>Please run a Compare first before synchronizing!</source>
+<target>Prosim najprej zaženite Primerjaj preden sinhronizirate!</target>
+<source>Comma separated list</source>
+<target>Seznam ločen z vejico</target>
+<source>Legend</source>
+<target>Legenda</target>
+<source>File list exported!</source>
+<target>Seznam datotek je bil izvožen!</target>
+<source>
+<pluralform>Object deleted successfully!</pluralform>
+<pluralform>%x objects deleted successfully!</pluralform>
+</source>
+<target>
+<pluralform>Objekt uspešno izbrisan!</pluralform>
+<pluralform>%x objekta uspešno izbrisana!</pluralform>
+<pluralform>%x objekti uspešno izbrisani!</pluralform>
+<pluralform>%x objektov uspešno izbrisanih!</pluralform>
+</target>
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>1 imenik</pluralform>
+<pluralform>%x imenika</pluralform>
+<pluralform>%x imeniki</pluralform>
+<pluralform>%x imenikov</pluralform>
+</target>
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>1 datoteka</pluralform>
+<pluralform>%x datoteki</pluralform>
+<pluralform>%x datoteke</pluralform>
+<pluralform>%x datotek</pluralform>
+</target>
+<source>
+<pluralform>%x of 1 row in view</pluralform>
+<pluralform>%x of %y rows in view</pluralform>
+</source>
+<target>
+<pluralform>%x od 1 vrstice v prikazu</pluralform>
+<pluralform>%x od %y vrstic v prikazu</pluralform>
+<pluralform>%x od %y vrstic v prikazu</pluralform>
+<pluralform>%x od %y vrstic v prikazu</pluralform>
+</target>
+<source>Scanning...</source>
+<target>Pregledujem...</target>
+<source>Comparing content...</source>
+<target>Primerjam vsebino...</target>
+<source>Paused</source>
+<target>Na premoru</target>
+<source>Aborted</source>
+<target>Prekinitev uspela</target>
+<source>Completed</source>
+<target>Zaključeno</target>
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Zahtevana je bila prekinitev: čakam, da se zaključi trenutna operacija...</target>
+<source>Continue</source>
+<target>Nadaljuj</target>
+<source>Pause</source>
+<target>Premor</target>
+<source>Cannot find %x</source>
+<target>Ne najdem %x</target>
+<source>DECISION TREE</source>
+<target>DREVO ODLOČITEV</target>
+<source>file exists on both sides</source>
+<target>datoteka obstaja na obeh straneh</target>
+<source>on one side only</source>
+<target>samo na eni strani</target>
+<source>different</source>
+<target>različni</target>
+<source>Inactive</source>
+<target>Neaktivno</target>
+<source>Second</source>
+<target>Sekunda</target>
+<source>Minute</source>
+<target>Minuta</target>
+<source>Hour</source>
+<target>Ura</target>
+<source>Day</source>
+<target>Dan</target>
+<source>Byte</source>
+<target>Bajt</target>
+<source>KB</source>
+<target>KB</target>
+<source>MB</source>
+<target>MB</target>
+<source>Filter: All pairs</source>
+<target>Filtriraj: Vse pare</target>
+<source>Filter: Single pair</source>
+<target>Filtriraj: En sam par</target>
+<source>Ignore</source>
+<target>Ignoriraj</target>
+<source>Direct</source>
+<target>Neposredno</target>
+<source>Follow</source>
+<target>Sledi</target>
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Integriraj zunanje aplikacije v kontekstni menu. Na voljo so naslednji makri:</target>
+<source>- full file or directory name</source>
+<target>- polno ime datoteke ali imenika</target>
+<source>- directory part only</source>
+<target>- del, ki zajema samo imenike</target>
+<source>- Other side's counterpart to %name</source>
+<target>- Duplikat z druge strani od %name</target>
+<source>- Other side's counterpart to %dir</source>
+<target>- Duplikat z druge strani od %dir</target>
+<source>Restore all hidden dialogs?</source>
+<target>Obnovim vse skrite pogovore?</target>
+<source>
+<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+</source>
+<target>
+<pluralform>Ali resnično želite premakniti naslednji objekt v Koš?</pluralform>
+<pluralform>Ali resnično želite premakniti naslednja %x objekta v Koš?</pluralform>
+<pluralform>Ali resnično želite premakniti naslednje %x objekte v Koš?</pluralform>
+<pluralform>Ali resnično želite premakniti naslednjih %x objektov v Koš?</pluralform>
+</target>
+<source>
+<pluralform>Do you really want to delete the following object?</pluralform>
+<pluralform>Do you really want to delete the following %x objects?</pluralform>
+</source>
+<target>
+<pluralform>Ali resnično želite izbrisati naslednji objekt?</pluralform>
+<pluralform>Ali resnično želite izbrisati naslednja %x objekta?</pluralform>
+<pluralform>Ali resnično želite izbrisati naslednje %x objekte?</pluralform>
+<pluralform>Ali resnično želite izbrisati naslednjih %x objektov?</pluralform>
+</target>
+<source>Leave as unresolved conflict</source>
+<target>Pusti kot nerešeni spor</target>
+<source>Delete permanently</source>
+<target>Trajno izbriši</target>
+<source>Delete or overwrite files permanently</source>
+<target>Trajno izbriši ali prepiši datoteke</target>
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>Uporabi Koš pri brisanju ali prepisovanju datotek</target>
+<source>Versioning</source>
+<target>Ustvarjanje različič</target>
+<source>Move files into a time-stamped subdirectory</source>
+<target>Premakni datoteke v časovno-označen podimenik</target>
+<source>Cannot determine sync-direction:</source>
+<target>Ne morem določiti sinhronizacijske smeri.</target>
+<source>Filter settings have changed!</source>
+<target>Nastavitve filtra so bile spremenjene!</target>
+<source>Both sides have changed since last synchronization!</source>
+<target>Obe strani sta se spremenili od zadnje sinhronizacije!</target>
+<source>No change since last synchronization!</source>
+<target>Ni sprememb od zadnje sinhronizacije!</target>
+<source>The file was not processed by last synchronization!</source>
+<target>Datoteka ni bila obdelana z zadnjo sinhronizacijo!</target>
+<source>Planned directory deletion is in conflict with its subdirectories and -files!</source>
+<target>Načrtovano brisanje imenika je v sporu z njegovimi podimeniki in -datotekami!</target>
+<source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
+<target>Nastavljanje privzetih smeri sinhronizacije: Stare datoteke bodo prepisane z novimi datotekami.</target>
+<source>The file does not contain a valid configuration:</source>
+<target>Datoteka ne vsebuje veljavne konfiguracije:</target>
+<source>Scanning:</source>
+<target>Pregledujem:</target>
+<source>Encoding extended time information: %x</source>
+<target>Podrobne informacije o času enkodiranja: %x</target>
+<source>You can ignore this error to consider the directory as empty.</source>
+<target>To napako z obravnavanjem imenika kot praznega lahko ignorirate.</target>
+<source>Directory does not exist:</source>
+<target>Imenik ne obstaja:</target>
+<source>Directories are dependent! Be careful when setting up synchronization rules:</source>
+<target>Imeniki so v odvisnosti! Bodite pozorni, ko nastavljate sinhronizacijska pravila:</target>
+<source>Comparing content of files %x</source>
+<target>Primerjam vsebino datotek %x</target>
+<source>Memory allocation failed!</source>
+<target>Neuspešno dodeljevanje pomnilnika!</target>
+<source>File %x has an invalid date!</source>
+<target>Datoteka %x ima neveljaven datum!</target>
+<source>Conflict detected:</source>
+<target>Zaznan spor:</target>
+<source>Files %x have the same date but a different size!</source>
+<target>Datoteki %x imata enak datum ampak različno velikost!</target>
+<source>Symlinks %x have the same date but a different target!</source>
+<target>Simbolične povezave %x imajo isti datum, vendar različni cilj!</target>
+<source>Comparing files by content failed.</source>
+<target>Primerjava datotek po vsebini ni uspela.</target>
+<source>Generating file list...</source>
+<target>Ustvarjam seznam datotek...</target>
+<source>Multiple...</source>
+<target>Večkratno...</target>
+<source>Files that are equal on both sides</source>
+<target>Datoteki, ki sta enaki na obeh straneh</target>
+<source>Equal files/folders that differ in attributes only</source>
+<target>Enake datoteke/mape, ki se razlikujejo samo v atributih</target>
+<source>Copy from right to left</source>
+<target>Kopiraj iz desne na levo</target>
+<source>Copy from left to right</source>
+<target>Kopiraj iz leve na desno</target>
+<source>Delete files/folders existing on left side only</source>
+<target>Izbriši datoteke/mape, ki obstajajo samo na levi strani</target>
+<source>Delete files/folders existing on right side only</source>
+<target>Izbriši datoteke/mape, ki obstajajo samo na desni strani</target>
+<source>Copy from right to left overwriting</source>
+<target>Kopiraj iz desne na levo s prepisovanjem</target>
+<source>Copy from left to right overwriting</source>
+<target>Kopiraj iz leve na desno s prepisovanjem</target>
+<source>Do nothing</source>
+<target>Ne naredi ničesar</target>
+<source>Copy attributes only from right to left</source>
+<target>Kopiraj atribute samo iz desne na levo</target>
+<source>Copy attributes only from left to right</source>
+<target>Kopiraj atribute samo iz leve na desno</target>
+<source>Deleting file %x</source>
+<target>Brisanje datoteke %x</target>
+<source>Deleting Symbolic Link %x</source>
+<target>Brisanje simbolične povezave %x</target>
+<source>Deleting folder %x</source>
+<target>Brisanje mape %x</target>
+<source>Moving %x to Recycle Bin</source>
+<target>Premikam %x v Koš</target>
+<source>Moving file %x to user-defined directory %y</source>
+<target>Premikam datoteko %x v uporabniško-določen imenik %y</target>
+<source>Moving folder %x to user-defined directory %y</source>
+<target>Premikam mapo %x v uporabniško-določen imenik %y</target>
+<source>Moving Symbolic Link %x to user-defined directory %y</source>
+<target>Premikam simbolično povezavo %x v uporabniško določen imenik %y</target>
+<source>Copying new file %x to %y</source>
+<target>Kopiram novo datoteko %x v %y</target>
+<source>Copying new Symbolic Link %x to %y</source>
+<target>Kopiram novo Simbolično povezavo %x v %y</target>
+<source>Overwriting file %x in %y</source>
+<target>Prepisujem datoteko %x v %y</target>
+<source>Overwriting Symbolic Link %x in %y</source>
+<target>Prepisujem Simbolično povezavo %x v %y</target>
+<source>Creating folder %x</source>
+<target>Ustvarjam mapo %x</target>
+<source>Verifying file %x</source>
+<target>Preverjam datoteko %x</target>
+<source>Updating attributes of %x</source>
+<target>Posodabljam atribute od %x</target>
+<source>Source directory does not exist anymore:</source>
+<target>Izvorni imenik ne obstaja več:</target>
+<source>Nothing to synchronize according to configuration!</source>
+<target>Po trenutni konfiguraciji ni nič za sinhronizirati!</target>
+<source>Target directory name must not be empty!</source>
+<target>Ime ciljnega imenika ne sme biti prazno!</target>
+<source>User-defined directory for deletion was not specified!</source>
+<target>Uporabniško-določen imenik za brisanje ni bil naveden!</target>
+<source>Unresolved conflicts existing!</source>
+<target>Obstajajo nerešeni spori!</target>
+<source>You can ignore conflicts and continue synchronization.</source>
+<target>Lahko ignorirate spore in nadaljujete s sinhronizacijo.</target>
+<source>Significant difference detected:</source>
+<target>Zaznana je važna razlika:</target>
+<source>More than 50% of the total number of files will be copied or deleted!</source>
+<target>Več kot 50% od celotnega števila datotek bo kopiranih ali izbrisanih!</target>
+<source>Not enough free disk space available in:</source>
+<target>Na voljo ni dovolj prostega prostora na disku v:</target>
+<source>Free disk space required:</source>
+<target>Potreben prostor na disku:</target>
+<source>Free disk space available:</source>
+<target>Prosti disk, ki je na voljo:</target>
+<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
+<target>Imenik bo spremenjen, kar je del večkratnih parov map! Prosimo preglejte nastavitve sinhronizacije!</target>
+<source>Processing folder pair:</source>
+<target>Obdelujem par map:</target>
+<source>Generating database...</source>
+<target>Ustvarjam podatkovno bazo...</target>
+<source>Error copying locked file %x!</source>
+<target>Napaka pri kopiranju zaklenjene datoteke %x!</target>
+<source>Data verification error: Source and target file have different content!</source>
+<target>Napaka pri preverjanju podatkov: izvorna in ciljna datoteka imata različno vsebino!</target>

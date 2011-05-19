@@ -154,7 +154,7 @@ template <> struct AddParameterType<void>
 
 template <typename T>
 struct IsFunctionPointerRaw
-    {enum {result = 0};};
+{enum {result = 0};};
 
 template <typename T>
 struct IsFunctionPointerRaw<T(*)()>
@@ -531,7 +531,7 @@ struct IsFunctionPointerRaw<T(*)(
 
 template <typename T>
 struct IsMemberFunctionPointerRaw
-    {enum {result = 0};};
+{enum {result = 0};};
 
 template <typename T, typename S>
 struct IsMemberFunctionPointerRaw<T (S::*)()>

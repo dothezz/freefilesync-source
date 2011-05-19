@@ -11,7 +11,7 @@
 
 #ifdef NDEBUG
 
-#define assert_static(x)	((void)0)
+#define assert_static(x)	//((void)0) -> leads to error when seen in namespace scope!
 
 #else /* debugging enabled */
 namespace StaticCheckImpl

@@ -7,29 +7,30 @@
 #include "db_file.h"
 #include <wx/wfstream.h>
 #include <wx/zstream.h>
+#include <wx/mstream.h>
 #include "../shared/global_func.h"
 #include "../shared/file_error.h"
 #include "../shared/string_conv.h"
 #include "../shared/file_handling.h"
-#include <wx/mstream.h>
 #include "../shared/serialize.h"
 #include "../shared/file_io.h"
 #include "../shared/loki/ScopeGuard.h"
 #include "../shared/i18n.h"
+#include <boost/bind.hpp>
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "../shared/long_path_prefix.h"
 #endif
 
-using namespace ffs3;
+using namespace zen;
 
 
 namespace
 {
 //-------------------------------------------------------------------------------------------------------------------------------
 const char FILE_FORMAT_DESCR[] = "FreeFileSync";
-const int FILE_FORMAT_VER = 5;
+const int FILE_FORMAT_VER = 6;
 //-------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -67,19 +68,17 @@ private:
 //#######################################################################################################################################
 
 
-
-
-class ReadDirInfo : public util::ReadInputStream
+class ReadDirInfo : public zen::ReadInputStream
 {
 public:
     ReadDirInfo(wxInputStream& stream, const wxString& errorObjName, DirInformation& dirInfo) : ReadInputStream(stream, errorObjName)
     {
         //|-------------------------------------------------------------------------------------
-        //| ensure 32/64 bit portability: used fixed size data types only e.g. boost::uint32_t |
+        //| ensure 32/64 bit portability: use fixed size data types only e.g. boost::uint32_t |
         //|-------------------------------------------------------------------------------------
 
-        //read filter settings
-        dirInfo.filter = BaseFilter::loadFilter(getStream());
+        //read filter settings -> currently not required, but persisting it doesn't hurt
+        dirInfo.filter = HardFilter::loadFilter(getStream());
         check();
 
         //start recursion
@@ -89,56 +88,48 @@ public:
 private:
     void execute(DirContainer& dirCont) const
     {
-        boost::uint32_t fileCount = readNumberC<boost::uint32_t>();
-        while (fileCount-- != 0)
+        while (readNumberC<bool>())
             readSubFile(dirCont);
 
-        boost::uint32_t symlinkCount = readNumberC<boost::uint32_t>();
-        while (symlinkCount-- != 0)
+        while (readNumberC<bool>())
             readSubLink(dirCont);
 
-        boost::uint32_t dirCount = readNumberC<boost::uint32_t>();
-        while (dirCount-- != 0)
+        while (readNumberC<bool>())
             readSubDirectory(dirCont);
     }
 
     void readSubFile(DirContainer& dirCont) const
     {
         //attention: order of function argument evaluation is undefined! So do it one after the other...
-        const Zstring shortName = readStringC(); //file name
+        const Zstring shortName = readStringC<Zstring>(); //file name
 
-        const boost::int32_t  modHigh = readNumberC<boost::int32_t>();
-        const boost::uint32_t modLow  = readNumberC<boost::uint32_t>();
-
-        const boost::uint32_t sizeHigh = readNumberC<boost::uint32_t>();
-        const boost::uint32_t sizeLow  = readNumberC<boost::uint32_t>();
+        const boost::int64_t  modTime  = readNumberC<boost::int64_t>();
+        const boost::uint64_t fileSize = readNumberC<boost::uint64_t>();
 
         //const util::FileID fileIdentifier(stream_);
         //check();
 
         dirCont.addSubFile(shortName,
-                           FileDescriptor(wxLongLong(modHigh, modLow),
-                                          wxULongLong(sizeHigh, sizeLow)));
+                           FileDescriptor(modTime, fileSize));
     }
 
 
     void readSubLink(DirContainer& dirCont) const
     {
         //attention: order of function argument evaluation is undefined! So do it one after the other...
-        const Zstring         shortName  = readStringC(); //file name
-        const boost::int32_t  modHigh    = readNumberC<boost::int32_t>();
-        const boost::uint32_t modLow     = readNumberC<boost::uint32_t>();
-        const Zstring         targetPath = readStringC(); //file name
+        const Zstring         shortName  = readStringC<Zstring>(); //file name
+        const boost::int64_t  modTime    = readNumberC<boost::int64_t>();
+        const Zstring         targetPath = readStringC<Zstring>(); //file name
         const LinkDescriptor::LinkType linkType  = static_cast<LinkDescriptor::LinkType>(readNumberC<boost::int32_t>());
 
         dirCont.addSubLink(shortName,
-                           LinkDescriptor(wxLongLong(modHigh, modLow), targetPath, linkType));
+                           LinkDescriptor(modTime, targetPath, linkType));
     }
 
 
     void readSubDirectory(DirContainer& dirCont) const
     {
-        const Zstring shortName = readStringC(); //directory name
+        const Zstring shortName = readStringC<Zstring>(); //directory name
         DirContainer& subDir = dirCont.addSubDir(shortName);
         execute(subDir); //recurse
     }
@@ -161,17 +152,19 @@ Partner-ID 567 _/  \_  Partner-ID 123
     ...                     ...
 */
 
-class ReadFileStream : public util::ReadInputStream
+class ReadFileStream : public zen::ReadInputStream
 {
 public:
-    ReadFileStream(wxInputStream& stream, const wxString& filename, DbStreamData& output) : ReadInputStream(stream, filename)
+    ReadFileStream(wxInputStream& stream, const wxString& filename, DbStreamData& output, int& versionId) : ReadInputStream(stream, filename)
     {
         //|-------------------------------------------------------------------------------------
         //| ensure 32/64 bit portability: used fixed size data types only e.g. boost::uint32_t |
         //|-------------------------------------------------------------------------------------
 
-        if (readNumberC<boost::int32_t>() != FILE_FORMAT_VER) //read file format version
+        boost::int32_t version = readNumberC<boost::int32_t>();
+        if (version != FILE_FORMAT_VER) //read file format version
             throw FileError(wxString(_("Incompatible synchronization database format:")) + wxT(" \n") + wxT("\"") + filename + wxT("\""));
+        versionId = version;
 
         //read DB id
         const CharArray tmp = readArrayC();
@@ -197,7 +190,7 @@ public:
 
 DbStreamData loadFile(const Zstring& filename) //throw (FileError)
 {
-    if (!ffs3::fileExists(filename))
+    if (!zen::fileExists(filename))
         throw FileErrorDatabaseNotExisting(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
                                            _("One of the FreeFileSync database files is not yet existing:") + wxT(" \n") +
                                            wxT("\"") + zToWx(filename) + wxT("\""));
@@ -208,12 +201,13 @@ DbStreamData loadFile(const Zstring& filename) //throw (FileError)
     wxZlibInputStream input(uncompressed, wxZLIB_ZLIB);
 
     DbStreamData output;
-    ReadFileStream(input, zToWx(filename), output);
+    int versionId = 0;
+    ReadFileStream (input, zToWx(filename), output, versionId);
     return output;
 }
 
 
-std::pair<DirInfoPtr, DirInfoPtr> ffs3::loadFromDisk(const BaseDirMapping& baseMapping) //throw (FileError)
+std::pair<DirInfoPtr, DirInfoPtr> zen::loadFromDisk(const BaseDirMapping& baseMapping) //throw (FileError)
 {
     const Zstring fileNameLeft  = baseMapping.getDBFilename<LEFT_SIDE>();
     const Zstring fileNameRight = baseMapping.getDBFilename<RIGHT_SIDE>();
@@ -257,87 +251,128 @@ std::pair<DirInfoPtr, DirInfoPtr> ffs3::loadFromDisk(const BaseDirMapping& baseM
 
 
 //-------------------------------------------------------------------------------------------------------------------------
-
 template <SelectedSide side>
-struct IsNonEmpty
-{
-    bool operator()(const FileSystemObject& fsObj) const
-    {
-        return !fsObj.isEmpty<side>();
-    }
-};
-
-
-template <SelectedSide side>
-class SaveDirInfo : public util::WriteOutputStream
+class SaveDirInfo : public WriteOutputStream
 {
 public:
-    SaveDirInfo(const BaseDirMapping& baseMapping, const wxString& errorObjName, wxOutputStream& stream) : WriteOutputStream(errorObjName, stream)
+    SaveDirInfo(const BaseDirMapping& baseMapping, const DirContainer* oldDirInfo, const wxString& errorObjName, wxOutputStream& stream) : WriteOutputStream(errorObjName, stream)
     {
         //save filter settings
         baseMapping.getFilter()->saveFilter(getStream());
         check();
 
         //start recursion
-        execute(baseMapping);
+        execute(baseMapping, oldDirInfo);
     }
 
 private:
-    friend class util::ProxyForEach<SaveDirInfo<side> >; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
-
-    void execute(const HierarchyObject& hierObj)
+    void execute(const HierarchyObject& hierObj, const DirContainer* oldDirInfo)
     {
-        util::ProxyForEach<SaveDirInfo<side> > prx(*this); //grant std::for_each access to private parts of this class
-
-        writeNumberC<boost::uint32_t>(std::count_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), IsNonEmpty<side>())); //number of (existing) files
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx);
-
-        writeNumberC<boost::uint32_t>(std::count_if(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), IsNonEmpty<side>())); //number of (existing) files
-        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx);
-
-        writeNumberC<boost::uint32_t>(std::count_if(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), IsNonEmpty<side>())); //number of (existing) directories
-        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), prx);
+        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), boost::bind(&SaveDirInfo::processFile, this, _1, oldDirInfo));
+        writeNumberC<bool>(false); //mark last entry
+        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), boost::bind(&SaveDirInfo::processLink, this, _1, oldDirInfo));
+        writeNumberC<bool>(false); //mark last entry
+        std::for_each(hierObj.useSubDirs ().begin(), hierObj.useSubDirs ().end(), boost::bind(&SaveDirInfo::processDir,  this, _1, oldDirInfo));
+        writeNumberC<bool>(false); //mark last entry
     }
 
-    void operator()(const FileMapping& fileMap)
+    void processFile(const FileMapping& fileMap, const DirContainer* oldDirInfo)
     {
-        if (!fileMap.isEmpty<side>())
-        {
-            writeStringC(fileMap.getShortName<side>()); //file name
-            writeNumberC<boost::int32_t> (fileMap.getLastWriteTime<side>().GetHi()); //last modification time
-            writeNumberC<boost::uint32_t>(fileMap.getLastWriteTime<side>().GetLo()); //
-            writeNumberC<boost::uint32_t>(fileMap.getFileSize<side>().GetHi()); //filesize
-            writeNumberC<boost::uint32_t>(fileMap.getFileSize<side>().GetLo()); //
+        const Zstring shortName = fileMap.getObjShortName();
 
-            //fileMap.getFileID<side>().toStream(stream_); //unique file identifier
-            //check();
+        if (fileMap.getCategory() == FILE_EQUAL) //data in sync: write current state
+        {
+            if (!fileMap.isEmpty<side>())
+            {
+                writeNumberC<bool>(true); //mark beginning of entry
+                writeStringC(shortName);
+                writeNumberC<boost::int64_t >(to<boost::int64_t>(fileMap.getLastWriteTime<side>())); //last modification time
+                writeNumberC<boost::uint64_t>(to<boost::uint64_t>(fileMap.getFileSize<side>())); //filesize
+            }
+        }
+        else //not in sync: reuse last synchronous state
+        {
+            if (oldDirInfo) //no data is also a "synchronous state"!
+            {
+                DirContainer::FileList::const_iterator iter = oldDirInfo->files.find(shortName);
+                if (iter != oldDirInfo->files.end())
+                {
+                    writeNumberC<bool>(true); //mark beginning of entry
+                    writeStringC(shortName);
+                    writeNumberC<boost::int64_t >(to<boost::int64_t>(iter->second.lastWriteTimeRaw)); //last modification time
+                    writeNumberC<boost::uint64_t>(to<boost::uint64_t>(iter->second.fileSize)); //filesize
+                }
+            }
         }
     }
 
-    void operator()(const SymLinkMapping& linkObj)
+    void processLink(const SymLinkMapping& linkObj, const DirContainer* oldDirInfo)
     {
-        if (!linkObj.isEmpty<side>())
+        const Zstring shortName = linkObj.getObjShortName();
+
+        if (linkObj.getCategory() == FILE_EQUAL) //data in sync: write current state
         {
-            writeStringC(linkObj.getShortName<side>());
-            writeNumberC<boost::int32_t> (linkObj.getLastWriteTime<side>().GetHi()); //last modification time
-            writeNumberC<boost::uint32_t>(linkObj.getLastWriteTime<side>().GetLo()); //
-            writeStringC(linkObj.getTargetPath<side>());
-            writeNumberC<boost::int32_t>(linkObj.getLinkType<side>());
+            if (!linkObj.isEmpty<side>())
+            {
+                writeNumberC<bool>(true); //mark beginning of entry
+                writeStringC(shortName);
+                writeNumberC<boost::int64_t>(to<boost::int64_t>(linkObj.getLastWriteTime<side>())); //last modification time
+                writeStringC(linkObj.getTargetPath<side>());
+                writeNumberC<boost::int32_t>(linkObj.getLinkType<side>());
+            }
+        }
+        else //not in sync: reuse last synchronous state
+        {
+            if (oldDirInfo) //no data is also a "synchronous state"!
+            {
+                DirContainer::LinkList::const_iterator iter = oldDirInfo->links.find(shortName);
+                if (iter != oldDirInfo->links.end())
+                {
+                    writeNumberC<bool>(true); //mark beginning of entry
+                    writeStringC(shortName);
+                    writeNumberC<boost::int64_t>(to<boost::int64_t>(iter->second.lastWriteTimeRaw)); //last modification time
+                    writeStringC(iter->second.targetPath);
+                    writeNumberC<boost::int32_t>(iter->second.type);
+                }
+            }
         }
     }
 
-    void operator()(const DirMapping& dirMap)
+    void processDir(const DirMapping& dirMap, const DirContainer* oldDirInfo)
     {
-        if (!dirMap.isEmpty<side>())
+        const Zstring shortName = dirMap.getObjShortName();
+
+        const DirContainer* subDirInfo = NULL;
+        if (oldDirInfo) //no data is also a "synchronous state"!
         {
-            writeStringC(dirMap.getShortName<side>()); //directory name
-            execute(dirMap); //recurse
+            DirContainer::DirList::const_iterator iter = oldDirInfo->dirs.find(shortName);
+            if (iter != oldDirInfo->dirs.end())
+                subDirInfo = &iter->second;
+        }
+
+        if (dirMap.getCategory() == FILE_EQUAL) //data in sync: write current state
+        {
+            if (!dirMap.isEmpty<side>())
+            {
+                writeNumberC<bool>(true); //mark beginning of entry
+                writeStringC(shortName);
+                execute(dirMap, subDirInfo); //recurse
+            }
+        }
+        else //not in sync: reuse last synchronous state
+        {
+            if (subDirInfo) //no data is also a "synchronous state"!
+            {
+                writeNumberC<bool>(true); //mark beginning of entry
+                writeStringC(shortName);
+            }
+            execute(dirMap, subDirInfo); //recurse
         }
     }
 };
 
 
-class WriteFileStream : public util::WriteOutputStream
+class WriteFileStream : public WriteOutputStream
 {
 public:
     WriteFileStream(const DbStreamData& input, const wxString& filename, wxOutputStream& stream) : WriteOutputStream(filename, stream)
@@ -383,7 +418,7 @@ void saveFile(const DbStreamData& dbStream, const Zstring& filename) //throw (Fi
     }
     //(try to) hide database file
 #ifdef FFS_WIN
-    ::SetFileAttributes(ffs3::applyLongPathPrefix(filename).c_str(), FILE_ATTRIBUTE_HIDDEN);
+    ::SetFileAttributes(zen::applyLongPathPrefix(filename).c_str(), FILE_ATTRIBUTE_HIDDEN);
 #endif
 }
 
@@ -395,13 +430,13 @@ bool entryExisting(const DirectoryTOC& table, const UniqueId& newKey, const Memo
         return false;
 
     if (!newValue.get() || !iter->second.get())
-        return !newValue.get() && !iter->second.get();
+        return newValue.get() == iter->second.get();
 
     return *newValue == *iter->second;
 }
 
 
-void ffs3::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
+void zen::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
 {
     //transactional behaviour! write to tmp files first
     const Zstring fileNameLeftTmp  = baseMapping.getDBFilename<LEFT_SIDE>()  + Zstr(".tmp");
@@ -437,11 +472,47 @@ void ffs3::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
         dbEntriesRight.first = util::generateGUID();
     }
 
+
+    //(try to) read old DirInfo
+    std::auto_ptr<DirInformation> oldDirInfoLeft;
+    try
+    {
+        DirectoryTOC::const_iterator iter = dbEntriesLeft.second.find(dbEntriesRight.first);
+        if (iter != dbEntriesLeft.second.end())
+            if (iter->second.get())
+            {
+                const std::vector<char>& memStream = *iter->second;
+                wxMemoryInputStream buffer(&memStream[0], memStream.size()); //convert char-array to inputstream: no copying, ownership not transferred
+                std::auto_ptr<DirInformation> dirInfoTmp(new DirInformation);
+                ReadDirInfo(buffer, zToWx(baseMapping.getDBFilename<LEFT_SIDE>()), *dirInfoTmp);  //read file/dir information
+                oldDirInfoLeft = dirInfoTmp;
+            }
+    }
+    catch(FileError&) {} //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
+
+    std::auto_ptr<DirInformation> oldDirInfoRight;
+    try
+    {
+        DirectoryTOC::const_iterator iter = dbEntriesRight.second.find(dbEntriesLeft.first);
+        if (iter != dbEntriesRight.second.end())
+            if (iter->second.get())
+            {
+                const std::vector<char>& memStream = *iter->second;
+                wxMemoryInputStream buffer(&memStream[0], memStream.size()); //convert char-array to inputstream: no copying, ownership not transferred
+                std::auto_ptr<DirInformation> dirInfoTmp(new DirInformation);
+                ReadDirInfo(buffer, zToWx(baseMapping.getDBFilename<RIGHT_SIDE>()), *dirInfoTmp);  //read file/dir information
+                oldDirInfoRight = dirInfoTmp;
+            }
+    }
+    catch(FileError&) {}
+
+
     //create new database entries
     MemoryStreamPtr dbEntryLeft(new std::vector<char>);
     {
         wxMemoryOutputStream buffer;
-        SaveDirInfo<LEFT_SIDE>(baseMapping, zToWx(baseMapping.getDBFilename<LEFT_SIDE>()), buffer);
+        DirContainer* oldDir = oldDirInfoLeft.get() ? &oldDirInfoLeft->baseDirContainer : NULL;
+        SaveDirInfo<LEFT_SIDE>(baseMapping, oldDir, zToWx(baseMapping.getDBFilename<LEFT_SIDE>()), buffer);
         dbEntryLeft->resize(buffer.GetSize());               //convert output stream to char-array
         buffer.CopyTo(&(*dbEntryLeft)[0], buffer.GetSize()); //
     }
@@ -449,7 +520,8 @@ void ffs3::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
     MemoryStreamPtr dbEntryRight(new std::vector<char>);
     {
         wxMemoryOutputStream buffer;
-        SaveDirInfo<RIGHT_SIDE>(baseMapping, zToWx(baseMapping.getDBFilename<RIGHT_SIDE>()), buffer);
+        DirContainer* oldDir = oldDirInfoRight.get() ? &oldDirInfoRight->baseDirContainer : NULL;
+        SaveDirInfo<RIGHT_SIDE>(baseMapping, oldDir, zToWx(baseMapping.getDBFilename<RIGHT_SIDE>()), buffer);
         dbEntryRight->resize(buffer.GetSize());               //convert output stream to char-array
         buffer.CopyTo(&(*dbEntryRight)[0], buffer.GetSize()); //
     }
@@ -462,15 +534,14 @@ void ffs3::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
         if (!updateRequiredLeft && !updateRequiredRight)
             return;
     }
-
-    dbEntriesLeft.second[dbEntriesRight.first] = dbEntryLeft;
-    dbEntriesRight.second[dbEntriesLeft.first] = dbEntryRight;
+    dbEntriesLeft .second[dbEntriesRight.first] = dbEntryLeft;
+    dbEntriesRight.second[dbEntriesLeft .first] = dbEntryRight;
 
     //write (temp-) files...
-    Loki::ScopeGuard guardTempFileLeft = Loki::MakeGuard(&ffs3::removeFile, fileNameLeftTmp);
+    Loki::ScopeGuard guardTempFileLeft = Loki::MakeGuard(&zen::removeFile, fileNameLeftTmp);
     saveFile(dbEntriesLeft, fileNameLeftTmp);  //throw (FileError)
 
-    Loki::ScopeGuard guardTempFileRight = Loki::MakeGuard(&ffs3::removeFile, fileNameRightTmp);
+    Loki::ScopeGuard guardTempFileRight = Loki::MakeGuard(&zen::removeFile, fileNameRightTmp);
     saveFile(dbEntriesRight, fileNameRightTmp); //throw (FileError)
 
     //operation finished: rename temp files -> this should work transactionally:

@@ -1,6 +1,6 @@
 /*
 www.sourceforge.net/projects/tinyxml
-Original code (2.0 and earlier )copyright (c) 2000-2002 Lee Thomason (www.grinninglizard.com)
+Original code by Lee Thomason (www.grinninglizard.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any
@@ -40,7 +40,7 @@ distribution.
 // Note tha "PutString" hardcodes the same list. This
 // is less flexible than it appears. Changing the entries
 // or order will break putstring.
-TiXmlBase::Entity TiXmlBase::entity[ NUM_ENTITY ] =
+TiXmlBase::Entity TiXmlBase::entity[ TiXmlBase::NUM_ENTITY ] =
 {
     { "&amp;",  5, '&' },
     { "&lt;",   4, '<' },
@@ -100,10 +100,7 @@ void TiXmlBase::ConvertUTF32ToUTF8( unsigned long input, char* output, int* leng
     else if ( input < 0x200000 )
         *length = 4;
     else
-    {
-        *length = 0;    // This code won't covert this correctly anyway.
-        return;
-    }
+    { *length = 0; return; }	// This code won't covert this correctly anyway.
 
     output += *length;
 
@@ -177,10 +174,7 @@ class TiXmlParsingData
 public:
     void Stamp( const char* now, TiXmlEncoding encoding );
 
-    const TiXmlCursor& Cursor()
-    {
-        return cursor;
-    }
+    const TiXmlCursor& Cursor() const	{ return cursor; }
 
 private:
     // Only used by the document!
@@ -281,10 +275,7 @@ void TiXmlParsingData::Stamp( const char* now, TiXmlEncoding encoding )
                         else if ( *(pU+1)==0xbfU && *(pU+2)==0xbfU )
                             p += 3;
                         else
-                        {
-                            p +=3;    // A normal character.
-                            ++col;
-                        }
+                        { p +=3; ++col; }	// A normal character.
                     }
                 }
                 else
@@ -425,8 +416,8 @@ const char* TiXmlBase::ReadName( const char* p, TIXML_STRING* name, TiXmlEncodin
     // After that, they can be letters, underscores, numbers,
     // hyphens, or colons. (Colons are valid ony for namespaces,
     // but tinyxml can't tell namespaces from names.)
-    if (p && *p
-        && ( IsAlpha( (unsigned char) *p, encoding ) || *p == '_' ) )
+    if (    p && *p
+            && ( IsAlpha( (unsigned char) *p, encoding ) || *p == '_' ) )
     {
         const char* start = p;
         while(		p && *p
@@ -592,8 +583,8 @@ const char* TiXmlBase::ReadText(	const char* p,
                                     TiXmlEncoding encoding )
 {
     *text = "";
-    if (!trimWhiteSpace			// certain tags always keep whitespace
-        || !condenseWhiteSpace )	// if true, whitespace is always kept
+    if (    !trimWhiteSpace			// certain tags always keep whitespace
+            || !condenseWhiteSpace )	// if true, whitespace is always kept
     {
         // Keep all the white space.
         while (	   p && *p
@@ -646,7 +637,7 @@ const char* TiXmlBase::ReadText(	const char* p,
     }
     if ( p && *p )
         p += strlen( endTag );
-    return p;
+    return ( p && *p ) ? p : 0;
 }
 
 #ifdef TIXML_USE_STL
@@ -778,8 +769,8 @@ const char* TiXmlDocument::Parse( const char* p, TiXmlParsingData* prevData, TiX
         }
 
         // Did we get encoding info?
-        if (encoding == TIXML_ENCODING_UNKNOWN
-            && node->ToDeclaration() )
+        if (    encoding == TIXML_ENCODING_UNKNOWN
+                && node->ToDeclaration() )
         {
             TiXmlDeclaration* dec = node->ToDeclaration();
             const char* enc = dec->Encoding();
@@ -888,8 +879,8 @@ TiXmlNode* TiXmlNode::Identify( const char* p, TiXmlEncoding encoding )
 #endif
         returnNode = new TiXmlUnknown();
     }
-    else if (IsAlpha( *(p+1), encoding )
-             || *(p+1) == '_' )
+    else if (    IsAlpha( *(p+1), encoding )
+                 || *(p+1) == '_' )
     {
 #ifdef DEBUG_PARSER
         TIXML_LOG( "XML parsing Element\n" );
@@ -939,8 +930,8 @@ void TiXmlElement::StreamIn (std::istream* in, TIXML_STRING* tag)
     // Okay...if we are a "/>" tag, then we're done. We've read a complete tag.
     // If not, identify and stream.
 
-    if (tag->at( tag->length() - 1 ) == '>'
-        && tag->at( tag->length() - 2 ) == '/' )
+    if (    tag->at( tag->length() - 1 ) == '>'
+            && tag->at( tag->length() - 2 ) == '/' )
     {
         // All good!
         return;
@@ -1315,9 +1306,10 @@ const char* TiXmlUnknown::Parse( const char* p, TiXmlParsingData* data, TiXmlEnc
 
     if ( !p )
     {
-        if ( document )	document->SetError( TIXML_ERROR_PARSING_UNKNOWN, 0, 0, encoding );
+        if ( document )
+            document->SetError( TIXML_ERROR_PARSING_UNKNOWN, 0, 0, encoding );
     }
-    if ( *p == '>' )
+    if ( p && *p == '>' )
         return p+1;
     return p;
 }
@@ -1367,7 +1359,8 @@ const char* TiXmlComment::Parse( const char* p, TiXmlParsingData* data, TiXmlEnc
 
     if ( !StringEqual( p, startTag, false, encoding ) )
     {
-        document->SetError( TIXML_ERROR_PARSING_COMMENT, p, data, encoding );
+        if ( document )
+            document->SetError( TIXML_ERROR_PARSING_COMMENT, p, data, encoding );
         return 0;
     }
     p += strlen( startTag );
@@ -1532,7 +1525,8 @@ const char* TiXmlText::Parse( const char* p, TiXmlParsingData* data, TiXmlEncodi
 
         if ( !StringEqual( p, startTag, false, encoding ) )
         {
-            document->SetError( TIXML_ERROR_PARSING_CDATA, p, data, encoding );
+            if ( document )
+                document->SetError( TIXML_ERROR_PARSING_CDATA, p, data, encoding );
             return 0;
         }
         p += strlen( startTag );
@@ -1556,7 +1550,7 @@ const char* TiXmlText::Parse( const char* p, TiXmlParsingData* data, TiXmlEncodi
 
         const char* end = "<";
         p = ReadText( p, &value, ignoreWhite, end, false, encoding );
-        if ( p )
+        if ( p && *p )
             return p-1;	// don't truncate the '<'
         return 0;
     }

@@ -9,16 +9,15 @@
 
 #include "shared/zstring.h"
 #include "shared/system_constants.h"
-#include <wx/longlong.h>
 #include <map>
 #include <set>
 #include <vector>
 #include "structures.h"
 #include <boost/shared_ptr.hpp>
 #include "shared/guid.h"
-#include "library/filter.h"
+#include "library/hard_filter.h"
 #include "shared/file_id.h"
-#include "library/dir_lock.h"
+#include "shared/int64.h"
 
 class DirectoryBuffer;
 
@@ -41,18 +40,18 @@ private:
 }
 
 
-namespace ffs3
+namespace zen
 {
 struct FileDescriptor
 {
     FileDescriptor() {}
-    FileDescriptor(const wxLongLong&  lastWriteTimeRawIn,
-                   const wxULongLong& fileSizeIn) :
+    FileDescriptor(zen::Int64  lastWriteTimeRawIn,
+                   zen::UInt64 fileSizeIn) :
         lastWriteTimeRaw(lastWriteTimeRawIn),
         fileSize(fileSizeIn) {}
 
-    wxLongLong  lastWriteTimeRaw;   //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
-    wxULongLong fileSize;
+    zen::Int64  lastWriteTimeRaw;   //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
+    zen::UInt64 fileSize;
 
     //#warning: what about memory consumption?? (assume large comparisons!!?)
     //util::FileID fileIdentifier; //unique file identifier, optional: may be NULL!
@@ -68,14 +67,14 @@ struct LinkDescriptor
     };
 
     LinkDescriptor() : type(TYPE_FILE) {}
-    LinkDescriptor(const wxLongLong& lastWriteTimeRawIn,
+    LinkDescriptor(zen::Int64 lastWriteTimeRawIn,
                    const Zstring& targetPathIn,
                    LinkType lt) :
         lastWriteTimeRaw(lastWriteTimeRawIn),
         targetPath(targetPathIn),
         type(lt) {}
 
-    wxLongLong lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
+    zen::Int64 lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
     Zstring    targetPath;       //symlink "content", may be empty if determination failed
     LinkType   type;             //type is required for Windows only! On Linux there is no such thing => consider this when comparing Symbolic Links!
 };
@@ -242,22 +241,16 @@ class BaseDirMapping : public HierarchyObject //synchronization base directory
 public:
     BaseDirMapping(const Zstring& dirPostfixedLeft,
                    const Zstring& dirPostfixedRight,
-                   const BaseFilter::FilterRef& filterIn) :
+                   const HardFilter::FilterRef& filterIn) :
         HierarchyObject(dirPostfixedLeft, dirPostfixedRight),
         filter(filterIn) {}
 
-    const BaseFilter::FilterRef& getFilter() const;
+    const HardFilter::FilterRef& getFilter() const;
     template <SelectedSide side> Zstring getDBFilename() const;
     virtual void swap();
 
-    //BaseDirMapping is created incrementally and not once via constructor => same for locks
-    template <SelectedSide side> void holdLock(const DirLock& lock);
-
 private:
-    boost::shared_ptr<DirLock> leftDirLock;
-    boost::shared_ptr<DirLock> rightDirLock;
-
-    BaseFilter::FilterRef filter;
+    HardFilter::FilterRef filter;
 };
 
 
@@ -308,10 +301,10 @@ public:
 
     //comparison result
     virtual CompareFilesResult getCategory() const = 0;
-    virtual const wxString& getCatConflict() const = 0; //only filled if getCategory() == FILE_CONFLICT
+    virtual wxString getCatConflict() const = 0; //only filled if getCategory() == FILE_CONFLICT
     //sync operation
     SyncOperation getSyncOperation() const;
-    const wxString& getSyncOpConflict() const; //only filled if getSyncOperation() == SYNC_DIR_INT_CONFLICT
+    wxString getSyncOpConflict() const; //only filled if getSyncOperation() == SYNC_DIR_INT_CONFLICT
     SyncOperation testSyncOperation(bool selected, SyncDirection syncDir) const; //get syncOp with provided settings
 
     //sync settings
@@ -380,7 +373,7 @@ public:
 
     virtual CompareFilesResult getCategory() const;
     CompareDirResult getDirCategory() const; //returns actually used subset of CompareFilesResult
-    virtual const wxString& getCatConflict() const;
+    virtual wxString getCatConflict() const;
 
 private:
     friend class CompareProcess; //only CompareProcess shall be allowed to change cmpResult
@@ -423,12 +416,12 @@ class FileMapping : public FileSystemObject
 public:
     virtual void accept(FSObjectVisitor& visitor) const;
 
-    template <SelectedSide side> const wxLongLong&  getLastWriteTime() const;
-    template <SelectedSide side> const wxULongLong& getFileSize() const;
+    template <SelectedSide side> zen::Int64  getLastWriteTime() const;
+    template <SelectedSide side> zen::UInt64 getFileSize() const;
     template <SelectedSide side> const Zstring getExtension() const;
 
     virtual CompareFilesResult getCategory() const;
-    virtual const wxString& getCatConflict() const;
+    virtual wxString getCatConflict() const;
 
 private:
     friend class CompareProcess;  //only CompareProcess shall be allowed to change cmpResult
@@ -470,13 +463,13 @@ class SymLinkMapping : public FileSystemObject //this class models a TRUE symbol
 public:
     virtual void accept(FSObjectVisitor& visitor) const;
 
-    template <SelectedSide side> const wxLongLong&  getLastWriteTime() const; //write time of the link, NOT target!
+    template <SelectedSide side> zen::Int64 getLastWriteTime() const; //write time of the link, NOT target!
     template <SelectedSide side> LinkDescriptor::LinkType getLinkType() const;
     template <SelectedSide side> const Zstring& getTargetPath() const;
 
     virtual CompareFilesResult getCategory() const;
     CompareSymlinkResult getLinkCategory()   const; //returns actually used subset of CompareFilesResult
-    virtual const wxString& getCatConflict() const;
+    virtual wxString getCatConflict() const;
 
 private:
     friend class CompareProcess;  //only CompareProcess shall be allowed to change cmpResult
@@ -598,7 +591,7 @@ CompareFilesResult FileMapping::getCategory() const
 
 
 inline
-const wxString& FileMapping::getCatConflict() const
+wxString FileMapping::getCatConflict() const
 {
     return cmpConflictDescr;
 }
@@ -619,10 +612,9 @@ CompareDirResult DirMapping::getDirCategory() const
 
 
 inline
-const wxString& DirMapping::getCatConflict() const
+wxString DirMapping::getCatConflict() const
 {
-    static wxString empty;
-    return empty;
+    return wxEmptyString;
 }
 
 
@@ -634,7 +626,7 @@ void FileSystemObject::setSyncDir(SyncDirection newDir)
 
 
 inline
-const wxString& FileSystemObject::getSyncOpConflict() const
+wxString FileSystemObject::getSyncOpConflict() const
 {
     //a sync operation conflict can occur when:
     //1. category-conflict and syncDir == NONE -> problem finding category
@@ -1016,7 +1008,7 @@ void DirMapping::copyToR()
 
 
 inline
-const BaseFilter::FilterRef& BaseDirMapping::getFilter() const
+const HardFilter::FilterRef& BaseDirMapping::getFilter() const
 {
     return filter;
 }
@@ -1027,22 +1019,6 @@ inline
 Zstring BaseDirMapping::getDBFilename() const
 {
     return getBaseDir<side>() + getSyncDBFilename();
-}
-
-
-template <>
-inline
-void BaseDirMapping::holdLock<LEFT_SIDE>(const DirLock& lock)
-{
-    leftDirLock.reset(new DirLock(lock));
-}
-
-
-template <>
-inline
-void BaseDirMapping::holdLock<RIGHT_SIDE>(const DirLock& lock)
-{
-    rightDirLock.reset(new DirLock(lock));
 }
 
 
@@ -1102,7 +1078,7 @@ inline
 void FileMapping::removeObjectL()
 {
     cmpResult = FILE_RIGHT_SIDE_ONLY;
-    dataLeft  = FileDescriptor(0, 0);
+    dataLeft  = FileDescriptor();
 }
 
 
@@ -1110,7 +1086,7 @@ inline
 void FileMapping::removeObjectR()
 {
     cmpResult = FILE_LEFT_SIDE_ONLY;
-    dataRight = FileDescriptor(0, 0);
+    dataRight = FileDescriptor();
 }
 
 
@@ -1134,7 +1110,7 @@ void FileMapping::copyToR()
 
 template <>
 inline
-const wxLongLong& FileMapping::getLastWriteTime<LEFT_SIDE>() const
+zen::Int64 FileMapping::getLastWriteTime<LEFT_SIDE>() const
 {
     return dataLeft.lastWriteTimeRaw;
 }
@@ -1142,7 +1118,7 @@ const wxLongLong& FileMapping::getLastWriteTime<LEFT_SIDE>() const
 
 template <>
 inline
-const wxLongLong& FileMapping::getLastWriteTime<RIGHT_SIDE>() const
+zen::Int64 FileMapping::getLastWriteTime<RIGHT_SIDE>() const
 {
     return dataRight.lastWriteTimeRaw;
 }
@@ -1150,7 +1126,7 @@ const wxLongLong& FileMapping::getLastWriteTime<RIGHT_SIDE>() const
 
 template <>
 inline
-const wxULongLong& FileMapping::getFileSize<LEFT_SIDE>() const
+zen::UInt64 FileMapping::getFileSize<LEFT_SIDE>() const
 {
     return dataLeft.fileSize;
 }
@@ -1158,7 +1134,7 @@ const wxULongLong& FileMapping::getFileSize<LEFT_SIDE>() const
 
 template <>
 inline
-const wxULongLong& FileMapping::getFileSize<RIGHT_SIDE>() const
+zen::UInt64 FileMapping::getFileSize<RIGHT_SIDE>() const
 {
     return dataRight.fileSize;
 }
@@ -1180,7 +1156,7 @@ const Zstring FileMapping::getExtension() const
 
 template <>
 inline
-const wxLongLong& SymLinkMapping::getLastWriteTime<LEFT_SIDE>() const
+zen::Int64 SymLinkMapping::getLastWriteTime<LEFT_SIDE>() const
 {
     return dataLeft.lastWriteTimeRaw;
 }
@@ -1188,7 +1164,7 @@ const wxLongLong& SymLinkMapping::getLastWriteTime<LEFT_SIDE>() const
 
 template <>
 inline
-const wxLongLong& SymLinkMapping::getLastWriteTime<RIGHT_SIDE>() const
+zen::Int64 SymLinkMapping::getLastWriteTime<RIGHT_SIDE>() const
 {
     return dataRight.lastWriteTimeRaw;
 }
@@ -1242,7 +1218,7 @@ CompareSymlinkResult SymLinkMapping::getLinkCategory() const
 
 
 inline
-const wxString& SymLinkMapping::getCatConflict() const
+wxString SymLinkMapping::getCatConflict() const
 {
     return cmpConflictDescr;
 }

@@ -4,10 +4,11 @@
 	<Project>
 		<Option title="RealtimeSync" />
 		<Option makefile="makefile" />
+		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Release">
-				<Option output="..\BUILD\RealtimeSync_Win32" prefix_auto="1" extension_auto="1" />
+				<Option output="..\BUILD\Bin\RealtimeSync_Win32" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="..\BUILD" />
 				<Option object_output="..\OBJ\RTS_Release_32_MinGW" />
 				<Option type="0" />
@@ -31,7 +32,7 @@
 				</Linker>
 			</Target>
 			<Target title="Debug-DLL">
-				<Option output="..\BUILD\RealtimeSync_Debug" prefix_auto="1" extension_auto="1" />
+				<Option output="..\BUILD\Bin\RealtimeSync_Debug" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="..\BUILD" />
 				<Option object_output="..\OBJ\RTS_Debug_32_MinGW" />
 				<Option type="0" />
@@ -136,7 +137,9 @@
 		<Unit filename="..\shared\help_provider.cpp" />
 		<Unit filename="..\shared\i18n.cpp" />
 		<Unit filename="..\shared\i18n.h" />
-		<Unit filename="..\shared\long_path_prefix.cpp" />
+		<Unit filename="..\shared\last_error.cpp" />
+		<Unit filename="..\shared\last_error.h" />
+		<Unit filename="..\shared\localization.cpp" />
 		<Unit filename="..\shared\long_path_prefix.h" />
 		<Unit filename="..\shared\mouse_move_dlg.cpp" />
 		<Unit filename="..\shared\pch.h">
@@ -149,8 +152,6 @@
 		<Unit filename="..\shared\resolve_path.h" />
 		<Unit filename="..\shared\standard_paths.cpp" />
 		<Unit filename="..\shared\standard_paths.h" />
-		<Unit filename="..\shared\system_func.cpp" />
-		<Unit filename="..\shared\system_func.h" />
 		<Unit filename="..\shared\tinyxml\tinystr.cpp" />
 		<Unit filename="..\shared\tinyxml\tinyxml.cpp" />
 		<Unit filename="..\shared\tinyxml\tinyxmlerror.cpp" />

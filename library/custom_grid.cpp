@@ -21,6 +21,7 @@
 #include <wx/icon.h>
 #include <wx/tooltip.h>
 #include <wx/settings.h>
+#include "../shared/i18n.h"
 
 #ifdef FFS_WIN
 #include <wx/timer.h>
@@ -31,7 +32,7 @@
 #include <gtk/gtk.h>
 #endif
 
-using namespace ffs3;
+using namespace zen;
 
 
 const size_t MIN_ROW_COUNT = 15;
@@ -294,10 +295,10 @@ protected:
                                 value = zToWx(fileObj.getBaseDirPf<side>());
                                 break;
                             case xmlAccess::SIZE: //file size
-                                value = ffs3::numberToStringSep(fileObj.getFileSize<side>());
+                                value = zen::toStringSep(fileObj.getFileSize<side>());
                                 break;
                             case xmlAccess::DATE: //date
-                                value = ffs3::utcTimeToLocalString(fileObj.getLastWriteTime<side>());
+                                value = zen::utcTimeToLocalString(fileObj.getLastWriteTime<side>());
                                 break;
                             case xmlAccess::EXTENSION: //file extension
                                 value = zToWx(fileObj.getExtension<side>());
@@ -325,7 +326,7 @@ protected:
                                 value = _("<Symlink>");
                                 break;
                             case xmlAccess::DATE: //date
-                                value = ffs3::utcTimeToLocalString(linkObj.getLastWriteTime<side>());
+                                value = zen::utcTimeToLocalString(linkObj.getLastWriteTime<side>());
                                 break;
                             case xmlAccess::EXTENSION: //file extension
                                 value = wxEmptyString;
@@ -675,7 +676,7 @@ void CustomGrid::initSettings(CustomGridLeft*   gridLeft,
 }
 
 
-void CustomGrid::release() //release connection to ffs3::GridView
+void CustomGrid::release() //release connection to zen::GridView
 {
     assert(getGridDataTable());
     getGridDataTable()->setGridDataTable(NULL); //kind of "disable" griddatatable; don't delete it with SetTable(NULL)! May be used by wxGridCellStringRenderer
@@ -1352,14 +1353,14 @@ void CustomGridRim::setTooltip(const wxMouseEvent& event)
                 virtual void visit(const FileMapping& fileObj)
                 {
                     tipMsg_ = zToWx(fileObj.getRelativeName<side>()) + wxT("\n") +
-                              _("Size") + wxT(": ") + ffs3::formatFilesizeToShortString(fileObj.getFileSize<side>()) + wxT("\n") +
-                              _("Date") + wxT(": ") + ffs3::utcTimeToLocalString(fileObj.getLastWriteTime<side>());
+                              _("Size") + wxT(": ") + zen::formatFilesizeToShortString(fileObj.getFileSize<side>()) + wxT("\n") +
+                              _("Date") + wxT(": ") + zen::utcTimeToLocalString(fileObj.getLastWriteTime<side>());
                 }
 
                 virtual void visit(const SymLinkMapping& linkObj)
                 {
                     tipMsg_ = zToWx(linkObj.getRelativeName<side>()) + wxT("\n") +
-                              _("Date") + wxT(": ") + ffs3::utcTimeToLocalString(linkObj.getLastWriteTime<side>());
+                              _("Date") + wxT(": ") + zen::utcTimeToLocalString(linkObj.getLastWriteTime<side>());
                 }
 
                 virtual void visit(const DirMapping& dirObj)
@@ -1698,7 +1699,7 @@ void CustomGridRim::getIconsToBeLoaded(std::vector<Zstring>& newLoad) //loads al
                 if (!fileName.empty())
                 {
                     //test if they are already loaded in buffer:
-                    if (ffs3::IconBuffer::getInstance().requestFileIcon(fileName))
+                    if (zen::IconBuffer::getInstance().requestFileIcon(fileName))
                     {
                         //exists in buffer: refresh Row
                         for (int k = 0; k < totalCols; ++k)
@@ -1746,7 +1747,7 @@ void IconUpdater::loadIconsAsynchronously(wxEvent& event) //loads all (not yet) 
     //merge vectors
     newLoad.insert(newLoad.end(), iconsLeft.begin(), iconsLeft.end());
 
-    ffs3::IconBuffer::getInstance().setWorkload(newLoad);
+    zen::IconBuffer::getInstance().setWorkload(newLoad);
 
     //event.Skip();
 }
@@ -1775,10 +1776,10 @@ bool CustomGridLeft::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelectio
 }
 
 
-void CustomGridLeft::initSettings(CustomGridLeft*   gridLeft,  //create connection with ffs3::GridView
+void CustomGridLeft::initSettings(CustomGridLeft*   gridLeft,  //create connection with zen::GridView
                                   CustomGridMiddle* gridMiddle,
                                   CustomGridRight*  gridRight,
-                                  const ffs3::GridView* gridDataView)
+                                  const zen::GridView* gridDataView)
 {
     //set underlying grid data
     assert(getGridDataTable());
@@ -1823,10 +1824,10 @@ bool CustomGridRight::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelecti
 }
 
 
-void CustomGridRight::initSettings(CustomGridLeft*   gridLeft,  //create connection with ffs3::GridView
+void CustomGridRight::initSettings(CustomGridLeft*   gridLeft,  //create connection with zen::GridView
                                    CustomGridMiddle* gridMiddle,
                                    CustomGridRight*  gridRight,
-                                   const ffs3::GridView* gridDataView)
+                                   const zen::GridView* gridDataView)
 {
     //set underlying grid data
     assert(getGridDataTable());
@@ -1921,10 +1922,10 @@ bool CustomGridMiddle::CreateGrid(int numRows, int numCols, wxGrid::wxGridSelect
 }
 
 
-void CustomGridMiddle::initSettings(CustomGridLeft*   gridLeft,  //create connection with ffs3::GridView
+void CustomGridMiddle::initSettings(CustomGridLeft*   gridLeft,  //create connection with zen::GridView
                                     CustomGridMiddle* gridMiddle,
                                     CustomGridRight*  gridRight,
-                                    const ffs3::GridView* gridDataView)
+                                    const zen::GridView* gridDataView)
 {
     //set underlying grid data
     assert(getGridDataTable());
@@ -2345,7 +2346,7 @@ void CustomGridMiddle::DrawColLabel(wxDC& dc, int col)
 }
 
 
-const wxBitmap& ffs3::getSyncOpImage(SyncOperation syncOp)
+const wxBitmap& zen::getSyncOpImage(SyncOperation syncOp)
 {
     switch (syncOp) //evaluate comparison result and sync direction
     {

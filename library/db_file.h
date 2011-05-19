@@ -7,24 +7,21 @@
 #ifndef DBFILE_H_INCLUDED
 #define DBFILE_H_INCLUDED
 
+#include "../shared/file_error.h"
 #include "../file_hierarchy.h"
 
-namespace ffs3
+namespace zen
 {
 void saveToDisk(const BaseDirMapping& baseMapping); //throw (FileError)
 
 struct DirInformation
 {
-    BaseFilter::FilterRef filter; //filter settings (used when retrieving directory data)
+    HardFilter::FilterRef filter; //filter settings (used when retrieving directory data)
     DirContainer baseDirContainer; //hierarchical directory information
 };
 typedef boost::shared_ptr<const DirInformation> DirInfoPtr;
 
-class FileErrorDatabaseNotExisting : public FileError
-{
-public:
-    FileErrorDatabaseNotExisting(const wxString& message) : FileError(message) {}
-};
+DEFINE_NEW_FILE_ERROR(FileErrorDatabaseNotExisting);
 
 std::pair<DirInfoPtr, DirInfoPtr> loadFromDisk(const BaseDirMapping& baseMapping); //throw (FileError, FileErrorDatabaseNotExisting) -> return value always bound!
 }

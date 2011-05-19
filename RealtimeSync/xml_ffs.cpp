@@ -15,7 +15,7 @@
 //include FreeFileSync xml headers
 #include "../library/process_xml.h"
 
-using namespace ffs3;
+using namespace zen;
 
 
 #ifdef FFS_WIN
@@ -44,7 +44,7 @@ xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& bat
     uniqueFolders.insert(zToWx(batchCfg.mainCfg.firstPair.rightDirectory));
 
     //additional folders
-    for (std::vector<ffs3::FolderPairEnh>::const_iterator i = batchCfg.mainCfg.additionalPairs.begin();
+    for (std::vector<zen::FolderPairEnh>::const_iterator i = batchCfg.mainCfg.additionalPairs.begin();
          i != batchCfg.mainCfg.additionalPairs.end(); ++i)
     {
         uniqueFolders.insert(zToWx(i->leftDirectory));
@@ -55,13 +55,8 @@ xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& bat
 
     output.directories.insert(output.directories.end(), uniqueFolders.begin(), uniqueFolders.end());
 
-    output.commandline = wxT("\"") + ffs3::getBinaryDir() +
-#ifdef FFS_WIN
-                         wxT("FreeFileSync.exe") +
-#elif defined FFS_LINUX
-                         wxT("FreeFileSync") +
-#endif
-                         wxT("\" \"") + filename + wxT("\"");
+    output.commandline = wxT("\"") + zen::getLauncher() + wxT("\"") +
+                         wxT(" \"") + filename + wxT("\"");
 
     return output;
 }
@@ -69,7 +64,7 @@ xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& bat
 
 void rts::readRealOrBatchConfig(const wxString& filename, xmlAccess::XmlRealConfig& config)  //throw (xmlAccess::XmlError);
 {
-    if (xmlAccess::getXmlType(filename) != xmlAccess::XML_BATCH_CONFIG)
+    if (xmlAccess::getXmlType(filename) != xmlAccess::XML_TYPE_BATCH)
     {
         xmlAccess::readRealConfig(filename, config);
         return;

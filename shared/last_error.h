@@ -10,7 +10,7 @@
 #include <wx/string.h>
 
 
-namespace ffs3
+namespace zen
 {
 //evaluate GetLastError()/errno and assemble specific error message
 #ifdef FFS_WIN

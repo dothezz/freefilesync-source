@@ -10,7 +10,7 @@
 #include "zstring.h"
 
 
-namespace ffs3
+namespace zen
 {
 Zstring getFormattedDirectoryName(const Zstring& dirname);
 }

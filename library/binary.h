@@ -8,10 +8,10 @@
 #define BINARY_H_INCLUDED
 
 #include "../shared/zstring.h"
-#include <wx/longlong.h>
 #include "../shared/file_error.h"
+#include "../shared/int64.h"
 
-namespace ffs3
+namespace zen
 {
 
 //callback functionality for status updates while comparing
@@ -19,7 +19,7 @@ class CompareCallback
 {
 public:
     virtual ~CompareCallback() {}
-    virtual void updateCompareStatus(const wxLongLong& totalBytesTransferred) = 0;
+    virtual void updateCompareStatus(zen::UInt64 totalBytesTransferred) = 0;
 };
 
 bool filesHaveSameContent(const Zstring& filename1, const Zstring& filename2, CompareCallback& callback); //throw FileError

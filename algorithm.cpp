@@ -12,7 +12,7 @@
 #include "shared/file_handling.h"
 #include "shared/recycler.h"
 #include <wx/msgdlg.h>
-#include "library/filter.h"
+#include "library/norm_filter.h"
 #include <boost/bind.hpp>
 #include "shared/string_conv.h"
 #include "shared/global_func.h"
@@ -20,11 +20,12 @@
 #include "shared/loki/TypeManip.h"
 #include "library/db_file.h"
 #include "library/cmp_filetime.h"
+#include "library/norm_filter.h"
 
-using namespace ffs3;
+using namespace zen;
 
 
-void ffs3::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp)
+void zen::swapGrids(const MainConfiguration& config, FolderComparison& folderCmp)
 {
     std::for_each(folderCmp.begin(), folderCmp.end(), boost::bind(&BaseDirMapping::swap, _1));
     redetermineSyncDirection(config, folderCmp, NULL);
@@ -35,7 +36,7 @@ void ffs3::swapGrids(const MainConfiguration& config, FolderComparison& folderCm
 class Redetermine
 {
 public:
-    Redetermine(const SyncConfiguration& configIn) : config(configIn) {}
+    Redetermine(const DirectionSet& dirCfgIn) : dirCfg(dirCfgIn) {}
 
     void execute(HierarchyObject& hierObj) const
     {
@@ -85,34 +86,34 @@ private:
         switch (fileObj.getCategory())
         {
             case FILE_LEFT_SIDE_ONLY:
-                if (fileObj.getFullName<LEFT_SIDE>().EndsWith(ffs3::TEMP_FILE_ENDING))
+                if (fileObj.getFullName<LEFT_SIDE>().EndsWith(zen::TEMP_FILE_ENDING))
                     fileObj.setSyncDir(SYNC_DIR_LEFT); //schedule potentially existing temporary files for deletion
                 else
-                    fileObj.setSyncDir(config.exLeftSideOnly);
+                    fileObj.setSyncDir(dirCfg.exLeftSideOnly);
                 break;
             case FILE_RIGHT_SIDE_ONLY:
-                if (fileObj.getFullName<RIGHT_SIDE>().EndsWith(ffs3::TEMP_FILE_ENDING))
+                if (fileObj.getFullName<RIGHT_SIDE>().EndsWith(zen::TEMP_FILE_ENDING))
                     fileObj.setSyncDir(SYNC_DIR_RIGHT); //schedule potentially existing temporary files for deletion
                 else
-                    fileObj.setSyncDir(config.exRightSideOnly);
+                    fileObj.setSyncDir(dirCfg.exRightSideOnly);
                 break;
             case FILE_RIGHT_NEWER:
-                fileObj.setSyncDir(config.rightNewer);
+                fileObj.setSyncDir(dirCfg.rightNewer);
                 break;
             case FILE_LEFT_NEWER:
-                fileObj.setSyncDir(config.leftNewer);
+                fileObj.setSyncDir(dirCfg.leftNewer);
                 break;
             case FILE_DIFFERENT:
-                fileObj.setSyncDir(config.different);
+                fileObj.setSyncDir(dirCfg.different);
                 break;
             case FILE_CONFLICT:
-                fileObj.setSyncDir(config.conflict);
+                fileObj.setSyncDir(dirCfg.conflict);
                 break;
             case FILE_EQUAL:
                 fileObj.setSyncDir(SYNC_DIR_NONE);
                 break;
             case FILE_DIFFERENT_METADATA:
-                fileObj.setSyncDir(config.conflict); //use setting from "conflict/cannot categorize"
+                fileObj.setSyncDir(dirCfg.conflict); //use setting from "conflict/cannot categorize"
                 break;
         }
     }
@@ -122,28 +123,28 @@ private:
         switch (linkObj.getLinkCategory())
         {
             case SYMLINK_LEFT_SIDE_ONLY:
-                linkObj.setSyncDir(config.exLeftSideOnly);
+                linkObj.setSyncDir(dirCfg.exLeftSideOnly);
                 break;
             case SYMLINK_RIGHT_SIDE_ONLY:
-                linkObj.setSyncDir(config.exRightSideOnly);
+                linkObj.setSyncDir(dirCfg.exRightSideOnly);
                 break;
             case SYMLINK_LEFT_NEWER:
-                linkObj.setSyncDir(config.leftNewer);
+                linkObj.setSyncDir(dirCfg.leftNewer);
                 break;
             case SYMLINK_RIGHT_NEWER:
-                linkObj.setSyncDir(config.rightNewer);
+                linkObj.setSyncDir(dirCfg.rightNewer);
                 break;
             case SYMLINK_CONFLICT:
-                linkObj.setSyncDir(config.conflict);
+                linkObj.setSyncDir(dirCfg.conflict);
                 break;
             case SYMLINK_DIFFERENT:
-                linkObj.setSyncDir(config.different);
+                linkObj.setSyncDir(dirCfg.different);
                 break;
             case SYMLINK_EQUAL:
                 linkObj.setSyncDir(SYNC_DIR_NONE);
                 break;
             case SYMLINK_DIFFERENT_METADATA:
-                linkObj.setSyncDir(config.conflict); //use setting from "conflict/cannot categorize"
+                linkObj.setSyncDir(dirCfg.conflict); //use setting from "conflict/cannot categorize"
                 break;
 
         }
@@ -154,16 +155,16 @@ private:
         switch (dirObj.getDirCategory())
         {
             case DIR_LEFT_SIDE_ONLY:
-                dirObj.setSyncDir(config.exLeftSideOnly);
+                dirObj.setSyncDir(dirCfg.exLeftSideOnly);
                 break;
             case DIR_RIGHT_SIDE_ONLY:
-                dirObj.setSyncDir(config.exRightSideOnly);
+                dirObj.setSyncDir(dirCfg.exRightSideOnly);
                 break;
             case DIR_EQUAL:
                 dirObj.setSyncDir(SYNC_DIR_NONE);
                 break;
             case DIR_DIFFERENT_METADATA:
-                dirObj.setSyncDir(config.conflict); //use setting from "conflict/cannot categorize"
+                dirObj.setSyncDir(dirCfg.conflict); //use setting from "conflict/cannot categorize"
                 break;
         }
 
@@ -171,7 +172,7 @@ private:
         execute(dirObj);
     }
 
-    const SyncConfiguration& config;
+    const DirectionSet dirCfg;
 };
 
 
@@ -216,7 +217,7 @@ struct AllElementsEqual : public std::unary_function<BaseDirMapping, bool>
 };
 
 
-bool ffs3::allElementsEqual(const FolderComparison& folderCmp)
+bool zen::allElementsEqual(const FolderComparison& folderCmp)
 {
     return std::find_if(folderCmp.begin(), folderCmp.end(), std::not1(AllElementsEqual())) == folderCmp.end();
 }
@@ -280,9 +281,9 @@ private:
         }
     }
 
-    Zstring     shortName;     //empty if object not existing
-    wxLongLong  lastWriteTime;
-    wxULongLong fileSize;
+    Zstring      shortName;     //empty if object not existing
+    zen::Int64  lastWriteTime;
+    zen::UInt64 fileSize;
 };
 
 
@@ -363,7 +364,7 @@ private:
     }
 
     Zstring    shortName;     //empty if object not existing
-    wxLongLong lastWriteTime;
+    zen::Int64 lastWriteTime;
     Zstring    targetPath;
 #ifdef FFS_WIN
     LinkDescriptor::LinkType type;
@@ -559,8 +560,8 @@ public:
         txtFilterChanged(wxString(_("Cannot determine sync-direction:")) + wxT(" \n") + _("Filter settings have changed!")),
         txtLastSyncFail(wxString(_("Cannot determine sync-direction:")) + wxT(" \n") + _("The file was not processed by last synchronization!")),
         txtDirDeleteConflict(_("Planned directory deletion is in conflict with its subdirectories and -files!")),
-        dbFilterLeft(NULL),
-        dbFilterRight(NULL),
+        //        dbFilterLeft(NULL),
+        //        dbFilterRight(NULL),
         handler_(handler)
     {
         if (AllElementsEqual()(baseDirectory)) //nothing to do: abort and don't show any nag-screens
@@ -571,23 +572,26 @@ public:
         if (dirInfo.first.get()  == NULL ||
             dirInfo.second.get() == NULL)
         {
-            //use standard settings:
-            SyncConfiguration defaultSync;
-            ffs3::setTwoWay(defaultSync);
-            Redetermine(defaultSync).execute(baseDirectory);
+            //set conservative "two-way" directions
+            DirectionSet twoWayCfg = getTwoWaySet();
+
+            Redetermine(twoWayCfg).execute(baseDirectory);
             return;
         }
 
         const DirInformation& dirInfoLeft  = *dirInfo.first;
         const DirInformation& dirInfoRight = *dirInfo.second;
 
-        //save db filter (if it needs to be considered only):
-        if (respectFiltering(baseDirectory, dirInfoLeft))
-            dbFilterLeft = dirInfoLeft.filter.get();
+        //-> considering filter not relevant:
+        //if narrowing filter: all ok; if widening filter (if file ex on both sides -> conflict, fine; if file ex. on one side: copy to other side: fine)
+        /*
+                //save db filter (if it needs to be considered only):
+                if (respectFiltering(baseDirectory, dirInfoLeft))
+                    dbFilterLeft = dirInfoLeft.filter.get();
 
-        if (respectFiltering(baseDirectory, dirInfoRight))
-            dbFilterRight = dirInfoRight.filter.get();
-
+                if (respectFiltering(baseDirectory, dirInfoRight))
+                    dbFilterRight = dirInfoRight.filter.get();
+        */
         execute(baseDirectory,
                 &dirInfoLeft.baseDirContainer,
                 &dirInfoRight.baseDirContainer);
@@ -595,6 +599,7 @@ public:
 
 
 private:
+    /*
     static bool respectFiltering(const BaseDirMapping& baseDirectory, const DirInformation& dirInfo)
     {
         //respect filtering if sync-DB filter is active && different from baseDir's filter:
@@ -602,7 +607,7 @@ private:
         // => dirInfo can be queried as if it were a scan without filters
         return !dirInfo.filter->isNull() && *dirInfo.filter != *baseDirectory.getFilter();
     }
-
+    */
 
     std::pair<DirInfoPtr, DirInfoPtr> loadDBFile(const BaseDirMapping& baseDirectory) //return NULL on failure
     {
@@ -666,12 +671,12 @@ private:
 
 
         //##################### schedule potentially existing temporary files for deletion ####################
-        if (cat == FILE_LEFT_SIDE_ONLY && fileObj.getFullName<LEFT_SIDE>().EndsWith(ffs3::TEMP_FILE_ENDING))
+        if (cat == FILE_LEFT_SIDE_ONLY && fileObj.getFullName<LEFT_SIDE>().EndsWith(zen::TEMP_FILE_ENDING))
         {
             fileObj.setSyncDir(SYNC_DIR_LEFT);
             return;
         }
-        else if (cat == FILE_RIGHT_SIDE_ONLY && fileObj.getFullName<RIGHT_SIDE>().EndsWith(ffs3::TEMP_FILE_ENDING))
+        else if (cat == FILE_RIGHT_SIDE_ONLY && fileObj.getFullName<RIGHT_SIDE>().EndsWith(zen::TEMP_FILE_ENDING))
         {
             fileObj.setSyncDir(SYNC_DIR_RIGHT);
             return;
@@ -895,40 +900,43 @@ private:
     const wxString txtLastSyncFail;
     const wxString txtDirDeleteConflict;
 
-    const BaseFilter* dbFilterLeft;  //optional
-    const BaseFilter* dbFilterRight; //optional
+    //const HardFilter* dbFilterLeft;  //optional
+    //const HardFilter* dbFilterRight; //optional
 
     DeterminationProblem* const handler_;
 };
 
 
 //---------------------------------------------------------------------------------------------------------------
-void ffs3::redetermineSyncDirection(const SyncConfiguration& config, BaseDirMapping& baseDirectory, DeterminationProblem* handler)
+void zen::redetermineSyncDirection(const SyncConfig& config, BaseDirMapping& baseDirectory, DeterminationProblem* handler)
 {
-    if (config.automatic)
+    if (config.var == SyncConfig::AUTOMATIC)
         RedetermineAuto(baseDirectory, handler);
     else
-        Redetermine(config).execute(baseDirectory);
+    {
+        DirectionSet dirCfg = extractDirections(config);
+        Redetermine(dirCfg).execute(baseDirectory);
+    }
 }
 
 
-void ffs3::redetermineSyncDirection(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp, DeterminationProblem* handler)
+void zen::redetermineSyncDirection(const MainConfiguration& mainCfg, FolderComparison& folderCmp, DeterminationProblem* handler)
 {
     if (folderCmp.size() == 0)
         return;
-    else if (folderCmp.size() != currentMainCfg.additionalPairs.size() + 1)
+    else if (folderCmp.size() != mainCfg.additionalPairs.size() + 1)
         throw std::logic_error("Programming Error: Contract violation!");
 
     //merge first and additional pairs
     std::vector<FolderPairEnh> allPairs;
-    allPairs.push_back(currentMainCfg.firstPair);
+    allPairs.push_back(mainCfg.firstPair);
     allPairs.insert(allPairs.end(),
-                    currentMainCfg.additionalPairs.begin(), //add additional pairs
-                    currentMainCfg.additionalPairs.end());
+                    mainCfg.additionalPairs.begin(), //add additional pairs
+                    mainCfg.additionalPairs.end());
 
     for (std::vector<FolderPairEnh>::const_iterator i = allPairs.begin(); i != allPairs.end(); ++i)
     {
-        redetermineSyncDirection(i->altSyncConfig.get() ? i->altSyncConfig->syncConfiguration : currentMainCfg.syncConfiguration,
+        redetermineSyncDirection(i->altSyncConfig.get() ? i->altSyncConfig->syncConfiguration : mainCfg.syncConfiguration,
                                  folderCmp[i - allPairs.begin()], handler);
     }
 }
@@ -975,7 +983,7 @@ private:
 };
 
 
-void ffs3::setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsObj)
+void zen::setSyncDirectionRec(SyncDirection newDirection, FileSystemObject& fsObj)
 {
     SetNewDirection dirSetter(newDirection);
 
@@ -1008,12 +1016,12 @@ template <bool include>
 class InOrExcludeAllRows
 {
 public:
-    void operator()(ffs3::BaseDirMapping& baseDirectory) const //be careful with operator() to no get called by std::for_each!
+    void operator()(zen::BaseDirMapping& baseDirectory) const //be careful with operator() to no get called by std::for_each!
     {
         execute(baseDirectory);
     }
 
-    void execute(ffs3::HierarchyObject& hierObj) const //don't create ambiguity by replacing with operator()
+    void execute(zen::HierarchyObject& hierObj) const //don't create ambiguity by replacing with operator()
     {
         util::ProxyForEach<const InOrExcludeAllRows<include> > prx(*this); //grant std::for_each access to private parts of this class
 
@@ -1025,17 +1033,17 @@ public:
 private:
     friend class util::ProxyForEach<const InOrExcludeAllRows<include> >; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
 
-    void operator()(ffs3::FileMapping& fileObj) const
+    void operator()(zen::FileMapping& fileObj) const
     {
         fileObj.setActive(include);
     }
 
-    void operator()(ffs3::SymLinkMapping& linkObj) const
+    void operator()(zen::SymLinkMapping& linkObj) const
     {
         linkObj.setActive(include);
     }
 
-    void operator()(ffs3::DirMapping& dirObj) const
+    void operator()(zen::DirMapping& dirObj) const
     {
         dirObj.setActive(include);
         execute(dirObj); //recursion
@@ -1043,7 +1051,7 @@ private:
 };
 
 
-void ffs3::setActiveStatus(bool newStatus, ffs3::FolderComparison& folderCmp)
+void zen::setActiveStatus(bool newStatus, zen::FolderComparison& folderCmp)
 {
     if (newStatus)
         std::for_each(folderCmp.begin(), folderCmp.end(), InOrExcludeAllRows<true>());  //include all rows
@@ -1052,7 +1060,7 @@ void ffs3::setActiveStatus(bool newStatus, ffs3::FolderComparison& folderCmp)
 }
 
 
-void ffs3::setActiveStatus(bool newStatus, ffs3::FileSystemObject& fsObj)
+void zen::setActiveStatus(bool newStatus, zen::FileSystemObject& fsObj)
 {
     fsObj.setActive(newStatus);
 
@@ -1079,21 +1087,44 @@ namespace
 {
 enum FilterStrategy
 {
-    STRATEGY_ALL,
-    STRATEGY_ACTIVE_ONLY
-    //STRATEGY_INACTIVE_ONLY -> logical conflict with InOrExcludeAllRows<false>
+    STRATEGY_SET,
+    STRATEGY_AND,
+    STRATEGY_OR
+};
+
+template <FilterStrategy strategy> struct Eval;
+
+template <>
+struct Eval<STRATEGY_SET> //process all elements
+{
+    template <class T>
+    bool process(const T& obj) const { return true; }
+};
+
+template <>
+struct Eval<STRATEGY_AND>
+{
+    template <class T>
+    bool process(const T& obj) const { return obj.isActive(); }
+};
+
+template <>
+struct Eval<STRATEGY_OR>
+{
+    template <class T>
+    bool process(const T& obj) const { return !obj.isActive(); }
 };
 
 
 template <FilterStrategy strategy>
-class FilterData
+class ApplyHardFilter
 {
 public:
-    FilterData(const BaseFilter& filterProcIn) : filterProc(filterProcIn) {}
+    ApplyHardFilter(const HardFilter& filterProcIn) : filterProc(filterProcIn) {}
 
-    void execute(ffs3::HierarchyObject& hierObj) const
+    void execute(zen::HierarchyObject& hierObj) const
     {
-        util::ProxyForEach<const FilterData> prx(*this); //grant std::for_each access to private parts of this class
+        util::ProxyForEach<const ApplyHardFilter> prx(*this); //grant std::for_each access to private parts of this class
 
         std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //files
         std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //symlinks
@@ -1101,28 +1132,26 @@ public:
     };
 
 private:
-    friend class util::ProxyForEach<const FilterData>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
+    friend class util::ProxyForEach<const ApplyHardFilter>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
 
-    bool processObject(ffs3::FileSystemObject& fsObj) const;
-
-    void operator()(ffs3::FileMapping& fileObj) const
+    void operator()(zen::FileMapping& fileObj) const
     {
-        if (processObject(fileObj))
+        if (Eval<strategy>().process(fileObj))
             fileObj.setActive(filterProc.passFileFilter(fileObj.getObjRelativeName()));
     }
 
-    void operator()(ffs3::SymLinkMapping& linkObj) const
+    void operator()(zen::SymLinkMapping& linkObj) const
     {
-        if (processObject(linkObj))
+        if (Eval<strategy>().process(linkObj))
             linkObj.setActive(filterProc.passFileFilter(linkObj.getObjRelativeName()));
     }
 
-    void operator()(ffs3::DirMapping& dirObj) const
+    void operator()(zen::DirMapping& dirObj) const
     {
         bool subObjMightMatch = true;
         const bool filterPassed = filterProc.passDirFilter(dirObj.getObjRelativeName(), &subObjMightMatch);
 
-        if (processObject(dirObj))
+        if (Eval<strategy>().process(dirObj))
             dirObj.setActive(filterPassed);
 
         if (!subObjMightMatch) //use same logic like directory traversing here: evaluate filter in subdirs only if objects could match
@@ -1134,65 +1163,150 @@ private:
         execute(dirObj);  //recursion
     }
 
-    const BaseFilter& filterProc;
+    const HardFilter& filterProc;
 };
 
-
-template <> //process all elements
-inline
-bool FilterData<STRATEGY_ALL>::processObject(ffs3::FileSystemObject& fsObj) const
-{
-    return true;
-}
-
 template <>
-inline
-bool FilterData<STRATEGY_ACTIVE_ONLY>::processObject(ffs3::FileSystemObject& fsObj) const
+class ApplyHardFilter<STRATEGY_OR>; //usage of InOrExcludeAllRows doesn't allow for strategy "or"
+
+
+
+template <FilterStrategy strategy>
+class ApplySoftFilter //falsify only! -> can run directly after "hard/base filter"
 {
-    return fsObj.isActive();
-}
+public:
+    ApplySoftFilter(const SoftFilter& timeSizeFilter) : timeSizeFilter_(timeSizeFilter) {}
+
+    void execute(zen::HierarchyObject& hierObj) const
+    {
+        util::ProxyForEach<const ApplySoftFilter> prx(*this); //grant std::for_each access to private parts of this class
+
+        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //files
+        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //symlinks
+        std::for_each(hierObj.useSubDirs ().begin(), hierObj.useSubDirs(). end(), prx); //directories
+    };
+
+private:
+    friend class util::ProxyForEach<const ApplySoftFilter>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
+
+    void operator()(zen::FileMapping& fileObj) const
+    {
+        if (Eval<strategy>().process(fileObj))
+        {
+            if (fileObj.isEmpty<LEFT_SIDE>())
+                fileObj.setActive(matchSize<RIGHT_SIDE>(fileObj) &&
+                                  matchTime<RIGHT_SIDE>(fileObj));
+            else if (fileObj.isEmpty<RIGHT_SIDE>())
+                fileObj.setActive(matchSize<LEFT_SIDE>(fileObj) &&
+                                  matchTime<LEFT_SIDE>(fileObj));
+            else
+            {
+                //the only case with partially unclear semantics:
+                //file and time filters may match on one side, leaving a total of 16 combinations for both sides!
+                /*
+                               ST S T -         ST := match size and time
+                               ---------         S := match size only
+                            ST |X|X|X|X|         T := match time only
+                            ------------         - := no match
+                             S |X|O|?|O|
+                            ------------         X := include row
+                             T |X|?|O|O|         O := exclude row
+                            ------------         ? := unclear
+                             - |X|O|O|O|
+                            ------------
+                */
+                //let's set ? := O
+                fileObj.setActive((matchSize<RIGHT_SIDE>(fileObj) &&
+                                   matchTime<RIGHT_SIDE>(fileObj)) ||
+                                  (matchSize<LEFT_SIDE>(fileObj) &&
+                                   matchTime<LEFT_SIDE>(fileObj)));
+            }
+        }
+    }
+
+    void operator()(zen::SymLinkMapping& linkObj) const
+    {
+        if (Eval<strategy>().process(linkObj))
+        {
+            if (linkObj.isEmpty<LEFT_SIDE>())
+                linkObj.setActive(matchTime<RIGHT_SIDE>(linkObj));
+            else if (linkObj.isEmpty<RIGHT_SIDE>())
+                linkObj.setActive(matchTime<LEFT_SIDE>(linkObj));
+            else
+                linkObj.setActive(matchTime<RIGHT_SIDE>(linkObj) ||
+                                  matchTime<LEFT_SIDE> (linkObj));
+        }
+    }
+
+    void operator()(zen::DirMapping& dirObj) const
+    {
+        execute(dirObj);  //recursion
+    }
+
+    template <SelectedSide side, class T>
+    bool matchTime(const T& obj) const
+    {
+        return timeSizeFilter_.matchTime(obj.template getLastWriteTime<side>());
+    }
+
+    template <SelectedSide side, class T>
+    bool matchSize(const T& obj) const
+    {
+        return timeSizeFilter_.matchSize(obj.template getFileSize<side>());
+    }
+
+    const SoftFilter timeSizeFilter_;
+};
 }
 
 
-void ffs3::addExcludeFiltering(const Zstring& excludeFilter, FolderComparison& folderCmp)
+void zen::addExcludeFiltering(FolderComparison& folderCmp, const Zstring& excludeFilter)
 {
     for (std::vector<BaseDirMapping>::iterator i = folderCmp.begin(); i != folderCmp.end(); ++i)
-        FilterData<STRATEGY_ACTIVE_ONLY>(*BaseFilter::FilterRef(new NameFilter(Zstr("*"), excludeFilter))).execute(*i);
+        ApplyHardFilter<STRATEGY_AND>(*HardFilter::FilterRef(
+                                          new NameFilter(FilterConfig().includeFilter, excludeFilter))).execute(*i);
 }
 
 
-void ffs3::applyFiltering(const MainConfiguration& currentMainCfg, FolderComparison& folderCmp)
+void zen::addSoftFiltering(BaseDirMapping& baseMap, const SoftFilter& timeSizeFilter)
+{
+    if (!timeSizeFilter.isNull()) //since we use STRATEGY_AND, we may skip a "null" filter
+        ApplySoftFilter<STRATEGY_AND>(timeSizeFilter).execute(baseMap);
+}
+
+
+void zen::applyFiltering(FolderComparison& folderCmp, const MainConfiguration& mainCfg)
 {
     if (folderCmp.size() == 0)
         return;
-    else if (folderCmp.size() != currentMainCfg.additionalPairs.size() + 1)
+    else if (folderCmp.size() != mainCfg.additionalPairs.size() + 1)
         throw std::logic_error("Programming Error: Contract violation!");
-
 
     //merge first and additional pairs
     std::vector<FolderPairEnh> allPairs;
-    allPairs.push_back(currentMainCfg.firstPair);
+    allPairs.push_back(mainCfg.firstPair);
     allPairs.insert(allPairs.end(),
-                    currentMainCfg.additionalPairs.begin(), //add additional pairs
-                    currentMainCfg.additionalPairs.end());
+                    mainCfg.additionalPairs.begin(), //add additional pairs
+                    mainCfg.additionalPairs.end());
 
-
-    const BaseFilter::FilterRef globalFilter(new NameFilter(currentMainCfg.globalFilter.includeFilter, currentMainCfg.globalFilter.excludeFilter));
 
     for (std::vector<FolderPairEnh>::const_iterator i = allPairs.begin(); i != allPairs.end(); ++i)
     {
         BaseDirMapping& baseDirectory = folderCmp[i - allPairs.begin()];
 
-        FilterData<STRATEGY_ALL>(*combineFilters(globalFilter,
-                                                 BaseFilter::FilterRef(new NameFilter(
-                                                                           i->localFilter.includeFilter,
-                                                                           i->localFilter.excludeFilter)))).execute(baseDirectory);
+        const NormalizedFilter normFilter = normalizeFilters(mainCfg.globalFilter, i->localFilter);
+
+        //"set" hard filter
+        ApplyHardFilter<STRATEGY_SET>(*normFilter.nameFilter).execute(baseDirectory);
+
+        //"and" soft filter
+        addSoftFiltering(baseDirectory, normFilter.timeSizeFilter);
     }
 }
 
 
 //############################################################################################################
-std::pair<wxString, int> ffs3::deleteFromGridAndHDPreview( //assemble message containing all files to be deleted
+std::pair<wxString, int> zen::deleteFromGridAndHDPreview( //assemble message containing all files to be deleted
     const std::vector<FileSystemObject*>& rowsToDeleteOnLeft,
     const std::vector<FileSystemObject*>& rowsToDeleteOnRight,
     const bool deleteOnBothSides)
@@ -1256,7 +1370,7 @@ std::pair<wxString, int> ffs3::deleteFromGridAndHDPreview( //assemble message co
 
 namespace
 {
-struct RemoveCallbackImpl : public ffs3::CallbackRemoveDir
+struct RemoveCallbackImpl : public zen::CallbackRemoveDir
 {
     RemoveCallbackImpl(DeleteFilesHandler& deleteCallback) : deleteCallback_(deleteCallback) {}
 
@@ -1287,7 +1401,7 @@ void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
                 {
                     if (useRecycleBin)
                     {
-                        if (ffs3::moveToRecycleBin(fsObj->getFullName<side>()))  //throw (FileError)
+                        if (zen::moveToRecycleBin(fsObj->getFullName<side>()))  //throw (FileError)
                             statusHandler.notifyDeletion(fsObj->getFullName<side>());
                     }
                     else
@@ -1301,7 +1415,7 @@ void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
 
                             virtual void visit(const FileMapping& fileObj)
                             {
-                                if (ffs3::removeFile(fileObj.getFullName<side>()))
+                                if (zen::removeFile(fileObj.getFullName<side>()))
                                     remCallback_.notifyDeletion(fileObj.getFullName<side>());
                             }
 
@@ -1310,10 +1424,10 @@ void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
                                 switch (linkObj.getLinkType<side>())
                                 {
                                     case LinkDescriptor::TYPE_DIR:
-                                        ffs3::removeDirectory(linkObj.getFullName<side>(), &remCallback_);
+                                        zen::removeDirectory(linkObj.getFullName<side>(), &remCallback_);
                                         break;
                                     case LinkDescriptor::TYPE_FILE:
-                                        if (ffs3::removeFile(linkObj.getFullName<side>()))
+                                        if (zen::removeFile(linkObj.getFullName<side>()))
                                             remCallback_.notifyDeletion(linkObj.getFullName<side>());
                                         break;
                                 }
@@ -1321,7 +1435,7 @@ void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
 
                             virtual void visit(const DirMapping& dirObj)
                             {
-                                ffs3::removeDirectory(dirObj.getFullName<side>(), &remCallback_);
+                                zen::removeDirectory(dirObj.getFullName<side>(), &remCallback_);
                             }
 
                         private:
@@ -1374,12 +1488,12 @@ private:
 };
 
 
-void ffs3::deleteFromGridAndHD(FolderComparison& folderCmp,                         //attention: rows will be physically deleted!
-                               std::vector<FileSystemObject*>& rowsToDeleteOnLeft,  //refresh GUI grid after deletion to remove invalid rows
-                               std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
-                               const bool deleteOnBothSides,
-                               const bool useRecycleBin,
-                               DeleteFilesHandler& statusHandler)
+void zen::deleteFromGridAndHD(FolderComparison& folderCmp,                         //attention: rows will be physically deleted!
+                              std::vector<FileSystemObject*>& rowsToDeleteOnLeft,  //refresh GUI grid after deletion to remove invalid rows
+                              std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
+                              const bool deleteOnBothSides,
+                              const bool useRecycleBin,
+                              DeleteFilesHandler& statusHandler)
 {
     FinalizeDeletion dummy(folderCmp); //ensure cleanup: redetermination of sync-directions and removal of invalid rows
 
@@ -1472,7 +1586,7 @@ unsigned int getThreshold(const unsigned filesWithSameSizeTotal)
 }
 
 
-void ffs3::checkForDSTChange(const FileCompareResult& gridData,
+void zen::checkForDSTChange(const FileCompareResult& gridData,
                                      const std::vector<FolderPair>& directoryPairsFormatted,
                                      int& timeShift, wxString& driveName)
 {

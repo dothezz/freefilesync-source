@@ -25,12 +25,12 @@ public:
                        const wxString* logfileDirectory, //non-empty if logging shall be active
                        size_t logFileMaxCount,
                        const xmlAccess::OnError handleError,
-                       const ffs3::SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
+                       const zen::SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
                        int& returnVal);
     ~BatchStatusHandler();
 
-    virtual void initNewProcess(int objectsTotal, wxLongLong dataTotal, Process processID);
-    virtual void updateProcessedData(int objectsProcessed, wxLongLong dataProcessed);
+    virtual void initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID);
+    virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed);
     virtual void reportInfo(const Zstring& text);
     virtual void forceUiRefresh();
 
@@ -41,11 +41,11 @@ public:
 private:
     virtual void abortThisProcess();
 
-    const ffs3::SwitchToGui& switchBatchToGui_; //functionality to change from batch mode to GUI mode
+    const zen::SwitchToGui& switchBatchToGui_; //functionality to change from batch mode to GUI mode
     bool exitWhenFinished;
     bool switchToGuiRequested;
     xmlAccess::OnError handleError_;
-    ffs3::ErrorLogging errorLog; //list of non-resolved errors and warnings
+    zen::ErrorLogging errorLog; //list of non-resolved errors and warnings
     Process currentProcess;
     int& returnValue;
 

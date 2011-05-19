@@ -10,8 +10,9 @@
 #include "../shared/zstring.h"
 #include <wx/toplevel.h>
 #include "../library/status_handler.h"
+#include "main_dlg.h"
 
-namespace ffs3
+namespace zen
 {
 class ErrorLogging;
 }
@@ -28,9 +29,9 @@ public:
     void init();     //make visible, initialize all status values
     void finalize(); //hide again
 
-    void switchToCompareBytewise(int totalObjectsToProcess, wxLongLong totalDataToProcess);
+    void switchToCompareBytewise(int totalObjectsToProcess, zen::Int64 totalDataToProcess);
     void incScannedObjects_NoUpdate(int number);
-    void incProcessedCmpData_NoUpdate(int objectsProcessed, wxLongLong dataProcessed);
+    void incProcessedCmpData_NoUpdate(int objectsProcessed, zen::Int64 dataProcessed);
     void setStatusText_NoUpdate(const Zstring& text);
     void updateStatusPanelNow();
 
@@ -43,8 +44,8 @@ private:
 class SyncStatus
 {
 public:
-    SyncStatus(StatusHandler& updater,
-               wxTopLevelWindow* parentWindow, //may be NULL
+    SyncStatus(AbortCallback& abortCb,
+               MainDialog* parentWindow, //may be NULL
                bool startSilent,
                const wxString& jobName);
     ~SyncStatus();
@@ -62,9 +63,9 @@ public:
         SYNCHRONIZING
     };
 
-    void resetGauge(int totalObjectsToProcess, wxLongLong totalDataToProcess);
+    void resetGauge(int totalObjectsToProcess, zen::Int64 totalDataToProcess);
     void incScannedObjects_NoUpdate(int number);
-    void incProgressIndicator_NoUpdate(int objectsProcessed, wxLongLong dataProcessed);
+    void incProgressIndicator_NoUpdate(int objectsProcessed, zen::Int64 dataProcessed);
     void setStatusText_NoUpdate(const Zstring& text);
     void updateStatusDialogNow();
 
@@ -72,7 +73,7 @@ public:
 
     //essential to call one of these two methods in StatusUpdater derived class destructor at the LATEST(!)
     //to prevent access to callback to updater (e.g. request abort)
-    void processHasFinished(SyncStatusID id, const ffs3::ErrorLogging& log);
+    void processHasFinished(SyncStatusID id, const zen::ErrorLogging& log);
     void closeWindowDirectly(); //don't wait for user
 
 private:

@@ -66,7 +66,7 @@ protected:
                 j.Execute();
             }
             catch(...)
-                {}
+            {}
     }
 
     mutable bool dismissed_;

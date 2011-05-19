@@ -13,17 +13,18 @@
 #include "file_handling.h"
 #include "string_conv.h"
 #include <stdexcept>
-#include "system_func.h"
+#include "last_error.h"
 #include "check_exist.h"
 #include "assert_static.h"
 #include "system_constants.h"
+#include "global_func.h"
 
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #endif
 
-wxString ffs3::extractJobName(const wxString& configFilename)
+wxString zen::extractJobName(const wxString& configFilename)
 {
     using namespace common;
 
@@ -33,29 +34,22 @@ wxString ffs3::extractJobName(const wxString& configFilename)
 }
 
 
-wxString ffs3::formatFilesizeToShortString(const wxLongLong& filesize)
+wxString zen::formatFilesizeToShortString(zen::UInt64 size)
 {
-    return ffs3::formatFilesizeToShortString(filesize.ToDouble());
-}
+    if (to<zen::Int64>(size) < 0) return _("Error");
 
-
-wxString ffs3::formatFilesizeToShortString(const wxULongLong& filesize)
-{
-    return ffs3::formatFilesizeToShortString(filesize.ToDouble());
-}
-
-
-wxString ffs3::formatFilesizeToShortString(double filesize)
-{
-    if (filesize < 0)
-        return _("Error");
-
-    wxString output = _("%x Bytes");
-
-    if (filesize > 999)
+    if (size <= 999U)
     {
+        wxString output = _P("1 Byte", "%x Bytes", to<int>(size));
+        output.Replace(wxT("%x"), zen::toStringSep(size)); //no decimal places in case of bytes
+        return output;
+    }
+    else
+    {
+        double filesize = to<double>(size);
+
         filesize /= 1024;
-        output = _("%x kB");
+        wxString output = _("%x KB");
         if (filesize > 999)
         {
             filesize /= 1024;
@@ -82,19 +76,14 @@ wxString ffs3::formatFilesizeToShortString(double filesize)
             return _("Error");
 
         output.Replace(wxT("%x"), wxString::Format(wxT("%.*f"), static_cast<int>(3 - leadDigitCount), filesize));
+        return output;
     }
-    else
-    {
-        output.Replace(wxT("%x"), common::numberToString(static_cast<int>(filesize))); //no decimal places in case of bytes
-    }
-
-    return output;
 }
 
 
-wxString ffs3::formatPercentage(const wxLongLong& dividend, const wxLongLong& divisor)
+wxString zen::formatPercentage(zen::Int64 dividend, zen::Int64 divisor)
 {
-    const double ratio = divisor != 0 ? dividend.ToDouble() * 100 / divisor.ToDouble() : 0;
+    const double ratio = divisor != 0 ? to<double>(dividend) * 100.0 / to<double>(divisor) : 0;
     wxString output = _("%x%");
     output.Replace(wxT("%x"), wxString::Format(wxT("%3.2f"), ratio), false);
     return output;
@@ -105,13 +94,13 @@ wxString ffs_Impl::includeNumberSeparator(const wxString& number)
 {
     wxString output(number);
     for (size_t i = output.size(); i > 3; i -= 3)
-        output.insert(i - 3, ffs3::getThousandsSeparator());
+        output.insert(i - 3, zen::getThousandsSeparator());
 
     return output;
 }
 
 
-void ffs3::scrollToBottom(wxScrolledWindow* scrWindow)
+void zen::scrollToBottom(wxScrolledWindow* scrWindow)
 {
     int height = 0;
     scrWindow->GetClientSize(NULL, &height);
@@ -149,28 +138,28 @@ bool isVistaOrLater()
 }
 
 
-wxString ffs3::utcTimeToLocalString(const wxLongLong& utcTime)
+wxString zen::utcTimeToLocalString(zen::Int64 utcTime)
 {
 #ifdef FFS_WIN
     //convert ansi C time to FILETIME
-    wxLongLong fileTimeLong(utcTime);
-    fileTimeLong += wxLongLong(2, 3054539008UL); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
-    fileTimeLong *= 10000000;
+    zen::UInt64 fileTimeLong = to<zen::UInt64>(utcTime + //may be < 0
+                                               zen::Int64(3054539008UL, 2)); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
+    fileTimeLong *= 10000000U;
 
     FILETIME lastWriteTimeUtc = {};
-    lastWriteTimeUtc.dwLowDateTime  = fileTimeLong.GetLo();             //GetLo() returns unsigned
-    lastWriteTimeUtc.dwHighDateTime = static_cast<DWORD>(fileTimeLong.GetHi());   //GetHi() returns signed
+    lastWriteTimeUtc.dwLowDateTime  = fileTimeLong.getLo();
+    lastWriteTimeUtc.dwHighDateTime = fileTimeLong.getHi();
 
-    assert(fileTimeLong.GetHi() >= 0);
-    assert_static(sizeof(DWORD) == sizeof(long));
-    assert_static(sizeof(long) == 4);
+    //dates less than a few (let's say 13) hours after 1.1.1601 cause conversion errors in ::SystemTimeToTzSpecificLocalTime() if timezone is subtracted!
+    if (lastWriteTimeUtc.dwHighDateTime < 110)
+        return _("Error");
 
     SYSTEMTIME systemTimeLocal = {};
 
     static const bool useNewLocalTimeCalculation = isVistaOrLater();
     if (useNewLocalTimeCalculation) //use DST setting from source date (like in Windows 7, see http://msdn.microsoft.com/en-us/library/ms724277(VS.85).aspx)
     {
-        if (lastWriteTimeUtc.dwHighDateTime > 0x7FFFFFFF)
+        if (lastWriteTimeUtc.dwHighDateTime >= 0x80000000)
             return _("Error");
 
         SYSTEMTIME systemTimeUtc = {};
@@ -178,7 +167,8 @@ wxString ffs3::utcTimeToLocalString(const wxLongLong& utcTime)
                 &lastWriteTimeUtc, //__in   const FILETIME *lpFileTime,
                 &systemTimeUtc))   //__out  LPSYSTEMTIME lpSystemTime
             throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" FILETIME -> SYSTEMTIME: ") +
-                                                  wxT("(") + wxULongLong(lastWriteTimeUtc.dwHighDateTime, lastWriteTimeUtc.dwLowDateTime).ToString() + wxT(") ") +
+                                                  wxT("(") + wxT("UTC [s]: ") + toString<wxString>(utcTime) + wxT(" ") +
+                                                  wxT("UTC FILETIME: ")  + toString<wxString>(fileTimeLong) + wxT(") ") +
                                                   wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
 
         if (!::SystemTimeToTzSpecificLocalTime(
@@ -186,29 +176,39 @@ wxString ffs3::utcTimeToLocalString(const wxLongLong& utcTime)
                 &systemTimeUtc,    //__in      LPSYSTEMTIME lpUniversalTime,
                 &systemTimeLocal)) //__out     LPSYSTEMTIME lpLocalTime
             throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" SYSTEMTIME -> local SYSTEMTIME: ") +
-                                                  wxT("(") + wxULongLong(lastWriteTimeUtc.dwHighDateTime, lastWriteTimeUtc.dwLowDateTime).ToString() + wxT(") ") +
+                                                  wxT("(") + wxT("UTC [s]: ") + toString<wxString>(utcTime) + wxT("\n") +
+                                                  wxT("UTC System time: ") +
+                                                  toString<wxString>(systemTimeUtc.wYear)   + wxT(" ") +
+                                                  toString<wxString>(systemTimeUtc.wMonth)  + wxT(" ") +
+                                                  toString<wxString>(systemTimeUtc.wDay)    + wxT(" ") +
+                                                  toString<wxString>(systemTimeUtc.wHour)   + wxT(" ") +
+                                                  toString<wxString>(systemTimeUtc.wMinute) + wxT(" ") +
+                                                  toString<wxString>(systemTimeUtc.wSecond) + wxT(")") +
                                                   wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
     }
-    else //use current DST setting (like in Windows 2000 and XP)
+    else //use DST setting (like in Windows 2000 and XP)
     {
         FILETIME fileTimeLocal = {};
         if (!::FileTimeToLocalFileTime( //convert to local time
                 &lastWriteTimeUtc,  //pointer to UTC file time to convert
                 &fileTimeLocal))    //pointer to converted file time
             throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" FILETIME -> local FILETIME: ") +
-                                                  wxT("(") + wxULongLong(lastWriteTimeUtc.dwHighDateTime, lastWriteTimeUtc.dwLowDateTime).ToString() + wxT(") ") +
+                                                  wxT("(") + wxT("UTC [s]: ") + toString<wxString>(utcTime) + wxT(" ") +
+                                                  wxT("UTC FILETIME: ")  + toString<wxString>(fileTimeLong) + wxT(") ") +
                                                   wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
 
-        if (fileTimeLocal.dwHighDateTime > 0x7FFFFFFF)
+        if (fileTimeLocal.dwHighDateTime >= 0x80000000)
             return _("Error");  //this actually CAN happen if UTC time is just below this border and ::FileTimeToLocalFileTime() adds 2 hours due to DST or whatever!
         //Testcase (UTC): dateHigh = 2147483647 (=0x7fffffff) -> year 30000
         //                dateLow  = 4294967295
 
-        if (!::FileTimeToSystemTime(
-                &fileTimeLocal,  //pointer to file time to convert
-                &systemTimeLocal)) //pointer to structure to receive system time
+        if (!::FileTimeToSystemTime(&fileTimeLocal,  //pointer to file time to convert
+                                    &systemTimeLocal)) //pointer to structure to receive system time
             throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" local FILETIME -> local SYSTEMTIME: ") +
-                                                  wxT("(") + wxULongLong(fileTimeLocal.dwHighDateTime, fileTimeLocal.dwLowDateTime).ToString() + wxT(") ") +
+                                                  wxT("(") + wxT("UTC [s]: ") + toString<wxString>(utcTime) + wxT(" ") +
+                                                  wxT("local FILETIME: ")  +
+                                                  wxT("High: ") + toString<wxString>(fileTimeLocal.dwHighDateTime) +
+                                                  wxT("Low: ") + toString<wxString>(fileTimeLocal.dwLowDateTime) + wxT(") ") +
                                                   wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
     }
 
@@ -220,9 +220,8 @@ wxString ffs3::utcTimeToLocalString(const wxLongLong& utcTime)
                                systemTimeLocal.wSecond);
 
 #elif defined FFS_LINUX
-    tm* timeinfo;
-    const time_t fileTime = utcTime.ToLong();
-    timeinfo = localtime(&fileTime); //convert to local time
+    const time_t fileTime = to<time_t>(utcTime);
+    const tm* timeinfo = ::localtime(&fileTime); //convert to local time
 
     /*
         char buffer[50];

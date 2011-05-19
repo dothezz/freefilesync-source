@@ -1,910 +1,1058 @@
-  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
-  MinGW \t- Windows port of GNU Compiler Collection\n  wxWidgets \t- Open-Source GUI framework\n  wxFormBuilder\t- wxWidgets GUI-builder\n  CodeBlocks \t- Open-Source IDE
-%x / %y objects deleted successfully
-%x / %y usuniętych obiektów
-%x Bytes
-%x Bajtów
-%x GB
-%x GB
-%x MB
-%x MB
-%x PB
-%x PB
-%x TB
-%x TB
-%x day(s)
-%x dni
-%x directories
-%x katalogi
-%x files
-%x pliki
-%x hour(s)
-%x godzin
-%x kB
-%x kB
-%x min
-%x minut
-%x of %y rows in view
-%x z %y wierszy w widoku
-%x of 1 row in view
-%x z 1 wiersza w widoku
-%x sec
-%x sekund
-%x%
-%x%
-&Abort
-&Przerwij
-&About...
-&O Programie...
-&Advanced
-&Zaawansowane
-&Cancel
-&Anuluj
-&Check for new version
-&Aktualizuj
-&Content
-&Zawartość
-&Create batch job...
-&Twórz plik wsadowy...
-&Default
-&Domyślne
-&Exit
-&Wyjście
-&Export file list...
-&Eksportuj listę plików...
-&File
-&Plik
-&Find next
-&Znajdź następny
-&Global settings...
-&Ustawienia programu...
-&Help
-&Pomoc
-&Ignore
-&Ignoruj
-&Language
-&Język
-&Load
-&Wczytaj
-&Load configuration...
-&Wczytaj konfigurację...
-&New
-&Nowy
-&No
-&Nie
-&OK
-&OK
-&Pause
-&Pauza
-&Program
-&Program
-&Quit
-&Zamknij
-&Restore
-&Przywróć
-&Retry
-&Powtórz
-&Save
-&Zapisz
-&Switch
-&Zamień
-&Yes
-&Tak
-(Build: %x)
-(Buduję: %x)
-(Requires an Internet connection!)
-(Wymaga połączenia z Internetem!)
-- Other side's counterpart to %dir
-- Odpowiednik %dir
-- Other side's counterpart to %name
-- Odpowiednik %name
-- conflict
-- konflikt
-- conflict (same date, different size)
-- konflikt (ta sama data, różny rozmiar)
-- different
-- różny
-- directory part only
-- tylko część katalogu
-- equal
-- równy
-- exists left only
-- istnieje tylko po lewej stronie
-- exists right only
-- istnieje tylko po prawej stronie
-- full file or directory name
-- pełna nazwa pliku lub katalogu
-- left
-- lewy
-- left newer
-- lewy jest nowszy
-- right
-- prawy
-- right newer
-- prawy jest nowszy
-/sec
-/sekundę
-1 directory
-1 katalog
-1 file
-1 plik
-1. &Compare
-1. &Porównaj
-1. Enter relative file or directory names separated by ';' or a new line.
-1. Wprowdź relatywne scieżki do plików lub katalogów oddzielone ';' lub nową linią.
-1. Select directories to monitor.
-1. Wprowadź katalogi do nadzorowania
-2. &Synchronize...
-2. &Synchronizuj...
-2. Enter a command line.
-2. Wprowadź komendę.
-2. Use wildcard characters '*' and '?'.
-2. Użyj wieloznacznika (wildcard) '*' i '?'.
-3. Exclude files directly on main grid via context menu.
-3. Wyklucz pliki i foldery używając prawego przycisku myszki.
-3. Press 'Start'.
-3. Wciśnij 'Start'.
-<Automatic>
-<Automatycznie>
-<Directory>
-<Katalog>
-<Last session>
-<Ostatnia sesja>
-<Symlink>
-<Dowiązanie symboliczne>
-<multiple selection>
-<zaznaczone elementy>
-A directory input field is empty.
-Pole ze ścieżką katalogu jest puste.
-A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!
-Katalog zostanie zmodyfikowany w efekcie synchronizacji wielu par folderów! Zweryfikuj ustawienia synchronizacji!
-A newer version of FreeFileSync is available:
-Dostępna jest nowa wersja FreeFileSync:
-Abort requested: Waiting for current operation to finish...
-Żądanie przerwania: Czekaj na koniec aktualnie wykonywanego zadania...
-Abort synchronization immediately
-Natychmiast zakończ synchronizację
-Aborted
-Przerwana
-About
-O Programie
-Action
-Akcja
-Add folder
-Dodaj folder
-Add folder pair
-Dodaj foldery do porównania
-All directories in sync!
-Wszystkie katalogi zsynchronizowane!
-An exception occurred!
-Wystąpił wyjątek!
-As a result the files are separated into the following categories:
-W rezultacie pliki zostały podzielone na następujące kategorie:
-As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.\n\nWith this option enabled the decision tree is smaller:
-Jak wskazuje nazwa, dwa pliki o tej samej nazwie są równe tylko i wyłącznie jeżeli ich zawartość jest jednakowa. Czas modyfikacji nie jest brany pod uwagę. Ta opcja jest raczej użyteczna do sprawdzania spójności plików niż zadań kopii zapasowej.\n\nDrzewko decyzyjne dla tej opcji jest mniejsze:
-Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.
-Twórz plik wsadowy dla automatyzacji procesu. By rozpocząć prace w tym trybie zwyczajnie uruchom plik klikając dwa razy lub dodaj go do zadań zaplanowanych Twojego systemu. Plik wsadowy może być również przekazywany jako parametr do programu w postaci: FreeFileSync.exe <plikwsadowy>.
-At least one directory input field is empty.
-Przynajmniej jedno pole jest puste.
-Auto-adjust columns
-Autodopasowanie kolumn
-Batch execution
-Uruchomienie pliku wsadowego
-Batch file created successfully!
-Plik wsadowy utworzony pomyślnie!
-Batch job
-Plik wsadowy
-Big thanks for localizing FreeFileSync goes out to:
-Podziękowania za tłumaczenie FreeFileSync:
-Both sides have changed since last synchronization!
-Obie strony uległy zmianie od ostatniej synchronizacji!
-Browse
-Przeglądaj
-Browse directory
-Przeglądaj katalog
-Cannot determine sync-direction:
-Nie można określić kierunku synchronizacji:
-Cannot find %x
-Nie można znaleźć %x
-Category
-Kategoria
-Clear filter settings
-Wyczyść ustawienia filtra
-Comma separated list
-Lista oddzielona przecinkami
-Command line
-Linia komend
-Command line is empty!
-Linia komend jest pusta!
-Compare
-Porównaj
-Compare both sides
-Porównaj foldery
-Compare by \"File content\"
-Porównaj przez \"Zawartość pliku\"
-Compare by \"File size and date\"
-Porównaj przez \"Rozmiar i data pliku\"
-Compare by...
-Porównaj przez...
-Comparing content of files %x
-Porównywanie zawartości plików %x
-Comparing content...
-Porównywanie zawartości...
-Comparing files by content failed.
-Porównywanie przez zawartość zakończone niepowodzeniem.
-Comparison Result
-Rezultat porównywania
-Comparison settings
-Ustawienia porównywania
-Completed
-Zakończono
-Configuration
-Konfiguracja
-Configuration loaded!
-Konfiguracja wczytana!
-Configuration overview:
-Przegląd konfiguracji:
-Configuration saved!
-Konfiguracja zapisana!
-Configure filter
-Konfiguruj filtr
-Configure your own synchronization rules.
-Skonfiguruj swoje własne zasady synchronizacji.
-Confirm
-Potwierdź
-Conflict detected:
-Wykryto konflikt:
-Conflicts/files that cannot be categorized
-Konflikty/pliki, które nie mogą być skategoryzowane
-Continue
-Kontynuuj
-Conversion error:
-Błąd konwersji:
-Copy attributes only from left to right
-Kopiuj atrybuty tylko z lewej strony
-Copy attributes only from right to left
-Kopiuj atrybuty tylko z prawej strony
-Copy filesystem permissions
-Kopiuj uprawnienia plików
-Copy from left to right
-Kopiuj z lewej do prawej
-Copy from left to right overwriting
-Kopiuj z lewej do prawej nadpisując
-Copy from right to left
-Kopiuj z prawej do lewej
-Copy from right to left overwriting
-Kopiuj z prawej do lewej nadpisując
-Copy locked files
-Kopiuj zablokowane pliki
-Copy new or updated files to right folder.
-Kopiuj nowe lub aktualniejsze pliki na prawą stronę.
-Copy shared or locked files using Volume Shadow Copy Service\n(Requires Administrator rights)
-Kopiuj pliki udostępnione i zablokowane używając usługi Volume Shadow Copy\n (Wymaga uprawnień administratora)
-Copy to clipboard\tCTRL+C
-Kopiuj do pamięci\tCTRL+C
-Copying new Symbolic Link %x to %y
-Kopiowanie nowego dowiązania symbolicznego %x
-Copying new file %x to %y
-Kopiowanie nowego pliku %x do %y
-Could not determine volume name for file:
-Nie można określić nazwy dysku dla pliku:
-Could not initialize directory monitoring:
-Nie można uruchomić monitora katalogów:
-Could not load a required DLL:
-Nie można załadować wymaganej biblioteki DLL:
-Could not read values for the following XML nodes:
-Nie można odczytać wartości dla danych gałęzi XML:
-Create a batch job
-Twórz plik wsadowy
-Creating folder %x
-Tworzenie folderu %x
-Custom
-Własne
-Customize columns
-Dostosuj kolumny
-Customize...
-Dostosuj...
-D-Click
-Podw. kliknięcie
-DECISION TREE
-DRZEWO DECYZYJNE
-Data verification error: Source and target file have different content!
-Błąd weryfikacji danych: Plik źródłowy i docelowy różnią się zawartością!
-Date
-Data
-Delete files/folders existing on left side only
-Usuń pliki/foldery istniejące tylko po lewej stronie
-Delete files/folders existing on right side only
-Usuń pliki/foldery istniejące tylko po prawej stronie
-Delete files\tDEL
-Usuń\tDEL
-Delete on both sides
-Usuń po obu stronach
-Delete on both sides even if the file is selected on one side only
-Usuń po obu stronach nawet jeżeli plik zaznaczony jest tylko po jednej stronie
-Delete or overwrite files permanently
-Usuń lub nadpisz pliki na stałe
-Delete permanently
-Usuń na stałe
-Deleting Symbolic Link %x
-Usuwanie dowiązania symbolicznego %x
-Deleting file %x
-Usuwanie pliku %x
-Deleting folder %x
-Usuwanie folderu %x
-Deletion handling
-Obsługa usuwania
-Description
-Opis
-Direct
-Bezpośrednio
-Directories are dependent! Be careful when setting up synchronization rules:
-Katalogi są zależne! Pamiętaj o tym podczas ustawiania zasad synchronizacji:
-Directories to watch
-Katalogi do obserwacji
-Directory
-Katalog
-Directory does not exist:
-Katalog nie istnieje:
-Do not show this dialog again
-Nie pokazuj tego okna ponownie
-Do nothing
-Nic nie rób
-Do you really want to delete the following object(s)?
-Czy na pewno chcesz usunąć wybrane obiekty?
-Do you really want to move the following object(s) to the Recycle Bin?
-Czy na pewno chcesz przenieść wybrane pliki do kosza?
-Do you want FreeFileSync to automatically check for updates every week?
-Czy chcesz aby FreeFileSync sprawdzał uaktualnienia co tydzień?
-Donate with PayPal
-Wesprzyj z PayPal
-Download now?
-Pobrać teraz?
-Drag && drop
-Drag && Drop
-Elements found:
-Znalezione elementy:
-Elements processed:
-Przetworzeone elementy:
-Elements remaining:
-Pozostałe elementy:
-Email
-Poczta
-Encoding extended time information: %x
-Odkodowywanie rozszerzonych informacji o czasie: %x
-Endless loop when traversing directory:
-Zapętlenie podczas przeglądania katalogu:
-Equal files/folders that differ in attributes only
-Pliki/foldery różniące się tylko atrybutami
-Error
-Błąd
-Error changing modification time:
-Błąd zmiany godziny modyfikacji:
-Error copying file permissions:
-Błąd podczas kopiowania uprawnień pliku:
-Error copying file:
-Błąd podczas kopiowania pliku:
-Error copying locked file %x!
-Błąd podczas kopiowania zablokowanego pliku %x!
-Error copying symbolic link:
-Błąd podczas kopiowania dowiązania symbolicznego (symlink)
-Error creating directory:
-Błąd podczas tworzenia katalogu:
-Error deleting directory:
-Błąd podczas usuwania katalogu:
-Error deleting file:
-Błąd podczas usuwania pliku:
-Error handling
-Obsługa błędów
-Error loading library function:
-Błąd wczytywania funkcji:
-Error moving directory:
-Błąd podczas przenoszenia katalogu:
-Error moving file:
-Błąd podczas przenoszenia pliku:
-Error moving to Recycle Bin:
-Błąd podczas przenoszenia do kosza:
-Error opening file:
-Błąd odczytu pliku:
-Error parsing configuration file:
-Błąd parsowania pliku konfiguracyjnego:
-Error reading file attributes:
-Błąd odczytu atrybutów pliku:
-Error reading file:
-Błąd odczytu pliku:
-Error reading from synchronization database:
-Błąd odczytu z bazy danych synchronizacji:
-Error reading security context:
-Błąd odczytu kontekstu bezpieczeństwa:
-Error resolving symbolic link:
-Błąd odczytu dowiązania symbolicznego:
-Error setting directory lock:
-Błąd ustawiania blokady katalogu:
-Error setting privilege:
-Błąd ustawiania uprawnień:
-Error starting Volume Shadow Copy Service!
-Błąd podczas uruchamianiu usługi Shadow Copy!
-Error traversing directory:
-Błąd podczas odczytywania katalogu:
-Error when monitoring directories.
-Błąd podczas monitorowania katalogów.
-Error writing file:
-Błąd zapisu pliku:
-Error writing security context:
-Błąd zapisu kontekstu bezpieczeństwa:
-Error writing to synchronization database:
-Błąd zapisu do bazy danych synchronizacji:
-Example
-Przykład
-Exclude
-Wyklucz
-Exclude all rows
-Wyklucz wszystkie rzędy
-Exclude temporarily
-Wyklucz tymczasowo
-Exclude via filter:
-Dodaj filtr:
-Exit instantly
-Wyjdź natychmiastowo
-Extension
-Rozszerzenie
-External applications
-Aplikacje zewnętrzne
-Fatal Error
-Błąd krytyczny
-Feedback and suggestions are welcome at:
-Komentarze i sugestie mile widziane na:
-File %x has an invalid date!
-Plik %x ma nieprawidłową datę!
-File already exists. Overwrite?
-Nadpisać istniejący już plik?
-File content
-Zawartość pliku
-File does not exist:
-Plik nie istnieje:
-File list exported!
-Lista plików wyeksportowana!
-File size and date
-Rozmiar i data pliku
-Filename
-Nazwa pliku
-Files %x have the same date but a different size!
-Pliki %x mają tą samą datę lecz różne rozmiary!
-Files are found equal if\n     - file content\nis the same
-Pliki są jednakowe jeżeli\n     - zawartość pliku\njest identyczna
-Files are found equal if\n     - filesize\n     - last write time and date\nare the same
-Pliki są jednakowe jeżeli\n     - rozmiar pliku\n     - czas i data modyfikacji\nsą identyczne
-Files that are equal on both sides
-Pliki równe po obu stronach
-Files that exist on both sides, left one is newer
-Pliki, które istnieją po obu stronach, lewa strona jest nowsza
-Files that exist on both sides, right one is newer
-Pliki, które istnieją po obu stronach, prawa strona jest nowsza
-Files that have different content
-Pliki, które mają różną zawartość
-Files/folders that exist on left side only
-Pliki/katalogi istniejące tylko po lewej stronie
-Files/folders that exist on right side only
-Pliki/katalogi istniejące tylko po prawej stronie
-Filter files
-Filtruj pliki
-Filter is active
-Filtr jest aktywny
-Filter settings have changed!
-Ustawienia filtra uległy zmianie!
-Filter: All pairs
-Filtr: Wszystkie pary
-Filter: Single pair
-Filtr: Pojedyńcza para
-Find
-Znajdź
-Find what:
-Co:
-Folder Comparison and Synchronization
-Porównywanie i Synchronizacja folderów
-Folder pairs
-Pary folderów
-Follow
-Podąrzaj
-Free disk space available:
-Wolne miejsce:
-Free disk space required:
-Wymagane wolne miejsce:
-FreeFileSync Batch Job
-FreeFileSync plik wsadowy
-FreeFileSync at Sourceforge
-FreeFileSync na Sourceforge
-FreeFileSync batch file
-FreeFileSync plik wsadowy
-FreeFileSync configuration
-Konfiguracja FreeFileSync
-FreeFileSync is up to date!
-FreeFileSync jest już uaktualniony!
-Full path
-Pełna scieżka
-Generating database...
-Generowanie bazy danych...
-Generating file list...
-Generowanie listy plików...
-Global settings
-Ustawienia programu
-Help
-Pomoc
-Hidden dialogs:
-Ukryte dialogi:
-Hide all error and warning messages
-Ukryj wszystkie informacje błędach i ostrzeżeniach
-Hide conflicts
-Ukryj konflikty
-Hide excluded items
-Ukryj wykluczone pliki
-Hide files that are different
-Ukryj pliki, które są różne
-Hide files that are equal
-Ukryj pliki, które są równe
-Hide files that are newer on left
-Ukryj pliki, które są nowsze po lewej stronie
-Hide files that are newer on right
-Ukryj pliki, które są nowsze po prawej stronie
-Hide files that exist on left side only
-Ukryj pliki, które istnieją tylko po lewej stronie
-Hide files that exist on right side only
-Ukryj pliki, które istnieją tylko po prawej stronie
-Hide files that will be created on the left side
-Ukryj pliki, które będą utworzone po lewej stronie
-Hide files that will be created on the right side
-Ukryj pliki, które będą utworzone po prawej stronie
-Hide files that will be deleted on the left side
-Ukryj pliki, które będą usunięte po lewej stronie
-Hide files that will be deleted on the right side
-Ukryj pliki, które będą usunięte po lewej stronie
-Hide files that will be overwritten on left side
-Ukryj pliki, które zostaną nadpisane po lewej stronie
-Hide files that will be overwritten on right side
-Ukryj pliki, które zostaną nadpisane po prawej stronie
-Hide files that won't be copied
-Ukryj pliki, które nie będą kopiowane
-Hide filtered or temporarily excluded files
-Ukryj pliki filtrowane lub tymczasowo wykluczone
-Hide further error messages during the current process
-Ukryj kolejne informacje o błędach dla tego zadania
-Hints:
-Wskazówki:
-Homepage
-Strona domowa
-Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.
-Wykryj i zastosuj zmiany po obu stronach używając bazy danych. Usunięcia i konflikty są wykrywane automatycznie.
-Idle time between detection of last change and execution of command line in seconds
-Odstęp czasu w sekundach pomiędzy pomiędzy ostatnią wykrytą zmianą, a wykonaniem komendy
-If you like FFS
-Jeżeli Ci się podoba
-Ignore
-Ignoruj
-Ignore errors
-Ignoruj błędy
-Ignore subsequent errors
-Ignoruj kolejne błędy
-Include
-Dołącz
-Include all rows
-Dołącz wszystkie rzędy
-Include temporarily
-Dołącz tymczasowo
-Include: *.doc;*.zip;*.exe\nExclude: \\stuff\\temp\\*
-Dołącz: *.doc;*.zip;*.exe\nWyklucz: \\stuff\\temp\\*
-Incompatible synchronization database format:
-Niepoprawny format bazy danych dla synchronizacji:
-Info
-Info
-Information
-Informacja
-Initial synchronization:
-Wstępna synchronizacja:
-Integrate external applications into context menu. The following macros are available:
-Dołącz zewnętrzną aplikację do menu kontekstowego. Dostępne macra:
-Invalid FreeFileSync config file!
-Nieprawidłowy plik konfiguracyjny!
-Last used configurations (press DEL to remove from list)
-Ostatnio użyta konfiguracja (naciśnij DEL żeby usunąć z listy)
-Leave as unresolved conflict
-Zostaw jako nierozwiązany konflikt
-Left
-Lewy
-Legend
-Legenda
-Load configuration from file
-Wczytaj konfigurację z pliku
-Log-messages:
-Logi:
-Logging
-Tworzenie logów
-Main bar
-Główny pasek
-Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.
-Tworzenie Shadow Copies dla WOW64 nie jest obsługiwane. Zainstaluj 64 bitową wersję FreeFileSync.
-Match case
-Uwzględnij wielkość liter
-Maximum number of logfiles:
-Maksymalna liczba plików z logami:
-Memory allocation failed!
-Błąd alokacji zasobów!
-Minimum Idle Time [seconds]
-Minimalny czas bezczynności [sekundy]
-Mirror ->>
-Lustrzana ->>
-Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.
-Lustrzana kopia lewego folderu. Prawy folder po synchronizacji jest lustrzaną kopią lewego folderu.
-Monitoring active...
-Monitorowanie aktywne...
-More than 50% of the total number of files will be copied or deleted!
-Ponad 50% plików zostanie skopiowanych lub usuniętych!
-Move column down
-Przesuń kolumnę w dół
-Move column up
-Przesuń kolumnę do góry
-Move files into a time-stamped subdirectory
-Przenieś pliki do oznaczonego podkatalogu
-Moving %x to Recycle Bin
-Przenoszenie %x do kosza.
-Moving Symbolic Link %x to user-defined directory %y
-Przenoszenie dowiązania symbolicznego %x do zdefiniowanego katalogu %y
-Moving file %x to user-defined directory %y
-Przenoszenie pliku %x do katalogu użytkownia %y
-Moving folder %x to user-defined directory %y
-Przenoszenie folderu %x do katalogu użytkownika %y
-Multiple...
-Wiele...
-No change since last synchronization!
-Brak zmian od ostatniej synchronizacji!
-No filter selected
-Nie wybrano żadnego filtra
-Not enough free disk space available in:
-Brak wystarczającej przestrzeni dyskowej na:
-Nothing to synchronize according to configuration!
-Brak elementów do synchronizacji!
-Number of files and directories that will be created
-Liczba plików i katalogów, które zostaną utworzone
-Number of files and directories that will be deleted
-Liczba plików i katalogów, które zostaną usunięte
-Number of files that will be overwritten
-Liczba plików, które zostaną nadpisane
-One of the FreeFileSync database entries within the following file is not yet existing:
-Jeden z wpisów bazy danych FreeFileSync dotyczący pliku nie istnieje:
-One of the FreeFileSync database files is not yet existing:
-Jeden z plików bazy danych FreeFileSync nie istnieje:
-Only files/directories that pass filtering will be selected for synchronization. The filter will be applied to the name relative(!) to the base synchronization directories.
-Tylko pliki/katalogi zaakceptowane przez filtr będą synchronizowane. Filtr działa dla nazw nazw relatywnych(!) względem katalogu bazowego. 
-Open with Explorer
-Otwórz za pomocą Explorer
-Open with default application
-Otwórz za pomocą domyślnej aplikacji
-Operation aborted!
-Operacja przerwana!
-Operation:
-Operacja:
-Overview
-Przegląd
-Overwriting Symbolic Link %x in %y
-Nadpisywanie dowiązania symbolicznego %x, %y
-Overwriting file %x in %y
-Nadpisywanie pliku %x plikiem %y
-Pause
-Pauza
-Paused
-Pauza
-Planned directory deletion is in conflict with its subdirectories and -files!
-Usunięcie katalogów jest w konflikcie podkatalogami oraz plikami!
-Please run a Compare first before synchronizing!
-Przed synchronizacją należy uruchomić Porównaj!
-Press \"Switch\" to open FreeFileSync GUI mode.
-Naciśnij \"Przełącz\" aby otworzyć moduł GUI.
-Processing folder pair:
-Przetwarzanie folderów:
-Published under the GNU General Public License:
-Udostępnione na zasadach licencji GNU General Public License:
-Question
-Pytanie
-RealtimeSync - Automated Synchronization
-RealtimeSync - Automatyczna Synchronizacja
-RealtimeSync configuration
-RealtimeSync konfiguracja
-Recycle Bin not yet supported for this system!
-Kosz nie jest jeszcze wspierany dla tej wersji systemu!
-Relative path
-Relatywna ścieżka
-Remove alternate settings
-Usuń alternatywne ustawienia
-Remove folder
-Usuń folder
-Remove folder pair
-Usuń parę folderów
-Report translation error
-Zgłoś błąd w tłumaczeniu
-Reset
-Resetuj
-Reset view
-Resetuj widok
-Restore all hidden dialogs?
-Przywrócić wszystkie ukryte dialogi?
-Right
-Prawy
-S&ave configuration...
-Z&apisz konfigurację...
-S&witch view
-P&rzełącz widok
-Save changes to current configuration?
-Zapisać zmiany obecnej konfiguracji?
-Save current configuration to file
-Zapisz aktualny plik konfiguracyjny
-Scanning...
-Skanowanie...
-Scanning:
-Skanowanie:
-Select a folder
-Wybierz folder
-Select alternate synchronization settings
-Stwórz alternatywne reguły synchronizacji
-Select logfile directory:
-Wybierz katalog z logami:
-Select variant:
-Wybierz wariant:
-Select view
-Określ widok
-Set direction:
-Kierunek  synchronizacji: 
-Setting default synchronization directions: Old files will be overwritten with newer files.
-Ustawianie domyślnego kierunku synchronizacji: Stare pliki zostaną nadpisane nowszymi.
-Show \"%x\"
-Pokaż \"%x\"
-Show conflicts
-Pokaż konflikty
-Show files that are different
-Pokaż pliki, które się różnią
-Show files that are equal
-Pokaż pliki, które są równe
-Show files that are newer on left
-Pokaż pliki nowsze po lewej stronie
-Show files that are newer on right
-Pokaż pliki nowsze po prawej stronie
-Show files that exist on left side only
-Pokaż pliki istniejące tylko po lewej stronie
-Show files that exist on right side only
-Pokaż pliki istniejące tylko po prawej stronie
-Show files that will be created on the left side
-Pokaż pliki, które będą utworzone po lewej stronie
-Show files that will be created on the right side
-Pokaż pliki, które będą utworzone po prawej stronie
-Show files that will be deleted on the left side
-Pokaż pliki, które będą usunięte po lewej stronie
-Show files that will be deleted on the right side
-Pokaż pliki, które będą usunięte po prawej stronie
-Show files that will be overwritten on left side
-Pokaż pliki, które zostaną nadpisane po lewej stronie
-Show files that will be overwritten on right side
-Pokaż pliki, które zostaną nadpisane po prawej stronie
-Show files that won't be copied
-Pokaż pliki, które nie będą kopiowane
-Show hidden dialogs
-Pokaż ukryte dialogi
-Show popup
-Pokaż okno popup
-Show popup on errors or warnings
-Pokaż okno popup dla błędów i ostrzeżeń
-Significant difference detected:
-Wykryto znaczące zmiany:
-Silent mode
-Tryb Cichy
-Size
-Rozmiar
-Source code written completely in C++ utilizing:
-Kod źródłowy napisany całkowicie w C++ z wykorzystaniem:
-Source directory does not exist anymore:
-Katalog źródłowy nie istnieje:
-Speed:
-Prędkość:
-Start
-Rozpocznij
-Start minimized and write status information to a logfile
-Uruchom zminimalizowane i zapisuj informacje do pliku logów
-Start synchronization
-Rozpocznij synchronizację
-Statistics
-Statystyki
-Status feedback
-Opinia statusu
-Stop
-Zatrzymaj
-Swap sides
-Zamień stronami
-Switching to FreeFileSync GUI mode...
-Przełączanie do trybu GUI FreeFileSync
-Symbolic Link handling
-Obsługa dowiązań symbolicznych
-Symlinks %x have the same date but a different target!
-Dowiązanie symboliczne %x ma te same dane, ale inny cel!
-Synchronization Preview
-Podgląd synchronizacji
-Synchronization aborted!
-Synchronizacja przerwana!
-Synchronization completed successfully!
-Synchronizacja zakończona pomyślnie!
-Synchronization completed with errors!
-Synchronizacja zakończona z błędami.
-Synchronization settings
-Ustawienia synchronizacji
-Synchronize all .doc, .zip and .exe files except everything in subfolder \"temp\".
-Synchronizuj wszystkie pliki .doc, .zip i exe z wyjątkiem folderu \"temp\"
-Synchronize...
-Synchronizuj...
-Synchronizing...
-Synchronizuję...
-Target directory already existing!
-Katalog docelowy już istnieje!
-Target file already existing!
-Plik docelowy już istnieje!
-The command line is executed each time:\n- all directories become available (e.g. USB stick insert)\n- files within these directories or subdirectories are modified
-Komenda jest wykonwywana za każdym razem gdy:\n- wszystkie katalogi będą dostępne (np. włożenie USB)\n- pliki w obrębie tych katalogów i podkatalogów ulegną zmianie
-The file does not contain a valid configuration:
-Nieprawidłowy format pliku:
-The file was not processed by last synchronization!
-Plik nie został przetworzony podczas ostatniej synchronizacji!
-This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.
-Ten wariant traktuje dwa pliki jako równe w przypadku gdy mają jednakowy rozmiar oraz tą samą datę i czas ostatniej modyfikacji.
-Time
-Czas
-Time elapsed:
-Czas:
-Time remaining:
-Pozostały czas:
-Total amount of data that will be transferred
-Liczba danych do przekopiowania
-Total time:
-Całkowity czas:
-Transfer file and directory permissions\n(Requires Administrator rights)
-Transfer uprawnień plików i katalogów\n(Wymaga uprawnień Administratora)
-Unable to connect to sourceforge.net!
-Nie można się połączyć z sourceforge.net!
-Unable to create logfile!
-Nie można utworzyć pliku z logami!
-Unresolved conflicts existing!
-Istnieją nierozwiązane konflikty!
-Update ->
-Uaktualnij ->
-Updating attributes of %x
-Aktualizowanie atrybutów %x
-Usage:
-Użycie:
-Use Recycle Bin
-Użyj kosza
-Use Recycle Bin when deleting or overwriting files
-Używaj Kosza podczas usuwania lub nadpisywania plików
-User-defined directory for deletion was not specified!
-Katalog użytkownika dla elementów usuniętych nie został określony!
-Variant
-Wariant
-Verifying file %x
-Weryfikowanie pliku %x
-Versioning
-Wersjonowanie
-Volume name %x not part of filename %y!
-Dysk %x nie jest częścią pliku %y!
-Waiting for missing directories...
-Oczekiwanie na brakujące katalogi...
-Waiting while directory is locked (%x)...
-Blokada katalogu (%x), oczekiwanie...
-Warning
-Uwaga
-When the comparison is started with this option set the following decision tree is processed:
-Gdy porównywanie z zaznaczoną opcją jest w toku, podejmowane są następujące dezyje:
-You can ignore conflicts and continue synchronization.
-Możesz je zignorować i kontynuować synchronizację.
-You can ignore this error to consider the directory as empty.
-Możesz zignorować ten błąd uznająć jeden z katalogów jako pusty.
-You may try to synchronize remaining items again (WITHOUT having to re-compare)!
-Możesz spróbować synchronizować pozostałe elementy ponownie (bez konieczności ponownego porównywania)!
-different
-różny
-file exists on both sides
-plik istnieje po obu stronach
-on one side only
-tylko po jednej stronie
+<header>
+	<language name>Polski</language name>
+	<translator>Wojtek Pietruszewski</translator>
+	<locale>pl_PL</locale>
+	<flag file>poland.png</flag file>
+	<plural forms>3</plural forms>
+	<plural definition>n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2</plural definition>
+</header>
+
+<source>Show in Explorer</source>
+<target>Wyświetl w explorerze</target>
+<source>Open with default application</source>
+<target>Otwórz za pomocą domyślnej aplikacji</target>
+<source>Browse directory</source>
+<target>Przeglądaj katalog</target>
+<source>RealtimeSync - Automated Synchronization</source>
+<target>RealtimeSync - Automatyczna Synchronizacja</target>
+<source>Browse</source>
+<target>Przeglądaj</target>
+<source>Error resolving symbolic link:</source>
+<target>Błąd odczytu dowiązania symbolicznego:</target>
+<source>Select alternate synchronization settings</source>
+<target>Stwórz alternatywne reguły synchronizacji</target>
+<source>No filter selected</source>
+<target>Nie wybrano żadnego filtra</target>
+<source>Filter is active</source>
+<target>Filtr jest aktywny</target>
+<source>Clear filter settings</source>
+<target>Wyczyść ustawienia filtra</target>
+<source>Remove alternate settings</source>
+<target>Usuń alternatywne ustawienia</target>
+<source>Create a batch job</source>
+<target>Utwórz plik wsadowy</target>
+<source>Synchronization settings</source>
+<target>Ustawienia synchronizacji</target>
+<source>Comparison settings</source>
+<target>Ustawienia porównywania</target>
+<source>About</source>
+<target>O Programie</target>
+<source>Error</source>
+<target>Błąd</target>
+<source>Warning</source>
+<target>Ostrzerzenie</target>
+<source>Question</source>
+<target>Pytanie</target>
+<source>Confirm</source>
+<target>Potwierdź</target>
+<source>Configure filter</source>
+<target>Konfiguruj filtr</target>
+<source>Customize columns</source>
+<target>Dostosuj kolumny</target>
+<source>Global settings</source>
+<target>Ustawienia programu</target>
+<source>Synchronization Preview</source>
+<target>Podgląd synchronizacji</target>
+<source>Find</source>
+<target>Znajdź</target>
+<source>%x MB</source>
+<target>%x MB</target>
+<source>%x KB</source>
+<target>%x KB</target>
+<source>%x GB</source>
+<target>%x GB</target>
+<source>
+<pluralform>1 Byte</pluralform>
+<pluralform>%x Bytes</pluralform>
+</source>
+<target>
+<pluralform>1 Bajt</pluralform>
+<pluralform>%x Bajty</pluralform>
+<pluralform>%x Bajtów</pluralform>
+</target>
+<source><Symlink></source>
+<target><Dowiązanie symboliczne></target>
+<source><Directory></source>
+<target><Katalog></target>
+<source>Size</source>
+<target>Rozmiar</target>
+<source>Date</source>
+<target>Data</target>
+<source>Full path</source>
+<target>Pełna scieżka</target>
+<source>Filename</source>
+<target>Nazwa pliku</target>
+<source>Relative path</source>
+<target>Relatywna ścieżka</target>
+<source>Directory</source>
+<target>Katalog</target>
+<source>Extension</source>
+<target>Rozszerzenie</target>
+<source>Comparison Result</source>
+<target>Rezultat porównywania</target>
+<source>Incompatible synchronization database format:</source>
+<target>Niepoprawny format bazy danych dla synchronizacji:</target>
+<source>Initial synchronization:</source>
+<target>Wstępna synchronizacja:</target>
+<source>One of the FreeFileSync database files is not yet existing:</source>
+<target>Jeden z plików bazy danych FreeFileSync nie istnieje:</target>
+<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
+<target>Jeden z wpisów bazy danych FreeFileSync dotyczący pliku nie istnieje:</target>
+<source>Error reading from synchronization database:</source>
+<target>Błąd odczytu z bazy danych synchronizacji:</target>
+<source>An exception occurred!</source>
+<target>Wystąpił wyjątek!</target>
+<source>Error deleting file:</source>
+<target>Błąd podczas usuwania pliku:</target>
+<source>Error reading file attributes:</source>
+<target>Błąd odczytu atrybutów pliku:</target>
+<source>Waiting while directory is locked (%x)...</source>
+<target>Blokada katalogu (%x), oczekiwanie...</target>
+<source>Error setting directory lock:</source>
+<target>Błąd ustawiania blokady katalogu:</target>
+<source>
+<pluralform>1 sec</pluralform>
+<pluralform>%x sec</pluralform>
+</source>
+<target>
+<pluralform>1 sekunda</pluralform>
+<pluralform>%x sekundy</pluralform>
+<pluralform>%x sekund</pluralform>
+</target>
+<source>Info</source>
+<target>Info</target>
+<source>Fatal Error</source>
+<target>Błąd krytyczny</target>
+<source>Invalid FreeFileSync config file!</source>
+<target>Nieprawidłowy plik konfiguracyjny!</target>
+<source>File does not exist:</source>
+<target>Plik nie istnieje:</target>
+<source>Error parsing configuration file:</source>
+<target>Błąd parsowania pliku konfiguracyjnego:</target>
+<source>Error writing file:</source>
+<target>Błąd zapisu pliku:</target>
+<source>/sec</source>
+<target>/sekundę</target>
+<source>
+<pluralform>1 min</pluralform>
+<pluralform>%x min</pluralform>
+</source>
+<target>
+<pluralform>1 minuta</pluralform>
+<pluralform>%x minuty</pluralform>
+<pluralform>%x minut</pluralform>
+</target>
+<source>
+<pluralform>1 hour</pluralform>
+<pluralform>%x hours</pluralform>
+</source>
+<target>
+<pluralform>1 godzina</pluralform>
+<pluralform>%x godziny</pluralform>
+<pluralform>%x godzin</pluralform>
+</target>
+<source>
+<pluralform>1 day</pluralform>
+<pluralform>%x days</pluralform>
+</source>
+<target>
+<pluralform>1 dzień</pluralform>
+<pluralform>%x dni</pluralform>
+<pluralform>%x dni</pluralform>
+</target>
+<source>S&ave configuration...</source>
+<target>Z&apisz konfigurację...</target>
+<source>&Load configuration...</source>
+<target>&Wczytaj konfigurację...</target>
+<source>&Quit</source>
+<target>&Zamknij</target>
+<source>&File</source>
+<target>&Plik</target>
+<source>&Content</source>
+<target>&Zawartość</target>
+<source>&About...</source>
+<target>&O Programie...</target>
+<source>&Help</source>
+<target>&Pomoc</target>
+<source>Usage:</source>
+<target>Użycie:</target>
+<source>1. Select directories to monitor.</source>
+<target>1. Wprowadź katalogi do nadzorowania</target>
+<source>2. Enter a command line.</source>
+<target>2. Wprowadź komendę.</target>
+<source>3. Press 'Start'.</source>
+<target>3. Wciśnij 'Start'.</target>
+<source>
+The command line is executed each time:
+- all directories become available (e.g. USB stick insert)
+- files within these directories or subdirectories are modified
+</source>
+<target>
+Komenda jest wykonwywana za każdym razem gdy:
+- wszystkie katalogi będą dostępne (np. włożenie USB)
+- pliki w obrębie tych katalogów i podkatalogów ulegną zmianie
+</target>
+<source>Directories to watch</source>
+<target>Katalogi do obserwacji</target>
+<source>Add folder</source>
+<target>Dodaj folder</target>
+<source>Remove folder</source>
+<target>Usuń folder</target>
+<source>Select a folder</source>
+<target>Wybierz folder</target>
+<source>Command line</source>
+<target>Linia komend</target>
+<source>Minimum Idle Time [seconds]</source>
+<target>Minimalny czas bezczynności [sekundy]</target>
+<source>Idle time between detection of last change and execution of command line in seconds</source>
+<target>Odstęp czasu w sekundach pomiędzy pomiędzy ostatnią wykrytą zmianą, a wykonaniem komendy</target>
+<source>Start</source>
+<target>Rozpocznij</target>
+<source>(Build: %x)</source>
+<target>(Buduję: %x)</target>
+<source>RealtimeSync configuration</source>
+<target>RealtimeSync konfiguracja</target>
+<source>File already exists. Overwrite?</source>
+<target>Nadpisać istniejący już plik?</target>
+<source>&Restore</source>
+<target>&Przywróć</target>
+<source>&Exit</source>
+<target>&Wyjście</target>
+<source>Monitoring active...</source>
+<target>Monitorowanie aktywne...</target>
+<source>Waiting for missing directories...</source>
+<target>Oczekiwanie na brakujące katalogi...</target>
+<source>Command line is empty!</source>
+<target>Linia komend jest pusta!</target>
+<source>Could not initialize directory monitoring:</source>
+<target>Nie można uruchomić monitora katalogów:</target>
+<source>A directory input field is empty.</source>
+<target>Pole ze ścieżką katalogu jest puste.</target>
+<source>Error when monitoring directories.</source>
+<target>Błąd podczas monitorowania katalogów.</target>
+<source>Drag && drop</source>
+<target>Drag && Drop</target>
+<source>Conversion error:</source>
+<target>Błąd konwersji:</target>
+<source>Error moving file:</source>
+<target>Błąd podczas przenoszenia pliku:</target>
+<source>Operation aborted!</source>
+<target>Operacja przerwana!</target>
+<source>Target file already existing!</source>
+<target>Plik docelowy już istnieje!</target>
+<source>Error moving directory:</source>
+<target>Błąd podczas przenoszenia katalogu:</target>
+<source>Target directory already existing!</source>
+<target>Katalog docelowy już istnieje!</target>
+<source>Error deleting directory:</source>
+<target>Błąd podczas usuwania katalogu:</target>
+<source>Error changing modification time:</source>
+<target>Błąd zmiany godziny modyfikacji:</target>
+<source>Error loading library function:</source>
+<target>Błąd wczytywania funkcji:</target>
+<source>Error reading security context:</source>
+<target>Błąd odczytu kontekstu bezpieczeństwa:</target>
+<source>Error writing security context:</source>
+<target>Błąd zapisu kontekstu bezpieczeństwa:</target>
+<source>Error copying file permissions:</source>
+<target>Błąd podczas kopiowania uprawnień pliku:</target>
+<source>Error creating directory:</source>
+<target>Błąd podczas tworzenia katalogu:</target>
+<source>Error copying symbolic link:</source>
+<target>Błąd podczas kopiowania dowiązania symbolicznego (symlink)</target>
+<source>Error copying file:</source>
+<target>Błąd podczas kopiowania pliku:</target>
+<source>Error opening file:</source>
+<target>Błąd odczytu pliku:</target>
+<source>Error reading file:</source>
+<target>Błąd odczytu pliku:</target>
+<source>Endless loop when traversing directory:</source>
+<target>Zapętlenie podczas przeglądania katalogu:</target>
+<source>Error traversing directory:</source>
+<target>Błąd podczas odczytywania katalogu:</target>
+<source>Error setting privilege:</source>
+<target>Błąd ustawiania uprawnień:</target>
+<source>Error moving to Recycle Bin:</source>
+<target>Błąd podczas przenoszenia do kosza:</target>
+<source>Could not load a required DLL:</source>
+<target>Nie można załadować wymaganej biblioteki DLL:</target>
+<source>Error writing to synchronization database:</source>
+<target>Błąd zapisu do bazy danych synchronizacji:</target>
+<source>Error starting Volume Shadow Copy Service!</source>
+<target>Błąd podczas uruchamianiu usługi Shadow Copy!</target>
+<source>Making shadow copies on WOW64 is not supported. Please use FreeFileSync 64-bit version.</source>
+<target>Tworzenie Shadow Copies dla WOW64 nie jest obsługiwane. Zainstaluj 64 bitową wersję FreeFileSync.</target>
+<source>Could not determine volume name for file:</source>
+<target>Nie można określić nazwy dysku dla pliku:</target>
+<source>Volume name %x not part of filename %y!</source>
+<target>Dysk %x nie jest częścią pliku %y!</target>
+<source>%x TB</source>
+<target>%x TB</target>
+<source>%x PB</source>
+<target>%x PB</target>
+<source>%x%</source>
+<target>%x%</target>
+<source>Could not read values for the following XML nodes:</source>
+<target>Nie można odczytać wartości dla danych gałęzi XML:</target>
+<source>Show popup</source>
+<target>Pokaż okno popup</target>
+<source>Show popup on errors or warnings</source>
+<target>Pokaż okno popup dla błędów i ostrzeżeń</target>
+<source>Ignore errors</source>
+<target>Ignoruj błędy</target>
+<source>Hide all error and warning messages</source>
+<target>Ukryj wszystkie informacje błędach i ostrzeżeniach</target>
+<source>Exit instantly</source>
+<target>Wyjdź natychmiastowo</target>
+<source>Abort synchronization immediately</source>
+<target>Natychmiast zakończ synchronizację</target>
+<source>Logging</source>
+<target>Tworzenie logów</target>
+<source>FreeFileSync batch file</source>
+<target>FreeFileSync plik wsadowy</target>
+<source>FreeFileSync configuration</source>
+<target>Konfiguracja FreeFileSync</target>
+<source>FreeFileSync Batch Job</source>
+<target>FreeFileSync plik wsadowy</target>
+<source>Unable to create logfile!</source>
+<target>Nie można utworzyć pliku z logami!</target>
+<source>Batch execution</source>
+<target>Uruchomienie pliku wsadowego</target>
+<source>Log-messages:</source>
+<target>Logi:</target>
+<source>Stop</source>
+<target>Zatrzymaj</target>
+<source>Total time:</source>
+<target>Całkowity czas:</target>
+<source>Synchronization aborted!</source>
+<target>Synchronizacja przerwana!</target>
+<source>Synchronization completed with errors!</source>
+<target>Synchronizacja zakończona z błędami.</target>
+<source>Synchronization completed successfully!</source>
+<target>Synchronizacja zakończona pomyślnie!</target>
+<source>Press "Switch" to open FreeFileSync GUI mode.</source>
+<target>Naciśnij "Przełącz" aby otworzyć moduł GUI.</target>
+<source>Switching to FreeFileSync GUI mode...</source>
+<target>Przełączanie do trybu GUI FreeFileSync</target>
+<source>Unable to connect to sourceforge.net!</source>
+<target>Nie można się połączyć z sourceforge.net!</target>
+<source>A newer version of FreeFileSync is available:</source>
+<target>Dostępna jest nowa wersja FreeFileSync:</target>
+<source>Download now?</source>
+<target>Pobrać teraz?</target>
+<source>Information</source>
+<target>Informacja</target>
+<source>FreeFileSync is up to date!</source>
+<target>FreeFileSync jest już uaktualniony!</target>
+<source>Do you want FreeFileSync to automatically check for updates every week?</source>
+<target>Czy chcesz aby FreeFileSync sprawdzał uaktualnienia co tydzień?</target>
+<source>(Requires an Internet connection!)</source>
+<target>(Wymaga połączenia z Internetem!)</target>
+<source>1. &Compare</source>
+<target>1. &Porównaj</target>
+<source>2. &Synchronize...</source>
+<target>2. &Synchronizuj...</target>
+<source>S&witch view</source>
+<target>P&rzełącz widok</target>
+<source>&New</source>
+<target>&Nowy</target>
+<source>&Program</source>
+<target>&Program</target>
+<source>&Language</source>
+<target>&Język</target>
+<source>&Global settings...</source>
+<target>&Ustawienia programu...</target>
+<source>&Create batch job...</source>
+<target>&Twórz plik wsadowy...</target>
+<source>&Export file list...</source>
+<target>&Eksportuj listę plików...</target>
+<source>&Advanced</source>
+<target>&Zaawansowane</target>
+<source>&Check for new version</source>
+<target>&Aktualizuj</target>
+<source>Compare</source>
+<target>Porównaj</target>
+<source>Compare both sides</source>
+<target>Porównaj foldery</target>
+<source>&Abort</source>
+<target>&Przerwij</target>
+<source>Synchronize...</source>
+<target>Synchronizuj...</target>
+<source>Start synchronization</source>
+<target>Rozpocznij synchronizację</target>
+<source>Swap sides</source>
+<target>Zamień stronami</target>
+<source>Add folder pair</source>
+<target>Dodaj foldery do porównania</target>
+<source>Remove folder pair</source>
+<target>Usuń parę folderów</target>
+<source>Save current configuration to file</source>
+<target>Zapisz aktualny plik konfiguracyjny</target>
+<source>Load configuration from file</source>
+<target>Wczytaj konfigurację z pliku</target>
+<source>Last used configurations (press DEL to remove from list)</source>
+<target>Ostatnio użyta konfiguracja (naciśnij DEL żeby usunąć z listy)</target>
+<source>Hide excluded items</source>
+<target>Ukryj wykluczone pliki</target>
+<source>Hide filtered or temporarily excluded files</source>
+<target>Ukryj pliki filtrowane lub tymczasowo wykluczone</target>
+<source>Number of files and directories that will be created</source>
+<target>Liczba plików i katalogów, które zostaną utworzone</target>
+<source>Number of files that will be overwritten</source>
+<target>Liczba plików, które zostaną nadpisane</target>
+<source>Number of files and directories that will be deleted</source>
+<target>Liczba plików i katalogów, które zostaną usunięte</target>
+<source>Total amount of data that will be transferred</source>
+<target>Liczba danych do przekopiowania</target>
+<source>Left</source>
+<target>Lewy</target>
+<source>Right</source>
+<target>Prawy</target>
+<source>Batch job</source>
+<target>Plik wsadowy</target>
+<source>Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
+<target>Twórz plik wsadowy dla automatyzacji procesu. By rozpocząć prace w tym trybie zwyczajnie uruchom plik klikając dwa razy lub dodaj go do zadań zaplanowanych Twojego systemu. Plik wsadowy może być również przekazywany jako parametr do programu w postaci: FreeFileSync.exe <plikwsadowy>.</target>
+<source>Help</source>
+<target>Pomoc</target>
+<source>Configuration overview:</source>
+<target>Przegląd konfiguracji:</target>
+<source>Filter files</source>
+<target>Filtruj pliki</target>
+<source>Status feedback</source>
+<target>Opinia statusu</target>
+<source>Silent mode</source>
+<target>Tryb Cichy</target>
+<source>Start minimized and write status information to a logfile</source>
+<target>Uruchom zminimalizowane i zapisuj informacje do pliku logów</target>
+<source>Error handling</source>
+<target>Obsługa błędów</target>
+<source>Overview</source>
+<target>Przegląd</target>
+<source>Select logfile directory:</source>
+<target>Wybierz katalog z logami:</target>
+<source>Maximum number of logfiles:</source>
+<target>Maksymalna liczba plików z logami:</target>
+<source>&Save</source>
+<target>&Zapisz</target>
+<source>&Load</source>
+<target>&Wczytaj</target>
+<source>&Cancel</source>
+<target>&Anuluj</target>
+<source>Elements found:</source>
+<target>Znalezione elementy:</target>
+<source>Elements remaining:</source>
+<target>Pozostałe elementy:</target>
+<source>Speed:</source>
+<target>Prędkość:</target>
+<source>Time remaining:</source>
+<target>Pozostały czas:</target>
+<source>Time elapsed:</source>
+<target>Czas:</target>
+<source>Operation:</source>
+<target>Operacja:</target>
+<source>Select variant:</source>
+<target>Wybierz wariant:</target>
+<source><Automatic></source>
+<target><Automatycznie></target>
+<source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
+<target>Wykryj i zastosuj zmiany po obu stronach używając bazy danych. Usunięcia i konflikty są wykrywane automatycznie.</target>
+<source>Mirror ->></source>
+<target>Lustrzana ->></target>
+<source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
+<target>Lustrzana kopia lewego folderu. Prawy folder po synchronizacji jest lustrzaną kopią lewego folderu.</target>
+<source>Update -></source>
+<target>Uaktualnij -></target>
+<source>Copy new or updated files to right folder.</source>
+<target>Kopiuj nowe lub aktualniejsze pliki na prawą stronę.</target>
+<source>Custom</source>
+<target>Własne</target>
+<source>Configure your own synchronization rules.</source>
+<target>Skonfiguruj swoje własne zasady synchronizacji.</target>
+<source>Deletion handling</source>
+<target>Obsługa usuwania</target>
+<source>&OK</source>
+<target>&OK</target>
+<source>Configuration</source>
+<target>Konfiguracja</target>
+<source>Category</source>
+<target>Kategoria</target>
+<source>Action</source>
+<target>Akcja</target>
+<source>Files/folders that exist on left side only</source>
+<target>Pliki/katalogi istniejące tylko po lewej stronie</target>
+<source>Files/folders that exist on right side only</source>
+<target>Pliki/katalogi istniejące tylko po prawej stronie</target>
+<source>Files that exist on both sides, left one is newer</source>
+<target>Pliki, które istnieją po obu stronach, lewa strona jest nowsza</target>
+<source>Files that exist on both sides, right one is newer</source>
+<target>Pliki, które istnieją po obu stronach, prawa strona jest nowsza</target>
+<source>Files that have different content</source>
+<target>Pliki, które mają różną zawartość</target>
+<source>Conflicts/files that cannot be categorized</source>
+<target>Konflikty/pliki, które nie mogą być skategoryzowane</target>
+<source>Compare by...</source>
+<target>Porównaj przez...</target>
+<source>
+Files are found equal if
+     - file size
+     - last write time and date
+are the same
+</source>
+<target>
+Pliki są jednakowe jeżeli
+     - rozmiar pliku
+     - czas i data modyfikacji
+są identyczne
+</target>
+<source>File size and date</source>
+<target>Rozmiar i data pliku</target>
+<source>
+Files are found equal if
+     - file content
+is the same
+</source>
+<target>
+Pliki są jednakowe jeżeli
+     - zawartość pliku
+jest identyczna
+</target>
+<source>File content</source>
+<target>Zawartość pliku</target>
+<source>Symbolic Link handling</source>
+<target>Obsługa dowiązań symbolicznych</target>
+<source>Synchronizing...</source>
+<target>Synchronizuję...</target>
+<source>Elements processed:</source>
+<target>Przetworzeone elementy:</target>
+<source>&Pause</source>
+<target>&Pauza</target>
+<source>Compare by "File size and date"</source>
+<target>Porównaj przez "Rozmiar i data pliku"</target>
+<source>This variant evaluates two equally named files as being equal when they have the same file size AND the same last write date and time.</source>
+<target>Ten wariant traktuje dwa pliki jako równe w przypadku gdy mają jednakowy rozmiar oraz tą samą datę i czas ostatniej modyfikacji.</target>
+<source>When the comparison is started with this option set the following decision tree is processed:</source>
+<target>Gdy porównywanie z zaznaczoną opcją jest w toku, podejmowane są następujące dezyje:</target>
+<source>As a result the files are separated into the following categories:</source>
+<target>W rezultacie pliki zostały podzielone na następujące kategorie:</target>
+<source>- equal</source>
+<target>- równy</target>
+<source>- left newer</source>
+<target>- lewy jest nowszy</target>
+<source>- right newer</source>
+<target>- prawy jest nowszy</target>
+<source>- exists left only</source>
+<target>- istnieje tylko po lewej stronie</target>
+<source>- exists right only</source>
+<target>- istnieje tylko po prawej stronie</target>
+<source>- conflict (same date, different size)</source>
+<target>- konflikt (ta sama data, różny rozmiar)</target>
+<source>Compare by "File content"</source>
+<target>Porównaj przez "Zawartość pliku"</target>
+<source>
+As the name suggests, two files which share the same name are marked as equal if and only if they have the same content. This option is useful for consistency checks rather than backup operations. Therefore the file times are not taken into account at all.
+
+With this option enabled the decision tree is smaller:
+</source>
+<target>
+Jak wskazuje nazwa, dwa pliki o tej samej nazwie są równe tylko i wyłącznie jeżeli ich zawartość jest jednakowa. Czas modyfikacji nie jest brany pod uwagę. Ta opcja jest raczej użyteczna do sprawdzania spójności plików niż zadań kopii zapasowej.
+
+Drzewko decyzyjne dla tej opcji jest mniejsze:
+</target>
+<source>- different</source>
+<target>- różny</target>
+<source>Source code written in C++ utilizing:</source>
+<target>Kod stworzony w C++ z wykorzystaniem:</target>
+<source>Big thanks for localizing FreeFileSync goes out to:</source>
+<target>Podziękowania za tłumaczenie FreeFileSync:</target>
+<source>Feedback and suggestions are welcome at:</source>
+<target>Komentarze i sugestie mile widziane na:</target>
+<source>FreeFileSync at Sourceforge</source>
+<target>FreeFileSync na Sourceforge</target>
+<source>Homepage</source>
+<target>Strona domowa</target>
+<source>If you like FFS</source>
+<target>Jeżeli Ci się podoba</target>
+<source>Donate with PayPal</source>
+<target>Wesprzyj z PayPal</target>
+<source>Email</source>
+<target>Poczta</target>
+<source>Report translation error</source>
+<target>Zgłoś błąd w tłumaczeniu</target>
+<source>Published under the GNU General Public License:</source>
+<target>Udostępnione na zasadach licencji GNU General Public License:</target>
+<source>Ignore subsequent errors</source>
+<target>Ignoruj kolejne błędy</target>
+<source>Hide further error messages during the current process</source>
+<target>Ukryj kolejne informacje o błędach dla tego zadania</target>
+<source>&Ignore</source>
+<target>&Ignoruj</target>
+<source>&Retry</source>
+<target>&Powtórz</target>
+<source>Do not show this dialog again</source>
+<target>Nie pokazuj tego okna ponownie</target>
+<source>&Switch</source>
+<target>&Zamień</target>
+<source>&Yes</source>
+<target>&Tak</target>
+<source>&No</source>
+<target>&Nie</target>
+<source>Delete on both sides</source>
+<target>Usuń po obu stronach</target>
+<source>Delete on both sides even if the file is selected on one side only</source>
+<target>Usuń po obu stronach nawet jeżeli plik zaznaczony jest tylko po jednej stronie</target>
+<source>Use Recycle Bin</source>
+<target>Użyj kosza</target>
+<source>
+Only files/directories that match all filter settings will be selected for synchronization.
+Note: The name filter must be specified relative(!) to main synchronization directories.
+</source>
+<target>
+Tylko pliki i katalogi, które spełniły wszystkie kryteria filtrów będą poddane synchronizacji.
+Uwaga: Podana nazwa musi być relatywną ścieżką względem synchronizowanych katalogów.
+</target>
+<source>Hints:</source>
+<target>Wskazówki:</target>
+<source>1. Enter relative file or directory names separated by ';' or a new line.</source>
+<target>1. Wprowdź relatywne scieżki do plików lub katalogów oddzielone ';' lub nową linią.</target>
+<source>2. Use wildcard characters '*' and '?'.</source>
+<target>2. Użyj wieloznacznika (wildcard) '*' i '?'.</target>
+<source>3. Exclude files directly on main grid via context menu.</source>
+<target>3. Wyklucz pliki i foldery używając prawego przycisku myszki.</target>
+<source>Example</source>
+<target>Przykład</target>
+<source>
+Include: *.doc;*.zip;*.exe
+Exclude: \stuff\temp\*
+</source>
+<target>
+Uwzględnik: *.doc;*zip*.exe
+Wyklucz: \moje\temp\*
+</target>
+<source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
+<target>Synchronizuj wszystkie pliki .doc, .zip i exe z wyjątkiem folderu "temp"</target>
+<source>Include</source>
+<target>Dołącz</target>
+<source>Exclude</source>
+<target>Wyklucz</target>
+<source>Select time span:</source>
+<target>Określ różnicę czasu:</target>
+<source>Minimum file size:</source>
+<target>Minimalny rozmiar pliku:</target>
+<source>Maximum file size:</source>
+<target>Maksymalny rozmiar pliku:</target>
+<source>&Default</source>
+<target>&Domyślne</target>
+<source>Move column up</source>
+<target>Przesuń kolumnę do góry</target>
+<source>Move column down</source>
+<target>Przesuń kolumnę w dół</target>
+<source>Copy locked files</source>
+<target>Kopiuj zablokowane pliki</target>
+<source>
+Copy shared or locked files using Volume Shadow Copy Service
+(Requires Administrator rights)
+</source>
+<target>
+Kopiuj pliki udostępnione i zablokowane używając usługi Volume Shadow Copy
+ (Wymaga uprawnień administratora)
+</target>
+<source>Copy filesystem permissions</source>
+<target>Kopiuj uprawnienia plików</target>
+<source>
+Transfer file and directory permissions
+(Requires Administrator rights)
+</source>
+<target>
+Transfer uprawnień plików i katalogów
+(Wymaga uprawnień Administratora)
+</target>
+<source>Hidden dialogs:</source>
+<target>Ukryte dialogi:</target>
+<source>Reset</source>
+<target>Resetuj</target>
+<source>Show hidden dialogs</source>
+<target>Pokaż ukryte dialogi</target>
+<source>External applications</source>
+<target>Aplikacje zewnętrzne</target>
+<source>Description</source>
+<target>Opis</target>
+<source>Variant</source>
+<target>Wariant</target>
+<source>Statistics</source>
+<target>Statystyki</target>
+<source>Find what:</source>
+<target>Co:</target>
+<source>Match case</source>
+<target>Uwzględnij wielkość liter</target>
+<source>&Find next</source>
+<target>&Znajdź następny</target>
+<source>You may try to synchronize remaining items again (WITHOUT having to re-compare)!</source>
+<target>Możesz spróbować synchronizować pozostałe elementy ponownie (bez konieczności ponownego porównywania)!</target>
+<source>Batch file created successfully!</source>
+<target>Plik wsadowy utworzony pomyślnie!</target>
+<source>Main bar</source>
+<target>Główny pasek</target>
+<source>Folder pairs</source>
+<target>Pary folderów</target>
+<source>Select view</source>
+<target>Określ widok</target>
+<source>Folder Comparison and Synchronization</source>
+<target>Porównywanie i Synchronizacja folderów</target>
+<source>Recycle Bin not yet supported for this system!</source>
+<target>Kosz nie jest jeszcze wspierany dla tej wersji systemu!</target>
+<source>Set direction:</source>
+<target>Kierunek  synchronizacji:</target>
+<source>Exclude temporarily</source>
+<target>Wyklucz tymczasowo</target>
+<source>Include temporarily</source>
+<target>Dołącz tymczasowo</target>
+<source>Exclude via filter:</source>
+<target>Dodaj filtr:</target>
+<source><multiple selection></source>
+<target><zaznaczone elementy></target>
+<source>D-Click</source>
+<target>Podw. kliknięcie</target>
+<source>Copy to clipboard	CTRL+C</source>
+<target>Kopiuj do pamięci	CTRL+C</target>
+<source>Delete files	DEL</source>
+<target>Usuń	DEL</target>
+<source>Customize...</source>
+<target>Dostosuj...</target>
+<source>Auto-adjust columns</source>
+<target>Autodopasowanie kolumn</target>
+<source>Include all rows</source>
+<target>Dołącz wszystkie rzędy</target>
+<source>Exclude all rows</source>
+<target>Wyklucz wszystkie rzędy</target>
+<source>Reset view</source>
+<target>Resetuj widok</target>
+<source>Show "%x"</source>
+<target>Pokaż "%x"</target>
+<source><Last session></source>
+<target><Ostatnia sesja></target>
+<source>Configuration saved!</source>
+<target>Konfiguracja zapisana!</target>
+<source>Save changes to current configuration?</source>
+<target>Zapisać zmiany obecnej konfiguracji?</target>
+<source>Configuration loaded!</source>
+<target>Konfiguracja wczytana!</target>
+<source>Hide files that exist on left side only</source>
+<target>Ukryj pliki, które istnieją tylko po lewej stronie</target>
+<source>Show files that exist on left side only</source>
+<target>Pokaż pliki istniejące tylko po lewej stronie</target>
+<source>Hide files that exist on right side only</source>
+<target>Ukryj pliki, które istnieją tylko po prawej stronie</target>
+<source>Show files that exist on right side only</source>
+<target>Pokaż pliki istniejące tylko po prawej stronie</target>
+<source>Hide files that are newer on left</source>
+<target>Ukryj pliki, które są nowsze po lewej stronie</target>
+<source>Show files that are newer on left</source>
+<target>Pokaż pliki nowsze po lewej stronie</target>
+<source>Hide files that are newer on right</source>
+<target>Ukryj pliki, które są nowsze po prawej stronie</target>
+<source>Show files that are newer on right</source>
+<target>Pokaż pliki nowsze po prawej stronie</target>
+<source>Hide files that are equal</source>
+<target>Ukryj pliki, które są równe</target>
+<source>Show files that are equal</source>
+<target>Pokaż pliki, które są równe</target>
+<source>Hide files that are different</source>
+<target>Ukryj pliki, które są różne</target>
+<source>Show files that are different</source>
+<target>Pokaż pliki, które się różnią</target>
+<source>Hide conflicts</source>
+<target>Ukryj konflikty</target>
+<source>Show conflicts</source>
+<target>Pokaż konflikty</target>
+<source>Hide files that will be created on the left side</source>
+<target>Ukryj pliki, które będą utworzone po lewej stronie</target>
+<source>Show files that will be created on the left side</source>
+<target>Pokaż pliki, które będą utworzone po lewej stronie</target>
+<source>Hide files that will be created on the right side</source>
+<target>Ukryj pliki, które będą utworzone po prawej stronie</target>
+<source>Show files that will be created on the right side</source>
+<target>Pokaż pliki, które będą utworzone po prawej stronie</target>
+<source>Hide files that will be deleted on the left side</source>
+<target>Ukryj pliki, które będą usunięte po lewej stronie</target>
+<source>Show files that will be deleted on the left side</source>
+<target>Pokaż pliki, które będą usunięte po lewej stronie</target>
+<source>Hide files that will be deleted on the right side</source>
+<target>Ukryj pliki, które będą usunięte po lewej stronie</target>
+<source>Show files that will be deleted on the right side</source>
+<target>Pokaż pliki, które będą usunięte po prawej stronie</target>
+<source>Hide files that will be overwritten on left side</source>
+<target>Ukryj pliki, które zostaną nadpisane po lewej stronie</target>
+<source>Show files that will be overwritten on left side</source>
+<target>Pokaż pliki, które zostaną nadpisane po lewej stronie</target>
+<source>Hide files that will be overwritten on right side</source>
+<target>Ukryj pliki, które zostaną nadpisane po prawej stronie</target>
+<source>Show files that will be overwritten on right side</source>
+<target>Pokaż pliki, które zostaną nadpisane po prawej stronie</target>
+<source>Hide files that won't be copied</source>
+<target>Ukryj pliki, które nie będą kopiowane</target>
+<source>Show files that won't be copied</source>
+<target>Pokaż pliki, które nie będą kopiowane</target>
+<source>All directories in sync!</source>
+<target>Wszystkie katalogi zsynchronizowane!</target>
+<source>Please run a Compare first before synchronizing!</source>
+<target>Przed synchronizacją należy uruchomić Porównaj!</target>
+<source>Comma separated list</source>
+<target>Lista oddzielona przecinkami</target>
+<source>Legend</source>
+<target>Legenda</target>
+<source>File list exported!</source>
+<target>Lista plików wyeksportowana!</target>
+<source>
+<pluralform>Object deleted successfully!</pluralform>
+<pluralform>%x objects deleted successfully!</pluralform>
+</source>
+<target></target>
+<source>
+<pluralform>1 directory</pluralform>
+<pluralform>%x directories</pluralform>
+</source>
+<target>
+<pluralform>1 katalog</pluralform>
+<pluralform>%x katalogi</pluralform>
+<pluralform>%x katalogów</pluralform>
+</target>
+<source>
+<pluralform>1 file</pluralform>
+<pluralform>%x files</pluralform>
+</source>
+<target>
+<pluralform>1 plik</pluralform>
+<pluralform>%x pliki</pluralform>
+<pluralform>%x plików</pluralform>
+</target>
+<source>
+<pluralform>%x of 1 row in view</pluralform>
+<pluralform>%x of %y rows in view</pluralform>
+</source>
+<target>
+<pluralform>%x z 1 rzędu w widoku</pluralform>
+<pluralform>%x z %y rzędów w widoku</pluralform>
+<pluralform>%x z %y rzędów w widoku</pluralform>
+</target>
+<source>Scanning...</source>
+<target>Skanowanie...</target>
+<source>Comparing content...</source>
+<target>Porównywanie zawartości...</target>
+<source>Paused</source>
+<target>Pauza</target>
+<source>Aborted</source>
+<target>Przerwana</target>
+<source>Completed</source>
+<target>Zakończono</target>
+<source>Abort requested: Waiting for current operation to finish...</source>
+<target>Żądanie przerwania: Czekaj na koniec aktualnie wykonywanego zadania...</target>
+<source>Continue</source>
+<target>Kontynuuj</target>
+<source>Pause</source>
+<target>Pauza</target>
+<source>Cannot find %x</source>
+<target>Nie można znaleźć %x</target>
+<source>DECISION TREE</source>
+<target>DRZEWO DECYZYJNE</target>
+<source>file exists on both sides</source>
+<target>plik istnieje po obu stronach</target>
+<source>on one side only</source>
+<target>tylko po jednej stronie</target>
+<source>same date</source>
+<target></target>
+<source>different date</source>
+<target></target>
+<source>Inactive</source>
+<target>Nieaktywny</target>
+<source>Second</source>
+<target>Sekund</target>
+<source>Minute</source>
+<target>Minut</target>
+<source>Hour</source>
+<target>Godzin</target>
+<source>Day</source>
+<target>Dni</target>
+<source>Byte</source>
+<target>Bajtów</target>
+<source>KB</source>
+<target>KB</target>
+<source>MB</source>
+<target>MB</target>
+<source>Filter: All pairs</source>
+<target>Filtr: Wszystkie pary</target>
+<source>Filter: Single pair</source>
+<target>Filtr: Pojedyńcza para</target>
+<source>Ignore</source>
+<target>Ignoruj</target>
+<source>Direct</source>
+<target>Bezpośrednio</target>
+<source>Follow</source>
+<target>Podąrzaj</target>
+<source>Integrate external applications into context menu. The following macros are available:</source>
+<target>Dołącz zewnętrzną aplikację do menu kontekstowego. Dostępne macra:</target>
+<source>- full file or directory name</source>
+<target>- pełna nazwa pliku lub katalogu</target>
+<source>- directory part only</source>
+<target>- tylko część katalogu</target>
+<source>- Other side's counterpart to %name</source>
+<target>- Odpowiednik %name</target>
+<source>- Other side's counterpart to %dir</source>
+<target>- Odpowiednik %dir</target>
+<source>Restore all hidden dialogs?</source>
+<target>Przywrócić wszystkie ukryte dialogi?</target>
+<source>
+<pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
+<pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
+</source>
+<target>
+<pluralform>Czy na pewno chcesz przenieś ten obiekt do kosza?</pluralform>
+<pluralform>Czy na pewno chcesz przenieś %x obiekty do kosza?</pluralform>
+<pluralform>Czy na pewno chcesz przenieś %x obiektów do kosza?</pluralform>
+</target>
+<source>
+<pluralform>Do you really want to delete the following object?</pluralform>
+<pluralform>Do you really want to delete the following %x objects?</pluralform>
+</source>
+<target>
+<pluralform>Czy na pewno chcesz usunuąc ten obiekt do kosza?</pluralform>
+<pluralform>Czy na pewno chcesz usunąc %x obiekty do kosza?</pluralform>
+<pluralform>Czy na pewno chcesz usunąć %x obiektów do kosza?</pluralform>
+</target>
+<source>Leave as unresolved conflict</source>
+<target>Zostaw jako nierozwiązany konflikt</target>
+<source>Delete permanently</source>
+<target>Usuń na stałe</target>
+<source>Delete or overwrite files permanently</source>
+<target>Usuń lub nadpisz pliki na stałe</target>
+<source>Use Recycle Bin when deleting or overwriting files</source>
+<target>Używaj Kosza podczas usuwania lub nadpisywania plików</target>
+<source>Versioning</source>
+<target>Wersjonowanie</target>
+<source>Move files into a time-stamped subdirectory</source>
+<target>Przenieś pliki do oznaczonego podkatalogu</target>
+<source>Cannot determine sync-direction:</source>
+<target>Nie można określić kierunku synchronizacji:</target>
+<source>Filter settings have changed!</source>
+<target>Ustawienia filtra uległy zmianie!</target>
+<source>Both sides have changed since last synchronization!</source>
+<target>Obie strony uległy zmianie od ostatniej synchronizacji!</target>
+<source>No change since last synchronization!</source>
+<target>Brak zmian od ostatniej synchronizacji!</target>
+<source>The file was not processed by last synchronization!</source>
+<target>Plik nie został przetworzony podczas ostatniej synchronizacji!</target>
+<source>Planned directory deletion is in conflict with its subdirectories and -files!</source>
+<target>Usunięcie katalogów jest w konflikcie podkatalogami oraz plikami!</target>
+<source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
+<target>Ustawianie domyślnego kierunku synchronizacji: Stare pliki zostaną nadpisane nowszymi.</target>
+<source>The file does not contain a valid configuration:</source>
+<target>Nieprawidłowy format pliku:</target>
+<source>Scanning:</source>
+<target>Skanowanie:</target>
+<source>Encoding extended time information: %x</source>
+<target>Odkodowywanie rozszerzonych informacji o czasie: %x</target>
+<source>You can ignore this error to consider the directory as empty.</source>
+<target>Możesz zignorować ten błąd uznająć jeden z katalogów jako pusty.</target>
+<source>Directory does not exist:</source>
+<target>Katalog nie istnieje:</target>
+<source>Directories are dependent! Be careful when setting up synchronization rules:</source>
+<target>Katalogi są zależne! Pamiętaj o tym podczas ustawiania zasad synchronizacji:</target>
+<source>Comparing content of files %x</source>
+<target>Porównywanie zawartości plików %x</target>
+<source>Memory allocation failed!</source>
+<target>Błąd alokacji zasobów!</target>
+<source>File %x has an invalid date!</source>
+<target>Plik %x ma nieprawidłową datę!</target>
+<source>Conflict detected:</source>
+<target>Wykryto konflikt:</target>
+<source>Files %x have the same date but a different size!</source>
+<target>Pliki %x mają tą samą datę lecz różne rozmiary!</target>
+<source>Symlinks %x have the same date but a different target!</source>
+<target>Dowiązanie symboliczne %x ma te same dane, ale inny cel!</target>
+<source>Comparing files by content failed.</source>
+<target>Porównywanie przez zawartość zakończone niepowodzeniem.</target>
+<source>Generating file list...</source>
+<target>Generowanie listy plików...</target>
+<source>Multiple...</source>
+<target>Wiele...</target>
+<source>Files that are equal on both sides</source>
+<target>Pliki równe po obu stronach</target>
+<source>Equal files/folders that differ in attributes only</source>
+<target>Pliki/foldery różniące się tylko atrybutami</target>
+<source>Copy from right to left</source>
+<target>Kopiuj z prawej do lewej</target>
+<source>Copy from left to right</source>
+<target>Kopiuj z lewej do prawej</target>
+<source>Delete files/folders existing on left side only</source>
+<target>Usuń pliki/foldery istniejące tylko po lewej stronie</target>
+<source>Delete files/folders existing on right side only</source>
+<target>Usuń pliki/foldery istniejące tylko po prawej stronie</target>
+<source>Copy from right to left overwriting</source>
+<target>Kopiuj z prawej do lewej nadpisując</target>
+<source>Copy from left to right overwriting</source>
+<target>Kopiuj z lewej do prawej nadpisując</target>
+<source>Do nothing</source>
+<target>Nic nie rób</target>
+<source>Copy attributes only from right to left</source>
+<target>Kopiuj atrybuty tylko z prawej strony</target>
+<source>Copy attributes only from left to right</source>
+<target>Kopiuj atrybuty tylko z lewej strony</target>
+<source>Deleting file %x</source>
+<target>Usuwanie pliku %x</target>
+<source>Deleting Symbolic Link %x</source>
+<target>Usuwanie dowiązania symbolicznego %x</target>
+<source>Deleting folder %x</source>
+<target>Usuwanie folderu %x</target>
+<source>Moving %x to Recycle Bin</source>
+<target>Przenoszenie %x do kosza.</target>
+<source>Moving file %x to user-defined directory %y</source>
+<target>Przenoszenie pliku %x do katalogu użytkownia %y</target>
+<source>Moving folder %x to user-defined directory %y</source>
+<target>Przenoszenie folderu %x do katalogu użytkownika %y</target>
+<source>Moving Symbolic Link %x to user-defined directory %y</source>
+<target>Przenoszenie dowiązania symbolicznego %x do zdefiniowanego katalogu %y</target>
+<source>Copying new file %x to %y</source>
+<target>Kopiowanie nowego pliku %x do %y</target>
+<source>Copying new Symbolic Link %x to %y</source>
+<target>Kopiowanie nowego dowiązania symbolicznego %x</target>
+<source>Overwriting file %x in %y</source>
+<target>Nadpisywanie pliku %x plikiem %y</target>
+<source>Overwriting Symbolic Link %x in %y</source>
+<target>Nadpisywanie dowiązania symbolicznego %x, %y</target>
+<source>Creating folder %x</source>
+<target>Tworzenie folderu %x</target>
+<source>Verifying file %x</source>
+<target>Weryfikowanie pliku %x</target>
+<source>Updating attributes of %x</source>
+<target>Aktualizowanie atrybutów %x</target>
+<source>Source directory does not exist anymore:</source>
+<target>Katalog źródłowy nie istnieje:</target>
+<source>Nothing to synchronize according to configuration!</source>
+<target>Brak elementów do synchronizacji!</target>
+<source>Target directory name must not be empty!</source>
+<target>Katalog docelowy nie może być pusty!</target>
+<source>User-defined directory for deletion was not specified!</source>
+<target>Katalog użytkownika dla elementów usuniętych nie został określony!</target>
+<source>Unresolved conflicts existing!</source>
+<target>Istnieją nierozwiązane konflikty!</target>
+<source>You can ignore conflicts and continue synchronization.</source>
+<target>Możesz je zignorować i kontynuować synchronizację.</target>
+<source>Significant difference detected:</source>
+<target>Wykryto znaczące zmiany:</target>
+<source>More than 50% of the total number of files will be copied or deleted!</source>
+<target>Ponad 50% plików zostanie skopiowanych lub usuniętych!</target>
+<source>Not enough free disk space available in:</source>
+<target>Brak wystarczającej przestrzeni dyskowej na:</target>
+<source>Free disk space required:</source>
+<target>Wymagane wolne miejsce:</target>
+<source>Free disk space available:</source>
+<target>Wolne miejsce:</target>
+<source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
+<target>Katalog zostanie zmodyfikowany w efekcie synchronizacji wielu par folderów! Zweryfikuj ustawienia synchronizacji!</target>
+<source>Processing folder pair:</source>
+<target>Przetwarzanie folderów:</target>
+<source>Generating database...</source>
+<target>Generowanie bazy danych...</target>
+<source>Error copying locked file %x!</source>
+<target>Błąd podczas kopiowania zablokowanego pliku %x!</target>
+<source>Data verification error: Source and target file have different content!</source>
+<target>Błąd weryfikacji danych: Plik źródłowy i docelowy różnią się zawartością!</target>

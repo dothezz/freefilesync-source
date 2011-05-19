@@ -13,7 +13,6 @@
 #include <memory>
 #include "ui/batch_status_handler.h"
 #include "ui/check_version.h"
-#include "library/filter.h"
 #include <wx/file.h>
 #include "shared/xml_base.h"
 #include "library/resources.h"
@@ -26,6 +25,7 @@
 #include "shared/string_conv.h"
 #include "shared/util.h"
 #include <wx/log.h>
+#include "library/lock_holder.h"
 
 #ifdef FFS_LINUX
 #include <gtkmm/main.h>
@@ -33,8 +33,7 @@
 #endif
 
 
-using ffs3::CustomLocale;
-using ffs3::SwitchToGui;
+using namespace zen;
 
 
 IMPLEMENT_APP(Application)
@@ -55,7 +54,7 @@ bool Application::OnInit()
 
 void Application::OnStartApplication(wxIdleEvent&)
 {
-    using namespace ffs3;
+    using namespace zen;
 
     Disconnect(wxEVT_IDLE, wxIdleEventHandler(Application::OnStartApplication), NULL, this);
 
@@ -68,7 +67,7 @@ void Application::OnStartApplication(wxIdleEvent&)
 
         ~HandleAppExit()
         {
-            if (!ffs3::AppMainWindow::mainWindowWasSet())
+            if (!zen::AppMainWindow::mainWindowWasSet())
                 wxTheApp->ExitMainLoop(); //quit application, if no main window was set (batch silent mode)
         }
 
@@ -81,7 +80,7 @@ void Application::OnStartApplication(wxIdleEvent&)
 #ifdef FFS_LINUX
     Gtk::Main::init_gtkmm_internals();
 
-    ::gtk_rc_parse(ffs3::wxToZ(ffs3::getResourceDir()) + "styles.rc"); //remove inner border from bitmap buttons
+    ::gtk_rc_parse(zen::wxToZ(zen::getResourceDir()) + "styles.rc"); //remove inner border from bitmap buttons
 #endif
 
 
@@ -128,7 +127,7 @@ void Application::OnStartApplication(wxIdleEvent&)
     }
 
     //set program language
-    ffs3::setLanguage(globalSettings.programLanguage);
+    zen::setLanguage(globalSettings.programLanguage);
 
 
     if (!cfgFilename.empty())
@@ -137,17 +136,16 @@ void Application::OnStartApplication(wxIdleEvent&)
         const xmlAccess::XmlType xmlConfigType = xmlAccess::getXmlType(cfgFilename);
         switch (xmlConfigType)
         {
-            case xmlAccess::XML_GUI_CONFIG: //start in GUI mode (configuration file specified)
+            case xmlAccess::XML_TYPE_GUI: //start in GUI mode (configuration file specified)
                 runGuiMode(cfgFilename, globalSettings);
                 break;
 
-            case xmlAccess::XML_BATCH_CONFIG: //start in commandline mode
+            case xmlAccess::XML_TYPE_BATCH: //start in commandline mode
                 runBatchMode(cfgFilename, globalSettings);
                 break;
 
-            case xmlAccess::XML_GLOBAL_SETTINGS:
-            case xmlAccess::XML_REAL_CONFIG:
-            case xmlAccess::XML_OTHER:
+            case xmlAccess::XML_TYPE_GLOBAL:
+            case xmlAccess::XML_TYPE_OTHER:
                 wxMessageBox(wxString(_("The file does not contain a valid configuration:")) + wxT(" \"") + cfgFilename + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
                 break;
         }
@@ -172,7 +170,7 @@ int Application::OnRun()
     catch (const std::exception& e) //catch all STL exceptions
     {
         //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
-        wxFile safeOutput(ffs3::getConfigDir() + wxT("LastError.txt"), wxFile::write);
+        wxFile safeOutput(zen::getConfigDir() + wxT("LastError.txt"), wxFile::write);
         safeOutput.Write(wxString::FromAscii(e.what()));
 
         wxSafeShowMessage(_("An exception occurred!"), wxString::FromAscii(e.what()));
@@ -187,7 +185,7 @@ int Application::OnRun()
 int Application::OnExit()
 {
     //get program language
-    globalSettings.programLanguage = ffs3::getLanguage();
+    globalSettings.programLanguage = zen::getLanguage();
 
     try //save global settings to XML
     {
@@ -228,7 +226,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
     //regular check for program updates -> disabled for batch
     //if (!batchCfg.silent)
-    //    ffs3::checkForUpdatePeriodically(globSettings.lastUpdateCheck);
+    //    zen::checkForUpdatePeriodically(globSettings.lastUpdateCheck);
 
     try //begin of synchronization process (all in one try-catch block)
     {
@@ -236,33 +234,43 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
         //class handling status updates and error messages
         BatchStatusHandler statusHandler(batchCfg.silent,
-                                         ffs3::extractJobName(filename),
+                                         zen::extractJobName(filename),
                                          batchCfg.silent ? &batchCfg.logFileDirectory : NULL,
                                          batchCfg.logFileCountMax,
                                          batchCfg.handleError,
                                          switchBatchToGui,
                                          returnValue);
 
-        //COMPARE DIRECTORIES
-        ffs3::CompareProcess comparison(batchCfg.mainCfg.handleSymlinks,
-                                        globSettings.fileTimeTolerance,
-                                        globSettings.optDialogs,
-                                        &statusHandler);
+        const std::vector<zen::FolderPairCfg> cmpConfig = zen::extractCompareCfg(batchCfg.mainCfg);
 
-        ffs3::FolderComparison folderCmp;
-        comparison.startCompareProcess(ffs3::extractCompareCfg(batchCfg.mainCfg),
+        //batch mode: place directory locks on directories during both comparison AND synchronization
+        LockHolder dummy;
+        for (std::vector<FolderPairCfg>::const_iterator i = cmpConfig.begin(); i != cmpConfig.end(); ++i)
+        {
+            dummy.addDir(i->leftDirectoryFmt,  statusHandler);
+            dummy.addDir(i->rightDirectoryFmt, statusHandler);
+        }
+
+        //COMPARE DIRECTORIES
+        zen::CompareProcess comparison(batchCfg.mainCfg.handleSymlinks,
+                                       globSettings.fileTimeTolerance,
+                                       globSettings.optDialogs,
+                                       statusHandler);
+
+        zen::FolderComparison folderCmp;
+        comparison.startCompareProcess(cmpConfig,
                                        batchCfg.mainCfg.compareVar,
                                        folderCmp);
 
         //START SYNCHRONIZATION
-        ffs3::SyncProcess synchronization(
+        zen::SyncProcess synchronization(
             globSettings.optDialogs,
             globSettings.verifyFileCopy,
             globSettings.copyLockedFiles,
             globSettings.copyFilePermissions,
             statusHandler);
 
-        const std::vector<ffs3::FolderPairSyncCfg> syncProcessCfg = ffs3::extractSyncCfg(batchCfg.mainCfg);
+        const std::vector<zen::FolderPairSyncCfg> syncProcessCfg = zen::extractSyncCfg(batchCfg.mainCfg);
         assert(syncProcessCfg.size() == folderCmp.size());
 
         synchronization.startSynchronizationProcess(syncProcessCfg, folderCmp);
@@ -270,12 +278,12 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         //play (optional) sound notification after sync has completed
         if (!batchCfg.silent)
         {
-            const wxString soundFile = ffs3::getResourceDir() + wxT("Sync_Complete.wav");
-            if (ffs3::fileExists(ffs3::wxToZ(soundFile)))
+            const wxString soundFile = zen::getResourceDir() + wxT("Sync_Complete.wav");
+            if (zen::fileExists(zen::wxToZ(soundFile)))
                 wxSound::Play(soundFile, wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message!
         }
     }
-    catch (ffs3::AbortThisProcess&)  //exit used by statusHandler
+    catch (zen::AbortThisProcess&)  //exit used by statusHandler
     {
         if (returnValue >= 0)
             returnValue = -12;

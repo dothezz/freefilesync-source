@@ -7,7 +7,7 @@
 #include "switch_to_gui.h"
 #include "main_dlg.h"
 
-using ffs3::SwitchToGui;
+using zen::SwitchToGui;
 
 
 SwitchToGui::SwitchToGui(const xmlAccess::XmlBatchConfig& batchCfg,

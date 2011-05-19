@@ -68,7 +68,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>BUILD\</OutDir>
+    <OutDir>BUILD\Bin\</OutDir>
     <IntDir>OBJ\$(ProjectName)_$(Configuration)_$(PlatformName)_VCPP\</IntDir>
     <TargetName>$(ProjectName)_$(PlatformName)</TargetName>
     <GenerateManifest>false</GenerateManifest>
@@ -76,21 +76,21 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>BUILD\</OutDir>
+    <OutDir>BUILD\Bin\</OutDir>
     <IntDir>OBJ\$(ProjectName)_$(Configuration)_$(PlatformName)_VCPP\</IntDir>
     <TargetName>$(ProjectName)_$(PlatformName)</TargetName>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>BUILD\</OutDir>
+    <OutDir>BUILD\Bin\</OutDir>
     <IntDir>OBJ\$(ProjectName)_$(Configuration)_$(PlatformName)_VCPP\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <TargetName>$(ProjectName)_$(PlatformName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>BUILD\</OutDir>
+    <OutDir>BUILD\Bin\</OutDir>
     <IntDir>OBJ\$(ProjectName)_$(Configuration)_$(PlatformName)_VCPP\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <TargetName>$(ProjectName)_$(PlatformName)</TargetName>
@@ -101,7 +101,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;__WXDEBUG__;TIXML_USE_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Programme\C++\wxWidgets\include;C:\Programme\C++\wxWidgets\lib\vc_lib\mswud;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswud;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>$(ProjectDir)shared\pch.h</PrecompiledHeaderFile>
       <DisableSpecificWarnings>4100;4996</DisableSpecificWarnings>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
@@ -117,12 +117,12 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalDependencies>wxmsw28ud_aui.lib;wxmsw28ud_adv.lib;wxmsw28ud_core.lib;wxbase28ud.lib;wxpngd.lib;wxzlibd.lib;wxbase28ud_net.lib;comctl32.lib;ws2_32.lib;Rpcrt4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Programme\C++\wxWidgets\lib\vc_lib;C:\Program Files\C++\Boost\stage\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\C++\wxWidgets\lib\vc_lib;C:\Program Files\C++\Boost\stage\lib</AdditionalLibraryDirectories>
       <LinkStatus>
       </LinkStatus>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>C:\Programme\C++\wxWidgets\include;C:\Programme\C++\wxWidgets\lib\vc_lib\mswud</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswud</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);</PreprocessorDefinitions>
     </ResourceCompile>
     <Manifest>
@@ -136,7 +136,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;__WXDEBUG__;TIXML_USE_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Programme\C++\wxWidgets-x64\include;C:\Programme\C++\wxWidgets-x64\lib\vc_lib\mswud;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\C++\wxWidgets-x64\include;C:\Program Files\C++\wxWidgets-x64\lib\vc_lib\mswud;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>$(ProjectDir)shared\pch.h</PrecompiledHeaderFile>
       <DisableSpecificWarnings>4100;4996</DisableSpecificWarnings>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
@@ -152,12 +152,12 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalDependencies>wxmsw28ud_aui.lib;wxmsw28ud_adv.lib;wxmsw28ud_core.lib;wxbase28ud.lib;wxpngd.lib;wxzlibd.lib;wxbase28ud_net.lib;comctl32.lib;ws2_32.lib;Rpcrt4.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Programme\C++\wxWidgets-x64\lib\vc_lib;C:\Program Files\C++\Boost\stage64\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\C++\wxWidgets-x64\lib\vc_lib;C:\Program Files\C++\Boost\stage64\lib</AdditionalLibraryDirectories>
       <LinkStatus>
       </LinkStatus>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>C:\Programme\C++\wxWidgets\include;C:\Programme\C++\wxWidgets\lib\vc_lib\mswud</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswud</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WX_CPU_AMD64</PreprocessorDefinitions>
     </ResourceCompile>
     <Manifest>
@@ -173,7 +173,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;NDEBUG;TIXML_USE_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Programme\C++\wxWidgets\include;C:\Programme\C++\wxWidgets\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <DisableSpecificWarnings>4100;4996</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -189,12 +189,12 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalDependencies>wxmsw28u_aui.lib;wxmsw28u_adv.lib;wxmsw28u_core.lib;wxbase28u.lib;wxpng.lib;wxzlib.lib;wxbase28u_net.lib;comctl32.lib;ws2_32.lib;winmm.lib;Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>C:\Programme\C++\wxWidgets\lib\vc_lib;C:\Program Files\C++\Boost\stage\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\C++\wxWidgets\lib\vc_lib;C:\Program Files\C++\Boost\stage\lib</AdditionalLibraryDirectories>
       <LinkStatus>
       </LinkStatus>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>C:\Programme\C++\wxWidgets\include;C:\Programme\C++\wxWidgets\lib\vc_lib\mswu</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswu</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <Culture>
       </Culture>
@@ -208,7 +208,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;NDEBUG;TIXML_USE_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Programme\C++\wxWidgets-x64\include;C:\Programme\C++\wxWidgets-x64\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\C++\wxWidgets-x64\include;C:\Program Files\C++\wxWidgets-x64\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <DisableSpecificWarnings>4100;4996</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -224,13 +224,13 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalDependencies>wxmsw28u_aui.lib;wxmsw28u_adv.lib;wxmsw28u_core.lib;wxbase28u.lib;wxpng.lib;wxzlib.lib;wxbase28u_net.lib;comctl32.lib;ws2_32.lib;winmm.lib;Rpcrt4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>C:\Programme\C++\wxWidgets-x64\lib\vc_lib;C:\Program Files\C++\Boost\stage64\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\C++\wxWidgets-x64\lib\vc_lib;C:\Program Files\C++\Boost\stage64\lib</AdditionalLibraryDirectories>
       <LinkStatus>
       </LinkStatus>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>C:\Programme\C++\wxWidgets\include;C:\Programme\C++\wxWidgets\lib\vc_lib\mswu</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\C++\wxWidgets\include;C:\Program Files\C++\wxWidgets\lib\vc_lib\mswu</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WX_CPU_AMD64</PreprocessorDefinitions>
       <Culture>
       </Culture>
@@ -249,11 +249,10 @@
     <ClCompile Include="library\db_file.cpp" />
     <ClCompile Include="library\dir_lock.cpp" />
     <ClCompile Include="library\error_log.cpp" />
-    <ClCompile Include="library\filter.cpp" />
+    <ClCompile Include="library\hard_filter.cpp" />
     <ClCompile Include="library\icon_buffer.cpp" />
     <ClCompile Include="library\process_xml.cpp" />
     <ClCompile Include="library\resources.cpp" />
-    <ClCompile Include="library\soft_filter.cpp" />
     <ClCompile Include="library\statistics.cpp" />
     <ClCompile Include="library\status_handler.cpp" />
     <ClCompile Include="shared\app_main.cpp" />
@@ -272,7 +271,7 @@
     <ClCompile Include="shared\guid.cpp" />
     <ClCompile Include="shared\help_provider.cpp" />
     <ClCompile Include="shared\i18n.cpp" />
-    <ClCompile Include="shared\long_path_prefix.cpp" />
+    <ClCompile Include="shared\localization.cpp" />
     <ClCompile Include="shared\mouse_move_dlg.cpp" />
     <ClCompile Include="shared\privilege.cpp" />
     <ClCompile Include="shared\recycler.cpp" />
@@ -280,7 +279,7 @@
     <ClCompile Include="shared\serialize.cpp" />
     <ClCompile Include="shared\shadow.cpp" />
     <ClCompile Include="shared\standard_paths.cpp" />
-    <ClCompile Include="shared\system_func.cpp" />
+    <ClCompile Include="shared\last_error.cpp" />
     <ClCompile Include="shared\taskbar.cpp" />
     <ClCompile Include="shared\tinyxml\tinyxml.cpp" />
     <ClCompile Include="shared\tinyxml\tinyxmlerror.cpp" />

@@ -21,13 +21,13 @@
 #include <wx/msgdlg.h>
 #include "../shared/mouse_move_dlg.h"
 
-using namespace ffs3;
+using namespace zen;
 
 
 class AboutDlg : public AboutDlgGenerated
 {
 public:
-    AboutDlg(wxWindow* window);
+    AboutDlg(wxWindow* parent);
 
 private:
     void OnClose(wxCloseEvent& event);
@@ -35,14 +35,8 @@ private:
 };
 
 
-AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
+AboutDlg::AboutDlg(wxWindow* parent) : AboutDlgGenerated(parent)
 {
-#ifdef FFS_WIN
-    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                        this,
-                        m_bitmap11); //ownership passed to "this"
-#endif
-
     m_bitmap9->SetBitmap(GlobalResources::instance().getImage(wxT("website")));
     m_bitmap10->SetBitmap(GlobalResources::instance().getImage(wxT("email")));
     m_bitmap11->SetBitmap(GlobalResources::instance().getImage(wxT("logo")));
@@ -50,7 +44,7 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
     m_bitmapTransl->SetBitmap(GlobalResources::instance().getImage(wxT("translation")));
 
     //create language credits
-    for (std::vector<LocInfoLine>::const_iterator i = LocalizationInfo::get().begin(); i != LocalizationInfo::get().end(); ++i)
+    for (std::vector<ExistingTranslations::Entry>::const_iterator i = ExistingTranslations::get().begin(); i != ExistingTranslations::get().end(); ++i)
     {
         //flag
         wxStaticBitmap* staticBitmapFlag = new wxStaticBitmap(m_scrolledWindowTranslators, wxID_ANY, GlobalResources::instance().getImage(i->languageFlag), wxDefaultPosition, wxSize(-1,11), 0 );
@@ -95,6 +89,10 @@ AboutDlg::AboutDlg(wxWindow* window) : AboutDlgGenerated(window)
 
     m_buttonOkay->SetFocus();
     Fit();
+
+#ifdef FFS_WIN
+    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
+#endif
 }
 
 
@@ -110,7 +108,7 @@ void AboutDlg::OnOK(wxCommandEvent& event)
 }
 
 
-void ffs3::showAboutDialog()
+void zen::showAboutDialog()
 {
     AboutDlg aboutDlg(NULL);
     aboutDlg.ShowModal();
@@ -121,7 +119,7 @@ void ffs3::showAboutDialog()
 class HelpDlg : public HelpDlgGenerated
 {
 public:
-    HelpDlg(wxWindow* window);
+    HelpDlg(wxWindow* parent);
 
 private:
     void OnClose(wxCloseEvent& event);
@@ -129,11 +127,10 @@ private:
 };
 
 
-HelpDlg::HelpDlg(wxWindow* window) : HelpDlgGenerated(window)
+HelpDlg::HelpDlg(wxWindow* parent) : HelpDlgGenerated(parent)
 {
 #ifdef FFS_WIN
-    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                        this, m_bitmap25, m_staticText56, m_scrolledWindow1, m_scrolledWindow5); //ownership passed to "this"
+    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
     m_notebook1->SetFocus();
@@ -145,15 +142,17 @@ HelpDlg::HelpDlg(wxWindow* window) : HelpDlgGenerated(window)
     wxTreeItemId treeBothSides = m_treeCtrl1->AppendItem(treeRoot, _("file exists on both sides"));
     wxTreeItemId treeOneSide   = m_treeCtrl1->AppendItem(treeRoot, _("on one side only"));
 
-    m_treeCtrl1->AppendItem(treeOneSide, _("- left"));
-    m_treeCtrl1->AppendItem(treeOneSide, _("- right"));
+    m_treeCtrl1->AppendItem(treeOneSide, _("- exists left only"));
+    m_treeCtrl1->AppendItem(treeOneSide, _("- exists right only"));
 
-    m_treeCtrl1->AppendItem(treeBothSides, _("- equal"));
-    wxTreeItemId treeDifferent = m_treeCtrl1->AppendItem(treeBothSides, _("different"));
+    wxTreeItemId treeSameDate = m_treeCtrl1->AppendItem(treeBothSides, _("same date"));
+    m_treeCtrl1->AppendItem(treeSameDate, _("- equal"));
+    m_treeCtrl1->AppendItem(treeSameDate, _("- conflict (same date, different size)"));
 
-    m_treeCtrl1->AppendItem(treeDifferent, _("- left newer"));
-    m_treeCtrl1->AppendItem(treeDifferent, _("- right newer"));
-    m_treeCtrl1->AppendItem(treeDifferent, _("- conflict (same date, different size)"));
+
+    wxTreeItemId treeDifferentDate = m_treeCtrl1->AppendItem(treeBothSides, _("different date"));
+    m_treeCtrl1->AppendItem(treeDifferentDate, _("- left newer"));
+    m_treeCtrl1->AppendItem(treeDifferentDate, _("- right newer"));
 
     m_treeCtrl1->ExpandAll();
 
@@ -162,8 +161,8 @@ HelpDlg::HelpDlg(wxWindow* window) : HelpDlgGenerated(window)
     wxTreeItemId tree2BothSides = m_treeCtrl2->AppendItem(tree2Root, _("file exists on both sides"));
     wxTreeItemId tree2OneSide   = m_treeCtrl2->AppendItem(tree2Root, _("on one side only"));
 
-    m_treeCtrl2->AppendItem(tree2OneSide, _("- left"));
-    m_treeCtrl2->AppendItem(tree2OneSide, _("- right"));
+    m_treeCtrl2->AppendItem(tree2OneSide, _("- exists left only"));
+    m_treeCtrl2->AppendItem(tree2OneSide, _("- exists right only"));
 
     m_treeCtrl2->AppendItem(tree2BothSides, _("- equal"));
     m_treeCtrl2->AppendItem(tree2BothSides, _("- different"));
@@ -184,7 +183,7 @@ void HelpDlg::OnOK(wxCommandEvent& event)
 }
 
 
-void ffs3::showHelpDialog()
+void zen::showHelpDialog()
 {
     HelpDlg helpDlg(NULL);
     helpDlg.ShowModal();
@@ -195,51 +194,60 @@ void ffs3::showHelpDialog()
 class FilterDlg : public FilterDlgGenerated
 {
 public:
-    FilterDlg(wxWindow* window,
+    FilterDlg(wxWindow* parent,
               bool isGlobalFilter,
-              Zstring& filterIncl,
-              Zstring& filterExcl);
+              FilterConfig& filter);
     ~FilterDlg() {}
 
-    enum
-    {
-        BUTTON_APPLY = 1
-    };
-
 private:
-    void OnHelp(wxCommandEvent& event);
-    void OnDefault(wxCommandEvent& event);
-    void OnApply(wxCommandEvent& event);
-    void OnCancel(wxCommandEvent& event);
-    void OnClose(wxCloseEvent& event);
+    void OnClose       (wxCloseEvent& event);
+    void OnHelp        (wxCommandEvent& event);
+    void OnDefault     (wxCommandEvent& event);
+    void OnApply       (wxCommandEvent& event);
+    void OnCancel      (wxCommandEvent& event);
+    void OnUpdateChoice(wxCommandEvent& event) { updateGui(); }
+    void OnUpdateNameFilter(wxCommandEvent& event) { updateGui(); }
+
+    void updateGui();
+    void setFilter(const FilterConfig& filter);
+    FilterConfig getFilter() const;
 
     const bool isGlobalFilter_;
-    Zstring& includeFilter;
-    Zstring& excludeFilter;
+    FilterConfig& outputRef;
+
+    EnumDescrList<UnitTime> enumTimeDescr;
+    EnumDescrList<UnitSize> enumSizeDescr;
 };
 
 
-FilterDlg::FilterDlg(wxWindow* window,
+FilterDlg::FilterDlg(wxWindow* parent,
                      bool isGlobalFilter, //global or local filter dialog?
-                     Zstring& filterIncl,
-                     Zstring& filterExcl) :
-    FilterDlgGenerated(window),
+                     FilterConfig& filter) :
+    FilterDlgGenerated(parent),
     isGlobalFilter_(isGlobalFilter),
-    includeFilter(filterIncl),
-    excludeFilter(filterExcl)
+    outputRef(filter) //just hold reference
 {
 #ifdef FFS_WIN
-    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                        this, m_bitmap26, m_staticTexHeader, m_bitmap8, m_bitmap9); //ownership passed to "this"
+    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
-    m_bitmap8->SetBitmap(GlobalResources::instance().getImage(wxT("include")));
-    m_bitmap9->SetBitmap(GlobalResources::instance().getImage(wxT("exclude")));
+    enumTimeDescr.
+    add(UTIME_NONE, _("Inactive")).
+    add(UTIME_SEC,  _("Second")).
+    add(UTIME_MIN,  _("Minute")).
+    add(UTIME_HOUR, _("Hour")).
+    add(UTIME_DAY,  _("Day"));
+
+    enumSizeDescr.
+    add(USIZE_NONE, _("Inactive")).
+    add(USIZE_BYTE, _("Byte")).
+    add(USIZE_KB,   _("KB")).
+    add(USIZE_MB,   _("MB"));
+
     m_bitmap26->SetBitmap(GlobalResources::instance().getImage(wxT("filterOn")));
     m_bpButtonHelp->SetBitmapLabel(GlobalResources::instance().getImage(wxT("help")));
 
-    m_textCtrlInclude->SetValue(zToWx(includeFilter));
-    m_textCtrlExclude->SetValue(zToWx(excludeFilter));
+    setFilter(filter);
 
     m_panel13->Hide();
     m_button10->SetFocus();
@@ -251,6 +259,67 @@ FilterDlg::FilterDlg(wxWindow* window,
         m_staticTexHeader->SetLabel(_("Filter: Single pair"));
 
     Fit();
+}
+
+
+void FilterDlg::updateGui()
+{
+    FilterConfig activeCfg = getFilter();
+
+    if (!NameFilter(activeCfg.includeFilter, FilterConfig().excludeFilter).isNull())
+        m_bitmapInclude->SetBitmap(GlobalResources::instance().getImage(wxT("include")));
+    else
+        m_bitmapInclude->SetBitmap(GlobalResources::instance().getImage(wxT("include_grey")));
+
+    if (!NameFilter(FilterConfig().includeFilter, activeCfg.excludeFilter).isNull())
+        m_bitmapExclude->SetBitmap(GlobalResources::instance().getImage(wxT("exclude")));
+    else
+        m_bitmapExclude->SetBitmap(GlobalResources::instance().getImage(wxT("exclude_grey")));
+
+    if (activeCfg.unitTimeSpan != UTIME_NONE)
+        m_bitmapFilterDate->SetBitmap(GlobalResources::instance().getImage(wxT("clock")));
+    else
+        m_bitmapFilterDate->SetBitmap(GlobalResources::instance().getImage(wxT("clock_grey")));
+
+    if (activeCfg.unitSizeMin != USIZE_NONE ||
+        activeCfg.unitSizeMax != USIZE_NONE)
+        m_bitmapFilterSize->SetBitmap(GlobalResources::instance().getImage(wxT("size")));
+    else
+        m_bitmapFilterSize->SetBitmap(GlobalResources::instance().getImage(wxT("size_grey")));
+
+    m_spinCtrlTimespan->Enable(activeCfg.unitTimeSpan != UTIME_NONE);
+    m_spinCtrlMinSize ->Enable(activeCfg.unitSizeMin  != USIZE_NONE);
+    m_spinCtrlMaxSize ->Enable(activeCfg.unitSizeMax  != USIZE_NONE);
+}
+
+
+void FilterDlg::setFilter(const FilterConfig& filter)
+{
+    m_textCtrlInclude->ChangeValue(zToWx(filter.includeFilter));
+    m_textCtrlExclude->ChangeValue(zToWx(filter.excludeFilter));
+
+    setEnumVal(enumTimeDescr, *m_choiceUnitTimespan, filter.unitTimeSpan);
+    setEnumVal(enumSizeDescr, *m_choiceUnitMinSize,  filter.unitSizeMin);
+    setEnumVal(enumSizeDescr, *m_choiceUnitMaxSize,  filter.unitSizeMax);
+
+    m_spinCtrlTimespan->SetValue(static_cast<int>(filter.timeSpan));
+    m_spinCtrlMinSize ->SetValue(static_cast<int>(filter.sizeMin));
+    m_spinCtrlMaxSize ->SetValue(static_cast<int>(filter.sizeMax));
+
+    updateGui();
+}
+
+
+FilterConfig FilterDlg::getFilter() const
+{
+    return FilterConfig(wxToZ(m_textCtrlInclude->GetValue()),
+                        wxToZ(m_textCtrlExclude->GetValue()),
+                        m_spinCtrlTimespan->GetValue(),
+                        getEnumVal(enumTimeDescr, *m_choiceUnitTimespan),
+                        m_spinCtrlMinSize->GetValue(),
+                        getEnumVal(enumSizeDescr, *m_choiceUnitMinSize),
+                        m_spinCtrlMaxSize->GetValue(),
+                        getEnumVal(enumSizeDescr, *m_choiceUnitMaxSize));
 }
 
 
@@ -267,19 +336,10 @@ void FilterDlg::OnHelp(wxCommandEvent& event)
 
 void FilterDlg::OnDefault(wxCommandEvent& event)
 {
-    const FilterConfig nullFilter;
-
     if (isGlobalFilter_)
-    {
-        m_textCtrlInclude->SetValue(zToWx(nullFilter.includeFilter));
-        //exclude various recycle bin directories with global filter
-        m_textCtrlExclude->SetValue(zToWx(standardExcludeFilter()));
-    }
+        setFilter(MainConfiguration().globalFilter);
     else
-    {
-        m_textCtrlInclude->SetValue(zToWx(nullFilter.includeFilter));
-        m_textCtrlExclude->SetValue(zToWx(nullFilter.excludeFilter));
-    }
+        setFilter(FilterConfig());
 
     //changes to mainDialog are only committed when the OK button is pressed
     Fit();
@@ -289,11 +349,10 @@ void FilterDlg::OnDefault(wxCommandEvent& event)
 void FilterDlg::OnApply(wxCommandEvent& event)
 {
     //only if user presses ApplyFilter, he wants the changes to be committed
-    includeFilter = wxToZ(m_textCtrlInclude->GetValue());
-    excludeFilter = wxToZ(m_textCtrlExclude->GetValue());
+    outputRef = getFilter();
 
     //when leaving dialog: filter and redraw grid, if filter is active
-    EndModal(BUTTON_APPLY);
+    EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
 
 
@@ -310,19 +369,12 @@ void FilterDlg::OnClose(wxCloseEvent& event)
 
 
 
-DefaultReturnCode::Response ffs3::showFilterDialog(bool isGlobalFilter,
-                                                   Zstring& filterIncl,
-                                                   Zstring& filterExcl)
+ReturnSmallDlg::ButtonPressed zen::showFilterDialog(bool isGlobalFilter, FilterConfig& filter)
 {
-    DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
     FilterDlg filterDlg(NULL,
                         isGlobalFilter, //is main filter dialog
-                        filterIncl,
-                        filterExcl);
-    if (filterDlg.ShowModal() == FilterDlg::BUTTON_APPLY)
-        rv = DefaultReturnCode::BUTTON_OKAY;
-
-    return rv;
+                        filter);
+    return static_cast<ReturnSmallDlg::ButtonPressed>(filterDlg.ShowModal());
 }
 //########################################################################################
 
@@ -330,17 +382,11 @@ DefaultReturnCode::Response ffs3::showFilterDialog(bool isGlobalFilter,
 class DeleteDialog : public DeleteDlgGenerated
 {
 public:
-    DeleteDialog(wxWindow* main,
-                 const std::vector<ffs3::FileSystemObject*>& rowsOnLeft,
-                 const std::vector<ffs3::FileSystemObject*>& rowsOnRight,
+    DeleteDialog(wxWindow* parent,
+                 const std::vector<zen::FileSystemObject*>& rowsOnLeft,
+                 const std::vector<zen::FileSystemObject*>& rowsOnRight,
                  bool& deleteOnBothSides,
                  bool& useRecycleBin);
-
-    enum
-    {
-        BUTTON_OKAY = 1,
-        BUTTON_CANCEL
-    };
 
 private:
     void OnOK(wxCommandEvent& event);
@@ -349,64 +395,69 @@ private:
     void OnDelOnBothSides(wxCommandEvent& event);
     void OnUseRecycler(wxCommandEvent& event);
 
-    void updateTexts();
+    void updateGui();
 
-    const std::vector<ffs3::FileSystemObject*>& rowsToDeleteOnLeft;
-    const std::vector<ffs3::FileSystemObject*>& rowsToDeleteOnRight;
-    bool& m_deleteOnBothSides;
-    bool& m_useRecycleBin;
+    const std::vector<zen::FileSystemObject*>& rowsToDeleteOnLeft;
+    const std::vector<zen::FileSystemObject*>& rowsToDeleteOnRight;
+    bool& outRefdeleteOnBothSides;
+    bool& outRefuseRecycleBin;
 };
 
 
-DeleteDialog::DeleteDialog(wxWindow* main,
+DeleteDialog::DeleteDialog(wxWindow* parent,
                            const std::vector<FileSystemObject*>& rowsOnLeft,
                            const std::vector<FileSystemObject*>& rowsOnRight,
                            bool& deleteOnBothSides,
                            bool& useRecycleBin) :
-    DeleteDlgGenerated(main),
+    DeleteDlgGenerated(parent),
     rowsToDeleteOnLeft(rowsOnLeft),
     rowsToDeleteOnRight(rowsOnRight),
-    m_deleteOnBothSides(deleteOnBothSides),
-    m_useRecycleBin(useRecycleBin)
+    outRefdeleteOnBothSides(deleteOnBothSides),
+    outRefuseRecycleBin(useRecycleBin)
 {
 #ifdef FFS_WIN
-    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                        this, m_bitmap12, m_staticTextHeader); //ownership passed to "this"
+    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
     m_checkBoxDeleteBothSides->SetValue(deleteOnBothSides);
     m_checkBoxUseRecycler->SetValue(useRecycleBin);
-    updateTexts();
+
+    //if both sides contain same rows this checkbox is superfluous
+    if (rowsToDeleteOnLeft == rowsToDeleteOnRight)
+    {
+        m_checkBoxDeleteBothSides->Show(false);
+        m_checkBoxDeleteBothSides->SetValue(true);
+    }
+
+    updateGui();
 
     m_buttonOK->SetFocus();
 }
 
 
-void DeleteDialog::updateTexts()
+void DeleteDialog::updateGui()
 {
+    const std::pair<wxString, int> delInfo = zen::deleteFromGridAndHDPreview(
+                                                 rowsToDeleteOnLeft,
+                                                 rowsToDeleteOnRight,
+                                                 m_checkBoxDeleteBothSides->GetValue());
+    wxString header;
     if (m_checkBoxUseRecycler->GetValue())
     {
-        m_staticTextHeader->SetLabel(_("Do you really want to move the following object(s) to the Recycle Bin?"));
+        header = _P("Do you really want to move the following object to the Recycle Bin?",
+                    "Do you really want to move the following %x objects to the Recycle Bin?", delInfo.second);
         m_bitmap12->SetBitmap(GlobalResources::instance().getImage(wxT("recycler")));
     }
     else
     {
-        m_staticTextHeader->SetLabel(_("Do you really want to delete the following object(s)?"));
+        header = _P("Do you really want to delete the following object?",
+                    "Do you really want to delete the following %x objects?", delInfo.second);
         m_bitmap12->SetBitmap(GlobalResources::instance().getImage(wxT("deleteFile")));
     }
-
-    const std::pair<wxString, int> delInfo = ffs3::deleteFromGridAndHDPreview(
-                                                 rowsToDeleteOnLeft,
-                                                 rowsToDeleteOnRight,
-                                                 m_checkBoxDeleteBothSides->GetValue());
+    header.Replace(wxT("%x"), toStringSep(delInfo.second));
+    m_staticTextHeader->SetLabel(header);
 
     const wxString filesToDelete = delInfo.first;
-
-    #ifndef _MSC_VER
-    #warning do something with this number: ("Do you really want to delete the following %x object(s)?"));
-    //totalDelCount = delInfo.second;
-    #endif
-
     m_textCtrlMessage->SetValue(filesToDelete);
 
     Layout();
@@ -415,47 +466,45 @@ void DeleteDialog::updateTexts()
 
 void DeleteDialog::OnOK(wxCommandEvent& event)
 {
-    EndModal(BUTTON_OKAY);
+    outRefuseRecycleBin = m_checkBoxUseRecycler->GetValue();
+    if (rowsToDeleteOnLeft != rowsToDeleteOnRight)
+        outRefdeleteOnBothSides = m_checkBoxDeleteBothSides->GetValue();
+
+    EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
 
 void DeleteDialog::OnCancel(wxCommandEvent& event)
 {
-    EndModal(BUTTON_CANCEL);
+    EndModal(ReturnSmallDlg::BUTTON_CANCEL);
 }
 
 void DeleteDialog::OnClose(wxCloseEvent& event)
 {
-    EndModal(BUTTON_CANCEL);
+    EndModal(ReturnSmallDlg::BUTTON_CANCEL);
 }
 
 void DeleteDialog::OnDelOnBothSides(wxCommandEvent& event)
 {
-    m_deleteOnBothSides = m_checkBoxDeleteBothSides->GetValue();
-    updateTexts();
+    updateGui();
 }
 
 void DeleteDialog::OnUseRecycler(wxCommandEvent& event)
 {
-    m_useRecycleBin = m_checkBoxUseRecycler->GetValue();
-    updateTexts();
+    updateGui();
 }
 
 
-DefaultReturnCode::Response ffs3::showDeleteDialog(const std::vector<ffs3::FileSystemObject*>& rowsOnLeft,
-                                                   const std::vector<ffs3::FileSystemObject*>& rowsOnRight,
-                                                   bool& deleteOnBothSides,
-                                                   bool& useRecycleBin)
+ReturnSmallDlg::ButtonPressed zen::showDeleteDialog(const std::vector<zen::FileSystemObject*>& rowsOnLeft,
+                                                    const std::vector<zen::FileSystemObject*>& rowsOnRight,
+                                                    bool& deleteOnBothSides,
+                                                    bool& useRecycleBin)
 {
-    DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
-
     DeleteDialog confirmDeletion(NULL,
                                  rowsOnLeft,
                                  rowsOnRight,
                                  deleteOnBothSides,
                                  useRecycleBin);
-    if (confirmDeletion.ShowModal() == DeleteDialog::BUTTON_OKAY)
-        rv = DefaultReturnCode::BUTTON_OKAY;
-    return rv;
+    return static_cast<ReturnSmallDlg::ButtonPressed>(confirmDeletion.ShowModal());
 }
 //########################################################################################
 
@@ -463,12 +512,7 @@ DefaultReturnCode::Response ffs3::showDeleteDialog(const std::vector<ffs3::FileS
 class CustomizeColsDlg : public CustomizeColsDlgGenerated
 {
 public:
-    CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes& attr);
-
-    enum
-    {
-        BUTTON_OKAY = 10
-    };
+    CustomizeColsDlg(wxWindow* parent, xmlAccess::ColumnAttributes& attr);
 
 private:
     void OnOkay(wxCommandEvent& event);
@@ -483,13 +527,12 @@ private:
 };
 
 
-CustomizeColsDlg::CustomizeColsDlg(wxWindow* window, xmlAccess::ColumnAttributes& attr) :
-    CustomizeColsDlgGenerated(window),
+CustomizeColsDlg::CustomizeColsDlg(wxWindow* parent, xmlAccess::ColumnAttributes& attr) :
+    CustomizeColsDlgGenerated(parent),
     output(attr)
 {
 #ifdef FFS_WIN
-    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                        this); //ownership passed to "this"
+    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
     m_bpButton29->SetBitmapLabel(GlobalResources::instance().getImage(wxT("moveUp")));
@@ -526,7 +569,7 @@ void CustomizeColsDlg::OnOkay(wxCommandEvent& event)
         }
     }
 
-    EndModal(BUTTON_OKAY);
+    EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
 
 
@@ -589,15 +632,10 @@ void CustomizeColsDlg::OnMoveDown(wxCommandEvent& event)
 }
 
 
-DefaultReturnCode::Response ffs3::showCustomizeColsDlg(xmlAccess::ColumnAttributes& attr)
+ReturnSmallDlg::ButtonPressed zen::showCustomizeColsDlg(xmlAccess::ColumnAttributes& attr)
 {
-    DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
-
     CustomizeColsDlg customizeDlg(NULL, attr);
-    if (customizeDlg.ShowModal() == CustomizeColsDlg::BUTTON_OKAY)
-        rv = DefaultReturnCode::BUTTON_OKAY;
-
-    return rv;
+    return static_cast<ReturnSmallDlg::ButtonPressed>(customizeDlg.ShowModal());
 }
 //########################################################################################
 
@@ -605,16 +643,10 @@ DefaultReturnCode::Response ffs3::showCustomizeColsDlg(xmlAccess::ColumnAttribut
 class SyncPreviewDlg : public SyncPreviewDlgGenerated
 {
 public:
-    SyncPreviewDlg(wxWindow* parentWindow,
+    SyncPreviewDlg(wxWindow* parent,
                    const wxString& variantName,
-                   const ffs3::SyncStatistics& statistics,
+                   const zen::SyncStatistics& statistics,
                    bool& dontShowAgain);
-    enum
-    {
-        BUTTON_START  = 1,
-        BUTTON_CANCEL = 2
-    };
-
 private:
     void OnClose(wxCloseEvent& event);
     void OnCancel(wxCommandEvent& event);
@@ -625,19 +657,18 @@ private:
 
 
 
-SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
+SyncPreviewDlg::SyncPreviewDlg(wxWindow* parent,
                                const wxString& variantName,
-                               const ffs3::SyncStatistics& statistics,
+                               const zen::SyncStatistics& statistics,
                                bool& dontShowAgain) :
-    SyncPreviewDlgGenerated(parentWindow),
+    SyncPreviewDlgGenerated(parent),
     m_dontShowAgain(dontShowAgain)
 {
 #ifdef FFS_WIN
-    new ffs3::MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                              this, m_staticTextVariant); //ownership passed to "this"
+    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
-    using ffs3::numberToStringSep;
+    using zen::toStringSep;
 
     m_buttonStartSync->setBitmapFront(GlobalResources::instance().getImage(wxT("startSync")));
     m_bitmapCreate->SetBitmap(GlobalResources::instance().getImage(wxT("create")));
@@ -646,15 +677,15 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
     m_bitmapData->SetBitmap(GlobalResources::instance().getImage(wxT("data")));
 
     m_staticTextVariant->SetLabel(variantName);
-    m_textCtrlData->SetValue(ffs3::formatFilesizeToShortString(statistics.getDataToProcess()));
+    m_textCtrlData->SetValue(zen::formatFilesizeToShortString(statistics.getDataToProcess()));
 
-    m_textCtrlCreateL->SetValue(numberToStringSep(statistics.getCreate   <LEFT_SIDE>()));
-    m_textCtrlUpdateL->SetValue(numberToStringSep(statistics.getOverwrite<LEFT_SIDE>()));
-    m_textCtrlDeleteL->SetValue(numberToStringSep(statistics.getDelete   <LEFT_SIDE>()));
+    m_textCtrlCreateL->SetValue(toStringSep(statistics.getCreate   <LEFT_SIDE>()));
+    m_textCtrlUpdateL->SetValue(toStringSep(statistics.getOverwrite<LEFT_SIDE>()));
+    m_textCtrlDeleteL->SetValue(toStringSep(statistics.getDelete   <LEFT_SIDE>()));
 
-    m_textCtrlCreateR->SetValue(numberToStringSep(statistics.getCreate   <RIGHT_SIDE>()));
-    m_textCtrlUpdateR->SetValue(numberToStringSep(statistics.getOverwrite<RIGHT_SIDE>()));
-    m_textCtrlDeleteR->SetValue(numberToStringSep(statistics.getDelete   <RIGHT_SIDE>()));
+    m_textCtrlCreateR->SetValue(toStringSep(statistics.getCreate   <RIGHT_SIDE>()));
+    m_textCtrlUpdateR->SetValue(toStringSep(statistics.getOverwrite<RIGHT_SIDE>()));
+    m_textCtrlDeleteR->SetValue(toStringSep(statistics.getDelete   <RIGHT_SIDE>()));
 
     m_checkBoxDontShowAgain->SetValue(dontShowAgain);
 
@@ -665,39 +696,34 @@ SyncPreviewDlg::SyncPreviewDlg(wxWindow* parentWindow,
 
 void SyncPreviewDlg::OnClose(wxCloseEvent& event)
 {
-    EndModal(BUTTON_CANCEL);
+    EndModal(ReturnSmallDlg::BUTTON_CANCEL);
 }
 
 
 void SyncPreviewDlg::OnCancel(wxCommandEvent& event)
 {
-    EndModal(BUTTON_CANCEL);
+    EndModal(ReturnSmallDlg::BUTTON_CANCEL);
 }
 
 
 void SyncPreviewDlg::OnStartSync(wxCommandEvent& event)
 {
     m_dontShowAgain = m_checkBoxDontShowAgain->GetValue();
-    EndModal(BUTTON_START);
+    EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
 
 
-DefaultReturnCode::Response ffs3::showSyncPreviewDlg(
+ReturnSmallDlg::ButtonPressed zen::showSyncPreviewDlg(
     const wxString& variantName,
-    const ffs3::SyncStatistics& statistics,
+    const zen::SyncStatistics& statistics,
     bool& dontShowAgain)
 {
-    DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
-
     SyncPreviewDlg preview(NULL,
                            variantName,
                            statistics,
                            dontShowAgain);
 
-    if (preview.ShowModal() == SyncPreviewDlg::BUTTON_START)
-        rv = DefaultReturnCode::BUTTON_OKAY;
-
-    return rv;
+    return static_cast<ReturnSmallDlg::ButtonPressed>(preview.ShowModal());
 }
 //########################################################################################
 
@@ -705,15 +731,10 @@ DefaultReturnCode::Response ffs3::showSyncPreviewDlg(
 class CompareCfgDialog : public CmpCfgDlgGenerated
 {
 public:
-    CompareCfgDialog(wxWindow* parentWindow,
+    CompareCfgDialog(wxWindow* parent,
                      const wxPoint& position,
-                     ffs3::CompareVariant& cmpVar,
+                     zen::CompareVariant& cmpVar,
                      SymLinkHandling& handleSymlinks);
-
-    enum
-    {
-        BUTTON_OKAY = 10
-    };
 
 private:
     void OnOkay(wxCommandEvent& event);
@@ -725,14 +746,14 @@ private:
 
     void updateView();
 
-    ffs3::CompareVariant& cmpVarOut;
+    zen::CompareVariant& cmpVarOut;
     SymLinkHandling& handleSymlinksOut;
 };
 
 
 namespace
 {
-void setValue(wxChoice& choiceCtrl, ffs3::SymLinkHandling value)
+void setValue(wxChoice& choiceCtrl, zen::SymLinkHandling value)
 {
     choiceCtrl.Clear();
     choiceCtrl.Append(_("Ignore"));
@@ -744,55 +765,54 @@ void setValue(wxChoice& choiceCtrl, ffs3::SymLinkHandling value)
 
     switch (value)
     {
-        case ffs3::SYMLINK_IGNORE:
+        case zen::SYMLINK_IGNORE:
             choiceCtrl.SetSelection(0);
             break;
-        case ffs3::SYMLINK_USE_DIRECTLY:
+        case zen::SYMLINK_USE_DIRECTLY:
             choiceCtrl.SetSelection(1);
             break;
-        case ffs3::SYMLINK_FOLLOW_LINK:
+        case zen::SYMLINK_FOLLOW_LINK:
             choiceCtrl.SetSelection(2);
             break;
     }
 }
 
 
-ffs3::SymLinkHandling getValue(const wxChoice& choiceCtrl)
+zen::SymLinkHandling getValue(const wxChoice& choiceCtrl)
 {
     switch (choiceCtrl.GetSelection())
     {
         case 0:
-            return ffs3::SYMLINK_IGNORE;
+            return zen::SYMLINK_IGNORE;
         case 1:
-            return ffs3::SYMLINK_USE_DIRECTLY;
+            return zen::SYMLINK_USE_DIRECTLY;
         case 2:
-            return ffs3::SYMLINK_FOLLOW_LINK;
+            return zen::SYMLINK_FOLLOW_LINK;
         default:
             assert(false);
-            return ffs3::SYMLINK_IGNORE;
+            return zen::SYMLINK_IGNORE;
     }
 }
 }
 
-CompareCfgDialog::CompareCfgDialog(wxWindow* parentWindow,
+CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
                                    const wxPoint& position,
                                    CompareVariant& cmpVar,
                                    SymLinkHandling& handleSymlinks) :
-    CmpCfgDlgGenerated(parentWindow),
+    CmpCfgDlgGenerated(parent),
     cmpVarOut(cmpVar),
     handleSymlinksOut(handleSymlinks)
 {
 #ifdef FFS_WIN
-    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                        this); //ownership passed to "this"
+    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
     //move dialog up so that compare-config button and first config-variant are on same level
     Move(wxPoint(position.x, std::max(0, position.y - (m_buttonTimeSize->GetScreenPosition() - GetScreenPosition()).y)));
 
-    m_bpButtonHelp->SetBitmapLabel(GlobalResources::instance().getImage(wxT("help")));
-    m_bitmapByTime->SetBitmap(GlobalResources::instance().getImage(wxT("cmpByTime")));
-    m_bitmapByContent->SetBitmap(GlobalResources::instance().getImage(wxT("cmpByContent")));
+    m_bpButtonHelp   ->SetBitmapLabel(GlobalResources::instance().getImage(wxT("help")));
+    m_bitmapByTime   ->SetBitmap     (GlobalResources::instance().getImage(wxT("clock")));
+    m_bitmapByContent->SetBitmap     (GlobalResources::instance().getImage(wxT("cmpByContent")));
 
     switch (cmpVar)
     {
@@ -826,7 +846,7 @@ void CompareCfgDialog::OnOkay(wxCommandEvent& event)
 
     handleSymlinksOut = getValue(*m_choiceHandleSymlinks);;
 
-    EndModal(BUTTON_OKAY);
+    EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
 
 
@@ -863,16 +883,14 @@ void CompareCfgDialog::OnShowHelp(wxCommandEvent& event)
 }
 
 
-DefaultReturnCode::Response ffs3::showCompareCfgDialog(
+ReturnSmallDlg::ButtonPressed zen::showCompareCfgDialog(
     const wxPoint& position,
     CompareVariant& cmpVar,
     SymLinkHandling& handleSymlinks)
 {
     CompareCfgDialog syncDlg(NULL, position, cmpVar, handleSymlinks);
 
-    return syncDlg.ShowModal() == CompareCfgDialog::BUTTON_OKAY ?
-           DefaultReturnCode::BUTTON_OKAY :
-           DefaultReturnCode::BUTTON_CANCEL;
+    return static_cast<ReturnSmallDlg::ButtonPressed>(syncDlg.ShowModal());
 }
 //########################################################################################
 
@@ -880,12 +898,7 @@ DefaultReturnCode::Response ffs3::showCompareCfgDialog(
 class GlobalSettingsDlg : public GlobalSettingsDlgGenerated
 {
 public:
-    GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSettings& globalSettings);
-
-    enum
-    {
-        BUTTON_OKAY = 10
-    };
+    GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings);
 
 private:
     void OnOkay(wxCommandEvent& event);
@@ -903,13 +916,12 @@ private:
 };
 
 
-GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* window, xmlAccess::XmlGlobalSettings& globalSettings) :
-    GlobalSettingsDlgGenerated(window),
+GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSettings& globalSettings) :
+    GlobalSettingsDlgGenerated(parent),
     settings(globalSettings)
 {
 #ifdef FFS_WIN
-    new MouseMoveWindow(*this, //allow moving main dialog by clicking (nearly) anywhere...
-                        this, m_bitmapSettings, m_staticText56); //ownership passed to "this"
+    new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
     m_bitmapSettings->SetBitmap(GlobalResources::instance().getImage(wxT("settings")));
@@ -948,17 +960,14 @@ void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
     settings.copyFilePermissions = m_checkBoxCopyPermissions->GetValue();
     settings.gui.externelApplications = getExtApp();
 
-    EndModal(BUTTON_OKAY);
+    EndModal(ReturnSmallDlg::BUTTON_OKAY);
 }
 
 
 void GlobalSettingsDlg::OnResetDialogs(wxCommandEvent& event)
 {
-    QuestionDlg messageDlg(this,
-                           QuestionDlg::BUTTON_YES | QuestionDlg::BUTTON_CANCEL,
-                           _("Restore all hidden dialogs?"));
-
-    if (messageDlg.ShowModal() == QuestionDlg::BUTTON_YES)
+    if (showQuestionDlg(ReturnQuestionDlg::BUTTON_YES | ReturnQuestionDlg::BUTTON_CANCEL,
+                        _("Restore all hidden dialogs?")) == ReturnQuestionDlg::BUTTON_YES)
         settings.optDialogs.resetDialogs();
 }
 
@@ -1044,13 +1053,8 @@ void GlobalSettingsDlg::OnRemoveRow(wxCommandEvent& event)
 }
 
 
-DefaultReturnCode::Response ffs3::showGlobalSettingsDlg(xmlAccess::XmlGlobalSettings& globalSettings)
+ReturnSmallDlg::ButtonPressed zen::showGlobalSettingsDlg(xmlAccess::XmlGlobalSettings& globalSettings)
 {
-    DefaultReturnCode::Response rv = DefaultReturnCode::BUTTON_CANCEL;
-
     GlobalSettingsDlg settingsDlg(NULL, globalSettings);
-    if (settingsDlg.ShowModal() == GlobalSettingsDlg::BUTTON_OKAY)
-        rv = DefaultReturnCode::BUTTON_OKAY;
-
-    return rv;
+    return static_cast<ReturnSmallDlg::ButtonPressed>(settingsDlg.ShowModal());
 }

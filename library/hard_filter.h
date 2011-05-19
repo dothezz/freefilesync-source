@@ -12,56 +12,60 @@
 #include <boost/shared_ptr.hpp>
 #include <wx/stream.h>
 
-namespace ffs3
+namespace zen
 {
 //------------------------------------------------------------------
-/*    class hierarchy:
+/*
+Semantics of HardFilter:
+1. using it creates a NEW folder hierarchy! -> must be considered by <Automatic>-mode! (fortunately it turns out, doing nothing already has perfect semantics :)
+2. it applies equally to both sides => it always matches either both sides or none! => can be used while traversing a single folder!
 
-          BaseFilter (interface)
+    class hierarchy:
+
+          HardFilter (interface)
                /|\
        _________|_____________
       |         |             |
 NullFilter  NameFilter  CombinedFilter
 */
 
-/*
-Semantics of BaseFilter:
-1. using it creates a NEW folder hierarchy! -> must be respected by <Automatic>-mode!
-2. it applies equally to both sides => it always matches either both sides or none! => can be used while traversing a single folder!
-*/
-
-class BaseFilter //interface for filtering
+class HardFilter //interface for filtering
 {
 public:
-    virtual ~BaseFilter() {}
+    virtual ~HardFilter() {}
 
     //filtering
     virtual bool passFileFilter(const Zstring& relFilename) const = 0;
-    virtual bool passDirFilter(const Zstring& relDirname, bool* subObjMightMatch) const = 0;
+    virtual bool passDirFilter (const Zstring& relDirname, bool* subObjMightMatch) const = 0;
     //subObjMightMatch: file/dir in subdirectories could(!) match
     //note: variable is only set if passDirFilter returns false!
 
     virtual bool isNull() const = 0; //filter is equivalent to NullFilter, but may be technically slower
 
-    //comparison
-    bool operator<(const BaseFilter& other)  const;
-    bool operator==(const BaseFilter& other) const;
-    bool operator!=(const BaseFilter& other) const;
-
-    typedef boost::shared_ptr<const BaseFilter> FilterRef; //always bound by design!
+    typedef boost::shared_ptr<const HardFilter> FilterRef; //always bound by design!
 
     //serialization
     void saveFilter(wxOutputStream& stream) const; //serialize derived object
     static FilterRef loadFilter(wxInputStream& stream); //CAVEAT!!! adapt this method for each new derivation!!!
 
 private:
+    friend bool operator< (const HardFilter& lhs, const HardFilter& rhs);
+
     virtual void save(wxOutputStream& stream) const = 0; //serialization
     virtual Zstring uniqueClassIdentifier() const = 0;   //get identifier, used for serialization
-    virtual bool cmpLessSameType(const BaseFilter& other) const = 0; //typeid(*this) == typeid(other) in this context!
+    virtual bool cmpLessSameType(const HardFilter& other) const = 0; //typeid(*this) == typeid(other) in this context!
 };
 
+inline bool operator==(const HardFilter& lhs, const HardFilter& rhs) { return !(lhs < rhs) && !(rhs < lhs); }
+inline bool operator!=(const HardFilter& lhs, const HardFilter& rhs) { return !(lhs == rhs); }
 
-class NullFilter : public BaseFilter  //no filtering at all
+
+//small helper method: merge two hard filters (thereby remove Null-filters)
+HardFilter::FilterRef combineFilters(const HardFilter::FilterRef& first,
+                                     const HardFilter::FilterRef& second);
+
+
+class NullFilter : public HardFilter  //no filtering at all
 {
 public:
     virtual bool passFileFilter(const Zstring& relFilename) const;
@@ -69,15 +73,15 @@ public:
     virtual bool isNull() const;
 
 private:
-    friend class BaseFilter;
+    friend class HardFilter;
     virtual void save(wxOutputStream& stream) const {}
     virtual Zstring uniqueClassIdentifier() const;
     static FilterRef load(wxInputStream& stream); //"serial constructor"
-    virtual bool cmpLessSameType(const BaseFilter& other) const;
+    virtual bool cmpLessSameType(const HardFilter& other) const;
 };
 
 
-class NameFilter : public BaseFilter  //standard filter by filename
+class NameFilter : public HardFilter  //standard filter by filename
 {
 public:
     NameFilter(const Zstring& includeFilter, const Zstring& excludeFilter);
@@ -87,11 +91,11 @@ public:
     virtual bool isNull() const;
 
 private:
-    friend class BaseFilter;
+    friend class HardFilter;
     virtual void save(wxOutputStream& stream) const;
     virtual Zstring uniqueClassIdentifier() const;
     static FilterRef load(wxInputStream& stream); //"serial constructor"
-    virtual bool cmpLessSameType(const BaseFilter& other) const;
+    virtual bool cmpLessSameType(const HardFilter& other) const;
 
     std::set<Zstring> filterFileIn;   //upper case (windows)
     std::set<Zstring> filterFolderIn; //
@@ -103,7 +107,7 @@ private:
 };
 
 
-class CombinedFilter : public BaseFilter  //combine two filters to match if and only if both match
+class CombinedFilter : public HardFilter  //combine two filters to match if and only if both match
 {
 public:
     CombinedFilter(const FilterRef& first, const FilterRef& second) : first_(first), second_(second) {}
@@ -113,20 +117,15 @@ public:
     virtual bool isNull() const;
 
 private:
-    friend class BaseFilter;
+    friend class HardFilter;
     virtual void save(wxOutputStream& stream) const;
     virtual Zstring uniqueClassIdentifier() const;
     static FilterRef load(wxInputStream& stream); //"serial constructor"
-    virtual bool cmpLessSameType(const BaseFilter& other) const;
+    virtual bool cmpLessSameType(const HardFilter& other) const;
 
     const FilterRef first_;
     const FilterRef second_;
 };
-
-
-//small helper method: remove Null-filters
-BaseFilter::FilterRef combineFilters(const BaseFilter::FilterRef& first,
-                                     const BaseFilter::FilterRef& second);
 
 
 
@@ -147,7 +146,7 @@ BaseFilter::FilterRef combineFilters(const BaseFilter::FilterRef& first,
 
 //---------------Inline Implementation---------------------------------------------------
 inline
-BaseFilter::FilterRef NullFilter::load(wxInputStream& stream) //"serial constructor"
+HardFilter::FilterRef NullFilter::load(wxInputStream& stream) //"serial constructor"
 {
     return FilterRef(new NullFilter);
 }
@@ -176,7 +175,7 @@ bool NullFilter::isNull() const
 
 
 inline
-bool NullFilter::cmpLessSameType(const BaseFilter& other) const
+bool NullFilter::cmpLessSameType(const HardFilter& other) const
 {
     assert(typeid(*this) == typeid(other)); //always given in this context!
     return false;
@@ -214,7 +213,7 @@ bool CombinedFilter::isNull() const
 
 
 inline
-bool CombinedFilter::cmpLessSameType(const BaseFilter& other) const
+bool CombinedFilter::cmpLessSameType(const HardFilter& other) const
 {
     assert(typeid(*this) == typeid(other)); //always given in this context!
 
@@ -243,7 +242,7 @@ void CombinedFilter::save(wxOutputStream& stream) const
 
 
 inline
-BaseFilter::FilterRef CombinedFilter::load(wxInputStream& stream) //"constructor"
+HardFilter::FilterRef CombinedFilter::load(wxInputStream& stream) //"constructor"
 {
     FilterRef first  = loadFilter(stream);
     FilterRef second = loadFilter(stream);
@@ -253,13 +252,13 @@ BaseFilter::FilterRef CombinedFilter::load(wxInputStream& stream) //"constructor
 
 
 inline
-BaseFilter::FilterRef combineFilters(const BaseFilter::FilterRef& first,
-                                     const BaseFilter::FilterRef& second)
+HardFilter::FilterRef combineFilters(const HardFilter::FilterRef& first,
+                                     const HardFilter::FilterRef& second)
 {
     if (first->isNull())
     {
         if (second->isNull())
-            return BaseFilter::FilterRef(new NullFilter);
+            return HardFilter::FilterRef(new NullFilter);
         else
             return second;
     }
@@ -268,7 +267,7 @@ BaseFilter::FilterRef combineFilters(const BaseFilter::FilterRef& first,
         if (second->isNull())
             return first;
         else
-            return BaseFilter::FilterRef(new CombinedFilter(first, second));
+            return HardFilter::FilterRef(new CombinedFilter(first, second));
     }
 }
 

@@ -445,9 +445,7 @@ protected:
     wxButton* m_buttonUpdate;
     wxStaticText* m_staticText101;
     wxRadioButton* m_radioBtnCustom;
-
-    wxStaticText* m_staticText23;
-
+    wxButton* m_buttonUpdate1;
     wxStaticText* m_staticText9;
 
     wxBoxSizer* bSizer201;
@@ -489,7 +487,7 @@ protected:
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
     virtual void OnSyncAutomatic( wxCommandEvent& event ) { event.Skip(); }
-    virtual void OnSyncLeftToRight( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnSyncMirror( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnSyncUpdate( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnSyncCustom( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnChangeErrorHandling( wxCommandEvent& event ) { event.Skip(); }
@@ -704,10 +702,21 @@ protected:
     wxStaticBitmap* m_bitmap11;
     wxStaticText* m_build;
 
-    wxScrolledWindow* m_scrolledWindowCodeInfo;
+    wxPanel* m_panel33;
     wxBoxSizer* bSizerCodeInfo;
     wxStaticText* m_staticText72;
-    wxStaticText* m_staticText73;
+    wxHyperlinkCtrl* m_hyperlink9;
+    wxHyperlinkCtrl* m_hyperlink10;
+    wxHyperlinkCtrl* m_hyperlink7;
+    wxHyperlinkCtrl* m_hyperlink13;
+    wxHyperlinkCtrl* m_hyperlink14;
+    wxHyperlinkCtrl* m_hyperlink16;
+    wxHyperlinkCtrl* m_hyperlink8;
+    wxHyperlinkCtrl* m_hyperlink15;
+    wxHyperlinkCtrl* m_hyperlink11;
+    wxHyperlinkCtrl* m_hyperlink12;
+    wxHyperlinkCtrl* m_hyperlink17;
+    wxHyperlinkCtrl* m_hyperlink18;
     wxHyperlinkCtrl* m_hyperlink21;
     wxScrolledWindow* m_scrolledWindowTranslators;
     wxBoxSizer* bSizerTranslators;
@@ -901,14 +910,22 @@ protected:
     wxStaticText* m_staticText181;
     wxStaticText* m_staticText1811;
 
-    wxStaticText* m_staticText15;
-    wxStaticBitmap* m_bitmap8;
+    wxStaticBitmap* m_bitmapInclude;
     wxTextCtrl* m_textCtrlInclude;
-
-    wxStaticText* m_staticText16;
-    wxStaticBitmap* m_bitmap9;
+    wxStaticBitmap* m_bitmapExclude;
     wxTextCtrl* m_textCtrlExclude;
 
+    wxStaticBitmap* m_bitmapFilterDate;
+    wxStaticText* m_staticText103;
+    wxSpinCtrl* m_spinCtrlTimespan;
+    wxChoice* m_choiceUnitTimespan;
+    wxStaticBitmap* m_bitmapFilterSize;
+    wxStaticText* m_staticText101;
+    wxSpinCtrl* m_spinCtrlMinSize;
+    wxChoice* m_choiceUnitMinSize;
+    wxStaticText* m_staticText102;
+    wxSpinCtrl* m_spinCtrlMaxSize;
+    wxChoice* m_choiceUnitMaxSize;
     wxButton* m_button9;
 
     wxButton* m_button10;
@@ -917,6 +934,8 @@ protected:
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
     virtual void OnHelp( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnUpdateNameFilter( wxCommandEvent& event ) { event.Skip(); }
+    virtual void OnUpdateChoice( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnDefault( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnApply( wxCommandEvent& event ) { event.Skip(); }
     virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }

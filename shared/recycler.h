@@ -10,7 +10,7 @@
 #include "file_error.h"
 #include "zstring.h"
 
-namespace ffs3
+namespace zen
 {
 /*
 --------------------
@@ -19,7 +19,7 @@ namespace ffs3
 
 Windows
 -------
-Recycler always available: during runtime dynamically either SHFileOperation or (since Vista) IFileOperation will be selected
+Recycler always available: during runtime either SHFileOperation or (since Vista) IFileOperation will be dynamically selected
 
 Linux
 -----

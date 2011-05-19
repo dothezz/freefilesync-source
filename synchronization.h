@@ -9,11 +9,10 @@
 
 #include "file_hierarchy.h"
 #include "library/process_xml.h"
+#include "library/status_handler.h"
 
-class StatusHandler;
 
-
-namespace ffs3
+namespace zen
 {
 
 class SyncStatistics
@@ -36,7 +35,7 @@ public:
     typedef std::vector<std::pair<Zstring, wxString> > ConflictTexts; // Pair(filename/conflict text)
     const ConflictTexts& getFirstConflicts() const; //get first few sync conflicts
 
-    wxULongLong getDataToProcess() const;
+    zen::UInt64 getDataToProcess() const;
     size_t getRowCount() const;
 
 private:
@@ -53,7 +52,7 @@ private:
     int deleteLeft,    deleteRight;
     int conflict;
     ConflictTexts firstConflicts; //save the first few conflict texts to display as a warning message
-    wxULongLong dataToProcess;
+    zen::UInt64 dataToProcess;
     size_t rowsTotal;
 };
 
@@ -81,7 +80,7 @@ public:
                 bool verifyCopiedFiles,
                 bool copyLockedFiles,
                 bool copyFilePermissions,
-                StatusHandler& handler);
+                ProcessCallback& handler);
 
     //CONTRACT: syncConfig must have SAME SIZE folderCmp and correspond per row!
     void startSynchronizationProcess(const std::vector<FolderPairSyncCfg>& syncConfig, FolderComparison& folderCmp);
@@ -96,7 +95,7 @@ private:
     //warnings
     xmlAccess::OptionalDialogs& m_warnings;
 
-    StatusHandler& statusUpdater;
+    ProcessCallback& procCallback;
 };
 
 

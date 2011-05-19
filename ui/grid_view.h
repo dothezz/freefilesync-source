@@ -10,7 +10,7 @@
 #include "../file_hierarchy.h"
 
 
-namespace ffs3
+namespace zen
 {
 //gui view of FolderComparison
 class GridView
@@ -42,8 +42,8 @@ public:
         unsigned int filesOnRightView;
         unsigned int foldersOnRightView;
 
-        wxULongLong filesizeLeftView;
-        wxULongLong filesizeRightView;
+        zen::UInt64 filesizeLeftView;
+        zen::UInt64 filesizeRightView;
     };
 
     //comparison results view
@@ -75,8 +75,8 @@ public:
         unsigned int filesOnRightView;
         unsigned int foldersOnRightView;
 
-        wxULongLong filesizeLeftView;
-        wxULongLong filesizeRightView;
+        zen::UInt64 filesizeLeftView;
+        zen::UInt64 filesizeRightView;
     };
 
     //synchronization preview
@@ -219,14 +219,14 @@ size_t GridView::rowsTotal() const //total number of rows available
 
 
 inline
-const ffs3::FileSystemObject* GridView::getReferencedRow(const RefIndex ref) const
+const zen::FileSystemObject* GridView::getReferencedRow(const RefIndex ref) const
 {
     return folderCmp[ref.folderIndex].retrieveById(ref.objId);
 }
 
 
 inline
-ffs3::FileSystemObject* GridView::getReferencedRow(const RefIndex ref)
+zen::FileSystemObject* GridView::getReferencedRow(const RefIndex ref)
 {
     //code re-use of const method: see Meyers Effective C++
     return const_cast<FileSystemObject*>(static_cast<const GridView&>(*this).getReferencedRow(ref));

@@ -6,27 +6,13 @@
 //
 #include "structures.h"
 #include "shared/i18n.h"
-//#include <stdexcept>
+#include <iterator>
+#include <stdexcept>
 
-using namespace ffs3;
-
-
-Zstring ffs3::standardExcludeFilter()
-{
-#ifdef FFS_WIN
-    static Zstring exclude(wxT("\
-\\System Volume Information\\\n\
-\\RECYCLER\\\n\
-\\RECYCLED\\\n\
-\\$Recycle.Bin\\")); //exclude Recycle Bin
-#elif defined FFS_LINUX
-    static Zstring exclude; //exclude nothing
-#endif
-    return exclude;
-}
+using namespace zen;
 
 
-wxString ffs3::getVariantName(CompareVariant var)
+wxString zen::getVariantName(CompareVariant var)
 {
     switch (var)
     {
@@ -41,120 +27,93 @@ wxString ffs3::getVariantName(CompareVariant var)
 }
 
 
-wxString ffs3::getVariantName(const SyncConfiguration& syncCfg)
+wxString zen::getVariantName(SyncConfig::Variant var)
 {
-    switch (getVariant(syncCfg))
+    switch (var)
     {
-        case SyncConfiguration::AUTOMATIC:
+        case SyncConfig::AUTOMATIC:
             return _("<Automatic>");
-        case SyncConfiguration::MIRROR:
+        case SyncConfig::MIRROR:
             return _("Mirror ->>");
-        case SyncConfiguration::UPDATE:
+        case SyncConfig::UPDATE:
             return _("Update ->");
-        case SyncConfiguration::CUSTOM:
+        case SyncConfig::CUSTOM:
             return _("Custom");
     }
     return _("Error");
 }
 
 
-void ffs3::setTwoWay(SyncConfiguration& syncCfg) //helper method used by <Automatic> mode fallback to overwrite old with newer files
+DirectionSet zen::extractDirections(const SyncConfig& cfg)
 {
-    syncCfg.automatic = false;
-    syncCfg.exLeftSideOnly  = SYNC_DIR_RIGHT;
-    syncCfg.exRightSideOnly = SYNC_DIR_LEFT;
-    syncCfg.leftNewer       = SYNC_DIR_RIGHT;
-    syncCfg.rightNewer      = SYNC_DIR_LEFT;
-    syncCfg.different       = SYNC_DIR_NONE;
-    syncCfg.conflict        = SYNC_DIR_NONE;
-}
-
-
-SyncConfiguration::Variant ffs3::getVariant(const SyncConfiguration& syncCfg)
-{
-    if (syncCfg.automatic == true)
-        return SyncConfiguration::AUTOMATIC;  //automatic mode
-
-    if (syncCfg.exLeftSideOnly  == SYNC_DIR_RIGHT &&
-        syncCfg.exRightSideOnly == SYNC_DIR_RIGHT &&
-        syncCfg.leftNewer       == SYNC_DIR_RIGHT &&
-        syncCfg.rightNewer      == SYNC_DIR_RIGHT &&
-        syncCfg.different       == SYNC_DIR_RIGHT &&
-        syncCfg.conflict        == SYNC_DIR_RIGHT)
-        return SyncConfiguration::MIRROR;    //one way ->
-
-    else if (syncCfg.exLeftSideOnly  == SYNC_DIR_RIGHT &&
-             syncCfg.exRightSideOnly == SYNC_DIR_NONE  &&
-             syncCfg.leftNewer       == SYNC_DIR_RIGHT &&
-             syncCfg.rightNewer      == SYNC_DIR_NONE  &&
-             syncCfg.different       == SYNC_DIR_RIGHT  &&
-             syncCfg.conflict        == SYNC_DIR_NONE)
-        return SyncConfiguration::UPDATE;    //Update ->
-    else
-        return SyncConfiguration::CUSTOM;    //other
-}
-
-
-void ffs3::setVariant(SyncConfiguration& syncCfg, const SyncConfiguration::Variant var)
-{
-    switch (var)
+    DirectionSet output;
+    switch (cfg.var)
     {
-        case SyncConfiguration::AUTOMATIC:
-            syncCfg.automatic = true;
+        case SyncConfig::AUTOMATIC:
+            throw std::logic_error("there are no predefined directions for automatic mode!");
+
+        case SyncConfig::MIRROR:
+            output.exLeftSideOnly  = SYNC_DIR_RIGHT;
+            output.exRightSideOnly = SYNC_DIR_RIGHT;
+            output.leftNewer       = SYNC_DIR_RIGHT;
+            output.rightNewer      = SYNC_DIR_RIGHT;
+            output.different       = SYNC_DIR_RIGHT;
+            output.conflict        = SYNC_DIR_RIGHT;
             break;
-        case SyncConfiguration::MIRROR:
-            syncCfg.automatic = false;
-            syncCfg.exLeftSideOnly  = SYNC_DIR_RIGHT;
-            syncCfg.exRightSideOnly = SYNC_DIR_RIGHT;
-            syncCfg.leftNewer       = SYNC_DIR_RIGHT;
-            syncCfg.rightNewer      = SYNC_DIR_RIGHT;
-            syncCfg.different       = SYNC_DIR_RIGHT;
-            syncCfg.conflict        = SYNC_DIR_RIGHT;
+
+        case SyncConfig::UPDATE:
+            output.exLeftSideOnly  = SYNC_DIR_RIGHT;
+            output.exRightSideOnly = SYNC_DIR_NONE;
+            output.leftNewer       = SYNC_DIR_RIGHT;
+            output.rightNewer      = SYNC_DIR_NONE;
+            output.different       = SYNC_DIR_RIGHT;
+            output.conflict        = SYNC_DIR_NONE;
             break;
-        case SyncConfiguration::UPDATE:
-            syncCfg.automatic = false;
-            syncCfg.exLeftSideOnly  = SYNC_DIR_RIGHT;
-            syncCfg.exRightSideOnly = SYNC_DIR_NONE;
-            syncCfg.leftNewer       = SYNC_DIR_RIGHT;
-            syncCfg.rightNewer      = SYNC_DIR_NONE;
-            syncCfg.different       = SYNC_DIR_RIGHT;
-            syncCfg.conflict        = SYNC_DIR_NONE;
-            break;
-        case SyncConfiguration::CUSTOM:
-            assert(false);
+
+        case SyncConfig::CUSTOM:
+            output = cfg.custom;
             break;
     }
+    return output;
 }
 
+
+DirectionSet zen::getTwoWaySet()
+{
+    DirectionSet output;
+    output.exLeftSideOnly  = SYNC_DIR_RIGHT;
+    output.exRightSideOnly = SYNC_DIR_LEFT;
+    output.leftNewer       = SYNC_DIR_RIGHT;
+    output.rightNewer      = SYNC_DIR_LEFT;
+    output.different       = SYNC_DIR_NONE;
+    output.conflict        = SYNC_DIR_NONE;
+    return output;
+}
 
 
 wxString MainConfiguration::getSyncVariantName()
 {
-    const SyncConfiguration firstSyncCfg =
-        firstPair.altSyncConfig.get() ?
-        firstPair.altSyncConfig->syncConfiguration :
-        syncConfiguration; //fallback to main sync cfg
-
-    const SyncConfiguration::Variant firstVariant = getVariant(firstSyncCfg);
+    const SyncConfig::Variant firstVariant = firstPair.altSyncConfig.get() ?
+                                             firstPair.altSyncConfig->syncConfiguration.var :
+                                             syncConfiguration.var; //fallback to main sync cfg
 
     //test if there's a deviating variant within the additional folder pairs
     for (std::vector<FolderPairEnh>::const_iterator i = additionalPairs.begin(); i != additionalPairs.end(); ++i)
     {
-        const SyncConfiguration::Variant thisVariant =
-            i->altSyncConfig.get() ?
-            getVariant(i->altSyncConfig->syncConfiguration) :
-            getVariant(syncConfiguration);
+        const SyncConfig::Variant thisVariant = i->altSyncConfig.get() ?
+                                                i->altSyncConfig->syncConfiguration.var :
+                                                syncConfiguration.var;
 
         if (thisVariant != firstVariant)
             return _("Multiple...");
     }
 
     //seems to be all in sync...
-    return getVariantName(firstSyncCfg);
+    return getVariantName(firstVariant);
 }
 
 
-wxString ffs3::getDescription(CompareFilesResult cmpRes)
+wxString zen::getDescription(CompareFilesResult cmpRes)
 {
     switch (cmpRes)
     {
@@ -181,7 +140,7 @@ wxString ffs3::getDescription(CompareFilesResult cmpRes)
 }
 
 
-wxString ffs3::getSymbol(CompareFilesResult cmpRes)
+wxString zen::getSymbol(CompareFilesResult cmpRes)
 {
     switch (cmpRes)
     {
@@ -207,7 +166,7 @@ wxString ffs3::getSymbol(CompareFilesResult cmpRes)
 }
 
 
-wxString ffs3::getDescription(SyncOperation op)
+wxString zen::getDescription(SyncOperation op)
 {
     switch (op)
     {
@@ -231,7 +190,7 @@ wxString ffs3::getDescription(SyncOperation op)
             return _("Copy attributes only from right to left");
         case SO_COPY_METADATA_TO_RIGHT:
             return _("Copy attributes only from left to right");
-        case SO_UNRESOLVED_CONFLICT:
+        case SO_UNRESOLVED_CONFLICT: //not used on GUI, but in .csv
             return _("Conflicts/files that cannot be categorized");
     };
 
@@ -240,7 +199,7 @@ wxString ffs3::getDescription(SyncOperation op)
 }
 
 
-wxString ffs3::getSymbol(SyncOperation op)
+wxString zen::getSymbol(SyncOperation op)
 {
     switch (op)
     {
@@ -273,7 +232,71 @@ wxString ffs3::getSymbol(SyncOperation op)
 
 namespace
 {
-bool sameFilterConfig(const std::vector<FolderPairEnh>& folderPairs)
+assert_static(std::numeric_limits<zen:: Int64>::is_specialized);
+assert_static(std::numeric_limits<zen::UInt64>::is_specialized);
+
+zen::Int64 resolve(size_t value, UnitTime unit, zen::Int64 defaultVal)
+{
+    double out = value;
+    switch (unit)
+    {
+        case UTIME_NONE:
+            return defaultVal;
+        case UTIME_SEC:
+            return zen::Int64(value);
+        case UTIME_MIN:
+            out *= 60;
+            break;
+        case UTIME_HOUR:
+            out *= 3600;
+            break;
+        case UTIME_DAY:
+            out *= 24 * 3600;
+            break;
+    }
+    return out >= to<double>(std::numeric_limits<zen::Int64>::max()) ? //prevent overflow!!!
+           std::numeric_limits<zen::Int64>::max() :
+           zen::Int64(out);
+}
+
+zen::UInt64 resolve(size_t value, UnitSize unit, zen::UInt64 defaultVal)
+{
+    double out = value;
+    switch (unit)
+    {
+        case USIZE_NONE:
+            return defaultVal;
+        case USIZE_BYTE:
+            return value;
+        case USIZE_KB:
+            out *= 1024;
+            break;
+        case USIZE_MB:
+            out *= 1024 * 1024;
+            break;
+    }
+    return out >= to<double>(std::numeric_limits<zen::UInt64>::max()) ? //prevent overflow!!!
+           std::numeric_limits<zen::UInt64>::max() :
+           zen::UInt64(out);
+}
+}
+
+void zen::resolveUnits(size_t timeSpan, UnitTime unitTimeSpan,
+                       size_t sizeMin,  UnitSize unitSizeMin,
+                       size_t sizeMax,  UnitSize unitSizeMax,
+                       zen::Int64&  timeSpanSec, //unit: seconds
+                       zen::UInt64& sizeMinBy,   //unit: bytes
+                       zen::UInt64& sizeMaxBy)   //unit: bytes
+{
+    timeSpanSec = resolve(timeSpan, unitTimeSpan, std::numeric_limits<zen::Int64>::max());
+    sizeMinBy   = resolve(sizeMin,  unitSizeMin, 0U);
+    sizeMaxBy   = resolve(sizeMax,  unitSizeMax, std::numeric_limits<zen::UInt64>::max());
+}
+
+
+namespace
+{
+bool sameFilter(const std::vector<FolderPairEnh>& folderPairs)
 {
     if (folderPairs.empty())
         return true;
@@ -284,14 +307,75 @@ bool sameFilterConfig(const std::vector<FolderPairEnh>& folderPairs)
 
     return true;
 }
+
+
+bool isEmpty(const FolderPairEnh& fp)
+{
+    return fp == FolderPairEnh();
 }
 
 
-ffs3::MainConfiguration ffs3::merge(const std::vector<MainConfiguration>& mainCfgs)
+FilterConfig mergeFilterConfig(const FilterConfig& global, const FilterConfig& local)
+{
+    FilterConfig out = local;
+
+    //hard filter
+
+    //pragmatism: if both global and local include filter contain data, only local filter is preserved
+    if (out.includeFilter == FilterConfig().includeFilter)
+        out.includeFilter = global.includeFilter;
+
+    out.excludeFilter.Trim(true, false);
+    out.excludeFilter = global.excludeFilter + Zstr("\n") + out.excludeFilter;
+    out.excludeFilter.Trim(true, false);
+
+    //soft filter
+    zen::Int64  locTimeSpanSec;
+    zen::UInt64 locSizeMinBy;
+    zen::UInt64 locSizeMaxBy;
+    zen::resolveUnits(out.timeSpan, out.unitTimeSpan,
+                      out.sizeMin,  out.unitSizeMin,
+                      out.sizeMax,  out.unitSizeMax,
+                      locTimeSpanSec, //unit: seconds
+                      locSizeMinBy,   //unit: bytes
+                      locSizeMaxBy);   //unit: bytes
+
+    //soft filter
+    zen::Int64  gloTimeSpanSec;
+    zen::UInt64 gloSizeMinBy;
+    zen::UInt64 gloSizeMaxBy;
+    zen::resolveUnits(global.timeSpan, global.unitTimeSpan,
+                      global.sizeMin,  global.unitSizeMin,
+                      global.sizeMax,  global.unitSizeMax,
+                      gloTimeSpanSec, //unit: seconds
+                      gloSizeMinBy,   //unit: bytes
+                      gloSizeMaxBy);   //unit: bytes
+
+    if (gloTimeSpanSec < locTimeSpanSec)
+    {
+        out.timeSpan     = global.timeSpan;
+        out.unitTimeSpan = global.unitTimeSpan;
+    }
+    if (gloSizeMinBy > locSizeMinBy)
+    {
+        out.sizeMin     = global.sizeMin;
+        out.unitSizeMin = global.unitSizeMin;
+    }
+    if (gloSizeMaxBy < locSizeMaxBy)
+    {
+        out.sizeMax     = global.sizeMax;
+        out.unitSizeMax = global.unitSizeMax;
+    }
+    return out;
+}
+}
+
+
+zen::MainConfiguration zen::merge(const std::vector<MainConfiguration>& mainCfgs)
 {
     assert(!mainCfgs.empty());
     if (mainCfgs.empty())
-        return ffs3::MainConfiguration();
+        return zen::MainConfiguration();
 
     if (mainCfgs.size() == 1) //mergeConfigFilesImpl relies on this!
         return mainCfgs[0];   //
@@ -301,10 +385,12 @@ ffs3::MainConfiguration ffs3::merge(const std::vector<MainConfiguration>& mainCf
     for (std::vector<MainConfiguration>::const_iterator i = mainCfgs.begin(); i != mainCfgs.end(); ++i)
     {
         std::vector<FolderPairEnh> fpTmp;
-        fpTmp.push_back(i->firstPair);
-        fpTmp.insert(fpTmp.end(), i->additionalPairs.begin(), i->additionalPairs.end());
 
-        //move all configuration to item level
+        //list non-empty local configurations
+        if (!isEmpty(i->firstPair)) fpTmp.push_back(i->firstPair);
+        std::remove_copy_if(i->additionalPairs.begin(), i->additionalPairs.end(), std::back_inserter(fpTmp), &isEmpty);
+
+        //move all configuration down to item level
         for (std::vector<FolderPairEnh>::iterator fp = fpTmp.begin(); fp != fpTmp.end(); ++fp)
         {
             if (!fp->altSyncConfig.get())
@@ -313,42 +399,37 @@ ffs3::MainConfiguration ffs3::merge(const std::vector<MainConfiguration>& mainCf
                                             i->handleDeletion,
                                             i->customDeletionDirectory));
 
-            //pragmatism: if both global and local include filter contain data, only local filter is preserved
-            if (fp->localFilter.includeFilter == FilterConfig().includeFilter)
-                fp->localFilter.includeFilter = i->globalFilter.includeFilter;
-
-            fp->localFilter.excludeFilter.Trim(true, false);
-            fp->localFilter.excludeFilter = i->globalFilter.excludeFilter + Zstr("\n") + fp->localFilter.excludeFilter;
-            fp->localFilter.excludeFilter.Trim(true, false);
+            fp->localFilter = mergeFilterConfig(i->globalFilter, fp->localFilter);
         }
 
         fpMerged.insert(fpMerged.end(), fpTmp.begin(), fpTmp.end());
     }
 
+    if (fpMerged.empty())
+        return zen::MainConfiguration();
+
     //optimization: remove redundant configuration
     FilterConfig newGlobalFilter;
 
-    const bool sameLocalFilter = sameFilterConfig(fpMerged);
-    if (sameLocalFilter)
+    const bool equalFilters = sameFilter(fpMerged);
+    if (equalFilters)
         newGlobalFilter = fpMerged[0].localFilter;
 
     for (std::vector<FolderPairEnh>::iterator fp = fpMerged.begin(); fp != fpMerged.end(); ++fp)
     {
         //if local config matches output global config we don't need local one
         if (fp->altSyncConfig &&
-            *fp->altSyncConfig ==
-            AlternateSyncConfig(mainCfgs[0].syncConfiguration,
-                                mainCfgs[0].handleDeletion,
-                                mainCfgs[0].customDeletionDirectory))
+            *fp->altSyncConfig == AlternateSyncConfig(mainCfgs[0].syncConfiguration,
+                                                      mainCfgs[0].handleDeletion,
+                                                      mainCfgs[0].customDeletionDirectory))
             fp->altSyncConfig.reset();
 
-        if (sameLocalFilter) //use global filter in this case
+        if (equalFilters) //use global filter in this case
             fp->localFilter = FilterConfig();
     }
 
-
     //final assembly
-    ffs3::MainConfiguration cfgOut = mainCfgs[0];
+    zen::MainConfiguration cfgOut = mainCfgs[0];
     cfgOut.globalFilter            = newGlobalFilter;
     cfgOut.firstPair               = fpMerged[0];
     cfgOut.additionalPairs.assign(fpMerged.begin() + 1, fpMerged.end());

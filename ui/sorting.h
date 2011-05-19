@@ -13,7 +13,7 @@
 #include "../shared/assert_static.h"
 
 
-namespace ffs3
+namespace zen
 {
 namespace
 {
@@ -68,7 +68,7 @@ bool sortByFileName(const FileSystemObject& a, const FileSystemObject& b)
     if (isDirectoryMapping(a)) //sort directories by relative name
     {
         if (isDirectoryMapping(b))
-            return cmpFileName(a.getRelativeName<side>(), b.getRelativeName<side>()) < 0;
+            return LessFilename()(a.getRelativeName<side>(), b.getRelativeName<side>());
         else
             return false;
     }
@@ -113,7 +113,7 @@ bool sortByRelativeName(const FileSystemObject& a, const FileSystemObject& b)
         else if (isDirectoryA)
             return true;
 
-        return cmpFileName(a.getShortName<side>(), b.getShortName<side>()) < 0;
+        return LessFilename()(a.getShortName<side>(), b.getShortName<side>());
     }
 }
 
@@ -172,8 +172,8 @@ bool sortByDate(const FileSystemObject& a, const FileSystemObject& b)
     else if (!fileObjB && !linkObjB)
         return true;  //directories last
 
-    const wxLongLong& dateA = fileObjA ? fileObjA->getLastWriteTime<side>() : linkObjA->getLastWriteTime<side>();
-    const wxLongLong& dateB = fileObjB ? fileObjB->getLastWriteTime<side>() : linkObjB->getLastWriteTime<side>();
+    zen::Int64 dateA = fileObjA ? fileObjA->getLastWriteTime<side>() : linkObjA->getLastWriteTime<side>();
+    zen::Int64 dateB = fileObjB ? fileObjB->getLastWriteTime<side>() : linkObjB->getLastWriteTime<side>();
 
     //return list beginning with newest files first
     return Compare<ascending>().isSmallerThan(dateA, dateB);

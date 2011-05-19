@@ -11,7 +11,7 @@ class wxGrid;
 class wxWindow;
 
 
-namespace ffs3
+namespace zen
 {
 void startFind(wxWindow& parentWindow, wxGrid& leftGrid, wxGrid& rightGrid, bool& respectCase); //Strg + F
 void findNext( wxWindow& parentWindow, wxGrid& leftGrid, wxGrid& rightGrid, bool& respectCase); //F3

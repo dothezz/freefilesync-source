@@ -9,7 +9,7 @@
 
 #include <sstream>
 
-#ifdef __WXWINDOWS__
+#ifdef __WXMSW__ //we have wxWidgets
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #else
 //#define WIN32_LEAN_AND_MEAN -> not in a header

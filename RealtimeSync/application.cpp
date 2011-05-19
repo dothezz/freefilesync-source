@@ -9,7 +9,7 @@
 #include <wx/event.h>
 #include "resources.h"
 #include <wx/msgdlg.h>
-#include "../shared/i18n.h"
+#include "../shared/localization.h"
 #include "xml_ffs.h"
 #include "../shared/standard_paths.h"
 #include <wx/file.h>
@@ -42,11 +42,11 @@ void Application::OnStartApplication(wxIdleEvent& event)
     SetAppName(wxT("FreeFileSync")); //use a different app name, to have "GetUserDataDir()" return the same directory as for FreeFileSync
 
 #ifdef FFS_LINUX
-    ::gtk_rc_parse(ffs3::wxToZ(ffs3::getResourceDir()) + "styles.rc"); //remove inner border from bitmap buttons
+    ::gtk_rc_parse(zen::wxToZ(zen::getResourceDir()) + "styles.rc"); //remove inner border from bitmap buttons
 #endif
 
     //set program language
-    ffs3::setLanguage(rts::getProgramLanguage());
+    zen::setLanguage(rts::getProgramLanguage());
 
     //try to set config/batch-filename set by %1 parameter
     wxString cfgFilename;
@@ -90,7 +90,7 @@ int Application::OnRun()
     catch (const std::exception& e) //catch all STL exceptions
     {
         //unfortunately it's not always possible to display a message box in this erroneous situation, however (non-stream) file output always works!
-        wxFile safeOutput(ffs3::getConfigDir() + wxT("LastError.txt"), wxFile::write);
+        wxFile safeOutput(zen::getConfigDir() + wxT("LastError.txt"), wxFile::write);
         safeOutput.Write(wxString::FromAscii(e.what()));
 
         wxSafeShowMessage(_("An exception occurred!"), wxString::FromAscii(e.what()));

@@ -9,48 +9,45 @@
 
 #include "../file_hierarchy.h"
 #include "../library/process_xml.h"
+#include "../synchronization.h"
 
-namespace ffs3
+namespace zen
 {
-class SyncStatistics;
-
-
-struct DefaultReturnCode
+struct ReturnSmallDlg
 {
-    enum Response
+    enum ButtonPressed
     {
-        BUTTON_OKAY,
-        BUTTON_CANCEL
+        BUTTON_CANCEL,
+        BUTTON_OKAY = 1
     };
 };
+
 
 void showAboutDialog();
 
 void showHelpDialog();
 
-DefaultReturnCode::Response showFilterDialog(bool isGlobalFilter,
-                                             Zstring& filterIncl,
-                                             Zstring& filterExcl);
+ReturnSmallDlg::ButtonPressed showFilterDialog(bool isGlobalFilter, FilterConfig& filter);
 
-DefaultReturnCode::Response showDeleteDialog(
+ReturnSmallDlg::ButtonPressed showDeleteDialog(
     const std::vector<FileSystemObject*>& rowsOnLeft,
     const std::vector<FileSystemObject*>& rowsOnRight,
     bool& deleteOnBothSides,
     bool& useRecycleBin);
 
-DefaultReturnCode::Response showCustomizeColsDlg(xmlAccess::ColumnAttributes& attr);
+ReturnSmallDlg::ButtonPressed showCustomizeColsDlg(xmlAccess::ColumnAttributes& attr);
 
-DefaultReturnCode::Response showSyncPreviewDlg(
+ReturnSmallDlg::ButtonPressed showSyncPreviewDlg(
     const wxString& variantName,
     const SyncStatistics& statistics,
     bool& dontShowAgain);
 
-DefaultReturnCode::Response showCompareCfgDialog(
+ReturnSmallDlg::ButtonPressed showCompareCfgDialog(
     const wxPoint& position,
     CompareVariant& cmpVar,
     SymLinkHandling& handleSymlinks);
 
-DefaultReturnCode::Response showGlobalSettingsDlg(xmlAccess::XmlGlobalSettings& globalSettings);
+ReturnSmallDlg::ButtonPressed showGlobalSettingsDlg(xmlAccess::XmlGlobalSettings& globalSettings);
 }
 
 #endif // SMALLDIALOGS_H_INCLUDED

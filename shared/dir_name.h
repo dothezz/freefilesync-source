@@ -7,19 +7,17 @@
 #ifndef DRAGANDDROP_H_INCLUDED
 #define DRAGANDDROP_H_INCLUDED
 
-#include <wx/event.h>
 #include <vector>
+#include <wx/event.h>
 #include <wx/sizer.h>
 #include <wx/filepicker.h>
 #include <wx/combobox.h>
-#include "zstring.h"
+#include "file_drop.h"
 
 
-struct FFSFileDropEvent;
-class wxCommandEvent;
 class wxFileDirPickerEvent;
 
-namespace ffs3
+namespace zen
 {
 //handle drag and drop, tooltip, label and manual input, coordinating a wxWindow, wxDirPickerCtrl, and wxComboBox/wxTextCtrl
 
@@ -34,8 +32,8 @@ public:
 
     virtual ~DirectoryNameMainDlg() {}
 
-    Zstring getName() const;
-    void setName(const Zstring& dirname);
+    wxString getName() const;
+    void setName(const wxString& dirname);
 
     virtual bool AcceptDrop(const std::vector<wxString>& droppedFiles) = 0; //return true if drop should be processed
 
@@ -60,8 +58,8 @@ public:
                   wxTextCtrl&      dirName,
                   wxStaticBoxSizer* staticBox = NULL); //optional
 
-    Zstring getName() const;
-    void setName(const Zstring& dirname);
+    wxString getName() const;
+    void setName(const wxString& dirname);
 
 private:
     void OnFilesDropped(FFSFileDropEvent& event);
