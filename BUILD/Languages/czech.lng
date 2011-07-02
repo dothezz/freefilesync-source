@@ -17,8 +17,22 @@
 <target>RealtimeSync - Automatická synchronizace</target>
 <source>Browse</source>
 <target>Procházet</target>
+<source>Invalid commandline: "%x"</source>
+<target>Neplatný příkaz: "%x"</target>
 <source>Error resolving symbolic link:</source>
 <target>Chyba odkazu zástupce:</target>
+<source>Show popup</source>
+<target>Zobrazit okno</target>
+<source>Show popup on errors or warnings</source>
+<target>Zobrazit hlášení při chybě nebo varování</target>
+<source>Ignore errors</source>
+<target>Ignorovat chyby</target>
+<source>Hide all error and warning messages</source>
+<target>Skrýt všechny chyby a varování</target>
+<source>Exit instantly</source>
+<target>Ukončit ihned</target>
+<source>Abort synchronization immediately</source>
+<target>Přerušit synchronizaci ihned</target>
 <source>Select alternate synchronization settings</source>
 <target>Vyberte alternativní nastavení synchronizace</target>
 <source>No filter selected</source>
@@ -123,14 +137,12 @@
 <target>Info</target>
 <source>Fatal Error</source>
 <target>Závažná chyba</target>
+<source>Invalid FreeFileSync config file!</source>
+<target>Chybný konfigurační soubor FreeFileSync!</target>
 <source>File does not exist:</source>
 <target>Soubor neexistuje:</target>
 <source>Error parsing configuration file:</source>
 <target>Chyba zpracování konfigurace:</target>
-<source>Error writing file:</source>
-<target>Chyba zápisu souboru:</target>
-<source>Invalid FreeFileSync config file!</source>
-<target>Chybný konfigurační soubor FreeFileSync!</target>
 <source>/sec</source>
 <target>/s</target>
 <source>
@@ -222,8 +234,6 @@ Příkazová řádka je spuštěna pokaždé když:
 <target>Sledování zapnuto...</target>
 <source>Waiting for missing directories...</source>
 <target>Čekání na nedostupné adresáře...</target>
-<source>Command line is empty!</source>
-<target>Příkazová řádka je prázdná!</target>
 <source>Could not initialize directory monitoring:</source>
 <target>Nelze nastavit monitorování adresáře:</target>
 <source>A directory input field is empty.</source>
@@ -264,12 +274,18 @@ Příkazová řádka je spuštěna pokaždé když:
 <target>Chyba kopírování souboru:</target>
 <source>Error opening file:</source>
 <target>Chyba otevření souboru:</target>
+<source>Error writing file:</source>
+<target>Chyba zápisu souboru:</target>
 <source>Error reading file:</source>
 <target>Chyba čtení souboru:</target>
 <source>Endless loop when traversing directory:</source>
 <target>Zacyklení při procházení adresáře:</target>
 <source>Error traversing directory:</source>
 <target>Chyba procházení adresáře:</target>
+<source>Windows Error Code %x:</source>
+<target>Chybový kód Windows %x:</target>
+<source>Linux Error Code %x:</source>
+<target>Chybový kód Linux %x:</target>
 <source>Error setting privilege:</source>
 <target>Chyba nastavení práv:</target>
 <source>Error moving to Recycle Bin:</source>
@@ -294,18 +310,6 @@ Příkazová řádka je spuštěna pokaždé když:
 <target>%x%</target>
 <source>Could not read values for the following XML nodes:</source>
 <target>Nelze načíst hodnoty následujících XML elementy:</target>
-<source>Show popup</source>
-<target>Zobrazit okno</target>
-<source>Show popup on errors or warnings</source>
-<target>Zobrazit hlášení při chybě nebo varování</target>
-<source>Ignore errors</source>
-<target>Ignorovat chyby</target>
-<source>Hide all error and warning messages</source>
-<target>Skrýt všechny chyby a varování</target>
-<source>Exit instantly</source>
-<target>Ukončit ihned</target>
-<source>Abort synchronization immediately</source>
-<target>Přerušit synchronizaci ihned</target>
 <source>Logging</source>
 <target>Zaznamenávání</target>
 <source>FreeFileSync batch file</source>
@@ -410,8 +414,8 @@ Příkazová řádka je spuštěna pokaždé když:
 <target>Pravý</target>
 <source>Batch job</source>
 <target>Dávkový soubor</target>
-<source>Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
-<target>Vytvoření dávkového souboru pro automatický provoz. Ke spuštění dávky jednoduše její jméno zadejte jako parametr při spuštění FreeFileSync: FreeFileSync.exe <batchfile>.</target>
+<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
+<target>Vytvoří dávkový souboru pro automatický provoz. Ke spuštění dávky jednoduše poklikejte na vytvořený soubor nebo jejho jméno zadejte jako parametr při spuštění FreeFileSync: FreeFileSync.exe <batchfile>. Stejně tak můžete ke spuštění využít plánovač úloh vašeho operačního systému.</target>
 <source>Help</source>
 <target>Nápověda</target>
 <source>Configuration overview:</source>
@@ -478,17 +482,17 @@ Příkazová řádka je spuštěna pokaždé když:
 <target>Kategorie</target>
 <source>Action</source>
 <target>Akce</target>
-<source>Files/folders that exist on left side only</source>
+<source>File/folder exists on left side only</source>
 <target>Soubory/adresáře, které existují pouze vlevo</target>
-<source>Files/folders that exist on right side only</source>
+<source>File/folder exists on right side only</source>
 <target>Soubory/adresáře, které existují pouze vpravo</target>
-<source>Files that exist on both sides, left one is newer</source>
-<target>Soubory, které existují na obou stranách, z nichž vlevo je novější</target>
-<source>Files that exist on both sides, right one is newer</source>
-<target>Soubory, které existují na obou stranách, z nichž vpravo je novější</target>
-<source>Files that have different content</source>
+<source>Left file is newer</source>
+<target>Levý soubor je novější</target>
+<source>Right file is newer</source>
+<target>Pravý soubor je novější</target>
+<source>Files have different content</source>
 <target>Soubory, které mají rozdílný obsah</target>
-<source>Conflicts/files that cannot be categorized</source>
+<source>Conflict/file cannot be categorized</source>
 <target>Konflikty/soubory které nelze zařadit</target>
 <source>Compare by...</source>
 <target>Porovnat ...</target>
@@ -544,8 +548,8 @@ je stejný
 <target>- existuje pouze na levé straně</target>
 <source>- exists right only</source>
 <target>- existuje pouze na pravé straně</target>
-<source>- conflict</source>
-<target>- konflikt</target>
+<source>- conflict (same date, different size)</source>
+<target>- konflikt (stejné datum, jiná velikost)</target>
 <source>Compare by "File content"</source>
 <target>Porovnat "podle obsahu souboru"</target>
 <source>
@@ -712,10 +716,8 @@ Přenést přístupová oprávnění souborů a adresářů
 <target><vícenásobný výběr></target>
 <source>D-Click</source>
 <target>Dvojklik</target>
-<source>Copy to clipboard	CTRL+C</source>
-<target>Vložit do schránky	CTRL+C</target>
-<source>Delete files	DEL</source>
-<target>Smazat soubory	DEL</target>
+<source>Delete</source>
+<target>Smazat</target>
 <source>Customize...</source>
 <target>Vlastní....</target>
 <source>Auto-adjust columns</source>
@@ -862,14 +864,10 @@ Přenést přístupová oprávnění souborů a adresářů
 <target>soubor existuje na obou stranách</target>
 <source>on one side only</source>
 <target>pouze na jedné straně</target>
-<source>- left</source>
-<target>- vlevo</target>
-<source>- right</source>
-<target>- vpravo</target>
-<source>different</source>
-<target>rozdílný</target>
-<source>- conflict (same date, different size)</source>
-<target>- konflikt (stejné datum, jiná velikost)</target>
+<source>same date</source>
+<target>stejné datum</target>
+<source>different date</source>
+<target>rozdílné datum</target>
 <source>Inactive</source>
 <target>Vypnuto</target>
 <source>Second</source>
@@ -982,28 +980,28 @@ Přenést přístupová oprávnění souborů a adresářů
 <target>Vytváření seznamu souborů...</target>
 <source>Multiple...</source>
 <target>Několikanásobný...</target>
-<source>Files that are equal on both sides</source>
-<target>Soubory shodné na obou stranách</target>
-<source>Equal files/folders that differ in attributes only</source>
-<target>Stejné soubory/adresáře, které se liší pouze ve vlastnostech</target>
-<source>Copy from right to left</source>
-<target>Kopírovat z prava do leva</target>
-<source>Copy from left to right</source>
-<target>Kopírovat z leva do prava</target>
-<source>Delete files/folders existing on left side only</source>
-<target>Smazat soubory/adresáře existující pouze na levé straně</target>
-<source>Delete files/folders existing on right side only</source>
-<target>Smazat soubory/adresáře existující pouze na pravé straně</target>
-<source>Copy from right to left overwriting</source>
-<target>Kopírovat z prava do leva přepisem</target>
-<source>Copy from left to right overwriting</source>
-<target>Kopírovat z leva do prava přepisem</target>
+<source>Both sides are equal</source>
+<target>Obě strany jsou shodné</target>
+<source>Files/folders differ in attributes only</source>
+<target>Soubory/adresáře se liší pouze ve vlastnostech</target>
+<source>Copy new file/folder to left</source>
+<target>Kopírovat nový soubor/adresář do leva</target>
+<source>Copy new file/folder to right</source>
+<target>Kopírovat nový soubor/adresář do prava</target>
+<source>Delete left file/folder</source>
+<target>Smazat soubor/adresář z leva</target>
+<source>Delete right file/folder</source>
+<target>Smazat soubor/adresáře z prava</target>
+<source>Overwrite left file/folder with right one</source>
+<target>Přepsat levý soubor/adresář tím z prava</target>
+<source>Overwrite right file/folder with left one</source>
+<target>Přepsat pravý soubor/adresář tím z leva</target>
 <source>Do nothing</source>
 <target>Nic nedělat</target>
-<source>Copy attributes only from right to left</source>
-<target>Kopírovat vlastnosti jen z prava do leva</target>
-<source>Copy attributes only from left to right</source>
-<target>Kopírovat vlastnosti jen z leva do prava</target>
+<source>Copy file attributes only to left</source>
+<target>Kopírovat vlastnosti souboru pouze do leva</target>
+<source>Copy file attributes only to right</source>
+<target>Kopírovat vlastnosti souboru pouze do prava</target>
 <source>Deleting file %x</source>
 <target>Mazání souboru %x</target>
 <source>Deleting Symbolic Link %x</source>
@@ -1034,6 +1032,8 @@ Přenést přístupová oprávnění souborů a adresářů
 <target>Aktualizace atributů souboru %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>Zdrojový adresář již neexistuje:</target>
+<source>Generating database...</source>
+<target>Vytváření databáze...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Podle dané konfigurace není co synchronizovat!</target>
 <source>Target directory name must not be empty!</source>
@@ -1058,8 +1058,6 @@ Přenést přístupová oprávnění souborů a adresářů
 <target>Bude změně adresář, který je součástí adresářového páru vícenásobného porovnání! Prosím zkontrolujte si nastavení synchronizace!</target>
 <source>Processing folder pair:</source>
 <target>Zpracovávání adresářové páru:</target>
-<source>Generating database...</source>
-<target>Vytváření databáze...</target>
 <source>Error copying locked file %x!</source>
 <target>Chyba kopírování zamčeného souboru %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

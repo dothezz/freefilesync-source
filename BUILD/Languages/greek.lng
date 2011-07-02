@@ -17,8 +17,22 @@
 <target>RealtimeSync - Αυτοματοποιημένος Συγχρονισμός</target>
 <source>Browse</source>
 <target>Αναζήτηση</target>
+<source>Invalid commandline: "%x"</source>
+<target>Εσφαλμένη εντολή: "%x"</target>
 <source>Error resolving symbolic link:</source>
 <target>Σφάλμα κατά την επίλυση του συμβολικού δεσμού:</target>
+<source>Show popup</source>
+<target>Εμφάνιση αναδυόμενου παράθυρου</target>
+<source>Show popup on errors or warnings</source>
+<target>Εμφάνιση αναδυόμενου παράθυρου σε σφάλματα ή προειδοποιήσεις</target>
+<source>Ignore errors</source>
+<target>Παράβλεψη των σφαλμάτων</target>
+<source>Hide all error and warning messages</source>
+<target>Απόκρυψη όλων των σφαλμάτων και προειδοποιήσεων</target>
+<source>Exit instantly</source>
+<target>Άμεση έξοδος</target>
+<source>Abort synchronization immediately</source>
+<target>Άμεση ματαίωση του συγχρονισμού</target>
 <source>Select alternate synchronization settings</source>
 <target>Επιλογή διαφοροποιημένων ρυθμίσεων συγχρονισμού</target>
 <source>No filter selected</source>
@@ -121,14 +135,12 @@
 <target>Πληροφορίες</target>
 <source>Fatal Error</source>
 <target>Σημαντικό Σφάλμα</target>
+<source>Invalid FreeFileSync config file!</source>
+<target>Το αρχείο διάταξης του FreeFileSync δεν είναι έγκυρο!</target>
 <source>File does not exist:</source>
 <target>Το αρχείο δεν υπάρχει:</target>
 <source>Error parsing configuration file:</source>
 <target>Σφάλμα κατά την ανάλυση του αρχείου διάταξης:</target>
-<source>Error writing file:</source>
-<target>Σφάλμα κατά την εγγραφή του αρχείου:</target>
-<source>Invalid FreeFileSync config file!</source>
-<target>Μη έγκυρο αρχείο διάταξης του FreeFileSync!</target>
 <source>/sec</source>
 <target>/δευτερόλεπτο</target>
 <source>
@@ -217,8 +229,6 @@ The command line is executed each time:
 <target>Ενεργή παρακολούθηση...</target>
 <source>Waiting for missing directories...</source>
 <target>Αναμονή για τους υποκαταλόγους που απουσιάζουν...</target>
-<source>Command line is empty!</source>
-<target>Η γραμμή εντολών είναι κενή!</target>
 <source>Could not initialize directory monitoring:</source>
 <target>Δεν ήταν δυνατό να γίνει έναρξη παρακολούθησης του υποκαταλόγου:</target>
 <source>A directory input field is empty.</source>
@@ -259,12 +269,18 @@ The command line is executed each time:
 <target>Σφάλμα κατά την αντιγραφή του αρχείου:</target>
 <source>Error opening file:</source>
 <target>Σφάλμα κατά το άνοιγμα του αρχείου:</target>
+<source>Error writing file:</source>
+<target>Σφάλμα κατά την εγγραφή του αρχείου:</target>
 <source>Error reading file:</source>
 <target>Σφάλμα κατά την ανάγνωση του αρχείου:</target>
 <source>Endless loop when traversing directory:</source>
 <target>Ατέρμονος βρόχος κατά την την ανάλυση του υποκαταλόγου:</target>
 <source>Error traversing directory:</source>
 <target>Σφάλμα κατά την ανάλυση του υποκαταλόγου:</target>
+<source>Windows Error Code %x:</source>
+<target>Κωδικός Σφάλματος των Windows %x:</target>
+<source>Linux Error Code %x:</source>
+<target>Κωδικός Σφάλματος του Linux %x:</target>
 <source>Error setting privilege:</source>
 <target>Σφάλμα κατά τον ορισμό δικαιωμάτων:</target>
 <source>Error moving to Recycle Bin:</source>
@@ -289,18 +305,6 @@ The command line is executed each time:
 <target>%x%</target>
 <source>Could not read values for the following XML nodes:</source>
 <target>Δεν αναγνώστηκαν τιμές για τους ακόλουθους κόμβους XML:</target>
-<source>Show popup</source>
-<target>Εμφάνιση αναδυόμενου παράθυρου</target>
-<source>Show popup on errors or warnings</source>
-<target>Εμφάνιση αναδυόμενου παράθυρου σε σφάλματα ή προειδοποιήσεις</target>
-<source>Ignore errors</source>
-<target>Παράβλεψη των σφαλμάτων</target>
-<source>Hide all error and warning messages</source>
-<target>Απόκρυψη όλων των σφαλμάτων και προειδοποιήσεων</target>
-<source>Exit instantly</source>
-<target>Άμεση έξοδος</target>
-<source>Abort synchronization immediately</source>
-<target>Άμεση ματαίωση του συγχρονισμού</target>
 <source>Logging</source>
 <target>Καταγραφή μηνυμάτων</target>
 <source>FreeFileSync batch file</source>
@@ -405,8 +409,8 @@ The command line is executed each time:
 <target>Δεξιά</target>
 <source>Batch job</source>
 <target>Δέσμη ενεργειών</target>
-<source>Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
-<target>Δημιουργία ενός αρχείου δέσμης ενεργειών για αυτόματο συγχρονισμό. Για την έναρξη σε λειτουργία δέσμης, δώστε το όνομα του αρχείου στο εκτελέσιμο του FreeFileSync: FreeFileSync.exe <αρχείο δέσμης>. Αυτή η λειτουργία μπορεί να προγραμματιστεί και στο χρονοδιάγραμμα εργασιών του λειτουργικού σας συστήματος.</target>
+<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
+<target>Για την αυτοματοποίηση του συγχρονισμού δημιουργείστε ένα αρχείο δέσμης ενεργειών. Για να ξεκινήσετε σε κατάσταση λειτουργίας της δέσμης, απλώς κάντε διπλό κλικ στο αρχείο ή γράψτε στη γραμμή εντολών: FreeFileSync.exe <batchfile>. Μπορείτε επίσης το προγραμματίσετε αυτήν την εργασία, χρησιμοποιώντας το χρονοδιάγραμμα εργασιών του λειτουργικού σας συστήματος.</target>
 <source>Help</source>
 <target>Βοήθεια</target>
 <source>Configuration overview:</source>
@@ -473,18 +477,18 @@ The command line is executed each time:
 <target>Κατηγορία</target>
 <source>Action</source>
 <target>Ενέργεια</target>
-<source>Files/folders that exist on left side only</source>
-<target>Αρχεία/υποκατάλογοι που υπάρχουν μόνο στα αριστερά</target>
-<source>Files/folders that exist on right side only</source>
-<target>Αρχεία/υποκατάλογοι που υπάρχουν μόνο στα δεξιά</target>
-<source>Files that exist on both sides, left one is newer</source>
-<target>Αρχεία που υπάρχουν και στις δυο πλευρές, αριστερά είναι πιο πρόσφατα</target>
-<source>Files that exist on both sides, right one is newer</source>
-<target>Αρχεία που υπάρχουν και στις δυο πλευρές, δεξιά είναι πιο πρόσφατα</target>
-<source>Files that have different content</source>
-<target>Αρχεία που έχουν διαφορετικό περιεχόμενο</target>
-<source>Conflicts/files that cannot be categorized</source>
-<target>Διενέξεις/αρχεία που δεν μπορούν να κατηγοριοποιηθούν</target>
+<source>File/folder exists on left side only</source>
+<target>Το αρχείο / ο υποκατάλογος υπάρχει μόνο στην αριστερή πλευρά</target>
+<source>File/folder exists on right side only</source>
+<target>Το αρχείο / ο υποκατάλογος υπάρχει μόνο στη δεξιά πλευρά</target>
+<source>Left file is newer</source>
+<target>Το αρχείο στα αριστερά είναι πιο πρόσφατο</target>
+<source>Right file is newer</source>
+<target>Το αρχείο στα δεξιά είναι πιο πρόσφατο</target>
+<source>Files have different content</source>
+<target>Τα αρχεία έχουν διαφορετικό περιεχόμενο</target>
+<source>Conflict/file cannot be categorized</source>
+<target>Η διένεξη / το αρχείο δεν μπορεί να κατηγοριοποιηθεί</target>
 <source>Compare by...</source>
 <target>Σύγκριση με βάση το...</target>
 <source>
@@ -539,8 +543,8 @@ is the same
 <target>- υπάρχει μόνο στα αριστερά</target>
 <source>- exists right only</source>
 <target>- υπάρχει μόνο στα δεξιά</target>
-<source>- conflict</source>
-<target>- διένεξη</target>
+<source>- conflict (same date, different size)</source>
+<target>- διένεξη (ίδια ημερομηνία, διαφορετικό μέγεθος)</target>
 <source>Compare by "File content"</source>
 <target>Σύγκριση με βάση το "Περιεχόμενο αρχείων"</target>
 <source>
@@ -707,10 +711,8 @@ Transfer file and directory permissions
 <target><πολλαπλή επιλογή></target>
 <source>D-Click</source>
 <target>Διπλό κλικ</target>
-<source>Copy to clipboard	CTRL+C</source>
-<target>Αντιγραφή στο πρόχειρο	CTRL+C</target>
-<source>Delete files	DEL</source>
-<target>Διαγραφή αρχείων	DEL</target>
+<source>Delete</source>
+<target>Διαγραφή</target>
 <source>Customize...</source>
 <target>Προσαρμογή...</target>
 <source>Auto-adjust columns</source>
@@ -853,14 +855,10 @@ Transfer file and directory permissions
 <target>Το αρχείο υπάρχει και στις δυο πλευρές</target>
 <source>on one side only</source>
 <target>το αρχείο υπάρχει μόνο στη μια πλευρά</target>
-<source>- left</source>
-<target>- αριστερά</target>
-<source>- right</source>
-<target>- δεξιά</target>
-<source>different</source>
-<target>διαφορετικά</target>
-<source>- conflict (same date, different size)</source>
-<target>- διένεξη (ίδια ημερομηνία, διαφορετικό μέγεθος)</target>
+<source>same date</source>
+<target>ίδια ημερομηνία</target>
+<source>different date</source>
+<target>διαφορετική ημερομηνία</target>
 <source>Inactive</source>
 <target>Ανενεργό</target>
 <source>Second</source>
@@ -971,28 +969,28 @@ Transfer file and directory permissions
 <target>Δημιουργία καταλόγου αρχείων...</target>
 <source>Multiple...</source>
 <target>Πολλαπλές ρυθμίσεις...</target>
-<source>Files that are equal on both sides</source>
-<target>Αρχεία ίδια και στις δυο πλευρές</target>
-<source>Equal files/folders that differ in attributes only</source>
-<target>Ίδια αρχεία/υποκατάλογοι που διαφέρουν μόνο στα χαρακτηριστικά αρχείου</target>
-<source>Copy from right to left</source>
-<target>Αντιγραφή από τα δεξιά προς τα αριστερά</target>
-<source>Copy from left to right</source>
-<target>Αντιγραφή από τα αριστερά προς τα δεξιά</target>
-<source>Delete files/folders existing on left side only</source>
-<target>Διαγραφή των αρχείων/υποκαταλόγων που υπάρχουν μόνο στα αριστερά</target>
-<source>Delete files/folders existing on right side only</source>
-<target>Διαγραφή των αρχείων/υποκαταλόγων που υπάρχουν μόνο στα δεξιά</target>
-<source>Copy from right to left overwriting</source>
-<target>Αντιγραφή από τα δεξιά προς τα αριστερά με αντικατάσταση</target>
-<source>Copy from left to right overwriting</source>
-<target>Αντιγραφή από τα αριστερά προς τα δεξιά με αντικατάσταση</target>
+<source>Both sides are equal</source>
+<target>Οι δυο πλευρές είναι ίδιες</target>
+<source>Files/folders differ in attributes only</source>
+<target>Τα αρχεία / οι υποκατάλογοι διαφέρουν μόνο στα χαρακτηριστικά τους</target>
+<source>Copy new file/folder to left</source>
+<target>Αντιγραφή του νέου αρχείου/υποκαταλόγου στα αριστερά</target>
+<source>Copy new file/folder to right</source>
+<target>Αντιγραφή του νέου αρχείου/υποκαταλόγου στα δεξιά</target>
+<source>Delete left file/folder</source>
+<target>Διαγραφή του αρχείου/υποκαταλόγου στα αριστερά</target>
+<source>Delete right file/folder</source>
+<target>Διαγραφή του αρχείου/υποκαταλόγου στα δεξιά</target>
+<source>Overwrite left file/folder with right one</source>
+<target>Αντικατάσταση του αρχείου/υποκαταλόγου στα αριστερά από το(ν) αντίστοιχο στα δεξιά</target>
+<source>Overwrite right file/folder with left one</source>
+<target>Αντικατάσταση του αρχείου/υποκαταλόγου στα δεξιά από το(ν) αντίστοιχο στα αριστερά</target>
 <source>Do nothing</source>
 <target>Καμία ενέργεια</target>
-<source>Copy attributes only from right to left</source>
-<target>Αντιγραφή των χαρακτηριστικών αρχείου μόνο από τα δεξιά προς τα αριστερά</target>
-<source>Copy attributes only from left to right</source>
-<target>Αντιγραφή των χαρακτηριστικών αρχείου μόνο από τα αριστερά προς τα δεξιά</target>
+<source>Copy file attributes only to left</source>
+<target>Αντιγραφή μόνο των χαρακτηριστικών του αρχείου στα αριστερά</target>
+<source>Copy file attributes only to right</source>
+<target>Αντιγραφή μόνο των χαρακτηριστικών του αρχείου στα δεξιά</target>
 <source>Deleting file %x</source>
 <target>Διαγραφή του αρχείου %x</target>
 <source>Deleting Symbolic Link %x</source>
@@ -1023,6 +1021,8 @@ Transfer file and directory permissions
 <target>Ενημέρωση των χαρακτηριστικών αρχείου του %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>Ο υποκατάλογος προέλευσης δεν υπάρχει πλέον:</target>
+<source>Generating database...</source>
+<target>Δημιουργία βάσης δεδομένων...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Τίποτα προς συγχρονισμό με βάση τη διάταξη!</target>
 <source>Target directory name must not be empty!</source>
@@ -1047,8 +1047,6 @@ Transfer file and directory permissions
 <target>Θα τροποποιηθεί ένας υποκατάλογος που ανήκει σε πολλαπλά ζεύγη υποκαταλόγων! Παρακαλώ αναθεωρείστε τις ρυθμίσεις συγχρονισμού.</target>
 <source>Processing folder pair:</source>
 <target>Σύγκριση του ζεύγους υποκαταλόγων:</target>
-<source>Generating database...</source>
-<target>Δημιουργία βάσης δεδομένων...</target>
 <source>Error copying locked file %x!</source>
 <target>Σφάλμα κατά την αντιγραφή του κλειδωμένου αρχείου %x !</target>
 <source>Data verification error: Source and target file have different content!</source>

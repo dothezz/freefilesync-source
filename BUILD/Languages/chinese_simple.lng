@@ -17,8 +17,22 @@
 <target>实时同步 - 自动同步</target>
 <source>Browse</source>
 <target>浏览</target>
+<source>Invalid commandline: "%x"</source>
+<target>非法命令行:"%x"</target>
 <source>Error resolving symbolic link:</source>
 <target>解决符号链接出错:</target>
+<source>Show popup</source>
+<target>显示弹出窗口</target>
+<source>Show popup on errors or warnings</source>
+<target>在错误或警告时显示弹出窗口</target>
+<source>Ignore errors</source>
+<target>忽略错误</target>
+<source>Hide all error and warning messages</source>
+<target>隐藏所有错误与警告信息</target>
+<source>Exit instantly</source>
+<target>立即退出</target>
+<source>Abort synchronization immediately</source>
+<target>立即中止同步</target>
 <source>Select alternate synchronization settings</source>
 <target>选择替换同步设置</target>
 <source>No filter selected</source>
@@ -125,8 +139,6 @@
 <target>文件不存在:</target>
 <source>Error parsing configuration file:</source>
 <target>分析配置文件出错:</target>
-<source>Error writing file:</source>
-<target>写入文件出错:</target>
 <source>/sec</source>
 <target>/秒</target>
 <source>
@@ -212,8 +224,6 @@ The command line is executed each time:
 <target>监视激活...</target>
 <source>Waiting for missing directories...</source>
 <target>正在等待丢失的目录...</target>
-<source>Command line is empty!</source>
-<target>命令行是空的!</target>
 <source>Could not initialize directory monitoring:</source>
 <target>不能初始化目录监视:</target>
 <source>A directory input field is empty.</source>
@@ -254,12 +264,18 @@ The command line is executed each time:
 <target>复制文件出错:</target>
 <source>Error opening file:</source>
 <target>打开文件出错:</target>
+<source>Error writing file:</source>
+<target>写入文件出错:</target>
 <source>Error reading file:</source>
 <target>读取文件出错:</target>
 <source>Endless loop when traversing directory:</source>
 <target>遍历目录时出现无限循环:</target>
 <source>Error traversing directory:</source>
 <target>遍历目录出错:</target>
+<source>Windows Error Code %x:</source>
+<target>Windows错误代码 %x:</target>
+<source>Linux Error Code %x:</source>
+<target>Linux错误代码 %x:</target>
 <source>Error setting privilege:</source>
 <target>设置权限时出错:</target>
 <source>Error moving to Recycle Bin:</source>
@@ -284,18 +300,6 @@ The command line is executed each time:
 <target>%x%</target>
 <source>Could not read values for the following XML nodes:</source>
 <target>不能从如下XML节点读取数值:</target>
-<source>Show popup</source>
-<target>显示弹出窗口</target>
-<source>Show popup on errors or warnings</source>
-<target>在错误或警告时显示弹出窗口</target>
-<source>Ignore errors</source>
-<target>忽略错误</target>
-<source>Hide all error and warning messages</source>
-<target>隐藏所有错误与警告信息</target>
-<source>Exit instantly</source>
-<target>立即退出</target>
-<source>Abort synchronization immediately</source>
-<target>立即中止同步</target>
 <source>Logging</source>
 <target>记录</target>
 <source>FreeFileSync batch file</source>
@@ -400,8 +404,8 @@ The command line is executed each time:
 <target>右侧</target>
 <source>Batch job</source>
 <target>批处理作业</target>
-<source>Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
-<target>装配一个批处理文件用于自动同步. 要开始批处理模式只需简单地将批处理文件名传送给FreeFileSync可执行文件:FreeFileSync.exe <batchfile>. 这个也可以安排在您的操作系统的计划任务中.</target>
+<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
+<target>为自动同步创建一个批处理. 要开始批处理模式只需简单地双击批处理文件或通过命令行执行：FreeFileSync.exe <批处理文件名>. 此外还可以通过操作系统的计划任务来定时执行.</target>
 <source>Help</source>
 <target>帮助</target>
 <source>Configuration overview:</source>
@@ -443,7 +447,7 @@ The command line is executed each time:
 <source>Select variant:</source>
 <target>选择变化的:</target>
 <source><Automatic></source>
-<target>自动</target>
+<target><自动></target>
 <source>Identify and propagate changes on both sides using a database. Deletions and conflicts are detected automatically.</source>
 <target>使用数据库来识别和传送两边的改变. 自动检测删除和冲突状态.</target>
 <source>Mirror ->></source>
@@ -451,7 +455,7 @@ The command line is executed each time:
 <source>Mirror backup of left folder. Right folder is modified to exactly match left folder after synchronization.</source>
 <target>镜像备份左边的文件夹.同步后右边的文件夹被修改为和左边文件夹精确匹配.</target>
 <source>Update -></source>
-<target>升级 -></target>
+<target>更新 -></target>
 <source>Copy new or updated files to right folder.</source>
 <target>复制新的或修改过的文件到右侧文件夹</target>
 <source>Custom</source>
@@ -468,18 +472,18 @@ The command line is executed each time:
 <target>分类</target>
 <source>Action</source>
 <target>动作</target>
-<source>Files/folders that exist on left side only</source>
-<target>仅在左侧存在的文件/文件夹</target>
-<source>Files/folders that exist on right side only</source>
-<target>仅在右侧存在的文件/文件夹</target>
-<source>Files that exist on both sides, left one is newer</source>
-<target>两侧都有,左侧较新的文件</target>
-<source>Files that exist on both sides, right one is newer</source>
-<target>两侧都有,右侧较新的文件</target>
-<source>Files that have different content</source>
-<target>有不同内容的文件</target>
-<source>Conflicts/files that cannot be categorized</source>
-<target>冲突/文件不能被归类</target>
+<source>File/folder exists on left side only</source>
+<target>文件/文件夹仅存在于左侧</target>
+<source>File/folder exists on right side only</source>
+<target>文件/文件夹仅存在于右侧</target>
+<source>Left file is newer</source>
+<target>左侧文件较新</target>
+<source>Right file is newer</source>
+<target>右侧文件较新</target>
+<source>Files have different content</source>
+<target>文件内容不同</target>
+<source>Conflict/file cannot be categorized</source>
+<target>冲突/文件不能被分类</target>
 <source>Compare by...</source>
 <target>比较选项...</target>
 <source>
@@ -544,7 +548,7 @@ As the name suggests, two files which share the same name are marked as equal if
 With this option enabled the decision tree is smaller:
 </source>
 <target>
-顾名思义,两个相同文件名的文件当且仅当它们具有相同的内容时会被认为是相同的。
+顾名思义,两个相同文件名的文件当且仅当它们具有相同的内容时会被认为是相同的.
 此选项对于一致性检查比较有用，而不是备份操作. 因此,文件时间没有被考虑到. 
 
 通过此选项使决策树较小:
@@ -616,8 +620,8 @@ Include: *.doc;*.zip;*.exe
 Exclude: \stuff\temp\*
 </source>
 <target>
-Include: *.doc;*.zip;*.exe
-Exclude: \stuff\temp\*
+包括: *.doc;*.zip;*.exe
+排除: \stuff\temp\*
 </target>
 <source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
 <target>同步所有 .doc, .zip和 .exe 文件, 除了"temp"中的一切.</target>
@@ -703,10 +707,8 @@ Transfer file and directory permissions
 <target><多选></target>
 <source>D-Click</source>
 <target>双击</target>
-<source>Copy to clipboard	CTRL+C</source>
-<target>复制到剪贴板	CTRL+C</target>
-<source>Delete files	DEL</source>
-<target>删除文件	DEL</target>
+<source>Delete</source>
+<target>删除</target>
 <source>Customize...</source>
 <target>自定义...</target>
 <source>Auto-adjust columns</source>
@@ -846,11 +848,11 @@ Transfer file and directory permissions
 <source>on one side only</source>
 <target>仅在一侧</target>
 <source>same date</source>
-<target></target>
+<target>日期相同</target>
 <source>different date</source>
-<target></target>
+<target>日期不同</target>
 <source>Inactive</source>
-<target>不活动</target>
+<target>不使用</target>
 <source>Second</source>
 <target>秒</target>
 <source>Minute</source>
@@ -957,28 +959,28 @@ Transfer file and directory permissions
 <target>生成文件列表...</target>
 <source>Multiple...</source>
 <target>并联...</target>
-<source>Files that are equal on both sides</source>
-<target>两边文件相同</target>
-<source>Equal files/folders that differ in attributes only</source>
-<target>相等的文件/文件夹仅仅文件属性不同</target>
-<source>Copy from right to left</source>
-<target>从右侧复制到左侧</target>
-<source>Copy from left to right</source>
-<target>从左侧复制到右侧</target>
-<source>Delete files/folders existing on left side only</source>
-<target>删除仅在左侧存在的文件/文件夹</target>
-<source>Delete files/folders existing on right side only</source>
-<target>删除仅在右侧存在的文件/文件夹</target>
-<source>Copy from right to left overwriting</source>
-<target>从右侧复制到左侧(覆盖模式)</target>
-<source>Copy from left to right overwriting</source>
-<target>从左侧复制到右侧(覆盖模式)</target>
+<source>Both sides are equal</source>
+<target>两侧相等</target>
+<source>Files/folders differ in attributes only</source>
+<target>文件/文件夹仅属性不同</target>
+<source>Copy new file/folder to left</source>
+<target>复制新文件/文件夹至左侧</target>
+<source>Copy new file/folder to right</source>
+<target>复制新文件/文件夹至右侧</target>
+<source>Delete left file/folder</source>
+<target>删除左侧文件/文件夹</target>
+<source>Delete right file/folder</source>
+<target>删除右侧文件/文件夹</target>
+<source>Overwrite left file/folder with right one</source>
+<target>从右侧覆盖左侧的文件/文件夹</target>
+<source>Overwrite right file/folder with left one</source>
+<target>从左侧覆盖右侧的文件/文件夹</target>
 <source>Do nothing</source>
 <target>保持不动</target>
-<source>Copy attributes only from right to left</source>
-<target>从右边到左边只复制文件属性</target>
-<source>Copy attributes only from left to right</source>
-<target>从左边到右边只复制文件属性</target>
+<source>Copy file attributes only to left</source>
+<target>仅复制文件属性到左侧</target>
+<source>Copy file attributes only to right</source>
+<target>仅复制文件属性到右侧</target>
 <source>Deleting file %x</source>
 <target>正删除文件 %x</target>
 <source>Deleting Symbolic Link %x</source>
@@ -1009,6 +1011,8 @@ Transfer file and directory permissions
 <target>更新 %x 的属性</target>
 <source>Source directory does not exist anymore:</source>
 <target>源目录已经不存在:</target>
+<source>Generating database...</source>
+<target>正在生成数据库...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>根据配置没有任何同步!</target>
 <source>Target directory name must not be empty!</source>
@@ -1033,8 +1037,6 @@ Transfer file and directory permissions
 <target>有一个目录将被修改,而它是多个文件夹对的一部分!请重新检查同步设置!</target>
 <source>Processing folder pair:</source>
 <target>正在处理成对文件夹:</target>
-<source>Generating database...</source>
-<target>正在生成数据库...</target>
 <source>Error copying locked file %x!</source>
 <target>复制已锁定的文件时出错 %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

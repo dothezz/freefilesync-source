@@ -12,7 +12,7 @@
 #include "shared/zstring.h"
 #include "shared/system_constants.h"
 #include "shared/assert_static.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "shared/int64.h"
 
 
@@ -104,10 +104,6 @@ enum SyncOperation
 
 wxString getDescription(SyncOperation op);
 wxString getSymbol(SyncOperation op);
-
-
-//Exception class used to abort the "compare" and "sync" process
-class AbortThisProcess {};
 
 
 struct DirectionSet
@@ -297,7 +293,7 @@ struct FolderPairEnh //enhanced folder pairs with (optional) alternate configura
 
     FolderPairEnh(const Zstring& leftDir,
                   const Zstring& rightDir,
-                  const boost::shared_ptr<const AlternateSyncConfig>& syncConfig,
+                  const std::shared_ptr<const AlternateSyncConfig>& syncConfig,
                   const FilterConfig& filter) :
         leftDirectory(leftDir),
         rightDirectory(rightDir) ,
@@ -307,7 +303,7 @@ struct FolderPairEnh //enhanced folder pairs with (optional) alternate configura
     Zstring leftDirectory;
     Zstring rightDirectory;
 
-    boost::shared_ptr<const AlternateSyncConfig> altSyncConfig; //optional
+    std::shared_ptr<const AlternateSyncConfig> altSyncConfig; //optional
     FilterConfig localFilter;
 };
 

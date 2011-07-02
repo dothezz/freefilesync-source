@@ -204,14 +204,14 @@ void CompareStatusHandler::OnAbortCompare(wxCommandEvent& event)
 void CompareStatusHandler::abortThisProcess()
 {
     requestAbortion();
-    throw zen::AbortThisProcess();
+    throw GuiAbortProcess();
 }
 //########################################################################################################
 
 
 SyncStatusHandler::SyncStatusHandler(MainDialog* parentDlg, OnGuiError handleError, const wxString& jobName) :
     parentDlg_(parentDlg),
-    syncStatusFrame(*this, parentDlg, false, jobName),
+    syncStatusFrame(*this, parentDlg, SyncStatus::SYNCHRONIZING, false, jobName),
     handleError_(handleError)
 {
 }
@@ -361,5 +361,5 @@ void SyncStatusHandler::forceUiRefresh()
 void SyncStatusHandler::abortThisProcess()
 {
     requestAbortion();
-    throw zen::AbortThisProcess();  //abort can be triggered by syncStatusFrame
+    throw GuiAbortProcess();  //abort can be triggered by syncStatusFrame
 }

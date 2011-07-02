@@ -14,7 +14,6 @@
 #include "ui/batch_status_handler.h"
 #include "ui/check_version.h"
 #include <wx/file.h>
-#include "shared/xml_base.h"
 #include "library/resources.h"
 #include "ui/switch_to_gui.h"
 #include "shared/standard_paths.h"
@@ -80,8 +79,33 @@ void Application::OnStartApplication(wxIdleEvent&)
 #ifdef FFS_LINUX
     Gtk::Main::init_gtkmm_internals();
 
-    ::gtk_rc_parse(zen::wxToZ(zen::getResourceDir()) + "styles.rc"); //remove inner border from bitmap buttons
+    ::gtk_rc_parse((Zstring(zen::getResourceDir()) + "styles.rc").c_str()); //remove inner border from bitmap buttons
 #endif
+
+
+#if wxCHECK_VERSION(2, 9, 1)
+    wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping
+    wxToolTip::SetAutoPop(7000); //tooltip visibilty in ms, 5s seems to be default for Windows
+#endif
+
+
+    try //load global settings from XML: they are written on exit, so read them FIRST
+    {
+        if (fileExists(wxToZ(xmlAccess::getGlobalConfigFile())))
+            xmlAccess::readConfig(globalSettings);
+        //else: globalSettings already has default values
+    }
+    catch (const xmlAccess::FfsXmlError& error)
+    {
+        //show messagebox and continue
+        if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
+            ; //wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING); -> ignore parsing errors: should be migration problems only *cross-fingers*
+        else
+            wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
+    }
+
+    //set program language
+    zen::setLanguage(globalSettings.programLanguage);
 
 
     //test if FFS is to be started on UI with config file passed as commandline parameter
@@ -101,34 +125,10 @@ void Application::OnStartApplication(wxIdleEvent&)
         else
         {
             wxMessageBox(wxString(_("File does not exist:")) + wxT(" \"") + arg1 + wxT("\""), _("Error"), wxOK | wxICON_ERROR);
+            returnValue = -13;
             return;
         }
     }
-
-#if wxCHECK_VERSION(2, 9, 1)
-    wxToolTip::SetMaxWidth(-1); //disable tooltip wrapping
-    wxToolTip::SetAutoPop(7000); //tooltip visibilty in ms, 5s seems to be default for Windows
-#endif
-
-
-    try //load global settings from XML
-    {
-        if (fileExists(wxToZ(xmlAccess::getGlobalConfigFile())))
-            xmlAccess::readConfig(globalSettings);
-        //else: globalSettings already has default values
-    }
-    catch (const xmlAccess::XmlError& error)
-    {
-        //show messagebox and continue
-        if (error.getSeverity() == xmlAccess::XmlError::WARNING)
-            ; //wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING); -> ignore parsing errors: should be migration problems only *cross-fingers*
-        else
-            wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
-    }
-
-    //set program language
-    zen::setLanguage(globalSettings.programLanguage);
-
 
     if (!cfgFilename.empty())
     {
@@ -174,7 +174,14 @@ int Application::OnRun()
         safeOutput.Write(wxString::FromAscii(e.what()));
 
         wxSafeShowMessage(_("An exception occurred!"), wxString::FromAscii(e.what()));
+        return -9;
+    }
+    catch (...) //catch the rest
+    {
+        wxFile safeOutput(zen::getConfigDir() + wxT("LastError.txt"), wxFile::write);
+        safeOutput.Write(wxT("Unknown exception!"));
 
+        wxSafeShowMessage(_("An exception occurred!"), wxT("Unknown exception!"));
         return -9;
     }
 
@@ -191,7 +198,7 @@ int Application::OnExit()
     {
         xmlAccess::writeConfig(globalSettings);
     }
-    catch (const xmlAccess::XmlError&)
+    catch (const xmlAccess::FfsXmlError&)
     {
         //wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR); -> not that important/might be tedious in silent batch?
         assert(false); //get info in debug build
@@ -217,9 +224,9 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
     {
         xmlAccess::readConfig(filename, batchCfg);
     }
-    catch (const xmlAccess::XmlError& error)
+    catch (const xmlAccess::FfsXmlError& error)
     {
-        wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
+        wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR); //batch mode: break on errors AND even warnings!
         return;
     }
     //all settings have been read successfully...
@@ -283,7 +290,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
                 wxSound::Play(soundFile, wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message!
         }
     }
-    catch (zen::AbortThisProcess&)  //exit used by statusHandler
+    catch (BatchAbortProcess&)  //exit used by statusHandler
     {
         if (returnValue >= 0)
             returnValue = -12;

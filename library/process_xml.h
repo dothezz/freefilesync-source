@@ -7,11 +7,10 @@
 #ifndef PROCESSXML_H_INCLUDED
 #define PROCESSXML_H_INCLUDED
 
-#include "../shared/xml_base.h"
+#include <wx/gdicmn.h>
 #include "../structures.h"
 #include "../shared/xml_error.h"
 #include "../shared/localization.h"
-
 
 namespace xmlAccess
 {
@@ -23,9 +22,7 @@ enum XmlType
     XML_TYPE_OTHER
 };
 
-XmlType getXmlType(const TiXmlDocument& doc); //throw()
 XmlType getXmlType(const wxString& filename); //throw()
-void initXmlDocument(TiXmlDocument& doc, XmlType type); //throw()
 
 
 enum OnError
@@ -159,10 +156,8 @@ struct XmlGlobalSettings
     struct _Gui
     {
         _Gui() :
-            widthNotMaximized( wxDefaultCoord),
-            heightNotMaximized(wxDefaultCoord),
-            posXNotMaximized(  wxDefaultCoord),
-            posYNotMaximized(  wxDefaultCoord),
+            dlgPos(wxDefaultCoord, wxDefaultCoord),
+            dlgSize(wxDefaultCoord, wxDefaultCoord),
             isMaximized(false),
             autoAdjustColumnsLeft(false),
             autoAdjustColumnsRight(false),
@@ -176,7 +171,6 @@ struct XmlGlobalSettings
 #endif
             showFileIconsLeft(true),
             showFileIconsRight(true),
-            addFolderPairCountMax(5),
             lastUpdateCheck(0)
         {
             //default external apps will be translated "on the fly"!!!
@@ -193,10 +187,8 @@ struct XmlGlobalSettings
 #endif
         }
 
-        int widthNotMaximized;
-        int heightNotMaximized;
-        int posXNotMaximized;
-        int posYNotMaximized;
+        wxPoint dlgPos;
+        wxSize dlgSize;
         bool isMaximized;
 
         ColumnAttributes columnAttribLeft;
@@ -220,7 +212,6 @@ struct XmlGlobalSettings
         bool showFileIconsLeft;
         bool showFileIconsRight;
 
-        size_t addFolderPairCountMax;
         long lastUpdateCheck;          //time of last update check
 
         wxString guiPerspectiveLast; //used by wxAuiManager
@@ -255,13 +246,13 @@ bool sortByPositionAndVisibility(const ColumnAttrib& a, const ColumnAttrib& b)
     return a.position < b.position;
 }
 
-void readConfig(const wxString& filename, XmlGuiConfig&      config); //throw (xmlAccess::XmlError)
-void readConfig(const wxString& filename, XmlBatchConfig&    config); //throw (xmlAccess::XmlError)
-void readConfig(                          XmlGlobalSettings& config); //throw (xmlAccess::XmlError)
+void readConfig(const wxString& filename, XmlGuiConfig&      config); //throw (xmlAccess::FfsXmlError)
+void readConfig(const wxString& filename, XmlBatchConfig&    config); //throw (xmlAccess::FfsXmlError)
+void readConfig(                          XmlGlobalSettings& config); //throw (xmlAccess::FfsXmlError)
 
-void writeConfig(const XmlGuiConfig&      outputCfg, const wxString& filename); //throw (xmlAccess::XmlError)
-void writeConfig(const XmlBatchConfig&    outputCfg, const wxString& filename); //throw (xmlAccess::XmlError)
-void writeConfig(const XmlGlobalSettings& outputCfg);                           //throw (xmlAccess::XmlError)
+void writeConfig(const XmlGuiConfig&      config, const wxString& filename); //throw (xmlAccess::FfsXmlError)
+void writeConfig(const XmlBatchConfig&    config, const wxString& filename); //throw (xmlAccess::FfsXmlError)
+void writeConfig(const XmlGlobalSettings& config);                           //throw (xmlAccess::FfsXmlError)
 
 //config conversion utilities
 XmlGuiConfig   convertBatchToGui(const XmlBatchConfig& batchCfg);
@@ -278,8 +269,8 @@ enum MergeType
 };
 MergeType getMergeType(const std::vector<wxString>& filenames);   //throw ()
 
-void convertConfig(const std::vector<wxString>& filenames, XmlGuiConfig&   config); //throw (xmlAccess::XmlError)
-void convertConfig(const std::vector<wxString>& filenames, XmlBatchConfig& config); //throw (xmlAccess::XmlError)
+void convertConfig(const std::vector<wxString>& filenames, XmlGuiConfig&   config); //throw (xmlAccess::FfsXmlError)
+void convertConfig(const std::vector<wxString>& filenames, XmlBatchConfig& config); //throw (xmlAccess::FfsXmlError)
 }
 
 

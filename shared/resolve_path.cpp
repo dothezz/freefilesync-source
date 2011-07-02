@@ -211,7 +211,7 @@ Zstring getVolumePath(const Zstring& volumeName) //empty string on error
                         std::vector<wchar_t> volPath(10000);
 
                         DWORD returnedLen = 0;
-                        if (getVolumePathNamesForVolumeName(&volGuid[0],    //__in   LPCTSTR lpszVolumeName,
+                        if (getVolumePathNamesForVolumeName(&volGuid[0],     //__in   LPCTSTR lpszVolumeName,
                                                             &volPath[0],     //__out  LPTSTR lpszVolumePathNames,
                                                             static_cast<DWORD>(volPath.size()), //__in   DWORD cchBufferLength,
                                                             &returnedLen))  //__out  PDWORD lpcchReturnLength
@@ -258,10 +258,10 @@ void expandVolumeName(Zstring& text)  // [volname]:\folder       [volname]\folde
             volname = Zstring(text.c_str() + posStart + 1, posEnd - posStart - 1);
             after   = Zstring(text.c_str() + posEnd + 1);
 
-            if (after.StartsWith(Zstr(":")))
-                after = after.AfterFirst(Zstr(':'));
-            if (after.StartsWith(Zstring() + FILE_NAME_SEPARATOR))
-                after = after.AfterFirst(FILE_NAME_SEPARATOR);
+            if (startsWith(after, ':'))
+                after = afterFirst(after, ':');
+            if (startsWith(after, FILE_NAME_SEPARATOR))
+                after = afterFirst(after, FILE_NAME_SEPARATOR);
         }
     }
 
@@ -294,7 +294,7 @@ Zstring zen::getFormattedDirectoryName(const Zstring& dirname)
 
     //remove leading/trailing whitespace
     trim(output, true, false);
-    while (endsWith(output, Zstr(" "))) //don't remove all whitespace from right, e.g. 0xa0 may be used as part of dir name
+    while (endsWith(output, " ")) //don't remove all whitespace from right, e.g. 0xa0 may be used as part of dir name
         output.resize(output.size() - 1);
 
     if (output.empty()) //an empty string will later be returned as "\"; this is not desired

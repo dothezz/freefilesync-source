@@ -13,7 +13,7 @@
 #include "../shared/dir_picker_i18n.h"
 #include "gui_generated.h"
 #include <memory>
-#include "../shared/util.h"
+#include "../shared/wx_choice_enum.h"
 #include "../shared/dir_name.h"
 
 using namespace zen;
@@ -75,8 +75,7 @@ private:
 
 
 
-void updateConfigIcons(const CompareVariant compareVar,
-                       const SyncConfig& syncConfig,
+void updateConfigIcons(const SyncConfig& syncConfig,
                        wxBitmapButton* buttonLeftOnly,
                        wxBitmapButton* buttonRightOnly,
                        wxBitmapButton* buttonLeftNewer,
@@ -88,46 +87,9 @@ void updateConfigIcons(const CompareVariant compareVar,
                        wxStaticBitmap* bitmapLeftNewer,
                        wxStaticBitmap* bitmapRightNewer,
                        wxStaticBitmap* bitmapDifferent,
-                       wxStaticBitmap* bitmapConflict,
-                       wxSizer*        syncDirections) //sizer containing all sync-directions
+                       wxStaticBitmap* bitmapConflict) //sizer containing all sync-directions
 {
-    //display only relevant sync options
-    syncDirections->Show(true);
-
-    buttonLeftOnly  ->Show(); //
-    buttonRightOnly ->Show(); //
-    buttonLeftNewer ->Show(); //
-    buttonRightNewer->Show(); // enable everything by default
-    buttonDifferent ->Show(); //
-    buttonConflict  ->Show(); //
-
-    bitmapLeftOnly  ->Show(); //
-    bitmapRightOnly ->Show(); //
-    bitmapLeftNewer ->Show(); //
-    bitmapRightNewer->Show(); //
-    bitmapDifferent ->Show(); //
-    bitmapConflict  ->Show(); //
-
-    switch (compareVar)
-    {
-        case CMP_BY_TIME_SIZE:
-            buttonDifferent ->Hide();
-
-            bitmapDifferent ->Hide();
-            break;
-
-        case CMP_BY_CONTENT:
-            buttonLeftNewer ->Hide();
-            buttonRightNewer->Hide();
-
-            bitmapLeftNewer ->Hide();
-            bitmapRightNewer->Hide();
-            break;
-    }
-
-    if (syncConfig.var == SyncConfig::AUTOMATIC) //automatic mode needs no sync-directions
-        syncDirections->Show(false);
-    else
+    if (syncConfig.var != SyncConfig::AUTOMATIC) //automatic mode needs no sync-directions
     {
         const DirectionSet dirCfg = extractDirections(syncConfig);
 
@@ -283,6 +245,7 @@ SyncCfgDialog::SyncCfgDialog(wxWindow* window,
     m_bitmapRightNewer->SetBitmap(GlobalResources::instance().getImage(wxT("rightNewer")));
     m_bitmapDifferent ->SetBitmap(GlobalResources::instance().getImage(wxT("different")));
     m_bitmapConflict  ->SetBitmap(GlobalResources::instance().getImage(wxT("conflictGrey")));
+    m_bitmapDatabase  ->SetBitmap(GlobalResources::instance().getImage(wxT("database")));
 
     bSizer201->Layout(); //wxButtonWithImage size might have changed
 
@@ -307,8 +270,7 @@ void SyncCfgDialog::updateGui()
     wxWindowUpdateLocker dummy7(m_bpButtonDifferent);
     wxWindowUpdateLocker dummy8(m_bpButtonConflict);
 
-    updateConfigIcons(cmpVariant,
-                      currentSyncConfig,
+    updateConfigIcons(currentSyncConfig,
                       m_bpButtonLeftOnly,
                       m_bpButtonRightOnly,
                       m_bpButtonLeftNewer,
@@ -320,8 +282,31 @@ void SyncCfgDialog::updateGui()
                       m_bitmapLeftNewer,
                       m_bitmapRightNewer,
                       m_bitmapDifferent,
-                      m_bitmapConflict,
-                      sbSizerSyncDirections);
+                      m_bitmapConflict);
+
+    //display only relevant sync options
+    m_bitmapDatabase->Show(true);
+    sbSizerSyncDirections->Show(true);
+
+    if (currentSyncConfig.var == SyncConfig::AUTOMATIC)
+    {
+        sbSizerSyncDirections->Show(false);
+    }
+    else
+    {
+        m_bitmapDatabase->Show(false);
+        switch (cmpVariant)
+        {
+            case CMP_BY_TIME_SIZE:
+                bSizerDifferent ->Show(false);
+                break;
+
+            case CMP_BY_CONTENT:
+                bSizerLeftNewer ->Show(false);
+                bSizerRightNewer->Show(false);
+                break;
+        }
+    }
 
     //set radiobuttons -> have no parameter-ownership at all!
     switch (currentSyncConfig.var)
@@ -340,6 +325,7 @@ void SyncCfgDialog::updateGui()
             break;
     }
 
+    Layout();
     GetSizer()->SetSizeHints(this); //this works like a charm for GTK2 with window resizing problems!!! (includes call to Fit())
 
     m_panelCustomDeletionDir->Enable(getEnumVal(enumDelhandDescr, *m_choiceHandleDeletion) == zen::MOVE_TO_CUSTOM_DIRECTORY);

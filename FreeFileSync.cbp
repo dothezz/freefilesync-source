@@ -95,15 +95,17 @@
 			<Add option="-Wall" />
 			<Add option="-pipe" />
 			<Add option="-mthreads" />
+			<Add option="-std=gnu++0x" />
 			<Add option="-D__GNUWIN32__" />
 			<Add option="-D__WXMSW__" />
 			<Add option="-DFFS_WIN" />
-			<Add option="-DTIXML_USE_STL" />
 			<Add option="-DwxUSE_UNICODE" />
 			<Add option="-DBOOST_THREAD_USE_LIB" />
 			<Add option="-DWXINTL_NO_GETTEXT_MACRO" />
+			<Add option="-DZEN_PLATFORM_WINDOWS" />
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
 			<Add directory="C:\Program Files\C++\Boost" />
+			<Add directory="shared" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
@@ -331,10 +333,6 @@
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
 		</Unit>
-		<Unit filename="shared\tinyxml\tinystr.cpp" />
-		<Unit filename="shared\tinyxml\tinyxml.cpp" />
-		<Unit filename="shared\tinyxml\tinyxmlerror.cpp" />
-		<Unit filename="shared\tinyxml\tinyxmlparser.cpp" />
 		<Unit filename="shared\toggle_button.cpp">
 			<Option target="Release" />
 			<Option target="Debug-DLL" />
@@ -345,6 +343,7 @@
 		</Unit>
 		<Unit filename="shared\util.cpp" />
 		<Unit filename="shared\util.h" />
+		<Unit filename="shared\wx_choice_enum.h" />
 		<Unit filename="shared\xml_base.cpp" />
 		<Unit filename="shared\xml_base.h" />
 		<Unit filename="shared\xml_error.h" />

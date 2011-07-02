@@ -138,7 +138,7 @@ private:
 namespace
 {
 typedef std::string UniqueId;
-typedef boost::shared_ptr<std::vector<char> > MemoryStreamPtr; //byte stream representing DirInformation
+typedef std::shared_ptr<std::vector<char> > MemoryStreamPtr; //byte stream representing DirInformation
 typedef std::map<UniqueId, MemoryStreamPtr>   DirectoryTOC;    //list of streams ordered by a UUID pointing to their partner database
 typedef std::pair<UniqueId, DirectoryTOC>     DbStreamData;    //header data: UUID representing this database, item data: list of dir-streams
 }
@@ -233,11 +233,11 @@ std::pair<DirInfoPtr, DirInfoPtr> zen::loadFromDisk(const BaseDirMapping& baseMa
                                                wxT("\"") + zToWx(fileNameRight) + wxT("\""));
 
         //read streams into DirInfo
-        boost::shared_ptr<DirInformation> dirInfoLeft(new DirInformation);
+        std::shared_ptr<DirInformation> dirInfoLeft(new DirInformation);
         wxMemoryInputStream buffer(&(*dbLeft->second)[0], dbLeft->second->size()); //convert char-array to inputstream: no copying, ownership not transferred
         ReadDirInfo(buffer, zToWx(fileNameLeft), *dirInfoLeft);  //read file/dir information
 
-        boost::shared_ptr<DirInformation> dirInfoRight(new DirInformation);
+        std::shared_ptr<DirInformation> dirInfoRight(new DirInformation);
         wxMemoryInputStream buffer2(&(*dbRight->second)[0], dbRight->second->size()); //convert char-array to inputstream: no copying, ownership not transferred
         ReadDirInfo(buffer2, zToWx(fileNameRight), *dirInfoRight);  //read file/dir information
 
@@ -474,7 +474,7 @@ void zen::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
 
 
     //(try to) read old DirInfo
-    std::auto_ptr<DirInformation> oldDirInfoLeft;
+    std::shared_ptr<DirInformation> oldDirInfoLeft;
     try
     {
         DirectoryTOC::const_iterator iter = dbEntriesLeft.second.find(dbEntriesRight.first);
@@ -483,14 +483,14 @@ void zen::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
             {
                 const std::vector<char>& memStream = *iter->second;
                 wxMemoryInputStream buffer(&memStream[0], memStream.size()); //convert char-array to inputstream: no copying, ownership not transferred
-                std::auto_ptr<DirInformation> dirInfoTmp(new DirInformation);
+                std::shared_ptr<DirInformation> dirInfoTmp = std::make_shared<DirInformation>();
                 ReadDirInfo(buffer, zToWx(baseMapping.getDBFilename<LEFT_SIDE>()), *dirInfoTmp);  //read file/dir information
                 oldDirInfoLeft = dirInfoTmp;
             }
     }
     catch(FileError&) {} //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
 
-    std::auto_ptr<DirInformation> oldDirInfoRight;
+    std::shared_ptr<DirInformation> oldDirInfoRight;
     try
     {
         DirectoryTOC::const_iterator iter = dbEntriesRight.second.find(dbEntriesLeft.first);
@@ -499,7 +499,7 @@ void zen::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
             {
                 const std::vector<char>& memStream = *iter->second;
                 wxMemoryInputStream buffer(&memStream[0], memStream.size()); //convert char-array to inputstream: no copying, ownership not transferred
-                std::auto_ptr<DirInformation> dirInfoTmp(new DirInformation);
+                std::shared_ptr<DirInformation> dirInfoTmp = std::make_shared<DirInformation>();
                 ReadDirInfo(buffer, zToWx(baseMapping.getDBFilename<RIGHT_SIDE>()), *dirInfoTmp);  //read file/dir information
                 oldDirInfoRight = dirInfoTmp;
             }

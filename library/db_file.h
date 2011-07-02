@@ -19,7 +19,7 @@ struct DirInformation
     HardFilter::FilterRef filter; //filter settings (used when retrieving directory data)
     DirContainer baseDirContainer; //hierarchical directory information
 };
-typedef boost::shared_ptr<const DirInformation> DirInfoPtr;
+typedef std::shared_ptr<const DirInformation> DirInfoPtr;
 
 DEFINE_NEW_FILE_ERROR(FileErrorDatabaseNotExisting);
 

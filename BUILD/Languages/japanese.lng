@@ -17,8 +17,22 @@
 <target>リアルタイム同期 - 自動同期</target>
 <source>Browse</source>
 <target>参照</target>
+<source>Invalid commandline: "%x"</source>
+<target>無効なコマンドライン: "%x"</target>
 <source>Error resolving symbolic link:</source>
 <target>シンボリックリンクの解決に失敗:</target>
+<source>Show popup</source>
+<target>ポップアップ表示</target>
+<source>Show popup on errors or warnings</source>
+<target>エラー/警告をポップアップ表示</target>
+<source>Ignore errors</source>
+<target>エラーを無視</target>
+<source>Hide all error and warning messages</source>
+<target>すべてのエラーと警告メッセージを非表示</target>
+<source>Exit instantly</source>
+<target>すぐに終了</target>
+<source>Abort synchronization immediately</source>
+<target>今すぐに同期処理を中断</target>
 <source>Select alternate synchronization settings</source>
 <target>代替同期設定を選択</target>
 <source>No filter selected</source>
@@ -119,14 +133,12 @@
 <target>情報</target>
 <source>Fatal Error</source>
 <target>致命的なエラー</target>
+<source>Invalid FreeFileSync config file!</source>
+<target>無効な FreeFileSync 構成ファイルです!</target>
 <source>File does not exist:</source>
 <target>ファイルが存在しません:</target>
 <source>Error parsing configuration file:</source>
 <target>構成ファイルの構文に誤りがあります:</target>
-<source>Error writing file:</source>
-<target>ファイル書き込みエラー:</target>
-<source>Invalid FreeFileSync config file!</source>
-<target>無効な FreeFileSync 構成ファイルです!</target>
 <source>/sec</source>
 <target>/秒</target>
 <source>
@@ -212,8 +224,6 @@ The command line is executed each time:
 <target>監視を開始します...</target>
 <source>Waiting for missing directories...</source>
 <target>見失ったディレクトリの待機中</target>
-<source>Command line is empty!</source>
-<target>コマンドラインが空白です!</target>
 <source>Could not initialize directory monitoring:</source>
 <target>監視するディレクトリを初期化できません:</target>
 <source>A directory input field is empty.</source>
@@ -254,12 +264,18 @@ The command line is executed each time:
 <target>ファイルのコピーに失敗:</target>
 <source>Error opening file:</source>
 <target>ファイルのオープンに失敗:</target>
+<source>Error writing file:</source>
+<target>ファイル書き込みエラー:</target>
 <source>Error reading file:</source>
 <target>ファイル読み込みエラー:</target>
 <source>Endless loop when traversing directory:</source>
 <target>ディレクトリ移動中に無限ループが発生:</target>
 <source>Error traversing directory:</source>
 <target>ディレクトリの移動エラー:</target>
+<source>Windows Error Code %x:</source>
+<target>Windows エラーコード %x:</target>
+<source>Linux Error Code %x:</source>
+<target>Linux エラーコード %x:</target>
 <source>Error setting privilege:</source>
 <target>特権の設定エラー:</target>
 <source>Error moving to Recycle Bin:</source>
@@ -284,18 +300,6 @@ The command line is executed each time:
 <target>%x%</target>
 <source>Could not read values for the following XML nodes:</source>
 <target>以下の XMLノードの値を読み込むことが出来ません:</target>
-<source>Show popup</source>
-<target>ポップアップ表示</target>
-<source>Show popup on errors or warnings</source>
-<target>エラー/警告をポップアップ表示</target>
-<source>Ignore errors</source>
-<target>エラーを無視</target>
-<source>Hide all error and warning messages</source>
-<target>すべてのエラーと警告メッセージを非表示</target>
-<source>Exit instantly</source>
-<target>すぐに終了</target>
-<source>Abort synchronization immediately</source>
-<target>今すぐに同期処理を中断</target>
 <source>Logging</source>
 <target>ログ</target>
 <source>FreeFileSync batch file</source>
@@ -335,7 +339,7 @@ The command line is executed each time:
 <source>FreeFileSync is up to date!</source>
 <target>FreeFileSync は最新です!</target>
 <source>Do you want FreeFileSync to automatically check for updates every week?</source>
-<target>FreeFileSync のアップデートの有無の確認を自動的に毎週行いますか></target>
+<target>FreeFileSync の更新確認を毎週自動的に行いますか?</target>
 <source>(Requires an Internet connection!)</source>
 <target>(インターネット接続を必要とします!)</target>
 <source>1. &Compare</source>
@@ -400,12 +404,8 @@ The command line is executed each time:
 <target>右側</target>
 <source>Batch job</source>
 <target>一括処理</target>
-<source>Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
-<target>
-一括で同期処理を行うためのバッチファイルを作成します。 一括モードを開始するときは、ファイルのパス名を実行ファイル
-< FreeFileSync.exe> 
-にバッチファイルで渡すだけです。 また、この操作はOSのタスクスケジューラから実行することができます。
-</target>
+<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
+<target>同期を一括で自動的に実行するためのバッチファイルを作成します。実行は.BAT ファイルをダブルクリック、または次のコマンドラインを実行します: FreeFileSync.exe<batchfile>.BAT ファイルは、OS のタスクスケジューラで実行することも可能です</target>
 <source>Help</source>
 <target>ヘルプ</target>
 <source>Configuration overview:</source>
@@ -472,18 +472,18 @@ The command line is executed each time:
 <target>カテゴリ</target>
 <source>Action</source>
 <target>操作</target>
-<source>Files/folders that exist on left side only</source>
+<source>File/folder exists on left side only</source>
 <target>左側のみに存在するファイル/フォルダ</target>
-<source>Files/folders that exist on right side only</source>
+<source>File/folder exists on right side only</source>
 <target>右側のみに存在するファイル/フォルダ</target>
-<source>Files that exist on both sides, left one is newer</source>
-<target>両側に存在するが、左側の方がより新しい</target>
-<source>Files that exist on both sides, right one is newer</source>
-<target>両側に存在するが、右側の方がより新しい</target>
-<source>Files that have different content</source>
-<target>内容が異なるファイル</target>
-<source>Conflicts/files that cannot be categorized</source>
-<target>分類のできない競合/ファイル</target>
+<source>Left file is newer</source>
+<target>左側の新しいファイル</target>
+<source>Right file is newer</source>
+<target>右側の新しいファイル</target>
+<source>Files have different content</source>
+<target>ファイル内容は異なります</target>
+<source>Conflict/file cannot be categorized</source>
+<target>競合があるため分類できません</target>
 <source>Compare by...</source>
 <target>比較対象...</target>
 <source>
@@ -538,8 +538,8 @@ is the same
 <target>- 左側にのみ存在</target>
 <source>- exists right only</source>
 <target>- 右側にのみ存在</target>
-<source>- conflict</source>
-<target>- 不一致</target>
+<source>- conflict (same date, different size)</source>
+<target>- 不一致 (同じ日付, 異なるサイズ)</target>
 <source>Compare by "File content"</source>
 <target>"ファイルの内容" を比較</target>
 <source>
@@ -555,7 +555,7 @@ With this option enabled the decision tree is smaller:
 <source>- different</source>
 <target>- 差異あり</target>
 <source>Source code written in C++ utilizing:</source>
-<target></target>
+<target>ソースコードは C++ で書かれています</target>
 <source>Big thanks for localizing FreeFileSync goes out to:</source>
 <target>FreeFileSync のローカライズへの協力に感謝します:</target>
 <source>Feedback and suggestions are welcome at:</source>
@@ -706,10 +706,8 @@ Transfer file and directory permissions
 <target><複数選択></target>
 <source>D-Click</source>
 <target>W-クリック</target>
-<source>Copy to clipboard	CTRL+C</source>
-<target>クリップボードにコピー	CTRL+C</target>
-<source>Delete files	DEL</source>
-<target>ファイルを削除	DEL</target>
+<source>Delete</source>
+<target>削除</target>
 <source>Customize...</source>
 <target>カスタマイズ...</target>
 <source>Auto-adjust columns</source>
@@ -848,14 +846,10 @@ Transfer file and directory permissions
 <target>両側に存在するファイル</target>
 <source>on one side only</source>
 <target>片側のみ</target>
-<source>- left</source>
-<target>- 左側</target>
-<source>- right</source>
-<target>- 右側</target>
-<source>different</source>
-<target>差異あり</target>
-<source>- conflict (same date, different size)</source>
-<target>- 不一致 (同じ日付, 異なるサイズ)</target>
+<source>same date</source>
+<target>日時が同一</target>
+<source>different date</source>
+<target>日時が異なる</target>
 <source>Inactive</source>
 <target>非アクティブ</target>
 <source>Second</source>
@@ -964,28 +958,28 @@ Transfer file and directory permissions
 <target>ファイル一覧を作成中...</target>
 <source>Multiple...</source>
 <target>複数処理...</target>
-<source>Files that are equal on both sides</source>
-<target>両側で同様のファイル</target>
-<source>Equal files/folders that differ in attributes only</source>
-<target>同様のファイル/フォルダで、属性のみ異なる</target>
-<source>Copy from right to left</source>
-<target>右から左にコピー</target>
-<source>Copy from left to right</source>
-<target>左から右にコピー</target>
-<source>Delete files/folders existing on left side only</source>
-<target>左側のみに存在するファイル/フォルダを削除</target>
-<source>Delete files/folders existing on right side only</source>
-<target>右側のみに存在するファイル/フォルダを削除</target>
-<source>Copy from right to left overwriting</source>
-<target>右から左に上書きコピー</target>
-<source>Copy from left to right overwriting</source>
-<target>左から右に上書きコピー</target>
+<source>Both sides are equal</source>
+<target>両側とも等しく</target>
+<source>Files/folders differ in attributes only</source>
+<target>属性の異なるファイル/フォルダのみ</target>
+<source>Copy new file/folder to left</source>
+<target>新しいファイル/フォルダを左側にコピー</target>
+<source>Copy new file/folder to right</source>
+<target>新しいファイル/フォルダを右側にコピー</target>
+<source>Delete left file/folder</source>
+<target>左側のファイル/フォルダを削除</target>
+<source>Delete right file/folder</source>
+<target>右側のファイル/フォルダを削除</target>
+<source>Overwrite left file/folder with right one</source>
+<target>右側のものを左側のファイル/フォルダに上書き</target>
+<source>Overwrite right file/folder with left one</source>
+<target>左側のものを右側のファイル/フォルダに上書き</target>
 <source>Do nothing</source>
 <target>何もしない</target>
-<source>Copy attributes only from right to left</source>
-<target>属性のみ右から左にコピー</target>
-<source>Copy attributes only from left to right</source>
-<target>属性のみ左から右にコピー</target>
+<source>Copy file attributes only to left</source>
+<target>ファイル属性のみ左側にコピー</target>
+<source>Copy file attributes only to right</source>
+<target>ファイル属性のみ右側にコピー</target>
 <source>Deleting file %x</source>
 <target>ファイル %x を削除中</target>
 <source>Deleting Symbolic Link %x</source>
@@ -1016,6 +1010,8 @@ Transfer file and directory permissions
 <target>%x の属性を更新</target>
 <source>Source directory does not exist anymore:</source>
 <target>ソースディレクトリが存在しません:</target>
+<source>Generating database...</source>
+<target>データベースを作成中...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>構成設定に対応する同期がみつかりません!</target>
 <source>Target directory name must not be empty!</source>
@@ -1040,8 +1036,6 @@ Transfer file and directory permissions
 <target>複数ペアのディレクトリ設定部分に変更された箇所があります! 同期設定を再確認してみてください!</target>
 <source>Processing folder pair:</source>
 <target>フォルダペアを処理中:</target>
-<source>Generating database...</source>
-<target>データベースを作成中...</target>
 <source>Error copying locked file %x!</source>
 <target>コピーに失敗! ファイル%x はロックされています!</target>
 <source>Data verification error: Source and target file have different content!</source>

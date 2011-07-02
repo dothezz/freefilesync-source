@@ -46,8 +46,6 @@ bool zen::fileExists(const Zstring& filename)
 {
     //symbolic links (broken or not) are also treated as existing files!
 #ifdef FFS_WIN
-    // we must use GetFileAttributes() instead of the ANSI C functions because
-    // it can cope with network (UNC) paths unlike them
     const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(filename).c_str());
     return ret != INVALID_FILE_ATTRIBUTES && !(ret & FILE_ATTRIBUTE_DIRECTORY); //returns true for (file-)symlinks also
 
@@ -63,8 +61,6 @@ bool zen::dirExists(const Zstring& dirname)
 {
     //symbolic links (broken or not) are also treated as existing directories!
 #ifdef FFS_WIN
-    // we must use GetFileAttributes() instead of the ANSI C functions because
-    // it can cope with network (UNC) paths unlike them
     const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(dirname).c_str());
     return (ret != INVALID_FILE_ATTRIBUTES) && (ret & FILE_ATTRIBUTE_DIRECTORY); //returns true for (dir-)symlinks also
 
@@ -882,14 +878,32 @@ void zen::copyFileTimes(const Zstring& sourceObj, const Zstring& targetObj, bool
     //privilege SE_BACKUP_NAME doesn't seem to be required here for symbolic links
     //note: setting privileges requires admin rights!
 
-    HANDLE hTarget = ::CreateFile(applyLongPathPrefix(targetObj).c_str(),
-                                  FILE_WRITE_ATTRIBUTES,
-                                  FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                  NULL,
-                                  OPEN_EXISTING,
-                                  FILE_FLAG_BACKUP_SEMANTICS | //needed to open a directory
-                                  (deRefSymlinks ? 0 : FILE_FLAG_OPEN_REPARSE_POINT), //process symlinks
-                                  NULL);
+    //opening newly created target file may fail due to some AV-software scanning it: no error, we will wait!
+    //http://support.microsoft.com/?scid=kb%3Ben-us%3B316609&x=17&y=20
+    //-> enable as soon it turns out it is required!
+    HANDLE hTarget = INVALID_HANDLE_VALUE;
+
+    /*const int retryInterval = 50;
+    const int maxRetries = 2000 / retryInterval;
+    for (int i = 0; i < maxRetries; ++i)
+    {
+    */
+    hTarget = ::CreateFile(applyLongPathPrefix(targetObj).c_str(),
+                           FILE_WRITE_ATTRIBUTES,
+                           FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                           NULL,
+                           OPEN_EXISTING,
+                           FILE_FLAG_BACKUP_SEMANTICS | //needed to open a directory
+                           (deRefSymlinks ? 0 : FILE_FLAG_OPEN_REPARSE_POINT), //process symlinks
+                           NULL);
+    /*
+    if (hTarget == INVALID_HANDLE_VALUE && ::GetLastError() == ERROR_SHARING_VIOLATION)
+        ::Sleep(retryInterval); //wait then retry
+    else //success or unknown failure
+        break;
+    }
+    */
+
     if (hTarget == INVALID_HANDLE_VALUE)
     {
         wxString errorMessage = wxString(_("Error changing modification time:")) + wxT("\n\"") + zToWx(targetObj) + wxT("\"");
@@ -1103,15 +1117,22 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, bool de
 {
 #ifdef FFS_WIN
     //setting privileges requires admin rights!
+    try
+    {
+        //enable privilege: required to read/write SACL information
+        Privileges::getInstance().ensureActive(SE_SECURITY_NAME); //polling allowed...
 
-    //enable privilege: required to read/write SACL information
-    Privileges::getInstance().ensureActive(SE_SECURITY_NAME); //polling allowed...
+        //enable privilege: required to copy owner information
+        Privileges::getInstance().ensureActive(SE_RESTORE_NAME);
 
-    //enable privilege: required to copy owner information
-    Privileges::getInstance().ensureActive(SE_RESTORE_NAME);
-
-    //the following privilege may be required according to http://msdn.microsoft.com/en-us/library/aa364399(VS.85).aspx (although not needed nor active in my tests)
-    Privileges::getInstance().ensureActive(SE_BACKUP_NAME);
+        //the following privilege may be required according to http://msdn.microsoft.com/en-us/library/aa364399(VS.85).aspx (although not needed nor active in my tests)
+        Privileges::getInstance().ensureActive(SE_BACKUP_NAME);
+    }
+    catch (const FileError& e)
+    {
+        const wxString errorMessage = wxString(_("Error copying file permissions:")) + wxT("\n\"") + zToWx(source) +  wxT("\" ->\n\"") + zToWx(target) + wxT("\"");
+        throw FileError(errorMessage + wxT("\n\n") + e.msg());
+    }
 
     PSECURITY_DESCRIPTOR buffer = NULL;
     PSID owner                  = NULL;
@@ -1159,7 +1180,7 @@ void copyObjectPermissions(const Zstring& source, const Zstring& target, bool de
 
     //read-only file attribute may cause trouble: temporarily reset it
     const DWORD targetAttr = ::GetFileAttributes(targetFmt.c_str());
-    Loki::ScopeGuard resetAttributes = Loki::MakeGuard(::SetFileAttributes, targetFmt, targetAttr);
+    Loki::ScopeGuard resetAttributes = Loki::MakeGuard(::SetFileAttributes, targetFmt.c_str(), targetAttr);
     if (targetAttr != INVALID_FILE_ATTRIBUTES &&
         (targetAttr & FILE_ATTRIBUTE_READONLY))
         ::SetFileAttributes(targetFmt.c_str(), targetAttr & (~FILE_ATTRIBUTE_READONLY)); //try to...
@@ -1294,7 +1315,7 @@ void createDirectoryRecursively(const Zstring& directory, const Zstring& templat
                 const bool isCompressed = (sourceAttr & FILE_ATTRIBUTE_COMPRESSED)  != 0;
                 const bool isEncrypted  = (sourceAttr & FILE_ATTRIBUTE_ENCRYPTED)   != 0;
 
-                ::SetFileAttributes(applyLongPathPrefix(directory), sourceAttr);
+                ::SetFileAttributes(applyLongPathPrefix(directory).c_str(), sourceAttr);
 
                 if (isEncrypted)
                     ::EncryptFile(directory.c_str()); //seems no long path is required (check passed!)

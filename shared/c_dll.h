@@ -9,7 +9,6 @@
 
 #include <string>
 #include <map>
-#undef min
 #include <algorithm>
 
 
@@ -86,7 +85,7 @@ template <class S, class T>
 inline
 HandleProvider<S, T>& HandleProvider<S, T>::instance()
 {
-    static HandleProvider inst;
+    static HandleProvider inst; //external linkage!!! :)
     return inst;
 }
 

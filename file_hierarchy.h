@@ -13,7 +13,7 @@
 #include <set>
 #include <vector>
 #include "structures.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "shared/guid.h"
 #include "library/hard_filter.h"
 #include "shared/file_id.h"

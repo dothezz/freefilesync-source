@@ -17,8 +17,22 @@
 <target>RealtimeSync - Автоматическая синхронизация</target>
 <source>Browse</source>
 <target>Обзор</target>
+<source>Invalid commandline: "%x"</source>
+<target>Неверная командная строка: "%x"</target>
 <source>Error resolving symbolic link:</source>
 <target>Ошибка при решении символической ссылки:</target>
+<source>Show popup</source>
+<target>Показывать всплывающие окна</target>
+<source>Show popup on errors or warnings</source>
+<target>Показывать всплывающие окна при ошибках и замечаниях</target>
+<source>Ignore errors</source>
+<target>Игнорировать ошибки</target>
+<source>Hide all error and warning messages</source>
+<target>Скрывать все ошибки и сообщения с предупреждениями</target>
+<source>Exit instantly</source>
+<target>Выйти немедленно</target>
+<source>Abort synchronization immediately</source>
+<target>Отменить синхронизацию немедленно</target>
 <source>Select alternate synchronization settings</source>
 <target>Выбрать альтернативные настройки синхронизации</target>
 <source>No filter selected</source>
@@ -129,8 +143,6 @@
 <target>Файл не существует:</target>
 <source>Error parsing configuration file:</source>
 <target>Ошибка при анализе файла настроек синхронизации:</target>
-<source>Error writing file:</source>
-<target>Ошибка при записи файла:</target>
 <source>/sec</source>
 <target>/с</target>
 <source>
@@ -222,8 +234,6 @@ The command line is executed each time:
 <target>Мониторинг включен...</target>
 <source>Waiting for missing directories...</source>
 <target>Ожидание пропущенных папок...</target>
-<source>Command line is empty!</source>
-<target>Командная строка пуста!</target>
 <source>Could not initialize directory monitoring:</source>
 <target>Не удалось инициализировать папку для мониторинга:</target>
 <source>A directory input field is empty.</source>
@@ -264,12 +274,18 @@ The command line is executed each time:
 <target>Ошибка при копировании файла:</target>
 <source>Error opening file:</source>
 <target>Ошибка при открытии файла:</target>
+<source>Error writing file:</source>
+<target>Ошибка при записи файла:</target>
 <source>Error reading file:</source>
 <target>Ошибка при чтении файла:</target>
 <source>Endless loop when traversing directory:</source>
 <target>Зацикливание при встрече пересекающихся путей:</target>
 <source>Error traversing directory:</source>
 <target>Ошибка при пересечении папок:</target>
+<source>Windows Error Code %x:</source>
+<target>Код ошибки Windows %x:</target>
+<source>Linux Error Code %x:</source>
+<target>Код ошибки Linux %x:</target>
 <source>Error setting privilege:</source>
 <target>Ошибка установки привилегий:</target>
 <source>Error moving to Recycle Bin:</source>
@@ -294,22 +310,10 @@ The command line is executed each time:
 <target>%x%</target>
 <source>Could not read values for the following XML nodes:</source>
 <target>Не удалось прочитать значения для следующих XML записей:</target>
-<source>Show popup</source>
-<target>Показывать всплывающие окна</target>
-<source>Show popup on errors or warnings</source>
-<target>Показывать всплывающие окна при ошибках и замечаниях</target>
-<source>Ignore errors</source>
-<target>Игнорировать ошибки</target>
-<source>Hide all error and warning messages</source>
-<target>Скрывать все ошибки и сообщения с предупреждениями</target>
-<source>Exit instantly</source>
-<target>Выйти немедленно</target>
-<source>Abort synchronization immediately</source>
-<target>Отменить синхронизацию немедленно</target>
 <source>Logging</source>
 <target>Лог-файлы</target>
 <source>FreeFileSync batch file</source>
-<target>Файл задания FreeFileSync</target>
+<target>Файл пакетного задания FreeFileSync</target>
 <source>FreeFileSync configuration</source>
 <target>Настройка FreeFileSync</target>
 <source>FreeFileSync Batch Job</source>
@@ -363,7 +367,7 @@ The command line is executed each time:
 <source>&Global settings...</source>
 <target>&Глобальные настройки...</target>
 <source>&Create batch job...</source>
-<target>&Создать задание...</target>
+<target>&Создать пакетное задание...</target>
 <source>&Export file list...</source>
 <target>&Экспортировать список файлов...</target>
 <source>&Advanced</source>
@@ -413,8 +417,8 @@ The command line is executed each time:
 <target>Справа</target>
 <source>Batch job</source>
 <target>Пакетное задание</target>
-<source>Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
-<target>Создайте файл задания для автоматизированной синхронизации. Чтобы запустить программу в этом режиме просто передайте название файла на выполнение FreeFileSync: FreeFileSync.exe <batchfile>. Это также может быть записано в планировщике задач Вашей операционной системы.</target>
+<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
+<target>Создайте файл пакетного задания для автоматической синхронизации. Для запуска в пакетном режиме просто дважды щелкните по файлу или выполните командную строку: FreeFileSync.exe <batchfile>. Также это может быть запланировано в планировщике задач операционной системы.</target>
 <source>Help</source>
 <target>Помощь</target>
 <source>Configuration overview:</source>
@@ -481,18 +485,18 @@ The command line is executed each time:
 <target>Категория</target>
 <source>Action</source>
 <target>Действие</target>
-<source>Files/folders that exist on left side only</source>
-<target>Файлы/папки, существующие только на левой стороне</target>
-<source>Files/folders that exist on right side only</source>
-<target>Файлы/папки, существующие только на правой стороне</target>
-<source>Files that exist on both sides, left one is newer</source>
-<target>Файлы, существующие на обоих сторонах, левый новее</target>
-<source>Files that exist on both sides, right one is newer</source>
-<target>Файлы, существующие на обоих сторонах, правый новее</target>
-<source>Files that have different content</source>
-<target>Файлы, имеющие различное содержание</target>
-<source>Conflicts/files that cannot be categorized</source>
-<target>Конфликты/файлы, которые не могут быть отнесены к какой-либо категории</target>
+<source>File/folder exists on left side only</source>
+<target>Файл/папка существует только на левой стороне</target>
+<source>File/folder exists on right side only</source>
+<target>Файл/папка существует только на правой стороне</target>
+<source>Left file is newer</source>
+<target>Файл на левой стороне новее</target>
+<source>Right file is newer</source>
+<target>Файл на правой стороне новее</target>
+<source>Files have different content</source>
+<target>Файлы имеют различное содержание</target>
+<source>Conflict/file cannot be categorized</source>
+<target>Конфликт/файл не может быть отнесен к какой-либо категории</target>
 <source>Compare by...</source>
 <target>Критерии сравнения</target>
 <source>
@@ -688,7 +692,7 @@ Transfer file and directory permissions
 <source>You may try to synchronize remaining items again (WITHOUT having to re-compare)!</source>
 <target>Вы можете попытаться синхронизировать оставшиеся пункты снова (без повторного сравнения)!</target>
 <source>Batch file created successfully!</source>
-<target>Файл задания создан успешно!</target>
+<target>Файл пакетного задания создан успешно!</target>
 <source>Main bar</source>
 <target>Главная панель</target>
 <source>Folder pairs</source>
@@ -711,10 +715,8 @@ Transfer file and directory permissions
 <target><групповое выделение></target>
 <source>D-Click</source>
 <target>Двойной клик</target>
-<source>Copy to clipboard	CTRL+C</source>
-<target>Копировать в буфер обмена	CTRL+C</target>
-<source>Delete files	DEL</source>
-<target>Удалить файл(ы)...	DEL</target>
+<source>Delete</source>
+<target>Удалить</target>
 <source>Customize...</source>
 <target>Выбрать колонки...</target>
 <source>Auto-adjust columns</source>
@@ -861,8 +863,10 @@ Transfer file and directory permissions
 <target>файлы существуют на обоих сторонах</target>
 <source>on one side only</source>
 <target>файлы существуют только на одной стороне</target>
-<source>different</source>
-<target>разные</target>
+<source>same date</source>
+<target>одинаковые даты</target>
+<source>different date</source>
+<target>разные даты</target>
 <source>Inactive</source>
 <target>---</target>
 <source>Second</source>
@@ -981,28 +985,28 @@ Transfer file and directory permissions
 <target>Создание списка файлов...</target>
 <source>Multiple...</source>
 <target>Различные варианты синхронизации</target>
-<source>Files that are equal on both sides</source>
-<target>Файлы, одинаковые с обеих сторон</target>
-<source>Equal files/folders that differ in attributes only</source>
-<target>Одинаковые файлы/папки, которые отличаются только атрибутами</target>
-<source>Copy from right to left</source>
-<target>Копировать справа налево</target>
-<source>Copy from left to right</source>
-<target>Копировать слева направо</target>
-<source>Delete files/folders existing on left side only</source>
-<target>Удалять файлы/папки, существующие только на левой стороне</target>
-<source>Delete files/folders existing on right side only</source>
-<target>Удалять файлы/папки, существующие только на правой стороне</target>
-<source>Copy from right to left overwriting</source>
-<target>Копировать справа налево с перезаписью</target>
-<source>Copy from left to right overwriting</source>
-<target>Копировать слева направо с перезаписью</target>
+<source>Both sides are equal</source>
+<target>Обе стороны равны</target>
+<source>Files/folders differ in attributes only</source>
+<target>Файлы/папки разнятся только атрибутами</target>
+<source>Copy new file/folder to left</source>
+<target>Скопировать новый файл/папку налево</target>
+<source>Copy new file/folder to right</source>
+<target>Скопировать новый файл/папку направо</target>
+<source>Delete left file/folder</source>
+<target>Удалить файл/папку слева</target>
+<source>Delete right file/folder</source>
+<target>Удалить файл/папку справа</target>
+<source>Overwrite left file/folder with right one</source>
+<target>Перезаписать файл/папку слева на аналогичную справа</target>
+<source>Overwrite right file/folder with left one</source>
+<target>Перезаписать файл/папку справа на аналогичную слева</target>
 <source>Do nothing</source>
 <target>Ничего не делать</target>
-<source>Copy attributes only from right to left</source>
-<target>Копировать только атрибуты справа налево</target>
-<source>Copy attributes only from left to right</source>
-<target>Копировать только атрибуты слева направо</target>
+<source>Copy file attributes only to left</source>
+<target>Скопировать только атрибуты файла налево</target>
+<source>Copy file attributes only to right</source>
+<target>Скопировать только атрибуты файла направо</target>
 <source>Deleting file %x</source>
 <target>Удаление файла %x</target>
 <source>Deleting Symbolic Link %x</source>
@@ -1033,6 +1037,8 @@ Transfer file and directory permissions
 <target>Обновление атрибутов %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>Исходная папка больше не существует:</target>
+<source>Generating database...</source>
+<target>Создание базы данных...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Ничего нет для синхронизации в соответствии с настройками синхронизации!</target>
 <source>Target directory name must not be empty!</source>
@@ -1057,8 +1063,6 @@ Transfer file and directory permissions
 <target>Папка, входящая в несколько пар папок, будет изменена. Пожалуйста, проверьте настройки синхронизации!</target>
 <source>Processing folder pair:</source>
 <target>Обработка пары папок:</target>
-<source>Generating database...</source>
-<target>Создание базы данных...</target>
 <source>Error copying locked file %x!</source>
 <target>Ошибка при копировании заблокированного файла %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

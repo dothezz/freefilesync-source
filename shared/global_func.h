@@ -19,7 +19,7 @@
 namespace common
 {
 //little rounding function
-inline int round(double d) { return static_cast<int>(d < 0 ? d - .5 : d + .5); }
+inline int round(double d) { return static_cast<int>(d < 0 ? d - 0.5 : d + 0.5); }
 
 //absolute value
 template <class T> inline T abs(const T& d) { return d < 0 ? -d : d; }
@@ -54,7 +54,7 @@ private:
     wxFile* logFile; //logFile.close(); <- not needed
 };
 extern DebugLog logDebugInfo;
-wxString getCodeLocation(const wxString file, const int line);
+wxString getCodeLocation(const wxString& file, int line);
 
 //small macro for writing debug information into a logfile
 #define WRITE_DEBUG_LOG(x) logDebugInfo.write(getCodeLocation(__TFILE__, __LINE__) + x);

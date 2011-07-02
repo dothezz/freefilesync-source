@@ -21,7 +21,6 @@ Usage:
 - Include everywhere before any other file: $(ProjectDir)\shared\debug_new.h
 For Minidumps:
 - Compile "debug_new.cpp"
-- Include library "Dbghelp.lib"
 - Compile in Debug build (need Symbols and less restrictive Optimization)
 */
 

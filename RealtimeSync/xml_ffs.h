@@ -14,7 +14,7 @@
 
 namespace rts
 {
-void readRealOrBatchConfig(const wxString& filename, xmlAccess::XmlRealConfig& config);  //throw (xmlAccess::XmlError);
+void readRealOrBatchConfig(const wxString& filename, xmlAccess::XmlRealConfig& config);  //throw (xmlAccess::FfsXmlError);
 
 int getProgramLanguage();
 }

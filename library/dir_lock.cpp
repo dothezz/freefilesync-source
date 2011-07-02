@@ -4,7 +4,7 @@
 #include <wx/timer.h>
 #include <wx/log.h>
 #include <wx/msgdlg.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <boost/weak_ptr.hpp>
 #include "../shared/string_conv.h"
 #include "../shared/i18n.h"
@@ -546,13 +546,13 @@ public:
     }
 
     //create or retrieve a SharedDirLock
-    boost::shared_ptr<SharedDirLock> retrieve(const Zstring& lockfilename, DirLockCallback* callback) //throw (FileError)
+    std::shared_ptr<SharedDirLock> retrieve(const Zstring& lockfilename, DirLockCallback* callback) //throw (FileError)
     {
         //optimization: check if there is an active(!) lock for "lockfilename"
         FileToUuidMap::const_iterator iterUuid = fileToUuid.find(lockfilename);
         if (iterUuid != fileToUuid.end())
         {
-            const boost::shared_ptr<SharedDirLock>& activeLock = findActive(iterUuid->second); //returns null-lock if not found
+            const std::shared_ptr<SharedDirLock>& activeLock = findActive(iterUuid->second); //returns null-lock if not found
             if (activeLock)
                 return activeLock; //SharedDirLock is still active -> enlarge circle of shared ownership
         }
@@ -561,7 +561,7 @@ public:
         {
             const std::string lockId = retrieveLockId(lockfilename); //throw (FileError, ErrorNotExisting)
 
-            const boost::shared_ptr<SharedDirLock>& activeLock = findActive(lockId); //returns null-lock if not found
+            const std::shared_ptr<SharedDirLock>& activeLock = findActive(lockId); //returns null-lock if not found
             if (activeLock)
             {
                 fileToUuid[lockfilename] = lockId; //perf-optimization: update relation
@@ -571,7 +571,7 @@ public:
         catch (const ErrorNotExisting&) {} //let other FileError(s) propagate!
 
         //not yet in buffer, so create a new directory lock
-        boost::shared_ptr<SharedDirLock> newLock(new SharedDirLock(lockfilename, callback)); //throw (FileError)
+        std::shared_ptr<SharedDirLock> newLock(new SharedDirLock(lockfilename, callback)); //throw (FileError)
         const std::string newLockId = retrieveLockId(lockfilename); //throw (FileError, ErrorNotExisting)
 
         //update registry
@@ -584,15 +584,15 @@ public:
 private:
     LockAdmin() {}
 
-    boost::shared_ptr<SharedDirLock> findActive(const std::string& lockId) //returns null-lock if not found
+    std::shared_ptr<SharedDirLock> findActive(const std::string& lockId) //returns null-lock if not found
     {
         UuidToLockMap::const_iterator iterLock = uuidToLock.find(lockId);
         return iterLock != uuidToLock.end() ?
                iterLock->second.lock() : //try to get shared_ptr; throw()
-               boost::shared_ptr<SharedDirLock>();
+               std::shared_ptr<SharedDirLock>();
     }
 
-    typedef boost::weak_ptr<SharedDirLock> SharedLock;
+    typedef std::weak_ptr<SharedDirLock> SharedLock;
 
     typedef std::string UniqueId;
     typedef std::map<Zstring, UniqueId, LessFilename> FileToUuidMap; //n:1 handle uppper/lower case correctly

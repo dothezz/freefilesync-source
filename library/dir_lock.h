@@ -3,7 +3,7 @@
 
 #include "../shared/zstring.h"
 #include "../shared/file_error.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 
 struct DirLockCallback //while waiting for the lock
@@ -30,7 +30,7 @@ public:
 private:
     class LockAdmin;
     class SharedDirLock;
-    boost::shared_ptr<SharedDirLock> sharedLock;
+    std::shared_ptr<SharedDirLock> sharedLock;
 };
 
 #endif // DIR_LOCK_H_INCLUDED

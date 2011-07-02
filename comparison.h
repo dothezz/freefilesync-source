@@ -62,7 +62,7 @@ private:
 
     //buffer accesses to the same directories; useful when multiple folder pairs are used
     class DirectoryBuffer;
-    boost::shared_ptr<DirectoryBuffer> directoryBuffer; //std::auto_ptr does not work with forward declarations (Or we need a non-inline ~CompareProcess())!
+    std::shared_ptr<DirectoryBuffer> directoryBuffer; //std::auto_ptr does not work with forward declarations (Or we need a non-inline ~CompareProcess())!
 
     const size_t fileTimeTolerance; //max allowed file time deviation
 

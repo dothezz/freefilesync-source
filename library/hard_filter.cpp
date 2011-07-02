@@ -129,7 +129,6 @@ const T* cStringFind(const T* str1, T ch) //strchr()
     return str1;
 }
 
-
 bool matchesMask(const Zchar* str, const Zchar* mask)
 {
     for (Zchar ch; (ch = *mask) != 0; ++mask, ++str)
@@ -204,7 +203,7 @@ public:
 
     bool operator()(const Zstring& mask) const
     {
-        return matchesMask(name_, mask);
+        return matchesMask(name_.c_str(), mask.c_str());
     }
 private:
     const Zstring& name_;
@@ -221,8 +220,13 @@ bool matchesFilter(const Zstring& nameFormatted, const std::set<Zstring>& filter
 inline
 bool matchesFilterBegin(const Zstring& nameFormatted, const std::set<Zstring>& filter)
 {
-    return std::find_if(filter.begin(), filter.end(),
-                        boost::bind(matchesMaskBegin, nameFormatted.c_str(), _1)) != filter.end();
+    for (std::set<Zstring>::const_iterator i = filter.begin(); i != filter.end(); ++i)
+        if (matchesMaskBegin(nameFormatted.c_str(), i->c_str()))
+            return true;
+    return false;
+
+    //    return std::find_if(filter.begin(), filter.end(),
+    //                      boost::bind(matchesMaskBegin, nameFormatted.c_str(), _1)) != filter.end();
 }
 
 

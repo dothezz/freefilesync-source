@@ -182,7 +182,7 @@ BatchStatusHandler::BatchStatusHandler(bool runSilent,
     handleError_(handleError),
     currentProcess(StatusHandler::PROCESS_NONE),
     returnValue(returnVal),
-    syncStatusFrame(*this, NULL, runSilent, jobName)
+    syncStatusFrame(*this, NULL, SyncStatus::SCANNING, runSilent, jobName)
 {
     if (logfileDirectory && logFileMaxCount > 0)
     {
@@ -195,7 +195,7 @@ BatchStatusHandler::BatchStatusHandler(bool runSilent,
         {
             wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
             returnValue = -7;
-            throw zen::AbortThisProcess();
+            throw BatchAbortProcess();
         }
     }
 
@@ -415,5 +415,5 @@ void BatchStatusHandler::forceUiRefresh()
 void BatchStatusHandler::abortThisProcess()
 {
     requestAbortion();
-    throw zen::AbortThisProcess();  //abort can be triggered by syncStatusFrame
+    throw BatchAbortProcess();  //abort can be triggered by syncStatusFrame
 }

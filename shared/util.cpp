@@ -12,7 +12,6 @@
 #include "i18n.h"
 #include "file_handling.h"
 #include "string_conv.h"
-#include <stdexcept>
 #include "last_error.h"
 #include "check_exist.h"
 #include "assert_static.h"
@@ -150,41 +149,22 @@ wxString zen::utcTimeToLocalString(zen::Int64 utcTime)
     lastWriteTimeUtc.dwLowDateTime  = fileTimeLong.getLo();
     lastWriteTimeUtc.dwHighDateTime = fileTimeLong.getHi();
 
-    //dates less than a few (let's say 13) hours after 1.1.1601 cause conversion errors in ::SystemTimeToTzSpecificLocalTime() if timezone is subtracted!
-    if (lastWriteTimeUtc.dwHighDateTime < 110)
-        return _("Error");
-
     SYSTEMTIME systemTimeLocal = {};
 
     static const bool useNewLocalTimeCalculation = isVistaOrLater();
     if (useNewLocalTimeCalculation) //use DST setting from source date (like in Windows 7, see http://msdn.microsoft.com/en-us/library/ms724277(VS.85).aspx)
     {
-        if (lastWriteTimeUtc.dwHighDateTime >= 0x80000000)
-            return _("Error");
-
         SYSTEMTIME systemTimeUtc = {};
         if (!::FileTimeToSystemTime(
                 &lastWriteTimeUtc, //__in   const FILETIME *lpFileTime,
                 &systemTimeUtc))   //__out  LPSYSTEMTIME lpSystemTime
-            throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" FILETIME -> SYSTEMTIME: ") +
-                                                  wxT("(") + wxT("UTC [s]: ") + toString<wxString>(utcTime) + wxT(" ") +
-                                                  wxT("UTC FILETIME: ")  + toString<wxString>(fileTimeLong) + wxT(") ") +
-                                                  wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
+            return _("Error");
 
         if (!::SystemTimeToTzSpecificLocalTime(
                 NULL,              //__in_opt  LPTIME_ZONE_INFORMATION lpTimeZone,
                 &systemTimeUtc,    //__in      LPSYSTEMTIME lpUniversalTime,
                 &systemTimeLocal)) //__out     LPSYSTEMTIME lpLocalTime
-            throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" SYSTEMTIME -> local SYSTEMTIME: ") +
-                                                  wxT("(") + wxT("UTC [s]: ") + toString<wxString>(utcTime) + wxT("\n") +
-                                                  wxT("UTC System time: ") +
-                                                  toString<wxString>(systemTimeUtc.wYear)   + wxT(" ") +
-                                                  toString<wxString>(systemTimeUtc.wMonth)  + wxT(" ") +
-                                                  toString<wxString>(systemTimeUtc.wDay)    + wxT(" ") +
-                                                  toString<wxString>(systemTimeUtc.wHour)   + wxT(" ") +
-                                                  toString<wxString>(systemTimeUtc.wMinute) + wxT(" ") +
-                                                  toString<wxString>(systemTimeUtc.wSecond) + wxT(")") +
-                                                  wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
+            return _("Error");
     }
     else //use DST setting (like in Windows 2000 and XP)
     {
@@ -192,24 +172,11 @@ wxString zen::utcTimeToLocalString(zen::Int64 utcTime)
         if (!::FileTimeToLocalFileTime( //convert to local time
                 &lastWriteTimeUtc,  //pointer to UTC file time to convert
                 &fileTimeLocal))    //pointer to converted file time
-            throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" FILETIME -> local FILETIME: ") +
-                                                  wxT("(") + wxT("UTC [s]: ") + toString<wxString>(utcTime) + wxT(" ") +
-                                                  wxT("UTC FILETIME: ")  + toString<wxString>(fileTimeLong) + wxT(") ") +
-                                                  wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
-
-        if (fileTimeLocal.dwHighDateTime >= 0x80000000)
-            return _("Error");  //this actually CAN happen if UTC time is just below this border and ::FileTimeToLocalFileTime() adds 2 hours due to DST or whatever!
-        //Testcase (UTC): dateHigh = 2147483647 (=0x7fffffff) -> year 30000
-        //                dateLow  = 4294967295
+            return _("Error");
 
         if (!::FileTimeToSystemTime(&fileTimeLocal,  //pointer to file time to convert
                                     &systemTimeLocal)) //pointer to structure to receive system time
-            throw std::runtime_error(std::string((wxString(_("Conversion error:")) + wxT(" local FILETIME -> local SYSTEMTIME: ") +
-                                                  wxT("(") + wxT("UTC [s]: ") + toString<wxString>(utcTime) + wxT(" ") +
-                                                  wxT("local FILETIME: ")  +
-                                                  wxT("High: ") + toString<wxString>(fileTimeLocal.dwHighDateTime) +
-                                                  wxT("Low: ") + toString<wxString>(fileTimeLocal.dwLowDateTime) + wxT(") ") +
-                                                  wxT("\n\n") + getLastErrorFormatted()).ToAscii()));
+            return _("Error");
     }
 
     const wxDateTime localTime(systemTimeLocal.wDay,

@@ -8,7 +8,7 @@
 #define PARSE_PLURAL_H_INCLUDED
 
 #include <list>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "zbase.h"
 
 
@@ -130,7 +130,7 @@ public:
     int getForm(int n) const { n_ = n ; return expr->eval(); }
 
 private:
-    typedef std::list<boost::shared_ptr<Expression> > DumpList;
+    typedef std::list<std::shared_ptr<Expression> > DumpList;
 
     struct Token
     {
@@ -391,7 +391,7 @@ private:
         template <class T>
         const T& manageObj(const T& obj)
         {
-            boost::shared_ptr<Expression> newEntry(new T(obj));
+            std::shared_ptr<Expression> newEntry(new T(obj));
             dump_.push_back(newEntry);
             return static_cast<T&>(*dump_.back());
         }

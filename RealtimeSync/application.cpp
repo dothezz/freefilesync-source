@@ -42,7 +42,7 @@ void Application::OnStartApplication(wxIdleEvent& event)
     SetAppName(wxT("FreeFileSync")); //use a different app name, to have "GetUserDataDir()" return the same directory as for FreeFileSync
 
 #ifdef FFS_LINUX
-    ::gtk_rc_parse(zen::wxToZ(zen::getResourceDir()) + "styles.rc"); //remove inner border from bitmap buttons
+    ::gtk_rc_parse((zen::wxToZ(zen::getResourceDir()) + "styles.rc").c_str()); //remove inner border from bitmap buttons
 #endif
 
     //set program language

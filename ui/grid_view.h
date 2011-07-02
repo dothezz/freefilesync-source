@@ -145,28 +145,28 @@ private:
 
     //sorting classes
     template <bool ascending>
-    class SortByDirectory;
+    class LessDirectoryPair;
 
     template <bool ascending, SelectedSide side>
-    class SortByRelName;
+    class LessRelativeName;
 
     template <bool ascending, SelectedSide side>
-    class SortByFileName;
+    class LessShortFileName;
 
     template <bool ascending, SelectedSide side>
-    class SortByFileSize;
+    class LessFilesize;
 
     template <bool ascending, SelectedSide side>
-    class SortByDate;
+    class LessFiletime;
 
     template <bool ascending, SelectedSide side>
-    class SortByExtension;
+    class LessExtension;
 
     template <bool ascending>
-    class SortByCmpResult;
+    class LessCmpResult;
 
     template <bool ascending>
-    class SortBySyncDirection;
+    class LessSyncDirection;
 };
 
 

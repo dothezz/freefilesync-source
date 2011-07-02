@@ -9,7 +9,7 @@
 
 #include "../shared/zstring.h"
 #include <set>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <wx/stream.h>
 
 namespace zen
@@ -42,7 +42,7 @@ public:
 
     virtual bool isNull() const = 0; //filter is equivalent to NullFilter, but may be technically slower
 
-    typedef boost::shared_ptr<const HardFilter> FilterRef; //always bound by design!
+    typedef std::shared_ptr<const HardFilter> FilterRef; //always bound by design!
 
     //serialization
     void saveFilter(wxOutputStream& stream) const; //serialize derived object

@@ -17,8 +17,22 @@
 <target>RealtimeSync - Automaattinen täsmäytys</target>
 <source>Browse</source>
 <target>Selaa</target>
+<source>Invalid commandline: "%x"</source>
+<target>Virheellinen komento: "%x"</target>
 <source>Error resolving symbolic link:</source>
 <target>Virhe selvittäessä symbolista linkkiä:</target>
+<source>Show popup</source>
+<target>Näytä Popup</target>
+<source>Show popup on errors or warnings</source>
+<target>Näytä virheet ja varoitukset Popupissa</target>
+<source>Ignore errors</source>
+<target>Älä huomioi virheitä</target>
+<source>Hide all error and warning messages</source>
+<target>Piilota kaikki virhe- ja varoitusviestit</target>
+<source>Exit instantly</source>
+<target>Poistu välittömästi</target>
+<source>Abort synchronization immediately</source>
+<target>Lopeta täsmäytys välittömästi</target>
 <source>Select alternate synchronization settings</source>
 <target>Valitse toiset asetukset täsmäytykselles</target>
 <source>No filter selected</source>
@@ -70,7 +84,7 @@
 <pluralform>%x tavua</pluralform>
 </target>
 <source><Symlink></source>
-<target><Symlinkki></target>
+<target><Pikakuvake></target>
 <source><Directory></source>
 <target><Hakemisto></target>
 <source>Size</source>
@@ -121,14 +135,12 @@
 <target>Info</target>
 <source>Fatal Error</source>
 <target>Kohtalokas virhe</target>
+<source>Invalid FreeFileSync config file!</source>
+<target>Virheellinen FreeFileSync asetustiedosto!</target>
 <source>File does not exist:</source>
 <target>Tiedosto puuttuu:</target>
 <source>Error parsing configuration file:</source>
 <target>Virhe jäsentäessä asetustiedostoa:</target>
-<source>Error writing file:</source>
-<target>Virhe kirjottaessa tiedostoa:</target>
-<source>Invalid FreeFileSync config file!</source>
-<target>Virheellinen FreeFileSync asetustiedosto!</target>
 <source>/sec</source>
 <target>/s</target>
 <source>
@@ -217,8 +229,6 @@ Komento suoritetaan kun:
 <target>Seuranta käynnissä...</target>
 <source>Waiting for missing directories...</source>
 <target>Odottaa puuttuvia hakemistoja...</target>
-<source>Command line is empty!</source>
-<target>Tyhjä komentokehoite!</target>
 <source>Could not initialize directory monitoring:</source>
 <target>Hakemiston tarkkailua ei voitu käynnistää:</target>
 <source>A directory input field is empty.</source>
@@ -259,12 +269,18 @@ Komento suoritetaan kun:
 <target>Virhe kopioitaessa tiedostoa:</target>
 <source>Error opening file:</source>
 <target>Virhe avatessa tiedostoa:</target>
+<source>Error writing file:</source>
+<target>Virhe kirjottaessa tiedostoa:</target>
 <source>Error reading file:</source>
 <target>Virhe lukiessa tiedostoa:</target>
 <source>Endless loop when traversing directory:</source>
 <target>Suorita hakemiston läpikulku jatkuvana:</target>
 <source>Error traversing directory:</source>
 <target>Virhe hakemistoa läpikäydessä:</target>
+<source>Windows Error Code %x:</source>
+<target>Windows virhekoodi %x:</target>
+<source>Linux Error Code %x:</source>
+<target>Linux virhekoodi %x:</target>
 <source>Error setting privilege:</source>
 <target>Virte oikeuksia asettaessa:</target>
 <source>Error moving to Recycle Bin:</source>
@@ -289,18 +305,6 @@ Komento suoritetaan kun:
 <target>%x%</target>
 <source>Could not read values for the following XML nodes:</source>
 <target>Tietoja lukeminen epäonnistui, XML jäsen:</target>
-<source>Show popup</source>
-<target>Näytä Popup</target>
-<source>Show popup on errors or warnings</source>
-<target>Näytä virheet ja varoitukset Popupissa</target>
-<source>Ignore errors</source>
-<target>Älä huomioi virheitä</target>
-<source>Hide all error and warning messages</source>
-<target>Piilota kaikki virhe- ja varoitusviestit</target>
-<source>Exit instantly</source>
-<target>Poistu välittömästi</target>
-<source>Abort synchronization immediately</source>
-<target>Lopeta täsmäytys välittömästi</target>
 <source>Logging</source>
 <target>Kirjaa</target>
 <source>FreeFileSync batch file</source>
@@ -405,8 +409,8 @@ Komento suoritetaan kun:
 <target>Oikea</target>
 <source>Batch job</source>
 <target>Eräajo</target>
-<source>Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
-<target>Luo komentotiedosto täsmäytyksen automaattiseen eräajoon. Käynnistä eräajo liittämällä FreeFileSync ohjelmalle komentotiedosto: FreeFileSync.exe <eräajotiedosto>. Tehtävän suoritusta voit ajoittaa käyttöjärjestelmän toimilla.</target>
+<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
+<target>Luo automaattisen täsmäytyksen eräajotiedosto. Käynnistä se kaksois klikillä tai komennolla: FreeFileSync.exe <eräajotiedosto>. Käyttöjärjestelmän tehtävien ajoitustoiminnolla voit ajastaa suorittaminen.</target>
 <source>Help</source>
 <target>Ohje</target>
 <source>Configuration overview:</source>
@@ -473,18 +477,18 @@ Komento suoritetaan kun:
 <target>Luokka</target>
 <source>Action</source>
 <target>Suorita</target>
-<source>Files/folders that exist on left side only</source>
-<target>Tiedostoja/hakemistoja vain vasemmalla</target>
-<source>Files/folders that exist on right side only</source>
-<target>Tiedostoja/hakemistoja vain oikealla</target>
-<source>Files that exist on both sides, left one is newer</source>
-<target>Tiedosto löytyy molemmilla puolilla, vasen on uudempi</target>
-<source>Files that exist on both sides, right one is newer</source>
-<target>Tiedosto löytyy molemmilla puolilla, oikea on uudempi</target>
-<source>Files that have different content</source>
-<target>Tiedostoja joissa eri sisältö</target>
-<source>Conflicts/files that cannot be categorized</source>
-<target>Ristiriita/tiedostoja joita ei voida luokitella</target>
+<source>File/folder exists on left side only</source>
+<target>Tiedosto/hakemisto löytyy vain vasemmalta</target>
+<source>File/folder exists on right side only</source>
+<target>Tiedosto/hakemisto löytyy vain vasemmalta</target>
+<source>Left file is newer</source>
+<target>Tiedosto vasemmalla on uudempi</target>
+<source>Right file is newer</source>
+<target>Tiedosto oikealla on uudempi</target>
+<source>Files have different content</source>
+<target>Tiedostojen sisältö on eri</target>
+<source>Conflict/file cannot be categorized</source>
+<target>Poikeaman/tiedoston luokittelu ei onnistu</target>
 <source>Compare by...</source>
 <target>Vertaile...</target>
 <source>
@@ -514,7 +518,7 @@ on sama
 <source>File content</source>
 <target>Tiedoston sisältö</target>
 <source>Symbolic Link handling</source>
-<target>Symlinkkien hallinta</target>
+<target>Pikakuvakkeiden hallinta</target>
 <source>Synchronizing...</source>
 <target>Täsmäytetään...</target>
 <source>Elements processed:</source>
@@ -539,8 +543,8 @@ on sama
 <target>- olemassa vain vasemmalla</target>
 <source>- exists right only</source>
 <target>- olemassa vain oikealla</target>
-<source>- conflict</source>
-<target>- eroavuus</target>
+<source>- conflict (same date, different size)</source>
+<target>- eroavuus (sama päivämäärä, eri koko)</target>
 <source>Compare by "File content"</source>
 <target>Vertaa: "tietosisältöä"</target>
 <source>
@@ -662,11 +666,11 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 (Vaatii Järjestelmävalvojan oikeuksia)
 </target>
 <source>Hidden dialogs:</source>
-<target>Piilodialogit:</target>
+<target>Piiloitetut ikkunat:</target>
 <source>Reset</source>
 <target>Palauta</target>
 <source>Show hidden dialogs</source>
-<target>Näytä piilodialogit</target>
+<target>Näytä piiloitetut ikkunat</target>
 <source>External applications</source>
 <target>Ulkopuolinen sovellus</target>
 <source>Description</source>
@@ -684,7 +688,7 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <source>You may try to synchronize remaining items again (WITHOUT having to re-compare)!</source>
 <target>Yritä täsmäytystä lopuille uudestaan (ILMAN uutta vertailua)!</target>
 <source>Batch file created successfully!</source>
-<target>Eräajotiedosto luotu onnistuneesti!</target>
+<target>Eräajotiedoston luonti onnistui!</target>
 <source>Main bar</source>
 <target>Päävalikko</target>
 <source>Folder pairs</source>
@@ -698,7 +702,7 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <source>Set direction:</source>
 <target>Aseta suunta:</target>
 <source>Exclude temporarily</source>
-<target>Sulje pois tilapäisesti</target>
+<target>Sulje pois, tilapäisesti</target>
 <source>Include temporarily</source>
 <target>Sisällytä tilapäisesti</target>
 <source>Exclude via filter:</source>
@@ -706,11 +710,9 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <source><multiple selection></source>
 <target><monivalinta></target>
 <source>D-Click</source>
-<target>Klikkaa D</target>
-<source>Copy to clipboard	CTRL+C</source>
-<target>Kopioi Leikepöydälle	CTRL+C</target>
-<source>Delete files	DEL</source>
-<target>Poista tiedostoja	DEL</target>
+<target>2*Klikkaa</target>
+<source>Delete</source>
+<target>Poista</target>
 <source>Customize...</source>
 <target>Sovita...</target>
 <source>Auto-adjust columns</source>
@@ -718,7 +720,7 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <source>Include all rows</source>
 <target>Sisällytä kaikki rivit</target>
 <source>Exclude all rows</source>
-<target>Sulje pois kaikki rivit</target>
+<target>Sulje pois, kaikki rivit</target>
 <source>Reset view</source>
 <target>Palauta näkymä</target>
 <source>Show "%x"</source>
@@ -732,19 +734,19 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <source>Configuration loaded!</source>
 <target>Asetukset ladattu!</target>
 <source>Hide files that exist on left side only</source>
-<target>Piilota tiedostot jotka ovat vain vasemmalla</target>
+<target>Piilota vain vasemmalla olevat tiedostot</target>
 <source>Show files that exist on left side only</source>
 <target>Näytä vain vasemmalla esiintyvät tiedostot</target>
 <source>Hide files that exist on right side only</source>
-<target>Piilota tiedostot jotka ovat voin oikealla</target>
+<target>Piilota vain oikealla olevat tiedostot</target>
 <source>Show files that exist on right side only</source>
 <target>Näytä vain oikealla esiintyvät tiedostot</target>
 <source>Hide files that are newer on left</source>
-<target>Piilota tiedostot jotka ovat uudempia vasemmalla</target>
+<target>Piilota vasemalla olevat uudemmat tiedostot</target>
 <source>Show files that are newer on left</source>
-<target>Näytä uudemmat tiedostot vasemmalla</target>
+<target>Näytä vasemmalla olevat uudemmat tiedostot</target>
 <source>Hide files that are newer on right</source>
-<target>Piilota tiedostot jotka ovat uudempia oikealla</target>
+<target>Piilota oikealla olevat uudemmat tiedostot</target>
 <source>Show files that are newer on right</source>
 <target>Näytä uudemmat tiedostot oikealla</target>
 <source>Hide files that are equal</source>
@@ -760,31 +762,31 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <source>Show conflicts</source>
 <target>Näytä ristiriidat</target>
 <source>Hide files that will be created on the left side</source>
-<target>Piilota tiedostot jotka ovat luotu vasemmalla</target>
+<target>Piilota tiedostot jotka luodaan vasemmalle</target>
 <source>Show files that will be created on the left side</source>
 <target>Näytä vasemmalle luotavat tiedostot</target>
 <source>Hide files that will be created on the right side</source>
-<target>Piilota tiedostot jotka ovat luotu oikealla</target>
+<target>Piilota tiedostot jotka luodaan oikealla</target>
 <source>Show files that will be created on the right side</source>
 <target>Näytä oikealle luotavat tiedostot</target>
 <source>Hide files that will be deleted on the left side</source>
-<target>Piilota tiedostot jotka ovat poistettu vasemmalla</target>
+<target>Piilota tiedostot jotka poistetaan vasemmalta</target>
 <source>Show files that will be deleted on the left side</source>
-<target>Näytä vasemmalla poistettavat tiedostot</target>
+<target>Näytä vasemmallta poistettavat tiedostot</target>
 <source>Hide files that will be deleted on the right side</source>
-<target>Piilota tiedostot jotka ovat poistettu oikealla</target>
+<target>Piilota tiedostot jotka poistetaan oikealta</target>
 <source>Show files that will be deleted on the right side</source>
-<target>Näytä oikealla poistettavat tiedostot</target>
+<target>Näytä oikealta poistettavat tiedostot</target>
 <source>Hide files that will be overwritten on left side</source>
-<target>Piilota tiedostot jotka on ylikirjoitettu vasemmalla</target>
+<target>Piilota tiedostot jotka ylikirjoitetaan vasemmalla</target>
 <source>Show files that will be overwritten on left side</source>
 <target>Näytä vasemmalla ylikirjoitettavat tiedostot</target>
 <source>Hide files that will be overwritten on right side</source>
-<target>Piilota tiedostot jotka on ylikirjoitettu oikealla</target>
+<target>Piilota tiedostot jotka ylikirjoitetaan oikealla</target>
 <source>Show files that will be overwritten on right side</source>
 <target>Näytä oikealla ylikirjoitettavat tiedostot</target>
 <source>Hide files that won't be copied</source>
-<target>Piilota tiedostot jotka eivät kopioidu</target>
+<target>Piilota tiedostot jotka eivät kopioida</target>
 <source>Show files that won't be copied</source>
 <target>Näytä kopioimatta jäävät tiedostot</target>
 <source>All directories in sync!</source>
@@ -802,6 +804,8 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <pluralform>%x objects deleted successfully!</pluralform>
 </source>
 <target>
+<pluralform>Kohde poistettu onnistuneesti!</pluralform>
+<pluralform>%x kohdetta poistettu onnistuneesti!</pluralform>
 </target>
 <source>
 <pluralform>1 directory</pluralform>
@@ -838,7 +842,7 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <source>Completed</source>
 <target>Valmis</target>
 <source>Abort requested: Waiting for current operation to finish...</source>
-<target>Ohjelma on lopetettava: Odotetaan toiminnon loppumista...</target>
+<target>Keskeytys pyydetty: Odotetaan toiminnon loppumista...</target>
 <source>Continue</source>
 <target>Jatka</target>
 <source>Pause</source>
@@ -851,14 +855,10 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <target>tiedosto löytyy molemmilla puolilla</target>
 <source>on one side only</source>
 <target>vain yhdellä puolella</target>
-<source>- left</source>
-<target>- vasen</target>
-<source>- right</source>
-<target>- oikea</target>
-<source>different</source>
-<target>erilaiset</target>
-<source>- conflict (same date, different size)</source>
-<target>- eroavuus (sama päivämäärä, eri koko)</target>
+<source>same date</source>
+<target>sama päiväys</target>
+<source>different date</source>
+<target>eri päiväys</target>
 <source>Inactive</source>
 <target>Lepotilassa</target>
 <source>Second</source>
@@ -876,7 +876,7 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <source>MB</source>
 <target>MB</target>
 <source>Filter: All pairs</source>
-<target>Suodata: kaikki parit</target>
+<target>Suodata: Kaikki parit</target>
 <source>Filter: Single pair</source>
 <target>Suodata: Yksi pari</target>
 <source>Ignore</source>
@@ -896,7 +896,7 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <source>- Other side's counterpart to %dir</source>
 <target>- Toisen puolen vastaavuus on %dir</target>
 <source>Restore all hidden dialogs?</source>
-<target>Palauttetaanko kaikki piilodialoogit?</target>
+<target>Palauta piiloitetut ikkunat?</target>
 <source>
 <pluralform>Do you really want to move the following object to the Recycle Bin?</pluralform>
 <pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
@@ -926,7 +926,7 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <source>Move files into a time-stamped subdirectory</source>
 <target>Siirrä tiedostot aikaleimattuun hakemistoon</target>
 <source>Cannot determine sync-direction:</source>
-<target>Täsmäytys suuntä tuntematon:</target>
+<target>Tuntematon täsmäytys suunta:</target>
 <source>Filter settings have changed!</source>
 <target>Suodinasetukset muutettu!</target>
 <source>Both sides have changed since last synchronization!</source>
@@ -938,7 +938,7 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <source>Planned directory deletion is in conflict with its subdirectories and -files!</source>
 <target>Suunniteltu hakemiston poistaminen on ristiriidassa alihakemiston ja tiedostojen kanssa!</target>
 <source>Setting default synchronization directions: Old files will be overwritten with newer files.</source>
-<target>Aseta oletu suunta täsmäytykselle: Vanhat tiedostot ylikirjoitetaan uudemilla tiedostoilla.</target>
+<target>Aseta oletettu suunta täsmäytykselle: Vanhat tiedostot ylikirjoitetaan uudemilla tiedostoilla.</target>
 <source>The file does not contain a valid configuration:</source>
 <target>Asetustiedosto ei ole kelvollinen:</target>
 <source>Scanning:</source>
@@ -946,7 +946,7 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <source>Encoding extended time information: %x</source>
 <target>Tulkitaan laajennettua aikatietoa: %x</target>
 <source>You can ignore this error to consider the directory as empty.</source>
-<target>Voit jättää tämä virhe huomiotta ja tulkita hakemisto tyhjäksi.</target>
+<target>Jätää virhe huomiotta ja tulkitse hakemisto tyhjäksi.</target>
 <source>Directory does not exist:</source>
 <target>Puuttuva hakemisto:</target>
 <source>Directories are dependent! Be careful when setting up synchronization rules:</source>
@@ -960,81 +960,83 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <source>Conflict detected:</source>
 <target>Ristiriita todettu:</target>
 <source>Files %x have the same date but a different size!</source>
-<target>Tiedostot %x samalta päivältä mutta koko poikkeaa!</target>
+<target>Tiedostoilla %x on sama päiväys mutta eri koko!</target>
 <source>Symlinks %x have the same date but a different target!</source>
-<target>Symlinkki %x samalta päivältä mutta kohde on toinen!</target>
+<target>Pikakuvakkeilla %x on sama päiväys mutta kohde on toinen!</target>
 <source>Comparing files by content failed.</source>
 <target>Tietosisällön vertailu epäonnistui.</target>
 <source>Generating file list...</source>
 <target>Luodaan tiedostolista...</target>
 <source>Multiple...</source>
 <target>Moninkertainen...</target>
-<source>Files that are equal on both sides</source>
-<target>Tiedosto sama molemmilla puolilla</target>
-<source>Equal files/folders that differ in attributes only</source>
-<target>Tiedostot/hakemistot ovat samat, ominaisuudet poikkeavat</target>
-<source>Copy from right to left</source>
-<target>Kopioidaan oikea -> vasen</target>
-<source>Copy from left to right</source>
-<target>Kopioidaan vasen -> oikea</target>
-<source>Delete files/folders existing on left side only</source>
-<target>Poista vain tiedostoja/hakemistoja vasemmalta</target>
-<source>Delete files/folders existing on right side only</source>
-<target>Poista vain tiedostoja/hakemistoja oikealta</target>
-<source>Copy from right to left overwriting</source>
-<target>Kopioidaan oikea -> vasen ylikirjoittaen</target>
-<source>Copy from left to right overwriting</source>
-<target>Kopioidaan vasen -> oikea ylikirjoittaen</target>
+<source>Both sides are equal</source>
+<target>Puolet ovat denttiset</target>
+<source>Files/folders differ in attributes only</source>
+<target>Tiedostot/hakemistot eroavat vain ominaisuuksissa</target>
+<source>Copy new file/folder to left</source>
+<target>Kopioi uusi tiedosto/hakemisto vasemmalle</target>
+<source>Copy new file/folder to right</source>
+<target>Kopioi uusi tiedosto/hakemisto oikealle</target>
+<source>Delete left file/folder</source>
+<target>Poista tiedosto/hakemisto vasemmalta</target>
+<source>Delete right file/folder</source>
+<target>Poista tiedosto/hakemisto oikealta</target>
+<source>Overwrite left file/folder with right one</source>
+<target>Ylikirjoita oikea tiedosto/hakemista vasemanpuolisella</target>
+<source>Overwrite right file/folder with left one</source>
+<target>Ylikirjoita vasen tiedosto/hakemista oikeannpuolisella</target>
 <source>Do nothing</source>
 <target>Älä tee mitään</target>
-<source>Copy attributes only from right to left</source>
-<target>Monista vain ominaisuudet oikea -> vasen</target>
-<source>Copy attributes only from left to right</source>
-<target>Monista vain ominaisuudet vasen -> oikea</target>
+<source>Copy file attributes only to left</source>
+<target>Monista tiedosto-ominaisuudet vasemmalle</target>
+<source>Copy file attributes only to right</source>
+<target>Monista tiedosto-ominaisuudet oikealle</target>
 <source>Deleting file %x</source>
 <target>Poista tiedosto %x</target>
 <source>Deleting Symbolic Link %x</source>
-<target>Poista Symlinkki %x</target>
+<target>Poista pikakuvake %x</target>
 <source>Deleting folder %x</source>
 <target>Poista hakemisto %x</target>
 <source>Moving %x to Recycle Bin</source>
 <target>Siirrä %x Roskakoriin</target>
 <source>Moving file %x to user-defined directory %y</source>
-<target>Siirretään tiedostoa %x valittuun hakemistoon %y</target>
+<target>Siirretään tiedostoa %x haluttuun hakemistoon %y</target>
 <source>Moving folder %x to user-defined directory %y</source>
-<target>Siirrä hakemisto %x valittuun hakemistoon %y</target>
+<target>Siirrä hakemisto %x haluttuun hakemistoon %y</target>
 <source>Moving Symbolic Link %x to user-defined directory %y</source>
-<target>Siirrä Symlinkki %x valittuun hakemistoon %y</target>
+<target>Siirrä pikakuvake %x haluttuun hakemistoon %y</target>
 <source>Copying new file %x to %y</source>
 <target>Kopioi uusi tiedosto %x -> %y</target>
 <source>Copying new Symbolic Link %x to %y</source>
-<target>Kopioi uusi Symlinkki %x -> %y</target>
+<target>Kopioi uusi pikakuvake %x -> %y</target>
 <source>Overwriting file %x in %y</source>
 <target>Ylikirjoita tiedosto %x kohdassa %y</target>
 <source>Overwriting Symbolic Link %x in %y</source>
-<target>Ylikirjoita Symlinkki %x kohdassa %y</target>
+<target>Ylikirjoita pikakuvake %x kohdassa %y</target>
 <source>Creating folder %x</source>
 <target>Luo hakemisto %x</target>
 <source>Verifying file %x</source>
-<target>Tarkistan tiedosto %x</target>
+<target>Tarkistan tiedostoa %x</target>
 <source>Updating attributes of %x</source>
-<target>Päivita %x:n ominaisuudet</target>
+<target>Päivitän %x:n ominaisuudet</target>
 <source>Source directory does not exist anymore:</source>
 <target>Lähdehakemisto puuttuu:</target>
+<source>Generating database...</source>
+<target>Luodaan tietokantaa...</target>
 <source>Nothing to synchronize according to configuration!</source>
-<target>Asetusten mukaan ei löydy täsmäytettävää !</target>
+<target>Asetusten mukaan ei löydy täsmäytettävää!</target>
 <source>Target directory name must not be empty!</source>
 <target>Kohdehakemisto ei saa olla tyhjä!</target>
 <source>User-defined directory for deletion was not specified!</source>
-<target>Hakemistoa ei valittu poistolle!</target>
+<target>Poistolle ei ole valittu hakemistoa!</target>
 <source>Unresolved conflicts existing!</source>
-<target>Ratkaisemattomia poikkeamia!</target>
+<target>Ratkaisemattomia ristiriitoja!</target>
 <source>You can ignore conflicts and continue synchronization.</source>
-<target>Voit jatkaa poikkeamista huolimatta täsmäytystä.</target>
+<target>Voit jatkaa täsmäytystä, ristiriidoista huolimatta.</target>
 <source>Significant difference detected:</source>
-<target>Merkittävä eroavaisuus todettu:</target>
+<target>Merkittävä eroavavuus todettu:</target>
 <source>More than 50% of the total number of files will be copied or deleted!</source>
-<target>Enemmän kuin 50% tiedostoista kopioidaan tai poistetaan!</target>
+<target>Yli 50% tiedostoista kopioidaan tai poistetaan!</target>
 <source>Not enough free disk space available in:</source>
 <target>Levytila ei riitä:</target>
 <source>Free disk space required:</source>
@@ -1045,8 +1047,6 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <target>Moniosaisen hakemistoparin hakemisto muutetaan! Tarkista täsmäytys asetuksia!</target>
 <source>Processing folder pair:</source>
 <target>Käsitellään hakemistoparia:</target>
-<source>Generating database...</source>
-<target>Luodaan tietokantaa...</target>
 <source>Error copying locked file %x!</source>
 <target>Virhe kopioitaessa lukittua tiedostoa  %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

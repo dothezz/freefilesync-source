@@ -16,6 +16,9 @@
 class LogFile;
 class SyncStatus;
 
+//Exception class used to abort the "compare" and "sync" process
+class BatchAbortProcess {};
+
 
 class BatchStatusHandler : public StatusHandler
 {
@@ -50,7 +53,7 @@ private:
     int& returnValue;
 
     SyncStatus syncStatusFrame; //the window managed by SyncStatus has longer lifetime than this handler!
-    boost::shared_ptr<LogFile> logFile; //optional!
+    std::shared_ptr<LogFile> logFile; //optional!
 };
 
 

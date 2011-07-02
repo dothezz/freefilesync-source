@@ -15,7 +15,7 @@
 #include <wx/wupdlock.h>
 #include "../shared/global_func.h"
 #include "tray_icon.h"
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "../shared/mouse_move_dlg.h"
 #include "../library/error_log.h"
 #include "../shared/toggle_button.h"
@@ -452,24 +452,26 @@ private:
 
         const std::vector<wxString>& messages = log_.getFormattedMessages(includedTypes);
 
+        //fast replacement for wxString modelling exponential growth
+        typedef Zbase<wchar_t> zxString;
 
         zxString newLogText; //perf: wxString doesn't model exponential growth and so is out
 
         if (!messages.empty())
             for (std::vector<wxString>::const_iterator i = messages.begin(); i != messages.end(); ++i)
             {
-                newLogText += wxToZx(*i);
+                newLogText += cvrtString<zxString>(*i);
                 newLogText += wxT("\n\n");
             }
         else //if no messages match selected view filter, show final status message at least
         {
             const std::vector<wxString>& allMessages = log_.getFormattedMessages();
             if (!allMessages.empty())
-                newLogText = wxToZx(allMessages.back());
+                newLogText = cvrtString<zxString>(allMessages.back());
         }
 
         wxWindowUpdateLocker dummy(m_textCtrlInfo);
-        m_textCtrlInfo->ChangeValue(zxToWx(newLogText));
+        m_textCtrlInfo->ChangeValue(cvrtString<wxString>(newLogText));
         m_textCtrlInfo->ShowPosition(m_textCtrlInfo->GetLastPosition());
     }
 
@@ -482,7 +484,7 @@ private:
 class SyncStatus::SyncStatusImpl : public SyncStatusDlgGenerated
 {
 public:
-    SyncStatusImpl(AbortCallback& abortCb, MainDialog* parentWindow, const wxString& jobName);
+    SyncStatusImpl(AbortCallback& abortCb, MainDialog* parentWindow, SyncStatusID startStatus, const wxString& jobName);
     ~SyncStatusImpl();
 
     void resetGauge(int totalObjectsToProcess, zen::Int64 totalDataToProcess);
@@ -529,11 +531,11 @@ private:
     SyncStatus::SyncStatusID currentStatus;
 
 #ifdef FFS_WIN
-    std::auto_ptr<util::TaskbarProgress> taskbar_;
+    std::unique_ptr<util::TaskbarProgress> taskbar_;
 #endif
 
     //remaining time
-    std::auto_ptr<Statistics> statistics;
+    std::unique_ptr<Statistics> statistics;
     long lastStatCallSpeed;   //used for calculating intervals between statistics update
     long lastStatCallRemTime; //
 
@@ -543,13 +545,17 @@ private:
     wxString progressTextLast;
     float progressPercentLast;
 
-    boost::shared_ptr<MinimizeToTray> minimizedToSysTray; //optional: if filled, hides all visible windows, shows again if destroyed
+    std::shared_ptr<MinimizeToTray> minimizedToSysTray; //optional: if filled, hides all visible windows, shows again if destroyed
 };
 
 
 //redirect to implementation
-SyncStatus::SyncStatus(AbortCallback& abortCb, MainDialog* parentWindow, bool startSilent, const wxString& jobName) :
-    pimpl(new SyncStatusImpl(abortCb, parentWindow, jobName))
+SyncStatus::SyncStatus(AbortCallback& abortCb,
+                       MainDialog* parentWindow,
+                       SyncStatusID startStatus,
+                       bool startSilent,
+                       const wxString& jobName) :
+    pimpl(new SyncStatusImpl(abortCb, parentWindow, startStatus, jobName))
 {
     if (startSilent)
         pimpl->minimizeToTray();
@@ -612,7 +618,10 @@ void SyncStatus::processHasFinished(SyncStatusID id, const ErrorLogging& log)
 //########################################################################################
 
 
-SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb, MainDialog* parentWindow, const wxString& jobName) :
+SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
+                                           MainDialog* parentWindow,
+                                           SyncStatusID startStatus,
+                                           const wxString& jobName) :
     SyncStatusDlgGenerated(parentWindow,
                            wxID_ANY,
                            parentWindow ? wxString(wxEmptyString) : (wxString(wxT("FreeFileSync - ")) + _("Folder Comparison and Synchronization")),
@@ -679,6 +688,8 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb, MainDialog* p
 
     //register key event
     Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(SyncStatusImpl::OnKeyPressed), NULL, this);
+
+    setCurrentStatus(startStatus); //first state: will be shown while waiting for dir locks (if at all)
 }
 
 
@@ -730,7 +741,9 @@ void SyncStatus::SyncStatusImpl::resetGauge(int totalObjectsToProcess, zen::Int6
     lastStatCallSpeed   = -1000000; //some big number
     lastStatCallRemTime = -1000000;
 
-    m_gauge1->SetValue(totalDataToProcess == 0 ? GAUGE_FULL_RANGE : 0); //explicitly reset and end "pending" state (if not data will be synced)
+    //set to 0 even if totalDataToProcess is 0: due to a bug in wxGauge::SetValue, it doesn't change to determinate mode when setting the old value again
+    //so give updateStatusDialogNow() a chance to set a different value
+    m_gauge1->SetValue(0);
 }
 
 
@@ -855,10 +868,22 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
         bool updateLayout = false; //avoid screen flicker by calling layout() only if necessary
 
         //progress indicator
-        if (currentStatus == SyncStatus::SCANNING)
-            m_gauge1->Pulse();
-        else
-            m_gauge1->SetValue(common::round(to<double>(currentData) * scalingFactor));
+        switch (currentStatus)
+        {
+            case SyncStatus::SCANNING:
+                m_gauge1->Pulse();
+                break;
+            case SyncStatus::COMPARING_CONTENT:
+            case SyncStatus::SYNCHRONIZING:
+            case SyncStatus::FINISHED_WITH_SUCCESS:
+            case SyncStatus::FINISHED_WITH_ERROR:
+            case SyncStatus::ABORTED:
+                m_gauge1->SetValue(totalData == 0 ? GAUGE_FULL_RANGE :
+                                   common::round(to<double>(currentData) * scalingFactor));
+                break;
+            case SyncStatus::PAUSE: //no change to gauge: don't switch between indeterminate/determinate modus
+                break;
+        }
 
         //status text
         const wxString statusTxt = zToWx(currentStatusText);

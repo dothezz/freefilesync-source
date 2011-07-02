@@ -82,7 +82,7 @@ public:
     };
 
     //notify wxGrid that underlying table size has changed
-    void updateGridSizes();
+    virtual void updateGridSizes();
 
     typedef std::pair<SortColumn, SortDirection> SortMarker;
     void setSortMarker(SortMarker marker);
@@ -163,6 +163,8 @@ public:
     void autoSizeColumns();        //performance optimized column resizer
 
     void enableFileIcons(const bool value);
+
+    virtual void updateGridSizes();
 
 protected:
     template <zen::SelectedSide side>

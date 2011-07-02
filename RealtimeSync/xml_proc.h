@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <wx/string.h>
-#include "../shared/xml_base.h"
+#include <xml_error.h>
 
 
 namespace xmlAccess
@@ -22,8 +22,8 @@ struct XmlRealConfig
     size_t delay;
 };
 
-void readRealConfig(const wxString& filename, XmlRealConfig& config);           //throw (xmlAccess::XmlError);
-void writeRealConfig(const XmlRealConfig& outputCfg, const wxString& filename); //throw (xmlAccess::XmlError);
+void readRealConfig(const wxString& filename, XmlRealConfig& config);        //throw (xmlAccess::FfsXmlError);
+void writeRealConfig(const XmlRealConfig& config, const wxString& filename); //throw (xmlAccess::FfsXmlError);
 }
 
 #endif // XMLPROCESSING_H_INCLUDED

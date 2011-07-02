@@ -252,12 +252,6 @@ private:
     //folder pairs:
     std::auto_ptr<DirectoryPairFirst> firstFolderPair; //always bound!!!
     std::vector<DirectoryPair*> additionalFolderPairs; //additional pairs to the first pair
-
-    //gui settings
-    int widthNotMaximized;
-    int heightNotMaximized;
-    int posXNotMaximized;
-    int posYNotMaximized;
     //-------------------------------------
 
 

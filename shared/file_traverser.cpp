@@ -116,7 +116,7 @@ private:
 
         WIN32_FIND_DATA fileInfo = {};
         HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(directoryFormatted + Zchar('*')).c_str(), //__in   LPCTSTR lpFileName
-                                              &fileInfo);                                                     //__out  LPWIN32_FIND_DATA lpFindFileData
+                                              &fileInfo);                                                   //__out  LPWIN32_FIND_DATA lpFindFileData
         //no noticable performance difference compared to FindFirstFileEx with FindExInfoBasic, FIND_FIRST_EX_CASE_SENSITIVE and/or FIND_FIRST_EX_LARGE_FETCH
 
         if (searchHandle == INVALID_HANDLE_VALUE)

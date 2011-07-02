@@ -43,7 +43,6 @@
 #include "../shared/file_handling.h"
 #include "../shared/resolve_path.h"
 #include "../shared/recycler.h"
-#include "../shared/xml_base.h"
 #include "../shared/standard_paths.h"
 #include "../shared/toggle_button.h"
 #include "folder_pair.h"
@@ -108,11 +107,11 @@ public:
                     xmlAccess::XmlGuiConfig guiCfg;
                     try
                     {
-                        convertConfig(droppedFiles, guiCfg); //throw (xmlAccess::XmlError)
+                        convertConfig(droppedFiles, guiCfg); //throw (xmlAccess::FfsXmlError)
                     }
-                    catch (const xmlAccess::XmlError& error)
+                    catch (const xmlAccess::FfsXmlError& error)
                     {
-                        if (error.getSeverity() == xmlAccess::XmlError::WARNING)
+                        if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
                             wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING);
                         else
                         {
@@ -369,13 +368,13 @@ MainDialog::MainDialog(const wxString& cfgFileName, xmlAccess::XmlGlobalSettings
             std::vector<wxString> filenames;
             filenames.push_back(currentConfigFile);
 
-            xmlAccess::convertConfig(filenames, guiCfg); //throw (xmlAccess::XmlError)
+            xmlAccess::convertConfig(filenames, guiCfg); //throw (xmlAccess::FfsXmlError)
 
             loadCfgSuccess = true;
         }
-        catch (const xmlAccess::XmlError& error)
+        catch (const xmlAccess::FfsXmlError& error)
         {
-            if (error.getSeverity() == xmlAccess::XmlError::WARNING)
+            if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
                 wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING);
             else
                 wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
@@ -656,7 +655,16 @@ void MainDialog::cleanUp(bool saveLastUsedConfig)
 
         //save configuration
         if (saveLastUsedConfig)
-            writeConfigurationToXml(lastRunConfigName());   //don't throw exceptions in destructors
+        {
+            const xmlAccess::XmlGuiConfig guiCfg = getCurrentConfiguration();
+            try
+            {
+                xmlAccess::writeConfig(guiCfg, lastRunConfigName());
+                setLastUsedConfig(lastRunConfigName(), guiCfg);
+            }
+            //don't annoy users on read-only drives: no error checking should be fine since this is not a config the user explitily wanted to save
+            catch (const xmlAccess::FfsXmlError&) {}
+        }
     }
 }
 
@@ -664,18 +672,13 @@ void MainDialog::cleanUp(bool saveLastUsedConfig)
 void MainDialog::readGlobalSettings()
 {
     //apply window size and position at program startup ONLY
-    widthNotMaximized  = globalSettings->gui.widthNotMaximized;
-    heightNotMaximized = globalSettings->gui.heightNotMaximized;
-    posXNotMaximized   = globalSettings->gui.posXNotMaximized;
-    posYNotMaximized   = globalSettings->gui.posYNotMaximized;
-
     //apply window size and position
-    if (widthNotMaximized  != wxDefaultCoord &&
-        heightNotMaximized != wxDefaultCoord &&
-        posXNotMaximized   != wxDefaultCoord &&
-        posYNotMaximized   != wxDefaultCoord &&
-        wxDisplay::GetFromPoint(wxPoint(posXNotMaximized, posYNotMaximized)) != wxNOT_FOUND) //make sure upper left corner is in visible view
-        SetSize(posXNotMaximized, posYNotMaximized, widthNotMaximized, heightNotMaximized);
+    if (globalSettings->gui.dlgSize.GetWidth () != wxDefaultCoord &&
+        globalSettings->gui.dlgSize.GetHeight() != wxDefaultCoord &&
+        globalSettings->gui.dlgPos.x != wxDefaultCoord &&
+        globalSettings->gui.dlgPos.y != wxDefaultCoord &&
+        wxDisplay::GetFromPoint(globalSettings->gui.dlgPos) != wxNOT_FOUND) //make sure upper left corner is in visible view
+        SetSize(wxRect(globalSettings->gui.dlgPos, globalSettings->gui.dlgSize));
     else
         Centre();
 
@@ -723,11 +726,7 @@ void MainDialog::readGlobalSettings()
 void MainDialog::writeGlobalSettings()
 {
     //write global settings to (global) variable stored in application instance
-    globalSettings->gui.widthNotMaximized  = widthNotMaximized;
-    globalSettings->gui.heightNotMaximized = heightNotMaximized;
-    globalSettings->gui.posXNotMaximized   = posXNotMaximized;
-    globalSettings->gui.posYNotMaximized   = posYNotMaximized;
-    globalSettings->gui.isMaximized        = IsMaximized();
+    globalSettings->gui.isMaximized = IsMaximized();
 
     //retrieve column attributes
     globalSettings->gui.columnAttribLeft  = m_gridLeft->getColumnAttributes();
@@ -832,6 +831,9 @@ void MainDialog::copySelectionToClipboard(CustomGrid& selectedGrid)
     const std::set<size_t> selectedRows = getSelectedRows(&selectedGrid);
     if (selectedRows.size() > 0)
     {
+        //fast replacement for wxString modelling exponential growth
+        typedef Zbase<wchar_t> zxString;
+
         zxString clipboardString; //perf: wxString doesn't model exponential growth and so is out
 
         const int colCount = selectedGrid.GetNumberCols();
@@ -840,7 +842,7 @@ void MainDialog::copySelectionToClipboard(CustomGrid& selectedGrid)
         {
             for (int k = 0; k < colCount; ++k)
             {
-                clipboardString += wxToZx(selectedGrid.GetCellValue(static_cast<int>(*i), k));
+                clipboardString += cvrtString<zxString>(selectedGrid.GetCellValue(static_cast<int>(*i), k));
                 if (k != colCount - 1)
                     clipboardString += wxT('\t');
             }
@@ -853,7 +855,7 @@ void MainDialog::copySelectionToClipboard(CustomGrid& selectedGrid)
             {
                 // these data objects are held by the clipboard,
                 // so do not delete them in the app.
-                wxTheClipboard->SetData(new wxTextDataObject(zxToWx(clipboardString)));
+                wxTheClipboard->SetData(new wxTextDataObject(cvrtString<wxString>(clipboardString)));
                 wxTheClipboard->Close();
             }
     }
@@ -880,6 +882,9 @@ std::set<size_t> MainDialog::getSelectedRows() const
     return selection;
 }
 
+
+//Exception class used to abort the "compare" and "sync" process
+class AbortDeleteProcess {};
 
 class ManualDeletionHandler : private wxEvtHandler, public DeleteFilesHandler
 {
@@ -910,7 +915,7 @@ public:
     virtual Response reportError(const wxString& errorMessage)
     {
         if (abortRequested)
-            throw zen::AbortThisProcess();
+            throw AbortDeleteProcess();
 
         if (ignoreErrors)
             return DeleteFilesHandler::IGNORE_ERROR;
@@ -925,7 +930,7 @@ public:
             case ReturnErrorDlg::BUTTON_RETRY:
                 return DeleteFilesHandler::RETRY;
             case ReturnErrorDlg::BUTTON_ABORT:
-                throw zen::AbortThisProcess();
+                throw AbortDeleteProcess();
         }
 
         assert (false);
@@ -950,7 +955,7 @@ public:
         }
 
         if (abortRequested) //test after (implicit) call to wxApp::Yield()
-            throw zen::AbortThisProcess();
+            throw AbortDeleteProcess();
     }
 
 private:
@@ -1014,7 +1019,7 @@ void MainDialog::deleteSelectedFiles(const std::set<size_t>& viewSelectionLeft, 
                                          globalSettings->gui.useRecyclerForManualDeletion,
                                          statusHandler);
             }
-            catch (zen::AbortThisProcess&) {}
+            catch (AbortDeleteProcess&) {}
 
             //remove rows that are empty: just a beautification, invalid rows shouldn't cause issues
             gridDataView->removeInvalidRows();
@@ -1114,9 +1119,11 @@ void MainDialog::openExternalApplication(size_t rowNumber, bool leftSide, const 
         if (name.empty())
         {
             if (leftSide)
-                zen::shellExecute(wxString(wxT("explorer ")) + L"\"" + zToWx(fsObj->getBaseDirPf<LEFT_SIDE>()) + L"\"");
+                zen::shellExecute(wxString(L"\"") + zToWx(fsObj->getBaseDirPf<LEFT_SIDE>()) + L"\"");
+            //zen::shellExecute(wxString(wxT("explorer ")) + L"\"" + zToWx(fsObj->getBaseDirPf<LEFT_SIDE>()) + L"\"");
             else
-                zen::shellExecute(wxString(wxT("explorer ")) + L"\"" + zToWx(fsObj->getBaseDirPf<RIGHT_SIDE>()) + L"\"");
+                zen::shellExecute(wxString(L"\"") + zToWx(fsObj->getBaseDirPf<RIGHT_SIDE>()) + L"\"");
+            //zen::shellExecute(wxString(wxT("explorer ")) + L"\"" + zToWx(fsObj->getBaseDirPf<RIGHT_SIDE>()) + L"\"");
             return;
         }
 #endif
@@ -1131,7 +1138,8 @@ void MainDialog::openExternalApplication(size_t rowNumber, bool leftSide, const 
             std::swap(dir, dirCo);
 
 #ifdef FFS_WIN
-        zen::shellExecute(wxString(wxT("explorer ")) + L"\"" + dir + L"\""); //default
+        zen::shellExecute(wxString(L"\"") + dir + L"\""); //default
+        //zen::shellExecute(wxString(wxT("explorer ")) + L"\"" + dir + L"\""); //default
         return;
 #endif
     }
@@ -1233,24 +1241,16 @@ void MainDialog::OnResize(wxSizeEvent& event)
 {
     if (!IsMaximized())
     {
-        int width  = 0;
-        int height = 0;
-        int x      = 0;
-        int y      = 0;
-
-        GetSize(&width, &height);
-        GetPosition(&x, &y);
+        wxSize sz  = GetSize();
+        wxPoint ps = GetPosition();
 
         //test ALL parameters at once, since width/height are invalid if the window is minimized (eg x,y == -32000; height = 28, width = 160)
         //note: negative values for x and y are possible when using multiple monitors!
-        if (width > 0 && height > 0 && x >= -3360 && y >= -200 &&
-            wxDisplay::GetFromPoint(wxPoint(x, y)) != wxNOT_FOUND) //make sure upper left corner is in visible view
+        if (sz.GetWidth() > 0 && sz.GetHeight() > 0 && ps.x >= -3360 && ps.y >= -200 &&
+            wxDisplay::GetFromPoint(ps) != wxNOT_FOUND) //make sure upper left corner is in visible view
         {
-            widthNotMaximized  = width;                        //visible coordinates x < 0 and y < 0 are possible with dual monitors!
-            heightNotMaximized = height;
-
-            posXNotMaximized = x;
-            posYNotMaximized = y;
+            globalSettings->gui.dlgSize = sz;
+            globalSettings->gui.dlgPos  = ps;
         }
     }
 
@@ -1700,11 +1700,6 @@ void MainDialog::OnContextRim(wxGridEvent& event)
 
     const FileSystemObject* fsObj = gridDataView->getObject(selectionBegin);
 
-#ifndef _MSC_VER
-#warning context menu buttons komplett lokalisieren: ALT+LEFT, SPACE D-Click, ENTER..
-#warning statt "Set direction: *-" besser "Set direction: ->"
-#endif
-
     //#######################################################
     //re-create context menu
     contextMenu.reset(new wxMenu);
@@ -1716,24 +1711,21 @@ void MainDialog::OnContextRim(wxGridEvent& event)
         {
             //CONTEXT_SYNC_DIR_LEFT
             wxMenuItem* menuItemSyncDirLeft = new wxMenuItem(contextMenu.get(), wxID_ANY, wxString(_("Set direction:")) +
-                                                             wxT(" ") + getSymbol(fsObj->testSyncOperation(true, SYNC_DIR_LEFT)) +
-                                                             wxT("\tAlt + Left")); //Linux needs a direction, "<-", because it has no context menu icons!
+                                                             wxT(" <-") + wxT("\tAlt - Left")); //Linux needs a direction, "<-", because it has no context menu icons!
             menuItemSyncDirLeft->SetBitmap(getSyncOpImage(fsObj->testSyncOperation(true, SYNC_DIR_LEFT)));
             contextMenu->Append(menuItemSyncDirLeft);
             contextMenu->Connect(menuItemSyncDirLeft->GetId(),  wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainDialog::OnContextSyncDirLeft),      NULL, this);
 
             //CONTEXT_SYNC_DIR_NONE
             wxMenuItem* menuItemSyncDirNone = new wxMenuItem(contextMenu.get(), wxID_ANY, wxString(_("Set direction:")) +
-                                                             wxT(" ") + getSymbol(fsObj->testSyncOperation(true, SYNC_DIR_NONE)) +
-                                                             wxT("\tAlt + Up"));
+                                                             wxT(" -") + wxT("\tAlt - Up"));
             menuItemSyncDirNone->SetBitmap(getSyncOpImage(fsObj->testSyncOperation(true, SYNC_DIR_NONE)));
             contextMenu->Append(menuItemSyncDirNone);
             contextMenu->Connect(menuItemSyncDirNone->GetId(),  wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainDialog::OnContextSyncDirNone),      NULL, this);
 
             //CONTEXT_SYNC_DIR_RIGHT
             wxMenuItem* menuItemSyncDirRight = new wxMenuItem(contextMenu.get(), wxID_ANY, wxString(_("Set direction:")) +
-                                                              wxT(" ") + getSymbol(fsObj->testSyncOperation(true, SYNC_DIR_RIGHT)) +
-                                                              wxT("\tAlt + Right"));
+                                                              wxT(" ->") + wxT("\tAlt - Right"));
             menuItemSyncDirRight->SetBitmap(getSyncOpImage(fsObj->testSyncOperation(true, SYNC_DIR_RIGHT)));
             contextMenu->Append(menuItemSyncDirRight);
             contextMenu->Connect(menuItemSyncDirRight->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainDialog::OnContextSyncDirRight),     NULL, this);
@@ -1867,7 +1859,7 @@ void MainDialog::OnContextRim(wxGridEvent& event)
 
             wxMenuItem* itemExtApp = NULL;
             if (i == globalSettings->gui.externelApplications.begin())
-                itemExtApp = contextMenu->Append(wxID_ANY, description + wxT("\t") + wxString(_("D-Click")) + wxT("; Enter"));
+                itemExtApp = contextMenu->Append(wxID_ANY, description + wxT("\t") + wxString(_("D-Click")) + wxT(" Enter"));
             else
                 itemExtApp = contextMenu->Append(wxID_ANY, description);
             contextMenu->Enable(itemExtApp->GetId(), externalAppEnabled);
@@ -1882,13 +1874,8 @@ void MainDialog::OnContextRim(wxGridEvent& event)
 
     contextMenu->AppendSeparator();
 
-
-#ifndef _MSC_VER
-#warning context menu buttons: nicht mehr all caps
-#endif
-
     //CONTEXT_DELETE_FILES
-    wxMenuItem* menuItemDelFiles = contextMenu->Append(wxID_ANY, _("Delete files\tDEL"));
+    wxMenuItem* menuItemDelFiles = contextMenu->Append(wxID_ANY, wxString(_("Delete")) + wxT("\tDel"));
     contextMenu->Enable(menuItemDelFiles->GetId(), selection.size() > 0);
     contextMenu->Connect(menuItemDelFiles->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainDialog::OnContextDeleteFiles),      NULL, this);
 
@@ -2067,9 +2054,9 @@ void MainDialog::OnContextCustColumnLeft(wxCommandEvent& event)
     {
         m_gridLeft->setColumnAttributes(colAttr);
 
-        m_gridLeft->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING)); //hide sort direction indicator on GUI grids
+        m_gridLeft  ->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING)); //hide sort direction indicator on GUI grids
         m_gridMiddle->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
-        m_gridRight->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
+        m_gridRight ->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
     }
 }
 
@@ -2082,9 +2069,9 @@ void MainDialog::OnContextCustColumnRight(wxCommandEvent& event)
     {
         m_gridRight->setColumnAttributes(colAttr);
 
-        m_gridLeft->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING)); //hide sort direction indicator on GUI grids
+        m_gridLeft  ->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING)); //hide sort direction indicator on GUI grids
         m_gridMiddle->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
-        m_gridRight->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
+        m_gridRight ->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
     }
 }
 
@@ -2150,12 +2137,10 @@ void MainDialog::OnContextMiddleLabel(wxGridEvent& event)
 
 void MainDialog::OnContextSetLayout(wxMouseEvent& event)
 {
-    int itemId = 1000;
-
     contextMenu.reset(new wxMenu); //re-create context menu
 
-    contextMenu->Append(++itemId, _("Reset view"));
-    contextMenu->Connect(itemId, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainDialog::OnContextSetLayoutReset), NULL, this);
+    wxMenuItem* itemReset = contextMenu->Append(wxID_ANY, _("Reset view"));
+    contextMenu->Connect(itemReset->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainDialog::OnContextSetLayoutReset), NULL, this);
 
     typedef std::vector<std::pair<wxString, wxString> > CaptionNameMapping;
     CaptionNameMapping captionNameMap;
@@ -2174,8 +2159,8 @@ void MainDialog::OnContextSetLayout(wxMouseEvent& event)
             wxString entry = _("Show \"%x\"");
             entry.Replace(wxT("%x"), i->first);
 
-            contextMenu->Append(++itemId, entry);
-            contextMenu->Connect(itemId,
+            wxMenuItem* newItem = contextMenu->Append(wxID_ANY, entry);
+            contextMenu->Connect(newItem->GetId(),
                                  wxEVT_COMMAND_MENU_SELECTED,
                                  wxCommandEventHandler(MainDialog::OnContextSetLayoutShowPanel),
                                  new CtxtSelectionString(i->second), //ownership passed!
@@ -2328,7 +2313,11 @@ bool MainDialog::trySaveConfig() //return true if saved successfully
         defaultFileName.Replace(wxT(".ffs_batch"), wxT(".ffs_gui"), false);
 
 
-    wxFileDialog filePicker(this, wxEmptyString, wxEmptyString, defaultFileName, wxString(_("FreeFileSync configuration")) + wxT(" (*.ffs_gui)|*.ffs_gui"), wxFD_SAVE); //creating this on freestore leads to memleak!
+    wxFileDialog filePicker(this,
+                            wxEmptyString,
+                            wxEmptyString,
+                            defaultFileName,
+                            wxString(_("FreeFileSync configuration")) + wxT(" (*.ffs_gui)|*.ffs_gui"), wxFD_SAVE); //creating this on freestore leads to memleak!
     if (filePicker.ShowModal() == wxID_OK)
     {
         const wxString newFileName = filePicker.GetPath();
@@ -2355,7 +2344,7 @@ void MainDialog::OnLoadConfig(wxCommandEvent& event)
 {
     wxFileDialog filePicker(this,
                             wxEmptyString,
-                            wxEmptyString,
+                            beforeLast(currentConfigFileName, common::FILE_NAME_SEPARATOR), //set default dir: empty string if "currentConfigFileName" is empty or has no path separator
                             wxEmptyString,
                             wxString(_("FreeFileSync configuration")) + wxT(" (*.ffs_gui;*.ffs_batch)|*.ffs_gui;*.ffs_batch"), wxFD_OPEN);
 
@@ -2538,13 +2527,13 @@ bool MainDialog::readConfigurationFromXml(const wxString& filename)
         std::vector<wxString> filenames;
         filenames.push_back(filename);
 
-        xmlAccess::convertConfig(filenames, newGuiCfg); //throw (xmlAccess::XmlError)
+        xmlAccess::convertConfig(filenames, newGuiCfg); //throw (xmlAccess::FfsXmlError)
 
         parsingError = false;
     }
-    catch (const xmlAccess::XmlError& error)
+    catch (const xmlAccess::FfsXmlError& error)
     {
-        if (error.getSeverity() == xmlAccess::XmlError::WARNING)
+        if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
             wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING);
         else
         {
@@ -2592,7 +2581,7 @@ bool MainDialog::writeConfigurationToXml(const wxString& filename)
         setLastUsedConfig(filename, guiCfg);
         return true;
     }
-    catch (const xmlAccess::XmlError& error)
+    catch (const xmlAccess::FfsXmlError& error)
     {
         wxMessageBox(error.msg().c_str(), _("Error"), wxOK | wxICON_ERROR);
         return false;
@@ -3027,7 +3016,7 @@ void MainDialog::OnCompare(wxCommandEvent& event)
         if (fileExists(wxToZ(soundFile)))
             wxSound::Play(soundFile, wxSOUND_ASYNC);
     }
-    catch (AbortThisProcess&)
+    catch (GuiAbortProcess&)
     {
         //disable the sync button
         syncPreview->enableSynchronization(false);
@@ -3077,20 +3066,6 @@ void MainDialog::updateGuiGrid()
     m_gridLeft  ->updateGridSizes();
     m_gridMiddle->updateGridSizes();
     m_gridRight ->updateGridSizes();
-
-    //enlarge label width to display row numbers correctly
-    const int nrOfRows = m_gridLeft->GetNumberRows();
-    if (nrOfRows >= 0)
-    {
-#ifdef FFS_WIN
-        const size_t digitWidth = 8;
-#elif defined FFS_LINUX
-        const size_t digitWidth = 10;
-#endif
-        const size_t nrOfDigits = common::getDigitCount(static_cast<size_t>(nrOfRows));
-        m_gridLeft ->SetRowLabelSize(static_cast<int>(nrOfDigits * digitWidth + 4));
-        m_gridRight->SetRowLabelSize(static_cast<int>(nrOfDigits * digitWidth + 4));
-    }
 
     //support for column auto adjustment
     if (globalSettings->gui.autoAdjustColumnsLeft)
@@ -3257,7 +3232,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
         if (fileExists(wxToZ(soundFile)))
             wxSound::Play(soundFile, wxSOUND_ASYNC);
     }
-    catch (AbortThisProcess&)
+    catch (GuiAbortProcess&)
     {
         //do NOT disable the sync button: user might want to try to sync the REMAINING rows
     }   //enableSynchronization(false);
@@ -3338,12 +3313,12 @@ void MainDialog::OnSortLeftGrid(wxGridEvent& event)
 
         gridDataView->sortView(st, true, sortAscending);
 
-        updateGuiGrid(); //refresh gridDataView
-
         //set sort direction indicator on UI
         m_gridMiddle->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
-        m_gridRight->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
-        m_gridLeft->setSortMarker(CustomGrid::SortMarker(currentSortColumn, sortAscending ? CustomGrid::ASCENDING : CustomGrid::DESCENDING));
+        m_gridRight ->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
+        m_gridLeft  ->setSortMarker(CustomGrid::SortMarker(currentSortColumn, sortAscending ? CustomGrid::ASCENDING : CustomGrid::DESCENDING));
+
+        updateGuiGrid(); //refresh gridDataView
     }
 }
 
@@ -3426,12 +3401,12 @@ void MainDialog::OnSortRightGrid(wxGridEvent& event)
 
         gridDataView->sortView(st, false, sortAscending);
 
-        updateGuiGrid(); //refresh gridDataView
-
         //set sort direction indicator on UI
         m_gridLeft->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
         m_gridMiddle->setSortMarker(CustomGrid::SortMarker(-1, CustomGrid::ASCENDING));
         m_gridRight->setSortMarker(CustomGrid::SortMarker(currentSortColumn, sortAscending ? CustomGrid::ASCENDING : CustomGrid::DESCENDING));
+
+        updateGuiGrid(); //refresh gridDataView
     }
 }
 
@@ -3942,13 +3917,15 @@ void MainDialog::OnMenuGlobalSettings(wxCommandEvent& event)
 
 namespace
 {
+typedef Zbase<wchar_t> zxString;
+
 inline
 void addCellValue(zxString& exportString, const wxString& cellVal)
 {
     if (cellVal.find(wxT(';')) != wxString::npos)
-        exportString += wxT('\"') + wxToZx(cellVal) + wxT('\"');
+        exportString += wxT('\"') + cvrtString<zxString>(cellVal) + wxT('\"');
     else
-        exportString += wxToZx(cellVal);
+        exportString += cvrtString<zxString>(cellVal);
 }
 }
 
@@ -3975,28 +3952,28 @@ void MainDialog::OnMenuExportFileList(wxCommandEvent& event)
         zxString exportString; //perf: wxString doesn't model exponential growth and so is out
 
         //write legend
-        exportString +=  wxToZx(_("Legend")) + wxT('\n');
+        exportString +=  cvrtString<zxString>(_("Legend")) + wxT('\n');
         if (syncPreview->previewIsEnabled())
         {
-            exportString += wxT("\"") + wxToZx(getDescription(SO_CREATE_NEW_LEFT))     + wxT("\";") + wxToZx(getSymbol(SO_CREATE_NEW_LEFT))     + wxT('\n');
-            exportString += wxT("\"") + wxToZx(getDescription(SO_CREATE_NEW_RIGHT))    + wxT("\";") + wxToZx(getSymbol(SO_CREATE_NEW_RIGHT))    + wxT('\n');
-            exportString += wxT("\"") + wxToZx(getDescription(SO_DELETE_LEFT))         + wxT("\";") + wxToZx(getSymbol(SO_DELETE_LEFT))         + wxT('\n');
-            exportString += wxT("\"") + wxToZx(getDescription(SO_DELETE_RIGHT))        + wxT("\";") + wxToZx(getSymbol(SO_DELETE_RIGHT))        + wxT('\n');
-            exportString += wxT("\"") + wxToZx(getDescription(SO_OVERWRITE_LEFT))      + wxT("\";") + wxToZx(getSymbol(SO_OVERWRITE_LEFT))      + wxT('\n');
-            exportString += wxT("\"") + wxToZx(getDescription(SO_OVERWRITE_RIGHT))     + wxT("\";") + wxToZx(getSymbol(SO_OVERWRITE_RIGHT))     + wxT('\n');
-            exportString += wxT("\"") + wxToZx(getDescription(SO_DO_NOTHING))          + wxT("\";") + wxToZx(getSymbol(SO_DO_NOTHING))          + wxT('\n');
-            exportString += wxT("\"") + wxToZx(getDescription(SO_EQUAL))               + wxT("\";") + wxToZx(getSymbol(SO_EQUAL))               + wxT('\n');
-            exportString += wxT("\"") + wxToZx(getDescription(SO_UNRESOLVED_CONFLICT)) + wxT("\";") + wxToZx(getSymbol(SO_UNRESOLVED_CONFLICT)) + wxT('\n');
+            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_CREATE_NEW_LEFT))     + wxT("\";") + cvrtString<zxString>(getSymbol(SO_CREATE_NEW_LEFT))     + wxT('\n');
+            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_CREATE_NEW_RIGHT))    + wxT("\";") + cvrtString<zxString>(getSymbol(SO_CREATE_NEW_RIGHT))    + wxT('\n');
+            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_DELETE_LEFT))         + wxT("\";") + cvrtString<zxString>(getSymbol(SO_DELETE_LEFT))         + wxT('\n');
+            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_DELETE_RIGHT))        + wxT("\";") + cvrtString<zxString>(getSymbol(SO_DELETE_RIGHT))        + wxT('\n');
+            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_OVERWRITE_LEFT))      + wxT("\";") + cvrtString<zxString>(getSymbol(SO_OVERWRITE_LEFT))      + wxT('\n');
+            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_OVERWRITE_RIGHT))     + wxT("\";") + cvrtString<zxString>(getSymbol(SO_OVERWRITE_RIGHT))     + wxT('\n');
+            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_DO_NOTHING))          + wxT("\";") + cvrtString<zxString>(getSymbol(SO_DO_NOTHING))          + wxT('\n');
+            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_EQUAL))               + wxT("\";") + cvrtString<zxString>(getSymbol(SO_EQUAL))               + wxT('\n');
+            exportString += wxT("\"") + cvrtString<zxString>(getDescription(SO_UNRESOLVED_CONFLICT)) + wxT("\";") + cvrtString<zxString>(getSymbol(SO_UNRESOLVED_CONFLICT)) + wxT('\n');
         }
         else
         {
-            exportString += wxT("\"") + wxToZx(getDescription(FILE_LEFT_SIDE_ONLY))  + wxT("\";") + wxToZx(getSymbol(FILE_LEFT_SIDE_ONLY))  + wxT('\n');
-            exportString += wxT("\"") + wxToZx(getDescription(FILE_RIGHT_SIDE_ONLY)) + wxT("\";") + wxToZx(getSymbol(FILE_RIGHT_SIDE_ONLY)) + wxT('\n');
-            exportString += wxT("\"") + wxToZx(getDescription(FILE_LEFT_NEWER))      + wxT("\";") + wxToZx(getSymbol(FILE_LEFT_NEWER))      + wxT('\n');
-            exportString += wxT("\"") + wxToZx(getDescription(FILE_RIGHT_NEWER))     + wxT("\";") + wxToZx(getSymbol(FILE_RIGHT_NEWER))     + wxT('\n');
-            exportString += wxT("\"") + wxToZx(getDescription(FILE_DIFFERENT))       + wxT("\";") + wxToZx(getSymbol(FILE_DIFFERENT))       + wxT('\n');
-            exportString += wxT("\"") + wxToZx(getDescription(FILE_EQUAL))           + wxT("\";") + wxToZx(getSymbol(FILE_EQUAL))           + wxT('\n');
-            exportString += wxT("\"") + wxToZx(getDescription(FILE_CONFLICT))        + wxT("\";") + wxToZx(getSymbol(FILE_CONFLICT))        + wxT('\n');
+            exportString += wxT("\"") + cvrtString<zxString>(getDescription(FILE_LEFT_SIDE_ONLY))  + wxT("\";") + cvrtString<zxString>(getSymbol(FILE_LEFT_SIDE_ONLY))  + wxT('\n');
+            exportString += wxT("\"") + cvrtString<zxString>(getDescription(FILE_RIGHT_SIDE_ONLY)) + wxT("\";") + cvrtString<zxString>(getSymbol(FILE_RIGHT_SIDE_ONLY)) + wxT('\n');
+            exportString += wxT("\"") + cvrtString<zxString>(getDescription(FILE_LEFT_NEWER))      + wxT("\";") + cvrtString<zxString>(getSymbol(FILE_LEFT_NEWER))      + wxT('\n');
+            exportString += wxT("\"") + cvrtString<zxString>(getDescription(FILE_RIGHT_NEWER))     + wxT("\";") + cvrtString<zxString>(getSymbol(FILE_RIGHT_NEWER))     + wxT('\n');
+            exportString += wxT("\"") + cvrtString<zxString>(getDescription(FILE_DIFFERENT))       + wxT("\";") + cvrtString<zxString>(getSymbol(FILE_DIFFERENT))       + wxT('\n');
+            exportString += wxT("\"") + cvrtString<zxString>(getDescription(FILE_EQUAL))           + wxT("\";") + cvrtString<zxString>(getSymbol(FILE_EQUAL))           + wxT('\n');
+            exportString += wxT("\"") + cvrtString<zxString>(getDescription(FILE_CONFLICT))        + wxT("\";") + cvrtString<zxString>(getSymbol(FILE_CONFLICT))        + wxT('\n');
         }
         exportString += wxT('\n');
 

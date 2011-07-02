@@ -17,6 +17,8 @@
 class SyncStatus;
 class wxCommandEvent;
 
+//Exception class used to abort the "compare" and "sync" process
+class GuiAbortProcess {};
 
 //classes handling sync and compare error as well as status information
 class CompareStatusHandler : private wxEvtHandler, public StatusHandler

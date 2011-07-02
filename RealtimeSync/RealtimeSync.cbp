@@ -64,16 +64,18 @@
 			<Add option="-Wall" />
 			<Add option="-pipe" />
 			<Add option="-mthreads" />
+			<Add option="-std=gnu++0x" />
 			<Add option="-D__GNUWIN32__" />
 			<Add option="-D__WXMSW__" />
 			<Add option="-DwxUSE_UNICODE" />
 			<Add option="-DFFS_WIN" />
-			<Add option="-DTIXML_USE_STL" />
+			<Add option="-DZEN_PLATFORM_WINDOWS" />
 			<Add option="-DBOOST_THREAD_NO_LIB" />
 			<Add option="-DBOOST_THREAD_USE_LIB" />
 			<Add option="-DWXINTL_NO_GETTEXT_MACRO" />
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
 			<Add directory="C:\Program Files\C++\Boost" />
+			<Add directory="..\shared" />
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="C:\Programme\C++\wxWidgets\include" />
@@ -152,10 +154,6 @@
 		<Unit filename="..\shared\resolve_path.h" />
 		<Unit filename="..\shared\standard_paths.cpp" />
 		<Unit filename="..\shared\standard_paths.h" />
-		<Unit filename="..\shared\tinyxml\tinystr.cpp" />
-		<Unit filename="..\shared\tinyxml\tinyxml.cpp" />
-		<Unit filename="..\shared\tinyxml\tinyxmlerror.cpp" />
-		<Unit filename="..\shared\tinyxml\tinyxmlparser.cpp" />
 		<Unit filename="..\shared\util.cpp" />
 		<Unit filename="..\shared\xml_base.cpp" />
 		<Unit filename="..\shared\xml_base.h" />

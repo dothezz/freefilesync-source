@@ -11,12 +11,11 @@
 #include "../version/version.h"
 #include <wx/utils.h>
 #include <wx/timer.h>
-#include "../shared/string_tools.h"
+#include <string_tools.h>
 #include "msg_popup.h"
 #include "../shared/standard_paths.h"
 #include <wx/tokenzr.h>
 #include "../shared/i18n.h"
-
 
 class CloseConnectionOnExit
 {

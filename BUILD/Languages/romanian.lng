@@ -17,8 +17,22 @@
 <target>RealtimeSync - Sincronizare Inteligentă</target>
 <source>Browse</source>
 <target>Explorează</target>
+<source>Invalid commandline: "%x"</source>
+<target>Linie de comandă nevalidă: "%x"</target>
 <source>Error resolving symbolic link:</source>
 <target>Eroare la rezolvarea legăturii simbolice:</target>
+<source>Show popup</source>
+<target>Arată casete de dialog</target>
+<source>Show popup on errors or warnings</source>
+<target>Este arătată o casetă de dialog pentru fiecare eroare sau avertisment</target>
+<source>Ignore errors</source>
+<target>Ignoră erorile</target>
+<source>Hide all error and warning messages</source>
+<target>Sînt ascunse toate mesajele de eroare și de avertizare</target>
+<source>Exit instantly</source>
+<target>Ieși imediat</target>
+<source>Abort synchronization immediately</source>
+<target>Abandonează imediat sincronizarea</target>
 <source>Select alternate synchronization settings</source>
 <target>Selectează o altă configurație a sincronizării</target>
 <source>No filter selected</source>
@@ -30,7 +44,7 @@
 <source>Remove alternate settings</source>
 <target>Înlătură setările alternative</target>
 <source>Create a batch job</source>
-<target>Creează o Sarcină Lot</target>
+<target>Creează o Sarcină Set</target>
 <source>Synchronization settings</source>
 <target>Setările Sincronizării</target>
 <source>Comparison settings</source>
@@ -81,7 +95,7 @@
 <source>Full path</source>
 <target>Cale completă</target>
 <source>Filename</source>
-<target>Numele Filei</target>
+<target>Numele Elementului</target>
 <source>Relative path</source>
 <target>Calea Relativă</target>
 <source>Directory</source>
@@ -123,14 +137,12 @@
 <target>Informații</target>
 <source>Fatal Error</source>
 <target>Eroare Fatală</target>
+<source>Invalid FreeFileSync config file!</source>
+<target>Filă de configurare FreeFileSync nevalidă!</target>
 <source>File does not exist:</source>
 <target>Fila nu există:</target>
 <source>Error parsing configuration file:</source>
 <target>Eroare la parsarea filei de configurare:</target>
-<source>Error writing file:</source>
-<target>Eroare la scrierea filei:</target>
-<source>Invalid FreeFileSync config file!</source>
-<target>Filă de configurare FreeFileSync nevalidă!</target>
 <source>/sec</source>
 <target>/sec</target>
 <source>
@@ -222,8 +234,6 @@ Linia de comandă este executată de fiecare dată cînd:
 <target>Monitorizare activă...</target>
 <source>Waiting for missing directories...</source>
 <target>Aștept ca dosarele lipsă să devină disponibile...</target>
-<source>Command line is empty!</source>
-<target>Linia de comandă este goală!</target>
 <source>Could not initialize directory monitoring:</source>
 <target>Nu pot inițializa monitorizarea dosarelor:</target>
 <source>A directory input field is empty.</source>
@@ -231,7 +241,7 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Error when monitoring directories.</source>
 <target>Eroare la monitorizarea dosarelor.</target>
 <source>Drag && drop</source>
-<target>Trage un dosar peste compartiment sau folosește butonul Explorează</target>
+<target>Trage un dosar peste compartimentul de mai jos sau folosește butonul Explorează</target>
 <source>Conversion error:</source>
 <target>Eroare de convertire:</target>
 <source>Error moving file:</source>
@@ -264,12 +274,18 @@ Linia de comandă este executată de fiecare dată cînd:
 <target>Eroare la copierea filei:</target>
 <source>Error opening file:</source>
 <target>Eroare la deschiderea filei:</target>
+<source>Error writing file:</source>
+<target>Eroare la scrierea filei:</target>
 <source>Error reading file:</source>
 <target>Eroare la citirea filei:</target>
 <source>Endless loop when traversing directory:</source>
 <target>Buclă infinită la parcurgerea dosarului:</target>
 <source>Error traversing directory:</source>
 <target>Eroare la parcurgerea dosarului:</target>
+<source>Windows Error Code %x:</source>
+<target>Codul Erorii Windows %x:</target>
+<source>Linux Error Code %x:</source>
+<target>Codul Erorii Linux %x:</target>
 <source>Error setting privilege:</source>
 <target>Eroare la setarea privilegiului:</target>
 <source>Error moving to Recycle Bin:</source>
@@ -294,30 +310,18 @@ Linia de comandă este executată de fiecare dată cînd:
 <target>%x%</target>
 <source>Could not read values for the following XML nodes:</source>
 <target>Nu pot citi valorile pentru următoarele noduri XML:</target>
-<source>Show popup</source>
-<target>Arată casete de dialog</target>
-<source>Show popup on errors or warnings</source>
-<target>Este arătată o casetă de dialog pentru fiecare eroare sau avertisment</target>
-<source>Ignore errors</source>
-<target>Ignoră erorile</target>
-<source>Hide all error and warning messages</source>
-<target>Sînt ascunse toate mesajele de eroare și de avertizare</target>
-<source>Exit instantly</source>
-<target>Ieși imediat</target>
-<source>Abort synchronization immediately</source>
-<target>Abandonează imediat sincronizarea</target>
 <source>Logging</source>
 <target>Jurnalizez</target>
 <source>FreeFileSync batch file</source>
-<target>Filă cu lot de comenzi FreeFileSync</target>
+<target>Filă cu set de comenzi FreeFileSync</target>
 <source>FreeFileSync configuration</source>
 <target>Configurație FreeFileSync</target>
 <source>FreeFileSync Batch Job</source>
-<target>Sarcină cu lot de comenzi FreeFileSync</target>
+<target>Sarcină cu set de comenzi FreeFileSync</target>
 <source>Unable to create logfile!</source>
 <target>Fila jurnal nu poate fi creată!</target>
 <source>Batch execution</source>
-<target>Execută Fila Lot</target>
+<target>Execută Fila Set</target>
 <source>Log-messages:</source>
 <target>Mesaje de jurnalizare:</target>
 <source>Stop</source>
@@ -363,7 +367,7 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>&Global settings...</source>
 <target>&Setări Globale...</target>
 <source>&Create batch job...</source>
-<target>&Creează o Sarcină Lot...</target>
+<target>&Creează o Sarcină Set...</target>
 <source>&Export file list...</source>
 <target>&Exportă Lista de File...</target>
 <source>&Advanced</source>
@@ -395,7 +399,7 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Hide excluded items</source>
 <target>Ascunde itemurile excluse</target>
 <source>Hide filtered or temporarily excluded files</source>
-<target>Ascunde filele filtrate sau excluse temporar</target>
+<target>Ascunde elementele (file/dosare) filtrate sau excluse temporar</target>
 <source>Number of files and directories that will be created</source>
 <target>Numărul de file și dosare care vor fi create</target>
 <source>Number of files that will be overwritten</source>
@@ -409,9 +413,9 @@ Linia de comandă este executată de fiecare dată cînd:
 <source>Right</source>
 <target>Dreapta</target>
 <source>Batch job</source>
-<target>Sarcină Lot</target>
-<source>Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
-<target>Se poate crea o filă cu un lot de comenzi [batch file] pentru sincronizarea inteligentă. Pentru a porni în modul lot, precizează astfel numele filei lot pentru prelucrarea sa de către executabilul FreeFileSync: freefilesync.exe <filă lot>. Această operație poate fi programată în planificatorul de sarcini al sistemului de operare [task scheduler].</target>
+<target>Sarcină Set</target>
+<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
+<target>Poți crea o filă ce include un set de comenzi [batch file], în scopul folosirii ei la sincronizarea inteligentă. Pentru a porni în modul set, dublu-clichează fila sau execut-o folosind linia de comandă: FreeFileSync.exe <filaset>. Această operație poate fi programată în planificatorul de sarcini al sistemului de operare [task scheduler].</target>
 <source>Help</source>
 <target>Ajutor</target>
 <source>Configuration overview:</source>
@@ -478,18 +482,18 @@ Linia de comandă este executată de fiecare dată cînd:
 <target>Categorie</target>
 <source>Action</source>
 <target>Acțiune</target>
-<source>Files/folders that exist on left side only</source>
-<target>File sau dosare care există doar în partea stîngă</target>
-<source>Files/folders that exist on right side only</source>
-<target>File sau dosare care există doar în partea dreaptă</target>
-<source>Files that exist on both sides, left one is newer</source>
-<target>File care există în ambele părți, cea din stînga fiind mai nouă</target>
-<source>Files that exist on both sides, right one is newer</source>
-<target>File care există în ambele părți, cea din dreapta fiind mai nouă</target>
-<source>Files that have different content</source>
-<target>File care au conținut diferit</target>
-<source>Conflicts/files that cannot be categorized</source>
-<target>Situații care nu pot fi incluse într-o anumită categorie</target>
+<source>File/folder exists on left side only</source>
+<target>Fila/Dosarul există doar în partea stîngă</target>
+<source>File/folder exists on right side only</source>
+<target>Fila/Dosarul există doar în partea dreaptă</target>
+<source>Left file is newer</source>
+<target>Fila stîngă e mai nouă</target>
+<source>Right file is newer</source>
+<target>Fila dreaptă e mai nouă</target>
+<source>Files have different content</source>
+<target>Filele au conținut diferit</target>
+<source>Conflict/file cannot be categorized</source>
+<target>Conflictul/Fila nu pot fi incluse într-o anumită categorie</target>
 <source>Compare by...</source>
 <target>Compară după:</target>
 <source>
@@ -544,8 +548,8 @@ este identic
 <target>- există doar în stînga</target>
 <source>- exists right only</source>
 <target>- există doar în dreapta</target>
-<source>- conflict</source>
-<target>- conflict</target>
+<source>- conflict (same date, different size)</source>
+<target>- conflict (dată identică, mărime diferită)</target>
 <source>Compare by "File content"</source>
 <target>Compară după "Conținutul Filelor"</target>
 <source>
@@ -712,10 +716,8 @@ Transferă permisiunile filelor și dosarelor
 <target><selectare multiplă></target>
 <source>D-Click</source>
 <target>Clic-Dreapta</target>
-<source>Copy to clipboard	CTRL+C</source>
-<target>Copiază în Cliplanșetă	CTRL+C</target>
-<source>Delete files	DEL</source>
-<target>Șterge Filele	DEL</target>
+<source>Delete</source>
+<target>Șterge</target>
 <source>Customize...</source>
 <target>Personalizează...</target>
 <source>Auto-adjust columns</source>
@@ -753,45 +755,45 @@ Transferă permisiunile filelor și dosarelor
 <source>Show files that are newer on right</source>
 <target>Arată filele din dreapta mai noi decît cele din stînga</target>
 <source>Hide files that are equal</source>
-<target>Ascunde filele care sînt identice</target>
+<target>Ascunde elementele (file/dosare) identice</target>
 <source>Show files that are equal</source>
-<target>Arată filele identice</target>
+<target>Arată elementele (file/dosare) identice</target>
 <source>Hide files that are different</source>
-<target>Ascunde filele care sînt diferite</target>
+<target>Ascunde elementele (file/dosare) care sînt diferite</target>
 <source>Show files that are different</source>
-<target>Arată filele diferite</target>
+<target>Arată elementele (file/dosare) diferite</target>
 <source>Hide conflicts</source>
 <target>Ascunde conflictele</target>
 <source>Show conflicts</source>
 <target>Arată conflictele</target>
 <source>Hide files that will be created on the left side</source>
-<target>Ascunde filele care vor fi create în stînga</target>
+<target>Ascunde elementele (file/dosare) care vor fi create în stînga</target>
 <source>Show files that will be created on the left side</source>
-<target>Arată filele care vor fi create în stînga</target>
+<target>Arată elementele (file/dosare) care vor fi create în stînga</target>
 <source>Hide files that will be created on the right side</source>
-<target>Ascunde filele care vor fi create în dreapta</target>
+<target>Ascunde elementele (file/dosare) care vor fi create în dreapta</target>
 <source>Show files that will be created on the right side</source>
-<target>Arată filele care vor fi create în dreapta</target>
+<target>Arată elementele (file/dosare) care vor fi create în dreapta</target>
 <source>Hide files that will be deleted on the left side</source>
-<target>Ascunde filele care vor fi șterse în stînga</target>
+<target>Ascunde elementele (file/dosare) care vor fi șterse în stînga</target>
 <source>Show files that will be deleted on the left side</source>
-<target>Arată filele care vor fi șterse în stînga</target>
+<target>Arată elementele (file/dosare) care vor fi șterse în stînga</target>
 <source>Hide files that will be deleted on the right side</source>
-<target>Ascunde filele care vor fi șterse în dreapta</target>
+<target>Ascunde elementele (file/dosare) care vor fi șterse în dreapta</target>
 <source>Show files that will be deleted on the right side</source>
-<target>Arată filele care vor fi șterse în dreapta</target>
+<target>Arată elementele (file/dosare) care vor fi șterse în dreapta</target>
 <source>Hide files that will be overwritten on left side</source>
-<target>Ascunde filele care vor fi suprascrise în stînga</target>
+<target>Ascunde elementele (file/dosare) care vor fi suprascrise în stînga</target>
 <source>Show files that will be overwritten on left side</source>
-<target>Arată filele care vor fi suprascrise în stînga</target>
+<target>Arată elementele (file/dosare) care vor fi suprascrise în stînga</target>
 <source>Hide files that will be overwritten on right side</source>
-<target>Ascunde filele care vor fi suprascrise în dreapta</target>
+<target>Ascunde elementele (file/dosare) care vor fi suprascrise în dreapta</target>
 <source>Show files that will be overwritten on right side</source>
-<target>Arată filele care vor fi suprascrise în dreapta</target>
+<target>Arată elementele (file/dosare) care vor fi suprascrise în dreapta</target>
 <source>Hide files that won't be copied</source>
-<target>Ascunde filele care nu vor fi copiate</target>
+<target>Ascunde elementele (file/dosare) care nu vor fi copiate</target>
 <source>Show files that won't be copied</source>
-<target>Arată filele care nu vor fi copiate</target>
+<target>Arată elementele (file/dosare) care nu vor fi copiate</target>
 <source>All directories in sync!</source>
 <target>Toate dosarele au fost sincronizate!</target>
 <source>Please run a Compare first before synchronizing!</source>
@@ -808,8 +810,8 @@ Transferă permisiunile filelor și dosarelor
 </source>
 <target>
 <pluralform>Item șters cu succes!</pluralform>
-<pluralform>%x itemuri șterse cu succes!</pluralform>
-<pluralform>%x de itemuri șterse cu succes!</pluralform>
+<pluralform>%x elemente șterse cu succes!</pluralform>
+<pluralform>%x de elemente șterse cu succes!</pluralform>
 </target>
 <source>
 <pluralform>1 directory</pluralform>
@@ -862,14 +864,10 @@ Transferă permisiunile filelor și dosarelor
 <target>fila există în ambele părți</target>
 <source>on one side only</source>
 <target>fila există doar într-o parte</target>
-<source>- left</source>
-<target>- stînga</target>
-<source>- right</source>
-<target>- dreapta</target>
-<source>different</source>
-<target>file diferite</target>
-<source>- conflict (same date, different size)</source>
-<target>- conflict (aceeași dată, mărime diferită)</target>
+<source>same date</source>
+<target>dată identică</target>
+<source>different date</source>
+<target>dată diferită</target>
 <source>Inactive</source>
 <target>Dezactivat</target>
 <source>Second</source>
@@ -973,37 +971,37 @@ Transferă permisiunile filelor și dosarelor
 <source>Conflict detected:</source>
 <target>Conflict detectat:</target>
 <source>Files %x have the same date but a different size!</source>
-<target>Filele %x au aceeași dată, dar mărime diferită!</target>
+<target>Filele %x au dată identică, dar mărime diferită!</target>
 <source>Symlinks %x have the same date but a different target!</source>
-<target>Simlegăturile %x au aceeași dată, dar ținte diferite!</target>
+<target>Simlegăturile %x au dată identică, dar ținte diferite!</target>
 <source>Comparing files by content failed.</source>
 <target>Compararea filelor după conținut a eșuat.</target>
 <source>Generating file list...</source>
 <target>Generez lista de file...</target>
 <source>Multiple...</source>
 <target>Multiplu...</target>
-<source>Files that are equal on both sides</source>
-<target>File identice în ambele părți</target>
-<source>Equal files/folders that differ in attributes only</source>
-<target>File/Dosare identice care diferă doar prin atributele lor</target>
-<source>Copy from right to left</source>
-<target>Copiază de la Dreapta la Stînga</target>
-<source>Copy from left to right</source>
-<target>Copiază de la Stînga la Dreapta</target>
-<source>Delete files/folders existing on left side only</source>
-<target>Șterge Itemul din Stînga</target>
-<source>Delete files/folders existing on right side only</source>
-<target>Șterge Itemul din Dreapta</target>
-<source>Copy from right to left overwriting</source>
-<target>Copiază de la Dreapta la Stînga cu Suprascriere</target>
-<source>Copy from left to right overwriting</source>
-<target>Copiază de la Stînga la Dreapta cu Suprascriere</target>
+<source>Both sides are equal</source>
+<target>Amblee părți sînt identice</target>
+<source>Files/folders differ in attributes only</source>
+<target>File/Dosarele diferă doar prin atributele lor</target>
+<source>Copy new file/folder to left</source>
+<target>Copiază fila/dosarul nou în stînga</target>
+<source>Copy new file/folder to right</source>
+<target>Copiază fila/dosarul nou în dreapta</target>
+<source>Delete left file/folder</source>
+<target>Șterge fila/dosarul stîng</target>
+<source>Delete right file/folder</source>
+<target>Șterge fila/dosarul drept</target>
+<source>Overwrite left file/folder with right one</source>
+<target>Suprascrie elementul stîng (fila/dosarul) cu cel drept</target>
+<source>Overwrite right file/folder with left one</source>
+<target>Suprascrie elementul drept (fila/dosarul) cu cel stîng</target>
 <source>Do nothing</source>
 <target>Nici o Acțiune</target>
-<source>Copy attributes only from right to left</source>
-<target>Copiază doar atributele de la dreapta la stînga</target>
-<source>Copy attributes only from left to right</source>
-<target>Copiază doar atributele de la stînga la dreapta</target>
+<source>Copy file attributes only to left</source>
+<target>Copiază atributele filelor doar înspre stînga</target>
+<source>Copy file attributes only to right</source>
+<target>Copiază atributele filelor doar înspre dreapta</target>
 <source>Deleting file %x</source>
 <target>Șterg fila %x</target>
 <source>Deleting Symbolic Link %x</source>
@@ -1034,6 +1032,8 @@ Transferă permisiunile filelor și dosarelor
 <target>Actualizez atributele lui %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>Dosarul sursă nu mai există:</target>
+<source>Generating database...</source>
+<target>Generez baza de date...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Nu este nimic de sincronizat conform configurației!</target>
 <source>Target directory name must not be empty!</source>
@@ -1058,8 +1058,6 @@ Transferă permisiunile filelor și dosarelor
 <target>Va fi modificat un dosar care face parte din mai multe perechi de dosare! Reverifică setările de sincronizare!</target>
 <source>Processing folder pair:</source>
 <target>Procesez perechea de dosare:</target>
-<source>Generating database...</source>
-<target>Generez baza de date...</target>
 <source>Error copying locked file %x!</source>
 <target>Eroare la copierea filei zăvorîte %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

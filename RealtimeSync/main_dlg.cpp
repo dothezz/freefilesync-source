@@ -63,9 +63,9 @@ MainDialog::MainDialog(wxDialog* dlg, const wxString& cfgFileName)
             rts::readRealOrBatchConfig(currentConfigFile, newConfig);
             loadCfgSuccess = true;
         }
-        catch (const xmlAccess::XmlError& error)
+        catch (const xmlAccess::FfsXmlError& error)
         {
-            if (error.getSeverity() == xmlAccess::XmlError::WARNING)
+            if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
                 wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING);
             else
                 wxMessageBox(error.msg(), _("Error"), wxOK | wxICON_ERROR);
@@ -99,7 +99,7 @@ MainDialog::~MainDialog()
     {
         writeRealConfig(currentCfg, lastConfigFileName());
     }
-    catch (const xmlAccess::XmlError& error)
+    catch (const xmlAccess::FfsXmlError& error)
     {
         wxMessageBox(error.msg().c_str(), _("Error"), wxOK | wxICON_ERROR);
     }
@@ -237,9 +237,9 @@ void MainDialog::loadConfig(const wxString& filename)
     {
         rts::readRealOrBatchConfig(filename, newConfig);
     }
-    catch (const xmlAccess::XmlError& error)
+    catch (const xmlAccess::FfsXmlError& error)
     {
-        if (error.getSeverity() == xmlAccess::XmlError::WARNING)
+        if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
             wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING);
         else
         {

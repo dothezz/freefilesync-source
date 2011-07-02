@@ -25,6 +25,11 @@
 #define DEPRECATED(x) __declspec(deprecated) x
 #endif
 
+//two macros for quick performance measurements
+#define PERF_START CpuTimer perfTest;
+#define PERF_STOP  perfTest.showResult();
+
+
 class CpuTimer
 {
 public:
@@ -73,9 +78,5 @@ private:
     LARGE_INTEGER startTime;
     bool resultShown;
 };
-
-//two macros for quick performance measurements
-#define PERF_START CpuTimer perfTest;
-#define PERF_STOP  perfTest.showResult();
 
 #endif //DEBUG_PERF_HEADER

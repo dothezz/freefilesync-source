@@ -70,7 +70,9 @@ void shellExecute(const wxString& command, ExecutionType type = EXEC_TYPE_ASYNC)
     if (!::ShellExecuteEx(&execInfo)) //__inout  LPSHELLEXECUTEINFO lpExecInfo
     {
         wxString errorMsg = _("Invalid commandline: \"%x\"");
-        errorMsg.Replace(L"%x", filename + L" " + arguments);
+        wxString cmdFmt = wxString(L"\nFile: ") + filename + L"\nArg: " + arguments;
+
+        errorMsg.Replace(L"%x", cmdFmt);
         wxMessageBox(errorMsg + L"\n\n" + getLastErrorFormatted());
         return;
     }

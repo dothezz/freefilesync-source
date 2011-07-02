@@ -456,33 +456,41 @@ protected:
     wxPanel* m_panelCustomDeletionDir;
     wxTextCtrl* m_textCtrlCustomDelFolder;
     FfsDirPickerCtrl* m_dirPickerCustomDelFolder;
-
     wxButton* m_buttonOK;
     wxButton* m_button16;
 
 
-    wxStaticBoxSizer* sbSizerSyncDirections;
+
+    wxStaticBitmap* m_bitmapDatabase;
+    wxBoxSizer* sbSizerSyncDirections;
     wxStaticText* m_staticText21;
     wxStaticText* m_staticText31;
     wxStaticLine* m_staticline3;
+    wxBoxSizer* bSizerLeftOnly;
     wxStaticBitmap* m_bitmapLeftOnly;
 
     wxBitmapButton* m_bpButtonLeftOnly;
+    wxBoxSizer* bSizerRightOnly;
     wxStaticBitmap* m_bitmapRightOnly;
 
     wxBitmapButton* m_bpButtonRightOnly;
+    wxBoxSizer* bSizerLeftNewer;
     wxStaticBitmap* m_bitmapLeftNewer;
 
     wxBitmapButton* m_bpButtonLeftNewer;
+    wxBoxSizer* bSizerRightNewer;
     wxStaticBitmap* m_bitmapRightNewer;
 
     wxBitmapButton* m_bpButtonRightNewer;
+    wxBoxSizer* bSizerDifferent;
     wxStaticBitmap* m_bitmapDifferent;
 
     wxBitmapButton* m_bpButtonDifferent;
+    wxBoxSizer* bSizerConflict;
     wxStaticBitmap* m_bitmapConflict;
 
     wxBitmapButton* m_bpButtonConflict;
+
 
     // Virtual event handlers, overide them in your derived class
     virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }

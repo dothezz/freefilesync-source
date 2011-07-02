@@ -99,7 +99,7 @@ public:
     virtual void onFile(const Zchar* shortName, const Zstring& fullName, const TraverseCallback::FileInfo& details);
 
 private:
-    typedef boost::shared_ptr<const DirCallback> CallbackPointer;
+    typedef std::shared_ptr<const DirCallback> CallbackPointer;
 
     const SymLinkHandling handleSymlinks_;
     const Zstring textScanning;
@@ -292,7 +292,7 @@ public:
     const DirContainer& getDirectoryDescription(const Zstring& directoryPostfixed, const HardFilter::FilterRef& filter);
 
 private:
-    typedef boost::shared_ptr<DirContainer> DirBufferValue; //exception safety: avoid memory leak
+    typedef std::shared_ptr<DirContainer> DirBufferValue; //exception safety: avoid memory leak
     typedef std::map<DirBufferKey, DirBufferValue> BufferType;
 
     DirContainer& insertIntoBuffer(const DirBufferKey& newKey);

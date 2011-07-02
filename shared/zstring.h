@@ -78,6 +78,8 @@ public:
 #endif
         ::operator delete(ptr);
     }
+
+    static size_t calcCapacity(size_t length) { return std::max<size_t>(16, length + length / 2); } //exponential growth + min size
 };
 
 
@@ -120,8 +122,6 @@ typedef char Zchar;
 //"The reason for all the fuss above" (Loki/SmartPtr)
 typedef Zbase<Zchar, StorageRefCount, AllocatorFreeStoreChecked> Zstring; //for use with file names
 
-//fast replacement for wxString modelling exponential growth
-typedef Zbase<wchar_t, StorageRefCount, AllocatorFreeStoreChecked> zxString; //general unicode string
 
 
 

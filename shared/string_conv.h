@@ -7,6 +7,7 @@
 #ifndef STRINGCONV_H_INCLUDED
 #define STRINGCONV_H_INCLUDED
 
+#include <string_utf8.h>
 #include <wx/string.h>
 #include "zstring.h"
 
@@ -22,8 +23,6 @@ Zstring wxToZ(const wxChar* str);
 Zstring wxToZ(wxChar ch);
 
 
-wxString zxToWx(const zxString& str);
-zxString wxToZx(const wxString& str);
 
 
 
@@ -53,9 +52,9 @@ inline
 wxString zToWx(const Zstring& str)
 {
 #ifdef FFS_WIN
-    return wxString(str.c_str(), str.length());
+    return cvrtString<wxString>(str);
 #elif defined FFS_LINUX
-    return wxString::FromUTF8(str.c_str(), str.length());
+    return utf8ToWide<wxString>(str);
 #endif
 }
 
@@ -64,9 +63,9 @@ inline
 wxString zToWx(const Zchar* str)
 {
 #ifdef FFS_WIN
-    return str;
+    return cvrtString<wxString>(str);
 #elif defined FFS_LINUX
-    return wxString::FromUTF8(str);
+    return utf8ToWide<wxString>(str);
 #endif
 }
 
@@ -74,7 +73,11 @@ wxString zToWx(const Zchar* str)
 inline
 wxString zToWx(Zchar ch)
 {
-    return zToWx(Zstring() + ch);
+#ifdef FFS_WIN
+    return cvrtString<wxString>(ch);
+#elif defined FFS_LINUX
+    return utf8ToWide<wxString>(ch);
+#endif
 }
 
 //-----------------------------------------------------------------
@@ -82,9 +85,9 @@ inline
 Zstring wxToZ(const wxString& str)
 {
 #ifdef FFS_WIN
-    return Zstring(str.c_str(), str.length());
+    return cvrtString<Zstring>(str);
 #elif defined FFS_LINUX
-    return Zstring(str.ToUTF8());
+    return wideToUtf8<Zstring>(str);
 #endif
 }
 
@@ -93,9 +96,9 @@ inline
 Zstring wxToZ(const wxChar* str)
 {
 #ifdef FFS_WIN
-    return str;
+    return cvrtString<Zstring>(str);
 #elif defined FFS_LINUX
-    return Zstring(wxString(str).ToUTF8());
+    return wideToUtf8<Zstring>(str);
 #endif
 }
 
@@ -103,21 +106,11 @@ Zstring wxToZ(const wxChar* str)
 inline
 Zstring wxToZ(wxChar ch)
 {
-    return wxToZ(wxString(ch));
-}
-
-
-inline
-wxString zxToWx(const zxString& str)
-{
-    return wxString(str.c_str(), str.length());
-}
-
-
-inline
-zxString wxToZx(const wxString& str)
-{
-    return zxString(str.c_str(), str.length());
+#ifdef FFS_WIN
+    return cvrtString<Zstring>(ch);
+#elif defined FFS_LINUX
+    return wideToUtf8<Zstring>(ch);
+#endif
 }
 }
 

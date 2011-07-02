@@ -42,7 +42,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     m_menuItemSave = new wxMenuItem( m_menuFile, wxID_ANY, wxString( _("S&ave configuration...") ) + wxT('\t') + wxT("Ctrl-S"), wxEmptyString, wxITEM_NORMAL );
     m_menuFile->Append( m_menuItemSave );
 
-    m_menuItemLoad = new wxMenuItem( m_menuFile, wxID_ANY, wxString( _("&Load configuration...") ) + wxT('\t') + wxT("Ctrl-L"), wxEmptyString, wxITEM_NORMAL );
+    m_menuItemLoad = new wxMenuItem( m_menuFile, wxID_ANY, wxString( _("&Load configuration...") ) + wxT('\t') + wxT("Ctrl-O"), wxEmptyString, wxITEM_NORMAL );
     m_menuFile->Append( m_menuItemLoad );
 
     wxMenuItem* m_separator3;
@@ -332,7 +332,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     m_gridLeft->SetDefaultCellAlignment( wxALIGN_LEFT, wxALIGN_CENTRE );
     m_gridLeft->SetMinSize( wxSize( 1,1 ) );
 
-    bSizer7->Add( m_gridLeft, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxRIGHT, 5 );
+    bSizer7->Add( m_gridLeft, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 
     m_panelLeft->SetSizer( bSizer7 );
     m_panelLeft->Layout();
@@ -369,7 +369,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     // Cell Defaults
     m_gridMiddle->SetDefaultCellFont( wxFont( wxNORMAL_FONT->GetPointSize(), 70, 90, 90, false, wxT("Arial") ) );
     m_gridMiddle->SetDefaultCellAlignment( wxALIGN_CENTRE, wxALIGN_CENTRE );
-    bSizer18->Add( m_gridMiddle, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND, 5 );
+    bSizer18->Add( m_gridMiddle, 1, wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxRIGHT|wxLEFT, 5 );
 
     m_panelMiddle->SetSizer( bSizer18 );
     m_panelMiddle->Layout();
@@ -406,7 +406,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
     m_gridRight->SetDefaultCellAlignment( wxALIGN_LEFT, wxALIGN_CENTRE );
     m_gridRight->SetMinSize( wxSize( 1,1 ) );
 
-    bSizer10->Add( m_gridRight, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxLEFT, 5 );
+    bSizer10->Add( m_gridRight, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 
     m_panelRight->SetSizer( bSizer10 );
     m_panelRight->Layout();
@@ -1031,7 +1031,7 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     wxBoxSizer* bSizer70;
     bSizer70 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_staticText44 = new wxStaticText( this, wxID_ANY, _("Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner."), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText44 = new wxStaticText( this, wxID_ANY, _("Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner."), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText44->Wrap( 500 );
     bSizer70->Add( m_staticText44, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
@@ -1682,9 +1682,6 @@ SyncCfgDlgGenerated::SyncCfgDlgGenerated( wxWindow* parent, wxWindowID id, const
 
     bSizer29->Add( bSizer201, 0, wxTOP|wxBOTTOM, 5 );
 
-
-    bSizer29->Add( 0, 5, 1, 0, 5 );
-
     wxBoxSizer* bSizer291;
     bSizer291 = new wxBoxSizer( wxHORIZONTAL );
 
@@ -1709,7 +1706,16 @@ SyncCfgDlgGenerated::SyncCfgDlgGenerated( wxWindow* parent, wxWindowID id, const
 
     bSizer181->Add( 10, 0, 0, 0, 5 );
 
-    sbSizerSyncDirections = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Configuration") ), wxVERTICAL );
+    wxStaticBoxSizer* sbSizer2453245;
+    sbSizer2453245 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Configuration") ), wxVERTICAL );
+
+
+    sbSizer2453245->Add( 0, 0, 1, wxEXPAND, 5 );
+
+    m_bitmapDatabase = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 70,70 ), 0 );
+    sbSizer2453245->Add( m_bitmapDatabase, 1, wxALIGN_CENTER_HORIZONTAL|wxRIGHT|wxLEFT, 10 );
+
+    sbSizerSyncDirections = new wxBoxSizer( wxVERTICAL );
 
     wxGridSizer* gSizer3;
     gSizer3 = new wxGridSizer( 1, 2, 0, 5 );
@@ -1734,105 +1740,104 @@ SyncCfgDlgGenerated::SyncCfgDlgGenerated( wxWindow* parent, wxWindowID id, const
     wxBoxSizer* bSizer121;
     bSizer121 = new wxBoxSizer( wxVERTICAL );
 
-    wxBoxSizer* bSizer122;
-    bSizer122 = new wxBoxSizer( wxHORIZONTAL );
+    bSizerLeftOnly = new wxBoxSizer( wxHORIZONTAL );
 
     m_bitmapLeftOnly = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 45,45 ), 0 );
-    m_bitmapLeftOnly->SetToolTip( _("Files/folders that exist on left side only") );
+    m_bitmapLeftOnly->SetToolTip( _("File/folder exists on left side only") );
 
-    bSizer122->Add( m_bitmapLeftOnly, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizerLeftOnly->Add( m_bitmapLeftOnly, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
-    bSizer122->Add( 5, 0, 0, wxALIGN_CENTER_VERTICAL, 5 );
+    bSizerLeftOnly->Add( 5, 0, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
     m_bpButtonLeftOnly = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 42,42 ), wxBU_AUTODRAW );
-    bSizer122->Add( m_bpButtonLeftOnly, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizerLeftOnly->Add( m_bpButtonLeftOnly, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
-    bSizer121->Add( bSizer122, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+    bSizer121->Add( bSizerLeftOnly, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 
-    wxBoxSizer* bSizer123;
-    bSizer123 = new wxBoxSizer( wxHORIZONTAL );
+    bSizerRightOnly = new wxBoxSizer( wxHORIZONTAL );
 
     m_bitmapRightOnly = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 45,45 ), 0 );
-    m_bitmapRightOnly->SetToolTip( _("Files/folders that exist on right side only") );
+    m_bitmapRightOnly->SetToolTip( _("File/folder exists on right side only") );
 
-    bSizer123->Add( m_bitmapRightOnly, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizerRightOnly->Add( m_bitmapRightOnly, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
-    bSizer123->Add( 5, 0, 0, 0, 5 );
+    bSizerRightOnly->Add( 5, 0, 0, 0, 5 );
 
     m_bpButtonRightOnly = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 42,42 ), wxBU_AUTODRAW );
-    bSizer123->Add( m_bpButtonRightOnly, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizerRightOnly->Add( m_bpButtonRightOnly, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
-    bSizer121->Add( bSizer123, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+    bSizer121->Add( bSizerRightOnly, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 
-    wxBoxSizer* bSizer124;
-    bSizer124 = new wxBoxSizer( wxHORIZONTAL );
+    bSizerLeftNewer = new wxBoxSizer( wxHORIZONTAL );
 
     m_bitmapLeftNewer = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 45,45 ), 0 );
-    m_bitmapLeftNewer->SetToolTip( _("Files that exist on both sides, left one is newer") );
+    m_bitmapLeftNewer->SetToolTip( _("Left file is newer") );
 
-    bSizer124->Add( m_bitmapLeftNewer, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizerLeftNewer->Add( m_bitmapLeftNewer, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
-    bSizer124->Add( 5, 0, 0, 0, 5 );
+    bSizerLeftNewer->Add( 5, 0, 0, 0, 5 );
 
     m_bpButtonLeftNewer = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 42,42 ), wxBU_AUTODRAW );
-    bSizer124->Add( m_bpButtonLeftNewer, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizerLeftNewer->Add( m_bpButtonLeftNewer, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
-    bSizer121->Add( bSizer124, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+    bSizer121->Add( bSizerLeftNewer, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 
-    wxBoxSizer* bSizer125;
-    bSizer125 = new wxBoxSizer( wxHORIZONTAL );
+    bSizerRightNewer = new wxBoxSizer( wxHORIZONTAL );
 
     m_bitmapRightNewer = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 45,45 ), 0 );
-    m_bitmapRightNewer->SetToolTip( _("Files that exist on both sides, right one is newer") );
+    m_bitmapRightNewer->SetToolTip( _("Right file is newer") );
 
-    bSizer125->Add( m_bitmapRightNewer, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizerRightNewer->Add( m_bitmapRightNewer, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
-    bSizer125->Add( 5, 0, 0, 0, 5 );
+    bSizerRightNewer->Add( 5, 0, 0, 0, 5 );
 
     m_bpButtonRightNewer = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 42,42 ), wxBU_AUTODRAW );
-    bSizer125->Add( m_bpButtonRightNewer, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizerRightNewer->Add( m_bpButtonRightNewer, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
-    bSizer121->Add( bSizer125, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+    bSizer121->Add( bSizerRightNewer, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 
-    wxBoxSizer* bSizer126;
-    bSizer126 = new wxBoxSizer( wxHORIZONTAL );
+    bSizerDifferent = new wxBoxSizer( wxHORIZONTAL );
 
     m_bitmapDifferent = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 45,45 ), 0 );
-    m_bitmapDifferent->SetToolTip( _("Files that have different content") );
+    m_bitmapDifferent->SetToolTip( _("Files have different content") );
 
-    bSizer126->Add( m_bitmapDifferent, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizerDifferent->Add( m_bitmapDifferent, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
-    bSizer126->Add( 5, 0, 0, 0, 5 );
+    bSizerDifferent->Add( 5, 0, 0, 0, 5 );
 
     m_bpButtonDifferent = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 42,42 ), wxBU_AUTODRAW );
-    bSizer126->Add( m_bpButtonDifferent, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizerDifferent->Add( m_bpButtonDifferent, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
-    bSizer121->Add( bSizer126, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+    bSizer121->Add( bSizerDifferent, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 
-    wxBoxSizer* bSizer127;
-    bSizer127 = new wxBoxSizer( wxHORIZONTAL );
+    bSizerConflict = new wxBoxSizer( wxHORIZONTAL );
 
     m_bitmapConflict = new wxStaticBitmap( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 45,45 ), 0 );
-    m_bitmapConflict->SetToolTip( _("Conflicts/files that cannot be categorized") );
+    m_bitmapConflict->SetToolTip( _("Conflict/file cannot be categorized") );
 
-    bSizer127->Add( m_bitmapConflict, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizerConflict->Add( m_bitmapConflict, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
-    bSizer127->Add( 5, 0, 0, 0, 5 );
+    bSizerConflict->Add( 5, 0, 0, 0, 5 );
 
     m_bpButtonConflict = new wxBitmapButton( this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxSize( 42,42 ), wxBU_AUTODRAW );
-    bSizer127->Add( m_bpButtonConflict, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizerConflict->Add( m_bpButtonConflict, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
-    bSizer121->Add( bSizer127, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+    bSizer121->Add( bSizerConflict, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 
     sbSizerSyncDirections->Add( bSizer121, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 
-    bSizer181->Add( sbSizerSyncDirections, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+    sbSizer2453245->Add( sbSizerSyncDirections, 0, wxEXPAND, 5 );
+
+
+    sbSizer2453245->Add( 0, 0, 1, wxEXPAND, 5 );
+
+    bSizer181->Add( sbSizer2453245, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 
     bSizer7->Add( bSizer181, 0, wxALL, 5 );
 
@@ -2565,7 +2570,7 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer172->Add( m_hyperlink8, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
-    m_hyperlink15 = new wxHyperlinkCtrl( m_panel33, wxID_ANY, _("TinyXML"), wxT("http://www.grinninglizard.com/tinyxml"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink15 = new wxHyperlinkCtrl( m_panel33, wxID_ANY, _("zenXML"), wxT("http://sourceforge.net/projects/zenxml/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink15->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 
     bSizer172->Add( m_hyperlink15, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );

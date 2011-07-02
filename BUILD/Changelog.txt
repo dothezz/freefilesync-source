@@ -2,6 +2,21 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.18
+---------------
+Launcher running synchronously and returning application error code
+Fixed sort by file extension
+Fixed drag and drop of SAMBA network folder
+Render (all) invalid file dates correctly on GUI
+Correct layout selection for RTL and LTR languages
+Correct GUI status texts while waiting for directory lock
+Properly set default directory when loading configuration
+New XML framework: zenXML
+Addded Hebrew language
+Addded Danish language
+Updated translation files
+
+
 Changelog v3.17
 ---------------
 Filter files by size

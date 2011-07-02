@@ -44,14 +44,6 @@ private:
 class SyncStatus
 {
 public:
-    SyncStatus(AbortCallback& abortCb,
-               MainDialog* parentWindow, //may be NULL
-               bool startSilent,
-               const wxString& jobName);
-    ~SyncStatus();
-
-    wxWindow* getAsWindow(); //convenience! don't abuse!
-
     enum SyncStatusID
     {
         ABORTED,
@@ -62,6 +54,15 @@ public:
         COMPARING_CONTENT,
         SYNCHRONIZING
     };
+
+    SyncStatus(AbortCallback& abortCb,
+               MainDialog* parentWindow, //may be NULL
+               SyncStatusID startStatus,
+               bool startSilent,
+               const wxString& jobName);
+    ~SyncStatus();
+
+    wxWindow* getAsWindow(); //convenience! don't abuse!
 
     void resetGauge(int totalObjectsToProcess, zen::Int64 totalDataToProcess);
     void incScannedObjects_NoUpdate(int number);

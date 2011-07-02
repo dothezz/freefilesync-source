@@ -62,7 +62,7 @@ xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& bat
 }
 
 
-void rts::readRealOrBatchConfig(const wxString& filename, xmlAccess::XmlRealConfig& config)  //throw (xmlAccess::XmlError);
+void rts::readRealOrBatchConfig(const wxString& filename, xmlAccess::XmlRealConfig& config)  //throw (xmlAccess::FfsXmlError);
 {
     if (xmlAccess::getXmlType(filename) != xmlAccess::XML_TYPE_BATCH)
     {
@@ -74,11 +74,11 @@ void rts::readRealOrBatchConfig(const wxString& filename, xmlAccess::XmlRealConf
     xmlAccess::XmlBatchConfig batchCfg;
     try
     {
-        xmlAccess::readConfig(filename, batchCfg); //throw (xmlAccess::XmlError);
+        xmlAccess::readConfig(filename, batchCfg); //throw (xmlAccess::FfsXmlError);
     }
-    catch (const xmlAccess::XmlError& e)
+    catch (const xmlAccess::FfsXmlError& e)
     {
-        if (e.getSeverity() == xmlAccess::XmlError::WARNING)
+        if (e.getSeverity() == xmlAccess::FfsXmlError::WARNING)
             config = convertBatchToReal(batchCfg, filename); //do work despite parsing errors, then re-throw
 
         throw;                                 //
@@ -95,7 +95,7 @@ int rts::getProgramLanguage()
     {
         xmlAccess::readConfig(settings);
     }
-    catch (const xmlAccess::XmlError&) {} //user default language if error occured
+    catch (const xmlAccess::FfsXmlError&) {} //user default language if error occured
 
     return settings.programLanguage;
 }

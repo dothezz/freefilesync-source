@@ -12,13 +12,27 @@
 <source>Open with default application</source>
 <target>Ouvrir avec l'application par défaut</target>
 <source>Browse directory</source>
-<target>Prcourir le répertoire</target>
+<target>Parcourir le répertoire</target>
 <source>RealtimeSync - Automated Synchronization</source>
 <target>RealtimeSync - Synchronisation Automatisée</target>
 <source>Browse</source>
 <target>Parcourir</target>
+<source>Invalid commandline: "%x"</source>
+<target>Ligne de commande invalide: "%x"</target>
 <source>Error resolving symbolic link:</source>
 <target>Erreur lors de la résolution du lien symbolique :</target>
+<source>Show popup</source>
+<target>Afficher la boîte de dialogue</target>
+<source>Show popup on errors or warnings</source>
+<target>Affiche la boîte de dialogue pour chaque erreur ou avertissement</target>
+<source>Ignore errors</source>
+<target>Ignorer les erreurs</target>
+<source>Hide all error and warning messages</source>
+<target>Masquer tous les messages d'erreurs et les avertissements</target>
+<source>Exit instantly</source>
+<target>Sortie immédiate</target>
+<source>Abort synchronization immediately</source>
+<target>Abandon immédiat de la synchronisation</target>
 <source>Select alternate synchronization settings</source>
 <target>Sélectionner une autre configuration de la synchronisation</target>
 <source>No filter selected</source>
@@ -121,14 +135,12 @@
 <target>Info</target>
 <source>Fatal Error</source>
 <target>Erreur Fatale</target>
+<source>Invalid FreeFileSync config file!</source>
+<target>Fichier de configuration FreeFileSync invalide !</target>
 <source>File does not exist:</source>
 <target>Le fichier n'existe pas :</target>
 <source>Error parsing configuration file:</source>
 <target>Erreur lors de l'analyse du fichier de configuration :</target>
-<source>Error writing file:</source>
-<target>Erreur lors de l'écriture du fichier :</target>
-<source>Invalid FreeFileSync config file!</source>
-<target>Fichier de configuration FreeFileSync invalide !</target>
 <source>/sec</source>
 <target>/sec</target>
 <source>
@@ -217,8 +229,6 @@ La ligne de commande est exécutée chaque fois que :
 <target>Surveillance en cours...</target>
 <source>Waiting for missing directories...</source>
 <target>En attente des répertoires absents ...</target>
-<source>Command line is empty!</source>
-<target>La ligne de commande est vide !</target>
 <source>Could not initialize directory monitoring:</source>
 <target>Impossible d'initialiser la surveillance des dossiers :</target>
 <source>A directory input field is empty.</source>
@@ -259,12 +269,18 @@ La ligne de commande est exécutée chaque fois que :
 <target>Erreur lors de la copie du fichier :</target>
 <source>Error opening file:</source>
 <target>Erreur lors de l'ouverture du fichier :</target>
+<source>Error writing file:</source>
+<target>Erreur lors de l'écriture du fichier :</target>
 <source>Error reading file:</source>
 <target>Erreur lors de la lecture du fichier :</target>
 <source>Endless loop when traversing directory:</source>
 <target>Boucle sans fin lors du parcours du répertoire :</target>
 <source>Error traversing directory:</source>
 <target>Erreur lors du parcours du répertoire :</target>
+<source>Windows Error Code %x:</source>
+<target>Code erreur Windows %x:</target>
+<source>Linux Error Code %x:</source>
+<target>Code erreur Linux %x:</target>
 <source>Error setting privilege:</source>
 <target>Erreur de paramétrage de privilège</target>
 <source>Error moving to Recycle Bin:</source>
@@ -289,18 +305,6 @@ La ligne de commande est exécutée chaque fois que :
 <target>%x %</target>
 <source>Could not read values for the following XML nodes:</source>
 <target>Impossible de lire les valeurs des noeuds XML suivants :</target>
-<source>Show popup</source>
-<target>Afficher la boîte de dialogue</target>
-<source>Show popup on errors or warnings</source>
-<target>Affiche la boîte de dialogue pour chaque erreur ou avertissement</target>
-<source>Ignore errors</source>
-<target>Ignorer les erreurs</target>
-<source>Hide all error and warning messages</source>
-<target>Masquer tous les messages d'erreurs et les avertissements</target>
-<source>Exit instantly</source>
-<target>Sortie immédiate</target>
-<source>Abort synchronization immediately</source>
-<target>Abandon immédiat de la synchronisation</target>
 <source>Logging</source>
 <target>Connexion</target>
 <source>FreeFileSync batch file</source>
@@ -405,8 +409,8 @@ La ligne de commande est exécutée chaque fois que :
 <target>Droite</target>
 <source>Batch job</source>
 <target>Fichier de commandes</target>
-<source>Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
-<target>Crée un fichier de traitement par lots pour une synchronisation automatique. Pour démarrer en mode de traitement par lots, indiquer le nom du fichier à l'exécutable FreeFileSync : freefilesync.exe <fichier de commandes>. Ceci peut aussi être programmé dans le plannificateur de tâches.</target>
+<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
+<target>Créer un fichier de commandes pour la synchronisation automatique. Pour démarrer en mode batch il suffit de double-cliquez sur le fichier de commandes ou d'exécuter en ligne de commande: FreeFileSync.exe <fichier de commandes>. Vous pouvez aussi le programmer à l'aide du planificateur de tâches de votre système d'exploitation.</target>
 <source>Help</source>
 <target>Aide</target>
 <source>Configuration overview:</source>
@@ -473,18 +477,18 @@ La ligne de commande est exécutée chaque fois que :
 <target>Catégorie</target>
 <source>Action</source>
 <target>Action</target>
-<source>Files/folders that exist on left side only</source>
-<target>Fichiers/répertoires existant seulement à gauche</target>
-<source>Files/folders that exist on right side only</source>
-<target>Fichiers/répertoires existant seulement à droite</target>
-<source>Files that exist on both sides, left one is newer</source>
-<target>Fichiers existants des deux côtés, celui de gauche est plus récent</target>
-<source>Files that exist on both sides, right one is newer</source>
-<target>Fichiers existants des deux côtés, celui de droite est plus récent</target>
-<source>Files that have different content</source>
-<target>Fichiers ayant un contenu différent</target>
-<source>Conflicts/files that cannot be categorized</source>
-<target>Conflits/fichiers ne pouvant être catégorisés</target>
+<source>File/folder exists on left side only</source>
+<target>Fichier/Dossier existant seulement à gauche</target>
+<source>File/folder exists on right side only</source>
+<target>Fichier/Dossier existant seulement à droite</target>
+<source>Left file is newer</source>
+<target>Le fichier à gauche est nouveau</target>
+<source>Right file is newer</source>
+<target>Le fichier à droite est nouveau</target>
+<source>Files have different content</source>
+<target>Les fichiers ont un contenu différent</target>
+<source>Conflict/file cannot be categorized</source>
+<target>Conflit ou fichier indéterminé</target>
 <source>Compare by...</source>
 <target>Comparaison par...</target>
 <source>
@@ -539,8 +543,8 @@ est identique
 <target>- le fichier existe seulement à gauche</target>
 <source>- exists right only</source>
 <target>- le fichier existe seulement à droite</target>
-<source>- conflict</source>
-<target>- conflit</target>
+<source>- conflict (same date, different size)</source>
+<target>- conflit (même date, taille différente)</target>
 <source>Compare by "File content"</source>
 <target>Comparaison par "Contenu des fichiers"</target>
 <source>
@@ -707,10 +711,8 @@ Transfert des attributs système des fichiers et des répertoires
 <target><sélection multiple></target>
 <source>D-Click</source>
 <target>Clic Droit</target>
-<source>Copy to clipboard	CTRL+C</source>
-<target>Copier dans le presse-papiers	CTRL+C</target>
-<source>Delete files	DEL</source>
-<target>Suppression des fichiers	DEL</target>
+<source>Delete</source>
+<target>Supprimer</target>
 <source>Customize...</source>
 <target>Personnaliser...</target>
 <source>Auto-adjust columns</source>
@@ -802,6 +804,8 @@ Transfert des attributs système des fichiers et des répertoires
 <pluralform>%x objects deleted successfully!</pluralform>
 </source>
 <target>
+<pluralform>Objet supprimé avec suucès!</pluralform>
+<pluralform>%x objets supprimés avec succès!</pluralform>
 </target>
 <source>
 <pluralform>1 directory</pluralform>
@@ -851,14 +855,10 @@ Transfert des attributs système des fichiers et des répertoires
 <target>le fichier existe des deux côtés</target>
 <source>on one side only</source>
 <target>le fichier existe d'un seul côté seulement</target>
-<source>- left</source>
-<target>- à gauche</target>
-<source>- right</source>
-<target>- à droite</target>
-<source>different</source>
-<target>fichiers différents</target>
-<source>- conflict (same date, different size)</source>
-<target>- conflit (même date, taille différente)</target>
+<source>same date</source>
+<target>même date</target>
+<source>different date</source>
+<target>date différente</target>
 <source>Inactive</source>
 <target>Inactif</target>
 <source>Second</source>
@@ -969,28 +969,28 @@ Transfert des attributs système des fichiers et des répertoires
 <target>Génération de la liste des fichiers...</target>
 <source>Multiple...</source>
 <target>Multiple...</target>
-<source>Files that are equal on both sides</source>
-<target>Fichiers identiques des deux côtés</target>
-<source>Equal files/folders that differ in attributes only</source>
-<target>Fichiers/Dossiers identiques dont seuls les attributs diffèrent</target>
-<source>Copy from right to left</source>
-<target>Copie de droite à gauche</target>
-<source>Copy from left to right</source>
-<target>Copie de gauche à droite</target>
-<source>Delete files/folders existing on left side only</source>
-<target>Suppression des fichiers/dossiers n'existant que sur le côté gauche</target>
-<source>Delete files/folders existing on right side only</source>
-<target>Suppression des fichiers/dossiers n'existant que sur le côté droit</target>
-<source>Copy from right to left overwriting</source>
-<target>Copie de droite à gauche avec remplacement</target>
-<source>Copy from left to right overwriting</source>
-<target>Copie de gauche à droite avec remplacement</target>
+<source>Both sides are equal</source>
+<target>Les deux cotés sont identiques</target>
+<source>Files/folders differ in attributes only</source>
+<target>Fichiers/Dossiers différant seulement par leurs attributs</target>
+<source>Copy new file/folder to left</source>
+<target>Copier les nouveaux fichiers/dossiers à gauche</target>
+<source>Copy new file/folder to right</source>
+<target>Copier les nouveaux fichiers/dossiers à droite</target>
+<source>Delete left file/folder</source>
+<target>Supprimer les fichiers/dossiers de gauche</target>
+<source>Delete right file/folder</source>
+<target>Supprimer les fichiers/dossiers de droite</target>
+<source>Overwrite left file/folder with right one</source>
+<target>Remplacer le fichier/dossier de gauche avec celui de droite</target>
+<source>Overwrite right file/folder with left one</source>
+<target>Remplacer le fichier/dossier de droite avec celui de gauche</target>
 <source>Do nothing</source>
 <target>Ne rien faire</target>
-<source>Copy attributes only from right to left</source>
-<target>Copier uniquement les attributs de droite à gauche</target>
-<source>Copy attributes only from left to right</source>
-<target>Copier uniquement les attributs de gauche à droite</target>
+<source>Copy file attributes only to left</source>
+<target>Copier seulement les attributs du fichier à gauche</target>
+<source>Copy file attributes only to right</source>
+<target>Copier seulement les attributs du fichier à droite</target>
 <source>Deleting file %x</source>
 <target>Suppression du fichier %x</target>
 <source>Deleting Symbolic Link %x</source>
@@ -1021,6 +1021,8 @@ Transfert des attributs système des fichiers et des répertoires
 <target>Mise à jour des attributs de %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>Le répertoire source n'existe plus :</target>
+<source>Generating database...</source>
+<target>Génération de la base de données...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Rien à synchroniser dans cette configuration !</target>
 <source>Target directory name must not be empty!</source>
@@ -1045,8 +1047,6 @@ Transfert des attributs système des fichiers et des répertoires
 <target>Un répertoire faisant partie de paires multiples doit être modifié ! Vérifiez les paramètres de la synchronisation !</target>
 <source>Processing folder pair:</source>
 <target>Traitement de la paire de dossiers :</target>
-<source>Generating database...</source>
-<target>Génération de la base de données...</target>
 <source>Error copying locked file %x!</source>
 <target>Erreur lors de la copie du fichier verrouillé %x !</target>
 <source>Data verification error: Source and target file have different content!</source>

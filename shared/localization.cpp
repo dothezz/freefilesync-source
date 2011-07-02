@@ -100,26 +100,6 @@ std::string getFileStream(const wxString& filename) //return empty string on err
 
 FFSLocale::FFSLocale(const wxString& filename, wxLanguage languageId) : langId_(languageId) //throw (lngfile::ParsingError, PluralForm::ParsingError)
 {
-    static class StaticInit
-    {
-    public:
-        StaticInit() : loc(wxLANGUAGE_DEFAULT)  //wxLocale: we need deferred initialization, sigh...
-        {
-            //::setlocale (LC_ALL, ""); -> implicitly called by wxLocale
-            const lconv* localInfo = ::localeconv();
-
-            //actually these two parameters are language dependent, but we take system setting to handle all kinds of language derivations
-            THOUSANDS_SEPARATOR = wxString::FromUTF8(localInfo->thousands_sep);
-
-            // why not working?
-            // THOUSANDS_SEPARATOR = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).thousands_sep();
-            // DECIMAL_POINT       = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).decimal_point();
-        }
-    private:
-        wxLocale loc; //required for RTL language support (and nothing else)
-    } dummy;
-
-
     const std::string inputStream = getFileStream(filename);
     if (inputStream.empty())
         throw lngfile::ParsingError(0, 0);
@@ -322,6 +302,7 @@ wxLanguage mapLanguageDialect(wxLanguage language)
             return wxLANGUAGE_SWEDISH;
 
             //case wxLANGUAGE_CZECH:
+            //case wxLANGUAGE_DANISH:
             //case wxLANGUAGE_FINNISH:
             //case wxLANGUAGE_GREEK:
             //case wxLANGUAGE_JAPANESE:
@@ -374,6 +355,37 @@ wxLanguage mapLanguageDialect(wxLanguage language)
 }
 
 
+class CustomLocale
+{
+public:
+    CustomLocale(int selectedLng)
+    {
+        const wxLanguageInfo* sysLngInfo = wxLocale::GetLanguageInfo(wxLocale::GetSystemLanguage());
+        const wxLanguageInfo* selLngInfo = wxLocale::GetLanguageInfo(selectedLng);
+
+        bool sysLangIsRTL      = sysLngInfo ? sysLngInfo->LayoutDirection == wxLayout_RightToLeft : false;
+        bool selectedLangIsRTL = selLngInfo ? selLngInfo->LayoutDirection == wxLayout_RightToLeft : false;
+
+        if (sysLangIsRTL == selectedLangIsRTL)
+            loc.Init(wxLANGUAGE_DEFAULT); //use sys-lang to preserve sub-language specific rules (e.g. german swiss number punctation)
+        else
+            loc.Init(selectedLng);
+
+        //::setlocale (LC_ALL, ""); -> implicitly called by wxLocale
+        const lconv* localInfo = ::localeconv();
+
+        //actually these two parameters are language dependent, but we take system setting to handle all kinds of language derivations
+        THOUSANDS_SEPARATOR = wxString::FromUTF8(localInfo->thousands_sep);
+
+        // why not working?
+        // THOUSANDS_SEPARATOR = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).thousands_sep();
+        // DECIMAL_POINT       = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).decimal_point();
+    }
+private:
+    wxLocale loc; //required for RTL language support (and nothing else)
+};
+
+
 void zen::setLanguage(int language)
 {
     //(try to) retrieve language file
@@ -384,6 +396,12 @@ void zen::setLanguage(int language)
             languageFile = i->languageFile;
             break;
         }
+
+
+    //handle RTL swapping: we need wxWidgets to do this
+    static std::auto_ptr<CustomLocale> dummy;
+    dummy.reset(); //avoid global locale lifetime overlap! wxWidgets cannot handle this and will crash!
+    dummy.reset(new CustomLocale(languageFile.empty() ? wxLANGUAGE_ENGLISH : language));
 
 
     //reset to english language; in case of error show error message just once

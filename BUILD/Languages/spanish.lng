@@ -17,8 +17,22 @@
 <target>RealtimeSync - Sincronización Automática</target>
 <source>Browse</source>
 <target>Examinar</target>
+<source>Invalid commandline: "%x"</source>
+<target>Línea de comandos inválida: "%x"</target>
 <source>Error resolving symbolic link:</source>
 <target>Error al resolver enlace simbólico:</target>
+<source>Show popup</source>
+<target>Mostrar ventanas emergentes</target>
+<source>Show popup on errors or warnings</source>
+<target>Mostrar ventanas emergentes de errores o avisos</target>
+<source>Ignore errors</source>
+<target>Ignorar errores</target>
+<source>Hide all error and warning messages</source>
+<target>Ocultar todos los mensajes de error y aviso</target>
+<source>Exit instantly</source>
+<target>Salir inmediatamente</target>
+<source>Abort synchronization immediately</source>
+<target>Abortar sincronización inmediatamente</target>
 <source>Select alternate synchronization settings</source>
 <target>Seleccione opciones alternativas de sincronización</target>
 <source>No filter selected</source>
@@ -121,14 +135,12 @@
 <target>Info</target>
 <source>Fatal Error</source>
 <target>Error fatal</target>
+<source>Invalid FreeFileSync config file!</source>
+<target>¡Archivo de configuración de FreeFileSync inválido!</target>
 <source>File does not exist:</source>
 <target>El archivo no existe:</target>
 <source>Error parsing configuration file:</source>
 <target>Error al analizar el archivo de configuración:</target>
-<source>Error writing file:</source>
-<target>Error al escribir archivo:</target>
-<source>Invalid FreeFileSync config file!</source>
-<target>¡Archivo de configuración de FreeFileSync inválido!</target>
 <source>/sec</source>
 <target>/seg</target>
 <source>
@@ -217,8 +229,6 @@ La línea de comandos se ejecuta cada vez:
 <target>Visualización activa...</target>
 <source>Waiting for missing directories...</source>
 <target>Esperando directorios faltantes...</target>
-<source>Command line is empty!</source>
-<target>¡La línea de comandos está vacía!</target>
 <source>Could not initialize directory monitoring:</source>
 <target>No se ha podido inicializar la visualización de directorios:</target>
 <source>A directory input field is empty.</source>
@@ -259,12 +269,18 @@ La línea de comandos se ejecuta cada vez:
 <target>Error al copiar archivo:</target>
 <source>Error opening file:</source>
 <target>Error al abrir archivo:</target>
+<source>Error writing file:</source>
+<target>Error al escribir archivo:</target>
 <source>Error reading file:</source>
 <target>Error al leer archivo:</target>
 <source>Endless loop when traversing directory:</source>
 <target>Bucle infinito al buscar en el directorio:</target>
 <source>Error traversing directory:</source>
 <target>Error al buscar en el directorio:</target>
+<source>Windows Error Code %x:</source>
+<target>Código de error de Windows %x:</target>
+<source>Linux Error Code %x:</source>
+<target>Código de error de Linux %x:</target>
 <source>Error setting privilege:</source>
 <target>Error al establecer privilegios:</target>
 <source>Error moving to Recycle Bin:</source>
@@ -289,18 +305,6 @@ La línea de comandos se ejecuta cada vez:
 <target>%x%</target>
 <source>Could not read values for the following XML nodes:</source>
 <target>No se ha podido leer los valores para los siguientes nodos XML:</target>
-<source>Show popup</source>
-<target>Mostrar ventanas emergentes</target>
-<source>Show popup on errors or warnings</source>
-<target>Mostrar ventanas emergentes de errores o avisos</target>
-<source>Ignore errors</source>
-<target>Ignorar errores</target>
-<source>Hide all error and warning messages</source>
-<target>Ocultar todos los mensajes de error y aviso</target>
-<source>Exit instantly</source>
-<target>Salir inmediatamente</target>
-<source>Abort synchronization immediately</source>
-<target>Abortar sincronización inmediatamente</target>
 <source>Logging</source>
 <target>Iniciando sesión</target>
 <source>FreeFileSync batch file</source>
@@ -405,8 +409,8 @@ La línea de comandos se ejecuta cada vez:
 <target>Derecha</target>
 <source>Batch job</source>
 <target>Tarea batch</target>
-<source>Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
-<target>Crear un archivo batch para una sincronización automática. Para empezar en modo batch simplemente pasar el nombre del archivo por el ejecutable FreeFileSync en la ventana de comandos (CMD): FreeFileSync.exe <archivo batch>. También se puede planificar en el administrador de tareas de su sistema operativo.</target>
+<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
+<target>Crear un archivo batch para la sincronización automática. Para iniciar el modo batch, simplemente hacer doble clic sobre el archivo o ejectuar mediante la línea de comandos: FreeFileSync.exe <archivo_batch>. También se puede programar en el planificador del tareas del sistema operativo.</target>
 <source>Help</source>
 <target>Ayuda</target>
 <source>Configuration overview:</source>
@@ -473,18 +477,18 @@ La línea de comandos se ejecuta cada vez:
 <target>Categoría</target>
 <source>Action</source>
 <target>Acción</target>
-<source>Files/folders that exist on left side only</source>
-<target>Archivos/carpetas que existen sólo en el lado izquierdo</target>
-<source>Files/folders that exist on right side only</source>
-<target>Archivos/carpetas que existen sólo en el lado derecho</target>
-<source>Files that exist on both sides, left one is newer</source>
-<target>Archivos que existen en ambos lados, el de la izquierda es más reciente</target>
-<source>Files that exist on both sides, right one is newer</source>
-<target>Archivos que existen en ambos lados, el de la derecha es más reciente</target>
-<source>Files that have different content</source>
-<target>Archivos que tienen un contenido diferente</target>
-<source>Conflicts/files that cannot be categorized</source>
-<target>Conflictos/archivos que no pueden ser clasificados</target>
+<source>File/folder exists on left side only</source>
+<target>Archivo/carpeta existe sólo en el lado izquierdo</target>
+<source>File/folder exists on right side only</source>
+<target>Archivo/carpeta existe sólo en el lado derecho</target>
+<source>Left file is newer</source>
+<target>El archivo de la izquierda es más reciente</target>
+<source>Right file is newer</source>
+<target>El archivo de la derecha es más reciente</target>
+<source>Files have different content</source>
+<target>Los archivos tienen contenido diferentes</target>
+<source>Conflict/file cannot be categorized</source>
+<target>Conflicto/el achivo no puede ser categorizado</target>
 <source>Compare by...</source>
 <target>Comparar por...</target>
 <source>
@@ -707,10 +711,8 @@ Transferir permisos de archivo y directorio
 <target><selección múltiple></target>
 <source>D-Click</source>
 <target>Doble click</target>
-<source>Copy to clipboard	CTRL+C</source>
-<target>Copiar al Portapapeles	CTRL+C</target>
-<source>Delete files	DEL</source>
-<target>Borrar archivos	DEL</target>
+<source>Delete</source>
+<target>Eliminar</target>
 <source>Customize...</source>
 <target>Personalizar...</target>
 <source>Auto-adjust columns</source>
@@ -853,8 +855,10 @@ Transferir permisos de archivo y directorio
 <target>el archivo existe en ambos lados</target>
 <source>on one side only</source>
 <target>sólo en un lado</target>
-<source>different</source>
-<target>diferentes</target>
+<source>same date</source>
+<target>misma fecha</target>
+<source>different date</source>
+<target>fecha diferente</target>
 <source>Inactive</source>
 <target>Inactivo</target>
 <source>Second</source>
@@ -965,28 +969,28 @@ Transferir permisos de archivo y directorio
 <target>Generando lista de archivos...</target>
 <source>Multiple...</source>
 <target>Múltiple...</target>
-<source>Files that are equal on both sides</source>
-<target>Archivos que son iguales en ambos lados</target>
-<source>Equal files/folders that differ in attributes only</source>
-<target>Archivos/Carpetas iguales que sólo difieren en los atributos</target>
-<source>Copy from right to left</source>
-<target>Copiar de derecha a izquierda</target>
-<source>Copy from left to right</source>
-<target>Copiar de izquierda a derecha</target>
-<source>Delete files/folders existing on left side only</source>
-<target>Borrar sólo archivos/carpetas existentes en el lado izquierdo</target>
-<source>Delete files/folders existing on right side only</source>
-<target>Borrar sólo archivos/carpetas existentes en el lado derecho</target>
-<source>Copy from right to left overwriting</source>
-<target>Copiar de derecha a izquierda con sobreescritura</target>
-<source>Copy from left to right overwriting</source>
-<target>Copiar de izquierda a derecha con sobreescritura</target>
+<source>Both sides are equal</source>
+<target>Ambos lados son iguales</target>
+<source>Files/folders differ in attributes only</source>
+<target>Archivos/carpetas se diferencia sólo en los atributos</target>
+<source>Copy new file/folder to left</source>
+<target>Copiar nuevo archivo/carpeta a la izquierda</target>
+<source>Copy new file/folder to right</source>
+<target>Copiar nuevo archivo/carpeta a la derecha</target>
+<source>Delete left file/folder</source>
+<target>Eliminar archivo/carpeta de la izquierda</target>
+<source>Delete right file/folder</source>
+<target>Eliinar archivo/carpeta de la derecha</target>
+<source>Overwrite left file/folder with right one</source>
+<target>Sobreescribir archivo/carpeta de la izquierda por el de la derecha</target>
+<source>Overwrite right file/folder with left one</source>
+<target>Sobreescribir archivo/carpeta de la derecha por el de la izquierda</target>
 <source>Do nothing</source>
 <target>No hacer nada</target>
-<source>Copy attributes only from right to left</source>
-<target>Copiar sólo atributos de izquierda a derecha</target>
-<source>Copy attributes only from left to right</source>
-<target>Copiar sólo atributos de izquierda a derecha</target>
+<source>Copy file attributes only to left</source>
+<target>Copiar sólo atributos del archivo a la izquierda</target>
+<source>Copy file attributes only to right</source>
+<target>Copiar sólo atributos del archivo a la derecha</target>
 <source>Deleting file %x</source>
 <target>Borrar archivo %x</target>
 <source>Deleting Symbolic Link %x</source>
@@ -1017,6 +1021,8 @@ Transferir permisos de archivo y directorio
 <target>Actualizar atributos de %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>El directorio origen ya no existe:</target>
+<source>Generating database...</source>
+<target>Generando base de datos...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>¡Nada que sincronizar de acuerdo con la configuración!</target>
 <source>Target directory name must not be empty!</source>
@@ -1041,8 +1047,6 @@ Transferir permisos de archivo y directorio
 <target>Un directorio será modificado, el cual es parte de mútiples pares de carpetas. ¡Por favor, revise la configuración de la sincronización!</target>
 <source>Processing folder pair:</source>
 <target>Procesar un par de carpetas:</target>
-<source>Generating database...</source>
-<target>Generando base de datos...</target>
 <source>Error copying locked file %x!</source>
 <target>¡Error al copiar archivo bloqueado %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

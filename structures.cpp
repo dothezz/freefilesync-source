@@ -118,21 +118,21 @@ wxString zen::getDescription(CompareFilesResult cmpRes)
     switch (cmpRes)
     {
         case FILE_LEFT_SIDE_ONLY:
-            return _("Files/folders that exist on left side only");
+            return _("File/folder exists on left side only");
         case FILE_RIGHT_SIDE_ONLY:
-            return _("Files/folders that exist on right side only");
+            return _("File/folder exists on right side only");
         case FILE_LEFT_NEWER:
-            return _("Files that exist on both sides, left one is newer");
+            return _("Left file is newer");
         case FILE_RIGHT_NEWER:
-            return _("Files that exist on both sides, right one is newer");
+            return _("Right file is newer");
         case FILE_DIFFERENT:
-            return _("Files that have different content");
+            return _("Files have different content");
         case FILE_EQUAL:
-            return _("Files that are equal on both sides");
+            return _("Both sides are equal");
         case FILE_DIFFERENT_METADATA:
-            return _("Equal files/folders that differ in attributes only");
+            return _("Files/folders differ in attributes only");
         case FILE_CONFLICT:
-            return _("Conflicts/files that cannot be categorized");
+            return _("Conflict/file cannot be categorized");
     }
 
     assert(false);
@@ -171,27 +171,27 @@ wxString zen::getDescription(SyncOperation op)
     switch (op)
     {
         case SO_CREATE_NEW_LEFT:
-            return _("Copy from right to left");
+            return _("Copy new file/folder to left");
         case SO_CREATE_NEW_RIGHT:
-            return _("Copy from left to right");
+            return _("Copy new file/folder to right");
         case SO_DELETE_LEFT:
-            return _("Delete files/folders existing on left side only");
+            return _("Delete left file/folder");
         case SO_DELETE_RIGHT:
-            return _("Delete files/folders existing on right side only");
+            return _("Delete right file/folder");
         case SO_OVERWRITE_LEFT:
-            return _("Copy from right to left overwriting");
+            return _("Overwrite left file/folder with right one");
         case SO_OVERWRITE_RIGHT:
-            return _("Copy from left to right overwriting");
+            return _("Overwrite right file/folder with left one");
         case SO_DO_NOTHING:
             return _("Do nothing");
         case SO_EQUAL:
-            return _("Files that are equal on both sides");
+            return _("Both sides are equal");
         case SO_COPY_METADATA_TO_LEFT:
-            return _("Copy attributes only from right to left");
+            return _("Copy file attributes only to left");
         case SO_COPY_METADATA_TO_RIGHT:
-            return _("Copy attributes only from left to right");
+            return _("Copy file attributes only to right");
         case SO_UNRESOLVED_CONFLICT: //not used on GUI, but in .csv
-            return _("Conflicts/files that cannot be categorized");
+            return _("Conflict/file cannot be categorized");
     };
 
     assert(false);

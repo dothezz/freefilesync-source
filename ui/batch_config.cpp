@@ -5,7 +5,6 @@
 // **************************************************************************
 //
 #include "batch_config.h"
-#include "../shared/xml_base.h"
 #include "../shared/dir_picker_i18n.h"
 #include "folder_pair.h"
 #include <iterator>
@@ -16,7 +15,8 @@
 #include "gui_generated.h"
 #include <wx/dnd.h>
 #include <wx/msgdlg.h>
-#include "../shared/util.h"
+//#include "../shared/util.h"
+#include "../shared/wx_choice_enum.h"
 #include "../shared/mouse_move_dlg.h"
 
 using namespace zen;
@@ -79,7 +79,7 @@ private:
 
     xmlAccess::XmlBatchConfig getCurrentConfiguration() const;
 
-    boost::shared_ptr<DirectoryPairBatchFirst> firstFolderPair; //always bound!!!
+    std::shared_ptr<DirectoryPairBatchFirst> firstFolderPair; //always bound!!!
     std::vector<DirectoryPairBatch*> additionalFolderPairs;
 
     //used when saving batch file
@@ -87,9 +87,9 @@ private:
 
     xmlAccess::XmlBatchConfig localBatchCfg;
 
-    std::auto_ptr<wxMenu> contextMenu;
+    std::unique_ptr<wxMenu> contextMenu;
 
-    std::auto_ptr<zen::DirectoryName> logfileDir;
+    std::unique_ptr<zen::DirectoryName> logfileDir;
 
     zen::EnumDescrList<xmlAccess::OnError> enumDescrMap;
 };
@@ -410,11 +410,11 @@ void BatchDialog::OnFilesDropped(FFSFileDropEvent& event)
                 xmlAccess::XmlBatchConfig batchCfg;
                 try
                 {
-                    convertConfig(fileList, batchCfg); //throw (xmlAccess::XmlError)
+                    convertConfig(fileList, batchCfg); //throw (xmlAccess::FfsXmlError)
                 }
-                catch (const xmlAccess::XmlError& error)
+                catch (const xmlAccess::FfsXmlError& error)
                 {
-                    if (error.getSeverity() == xmlAccess::XmlError::WARNING)
+                    if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
                         wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING);
                     else
                     {
@@ -571,7 +571,7 @@ bool BatchDialog::saveBatchFile(const wxString& filename)
     {
         xmlAccess::writeConfig(batchCfg, filename);
     }
-    catch (const xmlAccess::XmlError& error)
+    catch (const xmlAccess::FfsXmlError& error)
     {
         wxMessageBox(error.msg().c_str(), _("Error"), wxOK | wxICON_ERROR);
         return false;
@@ -594,13 +594,13 @@ void BatchDialog::loadBatchFile(const wxString& filename)
         std::vector<wxString> filenames;
         filenames.push_back(filename);
 
-        xmlAccess::convertConfig(filenames, batchCfg); //throw (xmlAccess::XmlError)
+        xmlAccess::convertConfig(filenames, batchCfg); //throw (xmlAccess::FfsXmlError)
 
         //xmlAccess::readConfig(filename, batchCfg);
     }
-    catch (const xmlAccess::XmlError& error)
+    catch (const xmlAccess::FfsXmlError& error)
     {
-        if (error.getSeverity() == xmlAccess::XmlError::WARNING)
+        if (error.getSeverity() == xmlAccess::FfsXmlError::WARNING)
             wxMessageBox(error.msg(), _("Warning"), wxOK | wxICON_WARNING);
         else
         {

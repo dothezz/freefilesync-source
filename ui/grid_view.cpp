@@ -326,7 +326,7 @@ void GridView::setData(FolderComparison& newData)
 
 //------------------------------------ SORTING TEMPLATES ------------------------------------------------
 template <bool ascending>
-class GridView::SortByDirectory : public std::binary_function<RefIndex, RefIndex, bool>
+class GridView::LessDirectoryPair : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
     bool operator()(const RefIndex a, const RefIndex b) const
@@ -339,10 +339,10 @@ public:
 
 
 template <bool ascending, zen::SelectedSide side>
-class GridView::SortByRelName : public std::binary_function<RefIndex, RefIndex, bool>
+class GridView::LessRelativeName : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
-    SortByRelName(const GridView& view) : m_view(view) {}
+    LessRelativeName(const GridView& view) : m_view(view) {}
 
     bool operator()(const RefIndex a, const RefIndex b) const
     {
@@ -359,7 +359,7 @@ public:
         else if (fsObjB == NULL)
             return true;
 
-        return sortByRelativeName<ascending, side>(*fsObjA, *fsObjB);
+        return lessRelativeName<ascending, side>(*fsObjA, *fsObjB);
     }
 private:
     const GridView& m_view;
@@ -367,10 +367,10 @@ private:
 
 
 template <bool ascending, zen::SelectedSide side>
-class GridView::SortByFileName : public std::binary_function<RefIndex, RefIndex, bool>
+class GridView::LessShortFileName : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
-    SortByFileName(const GridView& view) : m_view(view) {}
+    LessShortFileName(const GridView& view) : m_view(view) {}
 
     bool operator()(const RefIndex a, const RefIndex b) const
     {
@@ -381,7 +381,7 @@ public:
         else if (fsObjB == NULL)
             return true;
 
-        return sortByFileName<ascending, side>(*fsObjA, *fsObjB);
+        return lessShortFileName<ascending, side>(*fsObjA, *fsObjB);
     }
 private:
     const GridView& m_view;
@@ -389,10 +389,10 @@ private:
 
 
 template <bool ascending, zen::SelectedSide side>
-class GridView::SortByFileSize : public std::binary_function<RefIndex, RefIndex, bool>
+class GridView::LessFilesize : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
-    SortByFileSize(const GridView& view) : m_view(view) {}
+    LessFilesize(const GridView& view) : m_view(view) {}
 
     bool operator()(const RefIndex a, const RefIndex b) const
     {
@@ -403,7 +403,7 @@ public:
         else if (fsObjB == NULL)
             return true;
 
-        return sortByFileSize<ascending, side>(*fsObjA, *fsObjB);
+        return lessFilesize<ascending, side>(*fsObjA, *fsObjB);
     }
 private:
     const GridView& m_view;
@@ -411,10 +411,10 @@ private:
 
 
 template <bool ascending, zen::SelectedSide side>
-class GridView::SortByDate : public std::binary_function<RefIndex, RefIndex, bool>
+class GridView::LessFiletime : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
-    SortByDate(const GridView& view) : m_view(view) {}
+    LessFiletime(const GridView& view) : m_view(view) {}
 
     bool operator()(const RefIndex a, const RefIndex b) const
     {
@@ -425,7 +425,7 @@ public:
         else if (fsObjB == NULL)
             return true;
 
-        return sortByDate<ascending, side>(*fsObjA, *fsObjB);
+        return lessFiletime<ascending, side>(*fsObjA, *fsObjB);
     }
 private:
     const GridView& m_view;
@@ -433,10 +433,10 @@ private:
 
 
 template <bool ascending, zen::SelectedSide side>
-class GridView::SortByExtension : public std::binary_function<RefIndex, RefIndex, bool>
+class GridView::LessExtension : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
-    SortByExtension(const GridView& view) : m_view(view) {}
+    LessExtension(const GridView& view) : m_view(view) {}
 
     bool operator()(const RefIndex a, const RefIndex b) const
     {
@@ -447,7 +447,7 @@ public:
         else if (fsObjB == NULL)
             return true;
 
-        return sortByExtension<ascending, side>(*fsObjA, *fsObjB);
+        return lessExtension<ascending, side>(*fsObjA, *fsObjB);
     }
 private:
     const GridView& m_view;
@@ -455,10 +455,10 @@ private:
 
 
 template <bool ascending>
-class GridView::SortByCmpResult : public std::binary_function<RefIndex, RefIndex, bool>
+class GridView::LessCmpResult : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
-    SortByCmpResult(const GridView& view) : m_view(view) {}
+    LessCmpResult(const GridView& view) : m_view(view) {}
 
     bool operator()(const RefIndex a, const RefIndex b) const
     {
@@ -469,7 +469,7 @@ public:
         else if (fsObjB == NULL)
             return true;
 
-        return sortByCmpResult<ascending>(*fsObjA, *fsObjB);
+        return lessCmpResult<ascending>(*fsObjA, *fsObjB);
     }
 private:
     const GridView& m_view;
@@ -477,10 +477,10 @@ private:
 
 
 template <bool ascending>
-class GridView::SortBySyncDirection : public std::binary_function<RefIndex, RefIndex, bool>
+class GridView::LessSyncDirection : public std::binary_function<RefIndex, RefIndex, bool>
 {
 public:
-    SortBySyncDirection(const GridView& view) : m_view(view) {}
+    LessSyncDirection(const GridView& view) : m_view(view) {}
 
     bool operator()(const RefIndex a, const RefIndex b) const
     {
@@ -491,7 +491,7 @@ public:
         else if (fsObjB == NULL)
             return true;
 
-        return sortBySyncDirection<ascending>(*fsObjA, *fsObjB);
+        return lessSyncDirection<ascending>(*fsObjA, *fsObjB);
     }
 private:
     const GridView& m_view;
@@ -526,46 +526,46 @@ void GridView::sortView(SortType type, bool onLeft, bool ascending)
     switch (type)
     {
         case SORT_BY_REL_NAME:
-            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByRelName<true,  LEFT_SIDE>(*this));
-            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByRelName<true,  RIGHT_SIDE>(*this));
-            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByRelName<false, LEFT_SIDE >(*this));
-            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByRelName<false, RIGHT_SIDE>(*this));
+            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeName<true,  LEFT_SIDE>(*this));
+            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeName<true,  RIGHT_SIDE>(*this));
+            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeName<false, LEFT_SIDE >(*this));
+            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessRelativeName<false, RIGHT_SIDE>(*this));
             break;
         case SORT_BY_FILENAME:
-            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileName<true,  LEFT_SIDE >(*this));
-            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileName<true,  RIGHT_SIDE>(*this));
-            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileName<false, LEFT_SIDE >(*this));
-            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileName<false, RIGHT_SIDE>(*this));
+            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<true,  LEFT_SIDE >(*this));
+            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<true,  RIGHT_SIDE>(*this));
+            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<false, LEFT_SIDE >(*this));
+            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessShortFileName<false, RIGHT_SIDE>(*this));
             break;
         case SORT_BY_FILESIZE:
-            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileSize<true,  LEFT_SIDE >(*this));
-            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileSize<true,  RIGHT_SIDE>(*this));
-            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileSize<false, LEFT_SIDE >(*this));
-            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByFileSize<false, RIGHT_SIDE>(*this));
+            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<true,  LEFT_SIDE >(*this));
+            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<true,  RIGHT_SIDE>(*this));
+            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<false, LEFT_SIDE >(*this));
+            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFilesize<false, RIGHT_SIDE>(*this));
             break;
         case SORT_BY_DATE:
-            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByDate<true,  LEFT_SIDE >(*this));
-            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByDate<true,  RIGHT_SIDE>(*this));
-            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByDate<false, LEFT_SIDE >(*this));
-            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), SortByDate<false, RIGHT_SIDE>(*this));
+            if      ( ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<true,  LEFT_SIDE >(*this));
+            else if ( ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<true,  RIGHT_SIDE>(*this));
+            else if (!ascending &&  onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<false, LEFT_SIDE >(*this));
+            else if (!ascending && !onLeft) std::sort(sortedRef.begin(), sortedRef.end(), LessFiletime<false, RIGHT_SIDE>(*this));
             break;
         case SORT_BY_EXTENSION:
-            if      ( ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByExtension<true,  LEFT_SIDE >(*this));
-            else if ( ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByExtension<true,  RIGHT_SIDE>(*this));
-            else if (!ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByExtension<false, LEFT_SIDE >(*this));
-            else if (!ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByExtension<false, RIGHT_SIDE>(*this));
+            if      ( ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<true,  LEFT_SIDE >(*this));
+            else if ( ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<true,  RIGHT_SIDE>(*this));
+            else if (!ascending &&  onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<false, LEFT_SIDE >(*this));
+            else if (!ascending && !onLeft) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessExtension<false, RIGHT_SIDE>(*this));
             break;
         case SORT_BY_CMP_RESULT:
-            if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByCmpResult<true >(*this));
-            else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByCmpResult<false>(*this));
+            if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessCmpResult<true >(*this));
+            else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessCmpResult<false>(*this));
             break;
         case SORT_BY_SYNC_DIRECTION:
-            if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortBySyncDirection<true >(*this));
-            else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortBySyncDirection<false>(*this));
+            if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessSyncDirection<true >(*this));
+            else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessSyncDirection<false>(*this));
             break;
         case SORT_BY_DIRECTORY:
-            if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByDirectory<true>());
-            else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), SortByDirectory<false>());
+            if      ( ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessDirectoryPair<true>());
+            else if (!ascending) std::stable_sort(sortedRef.begin(), sortedRef.end(), LessDirectoryPair<false>());
             break;
     }
 }

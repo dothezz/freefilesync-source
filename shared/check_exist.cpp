@@ -6,8 +6,8 @@
 //
 #include "check_exist.h"
 #include "file_handling.h"
+#include <memory>
 #include "boost_thread_wrap.h" //include <boost/thread.hpp>
-#include <boost/shared_ptr.hpp>
 
 
 /*
@@ -22,34 +22,15 @@ namespace
 {
 typedef Zbase<Zchar, StorageDeepCopy> BasicString; //thread safe string class
 
-template <bool (*testExist)(const Zstring&)>
-class ExistenceChecker
-{
-public:
-    ExistenceChecker(const BasicString& filename, const boost::shared_ptr<bool>& isExisting) :
-        filename_(filename),       //deep copy: worker thread may run longer than main! avoid shared data
-        isExisting_(isExisting) {} //not accessed during thread run
-
-    void operator()()
-    {
-        *isExisting_ = testExist(filename_.c_str()); //throw()
-    }
-
-private:
-    const BasicString filename_; //no referencing, 'cause lifetime not known!
-    boost::shared_ptr<bool> isExisting_;
-};
-
-
 template <bool (*fun)(const Zstring&)>
 util::ResultExist checkExistence(const Zstring& objName, size_t timeout) //timeout in ms
 {
     using namespace util;
 
-    boost::shared_ptr<bool> isExisting(new bool(false));
+    std::shared_ptr<bool> isExisting = std::make_shared<bool>(false); //no mutex required: accessed after thread has finished only!
+    BasicString filename = objName.c_str(); //using thread safe string without ref-count!
 
-    ExistenceChecker<fun> task(objName.c_str(), isExisting);
-    boost::thread worker(task); //note: task is copied => using thread safe string!
+    boost::thread worker([=]() { *isExisting = fun(filename.c_str()); }); //throw()
 
     if (worker.timed_join(boost::posix_time::milliseconds(timeout)))
         return *isExisting ? EXISTING_TRUE : EXISTING_FALSE;
@@ -58,22 +39,6 @@ util::ResultExist checkExistence(const Zstring& objName, size_t timeout) //timeo
     /*
     main/worker thread may access different shared_ptr instances safely (even though they have the same target!)
     http://www.boost.org/doc/libs/1_43_0/libs/smart_ptr/shared_ptr.htm?sess=8153b05b34d890e02d48730db1ff7ddc#ThreadSafety
-    */
-
-#ifndef _MSC_VER
-#warning migrate this at some time...
-#endif
-    /*
-    unfortunately packaged_task/future is not mature enough to be used...
-    boost::packaged_task<bool> pt(boost::bind(fun, objName.c_str())); //attention: Zstring is not thread-safe => make deep copy
-    boost::unique_future<bool> fut = pt.get_future();
-
-    boost::thread worker(boost::move(pt)); //launch task on a thread
-
-    if (fut.timed_wait(boost::posix_time::milliseconds(timeout)))
-        return fut.get() ? EXISTING_TRUE : EXISTING_FALSE;
-    else
-        return EXISTING_TIMEOUT;
     */
 }
 }

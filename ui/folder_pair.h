@@ -26,7 +26,7 @@ template <class GuiPanel>
 class FolderPairPanelBasic : private wxEvtHandler
 {
 public:
-    typedef boost::shared_ptr<const zen::AlternateSyncConfig> AltSyncCfgPtr;
+    typedef std::shared_ptr<const zen::AlternateSyncConfig> AltSyncCfgPtr;
 
     AltSyncCfgPtr getAltSyncConfig() const
     {
@@ -177,7 +177,7 @@ private:
     AltSyncCfgPtr altSyncConfig; //optional: present if non-NULL
     FilterConfig  localFilter;
 
-    std::auto_ptr<wxMenu> contextMenu;
+    std::unique_ptr<wxMenu> contextMenu;
 };
 }
 

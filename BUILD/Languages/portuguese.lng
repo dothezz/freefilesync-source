@@ -8,7 +8,7 @@
 </header>
 
 <source>Show in Explorer</source>
-<target></target>
+<target>Mostrar no Explorer</target>
 <source>Open with default application</source>
 <target>Abrir com a aplicação associada</target>
 <source>Browse directory</source>
@@ -17,8 +17,22 @@
 <target>RealtimeSync - Sincronização Automática</target>
 <source>Browse</source>
 <target>Procurar</target>
+<source>Invalid commandline: "%x"</source>
+<target>Comando inválido: "%x"</target>
 <source>Error resolving symbolic link:</source>
 <target>Erro na resolução do link simbólico:</target>
+<source>Show popup</source>
+<target>Mostrar popups</target>
+<source>Show popup on errors or warnings</source>
+<target>Mostrar popup c/ erros ou avisos</target>
+<source>Ignore errors</source>
+<target>Ignorar erros</target>
+<source>Hide all error and warning messages</source>
+<target>Ocultar todas as mensagens de erro/aviso</target>
+<source>Exit instantly</source>
+<target>Sair imediatamente</target>
+<source>Abort synchronization immediately</source>
+<target>Abortar sincronização imediatamente</target>
 <source>Select alternate synchronization settings</source>
 <target>Seleccionar opções alternativas de sincronização</target>
 <source>No filter selected</source>
@@ -58,7 +72,7 @@
 <source>%x MB</source>
 <target>%x MB</target>
 <source>%x KB</source>
-<target></target>
+<target>%x KB</target>
 <source>%x GB</source>
 <target>%x GB</target>
 <source>
@@ -66,6 +80,8 @@
 <pluralform>%x Bytes</pluralform>
 </source>
 <target>
+<pluralform>1 Byte</pluralform>
+<pluralform>%x Bytes</pluralform>
 </target>
 <source><Symlink></source>
 <target><Link Simbólico></target>
@@ -112,19 +128,19 @@
 <pluralform>%x sec</pluralform>
 </source>
 <target>
+<pluralform>1 seg</pluralform>
+<pluralform>%x segs</pluralform>
 </target>
 <source>Info</source>
 <target>Info</target>
 <source>Fatal Error</source>
 <target>Erro fatal</target>
+<source>Invalid FreeFileSync config file!</source>
+<target>Ficheiro de configuração do FreeFileSync inválido!</target>
 <source>File does not exist:</source>
 <target>O ficheiro não existe:</target>
 <source>Error parsing configuration file:</source>
 <target>Erro de leitura do ficheiro de configuração:</target>
-<source>Error writing file:</source>
-<target>Erro de escrita no ficheiro:</target>
-<source>Invalid FreeFileSync config file!</source>
-<target>Ficheiro de configuração do FreeFileSync inválido!</target>
 <source>/sec</source>
 <target>/seg</target>
 <source>
@@ -132,33 +148,39 @@
 <pluralform>%x min</pluralform>
 </source>
 <target>
+<pluralform>1 min</pluralform>
+<pluralform>%x mins</pluralform>
 </target>
 <source>
 <pluralform>1 hour</pluralform>
 <pluralform>%x hours</pluralform>
 </source>
 <target>
+<pluralform>1 hora</pluralform>
+<pluralform>%x horas</pluralform>
 </target>
 <source>
 <pluralform>1 day</pluralform>
 <pluralform>%x days</pluralform>
 </source>
 <target>
+<pluralform>1 dia</pluralform>
+<pluralform>%x dias</pluralform>
 </target>
 <source>S&ave configuration...</source>
 <target>G&uardar a configuração...</target>
 <source>&Load configuration...</source>
 <target>&Carregar configuração...</target>
 <source>&Quit</source>
-<target>&Sair</target>
+<target>S&air</target>
 <source>&File</source>
 <target>&Ficheiro</target>
 <source>&Content</source>
-<target>&Conteúdo</target>
+<target>C&onteúdo</target>
 <source>&About...</source>
 <target>&Sobre...</target>
 <source>&Help</source>
-<target>&Ajuda</target>
+<target>A&juda</target>
 <source>Usage:</source>
 <target>Uso:</target>
 <source>1. Select directories to monitor.</source>
@@ -204,11 +226,9 @@ A linha de comandos é executada cada vez que:
 <source>&Exit</source>
 <target>&Sair</target>
 <source>Monitoring active...</source>
-<target>Monitorizar activo...</target>
+<target>Monitorizar activado...</target>
 <source>Waiting for missing directories...</source>
 <target>Aguardar pelos directórios em falta...</target>
-<source>Command line is empty!</source>
-<target>Linha de comandos vazia!</target>
 <source>Could not initialize directory monitoring:</source>
 <target>Não é possível iniciar monitorização do directório:</target>
 <source>A directory input field is empty.</source>
@@ -216,7 +236,7 @@ A linha de comandos é executada cada vez que:
 <source>Error when monitoring directories.</source>
 <target>Erro ao monitorizar os directórios.</target>
 <source>Drag && drop</source>
-<target>Pegar && largar</target>
+<target>Arrastar && Largar</target>
 <source>Conversion error:</source>
 <target>Erro de conversão:</target>
 <source>Error moving file:</source>
@@ -249,12 +269,18 @@ A linha de comandos é executada cada vez que:
 <target>Erro ao copiar ficheiro:</target>
 <source>Error opening file:</source>
 <target>Erro ao abrir ficheiro:</target>
+<source>Error writing file:</source>
+<target>Erro de escrita no ficheiro:</target>
 <source>Error reading file:</source>
 <target>Erro de leitura de ficheiro:</target>
 <source>Endless loop when traversing directory:</source>
 <target>Loop infinito ao percorrer directório:</target>
 <source>Error traversing directory:</source>
 <target>Erro ao percorrer a pasta:</target>
+<source>Windows Error Code %x:</source>
+<target>Código de erro do Windows %x:</target>
+<source>Linux Error Code %x:</source>
+<target>Código de erro do Linux %x:</target>
 <source>Error setting privilege:</source>
 <target>Erro ao estabelecer privilégios:</target>
 <source>Error moving to Recycle Bin:</source>
@@ -279,18 +305,6 @@ A linha de comandos é executada cada vez que:
 <target>%x%</target>
 <source>Could not read values for the following XML nodes:</source>
 <target>Não foi possível ler os valores dos seguintes nós XML:</target>
-<source>Show popup</source>
-<target>Mostrar popups</target>
-<source>Show popup on errors or warnings</source>
-<target>Mostrar popup c/ erros ou avisos</target>
-<source>Ignore errors</source>
-<target>Ignorar erros</target>
-<source>Hide all error and warning messages</source>
-<target>Ocultar todas as mensagens de erro ou aviso</target>
-<source>Exit instantly</source>
-<target>Sair imediatamente</target>
-<source>Abort synchronization immediately</source>
-<target>Abortar sincronização imediatamente</target>
 <source>Logging</source>
 <target>A escrever em log</target>
 <source>FreeFileSync batch file</source>
@@ -395,8 +409,8 @@ A linha de comandos é executada cada vez que:
 <target>Direita</target>
 <source>Batch job</source>
 <target>Ficheiro Batch</target>
-<source>Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
-<target>Criar um batch para sincronização automática. Para iniciar o modo batch, passar o nome do ficheiro para o executável do FreeFileSync: FreeFileSync.exe <ficheiro batch>. Também pode ser calendarizado no programador de tarefas.</target>
+<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
+<target>Criar um batch para sincronização automática. Para iniciar o batch, basta fazer duplo-clique no ficheiro ou executar via linha de comandos: FreeFileSync.exe <batch>. Também pode ser inserido no programador de tarefas do sistema operativo.</target>
 <source>Help</source>
 <target>Ajuda</target>
 <source>Configuration overview:</source>
@@ -463,18 +477,18 @@ A linha de comandos é executada cada vez que:
 <target>Categoria</target>
 <source>Action</source>
 <target>Acção</target>
-<source>Files/folders that exist on left side only</source>
-<target>Ficheiros/pastas existentes somente à esquerda</target>
-<source>Files/folders that exist on right side only</source>
-<target>Ficheiros/pastas existentes somente à direita</target>
-<source>Files that exist on both sides, left one is newer</source>
-<target>Ficheiros existentes dos dois lados, à esquerda é mais recente</target>
-<source>Files that exist on both sides, right one is newer</source>
-<target>Ficheiros existentes dos dois lados, à direita é mais recente</target>
-<source>Files that have different content</source>
-<target>Ficheiros com conteúdo diferente</target>
-<source>Conflicts/files that cannot be categorized</source>
-<target>Conflitos/ficheiros que não podem ser categorizados</target>
+<source>File/folder exists on left side only</source>
+<target>Ficheiro/pasta existe apenas à esquerda</target>
+<source>File/folder exists on right side only</source>
+<target>Ficheiro/pasta existe apenas à direita</target>
+<source>Left file is newer</source>
+<target>Ficheiro mais recente à esquerda</target>
+<source>Right file is newer</source>
+<target>Ficheiro mais recente à direita</target>
+<source>Files have different content</source>
+<target>Ficheiros são diferentes</target>
+<source>Conflict/file cannot be categorized</source>
+<target>Ficheiro/conflito não pode ser categorizado</target>
 <source>Compare by...</source>
 <target>Comparar por...</target>
 <source>
@@ -527,8 +541,8 @@ Os ficheiros são considerados iguais se
 <target>- existe apenas à esquerda</target>
 <source>- exists right only</source>
 <target>- existe apenas à direita</target>
-<source>- conflict</source>
-<target>- conflito</target>
+<source>- conflict (same date, different size)</source>
+<target>- conflito (mesma data, tamanho diferente)</target>
 <source>Compare by "File content"</source>
 <target>Comparar por "Conteúdo dos ficheiros"</target>
 <source>
@@ -544,7 +558,7 @@ Com esta opção, a arvoré de decisão é menor:
 <source>- different</source>
 <target>- ficheiros diferentes</target>
 <source>Source code written in C++ utilizing:</source>
-<target></target>
+<target>Código fonte escrito em C++ usando:</target>
 <source>Big thanks for localizing FreeFileSync goes out to:</source>
 <target>Pela tradução de FreeFileSync, um agradecimento a:</target>
 <source>Feedback and suggestions are welcome at:</source>
@@ -589,7 +603,10 @@ Com esta opção, a arvoré de decisão é menor:
 Only files/directories that match all filter settings will be selected for synchronization.
 Note: The name filter must be specified relative(!) to main synchronization directories.
 </source>
-<target></target>
+<target>
+Apenas ficheiros/directórios que coincidam com as opções de filtros vão ser seleccionados para sincronização.
+Nota: Os filtros devem ser especificados em relação aos directórios principais de sincronização.
+</target>
 <source>Hints:</source>
 <target>Dicas:</target>
 <source>1. Enter relative file or directory names separated by ';' or a new line.</source>
@@ -604,7 +621,10 @@ Note: The name filter must be specified relative(!) to main synchronization dire
 Include: *.doc;*.zip;*.exe
 Exclude: \stuff\temp\*
 </source>
-<target></target>
+<target>
+Incluir: *.doc;*.zip;*.exe
+Excluir: \stuff\temp\*
+</target>
 <source>Synchronize all .doc, .zip and .exe files except everything in subfolder "temp".</source>
 <target>Sincronizar todos os ficheiros .doc, .zip e .exe excepto os da pasta "temp".</target>
 <source>Include</source>
@@ -612,11 +632,11 @@ Exclude: \stuff\temp\*
 <source>Exclude</source>
 <target>Excluir</target>
 <source>Select time span:</source>
-<target></target>
+<target>Selecionar intervalo de tempo:</target>
 <source>Minimum file size:</source>
-<target></target>
+<target>Tamanho mínimo de ficheiro:</target>
 <source>Maximum file size:</source>
-<target></target>
+<target>Tamanho máximo de ficheiro:</target>
 <source>&Default</source>
 <target>&Config. Iniciais</target>
 <source>Move column up</source>
@@ -686,13 +706,11 @@ Transferir ficheiro e permissões
 <source>Exclude via filter:</source>
 <target>Excluir por filtro:</target>
 <source><multiple selection></source>
-<target><Selecção Múltipla></target>
+<target><selecção múltipla></target>
 <source>D-Click</source>
 <target>Duplo Clique</target>
-<source>Copy to clipboard	CTRL+C</source>
-<target>Copiar para a Área de transferência	CTRL+C</target>
-<source>Delete files	DEL</source>
-<target>Eliminar ficheiros	DEL</target>
+<source>Delete</source>
+<target>Eliminar</target>
 <source>Customize...</source>
 <target>Personalizar...</target>
 <source>Auto-adjust columns</source>
@@ -784,24 +802,32 @@ Transferir ficheiro e permissões
 <pluralform>%x objects deleted successfully!</pluralform>
 </source>
 <target>
+<pluralform>Objecto eliminado com sucesso!</pluralform>
+<pluralform>%x objectos eliminados com sucesso!</pluralform>
 </target>
 <source>
 <pluralform>1 directory</pluralform>
 <pluralform>%x directories</pluralform>
 </source>
 <target>
+<pluralform>1 directório</pluralform>
+<pluralform>%x directórios</pluralform>
 </target>
 <source>
 <pluralform>1 file</pluralform>
 <pluralform>%x files</pluralform>
 </source>
 <target>
+<pluralform>1 ficheiro</pluralform>
+<pluralform>%x ficheiros</pluralform>
 </target>
 <source>
 <pluralform>%x of 1 row in view</pluralform>
 <pluralform>%x of %y rows in view</pluralform>
 </source>
 <target>
+<pluralform>%x de 1 linha em vista</pluralform>
+<pluralform>%x de %y linhas em vista</pluralform>
 </target>
 <source>Scanning...</source>
 <target>A pesquisar...</target>
@@ -827,30 +853,26 @@ Transferir ficheiro e permissões
 <target>ficheiro existente em ambos os lados</target>
 <source>on one side only</source>
 <target>ficheiro existente apenas num lado</target>
-<source>- left</source>
-<target>- esquerda</target>
-<source>- right</source>
-<target>- direita</target>
-<source>different</source>
-<target>ficheiros diferentes</target>
-<source>- conflict (same date, different size)</source>
-<target>- conflito (mesma data, tamanho diferente)</target>
+<source>same date</source>
+<target>data igual</target>
+<source>different date</source>
+<target>data diferente</target>
 <source>Inactive</source>
-<target></target>
+<target>Inactivo</target>
 <source>Second</source>
-<target></target>
+<target>Segundo</target>
 <source>Minute</source>
-<target></target>
+<target>Minuto</target>
 <source>Hour</source>
-<target></target>
+<target>Hora</target>
 <source>Day</source>
-<target></target>
+<target>Dia</target>
 <source>Byte</source>
-<target></target>
+<target>Byte</target>
 <source>KB</source>
-<target></target>
+<target>KB</target>
 <source>MB</source>
-<target></target>
+<target>MB</target>
 <source>Filter: All pairs</source>
 <target>Filtro: Todos os pares</target>
 <source>Filter: Single pair</source>
@@ -878,12 +900,16 @@ Transferir ficheiro e permissões
 <pluralform>Do you really want to move the following %x objects to the Recycle Bin?</pluralform>
 </source>
 <target>
+<pluralform>Deseja mesmo mover o seguinte objecto para a Reciclagem?</pluralform>
+<pluralform>Deseja mesmo mover os seguintes %x objectos para a Reciclagem?</pluralform>
 </target>
 <source>
 <pluralform>Do you really want to delete the following object?</pluralform>
 <pluralform>Do you really want to delete the following %x objects?</pluralform>
 </source>
 <target>
+<pluralform>Deseja mesmo eliminar o seguinte objecto?</pluralform>
+<pluralform>Deseja mesmo eliminar os seguintes %x objectos?</pluralform>
 </target>
 <source>Leave as unresolved conflict</source>
 <target>Deixar como conflito</target>
@@ -894,7 +920,7 @@ Transferir ficheiro e permissões
 <source>Use Recycle Bin when deleting or overwriting files</source>
 <target>Utilizar Reciclagem ao apagar ou substituir ficheiros</target>
 <source>Versioning</source>
-<target></target>
+<target>Manter versões anteriores</target>
 <source>Move files into a time-stamped subdirectory</source>
 <target>Mover ficheiros para uma pasta com a data</target>
 <source>Cannot determine sync-direction:</source>
@@ -941,28 +967,28 @@ Transferir ficheiro e permissões
 <target>A gerar lista ficheiros...</target>
 <source>Multiple...</source>
 <target>Multiplo...</target>
-<source>Files that are equal on both sides</source>
-<target>Ficheiros iguais dos dois lados</target>
-<source>Equal files/folders that differ in attributes only</source>
-<target>Ficheiros/Pastas iguais que diferem apenas nos atributos</target>
-<source>Copy from right to left</source>
-<target>Copiar da direita para a esquerda</target>
-<source>Copy from left to right</source>
-<target>Copiar da esquerda para a direita</target>
-<source>Delete files/folders existing on left side only</source>
-<target>Eliminar itens existentes apenas no lado esquerdo</target>
-<source>Delete files/folders existing on right side only</source>
-<target>Eliminar itens existentes apenas no lado direito</target>
-<source>Copy from right to left overwriting</source>
-<target>Copiar da direita para a esquerda com sobreposição</target>
-<source>Copy from left to right overwriting</source>
-<target>Copiar da esquerda para a direita com sobreposição</target>
+<source>Both sides are equal</source>
+<target>Ambos os lados iguais</target>
+<source>Files/folders differ in attributes only</source>
+<target>Ficheiros/pastas diferem apenas nos atributos</target>
+<source>Copy new file/folder to left</source>
+<target>Copiar novo ficheiro/pasta para a esquerda</target>
+<source>Copy new file/folder to right</source>
+<target>Copiar novo ficheiro/pasta para a direita</target>
+<source>Delete left file/folder</source>
+<target>Eliminar ficheiro/pasta à esquerda</target>
+<source>Delete right file/folder</source>
+<target>Eliminar ficheiro/pasta à direita</target>
+<source>Overwrite left file/folder with right one</source>
+<target>Substituir ficheiro/pasta da esquerda (pelo da direita)</target>
+<source>Overwrite right file/folder with left one</source>
+<target>Substituir ficheiro/pasta da direita (pelo da esquerda)</target>
 <source>Do nothing</source>
 <target>Não fazer nada</target>
-<source>Copy attributes only from right to left</source>
-<target>Copiar atributos apenas da direita para a esquerda</target>
-<source>Copy attributes only from left to right</source>
-<target>Copiar atributos apenas da esquerda para a direita</target>
+<source>Copy file attributes only to left</source>
+<target>Copiar apenas atributos de ficheiro para a esquerda</target>
+<source>Copy file attributes only to right</source>
+<target>Copiar apenas atributos de ficheiro para a direita</target>
 <source>Deleting file %x</source>
 <target>Apagar ficheiro %x</target>
 <source>Deleting Symbolic Link %x</source>
@@ -993,10 +1019,12 @@ Transferir ficheiro e permissões
 <target>Actualizar atributos de %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>A pasta de origem já não existe:</target>
+<source>Generating database...</source>
+<target>A gerar base de dados...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Nada a sincronizar de acordo com a configuração!</target>
 <source>Target directory name must not be empty!</source>
-<target></target>
+<target>Nome do directório de destino não pode estar vazio!</target>
 <source>User-defined directory for deletion was not specified!</source>
 <target>Directório para eliminação não foi especificado!</target>
 <source>Unresolved conflicts existing!</source>
@@ -1017,8 +1045,6 @@ Transferir ficheiro e permissões
 <target>Um directório que pertencente a conjunto de vários directórios vai ser alterado! Por favor, verifique as opções de sincronização!</target>
 <source>Processing folder pair:</source>
 <target>A processar o par do directorio:</target>
-<source>Generating database...</source>
-<target>A gerar base de dados...</target>
 <source>Error copying locked file %x!</source>
 <target>Erro ao copiar ficheiro bloqueado %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

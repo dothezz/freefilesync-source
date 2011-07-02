@@ -13,7 +13,7 @@
 namespace xmlAccess
 {
 
-class XmlError //Exception class
+class FfsXmlError //Exception class
 {
 public:
     enum Severity
@@ -22,16 +22,10 @@ public:
         FATAL
     };
 
-    XmlError(const wxString& message, Severity sev = FATAL) : errorMessage(message), m_severity(sev) {}
+    FfsXmlError(const wxString& message, Severity sev = FATAL) : errorMessage(message), m_severity(sev) {}
 
-    const wxString& msg() const
-    {
-        return errorMessage;
-    }
-    Severity getSeverity() const
-    {
-        return m_severity;
-    }
+    const wxString& msg() const { return errorMessage; }
+    Severity getSeverity() const { return m_severity; }
 private:
     const wxString errorMessage;
     const Severity m_severity;

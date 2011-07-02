@@ -7,105 +7,78 @@
 #include "xml_proc.h"
 #include <wx/filefn.h>
 #include "../shared/i18n.h"
+#include <file_handling.h>
+#include <string_conv.h>
+#include <xml_base.h>
 
-
+using namespace zen;
 using namespace xmlAccess;
 
-class RtsXmlErrorLogger : public xmlAccess::XmlErrorLogger
+
+namespace
 {
-public:
-    void readConfig(const TiXmlElement* root, xmlAccess::XmlRealConfig& outputCfg);
-};
-
-
-//--------------------------------------------------------------------------------
-
-
-void RtsXmlErrorLogger::readConfig(const TiXmlElement* root, xmlAccess::XmlRealConfig& outputCfg)
+void readConfig(const XmlIn& in, XmlRealConfig& config)
 {
-    //read directories for monitoring
-    const TiXmlElement* directoriesToWatch = TiXmlHandleConst(root).FirstChild("Directories").ToElement();
-
-    readXmlElementLogging("Folder", directoriesToWatch, outputCfg.directories);
-
-    //commandline to execute
-    readXmlElementLogging("Commandline", root, outputCfg.commandline);
-
-    //delay
-    readXmlElementLogging("Delay", root, outputCfg.delay);
+    in["Directories"](config.directories);
+    in["Commandline"](config.commandline);
+    in["Delay"      ](config.delay);
 }
 
 
-void writeConfig(const xmlAccess::XmlRealConfig& outputCfg, TiXmlElement& root)
+bool isXmlTypeRTS(const XmlDoc& doc) //throw()
 {
-    //directories to monitor
-    TiXmlElement* directoriesToWatch = new TiXmlElement("Directories");
-    root.LinkEndChild(directoriesToWatch);
-    xmlAccess::addXmlElement("Folder", outputCfg.directories, directoriesToWatch);
-
-    //commandline to execute
-    xmlAccess::addXmlElement("Commandline", outputCfg.commandline, &root);
-
-    //delay
-    xmlAccess::addXmlElement("Delay", outputCfg.delay, &root);
-}
-
-
-bool isXmlTypeRTS(const TiXmlDocument& doc) //throw()
-{
-    const TiXmlElement* root = doc.RootElement();
-    if (root && root->ValueStr() == std::string("RealtimeSync"))
+    if (doc.root().getNameAs<std::string>() == "FreeFileSync")
     {
-        const char* cfgType = root->Attribute("XmlType");
-        if (cfgType)
-            return std::string(cfgType) == "REAL";
+        std::string type;
+        if (doc.root().getAttribute("XmlType", type))
+        {
+            if (type == "REAL")
+                return true;
+        }
     }
     return false;
 }
-
-
-void initXmlDocument(TiXmlDocument& doc) //throw()
-{
-    TiXmlDeclaration* decl = new TiXmlDeclaration("1.0", "UTF-8", ""); //delete won't be necessary later; ownership passed to TiXmlDocument!
-    doc.LinkEndChild(decl);
-
-    TiXmlElement* root = new TiXmlElement("RealtimeSync");
-    doc.LinkEndChild(root);
-
-    addXmlAttribute("XmlType", "REAL", doc.RootElement());
 }
 
 
 void xmlAccess::readRealConfig(const wxString& filename, XmlRealConfig& config)
 {
-    //load XML
-    if (!wxFileExists(filename))
-        throw XmlError(wxString(_("File does not exist:")) + wxT("\n\"") + filename + wxT("\""));
+    if (!fileExists(wxToZ(filename)))
+        throw FfsXmlError(wxString(_("File does not exist:")) + wxT("\n\"") + filename + wxT("\""));
 
-    TiXmlDocument doc;
-    loadXmlDocument(filename, doc); //throw (XmlError)
+    XmlDoc doc;
+    loadXmlDocument(filename, doc);  //throw (FfsXmlError)
 
     if (!isXmlTypeRTS(doc))
-        throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\""));
+        throw FfsXmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\""));
 
-    RtsXmlErrorLogger parser;
-    parser.readConfig(doc.RootElement(), config); //read GUI layout configuration
+    XmlIn in(doc);
+    ::readConfig(in, config);
 
-    if (parser.errorsOccurred())
-        throw XmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\"\n\n") +
-                       parser.getErrorMessageFormatted(), XmlError::WARNING);
+    if (in.errorsOccured())
+        throw FfsXmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\"\n\n") +
+                          getErrorMessageFormatted(in), FfsXmlError::WARNING);
 }
 
 
-void xmlAccess::writeRealConfig(const XmlRealConfig& outputCfg, const wxString& filename)
+namespace
 {
-    TiXmlDocument doc;
-    initXmlDocument(doc); //throw()
+void writeConfig(const XmlRealConfig& config, XmlOut& out)
+{
+    out["Directories"](config.directories);
+    out["Commandline"](config.commandline);
+    out["Delay"      ](config.delay);
+}
+}
 
-    if (!doc.RootElement())
-        throw XmlError(wxString(_("Error writing file:")) + wxT("\n\"") + filename + wxT("\""));
 
-    writeConfig(outputCfg, *doc.RootElement()); //add GUI layout configuration settings
+void xmlAccess::writeRealConfig(const XmlRealConfig& config, const wxString& filename)
+{
+    XmlDoc doc("FreeFileSync");
+    doc.root().setAttribute("XmlType", "REAL");
 
-    saveXmlDocument(filename, doc); //throw (XmlError)
+    XmlOut out(doc);
+    writeConfig(config, out);
+
+    saveXmlDocument(doc, filename); //throw (FfsXmlError)
 }

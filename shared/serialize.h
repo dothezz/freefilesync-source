@@ -10,7 +10,7 @@
 #include <vector>
 #include "file_error.h"
 #include <wx/stream.h>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <boost/cstdint.hpp>
 #include "file_io.h"
 
@@ -72,7 +72,7 @@ protected:
     template <class S>
     S readStringC() const; //throw (FileError), checked read operation
 
-    typedef boost::shared_ptr<std::vector<char> > CharArray; //there's no guarantee std::string has a ref-counted implementation... so use this "thing"
+    typedef std::shared_ptr<std::vector<char> > CharArray; //there's no guarantee std::string has a ref-counted implementation... so use this "thing"
     CharArray readArrayC() const; //throw (FileError)
 
     void check() const;

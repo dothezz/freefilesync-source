@@ -2,7 +2,7 @@
 #include "system_constants.h"
 #include "i18n.h"
 #include "long_path_prefix.h"
-#include "string_conv.h"
+#include "string_utf8.h"
 #include "last_error.h"
 #include "assert_static.h"
 #include <bitset>
@@ -133,9 +133,9 @@ FILETIME utcToLocal(const FILETIME& utcTime) //throw (std::runtime_error)
             &localTime)) //__out  LPFILETIME lpLocalFileTime
     {
         const wxString errorMessage = wxString(_("Conversion error:")) + wxT(" FILETIME -> local FILETIME: ") + wxT("(") +
-                                      wxT("High: ") + Zstring::fromNumber(utcTime.dwHighDateTime) + wxT(" ") +
-                                      wxT("Low: ")  + Zstring::fromNumber(utcTime.dwLowDateTime) + wxT(") ") + wxT("\n\n") + zen::getLastErrorFormatted();
-        throw std::runtime_error(std::string((errorMessage).ToUTF8()));
+                                      wxT("High: ") + toString<wxString>(utcTime.dwHighDateTime) + wxT(" ") +
+                                      wxT("Low: ")  + toString<wxString>(utcTime.dwLowDateTime) + wxT(") ") + wxT("\n\n") + zen::getLastErrorFormatted();
+        throw std::runtime_error(wideToUtf8<std::string>(errorMessage));
     }
     return localTime;
 }
@@ -150,17 +150,17 @@ FILETIME localToUtc(const FILETIME& localTime) //throw (std::runtime_error)
             &utcTime))  //__out  LPFILETIME lpFileTime
     {
         const wxString errorMessage = wxString(_("Conversion error:")) + wxT(" local FILETIME -> FILETIME: ") + wxT("(") +
-                                      wxT("High: ") + Zstring::fromNumber(localTime.dwHighDateTime) + wxT(" ") +
-                                      wxT("Low: ")  + Zstring::fromNumber(localTime.dwLowDateTime) + wxT(") ") + wxT("\n\n") + zen::getLastErrorFormatted();
-        throw std::runtime_error(std::string((errorMessage).ToUTF8()));
+                                      wxT("High: ") + toString<wxString>(localTime.dwHighDateTime) + wxT(" ") +
+                                      wxT("Low: ")  + toString<wxString>(localTime.dwLowDateTime) + wxT(") ") + wxT("\n\n") + zen::getLastErrorFormatted();
+        throw std::runtime_error(wideToUtf8<std::string>(errorMessage));
     }
     return utcTime;
 }
 
 
 //struct FILETIME {DWORD dwLowDateTime; DWORD dwHighDateTime;};
-const FILETIME FAT_MIN_TIME = {13374976, 27846544}; //1980 \ both are valid max/min FAT dates for 2 second precision
-const FILETIME FAT_MAX_TIME = {14487552, 37251238}; //2107 /
+const FILETIME FAT_MIN_TIME = { 13374976, 27846544 }; //1980 \ both are valid max/min FAT dates for 2 second precision
+const FILETIME FAT_MAX_TIME = { 14487552, 37251238 }; //2107 /
 
 //http://en.wikipedia.org/wiki/File_Allocation_Table
 const size_t PRECISION_WRITE_TIME  = 20000000; //number of 100 ns per step -> 2 s
@@ -250,8 +250,8 @@ std::bitset<UTC_LOCAL_OFFSET_BITS> getUtcLocalShift()
         timeShiftSec % (60 * 15) != 0) //all known time shift have at least 15 minute granularity!
     {
         const wxString errorMessage = wxString(_("Conversion error:")) + wxT(" Unexpected UTC <-> local time shift: ") +
-                                      wxT("(") + Zstring::fromNumber(timeShiftSec) + wxT(") ") + wxT("\n\n") + zen::getLastErrorFormatted();
-        throw std::runtime_error(std::string((errorMessage).ToUTF8()));
+                                      wxT("(") + toString<wxString>(timeShiftSec) + wxT(") ") + wxT("\n\n") + zen::getLastErrorFormatted();
+        throw std::runtime_error(wideToUtf8<std::string>(errorMessage));
     }
 
     std::bitset<UTC_LOCAL_OFFSET_BITS> output(absValue);

@@ -4,7 +4,7 @@ BINDIR      = $(DESTDIR)$(prefix)/bin
 SHAREDIR    = $(DESTDIR)$(prefix)/share
 APPSHAREDIR = $(SHAREDIR)/$(APPNAME)
 
-COMMON_COMPILE_FLAGS = -Wall -pipe `pkg-config --cflags gtk+-2.0` -O3 -pthread -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DTIXML_USE_STL -DWXINTL_NO_GETTEXT_MACRO
+COMMON_COMPILE_FLAGS = -Wall -pipe `pkg-config --cflags gtk+-2.0` -O3 -pthread -std=gnu++0x -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I./shared
 COMMON_LINK_FLAGS  = -O3 -pthread
 
 #default build
@@ -67,10 +67,8 @@ FILE_LIST+=shared/localization.cpp
 FILE_LIST+=shared/file_io.cpp
 FILE_LIST+=shared/dir_name.cpp
 FILE_LIST+=shared/guid.cpp
+FILE_LIST+=shared/xml_base.cpp
 FILE_LIST+=shared/check_exist.cpp
-FILE_LIST+=shared/tinyxml/tinyxml.cpp
-FILE_LIST+=shared/tinyxml/tinyxmlerror.cpp
-FILE_LIST+=shared/tinyxml/tinyxmlparser.cpp
 FILE_LIST+=shared/global_func.cpp
 FILE_LIST+=shared/last_error.cpp
 FILE_LIST+=shared/custom_tooltip.cpp
@@ -79,7 +77,6 @@ FILE_LIST+=shared/resolve_path.cpp
 FILE_LIST+=shared/file_traverser.cpp
 FILE_LIST+=shared/standard_paths.cpp
 FILE_LIST+=shared/zstring.cpp
-FILE_LIST+=shared/xml_base.cpp
 FILE_LIST+=shared/app_main.cpp
 FILE_LIST+=shared/custom_button.cpp
 FILE_LIST+=shared/toggle_button.cpp

@@ -11,6 +11,7 @@
 #include "../algorithm.h"
 #include "../shared/string_conv.h"
 #include "../shared/util.h"
+#include "../shared/wx_choice_enum.h"
 #include "../synchronization.h"
 #include "../library/custom_grid.h"
 #include "../shared/custom_button.h"

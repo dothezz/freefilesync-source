@@ -18,9 +18,21 @@
 <source>Browse</source>
 <target>Переглянути</target>
 <source>Invalid commandline: "%x"</source>
-<target></target>
+<target>Неправильний командний рядок: "%x"</target>
 <source>Error resolving symbolic link:</source>
 <target>Помилка при вирішені символічного посилання:</target>
+<source>Show popup</source>
+<target>Показувати виринаючі вікна</target>
+<source>Show popup on errors or warnings</source>
+<target>Показувати виринаючі вікна при помилках та зауваженнях</target>
+<source>Ignore errors</source>
+<target>Ігнорувати помилки</target>
+<source>Hide all error and warning messages</source>
+<target>Приховати всі помилки і повідомлення з попередженнями</target>
+<source>Exit instantly</source>
+<target>Вийти негайно</target>
+<source>Abort synchronization immediately</source>
+<target>Перервати синхронізацію негайно</target>
 <source>Select alternate synchronization settings</source>
 <target>Вибрати альтернативні налаштування синхронізації</target>
 <source>No filter selected</source>
@@ -101,7 +113,7 @@
 <source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
 <target>Записів, які стосуються таких файлів, в базі даних FreeFileSync ще не існує:</target>
 <source>Error reading from synchronization database:</source>
-<target>Помилка при читанні з базы даних синхронізації:</target>
+<target>Помилка при читанні з бази даних синхронізації:</target>
 <source>An exception occurred!</source>
 <target>Відбулось виключення!</target>
 <source>Error deleting file:</source>
@@ -131,8 +143,6 @@
 <target>Файл не існує:</target>
 <source>Error parsing configuration file:</source>
 <target>Помилка при анализі файла налаштувань синхронізації:</target>
-<source>Error writing file:</source>
-<target>Помилка при записі файла:</target>
 <source>/sec</source>
 <target>/сек</target>
 <source>
@@ -264,12 +274,18 @@ The command line is executed each time:
 <target>Помилка при копіюванні файла:</target>
 <source>Error opening file:</source>
 <target>Помилка при відкриванні файла:</target>
+<source>Error writing file:</source>
+<target>Помилка при записі файла:</target>
 <source>Error reading file:</source>
 <target>Помилка при читанні файла:</target>
 <source>Endless loop when traversing directory:</source>
 <target>Зациклюванння при обході каталогу:</target>
 <source>Error traversing directory:</source>
 <target>Помилка обходу каталогу:</target>
+<source>Windows Error Code %x:</source>
+<target>Код помилки Windows %x:</target>
+<source>Linux Error Code %x:</source>
+<target>Код помилки Linux %x:</target>
 <source>Error setting privilege:</source>
 <target>Помилка встановлення привилеїв:</target>
 <source>Error moving to Recycle Bin:</source>
@@ -294,18 +310,6 @@ The command line is executed each time:
 <target>%x%</target>
 <source>Could not read values for the following XML nodes:</source>
 <target>Не вдалося прочитати значення таких XML записів:</target>
-<source>Show popup</source>
-<target>Показувати виринаючі вікна</target>
-<source>Show popup on errors or warnings</source>
-<target>Показувати виринаючі вікна при помилках та зауваженнях</target>
-<source>Ignore errors</source>
-<target>Ігнорувати помилки</target>
-<source>Hide all error and warning messages</source>
-<target>Приховати всі помилки і повідомлення з попередженнями</target>
-<source>Exit instantly</source>
-<target>Вийти негайно</target>
-<source>Abort synchronization immediately</source>
-<target>Перервати синхронізацію негайно</target>
 <source>Logging</source>
 <target>Лог-файли</target>
 <source>FreeFileSync batch file</source>
@@ -413,8 +417,8 @@ The command line is executed each time:
 <target>Праворуч</target>
 <source>Batch job</source>
 <target>Пакетне завдання</target>
-<source>Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
-<target>Створіть файл завдання для автоматизованної синхронізації. Щоб запустити програму в цьому режимі просто передайте назву файла на виконання FreeFileSync: FreeFileSync.exe <файл завдання>. Це також може бути заплановано у планувальнику завдань операційної системи.</target>
+<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
+<target>Створити пакетний файл для автоматичної синхронізації. Щоб запустити пакетний режим просто двічі клацніть файл або виконайте командний рядок: FreeFileSync.exe <batchfile>. Це можна також запланувати в менеджері ОС</target>
 <source>Help</source>
 <target>Допомога</target>
 <source>Configuration overview:</source>
@@ -481,18 +485,18 @@ The command line is executed each time:
 <target>Категорія</target>
 <source>Action</source>
 <target>Дія</target>
-<source>Files/folders that exist on left side only</source>
-<target>Файли/папки, які є тільки ліворуч</target>
-<source>Files/folders that exist on right side only</source>
-<target>Файли/папки, які є тільки праворуч</target>
-<source>Files that exist on both sides, left one is newer</source>
-<target>Файли є по обох сторонах, лівий новіший</target>
-<source>Files that exist on both sides, right one is newer</source>
-<target>Файли є по обох сторонах, правий новіший</target>
-<source>Files that have different content</source>
-<target>Файли, які мають різний вміст</target>
-<source>Conflicts/files that cannot be categorized</source>
-<target>Конфлікти/файли, які не можуть бути віднесені до якоїсь категорії</target>
+<source>File/folder exists on left side only</source>
+<target>Файл/папка існує тільки ліворуч</target>
+<source>File/folder exists on right side only</source>
+<target>Файл/папка існує тільки праворуч</target>
+<source>Left file is newer</source>
+<target>Файл ліворуч є новішим</target>
+<source>Right file is newer</source>
+<target>Файл праворуч є новішим</target>
+<source>Files have different content</source>
+<target>Файли відрізняються вмістом</target>
+<source>Conflict/file cannot be categorized</source>
+<target>Не можна категоризувати конфлікт/файл</target>
 <source>Compare by...</source>
 <target>Критерії порівнювання</target>
 <source>
@@ -711,8 +715,8 @@ Transfer file and directory permissions
 <target><груповий вибір></target>
 <source>D-Click</source>
 <target>Клацніть двічі</target>
-<source>Delete files	DEL</source>
-<target>Вилучити файл(и)	DEL</target>
+<source>Delete</source>
+<target>Видалити</target>
 <source>Customize...</source>
 <target>Вибрати колонки...</target>
 <source>Auto-adjust columns</source>
@@ -978,28 +982,28 @@ Transfer file and directory permissions
 <target>Створення списку файлів...</target>
 <source>Multiple...</source>
 <target>Різні варіанти...</target>
-<source>Files that are equal on both sides</source>
-<target>Файли, однакові з обох сторін</target>
-<source>Equal files/folders that differ in attributes only</source>
-<target>Однакові файли/папки, що відрізняються тільки атрибутами</target>
-<source>Copy from right to left</source>
-<target>Копіювати справа наліво</target>
-<source>Copy from left to right</source>
-<target>Копіювати зліва направо</target>
-<source>Delete files/folders existing on left side only</source>
-<target>Вилучати файли/папки, які існують тільки ліворуч</target>
-<source>Delete files/folders existing on right side only</source>
-<target>Вилучати файли/папки, які існують тільки праворуч</target>
-<source>Copy from right to left overwriting</source>
-<target>Копіювати справа наліво перезаписуючи</target>
-<source>Copy from left to right overwriting</source>
-<target>Копіювати зліва направо перезаписуючи</target>
+<source>Both sides are equal</source>
+<target>Сторони ідентичні</target>
+<source>Files/folders differ in attributes only</source>
+<target>Файли/папки відрізняються лише атрибутами</target>
+<source>Copy new file/folder to left</source>
+<target>Зкопіювати новий файл/папку ліворуч</target>
+<source>Copy new file/folder to right</source>
+<target>Зкопіювати новий файл/папку праворуч</target>
+<source>Delete left file/folder</source>
+<target>Вилучити файл/папку ліворуч</target>
+<source>Delete right file/folder</source>
+<target>Вилучити файл/папку праворуч</target>
+<source>Overwrite left file/folder with right one</source>
+<target>Перезаписати файл/папку ліворуч відповідником зправа</target>
+<source>Overwrite right file/folder with left one</source>
+<target>Перезаписати файл/папку праворуч відповідником зліва</target>
 <source>Do nothing</source>
 <target>Нічого не робити</target>
-<source>Copy attributes only from right to left</source>
-<target>Копіювати тільки атрибути справа наліво</target>
-<source>Copy attributes only from left to right</source>
-<target>Копіювати тільки атрибути зліва направо</target>
+<source>Copy file attributes only to left</source>
+<target>Зкопіювати ліворуч лише атрибути файла</target>
+<source>Copy file attributes only to right</source>
+<target>Зкопіювати праворуч лише атрибути файла</target>
 <source>Deleting file %x</source>
 <target>Вилучення файла %x</target>
 <source>Deleting Symbolic Link %x</source>

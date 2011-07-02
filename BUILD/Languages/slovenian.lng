@@ -17,14 +17,28 @@
 <target>RealtimeSync - Avtomatizirana sinhronizacija</target>
 <source>Browse</source>
 <target>Brskaj</target>
+<source>Invalid commandline: "%x"</source>
+<target>Napačen ukaz v vrstici: "%x"</target>
 <source>Error resolving symbolic link:</source>
 <target>Napaka pri razreševanju simbolične povezave:</target>
+<source>Show popup</source>
+<target>Prikaži pojavno okno</target>
+<source>Show popup on errors or warnings</source>
+<target>Prikaži pojavno okno pri napakah in opozorilih</target>
+<source>Ignore errors</source>
+<target>Ignoriraj napake</target>
+<source>Hide all error and warning messages</source>
+<target>Skrij vsa obvestila o napakah in opozorilih</target>
+<source>Exit instantly</source>
+<target>Zapusti v trenutku</target>
+<source>Abort synchronization immediately</source>
+<target>Takoj prekini sinhronizacijo</target>
 <source>Select alternate synchronization settings</source>
 <target>Izberite nadomestne nastavitve sinhronizacije</target>
 <source>No filter selected</source>
 <target>Noben filter ni izbran</target>
 <source>Filter is active</source>
-<target>Filterj je aktiven</target>
+<target>Filter je aktiven</target>
 <source>Clear filter settings</source>
 <target>Počisti nastavitve filtra</target>
 <source>Remove alternate settings</source>
@@ -125,14 +139,12 @@
 <target>Info</target>
 <source>Fatal Error</source>
 <target>Usodna napaka</target>
+<source>Invalid FreeFileSync config file!</source>
+<target>Neveljavna FreeFileSync nastavitvena datoteka!</target>
 <source>File does not exist:</source>
 <target>Datoteka ne obstaja:</target>
 <source>Error parsing configuration file:</source>
 <target>Napaka pri preverjanju konfiguracijske datoteke:</target>
-<source>Error writing file:</source>
-<target>Napaka pri pisanju datoteke:</target>
-<source>Invalid FreeFileSync config file!</source>
-<target>Neveljavna FreeFileSync nastavitvena datoteka!</target>
 <source>/sec</source>
 <target>/sek</target>
 <source>
@@ -227,8 +239,6 @@ Ukazna vrstica se izvrši vsakič ko:
 <target>Nadziranje aktivno...</target>
 <source>Waiting for missing directories...</source>
 <target>Čakam na manjkajoče imenike...</target>
-<source>Command line is empty!</source>
-<target>Ukazna vrstica je prazna!</target>
 <source>Could not initialize directory monitoring:</source>
 <target>Ne morem začeti nadzorovanja imenikov:</target>
 <source>A directory input field is empty.</source>
@@ -269,12 +279,18 @@ Ukazna vrstica se izvrši vsakič ko:
 <target>Napaka pri kopiranju datoteke:</target>
 <source>Error opening file:</source>
 <target>Napaka pri odpiranju datoteke:</target>
+<source>Error writing file:</source>
+<target>Napaka pri pisanju datoteke:</target>
 <source>Error reading file:</source>
 <target>Napaka pri branju datoteke:</target>
 <source>Endless loop when traversing directory:</source>
 <target>Neskončna zanka pri prehodu imenika:</target>
 <source>Error traversing directory:</source>
 <target>Napaka pri prehajanju imenika:</target>
+<source>Windows Error Code %x:</source>
+<target>Windows koda napake %x:</target>
+<source>Linux Error Code %x:</source>
+<target>Linux koda napake %x:</target>
 <source>Error setting privilege:</source>
 <target>Napaka pri nastavljanju privilegija:</target>
 <source>Error moving to Recycle Bin:</source>
@@ -299,18 +315,6 @@ Ukazna vrstica se izvrši vsakič ko:
 <target>%x%</target>
 <source>Could not read values for the following XML nodes:</source>
 <target>Ne morem brati vrednosti za naslednja XML vozlišča:</target>
-<source>Show popup</source>
-<target>Prikaži pojavno okno</target>
-<source>Show popup on errors or warnings</source>
-<target>Prikaži pojavno okno pri napakah in opozorilih</target>
-<source>Ignore errors</source>
-<target>Ignoriraj napake</target>
-<source>Hide all error and warning messages</source>
-<target>Skrij vsa obvestila o napakah in opozorilih</target>
-<source>Exit instantly</source>
-<target>Zapusti v trenutku</target>
-<source>Abort synchronization immediately</source>
-<target>Takoj prekini sinhronizacijo</target>
 <source>Logging</source>
 <target>Beležim</target>
 <source>FreeFileSync batch file</source>
@@ -415,8 +419,8 @@ Ukazna vrstica se izvrši vsakič ko:
 <target>Desno</target>
 <source>Batch job</source>
 <target>Batch opravilo</target>
-<source>Assemble a batch file for automated synchronization. To start in batch mode simply pass the name of the file to the FreeFileSync executable: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
-<target>Sestavi batch datoteko za samodejno sinhronizacijo. Da začnete v batch načinu, preprosto podajte ime batch datoteke k FreeFileSync izvršilni datoteki: FreeFileSync.exe <imedatotekebatch>. To se lahko nastavi tudi v urniku opravil vašega operacijskega sistema.</target>
+<source>Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</source>
+<target>Ustvari batch datoteko za avtomatizirano sinhronizacijo. Da začnete v batch načinu preprosto dvokliknite datoteko ali jo izvršite preko ukazne vrstice: FreeFileSync.exe <batchfile>. To se lahko nastavi v razpored opravil vašega operacijskega sistema.</target>
 <source>Help</source>
 <target>Pomoč</target>
 <source>Configuration overview:</source>
@@ -483,18 +487,18 @@ Ukazna vrstica se izvrši vsakič ko:
 <target>Kategorija</target>
 <source>Action</source>
 <target>Ukrep</target>
-<source>Files/folders that exist on left side only</source>
-<target>Datoteke/mape, ki obstajajo samo na levi strani</target>
-<source>Files/folders that exist on right side only</source>
-<target>Datoteke/mape, ki obstajajo samo na desni strani</target>
-<source>Files that exist on both sides, left one is newer</source>
-<target>Datoteke, ki obstajajo na obeh straneh, leva je novejša</target>
-<source>Files that exist on both sides, right one is newer</source>
-<target>Datoteke, ki obstajajo na obeh straneh, desna je novejša</target>
-<source>Files that have different content</source>
-<target>Datoteke, ki imajo različno vsebino</target>
-<source>Conflicts/files that cannot be categorized</source>
-<target>Prisotni so spori/datoteke, ki ne morejo biti kategorizirani</target>
+<source>File/folder exists on left side only</source>
+<target>Datoteka/mapa obstaja samo na levi strani</target>
+<source>File/folder exists on right side only</source>
+<target>Datoteka/mapa obstaja samo na desni strani</target>
+<source>Left file is newer</source>
+<target>Leva datoteka je novejša</target>
+<source>Right file is newer</source>
+<target>Desna datoteka je novejša</target>
+<source>Files have different content</source>
+<target>Datoteki imata različno vsebino</target>
+<source>Conflict/file cannot be categorized</source>
+<target>Spor/datoteka ne more biti kategorizirana</target>
 <source>Compare by...</source>
 <target>Primerjaj po...</target>
 <source>
@@ -717,10 +721,8 @@ Prenesi dovoljenja datotek in imenikov
 <target><mnogokratna izbira></target>
 <source>D-Click</source>
 <target>D-Klik</target>
-<source>Copy to clipboard	CTRL+C</source>
-<target>Kopiraj v odložišče	CTRL+C</target>
-<source>Delete files	DEL</source>
-<target>Izbriši datoteke	DEL</target>
+<source>Delete</source>
+<target>Izbriši</target>
 <source>Customize...</source>
 <target>Prilagodi...</target>
 <source>Auto-adjust columns</source>
@@ -871,8 +873,10 @@ Prenesi dovoljenja datotek in imenikov
 <target>datoteka obstaja na obeh straneh</target>
 <source>on one side only</source>
 <target>samo na eni strani</target>
-<source>different</source>
-<target>različni</target>
+<source>same date</source>
+<target>enak datum</target>
+<source>different date</source>
+<target>različen datum</target>
 <source>Inactive</source>
 <target>Neaktivno</target>
 <source>Second</source>
@@ -987,28 +991,28 @@ Prenesi dovoljenja datotek in imenikov
 <target>Ustvarjam seznam datotek...</target>
 <source>Multiple...</source>
 <target>Večkratno...</target>
-<source>Files that are equal on both sides</source>
-<target>Datoteki, ki sta enaki na obeh straneh</target>
-<source>Equal files/folders that differ in attributes only</source>
-<target>Enake datoteke/mape, ki se razlikujejo samo v atributih</target>
-<source>Copy from right to left</source>
-<target>Kopiraj iz desne na levo</target>
-<source>Copy from left to right</source>
-<target>Kopiraj iz leve na desno</target>
-<source>Delete files/folders existing on left side only</source>
-<target>Izbriši datoteke/mape, ki obstajajo samo na levi strani</target>
-<source>Delete files/folders existing on right side only</source>
-<target>Izbriši datoteke/mape, ki obstajajo samo na desni strani</target>
-<source>Copy from right to left overwriting</source>
-<target>Kopiraj iz desne na levo s prepisovanjem</target>
-<source>Copy from left to right overwriting</source>
-<target>Kopiraj iz leve na desno s prepisovanjem</target>
+<source>Both sides are equal</source>
+<target>Obe strani sta enaki</target>
+<source>Files/folders differ in attributes only</source>
+<target>Datoteke/mape se razlikujejo samo v atributih</target>
+<source>Copy new file/folder to left</source>
+<target>Kopiraj novo datoteko/mapo na levo</target>
+<source>Copy new file/folder to right</source>
+<target>Kopiraj novo datoteko/mapo na desno</target>
+<source>Delete left file/folder</source>
+<target>Izbriši levo datoteko/mapo</target>
+<source>Delete right file/folder</source>
+<target>Izbriši desno datoteko/mapo</target>
+<source>Overwrite left file/folder with right one</source>
+<target>Prepiši levo datoteko/mapo s tisto na desni</target>
+<source>Overwrite right file/folder with left one</source>
+<target>Prepiši desno datoteko/mapo s tisto na levi</target>
 <source>Do nothing</source>
 <target>Ne naredi ničesar</target>
-<source>Copy attributes only from right to left</source>
-<target>Kopiraj atribute samo iz desne na levo</target>
-<source>Copy attributes only from left to right</source>
-<target>Kopiraj atribute samo iz leve na desno</target>
+<source>Copy file attributes only to left</source>
+<target>Kopiraj atribute datoteke samo na levo</target>
+<source>Copy file attributes only to right</source>
+<target>Kopiraj atribute datoteke samo na desno</target>
 <source>Deleting file %x</source>
 <target>Brisanje datoteke %x</target>
 <source>Deleting Symbolic Link %x</source>
@@ -1039,6 +1043,8 @@ Prenesi dovoljenja datotek in imenikov
 <target>Posodabljam atribute od %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>Izvorni imenik ne obstaja več:</target>
+<source>Generating database...</source>
+<target>Ustvarjam podatkovno bazo...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Po trenutni konfiguraciji ni nič za sinhronizirati!</target>
 <source>Target directory name must not be empty!</source>
@@ -1063,8 +1069,6 @@ Prenesi dovoljenja datotek in imenikov
 <target>Imenik bo spremenjen, kar je del večkratnih parov map! Prosimo preglejte nastavitve sinhronizacije!</target>
 <source>Processing folder pair:</source>
 <target>Obdelujem par map:</target>
-<source>Generating database...</source>
-<target>Ustvarjam podatkovno bazo...</target>
 <source>Error copying locked file %x!</source>
 <target>Napaka pri kopiranju zaklenjene datoteke %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

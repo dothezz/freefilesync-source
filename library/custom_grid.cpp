@@ -169,7 +169,7 @@ public:
             {
                 return result;
             }
-            else //grid attribute might be referenced by other nodes, so clone it!
+            else //grid attribute might be referenced by other elements, so clone it!
             {
                 wxGridCellAttr* attr = result->Clone(); //attr has ref-count 1
                 result->DecRef();
@@ -1063,6 +1063,28 @@ void CustomGrid::updateGridSizes()
 {
     if(getGridDataTable())
         getGridDataTable()->updateGridSizes();
+}
+
+
+void CustomGridRim::updateGridSizes()
+{
+    CustomGrid::updateGridSizes();
+
+    //set row label size
+
+    //SetRowLabelSize(wxGRID_AUTOSIZE); -> we can do better
+    wxClientDC dc(GetGridRowLabelWindow());
+    dc.SetFont(GetLabelFont());
+
+    wxArrayString lines;
+    lines.push_back(GetRowLabelValue(GetNumberRows()));
+
+    long width = 0;
+    long dummy = 0;
+    GetTextBoxSize(dc, lines, &width, &dummy);
+
+    width += 8;
+    SetRowLabelSize(width);
 }
 
 

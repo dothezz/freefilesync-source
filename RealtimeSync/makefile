@@ -2,7 +2,7 @@ APPNAME = RealtimeSync
 prefix = /usr
 BINDIR = $(DESTDIR)$(prefix)/bin
 
-COMMON_COMPILE_FLAGS = -Wall -pipe `pkg-config --cflags gtk+-2.0` -O3 -pthread -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DTIXML_USE_STL -DWXINTL_NO_GETTEXT_MACRO
+COMMON_COMPILE_FLAGS = -Wall -pipe `pkg-config --cflags gtk+-2.0` -O3 -pthread -std=gnu++0x -DNDEBUG -DwxUSE_UNICODE -DFFS_LINUX -DZEN_PLATFORM_OTHER -DWXINTL_NO_GETTEXT_MACRO -I../shared
 COMMON_LINK_FLAGS  = -O3 -pthread
 
 #default build
@@ -31,9 +31,6 @@ FILE_LIST+=../shared/check_exist.cpp
 FILE_LIST+=../shared/i18n.cpp
 FILE_LIST+=../shared/localization.cpp
 FILE_LIST+=../shared/inotify/inotify-cxx.cpp
-FILE_LIST+=../shared/tinyxml/tinyxml.cpp
-FILE_LIST+=../shared/tinyxml/tinyxmlerror.cpp
-FILE_LIST+=../shared/tinyxml/tinyxmlparser.cpp
 FILE_LIST+=../shared/global_func.cpp
 FILE_LIST+=../shared/last_error.cpp
 FILE_LIST+=../shared/dir_name.cpp

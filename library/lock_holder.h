@@ -2,7 +2,7 @@
 #define LOCK_HOLDER_H_INCLUDED
 
 #include <map>
-#include "../shared/Zstring.h"
+#include "../shared/zstring.h"
 #include "dir_lock.h"
 #include "status_handler.h"
 

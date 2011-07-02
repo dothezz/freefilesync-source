@@ -11,21 +11,32 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
-#include "string_tools.h"
+#include <string_tools.h>
 
 /*
 Allocator Policy:
 -----------------
     void* allocate(size_t size) //throw (std::bad_alloc)
     void deallocate(void* ptr)
+    size_t calcCapacity(size_t length)
 */
-class AllocatorFreeStore //same performance characterisics like malloc()/free()
+class AllocatorOptimalSpeed //exponential growth + min size
+{
+public:
+    //::operator new/ ::operator delete show same performance characterisics like malloc()/free()!
+    static void* allocate(size_t size) { return ::operator new(size); } //throw (std::bad_alloc)
+    static void  deallocate(void* ptr) { ::operator delete(ptr); }
+    static size_t calcCapacity(size_t length) { return std::max<size_t>(16, length + length / 2); }
+};
+
+
+class AllocatorOptimalMemory //no wasted memory, but more reallocations required when manipulating string
 {
 public:
     static void* allocate(size_t size) { return ::operator new(size); } //throw (std::bad_alloc)
     static void  deallocate(void* ptr) { ::operator delete(ptr); }
+    static size_t calcCapacity(size_t length) { return length; }
 };
-
 
 /*
 Storage Policy:
@@ -49,14 +60,10 @@ class StorageDeepCopy : public AP
 protected:
     ~StorageDeepCopy() {}
 
-    static T* create(size_t size)
-    {
-        return create(size, size);
-    }
-
+    static T* create(size_t size) { return create(size, size); }
     static T* create(size_t size, size_t minCapacity)
     {
-        const size_t newCapacity = calcCapacity(minCapacity);
+        const size_t newCapacity = AP::calcCapacity(minCapacity);
         assert(newCapacity >= minCapacity);
         assert(minCapacity >= size);
 
@@ -75,20 +82,11 @@ protected:
         return newData;
     }
 
-    static void destroy(T* ptr)
-    {
-        AP::deallocate(descr(ptr));
-    }
+    static void destroy(T* ptr) { AP::deallocate(descr(ptr)); }
 
-    static bool canWrite(const T* ptr, size_t minCapacity) //needs to be checked before writing to "ptr"
-    {
-        return minCapacity <= descr(ptr)->capacity;
-    }
-
-    static size_t length(const T* ptr)
-    {
-        return descr(ptr)->length;
-    }
+    //this needs to be checked before writing to "ptr"
+    static bool canWrite(const T* ptr, size_t minCapacity) { return minCapacity <= descr(ptr)->capacity; }
+    static size_t length(const T* ptr) { return descr(ptr)->length; }
 
     static void setLength(T* ptr, size_t newLength)
     {
@@ -112,11 +110,6 @@ private:
     {
         return reinterpret_cast<const Descriptor*>(ptr) - 1;
     }
-
-    static size_t calcCapacity(size_t length)
-    {
-        return std::max<size_t>(16, length + length / 2); //exponential growth + min size
-    }
 };
 
 
@@ -134,7 +127,7 @@ protected:
 
     static T* create(size_t size, size_t minCapacity)
     {
-        const size_t newCapacity = calcCapacity(minCapacity);
+        const size_t newCapacity = AP::calcCapacity(minCapacity);
         assert(newCapacity >= minCapacity);
         assert(minCapacity >= size);
 
@@ -194,22 +187,17 @@ private:
     {
         return reinterpret_cast<const Descriptor*>(ptr) - 1;
     }
-
-    static size_t calcCapacity(size_t length)
-    {
-        return std::max<size_t>(16, length + length / 2); //exponential growth + min size
-    }
 };
 
 
 template <class T,									         //Character Type
          template <class, class> class SP = StorageRefCount, //Storage Policy
-         class AP = AllocatorFreeStore>				         //Allocator Policy
+         class AP = AllocatorOptimalSpeed>				     //Allocator Policy
 class Zbase : public SP<T, AP>
 {
 public:
     Zbase();
-    Zbase(const T* source);
+    Zbase(const T* source); //implicit conversion from a C-string
     Zbase(const T* source, size_t length);
     Zbase(const Zbase& source);
     explicit Zbase(T source); //dangerous if implicit: T buffer[]; Zbase name = buffer; ups...
@@ -217,7 +205,7 @@ public:
     template <class S> explicit Zbase(const S& other, typename S::value_type = 0);
     ~Zbase();
 
-    operator const T* () const; //implicit conversion to C-string
+    //operator const T* () const; //NO implicit conversion to a C-string!! Many problems... one of them: if we forget to provide operator overloads, it'll just work with a T*...
 
     //STL accessors
     typedef       T*       iterator;
@@ -238,7 +226,7 @@ public:
     bool EndsWith  (const T*     postfix) const { return zen::endsWith  (*this, postfix); }
     bool EndsWith  (      T      postfix) const { return zen::endsWith  (*this, postfix); }
     void Truncate(size_t newLen) { return zen::truncate(*this, newLen); }
-    Zbase& Replace(const T* old, const T* replacement, bool replaceAll = true) { zen::replace(*this, old, replacement, replaceAll); return *this; }
+    Zbase& Replace(const Zbase& old, const Zbase& replacement, bool replaceAll = true) { zen::replace(*this, old, replacement, replaceAll); return *this; }
     Zbase AfterLast(  T ch) const { return zen::afterLast  (*this, ch); } //returns the whole string if "ch" not found
     Zbase BeforeLast( T ch) const { return zen::beforeLast (*this, ch); } //returns empty string if "ch" not found
     Zbase AfterFirst( T ch) const { return zen::afterFirst (*this, ch); } //returns empty string if "ch" not found
@@ -265,7 +253,7 @@ public:
     size_t find(T ch,             size_t pos = 0)    const; //
     size_t rfind(T ch,            size_t pos = npos) const; //
     size_t rfind(const T* str,    size_t pos = npos) const; //
-    Zbase& replace(size_t pos1, size_t n1, const T* str, size_t n2);
+    Zbase& replace(size_t pos1, size_t n1, const Zbase& str);
     void reserve(size_t minCapacity);
     Zbase& assign(const T* source, size_t len);
     void resize(size_t newSize, T fillChar = 0);
@@ -413,14 +401,6 @@ Zbase<T, SP, AP>::~Zbase()
 
 template <class T, template <class, class> class SP, class AP>
 inline
-Zbase<T, SP, AP>::operator const T* () const
-{
-    return rawStr;
-}
-
-
-template <class T, template <class, class> class SP, class AP>
-inline
 size_t Zbase<T, SP, AP>::find(const Zbase& str, size_t pos) const
 {
     assert(pos <= length());
@@ -490,14 +470,16 @@ size_t Zbase<T, SP, AP>::rfind(const T* str, size_t pos) const
 
 
 template <class T, template <class, class> class SP, class AP>
-Zbase<T, SP, AP>& Zbase<T, SP, AP>::replace(size_t pos1, size_t n1, const T* str, size_t n2)
+Zbase<T, SP, AP>& Zbase<T, SP, AP>::replace(size_t pos1, size_t n1, const Zbase& str)
 {
-    assert(str < rawStr || rawStr + length() < str); //str mustn't point to data in this string
+    assert(str.data() < rawStr || rawStr + length() < str.data()); //str mustn't point to data in this string
     assert(pos1 + n1 <= length());
+
+    const size_t n2 = str.length();
 
     const size_t oldLen = length();
     if (oldLen == 0)
-        return *this = Zbase(str, n2);
+        return *this = str;
 
     const size_t newLen = oldLen - n1 + n2;
 
@@ -514,7 +496,7 @@ Zbase<T, SP, AP>& Zbase<T, SP, AP>::replace(size_t pos1, size_t n1, const T* str
             setLength(rawStr, newLen);
         }
 
-        std::copy(str, str + n2, rawStr + pos1);
+        std::copy(str.data(), str.data() + n2, rawStr + pos1);
     }
     else
     {
@@ -522,7 +504,7 @@ Zbase<T, SP, AP>& Zbase<T, SP, AP>::replace(size_t pos1, size_t n1, const T* str
         T* const newStr = this->create(newLen);
 
         std::copy(rawStr, rawStr + pos1, newStr);
-        std::copy(str, str + n2, newStr + pos1);
+        std::copy(str.data(), str.data() + n2, newStr + pos1);
         std::copy(rawStr + pos1 + n1, rawStr + oldLen + 1, newStr + pos1 + n2); //include null-termination
 
         destroy(rawStr);

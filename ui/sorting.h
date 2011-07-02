@@ -56,7 +56,7 @@ struct Compare<false>
 
 template <bool ascending, SelectedSide side>
 inline
-bool sortByFileName(const FileSystemObject& a, const FileSystemObject& b)
+bool lessShortFileName(const FileSystemObject& a, const FileSystemObject& b)
 {
     //presort types: first files, then directories then empty rows
     if (a.isEmpty<side>())
@@ -84,7 +84,7 @@ bool sortByFileName(const FileSystemObject& a, const FileSystemObject& b)
 
 
 template <bool ascending, SelectedSide side>
-bool sortByRelativeName(const FileSystemObject& a, const FileSystemObject& b)
+bool lessRelativeName(const FileSystemObject& a, const FileSystemObject& b)
 {
     if (a.isEmpty<side>())
         return false;  //empty rows always last
@@ -120,7 +120,7 @@ bool sortByRelativeName(const FileSystemObject& a, const FileSystemObject& b)
 
 template <bool ascending, SelectedSide side>
 inline
-bool sortByFileSize(const FileSystemObject& a, const FileSystemObject& b)
+bool lessFilesize(const FileSystemObject& a, const FileSystemObject& b)
 {
     //empty rows always last
     if (a.isEmpty<side>())
@@ -153,7 +153,7 @@ bool sortByFileSize(const FileSystemObject& a, const FileSystemObject& b)
 
 template <bool ascending, SelectedSide side>
 inline
-bool sortByDate(const FileSystemObject& a, const FileSystemObject& b)
+bool lessFiletime(const FileSystemObject& a, const FileSystemObject& b)
 {
     if (a.isEmpty<side>())
         return false;  //empty rows always last
@@ -182,7 +182,7 @@ bool sortByDate(const FileSystemObject& a, const FileSystemObject& b)
 
 template <bool ascending, SelectedSide side>
 inline
-bool sortByExtension(const FileSystemObject& a, const FileSystemObject& b)
+bool lessExtension(const FileSystemObject& a, const FileSystemObject& b)
 {
     if (a.isEmpty<side>())
         return false;  //empty rows always last
@@ -198,13 +198,13 @@ bool sortByExtension(const FileSystemObject& a, const FileSystemObject& b)
     else if (fileObjB == NULL)
         return true;  //directories last
 
-    return Compare<ascending>().isSmallerThan(fileObjA->getExtension<side>(), fileObjB->getExtension<side>());
+    return Compare<ascending>().isSmallerThan(cmpFileName(fileObjA->getExtension<side>(), fileObjB->getExtension<side>()), 0);
 }
 
 
 template <bool ascending>
 inline
-bool sortByCmpResult(const FileSystemObject& a, const FileSystemObject& b)
+bool lessCmpResult(const FileSystemObject& a, const FileSystemObject& b)
 {
     //presort result: equal shall appear at end of list
     if (a.getCategory() == FILE_EQUAL)
@@ -218,7 +218,7 @@ bool sortByCmpResult(const FileSystemObject& a, const FileSystemObject& b)
 
 template <bool ascending>
 inline
-bool sortBySyncDirection(const FileSystemObject& a, const FileSystemObject& b)
+bool lessSyncDirection(const FileSystemObject& a, const FileSystemObject& b)
 {
     return Compare<ascending>().isSmallerThan(a.getSyncOperation(), b.getSyncOperation());
 }
