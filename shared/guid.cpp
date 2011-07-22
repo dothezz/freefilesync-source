@@ -10,6 +10,7 @@
 //boost really should clean a bit up...
 #ifdef __MINGW32__
 #pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wuninitialized"
 #endif
 
 #include <boost/uuid/uuid_generators.hpp>

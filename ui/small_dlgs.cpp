@@ -296,8 +296,8 @@ void FilterDlg::updateGui()
 
 void FilterDlg::setFilter(const FilterConfig& filter)
 {
-    m_textCtrlInclude->ChangeValue(zToWx(filter.includeFilter));
-    m_textCtrlExclude->ChangeValue(zToWx(filter.excludeFilter));
+    m_textCtrlInclude->ChangeValue(toWx(filter.includeFilter));
+    m_textCtrlExclude->ChangeValue(toWx(filter.excludeFilter));
 
     setEnumVal(enumTimeDescr, *m_choiceUnitTimespan, filter.unitTimeSpan);
     setEnumVal(enumSizeDescr, *m_choiceUnitMinSize,  filter.unitSizeMin);
@@ -313,8 +313,8 @@ void FilterDlg::setFilter(const FilterConfig& filter)
 
 FilterConfig FilterDlg::getFilter() const
 {
-    return FilterConfig(wxToZ(m_textCtrlInclude->GetValue()),
-                        wxToZ(m_textCtrlExclude->GetValue()),
+    return FilterConfig(toZ(m_textCtrlInclude->GetValue()),
+                        toZ(m_textCtrlExclude->GetValue()),
                         m_spinCtrlTimespan->GetValue(),
                         getEnumVal(enumTimeDescr, *m_choiceUnitTimespan),
                         m_spinCtrlMinSize->GetValue(),
@@ -458,7 +458,7 @@ void DeleteDialog::updateGui()
     header.Replace(wxT("%x"), toStringSep(delInfo.second));
     m_staticTextHeader->SetLabel(header);
 
-    const wxString filesToDelete = delInfo.first;
+    const wxString& filesToDelete = delInfo.first;
     m_textCtrlMessage->SetValue(filesToDelete);
 
     Layout();
@@ -733,71 +733,29 @@ class CompareCfgDialog : public CmpCfgDlgGenerated
 {
 public:
     CompareCfgDialog(wxWindow* parent,
-                     const wxPoint& position,
                      zen::CompareVariant& cmpVar,
                      SymLinkHandling& handleSymlinks);
 
 private:
     void OnOkay(wxCommandEvent& event);
-    void OnClose(wxCloseEvent& event);
-    void OnCancel(wxCommandEvent& event);
+    void OnClose(wxCloseEvent& event) { EndModal(0); }
+    void OnCancel(wxCommandEvent& event) { EndModal(0); }
     void OnTimeSize(wxCommandEvent& event);
+    void OnTimeSizeDouble(wxMouseEvent& event);
     void OnContent(wxCommandEvent& event);
+    void OnContentDouble(wxMouseEvent& event);
     void OnShowHelp(wxCommandEvent& event);
 
     void updateView();
 
     zen::CompareVariant& cmpVarOut;
     SymLinkHandling& handleSymlinksOut;
+
+    zen::EnumDescrList<SymLinkHandling>  enumDescrHandleSyml;
 };
 
 
-namespace
-{
-void setValue(wxChoice& choiceCtrl, zen::SymLinkHandling value)
-{
-    choiceCtrl.Clear();
-    choiceCtrl.Append(_("Ignore"));
-    choiceCtrl.Append(_("Direct"));
-    choiceCtrl.Append(_("Follow"));
-
-    //default
-    choiceCtrl.SetSelection(0);
-
-    switch (value)
-    {
-        case zen::SYMLINK_IGNORE:
-            choiceCtrl.SetSelection(0);
-            break;
-        case zen::SYMLINK_USE_DIRECTLY:
-            choiceCtrl.SetSelection(1);
-            break;
-        case zen::SYMLINK_FOLLOW_LINK:
-            choiceCtrl.SetSelection(2);
-            break;
-    }
-}
-
-
-zen::SymLinkHandling getValue(const wxChoice& choiceCtrl)
-{
-    switch (choiceCtrl.GetSelection())
-    {
-        case 0:
-            return zen::SYMLINK_IGNORE;
-        case 1:
-            return zen::SYMLINK_USE_DIRECTLY;
-        case 2:
-            return zen::SYMLINK_FOLLOW_LINK;
-        default:
-            assert(false);
-            return zen::SYMLINK_IGNORE;
-    }
-}
-}
-
 CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
-                                   const wxPoint& position,
                                    CompareVariant& cmpVar,
                                    SymLinkHandling& handleSymlinks) :
     CmpCfgDlgGenerated(parent),
@@ -808,8 +766,13 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
 #endif
 
+    enumDescrHandleSyml.
+    add(SYMLINK_IGNORE,       _("Ignore")).
+    add(SYMLINK_USE_DIRECTLY, _("Direct")).
+    add(SYMLINK_FOLLOW_LINK,  _("Follow"));
+
     //move dialog up so that compare-config button and first config-variant are on same level
-    Move(wxPoint(position.x, std::max(0, position.y - (m_buttonTimeSize->GetScreenPosition() - GetScreenPosition()).y)));
+    //   Move(wxPoint(position.x, std::max(0, position.y - (m_buttonTimeSize->GetScreenPosition() - GetScreenPosition()).y)));
 
     m_bpButtonHelp   ->SetBitmapLabel(GlobalResources::instance().getImage(wxT("help")));
     m_bitmapByTime   ->SetBitmap     (GlobalResources::instance().getImage(wxT("clock")));
@@ -827,8 +790,7 @@ CompareCfgDialog::CompareCfgDialog(wxWindow* parent,
             break;
     }
 
-
-    setValue(*m_choiceHandleSymlinks, handleSymlinks);
+    setEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks, handleSymlinks);
 
     updateView();
 }
@@ -845,35 +807,37 @@ void CompareCfgDialog::OnOkay(wxCommandEvent& event)
     else
         cmpVarOut = CMP_BY_TIME_SIZE;
 
-    handleSymlinksOut = getValue(*m_choiceHandleSymlinks);;
+    handleSymlinksOut = getEnumVal(enumDescrHandleSyml, *m_choiceHandleSymlinks);
 
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
-}
-
-
-void CompareCfgDialog::OnClose(wxCloseEvent& event)
-{
-    EndModal(0);
-}
-
-
-void CompareCfgDialog::OnCancel(wxCommandEvent& event)
-{
-    EndModal(0);
 }
 
 
 void CompareCfgDialog::OnTimeSize(wxCommandEvent& event)
 {
     m_radioBtnSizeDate->SetValue(true);
-    OnOkay(event);
 }
 
 
 void CompareCfgDialog::OnContent(wxCommandEvent& event)
 {
     m_radioBtnContent->SetValue(true);
-    OnOkay(event);
+}
+
+
+void CompareCfgDialog::OnTimeSizeDouble(wxMouseEvent& event)
+{
+    wxCommandEvent dummy;
+    OnTimeSize(dummy);
+    OnOkay(dummy);
+}
+
+
+void CompareCfgDialog::OnContentDouble(wxMouseEvent& event)
+{
+    wxCommandEvent dummy;
+    OnContent(dummy);
+    OnOkay(dummy);
 }
 
 
@@ -884,12 +848,10 @@ void CompareCfgDialog::OnShowHelp(wxCommandEvent& event)
 }
 
 
-ReturnSmallDlg::ButtonPressed zen::showCompareCfgDialog(
-    const wxPoint& position,
-    CompareVariant& cmpVar,
-    SymLinkHandling& handleSymlinks)
+ReturnSmallDlg::ButtonPressed zen::showCompareCfgDialog(CompareVariant& cmpVar,
+                                                        SymLinkHandling& handleSymlinks)
 {
-    CompareCfgDialog syncDlg(NULL, position, cmpVar, handleSymlinks);
+    CompareCfgDialog syncDlg(NULL, cmpVar, handleSymlinks);
 
     return static_cast<ReturnSmallDlg::ButtonPressed>(syncDlg.ShowModal());
 }

@@ -5,7 +5,7 @@
 // **************************************************************************
 //
 #include "last_error.h"
-#include "string_tools.h"
+#include "string_utf8.h"
 #include "i18n.h"
 
 #ifdef FFS_WIN
@@ -16,17 +16,18 @@
 #include <cerrno>
 #endif
 
+using namespace zen;
 
 
 #ifdef FFS_WIN
-wxString zen::getLastErrorFormatted(unsigned long lastError) //try to get additional Windows error information
+std::wstring zen::getLastErrorFormatted(unsigned long lastError) //try to get additional Windows error information
 {
     //determine error code if none was specified
     if (lastError == 0)
         lastError = ::GetLastError();
 
-    wxString output = _("Windows Error Code %x:");
-    output.Replace(wxT("%x"), zen::toString<wxString>(lastError));
+    std::wstring output = _("Windows Error Code %x:");
+    replace(output, L"%x", toString<std::wstring>(lastError));
 
     LPWSTR buffer = NULL;
     if (::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM    |
@@ -36,7 +37,7 @@ wxString zen::getLastErrorFormatted(unsigned long lastError) //try to get additi
     {
         if (buffer) //just to be sure
         {
-            output += wxT(" ");
+            output += L" ";
             output += buffer;
             ::LocalFree(buffer);
         }
@@ -46,16 +47,17 @@ wxString zen::getLastErrorFormatted(unsigned long lastError) //try to get additi
 }
 
 #elif defined FFS_LINUX
-wxString zen::getLastErrorFormatted(int lastError) //try to get additional Linux error information
+std::wstring zen::getLastErrorFormatted(int lastError) //try to get additional Linux error information
 {
     //determine error code if none was specified
     if (lastError == 0)
         lastError = errno; //don't use "::", errno is a macro!
 
-    wxString output = _("Linux Error Code %x:");
-    output.Replace(wxT("%x"), zen::toString<wxString>(lastError));
+    std::wstring output = _("Linux Error Code %x:");
+    replace(output, L"%x", toString<std::wstring>(lastError));
 
-    output += wxT(" ") + wxString::FromUTF8(::strerror(lastError));
+    output += L" ";
+    output += utf8CvrtTo<std::wstring>(::strerror(lastError));
 
     errno = lastError; //restore errno
     return output;

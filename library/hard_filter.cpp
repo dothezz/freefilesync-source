@@ -10,7 +10,6 @@
 #include <set>
 #include <stdexcept>
 #include <vector>
-#include "../shared/system_constants.h"
 #include "../structures.h"
 #include <boost/bind.hpp>
 #include "../shared/loki/LokiTypeInfo.h"
@@ -58,7 +57,6 @@ HardFilter::FilterRef HardFilter::loadFilter(wxInputStream& stream)
 
 
 //--------------------------------------------------------------------------------------------------
-inline
 void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, std::set<Zstring>& directoryFilter)
 {
     Zstring filterFormatted = filtername;
@@ -70,17 +68,17 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
     //Linux DOES distinguish between upper/lower-case: nothing to do here
 #endif
 
-    const Zstring sepAsterisk     = Zstring(common::FILE_NAME_SEPARATOR) + Zchar('*');
-    const Zstring sepQuestionMark = Zstring(common::FILE_NAME_SEPARATOR) + Zchar('?');
-    const Zstring asteriskSep     = Zstring(Zstr('*')) + common::FILE_NAME_SEPARATOR;
-    const Zstring questionMarkSep = Zstring(Zstr('?')) + common::FILE_NAME_SEPARATOR;
+    const Zstring sepAsterisk     = Zstring(FILE_NAME_SEPARATOR) + Zchar('*');
+    const Zstring sepQuestionMark = Zstring(FILE_NAME_SEPARATOR) + Zchar('?');
+    const Zstring asteriskSep     = Zstring(Zstr('*')) + FILE_NAME_SEPARATOR;
+    const Zstring questionMarkSep = Zstring(Zstr('?')) + FILE_NAME_SEPARATOR;
 
     //--------------------------------------------------------------------------------------------------
     //add some syntactic sugar: handle beginning of filtername
-    if (filterFormatted.StartsWith(common::FILE_NAME_SEPARATOR))
+    if (filterFormatted.StartsWith(FILE_NAME_SEPARATOR))
     {
         //remove leading separators (keep BEFORE test for Zstring::empty()!)
-        filterFormatted = filterFormatted.AfterFirst(common::FILE_NAME_SEPARATOR);
+        filterFormatted = filterFormatted.AfterFirst(FILE_NAME_SEPARATOR);
     }
     else if (filterFormatted.StartsWith(asteriskSep) ||   // *\abc
              filterFormatted.StartsWith(questionMarkSep)) // ?\abc
@@ -90,9 +88,9 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
 
     //--------------------------------------------------------------------------------------------------
     //even more syntactic sugar: handle end of filtername
-    if (filterFormatted.EndsWith(common::FILE_NAME_SEPARATOR))
+    if (filterFormatted.EndsWith(FILE_NAME_SEPARATOR))
     {
-        const Zstring candidate = filterFormatted.BeforeLast(common::FILE_NAME_SEPARATOR);
+        const Zstring candidate = filterFormatted.BeforeLast(FILE_NAME_SEPARATOR);
         if (!candidate.empty())
             directoryFilter.insert(candidate); //only relevant for directory filtering
     }
@@ -102,7 +100,7 @@ void addFilterEntry(const Zstring& filtername, std::set<Zstring>& fileFilter, st
         fileFilter.insert(     filterFormatted);
         directoryFilter.insert(filterFormatted);
 
-        const Zstring candidate = filterFormatted.BeforeLast(common::FILE_NAME_SEPARATOR);
+        const Zstring candidate = filterFormatted.BeforeLast(FILE_NAME_SEPARATOR);
         if (!candidate.empty())
             directoryFilter.insert(candidate); //only relevant for directory filtering
     }
@@ -235,19 +233,20 @@ std::vector<Zstring> compoundStringToFilter(const Zstring& filterString)
     //delimiters may be ';' or '\n'
     std::vector<Zstring> output;
 
-    const std::vector<Zstring> blocks = filterString.Split(Zchar(';'));
-    for (std::vector<Zstring>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    const std::vector<Zstring> blocks = split(filterString, Zchar(';'));
+    std::for_each(blocks.begin(), blocks.end(),
+                  [&](const Zstring& item)
     {
-        const std::vector<Zstring> blocks2 = i->Split(Zchar('\n'));
+        const std::vector<Zstring> blocks2 = split(item, Zchar('\n'));
 
-        for (std::vector<Zstring>::const_iterator j = blocks2.begin(); j != blocks2.end(); ++j)
+        std::for_each(blocks2.begin(), blocks2.end(),
+                      [&](Zstring entry)
         {
-            Zstring entry = *j;
-            entry.Trim();
+            trim(entry);
             if (!entry.empty())
                 output.push_back(entry);
-        }
-    }
+        });
+    });
 
     return output;
 }
@@ -261,12 +260,12 @@ NameFilter::NameFilter(const Zstring& includeFilter, const Zstring& excludeFilte
 
     //load filter into vectors of strings
     //delimiters may be ';' or '\n'
-    const std::vector<Zstring> includeList = compoundStringToFilter(includeFilter);
-    const std::vector<Zstring> excludeList = compoundStringToFilter(excludeFilter);
+    const std::vector<Zstring>& includeList = compoundStringToFilter(includeFilter);
+    const std::vector<Zstring>& excludeList = compoundStringToFilter(excludeFilter);
 
     //setup include/exclude filters for files and directories
-    std::for_each(includeList.begin(), includeList.end(), boost::bind(addFilterEntry, _1, boost::ref(filterFileIn), boost::ref(filterFolderIn)));
-    std::for_each(excludeList.begin(), excludeList.end(), boost::bind(addFilterEntry, _1, boost::ref(filterFileEx), boost::ref(filterFolderEx)));
+    std::for_each(includeList.begin(), includeList.end(), [&](const Zstring& entry) { addFilterEntry(entry, filterFileIn, filterFolderIn); });
+    std::for_each(excludeList.begin(), excludeList.end(), [&](const Zstring& entry) { addFilterEntry(entry, filterFileEx, filterFolderEx); });
 }
 
 
@@ -306,7 +305,7 @@ bool NameFilter::passDirFilter(const Zstring& relDirname, bool* subObjMightMatch
     {
         if (subObjMightMatch)
         {
-            const Zstring& subNameBegin = nameFormatted + common::FILE_NAME_SEPARATOR; //const-ref optimization
+            const Zstring& subNameBegin = nameFormatted + FILE_NAME_SEPARATOR; //const-ref optimization
 
             *subObjMightMatch = matchesFilterBegin(subNameBegin, filterFileIn) || //might match a file in subdirectory
                                 matchesFilterBegin(subNameBegin, filterFolderIn); //or another subdirectory

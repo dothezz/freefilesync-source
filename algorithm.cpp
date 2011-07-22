@@ -1240,6 +1240,9 @@ private:
 
     void operator()(zen::DirMapping& dirObj) const
     {
+        if (Eval<strategy>().process(dirObj))
+            dirObj.setActive(timeSizeFilter_.matchFolder()); //if date filter is active we deactivate all folders: effectively gets rid of empty folders!
+
         execute(dirObj);  //recursion
     }
 
@@ -1260,11 +1263,10 @@ private:
 }
 
 
-void zen::addExcludeFiltering(FolderComparison& folderCmp, const Zstring& excludeFilter)
+void zen::addHardFiltering(BaseDirMapping& baseMap, const Zstring& excludeFilter)
 {
-    for (std::vector<BaseDirMapping>::iterator i = folderCmp.begin(); i != folderCmp.end(); ++i)
-        ApplyHardFilter<STRATEGY_AND>(*HardFilter::FilterRef(
-                                          new NameFilter(FilterConfig().includeFilter, excludeFilter))).execute(*i);
+			ApplyHardFilter<STRATEGY_AND>(*HardFilter::FilterRef(
+                                          new NameFilter(FilterConfig().includeFilter, excludeFilter))).execute(baseMap);
 }
 
 
@@ -1311,7 +1313,10 @@ std::pair<wxString, int> zen::deleteFromGridAndHDPreview( //assemble message con
     const std::vector<FileSystemObject*>& rowsToDeleteOnRight,
     const bool deleteOnBothSides)
 {
-    wxString filesToDelete;
+    //fast replacement for wxString modelling exponential growth
+    typedef Zbase<wchar_t> zxString; //for use with UI texts
+
+    zxString filesToDelete;
     int totalDelCount = 0;
 
     if (deleteOnBothSides)
@@ -1320,51 +1325,48 @@ std::pair<wxString, int> zen::deleteFromGridAndHDPreview( //assemble message con
         std::set<FileSystemObject*> rowsToDelete(rowsToDeleteOnLeft.begin(), rowsToDeleteOnLeft.end());
         rowsToDelete.insert(rowsToDeleteOnRight.begin(), rowsToDeleteOnRight.end());
 
-        for (std::set<FileSystemObject*>::const_iterator i = rowsToDelete.begin(); i != rowsToDelete.end(); ++i)
+        std::for_each(rowsToDelete.begin(), rowsToDelete.end(),
+                      [&](const FileSystemObject* fsObj)
         {
-            const FileSystemObject& currObj = *(*i);
-
-            if (!currObj.isEmpty<LEFT_SIDE>())
+            if (!fsObj->isEmpty<LEFT_SIDE>())
             {
-                filesToDelete += zToWx(currObj.getFullName<LEFT_SIDE>()) + wxT("\n");
+                filesToDelete += utf8CvrtTo<zxString>(fsObj->getFullName<LEFT_SIDE>()) + wxT("\n");
                 ++totalDelCount;
             }
 
-            if (!currObj.isEmpty<RIGHT_SIDE>())
+            if (!fsObj->isEmpty<RIGHT_SIDE>())
             {
-                filesToDelete += zToWx(currObj.getFullName<RIGHT_SIDE>()) + wxT("\n");
+                filesToDelete += utf8CvrtTo<zxString>(fsObj->getFullName<RIGHT_SIDE>()) + wxT("\n");
                 ++totalDelCount;
             }
 
             filesToDelete += wxT("\n");
-        }
+        });
     }
     else //delete selected files only
     {
-        for (std::vector<FileSystemObject*>::const_iterator i = rowsToDeleteOnLeft.begin(); i != rowsToDeleteOnLeft.end(); ++i)
+        std::for_each(rowsToDeleteOnLeft.begin(), rowsToDeleteOnLeft.end(),
+                      [&](const FileSystemObject* fsObj)
         {
-            const FileSystemObject& currObj = *(*i);
-
-            if (!currObj.isEmpty<LEFT_SIDE>())
+            if (!fsObj->isEmpty<LEFT_SIDE>())
             {
-                filesToDelete += zToWx(currObj.getFullName<LEFT_SIDE>()) + wxT("\n");
+                filesToDelete += utf8CvrtTo<zxString>(fsObj->getFullName<LEFT_SIDE>()) + wxT("\n");
                 ++totalDelCount;
             }
-        }
+        });
 
-        for (std::vector<FileSystemObject*>::const_iterator i = rowsToDeleteOnRight.begin(); i != rowsToDeleteOnRight.end(); ++i)
+        std::for_each(rowsToDeleteOnRight.begin(), rowsToDeleteOnRight.end(),
+                      [&](const FileSystemObject* fsObj)
         {
-            const FileSystemObject& currObj = *(*i);
-
-            if (!currObj.isEmpty<RIGHT_SIDE>())
+            if (!fsObj->isEmpty<RIGHT_SIDE>())
             {
-                filesToDelete += zToWx(currObj.getFullName<RIGHT_SIDE>()) + wxT("\n");
+                filesToDelete += utf8CvrtTo<zxString>(fsObj->getFullName<RIGHT_SIDE>()) + wxT("\n");
                 ++totalDelCount;
             }
-        }
+        });
     }
 
-    return std::make_pair(filesToDelete, totalDelCount);
+    return std::make_pair(cvrtString<wxString>(filesToDelete), totalDelCount);
 }
 
 

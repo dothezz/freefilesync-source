@@ -69,7 +69,6 @@ FILE_LIST+=shared/dir_name.cpp
 FILE_LIST+=shared/guid.cpp
 FILE_LIST+=shared/xml_base.cpp
 FILE_LIST+=shared/check_exist.cpp
-FILE_LIST+=shared/global_func.cpp
 FILE_LIST+=shared/last_error.cpp
 FILE_LIST+=shared/custom_tooltip.cpp
 FILE_LIST+=shared/file_handling.cpp

@@ -36,7 +36,6 @@ std::string util::retrieveFileID(const Zstring& filename)
     //WARNING: CreateFile() is SLOW, while GetFileInformationByHandle() is cheap!
     //http://msdn.microsoft.com/en-us/library/aa363788(VS.85).aspx
 
-
     //privilege SE_BACKUP_NAME doesn't seem to be required here at all
 
     const HANDLE hFile = ::CreateFile(zen::applyLongPathPrefix(filename).c_str(),
@@ -68,13 +67,16 @@ std::string util::retrieveFileID(const Zstring& filename)
         fileID += numberToBytes(fileInfo.st_ino);
     }
 #endif
-
+    assert(!fileID.empty());
     return fileID;
 }
 
 
 bool util::sameFileSpecified(const Zstring& file1, const Zstring& file2)
 {
+    if (EqualFilename()(file1, file2)) //quick check
+        return true;
+
     const std::string id1 = retrieveFileID(file1);
     const std::string id2 = retrieveFileID(file2);
 

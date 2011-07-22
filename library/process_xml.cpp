@@ -88,6 +88,7 @@ void xmlAccess::OptionalDialogs::resetDialogs()
     warningNotEnoughDiskSpace      = true;
     warningUnresolvedConflicts     = true;
     warningSyncDatabase            = true;
+    warningRecyclerMissing         = true;
     popupOnConfigChange            = true;
     showSummaryBeforeSync          = true;
 }
@@ -747,6 +748,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inOpt["CheckForFreeDiskSpace"](config.optDialogs.warningNotEnoughDiskSpace);
     inOpt["CheckForUnresolvedConflicts"](config.optDialogs.warningUnresolvedConflicts);
     inOpt["NotifyDatabaseError"](config.optDialogs.warningSyncDatabase);
+    inOpt["CheckMissingRecycleBin"](config.optDialogs.warningRecyclerMissing);
     inOpt["PopupOnConfigChange"](config.optDialogs.popupOnConfigChange);
     inOpt["SummaryBeforeSync"  ](config.optDialogs.showSummaryBeforeSync);
 
@@ -760,6 +762,8 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inWnd["PosX"     ](config.gui.dlgPos.x);
     inWnd["PosY"     ](config.gui.dlgPos.y);
     inWnd["Maximized"](config.gui.isMaximized);
+
+    inWnd["MaxFolderPairsVisible"](config.gui.maxFolderPairsVisible);
 
     inWnd["ManualDeletionOnBothSides"](config.gui.deleteOnBothSides);
     inWnd["ManualDeletionUseRecycler"](config.gui.useRecyclerForManualDeletion);
@@ -796,10 +800,8 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     inGui["ExternalApplications"](config.gui.externelApplications);
 
     //load config file history
-    XmlIn inHist = inGui["ConfigHistory"];
-
-    inHist.attribute("LastUsed", config.gui.lastUsedConfigFile);
-    inHist(config.gui.cfgFileHistory);
+    inGui["LastConfigActive"](config.gui.lastUsedConfigFiles);
+    inGui["ConfigHistory"](config.gui.cfgFileHistory);
 
     //last update check
     inGui["LastUpdateCheck"](config.gui.lastUpdateCheck);
@@ -812,7 +814,7 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
 template <class ConfigType>
 void readConfig(const wxString& filename, XmlType type, ConfigType& config)
 {
-    if (!fileExists(wxToZ(filename)))
+    if (!fileExists(toZ(filename)))
         throw FfsXmlError(wxString(_("File does not exist:")) + wxT("\n\"") + filename + wxT("\""));
 
     XmlDoc doc;
@@ -1003,6 +1005,7 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outOpt["CheckForFreeDiskSpace"](config.optDialogs.warningNotEnoughDiskSpace);
     outOpt["CheckForUnresolvedConflicts"](config.optDialogs.warningUnresolvedConflicts);
     outOpt["NotifyDatabaseError"](config.optDialogs.warningSyncDatabase);
+    outOpt["CheckMissingRecycleBin"](config.optDialogs.warningRecyclerMissing);
     outOpt["PopupOnConfigChange"](config.optDialogs.popupOnConfigChange);
     outOpt["SummaryBeforeSync"  ](config.optDialogs.showSummaryBeforeSync);
 
@@ -1016,6 +1019,8 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outWnd["PosX"     ](config.gui.dlgPos.x);
     outWnd["PosY"     ](config.gui.dlgPos.y);
     outWnd["Maximized"](config.gui.isMaximized);
+
+    outWnd["MaxFolderPairsVisible"](config.gui.maxFolderPairsVisible);
 
     outWnd["ManualDeletionOnBothSides"](config.gui.deleteOnBothSides);
     outWnd["ManualDeletionUseRecycler"](config.gui.useRecyclerForManualDeletion);
@@ -1048,10 +1053,8 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     outGui["ExternalApplications"](config.gui.externelApplications);
 
     //load config file history
-    XmlOut outHist = outGui["ConfigHistory"];
-
-    outHist.attribute("LastUsed", config.gui.lastUsedConfigFile);
-    outHist(config.gui.cfgFileHistory);
+    outGui["LastConfigActive"](config.gui.lastUsedConfigFiles);
+    outGui["ConfigHistory"](config.gui.cfgFileHistory);
 
     //last update check
     outGui["LastUpdateCheck"](config.gui.lastUpdateCheck);

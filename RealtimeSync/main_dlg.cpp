@@ -16,7 +16,6 @@
 #include "tray_menu.h"
 #include "../shared/file_handling.h"
 #include "xml_ffs.h"
-#include "../shared/system_constants.h"
 #include "../shared/string_conv.h"
 #include "../shared/assert_static.h"
 #include "../shared/build_info.h"

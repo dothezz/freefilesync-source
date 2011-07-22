@@ -12,8 +12,6 @@
 #include <vector>
 #include <set>
 #include <wx/string.h>
-//#include <memory>
-//#include <sstream>
 
 
 namespace common
@@ -37,28 +35,6 @@ ForwardIterator custom_binary_search(ForwardIterator first, ForwardIterator last
 
 
 //############################################################################
-class wxFile;
-class DebugLog
-{
-public:
-    wxDEPRECATED(DebugLog(const wxString& filePrefix = wxString()));
-    ~DebugLog();
-    void write(const wxString& logText);
-
-private:
-    wxString assembleFileName();
-
-    wxString logfileName;
-    wxString prefix;
-    int lineCount;
-    wxFile* logFile; //logFile.close(); <- not needed
-};
-extern DebugLog logDebugInfo;
-wxString getCodeLocation(const wxString& file, int line);
-
-//small macro for writing debug information into a logfile
-#define WRITE_DEBUG_LOG(x) logDebugInfo.write(getCodeLocation(__TFILE__, __LINE__) + x);
-//speed alternative: wxLogDebug(wxT("text")) + DebugView
 
 
 
@@ -81,6 +57,13 @@ wxString getCodeLocation(const wxString& file, int line);
 
 
 //---------------Inline Implementation---------------------------------------------------
+inline
+size_t common::getDigitCount(size_t number) //count number of digits
+{
+    return number == 0 ? 1 : static_cast<size_t>(::log10(static_cast<double>(number))) + 1;
+}
+
+
 //Note: the following lines are a performance optimization for deleting elements from a vector: linear runtime at most!
 template <class T>
 void common::removeRowsFromVector(const std::set<size_t>& rowsToRemove, std::vector<T>& grid)

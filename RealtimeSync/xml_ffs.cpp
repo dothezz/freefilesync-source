@@ -18,42 +18,29 @@
 using namespace zen;
 
 
-#ifdef FFS_WIN
-struct CmpNoCase
-{
-    bool operator()(const wxString& a, const wxString& b) const
-    {
-        return a.CmpNoCase(b) < 0;
-    }
-};
-#endif
-
-
 xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& batchCfg, const wxString& filename)
 {
     xmlAccess::XmlRealConfig output;
 
-#ifdef FFS_WIN
-    std::set<wxString, CmpNoCase> uniqueFolders;
-#elif defined FFS_LINUX
-    std::set<wxString> uniqueFolders;
-#endif
+    std::set<Zstring, LessFilename> uniqueFolders;
 
     //add main folders
-    uniqueFolders.insert(zToWx(batchCfg.mainCfg.firstPair.leftDirectory));
-    uniqueFolders.insert(zToWx(batchCfg.mainCfg.firstPair.rightDirectory));
+    uniqueFolders.insert(batchCfg.mainCfg.firstPair.leftDirectory);
+    uniqueFolders.insert(batchCfg.mainCfg.firstPair.rightDirectory);
 
     //additional folders
-    for (std::vector<zen::FolderPairEnh>::const_iterator i = batchCfg.mainCfg.additionalPairs.begin();
-         i != batchCfg.mainCfg.additionalPairs.end(); ++i)
+    std::for_each(batchCfg.mainCfg.additionalPairs.begin(), batchCfg.mainCfg.additionalPairs.end(),
+                  [&](const FolderPairEnh& fp)
     {
-        uniqueFolders.insert(zToWx(i->leftDirectory));
-        uniqueFolders.insert(zToWx(i->rightDirectory));
-    }
+        uniqueFolders.insert(fp.leftDirectory);
+        uniqueFolders.insert(fp.rightDirectory);
+    });
 
-    uniqueFolders.erase(wxString());
+    uniqueFolders.erase(Zstring());
 
-    output.directories.insert(output.directories.end(), uniqueFolders.begin(), uniqueFolders.end());
+    output.directories.clear();
+    std::transform(uniqueFolders.begin(), uniqueFolders.end(), std::back_inserter(output.directories),
+    [](const Zstring& fn) { return toWx(fn); });
 
     output.commandline = wxT("\"") + zen::getLauncher() + wxT("\"") +
                          wxT(" \"") + filename + wxT("\"");
@@ -62,7 +49,7 @@ xmlAccess::XmlRealConfig convertBatchToReal(const xmlAccess::XmlBatchConfig& bat
 }
 
 
-void rts::readRealOrBatchConfig(const wxString& filename, xmlAccess::XmlRealConfig& config)  //throw (xmlAccess::FfsXmlError);
+void rts::readRealOrBatchConfig(const wxString& filename, xmlAccess::XmlRealConfig& config)  //throw xmlAccess::FfsXmlError;
 {
     if (xmlAccess::getXmlType(filename) != xmlAccess::XML_TYPE_BATCH)
     {
@@ -74,7 +61,7 @@ void rts::readRealOrBatchConfig(const wxString& filename, xmlAccess::XmlRealConf
     xmlAccess::XmlBatchConfig batchCfg;
     try
     {
-        xmlAccess::readConfig(filename, batchCfg); //throw (xmlAccess::FfsXmlError);
+        xmlAccess::readConfig(filename, batchCfg); //throw xmlAccess::FfsXmlError;
     }
     catch (const xmlAccess::FfsXmlError& e)
     {

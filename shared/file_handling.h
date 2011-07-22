@@ -37,7 +37,7 @@ ResponseSameVol onSameVolume(const Zstring& folderLeft, const Zstring& folderRig
 void copyFileTimes(const Zstring& sourceDir, const Zstring& targetDir, bool derefSymlinks); //throw (FileError)
 
 //symlink handling: always evaluate target
-zen::UInt64 getFilesize(const Zstring& filename); //throw (FileError)
+UInt64 getFilesize(const Zstring& filename); //throw (FileError)
 
 
 //file handling
@@ -88,19 +88,6 @@ struct CallbackRemoveDir
 };
 
 
-struct CallbackMoveFile //callback functionality
-{
-    virtual ~CallbackMoveFile() {}
-
-    enum Response
-    {
-        CONTINUE,
-        CANCEL
-    };
-    virtual Response requestUiRefresh(const Zstring& currentObject) = 0;  //DON'T throw exceptions here, at least in Windows build!
-};
-
-
 struct CallbackCopyFile //callback functionality
 {
     virtual ~CallbackCopyFile() {}
@@ -109,12 +96,17 @@ struct CallbackCopyFile //callback functionality
     //at this point full read access on source had been proven, so it's safe to delete it.
     virtual void deleteTargetFile(const Zstring& targetFile) = 0; //may throw exceptions
 
-    enum Response
-    {
-        CONTINUE,
-        CANCEL
-    };
-    virtual Response updateCopyStatus(zen::UInt64 totalBytesTransferred) = 0; //DON'T throw exceptions here, at least in Windows build!
+    //may throw:
+    //Linux:   unconditionally
+    //Windows: first exception is swallowed, requestUiRefresh() is then called again where it may throw again and exception will propagate as expected
+    virtual void updateCopyStatus(UInt64 totalBytesTransferred) = 0;
+};
+
+
+struct CallbackMoveFile //callback functionality
+{
+    virtual ~CallbackMoveFile() {}
+    virtual void requestUiRefresh(const Zstring& currentObject) = 0; //see CallbackCopyFile!
 };
 }
 

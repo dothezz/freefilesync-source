@@ -8,12 +8,7 @@
 #define UTIL_H_INCLUDED
 
 #include <wx/string.h>
-#include <wx/textctrl.h>
-#include <wx/filepicker.h>
-#include <wx/combobox.h>
 #include <wx/scrolwin.h>
-#include <wx/choice.h>
-#include "zstring.h"
 #include "string_tools.h"
 #include "int64.h"
 
@@ -21,15 +16,15 @@ namespace zen
 {
 wxString extractJobName(const wxString& configFilename);
 
-wxString formatFilesizeToShortString(zen::UInt64 filesize);
-wxString formatPercentage(zen::Int64 dividend, zen::Int64 divisor);
+wxString formatFilesizeToShortString(UInt64 filesize);
+wxString formatPercentage(Int64 dividend, Int64 divisor);
 
 template <class NumberType>
 wxString toStringSep(NumberType number); //convert number to wxString including thousands separator
 
 void scrollToBottom(wxScrolledWindow* scrWindow);
 
-wxString utcTimeToLocalString(zen::Int64 utcTime); //throw std::runtime_error
+wxString utcTimeToLocalString(Int64 utcTime); //throw std::runtime_error
 }
 
 
@@ -68,8 +63,7 @@ wxString includeNumberSeparator(const wxString& number);
 
 namespace zen
 {
-template <class NumberType>
-inline
+template <class NumberType> inline
 wxString toStringSep(NumberType number)
 {
     return ffs_Impl::includeNumberSeparator(zen::toString<wxString>(number));

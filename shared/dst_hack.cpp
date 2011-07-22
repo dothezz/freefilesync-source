@@ -1,5 +1,4 @@
 #include "dst_hack.h"
-#include "system_constants.h"
 #include "i18n.h"
 #include "long_path_prefix.h"
 #include "string_utf8.h"
@@ -9,6 +8,7 @@
 #include "global_func.h"
 #include <limits>
 #include "int64.h"
+#include "file_error.h"
 
 using namespace zen;
 
@@ -24,8 +24,8 @@ Zstring getVolumeName(const Zstring& filename)
     //                             BUFFER_SIZE))                               //__in   DWORD cchBufferLength
     // ...
     //    Zstring volumePath = fsName;
-    //    if (!volumePath.EndsWith(common::FILE_NAME_SEPARATOR)) //a trailing backslash is required
-    //        volumePath += common::FILE_NAME_SEPARATOR;
+    //    if (!volumePath.EndsWith(FILE_NAME_SEPARATOR)) //a trailing backslash is required
+    //        volumePath += FILE_NAME_SEPARATOR;
 
     Zstring nameFmt = removeLongPathPrefix(filename); //throw()
     if (!nameFmt.EndsWith(Zstr("\\")))
@@ -90,11 +90,11 @@ bool dst::isFatDrive(const Zstring& fileName) //throw()
 
 namespace
 {
-//convert zen::UInt64 and zen::Int64 to FILETIME
+//convert UInt64 and Int64 to FILETIME
 inline
-FILETIME toFiletime(zen::Int64 number)
+FILETIME toFiletime(Int64 number)
 {
-    const zen::UInt64 unsig = to<zen::UInt64>(number);
+    const UInt64 unsig = to<UInt64>(number);
 
     FILETIME output = {};
     output.dwLowDateTime  = unsig.getLo();
@@ -102,7 +102,7 @@ FILETIME toFiletime(zen::Int64 number)
     return output;
 }
 
-FILETIME toFiletime(zen::UInt64 number)
+FILETIME toFiletime(UInt64 number)
 {
     FILETIME output = {};
     output.dwLowDateTime  = number.getLo();
@@ -111,16 +111,16 @@ FILETIME toFiletime(zen::UInt64 number)
 }
 
 inline
-zen::UInt64 toUInt64(const FILETIME& fileTime)
+UInt64 toUInt64(const FILETIME& fileTime)
 {
-    return zen::UInt64(fileTime.dwLowDateTime, fileTime.dwHighDateTime);
+    return UInt64(fileTime.dwLowDateTime, fileTime.dwHighDateTime);
 }
 
 
 inline
-zen::Int64 toInt64(const FILETIME& fileTime)
+Int64 toInt64(const FILETIME& fileTime)
 {
-    return to<zen::Int64>(zen::UInt64(fileTime.dwLowDateTime, fileTime.dwHighDateTime));
+    return to<Int64>(UInt64(fileTime.dwLowDateTime, fileTime.dwHighDateTime));
 }
 
 
@@ -132,9 +132,9 @@ FILETIME utcToLocal(const FILETIME& utcTime) //throw (std::runtime_error)
             &utcTime,    //__in   const FILETIME *lpFileTime,
             &localTime)) //__out  LPFILETIME lpLocalFileTime
     {
-        const wxString errorMessage = wxString(_("Conversion error:")) + wxT(" FILETIME -> local FILETIME: ") + wxT("(") +
-                                      wxT("High: ") + toString<wxString>(utcTime.dwHighDateTime) + wxT(" ") +
-                                      wxT("Low: ")  + toString<wxString>(utcTime.dwLowDateTime) + wxT(") ") + wxT("\n\n") + zen::getLastErrorFormatted();
+        const std::wstring errorMessage = _("Conversion error:") + " FILETIME -> local FILETIME: " + "(" +
+                                          "High: " + toString<std::wstring>(utcTime.dwHighDateTime) + " " +
+                                          "Low: "  + toString<std::wstring>(utcTime.dwLowDateTime) + ") " + "\n\n" + getLastErrorFormatted();
         throw std::runtime_error(wideToUtf8<std::string>(errorMessage));
     }
     return localTime;
@@ -149,9 +149,9 @@ FILETIME localToUtc(const FILETIME& localTime) //throw (std::runtime_error)
             &localTime, //__in   const FILETIME *lpLocalFileTime,
             &utcTime))  //__out  LPFILETIME lpFileTime
     {
-        const wxString errorMessage = wxString(_("Conversion error:")) + wxT(" local FILETIME -> FILETIME: ") + wxT("(") +
-                                      wxT("High: ") + toString<wxString>(localTime.dwHighDateTime) + wxT(" ") +
-                                      wxT("Low: ")  + toString<wxString>(localTime.dwLowDateTime) + wxT(") ") + wxT("\n\n") + zen::getLastErrorFormatted();
+        const std::wstring errorMessage = _("Conversion error:") + " local FILETIME -> FILETIME: " + "(" +
+                                          "High: " + toString<std::wstring>(localTime.dwHighDateTime) + " " +
+                                          "Low: "  + toString<std::wstring>(localTime.dwLowDateTime) + ") " + "\n\n" + getLastErrorFormatted();
         throw std::runtime_error(wideToUtf8<std::string>(errorMessage));
     }
     return utcTime;
@@ -181,7 +181,7 @@ const size_t WRITE_TIME_HASH_BITS = CREATE_TIME_INFO_BITS - INDICATOR_EXISTING_B
 
 
 template <size_t precision>
-FILETIME encodeRawInformation(zen::UInt64 rawInfo)
+FILETIME encodeRawInformation(UInt64 rawInfo)
 {
     rawInfo *= precision;
     rawInfo += toUInt64(FAT_MIN_TIME);
@@ -192,13 +192,13 @@ FILETIME encodeRawInformation(zen::UInt64 rawInfo)
 
 
 template <size_t precision>
-zen::UInt64 extractRawInformation(const FILETIME& createTime)
+UInt64 extractRawInformation(const FILETIME& createTime)
 {
     assert(toUInt64(FAT_MIN_TIME) <= toUInt64(createTime));
     assert(toUInt64(createTime) <= toUInt64(FAT_MAX_TIME));
 
     //FAT create time ranges from 1980 - 2107 (2^7 years) with 1/100 seconds precision
-    zen::UInt64 rawInfo = toUInt64(createTime);
+    UInt64 rawInfo = toUInt64(createTime);
 
     rawInfo -= toUInt64(FAT_MIN_TIME);
     rawInfo /= precision;        //reduce precision (FILETIME has unit 10^-7 s)
@@ -209,9 +209,9 @@ zen::UInt64 extractRawInformation(const FILETIME& createTime)
 
 
 //convert write time to it's minimal representation (no restriction to FAT range "1980 - 2107")
-zen::UInt64 extractRawWriteTime(const FILETIME& writeTime)
+UInt64 extractRawWriteTime(const FILETIME& writeTime)
 {
-    zen::UInt64 rawInfo = toUInt64(writeTime);
+    UInt64 rawInfo = toUInt64(writeTime);
     assert(rawInfo % PRECISION_WRITE_TIME == 0U);
     rawInfo /= PRECISION_WRITE_TIME;        //reduce precision (FILETIME has unit 10^-7 s)
     return rawInfo;
@@ -221,7 +221,7 @@ zen::UInt64 extractRawWriteTime(const FILETIME& writeTime)
 //files with different resolution than 2 seconds are rounded up when written to FAT
 FILETIME roundToFatWriteTime(const FILETIME& writeTime)
 {
-    zen::UInt64 rawData = toUInt64(writeTime);
+    UInt64 rawData = toUInt64(writeTime);
 
     if (rawData % PRECISION_WRITE_TIME != 0U)
         rawData += PRECISION_WRITE_TIME;
@@ -249,8 +249,8 @@ std::bitset<UTC_LOCAL_OFFSET_BITS> getUtcLocalShift()
     if (std::bitset<UTC_LOCAL_OFFSET_BITS - 1>(absValue).to_ulong() != static_cast<unsigned long>(absValue) || //time shifts that big shouldn't be possible!
         timeShiftSec % (60 * 15) != 0) //all known time shift have at least 15 minute granularity!
     {
-        const wxString errorMessage = wxString(_("Conversion error:")) + wxT(" Unexpected UTC <-> local time shift: ") +
-                                      wxT("(") + toString<wxString>(timeShiftSec) + wxT(") ") + wxT("\n\n") + zen::getLastErrorFormatted();
+        const std::wstring errorMessage = _("Conversion error:") + " Unexpected UTC <-> local time shift: " +
+                                          "(" + toString<std::wstring>(timeShiftSec) + ") " + "\n\n" + getLastErrorFormatted();
         throw std::runtime_error(wideToUtf8<std::string>(errorMessage));
     }
 
@@ -284,7 +284,7 @@ bool dst::fatHasUtcEncoded(const RawTime& rawTime) //"createTimeRaw" as retrieve
         return false;
     }
 
-    const zen::UInt64 rawInfo = extractRawInformation<PRECISION_CREATE_TIME>(utcToLocal(rawTime.createTimeRaw));
+    const UInt64 rawInfo = extractRawInformation<PRECISION_CREATE_TIME>(utcToLocal(rawTime.createTimeRaw));
 
     assert_static(WRITE_TIME_HASH_BITS == 30);
     return (extractRawWriteTime(utcToLocal(rawTime.writeTimeRaw)) & 0x3FFFFFFFU) == (rawInfo & 0x3FFFFFFFU) && //ensure write time wasn't changed externally
@@ -299,7 +299,7 @@ dst::RawTime dst::fatEncodeUtcTime(const FILETIME& writeTimeRealUtc) //throw (st
     //create time lets us store 40 bit of information
 
     //indicator that utc time is encoded -> hopefully results in a date long way in the future; but even if this bit is accidentally set, we still have the hash!
-    zen::UInt64 data = 1U;
+    UInt64 data = 1U;
 
     const std::bitset<UTC_LOCAL_OFFSET_BITS> utcShift = getUtcLocalShift();
     data <<= UTC_LOCAL_OFFSET_BITS;
@@ -322,14 +322,14 @@ FILETIME dst::fatDecodeUtcTime(const RawTime& rawTime) //return real UTC time; t
     if (!fatHasUtcEncoded(rawTime))
         return rawTime.writeTimeRaw;
 
-    const zen::UInt64 rawInfo = extractRawInformation<PRECISION_CREATE_TIME>(utcToLocal(rawTime.createTimeRaw));
+    const UInt64 rawInfo = extractRawInformation<PRECISION_CREATE_TIME>(utcToLocal(rawTime.createTimeRaw));
 
-    const std::bitset<UTC_LOCAL_OFFSET_BITS> rawShift(zen::to<int>((rawInfo >> WRITE_TIME_HASH_BITS) & 0x7FU));  //static_cast<int>: a shame MSC... "unsigned long" should be supported instead!
+    const std::bitset<UTC_LOCAL_OFFSET_BITS> rawShift(to<int>((rawInfo >> WRITE_TIME_HASH_BITS) & 0x7FU));  //static_cast<int>: a shame MSC... "unsigned long" should be supported instead!
     assert_static(UTC_LOCAL_OFFSET_BITS == 7);
 
     const int timeShiftSec = convertUtcLocalShift(rawShift);
     const FILETIME writeTimeLocal = utcToLocal(rawTime.writeTimeRaw);
 
-    const zen::Int64 realUTC = toInt64(writeTimeLocal) - zen::Int64(timeShiftSec) * 10000000;
+    const Int64 realUTC = toInt64(writeTimeLocal) - Int64(timeShiftSec) * 10000000;
     return toFiletime(realUTC);
 }

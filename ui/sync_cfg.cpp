@@ -40,6 +40,11 @@ private:
     virtual void OnSyncUpdate(      wxCommandEvent& event);
     virtual void OnSyncCustom(      wxCommandEvent& event);
 
+    virtual void OnSyncAutomaticDouble(   wxMouseEvent& event);
+    virtual void OnSyncMirrorDouble(      wxMouseEvent& event);
+    virtual void OnSyncUpdateDouble(      wxMouseEvent& event);
+    virtual void OnSyncCustomDouble(      wxMouseEvent& event);
+
     virtual void OnExLeftSideOnly(  wxCommandEvent& event);
     virtual void OnExRightSideOnly( wxCommandEvent& event);
     virtual void OnLeftNewer(       wxCommandEvent& event);
@@ -47,8 +52,8 @@ private:
     virtual void OnDifferent(       wxCommandEvent& event);
     virtual void OnConflict(        wxCommandEvent& event);
 
-    virtual void OnClose(           wxCloseEvent&   event);
-    virtual void OnCancel(          wxCommandEvent& event);
+    virtual void OnClose(           wxCloseEvent&   event) { EndModal(0); }
+    virtual void OnCancel(          wxCommandEvent& event) { EndModal(0); }
     virtual void OnApply(           wxCommandEvent& event);
 
     void updateGui();
@@ -332,18 +337,6 @@ void SyncCfgDialog::updateGui()
 }
 
 
-void SyncCfgDialog::OnClose(wxCloseEvent& event)
-{
-    EndModal(0);
-}
-
-
-void SyncCfgDialog::OnCancel(wxCommandEvent& event)
-{
-    EndModal(0);
-}
-
-
 void SyncCfgDialog::OnApply(wxCommandEvent& event)
 {
     //write configuration to main dialog
@@ -396,6 +389,35 @@ void SyncCfgDialog::OnSyncCustom(wxCommandEvent& event)
 {
     currentSyncConfig.var = SyncConfig::CUSTOM;
     updateGui();
+}
+
+
+void SyncCfgDialog::OnSyncAutomaticDouble(wxMouseEvent& event)
+{
+    wxCommandEvent dummy;
+    OnSyncAutomatic(dummy);
+    OnApply(dummy);
+}
+
+void SyncCfgDialog::OnSyncMirrorDouble(wxMouseEvent& event)
+{
+    wxCommandEvent dummy;
+    OnSyncMirror(dummy);
+    OnApply(dummy);
+}
+
+void SyncCfgDialog::OnSyncUpdateDouble(wxMouseEvent& event)
+{
+    wxCommandEvent dummy;
+    OnSyncUpdate(dummy);
+    OnApply(dummy);
+}
+
+void SyncCfgDialog::OnSyncCustomDouble(wxMouseEvent& event)
+{
+    wxCommandEvent dummy;
+    OnSyncCustom(dummy);
+    OnApply(dummy);
 }
 
 

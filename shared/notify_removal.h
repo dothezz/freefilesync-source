@@ -12,7 +12,7 @@
 #endif
 
 #include <wx/msw/wrapwin.h> //includes "windows.h"
-#include "../shared/file_error.h"
+#include "file_error.h"
 #include <vector>
 #include <memory>
 
@@ -21,7 +21,7 @@
 class NotifyRequestDeviceRemoval
 {
 public:
-    NotifyRequestDeviceRemoval(const std::vector<HANDLE>& openHandles); //throw (FileError)
+    NotifyRequestDeviceRemoval(HANDLE hDir); //throw FileError
     virtual ~NotifyRequestDeviceRemoval();
 
 private:
@@ -33,7 +33,7 @@ private:
     void operator=(NotifyRequestDeviceRemoval&);             //
 
     class Pimpl;
-    std::auto_ptr<Pimpl> pimpl;
+    std::unique_ptr<Pimpl> pimpl;
 };
 
 

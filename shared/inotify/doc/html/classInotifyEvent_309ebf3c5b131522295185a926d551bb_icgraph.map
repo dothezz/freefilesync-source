@@ -1,4 +1,0 @@
-<area shape="rect" href="$classInotifyEvent.html#c08a0a26ea33dbe94aaf1ac830c103a5" title="Fills the string with all types contained in an event mask value." alt="" coords="188,5,351,32">
-<area shape="rect" href="$classInotifyEvent.html#477ae71116ec393434a1f62a7170a156" title="Checks for the event type." alt="" coords="203,56,336,83">
-<area shape="rect" href="$classInotify.html#139c27c6643bb199619f3eae9b32e53b" title="Waits for inotify events." alt="" coords="196,107,343,133">
-<area shape="rect" href="$classInotifyEvent.html#3e5d18ff8dea01d14286e4b44a2b76ea" title="Fills the string with all types contained in the event mask." alt="" coords="401,5,564,32">

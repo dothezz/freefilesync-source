@@ -29,10 +29,10 @@ public:
 
     virtual void initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID);
     virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed);
-    virtual void reportInfo(const Zstring& text);
+    virtual void reportInfo(const wxString& text);
     virtual void forceUiRefresh();
 
-    virtual ErrorHandler::Response reportError(const wxString& text);
+    virtual Response reportError(const wxString& text);
     virtual void reportFatalError(const wxString& errorMessage);
     virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
 
@@ -55,10 +55,10 @@ public:
 
     virtual void initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID);
     virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed);
-    virtual void reportInfo(const Zstring& text);
+    virtual void reportInfo(const wxString& text);
     virtual void forceUiRefresh();
 
-    virtual ErrorHandler::Response reportError(const wxString& text);
+    virtual Response reportError(const wxString& text);
     virtual void reportFatalError(const wxString& errorMessage);
     virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
 

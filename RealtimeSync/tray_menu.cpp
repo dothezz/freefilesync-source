@@ -27,7 +27,7 @@
 #include "../shared/shell_execute.h"
 
 using namespace rts;
-
+using namespace zen;
 
 class TrayIconHolder : private wxEvtHandler
 {
@@ -227,7 +227,7 @@ std::vector<Zstring> convert(const std::vector<wxString>& dirList)
 {
     std::set<Zstring, LessFilename> output;
     std::transform(dirList.begin(), dirList.end(),
-                   std::inserter(output, output.end()), static_cast<Zstring (*)(const wxString&)>(zen::wxToZ));
+    std::inserter(output, output.end()), [](const wxString& str) { return zen::toZ(str); });
     return std::vector<Zstring>(output.begin(), output.end());
 }
 }
@@ -299,9 +299,9 @@ rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& 
 
         if (config.commandline.empty())
         {
-            wxString errorMsg = _("Invalid commandline: \"%x\"");
-            errorMsg.Replace(L"%x", config.commandline);
-            throw zen::FileError(errorMsg);
+            std::wstring errorMsg = _("Invalid commandline: \"%x\"");
+            replace(errorMsg, L"%x", config.commandline);
+            throw FileError(errorMsg);
         }
 
         callback.notifyDirectoryMissing();
@@ -337,7 +337,7 @@ rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& 
                     callback.scheduleNextSync(wxGetLocalTime() + static_cast<long>(config.delay));
                 }
             }
-            catch (StartSyncNowException) {}
+            catch (StartSyncNowException&) {}
         }
     }
     catch (const ::AbortThisProcess& ab)

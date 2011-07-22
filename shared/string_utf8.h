@@ -15,20 +15,22 @@
 
 namespace zen
 {
-//Example: std::string tmp = toUtf8<std::string>(L"abc");
+//convert any(!) "string-like" object into target string by applying a UTF8 conversion (only if necessary!)
+template <class TargetString, class SourceString> TargetString utf8CvrtTo(const SourceString& str);
+
+//convert wide to utf8 string; example: std::string tmp = toUtf8<std::string>(L"abc");
 template <class CharString, class WideString>
 CharString wideToUtf8(const WideString& str);
 
-//Example: std::wstring tmp = utf8To<std::wstring>("abc");
+//convert utf8 string to wide; example: std::wstring tmp = utf8To<std::wstring>("abc");
 template <class WideString, class CharString>
 WideString utf8ToWide(const CharString& str);
 
 const char BYTE_ORDER_MARK_UTF8[] = "\xEF\xBB\xBF";
 
-//convert any(!) "string-like" object into a UTF8 encoded std::string
-template <class String> std::string toStdString(const String& str);
-//convert a UTF8 encoded std::string to any(!) string-class
-template <class String> String      stdStringTo(const std::string& str);
+
+
+
 
 
 
@@ -190,7 +192,7 @@ Function utf8ToCodePoint(CharIterator first, CharIterator last, Function f) //f 
         };
 
         CodePoint cp = static_cast<Char8>(*first);
-        switch (getUtf8Len(cp))
+        switch (getUtf8Len(static_cast<Char8>(cp)))
         {
             case 1:
                 break;
@@ -238,13 +240,13 @@ template <class String>
 class AppendStringIterator: public std::iterator<std::output_iterator_tag, void, void, void, void>
 {
 public:
-    explicit AppendStringIterator (String& x) : str(x) {}
-    AppendStringIterator& operator= (typename String::value_type value) { str += value; return *this; }
+    explicit AppendStringIterator (String& x) : str(&x) {}
+    AppendStringIterator& operator= (typename String::value_type value) { *str += value; return *this; }
     AppendStringIterator& operator*  ()    { return *this; }
     AppendStringIterator& operator++ ()    { return *this; }
     AppendStringIterator  operator++ (int) { return *this; }
 private:
-    String& str;
+    String* str;
 };
 
 
@@ -310,24 +312,24 @@ CharString wideToUtf8(const WideString& str)
 
 
 //-------------------------------------------------------------------------------------------
-template <class String> inline
-std::string toStdString(const String& str, wchar_t) { return wideToUtf8<std::string>(str); } //convert wide character string to UTF8
+template <class TargetString, class SourceString> inline
+TargetString utf8CvrtTo(const SourceString& str, char, wchar_t) { return utf8ToWide<TargetString>(str); }
 
-template <class String> inline
-std::string toStdString(const String& str, char) { return cvrtString<std::string>(str); } //directly process string without UTF8 conversion
+template <class TargetString, class SourceString> inline
+TargetString utf8CvrtTo(const SourceString& str, wchar_t, char) { return wideToUtf8<TargetString>(str); }
 
-template <class String> inline
-std::string toStdString(const String& str) { return toStdString(str, typename StringTraits<String>::CharType()); }
-//-------------------------------------------------------------------------------------------
+template <class TargetString, class SourceString> inline
+TargetString utf8CvrtTo(const SourceString& str, char, char) { return cvrtString<TargetString>(str); }
 
-template <class String> inline
-String stdStringTo(const std::string& str, wchar_t) { return utf8ToWide<String>(str); } //convert UTF8 to wide character string
+template <class TargetString, class SourceString> inline
+TargetString utf8CvrtTo(const SourceString& str, wchar_t, wchar_t) { return cvrtString<TargetString>(str); }
 
-template <class String> inline
-String stdStringTo(const std::string& str, char) { return cvrtString<String>(str); } //directly process string without UTF8 conversion
-
-template <class String> inline
-String stdStringTo(const std::string& str) { return stdStringTo<String>(str, typename StringTraits<String>::CharType()); }
+template <class TargetString, class SourceString> inline
+TargetString utf8CvrtTo(const SourceString& str)
+{
+    return utf8CvrtTo<TargetString>(str, typename StringTraits<SourceString>::CharType(),
+                                    typename StringTraits<TargetString>::CharType());
+}
 }
 
 #endif //STRING_UTF8_HEADER_01832479146991573473545

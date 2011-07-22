@@ -5,7 +5,6 @@
 // **************************************************************************
 //
 #include "custom_grid.h"
-#include "../shared/system_constants.h"
 #include "resources.h"
 #include <wx/dc.h>
 #include "../shared/util.h"
@@ -283,16 +282,16 @@ protected:
                         switch (colType_)
                         {
                             case xmlAccess::FULL_PATH:
-                                value = zToWx(fileObj.getFullName<side>().BeforeLast(common::FILE_NAME_SEPARATOR));
+                                value = toWx(fileObj.getFullName<side>().BeforeLast(FILE_NAME_SEPARATOR));
                                 break;
                             case xmlAccess::FILENAME: //filename
-                                value = zToWx(fileObj.getShortName<side>());
+                                value = toWx(fileObj.getShortName<side>());
                                 break;
                             case xmlAccess::REL_PATH: //relative path
-                                value = zToWx(fileObj.getParentRelativeName());
+                                value = toWx(fileObj.getParentRelativeName());
                                 break;
                             case xmlAccess::DIRECTORY:
-                                value = zToWx(fileObj.getBaseDirPf<side>());
+                                value = toWx(fileObj.getBaseDirPf<side>());
                                 break;
                             case xmlAccess::SIZE: //file size
                                 value = zen::toStringSep(fileObj.getFileSize<side>());
@@ -301,7 +300,7 @@ protected:
                                 value = zen::utcTimeToLocalString(fileObj.getLastWriteTime<side>());
                                 break;
                             case xmlAccess::EXTENSION: //file extension
-                                value = zToWx(fileObj.getExtension<side>());
+                                value = toWx(fileObj.getExtension<side>());
                                 break;
                         }
                     }
@@ -311,16 +310,16 @@ protected:
                         switch (colType_)
                         {
                             case xmlAccess::FULL_PATH:
-                                value = zToWx(linkObj.getFullName<side>().BeforeLast(common::FILE_NAME_SEPARATOR));
+                                value = toWx(linkObj.getFullName<side>().BeforeLast(FILE_NAME_SEPARATOR));
                                 break;
                             case xmlAccess::FILENAME: //filename
-                                value = zToWx(linkObj.getShortName<side>());
+                                value = toWx(linkObj.getShortName<side>());
                                 break;
                             case xmlAccess::REL_PATH: //relative path
-                                value = zToWx(linkObj.getParentRelativeName());
+                                value = toWx(linkObj.getParentRelativeName());
                                 break;
                             case xmlAccess::DIRECTORY:
-                                value = zToWx(linkObj.getBaseDirPf<side>());
+                                value = toWx(linkObj.getBaseDirPf<side>());
                                 break;
                             case xmlAccess::SIZE: //file size
                                 value = _("<Symlink>");
@@ -339,16 +338,16 @@ protected:
                         switch (colType_)
                         {
                             case xmlAccess::FULL_PATH:
-                                value = zToWx(dirObj.getFullName<side>());
+                                value = toWx(dirObj.getFullName<side>());
                                 break;
                             case xmlAccess::FILENAME:
-                                value = zToWx(dirObj.getShortName<side>());
+                                value = toWx(dirObj.getShortName<side>());
                                 break;
                             case xmlAccess::REL_PATH:
-                                value = zToWx(dirObj.getParentRelativeName());
+                                value = toWx(dirObj.getParentRelativeName());
                                 break;
                             case xmlAccess::DIRECTORY:
-                                value = zToWx(dirObj.getBaseDirPf<side>());
+                                value = toWx(dirObj.getBaseDirPf<side>());
                                 break;
                             case xmlAccess::SIZE: //file size
                                 value = _("<Directory>");
@@ -1264,7 +1263,8 @@ public:
                                 icon = IconBuffer::getFileIcon(); //better than nothing
                         }
 
-                        dc.DrawIcon(icon, rectShrinked.GetX() + LEFT_BORDER, rectShrinked.GetY());
+                        if (icon.IsOk())
+                            dc.DrawIcon(icon, rectShrinked.GetX() + LEFT_BORDER, rectShrinked.GetY());
 
                         //-----------------------------------------------------------------------------------------------
                         //save status of last icon load -> used for async. icon loading
@@ -1374,20 +1374,20 @@ void CustomGridRim::setTooltip(const wxMouseEvent& event)
 
                 virtual void visit(const FileMapping& fileObj)
                 {
-                    tipMsg_ = zToWx(fileObj.getRelativeName<side>()) + wxT("\n") +
-                              _("Size") + wxT(": ") + zen::formatFilesizeToShortString(fileObj.getFileSize<side>()) + wxT("\n") +
-                              _("Date") + wxT(": ") + zen::utcTimeToLocalString(fileObj.getLastWriteTime<side>());
+                    tipMsg_ = toWx(fileObj.getRelativeName<side>()) + "\n" +
+                              _("Size") + ": " + zen::formatFilesizeToShortString(fileObj.getFileSize<side>()) + "\n" +
+                              _("Date") + ": " + zen::utcTimeToLocalString(fileObj.getLastWriteTime<side>());
                 }
 
                 virtual void visit(const SymLinkMapping& linkObj)
                 {
-                    tipMsg_ = zToWx(linkObj.getRelativeName<side>()) + wxT("\n") +
-                              _("Date") + wxT(": ") + zen::utcTimeToLocalString(linkObj.getLastWriteTime<side>());
+                    tipMsg_ = toWx(linkObj.getRelativeName<side>()) + "\n" +
+                              _("Date") + ": " + zen::utcTimeToLocalString(linkObj.getLastWriteTime<side>());
                 }
 
                 virtual void visit(const DirMapping& dirObj)
                 {
-                    tipMsg_ = zToWx(dirObj.getRelativeName<side>());
+                    tipMsg_ = toWx(dirObj.getRelativeName<side>());
                 }
 
                 wxString& tipMsg_;

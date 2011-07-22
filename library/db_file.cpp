@@ -30,8 +30,27 @@ namespace
 {
 //-------------------------------------------------------------------------------------------------------------------------------
 const char FILE_FORMAT_DESCR[] = "FreeFileSync";
-const int FILE_FORMAT_VER = 6;
+const int FILE_FORMAT_VER = 7;
 //-------------------------------------------------------------------------------------------------------------------------------
+
+
+template <SelectedSide side> inline
+Zstring getDBFilename(const BaseDirMapping& baseMap, bool tempfile = false)
+{
+    //Linux and Windows builds are binary incompatible: char/wchar_t case, sensitive/insensitive
+    //32 and 64 bit db files ARE designed to be binary compatible!
+    //Give db files different names.
+    //make sure they end with ".ffs_db". These files will not be included into comparison when located in base sync directories
+#ifdef FFS_WIN
+    Zstring dbname = Zstring(Zstr("sync")) + (tempfile ? Zstr(".tmp") : Zstr("")) + SYNC_DB_FILE_ENDING;
+#elif defined FFS_LINUX
+    //files beginning with dots are hidden e.g. in Nautilus
+    Zstring dbname = Zstring(Zstr(".sync")) + (tempfile ? Zstr(".tmp") : Zstr("")) + SYNC_DB_FILE_ENDING;
+#endif
+
+    return baseMap.getBaseDir<side>() + dbname;
+}
+
 
 
 class FileInputStreamDB : public FileInputStream
@@ -45,7 +64,7 @@ public:
         Read(formatDescr, sizeof(formatDescr)); //throw (FileError)
 
         if (!std::equal(FILE_FORMAT_DESCR, FILE_FORMAT_DESCR + sizeof(FILE_FORMAT_DESCR), formatDescr))
-            throw FileError(wxString(_("Incompatible synchronization database format:")) + wxT(" \n") + wxT("\"") + zToWx(filename) + wxT("\""));
+            throw FileError(_("Incompatible synchronization database format:") + " \n" + "\"" + filename + "\"");
     }
 
 private:
@@ -138,115 +157,162 @@ private:
 namespace
 {
 typedef std::string UniqueId;
-typedef std::shared_ptr<std::vector<char> > MemoryStreamPtr; //byte stream representing DirInformation
-typedef std::map<UniqueId, MemoryStreamPtr>   DirectoryTOC;    //list of streams ordered by a UUID pointing to their partner database
-typedef std::pair<UniqueId, DirectoryTOC>     DbStreamData;    //header data: UUID representing this database, item data: list of dir-streams
+typedef std::shared_ptr<std::vector<char> > MemoryStreamPtr;  //byte stream representing DirInformation
+typedef std::map<UniqueId, MemoryStreamPtr> StreamMapping;    //list of streams ordered by session UUID
 }
-/* Example
-left side              right side
----------              ----------
-DB-ID 123     <-\  /-> DB-ID 567
-                 \/
-Partner-ID 111   /\    Partner-ID 222
-Partner-ID 567 _/  \_  Partner-ID 123
-    ...                     ...
-*/
 
 class ReadFileStream : public zen::ReadInputStream
 {
 public:
-    ReadFileStream(wxInputStream& stream, const wxString& filename, DbStreamData& output, int& versionId) : ReadInputStream(stream, filename)
+    ReadFileStream(wxInputStream& stream, const wxString& filename, StreamMapping& streamList, bool leftSide) : ReadInputStream(stream, filename)
     {
         //|-------------------------------------------------------------------------------------
         //| ensure 32/64 bit portability: used fixed size data types only e.g. boost::uint32_t |
         //|-------------------------------------------------------------------------------------
 
         boost::int32_t version = readNumberC<boost::int32_t>();
-        if (version != FILE_FORMAT_VER) //read file format version
-            throw FileError(wxString(_("Incompatible synchronization database format:")) + wxT(" \n") + wxT("\"") + filename + wxT("\""));
-        versionId = version;
 
-        //read DB id
-        const CharArray tmp = readArrayC();
-        output.first.assign(tmp->begin(), tmp->end());
+#ifndef _MSC_VER
+#warning remove this check after migration!
+#endif
+        if (version != 6) //migrate!
 
-        DirectoryTOC& dbList = output.second;
-        dbList.clear();
+            if (version != FILE_FORMAT_VER) //read file format version
+                throw FileError(_("Incompatible synchronization database format:") + " \n" + "\"" + filename.c_str() + "\"");
 
-        boost::uint32_t dbCount = readNumberC<boost::uint32_t>(); //number of databases: one for each sync-pair
-        while (dbCount-- != 0)
+
+#ifndef _MSC_VER
+#warning remove this case after migration!
+#endif
+
+        if (version == 6)
         {
-            //DB id of partner databases
-            const CharArray tmp2 = readArrayC();
-            const std::string partnerID(tmp2->begin(), tmp2->end());
+            streamList.clear();
 
-            CharArray buffer = readArrayC(); //read db-entry stream (containing DirInformation)
+            //read DB id
+            const CharArray tmp = readArrayC();
+            std::string mainId(tmp->begin(), tmp->end());
 
-            dbList.insert(std::make_pair(partnerID, buffer));
+            boost::uint32_t dbCount = readNumberC<boost::uint32_t>(); //number of databases: one for each sync-pair
+            while (dbCount-- != 0)
+            {
+                //DB id of partner databases
+                const CharArray tmp2 = readArrayC();
+                const std::string partnerID(tmp2->begin(), tmp2->end());
+
+                CharArray buffer = readArrayC(); //read db-entry stream (containing DirInformation)
+
+                if (leftSide)
+                    streamList.insert(std::make_pair(partnerID + mainId, buffer));
+                else
+                    streamList.insert(std::make_pair(mainId + partnerID, buffer));
+            }
+        }
+        else
+        {
+            streamList.clear();
+
+            boost::uint32_t dbCount = readNumberC<boost::uint32_t>(); //number of databases: one for each sync-pair
+            while (dbCount-- != 0)
+            {
+                //DB id of partner databases
+                const CharArray tmp2 = readArrayC();
+                const std::string sessionID(tmp2->begin(), tmp2->end());
+
+                CharArray buffer = readArrayC(); //read db-entry stream (containing DirInformation)
+
+                streamList.insert(std::make_pair(sessionID, buffer));
+            }
         }
     }
 };
 
+namespace
+{
+StreamMapping loadStreams(const Zstring& filename,
 
-DbStreamData loadFile(const Zstring& filename) //throw (FileError)
+#ifndef _MSC_VER
+#warning remove this parameter after migration!
+#endif
+                          bool leftSide) //throw (FileError)
 {
     if (!zen::fileExists(filename))
-        throw FileErrorDatabaseNotExisting(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
-                                           _("One of the FreeFileSync database files is not yet existing:") + wxT(" \n") +
-                                           wxT("\"") + zToWx(filename) + wxT("\""));
+        throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + " \n\n" +
+                                           _("One of the FreeFileSync database files is not yet existing:") + " \n" +
+                                           "\"" + filename + "\"");
 
-    //read format description (uncompressed)
-    FileInputStreamDB uncompressed(filename); //throw (FileError)
+    try
+    {
+        //read format description (uncompressed)
+        FileInputStreamDB uncompressed(filename); //throw (FileError)
 
-    wxZlibInputStream input(uncompressed, wxZLIB_ZLIB);
+        wxZlibInputStream input(uncompressed, wxZLIB_ZLIB);
 
-    DbStreamData output;
-    int versionId = 0;
-    ReadFileStream (input, zToWx(filename), output, versionId);
-    return output;
+        StreamMapping streamList;
+        ReadFileStream(input, toWx(filename), streamList, leftSide);
+        return streamList;
+    }
+    catch (const std::bad_alloc&) //this is most likely caused by a corrupted database file
+    {
+        throw FileError(_("Error reading from synchronization database:") + " (bad_alloc)");
+    }
+}
+
+
+DirInfoPtr parseStream(const std::vector<char>& stream, const Zstring& fileName) //throw FileError -> return value always bound!
+{
+    try
+    {
+        //read streams into DirInfo
+        auto dirInfo = std::make_shared<DirInformation>();
+        wxMemoryInputStream buffer(&stream[0], stream.size()); //convert char-array to inputstream: no copying, ownership not transferred
+        ReadDirInfo(buffer, toWx(fileName), *dirInfo); //throw FileError
+        return dirInfo;
+    }
+    catch (const std::bad_alloc&) //this is most likely caused by a corrupted database file
+    {
+        throw FileError(_("Error reading from synchronization database:") + " (bad_alloc)");
+    }
+}
 }
 
 
 std::pair<DirInfoPtr, DirInfoPtr> zen::loadFromDisk(const BaseDirMapping& baseMapping) //throw (FileError)
 {
-    const Zstring fileNameLeft  = baseMapping.getDBFilename<LEFT_SIDE>();
-    const Zstring fileNameRight = baseMapping.getDBFilename<RIGHT_SIDE>();
+    const Zstring fileNameLeft  = getDBFilename<LEFT_SIDE>(baseMapping);
+    const Zstring fileNameRight = getDBFilename<RIGHT_SIDE>(baseMapping);
 
-    try
+    //read file data: list of session ID + DirInfo-stream
+    const StreamMapping streamListLeft  = ::loadStreams(fileNameLeft, true);  //throw (FileError)
+    const StreamMapping streamListRight = ::loadStreams(fileNameRight, false); //throw (FileError)
+
+    //find associated session: there can be at most one session within intersection of left and right ids
+    StreamMapping::const_iterator streamLeft  = streamListLeft .end();
+    StreamMapping::const_iterator streamRight = streamListRight.end();
+    for (auto iterLeft = streamListLeft.begin(); iterLeft != streamListLeft.end(); ++iterLeft)
     {
-        //read file data: db ID + mapping of partner-ID/DirInfo-stream
-        const DbStreamData dbEntriesLeft  = ::loadFile(fileNameLeft);
-        const DbStreamData dbEntriesRight = ::loadFile(fileNameRight);
-
-        //find associated DirInfo-streams
-        DirectoryTOC::const_iterator dbLeft = dbEntriesLeft.second.find(dbEntriesRight.first); //find left db-entry that corresponds to right database
-        DirectoryTOC::const_iterator dbRight = dbEntriesRight.second.find(dbEntriesLeft.first); //find left db-entry that corresponds to right database
-
-        if (dbLeft == dbEntriesLeft.second.end())
-            throw FileErrorDatabaseNotExisting(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
-                                               _("One of the FreeFileSync database entries within the following file is not yet existing:") + wxT(" \n") +
-                                               wxT("\"") + zToWx(fileNameLeft) + wxT("\""));
-
-        if (dbRight == dbEntriesRight.second.end())
-            throw FileErrorDatabaseNotExisting(wxString(_("Initial synchronization:")) + wxT(" \n\n") +
-                                               _("One of the FreeFileSync database entries within the following file is not yet existing:") + wxT(" \n") +
-                                               wxT("\"") + zToWx(fileNameRight) + wxT("\""));
-
-        //read streams into DirInfo
-        std::shared_ptr<DirInformation> dirInfoLeft(new DirInformation);
-        wxMemoryInputStream buffer(&(*dbLeft->second)[0], dbLeft->second->size()); //convert char-array to inputstream: no copying, ownership not transferred
-        ReadDirInfo(buffer, zToWx(fileNameLeft), *dirInfoLeft);  //read file/dir information
-
-        std::shared_ptr<DirInformation> dirInfoRight(new DirInformation);
-        wxMemoryInputStream buffer2(&(*dbRight->second)[0], dbRight->second->size()); //convert char-array to inputstream: no copying, ownership not transferred
-        ReadDirInfo(buffer2, zToWx(fileNameRight), *dirInfoRight);  //read file/dir information
-
-        return std::make_pair(dirInfoLeft, dirInfoRight);
+        auto iterRight = streamListRight.find(iterLeft->first);
+        if (iterRight != streamListRight.end())
+        {
+            streamLeft  = iterLeft;
+            streamRight = iterRight;
+            break;
+        }
     }
-    catch (const std::bad_alloc&) //this is most likely caused by a corrupted database file
-    {
-        throw FileError(wxString(_("Error reading from synchronization database:")) + wxT(" (bad_alloc)"));
-    }
+
+    if (streamLeft  == streamListLeft .end() ||
+        streamRight == streamListRight.end() ||
+        !streamLeft ->second.get() ||
+        !streamRight->second.get())
+        throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + " \n\n" +
+                                           _("No matching synchronization session found in database files:") + " \n" +
+                                           "\"" + fileNameLeft  + "\"\n" +
+                                           "\"" + fileNameRight + "\"");
+    //read streams into DirInfo
+    DirInfoPtr dirInfoLeft  = parseStream(*streamLeft ->second, fileNameLeft);  //throw FileError
+    DirInfoPtr dirInfoRight = parseStream(*streamRight->second, fileNameRight); //throw FileError
+
+    return std::make_pair(dirInfoLeft, dirInfoRight);
 }
 
 
@@ -375,21 +441,16 @@ private:
 class WriteFileStream : public WriteOutputStream
 {
 public:
-    WriteFileStream(const DbStreamData& input, const wxString& filename, wxOutputStream& stream) : WriteOutputStream(filename, stream)
+    WriteFileStream(const StreamMapping& streamList, const wxString& filename, wxOutputStream& stream) : WriteOutputStream(filename, stream)
     {
         //save file format version
         writeNumberC<boost::int32_t>(FILE_FORMAT_VER);
 
-        //write DB id
-        writeArrayC(std::vector<char>(input.first.begin(), input.first.end()));
+        writeNumberC<boost::uint32_t>(static_cast<boost::uint32_t>(streamList.size())); //number of database records: one for each sync-pair
 
-        const DirectoryTOC& dbList = input.second;
-
-        writeNumberC<boost::uint32_t>(static_cast<boost::uint32_t>(dbList.size())); //number of database records: one for each sync-pair
-
-        for (DirectoryTOC::const_iterator i = dbList.begin(); i != dbList.end(); ++i)
+        for (StreamMapping::const_iterator i = streamList.begin(); i != streamList.end(); ++i)
         {
-            //DB id of partner database
+            //sync session id
             writeArrayC(std::vector<char>(i->first.begin(), i->first.end()));
 
             //write DirInformation stream
@@ -400,7 +461,7 @@ public:
 
 
 //save/load DirContainer
-void saveFile(const DbStreamData& dbStream, const Zstring& filename) //throw (FileError)
+void saveFile(const StreamMapping& streamList, const Zstring& filename) //throw (FileError)
 {
     {
         //write format description (uncompressed)
@@ -414,7 +475,7 @@ void saveFile(const DbStreamData& dbStream, const Zstring& filename) //throw (Fi
         6                       1,77 MB -  613 ms
         9 (maximal compression) 1,74 MB - 3330 ms */
 
-        WriteFileStream(dbStream, zToWx(filename), output);
+        WriteFileStream(streamList, toWx(filename), output);
     }
     //(try to) hide database file
 #ifdef FFS_WIN
@@ -423,133 +484,132 @@ void saveFile(const DbStreamData& dbStream, const Zstring& filename) //throw (Fi
 }
 
 
-bool entryExisting(const DirectoryTOC& table, const UniqueId& newKey, const MemoryStreamPtr& newValue)
+bool equalEntry(const MemoryStreamPtr& lhs, const MemoryStreamPtr& rhs)
 {
-    DirectoryTOC::const_iterator iter = table.find(newKey);
-    if (iter == table.end())
-        return false;
+    if (!lhs.get() || !rhs.get())
+        return lhs.get() == rhs.get();
 
-    if (!newValue.get() || !iter->second.get())
-        return newValue.get() == iter->second.get();
-
-    return *newValue == *iter->second;
+    return *lhs == *rhs;
 }
 
 
 void zen::saveToDisk(const BaseDirMapping& baseMapping) //throw (FileError)
 {
     //transactional behaviour! write to tmp files first
-    const Zstring fileNameLeftTmp  = baseMapping.getDBFilename<LEFT_SIDE>()  + Zstr(".tmp");
-    const Zstring fileNameRightTmp = baseMapping.getDBFilename<RIGHT_SIDE>() + Zstr(".tmp");;
+    const Zstring dbNameLeftTmp  = getDBFilename<LEFT_SIDE >(baseMapping, true);
+    const Zstring dbNameRightTmp = getDBFilename<RIGHT_SIDE>(baseMapping, true);
+
+    const Zstring dbNameLeft  = getDBFilename<LEFT_SIDE >(baseMapping);
+    const Zstring dbNameRight = getDBFilename<RIGHT_SIDE>(baseMapping);
 
     //delete old tmp file, if necessary -> throws if deletion fails!
-    removeFile(fileNameLeftTmp);  //
-    removeFile(fileNameRightTmp); //throw (FileError)
+    removeFile(dbNameLeftTmp);  //
+    removeFile(dbNameRightTmp); //throw (FileError)
 
-    //load old database files...
+    //(try to) load old database files...
+    StreamMapping streamListLeft;
+    StreamMapping streamListRight;
 
-    //read file data: db ID + mapping of partner-ID/DirInfo-stream: may throw!
-    DbStreamData dbEntriesLeft;
+    try //read file data: list of session ID + DirInfo-stream
+    {
+        streamListLeft = ::loadStreams(dbNameLeft, true);
+    }
+    catch(FileError&) {} //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
     try
     {
-        dbEntriesLeft = ::loadFile(baseMapping.getDBFilename<LEFT_SIDE>());
+        streamListRight = ::loadStreams(dbNameRight, false);
+    }
+    catch(FileError&) {}
+
+    //find associated session: there can be at most one session within intersection of left and right ids
+    StreamMapping::iterator streamLeft  = streamListLeft .end();
+    StreamMapping::iterator streamRight = streamListRight.end();
+    for (auto iterLeft = streamListLeft.begin(); iterLeft != streamListLeft.end(); ++iterLeft)
+    {
+        auto iterRight = streamListRight.find(iterLeft->first);
+        if (iterRight != streamListRight.end())
+        {
+            streamLeft  = iterLeft;
+            streamRight = iterRight;
+            break;
+        }
+    }
+
+    //(try to) read old DirInfo
+    DirInfoPtr oldDirInfoLeft;
+    DirInfoPtr oldDirInfoRight;
+    try
+    {
+        if (streamLeft  != streamListLeft .end() &&
+            streamRight != streamListRight.end() &&
+            streamLeft ->second.get() &&
+            streamRight->second.get())
+        {
+            oldDirInfoLeft  = parseStream(*streamLeft ->second, dbNameLeft); //throw FileError
+            oldDirInfoRight = parseStream(*streamRight->second, dbNameRight); //throw FileError
+        }
     }
     catch(FileError&)
     {
         //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
-        //dbEntriesLeft has empty mapping, but already a DB-ID!
-        dbEntriesLeft.first = util::generateGUID();
+        oldDirInfoLeft .reset(); //read both or none!
+        oldDirInfoRight.reset(); //
     }
-
-    //read file data: db ID + mapping of partner-ID/DirInfo-stream: may throw!
-    DbStreamData dbEntriesRight;
-    try
-    {
-        dbEntriesRight = ::loadFile(baseMapping.getDBFilename<RIGHT_SIDE>());
-    }
-    catch(FileError&)
-    {
-        dbEntriesRight.first = util::generateGUID();
-    }
-
-
-    //(try to) read old DirInfo
-    std::shared_ptr<DirInformation> oldDirInfoLeft;
-    try
-    {
-        DirectoryTOC::const_iterator iter = dbEntriesLeft.second.find(dbEntriesRight.first);
-        if (iter != dbEntriesLeft.second.end())
-            if (iter->second.get())
-            {
-                const std::vector<char>& memStream = *iter->second;
-                wxMemoryInputStream buffer(&memStream[0], memStream.size()); //convert char-array to inputstream: no copying, ownership not transferred
-                std::shared_ptr<DirInformation> dirInfoTmp = std::make_shared<DirInformation>();
-                ReadDirInfo(buffer, zToWx(baseMapping.getDBFilename<LEFT_SIDE>()), *dirInfoTmp);  //read file/dir information
-                oldDirInfoLeft = dirInfoTmp;
-            }
-    }
-    catch(FileError&) {} //if error occurs: just overwrite old file! User is already informed about issues right after comparing!
-
-    std::shared_ptr<DirInformation> oldDirInfoRight;
-    try
-    {
-        DirectoryTOC::const_iterator iter = dbEntriesRight.second.find(dbEntriesLeft.first);
-        if (iter != dbEntriesRight.second.end())
-            if (iter->second.get())
-            {
-                const std::vector<char>& memStream = *iter->second;
-                wxMemoryInputStream buffer(&memStream[0], memStream.size()); //convert char-array to inputstream: no copying, ownership not transferred
-                std::shared_ptr<DirInformation> dirInfoTmp = std::make_shared<DirInformation>();
-                ReadDirInfo(buffer, zToWx(baseMapping.getDBFilename<RIGHT_SIDE>()), *dirInfoTmp);  //read file/dir information
-                oldDirInfoRight = dirInfoTmp;
-            }
-    }
-    catch(FileError&) {}
-
 
     //create new database entries
-    MemoryStreamPtr dbEntryLeft(new std::vector<char>);
+    MemoryStreamPtr newStreamLeft = std::make_shared<std::vector<char>>();
     {
         wxMemoryOutputStream buffer;
-        DirContainer* oldDir = oldDirInfoLeft.get() ? &oldDirInfoLeft->baseDirContainer : NULL;
-        SaveDirInfo<LEFT_SIDE>(baseMapping, oldDir, zToWx(baseMapping.getDBFilename<LEFT_SIDE>()), buffer);
-        dbEntryLeft->resize(buffer.GetSize());               //convert output stream to char-array
-        buffer.CopyTo(&(*dbEntryLeft)[0], buffer.GetSize()); //
+        const DirContainer* oldDir = oldDirInfoLeft.get() ? &oldDirInfoLeft->baseDirContainer : NULL;
+        SaveDirInfo<LEFT_SIDE>(baseMapping, oldDir, toWx(dbNameLeft), buffer);
+        newStreamLeft->resize(buffer.GetSize());               //convert output stream to char-array
+        buffer.CopyTo(&(*newStreamLeft)[0], buffer.GetSize()); //
     }
 
-    MemoryStreamPtr dbEntryRight(new std::vector<char>);
+    MemoryStreamPtr newStreamRight = std::make_shared<std::vector<char>>();
     {
         wxMemoryOutputStream buffer;
-        DirContainer* oldDir = oldDirInfoRight.get() ? &oldDirInfoRight->baseDirContainer : NULL;
-        SaveDirInfo<RIGHT_SIDE>(baseMapping, oldDir, zToWx(baseMapping.getDBFilename<RIGHT_SIDE>()), buffer);
-        dbEntryRight->resize(buffer.GetSize());               //convert output stream to char-array
-        buffer.CopyTo(&(*dbEntryRight)[0], buffer.GetSize()); //
+        const DirContainer* oldDir = oldDirInfoRight.get() ? &oldDirInfoRight->baseDirContainer : NULL;
+        SaveDirInfo<RIGHT_SIDE>(baseMapping, oldDir, toWx(dbNameRight), buffer);
+        newStreamRight->resize(buffer.GetSize());               //convert output stream to char-array
+        buffer.CopyTo(&(*newStreamRight)[0], buffer.GetSize()); //
     }
 
-    //create/update DirInfo-streams
+    //check if there is some work to do at all
     {
-        const bool updateRequiredLeft  = !entryExisting(dbEntriesLeft. second, dbEntriesRight.first, dbEntryLeft);
-        const bool updateRequiredRight = !entryExisting(dbEntriesRight.second, dbEntriesLeft. first, dbEntryRight);
+        const bool updateRequiredLeft  = streamLeft  == streamListLeft .end() || !equalEntry(newStreamLeft,  streamLeft ->second);
+        const bool updateRequiredRight = streamRight == streamListRight.end() || !equalEntry(newStreamRight, streamRight->second);
         //some users monitor the *.ffs_db file with RTS => don't touch the file if it isnt't strictly needed
         if (!updateRequiredLeft && !updateRequiredRight)
             return;
     }
-    dbEntriesLeft .second[dbEntriesRight.first] = dbEntryLeft;
-    dbEntriesRight.second[dbEntriesLeft .first] = dbEntryRight;
+
+    //create/update DirInfo-streams
+    std::string sessionID = util::generateGUID();
+
+    //erase old session data
+    if (streamLeft != streamListLeft.end())
+        streamListLeft.erase(streamLeft);
+    if (streamRight != streamListRight.end())
+        streamListRight.erase(streamRight);
+
+    //fill in new
+    streamListLeft .insert(std::make_pair(sessionID, newStreamLeft));
+    streamListRight.insert(std::make_pair(sessionID, newStreamRight));
 
     //write (temp-) files...
-    Loki::ScopeGuard guardTempFileLeft = Loki::MakeGuard(&zen::removeFile, fileNameLeftTmp);
-    saveFile(dbEntriesLeft, fileNameLeftTmp);  //throw (FileError)
+    Loki::ScopeGuard guardTempFileLeft = Loki::MakeGuard(&zen::removeFile, dbNameLeftTmp);
+    saveFile(streamListLeft, dbNameLeftTmp);  //throw (FileError)
 
-    Loki::ScopeGuard guardTempFileRight = Loki::MakeGuard(&zen::removeFile, fileNameRightTmp);
-    saveFile(dbEntriesRight, fileNameRightTmp); //throw (FileError)
+    Loki::ScopeGuard guardTempFileRight = Loki::MakeGuard(&zen::removeFile, dbNameRightTmp);
+    saveFile(streamListRight, dbNameRightTmp); //throw (FileError)
 
     //operation finished: rename temp files -> this should work transactionally:
     //if there were no write access, creation of temp files would have failed
-    removeFile(baseMapping.getDBFilename<LEFT_SIDE>());
-    removeFile(baseMapping.getDBFilename<RIGHT_SIDE>());
-    renameFile(fileNameLeftTmp,  baseMapping.getDBFilename<LEFT_SIDE>());  //throw (FileError);
-    renameFile(fileNameRightTmp, baseMapping.getDBFilename<RIGHT_SIDE>()); //throw (FileError);
+    removeFile(dbNameLeft);
+    removeFile(dbNameRight);
+    renameFile(dbNameLeftTmp,  dbNameLeft);  //throw (FileError);
+    renameFile(dbNameRightTmp, dbNameRight); //throw (FileError);
 
     guardTempFileLeft. Dismiss(); //no need to delete temp file anymore
     guardTempFileRight.Dismiss(); //

@@ -11,7 +11,6 @@
 #include <wx/icon.h>
 #include <wx/mstream.h>
 #include "../shared/string_conv.h"
-#include "../shared/system_constants.h"
 #include <memory>
 #include "../shared/standard_paths.h"
 
@@ -102,9 +101,6 @@ void GlobalResources::load()
     //for compatibility it seems we need to stick with a "real" icon
     *programIcon = wxIcon(wxT("A_PROGRAM_ICON"));
 #else
-    //#include "FreeFileSync.xpm"
-    //*programIcon = wxIcon(FreeFileSync_xpm);
-
     //use big logo bitmap for better quality
     programIcon->CopyFromBitmap(getImage(wxT("FreeFileSync.png")));
 #endif

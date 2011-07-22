@@ -51,8 +51,7 @@ std::string getResourceStream(const std::wstring& libraryName, size_t resourceId
 //---------------Inline Implementation---------------------------------------------------
 FARPROC loadSymbol(const std::wstring& libraryName, const std::string& functionName);
 
-template <typename FunctionType>
-inline
+template <typename FunctionType> inline
 FunctionType getDllFun(const std::wstring& libraryName, const std::string& functionName)
 {
     return reinterpret_cast<FunctionType>(loadSymbol(libraryName, functionName));

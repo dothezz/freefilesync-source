@@ -12,6 +12,8 @@
 
 namespace zen
 {
+const Zstring SYNC_DB_FILE_ENDING = Zstr(".ffs_db");
+
 void saveToDisk(const BaseDirMapping& baseMapping); //throw (FileError)
 
 struct DirInformation

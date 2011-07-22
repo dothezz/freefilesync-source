@@ -1,7 +1,6 @@
 #ifndef DIR_LOCK_H_INCLUDED
 #define DIR_LOCK_H_INCLUDED
 
-#include "../shared/zstring.h"
 #include "../shared/file_error.h"
 #include <memory>
 
@@ -10,7 +9,7 @@ struct DirLockCallback //while waiting for the lock
 {
     virtual ~DirLockCallback() {}
     virtual void requestUiRefresh() = 0;  //allowed to throw exceptions
-    virtual void reportInfo(const Zstring& text) = 0;
+    virtual void reportInfo(const std::wstring& text) = 0;
 };
 
 /*

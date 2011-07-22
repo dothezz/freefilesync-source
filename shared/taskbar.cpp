@@ -33,16 +33,13 @@ bool windows7TaskbarAvailable()
 }
 
 
-const std::wstring& getTaskBarDllName()
+std::wstring getTaskBarDllName()
 {
     assert_static(util::is32BitBuild || util::is64BitBuild);
 
-    static const std::wstring filename(
-        util::is64BitBuild ?
-        L"Taskbar7_x64.dll" :
-        L"Taskbar7_Win32.dll");
-
-    return filename;
+    return util::is64BitBuild ?
+           L"Taskbar7_x64.dll" :
+           L"Taskbar7_Win32.dll";
 }
 }
 //########################################################################################################
@@ -108,7 +105,7 @@ private:
 
 TaskbarProgress::TaskbarProgress(const wxTopLevelWindow& window) : pimpl_(new Pimpl(window)) {}
 
-TaskbarProgress::~TaskbarProgress() {} //std::auto_ptr ...
+TaskbarProgress::~TaskbarProgress() {} //std::unique_ptr ...
 
 void TaskbarProgress::setStatus(Status status)
 {

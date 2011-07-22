@@ -13,105 +13,13 @@
 
 namespace zen
 {
-//conversion from Zstring to wxString
-wxString zToWx(const Zstring& str);
-wxString zToWx(const Zchar* str);
-wxString zToWx(Zchar ch);
-//conversion from wxString to Zstring
-Zstring wxToZ(const wxString& str);
-Zstring wxToZ(const wxChar* str);
-Zstring wxToZ(wxChar ch);
+inline wxString operator+(const wxString& lhs, const char*   rhs) { return wxString(lhs) += utf8CvrtTo<wxString>(rhs); }
+inline wxString operator+(const wxString& lhs, const Zstring& rhs) { return wxString(lhs) += utf8CvrtTo<wxString>(rhs); }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//---------------Inline Implementation---------------------------------------------------
-inline
-wxString zToWx(const Zstring& str)
-{
-#ifdef FFS_WIN
-    return cvrtString<wxString>(str);
-#elif defined FFS_LINUX
-    return utf8ToWide<wxString>(str);
-#endif
-}
-
-
-inline
-wxString zToWx(const Zchar* str)
-{
-#ifdef FFS_WIN
-    return cvrtString<wxString>(str);
-#elif defined FFS_LINUX
-    return utf8ToWide<wxString>(str);
-#endif
-}
-
-
-inline
-wxString zToWx(Zchar ch)
-{
-#ifdef FFS_WIN
-    return cvrtString<wxString>(ch);
-#elif defined FFS_LINUX
-    return utf8ToWide<wxString>(ch);
-#endif
-}
-
-//-----------------------------------------------------------------
-inline
-Zstring wxToZ(const wxString& str)
-{
-#ifdef FFS_WIN
-    return cvrtString<Zstring>(str);
-#elif defined FFS_LINUX
-    return wideToUtf8<Zstring>(str);
-#endif
-}
-
-
-inline
-Zstring wxToZ(const wxChar* str)
-{
-#ifdef FFS_WIN
-    return cvrtString<Zstring>(str);
-#elif defined FFS_LINUX
-    return wideToUtf8<Zstring>(str);
-#endif
-}
-
-
-inline
-Zstring wxToZ(wxChar ch)
-{
-#ifdef FFS_WIN
-    return cvrtString<Zstring>(ch);
-#elif defined FFS_LINUX
-    return wideToUtf8<Zstring>(ch);
-#endif
-}
+//conversion between Zstring and wxString
+inline wxString toWx(const Zstring&  str) { return utf8CvrtTo<wxString>(str); }
+inline Zstring   toZ(const wxString& str) { return utf8CvrtTo<Zstring>(str); }
 }
 
 #endif // STRINGCONV_H_INCLUDED

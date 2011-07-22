@@ -20,20 +20,18 @@ public:
 
     HMODULE getHandle(const std::wstring& libraryName)
     {
-        HandleMap::const_iterator foundEntry = handles.find(libraryName);
-        if (foundEntry == handles.end())
-        {
-            if (libraryName.empty())
-                return ::GetModuleHandle(NULL); //return handle to calling executable
+        if (libraryName.empty())
+            return ::GetModuleHandle(NULL); //return handle to calling executable
 
-            HMODULE newHandle = ::LoadLibrary(libraryName.c_str());
-            if (newHandle != NULL)
-                handles.insert(std::make_pair(libraryName, newHandle));
+        HandleMap::const_iterator iter = handles.find(libraryName);
+        if (iter != handles.end())
+            return iter->second;
 
-            return newHandle;
-        }
-        else
-            return foundEntry->second;
+        HMODULE newHandle = ::LoadLibrary(libraryName.c_str());
+        if (newHandle != NULL)
+            handles.insert(std::make_pair(libraryName, newHandle));
+
+        return newHandle;
     }
 
 private:
@@ -56,11 +54,7 @@ private:
 FARPROC util::loadSymbol(const std::wstring& libraryName, const std::string& functionName)
 {
     const HMODULE libHandle = DllHandler::getInstance().getHandle(libraryName);
-
-    if (libHandle != NULL)
-        return ::GetProcAddress(libHandle, functionName.c_str());
-    else
-        return NULL;
+    return libHandle != NULL ? ::GetProcAddress(libHandle, functionName.c_str()) : NULL;
 }
 
 

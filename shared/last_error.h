@@ -7,16 +7,16 @@
 #ifndef SYSTEMFUNCTIONS_H_INCLUDED
 #define SYSTEMFUNCTIONS_H_INCLUDED
 
-#include <wx/string.h>
+#include <string>
 
 
 namespace zen
 {
 //evaluate GetLastError()/errno and assemble specific error message
 #ifdef FFS_WIN
-wxString getLastErrorFormatted(unsigned long lastError = 0);
+std::wstring getLastErrorFormatted(unsigned long lastError = 0);
 #elif defined FFS_LINUX
-wxString getLastErrorFormatted(int lastError = 0);
+std::wstring getLastErrorFormatted(int lastError = 0);
 #endif
 }
 

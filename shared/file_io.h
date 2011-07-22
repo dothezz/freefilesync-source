@@ -37,6 +37,9 @@ public:
     bool eof(); //end of file reached
 
 private:
+    FileInput(const FileInput&);
+    FileInput& operator=(const FileInput&);
+
     bool eofReached;
     FileHandle fileHandle;
     const Zstring filename_;
@@ -58,6 +61,9 @@ public:
     void write(const void* buffer, size_t bytesToWrite); //throw (FileError)
 
 private:
+    FileOutput(const FileOutput&);
+    FileOutput& operator=(const FileOutput&);
+
     FileHandle fileHandle;
     const Zstring filename_;
 };

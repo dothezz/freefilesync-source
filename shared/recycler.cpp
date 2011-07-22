@@ -8,7 +8,6 @@
 #include <stdexcept>
 #include <iterator>
 #include "i18n.h"
-#include "string_conv.h"
 
 #ifdef FFS_WIN
 #include "dll_loader.h"
@@ -26,26 +25,26 @@
 #include <giomm/file.h>
 #endif
 
+using namespace zen;
+
 
 namespace
 {
 #ifdef FFS_WIN
-const std::wstring& getRecyclerDllName()
+inline
+std::wstring getRecyclerDllName()
 {
-    static const std::wstring filename(
-        util::is64BitBuild ?
-        L"FileOperation_x64.dll":
-        L"FileOperation_Win32.dll");
-
     assert_static(util::is32BitBuild || util::is64BitBuild);
 
-    return filename;
+    return util::is64BitBuild ?
+           L"FileOperation_x64.dll":
+           L"FileOperation_Win32.dll";
 }
 
 
 bool vistaOrLater()
 {
-    OSVERSIONINFO osvi;
+    OSVERSIONINFO osvi = {};
     ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
     osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
@@ -90,15 +89,15 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
 
         static MoveToRecycleBinFct moveToRecycler = NULL;
         if (!moveToRecycler)
-            moveToRecycler = util::getDllFun<MoveToRecycleBinFct>(getRecyclerDllName().c_str(), moveToRecycleBinFctName);
+            moveToRecycler = util::getDllFun<MoveToRecycleBinFct>(getRecyclerDllName(), moveToRecycleBinFctName);
 
         static GetLastErrorFct getLastError = NULL;
         if (!getLastError)
-            getLastError = util::getDllFun<GetLastErrorFct>(getRecyclerDllName().c_str(), getLastErrorFctName);
+            getLastError = util::getDllFun<GetLastErrorFct>(getRecyclerDllName(), getLastErrorFctName);
 
         if (moveToRecycler == NULL || getLastError == NULL)
-            throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + fileNames[0] + wxT("\"") + //report first file only... better than nothing
-                            wxT("\n\n") + wxString(_("Could not load a required DLL:")) + wxT(" \"") + getRecyclerDllName().c_str() + wxT("\""));
+            throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + fileNames[0] + "\"" + //report first file only... better than nothing
+                            "\n\n" + _("Could not load a required DLL:") + " \"" + getRecyclerDllName() + "\"");
 
         //#warning moving long file paths to recycler does not work! clarify!
         //        std::vector<Zstring> temp;
@@ -110,8 +109,8 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
         {
             wchar_t errorMessage[2000];
             getLastError(errorMessage, 2000);
-            throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + fileNames[0] + wxT("\"") + //report first file only... better than nothing
-                            wxT("\n\n") + wxT("(") + errorMessage + wxT(")"));
+            throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + fileNames[0] + "\"" + //report first file only... better than nothing
+                            "\n\n" + "(" + errorMessage + ")");
         }
     }
     else //regular recycle bin usage: available since XP
@@ -136,9 +135,9 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
         fileOp.hNameMappings         = NULL;
         fileOp.lpszProgressTitle     = NULL;
 
-        if (SHFileOperation(&fileOp) != 0 || fileOp.fAnyOperationsAborted)
+        if (::SHFileOperation(&fileOp) != 0 || fileOp.fAnyOperationsAborted)
         {
-            throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + filenameDoubleNull.c_str() + wxT("\"")); //report first file only... better than nothing
+            throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + filenameDoubleNull.c_str() + "\""); //report first file only... better than nothing
         }
     }
 }
@@ -167,34 +166,45 @@ bool zen::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileError)
     if (::lstat(fileToDelete.c_str(), &fileInfo) != 0)
         return false; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
 
-
     Glib::RefPtr<Gio::File> fileObj = Gio::File::create_for_path(fileToDelete.c_str()); //never fails
-
     try
     {
         if (!fileObj->trash())
-            throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + zToWx(fileToDelete) + wxT("\"") +
-                            wxT("\n\n") + wxT("(") + wxT("unknown error") + wxT(")"));
+            throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + fileToDelete + "\"" +
+                            "\n\n" + "(unknown error)");
     }
     catch (const Glib::Error& errorObj)
     {
         //assemble error message
-        const wxString errorMessage = wxString(wxT("Glib Error Code ")) + wxString::Format(wxT("%i"), errorObj.code()) + wxT(", ") +
-                                      wxString::FromUTF8(g_quark_to_string(errorObj.domain())) + wxT(": ") + wxString::FromUTF8(errorObj.what().c_str());
+        const std::wstring errorMessage = L"Glib Error Code " + toString<std::wstring>(errorObj.code()) + ", " +
+                                          g_quark_to_string(errorObj.domain()) + ": " + errorObj.what();
 
-        throw FileError(wxString(_("Error moving to Recycle Bin:")) + wxT("\n\"") + zToWx(fileToDelete) + wxT("\"") +
-                        wxT("\n\n") + wxT("(") + errorMessage + wxT(")"));
+        throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + fileToDelete + "\"" +
+                        "\n\n" + "(" + errorMessage + ")");
     }
 #endif
     return true;
 }
 
 
-bool zen::recycleBinExists()
-{
 #ifdef FFS_WIN
-    return true;
-#elif defined FFS_LINUX
-    return true;
-#endif
+zen::StatusRecycler zen::recycleBinExists(const Zstring& pathName)
+{
+    std::vector<wchar_t> buffer(MAX_PATH + 1);
+    if (::GetVolumePathName(applyLongPathPrefix(pathName).c_str(), //__in   LPCTSTR lpszFileName,
+                            &buffer[0],                            //__out  LPTSTR lpszVolumePathName,
+                            static_cast<DWORD>(buffer.size())))    //__in   DWORD cchBufferLength
+    {
+        Zstring rootPath =&buffer[0];
+        if (!rootPath.EndsWith(FILE_NAME_SEPARATOR)) //a trailing backslash is required
+            rootPath += FILE_NAME_SEPARATOR;
+
+        SHQUERYRBINFO recInfo = {};
+        recInfo.cbSize = sizeof(recInfo);
+        HRESULT rv = ::SHQueryRecycleBin(rootPath.c_str(), //__in_opt  LPCTSTR pszRootPath,
+                                         &recInfo);        //__inout   LPSHQUERYRBINFO pSHQueryRBInfo
+        return rv == S_OK ? STATUS_REC_EXISTS : STATUS_REC_MISSING;
+    }
+    return STATUS_REC_UNKNOWN;
 }
+#endif

@@ -5,42 +5,32 @@
 // **************************************************************************
 //
 #include "util.h"
-#include <wx/scrolwin.h>
-#include <wx/textctrl.h>
-#include <wx/combobox.h>
-#include <wx/filepicker.h>
+#include "zstring.h"
 #include "i18n.h"
-#include "file_handling.h"
-#include "string_conv.h"
 #include "last_error.h"
-#include "check_exist.h"
-#include "assert_static.h"
-#include "system_constants.h"
 #include "global_func.h"
-
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #endif
 
+
 wxString zen::extractJobName(const wxString& configFilename)
 {
-    using namespace common;
-
     const wxString shortName = configFilename.AfterLast(FILE_NAME_SEPARATOR); //returns the whole string if seperator not found
     const wxString jobName = shortName.BeforeLast(wxChar('.')); //returns empty string if seperator not found
     return jobName.IsEmpty() ? shortName : jobName;
 }
 
 
-wxString zen::formatFilesizeToShortString(zen::UInt64 size)
+wxString zen::formatFilesizeToShortString(UInt64 size)
 {
-    if (to<zen::Int64>(size) < 0) return _("Error");
+    if (to<Int64>(size) < 0) return _("Error");
 
     if (size <= 999U)
     {
         wxString output = _P("1 Byte", "%x Bytes", to<int>(size));
-        output.Replace(wxT("%x"), zen::toStringSep(size)); //no decimal places in case of bytes
+        output.Replace(wxT("%x"), toStringSep(size)); //no decimal places in case of bytes
         return output;
     }
     else

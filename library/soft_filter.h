@@ -28,22 +28,25 @@ public:
                size_t sizeMin,  UnitSize unitSizeMin,
                size_t sizeMax,  UnitSize unitSizeMax);
 
-    bool matchTime(zen::Int64 writeTime) const { return currentTime - writeTime <= timeSpan_; }
-    bool matchSize(zen::UInt64 fileSize) const { return sizeMin_ <= fileSize && fileSize <= sizeMax_; }
+    bool matchTime(Int64 writeTime) const { return currentTime - writeTime <= timeSpan_; }
+    bool matchSize(UInt64 fileSize) const { return sizeMin_ <= fileSize && fileSize <= sizeMax_; }
+    bool matchFolder() const { return timeSpan_ == std::numeric_limits<Int64>::max(); }
+    //if date filter is active we deactivate all folders: effectively gets rid of empty folders!
+
     bool isNull() const; //filter is equivalent to NullFilter, but may be technically slower
 
     //small helper method: merge two soft filters
     friend SoftFilter combineFilters(const SoftFilter& first, const SoftFilter& second);
 
 private:
-    SoftFilter(zen::Int64  timeSpan,
-               zen::UInt64 sizeMin,
-               zen::UInt64 sizeMax);
+    SoftFilter(Int64  timeSpan,
+               UInt64 sizeMin,
+               UInt64 sizeMax);
 
-    zen::Int64  timeSpan_; //unit: seconds
-    zen::UInt64 sizeMin_;  //unit: bytes
-    zen::UInt64 sizeMax_;  //unit: bytes
-    zen::Int64  currentTime;
+    Int64  timeSpan_; //unit: seconds
+    UInt64 sizeMin_;  //unit: bytes
+    UInt64 sizeMax_;  //unit: bytes
+    Int64  currentTime;
 };
 }
 
@@ -84,18 +87,18 @@ SoftFilter::SoftFilter(size_t timeSpan, UnitTime unitTimeSpan,
                        size_t sizeMax,  UnitSize unitSizeMax) :
     currentTime(wxGetUTCTime())
 {
-    zen::resolveUnits(timeSpan, unitTimeSpan,
-                      sizeMin, unitSizeMin,
-                      sizeMax, unitSizeMax,
-                      timeSpan_, //unit: seconds
-                      sizeMin_,   //unit: bytes
-                      sizeMax_);  //unit: bytes
+    resolveUnits(timeSpan, unitTimeSpan,
+                 sizeMin, unitSizeMin,
+                 sizeMax, unitSizeMax,
+                 timeSpan_, //unit: seconds
+                 sizeMin_,   //unit: bytes
+                 sizeMax_);  //unit: bytes
 }
 
 inline
-SoftFilter::SoftFilter(zen::Int64  timeSpan,
-                       zen::UInt64 sizeMin,
-                       zen::UInt64 sizeMax) :
+SoftFilter::SoftFilter(Int64  timeSpan,
+                       UInt64 sizeMin,
+                       UInt64 sizeMax) :
     timeSpan_(timeSpan),
     sizeMin_ (sizeMin),
     sizeMax_ (sizeMax),
@@ -112,9 +115,9 @@ SoftFilter combineFilters(const SoftFilter& first, const SoftFilter& second)
 inline
 bool SoftFilter::isNull() const //filter is equivalent to NullFilter, but may be technically slower
 {
-    return timeSpan_ == std::numeric_limits<zen::Int64>::max() &&
+    return timeSpan_ == std::numeric_limits<Int64>::max() &&
            sizeMin_  == 0U &&
-           sizeMax_  == std::numeric_limits<zen::UInt64>::max();
+           sizeMax_  == std::numeric_limits<UInt64>::max();
 }
 }
 

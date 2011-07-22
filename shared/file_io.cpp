@@ -5,7 +5,6 @@
 // **************************************************************************
 //
 #include "file_io.h"
-#include "string_conv.h"
 #include "last_error.h"
 #include "i18n.h"
 
@@ -31,7 +30,7 @@ FileInput::FileInput(const Zstring& filename)  : //throw (FileError, ErrorNotExi
 #ifdef FFS_WIN
     fileHandle = ::CreateFile(zen::applyLongPathPrefix(filename).c_str(),
                               GENERIC_READ,
-                              FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //all shared modes are required to read files that are open in other applications
+                              FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //all shared modes are required to read open files that are shared by other applications
                               NULL,
                               OPEN_EXISTING,
                               FILE_FLAG_SEQUENTIAL_SCAN,
@@ -64,8 +63,7 @@ FileInput::FileInput(const Zstring& filename)  : //throw (FileError, ErrorNotExi
     {
         const DWORD lastError = ::GetLastError();
 
-        wxString errorMessage = wxString(_("Error opening file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"");
-        errorMessage += wxT("\n\n") + zen::getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error opening file:") + "\n\"" + filename_ + "\"" + "\n\n" + zen::getLastErrorFormatted(lastError);
 
         if (lastError == ERROR_FILE_NOT_FOUND ||
             lastError == ERROR_PATH_NOT_FOUND)
@@ -73,14 +71,14 @@ FileInput::FileInput(const Zstring& filename)  : //throw (FileError, ErrorNotExi
 
         throw FileError(errorMessage);
     }
+
 #elif defined FFS_LINUX
     fileHandle = ::fopen(filename.c_str(), "r,type=record,noseek"); //utilize UTF-8 filename
     if (fileHandle == NULL)
     {
         const int lastError = errno;
 
-        wxString errorMessage = wxString(_("Error opening file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"");
-        errorMessage += wxT("\n\n") + zen::getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error opening file:") + "\n\"" + filename_ + "\"" + "\n\n" + zen::getLastErrorFormatted(lastError);
 
         if (lastError == ENOENT)
             throw ErrorNotExisting(errorMessage);
@@ -114,10 +112,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
     const size_t bytesRead = ::fread(buffer, 1, bytesToRead, fileHandle);
     if (::ferror(fileHandle) != 0)
 #endif
-    {
-        wxString errorMessage = wxString(_("Error reading file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"");
-        throw FileError(errorMessage + wxT("\n\n") + zen::getLastErrorFormatted());
-    }
+        throw FileError(_("Error reading file:") + "\n\"" + filename_ + "\"" + "\n\n" + zen::getLastErrorFormatted());
 
 #ifdef FFS_WIN
     if (bytesRead < bytesToRead) //falsify only!
@@ -127,10 +122,7 @@ size_t FileInput::read(void* buffer, size_t bytesToRead) //returns actual number
         eofReached = true;
 
     if (bytesRead > bytesToRead)
-    {
-        wxString errorMessage = wxString(_("Error reading file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"");
-        throw FileError(errorMessage + wxT("\n\n") + wxT("buffer overflow"));
-    }
+        throw FileError(_("Error reading file:") + "\n\"" + filename_ + "\"" + "\n\n" + "buffer overflow");
 
     return bytesRead;
 }
@@ -151,7 +143,7 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw (Fi
 #ifdef FFS_WIN
     fileHandle = ::CreateFile(zen::applyLongPathPrefix(filename).c_str(),
                               GENERIC_WRITE,
-                              FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, //note: FILE_SHARE_DELETE is required to rename file while handle is open!
+                              FILE_SHARE_READ | FILE_SHARE_DELETE, //note: FILE_SHARE_DELETE is required to rename file while handle is open!
                               NULL,
                               access == ACC_OVERWRITE ? CREATE_ALWAYS : CREATE_NEW,
                               FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN,
@@ -159,8 +151,7 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw (Fi
     if (fileHandle == INVALID_HANDLE_VALUE)
     {
         const DWORD lastError = ::GetLastError();
-        wxString errorMessage = wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"");
-        errorMessage += wxT("\n\n") + zen::getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error writing file:") + "\n\"" + filename_ + "\"" + "\n\n" + zen::getLastErrorFormatted(lastError);
 
         if (lastError == ERROR_FILE_EXISTS)
             throw ErrorTargetExisting(errorMessage);
@@ -178,8 +169,7 @@ FileOutput::FileOutput(const Zstring& filename, AccessFlag access) : //throw (Fi
     if (fileHandle == NULL)
     {
         const int lastError = errno;
-        wxString errorMessage = wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"");
-        errorMessage += wxT("\n\n") + zen::getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error writing file:") + "\n\"" + filename_ + "\"" + "\n\n" + zen::getLastErrorFormatted(lastError);
         if (lastError == EEXIST)
             throw ErrorTargetExisting(errorMessage);
 
@@ -215,14 +205,8 @@ void FileOutput::write(const void* buffer, size_t bytesToWrite) //throw (FileErr
     const size_t bytesWritten = ::fwrite(buffer, 1, bytesToWrite, fileHandle);
     if (::ferror(fileHandle) != 0)
 #endif
-    {
-        wxString errorMessage = wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"");
-        throw FileError(errorMessage + wxT("\n\n") + zen::getLastErrorFormatted() + wxT(" (w)")); //w -> distinguish from fopen error message!
-    }
+        throw FileError(_("Error writing file:") + "\n\"" + filename_ + "\"" + "\n\n" + zen::getLastErrorFormatted() + " (w)"); //w -> distinguish from fopen error message!
 
     if (bytesWritten != bytesToWrite) //must be fulfilled for synchronous writes!
-    {
-        wxString errorMessage = wxString(_("Error writing file:")) + wxT("\n\"") + zToWx(filename_) + wxT("\"");
-        throw FileError(errorMessage + wxT("\n\n") + wxT("incomplete write"));
-    }
+        throw FileError(_("Error writing file:") + "\n\"" + filename_ + "\"" + "\n\n" + "incomplete write");
 }

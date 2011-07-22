@@ -200,19 +200,3 @@ SyncOperation FileSystemObject::getSyncOperation(
 
     return SO_DO_NOTHING; //dummy
 }
-
-
-const Zstring& zen::getSyncDBFilename()
-{
-    //Linux and Windows builds are binary incompatible: char/wchar_t case, sensitive/insensitive
-    //32 and 64 bit db files ARE designed to be binary compatible!
-    //Give db files different names.
-    //make sure they end with ".ffs_db". These files will not be included into comparison when located in base sync directories
-#ifdef FFS_WIN
-    static Zstring output = Zstring(Zstr("sync.")) + SYNC_DB_FILE_ENDING;
-#elif defined FFS_LINUX
-    //files beginning with dots are hidden e.g. in Nautilus
-    static Zstring output = Zstring(Zstr(".sync.")) + SYNC_DB_FILE_ENDING;
-#endif
-    return output;
-}

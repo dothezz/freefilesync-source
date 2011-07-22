@@ -10,7 +10,6 @@
 #include <wx/string.h>
 #include <vector>
 #include "shared/zstring.h"
-#include "shared/system_constants.h"
 #include "shared/assert_static.h"
 #include <memory>
 #include "shared/int64.h"
@@ -50,9 +49,9 @@ enum CompareFilesResult
 //attention make sure these /|\  \|/ three enums match!!!
 enum CompareDirResult
 {
-    DIR_LEFT_SIDE_ONLY  = FILE_LEFT_SIDE_ONLY,
-    DIR_RIGHT_SIDE_ONLY = FILE_RIGHT_SIDE_ONLY,
-    DIR_EQUAL           = FILE_EQUAL,
+    DIR_LEFT_SIDE_ONLY     = FILE_LEFT_SIDE_ONLY,
+    DIR_RIGHT_SIDE_ONLY    = FILE_RIGHT_SIDE_ONLY,
+    DIR_EQUAL              = FILE_EQUAL,
     DIR_DIFFERENT_METADATA = FILE_DIFFERENT_METADATA //both sides equal, but different metadata only
 };
 
@@ -335,13 +334,16 @@ struct MainConfiguration
         compareVar(CMP_BY_TIME_SIZE),
         handleSymlinks(SYMLINK_IGNORE),
 #ifdef FFS_WIN
-        globalFilter(Zstr("*"), Zstr("\
+        globalFilter(Zstr("*"),
+                     Zstr("\
 \\System Volume Information\\\n\
-\\RECYCLER\\\n\
 \\RECYCLED\\\n\
-\\$Recycle.Bin\\")), //exclude Recycle Bin
+\\RECYCLER\\\n\
+\\$Recycle.Bin\\")),
 #elif defined FFS_LINUX
-        //exclude nothing
+        globalFilter(Zstr("*"),
+                     Zstr("/.Trash-*/\n\
+                          /.recycle/")),
 #endif
         handleDeletion(MOVE_TO_RECYCLE_BIN) {}
 

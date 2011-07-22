@@ -109,10 +109,10 @@
 <target>Erstmalige Synchronisation:</target>
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Eine der FreeFileSync Datenbankdateien existiert noch nicht:</target>
-<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
-<target>Einer der FreeFileSync Datenbankeinträge innerhalb der folgenden Datei existiert noch nicht:</target>
 <source>Error reading from synchronization database:</source>
 <target>Fehler beim Lesen der Synchronisationsdatenbank:</target>
+<source>No matching synchronization session found in database files:</source>
+<target></target>
 <source>An exception occurred!</source>
 <target>Eine Ausnahme ist aufgetreten!</target>
 <source>Error deleting file:</source>
@@ -134,7 +134,7 @@
 <source>Info</source>
 <target>Info</target>
 <source>Fatal Error</source>
-<target>Fataler Fehler</target>
+<target>Schwerer Fehler</target>
 <source>Invalid FreeFileSync config file!</source>
 <target>Ungültige FreeFileSync Konfigurationsdatei!</target>
 <source>File does not exist:</source>
@@ -695,10 +695,6 @@ Transfer file and directory permissions
 <target>Verzeichnispaare</target>
 <source>Select view</source>
 <target>Ansicht auswählen</target>
-<source>Folder Comparison and Synchronization</source>
-<target>Verzeichnisvergleich und Synchronisation</target>
-<source>Recycle Bin not yet supported for this system!</source>
-<target>Der Papierkorb wird für dieses System noch nicht unterstützt!</target>
 <source>Set direction:</source>
 <target>Setze Richtung:</target>
 <source>Exclude temporarily</source>
@@ -733,6 +729,8 @@ Transfer file and directory permissions
 <target>Änderungen der aktuellen Konfiguration sichern?</target>
 <source>Configuration loaded!</source>
 <target>Konfiguration geladen!</target>
+<source>Folder Comparison and Synchronization</source>
+<target>Verzeichnisvergleich und Synchronisation</target>
 <source>Hide files that exist on left side only</source>
 <target>Nur links existierende Dateien ausblenden</target>
 <source>Show files that exist on left side only</source>
@@ -1043,6 +1041,8 @@ Transfer file and directory permissions
 <target>Benötigter freier Speicherplatz:</target>
 <source>Free disk space available:</source>
 <target>Verfügbarer freier Speicherplatz:</target>
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target></target>
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>Es wird ein Verzeichnis verändert werden, das Teil mehrerer Verzeichnispaare ist! Bitte die Synchronisationseinstellungen prüfen!</target>
 <source>Processing folder pair:</source>

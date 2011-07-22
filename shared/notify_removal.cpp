@@ -4,10 +4,10 @@
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
 //
-#include "notify.h"
+#include "notify_removal.h"
 #include <set>
-#include "../shared/last_error.h"
-#include "../shared/Loki/ScopeGuard.h"
+#include "last_error.h"
+#include "Loki/ScopeGuard.h"
 #include <algorithm>
 #include <boost/bind.hpp>
 #include <dbt.h>
@@ -51,10 +51,10 @@ public:
         virtual ~Listener() {}
         virtual void onMessage(UINT message, WPARAM wParam, LPARAM lParam) = 0; //throw()!
     };
-    void registerListener(Listener& l);
-    void unregisterListener(Listener& l); //don't unregister objects with static lifetime
+    void   registerListener(Listener& l) { listener.insert(&l); }
+    void unregisterListener(Listener& l) { listener.erase(&l); } //don't unregister objects with static lifetime
 
-    HWND getWnd() const; //get handle in order to register additional notifications
+    HWND getWnd() const { return windowHandle; } //get handle in order to register additional notifications
 
 private:
     MessageProvider();
@@ -99,8 +99,7 @@ MessageProvider::MessageProvider() :
     windowHandle(NULL)
 {
     if (process == NULL)
-        throw zen::FileError(wxString(wxT("Could not start monitoring window notifications:")) + wxT("\n\n") +
-                             zen::getLastErrorFormatted() + wxT(" (GetModuleHandle)"));
+        throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + "\n\n" + getLastErrorFormatted() + " (GetModuleHandle)");
 
     //register the main window class
     WNDCLASS wc = {};
@@ -109,8 +108,7 @@ MessageProvider::MessageProvider() :
     wc.lpszClassName = WINDOW_NAME;
 
     if (::RegisterClass(&wc) == 0)
-        throw zen::FileError(wxString(wxT("Could not start monitoring window notifications:")) + wxT("\n\n") +
-                             zen::getLastErrorFormatted() + wxT(" (RegisterClass)"));
+        throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + "\n\n" + getLastErrorFormatted() + " (RegisterClass)");
 
     Loki::ScopeGuard guardClass = Loki::MakeGuard(::UnregisterClass, WINDOW_NAME, process);
 
@@ -128,8 +126,7 @@ MessageProvider::MessageProvider() :
                        process, //HINSTANCE hInstance,
                        NULL);   //LPVOID lpParam
     if (windowHandle == NULL)
-        throw zen::FileError(wxString(wxT("Could not start monitoring window notifications:")) + wxT("\n\n") +
-                             zen::getLastErrorFormatted() + wxT(" (CreateWindow)"));
+        throw zen::FileError(std::wstring(L"Could not start monitoring window notifications:") + "\n\n" + getLastErrorFormatted() + " (CreateWindow)");
 
     guardClass.Dismiss();
 }
@@ -144,27 +141,6 @@ MessageProvider::~MessageProvider()
 }
 
 
-inline
-void MessageProvider::registerListener(Listener& l)
-{
-    listener.insert(&l);
-}
-
-
-inline
-void MessageProvider::unregisterListener(Listener& l) //don't unregister objects with static lifetime
-{
-    listener.erase(&l);
-}
-
-
-inline
-HWND MessageProvider::getWnd() const //get handle in order to register additional notifications
-{
-    return windowHandle;
-}
-
-
 void MessageProvider::processMessage(UINT message, WPARAM wParam, LPARAM lParam)
 {
     std::for_each(listener.begin(), listener.end(), boost::bind(&Listener::onMessage, _1, message, wParam, lParam));
@@ -175,7 +151,7 @@ void MessageProvider::processMessage(UINT message, WPARAM wParam, LPARAM lParam)
 class NotifyRequestDeviceRemoval::Pimpl : private MessageProvider::Listener
 {
 public:
-    Pimpl(NotifyRequestDeviceRemoval& parent, const std::vector<HANDLE>& openHandles) : //throw (FileError)
+    Pimpl(NotifyRequestDeviceRemoval& parent, HANDLE hDir) : //throw (FileError)
         parent_(parent)
     {
         MessageProvider::instance().registerListener(*this); //throw (FileError)
@@ -184,44 +160,32 @@ public:
         DEV_BROADCAST_HANDLE filter = {};
         filter.dbch_size = sizeof(filter);
         filter.dbch_devicetype = DBT_DEVTYP_HANDLE;
+        filter.dbch_handle = hDir;
 
-        try
+        hNotification = ::RegisterDeviceNotification(
+                            MessageProvider::instance().getWnd(), //__in  HANDLE hRecipient,
+                            &filter,                              //__in  LPVOID NotificationFilter,
+                            DEVICE_NOTIFY_WINDOW_HANDLE);         //__in  DWORD Flags
+        if (hNotification == NULL)
         {
-            for (std::vector<HANDLE>::const_iterator i = openHandles.begin(); i != openHandles.end(); ++i)
-            {
-                filter.dbch_handle = *i;
-
-                HDEVNOTIFY hNotfication = ::RegisterDeviceNotification(
-                                              MessageProvider::instance().getWnd(), //__in  HANDLE hRecipient,
-                                              &filter,                              //__in  LPVOID NotificationFilter,
-                                              DEVICE_NOTIFY_WINDOW_HANDLE);         //__in  DWORD Flags
-                if (hNotfication == NULL)
-                {
-                    const DWORD lastError = ::GetLastError();
-                    if (lastError != ERROR_CALL_NOT_IMPLEMENTED   && //fail on SAMBA share: this shouldn't be a showstopper!
-                        lastError != ERROR_SERVICE_SPECIFIC_ERROR && //neither should be fail for "Pogoplug" mapped network drives
-                        lastError != ERROR_INVALID_DATA)             //this seems to happen for a NetDrive-mapped FTP server
-                        throw zen::FileError(wxString(wxT("Could not register device removal notifications:")) + wxT("\n\n") + zen::getLastErrorFormatted(lastError));
-                }
-                else
-                    notifications.insert(hNotfication);
-            }
-        }
-        catch (...)
-        {
-            std::for_each(notifications.begin(), notifications.end(), ::UnregisterDeviceNotification);
-            MessageProvider::instance().unregisterListener(*this); //throw() in this case
-            throw;
+            const DWORD lastError = ::GetLastError();
+            if (lastError != ERROR_CALL_NOT_IMPLEMENTED   && //fail on SAMBA share: this shouldn't be a showstopper!
+                lastError != ERROR_SERVICE_SPECIFIC_ERROR && //neither should be fail for "Pogoplug" mapped network drives
+                lastError != ERROR_INVALID_DATA)             //this seems to happen for a NetDrive-mapped FTP server
+                throw zen::FileError(std::wstring(L"Could not register device removal notifications:") + "\n\n" + getLastErrorFormatted(lastError));
         }
     }
 
     ~Pimpl()
     {
-        std::for_each(notifications.begin(), notifications.end(), ::UnregisterDeviceNotification);
+        ::UnregisterDeviceNotification(hNotification);
         MessageProvider::instance().unregisterListener(*this);
     }
 
 private:
+	Pimpl(Pimpl&);
+	Pimpl& operator=(Pimpl&);
+
     virtual void onMessage(UINT message, WPARAM wParam, LPARAM lParam) //throw()!
     {
         //DBT_DEVICEQUERYREMOVE example: http://msdn.microsoft.com/en-us/library/aa363427(v=VS.85).aspx
@@ -241,7 +205,7 @@ private:
 #else
                     const HDEVNOTIFY requestNotification = body->dbch_hdevnotify;
 #endif
-                    if (notifications.find(requestNotification) != notifications.end()) //is it for one of our notifications we registered?
+                    if (requestNotification == hNotification) //is it for the notification we registered?
                         switch (wParam)
                         {
                             case DBT_DEVICEQUERYREMOVE:
@@ -260,14 +224,14 @@ private:
     }
 
     NotifyRequestDeviceRemoval& parent_;
-    std::set<HDEVNOTIFY> notifications;
+    HDEVNOTIFY hNotification;
 };
 //####################################################################################################
 
 
-NotifyRequestDeviceRemoval::NotifyRequestDeviceRemoval(const std::vector<HANDLE>& openHandles)
+NotifyRequestDeviceRemoval::NotifyRequestDeviceRemoval(HANDLE hDir)
 {
-    pimpl.reset(new Pimpl(*this, openHandles));
+    pimpl.reset(new Pimpl(*this, hDir));
 }
 
 

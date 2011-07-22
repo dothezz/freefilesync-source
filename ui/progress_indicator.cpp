@@ -67,7 +67,7 @@ public:
     void switchToCompareBytewise(int totalObjectsToProcess, zen::Int64 totalDataToProcess);
     void incScannedObjects_NoUpdate(int number);
     void incProcessedCmpData_NoUpdate(int objectsProcessed, zen::Int64 dataProcessed);
-    void setStatusText_NoUpdate(const Zstring& text);
+    void setStatusText_NoUpdate(const wxString& text);
     void updateStatusPanelNow();
 
 private:
@@ -76,7 +76,7 @@ private:
 
     //status variables
     size_t scannedObjects;
-    Zstring currentStatusText;
+    wxString currentStatusText;
 
     wxStopWatch timeElapsed;
 
@@ -146,7 +146,7 @@ void CompareStatus::incProcessedCmpData_NoUpdate(int objectsProcessed, zen::Int6
     pimpl->incProcessedCmpData_NoUpdate(objectsProcessed, dataProcessed);
 }
 
-void CompareStatus::setStatusText_NoUpdate(const Zstring& text)
+void CompareStatus::setStatusText_NoUpdate(const wxString& text)
 {
     pimpl->setStatusText_NoUpdate(text);
 }
@@ -276,7 +276,7 @@ void CompareStatus::CompareStatusImpl::incProcessedCmpData_NoUpdate(int objectsP
 }
 
 
-void CompareStatus::CompareStatusImpl::setStatusText_NoUpdate(const Zstring& text)
+void CompareStatus::CompareStatusImpl::setStatusText_NoUpdate(const wxString& text)
 {
     currentStatusText = text;
 }
@@ -334,10 +334,8 @@ void CompareStatus::CompareStatusImpl::updateStatusPanelNow()
         bool updateLayout = false; //avoid screen flicker by calling layout() only if necessary
 
         //remove linebreaks from currentStatusText
-        wxString formattedStatusText = zToWx(currentStatusText);
-        for (wxString::iterator i = formattedStatusText.begin(); i != formattedStatusText.end(); ++i)
-            if (*i == wxChar('\n'))
-                *i = wxChar(' ');
+        wxString formattedStatusText = currentStatusText;
+        replace(formattedStatusText, L'\n', L' ');
 
         //status texts
         if (m_textCtrlStatus->GetValue() != formattedStatusText) //no layout update for status texts!
@@ -490,7 +488,7 @@ public:
     void resetGauge(int totalObjectsToProcess, zen::Int64 totalDataToProcess);
     void incProgressIndicator_NoUpdate(int objectsProcessed, zen::Int64 dataProcessed);
     void incScannedObjects_NoUpdate(int number);
-    void setStatusText_NoUpdate(const Zstring& text);
+    void setStatusText_NoUpdate(const wxString& text);
     void updateStatusDialogNow();
 
     void setCurrentStatus(SyncStatus::SyncStatusID id);
@@ -525,7 +523,7 @@ private:
 
     //status variables
     size_t scannedObjects;
-    Zstring currentStatusText;
+    wxString currentStatusText;
 
     bool processPaused;
     SyncStatus::SyncStatusID currentStatus;
@@ -596,7 +594,7 @@ void SyncStatus::incProgressIndicator_NoUpdate(int objectsProcessed, zen::Int64 
     pimpl->incProgressIndicator_NoUpdate(objectsProcessed, dataProcessed);
 }
 
-void SyncStatus::setStatusText_NoUpdate(const Zstring& text)
+void SyncStatus::setStatusText_NoUpdate(const wxString& text)
 {
     pimpl->setStatusText_NoUpdate(text);
 }
@@ -661,14 +659,14 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
     m_gauge1->SetRange(GAUGE_FULL_RANGE);
     m_gauge1->SetValue(0);
 
+
+    EnableCloseButton(false);
+
     if (IsShown()) //don't steal focus when starting in sys-tray!
         m_buttonAbort->SetFocus();
 
     if (mainDialog)
-    {
-        mainDialog->EnableCloseButton(false);
         mainDialog->disableAllElements(false); //disable all child elements
-    }
 
     timeElapsed.Start(); //measure total time
 
@@ -697,7 +695,6 @@ SyncStatus::SyncStatusImpl::~SyncStatusImpl()
 {
     if (mainDialog)
     {
-        mainDialog->EnableCloseButton(true);
         mainDialog->enableAllElements();
 
         //restore title text
@@ -716,7 +713,21 @@ void SyncStatus::SyncStatusImpl::OnKeyPressed(wxKeyEvent& event)
 {
     const int keyCode = event.GetKeyCode();
     if (keyCode == WXK_ESCAPE)
-        Close(); //generate close event: do NOT destroy window unconditionally!
+    {
+        wxCommandEvent dummy(wxEVT_COMMAND_BUTTON_CLICKED);
+
+        //simulate click on abort button
+        if (m_buttonAbort->IsShown()) //delegate to "abort" button if available
+        {
+            m_buttonAbort->GetEventHandler()->ProcessEvent(dummy);
+            return;
+        }
+        else if (m_buttonOK->IsShown()) //delegate to "abort" button if available
+        {
+            m_buttonOK->GetEventHandler()->ProcessEvent(dummy);
+            return;
+        }
+    }
 
     event.Skip();
 }
@@ -762,7 +773,7 @@ void SyncStatus::SyncStatusImpl::incScannedObjects_NoUpdate(int number)
 }
 
 
-void SyncStatus::SyncStatusImpl::setStatusText_NoUpdate(const Zstring& text)
+void SyncStatus::SyncStatusImpl::setStatusText_NoUpdate(const wxString& text)
 {
     currentStatusText = text;
 }
@@ -833,7 +844,7 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
     //static RetrieveStatistics statistic;
     //statistic.writeEntry(currentData.ToDouble(), currentObjects);
 
-    const float percent = totalData == 0 ? 0 : to<double>(currentData) * 100.0 / to<double>(totalData);
+    const float percent = totalData == 0 ? 100.0 : to<double>(currentData) * 100.0 / to<double>(totalData);
 
     //write status information to systray, taskbar, parent title ect.
 
@@ -886,9 +897,8 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
         }
 
         //status text
-        const wxString statusTxt = zToWx(currentStatusText);
-        if (m_textCtrlInfo->GetValue() != statusTxt) //no layout update for status texts!
-            m_textCtrlInfo->ChangeValue(statusTxt);
+        if (m_textCtrlInfo->GetValue() != currentStatusText) //no layout update for status texts!
+            m_textCtrlInfo->ChangeValue(currentStatusText);
 
         //remaining objects
         const wxString remainingObjTmp = toStringSep(totalObjects - currentObjects);
@@ -1016,6 +1026,8 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id,
 
     resumeFromSystray(); //if in tray mode...
 
+    EnableCloseButton(true);
+
     m_buttonAbort->Disable();
     m_buttonAbort->Hide();
     m_buttonPause->Disable();
@@ -1074,7 +1086,7 @@ void SyncStatus::SyncStatusImpl::OnAbort(wxCommandEvent& event)
         m_buttonPause->Disable();
         m_buttonPause->Hide();
 
-        setStatusText_NoUpdate(wxToZ(_("Abort requested: Waiting for current operation to finish...")));
+        setStatusText_NoUpdate(_("Abort requested: Waiting for current operation to finish..."));
         //no Layout() or UI-update here to avoid cascaded Yield()-call
 
         abortCb_->requestAbortion();
@@ -1114,17 +1126,11 @@ void SyncStatus::SyncStatusImpl::OnPause(wxCommandEvent& event)
 
 void SyncStatus::SyncStatusImpl::OnClose(wxCloseEvent& event)
 {
-    if (m_buttonAbort->IsShown()) //delegate to "abort" button if available
-    {
-        wxCommandEvent dummy(wxEVT_COMMAND_BUTTON_CLICKED);
-        m_buttonAbort->GetEventHandler()->ProcessEvent(dummy);
-
-        if (event.CanVeto())
-        {
-            event.Veto(); //that's what we want here
-            return;
-        }
-    }
+    //this event handler may be called due to a system shutdown DURING synchronization!
+    //try to stop sync gracefully and cross fingers:
+    if (currentProcessIsRunning())
+        abortCb_->requestAbortion();
+    //Note: we must NOT veto dialog destruction, else we will cancel system shutdown if this dialog is application main window (like in batch mode)
 
     Destroy();
 }

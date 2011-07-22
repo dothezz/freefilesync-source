@@ -2,7 +2,6 @@
 #include <wx/utils.h>
 #include <wx/datetime.h>
 #include "string_conv.h"
-#include "system_constants.h"
 #include "loki/ScopeGuard.h"
 
 #ifdef FFS_WIN
@@ -17,7 +16,6 @@
 #endif
 
 using namespace zen;
-using namespace common;
 
 
 namespace
@@ -73,29 +71,22 @@ bool replaceMacro(wxString& macro) //macro without %-characters, return true if 
         return true;
     }
 
-    if (macro.CmpNoCase(wxT("weekday")) == 0)
+    auto processPhrase = [&](const wchar_t* phrase, const wchar_t* format) -> bool
     {
-        macro = wxDateTime::Now().Format(wxT("%A"));
+        if (macro.CmpNoCase(phrase) != 0)
+            return false;
+        macro = wxDateTime::Now().Format(format);
         return true;
-    }
+    };
 
-    if (macro.CmpNoCase(wxT("month")) == 0)
-    {
-        macro = wxDateTime::Now().Format(wxT("%B"));
-        return true;
-    }
-
-    if (macro.CmpNoCase(wxT("week")) == 0)
-    {
-        macro = wxDateTime::Now().Format(wxT("%U"));
-        return true;
-    }
-
-    if (macro.CmpNoCase(wxT("year")) == 0)
-    {
-        macro = wxDateTime::Now().Format(wxT("%Y"));
-        return true;
-    }
+    if (processPhrase(L"weekday", L"%A")) return true;
+    if (processPhrase(L"day"    , L"%d")) return true;
+    if (processPhrase(L"month"  , L"%B")) return true;
+    if (processPhrase(L"week"   , L"%U")) return true;
+    if (processPhrase(L"year"   , L"%Y")) return true;
+    if (processPhrase(L"hour"   , L"%H")) return true;
+    if (processPhrase(L"min"    , L"%M")) return true;
+    if (processPhrase(L"sec"    , L"%S")) return true;
 
     //try to apply environment variables
     wxString envValue;
@@ -163,7 +154,7 @@ public:
         devices_.insert(std::make_pair(shortName, fullName));
         return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //DON'T traverse into subdirs
     }
-    virtual void onError(const wxString& errorText) {}
+    virtual HandleError onError(const std::wstring& errorText) { return TRAV_ERROR_IGNORE; }
 
 private:
     DeviceList& devices_;
@@ -285,10 +276,10 @@ Zstring zen::getFormattedDirectoryName(const Zstring& dirname)
     //Formatting is needed since functions expect the directory to end with '\' to be able to split the relative names.
     //note: don't combine directory formatting with wxFileName, as it doesn't respect //?/ - prefix!
 
-    wxString dirnameTmp = zToWx(dirname);
+    wxString dirnameTmp = toWx(dirname);
     expandMacros(dirnameTmp);
 
-    Zstring output = wxToZ(dirnameTmp);
+    Zstring output = toZ(dirnameTmp);
 
     expandVolumeName(output);
 

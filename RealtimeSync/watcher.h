@@ -33,7 +33,7 @@ enum WaitResult
     CHANGE_DETECTED,
     CHANGE_DIR_MISSING
 };
-WaitResult waitForChanges(const std::vector<Zstring>& dirNames444, WaitCallback* statusHandler); //throw(FileError)
+WaitResult waitForChanges(const std::vector<Zstring>& dirNames, WaitCallback* statusHandler); //throw(FileError)
 
 //wait until all directories become available (again)
 void waitForMissingDirs(const std::vector<Zstring>& dirNames, WaitCallback* statusHandler); //throw(FileError)

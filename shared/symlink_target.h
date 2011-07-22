@@ -9,7 +9,6 @@
 
 #include "loki/ScopeGuard.h"
 #include "last_error.h"
-#include "string_conv.h"
 #include "file_error.h"
 #include "i18n.h"
 
@@ -63,19 +62,18 @@ namespace
 //retrieve raw target data of symlink or junction
 Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw (FileError)
 {
-    using zen::zToWx;
-    using zen::FileError;
+    using namespace zen;
 #ifdef FFS_WIN
     //FSCTL_GET_REPARSE_POINT: http://msdn.microsoft.com/en-us/library/aa364571(VS.85).aspx
 
     try //reading certain symlinks requires admin rights! This shall not cause an error in user mode!
     {
         //allow access to certain symbolic links/junctions
-        zen::Privileges::getInstance().ensureActive(SE_BACKUP_NAME); //throw (FileError)
+        Privileges::getInstance().ensureActive(SE_BACKUP_NAME); //throw (FileError)
     }
     catch (...) {}
 
-    const HANDLE hLink = ::CreateFile(zen::applyLongPathPrefix(linkPath).c_str(),
+    const HANDLE hLink = ::CreateFile(applyLongPathPrefix(linkPath).c_str(),
                                       GENERIC_READ,
                                       FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                                       NULL,
@@ -83,10 +81,8 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw (FileError)
                                       FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
                                       NULL);
     if (hLink == INVALID_HANDLE_VALUE)
-    {
-        wxString errorMessage = wxString(_("Error resolving symbolic link:")) + wxT("\n\"") + zen::zToWx(linkPath) + wxT("\"");
-        throw FileError(errorMessage + wxT("\n\n") + zen::getLastErrorFormatted());
-    }
+        throw FileError(_("Error resolving symbolic link:") + "\n\"" + linkPath + "\"" + "\n\n" + getLastErrorFormatted());
+
     Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hLink);
     (void)dummy; //silence warning "unused variable"
 
@@ -102,10 +98,7 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw (FileError)
                            static_cast<DWORD>(buffer.size()), //__in         DWORD nOutBufferSize,
                            &bytesReturned,          //__out_opt    LPDWORD lpBytesReturned,
                            NULL))                   //__inout_opt  LPOVERLAPPED lpOverlapped
-    {
-        wxString errorMessage = wxString(_("Error resolving symbolic link:")) + wxT("\n\"") + zen::zToWx(linkPath) + wxT("\"");
-        throw FileError(errorMessage + wxT("\n\n") + zen::getLastErrorFormatted());
-    }
+        throw FileError(_("Error resolving symbolic link:") + "\n\"" + linkPath + "\"" + "\n\n" + getLastErrorFormatted());
 
     REPARSE_DATA_BUFFER& reparseData = *reinterpret_cast<REPARSE_DATA_BUFFER*>(&buffer[0]); //REPARSE_DATA_BUFFER needs to be artificially enlarged!
 
@@ -121,10 +114,7 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw (FileError)
                          reparseData.MountPointReparseBuffer.SubstituteNameLength / sizeof(WCHAR));
     }
     else
-    {
-        wxString errorMessage = wxString(_("Error resolving symbolic link:")) + wxT("\n\"") + zen::zToWx(linkPath) + wxT("\"");
-        throw FileError(errorMessage + wxT("\n\n") + wxT("Not a symbolic link or junction!"));
-    }
+        throw FileError(_("Error resolving symbolic link:") + "\n\"" + linkPath + "\"" + "\n\n" + "Not a symbolic link or junction!");
 
     //absolute symlinks and junctions technically start with \??\ while relative ones do not
     if (output.StartsWith(Zstr("\\??\\")))
@@ -139,8 +129,9 @@ Zstring getSymlinkRawTargetString(const Zstring& linkPath) //throw (FileError)
     const int bytesWritten = ::readlink(linkPath.c_str(), buffer, BUFFER_SIZE);
     if (bytesWritten < 0 || bytesWritten >= BUFFER_SIZE)
     {
-        wxString errorMessage = wxString(_("Error resolving symbolic link:")) + wxT("\n\"") + zToWx(linkPath) + wxT("\"");
-        if (bytesWritten < 0) errorMessage += wxString(wxT("\n\n")) + zen::getLastErrorFormatted();
+        std::wstring errorMessage = _("Error resolving symbolic link:") + "\n\"" + linkPath + "\"";
+        if (bytesWritten < 0)
+            errorMessage += L"\n\n" + getLastErrorFormatted();
         throw FileError(errorMessage);
     }
     buffer[bytesWritten] = 0; //set null-terminating char

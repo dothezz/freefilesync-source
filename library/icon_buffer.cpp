@@ -26,8 +26,6 @@
 
 using namespace zen;
 
-
-
 const size_t BUFFER_SIZE_MAX = 800; //maximum number of icons to buffer
 
 //---------------------------------------------------------------------------------------------------
@@ -80,7 +78,7 @@ public:
     IconHolder(HandleType handle = 0) : handle_(handle) {} //take ownership!
 
     //icon holder has value semantics!
-    IconHolder(const IconHolder& other) : handle_(other.handle_ == 0 ? 0 :
+    IconHolder(const IconHolder& other) : handle_(other.handle_ == NULL ? NULL :
 #ifdef FFS_WIN
                                                       ::CopyIcon(other.handle_)
 #elif defined FFS_LINUX
@@ -96,7 +94,7 @@ public:
 
     ~IconHolder()
     {
-        if (handle_ != 0)
+        if (handle_ != NULL)
 #ifdef FFS_WIN
             ::DestroyIcon(handle_);
 #elif defined FFS_LINUX
@@ -111,7 +109,7 @@ public:
 
     wxIcon toWxIcon() const //copy HandleType, caller needs to take ownership!
     {
-        if (handle_ == 0)
+        if (handle_ == NULL)
             return wxNullIcon;
 
         IconHolder clone(*this);
@@ -123,7 +121,7 @@ public:
 #elif defined FFS_LINUX                   //
         newIcon.SetPixbuf(clone.handle_); // transfer ownership!!
 #endif                                    //
-        clone.handle_ = 0;                //
+        clone.handle_ = NULL;             //
         return newIcon;
     }
 
@@ -213,7 +211,7 @@ IconHolder getAssociatedIconByExt(const BasicString& extension)
 #endif
 
 
-const wxIcon& getDirectoryIcon() //one folder icon should be sufficient...
+const wxIcon& getDirectoryIcon()
 {
     static wxIcon folderIcon;
 
@@ -246,7 +244,7 @@ const wxIcon& getDirectoryIcon() //one folder icon should be sufficient...
 }
 
 
-const wxIcon& getFileIcon()      //in case one folder icon is sufficient...
+const wxIcon& getFileIcon()
 {
     static wxIcon fileIcon;
 
@@ -292,126 +290,85 @@ const wxIcon& getFileIcon()      //in case one folder icon is sufficient...
 
 
 //################################################################################################################################################
-class Buffer
+//---------------------- Shared Data -------------------------
+struct WorkLoad
 {
-public:
-    //methods used by gui and worker thread
-    bool requestFileIcon(const Zstring& fileName, wxIcon* icon = NULL);
-
-    //methods used by worker thread
-    void insertIntoBuffer(const BasicString& entryName, const IconHolder& icon);
-
-private:
-    //---------------------------------------------------------------------------------------------------
-    typedef std::map<BasicString, IconHolder, LessFilename> IconDB; //entryName/icon -> ATTENTION: avoid ref-counting for this shared data structure!
-    typedef std::queue<BasicString> IconDbSequence; //entryName
-    //---------------------------------------------------------------------------------------------------
-
-    //---------------------- Shared Data -------------------------
-    boost::mutex lockIconDB;
-    IconDB         iconBuffer;      //use synchronisation when accessing this!
-    IconDbSequence iconSequence; //save sequence of buffer entry to delete oldest elements
-    //------------------------------------------------------------
+    std::vector<BasicString>  filesToLoad; //processes last elements of vector first!
+    boost::mutex              mutex;
+    boost::condition_variable condition; //signal event: data for processing available
 };
 
+typedef std::map<BasicString, IconHolder, LessFilename> NameIconMap; //entryName/icon -> ATTENTION: avoid ref-counting for this shared data structure!
+typedef std::queue<BasicString> IconDbSequence; //entryName
 
-bool Buffer::requestFileIcon(const Zstring& fileName, wxIcon* icon)
+struct Buffer
 {
-    boost::lock_guard<boost::mutex> dummy(lockIconDB);
+    boost::mutex   lockAccess;
+    NameIconMap    iconMappping;   //use synchronisation when accessing this!
+    IconDbSequence iconSequence; //save sequence of buffer entry to delete oldest elements
+};
+//------------------------------------------------------------
+
+
+bool requestFileIcon(Buffer& buf, const Zstring& fileName, wxIcon* icon = NULL)
+{
+    boost::lock_guard<boost::mutex> dummy(buf.lockAccess);
 
 #ifdef FFS_WIN
     //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
-    const BasicString extension    = getFileExtension(fileName.c_str());
-    const BasicString searchString = isPriceyExtension(extension) ? fileName.c_str() : extension.c_str();
-    IconDB::const_iterator i = iconBuffer.find(searchString);
+    const BasicString extension    = getFileExtension(BasicString(fileName));
+    const BasicString searchString = isPriceyExtension(extension) ? BasicString(fileName) : extension;
+    auto iter = buf.iconMappping.find(searchString);
 #elif defined FFS_LINUX
-    IconDB::const_iterator i = iconBuffer.find(fileName.c_str());
+    auto iter = buf.iconMappping.find(BasicString(fileName));
 #endif
 
-    if (i == iconBuffer.end())
+    if (iter == buf.iconMappping.end())
         return false;
 
     if (icon != NULL)
-        *icon = i->second.toWxIcon();
-
+        *icon = iter->second.toWxIcon();
     return true;
 }
 
 
-void Buffer::insertIntoBuffer(const BasicString& entryName, const IconHolder& icon) //called by worker thread
+void insertIntoBuffer(Buffer& buf, const BasicString& entryName, const IconHolder& icon) //called by worker thread
 {
-    boost::lock_guard<boost::mutex> dummy(lockIconDB);
+    boost::lock_guard<boost::mutex> dummy(buf.lockAccess);
 
     //thread saftey: icon uses ref-counting! But is NOT shared with main thread!
-    const std::pair<IconDB::iterator, bool> rc = iconBuffer.insert(std::make_pair(entryName, icon));
+    auto rc = buf.iconMappping.insert(std::make_pair(entryName, icon));
     if (rc.second) //if insertion took place
-        iconSequence.push(entryName); //note: sharing Zstring with IconDB!!!
+        buf.iconSequence.push(entryName); //note: sharing Zstring with IconDB!!!
 
-    assert(iconBuffer.size() == iconSequence.size());
+    assert(buf.iconMappping.size() == buf.iconSequence.size());
 
     //remove elements if buffer becomes too big:
-    if (iconBuffer.size() > BUFFER_SIZE_MAX) //limit buffer size: critical because GDI resources are limited (e.g. 10000 on XP per process)
+    if (buf.iconMappping.size() > BUFFER_SIZE_MAX) //limit buffer size: critical because GDI resources are limited (e.g. 10000 on XP per process)
     {
         //remove oldest element
-        iconBuffer.erase(iconSequence.front());
-        iconSequence.pop();
+        buf.iconMappping.erase(buf.iconSequence.front());
+        buf.iconSequence.pop();
     }
 }
-
-
 //################################################################################################################################################
-class WorkerThread
+
+class WorkerThread //lifetime is part of icon buffer
 {
 public:
-    WorkerThread(Buffer& iconBuff) : iconBuffer(iconBuff)
-    {
-        threadObj = boost::thread(boost::ref(*this)); //localize all thread logic to this class!
-    }
-
-    ~WorkerThread()
-    {
-        setWorkload(std::vector<Zstring>()); //make sure interruption point is always reached!
-        threadObj.interrupt();
-        threadObj.join();
-    }
-
-    void setWorkload(const std::vector<Zstring>& load); //(re-)set new workload of icons to be retrieved
+    WorkerThread(const std::shared_ptr<WorkLoad>& workload,
+                 const std::shared_ptr<Buffer>& buffer) :
+        workload_(workload),
+        buffer_(buffer) {}
 
     void operator()(); //thread entry
 
 private:
     void doWork();
 
-    //---------------------- Shared Data -------------------------
-    typedef BasicString FileName;
-
-    struct SharedData
-    {
-        std::vector<FileName>     workload; //processes last elements of vector first!
-        boost::mutex              mutex;
-        boost::condition_variable condition; //signal event: data for processing available
-    } shared;
-    //------------------------------------------------------------
-
-    Buffer& iconBuffer;
-
-    boost::thread threadObj;
+    std::shared_ptr<WorkLoad> workload_;
+    std::shared_ptr<Buffer> buffer_;
 };
-
-
-void WorkerThread::setWorkload(const std::vector<Zstring>& load) //(re-)set new workload of icons to be retrieved
-{
-    {
-        boost::lock_guard<boost::mutex> dummy(shared.mutex);
-
-        shared.workload.clear();
-        for (std::vector<Zstring>::const_iterator i = load.begin(); i != load.end(); ++i)
-            shared.workload.push_back(FileName(i->c_str(), i->size())); //make DEEP COPY from Zstring
-    }
-
-    shared.condition.notify_one();
-    //condition handling, see: http://www.boost.org/doc/libs/1_43_0/doc/html/thread/synchronization.html#thread.synchronization.condvar_ref
-}
 
 
 void WorkerThread::operator()() //thread entry
@@ -430,9 +387,9 @@ void WorkerThread::operator()() //thread entry
         while (true)
         {
             {
-                boost::unique_lock<boost::mutex> dummy(shared.mutex);
-                while(shared.workload.empty())
-                    shared.condition.wait(dummy); //interruption point!
+                boost::unique_lock<boost::mutex> dummy(workload_->mutex);
+                while(workload_->filesToLoad.empty())
+                    workload_->condition.wait(dummy); //interruption point!
                 //shared.condition.timed_wait(dummy, boost::get_system_time() + boost::posix_time::milliseconds(100));
             }
 
@@ -461,14 +418,14 @@ void WorkerThread::doWork()
     {
         BasicString fileName;
         {
-            boost::lock_guard<boost::mutex> dummy(shared.mutex);
-            if (shared.workload.empty())
+            boost::lock_guard<boost::mutex> dummy(workload_->mutex);
+            if (workload_->filesToLoad.empty())
                 break; //enter waiting state
-            fileName = shared.workload.back(); //deep copy
-            shared.workload.pop_back();
+            fileName = workload_->filesToLoad.back(); //deep copy
+            workload_->filesToLoad.pop_back();
         }
 
-        if (iconBuffer.requestFileIcon(fileName.c_str())) //thread safety: Zstring okay, won't be reference-counted in requestIcon()
+        if (requestFileIcon(*buffer_, Zstring(fileName))) //thread safety: Zstring okay, won't be reference-counted in requestIcon()
             continue; //icon already in buffer: skip
 
 #ifdef FFS_WIN
@@ -476,16 +433,16 @@ void WorkerThread::doWork()
         if (isPriceyExtension(extension)) //"pricey" extensions are stored with fullnames and are read from disk, while cheap ones require just the extension
         {
             const IconHolder newIcon = getAssociatedIcon(fileName);
-            iconBuffer.insertIntoBuffer(fileName, newIcon);
+            insertIntoBuffer(*buffer_, fileName, newIcon);
         }
         else //no read-access to disk! determine icon by extension
         {
             const IconHolder newIcon = getAssociatedIconByExt(extension);
-            iconBuffer.insertIntoBuffer(extension, newIcon);
+            insertIntoBuffer(*buffer_, extension, newIcon);
         }
 #elif defined FFS_LINUX
         const IconHolder newIcon = getAssociatedIcon(fileName);
-        iconBuffer.insertIntoBuffer(fileName, newIcon);
+        insertIntoBuffer(*buffer_, fileName, newIcon);
 #endif
     }
 }
@@ -495,16 +452,30 @@ void WorkerThread::doWork()
 
 struct IconBuffer::Pimpl
 {
-    Pimpl() : buffer(), worker(buffer) {} //might throw exceptions!
+    Pimpl() :
+        workload(std::make_shared<WorkLoad>()),
+        buffer(std::make_shared<Buffer>()) {}
 
-    Buffer buffer;
-    WorkerThread worker;
+
+    std::shared_ptr<WorkLoad> workload;
+    std::shared_ptr<Buffer> buffer;
+
+    boost::thread worker;
 };
 
 
-IconBuffer::IconBuffer() : pimpl(new Pimpl) {}
+IconBuffer::IconBuffer() : pimpl(new Pimpl)
+{
+    pimpl->worker = boost::thread(WorkerThread(pimpl->workload, pimpl->buffer));
+}
 
-IconBuffer::~IconBuffer() {} //auto_ptr<>: keep destructor non-inline
+
+IconBuffer::~IconBuffer()
+{
+    setWorkload(std::vector<Zstring>()); //make sure interruption point is always reached!
+    pimpl->worker.interrupt();
+    pimpl->worker.join();
+}
 
 const wxIcon& IconBuffer::getDirectoryIcon() { return ::getDirectoryIcon(); }
 
@@ -516,6 +487,19 @@ IconBuffer& IconBuffer::getInstance()
     return instance;
 }
 
-bool IconBuffer::requestFileIcon(const Zstring& fileName, wxIcon* icon) { return pimpl->buffer.requestFileIcon(fileName, icon); }
+bool IconBuffer::requestFileIcon(const Zstring& fileName, wxIcon* icon) { return ::requestFileIcon(*pimpl->buffer, fileName, icon); }
 
-void IconBuffer::setWorkload(const std::vector<Zstring>& load) { return pimpl->worker.setWorkload(load); }
+void IconBuffer::setWorkload(const std::vector<Zstring>& load)
+{
+    {
+        boost::lock_guard<boost::mutex> dummy(pimpl->workload->mutex);
+
+        pimpl->workload->filesToLoad.clear();
+
+        std::transform(load.begin(), load.end(), std::back_inserter(pimpl->workload->filesToLoad),
+        [](const Zstring& file) { return BasicString(file); }); //make DEEP COPY from Zstring
+    }
+
+    pimpl->workload->condition.notify_one();
+    //condition handling, see: http://www.boost.org/doc/libs/1_43_0/doc/html/thread/synchronization.html#thread.synchronization.condvar_ref
+}

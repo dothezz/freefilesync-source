@@ -43,7 +43,6 @@ ReturnSmallDlg::ButtonPressed showSyncPreviewDlg(
     bool& dontShowAgain);
 
 ReturnSmallDlg::ButtonPressed showCompareCfgDialog(
-    const wxPoint& position,
     CompareVariant& cmpVar,
     SymLinkHandling& handleSymlinks);
 

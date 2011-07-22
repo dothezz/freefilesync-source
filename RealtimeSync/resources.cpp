@@ -11,7 +11,6 @@
 #include <wx/icon.h>
 #include <memory>
 #include "../shared/standard_paths.h"
-#include "../shared/system_constants.h"
 
 using namespace zen;
 

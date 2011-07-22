@@ -8,7 +8,6 @@
 #define FILEHIERARCHY_H_INCLUDED
 
 #include "shared/zstring.h"
-#include "shared/system_constants.h"
 #include <map>
 #include <set>
 #include <vector>
@@ -131,11 +130,6 @@ struct DirContainer
 
 
 //------------------------------------------------------------------
-//save/load full directory information
-const Zstring& getSyncDBFilename(); //get short filename of database file
-const Zstring SYNC_DB_FILE_ENDING = Zstr("ffs_db");
-
-//------------------------------------------------------------------
 /*    class hierarchy:
 
                FileSystemObject         HierarchyObject
@@ -195,7 +189,7 @@ public:
 protected:
     //constructor used by DirMapping
     HierarchyObject(const HierarchyObject& parent, const Zstring& shortName) :
-        relNamePf(   parent.getRelativeNamePf() + shortName + common::FILE_NAME_SEPARATOR),
+        relNamePf(   parent.getRelativeNamePf() + shortName + FILE_NAME_SEPARATOR),
         baseDirLeft( parent.baseDirLeft),
         baseDirRight(parent.baseDirRight) {}
 
@@ -246,10 +240,10 @@ public:
         filter(filterIn) {}
 
     const HardFilter::FilterRef& getFilter() const;
-    template <SelectedSide side> Zstring getDBFilename() const;
     virtual void swap();
 
 private:
+    //this member is currently not used by the business logic -> may be removed!
     HardFilter::FilterRef filter;
 };
 
@@ -735,7 +729,7 @@ const Zstring& FileSystemObject::getObjShortName() const
 inline
 const Zstring FileSystemObject::getParentRelativeName() const
 {
-    return nameBuffer.parentRelNamePf.BeforeLast(common::FILE_NAME_SEPARATOR);  //returns empty string if char not found
+    return nameBuffer.parentRelNamePf.BeforeLast(FILE_NAME_SEPARATOR);  //returns empty string if char not found
 }
 
 
@@ -1011,14 +1005,6 @@ inline
 const HardFilter::FilterRef& BaseDirMapping::getFilter() const
 {
     return filter;
-}
-
-
-template <SelectedSide side>
-inline
-Zstring BaseDirMapping::getDBFilename() const
-{
-    return getBaseDir<side>() + getSyncDBFilename();
 }
 
 

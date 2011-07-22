@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Mar 22 2011)
+// C++ code generated with wxFormBuilder (version Jun 30 2011)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -439,7 +439,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 
     bSizerConfig->Add( bSizer151, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_listBoxHistory = new wxListBox( m_panelConfig, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_NEEDED_SB|wxLB_SINGLE|wxLB_SORT );
+    m_listBoxHistory = new wxListBox( m_panelConfig, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_EXTENDED|wxLB_NEEDED_SB|wxLB_SORT );
     m_listBoxHistory->SetToolTip( _("Last used configurations (press DEL to remove from list)") );
     m_listBoxHistory->SetMinSize( wxSize( -1,40 ) );
 
@@ -990,7 +990,7 @@ BatchFolderPairGenerated::~BatchFolderPairGenerated()
 
 BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-    this->SetSizeHints( wxSize( 460,420 ), wxDefaultSize );
+    this->SetSizeHints( wxSize( 560,320 ), wxDefaultSize );
 
     wxBoxSizer* bSizer54;
     bSizer54 = new wxBoxSizer( wxVERTICAL );
@@ -1021,18 +1021,13 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     bSizer87->Add( m_panel8, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
 
-    bSizer87->Add( 0, 0, 1, wxALIGN_CENTER_VERTICAL, 5 );
-
-    bSizer69->Add( bSizer87, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
-
-
-    bSizer69->Add( 0, 5, 0, 0, 5 );
+    bSizer87->Add( 5, 0, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
     wxBoxSizer* bSizer70;
     bSizer70 = new wxBoxSizer( wxHORIZONTAL );
 
     m_staticText44 = new wxStaticText( this, wxID_ANY, _("Create a batch file for automated synchronization. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner."), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText44->Wrap( 500 );
+    m_staticText44->Wrap( 460 );
     bSizer70->Add( m_staticText44, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
     m_bpButtonHelp = new wxBitmapButton( this, wxID_HELP, wxNullBitmap, wxDefaultPosition, wxSize( 40,40 ), wxBU_AUTODRAW );
@@ -1040,19 +1035,9 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer70->Add( m_bpButtonHelp, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 
-    bSizer69->Add( bSizer70, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+    bSizer87->Add( bSizer70, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 
-
-    bSizer69->Add( 0, 5, 0, 0, 5 );
-
-    m_staticline10 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
-    bSizer69->Add( m_staticline10, 0, wxEXPAND|wxTOP, 5 );
-
-    m_staticText531 = new wxStaticText( this, wxID_ANY, _("Configuration overview:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText531->Wrap( -1 );
-    m_staticText531->SetFont( wxFont( 10, 74, 90, 92, false, wxT("Arial Black") ) );
-
-    bSizer69->Add( m_staticText531, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+    bSizer69->Add( bSizer87, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 
     m_notebookSettings = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
     m_panelOverview = new wxPanel( m_notebookSettings, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
@@ -1241,26 +1226,10 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer120->Add( 0, 5, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 
-    wxFlexGridSizer* fgSizer15;
-    fgSizer15 = new wxFlexGridSizer( 1, 2, 10, 10 );
-    fgSizer15->SetFlexibleDirection( wxBOTH );
-    fgSizer15->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    bSizer67->Add( bSizer120, 1, wxALIGN_CENTER_VERTICAL|wxALL|wxEXPAND, 10 );
 
-    wxStaticBoxSizer* sbSizer24;
-    sbSizer24 = new wxStaticBoxSizer( new wxStaticBox( m_panelOverview, wxID_ANY, _("Status feedback") ), wxVERTICAL );
-
-
-    sbSizer24->Add( 0, 0, 1, wxEXPAND, 5 );
-
-    m_checkBoxSilent = new wxCheckBox( m_panelOverview, wxID_ANY, _("Silent mode"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_checkBoxSilent->SetToolTip( _("Start minimized and write status information to a logfile") );
-
-    sbSizer24->Add( m_checkBoxSilent, 0, wxALIGN_CENTER_HORIZONTAL|wxRIGHT|wxLEFT, 14 );
-
-
-    sbSizer24->Add( 0, 0, 1, wxEXPAND, 5 );
-
-    fgSizer15->Add( sbSizer24, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
+    wxBoxSizer* bSizer171;
+    bSizer171 = new wxBoxSizer( wxVERTICAL );
 
     wxStaticBoxSizer* sbSizer25;
     sbSizer25 = new wxStaticBoxSizer( new wxStaticBox( m_panelOverview, wxID_ANY, _("Error handling") ), wxHORIZONTAL );
@@ -1270,60 +1239,83 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     m_choiceHandleError->SetSelection( 0 );
     sbSizer25->Add( m_choiceHandleError, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
-    fgSizer15->Add( sbSizer25, 0, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer171->Add( sbSizer25, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 
-    bSizer120->Add( fgSizer15, 0, 0, 5 );
-
-    bSizer67->Add( bSizer120, 1, wxALIGN_CENTER_VERTICAL|wxALL|wxEXPAND, 10 );
+    bSizer67->Add( bSizer171, 0, wxTOP|wxBOTTOM|wxRIGHT, 10 );
 
     m_panelOverview->SetSizer( bSizer67 );
     m_panelOverview->Layout();
     bSizer67->Fit( m_panelOverview );
     m_notebookSettings->AddPage( m_panelOverview, _("Overview"), true );
-    m_panelLogging = new wxPanel( m_notebookSettings, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    m_panelBatchSettings = new wxPanel( m_notebookSettings, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
     wxBoxSizer* bSizer117;
     bSizer117 = new wxBoxSizer( wxVERTICAL );
 
-    wxBoxSizer* bSizer119;
-    bSizer119 = new wxBoxSizer( wxVERTICAL );
+    wxBoxSizer* bSizer172;
+    bSizer172 = new wxBoxSizer( wxVERTICAL );
 
-    m_staticText120 = new wxStaticText( m_panelLogging, wxID_ANY, _("Select logfile directory:"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_staticText120->Wrap( -1 );
-    bSizer119->Add( m_staticText120, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+    wxStaticBoxSizer* sbSizer24;
+    sbSizer24 = new wxStaticBoxSizer( new wxStaticBox( m_panelBatchSettings, wxID_ANY, _("Status feedback") ), wxVERTICAL );
 
-    sbSizerLogfileDir = new wxStaticBoxSizer( new wxStaticBox( m_panelLogging, wxID_ANY, _("Drag && drop") ), wxHORIZONTAL );
+    m_checkBoxSilent = new wxCheckBox( m_panelBatchSettings, wxID_ANY, _("Run minimized"), wxDefaultPosition, wxDefaultSize, 0 );
+    sbSizer24->Add( m_checkBoxSilent, 0, wxALL|wxEXPAND, 5 );
 
-    m_textCtrlLogfileDir = new wxTextCtrl( m_panelLogging, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-    sbSizerLogfileDir->Add( m_textCtrlLogfileDir, 1, wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer172->Add( sbSizer24, 0, wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );
 
-    m_dirPickerLogfileDir = new FfsDirPickerCtrl( m_panelLogging, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, 0 );
-    m_dirPickerLogfileDir->SetToolTip( _("Select a folder") );
 
-    sbSizerLogfileDir->Add( m_dirPickerLogfileDir, 0, wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer172->Add( 0, 5, 0, 0, 5 );
 
-    bSizer119->Add( sbSizerLogfileDir, 1, wxEXPAND, 5 );
+    sbSizerLogfileDir = new wxStaticBoxSizer( new wxStaticBox( m_panelBatchSettings, wxID_ANY, _("Logging") ), wxVERTICAL );
 
     wxBoxSizer* bSizer152;
     bSizer152 = new wxBoxSizer( wxHORIZONTAL );
 
-    m_staticText96 = new wxStaticText( m_panelLogging, wxID_ANY, _("Maximum number of logfiles:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText96 = new wxStaticText( m_panelBatchSettings, wxID_ANY, _("Maximum number of logfiles:"), wxDefaultPosition, wxDefaultSize, 0 );
     m_staticText96->Wrap( -1 );
-    bSizer152->Add( m_staticText96, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer152->Add( m_staticText96, 0, wxALIGN_CENTER_VERTICAL|wxLEFT, 5 );
 
 
     bSizer152->Add( 0, 0, 1, wxEXPAND, 5 );
 
-    m_spinCtrlLogCountMax = new wxSpinCtrl( m_panelLogging, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 2000000000, 0 );
-    bSizer152->Add( m_spinCtrlLogCountMax, 0, wxALL, 5 );
+    m_spinCtrlLogCountMax = new wxSpinCtrl( m_panelBatchSettings, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 2000000000, 0 );
+    bSizer152->Add( m_spinCtrlLogCountMax, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
-    bSizer119->Add( bSizer152, 0, wxEXPAND, 5 );
+    sbSizerLogfileDir->Add( bSizer152, 0, wxEXPAND|wxTOP|wxRIGHT|wxLEFT, 5 );
 
-    bSizer117->Add( bSizer119, 0, wxEXPAND|wxALL, 10 );
+    m_panelLogfile = new wxPanel( m_panelBatchSettings, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+    wxBoxSizer* bSizer1721;
+    bSizer1721 = new wxBoxSizer( wxVERTICAL );
 
-    m_panelLogging->SetSizer( bSizer117 );
-    m_panelLogging->Layout();
-    bSizer117->Fit( m_panelLogging );
-    m_notebookSettings->AddPage( m_panelLogging, _("Logging"), false );
+    m_staticText94 = new wxStaticText( m_panelLogfile, wxID_ANY, _("Select logfile directory:"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_staticText94->Wrap( -1 );
+    bSizer1721->Add( m_staticText94, 0, wxTOP|wxBOTTOM|wxLEFT, 5 );
+
+    wxBoxSizer* bSizer170;
+    bSizer170 = new wxBoxSizer( wxHORIZONTAL );
+
+    m_textCtrlLogfileDir = new wxTextCtrl( m_panelLogfile, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+    bSizer170->Add( m_textCtrlLogfileDir, 1, wxALIGN_CENTER_VERTICAL, 5 );
+
+    m_dirPickerLogfileDir = new FfsDirPickerCtrl( m_panelLogfile, wxID_ANY, wxEmptyString, _("Select a folder"), wxDefaultPosition, wxDefaultSize, 0 );
+    m_dirPickerLogfileDir->SetToolTip( _("Select a folder") );
+
+    bSizer170->Add( m_dirPickerLogfileDir, 0, wxALIGN_CENTER_VERTICAL, 5 );
+
+    bSizer1721->Add( bSizer170, 0, wxEXPAND, 5 );
+
+    m_panelLogfile->SetSizer( bSizer1721 );
+    m_panelLogfile->Layout();
+    bSizer1721->Fit( m_panelLogfile );
+    sbSizerLogfileDir->Add( m_panelLogfile, 0, wxEXPAND|wxBOTTOM|wxRIGHT|wxLEFT, 5 );
+
+    bSizer172->Add( sbSizerLogfileDir, 0, wxEXPAND, 5 );
+
+    bSizer117->Add( bSizer172, 1, wxEXPAND|wxALL, 10 );
+
+    m_panelBatchSettings->SetSizer( bSizer117 );
+    m_panelBatchSettings->Layout();
+    bSizer117->Fit( m_panelBatchSettings );
+    m_notebookSettings->AddPage( m_panelBatchSettings, _("Batch settings"), false );
 
     bSizer69->Add( m_notebookSettings, 1, wxEXPAND, 5 );
 
@@ -1364,7 +1356,6 @@ BatchDlgGenerated::BatchDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
     m_bpButtonSyncConfig->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnSyncSettings ), NULL, this );
     m_bpButtonAddPair->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnAddFolderPair ), NULL, this );
     m_bpButtonRemovePair->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnRemoveTopFolderPair ), NULL, this );
-    m_checkBoxSilent->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnCheckSilent ), NULL, this );
     m_choiceHandleError->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BatchDlgGenerated::OnChangeErrorHandling ), NULL, this );
     m_spinCtrlLogCountMax->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( BatchDlgGenerated::OnChangeMaxLogCountTxt ), NULL, this );
     m_buttonSave->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnSaveBatchJob ), NULL, this );
@@ -1382,7 +1373,6 @@ BatchDlgGenerated::~BatchDlgGenerated()
     m_bpButtonSyncConfig->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnSyncSettings ), NULL, this );
     m_bpButtonAddPair->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnAddFolderPair ), NULL, this );
     m_bpButtonRemovePair->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnRemoveTopFolderPair ), NULL, this );
-    m_checkBoxSilent->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnCheckSilent ), NULL, this );
     m_choiceHandleError->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BatchDlgGenerated::OnChangeErrorHandling ), NULL, this );
     m_spinCtrlLogCountMax->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( BatchDlgGenerated::OnChangeMaxLogCountTxt ), NULL, this );
     m_buttonSave->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BatchDlgGenerated::OnSaveBatchJob ), NULL, this );
@@ -1851,12 +1841,16 @@ SyncCfgDlgGenerated::SyncCfgDlgGenerated( wxWindow* parent, wxWindowID id, const
     this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SyncCfgDlgGenerated::OnClose ) );
     m_radioBtnAutomatic->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( SyncCfgDlgGenerated::OnSyncAutomatic ), NULL, this );
     m_buttonAutomatic->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncCfgDlgGenerated::OnSyncAutomatic ), NULL, this );
+    m_buttonAutomatic->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( SyncCfgDlgGenerated::OnSyncAutomaticDouble ), NULL, this );
     m_radioBtnMirror->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( SyncCfgDlgGenerated::OnSyncMirror ), NULL, this );
     m_buttonOneWay->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncCfgDlgGenerated::OnSyncMirror ), NULL, this );
+    m_buttonOneWay->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( SyncCfgDlgGenerated::OnSyncMirrorDouble ), NULL, this );
     m_radioBtnUpdate->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( SyncCfgDlgGenerated::OnSyncUpdate ), NULL, this );
     m_buttonUpdate->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncCfgDlgGenerated::OnSyncUpdate ), NULL, this );
+    m_buttonUpdate->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( SyncCfgDlgGenerated::OnSyncUpdateDouble ), NULL, this );
     m_radioBtnCustom->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( SyncCfgDlgGenerated::OnSyncCustom ), NULL, this );
     m_buttonUpdate1->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncCfgDlgGenerated::OnSyncCustom ), NULL, this );
+    m_buttonUpdate1->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( SyncCfgDlgGenerated::OnSyncCustomDouble ), NULL, this );
     m_choiceHandleError->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( SyncCfgDlgGenerated::OnChangeErrorHandling ), NULL, this );
     m_choiceHandleDeletion->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( SyncCfgDlgGenerated::OnChangeDeletionHandling ), NULL, this );
     m_buttonOK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncCfgDlgGenerated::OnApply ), NULL, this );
@@ -1875,12 +1869,16 @@ SyncCfgDlgGenerated::~SyncCfgDlgGenerated()
     this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SyncCfgDlgGenerated::OnClose ) );
     m_radioBtnAutomatic->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( SyncCfgDlgGenerated::OnSyncAutomatic ), NULL, this );
     m_buttonAutomatic->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncCfgDlgGenerated::OnSyncAutomatic ), NULL, this );
+    m_buttonAutomatic->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( SyncCfgDlgGenerated::OnSyncAutomaticDouble ), NULL, this );
     m_radioBtnMirror->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( SyncCfgDlgGenerated::OnSyncMirror ), NULL, this );
     m_buttonOneWay->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncCfgDlgGenerated::OnSyncMirror ), NULL, this );
+    m_buttonOneWay->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( SyncCfgDlgGenerated::OnSyncMirrorDouble ), NULL, this );
     m_radioBtnUpdate->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( SyncCfgDlgGenerated::OnSyncUpdate ), NULL, this );
     m_buttonUpdate->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncCfgDlgGenerated::OnSyncUpdate ), NULL, this );
+    m_buttonUpdate->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( SyncCfgDlgGenerated::OnSyncUpdateDouble ), NULL, this );
     m_radioBtnCustom->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( SyncCfgDlgGenerated::OnSyncCustom ), NULL, this );
     m_buttonUpdate1->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncCfgDlgGenerated::OnSyncCustom ), NULL, this );
+    m_buttonUpdate1->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( SyncCfgDlgGenerated::OnSyncCustomDouble ), NULL, this );
     m_choiceHandleError->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( SyncCfgDlgGenerated::OnChangeErrorHandling ), NULL, this );
     m_choiceHandleDeletion->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( SyncCfgDlgGenerated::OnChangeDeletionHandling ), NULL, this );
     m_buttonOK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SyncCfgDlgGenerated::OnApply ), NULL, this );
@@ -1996,8 +1994,10 @@ CmpCfgDlgGenerated::CmpCfgDlgGenerated( wxWindow* parent, wxWindowID id, const w
     this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( CmpCfgDlgGenerated::OnClose ) );
     m_radioBtnSizeDate->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( CmpCfgDlgGenerated::OnTimeSize ), NULL, this );
     m_buttonTimeSize->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CmpCfgDlgGenerated::OnTimeSize ), NULL, this );
+    m_buttonTimeSize->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( CmpCfgDlgGenerated::OnTimeSizeDouble ), NULL, this );
     m_radioBtnContent->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( CmpCfgDlgGenerated::OnContent ), NULL, this );
     m_buttonContent->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CmpCfgDlgGenerated::OnContent ), NULL, this );
+    m_buttonContent->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( CmpCfgDlgGenerated::OnContentDouble ), NULL, this );
     m_bpButtonHelp->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CmpCfgDlgGenerated::OnShowHelp ), NULL, this );
     m_choiceHandleSymlinks->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( CmpCfgDlgGenerated::OnChangeErrorHandling ), NULL, this );
     m_button10->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CmpCfgDlgGenerated::OnOkay ), NULL, this );
@@ -2010,8 +2010,10 @@ CmpCfgDlgGenerated::~CmpCfgDlgGenerated()
     this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( CmpCfgDlgGenerated::OnClose ) );
     m_radioBtnSizeDate->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( CmpCfgDlgGenerated::OnTimeSize ), NULL, this );
     m_buttonTimeSize->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CmpCfgDlgGenerated::OnTimeSize ), NULL, this );
+    m_buttonTimeSize->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( CmpCfgDlgGenerated::OnTimeSizeDouble ), NULL, this );
     m_radioBtnContent->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( CmpCfgDlgGenerated::OnContent ), NULL, this );
     m_buttonContent->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CmpCfgDlgGenerated::OnContent ), NULL, this );
+    m_buttonContent->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( CmpCfgDlgGenerated::OnContentDouble ), NULL, this );
     m_bpButtonHelp->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CmpCfgDlgGenerated::OnShowHelp ), NULL, this );
     m_choiceHandleSymlinks->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( CmpCfgDlgGenerated::OnChangeErrorHandling ), NULL, this );
     m_button10->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( CmpCfgDlgGenerated::OnOkay ), NULL, this );
@@ -2540,25 +2542,25 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer171->Add( m_hyperlink10, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
-    m_hyperlink7 = new wxHyperlinkCtrl( m_panel33, wxID_ANY, _("wxWidgets"), wxT("http://www.wxwidgets.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-    m_hyperlink7->SetBackgroundColour( wxColour( 208, 208, 208 ) );
-
-    bSizer171->Add( m_hyperlink7, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
-
     m_hyperlink13 = new wxHyperlinkCtrl( m_panel33, wxID_ANY, _("Boost"), wxT("http://www.boost.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink13->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 
     bSizer171->Add( m_hyperlink13, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
-    m_hyperlink14 = new wxHyperlinkCtrl( m_panel33, wxID_ANY, _("wxFormBuilder"), wxT("http://wxformbuilder.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-    m_hyperlink14->SetBackgroundColour( wxColour( 208, 208, 208 ) );
+    m_hyperlink7 = new wxHyperlinkCtrl( m_panel33, wxID_ANY, _("wxWidgets"), wxT("http://www.wxwidgets.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink7->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 
-    bSizer171->Add( m_hyperlink14, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+    bSizer171->Add( m_hyperlink7, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+
+    m_hyperlink11 = new wxHyperlinkCtrl( m_panel33, wxID_ANY, _("MS Visual C++"), wxT("http://msdn.microsoft.com/library/60k1461a.aspx"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink11->SetBackgroundColour( wxColour( 208, 208, 208 ) );
+
+    bSizer171->Add( m_hyperlink11, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
     m_hyperlink16 = new wxHyperlinkCtrl( m_panel33, wxID_ANY, _("Artistic Style"), wxT("http://astyle.sourceforge.net"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink16->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 
-    bSizer171->Add( m_hyperlink16, 0, wxALIGN_CENTER_VERTICAL, 5 );
+    bSizer171->Add( m_hyperlink16, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
     bSizer167->Add( bSizer171, 0, wxALIGN_CENTER_HORIZONTAL|wxBOTTOM, 5 );
 
@@ -2575,25 +2577,20 @@ AboutDlgGenerated::AboutDlgGenerated( wxWindow* parent, wxWindowID id, const wxS
 
     bSizer172->Add( m_hyperlink15, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
-    m_hyperlink11 = new wxHyperlinkCtrl( m_panel33, wxID_ANY, _("MS Visual C++"), wxT("http://msdn.microsoft.com/library/60k1461a.aspx"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-    m_hyperlink11->SetBackgroundColour( wxColour( 208, 208, 208 ) );
-
-    bSizer172->Add( m_hyperlink11, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
-
     m_hyperlink12 = new wxHyperlinkCtrl( m_panel33, wxID_ANY, _("Google Test"), wxT("http://code.google.com/p/googletest"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink12->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 
     bSizer172->Add( m_hyperlink12, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
-    m_hyperlink17 = new wxHyperlinkCtrl( m_panel33, wxID_ANY, _("inotify"), wxT("http://inotify.aiken.cz"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-    m_hyperlink17->SetBackgroundColour( wxColour( 208, 208, 208 ) );
-
-    bSizer172->Add( m_hyperlink17, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
-
     m_hyperlink18 = new wxHyperlinkCtrl( m_panel33, wxID_ANY, _("Unicode NSIS"), wxT("http://www.scratchpaper.com"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
     m_hyperlink18->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 
     bSizer172->Add( m_hyperlink18, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
+
+    m_hyperlink14 = new wxHyperlinkCtrl( m_panel33, wxID_ANY, _("wxFormBuilder"), wxT("http://wxformbuilder.org"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+    m_hyperlink14->SetBackgroundColour( wxColour( 208, 208, 208 ) );
+
+    bSizer172->Add( m_hyperlink14, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 5 );
 
     bSizer167->Add( bSizer172, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
 
@@ -3026,7 +3023,7 @@ DeleteDlgGenerated::DeleteDlgGenerated( wxWindow* parent, wxWindowID id, const w
 
     bSizer24->Add( bSizer99, 0, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxRIGHT|wxLEFT, 10 );
 
-    m_textCtrlMessage = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_MULTILINE|wxTE_READONLY );
+    m_textCtrlMessage = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxTE_DONTWRAP|wxTE_MULTILINE|wxTE_READONLY );
     m_textCtrlMessage->SetBackgroundColour( wxColour( 208, 208, 208 ) );
 
     bSizer24->Add( m_textCtrlMessage, 1, wxALL|wxALIGN_CENTER_VERTICAL|wxEXPAND, 5 );

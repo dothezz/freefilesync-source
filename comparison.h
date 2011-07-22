@@ -22,15 +22,18 @@ struct FolderPairCfg
     FolderPairCfg(const Zstring& leftDir, //must be formatted folder pairs!
                   const Zstring& rightDir,
                   const NormalizedFilter& filterIn,
+                  SymLinkHandling handleSymlinksIn,
                   const SyncConfig& syncCfg) :
         leftDirectoryFmt(leftDir),
         rightDirectoryFmt(rightDir),
         filter(filterIn),
+        handleSymlinks(handleSymlinksIn),
         syncConfiguration(syncCfg) {}
 
     Zstring leftDirectoryFmt;  //resolved folder pairs!!!
     Zstring rightDirectoryFmt; //
     NormalizedFilter filter;
+    SymLinkHandling handleSymlinks;
     SyncConfig syncConfiguration;
 };
 
@@ -41,28 +44,31 @@ std::vector<FolderPairCfg> extractCompareCfg(const MainConfiguration& mainCfg); 
 class CompareProcess
 {
 public:
-    CompareProcess(SymLinkHandling handleSymlinks,
-                   size_t fileTimeTol,
+    CompareProcess(size_t fileTimeTol,
                    xmlAccess::OptionalDialogs& warnings,
                    ProcessCallback& handler);
 
     void startCompareProcess(const std::vector<FolderPairCfg>& directoryPairs,
                              const CompareVariant cmpVar,
                              FolderComparison& output);
+~CompareProcess();
 
 private:
-    void compareByTimeSize(const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output) const;
-    void compareByContent( const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output) const;
+    void compareByTimeSize(const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output);
+    void compareByContent( const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output);
 
     //create comparison result table and fill category except for files existing on both sides: undefinedFiles and undefinedLinks are appended!
-    void performBaseComparison(BaseDirMapping& output, std::vector<FileMapping*>& undefinedFiles, std::vector<SymLinkMapping*>& undefinedLinks) const;
-
     void categorizeSymlinkByTime(SymLinkMapping* linkObj) const;
     void categorizeSymlinkByContent(SymLinkMapping* linkObj) const;
 
+    void performComparison(const FolderPairCfg& fpCfg,
+                           BaseDirMapping& output,
+                           std::vector<FileMapping*>& undefinedFiles,
+                           std::vector<SymLinkMapping*>& undefinedLinks);
+
     //buffer accesses to the same directories; useful when multiple folder pairs are used
     class DirectoryBuffer;
-    std::shared_ptr<DirectoryBuffer> directoryBuffer; //std::auto_ptr does not work with forward declarations (Or we need a non-inline ~CompareProcess())!
+    std::unique_ptr<DirectoryBuffer> directoryBuffer;
 
     const size_t fileTimeTolerance; //max allowed file time deviation
 

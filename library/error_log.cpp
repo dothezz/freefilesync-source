@@ -73,14 +73,19 @@ wxString ErrorLogging::formatMessage(const Entry& msg)
             break;
     }
 
-    const wxString prefix = wxString(wxT("[")) + wxDateTime(msg.time).FormatTime() + wxT("] ") + typeName + wxT(": ");
+    const wxString prefix = wxString(L"[") + wxDateTime(msg.time).FormatTime() + L"] " + typeName + L": ";
 
     wxString formattedText = prefix;
-    for (wxString::const_iterator i = msg.message.begin(); i != msg.message.end(); ++i)
+    for (auto i = msg.message.begin(); i != msg.message.end(); ++i)
         if (*i == wxChar('\n'))
         {
-            formattedText += wxString(wxChar('\n')).Pad(prefix.size(), wxChar(' '), true);
-            while (*++i == wxChar('\n')) //remove duplicate newlines
+            formattedText += L'\n';
+
+            wxString blanks;
+            blanks.resize(prefix.size(), L' ');
+            formattedText += blanks;
+
+            while (*++i == L'\n') //remove duplicate newlines
                 ;
             --i;
         }

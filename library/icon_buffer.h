@@ -17,7 +17,7 @@ namespace zen
 class IconBuffer
 {
 public:
-    static const wxIcon& getDirectoryIcon(); //one icon should be sufficient...
+    static const wxIcon& getDirectoryIcon(); //generic icons
     static const wxIcon& getFileIcon();      //
 
     static IconBuffer& getInstance();
@@ -35,7 +35,7 @@ private:
     ~IconBuffer();
 
     struct Pimpl;
-    std::auto_ptr<Pimpl> pimpl;
+    std::unique_ptr<Pimpl> pimpl;
 };
 }
 

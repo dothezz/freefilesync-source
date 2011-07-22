@@ -136,7 +136,6 @@ wxString Statistics::formatRemainingTime(double timeInMs) const
     }
     output.Replace(wxT("%x"), zen::toStringSep(formattedTime));
     return output;
-    //+ wxT("(") + common::numberToWxString(common::round(timeInMs / 1000)) + wxT(")");
 }
 
 
@@ -227,7 +226,8 @@ wxString Statistics::getBytesPerSecond() const
         const double dataDelta = backRecord.second.data - frontRecord.second.data;
 
         if (!isNull(timeDelta))
-            return zen::formatFilesizeToShortString(zen::UInt64(dataDelta * 1000 / timeDelta)) + _("/sec");
+            if (dataDelta > 0) //may be negative if user cancels copying
+                return zen::formatFilesizeToShortString(zen::UInt64(dataDelta * 1000 / timeDelta)) + _("/sec");
     }
 
     return wxT("-"); //fallback

@@ -125,6 +125,7 @@ struct OptionalDialogs
     bool warningNotEnoughDiskSpace;
     bool warningUnresolvedConflicts;
     bool warningSyncDatabase;
+    bool warningRecyclerMissing;
     bool popupOnConfigChange;
     bool showSummaryBeforeSync;
 };
@@ -159,6 +160,7 @@ struct XmlGlobalSettings
             dlgPos(wxDefaultCoord, wxDefaultCoord),
             dlgSize(wxDefaultCoord, wxDefaultCoord),
             isMaximized(false),
+            maxFolderPairsVisible(6),
             autoAdjustColumnsLeft(false),
             autoAdjustColumnsRight(false),
             folderHistMax(12),
@@ -191,6 +193,8 @@ struct XmlGlobalSettings
         wxSize dlgSize;
         bool isMaximized;
 
+        int maxFolderPairsVisible;
+
         ColumnAttributes columnAttribLeft;
         ColumnAttributes columnAttribRight;
 
@@ -200,7 +204,7 @@ struct XmlGlobalSettings
         ExternalApps externelApplications;
 
         std::vector<wxString> cfgFileHistory;
-        wxString lastUsedConfigFile;
+        std::vector<wxString> lastUsedConfigFiles;
 
         std::vector<wxString> folderHistoryLeft;
         std::vector<wxString> folderHistoryRight;

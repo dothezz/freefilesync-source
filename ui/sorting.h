@@ -8,7 +8,6 @@
 #define SORTING_H_INCLUDED
 
 #include "../file_hierarchy.h"
-#include "../shared/system_constants.h"
 #include "../synchronization.h"
 #include "../shared/assert_static.h"
 

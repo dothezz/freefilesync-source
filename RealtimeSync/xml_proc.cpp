@@ -43,7 +43,7 @@ bool isXmlTypeRTS(const XmlDoc& doc) //throw()
 
 void xmlAccess::readRealConfig(const wxString& filename, XmlRealConfig& config)
 {
-    if (!fileExists(wxToZ(filename)))
+    if (!fileExists(toZ(filename)))
         throw FfsXmlError(wxString(_("File does not exist:")) + wxT("\n\"") + filename + wxT("\""));
 
     XmlDoc doc;

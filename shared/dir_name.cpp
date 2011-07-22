@@ -15,7 +15,6 @@
 #include "check_exist.h"
 #include "util.h"
 #include "i18n.h"
-#include "system_constants.h"
 
 using namespace zen;
 
@@ -24,7 +23,7 @@ namespace
 {
 void setDirectoryNameImpl(const wxString& dirname, wxDirPickerCtrl* dirPicker, wxWindow& tooltipWnd, wxStaticBoxSizer* staticBox, size_t timeout)
 {
-    const wxString dirFormatted = zToWx(getFormattedDirectoryName(wxToZ(dirname)));
+    const wxString dirFormatted = toWx(getFormattedDirectoryName(toZ(dirname)));
 
     tooltipWnd.SetToolTip(dirFormatted); //wxComboBox bug: the edit control is not updated... hope this will be fixed: http://trac.wxwidgets.org/ticket/12659
 
@@ -32,17 +31,16 @@ void setDirectoryNameImpl(const wxString& dirname, wxDirPickerCtrl* dirPicker, w
     {
         //change static box label only if there is a real difference to what is shown in wxTextCtrl anyway
         wxString dirNormalized = dirname;
-        dirNormalized.Trim(true);
-        dirNormalized.Trim(false);
-        if (!dirNormalized.empty() && !dirNormalized.EndsWith(zToWx(common::FILE_NAME_SEPARATOR)))
-            dirNormalized += zToWx(common::FILE_NAME_SEPARATOR);
+        trim(dirNormalized);
+        if (!dirNormalized.empty() && !endsWith(dirNormalized, FILE_NAME_SEPARATOR))
+            dirNormalized += FILE_NAME_SEPARATOR;
 
         staticBox->GetStaticBox()->SetLabel(dirNormalized == dirFormatted ? wxString(_("Drag && drop")) : dirFormatted);
     }
 
     if (dirPicker)
     {
-        if (!dirFormatted.empty() && util::dirExists(wxToZ(dirFormatted), timeout) == util::EXISTING_TRUE) //potentially slow network access: wait 200ms at most
+        if (!dirFormatted.empty() && util::dirExists(toZ(dirFormatted), timeout) == util::EXISTING_TRUE) //potentially slow network access: wait 200ms at most
             dirPicker->SetPath(dirFormatted);
     }
 }
@@ -113,14 +111,14 @@ void DirectoryNameMainDlg::OnFilesDropped(FFSFileDropEvent& event)
 
     if (AcceptDrop(event.getFiles()))
     {
-        Zstring fileName = wxToZ(event.getFiles()[0]);
-        if (dirExists(fileName))
-            setDirectoryName(zToWx(fileName), &dirName_, &dirPicker_, dirName_, staticBox_);
+        wxString fileName = event.getFiles()[0];
+        if (dirExists(toZ(fileName)))
+            setDirectoryName(fileName, &dirName_, &dirPicker_, dirName_, staticBox_);
         else
         {
-            fileName = fileName.BeforeLast(common::FILE_NAME_SEPARATOR);
-            if (dirExists(fileName))
-                setDirectoryName(zToWx(fileName), &dirName_, &dirPicker_, dirName_, staticBox_);
+            fileName = beforeLast(fileName, FILE_NAME_SEPARATOR);
+            if (dirExists(toZ(fileName)))
+                setDirectoryName(fileName, &dirName_, &dirPicker_, dirName_, staticBox_);
         }
     }
 }
@@ -183,14 +181,14 @@ void DirectoryName::OnFilesDropped(FFSFileDropEvent& event)
     if (event.getFiles().empty())
         return;
 
-    Zstring fileName = wxToZ(event.getFiles()[0]);
-    if (dirExists(fileName))
-        setDirectoryName(zToWx(fileName), &dirName_, &dirPicker_, dirName_, staticBox_);
+    wxString fileName = event.getFiles()[0];
+    if (dirExists(toZ(fileName)))
+        setDirectoryName(fileName, &dirName_, &dirPicker_, dirName_, staticBox_);
     else
     {
-        fileName = fileName.BeforeLast(common::FILE_NAME_SEPARATOR);
-        if (dirExists(fileName))
-            setDirectoryName(zToWx(fileName), &dirName_, &dirPicker_, dirName_, staticBox_);
+        fileName = beforeLast(fileName, FILE_NAME_SEPARATOR);
+        if (dirExists(toZ(fileName)))
+            setDirectoryName(fileName, &dirName_, &dirPicker_, dirName_, staticBox_);
     }
 }
 

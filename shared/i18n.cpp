@@ -5,7 +5,7 @@ using namespace zen;
 
 namespace
 {
-std::auto_ptr<TranslationHandler> globalHandler;
+std::unique_ptr<TranslationHandler> globalHandler;
 }
 
 void zen::setTranslator(TranslationHandler* newHandler)

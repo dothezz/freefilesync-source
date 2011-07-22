@@ -25,8 +25,8 @@ class BatchStatusHandler : public StatusHandler
 public:
     BatchStatusHandler(bool runSilent, //defines: -start minimized and -quit immediately when finished
                        const wxString& jobName,
-                       const wxString* logfileDirectory, //non-empty if logging shall be active
-                       size_t logFileMaxCount,
+                       const wxString& logfileDirectory,
+                       size_t logFileCountMax, //0 if logging shall be inactive
                        const xmlAccess::OnError handleError,
                        const zen::SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
                        int& returnVal);
@@ -34,11 +34,11 @@ public:
 
     virtual void initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID);
     virtual void updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed);
-    virtual void reportInfo(const Zstring& text);
+    virtual void reportInfo(const wxString& text);
     virtual void forceUiRefresh();
 
     virtual void reportWarning(const wxString& warningMessage, bool& warningActive);
-    virtual ErrorHandler::Response reportError(const wxString& errorMessage);
+    virtual Response reportError(const wxString& errorMessage);
     virtual void reportFatalError(const wxString& errorMessage);
 
 private:

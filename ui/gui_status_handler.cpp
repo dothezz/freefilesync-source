@@ -7,7 +7,6 @@
 #include "gui_status_handler.h"
 #include "small_dlgs.h"
 #include "msg_popup.h"
-#include "../shared/system_constants.h"
 #include "main_dlg.h"
 #include <wx/wupdlock.h>
 #include "../shared/global_func.h"
@@ -73,12 +72,6 @@ void CompareStatusHandler::OnKeyPressed(wxKeyEvent& event)
 }
 
 
-void CompareStatusHandler::reportInfo(const Zstring& text)
-{
-    mainDlg.compareStatus->setStatusText_NoUpdate(text);
-}
-
-
 void CompareStatusHandler::initNewProcess(int objectsTotal, zen::Int64 dataTotal, Process processID)
 {
     currentProcess = processID;
@@ -103,31 +96,39 @@ void CompareStatusHandler::initNewProcess(int objectsTotal, zen::Int64 dataTotal
 }
 
 
-inline
 void CompareStatusHandler::updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed)
 {
     switch (currentProcess)
     {
         case StatusHandler::PROCESS_SCANNING:
-            mainDlg.compareStatus->incScannedObjects_NoUpdate(objectsProcessed);
+            mainDlg.compareStatus->incScannedObjects_NoUpdate(objectsProcessed); //throw ()
             break;
         case StatusHandler::PROCESS_COMPARING_CONTENT:
-            mainDlg.compareStatus->incProcessedCmpData_NoUpdate(objectsProcessed, dataProcessed);
+            mainDlg.compareStatus->incProcessedCmpData_NoUpdate(objectsProcessed, dataProcessed); //throw ()
             break;
         case StatusHandler::PROCESS_SYNCHRONIZING:
         case StatusHandler::PROCESS_NONE:
             assert(false);
             break;
     }
+
+    //note: this method should NOT throw in order to properly allow undoing setting of statistics!
 }
 
 
-ErrorHandler::Response CompareStatusHandler::reportError(const wxString& message)
+void CompareStatusHandler::reportInfo(const wxString& text)
+{
+    mainDlg.compareStatus->setStatusText_NoUpdate(text);
+    requestUiRefresh(); //throw AbortThisProcess
+}
+
+
+ProcessCallback::Response CompareStatusHandler::reportError(const wxString& message)
 {
     if (ignoreErrors)
-        return ErrorHandler::IGNORE_ERROR;
+        return ProcessCallback::IGNORE_ERROR;
 
-    mainDlg.compareStatus->updateStatusPanelNow();
+    forceUiRefresh();
 
     bool ignoreNextErrors = false;
     switch (showErrorDlg(ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
@@ -135,23 +136,23 @@ ErrorHandler::Response CompareStatusHandler::reportError(const wxString& message
     {
         case ReturnErrorDlg::BUTTON_IGNORE:
             ignoreErrors = ignoreNextErrors;
-            return ErrorHandler::IGNORE_ERROR;
+            return ProcessCallback::IGNORE_ERROR;
 
         case ReturnErrorDlg::BUTTON_RETRY:
-            return ErrorHandler::RETRY;
+            return ProcessCallback::RETRY;
 
         case ReturnErrorDlg::BUTTON_ABORT:
             abortThisProcess();
     }
 
     assert(false);
-    return ErrorHandler::IGNORE_ERROR; //dummy return value
+    return ProcessCallback::IGNORE_ERROR; //dummy return value
 }
 
 
 void CompareStatusHandler::reportFatalError(const wxString& errorMessage)
 {
-    mainDlg.compareStatus->updateStatusPanelNow();
+    forceUiRefresh();
 
     //show message and abort: currently there are no fatal errors during comparison that can be ignored
     bool dummy = false;
@@ -167,7 +168,7 @@ void CompareStatusHandler::reportWarning(const wxString& warningMessage, bool& w
     if (!warningActive || ignoreErrors) //if errors are ignored, then warnings should also
         return;
 
-    mainDlg.compareStatus->updateStatusPanelNow();
+    forceUiRefresh();
 
     //show popup and ask user how to handle warning
     bool dontWarnAgain = false;
@@ -188,7 +189,6 @@ void CompareStatusHandler::reportWarning(const wxString& warningMessage, bool& w
 }
 
 
-inline
 void CompareStatusHandler::forceUiRefresh()
 {
     mainDlg.compareStatus->updateStatusPanelNow();
@@ -223,9 +223,9 @@ SyncStatusHandler::~SyncStatusHandler()
 
     //finalize error log
     if (abortIsRequested())
-        errorLog.logMsg(wxString(_("Synchronization aborted!")) + wxT(" \n") + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!"), TYPE_ERROR);
+        errorLog.logMsg(_("Synchronization aborted!") + " \n" + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!"), TYPE_ERROR);
     else if (totalErrors > 0)
-        errorLog.logMsg(wxString(_("Synchronization completed with errors!")) + wxT(" \n") + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!"), TYPE_WARNING);
+        errorLog.logMsg(_("Synchronization completed with errors!") + " \n" + _("You may try to synchronize remaining items again (WITHOUT having to re-compare)!"), TYPE_WARNING);
     else
         errorLog.logMsg(_("Synchronization completed successfully!"), TYPE_INFO);
 
@@ -236,16 +236,6 @@ SyncStatusHandler::~SyncStatusHandler()
         syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_ERROR, errorLog);
     else
         syncStatusFrame.processHasFinished(SyncStatus::FINISHED_WITH_SUCCESS, errorLog);
-}
-
-
-inline
-void SyncStatusHandler::reportInfo(const Zstring& text)
-{
-    //if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING)
-    errorLog.logMsg(zToWx(text), TYPE_INFO);
-
-    syncStatusFrame.setStatusText_NoUpdate(text);
 }
 
 
@@ -266,14 +256,26 @@ void SyncStatusHandler::initNewProcess(int objectsTotal, zen::Int64 dataTotal, P
 }
 
 
-inline
 void SyncStatusHandler::updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed)
 {
-    syncStatusFrame.incProgressIndicator_NoUpdate(objectsProcessed, dataProcessed);
+    syncStatusFrame.incProgressIndicator_NoUpdate(objectsProcessed, dataProcessed); //throw ()
+
+    //note: this method should NOT throw in order to properly allow undoing setting of statistics!
 }
 
 
-ErrorHandler::Response SyncStatusHandler::reportError(const wxString& errorMessage)
+void SyncStatusHandler::reportInfo(const wxString& text)
+{
+    //if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING)
+    errorLog.logMsg(text, TYPE_INFO);
+
+    syncStatusFrame.setStatusText_NoUpdate(text); //throw ()
+
+    requestUiRefresh(); //throw AbortThisProccess
+}
+
+
+ProcessCallback::Response SyncStatusHandler::reportError(const wxString& errorMessage)
 {
     switch (handleError_)
     {
@@ -281,10 +283,10 @@ ErrorHandler::Response SyncStatusHandler::reportError(const wxString& errorMessa
             break;
         case ON_GUIERROR_IGNORE:
             errorLog.logMsg(errorMessage, TYPE_ERROR);
-            return ErrorHandler::IGNORE_ERROR;
+            return ProcessCallback::IGNORE_ERROR;
     }
 
-    syncStatusFrame.updateStatusDialogNow();
+    forceUiRefresh();
 
     bool ignoreNextErrors = false;
     switch (showErrorDlg(ReturnErrorDlg::BUTTON_IGNORE | ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
@@ -294,10 +296,10 @@ ErrorHandler::Response SyncStatusHandler::reportError(const wxString& errorMessa
         case ReturnErrorDlg::BUTTON_IGNORE:
             handleError_ = ignoreNextErrors ? ON_GUIERROR_IGNORE : ON_GUIERROR_POPUP;
             errorLog.logMsg(errorMessage, TYPE_ERROR);
-            return ErrorHandler::IGNORE_ERROR;
+            return ProcessCallback::IGNORE_ERROR;
 
         case ReturnErrorDlg::BUTTON_RETRY:
-            return ErrorHandler::RETRY;
+            return ProcessCallback::RETRY;
 
         case ReturnErrorDlg::BUTTON_ABORT:
             errorLog.logMsg(errorMessage, TYPE_ERROR);
@@ -306,7 +308,7 @@ ErrorHandler::Response SyncStatusHandler::reportError(const wxString& errorMessa
 
     assert (false);
     errorLog.logMsg(errorMessage, TYPE_ERROR);
-    return ErrorHandler::IGNORE_ERROR;
+    return ProcessCallback::IGNORE_ERROR;
 }
 
 
@@ -327,11 +329,11 @@ void SyncStatusHandler::reportWarning(const wxString& warningMessage, bool& warn
         case ON_GUIERROR_IGNORE:
             return; //if errors are ignored, then warnings should also
     }
-    if (!warningActive) return;
+    if (!warningActive)
+        return;
 
-    syncStatusFrame.updateStatusDialogNow();
+    forceUiRefresh();
 
-    //show popup and ask user how to handle warning
     bool dontWarnAgain = false;
     switch (showWarningDlg(ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_ABORT,
                            warningMessage,

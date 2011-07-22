@@ -12,14 +12,14 @@
 #include <wx/ffile.h>
 #include <wx/intl.h>
 #include <wx/msgdlg.h>
-#include "system_constants.h"
 #include "parse_plural.h"
 #include "parse_lng.h"
 #include "util.h"
 #include "string_tools.h"
 #include "file_traverser.h"
-#include "../shared/standard_paths.h"
-#include "../shared/string_conv.h"
+#include "standard_paths.h"
+#include "string_conv.h"
+#include "zenXml/zenxml_io.h"
 #include "i18n.h"
 
 using namespace zen;
@@ -28,7 +28,7 @@ using namespace zen;
 namespace
 {
 //global objects
-wxString THOUSANDS_SEPARATOR = wxT(",");
+std::wstring THOUSANDS_SEPARATOR = L",";
 
 
 class FFSLocale : public TranslationHandler
@@ -38,9 +38,9 @@ public:
 
     wxLanguage langId() const { return langId_; }
 
-    virtual wxString thousandsSeparator() { return THOUSANDS_SEPARATOR; };
+    virtual std::wstring thousandsSeparator() { return THOUSANDS_SEPARATOR; };
 
-    virtual wxString translate(const wxString& text)
+    virtual std::wstring translate(const std::wstring& text)
     {
         //look for translation in buffer table
         const Translation::const_iterator iter = transMapping.find(text);
@@ -50,7 +50,7 @@ public:
         return text; //fallback
     }
 
-    virtual wxString translate(const wxString& singular, const wxString& plural, int n)
+    virtual std::wstring translate(const std::wstring& singular, const std::wstring& plural, int n)
     {
         TranslationPlural::const_iterator iter = transMappingPl.find(std::make_pair(singular, plural));
         if (iter != transMappingPl.end())
@@ -64,8 +64,8 @@ public:
     }
 
 private:
-    typedef std::map<wxString, wxString> Translation;
-    typedef std::map<std::pair<wxString, wxString>, std::vector<wxString> > TranslationPlural;
+    typedef std::map<std::wstring, std::wstring> Translation;
+    typedef std::map<std::pair<std::wstring, std::wstring>, std::vector<std::wstring> > TranslationPlural;
 
     Translation       transMapping; //map original text |-> translation
     TranslationPlural transMappingPl;
@@ -75,34 +75,17 @@ private:
 
 
 
-std::string getFileStream(const wxString& filename) //return empty string on error throw()
-{
-    std::string inputStream;
-
-    //workaround to get a FILE* from a unicode filename in a portable way
-    wxFFile langFile(filename, wxT("rb"));
-    if (langFile.IsOpened())
-    {
-        FILE* fpInput = langFile.fp();
-
-        std::vector<char> buffer(50 * 1024);
-        size_t bytesRead = 0;
-        do
-        {
-            bytesRead = ::fread(&buffer[0], 1, buffer.size(), fpInput);
-            inputStream.append(&buffer[0], bytesRead);
-        }
-        while (bytesRead == buffer.size());
-    }
-    return inputStream;
-}
-
-
 FFSLocale::FFSLocale(const wxString& filename, wxLanguage languageId) : langId_(languageId) //throw (lngfile::ParsingError, PluralForm::ParsingError)
 {
-    const std::string inputStream = getFileStream(filename);
-    if (inputStream.empty())
+    std::string inputStream;
+    try
+    {
+        inputStream = loadStream(filename);; //throw XmlFileError
+    }
+    catch (...)
+    {
         throw lngfile::ParsingError(0, 0);
+    }
 
     lngfile::TransHeader          header;
     lngfile::TranslationMap       transInput;
@@ -111,21 +94,21 @@ FFSLocale::FFSLocale(const wxString& filename, wxLanguage languageId) : langId_(
 
     for (lngfile::TranslationMap::const_iterator i = transInput.begin(); i != transInput.end(); ++i)
     {
-        const wxString original    = wxString::FromUTF8(i->first.c_str());
-        const wxString translation = wxString::FromUTF8(i->second.c_str());
+        const std::wstring original    = utf8CvrtTo<std::wstring>(i->first);
+        const std::wstring translation = utf8CvrtTo<std::wstring>(i->second);
         assert(!translation.empty());
         transMapping.insert(std::make_pair(original , translation));
     }
 
     for (lngfile::TranslationPluralMap::const_iterator i = transPluralInput.begin(); i != transPluralInput.end(); ++i)
     {
-        const wxString singular = wxString::FromUTF8(i->first.first.c_str());
-        const wxString plural   = wxString::FromUTF8(i->first.second.c_str());
+        const std::wstring singular = utf8CvrtTo<std::wstring>(i->first.first);
+        const std::wstring plural   = utf8CvrtTo<std::wstring>(i->first.second);
         const lngfile::PluralForms& plForms = i->second;
 
-        std::vector<wxString> plFormsWide;
+        std::vector<std::wstring> plFormsWide;
         for (lngfile::PluralForms::const_iterator j = plForms.begin(); j != plForms.end(); ++j)
-            plFormsWide.push_back(wxString::FromUTF8(j->c_str()));
+            plFormsWide.push_back(utf8CvrtTo<std::wstring>(*j));
 
         assert(!plFormsWide.empty());
 
@@ -144,13 +127,13 @@ public:
 
     virtual void onFile(const Zchar* shortName, const Zstring& fullName, const FileInfo& details)
     {
-        if (Zstring(shortName).EndsWith(Zstr(".lng")))
+        if (endsWith(fullName, Zstr(".lng")))
             lngFiles_.push_back(fullName);
     }
 
     virtual void onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) {}
     virtual ReturnValDir onDir(const Zchar* shortName, const Zstring& fullName) { return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); }
-    virtual void onError(const wxString& errorText) {} //errors are not really critical in this context
+    virtual HandleError onError(const std::wstring& errorText) { return TRAV_ERROR_IGNORE; } //errors are not really critical in this context
 
 private:
     std::vector<Zstring>& lngFiles_;
@@ -197,32 +180,35 @@ ExistingTranslations::ExistingTranslations()
     std::vector<Zstring> lngFiles;
     FindLngfiles traverseCallback(lngFiles);
 
-    traverseFolder(wxToZ(zen::getResourceDir() +  wxT("Languages")), //throw();
+    traverseFolder(toZ(zen::getResourceDir() +  wxT("Languages")), //throw();
                    false, //don't follow symlinks
                    traverseCallback);
 
-    for (std::vector<Zstring>::const_iterator i = lngFiles.begin(); i != lngFiles.end(); ++i)
+    for (auto i = lngFiles.begin(); i != lngFiles.end(); ++i)
     {
-        const std::string stream = getFileStream(zToWx(*i));
-        if (!stream.empty())
+        try
+        {
+            std::string stream = loadStream(*i);; //throw XmlFileError
             try
             {
                 lngfile::TransHeader lngHeader;
                 lngfile::parseHeader(stream, lngHeader); //throw ParsingError
 
-                const wxLanguageInfo* locInfo = wxLocale::FindLanguageInfo(wxString::FromUTF8(lngHeader.localeName.c_str()));
+                const wxLanguageInfo* locInfo = wxLocale::FindLanguageInfo(utf8CvrtTo<wxString>(lngHeader.localeName));
                 if (locInfo)
                 {
                     ExistingTranslations::Entry newEntry;
                     newEntry.languageID     = locInfo->Language;
-                    newEntry.languageName   = wxString::FromUTF8(lngHeader.languageName.c_str());
-                    newEntry.languageFile   = zToWx(*i);
-                    newEntry.translatorName = wxString::FromUTF8(lngHeader.translatorName.c_str());
-                    newEntry.languageFlag   = wxString::FromUTF8(lngHeader.flagFile.c_str());
+                    newEntry.languageName   = utf8CvrtTo<wxString>(lngHeader.languageName);
+                    newEntry.languageFile   = toWx(*i);
+                    newEntry.translatorName = utf8CvrtTo<wxString>(lngHeader.translatorName);
+                    newEntry.languageFlag   = utf8CvrtTo<wxString>(lngHeader.flagFile);
                     locMapping.push_back(newEntry);
                 }
             }
             catch (lngfile::ParsingError&) {}
+        }
+        catch (...) {}
     }
 
     std::sort(locMapping.begin(), locMapping.end(), LessTranslation());
@@ -375,7 +361,7 @@ public:
         const lconv* localInfo = ::localeconv();
 
         //actually these two parameters are language dependent, but we take system setting to handle all kinds of language derivations
-        THOUSANDS_SEPARATOR = wxString::FromUTF8(localInfo->thousands_sep);
+        THOUSANDS_SEPARATOR = utf8CvrtTo<wxString>(localInfo->thousands_sep);
 
         // why not working?
         // THOUSANDS_SEPARATOR = std::use_facet<std::numpunct<wchar_t> >(std::locale("")).thousands_sep();

@@ -6,7 +6,6 @@
 //
 #include "standard_paths.h"
 #include <wx/stdpaths.h>
-#include "system_constants.h"
 #include "string_conv.h"
 
 using namespace zen;
@@ -16,14 +15,14 @@ namespace
 {
 const wxString& getBinaryDir() //directory containing executable WITH path separator at end
 {
-    static wxString instance = zToWx(wxToZ(wxStandardPaths::Get().GetExecutablePath()).BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR);
+    static wxString instance = beforeLast(wxStandardPaths::Get().GetExecutablePath(), FILE_NAME_SEPARATOR) + toWx(Zstring(FILE_NAME_SEPARATOR));
     return instance;
 }
 
 #ifdef FFS_WIN
 wxString getInstallDir() //root install directory WITH path separator at end
 {
-    return getBinaryDir().BeforeLast(common::FILE_NAME_SEPARATOR).BeforeLast(common::FILE_NAME_SEPARATOR) + common::FILE_NAME_SEPARATOR;
+    return getBinaryDir().BeforeLast(FILE_NAME_SEPARATOR).BeforeLast(FILE_NAME_SEPARATOR) + FILE_NAME_SEPARATOR;
 }
 #endif
 }
@@ -51,8 +50,8 @@ wxString zen::getResourceDir()
     {
         wxString resourceDir = wxStandardPathsBase::Get().GetResourcesDir();
 
-        if (!resourceDir.EndsWith(zToWx(common::FILE_NAME_SEPARATOR)))
-            resourceDir += zToWx(common::FILE_NAME_SEPARATOR);
+        if (!endsWith(resourceDir, FILE_NAME_SEPARATOR))
+            resourceDir += FILE_NAME_SEPARATOR;
 
         return resourceDir;
     }
@@ -66,7 +65,7 @@ wxString zen::getConfigDir()
 #ifdef FFS_WIN
         return getInstallDir();
 #elif defined FFS_LINUX
-        //wxString(wxT(".")) + zToWx(common::FILE_NAME_SEPARATOR) -> don't use current working directory
+        //wxString(wxT(".")) + zToWx(FILE_NAME_SEPARATOR) -> don't use current working directory
         //avoid surprises with GlobalSettings.xml being newly created in each working directory
         return getBinaryDir();
 #endif
@@ -77,8 +76,8 @@ wxString zen::getConfigDir()
         if (!wxDirExists(userDirectory))
             ::wxMkdir(userDirectory); //only top directory needs to be created: no recursion necessary
 
-        if (!userDirectory.EndsWith(zToWx(common::FILE_NAME_SEPARATOR)))
-            userDirectory += zToWx(common::FILE_NAME_SEPARATOR);
+        if (!endsWith(userDirectory, FILE_NAME_SEPARATOR))
+            userDirectory += FILE_NAME_SEPARATOR;
 
         return userDirectory;
     }

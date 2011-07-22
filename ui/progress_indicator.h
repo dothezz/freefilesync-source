@@ -32,7 +32,7 @@ public:
     void switchToCompareBytewise(int totalObjectsToProcess, zen::Int64 totalDataToProcess);
     void incScannedObjects_NoUpdate(int number);
     void incProcessedCmpData_NoUpdate(int objectsProcessed, zen::Int64 dataProcessed);
-    void setStatusText_NoUpdate(const Zstring& text);
+    void setStatusText_NoUpdate(const wxString& text);
     void updateStatusPanelNow();
 
 private:
@@ -67,7 +67,7 @@ public:
     void resetGauge(int totalObjectsToProcess, zen::Int64 totalDataToProcess);
     void incScannedObjects_NoUpdate(int number);
     void incProgressIndicator_NoUpdate(int objectsProcessed, zen::Int64 dataProcessed);
-    void setStatusText_NoUpdate(const Zstring& text);
+    void setStatusText_NoUpdate(const wxString& text);
     void updateStatusDialogNow();
 
     void setCurrentStatus(SyncStatusID id);

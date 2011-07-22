@@ -38,5 +38,8 @@ private:
     wxBitmap bitmapBack;
 };
 
+//set bitmap label flicker free!
+void setBitmapLabel(wxBitmapButton& button, const wxBitmap& bmp);
+
 
 #endif // CUSTOMBUTTON_H_INCLUDED

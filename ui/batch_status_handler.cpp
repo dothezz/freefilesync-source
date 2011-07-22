@@ -41,7 +41,7 @@ public:
         return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //DON'T traverse into subdirs
     }
 
-    virtual void onError(const wxString& errorText) {} //errors are not really critical in this context
+    virtual HandleError onError(const std::wstring& errorText) { return TRAV_ERROR_IGNORE; } //errors are not really critical in this context
 
 private:
     const Zstring prefix_;
@@ -68,11 +68,11 @@ public:
 
         logFile.Open(logfileName, wxT("w"));
         if (!logFile.IsOpened())
-            throw FileError(wxString(_("Unable to create logfile!")) + wxT("\"") + logfileName + wxT("\""));
+            throw FileError(_("Unable to create logfile!") + "\"" + logfileName.c_str() + "\"");
 
         //write header
-        wxString headerLine = wxString(wxT("FreeFileSync - ")) + _("Batch execution") +
-                              wxT(" (") + _("Date") + wxT(": ") + wxDateTime::Now().FormatDate() +  wxT(")"); //"Date" is used at other places, too
+        wxString headerLine = L"FreeFileSync - " + _("Batch execution") +
+                              " (" + _("Date") + ": " + wxDateTime::Now().FormatDate() +  ")"; //"Date" is used at other places, too
 
         logFile.Write(headerLine + wxChar('\n'));
         logFile.Write(wxString().Pad(headerLine.Len(), wxChar('-')) + wxChar('\n') + wxChar('\n'));
@@ -110,9 +110,9 @@ public:
     void limitLogfileCount(size_t maxCount) const
     {
         std::vector<Zstring> logFiles;
-        FindLogfiles traverseCallback(wxToZ(jobName_), logFiles);
+        FindLogfiles traverseCallback(toZ(jobName_), logFiles);
 
-        traverseFolder(wxToZ(logfileName).BeforeLast(common::FILE_NAME_SEPARATOR), //throw();
+        traverseFolder(beforeLast(toZ(logfileName), FILE_NAME_SEPARATOR), //throw();
                        false, //don't follow symlinks
                        traverseCallback);
 
@@ -131,8 +131,8 @@ private:
 
         //create logfile directory
         Zstring logfileDir = logfileDirectory.empty() ?
-                             wxToZ(zen::getConfigDir() + wxT("Logs")) :
-                             zen::getFormattedDirectoryName(wxToZ(logfileDirectory));
+                             toZ(zen::getConfigDir() + wxT("Logs")) :
+                             zen::getFormattedDirectoryName(toZ(logfileDirectory));
 
         if (!zen::dirExists(logfileDir))
             zen::createDirectory(logfileDir); //create recursively if necessary: may throw (FileError&)
@@ -141,7 +141,7 @@ private:
         if (!logfileDir.EndsWith(FILE_NAME_SEPARATOR))
             logfileDir += FILE_NAME_SEPARATOR;
 
-        wxString logfileName = zToWx(logfileDir);
+        wxString logfileName = toWx(logfileDir);
 
         //add prefix
         logfileName += jobName + wxT(" ");
@@ -154,7 +154,7 @@ private:
         wxString output = logfileName + wxT(".log");
 
         //ensure uniqueness
-        for (int i = 1; zen::somethingExists(wxToZ(output)); ++i)
+        for (int i = 1; zen::somethingExists(toZ(output)); ++i)
             output = logfileName + wxChar('_') + zen::toString<wxString>(i) + wxT(".log");
 
         return output;
@@ -171,8 +171,8 @@ private:
 //##############################################################################################################################
 BatchStatusHandler::BatchStatusHandler(bool runSilent,
                                        const wxString& jobName,
-                                       const wxString* logfileDirectory,
-                                       size_t logFileMaxCount,
+                                       const wxString& logfileDirectory,
+                                       size_t logFileCountMax,
                                        const xmlAccess::OnError handleError,
                                        const SwitchToGui& switchBatchToGui, //functionality to change from batch mode to GUI mode
                                        int& returnVal) :
@@ -184,12 +184,12 @@ BatchStatusHandler::BatchStatusHandler(bool runSilent,
     returnValue(returnVal),
     syncStatusFrame(*this, NULL, SyncStatus::SCANNING, runSilent, jobName)
 {
-    if (logfileDirectory && logFileMaxCount > 0)
+    if (logFileCountMax > 0)
     {
         try
         {
-            logFile.reset(new LogFile(*logfileDirectory, jobName));
-            logFile->limitLogfileCount(logFileMaxCount);
+            logFile = std::make_shared<LogFile>(logfileDirectory, jobName); //throw FileError
+            logFile->limitLogfileCount(logFileCountMax); //throw FileError
         }
         catch (zen::FileError& error)
         {
@@ -198,8 +198,6 @@ BatchStatusHandler::BatchStatusHandler(bool runSilent,
             throw BatchAbortProcess();
         }
     }
-
-    assert(runSilent || handleError != xmlAccess::ON_ERROR_EXIT); //shouldn't be selectable from GUI settings
 }
 
 
@@ -255,16 +253,6 @@ BatchStatusHandler::~BatchStatusHandler()
 }
 
 
-inline
-void BatchStatusHandler::reportInfo(const Zstring& text)
-{
-    if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING) //write file transfer information to log
-        errorLog.logMsg(zToWx(text), TYPE_INFO); //avoid spamming with file copy info: visually identifying warning messages has priority! however when saving to a log file wee need this info
-
-    syncStatusFrame.setStatusText_NoUpdate(text);
-}
-
-
 void BatchStatusHandler::initNewProcess(int objectsTotal, zen::Int64 dataTotal, StatusHandler::Process processID)
 {
     currentProcess = processID;
@@ -290,13 +278,12 @@ void BatchStatusHandler::initNewProcess(int objectsTotal, zen::Int64 dataTotal, 
 }
 
 
-inline
 void BatchStatusHandler::updateProcessedData(int objectsProcessed, zen::Int64 dataProcessed)
 {
     switch (currentProcess)
     {
         case StatusHandler::PROCESS_SCANNING:
-            syncStatusFrame.incScannedObjects_NoUpdate(objectsProcessed);
+            syncStatusFrame.incScannedObjects_NoUpdate(objectsProcessed); //throw ()
             break;
         case StatusHandler::PROCESS_COMPARING_CONTENT:
         case StatusHandler::PROCESS_SYNCHRONIZING:
@@ -306,6 +293,18 @@ void BatchStatusHandler::updateProcessedData(int objectsProcessed, zen::Int64 da
             assert(false);
             break;
     }
+
+    //note: this method should NOT throw in order to properly allow undoing setting of statistics!
+}
+
+
+void BatchStatusHandler::reportInfo(const wxString& text)
+{
+    if (currentProcess == StatusHandler::PROCESS_SYNCHRONIZING) //write file transfer information to log
+        errorLog.logMsg(text, TYPE_INFO); //avoid spamming with file copy info: visually identifying warning messages has priority! however when saving to a log file wee need this info
+
+    syncStatusFrame.setStatusText_NoUpdate(text);
+    requestUiRefresh(); //throw AbortThisProcess
 }
 
 
@@ -320,7 +319,8 @@ void BatchStatusHandler::reportWarning(const wxString& warningMessage, bool& war
     {
         case xmlAccess::ON_ERROR_POPUP:
         {
-            //show popup and ask user how to handle warning
+            forceUiRefresh();
+
             bool dontWarnAgain = false;
             switch (showWarningDlg(ReturnWarningDlg::BUTTON_IGNORE | ReturnWarningDlg::BUTTON_SWITCH | ReturnWarningDlg::BUTTON_ABORT,
                                    warningMessage + wxT("\n\n") + _("Press \"Switch\" to open FreeFileSync GUI mode."),
@@ -353,14 +353,15 @@ void BatchStatusHandler::reportWarning(const wxString& warningMessage, bool& war
 }
 
 
-ErrorHandler::Response BatchStatusHandler::reportError(const wxString& errorMessage)
+ProcessCallback::Response BatchStatusHandler::reportError(const wxString& errorMessage)
 {
     switch (handleError_)
     {
         case xmlAccess::ON_ERROR_POPUP:
         {
-            bool ignoreNextErrors = false;
+            forceUiRefresh();
 
+            bool ignoreNextErrors = false;
             switch (showErrorDlg(ReturnErrorDlg::BUTTON_IGNORE |  ReturnErrorDlg::BUTTON_RETRY | ReturnErrorDlg::BUTTON_ABORT,
                                  errorMessage,
                                  ignoreNextErrors))
@@ -369,10 +370,10 @@ ErrorHandler::Response BatchStatusHandler::reportError(const wxString& errorMess
                     if (ignoreNextErrors) //falsify only
                         handleError_ = xmlAccess::ON_ERROR_IGNORE;
                     errorLog.logMsg(errorMessage, TYPE_ERROR);
-                    return ErrorHandler::IGNORE_ERROR;
+                    return ProcessCallback::IGNORE_ERROR;
 
                 case ReturnErrorDlg::BUTTON_RETRY:
-                    return ErrorHandler::RETRY;
+                    return ProcessCallback::RETRY;
 
                 case ReturnErrorDlg::BUTTON_ABORT:
                     errorLog.logMsg(errorMessage, TYPE_ERROR);
@@ -387,11 +388,11 @@ ErrorHandler::Response BatchStatusHandler::reportError(const wxString& errorMess
 
         case xmlAccess::ON_ERROR_IGNORE:
             errorLog.logMsg(errorMessage, TYPE_ERROR);
-            return ErrorHandler::IGNORE_ERROR;
+            return ProcessCallback::IGNORE_ERROR;
     }
 
     assert(false);
-    return ErrorHandler::IGNORE_ERROR; //dummy value
+    return ProcessCallback::IGNORE_ERROR; //dummy value
 
 }
 
@@ -405,7 +406,6 @@ void BatchStatusHandler::reportFatalError(const wxString& errorMessage)
 }
 
 
-inline
 void BatchStatusHandler::forceUiRefresh()
 {
     syncStatusFrame.updateStatusDialogNow();

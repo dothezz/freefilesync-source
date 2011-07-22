@@ -10,7 +10,6 @@
 #include <wx/string.h>
 #include <vector>
 #include <map>
-#include "../shared/zstring.h"
 
 
 namespace zen
@@ -37,7 +36,7 @@ private:
     {
         MessageType type;
         time_t      time;
-        wxString    message;
+        wxString message;
     };
 
     static wxString formatMessage(const Entry& msg);

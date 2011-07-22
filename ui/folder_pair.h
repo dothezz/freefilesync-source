@@ -17,6 +17,7 @@
 #include "../shared/util.h"
 #include "../shared/string_conv.h"
 #include "../library/norm_filter.h"
+#include "../shared/custom_button.h"
 
 namespace zen
 {
@@ -50,25 +51,25 @@ public:
     {
         if (altSyncConfig.get())
         {
-            basicPanel_.m_bpButtonAltSyncCfg->SetBitmapLabel(GlobalResources::instance().getImage(wxT("syncConfigSmall")));
-            basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(wxString(_("Select alternate synchronization settings")) +  wxT(" ") + common::LINE_BREAK +
+            setBitmapLabel(*basicPanel_.m_bpButtonAltSyncCfg, GlobalResources::instance().getImage(wxT("syncConfigSmall")));
+            basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(wxString(_("Select alternate synchronization settings")) +  wxT(" \n") +
                                                          wxT("(") + getVariantName(altSyncConfig->syncConfiguration.var) + wxT(")"));
         }
         else
         {
-            basicPanel_.m_bpButtonAltSyncCfg->SetBitmapLabel(GlobalResources::instance().getImage(wxT("syncConfigSmallGrey")));
+            setBitmapLabel(*basicPanel_.m_bpButtonAltSyncCfg, GlobalResources::instance().getImage(wxT("syncConfigSmallGrey")));
             basicPanel_.m_bpButtonAltSyncCfg->SetToolTip(_("Select alternate synchronization settings"));
         }
 
         //test for Null-filter
         if (isNullFilter(localFilter))
         {
-            basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(GlobalResources::instance().getImage(wxT("filterSmallGrey")));
+            setBitmapLabel(*basicPanel_.m_bpButtonLocalFilter, GlobalResources::instance().getImage(wxT("filterSmallGrey")));
             basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("No filter selected"));
         }
         else
         {
-            basicPanel_.m_bpButtonLocalFilter->SetBitmapLabel(GlobalResources::instance().getImage(wxT("filterSmall")));
+            setBitmapLabel(*basicPanel_.m_bpButtonLocalFilter, GlobalResources::instance().getImage(wxT("filterSmall")));
             basicPanel_.m_bpButtonLocalFilter->SetToolTip(_("Filter is active"));
         }
     }
@@ -103,26 +104,28 @@ protected:
 private:
     void OnLocalFilterCfgRemove(wxCommandEvent& event)
     {
-        const int menuId = 1234;
         contextMenu.reset(new wxMenu); //re-create context menu
-        contextMenu->Append(menuId, _("Clear filter settings"));
-        contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfgRemoveConfirm), NULL, this);
+
+        wxMenuItem* itemClear = new wxMenuItem(contextMenu.get(), wxID_ANY, _("Clear filter settings"));
+        contextMenu->Append(itemClear);
+        contextMenu->Connect(itemClear->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FolderPairPanelBasic::OnLocalFilterCfgRemoveConfirm), NULL, this);
 
         if (isNullFilter(localFilter))
-            contextMenu->Enable(menuId, false); //disable menu item, if clicking wouldn't make sense anyway
+            contextMenu->Enable(itemClear->GetId(), false); //disable menu item, if clicking wouldn't make sense anyway
 
         basicPanel_.PopupMenu(contextMenu.get()); //show context menu
     }
 
     void OnAltSyncCfgRemove(wxCommandEvent& event)
     {
-        const int menuId = 1234;
         contextMenu.reset(new wxMenu); //re-create context menu
-        contextMenu->Append(menuId, _("Remove alternate settings"));
-        contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfgRemoveConfirm), NULL, this);
+
+        wxMenuItem* itemRemove = new wxMenuItem(contextMenu.get(), wxID_ANY, _("Remove alternate settings"));
+        contextMenu->Append(itemRemove);
+        contextMenu->Connect(itemRemove->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FolderPairPanelBasic::OnAltSyncCfgRemoveConfirm), NULL, this);
 
         if (!altSyncConfig.get())
-            contextMenu->Enable(menuId, false); //disable menu item, if clicking wouldn't make sense anyway
+            contextMenu->Enable(itemRemove->GetId(), false); //disable menu item, if clicking wouldn't make sense anyway
 
         basicPanel_.PopupMenu(contextMenu.get()); //show context menu
     }

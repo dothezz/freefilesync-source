@@ -8,7 +8,7 @@
 
 namespace zen
 {
-const Zstring LOCK_FILE_ENDING = Zstr("ffs_lock"); //intermediate locks created by DirLock use this extension, too!
+const Zstring LOCK_FILE_ENDING = Zstr(".ffs_lock"); //intermediate locks created by DirLock use this extension, too!
 
 //convenience class for creating and holding locks for a number of directories
 class LockHolder
@@ -18,21 +18,21 @@ public:
     {
         if (dirnameFmt.empty()) return;
         if (lockHolder.find(dirnameFmt) != lockHolder.end()) return;
-        assert(dirnameFmt.EndsWith(common::FILE_NAME_SEPARATOR)); //this is really the contract, formatting does other things as well, e.g. macro substitution
+        assert(dirnameFmt.EndsWith(FILE_NAME_SEPARATOR)); //this is really the contract, formatting does other things as well, e.g. macro substitution
 
         class WaitOnLockHandler : public DirLockCallback
         {
         public:
             WaitOnLockHandler(ProcessCallback& pc) : pc_(pc) {}
             virtual void requestUiRefresh() { pc_.requestUiRefresh(); }  //allowed to throw exceptions
-            virtual void reportInfo(const Zstring& text) { pc_.reportInfo(text); }
+            virtual void reportInfo(const std::wstring& text) { pc_.reportInfo(text); }
         private:
             ProcessCallback& pc_;
         } callback(procCallback);
 
         try
         {
-            lockHolder.insert(std::make_pair(dirnameFmt, DirLock(dirnameFmt + Zstr("sync.") + LOCK_FILE_ENDING, &callback)));
+            lockHolder.insert(std::make_pair(dirnameFmt, DirLock(dirnameFmt + Zstr("sync") + LOCK_FILE_ENDING, &callback)));
         }
         catch (const FileError& e)
         {

@@ -12,6 +12,44 @@
 #include <cmath>
 
 
+namespace
+{
+bool isEqual(const wxBitmap& lhs, const wxBitmap& rhs)
+{
+    if (lhs.IsOk() != rhs.IsOk())
+        return false;
+
+    if (!lhs.IsOk())
+        return true;
+
+    const int pixelCount = lhs.GetWidth() * lhs.GetHeight();
+    if (pixelCount != rhs.GetWidth() * rhs.GetHeight())
+        return false;
+
+    wxImage imLhs = lhs.ConvertToImage();
+    wxImage imRhs = rhs.ConvertToImage();
+
+    if (imLhs.HasAlpha() != imRhs.HasAlpha())
+        return false;
+
+    if (imLhs.HasAlpha())
+    {
+        if (!std::equal(imLhs.GetAlpha(), imLhs.GetAlpha() + pixelCount, imRhs.GetAlpha()))
+            return false;
+    }
+
+    return std::equal(imLhs.GetData(), imLhs.GetData() + pixelCount * 3, imRhs.GetData());
+}
+}
+
+
+void setBitmapLabel(wxBitmapButton& button, const wxBitmap& bmp)
+{
+    if (!isEqual(button.GetBitmapLabel(), bmp))
+        button.SetBitmapLabel(bmp);
+}
+
+
 wxButtonWithImage::wxButtonWithImage(wxWindow* parent,
                                      wxWindowID id,
                                      const wxString& label,
@@ -30,25 +68,34 @@ wxButtonWithImage::wxButtonWithImage(wxWindow* parent,
 
 void wxButtonWithImage::setBitmapFront(const wxBitmap& bitmap, unsigned spaceAfter)
 {
-    bitmapFront  = bitmap;
-    m_spaceAfter = spaceAfter;
-    refreshButtonLabel();
+    if (!isEqual(bitmap, bitmapFront) || spaceAfter != m_spaceAfter) //avoid flicker
+    {
+        bitmapFront  = bitmap;
+        m_spaceAfter = spaceAfter;
+        refreshButtonLabel();
+    }
 }
 
 
 void wxButtonWithImage::setTextLabel(const wxString& text)
 {
-    textLabel = text;
-    wxBitmapButton::SetLabel(text);
-    refreshButtonLabel();
+    if (text != textLabel) //avoid flicker
+    {
+        textLabel = text;
+        wxBitmapButton::SetLabel(text);
+        refreshButtonLabel();
+    }
 }
 
 
 void wxButtonWithImage::setBitmapBack(const wxBitmap& bitmap, unsigned spaceBefore)
 {
-    bitmapBack    = bitmap;
-    m_spaceBefore = spaceBefore;
-    refreshButtonLabel();
+    if (!isEqual(bitmap, bitmapBack) || spaceBefore != m_spaceBefore) //avoid flicker
+    {
+        bitmapBack    = bitmap;
+        m_spaceBefore = spaceBefore;
+        refreshButtonLabel();
+    }
 }
 
 
@@ -293,19 +340,33 @@ void writeToImage(const wxImage& source, const wxPoint pos, wxImage& target)
 }
 
 
+namespace
+{
+inline
+wxSize getSize(const wxBitmap& bmp)
+{
+    return bmp.IsOk() ? wxSize(bmp.GetWidth(), bmp.GetHeight()) : wxSize(0, 0);
+}
+}
+
+
 void wxButtonWithImage::refreshButtonLabel()
 {
     wxBitmap bitmapText = createBitmapFromText(textLabel);
 
+    wxSize szFront = getSize(bitmapFront); //
+    wxSize szText  = getSize(bitmapText);  //make sure to NOT access null-bitmaps!
+    wxSize szBack  = getSize(bitmapBack);  //
+
     //calculate dimensions of new button
-    const int height = std::max(std::max(bitmapFront.GetHeight(), bitmapText.GetHeight()), bitmapBack.GetHeight());
-    const int width  = bitmapFront.GetWidth() + m_spaceAfter + bitmapText.GetWidth() + m_spaceBefore + bitmapBack.GetWidth();
+    const int height = std::max(std::max(szFront.GetHeight(), szText.GetHeight()), szBack.GetHeight());
+    const int width  = szFront.GetWidth() + m_spaceAfter + szText.GetWidth() + m_spaceBefore + szBack.GetWidth();
 
     //create a transparent image
     wxImage transparentImage(width, height, false);
     transparentImage.SetAlpha();
     unsigned char* alpha = transparentImage.GetAlpha();
-    memset(alpha, wxIMAGE_ALPHA_TRANSPARENT, width * height);
+    ::memset(alpha, wxIMAGE_ALPHA_TRANSPARENT, width * height);
 
     //wxDC::DrawLabel() unfortunately isn't working for transparent images on Linux, so we need to use custom image-concatenation
     if (bitmapFront.IsOk())
@@ -315,12 +376,12 @@ void wxButtonWithImage::refreshButtonLabel()
 
     if (bitmapText.IsOk())
         writeToImage(bitmapText.ConvertToImage(),
-                     wxPoint(bitmapFront.GetWidth() + m_spaceAfter, (transparentImage.GetHeight() - bitmapText.GetHeight()) / 2),
+                     wxPoint(szFront.GetWidth() + m_spaceAfter, (transparentImage.GetHeight() - bitmapText.GetHeight()) / 2),
                      transparentImage);
 
     if (bitmapBack.IsOk())
         writeToImage(bitmapBack.ConvertToImage(),
-                     wxPoint(bitmapFront.GetWidth() + m_spaceAfter + bitmapText.GetWidth() + m_spaceBefore, (transparentImage.GetHeight() - bitmapBack.GetHeight()) / 2),
+                     wxPoint(szFront.GetWidth() + m_spaceAfter + szText.GetWidth() + m_spaceBefore, (transparentImage.GetHeight() - bitmapBack.GetHeight()) / 2),
                      transparentImage);
 
     //adjust button size

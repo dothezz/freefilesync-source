@@ -6,9 +6,7 @@
 //
 #include "file_traverser.h"
 #include <limits>
-#include "system_constants.h"
 #include "last_error.h"
-#include "string_conv.h"
 #include "assert_static.h"
 #include "symlink_target.h"
 
@@ -22,6 +20,36 @@
 #include <dirent.h>
 #include <cerrno>
 #endif
+
+using namespace zen;
+
+
+namespace
+{
+//implement "retry" in a generic way:
+
+//returns "true" if "cmd" was invoked successfully, "false" if error occured and was ignored
+template <class Command> inline //function object with bool operator()(std::wstring& errorMsg), returns "true" on success, "false" on error and writes "errorMsg" in this case
+bool tryReportingError(Command cmd, zen::TraverseCallback& callback)
+{
+    for (;;)
+    {
+        std::wstring errorMsg;
+        if (cmd(errorMsg))
+            return true;
+
+        switch (callback.onError(errorMsg))
+        {
+            case TraverseCallback::TRAV_ERROR_RETRY:
+                break;
+            case TraverseCallback::TRAV_ERROR_IGNORE:
+                return false;
+            default:
+                assert(false);
+                break;
+        }
+    }
+}
 
 
 #ifdef FFS_WIN
@@ -62,6 +90,7 @@ bool setWin32FileInformationFromSymlink(const Zstring& linkName, zen::TraverseCa
     return true;
 }
 #endif
+}
 
 
 class DirTraverser
@@ -78,8 +107,8 @@ public:
 
 #elif defined FFS_LINUX
         const Zstring directoryFormatted = //remove trailing slash
-            baseDirectory.size() > 1 && baseDirectory.EndsWith(common::FILE_NAME_SEPARATOR) ?  //exception: allow '/'
-            baseDirectory.BeforeLast(common::FILE_NAME_SEPARATOR) :
+            baseDirectory.size() > 1 && baseDirectory.EndsWith(FILE_NAME_SEPARATOR) ?  //exception: allow '/'
+            baseDirectory.BeforeLast(FILE_NAME_SEPARATOR) :
             baseDirectory;
 #endif
 
@@ -97,40 +126,56 @@ public:
     }
 
 private:
+	DirTraverser(const DirTraverser&);
+	DirTraverser& operator=(const DirTraverser&);
+
     template <bool followSymlinks>
     void traverse(const Zstring& directory, zen::TraverseCallback& sink, int level)
     {
-        using namespace zen;
+			using namespace zen;
 
-        if (level == 100) //catch endless recursion
+        tryReportingError([&](std::wstring& errorMsg) -> bool
         {
-            sink.onError(wxString(_("Endless loop when traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\""));
-            return;
-        }
+            if (level == 100) //notify endless recursion
+            {
+                errorMsg = _("Endless loop when traversing directory:") + "\n\"" + directory + "\"";
+                return false;
+            }
+            return true;
+        }, sink);
+
 
 #ifdef FFS_WIN
         //ensure directoryFormatted ends with backslash
-        const Zstring& directoryFormatted = directory.EndsWith(common::FILE_NAME_SEPARATOR) ?
+        const Zstring& directoryFormatted = directory.EndsWith(FILE_NAME_SEPARATOR) ?
                                             directory :
-                                            directory + common::FILE_NAME_SEPARATOR;
+                                            directory + FILE_NAME_SEPARATOR;
 
         WIN32_FIND_DATA fileInfo = {};
-        HANDLE searchHandle = ::FindFirstFile(applyLongPathPrefix(directoryFormatted + Zchar('*')).c_str(), //__in   LPCTSTR lpFileName
-                                              &fileInfo);                                                   //__out  LPWIN32_FIND_DATA lpFindFileData
-        //no noticable performance difference compared to FindFirstFileEx with FindExInfoBasic, FIND_FIRST_EX_CASE_SENSITIVE and/or FIND_FIRST_EX_LARGE_FETCH
+
+        HANDLE searchHandle = INVALID_HANDLE_VALUE;
+        tryReportingError([&](std::wstring& errorMsg) -> bool
+        {
+            searchHandle = ::FindFirstFile(
+                applyLongPathPrefix(directoryFormatted + Zchar('*')).c_str(), //__in   LPCTSTR lpFileName
+                &fileInfo);                                                   //__out  LPWIN32_FIND_DATA lpFindFileData
+            //no noticable performance difference compared to FindFirstFileEx with FindExInfoBasic, FIND_FIRST_EX_CASE_SENSITIVE and/or FIND_FIRST_EX_LARGE_FETCH
+
+            if (searchHandle == INVALID_HANDLE_VALUE)
+            {
+                const DWORD lastError = ::GetLastError();
+                if (lastError == ERROR_FILE_NOT_FOUND)
+                    return true; //fine: empty directory
+
+                //else: we have a problem... report it:
+                errorMsg = _("Error traversing directory:") + "\n\"" + directory + "\"" + "\n\n" + zen::getLastErrorFormatted(lastError);
+                return false;
+            }
+            return true;
+        }, sink);
 
         if (searchHandle == INVALID_HANDLE_VALUE)
-        {
-            const DWORD lastError = ::GetLastError();
-            if (lastError == ERROR_FILE_NOT_FOUND)
-                return;
-
-            //else: we have a problem... report it:
-            const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"");
-
-            sink.onError(errorMessage + wxT("\n\n") +zen::getLastErrorFormatted(lastError));
-            return;
-        }
+            return; //empty dir or ignore error
 
         Loki::ScopeGuard dummy = Loki::MakeGuard(::FindClose, searchHandle);
         (void)dummy; //silence warning "unused variable"
@@ -139,9 +184,8 @@ private:
         {
             //don't return "." and ".."
             const Zchar* const shortName = fileInfo.cFileName;
-            if ( shortName[0] == Zstr('.') &&
-                 ((shortName[1] == Zstr('.') && shortName[2] == Zstr('\0')) ||
-                  shortName[1] == Zstr('\0')))
+            if (shortName[0] == L'.' &&
+                (shortName[1] == L'\0' || (shortName[1] == L'.' && shortName[2] == L'\0')))
                 continue;
 
             const Zstring& fullName = directoryFormatted + shortName;
@@ -210,65 +254,95 @@ private:
                     details.fileSize         = zen::UInt64(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
                 }
 
-                sink.onFile(shortName, fullName, details);
+				sink.onFile(shortName, fullName, details);
             }
         }
-        while (::FindNextFile(searchHandle,	   // handle to search
-                              &fileInfo)); // pointer to structure for data on found file
+        while ([&]() -> bool
+    {
+        bool moreData = false;
 
-        const DWORD lastError = ::GetLastError();
-        if (lastError != ERROR_NO_MORE_FILES) //this is fine
+        tryReportingError([&](std::wstring& errorMsg) -> bool
         {
-            //else we have a problem... report it:
-            const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") ;
-            sink.onError(errorMessage + wxT("\n\n") + zen::getLastErrorFormatted(lastError));
-        }
+            if (!::FindNextFile(searchHandle, // handle to search
+                &fileInfo)) // pointer to structure for data on found file
+                {
+                    if (::GetLastError() == ERROR_NO_MORE_FILES) //this is fine
+                        return true;
+
+                    //else we have a problem... report it:
+                    errorMsg = _("Error traversing directory:") + "\n\"" + directory + "\"" + "\n\n" + zen::getLastErrorFormatted();
+                    return false;
+                }
+
+                moreData = true;
+                return true;
+            }, sink);
+
+            return moreData;
+        }());
+
 
 #elif defined FFS_LINUX
-        DIR* dirObj = ::opendir(directory.c_str()); //directory must NOT end with path separator, except "/"
-        if (dirObj == NULL)
-        {
-            const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") ;
-            sink.onError(errorMessage + wxT("\n\n") + zen::getLastErrorFormatted());
-            return;
-        }
+        DIR* dirObj = NULL;
+        if (!tryReportingError([&](std::wstring& errorMsg) -> bool
+    {
+        dirObj = ::opendir(directory.c_str()); //directory must NOT end with path separator, except "/"
+            if (dirObj == NULL)
+            {
+                errorMsg = _("Error traversing directory:") + "\n\"" + directory + "\"" + "\n\n" + zen::getLastErrorFormatted();
+                return false;
+            }
+            return true;
+        }, sink))
+        return;
 
         Loki::ScopeGuard dummy = Loki::MakeGuard(::closedir, dirObj); //never close NULL handles! -> crash
         (void)dummy; //silence warning "unused variable"
 
         while (true)
         {
-            errno = 0; //set errno to 0 as unfortunately this isn't done when readdir() returns NULL because it can't find any files
-            struct dirent* dirEntry = ::readdir(dirObj);
-            if (dirEntry == NULL)
+            struct dirent* dirEntry = NULL;
+            tryReportingError([&](std::wstring& errorMsg) -> bool
             {
-                if (errno == 0)
-                    return; //everything okay
+                errno = 0; //set errno to 0 as unfortunately this isn't done when readdir() returns NULL because it can't find any files
+                dirEntry = ::readdir(dirObj);
+                if (dirEntry == NULL)
+                {
+                    if (errno == 0)
+                        return true; //everything okay, not more items
 
-                //else: we have a problem... report it:
-                const wxString errorMessage = wxString(_("Error traversing directory:")) + wxT("\n\"") + zToWx(directory) + wxT("\"") ;
-                sink.onError(errorMessage + wxT("\n\n") + zen::getLastErrorFormatted());
+                    //else: we have a problem... report it:
+                    errorMsg = _("Error traversing directory:") + "\n\"" + directory + "\"" + "\n\n" + zen::getLastErrorFormatted();
+                    return false;
+                }
+                return true;
+            }, sink);
+            if (dirEntry == NULL) //no more items or ignore error
                 return;
-            }
+
 
             //don't return "." and ".."
             const Zchar* const shortName = dirEntry->d_name;
-            if (  shortName[0] == Zstr('.') &&
-                  ((shortName[1] == Zstr('.') && shortName[2] == Zstr('\0')) ||
-                   shortName[1] == Zstr('\0')))
+            if (shortName[0] == '.' &&
+                (shortName[1] == '\0' || (shortName[1] == '.' && shortName[2] == '\0')))
                 continue;
 
-            const Zstring& fullName = directory.EndsWith(common::FILE_NAME_SEPARATOR) ? //e.g. "/"
+            const Zstring& fullName = directory.EndsWith(FILE_NAME_SEPARATOR) ? //e.g. "/"
                                       directory + shortName :
-                                      directory + common::FILE_NAME_SEPARATOR + shortName;
+                                      directory + FILE_NAME_SEPARATOR + shortName;
 
-            struct stat fileInfo;
+            struct stat fileInfo = {};
+
+            if (!tryReportingError([&](std::wstring& errorMsg) -> bool
+        {
             if (::lstat(fullName.c_str(), &fileInfo) != 0) //lstat() does not resolve symlinks
-            {
-                const wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(fullName) + wxT("\"");
-                sink.onError(errorMessage + wxT("\n\n") + zen::getLastErrorFormatted());
-                continue;
-            }
+                {
+                    errorMsg = _("Error reading file attributes:") + "\n\"" + fullName + "\"" + "\n\n" + zen::getLastErrorFormatted();
+                    return false;
+                }
+                return true;
+            }, sink))
+            continue; //ignore error: skip file
 
             const bool isSymbolicLink = S_ISLNK(fileInfo.st_mode);
 
@@ -278,11 +352,7 @@ private:
                 {
                     if (::stat(fullName.c_str(), &fileInfo) != 0) //stat() resolves symlinks
                     {
-                        //a broken symbolic link
-                        TraverseCallback::FileInfo details;
-                        details.lastWriteTimeRaw = 0; //we are not interested in the modifiation time of the link
-                        details.fileSize         = 0U;
-                        sink.onFile(shortName, fullName, details); //report broken symlink as file!
+                        sink.onFile(shortName, fullName, TraverseCallback::FileInfo()); //report broken symlink as file!
                         continue;
                     }
                 }
@@ -352,7 +422,7 @@ private:
             const dst::RawTime encodedTime = dst::fatEncodeUtcTime(i->second); //throw (std::runtime_error)
             {
                 HANDLE hTarget = ::CreateFile(zen::applyLongPathPrefix(i->first).c_str(),
-                                              FILE_WRITE_ATTRIBUTES,
+                                              GENERIC_WRITE, //just FILE_WRITE_ATTRIBUTES may not be enough for some NAS shares!
                                               FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                                               NULL,
                                               OPEN_EXISTING,
@@ -410,5 +480,13 @@ private:
 
 void zen::traverseFolder(const Zstring& directory, bool followSymlinks, TraverseCallback& sink, DstHackCallback* dstCallback)
 {
+#ifdef FFS_WIN
+    try //traversing certain folders with restricted permissions requires this privilege! (but copying these files may still fail)
+    {
+        zen::Privileges::getInstance().ensureActive(SE_BACKUP_NAME); //throw (FileError)
+    }
+    catch (...) {} //don't cause issues in user mode
+#endif
+
     DirTraverser(directory, followSymlinks, sink, dstCallback);
 }

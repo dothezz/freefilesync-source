@@ -7,7 +7,6 @@
 #ifndef FILETRAVERSER_H_INCLUDED
 #define FILETRAVERSER_H_INCLUDED
 
-#include <wx/string.h>
 #include "zstring.h"
 #include "loki/TypeManip.h"
 #include "int64.h"
@@ -23,15 +22,15 @@ public:
 
     struct FileInfo
     {
-        zen::UInt64 fileSize;        //unit: bytes!
-        zen::Int64 lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
+        UInt64 fileSize;        //unit: bytes!
+        Int64 lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
     };
 
     struct SymlinkInfo
     {
-        zen::Int64 lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
-        Zstring    targetPath;       //may be empty if something goes wrong
-        bool dirLink;                //"true": point to dir; "false": point to file (or broken Link on Linux)
+        Int64 lastWriteTimeRaw; //number of seconds since Jan. 1st 1970 UTC
+        Zstring    targetPath;  //may be empty if something goes wrong
+        bool dirLink;           //"true": point to dir; "false": point to file (or broken Link on Linux)
     };
 
     struct ReturnValDir
@@ -46,14 +45,20 @@ public:
         ReturnValDir(Loki::Int2Type<TRAVERSING_DIR_CONTINUE>, TraverseCallback& subDirCallback) : returnCode(TRAVERSING_DIR_CONTINUE), subDirCb(&subDirCallback) {}
 
         const ReturnValueEnh returnCode;
-        TraverseCallback* const subDirCb;
+        TraverseCallback* subDirCb;
+    };
+
+    enum HandleError
+    {
+        TRAV_ERROR_RETRY,
+        TRAV_ERROR_IGNORE
     };
 
     //overwrite these virtual methods
-    virtual void onError(const wxString& errorText) = 0;
-    virtual void onFile(       const Zchar* shortName, const Zstring& fullName, const FileInfo&    details) = 0;
-    virtual void onSymlink(    const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) = 0;
-    virtual ReturnValDir onDir(const Zchar* shortName, const Zstring& fullName) = 0;
+    virtual void         onFile   (const Zchar* shortName, const Zstring& fullName, const FileInfo&    details) = 0;
+    virtual void         onSymlink(const Zchar* shortName, const Zstring& fullName, const SymlinkInfo& details) = 0;
+    virtual ReturnValDir onDir    (const Zchar* shortName, const Zstring& fullName) = 0;
+    virtual HandleError  onError  (const std::wstring& errorText) = 0;
 };
 
 

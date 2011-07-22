@@ -29,7 +29,7 @@
 					<Add library="libwxpng.a" />
 					<Add library="libwxzlib.a" />
 					<Add library="libwxbase28u_net.a" />
-					<Add library="libboost_thread-mgw45-mt-s-1_46_1.a" />
+					<Add library="libboost_thread-mgw45-mt-s-1_47.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 				</Linker>
 			</Target>
@@ -55,7 +55,7 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
-					<Add library="libboost_thread-mgw45-mt-sd-1_46_1.a" />
+					<Add library="libboost_thread-mgw45-mt-sd-1_47.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
@@ -79,7 +79,7 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxbase28ud_net.a" />
 					<Add library="libwxmsw28ud_aui.a" />
-					<Add library="libboost_thread-mgw45-mt-sd-1_46_1.a" />
+					<Add library="libboost_thread-mgw45-mt-sd-1_47.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
@@ -277,7 +277,6 @@
 		<Unit filename="shared\file_io.h" />
 		<Unit filename="shared\file_traverser.cpp" />
 		<Unit filename="shared\file_traverser.h" />
-		<Unit filename="shared\global_func.cpp" />
 		<Unit filename="shared\global_func.h" />
 		<Unit filename="shared\guid.cpp" />
 		<Unit filename="shared\guid.h" />
@@ -350,6 +349,7 @@
 		<Unit filename="shared\zbase.h" />
 		<Unit filename="shared\zstring.cpp" />
 		<Unit filename="shared\zstring.h" />
+		<Unit filename="shared\zxstring.h" />
 		<Unit filename="structures.cpp" />
 		<Unit filename="structures.h">
 			<Option target="&lt;{~None~}&gt;" />

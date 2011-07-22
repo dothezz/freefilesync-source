@@ -27,7 +27,7 @@
 					<Add library="libwxbase28u.a" />
 					<Add library="libwxpng.a" />
 					<Add library="libwxzlib.a" />
-					<Add library="libboost_thread-mgw45-mt-s-1_46_1.a" />
+					<Add library="libboost_thread-mgw45-mt-s-1_47.a" />
 					<Add directory="C:\Programme\C++\wxWidgets\lib\gcc_lib" />
 				</Linker>
 			</Target>
@@ -51,7 +51,7 @@
 					<Add library="libwxbase28ud.a" />
 					<Add library="libwxpngd.a" />
 					<Add library="libwxzlibd.a" />
-					<Add library="libboost_thread-mgw45-mt-sd-1_46_1.a" />
+					<Add library="libboost_thread-mgw45-mt-sd-1_47.a" />
 					<Add directory="C:\Program Files\C++\wxWidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
@@ -101,7 +101,6 @@
 		<Unit filename="gui_generated.h" />
 		<Unit filename="main_dlg.cpp" />
 		<Unit filename="main_dlg.h" />
-		<Unit filename="notify.cpp" />
 		<Unit filename="notify.h" />
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
@@ -124,6 +123,8 @@
 		<Unit filename="..\Shared\zstring.h" />
 		<Unit filename="..\library\process_xml.cpp" />
 		<Unit filename="..\shared\check_exist.cpp" />
+		<Unit filename="..\shared\dir_watcher.cpp" />
+		<Unit filename="..\shared\dir_watcher.h" />
 		<Unit filename="..\shared\dll_loader.cpp" />
 		<Unit filename="..\shared\dll_loader.h" />
 		<Unit filename="..\shared\dst_hack.cpp" />
@@ -134,7 +135,6 @@
 		<Unit filename="..\shared\file_id.cpp" />
 		<Unit filename="..\shared\file_io.cpp" />
 		<Unit filename="..\shared\file_traverser.cpp" />
-		<Unit filename="..\shared\global_func.cpp" />
 		<Unit filename="..\shared\global_func.h" />
 		<Unit filename="..\shared\help_provider.cpp" />
 		<Unit filename="..\shared\i18n.cpp" />
@@ -144,6 +144,8 @@
 		<Unit filename="..\shared\localization.cpp" />
 		<Unit filename="..\shared\long_path_prefix.h" />
 		<Unit filename="..\shared\mouse_move_dlg.cpp" />
+		<Unit filename="..\shared\notify_removal.cpp" />
+		<Unit filename="..\shared\notify_removal.h" />
 		<Unit filename="..\shared\pch.h">
 			<Option compile="1" />
 			<Option weight="0" />

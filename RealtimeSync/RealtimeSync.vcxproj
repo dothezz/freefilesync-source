@@ -199,7 +199,7 @@
       <PreprocessorDefinitions>ZEN_PLATFORM_WINDOWS;wxUSE_UNICODE;__WXMSW__;FFS_WIN;WXINTL_NO_GETTEXT_MACRO;NDEBUG</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\shared;C:\Program Files\C++\wxWidgets-x64\include;C:\Program Files\C++\wxWidgets-x64\lib\vc_lib\mswu;C:\Program Files\C++\Boost</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <DisableSpecificWarnings>4100;4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4512;4996;4100;4127</DisableSpecificWarnings>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
@@ -228,17 +228,18 @@
     <ClCompile Include="..\library\process_xml.cpp" />
     <ClCompile Include="..\shared\check_exist.cpp" />
     <ClCompile Include="..\shared\custom_button.cpp" />
+    <ClCompile Include="..\shared\dir_watcher.cpp" />
     <ClCompile Include="..\shared\dll_loader.cpp" />
     <ClCompile Include="..\shared\dir_name.cpp" />
     <ClCompile Include="..\shared\dst_hack.cpp" />
     <ClCompile Include="..\shared\file_handling.cpp" />
     <ClCompile Include="..\shared\file_io.cpp" />
     <ClCompile Include="..\shared\file_traverser.cpp" />
-    <ClCompile Include="..\shared\global_func.cpp" />
     <ClCompile Include="..\shared\help_provider.cpp" />
     <ClCompile Include="..\shared\i18n.cpp" />
     <ClCompile Include="..\shared\localization.cpp" />
     <ClCompile Include="..\shared\mouse_move_dlg.cpp" />
+    <ClCompile Include="..\shared\notify_removal.cpp" />
     <ClCompile Include="..\shared\privilege.cpp" />
     <ClCompile Include="..\shared\resolve_path.cpp" />
     <ClCompile Include="..\shared\standard_paths.cpp" />
@@ -254,7 +255,6 @@
     </ClCompile>
     <ClCompile Include="gui_generated.cpp" />
     <ClCompile Include="main_dlg.cpp" />
-    <ClCompile Include="notify.cpp" />
     <ClCompile Include="resources.cpp" />
     <ClCompile Include="tray_menu.cpp" />
     <ClCompile Include="watcher.cpp" />

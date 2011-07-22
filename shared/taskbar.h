@@ -40,7 +40,7 @@ public:
 
 private:
     class Pimpl;
-    std::auto_ptr<Pimpl> pimpl_;
+    std::unique_ptr<Pimpl> pimpl_;
 };
 
 }

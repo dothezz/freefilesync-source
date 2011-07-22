@@ -11,7 +11,6 @@
 #include "../shared/last_error.h"
 #include "../shared/boost_thread_wrap.h" //include <boost/thread.hpp>
 #include "../shared/loki/ScopeGuard.h"
-#include "../shared/system_constants.h"
 #include "../shared/guid.h"
 #include "../shared/file_io.h"
 #include "../shared/assert_static.h"
@@ -47,20 +46,12 @@ const int LOCK_FORMAT_VER = 1; //lock file format version
 typedef Zbase<Zchar, StorageDeepCopy> BasicString; //thread safe string class
 }
 
+//worker thread
 class LifeSigns
 {
 public:
     LifeSigns(const BasicString& lockfilename) : //throw()!!! siehe SharedDirLock()
-        lockfilename_(lockfilename) //thread safety: make deep copy!
-    {
-        threadObj = boost::thread(boost::cref(*this)); //localize all thread logic to this class!
-    }
-
-    ~LifeSigns()
-    {
-        threadObj.interrupt(); //thread lifetime is subset of this instances's life
-        threadObj.join();
-    }
+        lockfilename_(lockfilename) {} //thread safety: make deep copy!
 
     void operator()() const //thread entry
     {
@@ -129,11 +120,8 @@ public:
     }
 
 private:
-    LifeSigns(const LifeSigns&);            //just be sure this ref-counting Zstring doesn't bite
-    LifeSigns& operator=(const LifeSigns&); //
-
-    boost::thread threadObj;
-    const BasicString lockfilename_; //used by worker thread only! Not ref-counted!
+    //make sure this instance is safely copyable!
+    const BasicString lockfilename_; //thread local! Not ref-counted!
 };
 
 
@@ -147,8 +135,7 @@ void deleteLockFile(const Zstring& filename) //throw (FileError)
     if (::unlink(filename.c_str()) != 0)
 #endif
     {
-        wxString errorMessage = wxString(_("Error deleting file:")) + wxT("\n\"") + zToWx(filename) + wxT("\"");
-        throw FileError(errorMessage + wxT("\n\n") + getLastErrorFormatted());
+        throw FileError(_("Error deleting file:") + "\n\"" + filename + "\"" + "\n\n" + getLastErrorFormatted());
     }
 }
 
@@ -162,8 +149,7 @@ zen::UInt64 getLockFileSize(const Zstring& filename) //throw (FileError, ErrorNo
     {
         const DWORD lastError = ::GetLastError();
 
-        wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(filename) + wxT("\"");
-        errorMessage += wxT("\n\n") + getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error reading file attributes:") + "\n\"" + filename + "\"" + "\n\n" + getLastErrorFormatted(lastError);
 
         if (lastError == ERROR_FILE_NOT_FOUND ||
             lastError == ERROR_PATH_NOT_FOUND)
@@ -182,8 +168,7 @@ zen::UInt64 getLockFileSize(const Zstring& filename) //throw (FileError, ErrorNo
     {
         const int lastError = errno;
 
-        wxString errorMessage = wxString(_("Error reading file attributes:")) + wxT("\n\"") + zToWx(filename) + wxT("\"");
-        errorMessage += wxT("\n\n") + getLastErrorFormatted(lastError);
+        std::wstring errorMessage = _("Error reading file attributes:") + "\n\"" + filename + "\"" + "\n\n" + getLastErrorFormatted(lastError);
 
         if (lastError == ENOENT)
             throw ErrorNotExisting(errorMessage);
@@ -196,13 +181,13 @@ zen::UInt64 getLockFileSize(const Zstring& filename) //throw (FileError, ErrorNo
 }
 
 
-Zstring deleteAbandonedLockName(const Zstring& lockfilename)
+Zstring deleteAbandonedLockName(const Zstring& lockfilename) //make sure to NOT change file ending!
 {
-    const size_t pos = lockfilename.rfind(common::FILE_NAME_SEPARATOR); //search from end
+    const size_t pos = lockfilename.rfind(FILE_NAME_SEPARATOR); //search from end
     return pos == Zstring::npos ? Zstr("Del.") + lockfilename :
            Zstring(lockfilename.c_str(), pos + 1) + //include path separator
            Zstr("Del.") +
-           lockfilename.AfterLast(common::FILE_NAME_SEPARATOR); //returns the whole string if ch not found
+           lockfilename.AfterLast(FILE_NAME_SEPARATOR); //returns the whole string if ch not found
 }
 
 
@@ -319,6 +304,7 @@ ProcessStatus getProcessStatus(const LockInformation::ProcessDescription& procDe
                           0);                 //__in  DWORD th32ProcessID
     if (snapshot == INVALID_HANDLE_VALUE)
         return PROC_STATUS_NO_IDEA;
+
     Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, snapshot);
     (void)dummy; //silence warning "unused variable"
 
@@ -371,10 +357,10 @@ std::string retrieveLockId(const Zstring& lockfilename) //throw (FileError, Erro
 
 void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //throw (FileError)
 {
-    Zstring infoMsg;
-    infoMsg = wxToZ(_("Waiting while directory is locked (%x)..."));
-    infoMsg.Replace(Zstr("%x"), Zstr("\"") + lockfilename + Zstr("\""));
-    if (callback) callback->reportInfo(infoMsg);
+    std::wstring infoMsg = _("Waiting while directory is locked (%x)...");
+    replace(infoMsg, L"%x", std::wstring(L"\"") + lockfilename + "\"");
+    if (callback)
+        callback->reportInfo(infoMsg);
     //---------------------------------------------------------------
     try
     {
@@ -428,16 +414,15 @@ void waitOnDirLock(const Zstring& lockfilename, DirLockCallback* callback) //thr
                         long remainingSeconds = ((DETECT_EXITUS_INTERVAL - (wxGetLocalTimeMillis() - lockSilentStart)) / 1000).ToLong();
                         remainingSeconds = std::max(0L, remainingSeconds);
 
-                        Zstring remSecMsg = wxToZ(_P("1 sec", "%x sec", remainingSeconds));
-                        remSecMsg.Replace(Zstr("%x"), Zstring::fromNumber(remainingSeconds));
-                        callback->reportInfo(infoMsg + Zstr(" ") + remSecMsg);
+                        std::wstring remSecMsg = _P("1 sec", "%x sec", remainingSeconds);
+                        replace(remSecMsg, L"%x", toString<std::wstring>(remainingSeconds));
+                        callback->reportInfo(infoMsg + " " + remSecMsg);
                     }
                     else
                         callback->reportInfo(infoMsg); //emit a message in any case (might clear other one)
                 }
             }
         }
-
     }
     catch (const ErrorNotExisting&)
     {
@@ -471,10 +456,7 @@ bool tryLock(const Zstring& lockfilename) //throw (FileError)
         if (::GetLastError() == ERROR_FILE_EXISTS)
             return false;
         else
-        {
-            wxString errorMessage = wxString(_("Error setting directory lock:")) + wxT("\n\"") + zToWx(lockfilename) + wxT("\"");
-            throw FileError(errorMessage + wxT("\n\n") + getLastErrorFormatted());
-        }
+            throw FileError(_("Error setting directory lock:") + "\n\"" + lockfilename + "\"" + "\n\n" + getLastErrorFormatted());
     }
     ::CloseHandle(fileHandle);
 
@@ -487,11 +469,7 @@ bool tryLock(const Zstring& lockfilename) //throw (FileError)
         if (errno == EEXIST)
             return false;
         else
-        {
-            wxString errorMessage = wxString(_("Error setting directory lock:")) + wxT("\n\"") + zToWx(lockfilename) + wxT("\"");
-            throw FileError(errorMessage + wxT("\n\n") + getLastErrorFormatted());
-        }
-
+            throw FileError(_("Error setting directory lock:") + "\n\"" + lockfilename + "\"" + "\n\n" + getLastErrorFormatted());
     }
     ::close(fileHandle);
 #endif
@@ -516,12 +494,13 @@ public:
         while (!::tryLock(lockfilename))             //throw (FileError)
             ::waitOnDirLock(lockfilename, callback); //
 
-        emitLifeSigns.reset(new LifeSigns(lockfilename.c_str())); //throw()! ownership of lockfile not yet managed!
+        threadObj = boost::thread(LifeSigns(lockfilename.c_str()));
     }
 
     ~SharedDirLock()
     {
-        emitLifeSigns.reset();
+        threadObj.interrupt(); //thread lifetime is subset of this instances's life
+        threadObj.join();
 
         ::releaseLock(lockfilename_); //throw ()
     }
@@ -532,7 +511,7 @@ private:
 
     const Zstring lockfilename_;
 
-    std::auto_ptr<LifeSigns> emitLifeSigns;
+    boost::thread threadObj;
 };
 
 

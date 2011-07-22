@@ -110,10 +110,12 @@ void MakeUpper(Zbase<wchar_t, SP, AP>& str);
 #ifdef FFS_WIN //Windows stores filenames in wide character format
 typedef wchar_t Zchar;
 #define Zstr(x) L ## x
+const Zchar FILE_NAME_SEPARATOR = L'\\';
 
 #elif defined FFS_LINUX //Linux uses UTF-8
 typedef char Zchar;
 #define Zstr(x) x
+const Zchar FILE_NAME_SEPARATOR = '/';
 
 #else
 #error define platform you are in: FFS_WIN or FFS_LINUX
@@ -121,6 +123,7 @@ typedef char Zchar;
 
 //"The reason for all the fuss above" (Loki/SmartPtr)
 typedef Zbase<Zchar, StorageRefCount, AllocatorFreeStoreChecked> Zstring; //for use with file names
+
 
 
 

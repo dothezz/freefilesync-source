@@ -30,10 +30,20 @@ Linker flag:
 `pkg-config --libs gtkmm-2.4`
 */
 
-bool recycleBinExists(); //test existence of Recycle Bin API on current system
-
 //move a file or folder to Recycle Bin
 bool moveToRecycleBin(const Zstring& fileToDelete); //return "true" if file/dir was actually deleted; throw (FileError)
+
+
+#ifdef FFS_WIN
+enum StatusRecycler
+{
+    STATUS_REC_EXISTS,
+    STATUS_REC_MISSING,
+    STATUS_REC_UNKNOWN
+};
+
+StatusRecycler recycleBinExists(const Zstring& pathName); //test existence of Recycle Bin API for certain path
+#endif
 }
 
 #endif // RECYCLER_H_INCLUDED

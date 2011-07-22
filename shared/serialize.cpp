@@ -12,8 +12,7 @@ using namespace zen;
 
 void ReadInputStream::throwReadError() const  //throw (FileError)
 {
-    throw zen::FileError(wxString(_("Error reading from synchronization database:")) + wxT(" \n") +
-                         wxT("\"") +  errorObjName_ + wxT("\""));
+    throw zen::FileError(_("Error reading from synchronization database:") + " \n" + "\"" +  errorObjName_.c_str() + "\"");
 }
 
 
@@ -35,8 +34,7 @@ ReadInputStream::CharArray ReadInputStream::readArrayC() const
 //--------------------------------------------------------------------------------------------------------
 void WriteOutputStream::throwWriteError() const //throw (FileError)
 {
-    throw zen::FileError(wxString(_("Error writing to synchronization database:")) + wxT(" \n") +
-                         wxT("\"") + errorObjName_ + wxT("\""));
+    throw zen::FileError(_("Error writing to synchronization database:") + " \n" + "\"" + errorObjName_.c_str() + "\"");
 }
 
 

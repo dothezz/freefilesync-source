@@ -46,8 +46,8 @@ public:
 
     ~MainDialog();
 
-    void disableAllElements(bool enableAbort); //dis-/enables all elements (except abort button) that might receive user input during long-running processes: comparison, deletion
-    void enableAllElements();  //
+    void disableAllElements(bool enableAbort); //dis-/enables all elements (except abort button) that might receive user input
+    void enableAllElements();                   //during long-running processes: comparison, deletion
 
 private:
     friend class CompareStatusHandler;
@@ -68,18 +68,23 @@ private:
     void cleanUp(bool saveLastUsedConfig);
 
     //configuration load/save
-    bool readConfigurationFromXml(const wxString& filename);
-    bool writeConfigurationToXml(const wxString& filename);
     void setLastUsedConfig(const wxString& filename, const xmlAccess::XmlGuiConfig& guiConfig);
+    void setLastUsedConfig(const std::vector<wxString>& filenames, const xmlAccess::XmlGuiConfig& guiConfig);
 
-    xmlAccess::XmlGuiConfig getCurrentConfiguration() const;
-    void setCurrentConfiguration(const xmlAccess::XmlGuiConfig& newGuiCfg);
+    xmlAccess::XmlGuiConfig getConfig() const;
+    void setConfig(const xmlAccess::XmlGuiConfig& newGuiCfg);
+
+    void loadConfiguration(const wxString& filename);
+    void loadConfiguration(const std::vector<wxString>& filenames);
+
+    bool trySaveConfig(); //return true if saved successfully
+    bool saveOldConfig(); //return false on user abort
 
     static const wxString& lastRunConfigName();
 
     xmlAccess::XmlGuiConfig lastConfigurationSaved; //support for: "Save changed configuration?" dialog
     //used when saving configuration
-    wxString currentConfigFileName;
+    std::vector<wxString> activeConfigFiles; //name of currently loaded config file (may be more than 1)
 
     void readGlobalSettings();
     void writeGlobalSettings();
@@ -87,7 +92,8 @@ private:
     void initViewFilterButtons();
     void updateFilterButtons();
 
-    void addFileToCfgHistory(const wxString& filename);
+    void addFileToCfgHistory(const std::vector<wxString>& filenames);
+
     void addLeftFolderToHistory(const wxString& leftFolder);
     void addRightFolderToHistory(const wxString& rightFolder);
 
@@ -130,6 +136,14 @@ private:
     void OnContextMiddleLabel(         wxGridEvent& event);
     void OnContextSetLayout(           wxMouseEvent& event);
     void OnGlobalKeyEvent(             wxKeyEvent& event);
+
+    void OnContextSelectCompVariant(      wxMouseEvent& event);
+    void OnContextSelectSyncVariant(      wxMouseEvent& event);
+
+    void applyCompareConfig();
+
+    void OnSetCompVariant(wxCommandEvent& event);
+    void OnSetSyncVariant(wxCommandEvent& event);
 
     //context menu handler methods
     void OnContextFilterTemp        (wxCommandEvent& event);
@@ -182,15 +196,12 @@ private:
     void OnSaveConfig(          wxCommandEvent& event);
     void OnLoadConfig(          wxCommandEvent& event);
     void OnLoadFromHistory(     wxCommandEvent& event);
-    bool trySaveConfig(); //return true if saved successfully
-    bool saveOldConfig(); //return false on user abort
 
-    void loadConfiguration(const wxString& filename);
     void OnCfgHistoryKeyEvent(  wxKeyEvent& event);
     void OnRegularUpdateCheck(  wxIdleEvent& event);
     void OnLayoutWindowAsync(   wxIdleEvent& event);
 
-    void refreshGridAfterFilterChange(const int delay);
+    void refreshGridAfterFilterChange(int delay);
 
     void OnResize(              wxSizeEvent& event);
     //void OnResizeTopButtons(    wxEvent& event);

@@ -91,7 +91,7 @@ void Application::OnStartApplication(wxIdleEvent&)
 
     try //load global settings from XML: they are written on exit, so read them FIRST
     {
-        if (fileExists(wxToZ(xmlAccess::getGlobalConfigFile())))
+        if (fileExists(toZ(xmlAccess::getGlobalConfigFile())))
             xmlAccess::readConfig(globalSettings);
         //else: globalSettings already has default values
     }
@@ -116,11 +116,11 @@ void Application::OnStartApplication(wxIdleEvent&)
     {
         const wxString arg1(argv[1]);
 
-        if (fileExists(wxToZ(arg1)))  //load file specified by %1 parameter:
+        if (fileExists(toZ(arg1)))  //load file specified by %1 parameter:
             cfgFilename = arg1;
-        else if (fileExists(wxToZ(arg1 + wxT(".ffs_batch"))))
+        else if (fileExists(toZ(arg1 + wxT(".ffs_batch"))))
             cfgFilename = arg1 + wxT(".ffs_batch");
-        else if (fileExists(wxToZ(arg1 + wxT(".ffs_gui"))))
+        else if (fileExists(toZ(arg1 + wxT(".ffs_gui"))))
             cfgFilename = arg1 + wxT(".ffs_gui");
         else
         {
@@ -242,7 +242,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         //class handling status updates and error messages
         BatchStatusHandler statusHandler(batchCfg.silent,
                                          zen::extractJobName(filename),
-                                         batchCfg.silent ? &batchCfg.logFileDirectory : NULL,
+                                         batchCfg.logFileDirectory,
                                          batchCfg.logFileCountMax,
                                          batchCfg.handleError,
                                          switchBatchToGui,
@@ -259,8 +259,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         }
 
         //COMPARE DIRECTORIES
-        zen::CompareProcess comparison(batchCfg.mainCfg.handleSymlinks,
-                                       globSettings.fileTimeTolerance,
+        zen::CompareProcess comparison(globSettings.fileTimeTolerance,
                                        globSettings.optDialogs,
                                        statusHandler);
 
@@ -286,7 +285,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         if (!batchCfg.silent)
         {
             const wxString soundFile = zen::getResourceDir() + wxT("Sync_Complete.wav");
-            if (zen::fileExists(zen::wxToZ(soundFile)))
+            if (fileExists(toZ(soundFile)))
                 wxSound::Play(soundFile, wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message!
         }
     }
