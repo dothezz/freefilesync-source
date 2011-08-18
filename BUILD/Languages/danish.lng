@@ -654,6 +654,10 @@ Udeluk: \ting\temp\*
 <target>Flyt kolonne op</target>
 <source>Move column down</source>
 <target>Flyt kolonne ned</target>
+<source>Transactional File Copy</source>
+<target></target>
+<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
+<target></target>
 <source>Copy locked files</source>
 <target>Kopier låste filer</target>
 <source>

@@ -66,6 +66,7 @@ void createDirectory(const Zstring& directory); //throw (FileError); -> function
 void copyFile(const Zstring& sourceFile, //throw (FileError: ErrorTargetPathMissing, ErrorFileLocked (Windows-only));
               const Zstring& targetFile,
               bool copyFilePermissions,
+              bool transactionalCopy,
               CallbackCopyFile* callback);  //may be NULL
 //Note: it MAY happen that copyFile() leaves temp files behind, e.g. temporary network drop.
 // => clean them up at an appropriate time (automatically set sync directions to delete them). They have the following ending:

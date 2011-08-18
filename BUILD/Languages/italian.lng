@@ -653,6 +653,10 @@ Escludi: \stuff\temp\*
 <target>Sposta colonna su'</target>
 <source>Move column down</source>
 <target>Sposta colonna giu'</target>
+<source>Transactional File Copy</source>
+<target></target>
+<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
+<target></target>
 <source>Copy locked files</source>
 <target>Copia file bloccati</target>
 <source>

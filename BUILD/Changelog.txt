@@ -2,6 +2,13 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.21
+---------------
+Fixed deleting to user-defined directory
+Fixed crash when using include filter
+New global option to disable transactional file copy
+
+
 Changelog v3.20
 ---------------
 Scan multiple directories in parallel

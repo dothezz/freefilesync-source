@@ -657,6 +657,10 @@ Exclude: \stuff\temp\*
 <target>Move column up</target>
 <source>Move column down</source>
 <target>Move column down</target>
+<source>Transactional File Copy</source>
+<target></target>
+<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
+<target></target>
 <source>Copy locked files</source>
 <target>Copy locked files</target>
 <source>

@@ -19,6 +19,7 @@
 #include "shared/i18n.h"
 #include "shared/loki/TypeManip.h"
 #include "library/db_file.h"
+#include "shared/loki/ScopeGuard.h"
 #include "library/cmp_filetime.h"
 #include "library/norm_filter.h"
 
@@ -42,9 +43,9 @@ public:
     {
         util::ProxyForEach<const Redetermine> prx(*this); //grant std::for_each access to private parts of this class
 
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //process files
-        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //process links
-        std::for_each(hierObj.useSubDirs(). begin(), hierObj.useSubDirs(). end(), prx); //process directories
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), prx); //process files
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), prx); //process links
+        std::for_each(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(), prx); //process directories
     }
 
     /*
@@ -182,9 +183,9 @@ class FindNonEqual //test if non-equal items exist in scanned data
 public:
     bool findNonEqual(const HierarchyObject& hierObj) const
     {
-        return std::find_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this) != hierObj.useSubFiles().end()  || //files
-               std::find_if(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), *this) != hierObj.useSubLinks(). end() || //symlinks
-               std::find_if(hierObj.useSubDirs(). begin(), hierObj.useSubDirs(). end(), *this) != hierObj.useSubDirs(). end();    //directories
+        return std::find_if(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), *this) != hierObj.refSubFiles().end()  || //files
+               std::find_if(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), *this) != hierObj.refSubLinks(). end() || //symlinks
+               std::find_if(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(), *this) != hierObj.refSubDirs(). end();    //directories
     }
 
     //logical private! => __find_if (used by std::find_if) needs public access
@@ -454,9 +455,9 @@ public:
     {
         util::ProxyForEach<const SetDirChangedFilter> prx(*this); //grant std::for_each access to private parts of this class
 
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //process files
-        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //process links
-        std::for_each(hierObj.useSubDirs().begin(),  hierObj.useSubDirs().end(),  prx); //process directories
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), prx); //process files
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), prx); //process links
+        std::for_each(hierObj.refSubDirs().begin(),  hierObj.refSubDirs().end(),  prx); //process directories
     }
 
 private:
@@ -519,9 +520,9 @@ class FindDeleteDirConflictNonRec
 public:
     bool conflictFound(const HierarchyObject& hierObj) const
     {
-        return std::find_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this) != hierObj.useSubFiles().end() || //files
-               std::find_if(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), *this) != hierObj.useSubLinks().end() || //symlinks
-               std::find_if(hierObj.useSubDirs(). begin(), hierObj.useSubDirs(). end(), *this) != hierObj.useSubDirs(). end();   //directories
+        return std::find_if(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), *this) != hierObj.refSubFiles().end() || //files
+               std::find_if(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), *this) != hierObj.refSubLinks().end() || //symlinks
+               std::find_if(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(), *this) != hierObj.refSubDirs(). end();   //directories
     }
 
     //logical private! => __find_if (used by std::find_if) needs public access
@@ -650,13 +651,13 @@ private:
                  const DirContainer* dbDirectoryRight)
     {
         //process files
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(),
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
                       boost::bind(&RedetermineAuto::processFile, this, _1, dbDirectoryLeft, dbDirectoryRight));
         //process symbolic links
-        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(),
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
                       boost::bind(&RedetermineAuto::processSymlink, this, _1, dbDirectoryLeft, dbDirectoryRight));
         //process directories
-        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(),
+        std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(),
                       boost::bind(&RedetermineAuto::processDir, this, _1, dbDirectoryLeft, dbDirectoryRight));
     }
 
@@ -974,9 +975,9 @@ private:
     {
         util::ProxyForEach<const SetNewDirection> prx(*this); //grant std::for_each access to private parts of this class
 
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //process files
-        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //process links
-        std::for_each(hierObj.useSubDirs().begin(),  hierObj.useSubDirs().end(),  prx); //process directories
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), prx); //process files
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), prx); //process links
+        std::for_each(hierObj.refSubDirs().begin(),  hierObj.refSubDirs().end(),  prx); //process directories
     }
 
     const SyncDirection newDirection_;
@@ -1025,9 +1026,9 @@ public:
     {
         util::ProxyForEach<const InOrExcludeAllRows<include> > prx(*this); //grant std::for_each access to private parts of this class
 
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //process files
-        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //process links
-        std::for_each(hierObj.useSubDirs().begin(),  hierObj.useSubDirs().end(),  prx); //process directories
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), prx); //process files
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), prx); //process links
+        std::for_each(hierObj.refSubDirs().begin(),  hierObj.refSubDirs().end(),  prx); //process directories
     }
 
 private:
@@ -1126,9 +1127,9 @@ public:
     {
         util::ProxyForEach<const ApplyHardFilter> prx(*this); //grant std::for_each access to private parts of this class
 
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //files
-        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //symlinks
-        std::for_each(hierObj.useSubDirs(). begin(), hierObj.useSubDirs(). end(), prx); //directories
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), prx); //files
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), prx); //symlinks
+        std::for_each(hierObj.refSubDirs(). begin(), hierObj.refSubDirs(). end(), prx); //directories
     };
 
 private:
@@ -1181,9 +1182,9 @@ public:
     {
         util::ProxyForEach<const ApplySoftFilter> prx(*this); //grant std::for_each access to private parts of this class
 
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), prx); //files
-        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), prx); //symlinks
-        std::for_each(hierObj.useSubDirs ().begin(), hierObj.useSubDirs(). end(), prx); //directories
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), prx); //files
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), prx); //symlinks
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs(). end(), prx); //directories
     };
 
 private:
@@ -1473,23 +1474,6 @@ void deleteFromGridAndHDOneSide(InputIterator first, InputIterator last,
 }
 
 
-class FinalizeDeletion
-{
-public:
-    FinalizeDeletion(FolderComparison& folderCmp) : folderCmp_(folderCmp) {}
-
-    ~FinalizeDeletion()
-    {
-        std::for_each(folderCmp_.begin(), folderCmp_.end(), FileSystemObject::removeEmpty);
-
-        //redetermineSyncDirection(mainConfig_, folderCmp_, NULL);
-    }
-
-private:
-    FolderComparison& folderCmp_;
-};
-
-
 void zen::deleteFromGridAndHD(FolderComparison& folderCmp,                         //attention: rows will be physically deleted!
                               std::vector<FileSystemObject*>& rowsToDeleteOnLeft,  //refresh GUI grid after deletion to remove invalid rows
                               std::vector<FileSystemObject*>& rowsToDeleteOnRight, //all pointers need to be bound!
@@ -1497,7 +1481,9 @@ void zen::deleteFromGridAndHD(FolderComparison& folderCmp,                      
                               const bool useRecycleBin,
                               DeleteFilesHandler& statusHandler)
 {
-    FinalizeDeletion dummy(folderCmp); //ensure cleanup: redetermination of sync-directions and removal of invalid rows
+    //ensure cleanup: redetermination of sync-directions and removal of invalid rows
+				Loki::ScopeGuard guardFinalizeDeletion = Loki::MakeGuard([&]() { std::for_each(folderCmp.begin(), folderCmp.end(), BaseDirMapping::removeEmpty); });
+			(void) guardFinalizeDeletion;
 
     std::set<FileSystemObject*> deleteLeft;
     std::set<FileSystemObject*> deleteRight;

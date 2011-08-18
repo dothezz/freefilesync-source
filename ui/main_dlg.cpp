@@ -3367,6 +3367,7 @@ void MainDialog::OnStartSync(wxCommandEvent& event)
             globalSettings->verifyFileCopy,
             globalSettings->copyLockedFiles,
             globalSettings->copyFilePermissions,
+			globalSettings->transactionalFileCopy,
             statusHandler);
 
         const std::vector<zen::FolderPairSyncCfg> syncProcessCfg = zen::extractSyncCfg(getConfig().mainCfg);

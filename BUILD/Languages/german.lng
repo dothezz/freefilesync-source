@@ -657,6 +657,10 @@ Ausschließen: \stuff\temp\*
 <target>Spalte nach oben verschieben</target>
 <source>Move column down</source>
 <target>Spalte nach unten verschieben</target>
+<source>Transactional File Copy</source>
+<target>Kopiere Dateien als Transaktion</target>
+<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
+<target>Dateien zuerst temporär speichern (*.ffs_tmp) und dann umbenennen. Dadurch wird ein konsistenter Status auch im größten Fehlerfall sichergestellt.</target>
 <source>Copy locked files</source>
 <target>Gesperrte Dateien kopieren</target>
 <source>

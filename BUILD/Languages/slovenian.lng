@@ -664,6 +664,10 @@ Izključi: \stuff\temp\*
 <target>Premakni stolpec gor</target>
 <source>Move column down</source>
 <target>Premakni stolpec dol</target>
+<source>Transactional File Copy</source>
+<target></target>
+<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
+<target></target>
 <source>Copy locked files</source>
 <target>Kopiraj zaklenjene datoteke</target>
 <source>

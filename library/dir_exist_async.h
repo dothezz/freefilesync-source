@@ -21,9 +21,7 @@ bool dirExistsUpdating(const Zstring& dirname, ProcessCallback& procCallback)
 {
     using namespace util;
 
-    std::wstring statusText = _("Searching for directory %x...");
-    replace(statusText, L"%x", std::wstring(L"\"") + dirname + L"\"", false);
-    procCallback.reportInfo(statusText);
+    //do NOT include info messages here! this method is used by synchronization also, so avoid flooding!
 
     auto ft = dirExistsAsync(dirname);
     while (!ft.timed_wait(boost::posix_time::milliseconds(UI_UPDATE_INTERVAL)))

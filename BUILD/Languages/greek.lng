@@ -654,6 +654,10 @@ Exclude: \stuff\temp\*
 <target>Μετακίνηση της στήλης πάνω</target>
 <source>Move column down</source>
 <target>Μετακίνηση της στήλης κάτω</target>
+<source>Transactional File Copy</source>
+<target></target>
+<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
+<target></target>
 <source>Copy locked files</source>
 <target>Αντιγραφή κλειδωμένων αρχείων</target>
 <source>

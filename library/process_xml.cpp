@@ -729,14 +729,10 @@ void readConfig(const XmlIn& in, XmlGlobalSettings& config)
     //try to read program language setting
     inShared["Language"](config.programLanguage);
 
-    //copy locked files using VSS
-    inShared["CopyLockedFiles"](config.copyLockedFiles);
-
-    //file permissions
-    inShared["CopyFilePermissions"](config.copyFilePermissions);
-
-    //verify file copying
-    inShared["VerifyCopiedFiles"](config.verifyFileCopy);
+    inShared["CopyLockedFiles"      ](config.copyLockedFiles);
+    inShared["CopyFilePermissions"  ](config.copyFilePermissions);
+	inShared["TransactionalFileCopy"](config.transactionalFileCopy);
+    inShared["VerifyCopiedFiles"    ](config.verifyFileCopy);
 
     //max. allowed file time deviation
     inShared["FileTimeTolerance"](config.fileTimeTolerance);
@@ -986,14 +982,10 @@ void writeConfig(const XmlGlobalSettings& config, XmlOut& out)
     //write program language setting
     outShared["Language"](config.programLanguage);
 
-    //copy locked files using VSS
-    outShared["CopyLockedFiles"](config.copyLockedFiles);
-
-    //file permissions
-    outShared["CopyFilePermissions"](config.copyFilePermissions);
-
-    //verify file copying
-    outShared["VerifyCopiedFiles"](config.verifyFileCopy);
+    outShared["CopyLockedFiles"      ](config.copyLockedFiles);
+    outShared["CopyFilePermissions"  ](config.copyFilePermissions);
+    outShared["TransactionalFileCopy"](config.transactionalFileCopy);
+    outShared["VerifyCopiedFiles"    ](config.verifyFileCopy);
 
     //max. allowed file time deviation
     outShared["FileTimeTolerance"](config.fileTimeTolerance);

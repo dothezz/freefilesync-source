@@ -303,10 +303,10 @@ private:
 
 class DirCallback;
 
-struct TraverserConfig
+struct TraverserShared
 {
 public:
-    TraverserConfig(int threadID,
+    TraverserShared(int threadID,
                     SymLinkHandling handleSymlinks,
                     const HardFilter::FilterRef& filter,
                     std::set<Zstring>& failedReads,
@@ -322,7 +322,9 @@ public:
 
     const SymLinkHandling handleSymlinks_;
     const HardFilter::FilterRef filterInstance; //always bound!
+
     std::set<Zstring>& failedReads_; //relative postfixed names of directories that could not be read (empty for root)
+    std::set<DirContainer*> excludedDirs;
 
     AsyncCallback& acb_;
     int threadID_;
@@ -332,7 +334,7 @@ public:
 class DirCallback : public zen::TraverseCallback
 {
 public:
-    DirCallback(TraverserConfig& config,
+    DirCallback(TraverserShared& config,
                 const Zstring& relNameParentPf, //postfixed with FILE_NAME_SEPARATOR!
                 DirContainer& output) :
         cfg(config),
@@ -345,7 +347,7 @@ public:
     virtual HandleError  onError  (const std::wstring& errorText);
 
 private:
-    TraverserConfig& cfg;
+    TraverserShared& cfg;
     const Zstring relNameParentPf_;
     DirContainer& output_;
 };
@@ -424,20 +426,20 @@ TraverseCallback::ReturnValDir DirCallback::onDir(const Zchar* shortName, const 
 
     //apply filter before processing (use relative name!)
     bool subObjMightMatch = true;
-    if (!cfg.filterInstance->passDirFilter(relName, &subObjMightMatch))
-    {
-        if (!subObjMightMatch)
+    const bool passFilter = cfg.filterInstance->passDirFilter(relName, &subObjMightMatch);
+    if (!passFilter && !subObjMightMatch)
             return Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_IGNORE>(); //do NOT traverse subdirs
-    }
-    else
-        cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
+        //else: attention! ensure directory filtering is applied later to exclude actually filtered directories
 
     DirContainer& subDir = output_.addSubDir(shortName);
+    if (passFilter)
+		cfg.acb_.incItemsScanned(); //add 1 element to the progress indicator
+	else 
+        cfg.excludedDirs.insert(&subDir);
 
-    TraverserConfig::CallbackPointer subDirCallback = std::make_shared<DirCallback>(cfg, relName + FILE_NAME_SEPARATOR, subDir);
+    TraverserShared::CallbackPointer subDirCallback = std::make_shared<DirCallback>(cfg, relName + FILE_NAME_SEPARATOR, subDir);
     cfg.callBackBox.push_back(subDirCallback); //handle lifetime
-    //attention: ensure directory filtering is applied later to exclude actually filtered directories
-    return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), *subDirCallback.get());
+    return ReturnValDir(Loki::Int2Type<ReturnValDir::TRAVERSING_DIR_CONTINUE>(), *subDirCallback);
 }
 
 
@@ -482,6 +484,38 @@ private:
 #endif
 //------------------------------------------------------------------------------------------
 
+template <class M, class Predicate> inline
+void map_remove_if(M& map, Predicate p)
+{
+    for (auto iter = map.begin(); iter != map.end();)
+        if (p(*iter))
+            map.erase(iter++);
+        else
+            ++iter;
+}
+
+void removeFilteredDirs(DirContainer& dirCont, const std::set<DirContainer*>& excludedDirs)
+{
+    //process subdirs recursively
+    std::for_each(dirCont.dirs.begin(), dirCont.dirs.end(),
+                  [&](std::pair<const Zstring, DirContainer>& item)
+    {
+        removeFilteredDirs(item.second, excludedDirs);
+    });
+
+    //remove superfluous directories
+    map_remove_if(dirCont.dirs,
+                  [&](std::pair<const Zstring, DirContainer>& item) -> bool
+    {
+        DirContainer& subDir = item.second;
+        return
+        subDir.dirs .empty() &&
+        subDir.files.empty() &&
+        subDir.links.empty() &&
+        excludedDirs.find(&subDir) != excludedDirs.end();
+    });
+}
+
 
 class WorkerThread
 {
@@ -512,7 +546,7 @@ public:
                 //folder existence already checked in startCompareProcess(): do not treat as error when arriving here!
                 //perf note: missing network drives should not delay here, as Windows buffers result of last existence check for a short time
             {
-                TraverserConfig travCfg(threadID_,
+                TraverserShared travCfg(threadID_,
                                         item.first.handleSymlinks_, //shared by all(!) instances of DirCallback while traversing a folder hierarchy
                                         item.first.filter_,
                                         dirVal.failedReads,
@@ -544,6 +578,10 @@ public:
 
                 //get all files and folders from directoryPostfixed (and subdirectories)
                 traverseFolder(directoryName, followSymlinks, traverser, dstCallbackPtr); //exceptions may be thrown!
+
+                //attention: some filtered directories are still in the comparison result! (see include filter handling!)
+                if (!travCfg.excludedDirs.empty())
+                    removeFilteredDirs(dirVal.dirCont, travCfg.excludedDirs); //remove all excluded directories (but keeps those serving as parent folders for not excl. elements)
             }
         });
     }

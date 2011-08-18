@@ -37,7 +37,7 @@ void setDirectoryNameImpl(const wxString& dirname, wxDirPickerCtrl* dirPicker, w
 
         staticBox->GetStaticBox()->SetLabel(dirNormalized == dirFormatted ? wxString(_("Drag && drop")) : dirFormatted);
     }
-
+	 
     if (dirPicker)
     {
         if (!dirFormatted.empty() &&

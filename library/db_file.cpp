@@ -334,11 +334,11 @@ public:
 private:
     void execute(const HierarchyObject& hierObj, const DirContainer* oldDirInfo)
     {
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), boost::bind(&SaveDirInfo::processFile, this, _1, oldDirInfo));
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), boost::bind(&SaveDirInfo::processFile, this, _1, oldDirInfo));
         writeNumberC<bool>(false); //mark last entry
-        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), boost::bind(&SaveDirInfo::processLink, this, _1, oldDirInfo));
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), boost::bind(&SaveDirInfo::processLink, this, _1, oldDirInfo));
         writeNumberC<bool>(false); //mark last entry
-        std::for_each(hierObj.useSubDirs ().begin(), hierObj.useSubDirs ().end(), boost::bind(&SaveDirInfo::processDir,  this, _1, oldDirInfo));
+        std::for_each(hierObj.refSubDirs ().begin(), hierObj.refSubDirs ().end(), boost::bind(&SaveDirInfo::processDir,  this, _1, oldDirInfo));
         writeNumberC<bool>(false); //mark last entry
     }
 

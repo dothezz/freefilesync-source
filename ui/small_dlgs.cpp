@@ -892,7 +892,8 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
     m_bpButtonAddRow->SetBitmapLabel(GlobalResources::instance().getImage(wxT("addFolderPair")));
     m_bpButtonRemoveRow->SetBitmapLabel(GlobalResources::instance().getImage(wxT("removeFolderPair")));
 
-    m_checkBoxCopyLocked->SetValue(globalSettings.copyLockedFiles);
+    m_checkBoxCopyLocked     ->SetValue(globalSettings.copyLockedFiles);
+	m_checkBoxTransCopy      ->SetValue(globalSettings.transactionalFileCopy);
     m_checkBoxCopyPermissions->SetValue(globalSettings.copyFilePermissions);
 
 #ifndef FFS_WIN
@@ -919,8 +920,9 @@ GlobalSettingsDlg::GlobalSettingsDlg(wxWindow* parent, xmlAccess::XmlGlobalSetti
 void GlobalSettingsDlg::OnOkay(wxCommandEvent& event)
 {
     //write global settings only when okay-button is pressed!
-    settings.copyLockedFiles     = m_checkBoxCopyLocked->GetValue();
-    settings.copyFilePermissions = m_checkBoxCopyPermissions->GetValue();
+    settings.copyLockedFiles       = m_checkBoxCopyLocked->GetValue();
+	settings.transactionalFileCopy = m_checkBoxTransCopy->GetValue();
+    settings.copyFilePermissions   = m_checkBoxCopyPermissions->GetValue();
     settings.gui.externelApplications = getExtApp();
 
     EndModal(ReturnSmallDlg::BUTTON_OKAY);
@@ -939,8 +941,9 @@ void GlobalSettingsDlg::OnDefault(wxCommandEvent& event)
 {
     xmlAccess::XmlGlobalSettings defaultCfg;
 
-    m_checkBoxCopyLocked->     SetValue(defaultCfg.copyLockedFiles);
-    m_checkBoxCopyPermissions->SetValue(defaultCfg.copyFilePermissions);
+    m_checkBoxCopyLocked     ->SetValue(defaultCfg.copyLockedFiles);
+    m_checkBoxTransCopy      ->SetValue(defaultCfg.transactionalFileCopy);
+	m_checkBoxCopyPermissions->SetValue(defaultCfg.copyFilePermissions);
     set(defaultCfg.gui.externelApplications);
 }
 

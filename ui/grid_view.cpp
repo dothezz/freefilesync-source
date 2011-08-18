@@ -281,13 +281,13 @@ public:
     void execute(const HierarchyObject& hierObj)
     {
         //add file references
-        std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), *this);
+        std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(), *this);
 
         //add symlink references
-        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), *this);
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(), *this);
 
         //add dir references
-        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), *this);
+        std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(), *this);
     }
 
     void operator()(const FileMapping& fileObj)

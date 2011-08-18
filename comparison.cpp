@@ -89,6 +89,10 @@ void checkDirectoryExistence(const std::set<Zstring, LessFilename>& dirnames, Pr
     std::for_each(dirnames.begin(), dirnames.end(),
                   [&](const Zstring& dirname)
     {
+        std::wstring statusText = _("Searching for directory %x...");
+        replace(statusText, L"%x", std::wstring(L"\"") + dirname + L"\"", false);
+        procCallback.reportInfo(statusText);
+
         if (!dirname.empty())
             while (!dirExistsUpdating(dirname, procCallback))
             {
@@ -187,52 +191,8 @@ bool filesHaveSameContentUpdating(const Zstring& filename1, const Zstring& filen
     guardStatistics.Dismiss();
     return sameContent;
 }
-
-
-struct ToBeRemoved
-{
-    bool operator()(const DirMapping& dirObj) const
-    {
-        return !dirObj.isActive() &&
-               dirObj.useSubDirs ().empty() &&
-               dirObj.useSubLinks().empty() &&
-               dirObj.useSubFiles().empty();
-    }
-};
-
-
-class RemoveFilteredDirs
-{
-public:
-    RemoveFilteredDirs(const HardFilter& filterProc) :
-        filterProc_(filterProc) {}
-
-    void execute(HierarchyObject& hierObj)
-    {
-        HierarchyObject::SubDirMapping& subDirs = hierObj.useSubDirs();
-
-        //process subdirs recursively
-        util::ProxyForEach<RemoveFilteredDirs> prx(*this); //grant std::for_each access to private parts of this class
-        std::for_each(subDirs.begin(), subDirs.end(), prx);
-
-        //remove superfluous directories
-        subDirs.erase(
-            std::remove_if(subDirs.begin(), subDirs.end(), ::ToBeRemoved()),
-            subDirs.end());
-    }
-
-private:
-    friend class util::ProxyForEach<RemoveFilteredDirs>; //friend declaration of std::for_each is NOT sufficient as implementation is compiler dependent!
-
-    void operator()(DirMapping& dirObj)
-    {
-        dirObj.setActive(filterProc_.passDirFilter(dirObj.getObjRelativeName().c_str(), NULL)); //subObjMightMatch is always true in this context!
-        execute(dirObj);
-    }
-
-    const HardFilter& filterProc_;
-};
 }
+
 
 //#############################################################################################################################
 
@@ -712,6 +672,8 @@ void CompareProcess::compareByContent(const std::vector<FolderPairCfg>& director
 }
 
 
+namespace
+{
 class MergeSides
 {
 public:
@@ -735,9 +697,9 @@ template <>
 void MergeSides::fillOneSide<LEFT_SIDE>(const DirContainer& dirCont, HierarchyObject& output)
 {
     //reserve() fulfills one task here: massive performance improvement!
-    output.useSubFiles().reserve(dirCont.files.size());
-    output.useSubDirs(). reserve(dirCont.dirs. size());
-    output.useSubLinks().reserve(dirCont.links.size());
+    output.refSubFiles().reserve(dirCont.files.size());
+    output.refSubDirs(). reserve(dirCont.dirs. size());
+    output.refSubLinks().reserve(dirCont.links.size());
 
     for (DirContainer::FileList::const_iterator i = dirCont.files.begin(); i != dirCont.files.end(); ++i)
         output.addSubFile(i->second, i->first);
@@ -757,9 +719,9 @@ template <>
 void MergeSides::fillOneSide<RIGHT_SIDE>(const DirContainer& dirCont, HierarchyObject& output)
 {
     //reserve() fulfills one task here: massive performance improvement!
-    output.useSubFiles().reserve(dirCont.files.size());
-    output.useSubDirs ().reserve(dirCont.dirs. size());
-    output.useSubLinks().reserve(dirCont.links.size());
+    output.refSubFiles().reserve(dirCont.files.size());
+    output.refSubDirs ().reserve(dirCont.dirs. size());
+    output.refSubLinks().reserve(dirCont.links.size());
 
     for (DirContainer::FileList::const_iterator i = dirCont.files.begin(); i != dirCont.files.end(); ++i)
         output.addSubFile(i->first, i->second);
@@ -783,12 +745,12 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
     //3. entries may be deleted but NEVER new ones inserted!!!
     //=> this allows for a quasi-binary search by id!
 
-    //HierarchyObject::addSubFile() must not invalidate references used in "appendUndefined"! Currently a std::list, so no problem.
+    //HierarchyObject::addSubFile() must not invalidate references used in "appendUndefined"!
 
     //reserve() fulfills two task here: 1. massive performance improvement! 2. ensure references in appendUndefined remain valid!
-    output.useSubFiles().reserve(leftSide.files.size() + rightSide.files.size()); //assume worst case!
-    output.useSubDirs(). reserve(leftSide.dirs. size() + rightSide.dirs. size()); //
-    output.useSubLinks().reserve(leftSide.links.size() + rightSide.links.size()); //
+    output.refSubFiles().reserve(leftSide.files.size() + rightSide.files.size()); //assume worst case!
+    output.refSubDirs(). reserve(leftSide.dirs. size() + rightSide.dirs. size()); //
+    output.refSubLinks().reserve(leftSide.links.size() + rightSide.links.size()); //
 
     for (DirContainer::FileList::const_iterator i = leftSide.files.begin(); i != leftSide.files.end(); ++i)
     {
@@ -876,6 +838,21 @@ void MergeSides::execute(const DirContainer& leftSide, const DirContainer& right
     }
 }
 
+void setDirFilter(HierarchyObject& hierObj, const HardFilter& filterProc)
+{
+    HierarchyObject::SubDirMapping& subDirs = hierObj.refSubDirs();
+
+    //process subdirs recursively
+    std::for_each(subDirs.begin(), subDirs.end(),
+                  [&](DirMapping& dirObj)
+    {
+        dirObj.setActive(filterProc.passDirFilter(dirObj.getObjRelativeName().c_str(), NULL)); //subObjMightMatch is always true in this context!
+        setDirFilter(dirObj, filterProc);
+    });
+
+    //remove superfluous directories -> already done by fillBuffer(), secondly this would be dangerous here as it invalidates "std::vector<FileMapping*>& undefinedFiles"
+}
+}
 
 //create comparison result table and fill category except for files existing on both sides: undefinedFiles and undefinedLinks are appended!
 void CompareProcess::performComparison(const FolderPairCfg& fpCfg,
@@ -883,9 +860,9 @@ void CompareProcess::performComparison(const FolderPairCfg& fpCfg,
                                        std::vector<FileMapping*>& undefinedFiles,
                                        std::vector<SymLinkMapping*>& undefinedLinks)
 {
-    assert(output.useSubDirs(). empty());
-    assert(output.useSubLinks().empty());
-    assert(output.useSubFiles().empty());
+    assert(output.refSubDirs(). empty());
+    assert(output.refSubLinks().empty());
+    assert(output.refSubFiles().empty());
 
     //PERF_START;
 
@@ -908,9 +885,9 @@ void CompareProcess::performComparison(const FolderPairCfg& fpCfg,
 
     //##################### in/exclude rows according to filtering #####################
 
-    //attention: some filtered directories are still in the comparison result! (see include filter handling!)
+    //attention: some excluded directories are still in the comparison result! (see include filter handling!)
     if (!fpCfg.filter.nameFilter->isNull())
-        RemoveFilteredDirs(*fpCfg.filter.nameFilter).execute(output); //remove all excluded directories (but keeps those serving as parent folders for not excl. elements)
+        setDirFilter(output, *fpCfg.filter.nameFilter); //mark excluded directories (see fillBuffer())
 
     //apply soft filtering / hard filter already applied
     addSoftFiltering(output, fpCfg.filter.timeSizeFilter);

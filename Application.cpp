@@ -252,11 +252,12 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
 
         //batch mode: place directory locks on directories during both comparison AND synchronization
         LockHolder dummy;
-        for (std::vector<FolderPairCfg>::const_iterator i = cmpConfig.begin(); i != cmpConfig.end(); ++i)
+        std::for_each(cmpConfig.begin(), cmpConfig.end(),
+                      [&](const FolderPairCfg& fpCfg)
         {
-            dummy.addDir(i->leftDirectoryFmt,  statusHandler);
-            dummy.addDir(i->rightDirectoryFmt, statusHandler);
-        }
+            dummy.addDir(fpCfg.leftDirectoryFmt,  statusHandler);
+            dummy.addDir(fpCfg.rightDirectoryFmt, statusHandler);
+        });
 
         //COMPARE DIRECTORIES
         zen::CompareProcess comparison(globSettings.fileTimeTolerance,
@@ -274,6 +275,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
             globSettings.verifyFileCopy,
             globSettings.copyLockedFiles,
             globSettings.copyFilePermissions,
+			globSettings.transactionalFileCopy,
             statusHandler);
 
         const std::vector<zen::FolderPairSyncCfg> syncProcessCfg = zen::extractSyncCfg(batchCfg.mainCfg);
@@ -285,7 +287,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         if (!batchCfg.silent)
         {
             const wxString soundFile = zen::getResourceDir() + wxT("Sync_Complete.wav");
-            if (fileExists(toZ(soundFile)))
+            if (zen::fileExists(zen::toZ(soundFile)))
                 wxSound::Play(soundFile, wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as a service!
         }
     }

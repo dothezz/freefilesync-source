@@ -17,8 +17,14 @@ class LockHolder
 public:
     void addDir(const Zstring& dirnameFmt, ProcessCallback& procCallback) //resolved dirname ending with path separator
     {
-        if (dirnameFmt.empty() ||
-            !dirExistsUpdating(dirnameFmt, procCallback))
+        if (dirnameFmt.empty())
+            return;
+
+        std::wstring statusText = _("Searching for directory %x...");
+        replace(statusText, L"%x", std::wstring(L"\"") + dirnameFmt + L"\"", false);
+        procCallback.reportInfo(statusText);
+
+        if (!dirExistsUpdating(dirnameFmt, procCallback))
             return;
 
         if (lockHolder.find(dirnameFmt) != lockHolder.end()) return;

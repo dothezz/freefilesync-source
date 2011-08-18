@@ -297,9 +297,10 @@ public:
 
     void setWorkload(const std::vector<Zstring>& newLoad) //context of main thread
     {
-        boost::unique_lock<boost::mutex> dummy(lockFiles);
-        filesToLoad = newLoad;
-
+        {
+            boost::unique_lock<boost::mutex> dummy(lockFiles);
+            filesToLoad = newLoad;
+        }
         conditionNewFiles.notify_one();
         //condition handling, see: http://www.boost.org/doc/libs/1_43_0/doc/html/thread/synchronization.html#thread.synchronization.condvar_ref
     }

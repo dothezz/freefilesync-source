@@ -176,12 +176,12 @@ public:
     typedef std::vector<DirMapping>     SubDirMapping;  //Note: deque<> has circular reference in VCPP!
     typedef std::vector<SymLinkMapping> SubLinkMapping;
 
-    SubFileMapping& useSubFiles();
-    SubLinkMapping& useSubLinks();
-    SubDirMapping&  useSubDirs();
-    const SubFileMapping& useSubFiles() const;
-    const SubLinkMapping& useSubLinks() const;
-    const SubDirMapping&  useSubDirs()  const;
+    SubFileMapping& refSubFiles();
+    SubLinkMapping& refSubLinks();
+    SubDirMapping&  refSubDirs();
+    const SubFileMapping& refSubFiles() const;
+    const SubLinkMapping& refSubLinks() const;
+    const SubDirMapping&  refSubDirs()  const;
 
 protected:
     //constructor used by DirMapping
@@ -238,6 +238,8 @@ public:
 
     const HardFilter::FilterRef& getFilter() const;
     virtual void swap();
+
+	static void removeEmpty(BaseDirMapping& baseDir); //physically remove all invalid entries (where both sides are empty) recursively
 
 private:
     //this member is currently not used by the business logic -> may be removed!
@@ -308,8 +310,6 @@ public:
     void synchronizeSides();          //copy one side to the other (NOT recursive!!!)
     template <SelectedSide side> void removeObject();    //removes file or directory (recursively!) without physically removing the element: used by manual deletion
     bool isEmpty() const; //true, if both sides are empty
-    static void removeEmpty(BaseDirMapping& baseDir);        //physically remove all invalid entries (where both sides are empty) recursively
-    static void removeEmptyNonRec(HierarchyObject& hierObj); //physically remove all invalid entries (where both sides are empty) non-recursively
 
 protected:
     FileSystemObject(const Zstring& shortNameLeft, const Zstring& shortNameRight, const HierarchyObject& parent) :
@@ -805,11 +805,8 @@ void HierarchyObject::swap()
 {
     std::swap(baseDirLeft, baseDirRight);
 
-    //files
-    std::for_each(subFiles.begin(), subFiles.end(), std::mem_fun_ref(&FileMapping::swap));
-    //directories
-    std::for_each(subDirs.begin(), subDirs.end(), std::mem_fun_ref(&DirMapping::swap));
-    //symbolic links
+    std::for_each(subFiles.begin(), subFiles.end(), std::mem_fun_ref(&FileMapping   ::swap));
+    std::for_each(subDirs .begin(), subDirs .end(), std::mem_fun_ref(&DirMapping    ::swap));
     std::for_each(subLinks.begin(), subLinks.end(), std::mem_fun_ref(&SymLinkMapping::swap));
 }
 
@@ -889,44 +886,44 @@ void HierarchyObject::addSubLink(const Zstring&        shortNameRight, //link ex
 
 
 inline
-const HierarchyObject::SubDirMapping& HierarchyObject::useSubDirs() const
+const HierarchyObject::SubDirMapping& HierarchyObject::refSubDirs() const
 {
     return subDirs;
 }
 
 
 inline
-const HierarchyObject::SubFileMapping& HierarchyObject::useSubFiles() const
+const HierarchyObject::SubFileMapping& HierarchyObject::refSubFiles() const
 {
     return subFiles;
 }
 
 
 inline
-const HierarchyObject::SubLinkMapping& HierarchyObject::useSubLinks() const
+const HierarchyObject::SubLinkMapping& HierarchyObject::refSubLinks() const
 {
     return subLinks;
 }
 
 
 inline
-HierarchyObject::SubDirMapping& HierarchyObject::useSubDirs()
+HierarchyObject::SubDirMapping& HierarchyObject::refSubDirs()
 {
-    return const_cast<SubDirMapping&>(static_cast<const HierarchyObject*>(this)->useSubDirs());
+    return const_cast<SubDirMapping&>(static_cast<const HierarchyObject*>(this)->refSubDirs());
 }
 
 
 inline
-HierarchyObject::SubFileMapping& HierarchyObject::useSubFiles()
+HierarchyObject::SubFileMapping& HierarchyObject::refSubFiles()
 {
-    return const_cast<SubFileMapping&>(static_cast<const HierarchyObject*>(this)->useSubFiles());
+    return const_cast<SubFileMapping&>(static_cast<const HierarchyObject*>(this)->refSubFiles());
 }
 
 
 inline
-HierarchyObject::SubLinkMapping& HierarchyObject::useSubLinks()
+HierarchyObject::SubLinkMapping& HierarchyObject::refSubLinks()
 {
-    return const_cast<SubLinkMapping&>(static_cast<const HierarchyObject*>(this)->useSubLinks());
+    return const_cast<SubLinkMapping&>(static_cast<const HierarchyObject*>(this)->refSubLinks());
 }
 
 
@@ -965,9 +962,9 @@ inline
 void DirMapping::removeObjectL()
 {
     cmpResult = DIR_RIGHT_SIDE_ONLY;
-    std::for_each(useSubFiles().begin(), useSubFiles().end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
-    std::for_each(useSubLinks().begin(), useSubLinks().end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
-    std::for_each(useSubDirs(). begin(), useSubDirs() .end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
+    std::for_each(refSubFiles().begin(), refSubFiles().end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
+    std::for_each(refSubLinks().begin(), refSubLinks().end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
+    std::for_each(refSubDirs(). begin(), refSubDirs() .end(), std::mem_fun_ref(&FileSystemObject::removeObject<LEFT_SIDE>));
 }
 
 
@@ -975,9 +972,9 @@ inline
 void DirMapping::removeObjectR()
 {
     cmpResult = DIR_LEFT_SIDE_ONLY;
-    std::for_each(useSubFiles().begin(), useSubFiles().end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
-    std::for_each(useSubLinks().begin(), useSubLinks().end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
-    std::for_each(useSubDirs(). begin(), useSubDirs(). end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
+    std::for_each(refSubFiles().begin(), refSubFiles().end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
+    std::for_each(refSubLinks().begin(), refSubLinks().end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
+    std::for_each(refSubDirs(). begin(), refSubDirs(). end(), std::mem_fun_ref(&FileSystemObject::removeObject<RIGHT_SIDE>));
 }
 
 
@@ -1240,7 +1237,7 @@ inline
 void SymLinkMapping::removeObjectL()
 {
     cmpResult = SYMLINK_RIGHT_SIDE_ONLY;
-    dataLeft  = LinkDescriptor(0, Zstring(), LinkDescriptor::TYPE_FILE);
+    dataLeft  = LinkDescriptor();
 }
 
 
@@ -1248,7 +1245,7 @@ inline
 void SymLinkMapping::removeObjectR()
 {
     cmpResult = SYMLINK_LEFT_SIDE_ONLY;
-    dataRight = LinkDescriptor(0, Zstring(), LinkDescriptor::TYPE_FILE);
+    dataRight = LinkDescriptor();
 }
 
 

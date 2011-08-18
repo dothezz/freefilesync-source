@@ -473,7 +473,7 @@ bool tryLock(const Zstring& lockfilename) //throw (FileError)
 
     Loki::ScopeGuard guardLockFile = Loki::MakeGuard(::releaseLock, lockfilename);
 
-    //write UUID at the beginning of the file: this ID is a universal identifier for this lock (no matter what the path is, considering symlinks ,etc.)
+    //write UUID at the beginning of the file: this ID is a universal identifier for this lock (no matter what the path is, considering symlinks, etc.)
     writeLockInfo(lockfilename); //throw (FileError)
 
     guardLockFile.Dismiss(); //lockfile created successfully
@@ -491,7 +491,7 @@ public:
         while (!::tryLock(lockfilename))             //throw (FileError)
             ::waitOnDirLock(lockfilename, callback); //
 
-        threadObj = std::move(boost::thread(LifeSigns(lockfilename)));
+        threadObj = boost::thread(LifeSigns(lockfilename));
     }
 
     ~SharedDirLock()
@@ -579,5 +579,19 @@ private:
 };
 
 
-DirLock::DirLock(const Zstring& lockfilename, DirLockCallback* callback) : //throw (FileError)
-    sharedLock(LockAdmin::instance().retrieve(lockfilename, callback)) {}
+DirLock::DirLock(const Zstring& lockfilename, DirLockCallback* callback) //throw (FileError)
+{
+#ifdef FFS_WIN
+    std::vector<wchar_t> volName(std::max(lockfilename.size(), static_cast<size_t>(10000)));
+    if (::GetVolumePathName(lockfilename.c_str(), //__in   LPCTSTR lpszFileName,
+                            &volName[0],          //__out  LPTSTR lpszVolumePathName,
+                            static_cast<DWORD>(volName.size()))) //__in   DWORD cchBufferLength
+    {
+        DWORD dt = ::GetDriveType(&volName[0]);
+        if (dt == DRIVE_CDROM)
+            return; //we don't need a lock for a CD ROM
+    }
+#endif
+
+    sharedLock = LockAdmin::instance().retrieve(lockfilename, callback);
+}

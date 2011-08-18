@@ -492,7 +492,7 @@ void zen::moveFile(const Zstring& sourceFile, const Zstring& targetFile, bool ig
         if (symlinkExists(sourceFile))
             copySymlink(sourceFile, targetFile, SYMLINK_TYPE_FILE, false); //throw (FileError) dont copy filesystem permissions
         else
-            copyFile(sourceFile, targetFile, false, copyCallback.get()); //throw (FileError);
+            copyFile(sourceFile, targetFile, false, true, copyCallback.get()); //throw (FileError);
 
         //attention: if copy-operation was cancelled an exception is thrown => sourcefile is not deleted, as we wish!
     }
@@ -1441,6 +1441,8 @@ void rawCopyWinApi(const Zstring& sourceFile,
                 dst::isFatDrive(targetFile) &&
                 getFilesize(sourceFile) >= 4U * UInt64(1024U * 1024 * 1024)) //throw (FileError)
                 errorMessage += L"\nFAT volume cannot store files larger than 4 gigabyte!";
+
+            //note: ERROR_INVALID_PARAMETER can also occur when copying to a SharePoint server or MS SkyDrive and the target filename is of a restricted type.
         }
         catch(...) {}
 
@@ -1715,7 +1717,7 @@ void rawCopyWinApi(const Zstring& sourceFile,
 //        totalBytesTransferred += bytesRead;
 //
 //#ifndef _MSC_VER
-//#warning totalBytesTransferred  kann größer als filesize sein!!
+//#warning totalBytesTransferred  kann grÃ¶ÃŸer als filesize sein!!
 //#endif
 //
 //        //invoke callback method to update progress indicators
@@ -1878,41 +1880,60 @@ void copyFileImpl(const Zstring& sourceFile,
 void zen::copyFile(const Zstring& sourceFile, //throw (FileError: ErrorTargetPathMissing, ErrorFileLocked);
                    const Zstring& targetFile,
                    bool copyFilePermissions,
+                   bool transactionalCopy,
                    CallbackCopyFile* callback)
 {
-    Zstring temporary = targetFile + zen::TEMP_FILE_ENDING; //use temporary file until a correct date has been set
-    Loki::ScopeGuard guardTempFile = Loki::MakeGuard([&]() { removeFile(temporary); }); //transactional behavior: ensure cleanup (e.g. network drop) -> ref to temporary[!]
-
-    //raw file copy
-    try
+    if (transactionalCopy)
     {
-        copyFileImpl(sourceFile, temporary, callback); //throw FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
+        Zstring temporary = targetFile + zen::TEMP_FILE_ENDING; //use temporary file until a correct date has been set
+        Loki::ScopeGuard guardTempFile = Loki::MakeGuard([&]() { removeFile(temporary); }); //transactional behavior: ensure cleanup (e.g. network drop) -> ref to temporary[!]
+
+        //raw file copy
+        try
+        {
+            copyFileImpl(sourceFile, temporary, callback); //throw FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
+        }
+        catch (ErrorTargetExisting&)
+        {
+            //determine non-used temp file name "first":
+            //using optimistic strategy: assume everything goes well, but recover on error -> minimize file accesses
+            temporary = createTempName(targetFile);
+
+            //retry
+            copyFileImpl(sourceFile, temporary, callback); //throw FileError
+        }
+
+        //have target file deleted (after read access on source and target has been confirmed) => allow for almost transactional overwrite
+        if (callback) callback->deleteTargetFile(targetFile);
+
+        //rename temporary file:
+        //perf: this call is REALLY expensive on unbuffered volumes! ~40% performance decrease on FAT USB stick!
+        renameFile(temporary, targetFile); //throw (FileError)
+
+        guardTempFile.Dismiss();
+
+        //perf: interestingly it is much faster to apply file times BEFORE renaming temporary!
     }
-    catch (ErrorTargetExisting&)
+    else
     {
-        //determine non-used temp file name "first":
-        //using optimistic strategy: assume everything goes well, but recover on error -> minimize file accesses
-        temporary = createTempName(targetFile);
+        //have target file deleted
+        if (callback) callback->deleteTargetFile(targetFile);
 
-        //retry
-        copyFileImpl(sourceFile, temporary, callback); //throw FileError
+        copyFileImpl(sourceFile, targetFile, callback); //throw FileError: ErrorTargetPathMissing, ErrorTargetExisting, ErrorFileLocked
     }
-
-    //have target file deleted (after read access on source and target has been confirmed) => allow for almost transactional overwrite
-    if (callback) callback->deleteTargetFile(targetFile);
-
-    //rename temporary file:
-    //perf: this call is REALLY expensive on unbuffered volumes! ~40% performance decrease on FAT USB stick!
-    renameFile(temporary, targetFile); //throw (FileError)
-
-    guardTempFile.Dismiss();
-    Loki::ScopeGuard guardTargetFile = Loki::MakeGuard(&removeFile, targetFile);
-
-    //perf: interestingly it is much faster to apply file times BEFORE renaming temporary!
+/*
+   Note: non-transactional file copy solves at least four problems:
+    	-> skydrive - doesn't allow for .ffs_tmp extension and returns ERROR_INVALID_PARAMETER
+    	-> network renaming issues
+    	-> allow for true delete before copy to handle low disk space problems
+    	-> higher performance on non-buffered drives (e.g. usb sticks)
+*/
 
     //set file permissions
     if (copyFilePermissions)
+    {
+        Loki::ScopeGuard guardTargetFile = Loki::MakeGuard(&removeFile, targetFile);
         copyObjectPermissions(sourceFile, targetFile, true); //throw (FileError)
-
-    guardTargetFile.Dismiss(); //target has been created successfully!
+        guardTargetFile.Dismiss(); //target has been created successfully!
+    }
 }

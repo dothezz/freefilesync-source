@@ -29,18 +29,21 @@ Zstring resolveBrokenNetworkMap(const Zstring& dirname) //circumvent issue with 
     if (dirname.size() >= 2 && iswalpha(dirname[0]) && dirname[1] == L':')
     {
         Zstring driveLetter(dirname.c_str(), 2); //e.g.: "Q:"
-        if (::GetFileAttributes((driveLetter + L'\\').c_str()) == INVALID_FILE_ATTRIBUTES)
+
+        //if (::GetFileAttributes((driveLetter + L'\\').c_str()) == INVALID_FILE_ATTRIBUTES) <- this will seriously block if network is not reachable!!!
         {
             DWORD bufferSize = 10000;
             std::vector<wchar_t> remoteNameBuffer(bufferSize);
             DWORD rv = ::WNetGetConnection(driveLetter.c_str(),  //__in     LPCTSTR lpLocalName in the form "<driveletter>:"
                                            &remoteNameBuffer[0], //__out    LPTSTR lpRemoteName,
                                            &bufferSize);         //__inout  LPDWORD lpnLength
-            (void)rv;
-            //no error check here! remoteNameBuffer will be filled on ERROR_CONNECTION_UNAVAIL and maybe others?
+            if (rv == NO_ERROR ||
+				 rv == ERROR_CONNECTION_UNAVAIL) //remoteNameBuffer will be filled nevertheless!
+			{            
             Zstring networkShare = &remoteNameBuffer[0];
             if (!networkShare.empty())
                 return networkShare + (dirname.c_str() + 2);  //replace "Q:\subdir" by "\\server\share\subdir"
+			}
         }
     }
     return dirname;

@@ -142,7 +142,8 @@ struct XmlGlobalSettings
         copyLockedFiles(true),
         copyFilePermissions(false),
         fileTimeTolerance(2),  //default 2s: FAT vs NTFS
-        verifyFileCopy(false) {}
+        verifyFileCopy(false),
+		transactionalFileCopy(true) {}
 
     int programLanguage;
     bool copyLockedFiles;          //VSS usage
@@ -150,6 +151,7 @@ struct XmlGlobalSettings
 
     size_t fileTimeTolerance; //max. allowed file time deviation
     bool verifyFileCopy;   //verify copied files
+	bool transactionalFileCopy;
 
     OptionalDialogs optDialogs;
 

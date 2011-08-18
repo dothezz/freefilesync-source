@@ -80,6 +80,7 @@ public:
                 bool verifyCopiedFiles,
                 bool copyLockedFiles,
                 bool copyFilePermissions,
+                bool transactionalFileCopy,
                 ProcessCallback& handler);
 
     //CONTRACT: syncConfig must have SAME SIZE folderCmp and correspond per row!
@@ -91,6 +92,7 @@ private:
     const bool verifyCopiedFiles_;
     const bool copyLockedFiles_;
     const bool copyFilePermissions_;
+    const bool transactionalFileCopy_;
 
     //warnings
     xmlAccess::OptionalDialogs& m_warnings;

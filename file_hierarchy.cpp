@@ -75,36 +75,27 @@ const FileSystemObject* HierarchyObject::retrieveById(ObjectID id) const //retur
 }
 
 
-struct IsInvalid
+template <class V, class Predicate> inline
+void vector_remove_if(V& vec, Predicate p)
 {
-    bool operator()(const FileSystemObject& fsObj) const
-    {
-        return fsObj.isEmpty();
-    }
-};
-
-
-void FileSystemObject::removeEmptyNonRec(HierarchyObject& hierObj)
-{
-    //remove invalid files:
-    hierObj.useSubFiles().erase(std::remove_if(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(), IsInvalid()), hierObj.useSubFiles().end());
-    //remove invalid symlinks:
-    hierObj.useSubLinks().erase(std::remove_if(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(), IsInvalid()), hierObj.useSubLinks().end());
-    //remove invalid directories:
-    hierObj.useSubDirs(). erase(std::remove_if(hierObj.useSubDirs(). begin(), hierObj.useSubDirs(). end(), IsInvalid()), hierObj.useSubDirs(). end());
+	vec.erase(std::remove_if(vec.begin(), vec.end(), p), vec.end());
 }
 
 
 void removeEmptyRec(HierarchyObject& hierObj)
 {
-    FileSystemObject::removeEmptyNonRec(hierObj);
+	auto isEmpty = [](const FileSystemObject& fsObj) { return fsObj.isEmpty(); };
+
+	vector_remove_if(hierObj.refSubFiles(), isEmpty);
+	vector_remove_if(hierObj.refSubLinks(), isEmpty);
+	vector_remove_if(hierObj.refSubDirs (), isEmpty);
 
     //recurse
-    std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), removeEmptyRec);
+    std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(), removeEmptyRec);
 }
 
 
-void FileSystemObject::removeEmpty(BaseDirMapping& baseDir)
+void BaseDirMapping::removeEmpty(BaseDirMapping& baseDir)
 {
     removeEmptyRec(baseDir);
 }

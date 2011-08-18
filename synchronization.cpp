@@ -68,20 +68,20 @@ inline
 void SyncStatistics::getNumbersRecursively(const HierarchyObject& hierObj)
 {
     //process directories
-    std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(),
+    std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(),
                   boost::bind(&SyncStatistics::getDirNumbers, this, _1));
 
     //process files
-    std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(),
+    std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
                   boost::bind(&SyncStatistics::getFileNumbers, this, _1));
 
     //process symlinks
-    std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(),
+    std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
                   boost::bind(&SyncStatistics::getLinkNumbers, this, _1));
 
-    rowsTotal += hierObj.useSubDirs(). size();
-    rowsTotal += hierObj.useSubFiles().size();
-    rowsTotal += hierObj.useSubLinks().size();
+    rowsTotal += hierObj.refSubDirs(). size();
+    rowsTotal += hierObj.refSubFiles().size();
+    rowsTotal += hierObj.refSubLinks().size();
 }
 
 
@@ -364,10 +364,12 @@ SyncProcess::SyncProcess(xmlAccess::OptionalDialogs& warnings,
                          bool verifyCopiedFiles,
                          bool copyLockedFiles,
                          bool copyFilePermissions,
+                         bool transactionalFileCopy,
                          ProcessCallback& handler) :
     verifyCopiedFiles_(verifyCopiedFiles),
     copyLockedFiles_(copyLockedFiles),
     copyFilePermissions_(copyFilePermissions),
+    transactionalFileCopy_(transactionalFileCopy),
     m_warnings(warnings),
     procCallback(handler) {}
 //--------------------------------------------------------------------------------------------------------------
@@ -569,7 +571,7 @@ void DeletionHandling::removeFolder(const Zstring& relativeName) const
         break;
 
         case MOVE_TO_RECYCLE_BIN:
-            if (!dirExistsUpdating(fullName, *procCallback_))
+            if (dirExistsUpdating(fullName, *procCallback_))
             {
                 const Zstring targetDir      = sessionDelDir + relativeName;
                 const Zstring targetSuperDir = targetDir.BeforeLast(FILE_NAME_SEPARATOR);
@@ -593,7 +595,7 @@ void DeletionHandling::removeFolder(const Zstring& relativeName) const
             break;
 
         case MOVE_TO_CUSTOM_DIRECTORY:
-            if (!dirExistsUpdating(fullName, *procCallback_))
+            if (dirExistsUpdating(fullName, *procCallback_))
             {
                 const Zstring targetDir      = sessionDelDir + relativeName;
                 const Zstring targetSuperDir = targetDir.BeforeLast(FILE_NAME_SEPARATOR);
@@ -657,7 +659,7 @@ private:
         //don't process directories
 
         //process files
-        for (HierarchyObject::SubFileMapping::const_iterator i = hierObj.useSubFiles().begin(); i != hierObj.useSubFiles().end(); ++i)
+        for (HierarchyObject::SubFileMapping::const_iterator i = hierObj.refSubFiles().begin(); i != hierObj.refSubFiles().end(); ++i)
             switch (i->getSyncOperation()) //evaluate comparison result and sync direction
             {
                 case SO_CREATE_NEW_LEFT:
@@ -702,7 +704,7 @@ private:
         //[...]
 
         //recurse into sub-dirs
-        std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(), boost::bind(&DiskSpaceNeeded::processRecursively, this, _1));
+        std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(), boost::bind(&DiskSpaceNeeded::processRecursively, this, _1));
     }
 
     const bool freeSpaceDelLeft_;
@@ -787,8 +789,9 @@ public:
 #endif
         delHandlingLeft_(delHandlingLeft),
         delHandlingRight_(delHandlingRight),
-        verifyCopiedFiles_(syncProc.verifyCopiedFiles_),
-        copyFilePermissions_(syncProc.copyFilePermissions_),
+        verifyCopiedFiles(syncProc.verifyCopiedFiles_),
+        copyFilePermissions(syncProc.copyFilePermissions_),
+        transactionalFileCopy(syncProc.transactionalFileCopy_),
         txtCopyingFile    (toZ(_("Copying new file %x to %y")).         Replace(Zstr("%x"), Zstr("\"%x\""), false).Replace(Zstr("%y"), Zstr("\n\"%y\""), false)),
         txtCopyingLink    (toZ(_("Copying new Symbolic Link %x to %y")).Replace(Zstr("%x"), Zstr("\"%x\""), false).Replace(Zstr("%y"), Zstr("\n\"%y\""), false)),
         txtOverwritingFile(toZ(_("Overwriting file %x in %y")).         Replace(Zstr("%x"), Zstr("\"%x\""), false).Replace(Zstr("%y"), Zstr("\n\"%y\""), false)),
@@ -834,8 +837,9 @@ private:
     const DeletionHandling& delHandlingLeft_;
     const DeletionHandling& delHandlingRight_;
 
-    const bool verifyCopiedFiles_;
-    const bool copyFilePermissions_;
+    const bool verifyCopiedFiles;
+    const bool copyFilePermissions;
+    const bool transactionalFileCopy;
 
     //preload status texts
     const Zstring txtCopyingFile;
@@ -852,7 +856,7 @@ template <SynchronizeFolderPair::PassId pass>
 void SynchronizeFolderPair::execute(HierarchyObject& hierObj)
 {
     //synchronize files:
-    std::for_each(hierObj.useSubFiles().begin(), hierObj.useSubFiles().end(),
+    std::for_each(hierObj.refSubFiles().begin(), hierObj.refSubFiles().end(),
                   [&](FileMapping& fileObj)
     {
         const bool letsDoThis = (pass == FIRST_PASS) == diskSpaceIsReduced(fileObj); //to be deleted files on first pass, rest on second!
@@ -862,11 +866,11 @@ void SynchronizeFolderPair::execute(HierarchyObject& hierObj)
 
     //synchronize symbolic links: (process in second step only)
     if (pass == SECOND_PASS)
-        std::for_each(hierObj.useSubLinks().begin(), hierObj.useSubLinks().end(),
+        std::for_each(hierObj.refSubLinks().begin(), hierObj.refSubLinks().end(),
         [&](SymLinkMapping& linkObj) { tryReportingError(procCallback_, [&]() { synchronizeLink(linkObj); }); });
 
     //synchronize folders:
-    std::for_each(hierObj.useSubDirs().begin(), hierObj.useSubDirs().end(),
+    std::for_each(hierObj.refSubDirs().begin(), hierObj.refSubDirs().end(),
                   [&](DirMapping& dirObj)
     {
         const bool letsDoThis = (pass == FIRST_PASS) == diskSpaceIsReduced(dirObj); //to be deleted files on first pass, rest on second!
@@ -876,34 +880,6 @@ void SynchronizeFolderPair::execute(HierarchyObject& hierObj)
         //recursion!
         this->execute<pass>(dirObj);
     });
-}
-
-
-namespace
-{
-struct NullCommand
-{
-    void operator()() const {}
-};
-
-
-template <SelectedSide side>
-class DelTargetCommand
-{
-public:
-    DelTargetCommand(FileMapping& fileObj, const DeletionHandling& delHandling) : fileObj_(fileObj), delHandling_(delHandling) {}
-
-    void operator()() const
-    {
-        //delete target and copy source
-        delHandling_.removeFile(fileObj_.getObjRelativeName()); //throw (FileError)
-        fileObj_.removeObject<side>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
-    }
-
-private:
-    FileMapping& fileObj_;
-    const DeletionHandling& delHandling_;
-};
 }
 
 
@@ -923,8 +899,8 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
             procCallback_.reportInfo(utf8CvrtTo<wxString>(statusText));
 
             copyFileUpdating(fileObj.getFullName<RIGHT_SIDE>(), target,
-                             NullCommand(), //no target to delete
-                             fileObj.getFileSize<RIGHT_SIDE>());
+            []() {}, //no target to delete
+            fileObj.getFileSize<RIGHT_SIDE>());
             break;
 
         case SO_CREATE_NEW_RIGHT:
@@ -936,8 +912,8 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
             procCallback_.reportInfo(utf8CvrtTo<wxString>(statusText));
 
             copyFileUpdating(fileObj.getFullName<LEFT_SIDE>(), target,
-                             NullCommand(), //no target to delete
-                             fileObj.getFileSize<LEFT_SIDE>());
+            []() {}, //no target to delete
+            fileObj.getFileSize<LEFT_SIDE>());
             break;
 
         case SO_DELETE_LEFT:
@@ -965,8 +941,12 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
             procCallback_.reportInfo(utf8CvrtTo<wxString>(statusText));
 
             copyFileUpdating(fileObj.getFullName<RIGHT_SIDE>(), target,
-                             DelTargetCommand<LEFT_SIDE>(fileObj, delHandlingLeft_), //delete target at appropriate time
-                             fileObj.getFileSize<RIGHT_SIDE>());
+                             [&]() //delete target at appropriate time
+            {
+                delHandlingLeft_.removeFile(fileObj.getObjRelativeName()); //throw (FileError)
+                fileObj.removeObject<LEFT_SIDE>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
+            },
+            fileObj.getFileSize<RIGHT_SIDE>());
             break;
 
         case SO_OVERWRITE_RIGHT:
@@ -978,8 +958,12 @@ void SynchronizeFolderPair::synchronizeFile(FileMapping& fileObj) const
             procCallback_.reportInfo(utf8CvrtTo<wxString>(statusText));
 
             copyFileUpdating(fileObj.getFullName<LEFT_SIDE>(), target,
-                             DelTargetCommand<RIGHT_SIDE>(fileObj, delHandlingRight_), //delete target at appropriate time
-                             fileObj.getFileSize<LEFT_SIDE>());
+                             [&]() //delete target at appropriate time
+            {
+                delHandlingRight_.removeFile(fileObj.getObjRelativeName()); //throw (FileError)
+                fileObj.removeObject<RIGHT_SIDE>(); //remove file from FileMapping, to keep in sync (if subsequent copying fails!!)
+            },
+            fileObj.getFileSize<LEFT_SIDE>());
             break;
 
         case SO_COPY_METADATA_TO_LEFT:
@@ -1157,7 +1141,7 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
             //some check to catch the error that directory on source has been deleted externally after "compare"...
             if (!dirExistsUpdating(dirObj.getFullName<RIGHT_SIDE>(), procCallback_))
                 throw FileError(_("Source directory does not exist anymore:") + "\n\"" + dirObj.getFullName<RIGHT_SIDE>() + "\"");
-            createDirectory(target, dirObj.getFullName<RIGHT_SIDE>(), copyFilePermissions_); //no symlink copying!
+            createDirectory(target, dirObj.getFullName<RIGHT_SIDE>(), copyFilePermissions); //no symlink copying!
             break;
 
         case SO_CREATE_NEW_RIGHT:
@@ -1170,7 +1154,7 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
             //some check to catch the error that directory on source has been deleted externally after "compare"...
             if (!dirExistsUpdating(dirObj.getFullName<LEFT_SIDE>(), procCallback_))
                 throw FileError(_("Source directory does not exist anymore:") + "\n\"" + dirObj.getFullName<LEFT_SIDE>() + "\"");
-            createDirectory(target, dirObj.getFullName<LEFT_SIDE>(), copyFilePermissions_); //no symlink copying!
+            createDirectory(target, dirObj.getFullName<LEFT_SIDE>(), copyFilePermissions); //no symlink copying!
             break;
 
         case SO_COPY_METADATA_TO_LEFT:
@@ -1206,9 +1190,9 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
                 //progress indicator update: DON'T forget to notify about implicitly deleted objects!
                 const SyncStatistics subObjects(dirObj);
                 //...then remove everything
-                dirObj.useSubFiles().clear();
-                dirObj.useSubLinks().clear();
-                dirObj.useSubDirs ().clear();
+                dirObj.refSubFiles().clear();
+                dirObj.refSubLinks().clear();
+                dirObj.refSubDirs ().clear();
                 procCallback_.updateProcessedData(subObjects.getCreate() + subObjects.getOverwrite() + subObjects.getDelete(), to<zen::Int64>(subObjects.getDataToProcess()));
             }
             break;
@@ -1224,9 +1208,9 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
                 //progress indicator update: DON'T forget to notify about implicitly deleted objects!
                 const SyncStatistics subObjects(dirObj);
                 //...then remove everything
-                dirObj.useSubFiles().clear();
-                dirObj.useSubLinks().clear();
-                dirObj.useSubDirs ().clear();
+                dirObj.refSubFiles().clear();
+                dirObj.refSubLinks().clear();
+                dirObj.refSubDirs ().clear();
                 procCallback_.updateProcessedData(subObjects.getCreate() + subObjects.getOverwrite() + subObjects.getDelete(), to<zen::Int64>(subObjects.getDataToProcess()));
             }
             break;
@@ -1650,34 +1634,26 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             const Zstring dirnameLeft = j->getBaseDir<LEFT_SIDE>().BeforeLast(FILE_NAME_SEPARATOR);
             if (!dirnameLeft.empty() && !dirExistsUpdating(dirnameLeft, procCallback))
             {
-                if (!tryReportingError(procCallback, boost::bind(createDirectory, boost::cref(dirnameLeft)))) //may throw in error-callback!
-                    continue; //skip this folder pair
+                if (!tryReportingError(procCallback, [&]() { createDirectory(dirnameLeft); })) //may throw in error-callback!
+                continue; //skip this folder pair
             }
             const Zstring dirnameRight = j->getBaseDir<RIGHT_SIDE>().BeforeLast(FILE_NAME_SEPARATOR);
             if (!dirnameRight.empty() && !dirExistsUpdating(dirnameRight, procCallback))
             {
-                if (!tryReportingError(procCallback, boost::bind(createDirectory, boost::cref(dirnameRight)))) //may throw in error-callback!
-                    continue; //skip this folder pair
+                if (!tryReportingError(procCallback, [&]() { createDirectory(dirnameRight); })) //may throw in error-callback!
+                continue; //skip this folder pair
             }
             //------------------------------------------------------------------------------------------
             //execute synchronization recursively
 
             //update synchronization database (automatic sync only)
-            std::auto_ptr<EnforceUpdateDatabase> guardUpdateDb;
+            std::unique_ptr<EnforceUpdateDatabase> guardUpdateDb;
             if (folderPairCfg.inAutomaticMode)
                 guardUpdateDb.reset(new EnforceUpdateDatabase(*j));
 
-            //enforce removal of invalid entries (where element on both sides is empty)
-            struct RemoveInvalid
-            {
-                RemoveInvalid(BaseDirMapping& baseDir) : baseDir_(baseDir) {}
-                ~RemoveInvalid()
-                {
-                    FileSystemObject::removeEmpty(baseDir_);
-                }
-                BaseDirMapping& baseDir_;
-            } dummy1(*j);
-
+            //guarantee removal of invalid entries (where element on both sides is empty)
+			Loki::ScopeGuard guardInvalid = Loki::MakeGuard([&]() { BaseDirMapping::removeEmpty(*j); });
+			(void) guardInvalid;
 
             SynchronizeFolderPair syncFP(*this,
 #ifdef FFS_WIN
@@ -1757,7 +1733,8 @@ void SynchronizeFolderPair::copyFileUpdating(const Zstring& source, const Zstrin
 
         copyFile(source, //type File implicitly means symlinks need to be dereferenced!
                  target,
-                 copyFilePermissions_,
+                 copyFilePermissions,
+                 transactionalFileCopy,
                  &callback); //throw (FileError, ErrorFileLocked);
 
         //inform about the (remaining) processed amount of data
@@ -1800,7 +1777,7 @@ void SynchronizeFolderPair::copyFileUpdating(const Zstring& source, const Zstrin
 
         if (!targetDir.empty())
         {
-            createDirectory(targetDir, templateDir, copyFilePermissions_); //throw (FileError)
+            createDirectory(targetDir, templateDir, copyFilePermissions); //throw (FileError)
             /*symbolic link handling:
             if "not traversing symlinks": fullName == c:\syncdir<symlinks>\some\dirs\leaf<symlink>
             => setting irrelevant
@@ -1815,7 +1792,7 @@ void SynchronizeFolderPair::copyFileUpdating(const Zstring& source, const Zstrin
 
     //todo: transactional behavior: delete target if verification fails?
 
-    if (verifyCopiedFiles_) //verify if data was copied correctly
+    if (verifyCopiedFiles) //verify if data was copied correctly
         verifyFileCopy(source, target); //throw (FileError)
 
     guardStatistics.Dismiss();
@@ -1829,11 +1806,11 @@ void SynchronizeFolderPair::copySymlink(const Zstring& source, const Zstring& ta
         switch (type)
         {
             case LinkDescriptor::TYPE_DIR:
-                zen::copySymlink(source, target, SYMLINK_TYPE_DIR, copyFilePermissions_); //throw (FileError)
+                zen::copySymlink(source, target, SYMLINK_TYPE_DIR, copyFilePermissions); //throw (FileError)
                 break;
 
             case LinkDescriptor::TYPE_FILE: //Windows: true file symlink; Linux: file-link or broken link
-                zen::copySymlink(source, target, SYMLINK_TYPE_FILE, copyFilePermissions_); //throw (FileError)
+                zen::copySymlink(source, target, SYMLINK_TYPE_FILE, copyFilePermissions); //throw (FileError)
                 break;
         }
     }
@@ -1848,7 +1825,7 @@ void SynchronizeFolderPair::copySymlink(const Zstring& source, const Zstring& ta
 
         if (!targetDir.empty() && !dirExistsUpdating(targetDir, procCallback_))
         {
-            createDirectory(targetDir, templateDir, copyFilePermissions_); //throw (FileError)
+            createDirectory(targetDir, templateDir, copyFilePermissions); //throw (FileError)
             /*symbolic link handling:
             if "not traversing symlinks": fullName == c:\syncdir<symlinks>\some\dirs\leaf<symlink>
             => setting irrelevant

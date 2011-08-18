@@ -63,7 +63,7 @@ public:
     virtual void        reportStatus(const std::wstring& statusMsg, int itemTotal) = 0; //
 };
 
-//attention: ensure directory filtering is applied later to exclude filtered directories which have been erroneously kept
+//attention: ensure directory filtering is applied later to exclude filtered directories which have been kept as parent folders
 
 void fillBuffer(const std::set<DirectoryKey>& keysToRead, //in
                 std::map<DirectoryKey, DirectoryValue>& buf, //out

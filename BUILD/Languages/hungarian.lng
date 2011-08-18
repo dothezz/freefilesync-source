@@ -657,6 +657,10 @@ Kizárni: \stuff\temp\*
 <target>Oszlop mozgatása felfelé</target>
 <source>Move column down</source>
 <target>Oszlop mozgatása lefelé</target>
+<source>Transactional File Copy</source>
+<target></target>
+<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
+<target></target>
 <source>Copy locked files</source>
 <target>Zárolt fájlok másolása</target>
 <source>

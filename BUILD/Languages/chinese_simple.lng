@@ -650,6 +650,10 @@ Exclude: \stuff\temp\*
 <target>上移一行</target>
 <source>Move column down</source>
 <target>下移一行</target>
+<source>Transactional File Copy</source>
+<target></target>
+<source>Write files to a temporary (*.ffs_tmp) first and rename them. This guarantees a consistent state even in situations of fatal error.</source>
+<target></target>
 <source>Copy locked files</source>
 <target>复制被锁定的文件</target>
 <source>
