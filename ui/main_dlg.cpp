@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "main_dlg.h"
 #include <iterator>
 #include <stdexcept>
@@ -52,8 +52,10 @@
 #include "../shared/check_exist.h"
 #include "../library/lock_holder.h"
 #include "../shared/shell_execute.h"
+#include "../shared/localization.h"
 
 using namespace zen;
+
 
 namespace
 {
@@ -346,7 +348,7 @@ MainDialog::MainDialog(const wxString& cfgFileName, xmlAccess::XmlGlobalSettings
 
         if (filenames.empty())
         {
-            if (fileExists(toZ(lastRunConfigName()))) //3. try to load auto-save config
+            if (zen::fileExists(zen::toZ(lastRunConfigName()))) //3. try to load auto-save config
                 filenames.push_back(lastRunConfigName());
         }
     }
@@ -542,18 +544,19 @@ void MainDialog::init(const xmlAccess::XmlGuiConfig guiCfg,
 #endif
 
     //create language selection menu
-    for (std::vector<ExistingTranslations::Entry>::const_iterator i = ExistingTranslations::get().begin(); i != ExistingTranslations::get().end(); ++i)
+    std::for_each(zen::ExistingTranslations::get().begin(), zen::ExistingTranslations::get().end(),
+                  [&](const zen::ExistingTranslations::Entry& entry)
     {
-        wxMenuItem* newItem = new wxMenuItem(m_menuLanguages, wxID_ANY, i->languageName, wxEmptyString, wxITEM_NORMAL );
-        newItem->SetBitmap(GlobalResources::instance().getImage(i->languageFlag));
+        wxMenuItem* newItem = new wxMenuItem(m_menuLanguages, wxID_ANY, entry.languageName, wxEmptyString, wxITEM_NORMAL );
+        newItem->SetBitmap(GlobalResources::instance().getImage(entry.languageFlag));
 
         //map menu item IDs with language IDs: evaluated when processing event handler
-        languageMenuItemMap.insert(std::map<MenuItemID, LanguageID>::value_type(newItem->GetId(), i->languageID));
+        languageMenuItemMap.insert(std::map<MenuItemID, LanguageID>::value_type(newItem->GetId(), entry.languageID));
 
         //connect event
-        Connect(newItem->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainDialog::OnMenuLanguageSwitch));
+        this->Connect(newItem->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainDialog::OnMenuLanguageSwitch));
         m_menuLanguages->Append(newItem);
-    }
+    });
 
     //support for CTRL + C and DEL on grids
     m_gridLeft  ->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainDialog::onGridLeftButtonEvent),   NULL, this);
@@ -1030,43 +1033,6 @@ void MainDialog::deleteSelectedFiles(const std::set<size_t>& viewSelectionLeft, 
 }
 
 
-template <SelectedSide side>
-void exstractNames(const FileSystemObject& fsObj, wxString& name, wxString& dir)
-{
-    if (!fsObj.isEmpty<side>())
-    {
-        struct GetNames : public FSObjectVisitor
-        {
-            GetNames(wxString& nameIn, wxString& dirIn) : name_(nameIn), dir_(dirIn) {}
-            virtual void visit(const FileMapping& fileObj)
-            {
-                name_ = toWx(fileObj.getFullName<side>());
-                dir_  = toWx(fileObj.getFullName<side>().BeforeLast(FILE_NAME_SEPARATOR));
-            }
-            virtual void visit(const SymLinkMapping& linkObj)
-            {
-                name_ = toWx(linkObj.getFullName<side>());
-                dir_  = toWx(linkObj.getFullName<side>().BeforeLast(FILE_NAME_SEPARATOR));
-            }
-            virtual void visit(const DirMapping& dirObj)
-            {
-                dir_  = name_ = toWx(dirObj.getFullName<side>());
-            }
-
-            wxString& name_;
-            wxString& dir_;
-            ;
-        } getNames(name, dir);
-        fsObj.accept(getNames);
-    }
-    else
-    {
-        name.clear();
-        dir.clear();
-    }
-}
-
-
 void MainDialog::openExternalApplication(const wxString& commandline)
 {
     if (m_gridLeft->isLeadGrid() || m_gridRight->isLeadGrid())
@@ -1082,66 +1048,85 @@ void MainDialog::openExternalApplication(const wxString& commandline)
 }
 
 
+template <SelectedSide side>
+wxString extractLastValidDir(const FileSystemObject& fsObj)
+{
+    Zstring fullname = fsObj.getBaseDirPf<side>() + fsObj.getObjRelativeName(); //full name even if FileSystemObject::isEmpty<side>() == true
+
+    while (!fullname.empty() && !dirExists(fullname)) //bad algorithm: this one should better retrieve the status from fsObj
+        fullname = beforeLast(fullname, FILE_NAME_SEPARATOR);
+
+    return toWx(fullname);
+}
+
+bool tryReplace(const wxString& phrase, const wxString& replacement, wxString& command) //return false on error
+{
+    if (command.find(phrase) != wxString::npos)
+    {
+        if (replacement.empty())
+            return false;
+        replace(command, phrase,  replacement);
+    }
+    return true;
+}
+
+
 void MainDialog::openExternalApplication(size_t rowNumber, bool leftSide, const wxString& commandline)
 {
     if (commandline.empty())
         return;
 
-    wxString command = commandline;
-
     wxString name;
-    wxString dir;
     wxString nameCo;
+    wxString dir;
     wxString dirCo;
 
-    const FileSystemObject* fsObj = gridDataView->getObject(rowNumber);
-    if (fsObj)
     {
-        if (leftSide)
+        const FileSystemObject* fsObj = gridDataView->getObject(rowNumber);
+        if (fsObj)
         {
-            exstractNames<LEFT_SIDE>( *fsObj, name,   dir);
-            exstractNames<RIGHT_SIDE>(*fsObj, nameCo, dirCo);
-        }
-        else
-        {
-            exstractNames<RIGHT_SIDE>(*fsObj, name,   dir);
-            exstractNames<LEFT_SIDE>( *fsObj, nameCo, dirCo);
-        }
-#ifdef FFS_WIN
-        if (name.empty())
-        {
-            if (leftSide)
-                zen::shellExecute(wxString(L"\"") + fsObj->getBaseDirPf<LEFT_SIDE>() + "\"");
-            //zen::shellExecute(wxString(wxT("explorer ")) + L"\"" + zToWx(fsObj->getBaseDirPf<LEFT_SIDE>()) + L"\"");
-            else
-                zen::shellExecute(wxString(L"\"") + fsObj->getBaseDirPf<RIGHT_SIDE>() + "\"");
-            //zen::shellExecute(wxString(wxT("explorer ")) + L"\"" + zToWx(fsObj->getBaseDirPf<RIGHT_SIDE>()) + L"\"");
-            return;
-        }
-#endif
-    }
-    else
-    {
-        //fallback
-        dir   = toWx(zen::getFormattedDirectoryName(toZ(firstFolderPair->getLeftDir())));
-        dirCo = toWx(zen::getFormattedDirectoryName(toZ(firstFolderPair->getRightDir())));
+            name = toWx(fsObj->getFullName<LEFT_SIDE>()); //empty if obj not existing
+            dir  = toWx(beforeLast(fsObj->getFullName<LEFT_SIDE>(), FILE_NAME_SEPARATOR)); //small issue: if obj does not exist but parent exists, this one erronously returns empty
 
-        if (!leftSide)
-            std::swap(dir, dirCo);
-
-#ifdef FFS_WIN
-        zen::shellExecute(wxString(L"\"") + dir + L"\""); //default
-        //zen::shellExecute(wxString(wxT("explorer ")) + L"\"" + dir + L"\""); //default
-        return;
-#endif
+            nameCo = toWx(fsObj->getFullName<RIGHT_SIDE>());
+            dirCo  = toWx(beforeLast(fsObj->getFullName<RIGHT_SIDE>(), FILE_NAME_SEPARATOR));
+        }
     }
 
-    command.Replace(wxT("%nameCo"), nameCo, true); //attention: replace %nameCo, %dirCo BEFORE %name, %dir to handle dependency
-    command.Replace(wxT("%dirCo"),  dirCo,  true);
-    command.Replace(wxT("%name"),   name,   true);
-    command.Replace(wxT("%dir"),    dir,    true);
+    if (!leftSide)
+    {
+        std::swap(name, nameCo);
+        std::swap(dir,  dirCo);
+    }
 
-    zen::shellExecute(command);
+    wxString command = commandline;
+    if (tryReplace(L"%nameCo", nameCo, command) && //attention: replace %nameCo, %dirCo BEFORE %name, %dir to handle dependency
+        tryReplace(L"%dirCo",  dirCo,  command) &&
+        tryReplace(L"%name",   name,   command) &&
+        tryReplace(L"%dir",    dir,    command))
+        zen::shellExecute(command);
+    else //fallback
+    {
+        wxString fallbackDir;
+        const FileSystemObject* fsObj = gridDataView->getObject(rowNumber);
+        if (fsObj)
+        {
+            fallbackDir = leftSide ?
+                          extractLastValidDir<LEFT_SIDE>(*fsObj) :
+                          extractLastValidDir<RIGHT_SIDE>(*fsObj);
+        }
+
+        if (fallbackDir.empty())
+            fallbackDir = leftSide ?
+                          toWx(zen::getFormattedDirectoryName(toZ(firstFolderPair->getLeftDir()))) :
+                          toWx(zen::getFormattedDirectoryName(toZ(firstFolderPair->getRightDir())));
+
+#ifdef FFS_WIN
+        zen::shellExecute(wxString(L"\"") + fallbackDir + L"\""); //default
+#elif defined FFS_LINUX
+        zen::shellExecute(wxString(L"xdg-open \"") + fallbackDir + L"\""); //default
+#endif
+    }
 }
 
 
@@ -1157,7 +1142,7 @@ void MainDialog::pushStatusInformation(const wxString& text)
 
 void MainDialog::clearStatusBar()
 {
-    while (stackObjects.size() > 0)
+    while (!stackObjects.empty())
         stackObjects.pop();
 
     m_staticTextStatusMiddle->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT)); //reset color
@@ -1188,7 +1173,6 @@ void MainDialog::disableAllElements(bool enableAbort)
 
     if (enableAbort)
     {
-
         //show abort button
         m_buttonAbort->Enable();
         m_buttonAbort->Show();
@@ -1907,8 +1891,8 @@ void MainDialog::OnContextExcludeExtension(wxCommandEvent& event)
         updateFilterButtons();
 
         //do not fully apply filter, just exclude new items
-		    std::for_each(gridDataView->getDataTentative().begin(), gridDataView->getDataTentative().end(),
-		[&](BaseDirMapping& baseMap) { addHardFiltering(baseMap, newExclude); });
+        std::for_each(gridDataView->getDataTentative().begin(), gridDataView->getDataTentative().end(),
+        [&](BaseDirMapping& baseMap) { addHardFiltering(baseMap, newExclude); });
 
         //applyFiltering(getConfig().mainCfg, gridDataView->getDataTentative());
         updateGuiGrid();
@@ -1950,8 +1934,8 @@ void MainDialog::OnContextExcludeObject(wxCommandEvent& event)
             updateFilterButtons();
 
             //do not fully apply filter, just exclude new items
-					    std::for_each(gridDataView->getDataTentative().begin(), gridDataView->getDataTentative().end(),
-		[&](BaseDirMapping& baseMap) { addHardFiltering(baseMap, newExclude); });
+            std::for_each(gridDataView->getDataTentative().begin(), gridDataView->getDataTentative().end(),
+            [&](BaseDirMapping& baseMap) { addHardFiltering(baseMap, newExclude); });
 
             //applyFiltering(getConfig().mainCfg, gridDataView->getDataTentative());
             updateGuiGrid();
@@ -2555,11 +2539,12 @@ bool MainDialog::saveOldConfig() //return false on user abort
                                     &dontShowAgain))
             {
                 case ReturnQuestionDlg::BUTTON_YES:
-                    if (!trySaveConfig())
-                        return false;
-                    break;
+                    return trySaveConfig();
                 case ReturnQuestionDlg::BUTTON_NO:
                     globalSettings->optDialogs.popupOnConfigChange = !dontShowAgain;
+                    //by choosing "no" user actively discards current config selection
+                    //this ensures next app start will load <last session> instead of the original non-modified config selection
+                    setLastUsedConfig(std::vector<wxString>(), getConfig());
                     break;
                 case ReturnQuestionDlg::BUTTON_CANCEL:
                     return false;
@@ -3258,7 +3243,6 @@ void MainDialog::updateStatistics()
 
 void MainDialog::OnSwitchView(wxCommandEvent& event)
 {
-    //toggle view
     syncPreview->enablePreview(!syncPreview->previewIsEnabled());
 }
 

@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #ifndef Z_BASE_H_INCLUDED
 #define Z_BASE_H_INCLUDED
 
@@ -12,6 +12,7 @@
 #include <sstream>
 #include <algorithm>
 #include <string_tools.h>
+#include <boost/detail/atomic_count.hpp>
 
 /*
 Allocator Policy:
@@ -101,24 +102,17 @@ private:
         size_t capacity; //allocated size without null-termination
     };
 
-    static Descriptor* descr(T* ptr)
-    {
-        return reinterpret_cast<Descriptor*>(ptr) - 1;
-    }
-
-    static const Descriptor* descr(const T* ptr)
-    {
-        return reinterpret_cast<const Descriptor*>(ptr) - 1;
-    }
+    static       Descriptor* descr(      T* ptr) { return reinterpret_cast<      Descriptor*>(ptr) - 1; }
+    static const Descriptor* descr(const T* ptr) { return reinterpret_cast<const Descriptor*>(ptr) - 1; }
 };
 
 
 template <typename T, //Character Type
          class AP>    //Allocator Policy
-class StorageRefCount : public AP
+class StorageRefCountThreadSafe : public AP
 {
 protected:
-    ~StorageRefCount() {}
+    ~StorageRefCountThreadSafe() {}
 
     static T* create(size_t size)
     {
@@ -132,10 +126,7 @@ protected:
         assert(minCapacity >= size);
 
         Descriptor* const newDescr = static_cast<Descriptor*>(AP::allocate(sizeof(Descriptor) + (newCapacity + 1) * sizeof(T)));
-
-        newDescr->refCount = 1;
-        newDescr->length   = size;
-        newDescr->capacity = newCapacity;
+        new (newDescr) Descriptor(1, size, newCapacity);
 
         return reinterpret_cast<T*>(newDescr + 1);
     }
@@ -150,7 +141,10 @@ protected:
     static void destroy(T* ptr)
     {
         if (--descr(ptr)->refCount == 0)
+        {
+            descr(ptr)->~Descriptor();
             AP::deallocate(descr(ptr));
+        }
     }
 
     static bool canWrite(const T* ptr, size_t minCapacity) //needs to be checked before writing to "ptr"
@@ -173,26 +167,23 @@ protected:
 private:
     struct Descriptor
     {
-        size_t refCount;
+        Descriptor(long rc, size_t len, size_t cap) : refCount(rc), length(len), capacity(cap) {}
+
+        boost::detail::atomic_count refCount; //practically no perf loss: ~0.2%! (FFS comparison)
         size_t length;
         size_t capacity; //allocated size without null-termination
     };
 
-    static Descriptor* descr(T* ptr)
-    {
-        return reinterpret_cast<Descriptor*>(ptr) - 1;
-    }
-
-    static const Descriptor* descr(const T* ptr)
-    {
-        return reinterpret_cast<const Descriptor*>(ptr) - 1;
-    }
+    static       Descriptor* descr(      T* ptr) { return reinterpret_cast<      Descriptor*>(ptr) - 1; }
+    static const Descriptor* descr(const T* ptr) { return reinterpret_cast<const Descriptor*>(ptr) - 1; }
 };
 
 
-template <class T,									         //Character Type
-         template <class, class> class SP = StorageRefCount, //Storage Policy
-         class AP = AllocatorOptimalSpeed>				     //Allocator Policy
+//perf note: interstingly StorageDeepCopy and StorageRefCountThreadSafe show same performance in FFS comparison
+
+template <class T,									                   //Character Type
+         template <class, class> class SP = StorageRefCountThreadSafe, //Storage Policy
+         class AP = AllocatorOptimalSpeed>				               //Allocator Policy
 class Zbase : public SP<T, AP>
 {
 public:
@@ -200,6 +191,7 @@ public:
     Zbase(const T* source); //implicit conversion from a C-string
     Zbase(const T* source, size_t length);
     Zbase(const Zbase& source);
+    Zbase(Zbase&& tmp);
     explicit Zbase(T source); //dangerous if implicit: T buffer[]; Zbase name = buffer; ups...
     //allow explicit construction from different string type, prevent ambiguity via SFINAE
     template <class S> explicit Zbase(const S& other, typename S::value_type = 0);
@@ -261,6 +253,7 @@ public:
     void push_back(T val); //STL access
 
     Zbase& operator=(const Zbase& source);
+    Zbase& operator=(Zbase&& tmp);
     Zbase& operator=(const T* source);
     Zbase& operator=(T source);
     Zbase& operator+=(const Zbase& other);
@@ -376,6 +369,14 @@ inline
 Zbase<T, SP, AP>::Zbase(const Zbase<T, SP, AP>& source)
 {
     rawStr = this->clone(source.rawStr);
+}
+
+
+template <class T, template <class, class> class SP, class AP>
+inline
+Zbase<T, SP, AP>::Zbase(Zbase<T, SP, AP>&& tmp)
+{
+    rawStr = this->clone(tmp.rawStr); //for a ref-counting string there probably isn't a faster way, even with r-value references
 }
 
 
@@ -821,6 +822,15 @@ inline
 Zbase<T, SP, AP>& Zbase<T, SP, AP>::operator=(const Zbase<T, SP, AP>& source)
 {
     Zbase(source).swap(*this);
+    return *this;
+}
+
+
+template <class T, template <class, class> class SP, class AP>
+inline
+Zbase<T, SP, AP>& Zbase<T, SP, AP>::operator=(Zbase<T, SP, AP>&& tmp)
+{
+    swap(tmp);
     return *this;
 }
 

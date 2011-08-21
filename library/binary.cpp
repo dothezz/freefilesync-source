@@ -3,12 +3,13 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "binary.h"
 #include "../shared/file_io.h"
 #include <vector>
 #include <wx/stopwatch.h>
 #include "../shared/int64.h"
+#include <boost/thread/tss.hpp>
 
 inline
 void setMinSize(std::vector<char>& buffer, size_t minSize)
@@ -71,11 +72,15 @@ bool zen::filesHaveSameContent(const Zstring& filename1, const Zstring& filename
     FileInput file1(filename1); //throw (FileError)
     FileInput file2(filename2); //throw (FileError)
 
+    static boost::thread_specific_ptr<std::vector<char>> cpyBuf1;
+    static boost::thread_specific_ptr<std::vector<char>> cpyBuf2;
+    if (!cpyBuf1.get()) cpyBuf1.reset(new std::vector<char>());
+    if (!cpyBuf2.get()) cpyBuf2.reset(new std::vector<char>());
+
+    std::vector<char>& memory1 = *cpyBuf1;
+    std::vector<char>& memory2 = *cpyBuf2;
+
     BufferSize bufferSize;
-
-    static std::vector<char> memory1;
-    static std::vector<char> memory2;
-
     zen::UInt64 bytesCompared;
 
     wxLongLong lastDelayViolation = wxGetLocalTimeMillis();

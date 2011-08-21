@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #ifndef DIR_WATCHER_348577025748023458
 #define DIR_WATCHER_348577025748023458
 

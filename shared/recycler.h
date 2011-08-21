@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #ifndef RECYCLER_H_INCLUDED
 #define RECYCLER_H_INCLUDED
 
@@ -23,15 +23,12 @@ Recycler always available: during runtime either SHFileOperation or (since Vista
 
 Linux
 -----
-Include compilation flag:
-`pkg-config --cflags gtkmm-2.4`
-
-Linker flag:
-`pkg-config --libs gtkmm-2.4`
+Compiler flag: `pkg-config --cflags gtkmm-2.4`
+Linker   flag: `pkg-config --libs gtkmm-2.4`
 */
 
-//move a file or folder to Recycle Bin
-bool moveToRecycleBin(const Zstring& fileToDelete); //return "true" if file/dir was actually deleted; throw (FileError)
+//move a file or folder to Recycle Bin (deletes permanently if recycle is not available)
+bool moveToRecycleBin(const Zstring& filename); //return "true" if file/dir was actually deleted; throw (FileError)
 
 
 #ifdef FFS_WIN
@@ -42,7 +39,7 @@ enum StatusRecycler
     STATUS_REC_UNKNOWN
 };
 
-StatusRecycler recycleBinExists(const Zstring& pathName); //test existence of Recycle Bin API for certain path
+StatusRecycler recycleBinStatus(const Zstring& pathName); //test existence of Recycle Bin API for certain path
 #endif
 }
 

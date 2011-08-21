@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #ifndef DEBUG_LOG_HEADER_017324601673246392184621895740256342
 #define DEBUG_LOG_HEADER_017324601673246392184621895740256342
 

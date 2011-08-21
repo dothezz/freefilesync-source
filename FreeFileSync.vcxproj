@@ -94,6 +94,7 @@
     <IntDir>OBJ\$(ProjectName)_$(Configuration)_$(PlatformName)_VCPP\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <TargetName>$(ProjectName)_$(PlatformName)</TargetName>
+    <EmbedManifest>true</EmbedManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -107,7 +108,7 @@
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.obj</PrecompiledHeaderOutputFile>
-      <ForcedIncludeFiles>$(ProjectDir)shared/pch.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>$(SolutionDir)shared/warn_static.h;$(ProjectDir)shared/pch.h</ForcedIncludeFiles>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
@@ -142,7 +143,7 @@
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.obj</PrecompiledHeaderOutputFile>
-      <ForcedIncludeFiles>$(ProjectDir)shared/pch.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>$(SolutionDir)shared/warn_static.h;$(ProjectDir)shared/pch.h</ForcedIncludeFiles>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
@@ -180,6 +181,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <ForcedIncludeFiles>$(SolutionDir)shared/warn_static.h;</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -215,6 +217,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ForcedIncludeFiles>$(SolutionDir)shared/warn_static.h;</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -251,12 +254,12 @@
     <ClCompile Include="library\error_log.cpp" />
     <ClCompile Include="library\hard_filter.cpp" />
     <ClCompile Include="library\icon_buffer.cpp" />
+    <ClCompile Include="library\parallel_scan.cpp" />
     <ClCompile Include="library\process_xml.cpp" />
     <ClCompile Include="library\resources.cpp" />
     <ClCompile Include="library\statistics.cpp" />
     <ClCompile Include="library\status_handler.cpp" />
     <ClCompile Include="shared\app_main.cpp" />
-    <ClCompile Include="shared\check_exist.cpp" />
     <ClCompile Include="shared\custom_button.cpp" />
     <ClCompile Include="shared\custom_combo_box.cpp" />
     <ClCompile Include="shared\custom_tooltip.cpp" />

@@ -106,7 +106,7 @@
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.obj</PrecompiledHeaderOutputFile>
-      <ForcedIncludeFiles>$(ProjectDir)/../shared/pch.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>$(SolutionDir)shared/warn_static.h;$(ProjectDir)/../shared/pch.h</ForcedIncludeFiles>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
@@ -136,7 +136,7 @@
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.obj</PrecompiledHeaderOutputFile>
-      <ForcedIncludeFiles>$(ProjectDir)/../shared/pch.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>$(SolutionDir)shared/warn_static.h;$(ProjectDir)/../shared/pch.h</ForcedIncludeFiles>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </ClCompile>
@@ -169,6 +169,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ForcedIncludeFiles>$(SolutionDir)shared/warn_static.h;</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -204,6 +205,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ForcedIncludeFiles>$(SolutionDir)shared/warn_static.h;</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -226,7 +228,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\library\process_xml.cpp" />
-    <ClCompile Include="..\shared\check_exist.cpp" />
     <ClCompile Include="..\shared\custom_button.cpp" />
     <ClCompile Include="..\shared\dir_watcher.cpp" />
     <ClCompile Include="..\shared\dll_loader.cpp" />

@@ -7,6 +7,8 @@
 	<plural definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2</plural definition>
 </header>
 
+<source>Searching for directory %x...</source>
+<target></target>
 <source>Show in Explorer</source>
 <target>Показати у Провіднику</target>
 <source>Open with default application</source>
@@ -17,8 +19,8 @@
 <target>RealtimeSync - Автоматична синхронізація</target>
 <source>Browse</source>
 <target>Переглянути</target>
-<source>Invalid commandline: "%x"</source>
-<target>Неправильний командний рядок: "%x"</target>
+<source>Invalid commandline: %x</source>
+<target>Неправильний командний рядок: %x</target>
 <source>Error resolving symbolic link:</source>
 <target>Помилка при вирішені символічного посилання:</target>
 <source>Show popup</source>
@@ -110,10 +112,10 @@
 <target>Вступна синхронізація:</target>
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Файла бази даних FreeFileSync ще не існує:</target>
-<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
-<target>Записів, які стосуються таких файлів, в базі даних FreeFileSync ще не існує:</target>
 <source>Error reading from synchronization database:</source>
 <target>Помилка при читанні з бази даних синхронізації:</target>
+<source>Database files do not share a common synchronization session:</source>
+<target></target>
 <source>An exception occurred!</source>
 <target>Відбулось виключення!</target>
 <source>Error deleting file:</source>
@@ -137,6 +139,15 @@
 <target>Інформація</target>
 <source>Fatal Error</source>
 <target>Критична помилка</target>
+<source>Scanning:</source>
+<target>Сканую:</target>
+<source>Encoding extended time information: %x</source>
+<target>Кодування розширеної інформації про час: %x</target>
+<source>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</source>
+<target></target>
 <source>Invalid FreeFileSync config file!</source>
 <target>Неправильний файл конфігурації FreeFileSync!</target>
 <source>File does not exist:</source>
@@ -234,20 +245,18 @@ The command line is executed each time:
 <target>Моніторинг включений...</target>
 <source>Waiting for missing directories...</source>
 <target>Очікування пропущених каталогів...</target>
-<source>Could not initialize directory monitoring:</source>
-<target>Не вдалося ініціювати каталог для моніторингу:</target>
 <source>A directory input field is empty.</source>
 <target>Поле введення шляху каталога порожнє.</target>
-<source>Error when monitoring directories.</source>
-<target>Помилка моніторингу каталогу.</target>
 <source>Drag && drop</source>
 <target>Drag && drop</target>
+<source>Could not initialize directory monitoring:</source>
+<target>Не вдалося ініціювати каталог для моніторингу:</target>
+<source>Error when monitoring directories.</source>
+<target>Помилка моніторингу каталогу.</target>
 <source>Conversion error:</source>
 <target>Помилка перетворення:</target>
 <source>Error moving file:</source>
 <target>Помилка переміщення файла:</target>
-<source>Operation aborted!</source>
-<target>Операція відмінена!</target>
 <source>Target file already existing!</source>
 <target>Кінцевий файл уже існує!</target>
 <source>Error moving directory:</source>
@@ -278,6 +287,8 @@ The command line is executed each time:
 <target>Помилка при записі файла:</target>
 <source>Error reading file:</source>
 <target>Помилка при читанні файла:</target>
+<source>Operation aborted!</source>
+<target>Операція відмінена!</target>
 <source>Endless loop when traversing directory:</source>
 <target>Зациклюванння при обході каталогу:</target>
 <source>Error traversing directory:</source>
@@ -421,24 +432,22 @@ The command line is executed each time:
 <target>Створити пакетний файл для автоматичної синхронізації. Щоб запустити пакетний режим просто двічі клацніть файл або виконайте командний рядок: FreeFileSync.exe <batchfile>. Це можна також запланувати в менеджері ОС</target>
 <source>Help</source>
 <target>Допомога</target>
-<source>Configuration overview:</source>
-<target>Огляд конфігурації:</target>
 <source>Filter files</source>
 <target>Фільтр файлів</target>
-<source>Status feedback</source>
-<target>Статус оберненого зв’язку</target>
-<source>Silent mode</source>
-<target>Тихий режим роботи</target>
-<source>Start minimized and write status information to a logfile</source>
-<target>Запускати згорнутим і записувати інформацію про стан в лог-файл</target>
 <source>Error handling</source>
 <target>Обробка помилок</target>
 <source>Overview</source>
 <target>Головна</target>
-<source>Select logfile directory:</source>
-<target>Виберіть каталог для лог-файлів:</target>
+<source>Status feedback</source>
+<target>Статус оберненого зв’язку</target>
+<source>Run minimized</source>
+<target></target>
 <source>Maximum number of logfiles:</source>
 <target>Максимальна кількість лог-файлів:</target>
+<source>Select logfile directory:</source>
+<target>Виберіть каталог для лог-файлів:</target>
+<source>Batch settings</source>
+<target></target>
 <source>&Save</source>
 <target>&Зберегти</target>
 <source>&Load</source>
@@ -699,10 +708,6 @@ Transfer file and directory permissions
 <target>Пари папок</target>
 <source>Select view</source>
 <target>Список файлів</target>
-<source>Folder Comparison and Synchronization</source>
-<target>Порівнювання і синхронізація папок</target>
-<source>Recycle Bin not yet supported for this system!</source>
-<target>Корзина не підтримується у цій системі!</target>
 <source>Set direction:</source>
 <target>Виберіть напрям:</target>
 <source>Exclude temporarily</source>
@@ -737,6 +742,8 @@ Transfer file and directory permissions
 <target>Зберегти зміни в активних налаштуваннях?</target>
 <source>Configuration loaded!</source>
 <target>Налаштування синхронізації загружено!</target>
+<source>Folder Comparison and Synchronization</source>
+<target>Порівнювання і синхронізація папок</target>
 <source>Hide files that exist on left side only</source>
 <target>Приховати файли, які є тільки ліворуч</target>
 <source>Show files that exist on left side only</source>
@@ -954,10 +961,6 @@ Transfer file and directory permissions
 </target>
 <source>The file does not contain a valid configuration:</source>
 <target>Файл не містить правильних налаштувань синхронізації:</target>
-<source>Scanning:</source>
-<target>Сканую:</target>
-<source>Encoding extended time information: %x</source>
-<target>Кодування розширеної інформації про час: %x</target>
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Ви можете проігнорувати помилку, вважаючи каталог порожнім.</target>
 <source>Directory does not exist:</source>
@@ -1034,8 +1037,6 @@ Transfer file and directory permissions
 <target>Оновлення атрибутів %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>Каталог-джерело вже не існує:</target>
-<source>Generating database...</source>
-<target>Створення бази даних...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Нічого синхронізувати згідно з налаштуваннями синхронізації!</target>
 <source>Target directory name must not be empty!</source>
@@ -1056,10 +1057,14 @@ Transfer file and directory permissions
 <target>Потрібне вільне місце на диску:</target>
 <source>Free disk space available:</source>
 <target>Доступно вільного місця на диску:</target>
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target></target>
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>Каталог, який є частиною декількох пар папок, буде змінений. Будь ласка, перевірте налаштування синхронізації!</target>
 <source>Processing folder pair:</source>
 <target>Обробка пари папок:</target>
+<source>Generating database...</source>
+<target>Створення бази даних...</target>
 <source>Error copying locked file %x!</source>
 <target>Помилка при копіюванні заблокованого файла %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

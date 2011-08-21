@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "notify_removal.h"
 #include <set>
 #include "last_error.h"
@@ -183,8 +183,8 @@ public:
     }
 
 private:
-	Pimpl(Pimpl&);
-	Pimpl& operator=(Pimpl&);
+    Pimpl(Pimpl&);
+    Pimpl& operator=(Pimpl&);
 
     virtual void onMessage(UINT message, WPARAM wParam, LPARAM lParam) //throw()!
     {

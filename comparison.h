@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #ifndef COMPARISON_H_INCLUDED
 #define COMPARISON_H_INCLUDED
 
@@ -13,6 +13,7 @@
 #include "structures.h"
 #include "shared/disable_standby.h"
 #include "library/norm_filter.h"
+#include "library/parallel_scan.h"
 
 
 namespace zen
@@ -51,24 +52,22 @@ public:
     void startCompareProcess(const std::vector<FolderPairCfg>& directoryPairs,
                              const CompareVariant cmpVar,
                              FolderComparison& output);
-~CompareProcess();
+    ~CompareProcess();
 
 private:
     void compareByTimeSize(const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output);
     void compareByContent( const std::vector<FolderPairCfg>& directoryPairsFormatted, FolderComparison& output);
 
     //create comparison result table and fill category except for files existing on both sides: undefinedFiles and undefinedLinks are appended!
-    void categorizeSymlinkByTime(SymLinkMapping* linkObj) const;
-    void categorizeSymlinkByContent(SymLinkMapping* linkObj) const;
+    void categorizeSymlinkByTime(SymLinkMapping& linkObj) const;
+    void categorizeSymlinkByContent(SymLinkMapping& linkObj) const;
 
     void performComparison(const FolderPairCfg& fpCfg,
                            BaseDirMapping& output,
                            std::vector<FileMapping*>& undefinedFiles,
                            std::vector<SymLinkMapping*>& undefinedLinks);
 
-    //buffer accesses to the same directories; useful when multiple folder pairs are used
-    class DirectoryBuffer;
-    std::unique_ptr<DirectoryBuffer> directoryBuffer;
+    std::map<DirectoryKey, DirectoryValue> directoryBuffer;
 
     const size_t fileTimeTolerance; //max allowed file time deviation
 

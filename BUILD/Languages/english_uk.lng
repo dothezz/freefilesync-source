@@ -7,6 +7,8 @@
 	<plural definition>n == 1 ? 0 : 1</plural definition>
 </header>
 
+<source>Searching for directory %x...</source>
+<target>Searching for directory %x...</target>
 <source>Show in Explorer</source>
 <target>Show in Explorer</target>
 <source>Open with default application</source>
@@ -17,8 +19,8 @@
 <target>RealtimeSync - Automated Synchronisation</target>
 <source>Browse</source>
 <target>Browse</target>
-<source>Invalid commandline: "%x"</source>
-<target>Invalid commandline: "%x"</target>
+<source>Invalid commandline: %x</source>
+<target>Invalid commandline: %x</target>
 <source>Error resolving symbolic link:</source>
 <target>Error resolving symbolic link:</target>
 <source>Show popup</source>
@@ -109,10 +111,10 @@
 <target>Initial synchronisation:</target>
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>One of the FreeFileSync database files is not yet existing:</target>
-<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
-<target>One of the FreeFileSync database entries within the following file is not yet existing:</target>
 <source>Error reading from synchronization database:</source>
 <target>Error reading from synchronisation database:</target>
+<source>Database files do not share a common synchronization session:</source>
+<target>Database files do not share a common synchronisation session:</target>
 <source>An exception occurred!</source>
 <target>An exception occurred!</target>
 <source>Error deleting file:</source>
@@ -135,6 +137,18 @@
 <target>Info</target>
 <source>Fatal Error</source>
 <target>Fatal Error</target>
+<source>Scanning:</source>
+<target>Scanning:</target>
+<source>Encoding extended time information: %x</source>
+<target>Encoding extended time information: %x</target>
+<source>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</source>
+<target>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</target>
 <source>Invalid FreeFileSync config file!</source>
 <target>Invalid FreeFileSync config file!</target>
 <source>File does not exist:</source>
@@ -229,20 +243,18 @@ The command line is executed each time:
 <target>Monitoring active...</target>
 <source>Waiting for missing directories...</source>
 <target>Waiting for missing directories...</target>
-<source>Could not initialize directory monitoring:</source>
-<target>Could not initialise directory monitoring:</target>
 <source>A directory input field is empty.</source>
 <target>A directory input field is empty.</target>
-<source>Error when monitoring directories.</source>
-<target>Error when monitoring directories.</target>
 <source>Drag && drop</source>
 <target>Drag && drop</target>
+<source>Could not initialize directory monitoring:</source>
+<target>Could not initialise directory monitoring:</target>
+<source>Error when monitoring directories.</source>
+<target>Error when monitoring directories.</target>
 <source>Conversion error:</source>
 <target>Conversion error:</target>
 <source>Error moving file:</source>
 <target>Error moving file:</target>
-<source>Operation aborted!</source>
-<target>Operation aborted!</target>
 <source>Target file already existing!</source>
 <target>Target file already existing!</target>
 <source>Error moving directory:</source>
@@ -273,6 +285,8 @@ The command line is executed each time:
 <target>Error writing file:</target>
 <source>Error reading file:</source>
 <target>Error reading file:</target>
+<source>Operation aborted!</source>
+<target>Operation aborted!</target>
 <source>Endless loop when traversing directory:</source>
 <target>Endless loop when traversing directory:</target>
 <source>Error traversing directory:</source>
@@ -413,24 +427,22 @@ The command line is executed each time:
 <target>Create a batch file for automated synchronisation. To start in batch mode simply double-click the file or execute via command line: FreeFileSync.exe <batchfile>. This can also be scheduled in your operating system's task planner.</target>
 <source>Help</source>
 <target>Help</target>
-<source>Configuration overview:</source>
-<target>Configuration overview:</target>
 <source>Filter files</source>
 <target>Filter files</target>
-<source>Status feedback</source>
-<target>Status feedback</target>
-<source>Silent mode</source>
-<target>Silent mode</target>
-<source>Start minimized and write status information to a logfile</source>
-<target>Start minimized and write status information to a logfile</target>
 <source>Error handling</source>
 <target>Error handling</target>
 <source>Overview</source>
 <target>Overview</target>
-<source>Select logfile directory:</source>
-<target>Select logfile directory:</target>
+<source>Status feedback</source>
+<target>Status feedback</target>
+<source>Run minimized</source>
+<target>Run minimised</target>
 <source>Maximum number of logfiles:</source>
 <target>Maximum number of logfiles:</target>
+<source>Select logfile directory:</source>
+<target>Select logfile directory:</target>
+<source>Batch settings</source>
+<target>Batch settings</target>
 <source>&Save</source>
 <target>&Save</target>
 <source>&Load</source>
@@ -695,10 +707,6 @@ Transfer file and directory permissions
 <target>Folder pairs</target>
 <source>Select view</source>
 <target>Select view</target>
-<source>Folder Comparison and Synchronization</source>
-<target>Folder Comparison and Synchronisation</target>
-<source>Recycle Bin not yet supported for this system!</source>
-<target>Recycle Bin not yet supported for this system!</target>
 <source>Set direction:</source>
 <target>Set direction:</target>
 <source>Exclude temporarily</source>
@@ -733,6 +741,8 @@ Transfer file and directory permissions
 <target>Save changes to current configuration?</target>
 <source>Configuration loaded!</source>
 <target>Configuration loaded!</target>
+<source>Folder Comparison and Synchronization</source>
+<target>Folder Comparison and Synchronisation</target>
 <source>Hide files that exist on left side only</source>
 <target>Hide files that exist on left side only</target>
 <source>Show files that exist on left side only</source>
@@ -941,10 +951,6 @@ Transfer file and directory permissions
 <target>Setting default synchronisation directions: Old files will be overwritten with newer files.</target>
 <source>The file does not contain a valid configuration:</source>
 <target>The file does not contain a valid configuration:</target>
-<source>Scanning:</source>
-<target>Scanning:</target>
-<source>Encoding extended time information: %x</source>
-<target>Encoding extended time information: %x</target>
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>You can ignore this error to consider the directory as empty.</target>
 <source>Directory does not exist:</source>
@@ -1021,8 +1027,6 @@ Transfer file and directory permissions
 <target>Updating attributes of %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>Source directory does not exist anymore:</target>
-<source>Generating database...</source>
-<target>Generating database...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Nothing to synchronise according to configuration!</target>
 <source>Target directory name must not be empty!</source>
@@ -1043,10 +1047,14 @@ Transfer file and directory permissions
 <target>Free disk space required:</target>
 <source>Free disk space available:</source>
 <target>Free disk space available:</target>
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</target>
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>A directory will be modified which is part of multiple folder pairs! Please review synchronisation settings!</target>
 <source>Processing folder pair:</source>
 <target>Processing folder pair:</target>
+<source>Generating database...</source>
+<target>Generating database...</target>
 <source>Error copying locked file %x!</source>
 <target>Error copying locked file %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

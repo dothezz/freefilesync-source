@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "application.h"
 #include "ui/main_dlg.h"
 #include <wx/msgdlg.h>
@@ -286,7 +286,7 @@ void Application::runBatchMode(const wxString& filename, xmlAccess::XmlGlobalSet
         {
             const wxString soundFile = zen::getResourceDir() + wxT("Sync_Complete.wav");
             if (fileExists(toZ(soundFile)))
-                wxSound::Play(soundFile, wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message!
+                wxSound::Play(soundFile, wxSOUND_ASYNC); //warning: this may fail and show a wxWidgets error message! => must not play when running FFS as a service!
         }
     }
     catch (BatchAbortProcess&)  //exit used by statusHandler

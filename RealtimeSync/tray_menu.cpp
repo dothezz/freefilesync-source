@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "tray_menu.h"
 #include <algorithm>
 #include <iterator>
@@ -299,8 +299,8 @@ rts::MonitorResponse rts::startDirectoryMonitor(const xmlAccess::XmlRealConfig& 
 
         if (config.commandline.empty())
         {
-            std::wstring errorMsg = _("Invalid commandline: \"%x\"");
-            replace(errorMsg, L"%x", config.commandline);
+            std::wstring errorMsg = _("Invalid commandline: %x");
+            replace(errorMsg, L"%x", L"\"" + config.commandline + L"\"");
             throw FileError(errorMsg);
         }
 

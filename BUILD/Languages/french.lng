@@ -7,6 +7,8 @@
 	<plural definition>n <= 1 ? 0 : 1</plural definition>
 </header>
 
+<source>Searching for directory %x...</source>
+<target></target>
 <source>Show in Explorer</source>
 <target>Montrer dans l'explorateur</target>
 <source>Open with default application</source>
@@ -17,8 +19,8 @@
 <target>RealtimeSync - Synchronisation Automatisée</target>
 <source>Browse</source>
 <target>Parcourir</target>
-<source>Invalid commandline: "%x"</source>
-<target>Ligne de commande invalide: "%x"</target>
+<source>Invalid commandline: %x</source>
+<target>Ligne de commande invalide: %x</target>
 <source>Error resolving symbolic link:</source>
 <target>Erreur lors de la résolution du lien symbolique :</target>
 <source>Show popup</source>
@@ -109,10 +111,10 @@
 <target>Première synchronisation :</target>
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>L'un des fichiers de la base de données FreeFileSync n'existe plus :</target>
-<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
-<target>L'une des entrées de la base de données FreeFileSync n'existe plus dans le fichier :</target>
 <source>Error reading from synchronization database:</source>
 <target>Erreur lors de la lecture de la base de données de synchro :</target>
+<source>Database files do not share a common synchronization session:</source>
+<target></target>
 <source>An exception occurred!</source>
 <target>Une erreur s'est produite !</target>
 <source>Error deleting file:</source>
@@ -135,6 +137,15 @@
 <target>Info</target>
 <source>Fatal Error</source>
 <target>Erreur Fatale</target>
+<source>Scanning:</source>
+<target>Lecture en cours :</target>
+<source>Encoding extended time information: %x</source>
+<target>Codage de l'heure au format étendu : %x</target>
+<source>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</source>
+<target></target>
 <source>Invalid FreeFileSync config file!</source>
 <target>Fichier de configuration FreeFileSync invalide !</target>
 <source>File does not exist:</source>
@@ -229,20 +240,18 @@ La ligne de commande est exécutée chaque fois que :
 <target>Surveillance en cours...</target>
 <source>Waiting for missing directories...</source>
 <target>En attente des répertoires absents ...</target>
-<source>Could not initialize directory monitoring:</source>
-<target>Impossible d'initialiser la surveillance des dossiers :</target>
 <source>A directory input field is empty.</source>
 <target>Un champ répertoire est vide</target>
-<source>Error when monitoring directories.</source>
-<target>Erreur lors de la surveillance des répertoires.</target>
 <source>Drag && drop</source>
 <target>Glisser && Déposer</target>
+<source>Could not initialize directory monitoring:</source>
+<target>Impossible d'initialiser la surveillance des dossiers :</target>
+<source>Error when monitoring directories.</source>
+<target>Erreur lors de la surveillance des répertoires.</target>
 <source>Conversion error:</source>
 <target>Erreur de conversion :</target>
 <source>Error moving file:</source>
 <target>Erreur lors du déplacement du fichier :</target>
-<source>Operation aborted!</source>
-<target>Opération abandonnée !</target>
 <source>Target file already existing!</source>
 <target>Le fichier de destination existe déjà !</target>
 <source>Error moving directory:</source>
@@ -273,6 +282,8 @@ La ligne de commande est exécutée chaque fois que :
 <target>Erreur lors de l'écriture du fichier :</target>
 <source>Error reading file:</source>
 <target>Erreur lors de la lecture du fichier :</target>
+<source>Operation aborted!</source>
+<target>Opération abandonnée !</target>
 <source>Endless loop when traversing directory:</source>
 <target>Boucle sans fin lors du parcours du répertoire :</target>
 <source>Error traversing directory:</source>
@@ -413,24 +424,22 @@ La ligne de commande est exécutée chaque fois que :
 <target>Créer un fichier de commandes pour la synchronisation automatique. Pour démarrer en mode batch il suffit de double-cliquez sur le fichier de commandes ou d'exécuter en ligne de commande: FreeFileSync.exe <fichier de commandes>. Vous pouvez aussi le programmer à l'aide du planificateur de tâches de votre système d'exploitation.</target>
 <source>Help</source>
 <target>Aide</target>
-<source>Configuration overview:</source>
-<target>Contrôle des paramètres :</target>
 <source>Filter files</source>
 <target>Filtrage des fichiers</target>
-<source>Status feedback</source>
-<target>Retour d'informations</target>
-<source>Silent mode</source>
-<target>Mode silencieux</target>
-<source>Start minimized and write status information to a logfile</source>
-<target>Démarrage en mode réduit et écriture des informations d'état dans un fichier log</target>
 <source>Error handling</source>
 <target>Erreur de gestion de fichiers</target>
 <source>Overview</source>
 <target>Présentation</target>
-<source>Select logfile directory:</source>
-<target>Choisissez un dossier pour le fichier .log :</target>
+<source>Status feedback</source>
+<target>Retour d'informations</target>
+<source>Run minimized</source>
+<target></target>
 <source>Maximum number of logfiles:</source>
 <target>Nombre maximum de fichiers Log</target>
+<source>Select logfile directory:</source>
+<target>Choisissez un dossier pour le fichier .log :</target>
+<source>Batch settings</source>
+<target></target>
 <source>&Save</source>
 <target>&Sauvegarder</target>
 <source>&Load</source>
@@ -695,10 +704,6 @@ Transfert des attributs système des fichiers et des répertoires
 <target>Paires de dossiers</target>
 <source>Select view</source>
 <target>Choisissez une vue</target>
-<source>Folder Comparison and Synchronization</source>
-<target>Comparaison de dossiers et Synchronisation</target>
-<source>Recycle Bin not yet supported for this system!</source>
-<target>La Corbeille n'est pas supportée par ce système !</target>
 <source>Set direction:</source>
 <target>Choix de la direction :</target>
 <source>Exclude temporarily</source>
@@ -733,6 +738,8 @@ Transfert des attributs système des fichiers et des répertoires
 <target>Voulez-vous enregistrer les modifications dans la configuration actuelle ?</target>
 <source>Configuration loaded!</source>
 <target>Configuration chargée !</target>
+<source>Folder Comparison and Synchronization</source>
+<target>Comparaison de dossiers et Synchronisation</target>
 <source>Hide files that exist on left side only</source>
 <target>Masquer les fichiers n'existant qu'à gauche</target>
 <source>Show files that exist on left side only</source>
@@ -941,10 +948,6 @@ Transfert des attributs système des fichiers et des répertoires
 <target>Directions de la synchronisation par défaut : les anciens fichiers seront remplacés par les nouveaux.</target>
 <source>The file does not contain a valid configuration:</source>
 <target>Le fichier ne contient pas de configuration valide :</target>
-<source>Scanning:</source>
-<target>Lecture en cours :</target>
-<source>Encoding extended time information: %x</source>
-<target>Codage de l'heure au format étendu : %x</target>
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Vous pouvez ignorer cette erreur en considérant le répertoire comme vide.</target>
 <source>Directory does not exist:</source>
@@ -1021,8 +1024,6 @@ Transfert des attributs système des fichiers et des répertoires
 <target>Mise à jour des attributs de %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>Le répertoire source n'existe plus :</target>
-<source>Generating database...</source>
-<target>Génération de la base de données...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Rien à synchroniser dans cette configuration !</target>
 <source>Target directory name must not be empty!</source>
@@ -1043,10 +1044,14 @@ Transfert des attributs système des fichiers et des répertoires
 <target>Espace disque nécessaire :</target>
 <source>Free disk space available:</source>
 <target>Espace disque disponible :</target>
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target></target>
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>Un répertoire faisant partie de paires multiples doit être modifié ! Vérifiez les paramètres de la synchronisation !</target>
 <source>Processing folder pair:</source>
 <target>Traitement de la paire de dossiers :</target>
+<source>Generating database...</source>
+<target>Génération de la base de données...</target>
 <source>Error copying locked file %x!</source>
 <target>Erreur lors de la copie du fichier verrouillé %x !</target>
 <source>Data verification error: Source and target file have different content!</source>

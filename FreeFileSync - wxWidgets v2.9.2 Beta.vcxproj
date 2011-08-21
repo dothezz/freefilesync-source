@@ -256,7 +256,6 @@
     <ClCompile Include="library\statistics.cpp" />
     <ClCompile Include="library\status_handler.cpp" />
     <ClCompile Include="shared\app_main.cpp" />
-    <ClCompile Include="shared\check_exist.cpp" />
     <ClCompile Include="shared\custom_button.cpp" />
     <ClCompile Include="shared\custom_combo_box.cpp" />
     <ClCompile Include="shared\custom_tooltip.cpp" />

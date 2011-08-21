@@ -7,6 +7,8 @@
 	<plural definition>n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2</plural definition>
 </header>
 
+<source>Searching for directory %x...</source>
+<target></target>
 <source>Show in Explorer</source>
 <target>Wyświetl w explorerze</target>
 <source>Open with default application</source>
@@ -17,8 +19,8 @@
 <target>RealtimeSync - Automatyczna Synchronizacja</target>
 <source>Browse</source>
 <target>Przeglądaj</target>
-<source>Invalid commandline: "%x"</source>
-<target>Nieprawidłowa komenda: "%x"</target>
+<source>Invalid commandline: %x</source>
+<target>Nieprawidłowa komenda: %x</target>
 <source>Error resolving symbolic link:</source>
 <target>Błąd odczytu dowiązania symbolicznego:</target>
 <source>Show popup</source>
@@ -110,10 +112,10 @@
 <target>Wstępna synchronizacja:</target>
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Jeden z plików bazy danych FreeFileSync nie istnieje:</target>
-<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
-<target>Jeden z wpisów bazy danych FreeFileSync dotyczący pliku nie istnieje:</target>
 <source>Error reading from synchronization database:</source>
 <target>Błąd odczytu z bazy danych synchronizacji:</target>
+<source>Database files do not share a common synchronization session:</source>
+<target></target>
 <source>An exception occurred!</source>
 <target>Wystąpił wyjątek!</target>
 <source>Error deleting file:</source>
@@ -137,6 +139,15 @@
 <target>Info</target>
 <source>Fatal Error</source>
 <target>Błąd krytyczny</target>
+<source>Scanning:</source>
+<target>Skanowanie:</target>
+<source>Encoding extended time information: %x</source>
+<target>Odkodowywanie rozszerzonych informacji o czasie: %x</target>
+<source>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</source>
+<target></target>
 <source>Invalid FreeFileSync config file!</source>
 <target>Nieprawidłowy plik konfiguracyjny!</target>
 <source>File does not exist:</source>
@@ -234,20 +245,18 @@ Komenda jest wykonwywana za każdym razem gdy:
 <target>Monitorowanie aktywne...</target>
 <source>Waiting for missing directories...</source>
 <target>Oczekiwanie na brakujące katalogi...</target>
-<source>Could not initialize directory monitoring:</source>
-<target>Nie można uruchomić monitora katalogów:</target>
 <source>A directory input field is empty.</source>
 <target>Pole ze ścieżką katalogu jest puste.</target>
-<source>Error when monitoring directories.</source>
-<target>Błąd podczas monitorowania katalogów.</target>
 <source>Drag && drop</source>
 <target>Drag && Drop</target>
+<source>Could not initialize directory monitoring:</source>
+<target>Nie można uruchomić monitora katalogów:</target>
+<source>Error when monitoring directories.</source>
+<target>Błąd podczas monitorowania katalogów.</target>
 <source>Conversion error:</source>
 <target>Błąd konwersji:</target>
 <source>Error moving file:</source>
 <target>Błąd podczas przenoszenia pliku:</target>
-<source>Operation aborted!</source>
-<target>Operacja przerwana!</target>
 <source>Target file already existing!</source>
 <target>Plik docelowy już istnieje!</target>
 <source>Error moving directory:</source>
@@ -278,6 +287,8 @@ Komenda jest wykonwywana za każdym razem gdy:
 <target>Błąd zapisu pliku:</target>
 <source>Error reading file:</source>
 <target>Błąd odczytu pliku:</target>
+<source>Operation aborted!</source>
+<target>Operacja przerwana!</target>
 <source>Endless loop when traversing directory:</source>
 <target>Zapętlenie podczas przeglądania katalogu:</target>
 <source>Error traversing directory:</source>
@@ -418,24 +429,22 @@ Komenda jest wykonwywana za każdym razem gdy:
 <target>Utwórz plik wsadowy dla automatycznej synchronizacji. Aby uruchomić synchronizację w trybie wsadowym po prostu kliknij dwa razy na plik lub uruchom go z konsoli: FreeFileSync.exe <plikwsadowy>. Możesz to dodać do programu planującego zadania w Twoim systemie.</target>
 <source>Help</source>
 <target>Pomoc</target>
-<source>Configuration overview:</source>
-<target>Przegląd konfiguracji:</target>
 <source>Filter files</source>
 <target>Filtruj pliki</target>
-<source>Status feedback</source>
-<target>Opinia statusu</target>
-<source>Silent mode</source>
-<target>Tryb Cichy</target>
-<source>Start minimized and write status information to a logfile</source>
-<target>Uruchom zminimalizowane i zapisuj informacje do pliku logów</target>
 <source>Error handling</source>
 <target>Obsługa błędów</target>
 <source>Overview</source>
 <target>Przegląd</target>
-<source>Select logfile directory:</source>
-<target>Wybierz katalog z logami:</target>
+<source>Status feedback</source>
+<target>Opinia statusu</target>
+<source>Run minimized</source>
+<target></target>
 <source>Maximum number of logfiles:</source>
 <target>Maksymalna liczba plików z logami:</target>
+<source>Select logfile directory:</source>
+<target>Wybierz katalog z logami:</target>
+<source>Batch settings</source>
+<target></target>
 <source>&Save</source>
 <target>&Zapisz</target>
 <source>&Load</source>
@@ -700,10 +709,6 @@ Transfer uprawnień plików i katalogów
 <target>Pary folderów</target>
 <source>Select view</source>
 <target>Określ widok</target>
-<source>Folder Comparison and Synchronization</source>
-<target>Porównywanie i Synchronizacja folderów</target>
-<source>Recycle Bin not yet supported for this system!</source>
-<target>Kosz nie jest jeszcze wspierany dla tej wersji systemu!</target>
 <source>Set direction:</source>
 <target>Kierunek  synchronizacji:</target>
 <source>Exclude temporarily</source>
@@ -738,6 +743,8 @@ Transfer uprawnień plików i katalogów
 <target>Zapisać zmiany obecnej konfiguracji?</target>
 <source>Configuration loaded!</source>
 <target>Konfiguracja wczytana!</target>
+<source>Folder Comparison and Synchronization</source>
+<target>Porównywanie i Synchronizacja folderów</target>
 <source>Hide files that exist on left side only</source>
 <target>Ukryj pliki, które istnieją tylko po lewej stronie</target>
 <source>Show files that exist on left side only</source>
@@ -952,10 +959,6 @@ Transfer uprawnień plików i katalogów
 <target>Ustawianie domyślnego kierunku synchronizacji: Stare pliki zostaną nadpisane nowszymi.</target>
 <source>The file does not contain a valid configuration:</source>
 <target>Nieprawidłowy format pliku:</target>
-<source>Scanning:</source>
-<target>Skanowanie:</target>
-<source>Encoding extended time information: %x</source>
-<target>Odkodowywanie rozszerzonych informacji o czasie: %x</target>
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Możesz zignorować ten błąd uznająć jeden z katalogów jako pusty.</target>
 <source>Directory does not exist:</source>
@@ -1032,8 +1035,6 @@ Transfer uprawnień plików i katalogów
 <target>Aktualizowanie atrybutów %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>Katalog źródłowy nie istnieje:</target>
-<source>Generating database...</source>
-<target>Generowanie bazy danych...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Brak elementów do synchronizacji!</target>
 <source>Target directory name must not be empty!</source>
@@ -1054,10 +1055,14 @@ Transfer uprawnień plików i katalogów
 <target>Wymagane wolne miejsce:</target>
 <source>Free disk space available:</source>
 <target>Wolne miejsce:</target>
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target></target>
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>Katalog zostanie zmodyfikowany w efekcie synchronizacji wielu par folderów! Zweryfikuj ustawienia synchronizacji!</target>
 <source>Processing folder pair:</source>
 <target>Przetwarzanie folderów:</target>
+<source>Generating database...</source>
+<target>Generowanie bazy danych...</target>
 <source>Error copying locked file %x!</source>
 <target>Błąd podczas kopiowania zablokowanego pliku %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "xml_base.h"
 #include <file_handling.h>
 #include <string_conv.h>
@@ -13,12 +13,14 @@
 using namespace zen;
 
 
+//loadXmlDocument vs loadStream:
+//1. better error reporting
+//2. quick exit if (potentially large) input file is not an XML
 void xmlAccess::loadXmlDocument(const wxString& filename, XmlDoc& doc) //throw FfsXmlError()
 {
     std::string stream;
     try
     {
-        const zen::UInt64 fs = zen::getFilesize(toZ(filename)); //throw (FileError)
         {
             //quick test whether input is an XML: avoid loading large binary files up front!
             //doesn't correctly handle BOM! (but no issue yet...)
@@ -31,6 +33,7 @@ void xmlAccess::loadXmlDocument(const wxString& filename, XmlDoc& doc) //throw F
                 throw FfsXmlError(wxString(_("Error parsing configuration file:")) + wxT("\n\"") + filename + wxT("\""));
         }
 
+        const zen::UInt64 fs = zen::getFilesize(toZ(filename)); //throw (FileError)
         stream.resize(to<size_t>(fs));
 
         FileInput inputFile(toZ(filename)); //throw (FileError);

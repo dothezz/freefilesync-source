@@ -7,6 +7,8 @@
 	<plural definition>n == 1 ? 0 : 1</plural definition>
 </header>
 
+<source>Searching for directory %x...</source>
+<target></target>
 <source>Show in Explorer</source>
 <target>Näytä Explorerissa</target>
 <source>Open with default application</source>
@@ -17,8 +19,8 @@
 <target>RealtimeSync - Automaattinen täsmäytys</target>
 <source>Browse</source>
 <target>Selaa</target>
-<source>Invalid commandline: "%x"</source>
-<target>Virheellinen komento: "%x"</target>
+<source>Invalid commandline: %x</source>
+<target>Virheellinen komento: %x</target>
 <source>Error resolving symbolic link:</source>
 <target>Virhe selvittäessä symbolista linkkiä:</target>
 <source>Show popup</source>
@@ -109,10 +111,10 @@
 <target>Ensi täsmäytys:</target>
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Jokin FreeFileSynk tietokannan tiedostoista puuttuu vielä:</target>
-<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
-<target>Jokin FreeFileSynk tietokannan olioista puuttuu vielä tiedostossa:</target>
 <source>Error reading from synchronization database:</source>
 <target>Virhe lukiessa täsmäytyksen tietokantaa:</target>
+<source>Database files do not share a common synchronization session:</source>
+<target></target>
 <source>An exception occurred!</source>
 <target>Virhe havaittu!</target>
 <source>Error deleting file:</source>
@@ -135,6 +137,15 @@
 <target>Info</target>
 <source>Fatal Error</source>
 <target>Kohtalokas virhe</target>
+<source>Scanning:</source>
+<target>Haen:</target>
+<source>Encoding extended time information: %x</source>
+<target>Tulkitaan laajennettua aikatietoa: %x</target>
+<source>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</source>
+<target></target>
 <source>Invalid FreeFileSync config file!</source>
 <target>Virheellinen FreeFileSync asetustiedosto!</target>
 <source>File does not exist:</source>
@@ -229,20 +240,18 @@ Komento suoritetaan kun:
 <target>Seuranta käynnissä...</target>
 <source>Waiting for missing directories...</source>
 <target>Odottaa puuttuvia hakemistoja...</target>
-<source>Could not initialize directory monitoring:</source>
-<target>Hakemiston tarkkailua ei voitu käynnistää:</target>
 <source>A directory input field is empty.</source>
 <target>Hekemistokenttä on tyhjä.</target>
-<source>Error when monitoring directories.</source>
-<target>Virhe seuratessa hakemistoa.</target>
 <source>Drag && drop</source>
 <target>Vedä ja pudota</target>
+<source>Could not initialize directory monitoring:</source>
+<target>Hakemiston tarkkailua ei voitu käynnistää:</target>
+<source>Error when monitoring directories.</source>
+<target>Virhe seuratessa hakemistoa.</target>
 <source>Conversion error:</source>
 <target>Konversio virhe:</target>
 <source>Error moving file:</source>
 <target>Virhe siirtäessä tiedostoa:</target>
-<source>Operation aborted!</source>
-<target>Toiminto lopetettiin!</target>
 <source>Target file already existing!</source>
 <target>Kohde tiedosto on jo olemassa!</target>
 <source>Error moving directory:</source>
@@ -273,6 +282,8 @@ Komento suoritetaan kun:
 <target>Virhe kirjottaessa tiedostoa:</target>
 <source>Error reading file:</source>
 <target>Virhe lukiessa tiedostoa:</target>
+<source>Operation aborted!</source>
+<target>Toiminto lopetettiin!</target>
 <source>Endless loop when traversing directory:</source>
 <target>Suorita hakemiston läpikulku jatkuvana:</target>
 <source>Error traversing directory:</source>
@@ -413,24 +424,22 @@ Komento suoritetaan kun:
 <target>Luo automaattisen täsmäytyksen eräajotiedosto. Käynnistä se kaksois klikillä tai komennolla: FreeFileSync.exe <eräajotiedosto>. Käyttöjärjestelmän tehtävien ajoitustoiminnolla voit ajastaa suorittaminen.</target>
 <source>Help</source>
 <target>Ohje</target>
-<source>Configuration overview:</source>
-<target>Asetukset:</target>
 <source>Filter files</source>
 <target>Suodata tiedostoja</target>
-<source>Status feedback</source>
-<target>Tilan palaute</target>
-<source>Silent mode</source>
-<target>Hiljainen suoritus</target>
-<source>Start minimized and write status information to a logfile</source>
-<target>Käynnistä minimoituna ja kirjoita statukset lokiin</target>
 <source>Error handling</source>
 <target>Virhe käsitellessä</target>
 <source>Overview</source>
 <target>Yleiskatsaus</target>
-<source>Select logfile directory:</source>
-<target>Hakemisto lokitiedostoille:</target>
+<source>Status feedback</source>
+<target>Tilan palaute</target>
+<source>Run minimized</source>
+<target></target>
 <source>Maximum number of logfiles:</source>
 <target>Lokitiedostojen enimmäismäärä:</target>
+<source>Select logfile directory:</source>
+<target>Hakemisto lokitiedostoille:</target>
+<source>Batch settings</source>
+<target></target>
 <source>&Save</source>
 <target>&Tallenna</target>
 <source>&Load</source>
@@ -695,10 +704,6 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <target>Hakemistoparit</target>
 <source>Select view</source>
 <target>Valitse näkymä</target>
-<source>Folder Comparison and Synchronization</source>
-<target>Hakemistojen vertailu ja täsmäytys</target>
-<source>Recycle Bin not yet supported for this system!</source>
-<target>Tämä järjestelmä ei vielä tue Roskakoria!</target>
 <source>Set direction:</source>
 <target>Aseta suunta:</target>
 <source>Exclude temporarily</source>
@@ -733,6 +738,8 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <target>Tallenna asetuksiin tehdyt muutokset?</target>
 <source>Configuration loaded!</source>
 <target>Asetukset ladattu!</target>
+<source>Folder Comparison and Synchronization</source>
+<target>Hakemistojen vertailu ja täsmäytys</target>
 <source>Hide files that exist on left side only</source>
 <target>Piilota vain vasemmalla olevat tiedostot</target>
 <source>Show files that exist on left side only</source>
@@ -941,10 +948,6 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <target>Aseta oletettu suunta täsmäytykselle: Vanhat tiedostot ylikirjoitetaan uudemilla tiedostoilla.</target>
 <source>The file does not contain a valid configuration:</source>
 <target>Asetustiedosto ei ole kelvollinen:</target>
-<source>Scanning:</source>
-<target>Haen:</target>
-<source>Encoding extended time information: %x</source>
-<target>Tulkitaan laajennettua aikatietoa: %x</target>
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Jätää virhe huomiotta ja tulkitse hakemisto tyhjäksi.</target>
 <source>Directory does not exist:</source>
@@ -1021,8 +1024,6 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <target>Päivitän %x:n ominaisuudet</target>
 <source>Source directory does not exist anymore:</source>
 <target>Lähdehakemisto puuttuu:</target>
-<source>Generating database...</source>
-<target>Luodaan tietokantaa...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Asetusten mukaan ei löydy täsmäytettävää!</target>
 <source>Target directory name must not be empty!</source>
@@ -1043,10 +1044,14 @@ Siirrä tiedosto- ja hekimisto-oikeuksia
 <target>Tarvittava vapaa levytila:</target>
 <source>Free disk space available:</source>
 <target>Levytilaa jäljellä:</target>
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target></target>
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>Moniosaisen hakemistoparin hakemisto muutetaan! Tarkista täsmäytys asetuksia!</target>
 <source>Processing folder pair:</source>
 <target>Käsitellään hakemistoparia:</target>
+<source>Generating database...</source>
+<target>Luodaan tietokantaa...</target>
 <source>Error copying locked file %x!</source>
 <target>Virhe kopioitaessa lukittua tiedostoa  %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

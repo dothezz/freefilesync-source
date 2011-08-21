@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "watcher.h"
 #include "../shared/file_handling.h"
 #include "../shared/i18n.h"
@@ -120,13 +120,13 @@ rts::WaitResult rts::waitForChanges(const std::vector<Zstring>& dirNames, WaitCa
 
                 if (!changedFiles.empty())
                 {
-/*
-                std::for_each(changedFiles.begin(), changedFiles.end(),
-                [](const Zstring& fn) { wxMessageBox(toWx(fn));});
+                    /*
+                                    std::for_each(changedFiles.begin(), changedFiles.end(),
+                                    [](const Zstring& fn) { wxMessageBox(toWx(fn));});
 
-				const wxString filename = toWx(changedFiles[0]);
-                    ::wxSetEnv(wxT("RTS_CHANGE"), filename);
-*/
+                    				const wxString filename = toWx(changedFiles[0]);
+                                        ::wxSetEnv(wxT("RTS_CHANGE"), filename);
+                    */
 
                     return CHANGE_DETECTED; //directory change detected
                 }

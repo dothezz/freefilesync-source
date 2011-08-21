@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #ifndef FILEERROR_H_INCLUDED
 #define FILEERROR_H_INCLUDED
 
@@ -35,7 +35,7 @@ DEFINE_NEW_FILE_ERROR(ErrorFileLocked);
 
 
 
-//facilitate usage of std::wstring for error messages:
+//----------- facilitate usage of std::wstring for error messages --------------------
 
 //allow implicit UTF8 conversion: since std::wstring models a GUI string, convenience is more important than performance
 inline std::wstring operator+(const std::wstring& lhs, const Zstring&      rhs) { return std::wstring(lhs) += zen::utf8CvrtTo<std::wstring>(rhs); }

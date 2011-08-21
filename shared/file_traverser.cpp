@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "file_traverser.h"
 #include <limits>
 #include "last_error.h"
@@ -14,6 +14,7 @@
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "long_path_prefix.h"
 #include "dst_hack.h"
+#include "file_update_handle.h"
 
 #elif defined FFS_LINUX
 #include <sys/stat.h>
@@ -57,7 +58,7 @@ inline
 zen::Int64 filetimeToTimeT(const FILETIME& lastWriteTime)
 {
     //convert UTC FILETIME to ANSI C format (number of seconds since Jan. 1st 1970 UTC)
-    zen::Int64 writeTimeLong = zen::to<zen::Int64>(zen::UInt64(lastWriteTime.dwLowDateTime, lastWriteTime.dwHighDateTime) / 10000000U); //reduce precision to 1 second (FILETIME has unit 10^-7 s)
+    zen::Int64 writeTimeLong = to<zen::Int64>(zen::UInt64(lastWriteTime.dwLowDateTime, lastWriteTime.dwHighDateTime) / 10000000U); //reduce precision to 1 second (FILETIME has unit 10^-7 s)
     writeTimeLong -= zen::Int64(3054539008UL, 2); //timeshift between ansi C time and FILETIME in seconds == 11644473600s
     return writeTimeLong;
 }
@@ -126,14 +127,12 @@ public:
     }
 
 private:
-	DirTraverser(const DirTraverser&);
-	DirTraverser& operator=(const DirTraverser&);
+    DirTraverser(const DirTraverser&);
+    DirTraverser& operator=(const DirTraverser&);
 
     template <bool followSymlinks>
     void traverse(const Zstring& directory, zen::TraverseCallback& sink, int level)
     {
-			using namespace zen;
-
         tryReportingError([&](std::wstring& errorMsg) -> bool
         {
             if (level == 100) //notify endless recursion
@@ -146,19 +145,16 @@ private:
 
 
 #ifdef FFS_WIN
-        //ensure directoryFormatted ends with backslash
-        const Zstring& directoryFormatted = directory.EndsWith(FILE_NAME_SEPARATOR) ?
-                                            directory :
-                                            directory + FILE_NAME_SEPARATOR;
-
+        //ensure directoryPf ends with backslash
+        const Zstring& directoryPf = directory.EndsWith(FILE_NAME_SEPARATOR) ?
+                                     directory :
+                                     directory + FILE_NAME_SEPARATOR;
         WIN32_FIND_DATA fileInfo = {};
 
         HANDLE searchHandle = INVALID_HANDLE_VALUE;
         tryReportingError([&](std::wstring& errorMsg) -> bool
         {
-            searchHandle = ::FindFirstFile(
-                applyLongPathPrefix(directoryFormatted + Zchar('*')).c_str(), //__in   LPCTSTR lpFileName
-                &fileInfo);                                                   //__out  LPWIN32_FIND_DATA lpFindFileData
+            searchHandle = ::FindFirstFile(applyLongPathPrefix(directoryPf + L'*').c_str(), &fileInfo);
             //no noticable performance difference compared to FindFirstFileEx with FindExInfoBasic, FIND_FIRST_EX_CASE_SENSITIVE and/or FIND_FIRST_EX_LARGE_FETCH
 
             if (searchHandle == INVALID_HANDLE_VALUE)
@@ -188,7 +184,7 @@ private:
                 (shortName[1] == L'\0' || (shortName[1] == L'.' && shortName[2] == L'\0')))
                 continue;
 
-            const Zstring& fullName = directoryFormatted + shortName;
+            const Zstring& fullName = directoryPf + shortName;
 
             const bool isSymbolicLink = (fileInfo.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
 
@@ -254,7 +250,7 @@ private:
                     details.fileSize         = zen::UInt64(fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh);
                 }
 
-				sink.onFile(shortName, fullName, details);
+                sink.onFile(shortName, fullName, details);
             }
         }
         while ([&]() -> bool
@@ -322,7 +318,7 @@ private:
 
 
             //don't return "." and ".."
-            const Zchar* const shortName = dirEntry->d_name;
+            const char* const shortName = dirEntry->d_name;
             if (shortName[0] == '.' &&
                 (shortName[1] == '\0' || (shortName[1] == '.' && shortName[2] == '\0')))
                 continue;
@@ -421,23 +417,25 @@ private:
 
             const dst::RawTime encodedTime = dst::fatEncodeUtcTime(i->second); //throw (std::runtime_error)
             {
-                HANDLE hTarget = ::CreateFile(zen::applyLongPathPrefix(i->first).c_str(),
-                                              GENERIC_WRITE, //just FILE_WRITE_ATTRIBUTES may not be enough for some NAS shares!
-                                              FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                              NULL,
-                                              OPEN_EXISTING,
-                                              FILE_FLAG_BACKUP_SEMANTICS,
-                                              NULL);
-                if (hTarget == INVALID_HANDLE_VALUE)
+                //may need to remove the readonly-attribute (e.g. FAT usb drives)
+                FileUpdateHandle updateHandle(i->first, [=]()
+                {
+                    return ::CreateFile(zen::applyLongPathPrefix(i->first).c_str(),
+                                        GENERIC_WRITE, //just FILE_WRITE_ATTRIBUTES may not be enough for some NAS shares!
+                                        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                        NULL,
+                                        OPEN_EXISTING,
+                                        FILE_FLAG_BACKUP_SEMANTICS,
+                                        NULL);
+                });
+                if (updateHandle.get() == INVALID_HANDLE_VALUE)
                 {
                     ++failedAttempts;
                     assert(false); //don't throw exceptions due to dst hack here
                     continue;
                 }
-                Loki::ScopeGuard dummy = Loki::MakeGuard(::CloseHandle, hTarget);
-                (void)dummy; //silence warning "unused variable"
 
-                if (!::SetFileTime(hTarget,
+                if (!::SetFileTime(updateHandle.get(),
                                    &encodedTime.createTimeRaw,
                                    NULL,
                                    &encodedTime.writeTimeRaw))
@@ -483,7 +481,7 @@ void zen::traverseFolder(const Zstring& directory, bool followSymlinks, Traverse
 #ifdef FFS_WIN
     try //traversing certain folders with restricted permissions requires this privilege! (but copying these files may still fail)
     {
-        zen::Privileges::getInstance().ensureActive(SE_BACKUP_NAME); //throw (FileError)
+        zen::Privileges::getInstance().ensureActive(SE_BACKUP_NAME); //throw FileError
     }
     catch (...) {} //don't cause issues in user mode
 #endif

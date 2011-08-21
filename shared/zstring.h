@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #ifndef ZSTRING_H_INCLUDED
 #define ZSTRING_H_INCLUDED
 
@@ -11,8 +11,8 @@
 #include <cstring> //strcmp()
 
 #ifndef NDEBUG
+#include "boost_thread_wrap.h" //include <boost/thread.hpp>
 #include <map>
-#include <wx/thread.h>
 #endif
 
 
@@ -22,7 +22,7 @@ class LeakChecker //small test for memory leaks
 public:
     void insert(const void* ptr, size_t size)
     {
-        wxCriticalSectionLocker dummy(lockActStrings);
+        boost::lock_guard<boost::mutex> dummy(lockActStrings);
         if (activeStrings.find(ptr) != activeStrings.end())
             reportProblem(std::string("Fatal Error: New memory points into occupied space: ") + rawMemToString(ptr, size));
 
@@ -31,8 +31,7 @@ public:
 
     void remove(const void* ptr)
     {
-        wxCriticalSectionLocker dummy(lockActStrings);
-
+        boost::lock_guard<boost::mutex> dummy(lockActStrings);
         if (activeStrings.find(ptr) == activeStrings.end())
             reportProblem(std::string("Fatal Error: No memory available for deallocation at this location!"));
 
@@ -50,7 +49,7 @@ private:
     static std::string rawMemToString(const void* ptr, size_t size);
     void reportProblem(const std::string& message); //throw (std::logic_error)
 
-    wxCriticalSection lockActStrings;
+    boost::mutex lockActStrings;
     typedef std::map<const void*, size_t> VoidPtrSizeMap;
     VoidPtrSizeMap activeStrings;
 };
@@ -106,7 +105,6 @@ template <template <class, class> class SP, class AP>
 void MakeUpper(Zbase<wchar_t, SP, AP>& str);
 #endif
 
-
 #ifdef FFS_WIN //Windows stores filenames in wide character format
 typedef wchar_t Zchar;
 #define Zstr(x) L ## x
@@ -121,8 +119,8 @@ const Zchar FILE_NAME_SEPARATOR = '/';
 #error define platform you are in: FFS_WIN or FFS_LINUX
 #endif
 
-//"The reason for all the fuss above" (Loki/SmartPtr)
-typedef Zbase<Zchar, StorageRefCount, AllocatorFreeStoreChecked> Zstring; //for use with file names
+//"The reason for all the fuss above" - Loki/SmartPtr
+typedef Zbase<Zchar, StorageRefCountThreadSafe, AllocatorFreeStoreChecked> Zstring; //for use with file names
 
 
 

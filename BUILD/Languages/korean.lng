@@ -7,6 +7,8 @@
 	<plural definition>0</plural definition>
 </header>
 
+<source>Searching for directory %x...</source>
+<target></target>
 <source>Show in Explorer</source>
 <target>탐색기에 표시</target>
 <source>Open with default application</source>
@@ -17,8 +19,8 @@
 <target>실시간 동기화 - 자동 동기화</target>
 <source>Browse</source>
 <target>찾아보기</target>
-<source>Invalid commandline: "%x"</source>
-<target>잘못된 커맨드라인</target>
+<source>Invalid commandline: %x</source>
+<target></target>
 <source>Error resolving symbolic link:</source>
 <target>심볼릭 링크를 해결하던 중 발생한 오류 :</target>
 <source>Show popup</source>
@@ -108,10 +110,10 @@
 <target>초기 동기화 :</target>
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>FreeFileSync 데이터베이스 파일 중 하나가 아직 존재하지 않습니다 :</target>
-<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
-<target>다음 파일 내에 있는 FreeFileSync 데이터베이스 엔트리 중 하나가 아직 존재하지 않습니다 :</target>
 <source>Error reading from synchronization database:</source>
 <target>동기화 데이터베이스로부터 읽어 들이던 중 발생한 오류 :</target>
+<source>Database files do not share a common synchronization session:</source>
+<target></target>
 <source>An exception occurred!</source>
 <target>예외 발생!</target>
 <source>Error deleting file:</source>
@@ -133,6 +135,15 @@
 <target>정보</target>
 <source>Fatal Error</source>
 <target>치명적 오류</target>
+<source>Scanning:</source>
+<target>스캔 :</target>
+<source>Encoding extended time information: %x</source>
+<target>인코딩 확장 시간 정보 : %x</target>
+<source>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</source>
+<target></target>
 <source>Invalid FreeFileSync config file!</source>
 <target>잘못된 FreeFileSync 설정 파일!</target>
 <source>File does not exist:</source>
@@ -224,20 +235,18 @@ The command line is executed each time:
 <target>모니터링 활성화...</target>
 <source>Waiting for missing directories...</source>
 <target>누락 디렉토리 대기 중...</target>
-<source>Could not initialize directory monitoring:</source>
-<target>디렉토리 모니터링을 초기화 할 수 없습니다 :</target>
 <source>A directory input field is empty.</source>
 <target>디렉토리 입력 필드가 비어 있습니다.</target>
-<source>Error when monitoring directories.</source>
-<target>디렉토리 모니터링 중 발생한 오류 :</target>
 <source>Drag && drop</source>
 <target>드래그 && 드랍</target>
+<source>Could not initialize directory monitoring:</source>
+<target>디렉토리 모니터링을 초기화 할 수 없습니다 :</target>
+<source>Error when monitoring directories.</source>
+<target>디렉토리 모니터링 중 발생한 오류 :</target>
 <source>Conversion error:</source>
 <target>변환 오류 :</target>
 <source>Error moving file:</source>
 <target>파일 이동 중 발생한 오류 :</target>
-<source>Operation aborted!</source>
-<target>작업 중단!</target>
 <source>Target file already existing!</source>
 <target>대상 파일이 이미 존재합니다!</target>
 <source>Error moving directory:</source>
@@ -268,6 +277,8 @@ The command line is executed each time:
 <target>파일을 쓰던 중 발생한 오류 :</target>
 <source>Error reading file:</source>
 <target>파일을 읽던 중 발생한 오류 :</target>
+<source>Operation aborted!</source>
+<target>작업 중단!</target>
 <source>Endless loop when traversing directory:</source>
 <target>디렉토리 이동 중 무한 루프 발생 :</target>
 <source>Error traversing directory:</source>
@@ -408,24 +419,22 @@ The command line is executed each time:
 <target>자동 동기화를 위한 일괄파일 생성. 일괄모드 작업은 해당 파일을 더블클릭 하거나 커맨드라인: FreeFileSync.exe <일괄파일>을 통해 실행 가능합니다. 또한 운영체제(O/S)의 작업관리자에서도 예약할 수 있습니다.</target>
 <source>Help</source>
 <target>도움말</target>
-<source>Configuration overview:</source>
-<target>구성설정 개요 :</target>
 <source>Filter files</source>
 <target>파일 필터</target>
-<source>Status feedback</source>
-<target>상태 피드백</target>
-<source>Silent mode</source>
-<target>사일런트 모드</target>
-<source>Start minimized and write status information to a logfile</source>
-<target>최소화 상태로 시작하고, 로그파일에 상태 정보를 기록</target>
 <source>Error handling</source>
 <target>오류 발생시 :</target>
 <source>Overview</source>
 <target>개요</target>
-<source>Select logfile directory:</source>
-<target>로그파일 디렉토리 선택 :</target>
+<source>Status feedback</source>
+<target>상태 피드백</target>
+<source>Run minimized</source>
+<target></target>
 <source>Maximum number of logfiles:</source>
 <target>최대 로그파일 개수 :</target>
+<source>Select logfile directory:</source>
+<target>로그파일 디렉토리 선택 :</target>
+<source>Batch settings</source>
+<target></target>
 <source>&Save</source>
 <target>저장(&S)</target>
 <source>&Load</source>
@@ -688,10 +697,6 @@ Transfer file and directory permissions
 <target>폴더 페어(짝)</target>
 <source>Select view</source>
 <target>보기 선택</target>
-<source>Folder Comparison and Synchronization</source>
-<target>폴더 비교 및 동기화</target>
-<source>Recycle Bin not yet supported for this system!</source>
-<target>본 시스템에서는 휴지통을 아직 지원하지 않습니다.</target>
 <source>Set direction:</source>
 <target>방향 설정 :</target>
 <source>Exclude temporarily</source>
@@ -726,6 +731,8 @@ Transfer file and directory permissions
 <target>현재 설정의 변경 내용을 저장하시겠습니까?</target>
 <source>Configuration loaded!</source>
 <target>설정 로드 완료!</target>
+<source>Folder Comparison and Synchronization</source>
+<target>폴더 비교 및 동기화</target>
 <source>Hide files that exist on left side only</source>
 <target>좌측에만 존재하는 파일 숨기기</target>
 <source>Show files that exist on left side only</source>
@@ -928,10 +935,6 @@ Transfer file and directory permissions
 <target>기본값 동기화 방향 설정 : 이전 파일들은 신규 파일들로 덮어 쓰여집니다.</target>
 <source>The file does not contain a valid configuration:</source>
 <target>이 파일은 유효한 설정 값을 갖고 있지 않습니다 :</target>
-<source>Scanning:</source>
-<target>스캔 :</target>
-<source>Encoding extended time information: %x</source>
-<target>인코딩 확장 시간 정보 : %x</target>
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>디렉토리가 비었다는 오류는 무시 가능합니다.</target>
 <source>Directory does not exist:</source>
@@ -1008,8 +1011,6 @@ Transfer file and directory permissions
 <target>%x 속성 업데이트</target>
 <source>Source directory does not exist anymore:</source>
 <target>소스 디렉토리가 더 이상 존재하지 않습니다 :</target>
-<source>Generating database...</source>
-<target>데이터베이스 생성 중...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>구성 설정에 따라 동기화 할 내용이 없습니다!</target>
 <source>Target directory name must not be empty!</source>
@@ -1030,10 +1031,14 @@ Transfer file and directory permissions
 <target>필요한 디스크 여유 공간 :</target>
 <source>Free disk space available:</source>
 <target>사용 가능한 디스크 여유 공간 :</target>
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target></target>
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>다중폴더 페어의 일부인 디렉토리가 변경됩니다. 동기화 설정을 재검토해 주세요.</target>
 <source>Processing folder pair:</source>
 <target>폴더 페어 처리 중 :</target>
+<source>Generating database...</source>
+<target>데이터베이스 생성 중...</target>
 <source>Error copying locked file %x!</source>
 <target>복사 실패! 파일 %x 에 락이 걸려 있습니다.</target>
 <source>Data verification error: Source and target file have different content!</source>

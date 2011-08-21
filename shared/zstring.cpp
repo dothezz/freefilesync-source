@@ -3,9 +3,10 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "zstring.h"
 #include <stdexcept>
+#include <boost/thread/once.hpp>
 
 #ifdef FFS_WIN
 #include <wx/msw/wrapwin.h> //includes "windows.h"
@@ -50,6 +51,12 @@ LeakChecker& LeakChecker::instance()
 {
     static LeakChecker inst;
     return inst;
+}
+
+//caveat: function scope static initialization is not thread-safe in VS 2010! => make sure to call at app start!
+namespace
+{
+struct Dummy { Dummy() { LeakChecker::instance(); }} blah;
 }
 
 
@@ -113,7 +120,10 @@ int z_impl::compareFilenamesWin(const wchar_t* a, const wchar_t* b, size_t sizeA
         LPCWSTR lpString2,
         int     cchCount2,
         BOOL    bIgnoreCase);
-    static const CompareStringOrdinalFunc ordinalCompare = util::getDllFun<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal");
+    static CompareStringOrdinalFunc ordinalCompare = NULL; //caveat: function scope static initialization is not thread-safe in VS 2010!
+    static boost::once_flag once = BOOST_ONCE_INIT;
+    boost::call_once(once, []() { ordinalCompare = util::getDllFun<CompareStringOrdinalFunc>(L"kernel32.dll", "CompareStringOrdinal"); });
+
 
     if (ordinalCompare != NULL) //this additional test has no noticeable performance impact
     {

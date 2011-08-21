@@ -5,15 +5,23 @@
 // **************************************************************************
 //
 #include "taskbar.h"
+
+#ifdef FFS_WIN
 #include "Taskbar_Seven/taskbar.h"
 #include "dll_loader.h"
 #include "build_info.h"
 #include "assert_static.h"
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 
-using namespace util;
-using namespace tbseven;
+#elif defined HAVE_UBUNTU_UNITY
+#include <unity/unity/unity.h>
+#endif
 
+using namespace util;
+
+
+#ifdef FFS_WIN
+using namespace tbseven;
 
 namespace
 {
@@ -45,7 +53,7 @@ std::wstring getTaskBarDllName()
 //########################################################################################################
 
 
-class TaskbarProgress::Pimpl //throw (TaskbarNotAvailable)
+class Taskbar::Pimpl //throw (TaskbarNotAvailable)
 {
 public:
     Pimpl(const wxTopLevelWindow& window) :
@@ -60,29 +68,26 @@ public:
             throw TaskbarNotAvailable();
     }
 
-    ~Pimpl()
-    {
-        setStatus(STATUS_NOPROGRESS);
-    }
+    ~Pimpl() { setStatus(STATUS_NOPROGRESS); }
 
     void setStatus(Status status)
     {
         TaskBarStatus tbSevenStatus = tbseven::STATUS_NORMAL;
         switch (status)
         {
-            case TaskbarProgress::STATUS_NOPROGRESS:
+            case Taskbar::STATUS_NOPROGRESS:
                 tbSevenStatus = tbseven::STATUS_NOPROGRESS;
                 break;
-            case TaskbarProgress::STATUS_INDETERMINATE:
+            case Taskbar::STATUS_INDETERMINATE:
                 tbSevenStatus = tbseven::STATUS_INDETERMINATE;
                 break;
-            case TaskbarProgress::STATUS_NORMAL:
+            case Taskbar::STATUS_NORMAL:
                 tbSevenStatus = tbseven::STATUS_NORMAL;
                 break;
-            case TaskbarProgress::STATUS_ERROR:
+            case Taskbar::STATUS_ERROR:
                 tbSevenStatus = tbseven::STATUS_ERROR;
                 break;
-            case TaskbarProgress::STATUS_PAUSED:
+            case Taskbar::STATUS_PAUSED:
                 tbSevenStatus = tbseven::STATUS_PAUSED;
                 break;
         }
@@ -96,23 +101,80 @@ public:
     }
 
 private:
-    void* assocWindow;
+    void*  assocWindow; //HWND
     const SetStatusFct setStatus_;
     const SetProgressFct setProgress_;
 };
+
+#elif defined HAVE_UBUNTU_UNITY //Ubuntu unity
+namespace
+{
+const char FFS_DESKTOP_FILE[] = "freefilesync.desktop";
+}
+
+class Taskbar::Pimpl //throw (TaskbarNotAvailable)
+{
+public:
+    Pimpl(const wxTopLevelWindow& window) :
+        tbEntry(unity_launcher_entry_get_for_desktop_id(FFS_DESKTOP_FILE))
+        //tbEntry(unity_launcher_entry_get_for_app_uri("application://freefilesync.desktop"))
+    {
+        if (!tbEntry)
+            throw TaskbarNotAvailable();
+    }
+
+    ~Pimpl() { setStatus(STATUS_NOPROGRESS); } //it seems UnityLauncherEntry* does not need destruction
+
+    void setStatus(Status status)
+    {
+        switch (status)
+        {
+            case Taskbar::STATUS_ERROR:
+                unity_launcher_entry_set_urgent(tbEntry, true);
+                break;
+
+            case Taskbar::STATUS_NOPROGRESS:
+            case Taskbar::STATUS_INDETERMINATE:
+                unity_launcher_entry_set_urgent(tbEntry, false);
+                unity_launcher_entry_set_progress_visible(tbEntry, false);
+                break;
+
+            case Taskbar::STATUS_NORMAL:
+                unity_launcher_entry_set_urgent(tbEntry, false);
+                unity_launcher_entry_set_progress_visible(tbEntry, true);
+                break;
+
+            case Taskbar::STATUS_PAUSED:
+                unity_launcher_entry_set_urgent (tbEntry, false);
+                break;
+        }
+    }
+
+    void setProgress(size_t current, size_t total)
+    {
+        unity_launcher_entry_set_progress(tbEntry, total == 0 ? 0 : double(current) / total);
+    }
+
+private:
+    UnityLauncherEntry* tbEntry;
+};
+
+
+#else //no taskbar support yet
+class Taskbar::Pimpl
+{
+public:
+    Pimpl(const wxTopLevelWindow& window) { throw TaskbarNotAvailable(); }
+    void setStatus(Status status) {}
+    void setProgress(size_t current, size_t total) {}
+
+};
+#endif
+
+
 //########################################################################################################
+Taskbar::Taskbar(const wxTopLevelWindow& window) : pimpl_(new Pimpl(window)) {} //throw TaskbarNotAvailable
+Taskbar::~Taskbar() {} //std::unique_ptr ...
 
-
-TaskbarProgress::TaskbarProgress(const wxTopLevelWindow& window) : pimpl_(new Pimpl(window)) {}
-
-TaskbarProgress::~TaskbarProgress() {} //std::unique_ptr ...
-
-void TaskbarProgress::setStatus(Status status)
-{
-    pimpl_->setStatus(status);
-}
-
-void TaskbarProgress::setProgress(size_t current, size_t total)
-{
-    pimpl_->setProgress(current, total);
-}
+void Taskbar::setStatus(Status status) { pimpl_->setStatus(status); }
+void Taskbar::setProgress(size_t current, size_t total) { pimpl_->setProgress(current, total); }

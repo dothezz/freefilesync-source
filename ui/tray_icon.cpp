@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "tray_icon.h"
 #include "../library/resources.h"
 #include "small_dlgs.h"
@@ -14,6 +14,10 @@
 #include <wx/menu.h>
 #include <wx/icon.h> //req. by Linux
 
+
+const wxEventType FFS_REQUEST_RESUME_TRAY_EVENT = wxNewEventType();
+
+
 namespace
 {
 inline
@@ -21,7 +25,6 @@ int roundNum(double d) //little rounding function
 {
     return static_cast<int>(d < 0 ? d - .5 : d + .5);
 }
-
 
 void fillRange(wxImage& img, int pixelFirst, int pixelLast, const wxColor& col)
 {
@@ -147,15 +150,13 @@ enum Selection
 };
 
 
-class MinimizeToTray::TaskBarImpl : public wxTaskBarIcon
+class FfsTrayIcon::TaskBarImpl : public wxTaskBarIcon
 {
 public:
-    TaskBarImpl(MinimizeToTray* parent) : parent_(parent) {}
+    TaskBarImpl(FfsTrayIcon& parent) : parent_(&parent) {}
 
-    void parentHasDied()
-    {
-        parent_ = NULL;
-    }
+    void parentHasDied() { parent_ = NULL; }
+
 private:
     virtual wxMenu* CreatePopupMenu()
     {
@@ -167,96 +168,67 @@ private:
         contextMenu->AppendSeparator();
         contextMenu->Append(CONTEXT_RESTORE, _("&Restore"));
         //event handling
-        contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MinimizeToTray::OnContextMenuSelection), NULL, parent_);
+        contextMenu->Connect(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(FfsTrayIcon::OnContextMenuSelection), NULL, parent_);
 
         return contextMenu; //ownership transferred to caller
     }
 
-    MinimizeToTray* parent_;
+    FfsTrayIcon* parent_;
 };
 
 
-MinimizeToTray::MinimizeToTray(wxTopLevelWindow* callerWnd, wxTopLevelWindow* secondWnd) :
-    callerWnd_(callerWnd),
-    secondWnd_(secondWnd),
-    trayIcon(new TaskBarImpl(this))
+FfsTrayIcon::FfsTrayIcon() :
+    trayIcon(new TaskBarImpl(*this))
 {
     trayIcon->SetIcon(generateIcon(0), wxT("FreeFileSync"));
-    trayIcon->Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(MinimizeToTray::OnDoubleClick), NULL, this); //register double-click
-
-    if (callerWnd_)
-        callerWnd_->Hide();
-    if (secondWnd_)
-        secondWnd_->Hide();
+    trayIcon->Connect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(FfsTrayIcon::OnDoubleClick), NULL, this); //register double-click
 }
 
 
-MinimizeToTray::~MinimizeToTray()
+FfsTrayIcon::~FfsTrayIcon()
 {
-    resumeFromTray();
+    trayIcon->RemoveIcon(); //hide icon until final deletion takes place
+    trayIcon->Disconnect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(FfsTrayIcon::OnDoubleClick), NULL, this);
+    trayIcon->parentHasDied(); //TaskBarImpl (potentially) has longer lifetime than FfsTrayIcon: avoid callback!
+
+    //use wxWidgets delayed destruction: delete during next idle loop iteration (handle late window messages, e.g. when double-clicking)
+    if (!wxPendingDelete.Member(trayIcon))
+        wxPendingDelete.Append(trayIcon);
 }
 
 
-void MinimizeToTray::resumeFromTray() //remove trayIcon and restore windows:  MinimizeToTray is now a zombie object...
+void FfsTrayIcon::setToolTip(const wxString& toolTipText, double percent)
 {
-    if (trayIcon)
-    {
-        if (secondWnd_)
-        {
-            secondWnd_->Iconize(false);
-            secondWnd_->Show();
-        }
-
-        if (callerWnd_) //usecase: avoid dialog flashing in batch silent mode
-        {
-            callerWnd_->Iconize(false);
-            callerWnd_->Show();
-            callerWnd_->Raise();
-            callerWnd_->SetFocus();
-        }
-        trayIcon->RemoveIcon(); //hide icon until final deletion takes place
-        trayIcon->Disconnect(wxEVT_TASKBAR_LEFT_DCLICK, wxCommandEventHandler(MinimizeToTray::OnDoubleClick), NULL, this);
-        trayIcon->parentHasDied(); //TaskBarImpl (potentially) has longer lifetime than MinimizeToTray: avoid callback!
-
-        //use wxWidgets delayed destruction: delete during next idle loop iteration (handle late window messages, e.g. when double-clicking)
-        if (!wxPendingDelete.Member(trayIcon))
-            wxPendingDelete.Append(trayIcon);
-
-        trayIcon = NULL; //avoid reentrance
-    }
+    trayIcon->SetIcon(generateIcon(percent), toolTipText);
 }
 
 
-void MinimizeToTray::setToolTip(const wxString& toolTipText, double percent)
-{
-    if (trayIcon)
-        trayIcon->SetIcon(generateIcon(percent), toolTipText);
-}
-
-
-void MinimizeToTray::keepHidden()
-{
-    callerWnd_ = NULL;
-    secondWnd_ = NULL;
-}
-
-
-void MinimizeToTray::OnContextMenuSelection(wxCommandEvent& event)
+void FfsTrayIcon::OnContextMenuSelection(wxCommandEvent& event)
 {
     const Selection eventId = static_cast<Selection>(event.GetId());
     switch (eventId)
     {
         case CONTEXT_ABOUT:
+        {
+            //ATTENTION: the modal dialog below does NOT disable all GUI input, e.g. user may still double-click on tray icon
+            //which will implicitly destroy the tray icon while still showing the modal dialog
+            trayIcon->SetEvtHandlerEnabled(false);
             zen::showAboutDialog();
-            break;
+            trayIcon->SetEvtHandlerEnabled(true);
+        }
+        break;
         case CONTEXT_RESTORE:
-            resumeFromTray();
+        {
+            wxCommandEvent dummy(FFS_REQUEST_RESUME_TRAY_EVENT);
+            ProcessEvent(dummy);
+        }
     }
 }
 
 
-void MinimizeToTray::OnDoubleClick(wxCommandEvent& event)
+void FfsTrayIcon::OnDoubleClick(wxCommandEvent& event)
 {
-    resumeFromTray();
+    wxCommandEvent dummy(FFS_REQUEST_RESUME_TRAY_EVENT);
+    ProcessEvent(dummy);
 }
 

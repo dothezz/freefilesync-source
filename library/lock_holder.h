@@ -5,6 +5,7 @@
 #include "../shared/zstring.h"
 #include "dir_lock.h"
 #include "status_handler.h"
+#include "dir_exist_async.h"
 
 namespace zen
 {
@@ -16,7 +17,10 @@ class LockHolder
 public:
     void addDir(const Zstring& dirnameFmt, ProcessCallback& procCallback) //resolved dirname ending with path separator
     {
-        if (dirnameFmt.empty()) return;
+        if (dirnameFmt.empty() ||
+            !dirExistsUpdating(dirnameFmt, procCallback))
+            return;
+
         if (lockHolder.find(dirnameFmt) != lockHolder.end()) return;
         assert(dirnameFmt.EndsWith(FILE_NAME_SEPARATOR)); //this is really the contract, formatting does other things as well, e.g. macro substitution
 
@@ -37,7 +41,7 @@ public:
         catch (const FileError& e)
         {
             bool dummy = false; //this warning shall not be shown but logged only
-            procCallback.reportWarning(e.msg(), dummy);
+            procCallback.reportWarning(e.msg(), dummy); //may throw!
         }
     }
 

@@ -42,15 +42,13 @@ const size_t DETECT_EXITUS_INTERVAL  = 30000; //assume abandoned lock; unit [ms]
 
 const char LOCK_FORMAT_DESCR[] = "FreeFileSync";
 const int LOCK_FORMAT_VER = 1; //lock file format version
-
-typedef Zbase<Zchar, StorageDeepCopy> BasicString; //thread safe string class
 }
 
 //worker thread
 class LifeSigns
 {
 public:
-    LifeSigns(const BasicString& lockfilename) : //throw()!!! siehe SharedDirLock()
+    LifeSigns(const Zstring& lockfilename) : //throw()!!! siehe SharedDirLock()
         lockfilename_(lockfilename) {} //thread safety: make deep copy!
 
     void operator()() const //thread entry
@@ -120,8 +118,7 @@ public:
     }
 
 private:
-    //make sure this instance is safely copyable!
-    const BasicString lockfilename_; //thread local! Not ref-counted!
+    const Zstring lockfilename_; //thread local! atomic ref-count => binary value-type semantics!
 };
 
 
@@ -494,7 +491,7 @@ public:
         while (!::tryLock(lockfilename))             //throw (FileError)
             ::waitOnDirLock(lockfilename, callback); //
 
-        threadObj = boost::thread(LifeSigns(lockfilename.c_str()));
+        threadObj = std::move(boost::thread(LifeSigns(lockfilename)));
     }
 
     ~SharedDirLock()

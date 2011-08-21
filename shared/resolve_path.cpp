@@ -8,6 +8,9 @@
 #include "dll_loader.h"
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "long_path_prefix.h"
+#ifdef _MSC_VER
+#pragma comment(lib, "Mpr.lib")
+#endif
 
 #elif defined FFS_LINUX
 #include <map>
@@ -21,20 +24,42 @@ using namespace zen;
 namespace
 {
 #ifdef FFS_WIN
-Zstring resolveRelativePath(const Zstring& relativeName, DWORD proposedBufferSize = 1000)
+Zstring resolveBrokenNetworkMap(const Zstring& dirname) //circumvent issue with disconnected network maps that could be activated by a simple explorer double click
 {
-    std::vector<Zchar> fullPath(proposedBufferSize);
+    if (dirname.size() >= 2 && iswalpha(dirname[0]) && dirname[1] == L':')
+    {
+        Zstring driveLetter(dirname.c_str(), 2); //e.g.: "Q:"
+        if (::GetFileAttributes((driveLetter + L'\\').c_str()) == INVALID_FILE_ATTRIBUTES)
+        {
+            DWORD bufferSize = 10000;
+            std::vector<wchar_t> remoteNameBuffer(bufferSize);
+            DWORD rv = ::WNetGetConnection(driveLetter.c_str(),  //__in     LPCTSTR lpLocalName in the form "<driveletter>:"
+                                           &remoteNameBuffer[0], //__out    LPTSTR lpRemoteName,
+                                           &bufferSize);         //__inout  LPDWORD lpnLength
+            (void)rv;
+            //no error check here! remoteNameBuffer will be filled on ERROR_CONNECTION_UNAVAIL and maybe others?
+            Zstring networkShare = &remoteNameBuffer[0];
+            if (!networkShare.empty())
+                return networkShare + (dirname.c_str() + 2);  //replace "Q:\subdir" by "\\server\share\subdir"
+        }
+    }
+    return dirname;
+}
 
-    const DWORD rv = ::GetFullPathName(
-                         applyLongPathPrefix(relativeName).c_str(), //__in   LPCTSTR lpFileName,
-                         proposedBufferSize, //__in   DWORD nBufferLength,
-                         &fullPath[0],       //__out  LPTSTR lpBuffer,
-                         NULL);              //__out  LPTSTR *lpFilePart
-    if (rv == 0 || rv == proposedBufferSize)
+
+Zstring resolveRelativePath(Zstring relativeName)
+{
+    relativeName = resolveBrokenNetworkMap(relativeName);
+
+    std::vector<Zchar> fullPath(10000);
+
+    const DWORD rv = ::GetFullPathName(applyLongPathPrefix(relativeName).c_str(), //__in   LPCTSTR lpFileName,
+                                       static_cast<DWORD>(fullPath.size()), //__in   DWORD nBufferLength,
+                                       &fullPath[0],       //__out  LPTSTR lpBuffer,
+                                       NULL);              //__out  LPTSTR *lpFilePart
+    if (rv == 0 || rv >= fullPath.size()) //theoretically, rv can never be == fullPath.size()
         //ERROR! Don't do anything
         return relativeName;
-    if (rv > proposedBufferSize)
-        return resolveRelativePath(relativeName, rv);
 
     return &fullPath[0];
 }

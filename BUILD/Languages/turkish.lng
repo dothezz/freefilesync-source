@@ -7,6 +7,8 @@
 	<plural definition>n == 1 ? 0 : 1</plural definition>
 </header>
 
+<source>Searching for directory %x...</source>
+<target></target>
 <source>Show in Explorer</source>
 <target>Tarayıcıda Göster</target>
 <source>Open with default application</source>
@@ -17,8 +19,8 @@
 <target>RealtimeSync - Kendiliğinden Eşleştirme</target>
 <source>Browse</source>
 <target>Gözat</target>
-<source>Invalid commandline: "%x"</source>
-<target>Geçersiz komut satırı: "%x"</target>
+<source>Invalid commandline: %x</source>
+<target>Geçersiz komut satırı: %x</target>
 <source>Error resolving symbolic link:</source>
 <target>Sembolik bağlantı çözümlenirken hata:</target>
 <source>Show popup</source>
@@ -109,10 +111,10 @@
 <target>Başlangıç eşleştirmesi:</target>
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>FreeFileSync veritabanı dosyalarından biri henüz yok:</target>
-<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
-<target>Şu dosyadaki FreeFileSync veritabanı kayıtlarından biri henüz yok:</target>
 <source>Error reading from synchronization database:</source>
 <target>Eşleştirme veri tabanı okunurken hata:</target>
+<source>Database files do not share a common synchronization session:</source>
+<target></target>
 <source>An exception occurred!</source>
 <target>Olağan dışı bir durum oluştu!</target>
 <source>Error deleting file:</source>
@@ -135,6 +137,15 @@
 <target>Bilgi</target>
 <source>Fatal Error</source>
 <target>Ölümcül Hata</target>
+<source>Scanning:</source>
+<target>Taranıyor:</target>
+<source>Encoding extended time information: %x</source>
+<target>Uzatılmış zaman bilgisi kodlanıyor: %x</target>
+<source>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</source>
+<target></target>
 <source>Invalid FreeFileSync config file!</source>
 <target>Geçersiz FreeFileSync yapılandırma dosyası!</target>
 <source>File does not exist:</source>
@@ -229,20 +240,18 @@ Her seferinde çalıştırılacak komut satırı:
 <target>İzleme etkin...</target>
 <source>Waiting for missing directories...</source>
 <target>Kayıp klasörler için bekleniyor...</target>
-<source>Could not initialize directory monitoring:</source>
-<target>Klasör izlemesi başlatılamadı:</target>
 <source>A directory input field is empty.</source>
 <target>Bir klasör giriş alanı boş</target>
-<source>Error when monitoring directories.</source>
-<target>Klasörler izlenirken hata.</target>
 <source>Drag && drop</source>
 <target>Klasör ya da dosyaları buraya sürükleyip bırakabilirsiniz</target>
+<source>Could not initialize directory monitoring:</source>
+<target>Klasör izlemesi başlatılamadı:</target>
+<source>Error when monitoring directories.</source>
+<target>Klasörler izlenirken hata.</target>
 <source>Conversion error:</source>
 <target>Dönüştürme hatası:</target>
 <source>Error moving file:</source>
 <target>Dosya taşınırken hata:</target>
-<source>Operation aborted!</source>
-<target>İşlemden vazgeçildi!</target>
 <source>Target file already existing!</source>
 <target>Hedef dosya zaten var!</target>
 <source>Error moving directory:</source>
@@ -273,6 +282,8 @@ Her seferinde çalıştırılacak komut satırı:
 <target>Dosya yazılırken hata:</target>
 <source>Error reading file:</source>
 <target>Dosya okunurken hata:</target>
+<source>Operation aborted!</source>
+<target>İşlemden vazgeçildi!</target>
 <source>Endless loop when traversing directory:</source>
 <target>Klasörlerde dolaşırken sonsuz döngü:</target>
 <source>Error traversing directory:</source>
@@ -413,24 +424,22 @@ Her seferinde çalıştırılacak komut satırı:
 <target>Kendiliğinden eşleştirme için bir komut dosyası oluşturun. Komut dosyasını işlemek için dosyanın üzerinde çift tıklayabilir ya da FreeFileSync.exe <komutdosyası> şeklinde bir komut satırı yazabilirsiniz. Bu işi işletim sisteminizin görev yöneticisi ile istediğiniz zaman çalışacak şekilde ayarlayabilirsiniz.</target>
 <source>Help</source>
 <target>Yardım</target>
-<source>Configuration overview:</source>
-<target>Yapılandırma özeti:</target>
 <source>Filter files</source>
 <target>Dosya süzgeci</target>
-<source>Status feedback</source>
-<target>Durum geri bildirimi</target>
-<source>Silent mode</source>
-<target>Sessiz kip</target>
-<source>Start minimized and write status information to a logfile</source>
-<target>Simge durumuna küçültülmüş olarak başlat ve durum bilgisini günlük dosyasına yaz</target>
 <source>Error handling</source>
 <target>Hata olduğunda:</target>
 <source>Overview</source>
 <target>Özet</target>
-<source>Select logfile directory:</source>
-<target>Kayıt dosyası klasörünü seçin:</target>
+<source>Status feedback</source>
+<target>Durum geri bildirimi</target>
+<source>Run minimized</source>
+<target></target>
 <source>Maximum number of logfiles:</source>
 <target>En fazla günlük dosyası sayısı:</target>
+<source>Select logfile directory:</source>
+<target>Kayıt dosyası klasörünü seçin:</target>
+<source>Batch settings</source>
+<target></target>
 <source>&Save</source>
 <target>&Kaydet</target>
 <source>&Load</source>
@@ -695,10 +704,6 @@ Dosya ve klasör izinlerini de aktar
 <target>Klasör çiftleri</target>
 <source>Select view</source>
 <target>Görünümü seçin</target>
-<source>Folder Comparison and Synchronization</source>
-<target>Klasör Karşılaştırma ve Eşleştirme</target>
-<source>Recycle Bin not yet supported for this system!</source>
-<target>Geri Dönüşüm Kutusu bu sistemde desteklenmiyor!</target>
 <source>Set direction:</source>
 <target>Yönü seçin:</target>
 <source>Exclude temporarily</source>
@@ -733,6 +738,8 @@ Dosya ve klasör izinlerini de aktar
 <target>Değişiklikleri şu anki yapılandırmaya kaydetmek ister misiniz?</target>
 <source>Configuration loaded!</source>
 <target>Yapılandırma yüklendi!</target>
+<source>Folder Comparison and Synchronization</source>
+<target>Klasör Karşılaştırma ve Eşleştirme</target>
 <source>Hide files that exist on left side only</source>
 <target>Yalnız sol yanda bulunan dosyaları gizle</target>
 <source>Show files that exist on left side only</source>
@@ -941,10 +948,6 @@ Dosya ve klasör izinlerini de aktar
 <target>Varsayılan eşleştirme yönleri ayarlanıyor: Yeni dosyalar eski dosyaların üzerine yazılacak.</target>
 <source>The file does not contain a valid configuration:</source>
 <target>Dosya geçerli bir yapılandırma içermiyor:</target>
-<source>Scanning:</source>
-<target>Taranıyor:</target>
-<source>Encoding extended time information: %x</source>
-<target>Uzatılmış zaman bilgisi kodlanıyor: %x</target>
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Bu hatayı, klasörü boş sayacak şekilde yok sayabilirsiniz.</target>
 <source>Directory does not exist:</source>
@@ -1021,8 +1024,6 @@ Dosya ve klasör izinlerini de aktar
 <target>%x öznitelikleri güncelleniyor</target>
 <source>Source directory does not exist anymore:</source>
 <target>Kaynak klasör artık yok:</target>
-<source>Generating database...</source>
-<target>Veri tabanı oluşturuluyor...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Yapılandırmaya göre eşleştirilecek bir şey yok!</target>
 <source>Target directory name must not be empty!</source>
@@ -1043,10 +1044,14 @@ Dosya ve klasör izinlerini de aktar
 <target>Gereken boş disk alanı:</target>
 <source>Free disk space available:</source>
 <target>Kullanılabilir disk alanı:</target>
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target></target>
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>Çoklu klasör çiftlerinin bir parçası olduğan bir klasör düzenlenecek! Lütfen eşleştirme ayarlarınızı gözden geçirin!</target>
 <source>Processing folder pair:</source>
 <target>İşlenen klasör çifti:</target>
+<source>Generating database...</source>
+<target>Veri tabanı oluşturuluyor...</target>
 <source>Error copying locked file %x!</source>
 <target>Kilitli dosya %x kopyalanırken hata!</target>
 <source>Data verification error: Source and target file have different content!</source>

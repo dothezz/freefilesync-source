@@ -7,6 +7,8 @@
 	<plural definition>n == 1 ? 0 : 1</plural definition>
 </header>
 
+<source>Searching for directory %x...</source>
+<target></target>
 <source>Show in Explorer</source>
 <target>Mostra in Esplora Risorse</target>
 <source>Open with default application</source>
@@ -17,8 +19,8 @@
 <target>RealtimeSync - Sincronizzazione Automatizzata</target>
 <source>Browse</source>
 <target>Sfoglia</target>
-<source>Invalid commandline: "%x"</source>
-<target>Comando non valido: "%x"</target>
+<source>Invalid commandline: %x</source>
+<target>Comando non valido: %x</target>
 <source>Error resolving symbolic link:</source>
 <target>Errore nella risoluzione di collegamento simbolico:</target>
 <source>Show popup</source>
@@ -109,10 +111,10 @@
 <target>Prima sincronizzazione:</target>
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Un file database di FreeFileSync non è ancora stato creato:</target>
-<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
-<target>Una voce del database di FreeFileSync nel seguente file non e' ancora stata creata:</target>
 <source>Error reading from synchronization database:</source>
 <target>Errore in lettura dal database di sincronizzione:</target>
+<source>Database files do not share a common synchronization session:</source>
+<target></target>
 <source>An exception occurred!</source>
 <target>Si è verificato un problema!</target>
 <source>Error deleting file:</source>
@@ -135,6 +137,15 @@
 <target>Info</target>
 <source>Fatal Error</source>
 <target>Errore Fatale</target>
+<source>Scanning:</source>
+<target>Analisi in corso:</target>
+<source>Encoding extended time information: %x</source>
+<target>Codifica estesa informazioni orario: %x</target>
+<source>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</source>
+<target></target>
 <source>Invalid FreeFileSync config file!</source>
 <target>File di configurazione FreeFileSync non valido!</target>
 <source>File does not exist:</source>
@@ -229,20 +240,18 @@ La linea di comando è eseguita ogni volta che:
 <target>Monitoraggio attivo...</target>
 <source>Waiting for missing directories...</source>
 <target>In attesa delle directory mancanti...</target>
-<source>Could not initialize directory monitoring:</source>
-<target>Monitoraggio directory non inizializzabile:</target>
 <source>A directory input field is empty.</source>
 <target>Un campo directory di input è vuoto.</target>
-<source>Error when monitoring directories.</source>
-<target>Errore durante il monitoraggio directory.</target>
 <source>Drag && drop</source>
 <target>Drag && drop</target>
+<source>Could not initialize directory monitoring:</source>
+<target>Monitoraggio directory non inizializzabile:</target>
+<source>Error when monitoring directories.</source>
+<target>Errore durante il monitoraggio directory.</target>
 <source>Conversion error:</source>
 <target>Errore di conversione:</target>
 <source>Error moving file:</source>
 <target>Errore nello spostamento file:</target>
-<source>Operation aborted!</source>
-<target>Operazione abortita!</target>
 <source>Target file already existing!</source>
 <target>File destinazione già esistente!</target>
 <source>Error moving directory:</source>
@@ -273,6 +282,8 @@ La linea di comando è eseguita ogni volta che:
 <target>Errore durante la scrittura del file:</target>
 <source>Error reading file:</source>
 <target>Errore durante la lettura del file:</target>
+<source>Operation aborted!</source>
+<target>Operazione abortita!</target>
 <source>Endless loop when traversing directory:</source>
 <target>Loop senza fine attraverso le directory:</target>
 <source>Error traversing directory:</source>
@@ -413,24 +424,22 @@ La linea di comando è eseguita ogni volta che:
 <target>Crea un file batch per sincronizzazione automatica. Per partire in modalità batch effettua semplicemente doppio click sul file o esegui da linea di comando: FreeFileSync.exe <batchfile>. Puoi anche schedulare il batch nelle operazioni pianificate del tuo sistema operativo.</target>
 <source>Help</source>
 <target>Aiuto</target>
-<source>Configuration overview:</source>
-<target>Controllo configurazione:</target>
 <source>Filter files</source>
 <target>Filtro dei files</target>
-<source>Status feedback</source>
-<target>Feedback di stato</target>
-<source>Silent mode</source>
-<target>Modalità Silenziosa</target>
-<source>Start minimized and write status information to a logfile</source>
-<target>Lancia minimizzato e scrivi informazioni di stato in un file log</target>
 <source>Error handling</source>
 <target>Gestione degli errori</target>
 <source>Overview</source>
 <target>Controllo generale</target>
-<source>Select logfile directory:</source>
-<target>Seleziona cartella per il file di log:</target>
+<source>Status feedback</source>
+<target>Feedback di stato</target>
+<source>Run minimized</source>
+<target></target>
 <source>Maximum number of logfiles:</source>
 <target>Numero massimo di logfiles:</target>
+<source>Select logfile directory:</source>
+<target>Seleziona cartella per il file di log:</target>
+<source>Batch settings</source>
+<target></target>
 <source>&Save</source>
 <target>&Salva</target>
 <source>&Load</source>
@@ -694,10 +703,6 @@ Trasferisci file e permessi sulle cartelle
 <target>Coppia di cartelle</target>
 <source>Select view</source>
 <target>Seleziona vista</target>
-<source>Folder Comparison and Synchronization</source>
-<target>Comparazione di Cartelle e Sincronizzazione</target>
-<source>Recycle Bin not yet supported for this system!</source>
-<target>Cestino non ancora supportato per questo sistema!</target>
 <source>Set direction:</source>
 <target>Imposta direzione:</target>
 <source>Exclude temporarily</source>
@@ -732,6 +737,8 @@ Trasferisci file e permessi sulle cartelle
 <target>Salvare i cambiamenti alla configurazione corrente?</target>
 <source>Configuration loaded!</source>
 <target>Configurazione caricata!</target>
+<source>Folder Comparison and Synchronization</source>
+<target>Comparazione di Cartelle e Sincronizzazione</target>
 <source>Hide files that exist on left side only</source>
 <target>Nascondi i file esistenti solo a sinistra</target>
 <source>Show files that exist on left side only</source>
@@ -940,10 +947,6 @@ Trasferisci file e permessi sulle cartelle
 <target>Imposta direzioni di sincronizzazione di default: I vecchi file saranno sovrascritti dai nuovi.</target>
 <source>The file does not contain a valid configuration:</source>
 <target>Il file non contiene una configurazione valida</target>
-<source>Scanning:</source>
-<target>Analisi in corso:</target>
-<source>Encoding extended time information: %x</source>
-<target>Codifica estesa informazioni orario: %x</target>
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Puoi ignorare questo errore per considerare la directory come vuota.</target>
 <source>Directory does not exist:</source>
@@ -1020,8 +1023,6 @@ Trasferisci file e permessi sulle cartelle
 <target>Aggiornamento attributi di %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>La directory sorgente non è più esistente:</target>
-<source>Generating database...</source>
-<target>Generazione database...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Niente da sincronizzare in questa configurazione!</target>
 <source>Target directory name must not be empty!</source>
@@ -1042,10 +1043,14 @@ Trasferisci file e permessi sulle cartelle
 <target>Spazio libero su disco richiesto:</target>
 <source>Free disk space available:</source>
 <target>Spazio libero su disco disponibile:</target>
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target></target>
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>Una directory che fa parte di più coppie di cartelle sarà modificata! Ricontrolla le impostazioni di sincronizzazione!</target>
 <source>Processing folder pair:</source>
 <target>Elaborazione coppia di cartelle:</target>
+<source>Generating database...</source>
+<target>Generazione database...</target>
 <source>Error copying locked file %x!</source>
 <target>Errore durante la copia del file bloccato %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

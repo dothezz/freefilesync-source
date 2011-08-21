@@ -20,13 +20,21 @@ endif
 
 
 #support for GTKMM
-FFS_CPPFLAGS+=`pkg-config --cflags gtkmm-2.4`
-LINKFLAGS+=`pkg-config --libs gtkmm-2.4`
+FFS_CPPFLAGS += `pkg-config --cflags gtkmm-2.4`
+LINKFLAGS += `pkg-config --libs gtkmm-2.4`
 
 #support for SELinux (optional)
 SELINUX_EXISTING=$(shell pkg-config --exists libselinux && echo YES)
 ifeq ($(SELINUX_EXISTING),YES)
-FFS_CPPFLAGS += -DHAVE_SELINUX
+FFS_CPPFLAGS += `pkg-config --cflags libselinux ` -DHAVE_SELINUX
+LINKFLAGS    += `pkg-config --libs libselinux`
+endif
+
+#support for Ubuntu Unity (optional)
+UNITY_EXISTING=$(shell pkg-config --exists unity && echo YES)
+ifeq ($(UNITY_EXISTING),YES)
+FFS_CPPFLAGS += `pkg-config --cflags unity` -DHAVE_UBUNTU_UNITY
+LINKFLAGS    += `pkg-config --libs unity`
 endif
 
 FILE_LIST=              #internal list of all *.cpp files needed for compilation
@@ -50,6 +58,7 @@ FILE_LIST+=ui/search.cpp
 FILE_LIST+=ui/switch_to_gui.cpp
 FILE_LIST+=ui/msg_popup.cpp
 FILE_LIST+=ui/progress_indicator.cpp
+FILE_LIST+=library/parallel_scan.cpp
 FILE_LIST+=library/custom_grid.cpp
 FILE_LIST+=library/error_log.cpp
 FILE_LIST+=library/status_handler.cpp
@@ -65,10 +74,10 @@ FILE_LIST+=library/dir_lock.cpp
 FILE_LIST+=shared/i18n.cpp
 FILE_LIST+=shared/localization.cpp
 FILE_LIST+=shared/file_io.cpp
+FILE_LIST+=shared/taskbar.cpp
 FILE_LIST+=shared/dir_name.cpp
 FILE_LIST+=shared/guid.cpp
 FILE_LIST+=shared/xml_base.cpp
-FILE_LIST+=shared/check_exist.cpp
 FILE_LIST+=shared/last_error.cpp
 FILE_LIST+=shared/custom_tooltip.cpp
 FILE_LIST+=shared/file_handling.cpp

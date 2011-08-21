@@ -7,6 +7,8 @@
 	<plural definition>0</plural definition>
 </header>
 
+<source>Searching for directory %x...</source>
+<target></target>
 <source>Show in Explorer</source>
 <target>在Explorer中显示</target>
 <source>Open with default application</source>
@@ -17,8 +19,8 @@
 <target>实时同步 - 自动同步</target>
 <source>Browse</source>
 <target>浏览</target>
-<source>Invalid commandline: "%x"</source>
-<target>非法命令行:"%x"</target>
+<source>Invalid commandline: %x</source>
+<target>非法命令行:%x</target>
 <source>Error resolving symbolic link:</source>
 <target>解决符号链接出错:</target>
 <source>Show popup</source>
@@ -108,10 +110,10 @@
 <target>初始化同步:</target>
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>FreeFileSync数据库文件其中一个不存在:</target>
-<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
-<target>以下文件中的FreeFileSync数据库入口其中一个不存在：</target>
 <source>Error reading from synchronization database:</source>
 <target>从同步数据库中读取时出错:</target>
+<source>Database files do not share a common synchronization session:</source>
+<target></target>
 <source>An exception occurred!</source>
 <target>发生异常!</target>
 <source>Error deleting file:</source>
@@ -133,6 +135,15 @@
 <target>信息</target>
 <source>Fatal Error</source>
 <target>致命错误</target>
+<source>Scanning:</source>
+<target>扫描中:</target>
+<source>Encoding extended time information: %x</source>
+<target>正在编码扩展时间信息:%x</target>
+<source>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</source>
+<target></target>
 <source>Invalid FreeFileSync config file!</source>
 <target>无效的 FreeFileSync 配置文件!</target>
 <source>File does not exist:</source>
@@ -224,20 +235,18 @@ The command line is executed each time:
 <target>监视激活...</target>
 <source>Waiting for missing directories...</source>
 <target>正在等待丢失的目录...</target>
-<source>Could not initialize directory monitoring:</source>
-<target>不能初始化目录监视:</target>
 <source>A directory input field is empty.</source>
 <target>有一个目录输入字段是空的.</target>
-<source>Error when monitoring directories.</source>
-<target>监视目录时出错.</target>
 <source>Drag && drop</source>
 <target>拖放</target>
+<source>Could not initialize directory monitoring:</source>
+<target>不能初始化目录监视:</target>
+<source>Error when monitoring directories.</source>
+<target>监视目录时出错.</target>
 <source>Conversion error:</source>
 <target>转换错误:</target>
 <source>Error moving file:</source>
 <target>移动文件时出错:</target>
-<source>Operation aborted!</source>
-<target>操作已取消!</target>
 <source>Target file already existing!</source>
 <target>目标文件已经存在!</target>
 <source>Error moving directory:</source>
@@ -268,6 +277,8 @@ The command line is executed each time:
 <target>写入文件出错:</target>
 <source>Error reading file:</source>
 <target>读取文件出错:</target>
+<source>Operation aborted!</source>
+<target>操作已取消!</target>
 <source>Endless loop when traversing directory:</source>
 <target>遍历目录时出现无限循环:</target>
 <source>Error traversing directory:</source>
@@ -408,24 +419,22 @@ The command line is executed each time:
 <target>为自动同步创建一个批处理. 要开始批处理模式只需简单地双击批处理文件或通过命令行执行：FreeFileSync.exe <批处理文件名>. 此外还可以通过操作系统的计划任务来定时执行.</target>
 <source>Help</source>
 <target>帮助</target>
-<source>Configuration overview:</source>
-<target>配置概览:</target>
 <source>Filter files</source>
 <target>过滤文件</target>
-<source>Status feedback</source>
-<target>状况反馈</target>
-<source>Silent mode</source>
-<target>静默模式</target>
-<source>Start minimized and write status information to a logfile</source>
-<target>以最小化开始运行并将信息写到日志文件</target>
 <source>Error handling</source>
 <target>错误处理</target>
 <source>Overview</source>
 <target>摘要</target>
-<source>Select logfile directory:</source>
-<target>选择日志保存位置:</target>
+<source>Status feedback</source>
+<target>状况反馈</target>
+<source>Run minimized</source>
+<target></target>
 <source>Maximum number of logfiles:</source>
 <target>最大的日志文件数:</target>
+<source>Select logfile directory:</source>
+<target>选择日志保存位置:</target>
+<source>Batch settings</source>
+<target></target>
 <source>&Save</source>
 <target>保存(&S)</target>
 <source>&Load</source>
@@ -691,10 +700,6 @@ Transfer file and directory permissions
 <target>文件夹对</target>
 <source>Select view</source>
 <target>选择视图</target>
-<source>Folder Comparison and Synchronization</source>
-<target>文件夹比较与同步</target>
-<source>Recycle Bin not yet supported for this system!</source>
-<target>此系统上不支持回收站!</target>
 <source>Set direction:</source>
 <target>设置方向:</target>
 <source>Exclude temporarily</source>
@@ -729,6 +734,8 @@ Transfer file and directory permissions
 <target>保存更改到当前配置?</target>
 <source>Configuration loaded!</source>
 <target>配置已加载!</target>
+<source>Folder Comparison and Synchronization</source>
+<target>文件夹比较与同步</target>
 <source>Hide files that exist on left side only</source>
 <target>隐藏仅在左侧的文件</target>
 <source>Show files that exist on left side only</source>
@@ -931,10 +938,6 @@ Transfer file and directory permissions
 <target>设置默认的同步方向:旧文件会被新文件覆盖.</target>
 <source>The file does not contain a valid configuration:</source>
 <target>该文件不包含有效的配置:</target>
-<source>Scanning:</source>
-<target>扫描中:</target>
-<source>Encoding extended time information: %x</source>
-<target>正在编码扩展时间信息:%x</target>
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>你可以忽略这个错误而认为目录是空的.</target>
 <source>Directory does not exist:</source>
@@ -1011,8 +1014,6 @@ Transfer file and directory permissions
 <target>更新 %x 的属性</target>
 <source>Source directory does not exist anymore:</source>
 <target>源目录已经不存在:</target>
-<source>Generating database...</source>
-<target>正在生成数据库...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>根据配置没有任何同步!</target>
 <source>Target directory name must not be empty!</source>
@@ -1033,10 +1034,14 @@ Transfer file and directory permissions
 <target>需要可用的磁盘空间:</target>
 <source>Free disk space available:</source>
 <target>可用磁盘空间:</target>
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target></target>
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>有一个目录将被修改,而它是多个文件夹对的一部分!请重新检查同步设置!</target>
 <source>Processing folder pair:</source>
 <target>正在处理成对文件夹:</target>
+<source>Generating database...</source>
+<target>正在生成数据库...</target>
 <source>Error copying locked file %x!</source>
 <target>复制已锁定的文件时出错 %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

@@ -96,6 +96,7 @@
 			<Add option="-pipe" />
 			<Add option="-mthreads" />
 			<Add option="-std=gnu++0x" />
+			<Add option='-include &quot;shared/warn_static.h&quot;' />
 			<Add option="-D__GNUWIN32__" />
 			<Add option="-D__WXMSW__" />
 			<Add option="-DFFS_WIN" />
@@ -123,6 +124,7 @@
 			<Add library="libws2_32.a" />
 			<Add library="libwinspool.a" />
 			<Add library="libwinmm.a" />
+			<Add library="libmpr.a" />
 			<Add directory="C:\Program Files\C++\Boost\stage\lib" />
 		</Linker>
 		<Unit filename="WxWizFrame.fbp">
@@ -160,6 +162,7 @@
 			<Option target="Debug-DLL" />
 		</Unit>
 		<Unit filename="library\detect_renaming.h" />
+		<Unit filename="library\dir_exist_async.h" />
 		<Unit filename="library\dir_lock.cpp" />
 		<Unit filename="library\dir_lock.h" />
 		<Unit filename="library\error_log.cpp">
@@ -203,6 +206,8 @@
 		</Unit>
 		<Unit filename="library\lock_holder.h" />
 		<Unit filename="library\norm_filter.h" />
+		<Unit filename="library\parallel_scan.cpp" />
+		<Unit filename="library\parallel_scan.h" />
 		<Unit filename="library\process_xml.cpp" />
 		<Unit filename="library\process_xml.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -239,7 +244,6 @@
 		</Unit>
 		<Unit filename="shared\boost_thread_wrap.h" />
 		<Unit filename="shared\build_info.h" />
-		<Unit filename="shared\check_exist.cpp" />
 		<Unit filename="shared\check_exist.h" />
 		<Unit filename="shared\custom_button.cpp">
 			<Option target="Release" />
@@ -277,6 +281,7 @@
 		<Unit filename="shared\file_io.h" />
 		<Unit filename="shared\file_traverser.cpp" />
 		<Unit filename="shared\file_traverser.h" />
+		<Unit filename="shared\file_update_handle.h" />
 		<Unit filename="shared\global_func.h" />
 		<Unit filename="shared\guid.cpp" />
 		<Unit filename="shared\guid.h" />
@@ -349,7 +354,6 @@
 		<Unit filename="shared\zbase.h" />
 		<Unit filename="shared\zstring.cpp" />
 		<Unit filename="shared\zstring.h" />
-		<Unit filename="shared\zxstring.h" />
 		<Unit filename="structures.cpp" />
 		<Unit filename="structures.h">
 			<Option target="&lt;{~None~}&gt;" />

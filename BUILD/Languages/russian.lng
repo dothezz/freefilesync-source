@@ -7,6 +7,8 @@
 	<plural definition>n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<11 || n%100>14) ? 1 : 2</plural definition>
 </header>
 
+<source>Searching for directory %x...</source>
+<target></target>
 <source>Show in Explorer</source>
 <target>Показать в Проводнике</target>
 <source>Open with default application</source>
@@ -17,8 +19,8 @@
 <target>RealtimeSync - Автоматическая синхронизация</target>
 <source>Browse</source>
 <target>Обзор</target>
-<source>Invalid commandline: "%x"</source>
-<target>Неверная командная строка: "%x"</target>
+<source>Invalid commandline: %x</source>
+<target>Неверная командная строка: %x</target>
 <source>Error resolving symbolic link:</source>
 <target>Ошибка при решении символической ссылки:</target>
 <source>Show popup</source>
@@ -110,10 +112,10 @@
 <target>Первоначальная синхронизация:</target>
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Файла базы данных FreeFileSync еще не существует:</target>
-<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
-<target>Записей, относящихся к следующим файлам, в базе данных FreeFileSync еще не существует:</target>
 <source>Error reading from synchronization database:</source>
 <target>Ошибка при чтении из базы данных синхронизации:</target>
+<source>Database files do not share a common synchronization session:</source>
+<target></target>
 <source>An exception occurred!</source>
 <target>Исключение произошло!</target>
 <source>Error deleting file:</source>
@@ -137,6 +139,15 @@
 <target>Информация</target>
 <source>Fatal Error</source>
 <target>Критическая ошибка</target>
+<source>Scanning:</source>
+<target>Сканирую:</target>
+<source>Encoding extended time information: %x</source>
+<target>Кодирование расширенной информации о времени: %x</target>
+<source>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</source>
+<target></target>
 <source>Invalid FreeFileSync config file!</source>
 <target>Неверный файл конфигурации FreeFileSync!</target>
 <source>File does not exist:</source>
@@ -234,20 +245,18 @@ The command line is executed each time:
 <target>Мониторинг включен...</target>
 <source>Waiting for missing directories...</source>
 <target>Ожидание пропущенных папок...</target>
-<source>Could not initialize directory monitoring:</source>
-<target>Не удалось инициализировать папку для мониторинга:</target>
 <source>A directory input field is empty.</source>
 <target>Поле ввода пути папки пустое.</target>
-<source>Error when monitoring directories.</source>
-<target>Ошибка при мониторинге папок.</target>
 <source>Drag && drop</source>
 <target>Drag && drop</target>
+<source>Could not initialize directory monitoring:</source>
+<target>Не удалось инициализировать папку для мониторинга:</target>
+<source>Error when monitoring directories.</source>
+<target>Ошибка при мониторинге папок.</target>
 <source>Conversion error:</source>
 <target>Ошибка преобразования:</target>
 <source>Error moving file:</source>
 <target>Ошибка перемещения файла:</target>
-<source>Operation aborted!</source>
-<target>Операция отменена!</target>
 <source>Target file already existing!</source>
 <target>Конечный файл уже существует!</target>
 <source>Error moving directory:</source>
@@ -278,6 +287,8 @@ The command line is executed each time:
 <target>Ошибка при записи файла:</target>
 <source>Error reading file:</source>
 <target>Ошибка при чтении файла:</target>
+<source>Operation aborted!</source>
+<target>Операция отменена!</target>
 <source>Endless loop when traversing directory:</source>
 <target>Зацикливание при встрече пересекающихся путей:</target>
 <source>Error traversing directory:</source>
@@ -421,24 +432,22 @@ The command line is executed each time:
 <target>Создайте файл пакетного задания для автоматической синхронизации. Для запуска в пакетном режиме просто дважды щелкните по файлу или выполните командную строку: FreeFileSync.exe <batchfile>. Также это может быть запланировано в планировщике задач операционной системы.</target>
 <source>Help</source>
 <target>Помощь</target>
-<source>Configuration overview:</source>
-<target>Настройки синхронизации:</target>
 <source>Filter files</source>
 <target>Фильтр файлов</target>
-<source>Status feedback</source>
-<target>Статус обратной связи</target>
-<source>Silent mode</source>
-<target>Скрытый режим</target>
-<source>Start minimized and write status information to a logfile</source>
-<target>Запускать свернутым и писать информацию о состоянии в лог-файл</target>
 <source>Error handling</source>
 <target>Обработка ошибок</target>
 <source>Overview</source>
 <target>Главная</target>
-<source>Select logfile directory:</source>
-<target>Выберите папку для лог-файлов:</target>
+<source>Status feedback</source>
+<target>Статус обратной связи</target>
+<source>Run minimized</source>
+<target></target>
 <source>Maximum number of logfiles:</source>
 <target>Максимальное количество лог-файлов:</target>
+<source>Select logfile directory:</source>
+<target>Выберите папку для лог-файлов:</target>
+<source>Batch settings</source>
+<target></target>
 <source>&Save</source>
 <target>&Сохранить</target>
 <source>&Load</source>
@@ -699,10 +708,6 @@ Transfer file and directory permissions
 <target>Пары папок для синхронизации</target>
 <source>Select view</source>
 <target>Список файлов</target>
-<source>Folder Comparison and Synchronization</source>
-<target>Сравнение и синхронизация</target>
-<source>Recycle Bin not yet supported for this system!</source>
-<target>Корзина пока не поддерживается для этой системы!</target>
 <source>Set direction:</source>
 <target>Выберите направление:</target>
 <source>Exclude temporarily</source>
@@ -737,6 +742,8 @@ Transfer file and directory permissions
 <target>Сохранить изменения в текущих настройках синхронизации?</target>
 <source>Configuration loaded!</source>
 <target>Настройки синхронизации загружены!</target>
+<source>Folder Comparison and Synchronization</source>
+<target>Сравнение и синхронизация</target>
 <source>Hide files that exist on left side only</source>
 <target>Скрыть файлы, существующие только слева</target>
 <source>Show files that exist on left side only</source>
@@ -957,10 +964,6 @@ Transfer file and directory permissions
 </target>
 <source>The file does not contain a valid configuration:</source>
 <target>Файл не содержит действительных настроек синхронизации:</target>
-<source>Scanning:</source>
-<target>Сканирую:</target>
-<source>Encoding extended time information: %x</source>
-<target>Кодирование расширенной информации о времени: %x</target>
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Вы можете проигнорировать ошибку, приняв папку за пустую.</target>
 <source>Directory does not exist:</source>
@@ -1037,8 +1040,6 @@ Transfer file and directory permissions
 <target>Обновление атрибутов %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>Исходная папка больше не существует:</target>
-<source>Generating database...</source>
-<target>Создание базы данных...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Ничего нет для синхронизации в соответствии с настройками синхронизации!</target>
 <source>Target directory name must not be empty!</source>
@@ -1059,10 +1060,14 @@ Transfer file and directory permissions
 <target>Требуемое свободное место на диске:</target>
 <source>Free disk space available:</source>
 <target>Доступно свободного места на диске:</target>
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target></target>
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>Папка, входящая в несколько пар папок, будет изменена. Пожалуйста, проверьте настройки синхронизации!</target>
 <source>Processing folder pair:</source>
 <target>Обработка пары папок:</target>
+<source>Generating database...</source>
+<target>Создание базы данных...</target>
 <source>Error copying locked file %x!</source>
 <target>Ошибка при копировании заблокированного файла %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

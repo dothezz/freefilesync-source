@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #ifndef FILEHIERARCHY_H_INCLUDED
 #define FILEHIERARCHY_H_INCLUDED
 
@@ -51,9 +51,6 @@ struct FileDescriptor
 
     zen::Int64  lastWriteTimeRaw;   //number of seconds since Jan. 1st 1970 UTC, same semantics like time_t (== signed long)
     zen::UInt64 fileSize;
-
-    //#warning: what about memory consumption?? (assume large comparisons!!?)
-    //util::FileID fileIdentifier; //unique file identifier, optional: may be NULL!
 };
 
 
@@ -94,9 +91,9 @@ class FileSystemObject;
 //------------------------------------------------------------------
 /*
 ERD:
-DirContainer 1 -----> 0..n DirContainer
-DirContainer 1 -----> 0..n FileDescriptor
-DirContainer 1 -----> 0..n LinkDescriptor
+	DirContainer 1 -----> 0..n DirContainer
+	DirContainer 1 -----> 0..n FileDescriptor
+	DirContainer 1 -----> 0..n LinkDescriptor
 */
 
 struct DirContainer
@@ -145,7 +142,7 @@ SymLinkMapping    FileMapping     DirMapping    BaseDirMapping
 class HierarchyObject
 {
 public:
-    typedef size_t ObjectID;
+    typedef long ObjectID;
     FileSystemObject* retrieveById(ObjectID id);             //returns NULL if object is not found; logarithmic complexity
     const FileSystemObject* retrieveById(ObjectID id) const; //
 
@@ -282,9 +279,9 @@ class FileSystemObject
 public:
     virtual void accept(FSObjectVisitor& visitor) const = 0;
 
-    const Zstring getParentRelativeName() const; //get name relative to base sync dir without FILE_NAME_SEPARATOR postfix
-    const Zstring getObjRelativeName() const;    //same as getRelativeName() but also returns value if either side is empty
-    const Zstring& getObjShortName() const;      //same as getShortName() but also returns value if either side is empty
+    const Zstring  getParentRelativeName() const; //get name relative to base sync dir without FILE_NAME_SEPARATOR postfix
+    const Zstring& getObjShortName      () const; //same as getShortName() but also returns value if either side is empty
+    const Zstring  getObjRelativeName   () const; //same as getRelativeName() but also returns value if either side is empty
     template <SelectedSide side>           bool     isEmpty()         const;
     template <SelectedSide side> const Zstring&     getShortName()    const;
     template <SelectedSide side> const Zstring      getRelativeName() const; //get name relative to base sync dir without FILE_NAME_SEPARATOR prefix
@@ -572,6 +569,7 @@ HierarchyObject::ObjectID FileSystemObject::getId() const
 inline
 HierarchyObject::ObjectID FileSystemObject::getUniqueId()
 {
+    //warning: potential MT issue in the future!
     static HierarchyObject::ObjectID id = 0;
     return ++id;
 }
@@ -665,16 +663,14 @@ SyncOperation FileSystemObject::testSyncOperation(bool selected, SyncDirection p
 }
 
 
-template <>
-inline
+template <> inline
 bool FileSystemObject::isEmpty<LEFT_SIDE>() const
 {
     return shortNameLeft_.empty();
 }
 
 
-template <>
-inline
+template <> inline
 bool FileSystemObject::isEmpty<RIGHT_SIDE>() const
 {
     return shortNameRight_.empty();
@@ -688,16 +684,14 @@ bool FileSystemObject::isEmpty() const
 }
 
 
-template <>
-inline
+template <> inline
 const Zstring& FileSystemObject::getShortName<LEFT_SIDE>() const
 {
     return shortNameLeft_; //empty if not existing
 }
 
 
-template <>
-inline
+template <> inline
 const Zstring& FileSystemObject::getShortName<RIGHT_SIDE>() const
 {
     return shortNameRight_; //empty if not existing

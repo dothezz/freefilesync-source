@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "progress_indicator.h"
 #include <memory>
 #include "gui_generated.h"
@@ -19,10 +19,7 @@
 #include "../shared/mouse_move_dlg.h"
 #include "../library/error_log.h"
 #include "../shared/toggle_button.h"
-
-#ifdef FFS_WIN
 #include "../shared/taskbar.h"
-#endif
 
 using namespace zen;
 
@@ -97,9 +94,7 @@ private:
 
     CurrentStatus status;
 
-#ifdef FFS_WIN
-    std::auto_ptr<util::TaskbarProgress> taskbar_;
-#endif
+    std::unique_ptr<util::Taskbar> taskbar_;
 
     //remaining time
     std::auto_ptr<Statistics> statistics;
@@ -179,13 +174,11 @@ void CompareStatus::CompareStatusImpl::init()
 {
     titleTextBackup = parentWindow_.GetTitle();
 
-#ifdef FFS_WIN
-    try //try to get access to Windows 7 Taskbar
+    try //try to get access to Windows 7/Ubuntu taskbar
     {
-        taskbar_.reset(new util::TaskbarProgress(parentWindow_));
+        taskbar_.reset(new util::Taskbar(parentWindow_));
     }
     catch (const util::TaskbarNotAvailable&) {}
-#endif
 
     status = SCANNING;
 
@@ -223,10 +216,7 @@ void CompareStatus::CompareStatusImpl::init()
 
 void CompareStatus::CompareStatusImpl::finalize() //hide again
 {
-#ifdef FFS_WIN
     taskbar_.reset();
-#endif
-
     parentWindow_.SetTitle(titleTextBackup);
 }
 
@@ -288,7 +278,6 @@ void CompareStatus::CompareStatusImpl::showProgressExternally(const wxString& pr
         parentWindow_.SetTitle(progressText);
 
     //show progress on Windows 7 taskbar
-#ifdef FFS_WIN
     using namespace util;
 
     if (taskbar_.get())
@@ -298,15 +287,14 @@ void CompareStatus::CompareStatusImpl::showProgressExternally(const wxString& pr
         switch (status)
         {
             case SCANNING:
-                taskbar_->setStatus(TaskbarProgress::STATUS_INDETERMINATE);
+                taskbar_->setStatus(Taskbar::STATUS_INDETERMINATE);
                 break;
             case COMPARING_CONTENT:
-                taskbar_->setStatus(TaskbarProgress::STATUS_NORMAL);
+                taskbar_->setStatus(Taskbar::STATUS_NORMAL);
                 taskbar_->setProgress(current, total);
                 break;
         }
     }
-#endif
 }
 
 
@@ -489,7 +477,7 @@ public:
     void incProgressIndicator_NoUpdate(int objectsProcessed, zen::Int64 dataProcessed);
     void incScannedObjects_NoUpdate(int number);
     void setStatusText_NoUpdate(const wxString& text);
-    void updateStatusDialogNow();
+    void updateStatusDialogNow(bool allowYield = true);
 
     void setCurrentStatus(SyncStatus::SyncStatusID id);
     void processHasFinished(SyncStatus::SyncStatusID id, const ErrorLogging& log);  //essential to call this in StatusUpdater derived class destructor at the LATEST(!) to prevent access to currentStatusUpdater
@@ -505,6 +493,8 @@ private:
     virtual void OnIconize(wxIconizeEvent& event);
 
     void resumeFromSystray();
+    void OnResumeFromTray(wxCommandEvent& event);
+
     bool currentProcessIsRunning();
     void showProgressExternally(const wxString& progressText, float percent = 0); //percent may already be included in progressText
 
@@ -528,9 +518,7 @@ private:
     bool processPaused;
     SyncStatus::SyncStatusID currentStatus;
 
-#ifdef FFS_WIN
-    std::unique_ptr<util::TaskbarProgress> taskbar_;
-#endif
+    std::unique_ptr<util::Taskbar> taskbar_;
 
     //remaining time
     std::unique_ptr<Statistics> statistics;
@@ -539,11 +527,7 @@ private:
 
     wxString titelTextBackup;
 
-    //save last used systray icon description
-    wxString progressTextLast;
-    float progressPercentLast;
-
-    std::shared_ptr<MinimizeToTray> minimizedToSysTray; //optional: if filled, hides all visible windows, shows again if destroyed
+    std::unique_ptr<FfsTrayIcon> trayIcon; //optional: if filled all other windows should be hidden and conversely
 };
 
 
@@ -560,7 +544,7 @@ SyncStatus::SyncStatus(AbortCallback& abortCb,
     else
     {
         pimpl->Show();
-        pimpl->updateStatusDialogNow(); //update visual statistics to get rid of "dummy" texts
+        pimpl->updateStatusDialogNow(false); //update visual statistics to get rid of "dummy" texts
     }
 }
 
@@ -639,8 +623,7 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
     processPaused(false),
     currentStatus(SyncStatus::ABORTED),
     lastStatCallSpeed(-1000000), //some big number
-    lastStatCallRemTime(-1000000),
-    progressPercentLast(0)
+    lastStatCallRemTime(-1000000)
 {
 #ifdef FFS_WIN
     new zen::MouseMoveWindow(*this); //allow moving main dialog by clicking (nearly) anywhere...; ownership passed to "this"
@@ -670,13 +653,11 @@ SyncStatus::SyncStatusImpl::SyncStatusImpl(AbortCallback& abortCb,
 
     timeElapsed.Start(); //measure total time
 
-#ifdef FFS_WIN
-    try //try to get access to Windows 7 Taskbar
+    try //try to get access to Windows 7/Ubuntu taskbar
     {
-        taskbar_.reset(new util::TaskbarProgress(mainDialog != NULL ? *static_cast<wxTopLevelWindow*>(mainDialog) : *this));
+        taskbar_.reset(new util::Taskbar(mainDialog != NULL ? *static_cast<wxTopLevelWindow*>(mainDialog) : *this));
     }
     catch (const util::TaskbarNotAvailable&) {}
-#endif
 
     //hide "processed" statistics until end of process
     bSizerObjectsProcessed->Show(false);
@@ -703,9 +684,6 @@ SyncStatus::SyncStatusImpl::~SyncStatusImpl()
         mainDialog->Raise();
         mainDialog->SetFocus();
     }
-
-    if (minimizedToSysTray.get())
-        minimizedToSysTray->keepHidden(); //prevent window from flashing shortly before it is destroyed
 }
 
 
@@ -782,13 +760,8 @@ void SyncStatus::SyncStatusImpl::setStatusText_NoUpdate(const wxString& text)
 void SyncStatus::SyncStatusImpl::showProgressExternally(const wxString& progressText, float percent)
 {
     //write status information to systray, if window is minimized
-    if (minimizedToSysTray.get())
-        minimizedToSysTray->setToolTip(progressText, percent);
-    //minimizedToSysTray may be a zombie... so set title text anyway
-
-    //save progress text for later use (e.g. set systray icon tooltip in paused mode)
-    progressTextLast    = progressText;
-    progressPercentLast = percent;
+    if (trayIcon.get())
+        trayIcon->setToolTip(progressText, percent);
 
     wxString progressTextFmt = progressText;
     progressTextFmt.Replace(wxT("\n"), wxT(" - "));
@@ -804,7 +777,7 @@ void SyncStatus::SyncStatusImpl::showProgressExternally(const wxString& progress
             this->SetTitle(progressTextFmt);
     }
 
-#ifdef FFS_WIN
+
     using namespace util;
 
     //show progress on Windows 7 taskbar
@@ -816,30 +789,29 @@ void SyncStatus::SyncStatusImpl::showProgressExternally(const wxString& progress
         switch (currentStatus)
         {
             case SyncStatus::SCANNING:
-                taskbar_->setStatus(TaskbarProgress::STATUS_INDETERMINATE);
+                taskbar_->setStatus(Taskbar::STATUS_INDETERMINATE);
                 break;
             case SyncStatus::FINISHED_WITH_SUCCESS:
             case SyncStatus::COMPARING_CONTENT:
             case SyncStatus::SYNCHRONIZING:
-                taskbar_->setStatus(TaskbarProgress::STATUS_NORMAL);
+                taskbar_->setStatus(Taskbar::STATUS_NORMAL);
                 taskbar_->setProgress(current, total);
                 break;
             case SyncStatus::PAUSE:
-                taskbar_->setStatus(TaskbarProgress::STATUS_PAUSED);
+                taskbar_->setStatus(Taskbar::STATUS_PAUSED);
                 taskbar_->setProgress(current, total);
                 break;
             case SyncStatus::ABORTED:
             case SyncStatus::FINISHED_WITH_ERROR:
-                taskbar_->setStatus(TaskbarProgress::STATUS_ERROR);
+                taskbar_->setStatus(Taskbar::STATUS_ERROR);
                 taskbar_->setProgress(current, total);
                 break;
         }
     }
-#endif
 }
 
 
-void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
+void SyncStatus::SyncStatusImpl::updateStatusDialogNow(bool allowYield)
 {
     //static RetrieveStatistics statistic;
     //statistic.writeEntry(currentData.ToDouble(), currentObjects);
@@ -940,27 +912,29 @@ void SyncStatus::SyncStatusImpl::updateStatusDialogNow()
         }
     }
 
-
-    //support for pause button
-    if(processPaused)
+    if (allowYield)
     {
-        if (statistics.get()) statistics->pauseTimer();
-
-        while (processPaused && currentProcessIsRunning())
+        //support for pause button
+        if(processPaused)
         {
-            wxMilliSleep(UI_UPDATE_INTERVAL);
-            updateUiNow();
+            if (statistics.get()) statistics->pauseTimer();
+
+            while (processPaused && currentProcessIsRunning())
+            {
+                wxMilliSleep(UI_UPDATE_INTERVAL);
+                updateUiNow();
+            }
+
+            if (statistics.get()) statistics->resumeTimer();
         }
 
-        if (statistics.get()) statistics->resumeTimer();
+        /*
+            /|\
+             |   keep this order to ensure one full statistics update before entering pause mode
+            \|/
+        */
+        updateUiNow();
     }
-
-    /*
-        /|\
-         |   keep this order to ensure one full statistics update before entering pause mode
-        \|/
-    */
-    updateUiNow();
 }
 
 
@@ -1057,7 +1031,7 @@ void SyncStatus::SyncStatusImpl::processHasFinished(SyncStatus::SyncStatusID id,
         m_staticTextDataProcessed->SetLabel(zen::formatFilesizeToShortString(to<zen::UInt64>(currentData)));
     }
 
-    updateStatusDialogNow(); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
+    updateStatusDialogNow(false); //keep this sequence to avoid display distortion, if e.g. only 1 item is sync'ed
 
     //hide progress text control and show log control instead
     m_textCtrlInfo->Hide();
@@ -1140,17 +1114,51 @@ void SyncStatus::SyncStatusImpl::OnIconize(wxIconizeEvent& event)
 {
     if (event.IsIconized()) //ATTENTION: iconize event is also triggered on "Restore"! (at least under Linux)
         minimizeToTray();
+    else
+        resumeFromSystray(); //may be initiated by "show desktop" although all windows are hidden!
+}
+
+
+void SyncStatus::SyncStatusImpl::OnResumeFromTray(wxCommandEvent& event)
+{
+    resumeFromSystray();
 }
 
 
 void SyncStatus::SyncStatusImpl::minimizeToTray()
 {
-    minimizedToSysTray.reset(new MinimizeToTray(this, mainDialog));
-    minimizedToSysTray->setToolTip(progressTextLast, progressPercentLast); //set tooltip: in pause mode there is no statistics update, so this is the only chance
+    if (!trayIcon.get())
+    {
+        trayIcon.reset(new FfsTrayIcon);
+        trayIcon->Connect(FFS_REQUEST_RESUME_TRAY_EVENT, wxCommandEventHandler(SyncStatus::SyncStatusImpl::OnResumeFromTray), NULL, this);
+        //tray icon has shorter lifetime than this => no need to disconnect event later
+    }
+
+    updateStatusDialogNow(false); //set tooltip: in pause mode there is no statistics update, so this is the only chance
+
+    Hide();
+    if (mainDialog)
+        mainDialog->Hide();
 }
 
 
 void SyncStatus::SyncStatusImpl::resumeFromSystray()
 {
-    minimizedToSysTray.reset();
+    trayIcon.reset();
+
+    if (mainDialog)
+    {
+        if (mainDialog->IsIconized()) //caveat: if window is maximized calling Iconize(false) will erroneously un-maximize!
+            mainDialog->Iconize(false);
+        mainDialog->Show();
+        mainDialog->Raise();
+    }
+
+    if (IsIconized()) //caveat: if window is maximized calling Iconize(false) will erroneously un-maximize!
+        Iconize(false);
+    Show();
+    Raise();
+    SetFocus();
+
+    updateStatusDialogNow(false); //restore Windows 7 task bar status (e.g. required in pause mode)
 }

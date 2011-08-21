@@ -7,6 +7,8 @@
 	<plural definition>n == 1 ? 0 : 1</plural definition>
 </header>
 
+<source>Searching for directory %x...</source>
+<target></target>
 <source>Show in Explorer</source>
 <target>Toon in de verkenner</target>
 <source>Open with default application</source>
@@ -17,8 +19,8 @@
 <target>RealtimeSync - Geautomatiseerde Synchronisatie</target>
 <source>Browse</source>
 <target>Verkennen</target>
-<source>Invalid commandline: "%x"</source>
-<target>Ongeldige invoer: "%x"</target>
+<source>Invalid commandline: %x</source>
+<target>Ongeldige invoer: %x</target>
 <source>Error resolving symbolic link:</source>
 <target>Fout tijdens opzoeken van symbolische koppeling:</target>
 <source>Show popup</source>
@@ -109,10 +111,10 @@
 <target>Initiële  synchronisatie:</target>
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Eén van de FreeFileSync database bestanden bestaat nog niet:</target>
-<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
-<target>Eén van de FreeFileSync database ingangen van het volgende bestand bestaat nog niet:</target>
 <source>Error reading from synchronization database:</source>
 <target>Fout tijdens uitlezen van synchronisatie-database:</target>
+<source>Database files do not share a common synchronization session:</source>
+<target></target>
 <source>An exception occurred!</source>
 <target>Er heeft een uitzondering plaatsgevonden!</target>
 <source>Error deleting file:</source>
@@ -135,6 +137,15 @@
 <target>Info</target>
 <source>Fatal Error</source>
 <target>Fatale fout</target>
+<source>Scanning:</source>
+<target>Doorzoekt:</target>
+<source>Encoding extended time information: %x</source>
+<target>Coderen uitgebreide tijd informatie: %x</target>
+<source>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</source>
+<target></target>
 <source>Invalid FreeFileSync config file!</source>
 <target>Foutief FreeFileSync configuratiebestand!</target>
 <source>File does not exist:</source>
@@ -229,20 +240,18 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <target>Observeren actief...</target>
 <source>Waiting for missing directories...</source>
 <target>Wacht op missende mappen...</target>
-<source>Could not initialize directory monitoring:</source>
-<target>Initaliseren van map-observatie niet mogelijk:</target>
 <source>A directory input field is empty.</source>
 <target>Een tekstveld over de map is leeg.</target>
-<source>Error when monitoring directories.</source>
-<target>Fout tijdens observeren van mappen.</target>
 <source>Drag && drop</source>
 <target>Drag en drop</target>
+<source>Could not initialize directory monitoring:</source>
+<target>Initaliseren van map-observatie niet mogelijk:</target>
+<source>Error when monitoring directories.</source>
+<target>Fout tijdens observeren van mappen.</target>
 <source>Conversion error:</source>
 <target>Converteer fout:</target>
 <source>Error moving file:</source>
 <target>Fout tijdens verplaatsen van bestand:</target>
-<source>Operation aborted!</source>
-<target>Bewerking afgebroken!</target>
 <source>Target file already existing!</source>
 <target>Doelbestand bestaat al!</target>
 <source>Error moving directory:</source>
@@ -273,6 +282,8 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <target>Fout tijdens schrijven van bestand:</target>
 <source>Error reading file:</source>
 <target>Fout tijdens lezen van bestand:</target>
+<source>Operation aborted!</source>
+<target>Bewerking afgebroken!</target>
 <source>Endless loop when traversing directory:</source>
 <target>Oneindige lus bij het doorlopen van map:</target>
 <source>Error traversing directory:</source>
@@ -413,24 +424,22 @@ De opdrachtregel wordt telkens uitgevoerd indien:
 <target>Creëer een taakbestand voor geautomatiseerde synchronisatie. Om te starten in taakmodus dubbelklik op het bestand of uitvoeren via opdrachtregel: FreeFileSync.exe <takenbestand>. Dit kan ook gepland worden met de taakplanner van uw OS.</target>
 <source>Help</source>
 <target>Help</target>
-<source>Configuration overview:</source>
-<target>Configuratie overzicht:</target>
 <source>Filter files</source>
 <target>Filter bestanden</target>
-<source>Status feedback</source>
-<target>Status terugkoppeling</target>
-<source>Silent mode</source>
-<target>Stille modus</target>
-<source>Start minimized and write status information to a logfile</source>
-<target>Start geminimaliseerd en schrijf status informatie naar een logbestand</target>
 <source>Error handling</source>
 <target>Fout afhandeling</target>
 <source>Overview</source>
 <target>Overzicht</target>
-<source>Select logfile directory:</source>
-<target>Selecteer een map voor het logbestand:</target>
+<source>Status feedback</source>
+<target>Status terugkoppeling</target>
+<source>Run minimized</source>
+<target></target>
 <source>Maximum number of logfiles:</source>
 <target>Maximale aantal van logbestanden:</target>
+<source>Select logfile directory:</source>
+<target>Selecteer een map voor het logbestand:</target>
+<source>Batch settings</source>
+<target></target>
 <source>&Save</source>
 <target>&Opslaan</target>
 <source>&Load</source>
@@ -694,11 +703,7 @@ Zet bestand en map permissies over
 <source>Folder pairs</source>
 <target>Map paren</target>
 <source>Select view</source>
-<target>Kies kijk</target>
-<source>Folder Comparison and Synchronization</source>
-<target>Mappen vergelijken en synchroniseren</target>
-<source>Recycle Bin not yet supported for this system!</source>
-<target>Prullenbak is op dit systeem nog niet ondersteund!</target>
+<target>Kies weergave</target>
 <source>Set direction:</source>
 <target>Stel richting in:</target>
 <source>Exclude temporarily</source>
@@ -733,6 +738,8 @@ Zet bestand en map permissies over
 <target>Veranderingen opslaan in de huidige configuratie?</target>
 <source>Configuration loaded!</source>
 <target>Configuratie geladen!</target>
+<source>Folder Comparison and Synchronization</source>
+<target>Mappen vergelijken en synchroniseren</target>
 <source>Hide files that exist on left side only</source>
 <target>Verberg bestanden die alleen aan de linkerzijde bestaan</target>
 <source>Show files that exist on left side only</source>
@@ -941,10 +948,6 @@ Zet bestand en map permissies over
 <target>Stel standaard synchronisatie richtingen in: Oude bestanden worden door nieuwere bestanden overschreven.</target>
 <source>The file does not contain a valid configuration:</source>
 <target>Het bestand bevat geen geldige configuratie:</target>
-<source>Scanning:</source>
-<target>Doorzoekt:</target>
-<source>Encoding extended time information: %x</source>
-<target>Coderen uitgebreide tijd informatie: %x</target>
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Je kan deze error negeren als de map leeg is.</target>
 <source>Directory does not exist:</source>
@@ -1021,8 +1024,6 @@ Zet bestand en map permissies over
 <target>Attributen bijwerken van %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>Bronmap bestaat niet meer:</target>
-<source>Generating database...</source>
-<target>Genereren van database...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Volgens de configuratie hoeft er niets gesynchroniseerd te worden!</target>
 <source>Target directory name must not be empty!</source>
@@ -1043,10 +1044,14 @@ Zet bestand en map permissies over
 <target>Vrije ruimte op harde schrijf nodig:</target>
 <source>Free disk space available:</source>
 <target>Beschikbare vrije schijfruimte :</target>
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target></target>
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>Een map wordt bewerkt die deel is van meerdere mappen! Controleer de synchronisatie instellingen!</target>
 <source>Processing folder pair:</source>
 <target>Verwerking van gekoppelde mappen:</target>
+<source>Generating database...</source>
+<target>Genereren van database...</target>
 <source>Error copying locked file %x!</source>
 <target>Fout tijdens kopiëren van vergrendeld bestand %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

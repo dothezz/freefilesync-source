@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "file_id.h"
 
 #ifdef FFS_WIN
@@ -18,8 +18,7 @@
 
 namespace
 {
-template <class T>
-inline
+template <class T> inline
 std::string numberToBytes(T number)
 {
     const char* rawBegin = reinterpret_cast<const char*>(&number);

@@ -3,20 +3,20 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #ifndef EXECUTE_HEADER_23482134578134134
 #define EXECUTE_HEADER_23482134578134134
 
-#include <wx/string.h>
 #include <wx/msgdlg.h>
 
 #ifdef FFS_WIN
-#include "string_tools.h"
 #include "last_error.h"
+#include "string_tools.h"
 #include "i18n.h"
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 
 #elif defined FFS_LINUX
+#include <stdlib.h>
 #include <wx/utils.h>
 #endif
 
@@ -69,7 +69,7 @@ void shellExecute(const wxString& command, ExecutionType type = EXEC_TYPE_ASYNC)
 
     if (!::ShellExecuteEx(&execInfo)) //__inout  LPSHELLEXECUTEINFO lpExecInfo
     {
-        wxString errorMsg = _("Invalid commandline: \"%x\"");
+        wxString errorMsg = _("Invalid commandline: %x");
         wxString cmdFmt = wxString(L"\nFile: ") + filename + L"\nArg: " + arguments;
 
         errorMsg.Replace(L"%x", cmdFmt);
@@ -87,10 +87,26 @@ void shellExecute(const wxString& command, ExecutionType type = EXEC_TYPE_ASYNC)
     }
 
 #elif defined FFS_LINUX
-    //by default wxExecute uses a zero sized dummy window as a hack to keep focus which leaves a useless empty icon in ALT-TAB list
-    //=> use wxEXEC_NODISABLE and roll our own window disabler!                   (see comment in  app.cpp: void *wxGUIAppTraits::BeforeChildWaitLoop())
-    wxWindowDisabler dummy; //disables all top level windows
-    wxExecute(command, (type == EXEC_TYPE_ASYNC ? wxEXEC_ASYNC : wxEXEC_SYNC) | wxEXEC_NODISABLE);
+    if (type == EXEC_TYPE_SYNC)
+    {
+        int rv = ::system(utf8CvrtTo<std::string>(command).c_str()); //do NOT use std::system as its documentation says nothing about "WEXITSTATUS(rv)", ect...
+        if (rv == -1 || WEXITSTATUS(rv) == 127) //http://linux.die.net/man/3/system    "In case /bin/sh could not be executed, the exit status will be that of a command that does exit(127)"
+        {
+            wxString errorMsg = _("Invalid commandline: %x");
+            replace(errorMsg, L"%x", L"\n" + command);
+            wxMessageBox(errorMsg);
+            return;
+        }
+    }
+    else
+    {
+        // ! unfortunately it seems there is no way on Linux to get a failure notification for calling an invalid commandline asynchronously !
+
+        //by default wxExecute uses a zero sized dummy window as a hack to keep focus which leaves a useless empty icon in ALT-TAB list
+        //=> use wxEXEC_NODISABLE and roll our own window disabler!                   (see comment in  app.cpp: void *wxGUIAppTraits::BeforeChildWaitLoop())
+        wxWindowDisabler dummy; //disables all top level windows
+        wxExecute(command, wxEXEC_ASYNC | wxEXEC_NODISABLE);
+    }
 #endif
 }
 }

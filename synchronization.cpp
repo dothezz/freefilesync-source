@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "synchronization.h"
 #include <stdexcept>
 #include <wx/msgdlg.h>
@@ -19,9 +19,10 @@
 #include <wx/file.h>
 #include <boost/bind.hpp>
 #include "shared/global_func.h"
+#include "shared/disable_standby.h"
 #include <memory>
 #include "library/db_file.h"
-#include "shared/disable_standby.h"
+#include "library/dir_exist_async.h"
 #include "library/cmp_filetime.h"
 #include "shared/file_io.h"
 #include <deque>
@@ -49,13 +50,6 @@ void SyncStatistics::init()
 }
 
 
-SyncStatistics::SyncStatistics(const HierarchyObject&  hierObj)
-{
-    init();
-    getNumbersRecursively(hierObj);
-}
-
-
 SyncStatistics::SyncStatistics(const FolderComparison& folderCmp)
 {
     init();
@@ -63,25 +57,10 @@ SyncStatistics::SyncStatistics(const FolderComparison& folderCmp)
 }
 
 
-int SyncStatistics::getConflict() const
+SyncStatistics::SyncStatistics(const HierarchyObject&  hierObj)
 {
-    return conflict;
-}
-
-const SyncStatistics::ConflictTexts& SyncStatistics::getFirstConflicts() const //get first few sync conflicts
-{
-    return firstConflicts;
-}
-
-zen::UInt64 SyncStatistics::getDataToProcess() const
-{
-    return dataToProcess;
-}
-
-
-size_t SyncStatistics::getRowCount() const
-{
-    return rowsTotal;
+    init();
+    getNumbersRecursively(hierObj);
 }
 
 
@@ -443,7 +422,7 @@ DeletionHandling::DeletionHandling(DeletionPolicy handleDel,
     cleanedUp(false)
 {
 #ifdef FFS_WIN
-    if (deletionType == MOVE_TO_RECYCLE_BIN && recycleBinExists(baseDir) != STATUS_REC_EXISTS)
+    if (deletionType == MOVE_TO_RECYCLE_BIN && recycleBinStatus(baseDir) != STATUS_REC_EXISTS)
         deletionType = DELETE_PERMANENTLY; //Windows' ::SHFileOperation() will do this anyway, but we have a better and faster deletion routine (e.g. on networks)
 #endif
 
@@ -476,11 +455,9 @@ DeletionHandling::DeletionHandling(DeletionPolicy handleDel,
 
 DeletionHandling::~DeletionHandling()
 {
-    try //always (try to) clean up, even if synchronization is aborted!
-    {
-        tryCleanup(); //make sure this stays non-blocking!
-    }
-    catch (...) {}
+    //always (try to) clean up, even if synchronization is aborted!
+    try { tryCleanup(); }
+    catch (...) {}   //make sure this stays non-blocking!
 }
 
 
@@ -546,7 +523,7 @@ void DeletionHandling::removeFile(const Zstring& relativeName) const
 
                 try //rename file: no copying!!!
                 {
-                    if (!dirExists(targetDir))
+                    if (!dirExistsUpdating(targetDir, *procCallback_))
                         createDirectory(targetDir); //throw FileError -> may legitimately fail on Linux if permissions are missing
 
                     //performance optimization!! Instead of moving each object into recycle bin separately, we rename them ony by one into a
@@ -567,7 +544,7 @@ void DeletionHandling::removeFile(const Zstring& relativeName) const
                 const Zstring targetFile = sessionDelDir + relativeName; //altDeletionDir ends with path separator
                 const Zstring targetDir  = targetFile.BeforeLast(FILE_NAME_SEPARATOR);
 
-                if (!dirExists(targetDir))
+                if (!dirExistsUpdating(targetDir, *procCallback_))
                     createDirectory(targetDir); //throw (FileError)
 
                 CallbackMoveFileImpl callBack(*procCallback_); //if file needs to be copied we need callback functionality to update screen and offer abort
@@ -592,14 +569,14 @@ void DeletionHandling::removeFolder(const Zstring& relativeName) const
         break;
 
         case MOVE_TO_RECYCLE_BIN:
-            if (dirExists(fullName))
+            if (!dirExistsUpdating(fullName, *procCallback_))
             {
                 const Zstring targetDir      = sessionDelDir + relativeName;
                 const Zstring targetSuperDir = targetDir.BeforeLast(FILE_NAME_SEPARATOR);
 
                 try //rename directory: no copying!!!
                 {
-                    if (!dirExists(targetSuperDir))
+                    if (!dirExistsUpdating(targetSuperDir, *procCallback_))
                         createDirectory(targetSuperDir); //throw FileError -> may legitimately fail on Linux if permissions are missing
 
                     //performance optimization!! Instead of moving each object into recycle bin separately, we rename them ony by one into a
@@ -616,12 +593,12 @@ void DeletionHandling::removeFolder(const Zstring& relativeName) const
             break;
 
         case MOVE_TO_CUSTOM_DIRECTORY:
-            if (dirExists(fullName))
+            if (!dirExistsUpdating(fullName, *procCallback_))
             {
                 const Zstring targetDir      = sessionDelDir + relativeName;
                 const Zstring targetSuperDir = targetDir.BeforeLast(FILE_NAME_SEPARATOR);
 
-                if (!dirExists(targetSuperDir))
+                if (!dirExistsUpdating(targetSuperDir, *procCallback_))
                     createDirectory(targetSuperDir); //throw (FileError)
 
                 CallbackMoveFileImpl callBack(*procCallback_); //if files need to be copied, we need callback functionality to update screen and offer abort
@@ -643,11 +620,11 @@ bool DeletionHandling::deletionFreesSpace() const
         case MOVE_TO_CUSTOM_DIRECTORY:
             switch (zen::onSameVolume(baseDir_, sessionDelDir))
             {
-                case VOLUME_SAME:
+                case IS_SAME_YES:
                     return false;
-                case VOLUME_DIFFERENT:
+                case IS_SAME_NO:
                     return true; //but other volume (sessionDelDir) may become full...
-                case VOLUME_CANT_SAY:
+                case IS_SAME_CANT_SAY:
                     return true; //a rough guess!
             }
     }
@@ -1178,7 +1155,7 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
             procCallback_.reportInfo(utf8CvrtTo<wxString>(statusText));
 
             //some check to catch the error that directory on source has been deleted externally after "compare"...
-            if (!zen::dirExists(dirObj.getFullName<RIGHT_SIDE>()))
+            if (!dirExistsUpdating(dirObj.getFullName<RIGHT_SIDE>(), procCallback_))
                 throw FileError(_("Source directory does not exist anymore:") + "\n\"" + dirObj.getFullName<RIGHT_SIDE>() + "\"");
             createDirectory(target, dirObj.getFullName<RIGHT_SIDE>(), copyFilePermissions_); //no symlink copying!
             break;
@@ -1191,7 +1168,7 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
             procCallback_.reportInfo(utf8CvrtTo<wxString>(statusText));
 
             //some check to catch the error that directory on source has been deleted externally after "compare"...
-            if (!zen::dirExists(dirObj.getFullName<LEFT_SIDE>()))
+            if (!dirExistsUpdating(dirObj.getFullName<LEFT_SIDE>(), procCallback_))
                 throw FileError(_("Source directory does not exist anymore:") + "\n\"" + dirObj.getFullName<LEFT_SIDE>() + "\"");
             createDirectory(target, dirObj.getFullName<LEFT_SIDE>(), copyFilePermissions_); //no symlink copying!
             break;
@@ -1274,11 +1251,11 @@ void SynchronizeFolderPair::synchronizeFolder(DirMapping& dirObj) const
 
 
 //avoid data loss when source directory doesn't (temporarily?) exist anymore AND user chose to ignore errors (else we wouldn't arrive here)
-bool dataLossPossible(const Zstring& dirName, const SyncStatistics& folderPairStat)
+bool dataLossPossible(const Zstring& dirName, const SyncStatistics& folderPairStat, ProcessCallback& procCallback)
 {
     return folderPairStat.getCreate() +  folderPairStat.getOverwrite() + folderPairStat.getConflict() == 0 &&
            folderPairStat.getDelete() > 0 && //deletions only... (respect filtered items!)
-           !dirName.empty() && !zen::dirExists(dirName);
+           !dirName.empty() && !dirExistsUpdating(dirName, procCallback);
 }
 
 
@@ -1485,13 +1462,13 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         }
 
         //avoid data loss when source directory doesn't (temporarily?) exist anymore AND user chose to ignore errors(else we wouldn't arrive here)
-        if (dataLossPossible(j->getBaseDir<LEFT_SIDE>(), statisticsFolderPair))
+        if (dataLossPossible(j->getBaseDir<LEFT_SIDE>(), statisticsFolderPair, procCallback))
         {
             procCallback.reportFatalError(_("Source directory does not exist anymore:") + "\n\"" + j->getBaseDir<LEFT_SIDE>() + "\"");
             skipFolderPair[folderIndex] = true;
             continue;
         }
-        if (dataLossPossible(j->getBaseDir<RIGHT_SIDE>(), statisticsFolderPair))
+        if (dataLossPossible(j->getBaseDir<RIGHT_SIDE>(), statisticsFolderPair, procCallback))
         {
             procCallback.reportFatalError(_("Source directory does not exist anymore:") + "\n\"" + j->getBaseDir<RIGHT_SIDE>() + "\"");
             skipFolderPair[folderIndex] = true;
@@ -1531,13 +1508,13 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
             if (statisticsFolderPair.getOverwrite<LEFT_SIDE>() +
                 statisticsFolderPair.getDelete   <LEFT_SIDE>() > 0 &&
 
-                recycleBinExists(j->getBaseDir<LEFT_SIDE>()) != STATUS_REC_EXISTS)
+                recycleBinStatus(j->getBaseDir<LEFT_SIDE>()) != STATUS_REC_EXISTS)
                 recyclMissing.insert(j->getBaseDir<LEFT_SIDE>());
 
             if (statisticsFolderPair.getOverwrite<RIGHT_SIDE>() +
                 statisticsFolderPair.getDelete   <RIGHT_SIDE>() > 0 &&
 
-                recycleBinExists(j->getBaseDir<RIGHT_SIDE>()) != STATUS_REC_EXISTS)
+                recycleBinStatus(j->getBaseDir<RIGHT_SIDE>()) != STATUS_REC_EXISTS)
                 recyclMissing.insert(j->getBaseDir<RIGHT_SIDE>());
         }
 #endif
@@ -1591,8 +1568,8 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
         for (auto i = diskSpaceMissing.begin(); i != diskSpaceMissing.end(); ++i)
             warningMessage += wxString(wxT("\n\n")) +
                               "\"" + i->first + "\"\n" +
-                              _("Free disk space required:")  + wxT(" ") + formatFilesizeToShortString(to<zen::UInt64>(i->second.first))  + wxT("\n") +
-                              _("Free disk space available:") + wxT(" ") + formatFilesizeToShortString(to<zen::UInt64>(i->second.second));
+                              _("Free disk space required:")  + wxT(" ") + formatFilesizeToShortString(to<UInt64>(i->second.first))  + wxT("\n") +
+                              _("Free disk space available:") + wxT(" ") + formatFilesizeToShortString(to<UInt64>(i->second.second));
 
         procCallback.reportWarning(warningMessage, m_warnings.warningNotEnoughDiskSpace);
     }
@@ -1671,15 +1648,15 @@ void SyncProcess::startSynchronizationProcess(const std::vector<FolderPairSyncCf
 
             //create base directories first (if not yet existing) -> no symlink or attribute copying! -> single error message instead of one per file (e.g. unplugged network drive)
             const Zstring dirnameLeft = j->getBaseDir<LEFT_SIDE>().BeforeLast(FILE_NAME_SEPARATOR);
-            if (!dirnameLeft.empty() && !zen::dirExists(dirnameLeft))
+            if (!dirnameLeft.empty() && !dirExistsUpdating(dirnameLeft, procCallback))
             {
-                if (!tryReportingError(procCallback, boost::bind(zen::createDirectory, boost::cref(dirnameLeft)))) //may throw in error-callback!
+                if (!tryReportingError(procCallback, boost::bind(createDirectory, boost::cref(dirnameLeft)))) //may throw in error-callback!
                     continue; //skip this folder pair
             }
             const Zstring dirnameRight = j->getBaseDir<RIGHT_SIDE>().BeforeLast(FILE_NAME_SEPARATOR);
-            if (!dirnameRight.empty() && !zen::dirExists(dirnameRight))
+            if (!dirnameRight.empty() && !dirExistsUpdating(dirnameRight, procCallback))
             {
-                if (!tryReportingError(procCallback, boost::bind(zen::createDirectory, boost::cref(dirnameRight)))) //may throw in error-callback!
+                if (!tryReportingError(procCallback, boost::bind(createDirectory, boost::cref(dirnameRight)))) //may throw in error-callback!
                     continue; //skip this folder pair
             }
             //------------------------------------------------------------------------------------------
@@ -1778,10 +1755,10 @@ void SynchronizeFolderPair::copyFileUpdating(const Zstring& source, const Zstrin
     {
         WhileCopying<DelTargetCommand> callback(bytesReported, procCallback_, cmd);
 
-        zen::copyFile(source, //type File implicitly means symlinks need to be dereferenced!
-                      target,
-                      copyFilePermissions_,
-                      &callback); //throw (FileError, ErrorFileLocked);
+        copyFile(source, //type File implicitly means symlinks need to be dereferenced!
+                 target,
+                 copyFilePermissions_,
+                 &callback); //throw (FileError, ErrorFileLocked);
 
         //inform about the (remaining) processed amount of data
         procCallback_.updateProcessedData(0, to<Int64>(totalBytesToCpy) - to<Int64>(bytesReported));
@@ -1823,7 +1800,7 @@ void SynchronizeFolderPair::copyFileUpdating(const Zstring& source, const Zstrin
 
         if (!targetDir.empty())
         {
-            zen::createDirectory(targetDir, templateDir, copyFilePermissions_); //throw (FileError)
+            createDirectory(targetDir, templateDir, copyFilePermissions_); //throw (FileError)
             /*symbolic link handling:
             if "not traversing symlinks": fullName == c:\syncdir<symlinks>\some\dirs\leaf<symlink>
             => setting irrelevant
@@ -1869,9 +1846,9 @@ void SynchronizeFolderPair::copySymlink(const Zstring& source, const Zstring& ta
         const Zstring targetDir   = target.BeforeLast(FILE_NAME_SEPARATOR);
         const Zstring templateDir = source.BeforeLast(FILE_NAME_SEPARATOR);
 
-        if (!targetDir.empty() && !zen::dirExists(targetDir))
+        if (!targetDir.empty() && !dirExistsUpdating(targetDir, procCallback_))
         {
-            zen::createDirectory(targetDir, templateDir, copyFilePermissions_); //throw (FileError)
+            createDirectory(targetDir, templateDir, copyFilePermissions_); //throw (FileError)
             /*symbolic link handling:
             if "not traversing symlinks": fullName == c:\syncdir<symlinks>\some\dirs\leaf<symlink>
             => setting irrelevant
@@ -1921,7 +1898,7 @@ void verifyFiles(const Zstring& source, const Zstring& target, VerifyCallback& c
     static std::vector<char> memory2(1024 * 1024);
 
 #ifdef FFS_WIN
-    wxFile file1(zen::applyLongPathPrefix(source).c_str(), wxFile::read); //don't use buffered file input for verification!
+    wxFile file1(applyLongPathPrefix(source).c_str(), wxFile::read); //don't use buffered file input for verification!
 #elif defined FFS_LINUX
     wxFile file1(::open(source.c_str(), O_RDONLY)); //utilize UTF-8 filename
 #endif
@@ -1929,7 +1906,7 @@ void verifyFiles(const Zstring& source, const Zstring& target, VerifyCallback& c
         throw FileError(_("Error opening file:") + " \"" + source + "\"");
 
 #ifdef FFS_WIN
-    wxFile file2(zen::applyLongPathPrefix(target).c_str(), wxFile::read); //don't use buffered file input for verification!
+    wxFile file2(applyLongPathPrefix(target).c_str(), wxFile::read); //don't use buffered file input for verification!
 #elif defined FFS_LINUX
     wxFile file2(::open(target.c_str(), O_RDONLY)); //utilize UTF-8 filename
 #endif

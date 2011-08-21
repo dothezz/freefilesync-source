@@ -28,8 +28,8 @@ Zstring getVolumeName(const Zstring& filename)
     //        volumePath += FILE_NAME_SEPARATOR;
 
     Zstring nameFmt = removeLongPathPrefix(filename); //throw()
-    if (!nameFmt.EndsWith(Zstr("\\")))
-        nameFmt += Zstr("\\"); //GetVolumeInformation expects trailing backslash
+    if (!endsWith(nameFmt, FILE_NAME_SEPARATOR))
+        nameFmt += FILE_NAME_SEPARATOR; //GetVolumeInformation expects trailing backslash
 
     if (nameFmt.StartsWith(Zstr("\\\\"))) //UNC path: "\\ComputerName\SharedFolder\"
     {
@@ -58,8 +58,6 @@ Zstring getVolumeName(const Zstring& filename)
 
 bool dst::isFatDrive(const Zstring& fileName) //throw()
 {
-    using namespace zen;
-
     const size_t BUFFER_SIZE = MAX_PATH + 1;
     wchar_t fsName[BUFFER_SIZE];
 

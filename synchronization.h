@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #ifndef SYNCHRONIZATION_H_INCLUDED
 #define SYNCHRONIZATION_H_INCLUDED
 
@@ -30,13 +30,13 @@ public:
     int getDelete() const;
     template <SelectedSide side> int getDelete() const;
 
-    int getConflict() const;
+    int getConflict() const { return conflict; }
 
     typedef std::vector<std::pair<Zstring, wxString> > ConflictTexts; // Pair(filename/conflict text)
-    const ConflictTexts& getFirstConflicts() const; //get first few sync conflicts
+    const ConflictTexts& getFirstConflicts() const { return firstConflicts; }
 
-    zen::UInt64 getDataToProcess() const;
-    size_t getRowCount() const;
+    zen::UInt64 getDataToProcess() const { return dataToProcess; }
+    size_t      getRowCount()      const { return rowsTotal; }
 
 private:
     void init();

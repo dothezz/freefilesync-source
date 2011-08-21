@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "algorithm.h"
 #include <iterator>
 #include <stdexcept>
@@ -1265,8 +1265,8 @@ private:
 
 void zen::addHardFiltering(BaseDirMapping& baseMap, const Zstring& excludeFilter)
 {
-			ApplyHardFilter<STRATEGY_AND>(*HardFilter::FilterRef(
-                                          new NameFilter(FilterConfig().includeFilter, excludeFilter))).execute(baseMap);
+    ApplyHardFilter<STRATEGY_AND>(*HardFilter::FilterRef(
+                                      new NameFilter(FilterConfig().includeFilter, excludeFilter))).execute(baseMap);
 }
 
 

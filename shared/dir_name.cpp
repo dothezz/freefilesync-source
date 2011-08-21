@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "dir_name.h"
 #include <wx/dnd.h>
 #include <wx/window.h>
@@ -40,7 +40,8 @@ void setDirectoryNameImpl(const wxString& dirname, wxDirPickerCtrl* dirPicker, w
 
     if (dirPicker)
     {
-        if (!dirFormatted.empty() && util::dirExists(toZ(dirFormatted), timeout) == util::EXISTING_TRUE) //potentially slow network access: wait 200ms at most
+        if (!dirFormatted.empty() &&
+            util::dirExists(toZ(dirFormatted), timeout) == util::EXISTING_TRUE) //potentially slow network access: wait 200ms at most
             dirPicker->SetPath(dirFormatted);
     }
 }

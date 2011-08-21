@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #ifndef MAINDIALOG_H
 #define MAINDIALOG_H
 
@@ -254,27 +254,27 @@ private:
     xmlAccess::XmlGlobalSettings* globalSettings; //always bound
 
     //UI view of FolderComparison structure
-    std::auto_ptr<zen::GridView> gridDataView;
+    std::unique_ptr<zen::GridView> gridDataView;
 
     //-------------------------------------
     //functional configuration
     xmlAccess::XmlGuiConfig currentCfg;
 
     //folder pairs:
-    std::auto_ptr<DirectoryPairFirst> firstFolderPair; //always bound!!!
+    std::unique_ptr<DirectoryPairFirst> firstFolderPair; //always bound!!!
     std::vector<DirectoryPair*> additionalFolderPairs; //additional pairs to the first pair
     //-------------------------------------
 
 
     //***********************************************
-    std::auto_ptr<wxMenu> contextMenu;
+    std::unique_ptr<wxMenu> contextMenu;
 
     //status information
     wxLongLong lastStatusChange;
     std::stack<wxString> stackObjects;
 
     //compare status panel (hidden on start, shown when comparing)
-    std::auto_ptr<CompareStatus> compareStatus; //always bound
+    std::unique_ptr<CompareStatus> compareStatus; //always bound
 
     bool cleanedUp;
 
@@ -283,7 +283,7 @@ private:
     const wxGrid* lastSortGrid;
 
     //update icons periodically: one updater instance for both left and right grids
-    std::auto_ptr<IconUpdater> updateFileIcons;
+    std::unique_ptr<IconUpdater> updateFileIcons;
 
     bool processingGlobalKeyEvent; //indicator to notify recursion in OnGlobalKeyEvent()
 
@@ -304,7 +304,7 @@ private:
         bool syncPreviewEnabled; //toggle to display configuration preview instead of comparison result
         bool synchronizationEnabled; //determines whether synchronization should be allowed
     };
-    std::auto_ptr<SyncPreview> syncPreview; //always bound
+    std::unique_ptr<SyncPreview> syncPreview; //always bound
 
     wxAuiManager auiMgr; //implement dockable GUI design
 

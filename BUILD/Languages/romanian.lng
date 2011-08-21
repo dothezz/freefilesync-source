@@ -7,6 +7,8 @@
 	<plural definition>n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2</plural definition>
 </header>
 
+<source>Searching for directory %x...</source>
+<target></target>
 <source>Show in Explorer</source>
 <target>Arată în Explorator</target>
 <source>Open with default application</source>
@@ -17,8 +19,8 @@
 <target>RealtimeSync - Sincronizare Inteligentă</target>
 <source>Browse</source>
 <target>Explorează</target>
-<source>Invalid commandline: "%x"</source>
-<target>Linie de comandă nevalidă: "%x"</target>
+<source>Invalid commandline: %x</source>
+<target>Linie de comandă nevalidă: %x</target>
 <source>Error resolving symbolic link:</source>
 <target>Eroare la rezolvarea legăturii simbolice:</target>
 <source>Show popup</source>
@@ -110,10 +112,10 @@
 <target>Sincronizare inițială:</target>
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>Una dintre părți nu are o filă de tip bază de date FreeFileSync:</target>
-<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
-<target>Una dintre intrările în baza de date FreeFileSync din fila următoare nu există:</target>
 <source>Error reading from synchronization database:</source>
 <target>Eroare la citirea din baza de date a sincronizării:</target>
+<source>Database files do not share a common synchronization session:</source>
+<target></target>
 <source>An exception occurred!</source>
 <target>A apărut o excepție !</target>
 <source>Error deleting file:</source>
@@ -137,6 +139,15 @@
 <target>Informații</target>
 <source>Fatal Error</source>
 <target>Eroare Fatală</target>
+<source>Scanning:</source>
+<target>Scanez:</target>
+<source>Encoding extended time information: %x</source>
+<target>Codarea informațiilor timpului extins: %x</target>
+<source>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</source>
+<target></target>
 <source>Invalid FreeFileSync config file!</source>
 <target>Filă de configurare FreeFileSync nevalidă!</target>
 <source>File does not exist:</source>
@@ -234,20 +245,18 @@ Linia de comandă este executată de fiecare dată cînd:
 <target>Monitorizare activă...</target>
 <source>Waiting for missing directories...</source>
 <target>Aștept ca dosarele lipsă să devină disponibile...</target>
-<source>Could not initialize directory monitoring:</source>
-<target>Nu pot inițializa monitorizarea dosarelor:</target>
 <source>A directory input field is empty.</source>
 <target>Cel puțin unul din dosarele de comparat este nespecificat.</target>
-<source>Error when monitoring directories.</source>
-<target>Eroare la monitorizarea dosarelor.</target>
 <source>Drag && drop</source>
 <target>Trage un dosar peste compartimentul de mai jos sau folosește butonul Explorează</target>
+<source>Could not initialize directory monitoring:</source>
+<target>Nu pot inițializa monitorizarea dosarelor:</target>
+<source>Error when monitoring directories.</source>
+<target>Eroare la monitorizarea dosarelor.</target>
 <source>Conversion error:</source>
 <target>Eroare de convertire:</target>
 <source>Error moving file:</source>
 <target>Eroare la mutarea filei:</target>
-<source>Operation aborted!</source>
-<target>Operație abandonată!</target>
 <source>Target file already existing!</source>
 <target>Fila țintă există deja!</target>
 <source>Error moving directory:</source>
@@ -278,6 +287,8 @@ Linia de comandă este executată de fiecare dată cînd:
 <target>Eroare la scrierea filei:</target>
 <source>Error reading file:</source>
 <target>Eroare la citirea filei:</target>
+<source>Operation aborted!</source>
+<target>Operație abandonată!</target>
 <source>Endless loop when traversing directory:</source>
 <target>Buclă infinită la parcurgerea dosarului:</target>
 <source>Error traversing directory:</source>
@@ -418,24 +429,22 @@ Linia de comandă este executată de fiecare dată cînd:
 <target>Poți crea o filă ce include un set de comenzi [batch file], în scopul folosirii ei la sincronizarea inteligentă. Pentru a porni în modul set, dublu-clichează fila sau execut-o folosind linia de comandă: FreeFileSync.exe <filaset>. Această operație poate fi programată în planificatorul de sarcini al sistemului de operare [task scheduler].</target>
 <source>Help</source>
 <target>Ajutor</target>
-<source>Configuration overview:</source>
-<target>Panorama Configurației:</target>
 <source>Filter files</source>
 <target>Filtru de File</target>
-<source>Status feedback</source>
-<target>Afișarea Stării</target>
-<source>Silent mode</source>
-<target>Mod silențios</target>
-<source>Start minimized and write status information to a logfile</source>
-<target>Pornește minimizat și scrie informațiile de stare într-un jurnal</target>
 <source>Error handling</source>
 <target>Gestionarea Erorilor</target>
 <source>Overview</source>
 <target>Panoramă</target>
-<source>Select logfile directory:</source>
-<target>Selectează un dosar pentru fila .log:</target>
+<source>Status feedback</source>
+<target>Afișarea Stării</target>
+<source>Run minimized</source>
+<target></target>
 <source>Maximum number of logfiles:</source>
 <target>Numărul maxim de file jurnal:</target>
+<source>Select logfile directory:</source>
+<target>Selectează un dosar pentru fila .log:</target>
+<source>Batch settings</source>
+<target></target>
 <source>&Save</source>
 <target>&Salvează</target>
 <source>&Load</source>
@@ -700,10 +709,6 @@ Transferă permisiunile filelor și dosarelor
 <target>Perechi de Dosare</target>
 <source>Select view</source>
 <target>Selectează Vederea</target>
-<source>Folder Comparison and Synchronization</source>
-<target>Comparare și Sincronizare de Dosare</target>
-<source>Recycle Bin not yet supported for this system!</source>
-<target>Reciclatorul nu este încă suportat pentru acest sistem de operare!</target>
 <source>Set direction:</source>
 <target>Setează Acțiunea ca în Icoana Alăturată:</target>
 <source>Exclude temporarily</source>
@@ -738,6 +743,8 @@ Transferă permisiunile filelor și dosarelor
 <target>Vrei să salvezi modificările configurației curente?</target>
 <source>Configuration loaded!</source>
 <target>Configurație încărcată !</target>
+<source>Folder Comparison and Synchronization</source>
+<target>Comparare și Sincronizare de Dosare</target>
 <source>Hide files that exist on left side only</source>
 <target>Ascunde filele care există doar în stînga</target>
 <source>Show files that exist on left side only</source>
@@ -952,10 +959,6 @@ Transferă permisiunile filelor și dosarelor
 <target>Baza de date existentă va fi făcută compatibilă cu versiunea softului și apoi va fi setat sensul implicit de sincronizare: Filele vechi vor fi suprascrise de cele noi.</target>
 <source>The file does not contain a valid configuration:</source>
 <target>Fila nu conține o configurație validă:</target>
-<source>Scanning:</source>
-<target>Scanez:</target>
-<source>Encoding extended time information: %x</source>
-<target>Codarea informațiilor timpului extins: %x</target>
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Poți ignora această eroare dacă vrei ca dosarul să fie considerat gol.</target>
 <source>Directory does not exist:</source>
@@ -1032,8 +1035,6 @@ Transferă permisiunile filelor și dosarelor
 <target>Actualizez atributele lui %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>Dosarul sursă nu mai există:</target>
-<source>Generating database...</source>
-<target>Generez baza de date...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Nu este nimic de sincronizat conform configurației!</target>
 <source>Target directory name must not be empty!</source>
@@ -1054,10 +1055,14 @@ Transferă permisiunile filelor și dosarelor
 <target>Spațiu liber necesar:</target>
 <source>Free disk space available:</source>
 <target>Spațiu liber disponibil:</target>
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target></target>
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>Va fi modificat un dosar care face parte din mai multe perechi de dosare! Reverifică setările de sincronizare!</target>
 <source>Processing folder pair:</source>
 <target>Procesez perechea de dosare:</target>
+<source>Generating database...</source>
+<target>Generez baza de date...</target>
 <source>Error copying locked file %x!</source>
 <target>Eroare la copierea filei zăvorîte %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

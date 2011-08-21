@@ -3,9 +3,9 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "process_xml.h"
-#include <zenxml/zenxml.h>
+#include <zenXml/zenxml.h>
 #include "../shared/i18n.h"
 #include "../shared/global_func.h"
 #include "../shared/standard_paths.h"
@@ -42,10 +42,10 @@ XmlType xmlAccess::getXmlType(const wxString& filename) //throw()
     XmlDoc doc;
     try
     {
-        std::string stream = loadStream(filename); //throw XmlFileError
-        parse(stream, doc);                    //throw XmlParsingError
+        //do NOT use zen::loadStream as it will superfluously load even huge files!
+        loadXmlDocument(filename, doc); //throw FfsXmlError, quick exit if file is not an FFS XML
     }
-    catch (const zen::XmlError&) //catch XmlFileError, XmlParsingError
+    catch (const FfsXmlError&)
     {
         return XML_TYPE_OTHER;
     }

@@ -7,6 +7,8 @@
 	<plural definition>n == 1 ? 0 : 1</plural definition>
 </header>
 
+<source>Searching for directory %x...</source>
+<target></target>
 <source>Show in Explorer</source>
 <target>Visa i Utforskaren</target>
 <source>Open with default application</source>
@@ -17,8 +19,8 @@
 <target>RealtimeSync - Automatiserad synkronisering</target>
 <source>Browse</source>
 <target>Bläddra</target>
-<source>Invalid commandline: "%x"</source>
-<target>Ogiltig kommandorad: "%x"</target>
+<source>Invalid commandline: %x</source>
+<target>Ogiltig kommandorad: %x</target>
 <source>Error resolving symbolic link:</source>
 <target>Kan inte tyda symbolisk länk:</target>
 <source>Show popup</source>
@@ -109,10 +111,10 @@
 <target>Initial synkronisering:</target>
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>En av FreeFileSyncs databasfiler saknas:</target>
-<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
-<target>Ett av FreeFileSyncs databasobjekt saknas i följande fil:</target>
 <source>Error reading from synchronization database:</source>
 <target>Kan inte läsa från databasen:</target>
+<source>Database files do not share a common synchronization session:</source>
+<target></target>
 <source>An exception occurred!</source>
 <target>Ett undantag inträffade!</target>
 <source>Error deleting file:</source>
@@ -135,6 +137,15 @@
 <target>Info</target>
 <source>Fatal Error</source>
 <target>Allvarligt fel</target>
+<source>Scanning:</source>
+<target>Skannar:</target>
+<source>Encoding extended time information: %x</source>
+<target>Kodar utökad tidsinformation: %x</target>
+<source>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</source>
+<target></target>
 <source>Invalid FreeFileSync config file!</source>
 <target>Felaktig FreeFileSync konfigurationsfil!</target>
 <source>File does not exist:</source>
@@ -229,20 +240,18 @@ Kommandot verkställes när:
 <target>Övervakning aktiverad...</target>
 <source>Waiting for missing directories...</source>
 <target>Väntar på saknade destinationer...</target>
-<source>Could not initialize directory monitoring:</source>
-<target>Kan inte initiera katalogskanner:</target>
 <source>A directory input field is empty.</source>
 <target>Ett katalogfält är tomt</target>
-<source>Error when monitoring directories.</source>
-<target>Fel vid övervakning av kataloger.</target>
 <source>Drag && drop</source>
 <target>Dra && släpp</target>
+<source>Could not initialize directory monitoring:</source>
+<target>Kan inte initiera katalogskanner:</target>
+<source>Error when monitoring directories.</source>
+<target>Fel vid övervakning av kataloger.</target>
 <source>Conversion error:</source>
 <target>Konversionsfel:</target>
 <source>Error moving file:</source>
 <target>Kan inte flytta fil:</target>
-<source>Operation aborted!</source>
-<target>Processen avbruten!</target>
 <source>Target file already existing!</source>
 <target>Filen finns redan!</target>
 <source>Error moving directory:</source>
@@ -273,6 +282,8 @@ Kommandot verkställes när:
 <target>Kan inte skriva fil:</target>
 <source>Error reading file:</source>
 <target>Kan inte läsa fil:</target>
+<source>Operation aborted!</source>
+<target>Processen avbruten!</target>
 <source>Endless loop when traversing directory:</source>
 <target>Oändlig loop vid accessförsök på katalog:</target>
 <source>Error traversing directory:</source>
@@ -413,24 +424,22 @@ Kommandot verkställes när:
 <target>Skapa en batch-fil för automatiserad synkronisering. För att starta i batch-läge, Dubbelklicka på filen eller starta den med kommandoraden: FreeFileSync.exe <batch-fil>. Batch-filen kan också schemaläggas i Windows Schemaläggare.</target>
 <source>Help</source>
 <target>Hjälp</target>
-<source>Configuration overview:</source>
-<target>Översikt:</target>
 <source>Filter files</source>
 <target>Undantag</target>
-<source>Status feedback</source>
-<target>Status</target>
-<source>Silent mode</source>
-<target>Tyst läge</target>
-<source>Start minimized and write status information to a logfile</source>
-<target>Starta minimerad och skriv statusinformation till en loggfil</target>
 <source>Error handling</source>
 <target>Felhantering</target>
 <source>Overview</source>
 <target>Översikt</target>
-<source>Select logfile directory:</source>
-<target>Välj loggfilskatalog:</target>
+<source>Status feedback</source>
+<target>Status</target>
+<source>Run minimized</source>
+<target></target>
 <source>Maximum number of logfiles:</source>
 <target>Max antal loggfiler:</target>
+<source>Select logfile directory:</source>
+<target>Välj loggfilskatalog:</target>
+<source>Batch settings</source>
+<target></target>
 <source>&Save</source>
 <target>&Spara</target>
 <source>&Load</source>
@@ -695,10 +704,6 @@ Transfer file and directory permissions
 <target>Katalogpar</target>
 <source>Select view</source>
 <target>Välj vy</target>
-<source>Folder Comparison and Synchronization</source>
-<target>Katalogjämförelse och synkronisering</target>
-<source>Recycle Bin not yet supported for this system!</source>
-<target>Stödet för papperskorg finns ännu inte i detta system</target>
 <source>Set direction:</source>
 <target>Ange riktning:</target>
 <source>Exclude temporarily</source>
@@ -733,6 +738,8 @@ Transfer file and directory permissions
 <target>Vill du spara ändringarna i aktuella inställningar?</target>
 <source>Configuration loaded!</source>
 <target>Inställningar inlästa!</target>
+<source>Folder Comparison and Synchronization</source>
+<target>Katalogjämförelse och synkronisering</target>
 <source>Hide files that exist on left side only</source>
 <target>Visa inte filer som endast finns till vänster</target>
 <source>Show files that exist on left side only</source>
@@ -941,10 +948,6 @@ Transfer file and directory permissions
 <target>Standardsynkronisering: Gamla filer kommer att skrivas över av nyare versioner.</target>
 <source>The file does not contain a valid configuration:</source>
 <target>Filen är ingen giltig konfigureringsfil:</target>
-<source>Scanning:</source>
-<target>Skannar:</target>
-<source>Encoding extended time information: %x</source>
-<target>Kodar utökad tidsinformation: %x</target>
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Du kan bortse från det här felet och utgå ifrån att katalogen är tom</target>
 <source>Directory does not exist:</source>
@@ -1021,8 +1024,6 @@ Transfer file and directory permissions
 <target>Uppdaterar attribut för %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>Källkatalogen finns inte längre:</target>
-<source>Generating database...</source>
-<target>Skapar databas...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Inget att synkronisera enligt aktuella inställningar!</target>
 <source>Target directory name must not be empty!</source>
@@ -1043,10 +1044,14 @@ Transfer file and directory permissions
 <target>Krav på ledigt diskutrymme:</target>
 <source>Free disk space available:</source>
 <target>Ledigt diskutrymme:</target>
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target></target>
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>En katalog som är en del av flera katalogpar kommer att ändras! Kontrollera synkroniseringsinställningarna</target>
 <source>Processing folder pair:</source>
 <target>Processar katalogpar:</target>
+<source>Generating database...</source>
+<target>Skapar databas...</target>
 <source>Error copying locked file %x!</source>
 <target>Kan inte kopiera låst fil %x!</target>
 <source>Data verification error: Source and target file have different content!</source>

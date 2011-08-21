@@ -3,13 +3,15 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "recycler.h"
 #include <stdexcept>
 #include <iterator>
 #include "i18n.h"
+#include "file_handling.h"
 
 #ifdef FFS_WIN
+#include <boost/thread/once.hpp>
 #include "dll_loader.h"
 #include <wx/msw/wrapwin.h> //includes "windows.h"
 #include "build_info.h"
@@ -45,7 +47,6 @@ std::wstring getRecyclerDllName()
 bool vistaOrLater()
 {
     OSVERSIONINFO osvi = {};
-    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
     osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
     //IFileOperation is supported with Vista and later
@@ -72,12 +73,12 @@ Nevertheless, let's use IFileOperation for better error reporting!
 
 void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (FileError)
 {
-    using zen::FileError;
-
     if (filesToDelete.empty())
         return;
 
-    static const bool useIFileOperation = vistaOrLater();
+    static bool useIFileOperation = false;
+    static boost::once_flag once = BOOST_ONCE_INIT; //caveat: function scope static initialization is not thread-safe in VS 2010!
+    boost::call_once(once, []() { useIFileOperation = vistaOrLater(); });
 
     if (useIFileOperation) //new recycle bin usage: available since Vista
     {
@@ -86,14 +87,8 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
                        std::back_inserter(fileNames), std::mem_fun_ref(&Zstring::c_str));
 
         using namespace fileop;
-
-        static MoveToRecycleBinFct moveToRecycler = NULL;
-        if (!moveToRecycler)
-            moveToRecycler = util::getDllFun<MoveToRecycleBinFct>(getRecyclerDllName(), moveToRecycleBinFctName);
-
-        static GetLastErrorFct getLastError = NULL;
-        if (!getLastError)
-            getLastError = util::getDllFun<GetLastErrorFct>(getRecyclerDllName(), getLastErrorFctName);
+        MoveToRecycleBinFct moveToRecycler = util::getDllFun<MoveToRecycleBinFct>(getRecyclerDllName(), moveToRecycleBinFctName);
+        GetLastErrorFct     getLastError   = util::getDllFun<GetLastErrorFct>    (getRecyclerDllName(), getLastErrorFctName);
 
         if (moveToRecycler == NULL || getLastError == NULL)
             throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + fileNames[0] + "\"" + //report first file only... better than nothing
@@ -122,7 +117,7 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
             //filenameDoubleNull += removeLongPathPrefix(*i); //::SHFileOperation() can't handle \\?\-prefix!
             //You should use fully-qualified path names with this function. Using it with relative path names is not thread safe.
             filenameDoubleNull += *i; //::SHFileOperation() can't handle \\?\-prefix!
-            filenameDoubleNull += Zchar(0);
+            filenameDoubleNull += L'\0';
         }
 
         SHFILEOPSTRUCT fileOp = {};
@@ -137,7 +132,7 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
 
         if (::SHFileOperation(&fileOp) != 0 || fileOp.fAnyOperationsAborted)
         {
-            throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + filenameDoubleNull.c_str() + "\""); //report first file only... better than nothing
+            throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + filenameDoubleNull + "\""); //report first file only... better than nothing
         }
     }
 }
@@ -145,41 +140,48 @@ void moveToWindowsRecycler(const std::vector<Zstring>& filesToDelete)  //throw (
 }
 
 
-bool zen::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileError)
+bool zen::moveToRecycleBin(const Zstring& filename)  //throw (FileError)
 {
-#ifdef FFS_WIN
-    const Zstring filenameFmt = applyLongPathPrefix(fileToDelete);
-
-    const DWORD attr = ::GetFileAttributes(filenameFmt.c_str());
-    if (attr == INVALID_FILE_ATTRIBUTES)
+    if (!somethingExists(filename))
         return false; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
-    //::SetFileAttributes(filenameFmt.c_str(), FILE_ATTRIBUTE_NORMAL);
 
-    //both SHFileOperation and useIFileOperation are not able to delete a folder named "System Volume Information" with normal attributes but shamelessly report success
+#ifdef FFS_WIN
+    //::SetFileAttributes(applyLongPathPrefix(filename).c_str(), FILE_ATTRIBUTE_NORMAL);
+    //both SHFileOperation and IFileOperation are not able to delete a folder named "System Volume Information" with normal attributes but shamelessly report success
 
     std::vector<Zstring> fileNames;
-    fileNames.push_back(fileToDelete);
+    fileNames.push_back(filename);
     ::moveToWindowsRecycler(fileNames);  //throw (FileError)
 
 #elif defined FFS_LINUX
-    struct stat fileInfo = {};
-    if (::lstat(fileToDelete.c_str(), &fileInfo) != 0)
-        return false; //neither file nor any other object with that name existing: no error situation, manual deletion relies on it!
-
-    Glib::RefPtr<Gio::File> fileObj = Gio::File::create_for_path(fileToDelete.c_str()); //never fails
+    Glib::RefPtr<Gio::File> fileObj = Gio::File::create_for_path(filename.c_str()); //never fails
     try
     {
         if (!fileObj->trash())
-            throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + fileToDelete + "\"" +
+            throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + filename + "\"" +
                             "\n\n" + "(unknown error)");
     }
     catch (const Glib::Error& errorObj)
     {
-        //assemble error message
-        const std::wstring errorMessage = L"Glib Error Code " + toString<std::wstring>(errorObj.code()) + ", " +
-                                          g_quark_to_string(errorObj.domain()) + ": " + errorObj.what();
+        //implement same behavior as in Windows: if recycler is not existing, delete permanently
+        if (errorObj.code() == G_IO_ERROR_NOT_SUPPORTED)
+        {
+            struct stat fileInfo = {};
+            if (::lstat(filename.c_str(), &fileInfo) != 0)
+                return false;
 
-        throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + fileToDelete + "\"" +
+            if (S_ISLNK(fileInfo.st_mode) || S_ISREG(fileInfo.st_mode))
+                removeFile(filename); //throw FileError
+            else if (S_ISDIR(fileInfo.st_mode))
+                removeDirectory(filename); //throw FileError
+            return true;
+        }
+
+        //assemble error message
+        const std::wstring errorMessage = L"Glib Error Code " + toString<std::wstring>(errorObj.code()) + /* ", " +
+                                          g_quark_to_string(errorObj.domain()) + */ ": " + errorObj.what();
+
+        throw FileError(_("Error moving to Recycle Bin:") + "\n\"" + filename + "\"" +
                         "\n\n" + "(" + errorMessage + ")");
     }
 #endif
@@ -188,15 +190,15 @@ bool zen::moveToRecycleBin(const Zstring& fileToDelete)  //throw (FileError)
 
 
 #ifdef FFS_WIN
-zen::StatusRecycler zen::recycleBinExists(const Zstring& pathName)
+zen::StatusRecycler zen::recycleBinStatus(const Zstring& pathName)
 {
     std::vector<wchar_t> buffer(MAX_PATH + 1);
     if (::GetVolumePathName(applyLongPathPrefix(pathName).c_str(), //__in   LPCTSTR lpszFileName,
                             &buffer[0],                            //__out  LPTSTR lpszVolumePathName,
                             static_cast<DWORD>(buffer.size())))    //__in   DWORD cchBufferLength
     {
-        Zstring rootPath =&buffer[0];
-        if (!rootPath.EndsWith(FILE_NAME_SEPARATOR)) //a trailing backslash is required
+        Zstring rootPath = &buffer[0];
+        if (!endsWith(rootPath, FILE_NAME_SEPARATOR)) //a trailing backslash is required
             rootPath += FILE_NAME_SEPARATOR;
 
         SHQUERYRBINFO recInfo = {};
@@ -207,4 +209,22 @@ zen::StatusRecycler zen::recycleBinExists(const Zstring& pathName)
     }
     return STATUS_REC_UNKNOWN;
 }
+#elif defined FFS_LINUX
+/*
+We really need access to a similar function to check whether a directory supports trashing and emit a warning if it does not!
+
+The following function looks perfect, alas it is restricted to local files and to the implementation of GIO only:
+
+    gboolean _g_local_file_has_trash_dir(const char* dirname, dev_t dir_dev);
+    See: http://www.netmite.com/android/mydroid/2.0/external/bluetooth/glib/gio/glocalfileinfo.h
+
+    Just checking for "G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH" is not correct, since we find in
+    http://www.netmite.com/android/mydroid/2.0/external/bluetooth/glib/gio/glocalfileinfo.c
+
+            g_file_info_set_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH,
+                                           writable && parent_info->has_trash_dir);
+
+    => We're NOT interested in whether the specified folder can be trashed, but whether it supports thrashing its child elements! (Only support, not actual write access!)
+    This renders G_FILE_ATTRIBUTE_ACCESS_CAN_TRASH useless for this purpose.
+*/
 #endif

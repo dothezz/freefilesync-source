@@ -171,7 +171,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 
     fgSizer12->Add( m_bpButtonSyncConfig, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 3 );
 
-    m_buttonStartSync = new wxButtonWithImage( m_panelTopButtons, wxID_ANY, _("Synchronize..."), wxDefaultPosition, wxSize( -1,42 ), 0 );
+    m_buttonStartSync = new wxButtonWithImage( m_panelTopButtons, wxID_ANY, _("Synchronize..."), wxDefaultPosition, wxSize( 180,42 ), 0 );
     m_buttonStartSync->SetFont( wxFont( 14, 74, 90, 92, false, wxEmptyString ) );
     m_buttonStartSync->SetToolTip( _("Start synchronization") );
 
@@ -491,7 +491,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 
     fgSizer5->Add( m_bitmapCreate, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
-    m_textCtrlCreate = new wxTextCtrl( m_panelStatistics, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
+    m_textCtrlCreate = new wxTextCtrl( m_panelStatistics, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY|wxTE_RIGHT );
     m_textCtrlCreate->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
     m_textCtrlCreate->SetBackgroundColour( wxColour( 208, 208, 208 ) );
     m_textCtrlCreate->SetToolTip( _("Number of files and directories that will be created") );
@@ -503,7 +503,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 
     fgSizer5->Add( m_bitmapUpdate, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
-    m_textCtrlUpdate = new wxTextCtrl( m_panelStatistics, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
+    m_textCtrlUpdate = new wxTextCtrl( m_panelStatistics, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY|wxTE_RIGHT );
     m_textCtrlUpdate->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
     m_textCtrlUpdate->SetBackgroundColour( wxColour( 208, 208, 208 ) );
     m_textCtrlUpdate->SetToolTip( _("Number of files that will be overwritten") );
@@ -522,7 +522,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 
     fgSizer6->Add( m_bitmapDelete, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_textCtrlDelete = new wxTextCtrl( m_panelStatistics, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
+    m_textCtrlDelete = new wxTextCtrl( m_panelStatistics, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY|wxTE_RIGHT );
     m_textCtrlDelete->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
     m_textCtrlDelete->SetBackgroundColour( wxColour( 208, 208, 208 ) );
     m_textCtrlDelete->SetToolTip( _("Number of files and directories that will be deleted") );
@@ -534,7 +534,7 @@ MainDialogGenerated::MainDialogGenerated( wxWindow* parent, wxWindowID id, const
 
     fgSizer6->Add( m_bitmapData, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
-    m_textCtrlData = new wxTextCtrl( m_panelStatistics, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
+    m_textCtrlData = new wxTextCtrl( m_panelStatistics, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY|wxTE_RIGHT );
     m_textCtrlData->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
     m_textCtrlData->SetBackgroundColour( wxColour( 208, 208, 208 ) );
     m_textCtrlData->SetToolTip( _("Total amount of data that will be transferred") );
@@ -3686,7 +3686,7 @@ SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID i
 
     fgSizer5->Add( m_bitmapCreate, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
-    m_textCtrlCreateL = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
+    m_textCtrlCreateL = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY|wxTE_RIGHT );
     m_textCtrlCreateL->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
     m_textCtrlCreateL->SetBackgroundColour( wxColour( 208, 208, 208 ) );
     m_textCtrlCreateL->SetToolTip( _("Number of files and directories that will be created") );
@@ -3698,7 +3698,7 @@ SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID i
 
     fgSizer5->Add( m_bitmapUpdate, 0, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
 
-    m_textCtrlUpdateL = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
+    m_textCtrlUpdateL = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY|wxTE_RIGHT );
     m_textCtrlUpdateL->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
     m_textCtrlUpdateL->SetBackgroundColour( wxColour( 208, 208, 208 ) );
     m_textCtrlUpdateL->SetToolTip( _("Number of files that will be overwritten") );
@@ -3710,7 +3710,7 @@ SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID i
 
     fgSizer5->Add( m_bitmapDelete, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_textCtrlDeleteL = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
+    m_textCtrlDeleteL = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY|wxTE_RIGHT );
     m_textCtrlDeleteL->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
     m_textCtrlDeleteL->SetBackgroundColour( wxColour( 208, 208, 208 ) );
     m_textCtrlDeleteL->SetToolTip( _("Number of files and directories that will be deleted") );
@@ -3730,21 +3730,21 @@ SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID i
 
     fgSizer51->Add( m_staticText95, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_textCtrlCreateR = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
+    m_textCtrlCreateR = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY|wxTE_RIGHT );
     m_textCtrlCreateR->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
     m_textCtrlCreateR->SetBackgroundColour( wxColour( 208, 208, 208 ) );
     m_textCtrlCreateR->SetToolTip( _("Number of files and directories that will be created") );
 
     fgSizer51->Add( m_textCtrlCreateR, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_textCtrlUpdateR = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
+    m_textCtrlUpdateR = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY|wxTE_RIGHT );
     m_textCtrlUpdateR->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
     m_textCtrlUpdateR->SetBackgroundColour( wxColour( 208, 208, 208 ) );
     m_textCtrlUpdateR->SetToolTip( _("Number of files that will be overwritten") );
 
     fgSizer51->Add( m_textCtrlUpdateR, 0, wxALIGN_CENTER_VERTICAL, 5 );
 
-    m_textCtrlDeleteR = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
+    m_textCtrlDeleteR = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY|wxTE_RIGHT );
     m_textCtrlDeleteR->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
     m_textCtrlDeleteR->SetBackgroundColour( wxColour( 208, 208, 208 ) );
     m_textCtrlDeleteR->SetToolTip( _("Number of files and directories that will be deleted") );
@@ -3769,7 +3769,7 @@ SyncPreviewDlgGenerated::SyncPreviewDlgGenerated( wxWindow* parent, wxWindowID i
 
     bSizer156->Add( 0, 0, 1, wxEXPAND, 5 );
 
-    m_textCtrlData = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_READONLY );
+    m_textCtrlData = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxTE_CENTRE|wxTE_READONLY );
     m_textCtrlData->SetFont( wxFont( 8, 70, 90, 90, false, wxEmptyString ) );
     m_textCtrlData->SetBackgroundColour( wxColour( 208, 208, 208 ) );
     m_textCtrlData->SetToolTip( _("Total amount of data that will be transferred") );

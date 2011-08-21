@@ -92,6 +92,7 @@
 			<Add library="libcomdlg32.a" />
 			<Add library="libws2_32.a" />
 			<Add library="libwinspool.a" />
+			<Add library="libmpr.a" />
 			<Add directory="C:\Program Files\C++\Boost\stage\lib" />
 		</Linker>
 		<Unit filename="WxWizDialog.fbp" />
@@ -122,7 +123,6 @@
 		<Unit filename="..\Shared\zstring.cpp" />
 		<Unit filename="..\Shared\zstring.h" />
 		<Unit filename="..\library\process_xml.cpp" />
-		<Unit filename="..\shared\check_exist.cpp" />
 		<Unit filename="..\shared\dir_watcher.cpp" />
 		<Unit filename="..\shared\dir_watcher.h" />
 		<Unit filename="..\shared\dll_loader.cpp" />
@@ -154,6 +154,7 @@
 		<Unit filename="..\shared\privilege.cpp" />
 		<Unit filename="..\shared\resolve_path.cpp" />
 		<Unit filename="..\shared\resolve_path.h" />
+		<Unit filename="..\shared\shell_execute.h" />
 		<Unit filename="..\shared\standard_paths.cpp" />
 		<Unit filename="..\shared\standard_paths.h" />
 		<Unit filename="..\shared\util.cpp" />

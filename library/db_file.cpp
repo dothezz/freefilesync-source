@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "db_file.h"
 #include <wx/wfstream.h>
 #include <wx/zstream.h>
@@ -305,7 +305,7 @@ std::pair<DirInfoPtr, DirInfoPtr> zen::loadFromDisk(const BaseDirMapping& baseMa
         !streamLeft ->second.get() ||
         !streamRight->second.get())
         throw FileErrorDatabaseNotExisting(_("Initial synchronization:") + " \n\n" +
-                                           _("No matching synchronization session found in database files:") + " \n" +
+                                           _("Database files do not share a common synchronization session:") + " \n" +
                                            "\"" + fileNameLeft  + "\"\n" +
                                            "\"" + fileNameRight + "\"");
     //read streams into DirInfo
@@ -342,29 +342,27 @@ private:
         writeNumberC<bool>(false); //mark last entry
     }
 
-    void processFile(const FileMapping& fileMap, const DirContainer* oldDirInfo)
+    void processFile(const FileMapping& fileMap, const DirContainer* oldParentDir)
     {
-        const Zstring shortName = fileMap.getObjShortName();
-
         if (fileMap.getCategory() == FILE_EQUAL) //data in sync: write current state
         {
             if (!fileMap.isEmpty<side>())
             {
                 writeNumberC<bool>(true); //mark beginning of entry
-                writeStringC(shortName);
+                writeStringC(fileMap.getShortName<side>()); //save respecting case! (Windows)
                 writeNumberC<boost::int64_t >(to<boost::int64_t>(fileMap.getLastWriteTime<side>())); //last modification time
                 writeNumberC<boost::uint64_t>(to<boost::uint64_t>(fileMap.getFileSize<side>())); //filesize
             }
         }
         else //not in sync: reuse last synchronous state
         {
-            if (oldDirInfo) //no data is also a "synchronous state"!
+            if (oldParentDir) //no data is also a "synchronous state"!
             {
-                DirContainer::FileList::const_iterator iter = oldDirInfo->files.find(shortName);
-                if (iter != oldDirInfo->files.end())
+                auto iter = oldParentDir->files.find(fileMap.getObjShortName());
+                if (iter != oldParentDir->files.end())
                 {
                     writeNumberC<bool>(true); //mark beginning of entry
-                    writeStringC(shortName);
+                    writeStringC(iter->first); //save respecting case! (Windows)
                     writeNumberC<boost::int64_t >(to<boost::int64_t>(iter->second.lastWriteTimeRaw)); //last modification time
                     writeNumberC<boost::uint64_t>(to<boost::uint64_t>(iter->second.fileSize)); //filesize
                 }
@@ -372,16 +370,14 @@ private:
         }
     }
 
-    void processLink(const SymLinkMapping& linkObj, const DirContainer* oldDirInfo)
+    void processLink(const SymLinkMapping& linkObj, const DirContainer* oldParentDir)
     {
-        const Zstring shortName = linkObj.getObjShortName();
-
-        if (linkObj.getCategory() == FILE_EQUAL) //data in sync: write current state
+        if (linkObj.getLinkCategory() == SYMLINK_EQUAL) //data in sync: write current state
         {
             if (!linkObj.isEmpty<side>())
             {
                 writeNumberC<bool>(true); //mark beginning of entry
-                writeStringC(shortName);
+                writeStringC(linkObj.getShortName<side>()); //save respecting case! (Windows)
                 writeNumberC<boost::int64_t>(to<boost::int64_t>(linkObj.getLastWriteTime<side>())); //last modification time
                 writeStringC(linkObj.getTargetPath<side>());
                 writeNumberC<boost::int32_t>(linkObj.getLinkType<side>());
@@ -389,13 +385,13 @@ private:
         }
         else //not in sync: reuse last synchronous state
         {
-            if (oldDirInfo) //no data is also a "synchronous state"!
+            if (oldParentDir) //no data is also a "synchronous state"!
             {
-                DirContainer::LinkList::const_iterator iter = oldDirInfo->links.find(shortName);
-                if (iter != oldDirInfo->links.end())
+                auto iter = oldParentDir->links.find(linkObj.getObjShortName());
+                if (iter != oldParentDir->links.end())
                 {
                     writeNumberC<bool>(true); //mark beginning of entry
-                    writeStringC(shortName);
+                    writeStringC(iter->first); //save respecting case! (Windows)
                     writeNumberC<boost::int64_t>(to<boost::int64_t>(iter->second.lastWriteTimeRaw)); //last modification time
                     writeStringC(iter->second.targetPath);
                     writeNumberC<boost::int32_t>(iter->second.type);
@@ -404,35 +400,62 @@ private:
         }
     }
 
-    void processDir(const DirMapping& dirMap, const DirContainer* oldDirInfo)
+    void processDir(const DirMapping& dirMap, const DirContainer* oldParentDir)
     {
-        const Zstring shortName = dirMap.getObjShortName();
-
-        const DirContainer* subDirInfo = NULL;
-        if (oldDirInfo) //no data is also a "synchronous state"!
+        const DirContainer* oldDir     = NULL;
+        const Zstring*      oldDirName = NULL;
+        if (oldParentDir) //no data is also a "synchronous state"!
         {
-            DirContainer::DirList::const_iterator iter = oldDirInfo->dirs.find(shortName);
-            if (iter != oldDirInfo->dirs.end())
-                subDirInfo = &iter->second;
+            auto iter = oldParentDir->dirs.find(dirMap.getObjShortName());
+            if (iter != oldParentDir->dirs.end())
+            {
+                oldDirName = &iter->first;
+                oldDir     = &iter->second;
+            }
         }
 
-        if (dirMap.getCategory() == FILE_EQUAL) //data in sync: write current state
+        CompareDirResult cat = dirMap.getDirCategory();
+
+        if (cat == DIR_EQUAL) //data in sync: write current state
         {
             if (!dirMap.isEmpty<side>())
             {
                 writeNumberC<bool>(true); //mark beginning of entry
-                writeStringC(shortName);
-                execute(dirMap, subDirInfo); //recurse
+                writeStringC(dirMap.getShortName<side>()); //save respecting case! (Windows)
+                execute(dirMap, oldDir); //recurse
             }
         }
         else //not in sync: reuse last synchronous state
         {
-            if (subDirInfo) //no data is also a "synchronous state"!
+            if (oldDir)
             {
-                writeNumberC<bool>(true); //mark beginning of entry
-                writeStringC(shortName);
+                writeNumberC<bool>(true);  //mark beginning of entry
+                writeStringC(*oldDirName); //save respecting case! (Windows)
+                execute(dirMap, oldDir); //recurse
+                return;
             }
-            execute(dirMap, subDirInfo); //recurse
+            //no data is also a "synchronous state"!
+
+            //else: not in sync AND no "last synchronous state"
+            //we cannot simply skip the whole directory, since sub-items might be in sync
+            //Example: directories on left and right differ in case while sub-files are equal
+            switch (cat)
+            {
+                case DIR_LEFT_SIDE_ONLY: //sub-items cannot be in sync
+                    break;
+                case DIR_RIGHT_SIDE_ONLY: //sub-items cannot be in sync
+                    break;
+                case DIR_EQUAL:
+                    assert(false);
+                    break;
+                case DIR_DIFFERENT_METADATA:
+                    writeNumberC<bool>(true);
+                    writeStringC(dirMap.getShortName<side>());
+                    //ATTENTION: strictly this is a violation of the principle of reporting last synchronous state!
+                    //however in this case this will result in "last sync unsuccessful" for this directory within <automatic> algorithm, which is fine
+                    execute(dirMap, oldDir); //recurse and save sub-items which are in sync
+                    break;
+            }
         }
     }
 };

@@ -2,10 +2,22 @@
 |FreeFileSync|
 --------------
 
+Changelog v3.20
+---------------
+Scan multiple directories in parallel
+Automatically resolve disconnected network maps
+Fixed temporal hang when dropping large files on main dialog
+<Automatic> mode: Fixed issue regarding directory names differing in case during first sync
+Delete permanently if recycle bin is not available (Linux)
+Keep FreeFileSync responsive when trying to access non-existent network folder
+Support for Ubuntu Unity Launcher (Linux)
+RealtimeSync: Failure notification if command line is invalid (Linux)
+
+
 Changelog v3.19
 ---------------
-Exclude directories from synchronization which cannot be accessed during comparison
-Warning if Recycle Bin is not available instead of deleting silently
+Exclude subdirectories from synchronization which cannot be accessed during comparison
+Warning if Recycle Bin is not available instead of deleting silently (Windows)
 Adapted log message if missing recycler leads to permanent deletion (Windows)
 Revert to per file recycle bin handling if creating temp recycler folder fails
 Avoid orphaned deletion temp directories on network drives

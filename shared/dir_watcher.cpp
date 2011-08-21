@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #include "dir_watcher.h"
 #include "last_error.h"
 #include "i18n.h"
@@ -32,23 +32,22 @@ using namespace zen;
 #ifdef FFS_WIN
 namespace
 {
-typedef Zbase<Zchar,   StorageDeepCopy> BasicString;  //thread safe string class for file names
-typedef Zbase<wchar_t, StorageDeepCopy> BasicWString; //thread safe string class for UI texts
+typedef Zbase<wchar_t> BasicWString; //thread safe string class for UI texts
 
 
 struct SharedData
 {
     boost::mutex lockAccess;
-    std::set<BasicString> changedFiles; //get rid of duplicate entries (actually occur!)
+    std::set<Zstring> changedFiles; //get rid of duplicate entries (actually occur!)
     BasicWString errorMsg; //non-empty if errors occured in thread
 };
 
 
-void addChanges(SharedData& shared, const char* buffer, DWORD bytesWritten, const BasicString& dirname) //throw ()
+void addChanges(SharedData& shared, const char* buffer, DWORD bytesWritten, const Zstring& dirname) //throw ()
 {
     boost::lock_guard<boost::mutex> dummy(shared.lockAccess);
 
-    std::set<BasicString>& output = shared.changedFiles;
+    std::set<Zstring>& output = shared.changedFiles;
 
     if (bytesWritten == 0) //according to docu this may happen in case of internal buffer overflow: report some "dummy" change
         output.insert(L"Overflow!");
@@ -59,14 +58,14 @@ void addChanges(SharedData& shared, const char* buffer, DWORD bytesWritten, cons
         {
             const FILE_NOTIFY_INFORMATION& notifyInfo = reinterpret_cast<const FILE_NOTIFY_INFORMATION&>(*bufPos);
 
-            const BasicString fullname = dirname + BasicString(notifyInfo.FileName, notifyInfo.FileNameLength / sizeof(WCHAR));
+            const Zstring fullname = dirname + Zstring(notifyInfo.FileName, notifyInfo.FileNameLength / sizeof(WCHAR));
 
             //skip modifications sent by changed directories: reason for change, child element creation/deletion, will notify separately!
             bool skip = false;
             if (notifyInfo.Action == FILE_ACTION_MODIFIED)
             {
                 //note: this check will not work if top watched directory has been renamed
-                const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(Zstring(fullname)).c_str());
+                const DWORD ret = ::GetFileAttributes(applyLongPathPrefix(fullname).c_str());
                 bool isDir = ret != INVALID_FILE_ATTRIBUTES && (ret & FILE_ATTRIBUTE_DIRECTORY); //returns true for (dir-)symlinks also
                 skip = isDir;
             }
@@ -90,9 +89,7 @@ void getChanges(SharedData& shared, std::vector<Zstring>& output) //throw FileEr
     if (!shared.errorMsg.empty())
         throw zen::FileError(shared.errorMsg.c_str());
 
-    std::transform(shared.changedFiles.begin(), shared.changedFiles.end(),
-    std::back_inserter(output), [](const BasicString& str) { return Zstring(str); });
-
+    output.assign(shared.changedFiles.begin(), shared.changedFiles.end());
     shared.changedFiles.clear();
 }
 
@@ -107,7 +104,7 @@ void reportError(SharedData& shared, const BasicWString& errorMsg) //throw ()
 class ReadChangesAsync
 {
 public:
-    ReadChangesAsync(const BasicString& directory, //make sure to not leak in thread-unsafe types!
+    ReadChangesAsync(const Zstring& directory, //make sure to not leak in thread-unsafe types!
                      const std::shared_ptr<SharedData>& shared) :
         shared_(shared),
         dirname(directory)
@@ -239,7 +236,7 @@ private:
     //shared between main and worker:
     std::shared_ptr<SharedData> shared_;
     //worker thread only:
-    BasicString dirname; //conceptually thread-only, but technically moved to thread-local storage on instance creation: -> must not use ref-copying!
+    Zstring dirname; //thread safe!
     HANDLE hDir;
 };
 
@@ -250,7 +247,7 @@ public:
     HandleVolumeRemoval(HANDLE hDir,
                         boost::thread& worker,
                         const std::shared_ptr<SharedData>& shared,
-                        const BasicString& dirname) :
+                        const Zstring& dirname) :
         NotifyRequestDeviceRemoval(hDir), //throw FileError
         worker_(worker),
         shared_(shared),
@@ -283,7 +280,7 @@ private:
 
     boost::thread& worker_;
     std::shared_ptr<SharedData> shared_;
-    BasicString dirname_;
+    Zstring dirname_;
     bool removalRequested;
     bool operationComplete;
 };
@@ -304,8 +301,8 @@ DirWatcher::DirWatcher(const Zstring& directory) : //throw FileError
 {
     pimpl_->shared = std::make_shared<SharedData>();
 
-    ReadChangesAsync reader(BasicString(directory), pimpl_->shared); //throw FileError
-    pimpl_->volRemoval.reset(new HandleVolumeRemoval(reader.getDirHandle(), pimpl_->worker, pimpl_->shared, BasicString(directory))); //throw FileError
+    ReadChangesAsync reader(directory, pimpl_->shared); //throw FileError
+    pimpl_->volRemoval.reset(new HandleVolumeRemoval(reader.getDirHandle(), pimpl_->worker, pimpl_->shared, directory)); //throw FileError
     pimpl_->worker = boost::thread(std::move(reader));
 }
 

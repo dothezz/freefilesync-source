@@ -7,6 +7,8 @@
 	<plural definition>0</plural definition>
 </header>
 
+<source>Searching for directory %x...</source>
+<target></target>
 <source>Show in Explorer</source>
 <target>エクスプローラで表示</target>
 <source>Open with default application</source>
@@ -17,8 +19,8 @@
 <target>リアルタイム同期 - 自動同期</target>
 <source>Browse</source>
 <target>参照</target>
-<source>Invalid commandline: "%x"</source>
-<target>無効なコマンドライン: "%x"</target>
+<source>Invalid commandline: %x</source>
+<target>無効なコマンドライン: %x</target>
 <source>Error resolving symbolic link:</source>
 <target>シンボリックリンクの解決に失敗:</target>
 <source>Show popup</source>
@@ -108,10 +110,10 @@
 <target>同期処理の初期化:</target>
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>FreeFileSync データベースファイルが存在しません:</target>
-<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
-<target>FreeFileSync データベースに、以下のファイルに関するエントリは存在しません:</target>
 <source>Error reading from synchronization database:</source>
 <target>同期データベースからの読み込みエラー:</target>
+<source>Database files do not share a common synchronization session:</source>
+<target></target>
 <source>An exception occurred!</source>
 <target>例外が発生しました!</target>
 <source>Error deleting file:</source>
@@ -133,6 +135,15 @@
 <target>情報</target>
 <source>Fatal Error</source>
 <target>致命的なエラー</target>
+<source>Scanning:</source>
+<target>スキャン:</target>
+<source>Encoding extended time information: %x</source>
+<target>拡張された時間情報のエンコーディング: %x</target>
+<source>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</source>
+<target></target>
 <source>Invalid FreeFileSync config file!</source>
 <target>無効な FreeFileSync 構成ファイルです!</target>
 <source>File does not exist:</source>
@@ -224,20 +235,18 @@ The command line is executed each time:
 <target>監視を開始します...</target>
 <source>Waiting for missing directories...</source>
 <target>見失ったディレクトリの待機中</target>
-<source>Could not initialize directory monitoring:</source>
-<target>監視するディレクトリを初期化できません:</target>
 <source>A directory input field is empty.</source>
 <target>ディレクトリが入力されていません</target>
-<source>Error when monitoring directories.</source>
-<target>ディレクトリの監視エラー</target>
 <source>Drag && drop</source>
 <target>ドラッグ && ドロップ</target>
+<source>Could not initialize directory monitoring:</source>
+<target>監視するディレクトリを初期化できません:</target>
+<source>Error when monitoring directories.</source>
+<target>ディレクトリの監視エラー</target>
 <source>Conversion error:</source>
 <target>変換エラー:</target>
 <source>Error moving file:</source>
 <target>ファイルの移動に失敗:</target>
-<source>Operation aborted!</source>
-<target>操作の中断!</target>
 <source>Target file already existing!</source>
 <target>対象ファイルは既に存在します!</target>
 <source>Error moving directory:</source>
@@ -268,6 +277,8 @@ The command line is executed each time:
 <target>ファイル書き込みエラー:</target>
 <source>Error reading file:</source>
 <target>ファイル読み込みエラー:</target>
+<source>Operation aborted!</source>
+<target>操作の中断!</target>
 <source>Endless loop when traversing directory:</source>
 <target>ディレクトリ移動中に無限ループが発生:</target>
 <source>Error traversing directory:</source>
@@ -408,24 +419,22 @@ The command line is executed each time:
 <target>同期を一括で自動的に実行するためのバッチファイルを作成します。実行は.BAT ファイルをダブルクリック、または次のコマンドラインを実行します: FreeFileSync.exe<batchfile>.BAT ファイルは、OS のタスクスケジューラで実行することも可能です</target>
 <source>Help</source>
 <target>ヘルプ</target>
-<source>Configuration overview:</source>
-<target>構成設定の概要:</target>
 <source>Filter files</source>
 <target>ファイルフィルター</target>
-<source>Status feedback</source>
-<target>状態 フィードバック</target>
-<source>Silent mode</source>
-<target>サイレントモード</target>
-<source>Start minimized and write status information to a logfile</source>
-<target>最小化状態で起動して、ステータス情報をログファイルに書き出す</target>
 <source>Error handling</source>
 <target>ハンドリングのエラー時:</target>
 <source>Overview</source>
 <target>概要</target>
-<source>Select logfile directory:</source>
-<target>ログファイルの保存先を選択:</target>
+<source>Status feedback</source>
+<target>状態 フィードバック</target>
+<source>Run minimized</source>
+<target></target>
 <source>Maximum number of logfiles:</source>
 <target>ログファイルの最大数:</target>
+<source>Select logfile directory:</source>
+<target>ログファイルの保存先を選択:</target>
+<source>Batch settings</source>
+<target></target>
 <source>&Save</source>
 <target>保存(&S)</target>
 <source>&Load</source>
@@ -690,10 +699,6 @@ Transfer file and directory permissions
 <target>フォルダ・ペア</target>
 <source>Select view</source>
 <target>表示選択</target>
-<source>Folder Comparison and Synchronization</source>
-<target>フォルダの比較と同期</target>
-<source>Recycle Bin not yet supported for this system!</source>
-<target>このシステムでは、ゴミ箱に対応していません!</target>
 <source>Set direction:</source>
 <target>方向の設定:</target>
 <source>Exclude temporarily</source>
@@ -728,6 +733,8 @@ Transfer file and directory permissions
 <target>現在の構成の変更を保存しますか?</target>
 <source>Configuration loaded!</source>
 <target>構成設定を読み込み中!</target>
+<source>Folder Comparison and Synchronization</source>
+<target>フォルダの比較と同期</target>
 <source>Hide files that exist on left side only</source>
 <target>左側のみに存在するファイルを非表示</target>
 <source>Show files that exist on left side only</source>
@@ -930,10 +937,6 @@ Transfer file and directory permissions
 <target>同期方向のデフォルト設定: 古いファイルに新しいファイルを上書き</target>
 <source>The file does not contain a valid configuration:</source>
 <target>このファイルには有効な構成が含まれていません:</target>
-<source>Scanning:</source>
-<target>スキャン:</target>
-<source>Encoding extended time information: %x</source>
-<target>拡張された時間情報のエンコーディング: %x</target>
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>ディレクトリが空と考慮する場合、このエラーは無視できます。</target>
 <source>Directory does not exist:</source>
@@ -1010,8 +1013,6 @@ Transfer file and directory permissions
 <target>%x の属性を更新</target>
 <source>Source directory does not exist anymore:</source>
 <target>ソースディレクトリが存在しません:</target>
-<source>Generating database...</source>
-<target>データベースを作成中...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>構成設定に対応する同期がみつかりません!</target>
 <source>Target directory name must not be empty!</source>
@@ -1032,10 +1033,14 @@ Transfer file and directory permissions
 <target>必要なディスク空き容量:</target>
 <source>Free disk space available:</source>
 <target>利用可能なディスク空き容量:</target>
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target></target>
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>複数ペアのディレクトリ設定部分に変更された箇所があります! 同期設定を再確認してみてください!</target>
 <source>Processing folder pair:</source>
 <target>フォルダペアを処理中:</target>
+<source>Generating database...</source>
+<target>データベースを作成中...</target>
 <source>Error copying locked file %x!</source>
 <target>コピーに失敗! ファイル%x はロックされています!</target>
 <source>Data verification error: Source and target file have different content!</source>

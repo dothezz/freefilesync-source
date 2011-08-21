@@ -3,7 +3,7 @@
 // * GNU General Public License: http://www.gnu.org/licenses/gpl.html       *
 // * Copyright (C) 2008-2011 ZenJu (zhnmju123 AT gmx.de)                    *
 // **************************************************************************
-//
+
 #ifndef FILE_HANDLING_H_INCLUDED
 #define FILE_HANDLING_H_INCLUDED
 
@@ -25,13 +25,15 @@ bool somethingExists(const Zstring& objname);  //throw()       check whether any
 
 //check whether two folders are located on the same (logical) volume
 //left and right directories NEED NOT yet exist! volume prefix is sufficient! path may end with PATH_SEPARATOR
-enum ResponseSameVol
+enum ResponseSame
 {
-    VOLUME_SAME,
-    VOLUME_DIFFERENT,
-    VOLUME_CANT_SAY
+    IS_SAME_YES,
+    IS_SAME_NO,
+    IS_SAME_CANT_SAY
 };
-ResponseSameVol onSameVolume(const Zstring& folderLeft, const Zstring& folderRight); //throw()
+ResponseSame onSameVolume(const Zstring& folderLeft, const Zstring& folderRight); //throw()
+
+void checkthis(const Zstring& folderLeft); //throw()
 
 //copy file or directory create/last change date,
 void copyFileTimes(const Zstring& sourceDir, const Zstring& targetDir, bool derefSymlinks); //throw (FileError)

@@ -7,6 +7,8 @@
 	<plural definition>n == 1 ? 0 : 1</plural definition>
 </header>
 
+<source>Searching for directory %x...</source>
+<target></target>
 <source>Show in Explorer</source>
 <target>Vis i Explorer</target>
 <source>Open with default application</source>
@@ -17,8 +19,8 @@
 <target>RealtimeSynk - Automatisk Synkronisering</target>
 <source>Browse</source>
 <target>Gennemse</target>
-<source>Invalid commandline: "%x"</source>
-<target>Ugyldig kommando: "%x"</target>
+<source>Invalid commandline: %x</source>
+<target>Ugyldig kommando: %x</target>
 <source>Error resolving symbolic link:</source>
 <target>Error resolving symbolic link:</target>
 <source>Show popup</source>
@@ -109,10 +111,10 @@
 <target>Indledende synkronisering:</target>
 <source>One of the FreeFileSync database files is not yet existing:</source>
 <target>En af FreeFileSync database filerne findes ikke endnu:</target>
-<source>One of the FreeFileSync database entries within the following file is not yet existing:</source>
-<target>En af FreeFileSync database posterne i den følgende fil findes ikke endnu:</target>
 <source>Error reading from synchronization database:</source>
 <target>Fejl i læsning fra synkroniserings databasen:</target>
+<source>Database files do not share a common synchronization session:</source>
+<target></target>
 <source>An exception occurred!</source>
 <target>En undtagelse er opstået!</target>
 <source>Error deleting file:</source>
@@ -135,6 +137,15 @@
 <target>Info</target>
 <source>Fatal Error</source>
 <target>Uoprettelig Fejl</target>
+<source>Scanning:</source>
+<target>Skanner:</target>
+<source>Encoding extended time information: %x</source>
+<target>Finder udvidet tids information: %x</target>
+<source>
+<pluralform>[1 Thread]</pluralform>
+<pluralform>[%x Threads]</pluralform>
+</source>
+<target></target>
 <source>Invalid FreeFileSync config file!</source>
 <target>Ugyldig FreeFileSync config fil!</target>
 <source>File does not exist:</source>
@@ -229,20 +240,18 @@ Kommando linjen bliver afviklet hver gang:
 <target>Overvågning aktiv...</target>
 <source>Waiting for missing directories...</source>
 <target>Venter på manglende biblioteker...</target>
-<source>Could not initialize directory monitoring:</source>
-<target>Kunne ikke initialiserer biblioteks overvågningen:</target>
 <source>A directory input field is empty.</source>
 <target>Et biblioteks felt er tomt.</target>
-<source>Error when monitoring directories.</source>
-<target>Fejl i overvågning af biblioteker.</target>
 <source>Drag && drop</source>
 <target>Træk && slip</target>
+<source>Could not initialize directory monitoring:</source>
+<target>Kunne ikke initialiserer biblioteks overvågningen:</target>
+<source>Error when monitoring directories.</source>
+<target>Fejl i overvågning af biblioteker.</target>
 <source>Conversion error:</source>
 <target>Konverterings fejl:</target>
 <source>Error moving file:</source>
 <target>Fejl i flytning af fil:</target>
-<source>Operation aborted!</source>
-<target>Operation afbrudt!</target>
 <source>Target file already existing!</source>
 <target>Filen findes i forvejen!</target>
 <source>Error moving directory:</source>
@@ -273,6 +282,8 @@ Kommando linjen bliver afviklet hver gang:
 <target>Fejl i at skrive fil:</target>
 <source>Error reading file:</source>
 <target>Fejl i læsning af fil:</target>
+<source>Operation aborted!</source>
+<target>Operation afbrudt!</target>
 <source>Endless loop when traversing directory:</source>
 <target>Uendelig løkke ved gennemgang af bibliotek:</target>
 <source>Error traversing directory:</source>
@@ -413,24 +424,22 @@ Kommando linjen bliver afviklet hver gang:
 <target>Opret en batch fil til automatisk synkronisering. For at starte i batch mode dobbelt-click på filen eller afvikle med kommandoen: FreeFileSync.exe <batchfil>. Dette kan også planlægges i dit systems opgavestyring.</target>
 <source>Help</source>
 <target>Hjælp</target>
-<source>Configuration overview:</source>
-<target>Overblik over konfiguration:</target>
 <source>Filter files</source>
 <target>Filter filer</target>
-<source>Status feedback</source>
-<target>Status feedback</target>
-<source>Silent mode</source>
-<target>Lydløs tilstand</target>
-<source>Start minimized and write status information to a logfile</source>
-<target>Start minimeret og skriv status information til en log fil</target>
 <source>Error handling</source>
 <target>Fejl håndtering</target>
 <source>Overview</source>
 <target>Overblik</target>
-<source>Select logfile directory:</source>
-<target>Vælg log fil bibliotek:</target>
+<source>Status feedback</source>
+<target>Status feedback</target>
+<source>Run minimized</source>
+<target></target>
 <source>Maximum number of logfiles:</source>
 <target>Maksimalt antal log filer:</target>
+<source>Select logfile directory:</source>
+<target>Vælg log fil bibliotek:</target>
+<source>Batch settings</source>
+<target></target>
 <source>&Save</source>
 <target>&Gem</target>
 <source>&Load</source>
@@ -695,10 +704,6 @@ Overfør fil og biblioteks tilladelser
 <target>Mappe par</target>
 <source>Select view</source>
 <target>Vælg udseende</target>
-<source>Folder Comparison and Synchronization</source>
-<target>Mappe sammenligning og synkronisering</target>
-<source>Recycle Bin not yet supported for this system!</source>
-<target>Skraldespanden er ikke understøttet for dette system endnu!</target>
 <source>Set direction:</source>
 <target>Sæt handlevejen:</target>
 <source>Exclude temporarily</source>
@@ -733,6 +738,8 @@ Overfør fil og biblioteks tilladelser
 <target>Gem ændringer til nuværende konfiguration?</target>
 <source>Configuration loaded!</source>
 <target>Konfiguration hentet!</target>
+<source>Folder Comparison and Synchronization</source>
+<target>Mappe sammenligning og synkronisering</target>
 <source>Hide files that exist on left side only</source>
 <target>Skjul filder der kun findes på venstre side</target>
 <source>Show files that exist on left side only</source>
@@ -941,10 +948,6 @@ Overfør fil og biblioteks tilladelser
 <target>Sætter standard synkroniseringsvej: Gamle filer bliver overskrevet med nyere.</target>
 <source>The file does not contain a valid configuration:</source>
 <target>Filen indeholder ikke en gyldig konfiguration:</target>
-<source>Scanning:</source>
-<target>Skanner:</target>
-<source>Encoding extended time information: %x</source>
-<target>Finder udvidet tids information: %x</target>
 <source>You can ignore this error to consider the directory as empty.</source>
 <target>Du kan ignorer denne fejl, og opfatte biblioteket som tomt.</target>
 <source>Directory does not exist:</source>
@@ -1021,8 +1024,6 @@ Overfør fil og biblioteks tilladelser
 <target>Opdaterer attributter af %x</target>
 <source>Source directory does not exist anymore:</source>
 <target>Kilde biblioteket findes ikke mere:</target>
-<source>Generating database...</source>
-<target>Opretter database...</target>
 <source>Nothing to synchronize according to configuration!</source>
 <target>Intet at synkroniserer ifølge dokumentationen!</target>
 <source>Target directory name must not be empty!</source>
@@ -1043,10 +1044,14 @@ Overfør fil og biblioteks tilladelser
 <target>Krævet ledig diskplads:</target>
 <source>Free disk space available:</source>
 <target>Ledig diskplads tilgængelig:</target>
+<source>Recycle Bin is not available for the following paths! Files will be deleted permanently instead:</source>
+<target></target>
 <source>A directory will be modified which is part of multiple folder pairs! Please review synchronization settings!</source>
 <target>Et bibliotek vil blive ændret som er en del af et mappe par! Gennemse venligst synkroniserings indstillingerne!</target>
 <source>Processing folder pair:</source>
 <target>Behandler mappe par:</target>
+<source>Generating database...</source>
+<target>Opretter database...</target>
 <source>Error copying locked file %x!</source>
 <target>Fejl i kopiering af låst fil %x!</target>
 <source>Data verification error: Source and target file have different content!</source>
